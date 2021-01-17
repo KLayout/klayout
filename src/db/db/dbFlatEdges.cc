@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ namespace db
 //  FlatEdges implementation
 
 FlatEdges::FlatEdges ()
-  : AsIfFlatEdges (), m_edges (false), m_merged_edges (false)
+  : AsIfFlatEdges (), mp_edges (new db::Shapes (false)), mp_merged_edges (new db::Shapes (false))
 {
   init ();
 }
@@ -44,18 +44,16 @@ FlatEdges::~FlatEdges ()
 }
 
 FlatEdges::FlatEdges (const FlatEdges &other)
-  : AsIfFlatEdges (other), m_edges (false), m_merged_edges (false)
+  : AsIfFlatEdges (other), mp_edges (other.mp_edges), mp_merged_edges (other.mp_merged_edges)
 {
   init ();
 
   m_is_merged = other.m_is_merged;
-  m_edges = other.m_edges;
-  m_merged_edges = other.m_merged_edges;
   m_merged_edges_valid = other.m_merged_edges_valid;
 }
 
 FlatEdges::FlatEdges (const db::Shapes &edges, bool is_merged)
-  : AsIfFlatEdges (), m_edges (edges), m_merged_edges (false)
+  : AsIfFlatEdges (), mp_edges (new db::Shapes (edges)), mp_merged_edges (new db::Shapes (false))
 {
   init ();
 
@@ -63,7 +61,7 @@ FlatEdges::FlatEdges (const db::Shapes &edges, bool is_merged)
 }
 
 FlatEdges::FlatEdges (bool is_merged)
-  : AsIfFlatEdges (), m_edges (false), m_merged_edges (false)
+  : AsIfFlatEdges (), mp_edges (new db::Shapes (false)), mp_merged_edges (new db::Shapes (false))
 {
   init ();
 
@@ -78,7 +76,7 @@ void FlatEdges::set_is_merged (bool m)
 void FlatEdges::invalidate_cache ()
 {
   invalidate_bbox ();
-  m_merged_edges.clear ();
+  mp_merged_edges->clear ();
   m_merged_edges_valid = false;
 }
 
@@ -90,18 +88,18 @@ void FlatEdges::init ()
 
 void FlatEdges::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
-  layout->cell (into_cell).shapes (into_layer).insert (m_edges);
+  layout->cell (into_cell).shapes (into_layer).insert (*mp_edges);
 }
 
 void FlatEdges::merged_semantics_changed ()
 {
-  m_merged_edges.clear ();
+  mp_merged_edges->clear ();
   m_merged_edges_valid = false;
 }
 
 void FlatEdges::reserve (size_t n)
 {
-  m_edges.reserve (db::Edge::tag (), n);
+  mp_edges->reserve (db::Edge::tag (), n);
 }
 
 void
@@ -109,13 +107,13 @@ FlatEdges::ensure_merged_edges_valid () const
 {
   if (! m_merged_edges_valid) {
 
-    m_merged_edges.clear ();
+    mp_merged_edges->clear ();
 
     db::Shapes tmp (false);
     EdgeBooleanClusterCollectorToShapes cluster_collector (&tmp, EdgeOr);
 
     db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
-    scanner.reserve (m_edges.size ());
+    scanner.reserve (mp_edges->size ());
 
     for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
       if (! e->is_degenerate ()) {
@@ -125,7 +123,7 @@ FlatEdges::ensure_merged_edges_valid () const
 
     scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
 
-    m_merged_edges.swap (tmp);
+    mp_merged_edges->swap (tmp);
     m_merged_edges_valid = true;
 
   }
@@ -133,7 +131,7 @@ FlatEdges::ensure_merged_edges_valid () const
 
 EdgesIteratorDelegate *FlatEdges::begin () const
 {
-  return new FlatEdgesIterator (m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().begin (), m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ());
+  return new FlatEdgesIterator (mp_edges.get_const ());
 }
 
 EdgesIteratorDelegate *FlatEdges::begin_merged () const
@@ -142,13 +140,13 @@ EdgesIteratorDelegate *FlatEdges::begin_merged () const
     return begin ();
   } else {
     ensure_merged_edges_valid ();
-    return new FlatEdgesIterator (m_merged_edges.get_layer<db::Edge, db::unstable_layer_tag> ().begin (), m_merged_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ());
+    return new FlatEdgesIterator (mp_merged_edges.get_const ());
   }
 }
 
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans> FlatEdges::begin_iter () const
 {
-  return std::make_pair (db::RecursiveShapeIterator (m_edges), db::ICplxTrans ());
+  return std::make_pair (db::RecursiveShapeIterator (*mp_edges), db::ICplxTrans ());
 }
 
 std::pair<db::RecursiveShapeIterator, db::ICplxTrans> FlatEdges::begin_merged_iter () const
@@ -157,18 +155,23 @@ std::pair<db::RecursiveShapeIterator, db::ICplxTrans> FlatEdges::begin_merged_it
     return begin_iter ();
   } else {
     ensure_merged_edges_valid ();
-    return std::make_pair (db::RecursiveShapeIterator (m_merged_edges), db::ICplxTrans ());
+    return std::make_pair (db::RecursiveShapeIterator (*mp_merged_edges), db::ICplxTrans ());
   }
 }
 
 bool FlatEdges::empty () const
 {
-  return m_edges.empty ();
+  return mp_edges->empty ();
 }
 
-size_t FlatEdges::size () const
+size_t FlatEdges::count () const
 {
-  return m_edges.size ();
+  return mp_edges->size ();
+}
+
+size_t FlatEdges::hier_count () const
+{
+  return mp_edges->size ();
 }
 
 bool FlatEdges::is_merged () const
@@ -178,8 +181,8 @@ bool FlatEdges::is_merged () const
 
 Box FlatEdges::compute_bbox () const
 {
-  m_edges.update_bbox ();
-  return m_edges.bbox ();
+  mp_edges->update_bbox ();
+  return mp_edges->bbox ();
 }
 
 EdgesDelegate *
@@ -187,25 +190,27 @@ FlatEdges::processed_in_place (const EdgeProcessorBase &filter)
 {
   std::vector<db::Edge> edge_res;
 
-  edge_iterator_type pw = m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().begin ();
+  db::Shapes &e = *mp_edges;
+
+  edge_iterator_type pw = e.get_layer<db::Edge, db::unstable_layer_tag> ().begin ();
   for (EdgesIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
 
     edge_res.clear ();
     filter.process (*p, edge_res);
 
     for (std::vector<db::Edge>::const_iterator pr = edge_res.begin (); pr != edge_res.end (); ++pr) {
-      if (pw == m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ()) {
-        m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().insert (*pr);
-        pw = m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ();
+      if (pw == e.get_layer<db::Edge, db::unstable_layer_tag> ().end ()) {
+        e.get_layer<db::Edge, db::unstable_layer_tag> ().insert (*pr);
+        pw = e.get_layer<db::Edge, db::unstable_layer_tag> ().end ();
       } else {
-        m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().replace (pw++, *pr);
+        e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (pw++, *pr);
       }
     }
 
   }
 
-  m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().erase (pw, m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ());
-  m_merged_edges.clear ();
+  e.get_layer<db::Edge, db::unstable_layer_tag> ().erase (pw, e.get_layer<db::Edge, db::unstable_layer_tag> ().end ());
+  mp_merged_edges->clear ();
   m_is_merged = filter.result_is_merged () && merged_semantics ();
 
   return this;
@@ -214,20 +219,22 @@ FlatEdges::processed_in_place (const EdgeProcessorBase &filter)
 EdgesDelegate *
 FlatEdges::filter_in_place (const EdgeFilterBase &filter)
 {
-  edge_iterator_type pw = m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().begin ();
+  db::Shapes &e = *mp_edges;
+
+  edge_iterator_type pw = e.get_layer<db::Edge, db::unstable_layer_tag> ().begin ();
   for (EdgesIterator p (begin_merged ()); ! p.at_end (); ++p) {
     if (filter.selected (*p)) {
-      if (pw == m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ()) {
-        m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().insert (*p);
-        pw = m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ();
+      if (pw == e.get_layer<db::Edge, db::unstable_layer_tag> ().end ()) {
+        e.get_layer<db::Edge, db::unstable_layer_tag> ().insert (*p);
+        pw = e.get_layer<db::Edge, db::unstable_layer_tag> ().end ();
       } else {
-        m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().replace (pw++, *p);
+        e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (pw++, *p);
       }
     }
   }
 
-  m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().erase (pw, m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ());
-  m_merged_edges.clear ();
+  e.get_layer<db::Edge, db::unstable_layer_tag> ().erase (pw, e.get_layer<db::Edge, db::unstable_layer_tag> ().end ());
+  mp_merged_edges->clear ();
   m_is_merged = merged_semantics ();
 
   return this;
@@ -267,22 +274,24 @@ EdgesDelegate *FlatEdges::add_in_place (const Edges &other)
   invalidate_cache ();
   m_is_merged = false;
 
+  db::Shapes &e = *mp_edges;
+
   FlatEdges *other_flat = dynamic_cast<FlatEdges *> (other.delegate ());
   if (other_flat) {
 
-    m_edges.insert (other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().begin (), other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().end ());
+    e.insert (other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().begin (), other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().end ());
 
   } else {
 
-    size_t n = m_edges.size ();
+    size_t n = e.size ();
     for (EdgesIterator p (other.begin ()); ! p.at_end (); ++p) {
       ++n;
     }
 
-    m_edges.reserve (db::Edge::tag (), n);
+    e.reserve (db::Edge::tag (), n);
 
     for (EdgesIterator p (other.begin ()); ! p.at_end (); ++p) {
-      m_edges.insert (*p);
+      e.insert (*p);
     }
 
   }
@@ -292,7 +301,7 @@ EdgesDelegate *FlatEdges::add_in_place (const Edges &other)
 
 const db::Edge *FlatEdges::nth (size_t n) const
 {
-  return n < m_edges.size () ? &m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().begin () [n] : 0;
+  return n < mp_edges->size () ? &mp_edges->get_layer<db::Edge, db::unstable_layer_tag> ().begin () [n] : 0;
 }
 
 bool FlatEdges::has_valid_edges () const
@@ -317,10 +326,11 @@ FlatEdges::insert (const db::Box &box)
 
     bool was_empty = empty ();
 
-    m_edges.insert (db::Edge (box.lower_left (), box.upper_left ()));
-    m_edges.insert (db::Edge (box.upper_left (), box.upper_right ()));
-    m_edges.insert (db::Edge (box.upper_right (), box.lower_right ()));
-    m_edges.insert (db::Edge (box.lower_right (), box.lower_left ()));
+    db::Shapes &e = *mp_edges;
+    e.insert (db::Edge (box.lower_left (), box.upper_left ()));
+    e.insert (db::Edge (box.upper_left (), box.upper_right ()));
+    e.insert (db::Edge (box.upper_right (), box.lower_right ()));
+    e.insert (db::Edge (box.lower_right (), box.lower_left ()));
 
     if (was_empty) {
 
@@ -349,8 +359,9 @@ void
 FlatEdges::insert (const db::Polygon &polygon)
 {
   if (polygon.holes () > 0 || polygon.vertices () > 0) {
+    db::Shapes &edges = *mp_edges;
     for (db::Polygon::polygon_edge_iterator e = polygon.begin_edge (); ! e.at_end (); ++e) {
-      m_edges.insert (*e);
+      edges.insert (*e);
     }
     m_is_merged = false;
     invalidate_cache ();
@@ -361,8 +372,9 @@ void
 FlatEdges::insert (const db::SimplePolygon &polygon)
 {
   if (polygon.vertices () > 0) {
+    db::Shapes &edges = *mp_edges;
     for (db::SimplePolygon::polygon_edge_iterator e = polygon.begin_edge (); ! e.at_end (); ++e) {
-      m_edges.insert (*e);
+      edges.insert (*e);
     }
     m_is_merged = false;
     invalidate_cache ();
@@ -376,7 +388,7 @@ FlatEdges::insert (const db::Edge &edge)
     m_is_merged = false;
   }
 
-  m_edges.insert (edge);
+  mp_edges->insert (edge);
   invalidate_cache ();
 }
 

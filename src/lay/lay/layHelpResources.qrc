@@ -38,6 +38,7 @@
         <file alias="technology_manager.xml">doc/about/technology_manager.xml</file>
         <file alias="custom_queries.xml">doc/about/custom_queries.xml</file>
         <file alias="drc_ref.xml">doc/about/drc_ref.xml</file>
+        <file alias="drc_ref_drc.xml">doc/about/drc_ref_drc.xml</file>
         <file alias="drc_ref_layer.xml">doc/about/drc_ref_layer.xml</file>
         <file alias="drc_ref_source.xml">doc/about/drc_ref_source.xml</file>
         <file alias="drc_ref_global.xml">doc/about/drc_ref_global.xml</file>

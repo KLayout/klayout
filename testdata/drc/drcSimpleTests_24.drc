@@ -1,0 +1,29 @@
+
+# shielded/transparent
+
+source($drc_test_source, "TOP")
+target($drc_test_target)
+
+a = input(1, 0)
+b = input(2, 0)
+
+a.output(1, 0)
+b.output(2, 0)
+
+a.covering(b).output(100, 0)
+a.covering(b, 1..1).output(101, 0)
+a.covering(b, 2..2).output(102, 0)
+a.covering(b, 3..3).output(103, 0)
+b.inside(a).output(110, 0)
+
+deep
+
+a = input(1, 0)
+b = input(2, 0)
+
+a.covering(b).output(200, 0)
+a.covering(b, 1..1).output(201, 0)
+a.covering(b, 2..2).output(202, 0)
+a.covering(b, 3..3).output(203, 0)
+b.inside(a).output(210, 0)
+

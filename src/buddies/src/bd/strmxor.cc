@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -636,7 +636,7 @@ bool run_deep_xor (const XORData &xor_data)
           result.layer_output = result.layout->insert_layer (lp);
           xor_res.insert_into (xor_data.output_layout, xor_data.output_cell, result.layer_output);
         } else {
-          result.shape_count = xor_res.size ();
+          result.shape_count = xor_res.count ();
         }
 
         ++tol_index;

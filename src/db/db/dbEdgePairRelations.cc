@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ db::Edge::distance_type edge_projection (const db::Edge &a, const db::Edge &b)
  *  This function applies Euclidian metrics.
  *  If no such part is found, this function returns false.
  */
-bool euclidian_near_part_of_edge (bool include_zero, db::Coord d, const db::Edge &e, const db::Edge &other, db::Edge *output)
+bool euclidian_near_part_of_edge (bool include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &other, db::Edge *output)
 {
   //  Handle the case of point-like basic edge: cannot determine
   //  orientation
@@ -119,7 +119,7 @@ bool euclidian_near_part_of_edge (bool include_zero, db::Coord d, const db::Edge
 
   //  handle the parallel case
   if (e.parallel (g)) {
-    if (std::abs (e.distance (g.p1 ())) >= d) {
+    if (std::abs (double (e.distance (g.p1 ()))) >= double (d)) {
       return false;
     }
   } else {
@@ -197,7 +197,7 @@ bool euclidian_near_part_of_edge (bool include_zero, db::Coord d, const db::Edge
  *  This function applies Square metrics.
  *  If no such part is found, this function returns false.
  */
-static bool var_near_part_of_edge (bool include_zero, db::Coord d, db::Coord dd, const db::Edge &e, const db::Edge &other, db::Edge *output)
+static bool var_near_part_of_edge (bool include_zero, db::coord_traits<db::Coord>::distance_type d, db::coord_traits<db::Coord>::distance_type dd, const db::Edge &e, const db::Edge &other, db::Edge *output)
 {
   //  Handle the case of point-like basic edge: cannot determine
   //  orientation
@@ -229,14 +229,14 @@ static bool var_near_part_of_edge (bool include_zero, db::Coord d, db::Coord dd,
   //  Handle the case of point vs. edge
 
   if (g.is_degenerate ()) {
-    db::Coord gd = e.distance (g.p1 ());
-    if (gd <= -d || gd >= 0) {
+    double gd = double (e.distance (g.p1 ()));
+    if (gd <= -double (d) || gd >= 0) {
       return false;
     }
-    if (db::sprod (db::Vector (g.p1 () - e.p1 ()), e.d ()) < -dd * e.double_length ()) {
+    if (db::sprod (db::Vector (g.p1 () - e.p1 ()), e.d ()) < -(dd * e.double_length ())) {
       return false;
     }
-    if (db::sprod (db::Vector (e.p2 () - g.p1 ()), e.d ()) < -dd * e.double_length ()) {
+    if (db::sprod (db::Vector (e.p2 () - g.p1 ()), e.d ()) < -(dd * e.double_length ())) {
       return false;
     }
     if (output) {
@@ -255,7 +255,7 @@ static bool var_near_part_of_edge (bool include_zero, db::Coord d, db::Coord dd,
 
   //  handle the parallel case
   if (e.parallel (g)) {
-    if (std::abs (e.distance (g.p1 ())) >= d) {
+    if (std::abs (double (e.distance (g.p1 ()))) >= double (d)) {
       return false;
     }
   } else {
@@ -275,8 +275,8 @@ static bool var_near_part_of_edge (bool include_zero, db::Coord d, db::Coord dd,
   }
 
   if (db::sprod_sign (e, g) == 0) {
-    if (db::sprod (db::Vector (g.p1 () - e.p1 ()), e.d ()) < -dd * e.double_length () || 
-        db::sprod (db::Vector (e.p2 () - g.p1 ()), e.d ()) < -dd * e.double_length ()) {
+    if (db::sprod (db::Vector (g.p1 () - e.p1 ()), e.d ()) < -(dd * e.double_length ()) ||
+        db::sprod (db::Vector (e.p2 () - g.p1 ()), e.d ()) < -(dd * e.double_length ())) {
       return false;
     }
   } else {
@@ -314,7 +314,7 @@ static bool var_near_part_of_edge (bool include_zero, db::Coord d, db::Coord dd,
  *  This function applies Projected metrics.
  *  If no such part is found, this function returns false.
  */
-bool projected_near_part_of_edge (bool include_zero, db::Coord d, const db::Edge &e, const db::Edge &other, db::Edge *output)
+bool projected_near_part_of_edge (bool include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &other, db::Edge *output)
 {
   return var_near_part_of_edge (include_zero, d, 0, e, other, output);
 }
@@ -325,7 +325,7 @@ bool projected_near_part_of_edge (bool include_zero, db::Coord d, const db::Edge
  *  This function applies Square metrics.
  *  If no such part is found, this function returns false.
  */
-bool square_near_part_of_edge (bool include_zero, db::Coord d, const db::Edge &e, const db::Edge &other, db::Edge *output)
+bool square_near_part_of_edge (bool include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &other, db::Edge *output)
 {
   return var_near_part_of_edge (include_zero, d, d, e, other, output);
 }

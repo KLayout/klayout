@@ -1,0 +1,25 @@
+
+# shielded/transparent
+
+source($drc_test_source, "TOP")
+target($drc_test_target)
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+l1.separation(l2, 3.0, projection).output(100, 0)
+l1.separation(l2, 3.0, not_opposite, projection).output(110, 0)
+l1.separation(l2, 3.0, only_opposite, projection).output(111, 0)
+
+deep
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.separation(l2, 3.0, projection).output(200, 0)
+l1.separation(l2, 3.0, not_opposite, projection).output(210, 0)
+l1.separation(l2, 3.0, only_opposite, projection).output(211, 0)
+

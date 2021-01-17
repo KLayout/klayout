@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "tlExpression.h"
 #include "tlFileUtils.h"
 #include "tlStream.h"
+#include "tlEnv.h"
 
 #include "rba.h"
 #include "rbaInspector.h"
@@ -77,73 +78,90 @@ namespace rba
 // -------------------------------------------------------------------
 //  RubyStackTraceProvider definition and implementation
 
-class RBA_PUBLIC RubyStackTraceProvider
-  : public gsi::StackTraceProvider
+RubyStackTraceProvider::RubyStackTraceProvider (const std::string &scope)
+  : m_scope (scope)
+{ }
+
+std::vector<tl::BacktraceElement>
+RubyStackTraceProvider::stack_trace () const
 {
-public:
-  RubyStackTraceProvider (const std::string &scope)
-    : m_scope (scope) 
-  { }
+  std::vector<tl::BacktraceElement> bt;
+  bt.push_back (tl::BacktraceElement (rb_sourcefile (), rb_sourceline ()));
+  static ID id_caller = rb_intern ("caller");
+  rba_get_backtrace_from_array (rb_funcall (rb_mKernel, id_caller, 0), bt, 0);
+  return bt;
+}
 
-  virtual std::vector<tl::BacktraceElement> stack_trace () const 
-  {
-    std::vector<tl::BacktraceElement> bt;
-    bt.push_back (tl::BacktraceElement (rb_sourcefile (), rb_sourceline ()));
-    static ID id_caller = rb_intern ("caller");
-    rba_get_backtrace_from_array (rb_funcall (rb_mKernel, id_caller, 0), bt, 0);
-    return bt;
+size_t
+RubyStackTraceProvider::scope_index () const
+{
+  if (! m_scope.empty ()) {
+    return RubyStackTraceProvider::scope_index (stack_trace (), m_scope);
+  } else {
+    return 0;
   }
+}
 
-  virtual size_t scope_index () const
-  {
-    if (! m_scope.empty ()) {
-      std::vector<tl::BacktraceElement> bt = stack_trace ();
-      for (size_t i = 0; i < bt.size (); ++i) {
-        if (bt[i].file == m_scope) {
-          return i;
-        }
+size_t
+RubyStackTraceProvider::scope_index (const std::vector<tl::BacktraceElement> &bt, const std::string &scope)
+{
+  if (! scope.empty ()) {
+
+    static int consider_scope = -1;
+
+    //  disable scoped debugging (e.g. DRC script lines) if $KLAYOUT_RBA_DEBUG_SCOPE is set.
+    if (consider_scope < 0) {
+      consider_scope = tl::has_env ("KLAYOUT_RBA_DEBUG_SCOPE") ? 0 : 1;
+    }
+    if (! consider_scope) {
+      return 0;
+    }
+
+    for (size_t i = 0; i < bt.size (); ++i) {
+      if (bt[i].file == scope) {
+        return i;
       }
     }
-    return 0;
   }
+  return 0;
+}
 
-  virtual int stack_depth () const
-  {
-    //  NOTE: this implementation will provide an "internal stack depth".
-    //  It's not exactly the same than the length of the stack_trace vector length.
-    //  But the purpose is a relative compare, so efficiency is not sacrificed here
-    //  for unnecessary consistency.
-    int d = 1;
-    static ID id_caller = rb_intern ("caller");
-    VALUE backtrace = rb_funcall (rb_mKernel, id_caller, 0);
-    if (TYPE (backtrace) == T_ARRAY) {
-      d += RARRAY_LEN(backtrace);
-    }
-    return d;
+int
+RubyStackTraceProvider::stack_depth () const
+{
+  //  NOTE: this implementation will provide an "internal stack depth".
+  //  It's not exactly the same than the length of the stack_trace vector length.
+  //  But the purpose is a relative compare, so efficiency is not sacrificed here
+  //  for unnecessary consistency.
+  int d = 1;
+  static ID id_caller = rb_intern ("caller");
+  VALUE backtrace = rb_funcall (rb_mKernel, id_caller, 0);
+  if (TYPE (backtrace) == T_ARRAY) {
+    d += RARRAY_LEN(backtrace);
   }
+  return d;
+}
 
-  //  we could use this for ruby >= 1.9.3
+//  we could use this for ruby >= 1.9.3
 #if 0
-  static int
-  count_stack_levels(void *arg, VALUE file, int line, VALUE method)
-  {
-    *(int *)arg += 1;
-    return 0;
-  }
+static int
+RubyStackTraceProvider::count_stack_levels(void *arg, VALUE file, int line, VALUE method)
+{
+  *(int *)arg += 1;
+  return 0;
+}
 
-  extern "C" int rb_backtrace_each (int (*iter)(void *arg, VALUE file, int line, VALUE method), void *arg);
+extern "C" int
+RubyStackTraceProvider::rb_backtrace_each (int (*iter)(void *arg, VALUE file, int line, VALUE method), void *arg);
 
-  virutal int stack_depth ()
-  {
-    int l = 0;
-    rb_backtrace_each(count_stack_levels, &l);
-    return l;
-  }
+virtual int
+RubyStackTraceProvider::stack_depth ()
+{
+  int l = 0;
+  rb_backtrace_each(count_stack_levels, &l);
+  return l;
+}
 #endif
-
-private:
-  const std::string &m_scope;
-};
 
 // -------------------------------------------------------------------
 //  The lookup table for the method overload resolution
@@ -1025,7 +1043,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
         ret = rba_funcall2_checked (self, id_to_enum, argc + 1, new_args.begin ().operator-> ());
 #else
 	VALUE new_args[16];
-	tl_assert (argc + 1 <= sizeof(new_args) / sizeof(new_args[0]));
+	tl_assert (argc + 1 <= int (sizeof(new_args) / sizeof(new_args[0])));
 	VALUE *a = &new_args[0];
 	*a++ = method_sym;
 	for (int i = 0; i < argc; ++i) {

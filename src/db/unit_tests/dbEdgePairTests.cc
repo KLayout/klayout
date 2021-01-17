@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,7 +23,11 @@
 
 
 #include "dbEdgePair.h"
+#include "dbHash.h"
 #include "tlUnitTest.h"
+
+#include <set>
+#include <unordered_set>
 
 TEST(1) 
 {
@@ -147,3 +151,56 @@ TEST(2)
   EXPECT_EQ (ep.normalized ().to_polygon (1).to_string (), "(1,-1;-1,19;-1,31;1,11)");
 }
 
+TEST(3_symmetric)
+{
+  db::Edge e1 (db::Point (0, 0), db::Point (0, 100));
+  db::Edge e2 (db::Point (200, 100), db::Point (200, 0));
+
+  EXPECT_EQ (db::EdgePair (e1, e2, false) == db::EdgePair (e1, e2, false), true);
+  EXPECT_EQ (db::EdgePair (e1, e2, false) == db::EdgePair (e2, e1, false), false);
+  EXPECT_EQ (db::EdgePair (e1, e2, true) == db::EdgePair (e1, e2, false), false);
+  EXPECT_EQ (db::EdgePair (e1, e2, true) == db::EdgePair (e1, e2, true), true);
+  EXPECT_EQ (db::EdgePair (e1, e2, true) == db::EdgePair (e2, e1, true), true);
+
+  EXPECT_EQ (db::EdgePair (e1, e2, false) < db::EdgePair (e1, e2, false), false);
+  EXPECT_EQ (db::EdgePair (e1, e2, false) < db::EdgePair (e2, e1, false), true);
+  EXPECT_EQ (db::EdgePair (e2, e1, false) < db::EdgePair (e2, e1, false), false);
+  EXPECT_EQ (db::EdgePair (e1, e2, false) < db::EdgePair (e1, e2, true), true);
+  EXPECT_EQ (db::EdgePair (e1, e2, true) < db::EdgePair (e1, e2, false), false);
+  EXPECT_EQ (db::EdgePair (e1, e2, true) < db::EdgePair (e1, e2, true), false);
+  EXPECT_EQ (db::EdgePair (e1, e2, true) < db::EdgePair (e2, e1, true), false);
+
+  std::set<db::EdgePair> es;
+
+  es.clear ();
+  es.insert (db::EdgePair (e1, e2, false));
+  es.insert (db::EdgePair (e1, e2, true));
+  EXPECT_EQ (int (es.size ()), 2);
+
+  es.clear ();
+  es.insert (db::EdgePair (e1, e2, false));
+  es.insert (db::EdgePair (e2, e1, false));
+  EXPECT_EQ (int (es.size ()), 2);
+
+  es.clear ();
+  es.insert (db::EdgePair (e1, e2, true));
+  es.insert (db::EdgePair (e2, e1, true));
+  EXPECT_EQ (int (es.size ()), 1);
+
+  std::unordered_set<db::EdgePair> eh;
+
+  eh.clear ();
+  eh.insert (db::EdgePair (e1, e2, false));
+  eh.insert (db::EdgePair (e1, e2, true));
+  EXPECT_EQ (int (eh.size ()), 2);
+
+  eh.clear ();
+  eh.insert (db::EdgePair (e1, e2, false));
+  eh.insert (db::EdgePair (e2, e1, false));
+  EXPECT_EQ (int (eh.size ()), 2);
+
+  eh.clear ();
+  eh.insert (db::EdgePair (e1, e2, true));
+  eh.insert (db::EdgePair (e2, e1, true));
+  EXPECT_EQ (int (eh.size ()), 1);
+}

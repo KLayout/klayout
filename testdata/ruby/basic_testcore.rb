@@ -290,6 +290,42 @@ class Basic_TestClass < TestBase
 
   end
 
+  def test_10
+
+    GC.start 
+    
+    # all references of A are released now:
+    ic0 = RBA::A::instance_count
+    assert_equal(ic0, 0)
+
+    a = RBA::A.new_a_by_variant
+    assert_equal(RBA::A::instance_count, ic0 + 1)
+
+    assert_equal(a.a1, 17)
+    a.a5(-15)
+    assert_equal(a.a1, -15)
+
+    a = nil
+    GC.start
+    assert_equal(RBA::A::instance_count, ic0)
+
+    # destruction of raw instances (non-gsi-enabled) via c++
+    GC.start
+
+    ic0 = RBA::B::instance_count
+    assert_equal(ic0, 0)
+
+    b = RBA::B.new_b_by_variant
+    assert_equal(RBA::B::instance_count, ic0 + 1)
+
+    b.set_str_combine("x", "y")
+    assert_equal(b.str, "xy")
+
+    b._destroy
+    assert_equal(RBA::B::instance_count, ic0)
+
+  end
+
   def test_12
 
     a1 = RBA::A.new
@@ -537,14 +573,14 @@ class Basic_TestClass < TestBase
       
     b.amember_cptr.a2 
 
-    assert_equal( b.b1, 5 )
-    assert_equal( b.b2, "" )
-    b.b5( "xyz" )
-    assert_equal( b.b2, "xyz" )
-    assert_equal( b.b5a, "xyz" )
-    b.b5b( "yx", "zz" )
-    assert_equal( b.b2, "yxzz" )
-    assert_equal( b.b5a, "yxzz" )
+    assert_equal( b.always_5, 5 )
+    assert_equal( b.str, "" )
+    b.set_str( "xyz" )
+    assert_equal( b.str, "xyz" )
+    assert_equal( b.str_ccptr, "xyz" )
+    b.set_str_combine( "yx", "zz" )
+    assert_equal( b.str, "yxzz" )
+    assert_equal( b.str_ccptr, "yxzz" )
 
     arr = []
 
@@ -719,58 +755,58 @@ class Basic_TestClass < TestBase
     b = RBA::B.new
 
     bb = RBA::B.new
-    bb.b5("a")
+    bb.set_str("a")
     b.push_b(bb)
 
     bb = RBA::B.new
-    bb.b5("y")
+    bb.set_str("y")
     b.push_b(bb)
 
     bb = RBA::B.new
-    bb.b5("uu")
+    bb.set_str("uu")
     b.push_b(bb)
 
     arr = []
-    b.each_b_copy { |bb| arr.push(bb.b2) } 
+    b.each_b_copy { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["a", "y", "uu"])
     # through enumerator
-    assert_equal(b.each_b_copy.collect(&:b2), ["a", "y", "uu"])
+    assert_equal(b.each_b_copy.collect(&:str), ["a", "y", "uu"])
 
     arr = []
-    b.each_b_copy { |bb| bb.b5(bb.b2 + "x"); arr.push(bb.b2) } 
+    b.each_b_copy { |bb| bb.set_str(bb.str + "x"); arr.push(bb.str) } 
     assert_equal(arr, ["ax", "yx", "uux"])
 
     arr = []
-    b.each_b_copy { |bb| arr.push(bb.b2) } 
+    b.each_b_copy { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["a", "y", "uu"])
 
     arr = []
-    b.each_b_cref { |bb| arr.push(bb.b2) } 
+    b.each_b_cref { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["a", "y", "uu"])
     # through enumerator
-    assert_equal(b.each_b_cref.collect(&:b2), ["a", "y", "uu"])
+    assert_equal(b.each_b_cref.collect(&:str), ["a", "y", "uu"])
 
     arr = []
     # this works, since the "const B &" will be converted to a copy
-    b.each_b_cref { |bb| bb.b5(bb.b2 + "x"); arr.push(bb.b2) } 
+    b.each_b_cref { |bb| bb.set_str(bb.str + "x"); arr.push(bb.str) } 
     assert_equal(arr, ["ax", "yx", "uux"])
 
     arr = []
     # since that was a copy, the b children were not modified
-    b.each_b_cref { |bb| arr.push(bb.b2) } 
+    b.each_b_cref { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["a", "y", "uu"])
 
     arr = []
-    b.each_b_cptr { |bb| arr.push(bb.b2) } 
+    b.each_b_cptr { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["a", "y", "uu"])
     # through enumerator
-    assert_equal(b.each_b_cptr.collect(&:b2), ["a", "y", "uu"])
+    assert_equal(b.each_b_cptr.collect(&:str), ["a", "y", "uu"])
 
     arr = []
     # const references cannot be modified
     err_caught = false
     begin
-      b.each_b_cptr { |bb| bb.b5(bb.b2 + "x"); arr.push(bb.b2) } 
+      b.each_b_cptr { |bb| bb.set_str(bb.str + "x"); arr.push(bb.str) } 
     rescue 
       err_caught = true
     end
@@ -778,35 +814,35 @@ class Basic_TestClass < TestBase
     assert_equal(arr, [])
 
     arr = []
-    b.each_b_cptr { |bb| arr.push(bb.b2) } 
+    b.each_b_cptr { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["a", "y", "uu"])
 
     arr = []
-    b.each_b_ref { |bb| arr.push(bb.b2) } 
+    b.each_b_ref { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["a", "y", "uu"])
     # through enumerator
-    assert_equal(b.each_b_ref.collect(&:b2), ["a", "y", "uu"])
+    assert_equal(b.each_b_ref.collect(&:str), ["a", "y", "uu"])
 
     arr = []
-    b.each_b_ref { |bb| bb.b5(bb.b2 + "x"); arr.push(bb.b2) } 
+    b.each_b_ref { |bb| bb.set_str(bb.str + "x"); arr.push(bb.str) } 
     assert_equal(arr, ["ax", "yx", "uux"])
 
     arr = []
-    b.each_b_ref { |bb| arr.push(bb.b2) } 
+    b.each_b_ref { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["ax", "yx", "uux"])
 
     arr = []
-    b.each_b_ptr { |bb| arr.push(bb.b2) } 
+    b.each_b_ptr { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["ax", "yx", "uux"])
     # through enumerator
-    assert_equal(b.each_b_ptr.collect(&:b2), ["ax", "yx", "uux"])
+    assert_equal(b.each_b_ptr.collect(&:str), ["ax", "yx", "uux"])
 
     arr = []
-    b.each_b_ptr { |bb| bb.b5(bb.b2 + "x"); arr.push(bb.b2) } 
+    b.each_b_ptr { |bb| bb.set_str(bb.str + "x"); arr.push(bb.str) } 
     assert_equal(arr, ["axx", "yxx", "uuxx"])
 
     arr = []
-    b.each_b_ptr { |bb| arr.push(bb.b2) } 
+    b.each_b_ptr { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["axx", "yxx", "uuxx"])
 
   end

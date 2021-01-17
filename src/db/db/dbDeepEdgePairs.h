@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -53,7 +53,8 @@ public:
   virtual EdgePairsIteratorDelegate *begin () const;
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const;
 
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
   virtual std::string to_string (size_t) const;
   virtual Box bbox () const;
   virtual bool empty () const;
@@ -64,6 +65,7 @@ public:
   virtual EdgePairsDelegate *filter_in_place (const EdgePairFilterBase &filter);
   virtual EdgePairsDelegate *filtered (const EdgePairFilterBase &) const;
   virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const;
+  virtual EdgesDelegate *processed_to_edges (const EdgePairToEdgeProcessorBase &filter) const;
 
   virtual EdgePairsDelegate *add_in_place (const EdgePairs &other);
   virtual EdgePairsDelegate *add (const EdgePairs &other) const;

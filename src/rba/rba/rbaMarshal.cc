@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -556,17 +556,21 @@ struct reader<gsi::StringType>
   }
 };
 
-static VALUE object_from_variant (const tl::Variant &var, Proxy *self, const gsi::ArgType &atype)
+static VALUE object_from_variant (tl::Variant &var, Proxy *self, const gsi::ArgType &atype)
 {
   if (var.is_user()) {
 
-    bool pass_obj = atype.pass_obj() || (! atype.is_cptr() && ! atype.is_ptr () && ! atype.is_cref () && ! atype.is_ref ());
+    bool is_direct = (! atype.is_cptr() && ! atype.is_ptr () && ! atype.is_cref () && ! atype.is_ref ());
+    bool pass_obj = atype.pass_obj() || is_direct;
     bool is_const = atype.is_cptr() || atype.is_cref();
     bool prefer_copy = false;
     bool can_destroy = false;
 
     //  TODO: ugly const_cast, but there is no "const shared reference" ...
     gsi::Proxy *holder = dynamic_cast<gsi::Proxy *>(const_cast<tl::Object *>(var.to_object ()));
+
+    void *obj = var.to_user ();
+    const gsi::ClassBase *cls = var.user_cls ()->gsi_cls ();
 
     if (pass_obj) {
 
@@ -589,19 +593,20 @@ static VALUE object_from_variant (const tl::Variant &var, Proxy *self, const gsi
         //  If the object was not owned before, it is not owned after (bears risk of invalid
         //  pointers, but it's probably rarely the case. Non-managed objects are usually copied
         //  between the ownership spaces.
-        if (var.user_is_ref()) {
+        //  If the variant holds the user object, we can take it from it and claim ownership.
+        if (var.user_is_ref ()) {
           prefer_copy = false;   // unsafe
+          pass_obj = false;
         } else {
-          prefer_copy = true;   // safe
+          obj = var.user_take ();
+          can_destroy = true;
         }
-
-        pass_obj = false;
 
       }
 
     }
 
-    return object_to_ruby ((void *) var.to_user (), self, var.user_cls ()->gsi_cls (), pass_obj, is_const, prefer_copy, can_destroy);
+    return object_to_ruby (obj, self, cls, pass_obj, is_const, prefer_copy, can_destroy);
 
   } else {
     return c2ruby<tl::Variant> (var);
@@ -623,9 +628,10 @@ struct reader<gsi::VariantType>
       gsi::VariantAdaptorImpl<tl::Variant> *aa = dynamic_cast<gsi::VariantAdaptorImpl<tl::Variant> *> (a.get ());
       if (aa) {
         //  A small optimization that saves one variant copy
-        *ret = object_from_variant (aa->var_ref (), self, atype);
+        *ret = object_from_variant (aa->var_ref_nc (), self, atype);
       } else {
-        *ret = object_from_variant (a->var (), self, atype);
+        tl::Variant v = a->var ();
+        *ret = object_from_variant (v, self, atype);
       }
     }
   }

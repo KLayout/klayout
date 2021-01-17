@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -305,7 +305,7 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
     JoinEdgesClusterCollector cluster_collector (&sg, ext_b, ext_e, ext_o, ext_i);
 
     db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
-    scanner.reserve (size ());
+    scanner.reserve (count ());
 
     AddressableEdgeDelivery e (begin (), has_valid_edges ());
 
@@ -351,13 +351,19 @@ AsIfFlatEdges::in (const Edges &other, bool invert) const
 }
 
 size_t
-AsIfFlatEdges::size () const
+AsIfFlatEdges::count () const
 {
   size_t n = 0;
   for (EdgesIterator p (begin ()); ! p.at_end (); ++p) {
     ++n;
   }
   return n;
+}
+
+size_t
+AsIfFlatEdges::hier_count () const
+{
+  return count ();
 }
 
 AsIfFlatEdges::length_type
@@ -506,12 +512,12 @@ AsIfFlatEdges::filtered (const EdgeFilterBase &filter) const
 }
 
 EdgePairsDelegate *
-AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, const db::EdgesCheckOptions &options) const
 {
   std::auto_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
 
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve (size () + (other ? other->size () : 0));
+  scanner.reserve (count () + (other ? other->count () : 0));
 
   AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
 
@@ -532,12 +538,12 @@ AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Co
     }
   }
 
-  EdgeRelationFilter check (rel, d, metrics);
+  EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
-  check.set_whole_edges (whole_edges);
-  check.set_ignore_angle (ignore_angle);
-  check.set_min_projection (min_projection);
-  check.set_max_projection (max_projection);
+  check.set_whole_edges (options.whole_edges);
+  check.set_ignore_angle (options.ignore_angle);
+  check.set_min_projection (options.min_projection);
+  check.set_max_projection (options.max_projection);
 
   edge2edge_check_for_edges<db::FlatEdgePairs> edge_check (check, *result, other != 0);
   scanner.process (edge_check, d, db::box_convert<db::Edge> ());
@@ -552,7 +558,7 @@ AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
   EdgeBooleanClusterCollectorToShapes cluster_collector (&output->raw_edges (), op);
 
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve (size () + (other ? other->size () : 0));
+  scanner.reserve (count () + (other ? other->count () : 0));
 
   AddressableEdgeDelivery e (begin (), has_valid_edges ());
 
@@ -622,7 +628,7 @@ AsIfFlatEdges::add (const Edges &other) const
     new_edges->set_is_merged (false);
     new_edges->invalidate_cache ();
 
-    size_t n = new_edges->raw_edges ().size () + size ();
+    size_t n = new_edges->raw_edges ().size () + count ();
 
     new_edges->reserve (n);
 
@@ -636,7 +642,7 @@ AsIfFlatEdges::add (const Edges &other) const
 
     std::auto_ptr<FlatEdges> new_edges (new FlatEdges (false /*not merged*/));
 
-    size_t n = size () + other.size ();
+    size_t n = count () + other.count ();
 
     new_edges->reserve (n);
 
@@ -658,7 +664,7 @@ AsIfFlatEdges::equals (const Edges &other) const
   if (empty () != other.empty ()) {
     return false;
   }
-  if (size () != other.size ()) {
+  if (count () != other.count ()) {
     return false;
   }
   EdgesIterator o1 (begin ());
@@ -679,8 +685,8 @@ AsIfFlatEdges::less (const Edges &other) const
   if (empty () != other.empty ()) {
     return empty () < other.empty ();
   }
-  if (size () != other.size ()) {
-    return (size () < other.size ());
+  if (count () != other.count ()) {
+    return (count () < other.count ());
   }
   EdgesIterator o1 (begin ());
   EdgesIterator o2 (other.begin ());

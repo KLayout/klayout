@@ -102,7 +102,7 @@ def run_demo(gen, cmd, out)
 
   gen.produce(cell.shapes(l1), cell.shapes(l2))
 
-  view.zoom_box(RBA::DBox::new(-2.0, -1.0, 8.0, 9.0))
+  view.zoom_box(RBA::DBox::new(-2.0, -2.0, 8.0, 9.0))
   view.max_hier
 
   t = RBA::Text::new(cmd, -1500, 8500)
@@ -144,7 +144,7 @@ SCRIPT
   end
 
   view.update_content
-  view.save_image(res_path + "/" + img_path + "/" + out, 400, 400)
+  view.save_image(res_path + "/" + img_path + "/" + out, 500, 500)
 
   puts "---> written #{res_path}/#{img_path}/#{out}"
 
@@ -180,6 +180,31 @@ run_demo gen, "input.width(1.2, whole_edges)", "drc_width4.png"
 class Gen
   def produce(s1, s2)
     pts = [ 
+      RBA::Point::new(0, 0),
+      RBA::Point::new(3000, 0),
+      RBA::Point::new(3000, 4000),
+      RBA::Point::new(5000, 4000),
+      RBA::Point::new(5000, 7000),
+      RBA::Point::new(2000, 7000),
+      RBA::Point::new(2000, 2000),
+      RBA::Point::new(0, 2000)
+    ];
+    s1.insert(RBA::Polygon::new(pts))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input.drc(width < 2.0)", "drc_width1u.png"
+run_demo gen, "input.drc(width(projection) < 2.0)", "drc_width2u.png"
+run_demo gen, "input.drc(width(projection) > 2.0)", "drc_width3u.png"
+run_demo gen, "input.drc(width(projection) == 2.0)", "drc_width4u.png"
+run_demo gen, "input.drc(width(projection) != 2.0)", "drc_width5u.png"
+run_demo gen, "input.drc(1.0 < width(projection) <= 3.0)", "drc_width6u.png"
+
+class Gen
+  def produce(s1, s2)
+    pts = [ 
       RBA::Point::new(4000, 0),
       RBA::Point::new(4000, 1000),
       RBA::Point::new(6000, 1000),
@@ -205,6 +230,10 @@ gen = Gen::new
 run_demo gen, "input.space(1.2, euclidian)", "drc_space1.png"
 run_demo gen, "input.notch(1.2, euclidian)", "drc_space2.png"
 run_demo gen, "input.isolated(1.2, euclidian)", "drc_space3.png"
+
+run_demo gen, "input.drc(space(euclidian) < 1.2)", "drc_space1u.png"
+run_demo gen, "input.drc(notch(euclidian) < 1.2)", "drc_space2u.png"
+run_demo gen, "input.drc(isolated(euclidian) < 1.2)", "drc_space3u.png"
 
 class Gen
   def produce(s1, s2)
@@ -239,6 +268,117 @@ end
 gen = Gen::new
 
 run_demo gen, "input1.separation(input2, 1.2, euclidian)", "drc_separation1.png"
+run_demo gen, "input1.drc(separation(input2, euclidian) < 1.2)", "drc_separation1u.png"
+
+class Gen
+  def produce(s1, s2)
+    pts = [ 
+      RBA::Point::new(1000, 0),
+      RBA::Point::new(1000, 6000),
+      RBA::Point::new(2000, 6000),
+      RBA::Point::new(2000, 0),
+    ];
+    s2.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(5000, 2000),
+      RBA::Point::new(5000, 4000),
+      RBA::Point::new(6000, 4000),
+      RBA::Point::new(6000, 2000),
+    ];
+    s2.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(3000, 0),
+      RBA::Point::new(3000, 6000),
+      RBA::Point::new(4000, 6000),
+      RBA::Point::new(4000, 0)
+    ];
+    s1.insert(RBA::Polygon::new(pts))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.sep(input2, 1.2, projection)", "drc_separation2.png"
+run_demo gen, "input1.sep(input2, 1.2, projection, not_opposite)", "drc_separation3.png"
+run_demo gen, "input1.sep(input2, 1.2, projection, only_opposite)", "drc_separation4.png"
+
+class Gen
+  def produce(s1, s2)
+    pts = [ 
+      RBA::Point::new(0, 3000),
+      RBA::Point::new(0, 4000),
+      RBA::Point::new(1000, 4000),
+      RBA::Point::new(1000, 3000)
+    ]
+    s2.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(3000, 3000),
+      RBA::Point::new(3000, 4000),
+      RBA::Point::new(4000, 4000),
+      RBA::Point::new(4000, 3000)
+    ]
+    s2.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(6000, 3000),
+      RBA::Point::new(6000, 4000),
+      RBA::Point::new(7000, 4000),
+      RBA::Point::new(7000, 3000)
+    ]
+    s2.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(4500, 1500),
+      RBA::Point::new(4500, 2500),
+      RBA::Point::new(5500, 2500),
+      RBA::Point::new(5500, 1500)
+    ]
+    s2.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(1500, 3000),
+      RBA::Point::new(1500, 4000),
+      RBA::Point::new(2500, 4000),
+      RBA::Point::new(2500, 3000)
+    ]
+    s1.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(3000, 4500),
+      RBA::Point::new(3000, 5500),
+      RBA::Point::new(4000, 5500),
+      RBA::Point::new(4000, 4500)
+    ]
+    s1.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(3000, 1500),
+      RBA::Point::new(3000, 2500),
+      RBA::Point::new(4000, 2500),
+      RBA::Point::new(4000, 1500)
+    ]
+    s1.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(4500, 3000),
+      RBA::Point::new(4500, 4000),
+      RBA::Point::new(5500, 4000),
+      RBA::Point::new(5500, 3000)
+    ]
+    s1.insert(RBA::Polygon::new(pts))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.sep(input2, 1.0, projection)", "drc_separation5.png"
+run_demo gen, "input1.sep(input2, 1.0, projection,\n" +
+              "           one_side_allowed)", "drc_separation6.png"
+run_demo gen, "input1.sep(input2, 1.0, projection,\n" + 
+              "           two_sides_allowed)", "drc_separation7.png"
+run_demo gen, "input1.sep(input2, 1.0, projection,\n" +
+              "           two_opposite_sides_allowed)", "drc_separation8.png"
+run_demo gen, "input1.sep(input2, 1.0, projection,\n" + 
+              "           two_connected_sides_allowed)", "drc_separation9.png"
+run_demo gen, "input1.sep(input2, 1.0, projection,\n" +
+              "           three_sides_allowed)", "drc_separation10.png"
+run_demo gen, "input1.sep(input2, 1.0, projection,\n" +
+              "           one_side_allowed,\n" + 
+              "           two_opposite_sides_allowed)", "drc_separation11.png"
 
 # ...
 
@@ -307,6 +447,10 @@ gen = Gen::new
 run_demo gen, "input1.enclosing(input2, 2.0.um)", "drc_enc1.png"
 run_demo gen, "input1.enclosing(input2, 2.0.um, projection)", "drc_enc2.png"
 
+run_demo gen, "input1.drc(enclosing(input2) < 2.0.um)", "drc_enc1u.png"
+run_demo gen, "input1.drc(enclosing(input2,\n"+
+              "                     projection) < 2.0.um)", "drc_enc2u.png"
+
 
 class Gen
   def produce(s1, s2)
@@ -337,6 +481,10 @@ gen = Gen::new
 
 run_demo gen, "input1.overlap(input2, 2.0.um)", "drc_overlap1.png"
 run_demo gen, "input1.overlap(input2, 2.0.um, projection)", "drc_overlap2.png"
+
+run_demo gen, "input1.drc(overlap(input2) < 2.0.um)", "drc_overlap1u.png"
+run_demo gen, "input1.drc(overlap(input2,\n"+
+              "                   projection) < 2.0.um)", "drc_overlap2u.png"
 
 
 class Gen
@@ -434,6 +582,60 @@ run_demo gen, "input1.edges.and(input2)", "drc_and3.png"
 run_demo gen, "input1.edges.not(input2)", "drc_not3.png"
 run_demo gen, "input1.edges.inside_part(input2)", "drc_inside_part.png"
 run_demo gen, "input1.edges.outside_part(input2)", "drc_outside_part.png"
+
+class Gen
+  def produce(s1, s2)
+    s1.insert(RBA::Box::new(-1000, 0, 1000, 2000))
+    s1.insert(RBA::Box::new(2000, 0, 4000, 2000))
+    s1.insert(RBA::Box::new(5000, 0, 7000, 2000))
+    s1.insert(RBA::Box::new(-1000, 3000, 1000, 5000))
+    s1.insert(RBA::Box::new(2000, 3000, 4000, 5000))
+    s1.insert(RBA::Box::new(5000, 3000, 7000, 5000))
+    s2.insert(RBA::Box::new(0, 500, 1000, 1500))
+    s2.insert(RBA::Box::new(2500, 500, 3500, 1500))
+    s2.insert(RBA::Box::new(4000, 500, 5000, 1500))
+    s2.insert(RBA::Box::new(6250, 500, 7250, 1500))
+    s2.insert(RBA::Box::new(-500, 5000, 500, 6000))
+    s2.insert(RBA::Box::new(2500, 3500, 3500, 4500))
+    s2.insert(RBA::Box::new(6250, 4750, 7250, 5750))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.covering(input2)", "drc_covering.png"
+run_demo gen, "input1.not_covering(input2)", "drc_not_covering.png"
+
+class Gen
+  def produce(s1, s2)
+    s1.insert(RBA::Box::new(0, 5000, 2000, 7000))
+    s1.insert(RBA::Box::new(4000, 5000, 6000, 7000))
+    s1.insert(RBA::Box::new(0, 0, 2000, 2000))
+    s1.insert(RBA::Box::new(4000, 0, 6000, 2000))
+    s2.insert(RBA::Box::new(2000, 6000, 4000, 7000))
+    s2.insert(RBA::Box::new(4500, 5500, 5500, 6500))
+    s2.insert(RBA::Box::new(5000, 4000, 6000, 5000))
+    s2.insert(RBA::Polygon::new(
+      [ RBA::Point::new(2000, 0),    RBA::Point::new(2000, 3000), 
+        RBA::Point::new(1000, 3000), RBA::Point::new(1000, 2000), 
+        RBA::Point::new(0, 2000),    RBA::Point::new(0, 5000), 
+        RBA::Point::new(1000, 5000),    RBA::Point::new(1000, 4000), 
+        RBA::Point::new(3000, 4000), RBA::Point::new(3000, 0) ]
+    ))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.interacting(input2, 1)", "drc_interacting2.png"
+run_demo gen, "input1.interacting(input2, 1, 1)", "drc_interacting3.png"
+run_demo gen, "input1.interacting(input2, 2..)", "drc_interacting4.png"
+run_demo gen, "input1.interacting(input2, 1..2)", "drc_interacting5.png"
+
+run_demo gen, "input1.not_interacting(input2, 1)", "drc_not_interacting2.png"
+run_demo gen, "input1.not_interacting(input2, 1, 1)", "drc_not_interacting3.png"
+run_demo gen, "input1.not_interacting(input2, 2..)", "drc_not_interacting4.png"
+run_demo gen, "input1.not_interacting(input2, 1..2)", "drc_not_interacting5.png"
 
 class Gen
   def produce(s1, s2)
@@ -707,6 +909,37 @@ gen = Gen::new
 
 run_demo gen, "labels & input2", "drc_textpoly1.png"
 run_demo gen, "labels - input2", "drc_textpoly2.png"
+
+
+class Gen
+  def produce(s1, s2)
+    s1.insert(RBA::Polygon::new(RBA::Box::new(0, 0, 6000, 2000)))
+    s2.insert(RBA::Polygon::new(RBA::Box::new(3500, 3000, 6000, 4000)))
+    s2.insert(RBA::Polygon::new(RBA::Box::new(0, 5000, 2500, 7000)))
+    s2.insert(RBA::Polygon::new(RBA::Box::new(3500, 5000, 6000, 7000)))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.separation(input2, 3.5.um, projection, \n                  shielded)", "drc_shielded1.png"
+run_demo gen, "input1.separation(input2, 3.5.um, projection, \n                  transparent)", "drc_shielded2.png"
+
+
+class Gen
+  def produce(s1, s2)
+    s1.insert(RBA::Polygon::new(RBA::Box::new(0, 0, 2500, 2000)))
+    s1.insert(RBA::Polygon::new(RBA::Box::new(3500, 0, 6000, 2000)))
+    s2.insert(RBA::Polygon::new(RBA::Box::new(3500, 0, 6000, 2000)))
+    s2.insert(RBA::Polygon::new(RBA::Box::new(0, 5000, 2500, 7000)))
+    s2.insert(RBA::Polygon::new(RBA::Box::new(3500, 5000, 6000, 7000)))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.separation(input2, 3.5.um, projection, \n                  shielded)", "drc_shielded3.png"
+run_demo gen, "input1.separation(input2, 3.5.um, projection, \n                  transparent)", "drc_shielded4.png"
 
 
 QRCGenerator::instance.finish

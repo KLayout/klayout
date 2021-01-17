@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -73,41 +73,42 @@ public:
   virtual bool equals (const Edges &other) const;
   virtual bool less (const Edges &other) const;
 
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
   virtual Box bbox () const;
 
   virtual DeepEdges::length_type length (const db::Box &) const;
 
   virtual std::string to_string (size_t nmax) const;
 
-  virtual EdgePairsDelegate *width_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+  virtual EdgePairsDelegate *width_check (db::Coord d, const db::EdgesCheckOptions &options) const
   {
-    return run_check (db::WidthRelation, 0, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return run_check (db::WidthRelation, 0, d, options);
   }
     
-  virtual EdgePairsDelegate *space_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+  virtual EdgePairsDelegate *space_check (db::Coord d, const db::EdgesCheckOptions &options) const
   {
-    return run_check (db::SpaceRelation, 0, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return run_check (db::SpaceRelation, 0, d, options);
   }
 
-  virtual EdgePairsDelegate *enclosing_check (const Edges &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+  virtual EdgePairsDelegate *enclosing_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options) const
   {
-    return run_check (db::OverlapRelation, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return run_check (db::OverlapRelation, &other, d, options);
   }
 
-  virtual EdgePairsDelegate *overlap_check (const Edges &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+  virtual EdgePairsDelegate *overlap_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options) const
   {
-    return run_check (db::WidthRelation, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return run_check (db::WidthRelation, &other, d, options);
   }
 
-  virtual EdgePairsDelegate *separation_check (const Edges &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+  virtual EdgePairsDelegate *separation_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options) const
   {
-    return run_check (db::SpaceRelation, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return run_check (db::SpaceRelation, &other, d, options);
   }
 
-  virtual EdgePairsDelegate *inside_check (const Edges &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
+  virtual EdgePairsDelegate *inside_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options) const
   {
-    return run_check (db::InsideRelation, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
+    return run_check (db::InsideRelation, &other, d, options);
   }
 
   virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &filter);
@@ -168,7 +169,7 @@ private:
   const DeepLayer &merged_deep_layer () const;
   DeepLayer and_or_not_with(const DeepEdges *other, EdgeBoolOp op) const;
   DeepLayer edge_region_op (const DeepRegion *other, bool outside, bool include_borders) const;
-  EdgePairsDelegate *run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
+  EdgePairsDelegate *run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, const db::EdgesCheckOptions &options) const;
   virtual EdgesDelegate *pull_generic (const Edges &edges) const;
   virtual RegionDelegate *pull_generic (const Region &region) const;
   virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, bool invert) const;

@@ -1,0 +1,30 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+  threads(0) # easier to debug
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+# edge predicates
+
+l1.drc(length > 5.0).output(100, 0)
+l1.drc(2.0 < length <= 5.0).output(101, 0)
+l1.drc(primary.edges.length <= 2.0).output(102, 0)
+l1.drc(primary.length == 2.0).output(103, 0)
+
+l1.drc(angle == 0.0).output(110, 0)
+l1.drc(angle < 0.0).output(111, 0)
+l1.drc(primary.angle > 0.0).output(112, 0)
+l1.drc(primary.edges.angle == 90).output(113, 0)
+l1.drc((angle == 0.0) + (angle == 90)).output(114, 0)
+

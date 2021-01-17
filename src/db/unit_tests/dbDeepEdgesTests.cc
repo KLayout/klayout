@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "dbRegion.h"
 #include "dbEdgesUtils.h"
 #include "dbDeepShapeStore.h"
+#include "dbCellGraphUtils.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
@@ -59,7 +60,25 @@ TEST(1)
 
     edges.push_back (db::Edges (iter, dss));
 
-    EXPECT_EQ (edges.back ().size (), db::Edges (iter).size ());
+    size_t n = 0, nhier = 0;
+    db::CellCounter cc (&ly);
+    for (db::Layout::top_down_const_iterator c = ly.begin_top_down (); c != ly.end_top_down (); ++c) {
+      size_t ns = 0;
+      for (db::Shapes::shape_iterator is = ly.cell (*c).shapes (li1).begin (db::ShapeIterator::Edges); !is.at_end (); ++is) {
+        ++ns;
+      }
+      for (db::Shapes::shape_iterator is = ly.cell (*c).shapes (li1).begin (db::ShapeIterator::Regions); !is.at_end (); ++is) {
+        db::Polygon p;
+        is->polygon (p);
+        ns += p.hull ().size ();
+      }
+      n += cc.weight (*c) * ns;
+      nhier += ns;
+    }
+
+    EXPECT_EQ (db::Edges (iter).count (), n);
+    EXPECT_EQ (edges.back ().count (), n);
+    EXPECT_EQ (edges.back ().hier_count (), nhier);
     EXPECT_EQ (edges.back ().bbox (), db::Edges (iter).bbox ());
 
   }
@@ -240,8 +259,8 @@ TEST(5_Filters)
 
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
 
-    db::EdgeOrientationFilter eof1 (0, 1, false);
-    db::EdgeOrientationFilter eof2 (0, 1, true);
+    db::EdgeOrientationFilter eof1 (0, true, 1, true, false);
+    db::EdgeOrientationFilter eof2 (0, true, 1, true, true);
 
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e2.filtered (eof1));
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e2.filtered (eof2));
@@ -480,12 +499,12 @@ TEST(9_DRCChecks)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (4, 0)), r4);
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (6, 0)), r6);
 
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e3.space_check (500, false, db::Projection, 90, 0));
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e3.space_check (500, true, db::Projection, 90, 300));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e3.space_check (500, db::EdgesCheckOptions (false, db::Projection, 90, 0)));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e3.space_check (500, db::EdgesCheckOptions (true, db::Projection, 90, 300)));
 
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), e3.separation_check (e4, 200, false, db::Projection, 90, 0));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), e3.separation_check (e4, 200, db::EdgesCheckOptions (false, db::Projection, 90, 0)));
 
-    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), e6.enclosing_check (e4, 100, true, db::Projection, 90, 0));
+    target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), e6.enclosing_check (e4, 100, db::EdgesCheckOptions (true, db::Projection, 90, 0)));
 
     CHECKPOINT();
     db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au9.gds");

@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2020 Matthias Koefferlein
+# Copyright (C) 2006-2021 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -79,6 +79,10 @@ class DBShapes_TestClass < TestBase
 
     arr = []
     shapes.each( RBA::Shapes::SBoxes ) { |s| arr.push( s.box.to_s ) } 
+    assert_equal( arr, ["(10,-10;50,40)", "(100,-10;150,40)", "(200,-10;250,40)"] )
+
+    arr = []
+    shapes.each( RBA::Shapes::SRegions ) { |s| arr.push( s.box.to_s ) } 
     assert_equal( arr, ["(10,-10;50,40)", "(100,-10;150,40)", "(200,-10;250,40)"] )
 
     arr = []
@@ -256,8 +260,7 @@ class DBShapes_TestClass < TestBase
     a = RBA::SimplePolygon::new( [ RBA::Point::new( 0, 1 ), RBA::Point::new( 1, 5 ), RBA::Point::new( 5, 5 ) ] )
     b = RBA::Polygon::new( [ RBA::Point::new( 0, 1 ), RBA::Point::new( 1, 5 ), RBA::Point::new( 5, 5 ) ] )
     c1.shapes( lindex ).insert( a )
-    arr = []
-    shapes.each( RBA::Shapes::SPolygons ) { |s| arr.push( s ) } 
+    arr = shapes.each( RBA::Shapes::SPolygons ).to_a
     assert_equal( arr.size, 1 )
     assert_equal( arr[0].prop_id, 0 )
     assert_equal( arr[0].has_prop_id?, false )
@@ -341,6 +344,13 @@ class DBShapes_TestClass < TestBase
     shapes.each( RBA::Shapes::SBoxes ) { |s| arr.push( s ) } 
     assert_equal( arr.size, 1 )
     assert_equal( arr[0].is_box?, true )
+
+    # All kind of polygonizable shapes:
+
+    assert_equal( shapes.each( RBA::Shapes::SRegions ).collect(&:to_s), [ "polygon (0,1;1,5;5,5/1,2;4,4;2,4)",
+                                                                          "simple_polygon (0,1;1,5;5,5)",
+                                                                          "path (0,10;10,50) w=25 bx=0 ex=0 r=false",
+                                                                          "box (10,-10;50,40)" ] )
 
   end
 

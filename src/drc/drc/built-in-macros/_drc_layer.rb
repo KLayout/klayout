@@ -18,10 +18,6 @@ module DRC
       @data = data
     end
     
-    def data
-      @data
-    end
-
     # %DRC%
     # @name insert
     # @brief Inserts one or many objects into the layer
@@ -43,25 +39,32 @@ module DRC
     # @/code
     
     def insert(*args)
-      requires_edges_or_region("insert")
-      args.each do |a|
-        if a.is_a?(RBA::DBox) 
-          @data.insert(RBA::Box::from_dbox(a * (1.0 / @engine.dbu)))
-        elsif a.is_a?(RBA::DPolygon) 
-          @data.insert(RBA::Polygon::from_dpoly(a * (1.0 / @engine.dbu)))
-        elsif a.is_a?(RBA::DSimplePolygon) 
-          @data.insert(RBA::SimplePolygon::from_dpoly(a * (1.0 / @engine.dbu)))
-        elsif a.is_a?(RBA::DPath) 
-          @data.insert(RBA::Path::from_dpath(a * (1.0 / @engine.dbu)))
-        elsif a.is_a?(RBA::DEdge) 
-          @data.insert(RBA::Edge::from_dedge(a * (1.0 / @engine.dbu)))
-        elsif a.is_a?(Array)
-          insert(*a)
-        else
-          raise("Invalid argument type #{a.class.to_s} for 'insert' method")
+
+      @engine._context("insert") do
+
+        requires_edges_or_region
+        args.each do |a|
+          if a.is_a?(RBA::DBox) 
+            self.data.insert(RBA::Box::from_dbox(a * (1.0 / @engine.dbu)))
+          elsif a.is_a?(RBA::DPolygon) 
+            self.data.insert(RBA::Polygon::from_dpoly(a * (1.0 / @engine.dbu)))
+          elsif a.is_a?(RBA::DSimplePolygon) 
+            self.data.insert(RBA::SimplePolygon::from_dpoly(a * (1.0 / @engine.dbu)))
+          elsif a.is_a?(RBA::DPath) 
+            self.data.insert(RBA::Path::from_dpath(a * (1.0 / @engine.dbu)))
+          elsif a.is_a?(RBA::DEdge) 
+            self.data.insert(RBA::Edge::from_dedge(a * (1.0 / @engine.dbu)))
+          elsif a.is_a?(Array)
+            insert(*a)
+          else
+            raise("Invalid argument type for #{a.inspect}")
+          end
         end
+
+        self
+
       end
-      self
+
     end
     
     # %DRC%
@@ -79,9 +82,15 @@ module DRC
     # This feature has been introduced in version 0.23.2.
     
     def strict
-      requires_region("strict")
-      @data.strict_handling = true
-      self
+
+      @engine._context("strict") do
+
+        requires_region
+        self.data.strict_handling = true
+        self
+
+      end
+
     end
     
     # %DRC%
@@ -94,9 +103,15 @@ module DRC
     # This feature has been introduced in version 0.23.2.
     
     def non_strict
-      requires_region("non_strict")
-      @data.strict_handling = false
-      self
+
+      @engine._context("non_strict") do
+
+        requires_region
+        self.data.strict_handling = false
+        self
+
+      end
+
     end
     
     # %DRC% 
@@ -109,8 +124,14 @@ module DRC
     # This feature has been introduced in version 0.23.2.
     
     def is_strict?
-      requires_region("is_strict?")
-      @data.strict_handling?
+
+      @engine._context("is_strict") do
+
+        requires_region
+        self.data.strict_handling?
+
+      end
+
     end
     
     # %DRC%
@@ -127,9 +148,15 @@ module DRC
     # propagated.
     
     def clean
-      requires_edges_or_region("clean")
-      @data.merged_semantics = true
-      self
+
+      @engine._context("clean") do
+
+        requires_edges_or_region
+        self.data.merged_semantics = true
+        self
+
+      end
+
     end
     
     # %DRC%
@@ -158,9 +185,15 @@ module DRC
     # To avoid that, use the \dup method to create a real (deep) copy.
     
     def raw
-      requires_edges_or_region("raw")
-      @data.merged_semantics = false
-      self
+
+      @engine._context("raw") do
+
+        requires_edges_or_region
+        self.data.merged_semantics = false
+        self
+
+      end
+
     end
     
     # %DRC% 
@@ -171,8 +204,14 @@ module DRC
     # See \clean for a discussion of the clean state.
     
     def is_clean?
-      requires_edges_or_region("is_clean?")
-      @data.merged_semantics?
+
+      @engine._context("is_clean?") do
+
+        requires_edges_or_region
+        self.data.merged_semantics?
+
+      end
+
     end
     
     # %DRC% 
@@ -183,8 +222,57 @@ module DRC
     # See \clean for a discussion of the raw state.
     
     def is_raw?
-      requires_edges_or_region("is_raw?")
-      !@data.merged_semantics?
+
+      @engine._context("is_raw?") do
+
+        requires_edges_or_region
+        !self.data.merged_semantics?
+
+      end
+
+    end
+    
+    # %DRC%
+    # @name forget
+    # @brief Cleans up memory for this layer
+    # @synopsis forget
+    #
+    # KLayout's DRC engine is imperative. This means, every command is executed immediately
+    # rather than being compiled and executed later. The advantage of this approach is that
+    # it allows decisions to be taken depending on the content of a layer and to code 
+    # functions that operate directly on the layer's content.
+    #
+    # However, one drawback is that the engine cannot decide when a layer is no longer 
+    # required - it may still be used later in the script. So a layer's data is not cleaned
+    # up automatically.
+    #
+    # In order to save memory for DRC scripts intended for bigger layouts, the DRC script
+    # should clean up layers as soon as they are no longer required. The "forget" method
+    # will free the memory used for the layer's information.
+    #
+    # The recommended approach is:
+    #
+    # @code
+    # l = ... # compute some layer
+    # ...
+    # # once you're done with l:
+    # l.forget
+    # l = nil
+    # @/code
+    #
+    # By setting the layer to nil, it is ensured that it can no longer be accessed.
+
+    def forget
+
+      @engine._context("forget") do
+
+        if @data
+          @data._destroy
+          @data = nil
+        end
+
+      end
+
     end
     
     # %DRC%
@@ -197,7 +285,7 @@ module DRC
     # on input layers.
 
     def size
-      @data.size
+      self.data.size
     end
     
     # %DRC%
@@ -216,7 +304,7 @@ module DRC
     # and performing the deep copy may be expensive in terms of CPU time.
     
     def dup
-      DRCLayer::new(@engine, @data.dup)
+      DRCLayer::new(@engine, self.data.dup)
     end
 
     # %DRC%
@@ -249,19 +337,25 @@ module DRC
         mn = (inv ? "without" : "with") + "_" + f
         eval <<"CODE"
         def #{mn}(*args)
-          requires_region("#{f}")
-          if args.size == 1
-            a = args[0]
-            if a.is_a?(Range)
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(a.first), @engine._prep_value_area(a.last), #{inv.inspect}))
+
+          @engine._context("#{mn}") do
+
+            requires_region
+            if args.size == 1
+              a = args[0]
+              if a.is_a?(Range)
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_area_value_with_nil(a.begin), @engine._make_area_value_with_nil(a.end), #{inv.inspect}))
+              else
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_area_value(a), #{inv.inspect}))
+              end
+            elsif args.size == 2
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_area_value_with_nil(args[0]), @engine._make_area_value_with_nil(args[1]), #{inv.inspect}))
             else
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(a), #{inv.inspect}))
+              raise("Invalid number of arguments (1 or 2 expected)")
             end
-          elsif args.size == 2
-            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value_area(args[0]), @engine._prep_value_area(args[1]), #{inv.inspect}))
-          else
-            raise("Invalid number of arguments for method '#{mn}'")
+
           end
+
         end
 CODE
       end
@@ -399,19 +493,125 @@ CODE
         mn = (inv ? "without" : "with") + "_" + f
         eval <<"CODE"
         def #{mn}(*args)
-          requires_region("#{mn}")
-          if args.size == 1
-            a = args[0]
-            if a.is_a?(Range)
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value(a.first), @engine._prep_value(a.last), #{inv.inspect}))
+
+          @engine._context("#{mn}") do
+
+            requires_region
+            if args.size == 1
+              a = args[0]
+              if a.is_a?(Range)
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_value_with_nil(a.begin), @engine._make_value_with_nil(a.end), #{inv.inspect}))
+              else
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_value(a), #{inv.inspect}))
+              end
+            elsif args.size == 2
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_value_with_nil(args[0]), @engine._make_value_with_nil(args[1]), #{inv.inspect}))
             else
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value(a), #{inv.inspect}))
+              raise("Invalid number of arguments (1 or 2 expected)")
             end
-          elsif args.size == 2
-            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, @engine._prep_value(args[0]), @engine._prep_value(args[1]), #{inv.inspect}))
-          else
-            raise("Invalid number of arguments for method '#{mn}'")
+
           end
+
+        end
+CODE
+      end
+    end
+    
+    # %DRC%
+    # @name with_bbox_aspect_ratio
+    # @brief Selects polygons by the aspect ratio of their bounding box
+    # @synopsis layer.with_bbox_aspect_ratio(min .. max)
+    # @synopsis layer.with_bbox_aspect_ratio(value)
+    # @synopsis layer.with_bbox_aspect_ratio(min, max)
+    # The method selects polygons similar to \with_area or \with_perimeter.
+    # However, the measured value is the aspect ratio of the bounding 
+    # box. It is the larger dimensions divided by the smaller one.
+    # The "thinner" the polygon, the larger the aspect ratio. A square
+    # bounding box gives an aspect ratio of 1. 
+    #
+    # This method is available for polygon layers only.
+
+    # %DRC%
+    # @name without_bbox_height
+    # @brief Selects polygons by the aspect ratio of their bounding box
+    # @synopsis layer.without_bbox_aspect_ratio(min .. max)
+    # @synopsis layer.without_bbox_aspect_ratio(value)
+    # @synopsis layer.without_bbox_aspect_ratio(min, max)
+    # The method provides the opposite filter for \with_bbox_aspect_ratio.
+    #
+    # This method is available for polygon layers only.
+    
+    # %DRC%
+    # @name with_area_ratio
+    # @brief Selects polygons by the ratio of the bounding box area vs. polygon area
+    # @synopsis layer.with_area_ratio(min .. max)
+    # @synopsis layer.with_area_ratio(value)
+    # @synopsis layer.with_area_ratio(min, max)
+    # The area ratio is a measure how far a polygon is approximated by it's
+    # bounding box. The value is always larger or equal to 1. Boxes have a 
+    # area ratio of 1. Larger values mean more empty area inside the bounding box.
+    # 
+    # This method is available for polygon layers only.
+
+    # %DRC%
+    # @name without_area_ratio
+    # @brief Selects polygons by the aspect ratio of their bounding box
+    # @synopsis layer.without_area_ratio(min .. max)
+    # @synopsis layer.without_area_ratio(value)
+    # @synopsis layer.without_area_ratio(min, max)
+    # The method provides the opposite filter for \with_area_ratio.
+    #
+    # This method is available for polygon layers only.
+    
+    # %DRC%
+    # @name with_relative_height
+    # @brief Selects polygons by the ratio of the height vs. width of it's bounding box
+    # @synopsis layer.with_relative_height(min .. max)
+    # @synopsis layer.with_relative_height(value)
+    # @synopsis layer.with_relative_height(min, max)
+    # The relative height is a measure how tall a polygon is. Tall polygons
+    # have values larger than 1, wide polygons have a value smaller than 1.
+    # Squares have a value of 1.
+    #
+    # Don't use this method when you can use \with_area_ratio, which provides a 
+    # similar measure but is isotropic. 
+    # 
+    # This method is available for polygon layers only.
+
+    # %DRC%
+    # @name without_relative_height
+    # @brief Selects polygons by the ratio of the height vs. width
+    # @synopsis layer.without_relative_height(min .. max)
+    # @synopsis layer.without_relative_height(value)
+    # @synopsis layer.without_relative_height(min, max)
+    # The method provides the opposite filter for \with_relative_height.
+    #
+    # This method is available for polygon layers only.
+    
+    %w(area_ratio bbox_aspect_ratio relative_height).each do |f|
+      [true, false].each do |inv|
+        mn = (inv ? "without" : "with") + "_" + f
+        eval <<"CODE"
+        def #{mn}(*args)
+
+          @engine._context("#{mn}") do
+
+            requires_region
+            if args.size == 1
+              a = args[0]
+              if a.is_a?(Range)
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_numeric_value_with_nil(a.begin), @engine._make_numeric_value_with_nil(a.end), #{inv.inspect}))
+              else
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_numeric_value(a), #{inv.inspect}))
+              end
+            elsif args.size == 2
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_numeric_value(args[0]), @engine._make_numeric_value(args[1]), #{inv.inspect}))
+            else
+              raise("Invalid number of arguments (1 or 2 expected)")
+            end
+
+          end
+
         end
 CODE
       end
@@ -448,19 +648,25 @@ CODE
         mn = (inv ? "without" : "with") + "_" + f
         eval <<"CODE"
         def #{mn}(*args)
-          requires_edges("#{mn}")
-          if args.size == 1
-            a = args[0]
-            if a.is_a?(Range)
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(a.first), @engine._prep_value(a.last), #{inv.inspect}))
+
+          @engine._context("#{mn}") do
+
+            requires_edges
+            if args.size == 1
+              a = args[0]
+              if a.is_a?(Range)
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._make_value_with_nil(a.begin), @engine._make_value_with_nil(a.end), #{inv.inspect}))
+              else
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._make_value(a), #{inv.inspect}))
+              end
+            elsif args.size == 2
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._make_value_with_nil(args[0]), @engine._make_value_with_nil(args[1]), #{inv.inspect}))
             else
-              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(a), #{inv.inspect}))
+              raise("Invalid number of arguments (1 or 2 expected)")
             end
-          elsif args.size == 2
-            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, @engine._prep_value(args[0]), @engine._prep_value(args[1]), #{inv.inspect}))
-          else
-            raise("Invalid number of arguments for method '#{mn}'")
+
           end
+
         end
 CODE
       end
@@ -475,7 +681,12 @@ CODE
     #
     # When called on an edge layer, the method selects edges by their angle, 
     # measured against the horizontal axis in the mathematical sense. 
-    # The first version selects
+    #
+    # For this measurement edges are considered without their direction and straight lines. 
+    # A horizontal edge has an angle of zero degree. A vertical one has
+    # an angle of 90 degee. The angle range is from -90 (exclusive) to 90 degree (inclusive).
+    #
+    # The first version of this method selects
     # edges with a angle larger or equal to min and less than max (but not equal).
     # The second version selects edges with exactly the given angle. The third
     # version is identical to the first one. 
@@ -499,7 +710,6 @@ CODE
     #   @/tr
     # @/table
 
-
     # %DRC%
     # @name without_angle
     # @brief Selects edges by the their angle
@@ -515,20 +725,26 @@ CODE
       mn = (inv ? "without" : "with") + "_angle"
       eval <<"CODE"
       def #{mn}(*args)
-        requires_edges_or_region("#{mn}")
-        result_class = @data.is_a?(RBA::Region) ? RBA::EdgePairs : RBA::Edges
-        if args.size == 1
-          a = args[0]
-          if a.is_a?(Range)
-            DRCLayer::new(@engine, @engine._tcmd(@data, 0, result_class, :with_angle, a.first, a.last, #{inv.inspect}))
+
+        @engine._context("#{mn}") do
+
+          requires_edges_or_region
+          result_class = self.data.is_a?(RBA::Region) ? RBA::EdgePairs : RBA::Edges
+          if args.size == 1
+            a = args[0]
+            if a.is_a?(Range)
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_angle, a.begin, a.end, #{inv.inspect}))
+            else
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_angle, a, #{inv.inspect}))
+            end
+          elsif args.size == 2
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_angle, args[0], args[1], #{inv.inspect}))
           else
-            DRCLayer::new(@engine, @engine._tcmd(@data, 0, result_class, :with_angle, a, #{inv.inspect}))
+            raise("Invalid number of arguments (1 or 2 expected)")
           end
-        elsif args.size == 2
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, result_class, :with_angle, args[0], args[1], #{inv.inspect}))
-        else
-          raise("Invalid number of arguments for method '#{mn}'")
+
         end
+
       end
 CODE
     end
@@ -561,8 +777,10 @@ CODE
     # @/table
     
     def rounded_corners(inner, outer, n)
-      requires_region("rounded_corners")
-      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :rounded_corners, @engine._prep_value(inner), @engine._prep_value(outer), n))
+      @engine._context("rounded_corners") do
+        requires_region
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :rounded_corners, @engine._make_value(inner), @engine._make_value(outer), n))
+      end
     end
     
     # %DRC%
@@ -578,8 +796,10 @@ CODE
     # method (see \raw and \clean).
     
     def smoothed(d)
-      requires_region("smoothed")
-      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :smoothed, @engine._prep_value(d)))
+      @engine._context("smoothed") do
+        requires_region
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :smoothed, @engine._make_value(d)))
+      end
     end
     
     # %DRC%
@@ -632,8 +852,10 @@ CODE
     # @/table
      
     def texts(*args)
-      requires_texts_or_region("texts")
-      self._texts_impl(false, *args)
+      @engine._context("texts") do
+        requires_texts_or_region
+        self._texts_impl(false, *args)
+      end
     end
 
     # %DRC%
@@ -651,8 +873,10 @@ CODE
     # not matching the filter.
 
     def texts_not(*args)
-      requires_texts("texts_not")
-      self._texts_impl(true, *args)
+      @engine._context("texts_not") do
+        requires_texts
+        self._texts_impl(true, *args)
+      end
     end
 
     # Implementation of texts or texts_not
@@ -673,15 +897,15 @@ CODE
         elsif a.is_a?(DRCAsDots)
           as_dots = a.value
         else
-          raise("Invalid argument for 'texts' method")
+          raise("Invalid argument type #{a.inspect}")
         end
       end
 
-      if @data.is_a?(RBA::Texts)
+      if self.data.is_a?(RBA::Texts)
         if as_pattern
-          result = @engine._tcmd(@data, 0, RBA::Texts, :with_match, pattern, invert)
+          result = @engine._tcmd(self.data, 0, RBA::Texts, :with_match, pattern, invert)
         else
-          result = @engine._tcmd(@data, 0, RBA::Texts, :with_text, pattern, invert)
+          result = @engine._tcmd(self.data, 0, RBA::Texts, :with_text, pattern, invert)
         end
         if as_dots
           return DRCLayer::new(@engine, @engine._tcmd(result, 0, RBA::Region, :edges))
@@ -692,9 +916,9 @@ CODE
         end
       else    
         if as_dots
-          return DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts_dots, pattern, as_pattern))
+          return DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :texts_dots, pattern, as_pattern))
         else
-          return DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts, pattern, as_pattern))
+          return DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :texts, pattern, as_pattern))
         end
       end
 
@@ -733,30 +957,34 @@ CODE
 
     def corners(*args)
 
-      requires_region("corners")
+      @engine._context("corners") do
 
-      as_dots = false
-      amin = -180.0
-      amax = 180.0
+        requires_region
 
-      args.each do |a|
-        if a.is_a?(Range)
-          if (!a.min.is_a?(1.0.class) && !a.min.is_a?(1.class)) || (!a.max.is_a?(1.0.class) && !a.max.is_a?(1.class))
-            raise("An angle limit requires an interval of two angles")
+        as_dots = false
+        amin = -180.0
+        amax = 180.0
+
+        args.each do |a|
+          if a.is_a?(Range)
+            if (!a.min.is_a?(1.0.class) && !a.min.is_a?(1.class)) || (!a.max.is_a?(1.0.class) && !a.max.is_a?(1.class))
+              raise("An angle limit requires an interval of two angles")
+            end
+            amin = a.min.to_f
+            amax = a.max.to_f
+          elsif a.is_a?(1.0.class) || a.is_a?(1.class)
+            amin = a.to_f
+            amax = a.to_f
+          elsif a.is_a?(DRCAsDots)
+            as_dots = a.value
+          else
+            raise("Invalid argument #{a.inspect}")
           end
-          amin = a.min.to_f
-          amax = a.max.to_f
-        elsif a.is_a?(1.0.class) || a.is_a?(1.class)
-          amin = a.to_f
-          amax = a.to_f
-        elsif a.is_a?(DRCAsDots)
-          as_dots = a.value
-        else
-          raise("Invalid argument for 'corners' method")
         end
-      end
 
-      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, as_dots ? :corners_dots : :corners, amin, amax))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, as_dots ? :corners_dots : :corners, amin, amax))
+
+      end
 
     end
 
@@ -882,67 +1110,71 @@ CODE
       eval <<"CODE"
       def #{f}(*args)
 
-        requires_region("#{f}")
+        @engine._context("#{f}") do
 
-        f = []
-        as_edges = false
+          requires_region
 
-        @@std_refs ||= { 
-          :center => [0.5] * 4,
-          :c => [0.5] * 4,
-          :bottom_center => [ 0.5, 0.0, 0.5, 0.0 ],
-          :bc => [ 0.5, 0.0, 0.5, 0.0 ],
-          :bottom_left => [ 0.0, 0.0, 0.0, 0.0 ],
-          :bl => [ 0.0, 0.0, 0.0, 0.0 ],
-          :bottom_right => [ 1.0, 0.0, 1.0, 0.0 ],
-          :br => [ 1.0, 0.0, 1.0, 0.0 ],
-          :top_center => [ 0.5, 1.0, 0.5, 1.0 ],
-          :tc => [ 0.5, 1.0, 0.5, 1.0 ],
-          :top_left => [ 0.0, 1.0, 0.0, 1.0 ],
-          :tl => [ 0.0, 1.0, 0.0, 1.0 ],
-          :top_right => [ 1.0, 1.0, 1.0, 1.0 ],
-          :tr => [ 1.0, 1.0, 1.0, 1.0 ],
-          :left_center => [ 0.0, 0.5, 0.0, 0.5 ],
-          :lc => [ 0.0, 0.5, 0.0, 0.5 ],
-          :right_center => [ 1.0, 0.5, 1.0, 0.5 ],
-          :rc => [ 1.0, 0.5, 1.0, 0.5 ],
-          :south => [ 0.5, 0.0, 0.5, 0.0 ],
-          :s => [ 0.5, 0.0, 0.5, 0.0 ],
-          :left => [ 0.0, 0.0, 0.0, 1.0 ],
-          :l => [ 0.0, 0.0, 0.0, 1.0 ],
-          :bottom => [ 1.0, 0.0, 0.0, 0.0 ],
-          :b => [ 1.0, 0.0, 0.0, 0.0 ],
-          :right => [ 1.0, 1.0, 1.0, 0.0 ],
-          :r => [ 1.0, 1.0, 1.0, 0.0 ],
-          :top => [ 0.0, 1.0, 1.0, 1.0 ],
-          :t => [ 0.0, 1.0, 1.0, 1.0 ]
-        }
+          f = []
+          as_edges = false
 
-        args.each do |a|
-          if a.is_a?(1.0.class) && :#{f} != :middle
-            f << a 
-          elsif a.is_a?(DRCAsDots)
-            as_edges = a.value
-          elsif @@std_refs[a] && :#{f} != :middle
-            f = @@std_refs[a]
-          else
-            raise("Invalid argument for '#{f}' method")
+          @@std_refs ||= { 
+            :center => [0.5] * 4,
+            :c => [0.5] * 4,
+            :bottom_center => [ 0.5, 0.0, 0.5, 0.0 ],
+            :bc => [ 0.5, 0.0, 0.5, 0.0 ],
+            :bottom_left => [ 0.0, 0.0, 0.0, 0.0 ],
+            :bl => [ 0.0, 0.0, 0.0, 0.0 ],
+            :bottom_right => [ 1.0, 0.0, 1.0, 0.0 ],
+            :br => [ 1.0, 0.0, 1.0, 0.0 ],
+            :top_center => [ 0.5, 1.0, 0.5, 1.0 ],
+            :tc => [ 0.5, 1.0, 0.5, 1.0 ],
+            :top_left => [ 0.0, 1.0, 0.0, 1.0 ],
+            :tl => [ 0.0, 1.0, 0.0, 1.0 ],
+            :top_right => [ 1.0, 1.0, 1.0, 1.0 ],
+            :tr => [ 1.0, 1.0, 1.0, 1.0 ],
+            :left_center => [ 0.0, 0.5, 0.0, 0.5 ],
+            :lc => [ 0.0, 0.5, 0.0, 0.5 ],
+            :right_center => [ 1.0, 0.5, 1.0, 0.5 ],
+            :rc => [ 1.0, 0.5, 1.0, 0.5 ],
+            :south => [ 0.5, 0.0, 0.5, 0.0 ],
+            :s => [ 0.5, 0.0, 0.5, 0.0 ],
+            :left => [ 0.0, 0.0, 0.0, 1.0 ],
+            :l => [ 0.0, 0.0, 0.0, 1.0 ],
+            :bottom => [ 1.0, 0.0, 0.0, 0.0 ],
+            :b => [ 1.0, 0.0, 0.0, 0.0 ],
+            :right => [ 1.0, 1.0, 1.0, 0.0 ],
+            :r => [ 1.0, 1.0, 1.0, 0.0 ],
+            :top => [ 0.0, 1.0, 1.0, 1.0 ],
+            :t => [ 0.0, 1.0, 1.0, 1.0 ]
+          }
+
+          args.each do |a|
+            if a.is_a?(1.0.class) && :#{f} != :middle
+              f << a 
+            elsif a.is_a?(DRCAsDots)
+              as_edges = a.value
+            elsif @@std_refs[a] && :#{f} != :middle
+              f = @@std_refs[a]
+            else
+              raise("Invalid argument: " + a.inspect)
+            end
           end
-        end
 
-        if f.size == 2
-          f = f + f
-        else
-          f = (f + [0.5] * 4)[0..3]
-        end
-            
-        if as_edges
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :extent_refs_edges, *f))
-        else
-          # add oversize for point- and edge-like regions
-          zero_area = (f[0] - f[2]).abs < 1e-7 || (f[1] - f[3]).abs < 1e-7
-          f += [ zero_area ? 1 : 0 ] * 2
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :extent_refs, *f))
+          if f.size == 2
+            f = f + f
+          else
+            f = (f + [0.5] * 4)[0..3]
+          end
+              
+          if as_edges
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :extent_refs_edges, *f))
+          else
+            # add oversize for point- and edge-like regions
+            zero_area = (f[0] - f[2]).abs < 1e-7 || (f[1] - f[3]).abs < 1e-7
+            f += [ zero_area ? 1 : 0 ] * 2
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :extent_refs, *f))
+          end
+
         end
 
       end
@@ -967,14 +1199,20 @@ CODE
     # @/code
   
     def select(&block)
-      new_data = @data.class.new
-      t = RBA::CplxTrans::new(@engine.dbu)
-      @engine.run_timed("\"select\" in: #{@engine.src_line}", @data) do
-        @data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
-          block.call(object.transformed(t)) && new_data.insert(object)
+
+      @engine._wrapper_context("select") do
+
+        new_data = self.data.class.new
+        t = RBA::CplxTrans::new(@engine.dbu)
+        @engine.run_timed("\"select\" in: #{@engine.src_line}", self.data) do
+          self.data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
+            block.call(object.transformed(t)) && new_data.insert(object)
+          end
         end
+        DRCLayer::new(@engine, new_data)
+
       end
-      DRCLayer::new(@engine, new_data)
+
     end
     
     # %DRC%
@@ -988,12 +1226,18 @@ CODE
     # apply to this method.
   
     def each(&block)
-      t = RBA::CplxTrans::new(@engine.dbu)
-      @engine.run_timed("\"select\" in: #{@engine.src_line}", @data) do
-        @data.send(@data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
-          block.call(object.transformed(t))
+
+      @engine._wrapper_context("each") do
+
+        t = RBA::CplxTrans::new(@engine.dbu)
+        @engine.run_timed("\"select\" in: #{@engine.src_line}", self.data) do
+          self.data.send(self.data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
+            block.call(object.transformed(t))
+          end
         end
+
       end
+
     end
     
     # %DRC%
@@ -1054,26 +1298,30 @@ CODE
       eval <<"CODE"
       def #{f}(&block)
 
-        if :#{f} == :collect
-          new_data = @data.class.new
-        elsif :#{f} == :collect_to_region
-          new_data = RBA::Region.new
-        elsif :#{f} == :collect_to_edges
-          new_data = RBA::Edges.new
-        elsif :#{f} == :collect_to_edge_pairs
-          new_data = RBA::EdgePairs.new
-        end
+        @engine._wrapper_context("#{f}") do
 
-        t = RBA::CplxTrans::new(@engine.dbu)
-        dbu_trans = RBA::VCplxTrans::new(1.0 / @engine.dbu)
-
-        @engine.run_timed("\\"select\\" in: " + @engine.src_line, @data) do
-          @data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
-            insert_object_into(new_data, block.call(object.transformed(t)), dbu_trans)
+          if :#{f} == :collect
+            new_data = self.data.class.new
+          elsif :#{f} == :collect_to_region
+            new_data = RBA::Region.new
+          elsif :#{f} == :collect_to_edges
+            new_data = RBA::Edges.new
+          elsif :#{f} == :collect_to_edge_pairs
+            new_data = RBA::EdgePairs.new
           end
-        end
 
-        DRCLayer::new(@engine, new_data)
+          t = RBA::CplxTrans::new(@engine.dbu)
+          dbu_trans = RBA::VCplxTrans::new(1.0 / @engine.dbu)
+
+          @engine.run_timed("\\"select\\" in: " + @engine.src_line, self.data) do
+            self.data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
+              insert_object_into(new_data, block.call(object.transformed(t)), dbu_trans)
+            end
+          end
+
+          DRCLayer::new(@engine, new_data)
+
+        end
 
       end
 CODE
@@ -1085,10 +1333,20 @@ CODE
     # @synopsis layer.odd_polygons
     # Returns the parts of the polygons which are not orientable (i.e. "8" configuration) or self-overlapping.
     # Merged semantics does not apply for this method. Always the raw polygons are taken (see \raw).
+    #
+    # The odd_polygons check is not available in deep mode currently. See \deep_reject_odd_polygons for
+    # an alternative.
     
     def odd_polygons
-      requires_region("ongrid")
-      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :strange_polygon_check))
+      @engine._context("odd_polygons") do
+        if is_deep?
+          @engine.error("'odd_polygons' is not performing any check in deep mode - use 'deep_reject_odd_polygons' instead")
+          return @engine.polygons
+        else
+          requires_region
+          return DRCLayer::new(@engine, @engine._vcmd(self.data, :strange_polygon_check))
+        end
+      end
     end
     
     # %DRC%
@@ -1104,13 +1362,15 @@ CODE
     # This method requires a polygon layer. Merged semantics applies (see \raw and \clean).
     
     def ongrid(*args)
-      requires_region("ongrid")
-      if args.size == 1
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::EdgePairs, :grid_check, @engine._prep_value(args[0]), @engine._prep_value(args[0])))
-      elsif args.size == 2
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::EdgePairs, :grid_check, @engine._prep_value(args[0]), @engine._prep_value(args[1])))
-      else
-        raise("Invalid number of arguments for method 'ongrid'")
+      @engine._context("ongrid") do
+        requires_region
+        if args.size == 1
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::EdgePairs, :grid_check, @engine._make_value(args[0]), @engine._make_value(args[0])))
+        elsif args.size == 2
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::EdgePairs, :grid_check, @engine._make_value(args[0]), @engine._make_value(args[1])))
+        else
+          raise("Invalid number of arguments (1 or 2 expected)")
+        end
       end
     end
     
@@ -1140,27 +1400,32 @@ CODE
     %w(snap snapped).each do |f| 
       eval <<"CODE"
       def #{f}(*args)
-        requires_region("#{f}")
-        gx = gy = 0
-        if args.size == 1
-          gx = gy = @engine._prep_value(args[0])
-        elsif args.size == 2
-          gx = @engine._prep_value(args[0])
-          gy = @engine._prep_value(args[1])
-        else
-          raise("Invalid number of arguments for method 'ongrid'")
+
+        @engine._context("#{f}") do
+
+          requires_region
+          gx = gy = 0
+          if args.size == 1
+            gx = gy = @engine._make_value(args[0])
+          elsif args.size == 2
+            gx = @engine._make_value(args[0])
+            gy = @engine._make_value(args[1])
+          else
+            raise("Invalid number of arguments (1 or 2 expected)")
+          end
+          if :#{f} == :snap && @engine.is_tiled?
+            # in tiled mode, no modifying versions are available
+            self.data = @engine._tcmd(self.data, 0, self.data.class, :snapped, gx, gy)
+            self
+          elsif :#{f} == :snap
+            @engine._tcmd(self.data, 0, self.data.class, :#{f}, gx, gy)
+            self
+          else
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, gx, gy))
+          end
+
         end
-        aa = args.collect { |a| @engine._prep_value(a) }
-        if :#{f} == :snap && @engine.is_tiled?
-          # in tiled mode, no modifying versions are available
-          @data = @engine._tcmd(@data, 0, @data.class, :snapped, gx, gy)
-          self
-        elsif :#{f} == :snap
-          @engine._tcmd(@data, 0, @data.class, :#{f}, gx, gy)
-          self
-        else
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, gx, gy))
-        end
+
       end
 CODE
     end
@@ -1199,7 +1464,9 @@ CODE
     # @/table
     
     def and(other)
-      self & other    
+      @engine._context("and") do
+        self & other    
+      end
     end
     
     # %DRC%
@@ -1236,7 +1503,9 @@ CODE
     # @/table
     
     def not(other)
-      self - other    
+      @engine._context("not") do
+        self - other    
+      end
     end
     
     # %DRC%
@@ -1259,7 +1528,9 @@ CODE
     # @/table
     
     def xor(other)
-      self ^ other    
+      @engine._context("xor") do
+        self ^ other    
+      end
     end
     
     # %DRC%
@@ -1282,7 +1553,9 @@ CODE
     # @/table
     
     def or(other)
-      self | other    
+      @engine._context("or") do
+        self | other    
+      end
     end
     
     # %DRC%
@@ -1305,9 +1578,44 @@ CODE
     # @/table
     
     def join(other)
-      self + other
+      @engine._context("join") do
+        self + other
+      end
     end
     
+    # %DRC%
+    # @name andnot
+    # @brief Computes Boolean AND and NOT results at the same time
+    # @synopsis layer.andnot(other)
+    # This method returns a two-element array containing one layer for the
+    # AND result and one for the NOT result.
+    #
+    # This method is available for polygon layers.
+    #
+    # It can be used to initialize two variables with the AND and NOT results:
+    #
+    # @code
+    # (and_result, not_result) = l1.andnot(l2)
+    # @/code
+    #
+    # As the AND and NOT results are computed in the same sweep, calling this
+    # method is faster than calling AND and NOT separately.
+   
+    def andnot(other)
+
+      @engine._context("andnot") do
+
+        requires_region
+        other.requires_region
+
+        res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :andnot, other.data)
+
+        [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
+
+      end
+
+    end
+
     # %DRC%
     # @name &
     # @brief Boolean AND operation
@@ -1357,17 +1665,103 @@ CODE
     # is "\join". See there for a description of the function.
    
     # %DRC%
+    # @name covering
+    # @brief Selects shapes or regions of self which completely cover (enclose) one or more shapes from the other region
+    # @synopsis layer.covering(other)
+    # @synopsis layer.covering(other, min_count)
+    # @synopsis layer.covering(other, min_count, max_count)
+    # @synopsis layer.covering(other, min_count .. max_count)
+    # This method selects all shapes or regions from self which completly cover shapes from the other
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected.
+    # It returns a new layer containing the selected shapes. A version which modifies self
+    # is \select_covering.
+    #
+    # This method is available for polygons only.
+    #
+    # The following image shows the effect of the "covering" method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_covering.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # A range of counts can be specified. If so, the shape from the primary layer is 
+    # only selected when covering a given number of shapes from the other layer.
+    # For the interpretation of the count see \interacting.
+    #
+    # The "covering" attribute is sometimes called "enclosing", but this name is
+    # used for the respective DRC function (see \enclosing).
+    
+    # %DRC%
+    # @name not_covering
+    # @brief Selects shapes or regions of self which do not cover (enclose) one or more shapes from the other region
+    # @synopsis layer.not_covering(other)
+    # @synopsis layer.not_covering(other, min_count)
+    # @synopsis layer.not_covering(other, min_count, max_count)
+    # @synopsis layer.not_covering(other, min_count .. max_count)
+    # This method selects all shapes or regions from self which do not cover shapes from the other
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected. This method returns the inverse of \covering
+    # and provides the same options.
+    #
+    # The following image shows the effect of the "not_covering" method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_not_covering.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # This method is available for polygons only.
+    # It returns a new layer containing the selected shapes. A version which modifies self
+    # is \select_not_covering.
+    
+    # %DRC%
+    # @name select_covering
+    # @brief Selects shapes or regions of self which completely cover (enclose) one or more shapes from the other region
+    # @synopsis layer.select_covering(other)
+    # @synopsis layer.select_covering(other, min_count)
+    # @synopsis layer.select_covering(other, min_count, max_count)
+    # @synopsis layer.select_covering(other, min_count .. max_count)
+    # This method selects all shapes or regions from self which cover shapes from the other
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected.
+    # It modifies self to contain the selected shapes. A version which does not modify self
+    # is \covering.
+    #
+    # This method is available for polygons only.
+    
+    # %DRC%
+    # @name select_not_covering
+    # @brief Selects shapes or regions of self which do not cover (enclose) one or more shapes from the other region
+    # @synopsis layer.select_not_covering(other)
+    # @synopsis layer.select_not_covering(other, min_count)
+    # @synopsis layer.select_not_covering(other, min_count, max_count)
+    # @synopsis layer.select_not_covering(other, min_count .. max_count)
+    # This method selects all shapes or regions from self which do not cover shapes from the other
+    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected. 
+    # It modifies self to contain the selected shapes. A version which does not modify self
+    # is \not_covering.
+    #
+    # This method is available for polygons only.
+
+    # %DRC%
     # @name overlapping
     # @brief Selects shapes or regions of self which overlap shapes from the other region
     # @synopsis layer.overlapping(other)
+    # @synopsis layer.overlapping(other, min_count)
+    # @synopsis layer.overlapping(other, min_count, max_count)
+    # @synopsis layer.overlapping(other, min_count .. max_count)
     # This method selects all shapes or regions from self which overlap shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_overlapping.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygons only.
     #
     # The following image shows the effect of the "overlapping" method:
     #
@@ -1376,20 +1770,27 @@ CODE
     #     @td @img(/images/drc_overlapping.png) @/td
     #   @/tr
     # @/table
+    #
+    # A range of counts can be specified. If so, the shape from the primary layer is 
+    # only selected when overlapping a given number of shapes from the other layer.
+    # For the interpretation of the count see \interacting.
     
     # %DRC%
     # @name not_overlapping
     # @brief Selects shapes or regions of self which do not overlap shapes from the other region
     # @synopsis layer.not_overlapping(other)
+    # @synopsis layer.not_overlapping(other, min_count)
+    # @synopsis layer.not_overlapping(other, min_count, max_count)
+    # @synopsis layer.not_overlapping(other, min_count .. max_count)
     # This method selects all shapes or regions from self which do not overlap shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
-    # otherwise individual shapes are selected.
+    # otherwise individual shapes are selected. This method will return the inverse of \overlapping
+    # and provides the same options.
     #
-    # The "not_overlapping" method is equivalent to the \outside method. It is provided
-    # as an alias for consistency.
+    # The "not_overlapping" method is similar to the \outside method. However, "outside" does 
+    # not provide the option to specify counts.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygons only.
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_not_overlapping.
     
@@ -1397,27 +1798,31 @@ CODE
     # @name select_overlapping
     # @brief Selects shapes or regions of self which overlap shapes from the other region
     # @synopsis layer.select_overlapping(other)
+    # @synopsis layer.select_overlapping(other, min_count)
+    # @synopsis layer.select_overlapping(other, min_count, max_count)
+    # @synopsis layer.select_overlapping(other, min_count .. max_count)
     # This method selects all shapes or regions from self which overlap shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \overlapping.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygons only.
     
     # %DRC%
     # @name select_not_overlapping
     # @brief Selects shapes or regions of self which do not overlap shapes from the other region
     # @synopsis layer.select_not_overlapping(other)
+    # @synopsis layer.select_not_overlapping(other, min_count)
+    # @synopsis layer.select_not_overlapping(other, min_count, max_count)
+    # @synopsis layer.select_not_overlapping(other, min_count .. max_count)
     # This method selects all shapes or regions from self which do not overlap shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected. 
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \not_overlapping.
     #
-    # This method is available for polygon and edge layers. Edges can be selected
-    # with respect to other edges or polygons.
+    # This method is available for polygons only.
     
     # %DRC%
     # @name inside
@@ -1611,6 +2016,9 @@ CODE
     # @name interacting
     # @brief Selects shapes or regions of self which touch or overlap shapes from the other region
     # @synopsis layer.interacting(other)
+    # @synopsis layer.interacting(other, min_count)
+    # @synopsis layer.interacting(other, min_count, max_count)
+    # @synopsis layer.interacting(other, min_count .. max_count)
     # This method selects all shapes or regions from self which touch or overlap shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
@@ -1628,11 +2036,30 @@ CODE
     #     @td @img(/images/drc_interacting.png) @/td
     #   @/tr
     # @/table
+    #
+    # If a single count is given, shapes from self are selected only if they do interact at least with the given
+    # number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+    # self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
+    # from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_interacting2.png) @/td
+    #     @td @img(/images/drc_interacting3.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_interacting4.png) @/td
+    #     @td @img(/images/drc_interacting5.png) @/td
+    #   @/tr
+    # @/table
     
     # %DRC%
     # @name not_interacting
     # @brief Selects shapes or regions of self which do not touch or overlap shapes from the other region
     # @synopsis layer.not_interacting(other)
+    # @synopsis layer.not_interacting(other, min_count)
+    # @synopsis layer.not_interacting(other, min_count, max_count)
+    # @synopsis layer.not_interacting(other, min_count .. max_count)
     # This method selects all shapes or regions from self which do not touch or overlap shapes from the other
     # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
@@ -1650,13 +2077,32 @@ CODE
     #     @td @img(/images/drc_not_interacting.png) @/td
     #   @/tr
     # @/table
+    #
+    # If a single count is given, shapes from self are selected only if they interact with less than the given
+    # number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+    # self are selected only if they interact with less than min_count or more than max_count different shapes
+    # from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_not_interacting2.png) @/td
+    #     @td @img(/images/drc_not_interacting3.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_not_interacting4.png) @/td
+    #     @td @img(/images/drc_not_interacting5.png) @/td
+    #   @/tr
+    # @/table
     
     # %DRC%
     # @name select_interacting
     # @brief Selects shapes or regions of self which touch or overlap shapes from the other region
     # @synopsis layer.select_interacting(other)
+    # @synopsis layer.select_interacting(other, min_count)
+    # @synopsis layer.select_interacting(other, min_count, max_count)
+    # @synopsis layer.select_interacting(other, min_count .. max_count)
     # This method selects all shapes or regions from self which touch or overlap shapes from the other
-    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
+    # layer. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \interacting.
@@ -1664,13 +2110,21 @@ CODE
     # This method is available for polygon, text and edge layers. Edges can be selected
     # with respect to other edges or polygons. Texts can be selected with respect to 
     # polygons. Polygons can be selected with respect to edges, texts and other polygons.
+    #
+    # If a single count is given, shapes from self are selected only if they do interact at least with the given
+    # number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+    # self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
+    # from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
     
     # %DRC%
     # @name select_not_interacting
     # @brief Selects shapes or regions of self which do not touch or overlap shapes from the other region
-    # @synopsis layer.select_interacting(other)
+    # @synopsis layer.select_not_interacting(other)
+    # @synopsis layer.select_not_interacting(other, min_count)
+    # @synopsis layer.select_not_interacting(other, min_count, max_count)
+    # @synopsis layer.select_not_interacting(other, min_count .. max_count)
     # This method selects all shapes or regions from self which do not touch or overlap shapes from the other
-    # region. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
+    # layer. Unless self is in raw mode (see \raw), coherent regions are selected from self, 
     # otherwise individual shapes are selected.
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \not_interacting.
@@ -1678,6 +2132,11 @@ CODE
     # This method is available for polygon, text and edge layers. Edges can be selected
     # with respect to other edges or polygons. Texts can be selected with respect to 
     # polygons. Polygons can be selected with respect to edges, texts and other polygons.
+    #
+    # If a single count is given, shapes from self are selected only if they interact with less than the given
+    # number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+    # self are selected only if they interact with less than min_count or more than max_count different shapes
+    # from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
     
     # %DRC%
     # @name intersections
@@ -1768,30 +2227,39 @@ CODE
     %w(pull_interacting pull_overlapping pull_inside).each do |f| 
       eval <<"CODE"
       def #{f}(other)
-        if :#{f} != :pull_interacting 
-          requires_region("#{f}")
-          other.requires_region("#{f}")
-        else
-          requires_edges_texts_or_region("#{f}")
-          if @data.is_a?(RBA::Text)
-            other.requires_region("#{f}")
-          elsif @data.is_a?(RBA::Region)
-            other.requires_edges_texts_or_region("#{f}")
+ 
+        @engine._context("#{f}") do
+
+          if :#{f} != :pull_interacting 
+            requires_region
+            other.requires_region
           else
-            other.requires_edges_or_region("#{f}")
+            requires_edges_texts_or_region
+            if self.data.is_a?(RBA::Text)
+              other.requires_region
+            elsif self.data.is_a?(RBA::Region)
+              other.requires_edges_texts_or_region
+            else
+              other.requires_edges_or_region
+            end
           end
+
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, other.data.class, :#{f}, other.data))
+
         end
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, other.data.class, :#{f}, other.data))
+
       end
 CODE
     end
 
-    %w(| ^ overlapping not_overlapping inside not_inside outside not_outside in not_in).each do |f| 
+    %w(| ^ inside not_inside outside not_outside in not_in).each do |f| 
       eval <<"CODE"
       def #{f}(other)
-        requires_same_type(other, "#{f}")
-        requires_edges_or_region("#{f}")
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+        @engine._context("#{f}") do
+          requires_same_type(other)
+          requires_edges_or_region
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+        end
       end
 CODE
     end
@@ -1799,13 +2267,19 @@ CODE
     %w(& -).each do |f| 
       eval <<"CODE"
       def #{f}(other)
-        other.requires_edges_texts_or_region("#{f}")
-        if @data.is_a?(RBA::Texts)
-          other.requires_region("#{f}")
-        else
-          other.requires_edges_or_region("#{f}")
+
+        @engine._context("#{f}") do
+
+          other.requires_edges_texts_or_region
+          if self.data.is_a?(RBA::Texts)
+            other.requires_region
+          else
+            other.requires_edges_or_region
+          end
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+
         end
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+
       end
 CODE
     end
@@ -1813,52 +2287,120 @@ CODE
     %w(+).each do |f| 
       eval <<"CODE"
       def #{f}(other)
-        requires_same_type(other, "#{f}")
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+        @engine._context("#{f}") do
+          requires_same_type(other)
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+        end
       end
 CODE
     end
 
     %w(interacting not_interacting).each do |f| 
       eval <<"CODE"
-      def #{f}(other)
-        other.requires_edges_texts_or_region("#{f}")
-        if @data.is_a?(RBA::Text)
-          other.requires_region("#{f}")
-        elsif @data.is_a?(RBA::Region)
-          other.requires_edges_texts_or_region("#{f}")
-        else
-          other.requires_edges_or_region("#{f}")
+      def #{f}(other, *args)
+
+        @engine._context("#{f}") do
+
+          other.requires_edges_texts_or_region
+          if self.data.is_a?(RBA::Text)
+            other.requires_region
+          elsif self.data.is_a?(RBA::Region)
+            other.requires_edges_texts_or_region
+          else
+            other.requires_edges_or_region
+          end
+
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(*args)))
+
         end
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+
       end
 CODE
     end
 
-    %w(interacting not_interacting overlapping not_overlapping inside not_inside outside not_outside).each do |fi|
+    %w(interacting not_interacting).each do |fi|
+      f = "select_" + fi
+      # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
+      eval <<"CODE"
+      def #{f}(other, *args)
+
+        @engine._context("#{f}") do
+
+          requires_edges_texts_or_region
+          if self.data.is_a?(RBA::Text)
+            other.requires_region
+          elsif self.data.is_a?(RBA::Region)
+            other.requires_edges_texts_or_region
+          else
+            other.requires_edges_or_region
+          end
+          if @engine.is_tiled?
+            self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data, *minmax_count(*args))
+            DRCLayer::new(@engine, self.data)
+          else
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(*args)))
+          end
+
+        end
+
+      end
+CODE
+    end
+    
+    %w(overlapping not_overlapping covering not_covering).each do |f| 
+      eval <<"CODE"
+      def #{f}(other, *args)
+        @engine._context("#{f}") do
+          requires_same_type(other)
+          requires_region
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(*args)))
+        end
+      end
+CODE
+    end
+
+    %w(overlapping not_overlapping covering not_covering).each do |fi|
+      f = "select_" + fi
+      # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
+      eval <<"CODE"
+      def #{f}(other, *args)
+
+        @engine._context("#{f}") do
+
+          requires_region
+          requires_same_type(other)
+          if @engine.is_tiled?
+            self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data, *minmax_count(*args))
+            DRCLayer::new(@engine, self.data)
+          else
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(*args)))
+          end
+
+        end
+
+      end
+CODE
+    end
+    
+    %w(inside not_inside outside not_outside).each do |fi|
       f = "select_" + fi
       # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
       eval <<"CODE"
       def #{f}(other)
-        if :#{fi} != :interacting && :#{fi} != :not_interacting 
-          requires_edges_or_region("#{f}")
-          requires_same_type(other, "#{f}")
-        else
-          requires_edges_texts_or_region("#{f}")
-          if @data.is_a?(RBA::Text)
-            other.requires_region("#{f}")
-          elsif @data.is_a?(RBA::Region)
-            other.requires_edges_texts_or_region("#{f}")
+
+        @engine._context("#{f}") do
+
+          requires_region
+          requires_same_type(other)
+          if @engine.is_tiled?
+            self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data)
+            DRCLayer::new(@engine, self.data)
           else
-            other.requires_edges_or_region("#{f}")
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
           end
+
         end
-        if @engine.is_tiled?
-          @data = @engine._tcmd(@data, 0, @data.class, :#{fi}, other.data)
-          DRCLayer::new(@engine, @data)
-        else
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
-        end
+
       end
 CODE
     end
@@ -1866,9 +2408,11 @@ CODE
     %w(inside_part outside_part).each do |f|
       eval <<"CODE"
       def #{f}(other)
-        other.requires_region("#{f}")
-        requires_edges("#{f}")
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+        @engine._context("#{f}") do
+          other.requires_region
+          requires_edges
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+        end
       end
 CODE
     end
@@ -1876,21 +2420,32 @@ CODE
     %w(intersections).each do |f|
       eval <<"CODE"
       def #{f}(other)
-        other.requires_edges("#{f}")
-        requires_edges("#{f}")
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+        @engine._context("#{f}") do
+          other.requires_edges
+          requires_edges
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+        end
       end
 CODE
     end
     
     # %DRC%
     # @name rectangles
-    # @brief Selects all rectangle polygons from the input
+    # @brief Selects all rectangles from the input
     # @synopsis layer.rectangles
     #
     # This method is available for polygon layers. By default "merged" semantics applies, 
     # i.e. all polygons are merged before rectangles are selected (see \clean and \raw).
     # \non_rectangles will select all non-rectangles.
+
+    # %DRC%
+    # @name squares
+    # @brief Selects all squares from the input
+    # @synopsis layer.squares
+    #
+    # This method is available for polygon layers. By default "merged" semantics applies, 
+    # i.e. all polygons are merged before squares are selected (see \clean and \raw).
+    # \non_squares will select all non-rectangles.
 
     # %DRC%
     # @name rectilinear
@@ -1900,6 +2455,14 @@ CODE
     # This method is available for polygon layers. By default "merged" semantics applies, 
     # i.e. all polygons are merged before rectilinear polygons are selected (see \clean and \raw).
     # \non_rectilinear will select all non-rectangles.
+    
+    # %DRC%
+    # @name non_squares
+    # @brief Selects all polygons from the input which are not squares
+    # @synopsis layer.non_rectangles
+    #
+    # This method is available for polygon layers. By default "merged" semantics applies, 
+    # i.e. all polygons are merged before non-squares are selected (see \clean and \raw).
     
     # %DRC%
     # @name non_rectangles
@@ -1953,12 +2516,14 @@ CODE
     #   @/tr
     # @/table
 
-    %w(rectangles rectilinear non_rectangles non_rectilinear
+    %w(rectangles rectilinear non_rectangles non_rectilinear squares non_squares
        holes hulls).each do |f| 
       eval <<"CODE"
       def #{f}
-        requires_region("#{f}")
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :#{f}))
+        @engine._context("#{f}") do
+          requires_region
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :#{f}))
+        end
       end
 CODE
     end
@@ -2038,9 +2603,11 @@ CODE
     %w(end_segments start_segments centers).each do |f|
       eval <<"CODE"
       def #{f}(length, fraction = 0.0)
-        requires_edges("#{f}")
-        length = @engine._prep_value(length)
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :#{f}, length, fraction))
+        @engine._context("#{f}") do
+          requires_edges
+          length = @engine._make_value(length)
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :#{f}, length, fraction))
+        end
       end
 CODE
     end
@@ -2082,33 +2649,37 @@ CODE
       eval <<"CODE"
       def #{f}(*args)
       
-        requires_edges("#{f}")
-        
-        av = [ 0, 0, 0, 0, false ]
-        args.each_with_index do |a,i|
-          if a.is_a?(Hash)
-            a[:begin]  && av[0] = @engine._prep_value(a[:begin])
-            a[:end]    && av[1] = @engine._prep_value(a[:end])
-            a[:out]    && av[2] = @engine._prep_value(a[:out])
-            a[:in]     && av[3] = @engine._prep_value(a[:in])
-            a[:joined] && av[4] = true
-          elsif i < 4
-            if !a.is_a?(1.class) && !a.is_a?(Float)
-              raise("Invalid type for argument " + (i+1).to_s + " (method '#{f}')")
-            end
-            av[i] = @engine._prep_value(a)
-          elsif i == 4
-            if a.is_a?(DRCJoinFlag)
-              av[i] = a.value
-            else
-              av[i] = (a ? true : false)
-            end
-          else
-            raise("Too many arguments for method '#{f}' (1 to 5 expected)")
-          end
-        end
+        @engine._context("#{f}") do
 
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :#{f}, *av))
+          requires_edges
+          
+          av = [ 0, 0, 0, 0, false ]
+          args.each_with_index do |a,i|
+            if a.is_a?(Hash)
+              a[:begin]  && av[0] = @engine._make_value(a[:begin])
+              a[:end]    && av[1] = @engine._make_value(a[:end])
+              a[:out]    && av[2] = @engine._make_value(a[:out])
+              a[:in]     && av[3] = @engine._make_value(a[:in])
+              a[:joined] && av[4] = true
+            elsif i < 4
+              if !a.is_a?(1.class) && !a.is_a?(Float)
+                raise("Invalid type for argument #" + (i+1).to_s)
+              end
+              av[i] = @engine._make_value(a)
+            elsif i == 4
+              if a.is_a?(DRCJoinFlag)
+                av[i] = a.value
+              else
+                av[i] = (a ? true : false)
+              end
+            else
+              raise("Too many arguments (1 to 5 expected)")
+            end
+          end
+
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :#{f}, *av))
+
+        end
 
       end
 CODE
@@ -2141,8 +2712,10 @@ CODE
     %w(extended_in extended_out).each do |f| 
       eval <<"CODE"
       def #{f}(dist)
-        requires_edges("#{f}")
-        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :#{f}, @engine._prep_value(dist)))
+        @engine._context("#{f}") do
+          requires_edges
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :#{f}, @engine._make_value(dist)))
+        end
       end
 CODE
     end
@@ -2162,12 +2735,14 @@ CODE
     %w(edges).each do |f| 
       eval <<"CODE"
       def #{f}
-        if @data.is_a?(RBA::Region)
-          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :#{f}))
-        elsif @data.is_a?(RBA::EdgePairs)
-          DRCLayer::new(@engine, @engine._cmd(@data, :#{f}))
-        else
-          raise "#{f}: Layer must be a polygon or edge pair layer"
+        @engine._context("#{f}") do
+          if self.data.is_a?(RBA::Region)
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :#{f}))
+          elsif self.data.is_a?(RBA::EdgePairs)
+            DRCLayer::new(@engine, @engine._cmd(self.data, :#{f}))
+          else
+            raise "Layer must be a polygon or edge pair layer"
+          end
         end
       end
 CODE
@@ -2180,6 +2755,9 @@ CODE
     # 
     # Applies to edge pair collections only.
     # Returns the first edges of the edge pairs in the collection.
+    #
+    # Some checks deliver symmetric edge pairs (e.g. space, width, etc.) for which the
+    # edges are commutable. "first_edges" will deliver both edges for such edge pairs.
     
     # %DRC%
     # @name second_edges
@@ -2188,12 +2766,18 @@ CODE
     # 
     # Applies to edge pair collections only.
     # Returns the second edges of the edge pairs in the collection.
+    #
+    # Some checks deliver symmetric edge pairs (e.g. space, width, etc.) for which the
+    # edges are commutable. "second_edges" will not deliver edges for such edge pairs.
+    # Instead, "first_edges" will deliver both.
     
     %w(first_edges second_edges).each do |f| 
       eval <<"CODE"
       def #{f}
-        requires_edge_pairs("#{f}")
-        DRCLayer::new(@engine, @engine._cmd(@data, :#{f}))
+        @engine._context("#{f}") do
+          requires_edge_pairs
+          DRCLayer::new(@engine, @engine._cmd(self.data, :#{f}))
+        end
       end
 CODE
     end
@@ -2206,7 +2790,7 @@ CODE
     # micrometer units. 
     
     def bbox
-      RBA::DBox::from_ibox(@data.bbox) * @engine.dbu.to_f
+      RBA::DBox::from_ibox(self.data.bbox) * @engine.dbu.to_f
     end
     
     # %DRC%
@@ -2215,7 +2799,7 @@ CODE
     # @synopsis layer.polygons?
     
     def polygons?
-      @data.is_a?(RBA::Region)
+      self.data.is_a?(RBA::Region)
     end
     
     # %DRC%
@@ -2224,7 +2808,7 @@ CODE
     # @synopsis layer.edges?
     
     def edges?
-      @data.is_a?(RBA::Edges)
+      self.data.is_a?(RBA::Edges)
     end
     
     # %DRC%
@@ -2233,7 +2817,7 @@ CODE
     # @synopsis layer.edge_pairs?
     
     def edge_pairs?
-      @data.is_a?(RBA::EdgePairs)
+      self.data.is_a?(RBA::EdgePairs)
     end
     
     # %DRC%
@@ -2242,7 +2826,7 @@ CODE
     # @synopsis layer.is_deep?
     
     def is_deep?
-      @data.respond_to?(:is_deep?) && @data.is_deep?
+      self.data.respond_to?(:is_deep?) && self.data.is_deep?
     end
     
     # %DRC%
@@ -2259,8 +2843,10 @@ CODE
     # The returned value gives the area in square micrometer units.
     
     def area
-      requires_region("area")
-      @engine._tdcmd(@data, 0, :area) * (@engine.dbu.to_f * @engine.dbu.to_f)
+      @engine._context("area") do
+        requires_region
+        @engine._tdcmd(self.data, 0, :area) * (@engine.dbu.to_f * @engine.dbu.to_f)
+      end
     end
     
     # %DRC%
@@ -2276,10 +2862,12 @@ CODE
     # The returned value gives the perimeter in micrometer units.
     
     def perimeter
-      requires_region("perimeter")
-      # Note: we have to add 1 DBU border to collect the neighbors. It's important
-      # to know then since they tell us whether an edge is an outside edge.
-      @engine._tdcmd(@data, 1, :perimeter) * @engine.dbu.to_f
+      @engine._context("perimeter") do
+        requires_region
+        # Note: we have to add 1 DBU border to collect the neighbors. It's important
+        # to know then since they tell us whether an edge is an outside edge.
+        @engine._tdcmd(self.data, 1, :perimeter) * @engine.dbu.to_f
+      end
     end
     
     # %DRC%
@@ -2292,8 +2880,10 @@ CODE
     # is composed of multiple pieces, this method will not return true.
     
     def is_box?
-      requires_region("is_box?")
-      @engine._cmd(@data, :is_box?)
+      @engine._context("is_box?") do
+        requires_region
+        @engine._cmd(self.data, :is_box?)
+      end
     end
     
     # %DRC%
@@ -2308,10 +2898,12 @@ CODE
     # edges are not counted twice.
     
     def length
-      requires_edges("length")
-      @engine._cmd(@data, :length) * @engine.dbu.to_f
+      @engine._context("length") do
+        requires_edges
+        @engine._cmd(self.data, :length) * @engine.dbu.to_f
+      end
     end
-    
+
     # %DRC%
     # @name flatten
     # @brief Flattens the layer
@@ -2323,7 +2915,9 @@ CODE
     # to a flat collection of texts, polygons, edges or edge pairs.
     
     def flatten
-      DRC::DRCLayer::new(@engine, @engine._cmd(@data, :flatten))
+      @engine._context("flatten") do
+        DRC::DRCLayer::new(@engine, @engine._cmd(self.data, :flatten))
+      end
     end
     
     # %DRC%
@@ -2338,8 +2932,10 @@ CODE
     # tells, whether calling \merge is necessary.
     
     def is_merged?
-      requires_edges_or_region("is_merged?")
-      @data.is_merged?
+      @engine._context("is_merged?") do
+        requires_edges_or_region
+        self.data.is_merged?
+      end
     end
     
     # %DRC%
@@ -2348,7 +2944,7 @@ CODE
     # @synopsis layer.is_empty?
     
     def is_empty?
-      @data.is_empty?
+      self.data.is_empty?
     end
     
     # %DRC%
@@ -2386,6 +2982,9 @@ CODE
     # @brief A width check
     # @synopsis layer.width(value [, options])
     # 
+    # @b Note: @/b "width" is available as an operator for the "universal DRC" function \Layer#drc within
+    # the \DRC framework. This variant has more options and is more intuitive to use. See \global#width for more details.
+    #
     # This method performs a width check and returns a collection of edge pairs.
     # A width check can be performed on polygon and edge layers. On edge layers, all
     # edges are checked against all other edges. If two edges form a "back to back" relation
@@ -2394,6 +2993,8 @@ CODE
     # On polygon layers, the polygons on each layer are checked for locations where their
     # width is less than the specified value. In that case, an edge pair error shape is generated.
     # 
+    # @h3 Options @/h3
+    #
     # The options available are:
     #
     # @ul
@@ -2409,6 +3010,12 @@ CODE
     #   @li @b projection_limits(min, max) or projection_limits(min .. max) @/b:
     #         this option makes the check only consider edge pairs whose projected length on
     #         each other is more or equal than min and less than max @/li
+    #   @li @b projecting (in condition) @/b: This specification is equivalent to "projection_limits"
+    #         but is more intuitive, as "projecting" is written with a condition, like
+    #         "projecting < 2.um". Available operators are: "==", "<", "<=", ">" and ">=". 
+    #         Double-bounded ranges are also available, like: "0.5 <= projecting < 2.0". @/li
+    #   @li @b transparent @/b: performs the check without shielding (polygon layers only) @/li
+    #   @li @b shielded @/b: performs the check with shielding (polygon layers only) @/li
     # @/ul
     #
     # Note that without the angle_limit, acute corners will always be reported, since two 
@@ -2434,6 +3041,8 @@ CODE
     #   markers = in.width(20.nm)
     # @/code
     #
+    # @h3 Examples @/h3
+    #
     # The following images show the effect of various forms of the width check:
     # 
     # @table
@@ -2446,11 +3055,37 @@ CODE
     #     @td @img(/images/drc_width4.png) @/td
     #   @/tr
     # @/table
+    #
+    # @h3 Universal DRC function @/h3
+    #
+    # There is an alternative notation for the check using the "universal DRC" function ("\Layer#drc"). 
+    # This notation is more intuitive and allows checking for widths bigger than a certain value 
+    # or within a certain range. See "\global#width" for details.
+    #
+    # Apart from that it provides the same options than the plain width check. 
+    # Follow this link for the documentation of this feature: \global#width.
+    #
+    # @h3 Shielding @/h3
+    #
+    # "shielding" is a concept where an internal or external distance is measured only 
+    # if the opposite edge is not blocked by other edges between. Shielded mode makes 
+    # a difference if very large distances are to be checked and the minimum distance
+    # is much smaller: in this case, a large distance violation may be blocked by features
+    # located between the edges which are checked. With shielding, large distance violations
+    # are not reported in this case. Shielding is also effective at zero distance which has
+    # an adverse effect: Consider a case, where one layer A is a subset of another layer B. If 
+    # you try to check the distance between features of B vs. A, you cannot use shielding, 
+    # because B features which are identical to A features will shield those entirely. 
+    #
+    # Shielding is enabled by default, but can be switched off with the "transparent" option.
     
     # %DRC%
     # @name space
     # @brief A space check
     # @synopsis layer.space(value [, options])
+    #
+    # @b Note: @/b "space" is available as an operator for the "universal DRC" function \Layer#drc within
+    # the \DRC framework. This variant has more options and is more intuitive to use. See \global#space for more details.
     #
     # This method performs a space check and returns a collection of edge pairs.
     # A space check can be performed on polygon and edge layers. On edge layers, all
@@ -2467,10 +3102,12 @@ CODE
     # method will only report space violations to other polygons. \separation is a two-layer 
     # space check where space is checked against polygons of another layer.
     #
-    # The options available are the same than for the \width method. Like for the \width 
-    # method, merged semantics applies.
+    # Like for the \width method, merged semantics applies.
+    #
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
+    #
+    # For the manifold options of this function see the \width method description.
     #
     # The following image shows the effect of the space check:
     # 
@@ -2479,16 +3116,23 @@ CODE
     #     @td @img(/images/drc_space1.png) @/td
     #   @/tr
     # @/table
+    #
     
     # %DRC%
     # @name isolated
     # @brief An isolation check
     # @synopsis layer.isolated(value [, options])
+    # @synopsis layer.iso(value [, options])
+    #
+    # @b Note: @/b "isolated" and "iso" are available as operators for the "universal DRC" function \Layer#drc within
+    # the \DRC framework. These variants have more options and are more intuitive to use. See \global#isolated for more details.
     #
     # See \space for a description of this method. 
     # In contrast to \space, this
     # method is available for polygon layers only, since only on such layers 
     # different polygons can be identified.
+    #
+    # "iso" is the short form of this method.
     #
     # The following image shows the effect of the isolated check:
     # 
@@ -2503,10 +3147,14 @@ CODE
     # @brief An intra-region spacing check
     # @synopsis layer.notch(value [, options])
     #
+    # @b Note: @/b "notch" is available as an operator for the "universal DRC" function \Layer#drc within
+    # the \DRC framework. This variant has more options and is more intuitive to use. See \global#notch for more details.
+    #
     # See \space for a description of this method.
     # In contrast to \space, this
     # method is available for polygon layers only, since only on such layers 
-    # different polygons can be identified.
+    # different polygons can be identified. Also, opposite and rectangle error
+    # filtering is not available for this method.
     #
     # The following image shows the effect of the notch check:
     # 
@@ -2520,18 +3168,24 @@ CODE
     # @name separation
     # @brief A two-layer spacing check
     # @synopsis layer.separation(other_layer, value [, options])
+    # @synopsis layer.sep(other_layer, value [, options])
     # 
+    # @b Note: @/b "separation" and "sep" are available as operators for the "universal DRC" function \drc within
+    # the \DRC framework. These variants have more options and are more intuitive to use. 
+    # See \global#separation for more details.
+    #
     # This method performs a two-layer spacing check. Like \space, this method
     # can be applied to edge or polygon layers. Locations where edges of the layer
     # are closer than the specified distance to the other layer are reported
     # as edge pair error markers.
-    # 
+    #
+    # "sep" is the short form of this method.
+    #
     # In contrast to the \space and related methods, locations where both 
     # layers touch are also reported. More specifically, the case of zero spacing
     # will also trigger an error while for \space it will not.
     # 
-    # As for the other DRC methods, merged semantics applies. The options available 
-    # are the same than for \width.  
+    # As for the other DRC methods, merged semantics applies.
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
@@ -2542,11 +3196,83 @@ CODE
     #     @td @img(/images/drc_separation1.png) @/td
     #   @/tr
     # @/table
+    #
+    # @h3 opposite and rectangle error filtering @/h3
+    #
+    # The options for the separation check are those available for the \width or \space
+    # method plus opposite and rectangle error filtering. 
+    #
+    # Opposite error filtering will waive errors that are on opposite sides of the original
+    # figure. The inverse is selection of errors only when there is an error present on
+    # the opposite side of the original figure. Opposite error waiving or selection is achieved
+    # through these options inside the DRC function call:
+    #
+    # @ul
+    #   @li @b not_opposite @/b will waive opposite errors @/li
+    #   @li @b only_opposite @/b will select errors only if there is an opposite one @/li
+    # @/ul
+    #
+    # These modes imply partial waiving or selection if "opposite" only applies to a section
+    # of an error.
+    #
+    # The following images shows the effect of these options:
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_separation2.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_separation3.png) @/td
+    #     @td @img(/images/drc_separation4.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # Rectangle error filtering allows waiving errors based on how they cover the
+    # sides of an original rectangular figure. This selection only applies to errors
+    # covering the full edge of the rectangle. Errors covering parts of the rectangle
+    # edges are not considered in this scheme.
+    #
+    # The rectangle filter option is enabled by these modes:
+    #
+    # @ul
+    #   @li @b one_side_allowed @/b will waive errors when they appear on one side of the rectangle only @/li
+    #   @li @b two_sides_allowed @/b will waive errors when they appear on two sides of the rectangle @/li
+    #   @li @b two_connected_sides_allowed @/b will waive errors when they appear on two connected sides of the rectangle ("L" configuration) @/li
+    #   @li @b two_opposite_sides_allowed @/b will waive errors when they appear on two opposite sides of the rectangle @/li
+    #   @li @b three_sides_allowed @/b will waive errors when they appear on three sides of the rectangle @/li
+    #   @li @b four_sides_allowed @/b will waive errors when they appear on four sides of the rectangle @/li
+    # @/ul
+    #
+    # Multiple of these options can be given, which will make errors waived if one of these conditions is met.
+    # 
+    # The following images shows the effect of some rectangle filter modes:
+    # 
+    # @table 
+    #   @tr 
+    #     @td @img(/images/drc_separation5.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_separation6.png) @/td
+    #     @td @img(/images/drc_separation7.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_separation8.png) @/td
+    #     @td @img(/images/drc_separation9.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_separation10.png) @/td
+    #     @td @img(/images/drc_separation11.png) @/td
+    #   @/tr
+    # @/table
     
     # %DRC% 
     # @name overlap 
     # @brief An overlap check
     # @synopsis layer.overlap(other_layer, value [, options])
+    #
+    # @b Note: @/b "overlap" is available as an operator for the "universal DRC" function \drc within
+    # the \DRC framework. This variant has more options and is more intuitive to use. 
+    # See \global#overlap for more details.
     #
     # This method checks whether layer and other_layer overlap by at least the
     # given length. Locations, where this is not the case will be reported in form
@@ -2555,6 +3281,8 @@ CODE
     # such locations form an overlap with a value of 0. Locations, where both regions 
     # do not overlap or touch will not be reported. Such regions can be detected 
     # with \outside or by a boolean "not".
+    #
+    # The options are the same as for \separation.
     # 
     # Formally, the overlap method is a two-layer width check. In contrast to the single-
     # layer width method (\width), the zero value also triggers an error and separate
@@ -2583,6 +3311,11 @@ CODE
     # @name enclosing
     # @brief An enclosing check
     # @synopsis layer.enclosing(other_layer, value [, options])
+    # @synopsis layer.enc(other_layer, value [, options])
+    #
+    # @b Note: @/b "enclosing" and "enc" are available as operators for the "universal DRC" function \drc within
+    # the \DRC framework. These variants have more options and are more intuitive to use. 
+    # See \global#enclosing for more details.
     #
     # This method checks whether layer encloses (is bigger than) other_layer by the
     # given dimension. Locations, where this is not the case will be reported in form
@@ -2591,6 +3324,10 @@ CODE
     # such locations form an enclosure with a distance of 0. Locations, where other_layer
     # extends outside layer will not be reported as errors. Such regions can be detected
     # by \not_inside or a boolean "not" operation.
+    #
+    # "enc" is the short form of this method.
+    #
+    # The options are the same as for \separation.
     #
     # The enclosing method can be applied to both edge or polygon layers. On edge layers 
     # the orientation of the edges matters and only edges looking into the same direction
@@ -2610,119 +3347,97 @@ CODE
     #   @/tr
     # @/table
     
-    %w(width space overlap enclosing separation).each do |f|
+    %w(width space overlap enclosing separation isolated notch).each do |f|
       eval <<"CODE"
       def #{f}(*args)
 
-        requires_edges_or_region("#{f}")
-        
-        value = nil
-        metrics = nil
-        minp = nil
-        maxp = nil
-        alim = nil
-        whole_edges = false
-        other = nil
+        @engine._context("#{f}") do
 
-        n = 1
-        args.each do |a|
-          if a.is_a?(DRCMetrics)
-            metrics = a.value
-          elsif a.is_a?(DRCWholeEdges)
-            whole_edges = a.value
-          elsif a.is_a?(DRCAngleLimit)
-            alim = a.value
-          elsif a.is_a?(DRCLayer)
-            other = a
-          elsif a.is_a?(DRCProjectionLimits)
-            minp = @engine._prep_value(a.min)
-            maxp = @engine._prep_value(a.max)
-          elsif a.is_a?(Float) || a.is_a?(1.class)
-            value && raise("Value already specified")
-            value = @engine._prep_value(a)
+          if :#{f} == :width || :#{f} == :space || :#{f} == :overlap || :#{f} == :enclosing || :#{f} == :separation
+            requires_edges_or_region
           else
-            raise("#{f}: Parameter #" + n.to_s + " does not have an expected type")
+            requires_region
           end
-          n += 1
-        end
+          
+          value = nil
+          metrics = RBA::Region::Euclidian
+          minp = nil
+          maxp = nil
+          alim = nil
+          whole_edges = false
+          other = nil
+          shielded = nil
+          opposite_filter = RBA::Region::NoOppositeFilter
+          rect_filter = RBA::Region::NoRectFilter
 
-        if !value
-          raise("#{f}: A check value must be specified")
-        end
-        
-        border = (metrics == RBA::Region::Square ? value * 1.5 : value)
-        
-        if "#{f}" == "width" || "#{f}" == "space" || "#{f}" == "notch" || "#{f}" == "isolated"
-          if other
-            raise("No other layer must be specified for single-layer checks (i.e. width)")
+          n = 1
+          args.each do |a|
+            if a.is_a?(DRCMetrics)
+              metrics = a.value
+            elsif a.is_a?(DRCWholeEdges)
+              whole_edges = a.value
+            elsif a.is_a?(DRCOppositeErrorFilter)
+              opposite_filter = a.value
+            elsif a.is_a?(DRCRectangleErrorFilter)
+              rect_filter = RBA::Region::RectFilter::new(a.value.to_i | rect_filter.to_i)
+            elsif a.is_a?(DRCAngleLimit)
+              alim = a.value
+            elsif a.is_a?(DRCLayer)
+              other = a
+            elsif a.is_a?(DRCProjectionLimits)
+              (minp, maxp) = a.get_limits(@engine)
+            elsif a.is_a?(DRCShielded)
+              shielded = a.value
+            elsif a.is_a?(Float) || a.is_a?(1.class)
+              value && raise("Value already specified")
+              value = @engine._make_value(a)
+            else
+              raise("Parameter #" + n.to_s + " does not have an expected type")
+            end
+            n += 1
           end
-          DRCLayer::new(@engine, @engine._tcmd(@data, border, RBA::EdgePairs, :#{f}_check, value, whole_edges, metrics, alim, minp, maxp))
-        else
-          if !other
-            raise("The other layer must be specified for two-layer checks (i.e. overlap)")
+
+          if !value
+            raise("A check value must be specified")
           end
-          requires_same_type(other, "#{f}")
-          DRCLayer::new(@engine, @engine._tcmd(@data, border, RBA::EdgePairs, :#{f}_check, other.data, value, whole_edges, metrics, alim, minp, maxp))
-        end
-        
-      end  
-CODE
-    end
-    
-    %w(isolated notch).each do |f|
-      eval <<"CODE"
-      def #{f}(*args)
 
-        requires_region("#{f}")
-        
-        value = nil
-        metrics = nil
-        minp = nil
-        maxp = nil
-        alim = nil
-        whole_edges = false
-        other = nil
+          args = [ value, whole_edges, metrics, alim, minp, maxp ]
 
-        n = 1
-        args.each do |a|
-          if a.is_a?(DRCMetrics)
-            metrics = a.value
-          elsif a.is_a?(DRCWholeEdges)
-            whole_edges = a.value
-          elsif a.is_a?(DRCAngleLimit)
-            alim = a.value
-          elsif a.is_a?(DRCLayer)
-            other = a
-          elsif a.is_a?(DRCProjectionLimits)
-            minp = @engine._prep_value(a.min)
-            maxp = @engine._prep_value(a.max)
-          elsif a.is_a?(Float) || a.is_a?(1.class)
-            value && raise("Value already specified")
-            value = @engine._prep_value(a)
+          if self.data.is_a?(RBA::Region)
+            args << (shielded == nil ? true : shielded)
+            if :#{f} != :width && :#{f} != :notch
+              args << opposite_filter
+              args << rect_filter
+            elsif opposite_filter != RBA::Region::NoOppositeFilter
+              raise("An opposite error filter cannot be used with this check")
+            elsif rect_filter != RBA::Region::NoRectFilter
+              raise("A rectangle error filter cannot be used with this check")
+            end
+          elsif shielded != nil
+            raise("Shielding can only be used for polygon layers")
+          elsif opposite_filter != RBA::Region::NoOppositeFilter
+            raise("An opposite error filter can only be used for polygon layers")
+          elsif rect_filter != RBA::Region::NoRectFilter
+            raise("A rectangle error filter can only be used for polygon layers")
+          end
+          
+          border = (metrics == RBA::Region::Square ? value * 1.5 : value)
+          
+          if :#{f} == :width || :#{f} == :space || :#{f} == :notch || :#{f} == :isolated
+            if other
+              raise("No other layer must be specified for a single-layer check")
+            end
+            DRCLayer::new(@engine, @engine._tcmd(self.data, border, RBA::EdgePairs, :#{f}_check, *args))
           else
-            raise("#{f}: Parameter #" + n.to_s + " does not have an expected type")
+            if !other
+              raise("The other layer must be specified for a two-layer check")
+            end
+            requires_same_type(other)
+            DRCLayer::new(@engine, @engine._tcmd(self.data, border, RBA::EdgePairs, :#{f}_check, other.data, *args))
           end
-          n += 1
+        
         end
 
-        if !value
-          raise("A check value must be specified")
-        end
-        
-        border = (metrics == RBA::Region::Square ? value * 1.5 : value)
-        
-        if "#{f}" == "width" || "#{f}" == "space" || "#{f}" == "notch" || "#{f}" == "isolated"
-          if other
-            raise("#{f}: No other layer must be specified for single-layer checks (i.e. width)")
-          end
-          DRCLayer::new(@engine, @engine._tcmd(@data, border, RBA::EdgePairs, :#{f}_check, value, whole_edges, metrics, alim, minp, maxp))
-        else
-          if !other
-            raise("#{f}: The other layer must be specified for two-layer checks (i.e. overlap)")
-          end
-          DRCLayer::new(@engine, @engine._tcmd(@data, border, RBA::EdgePairs, :#{f}_check, other.data, value, whole_edges, metrics, alim, minp, maxp))
-        end
-        
       end  
 CODE
     end
@@ -2744,7 +3459,9 @@ CODE
     # @/table
     
     def scaled(f)
-      transformed(RBA::ICplxTrans::new(f.to_f))
+      @engine._context("scaled") do
+        transformed(RBA::ICplxTrans::new(f.to_f))
+      end
     end
     
     # %DRC%
@@ -2757,7 +3474,9 @@ CODE
     # the modified version is returned for further processing.
     
     def scale(f)
-      transform(RBA::ICplxTrans::new(f.to_f))
+      @engine._context("scale") do
+        transform(RBA::ICplxTrans::new(f.to_f))
+      end
     end
     
     # %DRC%
@@ -2777,7 +3496,9 @@ CODE
     # @/table
     
     def rotated(a)
-      transformed(RBA::ICplxTrans::new(1.0, a, false, 0, 0))
+      @engine._context("rotated") do
+        transformed(RBA::ICplxTrans::new(1.0, a, false, 0, 0))
+      end
     end
     
     # %DRC%
@@ -2789,7 +3510,9 @@ CODE
     # upon is modified and the modified version is returned for further processing.
     
     def rotate(a)
-      transform(RBA::ICplxTrans::new(1.0, a, false, 0, 0))
+      @engine._context("rotate") do
+        transform(RBA::ICplxTrans::new(1.0, a, false, 0, 0))
+      end
     end
     
     # %DRC%
@@ -2860,45 +3583,49 @@ CODE
       eval <<"CODE"
       def #{f}(*args)
       
-        requires_region("#{f}")
-        
-        dist = 0
-        
-        mode = 2
-        values = []
-        args.each do |a|
-          if a.is_a?(1.class) || a.is_a?(Float)
-            v = @engine._prep_value(a)
-            v.abs > dist && dist = v.abs 
-            values.push(v)
-          elsif a.is_a?(DRCSizingMode)
-            mode = a.value
+        @engine._context("#{f}") do
+
+          requires_region
+          
+          dist = 0
+          
+          mode = 2
+          values = []
+          args.each do |a|
+            if a.is_a?(1.class) || a.is_a?(Float)
+              v = @engine._make_value(a)
+              v.abs > dist && dist = v.abs 
+              values.push(v)
+            elsif a.is_a?(DRCSizingMode)
+              mode = a.value
+            end
           end
+          
+          aa = []
+          if values.size < 1
+            raise "Method requires one or two sizing values"
+          elsif values.size > 2
+            raise "Method must not have more than two values"
+          else
+            aa.push(values[0])
+            aa.push(values[-1])
+          end
+          
+          aa.push(mode)
+          
+          if :#{f} == :size && @engine.is_tiled?
+            # in tiled mode, no modifying versions are available
+            self.data = @engine._tcmd(self.data, dist, RBA::Region, :sized, *aa)
+            self
+          elsif :#{f} == :size 
+            @engine._tcmd(self.data, dist, RBA::Region, :#{f}, *aa)
+            self
+          else 
+            DRCLayer::new(@engine, @engine._tcmd(self.data, dist, RBA::Region, :#{f}, *aa))
+          end
+          
         end
-        
-        aa = []
-        if values.size < 1
-          raise "#{f}: Method requires one or two sizing values"
-        elsif values.size > 2
-          raise "#{f}: Method must not have more than two values"
-        else
-          aa.push(values[0])
-          aa.push(values[-1])
-        end
-        
-        aa.push(mode)
-        
-        if :#{f} == :size && @engine.is_tiled?
-          # in tiled mode, no modifying versions are available
-          @data = @engine._tcmd(@data, dist, RBA::Region, :sized, *aa)
-          self
-        elsif :#{f} == :size 
-          @engine._tcmd(@data, dist, RBA::Region, :#{f}, *aa)
-          self
-        else 
-          DRCLayer::new(@engine, @engine._tcmd(@data, dist, RBA::Region, :#{f}, *aa))
-        end
-        
+
       end
 CODE
     end
@@ -2916,10 +3643,12 @@ CODE
     # parameter is 0, special edge pairs with an area of 0 will be dropped.
     
     def polygons(*args)
-      requires_edge_pairs("polygons")
-      args.size <= 1 || raise("polygons: Method requires 0 or 1 arguments")
-      aa = args.collect { |a| @engine._prep_value(a) }
-      DRCLayer::new(@engine, @engine._cmd(@data, :polygons, *aa))
+      @engine._context("polygons") do
+        requires_edge_pairs
+        args.size <= 1 || raise("Method requires zero or 1 arguments")
+        aa = args.collect { |a| @engine._prep_value(a) }
+        DRCLayer::new(@engine, @engine._cmd(self.data, :polygons, *aa))
+      end
     end
     
     # %DRC%
@@ -3007,8 +3736,10 @@ CODE
     %w(extents moved transformed).each do |f| 
       eval <<"CODE"
       def #{f}(*args)
-        aa = args.collect { |a| @engine._prep_value(a) }
-        DRCLayer::new(@engine, @engine._cmd(@data, :#{f}, *aa))
+        @engine._context("#{f}") do
+          aa = args.collect { |a| @engine._prep_value(a) }
+          DRCLayer::new(@engine, @engine._cmd(self.data, :#{f}, *aa))
+        end
       end
 CODE
     end
@@ -3016,9 +3747,11 @@ CODE
     %w(move transform).each do |f| 
       eval <<"CODE"
       def #{f}(*args)
-        aa = args.collect { |a| @engine._prep_value(a) }
-        @engine._cmd(@data, :#{f}, *aa)
-        self
+        @engine._context("#{f}") do
+          aa = args.collect { |a| @engine._prep_value(a) }
+          @engine._cmd(self.data, :#{f}, *aa)
+          self
+        end
       end
 CODE
     end
@@ -3061,21 +3794,25 @@ CODE
     # new layer.
     
     def merged(*args)
-      requires_edges_or_region("merged")
-      aa = args.collect { |a| @engine._prep_value(a) }
-      DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :merged, *aa))
+      @engine._context("merged") do
+        requires_edges_or_region
+        aa = args.collect { |a| @engine._prep_value(a) }
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :merged, *aa))
+      end
     end
     
     def merge(*args)
-      requires_edges_or_region("merge")
-      aa = args.collect { |a| @engine._prep_value(a) }
-      if @engine.is_tiled?
-        # in tiled mode, no modifying versions are available
-        @data = @engine._tcmd(@data, 0, @data.class, :merged, *aa)
-      else
-        @engine._tcmd(@data, 0, @data.class, :merge, *aa)
+      @engine._context("merge") do
+        requires_edges_or_region
+        aa = args.collect { |a| @engine._prep_value(a) }
+        if @engine.is_tiled?
+          # in tiled mode, no modifying versions are available
+          self.data = @engine._tcmd(self.data, 0, self.data.class, :merged, *aa)
+        else
+          @engine._tcmd(self.data, 0, self.data.class, :merge, *aa)
+        end
+        self
       end
-      self
     end
     
     # %DRC%
@@ -3097,7 +3834,9 @@ CODE
     # or report database. 
     
     def output(*args)
-      @engine._vcmd(@engine, :_output, @data, *args)
+      @engine._context("output") do
+        @engine._vcmd(@engine, :_output, self.data, *args)
+      end
     end
     
     # %DRC%
@@ -3111,39 +3850,86 @@ CODE
     # of the layer's data. 
     
     def data
-      @data
+      @engine._context("data") do
+        @data || raise("Trying to access an invalid layer (did you use 'forget' on it?)")
+        @data
+      end
     end
 
-    def requires_region(f)
-      @data.is_a?(RBA::Region) || raise("#{f}: Requires a polygon layer")
+    def data=(d)
+      @data = d
+    end
+
+    def requires_region
+      self.data.is_a?(RBA::Region) || raise("Requires a polygon layer")
     end
     
-    def requires_texts_or_region(f)
-      @data.is_a?(RBA::Region) || @data.is_a?(RBA::Texts) || raise("#{f}: Requires a polygon or text layer")
+    def requires_texts_or_region
+      self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Texts) || raise("Requires a polygon or text layer")
     end
     
-    def requires_texts(f)
-      @data.is_a?(RBA::Texts) || raise("#{f}: Requires a text layer")
+    def requires_texts
+      self.data.is_a?(RBA::Texts) || raise("Requires a text layer")
     end
     
-    def requires_edge_pairs(f)
-      @data.is_a?(RBA::EdgePairs) || raise("#{f}: Requires a edge pair layer")
+    def requires_edge_pairs
+      self.data.is_a?(RBA::EdgePairs) || raise("Requires a edge pair layer")
     end
     
-    def requires_edges(f)
-      @data.is_a?(RBA::Edges) || raise("#{f}: Requires an edge layer")
+    def requires_edges
+      self.data.is_a?(RBA::Edges) || raise("Requires an edge layer")
     end
     
-    def requires_edges_or_region(f)
-      @data.is_a?(RBA::Edges) || @data.is_a?(RBA::Region) || raise("#{f}: Requires an edge or polygon layer")
+    def requires_edges_or_region
+      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::Region) || raise("Requires an edge or polygon layer")
     end
     
-    def requires_edges_texts_or_region(f)
-      @data.is_a?(RBA::Edges) || @data.is_a?(RBA::Region) || @data.is_a?(RBA::Texts) || raise("#{f}: Requires an edge, text or polygon layer")
+    def requires_edges_texts_or_region
+      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Texts) || raise("Requires an edge, text or polygon layer")
     end
     
-    def requires_same_type(other, f)
-      @data.class == other.data.class || raise("#{f}: Requires input of the same kind")
+    def requires_same_type(other)
+      self.data.class == other.data.class || raise("Requires input of the same kind")
+    end
+
+    def minmax_count(*args)
+      if args.size == 0
+        return []
+      elsif args.size == 1
+        a = args[0]
+        if a.is_a?(Range)
+          if a.begin && a.begin.to_i <= 0
+            raise("Lower bound of range must be a positive, non-zero number")
+          end
+          if a.end
+            return [(a.begin || 1).to_i, a.end.to_i]
+          else
+            return [(a.begin || 1).to_i]
+          end
+        elsif !a.is_a?(1.class)
+          raise("Count argument must be an integer number")
+        elsif a <= 0
+          raise("Count argument must be a positive, non-zero number")
+        else
+          return [a]
+        end
+      elsif args.size == 2
+        amin = args[0]
+        amax = args[1]
+        if !amin.is_a?(1.class)
+          raise("Min_count argument must be an integer number")
+        elsif !amax.is_a?(1.class)
+          raise("Max_count argument must be an integer number")
+        elsif amin <= 0
+          raise("Min_count argument must be a positive, non-zero number")
+        elsif amax < amin
+          raise("Max_count argument must be larger or equal to min_count")
+        else
+          return [amin, amax]
+        end
+      else
+        raise("Too many arguments")
+      end
     end
     
   private

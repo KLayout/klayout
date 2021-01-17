@@ -1,0 +1,36 @@
+
+# Breaking
+
+source($drc_test_source, "TOP")
+target($drc_test_target)
+
+deep
+
+max_area_ratio(0)
+max_vertex_count(0)
+l1 = input(1, 0)
+
+max_area_ratio(3.0)
+if max_area_ratio != 3.0
+  raise("Area ratio is not 3.0!")
+end
+max_vertex_count(0)
+l2 = input(1, 0)
+
+max_area_ratio(0)
+max_vertex_count(6)
+if max_vertex_count != 6
+  raise("Max vertex count is not 6!")
+end
+l3 = input(1, 0)
+
+# alternative notation
+self.max_area_ratio = 3
+self.max_vertex_count = 6
+l4 = input(1, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+l4.output(4, 0)
+

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,21 +26,6 @@
 
 namespace db
 {
-
-// -----------------------------------------------------------------------------------------------
-//  class PolygonRefGenerator
-
-PolygonRefGenerator::PolygonRefGenerator (db::Layout *layout, std::unordered_set<db::PolygonRef> &polyrefs)
-  : PolygonSink (), mp_layout (layout), mp_polyrefs (&polyrefs)
-{
-  //  .. nothing yet ..
-}
-
-void PolygonRefGenerator::put (const db::Polygon &polygon)
-{
-  tl::MutexLocker locker (&mp_layout->lock ());
-  mp_polyrefs->insert (db::PolygonRef (polygon, mp_layout->shape_repository ()));
-}
 
 // -----------------------------------------------------------------------------------------------
 //  class EdgeToEdgeSetGenerator

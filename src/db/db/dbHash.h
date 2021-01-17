@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -141,7 +141,7 @@ namespace std
   {
     size_t operator() (const db::edge_pair<C> &o) const
     {
-      return hfunc (o.first (), hfunc (o.second ()));
+      return hfunc (o.lesser (), hfunc (o.greater (), hfunc (int (o.is_symmetric ()))));
     }
   };
 
@@ -426,6 +426,36 @@ namespace std
       return hf;
     }
   };
+
+  /**
+   *  @brief Generic hash for an ordered map
+   */
+  template <class T1, class T2>
+  struct hash<std::map<T1, T2> >
+  {
+    size_t operator() (const std::map<T1, T2> &o) const
+    {
+      size_t hf = 0;
+      for (typename std::map<T1, T2>::const_iterator i = o.begin (); i != o.end (); ++i) {
+        hf = hfunc (hf, std::hash <T1> () (i->first));
+        hf = hfunc (hf, std::hash <T2> () (i->second));
+      }
+      return hf;
+    }
+  };
+
+  /**
+   *  @brief Create a pointer hash from the pointer's value
+   */
+  template <class X>
+  struct ptr_hash_from_value
+  {
+    size_t operator() (const X *ptr) const
+    {
+      return ptr ? hash<X> () (*ptr) : 0;
+    }
+  };
+
 }
 
 #endif

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -97,49 +97,67 @@ EmptyRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &) co
 }
 
 EdgePairsDelegate *
-EmptyRegion::width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+EmptyRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &)
+{
+  return new EmptyEdgePairs ();
+}
+
+RegionDelegate *
+EmptyRegion::cop_to_region (db::CompoundRegionOperationNode &)
+{
+  return new EmptyRegion ();
+}
+
+EdgesDelegate *
+EmptyRegion::cop_to_edges (db::CompoundRegionOperationNode &)
+{
+  return new EmptyEdges ();
+}
+
+EdgePairsDelegate *
+EmptyRegion::width_check (db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+EmptyRegion::space_check (db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::isolated_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+EmptyRegion::isolated_check (db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::notch_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+EmptyRegion::notch_check (db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::enclosing_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+EmptyRegion::enclosing_check (const Region &, db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::overlap_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+EmptyRegion::overlap_check (const Region &, db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::separation_check (const Region &, db::Coord, bool , metrics_type, double, distance_type, distance_type) const
+EmptyRegion::separation_check (const Region &, db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }
 
 EdgePairsDelegate *
-EmptyRegion::inside_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const
+EmptyRegion::inside_check (const Region &, db::Coord, const RegionCheckOptions &) const
 {
   return new EmptyEdgePairs ();
 }

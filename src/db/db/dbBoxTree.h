@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1139,6 +1139,16 @@ public:
   }
 
   /**
+   *  @brief Swaps the box tree with another one
+   */
+  void swap (box_tree &other)
+  {
+    m_objects.swap (other.m_objects);
+    m_elements.swap (other.m_elements);
+    std::swap (mp_root, other.mp_root);
+  }
+
+  /**
    *  @brief Collect memory statistics
    */
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
@@ -2074,6 +2084,15 @@ public:
   box_tree_node *root () const
   {
     return mp_root;
+  }
+
+  /**
+   *  @brief Swaps the box tree with another one
+   */
+  void swap (unstable_box_tree &other)
+  {
+    m_objects.swap (other.m_objects);
+    std::swap (mp_root, other.mp_root);
   }
 
   /**

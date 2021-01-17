@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -186,17 +186,27 @@ Timer::take ()
   m_wall_ms = wall_ms;
 }
 
-void
-SelfTimer::start_report () const
-{
-  tl::info << m_desc << ": " << tl::to_string (tr ("started"));
-}
-
-void
-SelfTimer::report () const
+size_t
+Timer::memory_size ()
 {
 #ifdef _WIN32
-  tl::info << m_desc << ": (user) " << sec_user () << " (sys) " << sec_sys ();
+
+  size_t mem = 0;
+
+  HANDLE h_process = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, GetCurrentProcessId ());
+  if (h_process != NULL) {
+
+    PROCESS_MEMORY_COUNTERS pmc;
+    if (GetProcessMemoryInfo (h_process, &pmc, sizeof (pmc))) {
+      mem = size_t (pmc.WorkingSetSize);
+    }
+
+    CloseHandle (h_process);
+
+  }
+
+  return mem;
+
 #else
 
   unsigned long memsize = 0;
@@ -250,12 +260,31 @@ SelfTimer::report () const
     }
   }
 
+  return size_t (memsize);
+
+#endif
+}
+
+void
+SelfTimer::start_report () const
+{
+  tl::info << m_desc << ": " << tl::to_string (tr ("started"));
+}
+
+void
+SelfTimer::report () const
+{
+  size_t memsize = memory_size ();
+
   tl::info << m_desc << ": " << sec_user () << " (user) "
            << sec_sys () << " (sys) "
-           << sec_wall () << " (wall) "
-           << tl::sprintf ("%.2fM", double (memsize) / (1024.0 * 1024.0)) << " (mem)"
-           ;
-#endif
+           << sec_wall () << " (wall)" << tl::noendl;
+
+  if (memsize > 0) {
+    tl::info << " " << tl::sprintf ("%.2fM", double (memsize) / (1024.0 * 1024.0)) << " (mem)";
+  } else {
+    tl::info << "";
+  }
 }
 
 // -------------------------------------------------------------

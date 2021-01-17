@@ -7,9 +7,6 @@
 <doc>
 <title>DRC Reference: Layer Object</title>
 <keyword name="Layer"/>
-<p>
-The layer object represents a collection of polygons, edges or edge pairs.
-</p>
 <h2-index/>
 <a name="&amp;"/><h2>"&amp;" - Boolean AND operation</h2>
 <keyword name="&amp;"/>
@@ -95,6 +92,27 @@ polygons will be written to the output (labels: red, input2: blue):
 <td><img src="/images/drc_textpoly1.png"/></td>
 </tr>
 </table>
+</p>
+<a name="andnot"/><h2>"andnot" - Computes Boolean AND and NOT results at the same time</h2>
+<keyword name="andnot"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.andnot(other)</tt></li>
+</ul>
+<p>
+This method returns a two-element array containing one layer for the
+AND result and one for the NOT result.
+</p><p>
+This method is available for polygon layers.
+</p><p>
+It can be used to initialize two variables with the AND and NOT results:
+</p><p>
+<pre>
+(and_result, not_result) = l1.andnot(l2)
+</pre>
+</p><p>
+As the AND and NOT results are computed in the same sweep, calling this
+method is faster than calling AND and NOT separately.
 </p>
 <a name="area"/><h2>"area" - Returns the total area of the polygons in the region</h2>
 <keyword name="area"/>
@@ -257,6 +275,39 @@ The following images show the effect of this method:
 </tr>
 </table>
 </p>
+<a name="covering"/><h2>"covering" - Selects shapes or regions of self which completely cover (enclose) one or more shapes from the other region</h2>
+<keyword name="covering"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.covering(other)</tt></li>
+<li><tt>layer.covering(other, min_count)</tt></li>
+<li><tt>layer.covering(other, min_count, max_count)</tt></li>
+<li><tt>layer.covering(other, min_count .. max_count)</tt></li>
+</ul>
+<p>
+This method selects all shapes or regions from self which completly cover shapes from the other
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+otherwise individual shapes are selected.
+It returns a new layer containing the selected shapes. A version which modifies self
+is <a href="#select_covering">select_covering</a>.
+</p><p>
+This method is available for polygons only.
+</p><p>
+The following image shows the effect of the "covering" method:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_covering.png"/></td>
+</tr>
+</table>
+</p><p>
+A range of counts can be specified. If so, the shape from the primary layer is 
+only selected when covering a given number of shapes from the other layer.
+For the interpretation of the count see <a href="#interacting">interacting</a>.
+</p><p>
+The "covering" attribute is sometimes called "enclosing", but this name is
+used for the respective DRC function (see <a href="#enclosing">enclosing</a>).
+</p>
 <a name="data"/><h2>"data" - Gets the low-level data object</h2>
 <keyword name="data"/>
 <p>Usage:</p>
@@ -268,6 +319,385 @@ This method returns a <class_doc href="Region">Region</class_doc>, <class_doc hr
 representing the underlying RBA object for the data.
 Access to these objects is provided to support low-level iteration and manipulation
 of the layer's data. 
+</p>
+<a name="drc"/><h2>"drc" - Provides a generic DRC function for use with <a href="/about/drc_ref_drc.xml">DRC</a> expressions</h2>
+<keyword name="drc"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.drc(expression)</tt></li>
+</ul>
+<p>
+This method implements the universal DRC which offers enhanced abilities,
+improved performance in some applications and better readability.
+</p><p>
+The key concept for this method are DRC expressions. DRC expressions
+are formed by using predefined keywords like "width", operators like "&amp;" 
+and methods to build an abstract definition of the operations to perform
+within the DRC.
+</p><p>
+When the DRC function is executed, it will basically visit all shapes
+from the input layer (the layer, the "drc" method is called on)).
+While it does, it collects the neighbor shapes from all involved other inputs 
+and runs the requested operations on each cluster. 
+Currently, "drc" is only available for polygon layers.
+</p><p>
+This way, the nature of the "drc" operation is that of the loop over all (merged) input
+polygons. Within the operation executed on each shape, it's possible to make
+decisions such as "if the shape has an area larger than something, apply this
+operation" or similar. This often can be achieved with conventional DRC functions too,
+but involves potentially complex and heavy operations such as booleans, interact
+etc. For this reason, the "drc" function may provide a better performance.
+</p><p>
+In addition, within the loop a single shape from the input layer is presented to the
+execution engine which runs the operations.
+This allows using operations such as "size" without having to consider 
+neighbor polygons growing into the area of the initial shape. In this sense,
+the "drc" function sees the layer as individual polygons rather than
+a global "sea of polygons". This enables new applications which are otherwise
+difficult to implement.
+</p><p>
+<h3>Primaries and secondaries </h3>
+</p><p>
+An important concept in "drc" expressions is the "primary".
+The primary represents a single shape from the input layer. "Secondaries" are shapes
+from other inputs. Primaries guide the operation - secondaries without
+primaries are not seen. The "drc" operation will look for secondaries within
+a certain distance which is determined from the operations from the 
+expression to execute. The secondaries collected in this step will not be
+merged, so the secondary polygons may be partial. This is important when
+using measurement operations like "area" on secondary polygons.
+</p><p>
+<h3>Checks </h3>
+</p><p>
+Here is an example for a generic DRC operation which performs a width
+check for less than 0.5.um on the primary shapes. It uses the "<a href="/about/drc_ref_global.xml#width">width</a>" operator:
+</p><p>
+<pre>
+out = in.drc(width &lt; 0.5.um)
+</pre>
+</p><p>
+Other single or double-bounded conditions are available too, for example:
+</p><p>
+<pre>
+out = in.drc(width &lt;= 0.5.um)
+out = in.drc(width &gt; 0.5.um)
+out = in.drc(width == 0.5.um)
+out = in.drc(width != 0.5.um)
+out = in.drc(0.2.um &lt; width &lt; 0.5.um)
+</pre>
+</p><p>
+To specify the second input for a two-layer check, add it to 
+the check function. This example shows how to use a two-layer separation check ("<a href="/about/drc_ref_global.xml#separation">separation</a>"):
+</p><p>
+<pre>
+l1 = input(1, 0)
+l2 = input(2, 0)
+out = l1.drc(separation(l2) &lt; 0.5.um)
+</pre>
+</p><p>
+The second input of this check function can be a computed expression. In this
+case the local loop will first evaluate the expression for the second input and
+then use the result as second input in the check. Note that this computation is
+performed locally and separately for each primary and its context.
+</p><p>
+Options for the checks are also specified inside the brackets. For example,
+to select projection metrics ("projection") for the "width" check use:
+</p><p>
+<pre>
+out = in.drc(width(projection) &lt; 0.5.um)
+</pre>
+</p><p>
+<h3>Edges and edge pairs </h3>
+</p><p>
+Although the "drc" function operates on polygon layers, internally it is 
+able to handle edge and edge pair types too. Some operations generate edge pairs,
+some other generate edges. As results from one operation can be processed further
+in the DRC expressions, methods are available to filter, process and convert
+these types.
+</p><p>
+For example, all checks produce edge pairs which can be converted into polygons
+using the "polygons" method:
+</p><p>
+<pre>
+out = in.drc((width(projection) &lt; 0.5.um).polygons)
+</pre>
+</p><p>
+Note a subtle detail: when putting the "polygons" method inside the "drc"
+brackets, it is executed locally on every visited primary polygon. The result
+in this case is identical to the global conversion:
+</p><p>
+<pre>
+# same, but with "global" conversion:
+out = in.drc(width(projection) &lt; 0.5.um).polygons
+</pre>
+</p><p>
+But having the check polygons inside the loop opens new opportunities and 
+is more efficient in general. In the previous example, the local conversion
+will keep a few edge pairs after having converted them to polygons. In
+the global case, all edge pairs are collected first and then converted.
+If there are many edge pairs, this requires more memory and a larger computing
+overhead for managing the bigger number of shapes.
+</p><p>
+For the conversion of edges, edge pairs and polygons into other types, these
+methods are provided:
+</p><p>
+<ul>
+<li>"<a href="/about/drc_ref_drc.xml#polygons">DRC#polygons</a>": converts edge pairs to polygons </li>
+<li>"<a href="/about/drc_ref_drc.xml#extended">DRC#extended</a>", "<a href="/about/drc_ref_drc.xml#extended_in">DRC#extended_in</a>", "<a href="/about/drc_ref_drc.xml#extended_out">DRC#extended_out</a>": converts edges to polygons </li>
+<li>"<a href="/about/drc_ref_drc.xml#first_edges">DRC#first_edges</a>", <a href="/about/drc_ref_drc.xml#second_edges">DRC#second_edges</a>": extracts edges from edge pairs </li>
+<li>"<a href="/about/drc_ref_drc.xml#edges">DRC#edges</a>": decomposes edge pairs and polygons into edges </li>
+<li>"<a href="/about/drc_ref_drc.xml#corners">DRC#corners</a>": can extract corners from polygons </li>
+</ul>
+</p><p>
+The following example decomposes the primary polygons into edges:
+</p><p>
+<pre>
+out = in.drc(primary.edges)
+</pre>
+</p><p>
+(for backward compatibility you cannot abbreviate "primary.edges" simply as "edges" like
+other functions). 
+</p><p>
+The previous example isn't quite exciting as it is equivalent to 
+</p><p>
+<pre>
+# Same as above
+out = in.edges
+</pre>
+</p><p>
+But it gets more interesting, as within the loop, "edges" delivers the edge set for
+each individual polygon. It's possible to work with this distinct set, so for example
+this will give you the edges of polygons with more than four corners:
+</p><p>
+<pre>
+out = in.drc(primary.edges.count &gt; 4)
+</pre>
+</p><p>
+Explanation: "count" is a "quantifier" which takes any kind of set (edges, edge pairs, polygons)
+and returns the set if the number of inhabitants meets the given condition. Otherwise the set
+is skipped. So it will look at the edges and if there are more than four (per primary shape),
+it will forward this set. 
+</p><p>
+The same result can be achieved with classic DRC with "interact" and a figure count, but
+at a much higher computation cost.
+</p><p>
+<h3>Edge and edge/polygon operations </h3>
+</p><p>
+The "drc" framework supports the following edge and edge/polygon operations:
+</p><p>
+<ul>
+<li>Edge vs. edge and edge vs. polygon booleans </li>
+<li>Edge vs. polygon interactions ("<a href="/about/drc_ref_drc.xml#interacting">DRC#interacting</a>", "<a href="/about/drc_ref_drc.xml#overlapping">DRC#overlapping</a>") </li>
+<li>Edge sampling ("<a href="/about/drc_ref_drc.xml#start_segments">DRC#start_segments</a>", "<a href="/about/drc_ref_drc.xml#centers">DRC#centers</a>", "<a href="/about/drc_ref_drc.xml#end_segments">DRC#end_segments</a>") </li>
+</ul>
+</p><p>
+<h3>Filters </h3>
+</p><p>
+Filter operators select input polygons or edges based on their properties. These filters are provided:
+</p><p>
+<ul>
+<li>"<a href="/about/drc_ref_drc.xml#area">DRC#area</a>": selects polygons based on their area </li>
+<li>"<a href="/about/drc_ref_drc.xml#perimeter">DRC#perimeter</a>": selects polygons based on their perimeter </li>
+<li>"<a href="/about/drc_ref_drc.xml#area_ratio">DRC#area_ratio</a>": selects polygons based on their bounding box to polygon area ratio </li>
+<li>"<a href="/about/drc_ref_drc.xml#bbox_aspect_ratio">DRC#bbox_aspect_ratio</a>": selects polygons based on their bounding box aspect ratio </li>
+<li>"<a href="/about/drc_ref_drc.xml#relative_height">DRC#relative_height</a>": selects polygons based on their relative height </li>
+<li>"<a href="/about/drc_ref_drc.xml#bbox_min">DRC#bbox_min</a>", "<a href="/about/drc_ref_global.xml#bbox_max">bbox_max</a>", "<a href="/about/drc_ref_global.xml#bbox_width">bbox_width</a>", "<a href="/about/drc_ref_global.xml#bbox_height">bbox_height</a>": selects polygons based on their bounding box properties </li>
+<li>"<a href="/about/drc_ref_drc.xml#length">DRC#length</a>": selects edges based on their length </li>
+<li>"<a href="/about/drc_ref_drc.xml#angle">DRC#angle</a>": selects edges based on their orientation </li>
+</ul>
+</p><p>
+For example, to select polygons with an area larger than one square micrometer, use:
+</p><p>
+<pre>
+out = in.drc(area &gt; 1.0)
+</pre>
+</p><p>
+For the condition, use the usual numerical bounds like:
+</p><p>
+<pre>
+out = in.drc(area == 1.0)
+out = in.drc(area &lt;= 1.0)
+out = in.drc(0.2 &lt; area &lt; 1.0)
+</pre>
+</p><p>
+The result of the area operation is the input polygon if the area condition is met.
+</p><p>
+In the same fashion, "perimeter" applies to the perimeter of the polygon.
+"bbox_min" etc. will evaluate a particular dimensions of the polygon's bounding box and
+use the respective dimension for filtering the polygon.
+</p><p>
+Note that it's basically possible to use the polygon filters on any input - computed and secondaries.
+In fact, plain "area" for example is a shortcut for "<a href="/about/drc_ref_global.xml#primary">primary</a>.area" indicating that
+the area of primary shapes are supposed to be computed.
+However, any input other than the primary is not necessarily complete or it may 
+consist of multiple polygons. Hence the computed values may be too big or too small.
+It's recommended therefore to use the measurement functions on primary polygons
+unless you know what you're doing.
+</p><p>
+<h3>Filter predicates </h3>
+</p><p>
+The "drc" feature also supports some predicates. "predicates" are boolean values
+indicating a certain condition. A predicate filter works in a way that it only
+passes the polygons if the condition is met.
+</p><p>
+The predicates available currently are:
+</p><p>
+<ul>
+<li>"<a href="/about/drc_ref_global.xml#rectangles">rectangles</a>": Filters rectangles </li>
+<li>"<a href="/about/drc_ref_global.xml#squares">squares</a>": Filters squares </li>
+<li>"<a href="/about/drc_ref_global.xml#rectilinear">rectilinear</a>": Filters rectilinear ("Manhattan") polygons </li>
+</ul>
+</p><p>
+For the same reason as explained above, it's recommended to use these predicates
+standalone, so they act on primary shapes. It's possible to use the predicates
+on computed shapes or secondaries, but that may not render the desired results.
+</p><p>
+<h3>Logical NOT operator </h3>
+</p><p>
+The "!" operator will evaluate the expression behind it and return the 
+current primary shape if the input is empty and return an empty polygon set 
+if not. Hence the following filter will deliver all polygons which are 
+not rectangles:
+</p><p>
+<pre>
+out = in.drc(! rectangles)
+</pre>
+</p><p>
+<h3>Logical combination operators </h3>
+</p><p>
+The logical "if_any" or "if_all" functions allow connecting multiple
+conditions and evaluate to "true" (means: a non-empty shape set) if either
+one input is a non-empty shape set ("if_any") or if all inputs are non-empty
+("if_all"). 
+</p><p>
+For example, this will select all polygons which are rectangles
+and whose area is larger than 20 square micrometers:
+</p><p>
+<pre>
+out = in.drc(if_all(rectangles, area &gt; 20.0))
+</pre>
+</p><p>
+"if_all" delivers the primary shape if all of the input expressions
+render a non-empty result.
+</p><p>
+In contrast to this, the "if_any" operation will deliver the primary shape
+if one of the input expressions renders a non-empty result.
+</p><p>
+The "<a href="/about/drc_ref_global.xml#switch">switch</a>" function allows selecting one input based on the results of an
+expression. In the two-input form it's equivalent to "if". The first expression
+is the condition. If it evaluates to a non-empty shape set, the result of the
+second expression is taken. Otherwise, the result is empty. 
+</p><p>
+Hence the following code delivers all rectangles sized by 100 nm. All
+other shapes are skipped:
+</p><p>
+<pre>
+out = in.drc(switch(rectangles, primary.sized(100.nm)))
+</pre>
+</p><p>
+A third expression will be considered the "else" branch: the result of
+this expression will be taken if the first one is not taken. So this
+example will size all rectangles and leave other shapes untouched:
+</p><p>
+<pre>
+out = in.drc(switch(rectangles, primary.sized(100.nm), primary))
+</pre>
+</p><p>
+If more expressions are given, they are considered as a sequence of condition/result
+chain (c1, e1, c2, e2, ...) in the sense of "if(c1) return(e1) else if(c2) return(e2) ...".
+So the e1 is taken if c1 is met, e2 is taken when c1 is not met, but c2 is and so forth.
+If there is an odd number of expressions, the last one will be the default expression
+which is taken if none of the conditions is met.
+</p><p>
+<h3>Polygon manipulations </h3>
+</p><p>
+The "drc" operations feature polygon manipulations where the input is
+either the primary, secondaries or derived shapes.
+Manipulations include sizing ("<a href="/about/drc_ref_global.xml#sized">sized</a>"), corner rounding ("<a href="/about/drc_ref_global.xml#rounded_corners">rounded_corners</a>"), smoothing ("<a href="/about/drc_ref_global.xml#smoothed">smoothed</a>")
+and boolean operations.
+</p><p>
+This example computes a boolean AND between two layers before selecting
+the result polygons with an area larger than 1 square micrometer. Note that
+"primary" is a placeholder for the primary shape:
+</p><p>
+<pre>
+l1 = input(1, 0)
+l2 = input(2, 0)
+out = l1.drc((primary &amp; l2).area &gt; 1.0)
+</pre>
+</p><p>
+This example demonstrates how the "drc" operation can improve performance: as the
+boolean operation is computed locally and the result is discarded when no longer required,
+less shapes need to be stored hence reducing the memory overhead and CPU time required
+to manage these shapes.
+</p><p>
+Note that the precise form of the example above is
+</p><p>
+<pre>
+out = l1.drc((primary &amp; secondary(l2)).area &gt; 1.0)
+</pre>
+</p><p>
+The "<a href="/about/drc_ref_global.xml#secondary">secondary</a>" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
+in this form, the operators of the boolean AND can be reversed:
+</p><p>
+<pre>
+out = l1.drc((secondary(l2) &amp; primary).area &gt; 1.0)
+</pre>
+</p><p>
+<h3>Quantifiers </h3>
+</p><p>
+Some filters operate on properties of the full, local, per-primary shape set. 
+While the loop is executed, the DRC expressions will collect shapes, either
+from the primary, it's neighborhood (secondaries) or from deriving shape sets.
+</p><p>
+Obviously the primary is a simple one: it consists of a single shape, because
+this is how the loop operates. Derived shape sets however can be more complex.
+"Quantifiers" allow assessing properties of the complete, per-primary shape
+set. A simple one is "<a href="/about/drc_ref_drc.xml#count">DRC#count</a>" which checks if the number of shapes within
+a shape set is within a given range.
+</p><p>
+Obviously, "primary.count == 1" is always true. So using "count" primaries isn't
+much fun. So it's better to use it on derived sets.
+The following condition will select all primary shapes which have more than 13 corners:
+</p><p>
+<pre>
+out = in.drc(if_any(primary.corners.count &gt; 13))
+</pre>
+</p><p>
+Note an important detail here: the "if_any" function will make this statement render primary
+polygons, if the expression inside gives a non-empty result. Without
+"if_any", the result would be the output of "count" which is the set of all
+corners where the corner count is larger than 13.
+</p><p>
+<h3>Expressions as objects </h3>
+</p><p>
+The expression inside the "drc" function is a Ruby object and can be 
+stored in variables. If you need the same expression multiple times, it can be 
+more efficient to use the same Ruby object. In this example, the same expression
+is used two times. Hence it's computed two times:
+</p><p>
+<pre>
+out = l1.drc(((primary &amp; l2).area == 1.0) + ((primary &amp; l2).area == 2.0))
+</pre>
+</p><p>
+A more efficient version is:
+</p><p>
+<pre>
+overlap_area = (primary &amp; l2).area
+out = l1.drc((overlap_area == 1.0) + (overlap_area == 2.0))
+</pre>
+</p><p>
+Note that the first line prepares the operation, but does not execute the area computation
+or the boolean operation. But when the "drc" function executes the loop over the primaries it will 
+only compute the area once per primary as it is represented by the same Ruby object.
+</p><p>
+<h3>Outlook </h3>
+</p><p>
+DRC expressions are quite rich and powerful. They provide a more intuitive way of
+writing DRC expressions, are more efficient and open new opportunities. DRC
+development is likely to focus on this scheme in the future.
+</p><p>
+More formal details about the bits and pieces can be found in the "<a href="#DRC">DRC</a>" class documentation.
 </p>
 <a name="dup"/><h2>"dup" - Duplicates a layer</h2>
 <keyword name="dup"/>
@@ -336,8 +766,13 @@ See <a href="#enclosing">enclosing</a> for a description of that method
 <p>Usage:</p>
 <ul>
 <li><tt>layer.enclosing(other_layer, value [, options])</tt></li>
+<li><tt>layer.enc(other_layer, value [, options])</tt></li>
 </ul>
 <p>
+<b>Note: </b>"enclosing" and "enc" are available as operators for the "universal DRC" function <a href="#drc">drc</a> within
+the <a href="#DRC">DRC</a> framework. These variants have more options and are more intuitive to use. 
+See <a href="/about/drc_ref_global.xml#enclosing">enclosing</a> for more details.
+</p><p>
 This method checks whether layer encloses (is bigger than) other_layer by the
 given dimension. Locations, where this is not the case will be reported in form
 of edge pair error markers.
@@ -345,6 +780,10 @@ Locations, where both edges coincide will be reported as errors as well. Formall
 such locations form an enclosure with a distance of 0. Locations, where other_layer
 extends outside layer will not be reported as errors. Such regions can be detected
 by <a href="#not_inside">not_inside</a> or a boolean "not" operation.
+</p><p>
+"enc" is the short form of this method.
+</p><p>
+The options are the same as for <a href="#separation">separation</a>.
 </p><p>
 The enclosing method can be applied to both edge or polygon layers. On edge layers 
 the orientation of the edges matters and only edges looking into the same direction
@@ -593,6 +1032,9 @@ The following images show the effect of the extents method:
 <p>
 Applies to edge pair collections only.
 Returns the first edges of the edge pairs in the collection.
+</p><p>
+Some checks deliver symmetric edge pairs (e.g. space, width, etc.) for which the
+edges are commutable. "first_edges" will deliver both edges for such edge pairs.
 </p>
 <a name="flatten"/><h2>"flatten" - Flattens the layer</h2>
 <keyword name="flatten"/>
@@ -605,6 +1047,38 @@ If the layer already is a flat one, this method does nothing.
 If the layer is a hierarchical layer (an original layer or
 a derived layer in deep mode), this method will convert it
 to a flat collection of texts, polygons, edges or edge pairs.
+</p>
+<a name="forget"/><h2>"forget" - Cleans up memory for this layer</h2>
+<keyword name="forget"/>
+<p>Usage:</p>
+<ul>
+<li><tt>forget</tt></li>
+</ul>
+<p>
+KLayout's DRC engine is imperative. This means, every command is executed immediately
+rather than being compiled and executed later. The advantage of this approach is that
+it allows decisions to be taken depending on the content of a layer and to code 
+functions that operate directly on the layer's content.
+</p><p>
+However, one drawback is that the engine cannot decide when a layer is no longer 
+required - it may still be used later in the script. So a layer's data is not cleaned
+up automatically.
+</p><p>
+In order to save memory for DRC scripts intended for bigger layouts, the DRC script
+should clean up layers as soon as they are no longer required. The "forget" method
+will free the memory used for the layer's information.
+</p><p>
+The recommended approach is:
+</p><p>
+<pre>
+l = ... # compute some layer
+...
+# once you're done with l:
+l.forget
+l = nil
+</pre>
+</p><p>
+By setting the layer to nil, it is ensured that it can no longer be accessed.
 </p>
 <a name="holes"/><h2>"holes" - Selects all polygon holes from the input</h2>
 <keyword name="holes"/>
@@ -680,10 +1154,10 @@ The following image shows the effect of the "in" method (input1: red, input2: bl
 <p>
 Objects that can be inserted are <class_doc href="Edge">Edge</class_doc> objects (into edge layers) or 
 <class_doc href="DPolygon">DPolygon</class_doc>, <class_doc href="DSimplePolygon">DSimplePolygon</class_doc>, <class_doc href="Path">Path</class_doc>, <class_doc href="DBox">DBox</class_doc> (into polygon layers).
-Convenience methods exist to create such objects (<a href="/about/drc_ref_global.xml#edge">global#edge</a>, <a href="/about/drc_ref_global.xml#polygon">global#polygon</a>, <a href="/about/drc_ref_global.xml#box">global#box</a> and <a href="/about/drc_ref_#global.xml#path">#global#path</a>).
+Convenience methods exist to create such objects (<a href="/about/drc_ref_global.xml#edge">edge</a>, <a href="/about/drc_ref_global.xml#polygon">polygon</a>, <a href="/about/drc_ref_global.xml#box">box</a> and <a href="/about/drc_ref_#global.xml#path">#global#path</a>).
 However, RBA constructors can used as well.
 </p><p>
-The insert method is useful in combination with the <a href="/about/drc_ref_global.xml#polygon_layer">global#polygon_layer</a> or <a href="/about/drc_ref_global.xml#edge_layer">global#edge_layer</a> functions: 
+The insert method is useful in combination with the <a href="/about/drc_ref_global.xml#polygon_layer">polygon_layer</a> or <a href="/about/drc_ref_global.xml#edge_layer">edge_layer</a> functions: 
 </p><p>
 <pre>
 el = edge_layer
@@ -742,6 +1216,9 @@ This method is available for edge layers. The argument must be a polygon layer.
 <p>Usage:</p>
 <ul>
 <li><tt>layer.interacting(other)</tt></li>
+<li><tt>layer.interacting(other, min_count)</tt></li>
+<li><tt>layer.interacting(other, min_count, max_count)</tt></li>
+<li><tt>layer.interacting(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which touch or overlap shapes from the other
@@ -759,6 +1236,22 @@ The following image shows the effect of the "interacting" method (input1: red, i
 <table>
 <tr>
 <td><img src="/images/drc_interacting.png"/></td>
+</tr>
+</table>
+</p><p>
+If a single count is given, shapes from self are selected only if they do interact at least with the given
+number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
+from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_interacting2.png"/></td>
+<td><img src="/images/drc_interacting3.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_interacting4.png"/></td>
+<td><img src="/images/drc_interacting5.png"/></td>
 </tr>
 </table>
 </p>
@@ -843,12 +1336,18 @@ See <a href="#isolated">isolated</a> for a description of that method
 <p>Usage:</p>
 <ul>
 <li><tt>layer.isolated(value [, options])</tt></li>
+<li><tt>layer.iso(value [, options])</tt></li>
 </ul>
 <p>
+<b>Note: </b>"isolated" and "iso" are available as operators for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
+the <a href="#DRC">DRC</a> framework. These variants have more options and are more intuitive to use. See <a href="/about/drc_ref_global.xml#isolated">isolated</a> for more details.
+</p><p>
 See <a href="#space">space</a> for a description of this method. 
 In contrast to <a href="#space">space</a>, this
 method is available for polygon layers only, since only on such layers 
 different polygons can be identified.
+</p><p>
+"iso" is the short form of this method.
 </p><p>
 The following image shows the effect of the isolated check:
 </p><p>
@@ -1014,6 +1513,16 @@ i.e. all polygons are merged before non-rectangles are selected (see <a href="#c
 This method is available for polygon layers. By default "merged" semantics applies, 
 i.e. all polygons are merged before non-rectilinear polygons are selected (see <a href="#clean">clean</a> and <a href="#raw">raw</a>).
 </p>
+<a name="non_squares"/><h2>"non_squares" - Selects all polygons from the input which are not squares</h2>
+<keyword name="non_squares"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.non_rectangles</tt></li>
+</ul>
+<p>
+This method is available for polygon layers. By default "merged" semantics applies, 
+i.e. all polygons are merged before non-squares are selected (see <a href="#clean">clean</a> and <a href="#raw">raw</a>).
+</p>
 <a name="non_strict"/><h2>"non_strict" - Marks a layer for non-strict handling</h2>
 <keyword name="non_strict"/>
 <p>Usage:</p>
@@ -1060,6 +1569,33 @@ written to the output (labels: red, input2: blue):
 <td><img src="/images/drc_textpoly2.png"/></td>
 </tr>
 </table>
+</p>
+<a name="not_covering"/><h2>"not_covering" - Selects shapes or regions of self which do not cover (enclose) one or more shapes from the other region</h2>
+<keyword name="not_covering"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.not_covering(other)</tt></li>
+<li><tt>layer.not_covering(other, min_count)</tt></li>
+<li><tt>layer.not_covering(other, min_count, max_count)</tt></li>
+<li><tt>layer.not_covering(other, min_count .. max_count)</tt></li>
+</ul>
+<p>
+This method selects all shapes or regions from self which do not cover shapes from the other
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+otherwise individual shapes are selected. This method returns the inverse of <a href="#covering">covering</a>
+and provides the same options.
+</p><p>
+The following image shows the effect of the "not_covering" method:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_not_covering.png"/></td>
+</tr>
+</table>
+</p><p>
+This method is available for polygons only.
+It returns a new layer containing the selected shapes. A version which modifies self
+is <a href="#select_not_covering">select_not_covering</a>.
 </p>
 <a name="not_in"/><h2>"not_in" - Selects shapes or regions of self which are not contained in the other layer</h2>
 <keyword name="not_in"/>
@@ -1116,6 +1652,9 @@ The following image shows the effect of the "not_inside" method (input1: red, in
 <p>Usage:</p>
 <ul>
 <li><tt>layer.not_interacting(other)</tt></li>
+<li><tt>layer.not_interacting(other, min_count)</tt></li>
+<li><tt>layer.not_interacting(other, min_count, max_count)</tt></li>
+<li><tt>layer.not_interacting(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which do not touch or overlap shapes from the other
@@ -1133,6 +1672,22 @@ The following image shows the effect of the "not_interacting" method (input1: re
 <table>
 <tr>
 <td><img src="/images/drc_not_interacting.png"/></td>
+</tr>
+</table>
+</p><p>
+If a single count is given, shapes from self are selected only if they interact with less than the given
+number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+self are selected only if they interact with less than min_count or more than max_count different shapes
+from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_not_interacting2.png"/></td>
+<td><img src="/images/drc_not_interacting3.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_not_interacting4.png"/></td>
+<td><img src="/images/drc_not_interacting5.png"/></td>
 </tr>
 </table>
 </p>
@@ -1166,17 +1721,20 @@ The following image shows the effect of the "not_outside" method (input1: red, i
 <p>Usage:</p>
 <ul>
 <li><tt>layer.not_overlapping(other)</tt></li>
+<li><tt>layer.not_overlapping(other, min_count)</tt></li>
+<li><tt>layer.not_overlapping(other, min_count, max_count)</tt></li>
+<li><tt>layer.not_overlapping(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which do not overlap shapes from the other
 region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
-otherwise individual shapes are selected.
+otherwise individual shapes are selected. This method will return the inverse of <a href="#overlapping">overlapping</a>
+and provides the same options.
 </p><p>
-The "not_overlapping" method is equivalent to the <a href="#outside">outside</a> method. It is provided
-as an alias for consistency.
+The "not_overlapping" method is similar to the <a href="#outside">outside</a> method. However, "outside" does 
+not provide the option to specify counts.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygons only.
 It returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_not_overlapping">select_not_overlapping</a>.
 </p>
@@ -1187,10 +1745,14 @@ is <a href="#select_not_overlapping">select_not_overlapping</a>.
 <li><tt>layer.notch(value [, options])</tt></li>
 </ul>
 <p>
+<b>Note: </b>"notch" is available as an operator for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
+the <a href="#DRC">DRC</a> framework. This variant has more options and is more intuitive to use. See <a href="/about/drc_ref_global.xml#notch">notch</a> for more details.
+</p><p>
 See <a href="#space">space</a> for a description of this method.
 In contrast to <a href="#space">space</a>, this
 method is available for polygon layers only, since only on such layers 
-different polygons can be identified.
+different polygons can be identified. Also, opposite and rectangle error
+filtering is not available for this method.
 </p><p>
 The following image shows the effect of the notch check:
 </p><p>
@@ -1209,6 +1771,9 @@ The following image shows the effect of the notch check:
 <p>
 Returns the parts of the polygons which are not orientable (i.e. "8" configuration) or self-overlapping.
 Merged semantics does not apply for this method. Always the raw polygons are taken (see <a href="#raw">raw</a>).
+</p><p>
+The odd_polygons check is not available in deep mode currently. See <a href="#deep_reject_odd_polygons">deep_reject_odd_polygons</a> for
+an alternative.
 </p>
 <a name="ongrid"/><h2>"ongrid" - Checks for on-grid vertices</h2>
 <keyword name="ongrid"/>
@@ -1264,7 +1829,7 @@ one to three parameters: a layer number, a data type (optional, default is 0)
 and a layer name (optional). Alternatively, the output can be specified by 
 a single <class_doc href="LayerInfo">LayerInfo</class_doc> object.
 </p><p>
-See <a href="/about/drc_ref_global.xml#report">global#report</a> and <a href="/about/drc_ref_global.xml#target">global#target</a> on how to configure output to a target layout
+See <a href="/about/drc_ref_global.xml#report">report</a> and <a href="/about/drc_ref_global.xml#target">target</a> on how to configure output to a target layout
 or report database. 
 </p>
 <a name="outside"/><h2>"outside" - Selects shapes or regions of self which are outside the other region</h2>
@@ -1318,6 +1883,10 @@ This method is available for edge layers. The argument must be a polygon layer.
 <li><tt>layer.overlap(other_layer, value [, options])</tt></li>
 </ul>
 <p>
+<b>Note: </b>"overlap" is available as an operator for the "universal DRC" function <a href="#drc">drc</a> within
+the <a href="#DRC">DRC</a> framework. This variant has more options and is more intuitive to use. 
+See <a href="/about/drc_ref_global.xml#overlap">overlap</a> for more details.
+</p><p>
 This method checks whether layer and other_layer overlap by at least the
 given length. Locations, where this is not the case will be reported in form
 of edge pair error markers.
@@ -1325,6 +1894,8 @@ Locations, where both layers touch will be reported as errors as well. Formally
 such locations form an overlap with a value of 0. Locations, where both regions 
 do not overlap or touch will not be reported. Such regions can be detected 
 with <a href="#outside">outside</a> or by a boolean "not".
+</p><p>
+The options are the same as for <a href="#separation">separation</a>.
 </p><p>
 Formally, the overlap method is a two-layer width check. In contrast to the single-
 layer width method (<a href="#width">width</a>), the zero value also triggers an error and separate
@@ -1354,6 +1925,9 @@ The following images show the effect of the overlap check (input1: red, input2: 
 <p>Usage:</p>
 <ul>
 <li><tt>layer.overlapping(other)</tt></li>
+<li><tt>layer.overlapping(other, min_count)</tt></li>
+<li><tt>layer.overlapping(other, min_count, max_count)</tt></li>
+<li><tt>layer.overlapping(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which overlap shapes from the other
@@ -1362,8 +1936,7 @@ otherwise individual shapes are selected.
 It returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_overlapping">select_overlapping</a>.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygons only.
 </p><p>
 The following image shows the effect of the "overlapping" method:
 </p><p>
@@ -1372,6 +1945,10 @@ The following image shows the effect of the "overlapping" method:
 <td><img src="/images/drc_overlapping.png"/></td>
 </tr>
 </table>
+</p><p>
+A range of counts can be specified. If so, the shape from the primary layer is 
+only selected when overlapping a given number of shapes from the other layer.
+For the interpretation of the count see <a href="#interacting">interacting</a>.
 </p>
 <a name="perimeter"/><h2>"perimeter" - Returns the total perimeter of the polygons in the region</h2>
 <keyword name="perimeter"/>
@@ -1487,7 +2064,7 @@ l.raw
 </p><p>
 To avoid that, use the <a href="#dup">dup</a> method to create a real (deep) copy.
 </p>
-<a name="rectangles"/><h2>"rectangles" - Selects all rectangle polygons from the input</h2>
+<a name="rectangles"/><h2>"rectangles" - Selects all rectangles from the input</h2>
 <keyword name="rectangles"/>
 <p>Usage:</p>
 <ul>
@@ -1604,6 +2181,10 @@ The following images shows the effect of the "scaled" method:
 <p>
 Applies to edge pair collections only.
 Returns the second edges of the edge pairs in the collection.
+</p><p>
+Some checks deliver symmetric edge pairs (e.g. space, width, etc.) for which the
+edges are commutable. "second_edges" will not deliver edges for such edge pairs.
+Instead, "first_edges" will deliver both.
 </p>
 <a name="select"/><h2>"select" - Selects edges, edge pairs or polygons based on evaluation of a block</h2>
 <keyword name="select"/>
@@ -1624,6 +2205,24 @@ Here is a (slow) equivalent of the area selection method:
 <pre>
 new_layer = layer.select { |polygon| polygon.area &gt;= 10.0 }
 </pre>
+</p>
+<a name="select_covering"/><h2>"select_covering" - Selects shapes or regions of self which completely cover (enclose) one or more shapes from the other region</h2>
+<keyword name="select_covering"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.select_covering(other)</tt></li>
+<li><tt>layer.select_covering(other, min_count)</tt></li>
+<li><tt>layer.select_covering(other, min_count, max_count)</tt></li>
+<li><tt>layer.select_covering(other, min_count .. max_count)</tt></li>
+</ul>
+<p>
+This method selects all shapes or regions from self which cover shapes from the other
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+otherwise individual shapes are selected.
+It modifies self to contain the selected shapes. A version which does not modify self
+is <a href="#covering">covering</a>.
+</p><p>
+This method is available for polygons only.
 </p>
 <a name="select_inside"/><h2>"select_inside" - Selects shapes or regions of self which are inside the other region</h2>
 <keyword name="select_inside"/>
@@ -1647,10 +2246,13 @@ This method is available for polygon layers.
 <p>Usage:</p>
 <ul>
 <li><tt>layer.select_interacting(other)</tt></li>
+<li><tt>layer.select_interacting(other, min_count)</tt></li>
+<li><tt>layer.select_interacting(other, min_count, max_count)</tt></li>
+<li><tt>layer.select_interacting(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which touch or overlap shapes from the other
-region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+layer. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
 otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#interacting">interacting</a>.
@@ -1658,6 +2260,29 @@ is <a href="#interacting">interacting</a>.
 This method is available for polygon, text and edge layers. Edges can be selected
 with respect to other edges or polygons. Texts can be selected with respect to 
 polygons. Polygons can be selected with respect to edges, texts and other polygons.
+</p><p>
+If a single count is given, shapes from self are selected only if they do interact at least with the given
+number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
+from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
+</p>
+<a name="select_not_covering"/><h2>"select_not_covering" - Selects shapes or regions of self which do not cover (enclose) one or more shapes from the other region</h2>
+<keyword name="select_not_covering"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.select_not_covering(other)</tt></li>
+<li><tt>layer.select_not_covering(other, min_count)</tt></li>
+<li><tt>layer.select_not_covering(other, min_count, max_count)</tt></li>
+<li><tt>layer.select_not_covering(other, min_count .. max_count)</tt></li>
+</ul>
+<p>
+This method selects all shapes or regions from self which do not cover shapes from the other
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+otherwise individual shapes are selected. 
+It modifies self to contain the selected shapes. A version which does not modify self
+is <a href="#not_covering">not_covering</a>.
+</p><p>
+This method is available for polygons only.
 </p>
 <a name="select_not_inside"/><h2>"select_not_inside" - Selects shapes or regions of self which are not inside the other region</h2>
 <keyword name="select_not_inside"/>
@@ -1680,11 +2305,14 @@ This method is available for polygon layers.
 <keyword name="select_not_interacting"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.select_interacting(other)</tt></li>
+<li><tt>layer.select_not_interacting(other)</tt></li>
+<li><tt>layer.select_not_interacting(other, min_count)</tt></li>
+<li><tt>layer.select_not_interacting(other, min_count, max_count)</tt></li>
+<li><tt>layer.select_not_interacting(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which do not touch or overlap shapes from the other
-region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+layer. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
 otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#not_interacting">not_interacting</a>.
@@ -1692,6 +2320,11 @@ is <a href="#not_interacting">not_interacting</a>.
 This method is available for polygon, text and edge layers. Edges can be selected
 with respect to other edges or polygons. Texts can be selected with respect to 
 polygons. Polygons can be selected with respect to edges, texts and other polygons.
+</p><p>
+If a single count is given, shapes from self are selected only if they interact with less than the given
+number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+self are selected only if they interact with less than min_count or more than max_count different shapes
+from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
 </p>
 <a name="select_not_outside"/><h2>"select_not_outside" - Selects shapes or regions of self which are not outside the other region</h2>
 <keyword name="select_not_outside"/>
@@ -1715,6 +2348,9 @@ This method is available for polygon layers.
 <p>Usage:</p>
 <ul>
 <li><tt>layer.select_not_overlapping(other)</tt></li>
+<li><tt>layer.select_not_overlapping(other, min_count)</tt></li>
+<li><tt>layer.select_not_overlapping(other, min_count, max_count)</tt></li>
+<li><tt>layer.select_not_overlapping(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which do not overlap shapes from the other
@@ -1723,8 +2359,7 @@ otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#not_overlapping">not_overlapping</a>.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygons only.
 </p>
 <a name="select_outside"/><h2>"select_outside" - Selects shapes or regions of self which are outside the other region</h2>
 <keyword name="select_outside"/>
@@ -1748,6 +2383,9 @@ This method is available for polygon layers.
 <p>Usage:</p>
 <ul>
 <li><tt>layer.select_overlapping(other)</tt></li>
+<li><tt>layer.select_overlapping(other, min_count)</tt></li>
+<li><tt>layer.select_overlapping(other, min_count, max_count)</tt></li>
+<li><tt>layer.select_overlapping(other, min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method selects all shapes or regions from self which overlap shapes from the other
@@ -1756,8 +2394,7 @@ otherwise individual shapes are selected.
 It modifies self to contain the selected shapes. A version which does not modify self
 is <a href="#overlapping">overlapping</a>.
 </p><p>
-This method is available for polygon and edge layers. Edges can be selected
-with respect to other edges or polygons.
+This method is available for polygons only.
 </p>
 <a name="sep"/><h2>"sep" - An alias for "separation"</h2>
 <keyword name="sep"/>
@@ -1773,19 +2410,25 @@ See <a href="#separation">separation</a> for a description of that method
 <p>Usage:</p>
 <ul>
 <li><tt>layer.separation(other_layer, value [, options])</tt></li>
+<li><tt>layer.sep(other_layer, value [, options])</tt></li>
 </ul>
 <p>
+<b>Note: </b>"separation" and "sep" are available as operators for the "universal DRC" function <a href="#drc">drc</a> within
+the <a href="#DRC">DRC</a> framework. These variants have more options and are more intuitive to use. 
+See <a href="/about/drc_ref_global.xml#separation">separation</a> for more details.
+</p><p>
 This method performs a two-layer spacing check. Like <a href="#space">space</a>, this method
 can be applied to edge or polygon layers. Locations where edges of the layer
 are closer than the specified distance to the other layer are reported
 as edge pair error markers.
 </p><p>
+"sep" is the short form of this method.
+</p><p>
 In contrast to the <a href="#space">space</a> and related methods, locations where both 
 layers touch are also reported. More specifically, the case of zero spacing
 will also trigger an error while for <a href="#space">space</a> it will not.
 </p><p>
-As for the other DRC methods, merged semantics applies. The options available 
-are the same than for <a href="#width">width</a>.  
+As for the other DRC methods, merged semantics applies.
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
 </p><p>
@@ -1794,6 +2437,74 @@ The following image shows the effect of the separation check (input1: red, input
 <table>
 <tr>
 <td><img src="/images/drc_separation1.png"/></td>
+</tr>
+</table>
+</p><p>
+<h3>opposite and rectangle error filtering </h3>
+</p><p>
+The options for the separation check are those available for the <a href="#width">width</a> or <a href="#space">space</a>
+method plus opposite and rectangle error filtering. 
+</p><p>
+Opposite error filtering will waive errors that are on opposite sides of the original
+figure. The inverse is selection of errors only when there is an error present on
+the opposite side of the original figure. Opposite error waiving or selection is achieved
+through these options inside the DRC function call:
+</p><p>
+<ul>
+<li><b>not_opposite </b>will waive opposite errors </li>
+<li><b>only_opposite </b>will select errors only if there is an opposite one </li>
+</ul>
+</p><p>
+These modes imply partial waiving or selection if "opposite" only applies to a section
+of an error.
+</p><p>
+The following images shows the effect of these options:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_separation2.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_separation3.png"/></td>
+<td><img src="/images/drc_separation4.png"/></td>
+</tr>
+</table>
+</p><p>
+Rectangle error filtering allows waiving errors based on how they cover the
+sides of an original rectangular figure. This selection only applies to errors
+covering the full edge of the rectangle. Errors covering parts of the rectangle
+edges are not considered in this scheme.
+</p><p>
+The rectangle filter option is enabled by these modes:
+</p><p>
+<ul>
+<li><b>one_side_allowed </b>will waive errors when they appear on one side of the rectangle only </li>
+<li><b>two_sides_allowed </b>will waive errors when they appear on two sides of the rectangle </li>
+<li><b>two_connected_sides_allowed </b>will waive errors when they appear on two connected sides of the rectangle ("L" configuration) </li>
+<li><b>two_opposite_sides_allowed </b>will waive errors when they appear on two opposite sides of the rectangle </li>
+<li><b>three_sides_allowed </b>will waive errors when they appear on three sides of the rectangle </li>
+<li><b>four_sides_allowed </b>will waive errors when they appear on four sides of the rectangle </li>
+</ul>
+</p><p>
+Multiple of these options can be given, which will make errors waived if one of these conditions is met.
+</p><p>
+The following images shows the effect of some rectangle filter modes:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_separation5.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_separation6.png"/></td>
+<td><img src="/images/drc_separation7.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_separation8.png"/></td>
+<td><img src="/images/drc_separation9.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_separation10.png"/></td>
+<td><img src="/images/drc_separation11.png"/></td>
 </tr>
 </table>
 </p>
@@ -1915,6 +2626,9 @@ not modify the layer but returns a snapped copy.
 <li><tt>layer.space(value [, options])</tt></li>
 </ul>
 <p>
+<b>Note: </b>"space" is available as an operator for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
+the <a href="#DRC">DRC</a> framework. This variant has more options and is more intuitive to use. See <a href="/about/drc_ref_global.xml#space">space</a> for more details.
+</p><p>
 This method performs a space check and returns a collection of edge pairs.
 A space check can be performed on polygon and edge layers. On edge layers, all
 edges are checked against all other edges. If two edges form a "face to face" relation
@@ -1930,10 +2644,12 @@ The <a href="#notch">notch</a> method is similar, but will only report self-spac
 method will only report space violations to other polygons. <a href="#separation">separation</a> is a two-layer 
 space check where space is checked against polygons of another layer.
 </p><p>
-The options available are the same than for the <a href="#width">width</a> method. Like for the <a href="#width">width</a> 
-method, merged semantics applies.
+Like for the <a href="#width">width</a> method, merged semantics applies.
+</p><p>
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
+</p><p>
+For the manifold options of this function see the <a href="#width">width</a> method description.
 </p><p>
 The following image shows the effect of the space check:
 </p><p>
@@ -1942,6 +2658,17 @@ The following image shows the effect of the space check:
 <td><img src="/images/drc_space1.png"/></td>
 </tr>
 </table>
+</p>
+<a name="squares"/><h2>"squares" - Selects all squares from the input</h2>
+<keyword name="squares"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.squares</tt></li>
+</ul>
+<p>
+This method is available for polygon layers. By default "merged" semantics applies, 
+i.e. all polygons are merged before squares are selected (see <a href="#clean">clean</a> and <a href="#raw">raw</a>).
+<a href="#non_squares">non_squares</a> will select all non-rectangles.
 </p>
 <a name="start_segments"/><h2>"start_segments" - Returns the part at the beginning of each edge</h2>
 <keyword name="start_segments"/>
@@ -2100,6 +2827,9 @@ The following image shows the effect of the "moved" method:
 <li><tt>layer.width(value [, options])</tt></li>
 </ul>
 <p>
+<b>Note: </b>"width" is available as an operator for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
+the <a href="#DRC">DRC</a> framework. This variant has more options and is more intuitive to use. See <a href="/about/drc_ref_global.xml#width">width</a> for more details.
+</p><p>
 This method performs a width check and returns a collection of edge pairs.
 A width check can be performed on polygon and edge layers. On edge layers, all
 edges are checked against all other edges. If two edges form a "back to back" relation
@@ -2107,6 +2837,8 @@ edges are checked against all other edges. If two edges form a "back to back" re
 value, an error shape is generated for that edge pair. 
 On polygon layers, the polygons on each layer are checked for locations where their
 width is less than the specified value. In that case, an edge pair error shape is generated.
+</p><p>
+<h3>Options </h3>
 </p><p>
 The options available are:
 </p><p>
@@ -2123,6 +2855,12 @@ make the check only consider edges enclosing angles of less than 45 degree. </li
 <li><b>projection_limits(min, max) or projection_limits(min .. max) </b>:
 this option makes the check only consider edge pairs whose projected length on
 each other is more or equal than min and less than max </li>
+<li><b>projecting (in condition) </b>: This specification is equivalent to "projection_limits"
+but is more intuitive, as "projecting" is written with a condition, like
+"projecting &lt; 2.um". Available operators are: "==", "&lt;", "&lt;=", "&gt;" and "&gt;=". 
+Double-bounded ranges are also available, like: "0.5 &lt;= projecting &lt; 2.0". </li>
+<li><b>transparent </b>: performs the check without shielding (polygon layers only) </li>
+<li><b>shielded </b>: performs the check with shielding (polygon layers only) </li>
 </ul>
 </p><p>
 Note that without the angle_limit, acute corners will always be reported, since two 
@@ -2148,6 +2886,8 @@ markers = in.width(2.um)
 markers = in.width(20.nm)
 </pre>
 </p><p>
+<h3>Examples </h3>
+</p><p>
 The following images show the effect of various forms of the width check:
 </p><p>
 <table>
@@ -2160,6 +2900,29 @@ The following images show the effect of various forms of the width check:
 <td><img src="/images/drc_width4.png"/></td>
 </tr>
 </table>
+</p><p>
+<h3>Universal DRC function </h3>
+</p><p>
+There is an alternative notation for the check using the "universal DRC" function ("<a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>"). 
+This notation is more intuitive and allows checking for widths bigger than a certain value 
+or within a certain range. See "<a href="/about/drc_ref_global.xml#width">width</a>" for details.
+</p><p>
+Apart from that it provides the same options than the plain width check. 
+Follow this link for the documentation of this feature: <a href="/about/drc_ref_global.xml#width">width</a>.
+</p><p>
+<h3>Shielding </h3>
+</p><p>
+"shielding" is a concept where an internal or external distance is measured only 
+if the opposite edge is not blocked by other edges between. Shielded mode makes 
+a difference if very large distances are to be checked and the minimum distance
+is much smaller: in this case, a large distance violation may be blocked by features
+located between the edges which are checked. With shielding, large distance violations
+are not reported in this case. Shielding is also effective at zero distance which has
+an adverse effect: Consider a case, where one layer A is a subset of another layer B. If 
+you try to check the distance between features of B vs. A, you cannot use shielding, 
+because B features which are identical to A features will shield those entirely. 
+</p><p>
+Shielding is enabled by default, but can be switched off with the "transparent" option.
 </p>
 <a name="with_angle"/><h2>"with_angle" - Selects edges by their angle</h2>
 <keyword name="with_angle"/>
@@ -2172,7 +2935,12 @@ The following images show the effect of various forms of the width check:
 <p>
 When called on an edge layer, the method selects edges by their angle, 
 measured against the horizontal axis in the mathematical sense. 
-The first version selects
+</p><p>
+For this measurement edges are considered without their direction and straight lines. 
+A horizontal edge has an angle of zero degree. A vertical one has
+an angle of 90 degee. The angle range is from -90 (exclusive) to 90 degree (inclusive).
+</p><p>
+The first version of this method selects
 edges with a angle larger or equal to min and less than max (but not equal).
 The second version selects edges with exactly the given angle. The third
 version is identical to the first one. 
@@ -2211,6 +2979,38 @@ will select the polygons with exactly the given area.
 The third form basically is equivalent to the first form, but
 allows specification of nil for min or max indicating no lower or 
 upper limit.
+</p>
+<a name="with_area_ratio"/><h2>"with_area_ratio" - Selects polygons by the ratio of the bounding box area vs. polygon area</h2>
+<keyword name="with_area_ratio"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.with_area_ratio(min .. max)</tt></li>
+<li><tt>layer.with_area_ratio(value)</tt></li>
+<li><tt>layer.with_area_ratio(min, max)</tt></li>
+</ul>
+<p>
+The area ratio is a measure how far a polygon is approximated by it's
+bounding box. The value is always larger or equal to 1. Boxes have a 
+area ratio of 1. Larger values mean more empty area inside the bounding box.
+</p><p>
+This method is available for polygon layers only.
+</p>
+<a name="with_bbox_aspect_ratio"/><h2>"with_bbox_aspect_ratio" - Selects polygons by the aspect ratio of their bounding box</h2>
+<keyword name="with_bbox_aspect_ratio"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.with_bbox_aspect_ratio(min .. max)</tt></li>
+<li><tt>layer.with_bbox_aspect_ratio(value)</tt></li>
+<li><tt>layer.with_bbox_aspect_ratio(min, max)</tt></li>
+</ul>
+<p>
+The method selects polygons similar to <a href="#with_area">with_area</a> or <a href="#with_perimeter">with_perimeter</a>.
+However, the measured value is the aspect ratio of the bounding 
+box. It is the larger dimensions divided by the smaller one.
+The "thinner" the polygon, the larger the aspect ratio. A square
+bounding box gives an aspect ratio of 1. 
+</p><p>
+This method is available for polygon layers only.
 </p>
 <a name="with_bbox_height"/><h2>"with_bbox_height" - Selects polygons by the height of the bounding box</h2>
 <keyword name="with_bbox_height"/>
@@ -2309,6 +3109,24 @@ upper limit.
 </p><p>
 This method is available for polygon layers only.
 </p>
+<a name="with_relative_height"/><h2>"with_relative_height" - Selects polygons by the ratio of the height vs. width of it's bounding box</h2>
+<keyword name="with_relative_height"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.with_relative_height(min .. max)</tt></li>
+<li><tt>layer.with_relative_height(value)</tt></li>
+<li><tt>layer.with_relative_height(min, max)</tt></li>
+</ul>
+<p>
+The relative height is a measure how tall a polygon is. Tall polygons
+have values larger than 1, wide polygons have a value smaller than 1.
+Squares have a value of 1.
+</p><p>
+Don't use this method when you can use <a href="#with_area_ratio">with_area_ratio</a>, which provides a 
+similar measure but is isotropic. 
+</p><p>
+This method is available for polygon layers only.
+</p>
 <a name="without_angle"/><h2>"without_angle" - Selects edges by the their angle</h2>
 <keyword name="without_angle"/>
 <p>Usage:</p>
@@ -2337,18 +3155,29 @@ the given interval.
 </p><p>
 This method is available for polygon layers only.
 </p>
-<a name="without_bbox_height"/><h2>"without_bbox_height" - Selects polygons by the height of the bounding box</h2>
+<a name="without_area_ratio"/><h2>"without_area_ratio" - Selects polygons by the aspect ratio of their bounding box</h2>
+<keyword name="without_area_ratio"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.without_area_ratio(min .. max)</tt></li>
+<li><tt>layer.without_area_ratio(value)</tt></li>
+<li><tt>layer.without_area_ratio(min, max)</tt></li>
+</ul>
+<p>
+The method provides the opposite filter for <a href="#with_area_ratio">with_area_ratio</a>.
+</p><p>
+This method is available for polygon layers only.
+</p>
+<a name="without_bbox_height"/><h2>"without_bbox_height" - Selects polygons by the aspect ratio of their bounding box</h2>
 <keyword name="without_bbox_height"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.without_bbox_height(min .. max)</tt></li>
-<li><tt>layer.without_bbox_height(value)</tt></li>
-<li><tt>layer.without_bbox_height(min, max)</tt></li>
+<li><tt>layer.without_bbox_aspect_ratio(min .. max)</tt></li>
+<li><tt>layer.without_bbox_aspect_ratio(value)</tt></li>
+<li><tt>layer.without_bbox_aspect_ratio(min, max)</tt></li>
 </ul>
 <p>
-The method selects polygons similar to <a href="#without_area">without_area</a> or <a href="#without_perimeter">without_perimeter</a>.
-However, the measured dimension is the width of the
-bounding box.
+The method provides the opposite filter for <a href="#with_bbox_aspect_ratio">with_bbox_aspect_ratio</a>.
 </p><p>
 This method is available for polygon layers only.
 </p>
@@ -2426,6 +3255,19 @@ This method is available for edge layers only.
 This method is the inverse of "with_perimeter". It will select 
 polygons without a perimeter equal to the given one or outside
 the given interval.
+</p><p>
+This method is available for polygon layers only.
+</p>
+<a name="without_relative_height"/><h2>"without_relative_height" - Selects polygons by the ratio of the height vs. width</h2>
+<keyword name="without_relative_height"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.without_relative_height(min .. max)</tt></li>
+<li><tt>layer.without_relative_height(value)</tt></li>
+<li><tt>layer.without_relative_height(min, max)</tt></li>
+</ul>
+<p>
+The method provides the opposite filter for <a href="#with_relative_height">with_relative_height</a>.
 </p><p>
 This method is available for polygon layers only.
 </p>

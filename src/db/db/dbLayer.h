@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -441,6 +441,18 @@ struct layer
   bool empty () const
   {
     return m_box_tree.empty ();
+  }
+
+  /**
+   *  @brief Swaps the layer with another one
+   */
+  void swap (layer &other)
+  {
+    m_box_tree.swap (other.m_box_tree);
+    std::swap (m_bbox, other.m_bbox);
+    bool x;
+    x = other.m_bbox_dirty; other.m_bbox_dirty = m_bbox_dirty; m_bbox_dirty = x;
+    x = other.m_tree_dirty; other.m_tree_dirty = m_tree_dirty; m_tree_dirty = x;
   }
 
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "dbRecursiveShapeIterator.h"
 #include "dbCellVariants.h"
 #include "dbShapeCollection.h"
+#include "dbGenericShapeIterator.h"
 
 #include <list>
 
@@ -44,19 +45,14 @@ class DeepShapeStore;
  *  The iterator delivers the edges of the edge set
  */
 class DB_PUBLIC EdgesIterator
+  : public generic_shape_iterator<db::Edge>
 {
 public:
-  typedef EdgesIteratorDelegate::value_type value_type;
-  typedef const value_type &reference;
-  typedef const value_type *pointer;
-  typedef std::forward_iterator_tag iterator_category;
-  typedef void difference_type;
-
   /**
    *  @brief Default constructor
    */
   EdgesIterator ()
-    : mp_delegate (0)
+    : generic_shape_iterator<db::Edge> ()
   {
     //  .. nothing yet ..
   }
@@ -66,27 +62,18 @@ public:
    *  The iterator will take ownership over the delegate
    */
   EdgesIterator (EdgesIteratorDelegate *delegate)
-    : mp_delegate (delegate)
+    : generic_shape_iterator<db::Edge> (delegate)
   {
     //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Destructor
-   */
-  ~EdgesIterator ()
-  {
-    delete mp_delegate;
-    mp_delegate = 0;
   }
 
   /**
    *  @brief Copy constructor and assignment
    */
   EdgesIterator (const EdgesIterator &other)
-    : mp_delegate (0)
+    : generic_shape_iterator<db::Edge> (static_cast<const generic_shape_iterator<db::Edge> &> (other))
   {
-    operator= (other);
+    //  .. nothing yet ..
   }
 
   /**
@@ -94,19 +81,8 @@ public:
    */
   EdgesIterator &operator= (const EdgesIterator &other)
   {
-    if (this != &other) {
-      delete mp_delegate;
-      mp_delegate = other.mp_delegate ? other.mp_delegate->clone () : 0;
-    }
+    generic_shape_iterator<db::Edge>::operator= (other);
     return *this;
-  }
-
-  /**
-   *  @Returns true, if the iterator is at the end
-   */
-  bool at_end () const
-  {
-    return mp_delegate == 0 || mp_delegate->at_end ();
   }
 
   /**
@@ -114,88 +90,12 @@ public:
    */
   EdgesIterator &operator++ ()
   {
-    if (mp_delegate) {
-      mp_delegate->increment ();
-    }
+    generic_shape_iterator<db::Edge>::operator++ ();
     return *this;
   }
-
-  /**
-   *  @brief Access
-   */
-  reference operator* () const
-  {
-    const value_type *value = operator-> ();
-    tl_assert (value != 0);
-    return *value;
-  }
-
-  /**
-   *  @brief Access
-   */
-  pointer operator-> () const
-  {
-    return mp_delegate ? mp_delegate->get () : 0;
-  }
-
-private:
-  EdgesIteratorDelegate *mp_delegate;
 };
 
-/**
- *  @brief A helper class allowing delivery of addressable edges
- *
- *  In some applications (i.e. box scanner), edges need to be taken
- *  by address. The edge set cannot always deliver adressable edges.
- *  This class help providing this ability by keeping a temporary copy
- *  if required.
- */
-
-class DB_PUBLIC AddressableEdgeDelivery
-{
-public:
-  AddressableEdgeDelivery ()
-    : m_iter (), m_valid (false)
-  {
-    //  .. nothing yet ..
-  }
-
-  AddressableEdgeDelivery (const EdgesIterator &iter, bool valid)
-    : m_iter (iter), m_valid (valid)
-  {
-    if (! m_valid && ! m_iter.at_end ()) {
-      m_heap.push_back (*m_iter);
-    }
-  }
-
-  bool at_end () const
-  {
-    return m_iter.at_end ();
-  }
-
-  AddressableEdgeDelivery &operator++ ()
-  {
-    ++m_iter;
-    if (! m_valid && ! m_iter.at_end ()) {
-      m_heap.push_back (*m_iter);
-    }
-    return *this;
-  }
-
-  const db::Edge *operator-> () const
-  {
-    if (m_valid) {
-      return m_iter.operator-> ();
-    } else {
-      return &m_heap.back ();
-    }
-  }
-
-private:
-  EdgesIterator m_iter;
-  bool m_valid;
-  std::list<db::Edge> m_heap;
-};
+typedef addressable_shape_delivery_gen<EdgesIterator> AddressableEdgeDelivery;
 
 class Edges;
 
@@ -475,11 +375,19 @@ public:
   }
 
   /**
-   *  @brief Returns the number of edges in the edge set
+   *  @brief Returns the number of (flat) edges in the edge set
    */
-  size_t size () const
+  size_t count () const
   {
-    return mp_delegate->size ();
+    return mp_delegate->count ();
+  }
+
+  /**
+   *  @brief Returns the number of (hierarchical) edges in the edge set
+   */
+  size_t hier_count () const
+  {
+    return mp_delegate->hier_count ();
   }
 
   /**
@@ -659,30 +567,17 @@ public:
    *  @brief Applies a width check and returns EdgePairs which correspond to violation markers
    *
    *  The width check will create a edge pairs if the width of the area between the 
-   *  edges is less than the specified threshold d. Without "whole_edges", the parts of
-   *  the edges are returned which violate the condition. If "whole_edges" is true, the 
-   *  result will contain the complete edges participating in the result.
+   *  edges is less than the specified threshold d.
    *
-   *  "Width" refers to the space between the "inside" sides of the edges.
-   *
-   *  The metrics parameter specifies which metrics to use. "Euclidian", "Square" and "Projected"
-   *  metrics are available.
-   *
-   *  ignore_angle allows specification of a maximum angle the edges can have to not participate
-   *  in the check. By choosing 90 degree, edges having an angle of 90 degree and larger are not checked,
-   *  but acute corners are for example. 
-   *
-   *  With min_projection and max_projection it is possible to specify how edges must be related 
-   *  to each other. If the length of the projection of either edge on the other is >= min_projection
-   *  or < max_projection, the edges are considered for the check.
+   *  "options" specifies various options to configure the check and it's output.
    *
    *  The order of the edges in the resulting edge pairs is undefined.
    *
    *  Merged semantics applies.
    */
-  EdgePairs width_check (db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
+  EdgePairs width_check (db::Coord d, const db::EdgesCheckOptions &options = db::EdgesCheckOptions ()) const
   {
-    return EdgePairs (mp_delegate->width_check (d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
+    return EdgePairs (mp_delegate->width_check (d, options));
   }
 
   /**
@@ -695,9 +590,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  EdgePairs space_check (db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
+  EdgePairs space_check (db::Coord d, const db::EdgesCheckOptions &options = db::EdgesCheckOptions ()) const
   {
-    return EdgePairs (mp_delegate->space_check (d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
+    return EdgePairs (mp_delegate->space_check (d, options));
   }
 
   /**
@@ -713,9 +608,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  EdgePairs enclosing_check (const Edges &other, db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
+  EdgePairs enclosing_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options = db::EdgesCheckOptions ()) const
   {
-    return EdgePairs (mp_delegate->enclosing_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
+    return EdgePairs (mp_delegate->enclosing_check (other, d, options));
   }
 
   /**
@@ -731,9 +626,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  EdgePairs overlap_check (const Edges &other, db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
+  EdgePairs overlap_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options = db::EdgesCheckOptions ()) const
   {
-    return EdgePairs (mp_delegate->overlap_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
+    return EdgePairs (mp_delegate->overlap_check (other, d, options));
   }
 
   /**
@@ -749,9 +644,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  EdgePairs separation_check (const Edges &other, db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
+  EdgePairs separation_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options = db::EdgesCheckOptions ()) const
   {
-    return EdgePairs (mp_delegate->separation_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
+    return EdgePairs (mp_delegate->separation_check (other, d, options));
   }
 
   /**
@@ -767,9 +662,9 @@ public:
    *
    *  Merged semantics applies.
    */
-  EdgePairs inside_check (const Edges &other, db::Coord d, bool whole_edges = false, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ()) const
+  EdgePairs inside_check (const Edges &other, db::Coord d, const db::EdgesCheckOptions &options = db::EdgesCheckOptions ()) const
   {
-    return EdgePairs (mp_delegate->inside_check (other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection));
+    return EdgePairs (mp_delegate->inside_check (other, d, options));
   }
 
   /**

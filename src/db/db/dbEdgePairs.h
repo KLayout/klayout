@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "dbShape.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbShapeCollection.h"
+#include "dbGenericShapeIterator.h"
 
 #include <list>
 
@@ -47,20 +48,20 @@ class TransformationReducer;
  *
  *  The iterator delivers the edge pairs of the edge pair set
  */
+/**
+ *  @brief An edge set iterator
+ *
+ *  The iterator delivers the edges of the edge set
+ */
 class DB_PUBLIC EdgePairsIterator
+  : public generic_shape_iterator<db::EdgePair>
 {
 public:
-  typedef EdgePairsIteratorDelegate::value_type value_type;
-  typedef const value_type &reference;
-  typedef const value_type *pointer;
-  typedef std::forward_iterator_tag iterator_category;
-  typedef void difference_type;
-
   /**
    *  @brief Default constructor
    */
   EdgePairsIterator ()
-    : mp_delegate (0)
+    : generic_shape_iterator<db::EdgePair> ()
   {
     //  .. nothing yet ..
   }
@@ -70,27 +71,18 @@ public:
    *  The iterator will take ownership over the delegate
    */
   EdgePairsIterator (EdgePairsIteratorDelegate *delegate)
-    : mp_delegate (delegate)
+    : generic_shape_iterator<db::EdgePair> (delegate)
   {
     //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Destructor
-   */
-  ~EdgePairsIterator ()
-  {
-    delete mp_delegate;
-    mp_delegate = 0;
   }
 
   /**
    *  @brief Copy constructor and assignment
    */
   EdgePairsIterator (const EdgePairsIterator &other)
-    : mp_delegate (0)
+    : generic_shape_iterator<db::EdgePair> (static_cast<const generic_shape_iterator<db::EdgePair> &> (other))
   {
-    operator= (other);
+    //  .. nothing yet ..
   }
 
   /**
@@ -98,19 +90,8 @@ public:
    */
   EdgePairsIterator &operator= (const EdgePairsIterator &other)
   {
-    if (this != &other) {
-      delete mp_delegate;
-      mp_delegate = other.mp_delegate ? other.mp_delegate->clone () : 0;
-    }
+    generic_shape_iterator<db::EdgePair>::operator= (other);
     return *this;
-  }
-
-  /**
-   *  @Returns true, if the iterator is at the end
-   */
-  bool at_end () const
-  {
-    return mp_delegate == 0 || mp_delegate->at_end ();
   }
 
   /**
@@ -118,88 +99,12 @@ public:
    */
   EdgePairsIterator &operator++ ()
   {
-    if (mp_delegate) {
-      mp_delegate->increment ();
-    }
+    generic_shape_iterator<db::EdgePair>::operator++ ();
     return *this;
   }
-
-  /**
-   *  @brief Access
-   */
-  reference operator* () const
-  {
-    const value_type *value = operator-> ();
-    tl_assert (value != 0);
-    return *value;
-  }
-
-  /**
-   *  @brief Access
-   */
-  pointer operator-> () const
-  {
-    return mp_delegate ? mp_delegate->get () : 0;
-  }
-
-private:
-  EdgePairsIteratorDelegate *mp_delegate;
 };
 
-/**
- *  @brief A helper class allowing delivery of addressable edges
- *
- *  In some applications (i.e. box scanner), edges need to be taken
- *  by address. The edge set cannot always deliver adressable edges.
- *  This class help providing this ability by keeping a temporary copy
- *  if required.
- */
-
-class DB_PUBLIC AddressableEdgePairDelivery
-{
-public:
-  AddressableEdgePairDelivery ()
-    : m_iter (), m_valid (false)
-  {
-    //  .. nothing yet ..
-  }
-
-  AddressableEdgePairDelivery (const EdgePairsIterator &iter, bool valid)
-    : m_iter (iter), m_valid (valid)
-  {
-    if (! m_valid && ! m_iter.at_end ()) {
-      m_heap.push_back (*m_iter);
-    }
-  }
-
-  bool at_end () const
-  {
-    return m_iter.at_end ();
-  }
-
-  AddressableEdgePairDelivery &operator++ ()
-  {
-    ++m_iter;
-    if (! m_valid && ! m_iter.at_end ()) {
-      m_heap.push_back (*m_iter);
-    }
-    return *this;
-  }
-
-  const db::EdgePair *operator-> () const
-  {
-    if (m_valid) {
-      return m_iter.operator-> ();
-    } else {
-      return &m_heap.back ();
-    }
-  }
-
-private:
-  EdgePairsIterator m_iter;
-  bool m_valid;
-  std::list<db::EdgePair> m_heap;
-};
+typedef addressable_shape_delivery_gen<EdgePairsIterator> AddressableEdgePairDelivery;
 
 class EdgePairs;
 
@@ -214,6 +119,7 @@ public:
 
   virtual bool selected (const db::EdgePair &edge) const = 0;
   virtual const TransformationReducer *vars () const = 0;
+  virtual bool wants_variants () const = 0;
 };
 
 /**
@@ -407,11 +313,19 @@ public:
   }
 
   /**
-   *  @brief Returns the number of edge pairs in the edge pair set
+   *  @brief Returns the number of (flat) edge pairs in the edge pair set
    */
-  size_t size () const
+  size_t count () const
   {
-    return mp_delegate->size ();
+    return mp_delegate->count ();
+  }
+
+  /**
+   *  @brief Returns the number of (hierarchical) edge pairs in the edge pair set
+   */
+  size_t hier_count () const
+  {
+    return mp_delegate->hier_count ();
   }
 
   /**
@@ -472,6 +386,14 @@ public:
    *  with the outputs of the processor.
    */
   void processed (Region &output, const EdgePairToPolygonProcessorBase &filter) const;
+
+  /**
+   *  @brief Processes the edge pairs into edges
+   *
+   *  This method will run the processor over all edge pairs and return a edge collection
+   *  with the outputs of the processor.
+   */
+  void processed (Edges &output, const EdgePairToEdgeProcessorBase &filter) const;
 
   /**
    *  @brief Transforms the edge pair set

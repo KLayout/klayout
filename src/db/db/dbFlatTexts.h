@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,50 +28,14 @@
 
 #include "dbAsIfFlatTexts.h"
 #include "dbShapes.h"
+#include "tlCopyOnWrite.h"
 
 namespace db {
 
 /**
  *  @brief An iterator delegate for the flat text set
  */
-class DB_PUBLIC FlatTextsIterator
-  : public TextsIteratorDelegate
-{
-public:
-  typedef db::layer<db::Text, db::unstable_layer_tag> edge_pair_layer_type;
-  typedef edge_pair_layer_type::iterator iterator_type;
-
-  FlatTextsIterator (iterator_type from, iterator_type to)
-    : m_from (from), m_to (to)
-  {
-    //  .. nothing yet ..
-  }
-
-  virtual bool at_end () const
-  {
-    return m_from == m_to;
-  }
-
-  virtual void increment ()
-  {
-    ++m_from;
-  }
-
-  virtual const value_type *get () const
-  {
-    return m_from.operator-> ();
-  }
-
-  virtual TextsIteratorDelegate *clone () const
-  {
-    return new FlatTextsIterator (*this);
-  }
-
-private:
-  friend class Texts;
-
-  iterator_type m_from, m_to;
-};
+typedef generic_shapes_iterator_delegate<db::Text> FlatTextsIterator;
 
 /**
  *  @brief The delegate for the actual text set implementation
@@ -103,7 +67,8 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const;
 
   virtual bool empty () const;
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
 
   virtual TextsDelegate *filter_in_place (const TextFilterBase &filter);
 
@@ -146,14 +111,16 @@ public:
   void transform (const Trans &trans)
   {
     if (! trans.is_unity ()) {
-      for (text_iterator_type p = m_texts.template get_layer<db::Text, db::unstable_layer_tag> ().begin (); p != m_texts.template get_layer<db::Text, db::unstable_layer_tag> ().end (); ++p) {
-        m_texts.get_layer<db::Text, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      db::Shapes &texts = *mp_texts;
+      for (text_iterator_type p = texts.template get_layer<db::Text, db::unstable_layer_tag> ().begin (); p != texts.template get_layer<db::Text, db::unstable_layer_tag> ().end (); ++p) {
+        texts.get_layer<db::Text, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
       }
       invalidate_cache ();
     }
   }
 
-  db::Shapes &raw_texts () { return m_texts; }
+  db::Shapes &raw_texts () { return *mp_texts; }
+  const db::Shapes &raw_texts () const { return *mp_texts; }
 
 protected:
   virtual Box compute_bbox () const;
@@ -164,7 +131,7 @@ private:
 
   FlatTexts &operator= (const FlatTexts &other);
 
-  mutable db::Shapes m_texts;
+  mutable tl::copy_on_write_ptr<db::Shapes> mp_texts;
 };
 
 }

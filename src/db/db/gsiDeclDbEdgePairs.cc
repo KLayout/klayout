@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -483,8 +483,19 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
   method ("is_empty?", &db::EdgePairs::empty,
     "@brief Returns true if the collection is empty\n"
   ) +
-  method ("size", &db::EdgePairs::size,
-    "@brief Returns the number of edge pairs in this collection\n"
+  method ("count|#size", (size_t (db::EdgePairs::*) () const) &db::EdgePairs::count,
+    "@brief Returns the (flat) number of edge pairs in the edge pair collection\n"
+    "\n"
+    "The count is computed 'as if flat', i.e. edge pairs inside a cell are multiplied by the number of times a cell is instantiated.\n"
+    "\n"
+    "Starting with version 0.27, the method is called 'count' for consistency with \\Region. 'size' is still provided as an alias."
+  ) +
+  method ("hier_count", (size_t (db::EdgePairs::*) () const) &db::EdgePairs::hier_count,
+    "@brief Returns the (hierarchical) number of edge pairs in the edge pair collection\n"
+    "\n"
+    "The count is computed 'hierarchical', i.e. edge pairs inside a cell are counted once even if the cell is instantiated multiple times.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   gsi::iterator ("each", &db::EdgePairs::begin,
     "@brief Returns each edge pair of the edge pair collection\n"

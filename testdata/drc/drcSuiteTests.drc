@@ -31,9 +31,13 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   
   message "--- general #{lb}"
   
-  l1 = a&b
+  l1 = a & b
   l1.output(lb, dm)
   expect_eq(l1.is_empty?, false)
+  
+  (an1, an2) = a.andnot(b)
+  an1.output(lb, dm + 1)
+  expect_eq(an1.is_empty?, false)
   
   a.and(b).xor(l1).is_empty? || raise("xor not empty")
   tiled || hier || expect_eq(a.and(b).is_merged?, true)
@@ -41,6 +45,7 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   a.xor(b).output(RBA::LayerInfo::new(lb + 1, dm))
   a.xor(b).xor(a ^ b).is_empty? || raise("xor not empty")
   a.not(b).output(lb + 2, dm)
+  an2.output(lb + 2, dm + 1)
   a.not(b).xor(a - b).is_empty? || raise("xor not empty")
   a.or(b).output(lb + 3, dm)
   a.or(b).xor(a | b).is_empty? || raise("xor not empty")
@@ -316,19 +321,16 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   lb += 10 #230
   message "--- isolated #{lb}"
   
-  b.isolated(0.4).polygons.output(lb, dm)
-  b.isolated(0.4).polygons.xor(b.iso(0.4).polygons).is_empty? == true || raise("xor not empty")
-  b.isolated(0.4, euclidian).polygons.output(lb + 1, dm)
-  b.isolated(0.4, square).polygons.output(lb + 2, dm)
-  b.isolated(0.4, projection).polygons.output(lb + 3, dm)
-  b.isolated(0.4, euclidian, whole_edges).polygons.output(lb + 4, dm)
-  b.isolated(0.4, euclidian, projection_limits(0.4, nil)).polygons.output(lb + 5, dm)
-  b.isolated(0.4, euclidian, projection_limits(nil, 0.4)).polygons.output(lb + 6, dm)
-  if has_float_range
-    b.isolated(0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
-  else
-    b.isolated(0.4, euclidian, projection_limits(0, 0.4)).polygons.output(lb + 7, dm)
-  end
+  b.isolated(0.4, shielded).polygons.output(lb, dm)
+  b.isolated(0.4, shielded).polygons.xor(b.iso(0.4, shielded).polygons).is_empty? == true || raise("xor not empty")
+  b.isolated(0.4, shielded, euclidian).polygons.output(lb + 1, dm)
+  b.isolated(0.4, shielded, square).polygons.output(lb + 2, dm)
+  b.isolated(0.4, shielded, projection).polygons.output(lb + 3, dm)
+  b.isolated(0.4, shielded, euclidian, whole_edges).polygons.output(lb + 4, dm)
+  b.isolated(0.4, shielded, euclidian, projection_limits(0.4, nil)).polygons.output(lb + 5, dm)
+  b.isolated(0.4, shielded, euclidian, projection_limits(nil, 0.4)).polygons.output(lb + 6, dm)
+  b.isolated(0.4, shielded, euclidian, projecting < 0.4).polygons.output(lb + 7, dm)
+  b.isolated(0.4, transparent).polygons.output(lb + 8, dm)
   
   lb += 10 #240
   message "--- notch #{lb}"

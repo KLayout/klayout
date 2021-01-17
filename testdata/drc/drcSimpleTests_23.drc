@@ -1,0 +1,35 @@
+
+# shielded/transparent
+
+source($drc_test_source, "TOP")
+target($drc_test_target)
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+l1.separation(l2, 3.0, projection).output(100, 0)
+l1.separation(l2, 3.0, one_side_allowed, projection).output(110, 0)
+l1.separation(l2, 3.0, two_sides_allowed, projection).output(111, 0)
+l1.separation(l2, 3.0, two_opposite_sides_allowed, projection).output(112, 0)
+l1.separation(l2, 3.0, two_connected_sides_allowed, projection).output(113, 0)
+l1.separation(l2, 3.0, three_sides_allowed, projection).output(114, 0)
+l1.separation(l2, 3.0, four_sides_allowed, projection).output(115, 0)
+l1.separation(l2, 3.0, one_side_allowed, two_opposite_sides_allowed, projection).output(116, 0)
+
+deep
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.separation(l2, 3.0, projection).output(200, 0)
+l1.separation(l2, 3.0, one_side_allowed, projection).output(210, 0)
+l1.separation(l2, 3.0, two_sides_allowed, projection).output(211, 0)
+l1.separation(l2, 3.0, two_opposite_sides_allowed, projection).output(212, 0)
+l1.separation(l2, 3.0, two_connected_sides_allowed, projection).output(213, 0)
+l1.separation(l2, 3.0, three_sides_allowed, projection).output(214, 0)
+l1.separation(l2, 3.0, four_sides_allowed, projection).output(215, 0)
+l1.separation(l2, 3.0, one_side_allowed, two_opposite_sides_allowed, projection).output(216, 0)
+

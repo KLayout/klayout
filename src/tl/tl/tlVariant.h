@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -860,6 +860,11 @@ public:
    *  An object can only be deleted if it is owned by the variant, i.e. user_is_ref is false.
    */
   void user_destroy ();
+
+  /**
+   *  @brief Takes the user object and releases it from the variant
+   */
+  void *user_take ();
 
   /**
    *  @brief Assigns the object stored in other to self

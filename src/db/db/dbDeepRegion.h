@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -72,7 +72,8 @@ public:
   virtual bool less (const Region &other) const;
 
   virtual bool is_box () const;
-  virtual size_t size () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
 
   virtual area_type area (const db::Box &box) const;
   virtual perimeter_type perimeter (const db::Box &box) const;
@@ -80,52 +81,17 @@ public:
 
   virtual std::string to_string (size_t nmax) const;
 
+  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node);
+  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node);
+  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node);
+
   virtual RegionDelegate *and_with (const Region &other) const;
   virtual RegionDelegate *not_with (const Region &other) const;
   virtual RegionDelegate *xor_with (const Region &other) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &) const;
 
   virtual RegionDelegate *add_in_place (const Region &other);
   virtual RegionDelegate *add (const Region &other) const;
-
-  EdgePairsDelegate *width_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_single_polygon_check (db::WidthRelation, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
-
-  EdgePairsDelegate *space_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_check (db::SpaceRelation, false, 0, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
-
-  EdgePairsDelegate *isolated_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_check (db::SpaceRelation, true, 0, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
-
-  EdgePairsDelegate *notch_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_single_polygon_check (db::SpaceRelation, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
-
-  EdgePairsDelegate *enclosing_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_check (db::OverlapRelation, true, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
-
-  EdgePairsDelegate *overlap_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_check (db::WidthRelation, true, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
-
-  EdgePairsDelegate *separation_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_check (db::SpaceRelation, true, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
-
-  EdgePairsDelegate *inside_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const
-  {
-    return run_check (db::InsideRelation, true, &other, d, whole_edges, metrics, ignore_angle, min_projection, max_projection);
-  }
 
   virtual EdgePairsDelegate *grid_check (db::Coord gx, db::Coord gy) const;
   virtual EdgePairsDelegate *angle_check (double min, double max, bool inverse) const;
@@ -166,9 +132,20 @@ public:
 
   void set_is_merged (bool f);
 
+  const DeepLayer &merged_deep_layer () const;
+
 protected:
   virtual void merged_semantics_changed ();
   virtual void min_coherence_changed ();
+
+  virtual EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const;
+  virtual EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options) const;
+  virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count, size_t max_count) const;
+  virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse, size_t min_count, size_t max_count) const;
+  virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse, size_t min_count, size_t max_count) const;
+  virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
+  virtual EdgesDelegate *pull_generic (const Edges &other) const;
+  virtual TextsDelegate *pull_generic (const Texts &other) const;
 
 private:
   friend class DeepEdges;
@@ -182,16 +159,8 @@ private:
 
   void init ();
   void ensure_merged_polygons_valid () const;
-  const DeepLayer &merged_deep_layer () const;
   DeepLayer and_or_not_with(const DeepRegion *other, bool and_op) const;
-  EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const;
-  virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse) const;
-  virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse) const;
-  virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
-  virtual EdgesDelegate *pull_generic (const Edges &other) const;
-  virtual TextsDelegate *pull_generic (const Texts &other) const;
+  std::pair<DeepLayer, DeepLayer> and_and_not_with (const DeepRegion *other) const;
   DeepRegion *apply_filter (const PolygonFilterBase &filter) const;
 
   template <class Result, class OutputContainer> OutputContainer *processed_impl (const polygon_processor<Result> &filter) const;

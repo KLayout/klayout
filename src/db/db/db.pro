@@ -21,6 +21,7 @@ SOURCES = \
   dbClip.cc \
   dbColdProxy.cc \
   dbCommonReader.cc \
+  dbCompoundOperation.cc \
   dbEdge.cc \
   dbEdgePair.cc \
   dbEdgePairRelations.cc \
@@ -29,6 +30,7 @@ SOURCES = \
   dbEdges.cc \
   dbFillTool.cc \
   dbFuzzyCellMapping.cc \
+  dbGenericShapeIterator.cc \
   dbGlyphs.cc \
   dbHershey.cc \
   dbInstances.cc \
@@ -61,8 +63,10 @@ SOURCES = \
   dbReader.cc \
   dbRecursiveShapeIterator.cc \
   dbRegion.cc \
+  dbRegionLocalOperations.cc \
   dbSaveLayoutOptions.cc \
   dbShape.cc \
+  dbShapeFlags.cc \
   dbShapes2.cc \
   dbShapes3.cc \
   dbShapes.cc \
@@ -91,6 +95,7 @@ SOURCES = \
   gsiDeclDbCell.cc \
   gsiDeclDbCellMapping.cc \
   gsiDeclDbCommonStreamOptions.cc \
+  gsiDeclDbCompoundOperation.cc \
   gsiDeclDbEdge.cc \
   gsiDeclDbEdgePair.cc \
   gsiDeclDbEdgePairs.cc \
@@ -217,6 +222,7 @@ HEADERS = \
   dbClip.h \
   dbColdProxy.h \
   dbCommonReader.h \
+  dbCompoundOperation.h \
   dbEdge.h \
   dbEdgePair.h \
   dbEdgePairRelations.h \
@@ -226,6 +232,7 @@ HEADERS = \
   dbEdgesToContours.h \
   dbFillTool.h \
   dbFuzzyCellMapping.h \
+  dbGenericShapeIterator.h \
   dbHash.h \
   dbHersheyFont.h \
   dbHershey.h \
@@ -262,8 +269,10 @@ HEADERS = \
   dbReader.h \
   dbRecursiveShapeIterator.h \
   dbRegion.h \
+  dbRegionLocalOperations.h \
   dbSaveLayoutOptions.h \
   dbShape.h \
+  dbShapeFlags.h \
   dbShapeRepository.h \
   dbShapes2.h \
   dbShapeProcessor.h \

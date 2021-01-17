@@ -1,0 +1,24 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+# advanced shielding (self, symmetric space)
+
+l1.drc(width(projection, shielded) < 1.0).output(100, 0)
+l1.drc(width(projection, transparent) < 1.0).output(101, 0)
+
+l1.drc(space(projection, shielded) < 1.0).output(110, 0)
+l1.drc(space(projection, transparent) < 1.0).output(111, 0)
+

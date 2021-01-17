@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -38,10 +38,17 @@ namespace
     : public EdgePairsIteratorDelegate
   {
   public:
+    typedef db::EdgePair value_type;
+
     OriginalLayerEdgePairsIterator (const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans)
       : m_rec_iter (iter), m_iter_trans (trans)
     {
       set ();
+    }
+
+    virtual bool is_addressable() const
+    {
+      return false;
     }
 
     virtual bool at_end () const
@@ -51,13 +58,13 @@ namespace
 
     virtual void increment ()
     {
-      inc ();
+      do_increment ();
       set ();
     }
 
     virtual const value_type *get () const
     {
-      return &m_edge_pair;
+      return &m_shape;
     }
 
     virtual EdgePairsIteratorDelegate *clone () const
@@ -65,25 +72,47 @@ namespace
       return new OriginalLayerEdgePairsIterator (*this);
     }
 
+    virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
+    {
+      const OriginalLayerEdgePairsIterator *o = dynamic_cast<const OriginalLayerEdgePairsIterator *> (other);
+      return o && o->m_rec_iter == m_rec_iter && o->m_iter_trans.equal (m_iter_trans);
+    }
+
+    virtual void do_reset (const db::Box &region, bool overlapping)
+    {
+      if (region == db::Box::world ()) {
+        m_rec_iter.set_region (region);
+      } else {
+        m_rec_iter.set_region (m_iter_trans.inverted () * region);
+      }
+      m_rec_iter.set_overlapping (overlapping);
+      set ();
+    }
+
+    virtual db::Box bbox () const
+    {
+      return m_iter_trans * m_rec_iter.bbox ();
+    }
+
   private:
     friend class EdgePairs;
 
     db::RecursiveShapeIterator m_rec_iter;
     db::ICplxTrans m_iter_trans;
-    db::EdgePair m_edge_pair;
+    value_type m_shape;
 
     void set ()
     {
-      while (! m_rec_iter.at_end () && ! m_rec_iter.shape ().is_edge_pair ()) {
+      while (! m_rec_iter.at_end () && !m_rec_iter.shape ().is_edge_pair ()) {
         ++m_rec_iter;
       }
       if (! m_rec_iter.at_end ()) {
-        m_rec_iter.shape ().edge_pair (m_edge_pair);
-        m_edge_pair.transform (m_iter_trans * m_rec_iter.trans ());
+        m_rec_iter.shape ().edge_pair (m_shape);
+        m_shape.transform (m_iter_trans * m_rec_iter.trans ());
       }
     }
 
-    void inc ()
+    void do_increment ()
     {
       if (! m_rec_iter.at_end ()) {
         ++m_rec_iter;

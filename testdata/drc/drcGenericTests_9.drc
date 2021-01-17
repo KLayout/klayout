@@ -1,0 +1,45 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+  threads(0) # easier to debug
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+# conversions
+l1.drc((space(projection) < 1.0).polygons).output(100, 0)
+l1.drc((space(projection) < 1.0).edges).output(101, 0)
+l1.drc((space(projection) < 1.0).first_edges).output(102, 0)
+l1.drc((space(projection) < 1.0).second_edges).output(103, 0)
+l1.drc((sep(l2, projection) < 1.0).first_edges).output(104, 0)
+l1.drc((sep(l2, projection) < 1.0).second_edges).output(105, 0)
+
+l2.drc(primary.edges).output(110, 0)
+l2.drc(primary.edges.extended_in(0.1)).output(111, 0)
+l2.drc(primary.edges.extended_out(0.1)).output(112, 0)
+
+# edge/polygon booleans
+l1.drc(primary.edges - secondary(l2)).output(120, 0)
+l1.drc(primary.edges & secondary(l2)).output(121, 0)
+
+# edge booleans 
+l1.drc(primary.edges - (primary & secondary(l2)).edges).output(130, 0)
+l1.drc(primary.edges & (primary & secondary(l2)).edges).output(131, 0)
+
+# start_segments
+l1.drc(primary.edges.start_segments(1.0)).output(140, 0)
+l1.drc(primary.edges.start_segments(0.0, 0.5)).output(141, 0)
+l1.drc(primary.edges.end_segments(1.0)).output(142, 0)
+l1.drc(primary.edges.end_segments(1.0, 0.5)).output(143, 0)
+l1.drc(primary.edges.centers(1.0)).output(144, 0)
+l1.drc(primary.edges.centers(1.0, 0.5)).output(145, 0)
+

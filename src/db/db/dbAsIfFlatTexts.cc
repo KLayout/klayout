@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -106,13 +106,19 @@ AsIfFlatTexts::in (const Texts &other, bool invert) const
 }
 
 size_t
-AsIfFlatTexts::size () const
+AsIfFlatTexts::count () const
 {
   size_t n = 0;
   for (TextsIterator t (begin ()); ! t.at_end (); ++t) {
     ++n;
   }
   return n;
+}
+
+size_t
+AsIfFlatTexts::hier_count () const
+{
+  return count ();
 }
 
 Box AsIfFlatTexts::bbox () const
@@ -216,7 +222,7 @@ AsIfFlatTexts::add (const Texts &other) const
     std::auto_ptr<FlatTexts> new_texts (new FlatTexts (*other_flat));
     new_texts->invalidate_cache ();
 
-    size_t n = new_texts->raw_texts ().size () + size ();
+    size_t n = new_texts->raw_texts ().size () + count ();
 
     new_texts->reserve (n);
 
@@ -230,7 +236,7 @@ AsIfFlatTexts::add (const Texts &other) const
 
     std::auto_ptr<FlatTexts> new_texts (new FlatTexts ());
 
-    size_t n = size () + other.size ();
+    size_t n = count () + other.count ();
 
     new_texts->reserve (n);
 
@@ -252,7 +258,7 @@ AsIfFlatTexts::equals (const Texts &other) const
   if (empty () != other.empty ()) {
     return false;
   }
-  if (size () != other.size ()) {
+  if (count () != other.count ()) {
     return false;
   }
   TextsIterator o1 (begin ());
@@ -273,8 +279,8 @@ AsIfFlatTexts::less (const Texts &other) const
   if (empty () != other.empty ()) {
     return empty () < other.empty ();
   }
-  if (size () != other.size ()) {
-    return (size () < other.size ());
+  if (count () != other.count ()) {
+    return (count () < other.count ());
   }
   TextsIterator o1 (begin ());
   TextsIterator o2 (other.begin ());

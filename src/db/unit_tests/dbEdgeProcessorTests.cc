@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #include "dbTestSupport.h"
 #include "dbSaveLayoutOptions.h"
 #include "dbWriter.h"
+#include "dbRecursiveShapeIterator.h"
 #include "tlStream.h"
 #include "tlTimer.h"
 
@@ -499,6 +500,165 @@ void run_test_size (tl::TestBase *_this, const char *file, const char *au_file, 
   db::compare_layouts (_this, layout_org, au_fn, lmap, false /*skip other layers*/, db::WriteOAS);
 }
 
+void run_test_twobool (tl::TestBase *_this, const char *file, const char *au_file)
+{
+  db::Manager m (true);
+
+  db::Layout layout_org (&m);
+  db::Layout layout_au (&m);
+
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/bool/";
+    fn += file;
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+
+    db::LayerMap lmap;
+    unsigned int index;
+    db::LayerProperties p;
+
+    p.layer = 1;
+    p.datatype = 0;
+    lmap.map (db::LDPair (1, 0), index = layout_org.insert_layer ());
+    layout_org.set_properties (index, p);
+
+    p.layer = 2;
+    p.datatype = 0;
+    lmap.map (db::LDPair (2, 0), index = layout_org.insert_layer ());
+    layout_org.set_properties (index, p);
+
+    p.layer = 100;
+    p.datatype = 0;
+    lmap.map (db::LDPair (100, 0), index = layout_org.insert_layer ());
+    layout_org.set_properties (index, p);
+
+    p.layer = 101;
+    p.datatype = 0;
+    lmap.map (db::LDPair (101, 0), index = layout_org.insert_layer ());
+    layout_org.set_properties (index, p);
+
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+    reader.read (layout_org, options);
+  }
+
+  std::string au_fn (tl::testsrc ());
+  au_fn += "/testdata/bool/";
+  au_fn += au_file;
+
+  int la = -1;
+  for (unsigned int l = 0; l < layout_org.layers (); ++l) {
+    if (layout_org.is_valid_layer (l) && layout_org.get_properties (l).layer == 1
+                                      && layout_org.get_properties (l).datatype == 0) {
+      la = l;
+      break;
+    }
+  }
+  if (la < 0) {
+    la = layout_org.insert_layer ();
+  }
+
+  int lb = -1;
+  for (unsigned int l = 0; l < layout_org.layers (); ++l) {
+    if (layout_org.is_valid_layer (l) && layout_org.get_properties (l).layer == 2
+                                      && layout_org.get_properties (l).datatype == 0) {
+      lb = l;
+      break;
+    }
+  }
+  if (lb < 0) {
+    lb = layout_org.insert_layer ();
+  }
+
+  int lra = -1;
+  for (unsigned int l = 0; l < layout_org.layers (); ++l) {
+    if (layout_org.is_valid_layer (l) && layout_org.get_properties (l).layer == 100
+                                      && layout_org.get_properties (l).datatype == 0) {
+      lra = l;
+      break;
+    }
+  }
+  if (lra >= 0) {
+    layout_org.delete_layer (lra);
+  }
+  lra = layout_org.insert_layer ();
+
+  int lrb = -1;
+  for (unsigned int l = 0; l < layout_org.layers (); ++l) {
+    if (layout_org.is_valid_layer (l) && layout_org.get_properties (l).layer == 101
+                                      && layout_org.get_properties (l).datatype == 0) {
+      lrb = l;
+      break;
+    }
+  }
+  if (lrb >= 0) {
+    layout_org.delete_layer (lrb);
+  }
+  lrb = layout_org.insert_layer ();
+
+  db::LayerProperties p;
+
+  p.layer = 1;
+  p.datatype = 0;
+  layout_org.set_properties (la, p);
+
+  p.layer = 2;
+  p.datatype = 0;
+  layout_org.set_properties (lb, p);
+
+  p.layer = 100;
+  p.datatype = 0;
+  layout_org.set_properties (lra, p);
+
+  p.layer = 101;
+  p.datatype = 0;
+  layout_org.set_properties (lrb, p);
+
+  db::EdgeProcessor ep;
+
+  size_t pn = 0;
+
+  for (db::RecursiveShapeIterator iter (layout_org, layout_org.cell (*layout_org.begin_top_down ()), la); ! iter.at_end (); ++iter) {
+    db::Polygon p;
+    iter.shape ().polygon (p);
+    p.transform (iter.trans ());
+    ep.insert (p, pn);
+    pn += 2;
+  }
+
+  pn = 1;
+
+  for (db::RecursiveShapeIterator iter (layout_org, layout_org.cell (*layout_org.begin_top_down ()), lb); ! iter.at_end (); ++iter) {
+    db::Polygon p;
+    iter.shape ().polygon (p);
+    p.transform (iter.trans ());
+    ep.insert (p, pn);
+    pn += 2;
+  }
+
+  db::ShapeGenerator sg1 (layout_org.cell (*layout_org.begin_top_down ()).shapes (lra), true /*clear shapes*/);
+  db::PolygonGenerator pg1 (sg1, true /*resolve holes*/, false /*min. coherence*/);
+  db::BooleanOp op1 (db::BooleanOp::And);
+
+  db::ShapeGenerator sg2 (layout_org.cell (*layout_org.begin_top_down ()).shapes (lrb), true /*clear shapes*/);
+  db::PolygonGenerator pg2 (sg2, true /*resolve holes*/, false /*min. coherence*/);
+  db::BooleanOp op2 (db::BooleanOp::ANotB);
+
+  std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > procs;
+  procs.push_back (std::make_pair (&pg1, &op1));
+  procs.push_back (std::make_pair (&pg2, &op2));
+  ep.process (procs);
+
+  db::LayerMap lmap;
+  lmap.map (db::LDPair (1, 0), la);
+  lmap.map (db::LDPair (2, 0), lb);
+  lmap.map (db::LDPair (100, 0), lra);
+  lmap.map (db::LDPair (101, 0), lrb);
+
+  db::compare_layouts (_this, layout_org, au_fn, lmap, false /*skip other layers*/, db::WriteOAS);
+}
 
 TEST(1size)
 {
@@ -562,7 +722,12 @@ TEST(8size)
   run_test_size (_this, "size8.oas", "size8_au4.oas", 2, 100, 100);
 }
 
-void write (const std::vector<db::Polygon> &q1, const std::vector<db::Polygon> &q2, 
+TEST(9twobool)
+{
+  run_test_twobool (_this, "twobool9.oas", "twobool9_au1.oas");
+}
+
+void write (const std::vector<db::Polygon> &q1, const std::vector<db::Polygon> &q2,
             const std::vector<db::Edge> &e1, const std::vector<db::Edge> &e2,
             const std::string &fn)
 {
@@ -1515,14 +1680,15 @@ TEST(26b)
 TEST(26c)
 {
   db::EdgeProcessor ep;
-  ep.insert (db::Polygon (db::Box (db::Point (0, 0), db::Point (100, 100))), 0);
-  ep.insert (db::Polygon (db::Box (db::Point (40, 0), db::Point (140, 100))), 1);
-  ep.insert (db::Polygon (db::Box (db::Point (60, 20), db::Point (160, 120))), 2);
-  ep.insert (db::Polygon (db::Box (db::Point (110, 50), db::Point (210, 150))), 3);
-  ep.insert (db::Polygon (db::Box (db::Point (-100, -100), db::Point (1000, 1000))), 4);
-  ep.insert (db::Polygon (db::Box (db::Point (1000, 1100), db::Point (1100, 1200))), 5);
+  ep.insert (db::Polygon (db::Box (db::Point (-100, -100), db::Point (1000, 1000))), 0);
+  ep.insert (db::Polygon (db::Box (db::Point (1000, 1100), db::Point (1100, 1200))), 1);
+  ep.insert (db::Polygon (db::Box (db::Point (0, 0), db::Point (100, 100))), 2);
+  ep.insert (db::Polygon (db::Box (db::Point (40, 0), db::Point (140, 100))), 3);
+  ep.insert (db::Polygon (db::Box (db::Point (60, 20), db::Point (160, 120))), 4);
+  ep.insert (db::Polygon (db::Box (db::Point (110, 50), db::Point (210, 150))), 5);
+  ep.insert (db::Polygon (db::Box (db::Point (1000, 1100), db::Point (1010, 1110))), 6);
 
-  db::InteractionDetector id (-1, 4); // inside with background #4
+  db::InteractionDetector id (-1, 0); // inside with background #0
   db::EdgeSink es;
   ep.process (es, id);
   id.finish ();
@@ -1536,7 +1702,35 @@ TEST(26c)
   }
 
   //  does not work yet!
-  EXPECT_EQ (s, "4:0,4:1,4:2,4:3");
+  EXPECT_EQ (s, "0:2,0:3,0:4,0:5");
+}
+
+TEST(26d)
+{
+  db::EdgeProcessor ep;
+  ep.insert (db::Polygon (db::Box (db::Point (-100, -100), db::Point (1000, 1000))), 0);
+  ep.insert (db::Polygon (db::Box (db::Point (1000, 1100), db::Point (1100, 1200))), 1);
+  ep.insert (db::Polygon (db::Box (db::Point (0, 0), db::Point (100, 100))), 2);
+  ep.insert (db::Polygon (db::Box (db::Point (40, 0), db::Point (140, 100))), 3);
+  ep.insert (db::Polygon (db::Box (db::Point (60, 20), db::Point (160, 120))), 4);
+  ep.insert (db::Polygon (db::Box (db::Point (110, 50), db::Point (210, 150))), 5);
+  ep.insert (db::Polygon (db::Box (db::Point (1000, 1100), db::Point (1010, 1110))), 6);
+
+  db::InteractionDetector id (-1, 1); // inside with background #0 and #1
+  db::EdgeSink es;
+  ep.process (es, id);
+  id.finish ();
+
+  std::string s;
+  for (db::InteractionDetector::iterator i = id.begin (); i != id.end (); ++i) {
+    if (! s.empty ()) {
+      s += ",";
+    }
+    s += tl::to_string (i->first) + ":" + tl::to_string (i->second);
+  }
+
+  //  does not work yet!
+  EXPECT_EQ (s, "0:2,0:3,0:4,0:5,1:6");
 }
 
 TEST(27)

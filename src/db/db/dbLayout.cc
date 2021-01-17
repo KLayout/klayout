@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -984,7 +984,7 @@ Layout::flatten (const db::Cell &source_cell, db::Cell &target_cell, const db::I
       //  even an iteration of the instances requires an update.
       start_changes ();
 
-      db::Instances old_instances (0);
+      db::Instances old_instances (&target_cell);
       old_instances = target_cell.instances ();
       target_cell.clear_insts ();
 

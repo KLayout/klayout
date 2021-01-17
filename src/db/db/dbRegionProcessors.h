@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "dbCommon.h"
 #include "dbRegionDelegate.h"
 #include "dbPolygonTools.h"
+#include "dbEdgesUtils.h"
 
 namespace db
 {
@@ -91,14 +92,13 @@ private:
 class DB_PUBLIC CornerDetectorCore
 {
 public:
-  CornerDetectorCore (double angle_start, double angle_end);
+  CornerDetectorCore (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end);
   virtual ~CornerDetectorCore () { }
 
   void detect_corners (const db::Polygon &poly, const CornerPointDelivery &delivery) const;
 
 private:
-  db::CplxTrans m_t_start, m_t_end;
-  bool m_big_angle, m_all;
+  db::EdgeAngleChecker m_checker;
 };
 
 /**
@@ -108,8 +108,8 @@ class DB_PUBLIC CornersAsRectangles
   : public db::PolygonProcessorBase, private CornerDetectorCore
 {
 public:
-  CornersAsRectangles (double angle_start, double angle_end, db::Coord dim = 1)
-    : CornerDetectorCore (angle_start, angle_end), m_dim (dim)
+  CornersAsRectangles (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, db::Coord dim = 1)
+    : CornerDetectorCore (angle_start, include_angle_start, angle_end, include_angle_end), m_dim (dim)
   {
     //  .. nothing yet ..
   }
@@ -137,8 +137,8 @@ class DB_PUBLIC CornersAsDots
   : public db::PolygonToEdgeProcessorBase, private CornerDetectorCore
 {
 public:
-  CornersAsDots (double angle_start, double angle_end)
-    : CornerDetectorCore (angle_start, angle_end)
+  CornersAsDots (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end)
+    : CornerDetectorCore (angle_start, include_angle_start, angle_end, include_angle_end)
   {
     //  .. nothing yet ..
   }
@@ -157,6 +157,27 @@ public:
 
 // -----------------------------------------------------------------------------------
 //  Extents
+
+/**
+ *  @brief A processor delivering the extents (bounding box) of the merged polygons
+ */
+class DB_PUBLIC Extents
+  : public db::PolygonProcessorBase
+{
+public:
+  Extents ()
+  {
+    //  .. nothing yet ..
+  }
+
+  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+
+  virtual const TransformationReducer *vars () const { return 0; }
+  virtual bool result_is_merged () const { return false; }
+  virtual bool result_must_not_be_merged () const { return false; }
+  virtual bool requires_raw_input () const { return false; }
+  virtual bool wants_variants () const { return false; }  //  variants are too common, so don't do this
+};
 
 /**
  *  @brief A processor delivering the relative extents (bounding box) of the merged polygons
@@ -216,6 +237,21 @@ public:
 private:
   double m_fx1, m_fy1, m_fx2, m_fy2;
   db::MagnificationAndOrientationReducer m_anisotropic_reducer;
+};
+
+/**
+ *  @brief A processor that delivers all edges for a polygon
+ */
+class DB_PUBLIC PolygonToEdgeProcessor
+  : public db::PolygonToEdgeProcessorBase
+{
+public:
+  PolygonToEdgeProcessor ()
+  {
+    //  .. nothing yet ..
+  }
+
+  void process (const db::Polygon &poly, std::vector<db::Edge> &result) const;
 };
 
 /**
@@ -300,15 +336,40 @@ private:
 };
 
 /**
+ *  @brief A sizing processor
+ */
+class DB_PUBLIC PolygonSizer
+  : public db::PolygonProcessorBase
+{
+public:
+  PolygonSizer (db::Coord dx, db::Coord dy, unsigned int mode);
+  ~PolygonSizer ();
+
+  virtual const TransformationReducer *vars () const { return m_vars; }
+
+  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+
+  virtual bool result_is_merged () const;
+  virtual bool result_must_not_be_merged () const { return false; }
+  virtual bool requires_raw_input () const { return false; }
+  virtual bool wants_variants () const { return true; }
+
+private:
+  TransformationReducer *m_vars;
+  db::Coord m_dx, m_dy;
+  unsigned int m_mode;
+};
+
+/**
  *  @brief Computes the Minkowsky sum between the polygons and the given object
  *  The object can be Edge, Polygon, Box and std::vector<Point>
  */
-template <class Object>
+template <class K>
 class DB_PUBLIC_TEMPLATE minkowsky_sum_computation
   : public db::PolygonProcessorBase
 {
 public:
-  minkowsky_sum_computation (const Object &q)
+  minkowsky_sum_computation (const K &q)
     : m_q (q)
   {
     //  .. nothing yet ..
@@ -327,7 +388,7 @@ public:
   virtual bool wants_variants () const { return true; }
 
 private:
-  Object m_q;
+  K m_q;
   db::MagnificationAndOrientationReducer m_vars;
 };
 

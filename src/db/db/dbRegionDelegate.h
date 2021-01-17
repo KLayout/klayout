@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,6 +32,8 @@
 #include "dbEdgePairs.h"
 #include "dbEdgePairRelations.h"
 #include "dbShapeCollection.h"
+#include "dbGenericShapeIterator.h"
+#include "dbRegionLocalOperations.h"
 
 #include <list>
 
@@ -41,6 +43,7 @@ class RecursiveShapeIterator;
 class EdgeFilterBase;
 class EdgesDelegate;
 class EdgePairsDelegate;
+class CompoundRegionOperationNode;
 
 /**
  *  @brief A base class for polygon filters
@@ -60,6 +63,24 @@ public:
    *  If this method returns true, the polygon is kept. Otherwise it's discarded.
    */
   virtual bool selected (const db::Polygon &polygon) const = 0;
+
+  /**
+   *  @brief Filters the polygon reference
+   *  If this method returns true, the polygon is kept. Otherwise it's discarded.
+   */
+  virtual bool selected (const db::PolygonRef &polygon) const = 0;
+
+  /**
+   *  @brief Filters the set of polygons (taking the overall properties)
+   *  If this method returns true, the polygon is kept. Otherwise it's discarded.
+   */
+  virtual bool selected_set (const std::unordered_set<db::Polygon> &polygons) const = 0;
+
+  /**
+   *  @brief Filters the set of polygon references (taking the overall properties)
+   *  If this method returns true, the polygon is kept. Otherwise it's discarded.
+   */
+  virtual bool selected_set (const std::unordered_set<db::PolygonRef> &polygons) const = 0;
 
   /**
    *  @brief Returns the transformation reducer for building cell variants
@@ -142,19 +163,7 @@ typedef shape_collection_processor<db::Polygon, db::EdgePair> PolygonToEdgePairP
 /**
  *  @brief The region iterator delegate
  */
-class DB_PUBLIC RegionIteratorDelegate
-{
-public:
-  RegionIteratorDelegate () { }
-  virtual ~RegionIteratorDelegate () { }
-
-  typedef db::Polygon value_type;
-
-  virtual bool at_end () const = 0;
-  virtual void increment () = 0;
-  virtual const value_type *get () const = 0;
-  virtual RegionIteratorDelegate *clone () const = 0;
-};
+typedef db::generic_shape_iterator_delegate_base <db::Polygon> RegionIteratorDelegate;
 
 /**
  *  @brief The delegate for the actual region implementation
@@ -219,20 +228,25 @@ public:
   virtual bool empty () const = 0;
   virtual bool is_box () const = 0;
   virtual bool is_merged () const = 0;
-  virtual size_t size () const = 0;
+  virtual size_t hier_count () const = 0;
+  virtual size_t count () const = 0;
 
   virtual area_type area (const db::Box &box) const = 0;
   virtual perimeter_type perimeter (const db::Box &box) const = 0;
   virtual Box bbox () const = 0;
 
-  virtual EdgePairsDelegate *width_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const = 0;
-  virtual EdgePairsDelegate *space_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const = 0;
-  virtual EdgePairsDelegate *isolated_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const = 0;
-  virtual EdgePairsDelegate *notch_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const = 0;
-  virtual EdgePairsDelegate *enclosing_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const = 0;
-  virtual EdgePairsDelegate *overlap_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const = 0;
-  virtual EdgePairsDelegate *separation_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const = 0;
-  virtual EdgePairsDelegate *inside_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const = 0;
+  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node) = 0;
+  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node) = 0;
+  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node) = 0;
+
+  virtual EdgePairsDelegate *width_check (db::Coord d, const RegionCheckOptions &options) const = 0;
+  virtual EdgePairsDelegate *space_check (db::Coord d, const RegionCheckOptions &options) const = 0;
+  virtual EdgePairsDelegate *isolated_check (db::Coord d, const RegionCheckOptions &options) const = 0;
+  virtual EdgePairsDelegate *notch_check (db::Coord d, const RegionCheckOptions &options) const = 0;
+  virtual EdgePairsDelegate *enclosing_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const = 0;
+  virtual EdgePairsDelegate *overlap_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const = 0;
+  virtual EdgePairsDelegate *separation_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const = 0;
+  virtual EdgePairsDelegate *inside_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const = 0;
   virtual EdgePairsDelegate *grid_check (db::Coord gx, db::Coord gy) const = 0;
   virtual EdgePairsDelegate *angle_check (double min, double max, bool inverse) const = 0;
 
@@ -263,19 +277,22 @@ public:
   virtual RegionDelegate *or_with (const Region &other) const = 0;
   virtual RegionDelegate *add_in_place (const Region &other) = 0;
   virtual RegionDelegate *add (const Region &other) const = 0;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &other) const = 0;
 
   virtual RegionDelegate *selected_outside (const Region &other) const = 0;
   virtual RegionDelegate *selected_not_outside (const Region &other) const = 0;
   virtual RegionDelegate *selected_inside (const Region &other) const = 0;
   virtual RegionDelegate *selected_not_inside (const Region &other) const = 0;
-  virtual RegionDelegate *selected_interacting (const Region &other) const = 0;
-  virtual RegionDelegate *selected_not_interacting (const Region &other) const = 0;
-  virtual RegionDelegate *selected_interacting (const Edges &other) const = 0;
-  virtual RegionDelegate *selected_not_interacting (const Edges &other) const = 0;
-  virtual RegionDelegate *selected_interacting (const Texts &other) const = 0;
-  virtual RegionDelegate *selected_not_interacting (const Texts &other) const = 0;
-  virtual RegionDelegate *selected_overlapping (const Region &other) const = 0;
-  virtual RegionDelegate *selected_not_overlapping (const Region &other) const = 0;
+  virtual RegionDelegate *selected_enclosing (const Region &other, size_t min_count, size_t max_count) const = 0;
+  virtual RegionDelegate *selected_not_enclosing (const Region &other, size_t min_count, size_t max_count) const = 0;
+  virtual RegionDelegate *selected_interacting (const Region &other, size_t min_count, size_t max_count) const = 0;
+  virtual RegionDelegate *selected_not_interacting (const Region &other, size_t min_count, size_t max_count) const = 0;
+  virtual RegionDelegate *selected_interacting (const Edges &other, size_t min_count, size_t max_count) const = 0;
+  virtual RegionDelegate *selected_not_interacting (const Edges &other, size_t min_count, size_t max_count) const = 0;
+  virtual RegionDelegate *selected_interacting (const Texts &other, size_t min_count, size_t max_count) const = 0;
+  virtual RegionDelegate *selected_not_interacting (const Texts &other, size_t min_count, size_t max_count) const = 0;
+  virtual RegionDelegate *selected_overlapping (const Region &other, size_t min_count, size_t max_count) const = 0;
+  virtual RegionDelegate *selected_not_overlapping (const Region &other, size_t min_count, size_t max_count) const = 0;
   virtual RegionDelegate *pull_inside (const Region &other) const = 0;
   virtual RegionDelegate *pull_interacting (const Region &other) const = 0;
   virtual EdgesDelegate *pull_interacting (const Edges &other) const = 0;
@@ -294,7 +311,6 @@ public:
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const = 0;
 
-protected:
   const std::string &progress_desc () const
   {
     return m_progress_desc;
@@ -305,6 +321,7 @@ protected:
     return m_report_progress;
   }
 
+protected:
   virtual void merged_semantics_changed () { }
   virtual void min_coherence_changed () { }
 

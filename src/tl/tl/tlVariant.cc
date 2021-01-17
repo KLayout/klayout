@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -2460,8 +2460,18 @@ void Variant::user_destroy ()
   void *obj = to_user ();
   if (obj) {
     user_cls ()->destroy (obj);
+    m_type = t_nil;
   }
-  reset ();
+}
+
+void *Variant::user_take ()
+{
+  tl_assert (is_user ());
+  void *obj = to_user ();
+  if (obj) {
+    m_type = t_nil;
+  }
+  return obj;
 }
 
 void Variant::user_assign (const tl::Variant &other)

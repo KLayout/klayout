@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -39,13 +39,15 @@ namespace db
 {
 
 /**
- *  @brief An iterator delegate for the deep text collection
+ *  @brief An iterator delegate for the deep region
  *  TODO: this is kind of redundant with OriginalLayerIterator ..
  */
 class DB_PUBLIC DeepTextsIterator
   : public TextsIteratorDelegate
 {
 public:
+  typedef db::Text value_type;
+
   DeepTextsIterator (const db::RecursiveShapeIterator &iter)
     : m_iter (iter)
   {
@@ -65,14 +67,37 @@ public:
     set ();
   }
 
+  virtual bool is_addressable() const
+  {
+    return false;
+  }
+
   virtual const value_type *get () const
   {
     return &m_text;
   }
 
+  virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
+  {
+    const DeepTextsIterator *o = dynamic_cast<const DeepTextsIterator *> (other);
+    return o && o->m_iter == m_iter;
+  }
+
   virtual TextsIteratorDelegate *clone () const
   {
     return new DeepTextsIterator (*this);
+  }
+
+  virtual void do_reset (const db::Box &region, bool overlapping)
+  {
+    m_iter.set_region (region);
+    m_iter.set_overlapping (overlapping);
+    set ();
+  }
+
+  virtual db::Box bbox () const
+  {
+    return m_iter.bbox ();
   }
 
 private:
@@ -81,14 +106,14 @@ private:
   db::RecursiveShapeIterator m_iter;
   mutable value_type m_text;
 
-  void set () const  {
+  void set () const
+  {
     if (! m_iter.at_end ()) {
       m_iter.shape ().text (m_text);
       m_text.transform (m_iter.trans ());
     }
   }
 };
-
 
 DeepTexts::DeepTexts ()
   : AsIfFlatTexts ()
@@ -167,7 +192,7 @@ std::pair<db::RecursiveShapeIterator, db::ICplxTrans> DeepTexts::begin_iter () c
   }
 }
 
-size_t DeepTexts::size () const
+size_t DeepTexts::count () const
 {
   size_t n = 0;
 
@@ -175,6 +200,18 @@ size_t DeepTexts::size () const
   db::CellCounter cc (&layout);
   for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
     n += cc.weight (*c) * layout.cell (*c).shapes (deep_layer ().layer ()).size ();
+  }
+
+  return n;
+}
+
+size_t DeepTexts::hier_count () const
+{
+  size_t n = 0;
+
+  const db::Layout &layout = deep_layer ().layout ();
+  for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+    n += layout.cell (*c).shapes (deep_layer ().layer ()).size ();
   }
 
   return n;
@@ -428,14 +465,17 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout * /*layout*/, const shape_interactions<db::TextRef, db::PolygonRef> &interactions, std::unordered_set<db::TextRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::TextRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::TextRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::TextRef> &result = results.front ();
+
     db::box_scanner2<db::TextRef, size_t, db::Polygon, size_t> scanner;
 
     std::set<db::PolygonRef> others;
     for (shape_interactions<db::TextRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::TextRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        others.insert (interactions.intruder_shape (*j));
+        others.insert (interactions.intruder_shape (*j).second);
       }
     }
 
@@ -471,7 +511,7 @@ public:
     }
   }
 
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const
   {
     if (m_inverse) {
       return Copy;
@@ -524,14 +564,17 @@ public:
     return 1;
   }
 
-  virtual void compute_local (db::Layout *layout, const shape_interactions<db::TextRef, db::PolygonRef> &interactions, std::unordered_set<db::PolygonRef> &result, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::TextRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
+    tl_assert (results.size () == 1);
+    std::unordered_set<db::PolygonRef> &result = results.front ();
+
     db::box_scanner2<db::TextRef, size_t, db::Polygon, size_t> scanner;
 
     std::set<db::PolygonRef> others;
     for (shape_interactions<db::TextRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       for (shape_interactions<db::TextRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        others.insert (interactions.intruder_shape (*j));
+        others.insert (interactions.intruder_shape (*j).second);
       }
     }
 
@@ -551,7 +594,7 @@ public:
     scanner.process (filter, 1, db::box_convert<db::TextRef> (), db::box_convert<db::Polygon> ());
   }
 
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const
   {
     return Drop;
   }

@@ -8,6 +8,7 @@ include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
   drcBasicTests.cc \
+  drcGenericTests.cc \
   drcSimpleTests.cc \
   drcSuiteTests.cc \
 

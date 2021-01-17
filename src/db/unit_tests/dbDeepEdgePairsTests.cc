@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -74,7 +74,8 @@ TEST(1_Basics)
   EXPECT_EQ (ep100.empty (), true);
   EXPECT_EQ (ep2.empty (), false);
   EXPECT_EQ (ep2.bbox ().to_string (), "(-1050,-475;24810,3275)");
-  EXPECT_EQ (ep2.size (), size_t (40));
+  EXPECT_EQ (ep2.count (), size_t (40));
+  EXPECT_EQ (ep2.hier_count (), size_t (1));
   EXPECT_EQ (ep2.to_string ().substr (0, 42), "(-1050,-475;-1050,475)/(250,475;250,-475);");
 
   db::Layout target;

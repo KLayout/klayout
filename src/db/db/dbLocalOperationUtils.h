@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "dbLayout.h"
 #include "dbPolygonGenerators.h"
 #include "dbHash.h"
+#include "tlThreads.h"
 
 #include <unordered_set>
 
@@ -63,26 +64,66 @@ private:
   const Trans m_trans;
 };
 
-class PolygonRefGenerator
+template <class T>
+class DB_PUBLIC polygon_ref_generator;
+
+template <>
+class DB_PUBLIC polygon_ref_generator<db::PolygonRef>
   : public PolygonSink
 {
 public:
   /**
    *  @brief Constructor
    */
-  PolygonRefGenerator (db::Layout *layout, std::unordered_set<db::PolygonRef> &polyrefs);
+  polygon_ref_generator (db::Layout *layout, std::unordered_set<db::PolygonRef> &polyrefs)
+    : PolygonSink (), mp_layout (layout), mp_polyrefs (&polyrefs)
+  {
+    //  .. nothing yet ..
+  }
 
   /**
    *  @brief Implementation of the PolygonSink interface
    */
-  virtual void put (const db::Polygon &polygon);
+  void put (const db::Polygon &polygon)
+  {
+    tl::MutexLocker locker (&mp_layout->lock ());
+    mp_polyrefs->insert (db::PolygonRef (polygon, mp_layout->shape_repository ()));
+  }
 
 private:
   db::Layout *mp_layout;
   std::unordered_set<db::PolygonRef> *mp_polyrefs;
 };
 
-class EdgeToEdgeSetGenerator
+template <>
+class DB_PUBLIC polygon_ref_generator<db::Polygon>
+  : public PolygonSink
+{
+public:
+  /**
+   *  @brief Constructor
+   */
+  polygon_ref_generator (db::Layout *, std::unordered_set<db::Polygon> &polygons)
+    : mp_polygons (&polygons)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Implementation of the PolygonSink interface
+   */
+  virtual void put (const db::Polygon &polygon)
+  {
+    mp_polygons->insert (polygon);
+  }
+
+private:
+  std::unordered_set<db::Polygon> *mp_polygons;
+};
+
+typedef polygon_ref_generator<db::PolygonRef> PolygonRefGenerator;
+
+class DB_PUBLIC EdgeToEdgeSetGenerator
   : public EdgeSink
 {
 public:
@@ -100,7 +141,7 @@ private:
   std::unordered_set<db::Edge> *mp_edges;
 };
 
-class PolygonRefToShapesGenerator
+class DB_PUBLIC PolygonRefToShapesGenerator
   : public PolygonSink
 {
 public:
@@ -119,7 +160,7 @@ private:
   db::Shapes *mp_shapes;
 };
 
-class PolygonSplitter
+class DB_PUBLIC PolygonSplitter
   : public PolygonSink
 {
 public:

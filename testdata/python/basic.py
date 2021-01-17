@@ -1,5 +1,5 @@
 # KLayout Layout Viewer
-# Copyright (C) 2006-2020 Matthias Koefferlein
+# Copyright (C) 2006-2021 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -393,6 +393,34 @@ class BasicTest(unittest.TestCase):
       a.mod_efptr( ee, pya.Enum.a )
       self.assertEqual( str(ee), "a|b" )
 
+  def test_10(self):
+
+    # all references of A are released now:
+    ic0 = pya.A.instance_count()
+    self.assertEqual(ic0, 0)
+
+    a = pya.A.new_a_by_variant()
+    self.assertEqual(pya.A.instance_count(), ic0 + 1)
+
+    self.assertEqual(a.a1(), 17)
+    a.a5(-15)
+    self.assertEqual(a.a1(), -15)
+
+    a = None
+    self.assertEqual(pya.A.instance_count(), ic0)
+
+    ic0 = pya.B.instance_count()
+    self.assertEqual(ic0, 0)
+
+    b = pya.B.new_b_by_variant()
+    self.assertEqual(pya.B.instance_count(), ic0 + 1)
+
+    b.set_str_combine("x", "y")
+    self.assertEqual(b.str(), "xy")
+
+    b._destroy()
+    self.assertEqual(pya.B.instance_count(), ic0)
+
   def test_12(self):
 
     a1 = pya.A()
@@ -629,14 +657,14 @@ class BasicTest(unittest.TestCase):
 
     b.amember_cptr().a2()
 
-    self.assertEqual( b.b1(), 5 )
-    self.assertEqual( b.b2(), "" )
-    b.b5( "xyz" )
-    self.assertEqual( b.b2(), "xyz" )
-    self.assertEqual( b.b5a(), "xyz" )
-    b.b5b( "yx", "zz" )
-    self.assertEqual( b.b2(), "yxzz" )
-    self.assertEqual( b.b5a(), "yxzz" )
+    self.assertEqual(b.always_5(), 5)
+    self.assertEqual(b.str(), "")
+    b.set_str("xyz")
+    self.assertEqual(b.str(), "xyz")
+    self.assertEqual(b.str_ccptr(), "xyz")
+    b.set_str_combine("yx", "zz")
+    self.assertEqual(b.str(), "yxzz")
+    self.assertEqual(b.str_ccptr(), "yxzz")
 
     arr = []
 
@@ -845,53 +873,53 @@ class BasicTest(unittest.TestCase):
     b = pya.B()
 
     bb = pya.B()
-    bb.b5("a")
+    bb.set_str("a")
     b.push_b(bb)
 
     bb = pya.B()
-    bb.b5("y")
+    bb.set_str("y")
     b.push_b(bb)
 
     bb = pya.B()
-    bb.b5("uu")
+    bb.set_str("uu")
     b.push_b(bb)
 
     arr = []
     for bb in b.each_b_copy():
-      arr.append(bb.b2())
+      arr.append(bb.str())
     self.assertEqual(arr, ["a", "y", "uu"])
 
     arr = []
     for bb in b.each_b_copy():
-      bb.b5(bb.b2() + "x")
-      arr.append(bb.b2())
+      bb.set_str(bb.str() + "x")
+      arr.append(bb.str())
     self.assertEqual(arr, ["ax", "yx", "uux"])
 
     arr = []
     for bb in b.each_b_copy():
-      arr.append(bb.b2())
+      arr.append(bb.str())
     self.assertEqual(arr, ["a", "y", "uu"])
 
     arr = []
     for bb in b.each_b_cref():
-      arr.append(bb.b2())
+      arr.append(bb.str())
     self.assertEqual(arr, ["a", "y", "uu"])
 
     arr = []
     # this works, since the "const B &" will be converted to a copy
     for bb in b.each_b_cref():
-      bb.b5(bb.b2() + "x")
-      arr.append(bb.b2())
+      bb.set_str(bb.str() + "x")
+      arr.append(bb.str())
     self.assertEqual(arr, ["ax", "yx", "uux"])
 
     arr = []
     for bb in b.each_b_cref():
-      arr.append(bb.b2())
+      arr.append(bb.str())
     self.assertEqual(arr, ["a", "y", "uu"])
 
     arr = []
     for bb in b.each_b_cptr():
-      arr.append(bb.b2())
+      arr.append(bb.str())
     self.assertEqual(arr, ["a", "y", "uu"])
 
     arr = []
@@ -899,8 +927,8 @@ class BasicTest(unittest.TestCase):
     err_caught = False
     try:
       for bb in b.each_b_cptr():
-        bb.b5(bb.b2() + "x")
-        arr.append(bb.b2())
+        bb.set_str(bb.str() + "x")
+        arr.append(bb.str())
     except: 
       err_caught = True
     self.assertEqual(err_caught, True)
@@ -908,39 +936,39 @@ class BasicTest(unittest.TestCase):
 
     arr = []
     for bb in b.each_b_cptr():
-      arr.append(bb.b2())
+      arr.append(bb.str())
     self.assertEqual(arr, ["a", "y", "uu"])
 
     arr = []
     for bb in b.each_b_ref():
-      arr.append(bb.b2())
+      arr.append(bb.str())
     self.assertEqual(arr, ["a", "y", "uu"])
 
     arr = []
     for bb in b.each_b_ref():
-      bb.b5(bb.b2() + "x")
-      arr.append(bb.b2())
+      bb.set_str(bb.str() + "x")
+      arr.append(bb.str())
     self.assertEqual(arr, ["ax", "yx", "uux"])
 
     arr = []
     for bb in b.each_b_ref():
-      arr.append(bb.b2())
+      arr.append(bb.str())
     self.assertEqual(arr, ["ax", "yx", "uux"])
 
     arr = []
     for bb in b.each_b_ptr():
-      arr.append(bb.b2())
+      arr.append(bb.str())
     self.assertEqual(arr, ["ax", "yx", "uux"])
 
     arr = []
     for bb in b.each_b_ptr():
-      bb.b5(bb.b2() + "x")
-      arr.append(bb.b2())
+      bb.set_str(bb.str() + "x")
+      arr.append(bb.str())
     self.assertEqual(arr, ["axx", "yxx", "uuxx"])
 
     arr = []
     for bb in b.each_b_ptr():
-      arr.append(bb.b2())
+      arr.append(bb.str())
     self.assertEqual(arr, ["axx", "yxx", "uuxx"])
 
   def test_14(self):

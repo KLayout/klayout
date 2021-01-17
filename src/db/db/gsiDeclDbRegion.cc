@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 */
 
 #include "gsiDecl.h"
+#include "gsiEnums.h"
 
 #include "dbRegion.h"
 #include "dbRegionUtils.h"
@@ -32,6 +33,7 @@
 #include "dbDeepShapeStore.h"
 #include "dbRegion.h"
 #include "dbRegionProcessors.h"
+#include "dbCompoundOperation.h"
 #include "tlGlobPattern.h"
 
 #include <memory>
@@ -110,14 +112,14 @@ static db::Region *texts_as_boxes2 (const db::Region *r, db::DeepShapeStore &dss
   return new db::Region (r->texts_as_boxes (pat, pattern, enl, dss));
 }
 
-static db::Edges corners_to_dots (const db::Region *r, double angle_start, double angle_end)
+static db::Edges corners_to_dots (const db::Region *r, double angle_start, double angle_end, bool include_angle_start, bool include_angle_end)
 {
-  return r->processed (db::CornersAsDots (angle_start, angle_end));
+  return r->processed (db::CornersAsDots (angle_start, include_angle_start, angle_end, include_angle_end));
 }
 
-static db::Region corners_to_boxes (const db::Region *r, double angle_start, double angle_end, db::Coord dim)
+static db::Region corners_to_boxes (const db::Region *r, double angle_start, double angle_end, db::Coord dim, bool include_angle_start, bool include_angle_end)
 {
-  return r->processed (db::CornersAsRectangles (angle_start, angle_end, dim));
+  return r->processed (db::CornersAsRectangles (angle_start, include_angle_start, angle_end, include_angle_end, dim));
 }
 
 static db::Region *new_si (const db::RecursiveShapeIterator &si)
@@ -364,6 +366,42 @@ static db::EdgePairs angle_check2 (const db::Region *r, double amin, double amax
   return r->angle_check (amin, amax, inverse);
 }
 
+static db::Region with_bbox_aspect_ratio1 (const db::Region *r, double v, bool inverse)
+{
+  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::AspectRatio);
+  return r->filtered (f);
+}
+
+static db::Region with_bbox_aspect_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::AspectRatio);
+  return r->filtered (f);
+}
+
+static db::Region with_area_ratio1 (const db::Region *r, double v, bool inverse)
+{
+  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::AreaRatio);
+  return r->filtered (f);
+}
+
+static db::Region with_area_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::AreaRatio);
+  return r->filtered (f);
+}
+
+static db::Region with_relative_height1 (const db::Region *r, double v, bool inverse)
+{
+  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::RelativeHeight);
+  return r->filtered (f);
+}
+
+static db::Region with_relative_height2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::RelativeHeight);
+  return r->filtered (f);
+}
+
 static db::Region in (const db::Region *r, const db::Region &other)
 {
   return r->in (other, false);
@@ -376,13 +414,25 @@ static db::Region not_in (const db::Region *r, const db::Region &other)
 
 static db::Region rectangles (const db::Region *r)
 {
-  db::RectangleFilter f (false);
+  db::RectangleFilter f (false, false);
   return r->filtered (f);
 }
 
 static db::Region non_rectangles (const db::Region *r)
 {
-  db::RectangleFilter f (true);
+  db::RectangleFilter f (false, true);
+  return r->filtered (f);
+}
+
+static db::Region squares (const db::Region *r)
+{
+  db::RectangleFilter f (true, false);
+  return r->filtered (f);
+}
+
+static db::Region non_squares (const db::Region *r)
+{
+  db::RectangleFilter f (true, true);
   return r->filtered (f);
 }
 
@@ -436,131 +486,127 @@ static db::Region merged_ext2 (db::Region *r, bool min_coherence, int min_wc)
   return r->merged (min_coherence, std::max (0, min_wc - 1));
 }
 
-static db::EdgePairs width1 (const db::Region *r, db::Region::distance_type d) 
+static db::EdgePairs width2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool negative)
 {
-  return r->width_check (d);
+  return r->width_check (d, db::RegionCheckOptions (whole_edges,
+                                            metrics,
+                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                            shielded,
+                                            db::NoOppositeFilter,
+                                            db::NoSideAllowed,
+                                            negative)
+                        );
 }
 
-static db::EdgePairs width2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative)
 {
-  return r->width_check (d, whole_edges,
-                         metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                         ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                         min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                         max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
+  return r->space_check (d, db::RegionCheckOptions (whole_edges,
+                                            metrics,
+                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                            shielded,
+                                            opposite,
+                                            rect_filter,
+                                            negative)
+                        );
 }
 
-static db::EdgePairs space1 (const db::Region *r, db::Region::distance_type d) 
+static db::EdgePairs notch2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool negative)
 {
-  return r->space_check (d);
+  return r->notch_check (d, db::RegionCheckOptions (whole_edges,
+                                            metrics,
+                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                            shielded,
+                                            db::NoOppositeFilter,
+                                            db::NoSideAllowed,
+                                            negative)
+                        );
 }
 
-static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs isolated2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative)
 {
-  return r->space_check (d, whole_edges,
-                         metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                         ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                         min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                         max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
+  return r->isolated_check (d, db::RegionCheckOptions (whole_edges,
+                                            metrics,
+                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                            shielded,
+                                            opposite,
+                                            rect_filter,
+                                            negative)
+                           );
 }
 
-static db::EdgePairs notch1 (const db::Region *r, db::Region::distance_type d) 
+static db::EdgePairs inside2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative)
 {
-  return r->notch_check (d);
+  return r->inside_check (other, d, db::RegionCheckOptions (whole_edges,
+                                            metrics,
+                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                            shielded,
+                                            opposite,
+                                            rect_filter,
+                                            negative)
+                         );
 }
 
-static db::EdgePairs notch2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs overlap2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative)
 {
-  return r->notch_check (d, whole_edges,
-                         metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                         ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                         min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                         max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
+  return r->overlap_check (other, d, db::RegionCheckOptions (whole_edges,
+                                            metrics,
+                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                            shielded,
+                                            opposite,
+                                            rect_filter,
+                                            negative)
+                          );
 }
 
-static db::EdgePairs isolated1 (const db::Region *r, db::Region::distance_type d) 
+static db::EdgePairs enclosing2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative)
 {
-  return r->isolated_check (d);
+  return r->enclosing_check (other, d, db::RegionCheckOptions (whole_edges,
+                                            metrics,
+                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                            shielded,
+                                            opposite,
+                                            rect_filter,
+                                            negative)
+                            );
 }
 
-static db::EdgePairs isolated2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
+static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative)
 {
-  return r->isolated_check (d, whole_edges,
-                            metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
+  return r->separation_check (other, d, db::RegionCheckOptions (whole_edges,
+                                            metrics,
+                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                            shielded,
+                                            opposite,
+                                            rect_filter,
+                                            negative)
+                             );
 }
 
-static db::EdgePairs inside1 (const db::Region *r, const db::Region &other, db::Region::distance_type d) 
+static std::vector<db::Region> andnot (const db::Region *r, const db::Region &other)
 {
-  return r->inside_check (other, d);
-}
+  std::pair<db::Region, db::Region> rp = r->andnot (other);
 
-static db::EdgePairs inside2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
-{
-  return r->inside_check (other, d, whole_edges,
-                          metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                          ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                          min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                          max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
-}
-
-static db::EdgePairs overlap1 (const db::Region *r, const db::Region &other, db::Region::distance_type d) 
-{
-  return r->overlap_check (other, d);
-}
-
-static db::EdgePairs overlap2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
-{
-  return r->overlap_check (other, d, whole_edges,
-                           metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                           ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                           min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                           max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
-}
-
-static db::EdgePairs enclosing1 (const db::Region *r, const db::Region &other, db::Region::distance_type d) 
-{
-  return r->enclosing_check (other, d);
-}
-
-static db::EdgePairs enclosing2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
-{
-  return r->enclosing_check (other, d, whole_edges,
-                             metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                             ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                             min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                             max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
-}
-
-static db::EdgePairs separation1 (const db::Region *r, const db::Region &other, db::Region::distance_type d) 
-{
-  return r->separation_check (other, d);
-}
-
-static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, const tl::Variant &metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection) 
-{
-  return r->separation_check (other, d, whole_edges,
-                              metrics.is_nil () ? db::Euclidian : db::metrics_type (metrics.to_int ()), 
-                              ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                              min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                              max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> ());
-}
-
-static int euclidian_metrics ()
-{
-  return db::Euclidian;
-}
-
-static int square_metrics ()
-{
-  return db::Square;
-}
-
-static int projection_metrics ()
-{
-  return db::Projection;
+  std::vector<db::Region> res;
+  res.resize (2, db::Region ());
+  res [0] = rp.first;
+  res [1] = rp.second;
+  return res;
 }
 
 template <class Container>
@@ -601,6 +647,20 @@ static bool is_deep (const db::Region *region)
 static size_t id (const db::Region *r)
 {
   return tl::id_of (r->delegate ());
+}
+
+
+tl::Variant complex_op (db::Region *region, db::CompoundRegionOperationNode *node)
+{
+  if (node->result_type () == db::CompoundRegionOperationNode::Region) {
+    return tl::Variant (region->cop_to_region (*node));
+  } else if (node->result_type () == db::CompoundRegionOperationNode::Edges) {
+    return tl::Variant (region->cop_to_edges (*node));
+  } else if (node->result_type () == db::CompoundRegionOperationNode::EdgePairs) {
+    return tl::Variant (region->cop_to_edge_pairs (*node));
+  } else {
+    return tl::Variant ();
+  }
 }
 
 //  provided by gsiDeclDbPolygon.cc:
@@ -820,9 +880,14 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@brief Gets a flag indicating whether minimum coherence is selected\n"
     "See \\min_coherence= for a description of this attribute.\n"
   ) + 
+  method_ext ("complex_op", &complex_op, gsi::arg ("node"),
+    "@brief Executes a complex operation (see \\CompoundRegionOperationNode for details)\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
   method_ext ("with_perimeter", with_perimeter1, gsi::arg ("perimeter"), gsi::arg ("inverse"),
     "@brief Filter the polygons by perimeter\n"
-    "Filters the polygons inside the region by perimeter. If \"inverse\" is false, only "
+    "Filters the polygons of the region by perimeter. If \"inverse\" is false, only "
     "polygons which have the given perimeter are returned. If \"inverse\" is true, "
     "polygons not having the given perimeter are returned.\n"
     "\n"
@@ -830,7 +895,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_perimeter", with_perimeter2, gsi::arg ("min_perimeter"), gsi::arg ("max_perimeter"), gsi::arg ("inverse"),
     "@brief Filter the polygons by perimeter\n"
-    "Filters the polygons inside the region by perimeter. If \"inverse\" is false, only "
+    "Filters the polygons of the region by perimeter. If \"inverse\" is false, only "
     "polygons which have a perimeter larger or equal to \"min_perimeter\" and less than \"max_perimeter\" are "
     "returned. If \"inverse\" is true, "
     "polygons having a perimeter less than \"min_perimeter\" or larger or equal than \"max_perimeter\" are "
@@ -842,7 +907,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_area", with_area1, gsi::arg ("area"), gsi::arg ("inverse"),
     "@brief Filter the polygons by area\n"
-    "Filters the polygons inside the region by area. If \"inverse\" is false, only "
+    "Filters the polygons of the region by area. If \"inverse\" is false, only "
     "polygons which have the given area are returned. If \"inverse\" is true, "
     "polygons not having the given area are returned.\n"
     "\n"
@@ -850,7 +915,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_area", with_area2, gsi::arg ("min_area"), gsi::arg ("max_area"), gsi::arg ("inverse"),
     "@brief Filter the polygons by area\n"
-    "Filters the polygons inside the region by area. If \"inverse\" is false, only "
+    "Filters the polygons of the region by area. If \"inverse\" is false, only "
     "polygons which have an area larger or equal to \"min_area\" and less than \"max_area\" are "
     "returned. If \"inverse\" is true, "
     "polygons having an area less than \"min_area\" or larger or equal than \"max_area\" are "
@@ -862,7 +927,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_width", with_bbox_width1, gsi::arg ("width"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width\n"
-    "Filters the polygons inside the region by the width of their bounding box. If \"inverse\" is false, only "
+    "Filters the polygons of the region by the width of their bounding box. If \"inverse\" is false, only "
     "polygons whose bounding box has the given width are returned. If \"inverse\" is true, "
     "polygons whose bounding box does not have the given width are returned.\n"
     "\n"
@@ -870,7 +935,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_width", with_bbox_width2, gsi::arg ("min_width"), gsi::arg ("max_width"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width\n"
-    "Filters the polygons inside the region by the width of their bounding box. If \"inverse\" is false, only "
+    "Filters the polygons of the region by the width of their bounding box. If \"inverse\" is false, only "
     "polygons whose bounding box has a width larger or equal to \"min_width\" and less than \"max_width\" are "
     "returned. If \"inverse\" is true, all polygons not matching this criterion are returned."
     "\n"
@@ -880,7 +945,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_height", with_bbox_height1, gsi::arg ("height"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box height\n"
-    "Filters the polygons inside the region by the height of their bounding box. If \"inverse\" is false, only "
+    "Filters the polygons of the region by the height of their bounding box. If \"inverse\" is false, only "
     "polygons whose bounding box has the given height are returned. If \"inverse\" is true, "
     "polygons whose bounding box does not have the given height are returned.\n"
     "\n"
@@ -888,7 +953,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_height", with_bbox_height2, gsi::arg ("min_height"), gsi::arg ("max_height"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box height\n"
-    "Filters the polygons inside the region by the height of their bounding box. If \"inverse\" is false, only "
+    "Filters the polygons of the region by the height of their bounding box. If \"inverse\" is false, only "
     "polygons whose bounding box has a height larger or equal to \"min_height\" and less than \"max_height\" are "
     "returned. If \"inverse\" is true, all polygons not matching this criterion are returned."
     "\n"
@@ -907,7 +972,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_min", with_bbox_min2, gsi::arg ("min_dim"), gsi::arg ("max_dim"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width or height, whichever is smaller\n"
-    "Filters the polygons inside the region by the minimum dimension of their bounding box. "
+    "Filters the polygons of the region by the minimum dimension of their bounding box. "
     "If \"inverse\" is false, only polygons whose bounding box's smaller dimension is larger or equal to \"min_dim\" "
     "and less than \"max_dim\" are returned. "
     "If \"inverse\" is true, all polygons not matching this criterion are returned."
@@ -918,7 +983,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_max", with_bbox_max1, gsi::arg ("dim"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width or height, whichever is larger\n"
-    "Filters the polygons inside the region by the maximum dimension of their bounding box. "
+    "Filters the polygons of the region by the maximum dimension of their bounding box. "
     "If \"inverse\" is false, only polygons whose bounding box's larger dimension is equal to the given value "
     "are returned. "
     "If \"inverse\" is true, all polygons not matching this criterion are returned."
@@ -927,7 +992,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_max", with_bbox_max2, gsi::arg ("min_dim"), gsi::arg ("max_dim"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width or height, whichever is larger\n"
-    "Filters the polygons inside the region by the minimum dimension of their bounding box. "
+    "Filters the polygons of the region by the minimum dimension of their bounding box. "
     "If \"inverse\" is false, only polygons whose bounding box's larger dimension is larger or equal to \"min_dim\" "
     "and less than \"max_dim\" are returned. "
     "If \"inverse\" is true, all polygons not matching this criterion are returned."
@@ -936,7 +1001,96 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method ("strange_polygon_check", &db::Region::strange_polygon_check, 
+  method_ext ("with_bbox_aspect_ratio", with_bbox_aspect_ratio1, gsi::arg ("ratio"), gsi::arg ("inverse"),
+    "@brief Filters the polygons by the aspect ratio of their bounding boxes\n"
+    "Filters the polygons of the region by the apspect ratio of their bounding boxes. "
+    "The aspect ratio is the ratio of larger to smaller dimension of the bounding box. "
+    "A square has an aspect ratio of 1.\n"
+    "\n"
+    "With 'inverse' set to false, this version filters polygons which have a bounding box aspect ratio equal to the given value. "
+    "With 'inverse' set to true, all other polygons will be returned.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("with_bbox_aspect_ratio", with_bbox_aspect_ratio2, gsi::arg ("min_ratio"), gsi::arg ("max_ratio"), gsi::arg ("inverse"), gsi::arg ("min_included", true), gsi::arg ("max_included", true),
+    "@brief Filters the polygons by the aspect ratio of their bounding boxes\n"
+    "Filters the polygons of the region by the apspect ratio of their bounding boxes. "
+    "The aspect ratio is the ratio of larger to smaller dimension of the bounding box. "
+    "A square has an aspect ratio of 1.\n"
+    "\n"
+    "With 'inverse' set to false, this version filters polygons which have a bounding box aspect ratio between 'min_ratio' and 'max_ratio'. "
+    "With 'min_included' set to true, the 'min_ratio' value is included in the range, otherwise it's excluded. Same for 'max_included' and 'max_ratio'. "
+    "With 'inverse' set to true, all other polygons will be returned.\n"
+    "\n"
+    "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("with_area_ratio", with_area_ratio1, gsi::arg ("ratio"), gsi::arg ("inverse"),
+    "@brief Filters the polygons by the bounding box area to polygon area ratio\n"
+    "The area ratio is defined by the ratio of bounding box area to polygon area. It's a measure "
+    "how much the bounding box is approximating the polygon. 'Thin polygons' have a large area ratio, boxes has an area ratio of 1.\n"
+    "The area ratio is always larger or equal to 1. "
+    "\n"
+    "With 'inverse' set to false, this version filters polygons which have an area ratio equal to the given value. "
+    "With 'inverse' set to true, all other polygons will be returned.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("with_area_ratio", with_area_ratio2, gsi::arg ("min_ratio"), gsi::arg ("max_ratio"), gsi::arg ("inverse"), gsi::arg ("min_included", true), gsi::arg ("max_included", true),
+    "@brief Filters the polygons by the aspect ratio of their bounding boxes\n"
+    "The area ratio is defined by the ratio of bounding box area to polygon area. It's a measure "
+    "how much the bounding box is approximating the polygon. 'Thin polygons' have a large area ratio, boxes has an area ratio of 1.\n"
+    "The area ratio is always larger or equal to 1. "
+    "\n"
+    "With 'inverse' set to false, this version filters polygons which have an area ratio between 'min_ratio' and 'max_ratio'. "
+    "With 'min_included' set to true, the 'min_ratio' value is included in the range, otherwise it's excluded. Same for 'max_included' and 'max_ratio'. "
+    "With 'inverse' set to true, all other polygons will be returned.\n"
+    "\n"
+    "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("with_relative_height", with_relative_height1, gsi::arg ("ratio"), gsi::arg ("inverse"),
+    "@brief Filters the polygons by the ratio of heigth to width\n"
+    "This method filters the polygons of the region by the ratio of height vs. width of their bounding boxes. "
+    "'Tall' polygons have a large value while 'flat' polygons have a small value. A square has a relative height of 1.\n"
+    "\n"
+    "An alternative method is 'with_area_ratio' which can be more efficient because it's isotropic.\n"
+    "\n"
+    "With 'inverse' set to false, this version filters polygons which have a relative height equal to the given value. "
+    "With 'inverse' set to true, all other polygons will be returned.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("with_relative_height", with_relative_height2, gsi::arg ("min_ratio"), gsi::arg ("max_ratio"), gsi::arg ("inverse"), gsi::arg ("min_included", true), gsi::arg ("max_included", true),
+    "@brief Filters the polygons by the bounding box height to width ratio\n"
+    "This method filters the polygons of the region by the ratio of height vs. width of their bounding boxes. "
+    "'Tall' polygons have a large value while 'flat' polygons have a small value. A square has a relative height of 1.\n"
+    "\n"
+    "An alternative method is 'with_area_ratio' which can be more efficient because it's isotropic.\n"
+    "\n"
+    "With 'inverse' set to false, this version filters polygons which have a relative height between 'min_ratio' and 'max_ratio'. "
+    "With 'min_included' set to true, the 'min_ratio' value is included in the range, otherwise it's excluded. Same for 'max_included' and 'max_ratio'. "
+    "With 'inverse' set to true, all other polygons will be returned.\n"
+    "\n"
+    "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method ("strange_polygon_check", &db::Region::strange_polygon_check,
     "@brief Returns a region containing those parts of polygons which are \"strange\"\n"
     "Strange parts of polygons are self-overlapping parts or non-orientable parts (i.e. in the \"8\" configuration).\n"
     "\n"
@@ -1104,11 +1258,14 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@hide\n"
     "This method is provided for DRC implementation.\n"
   ) +
-  method_ext ("corners", &corners_to_boxes, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0), gsi::arg ("dim", 1),
+  method_ext ("corners", &corners_to_boxes, gsi::arg ("angle_min", -180.0), gsi::arg ("angle_max", 180.0), gsi::arg ("dim", 1), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", true),
     "@brief This method will select all corners whose attached edges satisfy the angle condition.\n"
     "\n"
     "The angle values specify a range of angles: all corners whose attached edges form an angle "
-    "between angle_start and angle_end will be reported boxes with 2*dim x 2*dim dimension. The default dimension is 2x2 DBU.\n"
+    "between angle_min and angle_max will be reported boxes with 2*dim x 2*dim dimension. The default dimension is 2x2 DBU.\n"
+    "\n"
+    "If 'include_angle_min' is true, the angle condition is >= min. angle, otherwise it is > min. angle. "
+    "Same for 'include_angle_,ax' and the max. angle.\n"
     "\n"
     "The angle is measured "
     "between the incoming and the outcoming edge in mathematical sense: a positive value is a turn left "
@@ -1117,14 +1274,14 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "A similar function that reports corners as point-like edges is \\corners_dots.\n"
     "\n"
-    "This function has been introduced in version 0.25.\n"
+    "This function has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27.\n"
   ) +
-  method_ext ("corners_dots", &corners_to_dots, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0),
+  method_ext ("corners_dots", &corners_to_dots, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", true),
     "@brief This method will select all corners whose attached edges satisfy the angle condition.\n"
     "\n"
     "This method is similar to \\corners, but delivers an \\Edges collection with dot-like edges for each corner.\n"
     "\n"
-    "This function has been introduced in version 0.25.\n"
+    "This function has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27.\n"
   ) +
   method ("merge", (db::Region &(db::Region::*) ()) &db::Region::merge,
     "@brief Merge the region\n"
@@ -1311,6 +1468,16 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) + 
+  method_ext ("andnot", &andnot, gsi::arg ("other"),
+    "@brief Returns the boolean AND and NOT between self and the other region\n"
+    "\n"
+    "@return A two-element array of regions with the first one being the AND result and the second one being the NOT result\n"
+    "\n"
+    "This method will compute the boolean AND and NOT between two regions simultaneously. "
+    "Because this requires a single sweep only, using this method is faster than doing AND and NOT separately.\n"
+    "\n"
+    "This method has been added in version 0.27.\n"
+  ) +
   method ("&", &db::Region::operator&, gsi::arg ("other"),
     "@brief Returns the boolean AND between self and the other region\n"
     "\n"
@@ -1391,6 +1558,50 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This operator adds the polygons of the other region to self. "
     "This usually creates unmerged regions and polygons may overlap. Use \\merge if you want to ensure the result region is merged.\n"
   ) + 
+  method ("covering", &db::Region::selected_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the polygons of this region which are completely covering polygons from the other region\n"
+    "\n"
+    "@return A new region containing the polygons which are covering polygons from the other region\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This attribute is sometimes called 'enclosing' instead of 'covering', but this term is reserved for the respective DRC function.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  method ("not_covering", &db::Region::selected_not_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the polygons of this region which are not completely covering polygons from the other region\n"
+    "\n"
+    "@return A new region containing the polygons which are not covering polygons from the other region\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This attribute is sometimes called 'enclosing' instead of 'covering', but this term is reserved for the respective DRC function.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  method ("select_covering", &db::Region::select_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Selects the polygons of this region which are completely covering polygons from the other region\n"
+    "\n"
+    "@return The region after the polygons have been selected (self)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This attribute is sometimes called 'enclosing' instead of 'covering', but this term is reserved for the respective DRC function.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  method ("select_not_covering", &db::Region::select_not_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Selects the polygons of this region which are not completely covering polygons from the other region\n"
+    "\n"
+    "@return The region after the polygons have been selected (self)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This attribute is sometimes called 'enclosing' instead of 'covering', but this term is reserved for the respective DRC function.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
   method ("inside", &db::Region::selected_inside, gsi::arg ("other"),
     "@brief Returns the polygons of this region which are completely inside polygons from the other region\n"
     "\n"
@@ -1447,72 +1658,129 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) + 
-  method ("interacting", (db::Region (db::Region::*) (const db::Region &) const) &db::Region::selected_interacting, gsi::arg ("other"),
+  method ("interacting", (db::Region (db::Region::*) (const db::Region &, size_t, size_t) const) &db::Region::selected_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which overlap or touch polygons from the other region\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with (different) polygons of the other region to make the polygon selected. A polygon is "
+    "selected by this method if the number of polygons interacting with a polygon of this region is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "@return A new region containing the polygons overlapping or touching polygons from the other region\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-  ) + 
-  method ("not_interacting", (db::Region (db::Region::*) (const db::Region &) const) &db::Region::selected_not_interacting, gsi::arg ("other"),
+    "\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
+  ) +
+  method ("not_interacting", (db::Region (db::Region::*) (const db::Region &, size_t, size_t) const) &db::Region::selected_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which do not overlap or touch polygons from the other region\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with (different) polygons of the other region to make the polygon not selected. A polygon is not "
+    "selected by this method if the number of polygons interacting with a polygon of this region is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "@return A new region containing the polygons not overlapping or touching polygons from the other region\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-  ) + 
-  method ("select_interacting", (db::Region &(db::Region::*) (const db::Region &)) &db::Region::select_interacting, gsi::arg ("other"),
+    "\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
+  ) +
+  method ("select_interacting", (db::Region &(db::Region::*) (const db::Region &, size_t, size_t)) &db::Region::select_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which overlap or touch polygons from the other region\n"
     "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with (different) polygons of the other region to make the polygon selected. A polygon is "
+    "selected by this method if the number of polygons interacting with a polygon of this region is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-  ) + 
-  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Region &)) &db::Region::select_not_interacting, gsi::arg ("other"),
+    "\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
+  ) +
+  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Region &, size_t, size_t)) &db::Region::select_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which do not overlap or touch polygons from the other region\n"
     "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with (different) polygons of the other region to make the polygon not selected. A polygon is not "
+    "selected by this method if the number of polygons interacting with a polygon of this region is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-  ) + 
-  method ("interacting", (db::Region (db::Region::*) (const db::Edges &) const) &db::Region::selected_interacting, gsi::arg ("other"),
+    "\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
+  ) +
+  method ("interacting", (db::Region (db::Region::*) (const db::Edges &, size_t, size_t) const) &db::Region::selected_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which overlap or touch edges from the edge collection\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with edges of the edge collection to make the polygon selected. A polygon is "
+    "selected by this method if the number of edges interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "@return A new region containing the polygons overlapping or touching edges from the edge collection\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
-    "This method has been introduced in version 0.25\n"
+    "This method has been introduced in version 0.25.\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
   ) +
-  method ("not_interacting", (db::Region (db::Region::*) (const db::Edges &) const) &db::Region::selected_not_interacting, gsi::arg ("other"),
+  method ("not_interacting", (db::Region (db::Region::*) (const db::Edges &, size_t, size_t) const) &db::Region::selected_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which do not overlap or touch edges from the edge collection\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with edges of the edge collection to make the polygon not selected. A polygon is not "
+    "selected by this method if the number of edges interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "@return A new region containing the polygons not overlapping or touching edges from the edge collection\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
     "This method has been introduced in version 0.25\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
   ) +
-  method ("select_interacting", (db::Region &(db::Region::*) (const db::Edges &)) &db::Region::select_interacting, gsi::arg ("other"),
+  method ("select_interacting", (db::Region &(db::Region::*) (const db::Edges &, size_t, size_t)) &db::Region::select_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which overlap or touch edges from the edge collection\n"
     "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with edges of the edge collection to make the polygon selected. A polygon is "
+    "selected by this method if the number of edges interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
     "This method has been introduced in version 0.25\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
   ) +
-  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Edges &)) &db::Region::select_not_interacting, gsi::arg ("other"),
+  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Edges &, size_t, size_t)) &db::Region::select_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which do not overlap or touch edges from the edge collection\n"
     "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with edges of the edge collection to make the polygon not selected. A polygon is not "
+    "selected by this method if the number of edges interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
     "This method has been introduced in version 0.25\n"
+    "The min_count and max_count arguments have been added in version 0.27.\n"
   ) +
-  method ("interacting", (db::Region (db::Region::*) (const db::Texts &) const) &db::Region::selected_interacting, gsi::arg ("other"),
+  method ("interacting", (db::Region (db::Region::*) (const db::Texts &, size_t, size_t) const) &db::Region::selected_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which overlap or touch texts\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with texts of the text collection to make the polygon selected. A polygon is "
+    "selected by this method if the number of texts interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "@return A new region containing the polygons overlapping or touching texts\n"
     "\n"
@@ -1520,8 +1788,13 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
-  method ("not_interacting", (db::Region (db::Region::*) (const db::Texts &) const) &db::Region::selected_not_interacting, gsi::arg ("other"),
+  method ("not_interacting", (db::Region (db::Region::*) (const db::Texts &, size_t, size_t) const) &db::Region::selected_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which do not overlap or touch texts\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with texts of the text collection to make the polygon not selected. A polygon is not "
+    "selected by this method if the number of texts interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "@return A new region containing the polygons not overlapping or touching texts\n"
     "\n"
@@ -1529,17 +1802,27 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
-  method ("select_interacting", (db::Region &(db::Region::*) (const db::Texts &)) &db::Region::select_interacting, gsi::arg ("other"),
+  method ("select_interacting", (db::Region &(db::Region::*) (const db::Texts &, size_t, size_t)) &db::Region::select_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons of this region which overlap or touch texts\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with texts of the text collection to make the polygon selected. A polygon is "
+    "selected by this method if the number of texts interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
-  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Texts &)) &db::Region::select_not_interacting, gsi::arg ("other"),
+  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Texts &, size_t, size_t)) &db::Region::select_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons of this region which do not overlap or touch texts\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times a polygon of this region "
+    "has to interact with texts of the text collection to make the polygon not selected. A polygon is not "
+    "selected by this method if the number of texts interacting with the polygon is between min_count and max_count "
+    "(including max_count).\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
@@ -1547,34 +1830,42 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
-  method ("overlapping", &db::Region::selected_overlapping, gsi::arg ("other"),
+  method ("overlapping", &db::Region::selected_overlapping, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which overlap polygons from the other region\n"
     "\n"
     "@return A new region containing the polygons overlapping polygons from the other region\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The count options have been introduced in version 0.27."
   ) + 
-  method ("not_overlapping", &db::Region::selected_not_overlapping, gsi::arg ("other"),
+  method ("not_overlapping", &db::Region::selected_not_overlapping, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which do not overlap polygons from the other region\n"
     "\n"
     "@return A new region containing the polygons not overlapping polygons from the other region\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-  ) + 
-  method ("select_overlapping", &db::Region::select_overlapping, gsi::arg ("other"),
+    "\n"
+    "The count options have been introduced in version 0.27."
+  ) +
+  method ("select_overlapping", &db::Region::select_overlapping, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which overlap polygons from the other region\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-  ) + 
-  method ("select_not_overlapping", &db::Region::select_not_overlapping, gsi::arg ("other"),
+    "\n"
+    "The count options have been introduced in version 0.27."
+  ) +
+  method ("select_not_overlapping", &db::Region::select_not_overlapping, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which do not overlap polygons from the other region\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-  ) + 
+    "\n"
+    "The count options have been introduced in version 0.27."
+  ) +
   method ("pull_inside", &db::Region::pull_inside, gsi::arg ("other"),
     "@brief Returns all polygons of \"other\" which are inside polygons of this region\n"
     "The \"pull_...\" methods are similar to \"select_...\" but work the opposite way: they "
@@ -1722,6 +2013,20 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@brief Returns all polygons which are not rectangles\n"
     "This method returns all polygons in self which are not rectangles."
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+  ) +
+  method_ext ("squares", &squares,
+    "@brief Returns all polygons which are squares\n"
+    "This method returns all polygons in self which are squares."
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("non_squares", &non_squares,
+    "@brief Returns all polygons which are not squares\n"
+    "This method returns all polygons in self which are not squares."
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ) +
   method_ext ("rectilinear", &rectilinear,
     "@brief Returns all polygons which are rectilinear\n"
@@ -1888,18 +2193,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The transformed region.\n"
   ) +
-  method_ext ("width_check", &width1, gsi::arg ("d"),
-    "@brief Performs a width check\n"
-    "@param d The minimum width for which the polygons are checked\n"
-    "Performs a width check against the minimum width \"d\". For locations where a polygon has a "
-    "width less than the given value, an error marker is produced. Error markers form a "
-    "\\EdgePairs collection. Edge pairs are pairs of edges where each edge marks one edge of the original "
-    "polygon. Edge pairs can be converted back to polygons or separated into their edge contributions.\n"
-    "See \\EdgePairs for a description of that collection object.\n"
-    "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
-  ) +
-  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("negative", false),
     "@brief Performs a width check with options\n"
     "@param d The minimum width for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1907,6 +2201,8 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param ignore_angle The angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
+    "@param shielded Enables shielding\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "This version is similar to the simple version with one parameter. In addition, it allows "
     "to specify many more options.\n"
@@ -1928,23 +2224,17 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
-  ) +
-  method_ext ("space_check", &space1, gsi::arg ("d"),
-    "@brief Performs a space check\n"
-    "@param d The minimum space for which the polygons are checked\n"
-    "Performs a space check against the minimum space \"d\". For locations where a polygon has a "
-    "space less than the given value to either itself (a notch) or to other polygons, an error marker is produced. Error markers form a "
-    "\\EdgePairs collection. Edge pairs are pairs of edges where each edge marks one edge of the original "
-    "polygon. Edge pairs can be converted back to polygons or separated into their edge contributions.\n"
-    "See \\EdgePairs for a description of that collection object.\n"
-    "\n"
-    "\\notch_check is a version which checks spacing of polygon edges only against edges of the same polygon.\n"
-    "\\isolated_check is a version which checks spacing between different polygons only.\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded' and 'negative' options have been introduced in version 0.27."
   ) +
-  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Performs a space check with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1952,12 +2242,12 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param ignore_angle The angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
+    "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
+    "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
-    "edges which contribute in the space check.\n"
+    "edges which contribute in the width check.\n"
     "\n"
     "\"metrics\" can be one of the constants \\Euclidian, \\Square or \\Projection. See there for "
     "a description of these constants.\n"
@@ -1973,25 +2263,20 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
-  ) +
-  method_ext ("notch_check", &notch1, gsi::arg ("d"),
-    "@brief Performs a space check between edges of the same polygon\n"
-    "@param d The minimum space for which the polygons are checked\n"
-    "Performs a space check against the minimum space \"d\". For locations where a polygon has a "
-    "space less than the given value to either itself (a notch) or to other polygons, an error marker is produced. Error markers form a "
-    "\\EdgePairs collection. Edge pairs are pairs of edges where each edge marks one edge of the original "
-    "polygon. Edge pairs can be converted back to polygons or separated into their edge contributions.\n"
-    "See \\EdgePairs for a description of that collection object.\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
     "\n"
-    "This version is restricted to checking edges of one polygon vs. edges of itself.\n"
-    "To ensure that the polygon is merged and does not come in pieces, use the \\merge method before.\n"
-    "\\space_check is a version which checks spacing of all polygon edges vs. edges of the some or other polygons.\n"
-    "\\isolated_check is a version which checks spacing between different polygons only.\n"
+    "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
+    "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
-  method_ext ("notch_check", &notch2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("notch_check", &notch2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("negative", false),
     "@brief Performs a space check between edges of the same polygon with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1999,6 +2284,8 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param ignore_angle The angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
+    "@param shielded Enables shielding\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "This version is similar to the simple version with one parameter. In addition, it allows "
     "to specify many more options.\n"
@@ -2020,25 +2307,17 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
-  ) +
-  method_ext ("isolated_check", &isolated1, gsi::arg ("d"),
-    "@brief Performs a space check between edges of different polygons\n"
-    "@param d The minimum space for which the polygons are checked\n"
-    "Performs a space check against the minimum space \"d\". For locations where a polygon has a "
-    "space less than the given value to other polygons (not itself), an error marker is produced. Error markers form a "
-    "\\EdgePairs collection. Edge pairs are pairs of edges where each edge marks one edge of the original "
-    "polygon. Edge pairs can be converted back to polygons or separated into their edge contributions.\n"
-    "See \\EdgePairs for a description of that collection object.\n"
-    "\n"
-    "This version is restricted to checking edges of one polygon vs. edges of other polygons.\n"
-    "To ensure that the polygon is merged and does not come in pieces, use the \\merge method before.\n"
-    "\\space_check is a version which checks spacing of all polygon edges vs. edges of the some or other polygons.\n"
-    "\\notch_check is a version which checks spacing of polygons edges of the same polygon only.\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded' and 'negative' options have been introduced in version 0.27."
   ) +
-  method_ext ("isolated_check", &isolated2, gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("isolated_check", &isolated2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Performs a space check between edges of different polygons with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2046,12 +2325,12 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param ignore_angle The angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
+    "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
+    "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
-    "edges which contribute in the space check.\n"
+    "edges which contribute in the width check.\n"
     "\n"
     "\"metrics\" can be one of the constants \\Euclidian, \\Square or \\Projection. See there for "
     "a description of these constants.\n"
@@ -2067,20 +2346,20 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
-  ) +
-  method_ext ("inside_check", &inside1, gsi::arg ("other"), gsi::arg ("d"),
-    "@brief Performs a check whether polygons of this region are inside polygons of the other region by some amount\n"
-    "@param d The minimum overlap for which the polygons are checked\n"
-    "@param other The other region against which to check\n"
-    "Returns edge pairs for all locations where edges of polygons of this region are inside polygons of the other region "
-    "by less than the given value \"d\". "
-    "Contrary to the name, this check does not check whether polygons are inside other polygons but rather checks "
-    "whether there is enough overlap of the other polygons vs. polygons of this region. "
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
+    "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
+    "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
-  method_ext ("inside_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("inside_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Performs an inside check with options\n"
     "@param d The minimum distance for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2089,9 +2368,9 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param ignore_angle The angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
+    "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
+    "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -2110,18 +2389,20 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
-  ) +
-  method_ext ("overlap_check", &overlap1, gsi::arg ("other"), gsi::arg ("d"),
-    "@brief Performs a check whether polygons of this region overlap polygons of the other region by some amount\n"
-    "@param d The minimum overlap for which the polygons are checked\n"
-    "@param other The other region against which to check\n"
-    "Returns edge pairs for all locations where edges of polygons of this region overlap polygons of the other region "
-    "by less than the given value \"d\". "
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
+    "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
+    "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
-  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Performs an overlap check with options\n"
     "@param d The minimum overlap for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2130,9 +2411,9 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param ignore_angle The angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
+    "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
+    "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -2151,18 +2432,20 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
-  ) +
-  method_ext ("enclosing_check", &enclosing1, gsi::arg ("other"), gsi::arg ("d"),
-    "@brief Performs a check whether polygons of this region enclose polygons of the other region by some amount\n"
-    "@param d The minimum overlap for which the polygons are checked\n"
-    "@param other The other region against which to check\n"
-    "Returns edge pairs for all locations where edges of polygons of this region are enclosing polygons of the other region "
-    "by less than the given value \"d\". "
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
+    "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
+    "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
-  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Performs an enclosing check with options\n"
     "@param d The minimum enclosing distance for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2171,9 +2454,9 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param ignore_angle The angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
+    "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
+    "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -2192,18 +2475,20 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
-  ) +
-  method_ext ("separation_check", &separation1, gsi::arg ("other"), gsi::arg ("d"),
-    "@brief Performs a check whether polygons of this region are separated from polygons of the other region by some amount\n"
-    "@param d The minimum separation for which the polygons are checked\n"
-    "@param other The other region against which to check\n"
-    "Returns edge pairs for all locations where edges of polygons of this region are separated by polygons of the other region "
-    "by less than the given value \"d\". "
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
+    "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
+    "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
     "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
-  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges"), gsi::arg ("metrics"), gsi::arg ("ignore_angle"), gsi::arg ("min_projection"), gsi::arg ("max_projection"),
+  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoSideAllowed, "NoSideAllowed"), gsi::arg ("negative", false),
     "@brief Performs a separation check with options\n"
     "@param d The minimum separation for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2212,9 +2497,9 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param ignore_angle The angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper limit of the projected length of one edge onto another\n"
-    "\n"
-    "This version is similar to the simple version with one parameter. In addition, it allows "
-    "to specify many more options.\n"
+    "@param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes\n"
+    "@param rect_filter Specifies an error filter for rectangular input shapes\n"
+    "@param negative If true, edges not violation the condition will be output as pseudo-edge pairs\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -2233,7 +2518,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one limit, pass nil to the respective value.\n"
     "\n"
+    "\"shielded\" controls whether shielding is applied. Shielding means that rule violations are not "
+    "detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.\n"
+    "Shielding often is not optional as a rule violation in shielded case automatically comes with rule "
+    "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
+    "false. In general, this will improve performance somewhat.\n"
+    "\n"
+    "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
+    "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
+    "\n"
     "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
   method_ext ("area", &area1,
     "@brief The area of the region\n"
@@ -2285,11 +2581,21 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   method ("is_empty?", &db::Region::empty,
     "@brief Returns true if the region is empty\n"
   ) +
-  method ("size|count", (size_t (db::Region::*) () const) &db::Region::size,
-    "@brief Returns the number of polygons in the region\n"
+  method ("count|#size", (size_t (db::Region::*) () const) &db::Region::count,
+    "@brief Returns the (flat) number of polygons in the region\n"
     "\n"
     "This returns the number of raw polygons (not merged polygons if merged semantics is enabled).\n"
+    "The count is computed 'as if flat', i.e. polygons inside a cell are multiplied by the number of times a cell is instantiated.\n"
+    "\n"
     "The 'count' alias has been provided in version 0.26 to avoid ambiguitiy with the 'size' method which applies a geometrical bias."
+  ) +
+  method ("hier_count", (size_t (db::Region::*) () const) &db::Region::hier_count,
+    "@brief Returns the (hierarchical) number of polygons in the region\n"
+    "\n"
+    "This returns the number of raw polygons (not merged polygons if merged semantics is enabled).\n"
+    "The count is computed 'hierarchical', i.e. polygons inside a cell are counted once even if the cell is instantiated multiple times.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   iterator ("each", &db::Region::begin,
     "@brief Returns each polygon of the region\n"
@@ -2358,35 +2664,6 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "See \\base_verbosity= for details.\n"
     "\n"
     "This method has been introduced in version 0.26.\n"
-  ) +
-  method ("Euclidian", &euclidian_metrics,
-    "@brief Specifies Euclidian metrics for the check functions\n"
-    "This value can be used for the metrics parameter in the check functions, i.e. \\width_check. "
-    "This value specifies Euclidian metrics, i.e. the distance between two points is measured by:\n"
-    "\n"
-    "@code\n"
-    "d = sqrt(dx^2 + dy^2)\n"
-    "@/code\n"
-    "\n"
-    "All points within a circle with radius d around one point are considered to have a smaller distance than d."
-  ) +
-  method ("Square", &square_metrics,
-    "@brief Specifies square metrics for the check functions\n"
-    "This value can be used for the metrics parameter in the check functions, i.e. \\width_check. "
-    "This value specifies sqaure metrics, i.e. the distance between two points is measured by:\n"
-    "\n"
-    "@code\n"
-    "d = max(abs(dx), abs(dy))\n"
-    "@/code\n"
-    "\n"
-    "All points within a square with length 2*d around one point are considered to have a smaller distance than d in this metrics."
-  ) +
-  method ("Projection", &projection_metrics,
-    "@brief Specifies projected distance metrics for the check functions\n"
-    "This value can be used for the metrics parameter in the check functions, i.e. \\width_check. "
-    "This value specifies projected metrics, i.e. the distance is defined as the minimum distance "
-    "measured perpendicular to one edge. That implies that the distance is defined only where two "
-    "edges have a non-vanishing projection onto each other."
   ),
   "@brief A region (a potentially complex area consisting of multiple polygons)\n"
   "\n\n"
@@ -2423,6 +2700,94 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   "\n\n"
   "This class has been introduced in version 0.23.\n"
 );
+
+gsi::EnumIn<db::Region, db::metrics_type> decl_Region_Metrics ("db", "Metrics",
+  gsi::enum_const ("Euclidian", db::Euclidian,
+    "@brief Specifies Euclidian metrics for the check functions\n"
+    "This value can be used for the metrics parameter in the check functions, i.e. \\width_check. "
+    "This value specifies Euclidian metrics, i.e. the distance between two points is measured by:\n"
+    "\n"
+    "@code\n"
+    "d = sqrt(dx^2 + dy^2)\n"
+    "@/code\n"
+    "\n"
+    "All points within a circle with radius d around one point are considered to have a smaller distance than d."
+  ) +
+  gsi::enum_const ("Square", db::Square,
+    "@brief Specifies square metrics for the check functions\n"
+    "This value can be used for the metrics parameter in the check functions, i.e. \\width_check. "
+    "This value specifies sqaure metrics, i.e. the distance between two points is measured by:\n"
+    "\n"
+    "@code\n"
+    "d = max(abs(dx), abs(dy))\n"
+    "@/code\n"
+    "\n"
+    "All points within a square with length 2*d around one point are considered to have a smaller distance than d in this metrics."
+  ) +
+  gsi::enum_const ("Projection", db::Projection,
+    "@brief Specifies projected distance metrics for the check functions\n"
+    "This value can be used for the metrics parameter in the check functions, i.e. \\width_check. "
+    "This value specifies projected metrics, i.e. the distance is defined as the minimum distance "
+    "measured perpendicular to one edge. That implies that the distance is defined only where two "
+    "edges have a non-vanishing projection onto each other."
+  ),
+  "@brief This class represents the metrics type for \\Region#width and related checks.\n"
+  "\n"
+  "This enum has been introduced in version 0.27."
+);
+
+//  Inject the Region::Metrics declarations into Region and Edges:
+//  (Edges injection has to be done here because only here defs() is available)
+gsi::ClassExt<db::Region> inject_Metrics_in_parent (decl_Region_Metrics.defs ());
+gsi::ClassExt<db::Edges> inject_Metrics_in_Edges (decl_Region_Metrics.defs ());
+
+gsi::EnumIn<db::Region, db::RectFilter> decl_Region_RectFilter ("db", "RectFilter",
+  gsi::enum_const ("NoRectFilter", db::RectFilter::NoSideAllowed,
+    "@brief Specifies no filtering"
+  ) +
+  gsi::enum_const ("OneSideAllowed", db::RectFilter::OneSideAllowed,
+    "@brief Allow errors on one side"
+  ) +
+  gsi::enum_const ("TwoSidesAllowed", db::RectFilter::TwoSidesAllowed,
+    "@brief Allow errors on two sides (not specified which)"
+  ) +
+  gsi::enum_const ("TwoConnectedSidesAllowed", db::RectFilter::TwoConnectedSidesAllowed,
+    "@brief Allow errors on two sides (\"L\" configuration)"
+  ) +
+  gsi::enum_const ("TwoOppositeSidesAllowed", db::RectFilter::TwoOppositeSidesAllowed,
+    "@brief Allow errors on two opposite sides"
+  ) +
+  gsi::enum_const ("ThreeSidesAllowed", db::RectFilter::ThreeSidesAllowed,
+    "@brief Allow errors when on three sides"
+  ) +
+  gsi::enum_const ("FourSidesAllowed", db::RectFilter::FourSidesAllowed,
+    "@brief Allow errors when on all sides"
+  ),
+  "@brief This class represents the error filter mode on rectangles for \\Region#separation and related checks.\n"
+  "\n"
+  "This enum has been introduced in version 0.27."
+);
+
+//  Inject the Region::RectFilter declarations into Region:
+gsi::ClassExt<db::Region> inject_RectFilter_in_parent (decl_Region_RectFilter.defs ());
+
+gsi::EnumIn<db::Region, db::OppositeFilter> decl_Region_OppositeFilter ("db", "OppositeFilter",
+  gsi::enum_const ("NoOppositeFilter", db::OppositeFilter::NoOppositeFilter,
+    "@brief No opposite filtering\n"
+  ) +
+  gsi::enum_const ("OnlyOpposite", db::OppositeFilter::OnlyOpposite,
+    "@brief Only errors appearing on opposite sides of a figure will be reported\n"
+  ) +
+  gsi::enum_const ("NotOpposite", db::OppositeFilter::NotOpposite,
+    "@brief Only errors NOT appearing on opposite sides of a figure will be reported\n"
+  ),
+  "@brief This class represents the opposite error filter mode for \\Region#separation and related checks.\n"
+  "\n"
+  "This enum has been introduced in version 0.27."
+);
+
+//  Inject the Region::OppositeFilter declarations into Region:
+gsi::ClassExt<db::Region> inject_OppositeFilter_in_parent (decl_Region_OppositeFilter.defs ());
 
 }
 

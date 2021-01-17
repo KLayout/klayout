@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -51,7 +51,8 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const { return std::make_pair (db::RecursiveShapeIterator (), db::ICplxTrans ()); }
 
   virtual bool empty () const { return true; }
-  virtual size_t size () const { return 0; }
+  virtual size_t count () const { return 0; }
+  virtual size_t hier_count () const { return 0; }
   virtual std::string to_string (size_t) const { return std::string (); }
 
   virtual bool is_box () const { return false; }
@@ -61,14 +62,18 @@ public:
 
   virtual Box bbox () const { return Box (); }
 
-  virtual EdgePairsDelegate *width_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *isolated_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *notch_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *enclosing_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *overlap_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *separation_check (const Region &, db::Coord, bool , metrics_type, double, distance_type, distance_type) const;
-  virtual EdgePairsDelegate *inside_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const;
+  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node);
+  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node);
+  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node);
+
+  virtual EdgePairsDelegate *width_check (db::Coord, const RegionCheckOptions &) const;
+  virtual EdgePairsDelegate *space_check (db::Coord, const RegionCheckOptions &) const;
+  virtual EdgePairsDelegate *isolated_check (db::Coord, const RegionCheckOptions &) const;
+  virtual EdgePairsDelegate *notch_check (db::Coord, const RegionCheckOptions &) const;
+  virtual EdgePairsDelegate *enclosing_check (const Region &, db::Coord, const RegionCheckOptions &) const;
+  virtual EdgePairsDelegate *overlap_check (const Region &, db::Coord, const RegionCheckOptions &) const;
+  virtual EdgePairsDelegate *separation_check (const Region &, db::Coord, const RegionCheckOptions &) const;
+  virtual EdgePairsDelegate *inside_check (const Region &, db::Coord, const RegionCheckOptions &) const;
   virtual EdgePairsDelegate *grid_check (db::Coord, db::Coord) const;
   virtual EdgePairsDelegate *angle_check (double, double, bool) const;
 
@@ -95,6 +100,7 @@ public:
 
   virtual RegionDelegate *and_with (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *not_with (const Region &) const { return new EmptyRegion (); }
+  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
   virtual RegionDelegate *xor_with (const Region &other) const;
   virtual RegionDelegate *or_with (const Region &other) const;
   virtual RegionDelegate *add_in_place (const Region &other);
@@ -104,14 +110,16 @@ public:
   virtual RegionDelegate *selected_not_outside (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_inside (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_inside (const Region &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *selected_interacting (const Region &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *selected_not_interacting (const Region &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *selected_interacting (const Edges &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *selected_not_interacting (const Edges &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *selected_interacting (const Texts &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *selected_not_interacting (const Texts &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *selected_overlapping (const Region &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *selected_not_overlapping (const Region &) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_enclosing (const Region &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_not_enclosing (const Region &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_interacting (const Region &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_not_interacting (const Region &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_interacting (const Edges &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_not_interacting (const Edges &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_interacting (const Texts &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_not_interacting (const Texts &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_overlapping (const Region &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual RegionDelegate *selected_not_overlapping (const Region &, size_t, size_t) const { return new EmptyRegion (); }
   virtual RegionDelegate *pull_inside (const Region &) const  { return new EmptyRegion (); }
   virtual RegionDelegate *pull_interacting (const Region &) const  { return new EmptyRegion (); }
   virtual EdgesDelegate *pull_interacting (const Edges &) const  { return new EmptyEdges (); }

@@ -148,13 +148,13 @@ void run_test2 (tl::TestBase *_this, bool deep)
   unsigned int l1000 = ly.get_layer (db::LayerProperties (1000, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1000);
 
-  db::CompoundRegionEdgePairToEdgeProcessingOperationNode ep2e1 (new db::EdgePairToFirstEdgesProcessor (), width_check, true);
+  db::CompoundRegionEdgePairToEdgeProcessingOperationNode ep2e1 (new db::EdgePairToLesserEdgesProcessor (), width_check, true);
   db::Edges eres = r.cop_to_edges (ep2e1);
 
   unsigned int l1001 = ly.get_layer (db::LayerProperties (1001, 0));
   eres.insert_into (&ly, *ly.begin_top_down (), l1001);
 
-  db::CompoundRegionEdgePairToEdgeProcessingOperationNode ep2e2 (new db::EdgePairToSecondEdgesProcessor (), width_check, true);
+  db::CompoundRegionEdgePairToEdgeProcessingOperationNode ep2e2 (new db::EdgePairToGreaterEdgesProcessor (), width_check, true);
   eres = r.cop_to_edges (ep2e2);
 
   unsigned int l1002 = ly.get_layer (db::LayerProperties (1002, 0));

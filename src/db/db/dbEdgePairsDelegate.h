@@ -111,6 +111,34 @@ public:
   }
 };
 
+class DB_PUBLIC
+EdgePairToLesserEdgesProcessor
+  : public EdgePairToEdgeProcessorBase
+{
+public:
+  EdgePairToLesserEdgesProcessor ()
+  { }
+
+  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
+  {
+    res.push_back (ep.lesser ());
+  }
+};
+
+class DB_PUBLIC
+EdgePairToGreaterEdgesProcessor
+  : public EdgePairToEdgeProcessorBase
+{
+public:
+  EdgePairToGreaterEdgesProcessor ()
+  { }
+
+  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
+  {
+    res.push_back (ep.greater ());
+  }
+};
+
 /**
  *  @brief The edge pair set iterator delegate
  */

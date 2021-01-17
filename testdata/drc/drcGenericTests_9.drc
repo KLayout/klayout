@@ -20,6 +20,8 @@ l1.drc((space(projection) < 1.0).polygons).output(100, 0)
 l1.drc((space(projection) < 1.0).edges).output(101, 0)
 l1.drc((space(projection) < 1.0).first_edges).output(102, 0)
 l1.drc((space(projection) < 1.0).second_edges).output(103, 0)
+l1.drc((sep(l2, projection) < 1.0).first_edges).output(104, 0)
+l1.drc((sep(l2, projection) < 1.0).second_edges).output(105, 0)
 
 l2.drc(primary.edges).output(110, 0)
 l2.drc(primary.edges.extended_in(0.1)).output(111, 0)

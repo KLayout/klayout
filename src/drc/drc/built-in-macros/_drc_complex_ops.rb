@@ -1112,6 +1112,9 @@ CODE
   # 
   # This method acts on edge pair expressions and returns the first edges of the
   # edge pairs delivered by the expression.
+  #
+  # Some checks deliver symmetric edge pairs (e.g. space, width, etc.) for which the
+  # edges are commutable. "first_edges" will deliver both edges for such edge pairs.
 
   # %DRC%
   # @name second_edges
@@ -1120,6 +1123,10 @@ CODE
   # 
   # This method acts on edge pair expressions and returns the second edges of the
   # edge pairs delivered by the expression.
+  #
+  # Some checks deliver symmetric edge pairs (e.g. space, width, etc.) for which the
+  # edges are commutable. "second_edges" will not deliver edges for such edge pairs.
+  # Instead, "first_edges" will deliver both.
 
   def first_edges
     DRCOpNodeFilter::new(@engine, self, :new_edge_pair_to_first_edges, "first_edges")

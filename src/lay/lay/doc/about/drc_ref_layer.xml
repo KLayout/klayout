@@ -1032,6 +1032,9 @@ The following images show the effect of the extents method:
 <p>
 Applies to edge pair collections only.
 Returns the first edges of the edge pairs in the collection.
+</p><p>
+Some checks deliver symmetric edge pairs (e.g. space, width, etc.) for which the
+edges are commutable. "first_edges" will deliver both edges for such edge pairs.
 </p>
 <a name="flatten"/><h2>"flatten" - Flattens the layer</h2>
 <keyword name="flatten"/>
@@ -2178,6 +2181,10 @@ The following images shows the effect of the "scaled" method:
 <p>
 Applies to edge pair collections only.
 Returns the second edges of the edge pairs in the collection.
+</p><p>
+Some checks deliver symmetric edge pairs (e.g. space, width, etc.) for which the
+edges are commutable. "second_edges" will not deliver edges for such edge pairs.
+Instead, "first_edges" will deliver both.
 </p>
 <a name="select"/><h2>"select" - Selects edges, edge pairs or polygons based on evaluation of a block</h2>
 <keyword name="select"/>

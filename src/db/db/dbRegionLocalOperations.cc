@@ -202,7 +202,10 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
   tl_assert (results.size () == 1);
   std::unordered_set<db::EdgePair> result, intra_polygon_result;
 
-  edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check (m_check, result, intra_polygon_result, m_options.negative, m_different_polygons, m_has_other, m_options.shielded);
+  //  NOTE: the rectangle and opposite filters are unsymmetric
+  bool symmetric_edge_pairs = ! m_has_other && m_options.opposite_filter == db::NoOppositeFilter && m_options.rect_filter == RectFilter::NoSideAllowed;
+
+  edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check (m_check, result, intra_polygon_result, m_options.negative, m_different_polygons, m_has_other, m_options.shielded, symmetric_edge_pairs);
   poly2poly_check<TS> poly_check (edge_check);
 
   std::list<TS> heap;
@@ -302,7 +305,6 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
     scanner.process (poly_check, m_check.distance (), db::box_convert<TS> ());
   } while (edge_check.prepare_next_pass ());
 
-
   //  detect and remove parts of the result which have or do not have results "opposite"
   //  ("opposite" is defined by the projection of edges "through" the subject shape)
   if (m_options.opposite_filter != db::NoOppositeFilter && (! result.empty () || ! intra_polygon_result.empty ())) {
@@ -312,6 +314,8 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
     std::unordered_set<db::EdgePair> cleaned_result;
 
     if (m_has_other) {
+
+      tl_assert (intra_polygon_result.empty ());
 
       //  filter out opposite edges: this is the case of two-layer checks where we can maintain the edge pairs but
       //  strip them of the filtered-out part.

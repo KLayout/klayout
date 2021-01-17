@@ -70,7 +70,40 @@ TEST(1_SimpleLShape)
 
   db::EdgeRelationFilter er (db::WidthRelation, 1001, db::Projection);
 
-  db::edge2edge_check_with_negative_output<std::set<db::EdgePair>, std::set<db::Edge> > e2e (er, ep, ee1, ee2, false, false, false);
+  db::edge2edge_check_with_negative_output<std::set<db::EdgePair>, std::set<db::Edge> > e2e (er, ep, ee1, ee2, false, false, false, true);
+
+  db::Point pts[] = {
+    db::Point (0, 0),
+    db::Point (0, 2000),
+    db::Point (2000, 2000),
+    db::Point (2000, 1000),
+    db::Point (1000, 1000),
+    db::Point (1000, 0)
+  };
+
+  db::Polygon poly;
+  poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts[0]));
+
+  db::poly2poly_check<db::Polygon> poly_check (e2e);
+
+  do {
+    //  single polygon check
+    poly_check.enter (poly, 0);
+  } while (e2e.prepare_next_pass ());
+
+  EXPECT_EQ (tl::to_string (ep), "(0,0;0,1000)|(1000,1000;1000,0),(2000,1000;1000,1000)|(1000,2000;2000,2000)");
+  EXPECT_EQ (tl::to_string (ee1), "");
+  EXPECT_EQ (tl::to_string (ee2), "");
+}
+
+TEST(1s_SimpleLShape)
+{
+  std::set<db::EdgePair> ep;
+  std::set<db::Edge> ee1, ee2;
+
+  db::EdgeRelationFilter er (db::WidthRelation, 1001, db::Projection);
+
+  db::edge2edge_check_with_negative_output<std::set<db::EdgePair>, std::set<db::Edge> > e2e (er, ep, ee1, ee2, false, false, false, false);
 
   db::Point pts[] = {
     db::Point (0, 0),
@@ -103,7 +136,7 @@ TEST(2_SimpleLWithBigPart)
 
   db::EdgeRelationFilter er (db::WidthRelation, 1001, db::Projection);
 
-  db::edge2edge_check_with_negative_output<std::set<db::EdgePair>, std::set<db::Edge> > e2e (er, ep, ee1, ee2, false, false, false);
+  db::edge2edge_check_with_negative_output<std::set<db::EdgePair>, std::set<db::Edge> > e2e (er, ep, ee1, ee2, false, false, false, true);
 
   db::Point pts[] = {
     db::Point (0, 0),
@@ -124,7 +157,7 @@ TEST(2_SimpleLWithBigPart)
     poly_check.enter (poly, 0);
   } while (e2e.prepare_next_pass ());
 
-  EXPECT_EQ (tl::to_string (ep), "(0,0;0,1000)/(1000,1000;1000,0)");
+  EXPECT_EQ (tl::to_string (ep), "(0,0;0,1000)|(1000,1000;1000,0)");
   EXPECT_EQ (tl::to_string (ee1), "(0,1000;0,2500),(2000,1000;1000,1000),(0,2500;2000,2500),(2000,2500;2000,1000)");
   EXPECT_EQ (tl::to_string (ee2), "");
 }
@@ -136,7 +169,7 @@ TEST(3_SimpleTWithBigPart)
 
   db::EdgeRelationFilter er (db::WidthRelation, 1001, db::Projection);
 
-  db::edge2edge_check_with_negative_output<std::set<db::EdgePair>, std::set<db::Edge> > e2e (er, ep, ee1, ee2, false, false, false);
+  db::edge2edge_check_with_negative_output<std::set<db::EdgePair>, std::set<db::Edge> > e2e (er, ep, ee1, ee2, false, false, false, true);
 
   db::Point pts[] = {
     db::Point (0, 0),
@@ -159,7 +192,7 @@ TEST(3_SimpleTWithBigPart)
     poly_check.enter (poly, 0);
   } while (e2e.prepare_next_pass ());
 
-  EXPECT_EQ (tl::to_string (ep), "(0,0;0,1000)/(1000,1000;1000,0),(0,2500;0,3500)/(1000,3500;1000,2500)");
+  EXPECT_EQ (tl::to_string (ep), "(0,0;0,1000)|(1000,1000;1000,0),(0,2500;0,3500)|(1000,3500;1000,2500)");
   EXPECT_EQ (tl::to_string (ee1), "(0,1000;0,2500),(2000,1000;1000,1000),(1000,2500;2000,2500),(2000,2500;2000,1000)");
   EXPECT_EQ (tl::to_string (ee2), "");
 }
@@ -171,7 +204,7 @@ TEST(4_SimpleNotch)
 
   db::EdgeRelationFilter er (db::SpaceRelation, 1001, db::Projection);
 
-  db::edge2edge_check_with_negative_output<std::set<db::EdgePair>, std::set<db::Edge> > e2e (er, ep, ee1, ee2, false, false, false);
+  db::edge2edge_check_with_negative_output<std::set<db::EdgePair>, std::set<db::Edge> > e2e (er, ep, ee1, ee2, false, false, false, true);
 
   db::Point pts[] = {
     db::Point (0, 0),
@@ -194,7 +227,7 @@ TEST(4_SimpleNotch)
     poly_check.enter (poly, 0);
   } while (e2e.prepare_next_pass ());
 
-  EXPECT_EQ (tl::to_string (ep), "(2000,2000;1000,2000)/(1000,1000;2000,1000)");
+  EXPECT_EQ (tl::to_string (ep), "(1000,1000;2000,1000)|(2000,2000;1000,2000)");
   EXPECT_EQ (tl::to_string (ee1), "(0,0;0,3000),(2000,0;0,0),(2000,1000;2000,0),(0,3000;2000,3000),(2000,3000;2000,2000)");
   EXPECT_EQ (tl::to_string (ee2), "");
 }
@@ -206,7 +239,7 @@ TEST(5_LShapeNotch)
 
   db::EdgeRelationFilter er (db::SpaceRelation, 1001, db::Projection);
 
-  db::edge2edge_check_with_negative_output<std::set<db::EdgePair>, std::set<db::Edge> > e2e (er, ep, ee1, ee2, false, false, false);
+  db::edge2edge_check_with_negative_output<std::set<db::EdgePair>, std::set<db::Edge> > e2e (er, ep, ee1, ee2, false, false, false, true);
 
   db::Point pts[] = {
     db::Point (0, 0),
@@ -231,7 +264,7 @@ TEST(5_LShapeNotch)
     poly_check.enter (poly, 0);
   } while (e2e.prepare_next_pass ());
 
-  EXPECT_EQ (tl::to_string (ep), "(1500,1500;1500,2500)/(500,2500;500,1500),(2000,1500;1500,1500)/(1500,500;2000,500)");
+  EXPECT_EQ (tl::to_string (ep), "(1500,500;2000,500)|(2000,1500;1500,1500),(1500,1500;1500,2500)|(500,2500;500,1500)");
   EXPECT_EQ (tl::to_string (ee1), "(0,0;0,3000),(2000,0;0,0),(2000,500;2000,0),(0,3000;2000,3000),(2000,3000;2000,1500)");
   EXPECT_EQ (tl::to_string (ee2), "");
 }
@@ -243,7 +276,7 @@ TEST(6_SeparationLvsBox)
 
   db::EdgeRelationFilter er (db::SpaceRelation, 1001, db::Projection);
 
-  db::edge2edge_check_with_negative_output<std::set<db::EdgePair>, std::set<db::Edge> > e2e (er, ep, ee1, ee2, false, true /*different layers*/, false);
+  db::edge2edge_check_with_negative_output<std::set<db::EdgePair>, std::set<db::Edge> > e2e (er, ep, ee1, ee2, false, true /*different layers*/, false, false);
 
   db::Point pts1[] = {
     db::Point (0, 0),

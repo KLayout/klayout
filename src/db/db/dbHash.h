@@ -141,7 +141,7 @@ namespace std
   {
     size_t operator() (const db::edge_pair<C> &o) const
     {
-      return hfunc (o.first (), hfunc (o.second ()));
+      return hfunc (o.lesser (), hfunc (o.greater (), hfunc (int (o.is_symmetric ()))));
     }
   };
 

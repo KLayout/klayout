@@ -89,6 +89,9 @@ public:
   void process(const EdgePair &ep, std::vector<db::Edge> &res) const
   {
     res.push_back (ep.first ());
+    if (ep.is_symmetric ()) {
+      res.push_back (ep.second ());
+    }
   }
 };
 
@@ -102,7 +105,9 @@ public:
 
   void process(const EdgePair &ep, std::vector<db::Edge> &res) const
   {
-    res.push_back (ep.second ());
+    if (! ep.is_symmetric ()) {
+      res.push_back (ep.second ());
+    }
   }
 };
 

@@ -1257,7 +1257,7 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
   check.set_min_projection (options.min_projection);
   check.set_max_projection (options.max_projection);
 
-  edge2edge_check_negative_or_positive<db::FlatEdgePairs> edge_check (check, *result, options.negative, false /*=same polygons*/, false /*=same layers*/, options.shielded);
+  edge2edge_check_negative_or_positive<db::FlatEdgePairs> edge_check (check, *result, options.negative, false /*=same polygons*/, false /*=same layers*/, options.shielded, true /*symmetric edge pairs*/);
   poly2poly_check<db::Polygon> poly_check (edge_check);
 
   do {

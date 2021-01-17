@@ -1494,7 +1494,7 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, c
 
     for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::Polygons); ! s.at_end (); ++s) {
 
-      edge2edge_check_negative_or_positive<db::Shapes> edge_check (check, result, options.negative, false, false, options.shielded);
+      edge2edge_check_negative_or_positive<db::Shapes> edge_check (check, result, options.negative, false /*does not require different polygons*/, false /*does not require different layers*/, options.shielded, true /*symmetric edge pairs*/);
       poly2poly_check<db::Polygon> poly_check (edge_check);
 
       db::Polygon poly;

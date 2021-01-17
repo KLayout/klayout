@@ -2755,6 +2755,9 @@ CODE
     # 
     # Applies to edge pair collections only.
     # Returns the first edges of the edge pairs in the collection.
+    #
+    # Some checks deliver symmetric edge pairs (e.g. space, width, etc.) for which the
+    # edges are commutable. "first_edges" will deliver both edges for such edge pairs.
     
     # %DRC%
     # @name second_edges
@@ -2763,6 +2766,10 @@ CODE
     # 
     # Applies to edge pair collections only.
     # Returns the second edges of the edge pairs in the collection.
+    #
+    # Some checks deliver symmetric edge pairs (e.g. space, width, etc.) for which the
+    # edges are commutable. "second_edges" will not deliver edges for such edge pairs.
+    # Instead, "first_edges" will deliver both.
     
     %w(first_edges second_edges).each do |f| 
       eval <<"CODE"

@@ -32,9 +32,14 @@ namespace db
 // -------------------------------------------------------------------------------------
 //  Edge2EdgeCheckBase implementation
 
-Edge2EdgeCheckBase::Edge2EdgeCheckBase (const EdgeRelationFilter &check, bool different_polygons, bool requires_different_layers, bool with_shielding)
+Edge2EdgeCheckBase::Edge2EdgeCheckBase (const EdgeRelationFilter &check, bool different_polygons, bool requires_different_layers, bool with_shielding, bool symmetric_edges)
   : mp_check (&check), m_requires_different_layers (requires_different_layers), m_different_polygons (different_polygons),
-    m_first_pseudo (std::numeric_limits<size_t>::max ()), m_with_shielding (with_shielding), m_has_edge_pair_output (true), m_has_negative_edge_output (false), m_pass (0)
+    m_first_pseudo (std::numeric_limits<size_t>::max ()),
+    m_with_shielding (with_shielding),
+    m_symmetric_edges (symmetric_edges),
+    m_has_edge_pair_output (true),
+    m_has_negative_edge_output (false),
+    m_pass (0)
 {
   m_distance = check.distance ();
 }
@@ -159,13 +164,42 @@ Edge2EdgeCheckBase::feed_pseudo_edges (db::box_scanner<db::Edge, size_t> &scanne
   }
 }
 
+inline bool edges_considered (bool requires_different_polygons, bool requires_different_layers, size_t p1, size_t p2)
+{
+  if (p1 == p2) {
+    if (requires_different_polygons) {
+      return false;
+    } else if ((p1 & size_t (1)) != 0) {
+      //  edges from the same polygon are only considered on first layer.
+      //  Reasoning: this case happens when "intruder" polygons are put on layer 1
+      //  while "subject" polygons are put on layer 0. We don't want "intruders"
+      //  to generate intra-polygon markers.
+      return false;
+    }
+  }
+
+  if (((p1 ^ p2) & size_t (1)) == 0) {
+    if (requires_different_layers) {
+      return false;
+    } else if ((p1 & size_t (1)) != 0) {
+      //  edges on the same layer are only considered on first layer.
+      //  Reasoning: this case happens when "intruder" polygons are put on layer 1
+      //  while "subject" polygons are put on layer 0. We don't want "intruders"
+      //  to generate inter-polygon markers between them.
+      return false;
+    }
+  }
+
+  return true;
+}
+
 void
 Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2)
 {
   if (m_pass == 0) {
 
     //  Overlap or inside checks require input from different layers
-    if ((! m_different_polygons || p1 != p2) && (! m_requires_different_layers || ((p1 ^ p2) & 1) != 0)) {
+    if (edges_considered (m_different_polygons, m_requires_different_layers, p1, p2)) {
 
       //  ensure that the first check argument is of layer 1 and the second of
       //  layer 2 (unless both are of the same layer)
@@ -179,6 +213,8 @@ Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size
 
       db::EdgePair ep;
       if (mp_check->check (*o1, *o2, &ep)) {
+
+        ep.set_symmetric (m_symmetric_edges);
 
         //  found a violation: store inside the local buffer for now. In the second
         //  pass we will eliminate those which are shielded completely (with shielding)
@@ -266,7 +302,7 @@ Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size
       (m_pseudo_edges.find (std::make_pair (*o1, p1)) != m_pseudo_edges.end ()) != (m_pseudo_edges.find (std::make_pair (*o2, p2)) != m_pseudo_edges.end ())) {
 
       //  Overlap or inside checks require input from different layers
-      if ((! m_different_polygons || p1 != p2) && (! m_requires_different_layers || ((p1 ^ p2) & 1) != 0)) {
+      if (edges_considered (m_different_polygons, m_requires_different_layers, p1, p2)) {
 
         //  ensure that the first check argument is of layer 1 and the second of
         //  layer 2 (unless both are of the same layer)
@@ -756,7 +792,7 @@ SinglePolygonCheck::process (const db::Polygon &polygon, std::vector<db::EdgePai
   check.set_min_projection (m_options.min_projection);
   check.set_max_projection (m_options.max_projection);
 
-  edge2edge_check_negative_or_positive <std::unordered_set<db::EdgePair> > edge_check (check, result, m_options.negative, false /*=same polygons*/, false /*=same layers*/, m_options.shielded);
+  edge2edge_check_negative_or_positive <std::unordered_set<db::EdgePair> > edge_check (check, result, m_options.negative, false /*=same polygons*/, false /*=same layers*/, m_options.shielded, true /*=symmetric*/);
   poly2poly_check<db::Polygon> poly_check (edge_check);
 
   do {

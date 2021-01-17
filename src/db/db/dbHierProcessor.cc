@@ -723,10 +723,12 @@ shape_interactions<TS, TI>::intruder_shape (unsigned int id) const
 //  explicit instantiations
 template class DB_PUBLIC shape_interactions<db::Polygon, db::Polygon>;
 template class DB_PUBLIC shape_interactions<db::Polygon, db::Text>;
-template class DB_PUBLIC shape_interactions<db::PolygonRef, db::PolygonRef>;
-template class DB_PUBLIC shape_interactions<db::PolygonRef, db::Edge>;
+template class DB_PUBLIC shape_interactions<db::Polygon, db::TextRef>;
 template class DB_PUBLIC shape_interactions<db::Polygon, db::Edge>;
+template class DB_PUBLIC shape_interactions<db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC shape_interactions<db::PolygonRef, db::TextRef>;
+template class DB_PUBLIC shape_interactions<db::PolygonRef, db::Text>;
+template class DB_PUBLIC shape_interactions<db::PolygonRef, db::Edge>;
 template class DB_PUBLIC shape_interactions<db::Edge, db::Edge>;
 template class DB_PUBLIC shape_interactions<db::Edge, db::PolygonRef>;
 template class DB_PUBLIC shape_interactions<db::TextRef, db::TextRef>;

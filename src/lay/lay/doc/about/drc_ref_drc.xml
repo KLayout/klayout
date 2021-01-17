@@ -553,6 +553,9 @@ The plain function is equivalent to "primary.extents".
 <p>
 This method acts on edge pair expressions and returns the first edges of the
 edge pairs delivered by the expression.
+</p><p>
+Some checks deliver symmetric edge pairs (e.g. space, width, etc.) for which the
+edges are commutable. "first_edges" will deliver both edges for such edge pairs.
 </p>
 <a name="holes"/><h2>"holes" - Selects all holes from the input polygons</h2>
 <keyword name="holes"/>
@@ -860,6 +863,10 @@ The plain function is equivalent to "primary.rounded_corners".
 <p>
 This method acts on edge pair expressions and returns the second edges of the
 edge pairs delivered by the expression.
+</p><p>
+Some checks deliver symmetric edge pairs (e.g. space, width, etc.) for which the
+edges are commutable. "second_edges" will not deliver edges for such edge pairs.
+Instead, "first_edges" will deliver both.
 </p>
 <a name="sized"/><h2>"sized" - Returns the sized version of the input</h2>
 <keyword name="sized"/>

@@ -89,17 +89,27 @@ void local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape
 
 //  explicit instantiations
 template class DB_PUBLIC local_operation<db::Polygon, db::Polygon, db::Polygon>;
+template class DB_PUBLIC local_operation<db::Polygon, db::Polygon, db::Edge>;
 template class DB_PUBLIC local_operation<db::Polygon, db::Text, db::Polygon>;
 template class DB_PUBLIC local_operation<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_operation<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_operation<db::Polygon, db::Edge, db::Edge>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_operation<db::PolygonRef, db::Text, db::PolygonRef>;
+template class DB_PUBLIC local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>;
+template class DB_PUBLIC local_operation<db::PolygonRef, db::TextRef, db::TextRef>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_operation<db::PolygonRef, db::Edge, db::Edge>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_operation<db::PolygonRef, db::PolygonRef, db::Edge>;
 template class DB_PUBLIC local_operation<db::Polygon, db::Polygon, db::EdgePair>;
+template class DB_PUBLIC local_operation<db::Polygon, db::TextRef, db::TextRef>;
 template class DB_PUBLIC local_operation<db::Edge, db::Edge, db::Edge>;
 template class DB_PUBLIC local_operation<db::Edge, db::PolygonRef, db::Edge>;
+template class DB_PUBLIC local_operation<db::Edge, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_operation<db::Edge, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_operation<db::TextRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_operation<db::TextRef, db::PolygonRef, db::TextRef>;
 
 // ---------------------------------------------------------------------------------------------
 //  BoolAndOrNotLocalOperation implementation

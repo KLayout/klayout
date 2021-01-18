@@ -274,7 +274,7 @@ static db::CompoundRegionOperationNode *new_polygon_breaker (db::CompoundRegionO
 static db::CompoundRegionOperationNode *new_sized (db::CompoundRegionOperationNode *input, db::Coord dx, db::Coord dy, unsigned int mode)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionProcessingOperationNode (new db::PolygonSizer (dx, dy, mode), input, true /*processor is owned*/, std::max (0, std::max (dx, dy)) /*dist adder*/);
+  return new db::CompoundRegionProcessingOperationNode (new db::PolygonSizer (dx, dy, mode), input, true /*processor is owned*/, std::max (db::Coord (0), std::max (dx, dy)) /*dist adder*/);
 }
 
 static db::CompoundRegionOperationNode *new_merged (db::CompoundRegionOperationNode *input, bool min_coherence, unsigned int min_wc)
@@ -379,21 +379,6 @@ static db::CompoundRegionOperationNode *new_edge_pair_to_second_edges (db::Compo
 {
   check_non_null (input, "input");
   return new db::CompoundRegionEdgePairToEdgeProcessingOperationNode (new db::EdgePairToSecondEdgesProcessor (), input, true /*processor is owned*/);
-}
-
-static db::CompoundRegionOperationNode *new_check_node (db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter, bool negative)
-{
-  return new db::CompoundRegionCheckOperationNode (new_primary (), rel, different_polygons, d,
-    db::RegionCheckOptions (whole_edges,
-                            metrics,
-                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
-                            shielded,
-                            opposite_filter,
-                            rect_filter,
-                            negative)
-  );
 }
 
 static db::CompoundRegionOperationNode *new_check_node (db::CompoundRegionOperationNode *other, db::edge_relation_type rel, bool different_polygons, db::Coord d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite_filter, db::RectFilter rect_filter, bool negative)

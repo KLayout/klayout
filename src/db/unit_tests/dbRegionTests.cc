@@ -581,11 +581,11 @@ TEST(15d)
   r.insert (db::Box (db::Point (0, 140), db::Point (350, 160)));
 
   EXPECT_EQ (r.space_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (),
-    "(300,100;350,100)|(350,140;300,140);"
     "(0,100;100,100)|(100,140;0,140);"
-    "(0,160;100,160)|(100,200;0,200);"
     "(300,160;350,160)|(350,200;300,200);"
+    "(300,100;350,100)|(350,140;300,140);"
     "(300,100;400,100)|(400,200;300,200);"
+    "(0,160;100,160)|(100,200;0,200);"
     "(600,100;700,100)|(700,200;600,200)"
   );
 }
@@ -845,17 +845,17 @@ TEST(18a)
     o.select_inside (rr);
     EXPECT_EQ (o.to_string (), "(20,30;20,50;40,50;40,30)");
     o = r;
-    EXPECT_EQ (o.selected_not_inside (rr).to_string (), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(0,60;0,80;60,80;60,60);(70,60;70,80;90,80;90,60);(0,100;0,130;30,130;30,100)");
+    EXPECT_EQ (o.selected_not_inside (rr).to_string (), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
     EXPECT_EQ (o.selected_inside (rr).count () + o.selected_not_inside (rr).count (), size_t (6));
     EXPECT_EQ (o.selected_inside (rr).hier_count () + o.selected_not_inside (rr).hier_count (), size_t (6));
     o.select_not_inside (rr);
-    EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(0,60;0,80;60,80;60,60);(70,60;70,80;90,80;90,60);(0,100;0,130;30,130;30,100)");
+    EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
   }
-  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(50,10;50,30;70,30;70,10);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
   {
     db::Region o = r;
     o.select_interacting (rr);
-    EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(50,10;50,30;70,30;70,10);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
+    EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
     o = r;
     EXPECT_EQ (o.selected_not_interacting (rr).to_string (), "(70,60;70,80;90,80;90,60)");
     EXPECT_EQ (o.selected_interacting (rr).count () + o.selected_not_interacting (rr).count (), size_t (6));
@@ -881,11 +881,11 @@ TEST(18a)
     o.select_enclosing (rr);
     EXPECT_EQ (o.to_string (), "(0,100;0,130;30,130;30,100)");
     o = r;
-    EXPECT_EQ (o.selected_not_enclosing (rr).to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(0,60;0,80;60,80;60,60)");
+    EXPECT_EQ (o.selected_not_enclosing (rr).to_string (), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60)");
     EXPECT_EQ (o.selected_enclosing (rr).count () + o.selected_not_enclosing (rr).count (), size_t (6));
     EXPECT_EQ (o.selected_enclosing (rr).hier_count () + o.selected_not_enclosing (rr).hier_count (), size_t (6));
     o.select_not_enclosing (rr);
-    EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(0,60;0,80;60,80;60,60)");
+    EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60)");
   }
 }
 
@@ -957,7 +957,7 @@ TEST(18c)
   EXPECT_EQ (r.selected_outside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
   EXPECT_EQ (r.selected_inside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
   EXPECT_EQ (r.selected_overlapping (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
-  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-20,0;-20,20;20,20;20,0);(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
 
   EXPECT_EQ (r.selected_not_outside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
   EXPECT_EQ (r.selected_not_inside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
@@ -976,7 +976,7 @@ TEST(18c)
   EXPECT_EQ (r.selected_outside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
   EXPECT_EQ (r.selected_inside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
   EXPECT_EQ (r.selected_overlapping (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
-  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-20,0;-20,20;20,20;20,0);(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
 
   EXPECT_EQ (r.selected_not_outside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
   EXPECT_EQ (r.selected_not_inside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
@@ -994,7 +994,7 @@ TEST(18c)
   EXPECT_EQ (r.selected_outside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
   EXPECT_EQ (r.selected_inside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
   EXPECT_EQ (r.selected_overlapping (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
-  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-20,0;-20,20;20,20;20,0);(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
 
   EXPECT_EQ (r.selected_not_outside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
   EXPECT_EQ (r.selected_not_inside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
@@ -1013,10 +1013,10 @@ TEST(18c)
   EXPECT_EQ (r.selected_outside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
   EXPECT_EQ (r.selected_inside (rr).to_string (), "");
   EXPECT_EQ (r.selected_overlapping (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
-  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-20,0;-20,20;20,20;20,0);(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
 
   EXPECT_EQ (r.selected_not_outside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
-  EXPECT_EQ (r.selected_not_inside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_inside (rr).to_string (), "(-20,0;-20,20;20,20;20,0);(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
   EXPECT_EQ (r.selected_not_overlapping (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
   EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
 
@@ -1251,7 +1251,7 @@ TEST(20)
     EXPECT_EQ (r1.has_valid_polygons (), false);
     db::Region r2 (db::RecursiveShapeIterator (ly, ly.cell (top), l2));
     EXPECT_EQ (r2.has_valid_polygons (), false);
-    EXPECT_EQ (r1.separation_check (r2, 20).to_string (), "(50,0;50,30)/(40,40;40,10);(63,30;80,30)/(97,40;80,40);(80,70;80,40)/(80,40;80,70);(50,40;50,57)/(40,40;40,23)");
+    EXPECT_EQ (r1.separation_check (r2, 20).to_string (), "(63,30;80,30)/(97,40;80,40);(50,0;50,30)/(40,40;40,10);(80,70;80,40)/(80,40;80,70);(50,40;50,57)/(40,40;40,23)");
   }
 
   {

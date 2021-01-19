@@ -756,6 +756,7 @@ D25ViewWidget::do_initialize_gl ()
       "uniform vec4 ambient;\n"
       "uniform vec3 illum;\n"
       "out lowp vec4 vertexColor;\n"
+      //"in vec3 gl_in;\n"
       "uniform mat4 matrix;\n"
       "layout (triangles) in;\n"
       "layout (triangle_strip, max_vertices = 3) out;\n"

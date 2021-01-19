@@ -20,7 +20,7 @@ ar = 4.0/3.0   # "L" shape
 l1.with_area_ratio(ar).output(100, 0)
 l1.without_area_ratio(ar).output(101, 0)
 if has_unbounded_range
-  l1.with_area_ratio(ar+1e-6..).output(102, 0)
+  l1.with_area_ratio(eval("ar+1e-6..")).output(102, 0)
 else
   l1.with_area_ratio(ar+1e-6..10000).output(102, 0)
 end

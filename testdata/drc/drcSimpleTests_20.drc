@@ -85,7 +85,11 @@ l1.not_interacting(l2, 1, 2).output(304, 0)
 l1.not_overlapping(l2, 1).output(310, 0)
 l1.not_overlapping(l2, 2).output(311, 0)
 l1.not_overlapping(l2, 1..2).output(312, 0)
-l1.not_overlapping(l2, eval("2..")).output(313, 0)
+if has_unbounded_range
+  l1.not_overlapping(l2, eval("2..")).output(313, 0)
+else
+  l1.not_overlapping(l2, 2..10000).output(313, 0)
+end
 l1.not_overlapping(l2, 1, 2).output(314, 0)
 
 l = l1.dup

@@ -229,6 +229,9 @@ namespace tl
   {
     db::Edge p;
 
+    if (ex.at_end ()) {
+      return true;
+    }
     if (! ex.try_read (p)) {
       return false;
     }

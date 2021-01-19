@@ -43,16 +43,26 @@ template<> void extractor_impl (tl::Extractor &ex, db::DEdgePair &e)
 template<class C> bool _test_extractor_impl (tl::Extractor &ex, db::edge_pair<C> &e)
 {
   typedef db::edge<C> edge_type;
+  tl::Extractor ex_saved = ex;
 
   edge_type e1, e2;
 
   if (ex.try_read (e1)) {
 
-    ex.expect ("/");
-    ex.read (e2);
+    bool symmetric = false;
+    if (ex.test ("|")) {
+      symmetric = true;
+    } else if (! ex.test ("/")) {
+      ex = ex_saved;
+      return false;
+    }
 
-    e = db::edge_pair<C> (e1, e2);
+    if (! ex.try_read (e2)) {
+      ex = ex_saved;
+      return false;
+    }
 
+    e = db::edge_pair<C> (e1, e2, symmetric);
     return true;
 
   } else {

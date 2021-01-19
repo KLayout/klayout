@@ -30,6 +30,10 @@
 #include "dbLayoutDiff.h"
 #include "dbNetlist.h"
 #include "dbNetlistCompare.h"
+#include "dbRegion.h"
+#include "dbEdges.h"
+#include "dbEdgePairs.h"
+#include "dbTexts.h"
 
 #include "tlUnitTest.h"
 #include "tlFileUtils.h"
@@ -326,5 +330,87 @@ void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist,
   }
 }
 
+template <class Container, class Shape>
+static
+bool do_compare (const Container &cont, const std::string &string)
+{
+  std::set<Shape> a, b;
+
+  Container cs;
+  tl::Extractor ex (string.c_str ());
+  ex.read (cs);
+
+  for (typename Container::const_iterator i = cont.begin (); !i.at_end (); ++i) {
+    a.insert (*i);
+  }
+
+  for (typename Container::const_iterator i = cs.begin (); !i.at_end (); ++i) {
+    b.insert (*i);
+  }
+
+  if (a != b) {
+
+    tl::error << "Compare details:";
+    tl::error << "  a = '" << cont.to_string () << "'";
+    tl::error << "  b = '" << cs.to_string () << "'";
+    tl::error << "In list a, but not in b:";
+    for (typename std::set<Shape>::const_iterator i = a.begin (); i != a.end (); ++i) {
+      if (b.find (*i) == b.end ()) {
+        tl::error << "  " << i->to_string ();
+      }
+    }
+    tl::error << "In list b, but not in a:";
+    for (typename std::set<Shape>::const_iterator i = b.begin (); i != b.end (); ++i) {
+      if (a.find (*i) == a.end ()) {
+        tl::error << "  " << i->to_string ();
+      }
+    }
+
+    return false;
+
+  } else {
+    return true;
+  }
+}
+
+/**
+ *  @brief Convenient compare of region vs. string
+ */
+bool compare (const db::Region &region, const std::string &string)
+{
+  return do_compare<db::Region, db::Polygon> (region, string);
+}
+
+/**
+ *  @brief Convenient compare of edges vs. string
+ */
+bool compare (const db::Edges &edges, const std::string &string)
+{
+  return do_compare<db::Edges, db::Edge> (edges, string);
+}
+
+/**
+ *  @brief Convenient compare of edge pairs vs. string
+ */
+bool compare (const db::EdgePairs &edge_pairs, const std::string &string)
+{
+  return do_compare<db::EdgePairs, db::EdgePair> (edge_pairs, string);
+}
+
+/**
+ *  @brief Convenient compare of texts vs. string
+ */
+bool compare (const db::Texts &texts, const std::string &string)
+{
+  return do_compare<db::Texts, db::Text> (texts, string);
+}
+
+/**
+ *  @brief Convenient compare of box vs. string
+ */
+bool compare (const db::Box &box, const std::string &string)
+{
+  return box.to_string () == string;
+}
 
 }

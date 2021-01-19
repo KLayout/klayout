@@ -580,13 +580,14 @@ TEST(15d)
   r.insert (db::Box (db::Point (600, 200), db::Point (700, 300)));
   r.insert (db::Box (db::Point (0, 140), db::Point (350, 160)));
 
-  EXPECT_EQ (r.space_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (),
+  EXPECT_EQ (db::compare(r.space_check (120, db::RegionCheckOptions (false, db::Projection)),
     "(0,100;100,100)|(100,140;0,140);"
     "(300,160;350,160)|(350,200;300,200);"
     "(300,100;350,100)|(350,140;300,140);"
     "(300,100;400,100)|(400,200;300,200);"
     "(0,160;100,160)|(100,200;0,200);"
     "(600,100;700,100)|(700,200;600,200)"
+    ), true
   );
 }
 
@@ -682,17 +683,18 @@ TEST(15h)
   db::RegionCheckOptions options;
   options.shielded = false; //  does NOT disable internal shielding for "opposite"
   options.metrics = db::Projection;
+
   options.opposite_filter = db::NoOppositeFilter;
-  EXPECT_EQ (r1.separation_check (r2, 40, options).to_string (),
-    "(200,300;200,200)/(210,200;210,300);(100,200;100,300)/(90,300;90,200);(200,100;200,0)/(210,0;210,100);(100,0;100,100)/(90,100;90,0)");
+  EXPECT_EQ (db::compare(r1.separation_check (r2, 40, options),
+    "(200,300;200,200)/(210,200;210,300);(100,200;100,300)/(90,300;90,200);(200,100;200,0)/(210,0;210,100);(100,0;100,100)/(90,100;90,0)"), true);
 
   options.opposite_filter = db::NotOpposite;
-  EXPECT_EQ (r1.separation_check (r2, 40, options).to_string (),
-    "(100,200;100,300)/(90,300;90,200);(200,300;200,200)/(210,200;210,300)");
+  EXPECT_EQ (db::compare(r1.separation_check (r2, 40, options),
+    "(100,200;100,300)/(90,300;90,200);(200,300;200,200)/(210,200;210,300)"), true);
 
   options.opposite_filter = db::OnlyOpposite;
-  EXPECT_EQ (r1.separation_check (r2, 40, options).to_string (),
-    "(100,0;100,100)/(90,100;90,0);(200,100;200,0)/(210,0;210,100)");
+  EXPECT_EQ (db::compare (r1.separation_check (r2, 40, options),
+    "(100,0;100,100)/(90,100;90,0);(200,100;200,0)/(210,0;210,100)"), true);
 }
 
 TEST(15i)

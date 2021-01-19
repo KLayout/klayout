@@ -1,5 +1,5 @@
 
-has_unbounded_range = ((RUBY_VERSION.split(".").map(&:to_i) <=> [2,7,0]) <= 0)
+has_unbounded_range = ((RUBY_VERSION.split(".").map(&:to_i) <=> [2,7,0]) >= 0)
 
 source $drc_test_source
 target $drc_test_target

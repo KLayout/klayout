@@ -653,16 +653,16 @@ TEST(15g)
   db::RegionCheckOptions options;
   options.metrics = db::Projection;
   options.opposite_filter = db::NoOppositeFilter;
-  EXPECT_EQ (r1.separation_check (r2, 40, options).to_string (),
-    "(100,0;100,300)/(90,300;90,0);(200,200;200,100)/(210,100;210,200)");
+  EXPECT_EQ (db::compare (r1.separation_check (r2, 40, options),
+    "(100,0;100,300)/(90,300;90,0);(200,200;200,100)/(210,100;210,200)"), true);
 
   options.opposite_filter = db::NotOpposite;
-  EXPECT_EQ (r1.separation_check (r2, 40, options).to_string (),
-    "(100,0;100,100)/(90,300;90,0);(100,200;100,300)/(90,300;90,0)");
+  EXPECT_EQ (db::compare (r1.separation_check (r2, 40, options),
+    "(100,0;100,100)/(90,300;90,0);(100,200;100,300)/(90,300;90,0)"), true);
 
   options.opposite_filter = db::OnlyOpposite;
-  EXPECT_EQ (r1.separation_check (r2, 40, options).to_string (),
-    "(200,200;200,100)/(210,100;210,200);(100,100;100,200)/(90,300;90,0)");
+  EXPECT_EQ (db::compare (r1.separation_check (r2, 40, options),
+    "(200,200;200,100)/(210,100;210,200);(100,100;100,200)/(90,300;90,0)"), true);
 }
 
 TEST(15h)

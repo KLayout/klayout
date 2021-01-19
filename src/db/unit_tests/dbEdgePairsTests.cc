@@ -26,6 +26,7 @@
 #include "dbEdgePairs.h"
 #include "dbEdges.h"
 #include "dbRegion.h"
+#include "dbTestSupport.h"
 
 TEST(1) 
 {
@@ -87,27 +88,27 @@ TEST(2)
   ep.insert (db::EdgePair (db::Edge (db::Point (10, 20), db::Point (110, 120)), db::Edge (db::Point (-10, -20), db::Point (90, 80))));
   ep.insert (db::EdgePair (db::Edge (db::Point (10, 20), db::Point (110, 120)), db::Edge (db::Point (90, 80), db::Point (-10, -20))));
 
-  EXPECT_EQ (ep.to_string (), "(10,20;110,120)/(-10,-20;90,80);(10,20;110,120)/(90,80;-10,-20)");
+  EXPECT_EQ (db::compare (ep, "(10,20;110,120)/(-10,-20;90,80);(10,20;110,120)/(90,80;-10,-20)"), true);
 
   db::EdgePairs ee;
   std::string s = ep.to_string ();
   tl::Extractor ex (s.c_str ());
   EXPECT_EQ (ex.try_read (ee), true);
-  EXPECT_EQ (ee.to_string (), "(10,20;110,120)/(-10,-20;90,80);(10,20;110,120)/(90,80;-10,-20)");
+  EXPECT_EQ (db::compare (ee, "(10,20;110,120)/(-10,-20;90,80);(10,20;110,120)/(90,80;-10,-20)"), true);
 
   db::Edges e;
   ep.edges (e);
-  EXPECT_EQ (e.to_string (), "(10,20;110,120);(-10,-20;90,80);(10,20;110,120);(90,80;-10,-20)");
+  EXPECT_EQ (db::compare (e, "(10,20;110,120);(-10,-20;90,80);(10,20;110,120);(90,80;-10,-20)"), true);
   e.clear ();
   ep.first_edges (e);
-  EXPECT_EQ (e.to_string (), "(10,20;110,120);(10,20;110,120)");
+  EXPECT_EQ (db::compare (e, "(10,20;110,120);(10,20;110,120)"), true);
   e.clear ();
   ep.second_edges (e);
-  EXPECT_EQ (e.to_string (), "(-10,-20;90,80);(90,80;-10,-20)");
+  EXPECT_EQ (db::compare (e, "(-10,-20;90,80);(90,80;-10,-20)"), true);
 
   db::Region r;
   ep.polygons (r);
-  EXPECT_EQ (r.to_string (), "(-10,-20;10,20;110,120;90,80);(-10,-20;10,20;110,120;90,80)");
+  EXPECT_EQ (db::compare (r, "(-10,-20;10,20;110,120;90,80);(-10,-20;10,20;110,120;90,80)"), true);
 }
 
 struct EPTestFilter
@@ -157,5 +158,5 @@ TEST(4)
   ep.insert_into_as_polygons (&ly, top_cell, l1, 1);
 
   db::Region r (db::RecursiveShapeIterator (ly, ly.cell (top_cell), l1));
-  EXPECT_EQ (r.to_string (), "(-10,-21;9,20;50,51;91,80);(-10,-21;9,20;110,121;91,80)");
+  EXPECT_EQ (db::compare (r, "(-10,-21;9,20;50,51;91,80);(-10,-21;9,20;110,121;91,80)"), true);
 }

@@ -23,6 +23,13 @@ end
 
 load("test_prologue.rb")
 
+# normalizes a specification string for region, edges etc.
+# such that the order of the objects becomes irrelevant
+def csort(s)
+  # splits at ");(" without consuming the brackets
+  s.split(/(?<=\));(?=\()/).sort.join(";")
+end
+
 class DBEdges_TestClass < TestBase
 
   # Basics
@@ -47,7 +54,7 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.is_merged?, true)
 
     r.assign(RBA::Edges::new([RBA::Edge::new(10, 20, 100, 200), RBA::Edge::new(11, 21, 101, 201)]))
-    assert_equal(r.to_s, "(10,20;100,200);(11,21;101,201)")
+    assert_equal(csort(r.to_s), csort("(10,20;100,200);(11,21;101,201)"))
     assert_equal(r.is_empty?, false)
     assert_equal(r.count, 2)
     assert_equal(r.hier_count, 2)
@@ -63,7 +70,7 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.is_merged?, true)
 
     r.assign(RBA::Edges::new(RBA::Box::new(10, 20, 100, 200)))
-    assert_equal(r.to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
+    assert_equal(csort(r.to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)"))
     s = "" 
     r.each do |e|
       s.empty? || s += ";"
@@ -108,7 +115,7 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.is_merged?, true)
     
     r = RBA::Edges::new(RBA::Polygon::new(RBA::Box::new(10, 20, 100, 200)))
-    assert_equal(r.to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
+    assert_equal(csort(r.to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)"))
     assert_equal(r.is_empty?, false)
     assert_equal(r.count, 4)
     assert_equal(r.hier_count, 4)
@@ -116,7 +123,7 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.is_merged?, false)
     
     r = RBA::Edges::new(RBA::SimplePolygon::new(RBA::Box::new(10, 20, 100, 200)))
-    assert_equal(r.to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
+    assert_equal(csort(r.to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)"))
     assert_equal(r.is_empty?, false)
     assert_equal(r.count, 4)
     assert_equal(r.hier_count, 4)
@@ -128,18 +135,18 @@ class DBEdges_TestClass < TestBase
     r.insert(RBA::Box::new(10, 20, 100, 200))
     assert_equal(r.is_merged?, false)
     assert_equal(r.merged_semantics?, true)
-    assert_equal(r.to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20);(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
-    assert_equal(r.merged.to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
+    assert_equal(csort(r.to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20);(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)"))
+    assert_equal(csort(r.merged.to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)"))
     assert_equal(r.length, 2*90+2*180)
     r.merged_semantics = false
     assert_equal(r.merged_semantics?, false)
     assert_equal(r.length, 2*(2*90+2*180))
     
     r = RBA::Edges::new(RBA::Path::new([ RBA::Point::new(0, 0), RBA::Point::new(100, 0) ], 20))
-    assert_equal(r.to_s, "(0,-10;0,10);(0,10;100,10);(100,10;100,-10);(100,-10;0,-10)")
-    assert_equal(r.extents.to_s, "(0,-10;0,-10;0,10;0,10);(0,10;100,10;100,10;0,10);(100,-10;100,-10;100,10;100,10);(0,-10;100,-10;100,-10;0,-10)")
-    assert_equal(r.extents(10).to_s, "(-10,-20;-10,20;10,20;10,-20);(-10,0;-10,20;110,20;110,0);(90,-20;90,20;110,20;110,-20);(-10,-20;-10,0;110,0;110,-20)")
-    assert_equal(r.extents(5, -5).to_s, "(-5,-5;-5,5;5,5;5,-5);(95,-5;95,5;105,5;105,-5)")
+    assert_equal(csort(r.to_s), csort("(0,-10;0,10);(0,10;100,10);(100,10;100,-10);(100,-10;0,-10)"))
+    assert_equal(csort(r.extents.to_s), csort("(0,-10;0,-10;0,10;0,10);(0,10;100,10;100,10;0,10);(100,-10;100,-10;100,10;100,10);(0,-10;100,-10;100,-10;0,-10)"))
+    assert_equal(csort(r.extents(10).to_s), csort("(-10,-20;-10,20;10,20;10,-20);(-10,0;-10,20;110,20;110,0);(90,-20;90,20;110,20;110,-20);(-10,-20;-10,0;110,0;110,-20)"))
+    assert_equal(csort(r.extents(5, -5).to_s), csort("(-5,-5;-5,5;5,5;5,-5);(95,-5;95,5;105,5;105,-5)"))
     assert_equal(r.is_empty?, false)
     assert_equal(r.count, 4)
     assert_equal(r.hier_count, 4)
@@ -150,7 +157,7 @@ class DBEdges_TestClass < TestBase
         RBA::Polygon::new(RBA::Box::new(10, 20, 100, 200)),
         RBA::Polygon::new(RBA::Box::new(20, 50, 120, 250))
     ] )
-    assert_equal(r.to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20);(20,50;20,250);(20,250;120,250);(120,250;120,50);(120,50;20,50)")
+    assert_equal(csort(r.to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20);(20,50;20,250);(20,250;120,250);(120,250;120,50);(120,50;20,50)"))
     assert_equal(r.is_empty?, false)
     assert_equal(r.count, 8)
     assert_equal(r.hier_count, 8)
@@ -225,28 +232,28 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.to_s, "(10,20;100,200)")
     r.clear
     r.insert(RBA::Box::new(10, 20, 100, 200))
-    assert_equal(r.to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
+    assert_equal(csort(r.to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)"))
     r.clear
     r.insert(RBA::Polygon::new(RBA::Box::new(10, 20, 100, 200)))
-    assert_equal(r.to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
+    assert_equal(csort(r.to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)"))
     r.clear
     r.insert(RBA::SimplePolygon::new(RBA::Box::new(10, 20, 100, 200)))
-    assert_equal(r.to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
+    assert_equal(csort(r.to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)"))
     r.clear
     r.insert(RBA::Path::new([ RBA::Point::new(0, 0), RBA::Point::new(100, 0) ], 20))
-    assert_equal(r.to_s, "(0,-10;0,10);(0,10;100,10);(100,10;100,-10);(100,-10;0,-10)")
+    assert_equal(csort(r.to_s), csort("(0,-10;0,10);(0,10;100,10);(100,10;100,-10);(100,-10;0,-10)"))
     r.clear
     r.insert( [
         RBA::Polygon::new(RBA::Box::new(10, 20, 100, 200)),
         RBA::Polygon::new(RBA::Box::new(20, 50, 120, 250))
     ] )
-    assert_equal(r.to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20);(20,50;20,250);(20,250;120,250);(120,250;120,50);(120,50;20,50)")
+    assert_equal(csort(r.to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20);(20,50;20,250);(20,250;120,250);(120,250;120,50);(120,50;20,50)"))
     r.clear
     r.insert( [
         RBA::Edge::new(10, 20, 100, 200),
         RBA::Edge::new(20, 50, 120, 250)
     ] )
-    assert_equal(r.to_s, "(10,20;100,200);(20,50;120,250)")
+    assert_equal(csort(r.to_s), csort("(10,20;100,200);(20,50;120,250)"))
     r.clear
     r.insert(ly.begin_shapes(c1.cell_index, l1))
     assert_equal(r.to_s(30), "(-10,-20;-10,20);(-10,20;10,20);(10,20;10,-20);(10,-20;-10,-20);(-10,80;-10,120);(-10,120;10,120);(10,120;10,80);(10,80;-10,80);(190,80;190,120);(190,120;210,120);(210,120;210,80);(210,80;190,80)")
@@ -264,7 +271,7 @@ class DBEdges_TestClass < TestBase
     rr = RBA::Region::new
     rr.insert(RBA::Box::new(10, 20, 100, 200))
     r.insert(rr)
-    assert_equal(r.to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
+    assert_equal(csort(r.to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)"))
 
     r = RBA::Edges::new
     s = RBA::Shapes::new
@@ -276,7 +283,7 @@ class DBEdges_TestClass < TestBase
     s = RBA::Shapes::new
     s.insert(RBA::Polygon::new(RBA::Box::new(10, 20, 100, 200)))
     r.insert(s)
-    assert_equal(r.to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
+    assert_equal(csort(r.to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)"))
 
     r = RBA::Edges::new
     s = RBA::Shapes::new
@@ -307,14 +314,14 @@ class DBEdges_TestClass < TestBase
     r2.insert(RBA::Edge::new(50, 0, 200, 0))
 
     r = r1 + r2
-    assert_equal(r.to_s, "(0,0;100,0);(50,0;200,0)")
+    assert_equal(csort(r.to_s), csort("(0,0;100,0);(50,0;200,0)"))
     assert_equal(r.merged.to_s, "(0,0;200,0)")
     r.merge
     assert_equal(r.is_merged?, true)
     assert_equal(r.to_s, "(0,0;200,0)")
     r = r1.dup
     r += r2
-    assert_equal(r.to_s, "(0,0;100,0);(50,0;200,0)")
+    assert_equal(csort(r.to_s), csort("(0,0;100,0);(50,0;200,0)"))
 
     r = r1 | r2
     assert_equal(r.to_s, "(0,0;200,0)")
@@ -341,11 +348,11 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.to_s, "(0,0;50,0)")
 
     r = r1 ^ r2
-    assert_equal(r.to_s, "(0,0;50,0);(100,0;200,0)")
+    assert_equal(csort(r.to_s), csort("(0,0;50,0);(100,0;200,0)"))
     assert_equal(r.is_merged?, true)
     r = r1.dup
     r ^= r2
-    assert_equal(r.to_s, "(0,0;50,0);(100,0;200,0)")
+    assert_equal(csort(r.to_s), csort("(0,0;50,0);(100,0;200,0)"))
 
   end
 
@@ -370,10 +377,10 @@ class DBEdges_TestClass < TestBase
     r = RBA::Edges::new
     r.insert(RBA::Edge::new(0, 0, 100, 0))
     r.insert(RBA::Edge::new(100, 0, 100, 100))
-    assert_equal(r.extended(1, 2, 3, 4, false).to_s, "(-1,-4;-1,3;102,3;102,-4);(97,-1;97,102;104,102;104,-1)")
+    assert_equal(csort(r.extended(1, 2, 3, 4, false).to_s), csort("(-1,-4;-1,3;102,3;102,-4);(97,-1;97,102;104,102;104,-1)"))
     assert_equal(r.extended(1, 2, 3, 4, true).to_s, "(-1,-4;-1,3;97,3;97,102;104,102;104,-4)")
-    assert_equal(r.extended_in(1).to_s, "(0,-1;0,0;100,0;100,-1);(100,0;100,100;101,100;101,0)")
-    assert_equal(r.extended_out(1).to_s, "(0,0;0,1;100,1;100,0);(99,0;99,100;100,100;100,0)")
+    assert_equal(csort(r.extended_in(1).to_s), csort("(0,-1;0,0;100,0;100,-1);(100,0;100,100;101,100;101,0)"))
+    assert_equal(csort(r.extended_out(1).to_s), csort("(0,0;0,1;100,1;100,0);(99,0;99,100;100,100;100,0)"))
 
   end
 
@@ -414,24 +421,24 @@ class DBEdges_TestClass < TestBase
     assert_equal(r3a.separation_check(r1, 15, false, RBA::Edges::Projection, nil, 380, 500).to_s, "")
     assert_equal(r3a.separation_check(r1, 15, false, RBA::Edges::Projection, nil, 0, 300).to_s, "(-10,10;-10,0)/(0,0;0,10)")
     
-    assert_equal(r3b.overlap_check(r1, 15).to_s, "(-10,10;10,10)/(21,0;0,0);(10,10;10,-10)/(0,0;0,21)")
-    assert_equal(r3b.overlap_check(r1, 15, false, RBA::Edges::Projection, nil, nil, nil).to_s, "(0,10;10,10)/(10,0;0,0);(10,10;10,0)/(0,0;0,10)")
-    assert_equal(r3b.overlap_check(r1, 15, true, RBA::Edges::Projection, nil, nil, nil).to_s, "(-10,10;10,10)/(100,0;0,0);(10,10;10,-10)/(0,0;0,200)")
+    assert_equal(csort(r3b.overlap_check(r1, 15).to_s), csort("(-10,10;10,10)/(21,0;0,0);(10,10;10,-10)/(0,0;0,21)"))
+    assert_equal(csort(r3b.overlap_check(r1, 15, false, RBA::Edges::Projection, nil, nil, nil).to_s), csort("(0,10;10,10)/(10,0;0,0);(10,10;10,0)/(0,0;0,10)"))
+    assert_equal(csort(r3b.overlap_check(r1, 15, true, RBA::Edges::Projection, nil, nil, nil).to_s), csort("(-10,10;10,10)/(100,0;0,0);(10,10;10,-10)/(0,0;0,200)"))
     assert_equal(r3b.overlap_check(r1, 15, true, RBA::Edges::Projection, 0.0, nil, nil).to_s, "")
-    assert_equal(r3b.overlap_check(r1, 15, false, RBA::Edges::Projection, nil, 0, 500).to_s, "(0,10;10,10)/(10,0;0,0);(10,10;10,0)/(0,0;0,10)")
+    assert_equal(csort(r3b.overlap_check(r1, 15, false, RBA::Edges::Projection, nil, 0, 500).to_s), csort("(0,10;10,10)/(10,0;0,0);(10,10;10,0)/(0,0;0,10)"))
     assert_equal(r3b.overlap_check(r1, 15, false, RBA::Edges::Projection, nil, 380, 500).to_s, "")
-    assert_equal(r3b.overlap_check(r1, 15, false, RBA::Edges::Projection, nil, 0, 300).to_s, "(0,10;10,10)/(10,0;0,0);(10,10;10,0)/(0,0;0,10)")
+    assert_equal(csort(r3b.overlap_check(r1, 15, false, RBA::Edges::Projection, nil, 0, 300).to_s), csort("(0,10;10,10)/(10,0;0,0);(10,10;10,0)/(0,0;0,10)"))
     
-    assert_equal((r2 | r1).space_check(25).to_s, "(120,20;120,380)/(100,395;100,5);(0,200;50,200)/(50,220;10,220)")
-    assert_equal((r2 | r1).space_check(25, false, RBA::Edges::Projection, nil, nil, nil).to_s, "(120,20;120,380)/(100,380;100,20);(10,200;50,200)/(50,220;10,220)")
-    assert_equal((r2 | r1).space_check(25, true, RBA::Edges::Projection, nil, nil, nil).to_s, "(120,20;120,380)/(100,400;100,0);(0,200;50,200)/(50,220;10,220)")
+    assert_equal(csort((r2 | r1).space_check(25).to_s), csort("(120,20;120,380)/(100,395;100,5);(0,200;50,200)/(50,220;10,220)"))
+    assert_equal(csort((r2 | r1).space_check(25, false, RBA::Edges::Projection, nil, nil, nil).to_s), csort("(120,20;120,380)/(100,380;100,20);(10,200;50,200)/(50,220;10,220)"))
+    assert_equal(csort((r2 | r1).space_check(25, true, RBA::Edges::Projection, nil, nil, nil).to_s), csort("(120,20;120,380)/(100,400;100,0);(0,200;50,200)/(50,220;10,220)"))
     assert_equal((r2 | r1).space_check(25, true, RBA::Edges::Projection, 0.0, nil, nil).to_s, "")
     assert_equal((r2 | r1).space_check(25, true, RBA::Edges::Projection, nil, 50, nil).to_s, "(120,20;120,380)/(100,400;100,0)")
     assert_equal((r2 | r1).space_check(25, true, RBA::Edges::Projection, nil, nil, 50).to_s, "(0,200;50,200)/(50,220;10,220)")
 
-    assert_equal((r2 | r1).width_check(60).to_s, "(120,20;120,380)/(130,380;130,20);(50,200;50,220)/(100,253;100,167)")
-    assert_equal((r2 | r1).width_check(60, false, RBA::Edges::Projection, nil, nil, nil).to_s, "(120,20;120,380)/(130,380;130,20);(50,200;50,220)/(100,220;100,200)")
-    assert_equal((r2 | r1).width_check(60, true, RBA::Edges::Projection, nil, nil, nil).to_s, "(120,20;120,380)/(130,380;130,20);(50,200;50,220)/(100,400;100,0)")
+    assert_equal(csort((r2 | r1).width_check(60).to_s), csort("(120,20;120,380)/(130,380;130,20);(50,200;50,220)/(100,253;100,167)"))
+    assert_equal(csort((r2 | r1).width_check(60, false, RBA::Edges::Projection, nil, nil, nil).to_s), csort("(120,20;120,380)/(130,380;130,20);(50,200;50,220)/(100,220;100,200)"))
+    assert_equal(csort((r2 | r1).width_check(60, true, RBA::Edges::Projection, nil, nil, nil).to_s), csort("(120,20;120,380)/(130,380;130,20);(50,200;50,220)/(100,400;100,0)"))
     assert_equal((r2 | r1).width_check(60, true, RBA::Edges::Projection, 0.0, nil, nil).to_s, "")
     assert_equal((r2 | r1).width_check(60, true, RBA::Edges::Projection, nil, 50, nil).to_s, "(120,20;120,380)/(130,380;130,20)")
     assert_equal((r2 | r1).width_check(60, true, RBA::Edges::Projection, nil, nil, 50).to_s, "(50,200;50,220)/(100,400;100,0)")
@@ -505,18 +512,18 @@ class DBEdges_TestClass < TestBase
     r1.merged_semantics = false
     r2.merged_semantics = false
 
-    assert_equal(r1.in(r2).to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
-    assert_equal(r2.in(r1).to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
-    assert_equal(r1.not_in(r2).to_s, "(50,70;50,270);(50,270;150,270);(150,270;150,70);(150,70;50,70)")
-    assert_equal(r2.not_in(r1).to_s, "(100,70;100,270);(100,270;250,270);(250,270;250,70);(250,70;100,70)")
+    assert_equal(csort(r1.in(r2).to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)"))
+    assert_equal(csort(r2.in(r1).to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)"))
+    assert_equal(csort(r1.not_in(r2).to_s), csort("(50,70;50,270);(50,270;150,270);(150,270;150,70);(150,70;50,70)"))
+    assert_equal(csort(r2.not_in(r1).to_s), csort("(100,70;100,270);(100,270;250,270);(250,270;250,70);(250,70;100,70)"))
 
     r1.merged_semantics = true
     r2.merged_semantics = true
 
-    assert_equal(r1.in(r2).to_s, "(10,20;10,200);(10,200;100,200);(100,20;10,20)")
-    assert_equal(r2.in(r1).to_s, "(10,20;10,200);(10,200;100,200);(100,20;10,20)")
-    assert_equal(r1.not_in(r2).to_s, "(100,200;100,20);(50,70;50,270);(50,270;150,270);(150,270;150,70);(150,70;50,70)")
-    assert_equal(r2.not_in(r1).to_s, "(100,270;250,270);(250,270;250,70);(250,70;100,70);(100,70;100,20);(100,200;100,270)")
+    assert_equal(csort(r1.in(r2).to_s), csort("(10,20;10,200);(10,200;100,200);(100,20;10,20)"))
+    assert_equal(csort(r2.in(r1).to_s), csort("(10,20;10,200);(10,200;100,200);(100,20;10,20)"))
+    assert_equal(csort(r1.not_in(r2).to_s), csort("(100,200;100,20);(50,70;50,270);(50,270;150,270);(150,270;150,70);(150,70;50,70)"))
+    assert_equal(csort(r2.not_in(r1).to_s), csort("(100,270;250,270);(250,270;250,70);(250,70;100,70);(100,70;100,20);(100,200;100,270)"))
 
   end
 
@@ -539,16 +546,16 @@ class DBEdges_TestClass < TestBase
     ee.select_inside_part(r)
     assert_equal(ee.to_s, "(0,100;100,100)")
 
-    assert_equal((e - r).to_s, "(-100,100;0,100);(100,100;200,100)")
-    assert_equal(e.outside_part(r).to_s, "(-100,100;0,100);(100,100;200,100)")
+    assert_equal(csort((e - r).to_s), csort("(-100,100;0,100);(100,100;200,100)"))
+    assert_equal(csort(e.outside_part(r).to_s), csort("(-100,100;0,100);(100,100;200,100)"))
 
     ee = e.dup
     ee -= r
-    assert_equal(ee.to_s, "(-100,100;0,100);(100,100;200,100)")
+    assert_equal(csort(ee.to_s), csort("(-100,100;0,100);(100,100;200,100)"))
 
     ee = e.dup
     ee.select_outside_part(r)
-    assert_equal(ee.to_s, "(-100,100;0,100);(100,100;200,100)")
+    assert_equal(csort(ee.to_s), csort("(-100,100;0,100);(100,100;200,100)"))
 
     e.clear
     e.insert(RBA::Edge::new(-100, 0, 200, 0))
@@ -563,16 +570,16 @@ class DBEdges_TestClass < TestBase
     ee.select_inside_part(r)
     assert_equal(ee.to_s, "")
 
-    assert_equal((e - r).to_s, "(-100,0;0,0);(100,0;200,0)")
-    assert_equal(e.outside_part(r).to_s, "(-100,0;0,0);(0,0;100,0);(100,0;200,0)")
+    assert_equal(csort((e - r).to_s), csort("(-100,0;0,0);(100,0;200,0)"))
+    assert_equal(csort(e.outside_part(r).to_s), csort("(-100,0;0,0);(0,0;100,0);(100,0;200,0)"))
 
     ee = e.dup
     ee -= r
-    assert_equal(ee.to_s, "(-100,0;0,0);(100,0;200,0)")
+    assert_equal(csort(ee.to_s), csort("(-100,0;0,0);(100,0;200,0)"))
 
     ee = e.dup
     ee.select_outside_part(r)
-    assert_equal(ee.to_s, "(-100,0;0,0);(0,0;100,0);(100,0;200,0)")
+    assert_equal(csort(ee.to_s), csort("(-100,0;0,0);(0,0;100,0);(100,0;200,0)"))
 
   end
 
@@ -604,7 +611,7 @@ class DBEdges_TestClass < TestBase
     target.each_cell { |c| cells << c.name }
     assert_equal(cells.join(","), "TOP,C2")
     assert_equal(RBA::Edges::new(target.cell("TOP").shapes(target_li)).to_s, "")
-    assert_equal(RBA::Edges::new(target.cell("C2").shapes(target_li)).to_s, "(-10,-20;-10,20);(-10,20;10,20);(10,20;10,-20);(10,-20;-10,-20)")
+    assert_equal(csort(RBA::Edges::new(target.cell("C2").shapes(target_li)).to_s), csort("(-10,-20;-10,20);(-10,20;10,20);(10,20;10,-20);(10,-20;-10,-20)"))
 
     r.flatten
 

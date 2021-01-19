@@ -20,8 +20,6 @@
 
 */
 
-
-
 #include "dbEdgePair.h"
 #include "dbHash.h"
 #include "tlUnitTest.h"

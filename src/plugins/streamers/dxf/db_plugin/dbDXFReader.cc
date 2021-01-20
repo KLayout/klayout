@@ -1729,6 +1729,13 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
             xy_flag = 0;
           }
 
+        } else if (g == 70) {
+
+          int flags = read_int32 ();
+          if (flags != 8 && flags != 12) {
+            warn ("Invalid SPLINE flag (code 70): " + tl::to_string (flags) + ". Only types 8 (non-rational) and 12 (rational) are supported currently.");
+          }
+
         } else if (g == 71) {
           degree = read_int32 ();
         } else if (g == 40) {

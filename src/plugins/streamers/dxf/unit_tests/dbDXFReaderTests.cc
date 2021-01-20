@@ -491,15 +491,15 @@ TEST(33)
   db::DXFReaderOptions opt;
   opt.polyline_mode = 3;
 
-  opt.contour_accuracy = 0.0;
   run_test (_this, "t33.dxf.gz", "t33a_au.gds.gz", opt);
 
-  opt.contour_accuracy = 1.0;
+  opt.circle_accuracy = 1.0;
   run_test (_this, "t33.dxf.gz", "t33b_au.gds.gz", opt);
 
-  opt.contour_accuracy = 100.0;
+  opt.circle_accuracy = 50.0;
   run_test (_this, "t33.dxf.gz", "t33c_au.gds.gz", opt);
 
+  opt.circle_accuracy = 0.0;
   opt.polyline_mode = 4;
   run_test (_this, "t33.dxf.gz", "t33d_au.gds.gz", opt);
 

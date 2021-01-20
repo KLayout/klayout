@@ -196,6 +196,8 @@ D25ViewWidget::D25ViewWidget (QWidget *parent)
   format.setSamples (4); //  more -> widget extends beyond boundary!
   format.setStencilBufferSize (8);
   format.setProfile (QSurfaceFormat::CoreProfile);
+  format.setVersion(3, 2);
+  format.setRenderableType (QSurfaceFormat::OpenGLES);
   setFormat (format);
 
   m_zmin = m_zmax = 0.0;
@@ -737,9 +739,7 @@ D25ViewWidget::do_initialize_gl ()
 
   static const char *shapes_vertex_shader_source =
       "#version 320 es\n"
-      "#undef lowp\n"
-      "#undef highp\n"
-      "#undef mediump\n"
+      "\n"
       "layout (location = 0) in vec4 posAttr;\n"
       "\n"
       "void main() {\n"
@@ -748,15 +748,11 @@ D25ViewWidget::do_initialize_gl ()
 
   static const char *shapes_geometry_shader_source =
       "#version 320 es\n"
-      "#undef lowp\n"
-      "#undef highp\n"
-      "#undef mediump\n"
       "\n"
       "uniform vec4 color;\n"
       "uniform vec4 ambient;\n"
       "uniform vec3 illum;\n"
       "out lowp vec4 vertexColor;\n"
-      //"in vec3 gl_in;\n"
       "uniform mat4 matrix;\n"
       "layout (triangles) in;\n"
       "layout (triangle_strip, max_vertices = 3) out;\n"
@@ -780,9 +776,7 @@ D25ViewWidget::do_initialize_gl ()
 
   static const char *shapes_fragment_shader_source =
       "#version 320 es\n"
-      "#undef lowp\n"
-      "#undef highp\n"
-      "#undef mediump\n"
+      "\n"
       "in lowp vec4 vertexColor;\n"
       "out lowp vec4 fragColor;\n"
       "uniform highp float mist_factor;\n"

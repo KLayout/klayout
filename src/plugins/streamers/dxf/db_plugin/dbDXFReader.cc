@@ -775,73 +775,43 @@ DXFReader::add_bulge_segment (std::vector<db::DPoint> &points, const db::DPoint 
 
 /*
 
-Rationale B-Splines (NURBS) vs. non-rational B-Splines:
+Rational B-Splines (NURBS) vs. non-rational B-Splines:
+  https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline
 
-https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline
+De Boor algorithm for NURBS
+  https://github.com/caadxyz/DeBoorAlgorithmNurbs
 
-De Boor for NURBS
-https://github.com/caadxyz/DeBoorAlgorithmNurbs
-
-De Boor for non-rational B-Splines:
-
-def deBoor(k: int, x: int, t, c, p: int):
-    """Evaluates S(x).
-
-    Arguments
-    ---------
-    k: Index of knot interval that contains x.
-    x: Position.
-    t: Array of knot positions, needs to be padded as described above.
-    c: Array of control points.
-    p: Degree of B-spline.
-    """
-    d = [c[j + k - p] for j in range(0, p + 1)]
-
-    for r in range(1, p + 1):
-        for j in range(p, r - 1, -1):
-            alpha = (x - t[j + k - p]) / (t[j + 1 + k - r] - t[j + k - p])
-            d[j] = (1.0 - alpha) * d[j - 1] + alpha * d[j]
-
-    return d[p]
 */
 
-static double
-b_func (double t, size_t j, int n, const std::vector<double> &knots)
-{
-  if (n == 0) {
-    return (knots [j] < t - 1e-6 && knots [j + 1] > t - 1e-6) ? 1.0 : 0.0;
-  } else {
-    double dt1 = knots [j + n] - knots [j];
-    double dt2 = knots [j + n + 1] - knots [j + 1];
-    double f1 = 0.0;
-    if (dt1 > 1e-6) {
-      f1 = (t - knots [j]) / dt1;
-    }
-    double f2 = 0.0;
-    if (dt2 > 1e-6) {
-      f2 = (knots [j + n + 1] - t) / dt2;
-    }
-    return f1 * b_func (t, j, n - 1, knots) + f2 * b_func (t, j + 1, n - 1, knots);
-  }
-}
-
 static db::DPoint
-b_spline_point (double t, const std::vector<std::pair<db::DPoint, double> > &control_points, int degree, const std::vector<double> &knots)
+b_spline_point (double x, const std::vector<std::pair<db::DPoint, double> > &control_points, int p, const std::vector<double> &t)
 {
-  db::DPoint s;
-  double z = 0.0;
-  for (size_t j = 0; j < control_points.size (); ++j) {
-    double w = control_points [j].second;
-    double b = b_func (t, j, degree, knots);
-    s += db::DVector (control_points [j].first * (w * b));
-    z += w * b;
+  int k = (int) (std::lower_bound (t.begin (), t.end (), x + 1e-6) - t.begin ());
+  if (k <= p) {
+    return control_points.front ().first;
+  } else if (k > (int) control_points.size ()) {
+    return control_points.back ().first;
   }
-  if (z > 1e-6) {
-    return s * (1.0 / z);
-  } else {
-    //  TODO: issue warning? Should not happen for well-defined NURBs
-    return db::DPoint ();
+  --k;
+
+  std::vector<db::DPoint> d;
+  std::vector<double> dw;
+  d.reserve(p + 1);
+  for (int j = 0; j <= p; ++j) {
+    double w = control_points[j + k - p].second;
+    d.push_back (control_points[j + k - p].first * w);
+    dw.push_back (w);
   }
+
+  for (int r = 1; r <= p; ++r) {
+    for (int j = p; j >= r; --j) {
+      double alpha = (x - t[j + k - p]) / (t[j + 1 + k - r] - t[j + k - p]);
+      d[j] = d[j] * alpha + (d[j - 1] - d[j - 1] * alpha);
+      dw[j] = dw[j] * alpha + dw[j - 1] * (1.0 - alpha);
+    }
+  }
+
+  return d[p] * (1.0 / dw[p]);
 }
 
 /**

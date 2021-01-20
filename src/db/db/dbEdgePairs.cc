@@ -204,6 +204,9 @@ namespace tl
   {
     db::EdgePair ep;
 
+    if (ex.at_end ()) {
+      return true;
+    }
     if (! ex.try_read (ep)) {
       return false;
     }

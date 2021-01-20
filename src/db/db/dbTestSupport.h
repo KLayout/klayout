@@ -25,6 +25,7 @@
 
 #include "dbCommon.h"
 #include "dbTypes.h"
+#include "dbBox.h"
 
 #include <string>
 
@@ -40,6 +41,10 @@ class Layout;
 class Cell;
 class LayerMap;
 class Netlist;
+class Region;
+class EdgePairs;
+class Edges;
+class Texts;
 
 /**
  *  @brief Specifies the normalization mode for compare_layouts
@@ -83,6 +88,31 @@ void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist,
  *  @brief Compares a netlist against another netlist
  */
 void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const db::Netlist &netlist_au, bool exact_parameter_match = false);
+
+/**
+ *  @brief Convenient compare of region vs. string
+ */
+bool DB_PUBLIC compare (const db::Region &region, const std::string &string);
+
+/**
+ *  @brief Convenient compare of edges vs. string
+ */
+bool DB_PUBLIC compare (const db::Edges &edges, const std::string &string);
+
+/**
+ *  @brief Convenient compare of edge pairs vs. string
+ */
+bool DB_PUBLIC compare (const db::EdgePairs &edge_pairs, const std::string &string);
+
+/**
+ *  @brief Convenient compare of texts vs. string
+ */
+bool DB_PUBLIC compare (const db::Texts &texts, const std::string &string);
+
+/**
+ *  @brief Convenient compare of box vs. string
+ */
+bool DB_PUBLIC compare (const db::Box &box, const std::string &string);
 
 }
 

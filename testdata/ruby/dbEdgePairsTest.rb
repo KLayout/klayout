@@ -23,6 +23,13 @@ end
 
 load("test_prologue.rb")
 
+# normalizes a specification string for region, edges etc.
+# such that the order of the objects becomes irrelevant
+def csort(s)
+  # splits at ");(" without consuming the brackets
+  s.split(/(?<=\));(?=\()/).sort.join(";")
+end
+
 class DBEdgePairs_TestClass < TestBase
 
   # Basics
@@ -47,7 +54,7 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(r.extents(5, -5).to_s, "(-25,5;-25,95;5,95;5,5)")
     assert_equal(r.first_edges.to_s, "(0,0;0,100)")
     assert_equal(r.second_edges.to_s, "(-10,0;-20,50)")
-    assert_equal(r.edges.to_s, "(0,0;0,100);(-10,0;-20,50)")
+    assert_equal(csort(r.edges.to_s), csort("(0,0;0,100);(-10,0;-20,50)"))
     assert_equal(r.is_empty?, false)
     assert_equal(r.size, 1)
     assert_equal(r[0].to_s, "(0,0;0,100)/(-10,0;-20,50)")
@@ -105,9 +112,9 @@ class DBEdgePairs_TestClass < TestBase
     r2.insert(RBA::Edge::new(1, 0, 1, 100), RBA::Edge::new(-11, 0, -21, 50))
     r2.insert(RBA::Edge::new(1, 1, 1, 101), RBA::Edge::new(-11, 1, -21, 51))
 
-    assert_equal((r1 + r2).to_s, "(0,0;0,100)/(-10,0;-20,50);(0,1;0,101)/(-10,1;-20,51);(1,0;1,100)/(-11,0;-21,50);(1,1;1,101)/(-11,1;-21,51)")
+    assert_equal(csort((r1 + r2).to_s), csort("(0,0;0,100)/(-10,0;-20,50);(0,1;0,101)/(-10,1;-20,51);(1,0;1,100)/(-11,0;-21,50);(1,1;1,101)/(-11,1;-21,51)"))
     r1 += r2
-    assert_equal(r1.to_s, "(0,0;0,100)/(-10,0;-20,50);(0,1;0,101)/(-10,1;-20,51);(1,0;1,100)/(-11,0;-21,50);(1,1;1,101)/(-11,1;-21,51)")
+    assert_equal(csort(r1.to_s), csort("(0,0;0,100)/(-10,0;-20,50);(0,1;0,101)/(-10,1;-20,51);(1,0;1,100)/(-11,0;-21,50);(1,1;1,101)/(-11,1;-21,51)"))
 
   end
 
@@ -118,7 +125,7 @@ class DBEdgePairs_TestClass < TestBase
     ep3 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(10, 10, 10, 0))
 
     r1 = RBA::EdgePairs::new([ ep1, ep2 ])
-    assert_equal(r1.to_s, "(0,1;2,3)/(10,11;12,13);(20,21;22,23)/(30,31;32,33)")
+    assert_equal(csort(r1.to_s), csort("(0,1;2,3)/(10,11;12,13);(20,21;22,23)/(30,31;32,33)"))
 
     r1 = RBA::EdgePairs::new(ep1)
     assert_equal(r1.to_s, "(0,1;2,3)/(10,11;12,13)")
@@ -127,7 +134,7 @@ class DBEdgePairs_TestClass < TestBase
     s.insert(ep1)
     s.insert(ep2)
     r1 = RBA::EdgePairs::new(s)
-    assert_equal(r1.to_s, "(0,1;2,3)/(10,11;12,13);(20,21;22,23)/(30,31;32,33)")
+    assert_equal(csort(r1.to_s), csort("(0,1;2,3)/(10,11;12,13);(20,21;22,23)/(30,31;32,33)"))
 
     ly = RBA::Layout::new
     l1 = ly.layer("l1")

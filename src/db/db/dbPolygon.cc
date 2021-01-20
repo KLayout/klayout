@@ -514,6 +514,8 @@ template<class C> DB_PUBLIC bool _test_extractor_impl (tl::Extractor &ex, db::po
 
   if (ex.test ("(")) {
 
+    p.clear ();
+
     point_type pt;
     while (ex.try_read (pt)) {
       points.push_back (pt);

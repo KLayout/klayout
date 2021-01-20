@@ -32,6 +32,7 @@
 #include "dbDeepShapeStore.h"
 #include "dbOriginalLayerRegion.h"
 #include "dbCellGraphUtils.h"
+#include "dbTestSupport.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
@@ -1776,21 +1777,21 @@ TEST(30a_interact_with_count_region)
   r.set_merged_semantics (false);
 
   EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
-  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (db::compare (r.selected_interacting (rr), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)"), true);
   EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "(0,0;0,200;100,200;100,0)");
   EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "(0,0;0,200;100,200;100,0)");
-  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
-  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (db::compare (r.selected_interacting (rr, 1, 4), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)"), true);
+  EXPECT_EQ (db::compare (r.selected_interacting (rr, 2, 4), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)"), true);
   EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
   EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
 
-  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (db::compare (r.selected_not_interacting (empty), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)"), true);
   EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
-  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (db::compare (r.selected_not_interacting (rr, 2, 1), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)"), true);
   EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
 }
 
@@ -1867,21 +1868,21 @@ TEST(30b_interact_with_count_edge)
   r.set_merged_semantics (false);
 
   EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
-  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (db::compare (r.selected_interacting (rr), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)"), true);
   EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "(0,0;0,200;100,200;100,0)");
   EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "(0,0;0,200;100,200;100,0)");
-  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
-  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (db::compare (r.selected_interacting (rr, 1, 4), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)"), true);
+  EXPECT_EQ (db::compare (r.selected_interacting (rr, 2, 4), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)"), true);
   EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
   EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
 
-  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (db::compare (r.selected_not_interacting (empty), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)"), true);
   EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
-  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (db::compare (r.selected_not_interacting (rr, 2, 1), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)"), true);
   EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
 }
 
@@ -1957,21 +1958,21 @@ TEST(30c_interact_with_count_text)
   r.set_merged_semantics (false);
 
   EXPECT_EQ (r.selected_interacting (empty).to_string (), "");
-  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (db::compare (r.selected_interacting (rr), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)"), true);
   EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "(0,0;0,200;100,200;100,0)");
   EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "(0,0;0,200;100,200;100,0)");
-  EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
-  EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (db::compare (r.selected_interacting (rr, 1, 4), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)"), true);
+  EXPECT_EQ (db::compare (r.selected_interacting (rr, 2, 4), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)"), true);
   EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
   EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
 
-  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (db::compare (r.selected_not_interacting (empty), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)"), true);
   EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
-  EXPECT_EQ (r.selected_not_interacting (rr, 2, 1).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (db::compare (r.selected_not_interacting (rr, 2, 1), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)"), true);
   EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
 }
 

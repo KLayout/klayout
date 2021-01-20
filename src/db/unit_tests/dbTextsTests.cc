@@ -27,6 +27,7 @@
 #include "dbTextsUtils.h"
 #include "dbEdges.h"
 #include "dbRegion.h"
+#include "dbTestSupport.h"
 
 TEST(1) 
 {
@@ -88,21 +89,21 @@ TEST(2)
   texts.insert (db::Text ("abc", db::Trans (db::Vector (100, -200))));
   texts.insert (db::Text ("uvw", db::Trans (db::Vector (110, 210))));
 
-  EXPECT_EQ (texts.to_string (), "('abc',r0 100,-200);('uvw',r0 110,210)");
+  EXPECT_EQ (db::compare (texts, "('abc',r0 100,-200);('uvw',r0 110,210)"), true);
 
   db::Texts ee;
   std::string s = texts.to_string ();
   tl::Extractor ex (s.c_str ());
   EXPECT_EQ (ex.try_read (ee), true);
-  EXPECT_EQ (ee.to_string (), "('abc',r0 100,-200);('uvw',r0 110,210)");
+  EXPECT_EQ (db::compare (ee, "('abc',r0 100,-200);('uvw',r0 110,210)"), true);
 
   db::Edges e;
   texts.edges (e);
-  EXPECT_EQ (e.to_string (), "(100,-200;100,-200);(110,210;110,210)");
+  EXPECT_EQ (db::compare (e, "(100,-200;100,-200);(110,210;110,210)"), true);
 
   db::Region r;
   texts.polygons (r);
-  EXPECT_EQ (r.to_string (), "(99,-201;99,-199;101,-199;101,-201);(109,209;109,211;111,211;111,209)");
+  EXPECT_EQ (db::compare (r, "(99,-201;99,-199;101,-199;101,-201);(109,209;109,211;111,211;111,209)"), true);
 }
 
 TEST(3) 
@@ -160,7 +161,7 @@ TEST(5)
   texts.insert_into_as_polygons (&ly, top_cell, l1, 1);
 
   db::Region r (db::RecursiveShapeIterator (ly, ly.cell (top_cell), l1));
-  EXPECT_EQ (r.to_string (), "(99,-201;99,-199;101,-199;101,-201);(109,209;109,211;111,211;111,209)");
+  EXPECT_EQ (db::compare (r, "(99,-201;99,-199;101,-199;101,-201);(109,209;109,211;111,211;111,209)"), true);
 }
 
 TEST(6)
@@ -176,7 +177,7 @@ TEST(6)
   texts.insert_into (&ly, top_cell, l1);
 
   db::Texts r (db::RecursiveShapeIterator (ly, ly.cell (top_cell), l1));
-  EXPECT_EQ (r.to_string (), "('abc',r0 100,-200);('uvw',r0 110,210)");
+  EXPECT_EQ (db::compare (r, "('abc',r0 100,-200);('uvw',r0 110,210)"), true);
 }
 
 TEST(7)

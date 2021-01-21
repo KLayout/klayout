@@ -211,7 +211,7 @@ private:
   int determine_polyline_mode ();
   void parse_entity (const std::string &entity_code, size_t &nsolids, size_t &closed_polylines);
   void add_bulge_segment (std::vector<db::DPoint> &points, const db::DPoint &p, double b);
-  void spline_interpolation (std::vector<db::DPoint> &points, int n, const std::vector<double> &knots, bool save_first = false);
+  std::list<db::DPoint> spline_interpolation (std::vector<std::pair<db::DPoint, double> > &points, int n, const std::vector<double> &knots);
   void arc_interpolation (std::vector<db::DPoint> &points, const std::vector<double> &rad, const std::vector<double> &start, const std::vector<double> &end, const std::vector<int> &ccw);
   void elliptic_interpolation (std::vector<db::DPoint> &points, const std::vector<double> &rmin, const std::vector<db::DPoint> &vmaj, const std::vector<double> &start, const std::vector<double> &end, const std::vector<int> &ccw);
   void deliver_points_to_edges (std::vector<db::DPoint> &points, const std::vector<db::DPoint> &points2, const db::DCplxTrans &tt, int edge_type, int value94, const std::vector<double> &value40, const std::vector<double> &value50, const std::vector<double> &value51, const std::vector<int> &value73, std::vector<db::Edge> &iedges);

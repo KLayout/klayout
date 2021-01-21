@@ -773,70 +773,103 @@ DXFReader::add_bulge_segment (std::vector<db::DPoint> &points, const db::DPoint 
   points.push_back (p);
 }
 
-static double
-b_func (double t, size_t j, int n, const std::vector<double> &knots)
+/*
+
+Rational B-Splines (NURBS) vs. non-rational B-Splines:
+  https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline
+
+De Boor algorithm for NURBS
+  https://github.com/caadxyz/DeBoorAlgorithmNurbs
+
+*/
+
+static db::DPoint
+b_spline_point (double x, const std::vector<std::pair<db::DPoint, double> > &control_points, int p, const std::vector<double> &t)
 {
-  if (n == 0) {
-    return (knots [j] < t - 1e-6 && knots [j + 1] > t - 1e-6) ? 1.0 : 0.0;
-  } else {
-    double dt1 = knots [j + n] - knots [j];
-    double dt2 = knots [j + n + 1] - knots [j + 1];
-    double f1 = 0.0;
-    if (dt1 > 1e-6) {
-      f1 = (t - knots [j]) / dt1;
-    }
-    double f2 = 0.0;
-    if (dt2 > 1e-6) {
-      f2 = (knots [j + n + 1] - t) / dt2;
-    }
-    return f1 * b_func (t, j, n - 1, knots) + f2 * b_func (t, j + 1, n - 1, knots);
+  int k = (int) (std::lower_bound (t.begin (), t.end (), x + 1e-6) - t.begin ());
+  if (k <= p) {
+    return control_points.front ().first;
+  } else if (k > (int) control_points.size ()) {
+    return control_points.back ().first;
   }
+  --k;
+
+  std::vector<db::DPoint> d;
+  std::vector<double> dw;
+  d.reserve(p + 1);
+  for (int j = 0; j <= p; ++j) {
+    double w = control_points[j + k - p].second;
+    d.push_back (control_points[j + k - p].first * w);
+    dw.push_back (w);
+  }
+
+  for (int r = 1; r <= p; ++r) {
+    for (int j = p; j >= r; --j) {
+      double alpha = (x - t[j + k - p]) / (t[j + 1 + k - r] - t[j + k - p]);
+      d[j] = d[j] * alpha + (d[j - 1] - d[j - 1] * alpha);
+      dw[j] = dw[j] * alpha + dw[j - 1] * (1.0 - alpha);
+    }
+  }
+
+  return d[p] * (1.0 / dw[p]);
 }
 
+/**
+ *  @brief Inserts new points into a sequence of points to refine the curve
+ *
+ *  The idea is bisection of the segments until the desired degree of accuracy has been reached.
+ *
+ *  @param control_points The control points
+ *  @param curve_points The list of curve points which is going to be extended
+ *  @param current_curve_point The iterator pointing to the current curve point
+ *  @param t_start The t (curve parameter) value of the current curve point
+ *  @param dt The current t interval
+ *  @param degree The degree of the spline
+ *  @param knots The knots
+ *  @param sin_da The relative accuracy value implied by the circle resolution
+ *  @param accu The desired absolute accuracy value
+ *
+ *  New points are going to be inserted after current_curve_point and current_curve_point + 1 to achieve the
+ *  required curvature.
+ */
 static void
-spline_interpolate (const std::vector<db::DPoint> &points,
-                    std::list<db::DPoint> &new_points,
-                    std::list<db::DPoint>::iterator pb,
-                    double tb,
+spline_interpolate (std::list<db::DPoint> &curve_points,
+                    std::list<db::DPoint>::iterator current_curve_point,
+                    double t_start,
                     double dt,
-                    int n,
+                    const std::vector<std::pair<db::DPoint, double> > &control_points,
+                    int degree,
                     const std::vector<double> &knots,
                     double sin_da,
                     double accu)
 {
-  std::list<db::DPoint>::iterator pm = pb;
+  std::list<db::DPoint>::iterator pm = current_curve_point;
   ++pm;
   std::list<db::DPoint>::iterator pe = pm;
   ++pe;
 
-  db::DPoint s1, s2;
-  for (size_t j = 0; j < points.size (); ++j) {
-    s1 += db::DVector (points [j] * b_func (tb + 0.5 * dt, j, n, knots));
-  }
+  db::DPoint s1 = b_spline_point (t_start + 0.5 * dt, control_points, degree, knots);
+  db::DPoint s2 = b_spline_point (t_start + 1.5 * dt, control_points, degree, knots);
 
-  db::DVector p1 (s1, *pb);
+  db::DVector p1 (s1, *current_curve_point);
   db::DVector p2 (*pm, s1);
   double pl1 = p1.length(), pl2 = p2.length();
 
-  for (size_t j = 0; j < points.size (); ++j) {
-    s2 += db::DVector (points [j] * b_func (tb + 1.5 * dt, j, n, knots));
-  }
+  if (curve_points.size () < control_points.size () - degree - 1) {
 
-  db::DVector q1 (s2, *pm);
-  db::DVector q2 (*pe, s2);
-  double ql1 = q1.length(), ql2 = q2.length();
+    curve_points.insert (pm, s1);
+    spline_interpolate (curve_points, current_curve_point, t_start, dt * 0.5, control_points, degree, knots, sin_da, accu);
 
-  if (new_points.size () < points.size () - n - 1) {
-
-    new_points.insert (pm, s1);
-    spline_interpolate (points, new_points, pb, tb, dt * 0.5, n, knots, sin_da, accu);
-
-    new_points.insert (pe, s2);
-    spline_interpolate (points, new_points, pm, tb + dt, dt * 0.5, n, knots, sin_da, accu);
+    curve_points.insert (pe, s2);
+    spline_interpolate (curve_points, pm, t_start + dt, dt * 0.5, control_points, degree, knots, sin_da, accu);
 
   } else {
 
-    db::DVector p (*pm, *pb);
+    db::DVector q1 (s2, *pm);
+    db::DVector q2 (*pe, s2);
+    double ql1 = q1.length(), ql2 = q2.length();
+
+    db::DVector p (*pm, *current_curve_point);
     db::DVector q (*pe, *pm);
     double pl = p.length (), ql = q.length ();
 
@@ -854,8 +887,8 @@ spline_interpolate (const std::vector<db::DPoint> &points,
         //  In addition, the estimated accuracy is not good enough on the first segment: bisect this
         //  segment.
 
-        new_points.insert (pm, s1);
-        spline_interpolate (points, new_points, pb, tb, dt * 0.5, n, knots, sin_da, accu);
+        curve_points.insert (pm, s1);
+        spline_interpolate (curve_points, current_curve_point, t_start, dt * 0.5, control_points, degree, knots, sin_da, accu);
 
       }
 
@@ -864,8 +897,8 @@ spline_interpolate (const std::vector<db::DPoint> &points,
         //  In addition, the estimated accuracy is not good enough on the first segment: bisect this
         //  segment.
 
-        new_points.insert (pe, s2);
-        spline_interpolate (points, new_points, pm, tb + dt, dt * 0.5, n, knots, sin_da, accu);
+        curve_points.insert (pe, s2);
+        spline_interpolate (curve_points, pm, t_start + dt, dt * 0.5, control_points, degree, knots, sin_da, accu);
 
       }
 
@@ -874,51 +907,39 @@ spline_interpolate (const std::vector<db::DPoint> &points,
   }
 }
 
-void
-DXFReader::spline_interpolation (std::vector<db::DPoint> &points, int n, const std::vector<double> &knots, bool save_first)
+std::list<db::DPoint>
+DXFReader::spline_interpolation (std::vector<std::pair<db::DPoint, double> > &control_points, int degree, const std::vector<double> &knots)
 {
   //  TODO: this is quite inefficient
-  if (int (knots.size()) != int (points.size() + n + 1)) {
+  if (int (knots.size()) != int (control_points.size() + degree + 1)) {
     warn ("Spline interpolation failed: mismatch between number of knots and points");
-    return;
+    return std::list<db::DPoint> ();
   }
 
-  if (int(knots.size ()) <= n || points.empty () || n <= 1) {
-    return;
+  if (int(knots.size ()) <= degree || control_points.empty () || degree <= 1) {
+    return std::list<db::DPoint> ();
   }
 
-  double t0 = knots [n];
-  double tn = knots [knots.size () - n - 1];
+  double t0 = knots [degree];
+  double tn = knots [knots.size () - degree - 1];
 
   //  we shall have at least min_points points per spline curve
   double sin_da = sin (2.0 * M_PI / m_circle_points);
   double accu = std::max (m_circle_accuracy, m_dbu / m_unit);
 
   std::list<db::DPoint> new_points;
-  new_points.push_back (points.front ());
+  new_points.push_back (control_points.front ().first);
 
   double dt = 0.5 * (tn - t0);
 
   for (double t = t0 + dt; t < tn + 1e-6; t += dt) {
-
-    db::DPoint s;
-    for (size_t j = 0; j < points.size (); ++j) {
-      s += db::DVector (points [j] * b_func (t, j, n, knots));
-    }
-
+    db::DPoint s = b_spline_point (t, control_points, degree, knots);
     new_points.push_back (s);
-
   }
 
-  spline_interpolate (points, new_points, new_points.begin (), t0, dt, n, knots, sin_da, accu);
+  spline_interpolate (new_points, new_points.begin (), t0, dt, control_points, degree, knots, sin_da, accu);
 
-  points.clear ();
-  if (save_first) {
-    points.insert (points.end (), new_points.begin (), new_points.end ());
-  } else {
-    points.insert (points.end (), ++new_points.begin (), new_points.end ());
-  }
-
+  return new_points;
 }
 
 void 
@@ -1022,7 +1043,17 @@ DXFReader::deliver_points_to_edges (std::vector<db::DPoint> &points, const std::
 
   if (edge_type == 4) {
 
-    spline_interpolation (points, value94, value40);
+    std::vector<std::pair<db::DPoint, double> > control_points;
+    control_points.reserve (points.size ());
+    for (std::vector<db::DPoint>::const_iterator p = points.begin (); p != points.end (); ++p) {
+      control_points.push_back (std::make_pair (*p, 1.0));
+    }
+
+    std::list<db::DPoint> new_points = spline_interpolation (control_points, value94, value40);
+    if (! new_points.empty ()) {
+      points.clear ();
+      points.insert (points.end (), ++new_points.begin (), new_points.end ());
+    }
 
   } else if (edge_type == 1) {
 
@@ -1670,7 +1701,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
     } else if (entity_code == "SPLINE") {
 
       std::vector<double> knots;
-      std::vector<db::DPoint> points;
+      std::vector<std::pair<db::DPoint, double> > control_points;
       db::DPoint pc;
       double ex = 0.0, ey = 0.0, ez = 1.0;
 
@@ -1684,24 +1715,38 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         } else if (g == 10 || g == 20) {
 
           if (xy_flag == 0) {
-            points.push_back (db::DPoint ());
+            control_points.push_back (std::make_pair (db::DPoint (), 1.0));
           }
 
           if (g == 10) {
-            points.back ().set_x (read_double ());
+            control_points.back ().first.set_x (read_double ());
             xy_flag |= 1;
           } else {
-            points.back ().set_y (read_double ());
+            control_points.back ().first.set_y (read_double ());
             xy_flag |= 2;
           }
           if (xy_flag == 3) {
             xy_flag = 0;
           }
 
+        } else if (g == 70) {
+
+          int flags = read_int32 ();
+          if (flags != 8 && flags != 12) {
+            warn ("Invalid SPLINE flag (code 70): " + tl::to_string (flags) + ". Only types 8 (non-rational) and 12 (rational) are supported currently.");
+          }
+
         } else if (g == 71) {
           degree = read_int32 ();
         } else if (g == 40) {
           knots.push_back (read_double ());
+        } else if (g == 41) {
+
+          //  weight of the control point
+          if (! control_points.empty ()) {
+            control_points.back ().second = read_double ();
+          }
+
         } else if (g == 210) {
           ex = read_double ();
         } else if (g == 220) {
@@ -1716,23 +1761,30 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
       db::DCplxTrans tt = global_trans (offset, ex, ey, ez);
 
       std::pair <bool, unsigned int> ll = open_layer (layout, layer);
-      if (ll.first && ! points.empty ()) {
+      if (ll.first && ! control_points.empty ()) {
 
-        spline_interpolation (points, degree, knots, true /*save first point*/);
+        std::list<db::DPoint> new_points = spline_interpolation (control_points, degree, knots);
 
         if (m_polyline_mode == 3 || m_polyline_mode == 4) {
 
           //  in "join" mode, add an edge for each segment
           std::vector <db::Edge> &edges = collected_edges.insert (std::make_pair (ll.second, std::vector <db::Edge> ())).first->second;
-          for (size_t i = 0; i + 1 < points.size (); ++i) {
-            edges.push_back (safe_from_double (db::DEdge (tt.trans (points [i]), tt.trans (points [i + 1]))));
+          std::list<db::DPoint>::const_iterator i = new_points.begin ();
+          if (i != new_points.end ()) {
+            std::list<db::DPoint>::const_iterator ii = i;
+            ++ii;
+            while (ii != new_points.end ()) {
+              edges.push_back (safe_from_double (db::DEdge (tt.trans (*i), tt.trans (*ii))));
+              ++i;
+              ++ii;
+            }
           }
 
         } else {
 
           //  create a path with width 0 for the spline
           db::DPath p;
-          p.assign (points.begin (), points.end (), tt);
+          p.assign (new_points.begin (), new_points.end (), tt);
           p.bgn_ext (0.0);
           p.end_ext (0.0);
           p.width (0);

@@ -980,7 +980,7 @@ struct E
 
 private:
   int x;
-  static std::auto_ptr<E> e_inst;
+  static std::unique_ptr<E> e_inst;
   static int e_count;
 };
 
@@ -996,7 +996,7 @@ struct F
   int get_x() const { return x; }
 
   int x;
-  static std::auto_ptr<F> f_inst;
+  static std::unique_ptr<F> f_inst;
 };
 
 struct G
@@ -1043,7 +1043,7 @@ protected:
   std::string m_s;
 
 private:
-  static std::auto_ptr<X> sp_a, sp_b;
+  static std::unique_ptr<X> sp_a, sp_b;
 };
 
 class Y
@@ -1072,7 +1072,7 @@ public:
   int i () const;
 
 private:
-  static std::auto_ptr<Y> sp_a, sp_b;
+  static std::unique_ptr<Y> sp_a, sp_b;
   static int s_dyn_count;
   Y *mp_c;
 };

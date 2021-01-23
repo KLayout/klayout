@@ -67,7 +67,7 @@ Technologies::operator= (const Technologies &other)
   return *this;
 }
 
-static std::auto_ptr<db::Technologies> sp_technologies;
+static std::unique_ptr<db::Technologies> sp_technologies;
 
 db::Technologies *
 Technologies::instance ()
@@ -128,7 +128,7 @@ Technologies::add_tech (Technology *tech, bool replace_same)
     return;
   }
 
-  std::auto_ptr<Technology> tech_ptr (tech);
+  std::unique_ptr<Technology> tech_ptr (tech);
 
   Technology *t = 0;
   for (tl::stable_vector<Technology>::iterator i = m_technologies.begin (); !t && i != m_technologies.end (); ++i) {

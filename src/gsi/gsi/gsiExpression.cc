@@ -765,7 +765,7 @@ struct reader<gsi::StringType>
   void
   operator() (tl::Variant *out, gsi::SerialArgs *rr, const gsi::ArgType &, tl::Heap *heap)
   {
-    std::auto_ptr<StringAdaptor> a ((StringAdaptor *) rr->read<void *>(*heap));
+    std::unique_ptr<StringAdaptor> a ((StringAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
       *out = tl::Variant ();
     } else {
@@ -783,7 +783,7 @@ struct reader<gsi::VariantType>
   void
   operator() (tl::Variant *out, gsi::SerialArgs *rr, const gsi::ArgType &, tl::Heap *heap)
   {
-    std::auto_ptr<VariantAdaptor> a ((VariantAdaptor *) rr->read<void *>(*heap));
+    std::unique_ptr<VariantAdaptor> a ((VariantAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
       *out = tl::Variant ();
     } else {
@@ -801,7 +801,7 @@ struct reader<MapType>
   void
   operator() (tl::Variant *out, gsi::SerialArgs *rr, const gsi::ArgType &atype, tl::Heap *heap)
   {
-    std::auto_ptr<MapAdaptor> a ((MapAdaptor *) rr->read<void *>(*heap));
+    std::unique_ptr<MapAdaptor> a ((MapAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
       *out = tl::Variant ();
     } else {
@@ -822,7 +822,7 @@ struct reader<VectorType>
   void
   operator() (tl::Variant *out, gsi::SerialArgs *rr, const gsi::ArgType &atype, tl::Heap *heap)
   {
-    std::auto_ptr<VectorAdaptor> a ((VectorAdaptor *) rr->read<void *>(*heap));
+    std::unique_ptr<VectorAdaptor> a ((VectorAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
       *out = tl::Variant ();
     } else {

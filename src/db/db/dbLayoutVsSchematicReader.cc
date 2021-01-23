@@ -87,7 +87,7 @@ void LayoutVsSchematicStandardReader::read_netlist (db::LayoutVsSchematic *lvs)
     } else if (test (skeys::reference_key) || test (lkeys::reference_key)) {
 
       Brace br (this);
-      std::auto_ptr<db::Netlist> netlist (new db::Netlist ());
+      std::unique_ptr<db::Netlist> netlist (new db::Netlist ());
       LayoutToNetlistStandardReader::read_netlist (netlist.get (), 0, true /*nested*/, &m_map_per_circuit_b);
       lvs->set_reference_netlist (netlist.release ());
       br.done ();

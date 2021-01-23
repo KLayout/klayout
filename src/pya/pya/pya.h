@@ -286,7 +286,7 @@ private:
   std::map<PyObject *, size_t> m_file_id_map;
   wchar_t *mp_py3_app_name;
   bool m_embedded;
-  std::auto_ptr<pya::PythonModule> m_pya_module;
+  std::unique_ptr<pya::PythonModule> m_pya_module;
 };
 
 }

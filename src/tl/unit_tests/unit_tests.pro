@@ -7,47 +7,47 @@ TARGET = tl_tests
 include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
-  tlAlgorithm.cc \
-  tlClassRegistry.cc \
-  tlCommandLineParser.cc \
+  tlAlgorithmTests.cc \
+  tlClassRegistryTests.cc \
+  tlCommandLineParserTests.cc \
   tlCopyOnWriteTests.cc \
-  tlDataMapping.cc \
-  tlDeflate.cc \
-  tlEvents.cc \
-  tlExpression.cc \
-  tlFileUtils.cc \
+  tlDataMappingTests.cc \
+  tlDeferredExecutionTests.cc \
+  tlDeflateTests.cc \
+  tlEventsTests.cc \
+  tlExpressionTests.cc \
+  tlFileSystemWatcherTests.cc \
+  tlFileUtilsTests.cc \
+  tlHttpStreamTests.cc \
   tlIncludeTests.cc \
-  tlIntervalMap.cc \
-  tlIntervalSet.cc \
-  tlKDTree.cc \
-  tlMath.cc \
-  tlObject.cc \
-  tlReuseVector.cc \
-  tlStableVector.cc \
-  tlString.cc \
-  tlThreadedWorkers.cc \
-  tlThreads.cc \
-  tlUtils.cc \
-  tlVariant.cc \
-  tlXMLParser.cc \
+  tlInt128SupportTests.cc \
+  tlIntervalMapTests.cc \
+  tlIntervalSetTests.cc \
+  tlKDTreeTests.cc \
+  tlLongIntTests.cc \
+  tlMathTests.cc \
+  tlObjectTests.cc \
+  tlReuseVectorTests.cc \
+  tlStableVectorTests.cc \
   tlStreamTests.cc \
-  tlWebDAV.cc \
-  tlHttpStream.cc \
-  tlInt128Support.cc \
-  tlLongInt.cc \
+  tlStringTests.cc \
+  tlThreadedWorkersTests.cc \
+  tlThreadsTests.cc \
   tlUniqueIdTests.cc \
   tlListTests.cc \
   tlEquivalenceClustersTests.cc \
     tlUniqueNameTests.cc \
     tlGlobPatternTests.cc \
     tlRecipeTests.cc \
-    tlUriTests.cc
+    tlUriTests.cc \
+  tlUtilsTests.cc \
+  tlVariantTests.cc \
+  tlWebDAVTests.cc \
+  tlXMLParserTests.cc
 
 !equals(HAVE_QT, "0") {
 
   SOURCES += \
-    tlDeferredExecution.cc \
-    tlFileSystemWatcher.cc \
 
 }
 

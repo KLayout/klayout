@@ -94,7 +94,7 @@ AsIfFlatTexts::in (const Texts &other, bool invert) const
     op.insert (*o);
   }
 
-  std::auto_ptr<FlatTexts> new_texts (new FlatTexts ());
+  std::unique_ptr<FlatTexts> new_texts (new FlatTexts ());
 
   for (TextsIterator o (begin ()); ! o.at_end (); ++o) {
     if ((op.find (*o) == op.end ()) == invert) {
@@ -153,7 +153,7 @@ void AsIfFlatTexts::invalidate_bbox ()
 TextsDelegate *
 AsIfFlatTexts::filtered (const TextFilterBase &filter) const
 {
-  std::auto_ptr<FlatTexts> new_texts (new FlatTexts ());
+  std::unique_ptr<FlatTexts> new_texts (new FlatTexts ());
 
   for (TextsIterator p (begin ()); ! p.at_end (); ++p) {
     if (filter.selected (*p)) {
@@ -167,7 +167,7 @@ AsIfFlatTexts::filtered (const TextFilterBase &filter) const
 RegionDelegate *
 AsIfFlatTexts::processed_to_polygons (const TextToPolygonProcessorBase &filter) const
 {
-  std::auto_ptr<FlatRegion> region (new FlatRegion ());
+  std::unique_ptr<FlatRegion> region (new FlatRegion ());
 
   if (filter.result_must_not_be_merged ()) {
     region->set_merged_semantics (false);
@@ -189,7 +189,7 @@ AsIfFlatTexts::processed_to_polygons (const TextToPolygonProcessorBase &filter) 
 RegionDelegate *
 AsIfFlatTexts::polygons (db::Coord e) const
 {
-  std::auto_ptr<FlatRegion> output (new FlatRegion ());
+  std::unique_ptr<FlatRegion> output (new FlatRegion ());
 
   for (TextsIterator tp (begin ()); ! tp.at_end (); ++tp) {
     db::Box box = tp->box ();
@@ -203,7 +203,7 @@ AsIfFlatTexts::polygons (db::Coord e) const
 EdgesDelegate *
 AsIfFlatTexts::edges () const
 {
-  std::auto_ptr<FlatEdges> output (new FlatEdges ());
+  std::unique_ptr<FlatEdges> output (new FlatEdges ());
 
   for (TextsIterator tp (begin ()); ! tp.at_end (); ++tp) {
     db::Box box = tp->box ();
@@ -219,7 +219,7 @@ AsIfFlatTexts::add (const Texts &other) const
   FlatTexts *other_flat = dynamic_cast<FlatTexts *> (other.delegate ());
   if (other_flat) {
 
-    std::auto_ptr<FlatTexts> new_texts (new FlatTexts (*other_flat));
+    std::unique_ptr<FlatTexts> new_texts (new FlatTexts (*other_flat));
     new_texts->invalidate_cache ();
 
     size_t n = new_texts->raw_texts ().size () + count ();
@@ -234,7 +234,7 @@ AsIfFlatTexts::add (const Texts &other) const
 
   } else {
 
-    std::auto_ptr<FlatTexts> new_texts (new FlatTexts ());
+    std::unique_ptr<FlatTexts> new_texts (new FlatTexts ());
 
     size_t n = count () + other.count ();
 
@@ -342,7 +342,7 @@ AsIfFlatTexts::selected_interacting_generic (const Region &other, bool inverse) 
     scanner.insert2 (p.operator-> (), 1);
   }
 
-  std::auto_ptr<FlatTexts> output (new FlatTexts ());
+  std::unique_ptr<FlatTexts> output (new FlatTexts ());
 
   if (! inverse) {
 
@@ -388,7 +388,7 @@ AsIfFlatTexts::pull_generic (const Region &other) const
     scanner.insert2 (p.operator-> (), 1);
   }
 
-  std::auto_ptr<FlatRegion> output (new FlatRegion (true));
+  std::unique_ptr<FlatRegion> output (new FlatRegion (true));
 
   text_to_region_interaction_filter<FlatRegion, db::Text> filter (*output);
   scanner.process (filter, 1, db::box_convert<db::Text> (), db::box_convert<db::Polygon> ());

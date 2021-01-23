@@ -81,7 +81,7 @@ private:
   void sync_item (QTreeWidgetItem *parent, gsi::Inspector *inspector, const QString &key, size_t index, int pos, bool fresh);
   void sync (bool fresh);
 
-  std::auto_ptr<gsi::Inspector> mp_inspector;
+  std::unique_ptr<gsi::Inspector> mp_inspector;
   bool m_show_all;
 };
 

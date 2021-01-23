@@ -40,7 +40,7 @@ TEST(1)
   id = tl::id_of (0);
   EXPECT_EQ (id, tl::id_type (0));
 
-  std::auto_ptr<MyClass> ptr;
+  std::unique_ptr<MyClass> ptr;
   ptr.reset (new MyClass ());
   id0 = id = tl::id_of (ptr.get ());
   EXPECT_NE (id, tl::id_type (0));

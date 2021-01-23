@@ -5288,7 +5288,7 @@ LayoutView::paste_interactive ()
 {
   clear_selection ();
 
-  std::auto_ptr<db::Transaction> trans (new db::Transaction (manager (), tl::to_string (QObject::tr ("Paste and move"))));
+  std::unique_ptr<db::Transaction> trans (new db::Transaction (manager (), tl::to_string (QObject::tr ("Paste and move"))));
 
   {
     //  let the receivers sort out who is pasting what ..

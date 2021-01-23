@@ -445,7 +445,7 @@ private:
   bool m_editable;
   db::PropertiesRepository *mp_prep;
   Ui::UserPropertiesForm *mp_ui;
-  std::auto_ptr<lay::GenericSyntaxHighlighterAttributes> mp_hl_attributes, mp_hl_basic_attributes;
+  std::unique_ptr<lay::GenericSyntaxHighlighterAttributes> mp_hl_attributes, mp_hl_basic_attributes;
 };
 
 /**

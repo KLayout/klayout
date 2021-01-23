@@ -1492,7 +1492,7 @@ Object::read_file ()
 
     tl::InputFile file (m_filename);
     tl::InputStream stream (file);
-    std::auto_ptr<img::Object> read;
+    std::unique_ptr<img::Object> read;
     read.reset (img::ImageStreamer::read (stream));
     read->m_filename = m_filename;
 

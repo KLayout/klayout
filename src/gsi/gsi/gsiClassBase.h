@@ -631,7 +631,7 @@ private:
   std::string m_name;
   std::string m_module;
   tl::weak_collection<ClassBase> m_child_classes, m_subclasses;
-  mutable std::auto_ptr<PerClassClientSpecificData> mp_data[ClientIndex::MaxClientIndex];
+  mutable std::unique_ptr<PerClassClientSpecificData> mp_data[ClientIndex::MaxClientIndex];
 
   static class_collection *mp_class_collection;
   static class_collection *mp_new_class_collection;

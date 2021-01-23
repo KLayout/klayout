@@ -71,7 +71,7 @@ public:
 TEST(1)
 {
   Observed x;
-  std::auto_ptr<Observer> yp;
+  std::unique_ptr<Observer> yp;
   yp.reset (new Observer ());
 
   EXPECT_EQ (yp->obj == 0, true);
@@ -129,7 +129,7 @@ TEST(1)
 TEST(2)
 {
   Observed x1, x2;
-  std::auto_ptr<Observer> yp;
+  std::unique_ptr<Observer> yp;
   yp.reset (new Observer ());
 
   EXPECT_EQ (yp->obj == 0, true);
@@ -205,7 +205,7 @@ TEST(3)
 TEST(4)
 {
   Observed x;
-  std::auto_ptr<Observer> yp;
+  std::unique_ptr<Observer> yp;
   yp.reset (new Observer ());
 
   EXPECT_EQ (yp->obj == 0, true);
@@ -263,7 +263,7 @@ TEST(4)
 TEST(5)
 {
   Observed x1, x2;
-  std::auto_ptr<Observer> yp;
+  std::unique_ptr<Observer> yp;
   yp.reset (new Observer ());
 
   EXPECT_EQ (yp->obj == 0, true);

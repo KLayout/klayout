@@ -816,12 +816,12 @@ private:
   std::string m_original_file;
   std::string m_filename;
   db::RecursiveShapeIterator m_iter;
-  std::auto_ptr<db::DeepShapeStore> mp_internal_dss;
+  std::unique_ptr<db::DeepShapeStore> mp_internal_dss;
   tl::weak_ptr<db::DeepShapeStore> mp_dss;
   unsigned int m_layout_index;
   db::Connectivity m_conn;
   db::hier_clusters<db::NetShape> m_net_clusters;
-  std::auto_ptr<db::Netlist> mp_netlist;
+  std::unique_ptr<db::Netlist> mp_netlist;
   std::set<db::DeepLayer> m_dlrefs;
   std::map<std::string, db::DeepLayer> m_named_regions;
   std::map<unsigned int, std::string> m_name_of_layer;

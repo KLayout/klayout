@@ -61,7 +61,7 @@ TEST(1_FloatMono)
     img::ImageStreamer::write (stream, image);
   }
 
-  std::auto_ptr<img::Object> read;
+  std::unique_ptr<img::Object> read;
 
   {
     tl::InputFile file (path);
@@ -94,7 +94,7 @@ TEST(2_FloatMonoWithMask)
     img::ImageStreamer::write (stream, image);
   }
 
-  std::auto_ptr<img::Object> read;
+  std::unique_ptr<img::Object> read;
 
   {
     tl::InputFile file (path);
@@ -123,7 +123,7 @@ TEST(3_ByteMono)
     img::ImageStreamer::write (stream, image);
   }
 
-  std::auto_ptr<img::Object> read;
+  std::unique_ptr<img::Object> read;
 
   {
     tl::InputFile file (path);
@@ -156,7 +156,7 @@ TEST(4_ByteMonoWithMask)
     img::ImageStreamer::write (stream, image);
   }
 
-  std::auto_ptr<img::Object> read;
+  std::unique_ptr<img::Object> read;
 
   {
     tl::InputFile file (path);
@@ -185,7 +185,7 @@ TEST(5_FloatColor)
     img::ImageStreamer::write (stream, image);
   }
 
-  std::auto_ptr<img::Object> read;
+  std::unique_ptr<img::Object> read;
 
   {
     tl::InputFile file (path);
@@ -218,7 +218,7 @@ TEST(6_FloatColorWithMask)
     img::ImageStreamer::write (stream, image);
   }
 
-  std::auto_ptr<img::Object> read;
+  std::unique_ptr<img::Object> read;
 
   {
     tl::InputFile file (path);
@@ -247,7 +247,7 @@ TEST(7_ByteColor)
     img::ImageStreamer::write (stream, image);
   }
 
-  std::auto_ptr<img::Object> read;
+  std::unique_ptr<img::Object> read;
 
   {
     tl::InputFile file (path);
@@ -280,7 +280,7 @@ TEST(8_ByteColorWithMask)
     img::ImageStreamer::write (stream, image);
   }
 
-  std::auto_ptr<img::Object> read;
+  std::unique_ptr<img::Object> read;
 
   {
     tl::InputFile file (path);

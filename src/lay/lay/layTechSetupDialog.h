@@ -98,7 +98,7 @@ private:
   Ui::TechMacrosPage *mp_ui;
   std::string m_cat, m_cat_desc;
   std::vector<std::pair<QLabel *, QString> > m_original_labels;
-  std::auto_ptr<lym::MacroCollection> mp_collection;
+  std::unique_ptr<lym::MacroCollection> mp_collection;
   std::string m_current_path;
 
 private slots:

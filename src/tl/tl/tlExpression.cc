@@ -3158,7 +3158,7 @@ Eval::define_function (const std::string &name, EvalFunction *function)
 }
 
 void
-Eval::eval_top (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
+Eval::eval_top (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> &n)
 {
   do {
 
@@ -3171,7 +3171,7 @@ Eval::eval_top (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
 
     } else {
 
-      std::auto_ptr<ExpressionNode> nn;
+      std::unique_ptr<ExpressionNode> nn;
 
       ExpressionParserContext ex1 = ex;
 
@@ -3182,7 +3182,7 @@ Eval::eval_top (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
         ExpressionParserContext exb = ex;
         if (! exb.test ("=>") && ! exb.test ("==") && ex.test ("=")) {
 
-          std::auto_ptr<ExpressionNode> b;
+          std::unique_ptr<ExpressionNode> b;
           eval_assign (ex, b);
           nn.reset (new AssignExpressionNode (ex1, nn.release (), b.release ()));
 
@@ -3213,7 +3213,7 @@ Eval::eval_top (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
 }
 
 void
-Eval::eval_assign (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
+Eval::eval_assign (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> &n)
 {
   eval_if (ex, n);
 
@@ -3222,7 +3222,7 @@ Eval::eval_assign (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
   if (! exb.test ("=>") && ! exb.test ("==") && ex.test ("=")) {
 
     exb = ex;
-    std::auto_ptr<ExpressionNode> b;
+    std::unique_ptr<ExpressionNode> b;
     eval_assign (ex, b);
     n.reset (new AssignExpressionNode (ex1, n.release (), b.release ()));
 
@@ -3230,14 +3230,14 @@ Eval::eval_assign (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
 }
 
 void
-Eval::eval_if (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
+Eval::eval_if (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> &n)
 {
   eval_boolean (ex, n);
 
   ExpressionParserContext ex1 = ex;
   if (ex.test ("?")) {
 
-    std::auto_ptr<ExpressionNode> b, c;
+    std::unique_ptr<ExpressionNode> b, c;
     eval_if (ex, b);
     if (! ex.test (":")) {
       throw EvalError (tl::to_string (tr ("Expected ':'")), ex);
@@ -3249,7 +3249,7 @@ Eval::eval_if (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
 }
 
 void
-Eval::eval_boolean (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
+Eval::eval_boolean (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> &n)
 {
   eval_conditional (ex, n);
 
@@ -3258,13 +3258,13 @@ Eval::eval_boolean (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &
     ExpressionParserContext ex1 = ex;
     if (ex.test("||")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_conditional (ex, b);
       n.reset (new LogOrExpressionNode (ex1, n.release (), b.release ()));
 
     } else if (ex.test ("&&")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_conditional (ex, b);
       n.reset (new LogAndExpressionNode (ex1, n.release (), b.release ()));
 
@@ -3276,7 +3276,7 @@ Eval::eval_boolean (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &
 }
 
 void
-Eval::eval_conditional (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
+Eval::eval_conditional (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> &n)
 {
   eval_shift (ex, n);
 
@@ -3285,49 +3285,49 @@ Eval::eval_conditional (ExpressionParserContext &ex, std::auto_ptr<ExpressionNod
     ExpressionParserContext ex1 = ex;
     if (ex.test("<=")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_shift (ex, b);
       n.reset (new LessOrEqualExpressionNode (ex1, n.release (), b.release ()));
 
     } else if (ex.test("<")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_shift (ex, b);
       n.reset (new LessExpressionNode (ex1, n.release (), b.release ()));
 
     } else if (ex.test(">=")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_shift (ex, b);
       n.reset (new GreaterOrEqualExpressionNode (ex1, n.release (), b.release ()));
 
     } else if (ex.test(">")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_shift (ex, b);
       n.reset (new GreaterExpressionNode (ex1, n.release (), b.release ()));
 
     } else if (ex.test("==")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_shift (ex, b);
       n.reset (new EqualExpressionNode (ex1, n.release (), b.release ()));
 
     } else if (ex.test("!=")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_shift (ex, b);
       n.reset (new NotEqualExpressionNode (ex1, n.release (), b.release ()));
 
     } else if (ex.test("~")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_shift (ex, b);
       n.reset (new MatchExpressionNode (ex1, n.release (), b.release (), this));
 
     } else if (ex.test("!~")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_shift (ex, b);
       n.reset (new NoMatchExpressionNode (ex1, n.release (), b.release ()));
 
@@ -3339,7 +3339,7 @@ Eval::eval_conditional (ExpressionParserContext &ex, std::auto_ptr<ExpressionNod
 }
 
 void
-Eval::eval_shift (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
+Eval::eval_shift (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> &n)
 {
   eval_addsub (ex, n);
 
@@ -3348,13 +3348,13 @@ Eval::eval_shift (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
     ExpressionParserContext ex1 = ex;
     if (ex.test("<<")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_addsub (ex, b);
       n.reset (new ShiftLeftExpressionNode (ex1, n.release (), b.release ()));
 
     } else if (ex.test(">>")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_addsub (ex, b);
       n.reset (new ShiftRightExpressionNode (ex1, n.release (), b.release ()));
 
@@ -3366,7 +3366,7 @@ Eval::eval_shift (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
 }
 
 void
-Eval::eval_addsub (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
+Eval::eval_addsub (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> &n)
 {
   eval_product (ex, n);
 
@@ -3375,13 +3375,13 @@ Eval::eval_addsub (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
     ExpressionParserContext ex1 = ex;
     if (ex.test("+")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_product (ex, b);
       n.reset (new PlusExpressionNode (ex1, n.release (), b.release ()));
 
     } else if (ex.test("-")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_product (ex, b);
       n.reset (new MinusExpressionNode (ex1, n.release (), b.release ()));
 
@@ -3393,7 +3393,7 @@ Eval::eval_addsub (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
 }
 
 void
-Eval::eval_product (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
+Eval::eval_product (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> &n)
 {
   eval_bitwise (ex, n);
 
@@ -3402,19 +3402,19 @@ Eval::eval_product (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &
     ExpressionParserContext ex1 = ex;
     if (ex.test("*")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_bitwise (ex, b);
       n.reset (new StarExpressionNode (ex1, n.release (), b.release ()));
 
     } else if (ex.test("/")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_bitwise (ex, b);
       n.reset (new SlashExpressionNode (ex1, n.release (), b.release ()));
 
     } else if (ex.test("%")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_bitwise (ex, b);
       n.reset (new PercentExpressionNode (ex1, n.release (), b.release ()));
 
@@ -3426,7 +3426,7 @@ Eval::eval_product (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &
 }
 
 void
-Eval::eval_bitwise (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
+Eval::eval_bitwise (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> &n)
 {
   eval_unary (ex, n);
 
@@ -3440,19 +3440,19 @@ Eval::eval_bitwise (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &
       break; // not handled here
     } else if (ex.test("&")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_unary (ex, b);
       n.reset (new AmpersandExpressionNode (ex1, n.release (), b.release ()));
 
     } else if (ex.test("|")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_unary (ex, b);
       n.reset (new PipeExpressionNode (ex1, n.release (), b.release ()));
 
     } else if (ex.test("^")) {
 
-      std::auto_ptr<ExpressionNode> b;
+      std::unique_ptr<ExpressionNode> b;
       eval_unary (ex, b);
       n.reset (new AcuteExpressionNode (ex1, n.release (), b.release ()));
 
@@ -3464,7 +3464,7 @@ Eval::eval_bitwise (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &
 }
 
 void
-Eval::eval_unary (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
+Eval::eval_unary (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> &n)
 {
   ExpressionParserContext ex1 = ex;
   if (ex.test ("!")) {
@@ -3496,7 +3496,7 @@ static const char *operator_methods[] =
 };
 
 void
-Eval::eval_suffix (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
+Eval::eval_suffix (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> &n)
 {
   eval_atomic (ex, n, 1);
 
@@ -3530,7 +3530,7 @@ Eval::eval_suffix (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
 
         t += "=";
 
-        std::auto_ptr<ExpressionNode> a;
+        std::unique_ptr<ExpressionNode> a;
         eval_assign (ex, a);
 
         MethodExpressionNode *m = new MethodExpressionNode (ex1, t);
@@ -3549,7 +3549,7 @@ Eval::eval_suffix (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
 
           do {
 
-            std::auto_ptr<ExpressionNode> a;
+            std::unique_ptr<ExpressionNode> a;
             eval_assign (ex, a);
             m->add_child (a.release ());
 
@@ -3573,7 +3573,7 @@ Eval::eval_suffix (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
 
     } else if (ex.test ("[")) {
 
-      std::auto_ptr<ExpressionNode> a;
+      std::unique_ptr<ExpressionNode> a;
       eval_top (ex, a);
       n.reset (new IndexExpressionNode (ex1, n.release (), a.release ()));
 
@@ -3615,7 +3615,7 @@ scan_angle_bracket (tl::Extractor &ex, const char *term, std::string &s)
 }
 
 void
-Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n, int am)
+Eval::eval_atomic (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> &n, int am)
 {
   double g = 0.0;
   std::string t;
@@ -3636,7 +3636,7 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
 
       do {
 
-        std::auto_ptr<ExpressionNode> a;
+        std::unique_ptr<ExpressionNode> a;
         eval_top (ex, a);
         n->add_child (a.release ());
 
@@ -3730,12 +3730,12 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
       do {
 
         ExpressionParserContext ex2 = ex;
-        std::auto_ptr<ExpressionNode> k;
+        std::unique_ptr<ExpressionNode> k;
         eval_top (ex, k);
         n->add_child (k.release ());
 
         if (ex.test ("=>")) {
-          std::auto_ptr<ExpressionNode> v;
+          std::unique_ptr<ExpressionNode> v;
           eval_top (ex, v);
           n->add_child (v.release ());
         } else {
@@ -3891,7 +3891,7 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
 
           do {
 
-            std::auto_ptr<ExpressionNode> v;
+            std::unique_ptr<ExpressionNode> v;
             eval_top (ex, v);
             n->add_child (v.release ());
 
@@ -4021,7 +4021,7 @@ Eval::parse_expr (tl::Extractor &ex, bool top)
   tl::Extractor ex0 = ex;
   ExpressionParserContext context (&expr, ex);
 
-  std::auto_ptr<ExpressionNode> n;
+  std::unique_ptr<ExpressionNode> n;
   if (top) {
     eval.eval_top (context, n);
   } else {

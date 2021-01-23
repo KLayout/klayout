@@ -61,7 +61,7 @@ AdaptorBase::~AdaptorBase ()
 
 void AdaptorBase::tie_copies (AdaptorBase *target, tl::Heap &heap) 
 {
-  std::auto_ptr<AdaptorBase> t (target);
+  std::unique_ptr<AdaptorBase> t (target);
   copy_to (target, heap);
 
   //  This object (which will be destroyed before this is responsible for copying back 

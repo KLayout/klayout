@@ -981,7 +981,7 @@ BEGIN_PROTECTED
     return;
   }
 
-  std::auto_ptr<rdb::Database> rdb (new rdb::Database ());
+  std::unique_ptr<rdb::Database> rdb (new rdb::Database ());
 
   rdb->set_description (tl::to_string (QObject::tr ("Query results: ")) + m_last_query);
   rdb->set_name ("query_results");
@@ -1040,7 +1040,7 @@ BEGIN_PROTECTED
   query_to_model (model, lq, iq, std::numeric_limits<size_t>::max (), true);
   model.end_changes ();
 
-  std::auto_ptr <lay::LayoutHandle> handle (new lay::LayoutHandle (new db::Layout (), std::string ()));
+  std::unique_ptr <lay::LayoutHandle> handle (new lay::LayoutHandle (new db::Layout (), std::string ()));
   handle->rename ("query_results");
   model.export_layout (handle->layout ());
   mp_view->add_layout (handle.release (), true);

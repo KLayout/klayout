@@ -302,7 +302,7 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
 {
   const db::DeepLayer &texts = deep_layer ();
 
-  std::auto_ptr<VariantsCollectorBase> vars;
+  std::unique_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
@@ -318,7 +318,7 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
   db::Layout &layout = const_cast<db::Layout &> (texts.layout ());
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
-  std::auto_ptr<db::DeepTexts> res (new db::DeepTexts (texts.derived ()));
+  std::unique_ptr<db::DeepTexts> res (new db::DeepTexts (texts.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const db::Shapes &s = c->shapes (texts.layer ());
@@ -610,7 +610,7 @@ public:
 TextsDelegate *
 DeepTexts::selected_interacting_generic (const Region &other, bool inverse) const
 {
-  std::auto_ptr<db::DeepRegion> dr_holder;
+  std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
     //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
@@ -635,7 +635,7 @@ DeepTexts::selected_interacting_generic (const Region &other, bool inverse) cons
 
 RegionDelegate *DeepTexts::pull_generic (const Region &other) const
 {
-  std::auto_ptr<db::DeepRegion> dr_holder;
+  std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
     //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation

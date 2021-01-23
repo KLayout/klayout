@@ -643,11 +643,11 @@ LEFImporter::read_viadef (Layout &layout)
   test (";");
 
   if (test ("VIARULE")) {
-    std::auto_ptr<RuleBasedViaGenerator> vg (new RuleBasedViaGenerator ());
+    std::unique_ptr<RuleBasedViaGenerator> vg (new RuleBasedViaGenerator ());
     read_viadef_by_rule (vg.get (), via_desc, n, layout.dbu ());
     reader_state ()->register_via_cell (n, vg.release ());
   } else {
-    std::auto_ptr<GeometryBasedLayoutGenerator> vg (new GeometryBasedLayoutGenerator ());
+    std::unique_ptr<GeometryBasedLayoutGenerator> vg (new GeometryBasedLayoutGenerator ());
     read_viadef_by_geometry (vg.get (), via_desc, n, layout.dbu ());
     reader_state ()->register_via_cell (n, vg.release ());
   }

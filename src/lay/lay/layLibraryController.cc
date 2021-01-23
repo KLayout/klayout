@@ -187,7 +187,7 @@ LibraryController::sync_files ()
 
           if (needs_load) {
 
-            std::auto_ptr<db::Library> lib (new db::Library ());
+            std::unique_ptr<db::Library> lib (new db::Library ());
             lib->set_description (filename);
             if (! p->second.empty ()) {
               lib->set_technology (p->second);

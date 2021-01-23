@@ -275,11 +275,11 @@ JobBase::start ()
 
     //  synchronous case: create a temporary worker and 
     //  perform the tasks in the order they were delivered
-    std::auto_ptr <Worker> sync_worker (create_worker ());
+    std::unique_ptr <Worker> sync_worker (create_worker ());
     setup_worker (sync_worker.get ());
 
     while (! m_task_list.is_empty ()) {
-      std::auto_ptr<Task> task (m_task_list.fetch ());
+      std::unique_ptr<Task> task (m_task_list.fetch ());
       try {
         sync_worker->perform_task (task.get ());
       } catch (TaskTerminatedException) {
@@ -586,7 +586,7 @@ Worker::run ()
   while (true)
   {
     try {
-      std::auto_ptr<Task> task (mp_job->get_task (m_worker_index));
+      std::unique_ptr<Task> task (mp_job->get_task (m_worker_index));
       perform_task (task.get ());
     } catch (TaskTerminatedException) {
       //  .. try again

@@ -1379,7 +1379,7 @@ private:
   NameFilter m_pattern;
   const db::Cell *mp_parent;
   db::Layout::top_down_const_iterator m_cell, m_cell_end;
-  std::auto_ptr<db::CellCounter> m_cell_counter;
+  std::unique_ptr<db::CellCounter> m_cell_counter;
   bool m_reading;
   db::cell_index_type m_cell_index;
 };
@@ -2222,7 +2222,7 @@ parse_cell_name_filter_element (tl::Extractor &ex, LayoutQuery *q, ChildCellFilt
 
   } else if (ex.test ("(")) {
 
-    std::auto_ptr<FilterBracket> b (new FilterBracket (q));
+    std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     do {
       parse_cell_name_filter_seq (ex, q, b.get (), instance_mode, reading);
     } while (ex.test (",") || ex.test ("or"));
@@ -2276,7 +2276,7 @@ parse_cell_name_filter_element (tl::Extractor &ex, LayoutQuery *q, ChildCellFilt
       ++ex;
     }
 
-    std::auto_ptr<FilterBracket> b (new ChildCellFilter (q, NameFilterArgument ("*"), instance_mode, reading));
+    std::unique_ptr<FilterBracket> b (new ChildCellFilter (q, NameFilterArgument ("*"), instance_mode, reading));
     b->set_loopmin (0);
     b->set_loopmax (std::numeric_limits<unsigned int>::max ());
     return b.release ();
@@ -2360,7 +2360,7 @@ parse_cell_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bo
 
   } else {
 
-    std::auto_ptr<FilterBracket> b (new FilterBracket (q));
+    std::unique_ptr<FilterBracket> b (new FilterBracket (q));
 
     if (ex.test ("instances")) {
       (ex.test ("of") || ex.test ("from")) && (ex.test ("cells") || ex.test ("cell"));
@@ -2437,7 +2437,7 @@ parse_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool re
 
     ex.test ("of") || ex.test ("from");
 
-    std::auto_ptr<FilterBracket> b (new FilterBracket (q));
+    std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     parse_cell_filter (ex, q, b.get (), false, reading);
 
     FilterBase *f = 0, *fl = 0;
@@ -2482,7 +2482,7 @@ parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool
 
     ex.expect ("from");
 
-    std::auto_ptr<FilterBracket> b (new FilterBracket (q));
+    std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     parse_filter (ex, q, b.get (), true);
 
     bool unique = false;
@@ -2506,7 +2506,7 @@ parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool
 
   } else if (! reading && ex.test ("with")) {
 
-    std::auto_ptr<FilterBracket> b (new FilterBracket (q));
+    std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     parse_filter (ex, q, b.get (), false);
 
     ex.expect ("do");
@@ -2527,7 +2527,7 @@ parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool
 
   } else if (! reading && ex.test ("delete")) {
 
-    std::auto_ptr<FilterBracket> b (new FilterBracket (q));
+    std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     parse_filter (ex, q, b.get (), false);
 
     bool transparent = ex.test ("pass");
@@ -2550,7 +2550,7 @@ parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool
 LayoutQuery::LayoutQuery (const std::string &query)
   : mp_root (0)
 {
-  std::auto_ptr<FilterBracket> r (new FilterBracket (this));
+  std::unique_ptr<FilterBracket> r (new FilterBracket (this));
 
   tl::Extractor ex (query.c_str ());
   parse_statement (ex, this, r.get (), false);

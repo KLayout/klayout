@@ -2304,7 +2304,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
 
   //  NOTE: this is a receiver for both the child-to-child and
   //  local to child interactions.
-  std::auto_ptr<hc_receiver<T> > rec (new hc_receiver<T> (layout, cell, local, *this, cbc, conn, breakout_cells, &instance_interaction_cache));
+  std::unique_ptr<hc_receiver<T> > rec (new hc_receiver<T> (layout, cell, local, *this, cbc, conn, breakout_cells, &instance_interaction_cache));
   cell_inst_clusters_box_converter<T> cibc (cbc);
 
   //  The box scanner needs pointers so we have to first store the instances

@@ -119,7 +119,7 @@ FlatEdgePairs::filter_in_place (const EdgePairFilterBase &filter)
 
 EdgePairsDelegate *FlatEdgePairs::add (const EdgePairs &other) const
 {
-  std::auto_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs (*this));
+  std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs (*this));
   new_edge_pairs->invalidate_cache ();
 
   FlatEdgePairs *other_flat = dynamic_cast<FlatEdgePairs *> (other.delegate ());

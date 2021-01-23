@@ -247,7 +247,7 @@ MoveService::begin_move (db::Transaction *transaction, bool selected_after_move)
     return false;
   }
 
-  std::auto_ptr<db::Transaction> trans_holder (transaction);
+  std::unique_ptr<db::Transaction> trans_holder (transaction);
 
   bool drag_transient = ! selected_after_move;
   if (! mp_editables->has_selection ()) {
@@ -286,7 +286,7 @@ MoveService::begin_move (db::Transaction *transaction, bool selected_after_move)
 bool 
 MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction)
 {
-  std::auto_ptr<db::Transaction> trans_holder (transaction);
+  std::unique_ptr<db::Transaction> trans_holder (transaction);
 
   if (! m_dragging) {
 

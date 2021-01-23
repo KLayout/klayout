@@ -116,7 +116,7 @@ AsIfFlatEdges::selected_interacting_generic (const Region &other, bool inverse) 
     scanner.insert2 (p.operator-> (), 1);
   }
 
-  std::auto_ptr<FlatEdges> output (new FlatEdges (true));
+  std::unique_ptr<FlatEdges> output (new FlatEdges (true));
 
   if (! inverse) {
 
@@ -157,7 +157,7 @@ AsIfFlatEdges::selected_interacting_generic (const Edges &edges, bool inverse) c
     scanner.insert (ee.operator-> (), 1);
   }
 
-  std::auto_ptr<FlatEdges> output (new FlatEdges (true));
+  std::unique_ptr<FlatEdges> output (new FlatEdges (true));
 
   if (! inverse) {
 
@@ -198,7 +198,7 @@ AsIfFlatEdges::pull_generic (const Edges &edges) const
     scanner.insert (ee.operator-> (), 0);
   }
 
-  std::auto_ptr<FlatEdges> output (new FlatEdges (true));
+  std::unique_ptr<FlatEdges> output (new FlatEdges (true));
   edge_interaction_filter<FlatEdges> filter (*output);
   scanner.process (filter, 1, db::box_convert<db::Edge> ());
 
@@ -227,7 +227,7 @@ AsIfFlatEdges::pull_generic (const Region &other) const
     scanner.insert2 (p.operator-> (), 1);
   }
 
-  std::auto_ptr<FlatRegion> output (new FlatRegion (true));
+  std::unique_ptr<FlatRegion> output (new FlatRegion (true));
 
   edge_to_region_interaction_filter<FlatRegion> filter (*output);
   scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
@@ -300,7 +300,7 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
 {
   if (join) {
 
-    std::auto_ptr<FlatRegion> output (new FlatRegion ());
+    std::unique_ptr<FlatRegion> output (new FlatRegion ());
     db::ShapeGenerator sg (output->raw_polygons (), false);
     JoinEdgesClusterCollector cluster_collector (&sg, ext_b, ext_e, ext_o, ext_i);
 
@@ -321,7 +321,7 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
 
   } else {
 
-    std::auto_ptr<FlatRegion> output (new FlatRegion ());
+    std::unique_ptr<FlatRegion> output (new FlatRegion ());
     for (EdgesIterator e (begin_merged ()); ! e.at_end (); ++e) {
       output->insert (extended_edge (*e, ext_b, ext_e, ext_o, ext_i));
     }
@@ -339,7 +339,7 @@ AsIfFlatEdges::in (const Edges &other, bool invert) const
     op.insert (*o);
   }
 
-  std::auto_ptr<FlatEdges> new_region (new FlatEdges (false));
+  std::unique_ptr<FlatEdges> new_region (new FlatEdges (false));
 
   for (EdgesIterator o (begin_merged ()); ! o.at_end (); ++o) {
     if ((op.find (*o) == op.end ()) == invert) {
@@ -434,7 +434,7 @@ void AsIfFlatEdges::invalidate_bbox ()
 EdgesDelegate *
 AsIfFlatEdges::processed (const EdgeProcessorBase &filter) const
 {
-  std::auto_ptr<FlatEdges> edges (new FlatEdges ());
+  std::unique_ptr<FlatEdges> edges (new FlatEdges ());
 
   if (filter.result_must_not_be_merged ()) {
     edges->set_merged_semantics (false);
@@ -456,7 +456,7 @@ AsIfFlatEdges::processed (const EdgeProcessorBase &filter) const
 EdgePairsDelegate *
 AsIfFlatEdges::processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &filter) const
 {
-  std::auto_ptr<FlatEdgePairs> edge_pairs (new FlatEdgePairs ());
+  std::unique_ptr<FlatEdgePairs> edge_pairs (new FlatEdgePairs ());
 
   if (filter.result_must_not_be_merged ()) {
     edge_pairs->set_merged_semantics (false);
@@ -478,7 +478,7 @@ AsIfFlatEdges::processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &filte
 RegionDelegate *
 AsIfFlatEdges::processed_to_polygons (const EdgeToPolygonProcessorBase &filter) const
 {
-  std::auto_ptr<FlatRegion> region (new FlatRegion ());
+  std::unique_ptr<FlatRegion> region (new FlatRegion ());
 
   if (filter.result_must_not_be_merged ()) {
     region->set_merged_semantics (false);
@@ -500,7 +500,7 @@ AsIfFlatEdges::processed_to_polygons (const EdgeToPolygonProcessorBase &filter) 
 EdgesDelegate *
 AsIfFlatEdges::filtered (const EdgeFilterBase &filter) const
 {
-  std::auto_ptr<FlatEdges> new_region (new FlatEdges ());
+  std::unique_ptr<FlatEdges> new_region (new FlatEdges ());
 
   for (EdgesIterator p (begin_merged ()); ! p.at_end (); ++p) {
     if (filter.selected (*p)) {
@@ -514,7 +514,7 @@ AsIfFlatEdges::filtered (const EdgeFilterBase &filter) const
 EdgePairsDelegate *
 AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, const db::EdgesCheckOptions &options) const
 {
-  std::auto_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
+  std::unique_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
 
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (count () + (other ? other->count () : 0));
@@ -554,7 +554,7 @@ AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Co
 EdgesDelegate * 
 AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
 {
-  std::auto_ptr<FlatEdges> output (new FlatEdges (true));
+  std::unique_ptr<FlatEdges> output (new FlatEdges (true));
   EdgeBooleanClusterCollectorToShapes cluster_collector (&output->raw_edges (), op);
 
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
@@ -610,7 +610,7 @@ AsIfFlatEdges::edge_region_op (const Region &other, bool outside, bool include_b
     ep.insert (*e, 1);
   }
 
-  std::auto_ptr<FlatEdges> output (new FlatEdges (false));
+  std::unique_ptr<FlatEdges> output (new FlatEdges (false));
   db::EdgeShapeGenerator cc (output->raw_edges (), true /*clear*/);
   db::EdgePolygonOp op (outside, include_borders);
   ep.process (cc, op);
@@ -624,7 +624,7 @@ AsIfFlatEdges::add (const Edges &other) const
   FlatEdges *other_flat = dynamic_cast<FlatEdges *> (other.delegate ());
   if (other_flat) {
 
-    std::auto_ptr<FlatEdges> new_edges (new FlatEdges (*other_flat));
+    std::unique_ptr<FlatEdges> new_edges (new FlatEdges (*other_flat));
     new_edges->set_is_merged (false);
     new_edges->invalidate_cache ();
 
@@ -640,7 +640,7 @@ AsIfFlatEdges::add (const Edges &other) const
 
   } else {
 
-    std::auto_ptr<FlatEdges> new_edges (new FlatEdges (false /*not merged*/));
+    std::unique_ptr<FlatEdges> new_edges (new FlatEdges (false /*not merged*/));
 
     size_t n = count () + other.count ();
 

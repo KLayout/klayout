@@ -1265,7 +1265,7 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
     return;
   }
 
-  std::auto_ptr<lay::Bitmap> opt_bitmap;
+  std::unique_ptr<lay::Bitmap> opt_bitmap;
   lay::Bitmap *vertex_bitmap = dynamic_cast<lay::Bitmap *> (vertex);
   if (m_text_lazy_rendering && vertex_bitmap) {
     opt_bitmap.reset (new lay::Bitmap (vertex_bitmap->width (), vertex_bitmap->height (), vertex_bitmap->resolution ()));

@@ -274,7 +274,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 static const char *allowed_name_chars = "_.:,!+$/&\\#[]|<>";
 
 NetlistSpiceReader::NetlistSpiceReader (NetlistSpiceReaderDelegate *delegate)
-  : mp_netlist (0), mp_stream (0), mp_delegate (delegate)
+  : mp_netlist (0), mp_stream (), mp_delegate (delegate)
 {
   static NetlistSpiceReaderDelegate std_delegate;
   if (! delegate) {
@@ -978,7 +978,7 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex, const std::string &nc)
   }
   m_circuits_read.insert (cc);
 
-  std::auto_ptr<std::map<std::string, db::Net *> > n2n (mp_nets_by_name.release ());
+  std::unique_ptr<std::map<std::string, db::Net *> > n2n (mp_nets_by_name.release ());
   mp_nets_by_name.reset (0);
 
   std::swap (cc, mp_circuit);

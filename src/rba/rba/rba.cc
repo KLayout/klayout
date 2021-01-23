@@ -1093,7 +1093,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
         ret = Qnil;
 
-        std::auto_ptr<gsi::IterAdaptorAbstractBase> iter ((gsi::IterAdaptorAbstractBase *) retlist.read<void *> (heap));
+        std::unique_ptr<gsi::IterAdaptorAbstractBase> iter ((gsi::IterAdaptorAbstractBase *) retlist.read<void *> (heap));
         if (iter.get ()) {
 
           try {

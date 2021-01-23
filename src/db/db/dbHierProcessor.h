@@ -494,7 +494,7 @@ private:
   size_t m_max_vertex_count;
   double m_area_ratio;
   int m_base_verbosity;
-  mutable std::auto_ptr<tl::Job<local_processor_context_computation_worker<TS, TI, TR> > > mp_cc_job;
+  mutable std::unique_ptr<tl::Job<local_processor_context_computation_worker<TS, TI, TR> > > mp_cc_job;
   mutable size_t m_progress;
   mutable tl::Progress *mp_progress;
 

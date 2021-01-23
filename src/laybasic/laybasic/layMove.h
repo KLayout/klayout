@@ -71,7 +71,7 @@ private:
   double m_global_grid;
   db::DPoint m_shift;
   db::DPoint m_mouse_pos;
-  std::auto_ptr<db::Transaction> mp_transaction;
+  std::unique_ptr<db::Transaction> mp_transaction;
 };
 
 }

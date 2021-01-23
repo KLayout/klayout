@@ -125,10 +125,10 @@ private:
   db::Netlist *mp_netlist;
   db::Circuit *mp_circuit;
   db::Circuit *mp_anonymous_top_circuit;
-  std::auto_ptr<tl::TextInputStream> mp_stream;
+  std::unique_ptr<tl::TextInputStream> mp_stream;
   tl::weak_ptr<NetlistSpiceReaderDelegate> mp_delegate;
   std::vector<std::pair<tl::InputStream *, tl::TextInputStream *> > m_streams;
-  std::auto_ptr<std::map<std::string, db::Net *> > mp_nets_by_name;
+  std::unique_ptr<std::map<std::string, db::Net *> > mp_nets_by_name;
   std::string m_stored_line;
   std::map<std::string, bool> m_captured;
   std::vector<std::string> m_global_nets;

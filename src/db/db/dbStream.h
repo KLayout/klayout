@@ -199,7 +199,7 @@ public:
 
   void operator () (HOST &options, tl::XMLReaderState &reader) const
   {
-    std::auto_ptr<OPT> opt (new OPT ());
+    std::unique_ptr<OPT> opt (new OPT ());
 
     tl::XMLObjTag<OPT> tag;
     *opt = *reader.back (tag);

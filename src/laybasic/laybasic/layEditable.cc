@@ -90,7 +90,7 @@ Editables::~Editables ()
 void 
 Editables::del (db::Transaction *transaction)
 {
-  std::auto_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (QObject::tr ("Delete"))));
+  std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (QObject::tr ("Delete"))));
 
   if (has_selection ()) {
 
@@ -168,7 +168,7 @@ Editables::selection_catch_bbox ()
 void
 Editables::transform (const db::DCplxTrans &tr, db::Transaction *transaction)
 {
-  std::auto_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (QObject::tr ("Transform"))));
+  std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (QObject::tr ("Transform"))));
 
   if (has_selection ()) {
 
@@ -594,7 +594,7 @@ Editables::move_transform (const db::DPoint &p, db::DFTrans t, lay::angle_constr
 void 
 Editables::end_move (const db::DPoint &p, lay::angle_constraint_type ac, db::Transaction *transaction)
 {
-  std::auto_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (QObject::tr ("Move"))));
+  std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (QObject::tr ("Move"))));
 
   if (m_any_move_operation) {
 

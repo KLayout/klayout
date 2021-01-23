@@ -826,7 +826,7 @@ TEST(2)
   EXPECT_EQ (AA::ac, 0);
 
   //  shallow copy for tl::Object based objects
-  std::auto_ptr<AA> aptr (new AA ());
+  std::unique_ptr<AA> aptr (new AA ());
 
   v = tl::Variant (aptr.get (), &aa_class_instance, false);
   EXPECT_EQ (AA::ac, 1);

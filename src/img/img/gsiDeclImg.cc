@@ -409,7 +409,7 @@ private:
 
 static ImageRef *img_from_s (const std::string &s)
 {
-  std::auto_ptr<ImageRef> img (new ImageRef ());
+  std::unique_ptr<ImageRef> img (new ImageRef ());
   img->from_string (s.c_str ());
   return img.release ();
 }
@@ -419,7 +419,7 @@ static ImageRef *load_image (const std::string &path)
   tl::InputFile file (path);
   tl::InputStream stream (file);
 
-  std::auto_ptr<img::Object> read;
+  std::unique_ptr<img::Object> read;
   read.reset (img::ImageStreamer::read (stream));
   //  need to create a copy for now ...
   return new ImageRef (*read);

@@ -1633,7 +1633,7 @@ GenericSyntaxHighlighter::highlightBlock(const QString &text)
   int end_index = 0, last_index= -1;
   int attribute_id = 0, def_attribute_id = 0;
 
-  std::auto_ptr<SyntaxHighlighterUserData> user_data (new SyntaxHighlighterUserData ());
+  std::unique_ptr<SyntaxHighlighterUserData> user_data (new SyntaxHighlighterUserData ());
 
   while (std::max (0, index) < text.length ()) {
 

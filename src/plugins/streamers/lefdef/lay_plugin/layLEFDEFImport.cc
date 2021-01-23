@@ -123,7 +123,7 @@ public:
         }
         config_root->config_end ();
 
-        std::auto_ptr<db::Layout> layout (new db::Layout ());
+        std::unique_ptr<db::Layout> layout (new db::Layout ());
 
         tl::InputStream stream (data.file);
 

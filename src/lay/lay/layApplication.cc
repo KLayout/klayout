@@ -1033,7 +1033,7 @@ ApplicationBase::run ()
 
     BEGIN_PROTECTED 
 
-      std::auto_ptr<lym::Macro> macro (new lym::Macro ());
+      std::unique_ptr<lym::Macro> macro (new lym::Macro ());
       macro->load_from (*m);
       macro->set_file_path (*m);
       if (macro->show_in_menu ()) {
@@ -1084,7 +1084,7 @@ ApplicationBase::run ()
         }
 
         if (mw->current_view () != 0) {
-          std::auto_ptr <rdb::Database> db (new rdb::Database ());
+          std::unique_ptr <rdb::Database> db (new rdb::Database ());
           db->load (f->second.first);
           int rdb_index = mw->current_view ()->add_rdb (db.release ());
           mw->current_view ()->open_rdb_browser (rdb_index, mw->current_view ()->active_cellview_index ());

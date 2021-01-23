@@ -195,7 +195,6 @@ D25ViewWidget::D25ViewWidget (QWidget *parent)
   format.setDepthBufferSize (24);
   format.setSamples (4); //  more -> widget extends beyond boundary!
   format.setStencilBufferSize (8);
-  format.setProfile (QSurfaceFormat::CoreProfile);
   setFormat (format);
 
   m_zmin = m_zmax = 0.0;
@@ -736,27 +735,21 @@ D25ViewWidget::do_initialize_gl ()
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   static const char *shapes_vertex_shader_source =
-      "#version 320 es\n"
-      "#undef lowp\n"
-      "#undef highp\n"
-      "#undef mediump\n"
-      "layout (location = 0) in vec4 posAttr;\n"
+      "#version 150\n"
+      "\n"
+      "in vec4 posAttr;\n"
       "\n"
       "void main() {\n"
       "   gl_Position = posAttr;\n"
       "}\n";
 
   static const char *shapes_geometry_shader_source =
-      "#version 320 es\n"
-      "#undef lowp\n"
-      "#undef highp\n"
-      "#undef mediump\n"
+      "#version 150\n"
       "\n"
       "uniform vec4 color;\n"
       "uniform vec4 ambient;\n"
       "uniform vec3 illum;\n"
       "out lowp vec4 vertexColor;\n"
-      //"in vec3 gl_in;\n"
       "uniform mat4 matrix;\n"
       "layout (triangles) in;\n"
       "layout (triangle_strip, max_vertices = 3) out;\n"
@@ -779,10 +772,8 @@ D25ViewWidget::do_initialize_gl ()
       "}\n";
 
   static const char *shapes_fragment_shader_source =
-      "#version 320 es\n"
-      "#undef lowp\n"
-      "#undef highp\n"
-      "#undef mediump\n"
+      "#version 150\n"
+      "\n"
       "in lowp vec4 vertexColor;\n"
       "out lowp vec4 fragColor;\n"
       "uniform highp float mist_factor;\n"
@@ -823,11 +814,9 @@ D25ViewWidget::do_initialize_gl ()
   //  grid plane shader source
 
   static const char *gridplan_vertex_shader_source =
-      "#version 320 es\n"
-      "#undef lowp\n"
-      "#undef highp\n"
-      "#undef mediump\n"
-      "layout (location = 0) in vec4 posAttr;\n"
+      "#version 150\n"
+      "\n"
+      "in vec4 posAttr;\n"
       "uniform mat4 matrix;\n"
       "\n"
       "void main() {\n"
@@ -835,10 +824,8 @@ D25ViewWidget::do_initialize_gl ()
       "}\n";
 
   static const char *gridplan_fragment_shader_source =
-      "#version 320 es\n"
-      "#undef lowp\n"
-      "#undef highp\n"
-      "#undef mediump\n"
+      "#version 150\n"
+      "\n"
       "uniform lowp vec4 color;\n"
       "out lowp vec4 fragColor;\n"
       "void main() {\n"
@@ -871,11 +858,11 @@ D25ViewWidget::paintGL ()
   glClearColor (float (c.red ()) / 255.0f, float (c.green ()) / 255.0f, float (c.blue ()) / 255.0f, 1.0);
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  const int positions = 0;
-
   if (! m_shapes_program || ! m_gridplane_program) {
     return;
   }
+
+  int positions = m_shapes_program->attributeLocation ("posAttr");
 
   QMatrix4x4 scene_trans, scene_trans_wo_y;
 
@@ -913,7 +900,10 @@ D25ViewWidget::paintGL ()
 
   m_shapes_program->release ();
 
+
   //  decoration
+
+  positions = m_gridplane_program->attributeLocation ("posAttr");
 
   //  a vertex buffer for the decoration
   lay::mem_chunks<float, 1024 * 18> vertexes;

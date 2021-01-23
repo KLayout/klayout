@@ -649,4 +649,23 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
   "of the program."
 );
 
+//  extend lay::LayoutView with a "close" method
+
+static void lv_close (lay::LayoutView *view)
+{
+  int index = lay::MainWindow::instance ()->index_of (view);
+  if (index >= 0) {
+    lay::MainWindow::instance ()->close_view (index);
+  }
+}
+
+static
+gsi::ClassExt<lay::LayoutView> ext_layout_view (
+  gsi::method_ext ("close", &lv_close,
+    "@brief Closes the view\n"
+    "\nThis method has been added in version 0.27.\n"
+  ),
+  ""
+);
+
 }

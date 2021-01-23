@@ -50,7 +50,7 @@ void local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape
 
   } else {
 
-    std::auto_ptr<tl::RelativeProgress> progress;
+    std::unique_ptr<tl::RelativeProgress> progress;
     if (report_progress) {
       progress.reset (new tl::RelativeProgress (progress_desc, interactions.size ()));
     }

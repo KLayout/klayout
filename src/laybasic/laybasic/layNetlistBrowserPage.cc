@@ -1381,7 +1381,7 @@ NetlistBrowserPage::export_nets (const std::vector<const db::Net *> *nets)
 
   const db::Cell &source_top = source_layout.cell (*source_layout.begin_top_down ());
 
-  std::auto_ptr<lay::NetExportDialog> dialog (new lay::NetExportDialog (this));
+  std::unique_ptr<lay::NetExportDialog> dialog (new lay::NetExportDialog (this));
   if (dialog->exec_dialog (mp_plugin_root)) {
 
     //  NOTE: mp_view and database might get reset to 0 in create_layout

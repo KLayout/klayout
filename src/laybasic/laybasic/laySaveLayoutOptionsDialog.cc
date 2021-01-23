@@ -220,7 +220,7 @@ SaveLayoutOptionsDialog::update ()
       db::FormatSpecificWriterOptions *specific_options = m_opt_array [m_technology_index].get_options (page->second);
       if (! specific_options) {
         //  Create a container for the options unless there is one already
-        std::auto_ptr<db::FormatSpecificWriterOptions> new_options (StreamWriterPluginDeclaration::plugin_for_format (page->second)->create_specific_options ());
+        std::unique_ptr<db::FormatSpecificWriterOptions> new_options (StreamWriterPluginDeclaration::plugin_for_format (page->second)->create_specific_options ());
         page->first->setup (new_options.get (), m_tech_array [m_technology_index]);
       } else {
         page->first->setup (specific_options, m_tech_array [m_technology_index]);
@@ -385,7 +385,7 @@ SaveLayoutAsOptionsDialog::ok_button_pressed ()
     for (std::vector< std::pair<StreamWriterOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
       if (page->second == fmt_name) {
         if (page->first) {
-          std::auto_ptr<db::FormatSpecificWriterOptions> options (decl->create_specific_options ());
+          std::unique_ptr<db::FormatSpecificWriterOptions> options (decl->create_specific_options ());
           if (options.get ()) {
             page->first->commit (options.get (), mp_tech, tl::OutputStream::output_mode_from_filename (m_filename, index_to_om (compression->currentIndex ())) != tl::OutputStream::OM_Plain);
           }
@@ -442,7 +442,7 @@ SaveLayoutAsOptionsDialog::get_options (lay::LayoutView *view, unsigned int cv_i
     const StreamWriterPluginDeclaration *decl = plugin_for_format (page->second);
     if (decl) {
 
-      std::auto_ptr<db::FormatSpecificWriterOptions> specific_options;
+      std::unique_ptr<db::FormatSpecificWriterOptions> specific_options;
       if (options.get_options (page->second)) {
         specific_options.reset (options.get_options (page->second)->clone ());
       } else {
@@ -522,7 +522,7 @@ SaveLayoutAsOptionsDialog::get_options (lay::LayoutView *view, unsigned int cv_i
       for (std::vector< std::pair<StreamWriterOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
         if (page->second == options.format ()) {
 
-          std::auto_ptr<db::FormatSpecificWriterOptions> specific_options;
+          std::unique_ptr<db::FormatSpecificWriterOptions> specific_options;
           specific_options.reset (decl->create_specific_options ());
 
           if (specific_options.get ()) {

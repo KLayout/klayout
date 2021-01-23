@@ -588,7 +588,7 @@ TEST(7_DetachFromOriginalLayout)
   //  using OASIS means we create a lot of references to array
   //  and shape repo - we check here whether these references get
   //  translated or resolved in the hierarchy builder.
-  std::auto_ptr<db::Layout> ly (new db::Layout (false));
+  std::unique_ptr<db::Layout> ly (new db::Layout (false));
   {
     std::string fn (tl::testsrc ());
     fn += "/testdata/algo/hierarchy_builder_l5.oas.gz";

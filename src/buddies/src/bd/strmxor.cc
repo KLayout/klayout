@@ -308,7 +308,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
     l2l_map.insert (std::make_pair (*(*l).second, std::make_pair (-1, -1))).first->second.second = (*l).first;
   }
 
-  std::auto_ptr<db::Layout> output_layout;
+  std::unique_ptr<db::Layout> output_layout;
   db::cell_index_type output_top = 0;
 
   if (! output.empty ()) {

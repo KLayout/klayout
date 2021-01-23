@@ -999,7 +999,7 @@ private:
   std::vector <bool> m_tag_ids;
   Database *mp_database;
 #if defined(HAVE_QT)
-  std::auto_ptr<QImage> mp_image;
+  std::unique_ptr<QImage> mp_image;
 #endif
 
   Item ();

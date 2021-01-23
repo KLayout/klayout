@@ -28,6 +28,8 @@
 #include "tlStream.h"
 #include "tlEvents.h"
 
+class QNetworkReply;
+
 namespace tl
 {
 
@@ -54,9 +56,11 @@ class TL_PUBLIC HttpErrorException
   : public tl::Exception
 {
 public:
-  HttpErrorException (const std::string &f, int en, const std::string &url)
-    : tl::Exception (tl::to_string (tr ("Error %d: %s, fetching %s")), en, f, url)
+  HttpErrorException (const std::string &f, int ec, QNetworkReply *reply)
+    : tl::Exception (format_error (f, ec, reply))
   { }
+
+  static std::string format_error (const std::string &em, int ec, QNetworkReply *reply);
 };
 
 class InputHttpStreamPrivateData;

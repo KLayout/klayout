@@ -507,7 +507,7 @@ Region::texts_as_dots (const std::string &pat, bool pattern) const
     si.first.shape_flags (si.first.shape_flags () & db::ShapeIterator::Texts);
   }
 
-  std::auto_ptr<db::FlatEdges> res (new db::FlatEdges ());
+  std::unique_ptr<db::FlatEdges> res (new db::FlatEdges ());
   res->set_merged_semantics (false);
 
   fill_texts (si.first, pat, pattern, dot_delivery<db::FlatEdges> (), res.get (), si.second, dr);
@@ -529,7 +529,7 @@ Region::texts_as_dots (const std::string &pat, bool pattern, db::DeepShapeStore 
   if (! si.first.layout ()) {
 
     //  flat fallback if the source isn't a deep or original layer
-    std::auto_ptr<db::FlatEdges> res (new db::FlatEdges ());
+    std::unique_ptr<db::FlatEdges> res (new db::FlatEdges ());
     res->set_merged_semantics (false);
 
     fill_texts (si.first, pat, pattern, dot_delivery<db::FlatEdges> (), res.get (), si.second, dr);
@@ -560,7 +560,7 @@ Region::texts_as_boxes (const std::string &pat, bool pattern, db::Coord enl) con
     si.first.shape_flags (si.first.shape_flags () & db::ShapeIterator::Texts);
   }
 
-  std::auto_ptr<db::FlatRegion> res (new db::FlatRegion ());
+  std::unique_ptr<db::FlatRegion> res (new db::FlatRegion ());
   res->set_merged_semantics (false);
 
   fill_texts (si.first, pat, pattern, box_delivery<db::FlatRegion> (enl), res.get (), si.second, dr);
@@ -582,7 +582,7 @@ Region::texts_as_boxes (const std::string &pat, bool pattern, db::Coord enl, db:
   if (! si.first.layout ()) {
 
     //  flat fallback if the source isn't a deep or original layer
-    std::auto_ptr<db::FlatRegion> res (new db::FlatRegion ());
+    std::unique_ptr<db::FlatRegion> res (new db::FlatRegion ());
     res->set_merged_semantics (false);
 
     fill_texts (si.first, pat, pattern, box_delivery<db::FlatRegion> (enl), res.get (), si.second, dr);

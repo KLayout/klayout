@@ -443,7 +443,7 @@ DragDropDataBase *get_drag_drop_data (const QMimeData *data)
   QByteArray ba = data->data (QString::fromUtf8 (drag_drop_mime_type ()));
 
   //  TODO: provide some global mechanism to register drag & drop classes
-  std::auto_ptr<DragDropDataBase> cd (new CellDragDropData ());
+  std::unique_ptr<DragDropDataBase> cd (new CellDragDropData ());
   if (cd->deserialize (ba)) {
     return cd.release ();
   } 

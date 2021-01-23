@@ -30,6 +30,7 @@
 #include <QObject>
 #include <QBuffer>
 #include <QByteArray>
+#include <QTimer>
 #include <memory>
 
 class QNetworkAccessManager;
@@ -103,16 +104,18 @@ public:
 
 private slots:
   void finished (QNetworkReply *);
+  void resend ();
 
 private:
   std::string m_url;
   QNetworkReply *mp_reply;
-  std::auto_ptr<QNetworkReply> mp_active_reply;
+  std::unique_ptr<QNetworkReply> mp_active_reply;
   QByteArray m_request;
   QByteArray m_data;
   QBuffer *mp_buffer;
   std::map<std::string, std::string> m_headers;
   tl::Event m_ready;
+  QTimer *mp_resend_timer;
 
   void issue_request (const QUrl &url);
 };

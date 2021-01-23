@@ -331,7 +331,7 @@ public:
 private:
   const char *mp_text;
   std::string m_local_text;
-  std::auto_ptr<ExpressionNode> m_root;
+  std::unique_ptr<ExpressionNode> m_root;
   Eval *mp_eval;
 
   friend class Eval;
@@ -349,7 +349,7 @@ private:
   /**
    *  @brief Accessor to the root node
    */
-  std::auto_ptr<ExpressionNode> &root () 
+  std::unique_ptr<ExpressionNode> &root () 
   {
     return m_root;
   }
@@ -520,18 +520,18 @@ private:
   const ContextHandler *mp_ctx_handler;
   std::vector<std::string> m_match_substrings;
 
-  void eval_top (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
-  void eval_assign (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
-  void eval_if (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
-  void eval_boolean (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
-  void eval_conditional (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
-  void eval_shift (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
-  void eval_addsub (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
-  void eval_product (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
-  void eval_bitwise (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
-  void eval_unary (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
-  void eval_atomic (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v, int am);
-  void eval_suffix (ExpressionParserContext &context, std::auto_ptr<ExpressionNode> &v);
+  void eval_top (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
+  void eval_assign (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
+  void eval_if (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
+  void eval_boolean (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
+  void eval_conditional (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
+  void eval_shift (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
+  void eval_addsub (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
+  void eval_product (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
+  void eval_bitwise (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
+  void eval_unary (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
+  void eval_atomic (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v, int am);
+  void eval_suffix (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
   void resolve_name (const std::string &name, const EvalFunction *&function, const tl::Variant *&value, tl::Variant *&var);
   void resolve_var_name (const std::string &name, tl::Variant *&value);
 

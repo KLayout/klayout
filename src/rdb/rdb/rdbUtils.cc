@@ -241,7 +241,7 @@ scan_layer (rdb::Category *cat, rdb::Cell *cell, const db::CplxTrans &trans, con
     return;
   }
 
-  std::auto_ptr<db::RecursiveShapeReceiver> rec;
+  std::unique_ptr<db::RecursiveShapeReceiver> rec;
   if (flat) {
     rec.reset (new CreateItemsFlatReceiver (cat, trans, cell));
   } else {
@@ -259,7 +259,7 @@ void create_items_from_iterator (rdb::Database *db, rdb::id_type cell_id, rdb::i
   double dbu = iter.layout ()->dbu ();
 
   for (db::RecursiveShapeIterator i = iter; !i.at_end (); ++i) {
-    std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*i, db::CplxTrans (dbu) * i.trans ()));
+    std::unique_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*i, db::CplxTrans (dbu) * i.trans ()));
     if (value.get ()) {
       rdb::Item *item = db->create_item (cell_id, cat_id);
       item->values ().add (value.release ());
@@ -270,7 +270,7 @@ void create_items_from_iterator (rdb::Database *db, rdb::id_type cell_id, rdb::i
 void create_items_from_shapes (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Shapes &shapes)
 {
   for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::All); !s.at_end (); ++s) {
-    std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*s, trans));
+    std::unique_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*s, trans));
     if (value.get ()) {
       rdb::Item *item = db->create_item (cell_id, cat_id);
       item->values ().add (value.release ());
@@ -280,7 +280,7 @@ void create_items_from_shapes (rdb::Database *db, rdb::id_type cell_id, rdb::id_
 
 void create_item_from_shape (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Shape &shape)
 {
-  std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (shape, trans));
+  std::unique_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (shape, trans));
   if (value.get ()) {
     rdb::Item *item = db->create_item (cell_id, cat_id);
     item->values ().add (value.release ());

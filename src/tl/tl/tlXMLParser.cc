@@ -117,9 +117,9 @@ public:
   }
 
 private:
-  std::auto_ptr<tl::InputStream> mp_stream_holder;
+  std::unique_ptr<tl::InputStream> mp_stream_holder;
   tl::InputStream *mp_stream;
-  std::auto_ptr<tl::AbsoluteProgress> mp_progress;
+  std::unique_ptr<tl::AbsoluteProgress> mp_progress;
   bool m_has_error;
   std::string m_error;
 };
@@ -667,7 +667,7 @@ public:
 
 private:
   tl::InputStream *mp_stream;
-  std::auto_ptr<tl::InputStream> mp_stream_holder;
+  std::unique_ptr<tl::InputStream> mp_stream_holder;
   tl::AbsoluteProgress *mp_progress;
   bool m_has_error;
 };
@@ -696,7 +696,7 @@ public:
   }
 
 private:
-  std::auto_ptr<StreamIODevice> mp_io;
+  std::unique_ptr<StreamIODevice> mp_io;
 };
 
 // --------------------------------------------------------------------

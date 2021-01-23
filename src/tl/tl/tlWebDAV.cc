@@ -288,7 +288,7 @@ WebDAVObject::download (const std::string &url, const std::string &target)
       try {
 
         tl::OutputStream os (i->path);
-        std::auto_ptr<tl::InputStream> is (download_item (i->url));
+        std::unique_ptr<tl::InputStream> is (download_item (i->url));
         is->copy_to (os);
 
       } catch (tl::Exception &ex) {

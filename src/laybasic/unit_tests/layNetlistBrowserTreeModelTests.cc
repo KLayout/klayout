@@ -28,7 +28,7 @@ TEST (1)
   db::LayoutToNetlist l2n;
   l2n.load (tl::testsrc () + "/testdata/lay/l2n_browser.l2n");
 
-  std::auto_ptr<lay::NetlistBrowserTreeModel> model (new lay::NetlistBrowserTreeModel (0, &l2n));
+  std::unique_ptr<lay::NetlistBrowserTreeModel> model (new lay::NetlistBrowserTreeModel (0, &l2n));
 
   EXPECT_EQ (model->hasChildren (QModelIndex ()), true);
   //  two circuits
@@ -60,7 +60,7 @@ TEST (2)
   db::LayoutVsSchematic lvs;
   lvs.load (tl::testsrc () + "/testdata/lay/lvsdb_browser.lvsdb");
 
-  std::auto_ptr<lay::NetlistBrowserTreeModel> model (new lay::NetlistBrowserTreeModel (0, &lvs));
+  std::unique_ptr<lay::NetlistBrowserTreeModel> model (new lay::NetlistBrowserTreeModel (0, &lvs));
 
   EXPECT_EQ (model->hasChildren (QModelIndex ()), true);
   //  two top circuits

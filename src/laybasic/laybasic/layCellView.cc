@@ -281,7 +281,7 @@ LayoutHandle::update_save_options (db::SaveLayoutOptions &options)
       continue;
     }
 
-    std::auto_ptr<db::FormatSpecificWriterOptions> specific_options;
+    std::unique_ptr<db::FormatSpecificWriterOptions> specific_options;
     if (options.get_options (decl->format_name ())) {
       specific_options.reset (options.get_options (decl->format_name ())->clone ());
     } else {

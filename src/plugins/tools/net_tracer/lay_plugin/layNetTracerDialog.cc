@@ -573,7 +573,7 @@ NetTracerDialog::menu_activated (const std::string &symbol)
     const lay::CellView &cv = view ()->cellview (view ()->active_cellview_index ());
     if (cv.is_valid ()) {
       db::RecursiveShapeIterator si (cv->layout (), *cv.cell (), std::vector<unsigned int> ());
-      std::auto_ptr <db::LayoutToNetlist> l2ndb (new db::LayoutToNetlist (si));
+      std::unique_ptr <db::LayoutToNetlist> l2ndb (new db::LayoutToNetlist (si));
       trace_all_nets (l2ndb.get (), cv, flat);
       unsigned int l2ndb_index = view ()->add_l2ndb (l2ndb.release ());
       view ()->open_l2ndb_browser (l2ndb_index, view ()->index_of_cellview (&cv));

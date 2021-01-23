@@ -293,7 +293,7 @@ MacroController::drop_url (const std::string &path_or_url)
   }
 
   //  load and run macro
-  std::auto_ptr<lym::Macro> macro (new lym::Macro ());
+  std::unique_ptr<lym::Macro> macro (new lym::Macro ());
   macro->load_from (path);
   macro->set_file_path (path);
 

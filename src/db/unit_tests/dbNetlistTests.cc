@@ -390,7 +390,7 @@ TEST(4_CircuitDevices)
   dc2.add_parameter_definition (db::DeviceParameterDefinition ("U", "", 2.0));
   dc2.add_parameter_definition (db::DeviceParameterDefinition ("V", "", 1.0));
 
-  std::auto_ptr<db::Circuit> c (new db::Circuit ());
+  std::unique_ptr<db::Circuit> c (new db::Circuit ());
   c->set_name ("c");
 
   EXPECT_EQ (netlist2 (*c),
@@ -535,7 +535,7 @@ TEST(4_CircuitDevices)
 
 TEST(4_NetlistSubcircuits)
 {
-  std::auto_ptr<db::Netlist> nl (new db::Netlist ());
+  std::unique_ptr<db::Netlist> nl (new db::Netlist ());
 
   db::DeviceClass *dc = new db::DeviceClass ();
   dc->set_name ("dc2");
@@ -543,7 +543,7 @@ TEST(4_NetlistSubcircuits)
   dc->add_terminal_definition (db::DeviceTerminalDefinition ("B", ""));
   nl->add_device_class (dc);
 
-  std::auto_ptr<db::Netlist> nldup (new db::Netlist ());
+  std::unique_ptr<db::Netlist> nldup (new db::Netlist ());
   nldup->add_device_class (dc->clone ());
 
   db::DeviceAbstract *dm = new db::DeviceAbstract ();
@@ -1001,7 +1001,7 @@ TEST(10_NetPinRefBasics)
 
 TEST(11_NetlistCircuitRefs)
 {
-  std::auto_ptr<db::Netlist> nl (new db::Netlist ());
+  std::unique_ptr<db::Netlist> nl (new db::Netlist ());
 
   db::Circuit *c1 = new db::Circuit ();
   c1->set_name ("c1");
@@ -1036,7 +1036,7 @@ TEST(11_NetlistCircuitRefs)
 
 TEST(12_NetlistTopology)
 {
-  std::auto_ptr<db::Netlist> nl (new db::Netlist ());
+  std::unique_ptr<db::Netlist> nl (new db::Netlist ());
   EXPECT_EQ (nl->top_circuit_count (), size_t (0));
 
   db::Circuit *c1 = new db::Circuit ();
@@ -1053,7 +1053,7 @@ TEST(12_NetlistTopology)
   EXPECT_EQ (td2string (nl.get ()), "c2,c1");
   EXPECT_EQ (bu2string (nl.get ()), "c1,c2");
 
-  std::auto_ptr<db::NetlistLocker> locker (new db::NetlistLocker (nl.get ()));
+  std::unique_ptr<db::NetlistLocker> locker (new db::NetlistLocker (nl.get ()));
 
   db::Circuit *c3 = new db::Circuit ();
   c3->set_name ("c3");

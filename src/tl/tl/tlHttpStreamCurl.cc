@@ -336,7 +336,7 @@ public:
  *
  *  @code
  *    CurlNetworkManager mgr;
- *    std::auto_ptr<CurlConnection> conn (mgr.create_connection ());
+ *    std::unique_ptr<CurlConnection> conn (mgr.create_connection ());
  *    conn->set_url ("http://www.example.com");
  *    conn->send ();
  *    while (mgr.tick () > 0) {

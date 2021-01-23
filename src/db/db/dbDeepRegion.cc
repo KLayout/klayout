@@ -869,7 +869,7 @@ DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
   vars.collect (layout, polygons.initial_cell ());
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
-  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
+  std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
@@ -910,7 +910,7 @@ DeepRegion::angle_check (double min, double max, bool inverse) const
   const db::DeepLayer &polygons = merged_deep_layer ();
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
-  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
+  std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
@@ -956,7 +956,7 @@ DeepRegion::snapped (db::Coord gx, db::Coord gy)
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
   std::vector<db::Point> heap;
 
-  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
+  std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
@@ -987,7 +987,7 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
 {
   const db::DeepLayer &polygons = merged_deep_layer ();
 
-  std::auto_ptr<VariantsCollectorBase> vars;
+  std::unique_ptr<VariantsCollectorBase> vars;
 
   if (filter && filter->vars ()) {
 
@@ -1002,7 +1002,7 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
 
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
-  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (polygons.derived ()));
+  std::unique_ptr<db::DeepEdges> res (new db::DeepEdges (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     db::ICplxTrans tr;
@@ -1078,7 +1078,7 @@ DeepRegion::apply_filter (const PolygonFilterBase &filter) const
 {
   const db::DeepLayer &polygons = filter.requires_raw_input () ? deep_layer () : merged_deep_layer ();
 
-  std::auto_ptr<VariantsCollectorBase> vars;
+  std::unique_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
@@ -1094,7 +1094,7 @@ DeepRegion::apply_filter (const PolygonFilterBase &filter) const
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
-  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
+  std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const db::Shapes &s = c->shapes (polygons.layer ());
@@ -1174,7 +1174,7 @@ DeepRegion::merged () const
 
   db::Layout &layout = const_cast<db::Layout &> (m_merged_polygons.layout ());
 
-  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.derived ()));
+  std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (m_merged_polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
     c->shapes (res->deep_layer ().layer ()) = c->shapes (m_merged_polygons.layer ());
   }
@@ -1242,7 +1242,7 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
   //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
   const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
 
-  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
+  std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
@@ -1297,7 +1297,7 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
   //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
   const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
 
-  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
+  std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
@@ -1384,7 +1384,7 @@ Output *region_cop_impl (DeepRegion *region, db::CompoundRegionOperationNode &no
 
   }
 
-  std::auto_ptr<Output> res (new Output (polygons.derived ()));
+  std::unique_ptr<Output> res (new Output (polygons.derived ()));
   compound_local_operation<db::PolygonRef, db::PolygonRef, TR> op (&node);
   proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
 
@@ -1453,7 +1453,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
   check.set_min_projection (options.min_projection);
   check.set_max_projection (options.max_projection);
 
-  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
+  std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
 
   db::CheckLocalOperation op (check, different_polygons, other_deep != 0, other_is_merged, options);
 
@@ -1486,7 +1486,7 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, c
 
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
-  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
+  std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const db::Shapes &shapes = c->shapes (polygons.layer ());
@@ -1519,7 +1519,7 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
 
-  std::auto_ptr<db::DeepRegion> dr_holder;
+  std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
     //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
@@ -1560,7 +1560,7 @@ DeepRegion::selected_interacting_generic (const Edges &other, bool inverse, size
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
 
-  std::auto_ptr<db::DeepEdges> dr_holder;
+  std::unique_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
   if (! other_deep) {
     //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
@@ -1597,7 +1597,7 @@ DeepRegion::pull_generic (const Region &other, int mode, bool touching) const
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
 
-  std::auto_ptr<db::DeepRegion> dr_holder;
+  std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
     //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
@@ -1633,7 +1633,7 @@ DeepRegion::pull_generic (const Region &other, int mode, bool touching) const
 EdgesDelegate *
 DeepRegion::pull_generic (const Edges &other) const
 {
-  std::auto_ptr<db::DeepEdges> dr_holder;
+  std::unique_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
   if (! other_deep) {
     //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
@@ -1662,7 +1662,7 @@ DeepRegion::pull_generic (const Edges &other) const
 TextsDelegate *
 DeepRegion::pull_generic (const Texts &other) const
 {
-  std::auto_ptr<db::DeepTexts> dr_holder;
+  std::unique_ptr<db::DeepTexts> dr_holder;
   const db::DeepTexts *other_deep = dynamic_cast<const db::DeepTexts *> (other.delegate ());
   if (! other_deep) {
     //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
@@ -1694,7 +1694,7 @@ DeepRegion::selected_interacting_generic (const Texts &other, bool inverse, size
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
 
-  std::auto_ptr<db::DeepTexts> dr_holder;
+  std::unique_ptr<db::DeepTexts> dr_holder;
   const db::DeepTexts *other_deep = dynamic_cast<const db::DeepTexts *> (other.delegate ());
   if (! other_deep) {
     //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation

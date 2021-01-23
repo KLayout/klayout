@@ -297,7 +297,7 @@ void signal_handler (int signo, siginfo_t *si, void *)
             lay::Version::name () + " " +
             lay::Version::version () + " (" + lay::Version::subversion () + ")\n";
 
-  std::auto_ptr<CrashMessage> msg;
+  std::unique_ptr<CrashMessage> msg;
 
   bool has_gui = s_sh_has_gui && lay::ApplicationBase::instance () && lay::ApplicationBase::instance ()->has_gui ();
 

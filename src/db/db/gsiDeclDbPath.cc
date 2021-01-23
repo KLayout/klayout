@@ -53,7 +53,7 @@ struct path_defs
   static C *from_string (const char *s)
   {
     tl::Extractor ex (s);
-    std::auto_ptr<C> c (new C ());
+    std::unique_ptr<C> c (new C ());
     ex.read (*c.get ());
     return c.release ();
   }

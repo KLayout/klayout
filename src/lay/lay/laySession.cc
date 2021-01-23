@@ -237,7 +237,7 @@ Session::restore (lay::MainWindow &mw)
 
     for (unsigned int j = 0; j < vd.rdb_filenames.size (); ++j) {
 
-      std::auto_ptr<rdb::Database> rdb (new rdb::Database ());
+      std::unique_ptr<rdb::Database> rdb (new rdb::Database ());
 
       try {
         rdb->load (make_absolute (vd.rdb_filenames[j]));

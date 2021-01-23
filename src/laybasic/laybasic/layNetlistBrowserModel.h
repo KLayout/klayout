@@ -377,14 +377,14 @@ private:
   db::LayoutToNetlist *mp_l2ndb;
   db::LayoutVsSchematic *mp_lvsdb;
   NetColorizer *mp_colorizer;
-  std::auto_ptr<IndexedNetlistModel> mp_indexer;
+  std::unique_ptr<IndexedNetlistModel> mp_indexer;
   mutable std::map<lay::color_t, QIcon> m_net_icon_per_color;
   mutable std::map<lay::color_t, QIcon> m_connection_icon_per_color;
   int m_object_column;
   int m_status_column;
   int m_first_column;
   int m_second_column;
-  std::auto_ptr<NetlistModelItemData> mp_root;
+  std::unique_ptr<NetlistModelItemData> mp_root;
 
   RootItemData *root () const;
 };

@@ -423,8 +423,8 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
 static int
 main_cont (int &argc, char **argv)
 {
-  std::auto_ptr<rba::RubyInterpreter> ruby_interpreter;
-  std::auto_ptr<pya::PythonInterpreter> python_interpreter;
+  std::unique_ptr<rba::RubyInterpreter> ruby_interpreter;
+  std::unique_ptr<pya::PythonInterpreter> python_interpreter;
 
 #if defined(HAVE_QT)
 

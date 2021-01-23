@@ -498,7 +498,7 @@ private:
   {
     check_data ();
 
-    std::auto_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
+    std::unique_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
     mp_read += item_size<AdaptorBase *> ();
     tl_assert (p.get () != 0);
 
@@ -514,7 +514,7 @@ private:
 
     check_data ();
 
-    std::auto_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
+    std::unique_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
     mp_read += item_size<AdaptorBase *> ();
     tl_assert (p.get () != 0);
 
@@ -550,7 +550,7 @@ private:
 
     check_data ();
 
-    std::auto_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
+    std::unique_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
     mp_read += item_size<AdaptorBase *> ();
 
     x_type *x = 0;
@@ -1399,7 +1399,7 @@ public:
     gsi::SerialArgs rr (serial_size ());
     tl_assert (v->serial_size () == serial_size ());
 
-    std::auto_ptr<VectorAdaptorIterator> i (create_iterator ());
+    std::unique_ptr<VectorAdaptorIterator> i (create_iterator ());
     while (! i->at_end ()) {
       rr.reset ();
       i->get (rr, heap);
@@ -1672,7 +1672,7 @@ public:
     gsi::SerialArgs rr (serial_size ());
     tl_assert (v->serial_size () == serial_size ());
 
-    std::auto_ptr<MapAdaptorIterator> i (create_iterator ());
+    std::unique_ptr<MapAdaptorIterator> i (create_iterator ());
     while (! i->at_end ()) {
       rr.reset ();
       i->get (rr, heap);
@@ -1963,7 +1963,7 @@ inline AdaptorBase *adaptor_factory<Tag, X>::get (const X &v)
 template <class X>
 inline void copy_to (AdaptorBase &a, X &x, tl::Heap &heap)
 {
-  std::auto_ptr<AdaptorBase> t (adaptor_factory<typename gsi::type_traits<X &>::tag, X &>::get (x));
+  std::unique_ptr<AdaptorBase> t (adaptor_factory<typename gsi::type_traits<X &>::tag, X &>::get (x));
   a.copy_to (t.get (), heap);
 }
 

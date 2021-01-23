@@ -43,7 +43,7 @@ int _force_link_f ()
 // ----------------------------------------------------------------
 //  Implementation of A
 
-static std::auto_ptr<A> a_inst;
+static std::unique_ptr<A> a_inst;
 static int a_count = 0;
 
 void A::br () 
@@ -310,7 +310,7 @@ std::vector<int> C::m_v;
 // ----------------------------------------------------------------
 //  Implementation of E
 
-std::auto_ptr<E> E::e_inst;
+std::unique_ptr<E> E::e_inst;
 int E::e_count = 0;
 
 E::E() : x(0)
@@ -373,7 +373,7 @@ int inst_count();
 // ----------------------------------------------------------------
 //  Implementation of F
 
-std::auto_ptr<F> F::f_inst;
+std::unique_ptr<F> F::f_inst;
 
 const F &F::icref() 
 { 
@@ -414,8 +414,8 @@ F *F::inc()
 // ----------------------------------------------------------------
 //  Implementation of X
 
-std::auto_ptr<X> X::sp_a (new X ("X::a"));
-std::auto_ptr<X> X::sp_b (new X ("X::b"));
+std::unique_ptr<X> X::sp_a (new X ("X::a"));
+std::unique_ptr<X> X::sp_b (new X ("X::b"));
 
 static X *make_x (const char *x) 
 { 
@@ -524,8 +524,8 @@ void X::set_si (int v)
 // ----------------------------------------------------------------
 //  Implementation of Y
 
-std::auto_ptr<Y> Y::sp_a (new Y ("Y::a"));
-std::auto_ptr<Y> Y::sp_b (new Y ("Y::b"));
+std::unique_ptr<Y> Y::sp_a (new Y ("Y::a"));
+std::unique_ptr<Y> Y::sp_b (new Y ("Y::b"));
 int Y::s_dyn_count = 0;
 
 static Y *make_y (const char *x)

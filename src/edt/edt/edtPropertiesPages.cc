@@ -178,7 +178,7 @@ ShapePropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInst
 void 
 ShapePropertiesPage::do_apply (bool current_only, bool relative)
 {
-  std::auto_ptr<ChangeApplicator> applicator;
+  std::unique_ptr<ChangeApplicator> applicator;
 
   unsigned int cv_index = m_selection_ptrs [m_index]->cv_index ();
 
@@ -856,7 +856,7 @@ TextPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
   db::Text org_text;
   shape.text (org_text);
 
-  std::auto_ptr<CombinedChangeApplicator> appl (new CombinedChangeApplicator ());
+  std::unique_ptr<CombinedChangeApplicator> appl (new CombinedChangeApplicator ());
 
   if (db::FTrans (tt) != db::FTrans (org_text.trans ())) {
     appl->add (new TextOrientationChangeApplicator (db::FTrans (tt)));
@@ -1126,7 +1126,7 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
     break;
   } 
 
-  std::auto_ptr<CombinedChangeApplicator> appl (new CombinedChangeApplicator ());
+  std::unique_ptr<CombinedChangeApplicator> appl (new CombinedChangeApplicator ());
 
   db::Path org_path;
   shape.path (org_path);

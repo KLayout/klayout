@@ -612,7 +612,7 @@ static std::vector<db::Region> andnot (const db::Region *r, const db::Region &ot
 template <class Container>
 static Container *decompose_convex (const db::Region *r, int mode)
 {
-  std::auto_ptr<Container> shapes (new Container ());
+  std::unique_ptr<Container> shapes (new Container ());
   db::SimplePolygonContainer sp;
   for (db::Region::const_iterator p = r->begin_merged (); ! p.at_end(); ++p) {
     sp.polygons ().clear ();
@@ -627,7 +627,7 @@ static Container *decompose_convex (const db::Region *r, int mode)
 template <class Container>
 static Container *decompose_trapezoids (const db::Region *r, int mode)
 {
-  std::auto_ptr<Container> shapes (new Container ());
+  std::unique_ptr<Container> shapes (new Container ());
   db::SimplePolygonContainer sp;
   for (db::Region::const_iterator p = r->begin_merged (); ! p.at_end(); ++p) {
     sp.polygons ().clear ();

@@ -598,7 +598,7 @@ DeepEdges::apply_filter (const EdgeFilterBase &filter) const
 {
   const db::DeepLayer &edges = filter.requires_raw_input () ? deep_layer () : merged_deep_layer ();
 
-  std::auto_ptr<VariantsCollectorBase> vars;
+  std::unique_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
@@ -614,7 +614,7 @@ DeepEdges::apply_filter (const EdgeFilterBase &filter) const
   db::Layout &layout = const_cast<db::Layout &> (edges.layout ());
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
-  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (edges.derived ()));
+  std::unique_ptr<db::DeepEdges> res (new db::DeepEdges (edges.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const db::Shapes &s = c->shapes (edges.layer ());
@@ -681,7 +681,7 @@ EdgesDelegate *DeepEdges::merged () const
 
   db::Layout &layout = const_cast<db::Layout &> (m_merged_edges.layout ());
 
-  std::auto_ptr<db::DeepEdges> res (new db::DeepEdges (m_merged_edges.derived ()));
+  std::unique_ptr<db::DeepEdges> res (new db::DeepEdges (m_merged_edges.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
     c->shapes (res->deep_layer ().layer ()) = c->shapes (m_merged_edges.layer ());
   }
@@ -972,7 +972,7 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
 {
   const db::DeepLayer &edges = merged_deep_layer ();
 
-  std::auto_ptr<db::DeepRegion> res (new db::DeepRegion (edges.derived ()));
+  std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (edges.derived ()));
 
   db::Layout &layout = const_cast<db::Layout &> (edges.layout ());
   db::Cell &top_cell = const_cast<db::Cell &> (edges.initial_cell ());
@@ -1358,7 +1358,7 @@ public:
 EdgesDelegate *
 DeepEdges::selected_interacting_generic (const Region &other, bool inverse) const
 {
-  std::auto_ptr<db::DeepRegion> dr_holder;
+  std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
     //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
@@ -1384,7 +1384,7 @@ DeepEdges::selected_interacting_generic (const Region &other, bool inverse) cons
 EdgesDelegate *
 DeepEdges::selected_interacting_generic (const Edges &other, bool inverse) const
 {
-  std::auto_ptr<db::DeepEdges> dr_holder;
+  std::unique_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
   if (! other_deep) {
     //  if the other edge collection isn't deep, turn into a top-level only deep edge collection to facilitate re-hierarchisation
@@ -1409,7 +1409,7 @@ DeepEdges::selected_interacting_generic (const Edges &other, bool inverse) const
 
 RegionDelegate *DeepEdges::pull_generic (const Region &other) const
 {
-  std::auto_ptr<db::DeepRegion> dr_holder;
+  std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
     //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
@@ -1435,7 +1435,7 @@ RegionDelegate *DeepEdges::pull_generic (const Region &other) const
 
 EdgesDelegate *DeepEdges::pull_generic (const Edges &other) const
 {
-  std::auto_ptr<db::DeepEdges> dr_holder;
+  std::unique_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
   if (! other_deep) {
     //  if the other edge collection isn't deep, turn into a top-level only deep edge collection to facilitate re-hierarchisation
@@ -1572,7 +1572,7 @@ DeepEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord 
   check.set_min_projection (options.min_projection);
   check.set_max_projection (options.max_projection);
 
-  std::auto_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (edges.derived ()));
+  std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (edges.derived ()));
 
   db::EdgesCheckLocalOperation op (check, other_deep != 0);
 

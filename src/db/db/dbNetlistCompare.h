@@ -354,9 +354,9 @@ protected:
 
   mutable NetlistCompareLogger *mp_logger;
   std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<const Net *, const Net *> > > m_same_nets;
-  std::auto_ptr<CircuitPinMapper> mp_circuit_pin_mapper;
-  std::auto_ptr<DeviceCategorizer> mp_device_categorizer;
-  std::auto_ptr<CircuitCategorizer> mp_circuit_categorizer;
+  std::unique_ptr<CircuitPinMapper> mp_circuit_pin_mapper;
+  std::unique_ptr<DeviceCategorizer> mp_device_categorizer;
+  std::unique_ptr<CircuitCategorizer> mp_circuit_categorizer;
   double m_cap_threshold;
   double m_res_threshold;
   size_t m_max_n_branch;

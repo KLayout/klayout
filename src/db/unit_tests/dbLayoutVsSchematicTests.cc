@@ -89,20 +89,20 @@ TEST(1_BasicFlow)
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
   db::LayoutVsSchematic lvs (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  std::auto_ptr<db::Region> rbulk (lvs.make_layer ("bulk"));
-  std::auto_ptr<db::Region> rnwell (lvs.make_layer (nwell, "nwell"));
-  std::auto_ptr<db::Region> ractive (lvs.make_layer (active, "active"));
-  std::auto_ptr<db::Region> rpplus (lvs.make_layer (pplus, "pplus"));
-  std::auto_ptr<db::Region> rnplus (lvs.make_layer (nplus, "nplus"));
-  std::auto_ptr<db::Region> rpoly (lvs.make_polygon_layer (poly, "poly"));
-  std::auto_ptr<db::Region> rpoly_lbl (lvs.make_layer (poly_lbl, "poly_lbl"));
-  std::auto_ptr<db::Region> rdiff_cont (lvs.make_polygon_layer (diff_cont, "diff_cont"));
-  std::auto_ptr<db::Region> rpoly_cont (lvs.make_polygon_layer (poly_cont, "poly_cont"));
-  std::auto_ptr<db::Region> rmetal1 (lvs.make_polygon_layer (metal1, "metal1"));
-  std::auto_ptr<db::Region> rmetal1_lbl (lvs.make_layer (metal1_lbl, "metal1_lbl"));
-  std::auto_ptr<db::Region> rvia1 (lvs.make_polygon_layer (via1, "via1"));
-  std::auto_ptr<db::Region> rmetal2 (lvs.make_polygon_layer (metal2, "metal2"));
-  std::auto_ptr<db::Region> rmetal2_lbl (lvs.make_layer (metal2_lbl, "metal2_lbl"));
+  std::unique_ptr<db::Region> rbulk (lvs.make_layer ("bulk"));
+  std::unique_ptr<db::Region> rnwell (lvs.make_layer (nwell, "nwell"));
+  std::unique_ptr<db::Region> ractive (lvs.make_layer (active, "active"));
+  std::unique_ptr<db::Region> rpplus (lvs.make_layer (pplus, "pplus"));
+  std::unique_ptr<db::Region> rnplus (lvs.make_layer (nplus, "nplus"));
+  std::unique_ptr<db::Region> rpoly (lvs.make_polygon_layer (poly, "poly"));
+  std::unique_ptr<db::Region> rpoly_lbl (lvs.make_layer (poly_lbl, "poly_lbl"));
+  std::unique_ptr<db::Region> rdiff_cont (lvs.make_polygon_layer (diff_cont, "diff_cont"));
+  std::unique_ptr<db::Region> rpoly_cont (lvs.make_polygon_layer (poly_cont, "poly_cont"));
+  std::unique_ptr<db::Region> rmetal1 (lvs.make_polygon_layer (metal1, "metal1"));
+  std::unique_ptr<db::Region> rmetal1_lbl (lvs.make_layer (metal1_lbl, "metal1_lbl"));
+  std::unique_ptr<db::Region> rvia1 (lvs.make_polygon_layer (via1, "via1"));
+  std::unique_ptr<db::Region> rmetal2 (lvs.make_polygon_layer (metal2, "metal2"));
+  std::unique_ptr<db::Region> rmetal2_lbl (lvs.make_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 
@@ -215,7 +215,7 @@ TEST(1_BasicFlow)
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "lvs_test_1.spi");
 
-    std::auto_ptr<db::Netlist> netlist (new db::Netlist ());
+    std::unique_ptr<db::Netlist> netlist (new db::Netlist ());
     tl::InputStream stream (fn);
     reader.read (stream, *netlist);
     lvs.set_reference_netlist (netlist.release ());
@@ -287,20 +287,20 @@ TEST(2_FlowWithErrors)
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
   db::LayoutVsSchematic lvs (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  std::auto_ptr<db::Region> rbulk (lvs.make_layer ("bulk"));
-  std::auto_ptr<db::Region> rnwell (lvs.make_layer (nwell, "nwell"));
-  std::auto_ptr<db::Region> ractive (lvs.make_layer (active, "active"));
-  std::auto_ptr<db::Region> rpplus (lvs.make_layer (pplus, "pplus"));
-  std::auto_ptr<db::Region> rnplus (lvs.make_layer (nplus, "nplus"));
-  std::auto_ptr<db::Region> rpoly (lvs.make_polygon_layer (poly, "poly"));
-  std::auto_ptr<db::Region> rpoly_lbl (lvs.make_layer (poly_lbl, "poly_lbl"));
-  std::auto_ptr<db::Region> rdiff_cont (lvs.make_polygon_layer (diff_cont, "diff_cont"));
-  std::auto_ptr<db::Region> rpoly_cont (lvs.make_polygon_layer (poly_cont, "poly_cont"));
-  std::auto_ptr<db::Region> rmetal1 (lvs.make_polygon_layer (metal1, "metal1"));
-  std::auto_ptr<db::Region> rmetal1_lbl (lvs.make_layer (metal1_lbl, "metal1_lbl"));
-  std::auto_ptr<db::Region> rvia1 (lvs.make_polygon_layer (via1, "via1"));
-  std::auto_ptr<db::Region> rmetal2 (lvs.make_polygon_layer (metal2, "metal2"));
-  std::auto_ptr<db::Region> rmetal2_lbl (lvs.make_layer (metal2_lbl, "metal2_lbl"));
+  std::unique_ptr<db::Region> rbulk (lvs.make_layer ("bulk"));
+  std::unique_ptr<db::Region> rnwell (lvs.make_layer (nwell, "nwell"));
+  std::unique_ptr<db::Region> ractive (lvs.make_layer (active, "active"));
+  std::unique_ptr<db::Region> rpplus (lvs.make_layer (pplus, "pplus"));
+  std::unique_ptr<db::Region> rnplus (lvs.make_layer (nplus, "nplus"));
+  std::unique_ptr<db::Region> rpoly (lvs.make_polygon_layer (poly, "poly"));
+  std::unique_ptr<db::Region> rpoly_lbl (lvs.make_layer (poly_lbl, "poly_lbl"));
+  std::unique_ptr<db::Region> rdiff_cont (lvs.make_polygon_layer (diff_cont, "diff_cont"));
+  std::unique_ptr<db::Region> rpoly_cont (lvs.make_polygon_layer (poly_cont, "poly_cont"));
+  std::unique_ptr<db::Region> rmetal1 (lvs.make_polygon_layer (metal1, "metal1"));
+  std::unique_ptr<db::Region> rmetal1_lbl (lvs.make_layer (metal1_lbl, "metal1_lbl"));
+  std::unique_ptr<db::Region> rvia1 (lvs.make_polygon_layer (via1, "via1"));
+  std::unique_ptr<db::Region> rmetal2 (lvs.make_polygon_layer (metal2, "metal2"));
+  std::unique_ptr<db::Region> rmetal2_lbl (lvs.make_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 
@@ -413,7 +413,7 @@ TEST(2_FlowWithErrors)
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "lvs_test_2.spi");
 
-    std::auto_ptr<db::Netlist> netlist (new db::Netlist ());
+    std::unique_ptr<db::Netlist> netlist (new db::Netlist ());
     tl::InputStream stream (fn);
     reader.read (stream, *netlist);
     lvs.set_reference_netlist (netlist.release ());

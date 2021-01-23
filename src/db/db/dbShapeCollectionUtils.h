@@ -169,7 +169,7 @@ DB_PUBLIC_TEMPLATE
 OutputContainer *
 shape_collection_processed_impl (const db::DeepLayer &input, const shape_collection_processor<Shape, Result> &filter)
 {
-  std::auto_ptr<VariantsCollectorBase> vars;
+  std::unique_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
@@ -187,7 +187,7 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
   std::vector<Result> heap;
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
-  std::auto_ptr<OutputContainer> res (new OutputContainer (input.derived ()));
+  std::unique_ptr<OutputContainer> res (new OutputContainer (input.derived ()));
   if (filter.result_must_not_be_merged ()) {
     res->set_merged_semantics (false);
   }

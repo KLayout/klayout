@@ -119,7 +119,7 @@ FlatTexts::filter_in_place (const TextFilterBase &filter)
 
 TextsDelegate *FlatTexts::add (const Texts &other) const
 {
-  std::auto_ptr<FlatTexts> new_texts (new FlatTexts (*this));
+  std::unique_ptr<FlatTexts> new_texts (new FlatTexts (*this));
   new_texts->invalidate_cache ();
 
   FlatTexts *other_flat = dynamic_cast<FlatTexts *> (other.delegate ());

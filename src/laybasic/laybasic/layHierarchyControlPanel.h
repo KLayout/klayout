@@ -306,7 +306,7 @@ private:
   QColor m_text_color;
   tl::DeferredMethod<HierarchyControlPanel> m_do_update_content_dm;
   tl::DeferredMethod<HierarchyControlPanel> m_do_full_update_content_dm;
-  std::auto_ptr<QStyle> mp_tree_style;
+  std::unique_ptr<QStyle> mp_tree_style;
 
   //  locate the CellTreeItem in the tree corresponding to a partial path starting from p.
   CellTreeItem *find_child_item (cell_path_type::const_iterator start, cell_path_type::const_iterator end, CellTreeItem *p);

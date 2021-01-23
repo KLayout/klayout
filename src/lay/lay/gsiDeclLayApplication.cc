@@ -248,8 +248,8 @@ static std::string application_doc ()
 void
 LAY_PUBLIC make_application_decl (bool non_gui_mode)
 {
-  static std::auto_ptr<Class<lay::GuiApplication> > gui_app_decl;
-  static std::auto_ptr<Class<lay::NonGuiApplication> > non_gui_app_decl;
+  static std::unique_ptr<Class<lay::GuiApplication> > gui_app_decl;
+  static std::unique_ptr<Class<lay::NonGuiApplication> > non_gui_app_decl;
 
   if (non_gui_mode) {
 

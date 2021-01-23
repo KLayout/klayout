@@ -61,14 +61,14 @@ TEST (1)
     img_service->insert_image (img);
   }
 
-  std::auto_ptr<rdb::Database> rdb (new rdb::Database ());
+  std::unique_ptr<rdb::Database> rdb (new rdb::Database ());
   rdb->load (tl::testsrc () + "/testdata/sessions/test.lyrdb");
   view->add_rdb (rdb.release ());
 
-  std::auto_ptr<db::LayoutToNetlist> l2ndb (db::LayoutToNetlist::create_from_file (tl::testsrc () + "/testdata/sessions/test.l2n"));
+  std::unique_ptr<db::LayoutToNetlist> l2ndb (db::LayoutToNetlist::create_from_file (tl::testsrc () + "/testdata/sessions/test.l2n"));
   view->add_l2ndb (l2ndb.release ());
 
-  std::auto_ptr<db::LayoutToNetlist> lvsdb (db::LayoutToNetlist::create_from_file (tl::testsrc () + "/testdata/sessions/test.lvsdb"));
+  std::unique_ptr<db::LayoutToNetlist> lvsdb (db::LayoutToNetlist::create_from_file (tl::testsrc () + "/testdata/sessions/test.lvsdb"));
   view->add_l2ndb (lvsdb.release ());
 
   std::string lys_file = tmp_file ("test1.lys");

@@ -123,7 +123,7 @@ private:
   QMutex m_initial_wait_lock;
   QWaitCondition m_initial_wait_cond;
 
-  std::auto_ptr<tl::SelfTimer> m_main_timer;
+  std::unique_ptr<tl::SelfTimer> m_main_timer;
 };
 
 }

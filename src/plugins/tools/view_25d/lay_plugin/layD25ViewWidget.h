@@ -123,7 +123,7 @@ public slots:
 private:
   typedef lay::mem_chunks<GLfloat, 1024 * 18> chunks_type;
 
-  std::auto_ptr<D25InteractionMode> mp_mode;
+  std::unique_ptr<D25InteractionMode> mp_mode;
   QOpenGLShaderProgram *m_shapes_program, *m_gridplane_program;
   std::string m_error;
   double m_scale_factor;

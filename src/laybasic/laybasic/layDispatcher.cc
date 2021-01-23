@@ -200,7 +200,7 @@ Dispatcher::write_config (const std::string &config_file)
 bool
 Dispatcher::read_config (const std::string &config_file)
 {
-  std::auto_ptr<tl::XMLFileSource> file;
+  std::unique_ptr<tl::XMLFileSource> file;
 
   try {
     file.reset (new tl::XMLFileSource (config_file));

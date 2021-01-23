@@ -547,7 +547,7 @@ struct reader<gsi::StringType>
 {
   void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &, tl::Heap *heap)
   {
-    std::auto_ptr<gsi::StringAdaptor> a ((gsi::StringAdaptor *) rr->read<void *>(*heap));
+    std::unique_ptr<gsi::StringAdaptor> a ((gsi::StringAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
       *ret = Qnil;
     } else {
@@ -621,7 +621,7 @@ struct reader<gsi::VariantType>
 {
   void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy *self, const gsi::ArgType &atype, tl::Heap *heap)
   {
-    std::auto_ptr<gsi::VariantAdaptor> a ((gsi::VariantAdaptor *) rr->read<void *>(*heap));
+    std::unique_ptr<gsi::VariantAdaptor> a ((gsi::VariantAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
       *ret = Qnil;
     } else {
@@ -645,7 +645,7 @@ struct reader<gsi::VectorType>
 {
   void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &atype, tl::Heap *heap)
   {
-    std::auto_ptr<gsi::VectorAdaptor> a ((gsi::VectorAdaptor *) rr->read<void *>(*heap));
+    std::unique_ptr<gsi::VectorAdaptor> a ((gsi::VectorAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
       *ret = Qnil;
     } else {
@@ -665,7 +665,7 @@ struct reader<gsi::MapType>
 {
   void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &atype, tl::Heap *heap)
   {
-    std::auto_ptr<gsi::MapAdaptor> a ((gsi::MapAdaptor *) rr->read<void *>(*heap));
+    std::unique_ptr<gsi::MapAdaptor> a ((gsi::MapAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
       *ret = Qnil;
     } else {

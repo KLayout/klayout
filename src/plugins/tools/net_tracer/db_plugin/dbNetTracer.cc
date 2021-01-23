@@ -817,7 +817,7 @@ NetTracerLayerExpression::make_l2n_region (db::LayoutToNetlist &l2n, std::map <u
     rhb = make_l2n_region_for_org (l2n, region_cache, m_b, std::string ());
   }
 
-  std::auto_ptr<db::Region> res (new db::Region (*rha->get ()));
+  std::unique_ptr<db::Region> res (new db::Region (*rha->get ()));
 
   if (m_op == OPAnd) {
     *res &= *rhb->get ();

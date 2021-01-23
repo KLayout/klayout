@@ -447,7 +447,7 @@ SaltDownloadManager::execute (lay::SaltManagerDialog *parent, lay::Salt &salt)
       return true;
     }
 
-    std::auto_ptr<lay::ConfirmationDialog> dialog (make_confirmation_dialog (parent, salt));
+    std::unique_ptr<lay::ConfirmationDialog> dialog (make_confirmation_dialog (parent, salt));
 
     dialog->setModal (true);
     dialog->show ();

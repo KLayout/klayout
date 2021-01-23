@@ -224,7 +224,7 @@ string_to_pixels (img::Object *img, const std::string &s, size_t row, size_t w, 
 img::Object *
 ImageProxy::get_image () const
 {
-  std::auto_ptr<img::Object> img (new Object (std::max (size_t (1), m_width), std::max (size_t (1), m_height), m_matrix, m_color, ! m_byte_data.empty ()));
+  std::unique_ptr<img::Object> img (new Object (std::max (size_t (1), m_width), std::max (size_t (1), m_height), m_matrix, m_color, ! m_byte_data.empty ()));
   img->set_min_value (m_min_value);
   img->set_max_value (m_max_value);
   img->set_data_mapping (m_data_mapping);

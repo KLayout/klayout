@@ -23,6 +23,8 @@
 #ifndef HDR_laySaltGrainDetailsTextWidget
 #define HDR_laySaltGrainDetailsTextWidget
 
+#include "laySaltGrain.h"
+
 #include <QTextBrowser>
 #include <memory>
 
@@ -57,7 +59,7 @@ private slots:
   void open_link (const QUrl &url);
 
 private:
-  std::auto_ptr<lay::SaltGrain> mp_grain;
+  std::unique_ptr<lay::SaltGrain> mp_grain;
 
   QString details_text ();
 };

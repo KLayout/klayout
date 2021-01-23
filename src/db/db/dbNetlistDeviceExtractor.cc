@@ -483,7 +483,7 @@ void NetlistDeviceExtractor::extract_devices (const std::vector<db::Region> & /*
 
 void NetlistDeviceExtractor::register_device_class (DeviceClass *device_class)
 {
-  std::auto_ptr<DeviceClass> holder (device_class);
+  std::unique_ptr<DeviceClass> holder (device_class);
   tl_assert (device_class != 0);
   tl_assert (m_netlist.get () != 0);
 

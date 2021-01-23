@@ -184,10 +184,10 @@ private:
   SaltGrainPropertiesDialog *mp_properties_dialog;
   tl::DeferredMethod<SaltManagerDialog> dm_update_models;
   int m_current_tab;
-  std::auto_ptr<tl::InputStream> m_downloaded_grain_reader;
-  std::auto_ptr<lay::SaltGrain> m_downloaded_grain, m_salt_mine_grain;
+  std::unique_ptr<tl::InputStream> m_downloaded_grain_reader;
+  std::unique_ptr<lay::SaltGrain> m_downloaded_grain, m_salt_mine_grain;
   SaltGrainDetailsTextWidget *mp_downloaded_target;
-  std::auto_ptr<tl::InputStream> m_salt_mine_reader;
+  std::unique_ptr<tl::InputStream> m_salt_mine_reader;
 
   SaltGrain *current_grain ();
   std::vector<lay::SaltGrain *> current_grains ();

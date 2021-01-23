@@ -55,7 +55,7 @@ static void dump_nets_to_layout (const db::LayoutToNetlist &l2n, db::Layout &ly,
 
       for (std::map<const db::Region *, unsigned int>::const_iterator m = lmap.begin (); m != lmap.end (); ++m) {
 
-        std::auto_ptr<db::Region> shapes (l2n.shapes_of_net (*n, *m->first, false));
+        std::unique_ptr<db::Region> shapes (l2n.shapes_of_net (*n, *m->first, false));
         if (shapes->empty ()) {
           continue;
         }
@@ -126,7 +126,7 @@ TEST(0_Basic)
 {
   db::LayoutToNetlist l2n;
 
-  std::auto_ptr<db::Region> reg (l2n.make_layer ("l1"));
+  std::unique_ptr<db::Region> reg (l2n.make_layer ("l1"));
   EXPECT_EQ (l2n.is_persisted (*reg), true);
   EXPECT_EQ (l2n.name (*reg), "l1");
   EXPECT_EQ (l2n.layer_of (*reg), 0u);
@@ -138,7 +138,7 @@ TEST(0_Basic)
   EXPECT_EQ (l2n.layer_by_index (1) == 0, true);
   EXPECT_EQ (l2n.layer_by_name ("l2") == 0, true);
 
-  std::auto_ptr<db::Region> reg_copy (l2n.layer_by_name ("l1"));
+  std::unique_ptr<db::Region> reg_copy (l2n.layer_by_name ("l1"));
   EXPECT_EQ (reg_copy.get () != 0, true);
   EXPECT_EQ (l2n.name (*reg_copy), "l1");
   EXPECT_EQ (l2n.layer_of (*reg_copy), 0u);
@@ -148,7 +148,7 @@ TEST(0_Basic)
   EXPECT_EQ (l2n.layer_of (*reg_copy), 0u);
   reg_copy.reset (0);
 
-  std::auto_ptr<db::Region> reg2 (l2n.make_layer ());
+  std::unique_ptr<db::Region> reg2 (l2n.make_layer ());
   EXPECT_EQ (l2n.name (1u), "");
   EXPECT_EQ (l2n.name (*reg2), "");
   EXPECT_EQ (l2n.layer_of (*reg2), 1u);
@@ -156,7 +156,7 @@ TEST(0_Basic)
   reg2.reset (0);
   EXPECT_EQ (l2n.internal_layout ()->is_valid_layer (1), false);
 
-  std::auto_ptr<db::Region> reg3 (l2n.make_layer ("l3"));
+  std::unique_ptr<db::Region> reg3 (l2n.make_layer ("l3"));
   EXPECT_EQ (l2n.name (*reg3), "l3");
   EXPECT_EQ (l2n.layer_of (*reg3), 1u);
 
@@ -202,17 +202,17 @@ TEST(1_BasicExtraction)
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
   db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
-  std::auto_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
-  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
-  std::auto_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
-  std::auto_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
-  std::auto_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
-  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
-  std::auto_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
-  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
-  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
-  std::auto_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
+  std::unique_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
+  std::unique_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
+  std::unique_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
+  std::unique_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
+  std::unique_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
+  std::unique_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
+  std::unique_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
+  std::unique_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::unique_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
+  std::unique_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
+  std::unique_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 
@@ -690,17 +690,17 @@ TEST(2_Probing)
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
   db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
-  std::auto_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
-  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
-  std::auto_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
-  std::auto_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
-  std::auto_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
-  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
-  std::auto_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
-  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
-  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
-  std::auto_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
+  std::unique_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
+  std::unique_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
+  std::unique_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
+  std::unique_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
+  std::unique_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
+  std::unique_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
+  std::unique_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
+  std::unique_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::unique_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
+  std::unique_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
+  std::unique_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 
@@ -942,19 +942,19 @@ TEST(3_GlobalNetConnections)
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
   db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
-  std::auto_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
-  std::auto_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
-  std::auto_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
-  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
-  std::auto_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
-  std::auto_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
-  std::auto_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
-  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
-  std::auto_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
-  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
-  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
-  std::auto_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
+  std::unique_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
+  std::unique_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
+  std::unique_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
+  std::unique_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
+  std::unique_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
+  std::unique_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
+  std::unique_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
+  std::unique_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
+  std::unique_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
+  std::unique_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::unique_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
+  std::unique_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
+  std::unique_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 
@@ -1222,20 +1222,20 @@ TEST(4_GlobalNetDeviceExtraction)
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
   db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  std::auto_ptr<db::Region> rbulk (l2n.make_layer (ly.insert_layer (), "bulk"));
-  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
-  std::auto_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
-  std::auto_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
-  std::auto_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
-  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
-  std::auto_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
-  std::auto_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
-  std::auto_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
-  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
-  std::auto_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
-  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
-  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
-  std::auto_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
+  std::unique_ptr<db::Region> rbulk (l2n.make_layer (ly.insert_layer (), "bulk"));
+  std::unique_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
+  std::unique_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
+  std::unique_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
+  std::unique_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
+  std::unique_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
+  std::unique_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
+  std::unique_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
+  std::unique_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
+  std::unique_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
+  std::unique_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::unique_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
+  std::unique_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
+  std::unique_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 
@@ -1508,20 +1508,20 @@ TEST(5_DeviceExtractionWithDeviceCombination)
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
   db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  std::auto_ptr<db::Region> rbulk (l2n.make_layer ("bulk"));
-  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
-  std::auto_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
-  std::auto_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
-  std::auto_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
-  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
-  std::auto_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
-  std::auto_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
-  std::auto_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
-  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
-  std::auto_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
-  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
-  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
-  std::auto_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
+  std::unique_ptr<db::Region> rbulk (l2n.make_layer ("bulk"));
+  std::unique_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
+  std::unique_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
+  std::unique_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
+  std::unique_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
+  std::unique_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
+  std::unique_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
+  std::unique_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
+  std::unique_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
+  std::unique_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
+  std::unique_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::unique_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
+  std::unique_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
+  std::unique_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 
@@ -1786,20 +1786,20 @@ TEST(6_MoreDeviceTypes)
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
   db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  std::auto_ptr<db::Region> rbulk (l2n.make_layer ("bulk"));
-  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
-  std::auto_ptr<db::Region> rthickgox (l2n.make_layer (thickgox, "thickgox"));
-  std::auto_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
-  std::auto_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
-  std::auto_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
-  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
-  std::auto_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
-  std::auto_ptr<db::Region> rcont (l2n.make_polygon_layer (cont, "cont"));
-  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
-  std::auto_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
-  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
-  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
-  std::auto_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
+  std::unique_ptr<db::Region> rbulk (l2n.make_layer ("bulk"));
+  std::unique_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
+  std::unique_ptr<db::Region> rthickgox (l2n.make_layer (thickgox, "thickgox"));
+  std::unique_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
+  std::unique_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
+  std::unique_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
+  std::unique_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
+  std::unique_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
+  std::unique_ptr<db::Region> rcont (l2n.make_polygon_layer (cont, "cont"));
+  std::unique_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
+  std::unique_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::unique_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
+  std::unique_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
+  std::unique_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 
@@ -1943,20 +1943,20 @@ TEST(7_MoreByEmptyDeviceTypes)
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
   db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  std::auto_ptr<db::Region> rbulk (l2n.make_layer ("bulk"));
-  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
-  std::auto_ptr<db::Region> rthickgox (l2n.make_layer (thickgox, "thickgox"));
-  std::auto_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
-  std::auto_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
-  std::auto_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
-  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
-  std::auto_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
-  std::auto_ptr<db::Region> rcont (l2n.make_polygon_layer (cont, "cont"));
-  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
-  std::auto_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
-  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
-  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
-  std::auto_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
+  std::unique_ptr<db::Region> rbulk (l2n.make_layer ("bulk"));
+  std::unique_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
+  std::unique_ptr<db::Region> rthickgox (l2n.make_layer (thickgox, "thickgox"));
+  std::unique_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
+  std::unique_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
+  std::unique_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
+  std::unique_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
+  std::unique_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
+  std::unique_ptr<db::Region> rcont (l2n.make_polygon_layer (cont, "cont"));
+  std::unique_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
+  std::unique_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::unique_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
+  std::unique_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
+  std::unique_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 
@@ -2101,20 +2101,20 @@ TEST(8_FlatExtraction)
 
   db::LayoutToNetlist l2n (ly.cell_name (tc.cell_index ()), ly.dbu ());
 
-  std::auto_ptr<db::Region> rbulk (new db::Region ());
-  std::auto_ptr<db::Region> rnwell (new db::Region (db::RecursiveShapeIterator (ly, tc, nwell)));
-  std::auto_ptr<db::Region> rthickgox (new db::Region (db::RecursiveShapeIterator (ly, tc, thickgox)));
-  std::auto_ptr<db::Region> ractive (new db::Region (db::RecursiveShapeIterator (ly, tc, active)));
-  std::auto_ptr<db::Region> rpplus (new db::Region (db::RecursiveShapeIterator (ly, tc, pplus)));
-  std::auto_ptr<db::Region> rnplus (new db::Region (db::RecursiveShapeIterator (ly, tc, nplus)));
-  std::auto_ptr<db::Region> rpoly (new db::Region (db::RecursiveShapeIterator (ly, tc, poly)));
-  std::auto_ptr<db::Region> rpoly_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, poly_lbl)));
-  std::auto_ptr<db::Region> rcont (new db::Region (db::RecursiveShapeIterator (ly, tc, cont)));
-  std::auto_ptr<db::Region> rmetal1 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1)));
-  std::auto_ptr<db::Region> rmetal1_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1_lbl)));
-  std::auto_ptr<db::Region> rvia1 (new db::Region (db::RecursiveShapeIterator (ly, tc, via1)));
-  std::auto_ptr<db::Region> rmetal2 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2)));
-  std::auto_ptr<db::Region> rmetal2_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2_lbl)));
+  std::unique_ptr<db::Region> rbulk (new db::Region ());
+  std::unique_ptr<db::Region> rnwell (new db::Region (db::RecursiveShapeIterator (ly, tc, nwell)));
+  std::unique_ptr<db::Region> rthickgox (new db::Region (db::RecursiveShapeIterator (ly, tc, thickgox)));
+  std::unique_ptr<db::Region> ractive (new db::Region (db::RecursiveShapeIterator (ly, tc, active)));
+  std::unique_ptr<db::Region> rpplus (new db::Region (db::RecursiveShapeIterator (ly, tc, pplus)));
+  std::unique_ptr<db::Region> rnplus (new db::Region (db::RecursiveShapeIterator (ly, tc, nplus)));
+  std::unique_ptr<db::Region> rpoly (new db::Region (db::RecursiveShapeIterator (ly, tc, poly)));
+  std::unique_ptr<db::Region> rpoly_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, poly_lbl)));
+  std::unique_ptr<db::Region> rcont (new db::Region (db::RecursiveShapeIterator (ly, tc, cont)));
+  std::unique_ptr<db::Region> rmetal1 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1)));
+  std::unique_ptr<db::Region> rmetal1_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1_lbl)));
+  std::unique_ptr<db::Region> rvia1 (new db::Region (db::RecursiveShapeIterator (ly, tc, via1)));
+  std::unique_ptr<db::Region> rmetal2 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2)));
+  std::unique_ptr<db::Region> rmetal2_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2_lbl)));
 
   l2n.register_layer (*rbulk, "bulk");
   l2n.register_layer (*rnwell, "nwell");
@@ -2285,20 +2285,20 @@ TEST(9_FlatExtractionWithExternalDSS)
 
   db::LayoutToNetlist l2n (&dss);
 
-  std::auto_ptr<db::Region> rbulk (new db::Region ());
-  std::auto_ptr<db::Region> rnwell (new db::Region (db::RecursiveShapeIterator (ly, tc, nwell), dss));
-  std::auto_ptr<db::Region> rthickgox (new db::Region (db::RecursiveShapeIterator (ly, tc, thickgox), dss));
-  std::auto_ptr<db::Region> ractive (new db::Region (db::RecursiveShapeIterator (ly, tc, active), dss));
-  std::auto_ptr<db::Region> rpplus (new db::Region (db::RecursiveShapeIterator (ly, tc, pplus), dss));
-  std::auto_ptr<db::Region> rnplus (new db::Region (db::RecursiveShapeIterator (ly, tc, nplus), dss));
-  std::auto_ptr<db::Region> rpoly (new db::Region (db::RecursiveShapeIterator (ly, tc, poly), dss));
-  std::auto_ptr<db::Region> rpoly_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, poly_lbl), dss));
-  std::auto_ptr<db::Region> rcont (new db::Region (db::RecursiveShapeIterator (ly, tc, cont), dss));
-  std::auto_ptr<db::Region> rmetal1 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1), dss));
-  std::auto_ptr<db::Region> rmetal1_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1_lbl), dss));
-  std::auto_ptr<db::Region> rvia1 (new db::Region (db::RecursiveShapeIterator (ly, tc, via1), dss));
-  std::auto_ptr<db::Region> rmetal2 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2), dss));
-  std::auto_ptr<db::Region> rmetal2_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2_lbl), dss));
+  std::unique_ptr<db::Region> rbulk (new db::Region ());
+  std::unique_ptr<db::Region> rnwell (new db::Region (db::RecursiveShapeIterator (ly, tc, nwell), dss));
+  std::unique_ptr<db::Region> rthickgox (new db::Region (db::RecursiveShapeIterator (ly, tc, thickgox), dss));
+  std::unique_ptr<db::Region> ractive (new db::Region (db::RecursiveShapeIterator (ly, tc, active), dss));
+  std::unique_ptr<db::Region> rpplus (new db::Region (db::RecursiveShapeIterator (ly, tc, pplus), dss));
+  std::unique_ptr<db::Region> rnplus (new db::Region (db::RecursiveShapeIterator (ly, tc, nplus), dss));
+  std::unique_ptr<db::Region> rpoly (new db::Region (db::RecursiveShapeIterator (ly, tc, poly), dss));
+  std::unique_ptr<db::Region> rpoly_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, poly_lbl), dss));
+  std::unique_ptr<db::Region> rcont (new db::Region (db::RecursiveShapeIterator (ly, tc, cont), dss));
+  std::unique_ptr<db::Region> rmetal1 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1), dss));
+  std::unique_ptr<db::Region> rmetal1_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1_lbl), dss));
+  std::unique_ptr<db::Region> rvia1 (new db::Region (db::RecursiveShapeIterator (ly, tc, via1), dss));
+  std::unique_ptr<db::Region> rmetal2 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2), dss));
+  std::unique_ptr<db::Region> rmetal2_lbl (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2_lbl), dss));
 
   l2n.register_layer (*rbulk, "bulk");
   l2n.register_layer (*rnwell, "nwell");
@@ -2457,12 +2457,12 @@ TEST(10_Antenna)
 
   db::DeepShapeStore dss;
 
-  std::auto_ptr<db::Region> rdiode (new db::Region (db::RecursiveShapeIterator (ly, tc, diode), dss));
-  std::auto_ptr<db::Region> rpoly (new db::Region (db::RecursiveShapeIterator (ly, tc, poly), dss));
-  std::auto_ptr<db::Region> rcont (new db::Region (db::RecursiveShapeIterator (ly, tc, cont), dss));
-  std::auto_ptr<db::Region> rmetal1 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1), dss));
-  std::auto_ptr<db::Region> rvia1 (new db::Region (db::RecursiveShapeIterator (ly, tc, via1), dss));
-  std::auto_ptr<db::Region> rmetal2 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2), dss));
+  std::unique_ptr<db::Region> rdiode (new db::Region (db::RecursiveShapeIterator (ly, tc, diode), dss));
+  std::unique_ptr<db::Region> rpoly (new db::Region (db::RecursiveShapeIterator (ly, tc, poly), dss));
+  std::unique_ptr<db::Region> rcont (new db::Region (db::RecursiveShapeIterator (ly, tc, cont), dss));
+  std::unique_ptr<db::Region> rmetal1 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal1), dss));
+  std::unique_ptr<db::Region> rvia1 (new db::Region (db::RecursiveShapeIterator (ly, tc, via1), dss));
+  std::unique_ptr<db::Region> rmetal2 (new db::Region (db::RecursiveShapeIterator (ly, tc, metal2), dss));
 
   db::Layout ly2;
   ly2.dbu (ly.dbu ());
@@ -2734,17 +2734,17 @@ TEST(11_DuplicateInstances)
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
   db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
-  std::auto_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
-  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
-  std::auto_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
-  std::auto_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
-  std::auto_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
-  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
-  std::auto_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
-  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
-  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
-  std::auto_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
+  std::unique_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
+  std::unique_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
+  std::unique_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
+  std::unique_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
+  std::unique_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
+  std::unique_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
+  std::unique_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
+  std::unique_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::unique_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
+  std::unique_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
+  std::unique_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 
@@ -2939,20 +2939,20 @@ TEST(12_FlattenCircuitDoesFlattenLayout)
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
   db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  std::auto_ptr<db::Region> rbulk (l2n.make_layer ("bulk"));
-  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
-  std::auto_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
-  std::auto_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
-  std::auto_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
-  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
-  std::auto_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
-  std::auto_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
-  std::auto_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
-  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
-  std::auto_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
-  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
-  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
-  std::auto_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
+  std::unique_ptr<db::Region> rbulk (l2n.make_layer ("bulk"));
+  std::unique_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
+  std::unique_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
+  std::unique_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
+  std::unique_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
+  std::unique_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
+  std::unique_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
+  std::unique_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
+  std::unique_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
+  std::unique_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
+  std::unique_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::unique_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
+  std::unique_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
+  std::unique_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 
@@ -3193,20 +3193,20 @@ TEST(13_JoinNets)
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
   db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  std::auto_ptr<db::Region> rbulk (l2n.make_layer ("bulk"));
-  std::auto_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
-  std::auto_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
-  std::auto_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
-  std::auto_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
-  std::auto_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
-  std::auto_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
-  std::auto_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
-  std::auto_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
-  std::auto_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
-  std::auto_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
-  std::auto_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
-  std::auto_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
-  std::auto_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
+  std::unique_ptr<db::Region> rbulk (l2n.make_layer ("bulk"));
+  std::unique_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
+  std::unique_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
+  std::unique_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
+  std::unique_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
+  std::unique_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
+  std::unique_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
+  std::unique_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
+  std::unique_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
+  std::unique_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
+  std::unique_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
+  std::unique_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
+  std::unique_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
+  std::unique_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
 
   //  derived regions
 

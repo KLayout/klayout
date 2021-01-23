@@ -254,7 +254,7 @@ NetTracerConnectionInfo::NetTracerConnectionInfo (const NetTracerLayerExpression
 
 static int get_layer_id (const NetTracerLayerExpressionInfo &e, const db::Layout &layout, const NetTracerTechnologyComponent &tech, NetTracerData *data)
 {
-  std::auto_ptr<NetTracerLayerExpression> expr_in (NetTracerLayerExpressionInfo::compile (e.to_string ()).get (layout, tech));
+  std::unique_ptr<NetTracerLayerExpression> expr_in (NetTracerLayerExpressionInfo::compile (e.to_string ()).get (layout, tech));
   int l = expr_in->alias_for ();
   if (l < 0 && data) {
     l = data->find_symbol (e.to_string ());
@@ -531,7 +531,7 @@ NetTracerTechnologyComponent::get_tracer_data (const db::Layout &layout) const
       throw tl::Exception (tl::to_string (tr ("Missing expression on symbol specification #%d")), n);
     }
     try {
-      std::auto_ptr<NetTracerLayerExpression> expr_in (NetTracerLayerExpressionInfo::compile (s->expression ()).get (layout, *this));
+      std::unique_ptr<NetTracerLayerExpression> expr_in (NetTracerLayerExpressionInfo::compile (s->expression ()).get (layout, *this));
     } catch (tl::Exception &ex) {
       throw tl::Exception (tl::to_string (tr ("Error compiling expression '%s' (symbol #%d): %s")), s->expression (), n, ex.msg ());
     }

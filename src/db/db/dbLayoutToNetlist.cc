@@ -153,7 +153,7 @@ db::Region *LayoutToNetlist::make_layer (const std::string &n)
   db::RecursiveShapeIterator si (m_iter);
   si.shape_flags (db::ShapeIterator::Nothing);
 
-  std::auto_ptr <db::Region> region (new db::Region (si, dss ()));
+  std::unique_ptr <db::Region> region (new db::Region (si, dss ()));
   if (! n.empty ()) {
     register_layer (*region, n);
   }
@@ -166,7 +166,7 @@ db::Region *LayoutToNetlist::make_layer (unsigned int layer_index, const std::st
   si.set_layer (layer_index);
   si.shape_flags (db::ShapeIterator::All);
 
-  std::auto_ptr <db::Region> region (new db::Region (si, dss ()));
+  std::unique_ptr <db::Region> region (new db::Region (si, dss ()));
   if (! n.empty ()) {
     register_layer (*region, n);
   }
@@ -179,7 +179,7 @@ db::Texts *LayoutToNetlist::make_text_layer (unsigned int layer_index, const std
   si.set_layer (layer_index);
   si.shape_flags (db::ShapeIterator::Texts);
 
-  std::auto_ptr <db::Texts> texts (new db::Texts (si, dss ()));
+  std::unique_ptr <db::Texts> texts (new db::Texts (si, dss ()));
   if (! n.empty ()) {
     register_layer (*texts, n);
   }
@@ -192,7 +192,7 @@ db::Region *LayoutToNetlist::make_polygon_layer (unsigned int layer_index, const
   si.set_layer (layer_index);
   si.shape_flags (db::ShapeIterator::Paths | db::ShapeIterator::Polygons | db::ShapeIterator::Boxes);
 
-  std::auto_ptr <db::Region> region (new db::Region (si, dss ()));
+  std::unique_ptr <db::Region> region (new db::Region (si, dss ()));
   if (! n.empty ()) {
     register_layer (*region, n);
   }
@@ -773,7 +773,7 @@ db::Region *LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region
   const db::Circuit *circuit = net.circuit ();
   tl_assert (circuit != 0);
 
-  std::auto_ptr<db::Region> res (new db::Region ());
+  std::unique_ptr<db::Region> res (new db::Region ());
   std::map<unsigned int, db::Region *> lmap;
   lmap [lid] = res.get ();
 
@@ -1313,7 +1313,7 @@ void LayoutToNetlist::load (const std::string &path)
 
 db::LayoutToNetlist *LayoutToNetlist::create_from_file (const std::string &path)
 {
-  std::auto_ptr<db::LayoutToNetlist> db;
+  std::unique_ptr<db::LayoutToNetlist> db;
 
   //  TODO: generic concept to detect format
   std::string first_line;

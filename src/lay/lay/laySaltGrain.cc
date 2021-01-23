@@ -541,7 +541,7 @@ SaltGrain
 SaltGrain::from_url (const std::string &url_in)
 {
   std::string url = url_in;
-  std::auto_ptr<tl::InputStream> stream (stream_from_url (url));
+  std::unique_ptr<tl::InputStream> stream (stream_from_url (url));
 
   SaltGrain g;
   g.load (*stream);

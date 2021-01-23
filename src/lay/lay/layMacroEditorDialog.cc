@@ -1271,7 +1271,7 @@ MacroEditorDialog::update_inspected ()
     variableList->set_inspector (0);
   } else {
 
-    std::auto_ptr<gsi::Inspector> ci (mp_current_interpreter->inspector (m_eval_context));
+    std::unique_ptr<gsi::Inspector> ci (mp_current_interpreter->inspector (m_eval_context));
     variableListFrame->setVisible (ci.get () != 0);
     variableList->set_inspector (ci.release ());
 
@@ -3263,7 +3263,7 @@ MacroEditorDialog::stack_element_double_clicked (QListWidgetItem *item)
 MacroEditorPage *
 MacroEditorDialog::create_page (lym::Macro *macro)
 {
-  std::auto_ptr<MacroEditorPage> editor (new MacroEditorPage (this, &m_highlighters));
+  std::unique_ptr<MacroEditorPage> editor (new MacroEditorPage (this, &m_highlighters));
   editor->set_ntab (m_ntab);
   editor->set_nindent (m_nindent);
   editor->set_font (m_font_family, m_font_size);

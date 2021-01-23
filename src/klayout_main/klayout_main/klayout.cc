@@ -252,7 +252,7 @@ klayout_main_cont (int &argc, char **argv)
       }
     }
 
-    std::auto_ptr<lay::ApplicationBase> app;
+    std::unique_ptr<lay::ApplicationBase> app;
     if (non_ui_mode) {
       app.reset (new lay::NonGuiApplication (argc, argv));
     } else {

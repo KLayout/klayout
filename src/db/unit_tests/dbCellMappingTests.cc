@@ -430,7 +430,7 @@ TEST(5)
 //  Resolution of array references
 TEST(6)
 {
-  std::auto_ptr<db::Layout> g (new db::Layout ());
+  std::unique_ptr<db::Layout> g (new db::Layout ());
   db::Cell &a0 (g->cell (g->add_cell ("a0")));
   db::Cell *a4p, *a5p;
   a4p = &(g->cell (g->add_cell ("a4")));
@@ -456,7 +456,7 @@ TEST(6)
 //  Multi-mapping
 TEST(7)
 {
-  std::auto_ptr<db::Layout> g (new db::Layout ());
+  std::unique_ptr<db::Layout> g (new db::Layout ());
   db::Cell &a0 (g->cell (g->add_cell ("a0")));
   db::Cell &a1 (g->cell (g->add_cell ("a1")));
   db::Cell &a2 (g->cell (g->add_cell ("a2")));

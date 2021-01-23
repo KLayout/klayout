@@ -129,7 +129,7 @@ AsIfFlatRegion::to_string (size_t nmax) const
 EdgesDelegate *
 AsIfFlatRegion::edges (const EdgeFilterBase *filter) const
 {
-  std::auto_ptr<FlatEdges> result (new FlatEdges ());
+  std::unique_ptr<FlatEdges> result (new FlatEdges ());
 
   size_t n = 0;
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
@@ -156,7 +156,7 @@ AsIfFlatRegion::in (const Region &other, bool invert) const
     op.insert (*o);
   }
 
-  std::auto_ptr<FlatRegion> new_region (new FlatRegion (false));
+  std::unique_ptr<FlatRegion> new_region (new FlatRegion (false));
 
   for (RegionIterator o (begin_merged ()); ! o.at_end (); ++o) {
     if ((op.find (*o) == op.end ()) == invert) {
@@ -298,7 +298,7 @@ void AsIfFlatRegion::invalidate_bbox ()
 RegionDelegate *
 AsIfFlatRegion::filtered (const PolygonFilterBase &filter) const
 {
-  std::auto_ptr<FlatRegion> new_region (new FlatRegion ());
+  std::unique_ptr<FlatRegion> new_region (new FlatRegion ());
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
     if (filter.selected (*p)) {
@@ -312,7 +312,7 @@ AsIfFlatRegion::filtered (const PolygonFilterBase &filter) const
 RegionDelegate *
 AsIfFlatRegion::processed (const PolygonProcessorBase &filter) const
 {
-  std::auto_ptr<FlatRegion> new_region (new FlatRegion ());
+  std::unique_ptr<FlatRegion> new_region (new FlatRegion ());
   if (filter.result_must_not_be_merged ()) {
     new_region->set_merged_semantics (false);
   }
@@ -335,7 +335,7 @@ AsIfFlatRegion::processed (const PolygonProcessorBase &filter) const
 EdgesDelegate *
 AsIfFlatRegion::processed_to_edges (const PolygonToEdgeProcessorBase &filter) const
 {
-  std::auto_ptr<FlatEdges> new_edges (new FlatEdges ());
+  std::unique_ptr<FlatEdges> new_edges (new FlatEdges ());
   if (filter.result_must_not_be_merged ()) {
     new_edges->set_merged_semantics (false);
   }
@@ -358,7 +358,7 @@ AsIfFlatRegion::processed_to_edges (const PolygonToEdgeProcessorBase &filter) co
 EdgePairsDelegate *
 AsIfFlatRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &filter) const
 {
-  std::auto_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
+  std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
   if (filter.result_must_not_be_merged ()) {
     new_edge_pairs->set_merged_semantics (false);
   }
@@ -407,7 +407,7 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse, 
   std::vector<generic_shape_iterator<db::Edge> > others;
   others.push_back (counting ? other.begin_merged () : other.begin ());
 
-  std::auto_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
+  std::unique_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 
@@ -423,7 +423,7 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse, 
   scanner.reserve1 (count ());
   scanner.reserve2 (other.count ());
 
-  std::auto_ptr<FlatRegion> output (new FlatRegion (false));
+  std::unique_ptr<FlatRegion> output (new FlatRegion (false));
   region_to_edge_interaction_filter<db::Polygon, db::Edge, ResultCountingInserter> filter (inserter, false, counting /*get all in counting mode*/);
 
   AddressablePolygonDelivery p (begin_merged ());
@@ -483,7 +483,7 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse, 
   std::vector<generic_shape_iterator<db::Text> > others;
   others.push_back (other.begin ());
 
-  std::auto_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
+  std::unique_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 
@@ -522,7 +522,7 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse, 
 
   //  select hits based on their count
 
-  std::auto_ptr<FlatRegion> output (new FlatRegion (true));
+  std::unique_ptr<FlatRegion> output (new FlatRegion (true));
 
   for (std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> >::const_iterator r = counted_results.begin (); r != counted_results.end (); ++r) {
     bool hit = r->second >= min_count && r->second <= max_count;
@@ -568,7 +568,7 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
   std::vector<generic_shape_iterator<db::Polygon> > others;
   others.push_back ((mode < 0 || counting) ? other.begin_merged () : other.begin ());
 
-  std::auto_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
+  std::unique_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 
@@ -658,7 +658,7 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
   ep.process (es, id);
   id.finish ();
 
-  std::auto_ptr<FlatRegion> output (new FlatRegion (false));
+  std::unique_ptr<FlatRegion> output (new FlatRegion (false));
 
   std::map <size_t, size_t> interaction_counts;
   for (db::InteractionDetector::iterator i = id.begin (); i != id.end () ; ++i) {
@@ -706,7 +706,7 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
   std::vector<generic_shape_iterator<db::Edge> > others;
   others.push_back (other.begin_merged ());
 
-  std::auto_ptr<FlatEdges> output (new FlatEdges (merged_semantics ()));
+  std::unique_ptr<FlatEdges> output (new FlatEdges (merged_semantics ()));
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_edges ());
 
@@ -720,7 +720,7 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
   scanner.reserve1 (count ());
   scanner.reserve2 (other.count ());
 
-  std::auto_ptr<FlatEdges> output (new FlatEdges (false));
+  std::unique_ptr<FlatEdges> output (new FlatEdges (false));
   region_to_edge_interaction_filter<db::Polygon, db::Edge, db::Shapes, db::Edge> filter (output->raw_edges (), false);
 
   AddressablePolygonDelivery p (begin ());
@@ -756,7 +756,7 @@ AsIfFlatRegion::pull_generic (const Texts &other) const
   std::vector<generic_shape_iterator<db::Text> > others;
   others.push_back (other.begin ());
 
-  std::auto_ptr<FlatTexts> output (new FlatTexts ());
+  std::unique_ptr<FlatTexts> output (new FlatTexts ());
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_texts ());
 
@@ -775,7 +775,7 @@ AsIfFlatRegion::pull_generic (const Texts &other) const
   scanner.reserve1 (count ());
   scanner.reserve2 (other.count ());
 
-  std::auto_ptr<FlatTexts> output (new FlatTexts (false));
+  std::unique_ptr<FlatTexts> output (new FlatTexts (false));
   region_to_text_interaction_filter<db::Polygon, db::Text, db::Shapes, db::Text> filter (output->raw_texts (), false);
 
   AddressablePolygonDelivery p (begin ());
@@ -811,7 +811,7 @@ AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) cons
   std::vector<generic_shape_iterator<db::Polygon> > others;
   others.push_back (other.begin_merged ());
 
-  std::auto_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
+  std::unique_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 
@@ -849,7 +849,7 @@ AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) cons
   ep.process (es, id);
   id.finish ();
 
-  std::auto_ptr<FlatRegion> output (new FlatRegion (false));
+  std::unique_ptr<FlatRegion> output (new FlatRegion (false));
 
   n = 0;
   std::set <size_t> selected;
@@ -914,7 +914,7 @@ AsIfFlatRegion::grid_check (db::Coord gx, db::Coord gy) const
     return new EmptyEdgePairs ();
   }
 
-  std::auto_ptr<db::FlatEdgePairs> res (new db::FlatEdgePairs ());
+  std::unique_ptr<db::FlatEdgePairs> res (new db::FlatEdgePairs ());
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
     produce_markers_for_grid_check (*p, db::UnitTrans (), gx, gy, res->raw_edge_pairs ());
@@ -984,7 +984,7 @@ template void AsIfFlatRegion::produce_markers_for_angle_check<db::UnitTrans> (co
 EdgePairsDelegate *
 AsIfFlatRegion::angle_check (double min, double max, bool inverse) const
 {
-  std::auto_ptr<db::FlatEdgePairs> res (new db::FlatEdgePairs ());
+  std::unique_ptr<db::FlatEdgePairs> res (new db::FlatEdgePairs ());
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
     produce_markers_for_angle_check (*p, db::UnitTrans (), min, max, inverse, res->raw_edge_pairs ());
@@ -1000,7 +1000,7 @@ AsIfFlatRegion::snapped (db::Coord gx, db::Coord gy)
     throw tl::Exception (tl::to_string (tr ("Grid snap requires a positive grid value")));
   }
 
-  std::auto_ptr<FlatRegion> new_region (new FlatRegion (merged_semantics ()));
+  std::unique_ptr<FlatRegion> new_region (new FlatRegion (merged_semantics ()));
 
   gx = std::max (db::Coord (1), gx);
   gy = std::max (db::Coord (1), gy);
@@ -1025,7 +1025,7 @@ AsIfFlatRegion::scaled_and_snapped (db::Coord gx, db::Coord mx, db::Coord dx, db
     throw tl::Exception (tl::to_string (tr ("Scale and snap requires positive and non-null magnification or divisor values")));
   }
 
-  std::auto_ptr<FlatRegion> new_region (new FlatRegion (merged_semantics ()));
+  std::unique_ptr<FlatRegion> new_region (new FlatRegion (merged_semantics ()));
 
   gx = std::max (db::Coord (1), gx);
   gy = std::max (db::Coord (1), gy);
@@ -1073,7 +1073,7 @@ void region_cop_impl (AsIfFlatRegion *region, db::Shapes *output_to, db::Compoun
 EdgePairsDelegate *
 AsIfFlatRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &node)
 {
-  std::auto_ptr<FlatEdgePairs> output (new FlatEdgePairs ());
+  std::unique_ptr<FlatEdgePairs> output (new FlatEdgePairs ());
   region_cop_impl<db::EdgePair> (this, &output->raw_edge_pairs (), node);
   return output.release ();
 }
@@ -1081,7 +1081,7 @@ AsIfFlatRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &node)
 RegionDelegate *
 AsIfFlatRegion::cop_to_region (db::CompoundRegionOperationNode &node)
 {
-  std::auto_ptr<FlatRegion> output (new FlatRegion ());
+  std::unique_ptr<FlatRegion> output (new FlatRegion ());
   region_cop_impl<db::Polygon> (this, &output->raw_polygons (), node);
   return output.release ();
 }
@@ -1089,7 +1089,7 @@ AsIfFlatRegion::cop_to_region (db::CompoundRegionOperationNode &node)
 EdgesDelegate *
 AsIfFlatRegion::cop_to_edges (db::CompoundRegionOperationNode &node)
 {
-  std::auto_ptr<FlatEdges> output (new FlatEdges ());
+  std::unique_ptr<FlatEdges> output (new FlatEdges ());
   region_cop_impl<db::Edge> (this, &output->raw_edges (), node);
   return output.release ();
 }
@@ -1188,7 +1188,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
 
   db::check_local_operation<db::Polygon, db::Polygon> op (check, different_polygons, has_other, other_is_merged, options);
 
-  std::auto_ptr<FlatEdgePairs> output (new FlatEdgePairs ());
+  std::unique_ptr<FlatEdgePairs> output (new FlatEdgePairs ());
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_edge_pairs ());
 
@@ -1200,7 +1200,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   //  not supported in this implementation
   tl_assert (! m_options.no_opposite);
 
-  std::auto_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
+  std::unique_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
 
   db::box_scanner<db::Polygon, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (count () + (other ? other->count () : 0));
@@ -1248,7 +1248,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
 EdgePairsDelegate *
 AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options) const
 {
-  std::auto_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
+  std::unique_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
 
   EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
@@ -1307,7 +1307,7 @@ AsIfFlatRegion::merged (bool min_coherence, unsigned int min_wc) const
       ep.insert (*p, n);
     }
 
-    std::auto_ptr<FlatRegion> new_region (new FlatRegion (true));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
 
     //  and run the merge step
     db::MergeOp op (min_wc);
@@ -1355,7 +1355,7 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
   } else if (! merged_semantics () || is_merged ()) {
 
     //  Generic case
-    std::auto_ptr<FlatRegion> new_region (new FlatRegion (false /*output isn't merged*/));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (false /*output isn't merged*/));
 
     db::ShapeGenerator pc (new_region->raw_polygons (), false);
     db::PolygonGenerator pg (pc, false, true);
@@ -1385,7 +1385,7 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
       ep.insert (*p, n);
     }
 
-    std::auto_ptr<FlatRegion> new_region (new FlatRegion (false /*output isn't merged*/));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (false /*output isn't merged*/));
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
     db::SizingPolygonFilter siz (pg2, dx, dy, mode);
@@ -1417,7 +1417,7 @@ AsIfFlatRegion::and_with (const Region &other) const
 
     //  map AND with box to clip ..
     db::Box b = bbox ();
-    std::auto_ptr<FlatRegion> new_region (new FlatRegion (false));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (false));
 
     std::vector<db::Polygon> clipped;
     for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
@@ -1432,7 +1432,7 @@ AsIfFlatRegion::and_with (const Region &other) const
 
     //  map AND with box to clip ..
     db::Box b = other.bbox ();
-    std::auto_ptr<FlatRegion> new_region (new FlatRegion (false));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (false));
 
     std::vector<db::Polygon> clipped;
     for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
@@ -1474,7 +1474,7 @@ AsIfFlatRegion::and_with (const Region &other) const
       ep.insert (*p, n);
     }
 
-    std::auto_ptr<FlatRegion> new_region (new FlatRegion (true));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
     db::BooleanOp op (db::BooleanOp::And);
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
@@ -1529,7 +1529,7 @@ AsIfFlatRegion::not_with (const Region &other) const
       ep.insert (*p, n);
     }
 
-    std::auto_ptr<FlatRegion> new_region (new FlatRegion (true));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
     db::BooleanOp op (db::BooleanOp::ANotB);
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
@@ -1585,12 +1585,12 @@ AsIfFlatRegion::andnot_with (const Region &other) const
       ep.insert (*p, n);
     }
 
-    std::auto_ptr<FlatRegion> new_region1 (new FlatRegion (true));
+    std::unique_ptr<FlatRegion> new_region1 (new FlatRegion (true));
     db::BooleanOp op1 (db::BooleanOp::And);
     db::ShapeGenerator pc1 (new_region1->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg1 (pc1, false /*don't resolve holes*/, min_coherence ());
 
-    std::auto_ptr<FlatRegion> new_region2 (new FlatRegion (true));
+    std::unique_ptr<FlatRegion> new_region2 (new FlatRegion (true));
     db::BooleanOp op2 (db::BooleanOp::ANotB);
     db::ShapeGenerator pc2 (new_region2->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg2 (pc2, false /*don't resolve holes*/, min_coherence ());
@@ -1647,7 +1647,7 @@ AsIfFlatRegion::xor_with (const Region &other) const
       ep.insert (*p, n);
     }
 
-    std::auto_ptr<FlatRegion> new_region (new FlatRegion (true));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
     db::BooleanOp op (db::BooleanOp::Xor);
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
@@ -1701,7 +1701,7 @@ AsIfFlatRegion::or_with (const Region &other) const
       ep.insert (*p, n);
     }
 
-    std::auto_ptr<FlatRegion> new_region (new FlatRegion (true));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
     db::BooleanOp op (db::BooleanOp::Or);
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
@@ -1718,7 +1718,7 @@ AsIfFlatRegion::add (const Region &other) const
   FlatRegion *other_flat = dynamic_cast<FlatRegion *> (other.delegate ());
   if (other_flat) {
 
-    std::auto_ptr<FlatRegion> new_region (new FlatRegion (*other_flat));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (*other_flat));
     new_region->set_is_merged (false);
     new_region->invalidate_cache ();
 
@@ -1734,7 +1734,7 @@ AsIfFlatRegion::add (const Region &other) const
 
   } else {
 
-    std::auto_ptr<FlatRegion> new_region (new FlatRegion (false /*not merged*/));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion (false /*not merged*/));
 
     size_t n = count () + other.count ();
 

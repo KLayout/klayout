@@ -421,7 +421,7 @@ BEGIN_PROTECTED
   lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Load Marker Database File")), fmts);
   if (open_dialog.get_open (m_open_filename)) {
 
-    std::auto_ptr <rdb::Database> db (new rdb::Database ());
+    std::unique_ptr <rdb::Database> db (new rdb::Database ());
     db->load (m_open_filename);
 
     int rdb_index = view ()->add_rdb (db.release ());
@@ -743,7 +743,7 @@ MarkerBrowserDialog::scan_layer ()
   const lay::CellView &cv = view ()->cellview (cv_index);
   const db::Layout &layout = cv->layout ();
 
-  std::auto_ptr<rdb::Database> rdb (new rdb::Database ());
+  std::unique_ptr<rdb::Database> rdb (new rdb::Database ());
   rdb->set_name ("Shapes");
   rdb->set_top_cell_name (layout.cell_name (cv.cell_index ()));
   rdb::Cell *rdb_top_cell = rdb->create_cell (rdb->top_cell_name ());
@@ -787,7 +787,7 @@ MarkerBrowserDialog::scan_layer ()
           
           for (db::ShapeIterator shape = cell.shapes ((*l)->layer_index ()).begin (db::ShapeIterator::All); ! shape.at_end (); ++shape) {
 
-            std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*shape, db::CplxTrans (layout.dbu ())));
+            std::unique_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*shape, db::CplxTrans (layout.dbu ())));
             if (value.get ()) {
               rdb::Item *item = rdb->create_item (rdb_cell->id (), cat->id ());
               item->values ().add (value.release ());
@@ -841,7 +841,7 @@ MarkerBrowserDialog::scan_layer_flat ()
   const lay::CellView &cv = view ()->cellview (cv_index);
   const db::Layout &layout = cv->layout ();
 
-  std::auto_ptr<rdb::Database> rdb (new rdb::Database ());
+  std::unique_ptr<rdb::Database> rdb (new rdb::Database ());
   rdb->set_name ("Shapes");
   rdb->set_top_cell_name (layout.cell_name (cv.cell_index ()));
   rdb::Cell *rdb_top_cell = rdb->create_cell (rdb->top_cell_name ());
@@ -866,7 +866,7 @@ MarkerBrowserDialog::scan_layer_flat ()
       db::RecursiveShapeIterator shape (layout, *cv.cell (), (*l)->layer_index ());
       while (! shape.at_end ()) {
 
-        std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*shape, db::CplxTrans (layout.dbu ()) * shape.trans ()));
+        std::unique_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*shape, db::CplxTrans (layout.dbu ()) * shape.trans ()));
         if (value.get ()) {
           rdb::Item *item = rdb->create_item (rdb_top_cell->id (), cat->id ());
           item->values ().add (value.release ());

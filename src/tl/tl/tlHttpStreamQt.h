@@ -109,7 +109,7 @@ private slots:
 private:
   std::string m_url;
   QNetworkReply *mp_reply;
-  std::auto_ptr<QNetworkReply> mp_active_reply;
+  std::unique_ptr<QNetworkReply> mp_active_reply;
   QByteArray m_request;
   QByteArray m_data;
   QBuffer *mp_buffer;

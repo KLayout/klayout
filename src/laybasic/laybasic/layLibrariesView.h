@@ -250,7 +250,7 @@ private:
   QColor m_text_color;
   tl::DeferredMethod<LibrariesView> m_do_update_content_dm;
   tl::DeferredMethod<LibrariesView> m_do_full_update_content_dm;
-  std::auto_ptr<QStyle> mp_tree_style;
+  std::unique_ptr<QStyle> mp_tree_style;
   std::vector<tl::weak_ptr<db::Library> > m_libraries;
 
   //  event listener for changes in the cellview and layout

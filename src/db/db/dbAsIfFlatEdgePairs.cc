@@ -81,7 +81,7 @@ AsIfFlatEdgePairs::in (const EdgePairs &other, bool invert) const
     op.insert (*o);
   }
 
-  std::auto_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
+  std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
 
   for (EdgePairsIterator o (begin ()); ! o.at_end (); ++o) {
     if ((op.find (*o) == op.end ()) == invert) {
@@ -140,7 +140,7 @@ void AsIfFlatEdgePairs::invalidate_bbox ()
 RegionDelegate *
 AsIfFlatEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const
 {
-  std::auto_ptr<FlatRegion> region (new FlatRegion ());
+  std::unique_ptr<FlatRegion> region (new FlatRegion ());
 
   if (filter.result_must_not_be_merged ()) {
     region->set_merged_semantics (false);
@@ -162,7 +162,7 @@ AsIfFlatEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &
 EdgesDelegate *
 AsIfFlatEdgePairs::processed_to_edges (const EdgePairToEdgeProcessorBase &filter) const
 {
-  std::auto_ptr<FlatEdges> edges (new FlatEdges ());
+  std::unique_ptr<FlatEdges> edges (new FlatEdges ());
 
   if (filter.result_must_not_be_merged ()) {
     edges->set_merged_semantics (false);
@@ -184,7 +184,7 @@ AsIfFlatEdgePairs::processed_to_edges (const EdgePairToEdgeProcessorBase &filter
 EdgePairsDelegate *
 AsIfFlatEdgePairs::filtered (const EdgePairFilterBase &filter) const
 {
-  std::auto_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
+  std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
 
   for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
     if (filter.selected (*p)) {
@@ -198,7 +198,7 @@ AsIfFlatEdgePairs::filtered (const EdgePairFilterBase &filter) const
 RegionDelegate *
 AsIfFlatEdgePairs::polygons (db::Coord e) const
 {
-  std::auto_ptr<FlatRegion> output (new FlatRegion ());
+  std::unique_ptr<FlatRegion> output (new FlatRegion ());
 
   for (EdgePairsIterator ep (begin ()); ! ep.at_end (); ++ep) {
     db::Polygon poly = ep->normalized ().to_polygon (e);
@@ -213,7 +213,7 @@ AsIfFlatEdgePairs::polygons (db::Coord e) const
 EdgesDelegate *
 AsIfFlatEdgePairs::edges () const
 {
-  std::auto_ptr<FlatEdges> output (new FlatEdges ());
+  std::unique_ptr<FlatEdges> output (new FlatEdges ());
 
   for (EdgePairsIterator ep (begin ()); ! ep.at_end (); ++ep) {
     output->insert (ep->first ());
@@ -226,7 +226,7 @@ AsIfFlatEdgePairs::edges () const
 EdgesDelegate *
 AsIfFlatEdgePairs::first_edges () const
 {
-  std::auto_ptr<FlatEdges> output (new FlatEdges ());
+  std::unique_ptr<FlatEdges> output (new FlatEdges ());
 
   for (EdgePairsIterator ep (begin ()); ! ep.at_end (); ++ep) {
     output->insert (ep->first ());
@@ -238,7 +238,7 @@ AsIfFlatEdgePairs::first_edges () const
 EdgesDelegate *
 AsIfFlatEdgePairs::second_edges () const
 {
-  std::auto_ptr<FlatEdges> output (new FlatEdges ());
+  std::unique_ptr<FlatEdges> output (new FlatEdges ());
 
   for (EdgePairsIterator ep (begin ()); ! ep.at_end (); ++ep) {
     output->insert (ep->second ());
@@ -253,7 +253,7 @@ AsIfFlatEdgePairs::add (const EdgePairs &other) const
   FlatEdgePairs *other_flat = dynamic_cast<FlatEdgePairs *> (other.delegate ());
   if (other_flat) {
 
-    std::auto_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs (*other_flat));
+    std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs (*other_flat));
     new_edge_pairs->invalidate_cache ();
 
     size_t n = new_edge_pairs->raw_edge_pairs ().size () + count ();
@@ -268,7 +268,7 @@ AsIfFlatEdgePairs::add (const EdgePairs &other) const
 
   } else {
 
-    std::auto_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
+    std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
 
     size_t n = count () + other.count ();
 

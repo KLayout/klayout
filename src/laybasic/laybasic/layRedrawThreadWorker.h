@@ -244,7 +244,7 @@ private:
   std::vector<std::pair<unsigned int, lay::CanvasPlane *> > m_buffers;
   unsigned int m_test_count;
   tl::Clock m_clock;
-  std::auto_ptr<lay::Renderer> mp_renderer;
+  std::unique_ptr<lay::Renderer> mp_renderer;
 };
 
 }

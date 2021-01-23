@@ -51,7 +51,7 @@ public:
   }
 
 private:
-  std::auto_ptr<gsi::Inspector> mp_inspector;
+  std::unique_ptr<gsi::Inspector> mp_inspector;
 };
 
 }
@@ -180,7 +180,7 @@ void MacroVariableView::expanded (QTreeWidgetItem *item)
   if (item->childCount () > 0) {
     PlaceholderItem *ph = dynamic_cast<PlaceholderItem *> (item->child (0));
     if (ph) {
-      std::auto_ptr<QTreeWidgetItem> ph_taken (item->takeChild (0));
+      std::unique_ptr<QTreeWidgetItem> ph_taken (item->takeChild (0));
       sync (item, ph->inspector (), true);
     }
   }
@@ -238,7 +238,7 @@ void MacroVariableView::sync_item (QTreeWidgetItem *parent, gsi::Inspector *insp
 
     if (inspector->has_children (index)) {
 
-      std::auto_ptr<gsi::Inspector> ci (inspector->child_inspector (index));
+      std::unique_ptr<gsi::Inspector> ci (inspector->child_inspector (index));
       update_value (item, inspector_description (ci.get ()), false);
       if (item->isExpanded ()) {
         sync (item, ci.get (), fresh);

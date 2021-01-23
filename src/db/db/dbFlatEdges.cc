@@ -242,7 +242,7 @@ FlatEdges::filter_in_place (const EdgeFilterBase &filter)
 
 EdgesDelegate *FlatEdges::add (const Edges &other) const
 {
-  std::auto_ptr<FlatEdges> new_region (new FlatEdges (*this));
+  std::unique_ptr<FlatEdges> new_region (new FlatEdges (*this));
   new_region->invalidate_cache ();
   new_region->set_is_merged (false);
 

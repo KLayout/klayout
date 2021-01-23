@@ -93,7 +93,7 @@ private:
 
   db::LayoutToNetlist *mp_l2ndb;
   db::LayoutVsSchematic *mp_lvsdb;
-  std::auto_ptr<IndexedNetlistModel> mp_indexer;
+  std::unique_ptr<IndexedNetlistModel> mp_indexer;
   mutable std::map<std::pair<const db::Circuit *, const db::Circuit *>, QModelIndex> m_circuits_to_index;
   int m_object_column;
   int m_status_column;

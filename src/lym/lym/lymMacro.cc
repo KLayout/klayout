@@ -1429,7 +1429,7 @@ void MacroCollection::scan (const std::string &path)
     QStringList files = dir.entryList (filters, QDir::Files);
     for (QStringList::ConstIterator f = files.begin (); f != files.end (); ++f) {
 
-      std::auto_ptr<lym::Macro> new_macro;
+      std::unique_ptr<lym::Macro> new_macro;
 
       try {
 

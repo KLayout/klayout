@@ -379,7 +379,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
   bool has_error = false;
   bool has_pcell_error = false;
 
-  std::auto_ptr<CombinedChangeApplicator> appl (new CombinedChangeApplicator ());
+  std::unique_ptr<CombinedChangeApplicator> appl (new CombinedChangeApplicator ());
 
   edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
   const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
@@ -608,7 +608,7 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
   lay::LayerState layer_state = mp_service->view ()->layer_snapshot ();
   unsigned int cv_index = m_selection_ptrs [m_index]->cv_index ();
 
-  std::auto_ptr<ChangeApplicator> applicator;
+  std::unique_ptr<ChangeApplicator> applicator;
 
   {
     edt::Service::obj_iterator pos = m_selection_ptrs [m_index];

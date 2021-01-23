@@ -720,7 +720,7 @@ private:
   lay::HelpDialog *mp_assistant;
   std::string m_current_session;
   std::string m_message;
-  std::auto_ptr<QPrinter> mp_printer;
+  std::unique_ptr<QPrinter> mp_printer;
   std::vector<QString> m_changed_files;
 
   //  the object manager (undo/redo mechanism and others)

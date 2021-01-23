@@ -327,7 +327,7 @@ RegionDelegate *FlatRegion::merged () const
 
 RegionDelegate *FlatRegion::add (const Region &other) const
 {
-  std::auto_ptr<FlatRegion> new_region (new FlatRegion (*this));
+  std::unique_ptr<FlatRegion> new_region (new FlatRegion (*this));
   new_region->invalidate_cache ();
   new_region->set_is_merged (false);
 

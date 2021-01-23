@@ -899,7 +899,7 @@ private:
   gsi::VariantUserClass<X> m_var_cls;
   gsi::VariantUserClass<X> m_var_cls_c;
   gsi::VariantUserClass<X> m_var_cls_cls;
-  std::auto_ptr<SubClassTesterBase> m_subclass_tester;
+  std::unique_ptr<SubClassTesterBase> m_subclass_tester;
 };
 
 /**

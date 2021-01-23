@@ -444,7 +444,7 @@ public:
   {
     mp_expr.reset (0);
 
-    std::auto_ptr<tl::Expression> ex (new tl::Expression ());
+    std::unique_ptr<tl::Expression> ex (new tl::Expression ());
     tl::Eval::parse (*ex, e);
     mp_expr.reset (ex.release ());
   }
@@ -459,7 +459,7 @@ public:
   }
 
 private:
-  std::auto_ptr<tl::Expression> mp_expr;
+  std::unique_ptr<tl::Expression> mp_expr;
 };
 
 static tl::Variant eval_expr (const std::string &e)
@@ -471,14 +471,14 @@ static tl::Variant eval_expr (const std::string &e)
 
 static ExpressionWrapper *new_expr1 (const std::string &e)
 {
-  std::auto_ptr<ExpressionWrapper> expr (new ExpressionWrapper ());
+  std::unique_ptr<ExpressionWrapper> expr (new ExpressionWrapper ());
   expr->parse (e);
   return expr.release ();
 }
 
 static ExpressionWrapper *new_expr2 (const std::string &e, const std::map<std::string, tl::Variant> &variables)
 {
-  std::auto_ptr<ExpressionWrapper> expr (new ExpressionWrapper ());
+  std::unique_ptr<ExpressionWrapper> expr (new ExpressionWrapper ());
   for (std::map<std::string, tl::Variant>::const_iterator v = variables.begin (); v != variables.end (); ++v) {
     expr->set_var (v->first, v->second);
   }

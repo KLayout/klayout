@@ -219,7 +219,7 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
         read_word_or_quoted (lspec);
       }
 
-      std::auto_ptr<db::Region> region (l2n->make_layer (layer));
+      std::unique_ptr<db::Region> region (l2n->make_layer (layer));
       if (! lspec.empty ()) {
         unsigned int layer_index = l2n->layer_of (*region);
         tl::Extractor ex (lspec.c_str ());
@@ -683,7 +683,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
 
   std::pair<db::DeviceAbstract *, const db::DeviceClass *> dm = device_model_by_name (netlist, dmname);
 
-  std::auto_ptr<db::Device> device (new db::Device ());
+  std::unique_ptr<db::Device> device (new db::Device ());
   device->set_device_class (const_cast<db::DeviceClass *> (dm.second));
   device->set_device_abstract (dm.first);
 
@@ -936,7 +936,7 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
     throw tl::Exception (tl::to_string (tr ("Not a valid device circuit name: ")) + xname);
   }
 
-  std::auto_ptr<db::SubCircuit> subcircuit (new db::SubCircuit (circuit_ref));
+  std::unique_ptr<db::SubCircuit> subcircuit (new db::SubCircuit (circuit_ref));
 
   db::DCplxTrans trans;
 

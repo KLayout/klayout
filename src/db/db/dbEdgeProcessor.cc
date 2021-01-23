@@ -2162,7 +2162,7 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
 
   size_t todo_max = 1000000;
 
-  std::auto_ptr<tl::AbsoluteProgress> progress (0);
+  std::unique_ptr<tl::AbsoluteProgress> progress;
   if (m_report_progress) {
     if (m_progress_desc.empty ()) {
       progress.reset (new tl::AbsoluteProgress (tl::to_string (tr ("Processing")), 1000));

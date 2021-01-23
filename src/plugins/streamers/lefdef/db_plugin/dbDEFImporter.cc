@@ -902,10 +902,10 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
     ViaDesc &vd = m_via_desc.insert (std::make_pair (n, ViaDesc ())).first->second;
 
     //  produce a cell for vias
-    std::auto_ptr<RuleBasedViaGenerator> rule_based_vg;
-    std::auto_ptr<GeometryBasedLayoutGenerator> geo_based_vg;
+    std::unique_ptr<RuleBasedViaGenerator> rule_based_vg;
+    std::unique_ptr<GeometryBasedLayoutGenerator> geo_based_vg;
 
-    std::auto_ptr<LEFDEFLayoutGenerator> via_generator;
+    std::unique_ptr<LEFDEFLayoutGenerator> via_generator;
     std::set<std::string> seen_layers;
     std::vector<std::string> routing_layers;
 

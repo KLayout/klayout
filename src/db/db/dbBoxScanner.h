@@ -354,7 +354,7 @@ private:
       iterator_type current = m_pp.begin ();
       iterator_type future = m_pp.begin ();
 
-      std::auto_ptr<tl::RelativeProgress> progress (0);
+      std::unique_ptr<tl::RelativeProgress> progress;
       if (m_report_progress) {
         if (m_progress_desc.empty ()) {
           progress.reset (new tl::RelativeProgress (tl::to_string (tr ("Processing")), m_pp.size (), 1000));
@@ -767,7 +767,7 @@ private:
       iterator_type2 current2 = m_pp2.begin ();
       iterator_type2 future2 = m_pp2.begin ();
 
-      std::auto_ptr<tl::RelativeProgress> progress (0);
+      std::unique_ptr<tl::RelativeProgress> progress;
       if (m_report_progress) {
         if (m_progress_desc.empty ()) {
           progress.reset (new tl::RelativeProgress (tl::to_string (tr ("Processing")), m_pp1.size () + m_pp2.size (), 1000));

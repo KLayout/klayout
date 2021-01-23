@@ -2107,7 +2107,7 @@ MainService::cm_tap ()
 
   //  List the layers under the cursor as pop up a menu
 
-  std::auto_ptr<QMenu> menu (new QMenu (view ()));
+  std::unique_ptr<QMenu> menu (new QMenu (view ()));
   menu->show ();
 
   int icon_size = menu->style ()->pixelMetric (QStyle::PM_ButtonIconSize);

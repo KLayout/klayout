@@ -733,7 +733,7 @@ private:
   const shapes_type *mp_shapes;
 
   box_type m_region;
-  std::auto_ptr<region_type> mp_complex_region;
+  std::unique_ptr<region_type> mp_complex_region;
   db::box_convert<db::CellInst> m_box_convert;
 
   mutable inst_iterator m_inst;

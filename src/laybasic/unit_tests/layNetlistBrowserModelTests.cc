@@ -29,7 +29,7 @@ TEST (1)
   l2n.load (tl::testsrc () + "/testdata/lay/l2n_browser.l2n");
 
   lay::NetColorizer colorizer;
-  std::auto_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &l2n, &colorizer));
+  std::unique_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &l2n, &colorizer));
 
   EXPECT_EQ (model->hasChildren (QModelIndex ()), true);
   //  two circuits
@@ -246,7 +246,7 @@ TEST (2)
   lvs.load (tl::testsrc () + "/testdata/lay/lvsdb_browser.lvsdb");
 
   lay::NetColorizer colorizer;
-  std::auto_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &lvs, &colorizer));
+  std::unique_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &lvs, &colorizer));
 
   EXPECT_EQ (model->hasChildren (QModelIndex ()), true);
   //  two circuits
@@ -412,7 +412,7 @@ TEST (3)
   l2n.load (tl::testsrc () + "/testdata/lay/l2n_browser.l2n");
 
   lay::NetColorizer colorizer;
-  std::auto_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &l2n, &colorizer));
+  std::unique_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &l2n, &colorizer));
 
   db::Circuit *root = l2n.netlist ()->circuit_by_name ("RINGO");
   EXPECT_EQ (root != 0, true);
@@ -439,7 +439,7 @@ TEST (4)
   l2n.load (tl::testsrc () + "/testdata/lay/l2n_browser.l2n");
 
   lay::NetColorizer colorizer;
-  std::auto_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &l2n, &colorizer));
+  std::unique_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &l2n, &colorizer));
 
   db::Circuit *root = l2n.netlist ()->circuit_by_name ("RINGO");
   EXPECT_EQ (root != 0, true);
@@ -469,7 +469,7 @@ TEST (5)
   lvs.load (tl::testsrc () + "/testdata/lay/lvsdb_browser.lvsdb");
 
   lay::NetColorizer colorizer;
-  std::auto_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &lvs, &colorizer));
+  std::unique_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &lvs, &colorizer));
   QModelIndex idx;
 
   db::Circuit *root = lvs.netlist ()->circuit_by_name ("INV2PAIR");
@@ -527,7 +527,7 @@ TEST (6)
   lvs.load (tl::testsrc () + "/testdata/lay/lvsdb_browser.lvsdb");
 
   lay::NetColorizer colorizer;
-  std::auto_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &lvs, &colorizer));
+  std::unique_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &lvs, &colorizer));
   QModelIndex idx;
 
   db::Circuit *root = lvs.reference_netlist ()->circuit_by_name ("INV2PAIR");

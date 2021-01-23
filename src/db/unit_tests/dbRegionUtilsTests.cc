@@ -23,45 +23,9 @@
 
 
 #include "tlUnitTest.h"
-#include "tlString.h"
+#include "tlStringEx.h"
 
 #include "dbRegionUtils.h"
-
-namespace tl
-{
-
-template <class Iter>
-std::string to_string (Iter b, Iter e)
-{
-  std::string res;
-  for (Iter i = b; i != e; ++i) {
-    if (i != b) {
-      res += ",";
-    }
-    res += tl::to_string (*i);
-  }
-  return res;
-}
-
-template <class T>
-std::string to_string (const std::vector<T> &v)
-{
-  return to_string (v.begin (), v.end ());
-}
-
-template <class T>
-std::string to_string (const std::list<T> &v)
-{
-  return to_string (v.begin (), v.end ());
-}
-
-template <class T>
-std::string to_string (const std::set<T> &v)
-{
-  return to_string (v.begin (), v.end ());
-}
-
-}
 
 TEST(1_SimpleLShape)
 {

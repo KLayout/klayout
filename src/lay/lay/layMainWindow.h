@@ -616,6 +616,7 @@ public slots:
   void redraw ();
   void exit ();
   void close_current_view ();
+  void close_view (int index);
   void tab_close_requested (int);
   void open_recent (size_t n);
   void open_recent_session (size_t n);
@@ -779,7 +780,6 @@ private:
 
   int dirty_files (std::string &dirty_files);
 
-  void close_view (int index);
   void interactive_close_view (int index, bool all_cellviews);
   void call_on_current_view (void (lay::LayoutView::*func) (), const std::string &op_desc);
   void current_view_changed ();

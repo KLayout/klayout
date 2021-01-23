@@ -297,8 +297,9 @@ void
 InputHttpStreamPrivateData::close ()
 {
   if (mp_active_reply.get ()) {
-    mp_active_reply->abort ();
-    mp_active_reply.release ()->deleteLater ();
+    QNetworkReply *reply = mp_active_reply.release ();
+    reply->abort ();
+    reply->deleteLater ();
   }
   mp_reply = 0;
 }
@@ -343,7 +344,7 @@ InputHttpStreamPrivateData::finished (QNetworkReply *reply)
   if (tl::verbosity() >= 40) {
     const QList<QNetworkReply::RawHeaderPair> &raw_headers = reply->rawHeaderPairs ();
     for (QList<QNetworkReply::RawHeaderPair>::const_iterator h = raw_headers.begin (); h != raw_headers.end (); ++h) {
-      tl::info << "HTTP response header: " << h->first.constData ()<< ": " << h->second.constData ();
+      tl::info << "HTTP response header: " << h->first.constData () << ": " << h->second.constData ();
     }
   }
 
@@ -383,9 +384,6 @@ InputHttpStreamPrivateData::issue_request (const QUrl &url)
     tl::info << "HTTP request URL: " << url.toString ().toUtf8 ().constData ();
   }
   for (std::map<std::string, std::string>::const_iterator h = m_headers.begin (); h != m_headers.end (); ++h) {
-    if (tl::verbosity() >= 40) {
-      tl::info << "HTTP request header: " << h->first << ": " << h->second;
-    }
     request.setRawHeader (QByteArray (h->first.c_str ()), QByteArray (h->second.c_str ()));
   }
 
@@ -396,6 +394,14 @@ InputHttpStreamPrivateData::issue_request (const QUrl &url)
   request.setAttribute (QNetworkRequest::FollowRedirectsAttribute, false);
 #endif
 #endif
+
+  if (tl::verbosity() >= 40) {
+    tl::info << "HTTP request: " << m_request.constData ();
+    const QList<QByteArray> &raw_headers = request.rawHeaderList ();
+    for (QList<QByteArray>::const_iterator h = raw_headers.begin (); h != raw_headers.end (); ++h) {
+      tl::info << "HTTP request header: " << h->constData () << ": " << request.rawHeader (*h).constData ();
+    }
+  }
 
 #if QT_VERSION < 0x40700
   if (m_request == "GET" && m_data.isEmpty ()) {

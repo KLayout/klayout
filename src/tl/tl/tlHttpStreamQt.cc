@@ -123,6 +123,39 @@ AuthenticationHandler::proxyAuthenticationRequired (const QNetworkProxy &proxy, 
 // ---------------------------------------------------------------
 //  InputHttpStream implementation
 
+std::string
+HttpErrorException::format_error (const std::string &em, int ec, QNetworkReply *reply)
+{
+  std::string msg = tl::sprintf (tl::to_string (tr ("Error %d: %s, fetching %s")), ec, em, tl::to_string (reply->url ().toString ()));
+
+  std::string data = tl::to_string (QString::fromUtf8 (reply->readAll ()));
+  if (data.size () > 1000) {
+    data = data.substr (0, size_t (1000)) + "...";
+  }
+
+  if (! data.empty ()) {
+
+    msg += "\n\n";
+    msg += tl::to_string (tr ("Reply body:"));
+    msg += "\n";
+    msg += data;
+
+  }
+
+  std::string redirected = tl::to_string (reply->attribute (QNetworkRequest::RedirectionTargetAttribute).toString ());
+  if (! redirected.empty ()) {
+
+    msg += "\n\n";
+    msg += tl::to_string (tr ("Redirected to: ")) + redirected;
+
+  }
+
+  return msg;
+}
+
+// ---------------------------------------------------------------
+//  InputHttpStream implementation
+
 InputHttpStream::InputHttpStream (const std::string &url)
 {
   mp_data = new InputHttpStreamPrivateData (url);
@@ -237,7 +270,7 @@ static QNetworkAccessManager *s_network_manager (0);
 static AuthenticationHandler *s_auth_handler (0);
 
 InputHttpStreamPrivateData::InputHttpStreamPrivateData (const std::string &url)
-  : m_url (url), mp_reply (0), m_request ("GET"), mp_buffer (0)
+  : m_url (url), mp_reply (0), m_request ("GET"), mp_buffer (0), mp_resend_timer (new QTimer (this))
 {
   if (! s_network_manager) {
 
@@ -252,6 +285,7 @@ InputHttpStreamPrivateData::InputHttpStreamPrivateData (const std::string &url)
   }
 
   connect (s_network_manager, SIGNAL (finished (QNetworkReply *)), this, SLOT (finished (QNetworkReply *)));
+  connect (mp_resend_timer, SIGNAL (timeout ()), this, SLOT (resend ()));
 }
 
 InputHttpStreamPrivateData::~InputHttpStreamPrivateData ()
@@ -294,22 +328,44 @@ InputHttpStreamPrivateData::add_header (const std::string &name, const std::stri
 }
 
 void
+InputHttpStreamPrivateData::resend ()
+{
+  issue_request (QUrl (tl::to_qstring (m_url)));
+}
+
+void
 InputHttpStreamPrivateData::finished (QNetworkReply *reply)
 {
   if (reply != mp_active_reply.get ()) {
     return;
   }
 
+  if (tl::verbosity() >= 40) {
+    const QList<QNetworkReply::RawHeaderPair> &raw_headers = reply->rawHeaderPairs ();
+    for (QList<QNetworkReply::RawHeaderPair>::const_iterator h = raw_headers.begin (); h != raw_headers.end (); ++h) {
+      tl::info << "HTTP response header: " << h->first.constData ()<< ": " << h->second.constData ();
+    }
+  }
+
   QVariant redirect_target = reply->attribute (QNetworkRequest::RedirectionTargetAttribute);
   if (reply->error () == QNetworkReply::NoError && ! redirect_target.isNull ()) {
+
     m_url = tl::to_string (redirect_target.toString ());
     if (tl::verbosity() >= 30) {
       tl::info << "HTTP redirect to: " << m_url;
     }
-    issue_request (QUrl (redirect_target.toString ()));
+
+    close ();
+
+    mp_resend_timer->setSingleShot (true);
+    mp_resend_timer->setInterval (0);
+    mp_resend_timer->start ();
+
   } else {
+
     mp_reply = reply;
     m_ready ();
+
   }
 }
 
@@ -332,6 +388,14 @@ InputHttpStreamPrivateData::issue_request (const QUrl &url)
     }
     request.setRawHeader (QByteArray (h->first.c_str ()), QByteArray (h->second.c_str ()));
   }
+
+#if QT_VERSION >= 0x50600
+#if QT_VERSION >= 0x50900
+  request.setAttribute (QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy);
+#else
+  request.setAttribute (QNetworkRequest::FollowRedirectsAttribute, false);
+#endif
+#endif
 
 #if QT_VERSION < 0x40700
   if (m_request == "GET" && m_data.isEmpty ()) {
@@ -410,7 +474,7 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
       ec = int (mp_reply->error ());
     }
 
-    throw HttpErrorException (em, ec, m_url);
+    throw HttpErrorException (em, ec, mp_reply);
 
   }
 

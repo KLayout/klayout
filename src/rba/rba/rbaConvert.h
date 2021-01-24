@@ -183,6 +183,12 @@ inline bool test_type<gsi::StringType> (VALUE rval, bool /*loose*/)
 }
 
 template <>
+inline bool test_type<gsi::ByteArrayType> (VALUE rval, bool /*loose*/)
+{
+  return TYPE (rval) == T_STRING;
+}
+
+template <>
 inline bool test_type<gsi::VariantType> (VALUE /*rval*/, bool /*loose*/)
 {
   //  assume we can translate everything into a variant
@@ -311,6 +317,15 @@ inline std::string ruby2c<std::string> (VALUE rval)
 {
   VALUE str = rba_safe_string_value (rval);
   return std::string (RSTRING_PTR(str), RSTRING_LEN(str));
+}
+
+template <>
+inline std::vector<char> ruby2c<std::vector<char> > (VALUE rval)
+{
+  VALUE str = rba_safe_string_value (rval);
+  char *cp = RSTRING_PTR(str);
+  size_t sz = RSTRING_LEN(str);
+  return std::vector<char> (cp, cp + sz);
 }
 
 #if defined(HAVE_QT)
@@ -448,6 +463,12 @@ template <>
 inline VALUE c2ruby<std::string> (const std::string &c)
 {
   return rb_str_new (c.c_str (), long (c.size ()));
+}
+
+template <>
+inline VALUE c2ruby<std::vector<char> > (const std::vector<char> &c)
+{
+  return rb_str_new (&c.front (), c.size ());
 }
 
 #if defined(HAVE_QT)

@@ -26,6 +26,7 @@
 
 #include "tlInternational.h"
 #include "tlException.h"
+#include "tlTypeTraits.h"
 #include "gsiCommon.h"
 
 #include <string>
@@ -37,6 +38,7 @@
 #if defined(HAVE_QT)
 #include <QString>
 #include <QStringRef>
+#include <QByteArray>
 #include <QVariant>
 #include <QMap>
 #include <QHash>
@@ -61,6 +63,7 @@ class GSI_PUBLIC SerialArgs;
 class GSI_PUBLIC VectorAdaptor;
 class GSI_PUBLIC MapAdaptor;
 class GSI_PUBLIC StringAdaptor;
+class GSI_PUBLIC ByteArrayAdaptor;
 class GSI_PUBLIC VariantAdaptor;
 class GSI_PUBLIC ClassBase;
 struct NoAdaptorTag;
@@ -112,6 +115,7 @@ enum BasicType
   T_float = 14,
   T_var = 15,
   T_string = 16,
+  T_byte_array = 17,
   T_void_ptr = 19,
   T_object = 20,
   T_vector = 21,
@@ -175,6 +179,7 @@ struct adaptor_category_tag { };
 struct vector_adaptor_tag   : public adaptor_category_tag { };
 struct map_adaptor_tag      : public adaptor_category_tag { };
 struct string_adaptor_tag   : public adaptor_category_tag { };
+struct byte_array_adaptor_tag : public adaptor_category_tag { };
 struct variant_adaptor_tag  : public adaptor_category_tag { };
 
 struct basic_type_tag       : public type_tag_base { };
@@ -224,6 +229,7 @@ struct adaptor_ptr_tag      : public npod_ptr_tag { };
 struct vector_tag           : public adaptor_direct_tag, public vector_adaptor_tag { }; 
 struct map_tag              : public adaptor_direct_tag, public map_adaptor_tag { }; 
 struct string_tag           : public adaptor_direct_tag, public string_adaptor_tag { };
+struct byte_array_tag       : public adaptor_direct_tag, public byte_array_adaptor_tag { };
 struct var_tag              : public adaptor_direct_tag, public variant_adaptor_tag { };
 
 struct bool_cref_tag        : public pod_cref_tag { };
@@ -247,6 +253,7 @@ struct float_cref_tag       : public pod_cref_tag { };
 struct vector_cref_tag      : public adaptor_cref_tag, public vector_adaptor_tag { };
 struct map_cref_tag         : public adaptor_cref_tag, public map_adaptor_tag { };
 struct string_cref_tag      : public adaptor_cref_tag, public string_adaptor_tag { };
+struct byte_array_cref_tag  : public adaptor_cref_tag, public byte_array_adaptor_tag { };
 struct var_cref_tag         : public adaptor_cref_tag, public variant_adaptor_tag { };
 
 struct bool_ref_tag         : public pod_ref_tag { };
@@ -270,6 +277,7 @@ struct float_ref_tag        : public pod_ref_tag { };
 struct vector_ref_tag       : public adaptor_ref_tag, public vector_adaptor_tag { };
 struct map_ref_tag          : public adaptor_ref_tag, public map_adaptor_tag { };
 struct string_ref_tag       : public adaptor_ref_tag, public string_adaptor_tag { };
+struct byte_array_ref_tag   : public adaptor_ref_tag, public byte_array_adaptor_tag { };
 struct var_ref_tag          : public adaptor_ref_tag, public variant_adaptor_tag { };
 
 struct bool_cptr_tag        : public pod_cptr_tag { };
@@ -293,6 +301,7 @@ struct float_cptr_tag       : public pod_cptr_tag { };
 struct vector_cptr_tag      : public adaptor_cptr_tag, public vector_adaptor_tag { };
 struct map_cptr_tag         : public adaptor_cptr_tag, public map_adaptor_tag { };
 struct string_cptr_tag      : public adaptor_cptr_tag, public string_adaptor_tag { };
+struct byte_array_cptr_tag  : public adaptor_cptr_tag, public byte_array_adaptor_tag { };
 struct var_cptr_tag         : public adaptor_cptr_tag, public variant_adaptor_tag { };
 
 struct bool_ptr_tag         : public pod_ptr_tag { };
@@ -316,6 +325,7 @@ struct float_ptr_tag        : public pod_ptr_tag { };
 struct vector_ptr_tag       : public adaptor_ptr_tag, public vector_adaptor_tag { };
 struct map_ptr_tag          : public adaptor_ptr_tag, public map_adaptor_tag { };
 struct string_ptr_tag       : public adaptor_ptr_tag, public string_adaptor_tag { };
+struct byte_array_ptr_tag   : public adaptor_ptr_tag, public byte_array_adaptor_tag { };
 struct var_ptr_tag          : public adaptor_ptr_tag, public variant_adaptor_tag { };
 
 //  all other objects
@@ -427,7 +437,8 @@ template <> struct type_traits<std::string>                 : generic_type_trait
 #if defined(HAVE_QT)
 template <> struct type_traits<QString>                     : generic_type_traits<string_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringRef>                  : generic_type_traits<string_tag, StringAdaptor, T_string> { };
-template <> struct type_traits<QByteArray>                  : generic_type_traits<string_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<QByteArray>                  : generic_type_traits<byte_array_tag, StringAdaptor, T_byte_array> { };
+template <> struct type_traits<std::vector<char> >          : generic_type_traits<byte_array_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<QVariant>                    : generic_type_traits<var_tag, VariantAdaptor, T_var> { };
 #endif
 template <> struct type_traits<tl::Variant>                 : generic_type_traits<var_tag, VariantAdaptor, T_var> { };
@@ -459,7 +470,8 @@ template <> struct type_traits<const std::string &>         : generic_type_trait
 #if defined(HAVE_QT)
 template <> struct type_traits<const QString &>             : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QStringRef &>          : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
-template <> struct type_traits<const QByteArray &>          : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<const QByteArray &>          : generic_type_traits<byte_array_cref_tag, StringAdaptor, T_byte_array> { };
+template <> struct type_traits<const std::vector<char> &>   : generic_type_traits<byte_array_cref_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<const QVariant &>            : generic_type_traits<var_cref_tag, VariantAdaptor, T_var> { };
 #endif
 template <> struct type_traits<const tl::Variant &>         : generic_type_traits<var_cref_tag, VariantAdaptor, T_var> { };
@@ -488,7 +500,8 @@ template <> struct type_traits<std::string &>               : generic_type_trait
 #if defined(HAVE_QT)
 template <> struct type_traits<QString &>                   : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringRef &>                : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
-template <> struct type_traits<QByteArray &>                : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<QByteArray &>                : generic_type_traits<byte_array_ref_tag, StringAdaptor, T_byte_array> { };
+template <> struct type_traits<std::vector<char> &>         : generic_type_traits<byte_array_ref_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<QVariant &>                  : generic_type_traits<var_ref_tag, VariantAdaptor, T_var> { };
 #endif
 template <> struct type_traits<tl::Variant &>               : generic_type_traits<var_ref_tag, VariantAdaptor, T_var> { };
@@ -518,7 +531,8 @@ template <> struct type_traits<const std::string *>         : generic_type_trait
 #if defined(HAVE_QT)
 template <> struct type_traits<const QString *>             : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QStringRef *>          : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
-template <> struct type_traits<const QByteArray *>          : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<const QByteArray *>          : generic_type_traits<byte_array_cptr_tag, StringAdaptor, T_byte_array> { };
+template <> struct type_traits<const std::vector<char> *>   : generic_type_traits<byte_array_cptr_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<const QVariant *>            : generic_type_traits<var_cptr_tag, VariantAdaptor, T_var> { };
 #endif
 template <> struct type_traits<const tl::Variant *>         : generic_type_traits<var_cptr_tag, VariantAdaptor, T_var> { };
@@ -548,7 +562,8 @@ template <> struct type_traits<std::string *>               : generic_type_trait
 #if defined(HAVE_QT)
 template <> struct type_traits<QString *>                   : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringRef *>                : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
-template <> struct type_traits<QByteArray *>                : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<QByteArray *>                : generic_type_traits<byte_array_ptr_tag, StringAdaptor, T_byte_array> { };
+template <> struct type_traits<std::vector<char> *>         : generic_type_traits<byte_array_ptr_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<QVariant *>                  : generic_type_traits<var_ptr_tag, VariantAdaptor, T_var> { };
 #endif
 template <> struct type_traits<tl::Variant *>               : generic_type_traits<var_ptr_tag, VariantAdaptor, T_var> { };
@@ -1977,6 +1992,11 @@ struct ObjectType { };
 struct StringType { };
 
 /**
+ *  @brief Represents "T_byte_array" as a C++ type
+ */
+struct ByteArrayType { };
+
+/**
  *  @brief Represents "T_var" as a C++ type
  */
 struct VariantType { };
@@ -2053,7 +2073,10 @@ void do_on_type_impl (gsi::BasicType type, const A1 *arg1, const A2 *arg2, const
   case gsi::T_string:   
     call_variadic_function<F<StringType>, A1, A2, A3, A4, A5> () (arg1, arg2, arg3, arg4, arg5);
     break;
-  case gsi::T_var:   
+  case gsi::T_byte_array:
+    call_variadic_function<F<ByteArrayType>, A1, A2, A3, A4, A5> () (arg1, arg2, arg3, arg4, arg5);
+    break;
+  case gsi::T_var:
     call_variadic_function<F<VariantType>, A1, A2, A3, A4, A5> () (arg1, arg2, arg3, arg4, arg5);
     break;
   case gsi::T_object:   

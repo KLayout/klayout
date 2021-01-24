@@ -631,7 +631,11 @@ struct reader<gsi::ByteArrayType>
     } else {
       const char *cp = a->c_str ();
       size_t sz = a->size ();
-      *ret = c2python (std::vector<char> (cp, cp + sz));
+#if PY_MAJOR_VERSION < 3
+      *ret = PyByteArray_FromStringAndSize (cp, sz);
+#else
+      *ret = PyBytes_FromStringAndSize (cp, sz);
+#endif
     }
   }
 };

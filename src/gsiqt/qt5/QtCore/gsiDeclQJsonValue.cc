@@ -95,25 +95,6 @@ static void _call_ctor_QJsonValue_1071 (const qt_gsi::GenericStaticMethod * /*de
 }
 
 
-//  Constructor QJsonValue::QJsonValue(int n)
-
-
-static void _init_ctor_QJsonValue_767 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("n");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return_new<QJsonValue> ();
-}
-
-static void _call_ctor_QJsonValue_767 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  ret.write<QJsonValue *> (new QJsonValue (arg1));
-}
-
-
 //  Constructor QJsonValue::QJsonValue(qint64 n)
 
 
@@ -148,25 +129,6 @@ static void _call_ctor_QJsonValue_2025 (const qt_gsi::GenericStaticMethod * /*de
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QJsonValue *> (new QJsonValue (arg1));
-}
-
-
-//  Constructor QJsonValue::QJsonValue(const char *s)
-
-
-static void _init_ctor_QJsonValue_1731 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("s");
-  decl->add_arg<const char * > (argspec_0);
-  decl->set_return_new<QJsonValue> ();
-}
-
-static void _call_ctor_QJsonValue_1731 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<QJsonValue *> (new QJsonValue (arg1));
 }
 
@@ -592,10 +554,8 @@ static gsi::Methods methods_QJsonValue () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonValue::QJsonValue(QJsonValue::Type)\nThis method creates an object of class QJsonValue.", &_init_ctor_QJsonValue_1970, &_call_ctor_QJsonValue_1970);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonValue::QJsonValue(bool b)\nThis method creates an object of class QJsonValue.", &_init_ctor_QJsonValue_864, &_call_ctor_QJsonValue_864);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonValue::QJsonValue(double n)\nThis method creates an object of class QJsonValue.", &_init_ctor_QJsonValue_1071, &_call_ctor_QJsonValue_1071);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonValue::QJsonValue(int n)\nThis method creates an object of class QJsonValue.", &_init_ctor_QJsonValue_767, &_call_ctor_QJsonValue_767);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonValue::QJsonValue(qint64 n)\nThis method creates an object of class QJsonValue.", &_init_ctor_QJsonValue_986, &_call_ctor_QJsonValue_986);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonValue::QJsonValue(const QString &s)\nThis method creates an object of class QJsonValue.", &_init_ctor_QJsonValue_2025, &_call_ctor_QJsonValue_2025);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonValue::QJsonValue(const char *s)\nThis method creates an object of class QJsonValue.", &_init_ctor_QJsonValue_1731, &_call_ctor_QJsonValue_1731);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonValue::QJsonValue(const QJsonArray &a)\nThis method creates an object of class QJsonValue.", &_init_ctor_QJsonValue_2315, &_call_ctor_QJsonValue_2315);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonValue::QJsonValue(const QJsonObject &o)\nThis method creates an object of class QJsonValue.", &_init_ctor_QJsonValue_2403, &_call_ctor_QJsonValue_2403);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonValue::QJsonValue(const QJsonValue &other)\nThis method creates an object of class QJsonValue.", &_init_ctor_QJsonValue_2313, &_call_ctor_QJsonValue_2313);

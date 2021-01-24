@@ -31,8 +31,10 @@
 #include "dbFlatEdges.h"
 #include "dbPolygonTools.h"
 #include "dbCompoundOperation.h"
-#include "gsiClassBase.h"
 #include "tlGlobPattern.h"
+
+//  NOTE: include this to provide the symbols for "make_variant"
+#include "gsiDecl.h"
 
 namespace db
 {

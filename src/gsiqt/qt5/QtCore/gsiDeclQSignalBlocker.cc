@@ -56,25 +56,6 @@ static void _call_ctor_QSignalBlocker_1302 (const qt_gsi::GenericStaticMethod * 
 }
 
 
-//  Constructor QSignalBlocker::QSignalBlocker(QObject &o)
-
-
-static void _init_ctor_QSignalBlocker_1298 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("o");
-  decl->add_arg<QObject & > (argspec_0);
-  decl->set_return_new<QSignalBlocker> ();
-}
-
-static void _call_ctor_QSignalBlocker_1298 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject &arg1 = gsi::arg_reader<QObject & >() (args, heap);
-  ret.write<QSignalBlocker *> (new QSignalBlocker (arg1));
-}
-
-
 // void QSignalBlocker::reblock()
 
 
@@ -114,7 +95,6 @@ namespace gsi
 static gsi::Methods methods_QSignalBlocker () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSignalBlocker::QSignalBlocker(QObject *o)\nThis method creates an object of class QSignalBlocker.", &_init_ctor_QSignalBlocker_1302, &_call_ctor_QSignalBlocker_1302);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSignalBlocker::QSignalBlocker(QObject &o)\nThis method creates an object of class QSignalBlocker.", &_init_ctor_QSignalBlocker_1298, &_call_ctor_QSignalBlocker_1298);
   methods += new qt_gsi::GenericMethod ("reblock", "@brief Method void QSignalBlocker::reblock()\n", false, &_init_f_reblock_0, &_call_f_reblock_0);
   methods += new qt_gsi::GenericMethod ("unblock", "@brief Method void QSignalBlocker::unblock()\n", false, &_init_f_unblock_0, &_call_f_unblock_0);
   return methods;

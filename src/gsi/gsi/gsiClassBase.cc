@@ -422,6 +422,53 @@ static const std::set<std::pair<std::string, bool> > &name_map_for_class (const 
   return cc->second;
 }
 
+#if defined(_DEBUG)
+static std::string type_signature (const gsi::ArgType &t)
+{
+  gsi::ArgType tr (t);
+  tr.set_is_ptr (false);
+  tr.set_is_ref (false);
+  tr.set_is_cptr (false);
+  tr.set_is_cref (false);
+  return tr.to_string ();
+}
+
+static std::string signature (const gsi::MethodBase *m, const gsi::MethodBase::MethodSynonym &s)
+{
+  std::string res;
+
+  if (m->is_static ()) {
+    res += "static ";
+  }
+
+  res += type_signature (m->ret_type ());
+  res += " ";
+  res += s.name;
+  if (s.is_predicate) {
+    res += "?";
+  }
+  if (s.is_setter) {
+    res += "=";
+  }
+
+  res += "(";
+  for (gsi::MethodBase::argument_iterator a = m->begin_arguments (); a != m->end_arguments (); ++a) {
+    if (a != m->begin_arguments ()) {
+      res += ", ";
+    }
+    res += type_signature (*a);
+  }
+
+  res += ")";
+
+  if (m->is_const ()) {
+    res += " const";
+  }
+
+  return res;
+}
+#endif
+
 void
 ClassBase::merge_declarations ()
 {
@@ -564,6 +611,30 @@ ClassBase::merge_declarations ()
     //  lym::ExternalClass)
     tl_assert (! c->declaration () || c->declaration () == &*c);
   }
+
+#if defined(_DEBUG)
+  //  do a sanity check
+  for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
+
+    std::map<std::string, int> method_counts;
+
+    for (gsi::ClassBase::method_iterator m = c->begin_methods (); m != c->end_methods (); ++m) {
+      if (! (*m)->is_callback ()) {
+        for (gsi::MethodBase::synonym_iterator s = (*m)->begin_synonyms (); s != (*m)->end_synonyms (); ++s) {
+          method_counts [signature (*m, *s)] += 1;
+        }
+      }
+    }
+
+    for (std::map<std::string, int>::const_iterator mc = method_counts.begin (); mc != method_counts.end (); ++mc) {
+      if (mc->second > 1) {
+        tl::warn << "Ambiguous method declarations in class " << c->name () << " for method " << mc->first;
+      }
+    }
+
+  }
+#endif
+
 }
 
 static void collect_classes (const gsi::ClassBase *cls, std::list<const gsi::ClassBase *> &unsorted_classes)

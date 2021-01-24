@@ -192,6 +192,42 @@ std::string python2c_func<std::string>::operator() (PyObject *rval)
   }
 }
 
+template <>
+std::vector<char> python2c_func<std::vector<char> >::operator() (PyObject *rval)
+{
+#if PY_MAJOR_VERSION < 3
+  if (PyString_Check (rval)) {
+    const char *cp = PyString_AsString (rval);
+    return std::vector<char> (cp, cp + PyString_Size (rval));
+  } else
+#else
+  if (PyBytes_Check (rval)) {
+    char *cp = 0;
+    ssize_t sz = 0;
+    PyBytes_AsStringAndSize (rval, &cp, &sz);
+    tl_assert (cp != 0);
+    return std::vector<char> (cp, cp + sz);
+  } else
+#endif
+  if (PyUnicode_Check (rval)) {
+    PythonRef ba (PyUnicode_AsUTF8String (rval));
+    if (! ba) {
+      check_error ();
+    }
+    char *cp = 0;
+    ssize_t sz = 0;
+    PyBytes_AsStringAndSize (ba.get (), &cp, &sz);
+    tl_assert (cp != 0);
+    return std::vector<char> (cp, cp + sz);
+  } else if (PyByteArray_Check (rval)) {
+    char *cp = PyByteArray_AsString (rval);
+    ssize_t sz = PyByteArray_Size (rval);
+    return std::vector<char> (cp, cp + sz);
+  } else {
+    throw tl::Exception (tl::to_string (tr ("Argument cannot be converted to a byte array")));
+  }
+}
+
 #if defined(HAVE_QT)
 template <>
 QByteArray python2c_func<QByteArray>::operator() (PyObject *rval)
@@ -516,6 +552,16 @@ PyObject *c2python_func<const std::string &>::operator() (const std::string &c)
 }
 
 template <>
+PyObject *c2python_func<const std::vector<char> &>::operator() (const std::vector<char> &c)
+{
+#if PY_MAJOR_VERSION < 3
+  return PyByteArray_FromStringAndSize (&c.front (), Py_ssize_t (c.size ()));
+#else
+  return PyBytes_FromStringAndSize (&c.front (), Py_ssize_t (c.size ()));
+#endif
+}
+
+template <>
 PyObject *c2python_func<const char *>::operator() (const char *p)
 {
   const char *s = p;
@@ -542,9 +588,9 @@ PyObject *c2python_func<const QByteArray &>::operator() (const QByteArray &qba)
     Py_RETURN_NONE;
   } else {
 #if PY_MAJOR_VERSION < 3
-    return PyString_FromStringAndSize (qba.constData (), Py_ssize_t (qba.size ()));
-#else
     return PyByteArray_FromStringAndSize (qba.constData (), Py_ssize_t (qba.size ()));
+#else
+    return PyBytes_FromStringAndSize (qba.constData (), Py_ssize_t (qba.size ()));
 #endif
   }
 }

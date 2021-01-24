@@ -2837,6 +2837,30 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(sc.got_s0a, 0)
     self.assertEqual(sc.got_s0b, 0)
 
+  def test_74(self):
+
+    # binary strings
+
+    qba = pya.A.ia_cref_to_qba([ 17, 42, 0, 8 ])
+    self.assertEqual(repr(qba), "b'\\x11*\\x00\\x08'")
+    self.assertEqual(pya.A.qba_to_ia(qba), [ 17, 42, 0, 8 ])
+    self.assertEqual(pya.A.qba_cref_to_ia(qba), [ 17, 42, 0, 8 ])
+    self.assertEqual(pya.A.qba_cptr_to_ia(qba), [ 17, 42, 0, 8 ])
+    self.assertEqual(pya.A.qba_ref_to_ia(qba), [ 17, 42, 0, 8 ])
+    self.assertEqual(pya.A.qba_ptr_to_ia(qba), [ 17, 42, 0, 8 ])
+
+    self.assertEqual(pya.A.qba_to_ia(b'\x00\x01\x02'), [ 0, 1, 2 ])
+
+    ba = pya.A.ia_cref_to_ba([ 17, 42, 0, 8 ])
+    self.assertEqual(repr(ba), "b'\\x11*\\x00\\x08'")
+    self.assertEqual(pya.A.ba_to_ia(ba), [ 17, 42, 0, 8 ])
+    self.assertEqual(pya.A.ba_cref_to_ia(ba), [ 17, 42, 0, 8 ])
+    self.assertEqual(pya.A.ba_cptr_to_ia(ba), [ 17, 42, 0, 8 ])
+    self.assertEqual(pya.A.ba_ref_to_ia(ba), [ 17, 42, 0, 8 ])
+    self.assertEqual(pya.A.ba_ptr_to_ia(ba), [ 17, 42, 0, 8 ])
+
+    self.assertEqual(pya.A.ba_to_ia(b'\x00\x01\x02'), [ 0, 1, 2 ])
+
   # Custom factory implemented in Python
   def test_80(self):
     gc = pya.GObject.g_inst_count()

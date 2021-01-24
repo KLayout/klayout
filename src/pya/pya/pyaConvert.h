@@ -185,6 +185,7 @@ struct test_type_func<const char *>
 };
 
 template <> struct test_type_func<std::string> : public test_type_func<const char *> { };
+template <> struct test_type_func<std::vector<char> > : public test_type_func<const char *> { };
 #if defined(HAVE_QT)
 template <> struct test_type_func<QString> : public test_type_func<const char *> { };
 template <> struct test_type_func<QByteArray> : public test_type_func<const char *> { };
@@ -333,6 +334,7 @@ template <> PYA_PUBLIC double python2c_func<double>::operator() (PyObject *rval)
 template <> struct python2c_func<float> : public python2c_func_cast<float, double> { };
 
 template <> PYA_PUBLIC std::string python2c_func<std::string>::operator() (PyObject *rval);
+template <> PYA_PUBLIC std::vector<char> python2c_func<std::vector<char> >::operator() (PyObject *rval);
 #if defined(HAVE_QT)
 template <> PYA_PUBLIC QByteArray python2c_func<QByteArray>::operator() (PyObject *rval);
 template <> PYA_PUBLIC QString python2c_func<QString>::operator() (PyObject *rval);
@@ -620,6 +622,7 @@ template <> struct c2python_func<QByteArray> : public c2python_func<const QByteA
 
 template <> PYA_PUBLIC PyObject *c2python_func<const std::string &>::operator() (const std::string &c);
 template <> struct c2python_func<std::string> : public c2python_func<const std::string &> { };
+template <> struct c2python_func<std::vector<char> > : public c2python_func<const std::vector<char> &> { };
 
 template <>
 struct c2python_func<void *>

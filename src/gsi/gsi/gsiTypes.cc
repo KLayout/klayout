@@ -76,6 +76,8 @@ ArgType::to_string () const
     s += "float"; break;
   case T_string:
     s += "string"; break;
+  case T_byte_array:
+    s += "byte array"; break;
   case T_var:
     s += "variant"; break;
   case T_object:

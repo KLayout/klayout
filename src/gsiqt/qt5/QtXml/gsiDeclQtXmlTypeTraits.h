@@ -1759,12 +1759,6 @@ template <> struct type_traits<QXmlReader> : public type_traits<void> {
 };
 }
 
-class QXmlReader_Adaptor;
-namespace tl {
-template <> struct type_traits<QXmlReader_Adaptor> : public type_traits<void> {
-};
-}
-
 class QXmlSimpleReader;
 namespace tl {
 template <> struct type_traits<QXmlSimpleReader> : public type_traits<void> {

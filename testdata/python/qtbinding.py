@@ -487,12 +487,12 @@ class QtBindingTest(unittest.TestCase):
 
     slm = MyStandardItemModel()
     rn = slm.roleNames()
-    self.assertEqual(map2str(rn), "{0: display, 1: decoration, 2: edit, 3: toolTip, 4: statusTip, 5: whatsThis}")
+    self.assertEqual(map2str(rn), "{0: b'display', 1: b'decoration', 2: b'edit', 3: b'toolTip', 4: b'statusTip', 5: b'whatsThis'}")
     rnNew = slm.roleNames()
     rnNew[7] = "blabla"
     slm.srn(rnNew)
     rn = slm.roleNames()
-    self.assertEqual(map2str(rn), "{0: display, 1: decoration, 2: edit, 3: toolTip, 4: statusTip, 5: whatsThis, 7: blabla}")
+    self.assertEqual(map2str(rn), "{0: b'display', 1: b'decoration', 2: b'edit', 3: b'toolTip', 4: b'statusTip', 5: b'whatsThis', 7: b'blabla'}")
 
   def test_44(self):
 
@@ -585,6 +585,43 @@ class QtBindingTest(unittest.TestCase):
     self.assertEqual(trigger_log, "+-x")
     b.emit_clicked(False)
     self.assertEqual(trigger_log, "+-xx")
+
+  def test_51(self):
+
+    # issue #707 (QJsonValue constructor ambiguous)
+    if "QJsonValue" in pya.__dict__:
+
+      v = pya.QJsonValue("hello")
+      self.assertEqual(v.toString(), "hello")
+      self.assertEqual(v.toVariant(), "hello")
+      self.assertEqual(v.toInt(), 0)
+
+      v = pya.QJsonValue(17)
+      self.assertEqual(v.toString(), "")
+      self.assertEqual(v.toVariant(), 17)
+      self.assertEqual(v.toInt(), 17)
+
+      v = pya.QJsonValue(2.5)
+      self.assertEqual(v.toString(), "")
+      self.assertEqual(v.toVariant(), 2.5)
+      self.assertEqual(v.toDouble(), 2.5)
+
+      v = pya.QJsonValue(True)
+      self.assertEqual(v.toString(), "")
+      self.assertEqual(v.toVariant(), True)
+      self.assertEqual(v.toBool(), True)
+
+  def test_52(self):
+
+    # issue #708 (Image serialization to QByteArray)
+    img = pya.QImage(10, 10, pya.QImage.Format_Mono)
+    img.fill(0)
+
+    buf = pya.QBuffer()
+    img.save(buf, "PNG")
+
+    self.assertEqual(len(buf.data) > 100, True)
+    self.assertEqual(buf.data[0:8], b'\x89PNG\r\n\x1a\n')
 
 
 # run unit tests

@@ -852,7 +852,7 @@ static gsi::Methods methods_QRawFont () {
   methods += new qt_gsi::GenericMethod ("style", "@brief Method QFont::Style QRawFont::style()\n", true, &_init_f_style_c0, &_call_f_style_c0);
   methods += new qt_gsi::GenericMethod ("styleName", "@brief Method QString QRawFont::styleName()\n", true, &_init_f_styleName_c0, &_call_f_styleName_c0);
   methods += new qt_gsi::GenericMethod ("supportedWritingSystems", "@brief Method QList<QFontDatabase::WritingSystem> QRawFont::supportedWritingSystems()\n", true, &_init_f_supportedWritingSystems_c0, &_call_f_supportedWritingSystems_c0);
-  methods += new qt_gsi::GenericMethod ("supportsCharacter", "@brief Method bool QRawFont::supportsCharacter(unsigned int ucs4)\n", true, &_init_f_supportsCharacter_c1772, &_call_f_supportsCharacter_c1772);
+  methods += new qt_gsi::GenericMethod ("supportsCharacter_ucs4", "@brief Method bool QRawFont::supportsCharacter(unsigned int ucs4)\n", true, &_init_f_supportsCharacter_c1772, &_call_f_supportsCharacter_c1772);
   methods += new qt_gsi::GenericMethod ("supportsCharacter", "@brief Method bool QRawFont::supportsCharacter(QChar character)\n", true, &_init_f_supportsCharacter_c899, &_call_f_supportsCharacter_c899);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QRawFont::swap(QRawFont &other)\n", false, &_init_f_swap_1404, &_call_f_swap_1404);
   methods += new qt_gsi::GenericMethod ("underlinePosition", "@brief Method double QRawFont::underlinePosition()\n", true, &_init_f_underlinePosition_c0, &_call_f_underlinePosition_c0);

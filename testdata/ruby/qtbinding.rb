@@ -701,6 +701,49 @@ class QtBinding_TestClass < TestBase
 
   end
 
+  def test_51
+
+    # issue #707 (QJsonValue constructor ambiguous)
+    if RBA.const_defined?("QJsonValue")
+
+      v = RBA::QJsonValue::new("hello")
+      assert_equal(v.toString, "hello")
+      assert_equal(v.toVariant, "hello")
+      assert_equal(v.toInt, 0)
+
+      v = RBA::QJsonValue::new(17)
+      assert_equal(v.toString, "")
+      assert_equal(v.toVariant, 17)
+      assert_equal(v.toInt, 17)
+
+      v = RBA::QJsonValue::new(2.5)
+      assert_equal(v.toString, "")
+      assert_equal(v.toVariant, 2.5)
+      assert_equal(v.toDouble, 2.5)
+
+      v = RBA::QJsonValue::new(true)
+      assert_equal(v.toString, "")
+      assert_equal(v.toVariant, true)
+      assert_equal(v.toBool, true)
+
+    end
+
+  end
+
+  def test_52
+
+    # issue #708 (Image serialization to QByteArray)
+    img = RBA::QImage::new(10, 10, RBA::QImage::Format_Mono)
+    img.fill(0)
+
+    buf = RBA::QBuffer::new
+    img.save(buf, "PNG")
+
+    assert_equal(buf.data.size > 100, true)
+    assert_equal(buf.data[0..7].inspect, "\"\\x89PNG\\r\\n\\x1A\\n\"")
+
+  end
+
 end 
 
 load("test_epilogue.rb")

@@ -2743,6 +2743,9 @@ class Basic_TestClass < TestBase
     assert_equal(RBA::A::qba_ref_to_ia(qba), [ 17, 42, 0, 8 ])
     assert_equal(RBA::A::qba_ptr_to_ia(qba), [ 17, 42, 0, 8 ])
 
+    qba = RBA::A::ia_cref_to_qba_cref([ 17, 42, 0, 8 ])
+    assert_equal(qba.inspect, "\"\\x11*\\x00\\b\"")
+
     assert_equal(RBA::A::qba_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
 
     ba = RBA::A::ia_cref_to_ba([ 17, 42, 0, 8 ])
@@ -2752,6 +2755,9 @@ class Basic_TestClass < TestBase
     assert_equal(RBA::A::ba_cptr_to_ia(ba), [ 17, 42, 0, 8 ])
     assert_equal(RBA::A::ba_ref_to_ia(ba), [ 17, 42, 0, 8 ])
     assert_equal(RBA::A::ba_ptr_to_ia(ba), [ 17, 42, 0, 8 ])
+
+    ba = RBA::A::ia_cref_to_ba_cref([ 17, 42, 0, 8 ])
+    assert_equal(ba.inspect, "\"\\x11*\\x00\\b\"")
 
     assert_equal(RBA::A::ba_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
 

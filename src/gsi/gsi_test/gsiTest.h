@@ -107,6 +107,8 @@ struct A
    *  @brief Byte sequences: tests return of QByteArray
    */
   static QByteArray ia_cref_to_qba (const std::vector<int> &ia);
+  static const QByteArray &ia_cref_to_qba_cref (const std::vector<int> &ia);
+
 #endif
 
   /**
@@ -122,6 +124,7 @@ struct A
    *  @brief Byte sequences: tests return of std::vector<char>
    */
   static std::vector<char> ia_cref_to_ba (const std::vector<int> &ia);
+  static const std::vector<char> &ia_cref_to_ba_cref (const std::vector<int> &ia);
 
   /*
    *  @brief A dummy method providing a chance to set a breakpoint in the script

@@ -129,6 +129,17 @@ A::ia_cref_to_qba (const std::vector<int> &ia)
   return ba;
 }
 
+const QByteArray &
+A::ia_cref_to_qba_cref (const std::vector<int> &ia)
+{
+  static QByteArray ba;
+  ba.clear ();
+  for (std::vector<int>::const_iterator i = ia.begin (); i != ia.end (); ++i) {
+    ba.push_back (char (*i));
+  }
+  return ba;
+}
+
 std::vector<int>
 A::ba_cref_to_ia (const std::vector<char> &ba)
 {
@@ -148,6 +159,18 @@ A::ia_cref_to_ba (const std::vector<int> &ia)
   }
   return ba;
 }
+
+const std::vector<char> &
+A::ia_cref_to_ba_cref (const std::vector<int> &ia)
+{
+  static std::vector<char> ba;
+  ba.clear ();
+  for (std::vector<int>::const_iterator i = ia.begin (); i != ia.end (); ++i) {
+    ba.push_back (char (*i));
+  }
+  return ba;
+}
+
 
 static A *a_ctor (int i)
 {
@@ -831,6 +854,7 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("qba_ptr_to_ia", &A::qba_ptr_to_ia) +
   gsi::method ("qba_to_ia", &A::qba_to_ia) +
   gsi::method ("ia_cref_to_qba", &A::ia_cref_to_qba) +
+  gsi::method ("ia_cref_to_qba_cref", &A::ia_cref_to_qba_cref) +
 #endif
   gsi::method ("ba_cref_to_ia", &A::ba_cref_to_ia) +
   gsi::method ("ba_ref_to_ia", &A::ba_ref_to_ia) +
@@ -838,6 +862,7 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("ba_ptr_to_ia", &A::ba_ptr_to_ia) +
   gsi::method ("ba_to_ia", &A::ba_to_ia) +
   gsi::method ("ia_cref_to_ba", &A::ia_cref_to_ba) +
+  gsi::method ("ia_cref_to_ba_cref", &A::ia_cref_to_ba_cref) +
 
   gsi::method ("br", &A::br) +
   gsi::method ("get_e", &A::get_e) +

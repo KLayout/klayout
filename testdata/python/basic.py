@@ -2821,6 +2821,9 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(pya.A.qba_ref_to_ia(qba), [ 17, 42, 0, 8 ])
     self.assertEqual(pya.A.qba_ptr_to_ia(qba), [ 17, 42, 0, 8 ])
 
+    qba = pya.A.ia_cref_to_qba_cref([ 17, 42, 0, 8 ])
+    self.assertEqual(repr(qba), "b'\\x11*\\x00\\x08'")
+
     self.assertEqual(pya.A.qba_to_ia(b'\x00\x01\x02'), [ 0, 1, 2 ])
 
     ba = pya.A.ia_cref_to_ba([ 17, 42, 0, 8 ])
@@ -2830,6 +2833,9 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(pya.A.ba_cptr_to_ia(ba), [ 17, 42, 0, 8 ])
     self.assertEqual(pya.A.ba_ref_to_ia(ba), [ 17, 42, 0, 8 ])
     self.assertEqual(pya.A.ba_ptr_to_ia(ba), [ 17, 42, 0, 8 ])
+
+    ba = pya.A.ia_cref_to_ba_cref([ 17, 42, 0, 8 ])
+    self.assertEqual(repr(ba), "b'\\x11*\\x00\\x08'")
 
     self.assertEqual(pya.A.ba_to_ia(b'\x00\x01\x02'), [ 0, 1, 2 ])
 

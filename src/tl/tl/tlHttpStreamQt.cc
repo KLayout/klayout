@@ -342,10 +342,12 @@ InputHttpStreamPrivateData::finished (QNetworkReply *reply)
   }
 
   if (tl::verbosity() >= 40) {
+#if QT_VERSION >= 0x40800
     const QList<QNetworkReply::RawHeaderPair> &raw_headers = reply->rawHeaderPairs ();
     for (QList<QNetworkReply::RawHeaderPair>::const_iterator h = raw_headers.begin (); h != raw_headers.end (); ++h) {
       tl::info << "HTTP response header: " << h->first.constData () << ": " << h->second.constData ();
     }
+#endif
   }
 
   QVariant redirect_target = reply->attribute (QNetworkRequest::RedirectionTargetAttribute);

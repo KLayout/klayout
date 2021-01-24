@@ -88,10 +88,14 @@ LIBS += -L$$LIBDIR -lklayout_db
       -Wno-deprecated-declarations \
       -Wno-reserved-user-defined-literal \
 
+  # because we use unordered_map/unordered_set:
+  QMAKE_CXXFLAGS += -std=c++0x
+
   # Python is somewhat sloppy and relies on the compiler initializing fields
   # of strucs to 0:
   QMAKE_CXXFLAGS_WARN_ON += \
       -Wno-missing-field-initializers
+
 } else {
 
   # disable some warnings

@@ -123,39 +123,6 @@ AuthenticationHandler::proxyAuthenticationRequired (const QNetworkProxy &proxy, 
 // ---------------------------------------------------------------
 //  InputHttpStream implementation
 
-std::string
-HttpErrorException::format_error (const std::string &em, int ec, QNetworkReply *reply)
-{
-  std::string msg = tl::sprintf (tl::to_string (tr ("Error %d: %s, fetching %s")), ec, em, tl::to_string (reply->url ().toString ()));
-
-  std::string data = tl::to_string (QString::fromUtf8 (reply->readAll ()));
-  if (data.size () > 1000) {
-    data = data.substr (0, size_t (1000)) + "...";
-  }
-
-  if (! data.empty ()) {
-
-    msg += "\n\n";
-    msg += tl::to_string (tr ("Reply body:"));
-    msg += "\n";
-    msg += data;
-
-  }
-
-  std::string redirected = tl::to_string (reply->attribute (QNetworkRequest::RedirectionTargetAttribute).toString ());
-  if (! redirected.empty ()) {
-
-    msg += "\n\n";
-    msg += tl::to_string (tr ("Redirected to: ")) + redirected;
-
-  }
-
-  return msg;
-}
-
-// ---------------------------------------------------------------
-//  InputHttpStream implementation
-
 InputHttpStream::InputHttpStream (const std::string &url)
 {
   mp_data = new InputHttpStreamPrivateData (url);
@@ -482,7 +449,9 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
       ec = int (mp_reply->error ());
     }
 
-    throw HttpErrorException (em, ec, mp_reply);
+    QByteArray data = mp_reply->readAll ();
+
+    throw HttpErrorException (em, ec, tl::to_string (mp_reply->url ().toString ()), tl::to_string (data.constData (), (int)data.size ()));
 
   }
 

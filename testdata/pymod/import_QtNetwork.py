@@ -31,7 +31,7 @@ class BasicTest(unittest.TestCase):
   def test_2(self):
     q = QtNetwork.QNetworkRequest()
     q.setRawHeader("abc", "xyz")
-    self.assertEqual(q.rawHeader("abc"), "xyz")
+    self.assertEqual(q.rawHeader("abc"), b"xyz")
 
 # run unit tests
 if __name__ == '__main__':

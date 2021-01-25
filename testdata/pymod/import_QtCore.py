@@ -34,9 +34,9 @@ class BasicTest(unittest.TestCase):
     b = QtCore.QBuffer()
     b.setData("all you can eat")
     b.open(QtCore.QIODevice.ReadOnly)
-    self.assertEqual(b.read(3), "all")
+    self.assertEqual(b.read(3), b"all")
     b.read(1)
-    self.assertEqual(b.read(3), "you")
+    self.assertEqual(b.read(3), b"you")
 
 # run unit tests
 if __name__ == '__main__':

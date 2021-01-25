@@ -1,4 +1,15 @@
 
+0.26.10         (2020-xx-xx):
+
+* Bugfix: %GITHUB%/issues/708
+  Qt binding: missing support for binary strings as QByteArray representative
+* Bugfix: %GITHUB%/issues/707
+  QJsonValue's string constructor is ambiguous
+* Bugfix: %GITHUB%/issues/704
+  Rational Splines not supported DXF
+* Bugfix: %GITHUB%/issues/693
+  MAGIC files won't find subcells when reading from command line
+
 0.26.9          (2020-11-27):
 
 * Bugfix: %GITHUB%/issues/658

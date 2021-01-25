@@ -55,7 +55,7 @@ ColdProxy::ColdProxy (db::cell_index_type ci, db::Layout &layout, const ProxyCon
   if (! info.lib_name.empty ()) {
     tl::MutexLocker locker (&s_map_mutex);
     std::map<std::string, tl::weak_collection<ColdProxy> *>::iterator i = s_proxies_per_library_name.find (info.lib_name);
-    if (i != s_proxies_per_library_name.end ()) {
+    if (i == s_proxies_per_library_name.end ()) {
       i = s_proxies_per_library_name.insert (std::make_pair (info.lib_name, new tl::weak_collection<ColdProxy> ())).first;
     }
     i->second->push_back (this);

@@ -56,11 +56,11 @@ class TL_PUBLIC HttpErrorException
   : public tl::Exception
 {
 public:
-  HttpErrorException (const std::string &f, int ec, QNetworkReply *reply)
-    : tl::Exception (format_error (f, ec, reply))
+  HttpErrorException (const std::string &f, int ec, const std::string &url, const std::string &body = std::string ())
+    : tl::Exception (format_error (f, ec, url, body))
   { }
 
-  static std::string format_error (const std::string &em, int ec, QNetworkReply *reply);
+  static std::string format_error (const std::string &em, int ec, const std::string &url, const std::string &body);
 };
 
 class InputHttpStreamPrivateData;

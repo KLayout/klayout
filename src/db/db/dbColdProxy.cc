@@ -33,16 +33,16 @@ namespace db
 {
 
 static tl::Mutex s_map_mutex;
-static std::map<std::string, tl::weak_collection<ColdProxy> > s_proxies_per_library_name;
+static std::map<std::string, tl::weak_collection<ColdProxy> *> s_proxies_per_library_name;
 
 const tl::weak_collection<ColdProxy> &
 ColdProxy::cold_proxies_per_lib_name (const std::string &libname)
 {
   tl::MutexLocker locker (&s_map_mutex);
 
-  std::map<std::string, tl::weak_collection<ColdProxy> >::const_iterator i = s_proxies_per_library_name.find (libname);
+  std::map<std::string, tl::weak_collection<ColdProxy> *>::const_iterator i = s_proxies_per_library_name.find (libname);
   if (i != s_proxies_per_library_name.end ()) {
-    return i->second;
+    return *i->second;
   } else {
     static tl::weak_collection<ColdProxy> s_empty;
     return s_empty;
@@ -54,7 +54,11 @@ ColdProxy::ColdProxy (db::cell_index_type ci, db::Layout &layout, const ProxyCon
 {
   if (! info.lib_name.empty ()) {
     tl::MutexLocker locker (&s_map_mutex);
-    s_proxies_per_library_name [info.lib_name].push_back (this);
+    std::map<std::string, tl::weak_collection<ColdProxy> *>::iterator i = s_proxies_per_library_name.find (info.lib_name);
+    if (i == s_proxies_per_library_name.end ()) {
+      i = s_proxies_per_library_name.insert (std::make_pair (info.lib_name, new tl::weak_collection<ColdProxy> ())).first;
+    }
+    i->second->push_back (this);
   }
 }
 

@@ -189,10 +189,88 @@ gsi::Methods cm_method_decl ()
 //  is not the first base class.
 static lay::AbstractMenu *menu (lay::MainWindow *mw)
 {
-  return mw->menu ();
+  return mw->dispatcher ()->menu ();
+}
+
+static void clear_config (lay::MainWindow *mw)
+{
+  mw->dispatcher ()->clear_config ();
+}
+
+static bool write_config (lay::MainWindow *mw, const std::string &config_file)
+{
+  return mw->dispatcher ()->write_config (config_file);
+}
+
+static bool read_config (lay::MainWindow *mw, const std::string &config_file)
+{
+  return mw->dispatcher ()->read_config (config_file);
+}
+
+static tl::Variant get_config (lay::MainWindow *mw, const std::string &name)
+{
+  std::string value;
+  if (mw->dispatcher ()->config_get (name, value)) {
+    return tl::Variant (value);
+  } else {
+    return tl::Variant ();
+  }
+}
+
+static void set_config (lay::MainWindow *mw, const std::string &name, const std::string &value)
+{
+  mw->dispatcher ()->config_set (name, value);
+}
+
+static std::vector<std::string>
+get_config_names (lay::MainWindow *mw)
+{
+  std::vector<std::string> names;
+  mw->dispatcher ()->get_config_names (names);
+  return names;
+}
+
+void
+config_end (lay::MainWindow *mw)
+{
+  mw->dispatcher ()->config_end ();
 }
 
 Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "MainWindow",
+
+  //  Dispatcher interface and convenience functions
+  method ("dispatcher", &lay::MainWindow::dispatcher,
+    "@brief Gets the dispatcher interface (the plugin root configuration space)\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  method_ext ("clear_config", &clear_config,
+    "@brief Clears the configuration parameters\n"
+    "Since version 0.27 this is a convenience method which is equivalent to 'dispatcher().clear_config()'. See \\Dispatcher#clear_config for details."
+  ) +
+  method_ext ("write_config", &write_config, gsi::arg ("file_name"),
+    "@brief Writes configuration to a file\n"
+    "Since version 0.27 this is a convenience method which is equivalent to 'dispatcher().write_config(...)'. See \\Dispatcher#write_config for details."
+  ) +
+  method_ext ("read_config", &read_config, gsi::arg ("file_name"),
+    "@brief Reads the configuration from a file\n"
+    "Since version 0.27 this is a convenience method which is equivalent to 'dispatcher().read_config(...)'. See \\Dispatcher#read_config for details."
+  ) +
+  method_ext ("get_config", &get_config, gsi::arg ("name"),
+    "@brief Gets the value of a local configuration parameter\n"
+    "Since version 0.27 this is a convenience method which is equivalent to 'dispatcher().get_config(...)'. See \\Dispatcher#get_config for details."
+  ) +
+  method_ext ("set_config", &set_config, gsi::arg ("name"), gsi::arg ("value"),
+    "@brief Set a local configuration parameter with the given name to the given value\n"
+    "Since version 0.27 this is a convenience method which is equivalent to 'dispatcher().set_config(...)'. See \\Dispatcher#set_config for details."
+  ) +
+  method_ext ("get_config_names", &get_config_names,
+    "@brief Gets the configuration parameter names\n"
+    "Since version 0.27 this is a convenience method which is equivalent to 'dispatcher().get_config_names(...)'. See \\Dispatcher#get_config_names for details."
+  ) +
+  method_ext ("commit_config", &config_end,
+    "@brief Commits the configuration settings\n"
+    "Since version 0.27 this is a convenience method which is equivalent to 'dispatcher().config_end(...)'. See \\Dispatcher#config_end for details."
+  ) +
 
   //  QMainWindow interface
   gsi::method_ext ("menu", &menu,
@@ -510,7 +588,7 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "This method has been introduced in version 0.26.\n"
   ) +
-  gsi::method ("call_menu", &lay::MainWindow::menu_activated,
+  gsi::method ("call_menu", &lay::MainWindow::menu_activated, gsi::arg ("symbol"),
     "@brief Calls the menu item with the provided symbol.\n"
     "To obtain all symbols, use menu_symbols.\n"
     "\n"

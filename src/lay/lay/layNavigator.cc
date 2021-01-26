@@ -572,8 +572,8 @@ Navigator::showEvent (QShowEvent *)
 void 
 Navigator::closeEvent (QCloseEvent *)
 {
-  mp_main_window->config_set (cfg_show_navigator, "false");
-  mp_main_window->config_end ();
+  mp_main_window->dispatcher ()->config_set (cfg_show_navigator, "false");
+  mp_main_window->dispatcher ()->config_end ();
 }
 
 void 

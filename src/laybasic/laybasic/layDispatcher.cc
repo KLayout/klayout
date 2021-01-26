@@ -36,9 +36,22 @@ static Dispatcher *ms_dispatcher_instance = 0;
 
 Dispatcher::Dispatcher (Plugin *parent, bool standalone)
   : Plugin (parent, standalone),
-    m_menu (this)
+    m_menu (this),
+    mp_menu_parent_widget (0),
+    mp_delegate (0)
 {
   if (! parent && ! ms_dispatcher_instance) {
+    ms_dispatcher_instance = this;
+  }
+}
+
+Dispatcher::Dispatcher (DispatcherDelegate *delegate, Plugin *parent, bool standalone)
+  : Plugin (parent, standalone),
+    m_menu (this),
+    mp_menu_parent_widget (0),
+    mp_delegate (delegate)
+{
+  if (! ms_dispatcher_instance) {
     ms_dispatcher_instance = this;
   }
 }
@@ -57,8 +70,22 @@ Dispatcher::configure (const std::string &name, const std::string &value)
   for (std::vector<lay::ConfigureAction *>::const_iterator a = ca.begin (); a != ca.end (); ++a) {
     (*a)->configure (value);
   }
-  return false;
+
+  if (mp_delegate) {
+    return mp_delegate->configure (name, value);
+  } else {
+    return false;
+  }
 }
+
+void
+Dispatcher::config_finalize ()
+{
+  if (mp_delegate) {
+    return mp_delegate->config_finalize ();
+  }
+}
+
 
 //  Writing and Reading of configuration
 

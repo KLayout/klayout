@@ -605,7 +605,7 @@ ApplicationBase::init_app ()
   bool editable_from_config = false;
 
   {
-    lay::Dispatcher cfg (0);
+    lay::Dispatcher cfg;
 
     for (std::vector <std::string>::const_iterator c = m_config_files.begin (); c != m_config_files.end (); ++c) {
       try {
@@ -1474,7 +1474,7 @@ GuiApplication::start_recording ()
 lay::Dispatcher *
 GuiApplication::dispatcher () const
 {
-  return mp_mw;
+  return mp_mw->dispatcher ();
 }
 
 void
@@ -1482,7 +1482,7 @@ GuiApplication::setup ()
 {
   tl_assert (mp_mw == 0);
 
-  mp_mw = new lay::MainWindow (this, 0, "main_window", is_undo_enabled ());
+  mp_mw = new lay::MainWindow (this, "main_window", is_undo_enabled ());
 
   QObject::connect (mp_mw, SIGNAL (closed ()), this, SLOT (quit ()));
 
@@ -1579,7 +1579,7 @@ NonGuiApplication::setup ()
   mp_pr = new lay::ProgressReporter ();
   mp_pb = new TextProgress (10 /*verbosity level*/);
   mp_pr->set_progress_bar (mp_pb);
-  mp_dispatcher = new lay::Dispatcher (0);
+  mp_dispatcher = new lay::Dispatcher ();
 }
 
 }

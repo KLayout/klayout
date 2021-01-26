@@ -127,28 +127,46 @@ public:
   virtual bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio) 
   {
     if (f_mouse_press_event.can_issue ()) {
-      return f_mouse_press_event.issue<lay::ViewService, bool, const db::DPoint &, unsigned int, bool> (&lay::ViewService::mouse_press_event, p, buttons, prio);
+      return f_mouse_press_event.issue (&PluginBase::mouse_press_event_noref, p, buttons, prio);
     } else {
       return lay::ViewService::mouse_press_event (p, buttons, prio);
     }
   }
 
+  //  NOTE: this version doesn't take a point reference which allows up to store the point
+  bool mouse_press_event_noref (db::DPoint p, unsigned int buttons, bool prio)
+  {
+    return mouse_press_event (p, buttons, prio);
+  }
+
   virtual bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio) 
   {
     if (f_mouse_click_event.can_issue ()) {
-      return f_mouse_click_event.issue<lay::ViewService, bool, const db::DPoint &, unsigned int, bool> (&lay::ViewService::mouse_click_event, p, buttons, prio);
+      return f_mouse_click_event.issue (&PluginBase::mouse_click_event_noref, p, buttons, prio);
     } else {
       return lay::ViewService::mouse_click_event (p, buttons, prio);
     }
   }
 
+  //  NOTE: this version doesn't take a point reference which allows up to store the point
+  bool mouse_click_event_noref (db::DPoint p, unsigned int buttons, bool prio)
+  {
+    return mouse_click_event (p, buttons, prio);
+  }
+
   virtual bool mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
   {
     if (f_mouse_double_click_event.can_issue ()) {
-      return f_mouse_double_click_event.issue<lay::ViewService, bool, const db::DPoint &, unsigned int, bool> (&lay::ViewService::mouse_double_click_event, p, buttons, prio);
+      return f_mouse_double_click_event.issue (&PluginBase::mouse_double_click_event_noref, p, buttons, prio);
     } else {
       return lay::ViewService::mouse_double_click_event (p, buttons, prio);
     }
+  }
+
+  //  NOTE: this version doesn't take a point reference which allows up to store the point
+  bool mouse_double_click_event_noref (db::DPoint p, unsigned int buttons, bool prio)
+  {
+    return mouse_double_click_event (p, buttons, prio);
   }
 
   virtual bool leave_event (bool prio)
@@ -172,28 +190,46 @@ public:
   virtual bool mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
   {
     if (f_mouse_move_event.can_issue ()) {
-      return f_mouse_move_event.issue<lay::ViewService, bool, const db::DPoint &, unsigned int, bool> (&lay::ViewService::mouse_move_event, p, buttons, prio);
+      return f_mouse_move_event.issue (&PluginBase::mouse_move_event_noref, p, buttons, prio);
     } else {
       return lay::ViewService::mouse_move_event (p, buttons, prio);
     }
   }
 
+  //  NOTE: this version doesn't take a point reference which allows up to store the point
+  bool mouse_move_event_noref (db::DPoint p, unsigned int buttons, bool prio)
+  {
+    return mouse_move_event (p, buttons, prio);
+  }
+
   virtual bool mouse_release_event (const db::DPoint &p, unsigned int buttons, bool prio)
   {
     if (f_mouse_release_event.can_issue ()) {
-      return f_mouse_release_event.issue<lay::ViewService, bool, const db::DPoint &, unsigned int, bool> (&lay::ViewService::mouse_release_event, p, buttons, prio);
+      return f_mouse_release_event.issue (&PluginBase::mouse_release_event_noref, p, buttons, prio);
     } else {
       return lay::ViewService::mouse_release_event (p, buttons, prio);
     }
   }
 
+  //  NOTE: this version doesn't take a point reference which allows up to store the point
+  bool mouse_release_event_noref (db::DPoint p, unsigned int buttons, bool prio)
+  {
+    return mouse_release_event (p, buttons, prio);
+  }
+
   virtual bool wheel_event (int delta, bool horizontal, const db::DPoint &p, unsigned int buttons, bool prio)
   {
     if (f_wheel_event.can_issue ()) {
-      return f_wheel_event.issue<lay::ViewService, bool, int, bool, const db::DPoint &, unsigned int, bool> (&lay::ViewService::wheel_event, delta, horizontal, p, buttons, prio);
+      return f_wheel_event.issue (&PluginBase::wheel_event_noref, delta, horizontal, p, buttons, prio);
     } else {
       return lay::ViewService::wheel_event (delta, horizontal, p, buttons, prio);
     }
+  }
+
+  //  NOTE: this version doesn't take a point reference which allows up to store the point
+  bool wheel_event_noref (int delta, bool horizontal, db::DPoint p, unsigned int buttons, bool prio)
+  {
+    return wheel_event (delta, horizontal, p, buttons, prio);
   }
 
   virtual void activated ()
@@ -693,7 +729,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "@param buttons A combination of the constants in the \\ButtonState class which codes both the mouse buttons and the key modifiers (.e. ShiftButton etc).\n"
     "@return True to terminate dispatcher\n"
   ) +
-  callback ("mouse_button_pressed_event", &gsi::PluginBase::mouse_press_event, &gsi::PluginBase::f_mouse_press_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+  callback ("mouse_button_pressed_event", &gsi::PluginBase::mouse_press_event_noref, &gsi::PluginBase::f_mouse_press_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button pressed event\n"
     "This method will called by the view when a button is pressed on the mouse.\n"
     "\n"
@@ -715,11 +751,11 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "@param buttons A combination of the constants in the \\ButtonState class which codes both the mouse buttons and the key modifiers (.e. LeftButton, ShiftButton etc).\n"
     "@return True to terminate dispatcher\n"
   ) +
-  callback ("mouse_click_event", &gsi::PluginBase::mouse_click_event, &gsi::PluginBase::f_mouse_click_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+  callback ("mouse_click_event", &gsi::PluginBase::mouse_click_event_noref, &gsi::PluginBase::f_mouse_click_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button click event (after the button has been released)\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse button has been released without moving it.\n"
   ) +
-  callback ("mouse_double_click_event", &gsi::PluginBase::mouse_double_click_event, &gsi::PluginBase::f_mouse_double_click_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+  callback ("mouse_double_click_event", &gsi::PluginBase::mouse_double_click_event_noref, &gsi::PluginBase::f_mouse_double_click_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button double-click event\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse button has been double-clicked.\n"
   ) +
@@ -733,15 +769,15 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse enters the canvas area.\n"
     "This method does not have a position nor button flags.\n"
   ) +
-  callback ("mouse_moved_event", &gsi::PluginBase::mouse_move_event, &gsi::PluginBase::f_mouse_move_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+  callback ("mouse_moved_event", &gsi::PluginBase::mouse_move_event_noref, &gsi::PluginBase::f_mouse_move_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse move event\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse is moved in the canvas area.\n"
   ) +
-  callback ("mouse_button_released_event", &gsi::PluginBase::mouse_release_event, &gsi::PluginBase::f_mouse_release_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+  callback ("mouse_button_released_event", &gsi::PluginBase::mouse_release_event_noref, &gsi::PluginBase::f_mouse_release_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button release event\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse button is released.\n"
   ) +
-  callback ("wheel_event", &gsi::PluginBase::wheel_event, &gsi::PluginBase::f_wheel_event, gsi::arg ("delta"), gsi::arg ("horizontal"), gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+  callback ("wheel_event", &gsi::PluginBase::wheel_event_noref, &gsi::PluginBase::f_wheel_event, gsi::arg ("delta"), gsi::arg ("horizontal"), gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse wheel is rotated.\n"
     "Additional parameters for this event are 'delta' (the rotation angle in units of 1/8th degree) and 'horizontal' which is true when the horizontal wheel was rotated and "
     "false if the vertical wheel was rotated.\n"

@@ -82,6 +82,7 @@ SOURCES = \
   dbTilingProcessor.cc \
   dbTrans.cc \
   dbUserObject.cc \
+  dbUtils.cc \
   dbVector.cc \
   dbWriter.cc \
   dbWriterTools.cc \
@@ -122,6 +123,7 @@ SOURCES = \
   gsiDeclDbText.cc \
   gsiDeclDbTilingProcessor.cc \
   gsiDeclDbTrans.cc \
+  gsiDeclDbUtils.cc \
   gsiDeclDbVector.cc \
   gsiDeclDbLayoutDiff.cc \
   gsiDeclDbGlyphs.cc \
@@ -288,6 +290,7 @@ HEADERS = \
   dbTrans.h \
   dbTypes.h \
   dbUserObject.h \
+  dbUtils.h \
   dbVector.h \
   dbWriter.h \
   dbWriterTools.h \

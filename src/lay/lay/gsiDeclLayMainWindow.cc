@@ -23,6 +23,7 @@
 #include "gsiDecl.h"
 #include "gsiSignals.h"
 #include "layMainWindow.h"
+#include "layConfig.h"
 
 #if defined(HAVE_QTBINDINGS)
 # include "gsiQtGuiExternals.h"
@@ -230,10 +231,97 @@ get_config_names (lay::MainWindow *mw)
   return names;
 }
 
-void
+static void
 config_end (lay::MainWindow *mw)
 {
   mw->dispatcher ()->config_end ();
+}
+
+static void
+set_key_bindings (lay::MainWindow *mw, const std::map<std::string, std::string> &bindings)
+{
+  std::map<std::string, std::string> b = mw->menu ()->get_shortcuts (false);
+  std::map<std::string, std::string> b_def = mw->menu ()->get_shortcuts (true);
+
+  for (std::map<std::string, std::string>::const_iterator i = bindings.begin (); i != bindings.end (); ++i) {
+    b[i->first] = i->second;
+  }
+
+  //  cfg_key_bindings needs a special notation: lay::Action::no_shortcut () to force "none" instead of default
+  //  and and empty string to restore default.
+  for (std::map<std::string, std::string>::iterator i = b.begin (); i != b.end (); ++i) {
+    std::map<std::string, std::string>::const_iterator j = b_def.find (i->first);
+    if (j != b_def.end ()) {
+      if (i->second != j->second) {
+        if (i->second.empty ()) {
+          i->second = lay::Action::no_shortcut ();
+        }
+      } else {
+        i->second.clear ();
+      }
+    }
+  }
+
+  std::vector<std::pair<std::string, std::string> > bv (b.begin (), b.end ());
+  mw->dispatcher ()->config_set (lay::cfg_key_bindings, lay::pack_key_binding (bv));
+}
+
+static std::map<std::string, std::string>
+get_key_bindings (lay::MainWindow *mw)
+{
+  return mw->menu ()->get_shortcuts (false);
+}
+
+static std::map<std::string, std::string>
+get_default_key_bindings (lay::MainWindow *mw)
+{
+  return mw->menu ()->get_shortcuts (true);
+}
+
+
+static std::map<std::string, bool>
+get_menu_items_hidden (lay::MainWindow *mw)
+{
+  std::map<std::string, std::string> kb = get_key_bindings (mw);
+  std::map<std::string, bool> h;
+
+  if (mw->dispatcher ()->menu ()) {
+    for (std::map<std::string, std::string>::const_iterator i = kb.begin (); i != kb.end (); ++i) {
+      lay::Action *a = mw->dispatcher ()->menu ()->action (i->first);
+      if (a) {
+        h.insert (std::make_pair (i->first, a->is_hidden ()));
+      }
+    }
+  }
+
+  return h;
+}
+
+static std::map<std::string, bool>
+get_default_menu_items_hidden (lay::MainWindow *mw)
+{
+  std::map<std::string, std::string> kb = get_key_bindings (mw);
+
+  //  currently, all menu items are visible by default
+  std::map<std::string, bool> h;
+  for (std::map<std::string, std::string>::const_iterator i = kb.begin (); i != kb.end (); ++i) {
+    h.insert (std::make_pair (i->first, false));
+  }
+
+  return h;
+}
+
+static void
+set_menu_items_hidden (lay::MainWindow *mw, const std::map<std::string, bool> &hidden)
+{
+  std::map<std::string, bool> h = get_menu_items_hidden (mw);
+  for (std::map<std::string, bool>::const_iterator i = hidden.begin (); i != hidden.end (); ++i) {
+    h[i->first] = i->second;
+  }
+
+  std::vector<std::pair<std::string, bool> > hv;
+  hv.insert (hv.end (), h.begin (), h.end ());
+  mw->dispatcher ()->config_set (lay::cfg_menu_items_hidden, lay::pack_menu_items_hidden (hv));
 }
 
 Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "MainWindow",
@@ -245,31 +333,121 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
   ) +
   method_ext ("clear_config", &clear_config,
     "@brief Clears the configuration parameters\n"
-    "Since version 0.27 this is a convenience method which is equivalent to 'dispatcher().clear_config()'. See \\Dispatcher#clear_config for details."
+    "This method is provided for using MainWindow without an Application object. "
+    "It's a convience method which is equivalent to 'dispatcher().clear_config()'. See \\Dispatcher#clear_config for details.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ) +
   method_ext ("write_config", &write_config, gsi::arg ("file_name"),
     "@brief Writes configuration to a file\n"
-    "Since version 0.27 this is a convenience method which is equivalent to 'dispatcher().write_config(...)'. See \\Dispatcher#write_config for details."
+    "This method is provided for using MainWindow without an Application object. "
+    "It's a convience method which is equivalent to 'dispatcher().write_config(...)'. See \\Dispatcher#write_config for details.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ) +
   method_ext ("read_config", &read_config, gsi::arg ("file_name"),
     "@brief Reads the configuration from a file\n"
-    "Since version 0.27 this is a convenience method which is equivalent to 'dispatcher().read_config(...)'. See \\Dispatcher#read_config for details."
+    "This method is provided for using MainWindow without an Application object. "
+    "It's a convience method which is equivalent to 'dispatcher().read_config(...)'. See \\Dispatcher#read_config for details.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ) +
   method_ext ("get_config", &get_config, gsi::arg ("name"),
     "@brief Gets the value of a local configuration parameter\n"
-    "Since version 0.27 this is a convenience method which is equivalent to 'dispatcher().get_config(...)'. See \\Dispatcher#get_config for details."
+    "This method is provided for using MainWindow without an Application object. "
+    "It's a convience method which is equivalent to 'dispatcher().get_config(...)'. See \\Dispatcher#get_config for details.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ) +
   method_ext ("set_config", &set_config, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Set a local configuration parameter with the given name to the given value\n"
-    "Since version 0.27 this is a convenience method which is equivalent to 'dispatcher().set_config(...)'. See \\Dispatcher#set_config for details."
+    "This method is provided for using MainWindow without an Application object. "
+    "It's a convience method which is equivalent to 'dispatcher().set_config(...)'. See \\Dispatcher#set_config for details.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ) +
   method_ext ("get_config_names", &get_config_names,
     "@brief Gets the configuration parameter names\n"
-    "Since version 0.27 this is a convenience method which is equivalent to 'dispatcher().get_config_names(...)'. See \\Dispatcher#get_config_names for details."
+    "This method is provided for using MainWindow without an Application object. "
+    "It's a convience method which is equivalent to 'dispatcher().get_config_names(...)'. See \\Dispatcher#get_config_names for details.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ) +
   method_ext ("commit_config", &config_end,
     "@brief Commits the configuration settings\n"
-    "Since version 0.27 this is a convenience method which is equivalent to 'dispatcher().config_end(...)'. See \\Dispatcher#config_end for details."
+    "This method is provided for using MainWindow without an Application object. "
+    "It's a convience method which is equivalent to 'dispatcher().config_end(...)'. See \\Dispatcher#config_end for details.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+
+  //  key binding configuration
+  gsi::method_ext ("get_key_bindings", &get_key_bindings,
+    "@brief Gets the current key bindings\n"
+    "This method returns a hash with the key binding vs. menu item path.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("get_default_key_bindings", &get_default_key_bindings,
+    "@brief Gets the default key bindings\n"
+    "This method returns a hash with the default key binding vs. menu item path.\n"
+    "You can use this hash with \\set_key_bindings to reset all key bindings to the default ones.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("set_key_bindings", &set_key_bindings, gsi::arg ("bindings"),
+    "@brief Sets key bindings.\n"
+    "Sets the given key bindings. "
+    "Pass a hash listing the key bindings per menu item paths. Key strings follow the usual notation, e.g. 'Ctrl+A', 'Shift+X' or just 'F2'.\n"
+    "Use an empty value to remove a key binding from a menu entry.\n"
+    "\n"
+    "\\get_key_bindings will give you the current key bindings, \\get_default_key_bindings will give you the default ones.\n"
+    "\n"
+    "Examples:\n"
+    "\n"
+    "@code\n"
+    "# reset all key bindings to default:\n"
+    "mw = RBA::MainWindow.instance()\n"
+    "mw.set_key_bindings(mw.get_default_key_bindings())\n"
+    "\n"
+    "# disable key binding for 'copy':\n"
+    "RBA::MainWindow.instance.set_key_bindings({ \"edit_menu.copy\" => \"\" })\n"
+    "\n"
+    "# configure 'copy' to use Shift+K and 'cut' to use Ctrl+K:\n"
+    "RBA::MainWindow.instance.set_key_bindings({ \"edit_menu.copy\" => \"Shift+K\", \"edit_menu.cut\" => \"Ctrl+K\" })\n"
+    "@/code\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("get_menu_items_hidden", &get_menu_items_hidden,
+    "@brief Gets the flags indicating whether menu items are hidden\n"
+    "This method returns a hash with the hidden flag vs. menu item path.\n"
+    "You can use this hash with \\set_menu_items_hidden.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("get_default_menu_items_hidden", &get_default_menu_items_hidden,
+    "@brief Gets the flags indicating whether menu items are hidden by default\n"
+    "You can use this hash with \\set_menu_items_hidden to restore the visibility of all menu items.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("set_menu_items_hidden", &set_menu_items_hidden,
+    "@brief sets the flags indicating whether menu items are hidden\n"
+    "This method allows hiding certain menu items. It takes a hash with hidden flags vs. menu item paths. "
+    "\n"
+    "Examples:\n"
+    "\n"
+    "@code\n"
+    "# show all menu items:\n"
+    "mw = RBA::MainWindow.instance()\n"
+    "mw.set_menu_items_hidden(mw.get_default_menu_items_hidden())\n"
+    "\n"
+    "# hide the 'copy' entry from the 'Edit' menu:\n"
+    "RBA::MainWindow.instance().set_menu_items_hidden({ \"edit_menu.copy\" => true })\n"
+    "@/code\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ) +
 
   //  QMainWindow interface

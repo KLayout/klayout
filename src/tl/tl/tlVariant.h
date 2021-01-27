@@ -164,6 +164,7 @@ public:
     t_double, 
     t_string, 
     t_stdstring, 
+    t_bytearray,
 #if defined(HAVE_QT)
     t_qstring,
     t_qbytearray, 
@@ -189,6 +190,11 @@ public:
    *  @brief Copy ctor
    */
   Variant (const tl::Variant &d);
+
+  /**
+   *  @brief Initialize the Variant with a std::vector<char>
+   */
+  Variant (const std::vector<char> &s);
 
 #if defined(HAVE_QT)
   /**
@@ -448,6 +454,11 @@ public:
   Variant &operator= (const std::string &v);
 
   /**
+   *  @brief Assignment of a STL byte array
+   */
+  Variant &operator= (const std::vector<char> &v);
+
+  /**
    *  @brief Assignment of a double
    */
   Variant &operator= (double d);
@@ -624,6 +635,14 @@ public:
    */
   QString to_qstring () const;
 #endif
+
+  /**
+   *  @brief Conversion to a STL byte array
+   *
+   *  This performs the conversion to a std::vector<char> as far as possible.
+   *  No conversion is provided to user types currently.
+   */
+  std::vector<char> to_bytearray () const;
 
   /**
    *  @brief Conversion to a std::string
@@ -1331,6 +1350,14 @@ public:
     return m_type == t_id;
   }
 
+  /**
+   *  @brief Test, if it is a std::vector<char> byte array
+   */
+  bool is_bytearray () const
+  {
+    return m_type == t_bytearray;
+  }
+
 #if defined(HAVE_QT)
 
   /**
@@ -1373,9 +1400,21 @@ public:
   bool is_a_string () const
   {
 #if defined(HAVE_QT)
-    return m_type == t_string || m_type == t_stdstring || m_type == t_qstring || m_type == t_qbytearray;
+    return m_type == t_string || m_type == t_stdstring || m_type == t_qstring;
 #else
     return m_type == t_string || m_type == t_stdstring;
+#endif
+  }
+
+  /**
+   *  @brief Test, if it is a byte array
+   */
+  bool is_a_bytearray () const
+  {
+#if defined(HAVE_QT)
+    return m_type == t_bytearray || m_type == t_qbytearray;
+#else
+    return m_type == t_bytearray;
 #endif
   }
 
@@ -1530,6 +1569,7 @@ private:
     QString *m_qstring;
     QByteArray *m_qbytearray;
 #endif
+    std::vector<char> *m_bytearray;
     std::string *m_stdstring;
   } m_var;
 
@@ -1558,6 +1598,7 @@ template<> inline __int128 Variant::to<__int128> () const                       
 template<> inline double Variant::to<double> () const                             { return to_double (); }
 template<> inline float Variant::to<float> () const                               { return to_float (); }
 template<> inline std::string Variant::to<std::string> () const                   { return to_stdstring (); }
+template<> inline std::vector<char> Variant::to<std::vector<char> > () const      { return to_bytearray (); }
 #if defined(HAVE_QT)
 template<> inline QString Variant::to<QString> () const                           { return to_qstring (); }
 template<> inline QByteArray Variant::to<QByteArray> () const                     { return to_qbytearray (); }
@@ -1583,6 +1624,7 @@ template<> inline bool Variant::is<__int128> () const             { return m_typ
 template<> inline bool Variant::is<double> () const               { return m_type == t_double; }
 template<> inline bool Variant::is<float> () const                { return m_type == t_float; }
 template<> inline bool Variant::is<std::string> () const          { return m_type == t_stdstring; }
+template<> inline bool Variant::is<std::vector<char> > () const   { return m_type == t_bytearray; }
 #if defined(HAVE_QT)
 template<> inline bool Variant::is<QString> () const              { return m_type == t_qstring; }
 template<> inline bool Variant::is<QByteArray> () const           { return m_type == t_qbytearray; }
@@ -1608,6 +1650,7 @@ template<> inline bool Variant::can_convert_to<__int128> () const             { 
 template<> inline bool Variant::can_convert_to<double> () const               { return can_convert_to_double (); }
 template<> inline bool Variant::can_convert_to<float> () const                { return can_convert_to_float (); }
 template<> inline bool Variant::can_convert_to<std::string> () const          { return true; }
+template<> inline bool Variant::can_convert_to<std::vector<char> > () const   { return true; }
 #if defined(HAVE_QT)
 template<> inline bool Variant::can_convert_to<QString> () const              { return true; }
 template<> inline bool Variant::can_convert_to<QByteArray> () const           { return true; }

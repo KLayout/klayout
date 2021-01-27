@@ -152,34 +152,6 @@ static void _call_f_globalMatch_c10055 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// QRegularExpressionMatchIterator QRegularExpression::globalMatch(const QStringRef &subjectRef, int offset, QRegularExpression::MatchType matchType, QFlags<QRegularExpression::MatchOption> matchOptions)
-
-
-static void _init_f_globalMatch_c10340 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("subjectRef");
-  decl->add_arg<const QStringRef & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("offset", true, "0");
-  decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("matchType", true, "QRegularExpression::NormalMatch");
-  decl->add_arg<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("matchOptions", true, "QRegularExpression::NoMatchOption");
-  decl->add_arg<QFlags<QRegularExpression::MatchOption> > (argspec_3);
-  decl->set_return<QRegularExpressionMatchIterator > ();
-}
-
-static void _call_f_globalMatch_c10340 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
-  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
-  const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRegularExpression::MatchType>(heap, QRegularExpression::NormalMatch), heap);
-  QFlags<QRegularExpression::MatchOption> arg4 = args ? gsi::arg_reader<QFlags<QRegularExpression::MatchOption> >() (args, heap) : gsi::arg_maker<QFlags<QRegularExpression::MatchOption> >() (QRegularExpression::NoMatchOption, heap);
-  ret.write<QRegularExpressionMatchIterator > ((QRegularExpressionMatchIterator)((QRegularExpression *)cls)->globalMatch (arg1, arg2, qt_gsi::QtToCppAdaptor<QRegularExpression::MatchType>(arg3).cref(), arg4));
-}
-
-
 // bool QRegularExpression::isValid()
 
 
@@ -216,34 +188,6 @@ static void _call_f_match_c10055 (const qt_gsi::GenericMethod * /*decl*/, void *
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
-  const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRegularExpression::MatchType>(heap, QRegularExpression::NormalMatch), heap);
-  QFlags<QRegularExpression::MatchOption> arg4 = args ? gsi::arg_reader<QFlags<QRegularExpression::MatchOption> >() (args, heap) : gsi::arg_maker<QFlags<QRegularExpression::MatchOption> >() (QRegularExpression::NoMatchOption, heap);
-  ret.write<QRegularExpressionMatch > ((QRegularExpressionMatch)((QRegularExpression *)cls)->match (arg1, arg2, qt_gsi::QtToCppAdaptor<QRegularExpression::MatchType>(arg3).cref(), arg4));
-}
-
-
-// QRegularExpressionMatch QRegularExpression::match(const QStringRef &subjectRef, int offset, QRegularExpression::MatchType matchType, QFlags<QRegularExpression::MatchOption> matchOptions)
-
-
-static void _init_f_match_c10340 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("subjectRef");
-  decl->add_arg<const QStringRef & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("offset", true, "0");
-  decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("matchType", true, "QRegularExpression::NormalMatch");
-  decl->add_arg<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("matchOptions", true, "QRegularExpression::NoMatchOption");
-  decl->add_arg<QFlags<QRegularExpression::MatchOption> > (argspec_3);
-  decl->set_return<QRegularExpressionMatch > ();
-}
-
-static void _call_f_match_c10340 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QStringRef &arg1 = gsi::arg_reader<const QStringRef & >() (args, heap);
   int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRegularExpression::MatchType>(heap, QRegularExpression::NormalMatch), heap);
   QFlags<QRegularExpression::MatchOption> arg4 = args ? gsi::arg_reader<QFlags<QRegularExpression::MatchOption> >() (args, heap) : gsi::arg_maker<QFlags<QRegularExpression::MatchOption> >() (QRegularExpression::NoMatchOption, heap);
@@ -475,10 +419,8 @@ static gsi::Methods methods_QRegularExpression () {
   methods += new qt_gsi::GenericMethod ("captureCount", "@brief Method int QRegularExpression::captureCount()\n", true, &_init_f_captureCount_c0, &_call_f_captureCount_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QRegularExpression::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod ("globalMatch", "@brief Method QRegularExpressionMatchIterator QRegularExpression::globalMatch(const QString &subject, int offset, QRegularExpression::MatchType matchType, QFlags<QRegularExpression::MatchOption> matchOptions)\n", true, &_init_f_globalMatch_c10055, &_call_f_globalMatch_c10055);
-  methods += new qt_gsi::GenericMethod ("globalMatch", "@brief Method QRegularExpressionMatchIterator QRegularExpression::globalMatch(const QStringRef &subjectRef, int offset, QRegularExpression::MatchType matchType, QFlags<QRegularExpression::MatchOption> matchOptions)\n", true, &_init_f_globalMatch_c10340, &_call_f_globalMatch_c10340);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QRegularExpression::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("match", "@brief Method QRegularExpressionMatch QRegularExpression::match(const QString &subject, int offset, QRegularExpression::MatchType matchType, QFlags<QRegularExpression::MatchOption> matchOptions)\n", true, &_init_f_match_c10055, &_call_f_match_c10055);
-  methods += new qt_gsi::GenericMethod ("match", "@brief Method QRegularExpressionMatch QRegularExpression::match(const QStringRef &subjectRef, int offset, QRegularExpression::MatchType matchType, QFlags<QRegularExpression::MatchOption> matchOptions)\n", true, &_init_f_match_c10340, &_call_f_match_c10340);
   methods += new qt_gsi::GenericMethod ("namedCaptureGroups", "@brief Method QStringList QRegularExpression::namedCaptureGroups()\n", true, &_init_f_namedCaptureGroups_c0, &_call_f_namedCaptureGroups_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QRegularExpression::operator!=(const QRegularExpression &re)\n", true, &_init_f_operator_excl__eq__c3188, &_call_f_operator_excl__eq__c3188);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QRegularExpression &QRegularExpression::operator=(const QRegularExpression &re)\n", false, &_init_f_operator_eq__3188, &_call_f_operator_eq__3188);

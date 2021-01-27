@@ -112,6 +112,71 @@ tl::Variant A::new_a_by_variant ()
   return tl::Variant (A ());
 }
 
+std::vector<int>
+A::qba_cref_to_ia (const QByteArray &ba)
+{
+  const char *cp = ba.constData ();
+  size_t n = ba.size ();
+  std::vector<int> ia;
+  for (size_t i = 0; i < n; ++i) {
+    ia.push_back (int (*cp++));
+  }
+  return ia;
+}
+
+QByteArray
+A::ia_cref_to_qba (const std::vector<int> &ia)
+{
+  QByteArray ba;
+  for (std::vector<int>::const_iterator i = ia.begin (); i != ia.end (); ++i) {
+    ba.push_back (char (*i));
+  }
+  return ba;
+}
+
+const QByteArray &
+A::ia_cref_to_qba_cref (const std::vector<int> &ia)
+{
+  static QByteArray ba;
+  ba.clear ();
+  for (std::vector<int>::const_iterator i = ia.begin (); i != ia.end (); ++i) {
+    ba.push_back (char (*i));
+  }
+  return ba;
+}
+
+std::vector<int>
+A::ba_cref_to_ia (const std::vector<char> &ba)
+{
+  std::vector<int> ia;
+  for (std::vector<char>::const_iterator i = ba.begin (); i != ba.end (); ++i) {
+    ia.push_back (int (*i));
+  }
+  return ia;
+}
+
+std::vector<char>
+A::ia_cref_to_ba (const std::vector<int> &ia)
+{
+  std::vector<char> ba;
+  for (std::vector<int>::const_iterator i = ia.begin (); i != ia.end (); ++i) {
+    ba.push_back (char (*i));
+  }
+  return ba;
+}
+
+const std::vector<char> &
+A::ia_cref_to_ba_cref (const std::vector<int> &ia)
+{
+  static std::vector<char> ba;
+  ba.clear ();
+  for (std::vector<int>::const_iterator i = ia.begin (); i != ia.end (); ++i) {
+    ba.push_back (char (*i));
+  }
+  return ba;
+}
+
+
 static A *a_ctor (int i)
 {
   return new A (i);
@@ -810,6 +875,24 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::constructor ("new_a|new", &a_ctor) +
   gsi::method ("instance_count", &A::instance_count) +
   gsi::method ("new_a_by_variant", &A::new_a_by_variant) +
+
+#if defined(HAVE_QT)
+  gsi::method ("qba_cref_to_ia", &A::qba_cref_to_ia) +
+  gsi::method ("qba_ref_to_ia", &A::qba_ref_to_ia) +
+  gsi::method ("qba_cptr_to_ia", &A::qba_cptr_to_ia) +
+  gsi::method ("qba_ptr_to_ia", &A::qba_ptr_to_ia) +
+  gsi::method ("qba_to_ia", &A::qba_to_ia) +
+  gsi::method ("ia_cref_to_qba", &A::ia_cref_to_qba) +
+  gsi::method ("ia_cref_to_qba_cref", &A::ia_cref_to_qba_cref) +
+#endif
+  gsi::method ("ba_cref_to_ia", &A::ba_cref_to_ia) +
+  gsi::method ("ba_ref_to_ia", &A::ba_ref_to_ia) +
+  gsi::method ("ba_cptr_to_ia", &A::ba_cptr_to_ia) +
+  gsi::method ("ba_ptr_to_ia", &A::ba_ptr_to_ia) +
+  gsi::method ("ba_to_ia", &A::ba_to_ia) +
+  gsi::method ("ia_cref_to_ba", &A::ia_cref_to_ba) +
+  gsi::method ("ia_cref_to_ba_cref", &A::ia_cref_to_ba_cref) +
+
   gsi::method ("br", &A::br) +
   gsi::method ("get_e", &A::get_e) +
   gsi::method ("get_eptr", &A::get_eptr) +

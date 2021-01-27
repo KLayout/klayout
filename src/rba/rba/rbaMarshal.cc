@@ -68,10 +68,49 @@ public:
   virtual void set (const char * /*c_str*/, size_t /*s*/, tl::Heap & /*heap*/)
   {
     //  TODO: is there a setter for a string?
+    //  -> so far, string OUT parameters are not supported
   }
 
 private:
   VALUE m_string;
+};
+
+/**
+ *  @brief An adaptor for a byte array from ruby objects
+ */
+class RubyBasedByteArrayAdaptor
+  : public gsi::ByteArrayAdaptor
+{
+public:
+  RubyBasedByteArrayAdaptor (VALUE value)
+  {
+    m_bytes = rba_safe_string_value (value);
+    gc_lock_object (m_bytes);
+  }
+
+  ~RubyBasedByteArrayAdaptor ()
+  {
+    gc_unlock_object (m_bytes);
+  }
+
+  virtual const char *c_str () const
+  {
+    return RSTRING_PTR (m_bytes);
+  }
+
+  virtual size_t size () const
+  {
+    return RSTRING_LEN (m_bytes);
+  }
+
+  virtual void set (const char * /*c_str*/, size_t /*s*/, tl::Heap & /*heap*/)
+  {
+    //  TODO: is there a setter for a string?
+    //  -> so far, byte array OUT parameters are not supported
+  }
+
+private:
+  VALUE m_bytes;
 };
 
 /**
@@ -214,6 +253,7 @@ struct get_boxed_value_func_error
 
 template <> struct get_boxed_value_func<gsi::VariantType> : get_boxed_value_func_error { };
 template <> struct get_boxed_value_func<gsi::StringType> : get_boxed_value_func_error { };
+template <> struct get_boxed_value_func<gsi::ByteArrayType> : get_boxed_value_func_error { };
 template <> struct get_boxed_value_func<gsi::ObjectType> : get_boxed_value_func_error { };
 template <> struct get_boxed_value_func<gsi::VectorType> : get_boxed_value_func_error { };
 template <> struct get_boxed_value_func<gsi::MapType> : get_boxed_value_func_error { };
@@ -314,6 +354,55 @@ struct writer<gsi::StringType>
 
         //  NOTE: by convention we pass the ownership to the receiver for adaptors.
         aa->write<void *> ((void *)new RubyBasedStringAdaptor (arg));
+
+      }
+
+    }
+  }
+};
+
+/**
+ *  @brief Serialization for strings
+ */
+template <>
+struct writer<gsi::ByteArrayType>
+{
+  void operator() (gsi::SerialArgs *aa, VALUE arg, const gsi::ArgType &atype, tl::Heap *heap)
+  {
+    //  Cannot pass ownership currently
+    tl_assert (!atype.pass_obj ());
+
+    if (arg == Qnil) {
+
+      if (! (atype.is_ptr () || atype.is_cptr ())) {
+        //  nil is treated as an empty string for references
+        aa->write<void *> ((void *)new gsi::ByteArrayAdaptorImpl<std::vector<char> > (std::vector<char> ()));
+      } else {
+        aa->write<void *> ((void *)0);
+      }
+
+    } else {
+
+      if (atype.is_ref () || atype.is_ptr ()) {
+
+        // references or pointers require a boxed object. Pointers also allow nil.
+        void *vc = 0;
+        get_boxed_value_func<std::vector<char> > () (&vc, arg, heap);
+        if (! vc && atype.is_ref ()) {
+          throw tl::Exception (tl::to_string (tr ("Arguments or return values of reference or direct type cannot be passed nil or an empty boxed value object")));
+        }
+
+        //  NOTE: by convention we pass the ownership to the receiver for adaptors.
+        if (! vc) {
+          aa->write<void *> (0);
+        } else {
+          aa->write<void *> ((void *)new gsi::ByteArrayAdaptorImpl<std::vector<char> > ((std::vector<char> *) vc));
+        }
+
+      } else {
+
+        //  NOTE: by convention we pass the ownership to the receiver for adaptors.
+        aa->write<void *> ((void *)new RubyBasedByteArrayAdaptor (arg));
 
       }
 
@@ -548,6 +637,23 @@ struct reader<gsi::StringType>
   void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &, tl::Heap *heap)
   {
     std::unique_ptr<gsi::StringAdaptor> a ((gsi::StringAdaptor *) rr->read<void *>(*heap));
+    if (!a.get ()) {
+      *ret = Qnil;
+    } else {
+      *ret = rb_str_new (a->c_str (), long (a->size ()));
+    }
+  }
+};
+
+/**
+ *  @brief Deseralisation wrapper: specialization for strings
+ */
+template <>
+struct reader<gsi::ByteArrayType>
+{
+  void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &, tl::Heap *heap)
+  {
+    std::unique_ptr<gsi::ByteArrayAdaptor> a ((gsi::ByteArrayAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
       *ret = Qnil;
     } else {

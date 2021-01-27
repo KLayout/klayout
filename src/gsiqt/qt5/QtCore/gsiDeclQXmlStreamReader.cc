@@ -114,25 +114,6 @@ static void _call_ctor_QXmlStreamReader_2025 (const qt_gsi::GenericStaticMethod 
 }
 
 
-//  Constructor QXmlStreamReader::QXmlStreamReader(const char *data)
-
-
-static void _init_ctor_QXmlStreamReader_1731 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("data");
-  decl->add_arg<const char * > (argspec_0);
-  decl->set_return_new<QXmlStreamReader> ();
-}
-
-static void _call_ctor_QXmlStreamReader_1731 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
-  ret.write<QXmlStreamReader *> (new QXmlStreamReader (arg1));
-}
-
-
 // void QXmlStreamReader::addData(const QByteArray &data)
 
 
@@ -168,26 +149,6 @@ static void _call_f_addData_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QXmlStreamReader *)cls)->addData (arg1);
-}
-
-
-// void QXmlStreamReader::addData(const char *data)
-
-
-static void _init_f_addData_1731 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("data");
-  decl->add_arg<const char * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_addData_1731 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamReader *)cls)->addData (arg1);
 }
@@ -1004,10 +965,8 @@ static gsi::Methods methods_QXmlStreamReader () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamReader::QXmlStreamReader(QIODevice *device)\nThis method creates an object of class QXmlStreamReader.", &_init_ctor_QXmlStreamReader_1447, &_call_ctor_QXmlStreamReader_1447);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamReader::QXmlStreamReader(const QByteArray &data)\nThis method creates an object of class QXmlStreamReader.", &_init_ctor_QXmlStreamReader_2309, &_call_ctor_QXmlStreamReader_2309);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamReader::QXmlStreamReader(const QString &data)\nThis method creates an object of class QXmlStreamReader.", &_init_ctor_QXmlStreamReader_2025, &_call_ctor_QXmlStreamReader_2025);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamReader::QXmlStreamReader(const char *data)\nThis method creates an object of class QXmlStreamReader.", &_init_ctor_QXmlStreamReader_1731, &_call_ctor_QXmlStreamReader_1731);
   methods += new qt_gsi::GenericMethod ("addData", "@brief Method void QXmlStreamReader::addData(const QByteArray &data)\n", false, &_init_f_addData_2309, &_call_f_addData_2309);
   methods += new qt_gsi::GenericMethod ("addData", "@brief Method void QXmlStreamReader::addData(const QString &data)\n", false, &_init_f_addData_2025, &_call_f_addData_2025);
-  methods += new qt_gsi::GenericMethod ("addData", "@brief Method void QXmlStreamReader::addData(const char *data)\n", false, &_init_f_addData_1731, &_call_f_addData_1731);
   methods += new qt_gsi::GenericMethod ("addExtraNamespaceDeclaration", "@brief Method void QXmlStreamReader::addExtraNamespaceDeclaration(const QXmlStreamNamespaceDeclaration &extraNamespaceDeclaraction)\n", false, &_init_f_addExtraNamespaceDeclaration_4354, &_call_f_addExtraNamespaceDeclaration_4354);
   methods += new qt_gsi::GenericMethod ("addExtraNamespaceDeclarations", "@brief Method void QXmlStreamReader::addExtraNamespaceDeclarations(const QVector<QXmlStreamNamespaceDeclaration> &extraNamespaceDeclaractions)\n", false, &_init_f_addExtraNamespaceDeclarations_5184, &_call_f_addExtraNamespaceDeclarations_5184);
   methods += new qt_gsi::GenericMethod ("atEnd", "@brief Method bool QXmlStreamReader::atEnd()\n", true, &_init_f_atEnd_c0, &_call_f_atEnd_c0);

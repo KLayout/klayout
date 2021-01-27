@@ -699,76 +699,6 @@ class GSI_PUBLIC_TEMPLATE StringAdaptorImpl
 #if defined(HAVE_QT)
 
 /**
- *  @brief Specialization for QByteArray
- */
-template <>
-class GSI_PUBLIC StringAdaptorImpl<QByteArray>
-  : public StringAdaptor
-{
-public:
-  StringAdaptorImpl (QByteArray *s) 
-    : mp_s (s), m_is_const (false) 
-  { 
-    //  .. nothing yet ..
-  }
-
-  StringAdaptorImpl (const QByteArray *s) 
-    : mp_s (const_cast<QByteArray *> (s)), m_is_const (true) 
-  { 
-    //  .. nothing yet ..
-  }
-
-  StringAdaptorImpl (const QByteArray &s) 
-    : m_is_const (false), m_s (s) 
-  { 
-    mp_s = &m_s; 
-  }
-
-  StringAdaptorImpl () 
-    : m_is_const (false)
-  { 
-    mp_s = &m_s; 
-  }
-
-  virtual ~StringAdaptorImpl () 
-  { 
-    //  .. nothing yet ..
-  }
-
-  virtual size_t size () const 
-  { 
-    return mp_s->size (); 
-  }
-
-  virtual const char *c_str () const
-  {
-    return mp_s->constData (); 
-  }
-
-  virtual void set (const char *c_str, size_t s, tl::Heap &) 
-  {
-    if (! m_is_const) {
-      *mp_s = QByteArray (c_str, int (s));
-    }
-  }
-
-  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
-  {
-    StringAdaptorImpl<QByteArray> *s = dynamic_cast<StringAdaptorImpl<QByteArray> *>(target);
-    if (s) {
-      *s->mp_s = *mp_s;
-    } else {
-      StringAdaptor::copy_to (target, heap);
-    }
-  }
-   
-private:
-  QByteArray *mp_s;
-  bool m_is_const;
-  QByteArray m_s;
-};
-
-/**
  *  @brief Specialization for QString
  */
 template <>
@@ -1100,6 +1030,206 @@ public:
   StringAdaptorImpl (const char_type **s) : StringAdaptorImplCCP<const char_type *> (s) { }
   StringAdaptorImpl (const char_type * const *s) : StringAdaptorImplCCP<const char_type *> (s) { }
   StringAdaptorImpl (const char_type *s) : StringAdaptorImplCCP<const char_type *> (s) { }
+};
+
+// ------------------------------------------------------------
+//  ByteArray adaptor framework
+
+/**
+ *  @brief A generic adaptor for strings
+ *  This is the base class for implementing generic access to strings
+ */
+class GSI_PUBLIC ByteArrayAdaptor
+  : public AdaptorBase
+{
+public:
+  /**
+   *  @brief Default constructor
+   */
+  ByteArrayAdaptor () { }
+
+  /**
+   *  @brief Destructor
+   */
+  virtual ~ByteArrayAdaptor () { }
+
+  /**
+   *  @brief Returns the size of the string
+   */
+  virtual size_t size () const = 0;
+
+  /**
+   *  @brief Returns a pointer to a UTF8 encoded character array with size size()
+   */
+  virtual const char *c_str () const = 0;
+
+  /**
+   *  @brief Sets the string to the given UTF8 string with length s
+   */
+  virtual void set (const char *c_str, size_t s, tl::Heap &heap) = 0;
+
+  /**
+   *  @brief copy_to implementation
+   */
+  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
+  {
+    ByteArrayAdaptor *s = dynamic_cast<ByteArrayAdaptor *>(target);
+    tl_assert (s);
+    s->set (c_str (), size (), heap);
+  }
+};
+
+/**
+ *  @brief Generic string adaptor implementation
+ */
+template <class X>
+class GSI_PUBLIC_TEMPLATE ByteArrayAdaptorImpl
+  : public ByteArrayAdaptor
+{
+};
+
+#if defined(HAVE_QT)
+
+/**
+ *  @brief Specialization for QByteArray
+ */
+template <>
+class GSI_PUBLIC ByteArrayAdaptorImpl<QByteArray>
+  : public ByteArrayAdaptor
+{
+public:
+  ByteArrayAdaptorImpl (QByteArray *s)
+    : mp_s (s), m_is_const (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  ByteArrayAdaptorImpl (const QByteArray *s)
+    : mp_s (const_cast<QByteArray *> (s)), m_is_const (true)
+  {
+    //  .. nothing yet ..
+  }
+
+  ByteArrayAdaptorImpl (const QByteArray &s)
+    : m_is_const (false), m_s (s)
+  {
+    mp_s = &m_s;
+  }
+
+  ByteArrayAdaptorImpl ()
+    : m_is_const (false)
+  {
+    mp_s = &m_s;
+  }
+
+  virtual ~ByteArrayAdaptorImpl ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual size_t size () const
+  {
+    return mp_s->size ();
+  }
+
+  virtual const char *c_str () const
+  {
+    return mp_s->constData ();
+  }
+
+  virtual void set (const char *c_str, size_t s, tl::Heap &)
+  {
+    if (! m_is_const) {
+      *mp_s = QByteArray (c_str, int (s));
+    }
+  }
+
+  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
+  {
+    ByteArrayAdaptorImpl<QByteArray> *s = dynamic_cast<ByteArrayAdaptorImpl<QByteArray> *>(target);
+    if (s) {
+      *s->mp_s = *mp_s;
+    } else {
+      ByteArrayAdaptor::copy_to (target, heap);
+    }
+  }
+
+private:
+  QByteArray *mp_s;
+  bool m_is_const;
+  QByteArray m_s;
+};
+
+#endif
+
+/**
+ *  @brief Specialization for std::string
+ */
+template <>
+class GSI_PUBLIC ByteArrayAdaptorImpl<std::vector<char> >
+  : public ByteArrayAdaptor
+{
+public:
+  ByteArrayAdaptorImpl (std::vector<char> *s)
+    : mp_s (s), m_is_const (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  ByteArrayAdaptorImpl (const std::vector<char> *s)
+    : mp_s (const_cast<std::vector<char> *> (s)), m_is_const (true)
+  {
+    //  .. nothing yet ..
+  }
+
+  ByteArrayAdaptorImpl (const std::vector<char> &s)
+    : m_is_const (false), m_s (s)
+  {
+    mp_s = &m_s;
+  }
+
+  ByteArrayAdaptorImpl ()
+    : m_is_const (false)
+  {
+    mp_s = &m_s;
+  }
+
+  virtual ~ByteArrayAdaptorImpl ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual size_t size () const
+  {
+    return mp_s->size ();
+  }
+
+  virtual const char *c_str () const
+  {
+    return &mp_s->front ();
+  }
+
+  virtual void set (const char *c_str, size_t s, tl::Heap &)
+  {
+    if (! m_is_const) {
+      *mp_s = std::vector<char> (c_str, c_str + s);
+    }
+  }
+
+  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
+  {
+    ByteArrayAdaptorImpl<std::vector<char> > *s = dynamic_cast<ByteArrayAdaptorImpl<std::vector<char> > *>(target);
+    if (s) {
+      *s->mp_s = *mp_s;
+    } else {
+      ByteArrayAdaptor::copy_to (target, heap);
+    }
+  }
+
+private:
+  std::vector<char> *mp_s;
+  bool m_is_const;
+  std::vector<char> m_s;
 };
 
 // ------------------------------------------------------------
@@ -1912,6 +2042,12 @@ template <class X, class V>
 inline AdaptorBase *create_adaptor_by_category(const string_adaptor_tag & /*tag*/, V v)
 {
   return new StringAdaptorImpl<X> (v);
+}
+
+template <class X, class V>
+inline AdaptorBase *create_adaptor_by_category(const byte_array_adaptor_tag & /*tag*/, V v)
+{
+  return new ByteArrayAdaptorImpl<X> (v);
 }
 
 template <class X, class V>

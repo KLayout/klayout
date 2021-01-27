@@ -61,11 +61,46 @@ public:
   virtual void set (const char * /*c_str*/, size_t /*s*/, tl::Heap & /*heap*/)
   {
     //  TODO: is there a setter for a string?
+    //  So far it's not possible to have string OUT parameter
   }
 
 private:
   std::string m_stdstr;
   PythonPtr m_string;
+};
+
+/**
+ *  @brief An adaptor for a byte array from ruby objects
+ */
+class PythonBasedByteArrayAdaptor
+  : public gsi::ByteArrayAdaptor
+{
+public:
+  PythonBasedByteArrayAdaptor (const PythonPtr &ba)
+    : m_bytearray (python2c<std::vector<char> > (ba.get ())), m_bytes (ba)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual const char *c_str () const
+  {
+    return &m_bytearray.front ();
+  }
+
+  virtual size_t size () const
+  {
+    return m_bytearray.size ();
+  }
+
+  virtual void set (const char * /*c_str*/, size_t /*s*/, tl::Heap & /*heap*/)
+  {
+    //  TODO: is there a setter for a byte array?
+    //  So far it's not possible to have bytes OUT parameter
+  }
+
+private:
+  std::vector<char> m_bytearray;
+  PythonPtr m_bytes;
 };
 
 /**
@@ -304,6 +339,55 @@ struct writer<gsi::StringType>
 };
 
 /**
+ *  @brief Serialization for strings
+ */
+template <>
+struct writer<gsi::ByteArrayType>
+{
+  void operator() (gsi::SerialArgs *aa, PyObject *arg, const gsi::ArgType &atype, tl::Heap *heap)
+  {
+    //  Cannot pass ownership currently
+    tl_assert (!atype.pass_obj ());
+
+    if (arg == Py_None || arg == NULL) {
+
+      if (! (atype.is_ptr () || atype.is_cptr ())) {
+        //  nil is treated as an empty string for references
+        aa->write<void *> ((void *)new gsi::ByteArrayAdaptorImpl<std::vector<char> > (std::vector<char> ()));
+      } else {
+        aa->write<void *> ((void *)0);
+      }
+
+    } else {
+
+      if (atype.is_ref () || atype.is_ptr ()) {
+
+        // references or pointers require a boxed object. Pointers also allow nil.
+        void *vc = 0;
+        get_boxed_value_func<std::vector<char> > () (&vc, arg, heap);
+        if (! vc && atype.is_ref ()) {
+          throw tl::Exception (tl::to_string (tr ("Arguments or return values of reference or direct type cannot be passed nil or an empty boxed value object")));
+        }
+
+        //  NOTE: by convention we pass the ownership to the receiver for adaptors.
+        if (! vc) {
+          aa->write<void *> (0);
+        } else {
+          aa->write<void *> ((void *)new gsi::ByteArrayAdaptorImpl<std::vector<char> > ((std::vector<char> *) vc));
+        }
+
+      } else {
+
+        //  NOTE: by convention we pass the ownership to the receiver for adaptors.
+        aa->write<void *> ((void *)new PythonBasedByteArrayAdaptor (arg));
+
+      }
+
+    }
+  }
+};
+
+/**
  *  @brief Specialization for Variant
  */
 template <>
@@ -529,6 +613,29 @@ struct reader<gsi::StringType>
       *ret = PythonRef (Py_None, false /*borrowed*/);
     } else {
       *ret = c2python (std::string (a->c_str (), a->size ()));
+    }
+  }
+};
+
+/**
+ *  @brief Deseralisation wrapper: specialization for byte arrays
+ */
+template <>
+struct reader<gsi::ByteArrayType>
+{
+  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PYAObjectBase * /*self*/, const gsi::ArgType &, tl::Heap *heap)
+  {
+    std::unique_ptr<gsi::ByteArrayAdaptor> a ((gsi::ByteArrayAdaptor *) rr->read<void *>(*heap));
+    if (!a.get ()) {
+      *ret = PythonRef (Py_None, false /*borrowed*/);
+    } else {
+      const char *cp = a->c_str ();
+      size_t sz = a->size ();
+#if PY_MAJOR_VERSION < 3
+      *ret = PyByteArray_FromStringAndSize (cp, sz);
+#else
+      *ret = PyBytes_FromStringAndSize (cp, sz);
+#endif
     }
   }
 };

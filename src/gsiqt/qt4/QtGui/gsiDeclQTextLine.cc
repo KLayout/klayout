@@ -69,28 +69,6 @@ static void _call_f_ascent_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// double QTextLine::cursorToX(int *cursorPos, QTextLine::Edge edge)
-
-
-static void _init_f_cursorToX_c2664 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("cursorPos");
-  decl->add_arg<int * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("edge", true, "QTextLine::Leading");
-  decl->add_arg<const qt_gsi::Converter<QTextLine::Edge>::target_type & > (argspec_1);
-  decl->set_return<double > ();
-}
-
-static void _call_f_cursorToX_c2664 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int *arg1 = gsi::arg_reader<int * >() (args, heap);
-  const qt_gsi::Converter<QTextLine::Edge>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QTextLine::Edge>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QTextLine::Edge>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QTextLine::Edge>(heap, QTextLine::Leading), heap);
-  ret.write<double > ((double)((QTextLine *)cls)->cursorToX (arg1, qt_gsi::QtToCppAdaptor<QTextLine::Edge>(arg2).cref()));
-}
-
-
 // double QTextLine::cursorToX(int cursorPos, QTextLine::Edge edge)
 
 
@@ -497,7 +475,6 @@ static gsi::Methods methods_QTextLine () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTextLine::QTextLine()\nThis method creates an object of class QTextLine.", &_init_ctor_QTextLine_0, &_call_ctor_QTextLine_0);
   methods += new qt_gsi::GenericMethod ("ascent", "@brief Method double QTextLine::ascent()\n", true, &_init_f_ascent_c0, &_call_f_ascent_c0);
-  methods += new qt_gsi::GenericMethod ("cursorToX", "@brief Method double QTextLine::cursorToX(int *cursorPos, QTextLine::Edge edge)\n", true, &_init_f_cursorToX_c2664, &_call_f_cursorToX_c2664);
   methods += new qt_gsi::GenericMethod ("cursorToX", "@brief Method double QTextLine::cursorToX(int cursorPos, QTextLine::Edge edge)\n", true, &_init_f_cursorToX_c2478, &_call_f_cursorToX_c2478);
   methods += new qt_gsi::GenericMethod ("descent", "@brief Method double QTextLine::descent()\n", true, &_init_f_descent_c0, &_call_f_descent_c0);
   methods += new qt_gsi::GenericMethod ("draw", "@brief Method void QTextLine::draw(QPainter *p, const QPointF &point, const QTextLayout::FormatRange *selection)\n", true, &_init_f_draw_c6879, &_call_f_draw_c6879);

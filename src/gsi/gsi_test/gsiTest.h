@@ -98,6 +98,39 @@ struct A
    */
   static tl::Variant new_a_by_variant ();
 
+#if defined(HAVE_QT)
+  /**
+   *  @brief Byte sequences: tests access to QByteArray
+   */
+  static std::vector<int> qba_cref_to_ia (const QByteArray &ba);
+  static std::vector<int> qba_ref_to_ia (QByteArray &ba)           { return qba_cref_to_ia (ba); }
+  static std::vector<int> qba_cptr_to_ia (const QByteArray *ba)    { return qba_cref_to_ia (*ba); }
+  static std::vector<int> qba_ptr_to_ia (QByteArray *ba)           { return qba_cref_to_ia (*ba); }
+  static std::vector<int> qba_to_ia (QByteArray ba)                { return qba_cref_to_ia (ba); }
+
+  /**
+   *  @brief Byte sequences: tests return of QByteArray
+   */
+  static QByteArray ia_cref_to_qba (const std::vector<int> &ia);
+  static const QByteArray &ia_cref_to_qba_cref (const std::vector<int> &ia);
+
+#endif
+
+  /**
+   *  @brief Byte sequences: tests access to std::vector<char> (another byte array)
+   */
+  static std::vector<int> ba_cref_to_ia (const std::vector<char> &ba);
+  static std::vector<int> ba_ref_to_ia (std::vector<char> &ba)           { return ba_cref_to_ia (ba); }
+  static std::vector<int> ba_cptr_to_ia (const std::vector<char> *ba)    { return ba_cref_to_ia (*ba); }
+  static std::vector<int> ba_ptr_to_ia (std::vector<char> *ba)           { return ba_cref_to_ia (*ba); }
+  static std::vector<int> ba_to_ia (std::vector<char> ba)                { return ba_cref_to_ia (ba); }
+
+  /**
+   *  @brief Byte sequences: tests return of std::vector<char>
+   */
+  static std::vector<char> ia_cref_to_ba (const std::vector<int> &ia);
+  static const std::vector<char> &ia_cref_to_ba_cref (const std::vector<int> &ia);
+
   /*
    *  @brief A dummy method providing a chance to set a breakpoint in the script
    */
@@ -120,6 +153,9 @@ struct A
   int a3 (const std::string &x) { 
     return int (x.size ());
   }
+  int a3_ba (const std::vector<char> &x) {
+    return x.size ();
+  }
 #if defined(HAVE_QT)
   int a3_qstr (const QString &x) { 
     return x.size (); 
@@ -131,7 +167,7 @@ struct A
     return x.size (); 
   }
 #endif
-  double a4 (const std::vector<double> &d) { 
+  double a4 (const std::vector<double> &d) {
     m_d = d;
     return d.back (); 
   }
@@ -170,6 +206,7 @@ struct A
   unsigned long long a11_ull (double f) { return (unsigned long long)(f); }
 
   std::string a10_d (double f) { return tl::to_string (f); }
+  std::vector<char> a10_d_ba (double f) { std::string s = tl::to_string (f); return std::vector<char> (s.begin (), s.end ()); }
 #if defined(HAVE_QT)
   QByteArray a10_d_qba (double f) { return tl::to_qstring (tl::to_string (f)).toUtf8 (); }
   QString a10_d_qstr (double f) { return tl::to_qstring (tl::to_string (f)); }

@@ -212,7 +212,7 @@ spline_interpolation (const std::vector<std::pair<P, double> > &control_points, 
 }
 
 template <>
-std::list<db::DPoint>
+DB_PUBLIC std::list<db::DPoint>
 spline_interpolation (const std::vector<std::pair<db::DPoint, double> > &control_points, int degree, const std::vector<double> &knots, double relative_accuracy, double absolute_accuracy)
 {
   return do_spline_interpolation (control_points, degree, knots, relative_accuracy, absolute_accuracy);

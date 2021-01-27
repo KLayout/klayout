@@ -1599,14 +1599,14 @@ Variant::to_qstring () const
 std::vector<char>
 Variant::to_bytearray () const
 {
-  if (m_type == t_qbytearray) {
-    return std::vector<char> (m_var.m_qbytearray->constBegin (), m_var.m_qbytearray->constEnd ());
-  } else if (m_type == t_bytearray) {
+  if (m_type == t_bytearray) {
     return *m_var.m_bytearray;
 #if defined(HAVE_QT)
   } else if (m_type == t_qstring) {
     QByteArray ba = m_var.m_qstring->toUtf8 ();
     return std::vector<char> (ba.constBegin (), ba.constEnd ());
+  } else if (m_type == t_qbytearray) {
+    return std::vector<char> (m_var.m_qbytearray->constBegin (), m_var.m_qbytearray->constEnd ());
 #endif
   } else if (m_type == t_stdstring) {
     return std::vector<char> (m_var.m_stdstring->begin (), m_var.m_stdstring->end ());

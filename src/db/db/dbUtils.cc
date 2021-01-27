@@ -250,11 +250,11 @@ spline_interpolation (const std::vector<P> &control_points, int degree, const st
   return spline_interpolation (cp, degree, knots, relative_accuracy, absolute_accuracy);
 }
 
-template std::list<db::Point> spline_interpolation (const std::vector<db::Point> &, int, const std::vector<double> &, double, double);
-template std::list<db::Point> spline_interpolation (const std::vector<db::Point> &, const std::vector<double> &, int, const std::vector<double> &, double, double);
-template std::list<db::Point> spline_interpolation (const std::vector<std::pair<db::Point, double> > &, int, const std::vector<double> &, double, double);
+template DB_PUBLIC std::list<db::Point> spline_interpolation (const std::vector<db::Point> &, int, const std::vector<double> &, double, double);
+template DB_PUBLIC std::list<db::Point> spline_interpolation (const std::vector<db::Point> &, const std::vector<double> &, int, const std::vector<double> &, double, double);
+template DB_PUBLIC std::list<db::Point> spline_interpolation (const std::vector<std::pair<db::Point, double> > &, int, const std::vector<double> &, double, double);
 
-template std::list<db::DPoint> spline_interpolation (const std::vector<db::DPoint> &, int, const std::vector<double> &, double, double);
-template std::list<db::DPoint> spline_interpolation (const std::vector<db::DPoint> &, const std::vector<double> &, int, const std::vector<double> &, double, double);
+template DB_PUBLIC std::list<db::DPoint> spline_interpolation (const std::vector<db::DPoint> &, int, const std::vector<double> &, double, double);
+template DB_PUBLIC std::list<db::DPoint> spline_interpolation (const std::vector<db::DPoint> &, const std::vector<double> &, int, const std::vector<double> &, double, double);
 
 }

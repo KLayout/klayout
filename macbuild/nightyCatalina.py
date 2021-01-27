@@ -37,8 +37,8 @@ def Get_Build_Options( targetDic ):
     buildOp = dict()
     for key in targetDic.keys():
         target = targetDic[key]
-        if target == "std": # use 'Qt5Brew' that provides Qt 5.15.1 to run on "Big Sur", too
-            buildOp["std"]     = [ '-q', 'Qt5Brew',     '-r', 'sys',  '-p', 'sys'    ]
+        if target == "std": # use 'Qt5MacPorts' that provides Qt 5.15.2 to run on "Big Sur", too
+            buildOp["std"]     = [ '-q', 'Qt5MacPorts', '-r', 'sys',  '-p', 'sys'    ]
         elif target == "ports":
             buildOp["ports"]   = [ '-q', 'Qt5MacPorts', '-r', 'MP27', '-p', 'MP38'   ]
         elif target == "brew":
@@ -65,7 +65,7 @@ def Get_QAT_Directory( targetDic ):
     for key in targetDic.keys():
         target = targetDic[key]
         if target == "std":
-            dirQAT["std"]       = 'qt5Brew.build.macos-Catalina-release-RsysPsys.macQAT'
+            dirQAT["std"]       = 'qt5MP.build.macos-Catalina-release-RsysPsys.macQAT'
         elif target == "ports":
             dirQAT["ports"]     = 'qt5MP.build.macos-Catalina-release-Rmp27Pmp38.macQAT'
         elif target == "brew":
@@ -99,7 +99,7 @@ def Get_Package_Options( targetDic, srlDMG, makeflag ):
     for key in targetDic.keys():
         target = targetDic[key]
         if target == "std":
-            packOp["std"]       = [ '-p', 'ST-qt5Brew.pkg.macos-Catalina-release-RsysPsys',     '-s', '%d' % srlDMG, '%s' % flag ]
+            packOp["std"]       = [ '-p', 'ST-qt5MP.pkg.macos-Catalina-release-RsysPsys',       '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "ports":
             packOp["ports"]     = [ '-p', 'LW-qt5MP.pkg.macos-Catalina-release-Rmp27Pmp38',     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brew":

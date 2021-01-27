@@ -108,6 +108,7 @@ def SetGlobals():
     if release == 20:
         GenOSName = "macOS"
         Platform  = "BigSur"
+        LatestOS  = Platform
     elif release == 19:
         GenOSName = "macOS"
         Platform  = "Catalina"

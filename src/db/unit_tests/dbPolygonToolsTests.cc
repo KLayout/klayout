@@ -2373,6 +2373,24 @@ TEST(404)
   }
 }
 
+TEST(405)
+{
+  db::Polygon poly;
+  std::string s ("(0,0;0,1126;30,1126;30,30;3044,30;3044,1126;5782,1126;5782,30;8796,30;8796,1126;0,1126;0,1141;3009,1141;3009,1156;3194,1156;3194,1141;8826,1141;8826,0;5742,0;5742,1126;3084,1126;3084,0)");
+  tl::Extractor ex (s.c_str ());
+  ex.read (poly);
+
+  std::vector<db::Polygon> sp;
+  db::split_polygon (poly, sp);
+
+  EXPECT_EQ (sp.size (), size_t (3));
+  if (sp.size () >= 3) {
+    EXPECT_EQ (sp[0].to_string (), "..");
+    EXPECT_EQ (sp[1].to_string (), "..");
+    EXPECT_EQ (sp[2].to_string (), "..");
+  }
+}
+
 static db::Polygon str2poly (const std::string &s)
 {
   db::Polygon poly;
@@ -2382,7 +2400,7 @@ static db::Polygon str2poly (const std::string &s)
 }
 
 //  self-overlapping, non-orientable check
-TEST(405)
+TEST(500)
 {
   std::string ps;
   std::vector<db::Polygon> parts;

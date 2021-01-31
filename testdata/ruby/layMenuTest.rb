@@ -383,6 +383,42 @@ RESULT
 
   end
 
+  def test_6
+
+    app = RBA::Application.instance
+    mw = app.main_window
+
+    assert_equal(mw.get_key_bindings["file_menu.exit"], "Ctrl+Q")
+
+    # key bindings
+
+    mw.set_key_bindings({"file_menu.exit" => "F2"})
+    assert_equal(mw.get_key_bindings["file_menu.exit"], "F2")
+
+    mw.set_key_bindings({"file_menu.exit" => ""})
+    assert_equal(mw.get_key_bindings["file_menu.exit"], "")
+
+    mw.set_key_bindings(mw.get_default_key_bindings)
+    assert_equal(mw.get_key_bindings["file_menu.exit"], "Ctrl+Q")
+
+    mw.set_key_bindings({"file_menu.exit" => ""})
+    assert_equal(mw.get_key_bindings["file_menu.exit"], "")
+
+    # menu items hidden
+
+    assert_equal(mw.get_menu_items_hidden["file_menu.exit"], false)
+
+    mw.set_menu_items_hidden({"file_menu.exit" => true})
+    assert_equal(mw.get_menu_items_hidden["file_menu.exit"], true)
+
+    mw.set_menu_items_hidden(mw.get_default_menu_items_hidden)
+    assert_equal(mw.get_menu_items_hidden["file_menu.exit"], false)
+
+    mw.set_menu_items_hidden({"file_menu.exit" => true})
+    assert_equal(mw.get_menu_items_hidden["file_menu.exit"], true)
+
+  end
+
 end
 
 load("test_epilogue.rb")

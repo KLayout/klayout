@@ -2917,9 +2917,6 @@ private:
 
   std::list<lay::CellView>::iterator cellview_iter (int cv_index);
   std::list<lay::CellView>::const_iterator cellview_iter (int cv_index) const;
-
-  //  implementation of Dispatcher
-  virtual QWidget *menu_parent_widget ();
 };
 
 }

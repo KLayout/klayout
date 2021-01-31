@@ -774,6 +774,18 @@ public:
   QActionGroup *make_exclusive_group (const std::string &name);
 
   /**
+   *  @brief Gets the keyboard shortcuts
+   *  @param with_defaults Returns the default shortcuts if true. Otherwise returns the effective shortcut.
+   *  @return a hash with menu paths for keys and key binding for values
+   */
+  std::map<std::string, std::string> get_shortcuts (bool with_defaults)
+  {
+    std::map<std::string, std::string> b;
+    get_shortcuts (std::string (), b, with_defaults);
+    return b;
+  }
+
+  /**
    *  @brief Gets the root node of the menu
    */
   const AbstractMenuItem &root () const
@@ -798,6 +810,7 @@ private:
   void collect_group (std::vector<std::string> &grp, const std::string &name, const AbstractMenuItem &item) const;
   void collect_configure_actions (std::vector<ConfigureAction *> &ca, AbstractMenuItem &item);
   void emit_changed ();
+  void get_shortcuts (const std::string &root, std::map<std::string, std::string> &bindings, bool with_defaults);
 
   Dispatcher *mp_dispatcher;
   AbstractMenuItem m_root;

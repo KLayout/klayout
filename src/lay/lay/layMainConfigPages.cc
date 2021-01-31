@@ -356,27 +356,6 @@ CustomizeMenuConfigPage::~CustomizeMenuConfigPage ()
   mp_ui = 0;
 }
 
-static void get_shortcuts (const lay::AbstractMenu &menu, const std::string &root, std::map<std::string, std::string> &bindings, bool with_defaults)
-{
-  std::vector<std::string> items = menu.items (root);
-  for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
-    if (i->size () > 0) {
-      if (menu.is_valid (*i) && menu.action (*i)->is_visible ()) {
-        if (menu.is_menu (*i)) {
-          //  a menu must be listed (so it can be hidden), but does not have a shortcut
-          //  but we don't include special menus
-          if (i->at (0) != '@') {
-            bindings.insert (std::make_pair (*i, std::string ()));
-          }
-          get_shortcuts (menu, *i, bindings, with_defaults);
-        } else if (! menu.is_separator (*i)) {
-          bindings.insert (std::make_pair (*i, with_defaults ? menu.action (*i)->get_default_shortcut () : menu.action (*i)->get_effective_shortcut ()));
-        }
-      }
-    }
-  }
-}
-
 void
 CustomizeMenuConfigPage::reset_clicked ()
 {
@@ -405,12 +384,10 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
   m_paths_for_action.clear ();
 
   //  get the current bindings
-  m_current_bindings.clear ();
-  get_shortcuts (*mp_dispatcher->menu (), std::string (), m_current_bindings, false);
+  m_current_bindings = mp_dispatcher->menu ()->get_shortcuts (false);
 
   //  get the default bindings
-  std::map<std::string, std::string> default_bindings;
-  get_shortcuts (*mp_dispatcher->menu (), std::string (), default_bindings, true);
+  std::map<std::string, std::string> default_bindings = mp_dispatcher->menu ()->get_shortcuts (true);
 
   m_enable_event = false;
 

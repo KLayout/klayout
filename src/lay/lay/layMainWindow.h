@@ -94,7 +94,8 @@ class ProgressWidget;
  */
 class LAY_PUBLIC MainWindow
   : public QMainWindow,
-    public lay::Dispatcher
+    public tl::Object,
+    public lay::DispatcherDelegate
 {
 Q_OBJECT
 public:
@@ -107,7 +108,7 @@ public:
   /**
    *  @brief Constructor
    */
-  MainWindow (QApplication *app = 0, lay::Plugin *parent_plugin = 0, const char *name = "main_window", bool undo_enabled = true);
+  MainWindow (QApplication *app = 0, const char *name = "main_window", bool undo_enabled = true);
 
   /** 
    *  @brief Destructor
@@ -115,11 +116,11 @@ public:
   ~MainWindow ();
 
   /**
-   *  @brief Implementation of the Dispatcher interface
+   *  @brief Gets the dispatcher interface
    */
-  QWidget *menu_parent_widget ()
+  lay::Dispatcher *dispatcher () const
   {
-    return this;
+    return const_cast<lay::Dispatcher *> (&m_dispatcher);
   }
 
   /**
@@ -499,6 +500,14 @@ public:
   void show_macro_editor (const std::string &cat = std::string (), bool add = false);
 
   /**
+   *  @brief Gets the main window's menu
+   */
+  AbstractMenu *menu ()
+  {
+    return m_dispatcher.menu ();
+  }
+
+  /**
    *  @brief Handles a generic menu request
    */
   void menu_activated (const std::string &symbol);
@@ -658,6 +667,8 @@ protected:
   void do_update_mru_menus ();
 
 private:
+  lay::Dispatcher m_dispatcher;
+
   TextProgressDelegate m_text_progress;
 
   //  Main menu

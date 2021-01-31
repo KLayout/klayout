@@ -2570,6 +2570,67 @@ TEST(102)
   EXPECT_EQ (out[0].to_string (), "(0,0;0,200;100,200;100,100;200,100;200,200;500,200;500,100;600,100;600,200;0,200;0,1000;1000,1000;1000,0)");
 }
 
+TEST(103)
+{
+  db::EdgeProcessor ep;
+
+  {
+    db::Point pts[] = {
+      db::Point (0, 0),
+      db::Point (0, 500),
+      db::Point (1500, 500),
+      db::Point (1500, 0),
+      db::Point (1000, 0),
+      db::Point (1000, 400),
+      db::Point (500, 400),
+      db::Point (500, 0)
+    };
+    db::Polygon p;
+    p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    ep.insert (p, 0);
+  }
+
+  {
+    db::Point pts[] = {
+      db::Point (100, 100),
+      db::Point (100, 400),
+      db::Point (400, 400),
+      db::Point (400, 100)
+    };
+    db::Polygon p;
+    p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    ep.insert (p, 1);
+  }
+
+  {
+    db::Point pts[] = {
+      db::Point (1100, 100),
+      db::Point (1100, 400),
+      db::Point (1400, 400),
+      db::Point (1400, 100)
+    };
+    db::Polygon p;
+    p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    ep.insert (p, 1);
+  }
+
+  std::vector<db::Polygon> out;
+  db::PolygonContainer pc (out);
+  db::PolygonGenerator pg (pc, true, true);
+  db::BooleanOp op (db::BooleanOp::ANotB);
+
+  ep.process (pg, op);
+
+  EXPECT_EQ (out.size (), size_t (1));
+#if 1
+  //  fast hole treatment
+  EXPECT_EQ (out[0].to_string (), "(0,0;0,400;100,400;100,100;400,100;400,400;1100,400;1100,100;1400,100;1400,400;0,400;0,500;1500,500;1500,0;1000,0;1000,400;500,400;500,0)");
+#else
+  //  elaborate hole treatment
+  EXPECT_EQ (out[0].to_string (), "(0,0;0,400;100,400;100,100;400,100;400,400;0,400;0,500;1500,500;1500,0;1000,0;1000,400;1100,400;1100,100;1400,100;1400,400;500,400;500,0)");
+#endif
+}
+
 //  Bug 134
 TEST(134)
 {

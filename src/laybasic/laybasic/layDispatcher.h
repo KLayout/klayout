@@ -42,10 +42,68 @@ class Action;
 class ConfigureAction;
 
 /**
+ *  @brief A delegate by which the dispatcher can submit notification events
+ */
+class LAYBASIC_PUBLIC DispatcherDelegate
+{
+public:
+  /**
+   *  @brief Notifies the plugin root that a new plugin class has been registered
+   *
+   *  This method is called when a plugin is loaded dynamically during runtime.
+   */
+  virtual void plugin_registered (lay::PluginDeclaration * /*cls*/)
+  {
+    // .. this implementation does nothing ..
+  }
+
+  /**
+   *  @brief Notifies the plugin root that a plugin class is about to be removed
+   */
+  virtual void plugin_removed (lay::PluginDeclaration * /*cls*/)
+  {
+    // .. this implementation does nothing ..
+  }
+
+  /**
+   *  @brief Selects the given mode
+   *
+   *  The implementation is supposed to select the given mode on all related plugins.
+   */
+  virtual void select_mode (int /*mode*/)
+  {
+    // .. this implementation does nothing ..
+  }
+
+  /**
+   *  @brief Menu command handler
+   */
+  virtual void menu_activated (const std::string & /*symbol*/)
+  {
+    // .. this implementation does nothing ..
+  }
+
+  /**
+   *  @brief Receives configuration events
+   */
+  virtual bool configure (const std::string & /*name*/, const std::string & /*value*/)
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Configuration finalization
+   */
+  virtual void config_finalize ()
+  {
+    //  .. the default implementation does nothing ..
+  }
+};
+
+/**
  *  @brief The central menu event and configuration dispatcher class
  *
  *  This class acts as the top level dispatcher for plugin events and the menu configuration.
- *
  */
 class LAYBASIC_PUBLIC Dispatcher
   : public Plugin
@@ -57,7 +115,14 @@ public:
    *  @param parent Usually 0, but a dispatcher may have parents. In this case, the dispatcher is not the actual dispatcher, but the real plugin chain's root is.
    *  @param standalone The standalone flag passed to the plugin constructor.
    */
-  Dispatcher (Plugin *parent, bool standalone = false);
+  Dispatcher (Plugin *parent = 0, bool standalone = false);
+
+  /**
+   *  @brief The root constructor
+   *
+   *  @param delegate The notification receiver for dispatcher events
+   */
+  Dispatcher (DispatcherDelegate *delegate, Plugin *parent = 0, bool standalone = false);
 
   /**
    *  @brief Destructor
@@ -95,29 +160,65 @@ public:
    *
    *  This method is called when a plugin is loaded dynamically during runtime.
    */
-  virtual void plugin_registered (lay::PluginDeclaration * /*cls*/) { }
+  virtual void plugin_registered (lay::PluginDeclaration *cls)
+  {
+    if (mp_delegate) {
+      mp_delegate->plugin_registered (cls);
+    }
+  }
 
   /**
    *  @brief Notifies the plugin root that a plugin class is about to be removed
    */
-  virtual void plugin_removed (lay::PluginDeclaration * /*cls*/) { }
+  virtual void plugin_removed (lay::PluginDeclaration *cls)
+  {
+    if (mp_delegate) {
+      mp_delegate->plugin_registered (cls);
+    }
+  }
 
   /**
    *  @brief Selects the given mode
    *
    *  The implementation is supposed to select the given mode on all related plugins.
    */
-  virtual void select_mode (int /*mode*/) { }
+  virtual void select_mode (int mode)
+  {
+    if (mp_delegate) {
+      mp_delegate->select_mode (mode);
+    }
+  }
+
+  /**
+   *  @brief Called, when a menu item is selected
+   */
+  virtual void menu_activated (const std::string &symbol)
+  {
+    if (mp_delegate) {
+      mp_delegate->menu_activated (symbol);
+    }
+  }
 
   /**
    *  @brief Gets the parent widget
    */
-  virtual QWidget *menu_parent_widget () { return 0; }
+  QWidget *menu_parent_widget ()
+  {
+    return mp_menu_parent_widget;
+  }
+
+  /**
+   *  @brief Gets the parent widget
+   */
+  void set_menu_parent_widget (QWidget *w)
+  {
+    mp_menu_parent_widget = w;
+  }
 
   /**
    *  @brief Returns true, if the dispatcher supplies a user interface
    */
-  virtual bool has_ui () { return menu_parent_widget () != 0; }
+  bool has_ui () { return menu_parent_widget () != 0; }
 
   /**
    *  @brief Gets the AbstractMenu object
@@ -132,12 +233,15 @@ public:
 protected:
   //  capture the configuration events so we can change the value of the configuration actions
   virtual bool configure (const std::string &name, const std::string &value);
+  virtual void config_finalize ();
 
 private:
   Dispatcher (const Dispatcher &);
   Dispatcher &operator= (const Dispatcher &);
 
   lay::AbstractMenu m_menu;
+  QWidget *mp_menu_parent_widget;
+  DispatcherDelegate *mp_delegate;
 };
 
 }

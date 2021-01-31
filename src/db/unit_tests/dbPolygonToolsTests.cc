@@ -559,15 +559,18 @@ TEST(9c)
   std::vector<db::Polygon> right_of;
 
   db::cut_polygon (in, db::Edge (db::Point (15835, 0), db::Point (15835, 1)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), size_t (3));
-  EXPECT_EQ (right_of[0].to_string (), "(17335,8265;16335,9265;15835,9265;15835,9765;17335,9765)");
-  EXPECT_EQ (right_of[1].to_string (), "(15835,9765;16002,9932;15835,10015;17335,10015;17335,9765)");
-  EXPECT_EQ (right_of[2].to_string (), "(15835,10015;15835,10265;17335,10265;17335,10015)");
+  EXPECT_EQ (right_of.size (), size_t (1));
+  EXPECT_EQ (right_of[0].to_string (), "(17335,8265;16335,9265;15835,9265;15835,9765;16002,9932;15835,10015;15835,10265;17335,10265)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (15835, 1), db::Point (15835, 0)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), size_t (1));
-  EXPECT_EQ (right_of[0].to_string (), "(14335,8265;14335,10265;15335,10265;15335,9765;15668,9932;15335,10265;15835,10265;15835,10015;15668,9932;15835,9765;15335,9765;14335,9265;15335,9265;15335,9765;15835,9765;15835,9265;15335,9265)");
+  EXPECT_EQ (right_of.size (), size_t (4));
+  if (right_of.size () >= 4) {
+    EXPECT_EQ (right_of[0].to_string (), "(14335,8265;14335,9265;15335,9265)");
+    EXPECT_EQ (right_of[1].to_string (), "(15335,9265;15335,9765;15668,9932;15835,9765;15835,9265)");
+    EXPECT_EQ (right_of[2].to_string (), "(14335,9265;14335,10265;15335,10265;15335,9765)");
+    EXPECT_EQ (right_of[3].to_string (), "(15668,9932;15335,10265;15835,10265;15835,10015)");
+  }
 }
 
 TEST(9d) 
@@ -2373,6 +2376,23 @@ TEST(404)
   }
 }
 
+TEST(405)
+{
+  db::Polygon poly;
+  std::string s ("(0,0;0,1126;30,1126;30,30;3044,30;3044,1126;5782,1126;5782,30;8796,30;8796,1126;0,1126;0,1141;3009,1141;3009,1156;3194,1156;3194,1141;8826,1141;8826,0;5742,0;5742,1126;3084,1126;3084,0)");
+  tl::Extractor ex (s.c_str ());
+  ex.read (poly);
+
+  std::vector<db::Polygon> sp;
+  db::split_polygon (poly, sp);
+
+  EXPECT_EQ (sp.size (), size_t (2));
+  if (sp.size () >= 2) {
+    EXPECT_EQ (sp[0].to_string (), "(5742,0;5742,1126;5782,1126;5782,30;8796,30;8796,1126;3194,1126;3194,1141;8826,1141;8826,0)");
+    EXPECT_EQ (sp[1].to_string (), "(0,0;0,1126;30,1126;30,30;3044,30;3044,1126;0,1126;0,1141;3009,1141;3009,1156;3194,1156;3194,1126;3084,1126;3084,0)");
+  }
+}
+
 static db::Polygon str2poly (const std::string &s)
 {
   db::Polygon poly;
@@ -2382,7 +2402,7 @@ static db::Polygon str2poly (const std::string &s)
 }
 
 //  self-overlapping, non-orientable check
-TEST(405)
+TEST(500)
 {
   std::string ps;
   std::vector<db::Polygon> parts;

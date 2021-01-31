@@ -770,7 +770,10 @@ class Basic_TestClass < TestBase
     b.each_b_copy { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["a", "y", "uu"])
     # through enumerator
-    assert_equal(b.each_b_copy.collect(&:str), ["a", "y", "uu"])
+    if RUBY_VERSION > "2.0.0"
+      # this creates GC leaks in 2.0.0
+      assert_equal(b.each_b_copy.collect(&:str), ["a", "y", "uu"])
+    end
 
     arr = []
     b.each_b_copy { |bb| bb.set_str(bb.str + "x"); arr.push(bb.str) } 
@@ -784,7 +787,10 @@ class Basic_TestClass < TestBase
     b.each_b_cref { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["a", "y", "uu"])
     # through enumerator
-    assert_equal(b.each_b_cref.collect(&:str), ["a", "y", "uu"])
+    if RUBY_VERSION > "2.0.0"
+      # this creates GC leaks in 2.0.0
+      assert_equal(b.each_b_cref.collect(&:str), ["a", "y", "uu"])
+    end
 
     arr = []
     # this works, since the "const B &" will be converted to a copy
@@ -800,7 +806,10 @@ class Basic_TestClass < TestBase
     b.each_b_cptr { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["a", "y", "uu"])
     # through enumerator
-    assert_equal(b.each_b_cptr.collect(&:str), ["a", "y", "uu"])
+    if RUBY_VERSION > "2.0.0"
+      # this creates GC leaks in 2.0.0
+      assert_equal(b.each_b_cptr.collect(&:str), ["a", "y", "uu"])
+    end
 
     arr = []
     # const references cannot be modified
@@ -821,7 +830,10 @@ class Basic_TestClass < TestBase
     b.each_b_ref { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["a", "y", "uu"])
     # through enumerator
-    assert_equal(b.each_b_ref.collect(&:str), ["a", "y", "uu"])
+    if RUBY_VERSION > "2.0.0"
+      # this creates GC leaks in 2.0.0
+      assert_equal(b.each_b_ref.collect(&:str), ["a", "y", "uu"])
+    end
 
     arr = []
     b.each_b_ref { |bb| bb.set_str(bb.str + "x"); arr.push(bb.str) } 
@@ -835,7 +847,10 @@ class Basic_TestClass < TestBase
     b.each_b_ptr { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["ax", "yx", "uux"])
     # through enumerator
-    assert_equal(b.each_b_ptr.collect(&:str), ["ax", "yx", "uux"])
+    if RUBY_VERSION > "2.0.0"
+      # this creates GC leaks in 2.0.0
+      assert_equal(b.each_b_ptr.collect(&:str), ["ax", "yx", "uux"])
+    end
 
     arr = []
     b.each_b_ptr { |bb| bb.set_str(bb.str + "x"); arr.push(bb.str) } 
@@ -1422,6 +1437,7 @@ class Basic_TestClass < TestBase
 
     # makes sure the objects inside the block before are deleted
     GC.start
+    GC.start  # 2.0.0 needs a second one
 
     assert_equal(RBA::A.instance_count, ic0)
     assert_equal(RBA::A.a20_get == nil, true)

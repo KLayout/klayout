@@ -193,3 +193,9 @@ TEST(22_split_gate)
   run_test (_this, "nand2_split_gate", "nand2_split_gate.oas");
 }
 
+//  empty gds
+TEST(23_issue709)
+{
+  run_test (_this, "empty_subcells", "empty_subcells.gds");
+}
+

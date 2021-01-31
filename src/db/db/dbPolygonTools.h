@@ -74,25 +74,26 @@ private:
 
 //  Some helper classes and functions for implementing cut_polygon
 
-class DB_PUBLIC CutPolygonReceiverBase
+template <class Polygon>
+class DB_PUBLIC cut_polygon_receiver_base
 {
 public:
-  virtual ~CutPolygonReceiverBase () { }
-  virtual void put (const void *) = 0;
+  virtual ~cut_polygon_receiver_base () { }
+  virtual void put (const Polygon &) = 0;
 };
 
 template <class OutputIter, class Polygon>
 class cut_polygon_receiver
-  : public CutPolygonReceiverBase
+  : public cut_polygon_receiver_base<Polygon>
 {
 public:
   cut_polygon_receiver (const OutputIter &iter)
     : m_iter (iter)
   { }
 
-  virtual void put (const void *polygon)
+  virtual void put (const Polygon &polygon)
   {
-    *m_iter++ = *((const Polygon *) polygon);
+    *m_iter++ = polygon;
   }
 
 private:
@@ -100,7 +101,7 @@ private:
 };
 
 template <class PolygonType, class Edge>
-void DB_PUBLIC cut_polygon_internal (const PolygonType &input, const Edge &line, CutPolygonReceiverBase *right_of_line);
+void DB_PUBLIC cut_polygon_internal (const PolygonType &input, const Edge &line, cut_polygon_receiver_base<PolygonType> *right_of_line);
 
 /**
  *  @brief Polygon cut function

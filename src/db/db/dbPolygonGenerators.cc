@@ -90,6 +90,8 @@ public:
   void push_front (const db::Point &p) { m_contour.push_front (p); }
   void pop_back () { m_contour.pop_back (); }
   void pop_front () { m_contour.pop_front (); }
+  iterator erase (iterator i) { return m_contour.erase (i); }
+  iterator insert (iterator i, const db::Point &p) { return m_contour.insert (i, p); }
   bool empty () const { return m_contour.empty (); }
   size_t size () const { return m_contour.size (); }
 
@@ -136,9 +138,12 @@ public:
   }
 
   template <class I>
-  void insert (iterator at, I from, I to) 
+  iterator insert (iterator at, I from, I to)
   {
+    //  NOTE: in some STL m_contour.insert already returns the new iterator
+    size_t index_at = at - m_contour.begin ();
     m_contour.insert (at, from, to);
+    return m_contour.begin () + index_at;
   }
 
 private:
@@ -725,27 +730,56 @@ PolygonGenerator::join_contours (db::Coord x)
         PGPolyContour &cprev = (*mp_contours) [iprev];
 
         tl_assert (cprev.size () >= 2);
+        tl_assert (c1.size () >= 2);
+
+        PGPolyContour::iterator ins = cprev.end ();
+        db::Coord xprev = 0;
+        db::Edge eprev;
+
+#if 1
+        //  shallow analysis: insert the cutline at the end of the sequence - this may
+        //  cut lines collinear with contour edges
+
+        eprev = db::Edge (ins[-2], ins[-1]);
+        xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (db::Edge (ins[-2], ins[-1]), m_y));
+#else
+        //  deep analysis: determine insertion point: pick the one where the cutline is shortest
+
+        for (PGPolyContour::iterator i = ins; i > cprev.begin () + 1; --i) {
+
+          db::Edge ecut (i[-2], i[-1]);
+          db::Coord xcut = db::coord_traits<db::Coord>::rounded (edge_xaty (db::Edge (i[-2], i[-1]), m_y));
+
+          if (ins == i || (i[-1].y () >= m_y && i[-2].y () < m_y && xcut < c1.back ().x () && xcut > xprev)) {
+            xprev = xcut;
+            eprev = ecut;
+            ins = i;
+          }
+
+        }
+#endif
 
         //  compute intersection point with next edge
-        db::Edge eprev (cprev.end ()[-2], cprev.back ());
-        db::Coord xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (eprev, m_y));
         db::Point pprev (xprev, m_y);
 
         //  remove collinear edges along the cut line
-        cprev.back () = pprev;
-        while (cprev.size () > 1 && cprev.end ()[-2].y () == m_y && cprev.end ()[-1].y () == m_y) {
-          cprev.pop_back ();
+        ins[-1] = pprev;
+        while (ins - cprev.begin () > 1 && ins[-2].y () == m_y && ins[-1].y () == m_y) {
+          ins = cprev.erase (ins - 1);
         }
 
-        tl_assert (c1.size () >= 2);
         if ((c1.begin () + 1)->y () == m_y) {
-          cprev.insert (cprev.end (), c1.begin () + 1, c1.end ());
+          ins = cprev.insert (ins, c1.begin () + 1, c1.end ());
+          ins += c1.size () - 1;
         } else {
-          cprev.insert (cprev.end (), c1.begin (), c1.end ());
+          ins = cprev.insert (ins, c1.begin (), c1.end ());
+          ins += c1.size ();
         }
-        cprev.push_back (pprev);
+
+        ins = cprev.insert (ins, pprev);
+        ++ins;
         if (eprev.p2 () != pprev) {
-          cprev.push_back (eprev.p2 ());
+          cprev.insert (ins, eprev.p2 ());
         }
 
         mp_contours->free (i1);

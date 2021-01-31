@@ -1,0 +1,25 @@
+* Extracted by KLayout
+
+* cell empty_subcells
+.SUBCKT empty_subcells
+* cell instance $1 r0 *1 0,0
+X$1 1 2 blockB
+* cell instance $2 r0 *1 310,0
+X$2 1 2 blockA
+.ENDS empty_subcells
+
+* cell blockB
+* pin V
+* pin W
+.SUBCKT blockB 1 2
+* net 1 V
+* net 2 W
+.ENDS blockB
+
+* cell blockA
+* pin A
+* pin B
+.SUBCKT blockA 1 2
+* net 1 A
+* net 2 B
+.ENDS blockA

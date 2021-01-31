@@ -1,0 +1,12 @@
+
+
+.subckt blockA a b
+.ends
+
+.subckt blockB v w
+.ends
+
+.subckt empty_subcells
+X1 e f blockA
+X2 e f blockB
+.ends

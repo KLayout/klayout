@@ -4145,6 +4145,8 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
           ++nscm;
           if (scc.equals (scm->second, std::make_pair (sc.operator-> (), sc_cat))) {
             found = true;
+          } else {
+            ++scm;
           }
         }
 

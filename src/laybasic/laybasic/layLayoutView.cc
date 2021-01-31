@@ -261,6 +261,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
 {
   //  either it's us or the parent has a dispatcher
   tl_assert (dispatcher () != 0);
+  set_menu_parent_widget (this);
 
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
@@ -710,11 +711,6 @@ LayoutView::~LayoutView ()
   }
   mp_bookmarks_frame = 0;
   mp_bookmarks_view = 0;
-}
-
-QWidget *LayoutView::menu_parent_widget ()
-{
-  return this;
 }
 
 lay::EditorOptionsPages *LayoutView::editor_options_pages ()

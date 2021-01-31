@@ -1060,7 +1060,15 @@ EdgeProcessor::insert (const db::Edge &e, EdgeProcessor::property_type p)
   }
 }
 
-void 
+void
+EdgeProcessor::insert (const db::SimplePolygon &q, EdgeProcessor::property_type p)
+{
+  for (db::SimplePolygon::polygon_edge_iterator e = q.begin_edge (); ! e.at_end (); ++e) {
+    insert (*e, p);
+  }
+}
+
+void
 EdgeProcessor::insert (const db::Polygon &q, EdgeProcessor::property_type p)
 {
   for (db::Polygon::polygon_edge_iterator e = q.begin_edge (); ! e.at_end (); ++e) {

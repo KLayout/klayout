@@ -26,18 +26,9 @@
 #include "tlTimer.h"
 #include "tlUnitTest.h"
 #include "tlThreads.h"
+#include "tlSleep.h"
 
 #include <stdio.h>
-
-#if defined(WIN32)
-#include <windows.h>
-inline void usleep(long us)
-{
-  Sleep(us / 1000);
-}
-#else
-#include <unistd.h>
-#endif
 
 class Sum
 {
@@ -178,7 +169,7 @@ TEST(2)
 
   job.start ();
 
-  usleep (2000000);
+  tl::usleep (2000000);
 
   EXPECT_EQ (s_sum[0].sum (), 10000000);
 }
@@ -229,7 +220,7 @@ TEST(5)
 
   job.start ();
 
-  usleep (100000);
+  tl::usleep (100000);
   job.terminate ();
 
   EXPECT_EQ (s_sum[0].sum () < 10000000, true);
@@ -250,7 +241,7 @@ TEST(10)
 
   job.start ();
 
-  usleep (2000000);
+  tl::usleep (2000000);
 
   EXPECT_EQ (s_sum[0].sum () > 0, true);
   EXPECT_EQ (s_sum[1].sum () > 0, true);
@@ -361,7 +352,7 @@ void run_thread_tests (tl::TestBase *_this, int wait)
     }
 
     job.start ();
-    usleep (wait);
+    tl::usleep (wait);
     job.terminate ();
 
     EXPECT_EQ (job.is_running (), false);
@@ -449,7 +440,7 @@ TEST(22)
 
     job.start ();
     while (!s_sum[0].flag () || !s_sum[1].flag () || !s_sum[2].flag () || !s_sum[3].flag ()) {
-      usleep (10000);
+      tl::usleep (10000);
     }
     job.stop ();
     EXPECT_EQ (job.is_running (), false);
@@ -477,7 +468,7 @@ TEST(23)
 
     job.start ();
     while (!s_sum[0].flag () || !s_sum[1].flag ()) {
-      usleep (10000);
+      tl::usleep (10000);
     }
     job.stop ();
     EXPECT_EQ (job.is_running (), false);
@@ -505,7 +496,7 @@ TEST(24)
 
     job.start ();
     while (!s_sum[0].flag () && !s_sum[1].flag () && !s_sum[2].flag () && !s_sum[3].flag ()) {
-      usleep (10000);
+      tl::usleep (10000);
     }
     job.stop ();
     EXPECT_EQ (job.is_running (), false);
@@ -533,7 +524,7 @@ TEST(25)
 
     job.start ();
     while (!s_sum[0].flag () && !s_sum[1].flag ()) {
-      usleep (10000);
+      tl::usleep (10000);
     }
     job.stop ();
     EXPECT_EQ (job.is_running (), false);

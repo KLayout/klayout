@@ -154,9 +154,11 @@ show_dock_widget (QDockWidget *dock_widget, bool visible)
 
 // -------------------------------------------------------------
 
-MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const char *name, bool undo_enabled)
+MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
     : QMainWindow (0),
-      lay::Dispatcher (plugin_parent, false),
+      tl::Object (),
+      lay::DispatcherDelegate (),
+      m_dispatcher (this),
       m_text_progress (this, 10 /*verbosity threshold*/),
       m_mode (std::numeric_limits<unsigned int>::max ()),
       mp_setup_form (0),
@@ -175,6 +177,9 @@ MainWindow::MainWindow (QApplication *app, lay::Plugin *plugin_parent, const cha
       mp_app (app),
       m_manager (undo_enabled)
 {
+  //  install us as menu widget parent
+  m_dispatcher.set_menu_parent_widget (this);
+
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
@@ -699,7 +704,7 @@ MainWindow::about_to_exec ()
   bool f;
 
   f = false;
-  config_get (cfg_full_hier_new_cell, f);
+  dispatcher ()->config_get (cfg_full_hier_new_cell, f);
   if (!f) {
     TipDialog td (this,
                   tl::to_string (QObject::tr ("<html><body>"
@@ -737,7 +742,7 @@ MainWindow::about_to_exec ()
   }
 
   f = false;
-  config_get (cfg_no_stipple, f);
+  dispatcher ()->config_get (cfg_no_stipple, f);
   if (f) {
     TipDialog td (this,
                   tl::to_string (QObject::tr ("Layers are shown without fill because fill has been intentionally turned off. This can be confusing since selecting a stipple does not have an effect in this case.\n\nTo turn this feature off, uncheck \"Show Layers Without Fill\" in the \"View\" menu.")),
@@ -749,7 +754,7 @@ MainWindow::about_to_exec ()
   }
 
   f = false;
-  config_get (cfg_markers_visible, f);
+  dispatcher ()->config_get (cfg_markers_visible, f);
   if (! f) {
     TipDialog td (this,
                   tl::to_string (QObject::tr ("Markers are not visible because they have been turned off.\nYou may not see markers when using the marker browser feature.\n\nTo turn markers on, check \"Show Markers\" in the \"View\" menu.")),
@@ -761,7 +766,7 @@ MainWindow::about_to_exec ()
   }
 
   f = false;
-  config_get (cfg_hide_empty_layers, f);
+  dispatcher ()->config_get (cfg_hide_empty_layers, f);
   if (f) {
     TipDialog td (this,
                   tl::to_string (QObject::tr ("The \"Hide Empty Layers\" feature is enabled. This can be confusing, in particular in edit mode, because layers are not shown although they are actually present.\n\nTo disable this feature, uncheck \"Hide Empty Layers\" in the layer panel's context menu.")),
@@ -916,8 +921,6 @@ MainWindow::config_finalize ()
 bool
 MainWindow::configure (const std::string &name, const std::string &value)
 {
-  lay::Dispatcher::configure (name, value);
-
   if (name == cfg_grid) {
 
     double g = 0.0;
@@ -3337,7 +3340,7 @@ MainWindow::do_create_view ()
   view->set_synchronous (synchronous ());
 
   int tl = 0;
-  config_get (cfg_initial_hier_depth, tl);
+  dispatcher ()->config_get (cfg_initial_hier_depth, tl);
   view->set_hier_levels (std::make_pair (0, tl));
 
   //  select the current mode and select the enabled editables
@@ -3399,7 +3402,7 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
     if (mode == 0) {
       //  reset the hierarchy depth in the "replace" case
       int tl = 0;
-      config_get (cfg_initial_hier_depth, tl);
+      dispatcher ()->config_get (cfg_initial_hier_depth, tl);
       vw->set_hier_levels (std::make_pair (0, tl));
       vw->clear_states ();
       vw->store_state ();
@@ -3552,7 +3555,7 @@ MainWindow::get_hier_levels () const
     return current_view ()->get_hier_levels ();
   } else {
     int tl = 0;
-    config_get (cfg_initial_hier_depth, tl);
+    dispatcher ()->config_get (cfg_initial_hier_depth, tl);
     return std::make_pair (0, tl);
   }
 }
@@ -4136,7 +4139,7 @@ MainWindow::plugin_registered (lay::PluginDeclaration *cls)
 void
 MainWindow::plugin_removed (lay::PluginDeclaration *cls)
 {
-  cls->remove_menu_items (this);
+  cls->remove_menu_items (dispatcher ());
 
   //  recreate all plugins except the one that got removed
   for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {

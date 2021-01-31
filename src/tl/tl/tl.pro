@@ -27,6 +27,7 @@ SOURCES = \
     tlObject.cc \
     tlProgress.cc \
     tlScriptError.cc \
+    tlSleep.cc \
     tlStaticObjects.cc \
     tlStream.cc \
     tlString.cc \
@@ -77,6 +78,7 @@ HEADERS = \
     tlProgress.h \
     tlReuseVector.h \
     tlScriptError.h \
+    tlSleep.h \
     tlStableVector.h \
     tlStaticObjects.h \
     tlStream.h \

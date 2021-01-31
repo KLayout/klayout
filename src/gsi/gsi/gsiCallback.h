@@ -80,6 +80,7 @@ struct Callback
 
 #define _TMPLARGPART  
 #define _FUNCARGLIST  
+#define _COMMA
 #define _CALLARGLIST  
 #define _CALLARGS  
 #define _SETVALUE     
@@ -87,6 +88,7 @@ struct Callback
 #include "gsiCallbackVar.h"
 
 #undef _SETVALUE
+#undef _COMMA
 #undef _CALLARGLIST
 #undef _CALLARGS
 #undef _FUNCARGLIST
@@ -94,15 +96,17 @@ struct Callback
 
 // 1 argument
 
-#define _TMPLARGPART  , class A1
+#define _TMPLARGPART  class A1
 #define _FUNCARGLIST  A1
-#define _CALLARGLIST  , A1 a1
+#define _COMMA        ,
+#define _CALLARGLIST  A1 a1
 #define _CALLARGS     a1
 #define _SETVALUE     args.write<A1> (a1); \
 
 #include "gsiCallbackVar.h"
 
 #undef _SETVALUE
+#undef _COMMA
 #undef _CALLARGS
 #undef _CALLARGLIST
 #undef _FUNCARGLIST
@@ -110,9 +114,10 @@ struct Callback
 
 // 2 arguments
 
-#define _TMPLARGPART  , class A1, class A2
+#define _TMPLARGPART  class A1, class A2
 #define _FUNCARGLIST  A1, A2
-#define _CALLARGLIST  , A1 a1, A2 a2
+#define _COMMA        ,
+#define _CALLARGLIST  A1 a1, A2 a2
 #define _CALLARGS     a1, a2
 #define _SETVALUE     args.write<A1> (a1); \
                       args.write<A2> (a2); \
@@ -120,6 +125,7 @@ struct Callback
 #include "gsiCallbackVar.h"
 
 #undef _SETVALUE
+#undef _COMMA
 #undef _CALLARGS
 #undef _CALLARGLIST
 #undef _FUNCARGLIST
@@ -127,9 +133,10 @@ struct Callback
 
 // 3 arguments
 
-#define _TMPLARGPART  , class A1, class A2, class A3
+#define _TMPLARGPART  class A1, class A2, class A3
 #define _FUNCARGLIST  A1, A2, A3
-#define _CALLARGLIST  , A1 a1, A2 a2, A3 a3
+#define _COMMA        ,
+#define _CALLARGLIST  A1 a1, A2 a2, A3 a3
 #define _CALLARGS     a1, a2, a3
 #define _SETVALUE     args.write<A1> (a1); \
                       args.write<A2> (a2); \
@@ -138,6 +145,7 @@ struct Callback
 #include "gsiCallbackVar.h"
 
 #undef _SETVALUE
+#undef _COMMA
 #undef _CALLARGS
 #undef _CALLARGLIST
 #undef _FUNCARGLIST
@@ -145,9 +153,10 @@ struct Callback
 
 // 4 arguments
 
-#define _TMPLARGPART  , class A1, class A2, class A3, class A4
+#define _TMPLARGPART  class A1, class A2, class A3, class A4
 #define _FUNCARGLIST  A1, A2, A3, A4
-#define _CALLARGLIST  , A1 a1, A2 a2, A3 a3, A4 a4
+#define _COMMA        ,
+#define _CALLARGLIST  A1 a1, A2 a2, A3 a3, A4 a4
 #define _CALLARGS     a1, a2, a3, a4
 #define _SETVALUE     args.write<A1> (a1); \
                       args.write<A2> (a2); \
@@ -157,6 +166,7 @@ struct Callback
 #include "gsiCallbackVar.h"
 
 #undef _SETVALUE
+#undef _COMMA
 #undef _CALLARGS
 #undef _CALLARGLIST
 #undef _FUNCARGLIST
@@ -164,9 +174,10 @@ struct Callback
 
 // 5 arguments
 
-#define _TMPLARGPART  , class A1, class A2, class A3, class A4, class A5
+#define _TMPLARGPART  class A1, class A2, class A3, class A4, class A5
 #define _FUNCARGLIST  A1, A2, A3, A4, A5
-#define _CALLARGLIST  , A1 a1, A2 a2, A3 a3, A4 a4, A5 a5
+#define _COMMA        ,
+#define _CALLARGLIST  A1 a1, A2 a2, A3 a3, A4 a4, A5 a5
 #define _CALLARGS     a1, a2, a3, a4, a5
 #define _SETVALUE     args.write<A1> (a1); \
                       args.write<A2> (a2); \
@@ -177,6 +188,7 @@ struct Callback
 #include "gsiCallbackVar.h"
 
 #undef _SETVALUE
+#undef _COMMA
 #undef _CALLARGS
 #undef _CALLARGLIST
 #undef _FUNCARGLIST
@@ -184,9 +196,10 @@ struct Callback
 
 // 6 arguments
 
-#define _TMPLARGPART  , class A1, class A2, class A3, class A4, class A5, class A6
+#define _TMPLARGPART  class A1, class A2, class A3, class A4, class A5, class A6
 #define _FUNCARGLIST  A1, A2, A3, A4, A5, A6
-#define _CALLARGLIST  , A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6
+#define _COMMA        ,
+#define _CALLARGLIST  A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6
 #define _CALLARGS     a1, a2, a3, a4, a5, a6
 #define _SETVALUE     args.write<A1> (a1); \
                       args.write<A2> (a2); \
@@ -198,6 +211,7 @@ struct Callback
 #include "gsiCallbackVar.h"
 
 #undef _SETVALUE
+#undef _COMMA
 #undef _CALLARGS
 #undef _CALLARGLIST
 #undef _FUNCARGLIST
@@ -205,9 +219,10 @@ struct Callback
 
 // 7 arguments
 
-#define _TMPLARGPART  , class A1, class A2, class A3, class A4, class A5, class A6, class A7
+#define _TMPLARGPART  class A1, class A2, class A3, class A4, class A5, class A6, class A7
 #define _FUNCARGLIST  A1, A2, A3, A4, A5, A6, A7
-#define _CALLARGLIST  , A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7
+#define _COMMA        ,
+#define _CALLARGLIST  A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7
 #define _CALLARGS     a1, a2, a3, a4, a5, a6, a7
 #define _SETVALUE     args.write<A1> (a1); \
                       args.write<A2> (a2); \
@@ -220,6 +235,7 @@ struct Callback
 #include "gsiCallbackVar.h"
 
 #undef _SETVALUE
+#undef _COMMA
 #undef _CALLARGS
 #undef _CALLARGLIST
 #undef _FUNCARGLIST
@@ -227,9 +243,10 @@ struct Callback
 
 // 8 arguments
 
-#define _TMPLARGPART  , class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8
+#define _TMPLARGPART  class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8
 #define _FUNCARGLIST  A1, A2, A3, A4, A5, A6, A7, A8
-#define _CALLARGLIST  , A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8
+#define _COMMA        ,
+#define _CALLARGLIST  A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8
 #define _CALLARGS     a1, a2, a3, a4, a5, a6, a7, a8
 #define _SETVALUE     args.write<A1> (a1); \
                       args.write<A2> (a2); \
@@ -243,6 +260,7 @@ struct Callback
 #include "gsiCallbackVar.h"
 
 #undef _SETVALUE
+#undef _COMMA
 #undef _CALLARGS
 #undef _CALLARGLIST
 #undef _FUNCARGLIST

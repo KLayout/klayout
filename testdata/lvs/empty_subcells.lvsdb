@@ -1,0 +1,167 @@
+#%lvsdb-klayout
+
+# Layout
+layout(
+ top(empty_subcells)
+ unit(1)
+
+ # Layer section
+ # This section lists the mask layers (drawing or derived) and their connections.
+
+ # Mask layers
+ layer(l1 '1/0')
+ layer(l2 '2/0')
+ layer(l3 '3/0')
+ layer(l4 '254/0')
+
+ # Mask layer connectivity
+ connect(l1 l1 l2)
+ connect(l2 l1 l2 l3)
+ connect(l3 l2 l3 l4)
+ connect(l4 l3)
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(blockA
+
+  # Circuit boundary
+  rect((100 10) (30 80))
+
+  # Nets with their geometries
+  net(1 name(A)
+   rect(l3 (100 60) (30 30))
+   text(l4 A (-10 -10))
+  )
+  net(2 name(B)
+   rect(l3 (100 10) (30 30))
+   text(l4 B (-10 -10))
+  )
+
+  # Outgoing pins and their connections to nets
+  pin(1 name(A))
+  pin(2 name(B))
+
+ )
+ circuit(blockB
+
+  # Circuit boundary
+  rect((100 10) (30 80))
+
+  # Nets with their geometries
+  net(1 name(V)
+   rect(l3 (100 60) (30 30))
+   text(l4 V (-10 -10))
+  )
+  net(2 name(W)
+   rect(l3 (100 10) (30 30))
+   text(l4 W (-10 -10))
+  )
+
+  # Outgoing pins and their connections to nets
+  pin(1 name(V))
+  pin(2 name(W))
+
+ )
+ circuit(empty_subcells
+
+  # Circuit boundary
+  rect((100 10) (340 80))
+
+  # Nets with their geometries
+  net(1
+   rect(l1 (180 60) (90 30))
+   rect(l2 (-160 -20) (90 10))
+   rect(l2 (40 -10) (180 10))
+  )
+  net(2
+   rect(l1 (180 10) (90 30))
+   rect(l2 (-160 -20) (90 10))
+   rect(l2 (40 -10) (180 10))
+  )
+
+  # Subcircuits and their connections
+  circuit(1 blockB location(0 0)
+   pin(0 1)
+   pin(1 2)
+  )
+  circuit(2 blockA location(310 0)
+   pin(0 1)
+   pin(1 2)
+  )
+
+ )
+)
+
+# Reference netlist
+reference(
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(BLOCKA
+
+  # Nets
+  net(1 name(A))
+  net(2 name(B))
+
+  # Outgoing pins and their connections to nets
+  pin(1 name(A))
+  pin(2 name(B))
+
+ )
+ circuit(BLOCKB
+
+  # Nets
+  net(1 name(V))
+  net(2 name(W))
+
+  # Outgoing pins and their connections to nets
+  pin(1 name(V))
+  pin(2 name(W))
+
+ )
+ circuit(EMPTY_SUBCELLS
+
+  # Nets
+  net(1 name(E))
+  net(2 name(F))
+
+  # Subcircuits and their connections
+  circuit(1 BLOCKA name('1')
+   pin(0 1)
+   pin(1 2)
+  )
+  circuit(2 BLOCKB name('2')
+   pin(0 1)
+   pin(1 2)
+  )
+
+ )
+)
+
+# Cross reference
+xref(
+ circuit(blockA BLOCKA match
+  xref(
+   net(1 1 match)
+   net(2 2 match)
+   pin(0 0 match)
+   pin(1 1 match)
+  )
+ )
+ circuit(blockB BLOCKB match
+  xref(
+   net(1 1 match)
+   net(2 2 match)
+   pin(0 0 match)
+   pin(1 1 match)
+  )
+ )
+ circuit(empty_subcells EMPTY_SUBCELLS match
+  xref(
+   net(1 1 warning)
+   net(2 2 warning)
+   circuit(2 1 match)
+   circuit(1 2 match)
+  )
+ )
+)

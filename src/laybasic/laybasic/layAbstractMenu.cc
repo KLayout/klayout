@@ -1677,4 +1677,26 @@ AbstractMenu::collect_configure_actions (std::vector<lay::ConfigureAction *> &ca
   }
 }
 
+void
+AbstractMenu::get_shortcuts (const std::string &root, std::map<std::string, std::string> &bindings, bool with_defaults)
+{
+  std::vector<std::string> items = this->items (root);
+  for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
+    if (i->size () > 0) {
+      if (is_valid (*i) && action (*i)->is_visible ()) {
+        if (is_menu (*i)) {
+          //  a menu must be listed (so it can be hidden), but does not have a shortcut
+          //  but we don't include special menus
+          if (i->at (0) != '@') {
+            bindings.insert (std::make_pair (*i, std::string ()));
+          }
+          get_shortcuts (*i, bindings, with_defaults);
+        } else if (! is_separator (*i)) {
+          bindings.insert (std::make_pair (*i, with_defaults ? action (*i)->get_default_shortcut () : action (*i)->get_effective_shortcut ()));
+        }
+      }
+    }
+  }
+}
+
 }

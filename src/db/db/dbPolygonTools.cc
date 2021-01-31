@@ -185,10 +185,19 @@ public:
       return db::vprod_sign (edge (), other.edge ()) > 0;
     }
   }
+
+  bool operator== (const loose_end_struct<CuttingEdgeType> &other) const
+  {
+    if (! db::coord_traits<double>::equal (proj (), other.proj ())) {
+      return false;
+    } else {
+      return db::vprod_sign (edge (), other.edge ()) == 0;
+    }
+  }
 };
 
 template <class PolygonType, class Edge>
-static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, CutPolygonReceiverBase *right_of_line)
+static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, cut_polygon_receiver_base<PolygonType> *right_of_line)
 {
   typedef typename PolygonType::point_type point_type;
   typedef typename PolygonType::coord_type coord_type;
@@ -259,6 +268,7 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, C
       //  tie together last and first partial segments.
       if (cutting_segments[nfirst].segment < 0) {
         cutting_segments[nfirst].enter = cutting_segments.back ().enter;
+        cutting_segments[nfirst].segment = cutting_segments.back ().segment;
         cutting_segments.pop_back ();
       }
 
@@ -268,7 +278,7 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, C
 
         if (nc == 0) {
           //  the hull is fully on the right side -> just output the input polygon and that's it.
-          right_of_line->put (&input);
+          right_of_line->put (input);
           return true;
         } else {
           //  remember hole contours for later assignment
@@ -279,7 +289,7 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, C
       } else {
         PolygonType poly;
         poly.assign_hull (contour.begin (), contour.end ());
-        right_of_line->put (&poly);
+        right_of_line->put (poly);
       }
     }
 
@@ -297,23 +307,28 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, C
 
   std::stable_sort (loose_ends.begin (), loose_ends.end ());
 
-  //  bring the points in a strict enter/leave order if possible
+  //  we allow single pairs of collinear entry/leave edges (cut lines) and bring them in the right order
 
   bool enter = false;
   for (typename std::vector<loose_end_struct<cut_polygon_edge_type> >::iterator i = loose_ends.begin (); i != loose_ends.end (); ++i) {
+    if (i + 1 != loose_ends.end () && i[1] == i[0]) {
+      if (i + 2 != loose_ends.end () && i[2] == i[0]) {
+        //  triple collinear
+        return false;
+      }
+      if (i[0].enter != enter && i[1].enter == enter) {
+        std::swap (i[0], i[1]);
+      }
+    }
+    enter = !enter;
+  }
+
+  //  the points now have to be in strict enter/leave order - otherwise fallback to merge
+
+  enter = false;
+  for (typename std::vector<loose_end_struct<cut_polygon_edge_type> >::iterator i = loose_ends.begin (); i != loose_ends.end (); ++i) {
     if (i->enter != enter) {
-      typename std::vector<loose_end_struct<cut_polygon_edge_type> >::iterator j = i + 1;
-      typename std::vector<loose_end_struct<cut_polygon_edge_type> >::iterator jj = loose_ends.end ();
-      for ( ; j != loose_ends.end () && !(*j < *i) && !(*i < *j); ++j) {
-        if (j->enter == enter) {
-          jj = j;
-          break;
-        }
-      }
-      if (jj == loose_ends.end ()) {
-        return false; //  cannot cut (self-overlapping, self-intersecting)
-      }
-      std::swap (*jj, *i);
+      return false;
     }
     enter = !enter;
   }
@@ -410,7 +425,7 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, C
         //  it might happen in some cases, that cut pieces may vanish (i.e. all points on a line). Thus we check, if that
         //  is the case and do not produce a polygon then.
         if (poly.vertices () > 0) {
-          right_of_line->put (&poly);
+          right_of_line->put (poly);
         }
       }
 
@@ -441,7 +456,7 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, C
         }
       }
 
-      right_of_line->put (&*hull);
+      right_of_line->put (*hull);
 
     }
 
@@ -452,7 +467,7 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, C
   // we assign to a PolygonType, this check is not possible.
   for (typename std::vector<PolygonType>::iterator hole = hole_polygons.begin (); hole != hole_polygons.end (); ++hole) {
     if (hole->vertices () > 0) {
-      right_of_line->put (&*hole);
+      right_of_line->put (*hole);
     }
   }
 
@@ -474,23 +489,22 @@ namespace
   /**
    *  @brief A polygon sink for the edge processor that feeds the polygon into the cut algorithm
    */
-  template <class Sink, class PolygonType, class Edge>
-  struct cut_polygon_sink
+  template <class Sink, class PolygonType>
+  struct cut_polygon_bool_sink
     : public Sink
   {
-    cut_polygon_sink (const Edge &_line, CutPolygonReceiverBase *_right_of_line)
-      : line (_line), right_of_line (_right_of_line)
+    cut_polygon_bool_sink (cut_polygon_receiver_base<PolygonType> *_right_of_line)
+      : right_of_line (_right_of_line)
     {
       //  .. nothing yet ..
     }
 
     virtual void put (const PolygonType &poly)
     {
-      tl_assert (_cut_polygon_internal (poly, line, right_of_line));
+      right_of_line->put (poly);
     }
 
-    Edge line;
-    CutPolygonReceiverBase *right_of_line;
+    cut_polygon_receiver_base<PolygonType> *right_of_line;
   };
 
   /**
@@ -500,20 +514,31 @@ namespace
    *  fallback.
    */
   template <class PolygonType, class Edge>
-  void cut_polygon_internal_int (const PolygonType &input, const Edge &line, CutPolygonReceiverBase *right_of_line)
+  void cut_polygon_internal_int (const PolygonType &input, const Edge &line, cut_polygon_receiver_base<PolygonType> *right_of_line)
   {
     bool ok = _cut_polygon_internal (input, line, right_of_line);
     if (! ok) {
 
-      //  If the cut operation fails on the plain input, merge the input polygon and try again
+      //  If the fast cut operation fails, use boolean AND to perform the cut operation
 
-      db::EdgeProcessor ep;
-      ep.insert_sequence (input.begin_edge ());
-      db::SimpleMerge op;
+      PolygonType clip (input.box ());
+      std::vector<PolygonType> mask;
+      cut_polygon (clip, line, std::back_inserter (mask));
 
-      cut_polygon_sink<typename get_sink_type<PolygonType>::result, PolygonType, Edge> sink (line, right_of_line);
-      db::PolygonGenerator pg (sink);
-      ep.process (pg, op);
+      if (! mask.empty ()) {
+
+        db::EdgeProcessor ep;
+        ep.insert_sequence (input.begin_edge (), 0);
+        ep.insert_sequence (mask.begin (), mask.end (), 1);
+
+        db::BooleanOp op (BooleanOp::And);
+
+        cut_polygon_bool_sink<typename get_sink_type<PolygonType>::result, PolygonType> sink (right_of_line);
+        db::PolygonGenerator pg (sink);
+        ep.process (pg, op);
+
+
+      }
 
     }
 
@@ -524,14 +549,14 @@ namespace
    */
   template <class PolygonType, class IPolygonType>
   class cut_polygon_receiver_double_impl
-    : public CutPolygonReceiverBase
+    : public cut_polygon_receiver_base<IPolygonType>
   {
   public:
     cut_polygon_receiver_double_impl ()
       : mp_next (0)
     { }
 
-    void set_next (CutPolygonReceiverBase *next)
+    void set_next (cut_polygon_receiver_base<PolygonType> *next)
     {
       mp_next = next;
     }
@@ -541,14 +566,14 @@ namespace
       m_tr = tr;
     }
 
-    virtual void put (const void *p)
+    virtual void put (const IPolygonType &p)
     {
-      PolygonType pp = ((const IPolygonType *) p)->transformed (m_tr, false);
-      mp_next->put ((void *) &pp);
+      PolygonType pp = p.transformed (m_tr, false);
+      mp_next->put (pp);
     }
 
   private:
-    CutPolygonReceiverBase *mp_next;
+    cut_polygon_receiver_base<PolygonType> *mp_next;
     db::CplxTrans m_tr;
   };
 
@@ -565,7 +590,7 @@ namespace
    *  transform the polygon to int. On output, the polygon is transformed back to double.
    */
   template <class PolygonType, class Edge>
-  void cut_polygon_internal_double (const PolygonType &input, const Edge &line, CutPolygonReceiverBase *right_of_line)
+  void cut_polygon_internal_double (const PolygonType &input, const Edge &line, cut_polygon_receiver_base<PolygonType> *right_of_line)
   {
     db::DBox bbox = input.box ();
     bbox += db::DBox (0, 0, 0, 0);
@@ -585,22 +610,22 @@ namespace
 
 }
 
-template<> DB_PUBLIC void cut_polygon_internal (const db::Polygon &polygon, const db::Polygon::edge_type &line, CutPolygonReceiverBase *right_of_line)
+template<> DB_PUBLIC void cut_polygon_internal (const db::Polygon &polygon, const db::Polygon::edge_type &line, cut_polygon_receiver_base<db::Polygon> *right_of_line)
 {
   cut_polygon_internal_int (polygon, line, right_of_line);
 }
 
-template<> DB_PUBLIC void cut_polygon_internal (const db::SimplePolygon &polygon, const db::SimplePolygon::edge_type &line, CutPolygonReceiverBase *right_of_line)
+template<> DB_PUBLIC void cut_polygon_internal (const db::SimplePolygon &polygon, const db::SimplePolygon::edge_type &line, cut_polygon_receiver_base<db::SimplePolygon> *right_of_line)
 {
   cut_polygon_internal_int (polygon, line, right_of_line);
 }
 
-template<> DB_PUBLIC void cut_polygon_internal (const db::DPolygon &polygon, const db::DPolygon::edge_type &line, CutPolygonReceiverBase *right_of_line)
+template<> DB_PUBLIC void cut_polygon_internal (const db::DPolygon &polygon, const db::DPolygon::edge_type &line, cut_polygon_receiver_base<db::DPolygon> *right_of_line)
 {
   cut_polygon_internal_double (polygon, line, right_of_line);
 }
 
-template<> DB_PUBLIC void cut_polygon_internal (const db::DSimplePolygon &polygon, const db::DSimplePolygon::edge_type &line, CutPolygonReceiverBase *right_of_line)
+template<> DB_PUBLIC void cut_polygon_internal (const db::DSimplePolygon &polygon, const db::DSimplePolygon::edge_type &line, cut_polygon_receiver_base<db::DSimplePolygon> *right_of_line)
 {
   cut_polygon_internal_double (polygon, line, right_of_line);
 }

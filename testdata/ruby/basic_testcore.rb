@@ -1375,6 +1375,7 @@ class Basic_TestClass < TestBase
 
     # makes sure the objects inside the block before are deleted
     GC.start
+    GC.start  # 2.0.0 needs a second one
 
     assert_equal(RBA::A.instance_count, ic0)
     assert_equal(RBA::A.a20_get == nil, true)

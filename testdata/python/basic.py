@@ -2813,21 +2813,32 @@ class BasicTest(unittest.TestCase):
 
     # binary strings
 
-    qba = pya.A.ia_cref_to_qba([ 17, 42, 0, 8 ])
-    self.assertEqual(repr(qba), "b'\\x11*\\x00\\x08'")
-    self.assertEqual(pya.A.qba_to_ia(qba), [ 17, 42, 0, 8 ])
-    self.assertEqual(pya.A.qba_cref_to_ia(qba), [ 17, 42, 0, 8 ])
-    self.assertEqual(pya.A.qba_cptr_to_ia(qba), [ 17, 42, 0, 8 ])
-    self.assertEqual(pya.A.qba_ref_to_ia(qba), [ 17, 42, 0, 8 ])
-    self.assertEqual(pya.A.qba_ptr_to_ia(qba), [ 17, 42, 0, 8 ])
+    if "ia_cref_to_qba" in pya.A.__dict__:
 
-    qba = pya.A.ia_cref_to_qba_cref([ 17, 42, 0, 8 ])
-    self.assertEqual(repr(qba), "b'\\x11*\\x00\\x08'")
+      qba = pya.A.ia_cref_to_qba([ 17, 42, 0, 8 ])
+      if sys.version_info < (3, 0):
+        self.assertEqual(repr(qba), "bytearray(b'\\x11*\\x00\\x08')")
+      else:
+        self.assertEqual(repr(qba), "b'\\x11*\\x00\\x08'")
+      self.assertEqual(pya.A.qba_to_ia(qba), [ 17, 42, 0, 8 ])
+      self.assertEqual(pya.A.qba_cref_to_ia(qba), [ 17, 42, 0, 8 ])
+      self.assertEqual(pya.A.qba_cptr_to_ia(qba), [ 17, 42, 0, 8 ])
+      self.assertEqual(pya.A.qba_ref_to_ia(qba), [ 17, 42, 0, 8 ])
+      self.assertEqual(pya.A.qba_ptr_to_ia(qba), [ 17, 42, 0, 8 ])
+  
+      qba = pya.A.ia_cref_to_qba_cref([ 17, 42, 0, 8 ])
+      if sys.version_info < (3, 0):
+        self.assertEqual(repr(qba), "bytearray(b'\\x11*\\x00\\x08')")
+      else:
+        self.assertEqual(repr(qba), "b'\\x11*\\x00\\x08'")
 
-    self.assertEqual(pya.A.qba_to_ia(b'\x00\x01\x02'), [ 0, 1, 2 ])
+      self.assertEqual(pya.A.qba_to_ia(b'\x00\x01\x02'), [ 0, 1, 2 ])
 
     ba = pya.A.ia_cref_to_ba([ 17, 42, 0, 8 ])
-    self.assertEqual(repr(ba), "b'\\x11*\\x00\\x08'")
+    if sys.version_info < (3, 0):
+      self.assertEqual(repr(ba), "bytearray(b'\\x11*\\x00\\x08')")
+    else:
+      self.assertEqual(repr(ba), "b'\\x11*\\x00\\x08'")
     self.assertEqual(pya.A.ba_to_ia(ba), [ 17, 42, 0, 8 ])
     self.assertEqual(pya.A.ba_cref_to_ia(ba), [ 17, 42, 0, 8 ])
     self.assertEqual(pya.A.ba_cptr_to_ia(ba), [ 17, 42, 0, 8 ])
@@ -2835,7 +2846,10 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(pya.A.ba_ptr_to_ia(ba), [ 17, 42, 0, 8 ])
 
     ba = pya.A.ia_cref_to_ba_cref([ 17, 42, 0, 8 ])
-    self.assertEqual(repr(ba), "b'\\x11*\\x00\\x08'")
+    if sys.version_info < (3, 0):
+      self.assertEqual(repr(ba), "bytearray(b'\\x11*\\x00\\x08')")
+    else:
+      self.assertEqual(repr(ba), "b'\\x11*\\x00\\x08'")
 
     self.assertEqual(pya.A.ba_to_ia(b'\x00\x01\x02'), [ 0, 1, 2 ])
 

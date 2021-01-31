@@ -140,7 +140,10 @@ public:
   template <class I>
   iterator insert (iterator at, I from, I to)
   {
-    return m_contour.insert (at, from, to);
+    //  NOTE: in some STL m_contour.insert already returns the new iterator
+    size_t index_at = at - m_contour.begin ();
+    m_contour.insert (at, from, to);
+    return m_contour.begin () + index_at;
   }
 
 private:

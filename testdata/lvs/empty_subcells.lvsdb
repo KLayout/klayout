@@ -18,7 +18,7 @@ layout(
  connect(l1 l1 l2)
  connect(l2 l1 l2 l3)
  connect(l3 l2 l3 l4)
- connect(l4 l3)
+ connect(l4 l3 l4)
 
  # Circuit section
  # Circuits are the hierarchical building blocks of the netlist.
@@ -30,11 +30,11 @@ layout(
   # Nets with their geometries
   net(1 name(A)
    rect(l3 (100 60) (30 30))
-   text(l4 A (-10 -10))
+   rect(l4 (-11 -11) (2 2))
   )
   net(2 name(B)
    rect(l3 (100 10) (30 30))
-   text(l4 B (-10 -10))
+   rect(l4 (-11 -11) (2 2))
   )
 
   # Outgoing pins and their connections to nets
@@ -50,11 +50,11 @@ layout(
   # Nets with their geometries
   net(1 name(V)
    rect(l3 (100 60) (30 30))
-   text(l4 V (-10 -10))
+   rect(l4 (-11 -11) (2 2))
   )
   net(2 name(W)
    rect(l3 (100 10) (30 30))
-   text(l4 W (-10 -10))
+   rect(l4 (-11 -11) (2 2))
   )
 
   # Outgoing pins and their connections to nets

@@ -23,6 +23,7 @@
 #include "tlSleep.h"
 
 #if defined(_MSC_VER) || defined(_WIN32)
+#  include <Windows.h>
 #  include <Synchapi.h>
 #else
 #  include <unistd.h>

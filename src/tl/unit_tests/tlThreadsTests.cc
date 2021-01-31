@@ -22,18 +22,9 @@
 
 #include "tlThreads.h"
 #include "tlUnitTest.h"
+#include "tlSleep.h"
 
 #include <stdio.h>
-
-#if defined(WIN32)
-#include <Windows.h>
-inline void usleep(long us)
-{
-  Sleep(us / 1000);
-}
-#else
-#include <unistd.h>
-#endif
 
 class MyThread : public tl::Thread
 {
@@ -59,7 +50,7 @@ public:
         tl::MutexLocker locker (&m_lock);
         ++m_value;
       }
-      usleep (10000);
+      tl::usleep (10000);
     }
   }
 

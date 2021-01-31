@@ -1,6 +1,10 @@
 
-0.26.10         (2020-xx-xx):
+0.26.10         (2020-01-31):
 
+* Bugfix: %GITHUB%/issues/718
+  GDS export issue fixed (breaking of polygons was filling holes)
+* Bugfix: %GITHUB%/issues/709
+  LVS compare enters infinite loop when it encounters two entirely identical subcircuits
 * Bugfix: %GITHUB%/issues/708
   Qt binding: missing support for binary strings as QByteArray representative
 * Bugfix: %GITHUB%/issues/707

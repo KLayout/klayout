@@ -37,6 +37,8 @@
 namespace tl
 {
 
+#if !defined(_WIN32)
+
 static void init_sigmask_for_sleep (sigset_t *mask)
 {
   sigemptyset (mask);
@@ -47,6 +49,8 @@ static void init_sigmask_for_sleep (sigset_t *mask)
   sigaddset (mask, SIGPROF);
   sigaddset (mask, SIGWINCH);
 }
+
+#endif
 
 void usleep (unsigned long us)
 {

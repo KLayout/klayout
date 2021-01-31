@@ -1,0 +1,21 @@
+
+source($lvs_test_source)
+report_lvs($lvs_test_target_lvsdb, true)
+target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
+
+schematic("empty_subcells_sch.cir")
+
+deep
+
+m1  = input(1, 0)
+via  = input(2, 0)
+m2  = input(3, 0)
+lab  = labels(254,0)
+
+connect(m1,  via)
+connect(via, m2)
+connect(m2, lab)
+
+netlist.make_top_level_pins
+compare
+

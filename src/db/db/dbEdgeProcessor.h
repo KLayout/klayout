@@ -634,6 +634,11 @@ public:
   void insert (const db::Polygon &q, property_type p = 0);
 
   /**
+   *  @brief Insert a simple polygon
+   */
+  void insert (const db::SimplePolygon &q, property_type p = 0);
+
+  /**
    *  @brief Insert a polygon reference
    */
   void insert (const db::PolygonRef &q, property_type p = 0);

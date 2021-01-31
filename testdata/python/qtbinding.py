@@ -487,12 +487,18 @@ class QtBindingTest(unittest.TestCase):
 
     slm = MyStandardItemModel()
     rn = slm.roleNames()
-    self.assertEqual(map2str(rn), "{0: b'display', 1: b'decoration', 2: b'edit', 3: b'toolTip', 4: b'statusTip', 5: b'whatsThis'}")
+    if sys.version_info < (3, 0):
+      self.assertEqual(map2str(rn), "{0: display, 1: decoration, 2: edit, 3: toolTip, 4: statusTip, 5: whatsThis}")
+    else:
+      self.assertEqual(map2str(rn), "{0: b'display', 1: b'decoration', 2: b'edit', 3: b'toolTip', 4: b'statusTip', 5: b'whatsThis'}")
     rnNew = slm.roleNames()
     rnNew[7] = "blabla"
     slm.srn(rnNew)
     rn = slm.roleNames()
-    self.assertEqual(map2str(rn), "{0: b'display', 1: b'decoration', 2: b'edit', 3: b'toolTip', 4: b'statusTip', 5: b'whatsThis', 7: b'blabla'}")
+    if sys.version_info < (3, 0):
+      self.assertEqual(map2str(rn), "{0: display, 1: decoration, 2: edit, 3: toolTip, 4: statusTip, 5: whatsThis, 7: blabla}")
+    else:
+      self.assertEqual(map2str(rn), "{0: b'display', 1: b'decoration', 2: b'edit', 3: b'toolTip', 4: b'statusTip', 5: b'whatsThis', 7: b'blabla'}")
 
   def test_44(self):
 

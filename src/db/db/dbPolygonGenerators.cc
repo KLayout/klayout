@@ -733,7 +733,15 @@ PolygonGenerator::join_contours (db::Coord x)
         db::Coord xprev = 0;
         db::Edge eprev;
 
-        //  determine insertion point: pick the one where the cutline is shortest
+#if 1
+        //  shallow analysis: insert the cutline at the end of the sequence - this may
+        //  cut lines collinear with contour edges
+
+        eprev = db::Edge (ins[-2], ins[-1]);
+        xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (db::Edge (ins[-2], ins[-1]), m_y));
+#else
+        //  deep analysis: determine insertion point: pick the one where the cutline is shortest
+
         for (PGPolyContour::iterator i = ins; i > cprev.begin () + 1; --i) {
 
           db::Edge ecut (i[-2], i[-1]);
@@ -746,6 +754,7 @@ PolygonGenerator::join_contours (db::Coord x)
           }
 
         }
+#endif
 
         //  compute intersection point with next edge
         db::Point pprev (xprev, m_y);

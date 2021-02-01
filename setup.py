@@ -330,7 +330,41 @@ class Config(object):
         """
         Returns the macros to use for building
         """
-        return [('HAVE_CURL', 1), ('HAVE_EXPAT', 1)]
+        return [('HAVE_CURL', 1), ('HAVE_EXPAT', 1), ('KLAYOUT_MAJOR_VERSION', self.major_version()), ('KLAYOUT_MINOR_VERSION', self.minor_version())]
+
+    def minor_version(self):
+        """
+        Gets the version string
+        """
+
+        # this will obtain the version string from the "version.sh" file which
+        # is the central point of configuration
+        version_file = os.path.join(os.path.dirname(__file__), "version.sh")
+        with open(version_file, "r") as file:
+            version_txt = file.read()
+            rm = re.search(r"KLAYOUT_VERSION\s*=\s*\"(.*?)\.(.*?)(\..*)?\".*", version_txt)
+            if rm:
+                version_string = rm.group(2)
+                return version_string
+
+        raise RuntimeError("Unable to obtain version string from version.sh")
+
+    def major_version(self):
+        """
+        Gets the version string
+        """
+
+        # this will obtain the version string from the "version.sh" file which
+        # is the central point of configuration
+        version_file = os.path.join(os.path.dirname(__file__), "version.sh")
+        with open(version_file, "r") as file:
+            version_txt = file.read()
+            rm = re.search(r"KLAYOUT_VERSION\s*=\s*\"(.*?)\.(.*?)(\..*)?\".*", version_txt)
+            if rm:
+                version_string = rm.group(1)
+                return version_string
+
+        raise RuntimeError("Unable to obtain version string from version.sh")
 
     def version(self):
         """

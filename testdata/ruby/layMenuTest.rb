@@ -417,6 +417,10 @@ RESULT
     mw.set_menu_items_hidden({"file_menu.exit" => true})
     assert_equal(mw.get_menu_items_hidden["file_menu.exit"], true)
 
+    # reset for the next pass
+    mw.set_menu_items_hidden(mw.get_default_menu_items_hidden)
+    mw.set_key_bindings(mw.get_default_key_bindings)
+
   end
 
 end

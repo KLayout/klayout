@@ -703,6 +703,14 @@ public:
     return false;
   }
 
+  /**
+   *  @brief Rejects the output - for delegates supporting unrolling, this means the original file is restored
+   */
+  virtual void reject ()
+  {
+    //  ... the default implementation does not support this feature ..
+  }
+
 private:
   //  No copying
   OutputStreamBase (const OutputStreamBase &);
@@ -884,10 +892,14 @@ public:
    */
   virtual void write (const char *b, size_t n);
 
+  /**
+   *  @brief Unrolls the output
+   */
+  virtual void reject ();
+
 protected:
   virtual void seek_file (size_t s) = 0;
   virtual void write_file (const char *b, size_t n) = 0;
-  void mark_failed ();
 
 private:
   int m_keep_backups;
@@ -1103,6 +1115,13 @@ public:
   OutputStream (OutputStreamBase &delegate, bool as_text = false);
 
   /**
+   *  @brief Default constructor
+   *
+   *  This constructor takes a delegate object. The stream will own the delegate.
+   */
+  OutputStream (OutputStreamBase *delegate, bool as_text = false);
+
+  /**
    *  @brief Open an output stream with the given path and stream mode
    *
    *  This will automatically create a delegate object and delete it later.
@@ -1190,6 +1209,16 @@ public:
   {
     put (tl::to_string (t));
     return *this;
+  }
+
+  /**
+   *  @brief Rejects the output - for delegates which support backup, this means the original file is restored
+   */
+  void reject () const
+  {
+    if (mp_delegate) {
+      mp_delegate->reject ();
+    }
   }
 
   /**

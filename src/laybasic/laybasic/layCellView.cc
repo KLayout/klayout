@@ -297,7 +297,7 @@ LayoutHandle::update_save_options (db::SaveLayoutOptions &options)
 }
 
 void 
-LayoutHandle::save_as (const std::string &fn, tl::OutputStream::OutputStreamMode om, const db::SaveLayoutOptions &options, bool update)
+LayoutHandle::save_as (const std::string &fn, tl::OutputStream::OutputStreamMode om, const db::SaveLayoutOptions &options, bool update, int keep_backups)
 {
   if (update) {
 
@@ -321,8 +321,13 @@ LayoutHandle::save_as (const std::string &fn, tl::OutputStream::OutputStreamMode
     {
       //  The write needs to be finished before the file watcher gets the new modification time
       db::Writer writer (options);
-      tl::OutputStream stream (fn, om);
-      writer.write (*mp_layout, stream);
+      tl::OutputStream stream (fn, om, false, keep_backups);
+      try {
+        writer.write (*mp_layout, stream);
+      } catch (...) {
+        stream.reject ();
+        throw;
+      }
     }
 
     if (update) {

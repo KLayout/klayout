@@ -702,7 +702,15 @@ OutputStream::OutputStream (OutputStreamBase &delegate, bool as_text)
   mp_buffer = new char[m_buffer_capacity];
 }
 
-OutputStream::OutputStreamMode 
+OutputStream::OutputStream (OutputStreamBase *delegate, bool as_text)
+  : m_pos (0), mp_delegate (delegate), m_owns_delegate (true), m_as_text (as_text)
+{
+  m_buffer_capacity = 16384;
+  m_buffer_pos = 0;
+  mp_buffer = new char[m_buffer_capacity];
+}
+
+OutputStream::OutputStreamMode
 OutputStream::output_mode_from_filename (const std::string &abstract_path, OutputStream::OutputStreamMode om)
 {
   if (om == OM_Auto) {
@@ -762,15 +770,32 @@ OutputStream::~OutputStream ()
 void
 OutputStream::close ()
 {
-  flush ();
+  try {
 
-  if (mp_delegate && m_owns_delegate) {
-    delete mp_delegate;
-    mp_delegate = 0;
-  }
-  if (mp_buffer) {
-    delete[] mp_buffer;
-    mp_buffer = 0;
+    flush ();
+
+    if (mp_delegate && m_owns_delegate) {
+      delete mp_delegate;
+      mp_delegate = 0;
+    }
+    if (mp_buffer) {
+      delete[] mp_buffer;
+      mp_buffer = 0;
+    }
+
+  } catch (...) {
+
+    if (mp_delegate && m_owns_delegate) {
+      delete mp_delegate;
+      mp_delegate = 0;
+    }
+    if (mp_buffer) {
+      delete[] mp_buffer;
+      mp_buffer = 0;
+    }
+
+    throw;
+
   }
 }
 
@@ -960,7 +985,7 @@ void OutputFileBase::seek (size_t s)
   try {
     seek_file (s);
   } catch (...) {
-    mark_failed ();
+    reject ();
     throw;
   }
 }
@@ -970,12 +995,12 @@ void OutputFileBase::write (const char *b, size_t n)
   try {
     write_file (b, n);
   } catch (...) {
-    mark_failed ();
+    reject ();
     throw;
   }
 }
 
-void OutputFileBase::mark_failed ()
+void OutputFileBase::reject ()
 {
   m_has_error = true;
 }

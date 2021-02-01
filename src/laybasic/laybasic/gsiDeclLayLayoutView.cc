@@ -317,14 +317,14 @@ static void delete_layers2 (lay::LayoutView *view, unsigned int index, const std
 
 static void save_as1 (lay::LayoutView *view, unsigned int index, const std::string &filename, const db::SaveLayoutOptions &options)
 {
-  view->save_as (index, filename, tl::OutputStream::OM_Auto, options, true);
+  view->save_as (index, filename, tl::OutputStream::OM_Auto, options, true, 0);
 }
 
 static void save_as2 (lay::LayoutView *view, unsigned int index, const std::string &filename, bool /*gzip*/, const db::SaveLayoutOptions &options)
 {
   //  because set_format_from_name always returns true now, we ignore the gzip option -
   //  it's probably used only in that context.
-  view->save_as (index, filename, tl::OutputStream::OM_Auto, options, true);
+  view->save_as (index, filename, tl::OutputStream::OM_Auto, options, true, 0);
 }
 
 #if defined(HAVE_QTBINDINGS)

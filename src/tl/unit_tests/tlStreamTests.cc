@@ -235,6 +235,29 @@ TEST(SafeOutput)
     tl::InputStream is (tp);
     EXPECT_EQ (is.read_all (), "Hello, world!\n");
   }
+
+
+  try {
+    BrokenOutputStream *broken = new BrokenOutputStream (tp, 0);
+    tl::OutputStream os (broken);
+    EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
+    EXPECT_EQ (tl::file_exists (tp), true);
+    os << "Hi!\n";
+    os.flush ();   //  raises the exception
+    EXPECT_EQ (true, false);
+  } catch (...) {
+    //  '!' raises an exception
+  }
+
+  //  The original content is restored now
+
+  EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
+  EXPECT_EQ (tl::file_exists (tp), true);
+
+  {
+    tl::InputStream is (tp);
+    EXPECT_EQ (is.read_all (), "Hello, world!\n");
+  }
 }
 
 

@@ -695,6 +695,7 @@ private:
   SettingsForm *mp_setup_form;
   std::vector <lay::LayoutView *> mp_views;
   int m_open_mode;
+  int m_keep_backups;
   std::vector<std::pair<std::string, std::string> > m_mru;
   std::vector<std::string> m_mru_sessions, m_mru_layer_properties, m_mru_bookmarks;
   QStatusBar *mp_status_bar;

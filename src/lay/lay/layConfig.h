@@ -43,6 +43,7 @@ static const std::string cfg_mru ("mru");
 static const std::string cfg_mru_layer_properties ("mru-layer-properties");
 static const std::string cfg_mru_sessions ("mru-sessions");
 static const std::string cfg_mru_bookmarks ("mru-bookmarks");
+static const std::string cfg_keep_backups ("keep-backups");
 static const std::string cfg_technologies ("technology-data");
 static const std::string cfg_key_bindings ("key-bindings");
 static const std::string cfg_menu_items_hidden ("menu-items-hidden");

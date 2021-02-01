@@ -35,7 +35,6 @@
 // basics
 TEST(1) 
 {
-return; // @@@
   tl::Eval e;
   tl::Variant v;
 

@@ -442,6 +442,21 @@ bool mkpath (const std::string &p)
   return true;
 }
 
+bool rename_file (const std::string &path, const std::string &new_name)
+{
+  //  resolve relative names in new_name
+  std::string new_path = new_name;
+  if (! tl::is_absolute (new_path)) {
+    new_path = tl::combine_path (tl::dirname (path), new_name);
+  }
+
+#if defined(_WIN32)
+  return _wrename (tl::to_wstring (path).c_str (), tl::to_wstring (new_path).c_str ()) == 0;
+#else
+  return rename (tl::to_local (path).c_str (), tl::to_local (new_path).c_str ()) == 0;
+#endif
+}
+
 bool rm_file (const std::string &path)
 {
 #if defined(_WIN32)

@@ -127,7 +127,6 @@ GDS2Writer::write_time (const short *t)
 void 
 GDS2Writer::write_string (const char *t)
 {
-if (t[0] == '.') throw tl::Exception("@@@BANG!"); // @@@
   size_t l = strlen (t);
   mp_stream->put (t, l);
   if ((l & 1) != 0) {
@@ -138,7 +137,6 @@ if (t[0] == '.') throw tl::Exception("@@@BANG!"); // @@@
 void 
 GDS2Writer::write_string (const std::string &t)
 {
-if (t[0] == '.') throw tl::Exception("@@@BANG!"); // @@@
   size_t l = t.size ();
   mp_stream->put (t.c_str (), l);
   if ((l & 1) != 0) {

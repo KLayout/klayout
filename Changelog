@@ -13,6 +13,9 @@
   Rational Splines not supported DXF
 * Bugfix: %GITHUB%/issues/693
   MAGIC files won't find subcells when reading from command line
+* Bugfix: HTTP stream reading issue with redirect
+  At least on MacOS a segfault happened when reading HTTP stream data
+  (e.g. for package manager) from addresses which are redirected.
 
 0.26.9          (2020-11-27):
 

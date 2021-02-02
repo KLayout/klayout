@@ -41,6 +41,7 @@
 #include "tlDeflate.h"
 #include "tlAssert.h"
 #include "tlFileUtils.h"
+#include "tlLog.h"
 
 #include "tlException.h"
 #include "tlString.h"
@@ -701,7 +702,15 @@ OutputStream::OutputStream (OutputStreamBase &delegate, bool as_text)
   mp_buffer = new char[m_buffer_capacity];
 }
 
-OutputStream::OutputStreamMode 
+OutputStream::OutputStream (OutputStreamBase *delegate, bool as_text)
+  : m_pos (0), mp_delegate (delegate), m_owns_delegate (true), m_as_text (as_text)
+{
+  m_buffer_capacity = 16384;
+  m_buffer_pos = 0;
+  mp_buffer = new char[m_buffer_capacity];
+}
+
+OutputStream::OutputStreamMode
 OutputStream::output_mode_from_filename (const std::string &abstract_path, OutputStream::OutputStreamMode om)
 {
   if (om == OM_Auto) {
@@ -716,16 +725,16 @@ OutputStream::output_mode_from_filename (const std::string &abstract_path, Outpu
 }
 
 static
-OutputStreamBase *create_file_stream (const std::string &path, OutputStream::OutputStreamMode om)
+OutputStreamBase *create_file_stream (const std::string &path, OutputStream::OutputStreamMode om, int keep_backups)
 {
   if (om == OutputStream::OM_Zlib) {
-    return new OutputZLibFile (path);
+    return new OutputZLibFile (path, keep_backups);
   } else {
-    return new OutputFile (path);
+    return new OutputFile (path, keep_backups);
   }
 }
 
-OutputStream::OutputStream (const std::string &abstract_path, OutputStreamMode om, bool as_text)
+OutputStream::OutputStream (const std::string &abstract_path, OutputStreamMode om, bool as_text, int keep_backups)
   : m_pos (0), mp_delegate (0), m_owns_delegate (false), m_as_text (as_text), m_path (abstract_path)
 {
   //  Determine output mode
@@ -737,9 +746,9 @@ OutputStream::OutputStream (const std::string &abstract_path, OutputStreamMode o
   } else if (ex.test ("pipe:")) {
     mp_delegate = new OutputPipe (ex.get ());
   } else if (ex.test ("file:")) {
-    mp_delegate = create_file_stream (ex.get (), om);
+    mp_delegate = create_file_stream (ex.get (), om, keep_backups);
   } else {
-    mp_delegate = create_file_stream (abstract_path, om);
+    mp_delegate = create_file_stream (abstract_path, om, keep_backups);
   }
 
   m_owns_delegate = true;
@@ -751,21 +760,42 @@ OutputStream::OutputStream (const std::string &abstract_path, OutputStreamMode o
 
 OutputStream::~OutputStream ()
 {
-  close ();
+  try {
+    close ();
+  } catch (...) {
+    //  no recursive exceptions
+  }
 }
 
 void
 OutputStream::close ()
 {
-  flush ();
+  try {
 
-  if (mp_delegate && m_owns_delegate) {
-    delete mp_delegate;
-    mp_delegate = 0;
-  }
-  if (mp_buffer) {
-    delete[] mp_buffer;
-    mp_buffer = 0;
+    flush ();
+
+    if (mp_delegate && m_owns_delegate) {
+      delete mp_delegate;
+      mp_delegate = 0;
+    }
+    if (mp_buffer) {
+      delete[] mp_buffer;
+      mp_buffer = 0;
+    }
+
+  } catch (...) {
+
+    if (mp_delegate && m_owns_delegate) {
+      delete mp_delegate;
+      mp_delegate = 0;
+    }
+    if (mp_buffer) {
+      delete[] mp_buffer;
+      mp_buffer = 0;
+    }
+
+    throw;
+
   }
 }
 
@@ -877,10 +907,109 @@ OutputStream::seek (size_t pos)
 }
 
 // ---------------------------------------------------------------
+//  OutputFileBase implementation
+
+OutputFileBase::OutputFileBase (const std::string &path, int keep_backups)
+  : m_keep_backups (keep_backups), m_path (path), m_has_error (false)
+{
+  if (tl::file_exists (path)) {
+    m_backup_path = path + ".~backup";
+    if (tl::file_exists (m_backup_path)) {
+      if (! tl::rm_file (m_backup_path)) {
+        tl::warn << tl::sprintf (tl::to_string (tr ("Could not create backup file: unable to remove existing file '%s'")), m_backup_path);
+        m_backup_path = std::string ();
+      }
+    }
+    if (! m_backup_path.empty ()) {
+      if (! tl::rename_file (path, m_backup_path)) {
+        tl::warn << tl::sprintf (tl::to_string (tr ("Could not create backup file: unable to rename original file '%s' to backup file")), path, m_backup_path);
+        m_backup_path = std::string ();
+      }
+    }
+  }
+}
+
+OutputFileBase::~OutputFileBase ()
+{
+  if (! m_backup_path.empty ()) {
+
+    if (m_has_error) {
+
+      if (! tl::rm_file (m_path)) {
+        tl::warn << tl::sprintf (tl::to_string (tr ("Could not restore backup file: unable to remove file '%s'")), m_path);
+      } else if (! tl::rename_file (m_backup_path, m_path)) {
+        tl::warn << tl::sprintf (tl::to_string (tr ("Could not restore backup file: unable to rename file '%s' back to '%s'")), m_backup_path, m_path);
+      }
+
+    } else {
+
+      if (m_keep_backups == 0) {
+
+        if (! tl::rm_file (m_backup_path)) {
+          tl::warn << tl::sprintf (tl::to_string (tr ("Could not remove backup file '%s'")), m_backup_path);
+        }
+
+      } else {
+
+        //  shuffle backup files
+        int n = 1;
+        for ( ; m_keep_backups < 0 || n < m_keep_backups; ++n) {
+          std::string p = m_path + "." + tl::to_string (n);
+          if (! tl::file_exists (p)) {
+            break;
+          }
+        }
+
+        while (n > 0) {
+          std::string p = m_path + "." + tl::to_string (n);
+          std::string pprev = n > 1 ? (m_path + "." + tl::to_string (n - 1)) : m_backup_path;
+          if (tl::file_exists (p)) {
+            if (! tl::rm_file (p)) {
+              tl::warn << tl::sprintf (tl::to_string (tr ("Error shuffling backup files: unable to remove file '%s'")), p);
+            }
+          }
+          if (! tl::rename_file (pprev, p)) {
+            tl::warn << tl::sprintf (tl::to_string (tr ("Error shuffling backup files: unable to rename file '%s' to '%s'")), pprev, p);
+          }
+          --n;
+        }
+
+      }
+
+    }
+  }
+}
+
+void OutputFileBase::seek (size_t s)
+{
+  try {
+    seek_file (s);
+  } catch (...) {
+    reject ();
+    throw;
+  }
+}
+
+void OutputFileBase::write (const char *b, size_t n)
+{
+  try {
+    write_file (b, n);
+  } catch (...) {
+    reject ();
+    throw;
+  }
+}
+
+void OutputFileBase::reject ()
+{
+  m_has_error = true;
+}
+
+// ---------------------------------------------------------------
 //  OutputFile implementation
 
-OutputFile::OutputFile (const std::string &path)
-  : m_fd (-1)
+OutputFile::OutputFile (const std::string &path, int keep_backups)
+  : OutputFileBase (path, keep_backups), m_fd (-1)
 {
   m_source = path;
 #if defined(_WIN32)
@@ -907,11 +1036,11 @@ OutputFile::~OutputFile ()
     close (m_fd);
 #endif
     m_fd = -1;
-  }  
+  }
 }
 
-void 
-OutputFile::seek (size_t s)
+void
+OutputFile::seek_file (size_t s)
 {
   tl_assert (m_fd >= 0);
 #if defined(_WIN64)
@@ -923,8 +1052,8 @@ OutputFile::seek (size_t s)
 #endif
 }
 
-void 
-OutputFile::write (const char *b, size_t n)
+void
+OutputFile::write_file (const char *b, size_t n)
 {
   tl_assert (m_fd >= 0);
 #if defined(_WIN32)
@@ -940,8 +1069,8 @@ OutputFile::write (const char *b, size_t n)
 // ---------------------------------------------------------------
 //  OutputZLibFile implementation
 
-OutputZLibFile::OutputZLibFile (const std::string &path)
-  : mp_d (new ZLibFilePrivate ())
+OutputZLibFile::OutputZLibFile (const std::string &path, int keep_backups)
+  : OutputFileBase (path, keep_backups), mp_d (new ZLibFilePrivate ())
 {
   m_source = path;
 #if defined(_WIN32)
@@ -969,7 +1098,7 @@ OutputZLibFile::~OutputZLibFile ()
 }
 
 void 
-OutputZLibFile::write (const char *b, size_t n)
+OutputZLibFile::write_file (const char *b, size_t n)
 {
   tl_assert (mp_d->zs != NULL);
   int ret = gzwrite (mp_d->zs, (char *) b, (unsigned int) n);

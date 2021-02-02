@@ -826,7 +826,7 @@ public:
    *  @brief Save the given cellview into the given file (with options)
    *  If "update" is true, the cell view's properties will be updated (options, filename etc.).
    */
-  void save_as (unsigned int index, const std::string &filename, tl::OutputStream::OutputStreamMode om, const db::SaveLayoutOptions &options, bool update);
+  void save_as (unsigned int index, const std::string &filename, tl::OutputStream::OutputStreamMode om, const db::SaveLayoutOptions &options, bool update, int keep_backups);
 
   /**
    *  @brief Implementation of the undo operations

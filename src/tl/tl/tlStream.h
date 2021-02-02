@@ -703,6 +703,14 @@ public:
     return false;
   }
 
+  /**
+   *  @brief Rejects the output - for delegates supporting unrolling, this means the original file is restored
+   */
+  virtual void reject ()
+  {
+    //  ... the default implementation does not support this feature ..
+  }
+
 private:
   //  No copying
   OutputStreamBase (const OutputStreamBase &);
@@ -832,12 +840,80 @@ private:
 };
 
 /**
+ *  @brief A base for file writer delegates
+ *
+ *  This class mainly provides safety services for the file writer.
+ *  When writing a file, it will keep a backup until the file actually
+ *  has been written. This way, a network or disk full error will not
+ *  comprimise the file's content. The backup file name is created
+ *  by appending ".~backup" to the original file path.
+ *
+ *  In addition, a specified number or persistent backup files can
+ *  be kept. The first backup will be called like the original file
+ *  with ".1" appended. The second will be called ".2" etc.
+ *  The backups will be shuffled, so ".1" is always the most recent
+ *  one while older ones get bigger numbers.
+ *
+ *  The number of backups can be specified with "keep_backups". If this
+ *  count is zero, no backups will be kept. If the count is larger than
+ *  zero, the specified maximum number of backups is kept. If less than
+ *  zero, an infinite number of backups is made. But beware: shuffling
+ *  will become increasingly expensive.
+ */
+class TL_PUBLIC OutputFileBase
+  : public OutputStreamBase
+{
+public:
+  /**
+   *  @brief Constructor
+   *
+   *  @param path The (relative) path of the file to write
+   *  @param keep_backups The number of backups to keep (0: none, -1: infinite)
+   */
+  OutputFileBase (const std::string &path, int keep_backups);
+
+  /**
+   *  @brief Destructor
+   */
+  virtual ~OutputFileBase ();
+
+  /**
+   *  @brief Seek to the specified position
+   *
+   *  Writing continues at that position after a seek.
+   */
+  virtual void seek (size_t s);
+
+  /**
+   *  @brief Write to a file
+   *
+   *  Implements the basic write method.
+   *  Will throw a FileWriteErrorException if an error occurs.
+   */
+  virtual void write (const char *b, size_t n);
+
+  /**
+   *  @brief Unrolls the output
+   */
+  virtual void reject ();
+
+protected:
+  virtual void seek_file (size_t s) = 0;
+  virtual void write_file (const char *b, size_t n) = 0;
+
+private:
+  int m_keep_backups;
+  std::string m_backup_path, m_path;
+  bool m_has_error;
+};
+
+/**
  *  @brief A zlib output file delegate
  *
  *  Implements the writer for a zlib stream
  */
 class TL_PUBLIC OutputZLibFile
-  : public OutputStreamBase
+  : public OutputFileBase
 {
 public:
   /**
@@ -847,9 +923,10 @@ public:
    *  object. open() will throw a FileOpenErrorException if
    *  an error occurs.
    *
-   *  @param path The (relative) path of the file to open
+   *  @param path The (relative) path of the file to write
+   *  @param keep_backups The number of backups to keep (0: none, -1: infinite)
    */
-  OutputZLibFile (const std::string &path);
+  OutputZLibFile (const std::string &path, int keep_backups);
 
   /**
    *  @brief Close the file
@@ -858,13 +935,19 @@ public:
    */
   virtual ~OutputZLibFile ();
 
+protected:
   /**
    *  @brief Write to a file
    *
    *  Implements the basic write method.
    *  Will throw a ZLibWriteErrorException if an error occurs.
    */
-  virtual void write (const char *b, size_t n);
+  virtual void write_file (const char *b, size_t n);
+
+  /**
+   *  @brief The seek operation isn't implemented for zlib files
+   */
+  virtual void seek_file (size_t /*s*/) { }
 
 private:
   //  No copying
@@ -881,7 +964,7 @@ private:
  *  Implements the writer for ordinary files.
  */
 class TL_PUBLIC OutputFile
-  : public OutputStreamBase
+  : public OutputFileBase
 {
 public:
   /**
@@ -891,10 +974,10 @@ public:
    *  object. open() will throw a FileOpenErrorException if
    *  an error occurs.
    *
-   *  @param path The (relative) path of the file to open
-   *  @param read True, if the file should be read, false on write.
+   *  @param path The (relative) path of the file to write
+   *  @param keep_backups The number of backups to keep (0: none, -1: infinite)
    */
-  OutputFile (const std::string &path);
+  OutputFile (const std::string &path, int keep_backups = 0);
 
   /**
    *  @brief Close the file
@@ -904,19 +987,20 @@ public:
   virtual ~OutputFile ();
 
   /**
+   *  @brief Returns a value indicating whether that stream supports seek
+   */
+  virtual bool supports_seek ()
+  {
+    return true;
+  }
+
+protected:
+  /**
    *  @brief Seek to the specified position
    *
    *  Writing continues at that position after a seek.
    */
-  virtual void seek (size_t s);
-
-  /**
-   *  @brief Returns a value indicating whether that stream supports seek
-   */
-  bool supports_seek ()
-  {
-    return true;
-  }
+  virtual void seek_file (size_t s);
 
   /**
    *  @brief Write to a file
@@ -924,7 +1008,7 @@ public:
    *  Implements the basic write method.
    *  Will throw a FileWriteErrorException if an error occurs.
    */
-  virtual void write (const char *b, size_t n);
+  virtual void write_file (const char *b, size_t n);
 
 private:
   //  No copying
@@ -1031,12 +1115,19 @@ public:
   OutputStream (OutputStreamBase &delegate, bool as_text = false);
 
   /**
+   *  @brief Default constructor
+   *
+   *  This constructor takes a delegate object. The stream will own the delegate.
+   */
+  OutputStream (OutputStreamBase *delegate, bool as_text = false);
+
+  /**
    *  @brief Open an output stream with the given path and stream mode
    *
    *  This will automatically create a delegate object and delete it later.
    *  If "as_text" is true, the output will be formatted with the system's line separator.
    */
-  OutputStream (const std::string &abstract_path, OutputStreamMode om = OM_Auto, bool as_text = false);
+  OutputStream (const std::string &abstract_path, OutputStreamMode om = OM_Auto, bool as_text = false, int keep_backups = 0);
 
   /**
    *  @brief Destructor
@@ -1118,6 +1209,16 @@ public:
   {
     put (tl::to_string (t));
     return *this;
+  }
+
+  /**
+   *  @brief Rejects the output - for delegates which support backup, this means the original file is restored
+   */
+  void reject () const
+  {
+    if (mp_delegate) {
+      mp_delegate->reject ();
+    }
   }
 
   /**

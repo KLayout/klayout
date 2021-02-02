@@ -212,7 +212,7 @@ public:
    *  Save the layout under the given file name and with the given options.
    *  If update is true, this method updates the cell view's filename, title, save options and dirty flag.
    */
-  void save_as (const std::string &filename, tl::OutputStream::OutputStreamMode om, const db::SaveLayoutOptions &options, bool update = true);
+  void save_as (const std::string &filename, tl::OutputStream::OutputStreamMode om, const db::SaveLayoutOptions &options, bool update = true, int keep_backups = 0);
 
   /**
    *  @brief Sets the save options and a flag indicating whether they are valid

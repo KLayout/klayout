@@ -194,6 +194,10 @@ MainConfigPage7::setup (lay::Dispatcher *root)
   bool en = true;
   root->config_get (cfg_layout_file_watcher_enabled, en);
   mp_ui->check_for_updates->setChecked (en);
+
+  int kb = 0;
+  root->config_get (cfg_keep_backups, kb);
+  mp_ui->keep_backups->setValue (kb);
 }
 
 void
@@ -201,6 +205,7 @@ MainConfigPage7::commit (lay::Dispatcher *root)
 {
   try {
     root->config_set (cfg_layout_file_watcher_enabled, mp_ui->check_for_updates->isChecked ());
+    root->config_set (cfg_keep_backups, mp_ui->keep_backups->value ());
   } catch (...) { }
 }
 

@@ -676,3 +676,82 @@ TEST (17)
   EXPECT_EQ (tl::is_same_file (yfile, tl::combine_path (dpath, "../d/y")), true);
 }
 
+//  rename_file
+TEST (18)
+{
+  std::string tp = tl::absolute_file_path (tmp_file ());
+  std::string xfile = tl::combine_path (tp, "x");
+  std::string yfile = tl::combine_path (tp, "y");
+  std::string zfile = tl::combine_path (tl::combine_path (tp, "dir"), "z");
+
+  tl::mkpath (tl::combine_path (tp, "dir"));
+
+  {
+    tl::OutputStream os (xfile);
+    os << "hello, world!\n";
+  }
+
+  EXPECT_EQ (tl::file_exists (xfile), true);
+  EXPECT_EQ (tl::file_exists (yfile), false);
+  EXPECT_EQ (tl::file_exists (zfile), false);
+
+  {
+    tl::InputStream is (xfile);
+    EXPECT_EQ (is.read_all (), "hello, world!\n");
+  }
+
+  tl::rename_file (xfile, yfile);
+
+  EXPECT_EQ (tl::file_exists (xfile), false);
+  EXPECT_EQ (tl::file_exists (yfile), true);
+  EXPECT_EQ (tl::file_exists (zfile), false);
+
+  {
+    tl::InputStream is (yfile);
+    EXPECT_EQ (is.read_all (), "hello, world!\n");
+  }
+
+  tl::rename_file (yfile, "x");
+
+  EXPECT_EQ (tl::file_exists (xfile), true);
+  EXPECT_EQ (tl::file_exists (yfile), false);
+  EXPECT_EQ (tl::file_exists (zfile), false);
+
+  {
+    tl::InputStream is (xfile);
+    EXPECT_EQ (is.read_all (), "hello, world!\n");
+  }
+
+  tl::rename_file (xfile, zfile);
+
+  EXPECT_EQ (tl::file_exists (xfile), false);
+  EXPECT_EQ (tl::file_exists (yfile), false);
+  EXPECT_EQ (tl::file_exists (zfile), true);
+
+  {
+    tl::InputStream is (zfile);
+    EXPECT_EQ (is.read_all (), "hello, world!\n");
+  }
+
+  tl::rename_file (zfile, xfile);
+
+  EXPECT_EQ (tl::file_exists (xfile), true);
+  EXPECT_EQ (tl::file_exists (yfile), false);
+  EXPECT_EQ (tl::file_exists (zfile), false);
+
+  {
+    tl::InputStream is (xfile);
+    EXPECT_EQ (is.read_all (), "hello, world!\n");
+  }
+
+  tl::rename_file (xfile, tl::combine_path ("dir", "z"));
+
+  EXPECT_EQ (tl::file_exists (xfile), false);
+  EXPECT_EQ (tl::file_exists (yfile), false);
+  EXPECT_EQ (tl::file_exists (zfile), true);
+
+  {
+    tl::InputStream is (zfile);
+    EXPECT_EQ (is.read_all (), "hello, world!\n");
+  }
+}

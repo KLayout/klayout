@@ -1,6 +1,11 @@
 
-0.26.10         (2020-01-31):
+0.26.10         (2020-02-02):
 
+* Enhancement: %GITHUB%/issues/720
+  "Safe save" and backups: when saving files, the file is only overwritten after
+  the save terminated successfully. This will avoid loss of data for full volumes
+  or network share dropouts. In addition, a configurable number of back files can 
+  be kept (see File/Setup: Application/General).
 * Bugfix: %GITHUB%/issues/718
   GDS export issue fixed (breaking of polygons was filling holes)
 * Bugfix: %GITHUB%/issues/709

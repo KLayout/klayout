@@ -345,6 +345,9 @@ InputHttpStreamPrivateData::issue_request (const QUrl &url)
   delete mp_buffer;
   mp_buffer = 0;
 
+  //  remove old request (important for redirect)
+  close ();
+
   //  reset the retry counters -> this way we can detect authentication failures
   s_auth_handler->reset ();
 

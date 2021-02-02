@@ -55,28 +55,6 @@ get_appdata_path ()
   return tl::to_string (appdata_dir.absoluteFilePath (appdata_folder));
 }
 
-#ifdef _WIN32
-static void 
-get_other_system_paths (std::vector <std::string> &p)
-{
-  //  Use "Application Data" if it exists on Windows
-  const wchar_t *appdata_env = 0;
-  if ((appdata_env = _wgetenv (L"APPDATA")) != 0) {
-    QDir appdata_dir = QString ((const QChar *) appdata_env);
-    QString appdata_folder = QString::fromUtf8 ("KLayout");
-    if (appdata_dir.exists () && appdata_dir.exists (appdata_folder)) {
-      p.push_back (tl::to_string (appdata_dir.absoluteFilePath (appdata_folder)));
-    }
-  }
-}
-#else
-static void 
-get_other_system_paths (std::vector <std::string> &)
-{
-  //  .. nothing yet ..
-}
-#endif
-
 static void
 split_path (const std::string &path, std::vector <std::string> &pc)
 {
@@ -129,7 +107,6 @@ get_klayout_path ()
     if (! env.empty ()) {
       split_path (env, klayout_path);
     } else {
-      get_other_system_paths (klayout_path);
       klayout_path.push_back (tl::get_inst_path ());
     }
 

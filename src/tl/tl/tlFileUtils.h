@@ -126,6 +126,11 @@ bool TL_PUBLIC is_dir (const std::string &s);
 std::vector<std::string> TL_PUBLIC dir_entries (const std::string &s, bool with_files = true, bool with_dirs = true, bool without_dotfiles = false);
 
 /**
+ *  @brief Rename the given file
+ */
+bool TL_PUBLIC rename_file (const std::string &path, const std::string &new_name);
+
+/**
  *  @brief Removes the given file and returns true on success
  */
 bool TL_PUBLIC rm_file (const std::string &path);

@@ -162,3 +162,235 @@ TEST(TextInputStream)
     EXPECT_EQ (tis.read_all (), "Hello, world!\nWith another line\n\nseparated by a LFCR and CRLF.");
   }
 }
+
+namespace
+{
+
+class BrokenOutputStream
+  : public tl::OutputFile
+{
+public:
+  BrokenOutputStream (const std::string &path, int keep_backups)
+    : tl::OutputFile (path, keep_backups)
+  { }
+
+  void write_file(const char *b, size_t n)
+  {
+    for (const char *p = b; p < b + n; ++p) {
+      if (*p == '!') {
+        throw tl::Exception ("Bang!");
+      }
+    }
+    tl::OutputFile::write (b, n);
+  }
+};
+
+}
+
+TEST(SafeOutput)
+{
+  std::string tp = tmp_file ("x");
+
+  {
+    tl::OutputStream os (tp);
+    os << "blabla\n";
+  }
+
+  EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
+  EXPECT_EQ (tl::file_exists (tp), true);
+
+  {
+    tl::OutputStream os (tp);
+    EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
+    EXPECT_EQ (tl::file_exists (tp), true);
+    os << "Hello, world!\n";
+  }
+
+  EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
+  EXPECT_EQ (tl::file_exists (tp), true);
+
+  {
+    tl::InputStream is (tp);
+    EXPECT_EQ (is.read_all (), "Hello, world!\n");
+  }
+
+  try {
+    BrokenOutputStream broken (tp, 0);
+    tl::OutputStream os (broken);
+    EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
+    EXPECT_EQ (tl::file_exists (tp), true);
+    os << "Hi!\n";
+    os.flush ();   //  raises the exception
+    EXPECT_EQ (true, false);
+  } catch (...) {
+    //  '!' raises an exception
+  }
+
+  //  The original content is restored now
+
+  EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
+  EXPECT_EQ (tl::file_exists (tp), true);
+
+  {
+    tl::InputStream is (tp);
+    EXPECT_EQ (is.read_all (), "Hello, world!\n");
+  }
+
+
+  try {
+    BrokenOutputStream *broken = new BrokenOutputStream (tp, 0);
+    tl::OutputStream os (broken);
+    EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
+    EXPECT_EQ (tl::file_exists (tp), true);
+    os << "Hi!\n";
+    os.flush ();   //  raises the exception
+    EXPECT_EQ (true, false);
+  } catch (...) {
+    //  '!' raises an exception
+  }
+
+  //  The original content is restored now
+
+  EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
+  EXPECT_EQ (tl::file_exists (tp), true);
+
+  {
+    tl::InputStream is (tp);
+    EXPECT_EQ (is.read_all (), "Hello, world!\n");
+  }
+}
+
+
+TEST(Backups)
+{
+  std::string tp = tmp_file ("x");
+
+  {
+    tl::OutputStream os (tp, tl::OutputStream::OM_Auto, false, 2);
+    os << "1\n";
+  }
+
+  EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
+  EXPECT_EQ (tl::file_exists (tp + ".1"), false);
+  EXPECT_EQ (tl::file_exists (tp + ".2"), false);
+  EXPECT_EQ (tl::file_exists (tp + ".3"), false);
+  EXPECT_EQ (tl::file_exists (tp), true);
+
+  {
+    tl::InputStream is (tp);
+    EXPECT_EQ (is.read_all (), "1\n");
+  }
+
+  {
+    tl::OutputStream os (tp, tl::OutputStream::OM_Auto, false, 2);
+    EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
+    EXPECT_EQ (tl::file_exists (tp), true);
+    os << "2\n";
+  }
+
+  EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
+  EXPECT_EQ (tl::file_exists (tp + ".1"), true);
+  EXPECT_EQ (tl::file_exists (tp + ".2"), false);
+  EXPECT_EQ (tl::file_exists (tp + ".3"), false);
+  EXPECT_EQ (tl::file_exists (tp), true);
+
+  {
+    tl::InputStream is (tp);
+    EXPECT_EQ (is.read_all (), "2\n");
+  }
+
+  {
+    tl::InputStream is (tp + ".1");
+    EXPECT_EQ (is.read_all (), "1\n");
+  }
+
+  {
+    tl::OutputStream os (tp, tl::OutputStream::OM_Auto, false, 2);
+    EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
+    EXPECT_EQ (tl::file_exists (tp), true);
+    os << "3\n";
+  }
+
+  EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
+  EXPECT_EQ (tl::file_exists (tp + ".1"), true);
+  EXPECT_EQ (tl::file_exists (tp + ".2"), true);
+  EXPECT_EQ (tl::file_exists (tp + ".3"), false);
+  EXPECT_EQ (tl::file_exists (tp), true);
+
+  {
+    tl::InputStream is (tp);
+    EXPECT_EQ (is.read_all (), "3\n");
+  }
+
+  {
+    tl::InputStream is (tp + ".1");
+    EXPECT_EQ (is.read_all (), "2\n");
+  }
+
+  {
+    tl::InputStream is (tp + ".2");
+    EXPECT_EQ (is.read_all (), "1\n");
+  }
+
+  {
+    tl::OutputStream os (tp, tl::OutputStream::OM_Auto, false, 2);
+    EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
+    EXPECT_EQ (tl::file_exists (tp), true);
+    os << "4\n";
+  }
+
+  EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
+  EXPECT_EQ (tl::file_exists (tp + ".1"), true);
+  EXPECT_EQ (tl::file_exists (tp + ".2"), true);
+  EXPECT_EQ (tl::file_exists (tp + ".3"), false);
+  EXPECT_EQ (tl::file_exists (tp), true);
+
+  {
+    tl::InputStream is (tp);
+    EXPECT_EQ (is.read_all (), "4\n");
+  }
+
+  {
+    tl::InputStream is (tp + ".1");
+    EXPECT_EQ (is.read_all (), "3\n");
+  }
+
+  {
+    tl::InputStream is (tp + ".2");
+    EXPECT_EQ (is.read_all (), "2\n");
+  }
+
+  try {
+    BrokenOutputStream broken (tp, 2);
+    tl::OutputStream os (broken);
+    EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
+    EXPECT_EQ (tl::file_exists (tp), true);
+    os << "5!\n";
+    os.flush ();   //  raises the exception
+    EXPECT_EQ (true, false);
+  } catch (...) {
+    //  '!' raises an exception
+  }
+
+  EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
+  EXPECT_EQ (tl::file_exists (tp + ".1"), true);
+  EXPECT_EQ (tl::file_exists (tp + ".2"), true);
+  EXPECT_EQ (tl::file_exists (tp + ".3"), false);
+  EXPECT_EQ (tl::file_exists (tp), true);
+
+  {
+    tl::InputStream is (tp);
+    EXPECT_EQ (is.read_all (), "4\n");
+  }
+
+  {
+    tl::InputStream is (tp + ".1");
+    EXPECT_EQ (is.read_all (), "3\n");
+  }
+
+  {
+    tl::InputStream is (tp + ".2");
+    EXPECT_EQ (is.read_all (), "2\n");
+  }
+}
+

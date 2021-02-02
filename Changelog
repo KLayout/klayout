@@ -21,6 +21,10 @@
 * Bugfix: HTTP stream reading issue with redirect
   At least on MacOS a segfault happened when reading HTTP stream data
   (e.g. for package manager) from addresses which are redirected.
+* Enhancement: Removed %APPDATA% from DLL search path on Windows
+  This will avoid installation poisoning by the one from %APPDATA%
+  (which ironically is the default installation path). Eventually
+  multiple versions can be used in parallel.
 
 0.26.9          (2020-11-27):
 

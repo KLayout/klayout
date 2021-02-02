@@ -2216,12 +2216,12 @@ LayoutView::signal_selection_changed ()
 }
 
 void 
-LayoutView::save_as (unsigned int index, const std::string &filename, tl::OutputStream::OutputStreamMode om, const db::SaveLayoutOptions &options, bool update)
+LayoutView::save_as (unsigned int index, const std::string &filename, tl::OutputStream::OutputStreamMode om, const db::SaveLayoutOptions &options, bool update, int keep_backups)
 {
   tl_assert (index < cellviews ());
 
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Saving")));
-  cellview (index)->save_as (filename, om, options, update);
+  cellview (index)->save_as (filename, om, options, update, keep_backups);
 
   cellview_changed (index);
 }

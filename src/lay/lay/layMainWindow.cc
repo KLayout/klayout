@@ -163,6 +163,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
       m_mode (std::numeric_limits<unsigned int>::max ()),
       mp_setup_form (0),
       m_open_mode (0),
+      m_keep_backups (0),
       m_disable_tab_selected (false),
       m_exited (false),
       dm_do_update_menu (this, &MainWindow::do_update_menu),
@@ -1073,6 +1074,14 @@ MainWindow::configure (const std::string &name, const std::string &value)
     dm_do_update_mru_menus ();
 
     return true;
+
+  } else if (name == cfg_keep_backups) {
+
+    int kb = 0;
+    tl::from_string (value, kb);
+    m_keep_backups = kb;
+
+    return false; // not taken - let others set it too.
 
   } else if (name == cfg_micron_digits) {
 
@@ -2198,7 +2207,7 @@ MainWindow::cm_save_current_cell_as ()
               }
             }
 
-            cv->save_as (fn, om, options, false /*don't update*/);
+            cv->save_as (fn, om, options, false /*don't update*/, m_keep_backups);
 
             add_mru (fn, cv->tech_name ());
 
@@ -2273,7 +2282,7 @@ MainWindow::do_save (bool as)
             break;
           }
 
-          current_view ()->save_as ((unsigned int) cv_index, fn, om, options, true);
+          current_view ()->save_as ((unsigned int) cv_index, fn, om, options, true, m_keep_backups);
           add_mru (fn, current_view ()->cellview (cv_index)->tech_name ());
 
         }
@@ -2314,7 +2323,7 @@ MainWindow::cm_save_all ()
           }
         }
 
-        view (view_index)->save_as (cv_index, fn, om, options, true);
+        view (view_index)->save_as (cv_index, fn, om, options, true, m_keep_backups);
         add_mru (fn, current_view ()->cellview (cv_index)->tech_name ());
 
       }

@@ -119,6 +119,17 @@ class DBSimplePolygon_TestClass < TestBase
     p = RBA::DSimplePolygon::ellipse( RBA::DBox::new(-10000, -20000, 30000, 40000), 4 )
     assert_equal(p.to_s, "(10000,-20000;-10000,10000;10000,40000;30000,10000)")
 
+    # halfmanhattan variants
+    p = RBA::DSimplePolygon::new([ RBA::DPoint::new( 0, 0 ), RBA::DPoint::new( 0, 100 ), RBA::DPoint::new( 100, 100 ) ])
+    assert_equal(p.is_halfmanhattan?, true)
+    assert_equal(p.is_rectilinear?, false)
+    p = RBA::DSimplePolygon::new([ RBA::DPoint::new( 0, 0 ), RBA::DPoint::new( 0, 100 ), RBA::DPoint::new( 100, 101 ) ])
+    assert_equal(p.is_halfmanhattan?, false)
+    assert_equal(p.is_rectilinear?, false)
+    p = RBA::DSimplePolygon::new([ RBA::DPoint::new( 0, 0 ), RBA::DPoint::new( 0, 100 ), RBA::DPoint::new( 100, 100 ), RBA::DPoint::new( 100, 0) ])
+    assert_equal(p.is_halfmanhattan?, true)
+    assert_equal(p.is_rectilinear?, true)
+
   end
 
   # SimplePolygon basics
@@ -244,6 +255,17 @@ class DBSimplePolygon_TestClass < TestBase
     
     p = RBA::SimplePolygon::ellipse( RBA::Box::new(-10000, -20000, 30000, 40000), 4 )
     assert_equal(p.to_s, "(10000,-20000;-10000,10000;10000,40000;30000,10000)")
+
+    # halfmanhattan variants
+    p = RBA::SimplePolygon::new([ RBA::Point::new( 0, 0 ), RBA::Point::new( 0, 100 ), RBA::Point::new( 100, 100 ) ])
+    assert_equal(p.is_halfmanhattan?, true)
+    assert_equal(p.is_rectilinear?, false)
+    p = RBA::SimplePolygon::new([ RBA::Point::new( 0, 0 ), RBA::Point::new( 0, 100 ), RBA::Point::new( 100, 101 ) ])
+    assert_equal(p.is_halfmanhattan?, false)
+    assert_equal(p.is_rectilinear?, false)
+    p = RBA::SimplePolygon::new([ RBA::Point::new( 0, 0 ), RBA::Point::new( 0, 100 ), RBA::Point::new( 100, 100 ), RBA::Point::new( 100, 0) ])
+    assert_equal(p.is_halfmanhattan?, true)
+    assert_equal(p.is_rectilinear?, true)
 
   end
 

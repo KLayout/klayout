@@ -75,11 +75,6 @@ struct simple_polygon_defs
     return c->hull ().size ();
   }
 
-  static bool is_rectilinear (C *c)
-  {
-    return c->hull ().is_rectilinear ();
-  }
-
   static bool is_empty (C *c)
   {
     return c->hull ().size () == 0;
@@ -349,8 +344,15 @@ struct simple_polygon_defs
     method_ext ("is_empty?", &is_empty,
       "@brief Returns a value indicating whether the polygon is empty\n"
     ) +
-    method_ext ("is_rectilinear?", &is_rectilinear,
+    method ("is_rectilinear?", &C::is_rectilinear,
       "@brief Returns a value indicating whether the polygon is rectilinear\n"
+    ) +
+    method ("is_halfmanhattan?", &C::is_halfmanhattan,
+      "@brief Returns a value indicating whether the polygon is half-manhattan\n"
+      "Half-manhattan polygons have edges which are multiples of 45 degree. These polygons can be clipped at a rectangle without "
+      "potential grid snapping.\n"
+      "\n"
+      "This predicate was introduced in version 0.27.\n"
     ) +
     method_ext ("inside?", &inside, gsi::arg ("p"),
       "@brief Gets a value indicating whether the given point is inside the polygon\n"
@@ -871,11 +873,6 @@ struct polygon_defs
     return c->vertices ();
   }
 
-  static bool is_rectilinear (C *c)
-  {
-    return c->is_rectilinear ();
-  }
-
   static bool is_empty (C *c)
   {
     return c->vertices () == 0;
@@ -1151,8 +1148,15 @@ struct polygon_defs
     method_ext ("is_empty?", &is_empty,
       "@brief Returns a value indicating whether the polygon is empty\n"
     ) +
-    method_ext ("is_rectilinear?", &is_rectilinear,
+    method ("is_rectilinear?", &C::is_rectilinear,
       "@brief Returns a value indicating whether the polygon is rectilinear\n"
+    ) +
+    method ("is_halfmanhattan?", &C::is_halfmanhattan,
+      "@brief Returns a value indicating whether the polygon is half-manhattan\n"
+      "Half-manhattan polygons have edges which are multiples of 45 degree. These polygons can be clipped at a rectangle without "
+      "potential grid snapping.\n"
+      "\n"
+      "This predicate was introduced in version 0.27.\n"
     ) +
     method_ext ("hash", &hash_value,
       "@brief Computes a hash value\n"

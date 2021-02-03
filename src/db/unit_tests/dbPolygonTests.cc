@@ -83,6 +83,8 @@ TEST(1)
   EXPECT_EQ (tl::to_string (p.area_ratio ()), "1");
   EXPECT_EQ (p.perimeter (), db::Polygon::perimeter_type (2200));
   EXPECT_EQ (p.is_box (), true);
+  EXPECT_EQ (p.is_rectilinear (), true);
+  EXPECT_EQ (p.is_halfmanhattan (), true);
 
   c2.push_back (db::Point (10, 10));
   c2.push_back (db::Point (10, 390));
@@ -96,6 +98,9 @@ TEST(1)
   c3.push_back (db::Point (90, 510));
   p.insert_hole (c3.begin (), c3.end ());
   EXPECT_EQ (p.holes (), size_t (2));
+  EXPECT_EQ (p.is_box (), false);
+  EXPECT_EQ (p.is_rectilinear (), true);
+  EXPECT_EQ (p.is_halfmanhattan (), true);
 
   EXPECT_EQ (p.to_string (), std::string ("(0,0;0,1000;100,1000;100,0/10,10;90,10;90,390;10,390/10,510;90,510;90,890;10,890)"));
   db::DPolygon dp (p, db::cast_op<db::DPoint, db::Point> ());
@@ -148,6 +153,27 @@ TEST(1)
 
   p.clear ();
   EXPECT_EQ (p, empty);
+
+  c1.clear ();
+  c1.push_back (db::Point (0, 0));
+  c1.push_back (db::Point (0, 1000));
+  c1.push_back (db::Point (100, 1100));
+  c1.push_back (db::Point (100, 0));
+  p.assign_hull (c1.begin (), c1.end ());
+  EXPECT_EQ (p.is_box (), false);
+  EXPECT_EQ (p.is_rectilinear (), false);
+  EXPECT_EQ (p.is_halfmanhattan (), true);
+
+
+  c1.clear ();
+  c1.push_back (db::Point (0, 0));
+  c1.push_back (db::Point (0, 1000));
+  c1.push_back (db::Point (100, 1101));
+  c1.push_back (db::Point (100, 0));
+  p.assign_hull (c1.begin (), c1.end ());
+  EXPECT_EQ (p.is_box (), false);
+  EXPECT_EQ (p.is_rectilinear (), false);
+  EXPECT_EQ (p.is_halfmanhattan (), false);
 }
 
 
@@ -172,6 +198,8 @@ TEST(2)
   EXPECT_EQ (tl::to_string (p.area_ratio ()), "1");
   EXPECT_EQ (p.perimeter (), db::SimplePolygon::perimeter_type (2000+200));
   EXPECT_EQ (p.is_box (), true);
+  EXPECT_EQ (p.is_rectilinear (), true);
+  EXPECT_EQ (p.is_halfmanhattan (), true);
 
   EXPECT_EQ (p.to_string (), "(0,0;0,1000;100,1000;100,0)");
   db::DSimplePolygon dp (p, db::cast_op<db::DPoint, db::Point> ());
@@ -213,6 +241,24 @@ TEST(2)
 
   p.clear ();
   EXPECT_EQ (p, empty);
+
+  c1.clear ();
+  c1.push_back (db::Point (0, 0));
+  c1.push_back (db::Point (0, 1000));
+  c1.push_back (db::Point (100, 1100));
+  c1.push_back (db::Point (100, 0));
+  p.assign_hull (c1.begin (), c1.end ());
+  EXPECT_EQ (p.is_rectilinear (), false);
+  EXPECT_EQ (p.is_halfmanhattan (), true);
+
+  c1.clear ();
+  c1.push_back (db::Point (0, 0));
+  c1.push_back (db::Point (0, 1000));
+  c1.push_back (db::Point (100, 1101));
+  c1.push_back (db::Point (100, 0));
+  p.assign_hull (c1.begin (), c1.end ());
+  EXPECT_EQ (p.is_rectilinear (), false);
+  EXPECT_EQ (p.is_halfmanhattan (), false);
 }
 
 TEST(3) 

@@ -743,7 +743,29 @@ public:
     return true;
   }
   
-  /** 
+  /**
+   *  @brief returns true if the contour is a half-manhattan contour (multiples of 45 degree)
+   */
+  bool is_halfmanhattan () const
+  {
+    if (((size_t) mp_points & 1) != 0) {
+      return true;
+    }
+    if (m_size < 2) {
+      return false;
+    }
+    point_type pl = mp_points [m_size - 1];
+    for (size_t i = 0; i < m_size; ++i) {
+      point_type p = mp_points [i];
+      if (! coord_traits::equals (p.x (), pl.x ()) && ! coord_traits::equals (p.y (), pl.y ()) && ! coord_traits::equals (std::abs (p.x () - pl.x ()), std::abs (p.y () - pl.y ()))) {
+        return false;
+      }
+      pl = p;
+    }
+    return true;
+  }
+
+  /**
    *  @brief Returns true if the contour is a hole
    *
    *  Since this method employs the orientation property the results are only valid for
@@ -1665,6 +1687,19 @@ public:
   {
     for (size_t i = 0; i < m_ctrs.size (); ++i) {
       if (! m_ctrs [i].is_rectilinear ()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   *  @brief Returns true, if the polygon is halfmanhattan
+   */
+  bool is_halfmanhattan () const
+  {
+    for (size_t i = 0; i < m_ctrs.size (); ++i) {
+      if (! m_ctrs [i].is_halfmanhattan ()) {
         return false;
       }
     }
@@ -2799,6 +2834,14 @@ public:
   bool is_rectilinear () const
   {
     return m_hull.is_rectilinear ();
+  }
+
+  /**
+   *  @brief Returns true, if the polygon is halfmanhattan
+   */
+  bool is_halfmanhattan () const
+  {
+    return m_hull.is_halfmanhattan ();
   }
 
   /**

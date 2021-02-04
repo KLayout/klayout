@@ -287,7 +287,11 @@ std::string dirname (const std::string &s)
     parts.pop_back ();
   }
 
-  return tl::join (parts, "");
+  if (parts.empty ()) {
+    return is_part_with_separator (s) ? "" : ".";
+  } else {
+    return tl::join (parts, "");
+  }
 }
 
 std::string filename (const std::string &s)

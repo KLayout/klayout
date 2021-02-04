@@ -1,4 +1,10 @@
 
+0.26.11         (2020-02-05):
+
+* Bugfix: %GITHUB%/issues/723
+  Backup scheme wasn't working correctly with a single file without path
+  given as command line argument.
+
 0.26.10         (2020-02-02):
 
 * Enhancement: %GITHUB%/issues/720

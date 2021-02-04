@@ -351,6 +351,9 @@ TEST (10)
     EXPECT_EQ (tl::normalize_path ("d:/"), "D:\\");
     EXPECT_EQ (tl::normalize_path ("d://"), "D:\\");
 
+    EXPECT_EQ (tl::dirname ("hello"), ".");
+    EXPECT_EQ (tl::dirname (".\\hello"), ".");
+    EXPECT_EQ (tl::dirname ("/hello"), "");
     EXPECT_EQ (tl::dirname ("/hello/world"), "\\hello");
     EXPECT_EQ (tl::dirname ("\\hello\\world"), "\\hello");
     EXPECT_EQ (tl::dirname ("/hello//world/"), "\\hello\\world");
@@ -406,6 +409,33 @@ TEST (10)
     EXPECT_EQ (tl::combine_path ("hello", "world"), "hello\\world");
     EXPECT_EQ (tl::combine_path ("hello", ""), "hello");
     EXPECT_EQ (tl::combine_path ("hello", "", true), "hello\\");
+    EXPECT_EQ (tl::combine_path ("", "hello", true), "\\hello");
+    EXPECT_EQ (tl::combine_path (".", "hello", true), ".\\hello");
+
+    EXPECT_EQ (tl::combine_path (tl::dirname ("hello"), tl::filename ("hello")), ".\\hello");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("\\hello"), tl::filename ("\\hello")), "\\hello");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("c:\\hello"), tl::filename ("c:\\hello")), "C:\\hello");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("\\c:\\hello"), tl::filename ("\\c:\\hello")), "C:\\hello");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("\\\\hello"), tl::filename ("\\\\hello")), "\\hello");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("\\\\server:\\hello"), tl::filename ("\\\\server:\\hello")), "\\\\server:\\hello");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("\\hello\\x"), tl::filename ("\\hello\\x")), "\\hello\\x");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("c:\\hello\\x"), tl::filename ("c:\\hello\\x")), "C:\\hello\\x");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("\\c:\\hello\\x"), tl::filename ("\\c:\\hello\\x")), "C:\\hello\\x");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("\\\\hello\\x"), tl::filename ("\\\\hello\\x")), "\\\\hello\\x");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("\\hello\\x\\y"), tl::filename ("\\hello\\x\\y")), "\\hello\\x\\y");
+
+    EXPECT_EQ (tl::combine_path (tl::dirname ("hello/x"), tl::filename ("hello/x")), "hello\\x");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("/hello"), tl::filename ("/hello")), "\\hello");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("c:/hello"), tl::filename ("c:/hello")), "C:\\hello");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("/c:/hello"), tl::filename ("/c:/hello")), "C:\\hello");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("//hello"), tl::filename ("//hello")), "\\hello");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("//server:/hello"), tl::filename ("//server:/hello")), "\\\\server:\\hello");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("/hello/x"), tl::filename ("/hello/x")), "\\hello\\x");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("c:/hello/x"), tl::filename ("c:/hello/x")), "C:\\hello\\x");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("/c:/hello/x"), tl::filename ("/c:/hello/x")), "C:\\hello\\x");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("//hello/x"), tl::filename ("//hello/x")), "\\\\hello\\x");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("/hello/x/y"), tl::filename ("/hello/x/y")), "\\hello\\x\\y");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("hello/x"), tl::filename ("hello/x")), "hello\\x");
 
     tl::file_utils_force_reset ();
 
@@ -436,6 +466,9 @@ TEST (11)
     EXPECT_EQ (tl::join (tl::split_path ("/"), "+"), "/");
     EXPECT_EQ (tl::join (tl::split_path ("//"), "+"), "/");
 
+    EXPECT_EQ (tl::dirname ("hello"), ".");
+    EXPECT_EQ (tl::dirname ("./hello"), ".");
+    EXPECT_EQ (tl::dirname ("/hello"), "");
     EXPECT_EQ (tl::dirname ("/hello/world"), "/hello");
     EXPECT_EQ (tl::dirname ("/hello//world/"), "/hello/world");
     EXPECT_EQ (tl::dirname ("hello//world/"), "hello/world");
@@ -461,6 +494,14 @@ TEST (11)
     EXPECT_EQ (tl::combine_path ("hello", "world"), "hello/world");
     EXPECT_EQ (tl::combine_path ("hello", ""), "hello");
     EXPECT_EQ (tl::combine_path ("hello", "", true), "hello/");
+    EXPECT_EQ (tl::combine_path ("", "hello", true), "/hello");
+    EXPECT_EQ (tl::combine_path (".", "hello", true), "./hello");
+
+    EXPECT_EQ (tl::combine_path (tl::dirname ("hello"), tl::filename ("hello")), "./hello");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("/hello"), tl::filename ("/hello")), "/hello");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("/hello/x"), tl::filename ("/hello/x")), "/hello/x");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("/hello/x/y"), tl::filename ("/hello/x/y")), "/hello/x/y");
+    EXPECT_EQ (tl::combine_path (tl::dirname ("hello/x"), tl::filename ("hello/x")), "hello/x");
 
     tl::file_utils_force_reset ();
 

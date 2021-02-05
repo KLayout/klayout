@@ -601,7 +601,9 @@ ReducingHierarchyBuilderShapeReceiver::reduce (const db::Polygon &poly, const db
     }
   }
 
-  if ((m_max_vertex_count >= 4 && poly.vertices () > m_max_vertex_count) || (m_area_ratio > 2.0 && poly.area_ratio () > m_area_ratio)) {
+  //  NOTE: only halfmanhattan polygons are guaranteed not to generate grid snap artefacts when splitting.
+  //  This is important to maintain the connection integrity of shape clusters.
+  if (poly.is_halfmanhattan () && ((m_max_vertex_count >= 4 && poly.vertices () > m_max_vertex_count) || (m_area_ratio > 2.0 && poly.area_ratio () > m_area_ratio))) {
 
     std::vector <db::Polygon> split_polygons;
     db::split_polygon (poly, split_polygons);

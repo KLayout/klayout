@@ -1147,3 +1147,8 @@ TEST(27d_advancedShielding)
 {
   run_test (_this, "27", true);
 }
+
+TEST(28_inputFragmentation)
+{
+  run_test (_this, "28", true);
+}

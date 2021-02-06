@@ -1,6 +1,8 @@
 
-0.26.11         (2020-02-05):
+0.26.11         (2020-02-06):
 
+* Bugfix: %GITHUB%/issues/726
+  Crash on LayoutView#clear_selection on Linux.
 * Bugfix: %GITHUB%/issues/723
   Backup scheme wasn't working correctly with a single file without path
   given as command line argument.

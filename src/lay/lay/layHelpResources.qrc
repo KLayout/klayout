@@ -47,6 +47,7 @@
         <file alias="lvs_ref_global.xml">doc/about/lvs_ref_global.xml</file>
         <file alias="lvs_ref_netter.xml">doc/about/lvs_ref_netter.xml</file>
         <file alias="packages.xml">doc/about/packages.xml</file>
+        <file alias="editable_layouts.xml">doc/about/editable_layouts.xml</file>
     </qresource>
     <qresource prefix="/help/manual">
         <file alias="adjust_origin.xml">doc/manual/adjust_origin.xml</file>

@@ -949,8 +949,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This constructor specifies a manager object which is used to "
     "store undo information for example. It also allows one to specify whether "
-    "the layout is editable. In editable mode, some optimisations are disabled "
-    "and the layout can be manipulated through a variety of methods.\n"
+    "the layout is editable. For a discussion of editable vs. non-editable layouts see @<a href=\"/about/editable_layouts.xml\">Editable and non-editable layouts@</a>.\n"
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +

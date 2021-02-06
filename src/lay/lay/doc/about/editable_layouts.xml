@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Editable and non-editable layout objects</title>
+
+  <p>
+  Layout objects (see <class_doc href="Layout"/>) offer two basic modes which may make a huge 
+  difference is some cases:
+  </p>
+
+  <ul>
+    <li><b>editable mode</b>: This is the default. An editable layout object is fully functional,
+    but is in general less efficient in terms of memory and performance. KLayout uses editable layouts
+    in editor mode. Editable layouts are created with the default constructor or by passing "true" to
+    the editable argument.
+    </li>
+    <li><b>non-editable mode</b>: For non-editable layouts, some functions are disabled. On the 
+    other hand, non-editable layouts use less memory and are faster in general. Non-editable layout
+    objects offer a significant benefit over editable layout objects when working with file formats
+    which offer shape repetition compression (e.g. OASIS). Non-editable layout object are not 
+    immutable, but certain shape manipulations are not permitted (details see below).
+    KLayout uses non-editable layouts in viewer mode. Non-editable layouts are created by passing
+    "false" to the editable argument of the constructor.
+    </li>
+  </ul>
+
+  <p>
+  Non-editable layouts basically spend less memory on providing annotation information so certain
+  safeguards are not present. This makes coding of scripts more challenging. Non-editable layouts
+  internally maintain the shape repetitions and are therefore significantly more memory efficient
+  as editable layouts. On the downside, you cannot take out a shape from such an array and manipulate
+  it individually. This is the reason, this layout type is called non-editable.
+  </p>
+
+  <h3>Restrictions in non-editable mode</h3>
+
+  <p>
+  Functionality not supported in non-editable mode:
+  </p>
+
+  <ul>
+    <li>Undo and redo</li>
+    <li>Erasing of single shapes (shape collections can be cleared however)</li>
+    <li>Changing of a shape's properties</li>
+    <li>In-place transformation of shapes</li>
+    <li>Replacement of shapes by other shapes</li>
+  </ul>
+
+  <p>
+  Adding shapes to a shape collection (per-cell layer) is possible in non-editable mode, but this may
+  invalidate other shape objects (see <class_doc href="Shape"/>) from the same shape collection.
+  It's not safe to keep shape objects while manipulating shape collections. An application crash 
+  may follow when trying to access such invalid shapes.
+  </p>
+
+  <p>
+  In non-editable mode, when iterating over shapes all individual members of the 
+  shape array are traversed. While this is allowed, this basically means shape array
+  expansion with a potential impact on runtime and memory consumption. Some operations
+  which involve shape-by-shape operations (e.g. boolean operations) will also expand shape arrays.
+  Full-layer copies or moves - also on cell level - will preserve the shape array nature and
+  may be much more efficient in non-editable mode.
+  </p>
+
+  <p>
+  When manipulating instances, non-editable layouts are more susceptible to 
+  iterator corruption. Bulk manipulations of instances should be avoided. Instance objects (see <class_doc href="Instance"/>) may become invalid 
+  when the corresponding instance collection of the cell is manipulated. Accessing invalid instance objects may crash the application. 
+  </p>
+
+  <p>
+  In short, these cell instance operations are considered safe in non-editable mode:
+  </p>
+  
+  <ul>
+    <li>Manipulation of single instances</li>
+    <li>Erasing of single instances</li>
+    <li>Erasing of all instances of a cell (no instance object involved)</li>
+    <li>Adding instances (no instance object involved)</li>
+  </ul>
+
+</doc>
+

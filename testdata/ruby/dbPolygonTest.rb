@@ -34,6 +34,7 @@ class DBPolygon_TestClass < TestBase
     assert_equal( a.is_box?, false )
     assert_equal( a.is_empty?, true )
     assert_equal( a.is_rectilinear?, false )
+    assert_equal( a.is_halfmanhattan?, false )
 
     b = a.dup 
     a = RBA::DPolygon::new( [ RBA::DPoint::new( 0, 1 ), RBA::DPoint::new( 1, 5 ), RBA::DPoint::new( 5, 5 ) ] )
@@ -44,6 +45,7 @@ class DBPolygon_TestClass < TestBase
     assert_equal( a.num_points_hull, 3 )
     assert_equal( a.is_empty?, false )
     assert_equal( a.is_rectilinear?, false )
+    assert_equal( a.is_halfmanhattan?, false )
     c = a.dup 
 
     assert_equal( a == b, false )
@@ -55,6 +57,7 @@ class DBPolygon_TestClass < TestBase
     assert_equal( a.is_box?, true )
     assert_equal( a.is_empty?, false )
     assert_equal( a.is_rectilinear?, true )
+    assert_equal( a.is_halfmanhattan?, true )
     assert_equal( a.to_s, "(5,-10;5,15;20,15;20,-10)" )
     assert_equal( RBA::Polygon::new(a).to_s, "(5,-10;5,15;20,15;20,-10)" )
     assert_equal( a.num_points_hull, 4 )
@@ -147,6 +150,17 @@ class DBPolygon_TestClass < TestBase
     
     p = RBA::DPolygon::ellipse( RBA::DBox::new(-10000, -20000, 30000, 40000), 4 )
     assert_equal(p.to_s, "(10000,-20000;-10000,10000;10000,40000;30000,10000)")
+
+    # halfmanhattan variants
+    p = RBA::DPolygon::new([ RBA::DPoint::new( 0, 0 ), RBA::DPoint::new( 0, 100 ), RBA::DPoint::new( 100, 100 ) ])
+    assert_equal(p.is_halfmanhattan?, true)
+    assert_equal(p.is_rectilinear?, false)
+    p = RBA::DPolygon::new([ RBA::DPoint::new( 0, 0 ), RBA::DPoint::new( 0, 100 ), RBA::DPoint::new( 100, 101 ) ])
+    assert_equal(p.is_halfmanhattan?, false)
+    assert_equal(p.is_rectilinear?, false)
+    p = RBA::DPolygon::new([ RBA::DPoint::new( 0, 0 ), RBA::DPoint::new( 0, 100 ), RBA::DPoint::new( 100, 100 ), RBA::DPoint::new( 100, 0) ])
+    assert_equal(p.is_halfmanhattan?, true)
+    assert_equal(p.is_rectilinear?, true)
 
   end
 
@@ -300,6 +314,17 @@ class DBPolygon_TestClass < TestBase
     p = RBA::Polygon::ellipse( RBA::Box::new(-10000, -20000, 30000, 40000), 4 )
     assert_equal(p.to_s, "(10000,-20000;-10000,10000;10000,40000;30000,10000)")
 
+    # halfmanhattan variants
+    p = RBA::Polygon::new([ RBA::Point::new( 0, 0 ), RBA::Point::new( 0, 100 ), RBA::Point::new( 100, 100 ) ])
+    assert_equal(p.is_halfmanhattan?, true)
+    assert_equal(p.is_rectilinear?, false)
+    p = RBA::Polygon::new([ RBA::Point::new( 0, 0 ), RBA::Point::new( 0, 100 ), RBA::Point::new( 100, 101 ) ])
+    assert_equal(p.is_halfmanhattan?, false)
+    assert_equal(p.is_rectilinear?, false)
+    p = RBA::Polygon::new([ RBA::Point::new( 0, 0 ), RBA::Point::new( 0, 100 ), RBA::Point::new( 100, 100 ), RBA::Point::new( 100, 0) ])
+    assert_equal(p.is_halfmanhattan?, true)
+    assert_equal(p.is_rectilinear?, true)
+
   end
 
   # Polygon parametrized edge iterator
@@ -367,6 +392,7 @@ class DBPolygon_TestClass < TestBase
     assert_equal(p.to_s, "()")
     assert_equal(p.is_empty?, true)
     assert_equal(p.is_rectilinear?, false)
+    assert_equal(p.is_halfmanhattan?, false)
     
     pts = [ RBA::Point::new(0, 0) ]
     p = RBA::Polygon::new(pts)

@@ -1474,7 +1474,7 @@ GuiApplication::start_recording ()
 lay::Dispatcher *
 GuiApplication::dispatcher () const
 {
-  return mp_mw->dispatcher ();
+  return mp_mw ? mp_mw->dispatcher () : 0;
 }
 
 void

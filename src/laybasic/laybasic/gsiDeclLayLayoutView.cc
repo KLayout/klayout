@@ -821,17 +821,17 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "selection. Calling this method is useful to ensure there are no potential interactions with the script's "
     "functionality.\n"
   ) +
-  gsi::method ("clear_selection", &lay::LayoutView::clear_selection,
+  gsi::method ("clear_selection", (void (lay::LayoutView::*)()) &lay::LayoutView::clear_selection,
     "@brief Clears the selection of all objects (shapes, annotations, images ...)\n"
     "\n"
     "This method has been introduced in version 0.26.2\n"
   ) +
-  gsi::method ("clear_transient_selection", &lay::LayoutView::clear_transient_selection,
+  gsi::method ("clear_transient_selection", (void (lay::LayoutView::*)()) &lay::LayoutView::clear_transient_selection,
     "@brief Clears the transient selection (mouse-over hightlights) of all objects (shapes, annotations, images ...)\n"
     "\n"
     "This method has been introduced in version 0.26.2\n"
   ) +
-  gsi::method ("transient_to_selection", &lay::LayoutView::transient_to_selection,
+  gsi::method ("transient_to_selection", (void (lay::LayoutView::*)()) &lay::LayoutView::transient_to_selection,
     "@brief Turns the transient selection into the actual selection\n"
     "\n"
     "The current selection is cleared before. All highlighted objects under the mouse will become selected. "
@@ -839,7 +839,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been introduced in version 0.26.2\n"
   ) +
-  gsi::method ("selection_bbox", &lay::LayoutView::selection_bbox,
+  gsi::method ("selection_bbox", (db::DBox (lay::LayoutView::*)()) &lay::LayoutView::selection_bbox,
     "@brief Returns the bounding box of the current selection\n"
     "\n"
     "This method has been introduced in version 0.26.2\n"

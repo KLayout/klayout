@@ -37,6 +37,8 @@ class QToolButton;
 class QLabel;
 class QToolButton;
 class QGridLayout;
+class QListView;
+class QFrame;
 
 namespace tl
 {
@@ -60,6 +62,8 @@ public:
   void add_widget (QWidget *widget);
   void remove_widget ();
   QWidget *get_widget () const;
+  void set_full_width (bool fw);
+  bool full_width () const;
 
   QSize sizeHint () const;
 
@@ -75,6 +79,12 @@ private:
   QToolButton *mp_cancel_button;
   ProgressReporter *mp_pr;
   lay::LogFile m_log_file;
+  QFrame *mp_log_frame;
+  bool m_full_width;
+  int m_left_col, m_right_col;
+  bool m_log_visible;
+
+  void set_log_visible (bool f);
 };
 
 }

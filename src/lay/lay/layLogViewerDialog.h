@@ -192,6 +192,18 @@ public slots:
     return m_log_receiver;
   }
 
+  /**
+   *  @brief Sets the maximum number of entries to show
+   *
+   *  Setting this value to 0 basically disables the log collection
+   */
+  void set_max_entries (size_t n);
+
+  /**
+   *  @brief Gets the maximum number of entries to show
+   */
+  size_t max_entries () const;
+
 private slots:
   void timeout ();
 

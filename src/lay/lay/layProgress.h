@@ -68,16 +68,9 @@ public:
   virtual void yield (tl::Progress *progress);
   virtual bool eventFilter (QObject *dest, QEvent *event);
 
-  void signal_break ();
   void set_progress_bar (lay::ProgressBar *pb);
 
-  bool is_busy () const
-  {
-    return !mp_objects.empty ();
-  }
-
 private:
-  tl::list<tl::Progress> mp_objects;
   tl::Clock m_start_time;
   lay::ProgressBar *mp_pb;
   bool m_pw_visible;

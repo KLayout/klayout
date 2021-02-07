@@ -201,25 +201,6 @@ Class<tl::Timer> decl_Timer ("tl", "Timer",
 // ----------------------------------------------------------------
 //  Progress reporter objects
 
-namespace tl {
-
-  template <> struct type_traits<tl::Progress> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::false_tag has_default_constructor;
-  };
-
-  template <> struct type_traits<tl::RelativeProgress> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::false_tag has_default_constructor;
-  };
-
-  template <> struct type_traits<tl::AbsoluteProgress> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::false_tag has_default_constructor;
-  };
-
-}
-
 namespace gsi 
 {
   
@@ -245,6 +226,27 @@ Class<tl::Progress> decl_Progress ("tl", "Progress",
   "Actual implementations of the progress reporter class are \\RelativeProgress and \\AbsoluteProgress.\n"
   "\n"
   "This class has been introduced in version 0.23.\n"
+);
+
+static tl::AbstractProgress *abstract_progress (const std::string &desc)
+{
+  return new tl::AbstractProgress (desc);
+}
+
+Class<tl::AbstractProgress> decl_AbstractProgress (decl_Progress, "tl", "AbstractProgress",
+  gsi::constructor ("new", &abstract_progress, gsi::arg ("desc"),
+    "@brief Creates an abstract progress reporter with the given description\n"
+  ),
+  "@brief The abstract progress reporter\n"
+  "\n"
+  "The abstract progress reporter acts as a 'bracket' for a sequence of operations which are connected "
+  "logically. For example, a DRC script consists of multiple operations. An abstract progress reportert "
+  "is instantiated during the run time of the DRC script. This way, the application leaves the UI open while "
+  "the DRC executes and log messages can be collected.\n"
+  "\n"
+  "The abstract progress does not have a value.\n"
+  "\n"
+  "This class has been introduced in version 0.27.\n"
 );
 
 static tl::RelativeProgress *rel_progress_2 (const std::string &desc, size_t max)

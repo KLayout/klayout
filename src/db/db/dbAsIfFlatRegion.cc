@@ -403,6 +403,8 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse, 
 
   db::local_processor<db::Polygon, db::Edge, db::Polygon> proc;
   proc.set_base_verbosity (base_verbosity ());
+  proc.set_description (progress_desc ());
+  proc.set_report_progress (report_progress ());
 
   std::vector<generic_shape_iterator<db::Edge> > others;
   others.push_back (counting ? other.begin_merged () : other.begin ());
@@ -479,6 +481,8 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse, 
 
   db::local_processor<db::Polygon, db::Text, db::Polygon> proc;
   proc.set_base_verbosity (base_verbosity ());
+  proc.set_description (progress_desc ());
+  proc.set_report_progress (report_progress ());
 
   std::vector<generic_shape_iterator<db::Text> > others;
   others.push_back (other.begin ());
@@ -564,6 +568,8 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
 
   db::local_processor<db::Polygon, db::Polygon, db::Polygon> proc;
   proc.set_base_verbosity (base_verbosity ());
+  proc.set_description (progress_desc ());
+  proc.set_report_progress (report_progress ());
 
   std::vector<generic_shape_iterator<db::Polygon> > others;
   others.push_back ((mode < 0 || counting) ? other.begin_merged () : other.begin ());
@@ -702,6 +708,8 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
 
   db::local_processor<db::Polygon, db::Edge, db::Edge> proc;
   proc.set_base_verbosity (base_verbosity ());
+  proc.set_description (progress_desc ());
+  proc.set_report_progress (report_progress ());
 
   std::vector<generic_shape_iterator<db::Edge> > others;
   others.push_back (other.begin_merged ());
@@ -752,6 +760,8 @@ AsIfFlatRegion::pull_generic (const Texts &other) const
 
   db::local_processor<db::Polygon, db::Text, db::Text> proc;
   proc.set_base_verbosity (base_verbosity ());
+  proc.set_description (progress_desc ());
+  proc.set_report_progress (report_progress ());
 
   std::vector<generic_shape_iterator<db::Text> > others;
   others.push_back (other.begin ());
@@ -807,6 +817,8 @@ AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) cons
 
   db::local_processor<db::Polygon, db::Polygon, db::Polygon> proc;
   proc.set_base_verbosity (base_verbosity ());
+  proc.set_description (progress_desc ());
+  proc.set_report_progress (report_progress ());
 
   std::vector<generic_shape_iterator<db::Polygon> > others;
   others.push_back (other.begin_merged ());
@@ -1170,6 +1182,8 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
 
   db::local_processor<db::Polygon, db::Polygon, db::EdgePair> proc;
   proc.set_base_verbosity (base_verbosity ());
+  proc.set_description (progress_desc ());
+  proc.set_report_progress (report_progress ());
 
   std::vector<generic_shape_iterator<db::Polygon> > others;
   std::vector<bool> foreign;

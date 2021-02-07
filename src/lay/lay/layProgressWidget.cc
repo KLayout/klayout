@@ -26,6 +26,7 @@
 #include <QFrame>
 #include <QGridLayout>
 #include <QLabel>
+#include <QListView>
 
 #include <math.h>
 
@@ -136,13 +137,17 @@ ProgressBarWidget::resizeEvent (QResizeEvent *)
 
 ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool full_width)
   : QFrame (parent),
-    mp_widget (0), mp_pr (pr)
+    mp_widget (0), mp_pr (pr), m_log_file (6, true)
 {
   QVBoxLayout *top_layout = new QVBoxLayout (this);
   top_layout->addStretch (1);
 
   QFrame *bar_frame = new QFrame (this);
   top_layout->addWidget (bar_frame);
+
+  QListView *log_list = new QListView (this);
+  log_list->setModel (&m_log_file);
+  top_layout->addWidget (log_list);
 
   top_layout->addStretch (1);
 

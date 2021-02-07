@@ -31,6 +31,7 @@
 #include <QHBoxLayout>
 
 #include "layProgress.h"
+#include "layLogViewerDialog.h"
 
 class QToolButton;
 class QLabel;
@@ -73,6 +74,7 @@ private:
   QGridLayout *mp_layout;
   QToolButton *mp_cancel_button;
   ProgressReporter *mp_pr;
+  lay::LogFile m_log_file;
 };
 
 }

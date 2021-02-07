@@ -1331,6 +1331,8 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "end_changes, in particular when it is possible to put a layout object into an invalid state temporarily.\n\n"
     "While the layout is under construction \\update can be called to update the internal state explicitly if required.\n"
     "This for example might be necessary to update the cell bounding boxes or to redo the sorting for region queries.\n"
+    "\n"
+    "For further discussion of this mode, see @<a href=\"/about/layouts_under_construction.xml\">Editable and non-editable layouts@</a>.\n"
   ) +
   gsi::method ("end_changes", &db::Layout::end_changes,
     "@brief Cancels the \"in changes\" state (see \"start_changes\")\n"

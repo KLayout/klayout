@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Layouts "under construction"</title>
+
+  <p>
+  Layout objects hold primary information such as cells, shapeso and instances.
+  The also keep secondary information
+  they can derive from the basic data: bounding boxes, child cells, parent cells. There are also 
+  quad trees which speed up region lookups (search for objects inside a rectangular regions).
+  Secondary information needs to be updated on every change of the basic data.
+  This update may be time consuming and under certain conditions this may happen more
+  often than desired. 
+  </p>
+
+  <p>
+  This code for example is supposed to copy the bounding box of a cell into a
+  new layer:
+  </p>
+
+  <pre>
+# ly is a Layout, bbox_layer an layer index:
+for c in ly.each_cell():
+  c.shapes(bbox_layer).insert(c.bbox())
+</pre>
+
+  <p>
+  This loop executes in 0.3 s for 1000 cells, but takes 50 seconds for 10000 cells. This is 
+  a typical O(2) complexity and the time required for the loop will quickly grow with the
+  number of cells.
+  </p>
+
+  <p>
+  The reason behind this behaviour is the update step: after changing a single cell's 
+  shape collections, the bounding boxes need to be re-evaluated. So the loop basically
+  consists of two steps: insert of a shape and the re-evaluation of the bounding boxes.
+  Even though the bounding box re-evaluation isn't expensive for a single cell, simply
+  checking every cell for a change will consume time which is proportional to the
+  number of cells. As this is done for every cell, the complexity will become proportional
+  to the square of the number of cells.
+  </p>
+
+  <p>
+  To mitigate this, you can freeze the bounding boxes before the loop starts.
+  We don't need the bounding boxes to reflect the change by the shape insert.
+  First because it simply isn't changed and second because we only change a single
+  cell after we have obtained it's bounding box. 
+  </p>
+
+  <p>
+  To enter this "frozen bounding box mode", use <class_doc href="Layout#start_changes"/>.
+  After that you should make sure to release this mode using <class_doc href="Layout#end_changes"/>.
+  After "start_changes", the layout is in "under_construction" mode and bounding boxes will
+  not be updated among other information which is expensive to obtain. The sample code 
+  using this technique is this:
+  </p>
+
+  <pre>
+ly.start_changes()
+for c in ly.each_cell():
+  c.shapes(bbox_layer).insert(c.bbox())
+ly.end_changes()
+</pre>
+
+  <p>
+  To make sure, "end_changes" is always called - even in case of an exception between "start_changes" and "end_changes" - you can use 
+  a "try .. finally" block. In Ruby, that is the "begin .. ensure" equivalent:
+  </p>
+
+  <pre>
+# Python
+ly.start_changes()
+try:
+  for c in ly.each_cell():
+    c.shapes(bbox_layer).insert(c.bbox())
+finally:
+  ly.end_changes()
+</pre>
+
+  <pre>
+# Ruby
+ly.start_changes
+begin
+  ly.each_cell do |c|
+    c.shapes(bbox_layer).insert(c.bbox)
+  end
+ensure
+  ly.end_changes
+end
+</pre>
+
+  <p>
+  With this modification the above loop executes in 18 ms for 1000 cells and 180 ms for 10000 cells. 
+  So it scales nicely with the number of cells and provides a 277x performance improvement for the 10000 cell case.
+  </p>
+  
+  <p>
+  "start_changes" and "end_changes" add up, i.e. when you call "start_changes" two times, you'll also need to 
+  call "end_changes" two times before leaving "under_construction" mode.
+  Upon leaving this mode, the layout will automatically update its data to be prepared for further
+  actions.
+  </p>
+
+  <p>
+  You can check if a layout is under construction using <class_doc href="Layout#is_under_construction?"/>. 
+  You can use <class_doc href="Layout#update"/> to force an update of the layout's data while in "under_construction" mode.
+  </p>
+
+  <h3>Restrictions in "under_construction" mode</h3>
+
+  <p>
+  While under construction, a layout is subject to certain restrictions:
+  </p>
+
+  <ul>
+    <li>Bounding boxes of cells and shape collections are not updated</li>
+    <li>Region queries will be performed using the initial lookup trees (e.g <class_doc href="Shapes#begin_touching"/>)</li>
+    <li>Parent-child relations of cells may be invalid (e.g. <class_doc href="Cell#child_cells"/>)</li>
+  </ul>
+
+  <p>
+  In general, the data will reflect the initial status before the "under construction"
+  mode is entered. There is a specific risk connected with the erasing of 
+  objects during "under construction" mode: as some references may still point
+  to objects already erased, access to such objects may result in an application
+  crash. So be careful when erasing objects while in "under construction" mode.
+  A safe strategy in general is to first collect objects to be erased and then
+  delete them in a second loop hence avoiding using information outdated by the "erase".
+  </p>
+
+</doc>
+

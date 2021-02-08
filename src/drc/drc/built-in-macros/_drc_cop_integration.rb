@@ -954,6 +954,19 @@ CODE
     end
     
     # %DRC%
+    # @name with_holes
+    # @brief Selects all input polygons according to their number of holes in DRC expressions
+    # @synopsis with_holes (in condition)
+    #
+    # "with_holes" represents a polygon selector for
+    # \DRC# expressions selecting polygons of the primary by their number of holes
+    # (see \Layer#drc and \DRC#with_holes for more details).
+
+    def with_holes
+      primary.with_holes
+    end
+    
+    # %DRC%
     # @name enclosing
     # @brief Performs an enclosing check
     # @synopsis enclosing(other [, options ]) (in conditions)

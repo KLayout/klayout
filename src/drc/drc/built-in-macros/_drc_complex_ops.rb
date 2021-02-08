@@ -71,6 +71,7 @@ module DRC
 # @li \global#space @/li
 # @li \global#squares @/li
 # @li \global#width @/li
+# @li \global#with_holes @/li
 # @/ul
 # 
 # The following documentation will list the methods available for DRC expression objects.
@@ -434,7 +435,7 @@ CODE
   # result. Without "if_any" three corners are returned for each triangle.
   
   def count
-    DRCOpNodeCountFilter::new(@engine, self)
+    DRCOpNodeCountFilter::new(@engine, self, :new_count_filter, "count")
   end
   
   # %DRC%
@@ -1004,6 +1005,24 @@ CODE
   end
   
   # %DRC%
+  # @name with_holes
+  # @brief Selects all input polygons with the specified number of holes
+  # @synopsis expression.with_holes (in condition)
+  #
+  # This operation can be used as a plain function in which case it acts on primary
+  # shapes or can be used as method on another DRC expression.
+  # The following example selects all polygons with more than 2 holes:
+  #
+  # @code
+  # out = in.drc(with_holes > 2)
+  # out = in.drc(primary.with_holes > 2)   # equivalent
+  # @/code
+  
+  def with_holes
+    return DRCOpNodeCountFilter::new(@engine, self, :new_hole_count_filter, "with_holes")
+  end
+  
+  # %DRC%
   # @name merged
   # @brief Returns the merged input polygons, optionally selecting multi-overlap
   # @synopsis expression.merged
@@ -1552,16 +1571,19 @@ class DRCOpNodeCountFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
   attr_accessor :inverse
+  attr_accessor :method
+  attr_accessor :name
   
-  def initialize(engine, input)
+  def initialize(engine, input, method, name)
     super(engine)
     self.input = input
     self.inverse = false
-    self.description = "count"
+    self.description = name
+    self.method = method
   end
 
   def _description_for_dump
-    self.inverse ? "count" : "not_count"
+    self.inverse ? name : "not_" + name
   end
   
   def do_create_node(cache)
@@ -1570,7 +1592,7 @@ class DRCOpNodeCountFilter < DRCOpNodeWithCompare
     if self.lt || self.le
       args << (self.lt ? @engine._make_numeric_value(self.lt) : @engine._make_numeric_value(self.le) + 1)
     end
-    RBA::CompoundRegionOperationNode::new_count_filter(*args)
+    RBA::CompoundRegionOperationNode::send(self.method, *args)
   end
 
   def inverted

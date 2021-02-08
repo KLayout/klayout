@@ -615,6 +615,34 @@ RectilinearFilter::vars () const
 }
 
 // -------------------------------------------------------------------------------------
+//  HoleCountFilter implementation
+
+HoleCountFilter::HoleCountFilter (size_t min_count, size_t max_count, bool inverse)
+  : m_min_count (min_count), m_max_count (max_count), m_inverse (inverse)
+{
+  //  .. nothing yet ..
+}
+
+bool
+HoleCountFilter::selected (const db::Polygon &poly) const
+{
+  bool ok = poly.holes () < m_max_count && poly.holes () >= m_min_count;
+  return ok != m_inverse;
+}
+
+bool
+HoleCountFilter::selected (const db::PolygonRef &poly) const
+{
+  bool ok = poly.obj ().holes () < m_max_count && poly.obj ().holes () >= m_min_count;
+  return ok != m_inverse;
+}
+
+const TransformationReducer *HoleCountFilter::vars () const
+{
+  return 0;
+}
+
+// -------------------------------------------------------------------------------------
 //  RectilinearFilter implementation
 
 RectangleFilter::RectangleFilter (bool is_square, bool inverse)

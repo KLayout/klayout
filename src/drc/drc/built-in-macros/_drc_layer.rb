@@ -488,7 +488,7 @@ CODE
     #
     # This method is available for polygon layers only.
     
-    %w(bbox_height bbox_max bbox_min bbox_width perimeter).each do |f|
+    %w(bbox_height bbox_max bbox_min bbox_width perimeter holes).each do |f|
       [true, false].each do |inv|
         mn = (inv ? "without" : "with") + "_" + f
         eval <<"CODE"
@@ -506,6 +506,61 @@ CODE
               end
             elsif args.size == 2
               DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_value_with_nil(args[0]), @engine._make_value_with_nil(args[1]), #{inv.inspect}))
+            else
+              raise("Invalid number of arguments (1 or 2 expected)")
+            end
+
+          end
+
+        end
+CODE
+      end
+    end
+    
+    # %DRC%
+    # @name with_holes
+    # @brief Selects all polygons with the specified number of holes 
+    # @synopsis layer.with_holes(count)
+    # @synopsis layer.with_holes(min_count, max_count)
+    # @synopsis layer.with_holes(min_count .. max_count)
+    #
+    # This method is available for polygon layers. It will select all polygons from the input layer
+    # which have the specified number of holes.
+
+    # %DRC%
+    # @name without_holes
+    # @brief Selects all polygons with the specified number of holes 
+    # @synopsis layer.without_holes(count)
+    # @synopsis layer.without_holes(min_count, max_count)
+    # @synopsis layer.without_holes(min_count .. max_count)
+    #
+    # This method is available for polygon layers. It will select all polygons from the input layer
+    # which do not have the specified number of holes.
+
+    %w(holes).each do |f|
+      [true, false].each do |inv|
+        mn = (inv ? "without" : "with") + "_" + f
+        eval <<"CODE"
+        def #{mn}(*args)
+
+          @engine._context("#{mn}") do
+
+            requires_region
+            if args.size == 1
+              a = args[0]
+              if a.is_a?(Range)
+                min = @engine._make_numeric_value_with_nil(a.begin)
+                max = @engine._make_numeric_value_with_nil(a.end)
+                max && (max += 1)
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, min, max, #{inv.inspect}))
+              else
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, @engine._make_value(a), #{inv.inspect}))
+              end
+            elsif args.size == 2
+              min = @engine._make_numeric_value_with_nil(args[0])
+              max = @engine._make_numeric_value_with_nil(args[1])
+              max && (max += 1)
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, min, max, #{inv.inspect}))
             else
               raise("Invalid number of arguments (1 or 2 expected)")
             end

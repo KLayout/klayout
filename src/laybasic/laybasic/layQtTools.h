@@ -76,6 +76,11 @@ LAYBASIC_PUBLIC void register_help_handler (QObject *object, const char *slot, c
  */
 LAYBASIC_PUBLIC void indicate_error (QWidget *le, const tl::Exception *ex);
 
+/**
+ *  @brief Configures a QLineEdit or other widget to indicate an error
+ */
+LAYBASIC_PUBLIC void indicate_error (QWidget *le, bool error);
+
 } // namespace lay
 
 #endif

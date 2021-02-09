@@ -163,18 +163,28 @@ restore_dialog_state (QWidget *dialog, const std::string &s, bool with_section_s
 void
 indicate_error (QWidget *le, const tl::Exception *ex)
 {
+  if (ex) {
+    indicate_error (le, true);
+    le->setToolTip (tl::to_qstring (ex->msg ()));
+  } else {
+    indicate_error (le, false);
+    le->setToolTip (QString ());
+  }
+}
+
+void
+indicate_error (QWidget *le, bool f)
+{
   //  by the way, update the foreground color of the cell edit box as well (red, if not valid)
   QPalette pl = le->palette ();
-  if (ex) {
+  if (f) {
     pl.setColor (QPalette::Active, QPalette::Text, Qt::red);
     pl.setColor (QPalette::Active, QPalette::Base, QColor (Qt::red).lighter (180));
-    le->setToolTip (tl::to_qstring (ex->msg ()));
   } else {
     QWidget *pw = dynamic_cast<QWidget *> (le->parent ());
     tl_assert (pw != 0);
     pl.setColor (QPalette::Active, QPalette::Text, pw->palette ().color (QPalette::Text));
     pl.setColor (QPalette::Active, QPalette::Base, pw->palette ().color (QPalette::Base));
-    le->setToolTip (QString ());
   }
   le->setPalette (pl);
 }

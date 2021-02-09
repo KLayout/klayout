@@ -134,7 +134,7 @@ PropertiesPage::get_points (db::DPoint &p1, db::DPoint &p2)
 
   try {
     tl::from_string (tl::to_string (x1->text ()), dx1);
-    lay::indicate_error (x1, 0);
+    lay::indicate_error (x1, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (x1, &ex);
     has_error = true;
@@ -142,7 +142,7 @@ PropertiesPage::get_points (db::DPoint &p1, db::DPoint &p2)
 
   try {
     tl::from_string (tl::to_string (x2->text ()), dx2);
-    lay::indicate_error (x2, 0);
+    lay::indicate_error (x2, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (x2, &ex);
     has_error = true;
@@ -150,7 +150,7 @@ PropertiesPage::get_points (db::DPoint &p1, db::DPoint &p2)
 
   try {
     tl::from_string (tl::to_string (y1->text ()), dy1);
-    lay::indicate_error (y1, 0);
+    lay::indicate_error (y1, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (y1, &ex);
     has_error = true;
@@ -158,7 +158,7 @@ PropertiesPage::get_points (db::DPoint &p1, db::DPoint &p2)
 
   try {
     tl::from_string (tl::to_string (y2->text ()), dy2);
-    lay::indicate_error (y2, 0);
+    lay::indicate_error (y2, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (y2, &ex);
     has_error = true;

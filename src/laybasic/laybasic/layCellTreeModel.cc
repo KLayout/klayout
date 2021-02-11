@@ -450,6 +450,8 @@ CellTreeModel::do_configure (db::Layout *layout, db::Library *library, lay::Layo
 
   } else {
 
+    emit layoutAboutToBeChanged ();
+
     //  Translate persistent indexes: translation happens according to the path given by
     //  a sequence of cell indexes.
 
@@ -511,9 +513,9 @@ CellTreeModel::do_configure (db::Layout *layout, db::Library *library, lay::Layo
 
     changePersistentIndexList (indexes, new_indexes);
 
-  }
+    emit layoutChanged ();
 
-  signal_data_changed ();
+  }
 
   //  TODO: harden against exceptions
   for (std::vector<lay::CellTreeItem *>::iterator t = old_toplevel_items.begin (); t != old_toplevel_items.end (); ++t) {
@@ -541,6 +543,7 @@ CellTreeModel::set_sorting (Sorting s)
 void
 CellTreeModel::signal_data_changed ()
 {
+  emit layoutAboutToBeChanged ();
   emit layoutChanged ();
 }
 
@@ -1043,7 +1046,22 @@ CellTreeModel::clear_locate ()
   m_current_index = m_selected_indexes.begin ();
   m_selected_indexes_set.clear ();
 
-  signal_data_changed ();
+  emit layoutAboutToBeChanged ();
+
+  if (m_filter_mode) {
+
+    QModelIndexList indexes = persistentIndexList ();
+
+    QModelIndexList new_indexes;
+    for (QModelIndexList::iterator i = indexes.begin (); i != indexes.end (); ++i) {
+      new_indexes.push_back (model_index ((CellTreeItem *) i->internalPointer ()));
+    }
+
+    changePersistentIndexList (indexes, new_indexes);
+
+  }
+
+  emit layoutChanged ();
 }
 
 QModelIndex
@@ -1141,20 +1159,21 @@ CellTreeModel::search_children (const tl::GlobPattern &pattern, CellTreeItem *it
 
       bool visible = false;
 
+      c->set_tree_index (std::numeric_limits<size_t>::max ());
       if (c->name_matches (pattern)) {
+        c->set_tree_index (ti);
         m_selected_indexes.push_back (model_index (c));
         visible = true;
       }
       if (search_children (pattern, c)) {
+        c->set_tree_index (ti);
         visible = true;
       }
 
       if (visible) {
-        c->set_tree_index (ti++);
+        ++ti;
         m_visible_cell_set.insert (c);
         any = true;
-      } else {
-        c->set_tree_index (std::numeric_limits<size_t>::max ());
       }
 
     }
@@ -1171,7 +1190,15 @@ CellTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive,
     return QModelIndex ();
   }
 
+  emit layoutAboutToBeChanged ();
+
   QModelIndexList indexes = persistentIndexList ();
+  std::vector<CellTreeItem *> persistent_index_cells;
+  persistent_index_cells.reserve (indexes.size ());
+
+  for (QModelIndexList::iterator i = indexes.begin (); i != indexes.end (); ++i) {
+    persistent_index_cells.push_back ((CellTreeItem *) i->internalPointer ());
+  }
 
   m_selected_indexes.clear ();
   m_visible_cell_set.clear ();
@@ -1187,19 +1214,20 @@ CellTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive,
 
     bool visible = false;
 
+    (*lc)->set_tree_index (std::numeric_limits<size_t>::max ());
     if ((*lc)->name_matches (p)) {
+      (*lc)->set_tree_index (ti);
       m_selected_indexes.push_back (model_index (*lc));
       visible = true;
     }
     if (! top_only && search_children (p, *lc)) {
+      (*lc)->set_tree_index (ti);
       visible = true;
     }
 
     if (visible) {
-      (*lc)->set_tree_index (ti++);
+      ++ti;
       m_visible_cell_set.insert (*lc);
-    } else {
-      (*lc)->set_tree_index (std::numeric_limits<size_t>::max ());
     }
 
   }
@@ -1215,10 +1243,9 @@ CellTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive,
 
     QModelIndexList new_indexes;
 
-    for (QModelIndexList::iterator i = indexes.begin (); i != indexes.end (); ++i) {
-      CellTreeItem *item = (CellTreeItem *) i->internalPointer ();
-      if (m_visible_cell_set.find (item) != m_visible_cell_set.end ()) {
-        new_indexes.push_back (model_index (item));
+    for (std::vector<CellTreeItem *>::const_iterator item = persistent_index_cells.begin (); item != persistent_index_cells.end (); ++item) {
+      if (m_visible_cell_set.find (*item) != m_visible_cell_set.end ()) {
+        new_indexes.push_back (model_index (*item));
       } else {
         new_indexes.push_back (QModelIndex ());
       }
@@ -1228,7 +1255,7 @@ CellTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive,
 
   }
 
-  signal_data_changed ();
+  emit layoutChanged ();
 
   //  make the first selected one current
 

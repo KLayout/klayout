@@ -240,10 +240,6 @@ public:
 
   /**
    *  @brief Signal to the owner of the model that the data has changed
-   *
-   *  Basically, this signal should be emitted by the model, if it knew that
-   *  something changed. However, in our current architecture, it does not. So we
-   *  need to tell the model that something has changed.
    */
   void signal_data_changed ();
 

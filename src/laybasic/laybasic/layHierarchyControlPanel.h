@@ -66,6 +66,7 @@ Q_OBJECT
 
 public:
   HCPCellTreeWidget (QWidget *parent, const char *name, QWidget *key_event_receiver);
+  ~HCPCellTreeWidget ();
 
 signals:
   void cell_clicked (const QModelIndex &);

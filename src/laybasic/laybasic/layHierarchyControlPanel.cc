@@ -79,6 +79,17 @@ HCPCellTreeWidget::HCPCellTreeWidget (QWidget *parent, const char *name, QWidget
   setObjectName (QString::fromUtf8 (name));
 }
 
+HCPCellTreeWidget::~HCPCellTreeWidget ()
+{
+  //  NOTE: this should not be required, but I got a strange crash on closing the app with Qt 5.12.8
+  //  after using changePersistentIndex inside the model when ~QTreeWidget tried to clean up it's
+  //  persistent indexes and only found a model which was deleted already.
+  QAbstractItemModel *m = model ();
+  if (m) {
+    setModel (0);
+    delete m;
+  }
+}
 
 bool
 HCPCellTreeWidget::event (QEvent *event)

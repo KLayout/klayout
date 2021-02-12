@@ -318,6 +318,7 @@ CellTreeModel::CellTreeModel (QWidget *parent, lay::LayoutView *view, int cv_ind
   m_flat = ((flags & Flat) != 0) && ((flags & TopCells) == 0);
   m_pad = ((flags & NoPadding) == 0);
   m_filter_mode = false;
+  m_is_filtered = false;
 
   mp_layout = & view->cellview (cv_index)->layout ();
   mp_library = 0;
@@ -877,13 +878,23 @@ CellTreeModel::rowCount (const QModelIndex &parent) const
     } else if (! item->is_valid ()) {
       //  for safety we return 0 children for invalid cells
       return 0;
-    } else if (m_filter_mode && ! m_visible_cell_set.empty ()) {
+    } else if (m_filter_mode && m_is_filtered) {
       return int (item->children_in (m_visible_cell_set));
     } else {
       return int (item->children ());
     }
   } else {
-    return int (m_toplevel.size ());
+    if (m_filter_mode && m_is_filtered) {
+      size_t n = 0;
+      for (std::vector <CellTreeItem *>::const_iterator i = m_toplevel.begin (); i != m_toplevel.end (); ++i) {
+        if (m_visible_cell_set.find (*i) != m_visible_cell_set.end ()) {
+          ++n;
+        }
+      }
+      return n;
+    } else {
+      return int (m_toplevel.size ());
+    }
   }
 }
 
@@ -899,13 +910,25 @@ CellTreeModel::index (int row, int column, const QModelIndex &parent) const
     } else if (! item->is_valid ()) {
       //  for safety we don't return valid child indexes for invalid cells
       return QModelIndex ();
-    } else if (m_filter_mode && ! m_visible_cell_set.empty ()) {
+    } else if (m_filter_mode && m_is_filtered) {
       return createIndex (row, column, item->child_in (m_visible_cell_set, row));
     } else {
       return createIndex (row, column, item->child (row));
     }
   } else if (row >= 0 && row < int (m_toplevel.size ())) {
-    return createIndex (row, column, m_toplevel [row]);
+    if (m_filter_mode && m_is_filtered) {
+      int n = row;
+      for (std::vector <CellTreeItem *>::const_iterator i = m_toplevel.begin (); i != m_toplevel.end (); ++i) {
+        if (m_visible_cell_set.find (*i) != m_visible_cell_set.end ()) {
+          if (n-- == 0) {
+            return createIndex (row, column, *i);
+          }
+        }
+      }
+      return QModelIndex ();
+    } else {
+      return createIndex (row, column, m_toplevel [row]);
+    }
   } else {
     return QModelIndex ();
   }
@@ -927,7 +950,7 @@ CellTreeModel::parent (const QModelIndex &index) const
 
   CellTreeItem *pitem = item->parent ();
   if (pitem) {
-    if (m_filter_mode && ! m_visible_cell_set.empty ()) {
+    if (m_filter_mode && m_is_filtered) {
       if (pitem->tree_index () == std::numeric_limits<size_t>::max ()) {
         //  WARNING: invisible item!
         return QModelIndex ();
@@ -967,7 +990,7 @@ CellTreeModel::model_index (CellTreeItem *item) const
 {
   if (mp_layout->under_construction () || (mp_layout->manager () && mp_layout->manager ()->transacting ())) {
     return QModelIndex ();
-  } else if (m_filter_mode && ! m_visible_cell_set.empty ()) {
+  } else if (m_filter_mode && m_is_filtered) {
     if (item->tree_index () == std::numeric_limits<size_t>::max ()) {
       //  WARNING: invisible item!
       return QModelIndex ();
@@ -1043,6 +1066,7 @@ CellTreeModel::clear_locate ()
 {
   m_selected_indexes.clear ();
   m_visible_cell_set.clear ();
+  m_is_filtered = false;
   m_current_index = m_selected_indexes.begin ();
   m_selected_indexes_set.clear ();
 
@@ -1202,6 +1226,7 @@ CellTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive,
 
   m_selected_indexes.clear ();
   m_visible_cell_set.clear ();
+  m_is_filtered = true;
 
   tl::GlobPattern p = tl::GlobPattern (std::string (name));
   p.set_case_sensitive (case_sensitive);
@@ -1220,7 +1245,7 @@ CellTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive,
       m_selected_indexes.push_back (model_index (*lc));
       visible = true;
     }
-    if (! top_only && search_children (p, *lc)) {
+    if (! top_only && ! m_flat && search_children (p, *lc)) {
       (*lc)->set_tree_index (ti);
       visible = true;
     }

@@ -300,7 +300,7 @@ private:
   QAction *mp_case_sensitive;
   QAction *mp_use_regular_expressions;
   QAction *mp_filter;
-  CellTreeModel *mp_search_model;
+  int m_search_index;
   QFrame *mp_search_frame;
   QCheckBox *mp_search_close_cb;
   QSplitter *mp_splitter;

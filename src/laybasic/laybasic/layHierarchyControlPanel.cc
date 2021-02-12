@@ -254,7 +254,7 @@ HierarchyControlPanel::HierarchyControlPanel (lay::LayoutView *view, QWidget *pa
   mp_search_close_cb->setMaximumSize (QSize (mp_search_close_cb->maximumSize ().width (), mp_search_close_cb->sizeHint ().height () - 4));
   connect (mp_search_close_cb, SIGNAL (clicked ()), this, SLOT (search_editing_finished ()));
 
-  mp_search_model = 0;
+  m_search_index = -1;
   mp_search_edit_box = new lay::DecoratedLineEdit (mp_search_frame);
   mp_search_edit_box->setObjectName (QString::fromUtf8 ("cellview_search_edit_box"));
   mp_search_edit_box->set_escape_signal_enabled (true);
@@ -420,20 +420,20 @@ HierarchyControlPanel::cm_cell_select ()
 void
 HierarchyControlPanel::search_triggered (const QString &t)
 {
-  mp_search_model = 0;
+  m_search_index = -1;
   lay::HCPCellTreeWidget *w = dynamic_cast<lay::HCPCellTreeWidget *> (sender ());
   if (w) {
     for (size_t i = 0; i < mp_cell_lists.size (); ++i) {
       if (mp_cell_lists [i] == w) {
         //  Switch the active list for split mode -> CAUTION: this may trigger a search_editing_finished call
         select_active (int (i));
-        mp_search_model = dynamic_cast<lay::CellTreeModel *> (w->model ());
+        m_search_index = int (i);
         break;
       }
     }
   }
 
-  if (mp_search_model) {
+  if (m_search_index >= 0) {
     mp_search_close_cb->setChecked (true);
     mp_search_frame->show ();
     mp_search_edit_box->setText (t);
@@ -447,26 +447,27 @@ HierarchyControlPanel::search_edited ()
 {
   bool filter_invalid = false;
 
-  mp_search_model->set_filter_mode (mp_filter->isChecked ());
-
   QString t = mp_search_edit_box->text ();
 
-  for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
-    if ((*v)->model () == mp_search_model) {
-      if (t.isEmpty ()) {
-        mp_search_model->clear_locate ();
-        (*v)->setCurrentIndex (QModelIndex ());
+  if (m_search_index >= 0 && m_search_index < int (mp_cell_lists.size ())) {
+
+    lay::CellTreeModel *search_model = dynamic_cast<lay::CellTreeModel *> (mp_cell_lists [m_search_index]->model ());
+
+    search_model->set_filter_mode (mp_filter->isChecked ());
+
+    if (t.isEmpty ()) {
+      search_model->clear_locate ();
+      mp_cell_lists [m_search_index]->setCurrentIndex (QModelIndex ());
+    } else {
+      QModelIndex found = search_model->locate (t.toUtf8 ().constData (), mp_use_regular_expressions->isChecked (), mp_case_sensitive->isChecked (), false);
+      mp_cell_lists [m_search_index]->setCurrentIndex (found);
+      if (found.isValid ()) {
+        mp_cell_lists [m_search_index]->scrollTo (found);
       } else {
-        QModelIndex found = mp_search_model->locate (t.toUtf8 ().constData (), mp_use_regular_expressions->isChecked (), mp_case_sensitive->isChecked (), false);
-        (*v)->setCurrentIndex (found);
-        if (found.isValid ()) {
-          (*v)->scrollTo (found);
-        } else {
-          filter_invalid = true;
-        }
+        filter_invalid = true;
       }
-      break;
     }
+
   }
 
   lay::indicate_error (mp_search_edit_box, filter_invalid);
@@ -474,15 +475,13 @@ HierarchyControlPanel::search_edited ()
 
 void
 HierarchyControlPanel::search_next ()
-{
-  for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
-    if ((*v)->model () == mp_search_model) {
-      QModelIndex found = mp_search_model->locate_next ((*v)->currentIndex ());
-      if (found.isValid ()) {
-        (*v)->setCurrentIndex (found);
-        (*v)->scrollTo (found);
-      }
-      break;
+{  
+  if (m_search_index >= 0 && m_search_index < int (mp_cell_lists.size ())) {
+    lay::CellTreeModel *search_model = dynamic_cast<lay::CellTreeModel *> (mp_cell_lists [m_search_index]->model ());
+    QModelIndex found = search_model->locate_next (mp_cell_lists [m_search_index]->currentIndex ());
+    if (found.isValid ()) {
+      mp_cell_lists [m_search_index]->setCurrentIndex (found);
+      mp_cell_lists [m_search_index]->scrollTo (found);
     }
   }
 }
@@ -490,14 +489,12 @@ HierarchyControlPanel::search_next ()
 void
 HierarchyControlPanel::search_prev ()
 {
-  for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
-    if ((*v)->model () == mp_search_model) {
-      QModelIndex found = mp_search_model->locate_prev ();
-      if (found.isValid ()) {
-        (*v)->setCurrentIndex (found);
-        (*v)->scrollTo (found);
-      }
-      break;
+  if (m_search_index >= 0 && m_search_index < int (mp_cell_lists.size ())) {
+    lay::CellTreeModel *search_model = dynamic_cast<lay::CellTreeModel *> (mp_cell_lists [m_search_index]->model ());
+    QModelIndex found = search_model->locate_prev ();
+    if (found.isValid ()) {
+      mp_cell_lists [m_search_index]->setCurrentIndex (found);
+      mp_cell_lists [m_search_index]->scrollTo (found);
     }
   }
 }
@@ -517,15 +514,12 @@ HierarchyControlPanel::search_editing_finished ()
   }
 
   //  give back the focus to the cell list
-  for (size_t i = 0; i < mp_cell_lists.size (); ++i) {
-    if (mp_cell_lists [i]->model () == mp_search_model) {
-      mp_cell_lists [i]->setFocus ();
-      break;
-    }
+  if (m_search_index >= 0 && m_search_index < int (mp_cell_lists.size ())) {
+    mp_cell_lists [m_search_index]->setFocus ();
   }
 
   mp_search_frame->hide ();
-  mp_search_model = 0;
+  m_search_index = -1;
 }
 
 void 
@@ -813,11 +807,12 @@ void
 HierarchyControlPanel::do_update_content (int cv_index)
 {
   //  close the search box since we will modify the model
-  if (mp_search_model) {
-    mp_search_model->clear_locate ();
+  if (m_search_index >= 0 && m_search_index < int (mp_cell_lists.size ())) {
+    lay::CellTreeModel *search_model = dynamic_cast<lay::CellTreeModel *> (mp_cell_lists [m_search_index]->model ());
+    search_model->clear_locate ();
   }
   mp_search_frame->hide ();
-  mp_search_model = 0;
+  m_search_index = -1;
 
   unsigned int imin = (cv_index < 0 ? 0 : (unsigned int) cv_index);
   unsigned int imax = (cv_index < 0 ? std::numeric_limits <unsigned int>::max () : (unsigned int) cv_index);

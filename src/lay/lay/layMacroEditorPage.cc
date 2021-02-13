@@ -475,7 +475,7 @@ void MacroEditorSidePanel::paintEvent (QPaintEvent *)
 //  MacroEditorPage implementation
 
 MacroEditorPage::MacroEditorPage (QWidget * /*parent*/, MacroEditorHighlighters *highlighters)
-  : mp_macro (0), mp_highlighters (highlighters), mp_highlighter (0), m_error_line (-1), m_ntab (8), m_nindent (2)
+  : mp_macro (0), mp_highlighters (highlighters), mp_highlighter (0), m_error_line (-1), m_ntab (8), m_nindent (2), m_ignore_cursor_changed_event (false)
 {
   QVBoxLayout *layout = new QVBoxLayout (this);
   
@@ -600,7 +600,12 @@ static bool valid_element (const SyntaxHighlighterElement &e)
 
 void MacroEditorPage::cursor_position_changed ()
 {
+  if (m_ignore_cursor_changed_event) {
+    return;
+  }
+
   QTextCursor cursor = mp_text->textCursor ();
+  m_edit_cursor = cursor;
 
   //  prepare a format for the bracket highlights
   QTextCharFormat fmt;
@@ -861,10 +866,22 @@ void MacroEditorPage::connect_macro (lym::Macro *macro)
   }
 }
 
+void
+MacroEditorPage::find_reset ()
+{
+  m_ignore_cursor_changed_event = true;
+  mp_text->setTextCursor (m_edit_cursor);
+  m_ignore_cursor_changed_event = false;
+}
+
 bool
 MacroEditorPage::find_prev ()
 {
   update_extra_selections ();
+
+  if (m_current_search == QRegExp ()) {
+    return false;
+  }
 
   QTextCursor c = mp_text->textCursor ();
 
@@ -891,7 +908,9 @@ MacroEditorPage::find_prev ()
       QTextCursor newc (b);
       newc.setPosition (i + b.position () + l);
       newc.setPosition (i + b.position (), QTextCursor::KeepAnchor);
+      m_ignore_cursor_changed_event = true;
       mp_text->setTextCursor (newc);
+      m_ignore_cursor_changed_event = false;
       return true;
     }
 
@@ -913,6 +932,10 @@ MacroEditorPage::find_next ()
 {
   update_extra_selections ();
 
+  if (m_current_search == QRegExp ()) {
+    return false;
+  }
+
   QTextCursor c = mp_text->textCursor ();
 
   bool first = true;
@@ -926,7 +949,9 @@ MacroEditorPage::find_next ()
       QTextCursor newc (b);
       newc.setPosition (i + b.position () + m_current_search.matchedLength ());
       newc.setPosition (i + b.position (), QTextCursor::KeepAnchor);
+      m_ignore_cursor_changed_event = true;
       mp_text->setTextCursor (newc);
+      m_ignore_cursor_changed_event = false;
       emit edit_trace (false);
       return true;
     }
@@ -1153,224 +1178,288 @@ MacroEditorPage::current_pos () const
 }
 
 bool
+MacroEditorPage::tab_key_pressed ()
+{
+  if (mp_text->isReadOnly ()) {
+    return false;
+  }
+
+  QTextBlock bs, be;
+  bool adjust_end = false;
+
+  bool indent = false;
+  if (mp_text->textCursor ().hasSelection ()) {
+    bs = mp_text->document ()->findBlock (mp_text->textCursor ().selectionStart ());
+    be = mp_text->document ()->findBlock (mp_text->textCursor ().selectionEnd ());
+    if (be != bs) {
+      indent = true;
+      QTextCursor se (mp_text->document ());
+      se.setPosition (mp_text->textCursor ().selectionEnd ());
+      if (se.atBlockStart ()) {
+        be = be.previous ();
+        adjust_end = true;
+      }
+    }
+  }
+
+  if (indent) {
+
+    //  tab out
+    QTextCursor c (mp_text->document ());
+    c.setPosition (bs.position ());
+    c.beginEditBlock ();
+
+    for (QTextBlock b = bs; ; b = b.next()) {
+
+      c.setPosition (b.position ());
+      QString text = b.text ();
+
+      bool has_tabs = false;
+      int p = 0;
+      int i = 0;
+      for (; i < text.length (); ++i) {
+        if (text [i] == QChar::fromLatin1 (' ')) {
+          ++p;
+        } else if (text [i] == QChar::fromLatin1 ('\t')) {
+          p = (p - p % m_ntab) + m_ntab;
+          has_tabs = true;
+        } else {
+          break;
+        }
+      }
+
+      if (has_tabs) {
+        for ( ; i > 0; --i) {
+          c.deleteChar ();
+        }
+        c.insertText (QString (m_nindent + p, QChar::fromLatin1 (' ')));
+      } else {
+        c.insertText (QString (m_nindent, QChar::fromLatin1 (' ')));
+      }
+
+      if (b == be) {
+        break;
+      }
+
+    }
+
+    c.endEditBlock ();
+
+    c.setPosition (bs.position ());
+    if (adjust_end) {
+      c.setPosition (be.next ().position (), QTextCursor::KeepAnchor);
+    } else {
+      c.setPosition (be.position () + be.text ().length (), QTextCursor::KeepAnchor);
+    }
+    mp_text->setTextCursor (c);
+
+  } else {
+
+    QTextCursor c = mp_text->textCursor ();
+    QString text = c.block ().text ();
+    int col = c.position () - c.block ().position ();
+
+    int p = 0;
+    for (int i = 0; i < text.length () && i < col; ++i) {
+      if (text [i] == QChar::fromLatin1 ('\t')) {
+        p = (p - p % m_ntab) + m_ntab;
+      } else {
+        ++p;
+      }
+    }
+
+    c.insertText (QString (m_nindent - p % m_nindent, QChar::fromLatin1 (' ')));
+    mp_text->setTextCursor (c);
+
+  }
+
+  return true;
+}
+
+bool
+MacroEditorPage::back_tab_key_pressed ()
+{
+  if (!mp_text->textCursor ().hasSelection () || mp_text->isReadOnly ()) {
+    return false;
+  }
+
+  //  tab in
+  QTextBlock bs = mp_text->document ()->findBlock (mp_text->textCursor ().selectionStart ());
+  QTextBlock be = mp_text->document ()->findBlock (mp_text->textCursor ().selectionEnd ());
+  bool adjust_end = false;
+  if (be != bs) {
+    QTextCursor se (mp_text->document ());
+    se.setPosition (mp_text->textCursor ().selectionEnd ());
+    if (se.atBlockStart ()) {
+      be = be.previous ();
+      adjust_end = true;
+    }
+  }
+
+  QTextCursor c (mp_text->document ());
+  c.setPosition (bs.position ());
+  c.beginEditBlock ();
+
+  for (QTextBlock b = bs; ; b = b.next()) {
+
+    c.setPosition (b.position ());
+    QString text = b.text ();
+    int n = m_nindent;
+    int p = 0;
+    for (int i = 0; i < text.length () && n > 0; ++i) {
+      if (text [i] == QChar::fromLatin1 (' ')) {
+        ++p;
+        --n;
+        c.deleteChar ();
+      } else if (text [i] == QChar::fromLatin1 ('\t')) {
+        c.deleteChar ();
+        int pp = p;
+        p = (p - p % m_ntab) + m_ntab;
+        if (p - pp >= n) {
+          if (p - pp > n) {
+            c.insertText (QString (p - pp - n, QChar::fromLatin1 (' ')));
+          }
+          n = 0;
+        } else {
+          n -= p - pp;
+        }
+      } else {
+        break;
+      }
+    }
+
+    if (b == be) {
+      break;
+    }
+
+  }
+
+  c.endEditBlock ();
+
+  c.setPosition (bs.position ());
+  if (adjust_end) {
+    c.setPosition (be.next ().position (), QTextCursor::KeepAnchor);
+  } else {
+    c.setPosition (be.position () + be.text ().length (), QTextCursor::KeepAnchor);
+  }
+  mp_text->setTextCursor (c);
+
+  return true;
+}
+
+bool
+MacroEditorPage::backspace_pressed ()
+{
+  if (mp_text->textCursor ().hasSelection () || mp_text->isReadOnly()) {
+    return false;
+  }
+
+  QTextCursor c = mp_text->textCursor ();
+  QString text = c.block ().text ();
+  int col = c.position () - c.block ().position ();
+  if (col > 0) {
+
+    int p = 0;
+    bool only_space_before = true;
+
+    for (int i = 0; i < text.length () && i < col; ++i) {
+      if (text [i] == QChar::fromLatin1 ('\t')) {
+        p = (p - p % m_ntab) + m_ntab;
+      } else if (text [i] == QChar::fromLatin1 (' ')) {
+        ++p;
+      } else {
+        only_space_before = false;
+      }
+    }
+
+    if (only_space_before) {
+
+      for (int i = 0; i < col; ++i) {
+        c.deletePreviousChar ();
+      }
+
+      c.insertText (QString (std::max (0, ((p - 1) / m_nindent) * m_nindent), QChar::fromLatin1 (' ')));
+      mp_text->setTextCursor (c);
+
+      return true;
+
+    }
+
+  }
+
+  return false;
+}
+
+bool
+MacroEditorPage::return_pressed ()
+{
+  if (mp_text->isReadOnly ()) {
+    return false;
+  }
+
+  //  Implement auto-indent on return
+
+  QTextCursor c = mp_text->textCursor ();
+  QTextBlock b = c.block ();
+
+  c.insertBlock ();
+
+  QString l;
+  if (b.isValid ()) {
+    QString text = b.text ();
+    for (int i = 0; i < text.length (); ++i) {
+      if (text [i] == QChar::fromLatin1 ('\t') || text [i] == QChar::fromLatin1 (' ')) {
+        l += text [i];
+      } else {
+        break;
+      }
+    }
+  }
+
+  c.insertText (l);
+  mp_text->setTextCursor (c);
+
+  return true;
+}
+
+bool
 MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
 {
   if (watched == mp_text) {
 
-    if (event->type () == QEvent::KeyPress) {
+    if (event->type () == QEvent::ShortcutOverride) {
+
+      //  override shortcuts
+      event->accept ();
+      return true;
+
+    } else if (event->type () == QEvent::KeyPress) {
 
       m_error_line = -1;
       mp_text->setExtraSelections (QList<QTextEdit::ExtraSelection> ());
 
       QKeyEvent *ke = dynamic_cast<QKeyEvent *> (event);
-      if (ke && ke->key () == Qt::Key_Tab && (ke->modifiers () & Qt::ShiftModifier) == 0) {
+      if (! ke) {
+        return false;  //  should not happen
+      }
 
-        if (!mp_text->isReadOnly ()) {
+      if (ke->key () == Qt::Key_Tab && (ke->modifiers () & Qt::ShiftModifier) == 0) {
 
-          QTextBlock bs, be;
-          bool adjust_end = false;
+        return tab_key_pressed ();
 
-          bool indent = false;
-          if (mp_text->textCursor ().hasSelection ()) {
-            bs = mp_text->document ()->findBlock (mp_text->textCursor ().selectionStart ());
-            be = mp_text->document ()->findBlock (mp_text->textCursor ().selectionEnd ());
-            if (be != bs) {
-              indent = true;
-              QTextCursor se (mp_text->document ());
-              se.setPosition (mp_text->textCursor ().selectionEnd ());
-              if (se.atBlockStart ()) {
-                be = be.previous ();
-                adjust_end = true;
-              }
-            }
-          }
+      } else if ((ke->key () == Qt::Key_Backtab || (ke->key () == Qt::Key_Tab && (ke->modifiers () & Qt::ShiftModifier) != 0))) {
 
-          if (indent) {
+        return back_tab_key_pressed ();
 
-            //  tab out
-            QTextCursor c (mp_text->document ());
-            c.setPosition (bs.position ());
-            c.beginEditBlock ();
+      } else if (ke->key () == Qt::Key_Backspace) {
 
-            for (QTextBlock b = bs; ; b = b.next()) {
+        return backspace_pressed ();
 
-              c.setPosition (b.position ());
-              QString text = b.text ();
+      } else if (ke->key () == Qt::Key_Escape) {
 
-              bool has_tabs = false;
-              int p = 0;
-              int i = 0;
-              for (; i < text.length (); ++i) {
-                if (text [i] == QChar::fromLatin1 (' ')) {
-                  ++p;
-                } else if (text [i] == QChar::fromLatin1 ('\t')) {
-                  p = (p - p % m_ntab) + m_ntab;
-                  has_tabs = true;
-                } else {
-                  break;
-                }
-              }
+        //  Handle Esc to return to the before-find position and clear the selection
 
-              if (has_tabs) {
-                for ( ; i > 0; --i) {
-                  c.deleteChar ();
-                }
-                c.insertText (QString (m_nindent + p, QChar::fromLatin1 (' ')));
-              } else {
-                c.insertText (QString (m_nindent, QChar::fromLatin1 (' ')));
-              }
-
-              if (b == be) {
-                break;
-              }
-
-            }
-
-            c.endEditBlock ();
-
-            c.setPosition (bs.position ());
-            if (adjust_end) {
-              c.setPosition (be.next ().position (), QTextCursor::KeepAnchor);
-            } else {
-              c.setPosition (be.position () + be.text ().length (), QTextCursor::KeepAnchor);
-            }
-            mp_text->setTextCursor (c);
-
-          } else {
-
-            QTextCursor c = mp_text->textCursor ();
-            QString text = c.block ().text ();
-            int col = c.position () - c.block ().position ();
-
-            int p = 0;
-            for (int i = 0; i < text.length () && i < col; ++i) {
-              if (text [i] == QChar::fromLatin1 ('\t')) {
-                p = (p - p % m_ntab) + m_ntab;
-              } else {
-                ++p;
-              }
-            }
-
-            c.insertText (QString (m_nindent - p % m_nindent, QChar::fromLatin1 (' ')));
-            mp_text->setTextCursor (c);
-
-          }
-
-        }
-
-        return true;
-
-      } else if (ke && (ke->key () == Qt::Key_Backtab || (ke->key () == Qt::Key_Tab && (ke->modifiers () & Qt::ShiftModifier) != 0))) {
-        
-        if (mp_text->textCursor ().hasSelection () && !mp_text->isReadOnly ()) {
-
-          //  tab in 
-          QTextBlock bs = mp_text->document ()->findBlock (mp_text->textCursor ().selectionStart ());
-          QTextBlock be = mp_text->document ()->findBlock (mp_text->textCursor ().selectionEnd ());
-          bool adjust_end = false;
-          if (be != bs) {
-            QTextCursor se (mp_text->document ());
-            se.setPosition (mp_text->textCursor ().selectionEnd ());
-            if (se.atBlockStart ()) {
-              be = be.previous ();
-              adjust_end = true;
-            }
-          }
-
-          QTextCursor c (mp_text->document ());
-          c.setPosition (bs.position ());
-          c.beginEditBlock ();
-
-          for (QTextBlock b = bs; ; b = b.next()) {
-
-            c.setPosition (b.position ());
-            QString text = b.text ();
-            int n = m_nindent;
-            int p = 0;
-            for (int i = 0; i < text.length () && n > 0; ++i) {
-              if (text [i] == QChar::fromLatin1 (' ')) {
-                ++p;
-                --n;
-                c.deleteChar ();
-              } else if (text [i] == QChar::fromLatin1 ('\t')) {
-                c.deleteChar ();
-                int pp = p;
-                p = (p - p % m_ntab) + m_ntab;
-                if (p - pp >= n) {
-                  if (p - pp > n) {
-                    c.insertText (QString (p - pp - n, QChar::fromLatin1 (' ')));
-                  }
-                  n = 0;
-                } else {
-                  n -= p - pp;
-                }
-              } else {
-                break;
-              }
-            }
-
-            if (b == be) {
-              break;
-            }
-
-          }
-
-          c.endEditBlock ();
-
-          c.setPosition (bs.position ());
-          if (adjust_end) {
-            c.setPosition (be.next ().position (), QTextCursor::KeepAnchor);
-          } else {
-            c.setPosition (be.position () + be.text ().length (), QTextCursor::KeepAnchor);
-          }
-          mp_text->setTextCursor (c);
-
-        }
-
-        return true;
-
-      } else if (ke && ke->key () == Qt::Key_Backspace) {
-
-        if (!mp_text->textCursor ().hasSelection () && !mp_text->isReadOnly()) {
-
-          QTextCursor c = mp_text->textCursor ();
-          QString text = c.block ().text ();
-          int col = c.position () - c.block ().position ();
-          if (col > 0) {
-
-            int p = 0;
-            bool only_space_before = true;
-
-            for (int i = 0; i < text.length () && i < col; ++i) {
-              if (text [i] == QChar::fromLatin1 ('\t')) {
-                p = (p - p % m_ntab) + m_ntab;
-              } else if (text [i] == QChar::fromLatin1 (' ')) {
-                ++p;
-              } else {
-                only_space_before = false;
-              }
-            }
-
-            if (only_space_before) {
-
-              for (int i = 0; i < col; ++i) {
-                c.deletePreviousChar ();
-              }
-
-              c.insertText (QString (std::max (0, ((p - 1) / m_nindent) * m_nindent), QChar::fromLatin1 (' ')));
-              mp_text->setTextCursor (c);
-
-              return true;
-
-            }
-
-          }
-
-        }
-
-      } else if (ke && ke->key () == Qt::Key_Escape) {
-
-        //  Handle Esc to clear the selection
+        find_reset ();
 
         QTextCursor c = mp_text->textCursor ();
         c.clearSelection ();
@@ -1378,37 +1467,11 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
 
         return true;
 
-      } else if (ke && ke->key () == Qt::Key_Return) {
+      } else if (ke->key () == Qt::Key_Return) {
 
-        if (!mp_text->isReadOnly ()) {
+        return return_pressed ();
 
-          //  Implement auto-indent on return
-
-          QTextCursor c = mp_text->textCursor ();
-          QTextBlock b = c.block ();
-
-          c.insertBlock ();
-
-          QString l;
-          if (b.isValid ()) {
-            QString text = b.text ();
-            for (int i = 0; i < text.length (); ++i) {
-              if (text [i] == QChar::fromLatin1 ('\t') || text [i] == QChar::fromLatin1 (' ')) {
-                l += text [i];
-              } else {
-                break;
-              }
-            }
-          }
-
-          c.insertText (l);
-          mp_text->setTextCursor (c);
-
-          return true;
-
-        }
-
-      } else if (ke && ke->key () == Qt::Key_F1) {
+      } else if (ke->key () == Qt::Key_F1) {
 
         QTextCursor c = mp_text->textCursor ();
         if (c.selectionStart () == c.selectionEnd ()) {
@@ -1418,7 +1481,14 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
 
         return true;
 
-      } else if (ke && ke->key () == Qt::Key_F3) {
+      } else if (ke->key () == Qt::Key_F && (ke->modifiers () & Qt::ControlModifier) != 0) {
+
+        QTextCursor c = mp_text->textCursor ();
+        emit search_requested (c.selectedText ());
+
+        return true;
+
+      } else if (ke->key () == Qt::Key_F3) {
 
         //  Jump to the next occurence of the search string
 

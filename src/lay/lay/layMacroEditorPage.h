@@ -254,8 +254,8 @@ public:
     return m_current_search;
   }
 
+  void find_reset ();
   bool find_next ();
-
   bool find_prev ();
 
   void replace_and_find_next (const QString &replace);
@@ -268,6 +268,7 @@ public:
 
 signals:
   void help_requested (const QString &s);
+  void search_requested (const QString &s);
   void edit_trace (bool);
 
 public slots:
@@ -294,8 +295,15 @@ private:
   int m_ntab, m_nindent;
   std::set<QTextBlock> m_breakpoints;
   QRegExp m_current_search;
+  QTextCursor m_edit_cursor;
+  bool m_ignore_cursor_changed_event;
 
   void update_extra_selections ();
+  bool return_pressed ();
+  bool backspace_pressed ();
+  bool back_tab_key_pressed ();
+  bool tab_key_pressed ();
+
   bool eventFilter (QObject *watched, QEvent *event);
 };
 

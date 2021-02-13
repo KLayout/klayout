@@ -209,12 +209,16 @@ private slots:
   void commit ();
   void stack_element_double_clicked (QListWidgetItem *item);
   void search_edited ();
+  void search_editing ();
+  void search_finished ();
   void tab_close_requested (int);
   void replace_mode_button_clicked ();
   void replace_next_button_clicked ();
   void replace_all_button_clicked ();
   void find_next_button_clicked ();
+  void find_prev_button_clicked ();
   void help_requested (const QString &s);
+  void search_requested (const QString &s);
   void macro_changed (lym::Macro *macro);
   void macro_deleted (lym::Macro *macro);
   void macro_collection_deleted (lym::MacroCollection *collection);
@@ -288,6 +292,7 @@ private:
   void update_watches ();
   lym::Macro *new_macro ();
   void do_search_edited ();
+  void set_editor_focus ();
   void select_trace (size_t index);
   bool configure (const std::string &name, const std::string &value);
   void config_finalize ();

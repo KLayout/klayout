@@ -45,6 +45,9 @@ typedef QTextEdit TextEditWidget;
 
 class QLabel;
 class QSyntaxHighlighter;
+class QTimer;
+class QWindow;
+class QListWidget;
 
 namespace lay
 {
@@ -281,6 +284,8 @@ protected slots:
   void breakpoints_changed ();
   void current_line_changed ();
   void run_mode_changed ();
+  void completer_timer ();
+  void hide_completer ();
 
 private:
   lym::Macro *mp_macro;
@@ -297,12 +302,17 @@ private:
   QRegExp m_current_search;
   QTextCursor m_edit_cursor;
   bool m_ignore_cursor_changed_event;
+  QTimer *mp_completer_timer;
+  QWidget *mp_completer_popup;
+  QListWidget *mp_completer_list;
 
   void update_extra_selections ();
   bool return_pressed ();
   bool backspace_pressed ();
   bool back_tab_key_pressed ();
   bool tab_key_pressed ();
+  void fill_completer_list ();
+  void complete ();
 
   bool eventFilter (QObject *watched, QEvent *event);
 };

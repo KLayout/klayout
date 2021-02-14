@@ -42,6 +42,10 @@
 #include <QChar>
 #include <QResource>
 #include <QBuffer>
+#include <QTimer>
+#include <QWindow>
+#include <QListWidget>
+#include <QApplication>
 
 namespace lay
 {
@@ -499,11 +503,26 @@ MacroEditorPage::MacroEditorPage (QWidget * /*parent*/, MacroEditorHighlighters 
  
   connect (mp_text, SIGNAL (textChanged ()), this, SLOT (text_changed ()));
   connect (mp_text, SIGNAL (cursorPositionChanged ()), this, SLOT (cursor_position_changed ()));
+  connect (mp_text->horizontalScrollBar (), SIGNAL (valueChanged (int)), this, SLOT (hide_completer ()));
+  connect (mp_text->verticalScrollBar (), SIGNAL (valueChanged (int)), this, SLOT (hide_completer ()));
   connect (mp_exec_model, SIGNAL (breakpoints_changed ()), this, SLOT (breakpoints_changed ()));
   connect (mp_exec_model, SIGNAL (current_line_changed ()), this, SLOT (current_line_changed ()));
   connect (mp_exec_model, SIGNAL (run_mode_changed ()), this, SLOT (run_mode_changed ()));
 
   mp_text->installEventFilter (this);
+
+  mp_completer_popup = new QWidget (window (), Qt::ToolTip | Qt::WindowDoesNotAcceptFocus | Qt::WindowTransparentForInput);
+  mp_completer_popup->setWindowModality (Qt::NonModal);
+  QHBoxLayout *ly = new QHBoxLayout (mp_completer_popup);
+  ly->setMargin (0);
+  mp_completer_list = new QListWidget (mp_completer_popup);
+  ly->addWidget (mp_completer_list);
+  mp_completer_popup->hide ();
+
+  mp_completer_timer = new QTimer (this);
+  mp_completer_timer->setInterval (1000);
+  mp_completer_timer->setSingleShot (true);
+  connect (mp_completer_timer, SIGNAL (timeout ()), this, SLOT (completer_timer ()));
 }
 
 void MacroEditorPage::update ()
@@ -598,11 +617,106 @@ static bool valid_element (const SyntaxHighlighterElement &e)
   return e.basic_attribute_id != lay::dsComment && e.basic_attribute_id != lay::dsString;
 }
 
+void MacroEditorPage::complete ()
+{
+  QTextCursor c = mp_text->textCursor ();
+  if (c.selectionStart () != c.selectionEnd ()) {
+    return;
+  }
+
+  c.select (QTextCursor::WordUnderCursor);
+  if (mp_completer_list->currentItem ()) {
+    QString s = mp_completer_list->currentItem ()->text ();
+    c.insertText (s);
+  }
+}
+
+void MacroEditorPage::fill_completer_list ()
+{
+  QTextCursor c = mp_text->textCursor ();
+  if (c.selectionStart () != c.selectionEnd ()) {
+    return;
+  }
+
+  int pos = c.anchor ();
+  c.select (QTextCursor::WordUnderCursor);
+  int pos0 = c.selectionStart ();
+  if (pos0 >= pos) {
+    return;
+  }
+
+  QString s = c.selectedText ().mid (0, pos - pos0);
+
+  QString text = mp_text->toPlainText ();
+
+  std::set<QString> words;
+
+  int i = 0;
+  while (i >= 0) {
+    i = text.indexOf (s, i);
+    if (i >= 0) {
+      QString::iterator c = text.begin () + i;
+      QString w;
+      while (c->isLetterOrNumber () || c->toLatin1 () == '_') {
+        w += *c;
+        ++c;
+      }
+      if (! w.isEmpty () && w != s) {
+        words.insert (w);
+      }
+      ++i;
+    }
+  }
+
+  for (std::set<QString>::const_iterator w = words.begin (); w != words.end (); ++w) {
+    mp_completer_list->addItem (*w);
+  }
+}
+
+void MacroEditorPage::completer_timer ()
+{
+  if (! mp_text->hasFocus ()) {
+    return;
+  }
+
+  mp_completer_list->clear ();
+  fill_completer_list ();
+
+  if (mp_completer_list->count () > 0) {
+
+    mp_completer_list->setCurrentRow (0);
+
+    QTextCursor c = mp_text->textCursor ();
+    c.clearSelection ();
+    QRect r = mp_text->cursorRect (c);
+    QPoint pos = mp_text->mapToGlobal (r.bottomLeft ());
+
+    QSize sz = mp_completer_list->sizeHint ();
+    QFontMetrics fm (mp_completer_list->font ());
+    mp_completer_popup->setGeometry (pos.x (), pos.y () + r.height () / 3, sz.width (), 4 + 4 * fm.height () /*sz.height ()*/);
+    mp_completer_popup->show ();
+
+    mp_text->setFocus ();
+
+  } else {
+    mp_completer_popup->hide ();
+  }
+}
+
+void MacroEditorPage::hide_completer ()
+{
+  mp_completer_popup->hide ();
+}
+
 void MacroEditorPage::cursor_position_changed ()
 {
   if (m_ignore_cursor_changed_event) {
     return;
   }
+
+  mp_completer_popup->hide ();
+  mp_completer_timer->stop ();
+  mp_completer_timer->start ();
 
   QTextCursor cursor = mp_text->textCursor ();
   m_edit_cursor = cursor;
@@ -1433,6 +1547,11 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
       event->accept ();
       return true;
 
+    } else if (event->type () == QEvent::FocusOut) {
+
+      hide_completer ();
+      return true;
+
     } else if (event->type () == QEvent::KeyPress) {
 
       m_error_line = -1;
@@ -1445,7 +1564,12 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
 
       if (ke->key () == Qt::Key_Tab && (ke->modifiers () & Qt::ShiftModifier) == 0) {
 
-        return tab_key_pressed ();
+        if (mp_completer_popup->isVisible ()) {
+          complete ();
+          return true;
+        } else {
+          return tab_key_pressed ();
+        }
 
       } else if ((ke->key () == Qt::Key_Backtab || (ke->key () == Qt::Key_Tab && (ke->modifiers () & Qt::ShiftModifier) != 0))) {
 
@@ -1457,19 +1581,27 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
 
       } else if (ke->key () == Qt::Key_Escape) {
 
-        //  Handle Esc to return to the before-find position and clear the selection
+        //  Handle Esc to return to the before-find position and clear the selection or to hide popup
 
-        find_reset ();
-
-        QTextCursor c = mp_text->textCursor ();
-        c.clearSelection ();
-        mp_text->setTextCursor (c);
+        if (mp_completer_popup->isVisible ()) {
+          mp_completer_popup->hide ();
+        } else {
+          find_reset ();
+          QTextCursor c = mp_text->textCursor ();
+          c.clearSelection ();
+          mp_text->setTextCursor (c);
+        }
 
         return true;
 
       } else if (ke->key () == Qt::Key_Return) {
 
-        return return_pressed ();
+        if (mp_completer_popup->isVisible ()) {
+          complete ();
+          return true;
+        } else {
+          return return_pressed ();
+        }
 
       } else if (ke->key () == Qt::Key_F1) {
 
@@ -1479,6 +1611,11 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
         }
         emit help_requested (c.selectedText ());
 
+        return true;
+
+      } else if (mp_completer_popup->isVisible () && (ke->key () == Qt::Key_Up || ke->key () == Qt::Key_Down)) {
+
+        QApplication::sendEvent (mp_completer_list, event);
         return true;
 
       } else if (ke->key () == Qt::Key_F && (ke->modifiers () & Qt::ControlModifier) != 0) {

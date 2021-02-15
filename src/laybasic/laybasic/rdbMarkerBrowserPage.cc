@@ -558,15 +558,15 @@ public:
 
     } else if (role == Qt::ForegroundRole) {
 
+      //  Green color if no errors are present
+      if (no_errors (index)) {
+        return QVariant (QColor (0, 192, 0));
+      }
+
       MarkerBrowserTreeViewModelCacheEntry *node = (MarkerBrowserTreeViewModelCacheEntry *)(index.internalPointer ());
       if (node && node->id () == 0) {
         // blue color for the top level nodes
         return QVariant (QColor (0, 0, 255));
-      }
-
-      //  Green color if no errors are present
-      if (no_errors (index)) {
-        return QVariant (QColor (0, 192, 0));
       }
 
     }
@@ -1635,11 +1635,14 @@ set_hidden_rec (MarkerBrowserTreeViewModel *model, QTreeView *tree_view, const Q
   for (int r = 0; r < rows; ++r) {
 
     QModelIndex index = model->index (r, 0, parent);
-    bool hidden = (!show_all && model->no_errors (index)) || 
-                  (!cat_filter.isEmpty() && !model->cat_matches (index, cat_filter)) ||
-                  (!cell_filter.isEmpty() && !model->cell_matches (index, cell_filter));
 
-    tree_view->setRowHidden (r, parent, hidden);
+    //  NOTE: we don't hide the top level entries
+    if (parent.isValid ()) {
+      bool hidden = (!show_all && model->no_errors (index)) ||
+                    (!cat_filter.isEmpty() && !model->cat_matches (index, cat_filter)) ||
+                    (!cell_filter.isEmpty() && !model->cell_matches (index, cell_filter));
+      tree_view->setRowHidden (r, parent, hidden);
+    }
 
     set_hidden_rec (model, tree_view, index, show_all, cat_filter, cell_filter);
 
@@ -1693,12 +1696,32 @@ MarkerBrowserPage::set_rdb (rdb::Database *database)
       rerun_button->setToolTip (QString ());
     }
 
+    //  prepare a palette with "good" background (= light green, seen macro editor for "running" mode)
+
+    QPalette p = palette ();
+
+    if (database && database->num_items () == 0) {
+
+      double alpha = 0.95;
+
+      QColor base_color = qApp->palette ().color (QPalette::Base);
+      QColor alt_base_color = qApp->palette ().color (QPalette::AlternateBase);
+
+      base_color = QColor (int (0.5 + base_color.red () * alpha), base_color.green (), int (0.5 + base_color.blue () * alpha));
+      alt_base_color = QColor (int (0.5 + alt_base_color.red () * alpha), alt_base_color.green (), int (0.5 + alt_base_color.blue () * alpha));
+
+      p.setColor (QPalette::Base, base_color);
+      p.setColor (QPalette::AlternateBase, alt_base_color);
+
+    }
+
     QAbstractItemModel *tree_model = directory_tree->model ();
 
     MarkerBrowserTreeViewModel *new_model = new MarkerBrowserTreeViewModel ();
     new_model->set_show_empty_ones (true);
     new_model->set_database (database);
     directory_tree->setModel (new_model);
+    directory_tree->setPalette (p);
     connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (directory_selection_changed (const QItemSelection &, const QItemSelection &)));
 
     directory_tree->header ()->setSortIndicatorShown (true);
@@ -1716,12 +1739,15 @@ MarkerBrowserPage::set_rdb (rdb::Database *database)
     MarkerBrowserListViewModel *new_list_model = new MarkerBrowserListViewModel ();
     new_list_model->set_database (database);
     markers_list->setModel (new_list_model);
+    markers_list->setPalette (p);
     connect (markers_list->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (markers_selection_changed (const QItemSelection &, const QItemSelection &)));
     connect (markers_list->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (markers_current_changed (const QModelIndex &, const QModelIndex &)));
 
     if (list_model) {
       delete list_model;
     }
+
+    info_text->setPalette (p);
 
   }
 }

@@ -61,6 +61,7 @@ SOURCES = \
   dbPolygonGenerators.cc \
   dbPropertiesRepository.cc \
   dbReader.cc \
+  dbRecursiveInstanceIterator.cc \
   dbRecursiveShapeIterator.cc \
   dbRegion.cc \
   dbRegionLocalOperations.cc \
@@ -269,6 +270,7 @@ HEADERS = \
   dbPolygonGenerators.h \
   dbPropertiesRepository.h \
   dbReader.h \
+  dbRecursiveInstanceIterator.h \
   dbRecursiveShapeIterator.h \
   dbRegion.h \
   dbRegionLocalOperations.h \

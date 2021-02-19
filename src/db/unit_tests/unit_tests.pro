@@ -8,6 +8,7 @@ include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
   dbCompoundOperationTests.cc \
+  dbRecursiveInstanceIteratorTests.cc \
   dbRegionUtilsTests.cc \
   dbUtilsTests.cc \
   dbWriterTools.cc \

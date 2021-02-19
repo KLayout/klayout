@@ -432,14 +432,14 @@ RecursiveInstanceIterator::next_instance (RecursiveInstanceReceiver *receiver) c
         break;
       }
 
-      if (! m_inst.at_end () && int (m_inst_iterators.size () + 1) >= m_min_depth && ! is_inactive ()) {
+      if (! m_inst.at_end () && int (m_inst_iterators.size ()) >= m_min_depth && ! is_inactive ()) {
         break;
       }
 
     }
 
     if (! m_inst.at_end ()) {
-      if (int (m_inst_iterators.size () + 1) < m_min_depth || is_inactive ()) {
+      if (int (m_inst_iterators.size ()) < m_min_depth || is_inactive ()) {
         ++m_inst;
         new_inst (receiver);
       } else {

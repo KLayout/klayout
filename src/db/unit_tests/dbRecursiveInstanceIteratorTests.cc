@@ -104,31 +104,31 @@ TEST(1)
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
 
   db::RecursiveInstanceIterator i1_1inf (g, c0, db::Box (0, 0, 100, 100));
-  i1_1inf.min_depth(1);
+  i1_1inf.min_depth(0);
   x = collect(i1_1inf, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
   x = collect_with_copy(i1_1inf, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
 
-  db::RecursiveInstanceIterator i1_11 (g, c0, db::Box (0, 0, 100, 100));
-  i1_11.min_depth(1);
-  i1_11.max_depth(1);
+  db::RecursiveInstanceIterator i1_11 (g, c0, db::Box (0, 0, 2000, 100));
+  i1_11.min_depth(0);
+  i1_11.max_depth(0);
   x = collect(i1_11, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
   x = collect_with_copy(i1_11, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
 
-  db::RecursiveInstanceIterator i1_12 (g, c0, db::Box (0, 0, 100, 100));
-  i1_12.min_depth(1);
-  i1_12.max_depth(2);
+  db::RecursiveInstanceIterator i1_12 (g, c0, db::Box (0, 0, 2000, 100));
+  i1_12.min_depth(0);
+  i1_12.max_depth(1);
   x = collect(i1_12, g);
-  EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
+  EXPECT_EQ (x, "[$1]$2 r0 0,0/[$3]$4 r0 1100,0/[$1]$3 r0 100,-100");
   x = collect_with_copy(i1_12, g);
-  EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
+  EXPECT_EQ (x, "[$1]$2 r0 0,0/[$3]$4 r0 1100,0/[$1]$3 r0 100,-100");
 
   db::RecursiveInstanceIterator i1_22 (g, c0, db::Box (0, 0, 100, 100));
-  i1_22.min_depth(2);
-  i1_22.max_depth(2);
+  i1_22.min_depth(1);
+  i1_22.max_depth(1);
   x = collect(i1_22, g);
   EXPECT_EQ (x, "");
   x = collect_with_copy(i1_22, g);

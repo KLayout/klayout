@@ -218,7 +218,7 @@ RecursiveInstanceIterator::confine_region (const region_type &region)
 }
 
 void
-RecursiveInstanceIterator::all_targets ()
+RecursiveInstanceIterator::enable_all_targets ()
 {
   if (! m_all_targets) {
     m_all_targets = true;
@@ -228,7 +228,7 @@ RecursiveInstanceIterator::all_targets ()
 }
 
 void
-RecursiveInstanceIterator::targets (const std::set<db::cell_index_type> &tgt)
+RecursiveInstanceIterator::set_targets (const std::set<db::cell_index_type> &tgt)
 {
   if (m_all_targets || m_targets != tgt) {
     m_targets = tgt;

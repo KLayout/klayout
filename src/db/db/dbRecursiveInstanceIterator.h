@@ -49,11 +49,7 @@ class RecursiveInstanceReceiver;
  *  Some options can be specified, i.e. the level to which to look into or which cells
  *  to select.
  *
- *  The general iteration scheme is iterating is top-down and breadth-first.
- *
- *  While the iterator delivers instances, it will first deliver the instances of cells
- *  and then the instances of cells inside cells whose instances have been delivered already.
- *  No differentiation is made for leaf or non-leaf cells.
+ *  The general iteration scheme is iterating is depth-first and child instances before parent instances.
  */
 class DB_PUBLIC RecursiveInstanceIterator
 {
@@ -134,8 +130,9 @@ public:
   /**
    *  @brief Specify the maximum hierarchy depth to look into
    *
-   *  A depth of 0 instructs the iterator to deliver only shapes from the initial cell.
-   *  The depth must be specified before the shapes are being retrieved.
+   *  A depth of 0 instructs the iterator to deliver only instances from the initial cell.
+   *  A higher depth instructs the iterator to look deeper.
+   *  The depth must be specified before the instances are being retrieved.
    */
   void max_depth (int depth) 
   { 
@@ -156,9 +153,9 @@ public:
   /**
    *  @brief Specify the minimum hierarchy depth to look into
    *
-   *  A depth of 0 instructs the iterator to deliver shapes from the top level.
-   *  1 instructs to deliver shapes from the first child level.
-   *  The minimum depth must be specified before the shapes are being retrieved.
+   *  A depth of 0 instructs the iterator to deliver instance from the top level and below.
+   *  1 instructs to deliver instance from the first child level.
+   *  The minimum depth must be specified before the instances are being retrieved.
    */
   void min_depth (int depth)
   {
@@ -248,7 +245,7 @@ public:
   void confine_region (const region_type &region);
 
   /**
-   *  @brief Gets a flag indicating whether overlapping shapes are selected when a region is used
+   *  @brief Gets a flag indicating whether overlapping instances are selected when a region is used
    */
   bool overlapping () const
   {
@@ -256,7 +253,7 @@ public:
   }
 
   /**
-   *  @brief Sets a flag indicating whether overlapping shapes are selected when a region is used
+   *  @brief Sets a flag indicating whether overlapping instances are selected when a region is used
    */
   void set_overlapping (bool f)
   {
@@ -277,7 +274,13 @@ public:
   /**
    *  @brief Gets the selected target cells
    *
-   *  Only cells from the targets section are reported if "select_all_targets" is false.
+   *  Only instances of cells in the targets set are reported.
+   *  By default the iterator is configured to deliver all instances.
+   *  By using "set_targets" with a set of cell indexes, the reporting
+   *  can be confined to certain cells only. To enable all-cell reporting
+   *  use "enable_all_targets".
+   *
+   *  "all_targets_enabled" can be used to check which mode is used.
    */
   const std::set<db::cell_index_type> &targets () const
   {
@@ -286,26 +289,37 @@ public:
 
   /**
    *  @brief Gets a flags indicating whether all targets are selected
+   *  See \targets for more details.
    */
-  bool has_all_targets () const
+  bool all_targets_enabled () const
   {
     return m_all_targets;
   }
 
   /**
    *  @brief Selects all target cells
+   *  See \targets for more details.
    */
-  void all_targets ();
+  void enable_all_targets ();
 
   /**
    *  @brief Selects the given targets
    *
    *  This will reset the "all_targets" flag to false.
+   *  See \targets for more details.
    */
-  void targets (const std::set<db::cell_index_type> &targets);
+  void set_targets (const std::set<db::cell_index_type> &set_targets);
 
   /**
    *  @brief Select cells 
+   *
+   *  Cell selection allows confining the hierarchy traversal to subtrees of the
+   *  hierarchy tree. This happens by "selecting" and "unselecting" cells in the traversal path.
+   *  "selected" cells will make iterator traverse the tree below this cell while
+   *  "unselected" cells make the iterator ignore this cell.
+   *  Cells which are neither selected nor unselected will be traversed depending
+   *  on their parent's state. They are traversed if their parents are and are not traversed
+   *  if their parents are not.
    *
    *  If no specific cells have been selected before, this method will confine the selection 
    *  to the given cells (plus their sub-hierarchy).
@@ -318,6 +332,8 @@ public:
    *
    *  Makes all cells selected. After doing so, all unselect_cells calls 
    *  will unselect only that specific cell without children.
+   *
+   *  See \select_cells for more details.
    */
   void select_all_cells ();
 
@@ -325,6 +341,8 @@ public:
    *  @brief Unselect cells 
    *
    *  This method will remove the given cells (plus their sub-hierarchy) from the selection.
+   *
+   *  See \select_cells for more details.
    */
   void unselect_cells (const std::set<db::cell_index_type> &cells);
 
@@ -333,6 +351,8 @@ public:
    *
    *  Makes all cells unselected. After doing so, select_cells calls 
    *  will select only that specific cell without children.
+   *
+   *  See \select_cells for more details.
    */
   void unselect_all_cells ();
 
@@ -342,6 +362,8 @@ public:
    *  This will reset all selections and unselections. 
    *  After calling this methods, all select_cells will again select the cells
    *  including their children.
+   *
+   *  See \select_cells for more details.
    */
   void reset_selection ();
 

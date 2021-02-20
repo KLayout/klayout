@@ -287,7 +287,7 @@ public:
   /**
    *  @brief Gets a flags indicating whether all targets are selected
    */
-  bool all_targets () const
+  bool has_all_targets () const
   {
     return m_all_targets;
   }

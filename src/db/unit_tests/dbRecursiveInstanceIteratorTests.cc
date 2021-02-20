@@ -251,6 +251,23 @@ TEST(1)
   x = collect_with_copy(ii, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100/[$1]$4 r90 0,0");
 
+  db::RecursiveInstanceIterator i1z (g, c0);
+  EXPECT_EQ (i1z.has_all_targets (), true);
+  std::set<db::cell_index_type> ct;
+  ct.insert (c3.cell_index ());
+  i1z.targets (ct);
+  EXPECT_EQ (i1z.has_all_targets (), false);
+  EXPECT_EQ (i1z.targets () == ct, true);
+  i1z.all_targets ();
+  EXPECT_EQ (i1z.has_all_targets (), true);
+
+  i1z.targets (ct);
+  EXPECT_EQ (i1z.has_all_targets (), false);
+
+  x = collect(i1z, g);
+  EXPECT_EQ (x, "[$3]$4 r0 1100,0/[$1]$4 r90 0,0");
+  x = collect_with_copy(i1z, g);
+  EXPECT_EQ (x, "[$3]$4 r0 1100,0/[$1]$4 r90 0,0");
 }
 
 #if 0

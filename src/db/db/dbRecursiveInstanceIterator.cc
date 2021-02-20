@@ -45,8 +45,6 @@ RecursiveInstanceIterator &RecursiveInstanceIterator::operator= (const Recursive
 
     m_max_depth = d.m_max_depth;
     m_min_depth = d.m_min_depth;
-    m_shape_flags = d.m_shape_flags;
-    m_shape_inv_prop_sel = d.m_shape_inv_prop_sel;
     m_overlapping = d.m_overlapping;
     m_start = d.m_start;
     m_stop = d.m_stop;
@@ -91,7 +89,6 @@ RecursiveInstanceIterator::RecursiveInstanceIterator ()
   m_overlapping = false;
   m_max_depth = std::numeric_limits<int>::max (); // all
   m_min_depth = 0;
-  m_shape_inv_prop_sel = false;
   m_needs_reinit = false;
   m_inst_quad_id = 0;
   m_all_targets = true;
@@ -139,7 +136,6 @@ RecursiveInstanceIterator::init ()
   m_needs_reinit = true;
   m_max_depth = std::numeric_limits<int>::max (); // all
   m_min_depth = 0; // from the beginning
-  m_shape_inv_prop_sel = false;
   m_inst_quad_id = 0;
   mp_cell = 0;
   m_all_targets = true;
@@ -390,6 +386,14 @@ RecursiveInstanceIterator::select_all_cells ()
   }
 }
 
+const RecursiveInstanceIterator::instance_element_type *
+RecursiveInstanceIterator::operator-> () const
+{
+  validate (0);
+  m_combined_instance = db::InstElement (*m_inst, m_inst_array);
+  return &m_combined_instance;
+}
+
 bool
 RecursiveInstanceIterator::at_end () const
 {
@@ -438,9 +442,14 @@ void
 RecursiveInstanceIterator::next (RecursiveInstanceReceiver *receiver)
 {
   if (! at_end ()) {
-    ++m_inst;
-    new_inst (receiver);
-    next_instance (receiver);
+    ++m_inst_array;
+    if (! m_inst_array.at_end ()) {
+      new_inst_member (receiver);
+    } else {
+      ++m_inst;
+      new_inst (receiver);
+      next_instance (receiver);
+    }
   }
 }
 
@@ -474,8 +483,13 @@ RecursiveInstanceIterator::next_instance (RecursiveInstanceReceiver *receiver) c
 
     if (! m_inst.at_end ()) {
       if (! needs_visit ()) {
-        ++m_inst;
-        new_inst (receiver);
+        ++m_inst_array;
+        if (! m_inst_array.at_end ()) {
+          new_inst_member (receiver);
+        } else {
+          ++m_inst;
+          new_inst (receiver);
+        }
       } else {
         break;
       }

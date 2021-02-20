@@ -115,6 +115,7 @@ SOURCES = \
   gsiDeclDbPoint.cc \
   gsiDeclDbPolygon.cc \
   gsiDeclDbReader.cc \
+  gsiDeclDbRecursiveInstanceIterator.cc \
   gsiDeclDbRecursiveShapeIterator.cc \
   gsiDeclDbRegion.cc \
   gsiDeclDbShape.cc \

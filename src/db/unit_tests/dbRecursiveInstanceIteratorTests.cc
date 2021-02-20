@@ -41,7 +41,7 @@ std::string collect(db::RecursiveInstanceIterator &s, const db::Layout &layout)
     } else {
       res += "[]";
     }
-    res += s->to_string (true);
+    res += s->inst_ptr.to_string (true);
     ++s;
   }
   return res;
@@ -126,13 +126,13 @@ TEST(1)
   x = collect_with_copy(i1_12, g);
   EXPECT_EQ (x, "[$1]$2 r0 0,0/[$3]$4 r0 1100,0/[$1]$3 r0 100,-100");
 
-  db::RecursiveInstanceIterator i1_22 (g, c0, db::Box (0, 0, 100, 100));
+  db::RecursiveInstanceIterator i1_22 (g, c0, db::Box (0, 0, 2000, 100));
   i1_22.min_depth(1);
   i1_22.max_depth(1);
   x = collect(i1_22, g);
-  EXPECT_EQ (x, "");
+  EXPECT_EQ (x, "[$3]$4 r0 1100,0");
   x = collect_with_copy(i1_22, g);
-  EXPECT_EQ (x, "");
+  EXPECT_EQ (x, "[$3]$4 r0 1100,0");
 
   db::RecursiveInstanceIterator i1o (g, c0, db::Box (0, 0, 100, 100), true);
   x = collect(i1o, g);
@@ -350,7 +350,7 @@ TEST(2)
   std::set<db::Box> selected_boxes2;
 
   for (db::RecursiveInstanceIterator iter = db::RecursiveInstanceIterator (g, c0, search_box, true); !iter.at_end (); ++iter) {
-    selected_boxes.insert (iter.trans () * iter->bbox ());
+    selected_boxes.insert (iter.trans () * iter->inst_ptr.bbox ());
   }
 
   for (std::set<db::Box>::const_iterator b = boxes.begin (); b != boxes.end (); ++b) {
@@ -382,7 +382,7 @@ TEST(2)
   reg.insert (search_box2);
 
   for (db::RecursiveInstanceIterator iter = db::RecursiveInstanceIterator (g, c0, reg, true); !iter.at_end (); ++iter) {
-    selected_boxes.insert (iter.trans () * iter->bbox ());
+    selected_boxes.insert (iter.trans () * iter->bbox (db::box_convert<db::CellInst> (g)));
   }
 
   for (std::set<db::Box>::const_iterator b = boxes.begin (); b != boxes.end (); ++b) {
@@ -451,7 +451,7 @@ TEST(3)
   int n = 0;
   for ( ; !iter.at_end (); ++iter) {
     ++n;
-    selected_boxes.insert (iter.trans () * iter->bbox ());
+    selected_boxes.insert (iter.trans () * iter->bbox (db::box_convert<db::CellInst> (g)));
   }
 
   int nn = 0;
@@ -487,7 +487,7 @@ TEST(3)
   reg.insert (search_box2);
 
   for (db::RecursiveInstanceIterator iter = db::RecursiveInstanceIterator (g, c0, reg, true); !iter.at_end (); ++iter) {
-    selected_boxes.insert (iter.trans () * iter->bbox ());
+    selected_boxes.insert (iter.trans () * iter->bbox (db::box_convert<db::CellInst> (g)));
   }
 
   for (std::set<db::Box>::const_iterator b = boxes.begin (); b != boxes.end (); ++b) {
@@ -556,7 +556,7 @@ TEST(4)
   int n = 0;
   for ( ; !iter.at_end (); ++iter) {
     ++n;
-    selected_boxes.insert (iter.trans () * iter->bbox ());
+    selected_boxes.insert (iter.trans () * iter->bbox (db::box_convert<db::CellInst> (g)));
   }
 
   int nn = 0;
@@ -592,7 +592,7 @@ TEST(4)
   reg.insert (search_box2);
 
   for (db::RecursiveInstanceIterator iter = db::RecursiveInstanceIterator (g, c0, reg); !iter.at_end (); ++iter) {
-    selected_boxes.insert (iter.trans () * iter->bbox ());
+    selected_boxes.insert (iter.trans () * iter->bbox (db::box_convert<db::CellInst> (g)));
   }
 
   for (std::set<db::Box>::const_iterator b = boxes.begin (); b != boxes.end (); ++b) {

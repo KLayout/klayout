@@ -63,7 +63,9 @@ public:
   typedef db::Instances::overlapping_iterator overlapping_instance_iterator;
   typedef db::Instances::touching_iterator touching_instance_iterator;
   typedef db::Instance instance_type;
+  typedef db::InstElement instance_element_type;
   typedef db::ICplxTrans cplx_trans_type;
+  typedef instance_element_type value_type;
   typedef db::box_tree<db::Box, db::Box, db::box_convert<db::Box>, 20, 20> box_tree_type;
 
   /**
@@ -416,7 +418,7 @@ public:
    *  Returns the instance currently referred to by the recursive iterator.
    *  This instance is not transformed yet and is located in the current cell.
    */
-  instance_type instance () const
+  instance_element_type instance () const
   {
     return *operator-> ();
   }
@@ -426,7 +428,7 @@ public:
    *
    *  The access operator is identical to the instance method.
    */
-  instance_type operator* () const
+  instance_element_type operator* () const
   {
     return *operator-> ();
   }
@@ -436,11 +438,7 @@ public:
    *
    *  The access operator is identical to the instance method.
    */
-  const instance_type *operator-> () const
-  {
-    validate (0);
-    return m_inst.operator-> ();
-  }
+  const instance_element_type *operator-> () const;
 
   /**
    *  @brief End of iterator predicate
@@ -509,7 +507,7 @@ public:
   /**
    *  @brief The instance path
    */
-  std::vector<db::InstElement> path () const;
+  std::vector<instance_element_type> path () const;
 
   /**
    *  @brief Push-mode delivery
@@ -541,8 +539,6 @@ public:
 private:
   int m_max_depth;
   int m_min_depth;
-  unsigned int m_shape_flags;
-  bool m_shape_inv_prop_sel;
   bool m_overlapping;
   std::set<db::cell_index_type> m_start, m_stop;
   std::set<db::cell_index_type> m_targets;
@@ -557,6 +553,7 @@ private:
 
   mutable inst_iterator m_inst;
   mutable inst_array_iterator m_inst_array;
+  mutable instance_element_type m_combined_instance;
   mutable std::map<db::cell_index_type, bool> m_empty_cells_cache;
   mutable const cell_type *mp_cell;
   mutable cplx_trans_type m_trans;

@@ -275,6 +275,36 @@ public:
   }
 
   /**
+   *  @brief Gets the selected target cells
+   *
+   *  Only cells from the targets section are reported if "select_all_targets" is false.
+   */
+  const std::set<db::cell_index_type> &targets () const
+  {
+    return m_targets;
+  }
+
+  /**
+   *  @brief Gets a flags indicating whether all targets are selected
+   */
+  bool all_targets () const
+  {
+    return m_all_targets;
+  }
+
+  /**
+   *  @brief Selects all target cells
+   */
+  void all_targets ();
+
+  /**
+   *  @brief Selects the given targets
+   *
+   *  This will reset the "all_targets" flag to false.
+   */
+  void targets (const std::set<db::cell_index_type> &targets);
+
+  /**
    *  @brief Select cells 
    *
    *  If no specific cells have been selected before, this method will confine the selection 
@@ -493,6 +523,8 @@ private:
   bool m_shape_inv_prop_sel;
   bool m_overlapping;
   std::set<db::cell_index_type> m_start, m_stop;
+  std::set<db::cell_index_type> m_targets;
+  bool m_all_targets;
 
   const layout_type *mp_layout;
   const cell_type *mp_top_cell;
@@ -515,6 +547,7 @@ private:
   mutable bool m_needs_reinit;
   mutable size_t m_inst_quad_id;
   mutable std::vector<size_t> m_inst_quad_id_stack;
+  mutable std::set<db::cell_index_type> m_target_tree;
 
   void init ();
   void init_region (const region_type &region);
@@ -522,6 +555,7 @@ private:
   void skip_inst_iter_for_complex_region () const;
   void validate (RecursiveInstanceReceiver *receiver) const;
   void next (RecursiveInstanceReceiver *receiver);
+  bool needs_visit () const;
   void next_instance (RecursiveInstanceReceiver *receiver) const;
   void new_inst (RecursiveInstanceReceiver *receiver) const;
   void new_inst_member (RecursiveInstanceReceiver *receiver) const;

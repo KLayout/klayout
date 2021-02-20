@@ -40,6 +40,9 @@ RecursiveInstanceIterator &RecursiveInstanceIterator::operator= (const Recursive
 {
   if (&d != this) {
 
+    m_all_targets = d.m_all_targets;
+    m_targets = d.m_targets;
+
     m_max_depth = d.m_max_depth;
     m_min_depth = d.m_min_depth;
     m_shape_flags = d.m_shape_flags;
@@ -91,6 +94,7 @@ RecursiveInstanceIterator::RecursiveInstanceIterator ()
   m_shape_inv_prop_sel = false;
   m_needs_reinit = false;
   m_inst_quad_id = 0;
+  m_all_targets = true;
 }
 
 RecursiveInstanceIterator::RecursiveInstanceIterator (const layout_type &layout, const cell_type &cell, const box_type &region, bool overlapping)
@@ -138,6 +142,7 @@ RecursiveInstanceIterator::init ()
   m_shape_inv_prop_sel = false;
   m_inst_quad_id = 0;
   mp_cell = 0;
+  m_all_targets = true;
 }
 
 void
@@ -212,6 +217,26 @@ RecursiveInstanceIterator::confine_region (const region_type &region)
   m_needs_reinit = true;
 }
 
+void
+RecursiveInstanceIterator::all_targets ()
+{
+  if (! m_all_targets) {
+    m_all_targets = true;
+    m_targets.clear ();
+    m_needs_reinit = true;
+  }
+}
+
+void
+RecursiveInstanceIterator::targets (const std::set<db::cell_index_type> &tgt)
+{
+  if (m_all_targets || m_targets != tgt) {
+    m_targets = tgt;
+    m_all_targets = false;
+    m_needs_reinit = true;
+  }
+}
+
 namespace {
 
 struct BoxTreePusher
@@ -280,8 +305,15 @@ RecursiveInstanceIterator::validate (RecursiveInstanceReceiver *receiver) const
   }
 
   if (mp_top_cell) {
+
+    if (! m_all_targets) {
+      m_target_tree.clear ();
+      mp_top_cell->collect_called_cells (m_target_tree);
+    }
+
     new_cell (receiver);
     next_instance (receiver);
+
   }
 }
 
@@ -412,6 +444,12 @@ RecursiveInstanceIterator::next (RecursiveInstanceReceiver *receiver)
   }
 }
 
+bool
+RecursiveInstanceIterator::needs_visit () const
+{
+  return int (m_inst_iterators.size ()) >= m_min_depth && ! is_inactive () && (m_all_targets || m_targets.find (m_inst->cell_index ()) != m_targets.end ());
+}
+
 void
 RecursiveInstanceIterator::next_instance (RecursiveInstanceReceiver *receiver) const
 {
@@ -419,7 +457,7 @@ RecursiveInstanceIterator::next_instance (RecursiveInstanceReceiver *receiver) c
 
     if (! m_inst.at_end ()) {
 
-      if (int (m_inst_iterators.size ()) < m_max_depth) {
+      if (int (m_inst_iterators.size ()) < m_max_depth && (m_all_targets || m_target_tree.find (m_inst->cell_index ()) != m_target_tree.end ())) {
         down (receiver);
       }
 
@@ -432,14 +470,10 @@ RecursiveInstanceIterator::next_instance (RecursiveInstanceReceiver *receiver) c
         break;
       }
 
-      if (! m_inst.at_end () && int (m_inst_iterators.size ()) >= m_min_depth && ! is_inactive ()) {
-        break;
-      }
-
     }
 
     if (! m_inst.at_end ()) {
-      if (int (m_inst_iterators.size ()) < m_min_depth || is_inactive ()) {
+      if (! needs_visit ()) {
         ++m_inst;
         new_inst (receiver);
       } else {
@@ -548,13 +582,6 @@ RecursiveInstanceIterator::new_cell (RecursiveInstanceReceiver *receiver) const
   if (is_inactive () != new_cell_inactive) {
     set_inactive (new_cell_inactive);
   }
-
-// @@@ drop?
-  //  skip instance quad if possible
-  if (! m_local_complex_region_stack.empty ()) {
-    skip_inst_iter_for_complex_region ();
-  }
-// @@@
 
   m_inst = cell ()->begin_touching (correct_box_overlapping (m_local_region_stack.back ()));
 

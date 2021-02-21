@@ -476,6 +476,72 @@ public:
     set_per_mask_value (m_lef_pins_datatypes, mask, s);
   }
 
+  bool produce_fills () const
+  {
+    return m_produce_fills;
+  }
+
+  void set_produce_fills (bool f)
+  {
+    m_produce_fills = f;
+  }
+
+  const std::string &fills_suffix () const
+  {
+    return m_fills_suffix;
+  }
+
+  void set_fills_suffix (const std::string &s)
+  {
+    m_fills_suffix = s;
+  }
+
+  int fills_datatype () const
+  {
+    return m_fills_datatype;
+  }
+
+  void set_fills_datatype (int s)
+  {
+    m_fills_datatype = s;
+  }
+
+  void set_fills_suffix_str (const std::string &s);
+  std::string fills_suffix_str () const;
+
+  void set_fills_datatype_str (const std::string &s);
+  std::string fills_datatype_str () const;
+
+  void clear_fills_suffixes_per_mask ()
+  {
+    m_fills_suffixes.clear ();
+  }
+
+  void clear_fills_datatypes_per_mask ()
+  {
+    m_fills_datatypes.clear ();
+  }
+
+  const std::string &fills_suffix_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_fills_suffixes, m_fills_suffix, mask);
+  }
+
+  void set_fills_suffix_per_mask (unsigned int mask, const std::string &s)
+  {
+    set_per_mask_value (m_fills_suffixes, mask, s);
+  }
+
+  int fills_datatype_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_fills_datatypes, m_fills_datatype, mask);
+  }
+
+  void set_fills_datatype_per_mask (unsigned int mask, int s)
+  {
+    set_per_mask_value (m_fills_datatypes, mask, s);
+  }
+
   bool produce_obstructions () const
   {
     return m_produce_obstructions;
@@ -707,6 +773,8 @@ public:
     get_max_mask_number (mm, m_pins_datatypes);
     get_max_mask_number (mm, m_lef_pins_suffixes);
     get_max_mask_number (mm, m_lef_pins_datatypes);
+    get_max_mask_number (mm, m_fills_suffixes);
+    get_max_mask_number (mm, m_fills_datatypes);
     get_max_mask_number (mm, m_routing_suffixes);
     get_max_mask_number (mm, m_routing_datatypes);
     get_max_mask_number (mm, m_special_routing_suffixes);
@@ -841,6 +909,11 @@ private:
   int m_lef_pins_datatype;
   std::map<unsigned int, std::string> m_lef_pins_suffixes;
   std::map<unsigned int, int> m_lef_pins_datatypes;
+  bool m_produce_fills;
+  std::string m_fills_suffix;
+  int m_fills_datatype;
+  std::map<unsigned int, std::string> m_fills_suffixes;
+  std::map<unsigned int, int> m_fills_datatypes;
   bool m_produce_obstructions;
   std::string m_obstructions_suffix;
   int m_obstructions_datatype;
@@ -875,6 +948,8 @@ enum LayerPurpose
 {
   Routing = 0,        //  from DEF only
   Pins,               //  from DEF
+  Fills,              //  from DEF
+  FillsOPC,           //  from DEF
   SpecialRouting,     //  from DEF only
   LEFPins,            //  from LEF
   ViaGeometry,        //  from LEF+DEF

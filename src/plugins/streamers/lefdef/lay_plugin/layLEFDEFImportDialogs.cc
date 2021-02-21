@@ -354,6 +354,7 @@ LEFDEFReaderOptionsEditor::LEFDEFReaderOptionsEditor (QWidget *parent)
   connect (produce_via_geometry, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_pins, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_lef_pins, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
+  connect (produce_fills, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_obstructions, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_blockages, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_routing, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
@@ -493,6 +494,9 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_produce_lef_pins (produce_lef_pins->isChecked ());
   data->set_lef_pins_suffix_str (tl::to_string (suffix_lef_pins->text ()));
   data->set_lef_pins_datatype_str (tl::to_string (datatype_lef_pins->text ()));
+  data->set_produce_fills (produce_fills->isChecked ());
+  data->set_fills_suffix_str (tl::to_string (suffix_fills->text ()));
+  data->set_fills_datatype_str (tl::to_string (datatype_fills->text ()));
   data->set_produce_obstructions (produce_obstructions->isChecked ());
   data->set_obstructions_suffix (tl::to_string (suffix_obstructions->text ()));
   data->set_obstructions_datatype (datatype_obstructions->text ().toInt ());
@@ -556,6 +560,9 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   produce_lef_pins->setChecked (data->produce_lef_pins ());
   suffix_lef_pins->setText (tl::to_qstring (data->lef_pins_suffix_str ()));
   datatype_lef_pins->setText (tl::to_qstring (data->lef_pins_datatype_str ()));
+  produce_fills->setChecked (data->produce_fills ());
+  suffix_fills->setText (tl::to_qstring (data->fills_suffix_str ()));
+  datatype_fills->setText (tl::to_qstring (data->fills_datatype_str ()));
   produce_obstructions->setChecked (data->produce_obstructions ());
   suffix_obstructions->setText (tl::to_qstring (data->obstructions_suffix ()));
   datatype_obstructions->setText (QString::number (data->obstructions_datatype ()));
@@ -604,6 +611,7 @@ LEFDEFReaderOptionsEditor::checkbox_changed ()
   suffix_via_geometry->setEnabled (produce_via_geometry->isChecked ());
   suffix_pins->setEnabled (produce_pins->isChecked ());
   suffix_lef_pins->setEnabled (produce_lef_pins->isChecked ());
+  suffix_fills->setEnabled (produce_fills->isChecked ());
   suffix_obstructions->setEnabled (produce_obstructions->isChecked ());
   suffix_blockages->setEnabled (produce_blockages->isChecked ());
   suffix_routing->setEnabled (produce_routing->isChecked ());
@@ -612,6 +620,7 @@ LEFDEFReaderOptionsEditor::checkbox_changed ()
   datatype_via_geometry->setEnabled (produce_via_geometry->isChecked ());
   datatype_pins->setEnabled (produce_pins->isChecked ());
   datatype_lef_pins->setEnabled (produce_lef_pins->isChecked ());
+  datatype_fills->setEnabled (produce_fills->isChecked ());
   datatype_obstructions->setEnabled (produce_obstructions->isChecked ());
   datatype_blockages->setEnabled (produce_blockages->isChecked ());
   datatype_routing->setEnabled (produce_routing->isChecked ());

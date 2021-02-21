@@ -1426,10 +1426,12 @@ DEFImporter::do_read (db::Layout &layout)
         take ();
       }
     } else if (test ("FILLS")) {
+
       //  read over FILLS statements 
       while (! test ("END") || ! test ("FILLS")) {
         take ();
       }
+
     } else if (test ("SCANCHAINS")) {
       //  read over SCANCHAINS statements 
       while (! test ("END") || ! test ("SCANCHAINS")) {

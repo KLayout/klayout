@@ -82,6 +82,7 @@ private:
   void read_regions (std::map<std::string, std::vector<db::Polygon> > &regions, double scale);
   void read_groups (std::list<DEFImporterGroup> &groups, double scale);
   void read_blockages (db::Layout &layout, db::Cell &design, double scale);
+  void read_fills (db::Layout &layout, db::Cell &design, double scale);
   void read_nets (db::Layout &layout, db::Cell &design, double scale, bool specialnets);
   void read_vias (db::Layout &layout, db::Cell &design, double scale);
   void read_pins (db::Layout &layout, db::Cell &design, double scale);

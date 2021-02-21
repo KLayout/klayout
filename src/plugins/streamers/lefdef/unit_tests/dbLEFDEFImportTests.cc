@@ -752,6 +752,16 @@ TEST(119_multimapping)
   )
 }
 
+TEST(120_simplefill)
+{
+  run_test (_this, "fill", "lef:simple.lef+def:simple.def+map:simple.map", "simple_au.oas.gz", default_options (), false);
+}
+
+TEST(121_fillwithmask)
+{
+  run_test (_this, "fill", "lef:with_mask.lef+def:with_mask.def+map:with_mask.map", "with_mask_au.oas.gz", default_options (), false);
+}
+
 TEST(200_lefdef_plugin)
 {
   db::Layout ly;

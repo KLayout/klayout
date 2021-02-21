@@ -425,6 +425,9 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_produce_lef_pins (true),
     m_lef_pins_suffix (".PIN"),
     m_lef_pins_datatype (2),
+    m_produce_fills (true),
+    m_fills_suffix (".FILL"),
+    m_fills_datatype (5),
     m_produce_obstructions (true),
     m_obstructions_suffix (".OBS"),
     m_obstructions_datatype (3),
@@ -489,6 +492,11 @@ LEFDEFReaderOptions &LEFDEFReaderOptions::operator= (const LEFDEFReaderOptions &
     m_lef_pins_suffixes = d.m_lef_pins_suffixes;
     m_lef_pins_datatype = d.m_lef_pins_datatype;
     m_lef_pins_datatypes = d.m_lef_pins_datatypes;
+    m_produce_fills = d.m_produce_fills;
+    m_fills_suffix = d.m_fills_suffix;
+    m_fills_suffixes = d.m_fills_suffixes;
+    m_fills_datatype = d.m_fills_datatype;
+    m_fills_datatypes = d.m_fills_datatypes;
     m_produce_obstructions = d.m_produce_obstructions;
     m_obstructions_suffix = d.m_obstructions_suffix;
     m_obstructions_datatype = d.m_obstructions_datatype;
@@ -712,6 +720,30 @@ LEFDEFReaderOptions::lef_pins_datatype_str () const
 }
 
 void
+LEFDEFReaderOptions::set_fills_suffix_str (const std::string &s)
+{
+  set_suffixes (this, &LEFDEFReaderOptions::clear_fills_suffixes_per_mask, &LEFDEFReaderOptions::set_fills_suffix, &LEFDEFReaderOptions::set_fills_suffix_per_mask, s);
+}
+
+std::string
+LEFDEFReaderOptions::fills_suffix_str () const
+{
+  return get_suffixes (this, &LEFDEFReaderOptions::fills_suffix, &LEFDEFReaderOptions::fills_suffix_per_mask, max_mask_number ());
+}
+
+void
+LEFDEFReaderOptions::set_fills_datatype_str (const std::string &s)
+{
+  set_datatypes (this, &LEFDEFReaderOptions::clear_fills_datatypes_per_mask, &LEFDEFReaderOptions::set_fills_datatype, &LEFDEFReaderOptions::set_fills_datatype_per_mask, s);
+}
+
+std::string
+LEFDEFReaderOptions::fills_datatype_str () const
+{
+  return get_datatypes (this, &LEFDEFReaderOptions::fills_datatype, &LEFDEFReaderOptions::fills_datatype_per_mask, max_mask_number ());
+}
+
+void
 LEFDEFReaderOptions::set_routing_suffix_str (const std::string &s)
 {
   set_suffixes (this, &LEFDEFReaderOptions::clear_routing_suffixes_per_mask, &LEFDEFReaderOptions::set_routing_suffix, &LEFDEFReaderOptions::set_routing_suffix_per_mask, s);
@@ -835,6 +867,8 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
   std::map<std::string, LayerPurpose> purpose_translation;
   purpose_translation ["LEFPIN"] = LEFPins;
   purpose_translation ["PIN"] = Pins;
+  purpose_translation ["FILL"] = Fills;
+  purpose_translation ["FILLOPC"] = FillsOPC;
   purpose_translation ["LEFOBS"] = Obstructions;
   purpose_translation ["SPNET"] = SpecialRouting;
   purpose_translation ["NET"] = Routing;
@@ -1091,6 +1125,10 @@ static std::string purpose_to_name (LayerPurpose purpose)
     return "LABEL";
   case Pins:
     return "PIN";
+  case Fills:
+    return "FILL";
+  case FillsOPC:
+    return "FILLOPC";
   case LEFPins:
     return "LEFPIN";
   case Obstructions:
@@ -1262,6 +1300,10 @@ std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout
       case Pins:
         produce = mp_tech_comp->produce_pins ();
         break;
+      case Fills:
+      case FillsOPC:
+        produce = mp_tech_comp->produce_fills ();
+        break;
       case LEFPins:
         produce = mp_tech_comp->produce_lef_pins ();
         break;
@@ -1302,6 +1344,11 @@ std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout
       case Pins:
         name_suffix = mp_tech_comp->pins_suffix_per_mask (mask);
         dt = mp_tech_comp->pins_datatype_per_mask (mask);
+        break;
+      case Fills:
+      case FillsOPC:
+        name_suffix = mp_tech_comp->fills_suffix_per_mask (mask);
+        dt = mp_tech_comp->fills_datatype_per_mask (mask);
         break;
       case LEFPins:
         name_suffix = mp_tech_comp->lef_pins_suffix_per_mask (mask);

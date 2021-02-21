@@ -502,6 +502,94 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   gsi::method ("lef_pins_datatype_str=", &db::LEFDEFReaderOptions::set_lef_pins_datatype_str, gsi::arg ("datatype"),
     "@hide"
   ) +
+  gsi::method ("produce_fills", &db::LEFDEFReaderOptions::produce_fills,
+    "@brief Gets a value indicating whether fill geometries shall be produced.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n\n"
+    "Fill support has been introduced in version 0.27."
+  ) +
+  gsi::method ("produce_fills=", &db::LEFDEFReaderOptions::set_produce_fills, gsi::arg ("produce"),
+    "@brief Sets a value indicating whether fill geometries shall be produced.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n\n"
+    "Fill support has been introduced in version 0.27."
+  ) +
+  gsi::method ("fills_suffix", &db::LEFDEFReaderOptions::fills_suffix,
+    "@brief Gets the fill geometry layer name suffix.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n\n"
+    "Fill support has been introduced in version 0.27."
+  ) +
+  gsi::method ("fills_suffix=", &db::LEFDEFReaderOptions::set_fills_suffix, gsi::arg ("suffix"),
+    "@brief Sets the fill geometry layer name suffix.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n\n"
+    "Fill support has been introduced in version 0.27."
+  ) +
+  gsi::method ("fills_datatype", &db::LEFDEFReaderOptions::fills_datatype,
+    "@brief Gets the fill geometry layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n\n"
+    "Fill support has been introduced in version 0.27."
+  ) +
+  gsi::method ("fills_datatype=", &db::LEFDEFReaderOptions::set_fills_datatype, gsi::arg ("datatype"),
+    "@brief Sets the fill geometry layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "\n\n"
+    "Fill support has been introduced in version 0.27."
+  ) +
+  gsi::method ("clear_fills_suffixes_per_mask", &db::LEFDEFReaderOptions::clear_fills_suffixes_per_mask,
+    "@brief Clears the fill layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("clear_fill_datatypes_per_mask", &db::LEFDEFReaderOptions::clear_fills_datatypes_per_mask,
+    "@brief Clears the fill layer datatypes per mask.\n"
+    "See \\produce_via_geometry for details about this property.\n"
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("fills_suffix_per_mask", &db::LEFDEFReaderOptions::fills_suffix_per_mask, gsi::arg ("mask"),
+    "@brief Gets the fill geometry layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("set_fills_suffix_per_mask", &db::LEFDEFReaderOptions::set_fills_suffix_per_mask, gsi::arg ("mask"), gsi::arg ("suffix"),
+    "@brief Sets the fill geometry layer name suffix per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("fills_datatype", &db::LEFDEFReaderOptions::fills_datatype_per_mask,
+    "@brief Gets the fill geometry layer datatype value per mask.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("set_fills_datatype_per_mask", &db::LEFDEFReaderOptions::set_fills_datatype_per_mask, gsi::arg ("mask"), gsi::arg ("datatype"),
+    "@brief Sets the fill geometry layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules."
+    "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
+    "\n\n"
+    "Mask specific rules have been introduced in version 0.27."
+  ) +
+  gsi::method ("fills_suffix_str", &db::LEFDEFReaderOptions::fills_suffix_str,
+    "@hide"
+  ) +
+  gsi::method ("fills_suffix_str=", &db::LEFDEFReaderOptions::set_fills_suffix_str, gsi::arg ("suffix"),
+    "@hide"
+  ) +
+  gsi::method ("fills_datatype_str", &db::LEFDEFReaderOptions::fills_datatype_str,
+    "@hide"
+  ) +
+  gsi::method ("fills_datatype_str=", &db::LEFDEFReaderOptions::set_fills_datatype_str, gsi::arg ("datatype"),
+    "@hide"
+  ) +
   gsi::method ("produce_obstructions", &db::LEFDEFReaderOptions::produce_obstructions,
     "@brief Gets a value indicating whether obstruction markers shall be produced.\n"
     "See \\produce_via_geometry for details about the layer production rules."

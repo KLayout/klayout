@@ -510,7 +510,7 @@ MacroEditorPage::MacroEditorPage (QWidget * /*parent*/, MacroEditorHighlighters 
 
   mp_text->installEventFilter (this);
 
-  mp_completer_popup = new QWidget (window (), Qt::ToolTip | Qt::WindowDoesNotAcceptFocus | Qt::WindowTransparentForInput);
+  mp_completer_popup = new QWidget (window (), Qt::ToolTip);
   mp_completer_popup->setWindowModality (Qt::NonModal);
   QHBoxLayout *ly = new QHBoxLayout (mp_completer_popup);
   ly->setMargin (0);
@@ -644,7 +644,8 @@ void MacroEditorPage::fill_completer_list ()
     return;
   }
 
-  QString s = c.selectedText ().mid (0, pos - pos0);
+  QString ssel = c.selectedText ();
+  QString s = ssel.mid (0, pos - pos0);
 
   QString text = mp_text->toPlainText ();
 
@@ -660,7 +661,7 @@ void MacroEditorPage::fill_completer_list ()
         w += *c;
         ++c;
       }
-      if (! w.isEmpty () && w != s) {
+      if (! w.isEmpty () && w != s && w != ssel) {
         words.insert (w);
       }
       ++i;

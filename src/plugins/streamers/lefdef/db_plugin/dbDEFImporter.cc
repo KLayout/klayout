@@ -893,8 +893,16 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
   }
 }
 
+template <class Shape>
+static db::DVector
+via_size (double dbu, const Shape &shape)
+{
+  db::Box box = db::box_convert<Shape> () (shape);
+  return db::DVector (box.width () * dbu, box.height () * dbu);
+}
+
 void
-DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double scale)
+DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
 {
   while (test ("-")) {
 
@@ -1036,13 +1044,13 @@ DEFImporter::read_vias (db::Layout & /*layout*/, db::Cell & /*design*/, double s
 
           db::Polygon poly;
           read_polygon (poly, scale);
-          geo_based_vg->add_polygon (ln, ViaGeometry, poly, mask, 0);
+          geo_based_vg->add_polygon (ln, ViaGeometry, poly, mask, 0, via_size (layout.dbu (), poly));
 
         } else {
 
           db::Polygon poly;
           read_rect (poly, scale);
-          geo_based_vg->add_polygon (ln, ViaGeometry, poly, mask, 0);
+          geo_based_vg->add_polygon (ln, ViaGeometry, poly, mask, 0, via_size (layout.dbu (), poly));
 
         }
 

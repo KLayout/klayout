@@ -110,6 +110,66 @@ static unsigned int mask (const std::vector<unsigned int> &masks, unsigned int i
   }
 }
 
+static std::string purpose_to_name (LayerPurpose purpose)
+{
+  switch (purpose) {
+  case Outline:
+    return "OUTLINE";
+  case Regions:
+    return "REGION";
+  case PlacementBlockage:
+    return "BLOCKAGE";
+  case Routing:
+    return "NET";
+  case SpecialRouting:
+    return "SPNET";
+  case ViaGeometry:
+    return "VIA";
+  case Label:
+    return "LABEL";
+  case Pins:
+    return "PIN";
+  case Fills:
+    return "FILL";
+  case FillsOPC:
+    return "FILLOPC";
+  case LEFPins:
+    return "LEFPIN";
+  case Obstructions:
+    return "LEFOBS";
+  case Blockage:
+    return "BLK";
+  case All:
+    return "ALL";
+  }
+
+  return std::string ();
+}
+
+static std::string
+layer_spec_to_name (const std::string &layer_name, LayerPurpose purpose, unsigned int mask, const db::DVector &via_size)
+{
+  std::string ps = purpose_to_name (purpose);
+
+  std::string n = layer_name;
+  if (! n.empty ()) {
+    n += ".";
+  }
+  n += ps;
+
+  if (mask > 0) {
+    n += ":";
+    n += tl::to_string (mask);
+  }
+
+  if (via_size != db::DVector ()) {
+    n += ":SIZE";
+    n += tl::sprintf ("%.12gX%.12g", via_size.x (), via_size.y ());
+  }
+
+  return n;
+}
+
 // -----------------------------------------------------------------------------------
 //  RuleBasedViaGenerator implementation
 
@@ -144,12 +204,12 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
 
   std::set <unsigned int> dl;
 
-  dl = reader.open_layer (layout, m_bottom_layer, ViaGeometry, mask_bottom);
+  dl = reader.open_layer (layout, m_bottom_layer, ViaGeometry, mask_bottom, via_box.enlarged (m_be));
   for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
     cell.shapes (*l).insert (db::Polygon (via_box.enlarged (m_be).moved (m_bo)));
   }
 
-  dl = reader.open_layer (layout, m_top_layer, ViaGeometry, mask_top);
+  dl = reader.open_layer (layout, m_top_layer, ViaGeometry, mask_top, via_box.enlarged (m_te));
   for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
     cell.shapes (*l).insert (db::Polygon (via_box.enlarged (m_te).moved (m_bo)));
   }
@@ -248,7 +308,7 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
             cm = (mask_cut + r + c - 1) % num_cut_masks + 1;
           }
 
-          dl = reader.open_layer (layout, m_cut_layer, ViaGeometry, cm);
+          dl = reader.open_layer (layout, m_cut_layer, ViaGeometry, cm, vb);
           for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
             cell.shapes (*l).insert (db::Polygon (vb));
           }
@@ -313,12 +373,12 @@ GeometryBasedLayoutGenerator::combine_maskshifts (const std::string &ln, unsigne
 void
 GeometryBasedLayoutGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, db::Cell &cell, const std::vector<std::string> *ext_msl, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm)
 {
-  for (std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, db::Shapes>::const_iterator g = m_shapes.begin (); g != m_shapes.end (); ++g) {
+  for (std::map <std::pair<std::string, LayerDetailsKey>, db::Shapes>::const_iterator g = m_shapes.begin (); g != m_shapes.end (); ++g) {
 
     unsigned int mshift = get_maskshift (g->first.first, ext_msl, masks);
-    unsigned int mask = mask_for (g->first.first, g->first.second.second, mshift, nm);
+    unsigned int mask = mask_for (g->first.first, g->first.second.mask, mshift, nm);
 
-    std::set <unsigned int> dl = reader.open_layer (layout, g->first.first, g->first.second.first, mask);
+    std::set <unsigned int> dl = reader.open_layer (layout, g->first.first, g->first.second.purpose, mask, g->first.second.via_size);
     for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
       cell.shapes (*l).insert (g->second);
     }
@@ -363,27 +423,27 @@ static db::Shape insert_shape (db::Shapes &shapes, const Shape &shape, db::prope
 }
 
 void
-GeometryBasedLayoutGenerator::add_polygon (const std::string &ln, LayerPurpose purpose, const db::Polygon &poly, unsigned int mask, db::properties_id_type prop_id)
+GeometryBasedLayoutGenerator::add_polygon (const std::string &ln, LayerPurpose purpose, const db::Polygon &poly, unsigned int mask, db::properties_id_type prop_id, const db::DVector &via_size)
 {
-  insert_shape (m_shapes [std::make_pair (ln, std::make_pair (purpose, mask))], poly, prop_id);
+  insert_shape (m_shapes [std::make_pair (ln, LayerDetailsKey (purpose, mask, via_size))], poly, prop_id);
 }
 
 void
-GeometryBasedLayoutGenerator::add_box (const std::string &ln, LayerPurpose purpose, const db::Box &box, unsigned int mask, db::properties_id_type prop_id)
+GeometryBasedLayoutGenerator::add_box (const std::string &ln, LayerPurpose purpose, const db::Box &box, unsigned int mask, db::properties_id_type prop_id, const db::DVector &via_size)
 {
-  insert_shape (m_shapes [std::make_pair (ln, std::make_pair (purpose, mask))], box, prop_id);
+  insert_shape (m_shapes [std::make_pair (ln, LayerDetailsKey (purpose, mask, via_size))], box, prop_id);
 }
 
 void
-GeometryBasedLayoutGenerator::add_path (const std::string &ln, LayerPurpose purpose, const db::Path &path, unsigned int mask, db::properties_id_type prop_id)
+GeometryBasedLayoutGenerator::add_path (const std::string &ln, LayerPurpose purpose, const db::Path &path, unsigned int mask, db::properties_id_type prop_id, const db::DVector &via_size)
 {
-  insert_shape (m_shapes [std::make_pair (ln, std::make_pair (purpose, mask))], path, prop_id);
+  insert_shape (m_shapes [std::make_pair (ln, LayerDetailsKey (purpose, mask, via_size))], path, prop_id);
 }
 
 void
 GeometryBasedLayoutGenerator::add_text (const std::string &ln, LayerPurpose purpose, const db::Text &text, unsigned int mask, db::properties_id_type prop_id)
 {
-  insert_shape (m_shapes [std::make_pair (ln, std::make_pair (purpose, mask))], text, prop_id);
+  insert_shape (m_shapes [std::make_pair (ln, LayerDetailsKey (purpose, mask))], text, prop_id);
 }
 
 void
@@ -876,12 +936,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
   purpose_translation ["BLOCKAGE"] = Blockage;
   purpose_translation ["ALL"] = All;
 
-  std::map<LayerPurpose, std::string> purpose_translation_rev;
-  for (std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.begin (); i != purpose_translation.end (); ++i) {
-    purpose_translation_rev.insert (std::make_pair (i->second, i->first));
-  }
-
-  std::map<std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::vector<db::LayerProperties> > layer_map;
+  std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> > layer_map;
 
   while (! ts.at_end ()) {
 
@@ -896,7 +951,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
       std::string w1, w2;
       std::vector<int> layers, datatypes;
-      size_t max_purpose_str = 10;
+      size_t max_purpose_str = 15;
 
       if (! ex.try_read_word (w1) || ! ex.try_read_word (w2, "._$,/:") || ! try_read_layers (ex, layers) || ! try_read_layers (ex, datatypes)) {
         tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d not understood - skipped")), path, ts.line_number ());
@@ -907,7 +962,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
         for (std::vector<int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
           for (std::vector<int>::const_iterator d = datatypes.begin (); d != datatypes.end (); ++d) {
-            layer_map [std::make_pair (std::string (), std::make_pair (Outline, (unsigned int) 0))].push_back (db::LayerProperties (*l, *d, "OUTLINE"));
+            layer_map [std::make_pair (std::string (), LayerDetailsKey (Outline))].push_back (db::LayerProperties (*l, *d, "OUTLINE"));
           }
         }
 
@@ -915,7 +970,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
         for (std::vector<int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
           for (std::vector<int>::const_iterator d = datatypes.begin (); d != datatypes.end (); ++d) {
-            layer_map [std::make_pair (std::string (), std::make_pair (Regions, (unsigned int) 0))].push_back (db::LayerProperties (*l, *d, "REGIONS"));
+            layer_map [std::make_pair (std::string (), LayerDetailsKey (Regions))].push_back (db::LayerProperties (*l, *d, "REGIONS"));
           }
         }
 
@@ -923,7 +978,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
         for (std::vector<int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
           for (std::vector<int>::const_iterator d = datatypes.begin (); d != datatypes.end (); ++d) {
-            layer_map [std::make_pair (std::string (), std::make_pair (PlacementBlockage, (unsigned int) 0))].push_back (db::LayerProperties (*l, *d, "PLACEMENT_BLK"));
+            layer_map [std::make_pair (std::string (), LayerDetailsKey (PlacementBlockage))].push_back (db::LayerProperties (*l, *d, "PLACEMENT_BLK"));
           }
         }
 
@@ -949,7 +1004,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
         for (std::vector<std::string>::const_iterator ln = layer_names.begin (); ln != layer_names.end (); ++ln) {
           for (std::vector<int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
             for (std::vector<int>::const_iterator d = datatypes.begin (); d != datatypes.end (); ++d) {
-              layer_map [std::make_pair (*ln, std::make_pair (Label, (unsigned int) 0))].push_back (db::LayerProperties (*l, *d, final_name));
+              layer_map [std::make_pair (*ln, LayerDetailsKey (Label))].push_back (db::LayerProperties (*l, *d, final_name));
             }
           }
         }
@@ -968,7 +1023,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
         //    "(M1,PINS): M1.NET/PINS"
         //  (separating, translating and recombing the purposes)
 
-        std::set<std::pair<LayerPurpose, unsigned int> > translated_purposes;
+        std::set<LayerDetailsKey> translated_purposes;
 
         std::vector<std::string> purposes = tl::split (w2, ",");
         std::reverse (purposes.begin (), purposes.end ());
@@ -982,6 +1037,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
           std::string ps;
           ex.read_word_or_quoted (ps);
+          db::DVector via_size;
 
           std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.find (ps);
           if (i != purpose_translation.end ()) {
@@ -997,9 +1053,11 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
             } else if (i->second == ViaGeometry) {
 
               if (ex.test (":SIZE:")) {
-                std::string sz;
-                ex.read_word (sz);
-                tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: VIA size constraint ignored for layer %s")), path, ts.line_number (), w1);
+                double sx = 0.0, sy = 0.0;
+                ex.read (sx);
+                ex.test("X");
+                ex.read (sy);
+                via_size = db::DVector (sx, sy);
               }
 
             }
@@ -1018,13 +1076,13 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
             for (std::map<std::string, LayerPurpose>::const_iterator p = purpose_translation.begin (); p != purpose_translation.end (); ++p) {
               if (p->second != All) {
-                translated_purposes.insert (std::make_pair (p->second, mask));
+                translated_purposes.insert (LayerDetailsKey (p->second, mask, via_size));
               }
             }
 
           } else {
 
-            translated_purposes.insert (std::make_pair (i->second, mask));
+            translated_purposes.insert (LayerDetailsKey (i->second, mask, via_size));
 
           }
 
@@ -1033,19 +1091,15 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
         //  create a visual description string for the combined purposes
         std::string purpose_str;
 
-        for (std::set<std::pair<LayerPurpose, unsigned int> >::const_iterator p = translated_purposes.begin (); p != translated_purposes.end (); ++p) {
+        for (std::set<LayerDetailsKey>::const_iterator p = translated_purposes.begin (); p != translated_purposes.end (); ++p) {
 
           if (p != translated_purposes.begin ()) {
             purpose_str += "/";
           }
 
-          std::string ps = purpose_translation_rev [p->first];
-          if (p->second > 0) {
-            ps += ":";
-            ps += tl::to_string (p->second);
-          }
+          std::string ps = layer_spec_to_name (std::string (), p->purpose, p->mask, p->via_size);
 
-          if ((purpose_str + ps).size () > max_purpose_str) {
+          if (p != translated_purposes.begin () && (purpose_str + ps).size () > max_purpose_str) {
             purpose_str += "...";
             break;
           } else {
@@ -1056,7 +1110,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 
         std::string final_name = w1 + "." + purpose_str;
 
-        for (std::set<std::pair<LayerPurpose, unsigned int> >::const_iterator p = translated_purposes.begin (); p != translated_purposes.end (); ++p) {
+        for (std::set<LayerDetailsKey>::const_iterator p = translated_purposes.begin (); p != translated_purposes.end (); ++p) {
           for (std::vector<int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
             for (std::vector<int>::const_iterator d = datatypes.begin (); d != datatypes.end (); ++d) {
               layer_map [std::make_pair (w1, *p)].push_back (db::LayerProperties (*l, *d, final_name));
@@ -1077,7 +1131,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
   m_layer_map.clear ();
 
   db::DirectLayerMapping lm (&layout);
-  for (std::map<std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::vector<db::LayerProperties> >::const_iterator i = layer_map.begin (); i != layer_map.end (); ++i) {
+  for (std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> >::const_iterator i = layer_map.begin (); i != layer_map.end (); ++i) {
     for (std::vector<db::LayerProperties>::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
       unsigned int layer = lm.map_layer (*j).second;
       m_layers [i->first].insert (layer);
@@ -1087,9 +1141,13 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
 }
 
 std::set <unsigned int>
-LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPurpose purpose, unsigned int mask)
+LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPurpose purpose, unsigned int mask, const db::DVector &via_size)
 {
-  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::set<unsigned int> >::const_iterator nl = m_layers.find (std::make_pair (n, std::make_pair (purpose, mask)));
+  std::map <std::pair<std::string, LayerDetailsKey>, std::set<unsigned int> >::const_iterator nl;
+  nl = m_layers.find (std::make_pair (n, LayerDetailsKey (purpose, mask, via_size)));
+  if (nl == m_layers.end ()) {
+    nl = m_layers.find (std::make_pair (n, LayerDetailsKey (purpose, mask)));
+  }
   if (nl == m_layers.end ()) {
 
     std::set <unsigned int> ll;
@@ -1098,48 +1156,12 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
       ll = open_layer_uncached (layout, n, purpose, mask);
     }
 
-    m_layers.insert (std::make_pair (std::make_pair (n, std::make_pair (purpose, mask)), ll));
+    m_layers.insert (std::make_pair (std::make_pair (n, LayerDetailsKey (purpose, mask)), ll));
     return ll;
 
   } else {
     return nl->second;
   }
-}
-
-static std::string purpose_to_name (LayerPurpose purpose)
-{
-  switch (purpose) {
-  case Outline:
-    return "OUTLINE";
-  case Regions:
-    return "REGION";
-  case PlacementBlockage:
-    return "BLOCKAGE";
-  case Routing:
-    return "NET";
-  case SpecialRouting:
-    return "SPNET";
-  case ViaGeometry:
-    return "VIA";
-  case Label:
-    return "LABEL";
-  case Pins:
-    return "PIN";
-  case Fills:
-    return "FILL";
-  case FillsOPC:
-    return "FILLOPC";
-  case LEFPins:
-    return "LEFPIN";
-  case Obstructions:
-    return "LEFOBS";
-  case Blockage:
-    return "BLK";
-  case All:
-    return "ALL";
-  }
-
-  return std::string ();
 }
 
 /**
@@ -1467,24 +1489,13 @@ LEFDEFReaderState::finish (db::Layout &layout)
 
   db::LayerMap lm;
 
-  for (std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::set<unsigned int> >::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+  for (std::map <std::pair<std::string, LayerDetailsKey>, std::set<unsigned int> >::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
 
     if (l->second.empty ()) {
       continue;
     }
 
-    std::string ps = purpose_to_name (l->first.second.first);
-
-    std::string n = l->first.first;
-    if (! n.empty ()) {
-      n += ".";
-    }
-    n += ps;
-
-    if (l->first.second.second > 0) {
-      n += ":";
-      n += tl::to_string (l->first.second.second);
-    }
+    std::string n = layer_spec_to_name (l->first.first, l->first.second.purpose, l->first.second.mask, l->first.second.via_size);
 
     for (std::set<unsigned int>::const_iterator li = l->second.begin (); li != l->second.end (); ++li) {
 

@@ -963,6 +963,46 @@ enum LayerPurpose
 };
 
 /**
+ *  @brief A structure holding the layer details like purpose, mask and via size
+ */
+struct LayerDetailsKey
+{
+  LayerDetailsKey ()
+    : purpose (Routing), mask (0)
+  { }
+
+  LayerDetailsKey (LayerPurpose _purpose, unsigned int _mask = 0, const db::DVector &_via_size = db::DVector ())
+    : purpose (_purpose), mask (_mask), via_size (_via_size)
+  { }
+
+  bool operator< (const LayerDetailsKey &other) const
+  {
+    if (purpose != other.purpose) {
+      return purpose < other.purpose;
+    }
+    if (mask != other.mask) {
+      return mask < other.mask;
+    }
+    return via_size.less (other.via_size);
+  }
+
+  bool operator== (const LayerDetailsKey &other) const
+  {
+    if (purpose != other.purpose) {
+      return false;
+    }
+    if (mask != other.mask) {
+      return false;
+    }
+    return via_size.equal (other.via_size);
+  }
+
+  LayerPurpose purpose;
+  unsigned int mask;
+  db::DVector via_size;
+};
+
+/**
  *  @brief An interface for resolving the number of masks from a layer name
  */
 class DB_PLUGIN_PUBLIC LEFDEFNumberOfMasks
@@ -1054,9 +1094,9 @@ public:
   virtual std::vector<std::string> maskshift_layers () const { return m_maskshift_layers; }
   virtual bool is_fixedmask () const { return m_fixedmask; }
 
-  void add_polygon (const std::string &ln, LayerPurpose purpose, const db::Polygon &poly, unsigned int mask, properties_id_type prop_id);
-  void add_box (const std::string &ln, LayerPurpose purpose, const db::Box &box, unsigned int mask, properties_id_type prop_id);
-  void add_path (const std::string &ln, LayerPurpose purpose, const db::Path &path, unsigned int mask, properties_id_type prop_id);
+  void add_polygon (const std::string &ln, LayerPurpose purpose, const db::Polygon &poly, unsigned int mask, properties_id_type prop_id, const DVector &via_size = db::DVector ());
+  void add_box (const std::string &ln, LayerPurpose purpose, const db::Box &box, unsigned int mask, properties_id_type prop_id, const DVector &via_size = db::DVector ());
+  void add_path (const std::string &ln, LayerPurpose purpose, const db::Path &path, unsigned int mask, properties_id_type prop_id, const DVector &via_size = db::DVector ());
   void add_via (const std::string &vn, const db::Trans &trans, unsigned int bottom_mask, unsigned int cut_mask, unsigned int top_mask);
   void add_text (const std::string &ln, LayerPurpose purpose, const db::Text &text, unsigned int mask, db::properties_id_type prop_id);
 
@@ -1083,7 +1123,7 @@ private:
     db::Trans trans;
   };
 
-  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, db::Shapes> m_shapes;
+  std::map <std::pair<std::string, LayerDetailsKey>, db::Shapes> m_shapes;
   std::list<Via> m_vias;
   std::vector<std::string> m_maskshift_layers;
   bool m_fixedmask;
@@ -1129,7 +1169,17 @@ public:
   /**
    *  @brief Create a new layer or return the index of the given layer
    */
-  std::set<unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
+  std::set<unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask, const DVector &via_size = db::DVector ());
+
+  /**
+   *  @brief Create a new layer or return the index of the given layer
+   */
+  template <class Shape>
+  std::set<unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask, const Shape &via_shape)
+  {
+    db::Box via_box = db::box_convert<Shape> () (via_shape);
+    return open_layer (layout, name, purpose, mask, db::DVector (via_box.width () * layout.dbu (), via_box.height () * layout.dbu ()));
+  }
 
   /**
    *  @brief Registers a layer (assign a new default layer number)
@@ -1263,7 +1313,7 @@ private:
   LEFDEFReaderState (const LEFDEFReaderState &);
   LEFDEFReaderState &operator= (const LEFDEFReaderState &);
 
-  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::set<unsigned int> > m_layers;
+  std::map <std::pair<std::string, LayerDetailsKey>, std::set<unsigned int> > m_layers;
   db::LayerMap m_layer_map;
   bool m_create_layers;
   bool m_has_explicit_layer_mapping;
@@ -1438,9 +1488,9 @@ protected:
   /**
    *  @brief Create a new layer or return the index of the given layer
    */
-  std::set<unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask)
+  std::set<unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask, const db::DVector &via_size = db::DVector ())
   {
-    return mp_reader_state->open_layer (layout, name, purpose, mask);
+    return mp_reader_state->open_layer (layout, name, purpose, mask, via_size);
   }
 
   /**

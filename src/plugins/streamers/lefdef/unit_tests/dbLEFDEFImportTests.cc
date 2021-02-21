@@ -762,6 +762,11 @@ TEST(121_fillwithmask)
   run_test (_this, "fill", "map:with_mask.map+lef:with_mask.lef+def:with_mask.def", "with_mask_au.oas.gz", default_options (), false);
 }
 
+TEST(130_viasize)
+{
+  run_test (_this, "viasize", "map:test.map+lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
+}
+
 TEST(200_lefdef_plugin)
 {
   db::Layout ly;

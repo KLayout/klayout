@@ -1244,6 +1244,101 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
 }
 
 void
+DEFImporter::read_fills (db::Layout &layout, db::Cell &design, double scale)
+{
+  std::map <std::pair<std::string, unsigned int>, std::vector <db::Polygon> > geometry;
+
+  while (test ("-")) {
+
+    if (test ("LAYER")) {
+
+      std::string ln = get ();
+
+      unsigned int mask = 0;
+      bool opc = false;
+
+      while (test ("+")) {
+
+        if (test ("MASK")) {
+          mask = get_mask (get_long ());
+        } else if (test ("OPC")) {
+          opc = true;
+        } else {
+          error (tl::to_string (tr ("'MASK' or 'OPC' keyword expected")));
+        }
+
+      }
+
+      std::vector <db::Polygon> polygons;
+
+      while (! test (";")) {
+
+        if (test ("RECT")) {
+
+          test ("(");
+          db::Point pt1 = get_point (scale);
+          test (")");
+
+          test ("(");
+          db::Point pt2 = get_point (scale);
+          test (")");
+
+          polygons.push_back (db::Polygon (db::Box (pt1, pt2)));
+
+        } else if (test ("POLYGON")) {
+
+          std::vector<db::Point> points;
+
+          double x = 0.0, y = 0.0;
+
+          while (test ("(")) {
+
+            if (! test ("*")) {
+              x = get_double ();
+            }
+            if (! test ("*")) {
+              y = get_double ();
+            }
+            points.push_back (db::Point (db::DPoint (x * scale, y * scale)));
+            expect (")");
+
+          }
+
+          polygons.push_back (db::Polygon ());
+          polygons.back ().assign_hull (points.begin (), points.end ());
+
+        } else {
+          error (tl::to_string (tr ("'RECT' or 'POLYGON' keyword expected")));
+        }
+
+      }
+
+      std::set<unsigned int> dl = open_layer (layout, ln, opc ? FillsOPC : Fills, mask);
+      if (! dl.empty ()) {
+        for (std::vector<db::Polygon>::const_iterator p = polygons.begin (); p != polygons.end (); ++p) {
+          for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
+            design.shapes (*l).insert (*p);
+          }
+        }
+      }
+
+    } else if (test ("VIA")) {
+
+      //  TODO: implement
+      warn (tl::to_string (tr ("VIA not supported on fills currently")));
+
+      while (! at_end () && ! test (";")) {
+        take ();
+      }
+
+    } else {
+      error (tl::to_string (tr ("'LAYER' or 'VIA' keyword expected")));
+    }
+
+  }
+}
+
+void
 DEFImporter::read_styles (double scale)
 {
   while (test ("-")) {
@@ -1427,10 +1522,14 @@ DEFImporter::do_read (db::Layout &layout)
       }
     } else if (test ("FILLS")) {
 
-      //  read over FILLS statements 
-      while (! test ("END") || ! test ("FILLS")) {
-        take ();
-      }
+      //  Read FILLS statements
+      get_long ();
+      expect (";");
+
+      read_fills (layout, design, scale);
+
+      expect ("END");
+      expect ("FILLS");
 
     } else if (test ("SCANCHAINS")) {
       //  read over SCANCHAINS statements 

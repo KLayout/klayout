@@ -714,7 +714,7 @@
        <item>
         <widget class="QTabWidget" name="layer_map_mode">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="tab">
           <attribute name="title">
@@ -1352,6 +1352,17 @@ type ...</string>
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>read_lef_with_def</tabstop>
+  <tabstop>lef_files</tabstop>
+  <tabstop>add_lef_file</tabstop>
+  <tabstop>del_lef_files</tabstop>
+  <tabstop>move_lef_files_up</tabstop>
+  <tabstop>move_lef_files_down</tabstop>
+  <tabstop>dbu</tabstop>
+  <tabstop>separate_groups</tabstop>
+  <tabstop>prefix_via_cellname</tabstop>
+  <tabstop>produce_lef_geo</tabstop>
   <tabstop>produce_net_names</tabstop>
   <tabstop>net_prop_name</tabstop>
   <tabstop>produce_inst_names</tabstop>
@@ -1364,6 +1375,10 @@ type ...</string>
   <tabstop>placement_blockage_layer</tabstop>
   <tabstop>produce_regions</tabstop>
   <tabstop>region_layer</tabstop>
+  <tabstop>layer_map_mode</tabstop>
+  <tabstop>mapfile_path</tabstop>
+  <tabstop>browse_mapfile</tabstop>
+  <tabstop>scrollArea</tabstop>
   <tabstop>produce_via_geometry</tabstop>
   <tabstop>suffix_via_geometry</tabstop>
   <tabstop>datatype_via_geometry</tabstop>
@@ -1373,6 +1388,9 @@ type ...</string>
   <tabstop>produce_lef_pins</tabstop>
   <tabstop>suffix_lef_pins</tabstop>
   <tabstop>datatype_lef_pins</tabstop>
+  <tabstop>produce_fills</tabstop>
+  <tabstop>suffix_fills</tabstop>
+  <tabstop>datatype_fills</tabstop>
   <tabstop>produce_obstructions</tabstop>
   <tabstop>suffix_obstructions</tabstop>
   <tabstop>datatype_obstructions</tabstop>
@@ -1385,8 +1403,10 @@ type ...</string>
   <tabstop>produce_labels</tabstop>
   <tabstop>suffix_labels</tabstop>
   <tabstop>datatype_labels</tabstop>
-  <tabstop>mapfile_path</tabstop>
-  <tabstop>browse_mapfile</tabstop>
+  <tabstop>produce_blockages</tabstop>
+  <tabstop>suffix_blockages</tabstop>
+  <tabstop>datatype_blockages</tabstop>
+  <tabstop>read_all_cbx</tabstop>
  </tabstops>
  <resources>
   <include location="../../../../lay/lay/layResources.qrc"/>

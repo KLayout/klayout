@@ -741,6 +741,9 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options) const
   load_options.set_option_by_name ("lefdef_config.produce_lef_pins", m_lefdef_produce_lef_pins);
   load_options.set_option_by_name ("lefdef_config.lef_pins_suffix_str", m_lefdef_lef_pins_suffix);
   load_options.set_option_by_name ("lefdef_config.lef_pins_datatype_str", m_lefdef_lef_pins_datatype);
+  load_options.set_option_by_name ("lefdef_config.produce_fills", m_lefdef_produce_fills);
+  load_options.set_option_by_name ("lefdef_config.fills_suffix_str", m_lefdef_fills_suffix);
+  load_options.set_option_by_name ("lefdef_config.fills_datatype_str", m_lefdef_fills_datatype);
   load_options.set_option_by_name ("lefdef_config.produce_obstructions", m_lefdef_produce_obstructions);
   load_options.set_option_by_name ("lefdef_config.obstructions_suffix", m_lefdef_obstruction_suffix);
   load_options.set_option_by_name ("lefdef_config.obstructions_datatype", m_lefdef_obstruction_datatype);

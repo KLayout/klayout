@@ -6,8 +6,43 @@ import sys
 import os
 import shutil
 import glob
+import platform
 import optparse
 import subprocess
+
+#------------------------------------------------------------------------------
+## To test if the platform is a member of valid platforms
+#
+# @param[in] platforms     valid platforms
+#
+# @return matching platform name on success; "" on failure
+#------------------------------------------------------------------------------
+def Test_My_Platform( platforms=['Catalina', 'BigSur'] ):
+    (System, Node, Release, MacVersion, Machine, Processor) = platform.uname()
+
+    if not System == "Darwin":
+        return ""
+
+    release = int( Release.split(".")[0] ) # take the first of ['19', '0', '0']
+    if   release == 20:
+        Platform = "BigSur"
+    elif release == 19:
+        Platform = "Catalina"
+    elif release == 18:
+        Platform = "Mojave"
+    elif release == 17:
+        Platform = "HighSierra"
+    elif release == 16:
+        Platform = "Sierra"
+    elif release == 15:
+        Platform = "ElCapitan"
+    else:
+        Platform = ""
+
+    if Platform in platforms:
+        return Platform
+    else:
+        return ""
 
 #------------------------------------------------------------------------------
 ## To populate the build target dictionary
@@ -37,7 +72,7 @@ def Get_Build_Options( targetDic ):
     buildOp = dict()
     for key in targetDic.keys():
         target = targetDic[key]
-        if target == "std": # use 'Qt5MacPorts' that provides Qt 5.15.2 to run on "Big Sur", too
+        if target == "std": # use 'Qt5MacPorts' that provides Qt 5.15.2~ to run on "Big Sur", too
             buildOp["std"]     = [ '-q', 'Qt5MacPorts', '-r', 'sys',  '-p', 'sys'    ]
         elif target == "ports":
             buildOp["ports"]   = [ '-q', 'Qt5MacPorts', '-r', 'MP27', '-p', 'MP38'   ]
@@ -57,39 +92,41 @@ def Get_Build_Options( targetDic ):
 ## To get the ".macQAT" dictionary for QA Test
 #
 # @param[in] targetDic  build target dictionary
+# @param[in] platform   platform name
 #
 # @return a dictionary; key=mnemonic, value=".macQAT" directory
 #------------------------------------------------------------------------------
-def Get_QAT_Directory( targetDic ):
+def Get_QAT_Directory( targetDic, platform ):
     dirQAT = dict()
     for key in targetDic.keys():
         target = targetDic[key]
         if target == "std":
-            dirQAT["std"]       = 'qt5MP.build.macos-Catalina-release-RsysPsys.macQAT'
+            dirQAT["std"]       = 'qt5MP.build.macos-%s-release-RsysPsys.macQAT' % platform
         elif target == "ports":
-            dirQAT["ports"]     = 'qt5MP.build.macos-Catalina-release-Rmp27Pmp38.macQAT'
+            dirQAT["ports"]     = 'qt5MP.build.macos-%s-release-Rmp27Pmp38.macQAT' % platform
         elif target == "brew":
-            dirQAT["brew"]      = 'qt5Brew.build.macos-Catalina-release-Rhb27Phb38.macQAT'
+            dirQAT["brew"]      = 'qt5Brew.build.macos-%s-release-Rhb27Phb38.macQAT' % platform
         elif target == "brewHW":
-            dirQAT["brewHW"]    = 'qt5Brew.build.macos-Catalina-release-RsysPhb38.macQAT'
+            dirQAT["brewHW"]    = 'qt5Brew.build.macos-%s-release-RsysPhb38.macQAT' % platform
         elif target == "ana3":
-            dirQAT["ana3"]      = 'qt5Ana3.build.macos-Catalina-release-Rana3Pana3.macQAT'
+            dirQAT["ana3"]      = 'qt5Ana3.build.macos-%s-release-Rana3Pana3.macQAT' % platform
         elif target == "brewA":
-            dirQAT["brewA"]     = 'qt5Brew.build.macos-Catalina-release-Rhb27Phbauto.macQAT'
+            dirQAT["brewA"]     = 'qt5Brew.build.macos-%s-release-Rhb27Phbauto.macQAT' % platform
         elif target == "brewAHW":
-            dirQAT["brewAHW"]   = 'qt5Brew.build.macos-Catalina-release-RsysPhbauto.macQAT'
+            dirQAT["brewAHW"]   = 'qt5Brew.build.macos-%s-release-RsysPhbauto.macQAT' % platform
     return dirQAT
 
 #------------------------------------------------------------------------------
 ## To get the build option dictionary for making/cleaning DMG
 #
 # @param[in] targetDic  build target dictionary
+# @param[in] platform   platform name
 # @param[in] srlDMG     serial number of DMG
 # @param[in] makeflag   True to make; False to clean
 #
 # @return a dictionary; key=mnemonic, value=build option list
 #------------------------------------------------------------------------------
-def Get_Package_Options( targetDic, srlDMG, makeflag ):
+def Get_Package_Options( targetDic, platform, srlDMG, makeflag ):
     if makeflag:
         flag = '-m'
     else:
@@ -99,19 +136,26 @@ def Get_Package_Options( targetDic, srlDMG, makeflag ):
     for key in targetDic.keys():
         target = targetDic[key]
         if target == "std":
-            packOp["std"]       = [ '-p', 'ST-qt5MP.pkg.macos-Catalina-release-RsysPsys',       '-s', '%d' % srlDMG, '%s' % flag ]
+            packOp["std"]       = [ '-p', 'ST-qt5MP.pkg.macos-%s-release-RsysPsys' % platform,
+                                    '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "ports":
-            packOp["ports"]     = [ '-p', 'LW-qt5MP.pkg.macos-Catalina-release-Rmp27Pmp38',     '-s', '%d' % srlDMG, '%s' % flag ]
+            packOp["ports"]     = [ '-p', 'LW-qt5MP.pkg.macos-%s-release-Rmp27Pmp38' % platform,
+                                    '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brew":
-            packOp["brew"]      = [ '-p', 'LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb38',   '-s', '%d' % srlDMG, '%s' % flag ]
+            packOp["brew"]      = [ '-p', 'LW-qt5Brew.pkg.macos-%s-release-Rhb27Phb38' % platform,
+                                    '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brewHW":
-            packOp["brewHW"]    = [ '-p', 'HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb38',    '-s', '%d' % srlDMG, '%s' % flag ]
+            packOp["brewHW"]    = [ '-p', 'HW-qt5Brew.pkg.macos-%s-release-RsysPhb38' % platform,
+                                    '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "ana3":
-            packOp["ana3"]      = [ '-p', 'LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3',   '-s', '%d' % srlDMG, '%s' % flag ]
+            packOp["ana3"]      = [ '-p', 'LW-qt5Ana3.pkg.macos-%s-release-Rana3Pana3' % platform,
+                                    '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brewA":
-            packOp["brewA"]     = [ '-p', 'LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phbauto', '-s', '%d' % srlDMG, '%s' % flag ]
+            packOp["brewA"]     = [ '-p', 'LW-qt5Brew.pkg.macos-%s-release-Rhb27Phbauto' % platform,
+                                    '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brewAHW":
-            packOp["brewAHW"]   = [ '-p', 'HW-qt5Brew.pkg.macos-Catalina-release-RsysPhbauto',  '-s', '%d' % srlDMG, '%s' % flag ]
+            packOp["brewAHW"]   = [ '-p', 'HW-qt5Brew.pkg.macos-%s-release-RsysPhbauto' % platform,
+                                    '-s', '%d' % srlDMG, '%s' % flag ]
     return packOp
 
 #------------------------------------------------------------------------------
@@ -131,10 +175,10 @@ def Parse_CommandLine_Arguments():
 
     Usage  = "\n"
     Usage += "--------------------------------------------------------------------------------------------\n"
-    Usage += " nightyCatalina.py [EXPERIMENTAL] \n"
-    Usage += "   << To execute the jobs for making KLatyout's DMGs for macOS Catalina >> \n"
+    Usage += " nightlyBuild.py [EXPERIMENTAL] \n"
+    Usage += "   << To execute the jobs for making KLayout's DMGs for macOS Catalina or Big Sur >> \n"
     Usage += "\n"
-    Usage += "$ [python] nightyCatalina.py \n"
+    Usage += "$ [python] nightlyBuild.py \n"
     Usage += "   option & argument : comment on option if any                            | default value\n"
     Usage += "   ------------------------------------------------------------------------+--------------\n"
     Usage += "   [--target <list>] : 0='std', 1='ports', 2='brew', 3='brewHW', 4='ana3', | '0,1,2,3,4'\n"
@@ -146,14 +190,17 @@ def Parse_CommandLine_Arguments():
     Usage += "   [--upload <dropbox>] : upload DMGs to $HOME/Dropbox/klayout/<dropbox>   | disabled\n"
     Usage += "   [-?|--?]             : print this usage and exit                        | disabled\n"
     Usage += "                                                                           | \n"
-    Usage += "      Standard sequence for using this script:                             | \n"
-    Usage += "          (1) $ ./nightyCatalina.py  --build                               | \n"
+    Usage += "      To use this script, make a symbolic link in the project root by:     | \n"
+    Usage += "          $ ln -s ./macbuild/nightlyBuild.py .                             | \n"
+    Usage += "                                                                           | \n"
+    Usage += "      Regular sequence for using this script:                              | \n"
+    Usage += "          (1) $ ./nightlyBuild.py  --build                                 | \n"
     Usage += "          (2)   (confirm the build results)                                | \n"
-    Usage += "          (3) $ ./nightyCatalina.py  --test                                | \n"
-    Usage += "          (4) $ ./nightyCatalina.py  --check (confirm the QA Test results) | \n"
-    Usage += "          (5) $ ./nightyCatalina.py  --makedmg  1                          | \n"
-    Usage += "          (6) $ ./nightyCatalina.py  --upload  '0.26.9'                    | \n"
-    Usage += "          (7) $ ./nightyCatalina.py  --cleandmg 1                          | \n"
+    Usage += "          (3) $ ./nightlyBuild.py  --test                                  | \n"
+    Usage += "          (4) $ ./nightlyBuild.py  --check (confirm the QA Test results)   | \n"
+    Usage += "          (5) $ ./nightlyBuild.py  --makedmg  1                            | \n"
+    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.26.10'                     | \n"
+    Usage += "          (7) $ ./nightlyBuild.py  --cleandmg 1                            | \n"
     Usage += "---------------------------------------------------------------------------+----------------\n"
 
     p = optparse.OptionParser( usage=Usage )
@@ -208,6 +255,12 @@ def Parse_CommandLine_Arguments():
 
     opt, args = p.parse_args()
     if opt.checkusage:
+        print(Usage)
+        quit()
+
+    myPlatform = Test_My_Platform( ['Catalina', 'BigSur'] )
+    if myPlatform == "":
+        print( "! Current platform is not ['Catalina', 'BigSur']" )
         print(Usage)
         quit()
 
@@ -298,7 +351,8 @@ def Build_Deploy():
 #------------------------------------------------------------------------------
 def Run_QATest( exclude ):
     pyRunnerQAT = "./macQAT.py"
-    dirQAT      = Get_QAT_Directory( Get_Build_Target_Dict() )
+    myPlatform  = Test_My_Platform()
+    dirQAT      = Get_QAT_Directory( Get_Build_Target_Dict(), myPlatform )
 
     for key in Target:
         command1 = [ pyRunnerQAT ] + [ '--run', '--exclude', '%s' % exclude ]
@@ -329,7 +383,8 @@ def Run_QATest( exclude ):
 #------------------------------------------------------------------------------
 def Check_QATest_Results( lines ):
     tailCommand = "/usr/bin/tail"
-    dirQAT      = Get_QAT_Directory( Get_Build_Target_Dict() )
+    myPlatform  = Test_My_Platform()
+    dirQAT      = Get_QAT_Directory( Get_Build_Target_Dict(), myPlatform )
 
     for key in Target:
         os.chdir( dirQAT[key] )
@@ -362,7 +417,8 @@ def Check_QATest_Results( lines ):
 def DMG_Make( srlDMG ):
     pyDMGmaker = "./makeDMG4mac.py"
     stashDMG   = "./DMGStash"
-    packOp     = Get_Package_Options( Get_Build_Target_Dict(), srlDMG, makeflag=True )
+    myPlatform = Test_My_Platform()
+    packOp     = Get_Package_Options( Get_Build_Target_Dict(), myPlatform, srlDMG, makeflag=True )
 
     if os.path.isdir( stashDMG ):
         shutil.rmtree( stashDMG )
@@ -399,7 +455,8 @@ def DMG_Make( srlDMG ):
 def DMG_Clean( srlDMG ):
     pyDMGmaker = "./makeDMG4mac.py"
     stashDMG   = "./DMGStash"
-    packOp     = Get_Package_Options( Get_Build_Target_Dict(), srlDMG, makeflag=False )
+    myPlatform = Test_My_Platform()
+    packOp     = Get_Package_Options( Get_Build_Target_Dict(), myPlatform, srlDMG, makeflag=False )
 
     if os.path.isdir( stashDMG ):
         shutil.rmtree( stashDMG )

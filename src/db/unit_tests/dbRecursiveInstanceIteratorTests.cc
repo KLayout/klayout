@@ -302,20 +302,24 @@ static db::Layout boxes2layout (const std::set<db::Box> &boxes)
   return l;
 }
 
-class FlatPusher
-  : public db::RecursiveInstanceReceiver
-{
-public:
-  FlatPusher (std::set<db::Box> *boxes) : mp_boxes (boxes) { }
+namespace {
 
-  void enter_cell (const db::RecursiveInstanceIterator *iter, const db::Cell *cell, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
+  class FlatPusher
+    : public db::RecursiveInstanceReceiver
   {
-    mp_boxes->insert (iter->trans () * cell->bbox ());
-  }
+  public:
+    FlatPusher (std::set<db::Box> *boxes) : mp_boxes (boxes) { }
 
-private:
-  std::set<db::Box> *mp_boxes;
-};
+    void enter_cell (const db::RecursiveInstanceIterator *iter, const db::Cell *cell, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
+    {
+      mp_boxes->insert (iter->trans () * cell->bbox ());
+    }
+
+  private:
+    std::set<db::Box> *mp_boxes;
+  };
+
+}
 
 TEST(2)
 {

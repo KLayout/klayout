@@ -50,6 +50,7 @@
 #include "tlAssert.h"
 #include "tlStream.h"
 #include "tlExceptions.h"
+#include "tlExpression.h"
 #include "dbMemStatistics.h"
 #include "dbManager.h"
 #include "dbStream.h"
@@ -1773,13 +1774,17 @@ MainWindow::cm_goto_position ()
 
         double x = 0.0, y = 0.0, s = 0.0;
         std::string tt (tl::to_string (text));
+
         tl::Extractor ex (tt.c_str ());
-        ex >> x >> "," >> y;
+        x = tl::Eval ().parse (ex).execute ().to_double ();
+        ex.test (",");
+        y = tl::Eval ().parse (ex).execute ().to_double ();
 
         db::DPoint pt (x, y);
 
         if (! ex.at_end ()) {
-          ex >> "," >> s >> tl::Extractor::end ();
+          ex.test (",");
+          s = tl::Eval ().parse (ex).execute ().to_double ();
           current_view ()->goto_window (pt, s);
         } else {
           current_view ()->goto_window (pt);

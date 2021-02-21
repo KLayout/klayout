@@ -86,7 +86,7 @@ LAYBASIC_PUBLIC void indicate_error (QWidget *le, bool error);
 
 //  Provide missing QSignalBlocker for Qt4
 
-class SignalBlocker
+class LAYBASIC_PUBLIC SignalBlocker
 {
 public:
   SignalBlocker (QWidget *w);

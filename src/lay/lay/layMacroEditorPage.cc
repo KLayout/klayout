@@ -43,7 +43,6 @@
 #include <QResource>
 #include <QBuffer>
 #include <QTimer>
-#include <QWindow>
 #include <QListWidget>
 #include <QApplication>
 

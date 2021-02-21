@@ -189,5 +189,21 @@ indicate_error (QWidget *le, bool f)
   le->setPalette (pl);
 }
 
+#if QT_VERSION < 0x050000
+
+SignalBlocker::SignalBlocker (QWidget *w)
+  : mp_widget (w)
+{
+  m_state = mp_widget->blockSignals (true);
+}
+
+SignalBlocker::~SignalBlocker ()
+{
+  mp_widget->blockSignals (m_state);
+}
+
+#endif
+
+
 }
 

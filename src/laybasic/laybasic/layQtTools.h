@@ -31,6 +31,7 @@
 class QLabel;
 class QWidget;
 class QObject;
+class QSignalBlocker;
 
 namespace tl
 {
@@ -80,6 +81,27 @@ LAYBASIC_PUBLIC void indicate_error (QWidget *le, const tl::Exception *ex);
  *  @brief Configures a QLineEdit or other widget to indicate an error
  */
 LAYBASIC_PUBLIC void indicate_error (QWidget *le, bool error);
+
+#if QT_VERSION < 0x050000
+
+//  Provide missing QSignalBlocker for Qt4
+
+class SignalBlocker
+{
+public:
+  SignalBlocker (QWidget *w);
+  ~SignalBlocker ();
+
+private:
+  QWidget *mp_widget;
+  bool m_state;
+};
+
+#else
+
+typedef QSignalBlocker SignalBlocker;
+
+#endif
 
 } // namespace lay
 

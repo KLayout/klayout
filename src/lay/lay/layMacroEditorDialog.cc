@@ -1890,7 +1890,7 @@ MacroEditorDialog::set_editor_focus ()
     return;
   }
 
-  QSignalBlocker signal_blocker (searchEditBox);
+  lay::SignalBlocker signal_blocker (searchEditBox);
   page->set_editor_focus ();
 }
 

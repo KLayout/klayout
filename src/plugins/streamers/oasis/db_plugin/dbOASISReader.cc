@@ -1566,6 +1566,7 @@ OASISReader::read_repetition ()
 
     db::Coord x = 0;
     for (unsigned long i = 0; i <= n; ++i) {
+      m_progress.set (m_stream.pos ());
       db::Coord d = get_ucoord (lgrid);
       if (d != 0) {
         x += d;
@@ -1590,6 +1591,7 @@ OASISReader::read_repetition ()
 
     db::Coord y = 0;
     for (unsigned long i = 0; i <= n; ++i) {
+      m_progress.set (m_stream.pos ());
       db::Coord d = get_ucoord (lgrid);
       if (d != 0) {
         y += d;
@@ -1633,6 +1635,7 @@ OASISReader::read_repetition ()
 
     db::Vector p;
     for (unsigned long i = 0; i <= n; ++i) {
+      m_progress.set (m_stream.pos ());
       db::Vector d = get_gdelta (grid);
       if (d != db::Vector ()) {
         p += d;

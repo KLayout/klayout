@@ -1977,6 +1977,11 @@ static std::string get_technology (const lay::CellViewRef *cv)
   }
 }
 
+static tl::Event &get_technology_changed_event (lay::CellViewRef *cv)
+{
+  return (*cv)->technology_changed_event;
+}
+
 static lay::CellViewRef get_active_cellview_ref ()
 {
   lay::LayoutView *view = lay::LayoutView::current ();
@@ -2182,6 +2187,12 @@ Class<lay::CellViewRef> decl_CellView ("lay", "CellView",
     "The context path leads from the context cell to the target cell in a specific "
     "fashion, i.e. describing each instance in detail, not just by cell indexes. If "
     "the context and target cell are identical, the context path is empty."
+  ) +
+  event_ext ("on_technology_changed", &get_technology_changed_event,
+    "@brief An event indicating that the technology has changed\n"
+    "This event is triggered when the CellView is attached to a different technology.\n"
+    "\n"
+    "This event has been introduced in version 0.27.\n"
   ) +
   method_ext ("technology", &get_technology,
     "@brief Returns the technology name for the layout behind the given cell view\n"

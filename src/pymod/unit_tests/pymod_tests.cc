@@ -98,6 +98,7 @@ PYMODTEST (import_QtXml, "import_QtXml.py")
 PYMODTEST (import_QtSql, "import_QtSql.py")
 PYMODTEST (import_QtNetwork, "import_QtNetwork.py")
 PYMODTEST (import_QtDesigner, "import_QtDesigner.py")
+PYMODTEST (import_QtUiTools, "import_QtUiTools.py")
 
 #if QT_VERSION >= 0x50000
 

@@ -97,7 +97,7 @@ IncludeExpander::read (const std::string &path, tl::InputStream &is, std::string
           include_path = tl::combine_path (tl::dirname (path), include_path);
         }
       } else {
-        include_path = current_uri.resolved (new_uri).to_string ();
+        include_path = current_uri.resolved (new_uri).to_abstract_path ();
       }
 
       tl::InputStream is (include_path);

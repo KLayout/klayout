@@ -145,7 +145,7 @@ Session::make_absolute (const std::string &fp) const
 {
   tl::URI fp_uri (fp);
   if (! m_base_dir.empty () && ! tl::is_absolute (fp_uri.path ())) {
-    return tl::URI (m_base_dir).resolved (fp_uri).to_string ();
+    return tl::URI (m_base_dir).resolved (fp_uri).to_abstract_path ();
   } else {
     return fp;
   }

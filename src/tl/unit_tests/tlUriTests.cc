@@ -164,6 +164,8 @@ TEST(2)
     //  use case taken from Magic writer:
 
     tl::URI uri ("c:\\users\\myself\\path.txt");
+    EXPECT_EQ (uri.scheme (), "");
+    EXPECT_EQ (uri.path (), "c:\\users\\myself\\path.txt");
 
     std::string ext = tl::extension (uri.path ());
     EXPECT_EQ (ext, "txt");
@@ -177,4 +179,17 @@ TEST(2)
     tl::file_utils_force_reset ();
     throw;
   }
+}
+
+//  issue #733
+TEST(3_pathsWithPlus)
+{
+  EXPECT_EQ (tl::URI ("/users/a_plus_b").resolved (tl::URI ("file.txt")).to_string (), "/users/a_plus_b/file.txt");
+  EXPECT_EQ (tl::URI ("/users/a+b").resolved (tl::URI ("file.txt")).to_string (), "/users/a%2Bb/file.txt");
+  EXPECT_EQ (tl::URI ("/users/a+b").resolved (tl::URI ("file.txt")).to_abstract_path (), "/users/a+b/file.txt");
+  EXPECT_EQ (tl::URI ("file://users/a+b").resolved (tl::URI ("file.txt")).to_string (), "file://users/a%2Bb/file.txt");
+  EXPECT_EQ (tl::URI ("file://users/a+b").resolved (tl::URI ("file.txt")).to_abstract_path (), "file://users/a%2Bb/file.txt");
+  //  drive-letter paths
+  EXPECT_EQ (tl::URI ("c:/users/a+b").resolved (tl::URI ("file.txt")).to_string (), "c:/users/a%2Bb/file.txt");
+  EXPECT_EQ (tl::URI ("c:/users/a+b").resolved (tl::URI ("file.txt")).to_abstract_path (), "c:/users/a+b/file.txt");
 }

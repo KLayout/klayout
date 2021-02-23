@@ -25,6 +25,7 @@
 #include "lymMacroInterpreter.h"
 #include "tlExceptions.h"
 #include "tlString.h"
+#include "layQtTools.h"
 
 #include <cstdio>
 #include <iostream>
@@ -566,12 +567,23 @@ void MacroEditorPage::current_line_changed ()
 
 void MacroEditorPage::run_mode_changed ()
 {
-  if (mp_exec_model->run_mode ()) {
-    set_error_line (0);
+  //  this prevents recursion when the following lines trigger anything that routes through the interpreter
+  bool bl = mp_exec_model->blockSignals (true);
+
+  try {
+
+    if (mp_exec_model->run_mode ()) {
+      set_error_line (0);
+    }
+
+    mp_text->setReadOnly (! mp_macro || mp_macro->is_readonly () || mp_exec_model->run_mode ());
+    update_extra_selections ();
+
+  } catch (...) {
+    //  .. ignore exceptions here ..
   }
 
-  mp_text->setReadOnly (! mp_macro || mp_macro->is_readonly () || mp_exec_model->run_mode ());
-  update_extra_selections ();
+  mp_exec_model->blockSignals (bl);
 }
 
 void MacroEditorPage::breakpoints_changed ()

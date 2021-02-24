@@ -26,7 +26,7 @@ import sys
 class BasicTest(unittest.TestCase):
 
   def test_1(self):
-    self.assertEqual("QFormBuilder" in QtDesigner.__all__, True)
+    self.assertEqual("QUiLoader" in QtUiTools.__all__, True)
 
   def test_2(self):
     q = QtUiTools.QUiLoader()

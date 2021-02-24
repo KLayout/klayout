@@ -30,3 +30,4 @@ FORCE_LINK_GSI_QTCORE
 FORCE_LINK_GSI_QTUITOOLS
 
 DEFINE_PYMOD(QtUiTools, "QtUiTools", "KLayout/Qt module 'QtUiTools'")
+

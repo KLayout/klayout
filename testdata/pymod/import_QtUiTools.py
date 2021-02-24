@@ -29,6 +29,7 @@ class BasicTest(unittest.TestCase):
     self.assertEqual("QUiLoader" in QtUiTools.__all__, True)
 
   def test_2(self):
+    app = QtCore.QCoreApplication([ "appname" ])
     q = QtUiTools.QUiLoader()
 
 # run unit tests

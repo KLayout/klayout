@@ -2791,9 +2791,6 @@ MacroEditorDialog::start_exec (gsi::Interpreter *ec)
   try {
 
     m_file_to_widget.clear ();
-    m_include_expanders.clear ();
-    m_include_paths_to_ids.clear ();
-    m_include_file_id_cache.clear ();
 
     m_last_process_events = tl::Clock::current ();
 

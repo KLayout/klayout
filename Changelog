@@ -1,6 +1,10 @@
 
-0.26.11         (2021-02-06):
+0.26.11         (2021-02-xx):
 
+* Bugfix: %GITHUB%/issues/733
+  Relative path resolution in session files fails when the session file's path contains "+" characters
+* Enhancement: %GITHUB%/issues/730
+  Support of class 'QUiLoader' in PYA and RBA
 * Bugfix: %GITHUB%/issues/726
   Crash on LayoutView#clear_selection on Linux.
 * Bugfix: %GITHUB%/issues/723

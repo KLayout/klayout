@@ -7,10 +7,12 @@ SUBDIRS = \
   QtXml \
   QtSql \
   QtNetwork \
-  QtDesigner
+  QtDesigner \
+  QtUiTools
 
 QtGui.depends += QtCore
 QtNetwork.depends += QtCore
 QtSql.depends += QtCore
 QtDesigner.depends += QtCore
 QtXml.depends += QtCore
+QtUiTools.depends += QtCore

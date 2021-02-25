@@ -313,7 +313,7 @@ private:
   MacroEditorHighlighters m_highlighters;
   std::vector<std::pair<lym::Macro *, MacroEditorPage *> > m_file_to_widget;
   std::vector<lay::MacroEditorTree *> m_macro_trees;
-  bool m_in_exec, m_in_breakpoint;
+  bool m_in_exec, m_in_breakpoint, m_ignore_exec_events;
   gsi::Interpreter *mp_exec_controller, *mp_current_interpreter;
   bool m_continue;
   int m_trace_count;

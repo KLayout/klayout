@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2020 Matthias Koefferlein
+  Copyright (C) 2006-2021 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,15 +26,8 @@
 #include "../../gsiqt/qtbasic/gsiQtCoreExternals.h"
 FORCE_LINK_GSI_QTCORE
 
-//  And this is *only* required because of QSignalMapper which takes a QWidget argument from
-//  the QtGui library and we need to supply the GSI binding for this ...
-#include "../../gsiqt/qtbasic/gsiQtGuiExternals.h"
-FORCE_LINK_GSI_QTGUI
+#include "../../gsiqt/qtbasic/gsiQtUiToolsExternals.h"
+FORCE_LINK_GSI_QTUITOOLS
 
-//  And because we pull in QtGui, we also need to pull in QtWidgets because QtGui bindings
-//  use QAction and QWidget which are itself in QtWidgets
-#include "../../gsiqt/qtbasic/gsiQtWidgetsExternals.h"
-FORCE_LINK_GSI_QTWIDGETS
-
-DEFINE_PYMOD(QtCore, "QtCore", "KLayout/Qt module 'QtCore'")
+DEFINE_PYMOD(QtUiTools, "QtUiTools", "KLayout/Qt module 'QtUiTools'")
 

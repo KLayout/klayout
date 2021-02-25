@@ -20,6 +20,7 @@ SUBDIRS = \
         QtSql \
         QtWidgets \
         QtDesigner \
+        QtUiTools \
         QtMultimedia \
         QtPrintSupport \
         QtSvg \
@@ -34,7 +35,8 @@ SUBDIRS = \
         QtXml \
         QtSql \
         QtNetwork \
-        QtDesigner
+        QtDesigner \
+        QtUiTools
 
     }
   }

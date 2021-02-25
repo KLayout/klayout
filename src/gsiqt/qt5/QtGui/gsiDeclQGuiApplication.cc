@@ -99,28 +99,6 @@ static void _call_f_isSessionRestored_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// bool QGuiApplication::notify(QObject *, QEvent *)
-
-
-static void _init_f_notify_2411 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
-  decl->add_arg<QEvent * > (argspec_1);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_notify_2411 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
-  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
-  ret.write<bool > ((bool)((QGuiApplication *)cls)->notify (arg1, arg2));
-}
-
-
 // QString QGuiApplication::sessionId()
 
 
@@ -831,7 +809,6 @@ static gsi::Methods methods_QGuiApplication () {
   methods += new qt_gsi::GenericMethod ("devicePixelRatio", "@brief Method double QGuiApplication::devicePixelRatio()\n", true, &_init_f_devicePixelRatio_c0, &_call_f_devicePixelRatio_c0);
   methods += new qt_gsi::GenericMethod ("isSavingSession?", "@brief Method bool QGuiApplication::isSavingSession()\n", true, &_init_f_isSavingSession_c0, &_call_f_isSavingSession_c0);
   methods += new qt_gsi::GenericMethod ("isSessionRestored?", "@brief Method bool QGuiApplication::isSessionRestored()\n", true, &_init_f_isSessionRestored_c0, &_call_f_isSessionRestored_c0);
-  methods += new qt_gsi::GenericMethod ("notify", "@brief Method bool QGuiApplication::notify(QObject *, QEvent *)\nThis is a reimplementation of QCoreApplication::notify", false, &_init_f_notify_2411, &_call_f_notify_2411);
   methods += new qt_gsi::GenericMethod ("sessionId", "@brief Method QString QGuiApplication::sessionId()\n", true, &_init_f_sessionId_c0, &_call_f_sessionId_c0);
   methods += new qt_gsi::GenericMethod ("sessionKey", "@brief Method QString QGuiApplication::sessionKey()\n", true, &_init_f_sessionKey_c0, &_call_f_sessionKey_c0);
   methods += gsi::qt_signal ("aboutToQuit()", "aboutToQuit", "@brief Signal declaration for QGuiApplication::aboutToQuit()\nYou can bind a procedure to this signal.");
@@ -1034,21 +1011,6 @@ public:
     emit QGuiApplication::layoutDirectionChanged(direction);
   }
 
-  //  [adaptor impl] bool QGuiApplication::notify(QObject *, QEvent *)
-  bool cbs_notify_2411_0(QObject *arg1, QEvent *arg2)
-  {
-    return QGuiApplication::notify(arg1, arg2);
-  }
-
-  virtual bool notify(QObject *arg1, QEvent *arg2)
-  {
-    if (cb_notify_2411_0.can_issue()) {
-      return cb_notify_2411_0.issue<QGuiApplication_Adaptor, bool, QObject *, QEvent *>(&QGuiApplication_Adaptor::cbs_notify_2411_0, arg1, arg2);
-    } else {
-      return QGuiApplication::notify(arg1, arg2);
-    }
-  }
-
   //  [emitter impl] void QGuiApplication::objectNameChanged(const QString &objectName)
   void emitter_QGuiApplication_objectNameChanged_4567(const QString &objectName)
   {
@@ -1168,7 +1130,6 @@ public:
   }
 
   gsi::Callback cb_eventFilter_2411_0;
-  gsi::Callback cb_notify_2411_0;
   gsi::Callback cb_childEvent_1701_0;
   gsi::Callback cb_customEvent_1217_0;
   gsi::Callback cb_disconnectNotify_2394_0;
@@ -1495,32 +1456,6 @@ static void _call_emitter_layoutDirectionChanged_2316 (const qt_gsi::GenericMeth
 }
 
 
-// bool QGuiApplication::notify(QObject *, QEvent *)
-
-static void _init_cbs_notify_2411_0 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
-  decl->add_arg<QEvent * > (argspec_1);
-  decl->set_return<bool > ();
-}
-
-static void _call_cbs_notify_2411_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
-  ret.write<bool > ((bool)((QGuiApplication_Adaptor *)cls)->cbs_notify_2411_0 (arg1, arg2));
-}
-
-static void _set_callback_cbs_notify_2411_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QGuiApplication_Adaptor *)cls)->cb_notify_2411_0 = cb;
-}
-
-
 // emitter void QGuiApplication::objectNameChanged(const QString &objectName)
 
 static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
@@ -1738,8 +1673,6 @@ static gsi::Methods methods_QGuiApplication_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QGuiApplication::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_lastWindowClosed", "@brief Emitter for signal void QGuiApplication::lastWindowClosed()\nCall this method to emit this signal.", false, &_init_emitter_lastWindowClosed_0, &_call_emitter_lastWindowClosed_0);
   methods += new qt_gsi::GenericMethod ("emit_layoutDirectionChanged", "@brief Emitter for signal void QGuiApplication::layoutDirectionChanged(Qt::LayoutDirection direction)\nCall this method to emit this signal.", false, &_init_emitter_layoutDirectionChanged_2316, &_call_emitter_layoutDirectionChanged_2316);
-  methods += new qt_gsi::GenericMethod ("notify", "@hide", false, &_init_cbs_notify_2411_0, &_call_cbs_notify_2411_0);
-  methods += new qt_gsi::GenericMethod ("notify", "@brief Virtual method bool QGuiApplication::notify(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_notify_2411_0, &_call_cbs_notify_2411_0, &_set_callback_cbs_notify_2411_0);
   methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QGuiApplication::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("emit_organizationDomainChanged", "@brief Emitter for signal void QGuiApplication::organizationDomainChanged()\nCall this method to emit this signal.", false, &_init_emitter_organizationDomainChanged_0, &_call_emitter_organizationDomainChanged_0);
   methods += new qt_gsi::GenericMethod ("emit_organizationNameChanged", "@brief Emitter for signal void QGuiApplication::organizationNameChanged()\nCall this method to emit this signal.", false, &_init_emitter_organizationNameChanged_0, &_call_emitter_organizationNameChanged_0);

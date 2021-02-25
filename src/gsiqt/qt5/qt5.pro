@@ -12,7 +12,8 @@ SUBDIRS = \
   QtPrintSupport \
   QtSvg \
   QtXmlPatterns \
-  QtXml
+  QtXml \
+  QtUiTools
 
 QtGui.depends += QtCore
 QtNetwork.depends += QtCore
@@ -24,3 +25,4 @@ QtPrintSupport.depends += QtCore QtWidgets
 QtSvg.depends += QtCore QtWidgets
 QtXmlPatterns.depends += QtCore
 QtXml.depends += QtCore
+QtUiTools.depends += QtCore

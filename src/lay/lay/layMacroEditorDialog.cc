@@ -244,6 +244,7 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
     m_highlighters (this),
     m_in_exec (false), 
     m_in_breakpoint (false), 
+    m_ignore_exec_events (false),
     mp_exec_controller (0),
     mp_current_interpreter (0),
     m_continue (false),
@@ -2850,54 +2851,77 @@ MacroEditorDialog::start_exec (gsi::Interpreter *ec)
   if (m_in_exec) {
     tl_assert (ec != mp_exec_controller);
     return;
+  } else if (m_ignore_exec_events) {
+    return;
   }
 
-  m_file_to_widget.clear ();
-  m_include_expanders.clear ();
-  m_include_paths_to_ids.clear ();
-  m_include_file_id_cache.clear ();
+  //  prevents recursion
+  m_ignore_exec_events = true;
 
-  m_last_process_events = tl::Clock::current ();
+  try {
 
-  m_in_exec = true;
-  mp_exec_controller = ec;
-  m_in_breakpoint = false;
-  m_continue = true;
-  m_trace_count = 0;
-  m_current_stack_depth = -1;
-  m_process_events_interval = 0.05;
+    m_file_to_widget.clear ();
+    m_include_expanders.clear ();
+    m_include_paths_to_ids.clear ();
+    m_include_file_id_cache.clear ();
 
-  for (std::map<lym::Macro *, MacroEditorPage *>::const_iterator f = m_tab_widgets.begin (); f != m_tab_widgets.end (); ++f) {
-    f->second->exec_model ()->set_current_line (-1);
-    f->second->exec_model ()->set_run_mode (true);
+    m_last_process_events = tl::Clock::current ();
+
+    m_in_exec = true;
+    mp_exec_controller = ec;
+    m_in_breakpoint = false;
+    m_continue = true;
+    m_trace_count = 0;
+    m_current_stack_depth = -1;
+    m_process_events_interval = 0.05;
+
+    for (std::map<lym::Macro *, MacroEditorPage *>::const_iterator f = m_tab_widgets.begin (); f != m_tab_widgets.end (); ++f) {
+      f->second->exec_model ()->set_current_line (-1);
+      f->second->exec_model ()->set_run_mode (true);
+    }
+
+    do_update_ui_to_run_mode ();
+
+  } catch (...) {
+    //  .. ignore exceptions here ..
   }
 
-  do_update_ui_to_run_mode ();
+  m_ignore_exec_events = false;
 }
 
 void
 MacroEditorDialog::end_exec (gsi::Interpreter *ec)
 {
-  //  ignore calls from other interpreters
-  if (m_in_exec && ec != mp_exec_controller) {
+  if ((m_in_exec && ec != mp_exec_controller) || m_ignore_exec_events) {
     return;
   }
 
-  if (QApplication::activeModalWidget () == this) {
-    //  close this window if it was shown in modal mode
-    QDialog::accept ();
+  //  prevents recursion
+  m_ignore_exec_events = true;
+
+  try {
+
+    m_in_exec = false;
+    mp_exec_controller = 0;
+    m_continue = false;
+    m_current_stack_depth = -1;
+
+    if (QApplication::activeModalWidget () == this) {
+      //  close this window if it was shown in modal mode
+      QDialog::accept ();
+    }
+
+    for (std::map<lym::Macro *, MacroEditorPage *>::const_iterator f = m_tab_widgets.begin (); f != m_tab_widgets.end (); ++f) {
+      f->second->exec_model ()->set_run_mode (false);
+    }
+
+    do_update_ui_to_run_mode ();
+
+  } catch (...) {
+    //  .. ignore exceptions here ..
   }
 
-  m_in_exec = false;
-  mp_exec_controller = 0;
-  m_continue = false;
-  m_current_stack_depth = -1;
-
-  for (std::map<lym::Macro *, MacroEditorPage *>::const_iterator f = m_tab_widgets.begin (); f != m_tab_widgets.end (); ++f) {
-    f->second->exec_model ()->set_run_mode (false);
-  }
-
-  do_update_ui_to_run_mode ();
+  m_ignore_exec_events = false;
 }
 
 const size_t pseudo_file_offset = std::numeric_limits<size_t>::max () / 2;

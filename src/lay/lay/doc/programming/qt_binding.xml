@@ -30,6 +30,7 @@
     <li>QtSql: database support</li>
     <li>QtNetwork: various network protocols and supporting classes</li>
     <li>QtDesigner: dynamically load designer files (.ui)</li>
+    <li>QtUiTools: dynamically load designer files (.ui)</li>
     <li>QtMultimedia (Qt5): multimedia support</li>
     <li>QtPrintSupport (Qt5): print support</li>
     <li>QtSvg (Qt5): SVG implementation</li>

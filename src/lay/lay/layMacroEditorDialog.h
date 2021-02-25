@@ -323,7 +323,7 @@ private:
   std::map<std::string, size_t> m_include_paths_to_ids;
   std::map<std::pair<size_t, int>, std::pair<size_t, int> > m_include_file_id_cache;
   std::vector<lay::MacroEditorTree *> m_macro_trees;
-  bool m_in_exec, m_in_breakpoint;
+  bool m_in_exec, m_in_breakpoint, m_ignore_exec_events;
   gsi::Interpreter *mp_exec_controller, *mp_current_interpreter;
   bool m_continue;
   int m_trace_count;

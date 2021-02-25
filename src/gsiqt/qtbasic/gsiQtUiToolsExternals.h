@@ -20,21 +20,8 @@
 
 */
 
-#include "../pymodHelper.h"
-
-//  To force linking of the QtCore module
-#include "../../gsiqt/qtbasic/gsiQtCoreExternals.h"
-FORCE_LINK_GSI_QTCORE
-
-//  And this is *only* required because of QSignalMapper which takes a QWidget argument from
-//  the QtGui library and we need to supply the GSI binding for this ...
-#include "../../gsiqt/qtbasic/gsiQtGuiExternals.h"
-FORCE_LINK_GSI_QTGUI
-
-//  And because we pull in QtGui, we also need to pull in QtWidgets because QtGui bindings
-//  use QAction and QWidget which are itself in QtWidgets
-#include "../../gsiqt/qtbasic/gsiQtWidgetsExternals.h"
-FORCE_LINK_GSI_QTWIDGETS
-
-DEFINE_PYMOD(QtCore, "QtCore", "KLayout/Qt module 'QtCore'")
-
+#if QT_VERSION >= 0x050000
+#  include "../qt5/QtUiTools/gsiQtExternals.h"
+#else
+#  include "../qt4/QtUiTools/gsiQtExternals.h"
+#endif

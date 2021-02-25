@@ -163,13 +163,13 @@ equals(HAVE_QT, "0") {
   QT += core network xml sql
 
   equals(HAVE_QT5, "1") {
-    QT += designer printsupport widgets
+    QT += designer printsupport widgets uitools
     equals(HAVE_QTBINDINGS, "1") {
       QT += multimedia multimediawidgets xmlpatterns svg gui
     }
   } else {
     # questionable: use uitools instead?
-    CONFIG += designer
+    CONFIG += designer uitools
   }
 
 }

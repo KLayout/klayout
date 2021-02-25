@@ -398,6 +398,8 @@ public:
    *
    *  This will automatically create the appropriate delegate and 
    *  delete it later.
+   *
+   *  The abstract path
    */
   InputStream (const std::string &abstract_path);
 

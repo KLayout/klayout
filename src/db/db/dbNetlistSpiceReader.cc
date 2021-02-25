@@ -395,7 +395,7 @@ void NetlistSpiceReader::push_stream (const std::string &path)
       istream = new tl::InputStream (tl::combine_path (tl::dirname (mp_stream->source ()), path));
     }
   } else {
-    istream = new tl::InputStream (current_uri.resolved (new_uri).to_string ());
+    istream = new tl::InputStream (current_uri.resolved (new_uri).to_abstract_path ());
   }
 
   m_streams.push_back (std::make_pair (istream, mp_stream.release ()));

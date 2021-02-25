@@ -209,6 +209,16 @@ URI::to_string () const
   return res;
 }
 
+std::string
+URI::to_abstract_path () const
+{
+  if (m_scheme.empty ()) {
+    return path ();
+  } else {
+    return to_string ();
+  }
+}
+
 URI
 URI::resolved (const URI &other) const
 {

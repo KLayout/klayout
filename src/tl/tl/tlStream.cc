@@ -165,8 +165,9 @@ InputStream::InputStream (const std::string &abstract_path)
 
   tl::Extractor ex (abstract_path.c_str ());
 
-#if defined(HAVE_QT)
   if (ex.test (":")) {
+
+#if defined(HAVE_QT)
 
     QResource res (tl::to_qstring (abstract_path));
     if (res.size () > 0) {
@@ -187,20 +188,32 @@ InputStream::InputStream (const std::string &abstract_path)
 
     }
 
-  } else
+#else
+    throw tl::Exception (tl::to_string (tr ("Qt not enabled - resource paths are not available")));
 #endif
-#if defined(HAVE_CURL) || defined(HAVE_QT)
-  if (ex.test ("http:") || ex.test ("https:")) {
-    mp_delegate = new InputHttpStream (abstract_path);
-  } else
-#endif
-  if (ex.test ("pipe:")) {
+
+  } else if (ex.test ("pipe:")) {
+
     mp_delegate = new InputPipe (ex.get ());
-  } else if (ex.test ("file:")) {
-    tl::URI uri (abstract_path);
-    mp_delegate = new InputZLibFile (uri.path ());
+
   } else {
-    mp_delegate = new InputZLibFile (abstract_path);
+
+    tl::URI uri (abstract_path);
+
+    if (uri.scheme () == "http" || uri.scheme () == "https") {
+#if defined(HAVE_CURL) || defined(HAVE_QT)
+      mp_delegate = new InputHttpStream (abstract_path);
+#else
+      throw tl::Exception (tl::to_string (tr ("HTTP support not enabled - HTTP/HTTPS paths are not available")));
+#endif
+    } else if (uri.scheme () == "file") {
+      mp_delegate = new InputZLibFile (uri.path ());
+    } else if (! uri.scheme ().empty ()) {
+      throw tl::Exception (tl::to_string (tr ("URI scheme not supported: ")) + uri.scheme ());
+    } else {
+      mp_delegate = new InputZLibFile (abstract_path);
+    }
+
   }
 
   if (! mp_buffer) {

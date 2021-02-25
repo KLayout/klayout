@@ -126,21 +126,9 @@ public:
   lay::LayerPropertiesConstIterator iterator (const QModelIndex &index) const;
 
   /**
-   *  @brief Get a flag indicating that a layer is empty 
+   *  @brief Get a flag indicating that an entry is hidden
    */
-  bool empty_predicate (const QModelIndex &index) const;
-
-  /**
-   *  @brief Get a flag indicating that a layer does not have shapes within the shown area
-   */
-  bool empty_within_view_predicate (const QModelIndex &index) const;
-
-  /**
-   *  @brief Set the non-empty layers (the "uint" for the layer iterators) for the "test shapes is view" mode
-   *
-   *  @return True, if a change has been made.
-   */
-  bool set_non_empty_layers (const std::set <size_t> &non_empty_layers);
+  bool is_hidden (const QModelIndex &index) const;
 
   /**
    *  @brief Set the animation phase
@@ -201,13 +189,42 @@ public:
   void clear_locate ();
 
   /**
-   *  @brief Set the test_shapes_in_view flag
-   *
-   *  This method does not issue a data changed signal. This has to be done somewhere else.
+   *  @brief Sets a flag indicating whether to test shapes in view for highlighting non-empty layers
    */
-  void set_test_shapes_in_view (bool f)
+  void set_test_shapes_in_view (bool f);
+
+  /**
+   *  @brief Gets a flag indicating whether to test shapes in view for highlighting non-empty layers
+   */
+  bool get_test_shapes_in_view ()
   {
-    m_test_shapes_in_view = f;
+    return m_test_shapes_in_view;
+  }
+
+  /**
+   *  @brief Sets the flag indicating whether to hide empty layers
+   */
+  void set_hide_empty_layers (bool f);
+
+  /**
+   *  @brief Gets the flag indicating whether to hide empty layers
+   */
+  bool get_hide_empty_layers () const
+  {
+    return m_hide_empty_layers;
+  }
+
+  /**
+   *  @brief Sets a flag indicating whether selected indexes are filtered or highlighted
+   */
+  void set_filter_mode (bool f);
+
+  /**
+   *  @brief Gets a flag indicating whether selected indexes are filtered or highlighted
+   */
+  bool get_filter_mode () const
+  {
+    return m_filter_mode;
   }
 
   /**
@@ -220,17 +237,35 @@ public:
    */
   void signal_layer_changed ();
 
+signals:
+  /**
+   *  @brief This signal is emitted to indicate
+   */
+  void hidden_flags_need_update ();
+
 private: 
   lay::LayoutView *mp_view;
+  bool m_filter_mode;
   size_t m_id_start, m_id_end;
   unsigned int m_phase;
   bool m_test_shapes_in_view;
+  bool m_hide_empty_layers;
   QFont m_font;
   QColor m_text_color, m_background_color;
   mutable EmptyWithinViewCache m_test_shapes_cache;
   std::set <size_t> m_selected_ids;
   std::vector <QModelIndex> m_selected_indexes;
   std::vector <QModelIndex>::const_iterator m_current_index;
+
+  /**
+   *  @brief Get a flag indicating that a layer is empty
+   */
+  bool empty_predicate (const QModelIndex &index) const;
+
+  /**
+   *  @brief Get a flag indicating that a layer does not have shapes within the shown area
+   */
+  bool empty_within_view_predicate (const QModelIndex &index) const;
 
   void search_children (const tl::GlobPattern &pattern, const QModelIndex &parent, bool recurse);
 };

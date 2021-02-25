@@ -219,7 +219,7 @@ PropertiesPage::get_xmin_xmax (double &xmin, double &xmax, bool &has_error_out)
 
   try {
     tl::from_string (tl::to_string (from_le->text ()), xmin);
-    lay::indicate_error (from_le, 0);
+    lay::indicate_error (from_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (from_le, &ex);
     has_error = true;
@@ -227,7 +227,7 @@ PropertiesPage::get_xmin_xmax (double &xmin, double &xmax, bool &has_error_out)
 
   try {
     tl::from_string (tl::to_string (to_le->text ()), xmax);
-    lay::indicate_error (to_le, 0);
+    lay::indicate_error (to_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (to_le, &ex);
     has_error = true;
@@ -336,7 +336,7 @@ PropertiesPage::value_changed ()
   double x = 0.0;
   try {
     tl::from_string (tl::to_string (value_le->text ()), x);
-    lay::indicate_error (value_le, 0);
+    lay::indicate_error (value_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (value_le, &ex);
     has_error = true;
@@ -805,7 +805,7 @@ PropertiesPage::apply ()
     if (w <= 0.0 || h <= 0.0) {
       throw tl::Exception (tl::to_string (QObject::tr ("Pixel width or height must be positive, non-null values")));
     }
-    lay::indicate_error (width_le, 0);
+    lay::indicate_error (width_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (width_le, &ex);
     has_error = true;
@@ -813,7 +813,7 @@ PropertiesPage::apply ()
 
   try {
     tl::from_string (tl::to_string (height_le->text ()), h);
-    lay::indicate_error (height_le, 0);
+    lay::indicate_error (height_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (height_le, &ex);
     has_error = true;
@@ -821,7 +821,7 @@ PropertiesPage::apply ()
 
   try {
     tl::from_string (tl::to_string (x_offset_le->text ()), x);
-    lay::indicate_error (x_offset_le, 0);
+    lay::indicate_error (x_offset_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (x_offset_le, &ex);
     has_error = true;
@@ -829,7 +829,7 @@ PropertiesPage::apply ()
 
   try {
     tl::from_string (tl::to_string (y_offset_le->text ()), y);
-    lay::indicate_error (y_offset_le, 0);
+    lay::indicate_error (y_offset_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (y_offset_le, &ex);
     has_error = true;
@@ -837,7 +837,7 @@ PropertiesPage::apply ()
 
   try {
     tl::from_string (tl::to_string (angle_le->text ()), a);
-    lay::indicate_error (angle_le, 0);
+    lay::indicate_error (angle_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (angle_le, &ex);
     has_error = true;
@@ -848,7 +848,7 @@ PropertiesPage::apply ()
     if (sa <= -45 || sa >= 45) {
       throw tl::Exception (tl::to_string (QObject::tr ("The shear angle must be larger than -45 and less than 45 degree")));
     }
-    lay::indicate_error (shear_le, 0);
+    lay::indicate_error (shear_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (shear_le, &ex);
     has_error = true;
@@ -859,7 +859,7 @@ PropertiesPage::apply ()
     if (tx <= -90 || tx >= 90) {
       throw tl::Exception (tl::to_string (QObject::tr ("The perspective tilt angles must be larger than -90 and less than 90 degree")));
     }
-    lay::indicate_error (persp_tx_le, 0);
+    lay::indicate_error (persp_tx_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (persp_tx_le, &ex);
     has_error = true;
@@ -870,7 +870,7 @@ PropertiesPage::apply ()
     if (ty <= -90 || ty >= 90) {
       throw tl::Exception (tl::to_string (QObject::tr ("The perspective tilt angles must be larger than -90 and less than 90 degree")));
     }
-    lay::indicate_error (persp_ty_le, 0);
+    lay::indicate_error (persp_ty_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (persp_ty_le, &ex);
     has_error = true;

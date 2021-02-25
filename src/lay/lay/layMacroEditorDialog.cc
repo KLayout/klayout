@@ -355,8 +355,8 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   QMenu *m = new QMenu (searchEditBox);
   m->addAction (actionUseRegularExpressions);
   m->addAction (actionCaseSensitive);
-  connect (actionUseRegularExpressions, SIGNAL (triggered ()), this, SLOT (apply_search ()));
-  connect (actionCaseSensitive, SIGNAL (triggered ()), this, SLOT (apply_search ()));
+  connect (actionUseRegularExpressions, SIGNAL (triggered ()), this, SLOT (search_editing ()));
+  connect (actionCaseSensitive, SIGNAL (triggered ()), this, SLOT (search_editing ()));
 
   addAction (actionSearchReplace);
   connect (actionSearchReplace, SIGNAL (triggered ()), this, SLOT (search_replace ()));
@@ -364,7 +364,11 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   searchEditBox->set_clear_button_enabled (true);
   searchEditBox->set_options_button_enabled (true);
   searchEditBox->set_options_menu (m);
+  searchEditBox->set_escape_signal_enabled (true);
+  searchEditBox->set_tab_signal_enabled (true);
   replaceText->set_clear_button_enabled (true);
+  replaceText->set_escape_signal_enabled (true);
+  replaceText->set_tab_signal_enabled (true);
 #if QT_VERSION >= 0x40700
   searchEditBox->setPlaceholderText (tr ("Find text ..."));
   replaceText->setPlaceholderText (tr ("Replace text ..."));
@@ -382,8 +386,6 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   tabWidget->setMovable (true);
   tabWidget->setTabsClosable (true);
   connect (tabWidget, SIGNAL (tabCloseRequested (int)), this, SLOT (tab_close_requested (int)));
-  closeButton->hide ();
-  closeButtonSeparator->hide ();
 #endif
 
   dbgOn->setEnabled (true);
@@ -411,7 +413,6 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   connect (helpButton, SIGNAL (clicked ()), this, SLOT (help_button_clicked ()));
   connect (addButton, SIGNAL (clicked ()), this, SLOT (add_button_clicked ()));
   connect (actionAddMacro, SIGNAL (triggered ()), this, SLOT (add_button_clicked ()));
-  connect (closeButton, SIGNAL (clicked ()), this, SLOT (close_button_clicked ()));
   connect (deleteButton, SIGNAL (clicked ()), this, SLOT (delete_button_clicked ()));
   connect (actionDelete, SIGNAL (triggered ()), this, SLOT (delete_button_clicked ()));
   connect (renameButton, SIGNAL (clicked ()), this, SLOT (rename_button_clicked ()));
@@ -438,9 +439,16 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   connect (callStack, SIGNAL (itemDoubleClicked (QListWidgetItem *)), this, SLOT (stack_element_double_clicked (QListWidgetItem *)));
   connect (singleStepButton, SIGNAL (clicked ()), this, SLOT (single_step_button_clicked ()));
   connect (nextStepButton, SIGNAL (clicked ()), this, SLOT (next_step_button_clicked ()));
+  connect (searchEditBox, SIGNAL (textEdited (const QString &)), this, SLOT (search_editing ()));
   connect (searchEditBox, SIGNAL (returnPressed ()), this, SLOT (search_edited ()));
   connect (searchEditBox, SIGNAL (editingFinished ()), this, SLOT (search_edited ()));
-  connect (searchEditBox, SIGNAL (textEdited (QString)), this, SLOT (apply_search ()));
+  connect (searchEditBox, SIGNAL (esc_pressed ()), this, SLOT (search_finished ()));
+  connect (searchEditBox, SIGNAL (tab_pressed ()), this, SLOT (find_next_button_clicked ()));
+  connect (searchEditBox, SIGNAL (backtab_pressed ()), this, SLOT (find_prev_button_clicked ()));
+  connect (replaceText, SIGNAL (esc_pressed ()), this, SLOT (search_finished ()));
+  connect (replaceText, SIGNAL (tab_pressed ()), this, SLOT (find_next_button_clicked ()));
+  connect (replaceText, SIGNAL (backtab_pressed ()), this, SLOT (find_prev_button_clicked ()));
+  connect (replaceText, SIGNAL (returnPressed ()), this, SLOT (replace_next_button_clicked ()));
   connect (replaceModeButton, SIGNAL (clicked ()), this, SLOT (replace_mode_button_clicked ()));
   connect (replaceNextButton, SIGNAL (clicked ()), this, SLOT (replace_next_button_clicked ()));
   connect (findNextButton, SIGNAL (clicked ()), this, SLOT (find_next_button_clicked ()));
@@ -946,15 +954,13 @@ MacroEditorDialog::showEvent (QShowEvent *)
 void
 MacroEditorDialog::reject ()
 {
-  closeEvent (0);
-  QDialog::reject ();
+  //  .. ignore Esc ..
 }
   
 void
 MacroEditorDialog::accept ()
 {
-  closeEvent (0);
-  QDialog::accept ();
+  //  .. ignore Enter ..
 }
   
 void 
@@ -1103,12 +1109,6 @@ MacroEditorDialog::can_exit ()
   }
 
   return true;
-}
-
-void
-MacroEditorDialog::search_replace ()
-{
-  searchEditBox->setFocus (Qt::TabFocusReason);
 }
 
 void
@@ -1882,6 +1882,18 @@ BEGIN_PROTECTED
 END_PROTECTED
 }
 
+void
+MacroEditorDialog::set_editor_focus ()
+{
+  MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
+  if (! page) {
+    return;
+  }
+
+  lay::SignalBlocker signal_blocker (searchEditBox);
+  page->set_editor_focus ();
+}
+
 void  
 MacroEditorDialog::replace_mode_button_clicked ()
 {
@@ -1905,10 +1917,27 @@ MacroEditorDialog::find_next_button_clicked ()
 
   apply_search (true);
   page->find_next ();
-  page->set_editor_focus ();
+  if (sender () != searchEditBox && sender () != replaceText) {
+    set_editor_focus ();
+  }
 }
 
-void  
+void
+MacroEditorDialog::find_prev_button_clicked ()
+{
+  MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
+  if (! page) {
+    return;
+  }
+
+  apply_search (true);
+  page->find_prev ();
+  if (sender () != searchEditBox && sender () != replaceText) {
+    set_editor_focus ();
+  }
+}
+
+void
 MacroEditorDialog::replace_next_button_clicked ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
@@ -1918,10 +1947,12 @@ MacroEditorDialog::replace_next_button_clicked ()
 
   apply_search (true);
   page->replace_and_find_next (replaceText->text ());
-  page->set_editor_focus ();
+  if (sender () != replaceText) {
+    set_editor_focus ();
+  }
 }
 
-void  
+void
 MacroEditorDialog::replace_all_button_clicked ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
@@ -1931,7 +1962,34 @@ MacroEditorDialog::replace_all_button_clicked ()
 
   apply_search (true);
   page->replace_all (replaceText->text ());
-  page->set_editor_focus ();
+  set_editor_focus ();
+}
+
+void
+MacroEditorDialog::search_requested (const QString &s)
+{
+  searchEditBox->setText (s);
+  searchEditBox->setFocus ();
+  search_editing ();
+}
+
+void
+MacroEditorDialog::search_replace ()
+{
+  searchEditBox->setFocus (Qt::TabFocusReason);
+}
+
+void
+MacroEditorDialog::search_editing ()
+{
+  MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
+  if (! page) {
+    return;
+  }
+
+  apply_search ();
+  page->find_reset (); //  search from the initial position
+  page->find_next ();
 }
 
 void 
@@ -1943,6 +2001,18 @@ MacroEditorDialog::search_edited ()
 }
 
 void
+MacroEditorDialog::search_finished ()
+{
+  MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
+  if (! page) {
+    return;
+  }
+
+  page->find_reset (); //  search from the initial position
+  set_editor_focus ();
+}
+
+void
 MacroEditorDialog::do_search_edited ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
@@ -1951,8 +2021,9 @@ MacroEditorDialog::do_search_edited ()
   }
 
   apply_search ();
+  page->find_reset (); //  search from the initial position
   page->find_next ();
-  page->set_editor_focus ();
+  set_editor_focus ();
 }
 
 void
@@ -1963,7 +2034,7 @@ MacroEditorDialog::apply_search (bool if_needed)
     return;
   }
 
-  if (searchEditBox->text ().size () > 0) {
+  if (! searchEditBox->text ().isEmpty ()) {
     QRegExp re (searchEditBox->text (),
                 actionCaseSensitive->isChecked () ? Qt::CaseSensitive : Qt::CaseInsensitive,
                 actionUseRegularExpressions->isChecked () ? QRegExp::RegExp : QRegExp::FixedString);
@@ -2080,7 +2151,7 @@ BEGIN_PROTECTED
 END_PROTECTED
 }
 
-void 
+void
 MacroEditorDialog::help_requested(const QString &s)
 {
   lay::MainWindow::instance ()->show_assistant_topic (tl::to_string (s));
@@ -3172,7 +3243,6 @@ MacroEditorDialog::do_update_ui_to_run_mode ()
 
   addButton->setEnabled (! m_in_exec);
   actionAddMacro->setEnabled (! m_in_exec);
-  closeButton->setEnabled (! m_in_exec);
   deleteButton->setEnabled (! m_in_exec);
   actionDelete->setEnabled (! m_in_exec);
   renameButton->setEnabled (! m_in_exec);
@@ -3270,6 +3340,7 @@ MacroEditorDialog::create_page (lym::Macro *macro)
   editor->exec_model ()->set_run_mode (m_in_exec);
   editor->connect_macro (macro);
   connect (editor.get (), SIGNAL (help_requested (const QString &)), this, SLOT (help_requested (const QString &)));
+  connect (editor.get (), SIGNAL (search_requested (const QString &)), this, SLOT (search_requested (const QString &)));
   connect (editor.get (), SIGNAL (edit_trace (bool)), this, SLOT (add_edit_trace (bool)));
   return editor.release ();
 }

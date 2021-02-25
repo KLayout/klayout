@@ -46,6 +46,7 @@
 #include "layCellTreeModel.h"
 #include "layLayoutView.h"
 #include "layAbstractMenu.h"
+#include "layQtTools.h"
 #include "layDialogs.h"
 #include "tlExceptions.h"
 #include "laybasicConfig.h"
@@ -78,6 +79,17 @@ HCPCellTreeWidget::HCPCellTreeWidget (QWidget *parent, const char *name, QWidget
   setObjectName (QString::fromUtf8 (name));
 }
 
+HCPCellTreeWidget::~HCPCellTreeWidget ()
+{
+  //  NOTE: this should not be required, but I got a strange crash on closing the app with Qt 5.12.8
+  //  after using changePersistentIndex inside the model when ~QTreeWidget tried to clean up it's
+  //  persistent indexes and only found a model which was deleted already.
+  QAbstractItemModel *m = model ();
+  if (m) {
+    setModel (0);
+    delete m;
+  }
+}
 
 bool
 HCPCellTreeWidget::event (QEvent *event)
@@ -242,7 +254,7 @@ HierarchyControlPanel::HierarchyControlPanel (lay::LayoutView *view, QWidget *pa
   mp_search_close_cb->setMaximumSize (QSize (mp_search_close_cb->maximumSize ().width (), mp_search_close_cb->sizeHint ().height () - 4));
   connect (mp_search_close_cb, SIGNAL (clicked ()), this, SLOT (search_editing_finished ()));
 
-  mp_search_model = 0;
+  m_search_index = -1;
   mp_search_edit_box = new lay::DecoratedLineEdit (mp_search_frame);
   mp_search_edit_box->setObjectName (QString::fromUtf8 ("cellview_search_edit_box"));
   mp_search_edit_box->set_escape_signal_enabled (true);
@@ -264,11 +276,18 @@ HierarchyControlPanel::HierarchyControlPanel (lay::LayoutView *view, QWidget *pa
   mp_case_sensitive->setChecked (true);
   mp_case_sensitive->setText (tr ("Case sensitive search"));
 
+  mp_filter = new QAction (this);
+  mp_filter->setCheckable (true);
+  mp_filter->setChecked (false);
+  mp_filter->setText (tr ("Apply as filter"));
+
   QMenu *m = new QMenu (mp_search_edit_box);
   m->addAction (mp_use_regular_expressions);
   m->addAction (mp_case_sensitive);
+  m->addAction (mp_filter);
   connect (mp_use_regular_expressions, SIGNAL (triggered ()), this, SLOT (search_edited ()));
   connect (mp_case_sensitive, SIGNAL (triggered ()), this, SLOT (search_edited ()));
+  connect (mp_filter, SIGNAL (triggered ()), this, SLOT (search_edited ()));
 
   mp_search_edit_box->set_clear_button_enabled (true);
   mp_search_edit_box->set_options_button_enabled (true);
@@ -401,20 +420,20 @@ HierarchyControlPanel::cm_cell_select ()
 void
 HierarchyControlPanel::search_triggered (const QString &t)
 {
-  mp_search_model = 0;
+  m_search_index = -1;
   lay::HCPCellTreeWidget *w = dynamic_cast<lay::HCPCellTreeWidget *> (sender ());
   if (w) {
     for (size_t i = 0; i < mp_cell_lists.size (); ++i) {
       if (mp_cell_lists [i] == w) {
         //  Switch the active list for split mode -> CAUTION: this may trigger a search_editing_finished call
         select_active (int (i));
-        mp_search_model = dynamic_cast<lay::CellTreeModel *> (w->model ());
+        m_search_index = int (i);
         break;
       }
     }
   }
 
-  if (mp_search_model) {
+  if (m_search_index >= 0) {
     mp_search_close_cb->setChecked (true);
     mp_search_frame->show ();
     mp_search_edit_box->setText (t);
@@ -426,36 +445,43 @@ HierarchyControlPanel::search_triggered (const QString &t)
 void
 HierarchyControlPanel::search_edited ()
 {
+  bool filter_invalid = false;
+
   QString t = mp_search_edit_box->text ();
 
-  for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
-    if ((*v)->model () == mp_search_model) {
-      if (t.isEmpty ()) {
-        mp_search_model->clear_locate ();
-        (*v)->setCurrentIndex (QModelIndex ());
+  if (m_search_index >= 0 && m_search_index < int (mp_cell_lists.size ())) {
+
+    lay::CellTreeModel *search_model = dynamic_cast<lay::CellTreeModel *> (mp_cell_lists [m_search_index]->model ());
+
+    search_model->set_filter_mode (mp_filter->isChecked ());
+
+    if (t.isEmpty ()) {
+      search_model->clear_locate ();
+      mp_cell_lists [m_search_index]->setCurrentIndex (QModelIndex ());
+    } else {
+      QModelIndex found = search_model->locate (t.toUtf8 ().constData (), mp_use_regular_expressions->isChecked (), mp_case_sensitive->isChecked (), false);
+      mp_cell_lists [m_search_index]->setCurrentIndex (found);
+      if (found.isValid ()) {
+        mp_cell_lists [m_search_index]->scrollTo (found);
       } else {
-        QModelIndex found = mp_search_model->locate (t.toUtf8 ().constData (), mp_use_regular_expressions->isChecked (), mp_case_sensitive->isChecked (), false);
-        (*v)->setCurrentIndex (found);
-        if (found.isValid ()) {
-          (*v)->scrollTo (found);
-        }
+        filter_invalid = true;
       }
-      break;
     }
+
   }
+
+  lay::indicate_error (mp_search_edit_box, filter_invalid);
 }
 
 void
 HierarchyControlPanel::search_next ()
-{
-  for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
-    if ((*v)->model () == mp_search_model) {
-      QModelIndex found = mp_search_model->locate_next ();
-      if (found.isValid ()) {
-        (*v)->setCurrentIndex (found);
-        (*v)->scrollTo (found);
-      }
-      break;
+{  
+  if (m_search_index >= 0 && m_search_index < int (mp_cell_lists.size ())) {
+    lay::CellTreeModel *search_model = dynamic_cast<lay::CellTreeModel *> (mp_cell_lists [m_search_index]->model ());
+    QModelIndex found = search_model->locate_next (mp_cell_lists [m_search_index]->currentIndex ());
+    if (found.isValid ()) {
+      mp_cell_lists [m_search_index]->setCurrentIndex (found);
+      mp_cell_lists [m_search_index]->scrollTo (found);
     }
   }
 }
@@ -463,14 +489,12 @@ HierarchyControlPanel::search_next ()
 void
 HierarchyControlPanel::search_prev ()
 {
-  for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
-    if ((*v)->model () == mp_search_model) {
-      QModelIndex found = mp_search_model->locate_prev ();
-      if (found.isValid ()) {
-        (*v)->setCurrentIndex (found);
-        (*v)->scrollTo (found);
-      }
-      break;
+  if (m_search_index >= 0 && m_search_index < int (mp_cell_lists.size ())) {
+    lay::CellTreeModel *search_model = dynamic_cast<lay::CellTreeModel *> (mp_cell_lists [m_search_index]->model ());
+    QModelIndex found = search_model->locate_prev ();
+    if (found.isValid ()) {
+      mp_cell_lists [m_search_index]->setCurrentIndex (found);
+      mp_cell_lists [m_search_index]->scrollTo (found);
     }
   }
 }
@@ -490,15 +514,12 @@ HierarchyControlPanel::search_editing_finished ()
   }
 
   //  give back the focus to the cell list
-  for (size_t i = 0; i < mp_cell_lists.size (); ++i) {
-    if (mp_cell_lists [i]->model () == mp_search_model) {
-      mp_cell_lists [i]->setFocus ();
-      break;
-    }
+  if (m_search_index >= 0 && m_search_index < int (mp_cell_lists.size ())) {
+    mp_cell_lists [m_search_index]->setFocus ();
   }
 
   mp_search_frame->hide ();
-  mp_search_model = 0;
+  m_search_index = -1;
 }
 
 void 
@@ -786,8 +807,12 @@ void
 HierarchyControlPanel::do_update_content (int cv_index)
 {
   //  close the search box since we will modify the model
+  if (m_search_index >= 0 && m_search_index < int (mp_cell_lists.size ())) {
+    lay::CellTreeModel *search_model = dynamic_cast<lay::CellTreeModel *> (mp_cell_lists [m_search_index]->model ());
+    search_model->clear_locate ();
+  }
   mp_search_frame->hide ();
-  mp_search_model = 0;
+  m_search_index = -1;
 
   unsigned int imin = (cv_index < 0 ? 0 : (unsigned int) cv_index);
   unsigned int imax = (cv_index < 0 ? std::numeric_limits <unsigned int>::max () : (unsigned int) cv_index);
@@ -1199,7 +1224,7 @@ public:
     menu_entries.push_back (lay::menu_item ("cm_cell_show", "show_cell", at, tl::to_string (QObject::tr ("Show"))));
     menu_entries.push_back (lay::menu_item ("cm_cell_show_all", "show_all", at, tl::to_string (QObject::tr ("Show All"))));
     menu_entries.push_back (lay::separator ("utils_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_open_current_cell", "open_current", at, tl::to_string (QObject::tr ("Where Am I?"))));
+    menu_entries.push_back (lay::menu_item ("cm_open_current_cell", "open_current", at, tl::to_string (QObject::tr ("Where am I?"))));
     menu_entries.push_back (lay::separator ("file_group", at));
     menu_entries.push_back (lay::menu_item ("cm_save_current_cell_as", "save_cell_as:hide_vo", at, tl::to_string (QObject::tr ("Save Selected Cells As"))));
   }

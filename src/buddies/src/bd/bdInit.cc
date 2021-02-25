@@ -71,13 +71,10 @@ public:
   ProgressAdaptor (int verbosity);
   virtual ~ProgressAdaptor ();
 
-  virtual void register_object (tl::Progress *progress);
-  virtual void unregister_object (tl::Progress *progress);
   virtual void trigger (tl::Progress *progress);
   virtual void yield (tl::Progress *progress);
 
 private:
-  std::list<tl::Progress *> mp_objects;
   int m_verbosity;
   std::string m_progress_text, m_progress_value;
 };
@@ -94,35 +91,18 @@ ProgressAdaptor::~ProgressAdaptor ()
 }
 
 void
-ProgressAdaptor::register_object (tl::Progress *progress)
-{
-  mp_objects.push_back (progress); // this keeps the outmost one visible. push_front would make the latest one visible.
-}
-
-void
-ProgressAdaptor::unregister_object (tl::Progress *progress)
-{
-  for (std::list<tl::Progress *>::iterator k = mp_objects.begin (); k != mp_objects.end (); ++k) {
-    if (*k == progress) {
-      mp_objects.erase (k);
-      return;
-    }
-  }
-}
-
-void
 ProgressAdaptor::trigger (tl::Progress *progress)
 {
-  if (! mp_objects.empty () && mp_objects.front () == progress && tl::verbosity () >= m_verbosity) {
+  if (progress && first () == progress && tl::verbosity () >= m_verbosity) {
 
-    std::string text = mp_objects.front ()->desc ();
+    std::string text = progress->desc ();
 
     if (m_progress_text != text) {
       tl::info << text << " ..";
       m_progress_text = text;
     }
 
-    std::string value = mp_objects.front ()->formatted_value ();
+    std::string value = progress->formatted_value ();
     if (m_progress_value != value) {
       tl::info << ".. " << value;
       m_progress_value = value;

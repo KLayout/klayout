@@ -31,12 +31,57 @@
 #include "tlTimer.h"
 #include "tlList.h"
 
+#include <set>
+
 class QWidget;
 
 namespace tl
 {
 
 class Progress;
+class RelativeProgress;
+class AbstractProgress;
+class AbsoluteProgress;
+
+template <> struct type_traits<tl::Progress> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+};
+
+template <> struct type_traits<tl::RelativeProgress> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+};
+
+template <> struct type_traits<tl::AbstractProgress> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+};
+
+template <> struct type_traits<tl::AbsoluteProgress> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+};
+
+/**
+ *  @brief A helper class to clean up pending progress objects
+ *
+ *  Pending progress objects may be created in scripts. If scripts are aborted
+ *  (e.g. in the debugger), progress objects may stay behing a block the application.
+ *  To prevent this, this object keeps track of progress objects created between
+ *  it's constructor and destructor and cleans up the objects created but not
+ *  destroyed.
+ */
+
+class TL_PUBLIC ProgressGarbageCollector
+{
+public:
+  ProgressGarbageCollector ();
+  ~ProgressGarbageCollector ();
+
+private:
+  std::set<tl::Progress *> mp_valid_objects;
+};
 
 /**
  *  @brief The receivers for progress reports
@@ -48,20 +93,45 @@ class Progress;
 
 class TL_PUBLIC ProgressAdaptor
 {
-public:  
+public:
+  typedef tl::list<tl::Progress>::iterator iterator;
+
   ProgressAdaptor ();
   virtual ~ProgressAdaptor ();
 
-  virtual void register_object (Progress *progress) = 0;
-  virtual void unregister_object (Progress *progress) = 0;
+  virtual void register_object (Progress *progress);
+  virtual void unregister_object (Progress *progress);
   virtual void trigger (Progress *progress) = 0;
   virtual void yield (Progress *progress) = 0;
 
   void prev (ProgressAdaptor *pa);
   ProgressAdaptor *prev ();
 
+  bool is_busy () const
+  {
+    return !mp_objects.empty ();
+  }
+
+  tl::Progress *first ();
+
+  void signal_break ();
+
+protected:
+  iterator begin ()
+  {
+    return mp_objects.begin ();
+  }
+
+  iterator end ()
+  {
+    return mp_objects.end ();
+  }
+
 private:
+  friend class ProgressGarbageCollector;
+
   ProgressAdaptor *mp_prev;
+  tl::list<tl::Progress> mp_objects;
 };
 
 /**
@@ -76,8 +146,6 @@ class TL_PUBLIC BreakException
 public:
   BreakException () : tl::Exception ("Operation cancelled") { }
 };
-
-class Progress;
 
 /**
  *  @brief A "progress" reporter class 
@@ -137,6 +205,15 @@ public:
    *  values >= 100.
    */
   virtual double value () const = 0;
+
+  /**
+   *  @brief Returns true if the progress is an abstract one
+   *
+   *  Abstract progress objcts don't have a value but mark a section begin executed as a top level progress.
+   *  Technically they will open a channel for the UI - e.g. leaving a progress dialog open while the
+   *  operation is running.
+   */
+  virtual bool is_abstract () const = 0;
 
   /**
    *  @brief Creates a widget that renders the progress graphically
@@ -217,6 +294,7 @@ protected:
 
 private:
   friend class ProgressAdaptor;
+  friend class ProgressGarbageCollector;
 
   std::string m_desc;
   std::string m_title;
@@ -229,6 +307,43 @@ private:
 
   static tl::ProgressAdaptor *adaptor ();
   static void register_adaptor (tl::ProgressAdaptor *pa);
+};
+
+/**
+ *  @brief The abstract progress
+ *
+ *  An abstract progress object can be used as a top-level progress object to mark a section
+ *  in an operation flow. This will provide a hint for the UI to leave the progress dialog open
+ *  for example.
+ */
+class TL_PUBLIC AbstractProgress
+  : public Progress
+{
+public:
+  /**
+   *  @brief Constructor
+   */
+  AbstractProgress (const std::string &desc);
+
+  /**
+   *  @brief Destructor
+   */
+  ~AbstractProgress ();
+
+  /**
+   *  @brief Delivers the current progress as a string (empty for the abstract progress)
+   */
+  std::string formatted_value () const { return std::string (); }
+
+  /**
+   *  @brief Delivers the relative progress (0 for the abstract progress)
+   */
+  double value () const { return 0.0; }
+
+  /**
+   *  @brief Indicates this progress reporter is abstract
+   */
+  bool is_abstract() const { return true; }
 };
 
 /**
@@ -253,9 +368,6 @@ public:
    */
   RelativeProgress (const std::string &desc, size_t max_count = 0, size_t yield_interval = 1000);
 
-  /**
-   *  @brief Destructor
-   */
   ~RelativeProgress ();
 
   /**
@@ -270,6 +382,11 @@ public:
    *  values >= 1.
    */
   double value () const;
+
+  /**
+   *  @brief Indicates this progress reporter isn't abstract
+   */
+  bool is_abstract() const { return false; }
 
   /** 
    *  @brief Set the format of the output.
@@ -345,7 +462,12 @@ public:
    */
   double value () const;
 
-  /** 
+  /**
+   *  @brief Indicates this progress reporter isn't abstract
+   */
+  bool is_abstract() const { return false; }
+
+  /**
    *  @brief Set the format of the output.
    *
    *  This is a sprintf format string with the value being

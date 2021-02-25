@@ -26,6 +26,7 @@
 #include <QFrame>
 #include <QGridLayout>
 #include <QLabel>
+#include <QListView>
 
 #include <math.h>
 
@@ -59,7 +60,7 @@ private:
 
 ProgressBarWidget::ProgressBarWidget (QWidget *parent, const char *name)
   : QWidget (parent),
-    m_value (0.0), m_width (64), m_length (0), m_fw (1), m_bw (0)
+    m_value (0.0), m_width (200), m_length (0), m_fw (1), m_bw (0)
 {
   setObjectName (QString::fromUtf8 (name));
   setMinimumSize (64, 10);
@@ -134,12 +135,45 @@ ProgressBarWidget::resizeEvent (QResizeEvent *)
 
 // --------------------------------------------------------------------
 
-ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool full_width)
+ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool fw)
   : QFrame (parent),
-    mp_widget (0), mp_pr (pr)
+    mp_widget (0), mp_pr (pr), m_log_file (0, true), m_log_visible (false)
 {
   QVBoxLayout *top_layout = new QVBoxLayout (this);
   top_layout->addStretch (1);
+
+  mp_log_frame = new QFrame (this);
+  mp_log_frame->setFrameShape (QFrame::NoFrame);
+  mp_log_frame->hide ();
+  top_layout->addWidget (mp_log_frame);
+
+  QVBoxLayout *log_layout = new QVBoxLayout (mp_log_frame);
+
+  QListView *log_view = new QListView (this);
+  log_view->setModel (&m_log_file);
+  log_view->setUniformItemSizes (true);
+  log_layout->addWidget (log_view);
+
+  QFrame *attn_frame = new QFrame (this);
+  attn_frame->setFrameShape (QFrame::NoFrame);
+  attn_frame->hide ();
+  log_layout->addWidget (attn_frame);
+
+  QHBoxLayout *attn_layout = new QHBoxLayout (attn_frame);
+  attn_layout->setContentsMargins (0, 0, 0, 0);
+
+  QLabel *attn_label1 = new QLabel (attn_frame);
+  attn_label1->setPixmap (QPixmap (QString::fromUtf8 (":/warn_16.png")));
+  attn_layout->addWidget (attn_label1);
+
+  QLabel *attn_label2 = new QLabel (attn_frame);
+  attn_label2->setText (tr ("There are errors or warnings"));
+  attn_layout->addWidget (attn_label2);
+
+  attn_layout->addStretch (1);
+
+  connect (&m_log_file, SIGNAL (layoutChanged ()), log_view, SLOT (scrollToBottom ()));
+  connect (&m_log_file, SIGNAL (attention_changed (bool)), attn_frame, SLOT (setVisible (bool)));
 
   QFrame *bar_frame = new QFrame (this);
   top_layout->addWidget (bar_frame);
@@ -157,12 +191,11 @@ ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool full
 
   int col = 0;
 
-  if (! full_width) {
-    layout->addItem (new QSpacerItem (8, 8, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, col, 1, 1);
-    layout->setColumnStretch (col++, 1);
-  }
+  layout->addItem (new QSpacerItem (8, 8, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, col, 1, 1);
+  m_left_col = col++;
 
   mp_label = new QLabel (bar_frame);
+  layout->setColumnStretch(col, 2);
   layout->addWidget (mp_label, 0, col++, 1, 1);
 
   layout->addItem (new QSpacerItem (8, 8, QSizePolicy::Fixed, QSizePolicy::Fixed), 0, col++, 1, 1);
@@ -171,7 +204,6 @@ ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool full
   progress_bar_frame->setFrameStyle (QFrame::Box | QFrame::Plain);
   progress_bar_frame->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
   layout->addWidget (progress_bar_frame, 0, col, 1, 1);
-  layout->setColumnStretch(col++, 2);
 
   QGridLayout *pbf_layout = new QGridLayout (progress_bar_frame);
   progress_bar_frame->setLayout (pbf_layout);
@@ -191,16 +223,41 @@ ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool full
   mp_cancel_button->setText (QObject::tr ("Cancel"));
   layout->addWidget (mp_cancel_button, 0, col++, 1, 1);
 
-  if (! full_width) {
-    layout->addItem (new QSpacerItem (8, 8, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, col, 1, 1);
-    layout->setColumnStretch (col++, 1);
-  }
+  layout->addItem (new QSpacerItem (8, 8, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, col, 1, 1);
+  m_right_col = col++;
 
   layout->addItem (new QSpacerItem (10, 10, QSizePolicy::Fixed, QSizePolicy::Fixed), 1, 0, 1, col);
 
   m_widget_col = col;
 
   connect (mp_cancel_button, SIGNAL (clicked ()), this, SLOT (signal_break ()));
+
+  set_full_width (fw);
+}
+
+void
+ProgressWidget::set_log_visible (bool f)
+{
+  if (f != m_log_visible) {
+    m_log_visible = f;
+    mp_log_frame->setVisible (f);
+    set_full_width (m_full_width);
+  }
+}
+void
+ProgressWidget::set_full_width (bool fw)
+{
+  m_full_width = fw;
+
+  bool f = (fw || m_log_visible);
+  mp_layout->setColumnStretch (m_left_col, f ? 0 : 1);
+  mp_layout->setColumnStretch (m_right_col, f ? 0 : 1);
+}
+
+bool
+ProgressWidget::full_width () const
+{
+  return m_full_width;
 }
 
 QWidget *
@@ -233,6 +290,13 @@ ProgressWidget::remove_widget ()
 void
 ProgressWidget::set_progress (tl::Progress *progress)
 {
+  if (! progress || progress->is_abstract ()) {
+    m_log_file.clear ();
+    m_log_file.set_max_entries (progress ? 1000 : 0);
+    set_log_visible (progress != 0);
+    return;
+  }
+
   bool can_cancel = false;
   std::string text;
 

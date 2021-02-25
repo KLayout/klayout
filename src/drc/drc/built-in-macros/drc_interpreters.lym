@@ -25,6 +25,8 @@ module DRC
     drc._rdb_index = rdb_index
     drc._generator = generator
 
+    drc_progress = RBA::AbstractProgress::new("DRC: " + macro.path)
+
     begin
 
       # Set a debugger scope so that our errors end up with the debugger set to the DRC's line
@@ -45,6 +47,9 @@ module DRC
 
       # cleans up and creates layout and report views
       drc._finish
+
+      # unlocks the UI
+      drc_progress._destroy
 
     end
 

@@ -499,6 +499,20 @@ module DRC
     end
     
     # %DRC%
+    # @name warn
+    # @brief Prints a warning
+    # @synopsis warn(message)
+    # Similar to \log, but the message is printed formatted as a warning
+    
+    def warn(arg)
+      if @log_file
+        @log_file.puts("WARNING: " + arg)
+      else
+        RBA::Logger::warn(arg)
+      end
+    end
+    
+    # %DRC%
     # @name log_file
     # @brief Specify the log file where to send to log to
     # @synopsis log_file(filename)
@@ -1840,7 +1854,7 @@ CODE
     
     def run_timed(desc, obj)
 
-      info(desc)
+      log(desc)
 
       # enable progress
       if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs) || obj.is_a?(RBA::Texts)

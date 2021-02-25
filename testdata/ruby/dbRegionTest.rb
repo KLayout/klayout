@@ -1049,6 +1049,27 @@ class DBRegion_TestClass < TestBase
 
   end
 
+  # Some filters
+  def test_holesfilter
+
+    r = RBA::Region::new
+    r.insert(RBA::Box::new(RBA::Point::new(0, 0), RBA::Point::new(100, 200)))
+    rr = RBA::Region::new
+    rr.insert(RBA::Box::new(RBA::Point::new(10, 10), RBA::Point::new(20, 20)))
+    rr.insert(RBA::Box::new(RBA::Point::new(30, 30), RBA::Point::new(40, 40)))
+    r -= rr
+
+    assert_equal(r.with_holes(0, false).to_s, "")
+    assert_equal(r.with_holes(0, true).to_s, "(0,0;0,200;100,200;100,0/10,10;20,10;20,20;10,20/30,30;40,30;40,40;30,40)")
+    assert_equal(rr.with_holes(0, false).to_s, "(10,10;10,20;20,20;20,10);(30,30;30,40;40,40;40,30)")
+    assert_equal(rr.with_holes(0, true).to_s, "")
+    assert_equal(rr.with_holes(2, false).to_s, "")
+    assert_equal(r.with_holes(1, 3, false).to_s, "(0,0;0,200;100,200;100,0/10,10;20,10;20,20;10,20/30,30;40,30;40,40;30,40)")
+    assert_equal(r.with_holes(2, 3, false).to_s, "(0,0;0,200;100,200;100,0/10,10;20,10;20,20;10,20/30,30;40,30;40,40;30,40)")
+    assert_equal(r.with_holes(1, 2, false).to_s, "")
+
+  end
+
 end
 
 load("test_epilogue.rb")

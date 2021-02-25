@@ -35,6 +35,10 @@ TextProgress::TextProgress (int verbosity)
 
 void TextProgress::update_progress (tl::Progress *progress)
 {
+  if (! progress || progress->is_abstract ()) {
+    return;
+  }
+
   std::string text = progress->desc ();
   if (m_progress_text != text && tl::verbosity () >= m_verbosity) {
     tl::info << text << " ..";

@@ -308,6 +308,18 @@ static db::Region with_area2 (const db::Region *r, const tl::Variant &min, const
   return r->filtered (f);
 }
 
+static db::Region with_holes1 (const db::Region *r, size_t n, bool inverse)
+{
+  db::HoleCountFilter f (n, n + 1, inverse);
+  return r->filtered (f);
+}
+
+static db::Region with_holes2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
+{
+  db::HoleCountFilter f (min.is_nil () ? size_t (0) : min.to<size_t> (), max.is_nil () ? std::numeric_limits <size_t>::max () : max.to<size_t> (), inverse);
+  return r->filtered (f);
+}
+
 static db::Region with_bbox_width1 (const db::Region *r, db::Region::distance_type bbox_width, bool inverse)
 {
   db::RegionBBoxFilter f (bbox_width, bbox_width + 1, inverse, db::RegionBBoxFilter::BoxWidth);
@@ -924,6 +936,30 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+  ) +
+  method_ext ("with_holes", with_holes1, gsi::arg ("nholes"), gsi::arg ("inverse"),
+    "@brief Filters the polygons by their number of holes\n"
+    "Filters the polygons of the region by number of holes. If \"inverse\" is false, only "
+    "polygons which have the given number of holes are returned. If \"inverse\" is true, "
+    "polygons not having the given of holes are returned.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("with_holes", with_holes2, gsi::arg ("min_bholes"), gsi::arg ("max_nholes"), gsi::arg ("inverse"),
+    "@brief Filter the polygons by their number of holes\n"
+    "Filters the polygons of the region by number of holes. If \"inverse\" is false, only "
+    "polygons which have a hole count larger or equal to \"min_nholes\" and less than \"max_nholes\" are "
+    "returned. If \"inverse\" is true, "
+    "polygons having a hole count less than \"min_nholes\" or larger or equal than \"max_nholes\" are "
+    "returned.\n"
+    "\n"
+    "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ) +
   method_ext ("with_bbox_width", with_bbox_width1, gsi::arg ("width"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width\n"

@@ -1343,7 +1343,7 @@ Object::from_string (const char *str, const char *base_dir)
 
         tl::URI fp_uri (m_filename);
         if (base_dir && ! tl::is_absolute (fp_uri.path ())) {
-          m_filename = tl::URI (base_dir).resolved (fp_uri).to_string ();
+          m_filename = tl::URI (base_dir).resolved (fp_uri).to_abstract_path ();
         }
 
         read_file ();

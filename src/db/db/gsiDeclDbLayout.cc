@@ -1716,9 +1716,11 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "For details see the description of the \\RecursiveShapeIterator class.\n"
     "This version is convenience overload which takes a cell object instead of a cell index.\n"
     "\n"
+    "This method is deprecated. Use \\Cell#begin_shapes_rec instead.\n"
+    "\n"
     "This method has been added in version 0.24.\n"
   ) +
-  gsi::method_ext ("begin_shapes", &begin_shapes, gsi::arg ("cell_index"), gsi::arg ("layer"),
+  gsi::method_ext ("#begin_shapes", &begin_shapes, gsi::arg ("cell_index"), gsi::arg ("layer"),
     "@brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer\n"
     "@param cell_index The index of the initial (top) cell\n"
     "@param layer The layer from which to get the shapes\n"
@@ -1726,9 +1728,11 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "For details see the description of the \\RecursiveShapeIterator class.\n"
     "\n"
+    "This method is deprecated. Use \\Cell#begin_shapes_rec instead.\n"
+    "\n"
     "This method has been added in version 0.18.\n"
   ) +
-  gsi::method_ext ("begin_shapes_touching", &begin_shapes_touching, gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("region"),
+  gsi::method_ext ("#begin_shapes_touching", &begin_shapes_touching, gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("region"),
     "@brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search\n"
     "@param cell_index The index of the starting cell\n"
     "@param layer The layer from which to get the shapes\n"
@@ -1738,9 +1742,11 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "For details see the description of the \\RecursiveShapeIterator class.\n"
     "This version gives an iterator delivering shapes whose bounding box touches the given region.\n"
     "\n"
+    "This method is deprecated. Use \\Cell#begin_shapes_rec_touching instead.\n"
+    "\n"
     "This method has been added in version 0.18.\n"
   ) +
-  gsi::method_ext ("begin_shapes_touching", &begin_shapes_touching2, gsi::arg ("cell"), gsi::arg ("layer"), gsi::arg ("region"),
+  gsi::method_ext ("#begin_shapes_touching", &begin_shapes_touching2, gsi::arg ("cell"), gsi::arg ("layer"), gsi::arg ("region"),
     "@brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search\n"
     "@param cell The cell object for the starting cell\n"
     "@param layer The layer from which to get the shapes\n"
@@ -1750,10 +1756,12 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "For details see the description of the \\RecursiveShapeIterator class.\n"
     "This version gives an iterator delivering shapes whose bounding box touches the given region.\n"
     "It is convenience overload which takes a cell object instead of a cell index.\n"
+    "\n"
+    "This method is deprecated. Use \\Cell#begin_shapes_rec_touching instead.\n"
     "\n"
     "This method has been added in version 0.24.\n"
   ) +
-  gsi::method_ext ("begin_shapes_overlapping", &begin_shapes_overlapping, gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("region"),
+  gsi::method_ext ("#begin_shapes_overlapping", &begin_shapes_overlapping, gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("region"),
     "@brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search\n"
     "@param cell_index The index of the starting cell\n"
     "@param layer The layer from which to get the shapes\n"
@@ -1762,10 +1770,12 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "For details see the description of the \\RecursiveShapeIterator class.\n"
     "This version gives an iterator delivering shapes whose bounding box overlaps the given region.\n"
+    "\n"
+    "This method is deprecated. Use \\Cell#begin_shapes_rec_overlapping instead.\n"
     "\n"
     "This method has been added in version 0.18.\n"
   ) +
-  gsi::method_ext ("begin_shapes_overlapping", &begin_shapes_overlapping2, gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("region"),
+  gsi::method_ext ("#begin_shapes_overlapping", &begin_shapes_overlapping2, gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("region"),
     "@brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search\n"
     "@param cell The cell object for the starting cell\n"
     "@param layer The layer from which to get the shapes\n"
@@ -1776,9 +1786,11 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "This version gives an iterator delivering shapes whose bounding box overlaps the given region.\n"
     "It is convenience overload which takes a cell object instead of a cell index.\n"
     "\n"
+    "This method is deprecated. Use \\Cell#begin_shapes_rec_overlapping instead.\n"
+    "\n"
     "This method has been added in version 0.24.\n"
   ) +
-  gsi::method_ext ("begin_shapes_touching", &begin_shapes_touching_um, gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("region"),
+  gsi::method_ext ("#begin_shapes_touching", &begin_shapes_touching_um, gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("region"),
     "@brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search, the region given in micrometer units\n"
     "@param cell_index The index of the starting cell\n"
     "@param layer The layer from which to get the shapes\n"
@@ -1788,9 +1800,11 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "For details see the description of the \\RecursiveShapeIterator class.\n"
     "This version gives an iterator delivering shapes whose bounding box touches the given region.\n"
     "\n"
+    "This method is deprecated. Use \\Cell#begin_shapes_rec_touching instead.\n"
+    "\n"
     "This variant has been added in version 0.25.\n"
   ) +
-  gsi::method_ext ("begin_shapes_touching", &begin_shapes_touching2_um, gsi::arg ("cell"), gsi::arg ("layer"), gsi::arg ("region"),
+  gsi::method_ext ("#begin_shapes_touching", &begin_shapes_touching2_um, gsi::arg ("cell"), gsi::arg ("layer"), gsi::arg ("region"),
     "@brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search, the region given in micrometer units\n"
     "@param cell The cell object for the starting cell\n"
     "@param layer The layer from which to get the shapes\n"
@@ -1801,9 +1815,11 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "This version gives an iterator delivering shapes whose bounding box touches the given region.\n"
     "It is convenience overload which takes a cell object instead of a cell index.\n"
     "\n"
+    "This method is deprecated. Use \\Cell#begin_shapes_rec_touching instead.\n"
+    "\n"
     "This variant has been added in version 0.25.\n"
   ) +
-  gsi::method_ext ("begin_shapes_overlapping", &begin_shapes_overlapping_um, gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("region"),
+  gsi::method_ext ("#begin_shapes_overlapping", &begin_shapes_overlapping_um, gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("region"),
     "@brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search, the region given in micrometer units\n"
     "@param cell_index The index of the starting cell\n"
     "@param layer The layer from which to get the shapes\n"
@@ -1813,9 +1829,11 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "For details see the description of the \\RecursiveShapeIterator class.\n"
     "This version gives an iterator delivering shapes whose bounding box overlaps the given region.\n"
     "\n"
+    "This method is deprecated. Use \\Cell#begin_shapes_rec_overlapping instead.\n"
+    "\n"
     "This variant has been added in version 0.25.\n"
   ) +
-  gsi::method_ext ("begin_shapes_overlapping", &begin_shapes_overlapping2_um, gsi::arg ("cell"), gsi::arg ("layer"), gsi::arg ("region"),
+  gsi::method_ext ("#begin_shapes_overlapping", &begin_shapes_overlapping2_um, gsi::arg ("cell"), gsi::arg ("layer"), gsi::arg ("region"),
     "@brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search, the region given in micrometer units\n"
     "@param cell The cell object for the starting cell\n"
     "@param layer The layer from which to get the shapes\n"
@@ -1825,6 +1843,8 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "For details see the description of the \\RecursiveShapeIterator class.\n"
     "This version gives an iterator delivering shapes whose bounding box overlaps the given region.\n"
     "It is convenience overload which takes a cell object instead of a cell index.\n"
+    "\n"
+    "This method is deprecated. Use \\Cell#begin_shapes_rec_overlapping instead.\n"
     "\n"
     "This variant has been added in version 0.25.\n"
   ) +

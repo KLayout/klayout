@@ -496,7 +496,7 @@ PCellParametersPage::get_parameters (bool *ok)
                   tl::from_string (tl::to_string (le->text ()), v);
 
                   parameters.back () = tl::Variant (v);
-                  lay::indicate_error (le, 0);
+                  lay::indicate_error (le, (tl::Exception *) 0);
 
                 } catch (tl::Exception &ex) {
 
@@ -520,7 +520,7 @@ PCellParametersPage::get_parameters (bool *ok)
                   tl::from_string (tl::to_string (le->text ()), v);
 
                   parameters.back () = tl::Variant (v);
-                  lay::indicate_error (le, 0);
+                  lay::indicate_error (le, (tl::Exception *) 0);
 
                 } catch (tl::Exception &ex) {
 

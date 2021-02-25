@@ -184,10 +184,7 @@ public:
   /**
    *  @brief Get the "hide empty layers" flag
    */
-  bool hide_empty_layers () 
-  {
-    return m_hide_empty_layers;
-  }
+  bool hide_empty_layers ();
 
   /**
    *  @brief Set the "test_shapes_in_view" flag
@@ -201,7 +198,7 @@ public:
    */
   bool test_shapes_in_view () 
   {
-    return m_test_shapes_in_view;
+    return mp_model->get_test_shapes_in_view ();
   }
 
   /**
@@ -333,6 +330,9 @@ public slots:
   void search_next ();
   void search_prev ();
 
+private slots:
+  void update_hidden_flags ();
+
 private:
   QTabBar *mp_tab_bar;
   LCPTreeWidget *mp_layer_list;
@@ -341,19 +341,17 @@ private:
   lay::LayoutView *mp_view;
   bool m_needs_update;
   bool m_tabs_need_update;
-  bool m_force_update_hidden_flags;
   bool m_in_update;
   std::vector<size_t> m_new_sel;
   int m_phase;
-  tl::DeferredMethod<LayerControlPanel> m_do_update_content_dm;
-  bool m_hide_empty_layers;
-  bool m_test_shapes_in_view;
+  tl::DeferredMethod<LayerControlPanel> m_do_update_content_dm, m_do_update_hidden_flags_dm;
   std::set<unsigned int> m_expanded;
   bool m_no_stipples;
   QLabel *m_no_stipples_label;
   lay::DecoratedLineEdit *mp_search_edit_box;
   QAction *mp_case_sensitive;
   QAction *mp_use_regular_expressions;
+  QAction *mp_filter;
   QFrame *mp_search_frame;
   QCheckBox *mp_search_close_cb;
 
@@ -369,6 +367,7 @@ private:
   void signal_vp_changed ();
 
   void do_update_content ();
+  void do_update_hidden_flags ();
   void do_delete ();
   void do_copy ();
   void recover ();

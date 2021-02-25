@@ -211,7 +211,7 @@ static bool find_and_normalize_file (const tl::URI &uri, std::string &path)
       //  TODO: this is not quite efficient, but the only thing we can do for now
       tl::URI uri_with_ext = uri;
       uri_with_ext.set_path (uri_with_ext.path () + extensions[e]);
-      std::string us = uri_with_ext.to_string ();
+      std::string us = uri_with_ext.to_abstract_path ();
 
       if (tl::verbosity () >= 30) {
         tl::log << tl::to_string (tr ("Trying layout URI: ")) << us;

@@ -1973,6 +1973,27 @@ TEST(35c_interact_with_count_text)
   EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
 }
 
+TEST(40_with_holes)
+{
+  db::Region r;
+  r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+  db::Region rr;
+  rr.insert (db::Box (db::Point (10, 10), db::Point (20, 20)));
+  rr.insert (db::Box (db::Point (30, 30), db::Point (40, 40)));
+  r.set_merged_semantics (true);
+  r.set_min_coherence (false);
+
+  r -= rr;
+
+  EXPECT_EQ (rr.filtered (db::HoleCountFilter (0, 1, false)).to_string (), "(10,10;10,20;20,20;20,10);(30,30;30,40;40,40;40,30)");
+  EXPECT_EQ (r.filtered (db::HoleCountFilter (2, 3, false)).to_string (), "(0,0;0,200;100,200;100,0/10,10;20,10;20,20;10,20/30,30;40,30;40,40;30,40)");
+  EXPECT_EQ (r.filtered (db::HoleCountFilter (1, 2, false)).to_string (), "");
+  EXPECT_EQ (r.filtered (db::HoleCountFilter (1, 3, false)).to_string (), "(0,0;0,200;100,200;100,0/10,10;20,10;20,20;10,20/30,30;40,30;40,40;30,40)");
+  EXPECT_EQ (r.filtered (db::HoleCountFilter (0, 2, false)).to_string (), "");
+  EXPECT_EQ (r.filtered (db::HoleCountFilter (2, 5, false)).to_string (), "(0,0;0,200;100,200;100,0/10,10;20,10;20,20;10,20/30,30;40,30;40,40;30,40)");
+  EXPECT_EQ (r.filtered (db::HoleCountFilter (3, 5, true)).to_string (), "(0,0;0,200;100,200;100,0/10,10;20,10;20,20;10,20/30,30;40,30;40,40;30,40)");
+}
+
 TEST(100_Processors)
 {
   db::Region r;

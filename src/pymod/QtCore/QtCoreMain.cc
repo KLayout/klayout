@@ -37,3 +37,4 @@ FORCE_LINK_GSI_QTGUI
 FORCE_LINK_GSI_QTWIDGETS
 
 DEFINE_PYMOD(QtCore, "QtCore", "KLayout/Qt module 'QtCore'")
+

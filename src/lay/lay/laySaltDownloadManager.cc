@@ -409,8 +409,6 @@ namespace
       mp_dialog->mark_fetching (m_name);
     }
 
-    virtual void register_object (tl::Progress * /*progress*/) { }
-    virtual void unregister_object (tl::Progress * /*progress*/) { }
     virtual void yield (tl::Progress * /*progress*/) { }
 
     virtual void trigger (tl::Progress *progress)

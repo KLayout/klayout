@@ -47,6 +47,18 @@ ProgressAdaptor::~ProgressAdaptor ()
 }
 
 void
+ProgressAdaptor::register_object (Progress *progress)
+{
+  mp_objects.push_back (progress); // this keeps the outmost one visible. push_front would make the latest one visible.
+}
+
+void
+ProgressAdaptor::unregister_object (Progress *progress)
+{
+  progress->unlink ();
+}
+
+void
 ProgressAdaptor::prev (ProgressAdaptor *pa)
 {
   mp_prev = pa;
@@ -56,6 +68,59 @@ ProgressAdaptor *
 ProgressAdaptor::prev ()
 {
   return mp_prev;
+}
+
+void
+ProgressAdaptor::signal_break ()
+{
+  for (tl::list<tl::Progress>::iterator k = mp_objects.begin (); k != mp_objects.end (); ++k) {
+    k->signal_break ();
+  }
+}
+
+tl::Progress *
+ProgressAdaptor::first ()
+{
+  for (tl::list<tl::Progress>::iterator k = mp_objects.begin (); k != mp_objects.end (); ++k) {
+    if (! k->is_abstract ()) {
+      return k.operator-> ();
+    }
+  }
+  return 0;
+}
+
+// ---------------------------------------------------------------------------------------------
+//  ProgressGarbageCollector implementation
+
+ProgressGarbageCollector::ProgressGarbageCollector ()
+{
+  tl::ProgressAdaptor *a = tl::Progress::adaptor ();
+  if (a) {
+    for (tl::ProgressAdaptor::iterator p = a->begin (); p != a->end (); ++p) {
+      mp_valid_objects.insert (p.operator-> ());
+    }
+  }
+}
+
+ProgressGarbageCollector::~ProgressGarbageCollector ()
+{
+  tl::ProgressAdaptor *a = tl::Progress::adaptor ();
+  if (a) {
+
+    for (tl::ProgressAdaptor::iterator p = a->begin (); p != a->end (); ) {
+
+      tl::ProgressAdaptor::iterator pn = p;
+      ++pn;
+
+      if (mp_valid_objects.find (p.operator-> ()) == mp_valid_objects.end ()) {
+        a->unregister_object (p.operator-> ());
+      }
+
+      p = pn;
+
+    }
+
+  }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -187,7 +252,21 @@ bool Progress::test(bool force_yield)
 }
 
 // ---------------------------------------------------------------------------------------------
-//  Progress implementation
+//  AbstractProgress implementation
+
+AbstractProgress::AbstractProgress (const std::string &desc)
+  : tl::Progress (desc)
+{
+  initialize ();
+}
+
+AbstractProgress::~AbstractProgress ()
+{
+  shutdown ();
+}
+
+// ---------------------------------------------------------------------------------------------
+//  RelativeProgress implementation
 
 RelativeProgress::RelativeProgress (const std::string &desc, size_t max_count, size_t yield_interval)
   : Progress (desc, yield_interval)

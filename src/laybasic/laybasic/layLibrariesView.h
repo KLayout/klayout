@@ -242,6 +242,7 @@ private:
   lay::DecoratedLineEdit *mp_search_edit_box;
   QAction *mp_case_sensitive;
   QAction *mp_use_regular_expressions;
+  QAction *mp_filter;
   CellTreeModel *mp_search_model;
   QFrame *mp_search_frame;
   QCheckBox *mp_search_close_cb;

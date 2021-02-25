@@ -1,0 +1,4 @@
+DIEAREA	ALL	100		0
+M1      FILL   10      1
+M2      FILL   20      2
+M2	FILLOPC   20      3

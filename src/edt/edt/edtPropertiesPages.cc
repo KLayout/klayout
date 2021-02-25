@@ -509,7 +509,7 @@ PolygonPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Sha
 
     }
 
-    lay::indicate_error (pointListEdit, 0);
+    lay::indicate_error (pointListEdit, (tl::Exception *) 0);
 
   } catch (tl::Exception &ex) {
     lay::indicate_error (pointListEdit, &ex);
@@ -609,7 +609,7 @@ BoxPropertiesPage::get_box (int mode) const
 
     try {
       tl::from_string (tl::to_string (x1_le_1->text ()), x1);
-      lay::indicate_error (x1_le_1, 0);
+      lay::indicate_error (x1_le_1, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (x1_le_1, &ex);
       has_error = true;
@@ -617,7 +617,7 @@ BoxPropertiesPage::get_box (int mode) const
 
     try {
       tl::from_string (tl::to_string (y1_le_1->text ()), y1);
-      lay::indicate_error (y1_le_1, 0);
+      lay::indicate_error (y1_le_1, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (y1_le_1, &ex);
       has_error = true;
@@ -625,7 +625,7 @@ BoxPropertiesPage::get_box (int mode) const
 
     try {
       tl::from_string (tl::to_string (x2_le_1->text ()), x2);
-      lay::indicate_error (x2_le_1, 0);
+      lay::indicate_error (x2_le_1, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (x2_le_1, &ex);
       has_error = true;
@@ -633,7 +633,7 @@ BoxPropertiesPage::get_box (int mode) const
 
     try {
       tl::from_string (tl::to_string (y2_le_1->text ()), y2);
-      lay::indicate_error (y2_le_1, 0);
+      lay::indicate_error (y2_le_1, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (y2_le_1, &ex);
       has_error = true;
@@ -669,7 +669,7 @@ BoxPropertiesPage::get_box (int mode) const
 
     try {
       tl::from_string (tl::to_string (cx_le_2->text ()), cx);
-      lay::indicate_error (cx_le_2, 0);
+      lay::indicate_error (cx_le_2, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (cx_le_2, &ex);
       has_error = true;
@@ -677,7 +677,7 @@ BoxPropertiesPage::get_box (int mode) const
 
     try {
       tl::from_string (tl::to_string (cy_le_2->text ()), cy);
-      lay::indicate_error (cy_le_2, 0);
+      lay::indicate_error (cy_le_2, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (cy_le_2, &ex);
       has_error = true;
@@ -685,7 +685,7 @@ BoxPropertiesPage::get_box (int mode) const
 
     try {
       tl::from_string (tl::to_string (w_le_2->text ()), w);
-      lay::indicate_error (w_le_2, 0);
+      lay::indicate_error (w_le_2, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (w_le_2, &ex);
       has_error = true;
@@ -693,7 +693,7 @@ BoxPropertiesPage::get_box (int mode) const
 
     try {
       tl::from_string (tl::to_string (h_le_2->text ()), h);
-      lay::indicate_error (h_le_2, 0);
+      lay::indicate_error (h_le_2, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (h_le_2, &ex);
       has_error = true;
@@ -834,7 +834,7 @@ TextPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
 
   try {
     tl::from_string (tl::to_string (x_le->text ()), x);
-    lay::indicate_error (x_le, 0);
+    lay::indicate_error (x_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (x_le, &ex);
     has_error = true;
@@ -842,7 +842,7 @@ TextPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
 
   try {
     tl::from_string (tl::to_string (y_le->text ()), y);
-    lay::indicate_error (y_le, 0);
+    lay::indicate_error (y_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (y_le, &ex);
     has_error = true;
@@ -875,7 +875,7 @@ TextPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
   if (! size_le->text ().isEmpty ()) {
     try {
       size = coord_from_string (tl::to_string (size_le->text ()).c_str (), dbu, du, t);
-      lay::indicate_error (size_le, 0);
+      lay::indicate_error (size_le, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (size_le, &ex);
       has_error = true;
@@ -1084,7 +1084,7 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
       throw tl::Exception (tl::to_string (QObject::tr ("The path must have at least one point")));
     }
 
-    lay::indicate_error (ptlist_le, 0);
+    lay::indicate_error (ptlist_le, (tl::Exception *) 0);
 
   } catch (tl::Exception &ex) {
     lay::indicate_error (ptlist_le, &ex);
@@ -1094,7 +1094,7 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
   db::Coord w = 0;
   try {
     w = coord_from_string (tl::to_string (width_le->text ()).c_str (), dbu, du, t);
-    lay::indicate_error (width_le, 0);
+    lay::indicate_error (width_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (width_le, &ex);
     has_error = true;
@@ -1111,14 +1111,14 @@ EditablePathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db
   case 2: // variable
     try {
       se = coord_from_string (tl::to_string (start_ext_le->text ()).c_str (), dbu, du, t);
-      lay::indicate_error (start_ext_le, 0);
+      lay::indicate_error (start_ext_le, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (start_ext_le, &ex);
       has_error = true;
     }
     try {
       ee = coord_from_string (tl::to_string (end_ext_le->text ()).c_str (), dbu, du, t);
-      lay::indicate_error (end_ext_le, 0);
+      lay::indicate_error (end_ext_le, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (end_ext_le, &ex);
       has_error = true;

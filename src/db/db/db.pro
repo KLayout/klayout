@@ -61,6 +61,7 @@ SOURCES = \
   dbPolygonGenerators.cc \
   dbPropertiesRepository.cc \
   dbReader.cc \
+  dbRecursiveInstanceIterator.cc \
   dbRecursiveShapeIterator.cc \
   dbRegion.cc \
   dbRegionLocalOperations.cc \
@@ -114,6 +115,7 @@ SOURCES = \
   gsiDeclDbPoint.cc \
   gsiDeclDbPolygon.cc \
   gsiDeclDbReader.cc \
+  gsiDeclDbRecursiveInstanceIterator.cc \
   gsiDeclDbRecursiveShapeIterator.cc \
   gsiDeclDbRegion.cc \
   gsiDeclDbShape.cc \
@@ -269,6 +271,7 @@ HEADERS = \
   dbPolygonGenerators.h \
   dbPropertiesRepository.h \
   dbReader.h \
+  dbRecursiveInstanceIterator.h \
   dbRecursiveShapeIterator.h \
   dbRegion.h \
   dbRegionLocalOperations.h \

@@ -1152,3 +1152,14 @@ TEST(28_inputFragmentation)
 {
   run_test (_this, "28", true);
 }
+
+TEST(29_holes)
+{
+  run_test (_this, "29", false);
+}
+
+TEST(29d_holes)
+{
+  run_test (_this, "29", true);
+}
+

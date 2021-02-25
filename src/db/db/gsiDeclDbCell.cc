@@ -38,6 +38,8 @@
 #include "dbCellMapping.h"
 #include "dbPCellDeclaration.h"
 #include "dbSaveLayoutOptions.h"
+#include "dbRecursiveShapeIterator.h"
+#include "dbRecursiveInstanceIterator.h"
 #include "dbWriter.h"
 #include "dbHash.h"
 #include "tlStream.h"
@@ -1204,6 +1206,56 @@ begin_shapes_rec_overlapping_um (const db::Cell *cell, unsigned int layer, db::D
   return db::RecursiveShapeIterator (*layout, *cell, layer, db::CplxTrans (layout->dbu ()).inverted () * region, true);
 }
 
+static db::RecursiveInstanceIterator
+begin_instances_rec (const db::Cell *cell)
+{
+  const db::Layout *layout = cell->layout ();
+  if (! layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
+  }
+  return db::RecursiveInstanceIterator (*layout, *cell);
+}
+
+static db::RecursiveInstanceIterator
+begin_instances_rec_touching (const db::Cell *cell, db::Box region)
+{
+  const db::Layout *layout = cell->layout ();
+  if (! layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
+  }
+  return db::RecursiveInstanceIterator (*layout, *cell, region, false);
+}
+
+static db::RecursiveInstanceIterator
+begin_instances_rec_touching_um (const db::Cell *cell, db::DBox region)
+{
+  const db::Layout *layout = cell->layout ();
+  if (! layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
+  }
+  return db::RecursiveInstanceIterator (*layout, *cell, db::CplxTrans (layout->dbu ()).inverted () * region, false);
+}
+
+static db::RecursiveInstanceIterator
+begin_instances_rec_overlapping (const db::Cell *cell, db::Box region)
+{
+  const db::Layout *layout = cell->layout ();
+  if (! layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
+  }
+  return db::RecursiveInstanceIterator (*layout, *cell, region, true);
+}
+
+static db::RecursiveInstanceIterator
+begin_instances_rec_overlapping_um (const db::Cell *cell, db::DBox region)
+{
+  const db::Layout *layout = cell->layout ();
+  if (! layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
+  }
+  return db::RecursiveInstanceIterator (*layout, *cell, db::CplxTrans (layout->dbu ()).inverted () * region, true);
+}
+
 static void copy_shapes2 (db::Cell *cell, const db::Cell &source_cell, const db::LayerMapping &layer_mapping)
 {
   cell->copy_shapes (source_cell, layer_mapping);
@@ -1832,6 +1884,54 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "This version gives an iterator delivering shapes whose bounding box overlaps the given region.\n"
     "\n"
     "This variant has been added in version 0.25.\n"
+  ) +
+  gsi::method_ext ("begin_instances_rec", &begin_instances_rec,
+    "@brief Delivers a recursive instance iterator for the instances below the cell\n"
+    "@return A suitable iterator\n"
+    "\n"
+    "For details see the description of the \\RecursiveInstanceIterator class.\n"
+    "\n"
+    "This method has been added in version 0.27.\n"
+  ) +
+  gsi::method_ext ("begin_instances_rec_touching", &begin_instances_rec_touching, gsi::arg ("region"),
+    "@brief Delivers a recursive instance iterator for the instances below the cell\n"
+    "@param region The search region\n"
+    "@return A suitable iterator\n"
+    "\n"
+    "For details see the description of the \\RecursiveInstanceIterator class.\n"
+    "This version gives an iterator delivering instances whose bounding box touches the given region.\n"
+    "\n"
+    "This method has been added in version 0.27.\n"
+  ) +
+  gsi::method_ext ("begin_instances_rec_touching", &begin_instances_rec_touching_um, gsi::arg ("region"),
+    "@brief Delivers a recursive instance iterator for the instances below the cell using a region search, with the region given in micrometer units\n"
+    "@param region The search region as \\DBox object in micrometer units\n"
+    "@return A suitable iterator\n"
+    "\n"
+    "For details see the description of the \\RecursiveInstanceIterator class.\n"
+    "This version gives an iterator delivering instances whose bounding box touches the given region.\n"
+    "\n"
+    "This variant has been added in version 0.27.\n"
+  ) +
+  gsi::method_ext ("begin_instances_rec_overlapping", &begin_instances_rec_overlapping, gsi::arg ("region"),
+    "@brief Delivers a recursive instance iterator for the instances below the cell using a region search\n"
+    "@param region The search region\n"
+    "@return A suitable iterator\n"
+    "\n"
+    "For details see the description of the \\RecursiveInstanceIterator class.\n"
+    "This version gives an iterator delivering instances whose bounding box overlaps the given region.\n"
+    "\n"
+    "This method has been added in version 0.27.\n"
+  ) +
+  gsi::method_ext ("begin_instances_rec_overlapping", &begin_instances_rec_overlapping_um, gsi::arg ("region"),
+    "@brief Delivers a recursive instance iterator for the instances below the cell using a region search, with the region given in micrometer units\n"
+    "@param region The search region as \\DBox object in micrometer units\n"
+    "@return A suitable iterator\n"
+    "\n"
+    "For details see the description of the \\RecursiveInstanceIterator class.\n"
+    "This version gives an iterator delivering instances whose bounding box overlaps the given region.\n"
+    "\n"
+    "This variant has been added in version 0.27.\n"
   ) +
   gsi::method_ext ("copy_shapes", &copy_shapes1, gsi::arg ("source_cell"),
     "@brief Copies the shapes from the given cell into this cell\n"

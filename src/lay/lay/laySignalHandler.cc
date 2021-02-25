@@ -447,12 +447,10 @@ void signal_handler (int signo, siginfo_t *si, void *)
 void install_signal_handlers ()
 {
   struct sigaction act;
+  memset(&act, 0, sizeof(struct sigaction));
   act.sa_sigaction = signal_handler;
   sigemptyset (&act.sa_mask);
   act.sa_flags = SA_SIGINFO;
-#if !defined(__APPLE__) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
-  act.sa_restorer = 0;
-#endif
 
   sigaction (SIGSEGV, &act, NULL);
   sigaction (SIGILL, &act, NULL);

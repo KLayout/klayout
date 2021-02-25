@@ -291,7 +291,7 @@ TEST(16)
   run_test (_this, "def7", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au-new.oas.gz", options);
 
   options.set_placement_blockage_layer ("PLACEMENT_BLK (60/0)");
-  run_test (_this, "def7", "map:in.map+lef:cells.lef+lef:tech.lef+def:in.def.gz", "au_with_map_file-new.oas.gz", options);
+  run_test (_this, "def7", "map:in.map+lef:cells.lef+lef:tech.lef+def:in.def.gz", "au2_with_map_file-new.oas.gz", options);
 }
 
 TEST(17)
@@ -332,7 +332,7 @@ TEST(21)
 TEST(22)
 {
   db::LEFDEFReaderOptions opt = default_options ();
-  run_test (_this, "def13", "map:test.map+lef:test.lef_5.8+def:top.def.gz", "au.oas.gz", opt);
+  run_test (_this, "def13", "map:test.map+lef:test.lef_5.8+def:top.def.gz", "au2.oas.gz", opt);
 }
 
 TEST(100)
@@ -710,20 +710,26 @@ TEST(117_mapfile_all)
   EXPECT_EQ (lm_read.to_string (),
     "layer_map("
       "'OUTLINE : OUTLINE (1/0)';"
-      "'+M1.LEFOBS;M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/...\\' (1/5)';"
+      "'+M1.LEFOBS;M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/SPNET/...\\' (1/5)';"
       "'+M1.NET;M1.SPNET : \\'M1.NET/SPNET\\' (16/0)';"
       "'+M1.NET : M1.NET (18/0)';"
-      "'+M1.BLK;M1.LEFOBS;M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/...\\' (22/2)';"
-      "'+\\'M1.NET:1\\';\\'M1.PIN:1\\';\\'M1.SPNET:1\\';\\'M1.VIA:1\\' : \\'M1.NET:1/...\\' (6/0)';"
+      "'+M1.BLK;M1.FILL;M1.FILLOPC;M1.LEFOBS;M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/FILL/...\\' (22/2)';"
+      "'+\\'M1.NET:1\\';\\'M1.PIN:1\\';\\'M1.SPNET:1\\';\\'M1.VIA:1\\' : \\'M1.NET:1/PIN:1/...\\' (6/0)';"
       "'+\\'M1.NET:1\\' : \\'M1.NET:1\\' (7/0)';"
       "'+M1.PIN : M1.PIN (3/0)';"
       "'+M1.PIN : M1.PIN (4/0)';"
-      "'+M1.VIA : M1.VIA (20/0)';"
-      "'+M1.VIA : M1.VIA (21/0)';"
+      "'+M1.FILL : M1.FILL (14/0)';"
+      "'+M1.FILL : M1.FILL (15/0)';"
+      "'+M1.FILL : M1.FILL (17/0)';"
+      "'+M1.FILLOPC : M1.FILLOPC (9/0)';"
+      "'\\'M1.FILLOPC:1\\' : \\'M1.FILLOPC:1\\' (10/0)';"
+      "'\\'M1.FILLOPC:2\\' : \\'M1.FILLOPC:2\\' (11/0)';"
+      "'\\'M1.VIA:SIZE0.05X0.05\\' : \\'M1.VIA:SIZE0.05X0.05\\' (20/0)';"
+      "'\\'M1.VIA:SIZE3X3\\' : \\'M1.VIA:SIZE3X3\\' (21/0)';"
       "'+M1.LABEL : M1.LABEL (26/0)';"
       "'+M1.LABEL : M1.LABEL (27/0)';"
       "'+M1.LABEL : M1.LABEL (28/1)';"
-      "'+M1.BLK : M1.BLOCKAGE (13/0)';"
+      "'+M1.BLK : M1.BLK (13/0)';"
       "'M1_TEXT.LABEL : M1_TEXT.LABEL (29/0)'"
     ")"
   )
@@ -750,6 +756,21 @@ TEST(119_multimapping)
       "'VIA1.VIA : VIA1 (2/0)'"
     ")"
   )
+}
+
+TEST(120_simplefill)
+{
+  run_test (_this, "fill", "map:simple.map+lef:simple.lef+def:simple.def", "simple_au.oas.gz", default_options (), false);
+}
+
+TEST(121_fillwithmask)
+{
+  run_test (_this, "fill", "map:with_mask.map+lef:with_mask.lef+def:with_mask.def", "with_mask_au.oas.gz", default_options (), false);
+}
+
+TEST(130_viasize)
+{
+  run_test (_this, "viasize", "map:test.map+lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
 }
 
 TEST(200_lefdef_plugin)

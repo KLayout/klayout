@@ -87,7 +87,9 @@ struct cmp_cell_tree_item_vs_name_f
 //  CellTreeItem implementation
 
 CellTreeItem::CellTreeItem (const db::Layout *layout, bool is_pcell, size_t cell_or_pcell_index, bool flat, CellTreeModel::Sorting s)
-  : mp_layout (layout), mp_parent (0), m_sorting (s), m_is_pcell (is_pcell), m_index (0), m_children (), m_cell_or_pcell_index (cell_or_pcell_index)
+  : mp_layout (layout), mp_parent (0), m_sorting (s), m_is_pcell (is_pcell),
+    m_index (0), m_tree_index (0),
+    m_children (), m_cell_or_pcell_index (cell_or_pcell_index)
 {
   if (! flat && ! is_pcell) {
     m_child_count = int (mp_layout->cell (cell_or_pcell_index).child_cells ());
@@ -102,6 +104,16 @@ CellTreeItem::~CellTreeItem ()
     delete *c;
   }
   m_children.clear ();
+}
+
+size_t
+CellTreeItem::assign_serial (size_t index, std::map<CellTreeItem *, size_t> &serial)
+{
+  serial.insert (std::make_pair (this, index++));
+  for (std::vector<CellTreeItem *>::iterator c = m_children.begin (); c != m_children.end (); ++c) {
+    index = (*c)->assign_serial (index, serial);
+  }
+  return index;
 }
 
 bool
@@ -128,10 +140,22 @@ CellTreeItem::children () const
   return m_child_count;
 }
 
-CellTreeItem *
-CellTreeItem::child (int index) 
+int
+CellTreeItem::children_in (const std::set<const CellTreeItem *> &sel) const
 {
-  if (! m_is_pcell && int (m_children.size ()) <= index) {
+  size_t count = 0;
+  for (std::vector<CellTreeItem *>::const_iterator c = m_children.begin (); c != m_children.end (); ++c) {
+    if (sel.find (*c) != sel.end ()) {
+      ++count;
+    }
+  }
+  return count;
+}
+
+void
+CellTreeItem::ensure_children ()
+{
+  if (! m_is_pcell && m_children.empty ()) {
 
     //  create a list of child sub-item
 
@@ -146,8 +170,27 @@ CellTreeItem::child (int index)
     finish_children ();
 
   }
+}
 
+CellTreeItem *
+CellTreeItem::child (int index) 
+{
+  ensure_children ();
   return m_children [index];
+}
+
+CellTreeItem *
+CellTreeItem::child_in (const std::set<const CellTreeItem *> &sel, int index)
+{
+  ensure_children ();
+
+  for (std::vector<CellTreeItem *>::const_iterator c = m_children.begin (); c != m_children.end (); ++c) {
+    if (sel.find (*c) != sel.end () && index-- <= 0) {
+      return *c;
+    }
+  }
+
+  return 0;
 }
 
 void
@@ -274,6 +317,8 @@ CellTreeModel::CellTreeModel (QWidget *parent, lay::LayoutView *view, int cv_ind
 
   m_flat = ((flags & Flat) != 0) && ((flags & TopCells) == 0);
   m_pad = ((flags & NoPadding) == 0);
+  m_filter_mode = false;
+  m_is_filtered = false;
 
   mp_layout = & view->cellview (cv_index)->layout ();
   mp_library = 0;
@@ -295,6 +340,7 @@ CellTreeModel::CellTreeModel (QWidget *parent, db::Layout *layout, unsigned int 
 {
   m_flat = ((flags & Flat) != 0) && ((flags & TopCells) == 0);
   m_pad = ((flags & NoPadding) == 0);
+  m_filter_mode = false;
 
   mp_layout = layout;
   mp_library = 0;
@@ -316,6 +362,7 @@ CellTreeModel::CellTreeModel (QWidget *parent, db::Library *library, unsigned in
 {
   m_flat = ((flags & Flat) != 0) && ((flags & TopCells) == 0);
   m_pad = ((flags & NoPadding) == 0);
+  m_filter_mode = false;
 
   mp_layout = &library->layout ();
   mp_library = library;
@@ -404,6 +451,8 @@ CellTreeModel::do_configure (db::Layout *layout, db::Library *library, lay::Layo
 
   } else {
 
+    emit layoutAboutToBeChanged ();
+
     //  Translate persistent indexes: translation happens according to the path given by
     //  a sequence of cell indexes.
 
@@ -465,13 +514,22 @@ CellTreeModel::do_configure (db::Layout *layout, db::Library *library, lay::Layo
 
     changePersistentIndexList (indexes, new_indexes);
 
-  }
+    emit layoutChanged ();
 
-  signal_data_changed ();
+  }
 
   //  TODO: harden against exceptions
   for (std::vector<lay::CellTreeItem *>::iterator t = old_toplevel_items.begin (); t != old_toplevel_items.end (); ++t) {
     delete *t;
+  }
+}
+
+void
+CellTreeModel::set_filter_mode (bool f)
+{
+  if (f != m_filter_mode) {
+    m_filter_mode = f;
+    signal_data_changed ();
   }
 }
 
@@ -486,6 +544,7 @@ CellTreeModel::set_sorting (Sorting s)
 void
 CellTreeModel::signal_data_changed ()
 {
+  emit layoutAboutToBeChanged ();
   emit layoutChanged ();
 }
 
@@ -754,7 +813,7 @@ CellTreeModel::data (const QModelIndex &index, int role) const
 
   } else if (role == Qt::BackgroundRole) {
 
-    if (m_selected_indexes_set.find (index) != m_selected_indexes_set.end ()) {
+    if (m_selected_indexes_set.find (index.internalPointer ()) != m_selected_indexes_set.end ()) {
       //  for selected items pick a color between Highlight and Base
       QPalette pl (mp_parent->palette ());
       QColor c1 = pl.color (QPalette::Highlight);
@@ -819,11 +878,23 @@ CellTreeModel::rowCount (const QModelIndex &parent) const
     } else if (! item->is_valid ()) {
       //  for safety we return 0 children for invalid cells
       return 0;
+    } else if (m_filter_mode && m_is_filtered) {
+      return int (item->children_in (m_visible_cell_set));
     } else {
       return int (item->children ());
     }
   } else {
-    return int (m_toplevel.size ());
+    if (m_filter_mode && m_is_filtered) {
+      size_t n = 0;
+      for (std::vector <CellTreeItem *>::const_iterator i = m_toplevel.begin (); i != m_toplevel.end (); ++i) {
+        if (m_visible_cell_set.find (*i) != m_visible_cell_set.end ()) {
+          ++n;
+        }
+      }
+      return n;
+    } else {
+      return int (m_toplevel.size ());
+    }
   }
 }
 
@@ -839,11 +910,25 @@ CellTreeModel::index (int row, int column, const QModelIndex &parent) const
     } else if (! item->is_valid ()) {
       //  for safety we don't return valid child indexes for invalid cells
       return QModelIndex ();
+    } else if (m_filter_mode && m_is_filtered) {
+      return createIndex (row, column, item->child_in (m_visible_cell_set, row));
     } else {
       return createIndex (row, column, item->child (row));
     }
   } else if (row >= 0 && row < int (m_toplevel.size ())) {
-    return createIndex (row, column, m_toplevel [row]);
+    if (m_filter_mode && m_is_filtered) {
+      int n = row;
+      for (std::vector <CellTreeItem *>::const_iterator i = m_toplevel.begin (); i != m_toplevel.end (); ++i) {
+        if (m_visible_cell_set.find (*i) != m_visible_cell_set.end ()) {
+          if (n-- == 0) {
+            return createIndex (row, column, *i);
+          }
+        }
+      }
+      return QModelIndex ();
+    } else {
+      return createIndex (row, column, m_toplevel [row]);
+    }
   } else {
     return QModelIndex ();
   }
@@ -862,9 +947,19 @@ CellTreeModel::parent (const QModelIndex &index) const
   if (! item) {
     return QModelIndex ();
   }
+
   CellTreeItem *pitem = item->parent ();
   if (pitem) {
-    return createIndex (int (pitem->index ()), index.column (), pitem);
+    if (m_filter_mode && m_is_filtered) {
+      if (pitem->tree_index () == std::numeric_limits<size_t>::max ()) {
+        //  WARNING: invisible item!
+        return QModelIndex ();
+      } else {
+        return createIndex (int (pitem->tree_index ()), index.column (), pitem);
+      }
+    } else {
+      return createIndex (int (pitem->index ()), index.column (), pitem);
+    }
   } else {
     return QModelIndex ();
   }
@@ -895,6 +990,13 @@ CellTreeModel::model_index (CellTreeItem *item) const
 {
   if (mp_layout->under_construction () || (mp_layout->manager () && mp_layout->manager ()->transacting ())) {
     return QModelIndex ();
+  } else if (m_filter_mode && m_is_filtered) {
+    if (item->tree_index () == std::numeric_limits<size_t>::max ()) {
+      //  WARNING: invisible item!
+      return QModelIndex ();
+    } else {
+      return createIndex (int (item->tree_index ()), 0, item);
+    }
   } else {
     return createIndex (int (item->index ()), 0, item);
   }
@@ -963,10 +1065,72 @@ void
 CellTreeModel::clear_locate ()
 {
   m_selected_indexes.clear ();
+  m_visible_cell_set.clear ();
+  m_is_filtered = false;
   m_current_index = m_selected_indexes.begin ();
   m_selected_indexes_set.clear ();
 
-  signal_data_changed ();
+  emit layoutAboutToBeChanged ();
+
+  if (m_filter_mode) {
+
+    QModelIndexList indexes = persistentIndexList ();
+
+    QModelIndexList new_indexes;
+    for (QModelIndexList::iterator i = indexes.begin (); i != indexes.end (); ++i) {
+      new_indexes.push_back (model_index ((CellTreeItem *) i->internalPointer ()));
+    }
+
+    changePersistentIndexList (indexes, new_indexes);
+
+  }
+
+  emit layoutChanged ();
+}
+
+QModelIndex
+CellTreeModel::locate_next (const QModelIndex &index)
+{
+  if (m_current_index == m_selected_indexes.end ()) {
+    return QModelIndex ();
+  } else if (! index.isValid ()) {
+    return locate_next ();
+  }
+
+  //  easy case: the requested index is a selected one
+
+  for (std::vector <QModelIndex>::const_iterator i = m_selected_indexes.begin (); i != m_selected_indexes.end (); ++i) {
+    if (i->internalPointer () == index.internalPointer ()) {
+      m_current_index = i;
+      if (++m_current_index == m_selected_indexes.end ()) {
+        m_current_index = m_selected_indexes.begin ();
+      }
+      return *m_current_index;
+    }
+  }
+
+  //  otherwise: search by sequential order
+
+  m_current_index = m_selected_indexes.begin ();
+
+  std::map<CellTreeItem *, size_t> serial_index;
+  size_t seq = 0;
+  for (size_t i = 0; i < m_toplevel.size (); ++i) {
+    seq = m_toplevel [i]->assign_serial (seq, serial_index);
+  }
+
+  size_t serial = serial_index [(CellTreeItem *) index.internalPointer ()];
+  size_t next = 0;
+
+  for (std::vector <QModelIndex>::const_iterator i = m_selected_indexes.begin (); i != m_selected_indexes.end (); ++i) {
+    size_t s = serial_index [(CellTreeItem *) i->internalPointer ()];
+    if (s > serial && (next == 0 || s < next)) {
+      next = s;
+      m_current_index = i;
+    }
+  }
+
+  return *m_current_index;
 }
 
 QModelIndex 
@@ -1005,19 +1169,42 @@ CellTreeModel::locate_prev ()
   }
 }
 
-void
+bool
 CellTreeModel::search_children (const tl::GlobPattern &pattern, CellTreeItem *item)
 {
+  bool any = false;
+  size_t ti = 0;
+
   int children = item->children ();
   for (int i = 0; i < children; ++i) {
+
     CellTreeItem *c = item->child (i);
     if (c) {
+
+      bool visible = false;
+
+      c->set_tree_index (std::numeric_limits<size_t>::max ());
       if (c->name_matches (pattern)) {
+        c->set_tree_index (ti);
         m_selected_indexes.push_back (model_index (c));
+        visible = true;
       }
-      search_children (pattern, c);
+      if (search_children (pattern, c)) {
+        c->set_tree_index (ti);
+        visible = true;
+      }
+
+      if (visible) {
+        ++ti;
+        m_visible_cell_set.insert (c);
+        any = true;
+      }
+
     }
+
   }
+
+  return any;
 }
 
 QModelIndex 
@@ -1027,26 +1214,75 @@ CellTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive,
     return QModelIndex ();
   }
 
+  emit layoutAboutToBeChanged ();
+
+  QModelIndexList indexes = persistentIndexList ();
+  std::vector<CellTreeItem *> persistent_index_cells;
+  persistent_index_cells.reserve (indexes.size ());
+
+  for (QModelIndexList::iterator i = indexes.begin (); i != indexes.end (); ++i) {
+    persistent_index_cells.push_back ((CellTreeItem *) i->internalPointer ());
+  }
+
   m_selected_indexes.clear ();
+  m_visible_cell_set.clear ();
+  m_is_filtered = true;
 
   tl::GlobPattern p = tl::GlobPattern (std::string (name));
   p.set_case_sensitive (case_sensitive);
   p.set_exact (!glob_pattern);
   p.set_header_match (true);
 
+  size_t ti = 0;
+
   for (std::vector <CellTreeItem *>::const_iterator lc = m_toplevel.begin (); lc != m_toplevel.end (); ++lc) {
+
+    bool visible = false;
+
+    (*lc)->set_tree_index (std::numeric_limits<size_t>::max ());
     if ((*lc)->name_matches (p)) {
+      (*lc)->set_tree_index (ti);
       m_selected_indexes.push_back (model_index (*lc));
+      visible = true;
     }
-    if (! top_only) {
-      search_children (p, *lc);
+    if (! top_only && ! m_flat && search_children (p, *lc)) {
+      (*lc)->set_tree_index (ti);
+      visible = true;
     }
+
+    if (visible) {
+      ++ti;
+      m_visible_cell_set.insert (*lc);
+    }
+
   }
 
   m_selected_indexes_set.clear ();
-  m_selected_indexes_set.insert (m_selected_indexes.begin (), m_selected_indexes.end ());
-  
-  signal_data_changed ();
+  for (std::vector <QModelIndex>::const_iterator i = m_selected_indexes.begin (); i != m_selected_indexes.end (); ++i) {
+    m_selected_indexes_set.insert (i->internalPointer ());
+  }
+
+  //  re-layout the items
+
+  if (m_filter_mode) {
+
+    QModelIndexList new_indexes;
+
+    for (std::vector<CellTreeItem *>::const_iterator item = persistent_index_cells.begin (); item != persistent_index_cells.end (); ++item) {
+      if (m_visible_cell_set.find (*item) != m_visible_cell_set.end ()) {
+        new_indexes.push_back (model_index (*item));
+      } else {
+        new_indexes.push_back (QModelIndex ());
+      }
+    }
+
+    changePersistentIndexList (indexes, new_indexes);
+
+  }
+
+  emit layoutChanged ();
+
+  //  make the first selected one current
 
   m_current_index = m_selected_indexes.begin ();
   if (m_current_index == m_selected_indexes.end ()) {

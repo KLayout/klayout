@@ -145,6 +145,19 @@ public:
   std::string to_string () const;
 
   /**
+   *  @brief Turns the URI into an "abstract path"
+   *
+   *  The "abstract path" is a concept provided by "tl::InputStream".
+   *  URIs with scheme "file", "http" and "https" are equivalent to their abstract path.
+   *  URIs without a scheme turn into system file paths.
+   *  Other schemes are not allowed.
+   *
+   *  Abstract paths are more powerful as they support pipes and Qt resource access.
+   *  These modes are not supported by URIs.
+   */
+  std::string to_abstract_path () const;
+
+  /**
    *  @brief Resolves an URI relative to this one
    */
   URI resolved (const URI &other) const;

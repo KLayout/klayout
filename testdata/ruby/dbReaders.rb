@@ -289,6 +289,18 @@ class DBReaders_TestClass < TestBase
     conf.lef_pins_datatype = 181
     assert_equal(conf.lef_pins_datatype, 181)
 
+    assert_equal(conf.produce_fills, true)
+    conf.produce_fills = false
+    assert_equal(conf.produce_fills, false)
+
+    assert_equal(conf.fills_suffix, ".FILL")
+    conf.fills_suffix = "XFILL"
+    assert_equal(conf.fills_suffix, "XFILL")
+
+    assert_equal(conf.fills_datatype, 5)
+    conf.fills_datatype = 19
+    assert_equal(conf.fills_datatype, 19)
+
     assert_equal(conf.produce_obstructions, true)
     conf.produce_obstructions = false
     assert_equal(conf.produce_obstructions, false)

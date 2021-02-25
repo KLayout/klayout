@@ -97,6 +97,9 @@ GenericReaderOptions::GenericReaderOptions ()
   m_lefdef_produce_lef_pins = load_options.get_option_by_name ("lefdef_config.produce_lef_pins").to_bool ();
   m_lefdef_lef_pins_suffix = load_options.get_option_by_name ("lefdef_config.lef_pins_suffix_str").to_string ();
   m_lefdef_lef_pins_datatype = load_options.get_option_by_name ("lefdef_config.lef_pins_datatype_str").to_string ();
+  m_lefdef_produce_fills = load_options.get_option_by_name ("lefdef_config.produce_fills").to_bool ();
+  m_lefdef_fills_suffix = load_options.get_option_by_name ("lefdef_config.fills_suffix_str").to_string ();
+  m_lefdef_fills_datatype = load_options.get_option_by_name ("lefdef_config.fills_datatype_str").to_string ();
   m_lefdef_produce_obstructions = load_options.get_option_by_name ("lefdef_config.produce_obstructions").to_bool ();
   m_lefdef_obstruction_suffix = load_options.get_option_by_name ("lefdef_config.obstructions_suffix").to_string ();
   m_lefdef_obstruction_datatype = load_options.get_option_by_name ("lefdef_config.obstructions_datatype").to_int ();
@@ -501,6 +504,20 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "See '--" + m_long_prefix + "lefdef-produce-via-geometry' for a description of the mapping scheme.\n"
                    )
         << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-fills", &m_lefdef_produce_fills, "Skips fills when producing geometry",
+                    "If this option is given, no fill geometry will be produced."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-fills-suffix", &m_lefdef_fills_suffix, "Specifies the fill geometry layer suffix in pattern-based mode",
+                    "The fill geometry generation and layer mapfillg is designed in the same way than via geometry mapfillg. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapfillg scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-fills-datatype", &m_lefdef_fills_datatype, "Specifies the fill geometry layer datatype in pattern-based mode",
+                    "The fill geometry generation and layer mapfillg is designed in the same way than via geometry mapfillg. "
+                    "See '--" + m_long_prefix + "lefdef-produce-via-geometry' for a description of the mapfillg scheme.\n"
+                   )
+        << tl::arg (group +
                     "#!--" + m_long_prefix + "lefdef-dont-produce-routing", &m_lefdef_produce_routing, "Skips routing when producing geometry",
                     "If this option is given, no routing geometry will be produced."
                    )
@@ -724,6 +741,9 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options) const
   load_options.set_option_by_name ("lefdef_config.produce_lef_pins", m_lefdef_produce_lef_pins);
   load_options.set_option_by_name ("lefdef_config.lef_pins_suffix_str", m_lefdef_lef_pins_suffix);
   load_options.set_option_by_name ("lefdef_config.lef_pins_datatype_str", m_lefdef_lef_pins_datatype);
+  load_options.set_option_by_name ("lefdef_config.produce_fills", m_lefdef_produce_fills);
+  load_options.set_option_by_name ("lefdef_config.fills_suffix_str", m_lefdef_fills_suffix);
+  load_options.set_option_by_name ("lefdef_config.fills_datatype_str", m_lefdef_fills_datatype);
   load_options.set_option_by_name ("lefdef_config.produce_obstructions", m_lefdef_produce_obstructions);
   load_options.set_option_by_name ("lefdef_config.obstructions_suffix", m_lefdef_obstruction_suffix);
   load_options.set_option_by_name ("lefdef_config.obstructions_datatype", m_lefdef_obstruction_datatype);

@@ -161,6 +161,9 @@ private:
   bool m_lefdef_produce_lef_pins;
   std::string m_lefdef_lef_pins_suffix;
   std::string m_lefdef_lef_pins_datatype;
+  bool m_lefdef_produce_fills;
+  std::string m_lefdef_fills_suffix;
+  std::string m_lefdef_fills_datatype;
   bool m_lefdef_produce_obstructions;
   std::string m_lefdef_obstruction_suffix;
   int m_lefdef_obstruction_datatype;

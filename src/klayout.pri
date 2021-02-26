@@ -163,13 +163,20 @@ equals(HAVE_QT, "0") {
   QT += core network xml sql
 
   equals(HAVE_QT5, "1") {
-    QT += designer printsupport widgets uitools
+    QT += designer printsupport widgets 
+    contains(QT_MODULES, "uitools") {
+      # not all distributions have uitools
+      QT += uitools
+    }
     equals(HAVE_QTBINDINGS, "1") {
       QT += multimedia multimediawidgets xmlpatterns svg gui
     }
   } else {
-    # questionable: use uitools instead?
     CONFIG += designer uitools
+  }
+
+  contains(QT_MODULES, "uitools") {
+    DEFINES += HAVE_QT_UITOOLS
   }
 
 }

@@ -20,7 +20,9 @@
 
 */
 
-#if QT_VERSION >= 0x050000
+#if !defined(HAVE_QT_UITOOLS)
+#  defined FORCE_LINK_GSI_QTUITOOLS
+#elif QT_VERSION >= 0x050000
 #  include "../qt5/QtUiTools/gsiQtExternals.h"
 #else
 #  include "../qt4/QtUiTools/gsiQtExternals.h"

@@ -12,8 +12,7 @@ SUBDIRS = \
   QtPrintSupport \
   QtSvg \
   QtXmlPatterns \
-  QtXml \
-  QtUiTools
+  QtXml 
 
 QtGui.depends += QtCore
 QtNetwork.depends += QtCore
@@ -25,4 +24,9 @@ QtPrintSupport.depends += QtCore QtWidgets
 QtSvg.depends += QtCore QtWidgets
 QtXmlPatterns.depends += QtCore
 QtXml.depends += QtCore
-QtUiTools.depends += QtCore
+
+contains(QT_MODULES, uitools) {
+  # Not all distributions have uitools
+  SUBDIRS += QtUiTools
+  QtUiTools.depends += QtCore
+}

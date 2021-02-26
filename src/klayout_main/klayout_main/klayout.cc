@@ -61,7 +61,6 @@
 # include "gsiQtSvgExternals.h"
 # include "gsiQtNetworkExternals.h"
 # include "gsiQtDesignerExternals.h"
-# include "gsiQtUiToolsExternals.h"
 
 FORCE_LINK_GSI_QTCORE
 FORCE_LINK_GSI_QTGUI
@@ -74,7 +73,11 @@ FORCE_LINK_GSI_QTDESIGNER
 FORCE_LINK_GSI_QTNETWORK
 FORCE_LINK_GSI_QTSQL
 FORCE_LINK_GSI_QTSVG
+
+#if defined(HAVE_QT_UITOOLS)
+#  include "gsiQtUiToolsExternals.h"
 FORCE_LINK_GSI_QTUITOOLS
+#endif
 
 #else
 # define QT_EXTERNAL_BASE(x)

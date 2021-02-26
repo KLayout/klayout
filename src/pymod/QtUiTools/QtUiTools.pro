@@ -8,4 +8,8 @@ SOURCES = \
 
 HEADERS += \
 
-LIBS += -lklayout_QtUiTools -lklayout_QtCore
+LIBS += -lklayout_QtUiTools 
+
+contains(QT_MODULES, uitools) {
+  LIBS += -lklayout_QtCore
+}

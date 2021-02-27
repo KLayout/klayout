@@ -1460,10 +1460,8 @@ class Basic_TestClass < TestBase
     assert_equal(RBA::A.a20_get == nil, false)
 
     # after "manage" the object gets volatile again
-    1.times do
-      a = RBA::A.a20_get
-      a._manage
-    end
+    a = RBA::A.a20_get
+    a._manage
 
     # Looks like Ruby is keeping the last A instance in some kind of cache:
     # this will release it

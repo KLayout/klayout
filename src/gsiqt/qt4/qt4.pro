@@ -1,4 +1,6 @@
 
+include($$PWD/../../klayout.pri)
+
 TEMPLATE = subdirs
 
 SUBDIRS = \
@@ -15,8 +17,8 @@ QtSql.depends += QtCore
 QtDesigner.depends += QtCore
 QtXml.depends += QtCore
 
-contains(QT_MODULES, uitools) {
-  # Not all distributions have uitools
+equals(HAVE_QT_UITOOLS, "1") {
   SUBDIRS += QtUiTools
   QtUiTools.depends += QtCore
 }
+

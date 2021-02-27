@@ -26,6 +26,7 @@ IS_WINDOWS="no"
 IS_LINUX="no"
 
 HAVE_QTBINDINGS=1
+HAVE_QT_UITOOLS=1
 HAVE_64BIT_COORD=0
 HAVE_QT=1
 HAVE_QT5="" # not set
@@ -83,14 +84,17 @@ while [ "$*" != "" ]; do
   shift
 
   case $a in
-  -with-qtbinding)
-    HAVE_QTBINDINGS=1
-    ;;
   -without-qt)
     HAVE_QT=0
     ;;
+  -with-qtbinding)
+    HAVE_QTBINDINGS=1
+    ;;
   -without-qtbinding)
     HAVE_QTBINDINGS=0
+    ;;
+  -without-qt-uitools)
+    HAVE_QT_UITOOLS=0
     ;;
   -with-64bit-coord)
     HAVE_64BIT_COORD=1
@@ -207,6 +211,7 @@ while [ "$*" != "" ]; do
     echo ""
     echo "  -with-qtbinding       Create Qt bindings for ruby scripts [default]"
     echo "  -without-qtbinding    Don't create Qt bindings for ruby scripts"
+    echo "  -without-qt-uitools   Don't include uitools in Qt binding"
     echo "  -with-64bit-coord     Use long (64bit) coordinates - EXPERIMENTAL FEATURE"
     echo "                          (only available for gcc>=4.4 for 64bit build)"
     echo "  -without-64bit-coord  Don't use long (64bit) coordinates [default]"
@@ -604,6 +609,7 @@ qmake_options=(
   PYTHONEXTSUFFIX="$PYTHONEXTSUFFIX"
   HAVE_PYTHON="$HAVE_PYTHON"
   HAVE_QTBINDINGS="$HAVE_QTBINDINGS"
+  HAVE_QT_UITOOLS="$HAVE_QT_UITOOLS"
   HAVE_64BIT_COORD="$HAVE_64BIT_COORD"
   HAVE_QT="$HAVE_QT"
   HAVE_QT5="$HAVE_QT5"

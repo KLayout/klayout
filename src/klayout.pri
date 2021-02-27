@@ -40,6 +40,15 @@ equals(HAVE_QTBINDINGS, "1") {
   DEFINES += HAVE_QTBINDINGS
 }
 
+!equals(HAVE_QT_UITOOLS, "0") {
+  # auto-select uitools, not all distributions have it
+  contains(QT_MODULES, "uitools") {
+    HAVE_QT_UITOOLS = 1
+  } else {
+    HAVE_QT_UITOOLS = 0
+  }
+}
+
 equals(HAVE_64BIT_COORD, "1") {
   DEFINES += HAVE_64BIT_COORD
 }
@@ -164,18 +173,20 @@ equals(HAVE_QT, "0") {
 
   equals(HAVE_QT5, "1") {
     QT += designer printsupport widgets 
-    contains(QT_MODULES, "uitools") {
-      # not all distributions have uitools
-      QT += uitools
-    }
     equals(HAVE_QTBINDINGS, "1") {
       QT += multimedia multimediawidgets xmlpatterns svg gui
     }
+    equals(HAVE_QT_UITOOLS, "1") {
+      QT += uitools
+    }
   } else {
-    CONFIG += designer uitools
+    CONFIG += designer
+    equals(HAVE_QT_UITOOLS, "1") {
+      CONFIG += uitools
+    }
   }
 
-  contains(QT_MODULES, "uitools") {
+  equals(HAVE_QT_UITOOLS, "1") {
     DEFINES += HAVE_QT_UITOOLS
   }
 

@@ -5,6 +5,7 @@ include($$PWD/../../klayout.pri)
 
 TARGET = klayout
 
+include($$PWD/../../klayout.pri)
 include($$PWD/../../app.pri)
 include($$PWD/../../with_all_libs.pri)
 
@@ -26,7 +27,7 @@ DEPENDPATH += $$QTBASIC_INC
 
 equals(HAVE_QTBINDINGS, "1") {
   LIBS += -lklayout_qtbasic -lklayout_QtGui -lklayout_QtXml -lklayout_QtNetwork -lklayout_QtSql -lklayout_QtDesigner
-  contains(QT_MODULES, uitools) {
+  equals(HAVE_QT_UITOOLS, "1") {
     LIBS += -lklayout_QtUiTools
   }
   equals(HAVE_QT5, "1") {

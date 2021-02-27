@@ -8,7 +8,7 @@ SOURCES = \
 
 HEADERS += \
 
-contains(QT_MODULES, uitools) {
+equals(HAVE_QT_UITOOLS, "1") {
   LIBS += -lklayout_QtUiTools 
 }
 

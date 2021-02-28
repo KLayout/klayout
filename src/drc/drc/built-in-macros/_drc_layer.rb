@@ -1774,6 +1774,18 @@ CODE
     # is \select_not_covering.
     
     # %DRC%
+    # @name split_covering
+    # @brief Returns the results of \covering and \not_covering at the same time
+    #
+    # This method returns the polygons covering polygons from the other layer in 
+    # one layer and all others in a second layer. This method is equivalent to calling 
+    # \covering and \not_covering, but is faster than doing this is separate steps:
+    #
+    # @code
+    # (covering, not_covering) = l1.split_covering(l2)
+    # @/code
+    
+    # %DRC%
     # @name select_covering
     # @brief Selects shapes or regions of self which completely cover (enclose) one or more shapes from the other region
     # @synopsis layer.select_covering(other)
@@ -1850,6 +1862,18 @@ CODE
     # is \select_not_overlapping.
     
     # %DRC%
+    # @name split_overlapping
+    # @brief Returns the results of \overlapping and \not_overlapping at the same time
+    #
+    # This method returns the polygons overlapping polygons from the other layer in 
+    # one layer and all others in a second layer. This method is equivalent to calling 
+    # \overlapping and \not_overlapping, but is faster than doing this is separate steps:
+    #
+    # @code
+    # (overlapping, not_overlapping) = l1.split_overlapping(l2)
+    # @/code
+    
+    # %DRC%
     # @name select_overlapping
     # @brief Selects shapes or regions of self which overlap shapes from the other region
     # @synopsis layer.select_overlapping(other)
@@ -1924,6 +1948,18 @@ CODE
     # @/table
     
     # %DRC%
+    # @name split_inside
+    # @brief Returns the results of \inside and \not_inside at the same time
+    #
+    # This method returns the polygons inside of polygons from the other layer in 
+    # one layer and all others in a second layer. This method is equivalent to calling 
+    # \inside and \not_inside, but is faster than doing this is separate steps:
+    #
+    # @code
+    # (inside, not_inside) = l1.split_inside(l2)
+    # @/code
+    
+    # %DRC%
     # @name select_inside
     # @brief Selects shapes or regions of self which are inside the other region
     # @synopsis layer.select_inside(other)
@@ -1994,6 +2030,18 @@ CODE
     #     @td @img(/images/drc_not_outside.png) @/td
     #   @/tr
     # @/table
+    
+    # %DRC%
+    # @name split_outside
+    # @brief Returns the results of \outside and \not_outside at the same time
+    #
+    # This method returns the polygons outside of polygons from the other layer in 
+    # one layer and all others in a second layer. This method is equivalent to calling 
+    # \outside and \not_outside, but is faster than doing this is separate steps:
+    #
+    # @code
+    # (outside, not_outside) = l1.split_outside(l2)
+    # @/code
     
     # %DRC%
     # @name select_outside
@@ -2150,6 +2198,18 @@ CODE
     # @/table
     
     # %DRC%
+    # @name split_interacting
+    # @brief Returns the results of \interacting and \not_interacting at the same time
+    #
+    # This method returns the polygons interacting with objects from the other container in 
+    # one layer and all others in a second layer. This method is equivalent to calling 
+    # \interacting and \not_interacting, but is faster than doing this is separate steps:
+    #
+    # @code
+    # (interacting, not_interacting) = l1.split_interacting(l2)
+    # @/code
+    
+    # %DRC%
     # @name select_interacting
     # @brief Selects shapes or regions of self which touch or overlap shapes from the other region
     # @synopsis layer.select_interacting(other)
@@ -2192,7 +2252,7 @@ CODE
     # number of (different) shapes from the other layer. If a min and max count is given, shapes from  
     # self are selected only if they interact with less than min_count or more than max_count different shapes
     # from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
-    
+
     # %DRC%
     # @name intersections
     # @brief Returns the intersection points of intersecting edge segments for two edge collections
@@ -2310,11 +2370,16 @@ CODE
     %w(| ^ inside not_inside outside not_outside in not_in).each do |f| 
       eval <<"CODE"
       def #{f}(other)
+
         @engine._context("#{f}") do
+
           requires_same_type(other)
           requires_edges_or_region
+
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+
         end
+
       end
 CODE
     end
@@ -2331,6 +2396,7 @@ CODE
           else
             other.requires_edges_or_region
           end
+
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
 
         end
@@ -2342,10 +2408,14 @@ CODE
     %w(+).each do |f| 
       eval <<"CODE"
       def #{f}(other)
+
         @engine._context("#{f}") do
+
           requires_same_type(other)
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+
         end
+
       end
 CODE
     end
@@ -2356,7 +2426,6 @@ CODE
 
         @engine._context("#{f}") do
 
-          other.requires_edges_texts_or_region
           if self.data.is_a?(RBA::Text)
             other.requires_region
           elsif self.data.is_a?(RBA::Region)
@@ -2389,6 +2458,7 @@ CODE
           else
             other.requires_edges_or_region
           end
+
           if @engine.is_tiled?
             self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data, *minmax_count(*args))
             DRCLayer::new(@engine, self.data)
@@ -2402,14 +2472,38 @@ CODE
 CODE
     end
     
-    %w(overlapping not_overlapping covering not_covering).each do |f| 
+    %w(split_interacting).each do |f|
       eval <<"CODE"
       def #{f}(other, *args)
+
         @engine._context("#{f}") do
+
+          requires_region
+          other.requires_edges_texts_or_region
+
+          res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data, *minmax_count(*args))
+          [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
+
+        end
+
+      end
+CODE
+    end
+    
+    %w(overlapping not_overlapping covering not_covering).each do |f| 
+      eval <<"CODE"
+
+      def #{f}(other, *args)
+
+        @engine._context("#{f}") do
+
           requires_same_type(other)
           requires_region
+
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(*args)))
+
         end
+
       end
 CODE
     end
@@ -2424,12 +2518,31 @@ CODE
 
           requires_region
           requires_same_type(other)
+
           if @engine.is_tiled?
             self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data, *minmax_count(*args))
             DRCLayer::new(@engine, self.data)
           else
             DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(*args)))
           end
+
+        end
+
+      end
+CODE
+    end
+    
+    %w(split_overlapping split_covering).each do |f|
+      eval <<"CODE"
+      def #{f}(other, *args)
+
+        @engine._context("#{f}") do
+
+          requires_region
+          other.requires_region
+
+          res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data, *minmax_count(*args))
+          [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
 
         end
 
@@ -2447,6 +2560,7 @@ CODE
 
           requires_region
           requires_same_type(other)
+
           if @engine.is_tiled?
             self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data)
             DRCLayer::new(@engine, self.data)
@@ -2460,14 +2574,37 @@ CODE
 CODE
     end
     
+    %w(split_inside split_outside).each do |f|
+      eval <<"CODE"
+      def #{f}(other)
+
+        @engine._context("#{f}") do
+
+          requires_region
+          other.requires_region
+
+          res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data)
+          [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
+
+        end
+
+      end
+CODE
+    end
+    
     %w(inside_part outside_part).each do |f|
       eval <<"CODE"
       def #{f}(other)
+
         @engine._context("#{f}") do
+
           other.requires_region
           requires_edges
+
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+
         end
+
       end
 CODE
     end
@@ -2475,11 +2612,16 @@ CODE
     %w(intersections).each do |f|
       eval <<"CODE"
       def #{f}(other)
+
         @engine._context("#{f}") do
+
           other.requires_edges
           requires_edges
+
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+
         end
+
       end
 CODE
     end

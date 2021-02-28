@@ -1775,6 +1775,15 @@ In verbose mode, more output is generated in the log file
 <p>
 In verbose mode, more output is generated in the log file
 </p>
+<a name="warn"/><h2>"warn" - Prints a warning</h2>
+<keyword name="warn"/>
+<p>Usage:</p>
+<ul>
+<li><tt>warn(message)</tt></li>
+</ul>
+<p>
+Similar to <a href="#log">log</a>, but the message is printed formatted as a warning
+</p>
 <a name="width"/><h2>"width" - Performs a width check</h2>
 <keyword name="width"/>
 <p>Usage:</p>
@@ -1846,6 +1855,17 @@ shape.
 <td><img src="/images/drc_width6u.png"/></td>
 </tr>
 </table>
+</p>
+<a name="with_holes"/><h2>"with_holes" - Selects all input polygons according to their number of holes in DRC expressions</h2>
+<keyword name="with_holes"/>
+<p>Usage:</p>
+<ul>
+<li><tt>with_holes (in condition)</tt></li>
+</ul>
+<p>
+"with_holes" represents a polygon selector for
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions selecting polygons of the primary by their number of holes
+(see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#with_holes">DRC#with_holes</a> for more details).
 </p>
 <a name="write_spice"/><h2>"write_spice" - Defines SPICE output format (with options)</h2>
 <keyword name="write_spice"/>

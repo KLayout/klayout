@@ -211,6 +211,16 @@ module DRC
     end
   end
  
+  # A wrapper for the tile_count option
+  class DRCTileCount
+    def initialize(*args)
+      @xy = args
+    end
+    def get
+      @xy
+    end
+  end
+ 
   # A wrapper for the tile_boundary option
   class DRCTileBoundary
     def initialize(layer)

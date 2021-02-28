@@ -212,15 +212,19 @@ module DRC
     end
     
     def tile_size(x, y = nil)
-      DRCTileSize::new(_make_numeric_value(x), _make_numeric_value(y || x))
+      DRCTileSize::new(_make_value(x) * self.dbu, _make_value(y || x) * self.dbu)
     end
     
     def tile_step(x, y = nil)
-      DRCTileStep::new(_make_numeric_value(x), _make_numeric_value(y || x))
+      DRCTileStep::new(_make_value(x) * self.dbu, _make_value(y || x) * self.dbu)
     end
     
     def tile_origin(x, y)
-      DRCTileOrigin::new(_make_numeric_value(x), _make_numeric_value(y))
+      DRCTileOrigin::new(_make_value(x) * self.dbu, _make_value(y) * self.dbu)
+    end
+    
+    def tile_count(x, y)
+      DRCTileCount::new(_make_numeric_value(x), _make_numeric_value(y))
     end
     
     def tile_boundary(b)

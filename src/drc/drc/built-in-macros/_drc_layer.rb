@@ -983,8 +983,8 @@ CODE
     # @name corners
     # @brief Selects corners of polygons
     # @synopsis layer.corners([ options ])
-    # @synopsis layer.corners(angle, [ options ])
-    # @synopsis layer.corners(amin .. amax, [ options ])
+    # @synopsis layer.corners(angle [, options ])
+    # @synopsis layer.corners(amin .. amax [, options ])
     #
     # This method produces markers on the corners of the polygons. An angle criterion can be given which
     # selects corners based on the angle of the connecting edges. Positive angles indicate a left turn
@@ -3500,17 +3500,17 @@ CODE
     # %DRC%
     # @name with_density
     # @brief Returns tiles whose density is within a given range
-    # @synopsis layer.with_density(min_value, max_value, [options])
-    # @synopsis layer.with_density(min_value .. max_value, [options])
+    # @synopsis layer.with_density(min_value, max_value [, options ])
+    # @synopsis layer.with_density(min_value .. max_value [, options ])
     # 
-    # Runs a tiled analysis over the current layout. Reports the tiles whose density
+    # This method runs a tiled analysis over the current layout. It reports the tiles whose density
     # is between "min_value" and "max_value". "min_value" and "max_value" are given in
     # relative units, i.e. within the range of 0 to 1.0 corresponding to a density of 0 to 100%.
     #
     # "min_value" or "max_value" can be nil or omitted in the ".." range notation.
-    # In this case, they are taken as "0" or "100%".
+    # In this case, they are taken as "0" and "100%".
     #
-    # The tile size can be specified with the "tile_size" option:
+    # The tile size must be specified with the "tile_size" option:
     #
     # @code
     # # reports areas where layer 1/0 density is below 10% on 20x20 um tiles
@@ -3531,16 +3531,16 @@ CODE
     # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(30.um), tile_step(20.um))
     # @/code
     #
-    # For "tile_step", anisotropic values can be given by using two values: the first for the
+    # For "tile_step", anisotropic values can be given as well by using two values: the first for the
     # horizontal and the second for the vertical tile step.
     #
     # Another option is "tile_origin" which specifies the location of the first tile's position. 
-    # This is the first tile's lower left corner. If no origin is given, the tiles are centered over the 
-    # area to cover.
+    # This is the lower left tile's lower left corner. If no origin is given, the tiles are centered over the 
+    # area investigated.
     #
     # By default, the tiles will cover the bounding box of the input layer. A separate layer
-    # can be used instead. This way, the layout's dimensions can be derived from some 
-    # drawn boundary layer. To specify a separate boundary layer, use the "tile_boundary" option:
+    # can be used in addition. This way, the layout's dimensions can be derived from some 
+    # drawn boundary layer. To specify a separate, additional layer included in the bounding box, use the "tile_boundary" option:
     #
     # @code
     # # reports density of layer 1/0 below 10% on 20x20 um tiles. The layout's boundary is taken from
@@ -3548,14 +3548,26 @@ CODE
     # cell_frame = input(0, 0)
     # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), tile_boundary(cell_frame))
     # @/code
-    # 
-    # The complementary version of "with_density" is "without_density".
     #
+    # Note that the layer given in "tile_boundary" adds to the input layer for computing the bounding box.
+    # The computed area is at least the area of the input layer.
+    #
+    # Computation of the area can be skipped by explicitly giving a tile count in horizontal and vertical
+    # direction. With the "tile_origin" option this allows full control over the area covered:
+    #
+    # @code
+    # # reports density of layer 1/0 below 10% on 20x20 um tiles in the region 0,0 .. 2000,3000
+    # # (100 and 150 tiles of 20 um each are used in horizontal and vertical direction):
+    # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), tile_origin(0.0, 0.0), tile_count(100, 150))
+    # @/code
+    # 
+    # The complementary version of "with_density" is \without_density.
     
+    # %DRC%
     # @name without_density
     # @brief Returns tiles whose density is not within a given range
-    # @synopsis layer.without_density(min_value, max_value, [options])
-    # @synopsis layer.without_density(min_value .. max_value, [options])
+    # @synopsis layer.without_density(min_value, max_value [, options ])
+    # @synopsis layer.without_density(min_value .. max_value [, options ])
     # 
     # For details about the operations and the operation see \with_density. This version will return the
     # tiles where the density is not within the given range.
@@ -3569,6 +3581,7 @@ CODE
       tile_size = nil
       tile_step = nil
       tile_origin = nil
+      tile_count = nil
       tile_boundary = nil
 
       n = 1
@@ -3579,6 +3592,8 @@ CODE
           tile_step = a.get
         elsif a.is_a?(DRCTileOrigin)
           tile_origin = a.get
+        elsif a.is_a?(DRCTileCount)
+          tile_count = a.get
         elsif a.is_a?(DRCTileBoundary)
           tile_boundary = a.get
         elsif a.is_a?(Float) || a.is_a?(1.class) || a == nil
@@ -3614,6 +3629,9 @@ CODE
       end
       if tile_origin
         tp.tile_origin(*tile_origin)
+      end
+      if tile_count
+        tp.tiles(*tile_count)
       end
 
       res = RBA::Region.new      

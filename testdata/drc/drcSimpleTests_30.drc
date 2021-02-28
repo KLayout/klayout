@@ -13,5 +13,6 @@ a.without_density(0..0.1, tile_size(10.um)).output(101, 0)
 a.with_density(0.1, nil, tile_size(10.um), tile_origin(25.um, 10.um)).output(102, 0)
 a.with_density(0.1, nil, tile_size(10.um, 20.um)).output(103, 0)
 a.with_density(0.1, 1.0, tile_size(10.um), tile_step(10.um, 20.um)).output(104, 0)
+a.with_density(0.1, nil, tile_size(10.um), tile_origin(25.um, 10.um), tile_count(10, 15)).output(105, 0)
 a.with_density(0..0.1, tile_size(100.um), tile_step(10.um)).output(110, 0)
 

@@ -93,7 +93,7 @@ module DRC
     def transparent
       DRCShielded::new(false)
     end
-    
+
     def projection_limits(*args)
       self._context("projection_limits") do
         if args.size == 0
@@ -209,6 +209,23 @@ module DRC
       self._context("area_and_perimeter") do
         DRCAreaAndPerimeter::new(r, 1.0, f)
       end
+    end
+    
+    def tile_size(x, y = nil)
+      DRCTileSize::new(_make_numeric_value(x), _make_numeric_value(y || x))
+    end
+    
+    def tile_step(x, y = nil)
+      DRCTileStep::new(_make_numeric_value(x), _make_numeric_value(y || x))
+    end
+    
+    def tile_origin(x, y)
+      DRCTileOrigin::new(_make_numeric_value(x), _make_numeric_value(y))
+    end
+    
+    def tile_boundary(b)
+      b.is_a?(DRCLayer) || raise("'tile_boundary' requires a layer argument")
+      DRCTileBoundary::new(b)
     end
     
     # %DRC%
@@ -1857,7 +1874,9 @@ CODE
       log(desc)
 
       # enable progress
+      disable_progress = false
       if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs) || obj.is_a?(RBA::Texts)
+        disable_progress = true
         obj.enable_progress(desc)
       end
       
@@ -1867,31 +1886,37 @@ CODE
       res = yield
       t.stop
 
-      if @verbose
+      begin
 
-        # Report result statistics
-        if res.is_a?(RBA::Region)
-          info("Polygons (raw): #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
-        elsif res.is_a?(RBA::Edges)
-          info("Edges: #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
-        elsif res.is_a?(RBA::EdgePairs)
-          info("Edge pairs: #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
-        elsif res.is_a?(RBA::Texts)
-          info("Texts: #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
+        if @verbose
+
+          # Report result statistics
+          if res.is_a?(RBA::Region)
+            info("Polygons (raw): #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
+          elsif res.is_a?(RBA::Edges)
+            info("Edges: #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
+          elsif res.is_a?(RBA::EdgePairs)
+            info("Edge pairs: #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
+          elsif res.is_a?(RBA::Texts)
+            info("Texts: #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
+          end
+
+          mem = RBA::Timer::memory_size
+          if mem > 0
+            info("Elapsed: #{'%.3f'%(t.sys+t.user)}s  Memory: #{'%.2f'%(mem/(1024*1024))}M", 1)
+          else
+            info("Elapsed: #{'%.3f'%(t.sys+t.user)}s", 1)
+          end
+
         end
 
-        mem = RBA::Timer::memory_size
-        if mem > 0
-          info("Elapsed: #{'%.3f'%(t.sys+t.user)}s  Memory: #{'%.2f'%(mem/(1024*1024))}M", 1)
-        else
-          info("Elapsed: #{'%.3f'%(t.sys+t.user)}s", 1)
+      ensure
+
+        # disable progress again
+        if disable_progress
+          obj.disable_progress
         end
 
-      end
-
-      # disable progress
-      if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs) || obj.is_a?(RBA::Texts)
-        obj.disable_progress
       end
           
       res
@@ -1946,11 +1971,6 @@ CODE
 
       end
       
-      # disable progress again
-      if obj.is_a?(RBA::Region)
-        obj.disable_progress
-      end
-      
       res
       
     end
@@ -2001,11 +2021,6 @@ CODE
 
       end
       
-      # disable progress again
-      if obj.is_a?(RBA::Region)
-        obj.disable_progress
-      end
-      
       res
       
     end
@@ -2042,11 +2057,6 @@ CODE
           res = obj.send(method)
         end
 
-      end
-      
-      # disable progress again
-      if obj.is_a?(RBA::Region)
-        obj.disable_progress
       end
       
       res

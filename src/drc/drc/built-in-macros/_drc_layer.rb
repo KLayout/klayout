@@ -3496,6 +3496,161 @@ CODE
       end  
 CODE
     end
+
+    # %DRC%
+    # @name with_density
+    # @brief Returns tiles whose density is within a given range
+    # @synopsis layer.with_density(min_value, max_value, [options])
+    # @synopsis layer.with_density(min_value .. max_value, [options])
+    # 
+    # Runs a tiled analysis over the current layout. Reports the tiles whose density
+    # is between "min_value" and "max_value". "min_value" and "max_value" are given in
+    # relative units, i.e. within the range of 0 to 1.0 corresponding to a density of 0 to 100%.
+    #
+    # "min_value" or "max_value" can be nil or omitted in the ".." range notation.
+    # In this case, they are taken as "0" or "100%".
+    #
+    # The tile size can be specified with the "tile_size" option:
+    #
+    # @code
+    # # reports areas where layer 1/0 density is below 10% on 20x20 um tiles
+    # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um))
+    # @/code
+    #
+    # Anisotropic tiles can be specified by giving two values, like "tile_size(10.um, 20.um)".
+    # The first value is the horizontal tile dimension, the second value is the vertical tile
+    # dimension.
+    #
+    # A tile overlap can be specified using "tile_step". If the tile step is less than the
+    # tile size, the tiles will overlap. The layout window given by "tile_size" is moved
+    # in increments of the tile step:
+    #
+    # @code
+    # # reports areas where layer 1/0 density is below 10% on 30x30 um tiles
+    # # with a tile step of 20x20 um:
+    # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(30.um), tile_step(20.um))
+    # @/code
+    #
+    # For "tile_step", anisotropic values can be given by using two values: the first for the
+    # horizontal and the second for the vertical tile step.
+    #
+    # Another option is "tile_origin" which specifies the location of the first tile's position. 
+    # This is the first tile's lower left corner. If no origin is given, the tiles are centered over the 
+    # area to cover.
+    #
+    # By default, the tiles will cover the bounding box of the input layer. A separate layer
+    # can be used instead. This way, the layout's dimensions can be derived from some 
+    # drawn boundary layer. To specify a separate boundary layer, use the "tile_boundary" option:
+    #
+    # @code
+    # # reports density of layer 1/0 below 10% on 20x20 um tiles. The layout's boundary is taken from
+    # # layer 0/0:
+    # cell_frame = input(0, 0)
+    # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), tile_boundary(cell_frame))
+    # @/code
+    # 
+    # The complementary version of "with_density" is "without_density".
+    #
+    
+    # @name without_density
+    # @brief Returns tiles whose density is not within a given range
+    # @synopsis layer.without_density(min_value, max_value, [options])
+    # @synopsis layer.without_density(min_value .. max_value, [options])
+    # 
+    # For details about the operations and the operation see \with_density. This version will return the
+    # tiles where the density is not within the given range.
+
+    def _with_density(method, inverse, *args)
+
+      requires_region
+
+      limits = [ nil, nil ]
+      nlimits = 0
+      tile_size = nil
+      tile_step = nil
+      tile_origin = nil
+      tile_boundary = nil
+
+      n = 1
+      args.each do |a|
+        if a.is_a?(DRCTileSize)
+          tile_size = a.get
+        elsif a.is_a?(DRCTileStep)
+          tile_step = a.get
+        elsif a.is_a?(DRCTileOrigin)
+          tile_origin = a.get
+        elsif a.is_a?(DRCTileBoundary)
+          tile_boundary = a.get
+        elsif a.is_a?(Float) || a.is_a?(1.class) || a == nil
+          nlimits < 2 || raise("Too many values specified")
+          limits[nlimits] = @engine._make_numeric_value_with_nil(a)
+          nlimits += 1
+        elsif a.is_a?(Range)
+          nlimits == 0 || raise("Either a range or two limits have to be specified, not both")
+          limits = [ @engine._make_numeric_value_with_nil(a.begin), @engine._make_numeric_value_with_nil(a.end) ]
+          nlimits = 2
+        else
+          raise("Parameter #" + n.to_s + " does not have an expected type")
+        end
+        n += 1
+      end
+
+      tile_size || raise("At least the tile_size option needs to be present")
+      tile_step ||= tile_size
+
+      tp = RBA::TilingProcessor::new
+      tp.dbu = @engine.dbu
+      tp.scale_to_dbu = false
+      tp.tile_size(*tile_step)
+      if tile_size != tile_step
+        xb = 0.5 * (tile_size[0] - tile_step[0])
+        yb = 0.5 * (tile_size[1] - tile_step[1])
+        tp.tile_border(xb, yb)
+        tp.var("xoverlap", xb / tp.dbu)
+        tp.var("yoverlap", yb / tp.dbu)
+      else
+        tp.var("xoverlap", 0)
+        tp.var("yoverlap", 0)
+      end
+      if tile_origin
+        tp.tile_origin(*tile_origin)
+      end
+
+      res = RBA::Region.new      
+      tp.output("res", res)
+      tp.input("input", self.data)
+      tp.threads = (@engine.threads || 1)
+      if tile_boundary
+        tp.input("boundary", tile_boundary.data)
+      end
+
+      tp.var("vmin", limits[0] || 0.0)
+      tp.var("vmax", limits[1] || 1.0)
+      tp.var("inverse", inverse)
+      tp.queue(<<"TP_SCRIPT")
+        _tile && (
+          var bx = _tile.bbox.enlarged(xoverlap, yoverlap);
+          var d = to_f(input.area(bx)) / to_f(bx.area);
+          ((d > vmin - 1e-10 && d < vmax + 1e-10) != inverse) && _output(res, bx, false)
+        )
+TP_SCRIPT
+
+      @engine.run_timed("\"#{method}\" in: #{@engine.src_line}", self.data) do
+        tp.execute("Tiled \"#{method}\" in: #{@engine.src_line}")
+      end
+
+      DRCLayer::new(@engine, res)
+
+    end
+
+    def with_density(*args)
+      self._with_density("with_density", false, *args)
+    end
+
+    def without_density(*args)
+      self._with_density("without_density", true, *args)
+    end
+
     
     # %DRC%
     # @name scaled

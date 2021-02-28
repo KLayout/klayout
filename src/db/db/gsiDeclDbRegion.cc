@@ -903,7 +903,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "polygons which have the given perimeter are returned. If \"inverse\" is true, "
     "polygons not having the given perimeter are returned.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("with_perimeter", with_perimeter2, gsi::arg ("min_perimeter"), gsi::arg ("max_perimeter"), gsi::arg ("inverse"),
     "@brief Filter the polygons by perimeter\n"
@@ -915,7 +915,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("with_area", with_area1, gsi::arg ("area"), gsi::arg ("inverse"),
     "@brief Filter the polygons by area\n"
@@ -923,7 +923,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "polygons which have the given area are returned. If \"inverse\" is true, "
     "polygons not having the given area are returned.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("with_area", with_area2, gsi::arg ("min_area"), gsi::arg ("max_area"), gsi::arg ("inverse"),
     "@brief Filter the polygons by area\n"
@@ -935,7 +935,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("with_holes", with_holes1, gsi::arg ("nholes"), gsi::arg ("inverse"),
     "@brief Filters the polygons by their number of holes\n"
@@ -943,7 +943,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "polygons which have the given number of holes are returned. If \"inverse\" is true, "
     "polygons not having the given of holes are returned.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
@@ -957,7 +957,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
@@ -967,7 +967,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "polygons whose bounding box has the given width are returned. If \"inverse\" is true, "
     "polygons whose bounding box does not have the given width are returned.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("with_bbox_width", with_bbox_width2, gsi::arg ("min_width"), gsi::arg ("max_width"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width\n"
@@ -977,7 +977,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("with_bbox_height", with_bbox_height1, gsi::arg ("height"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box height\n"
@@ -985,7 +985,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "polygons whose bounding box has the given height are returned. If \"inverse\" is true, "
     "polygons whose bounding box does not have the given height are returned.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("with_bbox_height", with_bbox_height2, gsi::arg ("min_height"), gsi::arg ("max_height"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box height\n"
@@ -995,7 +995,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("with_bbox_min", with_bbox_min1, gsi::arg ("dim"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width or height, whichever is smaller\n"
@@ -1004,7 +1004,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "are returned. "
     "If \"inverse\" is true, all polygons not matching this criterion are returned."
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("with_bbox_min", with_bbox_min2, gsi::arg ("min_dim"), gsi::arg ("max_dim"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width or height, whichever is smaller\n"
@@ -1015,7 +1015,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("with_bbox_max", with_bbox_max1, gsi::arg ("dim"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width or height, whichever is larger\n"
@@ -1024,7 +1024,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "are returned. "
     "If \"inverse\" is true, all polygons not matching this criterion are returned."
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("with_bbox_max", with_bbox_max2, gsi::arg ("min_dim"), gsi::arg ("max_dim"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width or height, whichever is larger\n"
@@ -1035,7 +1035,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("with_bbox_aspect_ratio", with_bbox_aspect_ratio1, gsi::arg ("ratio"), gsi::arg ("inverse"),
     "@brief Filters the polygons by the aspect ratio of their bounding boxes\n"
@@ -1046,7 +1046,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "With 'inverse' set to false, this version filters polygons which have a bounding box aspect ratio equal to the given value. "
     "With 'inverse' set to true, all other polygons will be returned.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
@@ -1062,7 +1062,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
@@ -1075,7 +1075,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "With 'inverse' set to false, this version filters polygons which have an area ratio equal to the given value. "
     "With 'inverse' set to true, all other polygons will be returned.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
@@ -1091,7 +1091,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
@@ -1105,7 +1105,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "With 'inverse' set to false, this version filters polygons which have a relative height equal to the given value. "
     "With 'inverse' set to true, all other polygons will be returned.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
@@ -1122,7 +1122,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
@@ -1130,7 +1130,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@brief Returns a region containing those parts of polygons which are \"strange\"\n"
     "Strange parts of polygons are self-overlapping parts or non-orientable parts (i.e. in the \"8\" configuration).\n"
     "\n"
-    "Merged semantics does not apply for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics does not apply for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method ("snapped", &db::Region::snapped, gsi::arg ("gx"), gsi::arg ("gy"),
     "@brief Returns the snapped region\n"
@@ -1143,7 +1143,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "If gx or gy is 0, no snapping happens in that direction.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method ("scaled_and_snapped", &db::Region::scaled_and_snapped, gsi::arg ("gx"), gsi::arg ("mx"), gsi::arg ("dx"), gsi::arg ("gy"),gsi::arg ("my"), gsi::arg ("dy"),
     "@brief Returns the scaled and snapped region\n"
@@ -1159,7 +1159,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "If gx or gy is 0, the result is brought on a grid of 1.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.26.1."
   ) +
@@ -1171,7 +1171,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "If gx or gy is 0 or less, the grid is not checked in that direction.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("with_angle", angle_check1, gsi::arg ("angle"), gsi::arg ("inverse"),
     "@brief Returns markers on every corner with the given angle (or not with the given angle)\n"
@@ -1181,7 +1181,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "The edge pair objects returned will contain both edges forming the angle.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("with_angle", angle_check2, gsi::arg ("amin"), gsi::arg ("amax"), gsi::arg ("inverse"),
     "@brief Returns markers on every corner with an angle of more than amin and less than amax (or the opposite)\n"
@@ -1191,7 +1191,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "The edge pair objects returned will contain both edges forming the angle.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method ("insert", (void (db::Region::*)(const db::Box &)) &db::Region::insert, gsi::arg ("box"),
     "@brief Inserts a box\n"
@@ -1266,7 +1266,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The boxes will not be merged, so it is possible to determine overlaps "
     "of these boxes for example.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   method_ext ("extents", &extents1, gsi::arg ("d"),
     "@brief Returns a region with the enlarged bounding boxes of the polygons\n"
@@ -1275,7 +1275,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The boxes will not be merged, so it is possible to determine overlaps "
     "of these boxes for example.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   method_ext ("extents", &extents2, gsi::arg ("dx"), gsi::arg ("dy"),
     "@brief Returns a region with the enlarged bounding boxes of the polygons\n"
@@ -1284,7 +1284,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The boxes will not be merged, so it is possible to determine overlaps "
     "of these boxes for example.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   method_ext ("extent_refs", &extent_refs,
     "@hide\n"
@@ -1444,7 +1444,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The mode defines at which bending angle cutoff occurs \n"
     "(0:>0, 1:>45, 2:>90, 3:>135, 4:>approx. 168, other:>approx. 179)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The result is a set of polygons which may be overlapping, but are not self-\n"
     "intersecting. Polygons may overlap afterwards because they grew big enough to overlap their neighbors.\n"
@@ -1466,7 +1466,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method is equivalent to \"size(d, d, mode)\".\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   method_ext ("size", size_ext, gsi::arg ("d"),
     "@brief Isotropic sizing (biasing)\n"
@@ -1475,7 +1475,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method is equivalent to \"size(d, d, 2)\".\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   method ("sized", (db::Region (db::Region::*) (db::Coord, db::Coord, unsigned int) const) &db::Region::sized, gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("mode"),
     "@brief Returns the anisotropically sized region\n"
@@ -1484,7 +1484,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method is returns the sized region (see \\size), but does not modify self.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   method ("sized", (db::Region (db::Region::*) (db::Coord, unsigned int) const) &db::Region::sized, gsi::arg ("d"), gsi::arg ("mode"),
     "@brief Returns the isotropically sized region\n"
@@ -1493,7 +1493,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method is returns the sized region (see \\size), but does not modify self.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   method_ext ("sized", sized_ext, gsi::arg ("d"),
     "@brief Isotropic sizing (biasing)\n"
@@ -1502,7 +1502,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method is equivalent to \"sized(d, d, 2)\".\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   method_ext ("andnot", &andnot, gsi::arg ("other"),
     "@brief Returns the boolean AND and NOT between self and the other region\n"
@@ -1599,7 +1599,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return A new region containing the polygons which are covering polygons from the other region\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This attribute is sometimes called 'enclosing' instead of 'covering', but this term is reserved for the respective DRC function.\n"
     "\n"
@@ -1610,9 +1610,19 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return A new region containing the polygons which are not covering polygons from the other region\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This attribute is sometimes called 'enclosing' instead of 'covering', but this term is reserved for the respective DRC function.\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
+  method ("split_covering", &db::Region::selected_enclosing_differential, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the polygons of this region which are completely covering polygons from the other region and the ones which are not at the same time\n"
+    "\n"
+    "@return Two new regions: the first containing the result of \\covering, the second the result of \\not_covering\n"
+    "\n"
+    "This method is equivalent to calling \\covering and \\not_covering, but is faster when both results are required.\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept).\n"
     "\n"
     "This method has been introduced in version 0.27."
   ) +
@@ -1621,7 +1631,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This attribute is sometimes called 'enclosing' instead of 'covering', but this term is reserved for the respective DRC function.\n"
     "\n"
@@ -1632,7 +1642,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This attribute is sometimes called 'enclosing' instead of 'covering', but this term is reserved for the respective DRC function.\n"
     "\n"
@@ -1643,56 +1653,76 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return A new region containing the polygons which are inside polygons from the other region\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   method ("not_inside", &db::Region::selected_not_inside, gsi::arg ("other"),
     "@brief Returns the polygons of this region which are not completely inside polygons from the other region\n"
     "\n"
     "@return A new region containing the polygons which are not inside polygons from the other region\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
+  method ("split_inside", &db::Region::selected_inside_differential, gsi::arg ("other"),
+    "@brief Returns the polygons of this region which are completely inside polygons from the other region and the ones which are not at the same time\n"
+    "\n"
+    "@return Two new regions: the first containing the result of \\inside, the second the result of \\not_inside\n"
+    "\n"
+    "This method is equivalent to calling \\inside and \\not_inside, but is faster when both results are required.\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept).\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
   method ("select_inside", &db::Region::select_inside, gsi::arg ("other"),
     "@brief Selects the polygons of this region which are completely inside polygons from the other region\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   method ("select_not_inside", &db::Region::select_not_inside, gsi::arg ("other"),
     "@brief Selects the polygons of this region which are not completely inside polygons from the other region\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   method ("outside", &db::Region::selected_outside, gsi::arg ("other"),
     "@brief Returns the polygons of this region which are completely outside polygons from the other region\n"
     "\n"
     "@return A new region containing the polygons which are outside polygons from the other region\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   method ("not_outside", &db::Region::selected_not_outside, gsi::arg ("other"),
     "@brief Returns the polygons of this region which are not completely outside polygons from the other region\n"
     "\n"
     "@return A new region containing the polygons which are not outside polygons from the other region\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
+  method ("split_outside", &db::Region::selected_outside_differential, gsi::arg ("other"),
+    "@brief Returns the polygons of this region which are completely outside polygons from the other region and the ones which are not at the same time\n"
+    "\n"
+    "@return Two new regions: the first containing the result of \\outside, the second the result of \\not_outside\n"
+    "\n"
+    "This method is equivalent to calling \\outside and \\not_outside, but is faster when both results are required.\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept).\n"
+    "\n"
+    "This method has been introduced in version 0.27."
+  ) +
   method ("select_outside", &db::Region::select_outside, gsi::arg ("other"),
     "@brief Selects the polygons of this region which are completely outside polygons from the other region\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   method ("select_not_outside", &db::Region::select_not_outside, gsi::arg ("other"),
     "@brief Selects the polygons of this region which are not completely outside polygons from the other region\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   method ("interacting", (db::Region (db::Region::*) (const db::Region &, size_t, size_t) const) &db::Region::selected_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which overlap or touch polygons from the other region\n"
@@ -1704,7 +1734,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return A new region containing the polygons overlapping or touching polygons from the other region\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The min_count and max_count arguments have been added in version 0.27.\n"
   ) +
@@ -1718,9 +1748,19 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return A new region containing the polygons not overlapping or touching polygons from the other region\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The min_count and max_count arguments have been added in version 0.27.\n"
+  ) +
+  method ("split_interacting", (std::pair<db::Region, db::Region> (db::Region::*) (const db::Region &, size_t, size_t) const) &db::Region::selected_interacting_differential, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the polygons of this region which are interacting with polygons from the other region and the ones which are not at the same time\n"
+    "\n"
+    "@return Two new regions: the first containing the result of \\interacting, the second the result of \\not_interacting\n"
+    "\n"
+    "This method is equivalent to calling \\interacting and \\not_interacting, but is faster when both results are required.\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept).\n"
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   method ("select_interacting", (db::Region &(db::Region::*) (const db::Region &, size_t, size_t)) &db::Region::select_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which overlap or touch polygons from the other region\n"
@@ -1732,7 +1772,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The min_count and max_count arguments have been added in version 0.27.\n"
   ) +
@@ -1746,7 +1786,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The min_count and max_count arguments have been added in version 0.27.\n"
   ) +
@@ -1760,7 +1800,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return A new region containing the polygons overlapping or touching edges from the edge collection\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.25.\n"
     "The min_count and max_count arguments have been added in version 0.27.\n"
@@ -1775,10 +1815,20 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return A new region containing the polygons not overlapping or touching edges from the edge collection\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.25\n"
     "The min_count and max_count arguments have been added in version 0.27.\n"
+  ) +
+  method ("split_interacting", (std::pair<db::Region, db::Region> (db::Region::*) (const db::Edges &, size_t, size_t) const) &db::Region::selected_interacting_differential, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the polygons of this region which are interacting with edges from the other edge collection and the ones which are not at the same time\n"
+    "\n"
+    "@return Two new regions: the first containing the result of \\interacting, the second the result of \\not_interacting\n"
+    "\n"
+    "This method is equivalent to calling \\interacting and \\not_interacting, but is faster when both results are required.\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept).\n"
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   method ("select_interacting", (db::Region &(db::Region::*) (const db::Edges &, size_t, size_t)) &db::Region::select_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which overlap or touch edges from the edge collection\n"
@@ -1790,7 +1840,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.25\n"
     "The min_count and max_count arguments have been added in version 0.27.\n"
@@ -1805,7 +1855,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.25\n"
     "The min_count and max_count arguments have been added in version 0.27.\n"
@@ -1820,7 +1870,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return A new region containing the polygons overlapping or touching texts\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
@@ -1834,9 +1884,19 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return A new region containing the polygons not overlapping or touching texts\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27\n"
+  ) +
+  method ("split_interacting", (std::pair<db::Region, db::Region> (db::Region::*) (const db::Texts &, size_t, size_t) const) &db::Region::selected_interacting_differential, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the polygons of this region which are interacting with texts from the other text collection and the ones which are not at the same time\n"
+    "\n"
+    "@return Two new regions: the first containing the result of \\interacting, the second the result of \\not_interacting\n"
+    "\n"
+    "This method is equivalent to calling \\interacting and \\not_interacting, but is faster when both results are required.\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept).\n"
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   method ("select_interacting", (db::Region &(db::Region::*) (const db::Texts &, size_t, size_t)) &db::Region::select_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons of this region which overlap or touch texts\n"
@@ -1848,7 +1908,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "selected by this method if the number of texts interacting with the polygon is between min_count and max_count "
     "(including max_count).\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
@@ -1862,7 +1922,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
@@ -1871,7 +1931,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return A new region containing the polygons overlapping polygons from the other region\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The count options have been introduced in version 0.27."
   ) + 
@@ -1880,16 +1940,26 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return A new region containing the polygons not overlapping polygons from the other region\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The count options have been introduced in version 0.27."
+  ) +
+  method ("split_overlapping", &db::Region::selected_overlapping_differential, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the polygons of this region which are overlapping with polygons from the other region and the ones which are not at the same time\n"
+    "\n"
+    "@return Two new regions: the first containing the result of \\overlapping, the second the result of \\not_overlapping\n"
+    "\n"
+    "This method is equivalent to calling \\overlapping and \\not_overlapping, but is faster when both results are required.\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept).\n"
+    "\n"
+    "This method has been introduced in version 0.27."
   ) +
   method ("select_overlapping", &db::Region::select_overlapping, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the polygons from this region which overlap polygons from the other region\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The count options have been introduced in version 0.27."
   ) +
@@ -1898,7 +1968,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The count options have been introduced in version 0.27."
   ) +
@@ -1911,7 +1981,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The region after the polygons have been selected (from other)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.26.1\n"
   ) +
@@ -1921,7 +1991,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The region after the polygons have been selected (from other)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.26.1\n"
   ) +
@@ -1931,7 +2001,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The region after the polygons have been selected (from other)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.26.1\n"
   ) +
@@ -1941,7 +2011,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The edge collection after the edges have been selected (from other)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.26.1\n"
   ) +
@@ -1951,7 +2021,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The text collection after the texts have been selected (from other)\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
@@ -1972,7 +2042,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The edge collection returned can be manipulated in various ways. See \\Edges for a description of the "
     "possibilities of the edge collection.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
   factory_ext ("decompose_convex", &decompose_convex<db::Shapes>, gsi::arg ("preferred_orientation", po_any (), "\\Polygon#PO_any"),
     "@brief Decomposes the region into convex pieces.\n"
@@ -2016,7 +2086,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@brief Returns the holes of the region\n"
     "This method returns all holes as filled polygons.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "If merge semantics is not enabled, the holes may not be detected if the polygons "
     "are taken from a hole-less representation (i.e. GDS2 file). Use explicit merge (\\merge method) "
     "in order to merge the polygons and detect holes.\n"
@@ -2025,7 +2095,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@brief Returns the hulls of the region\n"
     "This method returns all hulls as polygons. The holes will be removed (filles). "
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "If merge semantics is not enabled, the hull may also enclose holes if the polygons "
     "are taken from a hole-less representation (i.e. GDS2 file). Use explicit merge (\\merge method) "
     "in order to merge the polygons and detect holes.\n"
@@ -2043,36 +2113,36 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   method_ext ("rectangles", &rectangles,
     "@brief Returns all polygons which are rectangles\n"
     "This method returns all polygons in self which are rectangles."
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("non_rectangles", &non_rectangles,
     "@brief Returns all polygons which are not rectangles\n"
     "This method returns all polygons in self which are not rectangles."
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("squares", &squares,
     "@brief Returns all polygons which are squares\n"
     "This method returns all polygons in self which are squares."
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
   method_ext ("non_squares", &non_squares,
     "@brief Returns all polygons which are not squares\n"
     "This method returns all polygons in self which are not squares."
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
   method_ext ("rectilinear", &rectilinear,
     "@brief Returns all polygons which are rectilinear\n"
     "This method returns all polygons in self which are rectilinear."
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("non_rectilinear", &non_rectilinear,
     "@brief Returns all polygons which are not rectilinear\n"
     "This method returns all polygons in self which are not rectilinear."
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("break", &break_polygons, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio", 0.0),
     "@brief Breaks the polygons of the region into smaller ones\n"
@@ -2101,7 +2171,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "with a pencil that has the shape of the given region.\n"
     "\n"
     "The resulting polygons are not merged. In order to remove overlaps, use the \\merge or \\merged method."
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("minkowsky_sum", &minkowsky_sum_pp, gsi::arg ("p"),
     "@brief Compute the Minkowsky sum of the region and a polygon\n"
@@ -2114,7 +2184,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "the region with a pen that has the shape of the second polygon.\n"
     "\n"
     "The resulting polygons are not merged. In order to remove overlaps, use the \\merge or \\merged method."
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("minkowsky_sum", &minkowsky_sum_pb, gsi::arg ("b"),
     "@brief Compute the Minkowsky sum of the region and a box\n"
@@ -2127,7 +2197,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "as the second polygon.\n"
     "\n"
     "The resulting polygons are not merged. In order to remove overlaps, use the \\merge or \\merged method."
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("minkowsky_sum", &minkowsky_sum_pc, gsi::arg ("b"),
     "@brief Compute the Minkowsky sum of the region and a contour of points (a trace)\n"
@@ -2141,7 +2211,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "with a pencil that has the shape of the given region.\n"
     "\n"
     "The resulting polygons are not merged. In order to remove overlaps, use the \\merge or \\merged method."
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
   method_ext ("move", &move_p, gsi::arg ("v"),
     "@brief Moves the region\n"
@@ -2266,7 +2336,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
     "false. In general, this will improve performance somewhat.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The 'shielded' and 'negative' options have been introduced in version 0.27."
   ) +
@@ -2308,7 +2378,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
     "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
@@ -2349,7 +2419,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to "
     "false. In general, this will improve performance somewhat.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The 'shielded' and 'negative' options have been introduced in version 0.27."
   ) +
@@ -2391,7 +2461,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
     "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
@@ -2434,7 +2504,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
     "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
@@ -2477,7 +2547,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
     "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
@@ -2520,7 +2590,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
     "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
@@ -2563,27 +2633,27 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\"opposite_filter\" specifies whether to require or reject errors happening on opposite sides of a figure. "
     "\"rect_filter\" allows suppressing specific error configurations on rectangular input figures.\n"
     "\n"
-    "Merged semantics applies for the input of this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27."
   ) +
   method_ext ("area", &area1,
     "@brief The area of the region\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "If merged semantics is not enabled, overlapping areas are counted twice.\n"
   ) +
   method_ext ("area", &area2, gsi::arg ("rect"),
     "@brief The area of the region (restricted to a rectangle)\n"
     "This version will compute the area of the shapes, restricting the computation to the given rectangle.\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "If merged semantics is not enabled, overlapping areas are counted twice.\n"
   ) +
   method_ext ("perimeter", &perimeter1,
     "@brief The total perimeter of the polygons\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "If merged semantics is not enabled, internal edges are counted as well.\n"
   ) +
   method_ext ("perimeter", &perimeter2, gsi::arg ("rect"),
@@ -2592,7 +2662,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "Edges along the border are handled in a special way: they are counted when they are oriented with their inside "
     "side toward the rectangle (in other words: outside edges must coincide with the rectangle's border in order to be counted).\n"
     "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "If merged semantics is not enabled, internal edges are counted as well.\n"
   ) +
   method ("bbox", &db::Region::bbox,

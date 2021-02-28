@@ -430,17 +430,17 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, InteractingOut
   //  shortcut
   if (empty ()) {
     if (output_mode == Positive || output_mode == Negative) {
-      return std::make_pair (const_cast <AsIfFlatRegion *> (this), (RegionDelegate *) 0);
+      return std::make_pair (clone (), (RegionDelegate *) 0);
     } else {
-      return std::make_pair (const_cast <AsIfFlatRegion *> (this), const_cast <AsIfFlatRegion *> (this));
+      return std::make_pair (clone (), clone ());
     }
   } else if (max_count < min_count || other.empty ()) {
     if (output_mode == Positive) {
       return std::make_pair (new EmptyRegion (), (RegionDelegate *) 0);
     } else if (output_mode == Negative) {
-      return std::make_pair (const_cast <AsIfFlatRegion *> (this), (RegionDelegate *) 0);
+      return std::make_pair (clone (), (RegionDelegate *) 0);
     } else {
-      return std::make_pair (new EmptyRegion (), const_cast <AsIfFlatRegion *> (this));
+      return std::make_pair (new EmptyRegion (), clone ());
     }
   }
 
@@ -481,17 +481,17 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, InteractingOut
   //  shortcut
   if (empty ()) {
     if (output_mode == Positive || output_mode == Negative) {
-      return std::make_pair (const_cast <AsIfFlatRegion *> (this), (RegionDelegate *) 0);
+      return std::make_pair (clone (), (RegionDelegate *) 0);
     } else {
-      return std::make_pair (const_cast <AsIfFlatRegion *> (this), const_cast <AsIfFlatRegion *> (this));
+      return std::make_pair (clone (), clone ());
     }
   } else if (max_count < min_count || other.empty ()) {
     if (output_mode == Positive) {
       return std::make_pair (new EmptyRegion (), (RegionDelegate *) 0);
     } else if (output_mode == Negative) {
-      return std::make_pair (const_cast <AsIfFlatRegion *> (this), (RegionDelegate *) 0);
+      return std::make_pair (clone (), (RegionDelegate *) 0);
     } else {
-      return std::make_pair (new EmptyRegion (), const_cast <AsIfFlatRegion *> (this));
+      return std::make_pair (new EmptyRegion (), clone ());
     }
   }
 
@@ -527,9 +527,9 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
   //  shortcut
   if (empty ()) {
     if (output_mode == Positive || output_mode == Negative) {
-      return std::make_pair (const_cast <AsIfFlatRegion *> (this), (RegionDelegate *) 0);
+      return std::make_pair (clone (), (RegionDelegate *) 0);
     } else {
-      return std::make_pair (const_cast <AsIfFlatRegion *> (this), const_cast <AsIfFlatRegion *> (this));
+      return std::make_pair (clone (), clone ());
     }
   } else if (max_count < min_count || other.empty ()) {
     //  clear, if b is empty and
@@ -539,17 +539,17 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
       if (output_mode == Positive) {
         return std::make_pair (new EmptyRegion (), (RegionDelegate *) 0);
       } else if (output_mode == Negative) {
-        return std::make_pair (const_cast <AsIfFlatRegion *> (this), (RegionDelegate *) 0);
+        return std::make_pair (clone (), (RegionDelegate *) 0);
       } else {
-        return std::make_pair (new EmptyRegion (), const_cast <AsIfFlatRegion *> (this));
+        return std::make_pair (new EmptyRegion (), clone ());
       }
     } else {
       if (output_mode == Positive) {
-        return std::make_pair (const_cast <AsIfFlatRegion *> (this), (RegionDelegate *) 0);
+        return std::make_pair (clone(), (RegionDelegate *) 0);
       } else if (output_mode == Negative) {
         return std::make_pair (new EmptyRegion (), (RegionDelegate *) 0);
       } else {
-        return std::make_pair (const_cast <AsIfFlatRegion *> (this), new EmptyRegion ());
+        return std::make_pair (clone (), new EmptyRegion ());
       }
     }
   }

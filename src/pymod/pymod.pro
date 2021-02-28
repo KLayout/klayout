@@ -13,6 +13,7 @@ SUBDIRS = \
   SUBDIRS += lay
 
   equals(HAVE_QTBINDINGS, "1") {
+
     equals(HAVE_QT5, "1") {
 
       SUBDIRS += \
@@ -39,11 +40,13 @@ SUBDIRS = \
         QtDesigner
 
     }
-  }
-}
 
-equals(HAVE_QT_UITOOLS, "1") {
-  SUBDIRS += QtUiTools
+    equals(HAVE_QT_UITOOLS, "1") {
+      SUBDIRS += QtUiTools
+    }
+
+  }
+
 }
 
 ALL_DIRS = $$SUBDIRS

@@ -1160,6 +1160,9 @@ class BasicTest(unittest.TestCase):
     # test client data binding to C++ objects 
     
     b = pya.B()
+
+    longint = 10000000000000000
+    longint_as_int = (sys.maxsize > 5000000000 or (str(longint) == "10000000000000000" and type(longint) is int))
     
     self.assertEqual( b.b20a( 5.0 ), False )
     self.assertEqual( b.b20a( None ), True )
@@ -1167,27 +1170,27 @@ class BasicTest(unittest.TestCase):
     self.assertEqual( b.b20a( "hallo" ), False )
     self.assertEqual( b.b20a( False ), False )
     self.assertEqual( b.b20a( True ), False )
-    self.assertEqual( b.b20a( 10000000000000000 ), False )
+    self.assertEqual( b.b20a( longint ), False )
     self.assertEqual( b.b20b( 5.0 ), True )
     self.assertEqual( b.b20b( None ), False )
     self.assertEqual( b.b20b( 1 ), False )
     self.assertEqual( b.b20b( "hallo" ), False )
     self.assertEqual( b.b20b( False ), False )
     self.assertEqual( b.b20b( True ), False )
-    if sys.maxsize > 5000000000:
-      # on 64 bit platforms this fits into a long value, therefore this test returns false:
-      self.assertEqual( b.b20b( 10000000000000000 ), False )
+    if longint_as_int:
+      # this fits into a long value, therefore this test returns false:
+      self.assertEqual( b.b20b( longint ), False )
     else:
       # otherwise it is converted to a double:
-      self.assertEqual( b.b20b( 10000000000000000 ), True )
+      self.assertEqual( b.b20b( longint ), True )
     self.assertEqual( b.b20c( 5.0 ), False )
     self.assertEqual( b.b20c( None ), False )
-    if sys.maxsize > 5000000000:
-      # on 64 bit platforms this fits into a long value, therefore this test returns True:
-      self.assertEqual( b.b20c( 10000000000000000 ), True )
+    if longint_as_int:
+      # this fits into a long value, therefore this test returns false:
+      self.assertEqual( b.b20c( longint ), True )
     else:
       # otherwise it is converted to a double and the test returns false:
-      self.assertEqual( b.b20c( 10000000000000000 ), False )
+      self.assertEqual( b.b20c( longint ), False )
     self.assertEqual( b.b20c( "hallo" ), False )
     self.assertEqual( b.b20c( False ), False )
     self.assertEqual( b.b20c( True ), False )
@@ -1197,14 +1200,14 @@ class BasicTest(unittest.TestCase):
     self.assertEqual( b.b20d( "hallo" ), True )
     self.assertEqual( b.b20d( False ), False )
     self.assertEqual( b.b20d( True ), False )
-    self.assertEqual( b.b20d( 10000000000000000 ), False )
+    self.assertEqual( b.b20d( longint ), False )
     self.assertEqual( b.b20e( 5.0 ), False )
     self.assertEqual( b.b20e( None ), False )
     self.assertEqual( b.b20e( 1 ), False )
     self.assertEqual( b.b20e( "hallo" ), False )
     self.assertEqual( b.b20e( False ), True )
     self.assertEqual( b.b20e( True ), True )
-    self.assertEqual( b.b20e( 10000000000000000 ), False )
+    self.assertEqual( b.b20e( longint ), False )
 
     self.assertEqual( b.b21a( 50 ), "50" )
     self.assertEqual( b.b21a( True ), "true" )

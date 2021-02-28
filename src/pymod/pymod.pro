@@ -1,4 +1,6 @@
 
+include($$PWD/../klayout.pri)
+
 TEMPLATE = subdirs
 SUBDIRS = \
   db \
@@ -20,7 +22,6 @@ SUBDIRS = \
         QtSql \
         QtWidgets \
         QtDesigner \
-        QtUiTools \
         QtMultimedia \
         QtPrintSupport \
         QtSvg \
@@ -35,11 +36,14 @@ SUBDIRS = \
         QtXml \
         QtSql \
         QtNetwork \
-        QtDesigner \
-        QtUiTools
+        QtDesigner
 
     }
   }
+}
+
+equals(HAVE_QT_UITOOLS, "1") {
+  SUBDIRS += QtUiTools
 }
 
 ALL_DIRS = $$SUBDIRS

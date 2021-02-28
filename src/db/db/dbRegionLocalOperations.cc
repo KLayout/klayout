@@ -537,8 +537,8 @@ private:
 }
 
 template <class TS, class TI, class TR>
-interacting_local_operation<TS, TI, TR>::interacting_local_operation (int mode, bool touching, bool inverse, size_t min_count, size_t max_count, bool other_is_merged)
-  : m_mode (mode), m_touching (touching), m_inverse (inverse), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count), m_other_is_merged (other_is_merged)
+interacting_local_operation<TS, TI, TR>::interacting_local_operation (int mode, bool touching, InteractingOutputMode output_mode, size_t min_count, size_t max_count, bool other_is_merged)
+  : m_mode (mode), m_touching (touching), m_output_mode (output_mode), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count), m_other_is_merged (other_is_merged)
 {
   //  .. nothing yet ..
 }
@@ -552,8 +552,13 @@ db::Coord interacting_local_operation<TS, TI, TR>::dist () const
 template <class TS, class TI, class TR>
 void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
-  tl_assert (results.size () == 1);
-  std::unordered_set<TR> &result = results.front ();
+  if (m_output_mode == None) {
+    return;
+  } else if (m_output_mode == Positive || m_output_mode == Negative) {
+    tl_assert (results.size () == 1);
+  } else {
+    tl_assert (results.size () == 2);
+  }
 
   db::EdgeProcessor ep;
 
@@ -652,9 +657,21 @@ void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*l
     if (c != interaction_counts.end ()) {
       count = c->second;
     }
-    if ((count >= m_min_count && count <= m_max_count) != m_inverse) {
-      const TS &subject = interactions.subject_shape (i->first);
-      result.insert (subject);
+    bool good = (count >= m_min_count && count <= m_max_count);
+    if (good) {
+      if (m_output_mode == Positive || m_output_mode == PositiveAndNegative) {
+        const TS &subject = interactions.subject_shape (i->first);
+        results [0].insert (subject);
+      }
+    } else {
+      if (m_output_mode == Negative) {
+        const TS &subject = interactions.subject_shape (i->first);
+        //  Yes, it's "positive_result" as this is the first one.
+        results [0].insert (subject);
+      } else if (m_output_mode == PositiveAndNegative) {
+        const TS &subject = interactions.subject_shape (i->first);
+        results [1].insert (subject);
+      }
     }
   }
 }
@@ -663,11 +680,22 @@ template <class TS, class TI, class TR>
 OnEmptyIntruderHint
 interacting_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
-  if ((m_mode <= 0) != m_inverse) {
-    return OnEmptyIntruderHint::Drop;
+  if ((m_mode <= 0)) {
+    if (m_output_mode == Positive) {
+      return OnEmptyIntruderHint::Drop;
+    } else if (m_output_mode == Negative) {
+      return OnEmptyIntruderHint::Copy;
+    } else if (m_output_mode == PositiveAndNegative) {
+      return OnEmptyIntruderHint::CopyToSecond;
+    }
   } else {
-    return OnEmptyIntruderHint::Copy;
+    if (m_output_mode == Positive || m_output_mode == PositiveAndNegative) {
+      return OnEmptyIntruderHint::Copy;
+    } else if (m_output_mode == Negative) {
+      return OnEmptyIntruderHint::Drop;
+    }
   }
+  return OnEmptyIntruderHint::Ignore;
 }
 
 template <class TS, class TI, class TR>
@@ -761,8 +789,8 @@ template class DB_PUBLIC pull_local_operation<db::Polygon, db::Polygon, db::Poly
 // ---------------------------------------------------------------------------------------------------------------
 
 template <class TS, class TI, class TR>
-interacting_with_edge_local_operation<TS, TI, TR>::interacting_with_edge_local_operation (bool inverse, size_t min_count, size_t max_count, bool other_is_merged)
-  : m_inverse (inverse), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count), m_other_is_merged (other_is_merged)
+interacting_with_edge_local_operation<TS, TI, TR>::interacting_with_edge_local_operation (InteractingOutputMode output_mode, size_t min_count, size_t max_count, bool other_is_merged)
+  : m_output_mode (output_mode), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count), m_other_is_merged (other_is_merged)
 {
   //  .. nothing yet ..
 }
@@ -777,6 +805,14 @@ db::Coord interacting_with_edge_local_operation<TS, TI, TR>::dist () const
 template <class TS, class TI, class TR>
 void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
+  if (m_output_mode == None) {
+    return;
+  } else if (m_output_mode == Positive || m_output_mode == Negative) {
+    tl_assert (results.size () == 1);
+  } else {
+    tl_assert (results.size () == 2);
+  }
+
   std::unordered_map<TR, size_t> counted_results;
   bool counting = !(m_min_count == 1 && m_max_count == std::numeric_limits<size_t>::max ());
 
@@ -829,7 +865,7 @@ void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::La
     const TR *addressable = push_polygon_to_heap (layout, subject, heap);
 
     scanner.insert1 (addressable, 0);
-    if (m_inverse) {
+    if (m_output_mode == Negative || m_output_mode == PositiveAndNegative) {
       inserter.init (*addressable);
     }
 
@@ -839,13 +875,18 @@ void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::La
 
   //  select hits based on their count
 
-  tl_assert (results.size () == 1);
-  std::unordered_set<TR> &result = results.front ();
-
   for (typename std::unordered_map<TR, size_t>::const_iterator r = counted_results.begin (); r != counted_results.end (); ++r) {
     bool hit = r->second >= m_min_count && r->second <= m_max_count;
-    if (hit != m_inverse) {
-      result.insert (r->first);
+    if (hit) {
+      if (m_output_mode == Positive || m_output_mode == PositiveAndNegative) {
+        results [0].insert (r->first);
+      }
+    } else {
+      if (m_output_mode == Negative) {
+        results [0].insert (r->first);
+      } else if (m_output_mode == PositiveAndNegative) {
+        results [1].insert (r->first);
+      }
     }
   }
 }
@@ -853,10 +894,14 @@ void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::La
 template <class TS, class TI, class TR>
 OnEmptyIntruderHint interacting_with_edge_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
-  if (!m_inverse) {
+  if (m_output_mode == Positive) {
     return OnEmptyIntruderHint::Drop;
-  } else {
+  } else if (m_output_mode == Negative) {
     return OnEmptyIntruderHint::Copy;
+  } else if (m_output_mode == PositiveAndNegative) {
+    return OnEmptyIntruderHint::CopyToSecond;
+  } else {
+    return OnEmptyIntruderHint::Ignore;
   }
 }
 
@@ -1000,8 +1045,8 @@ template class DB_PUBLIC pull_with_text_local_operation<db::Polygon, db::Text, d
 // ---------------------------------------------------------------------------------------------------------------
 
 template <class TS, class TI, class TR>
-interacting_with_text_local_operation<TS, TI, TR>::interacting_with_text_local_operation (bool inverse, size_t min_count, size_t max_count)
-  : m_inverse (inverse), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count)
+interacting_with_text_local_operation<TS, TI, TR>::interacting_with_text_local_operation (InteractingOutputMode output_mode, size_t min_count, size_t max_count)
+  : m_output_mode (output_mode), m_min_count (std::max (size_t (1), min_count)), m_max_count (max_count)
 {
   //  .. nothing yet ..
 }
@@ -1017,6 +1062,14 @@ db::Coord interacting_with_text_local_operation<TS, TI, TR>::dist () const
 template <class TS, class TI, class TR>
 void interacting_with_text_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
+  if (m_output_mode == None) {
+    return;
+  } else if (m_output_mode == Positive || m_output_mode == Negative) {
+    tl_assert (results.size () == 1);
+  } else {
+    tl_assert (results.size () == 2);
+  }
+
   std::unordered_map<TR, size_t> counted_results;
   bool counting = !(m_min_count == 1 && m_max_count == std::numeric_limits<size_t>::max ());
 
@@ -1042,7 +1095,7 @@ void interacting_with_text_local_operation<TS, TI, TR>::do_compute_local (db::La
     const TR *addressable = push_polygon_to_heap (layout, interactions.subject_shape (i->first), heap);
 
     scanner.insert1 (addressable, 0);
-    if (m_inverse) {
+    if (m_output_mode == Negative || m_output_mode == PositiveAndNegative) {
       inserter.init (*addressable);
     }
 
@@ -1052,13 +1105,19 @@ void interacting_with_text_local_operation<TS, TI, TR>::do_compute_local (db::La
 
   //  select hits based on their count
 
-  tl_assert (results.size () == 1);
-  std::unordered_set<TR> &result = results.front ();
-
   for (typename std::unordered_map<TR, size_t>::const_iterator r = counted_results.begin (); r != counted_results.end (); ++r) {
     bool hit = r->second >= m_min_count && r->second <= m_max_count;
-    if (hit != m_inverse) {
-      result.insert (r->first);
+    if (hit) {
+      if (m_output_mode == Positive || m_output_mode == PositiveAndNegative) {
+        results [0].insert (r->first);
+      }
+    } else {
+      if (m_output_mode == Negative) {
+        //  Yes. It's "positive"! This is the first output.
+        results [0].insert (r->first);
+      } else if (m_output_mode == PositiveAndNegative) {
+        results [1].insert (r->first);
+      }
     }
   }
 }
@@ -1066,10 +1125,14 @@ void interacting_with_text_local_operation<TS, TI, TR>::do_compute_local (db::La
 template <class TS, class TI, class TR>
 OnEmptyIntruderHint interacting_with_text_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
-  if (!m_inverse) {
+  if (m_output_mode == Positive) {
     return OnEmptyIntruderHint::Drop;
-  } else {
+  } else if (m_output_mode == Negative) {
     return OnEmptyIntruderHint::Copy;
+  } else if (m_output_mode == PositiveAndNegative) {
+    return OnEmptyIntruderHint::CopyToSecond;
+  } else {
+    return OnEmptyIntruderHint::Ignore;
   }
 }
 

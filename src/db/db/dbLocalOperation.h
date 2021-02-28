@@ -55,6 +55,11 @@ enum OnEmptyIntruderHint {
   Copy,
 
   /**
+   *  @brief Copy the subject shape to the second result
+   */
+  CopyToSecond,
+
+  /**
    *  @brief Drop the subject shape
    */
   Drop

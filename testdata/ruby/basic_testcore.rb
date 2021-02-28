@@ -27,6 +27,7 @@ class Basic_TestClass < TestBase
 
     a = nil
     GC.start
+    GC.start
     assert_equal( RBA::A::instance_count, ic0 )
 
     a = RBA::A.new
@@ -2737,12 +2738,15 @@ class Basic_TestClass < TestBase
 
     GC.start
 
+    nx = RBA::X::instances
     z = RBA::Z::new
 
-    nx = RBA::X::instances
     x = RBA::X::new("1")
     z.set_x(x)
     assert_equal(RBA::X::instances, nx + 1)
+
+    # weird. On WIN/32bit, this makes the test pass (enables GC somehow?):
+    puts("ANYTHING")
 
     x = nil
     z.set_x(nil)
@@ -2758,6 +2762,9 @@ class Basic_TestClass < TestBase
     GC.start
 
     assert_equal(RBA::X::instances, nx + 1)
+
+    # weird. On WIN/32bit, this makes the test pass (enables GC somehow?):
+    puts("ANYTHING")
 
     # this will release the object - hence it's going to be deleted
     z.set_x_keep(nil)

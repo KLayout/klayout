@@ -738,7 +738,7 @@ This function will evaluate the conditions c1 to cn and return the
 current primary shape if all conditions renders an empty result.
 See <a href="#if_all">if_all</a> for an example how to use the if_... functions.
 </p>
-<a name="info"/><h2>"info" - Outputs as message to the logger window</h2>
+<a name="info"/><h2>"info" - Outputs as message to the logger or progress window</h2>
 <keyword name="info"/>
 <p>Usage:</p>
 <ul>
@@ -747,7 +747,7 @@ See <a href="#if_all">if_all</a> for an example how to use the if_... functions.
 </ul>
 <p>
 Prints the message to the log window in verbose mode.
-In non-verbose more, nothing is printed.
+In non-verbose more, nothing is printed but a statement is put into the progress window.
 <a href="#log">log</a> is a function that always prints a message.
 </p>
 <a name="input"/><h2>"input" - Fetches the shapes from the specified input from the default source</h2>

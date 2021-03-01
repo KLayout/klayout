@@ -19,13 +19,10 @@ module DRC
 
   def DRC.execute_drc(macro, generator, rdb_index = nil)
 
-    timer = RBA::Timer::new
-    timer.start
     drc = DRCEngine::new
     drc._rdb_index = rdb_index
     drc._generator = generator
-
-    drc_progress = RBA::AbstractProgress::new("DRC: " + macro.path)
+    drc._start(macro.path)
 
     begin
 
@@ -48,13 +45,7 @@ module DRC
       # cleans up and creates layout and report views
       drc._finish
 
-      # unlocks the UI
-      drc_progress._destroy
-
     end
-
-    timer.stop
-    drc.info("Total run time: #{'%.3f'%(timer.sys+timer.user)}s")
 
   end
   

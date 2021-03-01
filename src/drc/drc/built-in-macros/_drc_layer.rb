@@ -1263,6 +1263,7 @@ CODE
           self.data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
             block.call(object.transformed(t)) && new_data.insert(object)
           end
+          new_data
         end
         DRCLayer::new(@engine, new_data)
 
@@ -1285,7 +1286,7 @@ CODE
       @engine._wrapper_context("each") do
 
         t = RBA::CplxTrans::new(@engine.dbu)
-        @engine.run_timed("\"select\" in: #{@engine.src_line}", self.data) do
+        @engine.run_timed("\"each\" in: #{@engine.src_line}", self.data) do
           self.data.send(self.data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
             block.call(object.transformed(t))
           end
@@ -1368,10 +1369,11 @@ CODE
           t = RBA::CplxTrans::new(@engine.dbu)
           dbu_trans = RBA::VCplxTrans::new(1.0 / @engine.dbu)
 
-          @engine.run_timed("\\"select\\" in: " + @engine.src_line, self.data) do
+          @engine.run_timed("\\"#{f}\\" in: " + @engine.src_line, self.data) do
             self.data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
               insert_object_into(new_data, block.call(object.transformed(t)), dbu_trans)
             end
+            new_data
           end
 
           DRCLayer::new(@engine, new_data)
@@ -3817,6 +3819,7 @@ TP_SCRIPT
 
       @engine.run_timed("\"#{method}\" in: #{@engine.src_line}", self.data) do
         tp.execute("Tiled \"#{method}\" in: #{@engine.src_line}")
+        res
       end
 
       DRCLayer::new(@engine, res)

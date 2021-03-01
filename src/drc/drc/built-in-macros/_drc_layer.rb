@@ -1660,6 +1660,7 @@ CODE
 
       @engine._context("andnot") do
 
+        check_is_layer(other)
         requires_region
         other.requires_region
 
@@ -1776,14 +1777,17 @@ CODE
     # %DRC%
     # @name split_covering
     # @brief Returns the results of \covering and \not_covering at the same time
+    # @synopsis (a, b) = layer.split_covering(other [, options ])
     #
     # This method returns the polygons covering polygons from the other layer in 
     # one layer and all others in a second layer. This method is equivalent to calling 
-    # \covering and \not_covering, but is faster than doing this is separate steps:
+    # \covering and \not_covering, but is faster than doing this in separate steps:
     #
     # @code
     # (covering, not_covering) = l1.split_covering(l2)
     # @/code
+    #
+    # The options of this method are the same than \covering.
     
     # %DRC%
     # @name select_covering
@@ -1864,14 +1868,17 @@ CODE
     # %DRC%
     # @name split_overlapping
     # @brief Returns the results of \overlapping and \not_overlapping at the same time
+    # @synopsis (a, b) = layer.split_overlapping(other [, options ])
     #
     # This method returns the polygons overlapping polygons from the other layer in 
     # one layer and all others in a second layer. This method is equivalent to calling 
-    # \overlapping and \not_overlapping, but is faster than doing this is separate steps:
+    # \overlapping and \not_overlapping, but is faster than doing this in separate steps:
     #
     # @code
     # (overlapping, not_overlapping) = l1.split_overlapping(l2)
     # @/code
+    #
+    # The options of this method are the same than \overlapping.
     
     # %DRC%
     # @name select_overlapping
@@ -1950,10 +1957,11 @@ CODE
     # %DRC%
     # @name split_inside
     # @brief Returns the results of \inside and \not_inside at the same time
+    # @synopsis (a, b) = layer.split_inside(other)
     #
     # This method returns the polygons inside of polygons from the other layer in 
     # one layer and all others in a second layer. This method is equivalent to calling 
-    # \inside and \not_inside, but is faster than doing this is separate steps:
+    # \inside and \not_inside, but is faster than doing this in separate steps:
     #
     # @code
     # (inside, not_inside) = l1.split_inside(l2)
@@ -2034,10 +2042,11 @@ CODE
     # %DRC%
     # @name split_outside
     # @brief Returns the results of \outside and \not_outside at the same time
+    # @synopsis (a, b) = layer.split_outside(other)
     #
     # This method returns the polygons outside of polygons from the other layer in 
     # one layer and all others in a second layer. This method is equivalent to calling 
-    # \outside and \not_outside, but is faster than doing this is separate steps:
+    # \outside and \not_outside, but is faster than doing this in separate steps:
     #
     # @code
     # (outside, not_outside) = l1.split_outside(l2)
@@ -2200,14 +2209,17 @@ CODE
     # %DRC%
     # @name split_interacting
     # @brief Returns the results of \interacting and \not_interacting at the same time
+    # @synopsis (a, b) = layer.split_interacting(other [, options ])
     #
     # This method returns the polygons interacting with objects from the other container in 
     # one layer and all others in a second layer. This method is equivalent to calling 
-    # \interacting and \not_interacting, but is faster than doing this is separate steps:
+    # \interacting and \not_interacting, but is faster than doing this in separate steps:
     #
     # @code
     # (interacting, not_interacting) = l1.split_interacting(l2)
     # @/code
+    #
+    # The options of this method are the same than \interacting.
     
     # %DRC%
     # @name select_interacting
@@ -2345,6 +2357,7 @@ CODE
  
         @engine._context("#{f}") do
 
+          check_is_layer(other)
           if :#{f} != :pull_interacting 
             requires_region
             other.requires_region
@@ -2390,6 +2403,7 @@ CODE
 
         @engine._context("#{f}") do
 
+          check_is_layer(other)
           other.requires_edges_texts_or_region
           if self.data.is_a?(RBA::Texts)
             other.requires_region
@@ -2426,6 +2440,7 @@ CODE
 
         @engine._context("#{f}") do
 
+          check_is_layer(other)
           if self.data.is_a?(RBA::Text)
             other.requires_region
           elsif self.data.is_a?(RBA::Region)
@@ -2450,6 +2465,7 @@ CODE
 
         @engine._context("#{f}") do
 
+          check_is_layer(other)
           requires_edges_texts_or_region
           if self.data.is_a?(RBA::Text)
             other.requires_region
@@ -2478,6 +2494,7 @@ CODE
 
         @engine._context("#{f}") do
 
+          check_is_layer(other)
           requires_region
           other.requires_edges_texts_or_region
 
@@ -2580,6 +2597,7 @@ CODE
 
         @engine._context("#{f}") do
 
+          check_is_layer(other)
           requires_region
           other.requires_region
 
@@ -2598,6 +2616,7 @@ CODE
 
         @engine._context("#{f}") do
 
+          check_is_layer(other)
           other.requires_region
           requires_edges
 
@@ -2615,6 +2634,7 @@ CODE
 
         @engine._context("#{f}") do
 
+          check_is_layer(other)
           other.requires_edges
           requires_edges
 
@@ -4228,6 +4248,10 @@ CODE
 
     def data=(d)
       @data = d
+    end
+
+    def check_is_layer(other)
+      other.is_a?(DRCLayer) || raise("Argument needs to be a DRC layer")
     end
 
     def requires_region

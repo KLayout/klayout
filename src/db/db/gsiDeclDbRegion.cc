@@ -610,15 +610,53 @@ static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, 
                              );
 }
 
+static inline std::vector<db::Region> as_2region_vector (const std::pair<db::Region, db::Region> &rp)
+{
+  std::vector<db::Region> res;
+  res.reserve (2);
+  res.push_back (db::Region (const_cast<db::Region &> (rp.first).take_delegate ()));
+  res.push_back (db::Region (const_cast<db::Region &> (rp.second).take_delegate ()));
+  return res;
+}
+
 static std::vector<db::Region> andnot (const db::Region *r, const db::Region &other)
 {
-  std::pair<db::Region, db::Region> rp = r->andnot (other);
+  return as_2region_vector (r->andnot (other));
+}
 
-  std::vector<db::Region> res;
-  res.resize (2, db::Region ());
-  res [0] = rp.first;
-  res [1] = rp.second;
-  return res;
+static std::vector<db::Region> split_inside (const db::Region *r, const db::Region &other)
+{
+  return as_2region_vector (r->selected_inside_differential (other));
+}
+
+static std::vector<db::Region> split_outside (const db::Region *r, const db::Region &other)
+{
+  return as_2region_vector (r->selected_outside_differential (other));
+}
+
+static std::vector<db::Region> split_overlapping (const db::Region *r, const db::Region &other, size_t min_count, size_t max_count)
+{
+  return as_2region_vector (r->selected_overlapping_differential (other, min_count, max_count));
+}
+
+static std::vector<db::Region> split_covering (const db::Region *r, const db::Region &other, size_t min_count, size_t max_count)
+{
+  return as_2region_vector (r->selected_enclosing_differential (other, min_count, max_count));
+}
+
+static std::vector<db::Region> split_interacting_with_region (const db::Region *r, const db::Region &other, size_t min_count, size_t max_count)
+{
+  return as_2region_vector (r->selected_interacting_differential (other, min_count, max_count));
+}
+
+static std::vector<db::Region> split_interacting_with_edges (const db::Region *r, const db::Edges &other, size_t min_count, size_t max_count)
+{
+  return as_2region_vector (r->selected_interacting_differential (other, min_count, max_count));
+}
+
+static std::vector<db::Region> split_interacting_with_texts (const db::Region *r, const db::Texts &other, size_t min_count, size_t max_count)
+{
+  return as_2region_vector (r->selected_interacting_differential (other, min_count, max_count));
 }
 
 template <class Container>
@@ -680,6 +718,7 @@ int td_simple ();
 int po_any ();
 
 extern Class<db::ShapeCollection> decl_dbShapeCollection;
+
 
 Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   constructor ("new", &new_v, 
@@ -1616,7 +1655,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27."
   ) +
-  method ("split_covering", &db::Region::selected_enclosing_differential, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+  method_ext ("split_covering", &split_covering, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which are completely covering polygons from the other region and the ones which are not at the same time\n"
     "\n"
     "@return Two new regions: the first containing the result of \\covering, the second the result of \\not_covering\n"
@@ -1662,7 +1701,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
-  method ("split_inside", &db::Region::selected_inside_differential, gsi::arg ("other"),
+  method_ext ("split_inside", &split_inside, gsi::arg ("other"),
     "@brief Returns the polygons of this region which are completely inside polygons from the other region and the ones which are not at the same time\n"
     "\n"
     "@return Two new regions: the first containing the result of \\inside, the second the result of \\not_inside\n"
@@ -1700,7 +1739,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
-  method ("split_outside", &db::Region::selected_outside_differential, gsi::arg ("other"),
+  method_ext ("split_outside", &split_outside, gsi::arg ("other"),
     "@brief Returns the polygons of this region which are completely outside polygons from the other region and the ones which are not at the same time\n"
     "\n"
     "@return Two new regions: the first containing the result of \\outside, the second the result of \\not_outside\n"
@@ -1752,7 +1791,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "The min_count and max_count arguments have been added in version 0.27.\n"
   ) +
-  method ("split_interacting", (std::pair<db::Region, db::Region> (db::Region::*) (const db::Region &, size_t, size_t) const) &db::Region::selected_interacting_differential, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+  method_ext ("split_interacting", &split_interacting_with_region, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which are interacting with polygons from the other region and the ones which are not at the same time\n"
     "\n"
     "@return Two new regions: the first containing the result of \\interacting, the second the result of \\not_interacting\n"
@@ -1820,7 +1859,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method has been introduced in version 0.25\n"
     "The min_count and max_count arguments have been added in version 0.27.\n"
   ) +
-  method ("split_interacting", (std::pair<db::Region, db::Region> (db::Region::*) (const db::Edges &, size_t, size_t) const) &db::Region::selected_interacting_differential, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+  method_ext ("split_interacting", &split_interacting_with_edges, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which are interacting with edges from the other edge collection and the ones which are not at the same time\n"
     "\n"
     "@return Two new regions: the first containing the result of \\interacting, the second the result of \\not_interacting\n"
@@ -1888,7 +1927,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
-  method ("split_interacting", (std::pair<db::Region, db::Region> (db::Region::*) (const db::Texts &, size_t, size_t) const) &db::Region::selected_interacting_differential, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+  method_ext ("split_interacting", &split_interacting_with_texts, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which are interacting with texts from the other text collection and the ones which are not at the same time\n"
     "\n"
     "@return Two new regions: the first containing the result of \\interacting, the second the result of \\not_interacting\n"
@@ -1944,7 +1983,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "The count options have been introduced in version 0.27."
   ) +
-  method ("split_overlapping", &db::Region::selected_overlapping_differential, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+  method_ext ("split_overlapping", &split_overlapping, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which are overlapping with polygons from the other region and the ones which are not at the same time\n"
     "\n"
     "@return Two new regions: the first containing the result of \\overlapping, the second the result of \\not_overlapping\n"

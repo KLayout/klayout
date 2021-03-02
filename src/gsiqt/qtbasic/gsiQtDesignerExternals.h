@@ -20,7 +20,9 @@
 
 */
 
-#if QT_VERSION >= 0x050000
+#if !defined(HAVE_QT_DESIGNER)
+#  define FORCE_LINK_GSI_QTDESIGNER
+#elif QT_VERSION >= 0x050000
 #  include "../qt5/QtDesigner/gsiQtExternals.h"
 #else
 #  include "../qt4/QtDesigner/gsiQtExternals.h"

@@ -27,6 +27,13 @@ IS_LINUX="no"
 
 HAVE_QTBINDINGS=1
 HAVE_QT_UITOOLS=1
+HAVE_QT_NETWORK=1
+HAVE_QT_SQL=1
+HAVE_QT_SVG=1
+HAVE_QT_PRINTSUPPORT=1
+HAVE_QT_MULTIMEDIA=1
+HAVE_QT_DESIGNER=1
+HAVE_QT_XML=1
 HAVE_64BIT_COORD=0
 HAVE_QT=1
 HAVE_QT5="" # not set
@@ -95,6 +102,27 @@ while [ "$*" != "" ]; do
     ;;
   -without-qt-uitools)
     HAVE_QT_UITOOLS=0
+    ;;
+  -without-qt-network)
+    HAVE_QT_NETWORK=0
+    ;;
+  -without-qt-sql)
+    HAVE_QT_SQL=0
+    ;;
+  -without-qt-svg)
+    HAVE_QT_SVG=0
+    ;;
+  -without-qt-printsupport)
+    HAVE_QT_PRINTSUPPORT=0
+    ;;
+  -without-qt-multimedia)
+    HAVE_QT_MULTIMEDIA=0
+    ;;
+  -without-qt-designer)
+    HAVE_QT_DESIGNER=0
+    ;;
+  -without-qt-xml)
+    HAVE_QT_XML=0
     ;;
   -with-64bit-coord)
     HAVE_64BIT_COORD=1
@@ -610,6 +638,13 @@ qmake_options=(
   HAVE_PYTHON="$HAVE_PYTHON"
   HAVE_QTBINDINGS="$HAVE_QTBINDINGS"
   HAVE_QT_UITOOLS="$HAVE_QT_UITOOLS"
+  HAVE_QT_NETWORK="$HAVE_QT_NETWORK"
+  HAVE_QT_SQL="$HAVE_QT_SQL"
+  HAVE_QT_SVG="$HAVE_QT_SVG"
+  HAVE_QT_PRINTSUPPORT="$HAVE_QT_PRINTSUPPORT"
+  HAVE_QT_MULTIMEDIA="$HAVE_QT_MULTIMEDIA"
+  HAVE_QT_DESIGNER="$HAVE_QT_DESIGNER"
+  HAVE_QT_XML="$HAVE_QT_XML"
   HAVE_64BIT_COORD="$HAVE_64BIT_COORD"
   HAVE_QT="$HAVE_QT"
   HAVE_QT5="$HAVE_QT5"

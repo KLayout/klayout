@@ -1,8 +1,12 @@
 
 TEMPLATE = subdirs
 
-equals(HAVE_QT5, "1") {
-  SUBDIRS = lay_plugin unit_tests
-}
+contains(QT_CONFIG, opengl) {
 
-unit_tests.depends += lay_plugin
+  equals(HAVE_QT5, "1") {
+    SUBDIRS = lay_plugin unit_tests
+  }
+
+  unit_tests.depends += lay_plugin
+
+}

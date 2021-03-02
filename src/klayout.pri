@@ -180,7 +180,7 @@ equals(HAVE_QT, "0") {
 
   equals(HAVE_QT5, "1") {
 
-    QT += widgets gui printsupport
+    QT += widgets gui printsupport xmlpatterns
 
     equals(HAVE_QTBINDINGS, "1") {
       !equals(HAVE_QT_DESIGNER, "0") {
@@ -190,10 +190,6 @@ equals(HAVE_QT, "0") {
       !equals(HAVE_QT_MULTIMEDIA, "0") {
         # multimedia isn't needed by the base application
         QT += multimedia multimediawidgets
-      }
-      !equals(HAVE_QT_XML, "0") {
-        # xmlpatterns isn't needed by the base application
-        QT += xmlpatterns
       }
       !equals(HAVE_QT_SVG, "0") {
         # svg isn't needed by the base application

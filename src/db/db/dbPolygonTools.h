@@ -449,6 +449,8 @@ db::Polygon DB_PUBLIC compute_rounded (const db::Polygon &poly, double rinner, d
  */
 db::DPolygon DB_PUBLIC compute_rounded (const db::DPolygon &poly, double rinner, double router, unsigned int n);
 
+#define KLAYOUT_SMOOTH_HAS_KEEP_HV 1
+
 /**
  *  @brief Smooth a contour 
  *

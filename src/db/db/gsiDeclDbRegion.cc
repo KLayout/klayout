@@ -1412,9 +1412,10 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "See \\round_corners for a description of this method. This version returns a new region instead of "
     "modifying self (out-of-place)."
   ) +
-  method ("smooth", &db::Region::smooth, gsi::arg ("d"),
+  method ("smooth", &db::Region::smooth, gsi::arg ("d"), gsi::arg ("keep_hv", false),
     "@brief Smoothing\n"
     "@param d The smoothing tolerance (in database units)\n"
+    "@param keep_hv If true, horizontal and vertical edges are maintained\n"
     "\n"
     "This method will simplify the merged polygons of the region by removing vertexes if the "
     "resulting polygon stays equivalent with the original polygon. Equivalence is measured "
@@ -1423,9 +1424,10 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method modifies the region. \\smoothed is a method that does the same but returns a new "
     "region without modifying self. Merged semantics applies for this method.\n"
   ) +
-  method ("smoothed", &db::Region::smoothed, gsi::arg ("d"),
+  method ("smoothed", &db::Region::smoothed, gsi::arg ("d"), gsi::arg ("keep_hv", false),
     "@brief Smoothing\n"
     "@param d The smoothing tolerance (in database units)\n"
+    "@param keep_hv If true, horizontal and vertical edges are maintained\n"
     "\n"
     "See \\smooth for a description of this method. This version returns a new region instead of "
     "modifying self (out-of-place). It has been introduced in version 0.25."

@@ -185,10 +185,10 @@ static db::CompoundRegionOperationNode *new_strange_polygons_filter (db::Compoun
   return new db::CompoundRegionProcessingOperationNode (new db::StrangePolygonCheckProcessor (), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_smoothed (db::CompoundRegionOperationNode *input, db::Coord d)
+static db::CompoundRegionOperationNode *new_smoothed (db::CompoundRegionOperationNode *input, db::Coord d, bool keep_hv)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionProcessingOperationNode (new db::SmoothingProcessor (d), input, true /*processor is owned*/, d);
+  return new db::CompoundRegionProcessingOperationNode (new db::SmoothingProcessor (d, keep_hv), input, true /*processor is owned*/, d);
 }
 
 static db::CompoundRegionOperationNode *new_rounded_corners (db::CompoundRegionOperationNode *input, double rinner, double router, unsigned int n)
@@ -572,9 +572,10 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
     "@brief Creates a node extracting strange polygons.\n"
     "'strange polygons' are ones which cannot be oriented - e.g. '8' shape polygons."
   ) +
-  gsi::constructor ("new_smoothed", &new_smoothed, gsi::arg ("input"), gsi::arg ("d"),
+  gsi::constructor ("new_smoothed", &new_smoothed, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("keep_hv", false),
     "@brief Creates a node smoothing the polygons.\n"
-    "@param d The tolerance to be applied for the smoothing."
+    "@param d The tolerance to be applied for the smoothing.\n"
+    "@param keep_hv If true, horizontal and vertical edges are maintained.\n"
   ) +
   gsi::constructor ("new_rounded_corners", &new_rounded_corners, gsi::arg ("input"), gsi::arg ("rinner"), gsi::arg ("router"), gsi::arg ("n"),
     "@brief Creates a node generating rounded corners.\n"

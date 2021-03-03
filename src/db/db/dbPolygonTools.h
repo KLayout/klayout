@@ -458,13 +458,14 @@ db::DPolygon DB_PUBLIC compute_rounded (const db::DPolygon &poly, double rinner,
  *  @param to The end of the contour
  *  @param new_pts The points that make up the new contour
  *  @param d The distance that determines the smoothing "roughness"
+ *  @param keep_hv If true, vertical and horizontal edges are maintained
  */
-void DB_PUBLIC smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector <db::Point> &new_pts, db::Coord d);
+void DB_PUBLIC smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector <db::Point> &new_pts, db::Coord d, bool keep_hv);
 
 /**
  *  @brief Smooth a polygon (apply smoothing to the whole polygon)
  */
-db::Polygon DB_PUBLIC smooth (const db::Polygon &poly, db::Coord d);
+db::Polygon DB_PUBLIC smooth (const db::Polygon &poly, db::Coord d, bool keep_hv);
 
 /**
  *  @brief Returns a value indicating whether the polygon is an "strange polygon"

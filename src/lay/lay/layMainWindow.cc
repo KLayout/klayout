@@ -2525,21 +2525,30 @@ MainWindow::cm_new_layout ()
   std::string technology = m_initial_technology;
   static std::string s_new_cell_cell_name ("TOP");
   static double s_new_cell_window_size = 2.0;
+  static std::vector<db::LayerProperties> s_layers;
 
   double dbu = 0.0;
 
   lay::NewLayoutPropertiesDialog dialog (this);
-  if (dialog.exec_dialog (technology, s_new_cell_cell_name, dbu, s_new_cell_window_size, m_new_layout_current_panel)) {
+  if (dialog.exec_dialog (technology, s_new_cell_cell_name, dbu, s_new_cell_window_size, s_layers, m_new_layout_current_panel)) {
 
-    lay::CellViewRef cellview = create_or_load_layout (0, 0, technology, m_new_layout_current_panel ? 2 : 1 /*= new view*/);
+    std::unique_ptr <lay::LayoutHandle> handle (new lay::LayoutHandle (new db::Layout (& manager ()), std::string ()));
+    handle->rename ("new");
 
     if (dbu > 1e-10) {
-      cellview->layout ().dbu (dbu);
+      handle->layout ().dbu (dbu);
     }
-    db::cell_index_type new_ci = cellview->layout ().add_cell (s_new_cell_cell_name.empty () ? 0 : s_new_cell_cell_name.c_str ());
-    cellview.set_cell (new_ci);
+    db::cell_index_type new_ci = handle->layout ().add_cell (s_new_cell_cell_name.empty () ? 0 : s_new_cell_cell_name.c_str ());
 
-    current_view ()->zoom_box_and_set_hier_levels (db::DBox (-0.5 * s_new_cell_window_size, -0.5 * s_new_cell_window_size, 0.5 * s_new_cell_window_size, 0.5 * s_new_cell_window_size), std::make_pair (0, 1));
+    for (std::vector<db::LayerProperties>::const_iterator l = s_layers.begin (); l != s_layers.end (); ++l) {
+      handle->layout ().insert_layer (*l);
+    }
+
+    lay::LayoutView *mp_view = (m_new_layout_current_panel && current_view ()) ? current_view () : view (create_view ());
+
+    unsigned int ci = mp_view->add_layout (handle.release (), true);
+    mp_view->cellview_ref (ci).set_cell (new_ci);
+    mp_view->zoom_box_and_set_hier_levels (db::DBox (-0.5 * s_new_cell_window_size, -0.5 * s_new_cell_window_size, 0.5 * s_new_cell_window_size, 0.5 * s_new_cell_window_size), std::make_pair (0, 1));
 
   }
 }

@@ -43,7 +43,8 @@
 namespace db
 {
 
-class Matrix3d;
+template <class C> class matrix_3d;
+typedef matrix_3d<db::DCoord> Matrix3d;
 
 /**
  *  @brief Generic base class of DXF reader exceptions

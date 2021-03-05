@@ -2209,8 +2209,32 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The transformed region.\n"
   ) +
+  method ("transform", (db::Region &(db::Region::*)(const db::IMatrix2d &)) &db::Region::transform, gsi::arg ("t"),
+    "@brief Transform the region (modifies self)\n"
+    "\n"
+    "Transforms the region with the given 2d matrix transformation.\n"
+    "This version modifies the region and returns a reference to self.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed region.\n"
+    "\n"
+    "This variant was introduced in version 0.27.\n"
+  ) +
+  method ("transform", (db::Region &(db::Region::*)(const db::IMatrix3d &)) &db::Region::transform, gsi::arg ("t"),
+    "@brief Transform the region (modifies self)\n"
+    "\n"
+    "Transforms the region with the given 3d matrix transformation.\n"
+    "This version modifies the region and returns a reference to self.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed region.\n"
+    "\n"
+    "This variant was introduced in version 0.27.\n"
+  ) +
   method ("transformed", (db::Region (db::Region::*)(const db::Trans &) const) &db::Region::transformed, gsi::arg ("t"),
-    "@brief Transform the region\n"
+    "@brief Transforms the region\n"
     "\n"
     "Transforms the region with the given transformation.\n"
     "Does not modify the region but returns the transformed region.\n"
@@ -2220,7 +2244,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@return The transformed region.\n"
   ) +
   method ("transformed|#transformed_icplx", (db::Region (db::Region::*)(const db::ICplxTrans &) const) &db::Region::transformed, gsi::arg ("t"),
-    "@brief Transform the region with a complex transformation\n"
+    "@brief Transforms the region with a complex transformation\n"
     "\n"
     "Transforms the region with the given complex transformation.\n"
     "Does not modify the region but returns the transformed region.\n"
@@ -2228,6 +2252,30 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param t The transformation to apply.\n"
     "\n"
     "@return The transformed region.\n"
+  ) +
+  method ("transformed", (db::Region (db::Region::*)(const db::IMatrix2d &) const) &db::Region::transformed, gsi::arg ("t"),
+    "@brief Transforms the region\n"
+    "\n"
+    "Transforms the region with the given 2d matrix transformation.\n"
+    "Does not modify the region but returns the transformed region.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed region.\n"
+    "\n"
+    "This variant was introduced in version 0.27.\n"
+  ) +
+  method ("transformed", (db::Region (db::Region::*)(const db::IMatrix3d &) const) &db::Region::transformed, gsi::arg ("t"),
+    "@brief Transforms the region\n"
+    "\n"
+    "Transforms the region with the given 3d matrix transformation.\n"
+    "Does not modify the region but returns the transformed region.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed region.\n"
+    "\n"
+    "This variant was introduced in version 0.27.\n"
   ) +
   method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("negative", false),
     "@brief Performs a width check with options\n"

@@ -382,19 +382,58 @@ rasterize_extended (const db::Polygon &fp, const db::Box &fc_bbox, db::AreaMap &
   return true;
 }
 
-DB_PUBLIC bool 
-fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_cell_index, const db::Box &fc_bbox, const db::Point &origin, bool enhanced_fill, 
+static db::IMatrix2d
+compute_shear_matrix (const db::Vector &row_step, const db::Vector &column_step)
+{
+  db::IMatrix2d mr = db::IMatrix2d (1.0, 0.0, -double (row_step.y ()) / double (row_step.x ()), 1.0);
+
+  double csy = column_step.y () + mr.m21 () * column_step.x ();
+
+  db::IMatrix2d mc = db::IMatrix2d (1.0, -double (column_step.x ()) / csy, 0.0, 1.0);
+
+  return mc * mr;
+}
+
+DB_PUBLIC bool
+fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_cell_index, const db::Box &fc_bbox, const db::Point &origin, bool enhanced_fill,
              std::vector <db::Polygon> *remaining_parts, const db::Vector &fill_margin)
 {
+  if (fc_bbox.empty () || fc_bbox.width () == 0 || fc_bbox.height () == 0) {
+    throw tl::Exception (tl::to_string (tr ("Invalid fill cell footprint (empty or zero width/height)")));
+  }
+
+  return fill_region (cell, fp0, fill_cell_index, fc_bbox.p1 () - db::Point (), db::Vector (fc_bbox.width (), 0), db::Vector (0, fc_bbox.height ()), origin, enhanced_fill, remaining_parts, fill_margin);
+}
+
+DB_PUBLIC bool
+fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
+             std::vector <db::Polygon> *remaining_parts, const db::Vector &fill_margin)
+{
+  if (row_step.x () <= 0 || column_step.y () <= 0) {
+    throw tl::Exception (tl::to_string (tr ("Invalid row or column step vectors in fill_region: row step must have a positive x component while column step must have a positive y component")));
+  }
+
+  if (db::vprod_sign (row_step, column_step) <= 0) {
+    throw tl::Exception (tl::to_string (tr ("Invalid row or column step vectors in fill_region: row_step x column_step vector vector product must be > 0")));
+  }
+
+  db::IMatrix2d shear = compute_shear_matrix (row_step, column_step);
+  db::IMatrix2d inverse_shear = shear.inverted ();
+
+  tl_assert (shear.trans (row_step).y () == 0);
+  tl_assert (shear.trans (row_step).x () == row_step.x ());
+  tl_assert (shear.trans (column_step).x () == 0);
+  tl_assert (shear.trans (column_step).y () == column_step.y ());
+
   std::vector <db::Polygon> filled_regions;
   db::EdgeProcessor ep;
 
   //  under- and oversize the polygon to remove slivers that cannot be filled.
-  db::Coord dx = fc_bbox.width () / 2 - 1, dy = fc_bbox.height () / 2 - 1;
+  db::Coord dx = row_step.x () / 2 - 1, dy = column_step.y () / 2 - 1;
 
   std::vector <db::Polygon> fpa;
   std::vector <db::Polygon> fpb;
-  fpa.push_back (fp0);
+  fpa.push_back (fp0.transformed (shear));
 
   ep.size (fpa, -dx, 0, fpb, 3 /*mode*/, false /*=don't resolve holes*/);
   fpa.swap (fpb);
@@ -423,8 +462,11 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
 
     db::AreaMap am;
 
+    db::Box raster_box (0, 0, row_step.x (), column_step.y ());
+
     //  Rasterize to determine fill regions
-    if ((enhanced_fill && rasterize_extended (*fp, fc_bbox, am)) || (!enhanced_fill && rasterize_simple (*fp, fc_bbox, origin, am))) {
+    //  NOTE: rasterization happens post-shear transformation (e.g. with a rectangular kernel)
+    if ((enhanced_fill && rasterize_extended (*fp, raster_box, am)) || (!enhanced_fill && rasterize_simple (*fp, raster_box, origin, am))) {
 
       size_t nx = am.nx ();
       size_t ny = am.ny ();
@@ -445,13 +487,13 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
 
             ninsts += (jj - j);
 
-            db::Vector p0 (am.p0 () - fc_bbox.p1 ());
-            p0 += db::Vector (db::Coord (i) * fc_bbox.width (), db::Coord (j) * fc_bbox.height ());
+            db::Vector p0 (inverse_shear.trans (am.p0 ()) - kernel_origin);
+            p0 += row_step * long (i) + column_step * long (j);
 
             db::CellInstArray array;
 
             if (jj > j + 1) {
-              array = db::CellInstArray (db::CellInst (fill_cell_index), db::Trans (p0), db::Vector (0, fc_bbox.height ()), db::Vector (fc_bbox.width (), 0), (unsigned long) (jj - j), 1);
+              array = db::CellInstArray (db::CellInst (fill_cell_index), db::Trans (p0), column_step, db::Vector (), (unsigned long) (jj - j), 1);
             } else {
               array = db::CellInstArray (db::CellInst (fill_cell_index), db::Trans (p0));
             }
@@ -459,9 +501,19 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
             cell->insert (array);
 
             if (remaining_parts) {
-              db::Box filled_box = array.raw_bbox () * fc_bbox; 
-              filled_regions.push_back (db::Polygon (filled_box.enlarged (fill_margin)));
+
+              db::Point fill_stripe[4] = {
+                db::Point () + p0 + kernel_origin,
+                db::Point () + p0 + kernel_origin + column_step * long (jj - j),
+                db::Point () + p0 + kernel_origin + column_step * long (jj - j) + row_step,
+                db::Point () + p0 + kernel_origin + row_step
+              };
+
+              filled_regions.push_back (db::Polygon ());
+              filled_regions.back ().assign_hull (fill_stripe, fill_stripe + 4);
+
             }
+
             any_fill = true;
 
           }
@@ -484,9 +536,19 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
   if (any_fill) {
 
     if (remaining_parts) {
+
       std::vector <db::Polygon> fp1;
+
+      if (fill_margin != db::Vector ()) {
+        ep.size (filled_regions, fill_margin.x (), fill_margin.y (), fp1, 3 /*mode*/, false /*=don't resolve holes*/);
+        filled_regions.swap (fp1);
+        fp1.clear ();
+      }
+
       fp1.push_back (fp0);
       ep.boolean (fp1, filled_regions, *remaining_parts, db::BooleanOp::ANotB, false /*=don't resolve holes*/);
+
+
     }
 
     return true;
@@ -497,13 +559,33 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
 }
 
 DB_PUBLIC void
-fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Point &origin, bool enhanced_fill, 
+fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_bbox, const db::Point &origin, bool enhanced_fill,
              db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons)
 {
+  if (fc_bbox.empty () || fc_bbox.width () == 0 || fc_bbox.height () == 0) {
+    throw tl::Exception (tl::to_string (tr ("Invalid fill cell footprint (empty or zero width/height)")));
+  }
+
+  fill_region (cell, fr, fill_cell_index, fc_bbox.p1 () - db::Point (), db::Vector (fc_bbox.width (), 0), db::Vector (0, fc_bbox.height ()),
+               origin, enhanced_fill, remaining_parts, fill_margin, remaining_polygons);
+}
+
+DB_PUBLIC void
+fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
+             db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons)
+{
+  if (row_step.x () <= 0 || column_step.y () <= 0) {
+    throw tl::Exception (tl::to_string (tr ("Invalid row or column step vectors in fill_region: row step must have a positive x component while column step must have a positive y component")));
+  }
+
+  if (db::vprod_sign (row_step, column_step) <= 0) {
+    throw tl::Exception (tl::to_string (tr ("Invalid row or column step vectors in fill_region: row_step x column_step vector vector product must be > 0")));
+  }
+
   std::vector<db::Polygon> rem_pp, rem_poly;
 
   for (db::Region::const_iterator p = fr.begin_merged (); !p.at_end (); ++p) {
-    if (!fill_region (cell, *p, fill_cell_index, fc_box, origin, enhanced_fill, remaining_parts ? &rem_pp : 0, fill_margin)) {
+    if (!fill_region (cell, *p, fill_cell_index, kernel_origin, row_step, column_step, origin, enhanced_fill, remaining_parts ? &rem_pp : 0, fill_margin)) {
       if (remaining_polygons) {
         rem_poly.push_back (*p);
       }

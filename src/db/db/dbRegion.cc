@@ -145,6 +145,8 @@ Region &Region::transform (const T &trans)
 template DB_PUBLIC Region &Region::transform (const db::ICplxTrans &);
 template DB_PUBLIC Region &Region::transform (const db::Trans &);
 template DB_PUBLIC Region &Region::transform (const db::Disp &);
+template DB_PUBLIC Region &Region::transform (const db::IMatrix2d &);
+template DB_PUBLIC Region &Region::transform (const db::IMatrix3d &);
 
 template <class Sh>
 void Region::insert (const Sh &shape)

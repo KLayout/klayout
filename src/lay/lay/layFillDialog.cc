@@ -83,6 +83,8 @@ FillDialog::FillDialog (lay::Dispatcher *main, lay::LayoutView *view)
 
   Ui::FillDialog::setupUi (this);
 
+  fc_boundary_layer->set_no_layer_available (true);
+
   fill_area_stack->setCurrentIndex (0);
   connect (fill_area_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (fill_area_changed (int)));
   connect (button_box, SIGNAL (accepted ()), this, SLOT (ok_pressed ()));
@@ -274,16 +276,36 @@ BEGIN_PROTECTED
   const db::Cell *fill_cell = &cv->layout ().cell (fc.second); 
 
   int fc_bbox_layer = fc_boundary_layer->current_layer ();
-  if (fc_bbox_layer < 0 || ! cv->layout ().is_valid_layer (fc_bbox_layer)) {
+  if (fc_bbox_layer >= 0 && ! cv->layout ().is_valid_layer (fc_bbox_layer)) {
     throw tl::Exception (tl::to_string (QObject::tr ("No valid layer selected to get fill cell's bounding box from")));
   }
 
-  db::Box fc_bbox = fill_cell->bbox (fc_bbox_layer);
+  db::Box fc_bbox = fc_bbox_layer < 0 ? fill_cell->bbox () : fill_cell->bbox (fc_bbox_layer);
   if (fc_bbox.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No valid layer selected to get fill cell's bounding box from - layer is empty for the fill cell")));
   }
 
+  db::Coord row_dx = fc_bbox.width (), row_dy = 0;
+  db::Coord column_dx = 0.0, column_dy = fc_bbox.height ();
+
+  s = tl::to_string (row_le->text ());
+  ex = tl::Extractor (s.c_str ());
+  if (ex.try_read (x) && ex.test (",") && ex.try_read (y)) {
+    row_dx = db::coord_traits<db::Coord>::rounded (x / cv->layout ().dbu ());
+    row_dy = db::coord_traits<db::Coord>::rounded (y / cv->layout ().dbu ());
+  }
+
+  s = tl::to_string (column_le->text ());
+  ex = tl::Extractor (s.c_str ());
+  if (ex.try_read (x) && ex.test (",") && ex.try_read (y)) {
+    column_dx = db::coord_traits<db::Coord>::rounded (x / cv->layout ().dbu ());
+    column_dy = db::coord_traits<db::Coord>::rounded (y / cv->layout ().dbu ());
+  }
+
   bool enhanced_fill = enhanced_cb->isChecked ();
+
+  double row_dx2 = 0.0, row_dy2 = 0.0;
+  double column_dx2 = 0.0, column_dy2 = 0.0;
 
   const db::Cell *fill_cell2 = 0;
   db::Box fc_bbox2;
@@ -297,9 +319,28 @@ BEGIN_PROTECTED
 
     fill_cell2 = &cv->layout ().cell (fc.second); 
 
-    fc_bbox2 = fill_cell2->bbox (fc_bbox_layer);
+    fc_bbox2 = fc_bbox_layer < 0 ? fill_cell2->bbox () : fill_cell2->bbox (fc_bbox_layer);
     if (fc_bbox2.empty ()) {
       throw tl::Exception (tl::to_string (QObject::tr ("Second order fill cell is empty for the given boundary layer")));
+    }
+
+    row_dx2 = fc_bbox2.width ();
+    row_dy2 = 0;
+    column_dx2 = 0.0;
+    column_dy2 = fc_bbox2.height ();
+
+    s = tl::to_string (row_2nd_le->text ());
+    ex = tl::Extractor (s.c_str ());
+    if (ex.try_read (x) && ex.test (",") && ex.try_read (y)) {
+      row_dx2 = db::coord_traits<db::Coord>::rounded (x / cv->layout ().dbu ());
+      row_dy2 = db::coord_traits<db::Coord>::rounded (y / cv->layout ().dbu ());
+    }
+
+    s = tl::to_string (column_2nd_le->text ());
+    ex = tl::Extractor (s.c_str ());
+    if (ex.try_read (x) && ex.test (",") && ex.try_read (y)) {
+      column_dx2 = db::coord_traits<db::Coord>::rounded (x / cv->layout ().dbu ());
+      column_dy2 = db::coord_traits<db::Coord>::rounded (y / cv->layout ().dbu ());
     }
 
   }
@@ -483,7 +524,10 @@ BEGIN_PROTECTED
             tl::info << "Compute fill for one region :" << fp0->to_string ();
           }
 
-          bool any_fill = fill_region (cv.cell (), *fp0, fill_cell->cell_index (), fc_bbox, fr_bbox.p1 (), enhanced_fill, (enhanced_fill || fill_cell2) ? &new_fill_area : 0, fill_margin);
+          db::Vector rs (row_dx, row_dy), cs (column_dx, column_dy);
+          db::Vector ko = fc_bbox.center () - db::Point () - (rs + cs) / 2;
+
+          bool any_fill = fill_region (cv.cell (), *fp0, fill_cell->cell_index (), ko, rs, cs, fr_bbox.center (), enhanced_fill, (enhanced_fill || fill_cell2) ? &new_fill_area : 0, fill_margin);
           if (! any_fill) {
             non_filled_area.push_back (*fp0);
           }
@@ -505,6 +549,11 @@ BEGIN_PROTECTED
       fill_cell = fill_cell2;
       fc_bbox = fc_bbox2;
       fill_margin = fill2_margin;
+
+      row_dx = row_dx2;
+      row_dy = row_dy2;
+      column_dx = column_dx2;
+      column_dy = column_dy2;
 
       fill_cell2 = 0;
       fc_bbox2 = db::Box ();

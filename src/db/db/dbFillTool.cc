@@ -388,10 +388,11 @@ compute_shear_matrix (const db::Vector &r, const db::Vector &c)
   double det = r.x () * c.y () - r.y () * c.x ();
 
   double m11 = c.y () * r.x () / det;
+  double m22 = m11;
   double m12 = -c.x () * r.x () / det;
-  double m22 = c.y () * r.x () / det;
+  double m21 = -c.y () * r.y () / det;
 
-  return IMatrix2d (m11, m12, m12, m22);
+  return IMatrix2d (m11, m12, m21, m22);
 }
 
 DB_PUBLIC bool

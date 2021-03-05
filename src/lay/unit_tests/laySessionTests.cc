@@ -45,6 +45,8 @@ TEST (1)
 
   lay::LayoutView *view = mw->current_view ();
 
+  view->set_title ("xyz");
+
   ant::Service *ant_service = view->get_plugin <ant::Service> ();
   tl_assert (ant_service != 0);
   if (ant_service) {
@@ -83,6 +85,8 @@ TEST (1)
 
   view = mw->current_view ();
   tl_assert (view != 0);
+
+  EXPECT_EQ (view->title (), "xyz");
 
   ant_service = view->get_plugin <ant::Service> ();
   tl_assert (ant_service != 0);

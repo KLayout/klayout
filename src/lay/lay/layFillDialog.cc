@@ -240,7 +240,7 @@ BEGIN_PROTECTED
   db::Coord distance_y = db::coord_traits<db::Coord>::rounded (y / cv->layout ().dbu ());
 
   //  read fill cell margin
-  db::Vector fill_margin (exclude_x, exclude_y);
+  db::Vector fill_margin;
   x = 0.0, y = 0.0;
   s = tl::to_string (fill_margin_le->text ());
   ex = tl::Extractor (s.c_str ());
@@ -254,7 +254,7 @@ BEGIN_PROTECTED
   }
 
   //  read fill cell 2 margin
-  db::Vector fill2_margin (exclude_x, exclude_y);
+  db::Vector fill2_margin;
   x = 0.0, y = 0.0;
   s = tl::to_string (fill2_margin_le->text ());
   ex = tl::Extractor (s.c_str ());
@@ -525,9 +525,9 @@ BEGIN_PROTECTED
           }
 
           db::Vector rs (row_dx, row_dy), cs (column_dx, column_dy);
-          db::Vector ko = fc_bbox.center () - db::Point () - (rs + cs) / 2;
+          db::Vector ko = fc_bbox.center () - db::Point (row_dx / 2, column_dy / 2);
 
-          bool any_fill = fill_region (cv.cell (), *fp0, fill_cell->cell_index (), ko, rs, cs, fr_bbox.center (), enhanced_fill, (enhanced_fill || fill_cell2) ? &new_fill_area : 0, fill_margin);
+          bool any_fill = fill_region (cv.cell (), *fp0, fill_cell->cell_index (), ko, rs, cs, fr_bbox.p1 (), enhanced_fill, (enhanced_fill || fill_cell2) ? &new_fill_area : 0, fill_margin);
           if (! any_fill) {
             non_filled_area.push_back (*fp0);
           }

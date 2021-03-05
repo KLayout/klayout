@@ -406,6 +406,73 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
   return fill_region (cell, fp0, fill_cell_index, fc_bbox.p1 () - db::Point (), db::Vector (fc_bbox.width (), 0), db::Vector (0, fc_bbox.height ()), origin, enhanced_fill, remaining_parts, fill_margin);
 }
 
+static db::Polygon
+produce_fill_stripe (const db::Vector &row_step, const db::Vector &column_step, long n)
+{
+  if (column_step.x () == 0) {
+
+    db::Coord ymin = std::min (0, row_step.y ());
+    db::Coord ymax = std::max (0, row_step.y ()) + n * column_step.y ();
+
+    return db::Polygon (db::Box (0, ymin, row_step.x (), ymax));
+
+  } else {
+
+    db::Coord xmin = 0;
+    db::Coord xmax = row_step.x ();
+
+    db::Coord ymin = 0;
+    db::Coord ymax = n * column_step.y ();
+
+    std::vector<db::Point> pts;
+    pts.reserve (n * 2);
+
+    for (long i = 0; i < n; ++i) {
+
+      db::Coord x = xmin + i * column_step.x ();
+      db::Coord y = i * column_step.y ();
+
+      if (i == 0) {
+        pts.push_back (db::Point (x, ymin));
+      } else {
+        pts.push_back (db::Point (x, y));
+      }
+      if (i == n - 1) {
+        pts.push_back (db::Point (x, ymax));
+      } else {
+        pts.push_back (db::Point (x, y + column_step.y ()));
+      }
+
+    }
+
+    for (long i = n; i > 0; ) {
+
+      --i;
+
+      db::Coord x = xmax + i * column_step.x ();
+      db::Coord y = i * column_step.y ();
+
+      if (i == n - 1) {
+        pts.push_back (db::Point (x, ymax));
+      } else {
+        pts.push_back (db::Point (x, y + column_step.y ()));
+      }
+      if (i == 0) {
+        pts.push_back (db::Point (x, ymin));
+      } else {
+        pts.push_back (db::Point (x, y));
+      }
+
+    }
+
+    db::Polygon p;
+    p.assign_hull (pts.begin (), pts.end ());
+    return p;
+
+  }
+}
+
+
 DB_PUBLIC bool
 fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
              std::vector <db::Polygon> *remaining_parts, const db::Vector &fill_margin)
@@ -502,17 +569,7 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
             cell->insert (array);
 
             if (remaining_parts) {
-
-              db::Point fill_stripe[4] = {
-                db::Point () + p0 + kernel_origin,
-                db::Point () + p0 + kernel_origin + column_step * long (jj - j),
-                db::Point () + p0 + kernel_origin + column_step * long (jj - j) + row_step,
-                db::Point () + p0 + kernel_origin + row_step
-              };
-
-              filled_regions.push_back (db::Polygon ());
-              filled_regions.back ().assign_hull (fill_stripe, fill_stripe + 4);
-
+              filled_regions.push_back (produce_fill_stripe (row_step, column_step, long (jj - j)).moved (p0 + kernel_origin));
             }
 
             any_fill = true;

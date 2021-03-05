@@ -383,15 +383,15 @@ rasterize_extended (const db::Polygon &fp, const db::Box &fc_bbox, db::AreaMap &
 }
 
 static db::IMatrix2d
-compute_shear_matrix (const db::Vector &row_step, const db::Vector &column_step)
+compute_shear_matrix (const db::Vector &r, const db::Vector &c)
 {
-  db::IMatrix2d mr = db::IMatrix2d (1.0, 0.0, -double (row_step.y ()) / double (row_step.x ()), 1.0);
+  double det = r.x () * c.y () - r.y () * c.x ();
 
-  double csy = column_step.y () + mr.m21 () * column_step.x ();
+  double m11 = c.y () * r.x () / det;
+  double m12 = -c.x () * r.x () / det;
+  double m22 = c.y () * r.x () / det;
 
-  db::IMatrix2d mc = db::IMatrix2d (1.0, -double (column_step.x ()) / csy, 0.0, 1.0);
-
-  return mc * mr;
+  return IMatrix2d (m11, m12, m12, m22);
 }
 
 DB_PUBLIC bool

@@ -52,3 +52,66 @@ TEST(1)
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au1.gds");
 }
 
+TEST(2)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/fill_tool2.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type fill_cell = ly.cell_by_name ("FILL_CELL").second;
+  db::cell_index_type top_cell = ly.cell_by_name ("TOP").second;
+  unsigned int fill_layer = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Region fill_region (db::RecursiveShapeIterator (ly, ly.cell (top_cell), fill_layer));
+
+  db::Region remaining_parts, remaining_polygons;
+
+  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, ly.cell (fill_cell).bbox (), db::Point (), true, &remaining_parts, db::Vector (50, 100), &remaining_polygons);
+
+  unsigned int l100 = ly.insert_layer (db::LayerProperties (100, 0));
+  unsigned int l101 = ly.insert_layer (db::LayerProperties (101, 0));
+  remaining_parts.insert_into (&ly, top_cell, l100);
+  remaining_polygons.insert_into (&ly, top_cell, l101);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au2.gds");
+}
+
+TEST(3)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/fill_tool3.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type fill_cell = ly.cell_by_name ("FILL_CELL").second;
+  db::cell_index_type top_cell = ly.cell_by_name ("TOP").second;
+  unsigned int fill_layer = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Region fill_region (db::RecursiveShapeIterator (ly, ly.cell (top_cell), fill_layer));
+
+  db::Region remaining_parts, remaining_polygons;
+
+  db::Vector ko (-100, -130);
+  db::Vector rs (230, 40);
+  db::Vector cs (40, 230);
+  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, ko, rs, cs, db::Point (), true, &remaining_parts, db::Vector (50, 100), &remaining_polygons);
+
+  unsigned int l100 = ly.insert_layer (db::LayerProperties (100, 0));
+  unsigned int l101 = ly.insert_layer (db::LayerProperties (101, 0));
+  remaining_parts.insert_into (&ly, top_cell, l100);
+  remaining_polygons.insert_into (&ly, top_cell, l101);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au3.gds");
+}
+

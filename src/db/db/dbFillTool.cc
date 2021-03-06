@@ -628,9 +628,9 @@ fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell
                origin, enhanced_fill, remaining_parts, fill_margin, remaining_polygons);
 }
 
-DB_PUBLIC void
-fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
-             db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons)
+static void
+fill_region_impl (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
+             db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, int iteration)
 {
   if (row_step.x () <= 0 || column_step.y () <= 0) {
     throw tl::Exception (tl::to_string (tr ("Invalid row or column step vectors in fill_region: row step must have a positive x component while column step must have a positive y component")));
@@ -642,11 +642,27 @@ fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell
 
   std::vector<db::Polygon> rem_pp, rem_poly;
 
+  size_t n = 0;
   for (db::Region::const_iterator p = fr.begin_merged (); !p.at_end (); ++p) {
-    if (!fill_region (cell, *p, fill_cell_index, kernel_origin, row_step, column_step, origin, enhanced_fill, remaining_parts ? &rem_pp : 0, fill_margin)) {
-      if (remaining_polygons) {
-        rem_poly.push_back (*p);
+    ++n;
+  }
+
+  {
+    std::string progress_title;
+    if (iteration > 0) {
+      progress_title = tl::sprintf (tl::to_string (tr ("Fill polygons (iteration #%d)")), iteration);
+    } else {
+      progress_title = tl::sprintf (tl::to_string (tr ("Fill polygons")));
+    }
+    tl::RelativeProgress progress (progress_title, n);
+
+    for (db::Region::const_iterator p = fr.begin_merged (); !p.at_end (); ++p) {
+      if (!fill_region (cell, *p, fill_cell_index, kernel_origin, row_step, column_step, origin, enhanced_fill, remaining_parts ? &rem_pp : 0, fill_margin)) {
+        if (remaining_polygons) {
+          rem_poly.push_back (*p);
+        }
       }
+      ++progress;
     }
   }
 
@@ -666,6 +682,37 @@ fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell
     for (std::vector<db::Polygon>::const_iterator p = rem_poly.begin (); p != rem_poly.end (); ++p) {
       remaining_polygons->insert (*p);
     }
+  }
+}
+
+DB_PUBLIC void
+fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
+             db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons)
+{
+  fill_region_impl (cell, fr, fill_cell_index, kernel_origin, row_step, column_step, origin, enhanced_fill, remaining_parts, fill_margin, remaining_polygons, 0);
+}
+
+DB_PUBLIC void
+fill_region_repeat (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index,
+                    const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step,
+                    const db::Vector &fill_margin, db::Region *remaining_polygons)
+{
+  const db::Region *fill_region = &fr;
+
+  db::Region new_fill_region;
+  db::Region remaining;
+
+  int iteration = 0;
+
+  while (! fill_region->empty ()) {
+
+    ++iteration;
+
+    fill_region_impl (cell, *fill_region, fill_cell_index, kernel_origin, row_step, column_step, db::Point (), true, &remaining, fill_margin, remaining_polygons, iteration);
+
+    new_fill_region.swap (remaining);
+    fill_region = &new_fill_region;
+
   }
 }
 

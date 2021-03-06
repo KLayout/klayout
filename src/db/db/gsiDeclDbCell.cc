@@ -1322,6 +1322,13 @@ fill_region2d (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_ce
   db::fill_region (cell, fr, fill_cell_index, kernel_origin, row_step, column_step, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons);
 }
 
+static void
+fill_region_repeat (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step,
+                    const db::Vector &fill_margin, db::Region *remaining_polygons)
+{
+  db::fill_region_repeat (cell, fr, fill_cell_index, kernel_origin, row_step, column_step, fill_margin, remaining_polygons);
+}
+
 static db::Instance cell_inst_dtransform_simple (db::Cell *cell, const db::Instance &inst, const db::DTrans &t)
 {
   const db::Layout *layout = cell->layout ();
@@ -1802,7 +1809,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "This method has been introduced in version 0.23.\n"
   ) +
   gsi::method_ext ("fill_region", &fill_region1d, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("kernel_origin"), gsi::arg ("row_step"), gsi::arg ("column_step"), gsi::arg ("origin"),
-    "@brief Fills the given region with cells of the given type (diamond-shape fill kernel)\n"
+    "@brief Fills the given region with cells of the given type (diamond fill kernel)\n"
     "@param region The region to fill\n"
     "@param fill_cell_index The fill cell to place\n"
     "@param kernel_origin The fill cell's footprint\n"
@@ -1860,7 +1867,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "This method has been introduced in version 0.23.\n"
   ) +
   gsi::method_ext ("fill_region", &fill_region2d, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("kernel_origin"), gsi::arg ("row_step"), gsi::arg ("column_step"), gsi::arg ("origin"), gsi::arg ("remaining_parts"), gsi::arg ("fill_margin"), gsi::arg ("remaining_polygons"),
-    "@brief Fills the given region with cells of the given type (diamond-shape fill kernel, extended version)\n"
+    "@brief Fills the given region with cells of the given type (diamond fill kernel, extended version)\n"
     "@param region The region to fill\n"
     "@param fill_cell_index The fill cell to place\n"
     "@param kernel_origin The fill cell's footprint\n"
@@ -1876,6 +1883,14 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "This version will try to fit as many of these diamond-shaped kernels into the region to fill.\n"
     "\n"
     "This variant has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("fill_region_multi", &fill_region_repeat, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("kernel_origin"), gsi::arg ("row_step"), gsi::arg ("column_step"), gsi::arg ("fill_margin"), gsi::arg ("remaining_polygons"),
+    "@brief Fills the given region with cells of the given type in enhanced mode with iterations\n"
+    "This version operates like \\fill_region, but repeates the fill generation until no further fill cells can be placed. "
+    "As the fill pattern origin changes between the iterations, narrow regions can be filled which cannot with a fixed fill pattern origin. "
+    "The \\fill_margin parameter is important as it controls the distance between fill cells with a different origin and therefore pitch-incompatible arrays.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ) +
   gsi::method_ext ("begin_shapes_rec", &begin_shapes_rec, gsi::arg ("layer"),
     "@brief Delivers a recursive shape iterator for the shapes below the cell on the given layer\n"

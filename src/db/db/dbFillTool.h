@@ -104,5 +104,15 @@ DB_PUBLIC void
 fill_region (db::Cell *cell, const db::Region &fp, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
              db::Region *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (), db::Region *remaining_polygons = 0);
 
-}
+/**
+ *  @brief An iterative version for enhanced fill
+ *
+ *  This version operates like the region-based fill_region version, but repeates the fill step until no further fill cells can be placed.
+ *  The remaining parts will be placed inside "remaining_polygons" unless this pointer is null.
+ */
+DB_PUBLIC void
+fill_region_repeat (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index,
+                    const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step,
+                    const db::Vector &fill_margin, db::Region *remaining_polygons = 0);
 
+}

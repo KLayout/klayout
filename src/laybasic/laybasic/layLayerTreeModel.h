@@ -235,11 +235,12 @@ public:
   /**
    *  @brief emit a layoutChanged signal
    */
-  void signal_layer_changed ();
+  void signal_layers_changed ();
 
 signals:
   /**
-   *  @brief This signal is emitted to indicate
+   *  @brief This signal is emitted to indicate the hidden flags need update by the client
+   *  Note this is neither done by the view nor the model. It needs to be implemented elsewhere.
    */
   void hidden_flags_need_update ();
 

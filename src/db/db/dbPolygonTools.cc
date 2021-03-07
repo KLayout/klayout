@@ -1687,6 +1687,10 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
     ++c;
   }
 
+  if (c == edges.end ()) {
+    return;
+  }
+
   std::vector <db::Edge>::iterator f = c;
 
   for (size_t iy = iy0; iy < iy1; ++iy) {
@@ -1704,7 +1708,7 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
 
     std::vector <db::Edge>::iterator cc = c;
 
-    while (cc != edges.end () && db::edge_xmax (*cc) <= x) {
+    while (cc != edges.end () && cc != f && db::edge_xmax (*cc) <= x) {
       db::Coord y1 = std::max (y, std::min (yy, cc->p1 ().y ()));
       db::Coord y2 = std::max (y, std::min (yy, cc->p2 ().y ()));
       a += area_type (dx) * area_type (y2 - y1);

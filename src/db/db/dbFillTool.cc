@@ -323,10 +323,68 @@ rasterize_extended (const db::Polygon &fp, const db::Box &fc_bbox, db::AreaMap &
     return false;
   }
 
-  am.reinitialize (fp_bbox.p1 (), db::Vector (dx, dy), size_t (nx), size_t (ny));
+// @@@
+  //  try to create a point for which the fill box is inside the polygon
+  size_t nhull = fp.hull ().size ();
+  if (nhull < 3) {
+    return false;
+  }
+
+  db::Point p0 = fp.hull ()[0];
+  db::Point p1 = fp.hull ()[1];
+  db::Point pm1 = fp.hull ()[nhull - 1];
+
+  db::Coord hx = (dx + 1) / 2;
+  db::Coord hy = (dy + 1) / 2;
+
+  db::Edge e1 (p0, p1);
+  if (e1.dx () < 0) {
+    e1.move (db::Vector (hx, hy));
+  } else {
+    e1.move (db::Vector (hx, -hy));
+  }
+
+  db::Edge em1 (p0, pm1);
+  if (em1.dy () < 0) {
+    em1.move (db::Vector (hx, hy));
+  } else {
+    em1.move (db::Vector (-hx, hy));
+  }
+
+  std::pair<bool, db::Point> cp = e1.cut_point (em1);
+
+  db::Point o = fp_bbox.p1 ();
+  if (cp.first) {
+    db::Point po = cp.second - db::Vector (hx, hy);
+    o = po - db::Vector (dx * ((po.x () - fp_bbox.p1 ().x ()) / dx), dy * ((po.y () - fp_bbox.p1 ().y ()) / dy));
+  }
+
+  printf("@@@ fp=%s\n", fp.to_string().c_str()); fflush(stdout); // @@@
+  printf("@@@ -> o=%s\n", o.to_string().c_str()); fflush(stdout); // @@@
+// @@@
+
+  am.reinitialize (o, db::Vector (dx, dy), size_t (nx), size_t (ny));
 
   //  Rasterize to determine fill regions
   db::rasterize (fp, am);
+
+// @@@
+{
+db::Coord nx = db::Coord (am.nx ());
+db::Coord ny = db::Coord (am.ny ());
+db::AreaMap::area_type amax = am.pixel_area ();
+double n = 0;
+for (size_t i = 0; i < size_t (nx); ++i) {
+  for (size_t j = 0; j < size_t (ny); ++j) {
+    if (am.get (i, j) >= amax) {
+      n += 1;
+    }
+  }
+}
+printf("@@@ -> n=%d\n", int(n)); fflush(stdout); // @@@
+}
+// @@@
+  return true; // @@@
 
   if (tl::verbosity () >= 50) {
 
@@ -356,7 +414,6 @@ rasterize_extended (const db::Polygon &fp, const db::Box &fc_bbox, db::AreaMap &
 
     am.move (d);
     am.clear ();
-
     db::rasterize (fp, am);
 
     if (tl::verbosity () >= 50) {
@@ -501,7 +558,7 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
 
   std::vector <db::Polygon> fpa;
   std::vector <db::Polygon> fpb;
-  fpa.push_back (fp0.transformed (shear));
+  fpa.push_back (fp0);
 
   ep.size (fpa, -dx, 0, fpb, 3 /*mode*/, false /*=don't resolve holes*/);
   fpa.swap (fpb);
@@ -524,7 +581,9 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
   filled_regions.clear ();
   bool any_fill = false;
 
-  for (std::vector <db::Polygon>::const_iterator fp = fpb.begin (); fp != fpb.end (); ++fp) {
+  for (std::vector <db::Polygon>::const_iterator fpr = fpb.begin (); fpr != fpb.end (); ++fpr) {
+
+    db::Polygon fp = fpr->transformed (shear);
 
     size_t ninsts = 0;
 
@@ -534,7 +593,7 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
 
     //  Rasterize to determine fill regions
     //  NOTE: rasterization happens post-shear transformation (e.g. with a rectangular kernel)
-    if ((enhanced_fill && rasterize_extended (*fp, raster_box, am)) || (!enhanced_fill && rasterize_simple (*fp, raster_box, origin, am))) {
+    if ((enhanced_fill && rasterize_extended (fp, raster_box, am)) || (!enhanced_fill && rasterize_simple (fp, raster_box, origin, am))) {
 
       size_t nx = am.nx ();
       size_t ny = am.ny ();
@@ -585,7 +644,7 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
     }
 
     if (tl::verbosity () >= 30 && ninsts > 0) {
-      tl::info << "Part " << fp->to_string ();
+      tl::info << "Part " << fpr->to_string ();
       tl::info << "Created " << ninsts << " instances";
     }
 
@@ -630,7 +689,7 @@ fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell
 
 static void
 fill_region_impl (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
-             db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, int iteration)
+                  db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, int iteration)
 {
   if (row_step.x () <= 0 || column_step.y () <= 0) {
     throw tl::Exception (tl::to_string (tr ("Invalid row or column step vectors in fill_region: row step must have a positive x component while column step must have a positive y component")));
@@ -708,6 +767,7 @@ fill_region_repeat (db::Cell *cell, const db::Region &fr, db::cell_index_type fi
 
     ++iteration;
 
+    remaining.clear ();
     fill_region_impl (cell, *fill_region, fill_cell_index, kernel_origin, row_step, column_step, db::Point (), true, &remaining, fill_margin, remaining_polygons, iteration);
 
     new_fill_region.swap (remaining);

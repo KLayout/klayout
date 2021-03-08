@@ -176,12 +176,14 @@ FillDialog::generate_fill (const FillParameters &fp)
 
   const db::Cell *fill_cell = &ly.cell (fc.second);
 
-  std::pair<bool, db::cell_index_type> fc2 = cv->layout ().cell_by_name (fp.fill_cell_name2.c_str ());
-  if (! fc.first) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Secondary fill cell not found: ")) + fp.fill_cell_name2);
+  const db::Cell *fill_cell2 = 0;
+  if (! fp.fill_cell_name2.empty ()) {
+    std::pair<bool, db::cell_index_type> fc2 = cv->layout ().cell_by_name (fp.fill_cell_name2.c_str ());
+    if (! fc2.first) {
+      throw tl::Exception (tl::to_string (QObject::tr ("Secondary fill cell not found: ")) + fp.fill_cell_name2);
+    }
+    fill_cell2 = &ly.cell (fc2.second);
   }
-
-  const db::Cell *fill_cell2 = &ly.cell (fc2.second);
 
   db::Vector row_step = db::CplxTrans (ly.dbu ()).inverted () * fp.row_step;
   db::Vector column_step = db::CplxTrans (ly.dbu ()).inverted () * fp.column_step;
@@ -472,7 +474,11 @@ FillDialog::get_fill_parameters ()
 
   db::DBox fc_bbox = db::CplxTrans (cv->layout ().dbu ()) * (fc_bbox_layer < 0 ? fill_cell->bbox () : fill_cell->bbox (fc_bbox_layer));
   if (fc_bbox.empty ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("No valid layer selected to get fill cell's bounding box from - layer is empty for the fill cell")));
+    if (fc_bbox_layer >= 0) {
+      throw tl::Exception (tl::to_string (QObject::tr ("No valid layer selected to get fill cell's bounding box from - layer is empty for the fill cell")));
+    } else {
+      throw tl::Exception (tl::to_string (QObject::tr ("Fill cell is empty")));
+    }
   }
 
   s = tl::to_string (row_le->text ());

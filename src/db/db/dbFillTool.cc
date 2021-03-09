@@ -27,6 +27,7 @@
 #include "dbRegion.h"
 #include "dbCell.h"
 #include "tlIntervalMap.h"
+#include "tlMath.h"
 
 namespace db
 {
@@ -268,9 +269,107 @@ optimize_offset (const db::Polygon &fp, const db::AreaMap &am)
   return db::Vector (xshift, yshift);
 }
 
+class GenericRasterizer
+{
+public:
+  GenericRasterizer ()
+    : m_row_step (), m_column_step (), m_row_steps (0), m_column_steps (0), m_origin ()
+  {
+    // .. nothing yet ..
+  }
+
+  GenericRasterizer (const db::Polygon &fp, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin)
+    : m_row_step (row_step), m_column_step (column_step), m_row_steps (0), m_column_steps (0), m_origin (origin)
+  {
+    db::Coord dx = row_step.x ();
+    db::Coord dy = column_step.y ();
+
+    if (row_step.y () == 0) {
+      m_row_steps = 1;
+    } else {
+      m_row_steps = tl::lcm (dy, std::abs (row_step.y ())) / std::abs (row_step.y ());
+    }
+
+    if (column_step.x () == 0) {
+      m_column_steps = 1;
+    } else {
+      m_column_steps = tl::lcm (dx, std::abs (column_step.x ())) / std::abs (column_step.x ());
+    }
+
+    db::Box fp_bbox = fp.box ();
+
+    db::Coord ddx = dx * db::Coord (m_row_steps) - column_step.x () * ((db::Coord (m_row_steps) * row_step.y ()) / dy);
+    db::Coord ddy = dy * db::Coord (m_column_steps) - row_step.y () * ((db::Coord (m_column_steps) * column_step.x ()) / dx);
+
+    //  round polygon bbox
+    db::Coord fp_left = db::Coord (tl::round_down (fp_bbox.left () - origin.x (), ddx)) + origin.x ();
+    db::Coord fp_bottom = db::Coord (tl::round_down (fp_bbox.bottom () - origin.y (), ddy)) + origin.y ();
+    db::Coord fp_right = db::Coord (tl::round_up (fp_bbox.right () - origin.x (), ddx)) + origin.x ();
+    db::Coord fp_top = db::Coord (tl::round_up (fp_bbox.top () - origin.y (), ddy)) + origin.y ();
+    fp_bbox = db::Box (fp_left, fp_bottom, fp_right, fp_top);
+
+    size_t nx = fp_bbox.width () / ddx;
+    size_t ny = fp_bbox.height () / ddy;
+
+    tl_assert (fp.box ().inside (fp_bbox));
+
+    if (nx == 0 || ny == 0) {
+      //  nothing to rasterize:
+      return;
+    }
+
+    m_area_maps.resize (m_row_steps * m_column_steps);
+
+    for (unsigned int ic = 0; ic < m_column_steps; ++ic) {
+
+      for (unsigned int ir = 0; ir < m_row_steps; ++ir) {
+
+        db::Vector dr = m_row_step * long (ir);
+        db::Vector dc = m_column_step * long (ic);
+
+        long ir_add = dc.x () / dx;
+        dr -= m_row_step * ir_add;
+
+        long ic_add = dr.y () / dy;
+        dc -= m_column_step * ic_add;
+
+        db::AreaMap &am = m_area_maps [ic * m_row_steps + ir];
+        am.reinitialize (db::Point (fp_left, fp_bottom) + dr + dc, db::Vector (ddx, ddy), db::Vector (dx, dy), nx, ny);
+
+        db::rasterize (fp, am);
+
+      }
+
+    }
+  }
+
+  const db::Point &p0 () const { return m_origin; }
+
+  unsigned int row_steps () const { return m_row_steps; }
+  unsigned int column_steps () const { return m_column_steps; }
+
+  const db::AreaMap &area_map (unsigned int ir, unsigned int ic) const
+  {
+    return m_area_maps [ic * m_row_steps + ir];
+  }
+
+  db::Vector area_map_offset (unsigned int ir, unsigned int ic) const
+  {
+    return m_row_step * long (ir) + m_column_step * long (ic);
+  }
+
+private:
+  std::vector<db::AreaMap> m_area_maps;
+  db::Vector m_row_step, m_column_step;
+  unsigned int m_row_steps, m_column_steps;
+  db::Point m_origin;
+};
+
+
 static bool
 rasterize_simple (const db::Polygon &fp, const db::Box &fc_bbox, const db::Point &p0, db::AreaMap &am)
 {
+
   db::Coord dx = fc_bbox.width ();
   db::Coord dy = fc_bbox.height ();
 
@@ -439,19 +538,6 @@ printf("@@@ -> n=%d\n", int(n)); fflush(stdout); // @@@
   return true;
 }
 
-static db::IMatrix2d
-compute_shear_matrix (const db::Vector &r, const db::Vector &c)
-{
-  double det = r.x () * c.y () - r.y () * c.x ();
-
-  double m11 = c.y () * r.x () / det;
-  double m22 = m11;
-  double m12 = -c.x () * r.x () / det;
-  double m21 = -c.y () * r.y () / det;
-
-  return IMatrix2d (m11, m12, m21, m22);
-}
-
 DB_PUBLIC bool
 fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_cell_index, const db::Box &fc_bbox, const db::Point &origin, bool enhanced_fill,
              std::vector <db::Polygon> *remaining_parts, const db::Vector &fill_margin)
@@ -462,73 +548,6 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
 
   return fill_region (cell, fp0, fill_cell_index, fc_bbox.p1 () - db::Point (), db::Vector (fc_bbox.width (), 0), db::Vector (0, fc_bbox.height ()), origin, enhanced_fill, remaining_parts, fill_margin);
 }
-
-static db::Polygon
-produce_fill_stripe (const db::Vector &row_step, const db::Vector &column_step, long n)
-{
-  if (column_step.x () == 0) {
-
-    db::Coord ymin = std::min (0, row_step.y ());
-    db::Coord ymax = std::max (0, row_step.y ()) + n * column_step.y ();
-
-    return db::Polygon (db::Box (0, ymin, row_step.x (), ymax));
-
-  } else {
-
-    db::Coord xmin = 0;
-    db::Coord xmax = row_step.x ();
-
-    db::Coord ymin = 0;
-    db::Coord ymax = n * column_step.y ();
-
-    std::vector<db::Point> pts;
-    pts.reserve (n * 2);
-
-    for (long i = 0; i < n; ++i) {
-
-      db::Coord x = xmin + i * column_step.x ();
-      db::Coord y = i * column_step.y ();
-
-      if (i == 0) {
-        pts.push_back (db::Point (x, ymin));
-      } else {
-        pts.push_back (db::Point (x, y));
-      }
-      if (i == n - 1) {
-        pts.push_back (db::Point (x, ymax));
-      } else {
-        pts.push_back (db::Point (x, y + column_step.y ()));
-      }
-
-    }
-
-    for (long i = n; i > 0; ) {
-
-      --i;
-
-      db::Coord x = xmax + i * column_step.x ();
-      db::Coord y = i * column_step.y ();
-
-      if (i == n - 1) {
-        pts.push_back (db::Point (x, ymax));
-      } else {
-        pts.push_back (db::Point (x, y + column_step.y ()));
-      }
-      if (i == 0) {
-        pts.push_back (db::Point (x, ymin));
-      } else {
-        pts.push_back (db::Point (x, y));
-      }
-
-    }
-
-    db::Polygon p;
-    p.assign_hull (pts.begin (), pts.end ());
-    return p;
-
-  }
-}
-
 
 DB_PUBLIC bool
 fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
@@ -541,14 +560,6 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
   if (db::vprod_sign (row_step, column_step) <= 0) {
     throw tl::Exception (tl::to_string (tr ("Invalid row or column step vectors in fill_region: row_step x column_step vector vector product must be > 0")));
   }
-
-  db::IMatrix2d shear = compute_shear_matrix (row_step, column_step);
-  db::IMatrix2d inverse_shear = shear.inverted ();
-
-  tl_assert (shear.trans (row_step).y () == 0);
-  tl_assert (shear.trans (row_step).x () == row_step.x ());
-  tl_assert (shear.trans (column_step).x () == 0);
-  tl_assert (shear.trans (column_step).y () == column_step.y ());
 
   std::vector <db::Polygon> filled_regions;
   db::EdgeProcessor ep;
@@ -581,61 +592,67 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
   filled_regions.clear ();
   bool any_fill = false;
 
-  for (std::vector <db::Polygon>::const_iterator fpr = fpb.begin (); fpr != fpb.end (); ++fpr) {
-
-    db::Polygon fp = fpr->transformed (shear);
+  for (std::vector <db::Polygon>::const_iterator fp = fpb.begin (); fp != fpb.end (); ++fp) {
 
     size_t ninsts = 0;
 
-    db::AreaMap am;
+    GenericRasterizer am (*fp, row_step, column_step, origin);
 
-    db::Box raster_box (0, 0, row_step.x (), column_step.y ());
+    //  @@@ optimize fill offset ...
 
-    //  Rasterize to determine fill regions
-    //  NOTE: rasterization happens post-shear transformation (e.g. with a rectangular kernel)
-    if ((enhanced_fill && rasterize_extended (fp, raster_box, am)) || (!enhanced_fill && rasterize_simple (fp, raster_box, origin, am))) {
+    for (unsigned int ir = 0; ir < am.row_steps (); ++ir) {
 
-      size_t nx = am.nx ();
-      size_t ny = am.ny ();
+      for (unsigned int ic = 0; ic < am.column_steps (); ++ic) {
 
-      db::AreaMap::area_type amax = am.pixel_area ();
+        const db::AreaMap &am1 = am.area_map (ir, ic);
 
-      //  Create the fill cell instances
-      for (size_t i = 0; i < nx; ++i) {
+        size_t nx = am1.nx ();
+        size_t ny = am1.ny ();
 
-        for (size_t j = 0; j < ny; ) {
+        //  Create the fill cell instances
+        for (size_t i = 0; i < nx; ++i) {
 
-          size_t jj = j + 1;
-          if (am.get (i, j) >= amax) {
+          for (size_t j = 0; j < ny; ) {
 
-            while (jj != ny && am.get (i, jj) >= amax) {
-              ++jj;
+            size_t jj = j + 1;
+            if (am1.get (i, j) == am1.pixel_area ()) {
+
+              while (jj != ny && am1.get (i, jj) == am1.pixel_area ()) {
+                ++jj;
+              }
+
+              ninsts += (jj - j);
+
+              db::Vector p0 = (am1.p0 () - db::Point ()) - kernel_origin;
+              p0 += db::Vector (i * am1.d ().x (), j * am1.d ().y ());
+
+              db::CellInstArray array;
+
+              if (jj > j + 1) {
+                array = db::CellInstArray (db::CellInst (fill_cell_index), db::Trans (p0), db::Vector (0, am1.d ().y ()), db::Vector (), (unsigned long) (jj - j), 1);
+              } else {
+                array = db::CellInstArray (db::CellInst (fill_cell_index), db::Trans (p0));
+              }
+
+              cell->insert (array);
+
+              if (remaining_parts) {
+                if (am1.d ().y () == am1.p ().y ()) {
+                  filled_regions.push_back (db::Polygon (db::Box (db::Point (), db::Point (am1.p ().x (), am1.p ().y () * (jj - j))).moved (kernel_origin + p0)));
+                } else {
+                  for (size_t k = 0; k < jj - j; ++k) {
+                    filled_regions.push_back (db::Polygon (db::Box (db::Point (), db::Point () + am1.p ()).moved (kernel_origin + p0 + db::Vector (0, am1.d ().y () * db::Coord (k)))));
+                  }
+                }
+              }
+
+              any_fill = true;
+
             }
 
-            ninsts += (jj - j);
-
-            db::Vector p0 (inverse_shear.trans (am.p0 ()) - kernel_origin);
-            p0 += row_step * long (i) + column_step * long (j);
-
-            db::CellInstArray array;
-
-            if (jj > j + 1) {
-              array = db::CellInstArray (db::CellInst (fill_cell_index), db::Trans (p0), column_step, db::Vector (), (unsigned long) (jj - j), 1);
-            } else {
-              array = db::CellInstArray (db::CellInst (fill_cell_index), db::Trans (p0));
-            }
-
-            cell->insert (array);
-
-            if (remaining_parts) {
-              filled_regions.push_back (produce_fill_stripe (row_step, column_step, long (jj - j)).moved (p0 + kernel_origin));
-            }
-
-            any_fill = true;
+            j = jj;
 
           }
-
-          j = jj;
 
         }
 
@@ -644,7 +661,7 @@ fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_ce
     }
 
     if (tl::verbosity () >= 30 && ninsts > 0) {
-      tl::info << "Part " << fpr->to_string ();
+      tl::info << "Part " << fp->to_string ();
       tl::info << "Created " << ninsts << " instances";
     }
 
@@ -772,6 +789,8 @@ fill_region_repeat (db::Cell *cell, const db::Region &fr, db::cell_index_type fi
 
     new_fill_region.swap (remaining);
     fill_region = &new_fill_region;
+
+    break; // @@@
 
   }
 }

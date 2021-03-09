@@ -501,9 +501,19 @@ public:
   AreaMap ();
 
   /**
+   *  @brief Copy constructor
+   */
+  AreaMap (const AreaMap &);
+
+  /**
    *  @brief Constructor
    */
   AreaMap (const db::Point &p0, const db::Vector &d, size_t nx, size_t ny);
+
+  /**
+   *  @brief Constructor with pixel size
+   */
+  AreaMap (const db::Point &p0, const db::Vector &d, const db::Vector &p, size_t nx, size_t ny);
 
   /**
    *  @brief Destructor
@@ -511,9 +521,19 @@ public:
   ~AreaMap ();
 
   /**
+   *  @brief Assignment
+   */
+  AreaMap &operator= (const AreaMap &);
+
+  /**
    *  @brief Reinitialize
    */
   void reinitialize (const db::Point &p0, const db::Vector &d, size_t nx, size_t ny);
+
+  /**
+   *  @brief Reinitialize with pixel size
+   */
+  void reinitialize (const db::Point &p0, const db::Vector &d, const db::Vector &p, size_t nx, size_t ny);
 
   /**
    *  @brief Swap of two maps
@@ -577,12 +597,17 @@ public:
   }
 
   /**
+   *  @brief The pixel size (must be less than d)
+   */
+  const db::Vector &p () const
+  {
+    return m_p;
+  }
+
+  /**
    *  @brief Compute the bounding box of the area map
    */
-  db::Box bbox () const
-  {
-    return db::Box (m_p0, m_p0 + db::Vector (db::Coord (m_nx) * m_d.x (), db::Coord (m_ny) * m_d.y ()));
-  }
+  db::Box bbox () const;
 
   /**
    *  @brief Compute the total area
@@ -594,7 +619,7 @@ public:
    */
   area_type pixel_area () const
   {
-    return area_type (m_d.x ()) * area_type (m_d.y ());
+    return area_type (m_p.x ()) * area_type (m_p.y ());
   }
 
   /**
@@ -606,11 +631,8 @@ private:
   area_type *mp_av;
   db::Point m_p0;
   db::Vector m_d;
+  db::Vector m_p;
   size_t m_nx, m_ny;
-
-  //  no copying
-  AreaMap (const AreaMap &);
-  AreaMap &operator= (const AreaMap &);
 };
 
 /**

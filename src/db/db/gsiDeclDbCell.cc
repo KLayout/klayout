@@ -1886,9 +1886,10 @@ Class<db::Cell> decl_Cell ("db", "Cell",
   ) +
   gsi::method_ext ("fill_region_multi", &fill_region_repeat, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("kernel_origin"), gsi::arg ("row_step"), gsi::arg ("column_step"), gsi::arg ("fill_margin"), gsi::arg ("remaining_polygons"),
     "@brief Fills the given region with cells of the given type in enhanced mode with iterations\n"
-    "This version operates like \\fill_region, but repeates the fill generation until no further fill cells can be placed. "
+    "This version operates like \\fill_region, but repeats the fill generation until no further fill cells can be placed. "
     "As the fill pattern origin changes between the iterations, narrow regions can be filled which cannot with a fixed fill pattern origin. "
-    "The \\fill_margin parameter is important as it controls the distance between fill cells with a different origin and therefore pitch-incompatible arrays.\n"
+    "The \\fill_margin parameter is important as it controls the distance between fill cells with a different origin and therefore "
+    "introduces a safety distance between pitch-incompatible arrays.\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +

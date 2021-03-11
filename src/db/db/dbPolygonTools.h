@@ -640,8 +640,10 @@ private:
  *
  *  This will decompose the polygon and produce per-pixel area values for the given 
  *  polygon. The area contributions will be added to the given area map.
+ *
+ *  Returns a value indicating whether the map will be non-empty.
  */
-void DB_PUBLIC rasterize (const db::Polygon &polygon, db::AreaMap &am);
+bool DB_PUBLIC rasterize (const db::Polygon &polygon, db::AreaMap &am);
 
 /**
  *  @brief Minkowsky sum of an edge and a polygon

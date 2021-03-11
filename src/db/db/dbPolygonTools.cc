@@ -1617,14 +1617,19 @@ AreaMap::reinitialize (const db::Point &p0, const db::Vector &d, const db::Vecto
   m_p0 = p0;
   m_d = d;
   m_p = db::Vector (std::min (d.x (), p.x ()), std::min (d.y (), p.y ()));
-  m_nx = nx;
-  m_ny = ny;
 
-  if (mp_av) {
-    delete mp_av;
+  if (nx != m_nx || ny != m_ny) {
+
+    m_nx = nx;
+    m_ny = ny;
+
+    if (mp_av) {
+      delete mp_av;
+    }
+
+    mp_av = new area_type [nx * ny];
+
   }
-
-  mp_av = new area_type [nx * ny];
 
   clear ();
 }
@@ -1645,6 +1650,7 @@ AreaMap::swap (AreaMap &other)
 {
   std::swap (m_p0, other.m_p0);
   std::swap (m_d, other.m_d);
+  std::swap (m_p, other.m_p);
   std::swap (m_nx, other.m_nx);
   std::swap (m_ny, other.m_ny);
   std::swap (mp_av, other.mp_av);
@@ -1676,7 +1682,7 @@ AreaMap::bbox () const
 // -------------------------------------------------------------------------
 //  Implementation of rasterize
 
-void
+bool
 rasterize (const db::Polygon &polygon, db::AreaMap &am)
 {
   typedef db::AreaMap::area_type area_type;
@@ -1685,7 +1691,7 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
 
   //  check if the polygon overlaps the rasterization area. Otherwise, we simply do nothing.
   if (! pbox.overlaps (box)) {
-    return;
+    return false;
   }
 
   db::Coord ymin = box.bottom (), ymax = box.top ();
@@ -1702,7 +1708,7 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
 
   //  no scanning required (i.e. degenerated polygon) -> do nothing 
   if (iy0 == iy1 || ix0 == ix1) {
-    return;
+    return false;
   }
 
   //  collect edges 
@@ -1733,7 +1739,7 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
   }
 
   if (c == edges.end ()) {
-    return;
+    return false;
   }
 
   std::vector <db::Edge>::iterator f = c;
@@ -1876,6 +1882,7 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
 
   }
 
+  return true;
 }
 
 // -------------------------------------------------------------------------

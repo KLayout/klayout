@@ -104,7 +104,7 @@ ExpressionParserContext::where () const
 
       int line = 1;
       size_t col = 0;
-      for (size_t p = 0; p < len; ++p, ++col) {
+      for (size_t p = 0; p < pos; ++p) {
         if (text [p] == '\n') {
           ++line;
           col = 1;
@@ -2044,7 +2044,7 @@ public:
         throw EvalError (tl::sprintf (tl::to_string (tr ("Not a valid object for a method call (not an object) - value is %s")), v->to_parsable_string ()), m_context);
       }
     } else {
-      throw EvalError (tl::sprintf (tl::to_string (tr ("Not a valid object for a method call (wrong type) - value is %1")), v->to_parsable_string ()), m_context);
+      throw EvalError (tl::sprintf (tl::to_string (tr ("Not a valid object for a method call (wrong type) - value is %s")), v->to_parsable_string ()), m_context);
     }
 
     tl::Variant o;

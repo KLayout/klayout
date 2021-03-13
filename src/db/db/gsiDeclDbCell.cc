@@ -1297,33 +1297,21 @@ static void move_tree_shapes3 (db::Cell *cell, db::Cell &source_cell, const db::
 }
 
 static void
-fill_region1 (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Point *origin)
-{
-  db::fill_region (cell, fr, fill_cell_index, fc_box, origin ? *origin : db::Point (), origin == 0, 0, db::Vector (), 0);
-}
-
-static void
-fill_region1d (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point *origin)
-{
-  db::fill_region (cell, fr, fill_cell_index, kernel_origin, row_step, column_step, origin ? *origin : db::Point (), origin == 0, 0, db::Vector (), 0);
-}
-
-static void
-fill_region2 (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Point *origin,
+fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Point *origin,
               db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons)
 {
   db::fill_region (cell, fr, fill_cell_index, fc_box, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons);
 }
 
 static void
-fill_region2d (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point *origin,
-              db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons)
+fill_region_diamond (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point *origin,
+                     db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons)
 {
   db::fill_region (cell, fr, fill_cell_index, kernel_origin, row_step, column_step, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons);
 }
 
 static void
-fill_region_repeat (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step,
+fill_region_multi (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step,
                     const db::Vector &fill_margin, db::Region *remaining_polygons)
 {
   db::fill_region_repeat (cell, fr, fill_cell_index, kernel_origin, row_step, column_step, fill_margin, remaining_polygons);
@@ -1510,6 +1498,8 @@ static db::Cell *dup_cell (const db::Cell *cell)
 
   return new_cell;
 }
+
+static db::Point default_origin;
 
 Class<db::Cell> decl_Cell ("db", "Cell",
   gsi::method ("name", &db::Cell::get_basic_name,
@@ -1784,46 +1774,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method_ext ("fill_region", &fill_region1, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("fc_box"), gsi::arg ("origin"),
-    "@brief Fills the given region with cells of the given type\n"
-    "@param region The region to fill\n"
-    "@param fill_cell_index The fill cell to place\n"
-    "@param fc_box The fill cell's footprint (the 'fill kernel')\n"
-    "@param origin The global origin of the fill pattern or nil to allow local (per-polygon) optimization\n"
-    "\n"
-    "This method creates a regular pattern of fill cells to cover the interior of the given region as far as possible. "
-    "This process is also known as tiling. This implementation supports rectangular (not necessarily square) tile cells. "
-    "The tile cell's footprint is given by the fc_box parameter and the cells will be arranged with their footprints forming "
-    "a seamless array.\n"
-    "\n"
-    "The algorithm supports a global fill raster as well as local (per-polygon) origin optimization. In the latter case "
-    "the origin of the regular raster is optimized per individual polygon of the fill region.\n"
-    "\n"
-    "The implementation will basically try to find a repetition pattern of the tile cell's footprint (the 'fill kernel') "
-    "and fit any many instances as possible into the given region. This version will use a fixed pattern while "
-    "a more elaborate version of this method is available which tries to optimize the number of fill cell instances. "
-    "This elaborate version will also return information about the non-filled parts.\n"
-    "\n"
-    "There is also a version available which offers a diamond-shape generic fill kernel instead of a box.\n"
-    "\n"
-    "This method has been introduced in version 0.23.\n"
-  ) +
-  gsi::method_ext ("fill_region", &fill_region1d, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("kernel_origin"), gsi::arg ("row_step"), gsi::arg ("column_step"), gsi::arg ("origin"),
-    "@brief Fills the given region with cells of the given type (diamond fill kernel)\n"
-    "@param region The region to fill\n"
-    "@param fill_cell_index The fill cell to place\n"
-    "@param kernel_origin The fill cell's footprint\n"
-    "@param row_step The fill cell's footprint\n"
-    "@param column_step The fill cell's footprint\n"
-    "@param origin The global origin of the fill pattern or nil to allow local (per-polygon) optimization\n"
-    "\n"
-    "This version is similar to the version providing a rectangular fill kernel, but it offers a more generic, diamond-shaped kernel.\n"
-    "The kerne is defined by an origin and two vectors (row_step and column_step) which span the diamond.\n"
-    "This version will try to fit as many of these diamond-shaped kernels into the region to fill.\n"
-    "\n"
-    "This variant has been introduced in version 0.27.\n"
-  ) +
-  gsi::method_ext ("fill_region", &fill_region2, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("fc_box"), gsi::arg ("origin"), gsi::arg ("remaining_parts"), gsi::arg ("fill_margin"), gsi::arg ("remaining_polygons"),
+  gsi::method_ext ("fill_region", &fill_region, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("fc_box"), gsi::arg ("origin", &default_origin, "(0, 0)"), gsi::arg ("remaining_parts", (db::Region *)0, "nil"), gsi::arg ("fill_margin", db::Vector ()), gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
     "@brief Fills the given region with cells of the given type (extended version)\n"
     "@param region The region to fill\n"
     "@param fill_cell_index The fill cell to place\n"
@@ -1833,9 +1784,19 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@param fill_margin See explanation below\n"
     "@param remaining_polygons See explanation below\n"
     "\n"
-    "First of all, this method behaves like the simple form. In addition, it can be configured to return information about the "
-    "parts which could not be filled. Those can be full polygons from the input (without a chance to fill) or parts of original polygons "
-    "which are worth being fed into the fill algorithm again.\n"
+    "This method creates a regular pattern of fill cells to cover the interior of the given region as far as possible. "
+    "This process is also known as tiling. This implementation supports rectangular (not necessarily square) tile cells. "
+    "The tile cell's footprint is given by the fc_box parameter and the cells will be arranged with their footprints forming "
+    "a seamless array.\n"
+    "\n"
+    "The algorithm supports a global fill raster as well as local (per-polygon) origin optimization. In the latter case "
+    "the origin of the regular raster is optimized per individual polygon of the fill region. To enable optimization, pass 'nil' to "
+    "the 'origin' argument.\n"
+    "\n"
+    "The implementation will basically try to find a repetition pattern of the tile cell's footprint "
+    "and produce instances which fit entirely into the fill region.\n"
+    "\n"
+    "There is also a version available which offers skew step vectors as a generalization of the orthogonal ones.\n"
     "\n"
     "If the 'remaining_parts' argument is non-nil, the corresponding region will receive the parts of the polygons which are not "
     "covered by tiles. Basically the tiles are subtracted from the original polygons. A margin can be specified which is applied "
@@ -1864,19 +1825,19 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "end\n"
     "@/code\n"
     "\n"
-    "This method has been introduced in version 0.23.\n"
+    "This method has been introduced in version 0.23 and generalized in version 0.27 with default values.\n"
   ) +
-  gsi::method_ext ("fill_region", &fill_region2d, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("kernel_origin"), gsi::arg ("row_step"), gsi::arg ("column_step"), gsi::arg ("origin"), gsi::arg ("remaining_parts"), gsi::arg ("fill_margin"), gsi::arg ("remaining_polygons"),
-    "@brief Fills the given region with cells of the given type (diamond fill kernel, extended version)\n"
+  gsi::method_ext ("fill_region", &fill_region_diamond, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("kernel_origin"), gsi::arg ("row_step"), gsi::arg ("column_step"), gsi::arg ("origin", &default_origin, "(0, 0)"), gsi::arg ("remaining_parts", (db::Region *)0, "nil"), gsi::arg ("fill_margin", db::Vector ()), gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
+    "@brief Fills the given region with cells of the given type (skew step version)\n"
     "@param region The region to fill\n"
     "@param fill_cell_index The fill cell to place\n"
     "@param kernel_origin The fill cell's footprint\n"
     "@param row_step The fill cell's footprint\n"
     "@param column_step The fill cell's footprint\n"
     "@param origin The global origin of the fill pattern or nil to allow local (per-polygon) optimization\n"
-    "@param remaining_parts See explanation below\n"
-    "@param fill_margin See explanation below\n"
-    "@param remaining_polygons See explanation below\n"
+    "@param remaining_parts See explanation in other version\n"
+    "@param fill_margin See explanation in other version\n"
+    "@param remaining_polygons See explanation in other version\n"
     "\n"
     "This version is similar to the version providing a rectangular fill kernel, but it offers a more generic, diamond-shaped kernel.\n"
     "The kerne is defined by an origin and two vectors (row_step and column_step) which span the diamond.\n"
@@ -1884,7 +1845,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This variant has been introduced in version 0.27.\n"
   ) +
-  gsi::method_ext ("fill_region_multi", &fill_region_repeat, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("kernel_origin"), gsi::arg ("row_step"), gsi::arg ("column_step"), gsi::arg ("fill_margin"), gsi::arg ("remaining_polygons"),
+  gsi::method_ext ("fill_region_multi", &fill_region_multi, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("kernel_origin"), gsi::arg ("row_step"), gsi::arg ("column_step"), gsi::arg ("fill_margin", db::Vector ()), gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
     "@brief Fills the given region with cells of the given type in enhanced mode with iterations\n"
     "This version operates like \\fill_region, but repeats the fill generation until no further fill cells can be placed. "
     "As the fill pattern origin changes between the iterations, narrow regions can be filled which cannot with a fixed fill pattern origin. "

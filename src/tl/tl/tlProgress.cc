@@ -131,7 +131,9 @@ ProgressGarbageCollector::~ProgressGarbageCollector ()
 static tl::ThreadStorage<ProgressAdaptor **> s_thread_data;
 
 Progress::Progress (const std::string &desc, size_t yield_interval)
-  : m_desc (desc), m_title (desc),
+  : m_desc (desc),
+    m_final (false),
+    m_title (desc),
     m_interval_count (0), 
     m_yield_interval (yield_interval), 
     m_last_value (-1.0),

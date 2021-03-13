@@ -618,6 +618,9 @@ void
 TilingProcessorJob::start (const std::string &job_description)
 {
   m_progress = tl::RelativeProgress (job_description, tasks (), 1);
+  //  prevents child progress objects from showing
+  m_progress.set_final (true);
+
   tl::JobBase::start ();
 }
 

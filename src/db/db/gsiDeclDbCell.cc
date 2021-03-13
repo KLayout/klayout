@@ -1298,23 +1298,23 @@ static void move_tree_shapes3 (db::Cell *cell, db::Cell &source_cell, const db::
 
 static void
 fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Point *origin,
-              db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons)
+              db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
 {
-  db::fill_region (cell, fr, fill_cell_index, fc_box, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons);
+  db::fill_region (cell, fr, fill_cell_index, fc_box, origin ? *origin : db::Point (), origin == 0 || !glue_box.empty (), remaining_parts, fill_margin, remaining_polygons, glue_box);
 }
 
 static void
-fill_region_diamond (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point *origin,
-                     db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons)
+fill_region_skew (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point *origin,
+                     db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
 {
-  db::fill_region (cell, fr, fill_cell_index, kernel_origin, row_step, column_step, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons);
+  db::fill_region (cell, fr, fill_cell_index, kernel_origin, row_step, column_step, origin ? *origin : db::Point (), origin == 0 || !glue_box.empty (), remaining_parts, fill_margin, remaining_polygons, glue_box);
 }
 
 static void
 fill_region_multi (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step,
-                    const db::Vector &fill_margin, db::Region *remaining_polygons)
+                    const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Point &origin, const db::Box &glue_box)
 {
-  db::fill_region_repeat (cell, fr, fill_cell_index, kernel_origin, row_step, column_step, fill_margin, remaining_polygons);
+  db::fill_region_repeat (cell, fr, fill_cell_index, kernel_origin, row_step, column_step, fill_margin, remaining_polygons, origin, glue_box);
 }
 
 static db::Instance cell_inst_dtransform_simple (db::Cell *cell, const db::Instance &inst, const db::DTrans &t)
@@ -1774,7 +1774,14 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method_ext ("fill_region", &fill_region, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("fc_box"), gsi::arg ("origin", &default_origin, "(0, 0)"), gsi::arg ("remaining_parts", (db::Region *)0, "nil"), gsi::arg ("fill_margin", db::Vector ()), gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
+  gsi::method_ext ("fill_region", &fill_region, gsi::arg ("region"),
+                                                gsi::arg ("fill_cell_index"),
+                                                gsi::arg ("fc_box"),
+                                                gsi::arg ("origin", &default_origin, "(0, 0)"),
+                                                gsi::arg ("remaining_parts", (db::Region *)0, "nil"),
+                                                gsi::arg ("fill_margin", db::Vector ()),
+                                                gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
+                                                gsi::arg ("glue_box", db::Box ()),
     "@brief Fills the given region with cells of the given type (extended version)\n"
     "@param region The region to fill\n"
     "@param fill_cell_index The fill cell to place\n"
@@ -1783,6 +1790,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@param remaining_parts See explanation below\n"
     "@param fill_margin See explanation below\n"
     "@param remaining_polygons See explanation below\n"
+    "@param glue_box Guarantees fill cell compatibility to neighbor regions in enhanced mode\n"
     "\n"
     "This method creates a regular pattern of fill cells to cover the interior of the given region as far as possible. "
     "This process is also known as tiling. This implementation supports rectangular (not necessarily square) tile cells. "
@@ -1825,9 +1833,27 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "end\n"
     "@/code\n"
     "\n"
-    "This method has been introduced in version 0.23 and generalized in version 0.27 with default values.\n"
+    "The glue box parameter supports fill cell array compatibility with neighboring regions. This is specifically useful when putting the fill_cell "
+    "method into a tiling processor. Fill cell array compatibility means that the fill cell array continues over tile boundaries. This is easy with an origin: "
+    "you can chose the origin identically over all tiles which is sufficient to guarantee fill cell array compatibility across the tiles. "
+    "However there is no freedom of choice of the origin then and fill cell placement may not be optimal. To enable the origin for the tile boundary only, "
+    "a glue box can given. The origin will then be used only when the polygons to fill not entirely inside and not at the border of the glue box. Hence, "
+    "while a certain degree of freedom is present for the placement of fill cells inside the glue box, the fill cells are guaranteed to be placed "
+    "at the raster implied by origin at the glue box border and beyond. To ensure fill cell compatibility inside the tiling processor, it is sufficient to use the tile "
+    "box as the glue box.\n"
+    "\n"
+    "This method has been introduced in version 0.23 and enhanced in version 0.27.\n"
   ) +
-  gsi::method_ext ("fill_region", &fill_region_diamond, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("kernel_origin"), gsi::arg ("row_step"), gsi::arg ("column_step"), gsi::arg ("origin", &default_origin, "(0, 0)"), gsi::arg ("remaining_parts", (db::Region *)0, "nil"), gsi::arg ("fill_margin", db::Vector ()), gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
+  gsi::method_ext ("fill_region", &fill_region_skew, gsi::arg ("region"),
+                                                     gsi::arg ("fill_cell_index"),
+                                                     gsi::arg ("kernel_origin"),
+                                                     gsi::arg ("row_step"),
+                                                     gsi::arg ("column_step"),
+                                                     gsi::arg ("origin", &default_origin, "(0, 0)"),
+                                                     gsi::arg ("remaining_parts", (db::Region *)0, "nil"),
+                                                     gsi::arg ("fill_margin", db::Vector ()),
+                                                     gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
+                                                     gsi::arg ("glue_box", db::Box ()),
     "@brief Fills the given region with cells of the given type (skew step version)\n"
     "@param region The region to fill\n"
     "@param fill_cell_index The fill cell to place\n"
@@ -1845,12 +1871,22 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This variant has been introduced in version 0.27.\n"
   ) +
-  gsi::method_ext ("fill_region_multi", &fill_region_multi, gsi::arg ("region"), gsi::arg ("fill_cell_index"), gsi::arg ("kernel_origin"), gsi::arg ("row_step"), gsi::arg ("column_step"), gsi::arg ("fill_margin", db::Vector ()), gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
+  gsi::method_ext ("fill_region_multi", &fill_region_multi, gsi::arg ("region"),
+                                                            gsi::arg ("fill_cell_index"),
+                                                            gsi::arg ("kernel_origin"),
+                                                            gsi::arg ("row_step"),
+                                                            gsi::arg ("column_step"),
+                                                            gsi::arg ("fill_margin", db::Vector ()),
+                                                            gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
+                                                            gsi::arg ("origin", db::Point ()),
+                                                            gsi::arg ("glue_box", db::Box ()),
     "@brief Fills the given region with cells of the given type in enhanced mode with iterations\n"
     "This version operates like \\fill_region, but repeats the fill generation until no further fill cells can be placed. "
     "As the fill pattern origin changes between the iterations, narrow regions can be filled which cannot with a fixed fill pattern origin. "
     "The \\fill_margin parameter is important as it controls the distance between fill cells with a different origin and therefore "
     "introduces a safety distance between pitch-incompatible arrays.\n"
+    "\n"
+    "The origin is ignored unless a glue box is given. See \\fill_region for a description of this concept.\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +

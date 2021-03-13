@@ -46,6 +46,7 @@ class Region;
  *
  *  @param remaining_parts If non-null, this vector receives the parts of the polygons not covered by the tiling cells (plus the fill_margin)
  *  @param fill_margin Only used if remaining_parts is not 0 (see there)
+ *  @param glue_box Guarantees boundary compatibility
  *
  *  Return value: true, if the polygon could be filled, false if no fill tile at all could be applied (remaining_parts will not be fed in that case)
  *
@@ -77,15 +78,22 @@ class Region;
  *
  *  As a practical consequence, if all fill cell geometries are within the kernel's boundary, they will also
  *  be within the polygon to fill.
+ *
+ *  If the glue box is non-empty, fill cells are guaranteed to use the global origin even in enhanced mode if
+ *  unless they are entirely inside and not touching the boundary of the glue box.
+ *  The glue box is useful to put the fill algorithm inside a tiling processor. In this case, the glue box
+ *  is the tile box while the actual fill region can be larger to allow overlapping tiles.
+ *
+ *  In enhanced fill mode, the origin is ignored unless a glue box is given.
  */
 
 DB_PUBLIC bool 
 fill_region (db::Cell *cell, const db::Polygon &fp, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Point &origin, bool enhanced_fill, 
-             std::vector <db::Polygon> *remaining_parts = 0, const db::Vector &fill_margin = db::Vector ());
+             std::vector <db::Polygon> *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (), const db::Box &glue_box = db::Box ());
 
 DB_PUBLIC bool
 fill_region (db::Cell *cell, const db::Polygon &fp, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
-             std::vector <db::Polygon> *remaining_parts = 0, const db::Vector &fill_margin = db::Vector ());
+             std::vector <db::Polygon> *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (), const db::Box &glue_box = db::Box ());
 
 
 /**
@@ -94,25 +102,31 @@ fill_region (db::Cell *cell, const db::Polygon &fp, db::cell_index_type fill_cel
  *  remaining_parts (if non-null) will receive the non-filled parts of partially filled polygons. 
  *  fill_margin will specify the margin around the filled area when computing (through subtraction of the tiled area) the remaining_parts.
  *  remaining_polygons (if non-null) will receive the polygons which could not be filled at all.
+ *
+ *  In enhanced fill mode, the origin is ignored unless a glue box is given.
  */
 
 DB_PUBLIC void
 fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Point &origin, bool enhanced_fill, 
-             db::Region *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (), db::Region *remaining_polygons = 0);
+             db::Region *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (), db::Region *remaining_polygons = 0, const db::Box &glue_box = db::Box ());
 
 DB_PUBLIC void
 fill_region (db::Cell *cell, const db::Region &fp, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
-             db::Region *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (), db::Region *remaining_polygons = 0);
+             db::Region *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (), db::Region *remaining_polygons = 0, const db::Box &glue_box = db::Box ());
 
 /**
  *  @brief An iterative version for enhanced fill
  *
  *  This version operates like the region-based fill_region version, but repeates the fill step until no further fill cells can be placed.
  *  The remaining parts will be placed inside "remaining_polygons" unless this pointer is null.
+ *
+ *  This version implies enhanced_mode (see "fill_region").
+ *
+ *  The origin is ignored unless a glue box is given.
  */
 DB_PUBLIC void
 fill_region_repeat (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index,
                     const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step,
-                    const db::Vector &fill_margin, db::Region *remaining_polygons = 0);
+                    const db::Vector &fill_margin, db::Region *remaining_polygons = 0, const db::Point &origin = db::Point (), const db::Box &glue_box = db::Box ());
 
 }

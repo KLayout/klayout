@@ -66,18 +66,18 @@ public:
     db::NetlistCompareLogger::end_netlist (a, b);
   }
 
-  virtual void device_class_mismatch (const db::DeviceClass *a, const db::DeviceClass *b)
+  virtual void device_class_mismatch (const db::DeviceClass *a, const db::DeviceClass *b, const std::string &msg)
   {
     if (cb_device_class_mismatch.can_issue ()) {
-      cb_device_class_mismatch.issue<GenericNetlistCompareLogger> (&GenericNetlistCompareLogger::device_class_mismatch_fb, a, b);
+      cb_device_class_mismatch.issue<GenericNetlistCompareLogger, const db::DeviceClass *, const db::DeviceClass *, const std::string &> (&GenericNetlistCompareLogger::device_class_mismatch_fb, a, b, msg);
     } else {
       db::NetlistCompareLogger::device_class_mismatch (a, b);
     }
   }
 
-  void device_class_mismatch_fb (const db::DeviceClass *a, const db::DeviceClass *b)
+  void device_class_mismatch_fb (const db::DeviceClass *a, const db::DeviceClass *b, const std::string &msg)
   {
-    db::NetlistCompareLogger::device_class_mismatch (a, b);
+    db::NetlistCompareLogger::device_class_mismatch (a, b, msg);
   }
 
   virtual void begin_circuit (const db::Circuit *a, const db::Circuit *b)
@@ -94,46 +94,46 @@ public:
     db::NetlistCompareLogger::begin_circuit (a, b);
   }
 
-  virtual void end_circuit (const db::Circuit *a, const db::Circuit *b, bool matching)
+  virtual void end_circuit (const db::Circuit *a, const db::Circuit *b, bool matching, const std::string &msg)
   {
     if (cb_end_circuit.can_issue ()) {
-      cb_end_circuit.issue<GenericNetlistCompareLogger> (&GenericNetlistCompareLogger::end_circuit_fb, a, b, matching);
+      cb_end_circuit.issue<GenericNetlistCompareLogger, const db::Circuit *, const db::Circuit *, bool, const std::string &> (&GenericNetlistCompareLogger::end_circuit_fb, a, b, matching, msg);
     } else {
       db::NetlistCompareLogger::end_circuit (a, b, matching);
     }
   }
 
-  void end_circuit_fb (const db::Circuit *a, const db::Circuit *b, bool matching)
+  void end_circuit_fb (const db::Circuit *a, const db::Circuit *b, bool matching, const std::string &msg)
   {
-    db::NetlistCompareLogger::end_circuit (a, b, matching);
+    db::NetlistCompareLogger::end_circuit (a, b, matching, msg);
   }
 
-  virtual void circuit_skipped (const db::Circuit *a, const db::Circuit *b)
+  virtual void circuit_skipped (const db::Circuit *a, const db::Circuit *b, const std::string &msg)
   {
     if (cb_circuit_skipped.can_issue ()) {
-      cb_circuit_skipped.issue<GenericNetlistCompareLogger> (&GenericNetlistCompareLogger::circuit_skipped_fb, a, b);
+      cb_circuit_skipped.issue<GenericNetlistCompareLogger, const db::Circuit *, const db::Circuit *, const std::string &> (&GenericNetlistCompareLogger::circuit_skipped_fb, a, b, msg);
     } else {
       db::NetlistCompareLogger::circuit_skipped (a, b);
     }
   }
 
-  void circuit_skipped_fb (const db::Circuit *a, const db::Circuit *b)
+  void circuit_skipped_fb (const db::Circuit *a, const db::Circuit *b, const std::string &msg)
   {
-    db::NetlistCompareLogger::circuit_skipped (a, b);
+    db::NetlistCompareLogger::circuit_skipped (a, b, msg);
   }
 
-  virtual void circuit_mismatch (const db::Circuit *a, const db::Circuit *b)
+  virtual void circuit_mismatch (const db::Circuit *a, const db::Circuit *b, const std::string &msg)
   {
     if (cb_circuit_mismatch.can_issue ()) {
-      cb_circuit_mismatch.issue<GenericNetlistCompareLogger> (&GenericNetlistCompareLogger::circuit_mismatch_fb, a, b);
+      cb_circuit_mismatch.issue<GenericNetlistCompareLogger, const db::Circuit *, const db::Circuit *, const std::string &> (&GenericNetlistCompareLogger::circuit_mismatch_fb, a, b, msg);
     } else {
       db::NetlistCompareLogger::circuit_mismatch (a, b);
     }
   }
 
-  void circuit_mismatch_fb (const db::Circuit *a, const db::Circuit *b)
+  void circuit_mismatch_fb (const db::Circuit *a, const db::Circuit *b, const std::string &msg)
   {
-    db::NetlistCompareLogger::circuit_mismatch (a, b);
+    db::NetlistCompareLogger::circuit_mismatch (a, b, msg);
   }
 
   virtual void match_nets (const db::Net *a, const db::Net *b)
@@ -150,32 +150,32 @@ public:
     db::NetlistCompareLogger::match_nets (a, b);
   }
 
-  virtual void match_ambiguous_nets (const db::Net *a, const db::Net *b)
+  virtual void match_ambiguous_nets (const db::Net *a, const db::Net *b, const std::string &msg)
   {
     if (cb_match_ambiguous_nets.can_issue ()) {
-      cb_match_ambiguous_nets.issue<GenericNetlistCompareLogger> (&GenericNetlistCompareLogger::match_ambiguous_nets_fb, a, b);
+      cb_match_ambiguous_nets.issue<GenericNetlistCompareLogger, const db::Net *, const db::Net *, const std::string &> (&GenericNetlistCompareLogger::match_ambiguous_nets_fb, a, b, msg);
     } else {
       db::NetlistCompareLogger::match_ambiguous_nets (a, b);
     }
   }
 
-  void match_ambiguous_nets_fb (const db::Net *a, const db::Net *b)
+  void match_ambiguous_nets_fb (const db::Net *a, const db::Net *b, const std::string &msg)
   {
-    db::NetlistCompareLogger::match_ambiguous_nets (a, b);
+    db::NetlistCompareLogger::match_ambiguous_nets (a, b, msg);
   }
 
-  virtual void net_mismatch (const db::Net *a, const db::Net *b)
+  virtual void net_mismatch (const db::Net *a, const db::Net *b, const std::string &msg)
   {
     if (cb_net_mismatch.can_issue ()) {
-      cb_net_mismatch.issue<GenericNetlistCompareLogger> (&GenericNetlistCompareLogger::net_mismatch_fb, a, b);
+      cb_net_mismatch.issue<GenericNetlistCompareLogger, const db::Net *, const db::Net *, const std::string &> (&GenericNetlistCompareLogger::net_mismatch_fb, a, b, msg);
     } else {
       db::NetlistCompareLogger::net_mismatch (a, b);
     }
   }
 
-  void net_mismatch_fb (const db::Net *a, const db::Net *b)
+  void net_mismatch_fb (const db::Net *a, const db::Net *b, const std::string &msg)
   {
-    db::NetlistCompareLogger::net_mismatch (a, b);
+    db::NetlistCompareLogger::net_mismatch (a, b, msg);
   }
 
   virtual void match_devices (const db::Device *a, const db::Device *b)
@@ -220,18 +220,18 @@ public:
     db::NetlistCompareLogger::match_devices_with_different_device_classes (a, b);
   }
 
-  virtual void device_mismatch (const db::Device *a, const db::Device *b)
+  virtual void device_mismatch (const db::Device *a, const db::Device *b, const std::string &msg)
   {
     if (cb_device_mismatch.can_issue ()) {
-      cb_device_mismatch.issue<GenericNetlistCompareLogger> (&GenericNetlistCompareLogger::device_mismatch_fb, a, b);
+      cb_device_mismatch.issue<GenericNetlistCompareLogger, const db::Device *, const db::Device *, const std::string &> (&GenericNetlistCompareLogger::device_mismatch_fb, a, b, msg);
     } else {
       db::NetlistCompareLogger::device_mismatch (a, b);
     }
   }
 
-  void device_mismatch_fb (const db::Device *a, const db::Device *b)
+  void device_mismatch_fb (const db::Device *a, const db::Device *b, const std::string &msg)
   {
-    db::NetlistCompareLogger::device_mismatch (a, b);
+    db::NetlistCompareLogger::device_mismatch (a, b, msg);
   }
 
   virtual void match_pins (const db::Pin *a, const db::Pin *b)
@@ -248,18 +248,18 @@ public:
     db::NetlistCompareLogger::match_pins (a, b);
   }
 
-  virtual void pin_mismatch (const db::Pin *a, const db::Pin *b)
+  virtual void pin_mismatch (const db::Pin *a, const db::Pin *b, const std::string &msg)
   {
     if (cb_pin_mismatch.can_issue ()) {
-      cb_pin_mismatch.issue<GenericNetlistCompareLogger> (&GenericNetlistCompareLogger::pin_mismatch_fb, a, b);
+      cb_pin_mismatch.issue<GenericNetlistCompareLogger, const db::Pin *, const db::Pin *, const std::string &> (&GenericNetlistCompareLogger::pin_mismatch_fb, a, b, msg);
     } else {
       db::NetlistCompareLogger::pin_mismatch (a, b);
     }
   }
 
-  void pin_mismatch_fb (const db::Pin *a, const db::Pin *b)
+  void pin_mismatch_fb (const db::Pin *a, const db::Pin *b, const std::string &msg)
   {
-    db::NetlistCompareLogger::pin_mismatch (a, b);
+    db::NetlistCompareLogger::pin_mismatch (a, b, msg);
   }
 
   virtual void match_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b)
@@ -276,18 +276,18 @@ public:
     db::NetlistCompareLogger::match_subcircuits (a, b);
   }
 
-  virtual void subcircuit_mismatch (const db::SubCircuit *a, const db::SubCircuit *b)
+  virtual void subcircuit_mismatch (const db::SubCircuit *a, const db::SubCircuit *b, const std::string &msg)
   {
     if (cb_subcircuit_mismatch.can_issue ()) {
-      cb_subcircuit_mismatch.issue<GenericNetlistCompareLogger> (&GenericNetlistCompareLogger::subcircuit_mismatch_fb, a, b);
+      cb_subcircuit_mismatch.issue<GenericNetlistCompareLogger, const db::SubCircuit *, const db::SubCircuit *, const std::string &> (&GenericNetlistCompareLogger::subcircuit_mismatch_fb, a, b, msg);
     } else {
       db::NetlistCompareLogger::subcircuit_mismatch (a, b);
     }
   }
 
-  void subcircuit_mismatch_fb (const db::SubCircuit *a, const db::SubCircuit *b)
+  void subcircuit_mismatch_fb (const db::SubCircuit *a, const db::SubCircuit *b, const std::string &msg)
   {
-    db::NetlistCompareLogger::subcircuit_mismatch (a, b);
+    db::NetlistCompareLogger::subcircuit_mismatch (a, b, msg);
   }
 
   gsi::Callback cb_begin_netlist;
@@ -339,7 +339,7 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger (decl_dbNetl
     "@brief This function is called at the end of the compare process.\n"
     "This method is called once when the compare run ended.\n"
   ) +
-  gsi::callback ("device_class_mismatch", &GenericNetlistCompareLogger::device_class_mismatch, &GenericNetlistCompareLogger::cb_device_class_mismatch, gsi::arg ("a"), gsi::arg ("b"),
+  gsi::callback ("device_class_mismatch", &GenericNetlistCompareLogger::device_class_mismatch, &GenericNetlistCompareLogger::cb_device_class_mismatch, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("msg"),
     "@brief This function is called when device classes can't be compared.\n"
     "This method is called when a device class can't be mapped to a partner in the other netlist. In this case, "
     "this method is called with the one device class and nil for the other class.\n"
@@ -354,19 +354,19 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger (decl_dbNetl
     "some or all subcircuits the pin assignment can't be derived. In this case, \\circuit_skipped will be called once "
     "instead of \\begin_circuit and \\end_circuit.\n"
   ) +
-  gsi::callback ("end_circuit", &GenericNetlistCompareLogger::end_circuit, &GenericNetlistCompareLogger::cb_end_circuit, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("matching"),
+  gsi::callback ("end_circuit", &GenericNetlistCompareLogger::end_circuit, &GenericNetlistCompareLogger::cb_end_circuit, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("matching"), gsi::arg ("msg"),
     "@brief This function is called at the end of the compare process.\n"
     "The 'matching' argument indicates whether the circuits have been identified as identical.\n"
     "See \\begin_circuit for details."
   ) +
-  gsi::callback ("circuit_skipped", &GenericNetlistCompareLogger::circuit_skipped, &GenericNetlistCompareLogger::cb_circuit_skipped, gsi::arg ("a"), gsi::arg ("b"),
+  gsi::callback ("circuit_skipped", &GenericNetlistCompareLogger::circuit_skipped, &GenericNetlistCompareLogger::cb_circuit_skipped, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("msg"),
     "@brief This function is called when circuits can't be compared.\n"
     "If there is a known circuit pair, but the circuits can be compared - for example because subcircuits can't be identified - this method will be called with "
     "both circuits.\n"
     "\n"
     "This method is called instead of \\begin_circuit and \\end_circuit."
   ) +
-  gsi::callback ("circuit_mismatch", &GenericNetlistCompareLogger::circuit_mismatch, &GenericNetlistCompareLogger::cb_circuit_mismatch, gsi::arg ("a"), gsi::arg ("b"),
+  gsi::callback ("circuit_mismatch", &GenericNetlistCompareLogger::circuit_mismatch, &GenericNetlistCompareLogger::cb_circuit_mismatch, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("msg"),
     "@brief This function is called when circuits can't be compared.\n"
     "This method is called when a circuit can't be mapped to a partner in the other netlist. In this case, "
     "this method is called with the one circuit and nil for the other circuit.\n"
@@ -379,13 +379,13 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger (decl_dbNetl
     "If the nets can be paired, but this match is ambiguous, \\match_ambiguous_nets will be called instead.\n"
     "If nets can't be matched to a partner, \\net_mismatch will be called.\n"
   ) +
-  gsi::callback ("match_ambiguous_nets", &GenericNetlistCompareLogger::match_ambiguous_nets, &GenericNetlistCompareLogger::cb_match_ambiguous_nets, gsi::arg ("a"), gsi::arg ("b"),
+  gsi::callback ("match_ambiguous_nets", &GenericNetlistCompareLogger::match_ambiguous_nets, &GenericNetlistCompareLogger::cb_match_ambiguous_nets, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("msg"),
     "@brief This function is called when two nets are identified, but this choice is ambiguous.\n"
     "This choice is a last-resort fallback to allow continuation of the compare procedure. It is likely that this "
     "compare will fail later. Looking for ambiguous nets allows deduction of the origin of this faulty decision. "
     "See \\match_nets for more details."
   ) +
-  gsi::callback ("net_mismatch", &GenericNetlistCompareLogger::net_mismatch, &GenericNetlistCompareLogger::cb_net_mismatch, gsi::arg ("a"), gsi::arg ("b"),
+  gsi::callback ("net_mismatch", &GenericNetlistCompareLogger::net_mismatch, &GenericNetlistCompareLogger::cb_net_mismatch, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("msg"),
     "@brief This function is called when a net can't be paired.\n"
     "This method will be called, if a net cannot be identified as identical with another net. The corresponding argument "
     "will identify the net and source netlist. The other argument will be nil.\n"
@@ -409,7 +409,7 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger (decl_dbNetl
     "@brief This function is called when two devices are identified but have different device classes.\n"
     "See \\match_devices for details.\n"
   ) +
-  gsi::callback ("device_mismatch", &GenericNetlistCompareLogger::device_mismatch, &GenericNetlistCompareLogger::cb_device_mismatch, gsi::arg ("a"), gsi::arg ("b"),
+  gsi::callback ("device_mismatch", &GenericNetlistCompareLogger::device_mismatch, &GenericNetlistCompareLogger::cb_device_mismatch, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("msg"),
     "@brief This function is called when two devices can't be paired.\n"
     "This will report the device considered in a or b. The other argument is nil. "
     "See \\match_devices for details.\n"
@@ -419,7 +419,7 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger (decl_dbNetl
     "If two pins are identified as a corresponding pair, this method will be called with both pins.\n"
     "If pins can't be matched, \\pin_mismatch will be called with the one pin considered and the other pin being nil."
   ) +
-  gsi::callback ("pin_mismatch", &GenericNetlistCompareLogger::pin_mismatch, &GenericNetlistCompareLogger::cb_pin_mismatch, gsi::arg ("a"), gsi::arg ("b"),
+  gsi::callback ("pin_mismatch", &GenericNetlistCompareLogger::pin_mismatch, &GenericNetlistCompareLogger::cb_pin_mismatch, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("msg"),
     "@brief This function is called when two pins can't be paired.\n"
     "This will report the pin considered in a or b. The other argument is nil. "
     "See \\match_pins for details.\n"
@@ -429,7 +429,7 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger (decl_dbNetl
     "If two subcircuits are identified as a corresponding pair, this method will be called with both subcircuits.\n"
     "If subcircuits can't be matched, \\subcircuit_mismatch will be called with the one subcircuit considered and the other subcircuit being nil."
   ) +
-  gsi::callback ("subcircuit_mismatch", &GenericNetlistCompareLogger::subcircuit_mismatch, &GenericNetlistCompareLogger::cb_subcircuit_mismatch, gsi::arg ("a"), gsi::arg ("b"),
+  gsi::callback ("subcircuit_mismatch", &GenericNetlistCompareLogger::subcircuit_mismatch, &GenericNetlistCompareLogger::cb_subcircuit_mismatch, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("msg"),
     "@brief This function is called when two subcircuits can't be paired.\n"
     "This will report the subcircuit considered in a or b. The other argument is nil. "
     "See \\match_subcircuits for details.\n"

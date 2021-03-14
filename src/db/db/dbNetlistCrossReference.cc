@@ -338,9 +338,9 @@ NetlistCrossReference::establish_pair (const db::Circuit *a, const db::Circuit *
 }
 
 void
-NetlistCrossReference::establish_pair (const db::Net *a, const db::Net *b, Status status)
+NetlistCrossReference::establish_pair (const db::Net *a, const db::Net *b, Status status, const std::string &msg)
 {
-  mp_per_circuit_data->nets.push_back (NetPairData (a, b, status));
+  mp_per_circuit_data->nets.push_back (NetPairData (a, b, status, msg));
   if (a) {
     m_other_net [a] = b;
   }
@@ -350,9 +350,9 @@ NetlistCrossReference::establish_pair (const db::Net *a, const db::Net *b, Statu
 }
 
 void
-NetlistCrossReference::establish_pair (const db::Device *a, const db::Device *b, Status status)
+NetlistCrossReference::establish_pair (const db::Device *a, const db::Device *b, Status status, const std::string &msg)
 {
-  mp_per_circuit_data->devices.push_back (DevicePairData (a, b, status));
+  mp_per_circuit_data->devices.push_back (DevicePairData (a, b, status, msg));
   if (a) {
     m_other_device [a] = b;
   }
@@ -362,9 +362,9 @@ NetlistCrossReference::establish_pair (const db::Device *a, const db::Device *b,
 }
 
 void
-NetlistCrossReference::establish_pair (const db::Pin *a, const db::Pin *b, Status status)
+NetlistCrossReference::establish_pair (const db::Pin *a, const db::Pin *b, Status status, const std::string &msg)
 {
-  mp_per_circuit_data->pins.push_back (PinPairData (a, b, status));
+  mp_per_circuit_data->pins.push_back (PinPairData (a, b, status, msg));
   if (a) {
     m_other_pin [a] = b;
   }
@@ -374,9 +374,9 @@ NetlistCrossReference::establish_pair (const db::Pin *a, const db::Pin *b, Statu
 }
 
 void
-NetlistCrossReference::establish_pair (const db::SubCircuit *a, const db::SubCircuit *b, Status status)
+NetlistCrossReference::establish_pair (const db::SubCircuit *a, const db::SubCircuit *b, Status status, const std::string &msg)
 {
-  mp_per_circuit_data->subcircuits.push_back (SubCircuitPairData (a, b, status));
+  mp_per_circuit_data->subcircuits.push_back (SubCircuitPairData (a, b, status, msg));
   if (a) {
     m_other_subcircuit [a] = b;
   }
@@ -403,36 +403,37 @@ NetlistCrossReference::sort_circuit ()
 }
 
 void
-NetlistCrossReference::gen_end_circuit (const db::Circuit *, const db::Circuit *, Status status)
+NetlistCrossReference::gen_end_circuit (const db::Circuit *, const db::Circuit *, Status status, const std::string &msg)
 {
   mp_per_circuit_data->status = status;
+  mp_per_circuit_data->msg = msg;
 
   m_current_circuits = std::make_pair((const db::Circuit *)0, (const db::Circuit *)0);
   mp_per_circuit_data = 0;
 }
 
 void
-NetlistCrossReference::gen_nets (const db::Net *a, const db::Net *b, Status status)
+NetlistCrossReference::gen_nets (const db::Net *a, const db::Net *b, Status status, const std::string &msg)
 {
-  establish_pair (a, b, status);
+  establish_pair (a, b, status, msg);
 }
 
 void
-NetlistCrossReference::gen_devices (const db::Device *a, const db::Device *b, Status status)
+NetlistCrossReference::gen_devices (const db::Device *a, const db::Device *b, Status status, const std::string &msg)
 {
-  establish_pair (a, b, status);
+  establish_pair (a, b, status, msg);
 }
 
 void
-NetlistCrossReference::gen_pins (const db::Pin *a, const db::Pin *b, Status status)
+NetlistCrossReference::gen_pins (const db::Pin *a, const db::Pin *b, Status status, const std::string &msg)
 {
-  establish_pair (a, b, status);
+  establish_pair (a, b, status, msg);
 }
 
 void
-NetlistCrossReference::gen_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b, Status status)
+NetlistCrossReference::gen_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b, Status status, const std::string &msg)
 {
-  establish_pair (a, b, status);
+  establish_pair (a, b, status, msg);
 }
 
 static void init_data_from_single (const db::Net *net, NetlistCrossReference::PerNetData &data, bool first)

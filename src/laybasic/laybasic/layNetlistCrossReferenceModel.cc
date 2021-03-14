@@ -263,39 +263,39 @@ IndexedNetlistModel::circuit_pair NetlistCrossReferenceModel::parent_of (const I
   return get_parent_of (subcircuit_pair, mp_cross_ref.get (), m_parents_of_subcircuits);
 }
 
-std::pair<IndexedNetlistModel::circuit_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::top_circuit_from_index (size_t index) const
+std::pair<IndexedNetlistModel::circuit_pair, std::pair<NetlistCrossReferenceModel::Status, std::string> > NetlistCrossReferenceModel::top_circuit_from_index (size_t index) const
 {
   build_top_circuit_list (mp_cross_ref.get (), m_top_level_circuits);
 
   IndexedNetlistModel::circuit_pair cp = m_top_level_circuits [index];
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (cp);
   tl_assert (data != 0);
-  return std::make_pair (cp, data->status);
+  return std::make_pair (cp, std::make_pair (data->status, data->msg));
 }
 
-std::pair<IndexedNetlistModel::circuit_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::child_circuit_from_index (const circuit_pair &circuits, size_t index) const
+std::pair<IndexedNetlistModel::circuit_pair, std::pair<NetlistCrossReferenceModel::Status, std::string> > NetlistCrossReferenceModel::child_circuit_from_index (const circuit_pair &circuits, size_t index) const
 {
   build_child_circuit_map (mp_cross_ref.get (), m_child_circuits);
 
   IndexedNetlistModel::circuit_pair cp = m_child_circuits [circuits][index];
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (cp);
   tl_assert (data != 0);
-  return std::make_pair (cp, data->status);
+  return std::make_pair (cp, std::make_pair (data->status, data->msg));
 }
 
-std::pair<IndexedNetlistModel::circuit_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::circuit_from_index (size_t index) const
+std::pair<IndexedNetlistModel::circuit_pair, std::pair<NetlistCrossReferenceModel::Status, std::string> > NetlistCrossReferenceModel::circuit_from_index (size_t index) const
 {
   IndexedNetlistModel::circuit_pair cp = mp_cross_ref->begin_circuits () [index];
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (cp);
   tl_assert (data != 0);
-  return std::make_pair (cp, data->status);
+  return std::make_pair (cp, std::make_pair (data->status, data->msg));
 }
 
-std::pair<IndexedNetlistModel::net_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::net_from_index (const circuit_pair &circuits, size_t index) const
+std::pair<IndexedNetlistModel::net_pair, std::pair<NetlistCrossReferenceModel::Status, std::string> > NetlistCrossReferenceModel::net_from_index (const circuit_pair &circuits, size_t index) const
 {
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
   tl_assert (data != 0);
-  return std::make_pair (data->nets [index].pair, data->nets [index].status);
+  return std::make_pair (data->nets [index].pair, std::make_pair (data->nets [index].status, data->nets [index].msg));
 }
 
 const db::Net *NetlistCrossReferenceModel::second_net_for (const db::Net *first) const
@@ -484,25 +484,25 @@ IndexedNetlistModel::net_pin_pair NetlistCrossReferenceModel::net_pinref_from_in
   return data->pins [index];
 }
 
-std::pair<IndexedNetlistModel::device_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::device_from_index (const circuit_pair &circuits, size_t index) const
+std::pair<IndexedNetlistModel::device_pair, std::pair<NetlistCrossReferenceModel::Status, std::string> > NetlistCrossReferenceModel::device_from_index (const circuit_pair &circuits, size_t index) const
 {
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
   tl_assert (data != 0);
-  return std::make_pair (data->devices [index].pair, data->devices [index].status);
+  return std::make_pair (data->devices [index].pair, std::make_pair (data->devices [index].status, data->devices [index].msg));
 }
 
-std::pair<IndexedNetlistModel::pin_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::pin_from_index (const circuit_pair &circuits, size_t index) const
+std::pair<IndexedNetlistModel::pin_pair, std::pair<NetlistCrossReferenceModel::Status, std::string> > NetlistCrossReferenceModel::pin_from_index (const circuit_pair &circuits, size_t index) const
 {
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
   tl_assert (data != 0);
-  return std::make_pair (data->pins [index].pair, data->pins [index].status);
+  return std::make_pair (data->pins [index].pair, std::make_pair (data->pins [index].status, data->pins [index].msg));
 }
 
-std::pair<IndexedNetlistModel::subcircuit_pair, NetlistCrossReferenceModel::Status> NetlistCrossReferenceModel::subcircuit_from_index (const circuit_pair &circuits, size_t index) const
+std::pair<IndexedNetlistModel::subcircuit_pair, std::pair<NetlistCrossReferenceModel::Status, std::string> > NetlistCrossReferenceModel::subcircuit_from_index (const circuit_pair &circuits, size_t index) const
 {
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
   tl_assert (data != 0);
-  return std::make_pair (data->subcircuits [index].pair, data->subcircuits [index].status);
+  return std::make_pair (data->subcircuits [index].pair, std::make_pair (data->subcircuits [index].status, data->pins [index].msg));
 }
 
 template <class Pair, class Iter>
@@ -609,27 +609,37 @@ size_t NetlistCrossReferenceModel::subcircuit_index (const subcircuit_pair &subc
   return get_index_of (subcircuits, org_data->subcircuits.begin (), org_data->subcircuits.end (), data->index_of_subcircuits);
 }
 
-std::string NetlistCrossReferenceModel::circuit_pair_status_hint (const std::pair<IndexedNetlistModel::circuit_pair, NetlistCrossReferenceModel::Status> &cps) const
+std::string NetlistCrossReferenceModel::circuit_pair_status_hint (const std::pair<IndexedNetlistModel::circuit_pair, std::pair<NetlistCrossReferenceModel::Status, std::string> > &cps) const
 {
-  if (cps.second == db::NetlistCrossReference::Mismatch || cps.second == db::NetlistCrossReference::NoMatch) {
+  std::string msg;
+
+  if (cps.second.first == db::NetlistCrossReference::Mismatch || cps.second.first == db::NetlistCrossReference::NoMatch) {
     if (! cps.first.first || ! cps.first.second) {
-      return tl::to_string (tr ("No matching circuit found in the other netlist.\n"
-                                "By default, circuits are identified by their name.\n"
-                                "A missing circuit probably means there is no circuit in the other netlist with this name.\n"
-                                "If circuits with different names need to be associated, use 'same_circuits' in the\n"
-                                "LVS script to establish such an association."));
+      msg = tl::to_string (tr ("No matching circuit found in the other netlist.\n"
+                               "By default, circuits are identified by their name.\n"
+                               "A missing circuit probably means there is no circuit in the other netlist with this name.\n"
+                               "If circuits with different names need to be associated, use 'same_circuits' in the\n"
+                               "LVS script to establish such an association."));
     } else {
-      return tl::to_string (tr ("Circuits could be paired, but there is a mismatch inside.\n"
-                                "Browse the circuit's component list to identify the mismatching elements."));
+      msg = tl::to_string (tr ("Circuits could be paired, but there is a mismatch inside.\n"
+                               "Browse the circuit's component list to identify the mismatching elements."));
     }
-  } else if (cps.second == db::NetlistCrossReference::Skipped) {
-      return tl::to_string (tr ("Circuits can only be matched if their child circuits have a known counterpart and a\n"
-                                "pin-to-pin correspondence could be established for each child circuit.\n"
-                                "This is not the case here. Browse the child circuits to identify the blockers.\n"
-                                "Potential blockers are subcircuits without a corresponding other circuit or circuits\n"
-                                "where some pins could not be mapped to pins from the corresponding other circuit."));
+  } else if (cps.second.first == db::NetlistCrossReference::Skipped) {
+      msg = tl::to_string (tr ("Circuits can only be matched if their child circuits have a known counterpart and a\n"
+                               "pin-to-pin correspondence could be established for each child circuit.\n"
+                               "This is not the case here. Browse the child circuits to identify the blockers.\n"
+                               "Potential blockers are subcircuits without a corresponding other circuit or circuits\n"
+                               "where some pins could not be mapped to pins from the corresponding other circuit."));
   }
-  return std::string ();
+
+  if (! cps.second.second.empty ()) {
+    if (! msg.empty ()) {
+      msg += "\n\n";
+    }
+    msg += cps.second.second;
+  }
+
+  return msg;
 }
 
 std::string NetlistCrossReferenceModel::top_circuit_status_hint (size_t index) const
@@ -644,94 +654,149 @@ std::string NetlistCrossReferenceModel::circuit_status_hint (size_t index) const
 
 std::string NetlistCrossReferenceModel::child_circuit_status_hint (const circuit_pair &circuits, size_t index) const
 {
-  std::pair<IndexedNetlistModel::circuit_pair, NetlistCrossReferenceModel::Status> cps = child_circuit_from_index (circuits, index);
-  if (cps.second == db::NetlistCrossReference::Mismatch || cps.second == db::NetlistCrossReference::NoMatch) {
+  std::string msg;
+
+  std::pair<IndexedNetlistModel::circuit_pair, std::pair<NetlistCrossReferenceModel::Status, std::string> > cps = child_circuit_from_index (circuits, index);
+
+  if (cps.second.first == db::NetlistCrossReference::Mismatch || cps.second.first == db::NetlistCrossReference::NoMatch) {
     if (!cps.first.first || !cps.first.second) {
-      return tl::to_string (tr ("No matching subcircuit was found in the other netlist - this is likely because pin\n"
-                                "assignment could not be derived from the nets connected to the pins.\n"
-                                "Check, if the pins are attached properly. If pins need to be swappable, consider using\n"
-                                "'equivalent_pins' in the LVS script."));
+      msg = tl::to_string (tr ("No matching subcircuit was found in the other netlist - this is likely because pin\n"
+                               "assignment could not be derived from the nets connected to the pins.\n"
+                               "Check, if the pins are attached properly. If pins need to be swappable, consider using\n"
+                               "'equivalent_pins' in the LVS script."));
     } else {
-      return tl::to_string (tr ("Two different subcircuits fit here in the same way, but they are not\n"
-                                "originating from equivalent circuits.\n"
-                                "If the circuits behind the subcircuits are identical, using 'same_circuits'\n"
-                                "in the LVS script will associate them."));
+      msg = tl::to_string (tr ("Two different subcircuits fit here in the same way, but they are not\n"
+                               "originating from equivalent circuits.\n"
+                               "If the circuits behind the subcircuits are identical, using 'same_circuits'\n"
+                               "in the LVS script will associate them."));
     }
   }
-  return std::string ();
+
+  if (! cps.second.second.empty ()) {
+    if (! msg.empty ()) {
+      msg += "\n\n";
+    }
+    msg += cps.second.second;
+  }
+
+  return msg;
 }
 
 std::string NetlistCrossReferenceModel::net_status_hint (const circuit_pair &circuits, size_t index) const
 {
-  std::pair<IndexedNetlistModel::net_pair, NetlistCrossReferenceModel::Status> cps = net_from_index (circuits, index);
-  if (cps.second == db::NetlistCrossReference::Mismatch || cps.second == db::NetlistCrossReference::NoMatch) {
-    return tl::to_string (tr ("Nets don't match. Nets match, if connected subcircuit pins and device terminals match to a\n"
-                              "counterpart in the other netlist (component-wise and pin/terminal-wise).\n"
-                              "If there already is a net candidate from the other netlist, scan the net members for\n"
-                              "mismatching items (with errors or warnings) and fix these issues.\n"
-                              "Otherwise, look for the corresponding other net.\n"
-                              "Net items not found in the reference netlist indicate additional connections.\n"
-                              "Net items only found in the reference netlist indicate missing connections."));
-  } else if (cps.second == db::NetlistCrossReference::MatchWithWarning) {
-    return tl::to_string (tr ("Nets match, but the choice was ambiguous. This may lead to mismatching nets in other places.\n"));
+  std::string msg;
+
+  std::pair<IndexedNetlistModel::net_pair, std::pair<NetlistCrossReferenceModel::Status, std::string> > cps = net_from_index (circuits, index);
+
+  if (cps.second.first == db::NetlistCrossReference::Mismatch || cps.second.first == db::NetlistCrossReference::NoMatch) {
+    msg = tl::to_string (tr ("Nets don't match. Nets match, if connected subcircuit pins and device terminals match to a\n"
+                             "counterpart in the other netlist (component-wise and pin/terminal-wise).\n"
+                             "If there already is a net candidate from the other netlist, scan the net members for\n"
+                             "mismatching items (with errors or warnings) and fix these issues.\n"
+                             "Otherwise, look for the corresponding other net.\n"
+                             "Net items not found in the reference netlist indicate additional connections.\n"
+                             "Net items only found in the reference netlist indicate missing connections."));
+  } else if (cps.second.first == db::NetlistCrossReference::MatchWithWarning) {
+    msg = tl::to_string (tr ("Nets match, but the choice was ambiguous. This may lead to mismatching nets in other places.\n"));
   }
-  return std::string ();
+
+  if (! cps.second.second.empty ()) {
+    if (! msg.empty ()) {
+      msg += "\n\n";
+    }
+    msg += cps.second.second;
+  }
+
+  return msg;
 }
 
 std::string NetlistCrossReferenceModel::device_status_hint (const circuit_pair &circuits, size_t index) const
 {
-  std::pair<IndexedNetlistModel::device_pair, NetlistCrossReferenceModel::Status> cps = device_from_index (circuits, index);
-  if (cps.second == db::NetlistCrossReference::Mismatch || cps.second == db::NetlistCrossReference::NoMatch) {
+  std::string msg;
+
+  std::pair<IndexedNetlistModel::device_pair, std::pair<NetlistCrossReferenceModel::Status, std::string> > cps = device_from_index (circuits, index);
+
+  if (cps.second.first == db::NetlistCrossReference::Mismatch || cps.second.first == db::NetlistCrossReference::NoMatch) {
     if (!cps.first.first || !cps.first.second) {
-      return tl::to_string (tr ("No matching device was found in the other netlist.\n"
-                                "Devices are identified by the nets they are attached to. Unmatched devices mean that\n"
-                                "at least one terminal net isn't matched with a corresponding net from the other netlist.\n"
-                                "Make all terminal nets match and the devices will match too."));
+      msg = tl::to_string (tr ("No matching device was found in the other netlist.\n"
+                               "Devices are identified by the nets they are attached to. Unmatched devices mean that\n"
+                               "at least one terminal net isn't matched with a corresponding net from the other netlist.\n"
+                               "Make all terminal nets match and the devices will match too."));
     } else {
-      return tl::to_string (tr ("Devices don't match topologically.\n"
-                                "Check the terminal connections to identify the terminals not being connected to\n"
-                                "corresponding nets. Either the devices are not connected correctly or the nets\n"
-                                "need to be fixed before the devices will match too."));
+      msg = tl::to_string (tr ("Devices don't match topologically.\n"
+                               "Check the terminal connections to identify the terminals not being connected to\n"
+                               "corresponding nets. Either the devices are not connected correctly or the nets\n"
+                               "need to be fixed before the devices will match too."));
     }
-  } else if (cps.second == db::NetlistCrossReference::MatchWithWarning) {
-    return tl::to_string (tr ("Topologically matching devices are found here but either the parameters or the\n"
-                              "device classes don't match.\n"
-                              "If the device class is different but should be considered the same, using\n"
-                              "'same_device_classed' in the LVS script will solve this issue."));
+  } else if (cps.second.first == db::NetlistCrossReference::MatchWithWarning) {
+    msg = tl::to_string (tr ("Topologically matching devices are found here but either the parameters or the\n"
+                             "device classes don't match.\n"
+                             "If the device class is different but should be considered the same, using\n"
+                             "'same_device_classed' in the LVS script will solve this issue."));
   }
-  return std::string ();
+
+  if (! cps.second.second.empty ()) {
+    if (! msg.empty ()) {
+      msg += "\n\n";
+    }
+    msg += cps.second.second;
+  }
+
+  return msg;
 }
 
 std::string NetlistCrossReferenceModel::pin_status_hint (const circuit_pair &circuits, size_t index) const
 {
-  std::pair<IndexedNetlistModel::pin_pair, NetlistCrossReferenceModel::Status> cps = pin_from_index (circuits, index);
-  if (cps.second == db::NetlistCrossReference::Mismatch || cps.second == db::NetlistCrossReference::NoMatch) {
+  std::string msg;
+
+  std::pair<IndexedNetlistModel::pin_pair, std::pair<NetlistCrossReferenceModel::Status, std::string> > cps = pin_from_index (circuits, index);
+
+  if (cps.second.first == db::NetlistCrossReference::Mismatch || cps.second.first == db::NetlistCrossReference::NoMatch) {
     if (!cps.first.first || !cps.first.second) {
-      return tl::to_string (tr ("No matching pin was found in the other netlist.\n"
-                                "Pins are identified by the nets they are attached to - pins on equivalent nets are also\n"
-                                "equivalent. Making the nets match will make the pins match too."));
+      msg = tl::to_string (tr ("No matching pin was found in the other netlist.\n"
+                               "Pins are identified by the nets they are attached to - pins on equivalent nets are also\n"
+                               "equivalent. Making the nets match will make the pins match too."));
     }
   }
-  return std::string ();
+
+  if (! cps.second.second.empty ()) {
+    if (! msg.empty ()) {
+      msg += "\n\n";
+    }
+    msg += cps.second.second;
+  }
+
+  return msg;
 }
 
 std::string NetlistCrossReferenceModel::subcircuit_status_hint (const circuit_pair &circuits, size_t index) const
 {
-  std::pair<IndexedNetlistModel::subcircuit_pair, NetlistCrossReferenceModel::Status> cps = subcircuit_from_index (circuits, index);
-  if (cps.second == db::NetlistCrossReference::Mismatch || cps.second == db::NetlistCrossReference::NoMatch) {
+  std::string msg;
+
+  std::pair<IndexedNetlistModel::subcircuit_pair, std::pair<NetlistCrossReferenceModel::Status, std::string> > cps = subcircuit_from_index (circuits, index);
+
+  if (cps.second.first == db::NetlistCrossReference::Mismatch || cps.second.first == db::NetlistCrossReference::NoMatch) {
     if (!cps.first.first || !cps.first.second) {
-      return tl::to_string (tr ("No matching subcircuit was found in the other netlist - this is likely because pin assignment\n"
-                                "could not be derived from the nets connected to the pins.\n"
-                                "Check, if the pins are attached properly. If pins need to be swappable, consider using\n"
-                                "'equivalent_pins' in the LVS script."));
+      msg = tl::to_string (tr ("No matching subcircuit was found in the other netlist - this is likely because pin assignment\n"
+                               "could not be derived from the nets connected to the pins.\n"
+                               "Check, if the pins are attached properly. If pins need to be swappable, consider using\n"
+                               "'equivalent_pins' in the LVS script."));
     } else {
-      return tl::to_string (tr ("Two different subcircuits fit here in the same way, but they are not originating from\n"
-                                "equivalent circuits.\n"
-                                "If the circuits behind the subcircuits are identical, using 'same_circuits' in the LVS script\n"
-                                "will associate them."));
+      msg = tl::to_string (tr ("Two different subcircuits fit here in the same way, but they are not originating from\n"
+                               "equivalent circuits.\n"
+                               "If the circuits behind the subcircuits are identical, using 'same_circuits' in the LVS script\n"
+                               "will associate them."));
     }
   }
-  return std::string ();
+
+  if (! cps.second.second.empty ()) {
+    if (! msg.empty ()) {
+      msg += "\n\n";
+    }
+    msg += cps.second.second;
+  }
+
+  return msg;
 }
 
 }

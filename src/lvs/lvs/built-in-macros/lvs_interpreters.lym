@@ -25,6 +25,8 @@ module LVS
     lvs._l2ndb_index = l2ndb_index
     lvs._generator = generator
 
+    lvs_progress = RBA::AbstractProgress::new("LVS: " + macro.path)
+
     begin
 
       # Set a debugger scope so that our errors end up with the debugger set to the LVS's line
@@ -45,6 +47,9 @@ module LVS
 
       # cleans up and creates layout and report views
       lvs._finish
+
+      # unlocks the UI
+      lvs_progress._destroy
 
     end
 

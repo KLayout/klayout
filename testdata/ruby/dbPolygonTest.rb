@@ -304,6 +304,9 @@ class DBPolygon_TestClass < TestBase
     p = RBA::Polygon::new( [ RBA::Point.new(0, 0), RBA::Point.new(10, 50), RBA::Point.new(0, 100), RBA::Point.new(200, 100), RBA::Point.new(200, 0) ])
     assert_equal(p.smooth(5).to_s, "(0,0;10,50;0,100;200,100;200,0)")
     assert_equal(p.smooth(15).to_s, "(0,0;0,100;200,100;200,0)")
+    p = RBA::Polygon::new( [ RBA::Point.new(0, 0), RBA::Point.new(10, 50), RBA::Point.new(10, 100), RBA::Point.new(200, 100), RBA::Point.new(200, 0) ])
+    assert_equal(p.smooth(15, false).to_s, "(0,0;10,100;200,100;200,0)")
+    assert_equal(p.smooth(15, true).to_s, "(0,0;10,50;10,100;200,100;200,0)")
 
     # Ellipse constructor
     p = RBA::Polygon::ellipse( RBA::Box::new(-10000, -20000, 30000, 40000), 200 )

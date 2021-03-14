@@ -1387,7 +1387,7 @@ MainService::cm_round_corners ()
   std::vector <db::Polygon> in;
   ep.merge (primary, in, 0 /*min_wc*/, false /*resolve holes*/, true /*min coherence*/);
   for (std::vector <db::Polygon>::iterator p = in.begin (); p != in.end (); ++p) {
-    *p = smooth (*p, 1);
+    *p = smooth (*p, 1, true);
   }
 
   std::vector <db::Polygon> out = in;

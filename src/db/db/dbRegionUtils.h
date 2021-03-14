@@ -504,7 +504,7 @@ class DB_PUBLIC SmoothingProcessor
   : public PolygonProcessorBase
 {
 public:
-  SmoothingProcessor (db::Coord d);
+  SmoothingProcessor (db::Coord d, bool keep_hv);
   ~SmoothingProcessor ();
 
   virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
@@ -517,6 +517,7 @@ public:
 
 private:
   db::Coord m_d;
+  bool m_keep_hv;
   db::MagnificationReducer m_vars;
 };
 

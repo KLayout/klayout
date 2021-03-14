@@ -502,7 +502,7 @@ std::pair<IndexedNetlistModel::subcircuit_pair, std::pair<NetlistCrossReferenceM
 {
   const db::NetlistCrossReference::PerCircuitData *data = mp_cross_ref->per_circuit_data_for (circuits);
   tl_assert (data != 0);
-  return std::make_pair (data->subcircuits [index].pair, std::make_pair (data->subcircuits [index].status, data->pins [index].msg));
+  return std::make_pair (data->subcircuits [index].pair, std::make_pair (data->subcircuits [index].status, data->subcircuits [index].msg));
 }
 
 template <class Pair, class Iter>

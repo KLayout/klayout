@@ -159,9 +159,11 @@ static std::string net_id_to_s (const db::Net *net, const std::map<const db::Net
 
 static void build_pin_index_map (const db::Circuit *c, std::map<const db::Pin *, unsigned int> &pin2index)
 {
-  size_t pi = 0;
-  for (db::Circuit::const_pin_iterator p = c->begin_pins (); p != c->end_pins (); ++p, ++pi) {
-    pin2index.insert (std::make_pair (p.operator-> (), pi));
+  if (c) {
+    size_t pi = 0;
+    for (db::Circuit::const_pin_iterator p = c->begin_pins (); p != c->end_pins (); ++p, ++pi) {
+      pin2index.insert (std::make_pair (p.operator-> (), pi));
+    }
   }
 }
 

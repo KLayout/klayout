@@ -772,10 +772,7 @@ NetlistBrowserDialog::update_content ()
   m_reload_action->setEnabled (l2ndb != 0);
 
   browser_page->enable_updates (false);  //  Avoid building the internal lists several times ...
-  if (browser_page->db () != l2ndb) {
-    db_changed = true;
-    browser_page->set_db (l2ndb);
-  }
+  db_changed = browser_page->set_db (l2ndb);
   browser_page->set_max_shape_count (m_max_shape_count);
   browser_page->set_highlight_style (m_marker_color, m_marker_line_width, m_marker_vertex_size, m_marker_halo, m_marker_dither_pattern, m_marker_intensity, m_use_original_colors, m_auto_color_enabled ? &m_auto_colors : 0);
   browser_page->set_window (m_window, m_window_dim);

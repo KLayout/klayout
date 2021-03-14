@@ -91,7 +91,7 @@ public:
   /**
    *  @brief Attaches the page to a L2N DB
    */
-  void set_db (db::LayoutToNetlist *database);
+  bool set_db(db::LayoutToNetlist *database);
 
   /**
    *  @brief Gets the database the page is connected to
@@ -228,6 +228,7 @@ private:
   unsigned int m_cv_index;
   lay::Dispatcher *mp_plugin_root;
   tl::weak_ptr<db::LayoutToNetlist> mp_database;
+  db::LayoutToNetlist *mp_last_db;
   std::vector<QModelIndex> m_history;
   size_t m_history_ptr;
   bool m_signals_enabled;

@@ -118,6 +118,7 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
     mp_view (0),
     m_cv_index (0),
     mp_plugin_root (0),
+    mp_last_db (0),
     m_history_ptr (0),
     m_signals_enabled (true),
     m_enable_updates (true),
@@ -606,7 +607,7 @@ NetlistBrowserPage::rerun_macro ()
 {
 BEGIN_PROTECTED
 
-  if (! mp_database->generator ().empty ()) {
+  if (mp_database.get () && ! mp_database->generator ().empty ()) {
 
     std::map<std::string, tl::Variant> add_pars;
 
@@ -764,12 +765,14 @@ NetlistBrowserPage::show_all (bool f)
   }
 }
 
-void
+bool
 NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
 {
-  if (l2ndb == mp_database.get ()) {
+  //  NOTE: mp_last_db mirrors mp_database, but does not automatically fall back to 0 when the DB is deleted. This way we can call
+  //  set_db(0) with the correct behavior after the DB has been destroyed.
+  if (l2ndb == mp_last_db) {
     //  not change
-    return;
+    return false;
   }
 
   if (mp_info_dialog) {
@@ -779,6 +782,7 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
 
   db::LayoutVsSchematic *lvsdb = dynamic_cast<db::LayoutVsSchematic *> (l2ndb);
   mp_database.reset (l2ndb);
+  mp_last_db = l2ndb;
 
   rerun_button->setEnabled (mp_database.get () && ! mp_database->generator ().empty ());
   if (rerun_button->isEnabled ()) {
@@ -807,6 +811,8 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
   setup_trees ();
 
   selection_changed_event ();
+
+  return true;
 }
 
 void

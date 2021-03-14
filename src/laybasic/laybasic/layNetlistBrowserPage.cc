@@ -800,7 +800,7 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
   show_xref->setChecked (lvsdb != 0);
   m_signals_enabled = se;
 
-  clear_markers ();
+  clear_highlights ();
 
   m_cell_context_cache = db::ContextCache (mp_database.get () ? mp_database->internal_layout () : 0);
 
@@ -893,6 +893,15 @@ NetlistBrowserPage::setup_trees ()
 }
 
 void
+NetlistBrowserPage::clear_highlights ()
+{
+  m_current_path = lay::NetlistObjectsPath ();
+  m_selected_paths.clear ();
+
+  update_highlights ();
+}
+
+void
 NetlistBrowserPage::highlight (const NetlistObjectsPath &current_path, const std::vector<NetlistObjectsPath> &selected_paths)
 {
   if (current_path != m_current_path && selected_paths != m_selected_paths) {
@@ -900,9 +909,8 @@ NetlistBrowserPage::highlight (const NetlistObjectsPath &current_path, const std
     m_current_path = current_path;
     m_selected_paths = selected_paths;
 
-    clear_markers ();
-    adjust_view ();
     update_highlights ();
+    adjust_view ();
 
   }
 }

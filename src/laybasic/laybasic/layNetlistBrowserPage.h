@@ -247,6 +247,7 @@ private:
   void adjust_view ();
   void clear_markers ();
   void highlight (const NetlistObjectsPath &current_path, const std::vector<NetlistObjectsPath> &selected_paths);
+  void clear_highlights ();
   std::vector<const db::Net *> selected_nets ();
   std::vector<const db::Device *> selected_devices ();
   std::vector<const db::SubCircuit *> selected_subcircuits ();

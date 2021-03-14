@@ -34,7 +34,7 @@ def Get_Default_Config():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'build4mac.py' >>\n"
-    Usage += "       for building KLayout 0.26.1 or later on different Apple Mac OSX platforms.\n"
+    Usage += "       for building KLayout 0.26.11 or later on different Apple Mac OSX platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./build4mac.py \n"
     Usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value\n"
@@ -58,6 +58,7 @@ def Get_Default_Config():
     Usage += "                        :   Ana3: use Python 3.7 from Anaconda3                          | \n"
     Usage += "                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew  | \n"
     Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled \n"
+    Usage += "   [-u|--noqtuitools]   : don't include uitools in Qt binding                            | disabled \n"
     Usage += "   [-m|--make <option>] : option passed to 'make'                                        | '-j4' \n"
     Usage += "   [-d|--debug]         : enable debug mode build                                        | disabled \n"
     Usage += "   [-c|--checkcom]      : check command-line and exit without building                   | disabled \n"
@@ -137,6 +138,7 @@ def Get_Default_Config():
 
     NonOSStdLang  = False
     NoQtBindings  = False
+    NoQtUiTools   = False
     MakeOptions   = "-j4"
     DebugMode     = False
     CheckComOnly  = False
@@ -157,6 +159,7 @@ def Get_Default_Config():
     config['ModulePython']  = ModulePython      # Python module to be used
     config['NonOSStdLang']  = NonOSStdLang      # True if non-OS-standard language is chosen
     config['NoQtBindings']  = NoQtBindings      # True if not creating Qt bindings for Ruby scripts
+    config['NoQtUiTools']   = NoQtUiTools       # True if not to include QtUiTools in Qt binding
     config['MakeOptions']   = MakeOptions       # options passed to `make`
     config['DebugMode']     = DebugMode         # True if debug mode build
     config['CheckComOnly']  = CheckComOnly      # True if only for checking the command line parameters to "build.sh"
@@ -195,6 +198,7 @@ def Parse_CLI_Args(config):
     ModulePython  = config['ModulePython']
     NonOSStdLang  = config['NonOSStdLang']
     NoQtBindings  = config['NoQtBindings']
+    NoQtUiTools   = config['NoQtUiTools']
     MakeOptions   = config['MakeOptions']
     DebugMode     = config['DebugMode']
     CheckComOnly  = config['CheckComOnly']
@@ -225,6 +229,12 @@ def Parse_CLI_Args(config):
                     dest='no_qt_binding',
                     default=False,
                     help="do not create Qt bindings for Ruby scripts" )
+
+    p.add_option( '-u', '--noqtuitools',
+                    action='store_true',
+                    dest='no_qt_uitools',
+                    default=False,
+                    help="don't include uitools in Qt binding" )
 
     p.add_option( '-m', '--make',
                     dest='make_option',
@@ -268,6 +278,7 @@ def Parse_CLI_Args(config):
                     type_ruby      = "sys",
                     type_python    = "sys",
                     no_qt_binding  = False,
+                    no_qt_uitools  = False,
                     make_option    = "-j4",
                     debug_build    = False,
                     check_command  = False,
@@ -406,6 +417,7 @@ def Parse_CLI_Args(config):
     ModuleSet = ( choiceQt5, choiceRuby, choicePython )
 
     NoQtBindings = opt.no_qt_binding
+    NoQtUiTools  = opt.no_qt_uitools
     MakeOptions  = opt.make_option
     DebugMode    = opt.debug_build
     CheckComOnly = opt.check_command
@@ -462,6 +474,7 @@ def Parse_CLI_Args(config):
     config['ModulePython']  = ModulePython
     config['NonOSStdLang']  = NonOSStdLang
     config['NoQtBindings']  = NoQtBindings
+    config['NoQtUiTools']   = NoQtUiTools
     config['MakeOptions']   = MakeOptions
     config['DebugMode']     = DebugMode
     config['CheckComOnly']  = CheckComOnly
@@ -491,6 +504,7 @@ def Get_Build_Parameters(config):
     ModulePython  = config['ModulePython']
     ModuleSet     = config['ModuleSet']
     NoQtBindings  = config['NoQtBindings']
+    NoQtUiTools   = config['NoQtUiTools']
     MakeOptions   = config['MakeOptions']
     DebugMode     = config['DebugMode']
     CheckComOnly  = config['CheckComOnly']
@@ -542,11 +556,14 @@ def Get_Build_Parameters(config):
     # (E) want Qt bindings with Ruby scripts?
     parameters['no_qt_bindings'] = NoQtBindings
 
-    # (F) options to `make` tool
+    # (F) want QtUiTools?
+    parameters['no_qt_uitools'] = NoQtUiTools
+
+    # (G) options to `make` tool
     if not MakeOptions == "":
         parameters['make_options'] = MakeOptions
 
-    # (G) about Ruby
+    # (H) about Ruby
     if ModuleRuby != "nil":
         parameters['ruby']  = RubyDictionary[ModuleRuby]['exe']
         parameters['rbinc'] = RubyDictionary[ModuleRuby]['inc']
@@ -554,7 +571,7 @@ def Get_Build_Parameters(config):
         if 'inc2' in RubyDictionary[ModuleRuby]:
             parameters['rbinc2'] = RubyDictionary[ModuleRuby]['inc2']
 
-    # (H) about Python
+    # (I) about Python
     if ModulePython != "nil":
         parameters['python'] = PythonDictionary[ModulePython]['exe']
         parameters['pyinc']  = PythonDictionary[ModulePython]['inc']
@@ -566,7 +583,7 @@ def Get_Build_Parameters(config):
     config['MacBuildDirQAT'] = MacBuildDirQAT   # relative path to build directory for QATest
     config['MacBuildLog']    = MacBuildLog      # relative path to build log file
 
-    # (I) Extra parameteres needed for deployment
+    # (J) Extra parameters needed for deployment
     parameters['project_dir'] = ProjectDir
     return parameters
 
@@ -607,11 +624,15 @@ def Run_Build_Command(parameters):
     else:
         cmd_args += " \\\n  -with-qtbinding"
 
-    # (F) options to `make` tool
+    # (F) want QtUiTools?
+    if parameters['no_qt_uitools']:
+        cmd_args += " \\\n  -without-qt-uitools"
+
+    # (G) options to `make` tool
     if 'make_options' in parameters:
         cmd_args += " \\\n  -option %s" % parameters['make_options']
 
-    # (G) about Ruby
+    # (H) about Ruby
     if 'ruby' in parameters:
         cmd_args += " \\\n  -ruby   %s" % parameters['ruby']
         cmd_args += " \\\n  -rbinc  %s" % parameters['rbinc']
@@ -621,7 +642,7 @@ def Run_Build_Command(parameters):
     else:
         cmd_args += " \\\n  -noruby"
 
-    # (H) about Python
+    # (I) about Python
     if 'python' in parameters:
         cmd_args += " \\\n  -python %s" % parameters['python']
         cmd_args += " \\\n  -pyinc  %s" % parameters['pyinc']

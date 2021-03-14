@@ -1163,3 +1163,8 @@ TEST(29d_holes)
   run_test (_this, "29", true);
 }
 
+TEST(30_density)
+{
+  run_test (_this, "30", false);
+}
+

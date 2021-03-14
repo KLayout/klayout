@@ -1060,13 +1060,13 @@ template void CompoundRegionLogicalCaseSelectOperationNode::implement_compute_lo
 // ---------------------------------------------------------------------------------------------
 
 CompoundRegionInteractOperationNode::CompoundRegionInteractOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, int mode, bool touching, bool inverse, size_t min_count, size_t max_count)
-  : compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon> (&m_op, a, b), m_op (mode, touching, inverse, min_count, max_count, b->is_merged ())
+  : compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon> (&m_op, a, b), m_op (mode, touching, inverse ? Negative : Positive, min_count, max_count, b->is_merged ())
 {
   //  .. nothing yet ..
 }
 
 CompoundRegionInteractOperationNode::CompoundRegionInteractOperationNode (db::Region *a, db::Region *b, int mode, bool touching, bool inverse, size_t min_count, size_t max_count)
-  : compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon> (&m_op, a, b), m_op (mode, touching, inverse, min_count, max_count, b->is_merged ())
+  : compound_region_generic_operation_node<db::Polygon, db::Polygon, db::Polygon> (&m_op, a, b), m_op (mode, touching, inverse ? Negative : Positive, min_count, max_count, b->is_merged ())
 {
   //  .. nothing yet ..
 }
@@ -1080,7 +1080,7 @@ CompoundRegionInteractOperationNode::generated_description () const
 // ---------------------------------------------------------------------------------------------
 
 CompoundRegionInteractWithEdgeOperationNode::CompoundRegionInteractWithEdgeOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b, bool inverse, size_t min_count, size_t max_count)
-  : compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon> (&m_op, a, b), m_op (inverse, min_count, max_count, b->is_merged ())
+  : compound_region_generic_operation_node<db::Polygon, db::Edge, db::Polygon> (&m_op, a, b), m_op (inverse ? Negative : Positive, min_count, max_count, b->is_merged ())
 {
   //  .. nothing yet ..
 }

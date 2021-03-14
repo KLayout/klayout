@@ -108,18 +108,25 @@ public:
 
   virtual RegionDelegate *selected_outside (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_outside (const Region &) const { return new EmptyRegion (); }
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_outside_pair (const Region &) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
   virtual RegionDelegate *selected_inside (const Region &) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_inside (const Region &) const { return new EmptyRegion (); }
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_inside_pair (const Region &) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
   virtual RegionDelegate *selected_enclosing (const Region &, size_t, size_t) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_enclosing (const Region &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_enclosing_pair (const Region &, size_t, size_t) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
   virtual RegionDelegate *selected_interacting (const Region &, size_t, size_t) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_interacting (const Region &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_pair (const Region &, size_t, size_t) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
   virtual RegionDelegate *selected_interacting (const Edges &, size_t, size_t) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_interacting (const Edges &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_pair (const Edges &, size_t, size_t) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
   virtual RegionDelegate *selected_interacting (const Texts &, size_t, size_t) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_interacting (const Texts &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_pair (const Texts &, size_t, size_t) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
   virtual RegionDelegate *selected_overlapping (const Region &, size_t, size_t) const { return new EmptyRegion (); }
   virtual RegionDelegate *selected_not_overlapping (const Region &, size_t, size_t) const { return new EmptyRegion (); }
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_overlapping_pair (const Region &, size_t, size_t) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
   virtual RegionDelegate *pull_inside (const Region &) const  { return new EmptyRegion (); }
   virtual RegionDelegate *pull_interacting (const Region &) const  { return new EmptyRegion (); }
   virtual EdgesDelegate *pull_interacting (const Edges &) const  { return new EmptyEdges (); }

@@ -1281,6 +1281,14 @@ void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned
 }
 
 template <class TS, class TI, class TR>
+void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, const std::vector<unsigned int> &output_layers)
+{
+  std::vector<unsigned int> ol, il;
+  il.push_back (intruder_layer);
+  run (op, subject_layer, il, output_layers);
+}
+
+template <class TS, class TI, class TR>
 void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, unsigned int output_layer)
 {
   std::vector<unsigned int> ol;

@@ -739,16 +739,18 @@ CODE
   # %DRC%
   # @name smoothed
   # @brief Applies smoothing
-  # @synopsis expression.smoothed(d)
+  # @synopsis expression.smoothed(d [, keep_hv ])
   #
-  # This operation acts on polygons and applies polygon smoothing with the tolerance d. See \Layer#smoothed for more details.
+  # This operation acts on polygons and applies polygon smoothing with the tolerance d. 'keep_hv' indicates
+  # whether horizontal and vertical edges are maintained. Default is 'no' which means such edges may be distorted.
+  # See \Layer#smoothed for more details.
   #
   # The "smoothed" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.smoothed".
 
-  def smoothed(d)
+  def smoothed(d, keep_hv = false)
     @engine._context("smoothed") do
-      DRCOpNodeFilter::new(@engine, self, :new_smoothed, "smoothed", @engine._make_value(d))
+      DRCOpNodeFilter::new(@engine, self, :new_smoothed, "smoothed", @engine._make_value(d), keep_hv)
     end
   end
   

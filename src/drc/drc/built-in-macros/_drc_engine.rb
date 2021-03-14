@@ -48,6 +48,8 @@ module DRC
       @deep = false
       @netter = nil
       @netter_data = nil
+      @total_timer = nil
+      @drc_progress = nil
       
       # initialize the defaults for max_area_ratio, max_vertex_count
       dss = RBA::DeepShapeStore::new
@@ -58,7 +60,7 @@ module DRC
 
       @verbose = false
 
-      @in_context = false
+      @in_context = nil
 
     end
     
@@ -93,7 +95,7 @@ module DRC
     def transparent
       DRCShielded::new(false)
     end
-    
+
     def projection_limits(*args)
       self._context("projection_limits") do
         if args.size == 0
@@ -209,6 +211,27 @@ module DRC
       self._context("area_and_perimeter") do
         DRCAreaAndPerimeter::new(r, 1.0, f)
       end
+    end
+    
+    def tile_size(x, y = nil)
+      DRCTileSize::new(_make_value(x) * self.dbu, _make_value(y || x) * self.dbu)
+    end
+    
+    def tile_step(x, y = nil)
+      DRCTileStep::new(_make_value(x) * self.dbu, _make_value(y || x) * self.dbu)
+    end
+    
+    def tile_origin(x, y)
+      DRCTileOrigin::new(_make_value(x) * self.dbu, _make_value(y) * self.dbu)
+    end
+    
+    def tile_count(x, y)
+      DRCTileCount::new(_make_numeric_value(x), _make_numeric_value(y))
+    end
+    
+    def tile_boundary(b)
+      b.is_a?(DRCLayer) || raise("'tile_boundary' requires a layer argument")
+      DRCTileBoundary::new(b)
     end
     
     # %DRC%
@@ -455,15 +478,20 @@ module DRC
     
     # %DRC%
     # @name info 
-    # @brief Outputs as message to the logger window
+    # @brief Outputs as message to the logger or progress window
     # @synopsis info(message)
     # @synopsis info(message, indent)
     # Prints the message to the log window in verbose mode.
-    # In non-verbose more, nothing is printed.
+    # In non-verbose more, nothing is printed but a statement is put into the progress window.
     # \log is a function that always prints a message.
     
     def info(arg, indent = 0)
-      @verbose && log(arg, indent)
+      if @verbose
+        log(arg, indent)
+      else
+        str = ("    " * indent) + arg
+        RBA::Logger::log(str)
+      end
     end
     
     # %DRC%
@@ -476,7 +504,7 @@ module DRC
     # verbose mode is enabled.
     
     def log(arg, indent = 0)
-      str = ("  " * indent) + arg
+      str = ("    " * indent) + arg
       if @log_file
         @log_file.puts(str)
       else
@@ -1828,7 +1856,7 @@ CODE
     def _wrapper_context(func, *args, &proc)
       in_context_outer = @in_context
       begin
-        @in_context = true
+        @in_context = func
         return yield(*args)
       rescue => ex
         raise("'" + func + "': " + ex.to_s)
@@ -1842,22 +1870,40 @@ CODE
         return yield(*args)
       else
         begin
-          @in_context = true
+          @in_context = func
           return yield(*args)
         rescue => ex
           raise("'" + func + "': " + ex.to_s)
         ensure
-          @in_context = false
+          @in_context = nil
         end
       end
     end
     
+    def _result_info(res, indent, prefix = "")
+      if res.is_a?(Array)
+        res.each_with_index do |a, index|
+          _result_info(a, indent, "[#{index + 1}] ")
+        end
+      elsif res.is_a?(RBA::Region)
+        info(prefix + "Polygons (raw): #{res.count} (flat)  #{res.hier_count} (hierarchical)", indent)
+      elsif res.is_a?(RBA::Edges)
+        info(prefix + "Edges: #{res.count} (flat)  #{res.hier_count} (hierarchical)", indent)
+      elsif res.is_a?(RBA::EdgePairs)
+        info(prefix + "Edge pairs: #{res.count} (flat)  #{res.hier_count} (hierarchical)", indent)
+      elsif res.is_a?(RBA::Texts)
+        info(prefix + "Texts: #{res.count} (flat)  #{res.hier_count} (hierarchical)", indent)
+      end
+    end
+
     def run_timed(desc, obj)
 
-      log(desc)
+      info(desc)
 
       # enable progress
+      disable_progress = false
       if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs) || obj.is_a?(RBA::Texts)
+        disable_progress = true
         obj.enable_progress(desc)
       end
       
@@ -1867,31 +1913,29 @@ CODE
       res = yield
       t.stop
 
-      if @verbose
+      begin
 
-        # Report result statistics
-        if res.is_a?(RBA::Region)
-          info("Polygons (raw): #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
-        elsif res.is_a?(RBA::Edges)
-          info("Edges: #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
-        elsif res.is_a?(RBA::EdgePairs)
-          info("Edge pairs: #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
-        elsif res.is_a?(RBA::Texts)
-          info("Texts: #{res.count} (flat)  #{res.hier_count} (hierarchical)", 1)
+        if @verbose
+
+          # Report result statistics
+          _result_info(res, 1)
+
+          mem = RBA::Timer::memory_size
+          if mem > 0
+            info("Elapsed: #{'%.3f'%(t.sys+t.user)}s  Memory: #{'%.2f'%(mem/(1024*1024))}M", 1)
+          else
+            info("Elapsed: #{'%.3f'%(t.sys+t.user)}s", 1)
+          end
+
         end
 
-        mem = RBA::Timer::memory_size
-        if mem > 0
-          info("Elapsed: #{'%.3f'%(t.sys+t.user)}s  Memory: #{'%.2f'%(mem/(1024*1024))}M", 1)
-        else
-          info("Elapsed: #{'%.3f'%(t.sys+t.user)}s", 1)
+      ensure
+
+        # disable progress again
+        if disable_progress
+          obj.disable_progress
         end
 
-      end
-
-      # disable progress
-      if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs) || obj.is_a?(RBA::Texts)
-        obj.disable_progress
       end
           
       res
@@ -1899,7 +1943,7 @@ CODE
     end
     
     def _cmd(obj, method, *args)
-      run_timed("\"#{method}\" in: #{src_line}", obj) do
+      run_timed("\"#{@in_context || method}\" in: #{src_line}", obj) do
         obj.send(method, *args)
       end
     end
@@ -1929,8 +1973,9 @@ CODE
         end
         av = args.size.times.collect { |i| "a#{i}" }.join(", ")
         tp.queue("_output(res, self.#{method}(#{av}))")
-        run_timed("\"#{method}\" in: #{src_line}", obj) do
+        run_timed("\"#{@in_context || method}\" in: #{src_line}", obj) do
           tp.execute("Tiled \"#{method}\" in: #{src_line}")
+          res
         end
         
       else
@@ -1940,15 +1985,10 @@ CODE
         end
 
         res = nil
-        run_timed("\"#{method}\" in: #{src_line}", obj) do
+        run_timed("\"#{@in_context || method}\" in: #{src_line}", obj) do
           res = obj.send(method, *args)
         end
 
-      end
-      
-      # disable progress again
-      if obj.is_a?(RBA::Region)
-        obj.disable_progress
       end
       
       res
@@ -1984,8 +2024,9 @@ CODE
         end
         av = args.size.times.collect { |i| "a#{i}" }.join(", ")
         tp.queue("var rr = self.#{method}(#{av}); _output(res1, rr[0]); _output(res2, rr[1])")
-        run_timed("\"#{method}\" in: #{src_line}", obj) do
+        run_timed("\"#{@in_context || method}\" in: #{src_line}", obj) do
           tp.execute("Tiled \"#{method}\" in: #{src_line}")
+          res
         end
         
       else
@@ -1995,15 +2036,10 @@ CODE
         end
 
         res = nil
-        run_timed("\"#{method}\" in: #{src_line}", obj) do
+        run_timed("\"#{@in_context || method}\" in: #{src_line}", obj) do
           res = obj.send(method, *args)
         end
 
-      end
-      
-      # disable progress again
-      if obj.is_a?(RBA::Region)
-        obj.disable_progress
       end
       
       res
@@ -2025,8 +2061,9 @@ CODE
         tp.input("self", obj)
         tp.threads = (@tt || 1)
         tp.queue("_output(res, _tile ? self.#{method}(_tile.bbox) : self.#{method})")
-        run_timed("\"#{method}\" in: #{src_line}", obj) do
+        run_timed("\"#{@in_context || method}\" in: #{src_line}", obj) do
           tp.execute("Tiled \"#{method}\" in: #{src_line}")
+          res
         end
         
         res = res.value
@@ -2038,15 +2075,10 @@ CODE
         end
 
         res = nil
-        run_timed("\"#{method}\" in: #{src_line}", obj) do
+        run_timed("\"#{@in_context || method}\" in: #{src_line}", obj) do
           res = obj.send(method)
         end
 
-      end
-      
-      # disable progress again
-      if obj.is_a?(RBA::Region)
-        obj.disable_progress
       end
       
       res
@@ -2054,23 +2086,29 @@ CODE
     end
     
     def _rcmd(obj, method, *args)
-      run_timed("\"#{method}\" in: #{src_line}", obj) do
+      run_timed("\"#{@in_context || method}\" in: #{src_line}", obj) do
         RBA::Region::new(obj.send(method, *args))
       end
     end
     
     def _vcmd(obj, method, *args)
-      run_timed("\"#{method}\" in: #{src_line}", obj) do
+      run_timed("\"#{@in_context || method}\" in: #{src_line}", obj) do
         obj.send(method, *args)
       end
     end
     
-    def _start
+    def _start(macro_path)
     
       # clearing the selection avoids some nasty problems
       view = RBA::LayoutView::current
       view && view.cancel
       
+      @total_timer = RBA::Timer::new
+      @total_timer.start
+
+      @drc_progress = RBA::AbstractProgress::new("DRC: " + macro_path)
+
+
     end
     
     def _flush
@@ -2210,6 +2248,18 @@ CODE
         @netter = nil
         @netter_data = nil
         
+        if final
+          @total_timer.stop
+          if @verbose
+            mem = RBA::Timer::memory_size
+            if mem > 0
+              info("Total elapsed: #{'%.3f'%(@total_timer.sys+@total_timer.user)}s  Memory: #{'%.2f'%(mem/(1024*1024))}M")
+            else
+              info("Total elapsed: #{'%.3f'%(@total_timer.sys+@total_timer.user)}s")
+            end
+          end
+        end
+
         if final && @log_file
           @log_file.close
           @log_file = nil
@@ -2217,6 +2267,10 @@ CODE
 
         # force garbage collection
         GC.start
+
+        # unlocks the UI
+        @drc_progress._destroy
+        @drc_progress = nil
 
       end
 
@@ -2526,6 +2580,9 @@ CODE
         end
 
       end        
+
+      data 
+
     end
     
     def make_source(layout, cell = nil, path = nil)

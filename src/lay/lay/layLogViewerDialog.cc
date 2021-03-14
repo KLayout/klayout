@@ -101,7 +101,7 @@ LogReceiver::begin ()
 LogFile::LogFile (size_t max_entries, bool register_global)
   : m_error_receiver (this, 0, &LogFile::add_error),
     m_warn_receiver (this, 0, &LogFile::add_warn),
-    m_log_receiver (this, 10, &LogFile::add_info),
+    m_log_receiver (this, 0, &LogFile::add_info),
     m_info_receiver (this, 0, &LogFile::add_info),
     m_max_entries (max_entries),
     m_generation_id (0), 

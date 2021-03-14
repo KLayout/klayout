@@ -733,7 +733,8 @@ TEST(11_RoundAndSmoothed)
   r1_sized -= r1;
 
   db::Region rounded = r1_sized.rounded_corners (3000, 5000, 100);
-  db::Region smoothed = rounded.smoothed (100);
+  db::Region smoothed = rounded.smoothed (100, false);
+  db::Region smoothed_keep_hv = rounded.smoothed (100, true);
 
   db::Layout target;
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -741,6 +742,7 @@ TEST(11_RoundAndSmoothed)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1_sized);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), rounded);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), smoothed);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), smoothed_keep_hv);
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au11.gds");

@@ -378,28 +378,77 @@ AsIfFlatRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &f
   return new_edge_pairs.release ();
 }
 
-RegionDelegate *
-AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse, size_t min_count, size_t max_count) const
+namespace {
+
+class OutputPairHolder
 {
+public:
+  OutputPairHolder (InteractingOutputMode output_mode, bool merged_semantics)
+  {
+    if (output_mode == None) {
+      return;
+    }
+
+    if (output_mode == Positive || output_mode == Negative || output_mode == PositiveAndNegative) {
+      m_positive.reset (new FlatRegion (merged_semantics));
+      m_results.push_back (& m_positive->raw_polygons ());
+    } else {
+      m_results.push_back ((db::Shapes *) 0);
+    }
+
+    if (output_mode == PositiveAndNegative) {
+      m_negative.reset (new FlatRegion (merged_semantics));
+      m_results.push_back (& m_negative->raw_polygons ());
+    }
+  }
+
+  std::pair<RegionDelegate *, RegionDelegate *> region_pair ()
+  {
+    return std::make_pair (m_positive.release (), m_negative.release ());
+  }
+
+  const std::vector<db::Shapes *> &results () { return m_results; }
+
+private:
+  std::unique_ptr<FlatRegion> m_positive, m_negative;
+  std::vector<db::Shapes *> m_results;
+};
+
+}
+
+std::pair<RegionDelegate *, RegionDelegate *>
+AsIfFlatRegion::selected_interacting_generic (const Edges &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
+{
+  OutputPairHolder oph (output_mode, merged_semantics ());
+
+  if (output_mode == None) {
+    return oph.region_pair ();
+  }
+
   min_count = std::max (size_t (1), min_count);
 
-  if (max_count < min_count || other.empty ()) {
-    if (! inverse) {
-      return new EmptyRegion ();
+  //  shortcut
+  if (empty ()) {
+    if (output_mode == Positive || output_mode == Negative) {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
     } else {
-      return clone ();
+      return std::make_pair (clone (), clone ());
     }
-  } else if (empty ()) {
-    return clone ();
+  } else if (max_count < min_count || other.empty ()) {
+    if (output_mode == Positive) {
+      return std::make_pair (new EmptyRegion (), (RegionDelegate *) 0);
+    } else if (output_mode == Negative) {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    } else {
+      return std::make_pair (new EmptyRegion (), clone ());
+    }
   }
 
   bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
-#if defined(USE_LOCAL_PROCESSOR)
-
   db::RegionIterator polygons (begin_merged ());
 
-  db::interacting_with_edge_local_operation<db::Polygon, db::Edge, db::Polygon> op (inverse, min_count, max_count, true);
+  db::interacting_with_edge_local_operation<db::Polygon, db::Edge, db::Polygon> op (output_mode, min_count, max_count, true);
 
   db::local_processor<db::Polygon, db::Edge, db::Polygon> proc;
   proc.set_base_verbosity (base_verbosity ());
@@ -413,71 +462,42 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse, 
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 
-  proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
+  proc.run_flat (polygons, others, std::vector<bool> (), &op, oph.results ());
 
-  return output.release ();
-
-#else
-  std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> > counted_results;
-  ResultCountingInserter inserter (counted_results);
-
-  db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve1 (count ());
-  scanner.reserve2 (other.count ());
-
-  std::unique_ptr<FlatRegion> output (new FlatRegion (false));
-  region_to_edge_interaction_filter<db::Polygon, db::Edge, ResultCountingInserter> filter (inserter, false, counting /*get all in counting mode*/);
-
-  AddressablePolygonDelivery p (begin_merged ());
-
-  for ( ; ! p.at_end (); ++p) {
-    scanner.insert1 (p.operator-> (), 0);
-    if (inverse) {
-      inserter.init (p.operator-> ());
-    }
-  }
-
-  AddressableEdgeDelivery e (counting ? other.addressable_merged_edges () : other.addressable_edges ());
-
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert2 (e.operator-> (), 0);
-  }
-
-  scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
-
-  //  select hits based on their count
-
-  for (std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> >::const_iterator r = counted_results.begin (); r != counted_results.end (); ++r) {
-    bool hit = r->second >= min_count && r->second <= max_count;
-    if (hit != inverse) {
-      output->insert (*r->first);
-    }
-  }
-
-  return output.release ();
-#endif
+  return oph.region_pair ();
 }
 
-RegionDelegate *
-AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse, size_t min_count, size_t max_count) const
+std::pair<RegionDelegate *, RegionDelegate *>
+AsIfFlatRegion::selected_interacting_generic (const Texts &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
-  min_count = std::max (size_t (1), min_count);
+  OutputPairHolder oph (output_mode, merged_semantics ());
 
-  if (max_count < min_count || other.empty ()) {
-    if (! inverse) {
-      return new EmptyRegion ();
-    } else {
-      return clone ();
-    }
-  } else if (empty ()) {
-    return clone ();
+  if (output_mode == None) {
+    return oph.region_pair ();
   }
 
-#if defined(USE_LOCAL_PROCESSOR)
+  min_count = std::max (size_t (1), min_count);
+
+  //  shortcut
+  if (empty ()) {
+    if (output_mode == Positive || output_mode == Negative) {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    } else {
+      return std::make_pair (clone (), clone ());
+    }
+  } else if (max_count < min_count || other.empty ()) {
+    if (output_mode == Positive) {
+      return std::make_pair (new EmptyRegion (), (RegionDelegate *) 0);
+    } else if (output_mode == Negative) {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    } else {
+      return std::make_pair (new EmptyRegion (), clone ());
+    }
+  }
 
   db::RegionIterator polygons (begin_merged ());
 
-  db::interacting_with_text_local_operation<db::Polygon, db::Text, db::Polygon> op (inverse, min_count, max_count);
+  db::interacting_with_text_local_operation<db::Polygon, db::Text, db::Polygon> op (output_mode, min_count, max_count);
 
   db::local_processor<db::Polygon, db::Text, db::Polygon> proc;
   proc.set_base_verbosity (base_verbosity ());
@@ -487,84 +507,58 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, bool inverse, 
   std::vector<generic_shape_iterator<db::Text> > others;
   others.push_back (other.begin ());
 
-  std::unique_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
-  std::vector<db::Shapes *> results;
-  results.push_back (&output->raw_polygons ());
+  proc.run_flat (polygons, others, std::vector<bool> (), &op, oph.results ());
 
-  proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
-
-  return output.release ();
-
-#else
-  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
-
-  std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> > counted_results;
-  ResultCountingInserter inserter (counted_results);
-
-  db::box_scanner2<db::Polygon, size_t, db::Text, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve1 (count ());
-  scanner.reserve2 (other.count ());
-
-  region_to_text_interaction_filter<db::Polygon, db::Text, ResultCountingInserter> filter (inserter, false, counting /*get all in counting mode*/);
-
-  AddressablePolygonDelivery p (begin_merged ());
-
-  for ( ; ! p.at_end (); ++p) {
-    scanner.insert1 (p.operator-> (), 0);
-    if (inverse) {
-      inserter.init (p.operator-> ());
-    }
-  }
-
-  AddressableTextDelivery e (other.addressable_texts ());
-
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert2 (e.operator-> (), 0);
-  }
-
-  scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Text> ());
-
-  //  select hits based on their count
-
-  std::unique_ptr<FlatRegion> output (new FlatRegion (true));
-
-  for (std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> >::const_iterator r = counted_results.begin (); r != counted_results.end (); ++r) {
-    bool hit = r->second >= min_count && r->second <= max_count;
-    if (hit != inverse) {
-      output->insert (*r->first);
-    }
-  }
-
-  return output.release ();
-#endif
+  return oph.region_pair ();
 }
 
-RegionDelegate *
-AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count, size_t max_count) const
+
+std::pair<RegionDelegate *, RegionDelegate *>
+AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, bool touching, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
+  OutputPairHolder oph (output_mode, merged_semantics ());
+
+  if (output_mode == None) {
+    return oph.region_pair ();
+  }
+
   min_count = std::max (size_t (1), min_count);
 
   //  shortcut
   if (empty ()) {
-    return clone ();
+    if (output_mode == Positive || output_mode == Negative) {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    } else {
+      return std::make_pair (clone (), clone ());
+    }
   } else if (max_count < min_count || other.empty ()) {
     //  clear, if b is empty and
     //   * mode is inside, enclosing or interacting and inverse is false ("inside" or "interacting")
     //   * mode is outside and inverse is true ("not outside")
-    if ((mode <= 0) != inverse) {
-      return new EmptyRegion ();
+    if ((mode <= 0)) {
+      if (output_mode == Positive) {
+        return std::make_pair (new EmptyRegion (), (RegionDelegate *) 0);
+      } else if (output_mode == Negative) {
+        return std::make_pair (clone (), (RegionDelegate *) 0);
+      } else {
+        return std::make_pair (new EmptyRegion (), clone ());
+      }
     } else {
-      return clone ();
+      if (output_mode == Positive) {
+        return std::make_pair (clone(), (RegionDelegate *) 0);
+      } else if (output_mode == Negative) {
+        return std::make_pair (new EmptyRegion (), (RegionDelegate *) 0);
+      } else {
+        return std::make_pair (clone (), new EmptyRegion ());
+      }
     }
   }
-
-#if defined(USE_LOCAL_PROCESSOR)
 
   bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   db::RegionIterator polygons (begin_merged ());
 
-  db::interacting_local_operation<db::Polygon, db::Polygon, db::Polygon> op (mode, touching, inverse, min_count, max_count, true);
+  db::interacting_local_operation<db::Polygon, db::Polygon, db::Polygon> op (mode, touching, output_mode, min_count, max_count, true);
 
   db::local_processor<db::Polygon, db::Polygon, db::Polygon> proc;
   proc.set_base_verbosity (base_verbosity ());
@@ -574,121 +568,9 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
   std::vector<generic_shape_iterator<db::Polygon> > others;
   others.push_back ((mode < 0 || counting) ? other.begin_merged () : other.begin ());
 
-  std::unique_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
-  std::vector<db::Shapes *> results;
-  results.push_back (&output->raw_polygons ());
+  proc.run_flat (polygons, others, std::vector<bool> (), &op, oph.results ());
 
-  proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
-
-  return output.release ();
-
-#else
-  db::EdgeProcessor ep (report_progress (), progress_desc ());
-  ep.set_base_verbosity (base_verbosity ());
-
-  size_t n = 0;
-  size_t nstart = 0;
-
-  if (mode < -1) {
-
-    //  in enclosing mode self must be primary and other the secondary. For other
-    //  modes it's the other way round
-
-    for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p, ++n) {
-      if (mode > 0 || p->box ().touches (other.bbox ())) {
-        ep.insert (*p, n);
-      }
-    }
-
-    nstart = n;
-
-  }
-
-  if (min_count == size_t (1) && max_count == std::numeric_limits<size_t>::max ()) {
-
-    if (mode < 0) {
-
-      //  NOTE: on "inside" or "enclosing", the other region must be merged
-      for (RegionIterator p = other.begin_merged (); ! p.at_end (); ++p) {
-        if (p->box ().touches (bbox ())) {
-          ep.insert (*p, n);
-        }
-      }
-
-    } else {
-
-      for (RegionIterator p = other.begin (); ! p.at_end (); ++p) {
-        if (p->box ().touches (bbox ())) {
-          ep.insert (*p, n);
-        }
-      }
-
-    }
-
-    ++n;
-
-  } else {
-
-    //  with counting we need to separate the other polygons by different properties
-
-    //  cannot only have min_count/max_count in outside mode
-    tl_assert (mode <= 0);
-
-    for (RegionIterator p = other.begin_merged (); ! p.at_end (); ++p) {
-      if (p->box ().touches (bbox ())) {
-        ep.insert (*p, n);
-      }
-      ++n;
-    }
-
-  }
-
-  if (mode >= -1) {
-
-    nstart = n;
-
-    for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p, ++n) {
-      if (mode > 0 || p->box ().touches (other.bbox ())) {
-        ep.insert (*p, n);
-      }
-    }
-
-  }
-
-  //  there should be at least one element to look at for primary
-  tl_assert (nstart > 0);
-
-  db::InteractionDetector id (mode, nstart - 1);
-  id.set_include_touching (touching);
-  db::EdgeSink es;
-  ep.process (es, id);
-  id.finish ();
-
-  std::unique_ptr<FlatRegion> output (new FlatRegion (false));
-
-  std::map <size_t, size_t> interaction_counts;
-  for (db::InteractionDetector::iterator i = id.begin (); i != id.end () ; ++i) {
-    if (i->first < nstart && i->second >= nstart) {
-      interaction_counts [mode < -1 ? i->first : i->second] += 1;
-    }
-  }
-
-  output->reserve (n);
-
-  n = (mode < -1 ? 0 : nstart);
-  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p, ++n) {
-    size_t count = 0;
-    std::map <size_t, size_t>::const_iterator c = interaction_counts.find (n);
-    if (c != interaction_counts.end ()) {
-      count = c->second;
-    }
-    if ((count >= min_count && count <= max_count) != inverse) {
-      output->insert (*p);
-    }
-  }
-
-  return output.release ();
-#endif
+  return oph.region_pair ();
 }
 
 EdgesDelegate *

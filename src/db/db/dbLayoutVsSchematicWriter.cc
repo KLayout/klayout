@@ -146,11 +146,30 @@ std::string ion_to_s (const Obj *obj)
   }
 }
 
-std::string net_id_to_s (const db::Net *net, const std::map<const db::Net *, unsigned int> &net2id)
+static std::string net_id_to_s (const db::Net *net, const std::map<const db::Net *, unsigned int> &net2id)
 {
   if (net) {
     std::map<const db::Net *, unsigned int>::const_iterator i = net2id.find (net);
     tl_assert (i != net2id.end ());
+    return tl::to_string (i->second);
+  } else {
+    return "()";
+  }
+}
+
+static void build_pin_index_map (const db::Circuit *c, std::map<const db::Pin *, unsigned int> &pin2index)
+{
+  size_t pi = 0;
+  for (db::Circuit::const_pin_iterator p = c->begin_pins (); p != c->end_pins (); ++p, ++pi) {
+    pin2index.insert (std::make_pair (p.operator-> (), pi));
+  }
+}
+
+static std::string pin_id_to_s (const db::Pin *pin, const std::map<const db::Pin *, unsigned int> &pin2index)
+{
+  if (pin) {
+    std::map<const db::Pin *, unsigned int>::const_iterator i = pin2index.find (pin);
+    tl_assert (i != pin2index.end ());
     return tl::to_string (i->second);
   } else {
     return "()";
@@ -200,8 +219,12 @@ void std_writer_impl<Keys>::write (const db::NetlistCrossReference *xref)
       stream () << indent1 << indent2 << Keys::net_key << "(" << net_id_to_s (n->pair.first, m_net2id_per_circuit_a [c->first]) << " " << net_id_to_s (n->pair.second, m_net2id_per_circuit_b [c->second]) << status_to_s (n->status) << message_to_s (n->msg) << ")" << endl;
     }
 
+    std::map<const db::Pin *, unsigned int> pin2index_a, pin2index_b;
+    build_pin_index_map (c->first, pin2index_a);
+    build_pin_index_map (c->second, pin2index_b);
+
     for (db::NetlistCrossReference::PerCircuitData::pin_pairs_const_iterator n = pcd->pins.begin (); n != pcd->pins.end (); ++n) {
-      stream () << indent1 << indent2 << Keys::pin_key << "(" << ion_to_s (n->pair.first) << " " << ion_to_s (n->pair.second) << status_to_s (n->status) << message_to_s (n->msg) << ")" << endl;
+      stream () << indent1 << indent2 << Keys::pin_key << "(" << pin_id_to_s (n->pair.first, pin2index_a) << " " << pin_id_to_s (n->pair.second, pin2index_b) << status_to_s (n->status) << message_to_s (n->msg) << ")" << endl;
     }
 
     for (db::NetlistCrossReference::PerCircuitData::device_pairs_const_iterator n = pcd->devices.begin (); n != pcd->devices.end (); ++n) {

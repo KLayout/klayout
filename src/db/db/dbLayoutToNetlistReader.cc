@@ -632,6 +632,9 @@ LayoutToNetlistStandardReader::read_pin (db::Netlist * /*netlist*/, db::LayoutTo
   }
 
   size_t pin_id = circuit->add_pin (pin).id ();
+  //  NOTE: because we identify pins by their order and not by ID we need to ensure the pin IDs are
+  //  generated sequentially.
+  tl_assert (circuit->pin_count () == pin_id + 1);
   if (net) {
     circuit->connect_pin (pin_id, net);
   }

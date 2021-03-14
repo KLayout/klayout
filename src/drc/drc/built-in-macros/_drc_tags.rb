@@ -180,6 +180,116 @@ module DRC
       @value
     end
   end
+
+  # A wrapper for the fill cell definition
+  class DRCFillCell
+
+    def initialize(name)
+      @cell_name = name
+      @shapes = []
+      @origin = RBA::DVector::new
+    end
+
+    def shape(*args)
+
+      layer = nil
+      datatype = nil
+      name = nil
+      shapes = []
+
+      args.each_with_index do |a,ai|
+        if a.is_a?(1.class)
+          if !layer
+            layer = a
+            datatype = 0
+          elsif !datatype
+            datatype = a
+          else
+            raise("Argument ##{ai+1} not understood for FillCell#shape")
+          end
+        elsif a.is_a?(String)
+          if !name
+            name = a
+          else
+            raise("Argument ##{ai+1} not understood for FillCell#shape")
+          end
+        elsif a.is_a?(RBA::DBox) || a.is_a?(RBA::DPath) || a.is_a?(RBA::DPolygon) || a.is_a?(RBA::DText)
+          shapes << a
+        else
+          raise("Argument ##{ai+1} not understood for FillCell#shape (needs to one of: number, string or box, path, polygon or text)")
+        end
+      end
+
+      if !shapes.empty?
+
+        li = RBA::LayerInfo::new
+        layer && li.layer = layer
+        datatype && li.datatype = datatype
+        name && li.name = name
+
+        @shapes << [ li, shapes ]
+
+      end
+     
+    end
+
+    def origin(x, y)
+      if !x.is_a?(1.class) && !x.is_a?(1.0.class)
+        raise("x argument not numeric FillCell#origin")
+      end
+      if !y.is_a?(1.class) && !y.is_a?(1.0.class)
+        raise("y argument not numeric FillCell#origin")
+      end
+      @origin = RBA::DVector::new(x, y)
+    end
+
+  end
  
+  # A wrapper for the fill step definition
+  class DRCFillStep
+    def initialize(for_row, x, y = nil)
+      @for_row = for_row
+      if !x.is_a?(1.class) && !x.is_a?(1.0.class)
+        raise("x argument not numeric in fill step")
+      end
+      if y && !y.is_a?(1.class) && !y.is_a?(1.0.class)
+        raise("y argument not numeric in fill step")
+      end
+      if y
+        @step = RBA::DVector::new(x, y)
+      elsif for_row
+        @step = RBA::DVector::new(x, 0)
+      else
+        @step = RBA::DVector::new(0, x)
+      end 
+    end
+    def for_row
+      @for_row
+    end
+    def step
+      @step
+    end
+  end
+
+  # A wrapper for the fill origin definition
+  class DRCFillOrigin
+    def initialize(x = nil, y = nil)
+      if !x && !y
+        @origin = nil
+      else
+        if !x.is_a?(1.class) && !x.is_a?(1.0.class)
+          raise("x argument not numeric in fill origin")
+        end
+        if !y.is_a?(1.class) && !y.is_a?(1.0.class)
+          raise("y argument not numeric in fill origin")
+        end
+        @origin = RBA::DVector::new(x, y)
+      end
+    end
+    def origin
+      @origin
+    end
+  end
+
 end
 

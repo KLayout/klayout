@@ -93,7 +93,7 @@ module DRC
     def transparent
       DRCShielded::new(false)
     end
-    
+
     def projection_limits(*args)
       self._context("projection_limits") do
         if args.size == 0
@@ -209,6 +209,26 @@ module DRC
       self._context("area_and_perimeter") do
         DRCAreaAndPerimeter::new(r, 1.0, f)
       end
+    end
+
+    def fill_cell(name)
+      DRCFillCell::new(name)
+    end
+
+    def hstep(x, y = nil)
+      DRCFillStep(true, x, y)
+    end
+    
+    def vstep(x, y = nil)
+      DRCFillStep(false, x, y)
+    end
+
+    def auto_origin
+      DRCFillOrigin::new
+    end
+
+    def origin(x, y)
+      DRCFillOrigin::new(x, y)
     end
     
     # %DRC%

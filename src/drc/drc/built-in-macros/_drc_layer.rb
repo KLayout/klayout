@@ -3893,6 +3893,63 @@ CODE
         @engine._vcmd(@engine, :_output, self.data, *args)
       end
     end
+
+    # Experimental
+    
+    def fill(*args)
+
+      m = "fill"
+
+      source = @engine.source
+      row_step = nil
+      column_step = nil
+      pattern = nil
+      origin = RBA::DPoint::new
+
+      args.each_with_index do |a,ai|
+        if a.is_a?(DRCSource)
+          if source
+            raise("Duplicate source specification for '#{m}' at argument ##{ai+1}")
+          end
+          source = a
+        elsif a.is_a?(DRCFillCell)
+          if pattern
+            raise("Duplicate fill pattern specification for '#{m}' at argument ##{ai+1}")
+          end
+          pattern = a
+        elsif a.is_a?(DRCFillStep)
+          if a.for_row
+            if row_step
+              raise("Duplicate hstep specification for '#{m}' at argument ##{ai+1}")
+            end
+            row_step = a
+          else
+            if column_step
+              raise("Duplicate vstep specification for '#{m}' at argument ##{ai+1}")
+            end
+            column_step = a
+          end
+        elsif a.is_a?(DRCFillOrigin)
+          origin = a.origin
+        else
+          raise("Argument ##{ai+1} not understood for '#{m}'")
+        end
+      end
+
+      if !pattern
+        raise("No fill pattern given for '#{m}'")
+      end
+
+      if !row_step
+        row_step = RBA::DVector::new(pattern.bbox.width, 0)
+      end
+      if !column_step
+        column_step = RBA::DVector::new(0, pattern.bbox.height)
+      end
+
+
+
+    end
     
     # %DRC%
     # @name data

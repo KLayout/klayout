@@ -101,28 +101,6 @@ static void _call_f_isSessionRestored_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// bool QApplication::notify(QObject *, QEvent *)
-
-
-static void _init_f_notify_2411 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
-  decl->add_arg<QEvent * > (argspec_1);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_notify_2411 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
-  QEvent *arg2 = gsi::arg_reader<QEvent * >() (args, heap);
-  ret.write<bool > ((bool)((QApplication *)cls)->notify (arg1, arg2));
-}
-
-
 // QString QApplication::sessionId()
 
 
@@ -1534,7 +1512,6 @@ static gsi::Methods methods_QApplication () {
   methods += new qt_gsi::GenericMethod (":autoSipEnabled", "@brief Method bool QApplication::autoSipEnabled()\n", true, &_init_f_autoSipEnabled_c0, &_call_f_autoSipEnabled_c0);
   methods += new qt_gsi::GenericMethod (":inputContext", "@brief Method QInputContext *QApplication::inputContext()\n", true, &_init_f_inputContext_c0, &_call_f_inputContext_c0);
   methods += new qt_gsi::GenericMethod ("isSessionRestored?", "@brief Method bool QApplication::isSessionRestored()\n", true, &_init_f_isSessionRestored_c0, &_call_f_isSessionRestored_c0);
-  methods += new qt_gsi::GenericMethod ("notify", "@brief Method bool QApplication::notify(QObject *, QEvent *)\nThis is a reimplementation of QCoreApplication::notify", false, &_init_f_notify_2411, &_call_f_notify_2411);
   methods += new qt_gsi::GenericMethod ("sessionId", "@brief Method QString QApplication::sessionId()\n", true, &_init_f_sessionId_c0, &_call_f_sessionId_c0);
   methods += new qt_gsi::GenericMethod ("sessionKey", "@brief Method QString QApplication::sessionKey()\n", true, &_init_f_sessionKey_c0, &_call_f_sessionKey_c0);
   methods += new qt_gsi::GenericMethod ("setAutoSipEnabled|autoSipEnabled=", "@brief Method void QApplication::setAutoSipEnabled(const bool enabled)\n", false, &_init_f_setAutoSipEnabled_1559, &_call_f_setAutoSipEnabled_1559);
@@ -1686,21 +1663,6 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QApplication::notify(QObject *, QEvent *)
-  bool cbs_notify_2411_0(QObject *arg1, QEvent *arg2)
-  {
-    return QApplication::notify(arg1, arg2);
-  }
-
-  virtual bool notify(QObject *arg1, QEvent *arg2)
-  {
-    if (cb_notify_2411_0.can_issue()) {
-      return cb_notify_2411_0.issue<QApplication_Adaptor, bool, QObject *, QEvent *>(&QApplication_Adaptor::cbs_notify_2411_0, arg1, arg2);
-    } else {
-      return QApplication::notify(arg1, arg2);
-    }
-  }
-
   //  [emitter impl] void QApplication::aboutToQuit()
   void emitter_QApplication_aboutToQuit_0()
   {
@@ -1813,7 +1775,6 @@ public:
   }
 
   gsi::Callback cb_eventFilter_2411_0;
-  gsi::Callback cb_notify_2411_0;
   gsi::Callback cb_childEvent_1701_0;
   gsi::Callback cb_customEvent_1217_0;
   gsi::Callback cb_disconnectNotify_1731_0;
@@ -2025,32 +1986,6 @@ static void _call_emitter_lastWindowClosed_0 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// bool QApplication::notify(QObject *, QEvent *)
-
-static void _init_cbs_notify_2411_0 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
-  decl->add_arg<QEvent * > (argspec_1);
-  decl->set_return<bool > ();
-}
-
-static void _call_cbs_notify_2411_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = args.read<QObject * > (heap);
-  QEvent *arg2 = args.read<QEvent * > (heap);
-  ret.write<bool > ((bool)((QApplication_Adaptor *)cls)->cbs_notify_2411_0 (arg1, arg2));
-}
-
-static void _set_callback_cbs_notify_2411_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QApplication_Adaptor *)cls)->cb_notify_2411_0 = cb;
-}
-
-
 // exposed int QApplication::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -2147,8 +2082,6 @@ static gsi::Methods methods_QApplication_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_focusChanged", "@brief Emitter for signal void QApplication::focusChanged(QWidget *old, QWidget *now)\nCall this method to emit this signal.", false, &_init_emitter_focusChanged_2522, &_call_emitter_focusChanged_2522);
   methods += new qt_gsi::GenericMethod ("emit_fontDatabaseChanged", "@brief Emitter for signal void QApplication::fontDatabaseChanged()\nCall this method to emit this signal.", false, &_init_emitter_fontDatabaseChanged_0, &_call_emitter_fontDatabaseChanged_0);
   methods += new qt_gsi::GenericMethod ("emit_lastWindowClosed", "@brief Emitter for signal void QApplication::lastWindowClosed()\nCall this method to emit this signal.", false, &_init_emitter_lastWindowClosed_0, &_call_emitter_lastWindowClosed_0);
-  methods += new qt_gsi::GenericMethod ("notify", "@brief Virtual method bool QApplication::notify(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_notify_2411_0, &_call_cbs_notify_2411_0);
-  methods += new qt_gsi::GenericMethod ("notify", "@hide", false, &_init_cbs_notify_2411_0, &_call_cbs_notify_2411_0, &_set_callback_cbs_notify_2411_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QApplication::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QApplication::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QApplication::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);

@@ -180,7 +180,7 @@ EmptyWithinViewCache::determine_empty_layers (const db::Layout *layout, unsigned
 
 LayerTreeModel::LayerTreeModel (QWidget *parent, lay::LayoutView *view)
   : QAbstractItemModel (parent), 
-    mp_view (view), m_id_start (0), m_id_end (0), m_phase ((unsigned int) -1), m_test_shapes_in_view (false)
+    mp_view (view), m_filter_mode (false), m_id_start (0), m_id_end (0), m_phase ((unsigned int) -1), m_test_shapes_in_view (false), m_hide_empty_layers (false)
 {
   // .. nothing yet ..
 }
@@ -208,6 +208,37 @@ LayerTreeModel::set_text_color (QColor color)
 {
   m_text_color = color;
   signal_data_changed ();
+}
+
+void
+LayerTreeModel::set_test_shapes_in_view (bool f)
+{
+  if (m_test_shapes_in_view != f) {
+    m_test_shapes_in_view = f;
+    if (m_hide_empty_layers) {
+      emit hidden_flags_need_update ();
+    }
+    signal_data_changed ();
+  }
+}
+
+void
+LayerTreeModel::set_hide_empty_layers (bool f)
+{
+  if (m_hide_empty_layers != f) {
+    m_hide_empty_layers = f;
+    //  we actually can't do this ourselves.
+    emit hidden_flags_need_update ();
+  }
+}
+
+void
+LayerTreeModel::set_filter_mode (bool f)
+{
+  if (f != m_filter_mode) {
+    m_filter_mode = f;
+    emit hidden_flags_need_update ();
+  }
 }
 
 void 
@@ -288,6 +319,10 @@ LayerTreeModel::clear_locate ()
   m_selected_ids.clear ();
 
   signal_data_changed ();
+
+  if (m_filter_mode) {
+    emit hidden_flags_need_update ();
+  }
 }
 
 QModelIndex
@@ -358,6 +393,10 @@ LayerTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive
 
   signal_data_changed ();
 
+  if (m_filter_mode) {
+    emit hidden_flags_need_update ();
+  }
+
   m_current_index = m_selected_indexes.begin ();
   if (m_current_index == m_selected_indexes.end ()) {
     return QModelIndex ();
@@ -382,9 +421,9 @@ LayerTreeModel::signal_begin_layer_changed ()
 }
 
 void 
-LayerTreeModel::signal_layer_changed () 
+LayerTreeModel::signal_layers_changed ()
 {
-  // establish a new range of valid iterator indices
+  //  establish a new range of valid iterator indices
   m_id_start = m_id_end; 
 
   //  TODO: is there a more efficient way to compute that?
@@ -393,6 +432,21 @@ LayerTreeModel::signal_layer_changed ()
     max_id = std::max (iter.uint (), max_id);
   }
   m_id_end += max_id + 1;
+
+  //  update the persistent indexes
+
+  QModelIndexList indexes = persistentIndexList ();
+  QModelIndexList new_indexes;
+  for (QModelIndexList::const_iterator i = indexes.begin (); i != indexes.end (); ++i) {
+    lay::LayerPropertiesConstIterator li = iterator (*i);
+    if (! li.at_end ()) {
+      new_indexes.push_back (createIndex (li.child_index (), i->column (), (void *) (li.uint () + m_id_start)));
+    } else {
+      new_indexes.push_back (QModelIndex ());
+    }
+  }
+
+  changePersistentIndexList (indexes, new_indexes);
 
   m_test_shapes_cache.clear ();
   emit layoutChanged ();
@@ -479,6 +533,22 @@ single_bitmap_to_image (const lay::ViewOp &view_op, lay::Bitmap &bitmap,
   pbitmaps.push_back (&bitmap);
 
   lay::bitmaps_to_image (view_ops, pbitmaps, dither_pattern, line_styles, pimage, width, height, false, 0);
+}
+
+bool
+LayerTreeModel::is_hidden (const QModelIndex &index) const
+{
+  if (m_filter_mode && ! m_selected_ids.empty () && m_selected_ids.find (size_t (index.internalPointer ())) == m_selected_ids.end ()) {
+    return true;
+  }
+
+  if (! m_hide_empty_layers) {
+    return false;
+  } else if (m_test_shapes_in_view) {
+    return empty_within_view_predicate (index);
+  } else {
+    return empty_predicate (index);
+  }
 }
 
 bool 

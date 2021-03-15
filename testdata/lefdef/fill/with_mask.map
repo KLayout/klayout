@@ -1,0 +1,4 @@
+DIEAREA	ALL	100		0
+M1      FILL:MASK:1   10      1
+M2      FILL:MASK:2   20      2
+M2	FILLOPC:MASK:2   20      3

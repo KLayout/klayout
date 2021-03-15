@@ -723,20 +723,24 @@ static db::Layout boxes2layout (const std::set<db::Box> &boxes)
   return l;
 }
 
-class FlatPusher
-  : public db::RecursiveShapeReceiver
-{
-public:
-  FlatPusher (std::set<db::Box> *boxes) : mp_boxes (boxes) { }
+namespace {
 
-  void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
+  class FlatPusher
+    : public db::RecursiveShapeReceiver
   {
-    mp_boxes->insert (trans * shape.bbox ());
-  }
+  public:
+    FlatPusher (std::set<db::Box> *boxes) : mp_boxes (boxes) { }
 
-private:
-  std::set<db::Box> *mp_boxes;
-};
+    void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
+    {
+      mp_boxes->insert (trans * shape.bbox ());
+    }
+
+  private:
+    std::set<db::Box> *mp_boxes;
+  };
+
+}
 
 TEST(4)
 {
@@ -1023,6 +1027,8 @@ TEST(10)
 
   db::Box b (1000, -500, 2000, 500);
   c2.shapes (0).insert (b);
+  c0.shapes (0).insert (b.moved (db::Vector (-1000, 500)));
+  c0.shapes (0).insert (b.moved (db::Vector (-2000, 500)));
 
   db::Trans tt;
   c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), tt, db::Vector (0, 6000), db::Vector (6000, 0), 2, 2));
@@ -1036,6 +1042,9 @@ TEST(10)
     "begin\n"
     "new_inst($2,all)\n"
     "new_inst_member($2,r0 *1 0,0,all)\n"
+    //  It's a bit weird to have shape events after new_inst_member, but remember, new_inst_member is a query callback, not an event.
+    "shape(box (0,0;1000,1000),r0 *1 0,0)\n"
+    "shape(box (-1000,0;0,1000),r0 *1 0,0)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
     "new_inst_member($3,r0 *1 0,0,all)\n"
@@ -1126,6 +1135,8 @@ TEST(10)
     "begin\n"
     "new_inst($2,all)\n"
     "new_inst_member($2,r0 *1 0,0,all)\n"
+    "shape(box (0,0;1000,1000),r0 *1 0,0)\n"
+    "shape(box (-1000,0;0,1000),r0 *1 0,0)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
     "leave_cell($2)\n"
@@ -1152,6 +1163,8 @@ TEST(10)
     "begin\n"
     "new_inst($2,all)\n"
     "new_inst_member($2,r0 *1 0,0,all)\n"
+    "shape(box (0,0;1000,1000),r0 *1 0,0)\n"
+    "shape(box (-1000,0;0,1000),r0 *1 0,0)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
     "new_inst_member($3,r0 *1 0,0,all)\n"
@@ -1194,6 +1207,8 @@ TEST(10)
     "begin\n"
     "new_inst($2,all)\n"
     "new_inst_member($2,r0 *1 0,0,all)\n"
+    "shape(box (0,0;1000,1000),r0 *1 0,0)\n"
+    "shape(box (-1000,0;0,1000),r0 *1 0,0)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
     "new_inst_member($3,r0 *1 0,0,all)\n"     // -> skipped
@@ -1271,6 +1286,8 @@ TEST(10)
   EXPECT_EQ (rr2.text (),
     "begin\n"
     "new_inst($2,all)\n"
+    "shape(box (0,0;1000,1000),r0 *1 0,0)\n"
+    "shape(box (-1000,0;0,1000),r0 *1 0,0)\n"
     "end\n"
   );
 
@@ -1282,6 +1299,8 @@ TEST(10)
     "begin\n"
     "new_inst($2)\n"
     "new_inst_member($2,r0 *1 0,0)\n"
+    "shape(box (0,0;1000,1000),r0 *1 0,0)\n"
+    "shape(box (-1000,0;0,1000),r0 *1 0,0)\n"
     "enter_cell($2)\n"
     "new_inst($3)\n"
     "new_inst_member($3,r0 *1 0,0)\n"

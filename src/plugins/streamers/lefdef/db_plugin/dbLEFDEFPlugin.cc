@@ -339,6 +339,13 @@ class LEFDEFFormatDeclaration
       //  new:
       tl::make_member (&LEFDEFReaderOptions::lef_pins_suffix_str, &LEFDEFReaderOptions::set_lef_pins_suffix_str, "special-lef_pins-suffix-string") +
       tl::make_member (&LEFDEFReaderOptions::lef_pins_datatype_str, &LEFDEFReaderOptions::set_lef_pins_datatype_str, "special-lef_pins-datatype-string") +
+      tl::make_member (&LEFDEFReaderOptions::produce_fills, &LEFDEFReaderOptions::set_produce_fills, "produce-fills") +
+      //  for backward compatibility
+      tl::make_member (&LEFDEFReaderOptions::set_fills_suffix, "special-fills-suffix") +
+      tl::make_member (&LEFDEFReaderOptions::set_fills_datatype, "special-fills-datatype") +
+      //  new:
+      tl::make_member (&LEFDEFReaderOptions::fills_suffix_str, &LEFDEFReaderOptions::set_fills_suffix_str, "special-fills-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::fills_datatype_str, &LEFDEFReaderOptions::set_fills_datatype_str, "special-fills-datatype-string") +
       tl::make_member (&LEFDEFReaderOptions::produce_obstructions, &LEFDEFReaderOptions::set_produce_obstructions, "produce-obstructions") +
       tl::make_member (&LEFDEFReaderOptions::obstructions_suffix, &LEFDEFReaderOptions::set_obstructions_suffix, "obstructions-suffix") +
       tl::make_member (&LEFDEFReaderOptions::obstructions_datatype, &LEFDEFReaderOptions::set_obstructions_datatype, "obstructions-datatype") +

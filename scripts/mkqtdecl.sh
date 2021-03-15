@@ -49,8 +49,8 @@ inst_dir5=`pwd`/scripts/mkqtdecl5
 src_dir=`pwd`/src
 src_name4=gsiqt/qt4
 src_name5=gsiqt/qt5
-qt_mods4="QtCore QtGui QtDesigner QtNetwork QtSql QtXml"
-qt_mods5="QtCore QtGui QtWidgets QtDesigner QtNetwork QtPrintSupport QtSql QtSvg QtXml QtXmlPatterns QtMultimedia"
+qt_mods4="QtCore QtGui QtDesigner QtNetwork QtSql QtXml QtUiTools"
+qt_mods5="QtCore QtGui QtWidgets QtDesigner QtNetwork QtPrintSupport QtSql QtSvg QtXml QtXmlPatterns QtMultimedia QtUiTools"
 
 src_name=$src_name4
 inst_dir=$inst_dir4

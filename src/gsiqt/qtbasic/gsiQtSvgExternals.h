@@ -20,7 +20,9 @@
 
 */
 
-#if QT_VERSION >= 0x050000
+#if !defined(HAVE_QT_SVG)
+#  define FORCE_LINK_GSI_QTSVG
+#elif QT_VERSION >= 0x050000
 #  include "../qt5/QtSvg/gsiQtExternals.h"
 #else
 //  no present in Qt4

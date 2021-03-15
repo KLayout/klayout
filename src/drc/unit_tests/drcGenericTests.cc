@@ -238,3 +238,13 @@ TEST(17d)
 {
   run_test (_this, "17", true);
 }
+
+TEST(18)
+{
+  run_test (_this, "18", false);
+}
+
+TEST(18d)
+{
+  run_test (_this, "18", true);
+}

@@ -512,8 +512,6 @@ class TL_PUBLIC WorkerProgressAdaptor : public tl::ProgressAdaptor
 public:
   WorkerProgressAdaptor (Worker *worker);
   
-  virtual void register_object (Progress *progress);
-  virtual void unregister_object (Progress *progress);
   virtual void trigger (Progress *progress);
   virtual void yield (Progress *progress);
 
@@ -527,16 +525,6 @@ WorkerProgressAdaptor::WorkerProgressAdaptor (Worker *worker)
   // .. nothing yet .. 
 }
   
-void WorkerProgressAdaptor::register_object (Progress * /*progress*/)
-{
-  // .. nothing yet .. 
-}
-
-void WorkerProgressAdaptor::unregister_object (Progress * /*progress*/)
-{
-  // .. nothing yet .. 
-}
-
 void WorkerProgressAdaptor::trigger (Progress * /*progress*/)
 {
   // .. nothing yet .. 

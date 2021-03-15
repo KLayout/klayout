@@ -1518,14 +1518,14 @@ public:
   /**
    *  @brief Smoothes the region (in-place)
    */
-  void smooth (coord_type d);
+  void smooth (coord_type d, bool keep_hv);
 
   /**
    *  @brief Returns the smoothed region
    *
    *  @param d The smoothing accuracy
    */
-  Region smoothed (coord_type d) const;
+  Region smoothed (coord_type d, bool keep_hv) const;
 
   /**
    *  @brief Returns the nth polygon

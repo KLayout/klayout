@@ -203,6 +203,11 @@ public:
   QModelIndex locate_prev ();
 
   /**
+   *  @brief Resets the search pointer to the one next to the given index
+   */
+  QModelIndex locate_next (const QModelIndex &index);
+
+  /**
    *  @brief Clears the locate flags
    */
   void clear_locate ();
@@ -221,11 +226,20 @@ public:
   }
 
   /**
+   *  @brief Sets a flag indicating whether selected indexes are filtered or highlighted
+   */
+  void set_filter_mode (bool f);
+
+  /**
+   *  @brief Gets a flag indicating whether selected indexes are filtered or highlighted
+   */
+  bool get_filter_mode () const
+  {
+    return m_filter_mode;
+  }
+
+  /**
    *  @brief Signal to the owner of the model that the data has changed
-   *
-   *  Basically, this signal should be emitted by the model, if it knew that
-   *  something changed. However, in our current architecture, it does not. So we
-   *  need to tell the model that something has changed.
    */
   void signal_data_changed ();
 
@@ -239,6 +253,7 @@ public:
 
 private:
   bool m_flat, m_pad;
+  bool m_filter_mode, m_is_filtered;
   unsigned int m_flags;
   Sorting m_sorting;
   QWidget *mp_parent;
@@ -248,13 +263,14 @@ private:
   int m_cv_index;
   const db::Cell *mp_base;
   std::vector <CellTreeItem *> m_toplevel;
-  std::set <QModelIndex> m_selected_indexes_set;
+  std::set <void *> m_selected_indexes_set;
+  std::set<const CellTreeItem *> m_visible_cell_set;
   std::vector <QModelIndex> m_selected_indexes;
   std::vector <QModelIndex>::const_iterator m_current_index;
 
   void build_top_level ();
   void clear_top_level ();
-  void search_children (const tl::GlobPattern &pattern, CellTreeItem *item);
+  bool search_children (const tl::GlobPattern &pattern, CellTreeItem *item);
   void do_configure (db::Layout *layout, db::Library *library, lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting);
 };
 
@@ -271,7 +287,9 @@ public:
   ~CellTreeItem ();
 
   int children () const;
+  int children_in (const std::set<const CellTreeItem *> &sel) const;
   CellTreeItem *child (int index);
+  CellTreeItem *child_in (const std::set<const CellTreeItem *> &sel, int index);
   db::cell_index_type cell_or_pcell_index () const;
   CellTreeItem *parent () const;
   bool by_name_less_than (const CellTreeItem *b) const;
@@ -300,17 +318,30 @@ public:
     m_index = index;
   }
 
+  size_t tree_index () const
+  {
+    return m_tree_index;
+  }
+
+  void set_tree_index (size_t index)
+  {
+    m_tree_index = index;
+  }
+
+  size_t assign_serial (size_t index, std::map<CellTreeItem *, size_t> &serial);
+
 private:
   const db::Layout *mp_layout;
   CellTreeItem *mp_parent;
   CellTreeModel::Sorting m_sorting;
   bool m_is_pcell;
-  size_t m_index;
+  size_t m_index, m_tree_index;
   std::vector<CellTreeItem *> m_children;
   int m_child_count;
   size_t m_cell_or_pcell_index;
 
   const char *name () const;
+  void ensure_children ();
 };
 
 }

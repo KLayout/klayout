@@ -34,6 +34,7 @@
 #include "layDialogs.h"
 #include "layLayoutCanvas.h"
 #include "layAbstractMenu.h"
+#include "layQtTools.h"
 #include "tlExceptions.h"
 #include "tlInternational.h"
 #include "tlAssert.h"
@@ -203,12 +204,10 @@ LayerControlPanel::LayerControlPanel (lay::LayoutView *view, db::Manager *manage
     mp_view (view), 
     m_needs_update (true), 
     m_tabs_need_update (true), 
-    m_force_update_hidden_flags (true), 
+    m_hidden_flags_need_update (true),
     m_in_update (false),
     m_phase (0), 
     m_do_update_content_dm (this, &LayerControlPanel::do_update_content),
-    m_hide_empty_layers (false),
-    m_test_shapes_in_view (false),
     m_no_stipples (false)
 {
   setObjectName (QString::fromUtf8 (name));
@@ -269,11 +268,18 @@ LayerControlPanel::LayerControlPanel (lay::LayoutView *view, db::Manager *manage
   mp_case_sensitive->setChecked (true);
   mp_case_sensitive->setText (tr ("Case sensitive search"));
 
+  mp_filter = new QAction (this);
+  mp_filter->setCheckable (true);
+  mp_filter->setChecked (false);
+  mp_filter->setText (tr ("Apply as filter"));
+
   QMenu *m = new QMenu (mp_search_edit_box);
   m->addAction (mp_use_regular_expressions);
   m->addAction (mp_case_sensitive);
+  m->addAction (mp_filter);
   connect (mp_use_regular_expressions, SIGNAL (triggered ()), this, SLOT (search_edited ()));
   connect (mp_case_sensitive, SIGNAL (triggered ()), this, SLOT (search_edited ()));
+  connect (mp_filter, SIGNAL (triggered ()), this, SLOT (search_edited ()));
 
   mp_search_edit_box->set_clear_button_enabled (true);
   mp_search_edit_box->set_options_button_enabled (true);
@@ -370,6 +376,8 @@ LayerControlPanel::LayerControlPanel (lay::LayoutView *view, db::Manager *manage
   m_no_stipples_label->setPixmap (QPixmap (QString::fromUtf8 (":/important.png")));
   m_no_stipples_label->setToolTip (tr ("Stipples are disabled - unselect \"View/Show Layers Without Fill\" to re-enable them"));
   ltb->addWidget (m_no_stipples_label);
+
+  connect (mp_model, SIGNAL (hidden_flags_need_update ()), this, SLOT (update_hidden_flags ()));
 }
 
 LayerControlPanel::~LayerControlPanel ()
@@ -1126,6 +1134,10 @@ LayerControlPanel::search_edited ()
     return;
   }
 
+  mp_model->set_filter_mode (mp_filter->isChecked ());
+
+  bool filter_invalid = false;
+
   QString t = mp_search_edit_box->text ();
   if (t.isEmpty ()) {
     mp_model->clear_locate ();
@@ -1135,8 +1147,12 @@ LayerControlPanel::search_edited ()
     mp_layer_list->setCurrentIndex (found);
     if (found.isValid ()) {
       mp_layer_list->scrollTo (found);
+    } else {
+      filter_invalid = true;
     }
   }
+
+  lay::indicate_error (mp_search_edit_box, filter_invalid);
 }
 
 void
@@ -1642,27 +1658,29 @@ LayerControlPanel::set_text_color (QColor c)
   mp_model->set_text_color (c);
 }
 
-void 
+void
+LayerControlPanel::update_hidden_flags ()
+{
+  m_hidden_flags_need_update = true;
+  m_do_update_content_dm ();
+}
+
+void
 LayerControlPanel::set_hide_empty_layers (bool f)
 {
-  if (f != m_hide_empty_layers) {
-    m_hide_empty_layers = f;
-    m_force_update_hidden_flags = true;
-    m_do_update_content_dm ();
-  }
+  mp_model->set_hide_empty_layers (f);
+}
+
+bool
+LayerControlPanel::hide_empty_layers ()
+{
+  return mp_model->get_hide_empty_layers ();
 }
 
 void
 LayerControlPanel::set_test_shapes_in_view (bool f)
 {
-  if (f != m_test_shapes_in_view) {
-    m_test_shapes_in_view = f;
-    mp_model->set_test_shapes_in_view (f);
-    if (m_hide_empty_layers) {
-      m_force_update_hidden_flags = true;
-    }
-    m_do_update_content_dm ();
-  }
+  mp_model->set_test_shapes_in_view (f);
 }
 
 void
@@ -1671,6 +1689,7 @@ LayerControlPanel::begin_updates ()
   if (! m_in_update) {
 
     m_in_update = true;
+    m_hidden_flags_need_update = true;
 
     mp_model->signal_begin_layer_changed ();  //  this makes the view redraw the data
 
@@ -1701,13 +1720,13 @@ LayerControlPanel::cancel_updates ()
 {
   m_in_update = false;
   m_needs_update = false;
+  m_hidden_flags_need_update = false;
   m_tabs_need_update = false;
 }
 
 void
 LayerControlPanel::end_updates ()
 {
-  m_force_update_hidden_flags = true;
   do_update_content ();
 }
 
@@ -1721,7 +1740,7 @@ LayerControlPanel::set_phase (int phase)
 }
 
 static void 
-set_hidden_flags_within_view_rec (LayerTreeModel *model, QTreeView *tree_view, const QModelIndex &parent, bool hide_empty)
+set_hidden_flags_rec (LayerTreeModel *model, QTreeView *tree_view, const QModelIndex &parent)
 {
   int rows = model->rowCount (parent);
   for (int r = 0; r < rows; ++r) {
@@ -1730,7 +1749,7 @@ set_hidden_flags_within_view_rec (LayerTreeModel *model, QTreeView *tree_view, c
 
     if (! model->hasChildren (index)) {
 
-      if (hide_empty && model->empty_within_view_predicate (index)) {
+      if (model->is_hidden (index)) {
         tree_view->setRowHidden (r, parent, true);
       } else {
         tree_view->setRowHidden (r, parent, false);
@@ -1738,43 +1757,33 @@ set_hidden_flags_within_view_rec (LayerTreeModel *model, QTreeView *tree_view, c
 
     } else {
       tree_view->setRowHidden (r, parent, false);
-      set_hidden_flags_within_view_rec (model, tree_view, index, hide_empty);
-    }
-
-  }
-}
-
-static void 
-set_hidden_flags_rec (LayerTreeModel *model, QTreeView *tree_view, const QModelIndex &parent, bool hide_empty)
-{
-  int rows = model->rowCount (parent);
-  for (int r = 0; r < rows; ++r) {
-
-    QModelIndex index = model->index (r, 0, parent);
-
-    if (! model->hasChildren (index)) {
-
-      if (hide_empty && model->empty_predicate (index)) {
-        tree_view->setRowHidden (r, parent, true);
-      } else {
-        tree_view->setRowHidden (r, parent, false);
-      }
-
-    } else {
-      tree_view->setRowHidden (r, parent, false);
-      set_hidden_flags_rec (model, tree_view, index, hide_empty);
+      set_hidden_flags_rec (model, tree_view, index);
     }
 
   }
 }
 
 void
+LayerControlPanel::do_update_hidden_flags ()
+{
+  set_hidden_flags_rec (mp_model, mp_layer_list, QModelIndex ());
+
+  //  scroll the current index into view if it was not visible before
+  QModelIndex current = mp_layer_list->currentIndex ();
+  if (current.isValid ()) {
+    QModelIndex parent = mp_layer_list->model ()->parent (current);
+    if (! mp_layer_list->isRowHidden (current.row (), parent)) {
+      QRect visual_rect = mp_layer_list->visualRect (current);
+      if (! visual_rect.intersects (mp_layer_list->viewport ()->rect ())) {
+        mp_layer_list->scrollTo (current, QAbstractItemView::PositionAtCenter);
+      }
+    }
+  }
+}
+
+void
 LayerControlPanel::do_update_content ()
 {
-  //  clear search. TODO: update search instead of clearing
-  mp_search_edit_box->clear ();
-  mp_model->clear_locate();
-
   mp_model->set_phase (m_phase);
 
   if (m_tabs_need_update) {
@@ -1827,7 +1836,7 @@ LayerControlPanel::do_update_content ()
     mp_layer_list->setCurrentIndex(QModelIndex());
 
     //  this makes the view redraw the data and establishes a valid selection scheme
-    mp_model->signal_layer_changed ();  
+    mp_model->signal_layers_changed ();
 
     //  now realize the selection if required
     if (! m_new_sel.empty ()) {
@@ -1853,47 +1862,28 @@ LayerControlPanel::do_update_content ()
 
     m_needs_update = false;
 
-  } else {
+  } else if (m_needs_update) {
 
-    if (m_needs_update) {
+    m_needs_update = false;
 
-      m_needs_update = false;
-
-      bool has_children = false;
-      for (lay::LayerPropertiesConstIterator l = mp_view->begin_layers (); l != mp_view->end_layers () && ! has_children; ++l) {
-        if (l->has_children ()) {
-          has_children = true;
-        }
+    bool has_children = false;
+    for (lay::LayerPropertiesConstIterator l = mp_view->begin_layers (); l != mp_view->end_layers () && ! has_children; ++l) {
+      if (l->has_children ()) {
+        has_children = true;
       }
-      mp_layer_list->setRootIsDecorated (has_children);
-      mp_layer_list->reset ();
-
-    } else {
-      mp_model->signal_data_changed ();  //  this makes the view redraw the data
     }
+    mp_layer_list->setRootIsDecorated (has_children);
+    mp_layer_list->reset ();
 
+  } else {
+    mp_model->signal_data_changed ();  //  this makes the view redraw the data
   }
 
-  if (m_hide_empty_layers || m_force_update_hidden_flags) {
+  if (m_hidden_flags_need_update) {
 
-    m_force_update_hidden_flags = false;
-    if (m_test_shapes_in_view) {
-      set_hidden_flags_within_view_rec (mp_model, mp_layer_list, QModelIndex (), m_hide_empty_layers);
-    } else {
-      set_hidden_flags_rec (mp_model, mp_layer_list, QModelIndex (), m_hide_empty_layers);
-    }
+    do_update_hidden_flags ();
 
-    //  scroll the current index into view if it was not visible before
-    QModelIndex current = mp_layer_list->currentIndex ();
-    if (current.isValid ()) {
-      QModelIndex parent = mp_layer_list->model ()->parent (current);
-      if (! mp_layer_list->isRowHidden (current.row (), parent)) {
-        QRect visual_rect = mp_layer_list->visualRect (current);
-        if (! visual_rect.intersects (mp_layer_list->viewport ()->rect ())) {
-          mp_layer_list->scrollTo (current, QAbstractItemView::PositionAtCenter);
-        }
-      }
-    }
+    m_hidden_flags_need_update = false;
 
   }
 }
@@ -1975,7 +1965,7 @@ LayerControlPanel::redo (db::Op *op)
 void 
 LayerControlPanel::signal_vp_changed ()
 {
-  if (m_test_shapes_in_view) {
+  if (mp_model->get_test_shapes_in_view ()) {
     update_required (1);
   }
 }
@@ -2028,7 +2018,7 @@ LayerControlPanel::update_required (int f)
   }
 
   if ((f & 3) != 0) {
-    m_force_update_hidden_flags = true;
+    m_hidden_flags_need_update = true;
   }
 
   m_do_update_content_dm ();

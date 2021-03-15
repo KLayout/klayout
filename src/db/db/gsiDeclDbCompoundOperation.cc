@@ -185,10 +185,10 @@ static db::CompoundRegionOperationNode *new_strange_polygons_filter (db::Compoun
   return new db::CompoundRegionProcessingOperationNode (new db::StrangePolygonCheckProcessor (), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_smoothed (db::CompoundRegionOperationNode *input, db::Coord d)
+static db::CompoundRegionOperationNode *new_smoothed (db::CompoundRegionOperationNode *input, db::Coord d, bool keep_hv)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionProcessingOperationNode (new db::SmoothingProcessor (d), input, true /*processor is owned*/, d);
+  return new db::CompoundRegionProcessingOperationNode (new db::SmoothingProcessor (d, keep_hv), input, true /*processor is owned*/, d);
 }
 
 static db::CompoundRegionOperationNode *new_rounded_corners (db::CompoundRegionOperationNode *input, double rinner, double router, unsigned int n)
@@ -466,6 +466,12 @@ static db::CompoundRegionOperationNode *new_perimeter_sum_filter (db::CompoundRe
   return new db::CompoundRegionFilterOperationNode (new db::RegionPerimeterFilter (pmin, pmax, inverse), input, true, true /*sum of set*/);
 }
 
+static db::CompoundRegionOperationNode *new_hole_count_filter (db::CompoundRegionOperationNode *input, bool inverse, size_t hmin, size_t hmax)
+{
+  check_non_null (input, "input");
+  return new db::CompoundRegionFilterOperationNode (new db::HoleCountFilter (hmin, hmax, inverse), input, true);
+}
+
 static db::CompoundRegionOperationNode *new_area_filter (db::CompoundRegionOperationNode *input, bool inverse, db::coord_traits<db::Coord>::area_type amin, db::coord_traits<db::Coord>::area_type amax)
 {
   check_non_null (input, "input");
@@ -566,9 +572,10 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
     "@brief Creates a node extracting strange polygons.\n"
     "'strange polygons' are ones which cannot be oriented - e.g. '8' shape polygons."
   ) +
-  gsi::constructor ("new_smoothed", &new_smoothed, gsi::arg ("input"), gsi::arg ("d"),
+  gsi::constructor ("new_smoothed", &new_smoothed, gsi::arg ("input"), gsi::arg ("d"), gsi::arg ("keep_hv", false),
     "@brief Creates a node smoothing the polygons.\n"
-    "@param d The tolerance to be applied for the smoothing."
+    "@param d The tolerance to be applied for the smoothing.\n"
+    "@param keep_hv If true, horizontal and vertical edges are maintained.\n"
   ) +
   gsi::constructor ("new_rounded_corners", &new_rounded_corners, gsi::arg ("input"), gsi::arg ("rinner"), gsi::arg ("router"), gsi::arg ("n"),
     "@brief Creates a node generating rounded corners.\n"
@@ -671,6 +678,11 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_area_sum_filter", &new_area_sum_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("amin", 0), gsi::arg ("amax", std::numeric_limits<db::coord_traits<db::Coord>::area_type>::max (), "max"),
     "@brief Creates a node filtering the input by area sum.\n"
     "Like \\new_area_filter, but applies to the sum of all shapes in the current set.\n"
+  ) +
+  gsi::constructor ("new_hole_count_filter", &new_hole_count_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("hmin", 0), gsi::arg ("hmax", std::numeric_limits<size_t>::max (), "max"),
+    "@brief Creates a node filtering the input by number of holes per polygon.\n"
+    "This node renders the input if the hole count is between hmin and hmax (exclusively). If 'inverse' is set to true, the "
+    "input shape is returned if the hole count is less than hmin (exclusively) or larger than hmax (inclusively)."
   ) +
   gsi::constructor ("new_bbox_filter", &new_bbox_filter, gsi::arg ("input"), gsi::arg ("parameter"), gsi::arg ("inverse", false), gsi::arg ("pmin", 0), gsi::arg ("pmax", std::numeric_limits<db::coord_traits<db::Coord>::area_type>::max (), "max"),
     "@brief Creates a node filtering the input by bounding box parameters.\n"

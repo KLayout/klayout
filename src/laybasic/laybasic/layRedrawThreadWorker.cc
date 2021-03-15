@@ -1531,9 +1531,9 @@ bool draw_array_simplified (lay::Renderer *r, const db::Shape &array_shape, lay:
           (na <= 1 || trans.ctrans (a.length ()) < 1.5) &&
           (nb <= 1 || trans.ctrans (b.length ()) < 1.5)) {
 
-        db::DBox array_box_trans = trans * array_shape.bbox ();
-        r->draw (array_box_trans, frame, frame, 0, 0);
-        r->draw (array_box_trans, vertex, vertex, 0, 0);
+        db::Box array_box = array_shape.bbox ();
+        r->draw (array_box, trans, frame, frame, 0, 0);
+        r->draw (array_box, trans, vertex, vertex, 0, 0);
         return true;
 
       } else if (is_regular && 

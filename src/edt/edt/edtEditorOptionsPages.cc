@@ -60,7 +60,7 @@ static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le
     Value value = Value (0);
     tl::from_string (tl::to_string (le->text ()), value);
     dispatcher->config_set (cfg_name, tl::to_string (value));
-    lay::indicate_error (le, 0);
+    lay::indicate_error (le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (le, &ex);
   }
@@ -114,7 +114,7 @@ EditorOptionsGeneric::apply (lay::Dispatcher *root)
     try {
       db::DVector eg;
       egc.from_string_picky (tl::to_string (mp_ui->edit_grid_le->text ()), eg);
-      lay::indicate_error (mp_ui->edit_grid_le, 0);
+      lay::indicate_error (mp_ui->edit_grid_le, (tl::Exception *) 0);
       root->config_set (cfg_edit_grid, egc.to_string (eg));
     } catch (tl::Exception &ex) {
       lay::indicate_error (mp_ui->edit_grid_le, &ex);
@@ -166,7 +166,7 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
     mp_ui->edit_grid_le->setText (tl::to_qstring (egc.to_string (eg)));
   }
   grid_changed (mp_ui->grid_cb->currentIndex ());
-  lay::indicate_error (mp_ui->edit_grid_le, 0);
+  lay::indicate_error (mp_ui->edit_grid_le, (tl::Exception *) 0);
 
   //  edit & move angle
 
@@ -196,7 +196,7 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
   unsigned int max_shapes = 1000;
   root->config_get (cfg_edit_max_shapes_of_instances, max_shapes);
   mp_ui->max_shapes_le->setText (tl::to_qstring (tl::to_string (max_shapes)));
-  lay::indicate_error (mp_ui->max_shapes_le, 0);
+  lay::indicate_error (mp_ui->max_shapes_le, (tl::Exception *) 0);
 
   bool show_shapes = true;
   root->config_get (cfg_edit_show_shapes_of_instances, show_shapes);
@@ -356,7 +356,7 @@ EditorOptionsPath::setup (lay::Dispatcher *root)
   double w = 0.0;
   root->config_get (cfg_edit_path_width, w);
   mp_ui->width_le->setText (tl::to_qstring (tl::to_string (w)));
-  lay::indicate_error (mp_ui->width_le, 0);
+  lay::indicate_error (mp_ui->width_le, (tl::Exception *) 0);
 
   //  path type and extensions 
 
@@ -377,9 +377,9 @@ EditorOptionsPath::setup (lay::Dispatcher *root)
   root->config_get (cfg_edit_path_ext_var_begin, bgnext);
   root->config_get (cfg_edit_path_ext_var_end, endext);
   mp_ui->start_ext_le->setText (tl::to_qstring (tl::to_string (bgnext)));
-  lay::indicate_error (mp_ui->start_ext_le, 0);
+  lay::indicate_error (mp_ui->start_ext_le, (tl::Exception *) 0);
   mp_ui->end_ext_le->setText (tl::to_qstring (tl::to_string (endext)));
-  lay::indicate_error (mp_ui->end_ext_le, 0);
+  lay::indicate_error (mp_ui->end_ext_le, (tl::Exception *) 0);
 }
 
 // ------------------------------------------------------------------
@@ -631,7 +631,7 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
   double angle = 0.0;
   root->config_get (cfg_edit_inst_angle, angle);
   mp_ui->angle_le->setText (tl::to_qstring (tl::to_string (angle)));
-  lay::indicate_error (mp_ui->angle_le, 0);
+  lay::indicate_error (mp_ui->angle_le, (tl::Exception *) 0);
 
   bool mirror = false;
   root->config_get (cfg_edit_inst_mirror, mirror);
@@ -640,7 +640,7 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
   double scale = 1.0;
   root->config_get (cfg_edit_inst_scale, scale);
   mp_ui->scale_le->setText (tl::to_qstring (tl::to_string (scale)));
-  lay::indicate_error (mp_ui->scale_le, 0);
+  lay::indicate_error (mp_ui->scale_le, (tl::Exception *) 0);
 
   //  array
   bool array = false;
@@ -657,17 +657,17 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
   root->config_get (cfg_edit_inst_column_y, column_y);
 
   mp_ui->rows_le->setText (tl::to_qstring (tl::to_string (rows)));
-  lay::indicate_error (mp_ui->rows_le, 0);
+  lay::indicate_error (mp_ui->rows_le, (tl::Exception *) 0);
   mp_ui->row_x_le->setText (tl::to_qstring (tl::to_string (row_x)));
-  lay::indicate_error (mp_ui->row_x_le, 0);
+  lay::indicate_error (mp_ui->row_x_le, (tl::Exception *) 0);
   mp_ui->row_y_le->setText (tl::to_qstring (tl::to_string (row_y)));
-  lay::indicate_error (mp_ui->row_y_le, 0);
+  lay::indicate_error (mp_ui->row_y_le, (tl::Exception *) 0);
   mp_ui->columns_le->setText (tl::to_qstring (tl::to_string (columns)));
-  lay::indicate_error (mp_ui->columns_le, 0);
+  lay::indicate_error (mp_ui->columns_le, (tl::Exception *) 0);
   mp_ui->column_x_le->setText (tl::to_qstring (tl::to_string (column_x)));
-  lay::indicate_error (mp_ui->column_x_le, 0);
+  lay::indicate_error (mp_ui->column_x_le, (tl::Exception *) 0);
   mp_ui->column_y_le->setText (tl::to_qstring (tl::to_string (column_y)));
-  lay::indicate_error (mp_ui->column_y_le, 0);
+  lay::indicate_error (mp_ui->column_y_le, (tl::Exception *) 0);
 
   //  place origin of cell flag
   bool place_origin = false;

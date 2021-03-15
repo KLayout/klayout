@@ -1,0 +1,25 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+h = l1 - l2
+h.drc(with_holes == 0).output(100, 0)
+h.drc(with_holes != 0).output(101, 0)
+h.drc(with_holes == 3).output(102, 0)
+h.drc(1 <= with_holes < 3).output(103, 0)
+h.drc(1 <= primary.with_holes <= 1).output(104, 0)
+h.drc(with_holes >= 2).output(105, 0)
+h.drc(with_holes >= 0).output(106, 0)
+

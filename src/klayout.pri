@@ -40,6 +40,15 @@ equals(HAVE_QTBINDINGS, "1") {
   DEFINES += HAVE_QTBINDINGS
 }
 
+!equals(HAVE_QT_UITOOLS, "0") {
+  # auto-select uitools, not all distributions have it
+  contains(QT_MODULES, "uitools") {
+    HAVE_QT_UITOOLS = 1
+  } else {
+    HAVE_QT_UITOOLS = 0
+  }
+}
+
 equals(HAVE_64BIT_COORD, "1") {
   DEFINES += HAVE_64BIT_COORD
 }
@@ -160,18 +169,77 @@ equals(HAVE_QT, "0") {
 } else {
 
   DEFINES += HAVE_QT
-  QT += core network xml sql
+  QT += core xml network
 
-  equals(HAVE_QT5, "1") {
-    QT += designer printsupport widgets
-    equals(HAVE_QTBINDINGS, "1") {
-      QT += multimedia multimediawidgets xmlpatterns svg gui
+  equals(HAVE_QTBINDINGS, "1") {
+    # sql isn't needed by the base application
+    !equals(HAVE_QT_SQL, "0") {
+      QT += sql
     }
-  } else {
-    # questionable: use uitools instead?
-    CONFIG += designer
   }
 
+  equals(HAVE_QT5, "1") {
+
+    QT += widgets gui printsupport xmlpatterns
+
+    equals(HAVE_QTBINDINGS, "1") {
+      !equals(HAVE_QT_DESIGNER, "0") {
+        # designer isn't needed by the base application
+        QT += designer
+      }
+      !equals(HAVE_QT_MULTIMEDIA, "0") {
+        # multimedia isn't needed by the base application
+        QT += multimedia multimediawidgets
+      }
+      !equals(HAVE_QT_SVG, "0") {
+        # svg isn't needed by the base application
+        QT += svg
+      }
+      !equals(HAVE_QT_UITOOLS, "0") {
+        # uitools isn't needed by the base application
+        QT += uitools
+      }
+    }
+
+  } else {
+
+    equals(HAVE_QTBINDINGS, "1") {
+      !equals(HAVE_QT_DESIGNER, "0") {
+        # designer isn't needed by the base application
+        CONFIG += designer
+      }
+      !equals(HAVE_QT_UITOOLS, "0") {
+        # uitools isn't needed by the base application
+        CONFIG += uitools
+      }
+    }
+
+  }
+
+  !equals(HAVE_QT_UITOOLS, "0") {
+    DEFINES += HAVE_QT_UITOOLS
+  }
+  !equals(HAVE_QT_NETWORK, "0") {
+    DEFINES += HAVE_QT_NETWORK
+  }
+  !equals(HAVE_QT_SQL, "0") {
+    DEFINES += HAVE_QT_SQL
+  }
+  !equals(HAVE_QT_SVG, "0") {
+    DEFINES += HAVE_QT_SVG
+  }
+  !equals(HAVE_QT_PRINTSUPPORT, "0") {
+    DEFINES += HAVE_QT_PRINTSUPPORT
+  }
+  !equals(HAVE_QT_MULTIMEDIA, "0") {
+    DEFINES += HAVE_QT_MULTIMEDIA
+  }
+  !equals(HAVE_QT_DESIGNER, "0") {
+    DEFINES += HAVE_QT_DESIGNER
+  }
+  !equals(HAVE_QT_XML, "0") {
+    DEFINES += HAVE_QT_XML
+  }
 }
 
 VERSION_STRING = $$KLAYOUT_VERSION

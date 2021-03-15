@@ -97,7 +97,7 @@ Class<lay::HelpDialog> decl_HelpDialog (QT_EXTERNAL_BASE (QDialog) "lay", "HelpD
 LAYBASIC_PUBLIC Class<lay::BrowserSource> &laybasicdecl_BrowserSource ();
 
 Class<lay::HelpSource> decl_HelpSource (laybasicdecl_BrowserSource (), "lay", "HelpSource",
-#if defined(HAVE_QTBINDINGS)
+#if defined(HAVE_QTBINDINGS) && defined(HAVE_QT_XML)
   gsi::method ("get_dom", &lay::HelpSource::get_dom, "@brief For internal use") + 
 #endif
   gsi::method ("urls", &lay::HelpSource::urls, "@brief Reserved for internal use") +

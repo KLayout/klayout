@@ -34,6 +34,7 @@
 #include "tlXMLParser.h"
 #include "tlGlobPattern.h"
 #include "tlInclude.h"
+#include "tlProgress.h"
 
 #include "rba.h"
 #include "pya.h"
@@ -1021,6 +1022,8 @@ int Macro::run () const
   }
 
   try {
+
+    tl::ProgressGarbageCollector progress_gc;
 
     gsi::Interpreter *ip = script_interpreter (interpreter ());
     if (ip) {

@@ -615,6 +615,34 @@ RectilinearFilter::vars () const
 }
 
 // -------------------------------------------------------------------------------------
+//  HoleCountFilter implementation
+
+HoleCountFilter::HoleCountFilter (size_t min_count, size_t max_count, bool inverse)
+  : m_min_count (min_count), m_max_count (max_count), m_inverse (inverse)
+{
+  //  .. nothing yet ..
+}
+
+bool
+HoleCountFilter::selected (const db::Polygon &poly) const
+{
+  bool ok = poly.holes () < m_max_count && poly.holes () >= m_min_count;
+  return ok != m_inverse;
+}
+
+bool
+HoleCountFilter::selected (const db::PolygonRef &poly) const
+{
+  bool ok = poly.obj ().holes () < m_max_count && poly.obj ().holes () >= m_min_count;
+  return ok != m_inverse;
+}
+
+const TransformationReducer *HoleCountFilter::vars () const
+{
+  return 0;
+}
+
+// -------------------------------------------------------------------------------------
 //  RectilinearFilter implementation
 
 RectangleFilter::RectangleFilter (bool is_square, bool inverse)
@@ -840,14 +868,14 @@ StrangePolygonCheckProcessor::process (const db::Polygon &poly, std::vector<db::
 // -------------------------------------------------------------------------------------------------------------
 //  Smoothing processor
 
-SmoothingProcessor::SmoothingProcessor (db::Coord d) : m_d (d) { }
+SmoothingProcessor::SmoothingProcessor (db::Coord d, bool keep_hv) : m_d (d), m_keep_hv (keep_hv) { }
 
 SmoothingProcessor::~SmoothingProcessor () { }
 
 void
 SmoothingProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
 {
-  res.push_back (db::smooth (poly, m_d));
+  res.push_back (db::smooth (poly, m_d, m_keep_hv));
 }
 
 // -------------------------------------------------------------------------------------------------------------

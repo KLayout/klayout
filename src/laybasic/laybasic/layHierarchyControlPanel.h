@@ -66,6 +66,7 @@ Q_OBJECT
 
 public:
   HCPCellTreeWidget (QWidget *parent, const char *name, QWidget *key_event_receiver);
+  ~HCPCellTreeWidget ();
 
 signals:
   void cell_clicked (const QModelIndex &);
@@ -298,7 +299,8 @@ private:
   lay::DecoratedLineEdit *mp_search_edit_box;
   QAction *mp_case_sensitive;
   QAction *mp_use_regular_expressions;
-  CellTreeModel *mp_search_model;
+  QAction *mp_filter;
+  int m_search_index;
   QFrame *mp_search_frame;
   QCheckBox *mp_search_close_cb;
   QSplitter *mp_splitter;

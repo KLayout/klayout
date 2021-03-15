@@ -287,6 +287,51 @@ private:
 };
 
 /**
+ *  @brief Filters by number of holes
+ *
+ *  This filter will select all polygons with a hole count between min_holes and max_holes (exclusively)
+ */
+
+struct DB_PUBLIC HoleCountFilter
+  : public AllMustMatchFilter
+{
+  /**
+   *  @brief Constructor
+   *  @param inverse If set to true, only polygons not matching this criterion will be filtered
+   */
+  HoleCountFilter (size_t min_count, size_t max_count, bool inverse);
+
+  /**
+   *  @brief Returns true if the polygon is a rectangle
+   */
+  virtual bool selected (const db::Polygon &poly) const;
+
+  /**
+   *  @brief Returns true if the polygon is a rectangle
+   */
+  virtual bool selected (const db::PolygonRef &poly) const;
+
+  /**
+   *  @brief This filter does not need variants
+   */
+  virtual const TransformationReducer *vars () const;
+
+  /**
+   *  @brief This filter prefers producing variants
+   */
+  virtual bool wants_variants () const { return true; }
+
+  /**
+   *  @brief This filter wants merged input
+   */
+  virtual bool requires_raw_input () const { return false; }
+
+private:
+  size_t m_min_count, m_max_count;
+  bool m_inverse;
+};
+
+/**
  *  @brief A bounding box filter for use with Region::filter or Region::filtered
  *
  *  This filter has two parameters: vmin and vmax.
@@ -459,7 +504,7 @@ class DB_PUBLIC SmoothingProcessor
   : public PolygonProcessorBase
 {
 public:
-  SmoothingProcessor (db::Coord d);
+  SmoothingProcessor (db::Coord d, bool keep_hv);
   ~SmoothingProcessor ();
 
   virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
@@ -472,6 +517,7 @@ public:
 
 private:
   db::Coord m_d;
+  bool m_keep_hv;
   db::MagnificationReducer m_vars;
 };
 

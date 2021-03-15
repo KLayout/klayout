@@ -31,6 +31,8 @@
 #elif defined(__MACH__)
 #  include <mach/clock.h>
 #  include <mach/mach.h>
+#  include <sys/times.h>
+#  include <unistd.h>
 #else
 #  include <sys/times.h>
 #  include <unistd.h>

@@ -289,6 +289,9 @@ class DBPolygonTests(unittest.TestCase):
     p = pya.Polygon( [ pya.Point.new(0, 0), pya.Point.new(10, 50), pya.Point.new(0, 100), pya.Point.new(200, 100), pya.Point.new(200, 0) ])
     self.assertEqual(str(p.smooth(5)), "(0,0;10,50;0,100;200,100;200,0)")
     self.assertEqual(str(p.smooth(15)), "(0,0;0,100;200,100;200,0)")
+    p = pya.Polygon( [ pya.Point.new(0, 0), pya.Point.new(10, 50), pya.Point.new(10, 100), pya.Point.new(200, 100), pya.Point.new(200, 0) ])
+    self.assertEqual(str(p.smooth(15, False)), "(0,0;10,100;200,100;200,0)")
+    self.assertEqual(str(p.smooth(15, True)), "(0,0;10,50;10,100;200,100;200,0)")
 
     # Ellipse constructor
     p = pya.Polygon.ellipse( pya.Box(-10000, -20000, 30000, 40000), 200 )

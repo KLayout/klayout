@@ -476,6 +476,72 @@ public:
     set_per_mask_value (m_lef_pins_datatypes, mask, s);
   }
 
+  bool produce_fills () const
+  {
+    return m_produce_fills;
+  }
+
+  void set_produce_fills (bool f)
+  {
+    m_produce_fills = f;
+  }
+
+  const std::string &fills_suffix () const
+  {
+    return m_fills_suffix;
+  }
+
+  void set_fills_suffix (const std::string &s)
+  {
+    m_fills_suffix = s;
+  }
+
+  int fills_datatype () const
+  {
+    return m_fills_datatype;
+  }
+
+  void set_fills_datatype (int s)
+  {
+    m_fills_datatype = s;
+  }
+
+  void set_fills_suffix_str (const std::string &s);
+  std::string fills_suffix_str () const;
+
+  void set_fills_datatype_str (const std::string &s);
+  std::string fills_datatype_str () const;
+
+  void clear_fills_suffixes_per_mask ()
+  {
+    m_fills_suffixes.clear ();
+  }
+
+  void clear_fills_datatypes_per_mask ()
+  {
+    m_fills_datatypes.clear ();
+  }
+
+  const std::string &fills_suffix_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_fills_suffixes, m_fills_suffix, mask);
+  }
+
+  void set_fills_suffix_per_mask (unsigned int mask, const std::string &s)
+  {
+    set_per_mask_value (m_fills_suffixes, mask, s);
+  }
+
+  int fills_datatype_per_mask (unsigned int mask) const
+  {
+    return per_mask_value (m_fills_datatypes, m_fills_datatype, mask);
+  }
+
+  void set_fills_datatype_per_mask (unsigned int mask, int s)
+  {
+    set_per_mask_value (m_fills_datatypes, mask, s);
+  }
+
   bool produce_obstructions () const
   {
     return m_produce_obstructions;
@@ -707,6 +773,8 @@ public:
     get_max_mask_number (mm, m_pins_datatypes);
     get_max_mask_number (mm, m_lef_pins_suffixes);
     get_max_mask_number (mm, m_lef_pins_datatypes);
+    get_max_mask_number (mm, m_fills_suffixes);
+    get_max_mask_number (mm, m_fills_datatypes);
     get_max_mask_number (mm, m_routing_suffixes);
     get_max_mask_number (mm, m_routing_datatypes);
     get_max_mask_number (mm, m_special_routing_suffixes);
@@ -841,6 +909,11 @@ private:
   int m_lef_pins_datatype;
   std::map<unsigned int, std::string> m_lef_pins_suffixes;
   std::map<unsigned int, int> m_lef_pins_datatypes;
+  bool m_produce_fills;
+  std::string m_fills_suffix;
+  int m_fills_datatype;
+  std::map<unsigned int, std::string> m_fills_suffixes;
+  std::map<unsigned int, int> m_fills_datatypes;
   bool m_produce_obstructions;
   std::string m_obstructions_suffix;
   int m_obstructions_datatype;
@@ -875,6 +948,8 @@ enum LayerPurpose
 {
   Routing = 0,        //  from DEF only
   Pins,               //  from DEF
+  Fills,              //  from DEF
+  FillsOPC,           //  from DEF
   SpecialRouting,     //  from DEF only
   LEFPins,            //  from LEF
   ViaGeometry,        //  from LEF+DEF
@@ -885,6 +960,46 @@ enum LayerPurpose
   PlacementBlockage,  //  from DEF only
   Regions,            //  from DEF only
   All                 //  from DEF only
+};
+
+/**
+ *  @brief A structure holding the layer details like purpose, mask and via size
+ */
+struct LayerDetailsKey
+{
+  LayerDetailsKey ()
+    : purpose (Routing), mask (0)
+  { }
+
+  LayerDetailsKey (LayerPurpose _purpose, unsigned int _mask = 0, const db::DVector &_via_size = db::DVector ())
+    : purpose (_purpose), mask (_mask), via_size (_via_size)
+  { }
+
+  bool operator< (const LayerDetailsKey &other) const
+  {
+    if (purpose != other.purpose) {
+      return purpose < other.purpose;
+    }
+    if (mask != other.mask) {
+      return mask < other.mask;
+    }
+    return via_size.less (other.via_size);
+  }
+
+  bool operator== (const LayerDetailsKey &other) const
+  {
+    if (purpose != other.purpose) {
+      return false;
+    }
+    if (mask != other.mask) {
+      return false;
+    }
+    return via_size.equal (other.via_size);
+  }
+
+  LayerPurpose purpose;
+  unsigned int mask;
+  db::DVector via_size;
 };
 
 /**
@@ -979,9 +1094,9 @@ public:
   virtual std::vector<std::string> maskshift_layers () const { return m_maskshift_layers; }
   virtual bool is_fixedmask () const { return m_fixedmask; }
 
-  void add_polygon (const std::string &ln, LayerPurpose purpose, const db::Polygon &poly, unsigned int mask, properties_id_type prop_id);
-  void add_box (const std::string &ln, LayerPurpose purpose, const db::Box &box, unsigned int mask, properties_id_type prop_id);
-  void add_path (const std::string &ln, LayerPurpose purpose, const db::Path &path, unsigned int mask, properties_id_type prop_id);
+  void add_polygon (const std::string &ln, LayerPurpose purpose, const db::Polygon &poly, unsigned int mask, properties_id_type prop_id, const DVector &via_size = db::DVector ());
+  void add_box (const std::string &ln, LayerPurpose purpose, const db::Box &box, unsigned int mask, properties_id_type prop_id, const DVector &via_size = db::DVector ());
+  void add_path (const std::string &ln, LayerPurpose purpose, const db::Path &path, unsigned int mask, properties_id_type prop_id, const DVector &via_size = db::DVector ());
   void add_via (const std::string &vn, const db::Trans &trans, unsigned int bottom_mask, unsigned int cut_mask, unsigned int top_mask);
   void add_text (const std::string &ln, LayerPurpose purpose, const db::Text &text, unsigned int mask, db::properties_id_type prop_id);
 
@@ -1008,7 +1123,7 @@ private:
     db::Trans trans;
   };
 
-  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, db::Shapes> m_shapes;
+  std::map <std::pair<std::string, LayerDetailsKey>, db::Shapes> m_shapes;
   std::list<Via> m_vias;
   std::vector<std::string> m_maskshift_layers;
   bool m_fixedmask;
@@ -1054,7 +1169,17 @@ public:
   /**
    *  @brief Create a new layer or return the index of the given layer
    */
-  std::set<unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
+  std::set<unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask, const DVector &via_size = db::DVector ());
+
+  /**
+   *  @brief Create a new layer or return the index of the given layer
+   */
+  template <class Shape>
+  std::set<unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask, const Shape &via_shape)
+  {
+    db::Box via_box = db::box_convert<Shape> () (via_shape);
+    return open_layer (layout, name, purpose, mask, db::DVector (via_box.width () * layout.dbu (), via_box.height () * layout.dbu ()));
+  }
 
   /**
    *  @brief Registers a layer (assign a new default layer number)
@@ -1188,7 +1313,7 @@ private:
   LEFDEFReaderState (const LEFDEFReaderState &);
   LEFDEFReaderState &operator= (const LEFDEFReaderState &);
 
-  std::map <std::pair<std::string, std::pair<LayerPurpose, unsigned int> >, std::set<unsigned int> > m_layers;
+  std::map <std::pair<std::string, LayerDetailsKey>, std::set<unsigned int> > m_layers;
   db::LayerMap m_layer_map;
   bool m_create_layers;
   bool m_has_explicit_layer_mapping;
@@ -1363,9 +1488,9 @@ protected:
   /**
    *  @brief Create a new layer or return the index of the given layer
    */
-  std::set<unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask)
+  std::set<unsigned int> open_layer (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask, const db::DVector &via_size = db::DVector ())
   {
-    return mp_reader_state->open_layer (layout, name, purpose, mask);
+    return mp_reader_state->open_layer (layout, name, purpose, mask, via_size);
   }
 
   /**

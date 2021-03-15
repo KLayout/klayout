@@ -517,6 +517,14 @@ LEFImporter::read_viadef_by_rule (RuleBasedViaGenerator *vg, ViaDesc &via_desc, 
   }
 }
 
+template <class Shape>
+static db::DVector
+via_size (double dbu, const Shape &shape)
+{
+  db::Box box = db::box_convert<Shape> () (shape);
+  return db::DVector (box.width () * dbu, box.height () * dbu);
+}
+
 void
 LEFImporter::read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc &via_desc, const std::string &n, double dbu)
 {
@@ -577,7 +585,7 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc 
       db::Polygon p;
       p.assign_hull (points.begin (), points.end ());
 
-      lg->add_polygon (layer_name, ViaGeometry, p, mask, 0);
+      lg->add_polygon (layer_name, ViaGeometry, p, mask, 0, via_size (dbu, p));
 
       expect (";");
 
@@ -599,7 +607,7 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc 
       }
 
       db::Box b (points [0], points [1]);
-      lg->add_box (layer_name, ViaGeometry, b, mask, 0);
+      lg->add_box (layer_name, ViaGeometry, b, mask, 0, via_size (dbu, b));
 
       expect (";");
 

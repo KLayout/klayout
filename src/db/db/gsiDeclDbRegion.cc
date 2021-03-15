@@ -308,6 +308,18 @@ static db::Region with_area2 (const db::Region *r, const tl::Variant &min, const
   return r->filtered (f);
 }
 
+static db::Region with_holes1 (const db::Region *r, size_t n, bool inverse)
+{
+  db::HoleCountFilter f (n, n + 1, inverse);
+  return r->filtered (f);
+}
+
+static db::Region with_holes2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
+{
+  db::HoleCountFilter f (min.is_nil () ? size_t (0) : min.to<size_t> (), max.is_nil () ? std::numeric_limits <size_t>::max () : max.to<size_t> (), inverse);
+  return r->filtered (f);
+}
+
 static db::Region with_bbox_width1 (const db::Region *r, db::Region::distance_type bbox_width, bool inverse)
 {
   db::RegionBBoxFilter f (bbox_width, bbox_width + 1, inverse, db::RegionBBoxFilter::BoxWidth);
@@ -925,6 +937,30 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) +
+  method_ext ("with_holes", with_holes1, gsi::arg ("nholes"), gsi::arg ("inverse"),
+    "@brief Filters the polygons by their number of holes\n"
+    "Filters the polygons of the region by number of holes. If \"inverse\" is false, only "
+    "polygons which have the given number of holes are returned. If \"inverse\" is true, "
+    "polygons not having the given of holes are returned.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("with_holes", with_holes2, gsi::arg ("min_bholes"), gsi::arg ("max_nholes"), gsi::arg ("inverse"),
+    "@brief Filter the polygons by their number of holes\n"
+    "Filters the polygons of the region by number of holes. If \"inverse\" is false, only "
+    "polygons which have a hole count larger or equal to \"min_nholes\" and less than \"max_nholes\" are "
+    "returned. If \"inverse\" is true, "
+    "polygons having a hole count less than \"min_nholes\" or larger or equal than \"max_nholes\" are "
+    "returned.\n"
+    "\n"
+    "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
   method_ext ("with_bbox_width", with_bbox_width1, gsi::arg ("width"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width\n"
     "Filters the polygons of the region by the width of their bounding box. If \"inverse\" is false, only "
@@ -1376,9 +1412,10 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "See \\round_corners for a description of this method. This version returns a new region instead of "
     "modifying self (out-of-place)."
   ) +
-  method ("smooth", &db::Region::smooth, gsi::arg ("d"),
+  method ("smooth", &db::Region::smooth, gsi::arg ("d"), gsi::arg ("keep_hv", false),
     "@brief Smoothing\n"
     "@param d The smoothing tolerance (in database units)\n"
+    "@param keep_hv If true, horizontal and vertical edges are maintained\n"
     "\n"
     "This method will simplify the merged polygons of the region by removing vertexes if the "
     "resulting polygon stays equivalent with the original polygon. Equivalence is measured "
@@ -1387,9 +1424,10 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method modifies the region. \\smoothed is a method that does the same but returns a new "
     "region without modifying self. Merged semantics applies for this method.\n"
   ) +
-  method ("smoothed", &db::Region::smoothed, gsi::arg ("d"),
+  method ("smoothed", &db::Region::smoothed, gsi::arg ("d"), gsi::arg ("keep_hv", false),
     "@brief Smoothing\n"
     "@param d The smoothing tolerance (in database units)\n"
+    "@param keep_hv If true, horizontal and vertical edges are maintained\n"
     "\n"
     "See \\smooth for a description of this method. This version returns a new region instead of "
     "modifying self (out-of-place). It has been introduced in version 0.25."

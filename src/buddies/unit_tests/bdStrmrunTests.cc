@@ -27,6 +27,7 @@
 //  Testing the converter main implementation (CIF)
 TEST(1)
 {
+#if defined(HAVE_PYTHON)
   std::string fp (tl::testsrc ());
   fp += "/testdata/bd/strmrun.py";
 
@@ -51,5 +52,6 @@ TEST(1)
   tl::info << data;
 
   EXPECT_EQ (data, "Hello, world (0,-42;42,0)!\n");
+#endif
 }
 

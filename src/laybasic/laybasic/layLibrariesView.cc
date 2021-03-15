@@ -199,6 +199,7 @@ LibrariesView::LibrariesView (lay::LayoutView *view, QWidget *parent, const char
   : QFrame (parent),
     m_enable_cb (true),
     mp_view (view),
+    m_active_index (-1),
     m_split_mode (false),
     m_do_update_content_dm (this, &LibrariesView::do_update_content),
     m_do_full_update_content_dm (this, &LibrariesView::do_full_update_content)
@@ -262,11 +263,18 @@ LibrariesView::LibrariesView (lay::LayoutView *view, QWidget *parent, const char
   mp_case_sensitive->setChecked (true);
   mp_case_sensitive->setText (tr ("Case sensitive search"));
 
+  mp_filter = new QAction (this);
+  mp_filter->setCheckable (true);
+  mp_filter->setChecked (false);
+  mp_filter->setText (tr ("Apply as filter"));
+
   QMenu *m = new QMenu (mp_search_edit_box);
   m->addAction (mp_use_regular_expressions);
   m->addAction (mp_case_sensitive);
+  m->addAction (mp_filter);
   connect (mp_use_regular_expressions, SIGNAL (triggered ()), this, SLOT (search_edited ()));
   connect (mp_case_sensitive, SIGNAL (triggered ()), this, SLOT (search_edited ()));
+  connect (mp_filter, SIGNAL (triggered ()), this, SLOT (search_edited ()));
 
   mp_search_edit_box->set_clear_button_enabled (true);
   mp_search_edit_box->set_options_button_enabled (true);
@@ -382,6 +390,7 @@ LibrariesView::search_edited ()
 
   for (std::vector <QTreeView *>::const_iterator v = mp_cell_lists.begin (); v != mp_cell_lists.end (); ++v) {
     if ((*v)->model () == mp_search_model) {
+      mp_search_model->set_filter_mode (mp_filter->isChecked ());
       if (t.isEmpty ()) {
         mp_search_model->clear_locate ();
         (*v)->setCurrentIndex (QModelIndex ());

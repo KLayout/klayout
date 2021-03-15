@@ -200,10 +200,32 @@ LogFile::timeout ()
   }
 }
 
+void
+LogFile::set_max_entries (size_t n)
+{
+  QMutexLocker locker (&m_lock);
+
+  m_max_entries = n;
+
+  while (m_messages.size () > m_max_entries) {
+    m_messages.pop_front ();
+  }
+}
+
+size_t
+LogFile::max_entries () const
+{
+  return m_max_entries;
+}
+
 void 
 LogFile::add (LogFileEntry::mode_type mode, const std::string &msg, bool continued)
 {
   QMutexLocker locker (&m_lock);
+
+  if (m_max_entries == 0) {
+    return;
+  }
 
   if (m_messages.size () >= m_max_entries) {
     m_messages.pop_front ();

@@ -954,7 +954,7 @@ TEST(5_BufferTwoPathsDifferentParameters)
   EXPECT_EQ (good, false);
 
   logger.clear ();
-  nl2.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 1.5, 0.0));
+  nl1.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 1.5, 0.0));
   good = comp.compare (&nl1, &nl2);
 
   EXPECT_EQ (logger.text (),
@@ -980,7 +980,7 @@ TEST(5_BufferTwoPathsDifferentParameters)
   EXPECT_EQ (good, true);
 
   logger.clear ();
-  nl2.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.0, 0.0));
+  nl1.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.0, 0.0));
   good = comp.compare (&nl1, &nl2);
 
   EXPECT_EQ (logger.text (),
@@ -1006,7 +1006,7 @@ TEST(5_BufferTwoPathsDifferentParameters)
   EXPECT_EQ (good, false);
 
   logger.clear ();
-  nl2.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.0, 0.2));
+  nl1.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.0, 0.2));
   good = comp.compare (&nl1, &nl2);
 
   EXPECT_EQ (logger.text (),
@@ -1032,7 +1032,7 @@ TEST(5_BufferTwoPathsDifferentParameters)
   EXPECT_EQ (good, false);
 
   logger.clear ();
-  nl2.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.0, 0.4));
+  nl1.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.0, 0.4));
   good = comp.compare (&nl1, &nl2);
 
   EXPECT_EQ (logger.text (),
@@ -1059,7 +1059,7 @@ TEST(5_BufferTwoPathsDifferentParameters)
 
   logger.clear ();
   db::EqualDeviceParameters eq_dp = db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_W) + db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 0.2, 0.0);
-  nl2.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (eq_dp));
+  nl1.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (eq_dp));
   good = comp.compare (&nl1, &nl2);
 
   EXPECT_EQ (logger.text (),
@@ -1086,7 +1086,7 @@ TEST(5_BufferTwoPathsDifferentParameters)
 
   logger.clear ();
   eq_dp = db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_W) + db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L);
-  nl2.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (eq_dp));
+  nl1.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (eq_dp));
   good = comp.compare (&nl1, &nl2);
 
   EXPECT_EQ (logger.text (),

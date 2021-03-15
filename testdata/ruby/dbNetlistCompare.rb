@@ -482,7 +482,7 @@ END
 
     logger.clear
     eqp = RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_L, 0.2, 0.0)
-    nl2.device_class_by_name("NMOS").equal_parameters = eqp
+    nl1.device_class_by_name("NMOS").equal_parameters = eqp
     good = comp.compare(nl1, nl2)
 
     assert_equal(logger.text, <<"END")
@@ -509,8 +509,8 @@ END
     assert_equal(good, true)
 
     logger.clear
-    nl2.device_class_by_name("NMOS").equal_parameters = nil
-    assert_equal(nl2.device_class_by_name("NMOS").equal_parameters == nil, true)
+    nl1.device_class_by_name("NMOS").equal_parameters = nil
+    assert_equal(nl1.device_class_by_name("NMOS").equal_parameters == nil, true)
     good = comp.compare(nl1, nl2)
 
     assert_equal(logger.text, <<"END")
@@ -539,8 +539,8 @@ END
     logger.clear
     eqp = RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_W, 0.01, 0.0)
     eqp = eqp + RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_L, 0.2, 0.0)
-    nl2.device_class_by_name("NMOS").equal_parameters = eqp
-    assert_equal(nl2.device_class_by_name("NMOS").equal_parameters == nil, false)
+    nl1.device_class_by_name("NMOS").equal_parameters = eqp
+    assert_equal(nl1.device_class_by_name("NMOS").equal_parameters == nil, false)
     good = comp.compare(nl1, nl2)
 
     assert_equal(logger.text, <<"END")
@@ -567,7 +567,7 @@ END
     assert_equal(good, true)
 
     logger.clear
-    dc = nl2.device_class_by_name("NMOS")
+    dc = nl1.device_class_by_name("NMOS")
     dc.equal_parameters = RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_W, 0.01, 0.0)
     dc.equal_parameters += RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_L, 0.2, 0.0)
     good = comp.compare(nl1, nl2)

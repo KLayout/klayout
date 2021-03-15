@@ -673,7 +673,7 @@ namespace gsi
 
 Class<tl::Executable> decl_Executable ("tl", "ExecutableBase",
   gsi::Methods (),
-  "@hide"
+  "@hide\n@alias Executable"
 );
 
 Class<Executable_Impl> decl_Executable_Impl (decl_Executable, "tl", "Executable",

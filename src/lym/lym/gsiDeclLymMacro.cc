@@ -309,7 +309,7 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
   ) + 
   gsi::method ("create_template", &MacroInterpreter::create_template, gsi::arg ("url"),
     "@brief Creates a new macro template\n"
-    "@url The template will be initialized from that URL.\n"
+    "@param url The template will be initialized from that URL.\n"
     "\n"
     "This method will create a register a new macro template. It returns a \\Macro object which "
     "can be modified in order to adjust the template (for example to set description, add a content, "
@@ -421,12 +421,12 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
   "\n"
   "  # Constructor\n"
   "  def initialize(macro)\n"
-  "    @macro = macro\n"
+  "    \\@macro = macro\n"
   "  end\n"
   "  \n"
   "  # Implements the execute method\n"
   "  def execute\n"
-  "    eval(@macro.text, nil, @macro.path)"
+  "    eval(\\@macro.text, nil, \\@macro.path)\n"
   "    nil\n"
   "  end\n"
   "\n"
@@ -446,7 +446,7 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
   "    mt.description = \"Special;;Simple interpreter macro\"\n" 
   "  end\n"
   "  \n"
-  "  # Implements the execute method\n"
+  "  # Creates the executable delegate\n"
   "  def executable(macro)\n"
   "    SimpleExecutable::new(macro)\n"
   "  end\n"
@@ -466,7 +466,7 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
   "\n"
   "In order to make the above code effective, store the code in an macro, set \"early auto-run\" and restart KLayout.\n"
   "\n"
-  "This class has been introduced in version 0.23.\n"
+  "This class has been introduced in version 0.23 and modified in 0.27.\n"
 );
 
 static lym::Macro *macro_by_path (const std::string &path)

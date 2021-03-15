@@ -17,33 +17,50 @@
  <text>
 module DRC
 
-  def DRC.execute_drc(macro, generator, rdb_index = nil)
+  class DRCExecutable &lt; RBA::Executable
 
-    drc = DRCEngine::new
-    drc._rdb_index = rdb_index
-    drc._generator = generator
-    drc._start(macro.path)
+    def initialize(macro, generator, rdb_index = nil)
 
-    begin
+      @drc = DRCEngine::new
+      @drc._rdb_index = rdb_index
+      @drc._generator = generator
+
+      @macro = macro
+
+    end
+
+    def execute
+
+      @drc._start("DRC: " + @macro.path)
 
       # Set a debugger scope so that our errors end up with the debugger set to the DRC's line
-      RBA::MacroExecutionContext::set_debugger_scope(macro.path)
-      # No verbosity set in drc engine - we cannot use the engine's logger 
-      RBA::Logger::verbosity &gt;= 10 &amp;&amp; RBA::Logger::info("Running #{macro.path}")
-      drc.instance_eval(macro.text, macro.path)
+      RBA::MacroExecutionContext::set_debugger_scope(@macro.path)
+
+      begin
+
+        # No verbosity set in drc engine - we cannot use the engine's logger 
+        RBA::Logger::verbosity &gt;= 10 &amp;&amp; RBA::Logger::info("Running #{@macro.path}")
+        @drc.instance_eval(@macro.text, @macro.path)
+
+      rescue =&gt; ex
+
+        @drc.error("In #{@macro.path}: #{ex.to_s}")
+        RBA::MacroExecutionContext::ignore_next_exception
+        raise ex
+
+      end
+
+      nil
+
+    end
+
+    def cleanup
+
       # Remove the debugger scope
       RBA::MacroExecutionContext::remove_debugger_scope
 
-    rescue =&gt; ex
-
-      drc.error("In #{macro.path}: #{ex.to_s}")
-      RBA::MacroExecutionContext::ignore_next_exception
-      raise ex
-
-    ensure
-
       # cleans up and creates layout and report views
-      drc._finish
+      @drc._finish
 
     end
 
@@ -70,11 +87,17 @@ module DRC
       # create a template for the macro editor:
       create_template(":/drc-templates/drc.lym")
 
+      # if available, create a menu branch
+      if RBA::Application::instance &amp;&amp; RBA::Application::instance.main_window
+        mw = RBA::Application::instance.main_window
+        mw.menu.insert_menu("tools_menu.verification_group+", "drc", "DRC")
+      end
+
     end
     
     # Implements the execute method
-    def execute(macro)
-      DRC::execute_drc(macro, @recipe.generator("script" => macro.path))
+    def executable(macro)
+      DRCExecutable::new(macro, @recipe.generator("script" => macro.path))
     end
     
   end
@@ -100,20 +123,20 @@ module DRC
     end
     
     # Implements the execute method
-    def execute(macro)
-      DRC::execute_drc(macro, @recipe.generator("script" => macro.path))
+    def executable(macro)
+      DRCExecutable::new(macro, @recipe.generator("script" => macro.path))
     end
     
   end
   
-  # A recipe implementation allowing the LVS run to be redone
+  # A recipe implementation allowing the DRC run to be redone
   class DRCRecipe &lt; RBA::Recipe
 
     def initialize
       super("drc", "DRC recipe")
     end
 
-    def execute(params)
+    def executable(params)
 
       script = params["script"]
       if ! script
@@ -123,7 +146,7 @@ module DRC
       macro = RBA::Macro::macro_by_path(script)
       macro || raise("Can't find DRC script #{script} - unable to re-run")
 
-      DRC::execute_drc(macro, self.generator("script" => script), params["rdb_index"])
+      DRCExecutable::new(macro, self.generator("script" => script), params["rdb_index"])
       
     end
 

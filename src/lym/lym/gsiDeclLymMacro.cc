@@ -142,10 +142,12 @@ public:
     m_name = name;
   }
 
-  virtual void execute (const lym::Macro *macro) const
+  virtual tl::Executable *executable (const lym::Macro *macro) const
   {
-    if (f_execute.can_issue ()) {
-      f_execute.issue<MacroInterpreter, const lym::Macro *> (&MacroInterpreter::execute, macro);
+    if (f_executable.can_issue ()) {
+      return f_executable.issue<MacroInterpreter, tl::Executable *, const lym::Macro *> (&MacroInterpreter::executable, macro);
+    } else {
+      return 0;
     }
   }
 
@@ -240,7 +242,7 @@ public:
     }
   }
 
-  gsi::Callback f_execute;
+  gsi::Callback f_executable;
 
 private:
   tl::RegisteredClass <lym::MacroInterpreter> *mp_registration;
@@ -378,13 +380,15 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
     "Before version 0.25 this attribute was a reimplementable method. It has been turned into an attribute for "
     "performance reasons in version 0.25.\n"
   ) +
-  gsi::callback ("execute", &gsi::MacroInterpreter::execute, &gsi::MacroInterpreter::f_execute, gsi::arg ("macro"),
-    "@brief Gets called to execute a macro\n"
-    "This method must be reimplemented to execute the macro. "
-    "The system will call this script when a macro with interpreter type 'dsl' and the "
-    "name of this interpreter is run."
+  gsi::callback ("executable", &gsi::MacroInterpreter::executable, &gsi::MacroInterpreter::f_executable, gsi::arg ("macro"),
+    "@brief Returns the executable object which implements the macro execution\n"
+    "This method must be reimplemented to return an \\Executable object for the actual implementation. "
+    "The system will use this function to execute the script when a macro with interpreter type 'dsl' and the "
+    "name of this interpreter is run.\n"
     "\n"
     "@param macro The macro to execute\n"
+    "\n"
+    "This method has been introduced in version 0.27 and replaces the 'execute' method.\n"
   ),
   "@brief A custom interpreter for a DSL (domain specific language)\n"
   "\n"
@@ -413,6 +417,21 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
   "just evaluates the script text:\n"
   "\n"
   "@code\n"
+  "class SimpleExecutable < RBA::Excutable\n"
+  "\n"
+  "  # Constructor\n"
+  "  def initialize(macro)\n"
+  "    @macro = macro\n"
+  "  end\n"
+  "  \n"
+  "  # Implements the execute method\n"
+  "  def execute\n"
+  "    eval(@macro.text, nil, @macro.path)"
+  "    nil\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
   "class SimpleInterpreter < RBA::MacroInterpreter\n"
   "\n"
   "  # Constructor\n"
@@ -428,8 +447,8 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
   "  end\n"
   "  \n"
   "  # Implements the execute method\n"
-  "  def execute(macro)\n"
-  "    eval(macro.text, nil, macro.path)\n"
+  "  def executable(macro)\n"
+  "    SimpleExecutable::new(macro)\n"
   "  end\n"
   "\n"
   "end\n"

@@ -1859,6 +1859,7 @@ CODE
         @in_context = func
         return yield(*args)
       rescue => ex
+        RBA::MacroExecutionContext::ignore_next_exception
         raise("'" + func + "': " + ex.to_s)
       ensure 
         @in_context = in_context_outer
@@ -1873,6 +1874,7 @@ CODE
           @in_context = func
           return yield(*args)
         rescue => ex
+          RBA::MacroExecutionContext::ignore_next_exception
           raise("'" + func + "': " + ex.to_s)
         ensure
           @in_context = nil
@@ -2097,7 +2099,7 @@ CODE
       end
     end
     
-    def _start(macro_path)
+    def _start(job_description)
     
       # clearing the selection avoids some nasty problems
       view = RBA::LayoutView::current
@@ -2106,8 +2108,7 @@ CODE
       @total_timer = RBA::Timer::new
       @total_timer.start
 
-      @drc_progress = RBA::AbstractProgress::new("DRC: " + macro_path)
-
+      @drc_progress = RBA::AbstractProgress::new(job_description)
 
     end
     
@@ -2249,6 +2250,7 @@ CODE
         @netter_data = nil
         
         if final
+
           @total_timer.stop
           if @verbose
             mem = RBA::Timer::memory_size
@@ -2258,21 +2260,32 @@ CODE
               info("Total elapsed: #{'%.3f'%(@total_timer.sys+@total_timer.user)}s")
             end
           end
-        end
 
-        if final && @log_file
-          @log_file.close
-          @log_file = nil
+          _cleanup
+
         end
 
         # force garbage collection
         GC.start
 
-        # unlocks the UI
+      end
+
+    end
+
+    def _cleanup
+
+      if @log_file
+        @log_file.close
+        @log_file = nil
+      end
+
+      # unlocks the UI
+      if @drc_progress
         @drc_progress._destroy
         @drc_progress = nil
-
       end
+
+      GC.start
 
     end
 

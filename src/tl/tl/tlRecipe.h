@@ -33,6 +33,80 @@ namespace tl
 {
 
 /**
+ *  @brief A base class for an executable item
+ *
+ *  This is a little more than just a function: it also provides a post-mortem
+ *  action (cleanup). This is useful for script-based applications: as the
+ *  main thread can be terminated in the debugger through ExitException unconditionally,
+ *  cleanup() provides a way to implement actions after such an event.
+ */
+
+class TL_PUBLIC Executable
+{
+public:
+  Executable ();
+  virtual ~Executable ();
+
+  /**
+   *  @brief Runs the function with error handling and cleanup
+   */
+  tl::Variant do_execute ();
+
+  /**
+   *  @brief Runs the specific job
+   */
+  virtual tl::Variant execute ();
+
+  /**
+   *  @brief Called after the job terminated
+   */
+  virtual void cleanup ();
+
+private:
+  void do_cleanup ();
+};
+
+/**
+ *  @brief Provides a convenience class for an executable with parameters
+ */
+class TL_PUBLIC ExecutableWithParameters
+  : public Executable
+{
+public:
+  ExecutableWithParameters (const std::map<std::string, tl::Variant> &params)
+    : m_params (params)
+  { }
+
+  /**
+   *  @brief An utility function to get a parameter
+   */
+  template <class T>
+  static T get_value (const std::map<std::string, tl::Variant> &params, const std::string &pname, const T &def_value)
+  {
+    std::map<std::string, tl::Variant>::const_iterator p = params.find (pname);
+    if (p != params.end ()) {
+      const tl::Variant &v = p->second;
+      return v.to<T> ();
+    } else {
+      return def_value;
+    }
+  }
+
+  /**
+   *  @brief Gets the parameters
+   */
+  const std::map<std::string, tl::Variant> &parameters () const
+  {
+    return m_params;
+  }
+
+private:
+  std::map<std::string, tl::Variant> m_params;
+
+  void do_cleanup ();
+};
+
+/**
  *  @brief A facility for providing reproducable recipes
  *
  *  The idea of this facility is to provide a service by which an object
@@ -81,21 +155,6 @@ public:
   }
 
   /**
-   *  @brief An utility function to get a parameters
-   */
-  template <class T>
-  static T get_value (const std::map<std::string, tl::Variant> &params, const std::string &pname, const T &def_value)
-  {
-    std::map<std::string, tl::Variant>::const_iterator p = params.find (pname);
-    if (p != params.end ()) {
-      const tl::Variant &v = p->second;
-      return v.to<T> ();
-    } else {
-      return def_value;
-    }
-  }
-
-  /**
    *  @brief Serializes the given recipe
    */
   std::string generator (const std::map<std::string, tl::Variant> &params);
@@ -110,9 +169,11 @@ public:
   static tl::Variant make (const std::string &generator, const std::map<std::string, tl::Variant> &params = std::map<std::string, tl::Variant> ());
 
   /**
-   *  @brief Recipe interface: executes the recipe with the given parameters
+   *  @brief Returns the executable object which actually implements the action to take
+   *
+   *  The returned object is deleted by the caller.
    */
-  virtual tl::Variant execute (const std::map<std::string, tl::Variant> &params) const = 0;
+  virtual Executable *executable (const std::map<std::string, tl::Variant> &params) const = 0;
 
 private:
   Recipe (const Recipe &) : tl::RegisteredClass<tl::Recipe> (this) { }

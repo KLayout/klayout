@@ -2991,6 +2991,23 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
     }
   }
 
+  //  impose the compare tolerances of the layout (first netlist) on the schematic (second netlist)
+  //  TODO: this is kind of clumsy. But it's very important to use the same device sorting for both netlists, so we play this trick.
+  //  A better solution was to have a common compare framework for both netlists.
+  for (std::map<size_t, std::pair<const db::DeviceClass *, const db::DeviceClass *> >::const_iterator i = cat2dc.begin (); i != cat2dc.end (); ++i) {
+
+    if (i->second.first && i->second.second) {
+
+      const db::DeviceClass *da = i->second.first;
+      db::DeviceClass *db = const_cast<db::DeviceClass *> (i->second.second);
+
+      const db::DeviceParameterCompareDelegate *cmp = da->parameter_compare_delegate ();
+      db->set_parameter_compare_delegate (cmp ? cmp->clone () : 0);
+
+    }
+
+  }
+
   //  device whether to use a device category in strict mode
 
   device_categorizer.clear_strict_device_categories ();

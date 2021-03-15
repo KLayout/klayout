@@ -252,6 +252,7 @@ public:
   DeviceParameterCompareDelegate () { }
   virtual ~DeviceParameterCompareDelegate () { }
 
+  virtual DeviceParameterCompareDelegate *clone () const = 0;
   virtual bool less (const db::Device &a, const db::Device &b) const = 0;
   virtual bool equal (const db::Device &a, const db::Device &b) const = 0;
 };
@@ -272,6 +273,11 @@ public:
 
   virtual bool less (const db::Device &a, const db::Device &b) const;
   virtual bool equal (const db::Device &a, const db::Device &b) const;
+
+  virtual DeviceParameterCompareDelegate *clone () const
+  {
+    return new EqualDeviceParameters (*this);
+  }
 
   EqualDeviceParameters &operator+= (const EqualDeviceParameters &other);
 
@@ -297,6 +303,11 @@ public:
 
   virtual bool less (const db::Device &a, const db::Device &b) const;
   virtual bool equal (const db::Device &a, const db::Device &b) const;
+
+  virtual DeviceParameterCompareDelegate *clone () const
+  {
+    return new AllDeviceParametersAreEqual (*this);
+  }
 
 private:
   double m_relative;
@@ -573,6 +584,14 @@ public:
 
   /**
    *  @brief Gets the parameter compare delegate or null if no such delegate is registered
+   */
+  const db::DeviceParameterCompareDelegate *parameter_compare_delegate () const
+  {
+    return mp_pc_delegate.get ();
+  }
+
+  /**
+   *  @brief Gets the parameter compare delegate or null if no such delegate is registered (non-const version)
    */
   db::DeviceParameterCompareDelegate *parameter_compare_delegate ()
   {

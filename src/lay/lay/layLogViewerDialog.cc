@@ -247,7 +247,7 @@ LogFile::add (LogFileEntry::mode_type mode, const std::string &msg, bool continu
 
     ++m_generation_id;
 
-    if (QThread::currentThread ()->eventDispatcher () && (tl::Clock::current () - m_last_yield).seconds () > 0.1) {
+    if (lay::ApplicationBase::instance ()->qapp_gui () && QThread::currentThread () == lay::ApplicationBase::instance ()->qapp_gui ()->thread () && (tl::Clock::current () - m_last_yield).seconds () > 0.1) {
       m_last_yield = tl::Clock::current ();
       can_yield = true;
     }
@@ -255,7 +255,7 @@ LogFile::add (LogFileEntry::mode_type mode, const std::string &msg, bool continu
 
   //  use this opportunity to process events
   if (can_yield) {
-    QThread::currentThread ()->eventDispatcher ()->processEvents (QEventLoop::AllEvents);
+    lay::ApplicationBase::instance ()->process_events (QEventLoop::AllEvents);
   }
 }
 

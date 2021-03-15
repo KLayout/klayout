@@ -13,13 +13,13 @@ b.output(2, 0)
 def split_vs_normal(r, f1, f2, *args)
   d1 = r.send(f1, *args)[0].data
   d2 = r.send(f2, *args).data
-  d1.to_s == d2.to_s || raise("#{f1.to_s} vs. #{f2.to_s} check failed: #{d1.to_s} != #{d2.to_s}")
+  d1.each.collect(&:to_s).sort == d2.each.collect(&:to_s).sort || raise("#{f1.to_s} vs. #{f2.to_s} check failed: #{d1.to_s} != #{d2.to_s}")
 end
 
 def splitn_vs_normal(r, f1, f2, *args)
   d1 = r.send(f1, *args)[1].data
   d2 = r.send(f2, *args).data
-  d1.to_s == d2.to_s || raise("#{f1.to_s} vs. #{f2.to_s} check failed: #{d1.to_s} != #{d2.to_s}")
+  d1.each.collect(&:to_s).sort == d2.each.collect(&:to_s).sort || raise("#{f1.to_s} vs. #{f2.to_s} check failed: #{d1.to_s} != #{d2.to_s}")
 end
 
 a.covering(b).output(100, 0)

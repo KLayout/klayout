@@ -25,6 +25,7 @@
 #define HDR_layProperties
 
 #include "laybasicCommon.h"
+#include "layEditable.h"
 
 #include <QFrame>
 
@@ -209,7 +210,7 @@ public:
    */
   lay::Editable *editable () 
   {
-    return mp_editable;
+    return mp_editable.get ();
   }
 
   /**
@@ -229,7 +230,7 @@ signals:
 
 private:
   db::Manager *mp_manager;
-  lay::Editable *mp_editable;
+  tl::weak_ptr<lay::Editable> mp_editable;
 };
 
 }

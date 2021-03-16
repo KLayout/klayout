@@ -26,6 +26,7 @@
 
 #include "lymCommon.h"
 
+#include "tlRecipe.h"
 #include "gsiObject.h"
 #include "tlClassRegistry.h"
 
@@ -63,11 +64,11 @@ public:
   }
 
   /**
-   *  @brief Executes the macro 
+   *  @brief Creates the executable for a macro
    *
-   *  This method must be reimplemented to provide the actual execution of the macro.
+   *  The caller will delete the returned object.
    */
-  virtual void execute (const lym::Macro *macro) const;
+  virtual tl::Executable *executable (const lym::Macro *macro) const;
 
   /**
    *  @brief Returns the storage scheme

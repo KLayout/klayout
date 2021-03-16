@@ -88,19 +88,19 @@ namespace db
  *
  *  [xref-def]:
  *
- *    circuit([non] [non] [status]? [circuit-xrefs])
+ *    circuit([non] [non] [status]? [message]? [circuit-xrefs])
  *                                     - circuit pair [short key: X]
  *
  *  [circuit-xrefs]:
  *
- *    xref([pair]*)
+ *    xref([pair]*)                    - circuit cross-reference part [short key: Z]
  *
  *  [pair]
  *
- *    pin([ion] [ion] [status]?)       - a pin pair [short key: P]
- *    device([ion] [ion] [status]?)    - a device pair [short key: D]
- *    circuit([ion] [ion] [status]?)   - a subcircuit pair [short key: X]
- *    net([ion] [ion] [status]?)       - a net pair [short key: N]
+ *    pin([ion] [ion] [status]? [message]?)       - a pin pair [short key: P]
+ *    device([ion] [ion] [status]? [message]?)    - a device pair [short key: D]
+ *    circuit([ion] [ion] [status]? [message]?)   - a subcircuit pair [short key: X]
+ *    net([ion] [ion] [status]? [message]?)       - a net pair [short key: N]
  *
  *  [non]
  *
@@ -109,6 +109,10 @@ namespace db
  *  [ion]
  *
  *    <id> | ()
+ *
+ *  [message]
+ *
+ *    description(<name>)              - error description [short key: B]
  *
  *  [status]
  *

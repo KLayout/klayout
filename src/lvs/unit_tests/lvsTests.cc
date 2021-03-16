@@ -30,7 +30,7 @@
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
-void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string &au_netlist, const std::string &layout, bool priv = false)
+void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string &au_netlist, const std::string &layout, bool priv = false, const std::string &au_lvsdb_name = std::string ())
 {
   std::string testsrc = priv ? tl::testsrc_private () : tl::testsrc ();
   testsrc = tl::combine_path (tl::combine_path (testsrc, "testdata"), "lvs");
@@ -88,6 +88,11 @@ void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string
     tl::info << "  golden: " << au_cir;
   }
   EXPECT_EQ (res, true);
+
+  if (! au_lvsdb_name.empty ()) {
+    std::string au_lvsdb = tl::combine_path (testsrc, au_lvsdb_name);
+    _this->compare_text_files (output_lvsdb, au_lvsdb);
+  }
 }
 
 TEST(1_full)
@@ -142,4 +147,10 @@ TEST(16_private)
 {
   // test_is_long_runner ();
   run_test (_this, "test_16.lvs", "test_16.cir.gz", "test_16.gds.gz", true);
+}
+
+TEST(17_private)
+{
+  test_is_long_runner ();
+  run_test (_this, "test_17.lylvs", "test_17.cir.gz", "test_17.gds.gz", true, "test_17.lvsdb");
 }

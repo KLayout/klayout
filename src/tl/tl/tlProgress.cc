@@ -49,7 +49,11 @@ ProgressAdaptor::~ProgressAdaptor ()
 void
 ProgressAdaptor::register_object (Progress *progress)
 {
+  bool cancelled = ! mp_objects.empty () && mp_objects.first ()->break_scheduled ();
   mp_objects.push_back (progress); // this keeps the outmost one visible. push_front would make the latest one visible.
+  if (cancelled) {
+    progress->signal_break ();
+  }
 }
 
 void
@@ -130,15 +134,19 @@ ProgressGarbageCollector::~ProgressGarbageCollector ()
 //  store a pointer but a pointer to a pointer.
 static tl::ThreadStorage<ProgressAdaptor **> s_thread_data;
 
-Progress::Progress (const std::string &desc, size_t yield_interval)
+const double yield_timeout = 0.3;
+const size_t default_yield_interval = 1000;
+
+Progress::Progress (const std::string &desc, size_t yield_interval, bool can_cancel)
   : m_desc (desc), m_title (desc),
     m_interval_count (0), 
-    m_yield_interval (yield_interval), 
+    m_yield_interval (yield_interval == 0 ? default_yield_interval : yield_interval),
     m_last_value (-1.0),
-    m_can_cancel (true),
-    m_cancelled (false)
+    m_can_cancel (can_cancel),
+    m_cancelled (false),
+    m_registered (false)
 {
-  //  .. nothing yet ..
+  m_last_yield = tl::Clock::current ();
 }
 
 Progress::~Progress ()
@@ -149,9 +157,19 @@ Progress::~Progress ()
 void
 Progress::initialize ()
 {
+  //  The abstract progress does not get test() calls so we need to register it now.
   ProgressAdaptor *a = adaptor ();
   if (a) {
+
     a->register_object (this);
+    m_registered = true;
+
+    //  A pending cancel request may immediately kill the operation - "register_object" will set the cancelled flag then.
+    if (m_cancelled) {
+      m_cancelled = false;
+      throw tl::BreakException ();
+    }
+
   }
 }
 
@@ -159,7 +177,7 @@ void
 Progress::shutdown ()
 {
   ProgressAdaptor *a = adaptor ();
-  if (a) {
+  if (a && m_registered) {
     a->unregister_object (this);
   }
 }
@@ -192,29 +210,27 @@ Progress::adaptor ()
 void 
 Progress::signal_break ()
 {
-  m_cancelled = true;
+  if (m_can_cancel) {
+    m_cancelled = true;
+  }
 }
 
 void
 Progress::set_desc (const std::string &d)
 {
-  ProgressAdaptor *a = adaptor ();
-  if (a && d != m_desc) {
-
+  if (d != m_desc) {
     m_desc = d;
-    a->trigger (this);
-    a->yield (this);
-
-    if (m_cancelled) {
-      m_cancelled = false;
-      throw tl::BreakException ();
-    }
-
+    test (true);
   }
 }
 
-bool Progress::test(bool force_yield)
+bool Progress::test (bool force_yield)
 {
+  if (m_cancelled) {
+    m_cancelled = false;
+    throw tl::BreakException ();
+  }
+
   if (++m_interval_count >= m_yield_interval || force_yield) {
 
     ProgressAdaptor *a = adaptor ();
@@ -226,22 +242,28 @@ bool Progress::test(bool force_yield)
       needs_trigger = true;
     }
 
+    if (m_desc != m_last_desc) {
+      m_last_desc = m_desc;
+      needs_trigger = true;
+    }
+
     m_interval_count = 0;
 
     if (a) {
+
       tl::Clock now = tl::Clock::current ();
-      if ((now - m_last_yield).seconds () > 0.1) {
+      if ((now - m_last_yield).seconds () > yield_timeout) {
+
         m_last_yield = now;
+
         if (needs_trigger) {
           a->trigger (this);
         }
-        a->yield (this);
-      }
-    }
 
-    if (m_cancelled) {
-      m_cancelled = false;
-      throw tl::BreakException ();
+        a->yield (this);
+
+      }
+
     }
 
     return true;
@@ -268,8 +290,8 @@ AbstractProgress::~AbstractProgress ()
 // ---------------------------------------------------------------------------------------------
 //  RelativeProgress implementation
 
-RelativeProgress::RelativeProgress (const std::string &desc, size_t max_count, size_t yield_interval)
-  : Progress (desc, yield_interval)
+RelativeProgress::RelativeProgress (const std::string &desc, size_t max_count, size_t yield_interval, bool can_cancel)
+  : Progress (desc, yield_interval, can_cancel)
 {
   m_format = "%.0f%%";
   m_unit = double (max_count) / 100.0;
@@ -313,8 +335,8 @@ RelativeProgress::set (size_t count, bool force_yield)
 // ---------------------------------------------------------------------------------------------
 //  Progress implementation
 
-AbsoluteProgress::AbsoluteProgress (const std::string &desc, size_t yield_interval)
-  : Progress (desc, yield_interval)
+AbsoluteProgress::AbsoluteProgress (const std::string &desc, size_t yield_interval, bool can_cancel)
+  : Progress (desc, yield_interval, can_cancel)
 {
   m_format = "%.0f";
   m_unit = 1.0;

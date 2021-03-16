@@ -190,17 +190,17 @@ public:
     m_circuit = circuit2str (a) + " vs. " + circuit2str (b);
   }
 
-  virtual void device_class_mismatch (const db::DeviceClass *a, const db::DeviceClass *b)
+  virtual void device_class_mismatch (const db::DeviceClass *a, const db::DeviceClass *b, const std::string & /*msg*/)
   {
     out ("device_class_mismatch " + device_class2str (a) + " " + device_class2str (b));
   }
 
-  virtual void circuit_skipped (const db::Circuit *a, const db::Circuit *b)
+  virtual void circuit_skipped (const db::Circuit *a, const db::Circuit *b, const std::string & /*msg*/)
   {
     out ("circuit_skipped " + circuit2str (a) + " " + circuit2str (b));
   }
 
-  virtual void circuit_mismatch (const db::Circuit *a, const db::Circuit *b)
+  virtual void circuit_mismatch (const db::Circuit *a, const db::Circuit *b, const std::string & /*msg*/)
   {
     out ("circuit_mismatch " + circuit2str (a) + " " + circuit2str (b));
   }
@@ -210,12 +210,12 @@ public:
     out ("match_nets " + net2str (a) + " " + net2str (b));
   }
 
-  virtual void match_ambiguous_nets (const db::Net *a, const db::Net *b)
+  virtual void match_ambiguous_nets (const db::Net *a, const db::Net *b, const std::string & /*msg*/)
   {
     out ("match_ambiguous_nets " + net2str (a) + " " + net2str (b));
   }
 
-  virtual void net_mismatch (const db::Net *a, const db::Net *b)
+  virtual void net_mismatch (const db::Net *a, const db::Net *b, const std::string & /*msg*/)
   {
     out ("net_mismatch " + net2str (a) + " " + net2str (b));
   }
@@ -225,7 +225,7 @@ public:
     out ("match_devices " + device2str (a) + " " + device2str (b));
   }
 
-  virtual void device_mismatch (const db::Device *a, const db::Device *b)
+  virtual void device_mismatch (const db::Device *a, const db::Device *b, const std::string & /*msg*/)
   {
     out ("device_mismatch " + device2str (a) + " " + device2str (b));
   }
@@ -245,7 +245,7 @@ public:
     out ("match_pins " + pin2str (a) + " " + pin2str (b));
   }
 
-  virtual void pin_mismatch (const db::Pin *a, const db::Pin *b)
+  virtual void pin_mismatch (const db::Pin *a, const db::Pin *b, const std::string & /*msg*/)
   {
     out ("pin_mismatch " + pin2str (a) + " " + pin2str (b));
   }
@@ -255,7 +255,7 @@ public:
     out ("match_subcircuits " + subcircuit2str (a) + " " + subcircuit2str (b));
   }
 
-  virtual void subcircuit_mismatch (const db::SubCircuit *a, const db::SubCircuit *b)
+  virtual void subcircuit_mismatch (const db::SubCircuit *a, const db::SubCircuit *b, const std::string & /*msg*/)
   {
     out ("subcircuit_mismatch " + subcircuit2str (a) + " " + subcircuit2str (b));
   }

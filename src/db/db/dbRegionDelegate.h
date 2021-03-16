@@ -281,18 +281,25 @@ public:
 
   virtual RegionDelegate *selected_outside (const Region &other) const = 0;
   virtual RegionDelegate *selected_not_outside (const Region &other) const = 0;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_outside_pair (const Region &other) const = 0;
   virtual RegionDelegate *selected_inside (const Region &other) const = 0;
   virtual RegionDelegate *selected_not_inside (const Region &other) const = 0;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_inside_pair (const Region &other) const = 0;
   virtual RegionDelegate *selected_enclosing (const Region &other, size_t min_count, size_t max_count) const = 0;
   virtual RegionDelegate *selected_not_enclosing (const Region &other, size_t min_count, size_t max_count) const = 0;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_enclosing_pair (const Region &other, size_t min_count, size_t max_count) const = 0;
   virtual RegionDelegate *selected_interacting (const Region &other, size_t min_count, size_t max_count) const = 0;
   virtual RegionDelegate *selected_not_interacting (const Region &other, size_t min_count, size_t max_count) const = 0;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_pair (const Region &other, size_t min_count, size_t max_count) const = 0;
   virtual RegionDelegate *selected_interacting (const Edges &other, size_t min_count, size_t max_count) const = 0;
   virtual RegionDelegate *selected_not_interacting (const Edges &other, size_t min_count, size_t max_count) const = 0;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_pair (const Edges &other, size_t min_count, size_t max_count) const = 0;
   virtual RegionDelegate *selected_interacting (const Texts &other, size_t min_count, size_t max_count) const = 0;
   virtual RegionDelegate *selected_not_interacting (const Texts &other, size_t min_count, size_t max_count) const = 0;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_pair (const Texts &other, size_t min_count, size_t max_count) const = 0;
   virtual RegionDelegate *selected_overlapping (const Region &other, size_t min_count, size_t max_count) const = 0;
   virtual RegionDelegate *selected_not_overlapping (const Region &other, size_t min_count, size_t max_count) const = 0;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_overlapping_pair (const Region &other, size_t min_count, size_t max_count) const = 0;
   virtual RegionDelegate *pull_inside (const Region &other) const = 0;
   virtual RegionDelegate *pull_interacting (const Region &other) const = 0;
   virtual EdgesDelegate *pull_interacting (const Edges &other) const = 0;

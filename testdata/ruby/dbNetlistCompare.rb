@@ -33,7 +33,7 @@ class NetlistCompareTestLogger < RBA::GenericNetlistCompareLogger
     @texts << text
   end
 
-  def device_class_mismatch(a, b)
+  def device_class_mismatch(a, b, msg)
     out("device_class_mismatch " + dc2str(a) + " " + dc2str(b))
   end
 
@@ -41,15 +41,15 @@ class NetlistCompareTestLogger < RBA::GenericNetlistCompareLogger
     out("begin_circuit " + circuit2str(a) + " " + circuit2str(b))
   end
 
-  def end_circuit(a, b, matching)
+  def end_circuit(a, b, matching, msg)
     out("end_circuit " + circuit2str(a) + " " + circuit2str(b) + " " + (matching ? "MATCH" : "NOMATCH"))
   end
 
-  def circuit_skipped(a, b)
+  def circuit_skipped(a, b, msg)
     out("circuit_skipped " + circuit2str(a) + " " + circuit2str(b))
   end
 
-  def circuit_mismatch(a, b)
+  def circuit_mismatch(a, b, msg)
     out("circuit_mismatch " + circuit2str(a) + " " + circuit2str(b))
   end
 
@@ -57,11 +57,11 @@ class NetlistCompareTestLogger < RBA::GenericNetlistCompareLogger
     out("match_nets " + net2str(a) + " " + net2str(b))
   end
 
-  def match_ambiguous_nets(a, b)
+  def match_ambiguous_nets(a, b, msg)
     out("match_ambiguous_nets " + net2str(a) + " " + net2str(b))
   end
 
-  def net_mismatch(a, b)
+  def net_mismatch(a, b, msg)
     out("net_mismatch " + net2str(a) + " " + net2str(b))
   end
 
@@ -69,7 +69,7 @@ class NetlistCompareTestLogger < RBA::GenericNetlistCompareLogger
     out("match_devices " + device2str(a) + " " + device2str(b))
   end
 
-  def device_mismatch(a, b)
+  def device_mismatch(a, b, msg)
     out("device_mismatch " + device2str(a) + " " + device2str(b))
   end
 
@@ -85,7 +85,7 @@ class NetlistCompareTestLogger < RBA::GenericNetlistCompareLogger
     out("match_pins " + pin2str(a) + " " + pin2str(b))
   end
 
-  def pin_mismatch(a, b)
+  def pin_mismatch(a, b, msg)
     out("pin_mismatch " + pin2str(a) + " " + pin2str(b))
   end
 
@@ -93,7 +93,7 @@ class NetlistCompareTestLogger < RBA::GenericNetlistCompareLogger
     out("match_subcircuits " + subcircuit2str(a) + " " + subcircuit2str(b))
   end
 
-  def subcircuit_mismatch(a, b)
+  def subcircuit_mismatch(a, b, msg)
     out("subcircuit_mismatch " + subcircuit2str(a) + " " + subcircuit2str(b))
   end
 
@@ -482,7 +482,7 @@ END
 
     logger.clear
     eqp = RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_L, 0.2, 0.0)
-    nl2.device_class_by_name("NMOS").equal_parameters = eqp
+    nl1.device_class_by_name("NMOS").equal_parameters = eqp
     good = comp.compare(nl1, nl2)
 
     assert_equal(logger.text, <<"END")
@@ -509,8 +509,8 @@ END
     assert_equal(good, true)
 
     logger.clear
-    nl2.device_class_by_name("NMOS").equal_parameters = nil
-    assert_equal(nl2.device_class_by_name("NMOS").equal_parameters == nil, true)
+    nl1.device_class_by_name("NMOS").equal_parameters = nil
+    assert_equal(nl1.device_class_by_name("NMOS").equal_parameters == nil, true)
     good = comp.compare(nl1, nl2)
 
     assert_equal(logger.text, <<"END")
@@ -539,8 +539,8 @@ END
     logger.clear
     eqp = RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_W, 0.01, 0.0)
     eqp = eqp + RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_L, 0.2, 0.0)
-    nl2.device_class_by_name("NMOS").equal_parameters = eqp
-    assert_equal(nl2.device_class_by_name("NMOS").equal_parameters == nil, false)
+    nl1.device_class_by_name("NMOS").equal_parameters = eqp
+    assert_equal(nl1.device_class_by_name("NMOS").equal_parameters == nil, false)
     good = comp.compare(nl1, nl2)
 
     assert_equal(logger.text, <<"END")
@@ -567,7 +567,7 @@ END
     assert_equal(good, true)
 
     logger.clear
-    dc = nl2.device_class_by_name("NMOS")
+    dc = nl1.device_class_by_name("NMOS")
     dc.equal_parameters = RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_W, 0.01, 0.0)
     dc.equal_parameters += RBA::EqualDeviceParameters::new(RBA::DeviceClassMOS3Transistor::PARAM_L, 0.2, 0.0)
     good = comp.compare(nl1, nl2)

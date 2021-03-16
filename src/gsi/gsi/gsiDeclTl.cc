@@ -629,6 +629,72 @@ Class<tl::GlobPattern> decl_GlobPattern ("tl", "GlobPattern",
   "This class has been introduced in version 0.26."
 );
 
+class Executable_Impl
+  : public tl::Executable, public gsi::ObjectBase
+{
+public:
+  Executable_Impl ()
+    : tl::Executable ()
+  {
+    //  makes the object owned by the C++ side (registrar). This way we don't need to keep a
+    //  singleton instance.
+    keep ();
+  }
+
+  virtual tl::Variant execute ()
+  {
+    if (execute_cb.can_issue ()) {
+      return execute_cb.issue<tl::Executable, tl::Variant> (&tl::Executable::execute);
+    } else {
+      return tl::Variant ();
+    }
+  }
+
+  virtual void cleanup ()
+  {
+    if (cleanup_cb.can_issue ()) {
+      cleanup_cb.issue<tl::Executable> (&tl::Executable::cleanup);
+    }
+  }
+
+  gsi::Callback execute_cb;
+  gsi::Callback cleanup_cb;
+};
+
+}
+
+namespace tl
+{
+  template <> struct type_traits<gsi::Executable_Impl> : public type_traits<tl::Executable> { };
+}
+
+namespace gsi
+{
+
+Class<tl::Executable> decl_Executable ("tl", "ExecutableBase",
+  gsi::Methods (),
+  "@hide\n@alias Executable"
+);
+
+Class<Executable_Impl> decl_Executable_Impl (decl_Executable, "tl", "Executable",
+  gsi::callback ("execute", &Executable_Impl::execute, &Executable_Impl::execute_cb,
+    "@brief Reimplement this method to provide the functionality of the executable.\n"
+    "This method is supposed to execute the operation with the given parameters and return the desired output."
+  ) +
+  gsi::callback ("cleanup", &Executable_Impl::cleanup, &Executable_Impl::cleanup_cb,
+    "@brief Reimplement this method to provide post-mortem cleanup functionality.\n"
+    "This method is always called after execute terminated."
+  ),
+  "@brief A generic executable object\n"
+  "This object is a delegate for implementing the actual function of some generic executable function. "
+  "In addition to the plain execution, if offers a post-mortem cleanup callback which is always executed, even "
+  "if execute's implementation is cancelled in the debugger.\n"
+  "\n"
+  "Parameters are kept as a generic key/value map.\n"
+  "\n"
+  "This class has been introduced in version 0.27."
+);
+
 class Recipe_Impl
   : public tl::Recipe, public gsi::ObjectBase
 {
@@ -641,16 +707,16 @@ public:
     keep ();
   }
 
-  virtual tl::Variant execute (const std::map<std::string, tl::Variant> &params) const
+  virtual tl::Executable *executable (const std::map<std::string, tl::Variant> &params) const
   {
-    if (execute_cb.can_issue ()) {
-      return execute_cb.issue<tl::Recipe, tl::Variant, const std::map<std::string, tl::Variant> &> (&tl::Recipe::execute, params);
+    if (executable_cb.can_issue ()) {
+      return executable_cb.issue<tl::Recipe, tl::Executable *, const std::map<std::string, tl::Variant> &> (&tl::Recipe::executable, params);
     } else {
-      return tl::Variant ();
+      return 0;
     }
   }
 
-  gsi::Callback execute_cb;
+  gsi::Callback executable_cb;
 };
 
 }
@@ -688,10 +754,13 @@ Class<Recipe_Impl> decl_Recipe_Impl ("tl", "Recipe",
     "@brief Delivers the generator string from the given parameters.\n"
     "The generator string can be used with \\make to re-run the recipe."
   ) +
-  gsi::callback ("execute", &Recipe_Impl::execute, &Recipe_Impl::execute_cb, gsi::arg ("params"),
-    "@brief Reimplement this method to provide the functionality of the recipe.\n"
-    "This method is supposed to re-run the recipe with the given parameters and deliver the "
-    "the intended output object."
+  gsi::callback ("executable", &Recipe_Impl::executable, &Recipe_Impl::executable_cb, gsi::arg ("params"),
+    "@brief Reimplement this method to provide an executable object for the actual implementation.\n"
+    "The reasoning behind this architecture is to supply a cleanup callback. This is useful when the "
+    "actual function is executed as a script and the script terminates in the debugger. The cleanup callback "
+    "allows implementing any kind of post-mortem action despite being cancelled in the debugger.\n"
+    "\n"
+    "This method has been introduced in version 0.27 and replaces 'execute'."
   ),
   "@brief A facility for providing reproducable recipes\n"
   "The idea of this facility is to provide a service by which an object\n"

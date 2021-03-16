@@ -140,9 +140,9 @@ protected:
 
   virtual EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const;
   virtual EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options) const;
-  virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count, size_t max_count) const;
-  virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse, size_t min_count, size_t max_count) const;
-  virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse, size_t min_count, size_t max_count) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_generic (const Region &other, int mode, bool touching, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_generic (const Edges &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_generic (const Texts &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const;
   virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
   virtual EdgesDelegate *pull_generic (const Edges &other) const;
   virtual TextsDelegate *pull_generic (const Texts &other) const;

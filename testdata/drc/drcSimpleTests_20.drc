@@ -12,6 +12,18 @@ l2 = input(2, 0)
 l1.output(1, 0)
 l2.output(2, 0)
 
+def split_vs_normal(r, f1, f2, *args)
+  d1 = r.send(f1, *args)[0].data
+  d2 = r.send(f2, *args).data
+  d1.to_s == d2.to_s || raise("#{f1.to_s} vs. #{f2.to_s} check failed: #{d1.to_s} != #{d2.to_s}")
+end
+
+def splitn_vs_normal(r, f1, f2, *args)
+  d1 = r.send(f1, *args)[1].data
+  d2 = r.send(f2, *args).data
+  d1.to_s == d2.to_s || raise("#{f1.to_s} vs. #{f2.to_s} check failed: #{d1.to_s} != #{d2.to_s}")
+end
+
 l1.interacting(l2, 1).output(100, 0)
 l1.interacting(l2, 2).output(101, 0)
 l1.interacting(l2, 1..2).output(102, 0)
@@ -22,6 +34,11 @@ else
 end
 l1.interacting(l2, 1, 2).output(104, 0)
 
+split_vs_normal(l1, :split_interacting, :interacting, l2, 1)
+split_vs_normal(l1, :split_interacting, :interacting, l2, 2)
+split_vs_normal(l1, :split_interacting, :interacting, l2, 1..2)
+split_vs_normal(l1, :split_interacting, :interacting, l2, 1, 2)
+
 l1.overlapping(l2, 1).output(110, 0)
 l1.overlapping(l2, 2).output(111, 0)
 l1.overlapping(l2, 1..2).output(112, 0)
@@ -31,6 +48,11 @@ else
   l1.overlapping(l2, 2..10000).output(113, 0)
 end
 l1.overlapping(l2, 1, 2).output(114, 0)
+
+split_vs_normal(l1, :split_overlapping, :overlapping, l2, 1)
+split_vs_normal(l1, :split_overlapping, :overlapping, l2, 2)
+split_vs_normal(l1, :split_overlapping, :overlapping, l2, 1..2)
+split_vs_normal(l1, :split_overlapping, :overlapping, l2, 1, 2)
 
 l = l1.dup
 l.select_interacting(l2, 1)
@@ -82,6 +104,11 @@ else
 end
 l1.not_interacting(l2, 1, 2).output(304, 0)
 
+splitn_vs_normal(l1, :split_interacting, :not_interacting, l2, 1)
+splitn_vs_normal(l1, :split_interacting, :not_interacting, l2, 2)
+splitn_vs_normal(l1, :split_interacting, :not_interacting, l2, 1..2)
+splitn_vs_normal(l1, :split_interacting, :not_interacting, l2, 1, 2)
+
 l1.not_overlapping(l2, 1).output(310, 0)
 l1.not_overlapping(l2, 2).output(311, 0)
 l1.not_overlapping(l2, 1..2).output(312, 0)
@@ -91,6 +118,11 @@ else
   l1.not_overlapping(l2, 2..10000).output(313, 0)
 end
 l1.not_overlapping(l2, 1, 2).output(314, 0)
+
+splitn_vs_normal(l1, :split_overlapping, :not_overlapping, l2, 1)
+splitn_vs_normal(l1, :split_overlapping, :not_overlapping, l2, 2)
+splitn_vs_normal(l1, :split_overlapping, :not_overlapping, l2, 1..2)
+splitn_vs_normal(l1, :split_overlapping, :not_overlapping, l2, 1, 2)
 
 l = l1.dup
 l.select_not_interacting(l2, 1)

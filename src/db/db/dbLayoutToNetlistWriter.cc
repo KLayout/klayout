@@ -561,7 +561,8 @@ void std_writer_impl<Keys>::write (const db::SubCircuit &subcircuit, std::map<co
     *mp_stream << indent << indent2 << Keys::property_key << "(" << p->first.to_parsable_string () << " " << p->second.to_parsable_string () << ")" << endl;
   }
 
-  for (db::Circuit::const_pin_iterator p = subcircuit.circuit_ref ()->begin_pins (); p != subcircuit.circuit_ref ()->end_pins (); ++p) {
+  unsigned int pin_id = 0;
+  for (db::Circuit::const_pin_iterator p = subcircuit.circuit_ref ()->begin_pins (); p != subcircuit.circuit_ref ()->end_pins (); ++p, ++pin_id) {
     const db::Net *net = subcircuit.net_for_pin (p->id ());
     if (net) {
       if (separate_lines) {
@@ -569,7 +570,7 @@ void std_writer_impl<Keys>::write (const db::SubCircuit &subcircuit, std::map<co
       } else {
         *mp_stream << " ";
       }
-      *mp_stream << Keys::pin_key << "(" << tl::to_string (p->id ()) << " " << net2id [net] << ")";
+      *mp_stream << Keys::pin_key << "(" << tl::to_string (pin_id) << " " << net2id [net] << ")";
       if (separate_lines) {
         *mp_stream << endl;
       }

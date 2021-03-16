@@ -28,6 +28,8 @@
 
 #include <string>
 #include <list>
+#include <map>
+#include <set>
 
 #include "tlProgress.h"
 #include "tlObject.h"
@@ -71,9 +73,10 @@ public:
   void set_progress_bar (lay::ProgressBar *pb);
 
 private:
-  tl::Clock m_start_time;
   lay::ProgressBar *mp_pb;
   bool m_pw_visible;
+  std::map<tl::Progress *, tl::Clock> m_queued;
+  std::set<tl::Progress *> m_active;
 
   void process_events ();
   void update_and_yield ();

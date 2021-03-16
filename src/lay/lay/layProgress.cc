@@ -57,8 +57,10 @@ static bool is_marked_alive (QObject *obj)
 
 // --------------------------------------------------------------------
 
+const double visibility_delay = 1.0;
+
 ProgressReporter::ProgressReporter ()
-  : m_start_time (), mp_pb (0), m_pw_visible (false)
+  : mp_pb (0), m_pw_visible (false)
 {
   //  .. nothing yet ..
 }
@@ -94,22 +96,21 @@ ProgressReporter::register_object (tl::Progress *progress)
 
   tl::ProgressAdaptor::register_object (progress);
 
-  if (m_start_time == tl::Clock () && ! m_pw_visible) {
-    m_start_time = tl::Clock::current ();
-  }
-
-  //  make dialog visible after some time has passed
-  if (! m_pw_visible && (tl::Clock::current () - m_start_time).seconds () > 1.0) {
-    set_visible (true);
-  }
-
   if (progress->is_abstract ()) {
+
+    m_active.insert (progress);
+
+    if (! m_pw_visible) {
+      set_visible (true);
+    }
+
     if (mp_pb) {
       mp_pb->update_progress (progress);
     }
     process_events ();
+
   } else {
-    update_and_yield ();
+    m_queued.insert (std::make_pair (progress, tl::Clock::current ()));
   }
 }
 
@@ -121,46 +122,64 @@ ProgressReporter::unregister_object (tl::Progress *progress)
   //  close or refresh window
   if (begin () == end ()) {
 
+    m_queued.clear ();
+    m_active.clear ();
+
     if (m_pw_visible) {
       set_visible (false);
     }
 
-    m_start_time = tl::Clock ();
-
     if (mp_pb) {
       mp_pb->update_progress (0);
     }
-
     process_events ();
 
     QApplication::instance ()->removeEventFilter (this);
 
   } else {
-    update_and_yield ();
+
+    m_queued.erase (progress);
+
+    std::set<tl::Progress *>::iterator a = m_active.find (progress);
+    if (a != m_active.end ()) {
+      m_active.erase (a);
+      update_and_yield ();
+    }
+
   }
 }
 
 void 
-ProgressReporter::trigger (tl::Progress * /*progress*/)
+ProgressReporter::trigger (tl::Progress *progress)
 {
-  if (begin () != end ()) {
-    //  make dialog visible after some time has passed
-    if (! m_pw_visible && (tl::Clock::current () - m_start_time).seconds () > 1.0) {
+  std::map<tl::Progress *, tl::Clock>::iterator q = m_queued.find (progress);
+  if (q != m_queued.end () && (tl::Clock::current () - q->second).seconds () > visibility_delay) {
+    if (! m_pw_visible) {
       set_visible (true);
     }
+    m_active.insert (progress);
+    m_queued.erase (q);
+  }
+
+  if (m_active.find (progress) != m_active.end ()) {
     update_and_yield ();
   }
 }
 
 void 
-ProgressReporter::yield (tl::Progress * /*progress*/)
+ProgressReporter::yield (tl::Progress *progress)
 {
-  //  make dialog visible after some time has passed
-  if (! m_pw_visible && (tl::Clock::current () - m_start_time).seconds () > 1.0) {
-    set_visible (true);
+  std::map<tl::Progress *, tl::Clock>::iterator q = m_queued.find (progress);
+  if (q != m_queued.end () && (tl::Clock::current () - q->second).seconds () > visibility_delay) {
+    if (! m_pw_visible) {
+      set_visible (true);
+    }
+    m_active.insert (progress);
+    m_queued.erase (q);
     update_and_yield ();
-  } else if (m_pw_visible) {
-    //  process events if necessary
+  }
+
+  if (m_active.find (progress) != m_active.end ()) {
     process_events ();
   }
 }
@@ -172,11 +191,17 @@ ProgressReporter::update_and_yield ()
     return;
   }
 
-  if (mp_pb && first ()) {
-    mp_pb->update_progress (first ());
-    QWidget *w = mp_pb->progress_get_widget ();
-    if (w) {
-      first ()->render_progress (w);
+  if (mp_pb) {
+    if (first ()) {
+      mp_pb->update_progress (first ());
+      QWidget *w = mp_pb->progress_get_widget ();
+      if (w) {
+        first ()->render_progress (w);
+      }
+    } else if (begin () != end ()) {
+      mp_pb->update_progress (begin ().operator-> ());
+    } else {
+      mp_pb->update_progress (0);
     }
   }
 

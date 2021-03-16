@@ -266,7 +266,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  setObjectName (QString::fromUtf8 (name));
+  setObjectName (QString::fromUtf8(name));
   init (manager, parent);
 }
 
@@ -3972,6 +3972,8 @@ LayoutView::cancel ()
 {
   //  cancel all drags and pending edit operations such as move operations.
   cancel_edits ();
+  //  re-enable edit mode
+  enable_edits (true);
   //  and clear the selection
   clear_selection ();
 }

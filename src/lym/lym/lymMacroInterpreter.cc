@@ -32,10 +32,10 @@
 namespace lym
 {
 
-void 
-MacroInterpreter::execute (const lym::Macro *) const
+tl::Executable *
+MacroInterpreter::executable (const lym::Macro *) const
 {
-  throw tl::Exception (tl::to_string (QObject::tr ("execute() implementation missing for DSL interpreter")));
+  throw tl::Exception (tl::to_string (QObject::tr ("executable() implementation missing for DSL interpreter")));
 }
 
 bool 
@@ -107,7 +107,10 @@ MacroInterpreter::execute_macro (const lym::Macro *macro)
       std::pair<std::string, std::string> et = cls->include_expansion (macro);
       if (et.first.empty () || et.first == macro->path ()) {
 
-        cls->execute (macro);
+        std::unique_ptr<tl::Executable> eo (cls->executable (macro));
+        if (eo.get ()) {
+          eo->do_execute ();
+        }
 
       } else {
 
@@ -116,7 +119,10 @@ MacroInterpreter::execute_macro (const lym::Macro *macro)
         tmp_macro.assign (*macro);
         tmp_macro.set_text (et.second);
         tmp_macro.set_file_path (et.first);
-        cls->execute (&tmp_macro);
+        std::unique_ptr<tl::Executable> eo (cls->executable (&tmp_macro));
+        if (eo.get ()) {
+          eo->do_execute ();
+        }
 
       }
 

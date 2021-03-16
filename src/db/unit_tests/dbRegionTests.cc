@@ -354,6 +354,8 @@ TEST(10a)
   r.set_merged_semantics (false);
   EXPECT_EQ (r.selected_interacting (db::Region (db::Box (db::Point (20, 20), db::Point (30, 30)))).to_string (), "(0,0;0,200;100,200;100,0)");
   EXPECT_EQ (r.selected_not_interacting (db::Region (db::Box (db::Point (20, 20), db::Point (30, 30)))).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting_differential (db::Region (db::Box (db::Point (20, 20), db::Point (30, 30)))).first.to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting_differential (db::Region (db::Box (db::Point (20, 20), db::Point (30, 30)))).second.to_string (), "(-100,-100;-100,0;0,0;0,-100)");
   EXPECT_EQ (db::compare (r.selected_interacting (db::Region (db::Box (db::Point (-20, -20), db::Point (30, 30)))), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)"), true);
   EXPECT_EQ (r.selected_interacting (db::Region (db::Box (db::Point (-200, -200), db::Point (-190, -190)))).to_string (), "");
   db::Region rr = r;
@@ -836,6 +838,8 @@ TEST(18a)
     EXPECT_EQ (db::compare (o, "(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60)"), true);
     o = r;
     EXPECT_EQ (db::compare (o.selected_not_outside (rr), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)"), true);
+    EXPECT_EQ (db::compare (o.selected_outside_differential (rr).first, "(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60)"), true);
+    EXPECT_EQ (db::compare (o.selected_outside_differential (rr).second, "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)"), true);
     EXPECT_EQ (o.selected_outside (rr).count () + o.selected_not_outside (rr).count (), size_t (6));
     EXPECT_EQ (o.selected_outside (rr).hier_count () + o.selected_not_outside (rr).hier_count (), size_t (6));
     o.select_not_outside (rr);
@@ -848,6 +852,8 @@ TEST(18a)
     EXPECT_EQ (o.to_string (), "(20,30;20,50;40,50;40,30)");
     o = r;
     EXPECT_EQ (db::compare (o.selected_not_inside (rr), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)"), true);
+    EXPECT_EQ (db::compare (o.selected_inside_differential (rr).first, "(20,30;20,50;40,50;40,30)"), true);
+    EXPECT_EQ (db::compare (o.selected_inside_differential (rr).second, "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)"), true);
     EXPECT_EQ (o.selected_inside (rr).count () + o.selected_not_inside (rr).count (), size_t (6));
     EXPECT_EQ (o.selected_inside (rr).hier_count () + o.selected_not_inside (rr).hier_count (), size_t (6));
     o.select_not_inside (rr);
@@ -860,6 +866,8 @@ TEST(18a)
     EXPECT_EQ (db::compare (o, "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)"), true);
     o = r;
     EXPECT_EQ (o.selected_not_interacting (rr).to_string (), "(70,60;70,80;90,80;90,60)");
+    EXPECT_EQ (db::compare (o.selected_interacting_differential (rr).first, "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)"), true);
+    EXPECT_EQ (db::compare (o.selected_interacting_differential (rr).second, "(70,60;70,80;90,80;90,60)"), true);
     EXPECT_EQ (o.selected_interacting (rr).count () + o.selected_not_interacting (rr).count (), size_t (6));
     EXPECT_EQ (o.selected_interacting (rr).hier_count () + o.selected_not_interacting (rr).hier_count (), size_t (6));
     o.select_not_interacting (rr);
@@ -872,6 +880,8 @@ TEST(18a)
     EXPECT_EQ (db::compare (o, "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)"), true);
     o = r;
     EXPECT_EQ (db::compare (o.selected_not_overlapping (rr), "(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60)"), true);
+    EXPECT_EQ (db::compare (o.selected_overlapping_differential (rr).first, "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)"), true);
+    EXPECT_EQ (db::compare (o.selected_overlapping_differential (rr).second, "(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60)"), true);
     EXPECT_EQ (o.selected_overlapping (rr).count () + o.selected_not_overlapping (rr).count (), size_t (6));
     EXPECT_EQ (o.selected_overlapping (rr).hier_count () + o.selected_not_overlapping (rr).hier_count (), size_t (6));
     o.select_not_overlapping (rr);
@@ -884,6 +894,8 @@ TEST(18a)
     EXPECT_EQ (o.to_string (), "(0,100;0,130;30,130;30,100)");
     o = r;
     EXPECT_EQ (db::compare (o.selected_not_enclosing (rr), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60)"), true);
+    EXPECT_EQ (db::compare (o.selected_enclosing_differential (rr).first, "(0,100;0,130;30,130;30,100)"), true);
+    EXPECT_EQ (db::compare (o.selected_enclosing_differential (rr).second, "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60)"), true);
     EXPECT_EQ (o.selected_enclosing (rr).count () + o.selected_not_enclosing (rr).count (), size_t (6));
     EXPECT_EQ (o.selected_enclosing (rr).hier_count () + o.selected_not_enclosing (rr).hier_count (), size_t (6));
     o.select_not_enclosing (rr);
@@ -1506,6 +1518,8 @@ TEST(30a)
   r.set_merged_semantics (false);
   EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "(0,0;0,200;100,200;100,0)");
   EXPECT_EQ (r.selected_not_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting_differential (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).first.to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting_differential (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).second.to_string (), "(-100,-100;-100,0;0,0;0,-100)");
   EXPECT_EQ (db::compare (r.selected_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (30, 30)))), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)"), true);
   EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-200, -200), db::Point (-190, -190)))).to_string (), "");
   db::Region rr = r;
@@ -1689,6 +1703,8 @@ TEST(34a)
   r.set_merged_semantics (false);
   EXPECT_EQ (r.selected_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (30, 30))))).to_string (), "(0,0;0,200;100,200;100,0)");
   EXPECT_EQ (r.selected_not_interacting (db::Texts (db::Text ("abc", db::Trans (db::Vector (30, 30))))).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting_differential (db::Texts (db::Text ("abc", db::Trans (db::Vector (30, 30))))).first.to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting_differential (db::Texts (db::Text ("abc", db::Trans (db::Vector (30, 30))))).second.to_string (), "(-100,-100;-100,0;0,0;0,-100)");
   db::Texts tt;
   tt.insert (db::Text ("abc", db::Trans (db::Vector (30, 30))));
   tt.insert (db::Text ("xyz", db::Trans (db::Vector (-100, 0))));
@@ -1782,6 +1798,7 @@ TEST(35a_interact_with_count_region)
   EXPECT_EQ (r.selected_interacting (rr, 0, 2).to_string (), "");
   EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "");
   EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting_differential (rr, 1, 4).first.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
   EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
@@ -1797,6 +1814,7 @@ TEST(35a_interact_with_count_region)
   EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting_differential (rr, 1, 2).second.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
   EXPECT_EQ (db::compare (r.selected_not_interacting (rr, 2, 1), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)"), true);
@@ -1855,6 +1873,7 @@ TEST(35b_interact_with_count_edge)
   EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "");
   EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting_differential (rr, 2, 4).first.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
   EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_interacting (rr, 4, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
@@ -1869,6 +1888,7 @@ TEST(35b_interact_with_count_edge)
   EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting_differential (rr, 1, 2).second.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
   EXPECT_EQ (db::compare (r.selected_not_interacting (rr, 2, 1), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)"), true);
@@ -1926,6 +1946,7 @@ TEST(35c_interact_with_count_text)
   EXPECT_EQ (r.selected_interacting (rr, 1, 2).to_string (), "");
   EXPECT_EQ (r.selected_interacting (rr, 1, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_interacting (rr, 2, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting_differential (rr, 2, 4).first.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_interacting (rr, 2, 1).to_string (), "");
   EXPECT_EQ (r.selected_interacting (rr, 3, 4).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_interacting (rr, 4, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
@@ -1940,6 +1961,7 @@ TEST(35c_interact_with_count_text)
   EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting_differential (rr, 1, 2).second.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 4).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
   EXPECT_EQ (db::compare (r.selected_not_interacting (rr, 2, 1), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)"), true);

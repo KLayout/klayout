@@ -983,8 +983,8 @@ CODE
     # @name corners
     # @brief Selects corners of polygons
     # @synopsis layer.corners([ options ])
-    # @synopsis layer.corners(angle, [ options ])
-    # @synopsis layer.corners(amin .. amax, [ options ])
+    # @synopsis layer.corners(angle [, options ])
+    # @synopsis layer.corners(amin .. amax [, options ])
     #
     # This method produces markers on the corners of the polygons. An angle criterion can be given which
     # selects corners based on the angle of the connecting edges. Positive angles indicate a left turn
@@ -1263,6 +1263,7 @@ CODE
           self.data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
             block.call(object.transformed(t)) && new_data.insert(object)
           end
+          new_data
         end
         DRCLayer::new(@engine, new_data)
 
@@ -1285,7 +1286,7 @@ CODE
       @engine._wrapper_context("each") do
 
         t = RBA::CplxTrans::new(@engine.dbu)
-        @engine.run_timed("\"select\" in: #{@engine.src_line}", self.data) do
+        @engine.run_timed("\"each\" in: #{@engine.src_line}", self.data) do
           self.data.send(self.data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
             block.call(object.transformed(t))
           end
@@ -1368,10 +1369,11 @@ CODE
           t = RBA::CplxTrans::new(@engine.dbu)
           dbu_trans = RBA::VCplxTrans::new(1.0 / @engine.dbu)
 
-          @engine.run_timed("\\"select\\" in: " + @engine.src_line, self.data) do
+          @engine.run_timed("\\"#{f}\\" in: " + @engine.src_line, self.data) do
             self.data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
               insert_object_into(new_data, block.call(object.transformed(t)), dbu_trans)
             end
+            new_data
           end
 
           DRCLayer::new(@engine, new_data)
@@ -1660,6 +1662,7 @@ CODE
 
       @engine._context("andnot") do
 
+        check_is_layer(other)
         requires_region
         other.requires_region
 
@@ -1774,6 +1777,21 @@ CODE
     # is \select_not_covering.
     
     # %DRC%
+    # @name split_covering
+    # @brief Returns the results of \covering and \not_covering at the same time
+    # @synopsis (a, b) = layer.split_covering(other [, options ])
+    #
+    # This method returns the polygons covering polygons from the other layer in 
+    # one layer and all others in a second layer. This method is equivalent to calling 
+    # \covering and \not_covering, but is faster than doing this in separate steps:
+    #
+    # @code
+    # (covering, not_covering) = l1.split_covering(l2)
+    # @/code
+    #
+    # The options of this method are the same than \covering.
+    
+    # %DRC%
     # @name select_covering
     # @brief Selects shapes or regions of self which completely cover (enclose) one or more shapes from the other region
     # @synopsis layer.select_covering(other)
@@ -1850,6 +1868,21 @@ CODE
     # is \select_not_overlapping.
     
     # %DRC%
+    # @name split_overlapping
+    # @brief Returns the results of \overlapping and \not_overlapping at the same time
+    # @synopsis (a, b) = layer.split_overlapping(other [, options ])
+    #
+    # This method returns the polygons overlapping polygons from the other layer in 
+    # one layer and all others in a second layer. This method is equivalent to calling 
+    # \overlapping and \not_overlapping, but is faster than doing this in separate steps:
+    #
+    # @code
+    # (overlapping, not_overlapping) = l1.split_overlapping(l2)
+    # @/code
+    #
+    # The options of this method are the same than \overlapping.
+    
+    # %DRC%
     # @name select_overlapping
     # @brief Selects shapes or regions of self which overlap shapes from the other region
     # @synopsis layer.select_overlapping(other)
@@ -1924,6 +1957,19 @@ CODE
     # @/table
     
     # %DRC%
+    # @name split_inside
+    # @brief Returns the results of \inside and \not_inside at the same time
+    # @synopsis (a, b) = layer.split_inside(other)
+    #
+    # This method returns the polygons inside of polygons from the other layer in 
+    # one layer and all others in a second layer. This method is equivalent to calling 
+    # \inside and \not_inside, but is faster than doing this in separate steps:
+    #
+    # @code
+    # (inside, not_inside) = l1.split_inside(l2)
+    # @/code
+    
+    # %DRC%
     # @name select_inside
     # @brief Selects shapes or regions of self which are inside the other region
     # @synopsis layer.select_inside(other)
@@ -1994,6 +2040,19 @@ CODE
     #     @td @img(/images/drc_not_outside.png) @/td
     #   @/tr
     # @/table
+    
+    # %DRC%
+    # @name split_outside
+    # @brief Returns the results of \outside and \not_outside at the same time
+    # @synopsis (a, b) = layer.split_outside(other)
+    #
+    # This method returns the polygons outside of polygons from the other layer in 
+    # one layer and all others in a second layer. This method is equivalent to calling 
+    # \outside and \not_outside, but is faster than doing this in separate steps:
+    #
+    # @code
+    # (outside, not_outside) = l1.split_outside(l2)
+    # @/code
     
     # %DRC%
     # @name select_outside
@@ -2150,6 +2209,21 @@ CODE
     # @/table
     
     # %DRC%
+    # @name split_interacting
+    # @brief Returns the results of \interacting and \not_interacting at the same time
+    # @synopsis (a, b) = layer.split_interacting(other [, options ])
+    #
+    # This method returns the polygons interacting with objects from the other container in 
+    # one layer and all others in a second layer. This method is equivalent to calling 
+    # \interacting and \not_interacting, but is faster than doing this in separate steps:
+    #
+    # @code
+    # (interacting, not_interacting) = l1.split_interacting(l2)
+    # @/code
+    #
+    # The options of this method are the same than \interacting.
+    
+    # %DRC%
     # @name select_interacting
     # @brief Selects shapes or regions of self which touch or overlap shapes from the other region
     # @synopsis layer.select_interacting(other)
@@ -2192,7 +2266,7 @@ CODE
     # number of (different) shapes from the other layer. If a min and max count is given, shapes from  
     # self are selected only if they interact with less than min_count or more than max_count different shapes
     # from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
-    
+
     # %DRC%
     # @name intersections
     # @brief Returns the intersection points of intersecting edge segments for two edge collections
@@ -2285,6 +2359,7 @@ CODE
  
         @engine._context("#{f}") do
 
+          check_is_layer(other)
           if :#{f} != :pull_interacting 
             requires_region
             other.requires_region
@@ -2310,11 +2385,16 @@ CODE
     %w(| ^ inside not_inside outside not_outside in not_in).each do |f| 
       eval <<"CODE"
       def #{f}(other)
+
         @engine._context("#{f}") do
+
           requires_same_type(other)
           requires_edges_or_region
+
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+
         end
+
       end
 CODE
     end
@@ -2325,12 +2405,14 @@ CODE
 
         @engine._context("#{f}") do
 
+          check_is_layer(other)
           other.requires_edges_texts_or_region
           if self.data.is_a?(RBA::Texts)
             other.requires_region
           else
             other.requires_edges_or_region
           end
+
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
 
         end
@@ -2342,10 +2424,14 @@ CODE
     %w(+).each do |f| 
       eval <<"CODE"
       def #{f}(other)
+
         @engine._context("#{f}") do
+
           requires_same_type(other)
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+
         end
+
       end
 CODE
     end
@@ -2356,7 +2442,7 @@ CODE
 
         @engine._context("#{f}") do
 
-          other.requires_edges_texts_or_region
+          check_is_layer(other)
           if self.data.is_a?(RBA::Text)
             other.requires_region
           elsif self.data.is_a?(RBA::Region)
@@ -2381,6 +2467,7 @@ CODE
 
         @engine._context("#{f}") do
 
+          check_is_layer(other)
           requires_edges_texts_or_region
           if self.data.is_a?(RBA::Text)
             other.requires_region
@@ -2389,6 +2476,7 @@ CODE
           else
             other.requires_edges_or_region
           end
+
           if @engine.is_tiled?
             self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data, *minmax_count(*args))
             DRCLayer::new(@engine, self.data)
@@ -2402,14 +2490,39 @@ CODE
 CODE
     end
     
-    %w(overlapping not_overlapping covering not_covering).each do |f| 
+    %w(split_interacting).each do |f|
       eval <<"CODE"
       def #{f}(other, *args)
+
         @engine._context("#{f}") do
+
+          check_is_layer(other)
+          requires_region
+          other.requires_edges_texts_or_region
+
+          res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data, *minmax_count(*args))
+          [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
+
+        end
+
+      end
+CODE
+    end
+    
+    %w(overlapping not_overlapping covering not_covering).each do |f| 
+      eval <<"CODE"
+
+      def #{f}(other, *args)
+
+        @engine._context("#{f}") do
+
           requires_same_type(other)
           requires_region
+
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(*args)))
+
         end
+
       end
 CODE
     end
@@ -2424,12 +2537,31 @@ CODE
 
           requires_region
           requires_same_type(other)
+
           if @engine.is_tiled?
             self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data, *minmax_count(*args))
             DRCLayer::new(@engine, self.data)
           else
             DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(*args)))
           end
+
+        end
+
+      end
+CODE
+    end
+    
+    %w(split_overlapping split_covering).each do |f|
+      eval <<"CODE"
+      def #{f}(other, *args)
+
+        @engine._context("#{f}") do
+
+          requires_region
+          other.requires_region
+
+          res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data, *minmax_count(*args))
+          [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
 
         end
 
@@ -2447,6 +2579,7 @@ CODE
 
           requires_region
           requires_same_type(other)
+
           if @engine.is_tiled?
             self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data)
             DRCLayer::new(@engine, self.data)
@@ -2460,14 +2593,39 @@ CODE
 CODE
     end
     
+    %w(split_inside split_outside).each do |f|
+      eval <<"CODE"
+      def #{f}(other)
+
+        @engine._context("#{f}") do
+
+          check_is_layer(other)
+          requires_region
+          other.requires_region
+
+          res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data)
+          [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
+
+        end
+
+      end
+CODE
+    end
+    
     %w(inside_part outside_part).each do |f|
       eval <<"CODE"
       def #{f}(other)
+
         @engine._context("#{f}") do
+
+          check_is_layer(other)
           other.requires_region
           requires_edges
+
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+
         end
+
       end
 CODE
     end
@@ -2475,11 +2633,17 @@ CODE
     %w(intersections).each do |f|
       eval <<"CODE"
       def #{f}(other)
+
         @engine._context("#{f}") do
+
+          check_is_layer(other)
           other.requires_edges
           requires_edges
+
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+
         end
+
       end
 CODE
     end
@@ -3496,6 +3660,180 @@ CODE
       end  
 CODE
     end
+
+    # %DRC%
+    # @name with_density
+    # @brief Returns tiles whose density is within a given range
+    # @synopsis layer.with_density(min_value, max_value [, options ])
+    # @synopsis layer.with_density(min_value .. max_value [, options ])
+    # 
+    # This method runs a tiled analysis over the current layout. It reports the tiles whose density
+    # is between "min_value" and "max_value". "min_value" and "max_value" are given in
+    # relative units, i.e. within the range of 0 to 1.0 corresponding to a density of 0 to 100%.
+    #
+    # "min_value" or "max_value" can be nil or omitted in the ".." range notation.
+    # In this case, they are taken as "0" and "100%".
+    #
+    # The tile size must be specified with the "tile_size" option:
+    #
+    # @code
+    # # reports areas where layer 1/0 density is below 10% on 20x20 um tiles
+    # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um))
+    # @/code
+    #
+    # Anisotropic tiles can be specified by giving two values, like "tile_size(10.um, 20.um)".
+    # The first value is the horizontal tile dimension, the second value is the vertical tile
+    # dimension.
+    #
+    # A tile overlap can be specified using "tile_step". If the tile step is less than the
+    # tile size, the tiles will overlap. The layout window given by "tile_size" is moved
+    # in increments of the tile step:
+    #
+    # @code
+    # # reports areas where layer 1/0 density is below 10% on 30x30 um tiles
+    # # with a tile step of 20x20 um:
+    # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(30.um), tile_step(20.um))
+    # @/code
+    #
+    # For "tile_step", anisotropic values can be given as well by using two values: the first for the
+    # horizontal and the second for the vertical tile step.
+    #
+    # Another option is "tile_origin" which specifies the location of the first tile's position. 
+    # This is the lower left tile's lower left corner. If no origin is given, the tiles are centered over the 
+    # area investigated.
+    #
+    # By default, the tiles will cover the bounding box of the input layer. A separate layer
+    # can be used in addition. This way, the layout's dimensions can be derived from some 
+    # drawn boundary layer. To specify a separate, additional layer included in the bounding box, use the "tile_boundary" option:
+    #
+    # @code
+    # # reports density of layer 1/0 below 10% on 20x20 um tiles. The layout's boundary is taken from
+    # # layer 0/0:
+    # cell_frame = input(0, 0)
+    # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), tile_boundary(cell_frame))
+    # @/code
+    #
+    # Note that the layer given in "tile_boundary" adds to the input layer for computing the bounding box.
+    # The computed area is at least the area of the input layer.
+    #
+    # Computation of the area can be skipped by explicitly giving a tile count in horizontal and vertical
+    # direction. With the "tile_origin" option this allows full control over the area covered:
+    #
+    # @code
+    # # reports density of layer 1/0 below 10% on 20x20 um tiles in the region 0,0 .. 2000,3000
+    # # (100 and 150 tiles of 20 um each are used in horizontal and vertical direction):
+    # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), tile_origin(0.0, 0.0), tile_count(100, 150))
+    # @/code
+    # 
+    # The complementary version of "with_density" is \without_density.
+    
+    # %DRC%
+    # @name without_density
+    # @brief Returns tiles whose density is not within a given range
+    # @synopsis layer.without_density(min_value, max_value [, options ])
+    # @synopsis layer.without_density(min_value .. max_value [, options ])
+    # 
+    # For details about the operations and the operation see \with_density. This version will return the
+    # tiles where the density is not within the given range.
+
+    def _with_density(method, inverse, *args)
+
+      requires_region
+
+      limits = [ nil, nil ]
+      nlimits = 0
+      tile_size = nil
+      tile_step = nil
+      tile_origin = nil
+      tile_count = nil
+      tile_boundary = nil
+
+      n = 1
+      args.each do |a|
+        if a.is_a?(DRCTileSize)
+          tile_size = a.get
+        elsif a.is_a?(DRCTileStep)
+          tile_step = a.get
+        elsif a.is_a?(DRCTileOrigin)
+          tile_origin = a.get
+        elsif a.is_a?(DRCTileCount)
+          tile_count = a.get
+        elsif a.is_a?(DRCTileBoundary)
+          tile_boundary = a.get
+        elsif a.is_a?(Float) || a.is_a?(1.class) || a == nil
+          nlimits < 2 || raise("Too many values specified")
+          limits[nlimits] = @engine._make_numeric_value_with_nil(a)
+          nlimits += 1
+        elsif a.is_a?(Range)
+          nlimits == 0 || raise("Either a range or two limits have to be specified, not both")
+          limits = [ @engine._make_numeric_value_with_nil(a.begin), @engine._make_numeric_value_with_nil(a.end) ]
+          nlimits = 2
+        else
+          raise("Parameter #" + n.to_s + " does not have an expected type")
+        end
+        n += 1
+      end
+
+      tile_size || raise("At least the tile_size option needs to be present")
+      tile_step ||= tile_size
+
+      tp = RBA::TilingProcessor::new
+      tp.dbu = @engine.dbu
+      tp.scale_to_dbu = false
+      tp.tile_size(*tile_step)
+      if tile_size != tile_step
+        xb = 0.5 * (tile_size[0] - tile_step[0])
+        yb = 0.5 * (tile_size[1] - tile_step[1])
+        tp.tile_border(xb, yb)
+        tp.var("xoverlap", xb / tp.dbu)
+        tp.var("yoverlap", yb / tp.dbu)
+      else
+        tp.var("xoverlap", 0)
+        tp.var("yoverlap", 0)
+      end
+      if tile_origin
+        tp.tile_origin(*tile_origin)
+      end
+      if tile_count
+        tp.tiles(*tile_count)
+      end
+
+      res = RBA::Region.new      
+      tp.output("res", res)
+      tp.input("input", self.data)
+      tp.threads = (@engine.threads || 1)
+      if tile_boundary
+        tp.input("boundary", tile_boundary.data)
+      end
+
+      tp.var("vmin", limits[0] || 0.0)
+      tp.var("vmax", limits[1] || 1.0)
+      tp.var("inverse", inverse)
+      tp.queue(<<"TP_SCRIPT")
+        _tile && (
+          var bx = _tile.bbox.enlarged(xoverlap, yoverlap);
+          var d = to_f(input.area(bx)) / to_f(bx.area);
+          ((d > vmin - 1e-10 && d < vmax + 1e-10) != inverse) && _output(res, bx, false)
+        )
+TP_SCRIPT
+
+      @engine.run_timed("\"#{method}\" in: #{@engine.src_line}", self.data) do
+        tp.execute("Tiled \"#{method}\" in: #{@engine.src_line}")
+        res
+      end
+
+      DRCLayer::new(@engine, res)
+
+    end
+
+    def with_density(*args)
+      self._with_density("with_density", false, *args)
+    end
+
+    def without_density(*args)
+      self._with_density("without_density", true, *args)
+    end
+
     
     # %DRC%
     # @name scaled
@@ -3913,6 +4251,10 @@ CODE
 
     def data=(d)
       @data = d
+    end
+
+    def check_is_layer(other)
+      other.is_a?(DRCLayer) || raise("Argument needs to be a DRC layer")
     end
 
     def requires_region

@@ -72,6 +72,7 @@ The following global functions are relevant for the DRC expressions:
 <li><a href="/about/drc_ref_global.xml#space">space</a> </li>
 <li><a href="/about/drc_ref_global.xml#squares">squares</a> </li>
 <li><a href="/about/drc_ref_global.xml#width">width</a> </li>
+<li><a href="/about/drc_ref_global.xml#with_holes">with_holes</a> </li>
 </ul>
 </p><p>
 The following documentation will list the methods available for DRC expression objects.
@@ -920,6 +921,22 @@ out = in.drc(primary.squares)    # equivalent
 <p>
 This method acts on edge expressions and delivers a specific part of each edge.
 See <a href="/about/drc_ref_layer.xml#start_segments">layer#start_segments</a> for details about this functionality.
+</p>
+<a name="with_holes"/><h2>"with_holes" - Selects all input polygons with the specified number of holes</h2>
+<keyword name="with_holes"/>
+<p>Usage:</p>
+<ul>
+<li><tt>expression.with_holes (in condition)</tt></li>
+</ul>
+<p>
+This operation can be used as a plain function in which case it acts on primary
+shapes or can be used as method on another DRC expression.
+The following example selects all polygons with more than 2 holes:
+</p><p>
+<pre>
+out = in.drc(with_holes &gt; 2)
+out = in.drc(primary.with_holes &gt; 2)   # equivalent
+</pre>
 </p>
 <a name="|"/><h2>"|" - Boolean OR between the results of two expressions</h2>
 <keyword name="|"/>

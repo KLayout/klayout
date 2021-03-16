@@ -139,72 +139,107 @@ public:
 
   virtual RegionDelegate *selected_outside (const Region &other) const
   {
-    return selected_interacting_generic (other, 1, false, false);
+    return selected_interacting_generic (other, 1, false, Positive, size_t (0), std::numeric_limits<size_t>::max ()).first;
   }
 
   virtual RegionDelegate *selected_not_outside (const Region &other) const
   {
-    return selected_interacting_generic (other, 1, false, true);
+    return selected_interacting_generic (other, 1, false, Negative, size_t (0), std::numeric_limits<size_t>::max ()).first;
+  }
+
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_outside_pair (const Region &other) const
+  {
+    return selected_interacting_generic (other, 1, false, PositiveAndNegative, size_t (0), std::numeric_limits<size_t>::max ());
   }
 
   virtual RegionDelegate *selected_inside (const Region &other) const
   {
-    return selected_interacting_generic (other, -1, true, false);
+    return selected_interacting_generic (other, -1, true, Positive, size_t (0), std::numeric_limits<size_t>::max ()).first;
   }
 
   virtual RegionDelegate *selected_not_inside (const Region &other) const
   {
-    return selected_interacting_generic (other, -1, true, true);
+    return selected_interacting_generic (other, -1, true, Negative, size_t (0), std::numeric_limits<size_t>::max ()).first;
+  }
+
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_inside_pair (const Region &other) const
+  {
+    return selected_interacting_generic (other, -1, true, PositiveAndNegative, size_t (0), std::numeric_limits<size_t>::max ());
   }
 
   virtual RegionDelegate *selected_enclosing (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, -2, false, false, min_count, max_count);
+    return selected_interacting_generic (other, -2, false, Positive, min_count, max_count).first;
   }
 
   virtual RegionDelegate *selected_not_enclosing (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, -2, false, true, min_count, max_count);
+    return selected_interacting_generic (other, -2, false, Negative, min_count, max_count).first;
+  }
+
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_enclosing_pair (const Region &other, size_t min_count, size_t max_count) const
+  {
+    return selected_interacting_generic (other, -2, false, PositiveAndNegative, min_count, max_count);
   }
 
   virtual RegionDelegate *selected_interacting (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, 0, true, false, min_count, max_count);
+    return selected_interacting_generic (other, 0, true, Positive, min_count, max_count).first;
   }
 
   virtual RegionDelegate *selected_not_interacting (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, 0, true, true, min_count, max_count);
+    return selected_interacting_generic (other, 0, true, Negative, min_count, max_count).first;
+  }
+
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_pair (const Region &other, size_t min_count, size_t max_count) const
+  {
+    return selected_interacting_generic (other, 0, true, PositiveAndNegative, min_count, max_count);
   }
 
   virtual RegionDelegate *selected_interacting (const Edges &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, false, min_count, max_count);
+    return selected_interacting_generic (other, Positive, min_count, max_count).first;
   }
 
   virtual RegionDelegate *selected_not_interacting (const Edges &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, true, min_count, max_count);
+    return selected_interacting_generic (other, Negative, min_count, max_count).first;
+  }
+
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_pair (const Edges &other, size_t min_count, size_t max_count) const
+  {
+    return selected_interacting_generic (other, PositiveAndNegative, min_count, max_count);
   }
 
   virtual RegionDelegate *selected_interacting (const Texts &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, false, min_count, max_count);
+    return selected_interacting_generic (other, Positive, min_count, max_count).first;
   }
 
   virtual RegionDelegate *selected_not_interacting (const Texts &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, true, min_count, max_count);
+    return selected_interacting_generic (other, Negative, min_count, max_count).first;
+  }
+
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_pair (const Texts &other, size_t min_count, size_t max_count) const
+  {
+    return selected_interacting_generic (other, PositiveAndNegative, min_count, max_count);
   }
 
   virtual RegionDelegate *selected_overlapping (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, 0, false, false, min_count, max_count);
+    return selected_interacting_generic (other, 0, false, Positive, min_count, max_count).first;
   }
 
   virtual RegionDelegate *selected_not_overlapping (const Region &other, size_t min_count, size_t max_count) const
   {
-    return selected_interacting_generic (other, 0, false, true, min_count, max_count);
+    return selected_interacting_generic (other, 0, false, Negative, min_count, max_count).first;
+  }
+
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_overlapping_pair (const Region &other, size_t min_count, size_t max_count) const
+  {
+    return selected_interacting_generic (other, 0, false, PositiveAndNegative, min_count, max_count);
   }
 
   virtual RegionDelegate *pull_inside (const Region &other) const
@@ -245,9 +280,9 @@ protected:
 
   virtual EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const;
   virtual EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options) const;
-  virtual RegionDelegate *selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;
-  virtual RegionDelegate *selected_interacting_generic (const Edges &other, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;
-  virtual RegionDelegate *selected_interacting_generic (const Texts &other, bool inverse, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_generic (const Region &other, int mode, bool touching, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_generic (const Edges &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_generic (const Texts &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const;
   virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
   virtual EdgesDelegate *pull_generic (const Edges &other) const;
   virtual TextsDelegate *pull_generic (const Texts &other) const;

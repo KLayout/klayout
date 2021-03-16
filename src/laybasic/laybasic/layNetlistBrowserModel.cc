@@ -1598,7 +1598,7 @@ db::NetlistCrossReference::Status
 CircuitItemData::status (NetlistBrowserModel *model)
 {
   size_t index = model->indexer ()->circuit_index (m_cp);
-  return model->indexer ()->circuit_from_index (index).second;
+  return model->indexer ()->circuit_from_index (index).second.first;
 }
 
 CircuitNetItemData *
@@ -1938,7 +1938,7 @@ CircuitNetItemData::status (NetlistBrowserModel *model)
 {
   if (m_np.first || m_np.second) {
     size_t index = model->indexer ()->net_index (m_np);
-    return model->indexer ()->net_from_index (circuits (), index).second;
+    return model->indexer ()->net_from_index (circuits (), index).second.first;
   } else {
     return db::NetlistCrossReference::None;
   }
@@ -2016,7 +2016,7 @@ CircuitNetDeviceTerminalItemData::tooltip (NetlistBrowserModel *model)
 db::NetlistCrossReference::Status
 CircuitNetDeviceTerminalItemData::status (NetlistBrowserModel *model)
 {
-  return model->indexer ()->device_from_index (circuits (), model->indexer ()->device_index (dp ())).second;
+  return model->indexer ()->device_from_index (circuits (), model->indexer ()->device_index (dp ())).second.first;
 }
 
 // ----------------------------------------------------------------------------------
@@ -2113,7 +2113,7 @@ CircuitNetSubCircuitPinItemData::tooltip (NetlistBrowserModel *model)
 db::NetlistCrossReference::Status
 CircuitNetSubCircuitPinItemData::status (NetlistBrowserModel *model)
 {
-  return model->indexer ()->subcircuit_from_index (parent ()->circuits (), model->indexer ()->subcircuit_index (subcircuits ())).second;
+  return model->indexer ()->subcircuit_from_index (parent ()->circuits (), model->indexer ()->subcircuit_index (subcircuits ())).second.first;
 }
 
 // ----------------------------------------------------------------------------------
@@ -2272,7 +2272,7 @@ db::NetlistCrossReference::Status
 CircuitSubCircuitItemData::status (NetlistBrowserModel *model)
 {
   size_t index = model->indexer ()->subcircuit_index (sp ());
-  return model->indexer ()->subcircuit_from_index (circuits (), index).second;
+  return model->indexer ()->subcircuit_from_index (circuits (), index).second.first;
 }
 
 // ----------------------------------------------------------------------------------
@@ -2371,7 +2371,7 @@ db::NetlistCrossReference::Status
 CircuitDeviceItemData::status (NetlistBrowserModel *model)
 {
   size_t index = model->indexer ()->device_index (m_dp);
-  return model->indexer ()->device_from_index (circuits (), index).second;
+  return model->indexer ()->device_from_index (circuits (), index).second.first;
 }
 
 // ----------------------------------------------------------------------------------

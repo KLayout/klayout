@@ -72,6 +72,7 @@ public slots:
 
 private:
   QLabel *mp_label;
+  QFrame *mp_progress_bar_frame;
   ProgressBarWidget *mp_progress_bar1, *mp_progress_bar2, *mp_progress_bar3;
   QWidget *mp_widget;
   int m_widget_col;
@@ -79,12 +80,13 @@ private:
   QToolButton *mp_cancel_button;
   ProgressReporter *mp_pr;
   lay::LogFile m_log_file;
+  QLabel *mp_log_label;
   QFrame *mp_log_frame;
   bool m_full_width;
   int m_left_col, m_right_col;
   bool m_log_visible;
 
-  void set_log_visible (bool f);
+  void set_log_visible (tl::Progress *progress);
 };
 
 }

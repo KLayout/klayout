@@ -112,6 +112,18 @@ void LayoutVsSchematicStandardReader::read_netlist (db::LayoutVsSchematic *lvs)
   }
 }
 
+bool LayoutVsSchematicStandardReader::read_message (std::string &msg)
+{
+  if (test (skeys::description_key) || test (lkeys::description_key)) {
+    Brace br (this);
+    read_word_or_quoted (msg);
+    br.done ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
 bool LayoutVsSchematicStandardReader::read_status (db::NetlistCrossReference::Status &status)
 {
   if (test (skeys::match_key) || test (lkeys::match_key)) {
@@ -189,10 +201,13 @@ void LayoutVsSchematicStandardReader::read_xref (db::NetlistCrossReference *xref
       xref->gen_begin_circuit (circuit_a, circuit_b);
 
       db::NetlistCrossReference::Status status = db::NetlistCrossReference::None;
+      std::string msg;
 
       while (br) {
 
         if (read_status (status)) {
+          //  continue
+        } else if (read_message (msg)) {
           //  continue
         } else if (test (skeys::xref_key) || test (lkeys::xref_key)) {
           read_xrefs_for_circuits (xref, circuit_a, circuit_b);
@@ -204,7 +219,7 @@ void LayoutVsSchematicStandardReader::read_xref (db::NetlistCrossReference *xref
 
       }
 
-      xref->gen_end_circuit (circuit_a, circuit_b, status);
+      xref->gen_end_circuit (circuit_a, circuit_b, status, msg);
 
       br.done ();
 
@@ -325,11 +340,13 @@ void LayoutVsSchematicStandardReader::read_net_pair (db::NetlistCrossReference *
   ion_b = read_ion ();
 
   db::NetlistCrossReference::Status status = db::NetlistCrossReference::None;
+  std::string msg;
   read_status (status);
+  read_message (msg);
 
   br.done ();
 
-  xref->gen_nets (net_by_numerical_id (circuit_a, ion_a, m_map_per_circuit_a), net_by_numerical_id (circuit_b, ion_b, m_map_per_circuit_b), status);
+  xref->gen_nets (net_by_numerical_id (circuit_a, ion_a, m_map_per_circuit_a), net_by_numerical_id (circuit_b, ion_b, m_map_per_circuit_b), status, msg);
 }
 
 void LayoutVsSchematicStandardReader::read_pin_pair (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b)
@@ -341,11 +358,13 @@ void LayoutVsSchematicStandardReader::read_pin_pair (db::NetlistCrossReference *
   ion_b = read_ion ();
 
   db::NetlistCrossReference::Status status = db::NetlistCrossReference::None;
+  std::string msg;
   read_status (status);
+  read_message (msg);
 
   br.done ();
 
-  xref->gen_pins (pin_by_numerical_id (circuit_a, ion_a), pin_by_numerical_id (circuit_b, ion_b), status);
+  xref->gen_pins (pin_by_numerical_id (circuit_a, ion_a), pin_by_numerical_id (circuit_b, ion_b), status, msg);
 }
 
 void LayoutVsSchematicStandardReader::read_device_pair (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b)
@@ -357,11 +376,13 @@ void LayoutVsSchematicStandardReader::read_device_pair (db::NetlistCrossReferenc
   ion_b = read_ion ();
 
   db::NetlistCrossReference::Status status = db::NetlistCrossReference::None;
+  std::string msg;
   read_status (status);
+  read_message (msg);
 
   br.done ();
 
-  xref->gen_devices (device_by_numerical_id (circuit_a, ion_a, m_map_per_circuit_a), device_by_numerical_id (circuit_b, ion_b, m_map_per_circuit_b), status);
+  xref->gen_devices (device_by_numerical_id (circuit_a, ion_a, m_map_per_circuit_a), device_by_numerical_id (circuit_b, ion_b, m_map_per_circuit_b), status, msg);
 }
 
 void LayoutVsSchematicStandardReader::read_subcircuit_pair (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b)
@@ -373,11 +394,13 @@ void LayoutVsSchematicStandardReader::read_subcircuit_pair (db::NetlistCrossRefe
   ion_b = read_ion ();
 
   db::NetlistCrossReference::Status status = db::NetlistCrossReference::None;
+  std::string msg;
   read_status (status);
+  read_message (msg);
 
   br.done ();
 
-  xref->gen_subcircuits (subcircuit_by_numerical_id (circuit_a, ion_a, m_map_per_circuit_a), subcircuit_by_numerical_id (circuit_b, ion_b, m_map_per_circuit_b), status);
+  xref->gen_subcircuits (subcircuit_by_numerical_id (circuit_a, ion_a, m_map_per_circuit_a), subcircuit_by_numerical_id (circuit_b, ion_b, m_map_per_circuit_b), status, msg);
 }
 
 }

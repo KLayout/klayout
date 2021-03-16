@@ -397,7 +397,7 @@ public:
  *  @brief A generic categorizer
  *
  *  The objective of this class is to supply a category ID for a given object.
- *  The category ID also identities equivalent objects from netlist A and B.
+ *  The category ID also identifies equivalent objects from netlist A and B.
  */
 template <class Obj>
 class generic_categorizer
@@ -2991,6 +2991,23 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
     }
   }
 
+  //  impose the compare tolerances of the layout (first netlist) on the schematic (second netlist)
+  //  TODO: this is kind of clumsy. But it's very important to use the same device sorting for both netlists, so we play this trick.
+  //  A better solution was to have a common compare framework for both netlists.
+  for (std::map<size_t, std::pair<const db::DeviceClass *, const db::DeviceClass *> >::const_iterator i = cat2dc.begin (); i != cat2dc.end (); ++i) {
+
+    if (i->second.first && i->second.second) {
+
+      const db::DeviceClass *da = i->second.first;
+      db::DeviceClass *db = const_cast<db::DeviceClass *> (i->second.second);
+
+      const db::DeviceParameterCompareDelegate *cmp = da->parameter_compare_delegate ();
+      db->set_parameter_compare_delegate (cmp ? cmp->clone () : 0);
+
+    }
+
+  }
+
   //  device whether to use a device category in strict mode
 
   device_categorizer.clear_strict_device_categories ();
@@ -3083,7 +3100,7 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
     } else {
 
       if (mp_logger) {
-        mp_logger->circuit_skipped (ca, cb);
+        mp_logger->circuit_skipped (ca, cb, generate_subcircuits_not_verified_warning (ca, verified_circuits_a, cb, verified_circuits_b));
         good = false;
       }
 
@@ -3130,22 +3147,59 @@ NetlistComparer::derive_pin_equivalence (const db::Circuit *ca, const db::Circui
   circuit_pin_mapper->map_pins (cb, pb);
 }
 
+static bool is_valid_circuit (const db::Circuit *c)
+{
+  //  typical via subcircuits attach through one pin. We can safely ignore such subcircuits because they don't
+  //  contribute graph edges.
+  return c->pin_count () > 1;
+}
+
 bool
 NetlistComparer::all_subcircuits_verified (const db::Circuit *c, const std::set<const db::Circuit *> &verified_circuits) const
 {
   for (db::Circuit::const_subcircuit_iterator sc = c->begin_subcircuits (); sc != c->end_subcircuits (); ++sc) {
-
     const db::Circuit *cr = sc->circuit_ref ();
-
-    //  typical via subcircuits attach through one pin. We can safely ignore such subcircuits because they don't
-    //  contribute graph edges.
-    if (cr->pin_count () > 1 && verified_circuits.find (cr) == verified_circuits.end ()) {
+    if (is_valid_circuit (cr) && verified_circuits.find (cr) == verified_circuits.end ()) {
       return false;
     }
-
   }
 
   return true;
+}
+
+static std::vector<std::string> unverified_names (const db::Circuit *c, const std::set<const db::Circuit *> &verified_circuits)
+{
+  std::vector<std::string> names;
+
+  std::set<const db::Circuit *> seen;
+  for (db::Circuit::const_subcircuit_iterator sc = c->begin_subcircuits (); sc != c->end_subcircuits (); ++sc) {
+    const db::Circuit *cr = sc->circuit_ref ();
+    if (is_valid_circuit (cr) && seen.find (cr) == seen.end () && verified_circuits.find (cr) == verified_circuits.end ()) {
+      seen.insert (cr);
+      names.push_back (cr->name ());
+    }
+  }
+
+  std::sort (names.begin (), names.end ());
+  return names;
+}
+
+std::string
+NetlistComparer::generate_subcircuits_not_verified_warning (const db::Circuit *ca, const std::set<const db::Circuit *> &verified_circuits_a, const db::Circuit *cb, const std::set<const db::Circuit *> &verified_circuits_b) const
+{
+  std::string msg = tl::sprintf (tl::to_string (tr ("Circuits %s and %s could not be compared because the following subcircuits failed to compare:")), ca->name (), cb->name ());
+
+  std::vector<std::string> names_a = unverified_names (ca, verified_circuits_a);
+  if (! names_a.empty ()) {
+    msg += "\n  A: " + tl::join (names_a, ",");
+  }
+
+  std::vector<std::string> names_b = unverified_names (cb, verified_circuits_b);
+  if (! names_b.empty ()) {
+    msg += "\n  B: " + tl::join (names_b, ",");
+  }
+
+  return msg;
 }
 
 static std::vector<std::pair<size_t, size_t> >

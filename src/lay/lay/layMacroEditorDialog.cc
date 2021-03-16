@@ -3003,6 +3003,11 @@ MacroEditorDialog::translate_pseudo_id (size_t &file_id, int &line)
   }
 }
 
+static void exit_from_macro ()
+{
+  throw tl::ExitException ();
+}
+
 void   
 MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_id, int line, const std::string &eclass, const std::string &emsg, const gsi::StackTraceProvider *stack_trace_provider)
 {
@@ -3012,7 +3017,7 @@ MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_
   }
 
   if (!m_in_exec) {
-    throw tl::ExitException ();
+    exit_from_macro ();
   }
 
   //  avoid recursive breakpoints and exception catches from the console while in a breakpoint or exception stop
@@ -3098,7 +3103,7 @@ MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_
   }
 
   if (! m_in_exec) {
-    throw tl::ExitException ();
+    exit_from_macro ();
   }
 }
 
@@ -3106,7 +3111,7 @@ void
 MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int line, const gsi::StackTraceProvider *stack_trace_provider)
 {
   if (!m_in_exec) {
-    throw tl::ExitException ();
+    exit_from_macro ();
   }
 
   //  avoid recursive breakpoints and exception catches from the console while in a breakpoint or exception stop
@@ -3157,7 +3162,7 @@ MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int lin
     }
 
     if (! m_in_exec) {
-      throw tl::ExitException ();
+      exit_from_macro ();
     }
 
   } else if (++m_trace_count == 20) {
@@ -3175,7 +3180,7 @@ MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int lin
       m_process_events_interval = std::max (0.05, std::min (2.0, (m_last_process_events - start).seconds () * 5.0));
 
       if (!m_in_exec) {
-        throw tl::ExitException ();
+        exit_from_macro ();
       }
 
     }
@@ -3590,6 +3595,9 @@ MacroEditorDialog::run (int stop_stack_depth, lym::Macro *macro)
     } catch (tl::ExitException &) {
       m_stop_stack_depth = -1;
       //  .. ignore exit exceptions ..
+    } catch (tl::BreakException &) {
+      m_stop_stack_depth = -1;
+      //  .. ignore break exceptions ..
     } catch (tl::ScriptError &re) {
       m_stop_stack_depth = -1;
       handle_error (re);

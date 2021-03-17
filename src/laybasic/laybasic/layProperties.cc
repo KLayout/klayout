@@ -22,7 +22,6 @@
 
 
 #include "layProperties.h"
-#include "layEditable.h"
 
 namespace lay
 {

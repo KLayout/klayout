@@ -72,6 +72,7 @@ RecursiveShapeIterator &RecursiveShapeIterator::operator= (const RecursiveShapeI
     m_current_layer = d.m_current_layer;
     m_shape = d.m_shape;
     m_trans = d.m_trans;
+    m_global_trans = d.m_global_trans;
     m_trans_stack = d.m_trans_stack;
     m_inst_iterators = d.m_inst_iterators;
     m_inst_array_iterators = d.m_inst_array_iterators;
@@ -286,6 +287,7 @@ RecursiveShapeIterator::init ()
   m_shape_quad_id = 0;
   mp_cell = 0;
   m_current_layer = 0;
+  m_global_trans = cplx_trans_type ();
 }
 
 void
@@ -315,6 +317,26 @@ RecursiveShapeIterator::init_region (const RecursiveShapeIterator::region_type &
     //  A small optimization. We can do this since we merge and translate to trapezoids anyway.
     mp_complex_region->set_strict_handling (false);
 
+  }
+}
+
+void
+RecursiveShapeIterator::set_global_trans (const cplx_trans_type &tr)
+{
+  if (m_global_trans != tr) {
+    m_global_trans = tr;
+    m_needs_reinit = true;
+  }
+}
+
+const db::RecursiveShapeIterator::cplx_trans_type &
+RecursiveShapeIterator::always_apply () const
+{
+  if (m_trans_stack.empty ()) {
+    return m_global_trans;
+  } else {
+    static cplx_trans_type unity;
+    return unity;
   }
 }
 
@@ -420,13 +442,13 @@ RecursiveShapeIterator::validate (RecursiveShapeReceiver *receiver) const
   m_inst_quad_id_stack.clear ();
   m_inst_array_iterators.clear ();
   m_cells.clear ();
-  m_trans = cplx_trans_type ();
+  m_trans = m_global_trans;
   m_current_layer = 0;
   m_shape = shape_iterator ();
   m_shape_quad_id = 0;
 
   m_local_region_stack.clear ();
-  m_local_region_stack.push_back (m_region);
+  m_local_region_stack.push_back (m_global_trans.inverted () * m_region);
 
   m_local_complex_region_stack.clear ();
   if (mp_complex_region.get ()) {
@@ -749,8 +771,8 @@ RecursiveShapeIterator::down (RecursiveShapeReceiver *receiver) const
   box_type new_region = box_type::world ();
 
   //  compute the region inside the new cell
-  if (new_region != m_local_region_stack.front ()) {
-    new_region = m_trans.inverted () * m_local_region_stack.front ();
+  if (new_region != m_region) {
+    new_region = m_trans.inverted () * m_region;
     new_region &= cell ()->bbox ();
   }
   m_local_region_stack.push_back (new_region);
@@ -911,7 +933,7 @@ RecursiveShapeIterator::new_inst (RecursiveShapeReceiver *receiver) const
 
     RecursiveShapeReceiver::new_inst_mode ni = RecursiveShapeReceiver::NI_all;
     if (receiver) {
-      ni = receiver->new_inst (this, m_inst->cell_inst (), m_local_region_stack.back (), m_local_complex_region_stack.empty () ? 0 : &m_local_complex_region_stack.back (), all_of_instance);
+      ni = receiver->new_inst (this, m_inst->cell_inst (), always_apply (), m_local_region_stack.back (), m_local_complex_region_stack.empty () ? 0 : &m_local_complex_region_stack.back (), all_of_instance);
     }
 
     if (ni == RecursiveShapeReceiver::NI_skip) {
@@ -956,7 +978,7 @@ RecursiveShapeIterator::new_inst_member (RecursiveShapeReceiver *receiver) const
   }
 
   while (! m_inst_array.at_end () && receiver) {
-    if (receiver->new_inst_member (this, m_inst->cell_inst (), m_inst->complex_trans (*m_inst_array), m_local_region_stack.back (), m_local_complex_region_stack.empty () ? 0 : &m_local_complex_region_stack.back (), is_all_of_instance ())) {
+    if (receiver->new_inst_member (this, m_inst->cell_inst (), always_apply (), m_inst->complex_trans (*m_inst_array), m_local_region_stack.back (), m_local_complex_region_stack.empty () ? 0 : &m_local_complex_region_stack.back (), is_all_of_instance ())) {
       break;
     } else {
       ++m_inst_array;
@@ -999,7 +1021,7 @@ RecursiveShapeIterator::push (RecursiveShapeReceiver *receiver)
     validate (receiver);
 
     while (! at_end ()) {
-      receiver->shape (this, *m_shape, m_trans, m_local_region_stack.back (), m_local_complex_region_stack.empty () ? 0 : &m_local_complex_region_stack.back ());
+      receiver->shape (this, *m_shape, always_apply (), m_trans, m_local_region_stack.back (), m_local_complex_region_stack.empty () ? 0 : &m_local_complex_region_stack.back ());
       next (receiver);
     }
 

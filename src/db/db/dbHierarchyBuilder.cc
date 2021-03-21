@@ -40,10 +40,10 @@ int
 compare_iterators_with_respect_to_target_hierarchy (const db::RecursiveShapeIterator &iter1, const db::RecursiveShapeIterator &iter2)
 {
   if ((iter1.layout () == 0) != (iter2.layout () == 0)) {
-    return (iter1.layout () == 0) < (iter2.layout () == 0);
+    return (iter1.layout () == 0) < (iter2.layout () == 0) ? -1 : 1;
   }
   if ((iter1.top_cell () == 0) != (iter2.top_cell () == 0)) {
-    return (iter1.top_cell () == 0) < (iter2.top_cell () == 0);
+    return (iter1.top_cell () == 0) < (iter2.top_cell () == 0) ? -1 : 1;
   }
 
   //  basic source (layout, top_cell) needs to be the same of course
@@ -68,6 +68,11 @@ compare_iterators_with_respect_to_target_hierarchy (const db::RecursiveShapeIter
   }
   if (iter1.enables () != iter2.enables ()) {
     return iter1.enables () < iter2.enables () ? -1 : 1;
+  }
+
+  //  compare global transformations
+  if (! iter1.global_trans ().equal (iter2.global_trans ())) {
+    return iter1.global_trans ().less (iter2.global_trans ()) ? -1 : 1;
   }
 
   //  if a region is set, the hierarchical appearance is the same only if the layers and
@@ -338,7 +343,7 @@ HierarchyBuilder::make_cell_variant (const HierarchyBuilder::CellMapKey &key, co
 }
 
 HierarchyBuilder::new_inst_mode
-HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all)
+HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all)
 {
   if (all) {
 
@@ -349,6 +354,7 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
     if (m_cell_stack.back ().first) {
       db::CellInstArray new_inst (inst, &mp_target->array_repository ());
       new_inst.object () = db::CellInst (new_cell);
+      new_inst.transform (always_apply);
       new_inst.transform_into (m_trans);
       for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
         (*c)->insert (new_inst);
@@ -367,7 +373,7 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
 }
 
 bool
-HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region, bool all)
+HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region, bool all)
 {
   if (all) {
 
@@ -386,7 +392,7 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
 
     //  for a new cell, create this instance
     if (m_cell_stack.back ().first) {
-      db::CellInstArray new_inst (db::CellInst (new_cell), trans);
+      db::CellInstArray new_inst (db::CellInst (new_cell), always_apply * trans);
       new_inst.transform_into (m_trans);
       for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
         (*c)->insert (new_inst);
@@ -399,11 +405,11 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
 }
 
 void
-HierarchyBuilder::shape (const RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans & /*trans*/, const db::Box &region, const box_tree_type *complex_region)
+HierarchyBuilder::shape (const RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans &apply_always, const db::ICplxTrans & /*trans*/, const db::Box &region, const box_tree_type *complex_region)
 {
   for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
     db::Shapes &shapes = (*c)->shapes (m_target_layer);
-    mp_pipe->push (shape, m_trans, region, complex_region, &shapes);
+    mp_pipe->push (shape, m_trans * apply_always, region, complex_region, &shapes);
   }
 }
 

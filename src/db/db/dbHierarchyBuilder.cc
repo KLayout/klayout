@@ -534,9 +534,12 @@ ClippingHierarchyBuilderShapeReceiver::insert_clipped (const db::Box &box, const
 
   if (complex_region) {
     for (db::RecursiveShapeReceiver::box_tree_type::overlapping_iterator cr = complex_region->begin_overlapping (bb, db::box_convert<db::Box> ()); ! cr.at_end (); ++cr) {
-      mp_pipe->push (*cr & bb, trans, world, 0, target);
+      db::Box bc = *cr & bb;
+      if (! bc.empty ()) {
+        mp_pipe->push (bc, trans, world, 0, target);
+      }
     }
-  } else {
+  } else if (! bb.empty ()) {
     mp_pipe->push (bb, trans, world, 0, target);
   }
 }

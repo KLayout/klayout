@@ -2536,8 +2536,12 @@ CODE
         end
         
         # clip if a box is specified
-        if box && clip && (cls == RBA::Region || cls == RBA::Edge)
-          r &= RBA::Region::new(box)
+        # TODO: the whole clip thing could be a part of the Region constructor
+        if cls == RBA::Region && clip && box
+          # HACK: deep regions will always clip in the constructor, so skip this
+          if ! @deep 
+            r &= RBA::Region::new(box)
+          end
         end
       
       end

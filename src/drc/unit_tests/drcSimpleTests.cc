@@ -1188,3 +1188,8 @@ TEST(32d_globalTransformationWithClip)
   run_test (_this, "32", true);
 }
 
+TEST(33_globalTransformationWithTiles)
+{
+  run_test (_this, "33", true);
+}
+

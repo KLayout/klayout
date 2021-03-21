@@ -593,6 +593,8 @@ RecursiveShapeIterator::bbox () const
     }
   }
 
+  box = box.transformed (m_global_trans);
+
   if (m_region != box_type::world ()) {
     box &= m_region;
   }

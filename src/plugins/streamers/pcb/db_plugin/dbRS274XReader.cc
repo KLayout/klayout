@@ -513,6 +513,7 @@ RS274XReader::do_read ()
           if (m_polygon_mode) {
 
             //  D02 strokes close the polygon (and restart a new one)
+
             if (m_polygon_points.size () >= 3) {
               db::DPolygon poly;
               poly.assign_hull (m_polygon_points.begin (), m_polygon_points.end ());
@@ -520,6 +521,7 @@ RS274XReader::do_read ()
             }
 
             m_polygon_points.clear ();
+            m_polygon_points.push_back (db::DPoint (x, y));
 
           }
 

@@ -297,8 +297,11 @@ module LVS
     # Use this method to provide hints for the comparer in cases which are difficult to
     # resolve otherwise.
     #
-    # Before this method can be used, a schematic netlist needs to be loaded with
-    # \schematic.
+    # circuit_a and net_a are for the layout netlist, circuit_b and net_b for the schematic netlist.
+    # Note that SPICE netlists are normalized to @b upper case @/b. So enter
+    # upper case circuit or net names for SPICE schematic netlists.
+    #
+    # Use this method andwhere in the script before the \compare call.
 
     def same_nets(*args)
 
@@ -373,12 +376,15 @@ module LVS
     # This method will force an equivalence between the two circuits.
     # By default, circuits are identified by name. If names are different, this
     # method allows establishing an explicit correspondence.
+    #
+    # circuit_a is for the layout netlist, circuit_b for the schematic netlist.
+    # Note that SPICE netlists are normalized to @b upper case @/b. So enter
+    # upper case circuit names for SPICE schematic netlists.
     # 
     # One of the circuits may be nil. In this case, the corresponding
     # other circuit is mapped to "nothing", i.e. ignored.
     #
-    # Before this method can be used, a schematic netlist needs to be loaded with
-    # \schematic.
+    # Use this method andwhere in the script before the \compare call.
 
     def same_circuits(a, b)
 
@@ -413,6 +419,10 @@ module LVS
     # Before this method can be used, a schematic netlist needs to be loaded with
     # \schematic.
     #
+    # class_a is for the layout netlist, class_b for the schematic netlist.
+    # Note that SPICE netlists are normalized to @b upper case @/b. So enter
+    # upper case device names for SPICE schematic netlists.
+    # 
     # One of the device classes may be "nil". In this case, the corresponding
     # other device class is mapped to "nothing", i.e. ignored.
     #
@@ -429,7 +439,11 @@ module LVS
     #
     # Once a device class is mentioned with "same_device_classes", matching by
     # name is disabled for this class. So after using 'same_device_classes("A", "B")'
-    # "A" is no longer equivalent to "A" on the other side.
+    # "A" is no longer equivalent to "A" on the other side. If you want "A" to 
+    # stay equivalent to "A" too, you need to use 'same_device_classes("A", "A")' 
+    # in addition.
+    #
+    # Use this method andwhere in the script before the \compare call.
 
     def same_device_classes(a, b)
 
@@ -468,13 +482,16 @@ module LVS
     # @/code
     #
     # The circuit argument is either a circuit name (a string) or a Circuit object
-    # from the schematic netlist.
+    # from the schematic netlist. 
+    #
+    # Note that SPICE netlists are normalized to @b upper case @/b. So enter
+    # upper case circuit names for SPICE schematic netlists.
     #
     # The pin arguments are zero-based pin numbers, where 0 is the first number, 1 the second etc.
-    # If the netlist provides named pins, names can be used instead of numbers.
+    # If the netlist provides named pins, names can be used instead of numbers. Again, use upper
+    # case pin names for SPICE netlists.
     #
-    # Before this method can be used, a schematic netlist needs to be loaded with
-    # \schematic.
+    # Use this method andwhere in the script before the \compare call.
 
     def equivalent_pins(circuit, *pins)
 

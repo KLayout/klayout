@@ -3008,7 +3008,7 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 
   }
 
-  //  device whether to use a device category in strict mode
+  //  decide whether to use a device category in strict mode
 
   device_categorizer.clear_strict_device_categories ();
 

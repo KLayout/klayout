@@ -99,6 +99,9 @@ Channel::release_proxy ()
   m_active = false;
   m_no_endl = false;
   m_lock.unlock ();
+
+  //  after we have released the lock we give the receivers an opportunity to process events
+  yield ();
 }
 
 ChannelEndl endl;
@@ -154,6 +157,18 @@ LogTee::puts (const char *s)
   try {
     for (tl::weak_collection<tl::Channel>::iterator c = m_channels.begin (); c != m_channels.end (); ++c) {
       c->puts (s);
+    }
+  } catch (...) {
+    //  ignore exceptions here
+  }
+}
+
+void
+LogTee::yield ()
+{
+  try {
+    for (tl::weak_collection<tl::Channel>::iterator c = m_channels.begin (); c != m_channels.end (); ++c) {
+      c->yield ();
     }
   } catch (...) {
     //  ignore exceptions here
@@ -270,6 +285,7 @@ protected:
   virtual void endl ();
   virtual void end ();
   virtual void begin ();
+  virtual void yield () { }
 
 private:
   int m_verbosity;
@@ -342,6 +358,7 @@ protected:
   virtual void endl ();
   virtual void end ();
   virtual void begin ();
+  virtual void yield () { }
 
 private:
   bool m_colorized;
@@ -406,6 +423,7 @@ protected:
   virtual void endl ();
   virtual void end ();
   virtual void begin ();
+  virtual void yield () { }
 
 private:
   bool m_colorized;

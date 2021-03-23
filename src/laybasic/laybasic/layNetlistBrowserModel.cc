@@ -1927,7 +1927,11 @@ CircuitNetItemData::tooltip (NetlistBrowserModel *model)
 {
   if (m_np.first || m_np.second) {
     size_t index = model->indexer ()->net_index (m_np);
-    return model->indexer ()->net_status_hint (circuits (), index);
+    if (index == lay::no_netlist_index) {
+      return std::string ();
+    } else {
+      return model->indexer ()->net_status_hint (circuits (), index);
+    }
   } else {
     return std::string ();
   }
@@ -1938,7 +1942,11 @@ CircuitNetItemData::status (NetlistBrowserModel *model)
 {
   if (m_np.first || m_np.second) {
     size_t index = model->indexer ()->net_index (m_np);
-    return model->indexer ()->net_from_index (circuits (), index).second.first;
+    if (index == lay::no_netlist_index) {
+      return db::NetlistCrossReference::None;
+    } else {
+      return model->indexer ()->net_from_index (circuits (), index).second.first;
+    }
   } else {
     return db::NetlistCrossReference::None;
   }

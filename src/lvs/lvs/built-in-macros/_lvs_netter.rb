@@ -298,8 +298,7 @@ module LVS
     # resolve otherwise.
     #
     # circuit_a and net_a are for the layout netlist, circuit_b and net_b for the schematic netlist.
-    # Note that SPICE netlists are normalized to @b upper case @/b. So enter
-    # upper case circuit or net names for SPICE schematic netlists.
+    # Names are case sensitive for layout-derived netlists and case-insensitive for SPICE schematic netlists.
     #
     # Use this method andwhere in the script before the \compare call.
 
@@ -378,8 +377,7 @@ module LVS
     # method allows establishing an explicit correspondence.
     #
     # circuit_a is for the layout netlist, circuit_b for the schematic netlist.
-    # Note that SPICE netlists are normalized to @b upper case @/b. So enter
-    # upper case circuit names for SPICE schematic netlists.
+    # Names are case sensitive for layout-derived netlists and case-insensitive for SPICE schematic netlists.
     # 
     # One of the circuits may be nil. In this case, the corresponding
     # other circuit is mapped to "nothing", i.e. ignored.
@@ -420,8 +418,7 @@ module LVS
     # \schematic.
     #
     # class_a is for the layout netlist, class_b for the schematic netlist.
-    # Note that SPICE netlists are normalized to @b upper case @/b. So enter
-    # upper case device names for SPICE schematic netlists.
+    # Names are case sensitive for layout-derived netlists and case-insensitive for SPICE schematic netlists.
     # 
     # One of the device classes may be "nil". In this case, the corresponding
     # other device class is mapped to "nothing", i.e. ignored.
@@ -484,8 +481,7 @@ module LVS
     # The circuit argument is either a circuit name (a string) or a Circuit object
     # from the schematic netlist. 
     #
-    # Note that SPICE netlists are normalized to @b upper case @/b. So enter
-    # upper case circuit names for SPICE schematic netlists.
+    # Names are case sensitive for layout-derived netlists and case-insensitive for SPICE schematic netlists.
     #
     # The pin arguments are zero-based pin numbers, where 0 is the first number, 1 the second etc.
     # If the netlist provides named pins, names can be used instead of numbers. Again, use upper

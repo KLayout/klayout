@@ -8,7 +8,7 @@ target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
 schematic("ringo.cir")
 
 # preempt configuration (see below)
-same_nets("top", "ENABLE", "RINGO", "ENABLE")
+same_nets("top", "ENABLE", $change_case ? "Ringo" : "RINGO", $change_case ? "enable" : "ENABLE")
 
 deep
 
@@ -71,8 +71,8 @@ connect_global(ptie, "SUBSTRATE")
 
 # Compare section
 
-same_circuits("top", "RINGO")
-same_circuits("INV", "INVX1")
+same_circuits("top", $change_case ? "ringo" : "RINGO")
+same_circuits("INV", $change_case ? "invX1" : "INVX1")
 same_circuits("DOESNOTEXIST", "DOESNOTEXIST2")
 same_nets("DOESNOTEXIST", "ENABLE", "DOESNOTEXIST2", "ENABLE")
 

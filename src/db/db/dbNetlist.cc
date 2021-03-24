@@ -31,7 +31,7 @@ namespace db
 //  Netlist class implementation
 
 Netlist::Netlist (NetlistManipulationCallbacks *callbacks)
-  : mp_callbacks (callbacks),
+  : m_case_sensitive (true), mp_callbacks (callbacks),
     m_valid_topology (false), m_lock_count (0),
     m_circuit_by_name (this, &Netlist::begin_circuits, &Netlist::end_circuits),
     m_circuit_by_cell_index (this, &Netlist::begin_circuits, &Netlist::end_circuits),
@@ -44,7 +44,8 @@ Netlist::Netlist (NetlistManipulationCallbacks *callbacks)
 }
 
 Netlist::Netlist (const Netlist &other)
-  : gsi::ObjectBase (other), tl::Object (other), m_valid_topology (false), m_lock_count (0),
+  : gsi::ObjectBase (other), tl::Object (other), m_case_sensitive (true),
+    m_valid_topology (false), m_lock_count (0),
     m_circuit_by_name (this, &Netlist::begin_circuits, &Netlist::end_circuits),
     m_circuit_by_cell_index (this, &Netlist::begin_circuits, &Netlist::end_circuits),
     m_device_abstract_by_name (this, &Netlist::begin_device_abstracts, &Netlist::end_device_abstracts),
@@ -68,6 +69,8 @@ Netlist &Netlist::operator= (const Netlist &other)
   if (this != &other) {
 
     clear ();
+
+    set_case_sensitive (other.is_case_sensitive ());
 
     std::map<const DeviceClass *, DeviceClass *> dct;
     for (const_device_class_iterator dc = other.begin_device_classes (); dc != other.end_device_classes (); ++dc) {
@@ -98,6 +101,34 @@ Netlist &Netlist::operator= (const Netlist &other)
 
   }
   return *this;
+}
+
+void Netlist::set_case_sensitive (bool f)
+{
+  m_case_sensitive = f;
+}
+
+int Netlist::name_compare (bool case_sensitive, const std::string &n1, const std::string &n2)
+{
+  //  TODO: unicode support?
+  if (case_sensitive) {
+    return strcmp (n1.c_str (), n2.c_str ());
+  } else {
+#if defined(_WIN32)
+    return _stricmp (n1.c_str (), n2.c_str ());
+#else
+    return strcasecmp (n1.c_str (), n2.c_str ());
+#endif
+  }
+}
+
+std::string Netlist::normalize_name (bool case_sensitive, const std::string &n)
+{
+  if (case_sensitive) {
+    return n;
+  } else {
+    return tl::to_upper_case (n);
+  }
 }
 
 void Netlist::circuits_changed ()
@@ -472,8 +503,10 @@ void Netlist::flatten ()
 
 DeviceClass *Netlist::device_class_by_name (const std::string &name)
 {
+  std::string nn = m_case_sensitive ? name : normalize_name (name);
+
   for (device_class_iterator d = begin_device_classes (); d != end_device_classes (); ++d) {
-    if (d->name () == name) {
+    if (d->name () == nn) {
       return d.operator-> ();
     }
   }

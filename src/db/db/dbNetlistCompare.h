@@ -364,6 +364,7 @@ protected:
   size_t m_max_depth;
   bool m_depth_first;
   bool m_dont_consider_net_names;
+  mutable bool m_case_sensitive;
 };
 
 }

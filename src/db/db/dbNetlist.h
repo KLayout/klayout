@@ -103,6 +103,19 @@ public:
   void clear ();
 
   /**
+   *  @brief Returns a value indicating whether the netlist names are case sensitive
+   */
+  bool is_case_sensitive () const
+  {
+    return m_case_sensitive;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether the netlist names are case sensitive
+   */
+  void set_case_sensitive (bool f);
+
+  /**
    *  @brief Returns a parsable string representation of the netlist
    *
    *  This method returns a string suitable for being put into from_string.
@@ -225,7 +238,7 @@ public:
    */
   Circuit *circuit_by_name (const std::string &name)
   {
-    return m_circuit_by_name.object_by (name);
+    return m_circuit_by_name.object_by (normalize_name (name));
   }
 
   /**
@@ -235,7 +248,7 @@ public:
    */
   const Circuit *circuit_by_name (const std::string &name) const
   {
-    return m_circuit_by_name.object_by (name);
+    return m_circuit_by_name.object_by (normalize_name (name));
   }
 
   /**
@@ -429,7 +442,7 @@ public:
    */
   DeviceAbstract *device_abstract_by_name (const std::string &name)
   {
-    return m_device_abstract_by_name.object_by (name);
+    return m_device_abstract_by_name.object_by (normalize_name (name));
   }
 
   /**
@@ -439,7 +452,7 @@ public:
    */
   const DeviceAbstract *device_abstract_by_name (const std::string &name) const
   {
-    return m_device_abstract_by_name.object_by (name);
+    return m_device_abstract_by_name.object_by (normalize_name (name));
   }
 
   /**
@@ -502,10 +515,29 @@ public:
    */
   void combine_devices ();
 
+  /**
+   *  @brief Compares two names with the given case sensitivity
+   */
+  static int name_compare (bool case_sensitive, const std::string &n1, const std::string &n2);
+
+  /**
+   *  @brief Normalizes a name with the given case sensitivity
+   */
+  static std::string normalize_name (bool case_sensitive, const std::string &n);
+
+  /**
+   *  @brief Normalizes a name with the given case sensitivity of the netlist
+   */
+  std::string normalize_name (const std::string &n) const
+  {
+    return normalize_name (is_case_sensitive (), n);
+  }
+
 private:
   friend class Circuit;
   friend class DeviceAbstract;
 
+  bool m_case_sensitive;
   tl::weak_ptr<db::NetlistManipulationCallbacks> mp_callbacks;
   circuit_list m_circuits;
   device_class_list m_device_classes;

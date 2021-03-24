@@ -48,15 +48,12 @@ struct GlobalCompareOptions
       debug_netcompare = tl::app_flag ("netlist-compare-debug-netcompare");
       //  $KLAYOUT_NETLIST_COMPARE_DEBUG_NETGRAPH
       debug_netgraph = tl::app_flag ("netlist-compare-debug-netgraph");
-      //  $KLAYOUT_NETLIST_COMPARE_CASE_SENSITIVE
-      compare_case_sensitive = tl::app_flag ("netlist-compare-case-sensitive");
       m_is_initialized = true;
     }
   }
 
   bool debug_netcompare;
   bool debug_netgraph;
-  bool compare_case_sensitive;
 
 private:
   bool m_is_initialized;
@@ -90,28 +87,18 @@ namespace db
 // --------------------------------------------------------------------------------------------------------------------
 //  A generic string compare
 
-static int name_compare (const std::string &n1, const std::string &n2)
+bool combined_case_sensitive (const db::Netlist *a, const db::Netlist *b)
 {
-  //  TODO: unicode support?
-  if (options ()->compare_case_sensitive) {
-    return strcmp (n1.c_str (), n2.c_str ());
-  } else {
-#if defined(_WIN32)
-    return _stricmp (n1.c_str (), n2.c_str ());
-#else
-    return strcasecmp (n1.c_str (), n2.c_str ());
-#endif
-  }
+  bool csa = a ? a->is_case_sensitive () : true;
+  bool csb = b ? b->is_case_sensitive () : true;
+  return csa && csb;
 }
 
-static inline std::string normalize_name (const std::string &n)
+int name_compare (const db::Net *a, const db::Net *b)
 {
-  if (options ()->compare_case_sensitive) {
-    return n;
-  } else {
-    return tl::to_upper_case (n);
-  }
+  return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), a->name (), b->name ());
 }
+
 
 // --------------------------------------------------------------------------------------------------------------------
 //  DeviceCompare definition and implementation
@@ -404,9 +391,14 @@ class generic_categorizer
 {
 public:
   generic_categorizer (bool with_name = true)
-    : m_next_cat (0), m_with_name (with_name)
+    : m_next_cat (0), m_with_name (with_name), m_case_sensitive (true)
   {
     //  .. nothing yet ..
+  }
+
+  void set_case_sensitive (bool f)
+  {
+    m_case_sensitive = f;
   }
 
   void same (const Obj *ca, const Obj *cb)
@@ -471,7 +463,7 @@ public:
 
     if (m_with_name) {
 
-      std::string cls_name = normalize_name (cls->name ());
+      std::string cls_name = db::Netlist::normalize_name (m_case_sensitive, cls->name ());
 
       std::map<std::string, size_t>::const_iterator c = m_cat_by_name.find (cls_name);
       if (c != m_cat_by_name.end ()) {
@@ -498,6 +490,7 @@ public:
   std::map<std::string, size_t> m_cat_by_name;
   size_t m_next_cat;
   bool m_with_name;
+  bool m_case_sensitive;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -559,6 +552,11 @@ public:
     return m_strict_device_categories.find (cat) != m_strict_device_categories.end ();
   }
 
+  void set_case_sensitive (bool f)
+  {
+    generic_categorizer::set_case_sensitive (f);
+  }
+
 private:
   std::set<size_t> m_strict_device_categories;
 };
@@ -605,6 +603,11 @@ public:
   size_t cat_for_circuit (const db::Circuit *cr)
   {
     return generic_categorizer<db::Circuit>::cat_for (cr);
+  }
+
+  void set_case_sensitive (bool f)
+  {
+    generic_categorizer::set_case_sensitive (f);
   }
 };
 
@@ -1461,7 +1464,7 @@ NetGraphNode::net_less (const db::Net *a, const db::Net *b)
       const std::string &pna = a->begin_pins ()->pin ()->name ();
       const std::string &pnb = b->begin_pins ()->pin ()->name ();
       if (! pna.empty () && ! pnb.empty ()) {
-        return name_compare (pna, pnb) < 0;
+        return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), pna, pnb) < 0;
       }
     }
     return false;
@@ -1484,7 +1487,7 @@ NetGraphNode::edge_equal (const db::Net *a, const db::Net *b)
       const std::string &pna = a->begin_pins ()->pin ()->name ();
       const std::string &pnb = b->begin_pins ()->pin ()->name ();
       if (! pna.empty () && ! pnb.empty ()) {
-        return name_compare (pna, pnb) == 0;
+        return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), pna, pnb) == 0;
       }
     }
     return true;
@@ -2256,7 +2259,7 @@ namespace {
       bool operator() (const std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> &a, const std::pair<const NetGraphNode *, NetGraphNode::edge_iterator>b) const
       {
         tl_assert (a.first->net () && b.first->net ());
-        return name_compare (a.first->net ()->name (), b.first->net ()->name ()) < 0;
+        return name_compare (a.first->net (), b.first->net ()) < 0;
       }
   };
 
@@ -2317,7 +2320,7 @@ static bool net_names_are_different (const db::Net *a, const db::Net *b)
   if (! a || ! b || a->name ().empty () || b->name ().empty ()) {
     return false;
   } else {
-    return name_compare (a->name (), b->name ()) != 0;
+    return name_compare (a, b) != 0;
   }
 }
 
@@ -2326,7 +2329,7 @@ static bool net_names_are_equal (const db::Net *a, const db::Net *b)
   if (! a || ! b || a->name ().empty () || b->name ().empty ()) {
     return false;
   } else {
-    return name_compare (a->name (), b->name ()) == 0;
+    return name_compare (a, b) == 0;
   }
 }
 
@@ -2815,6 +2818,7 @@ NetlistComparer::NetlistComparer (NetlistCompareLogger *logger)
   m_depth_first = true;
 
   m_dont_consider_net_names = false;
+  m_case_sensitive = false;
 }
 
 NetlistComparer::~NetlistComparer ()
@@ -2887,6 +2891,7 @@ NetlistComparer::unmatched_circuits (db::Netlist *a, db::Netlist *b, std::vector
 {
   //  we need to create a copy because this method is supposed to be const.
   db::CircuitCategorizer circuit_categorizer = *mp_circuit_categorizer;
+  circuit_categorizer.set_case_sensitive (m_case_sensitive);
 
   std::map<size_t, std::pair<std::vector<db::Circuit *>, std::vector<db::Circuit *> > > cat2circuits;
 
@@ -2928,10 +2933,15 @@ NetlistComparer::unmatched_circuits (db::Netlist *a, db::Netlist *b, std::vector
 bool
 NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 {
+  m_case_sensitive = combined_case_sensitive (a, b);
+
   //  we need to create a copy because this method is supposed to be const.
   db::CircuitCategorizer circuit_categorizer = *mp_circuit_categorizer;
   db::DeviceCategorizer device_categorizer = *mp_device_categorizer;
   db::CircuitPinMapper circuit_pin_mapper = *mp_circuit_pin_mapper;
+
+  circuit_categorizer.set_case_sensitive (m_case_sensitive);
+  device_categorizer.set_case_sensitive (m_case_sensitive);
 
   bool good = true;
 
@@ -3745,14 +3755,14 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
   for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
     const db::Net *net = c2->net_for_pin (p->id ());
     if (!net && !p->name ().empty ()) {
-      abstract_pins_by_name.insert (std::make_pair (normalize_name (p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.second = p.operator-> ();
+      abstract_pins_by_name.insert (std::make_pair (db::Netlist::normalize_name (m_case_sensitive, p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.second = p.operator-> ();
     }
   }
 
   for (db::Circuit::const_pin_iterator p = c1->begin_pins (); p != c1->end_pins (); ++p) {
     const db::Net *net = c1->net_for_pin (p->id ());
     if (!net && !p->name ().empty ()) {
-      abstract_pins_by_name.insert (std::make_pair (normalize_name (p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.first = p.operator-> ();
+      abstract_pins_by_name.insert (std::make_pair (db::Netlist::normalize_name (m_case_sensitive, p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.first = p.operator-> ();
     }
   }
 

@@ -299,6 +299,9 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
   m_global_nets.clear ();
   m_circuits_read.clear ();
 
+  //  SPICE netlists are case insensitive
+  netlist.set_case_sensitive (false);
+
   try {
 
     mp_delegate->start (&netlist);
@@ -775,13 +778,7 @@ std::string NetlistSpiceReader::read_name_with_case (tl::Extractor &ex)
 
 std::string NetlistSpiceReader::read_name (tl::Extractor &ex)
 {
-  //  TODO: allow configuring Spice reader as case sensitive?
-  //  this is easy to do: just avoid to_upper here:
-#if 1
-  return tl::to_upper_case (read_name_with_case (ex));
-#else
-  return read_name_with_case (ex);
-#endif
+  return mp_netlist->normalize_name (read_name_with_case (ex));
 }
 
 bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &element, const std::string &name)

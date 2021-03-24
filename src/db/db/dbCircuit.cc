@@ -186,8 +186,10 @@ void Circuit::rename_pin (size_t id, const std::string &name)
 
 const Pin *Circuit::pin_by_name (const std::string &name) const
 {
+  std::string nn = mp_netlist ? mp_netlist->normalize_name (name) : name;
+
   for (Circuit::const_pin_iterator p = begin_pins (); p != end_pins (); ++p) {
-    if (p->name () == name) {
+    if (p->name () == nn) {
       return p.operator-> ();
     }
   }
@@ -331,6 +333,11 @@ void Circuit::remove_pin (size_t id)
   }
 }
 
+Net *Circuit::net_by_name (const std::string &name)
+{
+  return m_net_by_name.object_by (mp_netlist ? mp_netlist->normalize_name (name) : name);
+}
+
 void Circuit::add_net (Net *net)
 {
   if (! net) {
@@ -423,6 +430,11 @@ void Circuit::remove_device (Device *device)
   m_devices.erase (device);
 }
 
+Device *Circuit::device_by_name (const std::string &name)
+{
+  return m_device_by_name.object_by (mp_netlist ? mp_netlist->normalize_name (name) : name);
+}
+
 void Circuit::add_subcircuit (SubCircuit *subcircuit)
 {
   if (! subcircuit) {
@@ -454,6 +466,11 @@ void Circuit::remove_subcircuit (SubCircuit *subcircuit)
   }
 
   m_subcircuits.erase (subcircuit);
+}
+
+SubCircuit *Circuit::subcircuit_by_name (const std::string &name)
+{
+  return m_subcircuit_by_name.object_by (mp_netlist ? mp_netlist->normalize_name (name) : name);
 }
 
 void Circuit::register_ref (SubCircuit *r)

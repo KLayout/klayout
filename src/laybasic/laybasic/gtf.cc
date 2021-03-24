@@ -1112,6 +1112,7 @@ protected:
   virtual void endl () { mp_rec->errlog_endl (); }
   virtual void end () { mp_rec->errlog_end (); }
   virtual void begin () { mp_rec->errlog_begin (); }
+  virtual void yield () { }
 
 private:
   Recorder *mp_rec;

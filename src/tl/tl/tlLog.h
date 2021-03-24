@@ -136,6 +136,7 @@ protected:
   virtual void endl () = 0;
   virtual void end () = 0;
   virtual void begin () = 0;
+  virtual void yield () = 0;
 
   tl::Mutex m_lock;
 
@@ -265,6 +266,7 @@ protected:
   virtual void endl ();
   virtual void end ();
   virtual void begin ();
+  virtual void yield ();
 
 private:
   tl::weak_collection<tl::Channel> m_channels;

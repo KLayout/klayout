@@ -75,6 +75,8 @@ protected:
     //  .. nothing yet ..
   }
 
+  virtual void yield () { }
+
 private:
   int m_verbosity;
 };
@@ -108,6 +110,8 @@ protected:
   {
     TestConsole::instance ()->begin_warn ();
   }
+
+  virtual void yield () { }
 };
 
 class ErrorChannel : public tl::Channel
@@ -139,6 +143,8 @@ protected:
   {
     TestConsole::instance ()->begin_error ();
   }
+
+  virtual void yield () { }
 };
 
 class CtrlChannel : public tl::Channel
@@ -179,6 +185,8 @@ protected:
       TestConsole::instance ()->begin_info ();
     }
   }
+
+  virtual void yield () { }
 
 private:
   bool m_with_xml;

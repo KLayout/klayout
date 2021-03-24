@@ -90,6 +90,7 @@ protected:
   virtual void endl ();
   virtual void end ();
   virtual void begin ();
+  virtual void yield ();
 
 private:
   LogFile *mp_file;
@@ -192,6 +193,11 @@ public slots:
   {
     return m_log_receiver;
   }
+
+  /**
+   *  @brief Implementation of post-log action
+   */
+  void yield ();
 
   /**
    *  @brief Sets the maximum number of entries to show

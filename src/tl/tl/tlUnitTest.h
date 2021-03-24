@@ -208,6 +208,7 @@ protected:
   virtual void endl ();
   virtual void end ();
   virtual void begin ();
+  virtual void yield () { }
 
 private:
   std::ostringstream m_text;

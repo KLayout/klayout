@@ -84,6 +84,12 @@ LogReceiver::endl ()
   }
 }
 
+void
+LogReceiver::yield ()
+{
+  mp_file->yield ();
+}
+
 void 
 LogReceiver::end () 
 { 
@@ -224,28 +230,34 @@ LogFile::max_entries () const
 void 
 LogFile::add (LogFileEntry::mode_type mode, const std::string &msg, bool continued)
 {
+  QMutexLocker locker (&m_lock);
+
+  if (m_max_entries == 0) {
+    return;
+  }
+
+  if (m_messages.size () >= m_max_entries) {
+    m_messages.pop_front ();
+  }
+
+  if (mode == LogFileEntry::Warning || mode == LogFileEntry::WarningContinued) {
+    m_has_warnings = true;
+  } else if (mode == LogFileEntry::Error || mode == LogFileEntry::ErrorContinued) {
+    m_has_errors = true;
+  }
+
+  m_messages.push_back (LogFileEntry (mode, msg, continued));
+
+  ++m_generation_id;
+}
+
+void
+LogFile::yield ()
+{
   bool can_yield = false;
 
   {
     QMutexLocker locker (&m_lock);
-
-    if (m_max_entries == 0) {
-      return;
-    }
-
-    if (m_messages.size () >= m_max_entries) {
-      m_messages.pop_front ();
-    }
-
-    if (mode == LogFileEntry::Warning || mode == LogFileEntry::WarningContinued) {
-      m_has_warnings = true;
-    } else if (mode == LogFileEntry::Error || mode == LogFileEntry::ErrorContinued) {
-      m_has_errors = true;
-    }
-
-    m_messages.push_back (LogFileEntry (mode, msg, continued));
-
-    ++m_generation_id;
 
     if (lay::ApplicationBase::instance ()->qapp_gui () && QThread::currentThread () == lay::ApplicationBase::instance ()->qapp_gui ()->thread () && (tl::Clock::current () - m_last_yield).seconds () > 0.1) {
       m_last_yield = tl::Clock::current ();
@@ -254,6 +266,9 @@ LogFile::add (LogFileEntry::mode_type mode, const std::string &msg, bool continu
   }
 
   //  use this opportunity to process events
+  //  NOTE: as process events may trigger further log output, it's necessary to do process events outside any other
+  //  method (e.g. add) which is subject to locking. Hence we avoid deadlocks.
+  //  We accept the risk of recursion inside process_events as we have a timeout before accepting new yield calls.
   if (can_yield) {
     lay::ApplicationBase::instance ()->process_events (QEventLoop::AllEvents);
   }

@@ -2649,7 +2649,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
     indent_s += "*" + tl::to_string (n_branch) + " ";
   }
 
-  if (depth > data->max_depth) {
+  if (data->max_depth != std::numeric_limits<size_t>::max() && depth > data->max_depth) {
     if (options ()->debug_netcompare) {
       tl::info << indent_s << "max. depth exhausted (" << depth + 1 << ">" << data->max_depth << ")";
     }
@@ -2783,7 +2783,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
 
       new_nodes += n;
 
-    } else if (nr->num * n_branch > data->max_n_branch) {
+    } else if (data->max_n_branch != std::numeric_limits<size_t>::max () && double (nr->num) * double (n_branch) > double (data->max_n_branch)) {
 
       if (options ()->debug_netcompare) {
         tl::info << indent_s << "max. complexity exhausted (" << nr->num << "*" << n_branch << ">" << data->max_n_branch << ") - mismatch.";
@@ -2828,8 +2828,8 @@ NetlistComparer::NetlistComparer (NetlistCompareLogger *logger)
   m_cap_threshold = -1.0;   //  not set
   m_res_threshold = -1.0;   //  not set
 
-  m_max_depth = 50;
-  m_max_n_branch = 500;
+  m_max_depth = std::numeric_limits<size_t>::max ();
+  m_max_n_branch = std::numeric_limits<size_t>::max ();
   m_depth_first = true;
 
   m_dont_consider_net_names = false;

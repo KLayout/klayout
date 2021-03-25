@@ -616,6 +616,12 @@ module LVS
     # pursues this "deduction path" in greater depth while with 
     # smaller values, the algorithm prefers picking nets in a random fashion
     # as the seeds for this deduction path. The default value is 8. 
+    # 
+    # By default, the depth is unlimited, but it may
+    # be reduced in order to limit the compare runtimes at the cost
+    # of a less elaborate compare attempt. The preferred solution 
+    # however is to use labels for net name hints which also reduces
+    # the branch complexity.
 
     def max_depth(value)
       v = value.to_i
@@ -638,6 +644,12 @@ module LVS
     # can be increased at the expense of potentially larger runtimes.
     # The runtime penality is roughly proportional to the branch
     # complexity.
+    # 
+    # By default, the branch complexity is unlimited, but it may
+    # be reduced in order to limit the compare runtimes at the cost
+    # of a less elaborate compare attempt. The preferred solution 
+    # however is to use labels for net name hints which also reduces
+    # the depth.
  
     def max_branch_complexity(value)
       v = value.to_i

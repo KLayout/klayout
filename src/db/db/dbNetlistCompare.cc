@@ -2357,7 +2357,7 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
   {
 
     //  marks the nodes from the ambiguity group as unknown so we don't revisit them (causing deep recursion)
-    TentativeNodeMapping tn2unknown;
+    TentativeNodeMapping tn_temp;
 
     //  collect and mark the ambiguity combinations to consider
     std::vector<std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator> iters1, iters2;
@@ -2366,7 +2366,7 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
       if (! i1->first->has_any_other ()) {
         iters1.push_back (i1);
         size_t ni = node_index_for_net (i1->first->net ());
-        TentativeNodeMapping::map_to_unknown (&tn2unknown, this, ni);
+        TentativeNodeMapping::map_to_unknown (&tn_temp, this, ni);
       }
     }
 
@@ -2374,7 +2374,7 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
       if (! i2->first->has_any_other ()) {
         iters2.push_back (i2);
         size_t other_ni = data->other->node_index_for_net (i2->first->net ());
-        TentativeNodeMapping::map_to_unknown (&tn2unknown, data->other, other_ni);
+        TentativeNodeMapping::map_to_unknown (&tn_temp, data->other, other_ni);
       }
     }
 
@@ -2463,7 +2463,22 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
       }
 
       if (to_remove != iters2.end ()) {
+
+        //  Add the new pair to the temporary mapping (even in tentative mode)
+        //  Reasoning: doing the mapping may render other nets incompatible, so to ensure "edges_are_compatible" works properly we
+        //  need to lock the current pairs resources such as devices by listing them in the mapping. This is doing by "derive_*_equivalence" inside
+        //  TentativeNodeMapping::map_pair
+
+        std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i2 = *to_remove;
+
+        size_t ni = node_index_for_net (i1->first->net ());
+        size_t other_ni = data->other->node_index_for_net (i2->first->net ());
+
+        TentativeNodeMapping::map_pair (&tn_temp, this, ni, data->other, other_ni, dm, dm_other, *data->device_equivalence, scm, scm_other, *data->subcircuit_equivalence, depth);
+
+        //  now we can get rid of the node and reduce the "other" list of ambiguous nodes
         iters2.erase (to_remove);
+
       }
 
       if (! any && tentative) {

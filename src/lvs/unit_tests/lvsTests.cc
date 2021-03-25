@@ -154,3 +154,10 @@ TEST(17_private)
   test_is_long_runner ();
   run_test (_this, "test_17.lylvs", "test_17.cir.gz", "test_17.gds.gz", true, "test_17.lvsdb");
 }
+
+TEST(18_private)
+{
+  // test_is_long_runner ();
+  run_test (_this, "test_18.lvs", "test_18.cir.gz", "test_18.gds.gz", true);
+}
+

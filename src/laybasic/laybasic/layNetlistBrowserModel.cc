@@ -530,10 +530,26 @@ static std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalD
       size_t td1_id_norm = device_classes.first->normalize_terminal_id (td1->id ());
       const db::Net *n2 = model->second_net_for (devices.first->net_for_terminal (terminal_id));
 
+      //  this scheme makes a guess what terminal to use when a pair of terminals does not connect
+      //  to matching nets
+      std::set<const db::Net *> n2_excluded;
+      if (! n2) {
+        for (size_t i = 0; i < device_classes.first->terminal_definitions ().size (); ++i) {
+          const db::DeviceTerminalDefinition &td = device_classes.first->terminal_definitions () [i];
+          if (device_classes.first->normalize_terminal_id (td.id ()) == td1_id_norm) {
+            const db::Net *n2x = model->second_net_for (devices.first->net_for_terminal (td.id ()));
+            if (n2x) {
+              n2_excluded.insert (n2x);
+            }
+          }
+        }
+      }
+
       for (size_t i = 0; i < device_classes.second->terminal_definitions ().size (); ++i) {
         const db::DeviceTerminalDefinition &td = device_classes.second->terminal_definitions () [i];
         if (device_classes.second->normalize_terminal_id (td.id ()) == td1_id_norm) {
-          if (devices.second->net_for_terminal (i) == n2) {
+          const db::Net *n2_actual = devices.second->net_for_terminal (i);
+          if ((! n2 || n2_actual == n2) && n2_excluded.find (n2_actual) == n2_excluded.end ()) {
             second_terminal_id = i;
             break;
           }

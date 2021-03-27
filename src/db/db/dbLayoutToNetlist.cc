@@ -40,7 +40,7 @@ namespace db
 //  the iterator provides the hierarchical selection (enabling/disabling cells etc.)
 
 LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
-  : m_iter (iter), m_layout_index (0), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0)
+  : m_iter (iter), m_layout_index (0), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false)
 {
   //  check the iterator
   if (iter.has_complex_region () || iter.region () != db::Box::world ()) {
@@ -60,7 +60,7 @@ LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
 }
 
 LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_index)
-  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0)
+  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false)
 {
   if (dss->is_valid_layout_index (m_layout_index)) {
     m_iter = db::RecursiveShapeIterator (dss->layout (m_layout_index), dss->initial_cell (m_layout_index), std::set<unsigned int> ());
@@ -68,7 +68,7 @@ LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_i
 }
 
 LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
-  : m_iter (), m_netlist_extracted (false), m_is_flat (true), m_device_scaling (1.0)
+  : m_iter (), m_netlist_extracted (false), m_is_flat (true), m_device_scaling (1.0), m_include_floating_subcircuits (false)
 {
   mp_internal_dss.reset (new db::DeepShapeStore (topcell_name, dbu));
   mp_dss.reset (mp_internal_dss.get ());
@@ -79,7 +79,7 @@ LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
 
 LayoutToNetlist::LayoutToNetlist ()
   : m_iter (), mp_internal_dss (new db::DeepShapeStore ()), mp_dss (mp_internal_dss.get ()), m_layout_index (0),
-    m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0)
+    m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false)
 {
   init ();
 }
@@ -310,37 +310,91 @@ size_t LayoutToNetlist::global_net_id (const std::string &name)
   return m_conn.global_net_id (name);
 }
 
-void LayoutToNetlist::extract_netlist (const std::string &joined_net_names, bool include_floating_subcircuits)
+void LayoutToNetlist::set_include_floating_subcircuits (bool f)
 {
-  extract_netlist (joined_net_names, std::map<std::string, std::string> (), include_floating_subcircuits);
+  m_include_floating_subcircuits = f;
 }
 
-void LayoutToNetlist::extract_netlist (const std::string &joined_net_names, const std::map<std::string, std::string> &joined_net_names_per_cell, bool include_floating_subcircuits)
+void LayoutToNetlist::clear_join_net_names ()
+{
+  m_joined_net_names.clear ();
+  m_joined_net_names_per_cell.clear ();
+}
+
+void LayoutToNetlist::join_net_names (const tl::GlobPattern &gp)
+{
+  m_joined_net_names.push_back (gp);
+}
+
+void LayoutToNetlist::join_net_names (const tl::GlobPattern &cell, const tl::GlobPattern &gp)
+{
+  m_joined_net_names_per_cell.push_back (std::make_pair (cell, gp));
+}
+
+void LayoutToNetlist::clear_join_nets ()
+{
+  m_joined_nets.clear ();
+  m_joined_nets_per_cell.clear ();
+}
+
+void LayoutToNetlist::join_nets (const std::set<std::string> &jn)
+{
+  m_joined_nets.push_back (jn);
+}
+
+void LayoutToNetlist::join_nets (const tl::GlobPattern &cell, const std::set<std::string> &gp)
+{
+  m_joined_nets_per_cell.push_back (std::make_pair (cell, gp));
+}
+
+void LayoutToNetlist::extract_netlist ()
 {
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
   }
   ensure_netlist ();
 
+  const db::Layout &layout = dss ().layout (m_layout_index);
+
   db::NetlistExtractor netex;
 
-  netex.set_joined_net_names (joined_net_names);
+  netex.set_joined_net_names (m_joined_net_names);
 
-  const db::Layout &layout = dss ().layout (m_layout_index);
-  for (std::map<std::string, std::string>::const_iterator j = joined_net_names_per_cell.begin (); j != joined_net_names_per_cell.end (); ++j) {
-    tl::GlobPattern pat (j->first);
-    if (pat.is_const ()) {
-      netex.set_joined_net_names (j->first, j->second);
+  std::map<std::string, std::list<tl::GlobPattern> > jp_per_cell;
+  for (std::list<std::pair<tl::GlobPattern, tl::GlobPattern> >::const_iterator j = m_joined_net_names_per_cell.begin (); j != m_joined_net_names_per_cell.end (); ++j) {
+    if (j->first.is_const ()) {
+      jp_per_cell [j->first.pattern ()].push_back (j->second);
     } else {
       for (db::Layout::const_iterator c = layout.begin (); c != layout.end (); ++c) {
-        if (pat.match (layout.cell_name (c->cell_index ()))) {
-          netex.set_joined_net_names (layout.cell_name (c->cell_index ()), j->second);
+        if (j->first.match (layout.cell_name (c->cell_index ()))) {
+          jp_per_cell [layout.cell_name (c->cell_index ())].push_back (j->second);
         }
       }
     }
   }
+  for (std::map<std::string, std::list<tl::GlobPattern> >::const_iterator i = jp_per_cell.begin (); i != jp_per_cell.end (); ++i) {
+    netex.set_joined_net_names (i->first, i->second);
+  }
 
-  netex.set_include_floating_subcircuits (include_floating_subcircuits);
+  netex.set_joined_nets (m_joined_nets);
+
+  std::map<std::string, std::list<std::set<std::string> > > jn_per_cell;
+  for (std::list<std::pair<tl::GlobPattern, std::set<std::string> > >::const_iterator j = m_joined_nets_per_cell.begin (); j != m_joined_nets_per_cell.end (); ++j) {
+    if (j->first.is_const ()) {
+      jn_per_cell [j->first.pattern ()].push_back (j->second);
+    } else {
+      for (db::Layout::const_iterator c = layout.begin (); c != layout.end (); ++c) {
+        if (j->first.match (layout.cell_name (c->cell_index ()))) {
+          jn_per_cell [layout.cell_name (c->cell_index ())].push_back (j->second);
+        }
+      }
+    }
+  }
+  for (std::map<std::string, std::list<std::set<std::string> > >::const_iterator i = jn_per_cell.begin (); i != jn_per_cell.end (); ++i) {
+    netex.set_joined_nets (i->first, i->second);
+  }
+
+  netex.set_include_floating_subcircuits (m_include_floating_subcircuits);
   netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters);
 
   m_netlist_extracted = true;

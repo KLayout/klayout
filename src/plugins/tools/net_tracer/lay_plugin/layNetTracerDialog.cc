@@ -1704,7 +1704,12 @@ NetTracerDialog::trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView
 
   tracer_data.configure_l2n (*l2ndb);
 
-  l2ndb->extract_netlist (std::string (), flat /*include floating subcircuits for netlist to flatten*/);
+  l2ndb->clear_join_nets ();
+  l2ndb->clear_join_net_names ();
+
+  //  include floating subcircuits for netlist to flatten
+  l2ndb->set_include_floating_subcircuits (flat);
+  l2ndb->extract_netlist ();
 
   if (flat) {
     l2ndb->netlist ()->flatten ();

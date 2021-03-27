@@ -67,6 +67,8 @@ module DRC
       @netlisted = false
       @connect_implicit = []
       @connect_implicit_per_cell = {}
+      @connect_explicit = []
+      @connect_explicit_per_cell = {}
       @l2n = nil
       @lnum = 0
       @device_scaling = 1.0
@@ -241,6 +243,8 @@ module DRC
       @netlisted = false
       @connect_implicit = []
       @connect_implicit_per_cell = {}
+      @connect_explicit = []
+      @connect_explicit_per_cell = {}
       _clear_data
     end
     
@@ -280,6 +284,67 @@ module DRC
         else
           arg1.is_a?(String) || raise("The argument has to be a string")
           @connect_implicit << arg1
+        end
+
+      end
+
+    end
+
+    # %DRC%
+    # @name connect_explicit
+    # @brief Specifies a list of net names for nets to connect explicitly
+    # @synopsis connect_explicit(net_names)
+    # @synopsis connect_explicit(cell_pattern, net_names)
+    # Use this method to explicitly connect nets even if there is no physical connection.
+    # As this breaks with the concept of physical verification, this feature should be used 
+    # with care. 
+    #
+    # The first version of this function will connect all nets listed in the "net_names" array 
+    # in the top level cell. The second version takes a cell name pattern and connects all nets listed
+    # in "net_names" for cells matching this pattern.
+    #
+    # A use case for this method is the following: consider a set of standard cells. These do not have a bulk
+    # or n-well pin in the schematics. They also do not have build in tie-down diodes for the 
+    # substrate connections. In this case there is a build-in discrepancy between the 
+    # schematics and the layout: bulk and VSS are separate nets within the layout, but the 
+    # schematic does not list them as separate. The solution is to make an explicit connection
+    # between VDD and n-well and VSS and bulk, provided VDD and VSS are properly labelled as "VDD" and "VSS"
+    # and n-well and bulk are accessible as named nets (for bulk you can use "connect_global").
+    #
+    # The following code will establish an explicit connection for all cells called "INV.." between 
+    # BULK and VSS nets:
+    #
+    # @code
+    # connect_global(bulk, "BULK")
+    # ...
+    # connect_explicit("INV*", [ "BULK", "VSS" ])
+    # @/code
+    #
+    # Explicit connections also imply implicit connections between different parts of 
+    # one of the nets. In the example before, "VSS" pieces without a physical connection
+    # will also be connected.
+    #
+    # When you use explicit connections you should make sure by other ways that the connection
+    # is made physically. For example, for the bulk/n-well pin example above, by enforcing at least one
+    # tie-down diode per n-well island and in the substrate by means of a DRC rule.
+    #
+    # The explicit connections are applied on the next net extraction and cleared
+    # on "clear_connections".
+
+    def connect_explicit(arg1, arg2 = nil)
+
+      @engine._context("connect_explicit") do
+
+        cleanup
+        if arg2
+          arg2.is_a?(Array) || raise("The second argument has to be an array of strings")
+          arg2.find { |a| !a.is_a?(String) } && raise("The second argument has to be an array of strings")
+          arg1.is_a?(String) || raise("The first argument has to be a string")
+          @connect_explicit_per_cell[arg1] ||= []
+          @connect_explicit_per_cell[arg1] << arg2
+        else
+          arg1.is_a?(String) || raise("The argument has to be a string")
+          @connect_explicit << arg1
         end
 
       end
@@ -481,16 +546,29 @@ module DRC
         # run extraction in a timed environment
         if ! @netlisted
 
-          # build a glob expression from the parts
-          expr = _join_glob_pattern(@connect_implicit)
-
-          # build cell-pattern specific glob expressions from the parts
-          per_cell_expr = {}
+          # configure implicit net connections
+          @l2n.clear_join_net_names
+          @connect_implicit.each do |label_pattern|
+            @l2n.join_net_names(label_pattern)
+          end
           @connect_implicit_per_cell.each do |cell_pattern,label_pattern|
-            per_cell_expr[cell_pattern] = _join_glob_pattern(label_pattern)
+            label_pattern.each do |lp|
+              @l2n.join_net_names(cell_pattern, lp)
+            end
           end
 
-          @engine._cmd(@l2n, :extract_netlist, expr, per_cell_expr)
+          # configure explicit net connections
+          @l2n.clear_join_nets
+          @connect_explicit.each do |names|
+            @l2n.join_nets(names)
+          end
+          @connect_explicit_per_cell.each do |cell_pattern,name_lists|
+            name_lists.each do |names|
+              @l2n.join_nets(cell_pattern, names)
+            end
+          end
+
+          @engine._cmd(@l2n, :extract_netlist)
           @netlisted = true
 
         end
@@ -546,18 +624,6 @@ module DRC
         _make_data
         @l2n.device_scaling = @device_scaling
       end
-    end
-
-    def _join_glob_pattern(exprs)
-
-      if exprs.size > 1
-        expr = "{" + exprs.join(",") + "}"
-      else
-        expr = exprs[0] || ""
-      end
-
-      expr
-
     end
 
     def _make_data

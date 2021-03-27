@@ -161,3 +161,9 @@ TEST(18_private)
   run_test (_this, "test_18.lvs", "test_18.cir.gz", "test_18.gds.gz", true);
 }
 
+TEST(19_private)
+{
+  // test_is_long_runner ();
+  run_test (_this, "test_19.lvs", "test_19.cir.gz", "test_19.gds.gz", true);
+}
+

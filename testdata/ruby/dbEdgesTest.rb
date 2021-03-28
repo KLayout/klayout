@@ -81,7 +81,7 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.count, 4)
     assert_equal(r.hier_count, 4)
     assert_equal(r.bbox.to_s, "(10,20;100,200)")
-    assert_equal(r.is_merged?, true)
+    assert_equal(r.is_merged?, false)
 
     assert_equal(r.moved(RBA::Point::new(10, 20)).bbox.to_s, "(20,40;110,220)")
     assert_equal(r.moved(10, 20).bbox.to_s, "(20,40;110,220)")
@@ -615,12 +615,11 @@ class DBEdges_TestClass < TestBase
 
     r.flatten
 
-    assert_equal(r.is_deep?, false)
+    assert_equal(r.is_deep?, true)
 
     assert_equal(r.count, 12)
     assert_equal(r.hier_count, 12)
-    assert_equal(r[1].to_s, "(-10,20;10,20)")
-    assert_equal(r[100].to_s, "")
+    assert_equal(r.to_s, "(-10,-20;-10,20);(-10,20;10,20);(10,20;10,-20);(10,-20;-10,-20);(-10,80;-10,120);(-10,120;10,120);(10,120;10,80);(10,80;-10,80);(190,80;190,120);(190,120;210,120)...")
 
   end
 

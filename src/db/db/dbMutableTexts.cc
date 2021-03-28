@@ -50,7 +50,9 @@ void
 MutableTexts::insert (const db::Shape &shape)
 {
   if (shape.is_text ()) {
-    insert (shape.text ());
+    db::Text text;
+    shape.text (text);
+    insert (text);
   }
 }
 

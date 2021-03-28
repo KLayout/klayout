@@ -413,9 +413,14 @@ void
 FlatRegion::do_insert (const db::Polygon &polygon)
 {
   if (polygon.holes () > 0 || polygon.vertices () > 0) {
+
+    bool is_box = (empty () && polygon.is_box ());
+
     mp_polygons->insert (polygon);
-    m_is_merged = false;
+    set_is_merged (is_box);
+
     invalidate_cache ();
+
   }
 }
 

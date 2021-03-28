@@ -233,9 +233,9 @@ static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
 
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
 
-    db::Shapes flat_shapes;
+    db::Shapes flat_shapes (layout.is_editable ());
     for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); !iter.at_end (); ++iter) {
-      flat_shapes.insert (iter->polygon ().transformed (t));
+      flat_shapes.insert (iter->edge ().transformed (iter.trans ()).transformed (t));
     }
 
     layout.clear_layer (deep_layer.layer ());
@@ -268,9 +268,9 @@ void DeepEdges::flatten ()
 
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
 
-    db::Shapes flat_shapes;
+    db::Shapes flat_shapes (layout.is_editable ());
     for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer ().layer ()); !iter.at_end (); ++iter) {
-      flat_shapes.insert (iter->polygon ());
+      flat_shapes.insert (iter->edge ().transformed (iter.trans ()));
     }
 
     layout.clear_layer (deep_layer ().layer ());

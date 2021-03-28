@@ -26,7 +26,7 @@
 
 #include "dbCommon.h"
 
-#include "dbAsIfFlatRegion.h"
+#include "dbMutableRegion.h"
 #include "dbShapes.h"
 #include "dbShapes2.h"
 #include "tlCopyOnWrite.h"
@@ -42,7 +42,7 @@ typedef generic_shapes_iterator_delegate<db::Polygon> FlatRegionIterator;
  *  @brief A flat, polygon-set delegate
  */
 class DB_PUBLIC FlatRegion
-  : public AsIfFlatRegion
+  : public MutableRegion
 {
 public:
   typedef db::Polygon value_type;
@@ -62,7 +62,7 @@ public:
     return new FlatRegion (*this);
   }
 
-  void reserve (size_t);
+  virtual void reserve (size_t);
 
   virtual RegionIteratorDelegate *begin () const;
   virtual RegionIteratorDelegate *begin_merged () const;
@@ -97,51 +97,19 @@ public:
 
   virtual const db::RecursiveShapeIterator *iter () const;
 
-  void insert (const db::Box &box);
-  void insert (const db::Path &path);
-  void insert (const db::SimplePolygon &polygon);
-  void insert (const db::Polygon &polygon);
-  void insert (const db::Shape &shape);
+  void do_insert (const db::Polygon &polygon);
 
-  template <class T>
-  void insert (const db::Shape &shape, const T &trans)
+  void do_transform (const db::Trans &t)
   {
-    if (shape.is_polygon () || shape.is_path () || shape.is_box ()) {
-      db::Polygon poly;
-      shape.polygon (poly);
-      poly.transform (trans);
-      insert (poly);
-    }
+    transform_generic (t);
   }
 
-  template <class Iter>
-  void insert (const Iter &b, const Iter &e)
+  void do_transform (const db::ICplxTrans &t)
   {
-    reserve (count () + (e - b));
-    for (Iter i = b; i != e; ++i) {
-      insert (*i);
-    }
+    transform_generic (t);
   }
 
-  template <class Iter>
-  void insert_seq (const Iter &seq)
-  {
-    for (Iter i = seq; ! i.at_end (); ++i) {
-      insert (*i);
-    }
-  }
-
-  template <class Trans>
-  void transform (const Trans &trans)
-  {
-    if (! trans.is_unity ()) {
-      db::Shapes &polygons = *mp_polygons;
-      for (polygon_iterator_type p = polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (); p != polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end (); ++p) {
-        polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
-      }
-      invalidate_cache ();
-    }
-  }
+  void flatten () { }
 
   db::Shapes &raw_polygons () { return *mp_polygons; }
   const db::Shapes &raw_polygons () const { return *mp_polygons; }
@@ -166,6 +134,18 @@ private:
 
   void init ();
   void ensure_merged_polygons_valid () const;
+
+  template <class Trans>
+  void transform_generic (const Trans &trans)
+  {
+    if (! trans.is_unity ()) {
+      db::Shapes &polygons = *mp_polygons;
+      for (polygon_iterator_type p = polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (); p != polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end (); ++p) {
+        polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      }
+      invalidate_cache ();
+    }
+  }
 };
 
 }

@@ -33,7 +33,7 @@ namespace db
 //  FlatRegion implementation
 
 FlatRegion::FlatRegion ()
-  : AsIfFlatRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false))
+  : MutableRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false))
 {
   init ();
 }
@@ -44,7 +44,7 @@ FlatRegion::~FlatRegion ()
 }
 
 FlatRegion::FlatRegion (const FlatRegion &other)
-  : AsIfFlatRegion (other), mp_polygons (other.mp_polygons), mp_merged_polygons (other.mp_merged_polygons)
+  : MutableRegion (other), mp_polygons (other.mp_polygons), mp_merged_polygons (other.mp_merged_polygons)
 {
   init ();
 
@@ -53,7 +53,7 @@ FlatRegion::FlatRegion (const FlatRegion &other)
 }
 
 FlatRegion::FlatRegion (const db::Shapes &polygons, bool is_merged)
-  : AsIfFlatRegion (), mp_polygons (new db::Shapes (polygons)), mp_merged_polygons (new db::Shapes (false))
+  : MutableRegion (), mp_polygons (new db::Shapes (polygons)), mp_merged_polygons (new db::Shapes (false))
 {
   init ();
 
@@ -61,7 +61,7 @@ FlatRegion::FlatRegion (const db::Shapes &polygons, bool is_merged)
 }
 
 FlatRegion::FlatRegion (bool is_merged)
-  : AsIfFlatRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false))
+  : MutableRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false))
 {
   init ();
 
@@ -410,66 +410,10 @@ void FlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, uns
 }
 
 void
-FlatRegion::insert (const db::Box &box)
-{
-  if (! box.empty () && box.width () > 0 && box.height () > 0) {
-
-    if (empty ()) {
-
-      mp_polygons->insert (db::Polygon (box));
-      m_is_merged = true;
-      update_bbox (box);
-
-    } else {
-
-      mp_polygons->insert (db::Polygon (box));
-      m_is_merged = false;
-      invalidate_cache ();
-
-    }
-
-  }
-}
-
-void
-FlatRegion::insert (const db::Path &path)
-{
-  if (path.points () > 0) {
-    mp_polygons->insert (path.polygon ());
-    m_is_merged = false;
-    invalidate_cache ();
-  }
-}
-
-void
-FlatRegion::insert (const db::Polygon &polygon)
+FlatRegion::do_insert (const db::Polygon &polygon)
 {
   if (polygon.holes () > 0 || polygon.vertices () > 0) {
     mp_polygons->insert (polygon);
-    m_is_merged = false;
-    invalidate_cache ();
-  }
-}
-
-void
-FlatRegion::insert (const db::SimplePolygon &polygon)
-{
-  if (polygon.vertices () > 0) {
-    db::Polygon poly;
-    poly.assign_hull (polygon.begin_hull (), polygon.end_hull ());
-    mp_polygons->insert (poly);
-    m_is_merged = false;
-    invalidate_cache ();
-  }
-}
-
-void
-FlatRegion::insert (const db::Shape &shape)
-{
-  if (shape.is_polygon () || shape.is_path () || shape.is_box ()) {
-    db::Polygon poly;
-    shape.polygon (poly);
-    mp_polygons->insert (poly);
     m_is_merged = false;
     invalidate_cache ();
   }

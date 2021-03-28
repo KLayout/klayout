@@ -26,7 +26,7 @@
 
 #include "dbCommon.h"
 
-#include "dbAsIfFlatRegion.h"
+#include "dbMutableRegion.h"
 #include "dbDeepShapeStore.h"
 
 namespace db {
@@ -35,7 +35,7 @@ namespace db {
  *  @brief A deep, polygon-set delegate
  */
 class DB_PUBLIC DeepRegion
-  : public AsIfFlatRegion, public DeepShapeCollectionDelegateBase
+  : public MutableRegion, public DeepShapeCollectionDelegateBase
 {
 public:
   typedef db::layer<db::Polygon, db::unstable_layer_tag> polygon_layer_type;
@@ -52,6 +52,15 @@ public:
   virtual ~DeepRegion ();
 
   RegionDelegate *clone () const;
+
+  virtual void do_insert (const db::Polygon &polygon);
+
+  virtual void do_transform (const db::Trans &t);
+  virtual void do_transform (const db::ICplxTrans &t);
+
+  virtual void flatten ();
+
+  virtual void reserve (size_t);
 
   virtual RegionIteratorDelegate *begin () const;
   virtual RegionIteratorDelegate *begin_merged () const;

@@ -21,36 +21,29 @@
 */
 
 
-#ifndef HDR_dbMutableRegion
-#define HDR_dbMutableRegion
+#ifndef HDR_dbMutableEdges
+#define HDR_dbMutableEdges
 
 #include "dbCommon.h"
 
-#include "dbAsIfFlatRegion.h"
+#include "dbAsIfFlatEdges.h"
 
 #include <set>
 
 namespace db {
 
 /**
- *  @brief An interface representing mutable regions
+ *  @brief An interface representing mutable edge collections
  *
- *  Mutable regions offer insert, transform, flatten and other manipulation functions.
+ *  Mutable edge collections offer insert, transform, flatten and other manipulation functions.
  */
-class DB_PUBLIC MutableRegion
-  : public AsIfFlatRegion
+class DB_PUBLIC MutableEdges
+  : public AsIfFlatEdges
 {
 public:
-  MutableRegion ();
-  MutableRegion (const MutableRegion &other);
-  virtual ~MutableRegion ();
-
-  virtual void do_insert (const db::Polygon &polygon) = 0;
-
-  void transform (const db::UnitTrans &) { }
-  void transform (const db::Disp &t) { do_transform (db::Trans (t)); }
-  void transform (const db::Trans &t) { do_transform (t); }
-  void transform (const db::ICplxTrans &t) { do_transform (t); }
+  MutableEdges ();
+  MutableEdges (const MutableEdges &other);
+  virtual ~MutableEdges ();
 
   virtual void do_transform (const db::Trans &t) = 0;
   virtual void do_transform (const db::ICplxTrans &t) = 0;
@@ -59,21 +52,37 @@ public:
 
   virtual void reserve (size_t n) = 0;
 
-  void insert (const db::Polygon &polygon) { do_insert (polygon); }
+  virtual void do_insert (const db::Edge &edge) = 0;
+
+  void transform (const db::UnitTrans &) { }
+  void transform (const db::Disp &t) { do_transform (db::Trans (t)); }
+  void transform (const db::Trans &t) { do_transform (t); }
+  void transform (const db::ICplxTrans &t) { do_transform (t); }
+
+  void insert (const db::Edge &edge) { do_insert (edge); }
   void insert (const db::Box &box);
   void insert (const db::Path &path);
   void insert (const db::SimplePolygon &polygon);
-
+  void insert (const db::Polygon &polygon);
   void insert (const db::Shape &shape);
 
   template <class T>
   void insert (const db::Shape &shape, const T &trans)
   {
     if (shape.is_polygon () || shape.is_path () || shape.is_box ()) {
+
       db::Polygon poly;
       shape.polygon (poly);
       poly.transform (trans);
       insert (poly);
+
+    } else if (shape.is_edge ()) {
+
+      db::Edge edge;
+      shape.edge (edge);
+      edge.transform (trans);
+      insert (edge);
+
     }
   }
 

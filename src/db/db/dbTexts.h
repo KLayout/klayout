@@ -36,7 +36,7 @@ namespace db
 {
 
 class TextFilterBase;
-class FlatTexts;
+class MutableTexts;
 class EmptyTexts;
 class Edges;
 class Region;
@@ -491,10 +491,7 @@ public:
    *
    *  This method will turn any edge pair collection into a flat one.
    */
-  void flatten ()
-  {
-    flat_texts ();
-  }
+  void flatten ();
 
   /**
    *  @brief Returns true, if the text set has valid texts stored within itself
@@ -616,7 +613,7 @@ private:
   TextsDelegate *mp_delegate;
 
   void set_delegate (TextsDelegate *delegate);
-  FlatTexts *flat_texts ();
+  MutableTexts *mutable_texts();
 };
 
 }

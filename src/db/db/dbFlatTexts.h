@@ -26,7 +26,7 @@
 
 #include "dbCommon.h"
 
-#include "dbAsIfFlatTexts.h"
+#include "dbMutableTexts.h"
 #include "dbShapes.h"
 #include "tlCopyOnWrite.h"
 
@@ -41,7 +41,7 @@ typedef generic_shapes_iterator_delegate<db::Text> FlatTextsIterator;
  *  @brief The delegate for the actual text set implementation
  */
 class DB_PUBLIC FlatTexts
-  : public AsIfFlatTexts
+  : public MutableTexts
 {
 public:
   typedef db::Text value_type;
@@ -83,40 +83,18 @@ public:
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
   virtual void insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const;
 
-  void insert (const db::Text &text);
-  void insert (const db::Shape &shape);
+  virtual void flatten () { }
 
-  template <class T>
-  void insert (const db::Shape &shape, const T &trans)
+  void do_insert (const db::Text &text);
+
+  virtual void do_transform (const db::Trans &t)
   {
-    if (shape.is_edge_pair ()) {
-
-      db::Text t;
-      shape.text (t);
-      t.transform (trans);
-      insert (t);
-
-    }
+    transform_generic (t);
   }
 
-  template <class Iter>
-  void insert_seq (const Iter &seq)
+  virtual void do_transform (const db::ICplxTrans &t)
   {
-    for (Iter i = seq; ! i.at_end (); ++i) {
-      insert (*i);
-    }
-  }
-
-  template <class Trans>
-  void transform (const Trans &trans)
-  {
-    if (! trans.is_unity ()) {
-      db::Shapes &texts = *mp_texts;
-      for (text_iterator_type p = texts.template get_layer<db::Text, db::unstable_layer_tag> ().begin (); p != texts.template get_layer<db::Text, db::unstable_layer_tag> ().end (); ++p) {
-        texts.get_layer<db::Text, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
-      }
-      invalidate_cache ();
-    }
+    transform_generic (t);
   }
 
   db::Shapes &raw_texts () { return *mp_texts; }
@@ -132,6 +110,18 @@ private:
   FlatTexts &operator= (const FlatTexts &other);
 
   mutable tl::copy_on_write_ptr<db::Shapes> mp_texts;
+
+  template <class Trans>
+  void transform_generic (const Trans &trans)
+  {
+    if (! trans.is_unity ()) {
+      db::Shapes &texts = *mp_texts;
+      for (text_iterator_type p = texts.template get_layer<db::Text, db::unstable_layer_tag> ().begin (); p != texts.template get_layer<db::Text, db::unstable_layer_tag> ().end (); ++p) {
+        texts.get_layer<db::Text, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      }
+      invalidate_cache ();
+    }
+  }
 };
 
 }

@@ -26,7 +26,7 @@
 
 #include "dbCommon.h"
 
-#include "dbAsIfFlatEdges.h"
+#include "dbMutableEdges.h"
 #include "dbDeepShapeStore.h"
 #include "dbEdgeBoolean.h"
 #include "dbEdgePairs.h"
@@ -40,7 +40,7 @@ class DeepRegion;
  *  @brief Provides hierarchical edges implementation
  */
 class DB_PUBLIC DeepEdges
-  : public db::AsIfFlatEdges, public db::DeepShapeCollectionDelegateBase
+  : public db::MutableEdges, public db::DeepShapeCollectionDelegateBase
 {
 public:
   DeepEdges ();
@@ -52,6 +52,15 @@ public:
   DeepEdges (const DeepLayer &dl);
 
   virtual ~DeepEdges ();
+
+  virtual void do_transform (const db::Trans &t);
+  virtual void do_transform (const db::ICplxTrans &t);
+
+  virtual void flatten ();
+
+  virtual void reserve (size_t n);
+
+  virtual void do_insert (const db::Edge &edge);
 
   EdgesDelegate *clone () const;
 

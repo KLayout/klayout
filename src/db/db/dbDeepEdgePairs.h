@@ -26,7 +26,7 @@
 
 #include "dbCommon.h"
 
-#include "dbAsIfFlatEdgePairs.h"
+#include "dbMutableEdgePairs.h"
 #include "dbDeepShapeStore.h"
 #include "dbEdgePairs.h"
 
@@ -36,7 +36,7 @@ namespace db {
  *  @brief Provides hierarchical edges implementation
  */
 class DB_PUBLIC DeepEdgePairs
-  : public db::AsIfFlatEdgePairs, public db::DeepShapeCollectionDelegateBase
+  : public db::MutableEdgePairs, public db::DeepShapeCollectionDelegateBase
 {
 public:
   DeepEdgePairs ();
@@ -49,6 +49,15 @@ public:
   virtual ~DeepEdgePairs ();
 
   EdgePairsDelegate *clone () const;
+
+  virtual void do_insert (const db::EdgePair &edge_pair);
+
+  virtual void do_transform (const db::Trans &t);
+  virtual void do_transform (const db::ICplxTrans &t);
+
+  virtual void flatten ();
+
+  virtual void reserve (size_t n);
 
   virtual EdgePairsIteratorDelegate *begin () const;
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const;

@@ -21,36 +21,31 @@
 */
 
 
-#ifndef HDR_dbMutableRegion
-#define HDR_dbMutableRegion
+#ifndef HDR_dbMutableTexts
+#define HDR_dbMutableTexts
 
 #include "dbCommon.h"
 
-#include "dbAsIfFlatRegion.h"
+#include "dbAsIfFlatTexts.h"
 
 #include <set>
 
 namespace db {
 
 /**
- *  @brief An interface representing mutable regions
+ *  @brief An interface representing mutable text collections 
  *
- *  Mutable regions offer insert, transform, flatten and other manipulation functions.
+ *  Mutable text collections offer insert, transform, flatten and other manipulation functions.
  */
-class DB_PUBLIC MutableRegion
-  : public AsIfFlatRegion
+class DB_PUBLIC MutableTexts
+  : public AsIfFlatTexts
 {
 public:
-  MutableRegion ();
-  MutableRegion (const MutableRegion &other);
-  virtual ~MutableRegion ();
+  MutableTexts ();
+  MutableTexts (const MutableTexts &other);
+  virtual ~MutableTexts ();
 
-  virtual void do_insert (const db::Polygon &polygon) = 0;
-
-  void transform (const db::UnitTrans &) { }
-  void transform (const db::Disp &t) { do_transform (db::Trans (t)); }
-  void transform (const db::Trans &t) { do_transform (t); }
-  void transform (const db::ICplxTrans &t) { do_transform (t); }
+  virtual void do_insert (const db::Text &text) = 0;
 
   virtual void do_transform (const db::Trans &t) = 0;
   virtual void do_transform (const db::ICplxTrans &t) = 0;
@@ -59,21 +54,21 @@ public:
 
   virtual void reserve (size_t n) = 0;
 
-  void insert (const db::Polygon &polygon) { do_insert (polygon); }
-  void insert (const db::Box &box);
-  void insert (const db::Path &path);
-  void insert (const db::SimplePolygon &polygon);
+  void transform (const db::UnitTrans &) { }
+  void transform (const db::Disp &t) { do_transform (db::Trans (t)); }
+  void transform (const db::Trans &t) { do_transform (t); }
+  void transform (const db::ICplxTrans &t) { do_transform (t); }
 
+  void insert (const db::Text &text) { do_insert (text); }
   void insert (const db::Shape &shape);
 
   template <class T>
   void insert (const db::Shape &shape, const T &trans)
   {
-    if (shape.is_polygon () || shape.is_path () || shape.is_box ()) {
-      db::Polygon poly;
-      shape.polygon (poly);
-      poly.transform (trans);
-      insert (poly);
+    if (shape.is_text ()) {
+      db::Text text = shape.text ();
+      text.transform (trans);
+      insert (text);
     }
   }
 

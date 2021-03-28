@@ -116,31 +116,31 @@ private:
 };
 
 DeepTexts::DeepTexts ()
-  : AsIfFlatTexts ()
+  : MutableTexts ()
 {
   //  .. nothing yet ..
 }
 
 DeepTexts::DeepTexts (const db::Texts &other, DeepShapeStore &dss)
-  : AsIfFlatTexts ()
+  : MutableTexts ()
 {
   set_deep_layer (dss.create_from_flat (other));
 }
 
 DeepTexts::DeepTexts (const RecursiveShapeIterator &si, DeepShapeStore &dss)
-  : AsIfFlatTexts ()
+  : MutableTexts ()
 {
   set_deep_layer (dss.create_text_layer (si));
 }
 
 DeepTexts::DeepTexts (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans)
-  : AsIfFlatTexts ()
+  : MutableTexts ()
 {
   set_deep_layer (dss.create_text_layer (si, trans));
 }
 
 DeepTexts::DeepTexts (const DeepTexts &other)
-  : AsIfFlatTexts (other), DeepShapeCollectionDelegateBase (other)
+  : MutableTexts (other), DeepShapeCollectionDelegateBase (other)
 {
   //  .. nothing yet ..
 }
@@ -156,7 +156,7 @@ DeepTexts::operator= (const DeepTexts &other)
 }
 
 DeepTexts::DeepTexts (const DeepLayer &dl)
-  : AsIfFlatTexts ()
+  : MutableTexts ()
 {
   set_deep_layer (dl);
 }
@@ -169,6 +169,74 @@ DeepTexts::~DeepTexts ()
 TextsDelegate *DeepTexts::clone () const
 {
   return new DeepTexts (*this);
+}
+
+void DeepTexts::do_insert (const db::Text &text)
+{
+  db::Layout &layout = deep_layer ().layout ();
+  if (layout.begin_top_down () != layout.end_top_down ()) {
+    db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+    top_cell.shapes (deep_layer ().layer ()).insert (db::TextRef (text, layout.shape_repository ()));
+  }
+
+  invalidate_bbox ();
+  set_is_merged (false);
+}
+
+template <class Trans>
+static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
+{
+  //  TODO: this is a pretty cheap implementation. At least a plain move can be done with orientation variants.
+
+  db::Layout &layout = deep_layer.layout ();
+  if (layout.begin_top_down () != layout.end_top_down ()) {
+
+    db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+
+    db::Shapes flat_shapes;
+    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); !iter.at_end (); ++iter) {
+      flat_shapes.insert (iter->polygon ().transformed (t));
+    }
+
+    layout.clear_layer (deep_layer.layer ());
+    top_cell.shapes (deep_layer.layer ()).swap (flat_shapes);
+
+  }
+}
+
+void DeepTexts::do_transform (const db::Trans &t)
+{
+  transform_deep_layer (deep_layer (), t);
+  invalidate_bbox ();
+}
+
+void DeepTexts::do_transform (const db::ICplxTrans &t)
+{
+  transform_deep_layer (deep_layer (), t);
+  invalidate_bbox ();
+}
+
+void DeepTexts::reserve (size_t)
+{
+  //  Not implemented for deep regions
+}
+
+void DeepTexts::flatten ()
+{
+  db::Layout &layout = deep_layer ().layout ();
+  if (layout.begin_top_down () != layout.end_top_down ()) {
+
+    db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+
+    db::Shapes flat_shapes;
+    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer ().layer ()); !iter.at_end (); ++iter) {
+      flat_shapes.insert (iter->polygon ());
+    }
+
+    layout.clear_layer (deep_layer ().layer ());
+    top_cell.shapes (deep_layer ().layer ()).swap (flat_shapes);
+
+  }
 }
 
 TextsIteratorDelegate *DeepTexts::begin () const

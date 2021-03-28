@@ -123,14 +123,14 @@ private:
 //  DeepEdges implementation
 
 DeepEdges::DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, bool as_edges)
-  : AsIfFlatEdges (), m_merged_edges ()
+  : MutableEdges (), m_merged_edges ()
 {
   set_deep_layer (dss.create_edge_layer (si, as_edges));
   init ();
 }
 
 DeepEdges::DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool as_edges, bool merged_semantics)
-  : AsIfFlatEdges (), m_merged_edges ()
+  : MutableEdges (), m_merged_edges ()
 {
   set_deep_layer (dss.create_edge_layer (si, as_edges, trans));
   init ();
@@ -138,7 +138,7 @@ DeepEdges::DeepEdges (const RecursiveShapeIterator &si, DeepShapeStore &dss, con
 }
 
 DeepEdges::DeepEdges (const db::Edges &other, DeepShapeStore &dss)
-  : AsIfFlatEdges (), m_merged_edges ()
+  : MutableEdges (), m_merged_edges ()
 {
   set_deep_layer (dss.create_from_flat (other));
 
@@ -147,13 +147,13 @@ DeepEdges::DeepEdges (const db::Edges &other, DeepShapeStore &dss)
 }
 
 DeepEdges::DeepEdges ()
-  : AsIfFlatEdges ()
+  : MutableEdges ()
 {
   init ();
 }
 
 DeepEdges::DeepEdges (const DeepLayer &dl)
-  : AsIfFlatEdges ()
+  : MutableEdges ()
 {
   set_deep_layer (dl);
   init ();
@@ -165,7 +165,7 @@ DeepEdges::~DeepEdges ()
 }
 
 DeepEdges::DeepEdges (const DeepEdges &other)
-  : AsIfFlatEdges (other), DeepShapeCollectionDelegateBase (other),
+  : MutableEdges (other), DeepShapeCollectionDelegateBase (other),
     m_merged_edges_valid (other.m_merged_edges_valid),
     m_is_merged (other.m_is_merged)
 {
@@ -209,6 +209,74 @@ DeepEdges::clone () const
 void DeepEdges::merged_semantics_changed ()
 {
   //  .. nothing yet ..
+}
+
+void DeepEdges::do_insert (const db::Edge &edge)
+{
+  db::Layout &layout = deep_layer ().layout ();
+  if (layout.begin_top_down () != layout.end_top_down ()) {
+    db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+    top_cell.shapes (deep_layer ().layer ()).insert (edge);
+  }
+
+  invalidate_bbox ();
+  set_is_merged (false);
+}
+
+template <class Trans>
+static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
+{
+  //  TODO: this is a pretty cheap implementation. At least a plain move can be done with orientation variants.
+
+  db::Layout &layout = deep_layer.layout ();
+  if (layout.begin_top_down () != layout.end_top_down ()) {
+
+    db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+
+    db::Shapes flat_shapes;
+    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); !iter.at_end (); ++iter) {
+      flat_shapes.insert (iter->polygon ().transformed (t));
+    }
+
+    layout.clear_layer (deep_layer.layer ());
+    top_cell.shapes (deep_layer.layer ()).swap (flat_shapes);
+
+  }
+}
+
+void DeepEdges::do_transform (const db::Trans &t)
+{
+  transform_deep_layer (deep_layer (), t);
+  invalidate_bbox ();
+}
+
+void DeepEdges::do_transform (const db::ICplxTrans &t)
+{
+  transform_deep_layer (deep_layer (), t);
+  invalidate_bbox ();
+}
+
+void DeepEdges::reserve (size_t)
+{
+  //  Not implemented for deep regions
+}
+
+void DeepEdges::flatten ()
+{
+  db::Layout &layout = deep_layer ().layout ();
+  if (layout.begin_top_down () != layout.end_top_down ()) {
+
+    db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+
+    db::Shapes flat_shapes;
+    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer ().layer ()); !iter.at_end (); ++iter) {
+      flat_shapes.insert (iter->polygon ());
+    }
+
+    layout.clear_layer (deep_layer ().layer ());
+    top_cell.shapes (deep_layer ().layer ()).swap (flat_shapes);
+
+  }
 }
 
 EdgesIteratorDelegate *

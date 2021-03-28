@@ -35,7 +35,7 @@
 namespace db {
 
 class EdgeFilterBase;
-class FlatEdges;
+class MutableEdges;
 class EmptyEdges;
 class DeepShapeStore;
 
@@ -1112,10 +1112,7 @@ public:
    *
    *  This method will turn any edge collection into a flat one.
    */
-  void flatten ()
-  {
-    flat_edges ();
-  }
+  void flatten ();
 
   /**
    *  @brief Returns true, if the edge set has valid edges stored within itself
@@ -1208,7 +1205,7 @@ private:
   EdgesDelegate *mp_delegate;
 
   void set_delegate (EdgesDelegate *delegate, bool keep_attributes = true);
-  FlatEdges *flat_edges ();
+  MutableEdges *mutable_edges();
 };
 
 } // namespace db

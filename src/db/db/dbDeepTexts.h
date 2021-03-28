@@ -26,7 +26,7 @@
 
 #include "dbCommon.h"
 
-#include "dbAsIfFlatTexts.h"
+#include "dbMutableTexts.h"
 #include "dbDeepShapeStore.h"
 #include "dbTexts.h"
 
@@ -36,7 +36,7 @@ namespace db {
  *  @brief Provides hierarchical edges implementation
  */
 class DB_PUBLIC DeepTexts
-  : public db::AsIfFlatTexts, public db::DeepShapeCollectionDelegateBase
+  : public db::MutableTexts, public db::DeepShapeCollectionDelegateBase
 {
 public:
   DeepTexts ();
@@ -50,6 +50,15 @@ public:
   virtual ~DeepTexts ();
 
   TextsDelegate *clone () const;
+
+  virtual void do_insert (const db::Text &text);
+
+  virtual void do_transform (const db::Trans &t);
+  virtual void do_transform (const db::ICplxTrans &t);
+
+  virtual void flatten ();
+
+  virtual void reserve (size_t n);
 
   virtual TextsIteratorDelegate *begin () const;
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const;

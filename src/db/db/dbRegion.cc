@@ -265,15 +265,15 @@ Region::rounded_corners (double rinner, double router, unsigned int n) const
 }
 
 void
-Region::smooth (coord_type d)
+Region::smooth (coord_type d, bool keep_hv)
 {
-  process (SmoothingProcessor (d));
+  process (SmoothingProcessor (d, keep_hv));
 }
 
 Region
-Region::smoothed (coord_type d) const
+Region::smoothed (coord_type d, bool keep_hv) const
 {
-  return processed (SmoothingProcessor (d));
+  return processed (SmoothingProcessor (d, keep_hv));
 }
 
 void

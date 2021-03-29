@@ -35,6 +35,8 @@ static tl::RegisteredClass<db::DeviceClassTemplateBase> dct_ind (new db::device_
 static tl::RegisteredClass<db::DeviceClassTemplateBase> dct_diode (new db::device_class_template<db::DeviceClassDiode> ("DIODE"));
 static tl::RegisteredClass<db::DeviceClassTemplateBase> dct_mos3 (new db::device_class_template<db::DeviceClassMOS3Transistor> ("MOS3"));
 static tl::RegisteredClass<db::DeviceClassTemplateBase> dct_mos4 (new db::device_class_template<db::DeviceClassMOS4Transistor> ("MOS4"));
+static tl::RegisteredClass<db::DeviceClassTemplateBase> dct_bjt3 (new db::device_class_template<db::DeviceClassBJT3Transistor> ("BJT3"));
+static tl::RegisteredClass<db::DeviceClassTemplateBase> dct_bjt4 (new db::device_class_template<db::DeviceClassBJT4Transistor> ("BJT4"));
 
 // ------------------------------------------------------------------------------------
 //  DeviceClassTwoTerminalDevice implementation

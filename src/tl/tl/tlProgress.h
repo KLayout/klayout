@@ -185,8 +185,9 @@ public:
    * 
    *  @param desc The description and title string
    *  @param yield_interval See above.
+   *  @param can_cancel If set to true, the progress may be cancelled which results in a BreakException begin raised
    */
-  Progress (const std::string &desc, size_t yield_interval = 1000);
+  Progress (const std::string &desc, size_t yield_interval = 0, bool can_cancel = true);
 
   /**
    *  @brief The destructor
@@ -227,17 +228,6 @@ public:
    *  @brief Renders the progress on the widget that was created by progress_widget
    */
   virtual void render_progress (QWidget * /*widget*/) const { }
-
-  /**
-   *  @brief Set a value indicating whether the operation can be cancelled
-   *  
-   *  The progress object will throw a BreakException is cancelled and this
-   *  flag is set to true. The default is "true".
-   */
-  void can_cancel (bool f)
-  {
-    m_can_cancel = f;
-  }
 
   /**
    *  @brief Gets a value indicating whether the operation can be cancelled
@@ -292,6 +282,14 @@ public:
    */
   void signal_break ();
 
+  /**
+   *  @brief Returns true, if a break is scheduled
+   */
+  bool break_scheduled () const
+  {
+    return m_cancelled;
+  }
+
 protected:
   /**
    *  @brief Indicates that a new value has arrived
@@ -315,14 +313,14 @@ private:
   friend class ProgressAdaptor;
   friend class ProgressGarbageCollector;
 
-  std::string m_desc;
-  bool m_final;
+  std::string m_desc, m_last_desc;
   std::string m_title;
   size_t m_interval_count;
   size_t m_yield_interval;
   double m_last_value;
   bool m_can_cancel;
   bool m_cancelled;
+  bool m_registered;
   tl::Clock m_last_yield;
 
   static tl::ProgressAdaptor *adaptor ();
@@ -385,8 +383,9 @@ public:
    *  @param desc The description and title string
    *  @param max_count The limit "max" value. 0 for absolute display of values.
    *  @param yield_interval See above.
+   *  @param can_cancel If set to true, the progress may be cancelled which results in a BreakException begin raised
    */
-  RelativeProgress (const std::string &desc, size_t max_count = 0, size_t yield_interval = 1000);
+  RelativeProgress (const std::string &desc, size_t max_count = 0, size_t yield_interval = 0, bool can_cancel = true);
 
   ~RelativeProgress ();
 
@@ -462,7 +461,7 @@ public:
    *  @param desc The description and title string
    *  @param yield_interval See above.
    */
-  AbsoluteProgress (const std::string &desc, size_t yield_interval = 1000);
+  AbsoluteProgress (const std::string &desc, size_t yield_interval = 0, bool can_cancel = true);
 
   /**
    *  @brief Destructor

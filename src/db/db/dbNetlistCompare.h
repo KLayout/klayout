@@ -64,7 +64,7 @@ public:
    *  @brief There is a device class mismatch
    *  "a" is null if there is no match for b and vice versa.
    */
-  virtual void device_class_mismatch (const db::DeviceClass * /*a*/, const db::DeviceClass * /*b*/) { }
+  virtual void device_class_mismatch (const db::DeviceClass * /*a*/, const db::DeviceClass * /*b*/, const std::string & /*msg*/ = std::string ()) { }
 
   /**
    *  @brief Begin logging for circuit a and b
@@ -74,19 +74,19 @@ public:
   /**
    *  @brief End logging for circuit a and b
    */
-  virtual void end_circuit (const db::Circuit * /*a*/, const db::Circuit * /*b*/, bool /*matching*/) { }
+  virtual void end_circuit (const db::Circuit * /*a*/, const db::Circuit * /*b*/, bool /*matching*/, const std::string & /*msg*/ = std::string ()) { }
 
   /**
    *  @brief Circuits are skipped
    *  Circuits are skipped if their subcircuits could not be matched.
    */
-  virtual void circuit_skipped (const db::Circuit * /*a*/, const db::Circuit * /*b*/) { }
+  virtual void circuit_skipped (const db::Circuit * /*a*/, const db::Circuit * /*b*/, const std::string & /*msg*/ = std::string ()) { }
 
   /**
    *  @brief There is a circuit mismatch
    *  "a" is null if there is no match for b and vice versa.
    */
-  virtual void circuit_mismatch (const db::Circuit * /*a*/, const db::Circuit * /*b*/) { }
+  virtual void circuit_mismatch (const db::Circuit * /*a*/, const db::Circuit * /*b*/, const std::string & /*msg*/ = std::string ()) { }
 
   /**
    *  @brief Nets a and b match exactly
@@ -98,7 +98,7 @@ public:
    *  Other nets might also match with a and also with b. Matching this a and b is
    *  an arbitrary decision.
    */
-  virtual void match_ambiguous_nets (const db::Net * /*a*/, const db::Net * /*b*/) { }
+  virtual void match_ambiguous_nets (const db::Net * /*a*/, const db::Net * /*b*/, const std::string & /*msg*/ = std::string ()) { }
 
   /**
    *  @brief Net a or b doesn't match
@@ -107,7 +107,7 @@ public:
    *  nets are known not to match. Still the compare algorithm will proceed as
    *  if these nets were equivalent to derive further matches.
    */
-  virtual void net_mismatch (const db::Net * /*a*/, const db::Net * /*b*/) { }
+  virtual void net_mismatch (const db::Net * /*a*/, const db::Net * /*b*/, const std::string & /*msg*/ = std::string ()) { }
 
   /**
    *  @brief Devices a and b match exactly
@@ -128,7 +128,7 @@ public:
    *  @brief Device a or b doesn't match
    *  "a" is null if there is no match for b and vice versa.
    */
-  virtual void device_mismatch (const db::Device * /*a*/, const db::Device * /*b*/) { }
+  virtual void device_mismatch (const db::Device * /*a*/, const db::Device * /*b*/, const std::string & /*msg*/ = std::string ()) { }
 
   /**
    *  @brief Pins a and b of the current circuit are matched
@@ -139,7 +139,7 @@ public:
    *  @brief Pin a or b doesn't match
    *  "a" is null if there is no match for b and vice versa.
    */
-  virtual void pin_mismatch (const db::Pin * /*a*/, const db::Pin * /*b*/) { }
+  virtual void pin_mismatch (const db::Pin * /*a*/, const db::Pin * /*b*/, const std::string & /*msg*/ = std::string ()) { }
 
   /**
    *  @brief Subcircuits a and b match exactly
@@ -150,7 +150,7 @@ public:
    *  @brief SubCircuit a or b doesn't match
    *  "a" is null if there is no match for b and vice versa.
    */
-  virtual void subcircuit_mismatch (const db::SubCircuit * /*a*/, const db::SubCircuit * /*b*/) { }
+  virtual void subcircuit_mismatch (const db::SubCircuit * /*a*/, const db::SubCircuit * /*b*/, const std::string & /*msg*/ = std::string ()) { }
 
 private:
   //  No copying
@@ -346,6 +346,7 @@ private:
 protected:
   bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, db::CircuitPinMapper &circuit_pin_mapper, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const;
   bool all_subcircuits_verified (const db::Circuit *c, const std::set<const db::Circuit *> &verified_circuits) const;
+  std::string generate_subcircuits_not_verified_warning (const db::Circuit *ca, const std::set<const db::Circuit *> &verified_circuits_a, const db::Circuit *cb, const std::set<const db::Circuit *> &verified_circuits_b) const;
   static void derive_pin_equivalence (const db::Circuit *ca, const db::Circuit *cb, CircuitPinMapper *circuit_pin_mapper);
   void do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, bool &pin_mismatch, bool &good) const;
   void do_device_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, const db::DeviceFilter &device_filter, DeviceCategorizer &device_categorizer, db::DeviceEquivalenceTracker &device_eq, bool &good) const;

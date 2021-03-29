@@ -732,6 +732,8 @@ type_to_s (const gsi::ArgType &a, bool linked, bool for_return)
     s += "float"; break;
   case gsi::T_string:
     s += "string"; break;
+  case gsi::T_byte_array:
+    s += "bytes"; break;
   case gsi::T_var:
     s += "variant"; break;
   case gsi::T_object:

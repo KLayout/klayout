@@ -199,6 +199,7 @@ LibrariesView::LibrariesView (lay::LayoutView *view, QWidget *parent, const char
   : QFrame (parent),
     m_enable_cb (true),
     mp_view (view),
+    m_active_index (-1),
     m_split_mode (false),
     m_do_update_content_dm (this, &LibrariesView::do_update_content),
     m_do_full_update_content_dm (this, &LibrariesView::do_full_update_content)

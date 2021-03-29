@@ -59,24 +59,24 @@ public:
   virtual circuit_pair parent_of (const device_pair &device_pair) const;
   virtual circuit_pair parent_of (const subcircuit_pair &subcircuit_pair) const;
 
-  virtual std::pair<circuit_pair, Status> top_circuit_from_index (size_t index) const;
-  virtual std::pair<circuit_pair, Status> circuit_from_index (size_t index) const;
-  virtual std::pair<circuit_pair, Status> child_circuit_from_index (const circuit_pair &circuits, size_t index) const;
-  virtual std::pair<net_pair, Status> net_from_index (const circuit_pair &circuits, size_t index) const;
+  virtual std::pair<circuit_pair, std::pair<Status, std::string> > top_circuit_from_index(size_t index) const;
+  virtual std::pair<circuit_pair, std::pair<Status, std::string> > circuit_from_index (size_t index) const;
+  virtual std::pair<circuit_pair, std::pair<Status, std::string> > child_circuit_from_index(const circuit_pair &circuits, size_t index) const;
+  virtual std::pair<net_pair, std::pair<Status, std::string> > net_from_index (const circuit_pair &circuits, size_t index) const;
   virtual const db::Net *second_net_for (const db::Net *first) const;
   virtual const db::Circuit *second_circuit_for (const db::Circuit *first) const;
   virtual net_subcircuit_pin_pair net_subcircuit_pinref_from_index (const net_pair &nets, size_t index) const;
   virtual net_subcircuit_pin_pair subcircuit_pinref_from_index (const subcircuit_pair &nets, size_t index) const;
   virtual net_terminal_pair net_terminalref_from_index (const net_pair &nets, size_t index) const;
   virtual net_pin_pair net_pinref_from_index (const net_pair &nets, size_t index) const;
-  virtual std::pair<device_pair, Status> device_from_index (const circuit_pair &circuits, size_t index) const;
-  virtual std::pair<pin_pair, Status> pin_from_index (const circuit_pair &circuits, size_t index) const;
-  virtual std::pair<subcircuit_pair, Status> subcircuit_from_index (const circuit_pair &circuits, size_t index) const;
+  virtual std::pair<device_pair, std::pair<Status, std::string> > device_from_index (const circuit_pair &circuits, size_t index) const;
+  virtual std::pair<pin_pair, std::pair<Status, std::string> > pin_from_index (const circuit_pair &circuits, size_t index) const;
+  virtual std::pair<subcircuit_pair, std::pair<Status, std::string> > subcircuit_from_index (const circuit_pair &circuits, size_t index) const;
 
   virtual std::string top_circuit_status_hint (size_t index) const;
   virtual std::string circuit_status_hint (size_t index) const;
   virtual std::string child_circuit_status_hint (const circuit_pair &circuits, size_t index) const;
-  virtual std::string circuit_pair_status_hint (const std::pair<circuit_pair, Status> &cp) const;
+  virtual std::string circuit_pair_status_hint (const std::pair<circuit_pair, std::pair<Status, std::string> > &cp) const;
   virtual std::string net_status_hint (const circuit_pair &circuits, size_t index) const;
   virtual std::string device_status_hint (const circuit_pair &circuits, size_t index) const;
   virtual std::string pin_status_hint (const circuit_pair &circuits, size_t index) const;

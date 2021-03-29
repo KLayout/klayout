@@ -26,6 +26,7 @@
 
 #include "ui_LogViewerDialog.h"
 #include "tlLog.h"
+#include "tlTimer.h"
 #include "layCommon.h"
 
 #include <QTimer>
@@ -227,6 +228,7 @@ private:
   size_t m_last_generation_id;
   bool m_has_errors, m_has_warnings;
   bool m_last_attn;
+  tl::Clock m_last_yield;
 
   /**
    *  @brief Adds an error

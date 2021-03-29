@@ -10,11 +10,33 @@ b = input(2, 0)
 a.output(1, 0)
 b.output(2, 0)
 
+def split_vs_normal(r, f1, f2, *args)
+  d1 = r.send(f1, *args)[0].data
+  d2 = r.send(f2, *args).data
+  d1.each.collect(&:to_s).sort == d2.each.collect(&:to_s).sort || raise("#{f1.to_s} vs. #{f2.to_s} check failed: #{d1.to_s} != #{d2.to_s}")
+end
+
+def splitn_vs_normal(r, f1, f2, *args)
+  d1 = r.send(f1, *args)[1].data
+  d2 = r.send(f2, *args).data
+  d1.each.collect(&:to_s).sort == d2.each.collect(&:to_s).sort || raise("#{f1.to_s} vs. #{f2.to_s} check failed: #{d1.to_s} != #{d2.to_s}")
+end
+
 a.covering(b).output(100, 0)
 a.covering(b, 1..1).output(101, 0)
 a.covering(b, 2..2).output(102, 0)
 a.covering(b, 3..3).output(103, 0)
 b.inside(a).output(110, 0)
+a.not_covering(b).output(120, 0)
+b.not_inside(a).output(130, 0)
+
+split_vs_normal(a, :split_covering, :covering, b)
+split_vs_normal(a, :split_covering, :covering, b, 1..1)
+split_vs_normal(a, :split_covering, :covering, b, 2..2)
+split_vs_normal(a, :split_covering, :covering, b, 3..3)
+split_vs_normal(b, :split_inside, :inside, a)
+splitn_vs_normal(a, :split_covering, :not_covering, b)
+splitn_vs_normal(b, :split_inside, :not_inside, a)
 
 deep
 
@@ -26,4 +48,14 @@ a.covering(b, 1..1).output(201, 0)
 a.covering(b, 2..2).output(202, 0)
 a.covering(b, 3..3).output(203, 0)
 b.inside(a).output(210, 0)
+a.not_covering(b).output(220, 0)
+b.not_inside(a).output(230, 0)
+
+split_vs_normal(a, :split_covering, :covering, b)
+split_vs_normal(a, :split_covering, :covering, b, 1..1)
+split_vs_normal(a, :split_covering, :covering, b, 2..2)
+split_vs_normal(a, :split_covering, :covering, b, 3..3)
+split_vs_normal(b, :split_inside, :inside, a)
+splitn_vs_normal(a, :split_covering, :not_covering, b)
+splitn_vs_normal(b, :split_inside, :not_inside, a)
 

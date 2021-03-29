@@ -421,9 +421,9 @@ LayerTreeModel::signal_begin_layer_changed ()
 }
 
 void 
-LayerTreeModel::signal_layer_changed () 
+LayerTreeModel::signal_layers_changed ()
 {
-  // establish a new range of valid iterator indices
+  //  establish a new range of valid iterator indices
   m_id_start = m_id_end; 
 
   //  TODO: is there a more efficient way to compute that?
@@ -432,6 +432,21 @@ LayerTreeModel::signal_layer_changed ()
     max_id = std::max (iter.uint (), max_id);
   }
   m_id_end += max_id + 1;
+
+  //  update the persistent indexes
+
+  QModelIndexList indexes = persistentIndexList ();
+  QModelIndexList new_indexes;
+  for (QModelIndexList::const_iterator i = indexes.begin (); i != indexes.end (); ++i) {
+    lay::LayerPropertiesConstIterator li = iterator (*i);
+    if (! li.at_end ()) {
+      new_indexes.push_back (createIndex (li.child_index (), i->column (), (void *) (li.uint () + m_id_start)));
+    } else {
+      new_indexes.push_back (QModelIndex ());
+    }
+  }
+
+  changePersistentIndexList (indexes, new_indexes);
 
   m_test_shapes_cache.clear ();
   emit layoutChanged ();

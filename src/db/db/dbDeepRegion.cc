@@ -1519,9 +1519,67 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, c
   return res.release ();
 }
 
-RegionDelegate *
-DeepRegion::selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse, size_t min_count, size_t max_count) const
+namespace
 {
+
+class InteractingResultHolder
+{
+public:
+  InteractingResultHolder (InteractingOutputMode output_mode, bool is_merged, const db::DeepLayer &polygons)
+    : m_output_mode (output_mode), m_is_merged (is_merged)
+  {
+    if (m_output_mode == Positive || m_output_mode == Negative) {
+      m_dl1 = db::DeepLayer (polygons.derived ());
+    } else if (m_output_mode == PositiveAndNegative) {
+      m_dl1 = db::DeepLayer (polygons.derived ());
+      m_dl2 = db::DeepLayer (polygons.derived ());
+    }
+  }
+
+  std::vector<unsigned int> layers () const
+  {
+    std::vector<unsigned int> l;
+    if (m_output_mode == Positive || m_output_mode == Negative) {
+      l.push_back (m_dl1.layer ());
+    } else if (m_output_mode == PositiveAndNegative) {
+      l.push_back (m_dl1.layer ());
+      l.push_back (m_dl2.layer ());
+    }
+    return l;
+  }
+
+  std::pair<RegionDelegate *, RegionDelegate *> result_pair ()
+  {
+    if (m_output_mode == Positive || m_output_mode == Negative) {
+      db::DeepRegion *res = new db::DeepRegion (m_dl1);
+      res->set_is_merged (m_is_merged);
+      return std::pair<RegionDelegate *, RegionDelegate *> (res, 0);
+    } else if (m_output_mode == PositiveAndNegative) {
+      db::DeepRegion *res1 = new db::DeepRegion (m_dl1);
+      res1->set_is_merged (m_is_merged);
+      db::DeepRegion *res2 = new db::DeepRegion (m_dl2);
+      res2->set_is_merged (m_is_merged);
+      return std::pair<RegionDelegate *, RegionDelegate *> (res1, res2);
+    } else {
+      return std::pair<RegionDelegate *, RegionDelegate *> (0, 0);
+    }
+  }
+
+private:
+  InteractingOutputMode m_output_mode;
+  bool m_is_merged;
+  DeepLayer m_dl1, m_dl2;
+};
+
+}
+
+std::pair<RegionDelegate *, RegionDelegate *>
+DeepRegion::selected_interacting_generic (const Region &other, int mode, bool touching, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
+{
+  if (output_mode == None) {
+    return std::pair<RegionDelegate *, RegionDelegate *> (0, 0);
+  }
+
   bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   //  with these flag set to true, the resulting polygons are broken again.
@@ -1539,9 +1597,7 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
   //  NOTE: on "inside" or with counting, the other polygons must be merged
   const db::DeepLayer &other_polygons = (mode < 0 || counting) ? other_deep->merged_deep_layer () : other_deep->deep_layer ();
 
-  DeepLayer dl_out (polygons.derived ());
-
-  db::InteractingLocalOperation op (mode, touching, inverse, min_count, max_count, true);
+  db::InteractingLocalOperation op (mode, touching, output_mode, min_count, max_count, true);
 
   db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell (), polygons.breakout_cells (), other_polygons.breakout_cells ());
   proc.set_description (progress_desc ());
@@ -1553,17 +1609,16 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
     proc.set_max_vertex_count (polygons.store ()->max_vertex_count ());
   }
 
-  proc.run (&op, polygons.layer (), other_polygons.layer (), dl_out.layer ());
+  bool result_is_merged = (! split_after && ((mode < 0 && other.merged_semantics ()) || other.is_merged ()) && (merged_semantics () || is_merged ()));
+  InteractingResultHolder orh (output_mode, result_is_merged, polygons);
 
-  db::DeepRegion *res = new db::DeepRegion (dl_out);
-  if (! split_after && ((mode < 0 && other.merged_semantics ()) || other.is_merged ()) && (merged_semantics () || is_merged ())) {
-    res->set_is_merged (true);
-  }
-  return res;
+  proc.run (&op, polygons.layer (), other_polygons.layer (), orh.layers ());
+
+  return orh.result_pair ();
 }
 
-RegionDelegate *
-DeepRegion::selected_interacting_generic (const Edges &other, bool inverse, size_t min_count, size_t max_count) const
+std::pair<RegionDelegate *, RegionDelegate *>
+DeepRegion::selected_interacting_generic (const Edges &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
   bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
@@ -1580,9 +1635,7 @@ DeepRegion::selected_interacting_generic (const Edges &other, bool inverse, size
 
   const db::DeepLayer &polygons = merged_deep_layer ();
 
-  DeepLayer dl_out (polygons.derived ());
-
-  db::InteractingWithEdgeLocalOperation op (inverse, min_count, max_count, true);
+  db::InteractingWithEdgeLocalOperation op (output_mode, min_count, max_count, true);
 
   db::local_processor<db::PolygonRef, db::Edge, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), polygons.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_description (progress_desc ());
@@ -1594,13 +1647,12 @@ DeepRegion::selected_interacting_generic (const Edges &other, bool inverse, size
     proc.set_max_vertex_count (polygons.store ()->max_vertex_count ());
   }
 
-  proc.run (&op, polygons.layer (), counting ? other_deep->merged_deep_layer ().layer () : other_deep->deep_layer ().layer (), dl_out.layer ());
+  bool result_is_merged = (! split_after && other.is_merged () && (merged_semantics () || is_merged ()));
+  InteractingResultHolder orh (output_mode, result_is_merged, polygons);
 
-  db::DeepRegion *res = new db::DeepRegion (dl_out);
-  if (! split_after) {
-    res->set_is_merged (other.is_merged () && (merged_semantics () || is_merged ()));
-  }
-  return res;
+  proc.run (&op, polygons.layer (), counting ? other_deep->merged_deep_layer ().layer () : other_deep->deep_layer ().layer (), orh.layers ());
+
+  return orh.result_pair ();
 }
 
 RegionDelegate *
@@ -1706,8 +1758,9 @@ DeepRegion::pull_generic (const Texts &other) const
   return res;
 }
 
-RegionDelegate *
-DeepRegion::selected_interacting_generic (const Texts &other, bool inverse, size_t min_count, size_t max_count) const
+
+std::pair<RegionDelegate *, RegionDelegate *>
+DeepRegion::selected_interacting_generic (const Texts &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
@@ -1722,9 +1775,7 @@ DeepRegion::selected_interacting_generic (const Texts &other, bool inverse, size
 
   const db::DeepLayer &polygons = merged_deep_layer ();
 
-  DeepLayer dl_out (polygons.derived ());
-
-  db::InteractingWithTextLocalOperation op (inverse, min_count, max_count);
+  db::InteractingWithTextLocalOperation op (output_mode, min_count, max_count);
 
   db::local_processor<db::PolygonRef, db::TextRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), polygons.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_description (progress_desc ());
@@ -1736,13 +1787,12 @@ DeepRegion::selected_interacting_generic (const Texts &other, bool inverse, size
     proc.set_max_vertex_count (polygons.store ()->max_vertex_count ());
   }
 
-  proc.run (&op, polygons.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
+  bool result_is_merged = (! split_after && (merged_semantics () || is_merged ()));
+  InteractingResultHolder orh (output_mode, result_is_merged, polygons);
 
-  db::DeepRegion *res = new db::DeepRegion (dl_out);
-  if (! split_after) {
-    res->set_is_merged (merged_semantics () || is_merged ());
-  }
-  return res;
+  proc.run (&op, polygons.layer (), other_deep->deep_layer ().layer (), orh.layers ());
+
+  return orh.result_pair ();
 }
 
 }

@@ -322,5 +322,55 @@ module DRC
     end
   end
 
+  # A wrapper for the tile_size option
+  class DRCTileSize
+    def initialize(*args)
+      @xy = args
+    end
+    def get
+      @xy
+    end
+  end
+ 
+  # A wrapper for the tile_step option
+  class DRCTileStep
+    def initialize(*args)
+      @xy = args
+    end
+    def get
+      @xy
+    end
+  end
+ 
+  # A wrapper for the tile_origin option
+  class DRCTileOrigin
+    def initialize(*args)
+      @xy = args
+    end
+    def get
+      @xy
+    end
+  end
+ 
+  # A wrapper for the tile_count option
+  class DRCTileCount
+    def initialize(*args)
+      @xy = args
+    end
+    def get
+      @xy
+    end
+  end
+ 
+  # A wrapper for the tile_boundary option
+  class DRCTileBoundary
+    def initialize(layer)
+      @b = layer
+    end
+    def get
+      @b
+    end
+  end
+
 end
 

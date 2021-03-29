@@ -266,7 +266,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  setObjectName (QString::fromUtf8 (name));
+  setObjectName (QString::fromUtf8(name));
   init (manager, parent);
 }
 
@@ -2859,6 +2859,8 @@ LayoutView::add_new_layers (const std::vector <unsigned int> &layer_ids, int cv_
     //  create the layers and do a basic recoloring ..
     lay::LayerPropertiesList new_props (get_properties ());
 
+    bool was_empty = new_props.begin_const_recursive ().at_end ();
+
     //  don't create new layers for those, for which there are layers already: compute a 
     //  set of layers already present
     std::set <db::LayerProperties, db::LPLogicalLessFunc> present_layers;
@@ -2889,6 +2891,10 @@ LayoutView::add_new_layers (const std::vector <unsigned int> &layer_ids, int cv_
     }
 
     set_properties (new_props);
+
+    if (was_empty) {
+      set_current_layer (new_props.begin_const_recursive ());
+    }
 
   }
 }
@@ -3291,6 +3297,18 @@ LayoutView::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview, boo
 
     }
 
+    //  select the first layer if nothing else is selected
+    if (cv_index == 0 && ! mp_control_panel->has_selection ()) {
+      const lay::LayerPropertiesList &lp = get_properties ();
+      lay::LayerPropertiesConstIterator li = lp.begin_const_recursive ();
+      while (! li.at_end () && li->has_children ()) {
+        ++li;
+      }
+      if (! li.at_end ()) {
+        mp_control_panel->set_current_layer (li);
+      }
+    }
+
     //  signal to any observers
     file_open_event ();
 
@@ -3455,6 +3473,18 @@ LayoutView::load_layout (const std::string &filename, const db::LoadLayoutOption
 
     //  create the initial layer properties
     create_initial_layer_props (cv_index, lyp_file, add_other_layers);
+
+    //  select the first layer if nothing else is selected
+    if (cv_index == 0 && ! mp_control_panel->has_selection ()) {
+      const lay::LayerPropertiesList &lp = get_properties ();
+      lay::LayerPropertiesConstIterator li = lp.begin_const_recursive ();
+      while (! li.at_end () && li->has_children ()) {
+        ++li;
+      }
+      if (! li.at_end ()) {
+        mp_control_panel->set_current_layer (li);
+      }
+    }
 
     //  signal to any observers
     file_open_event ();
@@ -3942,6 +3972,8 @@ LayoutView::cancel ()
 {
   //  cancel all drags and pending edit operations such as move operations.
   cancel_edits ();
+  //  re-enable edit mode
+  enable_edits (true);
   //  and clear the selection
   clear_selection ();
 }

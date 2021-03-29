@@ -1219,8 +1219,8 @@ TEST(100)
   db::Polygon p;
   p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
 
-  EXPECT_EQ (smooth (p, 5).to_string (),  "(0,-100;0,0;50,10;100,-10;150,0;150,-100)");
-  EXPECT_EQ (smooth (p, 20).to_string (), "(0,-100;0,0;150,0;150,-100)");
+  EXPECT_EQ (smooth (p, 5, true).to_string (),  "(0,-100;0,0;50,10;100,-10;150,0;150,-100)");
+  EXPECT_EQ (smooth (p, 20, true).to_string (), "(0,-100;0,0;150,0;150,-100)");
 }
 
 //  smoothing
@@ -1238,8 +1238,8 @@ TEST(101)
   db::Polygon p;
   p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
 
-  EXPECT_EQ (smooth (p, 5).to_string (),  "(100,-10;50,10;0,0;0,100;150,100;150,0)");
-  EXPECT_EQ (smooth (p, 20).to_string (), "(0,0;0,100;150,100;150,0)");
+  EXPECT_EQ (smooth (p, 5, true).to_string (),  "(100,-10;50,10;0,0;0,100;150,100;150,0)");
+  EXPECT_EQ (smooth (p, 20, true).to_string (), "(0,0;0,100;150,100;150,0)");
 }
 
 //  smoothing
@@ -1255,8 +1255,8 @@ TEST(102)
   db::Polygon p;
   p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
 
-  EXPECT_EQ (smooth (p, 20).to_string (),  "()");
-  EXPECT_EQ (smooth (p, 5).to_string (), "(100,-10;150,0;0,0;50,10)");
+  EXPECT_EQ (smooth (p, 20, true).to_string (),  "()");
+  EXPECT_EQ (smooth (p, 5, true).to_string (), "(100,-10;150,0;0,0;50,10)");
 }
 
 //  smoothing
@@ -1282,9 +1282,9 @@ TEST(103)
   db::Polygon p;
   p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
 
-  EXPECT_EQ (smooth (p, 0).to_string (),  "(59881,-249925;56852,-237283;56961,-237258;60061,-236492;63152,-235686;66231,-234839;69300,-233952;69407,-233919;73105,-246382;72992,-246417;69760,-247351;66516,-248243;63261,-249092;59995,-249899)");
-  EXPECT_EQ (smooth (p, 50).to_string (),  "(59881,-249925;56852,-237283;63152,-235686;69407,-233919;73105,-246382;69760,-247351)");
-  EXPECT_EQ (smooth (p, 5000).to_string (),  "(59881,-249925;56852,-237283;69407,-233919;73105,-246382)");
+  EXPECT_EQ (smooth (p, 0, true).to_string (),  "(59881,-249925;56852,-237283;56961,-237258;60061,-236492;63152,-235686;66231,-234839;69300,-233952;69407,-233919;73105,-246382;72992,-246417;69760,-247351;66516,-248243;63261,-249092;59995,-249899)");
+  EXPECT_EQ (smooth (p, 50, true).to_string (),  "(59881,-249925;56852,-237283;63152,-235686;69407,-233919;73105,-246382;69760,-247351)");
+  EXPECT_EQ (smooth (p, 5000, true).to_string (),  "(59881,-249925;56852,-237283;69407,-233919;73105,-246382)");
 }
 
 //  smoothing
@@ -1303,7 +1303,8 @@ TEST(104)
   db::Polygon p;
   p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
 
-  EXPECT_EQ (smooth (p, 12).to_string (),  "(-244,-942;-942,-246;248,943;943,246)");
+  EXPECT_EQ (smooth (p, 12, false).to_string (),  "(-244,-942;-942,-246;248,943;943,246)");
+  EXPECT_EQ (smooth (p, 12, true).to_string (),  "(-245,-942;-942,-247;-942,-246;247,943;248,943;943,246;-244,-942)");
 }
 
 //  smoothing
@@ -1323,11 +1324,46 @@ TEST(105)
   db::Polygon p;
   p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
 
-  EXPECT_EQ (smooth (p, 0).to_string (),  "(0,0;0,1000;100,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
-  EXPECT_EQ (smooth (p, 50).to_string (),  "(0,0;0,1000;100,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
-  EXPECT_EQ (smooth (p, 80).to_string (),  "(0,0;0,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
-  EXPECT_EQ (smooth (p, 90).to_string (),  "(0,0;100,1100;800,1100;800,1000;2000,1000;2000,0)");
-  EXPECT_EQ (smooth (p, 100).to_string (),  "(0,0;0,1000;2000,1000;2000,0)");
+  EXPECT_EQ (smooth (p, 0, false).to_string (),  "(0,0;0,1000;100,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
+  EXPECT_EQ (smooth (p, 50, false).to_string (),  "(0,0;0,1000;100,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
+  EXPECT_EQ (smooth (p, 80, false).to_string (),  "(0,0;0,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
+  EXPECT_EQ (smooth (p, 90, false).to_string (),  "(0,0;100,1100;800,1100;800,1000;2000,1000;2000,0)");
+  EXPECT_EQ (smooth (p, 100, false).to_string (),  "(0,0;0,1000;2000,1000;2000,0)");
+  EXPECT_EQ (smooth (p, 100, true).to_string (),  "(0,0;0,1000;100,1000;100,1100;800,1100;800,1000;2000,1000;2000,0)");
+}
+
+//  smoothing
+TEST(106)
+{
+  db::Point pattern [] = {
+    db::Point (0, 0),
+    db::Point (0, 73235),
+    db::Point (100, 74568),
+    db::Point (700, 82468),
+    db::Point (1200, 90468),
+    db::Point (2000, 106468),
+    db::Point (2300, 114468),
+    db::Point (2700, 130468),
+    db::Point (2800, 138468),
+    db::Point (2800, 154468),
+    db::Point (2700, 162468),
+    db::Point (2300, 178468),
+    db::Point (2000, 186468),
+    db::Point (1200, 202468),
+    db::Point (700, 210468),
+    db::Point (100, 218368),
+    db::Point (0, 219701),
+    db::Point (0, 272971),
+    db::Point (126450, 272971),
+    db::Point (126450, 0),
+  };
+
+  db::Polygon p;
+  p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
+
+  EXPECT_EQ (smooth (p, 0, false).to_string (),  "(0,0;0,73235;100,74568;700,82468;1200,90468;2000,106468;2300,114468;2700,130468;2800,138468;2800,154468;2700,162468;2300,178468;2000,186468;1200,202468;700,210468;100,218368;0,219701;0,272971;126450,272971;126450,0)");
+  EXPECT_EQ (smooth (p, 100, false).to_string (),  "(0,0;100,74568;1200,90468;2300,114468;2800,138468;2700,162468;2000,186468;700,210468;0,219701;0,272971;126450,272971;126450,0)");
+  EXPECT_EQ (smooth (p, 100, true).to_string (),  "(0,0;0,73235;1200,90468;2300,114468;2800,138468;2800,154468;2000,186468;700,210468;0,219701;0,272971;126450,272971;126450,0)");
 }
 
 //  rounding
@@ -1532,7 +1568,7 @@ TEST(203)
   in.push_back (pp);
   ep.simple_merge (in, out, false /*no cut line*/);
   pp = out.front ();
-  pp = smooth (pp, 1);
+  pp = smooth (pp, 1, true);
 
   EXPECT_EQ (pp.hull ().size (), size_t (300));
   EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
@@ -1578,7 +1614,7 @@ TEST(204)
   in.push_back (pp);
   ep.simple_merge (in, out, false /*no cut line*/);
   pp = out.front ();
-  pp = smooth (pp, 1);
+  pp = smooth (pp, 1, true);
 
   EXPECT_EQ (pp.hull ().size (), size_t (200));
   EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);

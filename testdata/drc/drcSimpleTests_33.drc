@@ -1,0 +1,34 @@
+
+source $drc_test_source
+target $drc_test_target
+
+tiles(10.um)
+
+global_transform(magnify(2.0), shift(10.um, 20.um))
+
+# The actual DRC test
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+l1.merged.output(10, 0)
+l1.sized(100.nm).output(11, 0)
+l2.sized(100.nm).output(12, 0)
+
+# reset
+global_transform
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+
+l1.output(101, 0)
+l2.output(102, 0)
+
+l1.merged.output(110, 0)
+l1.sized(100.nm).output(111, 0)
+l2.sized(100.nm).output(112, 0)
+

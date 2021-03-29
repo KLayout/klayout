@@ -868,14 +868,14 @@ StrangePolygonCheckProcessor::process (const db::Polygon &poly, std::vector<db::
 // -------------------------------------------------------------------------------------------------------------
 //  Smoothing processor
 
-SmoothingProcessor::SmoothingProcessor (db::Coord d) : m_d (d) { }
+SmoothingProcessor::SmoothingProcessor (db::Coord d, bool keep_hv) : m_d (d), m_keep_hv (keep_hv) { }
 
 SmoothingProcessor::~SmoothingProcessor () { }
 
 void
 SmoothingProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
 {
-  res.push_back (db::smooth (poly, m_d));
+  res.push_back (db::smooth (poly, m_d, m_keep_hv));
 }
 
 // -------------------------------------------------------------------------------------------------------------

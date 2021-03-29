@@ -204,10 +204,10 @@ LayerControlPanel::LayerControlPanel (lay::LayoutView *view, db::Manager *manage
     mp_view (view), 
     m_needs_update (true), 
     m_tabs_need_update (true), 
+    m_hidden_flags_need_update (true),
     m_in_update (false),
     m_phase (0), 
     m_do_update_content_dm (this, &LayerControlPanel::do_update_content),
-    m_do_update_hidden_flags_dm (this, &LayerControlPanel::do_update_hidden_flags),
     m_no_stipples (false)
 {
   setObjectName (QString::fromUtf8 (name));
@@ -1661,7 +1661,8 @@ LayerControlPanel::set_text_color (QColor c)
 void
 LayerControlPanel::update_hidden_flags ()
 {
-  m_do_update_hidden_flags_dm ();
+  m_hidden_flags_need_update = true;
+  m_do_update_content_dm ();
 }
 
 void
@@ -1688,6 +1689,7 @@ LayerControlPanel::begin_updates ()
   if (! m_in_update) {
 
     m_in_update = true;
+    m_hidden_flags_need_update = true;
 
     mp_model->signal_begin_layer_changed ();  //  this makes the view redraw the data
 
@@ -1718,6 +1720,7 @@ LayerControlPanel::cancel_updates ()
 {
   m_in_update = false;
   m_needs_update = false;
+  m_hidden_flags_need_update = false;
   m_tabs_need_update = false;
 }
 
@@ -1833,7 +1836,7 @@ LayerControlPanel::do_update_content ()
     mp_layer_list->setCurrentIndex(QModelIndex());
 
     //  this makes the view redraw the data and establishes a valid selection scheme
-    mp_model->signal_layer_changed ();  
+    mp_model->signal_layers_changed ();
 
     //  now realize the selection if required
     if (! m_new_sel.empty ()) {
@@ -1874,6 +1877,14 @@ LayerControlPanel::do_update_content ()
 
   } else {
     mp_model->signal_data_changed ();  //  this makes the view redraw the data
+  }
+
+  if (m_hidden_flags_need_update) {
+
+    do_update_hidden_flags ();
+
+    m_hidden_flags_need_update = false;
+
   }
 }
 
@@ -2007,7 +2018,7 @@ LayerControlPanel::update_required (int f)
   }
 
   if ((f & 3) != 0) {
-    m_do_update_hidden_flags_dm ();
+    m_hidden_flags_need_update = true;
   }
 
   m_do_update_content_dm ();

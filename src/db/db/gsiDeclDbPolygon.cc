@@ -1602,9 +1602,9 @@ static db::Polygon transformed_icplx_dp (const db::Polygon *p, const db::ICplxTr
   return p->transformed (t, false /*don't compress*/);
 }
 
-static db::Polygon smooth (const db::Polygon *p, db::Coord d)
+static db::Polygon smooth (const db::Polygon *p, db::Coord d, bool keep_hv)
 {
-  return db::smooth (*p, d);
+  return db::smooth (*p, d, keep_hv);
 }
 
 static db::Polygon minkowsky_sum_pe (const db::Polygon *p, const db::Edge &e, bool rh)
@@ -1787,17 +1787,18 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("smooth", &smooth, gsi::arg ("d"),
+  method_ext ("smooth", &smooth, gsi::arg ("d"), gsi::arg ("keep_hv", false),
     "@brief Smoothes a polygon\n"
     "\n"
     "Remove vertices that deviate by more than the distance d from the average contour.\n"
     "The value d is basically the roughness which is removed.\n"
     "\n"
     "@param d The smoothing \"roughness\".\n"
+    "@param keep_hv If true, horizontal and vertical edges will be preserved always.\n"
     "\n"
     "@return The smoothed polygon.\n"
     "\n"
-    "This method was introduced in version 0.23.\n"
+    "This method was introduced in version 0.23. The 'keep_hv' optional parameter was added in version 0.27.\n"
   ) +
   method_ext ("minkowsky_sum", &minkowsky_sum_pe, gsi::arg ("e"), gsi::arg ("resolve_holes"),
     "@brief Computes the Minkowsky sum of the polygon and an edge\n"

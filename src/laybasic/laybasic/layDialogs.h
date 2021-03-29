@@ -328,7 +328,7 @@ public:
   NewLayoutPropertiesDialog (QWidget *parent);
   virtual ~NewLayoutPropertiesDialog ();
 
-  bool exec_dialog (std::string &tech_name, std::string &cell_name, double &dbu, double &window_size, bool &current_panel);
+  bool exec_dialog (std::string &tech_name, std::string &cell_name, double &dbu, double &window_size, std::vector<db::LayerProperties> &layers, bool &current_panel);
 
 private slots:
   void tech_changed ();

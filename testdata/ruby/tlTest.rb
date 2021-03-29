@@ -262,17 +262,29 @@ class Tl_TestClass < TestBase
 
   end
 
+  class MyRecipeExecutable < RBA::Executable
+
+    def initialize(params)
+      @params = params
+    end
+
+    def execute
+      a = @params["A"] || 0
+      b = @params["B"] || 0.0
+      c = @params["C"] || 1.0
+      b * a * c
+    end
+
+  end
+
   class MyRecipe < RBA::Recipe
 
     def initialize
       super("rba_test_recipe", "description")
     end
 
-    def execute(params)
-      a = params["A"] || 0
-      b = params["B"] || 0.0
-      c = params["C"] || 1.0
-      b * a * c
+    def executable(params)
+      return MyRecipeExecutable::new(params)
     end
 
   end
@@ -291,7 +303,7 @@ class Tl_TestClass < TestBase
 
     g = my_recipe.generator("A" => 6, "B" => 7.0)
     assert_equal(g, "rba_test_recipe: A=#6,B=##7")
-    assert_equal("%g" % RBA::Recipe::make(g).to_s, "42")
+    assert_equal("%g" % RBA::Recipe::make(g), "42")
     assert_equal("%g" % RBA::Recipe::make(g, "C" => 1.5).to_s, "63")
 
     my_recipe._destroy

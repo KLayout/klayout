@@ -341,10 +341,11 @@ private:
   lay::LayoutView *mp_view;
   bool m_needs_update;
   bool m_tabs_need_update;
+  bool m_hidden_flags_need_update;
   bool m_in_update;
   std::vector<size_t> m_new_sel;
   int m_phase;
-  tl::DeferredMethod<LayerControlPanel> m_do_update_content_dm, m_do_update_hidden_flags_dm;
+  tl::DeferredMethod<LayerControlPanel> m_do_update_content_dm;
   std::set<unsigned int> m_expanded;
   bool m_no_stipples;
   QLabel *m_no_stipples_label;

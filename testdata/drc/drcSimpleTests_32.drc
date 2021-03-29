@@ -1,0 +1,59 @@
+
+source $drc_test_source
+target $drc_test_target
+
+clip(0.um, 0.um, 26.um, 45.um)
+
+if $drc_test_deep
+  deep
+end
+
+def self_test(id, a, b)
+  a == b || raise(id + ": self-test failed (" + a.inspect + " != " + b.inspect + ")")
+end
+
+self_test("magnify(2.0)", source.global_transformation.to_s, "r0 *1 0,0")
+
+global_transform(magnify(2.0))
+
+self_test("magnify(2.0)", source.global_transformation.to_s, "r0 *2 0,0")
+
+global_transform(magnify(2.0), rotate(90.0))
+
+self_test("magnify(2.0)", source.global_transformation.to_s, "r90 *2 0,0")
+
+global_transform(mirror_x, mirror_y)
+
+self_test("magnify(2.0)", source.global_transformation.to_s, "r180 *1 0,0")
+
+global_transform(magnify(2.0), shift(10.um, 20.um))
+
+self_test("magnify(2.0)", source.global_transformation.to_s, "r0 *2 10,20")
+
+
+# The actual DRC test
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+l1.merged.output(10, 0)
+l1.sized(100.nm).output(11, 0)
+l2.sized(100.nm).output(12, 0)
+
+# reset
+global_transform
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+
+l1.output(101, 0)
+l2.output(102, 0)
+
+l1.merged.output(110, 0)
+l1.sized(100.nm).output(111, 0)
+l2.sized(100.nm).output(112, 0)
+

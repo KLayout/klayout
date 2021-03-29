@@ -129,7 +129,7 @@ NewLayoutPropertiesDialog::tech_changed ()
 }
 
 bool 
-NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &cell_name, double &dbu, double &size, bool &current_panel)
+NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &cell_name, double &dbu, double &size, std::vector<db::LayerProperties> &layers, bool &current_panel)
 {
   mp_ui->tech_cbx->clear ();
   unsigned int technology_index = 0;
@@ -151,6 +151,15 @@ NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &ce
   mp_ui->topcell_le->setText (tl::to_qstring (cell_name));
   mp_ui->current_panel_cb->setChecked (current_panel);
 
+  std::string layer_string;
+  for (std::vector<db::LayerProperties>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+    if (l != layers.begin ()) {
+      layer_string += ", ";
+    }
+    layer_string += l->to_string ();
+  }
+  mp_ui->layers_le->setText (tl::to_qstring (layer_string));
+
   if (QDialog::exec ()) {
 
     //  get the selected technology name
@@ -167,8 +176,24 @@ NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &ce
     } else {
       dbu = 0.0;
     }
+
     cell_name = tl::to_string (mp_ui->topcell_le->text ());
     current_panel = mp_ui->current_panel_cb->isChecked ();
+
+    layers.clear ();
+    layer_string = tl::to_string (mp_ui->layers_le->text ());
+    tl::Extractor ex (layer_string.c_str ());
+    while (! ex.at_end ()) {
+      db::LayerProperties lp;
+      try {
+        lp.read (ex);
+      } catch (...) {
+        break;
+      }
+      layers.push_back (lp);
+      ex.test (",");
+    }
+
     return true;
 
   } else {

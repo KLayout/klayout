@@ -1548,6 +1548,71 @@ MacroEditorPage::return_pressed ()
   return true;
 }
 
+static bool is_tab_key (QKeyEvent *ke)
+{
+  return ke->key () == Qt::Key_Tab && (ke->modifiers () & Qt::ShiftModifier) == 0;
+}
+
+static bool is_backtab_key (QKeyEvent *ke)
+{
+  return ke->key () == Qt::Key_Backtab || (ke->key () == Qt::Key_Tab && (ke->modifiers () & Qt::ShiftModifier) != 0);
+}
+
+static bool is_backspace_key (QKeyEvent *ke)
+{
+  return ke->key () == Qt::Key_Backspace;
+}
+
+static bool is_escape_key (QKeyEvent *ke)
+{
+  return ke->key () == Qt::Key_Escape;
+}
+
+static bool is_return_key (QKeyEvent *ke)
+{
+  return ke->key () == Qt::Key_Return;
+}
+
+static bool is_help_key (QKeyEvent *ke)
+{
+  return ke->key () == Qt::Key_F1;
+}
+
+static bool is_find_next_key (QKeyEvent *ke)
+{
+  return ke->key () == Qt::Key_F3;
+}
+
+static bool is_find_key (QKeyEvent *ke)
+{
+  return ke->key () == Qt::Key_F && (ke->modifiers () & Qt::ControlModifier) != 0;
+}
+
+static bool is_up_key (QKeyEvent *ke)
+{
+  return ke->key () == Qt::Key_Up;
+}
+
+static bool is_down_key (QKeyEvent *ke)
+{
+  return ke->key () == Qt::Key_Down;
+}
+
+
+static bool is_any_known_key (QKeyEvent *ke)
+{
+  return is_tab_key (ke) ||
+         is_backtab_key (ke) ||
+         is_backspace_key (ke) ||
+         is_escape_key (ke) ||
+         is_return_key (ke) ||
+         is_help_key (ke) ||
+         is_find_next_key (ke) ||
+         is_find_key (ke) ||
+         is_up_key (ke) ||
+         is_down_key (ke);
+}
+
 bool
 MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
 {
@@ -1555,9 +1620,16 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
 
     if (event->type () == QEvent::ShortcutOverride) {
 
-      //  override shortcuts
-      event->accept ();
-      return true;
+      //  override shortcuts if the collide with keys we accept ourselves
+      QKeyEvent *ke = dynamic_cast<QKeyEvent *> (event);
+      if (! ke) {
+        return false;  //  should not happen
+      }
+
+      if (is_any_known_key (ke)) {
+        event->accept ();
+        return true;
+      }
 
     } else if (event->type () == QEvent::FocusOut) {
 
@@ -1574,7 +1646,7 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
         return false;  //  should not happen
       }
 
-      if (ke->key () == Qt::Key_Tab && (ke->modifiers () & Qt::ShiftModifier) == 0) {
+      if (is_tab_key (ke)) {
 
         if (mp_completer_popup->isVisible ()) {
           complete ();
@@ -1583,15 +1655,15 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
           return tab_key_pressed ();
         }
 
-      } else if ((ke->key () == Qt::Key_Backtab || (ke->key () == Qt::Key_Tab && (ke->modifiers () & Qt::ShiftModifier) != 0))) {
+      } else if (is_backtab_key (ke)) {
 
         return back_tab_key_pressed ();
 
-      } else if (ke->key () == Qt::Key_Backspace) {
+      } else if (is_backspace_key (ke)) {
 
         return backspace_pressed ();
 
-      } else if (ke->key () == Qt::Key_Escape) {
+      } else if (is_escape_key (ke)) {
 
         //  Handle Esc to return to the before-find position and clear the selection or to hide popup
 
@@ -1606,7 +1678,7 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
 
         return true;
 
-      } else if (ke->key () == Qt::Key_Return) {
+      } else if (is_return_key (ke)) {
 
         if (mp_completer_popup->isVisible ()) {
           complete ();
@@ -1615,7 +1687,7 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
           return return_pressed ();
         }
 
-      } else if (ke->key () == Qt::Key_F1) {
+      } else if (is_help_key (ke)) {
 
         QTextCursor c = mp_text->textCursor ();
         if (c.selectionStart () == c.selectionEnd ()) {
@@ -1625,19 +1697,19 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
 
         return true;
 
-      } else if (mp_completer_popup->isVisible () && (ke->key () == Qt::Key_Up || ke->key () == Qt::Key_Down)) {
+      } else if (mp_completer_popup->isVisible () && (is_up_key (ke) || is_down_key (ke))) {
 
         QApplication::sendEvent (mp_completer_list, event);
         return true;
 
-      } else if (ke->key () == Qt::Key_F && (ke->modifiers () & Qt::ControlModifier) != 0) {
+      } else if (is_find_key (ke)) {
 
         QTextCursor c = mp_text->textCursor ();
         emit search_requested (c.selectedText ());
 
         return true;
 
-      } else if (ke->key () == Qt::Key_F3) {
+      } else if (is_find_next_key (ke)) {
 
         //  Jump to the next occurence of the search string
 

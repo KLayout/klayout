@@ -1671,7 +1671,9 @@ Layout::do_update ()
   //  HINT: because of some gcc bug, automatic destruction of the tl::Progress
   //  object does not work. We overcome this problem by creating the object with new 
   //  and catching exceptions.
-  tl::RelativeProgress *pr = new tl::RelativeProgress (tl::to_string (tr ("Sorting layout")), m_cells_size, 1000);
+  //  As this operation is critical we don't want to have it cancelled. Plus: do_update is called during ~LayoutLocker and
+  //  if we throw exceptions then, we'll get a runtime assertion.
+  tl::RelativeProgress *pr = new tl::RelativeProgress (tl::to_string (tr ("Sorting layout")), m_cells_size, 0, false /*can't cancel*/);
   pr->set_desc ("");
 
   try {

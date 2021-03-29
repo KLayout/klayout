@@ -725,7 +725,7 @@ template DB_PUBLIC void split_polygon<> (const db::DSimplePolygon &polygon, std:
 //  Smoothing tools
 
 void 
-smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector <db::Point> &points, db::Coord d)
+smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector <db::Point> &points, db::Coord d, bool keep_hv)
 {
   points.clear ();
   points.reserve (std::distance (from, to));
@@ -781,7 +781,9 @@ smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon
 
       bool can_drop = false;
 
-      if (db::Coord (p1.distance(p0)) <= d && db::sprod_sign (p2 - p1, p0 - pm1) > 0 && std::abs (db::vprod (p2 - p1, p0 - pm1)) < 0.8 * p2.distance (p1) * p0.distance (pm1)) {
+      if (keep_hv && (p1.x () == p0.x () || p1.y () == p0.y () || p2.x () == p1.x () || p2.y () == p1.y ())) {
+        //  keep points which participate in either a vertical or horizontal edge
+      } else if (db::Coord (p1.distance(p0)) <= d && db::sprod_sign (p2 - p1, p0 - pm1) > 0 && std::abs (db::vprod (p2 - p1, p0 - pm1)) < 0.8 * p2.distance (p1) * p0.distance (pm1)) {
         //  jog configurations with small edges are candidates
         can_drop = true;
       } else if (db::vprod_sign (p2 - p1, p1 - p0) < 0) {
@@ -839,19 +841,19 @@ smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon
 }
 
 db::Polygon 
-smooth (const db::Polygon &polygon, db::Coord d)
+smooth (const db::Polygon &polygon, db::Coord d, bool keep_hv)
 {
   db::Polygon new_poly;
   std::vector <db::Point> new_pts;
 
-  smooth_contour (polygon.begin_hull (), polygon.end_hull (), new_pts, d);
+  smooth_contour (polygon.begin_hull (), polygon.end_hull (), new_pts, d, keep_hv);
   if (new_pts.size () >= 3) {
 
     new_poly.assign_hull (new_pts.begin (), new_pts.end (), false /*don't compress*/);
 
     for (unsigned int h = 0; h < polygon.holes (); ++h) {
       new_pts.clear ();
-      smooth_contour (polygon.begin_hole (h), polygon.end_hole (h), new_pts, d);
+      smooth_contour (polygon.begin_hole (h), polygon.end_hole (h), new_pts, d, keep_hv);
       if (new_pts.size () >= 3) {
         new_poly.insert_hole (new_pts.begin (), new_pts.end (), false /*don't compress*/);
       }

@@ -146,7 +146,7 @@ public:
     m_cell_stack.pop_back ();
   }
 
-  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator * /*iter*/, const db::CellInstArray &inst, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/)
+  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator * /*iter*/, const db::CellInstArray &inst, const db::ICplxTrans & /*always_apply*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/)
   {
     db::cell_index_type ci = inst.object ().cell_index ();
     if (m_id_to_cell.find (ci) != m_id_to_cell.end ()) {
@@ -156,7 +156,7 @@ public:
     }
   }
 
-  virtual void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
+  virtual void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans & /*always_apply*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
   {
     tl_assert (! m_cell_stack.empty ());
     create_item_from_shape (mp_rdb, m_cell_stack.back ()->id (), mp_cat->id (), m_trans, shape);
@@ -209,9 +209,9 @@ public:
     }
   }
 
-  virtual void shape (const db::RecursiveShapeIterator *iter, const db::Shape &shape, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
+  virtual void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans & /*always_apply*/, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
   {
-    create_item_from_shape (mp_rdb, mp_rdb_cell->id (), mp_cat->id (), m_trans * iter->trans (), shape);
+    create_item_from_shape (mp_rdb, mp_rdb_cell->id (), mp_cat->id (), m_trans * trans, shape);
   }
 
 public:

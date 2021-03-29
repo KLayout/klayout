@@ -22,12 +22,15 @@
 
 
 #include "layLogViewerDialog.h"
+#include "layApplication.h"
 
 #include <QMutex>
 #include <QMutexLocker>
 #include <QTimer>
 #include <QClipboard>
 #include <QFrame>
+#include <QThread>
+#include <QAbstractEventDispatcher>
 
 #include <stdio.h>
 
@@ -101,7 +104,7 @@ LogReceiver::begin ()
 LogFile::LogFile (size_t max_entries, bool register_global)
   : m_error_receiver (this, 0, &LogFile::add_error),
     m_warn_receiver (this, 0, &LogFile::add_warn),
-    m_log_receiver (this, 10, &LogFile::add_info),
+    m_log_receiver (this, 0, &LogFile::add_info),
     m_info_receiver (this, 0, &LogFile::add_info),
     m_max_entries (max_entries),
     m_generation_id (0), 
@@ -221,25 +224,39 @@ LogFile::max_entries () const
 void 
 LogFile::add (LogFileEntry::mode_type mode, const std::string &msg, bool continued)
 {
-  QMutexLocker locker (&m_lock);
+  bool can_yield = false;
 
-  if (m_max_entries == 0) {
-    return;
+  {
+    QMutexLocker locker (&m_lock);
+
+    if (m_max_entries == 0) {
+      return;
+    }
+
+    if (m_messages.size () >= m_max_entries) {
+      m_messages.pop_front ();
+    }
+
+    if (mode == LogFileEntry::Warning || mode == LogFileEntry::WarningContinued) {
+      m_has_warnings = true;
+    } else if (mode == LogFileEntry::Error || mode == LogFileEntry::ErrorContinued) {
+      m_has_errors = true;
+    }
+
+    m_messages.push_back (LogFileEntry (mode, msg, continued));
+
+    ++m_generation_id;
+
+    if (lay::ApplicationBase::instance ()->qapp_gui () && QThread::currentThread () == lay::ApplicationBase::instance ()->qapp_gui ()->thread () && (tl::Clock::current () - m_last_yield).seconds () > 0.1) {
+      m_last_yield = tl::Clock::current ();
+      can_yield = true;
+    }
   }
 
-  if (m_messages.size () >= m_max_entries) {
-    m_messages.pop_front ();
+  //  use this opportunity to process events
+  if (can_yield) {
+    lay::ApplicationBase::instance ()->process_events (QEventLoop::AllEvents);
   }
-
-  if (mode == LogFileEntry::Warning || mode == LogFileEntry::WarningContinued) {
-    m_has_warnings = true;
-  } else if (mode == LogFileEntry::Error || mode == LogFileEntry::ErrorContinued) {
-    m_has_errors = true;
-  }
-
-  m_messages.push_back (LogFileEntry (mode, msg, continued));
-
-  ++m_generation_id;
 }
 
 int 

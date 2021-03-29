@@ -268,6 +268,16 @@ public:
   }
 
   /**
+   *  @brief Takes the underlying delegate object
+   */
+  RegionDelegate *take_delegate ()
+  {
+    RegionDelegate *delegate = mp_delegate;
+    mp_delegate = 0;
+    return delegate;
+  }
+
+  /**
    *  @brief Sets the base verbosity
    *
    *  Setting this value will make timing measurements appear at least at
@@ -1133,6 +1143,19 @@ public:
   }
 
   /**
+   *  @brief Returns all polygons of this which are completly outside polygons from the other region and the opposite ones at the same time
+   *
+   *  This method is equivalent to calling selected_outside and selected_not_outside, but faster.
+   *
+   *  Merged semantics applies.
+   */
+  std::pair<Region, Region> selected_outside_differential (const Region &other) const
+  {
+    std::pair<db::RegionDelegate *, db::RegionDelegate *> p = mp_delegate->selected_outside_pair (other);
+    return std::pair<Region, Region> (Region (p.first), Region (p.second));
+  }
+
+  /**
    *  @brief Selects all polygons of this region which are completly inside polygons from the other region
    *
    *  Merged semantics applies.
@@ -1179,6 +1202,19 @@ public:
   }
 
   /**
+   *  @brief Returns all polygons of this which are completly inside polygons from the other region and the opposite ones at the same time
+   *
+   *  This method is equivalent to calling selected_inside and selected_not_inside, but faster.
+   *
+   *  Merged semantics applies.
+   */
+  std::pair<Region, Region> selected_inside_differential (const Region &other) const
+  {
+    std::pair<db::RegionDelegate *, db::RegionDelegate *> p = mp_delegate->selected_inside_pair (other);
+    return std::pair<Region, Region> (Region (p.first), Region (p.second));
+  }
+
+  /**
    *  @brief Returns all polygons of this which are enclosing polygons from the other region
    *
    *  Merged semantics applies.
@@ -1222,6 +1258,19 @@ public:
   Region selected_not_enclosing (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
     return Region (mp_delegate->selected_not_enclosing (other, min_count, max_count));
+  }
+
+  /**
+   *  @brief Returns all polygons of this which are completly enclosing polygons from the other region and the opposite ones at the same time
+   *
+   *  This method is equivalent to calling selected_enclosing and selected_not_enclosing, but faster.
+   *
+   *  Merged semantics applies.
+   */
+  std::pair<Region, Region> selected_enclosing_differential (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
+  {
+    std::pair<db::RegionDelegate *, db::RegionDelegate *> p = mp_delegate->selected_enclosing_pair (other, min_count, max_count);
+    return std::pair<Region, Region> (Region (p.first), Region (p.second));
   }
 
   /**
@@ -1279,6 +1328,19 @@ public:
   }
 
   /**
+   *  @brief Returns all polygons of this which are interacting with polygons from the other region and the opposite ones at the same time
+   *
+   *  This method is equivalent to calling selected_interacting and selected_not_interacting, but faster.
+   *
+   *  Merged semantics applies.
+   */
+  std::pair<Region, Region> selected_interacting_differential (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
+  {
+    std::pair<db::RegionDelegate *, db::RegionDelegate *> p = mp_delegate->selected_interacting_pair (other, min_count, max_count);
+    return std::pair<Region, Region> (Region (p.first), Region (p.second));
+  }
+
+  /**
    *  @brief Selects all polygons of this region which overlap or touch edges from the given edge collection
    *
    *  Merged semantics applies to both operators.
@@ -1322,6 +1384,19 @@ public:
   Region selected_not_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
     return Region (mp_delegate->selected_not_interacting (other, min_count, max_count));
+  }
+
+  /**
+   *  @brief Returns all polygons of this which are interacting with edges from the other region and the opposite ones at the same time
+   *
+   *  This method is equivalent to calling selected_interacting and selected_not_interacting, but faster.
+   *
+   *  Merged semantics applies.
+   */
+  std::pair<Region, Region> selected_interacting_differential (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
+  {
+    std::pair<db::RegionDelegate *, db::RegionDelegate *> p = mp_delegate->selected_interacting_pair (other, min_count, max_count);
+    return std::pair<Region, Region> (Region (p.first), Region (p.second));
   }
 
   /**
@@ -1371,6 +1446,19 @@ public:
   }
 
   /**
+   *  @brief Returns all polygons of this which are interacting with texts from the other region and the opposite ones at the same time
+   *
+   *  This method is equivalent to calling selected_interacting and selected_not_interacting, but faster.
+   *
+   *  Merged semantics applies.
+   */
+  std::pair<Region, Region> selected_interacting_differential (const Texts &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
+  {
+    std::pair<db::RegionDelegate *, db::RegionDelegate *> p = mp_delegate->selected_interacting_pair (other, min_count, max_count);
+    return std::pair<Region, Region> (Region (p.first), Region (p.second));
+  }
+
+  /**
    *  @brief Selects all polygons of this region which overlap polygons from the other region
    *
    *  Merged semantics applies.
@@ -1414,6 +1502,19 @@ public:
   Region selected_not_overlapping (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
     return Region (mp_delegate->selected_not_overlapping (other, min_count, max_count));
+  }
+
+  /**
+   *  @brief Returns all polygons of this which are overlapping polygons from the other region and the opposite ones at the same time
+   *
+   *  This method is equivalent to calling selected_overlapping and selected_not_overlapping, but faster.
+   *
+   *  Merged semantics applies.
+   */
+  std::pair<Region, Region> selected_overlapping_differential (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
+  {
+    std::pair<db::RegionDelegate *, db::RegionDelegate *> p = mp_delegate->selected_overlapping_pair (other, min_count, max_count);
+    return std::pair<Region, Region> (Region (p.first), Region (p.second));
   }
 
   /**
@@ -1518,14 +1619,14 @@ public:
   /**
    *  @brief Smoothes the region (in-place)
    */
-  void smooth (coord_type d);
+  void smooth (coord_type d, bool keep_hv);
 
   /**
    *  @brief Returns the smoothed region
    *
    *  @param d The smoothing accuracy
    */
-  Region smoothed (coord_type d) const;
+  Region smoothed (coord_type d, bool keep_hv) const;
 
   /**
    *  @brief Returns the nth polygon

@@ -326,8 +326,7 @@ HelpSource::produce_index_file (const std::string &path)
   m_title_map.clear ();
   m_parent_of.clear ();
 
-  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Initializing help index")), 1);
-  progress.can_cancel (false);
+  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Initializing help index")), 1, false /*can't cancel*/);
   scan ("/index.xml", progress);
   try {
 

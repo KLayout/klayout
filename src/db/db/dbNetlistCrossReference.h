@@ -61,44 +61,48 @@ public:
   {
     typedef db::Net object_type;
 
-    NetPairData (const db::Net *a, const db::Net *b, Status s) : pair (a, b), status (s) { }
+    NetPairData (const db::Net *a, const db::Net *b, Status s, const std::string &m) : pair (a, b), status (s), msg (m) { }
     NetPairData () : pair ((const db::Net *)0, (const db::Net *)0), status (None) { }
 
     std::pair<const db::Net *, const db::Net *> pair;
     Status status;
+    std::string msg;
   };
 
   struct DevicePairData
   {
     typedef db::Device object_type;
 
-    DevicePairData (const db::Device *a, const db::Device *b, Status s) : pair (a, b), status (s) { }
+    DevicePairData (const db::Device *a, const db::Device *b, Status s, const std::string &m) : pair (a, b), status (s), msg (m) { }
     DevicePairData () : pair ((const db::Device *)0, (const db::Device *)0), status (None) { }
 
     std::pair<const db::Device *, const db::Device *> pair;
     Status status;
+    std::string msg;
   };
 
   struct PinPairData
   {
     typedef db::Pin object_type;
 
-    PinPairData (const db::Pin *a, const db::Pin *b, Status s) : pair (a, b), status (s) { }
+    PinPairData (const db::Pin *a, const db::Pin *b, Status s, const std::string &m) : pair (a, b), status (s), msg (m) { }
     PinPairData () : pair ((const db::Pin *)0, (const db::Pin *)0), status (None) { }
 
     std::pair<const db::Pin *, const db::Pin *> pair;
     Status status;
+    std::string msg;
   };
 
   struct SubCircuitPairData
   {
     typedef db::SubCircuit object_type;
 
-    SubCircuitPairData (const db::SubCircuit *a, const db::SubCircuit *b, Status s) : pair (a, b), status (s) { }
+    SubCircuitPairData (const db::SubCircuit *a, const db::SubCircuit *b, Status s, const std::string &m) : pair (a, b), status (s), msg (m) { }
     SubCircuitPairData () : pair ((const db::SubCircuit *)0, (const db::SubCircuit *)0), status (None) { }
 
     std::pair<const db::SubCircuit *, const db::SubCircuit *> pair;
     Status status;
+    std::string msg;
   };
 
   struct PerCircuitData
@@ -115,6 +119,7 @@ public:
     typedef subcircuit_pairs_type::const_iterator subcircuit_pairs_const_iterator;
 
     Status status;
+    std::string msg;
     net_pairs_type nets;
     device_pairs_type devices;
     pin_pairs_type pins;
@@ -139,11 +144,11 @@ public:
   void gen_begin_netlist (const db::Netlist *a, const db::Netlist *b);
   void gen_end_netlist (const db::Netlist *a, const db::Netlist *b);
   void gen_begin_circuit (const db::Circuit *a, const db::Circuit *b);
-  void gen_end_circuit (const db::Circuit *a, const db::Circuit *b, Status status);
-  void gen_nets (const db::Net *a, const db::Net *b, Status status);
-  void gen_devices (const db::Device *a, const db::Device *b, Status status);
-  void gen_pins (const db::Pin *a, const db::Pin *b, Status status);
-  void gen_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b, Status status);
+  void gen_end_circuit (const db::Circuit *a, const db::Circuit *b, Status status, const std::string &msg);
+  void gen_nets (const db::Net *a, const db::Net *b, Status status, const std::string &msg);
+  void gen_devices (const db::Device *a, const db::Device *b, Status status, const std::string &msg);
+  void gen_pins (const db::Pin *a, const db::Pin *b, Status status, const std::string &msg);
+  void gen_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b, Status status, const std::string &msg);
 
   //  db::NetlistCompareLogger interface
   virtual void begin_netlist (const db::Netlist *a, const db::Netlist *b)
@@ -162,77 +167,77 @@ public:
     gen_begin_circuit (a, b);
   }
 
-  virtual void end_circuit (const db::Circuit *a, const db::Circuit *b, bool matching)
+  virtual void end_circuit (const db::Circuit *a, const db::Circuit *b, bool matching, const std::string &msg)
   {
     sort_circuit ();
-    gen_end_circuit (a, b, matching ? Match : NoMatch);
+    gen_end_circuit (a, b, matching ? Match : NoMatch, msg);
   }
 
-  virtual void circuit_skipped (const db::Circuit *a, const db::Circuit *b)
+  virtual void circuit_skipped (const db::Circuit *a, const db::Circuit *b, const std::string &msg)
   {
     gen_begin_circuit (a, b);
-    gen_end_circuit (a, b, Skipped);
+    gen_end_circuit (a, b, Skipped, msg);
   }
 
-  virtual void circuit_mismatch (const db::Circuit *a, const db::Circuit *b)
+  virtual void circuit_mismatch (const db::Circuit *a, const db::Circuit *b, const std::string &msg)
   {
     gen_begin_circuit (a, b);
-    gen_end_circuit (a, b, Mismatch);
+    gen_end_circuit (a, b, Mismatch, msg);
   }
 
   virtual void match_nets (const db::Net *a, const db::Net *b)
   {
-    gen_nets (a, b, Match);
+    gen_nets (a, b, Match, std::string ());
   }
 
-  virtual void match_ambiguous_nets (const db::Net *a, const db::Net *b)
+  virtual void match_ambiguous_nets (const db::Net *a, const db::Net *b, const std::string &msg)
   {
-    gen_nets (a, b, MatchWithWarning);
+    gen_nets (a, b, MatchWithWarning, msg);
   }
 
-  virtual void net_mismatch (const db::Net *a, const db::Net *b)
+  virtual void net_mismatch (const db::Net *a, const db::Net *b, const std::string &msg)
   {
-    gen_nets (a, b, Mismatch);
+    gen_nets (a, b, Mismatch, msg);
   }
 
   virtual void match_devices (const db::Device *a, const db::Device *b)
   {
-    gen_devices (a, b, Match);
+    gen_devices (a, b, Match, std::string ());
   }
 
   virtual void match_devices_with_different_parameters (const db::Device *a, const db::Device *b)
   {
-    gen_devices (a, b, MatchWithWarning);
+    gen_devices (a, b, MatchWithWarning, std::string ());
   }
 
   virtual void match_devices_with_different_device_classes (const db::Device *a, const db::Device *b)
   {
-    gen_devices (a, b, MatchWithWarning);
+    gen_devices (a, b, MatchWithWarning, std::string ());
   }
 
-  virtual void device_mismatch (const db::Device *a, const db::Device *b)
+  virtual void device_mismatch (const db::Device *a, const db::Device *b, const std::string &msg)
   {
-    gen_devices (a, b, Mismatch);
+    gen_devices (a, b, Mismatch, msg);
   }
 
   virtual void match_pins (const db::Pin *a, const db::Pin *b)
   {
-    gen_pins (a, b, Match);
+    gen_pins (a, b, Match, std::string ());
   }
 
-  virtual void pin_mismatch (const db::Pin *a, const db::Pin *b)
+  virtual void pin_mismatch (const db::Pin *a, const db::Pin *b, const std::string &msg)
   {
-    gen_pins (a, b, Mismatch);
+    gen_pins (a, b, Mismatch, msg);
   }
 
   virtual void match_subcircuits (const db::SubCircuit *a, const db::SubCircuit *b)
   {
-    gen_subcircuits (a, b, Match);
+    gen_subcircuits (a, b, Match, std::string ());
   }
 
-  virtual void subcircuit_mismatch (const db::SubCircuit *a, const db::SubCircuit *b)
+  virtual void subcircuit_mismatch (const db::SubCircuit *a, const db::SubCircuit *b, const std::string &msg)
   {
-    gen_subcircuits (a, b, Mismatch);
+    gen_subcircuits (a, b, Mismatch, msg);
   }
 
   void clear ();
@@ -292,10 +297,10 @@ private:
   PerCircuitData *mp_per_circuit_data;
 
   void establish_pair (const db::Circuit *a, const db::Circuit *b);
-  void establish_pair (const db::Net *a, const db::Net *b, Status status);
-  void establish_pair (const db::Device *a, const db::Device *b, Status status);
-  void establish_pair (const db::Pin *a, const db::Pin *b, Status status);
-  void establish_pair (const db::SubCircuit *a, const db::SubCircuit *b, Status status);
+  void establish_pair (const db::Net *a, const db::Net *b, Status status, const std::string &msg);
+  void establish_pair (const db::Device *a, const db::Device *b, Status status, const std::string &msg);
+  void establish_pair (const db::Pin *a, const db::Pin *b, Status status, const std::string &msg);
+  void establish_pair (const db::SubCircuit *a, const db::SubCircuit *b, Status status, const std::string &msg);
   void sort_circuit ();
   void sort_netlist ();
 

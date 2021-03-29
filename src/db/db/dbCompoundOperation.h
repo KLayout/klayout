@@ -753,7 +753,8 @@ public:
   virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> & /*interactions*/, std::vector<std::unordered_set<db::EdgePair> > & /*results*/,    size_t /*max_vertex_count*/, double /*area_ratio*/) const { }
 
 private:
-  db::interacting_local_operation<db::Polygon, db::Polygon, db::Polygon> m_op;
+  typedef db::interacting_local_operation<db::Polygon, db::Polygon, db::Polygon> op_type;
+  op_type m_op;
 };
 
 class DB_PUBLIC CompoundRegionInteractWithEdgeOperationNode

@@ -107,11 +107,34 @@ TEST(1)
 
   std::string x;
 
+  db::RecursiveShapeIterator i0s (g, c0, 0);
+  x = collect(i0s, g);
+  EXPECT_EQ (x, "[$1](0,100;1000,1200)/[$2](0,100;1000,1200)/[$3](100,0;1100,1100)/[$4](1200,0;2200,1100)/[$4](-1200,0;-100,1000)");
+  EXPECT_EQ (i0s.bbox ().to_string (), "(-1200,0;2200,1200)");
+
+  i0s.set_global_trans (db::ICplxTrans (2.0));
+  x = collect(i0s, g);
+  EXPECT_EQ (x, "[$1](0,200;2000,2400)/[$2](0,200;2000,2400)/[$3](200,0;2200,2200)/[$4](2400,0;4400,2200)/[$4](-2400,0;-200,2000)");
+  EXPECT_EQ (i0s.bbox ().to_string (), "(-2400,0;4400,2400)");
+
   db::RecursiveShapeIterator i1 (g, c0, 0, db::Box (0, 0, 100, 100));
   x = collect(i1, g);
   EXPECT_EQ (x, "[$1](0,100;1000,1200)/[$2](0,100;1000,1200)/[$3](100,0;1100,1100)");
   x = collect_with_copy(i1, g);
   EXPECT_EQ (x, "[$1](0,100;1000,1200)/[$2](0,100;1000,1200)/[$3](100,0;1100,1100)");
+
+  i1.set_global_trans (db::ICplxTrans (db::Trans (db::Vector (10, 20))));
+  i1.set_region (db::Box (10, 20, 110, 120));
+  x = collect(i1, g);
+  EXPECT_EQ (x, "[$1](10,120;1010,1220)/[$2](10,120;1010,1220)/[$3](110,20;1110,1120)");
+  x = collect_with_copy(i1, g);
+  EXPECT_EQ (x, "[$1](10,120;1010,1220)/[$2](10,120;1010,1220)/[$3](110,20;1110,1120)");
+
+  i1.reset ();
+  x = collect(i1, g);
+  EXPECT_EQ (x, "[$1](10,120;1010,1220)/[$2](10,120;1010,1220)/[$3](110,20;1110,1120)");
+  x = collect_with_copy(i1, g);
+  EXPECT_EQ (x, "[$1](10,120;1010,1220)/[$2](10,120;1010,1220)/[$3](110,20;1110,1120)");
 
   db::RecursiveShapeIterator i1_1inf (g, c0, 0, db::Box (0, 0, 100, 100));
   i1_1inf.min_depth(1);
@@ -731,7 +754,7 @@ namespace {
   public:
     FlatPusher (std::set<db::Box> *boxes) : mp_boxes (boxes) { }
 
-    void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
+    void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans & /*always_apply*/, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
     {
       mp_boxes->insert (trans * shape.bbox ());
     }
@@ -766,6 +789,8 @@ TEST(4)
 
   }
 
+  // ...
+
   db::Box search_box (2500, 2500, 7500, 7500);
 
   std::set<db::Box> selected_boxes;
@@ -793,6 +818,45 @@ TEST(4)
 
   EXPECT_EQ (selected_boxes.size () > 100, true);
   EXPECT_EQ (db::compare_layouts (boxes2layout (selected_boxes), boxes2layout (selected_boxes2), db::layout_diff::f_verbose, 0, 100 /*max diff lines*/), true);
+
+  //  with global trans
+
+  selected_boxes.clear ();
+  selected_boxes2.clear ();
+  db::ICplxTrans ctr (db::Trans (db::Vector (10, 20)));
+
+  {
+    db::RecursiveShapeIterator iter (g, c0, 0, search_box, true);
+    iter.set_global_trans (ctr);
+    for ( ; !iter.at_end (); ++iter) {
+      selected_boxes.insert (iter->bbox ().transformed (iter.trans ()));
+    }
+  }
+
+  {
+    for (std::set<db::Box>::const_iterator b = boxes.begin (); b != boxes.end (); ++b) {
+      if (search_box.overlaps (b->transformed (ctr))) {
+        selected_boxes2.insert (b->transformed (ctr));
+      }
+    }
+  }
+
+  EXPECT_EQ (selected_boxes.size () > 100, true);
+  EXPECT_EQ (db::compare_layouts (boxes2layout (selected_boxes), boxes2layout (selected_boxes2), db::layout_diff::f_verbose, 0, 100 /*max diff lines*/), true);
+
+  //  push mode
+  {
+    selected_boxes.clear ();
+    FlatPusher pusher (&selected_boxes);
+    db::RecursiveShapeIterator iter (g, c0, 0, search_box, true);
+    iter.set_global_trans (ctr);
+    iter.push (&pusher);
+  }
+
+  EXPECT_EQ (selected_boxes.size () > 100, true);
+  EXPECT_EQ (db::compare_layouts (boxes2layout (selected_boxes), boxes2layout (selected_boxes2), db::layout_diff::f_verbose, 0, 100 /*max diff lines*/), true);
+
+  // ...
 
   db::Box search_box2 (500, 500, 1000, 1000);
 
@@ -882,6 +946,40 @@ TEST(5)
   EXPECT_EQ (selected_boxes.size () > 100, true);
   EXPECT_EQ (db::compare_layouts (boxes2layout (selected_boxes), boxes2layout (selected_boxes2), db::layout_diff::f_verbose, 0, 100 /*max diff lines*/), true);
 
+  selected_boxes.clear ();
+  selected_boxes2.clear ();
+
+  db::ICplxTrans ctr (db::Trans (db::Vector (10, 20)));
+
+  {
+    db::RecursiveShapeIterator iter = db::RecursiveShapeIterator (g, c0, 0, search_box, true);
+    iter.set_global_trans (ctr);
+    for ( ; !iter.at_end (); ++iter) {
+      selected_boxes.insert (iter.trans () * iter->bbox ());
+    }
+  }
+
+  for (std::set<db::Box>::const_iterator b = boxes.begin (); b != boxes.end (); ++b) {
+    if (search_box.overlaps (b->transformed (ctr))) {
+      selected_boxes2.insert (b->transformed (ctr));
+    }
+  }
+
+  EXPECT_EQ (selected_boxes.size () > 100, true);
+  EXPECT_EQ (db::compare_layouts (boxes2layout (selected_boxes), boxes2layout (selected_boxes2), db::layout_diff::f_verbose, 0, 100 /*max diff lines*/), true);
+
+  //  push mode
+  {
+    selected_boxes.clear ();
+    FlatPusher pusher (&selected_boxes);
+    db::RecursiveShapeIterator iter (g, c0, 0, search_box, true);
+    iter.set_global_trans (ctr);
+    iter.push (&pusher);
+  }
+
+  EXPECT_EQ (selected_boxes.size () > 100, true);
+  EXPECT_EQ (db::compare_layouts (boxes2layout (selected_boxes), boxes2layout (selected_boxes2), db::layout_diff::f_verbose, 0, 100 /*max diff lines*/), true);
+
   db::Box search_box2 (500, 500, 1000, 1000);
 
   selected_boxes.clear ();
@@ -936,7 +1034,7 @@ public:
     m_text += std::string ("leave_cell(") + iter->layout ()->cell_name (cell->cell_index ()) + ")\n";
   }
 
-  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all)
+  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans & /*always_apply*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all)
   {
     m_text += std::string ("new_inst(") + iter->layout ()->cell_name (inst.object ().cell_index ());
     if (all) {
@@ -946,9 +1044,9 @@ public:
     return NI_all;
   }
 
-  virtual bool new_inst_member (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all)
+  virtual bool new_inst_member (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all)
   {
-    m_text += std::string ("new_inst_member(") + iter->layout ()->cell_name (inst.object ().cell_index ()) + "," + tl::to_string (trans);
+    m_text += std::string ("new_inst_member(") + iter->layout ()->cell_name (inst.object ().cell_index ()) + "," + tl::to_string (always_apply * trans);
     if (all) {
       m_text += ",all";
     }
@@ -956,7 +1054,7 @@ public:
     return true;
   }
 
-  virtual void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
+  virtual void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans & /*always_apply*/, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
   {
     m_text += "shape(" + shape.to_string () + "," + tl::to_string (trans) + ")\n";
   }
@@ -971,9 +1069,9 @@ class ReceiverRejectingACellInstanceArray
 public:
   ReceiverRejectingACellInstanceArray (db::cell_index_type rejected) : m_rejected (rejected) { }
 
-  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::Box &region, const box_tree_type *complex_region, bool all)
+  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::Box &region, const box_tree_type *complex_region, bool all)
   {
-    LoggingReceiver::new_inst (iter, inst, region, complex_region, all);
+    LoggingReceiver::new_inst (iter, inst, always_apply, region, complex_region, all);
     return inst.object ().cell_index () != m_rejected ? NI_all : NI_skip;
   }
 
@@ -987,9 +1085,9 @@ class ReceiverRejectingACellInstanceArrayExceptOne
 public:
   ReceiverRejectingACellInstanceArrayExceptOne (db::cell_index_type rejected) : m_rejected (rejected) { }
 
-  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::Box &region, const box_tree_type *complex_region, bool all)
+  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::Box &region, const box_tree_type *complex_region, bool all)
   {
-    LoggingReceiver::new_inst (iter, inst, region, complex_region, all);
+    LoggingReceiver::new_inst (iter, inst, always_apply, region, complex_region, all);
     return inst.object ().cell_index () != m_rejected ? NI_all : NI_single;
   }
 
@@ -1003,9 +1101,9 @@ class ReceiverRejectingACellInstance
 public:
   ReceiverRejectingACellInstance (db::cell_index_type rejected, const db::ICplxTrans &trans_rejected) : m_rejected (rejected), m_trans_rejected (trans_rejected) { }
 
-  virtual bool new_inst_member (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region, bool all)
+  virtual bool new_inst_member (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region, bool all)
   {
-    LoggingReceiver::new_inst_member (iter, inst, trans, region, complex_region, all);
+    LoggingReceiver::new_inst_member (iter, inst, always_apply, trans, region, complex_region, all);
     return inst.object ().cell_index () != m_rejected || trans != m_trans_rejected;
   }
 
@@ -1122,6 +1220,100 @@ TEST(10)
     "new_inst_member($3,r0 *1 3000,3000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 9000,9000)\n"
+    "leave_cell($3)\n"
+    "leave_cell($2)\n"
+    "end\n"
+  );
+
+  LoggingReceiver lr1_gt;
+  db::RecursiveShapeIterator i1_gt (g, c0, 0);
+  i1_gt.set_global_trans (db::ICplxTrans (db::Trans (db::Vector (10, 20))));
+  i1_gt.push (&lr1_gt);
+
+  EXPECT_EQ (lr1_gt.text (),
+    "begin\n"
+    "new_inst($2,all)\n"
+    "new_inst_member($2,r0 *1 10,20,all)\n"
+    //  It's a bit weird to have shape events after new_inst_member, but remember, new_inst_member is a query callback, not an event.
+    "shape(box (0,0;1000,1000),r0 *1 10,20)\n"
+    "shape(box (-1000,0;0,1000),r0 *1 10,20)\n"
+    "enter_cell($2)\n"
+    "new_inst($3,all)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 10,20)\n"
+    "leave_cell($3)\n"
+    "new_inst_member($3,r0 *1 0,2000,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 10,2020)\n"
+    "leave_cell($3)\n"
+    "new_inst_member($3,r0 *1 3000,1000,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 3010,1020)\n"
+    "leave_cell($3)\n"
+    "new_inst_member($3,r0 *1 3000,3000,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 3010,3020)\n"
+    "leave_cell($3)\n"
+    "leave_cell($2)\n"
+    "new_inst_member($2,r0 *1 10,6020,all)\n"
+    "enter_cell($2)\n"
+    "new_inst($3,all)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 10,6020)\n"
+    "leave_cell($3)\n"
+    "new_inst_member($3,r0 *1 0,2000,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 10,8020)\n"
+    "leave_cell($3)\n"
+    "new_inst_member($3,r0 *1 3000,1000,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 3010,7020)\n"
+    "leave_cell($3)\n"
+    "new_inst_member($3,r0 *1 3000,3000,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 3010,9020)\n"
+    "leave_cell($3)\n"
+    "leave_cell($2)\n"
+    "new_inst_member($2,r0 *1 6010,20,all)\n"
+    "enter_cell($2)\n"
+    "new_inst($3,all)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 6010,20)\n"
+    "leave_cell($3)\n"
+    "new_inst_member($3,r0 *1 0,2000,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 6010,2020)\n"
+    "leave_cell($3)\n"
+    "new_inst_member($3,r0 *1 3000,1000,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 9010,1020)\n"
+    "leave_cell($3)\n"
+    "new_inst_member($3,r0 *1 3000,3000,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 9010,3020)\n"
+    "leave_cell($3)\n"
+    "leave_cell($2)\n"
+    "new_inst_member($2,r0 *1 6010,6020,all)\n"
+    "enter_cell($2)\n"
+    "new_inst($3,all)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 6010,6020)\n"
+    "leave_cell($3)\n"
+    "new_inst_member($3,r0 *1 0,2000,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 6010,8020)\n"
+    "leave_cell($3)\n"
+    "new_inst_member($3,r0 *1 3000,1000,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 9010,7020)\n"
+    "leave_cell($3)\n"
+    "new_inst_member($3,r0 *1 3000,3000,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 9010,9020)\n"
     "leave_cell($3)\n"
     "leave_cell($2)\n"
     "end\n"

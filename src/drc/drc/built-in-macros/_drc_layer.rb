@@ -4287,9 +4287,10 @@ CODE
     #
     # Without a reference point given, the lower left corner of the fill pattern's bounding box will be used
     # as the reference point. The reference point will also defined the footprint of the fill cell - more precisely
-    # the lower left corner. The fill cell's foot print is taken to be a rectangle having the horizontal and vertical
-    # step pitch for width and height respectively. The dimension can be changed however so that the fill cells
-    # can overlap or there can be spacing between the cells. To change the dimensions use the "dim" method.
+    # the lower left corner. When step vectors are given, the fill cell's footprint is taken to be a rectangle
+    # having the horizontal and vertical step pitch for width and height respectively. This way the fill cells 
+    # will be arrange seamlessly. However, the cell's dimensions can be changed, so that the fill cells
+    # can overlap or there is a space between the cells. To change the dimensions use the "dim" method.
     #
     # The following example specifies a fill cell with an active area of -0.5 .. 1.5 in both directions
     # (2 micron width and height). With these dimensions the fill cell's footprint is independent of the
@@ -4329,7 +4330,7 @@ CODE
     end
 
     # %DRC%
-    # @name fill
+    # @name fill_with_left
     # @brief Fills the region with regular pattern of shapes
     # @synopsis layer.fill_with_left([ options ])
     #
@@ -4390,10 +4391,10 @@ CODE
       end
 
       if !row_step
-        row_step = RBA::DVector::new(pattern.bbox.width, 0)
+        row_step = RBA::DVector::new(pattern.default_xpitch, 0)
       end
       if !column_step
-        column_step = RBA::DVector::new(0, pattern.bbox.height)
+        column_step = RBA::DVector::new(0, pattern.default_ypitch)
       end
 
       dbu_trans = RBA::VCplxTrans::new(1.0 / @engine.dbu)

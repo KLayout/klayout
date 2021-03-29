@@ -207,6 +207,14 @@ module DRC
       RBA::DBox::new(o, o + d)
     end
 
+    def default_xpitch
+      @dim ? @dim.x : self.bbox.width
+    end
+
+    def default_ypitch
+      @dim ? @dim.y : self.bbox.height
+    end
+
     def _computed_origin
       b = self.bbox
       return b.empty? ? RBA::DPoint::new : b.p1

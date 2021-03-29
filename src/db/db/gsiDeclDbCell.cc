@@ -1304,17 +1304,17 @@ fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell
 }
 
 static void
-fill_region_skew (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point *origin,
+fill_region_skew (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step, const db::Point *origin,
                   db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
 {
-  db::fill_region (cell, fr, fill_cell_index, kernel_origin, row_step, column_step, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons, glue_box);
+  db::fill_region (cell, fr, fill_cell_index, fc_box, row_step, column_step, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons, glue_box);
 }
 
 static void
-fill_region_multi (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step,
+fill_region_multi (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step,
                    const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Point &origin, const db::Box &glue_box)
 {
-  db::fill_region_repeat (cell, fr, fill_cell_index, kernel_origin, row_step, column_step, fill_margin, remaining_polygons, origin, glue_box);
+  db::fill_region_repeat (cell, fr, fill_cell_index, fc_box, row_step, column_step, fill_margin, remaining_polygons, origin, glue_box);
 }
 
 static db::Instance cell_inst_dtransform_simple (db::Cell *cell, const db::Instance &inst, const db::DTrans &t)
@@ -1846,7 +1846,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
   ) +
   gsi::method_ext ("fill_region", &fill_region_skew, gsi::arg ("region"),
                                                      gsi::arg ("fill_cell_index"),
-                                                     gsi::arg ("fc_origin"),
+                                                     gsi::arg ("fc_bbox"),
                                                      gsi::arg ("row_step"),
                                                      gsi::arg ("column_step"),
                                                      gsi::arg ("origin", &default_origin, "(0, 0)"),
@@ -1857,7 +1857,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@brief Fills the given region with cells of the given type (skew step version)\n"
     "@param region The region to fill\n"
     "@param fill_cell_index The fill cell to place\n"
-    "@param fc_origin The location of the reference point of the fill cell\n"
+    "@param fc_bbox The fill cell's box to place\n"
     "@param row_step The 'rows' step vector\n"
     "@param column_step The 'columns' step vector\n"
     "@param origin The global origin of the fill pattern or nil to allow local (per-polygon) optimization\n"
@@ -1865,14 +1865,18 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@param fill_margin See explanation in other version\n"
     "@param remaining_polygons See explanation in other version\n"
     "\n"
-    "This version is similar to the version providing a rectangular fill kernel, but it offers more generic stepping of the fill cell.\n"
+    "This version is similar to the version providing an orthogonal fill, but it offers more generic stepping of the fill cell.\n"
     "The step pattern is defined by an origin and two vectors (row_step and column_step) which span the axes of the fill cell pattern.\n"
+    "\n"
+    "The fill box and the step vectors are decoupled which means the fill box can be larger or smaller than the step pitch - it can "
+    "be overlapping and there can be space between the fill box instances. Fill boxes are placed where they fit entirely into a polygon of the region. "
+    "The fill boxes lower left corner is the reference for the fill pattern and aligns with the origin if given.\n"
     "\n"
     "This variant has been introduced in version 0.27.\n"
   ) +
   gsi::method_ext ("fill_region_multi", &fill_region_multi, gsi::arg ("region"),
                                                             gsi::arg ("fill_cell_index"),
-                                                            gsi::arg ("fc_origin"),
+                                                            gsi::arg ("fc_bbox"),
                                                             gsi::arg ("row_step"),
                                                             gsi::arg ("column_step"),
                                                             gsi::arg ("fill_margin", db::Vector ()),

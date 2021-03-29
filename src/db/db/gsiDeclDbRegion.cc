@@ -722,17 +722,17 @@ fill_region (const db::Region *fr, db::Cell *cell, db::cell_index_type fill_cell
 }
 
 static void
-fill_region_skew (const db::Region *fr, db::Cell *cell, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point *origin,
+fill_region_skew (const db::Region *fr, db::Cell *cell, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step, const db::Point *origin,
                   db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
 {
-  db::fill_region (cell, *fr, fill_cell_index, kernel_origin, row_step, column_step, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons, glue_box);
+  db::fill_region (cell, *fr, fill_cell_index, fc_box, row_step, column_step, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons, glue_box);
 }
 
 static void
-fill_region_multi (const db::Region *fr, db::Cell *cell, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step,
+fill_region_multi (const db::Region *fr, db::Cell *cell, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step,
                    const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Point &origin, const db::Box &glue_box)
 {
-  db::fill_region_repeat (cell, *fr, fill_cell_index, kernel_origin, row_step, column_step, fill_margin, remaining_polygons, origin, glue_box);
+  db::fill_region_repeat (cell, *fr, fill_cell_index, fc_box, row_step, column_step, fill_margin, remaining_polygons, origin, glue_box);
 }
 
 static db::Point default_origin;

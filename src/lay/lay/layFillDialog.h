@@ -60,10 +60,12 @@ struct LAY_PUBLIC FillParameters
   bool enhanced_fill;
   std::string fill_cell_name;
   db::DVector fill_cell_margin;
-  db::DVector kernel_origin, row_step, column_step;
+  db::DVector row_step, column_step;
+  db::DBox fc_bbox;
   std::string fill_cell_name2;
   db::DVector fill_cell_margin2;
-  db::DVector kernel_origin2, row_step2, column_step2;
+  db::DVector row_step2, column_step2;
+  db::DBox fc_bbox2;
 };
 
 class LAY_PUBLIC FillDialog

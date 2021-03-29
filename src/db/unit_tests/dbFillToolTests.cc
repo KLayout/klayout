@@ -104,7 +104,8 @@ TEST(3)
   db::Vector ko (-100, -130);
   db::Vector rs (230, 40);
   db::Vector cs (40, 230);
-  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, ko, rs, cs, db::Point (), true, &remaining_parts, db::Vector (50, 100), &remaining_polygons);
+  db::Box fc_box (db::Point () + ko, db::Point (rs.x (), cs.y ()) + ko);
+  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, fc_box, rs, cs, db::Point (), true, &remaining_parts, db::Vector (50, 100), &remaining_polygons);
 
   unsigned int l100 = ly.insert_layer (db::LayerProperties (100, 0));
   unsigned int l101 = ly.insert_layer (db::LayerProperties (101, 0));
@@ -137,7 +138,8 @@ TEST(3a)
   db::Vector ko (-100, -130);
   db::Vector rs (230, 40);
   db::Vector cs (-40, 230);
-  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, ko, rs, cs, db::Point (), true, &remaining_parts, db::Vector (50, 100), &remaining_polygons);
+  db::Box fc_box (db::Point () + ko, db::Point (rs.x (), cs.y ()) + ko);
+  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, fc_box, rs, cs, db::Point (), true, &remaining_parts, db::Vector (50, 100), &remaining_polygons);
 
   unsigned int l100 = ly.insert_layer (db::LayerProperties (100, 0));
   unsigned int l101 = ly.insert_layer (db::LayerProperties (101, 0));
@@ -170,7 +172,8 @@ TEST(3b)
   db::Vector ko (-100, -130);
   db::Vector rs (230, -40);
   db::Vector cs (40, 230);
-  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, ko, rs, cs, db::Point (), true, &remaining_parts, db::Vector (50, 100), &remaining_polygons);
+  db::Box fc_box (db::Point () + ko, db::Point (rs.x (), cs.y ()) + ko);
+  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, fc_box, rs, cs, db::Point (), true, &remaining_parts, db::Vector (50, 100), &remaining_polygons);
 
   unsigned int l100 = ly.insert_layer (db::LayerProperties (100, 0));
   unsigned int l101 = ly.insert_layer (db::LayerProperties (101, 0));
@@ -203,7 +206,8 @@ TEST(3c)
   db::Vector ko (-100, -130);
   db::Vector rs (230, -40);
   db::Vector cs (-40, 230);
-  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, ko, rs, cs, db::Point (), true, &remaining_parts, db::Vector (50, 100), &remaining_polygons);
+  db::Box fc_box (db::Point () + ko, db::Point (rs.x (), cs.y ()) + ko);
+  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, fc_box, rs, cs, db::Point (), true, &remaining_parts, db::Vector (50, 100), &remaining_polygons);
 
   unsigned int l100 = ly.insert_layer (db::LayerProperties (100, 0));
   unsigned int l101 = ly.insert_layer (db::LayerProperties (101, 0));
@@ -236,12 +240,76 @@ TEST(4)
   db::Vector ko (-100, -130);
   db::Vector rs (230, 0);
   db::Vector cs (0, 230);
-  db::fill_region_repeat (&ly.cell (top_cell), fill_region, fill_cell, ko, rs, cs, db::Vector (50, 100), &remaining_polygons);
+  db::Box fc_box (db::Point () + ko, db::Point (rs.x (), cs.y ()) + ko);
+  db::fill_region_repeat (&ly.cell (top_cell), fill_region, fill_cell, fc_box, rs, cs, db::Vector (50, 100), &remaining_polygons);
 
-  unsigned int l100 = ly.insert_layer (db::LayerProperties (100, 0));
   unsigned int l101 = ly.insert_layer (db::LayerProperties (101, 0));
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
   CHECKPOINT();
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au4.gds");
+}
+
+TEST(4b)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/fill_tool4.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type fill_cell = ly.cell_by_name ("FILL_CELL").second;
+  db::cell_index_type top_cell = ly.cell_by_name ("TOP").second;
+  unsigned int fill_layer = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Region fill_region (db::RecursiveShapeIterator (ly, ly.cell (top_cell), fill_layer));
+
+  db::Region remaining_polygons;
+
+  db::Vector ko (-100, -130);
+  db::Vector rs (230, 0);
+  db::Vector cs (0, 230);
+  db::Box fc_box (db::Point () + ko, db::Point ());
+  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, fc_box, rs, cs, db::Point (), true, &remaining_polygons);
+
+  unsigned int l101 = ly.insert_layer (db::LayerProperties (101, 0));
+  remaining_polygons.insert_into (&ly, top_cell, l101);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au4b.gds");
+}
+
+TEST(4c)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/fill_tool4.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type fill_cell = ly.cell_by_name ("FILL_CELL").second;
+  db::cell_index_type top_cell = ly.cell_by_name ("TOP").second;
+  unsigned int fill_layer = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Region fill_region (db::RecursiveShapeIterator (ly, ly.cell (top_cell), fill_layer));
+
+  db::Region remaining_polygons;
+
+  db::Vector ko (-100, -130);
+  db::Vector rs (230, 0);
+  db::Vector cs (0, 230);
+  db::Box fc_box (db::Point () + ko, db::Point (rs.x (), cs.y ()) + ko);
+  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, fc_box.enlarged (db::Vector (100, 100)), rs, cs, db::Point (), true, &remaining_polygons);
+
+  unsigned int l101 = ly.insert_layer (db::LayerProperties (101, 0));
+  remaining_polygons.insert_into (&ly, top_cell, l101);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au4c.gds");
 }

@@ -187,11 +187,11 @@ FillDialog::generate_fill (const FillParameters &fp)
 
   db::Vector row_step = db::CplxTrans (ly.dbu ()).inverted () * fp.row_step;
   db::Vector column_step = db::CplxTrans (ly.dbu ()).inverted () * fp.column_step;
-  db::Vector kernel_origin = db::CplxTrans (ly.dbu ()).inverted () * fp.kernel_origin;
+  db::Box fc_bbox = db::CplxTrans (ly.dbu ()).inverted () * fp.fc_bbox;
 
   db::Vector row_step2 = db::CplxTrans (ly.dbu ()).inverted () * fp.row_step2;
   db::Vector column_step2 = db::CplxTrans (ly.dbu ()).inverted () * fp.column_step2;
-  db::Vector kernel_origin2 = db::CplxTrans (ly.dbu ()).inverted () * fp.kernel_origin2;
+  db::Box fc_bbox2 = db::CplxTrans (ly.dbu ()).inverted () * fp.fc_bbox2;
 
 
   if (tl::verbosity () >= 20) {
@@ -271,15 +271,15 @@ FillDialog::generate_fill (const FillParameters &fp)
       }
 
       if (! enhanced_fill) {
-        db::fill_region (cv.cell (), fill_region, fill_cell->cell_index (), kernel_origin, row_step, column_step, fr_bbox.p1 (), false, fill_cell2 ? &fill_region : 0, fill_margin, fill_cell2 ? &fill_region : 0);
+        db::fill_region (cv.cell (), fill_region, fill_cell->cell_index (), fc_bbox, row_step, column_step, fr_bbox.p1 (), false, fill_cell2 ? &fill_region : 0, fill_margin, fill_cell2 ? &fill_region : 0);
       } else {
-        db::fill_region_repeat (cv.cell (), fill_region, fill_cell->cell_index (), kernel_origin, row_step, column_step, fill_margin, fill_cell2 ? &fill_region : 0);
+        db::fill_region_repeat (cv.cell (), fill_region, fill_cell->cell_index (), fc_bbox, row_step, column_step, fill_margin, fill_cell2 ? &fill_region : 0);
       }
 
       fill_cell = fill_cell2;
       row_step = row_step2;
       column_step = column_step2;
-      kernel_origin = kernel_origin2;
+      fc_bbox = fc_bbox2;
       fill_margin = fill_margin2;
 
       fill_cell2 = 0;
@@ -497,12 +497,11 @@ FillDialog::get_fill_parameters ()
     fp.column_step = db::DVector (0.0, fc_bbox.height ());
   }
 
-  fp.kernel_origin = fc_bbox.p1 () - db::DPoint ();
-
-  const db::Cell *fill_cell2 = 0;
-  db::DBox fc_bbox2;
+  fp.fc_bbox = fc_bbox;
 
   if (second_order_fill_cb->isChecked ()) {
+
+    db::DBox fc_bbox2;
 
     fp.fill_cell_name2 = tl::to_string (fill_cell_2nd_le->text ());
 
@@ -511,7 +510,7 @@ FillDialog::get_fill_parameters ()
       throw tl::Exception (tl::to_string (QObject::tr ("Second order fill cell not found: ")) + tl::to_string (fill_cell_2nd_le->text ()));
     }
 
-    fill_cell2 = &cv->layout ().cell (fc.second);
+    const db::Cell *fill_cell2 = &cv->layout ().cell (fc.second);
 
     fc_bbox2 = db::CplxTrans (cv->layout ().dbu ()) * (fc_bbox_layer < 0 ? fill_cell2->bbox () : fill_cell2->bbox (fc_bbox_layer));
     if (fc_bbox2.empty ()) {
@@ -533,6 +532,8 @@ FillDialog::get_fill_parameters ()
     } else {
       fp.column_step2 = db::DVector (0.0, fc_bbox2.height ());
     }
+
+    fp.fc_bbox2 = fc_bbox2;
 
   }
 

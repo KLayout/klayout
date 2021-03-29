@@ -50,33 +50,24 @@ class Region;
  *
  *  Return value: true, if the polygon could be filled, false if no fill tile at all could be applied (remaining_parts will not be fed in that case)
  *
- *  Explanation for the fill kernel_origin, row step and column step vectors:
+ *  Explanation for the fill fc_box, row step and column step vectors:
  *
- *  The "kernel" is a rectangular or diamond-shaped area which is repeated along it's primary
- *  axes. In case of a box, the kernel is a rectangle and the primary axes are the x and y axes.
- *  The step vectors describe the repetition: in case of the box, the row step vector is (w,0) and
- *  the column step vector is (h,0) (w and h are the box width and heigth respectively). Hence
- *  the kernel will be repeated seamlessly.
+ *  The "fc_box" is a rectangular area which is repeated along the primary fill axes given by row_step
+ *  and column_step vectors. The fill box is placed with the lower-left corner.
  *
- *  The kernel's boundary in case of the diamond kernel is:
- *
- *    (o,o+c,o+c+r,o+r)
- *
- *  (o = kernel_origin, r = row_step, c = column_step)
- *
- *  Formally, the kernel will be placed a positions
+ *  Formally, the fill box will be placed a positions
  *
  *    p(i,j) = p0 + i * row_step + j * column_step
  *
  *  p0 is a position chosen by the fill alogorithm or the "origin", if enhanced_fill is false.
  *
- *  This pattern is overlaid with the polygon to fill and all instances where the kernel moved by p(i,j) is entirely inside
+ *  This pattern is overlaid with the polygon to fill and all instances where the fill box moved by p(i,j) is entirely inside
  *  the polygon generate a fill cell instance with a displacement of p.
  *
- *  Afterwards, the residual parts are computed by subtracting all moved kernels from the polygon to fill.
+ *  Afterwards, the residual parts are computed by subtracting all moved fill boxes from the polygon to fill.
  *  This implies that ideally the fc_boxes should overlap while they are repeated with row_step and column_step.
  *
- *  As a practical consequence, if all fill cell geometries are within the kernel's boundary, they will also
+ *  As a practical consequence, if all fill cell geometries are within the fill boxes boundary, they will also
  *  be within the polygon to fill.
  *
  *  If the glue box is non-empty, fill cells are guaranteed to use the global origin even in enhanced mode if
@@ -92,7 +83,7 @@ fill_region (db::Cell *cell, const db::Polygon &fp, db::cell_index_type fill_cel
              std::vector <db::Polygon> *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (), const db::Box &glue_box = db::Box ());
 
 DB_PUBLIC bool
-fill_region (db::Cell *cell, const db::Polygon &fp, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
+fill_region (db::Cell *cell, const db::Polygon &fp, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
              std::vector <db::Polygon> *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (), const db::Box &glue_box = db::Box ());
 
 
@@ -111,7 +102,7 @@ fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell
              db::Region *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (), db::Region *remaining_polygons = 0, const db::Box &glue_box = db::Box ());
 
 DB_PUBLIC void
-fill_region (db::Cell *cell, const db::Region &fp, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
+fill_region (db::Cell *cell, const db::Region &fp, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
              db::Region *remaining_parts = 0, const db::Vector &fill_margin = db::Vector (), db::Region *remaining_polygons = 0, const db::Box &glue_box = db::Box ());
 
 /**
@@ -126,7 +117,7 @@ fill_region (db::Cell *cell, const db::Region &fp, db::cell_index_type fill_cell
  */
 DB_PUBLIC void
 fill_region_repeat (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index,
-                    const db::Vector &kernel_origin, const db::Vector &row_step, const db::Vector &column_step,
+                    const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step,
                     const db::Vector &fill_margin, db::Region *remaining_polygons = 0, const db::Point &origin = db::Point (), const db::Box &glue_box = db::Box ());
 
 }

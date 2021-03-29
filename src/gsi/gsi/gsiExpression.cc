@@ -1504,9 +1504,14 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
     tl::Heap heap;
     size_t narg = 0;
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && narg < args.size (); ++a, ++narg) {
-      //  Note: this const_cast is ugly, but it will basically enable "out" parameters
-      //  TODO: clean this up.
-      gsi::do_on_type<writer> () (a->type (), &arglist, const_cast<tl::Variant *> (&args [narg]), *a, &heap);
+      try {
+        //  Note: this const_cast is ugly, but it will basically enable "out" parameters
+        //  TODO: clean this up.
+        gsi::do_on_type<writer> () (a->type (), &arglist, const_cast<tl::Variant *> (&args [narg]), *a, &heap);
+      } catch (tl::Exception &ex) {
+        std::string msg = ex.msg () + tl::sprintf (tl::to_string (tr (" (argument '%s')")), a->spec ()->name ());
+        throw tl::Exception (msg);
+      }
     }
 
     SerialArgs retlist (meth->retsize ());
@@ -1518,7 +1523,12 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
       throw tl::Exception (tl::sprintf (tl::to_string (tr ("Iterators not supported yet (method %s, class %s)")), method.c_str (), mp_cls->name ()));
     } else {
       out = tl::Variant ();
-      gsi::do_on_type<reader> () (meth->ret_type ().type (), &out, &retlist, meth->ret_type (), &heap);
+      try {
+        gsi::do_on_type<reader> () (meth->ret_type ().type (), &out, &retlist, meth->ret_type (), &heap);
+      } catch (tl::Exception &ex) {
+        std::string msg = ex.msg () + tl::to_string (tr (" (return value)"));
+        throw tl::Exception (msg);
+      }
     }
 
   }

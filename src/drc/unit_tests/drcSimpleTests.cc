@@ -1203,3 +1203,13 @@ TEST(41_fillTiled)
   run_test (_this, "41", false);
 }
 
+TEST(42_fillWithLeft)
+{
+  run_test (_this, "42", false);
+}
+
+TEST(43_fillWithLeftTiled)
+{
+  run_test (_this, "43", false);
+}
+

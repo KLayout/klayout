@@ -187,7 +187,7 @@ module DRC
     def initialize(name)
       @cell_name = name
       @shapes = []
-      @origin = RBA::DVector::new
+      @origin = nil
     end
 
     def create_cell(layout, engine)
@@ -201,7 +201,12 @@ module DRC
     end
 
     def cell_origin
-      @origin
+      @origin || self._computed_origin
+    end
+
+    def _computed_origin
+      b = self.bbox
+      return b.empty? ? RBA::DVector::new : (b.p1 - RBA::DPoint::new)
     end
 
     def bbox

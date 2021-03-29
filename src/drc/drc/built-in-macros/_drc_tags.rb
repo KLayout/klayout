@@ -190,6 +190,27 @@ module DRC
       @origin = RBA::DVector::new
     end
 
+    def create_cell(layout)
+      cell = layout.create_cell(@cell_name)
+      @shapes.each do |s|
+        li = layout.layer(s[0])
+        s[1].each { |t| cell.shapes(li).insert(t) }
+      end
+      cell
+    end
+
+    def cell_origin
+      @origin
+    end
+
+    def bbox
+      box = RBA::DBox::new
+      @shapes.each do |s|
+        s[1].each { |t| box += t.bbox }
+      end
+      box
+    end
+
     def shape(*args)
 
       layer = nil
@@ -201,7 +222,6 @@ module DRC
         if a.is_a?(1.class)
           if !layer
             layer = a
-            datatype = 0
           elsif !datatype
             datatype = a
           else
@@ -223,17 +243,24 @@ module DRC
       if !shapes.empty?
 
         li = RBA::LayerInfo::new
-        layer && li.layer = layer
-        datatype && li.datatype = datatype
-        name && li.name = name
+        if layer 
+          li.layer = layer
+          li.datatype = datatype || 0
+        end
+        if name
+          li.name = name
+        end
 
         @shapes << [ li, shapes ]
 
       end
+
+      self
      
     end
 
     def origin(x, y)
+
       if !x.is_a?(1.class) && !x.is_a?(1.0.class)
         raise("x argument not numeric FillCell#origin")
       end
@@ -241,6 +268,9 @@ module DRC
         raise("y argument not numeric FillCell#origin")
       end
       @origin = RBA::DVector::new(x, y)
+
+      self
+
     end
 
   end

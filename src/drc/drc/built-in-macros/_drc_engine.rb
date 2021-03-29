@@ -211,16 +211,16 @@ module DRC
       end
     end
 
-    def fill_cell(name)
+    def fill_pattern(name)
       DRCFillCell::new(name)
     end
 
     def hstep(x, y = nil)
-      DRCFillStep(true, x, y)
+      DRCFillStep::new(true, x, y)
     end
     
     def vstep(x, y = nil)
-      DRCFillStep(false, x, y)
+      DRCFillStep::new(false, x, y)
     end
 
     def auto_origin
@@ -1967,7 +1967,7 @@ CODE
       end
       
       # disable progress again
-      if obj.is_a?(RBA::Region)
+      if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs) || obj.is_a?(RBA::Texts)
         obj.disable_progress
       end
       
@@ -2022,7 +2022,7 @@ CODE
       end
       
       # disable progress again
-      if obj.is_a?(RBA::Region)
+      if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs) || obj.is_a?(RBA::Texts)
         obj.disable_progress
       end
       
@@ -2065,7 +2065,7 @@ CODE
       end
       
       # disable progress again
-      if obj.is_a?(RBA::Region)
+      if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs) || obj.is_a?(RBA::Texts)
         obj.disable_progress
       end
       
@@ -2083,6 +2083,22 @@ CODE
       run_timed("\"#{method}\" in: #{src_line}", obj) do
         obj.send(method, *args)
       end
+    end
+
+    def _bx
+      @bx
+    end
+    
+    def _by
+      @by
+    end
+    
+    def _tx
+      @tx
+    end
+    
+    def _ty
+      @ty
     end
     
     def _start

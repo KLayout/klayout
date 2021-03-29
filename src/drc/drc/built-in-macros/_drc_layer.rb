@@ -3898,6 +3898,9 @@ CODE
     
     def fill(*args)
 
+      # generation of new cells not tested in deep mode
+      @deep && raise("fill command not supported in deep mode currently")
+
       m = "fill"
 
       source = @engine.source
@@ -3922,12 +3925,12 @@ CODE
             if row_step
               raise("Duplicate hstep specification for '#{m}' at argument ##{ai+1}")
             end
-            row_step = a
+            row_step = a.step
           else
             if column_step
               raise("Duplicate vstep specification for '#{m}' at argument ##{ai+1}")
             end
-            column_step = a
+            column_step = a.step
           end
         elsif a.is_a?(DRCFillOrigin)
           origin = a.origin
@@ -3937,7 +3940,7 @@ CODE
       end
 
       if !pattern
-        raise("No fill pattern given for '#{m}'")
+        raise("No fill pattern given for '#{m}' (use 'fill_pattern')")
       end
 
       if !row_step
@@ -3947,7 +3950,64 @@ CODE
         column_step = RBA::DVector::new(0, pattern.bbox.height)
       end
 
+      dbu_trans = RBA::VCplxTrans::new(1.0 / @engine.dbu)
 
+      fill_cell = pattern.create_cell(source.layout)
+      top_cell = source.cell_obj
+      ko = dbu_trans * pattern.cell_origin
+      rs = dbu_trans * row_step
+      cs = dbu_trans * column_step
+      origin = origin ? dbu_trans * origin : nil
+      fc_index = fill_cell.cell_index
+
+      if @engine._tx && @engine._ty
+
+        tp = RBA::TilingProcessor::new
+        tp.dbu = @engine.dbu
+        tp.scale_to_dbu = false
+        tp.tile_size(@engine._tx, @engine._ty)
+        bx = [ @engine._bx || 0.0, row_step.x ].max
+        by = [ @engine._by || 0.0, column_step.y ].max
+        tp.tile_border(bx, by)
+        tp.threads = (@engine.threads || 1)
+
+        tp.input("region", self.data)
+        tp.var("top_cell", top_cell)
+        tp.var("ko", ko)
+        tp.var("rs", rs)
+        tp.var("cs", cs)
+        tp.var("origin", origin)
+        tp.var("fc_index", fc_index)
+
+        tp.queue(<<"END")
+var tc_box = top_cell.bbox;
+var tile_box = _tile ? (tc_box & _tile.bbox) : top_cell.bbox;
+!tile_box.empty && (
+  tile_box.right = tile_box.right + rs.x - 1;
+  tile_box.top = tile_box.top + cs.y - 1;
+  tile_box = tile_box & tc_box;
+  (region & tile_box).fill(top_cell, fc_index, ko, rs, cs, origin, nil, Vector.new, nil, _tile.bbox)
+)
+END
+          
+        begin
+          source.layout.start_changes
+          @engine.run_timed("\"#{m}\" in: #{@engine.src_line}", self.data) do
+            tp.execute("Tiled \"#{m}\" in: #{@engine.src_line}")
+          end
+        ensure
+          source.layout.end_changes
+        end
+
+      else
+
+        @engine.run_timed("\"#{m}\" in: #{@engine.src_line}", self.data) do
+          self.data.fill(top_cell, fc_index, ko, rs, cs, origin)
+        end
+
+      end
+          
+      self.data.disable_progress
 
     end
     

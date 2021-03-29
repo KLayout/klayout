@@ -887,10 +887,12 @@ The plain function is equivalent to "primary.sized".
 <keyword name="smoothed"/>
 <p>Usage:</p>
 <ul>
-<li><tt>expression.smoothed(d)</tt></li>
+<li><tt>expression.smoothed(d [, keep_hv ])</tt></li>
 </ul>
 <p>
-This operation acts on polygons and applies polygon smoothing with the tolerance d. See <a href="/about/drc_ref_layer.xml#smoothed">Layer#smoothed</a> for more details.
+This operation acts on polygons and applies polygon smoothing with the tolerance d. 'keep_hv' indicates
+whether horizontal and vertical edges are maintained. Default is 'no' which means such edges may be distorted.
+See <a href="/about/drc_ref_layer.xml#smoothed">Layer#smoothed</a> for more details.
 </p><p>
 The "smoothed" method is available as a plain function or as a method on <a href="/about/drc_ref_drc.xml">DRC</a> expressions.
 The plain function is equivalent to "primary.smoothed".

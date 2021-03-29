@@ -3894,7 +3894,76 @@ CODE
       end
     end
 
-    # Experimental
+    # %DRC%
+    # @name fill
+    # @brief Fills the region with regular pattern of shapes
+    # @synopsis layer.fill([ options ])
+    #
+    # This method will attempt to fill the polygons of the layer with a regular pattern
+    # of shapes.
+    #  
+    # The fill function currently is not available in deep mode.
+    #
+    # Options are:
+    # @ul
+    # @li @b hstep(x) @/b or @b hstep(x, y) @/b: specifies the horizontal step pitch of the pattern. x must be 
+    #     a positive value. A vertical displacement component can be specified too, which results in a skewed pattern. @/li
+    # @li @b vstep(y) @/b or @b vstep(x, y) @/b: specifies the vertical step pitch of the pattern. y must be 
+    #     a positive value. A horizontal displacement component can be specified too, which results in a skewed pattern. @/li
+    # @li @b origin(x, y) @/b: specifies a fixed point to align the pattern with. This point specifies the location
+    #     of the reference point for one pattern cell. @/li
+    # @li @b auto_origin @/b: lets the algorithm choose the origin. This may result is a slightly better fill coverage
+    #     as the algorithm is able to determine a pattern origin per fill island. @/li
+    # @li @b fill_pattern(..) @/b: specifies the fill pattern. @/li
+    # @/ul
+    #
+    # "fill_pattern" generates a fill pattern object. This object is used for configuring the fill pattern
+    # content. Fill pattern need to be named. The name will be used for generating the fill cell.
+    #
+    # To provide a fill pattern, create a fill pattern object and add shapes to it. The following example creates
+    # a fill pattern named "FILL_CELL" and adds a 1x1 micron box on layer 1/0:
+    #
+    # @code
+    # p = fill_pattern("FILL_CELL")
+    # p.shape(1, 0, box(0.0, 0.0, 1.0, 1.0))
+    # @/code
+    # 
+    # See \global#box for details about the box specification. You can also add paths or polygons with \global#path or \global#polygon.
+    # 
+    # A more compact way of writing this is:
+    #
+    # @code
+    # p = fill_pattern("FILL_CELL").shape(1, 0, box(0.0, 0.0, 1.0, 1.0))
+    # @/code
+    #
+    # The fill pattern can be given a reference point which is used for placing the pattern. The reference point
+    # is the one which is aligned with the pattern origin. The following code will assign (-0.5, -0.5) as the reference
+    # point for the 1x1 micron rectangle. Hence the reference point is a little below and left of the rectangle which 
+    # in turn shifts the rectangle fill pattern to the right and up:
+    #
+    # @code
+    # p = fill_pattern("FILL_CELL")
+    # p.shape(1, 0, box(0.0, 0.0, 1.0, 1.0))
+    # p.origin(-0.5, -0.5)
+    # @/code
+    #
+    # Without a reference point given, the lower left corner of the fill pattern's bounding box will be used
+    # as the reference point.
+    #
+    # With these ingredients will can use the fill function. The first example fills the polygons
+    # of "to_fill" with an orthogonal pattern of 1x1 micron rectangles with a pitch of 2 microns:
+    #
+    # @code
+    # pattern = fill_pattern("FILL_CELL").shape(1, 0, box(0.0, 0.0, 1.0, 1.0)).origin(-0.5, -0.5)
+    # to_fill.fill(pattern, hstep(2.0), vstep(2.0))
+    # @/code
+    #
+    # This second example will create a skewed fill pattern in auto-origin mode:
+    #  
+    # @code
+    # pattern = fill_pattern("FILL_CELL").shape(1, 0, box(0.0, 0.0, 1.0, 1.0)).origin(-0.5, -0.5)
+    # to_fill.fill(pattern, hstep(2.0, 1.0), vstep(-1.0, 2.0), auto_origin)
+    # @/code
     
     def fill(*args)
 

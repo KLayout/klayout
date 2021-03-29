@@ -315,6 +315,7 @@ private:
 
   std::string m_desc, m_last_desc;
   std::string m_title;
+  bool m_final;
   size_t m_interval_count;
   size_t m_yield_interval;
   double m_last_value;

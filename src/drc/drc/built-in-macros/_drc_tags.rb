@@ -188,6 +188,7 @@ module DRC
       @cell_name = name
       @shapes = []
       @origin = nil
+      @dim = nil
     end
 
     def create_cell(layout, engine)
@@ -200,13 +201,15 @@ module DRC
       cell
     end
 
-    def cell_origin
-      @origin || self._computed_origin
+    def cell_box(def_w, def_h)
+      o = @origin || self._computed_origin
+      d = @dim || RBA::DVector::new(def_w, def_h)
+      RBA::DBox::new(o, o + d)
     end
 
     def _computed_origin
       b = self.bbox
-      return b.empty? ? RBA::DVector::new : (b.p1 - RBA::DPoint::new)
+      return b.empty? ? RBA::DPoint::new : b.p1
     end
 
     def bbox
@@ -274,6 +277,20 @@ module DRC
         raise("y argument not numeric FillCell#origin")
       end
       @origin = RBA::DVector::new(x, y)
+
+      self
+
+    end
+
+    def dim(w, h)
+
+      if !w.is_a?(1.class) && !w.is_a?(1.0.class)
+        raise("w argument not numeric FillCell#dim")
+      end
+      if !h.is_a?(1.class) && !h.is_a?(1.0.class)
+        raise("h argument not numeric FillCell#dim")
+      end
+      @dim = RBA::DVector::new(w, h)
 
       self
 

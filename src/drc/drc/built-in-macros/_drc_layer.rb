@@ -4286,7 +4286,21 @@ CODE
     # @/code
     #
     # Without a reference point given, the lower left corner of the fill pattern's bounding box will be used
-    # as the reference point.
+    # as the reference point. The reference point will also defined the footprint of the fill cell - more precisely
+    # the lower left corner. The fill cell's foot print is taken to be a rectangle having the horizontal and vertical
+    # step pitch for width and height respectively. The dimension can be changed however so that the fill cells
+    # can overlap or there can be spacing between the cells. To change the dimensions use the "dim" method.
+    #
+    # The following example specifies a fill cell with an active area of -0.5 .. 1.5 in both directions
+    # (2 micron width and height). With these dimensions the fill cell's footprint is independent of the
+    # step pitch:
+    #
+    # @code
+    # p = fill_pattern("FILL_CELL")
+    # p.shape(1, 0, box(0.0, 0.0, 1.0, 1.0))
+    # p.origin(-0.5, -0.5)
+    # p.dim(2.0, 2.0)
+    # @/code
     #
     # With these ingredients will can use the fill function. The first example fills the polygons
     # of "to_fill" with an orthogonal pattern of 1x1 micron rectangles with a pitch of 2 microns:
@@ -4388,7 +4402,7 @@ CODE
 
       fill_cell = pattern.create_cell(@engine._output_layout, @engine)
       top_cell = @engine._output_cell
-      ko = dbu_trans * pattern.cell_origin
+      fc_box = dbu_trans * pattern.cell_box(row_step.x, column_step.y)
       rs = dbu_trans * row_step
       cs = dbu_trans * column_step
       origin = origin ? dbu_trans * origin : nil
@@ -4415,7 +4429,7 @@ CODE
 
         tp.input("region", self.data)
         tp.var("top_cell", top_cell)
-        tp.var("ko", ko)
+        tp.var("fc_box", fc_box)
         tp.var("rs", rs)
         tp.var("cs", cs)
         tp.var("origin", origin)
@@ -4426,10 +4440,10 @@ CODE
             var tc_box = _frame.bbox;
             var tile_box = _tile ? (tc_box & _tile.bbox) : tc_box;
             !tile_box.empty && (
-              tile_box = tile_box.enlarged(Vector.new(rs.x, cs.y));
+              tile_box = tile_box.enlarged(Vector.new(max(rs.x, fc_box.width), max(cs.y, fc_box.height)));
               tile_box = tile_box & tc_box;
               var left = Region.new;
-              (region & tile_box).fill(top_cell, fc_index, ko, rs, cs, origin, left, Vector.new, left, _tile.bbox);
+              (region & tile_box).fill(top_cell, fc_index, fc_box, rs, cs, origin, left, Vector.new, left, _tile.bbox);
               _output(#{result_arg}, left)
             )
 END
@@ -4441,7 +4455,7 @@ END
               tile_box.right = tile_box.right + rs.x - 1;
               tile_box.top = tile_box.top + cs.y - 1;
               tile_box = tile_box & tc_box;
-              (region & tile_box).fill(top_cell, fc_index, ko, rs, cs, origin, nil, Vector.new, nil, _tile.bbox)
+              (region & tile_box).fill(top_cell, fc_index, fc_box, rs, cs, origin, nil, Vector.new, nil, _tile.bbox)
             )
 END
         end
@@ -4462,7 +4476,7 @@ END
         end
 
         @engine.run_timed("\"#{m}\" in: #{@engine.src_line}", self.data) do
-          self.data.fill(top_cell, fc_index, ko, rs, cs, origin, result, RBA::Vector::new, result)
+          self.data.fill(top_cell, fc_index, fc_box, rs, cs, origin, result, RBA::Vector::new, result)
         end
 
       end

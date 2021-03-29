@@ -140,7 +140,7 @@ public:
         db::Vector dr = m_row_step * long ((rows_per_columns > 0 ? -(ir + 1) : ir) + m_row_steps);
         db::Vector dc = m_column_step * long ((columns_per_rows > 0 ? -(ic + 1) : ic) + m_column_steps);
 
-        am.reinitialize (db::Point (fp_left, fp_bottom) + dr + dc, db::Vector (ddx, ddy), db::Vector (dx, dy), nx, ny);
+        am.reinitialize (db::Point (fp_left, fp_bottom) + dr + dc, db::Vector (ddx, ddy), m_dim, nx, ny);
 
         if (db::rasterize (fp, am)) {
           m_area_maps.push_back (db::AreaMap ());

@@ -1163,3 +1163,12 @@ TEST(29d_holes)
   run_test (_this, "29", true);
 }
 
+TEST(30_fill)
+{
+  run_test (_this, "30", false);
+}
+
+TEST(31_fillTiled)
+{
+  run_test (_this, "31", false);
+}

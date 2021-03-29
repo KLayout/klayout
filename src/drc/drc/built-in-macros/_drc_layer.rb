@@ -4021,8 +4021,8 @@ CODE
 
       dbu_trans = RBA::VCplxTrans::new(1.0 / @engine.dbu)
 
-      fill_cell = pattern.create_cell(source.layout)
-      top_cell = source.cell_obj
+      fill_cell = pattern.create_cell(@engine._output_layout, @engine)
+      top_cell = @engine._output_cell
       ko = dbu_trans * pattern.cell_origin
       rs = dbu_trans * row_step
       cs = dbu_trans * column_step
@@ -4033,6 +4033,7 @@ CODE
 
         tp = RBA::TilingProcessor::new
         tp.dbu = @engine.dbu
+        tp.frame = RBA::CplxTrans::new(@engine.dbu) * self.data.bbox
         tp.scale_to_dbu = false
         tp.tile_size(@engine._tx, @engine._ty)
         bx = [ @engine._bx || 0.0, row_step.x ].max
@@ -4049,8 +4050,8 @@ CODE
         tp.var("fc_index", fc_index)
 
         tp.queue(<<"END")
-var tc_box = top_cell.bbox;
-var tile_box = _tile ? (tc_box & _tile.bbox) : top_cell.bbox;
+var tc_box = _frame.bbox;
+var tile_box = _tile ? (tc_box & _tile.bbox) : tc_box;
 !tile_box.empty && (
   tile_box.right = tile_box.right + rs.x - 1;
   tile_box.top = tile_box.top + cs.y - 1;
@@ -4060,12 +4061,12 @@ var tile_box = _tile ? (tc_box & _tile.bbox) : top_cell.bbox;
 END
           
         begin
-          source.layout.start_changes
+          @engine._output_layout.start_changes
           @engine.run_timed("\"#{m}\" in: #{@engine.src_line}", self.data) do
             tp.execute("Tiled \"#{m}\" in: #{@engine.src_line}")
           end
         ensure
-          source.layout.end_changes
+          @engine._output_layout.end_changes
         end
 
       else

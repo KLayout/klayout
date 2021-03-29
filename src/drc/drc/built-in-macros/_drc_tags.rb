@@ -190,10 +190,11 @@ module DRC
       @origin = RBA::DVector::new
     end
 
-    def create_cell(layout)
+    def create_cell(layout, engine)
       cell = layout.create_cell(@cell_name)
       @shapes.each do |s|
         li = layout.layer(s[0])
+        engine._use_output_layer(li)
         s[1].each { |t| cell.shapes(li).insert(t) }
       end
       cell

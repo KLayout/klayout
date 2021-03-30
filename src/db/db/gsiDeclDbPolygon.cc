@@ -1855,7 +1855,7 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "\n"
     "This method was introduced in version 0.24.\n"
   ) +
-  method_ext ("transformed", &transformed_icplx_dp, gsi::arg ("t"),
+  method_ext ("#transformed", &transformed_icplx_dp, gsi::arg ("t"),
     "@brief Transforms the polygon with a complex transformation\n"
     "\n"
     "Transforms the polygon with the given complex transformation.\n"

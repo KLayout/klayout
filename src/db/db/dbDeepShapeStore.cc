@@ -953,7 +953,7 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
     //  collects the cell mappings we skip because they are variants (variant building or box variants)
     std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey> cm_skipped_variants;
 
-    if (into_layout == original_builder.source ().layout () && &into_layout->cell (into_cell) == original_builder.source ().top_cell ()) {
+    if (into_layout == original_builder.source ().layout () && &into_layout->cell (into_cell) == original_builder.source ().top_cell () && original_builder.source ().global_trans ().is_unity ()) {
 
       //  This is the case of mapping back to the original. In this case we can use the information
       //  provided inside the original hierarchy builders. They list the source cells and the target cells

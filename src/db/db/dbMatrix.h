@@ -42,23 +42,24 @@ namespace db
 /**
  *  @brief A class representing a 2d matrix, mainly to represent a rotation or shear transformation of 2d vectors
  */
-class DB_PUBLIC Matrix2d 
+template <class C>
+class DB_PUBLIC matrix_2d
 {
 public:
   /**
    *  @brief typedefs for compatibility with the other transformations
    */
-  typedef double target_coord_type;
-  typedef double coord_type;
-  typedef db::DPoint displacement_type;
-  typedef Matrix2d inverse_trans;
+  typedef C target_coord_type;
+  typedef C coord_type;
+  typedef db::point<C> displacement_type;
+  typedef matrix_2d<C> inverse_trans;
 
   /**
    *  @brief Default ctor
    *
    *  Creates a null matrix
    */
-  Matrix2d ()
+  matrix_2d ()
     : m_m11 (0.0), m_m12 (0.0), m_m21 (0.0), m_m22 (0.0)
   {
     // .. nothing yet ..
@@ -69,8 +70,20 @@ public:
    *
    *  Creates a matrix (m11, m12) (m21, m22)
    */
-  Matrix2d (double m11, double m12, double m21, double m22)
+  matrix_2d (double m11, double m12, double m21, double m22)
     : m_m11 (m11), m_m12 (m12), m_m21 (m21), m_m22 (m22)
+  {
+    // .. nothing yet ..
+  }
+
+  /**
+   *  @brief Full ctor
+   *
+   *  Creates a matrix (m11, m12) (m21, m22)
+   */
+  template <class D>
+  matrix_2d (const matrix_2d<D> &m)
+    : m_m11 (m.m11 ()), m_m12 (m.m12 ()), m_m21 (m.m21 ()), m_m22 (m.m22 ())
   {
     // .. nothing yet ..
   }
@@ -80,7 +93,7 @@ public:
    *
    *  Creates a matrix (d, 0) (0, d)
    */
-  Matrix2d (double d)
+  matrix_2d (double d)
     : m_m11 (d), m_m12 (0.0), m_m21 (0.0), m_m22 (d)
   {
     // .. nothing yet ..
@@ -91,7 +104,7 @@ public:
    *
    *  Creates a matrix (d1, 0) (0, d2)
    */
-  Matrix2d (double d1, double d2)
+  matrix_2d (double d1, double d2)
     : m_m11 (d1), m_m12 (0.0), m_m21 (0.0), m_m22 (d2)
   {
     // .. nothing yet ..
@@ -101,7 +114,7 @@ public:
    *  @brief Make a matrix from a transformation
    */
   template <class Tr> 
-  Matrix2d (const Tr &t)
+  matrix_2d (const Tr &t)
   {
     *this = t.to_matrix2d ();
   }
@@ -109,9 +122,10 @@ public:
   /**
    *  @brief Add operator
    */
-  Matrix2d operator+ (const Matrix2d &other) const
+  template <class D>
+  matrix_2d operator+ (const matrix_2d<D> &other) const
   {
-    Matrix2d m (*this);
+    matrix_2d m (*this);
     m += other;
     return m;
   }
@@ -119,7 +133,8 @@ public:
   /**
    *  @brief Add to operator
    */
-  Matrix2d &operator+= (const Matrix2d &other)
+  template <class D>
+  matrix_2d &operator+= (const matrix_2d<D> &other)
   {
     m_m11 += other.m_m11;
     m_m12 += other.m_m12;
@@ -131,18 +146,19 @@ public:
   /**
    *  @brief Product of two matrices
    */
-  Matrix2d operator* (const Matrix2d &other) const
+  template <class D>
+  matrix_2d operator* (const matrix_2d<D> &other) const
   {
-    return Matrix2d (m_m11 * other.m_m11 + m_m12 * other.m_m21,
-                     m_m11 * other.m_m12 + m_m12 * other.m_m22,
-                     m_m21 * other.m_m11 + m_m22 * other.m_m21,
-                     m_m21 * other.m_m12 + m_m22 * other.m_m22);
+    return matrix_2d (m_m11 * other.m_m11 + m_m12 * other.m_m21,
+                      m_m11 * other.m_m12 + m_m12 * other.m_m22,
+                      m_m21 * other.m_m11 + m_m22 * other.m_m21,
+                      m_m21 * other.m_m12 + m_m22 * other.m_m22);
   }
 
   /**
    *  @brief Multiply another to this matrix
    */
-  Matrix2d &operator*= (const Matrix2d &other)
+  matrix_2d &operator*= (const matrix_2d &other)
   {
     *this = (*this * other);
     return *this;
@@ -151,9 +167,9 @@ public:
   /**
    *  @brief Multiply with a scalar
    */
-  Matrix2d operator* (double d) const
+  matrix_2d operator* (double d) const
   {
-    Matrix2d m (*this);
+    matrix_2d m (*this);
     m *= d;
     return m;
   }
@@ -161,7 +177,7 @@ public:
   /**
    *  @brief Multiply a scalar to this matrix
    */
-  Matrix2d &operator*= (double d)
+  matrix_2d &operator*= (double d)
   {
     m_m11 *= d;
     m_m12 *= d;
@@ -173,15 +189,15 @@ public:
   /**
    *  @brief Transformation of a vector
    */
-  db::DVector operator* (const db::DVector &v) const
+  db::vector<C> operator* (const db::vector<C> &v) const
   {
-    return db::DVector (m_m11 * v.x () + m_m12 * v.y (), m_m21 * v.x () + m_m22 * v.y ());
+    return db::vector<C> (m_m11 * v.x () + m_m12 * v.y (), m_m21 * v.x () + m_m22 * v.y ());
   }
 
   /**
    *  @brief "trans" alias for compatibility with the other transformations
    */
-  db::DVector trans (const db::DVector &p) const
+  db::vector<C> trans (const db::vector<C> &p) const
   {
     return operator* (p);
   }
@@ -189,7 +205,7 @@ public:
   /**
    *  @brief "operator()" alias for compatibility with the other transformations
    */
-  db::DVector operator() (const db::DVector &p) const
+  db::vector<C> operator() (const db::vector<C> &p) const
   {
     return operator* (p);
   }
@@ -197,15 +213,15 @@ public:
   /**
    *  @brief Transformation of a point
    */
-  db::DPoint operator* (const db::DPoint &v) const
+  db::point<C> operator* (const db::point<C> &v) const
   {
-    return db::DPoint (m_m11 * v.x () + m_m12 * v.y (), m_m21 * v.x () + m_m22 * v.y ());
+    return db::point<C> (m_m11 * v.x () + m_m12 * v.y (), m_m21 * v.x () + m_m22 * v.y ());
   }
 
   /**
    *  @brief "trans" alias for compatibility with the other transformations
    */
-  db::DPoint trans (const db::DPoint &p) const
+  db::point<C> trans (const db::point<C> &p) const
   {
     return operator* (p);
   }
@@ -213,7 +229,7 @@ public:
   /**
    *  @brief "operator()" alias for compatibility with the other transformations
    */
-  db::DPoint operator() (const db::DPoint &p) const
+  db::point<C> operator() (const db::point<C> &p) const
   {
     return operator* (p);
   }
@@ -221,9 +237,9 @@ public:
   /**
    *  @brief Return the transposed matrix
    */
-  Matrix2d transposed () const
+  matrix_2d<C> transposed () const
   {
-    return Matrix2d (m_m11, m_m21, m_m12, m_m22);
+    return matrix_2d<C> (m_m11, m_m21, m_m12, m_m22);
   }
 
   /**
@@ -245,9 +261,9 @@ public:
   /**
    *  @brief Return the inverted matrix
    */
-  Matrix2d inverted () const
+  matrix_2d<C> inverted () const
   {
-    Matrix2d m (*this);
+    matrix_2d<C> m (*this);
     m.invert ();
     return m;
   }
@@ -325,9 +341,9 @@ public:
    *  @param mx The x magnification 
    *  @param my The y magnification
    */
-  static Matrix2d mag (double mx, double my)
+  static matrix_2d<C> mag (double mx, double my)
   {
-    return Matrix2d (mx, 0.0, 0.0, my);
+    return matrix_2d<C> (mx, 0.0, 0.0, my);
   }
 
   /**
@@ -335,9 +351,9 @@ public:
    *
    *  @param m The magnification 
    */
-  static Matrix2d mag (double m)
+  static matrix_2d<C> mag (double m)
   {
-    return Matrix2d (m, 0.0, 0.0, m);
+    return matrix_2d<C> (m, 0.0, 0.0, m);
   }
 
   /**
@@ -356,9 +372,9 @@ public:
   /**
    *  @brief Create the mirror matrix
    */
-  static Matrix2d mirror (bool m)
+  static matrix_2d<C> mirror (bool m)
   {
-    return Matrix2d (1.0, 0.0, 0.0, m ? -1.0 : 1.0);
+    return matrix_2d<C> (1.0, 0.0, 0.0, m ? -1.0 : 1.0);
   }
 
   /**
@@ -380,7 +396,7 @@ public:
   /**
    *  @brief Create the rotation matrix from the given angle
    */
-  static Matrix2d rotation (double a);
+  static matrix_2d<C> rotation (double a);
 
   /**
    *  @brief Determine the shear component of the matrix and return the shear angle in degree
@@ -403,7 +419,7 @@ public:
   /**
    *  @brief Create the shear matrix from the given angle
    */
-  static Matrix2d shear (double a);
+  static matrix_2d<C> shear (double a);
 
   /**
    *  @brief Determine whether the matrix represents an orthogonal transformation
@@ -413,6 +429,13 @@ public:
   bool is_ortho () const;
 
   /**
+   *  @brief Determine whether the matrix represents an unit transformation
+   *
+   *  This method is provided for compatibility to the other transformations.
+   */
+  bool is_unity () const;
+
+  /**
    *  @brief Convert to a string
    */
   std::string to_string () const;
@@ -420,37 +443,41 @@ public:
   /**
    *  @brief A fuzzy compare operator (equal)
    */
-  bool equal (const Matrix2d &d) const;
+  bool equal (const matrix_2d<C> &d) const;
 
   /**
    *  @brief A fuzzy compare operator (less)
    */
-  bool less (const Matrix2d &d) const;
+  bool less (const matrix_2d<C> &d) const;
 
 private:
   double m_m11, m_m12, m_m21, m_m22;
 };
 
+typedef matrix_2d<db::DCoord> Matrix2d;
+typedef matrix_2d<db::Coord> IMatrix2d;
+
 /**
  *  @brief A class representing a 3d matrix, mainly to represent a rotation, shear or perspective transformation of 2d vectors
  */
-class DB_PUBLIC Matrix3d 
+template <class C>
+class DB_PUBLIC matrix_3d
 {
 public:
   /**
    *  @brief typedefs for compatibility with the other transformations
    */
-  typedef double target_coord_type;
-  typedef double coord_type;
-  typedef db::DPoint displacement_type;
-  typedef Matrix3d inverse_trans;
+  typedef C target_coord_type;
+  typedef C coord_type;
+  typedef db::point<C> displacement_type;
+  typedef matrix_3d<C> inverse_trans;
 
   /**
    *  @brief Default ctor
    *
    *  Creates a null matrix
    */
-  Matrix3d ()
+  matrix_3d ()
   {
     set (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   }
@@ -460,7 +487,7 @@ public:
    *
    *  Creates a matrix (m11, m12, 0) (m21, m22, 0) (0, 0, 1)
    */
-  Matrix3d (double m11, double m12, double m21, double m22)
+  matrix_3d (double m11, double m12, double m21, double m22)
   {
     set (m11, m12, 0.0, m21, m22, 0.0, 0.0, 0.0, 1.0);
   }
@@ -470,9 +497,25 @@ public:
    *
    *  Creates a matrix (m11, m12, m13) (m21, m22, m23) (m31, m32, m33)
    */
-  Matrix3d (double m11, double m12, double m13, double m21, double m22, double m23, double m31, double m32, double m33)
+  matrix_3d (double m11, double m12, double m13, double m21, double m22, double m23, double m31, double m32, double m33)
   {
     set (m11, m12, m13, m21, m22, m23, m31, m32, m33);
+  }
+
+  /**
+   *  @brief Full ctor
+   *
+   *  Creates a matrix (m11, m12) (m21, m22)
+   */
+  template <class D>
+  matrix_3d (const matrix_3d<D> &m)
+  {
+    const double (&mm) [3][3] = m.m ();
+    for (unsigned int i = 0; i < 3; ++i) {
+      for (unsigned int j = 0; j < 3; ++j) {
+        m_m [i][j] = mm [i][j];
+      }
+    }
   }
 
   /**
@@ -480,7 +523,7 @@ public:
    *
    *  Creates a matrix (m11, m12, d1) (m21, m22, d2) (p1, p2, 1)
    */
-  Matrix3d (double m11, double m12, double m21, double m22, double d1, double d2, double p1, double p2)
+  matrix_3d (double m11, double m12, double m21, double m22, double d1, double d2, double p1, double p2)
   {
     set (m11, m12, d1, m21, m22, d2, p1, p2, 1.0);
   }
@@ -490,7 +533,8 @@ public:
    *
    *  Creates a matrix representing the given Matrix2d.
    */
-  explicit Matrix3d (const Matrix2d &m)
+  template <class D>
+  explicit matrix_3d (const matrix_2d<D> &m)
   {
     set (m.m11 (), m.m12 (), 0.0, m.m21 (), m.m22 (), 0.0, 0.0, 0.0, 1.0);
   }
@@ -499,7 +543,7 @@ public:
    *  @brief Make a matrix from a transformation
    */
   template <class Tr> 
-  explicit Matrix3d (const Tr &t)
+  explicit matrix_3d (const Tr &t)
   {
     *this = t.to_matrix3d ();
   }
@@ -509,7 +553,7 @@ public:
    *
    *  Creates a matrix (d, 0, 0) (0, d, 0) (0, 0, 1)
    */
-  explicit Matrix3d (double d)
+  explicit matrix_3d (double d)
   {
     set (d, 0.0, 0.0, 0.0, d, 0.0, 0.0, 0.0, 1.0);
   }
@@ -517,9 +561,10 @@ public:
   /**
    *  @brief Add operator
    */
-  Matrix3d operator+ (const Matrix3d &other) const
+  template <class D>
+  matrix_3d operator+ (const matrix_3d<D> &other) const
   {
-    Matrix3d m (*this);
+    matrix_3d m (*this);
     m += other;
     return m;
   }
@@ -527,7 +572,8 @@ public:
   /**
    *  @brief Add to operator
    */
-  Matrix3d &operator+= (const Matrix3d &other)
+  template <class D>
+  matrix_3d &operator+= (const matrix_3d<D> &other)
   {
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 3; ++j) {
@@ -540,13 +586,14 @@ public:
   /**
    *  @brief Product of two matrices
    */
-  Matrix3d operator* (const Matrix3d &other) const
+  template <class D>
+  matrix_3d operator* (const matrix_3d<D> &other) const
   {
-    Matrix3d res;
+    matrix_3d res;
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 3; ++j) {
         for (int k = 0; k < 3; ++k) {
-          res.m_m [i][j] += m_m [i][k] * other.m_m [k][j];
+          res.m_m [i][j] += m_m [i][k] * other.m () [k][j];
         }
       }
     }
@@ -556,7 +603,8 @@ public:
   /**
    *  @brief Multiply another to this matrix
    */
-  Matrix3d &operator*= (const Matrix3d &other)
+  template <class D>
+  matrix_3d &operator*= (const matrix_3d<D> &other)
   {
     *this = (*this * other);
     return *this;
@@ -565,9 +613,9 @@ public:
   /**
    *  @brief Multiply with a scalar
    */
-  Matrix3d operator* (double d) const
+  matrix_3d operator* (double d) const
   {
-    Matrix3d m (*this);
+    matrix_3d m (*this);
     m *= d;
     return m;
   }
@@ -575,7 +623,7 @@ public:
   /**
    *  @brief Multiply a scalar to this matrix
    */
-  Matrix3d &operator*= (double d)
+  matrix_3d &operator*= (double d)
   {
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 3; ++j) {
@@ -591,17 +639,17 @@ public:
    *  A point can be transformed if the resulting point is 
    *  located in the positive z plane.
    */
-  bool can_transform (const db::DPoint &p) const;
+  bool can_transform (const db::point<C> &p) const;
 
   /**
    *  @brief Transforms a vector which emerges from a certain point
    */
-  db::DVector trans (const db::DPoint &p, const db::DVector &v) const;
+  db::vector<C> trans (const db::point<C> &p, const db::vector<C> &v) const;
 
   /**
    *  @brief Transforms a point
    */
-  db::DPoint trans (const db::DPoint &p) const;
+  db::point<C> trans (const db::point<C> &p) const;
 
   /**
    *  @brief Transforms a vector
@@ -613,34 +661,34 @@ public:
    *  In this implementation we assume the vector starts at 0, 0. This at least renders this
    *  feature useful for implementing shear and anisotropic scaling.
    */
-  db::DVector trans (const db::DVector &p) const
+  db::vector<C> trans (const db::vector<C> &p) const
   {
-    return this->trans (db::DPoint () + p) - this->trans (db::DPoint ());
+    return this->trans (db::point<C> () + p) - this->trans (db::point<C> ());
   }
 
   /**
    *  @brief "trans" alias for compatibility with the other transformations
    */
-  template <class C>
-  db::DPoint trans (const db::point<C> &p) const
+  template <class D>
+  db::point<C> trans (const db::point<D> &p) const
   {
-    return trans (db::DPoint (p));
+    return trans (db::point<C> (p));
   }
 
   /**
    *  @brief "trans" alias for compatibility with the other transformations
    */
-  template <class C>
-  db::DVector trans (const db::vector<C> &p) const
+  template <class D>
+  db::vector<C> trans (const db::vector<D> &p) const
   {
-    return trans (db::DVector (p));
+    return trans (db::vector<C> (p));
   }
 
   /**
    *  @brief "operator()" alias for compatibility with the other transformations
    */
-  template <class C>
-  db::DPoint operator() (const db::point<C> &p) const
+  template <class D>
+  db::point<C> operator() (const db::point<D> &p) const
   {
     return trans (p);
   }
@@ -648,8 +696,8 @@ public:
   /**
    *  @brief "operator()" alias for compatibility with the other transformations
    */
-  template <class C>
-  db::DVector operator() (const db::vector<C> &p) const
+  template <class D>
+  db::vector<C> operator() (const db::vector<D> &p) const
   {
     return trans (p);
   }
@@ -657,9 +705,9 @@ public:
   /**
    *  @brief Return the transposed matrix
    */
-  Matrix3d transposed () const
+  matrix_3d transposed () const
   {
-    Matrix3d res;
+    matrix_3d res;
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 3; ++j) {
         res.m_m [i][j] = m_m [j][i];
@@ -684,7 +732,7 @@ public:
   /**
    *  @brief Return the inverted matrix
    */
-  Matrix3d inverted () const;
+  matrix_3d inverted () const;
 
   /**
    *  @brief In-place invert
@@ -697,7 +745,12 @@ public:
   /**
    *  @brief Accessor to the internal matrix
    */
-  const double (*m () const) [3] { return m_m; }
+  const double (&m () const) [3][3] { return m_m; }
+
+  /**
+   *  @brief Accessor to the internal matrix
+   */
+  double (&m ()) [3][3] { return m_m; }
 
   /**
    *  @brief Return the magnification component of the matrix
@@ -730,17 +783,17 @@ public:
   /**
    *  @brief Create the magnification matrix with isotropic magnification
    */
-  static Matrix3d mag (double m)
+  static matrix_3d mag (double m)
   {
-    return Matrix3d (m, 0.0, 0.0, m);
+    return matrix_3d (m, 0.0, 0.0, m);
   }
 
   /**
    *  @brief Create the magnification matrix with anisotropic magnification
    */
-  static Matrix3d mag (double mx, double my)
+  static matrix_3d mag (double mx, double my)
   {
-    return Matrix3d (mx, 0.0, 0.0, my);
+    return matrix_3d (mx, 0.0, 0.0, my);
   }
 
   /**
@@ -759,9 +812,9 @@ public:
   /**
    *  @brief Create the mirror matrix
    */
-  static Matrix3d mirror (bool m)
+  static matrix_3d mirror (bool m)
   {
-    return Matrix3d (1.0, 0.0, 0.0, m ? -1.0 : 1.0);
+    return matrix_3d (1.0, 0.0, 0.0, m ? -1.0 : 1.0);
   }
 
   /**
@@ -789,9 +842,9 @@ public:
   /**
    *  @brief Create the rotation matrix from the given angle
    */
-  static Matrix3d rotation (double a)
+  static matrix_3d rotation (double a)
   {
-    return Matrix3d (Matrix2d::rotation (a));
+    return matrix_3d (Matrix2d::rotation (a));
   }
 
   /**
@@ -821,9 +874,9 @@ public:
   /**
    *  @brief Create the shear matrix from the given angle
    */
-  static Matrix3d shear (double a)
+  static matrix_3d shear (double a)
   {
-    return Matrix3d (Matrix2d::shear (a));
+    return matrix_3d (Matrix2d::shear (a));
   } 
 
   /**
@@ -860,19 +913,19 @@ public:
    *  @param ty The tilt angle in y direction (around the x axis) in degree for the given observer distance.
    *  @param z The observer distance.
    */
-  static Matrix3d perspective (double tx, double ty, double z);
+  static matrix_3d perspective (double tx, double ty, double z);
 
   /**
    *  @brief Get the displacement vector component
    */
-  db::DVector disp () const;
+  db::vector<C> disp () const;
 
   /**
    *  @brief Create the mirror matrix
    */
-  static Matrix3d disp (const db::DVector &d)
+  static matrix_3d disp (const db::vector<C> &d)
   {
-    return Matrix3d (1.0, 0.0, 0.0, 1.0, d.x (), d.y (), 0.0, 0.0);
+    return matrix_3d (1.0, 0.0, 0.0, 1.0, d.x (), d.y (), 0.0, 0.0);
   }
 
   /**
@@ -883,9 +936,16 @@ public:
   bool is_ortho () const;
 
   /**
+   *  @brief Determine whether the matrix represents an unit transformation
+   *
+   *  This method is provided for compatibility to the other transformations.
+   */
+  bool is_unity () const;
+
+  /**
    *  @brief Get the 2d matrix component (without perspective transformation or displacement)
    */
-  Matrix2d m2d () const;
+  matrix_2d<C> m2d () const;
 
   /**
    *  @brief Convert to a string
@@ -895,12 +955,12 @@ public:
   /**
    *  @brief A fuzzy compare operator (equal)
    */
-  bool equal (const Matrix3d &d) const;
+  bool equal (const matrix_3d &d) const;
 
   /**
    *  @brief A fuzzy compare operator (less)
    */
-  bool less (const Matrix3d &d) const;
+  bool less (const matrix_3d &d) const;
 
 private:
   double m_m[3][3];
@@ -918,6 +978,9 @@ private:
     m_m[2][2] = m33;
   }
 };
+
+typedef matrix_3d<db::DCoord> Matrix3d;
+typedef matrix_3d<db::Coord> IMatrix3d;
 
 /**
  *  @brief Some adjustment flags 
@@ -982,10 +1045,15 @@ void DB_PUBLIC adjust_matrix (Matrix3d &matrix, const std::vector <db::DPoint> &
 
 namespace tl 
 {
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Matrix2d &t);
-  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Matrix3d &t);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Matrix2d &t);
-  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Matrix3d &t);
+  template<> DB_PUBLIC void extractor_impl<db::matrix_2d<db::Coord> > (tl::Extractor &ex, db::matrix_2d<db::Coord> &t);
+  template<> DB_PUBLIC void extractor_impl<db::matrix_2d<db::DCoord> > (tl::Extractor &ex, db::matrix_2d<db::DCoord> &t);
+  template<> DB_PUBLIC void extractor_impl<db::matrix_3d<db::Coord> > (tl::Extractor &ex, db::matrix_3d<db::Coord> &t);
+  template<> DB_PUBLIC void extractor_impl<db::matrix_3d<db::DCoord> > (tl::Extractor &ex, db::matrix_3d<db::DCoord> &t);
+
+  template<> DB_PUBLIC bool test_extractor_impl<db::matrix_2d<db::Coord> > (tl::Extractor &ex, db::matrix_2d<db::Coord> &t);
+  template<> DB_PUBLIC bool test_extractor_impl<db::matrix_2d<db::DCoord> > (tl::Extractor &ex, db::matrix_2d<db::DCoord> &t);
+  template<> DB_PUBLIC bool test_extractor_impl<db::matrix_3d<db::Coord> > (tl::Extractor &ex, db::matrix_3d<db::Coord> &t);
+  template<> DB_PUBLIC bool test_extractor_impl<db::matrix_3d<db::DCoord> > (tl::Extractor &ex, db::matrix_3d<db::DCoord> &t);
 } // namespace tl
 
 #endif

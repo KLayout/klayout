@@ -70,6 +70,27 @@ static db::DCplxTrans si_dtrans (const db::RecursiveShapeIterator *r)
   return db::CplxTrans (ly->dbu ()) * r->trans () * db::VCplxTrans (1.0 / ly->dbu ());
 }
 
+static db::DCplxTrans si_global_dtrans (const db::RecursiveShapeIterator *r)
+{
+  const db::Layout *ly = r->layout ();
+  tl_assert (ly != 0);
+  return db::CplxTrans (ly->dbu ()) * r->global_trans () * db::VCplxTrans (1.0 / ly->dbu ());
+}
+
+static db::DCplxTrans si_always_apply_dtrans (const db::RecursiveShapeIterator *r)
+{
+  const db::Layout *ly = r->layout ();
+  tl_assert (ly != 0);
+  return db::CplxTrans (ly->dbu ()) * r->always_apply () * db::VCplxTrans (1.0 / ly->dbu ());
+}
+
+static void si_set_global_dtrans (db::RecursiveShapeIterator *r, const db::DCplxTrans &gt)
+{
+  const db::Layout *ly = r->layout ();
+  tl_assert (ly != 0);
+  r->set_global_trans (db::VCplxTrans (1.0 / ly->dbu ()) * gt * db::CplxTrans (ly->dbu ()));
+}
+
 static void select_cells1 (db::RecursiveShapeIterator *r, const std::vector<db::cell_index_type> &cells)
 {
   std::set<db::cell_index_type> cc;
@@ -270,7 +291,47 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method ("region", &db::RecursiveShapeIterator::region, 
+  gsi::method ("global_trans=", &db::RecursiveShapeIterator::set_global_trans, gsi::arg ("t"),
+    "@brief Sets the global transformation to apply to all shapes delivered\n"
+    "The global transformation will be applied to all shapes delivered by biasing the \"trans\" attribute.\n"
+    "The search regions apply to the coordinate space after global transformation.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method ("global_trans", &db::RecursiveShapeIterator::global_trans,
+    "@brief Gets the global transformation to apply to all shapes delivered\n"
+    "See also \\global_trans=.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("global_dtrans=", &si_set_global_dtrans,
+    "@brief Sets the global transformation to apply to all shapes delivered (transformation in micrometer units)\n"
+    "The global transformation will be applied to all shapes delivered by biasing the \"trans\" attribute.\n"
+    "The search regions apply to the coordinate space after global transformation.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("global_dtrans", &si_global_dtrans,
+    "@brief Gets the global transformation to apply to all shapes delivered (in micrometer units)\n"
+    "See also \\global_dtrans=.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method ("always_apply_trans", &db::RecursiveShapeIterator::always_apply,
+    "@brief Gets the global transformation if at top level, unity otherwise\n"
+    "As the global transformation is only applicable on top level, use this method to transform shapes and instances into their local (cell-level) version "
+    "while considering the global transformation properly.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("always_apply_dtrans", &si_always_apply_dtrans,
+    "@brief Gets the global transformation if at top level, unity otherwise (micrometer-unit version)\n"
+    "As the global transformation is only applicable on top level, use this method to transform shapes and instances into their local (cell-level) version "
+    "while considering the global transformation properly.\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method ("region", &db::RecursiveShapeIterator::region,
     "@brief Gets the basic region that is iterator is using\n"
     "The basic region is the overall box the region iterator iterates over. "
     "There may be an additional complex region that confines the region iterator. "

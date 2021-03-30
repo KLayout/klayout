@@ -32,6 +32,7 @@
 #include "dbShapes.h"
 #include "dbDeepShapeStore.h"
 #include "dbRegion.h"
+#include "dbFillTool.h"
 #include "dbRegionProcessors.h"
 #include "dbCompoundOperation.h"
 #include "tlGlobPattern.h"
@@ -712,6 +713,29 @@ tl::Variant complex_op (db::Region *region, db::CompoundRegionOperationNode *nod
     return tl::Variant ();
   }
 }
+
+static void
+fill_region (const db::Region *fr, db::Cell *cell, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Point *origin,
+             db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
+{
+  db::fill_region (cell, *fr, fill_cell_index, fc_box, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons, glue_box);
+}
+
+static void
+fill_region_skew (const db::Region *fr, db::Cell *cell, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step, const db::Point *origin,
+                  db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
+{
+  db::fill_region (cell, *fr, fill_cell_index, fc_box, row_step, column_step, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons, glue_box);
+}
+
+static void
+fill_region_multi (const db::Region *fr, db::Cell *cell, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step,
+                   const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Point &origin, const db::Box &glue_box)
+{
+  db::fill_region_repeat (cell, *fr, fill_cell_index, fc_box, row_step, column_step, fill_margin, remaining_polygons, origin, glue_box);
+}
+
+static db::Point default_origin;
 
 //  provided by gsiDeclDbPolygon.cc:
 int td_simple ();
@@ -2320,8 +2344,32 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The transformed region.\n"
   ) +
+  method ("transform", (db::Region &(db::Region::*)(const db::IMatrix2d &)) &db::Region::transform, gsi::arg ("t"),
+    "@brief Transform the region (modifies self)\n"
+    "\n"
+    "Transforms the region with the given 2d matrix transformation.\n"
+    "This version modifies the region and returns a reference to self.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed region.\n"
+    "\n"
+    "This variant was introduced in version 0.27.\n"
+  ) +
+  method ("transform", (db::Region &(db::Region::*)(const db::IMatrix3d &)) &db::Region::transform, gsi::arg ("t"),
+    "@brief Transform the region (modifies self)\n"
+    "\n"
+    "Transforms the region with the given 3d matrix transformation.\n"
+    "This version modifies the region and returns a reference to self.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed region.\n"
+    "\n"
+    "This variant was introduced in version 0.27.\n"
+  ) +
   method ("transformed", (db::Region (db::Region::*)(const db::Trans &) const) &db::Region::transformed, gsi::arg ("t"),
-    "@brief Transform the region\n"
+    "@brief Transforms the region\n"
     "\n"
     "Transforms the region with the given transformation.\n"
     "Does not modify the region but returns the transformed region.\n"
@@ -2331,7 +2379,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@return The transformed region.\n"
   ) +
   method ("transformed|#transformed_icplx", (db::Region (db::Region::*)(const db::ICplxTrans &) const) &db::Region::transformed, gsi::arg ("t"),
-    "@brief Transform the region with a complex transformation\n"
+    "@brief Transforms the region with a complex transformation\n"
     "\n"
     "Transforms the region with the given complex transformation.\n"
     "Does not modify the region but returns the transformed region.\n"
@@ -2339,6 +2387,30 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param t The transformation to apply.\n"
     "\n"
     "@return The transformed region.\n"
+  ) +
+  method ("transformed", (db::Region (db::Region::*)(const db::IMatrix2d &) const) &db::Region::transformed, gsi::arg ("t"),
+    "@brief Transforms the region\n"
+    "\n"
+    "Transforms the region with the given 2d matrix transformation.\n"
+    "Does not modify the region but returns the transformed region.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed region.\n"
+    "\n"
+    "This variant was introduced in version 0.27.\n"
+  ) +
+  method ("transformed", (db::Region (db::Region::*)(const db::IMatrix3d &) const) &db::Region::transformed, gsi::arg ("t"),
+    "@brief Transforms the region\n"
+    "\n"
+    "Transforms the region with the given 3d matrix transformation.\n"
+    "Does not modify the region but returns the transformed region.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed region.\n"
+    "\n"
+    "This variant was introduced in version 0.27.\n"
   ) +
   method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("negative", false),
     "@brief Performs a width check with options\n"
@@ -2811,6 +2883,51 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "See \\base_verbosity= for details.\n"
     "\n"
     "This method has been introduced in version 0.26.\n"
+  ) +
+  gsi::method_ext ("fill", &fill_region, gsi::arg ("in_cell"),
+                                         gsi::arg ("fill_cell_index"),
+                                         gsi::arg ("fc_box"),
+                                         gsi::arg ("origin", &default_origin, "(0, 0)"),
+                                         gsi::arg ("remaining_parts", (db::Region *)0, "nil"),
+                                         gsi::arg ("fill_margin", db::Vector ()),
+                                         gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
+                                         gsi::arg ("glue_box", db::Box ()),
+    "@brief A mapping of \\Cell#fill_region to the Region class\n"
+    "\n"
+    "This method is equivalent to \\Cell#fill_region, but is based on Region (with the cell being the first parameter).\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("fill", &fill_region_skew, gsi::arg ("in_cell"),
+                                              gsi::arg ("fill_cell_index"),
+                                              gsi::arg ("fc_origin"),
+                                              gsi::arg ("row_step"),
+                                              gsi::arg ("column_step"),
+                                              gsi::arg ("origin", &default_origin, "(0, 0)"),
+                                              gsi::arg ("remaining_parts", (db::Region *)0, "nil"),
+                                              gsi::arg ("fill_margin", db::Vector ()),
+                                              gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
+                                                   gsi::arg ("glue_box", db::Box ()),
+    "@brief A mapping of \\Cell#fill_region to the Region class\n"
+    "\n"
+    "This method is equivalent to \\Cell#fill_region, but is based on Region (with the cell being the first parameter).\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("fill_multi", &fill_region_multi, gsi::arg ("in_cell"),
+                                                     gsi::arg ("fill_cell_index"),
+                                                     gsi::arg ("fc_origin"),
+                                                     gsi::arg ("row_step"),
+                                                     gsi::arg ("column_step"),
+                                                     gsi::arg ("fill_margin", db::Vector ()),
+                                                     gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
+                                                     gsi::arg ("origin", db::Point ()),
+                                                     gsi::arg ("glue_box", db::Box ()),
+    "@brief A mapping of \\Cell#fill_region to the Region class\n"
+    "\n"
+    "This method is equivalent to \\Cell#fill_region, but is based on Region (with the cell being the first parameter).\n"
+    "\n"
+    "This method has been introduced in version 0.27.\n"
   ),
   "@brief A region (a potentially complex area consisting of multiple polygons)\n"
   "\n\n"

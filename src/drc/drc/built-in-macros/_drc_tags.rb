@@ -181,6 +181,177 @@ module DRC
     end
   end
 
+  # A wrapper for the fill cell definition
+  class DRCFillCell
+
+    def initialize(name)
+      @cell_name = name
+      @shapes = []
+      @origin = nil
+      @dim = nil
+    end
+
+    def create_cell(layout, engine)
+      cell = layout.create_cell(@cell_name)
+      @shapes.each do |s|
+        li = layout.layer(s[0])
+        engine._use_output_layer(li)
+        s[1].each { |t| cell.shapes(li).insert(t) }
+      end
+      cell
+    end
+
+    def cell_box(def_w, def_h)
+      o = @origin || self._computed_origin
+      d = @dim || RBA::DVector::new(def_w, def_h)
+      RBA::DBox::new(o, o + d)
+    end
+
+    def default_xpitch
+      @dim ? @dim.x : self.bbox.width
+    end
+
+    def default_ypitch
+      @dim ? @dim.y : self.bbox.height
+    end
+
+    def _computed_origin
+      b = self.bbox
+      return b.empty? ? RBA::DPoint::new : b.p1
+    end
+
+    def bbox
+      box = RBA::DBox::new
+      @shapes.each do |s|
+        s[1].each { |t| box += t.bbox }
+      end
+      box
+    end
+
+    def shape(*args)
+
+      layer = nil
+      datatype = nil
+      name = nil
+      shapes = []
+
+      args.each_with_index do |a,ai|
+        if a.is_a?(1.class)
+          if !layer
+            layer = a
+          elsif !datatype
+            datatype = a
+          else
+            raise("Argument ##{ai+1} not understood for FillCell#shape")
+          end
+        elsif a.is_a?(String)
+          if !name
+            name = a
+          else
+            raise("Argument ##{ai+1} not understood for FillCell#shape")
+          end
+        elsif a.is_a?(RBA::DBox) || a.is_a?(RBA::DPath) || a.is_a?(RBA::DPolygon) || a.is_a?(RBA::DText)
+          shapes << a
+        else
+          raise("Argument ##{ai+1} not understood for FillCell#shape (needs to one of: number, string or box, path, polygon or text)")
+        end
+      end
+
+      if !shapes.empty?
+
+        li = RBA::LayerInfo::new
+        if layer 
+          li.layer = layer
+          li.datatype = datatype || 0
+        end
+        if name
+          li.name = name
+        end
+
+        @shapes << [ li, shapes ]
+
+      end
+
+      self
+     
+    end
+
+    def origin(x, y)
+
+      if !x.is_a?(1.class) && !x.is_a?(1.0.class)
+        raise("x argument not numeric FillCell#origin")
+      end
+      if !y.is_a?(1.class) && !y.is_a?(1.0.class)
+        raise("y argument not numeric FillCell#origin")
+      end
+      @origin = RBA::DVector::new(x, y)
+
+      self
+
+    end
+
+    def dim(w, h)
+
+      if !w.is_a?(1.class) && !w.is_a?(1.0.class)
+        raise("w argument not numeric FillCell#dim")
+      end
+      if !h.is_a?(1.class) && !h.is_a?(1.0.class)
+        raise("h argument not numeric FillCell#dim")
+      end
+      @dim = RBA::DVector::new(w, h)
+
+      self
+
+    end
+
+  end
+ 
+  # A wrapper for the fill step definition
+  class DRCFillStep
+    def initialize(for_row, x, y = nil)
+      @for_row = for_row
+      if !x.is_a?(1.class) && !x.is_a?(1.0.class)
+        raise("x argument not numeric in fill step")
+      end
+      if y && !y.is_a?(1.class) && !y.is_a?(1.0.class)
+        raise("y argument not numeric in fill step")
+      end
+      if y
+        @step = RBA::DVector::new(x, y)
+      elsif for_row
+        @step = RBA::DVector::new(x, 0)
+      else
+        @step = RBA::DVector::new(0, x)
+      end 
+    end
+    def for_row
+      @for_row
+    end
+    def step
+      @step
+    end
+  end
+
+  # A wrapper for the fill origin definition
+  class DRCFillOrigin
+    def initialize(x = nil, y = nil)
+      if !x && !y
+        @origin = nil
+      else
+        if !x.is_a?(1.class) && !x.is_a?(1.0.class)
+          raise("x argument not numeric in fill origin")
+        end
+        if !y.is_a?(1.class) && !y.is_a?(1.0.class)
+          raise("y argument not numeric in fill origin")
+        end
+        @origin = RBA::DVector::new(x, y)
+      end
+    end
+    def origin
+      @origin
+    end
+  end
+
   # A wrapper for the tile_size option
   class DRCTileSize
     def initialize(*args)
@@ -230,6 +401,6 @@ module DRC
       @b
     end
   end
- 
+
 end
 

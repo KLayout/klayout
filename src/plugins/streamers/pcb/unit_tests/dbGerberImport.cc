@@ -297,6 +297,11 @@ TEST(26)
   run_test (_this, "pos-neg");
 }
 
+TEST(27)
+{
+  run_test (_this, "polygon-mode");
+}
+
 TEST(X2_1)
 {
   run_test (_this, "x2-1");

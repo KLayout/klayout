@@ -644,6 +644,14 @@ public:
    */
   void execute (const std::string &desc);
 
+  /**
+   *  @brief Gets the output mutex for operations not using the output method
+   */
+  static tl::Mutex &output_lock ()
+  {
+    return s_output_lock;
+  }
+
 private:
   friend class TilingProcessorWorker;
   friend class TilingProcessorOutputFunction;
@@ -689,8 +697,8 @@ private:
   bool m_dbu_specific_set;
   bool m_scale_to_dbu;
   std::vector<std::string> m_scripts;
-  tl::Mutex m_output_mutex;
   tl::Eval m_top_eval;
+  static tl::Mutex s_output_lock;
 };
 
 }

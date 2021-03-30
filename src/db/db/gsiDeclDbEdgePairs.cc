@@ -398,6 +398,30 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "@return The transformed edge pairs.\n"
   ) +
+  method ("transformed", (db::EdgePairs (db::EdgePairs::*)(const db::IMatrix2d &) const) &db::EdgePairs::transformed, gsi::arg ("t"),
+    "@brief Transform the edge pair collection\n"
+    "\n"
+    "Transforms the edge pairs with the given 2d matrix transformation.\n"
+    "Does not modify the edge pair collection but returns the transformed edge pairs.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed edge pairs.\n"
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
+  ) +
+  method ("transformed", (db::EdgePairs (db::EdgePairs::*)(const db::IMatrix3d &) const) &db::EdgePairs::transformed, gsi::arg ("t"),
+    "@brief Transform the edge pair collection\n"
+    "\n"
+    "Transforms the edge pairs with the given 3d matrix transformation.\n"
+    "Does not modify the edge pair collection but returns the transformed edge pairs.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed edge pairs.\n"
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
+  ) +
   method ("transform", (db::EdgePairs &(db::EdgePairs::*)(const db::Trans &)) &db::EdgePairs::transform, gsi::arg ("t"),
     "@brief Transform the edge pair collection (modifies self)\n"
     "\n"
@@ -417,6 +441,30 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "@param t The transformation to apply.\n"
     "\n"
     "@return The transformed edge pair collection.\n"
+  ) +
+  method ("transform", (db::EdgePairs &(db::EdgePairs::*)(const db::IMatrix2d &)) &db::EdgePairs::transform, gsi::arg ("t"),
+    "@brief Transform the edge pair collection (modifies self)\n"
+    "\n"
+    "Transforms the edge pair collection with the given 2d matrix transformation.\n"
+    "This version modifies the edge pair collection and returns a reference to self.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed edge pair collection.\n"
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
+  ) +
+  method ("transform", (db::EdgePairs &(db::EdgePairs::*)(const db::IMatrix3d &)) &db::EdgePairs::transform, gsi::arg ("t"),
+    "@brief Transform the edge pair collection (modifies self)\n"
+    "\n"
+    "Transforms the edge pair collection with the given 3d matrix transformation.\n"
+    "This version modifies the edge pair collection and returns a reference to self.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed edge pair collection.\n"
+    "\n"
+    "This variant has been introduced in version 0.27.\n"
   ) +
   method_ext ("insert", &insert_e, gsi::arg ("edge_pairs"),
     "@brief Inserts all edge pairs from the other edge pair collection into this edge pair collection\n"

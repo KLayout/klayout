@@ -109,6 +109,11 @@ public:
     return mp_first;
   }
 
+  /**
+   *  @brief Gets the number of tasks
+   */
+  size_t size () const;
+
 private:
   Task *mp_first, *mp_last;
 
@@ -162,6 +167,14 @@ public:
    *  might be send to a different thread.
    */
   void schedule (Task *task);
+
+  /**
+   *  @brief Gets the number of tasks in the queue
+   */
+  size_t tasks () const
+  {
+    return m_task_list.size ();
+  }
 
   /**
    *  @brief Start the execution of the job
@@ -228,6 +241,16 @@ protected:
   virtual void setup_worker (Worker * /*worker*/) { }
 
   /**
+   *  @brief This method is called before the given task is started in sync mode (workers == 0)
+   */
+  virtual void before_sync_task (Task * /*task*/) { }
+
+  /**
+   *  @brief This method is called after the given task has finished in sync mode (workers == 0)
+   */
+  virtual void after_sync_task (Task * /*task*/) { }
+
+  /**
    *  @brief Indicates that the job has finished
    *
    *  This method is called when the last worker has terminated.
@@ -276,6 +299,7 @@ private:
 
   Task *get_task (int for_worker);
   void log_error (const std::string &s);
+  void cleanup ();
 };
 
 /**

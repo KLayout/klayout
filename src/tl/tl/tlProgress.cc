@@ -138,7 +138,7 @@ const double yield_timeout = 0.3;
 const size_t default_yield_interval = 1000;
 
 Progress::Progress (const std::string &desc, size_t yield_interval, bool can_cancel)
-  : m_desc (desc), m_title (desc),
+  : m_desc (desc), m_title (desc), m_final (false),
     m_interval_count (0), 
     m_yield_interval (yield_interval == 0 ? default_yield_interval : yield_interval),
     m_last_value (-1.0),

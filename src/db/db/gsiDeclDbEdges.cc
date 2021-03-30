@@ -1040,6 +1040,30 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "@return The transformed edge collection.\n"
   ) +
+  method ("transformed", (db::Edges (db::Edges::*)(const db::IMatrix2d &) const) &db::Edges::transformed, gsi::arg ("t"),
+    "@brief Transform the edge collection\n"
+    "\n"
+    "Transforms the edge collection with the given 2d matrix transformation.\n"
+    "Does not modify the edge collection but returns the transformed edge collection.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed edge collection.\n"
+    "\n"
+    "This variant has been introduced in version 0.27."
+  ) +
+  method ("transformed", (db::Edges (db::Edges::*)(const db::IMatrix3d &) const) &db::Edges::transformed, gsi::arg ("t"),
+    "@brief Transform the edge collection\n"
+    "\n"
+    "Transforms the edge collection with the given 3d matrix transformation.\n"
+    "Does not modify the edge collection but returns the transformed edge collection.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed edge collection.\n"
+    "\n"
+    "This variant has been introduced in version 0.27."
+  ) +
   method ("transform", (db::Edges &(db::Edges::*)(const db::Trans &)) &db::Edges::transform, gsi::arg ("t"),
     "@brief Transform the edge collection (modifies self)\n"
     "\n"
@@ -1059,6 +1083,30 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "@param t The transformation to apply.\n"
     "\n"
     "@return The transformed edge collection.\n"
+  ) +
+  method ("transform", (db::Edges &(db::Edges::*)(const db::IMatrix2d &)) &db::Edges::transform, gsi::arg ("t"),
+    "@brief Transform the edge collection (modifies self)\n"
+    "\n"
+    "Transforms the edge collection with the given 2d matrix transformation.\n"
+    "This version modifies the edge collection and returns a reference to self.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed edge collection.\n"
+    "\n"
+    "This variant has been introduced in version 0.27."
+  ) +
+  method ("transform", (db::Edges &(db::Edges::*)(const db::IMatrix3d &)) &db::Edges::transform, gsi::arg ("t"),
+    "@brief Transform the edge collection (modifies self)\n"
+    "\n"
+    "Transforms the edge collection with the given 3d matrix transformation.\n"
+    "This version modifies the edge collection and returns a reference to self.\n"
+    "\n"
+    "@param t The transformation to apply.\n"
+    "\n"
+    "@return The transformed edge collection.\n"
+    "\n"
+    "This variant has been introduced in version 0.27."
   ) +
   method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
     "@brief Performs a width check with options\n"

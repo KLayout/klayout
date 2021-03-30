@@ -939,7 +939,7 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
 #define _FUNCARGLIST  A1
 #define _ADDARGS      this->template add_arg<A1> (m_s1);
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init ();
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init ();
 #define _ARGVARLIST   a1
 #define _ARGSPECARGS  s1
 #define _ARGSPEC      const ArgSpec<A1> &s1
@@ -973,8 +973,8 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
 #define _ADDARGS      this->template add_arg<A1> (m_s1); \
                       this->template add_arg<A2> (m_s2); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); 
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init ();
 #define _ARGVARLIST   a1, a2
 #define _ARGSPECARGS  s1, s2
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2
@@ -1010,9 +1010,9 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
                       this->template add_arg<A2> (m_s2); \
                       this->template add_arg<A3> (m_s3); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); \
-                      A3 a3 = args ? args.template read<A3> (heap) : m_s3.init (); 
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init (); \
+                      A3 a3 = args ? args.template read<A3> (heap, &m_s3) : m_s3.init ();
 #define _ARGVARLIST   a1, a2, a3
 #define _ARGSPECARGS  s1, s2, s3
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2, const ArgSpec<A3> &s3
@@ -1050,10 +1050,10 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
                       this->template add_arg<A3> (m_s3); \
                       this->template add_arg<A4> (m_s4); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); \
-                      A3 a3 = args ? args.template read<A3> (heap) : m_s3.init (); \
-                      A4 a4 = args ? args.template read<A4> (heap) : m_s4.init (); 
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init (); \
+                      A3 a3 = args ? args.template read<A3> (heap, &m_s3) : m_s3.init (); \
+                      A4 a4 = args ? args.template read<A4> (heap, &m_s4) : m_s4.init ();
 #define _ARGVARLIST   a1, a2, a3, a4
 #define _ARGSPECARGS  s1, s2, s3, s4
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2, const ArgSpec<A3> &s3, const ArgSpec<A4> &s4
@@ -1093,11 +1093,11 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
                       this->template add_arg<A4> (m_s4); \
                       this->template add_arg<A5> (m_s5); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); \
-                      A3 a3 = args ? args.template read<A3> (heap) : m_s3.init (); \
-                      A4 a4 = args ? args.template read<A4> (heap) : m_s4.init (); \
-                      A5 a5 = args ? args.template read<A5> (heap) : m_s5.init (); 
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init (); \
+                      A3 a3 = args ? args.template read<A3> (heap, &m_s3) : m_s3.init (); \
+                      A4 a4 = args ? args.template read<A4> (heap, &m_s4) : m_s4.init (); \
+                      A5 a5 = args ? args.template read<A5> (heap, &m_s5) : m_s5.init ();
 #define _ARGVARLIST   a1, a2, a3, a4, a5
 #define _ARGSPECARGS  s1, s2, s3, s4, s5
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2, const ArgSpec<A3> &s3, const ArgSpec<A4> &s4, const ArgSpec<A5> &s5
@@ -1139,12 +1139,12 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
                       this->template add_arg<A5> (m_s5); \
                       this->template add_arg<A6> (m_s6); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); \
-                      A3 a3 = args ? args.template read<A3> (heap) : m_s3.init (); \
-                      A4 a4 = args ? args.template read<A4> (heap) : m_s4.init (); \
-                      A5 a5 = args ? args.template read<A5> (heap) : m_s5.init (); \
-                      A6 a6 = args ? args.template read<A6> (heap) : m_s6.init (); 
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init (); \
+                      A3 a3 = args ? args.template read<A3> (heap, &m_s3) : m_s3.init (); \
+                      A4 a4 = args ? args.template read<A4> (heap, &m_s4) : m_s4.init (); \
+                      A5 a5 = args ? args.template read<A5> (heap, &m_s5) : m_s5.init (); \
+                      A6 a6 = args ? args.template read<A6> (heap, &m_s6) : m_s6.init ();
 #define _ARGVARLIST   a1, a2, a3, a4, a5, a6
 #define _ARGSPECARGS  s1, s2, s3, s4, s5, s6
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2, const ArgSpec<A3> &s3, const ArgSpec<A4> &s4, const ArgSpec<A5> &s5, const ArgSpec<A6> &s6
@@ -1188,13 +1188,13 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
                       this->template add_arg<A6> (m_s6); \
                       this->template add_arg<A7> (m_s7); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); \
-                      A3 a3 = args ? args.template read<A3> (heap) : m_s3.init (); \
-                      A4 a4 = args ? args.template read<A4> (heap) : m_s4.init (); \
-                      A5 a5 = args ? args.template read<A5> (heap) : m_s5.init (); \
-                      A6 a6 = args ? args.template read<A6> (heap) : m_s6.init (); \
-                      A7 a7 = args ? args.template read<A7> (heap) : m_s7.init (); 
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init (); \
+                      A3 a3 = args ? args.template read<A3> (heap, &m_s3) : m_s3.init (); \
+                      A4 a4 = args ? args.template read<A4> (heap, &m_s4) : m_s4.init (); \
+                      A5 a5 = args ? args.template read<A5> (heap, &m_s5) : m_s5.init (); \
+                      A6 a6 = args ? args.template read<A6> (heap, &m_s6) : m_s6.init (); \
+                      A7 a7 = args ? args.template read<A7> (heap, &m_s7) : m_s7.init ();
 #define _ARGVARLIST   a1, a2, a3, a4, a5, a6, a7
 #define _ARGSPECARGS  s1, s2, s3, s4, s5, s6, s7
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2, const ArgSpec<A3> &s3, const ArgSpec<A4> &s4, const ArgSpec<A5> &s5, const ArgSpec<A6> &s6, const ArgSpec<A7> &s7
@@ -1240,14 +1240,14 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
                       this->template add_arg<A7> (m_s7); \
                       this->template add_arg<A8> (m_s8); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); \
-                      A3 a3 = args ? args.template read<A3> (heap) : m_s3.init (); \
-                      A4 a4 = args ? args.template read<A4> (heap) : m_s4.init (); \
-                      A5 a5 = args ? args.template read<A5> (heap) : m_s5.init (); \
-                      A6 a6 = args ? args.template read<A6> (heap) : m_s6.init (); \
-                      A7 a7 = args ? args.template read<A7> (heap) : m_s7.init (); \
-                      A8 a8 = args ? args.template read<A8> (heap) : m_s8.init (); 
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init (); \
+                      A3 a3 = args ? args.template read<A3> (heap, &m_s3) : m_s3.init (); \
+                      A4 a4 = args ? args.template read<A4> (heap, &m_s4) : m_s4.init (); \
+                      A5 a5 = args ? args.template read<A5> (heap, &m_s5) : m_s5.init (); \
+                      A6 a6 = args ? args.template read<A6> (heap, &m_s6) : m_s6.init (); \
+                      A7 a7 = args ? args.template read<A7> (heap, &m_s7) : m_s7.init (); \
+                      A8 a8 = args ? args.template read<A8> (heap, &m_s8) : m_s8.init ();
 #define _ARGVARLIST   a1, a2, a3, a4, a5, a6, a7, a8
 #define _ARGSPECARGS  s1, s2, s3, s4, s5, s6, s7, s8
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2, const ArgSpec<A3> &s3, const ArgSpec<A4> &s4, const ArgSpec<A5> &s5, const ArgSpec<A6> &s6, const ArgSpec<A7> &s7, const ArgSpec<A8> &s8
@@ -1295,15 +1295,15 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
                       this->template add_arg<A8> (m_s8); \
                       this->template add_arg<A9> (m_s9); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); \
-                      A3 a3 = args ? args.template read<A3> (heap) : m_s3.init (); \
-                      A4 a4 = args ? args.template read<A4> (heap) : m_s4.init (); \
-                      A5 a5 = args ? args.template read<A5> (heap) : m_s5.init (); \
-                      A6 a6 = args ? args.template read<A6> (heap) : m_s6.init (); \
-                      A7 a7 = args ? args.template read<A7> (heap) : m_s7.init (); \
-                      A8 a8 = args ? args.template read<A8> (heap) : m_s8.init (); \
-                      A9 a9 = args ? args.template read<A9> (heap) : m_s9.init (); 
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init (); \
+                      A3 a3 = args ? args.template read<A3> (heap, &m_s3) : m_s3.init (); \
+                      A4 a4 = args ? args.template read<A4> (heap, &m_s4) : m_s4.init (); \
+                      A5 a5 = args ? args.template read<A5> (heap, &m_s5) : m_s5.init (); \
+                      A6 a6 = args ? args.template read<A6> (heap, &m_s6) : m_s6.init (); \
+                      A7 a7 = args ? args.template read<A7> (heap, &m_s7) : m_s7.init (); \
+                      A8 a8 = args ? args.template read<A8> (heap, &m_s8) : m_s8.init (); \
+                      A9 a9 = args ? args.template read<A9> (heap, &m_s9) : m_s9.init ();
 #define _ARGVARLIST   a1, a2, a3, a4, a5, a6, a7, a8, a9
 #define _ARGSPECARGS  s1, s2, s3, s4, s5, s6, s7, s8, s9
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2, const ArgSpec<A3> &s3, const ArgSpec<A4> &s4, const ArgSpec<A5> &s5, const ArgSpec<A6> &s6, const ArgSpec<A7> &s7, const ArgSpec<A8> &s8, const ArgSpec<A9> &s9
@@ -1353,16 +1353,16 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
                       this->template add_arg<A9> (m_s9); \
                       this->template add_arg<A10> (m_s10); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); \
-                      A3 a3 = args ? args.template read<A3> (heap) : m_s3.init (); \
-                      A4 a4 = args ? args.template read<A4> (heap) : m_s4.init (); \
-                      A5 a5 = args ? args.template read<A5> (heap) : m_s5.init (); \
-                      A6 a6 = args ? args.template read<A6> (heap) : m_s6.init (); \
-                      A7 a7 = args ? args.template read<A7> (heap) : m_s7.init (); \
-                      A8 a8 = args ? args.template read<A8> (heap) : m_s8.init (); \
-                      A9 a9 = args ? args.template read<A9> (heap) : m_s9.init (); \
-                      A10 a10 = args ? args.template read<A10> (heap) : m_s10.init (); 
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init (); \
+                      A3 a3 = args ? args.template read<A3> (heap, &m_s3) : m_s3.init (); \
+                      A4 a4 = args ? args.template read<A4> (heap, &m_s4) : m_s4.init (); \
+                      A5 a5 = args ? args.template read<A5> (heap, &m_s5) : m_s5.init (); \
+                      A6 a6 = args ? args.template read<A6> (heap, &m_s6) : m_s6.init (); \
+                      A7 a7 = args ? args.template read<A7> (heap, &m_s7) : m_s7.init (); \
+                      A8 a8 = args ? args.template read<A8> (heap, &m_s8) : m_s8.init (); \
+                      A9 a9 = args ? args.template read<A9> (heap, &m_s9) : m_s9.init (); \
+                      A10 a10 = args ? args.template read<A10> (heap, &m_s10) : m_s10.init ();
 #define _ARGVARLIST   a1, a2, a3, a4, a5, a6, a7, a8, a9, a10
 #define _ARGSPECARGS  s1, s2, s3, s4, s5, s6, s7, s8, s9, s10
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2, const ArgSpec<A3> &s3, const ArgSpec<A4> &s4, const ArgSpec<A5> &s5, const ArgSpec<A6> &s6, const ArgSpec<A7> &s7, const ArgSpec<A8> &s8, const ArgSpec<A9> &s9, const ArgSpec<A10> &s10
@@ -1414,17 +1414,17 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
                       this->template add_arg<A10> (m_s10); \
                       this->template add_arg<A11> (m_s11); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); \
-                      A3 a3 = args ? args.template read<A3> (heap) : m_s3.init (); \
-                      A4 a4 = args ? args.template read<A4> (heap) : m_s4.init (); \
-                      A5 a5 = args ? args.template read<A5> (heap) : m_s5.init (); \
-                      A6 a6 = args ? args.template read<A6> (heap) : m_s6.init (); \
-                      A7 a7 = args ? args.template read<A7> (heap) : m_s7.init (); \
-                      A8 a8 = args ? args.template read<A8> (heap) : m_s8.init (); \
-                      A9 a9 = args ? args.template read<A9> (heap) : m_s9.init (); \
-                      A10 a10 = args ? args.template read<A10> (heap) : m_s10.init (); \
-                      A11 a11 = args ? args.template read<A11> (heap) : m_s11.init (); 
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init (); \
+                      A3 a3 = args ? args.template read<A3> (heap, &m_s3) : m_s3.init (); \
+                      A4 a4 = args ? args.template read<A4> (heap, &m_s4) : m_s4.init (); \
+                      A5 a5 = args ? args.template read<A5> (heap, &m_s5) : m_s5.init (); \
+                      A6 a6 = args ? args.template read<A6> (heap, &m_s6) : m_s6.init (); \
+                      A7 a7 = args ? args.template read<A7> (heap, &m_s7) : m_s7.init (); \
+                      A8 a8 = args ? args.template read<A8> (heap, &m_s8) : m_s8.init (); \
+                      A9 a9 = args ? args.template read<A9> (heap, &m_s9) : m_s9.init (); \
+                      A10 a10 = args ? args.template read<A10> (heap, &m_s10) : m_s10.init (); \
+                      A11 a11 = args ? args.template read<A11> (heap, &m_s11) : m_s11.init ();
 #define _ARGVARLIST   a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11
 #define _ARGSPECARGS  s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2, const ArgSpec<A3> &s3, const ArgSpec<A4> &s4, const ArgSpec<A5> &s5, const ArgSpec<A6> &s6, const ArgSpec<A7> &s7, const ArgSpec<A8> &s8, const ArgSpec<A9> &s9, const ArgSpec<A10> &s10, const ArgSpec<A11> &s11
@@ -1478,18 +1478,18 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
                       this->template add_arg<A11> (m_s11); \
                       this->template add_arg<A12> (m_s12); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); \
-                      A3 a3 = args ? args.template read<A3> (heap) : m_s3.init (); \
-                      A4 a4 = args ? args.template read<A4> (heap) : m_s4.init (); \
-                      A5 a5 = args ? args.template read<A5> (heap) : m_s5.init (); \
-                      A6 a6 = args ? args.template read<A6> (heap) : m_s6.init (); \
-                      A7 a7 = args ? args.template read<A7> (heap) : m_s7.init (); \
-                      A8 a8 = args ? args.template read<A8> (heap) : m_s8.init (); \
-                      A9 a9 = args ? args.template read<A9> (heap) : m_s9.init (); \
-                      A10 a10 = args ? args.template read<A10> (heap) : m_s10.init (); \
-                      A11 a11 = args ? args.template read<A11> (heap) : m_s11.init (); \
-                      A12 a12 = args ? args.template read<A12> (heap) : m_s12.init (); 
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init (); \
+                      A3 a3 = args ? args.template read<A3> (heap, &m_s3) : m_s3.init (); \
+                      A4 a4 = args ? args.template read<A4> (heap, &m_s4) : m_s4.init (); \
+                      A5 a5 = args ? args.template read<A5> (heap, &m_s5) : m_s5.init (); \
+                      A6 a6 = args ? args.template read<A6> (heap, &m_s6) : m_s6.init (); \
+                      A7 a7 = args ? args.template read<A7> (heap, &m_s7) : m_s7.init (); \
+                      A8 a8 = args ? args.template read<A8> (heap, &m_s8) : m_s8.init (); \
+                      A9 a9 = args ? args.template read<A9> (heap, &m_s9) : m_s9.init (); \
+                      A10 a10 = args ? args.template read<A10> (heap, &m_s10) : m_s10.init (); \
+                      A11 a11 = args ? args.template read<A11> (heap, &m_s11) : m_s11.init (); \
+                      A12 a12 = args ? args.template read<A12> (heap, &m_s12) : m_s12.init ();
 #define _ARGVARLIST   a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12
 #define _ARGSPECARGS  s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2, const ArgSpec<A3> &s3, const ArgSpec<A4> &s4, const ArgSpec<A5> &s5, const ArgSpec<A6> &s6, const ArgSpec<A7> &s7, const ArgSpec<A8> &s8, const ArgSpec<A9> &s9, const ArgSpec<A10> &s10, const ArgSpec<A11> &s11, const ArgSpec<A12> &s12
@@ -1545,19 +1545,19 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
                       this->template add_arg<A12> (m_s12); \
                       this->template add_arg<A13> (m_s13); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); \
-                      A3 a3 = args ? args.template read<A3> (heap) : m_s3.init (); \
-                      A4 a4 = args ? args.template read<A4> (heap) : m_s4.init (); \
-                      A5 a5 = args ? args.template read<A5> (heap) : m_s5.init (); \
-                      A6 a6 = args ? args.template read<A6> (heap) : m_s6.init (); \
-                      A7 a7 = args ? args.template read<A7> (heap) : m_s7.init (); \
-                      A8 a8 = args ? args.template read<A8> (heap) : m_s8.init (); \
-                      A9 a9 = args ? args.template read<A9> (heap) : m_s9.init (); \
-                      A10 a10 = args ? args.template read<A10> (heap) : m_s10.init (); \
-                      A11 a11 = args ? args.template read<A11> (heap) : m_s11.init (); \
-                      A12 a12 = args ? args.template read<A12> (heap) : m_s12.init (); \
-                      A13 a13 = args ? args.template read<A13> (heap) : m_s13.init ();
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init (); \
+                      A3 a3 = args ? args.template read<A3> (heap, &m_s3) : m_s3.init (); \
+                      A4 a4 = args ? args.template read<A4> (heap, &m_s4) : m_s4.init (); \
+                      A5 a5 = args ? args.template read<A5> (heap, &m_s5) : m_s5.init (); \
+                      A6 a6 = args ? args.template read<A6> (heap, &m_s6) : m_s6.init (); \
+                      A7 a7 = args ? args.template read<A7> (heap, &m_s7) : m_s7.init (); \
+                      A8 a8 = args ? args.template read<A8> (heap, &m_s8) : m_s8.init (); \
+                      A9 a9 = args ? args.template read<A9> (heap, &m_s9) : m_s9.init (); \
+                      A10 a10 = args ? args.template read<A10> (heap, &m_s10) : m_s10.init (); \
+                      A11 a11 = args ? args.template read<A11> (heap, &m_s11) : m_s11.init (); \
+                      A12 a12 = args ? args.template read<A12> (heap, &m_s12) : m_s12.init (); \
+                      A13 a13 = args ? args.template read<A13> (heap, &m_s13) : m_s13.init ();
 #define _ARGVARLIST   a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13
 #define _ARGSPECARGS  s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2, const ArgSpec<A3> &s3, const ArgSpec<A4> &s4, const ArgSpec<A5> &s5, const ArgSpec<A6> &s6, const ArgSpec<A7> &s7, const ArgSpec<A8> &s8, const ArgSpec<A9> &s9, const ArgSpec<A10> &s10, const ArgSpec<A11> &s11, const ArgSpec<A12> &s12, const ArgSpec<A13> &s13
@@ -1615,20 +1615,20 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
                       this->template add_arg<A13> (m_s13); \
                       this->template add_arg<A14> (m_s14); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); \
-                      A3 a3 = args ? args.template read<A3> (heap) : m_s3.init (); \
-                      A4 a4 = args ? args.template read<A4> (heap) : m_s4.init (); \
-                      A5 a5 = args ? args.template read<A5> (heap) : m_s5.init (); \
-                      A6 a6 = args ? args.template read<A6> (heap) : m_s6.init (); \
-                      A7 a7 = args ? args.template read<A7> (heap) : m_s7.init (); \
-                      A8 a8 = args ? args.template read<A8> (heap) : m_s8.init (); \
-                      A9 a9 = args ? args.template read<A9> (heap) : m_s9.init (); \
-                      A10 a10 = args ? args.template read<A10> (heap) : m_s10.init (); \
-                      A11 a11 = args ? args.template read<A11> (heap) : m_s11.init (); \
-                      A12 a12 = args ? args.template read<A12> (heap) : m_s12.init (); \
-                      A13 a13 = args ? args.template read<A13> (heap) : m_s13.init (); \
-                      A14 a14 = args ? args.template read<A14> (heap) : m_s14.init ();
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init (); \
+                      A3 a3 = args ? args.template read<A3> (heap, &m_s3) : m_s3.init (); \
+                      A4 a4 = args ? args.template read<A4> (heap, &m_s4) : m_s4.init (); \
+                      A5 a5 = args ? args.template read<A5> (heap, &m_s5) : m_s5.init (); \
+                      A6 a6 = args ? args.template read<A6> (heap, &m_s6) : m_s6.init (); \
+                      A7 a7 = args ? args.template read<A7> (heap, &m_s7) : m_s7.init (); \
+                      A8 a8 = args ? args.template read<A8> (heap, &m_s8) : m_s8.init (); \
+                      A9 a9 = args ? args.template read<A9> (heap, &m_s9) : m_s9.init (); \
+                      A10 a10 = args ? args.template read<A10> (heap, &m_s10) : m_s10.init (); \
+                      A11 a11 = args ? args.template read<A11> (heap, &m_s11) : m_s11.init (); \
+                      A12 a12 = args ? args.template read<A12> (heap, &m_s12) : m_s12.init (); \
+                      A13 a13 = args ? args.template read<A13> (heap, &m_s13) : m_s13.init (); \
+                      A14 a14 = args ? args.template read<A14> (heap, &m_s14) : m_s14.init ();
 #define _ARGVARLIST   a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14
 #define _ARGSPECARGS  s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2, const ArgSpec<A3> &s3, const ArgSpec<A4> &s4, const ArgSpec<A5> &s5, const ArgSpec<A6> &s6, const ArgSpec<A7> &s7, const ArgSpec<A8> &s8, const ArgSpec<A9> &s9, const ArgSpec<A10> &s10, const ArgSpec<A11> &s11, const ArgSpec<A12> &s12, const ArgSpec<A13> &s13, const ArgSpec<A14> &s14
@@ -1688,21 +1688,21 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
                       this->template add_arg<A14> (m_s14); \
                       this->template add_arg<A15> (m_s15); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); \
-                      A3 a3 = args ? args.template read<A3> (heap) : m_s3.init (); \
-                      A4 a4 = args ? args.template read<A4> (heap) : m_s4.init (); \
-                      A5 a5 = args ? args.template read<A5> (heap) : m_s5.init (); \
-                      A6 a6 = args ? args.template read<A6> (heap) : m_s6.init (); \
-                      A7 a7 = args ? args.template read<A7> (heap) : m_s7.init (); \
-                      A8 a8 = args ? args.template read<A8> (heap) : m_s8.init (); \
-                      A9 a9 = args ? args.template read<A9> (heap) : m_s9.init (); \
-                      A10 a10 = args ? args.template read<A10> (heap) : m_s10.init (); \
-                      A11 a11 = args ? args.template read<A11> (heap) : m_s11.init (); \
-                      A12 a12 = args ? args.template read<A12> (heap) : m_s12.init (); \
-                      A13 a13 = args ? args.template read<A13> (heap) : m_s13.init (); \
-                      A14 a14 = args ? args.template read<A14> (heap) : m_s14.init (); \
-                      A15 a15 = args ? args.template read<A15> (heap) : m_s15.init ();
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init (); \
+                      A3 a3 = args ? args.template read<A3> (heap, &m_s3) : m_s3.init (); \
+                      A4 a4 = args ? args.template read<A4> (heap, &m_s4) : m_s4.init (); \
+                      A5 a5 = args ? args.template read<A5> (heap, &m_s5) : m_s5.init (); \
+                      A6 a6 = args ? args.template read<A6> (heap, &m_s6) : m_s6.init (); \
+                      A7 a7 = args ? args.template read<A7> (heap, &m_s7) : m_s7.init (); \
+                      A8 a8 = args ? args.template read<A8> (heap, &m_s8) : m_s8.init (); \
+                      A9 a9 = args ? args.template read<A9> (heap, &m_s9) : m_s9.init (); \
+                      A10 a10 = args ? args.template read<A10> (heap, &m_s10) : m_s10.init (); \
+                      A11 a11 = args ? args.template read<A11> (heap, &m_s11) : m_s11.init (); \
+                      A12 a12 = args ? args.template read<A12> (heap, &m_s12) : m_s12.init (); \
+                      A13 a13 = args ? args.template read<A13> (heap, &m_s13) : m_s13.init (); \
+                      A14 a14 = args ? args.template read<A14> (heap, &m_s14) : m_s14.init (); \
+                      A15 a15 = args ? args.template read<A15> (heap, &m_s15) : m_s15.init ();
 #define _ARGVARLIST   a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15
 #define _ARGSPECARGS  s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2, const ArgSpec<A3> &s3, const ArgSpec<A4> &s4, const ArgSpec<A5> &s5, const ArgSpec<A6> &s6, const ArgSpec<A7> &s7, const ArgSpec<A8> &s8, const ArgSpec<A9> &s9, const ArgSpec<A10> &s10, const ArgSpec<A11> &s11, const ArgSpec<A12> &s12, const ArgSpec<A13> &s13, const ArgSpec<A14> &s14, const ArgSpec<A15> &s15
@@ -1764,22 +1764,22 @@ constant (const std::string &name, const R &v, const std::string &doc = std::str
                       this->template add_arg<A15> (m_s15); \
                       this->template add_arg<A16> (m_s16); 
 #define _GETARGVARS   tl::Heap heap;\
-                      A1 a1 = args ? args.template read<A1> (heap) : m_s1.init (); \
-                      A2 a2 = args ? args.template read<A2> (heap) : m_s2.init (); \
-                      A3 a3 = args ? args.template read<A3> (heap) : m_s3.init (); \
-                      A4 a4 = args ? args.template read<A4> (heap) : m_s4.init (); \
-                      A5 a5 = args ? args.template read<A5> (heap) : m_s5.init (); \
-                      A6 a6 = args ? args.template read<A6> (heap) : m_s6.init (); \
-                      A7 a7 = args ? args.template read<A7> (heap) : m_s7.init (); \
-                      A8 a8 = args ? args.template read<A8> (heap) : m_s8.init (); \
-                      A9 a9 = args ? args.template read<A9> (heap) : m_s9.init (); \
-                      A10 a10 = args ? args.template read<A10> (heap) : m_s10.init (); \
-                      A11 a11 = args ? args.template read<A11> (heap) : m_s11.init (); \
-                      A12 a12 = args ? args.template read<A12> (heap) : m_s12.init (); \
-                      A13 a13 = args ? args.template read<A13> (heap) : m_s13.init (); \
-                      A14 a14 = args ? args.template read<A14> (heap) : m_s14.init (); \
-                      A15 a15 = args ? args.template read<A15> (heap) : m_s15.init (); \
-                      A16 a16 = args ? args.template read<A16> (heap) : m_s16.init ();
+                      A1 a1 = args ? args.template read<A1> (heap, &m_s1) : m_s1.init (); \
+                      A2 a2 = args ? args.template read<A2> (heap, &m_s2) : m_s2.init (); \
+                      A3 a3 = args ? args.template read<A3> (heap, &m_s3) : m_s3.init (); \
+                      A4 a4 = args ? args.template read<A4> (heap, &m_s4) : m_s4.init (); \
+                      A5 a5 = args ? args.template read<A5> (heap, &m_s5) : m_s5.init (); \
+                      A6 a6 = args ? args.template read<A6> (heap, &m_s6) : m_s6.init (); \
+                      A7 a7 = args ? args.template read<A7> (heap, &m_s7) : m_s7.init (); \
+                      A8 a8 = args ? args.template read<A8> (heap, &m_s8) : m_s8.init (); \
+                      A9 a9 = args ? args.template read<A9> (heap, &m_s9) : m_s9.init (); \
+                      A10 a10 = args ? args.template read<A10> (heap, &m_s10) : m_s10.init (); \
+                      A11 a11 = args ? args.template read<A11> (heap, &m_s11) : m_s11.init (); \
+                      A12 a12 = args ? args.template read<A12> (heap, &m_s12) : m_s12.init (); \
+                      A13 a13 = args ? args.template read<A13> (heap, &m_s13) : m_s13.init (); \
+                      A14 a14 = args ? args.template read<A14> (heap, &m_s14) : m_s14.init (); \
+                      A15 a15 = args ? args.template read<A15> (heap, &m_s15) : m_s15.init (); \
+                      A16 a16 = args ? args.template read<A16> (heap, &m_s16) : m_s16.init ();
 #define _ARGVARLIST   a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16
 #define _ARGSPECARGS  s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16
 #define _ARGSPEC      const ArgSpec<A1> &s1, const ArgSpec<A2> &s2, const ArgSpec<A3> &s3, const ArgSpec<A4> &s4, const ArgSpec<A5> &s5, const ArgSpec<A6> &s6, const ArgSpec<A7> &s7, const ArgSpec<A8> &s8, const ArgSpec<A9> &s9, const ArgSpec<A10> &s10, const ArgSpec<A11> &s11, const ArgSpec<A12> &s12, const ArgSpec<A13> &s13, const ArgSpec<A14> &s14, const ArgSpec<A15> &s15, const ArgSpec<A16> &s16

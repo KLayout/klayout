@@ -242,6 +242,26 @@ module DRC
         DRCAreaAndPerimeter::new(r, 1.0, f)
       end
     end
+
+    def fill_pattern(name)
+      DRCFillCell::new(name)
+    end
+
+    def hstep(x, y = nil)
+      DRCFillStep::new(true, x, y)
+    end
+    
+    def vstep(x, y = nil)
+      DRCFillStep::new(false, x, y)
+    end
+
+    def auto_origin
+      DRCFillOrigin::new
+    end
+
+    def origin(x, y)
+      DRCFillOrigin::new(x, y)
+    end
     
     def tile_size(x, y = nil)
       DRCTileSize::new(_make_value(x) * self.dbu, _make_value(y || x) * self.dbu)
@@ -2142,6 +2162,47 @@ CODE
         obj.send(method, *args)
       end
     end
+
+    def _bx
+      @bx
+    end
+    
+    def _by
+      @by
+    end
+    
+    def _tx
+      @tx
+    end
+    
+    def _ty
+      @ty
+    end
+
+    def _output_layout
+      if @output_layout 
+        output = @output_layout
+      else
+        output = @def_layout
+        output || raise("No output layout specified")
+      end
+      output
+    end
+    
+    def _output_cell
+      if @output_layout 
+        if @output_cell
+          output_cell = @output_cell
+        elsif @def_cell
+          output_cell = @output_layout.cell(@def_cell.name) || @output_layout.create_cell(@def_cell.name)
+        end
+        output_cell || raise("No output cell specified (see 'target' instruction)")
+      else
+        output_cell = @output_cell || @def_cell
+        output_cell || raise("No output cell specified")
+      end
+      output_cell
+    end
     
     def _start(job_description)
     
@@ -2474,6 +2535,13 @@ CODE
       v
     end
   
+    def _use_output_layer(li)
+      if !@used_output_layers[li]
+        @output_layers.push(li)
+        @used_output_layers[li] = true
+      end
+    end
+    
   private
 
     def _make_string(v)
@@ -2569,20 +2637,8 @@ CODE
       
       else 
 
-        if @output_layout 
-          output = @output_layout
-          if @output_cell
-            output_cell = @output_cell
-          elsif @def_cell
-            output_cell = @output_layout.cell(@def_cell.name) || @output_layout.create_cell(@def_cell.name)
-          end
-          output_cell || raise("No output cell specified (see 'target' instruction)")
-        else
-          output = @def_layout
-          output || raise("No output layout specified")
-          output_cell = @output_cell || @def_cell
-          output_cell || raise("No output cell specified")
-        end
+        output = self._output_layout
+        output_cell = self._output_cell
 
         info = nil
         if args.size == 1
@@ -2646,7 +2702,7 @@ CODE
       data 
 
     end
-    
+
     def make_source(layout, cell = nil, path = nil)
       name = "layout" + @lnum.to_s
       @lnum += 1

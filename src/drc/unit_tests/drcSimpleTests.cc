@@ -1193,3 +1193,32 @@ TEST(33_globalTransformationWithTiles)
   run_test (_this, "33", true);
 }
 
+TEST(40_fill)
+{
+  run_test (_this, "40", false);
+}
+
+TEST(41_fillTiled)
+{
+  run_test (_this, "41", false);
+}
+
+TEST(42_fillWithLeft)
+{
+  run_test (_this, "42", false);
+}
+
+TEST(43_fillWithLeftTiled)
+{
+  run_test (_this, "43", false);
+}
+
+TEST(44_fillWithOverlappingBoxes)
+{
+  run_test (_this, "44", false);
+}
+
+TEST(45_fillWithOverlappingBoxesTiled)
+{
+  run_test (_this, "45", false);
+}

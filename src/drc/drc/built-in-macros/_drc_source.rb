@@ -278,11 +278,11 @@ module DRC
     # following specifications:
     #
     # @ul
-    # @li "shift(x, y)": shifts the input layout horizontally by x and vertically by y micrometers
-    # @li "rotate(a)": rotates the input layout by a degree counter-clockwise
-    # @li "magnify(m)": magnifies the input layout by the factor m (NOTE: using fractional scale factors may result in small gaps due to grid snapping)
-    # @li "mirror_x": mirrors the input layout at the x axis
-    # @li "mirror_y": mirrors the input layout at the y axis
+    # @li "shift(x, y)": shifts the input layout horizontally by x and vertically by y micrometers @/li
+    # @li "rotate(a)": rotates the input layout by a degree counter-clockwise @/li
+    # @li "magnify(m)": magnifies the input layout by the factor m (NOTE: using fractional scale factors may result in small gaps due to grid snapping) @/li
+    # @li "mirror_x": mirrors the input layout at the x axis @/li
+    # @li "mirror_y": mirrors the input layout at the y axis @/li
     # @/ul
     #
     # Multiple transformation specs can be given. In that case the transformations are applied right to left.

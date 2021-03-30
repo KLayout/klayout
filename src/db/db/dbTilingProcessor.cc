@@ -327,10 +327,13 @@ public:
     : tl::JobBase (nworkers),
       mp_proc (proc),
       m_has_tiles (has_tiles),
-      m_progress (0)
+      m_progress_count (0),
+      m_progress (std::string ())
   {
     //  .. nothing yet ..
   }
+
+  void start (const std::string &job_description);
 
   bool has_tiles () const
   {
@@ -340,18 +343,18 @@ public:
   void next_progress () 
   {
     tl::MutexLocker locker (&m_mutex);
-    ++m_progress;
+    ++m_progress_count;
   }
 
-  void update_progress (tl::RelativeProgress &progress) 
+  void update_progress ()
   {
     unsigned int p;
     {
       tl::MutexLocker locker (&m_mutex);
-      p = m_progress;
+      p = m_progress_count;
     }
 
-    progress.set (p, true /*force yield*/);
+    m_progress.set (p, true /*force yield*/);
   }
 
   TilingProcessor *processor () const
@@ -361,11 +364,14 @@ public:
 
   virtual tl::Worker *create_worker ();
 
+  virtual void after_sync_task (tl::Task *task);
+
 private:
   TilingProcessor *mp_proc;
   bool m_has_tiles;
-  unsigned int m_progress;
+  unsigned int m_progress_count;
   tl::Mutex m_mutex;
+  tl::RelativeProgress m_progress;
 };
 
 class TilingProcessorTask
@@ -601,8 +607,27 @@ TilingProcessorJob::create_worker ()
   return new TilingProcessorWorker (this);
 }
 
+void
+TilingProcessorJob::after_sync_task (tl::Task * /*task*/)
+{
+  //  This needs to be done here as there is no external loop to do this
+  update_progress ();
+}
+
+void
+TilingProcessorJob::start (const std::string &job_description)
+{
+  m_progress = tl::RelativeProgress (job_description, tasks (), 1);
+  //  prevents child progress objects from showing
+  m_progress.set_final (true);
+
+  tl::JobBase::start ();
+}
+
 // ----------------------------------------------------------------------------------
 //  The tiling processor implementation
+
+tl::Mutex TilingProcessor::s_output_lock;
 
 TilingProcessor::TilingProcessor ()
   : m_tile_width (0.0), m_tile_height (0.0),
@@ -781,7 +806,7 @@ TilingProcessor::output (const std::string &name, db::Edges &edges)
 tl::Variant
 TilingProcessor::receiver (const std::vector<tl::Variant> &args)
 {
-  tl::MutexLocker locker (&m_output_mutex);
+  tl::MutexLocker locker (&s_output_lock);
 
   if (args.size () != 1) {
     throw tl::Exception (tl::to_string (tr ("_rec function requires one argument: the handle of the output channel")));
@@ -803,7 +828,7 @@ TilingProcessor::receiver (const std::vector<tl::Variant> &args)
 void 
 TilingProcessor::put (size_t ix, size_t iy, const db::Box &tile, const std::vector<tl::Variant> &args)
 {
-  tl::MutexLocker locker (&m_output_mutex);
+  tl::MutexLocker locker (&s_output_lock);
 
   if (args.size () < 2 || args.size () > 3) {
     throw tl::Exception (tl::to_string (tr ("_output function requires two or three arguments: handle and object and a clip flag (optional)")));
@@ -930,11 +955,6 @@ TilingProcessor::execute (const std::string &desc)
 
   }
 
-  //  TODO: there should be a general scheme of how thread-specific progress is merged
-  //  into a global one ..
-  size_t todo_count = ntiles_w * ntiles_h * m_scripts.size ();
-  tl::RelativeProgress progress (desc, todo_count, 1);
-
   try {
 
     try {
@@ -946,10 +966,10 @@ TilingProcessor::execute (const std::string &desc)
         }
       }
 
-      job.start ();
+      job.start (desc);
       while (job.is_running ()) {
         //  This may throw an exception, if the cancel button has been pressed.
-        job.update_progress (progress);
+        job.update_progress ();
         job.wait (100);
       }
 

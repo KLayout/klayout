@@ -251,6 +251,25 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating whether the progress is a "final" one
+   *
+   *  A final progress will prevent child progress objects from showing. It basically summarizes child operations.
+   *  By default, a progress object is not final.
+   */
+  void set_final (bool f)
+  {
+    m_final = f;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the progress is a "final" one
+   */
+  bool final () const
+  {
+    return m_final;
+  }
+
+  /**
    *  @brief Render the title string
    */
   const std::string &title () const
@@ -296,6 +315,7 @@ private:
 
   std::string m_desc, m_last_desc;
   std::string m_title;
+  bool m_final;
   size_t m_interval_count;
   size_t m_yield_interval;
   double m_last_value;

@@ -63,6 +63,25 @@ class DBRecursiveShapeIterator_TestClass < TestBase
 
   end
 
+  def acollect(s, l)
+
+    res = []
+    while !s.at_end?
+      r = "[#{l.cell_name(s.cell_index)}]"
+      if s.shape.is_box?
+        box = s.shape.box
+        r += box.transformed(s.always_apply_trans).to_s
+      else 
+        r += "X";
+      end
+      s.next
+      res.push(r)
+    end
+
+    return res.join("/")
+
+  end
+
   def test_1
 
     # Recursive shape iterator tests
@@ -197,6 +216,19 @@ class DBRecursiveShapeIterator_TestClass < TestBase
     
     ii = RBA::RecursiveShapeIterator::new(l, c2, [0, 1], RBA::Box.new(-100, 0, 2000, 101), false)
     assert_equal(collect(ii, l), "[c2](0,100;1000,1200)/[c3](1100,100;2100,1200)/[c3](1101,101;2101,1201)")
+    ii.reset
+    assert_equal(acollect(ii, l), "[c2](0,100;1000,1200)/[c3](0,100;1000,1200)/[c3](1,101;1001,1201)")
+    
+    ii = RBA::RecursiveShapeIterator::new(l, c2, [0, 1], RBA::Box.new(-100, 20, 2000, 121), true)
+    ii.global_trans = RBA::ICplxTrans::new(RBA::Vector::new(10, 20))
+    assert_equal(ii.global_trans.to_s, "r0 *1 10,20")
+    assert_equal(collect(ii, l), "[c2](10,120;1010,1220)/[c3](1110,120;2110,1220)")
+    ii.global_dtrans = RBA::DCplxTrans::new(RBA::DVector::new(0.01, 0.02))
+    ii.reset
+    assert_equal(ii.global_dtrans.to_s, "r0 *1 0.01,0.02")
+    assert_equal(collect(ii, l), "[c2](10,120;1010,1220)/[c3](1110,120;2110,1220)")
+    ii.reset
+    assert_equal(acollect(ii, l), "[c2](10,120;1010,1220)/[c3](0,100;1000,1200)")
     
     ii = RBA::RecursiveShapeIterator::new(l, c2, [0, 1], RBA::Box.new(-100, 0, 2000, 101), true)
     assert_equal(collect(ii, l), "[c2](0,100;1000,1200)/[c3](1100,100;2100,1200)")

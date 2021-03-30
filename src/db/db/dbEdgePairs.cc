@@ -139,6 +139,8 @@ EdgePairs &EdgePairs::transform (const T &trans)
 template DB_PUBLIC EdgePairs &EdgePairs::transform (const db::ICplxTrans &);
 template DB_PUBLIC EdgePairs &EdgePairs::transform (const db::Trans &);
 template DB_PUBLIC EdgePairs &EdgePairs::transform (const db::Disp &);
+template DB_PUBLIC EdgePairs &EdgePairs::transform (const db::IMatrix2d &);
+template DB_PUBLIC EdgePairs &EdgePairs::transform (const db::IMatrix3d &);
 
 const db::RecursiveShapeIterator &
 EdgePairs::iter () const

@@ -1565,8 +1565,35 @@ AreaMap::AreaMap ()
   mp_av = 0;
 }
 
+AreaMap::AreaMap (const AreaMap &other)
+  : m_nx (0), m_ny (0)
+{
+  mp_av = 0;
+  operator= (other);
+}
+
+AreaMap &
+AreaMap::operator= (const AreaMap &other)
+{
+  if (this != &other) {
+    //  TODO: this could be copy on write
+    reinitialize (other.p0 (), other.d (), other.p (), other.nx (), other.ny ());
+    if (other.mp_av) {
+      memcpy (mp_av, other.mp_av, m_nx * m_ny * sizeof (*mp_av));
+    }
+  }
+  return *this;
+}
+
 AreaMap::AreaMap (const db::Point &p0, const db::Vector &d, size_t nx, size_t ny)
-  : m_p0 (p0), m_d (d), m_nx (nx), m_ny (ny)
+  : m_p0 (p0), m_d (d), m_p (d), m_nx (nx), m_ny (ny)
+{
+  mp_av = new area_type [nx * ny];
+  clear ();
+}
+
+AreaMap::AreaMap (const db::Point &p0, const db::Vector &d, const db::Vector &p, size_t nx, size_t ny)
+  : m_p0 (p0), m_d (d), m_p (std::min (d.x (), p.x ()), std::min (d.y (), p.y ())), m_nx (nx), m_ny (ny)
 {
   mp_av = new area_type [nx * ny];
   clear ();
@@ -1583,16 +1610,28 @@ AreaMap::~AreaMap ()
 void
 AreaMap::reinitialize (const db::Point &p0, const db::Vector &d, size_t nx, size_t ny)
 {
+  reinitialize (p0, d, d, nx, ny);
+}
+
+void
+AreaMap::reinitialize (const db::Point &p0, const db::Vector &d, const db::Vector &p, size_t nx, size_t ny)
+{
   m_p0 = p0;
   m_d = d;
-  m_nx = nx;
-  m_ny = ny;
+  m_p = db::Vector (std::min (d.x (), p.x ()), std::min (d.y (), p.y ()));
 
-  if (mp_av) {
-    delete mp_av;
+  if (nx != m_nx || ny != m_ny) {
+
+    m_nx = nx;
+    m_ny = ny;
+
+    if (mp_av) {
+      delete mp_av;
+    }
+
+    mp_av = new area_type [nx * ny];
+
   }
-
-  mp_av = new area_type [nx * ny];
 
   clear ();
 }
@@ -1613,6 +1652,7 @@ AreaMap::swap (AreaMap &other)
 {
   std::swap (m_p0, other.m_p0);
   std::swap (m_d, other.m_d);
+  std::swap (m_p, other.m_p);
   std::swap (m_nx, other.m_nx);
   std::swap (m_ny, other.m_ny);
   std::swap (mp_av, other.mp_av);
@@ -1631,10 +1671,20 @@ AreaMap::total_area () const
   return asum;
 }
 
+db::Box
+AreaMap::bbox () const
+{
+  if (m_nx == 0 || m_ny == 0) {
+    return db::Box ();
+  } else {
+    return db::Box (m_p0, m_p0 + db::Vector (db::Coord (m_nx - 1) * m_d.x () + m_p.x (), db::Coord (m_ny - 1) * m_d.y () + m_p.y ()));
+  }
+}
+
 // -------------------------------------------------------------------------
 //  Implementation of rasterize
 
-void
+bool
 rasterize (const db::Polygon &polygon, db::AreaMap &am)
 {
   typedef db::AreaMap::area_type area_type;
@@ -1643,11 +1693,12 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
 
   //  check if the polygon overlaps the rasterization area. Otherwise, we simply do nothing.
   if (! pbox.overlaps (box)) {
-    return;
+    return false;
   }
 
   db::Coord ymin = box.bottom (), ymax = box.top ();
   db::Coord dy = am.d ().y (), dx = am.d ().x ();
+  db::Coord py = am.p ().y (), px = am.p ().x ();
   db::Coord y0 = am.p0 ().y (), x0 = am.p0 ().x ();
   size_t ny = am.ny (), nx = am.nx ();
 
@@ -1659,7 +1710,7 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
 
   //  no scanning required (i.e. degenerated polygon) -> do nothing 
   if (iy0 == iy1 || ix0 == ix1) {
-    return;
+    return false;
   }
 
   //  collect edges 
@@ -1689,11 +1740,15 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
     ++c;
   }
 
+  if (c == edges.end ()) {
+    return false;
+  }
+
   std::vector <db::Edge>::iterator f = c;
 
   for (size_t iy = iy0; iy < iy1; ++iy) {
 
-    db::Coord yy = y + dy;
+    db::Coord yy = y + py;
     while (f != edges.end () && db::edge_ymin (*f) < yy) {
       ++f;
     }
@@ -1706,10 +1761,10 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
 
     std::vector <db::Edge>::iterator cc = c;
 
-    while (cc != edges.end () && db::edge_xmax (*cc) <= x) {
+    while (cc != edges.end () && cc != f && db::edge_xmax (*cc) <= x) {
       db::Coord y1 = std::max (y, std::min (yy, cc->p1 ().y ()));
       db::Coord y2 = std::max (y, std::min (yy, cc->p2 ().y ()));
-      a += area_type (dx) * area_type (y2 - y1);
+      a += area_type (px) * area_type (y2 - y1);
       ++cc;
     }
 
@@ -1717,7 +1772,8 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
 
     for (size_t ix = ix0; ix < ix1; ++ix) {
 
-      db::Coord xx = x + dx;
+      db::Coord xx = x + px;
+      db::Coord xxx = x + dx;
 
       // TODO: edge_xmin_at_interval(y, yy) and edge_xmax.. would be more efficient in the
       // all-angle case. However, it is crucial that the edge clipping produces 
@@ -1726,6 +1782,14 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
 
       while (ff != f && db::edge_xmin (*ff) < xx) {
         ++ff;
+      }
+
+      std::vector <db::Edge>::iterator fff = ff;
+
+      if (xx < xxx) {
+        while (fff != f && db::edge_xmin (*fff) < xxx) {
+          ++fff;
+        }
       }
 
       if (xl < x) {
@@ -1737,24 +1801,50 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
 
           std::pair<bool, db::Edge> ec = e->clipped (left);
           if (ec.first && db::edge_xmin (ec.second) < x) {
-            a += area_type (ec.second.dy ()) * area_type (dx);
+            a += area_type (ec.second.dy ()) * area_type (px);
           }
 
         }
 
       }
 
-      db::Box cell (x, y, xx, yy);
-
       area_type aa = a;
 
-      for (std::vector <db::Edge>::iterator e = cc; e != ff; ++e) {
+      if (dx == py) {
 
-        std::pair<bool, db::Edge> ec = e->clipped (cell);
-        if (ec.first && db::edge_xmin (ec.second) < xx) {
+        db::Box cell (x, y, xx, yy);
 
-          aa += area_type (ec.second.dy ()) * area_type (2 * xx - (ec.second.p2 ().x () + ec.second.p1 ().x ())) / 2;
-          a += area_type (ec.second.dy ()) * area_type (dx);
+        for (std::vector <db::Edge>::iterator e = cc; e != ff; ++e) {
+
+          std::pair<bool, db::Edge> ec = e->clipped (cell);
+          if (ec.first && db::edge_xmin (ec.second) < xx) {
+            aa += (area_type (ec.second.dy ()) * area_type (2 * xx - (ec.second.p2 ().x () + ec.second.p1 ().x ()))) / 2;
+            a += area_type (ec.second.dy ()) * area_type (px);
+          }
+
+        }
+
+      } else {
+
+        db::Box cell (x, y, xx, yy);
+
+        for (std::vector <db::Edge>::iterator e = cc; e != ff; ++e) {
+
+          std::pair<bool, db::Edge> ec = e->clipped (cell);
+          if (ec.first && db::edge_xmin (ec.second) < xx) {
+            aa += (area_type (ec.second.dy ()) * area_type (2 * xx - (ec.second.p2 ().x () + ec.second.p1 ().x ()))) / 2;
+          }
+
+        }
+
+        db::Box wide_cell (x, y, x + dx, yy);
+
+        for (std::vector <db::Edge>::iterator e = cc; e != fff; ++e) {
+
+          std::pair<bool, db::Edge> wide_ec = e->clipped (wide_cell);
+          if (wide_ec.first && db::edge_xmin (wide_ec.second) < x + dx) {
+            a += area_type (wide_ec.second.dy ()) * area_type (px);
+          }
 
         }
 
@@ -1762,8 +1852,10 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
 
       am.get (ix, iy) += aa;
 
-      x = xx;
-      xl = xx;
+      x += dx;
+      xl = x;
+
+      ff = fff;
 
       for (std::vector <db::Edge>::iterator ccx = cc; ccx != ff; ++ccx) {
         if (db::edge_xmax (*ccx) <= x) {
@@ -1772,6 +1864,13 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
         }
       }
 
+    }
+
+    if (yy < y + dy) {
+      yy = y + dy;
+      while (f != edges.end () && db::edge_ymin (*f) < yy) {
+        ++f;
+      }
     }
 
     y = yy;
@@ -1785,6 +1884,7 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
 
   }
 
+  return true;
 }
 
 // -------------------------------------------------------------------------

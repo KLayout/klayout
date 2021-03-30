@@ -63,6 +63,36 @@ module DRC
       @in_context = nil
 
     end
+
+    def shift(x, y)
+      self._context("shift") do
+        RBA::DCplxTrans::new(RBA::DVector::new(_make_value(x) * self.dbu, _make_value(y) * self.dbu))
+      end
+    end
+    
+    def magnify(m)
+      self._context("magnify") do
+        RBA::DCplxTrans::new(_make_numeric_value(m))
+      end
+    end
+    
+    def rotate(a)
+      self._context("rotate") do
+        RBA::DCplxTrans::new(1.0, _make_numeric_value(a), false, RBA::DVector::new)
+      end
+    end
+    
+    def mirror_x
+      self._context("mirror_x") do
+        RBA::DCplxTrans::new(1.0, 0.0, true, RBA::DVector::new)
+      end
+    end
+    
+    def mirror_y
+      self._context("mirror_y") do
+        RBA::DCplxTrans::new(1.0, 180.0, true, RBA::DVector::new)
+      end
+    end
     
     def joined
       DRCJoinFlag::new(true)
@@ -211,6 +241,26 @@ module DRC
       self._context("area_and_perimeter") do
         DRCAreaAndPerimeter::new(r, 1.0, f)
       end
+    end
+
+    def fill_pattern(name)
+      DRCFillCell::new(name)
+    end
+
+    def hstep(x, y = nil)
+      DRCFillStep::new(true, x, y)
+    end
+    
+    def vstep(x, y = nil)
+      DRCFillStep::new(false, x, y)
+    end
+
+    def auto_origin
+      DRCFillOrigin::new
+    end
+
+    def origin(x, y)
+      DRCFillOrigin::new(x, y)
     end
     
     def tile_size(x, y = nil)
@@ -1495,6 +1545,22 @@ CODE
     end
 
     # %DRC%
+    # @name global_transform
+    # @brief Gets or sets a global transformation
+    # @synopsis global_transform
+    # @synopsis global_transform([ transformations ])
+    #
+    # Applies a global transformation to the default source layout.
+    # See \Source#global_transform for a description of this feature.
+  
+    def global_transform(*args)
+      self._context("global_transform") do
+        @def_source = layout.global_transform(*args)
+      end
+      nil
+    end
+
+    # %DRC%
     # @name cheat 
     # @brief Hierarchy cheats
     # @synopsis cheat(args) { block }
@@ -1679,8 +1745,6 @@ CODE
       pull_overlapping 
       rectangles
       rectilinear
-      rotate
-      rotated
       rounded_corners
       scale
       scaled
@@ -2107,6 +2171,47 @@ CODE
         obj.send(method, *args)
       end
     end
+
+    def _bx
+      @bx
+    end
+    
+    def _by
+      @by
+    end
+    
+    def _tx
+      @tx
+    end
+    
+    def _ty
+      @ty
+    end
+
+    def _output_layout
+      if @output_layout 
+        output = @output_layout
+      else
+        output = @def_layout
+        output || raise("No output layout specified")
+      end
+      output
+    end
+    
+    def _output_cell
+      if @output_layout 
+        if @output_cell
+          output_cell = @output_cell
+        elsif @def_cell
+          output_cell = @output_layout.cell(@def_cell.name) || @output_layout.create_cell(@def_cell.name)
+        end
+        output_cell || raise("No output cell specified (see 'target' instruction)")
+      else
+        output_cell = @output_cell || @def_cell
+        output_cell || raise("No output cell specified")
+      end
+      output_cell
+    end
     
     def _start(job_description)
     
@@ -2439,6 +2544,13 @@ CODE
       v
     end
   
+    def _use_output_layer(li)
+      if !@used_output_layers[li]
+        @output_layers.push(li)
+        @used_output_layers[li] = true
+      end
+    end
+    
   private
 
     def _make_string(v)
@@ -2449,7 +2561,7 @@ CODE
       end
     end
 
-    def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags, cls)
+    def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags, global_trans, cls)
     
       if layers.empty? && ! @deep
 
@@ -2463,6 +2575,7 @@ CODE
           iter = RBA::RecursiveShapeIterator::new(layout, layout.cell(cell_index), layers)
         end
         iter.shape_flags = shape_flags
+        iter.global_dtrans = global_trans
         
         sel.each do |s|
           if s == "-"
@@ -2500,8 +2613,12 @@ CODE
         end
         
         # clip if a box is specified
-        if box && clip && (cls == RBA::Region || cls == RBA::Edge)
-          r &= RBA::Region::new(box)
+        # TODO: the whole clip thing could be a part of the Region constructor
+        if cls == RBA::Region && clip && box
+          # HACK: deep regions will always clip in the constructor, so skip this
+          if ! @deep 
+            r &= RBA::Region::new(box)
+          end
         end
       
       end
@@ -2529,20 +2646,8 @@ CODE
       
       else 
 
-        if @output_layout 
-          output = @output_layout
-          if @output_cell
-            output_cell = @output_cell
-          elsif @def_cell
-            output_cell = @output_layout.cell(@def_cell.name) || @output_layout.create_cell(@def_cell.name)
-          end
-          output_cell || raise("No output cell specified (see 'target' instruction)")
-        else
-          output = @def_layout
-          output || raise("No output layout specified")
-          output_cell = @output_cell || @def_cell
-          output_cell || raise("No output cell specified")
-        end
+        output = self._output_layout
+        output_cell = self._output_cell
 
         info = nil
         if args.size == 1
@@ -2606,7 +2711,7 @@ CODE
       data 
 
     end
-    
+
     def make_source(layout, cell = nil, path = nil)
       name = "layout" + @lnum.to_s
       @lnum += 1

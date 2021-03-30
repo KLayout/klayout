@@ -338,7 +338,11 @@ ProgressWidget::set_progress (tl::Progress *progress)
       double v = progress->value ();
       pb->set_value (v, value);
 
-      progress = progress->next ();
+      if (progress->final ()) {
+        progress = 0;
+      } else {
+        progress = progress->next ();
+      }
 
     } else {
       pb->hide ();

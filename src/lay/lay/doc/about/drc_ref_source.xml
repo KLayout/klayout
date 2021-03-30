@@ -109,6 +109,40 @@ The extent function is useful to invert a layer:
 inverse_1 = extent.sized(100.0) - input(1, 0)
 </pre>
 </p>
+<a name="global_transform"/><h2>"global_transform" - Gets or sets a global transformation</h2>
+<keyword name="global_transform"/>
+<p>Usage:</p>
+<ul>
+<li><tt>global_transform</tt></li>
+<li><tt>global_transform([ transformations ])</tt></li>
+</ul>
+<p>
+This method returns a new source representing the transformed layout. It is provided in the spritit of 
+<a href="/about/drc_ref_source.xml#clip">Source#clip</a> and similar methods.
+</p><p>
+The transformation
+is either given as a <class_doc href="DTrans">DTrans</class_doc>, <class_doc href="DVector">DVector</class_doc> or <class_doc href="DCplxTrans">DCplxTrans</class_doc> object or as one of the 
+following specifications:
+</p><p>
+<ul>
+<li>"shift(x, y)": shifts the input layout horizontally by x and vertically by y micrometers </li>
+<li>"rotate(a)": rotates the input layout by a degree counter-clockwise </li>
+<li>"magnify(m)": magnifies the input layout by the factor m (NOTE: using fractional scale factors may result in small gaps due to grid snapping) </li>
+<li>"mirror_x": mirrors the input layout at the x axis </li>
+<li>"mirror_y": mirrors the input layout at the y axis </li>
+</ul>
+</p><p>
+Multiple transformation specs can be given. In that case the transformations are applied right to left.
+Using "global_transform" will reset any global transformation present already.
+Without an argument, the global transformation is reset.
+</p><p>
+The following example rotates the layout by 90 degree at the origin (0, 0) and then shifts it up by 
+100 micrometers:
+</p><p>
+<pre>
+source.global_transform(shift(0, 100.um), rotate(90.0))
+</pre>
+</p>
 <a name="input"/><h2>"input" - Specifies input from a source</h2>
 <keyword name="input"/>
 <p>Usage:</p>

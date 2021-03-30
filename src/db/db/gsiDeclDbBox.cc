@@ -101,6 +101,11 @@ struct box_defs
     return std::hfunc (*box);
   }
 
+  static const C &bbox (const C *box)
+  {
+    return *box;
+  }
+
   static gsi::Methods methods ()
   {
     return
@@ -171,6 +176,12 @@ struct box_defs
     ) +
     method ("p2=", &C::set_p2, gsi::arg ("p"),
       "@brief Sets the upper right point of the box\n"
+    ) +
+    method_ext ("bbox", &bbox,
+      "@brief Returns the bounding box\n"
+      "This method is provided for consistency of the shape API is returns the box itself.\n"
+      "\n"
+      "This method has been introduced in version 0.27."
     ) +
     method_ext ("contains?", &box_defs<C>::contains, gsi::arg ("x"), gsi::arg ("y"),
       "@brief Returns true if the box contains the given point\n"

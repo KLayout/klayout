@@ -27,6 +27,7 @@ module DRC
       @clip = false
       @overlapping = false
       @tmp_layers = []
+      @global_trans = RBA::DCplxTrans::new
     end
 
     # Conceptual deep copy (not including the temp layers)
@@ -69,6 +70,24 @@ module DRC
     
     def cell_obj
       @cell
+    end
+
+    def inplace_global_transform(*args)
+      gt = RBA::DCplxTrans::new
+      args.each do |a|
+        if a.is_a?(RBA::DVector) || a.is_a?(RBA::DTrans)
+          gt = RBA::DCplxTrans::new(a) * gt
+        elsif a.is_a?(RBA::DCplxTrans)
+          gt = a * gt
+        else
+          raise("Expected a transformation spec instead of #{a.inspect}")
+        end
+      end
+      @global_trans = gt
+    end
+
+    def global_transformation
+      @global_trans
     end
     
     def finish
@@ -245,8 +264,40 @@ module DRC
     # \touching is a similar method which delivers shapes touching
     # the search region with their bounding box (without the requirement to overlap)
     
+    # %DRC%
+    # @name global_transform
+    # @brief Gets or sets a global transformation
+    # @synopsis global_transform
+    # @synopsis global_transform([ transformations ])
+    #
+    # This method returns a new source representing the transformed layout. It is provided in the spritit of 
+    # \Source#clip and similar methods.
+    #
+    # The transformation
+    # is either given as a RBA::DTrans, RBA::DVector or RBA::DCplxTrans object or as one of the 
+    # following specifications:
+    #
+    # @ul
+    # @li "shift(x, y)": shifts the input layout horizontally by x and vertically by y micrometers @/li
+    # @li "rotate(a)": rotates the input layout by a degree counter-clockwise @/li
+    # @li "magnify(m)": magnifies the input layout by the factor m (NOTE: using fractional scale factors may result in small gaps due to grid snapping) @/li
+    # @li "mirror_x": mirrors the input layout at the x axis @/li
+    # @li "mirror_y": mirrors the input layout at the y axis @/li
+    # @/ul
+    #
+    # Multiple transformation specs can be given. In that case the transformations are applied right to left.
+    # Using "global_transform" will reset any global transformation present already.
+    # Without an argument, the global transformation is reset.
+    #
+    # The following example rotates the layout by 90 degree at the origin (0, 0) and then shifts it up by 
+    # 100 micrometers:
+    #
+    # @code
+    # source.global_transform(shift(0, 100.um), rotate(90.0))
+    # @/code
+
     # export inplace_* as * out-of-place
-    %w(select cell clip touching overlapping).each do |f|
+    %w(select cell clip touching overlapping global_transform).each do |f|
       eval <<"CODE"
         def #{f}(*args)
           @engine._context("#{f}") do
@@ -274,7 +325,7 @@ CODE
         if @box
           layer.insert(RBA::DBox::from_ibox(@box) * @layout.dbu)
         else
-          layer.insert(RBA::DBox::from_ibox(@cell.bbox) * @layout.dbu)
+          layer.insert((RBA::DBox::from_ibox(@cell.bbox) * @layout.dbu).transformed(@global_trans))
         end
         layer
       end
@@ -326,7 +377,7 @@ CODE
     def input(*args)
       @engine._context("input") do
         layers = parse_input_layers(*args)
-        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, RBA::Region))
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, @global_trans, RBA::Region))
       end
     end
 
@@ -350,7 +401,7 @@ CODE
     def labels(*args)
       @engine._context("labels") do
         layers = parse_input_layers(*args)
-        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::STexts, RBA::Texts))
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::STexts, @global_trans, RBA::Texts))
       end
     end
 
@@ -373,7 +424,7 @@ CODE
     def polygons(*args)
       @engine._context("polygons") do
         layers = parse_input_layers(*args)
-        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs, RBA::Region))
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs, @global_trans, RBA::Region))
       end
     end
 
@@ -399,7 +450,7 @@ CODE
     def edges(*args)
       @engine._context("edges") do
         layers = parse_input_layers(*args)
-        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs | RBA::Shapes::SEdges, RBA::Edges))
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs | RBA::Shapes::SEdges, @global_trans, RBA::Edges))
       end
     end
 
@@ -425,7 +476,7 @@ CODE
     def edge_pairs(*args)
       @engine._context("edge_pairs") do
         layers = parse_input_layers(*args)
-        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SEdgePairs, RBA::EdgePairs))
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SEdgePairs, @global_trans, RBA::EdgePairs))
       end
     end
 
@@ -437,7 +488,7 @@ CODE
 
     def make_layer
       layers = []
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, RBA::Region))
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, @global_trans, RBA::Region))
     end
 
     # %DRC%

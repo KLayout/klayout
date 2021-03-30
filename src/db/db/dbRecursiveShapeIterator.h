@@ -392,6 +392,30 @@ public:
   }
 
   /**
+   *  @brief Sets a global transformation
+   *
+   *  The global transformation will be applied to all shapes delivered by biasing the "trans" attribute
+   */
+  void set_global_trans (const cplx_trans_type &tr);
+
+  /**
+   *  @brief Gets the global transformation
+   */
+  cplx_trans_type global_trans () const
+  {
+    return m_global_trans;
+  }
+
+  /**
+   *  @brief Gets the transformation which is to be applied always in push mode
+   *
+   *  The reasoning behind this method is that in push mode and with the presence of a global transformation we need to
+   *  somehow reflect the fact that the top-level is transformed. Instead of transforming every shape and instance we use
+   *  this attribute. It is unity for all cells below top level and equal to the global transformation for the top cell.
+   */
+  const cplx_trans_type &always_apply () const;
+
+  /**
    *  @brief Reset the iterator
    */
   void reset () 
@@ -727,6 +751,7 @@ private:
   bool m_shape_inv_prop_sel;
   bool m_overlapping;
   std::set<db::cell_index_type> m_start, m_stop;
+  cplx_trans_type m_global_trans;
 
   const layout_type *mp_layout;
   const cell_type *mp_top_cell;
@@ -881,7 +906,7 @@ public:
    *   - NI_single: iterate a single member (the first one)
    *   - NI_skip: skips the whole array (not a single instance is iterated)
    */
-  virtual new_inst_mode new_inst (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/) { return NI_all; }
+  virtual new_inst_mode new_inst (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::ICplxTrans & /*always_apply*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/) { return NI_all; }
 
   /**
    *  @brief Enters a new array member of the instance
@@ -894,14 +919,14 @@ public:
    *
    *  If this method returns false, this array instance (but not the whole array) is skipped and the cell is not entered.
    */
-  virtual bool new_inst_member (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/) { return true; }
+  virtual bool new_inst_member (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::ICplxTrans & /*always_apply*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/) { return true; }
 
   /**
    *  @brief Delivers a shape
    *
    *  @param trans The transformation which maps the shape to the top cell.
    */
-  virtual void shape (const RecursiveShapeIterator * /*iter*/, const db::Shape & /*shape*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) { }
+  virtual void shape (const RecursiveShapeIterator * /*iter*/, const db::Shape & /*shape*/, const db::ICplxTrans & /*always_apply*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) { }
 };
 
 }  // namespace db

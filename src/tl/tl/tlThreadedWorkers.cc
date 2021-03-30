@@ -159,6 +159,16 @@ TaskList::put_front (Task *task)
   }
 }
 
+size_t
+TaskList::size () const
+{
+  size_t n = 0;
+  for (Task *t = mp_first; t; t = t->mp_next) {
+    ++n;
+  }
+  return n;
+}
+
 // -----------------------------------------------------------------------------
 //  tl::JobBase implementation
 
@@ -264,6 +274,11 @@ JobBase::start ()
     mp_workers.back ()->start (this, int (mp_workers.size ()) - 1);
   }
 
+  while (m_nworkers < int (mp_workers.size ())) {
+    delete mp_workers.back ();
+    mp_workers.pop_back ();
+  }
+
   for (int i = 0; i < int (mp_workers.size ()); ++i) {
     setup_worker (mp_workers [i]);
     mp_workers [i]->reset_stop_request ();
@@ -278,36 +293,56 @@ JobBase::start ()
     std::unique_ptr <Worker> sync_worker (create_worker ());
     setup_worker (sync_worker.get ());
 
-    while (! m_task_list.is_empty ()) {
-      std::unique_ptr<Task> task (m_task_list.fetch ());
-      try {
-        sync_worker->perform_task (task.get ());
-      } catch (TaskTerminatedException) {
-        //  Stop the thread.
-        break;
-      } catch (WorkerTerminatedException) {
-        //  Stop the thread.
-        break;
-      } catch (tl::Exception &ex) {
-        log_error (ex.msg ());
-      } catch (std::exception &ex) {
-        log_error (ex.what ());
-      } catch (...) {
-        log_error (tl::to_string (tr ("Unspecific error")));
+    try {
+
+      while (! m_task_list.is_empty ()) {
+
+        std::unique_ptr<Task> task (m_task_list.fetch ());
+        before_sync_task (task.get ());
+
+        try {
+          sync_worker->perform_task (task.get ());
+        } catch (TaskTerminatedException) {
+          //  Stop the thread.
+          break;
+        } catch (WorkerTerminatedException) {
+          //  Stop the thread.
+          break;
+        } catch (tl::Exception &ex) {
+          log_error (ex.msg ());
+        } catch (std::exception &ex) {
+          log_error (ex.what ());
+        } catch (...) {
+          log_error (tl::to_string (tr ("Unspecific error")));
+        }
+
+        after_sync_task (task.get ());
+
       }
+
+    } catch (...) {
+      //  handle exceptions raised by before_sync_task or after_sync_task
+      cleanup ();
+      m_running = false;
+      throw;
     }
 
-    //  clean up any remaining tasks
-    while (! m_task_list.is_empty ()) {
-      Task *task = m_task_list.fetch ();
-      if (task) {
-        delete task;
-      }
-    }
-
+    cleanup ();
     finished ();
     m_running = false;
 
+  }
+}
+
+void
+JobBase::cleanup ()
+{
+  //  clean up any remaining tasks
+  while (! m_task_list.is_empty ()) {
+    Task *task = m_task_list.fetch ();
+    if (task) {
+      delete task;
+    }
   }
 }
 

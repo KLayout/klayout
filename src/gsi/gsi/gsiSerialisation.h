@@ -84,6 +84,17 @@ struct GSI_PUBLIC ArglistUnderflowException
 };
 
 /**
+ *  @brief An exception thrown if there are not enough arguments on the serialization buffer
+ */
+struct GSI_PUBLIC ArglistUnderflowExceptionWithType
+  : public tl::Exception
+{
+  ArglistUnderflowExceptionWithType (const ArgSpecBase &as)
+    : tl::Exception (tl::to_string (tr ("Too few arguments - missing '%s'")), as.name ())
+  { }
+};
+
+/**
  *  @brief An exception thrown if a reference is null (nil)
  */
 struct GSI_PUBLIC NilPointerToReference
@@ -91,6 +102,17 @@ struct GSI_PUBLIC NilPointerToReference
 {
   NilPointerToReference ()
     : tl::Exception (tl::to_string (tr ("nil object passed to a reference")))
+  { }
+};
+
+/**
+ *  @brief An exception thrown if a reference is null (nil)
+ */
+struct GSI_PUBLIC NilPointerToReferenceWithType
+  : public tl::Exception
+{
+  NilPointerToReferenceWithType (const ArgSpecBase &as)
+    : tl::Exception (tl::to_string (tr ("nil object passed to a reference for '%s'")), as.name ())
   { }
 };
 
@@ -208,7 +230,16 @@ public:
   template <class X>
   inline X read (tl::Heap &heap)
   {
-    return this->read_impl<X> (typename type_traits<X>::tag (), heap);
+    return this->read_impl<X> (typename type_traits<X>::tag (), heap, 0);
+  }
+
+  /**
+   *  @brief Reads a value from the buffer
+   */
+  template <class X>
+  inline X read (tl::Heap &heap, const ArgSpecBase *as)
+  {
+    return this->read_impl<X> (typename type_traits<X>::tag (), heap, as);
   }
 
   /**
@@ -228,6 +259,26 @@ private:
   {
     if (! *this) {
       throw ArglistUnderflowException ();
+    }
+  }
+
+  inline void check_data (const ArgSpecBase *as) const
+  {
+    if (! *this) {
+      if (as) {
+        throw ArglistUnderflowExceptionWithType (*as);
+      } else {
+        throw ArglistUnderflowException ();
+      }
+    }
+  }
+
+  inline void throw_nil_for_reference (const ArgSpecBase *as) const
+  {
+    if (as) {
+      throw NilPointerToReferenceWithType (*as);
+    } else {
+      throw NilPointerToReference ();
     }
   }
 
@@ -369,18 +420,18 @@ private:
   //  reader implementations
 
   template <class X>
-  X read_impl (const pod_direct_tag &, tl::Heap &)
+  X read_impl (const pod_direct_tag &, tl::Heap &, const ArgSpecBase *as)
   {
-    check_data ();
+    check_data (as);
     X r = *((X *)mp_read);
     mp_read += item_size<X> ();
     return r;
   }
 
   template <class X>
-  X read_impl (const x_tag &, tl::Heap &)
+  X read_impl (const x_tag &, tl::Heap &, const ArgSpecBase *as)
   {
-    check_data ();
+    check_data (as);
     X *xp = *(X **)mp_read;
     X x = *xp;
     delete xp;
@@ -389,7 +440,7 @@ private:
   }
 
   template <class X>
-  X read_impl (const vptr_tag &, tl::Heap &)
+  X read_impl (const vptr_tag &, tl::Heap &, const ArgSpecBase *)
   {
     void *r = *((void **)mp_read);
     mp_read += item_size<void *> ();
@@ -398,73 +449,73 @@ private:
   }
 
   template <class X>
-  X read_impl (const ref_tag &, tl::Heap &)
+  X read_impl (const ref_tag &, tl::Heap &, const ArgSpecBase *as)
   {
     typedef typename type_traits<X>::value_type value_type;
-    check_data ();
+    check_data (as);
     value_type *r = *((value_type **)mp_read);
     mp_read += item_size<value_type *> ();
     if (! r) {
-      throw NilPointerToReference ();
+      throw_nil_for_reference (as);
     }
     return *r;
   }
 
   template <class X>
-  X read_impl (const pod_cref_tag &, tl::Heap &)
+  X read_impl (const pod_cref_tag &, tl::Heap &, const ArgSpecBase *as)
   {
     //  X is actually an (const X &)
     typedef typename type_traits<X>::value_type value_type;
-    check_data ();
+    check_data (as);
     const value_type *r = ((const value_type *)mp_read);
     mp_read += item_size<value_type> ();
     return *r;
   }
 
   template <class X>
-  X read_impl (const npod_cref_tag &, tl::Heap &)
+  X read_impl (const npod_cref_tag &, tl::Heap &, const ArgSpecBase *as)
   {
     //  X is actually an (const X &)
     typedef typename type_traits<X>::value_type value_type;
-    check_data ();
+    check_data (as);
     const value_type *r = *((const value_type **)mp_read);
     mp_read += item_size<const value_type *> ();
     if (! r) {
-      throw NilPointerToReference ();
+      throw_nil_for_reference (as);
     }
     return *r;
   }
 
   template <class X>
-  X read_impl (const x_cref_tag &, tl::Heap &)
+  X read_impl (const x_cref_tag &, tl::Heap &, const ArgSpecBase *as)
   {
     //  X is actually an (const X &)
     typedef typename type_traits<X>::value_type value_type;
-    check_data ();
+    check_data (as);
     const value_type *r = *((const value_type **)mp_read);
     mp_read += item_size<const value_type *> ();
     if (! r) {
-      throw NilPointerToReference ();
+      throw_nil_for_reference (as);
     }
     return *r;
   }
 
   template <class X>
-  X read_impl (const ptr_tag &, tl::Heap &)
+  X read_impl (const ptr_tag &, tl::Heap &, const ArgSpecBase *as)
   {
     //  X is actually an (X *)
     typedef typename type_traits<X>::value_type value_type;
-    check_data ();
+    check_data (as);
     value_type * const &r = *((value_type **)mp_read);
     mp_read += item_size<value_type *> ();
     return r;
   }
 
   template <class X>
-  X read_impl (const pod_cptr_tag &, tl::Heap &)
+  X read_impl (const pod_cptr_tag &, tl::Heap &, const ArgSpecBase *as)
   {
     //  X is actually an (const X *)
-    check_data ();
+    check_data (as);
     bool h = *(bool *)mp_read;
     mp_read += item_size<bool> ();
     X r = h ? (X)mp_read : (X)0;
@@ -474,29 +525,29 @@ private:
 
   //  see notes on the serialization for this type:
   template <class X>
-  X read_impl (const npod_cptr_tag &, tl::Heap &)
+  X read_impl (const npod_cptr_tag &, tl::Heap &, const ArgSpecBase *as)
   {
     //  X is actually an (const X *)
-    check_data ();
+    check_data (as);
     X r = *((X *)mp_read);
     mp_read += item_size<X> ();
     return r;
   }
 
   template <class X>
-  X read_impl (const x_cptr_tag &, tl::Heap &)
+  X read_impl (const x_cptr_tag &, tl::Heap &, const ArgSpecBase *as)
   {
     //  X is actually an (const X *)
-    check_data ();
+    check_data (as);
     X r = *((X *)mp_read);
     mp_read += item_size<X> ();
     return r;
   }
 
   template <class X>
-  X read_impl (const adaptor_direct_tag &, tl::Heap &heap)
+  X read_impl (const adaptor_direct_tag &, tl::Heap &heap, const ArgSpecBase *as)
   {
-    check_data ();
+    check_data (as);
 
     std::unique_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
     mp_read += item_size<AdaptorBase *> ();
@@ -508,11 +559,11 @@ private:
   }
 
   template <class X>
-  X read_impl (const adaptor_cref_tag &, tl::Heap &heap)
+  X read_impl (const adaptor_cref_tag &, tl::Heap &heap, const ArgSpecBase *as)
   {
     typedef typename tl::get_inner_type<X>::result x_type;
 
-    check_data ();
+    check_data (as);
 
     std::unique_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
     mp_read += item_size<AdaptorBase *> ();
@@ -526,11 +577,11 @@ private:
   }
 
   template <class X>
-  X read_impl (const adaptor_ref_tag &, tl::Heap &heap)
+  X read_impl (const adaptor_ref_tag &, tl::Heap &heap, const ArgSpecBase *as)
   {
     typedef typename tl::get_inner_type<X>::result x_type;
 
-    check_data ();
+    check_data (as);
 
     AdaptorBase *p = *(AdaptorBase **)mp_read;
     mp_read += item_size<AdaptorBase *> ();
@@ -544,11 +595,11 @@ private:
   }
 
   template <class X>
-  X read_impl (const adaptor_cptr_tag &, tl::Heap &heap)
+  X read_impl (const adaptor_cptr_tag &, tl::Heap &heap, const ArgSpecBase *as)
   {
     typedef typename tl::get_inner_type<X>::result x_type;
 
-    check_data ();
+    check_data (as);
 
     std::unique_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
     mp_read += item_size<AdaptorBase *> ();
@@ -564,11 +615,11 @@ private:
   }
 
   template <class X>
-  X read_impl (const adaptor_ptr_tag &, tl::Heap &heap)
+  X read_impl (const adaptor_ptr_tag &, tl::Heap &heap, const ArgSpecBase *as)
   {
     typedef typename tl::get_inner_type<X>::result x_type;
 
-    check_data ();
+    check_data (as);
 
     AdaptorBase *p = *(AdaptorBase **)mp_read;
     mp_read += item_size<AdaptorBase *> ();

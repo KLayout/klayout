@@ -184,6 +184,8 @@ Edges &Edges::transform (const T &trans)
 template DB_PUBLIC Edges &Edges::transform (const db::ICplxTrans &);
 template DB_PUBLIC Edges &Edges::transform (const db::Trans &);
 template DB_PUBLIC Edges &Edges::transform (const db::Disp &);
+template DB_PUBLIC Edges &Edges::transform (const db::IMatrix2d &);
+template DB_PUBLIC Edges &Edges::transform (const db::IMatrix3d &);
 
 template <class Sh>
 void Edges::insert (const Sh &shape)

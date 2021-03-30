@@ -630,3 +630,12 @@ TEST(10)
   EXPECT_EQ ((m * p[2]).to_string (), "2,3");
 }
 
+TEST(11)
+{
+  //  double and integer versions basic functionality
+  EXPECT_EQ ((db::Matrix2d (1.0, 0.5, -0.5, 2.0) * db::DPoint (1, 2)).to_string (), "2,3.5");
+  EXPECT_EQ ((db::IMatrix2d (1.0, 0.5, -0.5, 2.0) * db::Point (10, 20)).to_string (), "20,35");
+  EXPECT_EQ ((db::Matrix3d (1.0, 0.5, 0.0, -0.5, 2.0, 1.0, 0.0, 0.0, 1.0) * db::DPoint (1, 2)).to_string (), "2,4.5");
+  EXPECT_EQ ((db::IMatrix3d (1.0, 0.5, 0.0, -0.5, 2.0, 1.0, 0.0, 0.0, 1.0) * db::DPoint (10, 20)).to_string (), "20,36");
+}
+

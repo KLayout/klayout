@@ -63,6 +63,36 @@ module DRC
       @in_context = nil
 
     end
+
+    def shift(x, y)
+      self._context("shift") do
+        RBA::DCplxTrans::new(RBA::DVector::new(_make_value(x) * self.dbu, _make_value(y) * self.dbu))
+      end
+    end
+    
+    def magnify(m)
+      self._context("magnify") do
+        RBA::DCplxTrans::new(_make_numeric_value(m))
+      end
+    end
+    
+    def rotate(a)
+      self._context("rotate") do
+        RBA::DCplxTrans::new(1.0, _make_numeric_value(a), false, RBA::DVector::new)
+      end
+    end
+    
+    def mirror_x
+      self._context("mirror_x") do
+        RBA::DCplxTrans::new(1.0, 0.0, true, RBA::DVector::new)
+      end
+    end
+    
+    def mirror_y
+      self._context("mirror_y") do
+        RBA::DCplxTrans::new(1.0, 180.0, true, RBA::DVector::new)
+      end
+    end
     
     def joined
       DRCJoinFlag::new(true)
@@ -1495,6 +1525,22 @@ CODE
     end
 
     # %DRC%
+    # @name global_transform
+    # @brief Gets or sets a global transformation
+    # @synopsis global_transform
+    # @synopsis global_transform([ transformations ])
+    #
+    # Applies a global transformation to the default source layout.
+    # See \Source#global_transform for a description of this feature.
+  
+    def global_transform(*args)
+      self._context("global_transform") do
+        @def_source = layout.global_transform(*args)
+      end
+      nil
+    end
+
+    # %DRC%
     # @name cheat 
     # @brief Hierarchy cheats
     # @synopsis cheat(args) { block }
@@ -1679,8 +1725,6 @@ CODE
       pull_overlapping 
       rectangles
       rectilinear
-      rotate
-      rotated
       rounded_corners
       scale
       scaled
@@ -2440,7 +2484,7 @@ CODE
       end
     end
 
-    def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags, cls)
+    def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags, global_trans, cls)
     
       if layers.empty? && ! @deep
 
@@ -2454,6 +2498,7 @@ CODE
           iter = RBA::RecursiveShapeIterator::new(layout, layout.cell(cell_index), layers)
         end
         iter.shape_flags = shape_flags
+        iter.global_dtrans = global_trans
         
         sel.each do |s|
           if s == "-"
@@ -2491,8 +2536,12 @@ CODE
         end
         
         # clip if a box is specified
-        if box && clip && (cls == RBA::Region || cls == RBA::Edge)
-          r &= RBA::Region::new(box)
+        # TODO: the whole clip thing could be a part of the Region constructor
+        if cls == RBA::Region && clip && box
+          # HACK: deep regions will always clip in the constructor, so skip this
+          if ! @deep 
+            r &= RBA::Region::new(box)
+          end
         end
       
       end

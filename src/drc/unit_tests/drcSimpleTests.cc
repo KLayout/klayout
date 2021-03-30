@@ -1168,3 +1168,28 @@ TEST(30_density)
   run_test (_this, "30", false);
 }
 
+TEST(31_globaTransformation)
+{
+  run_test (_this, "31", false);
+}
+
+TEST(31d_globalTransformation)
+{
+  run_test (_this, "31", true);
+}
+
+TEST(32_globalTransformationWithClip)
+{
+  run_test (_this, "32", false);
+}
+
+TEST(32d_globalTransformationWithClip)
+{
+  run_test (_this, "32", true);
+}
+
+TEST(33_globalTransformationWithTiles)
+{
+  run_test (_this, "33", true);
+}
+

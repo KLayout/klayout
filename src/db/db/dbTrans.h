@@ -377,6 +377,32 @@ public:
   }
 
   /**
+   *  @brief Reduction
+   */
+  template <class T>
+  explicit fixpoint_trans (const T &t)
+    : m_f (0)
+  {
+    *this = t.fp_trans ();
+  }
+
+  /**
+   *  @brief Reduction from a matrix2d
+   */
+  explicit fixpoint_trans (const db::matrix_2d<coord_type> &t)
+  {
+    m_f = ((int (floor (t.angle () / 90.0 + 0.5) + 4)) % 4) + (t.is_mirror () ? 4 : 0);
+  }
+
+  /**
+   *  @brief Reduction from a matrix3d
+   */
+  explicit fixpoint_trans (const db::matrix_3d<coord_type> &t)
+  {
+    m_f = ((int (floor (t.angle () / 90.0 + 0.5) + 4)) % 4) + (t.is_mirror () ? 4 : 0);
+  }
+
+  /**
    *  @brief Returns true, if the transformation is unity
    */
   bool is_unity () const
@@ -420,7 +446,18 @@ public:
     // .. nothing else ..
   }
 
-  /** 
+  /**
+   *  @brief The standard constructor using a code rather than angle and mirror and no displacement
+   *
+   *  @param f The rotation/mirror code (r0 .. m135 constants)
+   */
+  explicit fixpoint_trans (unsigned int f)
+    : m_f (f)
+  {
+    // .. nothing else ..
+  }
+
+  /**
    *  @brief The rotation/mirror codes
    */
   static const int r0   = 0;  //  No rotation
@@ -1651,7 +1688,7 @@ public:
   {
     tl_assert (! m.has_shear ());
     tl_assert (! m.has_perspective ());
-    std::pair<double, double> mag = m.mag ();
+    std::pair<double, double> mag = m.mag2 ();
     tl_assert (fabs (mag.first - mag.second) < 1e-10);
     double rot = m.angle () * M_PI / 180.0;
     m_mag = m.is_mirror () ? -mag.first : mag.first;
@@ -1674,7 +1711,7 @@ public:
     : m_u (u)
   {
     tl_assert (! m.has_shear ());
-    std::pair<double, double> mag = m.mag ();
+    std::pair<double, double> mag = m.mag2 ();
     tl_assert (fabs (mag.first - mag.second) < 1e-10);
     double rot = m.angle () * M_PI / 180.0;
     m_mag = m.is_mirror () ? -mag.first : mag.first;

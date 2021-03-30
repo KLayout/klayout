@@ -256,6 +256,18 @@ void DeepEdges::do_transform (const db::ICplxTrans &t)
   invalidate_bbox ();
 }
 
+void DeepEdges::do_transform (const db::IMatrix2d &t)
+{
+  transform_deep_layer (deep_layer (), t);
+  invalidate_bbox ();
+}
+
+void DeepEdges::do_transform (const db::IMatrix3d &t)
+{
+  transform_deep_layer (deep_layer (), t);
+  invalidate_bbox ();
+}
+
 void DeepEdges::reserve (size_t)
 {
   //  Not implemented for deep regions

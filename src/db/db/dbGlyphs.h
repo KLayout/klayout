@@ -121,13 +121,13 @@ public:
    *  @param char_spacing Additional spacing between the lines in µm
    *  @param The resulting polygons will be put here (the vector will be cleared before)
    */
-  void text (const std::string &t, double target_dbu, double mag, bool inv, double bias, double char_spacing, double line_spacing, std::vector<db::Polygon> &polygons) const;
+  void text (const std::string &t, double target_dbu, double mag2, bool inv, double bias, double char_spacing, double line_spacing, std::vector<db::Polygon> &polygons) const;
 
   /**
    *  @brief Creates the given text as a region
    *  For the parameters see "text"
    */
-  db::Region text_as_region (const std::string &t, double target_dbu, double mag, bool inv, double bias, double char_spacing, double line_spacing) const;
+  db::Region text_as_region (const std::string &t, double target_dbu, double mag2, bool inv, double bias, double char_spacing, double line_spacing) const;
 
   /**
    *  @brief Gets the glyph for a given character

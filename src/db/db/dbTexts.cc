@@ -112,6 +112,8 @@ void Texts::insert (const db::Shape &shape, const T &trans)
 template DB_PUBLIC void Texts::insert (const db::Shape &, const db::ICplxTrans &);
 template DB_PUBLIC void Texts::insert (const db::Shape &, const db::Trans &);
 template DB_PUBLIC void Texts::insert (const db::Shape &, const db::Disp &);
+template DB_PUBLIC void Texts::insert (const db::Shape &, const db::IMatrix2d &);
+template DB_PUBLIC void Texts::insert (const db::Shape &, const db::IMatrix3d &);
 
 void Texts::clear ()
 {

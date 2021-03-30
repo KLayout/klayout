@@ -94,6 +94,16 @@ public:
     transform_generic (t);
   }
 
+  virtual void do_transform (const db::IMatrix2d &t)
+  {
+    transform_generic (t);
+  }
+
+  virtual void do_transform (const db::IMatrix3d &t)
+  {
+    transform_generic (t);
+  }
+
   virtual void flatten () { }
 
   db::Shapes &raw_edge_pairs () { return *mp_edge_pairs; }

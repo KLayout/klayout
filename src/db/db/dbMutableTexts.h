@@ -49,6 +49,8 @@ public:
 
   virtual void do_transform (const db::Trans &t) = 0;
   virtual void do_transform (const db::ICplxTrans &t) = 0;
+  virtual void do_transform (const db::IMatrix3d &t) = 0;
+  virtual void do_transform (const db::IMatrix2d &t) = 0;
 
   virtual void flatten () = 0;
 
@@ -58,6 +60,8 @@ public:
   void transform (const db::Disp &t) { do_transform (db::Trans (t)); }
   void transform (const db::Trans &t) { do_transform (t); }
   void transform (const db::ICplxTrans &t) { do_transform (t); }
+  void transform (const db::IMatrix3d &t) { do_transform (t); }
+  void transform (const db::IMatrix2d &t) { do_transform (t); }
 
   void insert (const db::Text &text) { do_insert (text); }
   void insert (const db::Shape &shape);

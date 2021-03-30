@@ -114,10 +114,10 @@ TEST(1)
   EXPECT_EQ (tl::to_string (db::Matrix2d::shear (17).has_shear ()), "true");
   EXPECT_EQ (tl::to_string (db::Matrix2d::shear (40).shear_angle ()), "40");
   EXPECT_EQ (tl::to_string (db::Matrix2d::shear (-40).shear_angle ()), "-40");
-  EXPECT_EQ (tl::to_string (1.0 / db::Matrix2d::mag (17.5).inverted ().mag ().first), "17.5");
-  EXPECT_EQ (tl::to_string (1.0 / db::Matrix2d::mag (17.5).inverted ().mag ().second), "17.5");
-  EXPECT_EQ (tl::to_string (1.0 / db::Matrix2d::mag (27.5, 7.5).inverted ().mag ().first), "27.5");
-  EXPECT_EQ (tl::to_string (1.0 / db::Matrix2d::mag (27.5, 7.5).inverted ().mag ().second), "7.5");
+  EXPECT_EQ (tl::to_string (1.0 / db::Matrix2d::mag (17.5).inverted ().mag2 ().first), "17.5");
+  EXPECT_EQ (tl::to_string (1.0 / db::Matrix2d::mag (17.5).inverted ().mag2 ().second), "17.5");
+  EXPECT_EQ (tl::to_string (1.0 / db::Matrix2d::mag (27.5, 7.5).inverted ().mag2 ().first), "27.5");
+  EXPECT_EQ (tl::to_string (1.0 / db::Matrix2d::mag (27.5, 7.5).inverted ().mag2 ().second), "7.5");
   EXPECT_EQ (tl::to_string (db::Matrix2d::mirror (true).inverted ().is_mirror ()), "true");
   EXPECT_EQ (tl::to_string (db::Matrix2d::mirror (false).inverted ().is_mirror ()), "false");
   EXPECT_EQ (tl::to_string (db::Matrix2d::rotation (25).inverted ().angle ()), "-25");

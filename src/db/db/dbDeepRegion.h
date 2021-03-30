@@ -57,6 +57,8 @@ public:
 
   virtual void do_transform (const db::Trans &t);
   virtual void do_transform (const db::ICplxTrans &t);
+  virtual void do_transform (const db::IMatrix2d &t);
+  virtual void do_transform (const db::IMatrix3d &t);
 
   virtual void flatten ();
 

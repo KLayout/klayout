@@ -99,7 +99,17 @@ public:
     transform_generic (t);
   }
 
-  void do_transform(const db::ICplxTrans &t)
+  void do_transform (const db::ICplxTrans &t)
+  {
+    transform_generic (t);
+  }
+
+  void do_transform (const db::IMatrix2d &t)
+  {
+    transform_generic (t);
+  }
+
+  void do_transform (const db::IMatrix3d &t)
   {
     transform_generic (t);
   }

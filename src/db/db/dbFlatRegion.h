@@ -109,6 +109,16 @@ public:
     transform_generic (t);
   }
 
+  virtual void do_transform (const db::IMatrix2d &t)
+  {
+    transform_generic (t);
+  }
+
+  virtual void do_transform (const db::IMatrix3d &t)
+  {
+    transform_generic (t);
+  }
+
   void flatten () { }
 
   db::Shapes &raw_polygons () { return *mp_polygons; }

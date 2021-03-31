@@ -2031,7 +2031,7 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
 
   }
 
-  //  propagate pairing in picky mode: this means we only accept exact a match if the node set
+  //  propagate pairing in picky mode: this means we only accept a match if the node set
   //  is exactly identical and no ambiguous nodes are present when ambiguous nodes are forbidden
 
   size_t bt_count = derive_node_identities_from_node_set (nodes, other_nodes, depth, n_branch, tentative, data);
@@ -2828,7 +2828,13 @@ NetlistComparer::NetlistComparer (NetlistCompareLogger *logger)
   m_cap_threshold = -1.0;   //  not set
   m_res_threshold = -1.0;   //  not set
 
-  m_max_depth = std::numeric_limits<size_t>::max ();
+  //  NOTE: as the backtracking algorithm is recursive, we need to limit the number of steps to follow
+  //  Long chains can happen in case of depth-first because the backtracking algorithm will follow
+  //  each successful path further to the very end. Depending on the circuit's complexity a long chain of
+  //  jumps is possible leading to a deep stack. A value of 500 is compatible with 4M stack depth on a
+  //  64bit machine which is considered acceptable for now.
+  m_max_depth = 500;
+
   m_max_n_branch = std::numeric_limits<size_t>::max ();
   m_depth_first = true;
 

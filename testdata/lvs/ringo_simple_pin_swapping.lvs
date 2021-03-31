@@ -8,7 +8,7 @@ target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
 schematic("ringo_pin_swapping.cir")
 
 # preempt configuration
-equivalent_pins("ND2X1", 4, 5)
+equivalent_pins($change_case ? "nd2X1" : "ND2X1", 4, 5)
 
 deep
 

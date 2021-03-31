@@ -309,7 +309,15 @@ public:
    *  into the geometrical base transformations. This member returns the x and y magnification
    *  components. The order of the execution is mirror, magnification, shear and rotation.
    */
-  std::pair<double, double> mag () const;
+  std::pair<double, double> mag2 () const;
+
+  /**
+   *  @brief For compatibility with other transformations
+   */
+  double mag () const
+  {
+    return mag2 ().first;
+  }
 
   /**
    *  @brief Return the x magnification component of the matrix
@@ -320,7 +328,7 @@ public:
    */
   double mag_x () const
   {
-    return mag ().first;
+    return mag2 ().first;
   }
 
   /**
@@ -332,7 +340,7 @@ public:
    */
   double mag_y () const
   {
-    return mag ().second;
+    return mag2 ().second;
   }
 
   /**
@@ -354,6 +362,22 @@ public:
   static matrix_2d<C> mag (double m)
   {
     return matrix_2d<C> (m, 0.0, 0.0, m);
+  }
+
+  /**
+   *  @brief A dummy displacement accessor (matrix2d does not have a displacement)
+   */
+  db::vector<coord_type> disp () const
+  {
+    return db::vector<coord_type> ();
+  }
+
+  /**
+   *  @brief For compatibility with other transformations
+   */
+  coord_type ctrans (coord_type c) const
+  {
+    return db::coord_traits<coord_type>::rounded (mag2 ().first * c);
   }
 
   /**
@@ -759,9 +783,25 @@ public:
    *  into the geometrical base transformations. This member returns the magnification
    *  component for both x and y direction (anisotropic magnification). The order of the execution is mirror, magnification, shear, rotation, perspective and displacement.
    */
-  std::pair<double, double> mag () const
+  std::pair<double, double> mag2 () const
   {
-    return m2d ().mag ();
+    return m2d ().mag2 ();
+  }
+
+  /**
+   *  @brief For compatibility with other transformations
+   */
+  double mag () const
+  {
+    return mag2 ().first;
+  }
+
+  /**
+   *  @brief For compatibility with other transformations
+   */
+  coord_type ctrans (coord_type c) const
+  {
+    return db::coord_traits<coord_type>::rounded (mag2 ().first * c);
   }
 
   /**
@@ -769,7 +809,7 @@ public:
    */
   double mag_x () const
   {
-    return mag ().first;
+    return mag2 ().first;
   }
 
   /**
@@ -777,7 +817,7 @@ public:
    */
   double mag_y () const
   {
-    return mag ().second;
+    return mag2 ().second;
   }
 
   /**

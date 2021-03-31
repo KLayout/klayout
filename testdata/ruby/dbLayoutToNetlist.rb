@@ -99,6 +99,46 @@ class DBLayoutToNetlist_TestClass < TestBase
     end
     assert_equal(map.select { |i| i }.join(","), "RINGO=>TOP,INV2=>INV2")
 
+    # extended attributes for extract_netlist
+
+    l2n = RBA::LayoutToNetlist::new
+    l2n.include_floating_subcircuits = true
+    assert_equal(l2n.include_floating_subcircuits, true)
+    l2n.include_floating_subcircuits = false
+    assert_equal(l2n.include_floating_subcircuits, false)
+
+    assert_equal(l2n.dump_joined_nets, "")
+    l2n.join_nets([ "VDD", "NWELL" ])
+    l2n.join_nets([ "VSS", "BULK" ])
+    assert_equal(l2n.dump_joined_nets, "NWELL+VDD,BULK+VSS")
+    l2n.clear_join_nets
+    assert_equal(l2n.dump_joined_nets, "")
+    assert_equal(l2n.dump_joined_nets_per_cell, "")
+
+    l2n.join_nets("INV*", [ "VDD", "NWELL" ])
+    l2n.join_nets("ND2*", [ "VSS", "BULK" ])
+    assert_equal(l2n.dump_joined_nets_per_cell, "INV*:NWELL+VDD,ND2*:BULK+VSS")
+
+    l2n.clear_join_nets
+    assert_equal(l2n.dump_joined_nets, "")
+    assert_equal(l2n.dump_joined_nets_per_cell, "")
+
+    assert_equal(l2n.dump_joined_net_names, "")
+    l2n.join_net_names("VDD")
+    l2n.join_net_names("VSS")
+    assert_equal(l2n.dump_joined_net_names, "VDD,VSS")
+    l2n.clear_join_net_names
+    assert_equal(l2n.dump_joined_net_names, "")
+    assert_equal(l2n.dump_joined_net_names_per_cell, "")
+
+    l2n.join_net_names("INV*", "VDD")
+    l2n.join_net_names("ND2*", "VSS")
+    assert_equal(l2n.dump_joined_net_names_per_cell, "INV*:VDD,ND2*:VSS")
+
+    l2n.clear_join_net_names
+    assert_equal(l2n.dump_joined_net_names, "")
+    assert_equal(l2n.dump_joined_net_names_per_cell, "")
+
   end
 
   def test_2_ShapesFromNet

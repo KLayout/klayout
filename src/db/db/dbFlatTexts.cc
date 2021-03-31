@@ -32,7 +32,7 @@ namespace db
 //  FlatTexts implementation
 
 FlatTexts::FlatTexts ()
-  : AsIfFlatTexts (), mp_texts (new db::Shapes (false))
+  : MutableTexts (), mp_texts (new db::Shapes (false))
 {
   //  .. nothing yet ..
 }
@@ -43,13 +43,13 @@ FlatTexts::~FlatTexts ()
 }
 
 FlatTexts::FlatTexts (const FlatTexts &other)
-  : AsIfFlatTexts (other), mp_texts (other.mp_texts)
+  : MutableTexts (other), mp_texts (other.mp_texts)
 {
   //  .. nothing yet ..
 }
 
 FlatTexts::FlatTexts (const db::Shapes &texts)
-  : AsIfFlatTexts (), mp_texts (new db::Shapes (texts))
+  : MutableTexts (), mp_texts (new db::Shapes (texts))
 {
   //  .. nothing yet ..
 }
@@ -207,22 +207,10 @@ FlatTexts::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned 
 }
 
 void
-FlatTexts::insert (const db::Text &t)
+FlatTexts::do_insert (const db::Text &t)
 {
   mp_texts->insert (t);
   invalidate_cache ();
-}
-
-void
-FlatTexts::insert (const db::Shape &shape)
-{
-  if (shape.is_text ()) {
-
-    db::Text t;
-    shape.text (t);
-    insert (t);
-
-  }
 }
 
 }

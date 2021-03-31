@@ -513,40 +513,90 @@ static std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalD
   return std::make_pair (termrefs.first ? termrefs.first->terminal_def () : 0, termrefs.second ? termrefs.second->terminal_def () : 0);
 }
 
-static std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> terminal_defs_from_device_classes (IndexedNetlistModel *model, const std::pair<const db::DeviceClass *, const db::DeviceClass *> &device_classes, const std::pair<const db::Device *, const db::Device *> &devices, size_t terminal_id)
+static std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> > terminal_defs_from_device_classes (IndexedNetlistModel *model, const std::pair<const db::DeviceClass *, const db::DeviceClass *> &device_classes, const std::pair<const db::Device *, const db::Device *> &devices)
 {
-  const db::DeviceTerminalDefinition *td1 = 0, *td2 = 0;
-  if (device_classes.first && device_classes.first->terminal_definitions ().size () > terminal_id) {
-    td1 = &device_classes.first->terminal_definitions () [terminal_id];
+  std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> > result;
+
+  std::map<size_t, std::pair<std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> >, std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> > > > nets;
+
+  size_t n1 = 0;
+  if (device_classes.first) {
+    n1 = device_classes.first->terminal_definitions ().size ();
   }
 
+  size_t n2 = 0;
   if (device_classes.second) {
+    n2 = device_classes.second->terminal_definitions ().size ();
+  }
 
-    size_t second_terminal_id = terminal_id;
+  for (size_t i = 0; i < n1 || i < n2; ++i) {
 
-    //  Because of terminal swapping we need to look up the second terminal by looking for equivalent terminals which carry the corresponding net
-    if (td1 && devices.first && devices.second) {
+    if (i < n2) {
+      const db::DeviceTerminalDefinition &td = device_classes.second->terminal_definitions () [i];
+      size_t id = td.id ();
+      size_t id_norm = device_classes.second->normalize_terminal_id (id);
+      nets [id_norm].second.push_back (std::make_pair (&td, devices.second->net_for_terminal (id)));
+    }
 
-      size_t td1_id_norm = device_classes.first->normalize_terminal_id (td1->id ());
-      const db::Net *n2 = model->second_net_for (devices.first->net_for_terminal (terminal_id));
+    if (i < n1) {
+      const db::DeviceTerminalDefinition &td = device_classes.first->terminal_definitions () [i];
+      size_t id = td.id ();
+      size_t id_norm = device_classes.first->normalize_terminal_id (id);
+      nets [id_norm].first.push_back (std::make_pair (&td, devices.first->net_for_terminal (id)));
+    }
 
-      for (size_t i = 0; i < device_classes.second->terminal_definitions ().size (); ++i) {
-        const db::DeviceTerminalDefinition &td = device_classes.second->terminal_definitions () [i];
-        if (device_classes.second->normalize_terminal_id (td.id ()) == td1_id_norm) {
-          if (devices.second->net_for_terminal (i) == n2) {
-            second_terminal_id = i;
-            break;
+  }
+
+  for (std::map<size_t, std::pair<std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> >, std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> > > >::iterator n = nets.begin (); n != nets.end (); ++n) {
+
+    std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> > &nn1 = n->second.first;
+    std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> > &nn2 = n->second.second;
+
+    if (nn2.empty ()) {
+
+      for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> >::const_iterator i = nn1.begin (); i != nn1.end (); ++i) {
+        result.push_back (std::make_pair (i->first, (const db::DeviceTerminalDefinition *) 0));
+      }
+
+    } else if (nn1.empty ()) {
+
+      for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> >::const_iterator j = nn2.begin (); j != nn2.end (); ++j) {
+        result.push_back (std::make_pair ((const db::DeviceTerminalDefinition *) 0, j->first));
+      }
+
+    } else {
+
+      std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> >::iterator w = nn1.begin ();
+      for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> >::const_iterator i = nn1.begin (); i != nn1.end (); ++i) {
+
+        bool found = false;
+
+        for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Net *> >::iterator j = nn2.begin (); j != nn2.end () && ! found; ++j) {
+          const db::Net *n2 = model->second_net_for (i->second);
+          if (n2 == j->second) {
+            result.push_back (std::make_pair (i->first, j->first));
+            nn2.erase (j);
+            found = true;
           }
         }
+
+        if (! found) {
+          *w++ = *i;
+        }
+
+      }
+
+      nn1.erase (w, nn1.end ());
+
+      for (size_t i = 0; i < nn1.size () && i < nn2.size (); ++i) {
+        result.push_back (std::make_pair (nn1 [i].first, nn2 [i].first));
       }
 
     }
 
-    td2 = &device_classes.second->terminal_definitions () [second_terminal_id];
-
   }
 
-  return std::make_pair (td1, td2);
+  return result;
 }
 
 static
@@ -582,24 +632,6 @@ static std::string combine_search_strings (const std::string &s1, const std::str
     return s1;
   } else {
     return s1 + "|" + s2;
-  }
-}
-
-static size_t rows_for (const db::Device *device)
-{
-  if (! device || ! device->device_class ()) {
-    return 0;
-  } else {
-    return device->device_class ()->terminal_definitions ().size ();
-  }
-}
-
-static size_t rows_for (const db::NetTerminalRef *ref)
-{
-  if (! ref || ! ref->device_class ()) {
-    return 0;
-  } else {
-    return ref->device_class ()->terminal_definitions ().size ();
   }
 }
 
@@ -1965,12 +1997,14 @@ CircuitNetDeviceTerminalItemData::do_ensure_children (NetlistBrowserModel *model
     return;
   }
 
-  size_t n = std::max (rows_for (m_tp.first), rows_for (m_tp.second));
-  for (size_t i = 0; i < n; ++i) {
-    std::pair<const db::DeviceClass *, const db::DeviceClass *> device_classes = device_classes_from_devices (dp ());
-    std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> termdefs = terminal_defs_from_device_classes (model->indexer (), device_classes, dp (), i);
-    IndexedNetlistModel::net_pair nets = nets_from_device_terminals (dp (), termdefs);
-    push_back (new CircuitNetDeviceTerminalOthersItemData (this, nets, termdefs));
+  std::pair<const db::Device *, const db::Device *> devices = dp ();
+  std::pair<const db::DeviceClass *, const db::DeviceClass *> device_classes = device_classes_from_devices (devices);
+
+  std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> > tp = terminal_defs_from_device_classes (model->indexer (), device_classes, devices);
+
+  for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> >::const_iterator i = tp.begin (); i != tp.end (); ++i) {
+    IndexedNetlistModel::net_pair nets = nets_from_device_terminals (dp (), *i);
+    push_back (new CircuitNetDeviceTerminalOthersItemData (this, nets, *i));
   }
 }
 
@@ -2320,10 +2354,13 @@ CircuitDeviceItemData::CircuitDeviceItemData (NetlistModelItemData *parent, cons
 void
 CircuitDeviceItemData::do_ensure_children (NetlistBrowserModel *model)
 {
-  size_t n = std::max (rows_for (dp ().first), rows_for (dp ().second));
-  for (size_t i = 0; i < n; ++i) {
-    std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> tp = terminal_defs_from_device_classes (model->indexer (), device_classes_from_devices (dp ()), dp (), i);
-    push_back (new CircuitDeviceTerminalItemData (this, tp));
+  std::pair<const db::Device *, const db::Device *> devices = dp ();
+  std::pair<const db::DeviceClass *, const db::DeviceClass *> device_classes = device_classes_from_devices (devices);
+
+  std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> > tp = terminal_defs_from_device_classes (model->indexer (), device_classes, devices);
+
+  for (std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::DeviceTerminalDefinition *> >::const_iterator i = tp.begin (); i != tp.end (); ++i) {
+    push_back (new CircuitDeviceTerminalItemData (this, *i));
   }
 }
 

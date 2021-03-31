@@ -26,7 +26,7 @@
 
 #include "dbCommon.h"
 
-#include "dbAsIfFlatEdges.h"
+#include "dbMutableEdges.h"
 #include "dbShapes.h"
 #include "dbShapes2.h"
 #include "dbGenericShapeIterator.h"
@@ -43,7 +43,7 @@ typedef generic_shapes_iterator_delegate<db::Edge> FlatEdgesIterator;
  *  @brief A flat, edge-set delegate
  */
 class DB_PUBLIC FlatEdges
-  : public AsIfFlatEdges
+  : public MutableEdges
 {
 public:
   typedef db::Edge value_type;
@@ -65,6 +65,7 @@ public:
   }
 
   void reserve (size_t);
+  void flatten () { }
 
   virtual EdgesIteratorDelegate *begin () const;
   virtual EdgesIteratorDelegate *begin_merged () const;
@@ -91,60 +92,26 @@ public:
 
   virtual const db::RecursiveShapeIterator *iter () const;
 
-  void insert (const db::Box &box);
-  void insert (const db::Path &path);
-  void insert (const db::SimplePolygon &polygon);
-  void insert (const db::Polygon &polygon);
-  void insert (const db::Edge &edge);
-  void insert (const db::Shape &shape);
+  void do_insert (const db::Edge &edge);
 
-  template <class T>
-  void insert (const db::Shape &shape, const T &trans)
+  void do_transform (const db::Trans &t)
   {
-    if (shape.is_polygon () || shape.is_path () || shape.is_box ()) {
-
-      db::Polygon poly;
-      shape.polygon (poly);
-      poly.transform (trans);
-      insert (poly);
-
-    } else if (shape.is_edge ()) {
-
-      db::Edge edge;
-      shape.edge (edge);
-      edge.transform (trans);
-      insert (edge);
-
-    }
+    transform_generic (t);
   }
 
-  template <class Iter>
-  void insert (const Iter &b, const Iter &e)
+  void do_transform (const db::ICplxTrans &t)
   {
-    reserve (count () + (e - b));
-    for (Iter i = b; i != e; ++i) {
-      insert (*i);
-    }
+    transform_generic (t);
   }
 
-  template <class Iter>
-  void insert_seq (const Iter &seq)
+  void do_transform (const db::IMatrix2d &t)
   {
-    for (Iter i = seq; ! i.at_end (); ++i) {
-      insert (*i);
-    }
+    transform_generic (t);
   }
 
-  template <class Trans>
-  void transform (const Trans &trans)
+  void do_transform (const db::IMatrix3d &t)
   {
-    if (! trans.is_unity ()) {
-      db::Shapes &e = *mp_edges;
-      for (edge_iterator_type p = e.template get_layer<db::Edge, db::unstable_layer_tag> ().begin (); p != e.get_layer<db::Edge, db::unstable_layer_tag> ().end (); ++p) {
-        e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
-      }
-      invalidate_cache ();
-    }
+    transform_generic (t);
   }
 
   db::Shapes &raw_edges () { return *mp_edges; }
@@ -168,6 +135,18 @@ private:
 
   void init ();
   void ensure_merged_edges_valid () const;
+
+  template <class Trans>
+  void transform_generic (const Trans &trans)
+  {
+    if (! trans.is_unity ()) {
+      db::Shapes &e = *mp_edges;
+      for (edge_iterator_type p = e.template get_layer<db::Edge, db::unstable_layer_tag> ().begin (); p != e.get_layer<db::Edge, db::unstable_layer_tag> ().end (); ++p) {
+        e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      }
+      invalidate_cache ();
+    }
+  }
 };
 
 }

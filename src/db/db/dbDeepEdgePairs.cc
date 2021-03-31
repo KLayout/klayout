@@ -112,31 +112,31 @@ private:
 
 
 DeepEdgePairs::DeepEdgePairs ()
-  : AsIfFlatEdgePairs ()
+  : MutableEdgePairs ()
 {
   //  .. nothing yet ..
 }
 
 DeepEdgePairs::DeepEdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss)
-  : AsIfFlatEdgePairs ()
+  : MutableEdgePairs ()
 {
   set_deep_layer (dss.create_edge_pair_layer (si));
 }
 
 DeepEdgePairs::DeepEdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans)
-  : AsIfFlatEdgePairs ()
+  : MutableEdgePairs ()
 {
   set_deep_layer (dss.create_edge_pair_layer (si, trans));
 }
 
 DeepEdgePairs::DeepEdgePairs (const DeepEdgePairs &other)
-  : AsIfFlatEdgePairs (other), db::DeepShapeCollectionDelegateBase (other)
+  : MutableEdgePairs (other), db::DeepShapeCollectionDelegateBase (other)
 {
   //  .. nothing yet ..
 }
 
 DeepEdgePairs::DeepEdgePairs (const DeepLayer &dl)
-  : AsIfFlatEdgePairs ()
+  : MutableEdgePairs ()
 {
   set_deep_layer (dl);
 }
@@ -149,6 +149,86 @@ DeepEdgePairs::~DeepEdgePairs ()
 EdgePairsDelegate *DeepEdgePairs::clone () const
 {
   return new DeepEdgePairs (*this);
+}
+
+void DeepEdgePairs::do_insert (const db::EdgePair &edge_pair)
+{
+  db::Layout &layout = deep_layer ().layout ();
+  if (layout.begin_top_down () != layout.end_top_down ()) {
+    db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+    top_cell.shapes (deep_layer ().layer ()).insert (edge_pair);
+  }
+
+  invalidate_bbox ();
+  set_is_merged (false);
+}
+
+template <class Trans>
+static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
+{
+  //  TODO: this is a pretty cheap implementation. At least a plain move can be done with orientation variants.
+
+  db::Layout &layout = deep_layer.layout ();
+  if (layout.begin_top_down () != layout.end_top_down ()) {
+
+    db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+
+    db::Shapes flat_shapes (layout.is_editable ());
+    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); !iter.at_end (); ++iter) {
+      flat_shapes.insert (iter->edge_pair ().transformed (iter.trans ()).transformed (t));
+    }
+
+    layout.clear_layer (deep_layer.layer ());
+    top_cell.shapes (deep_layer.layer ()).swap (flat_shapes);
+
+  }
+}
+
+void DeepEdgePairs::do_transform (const db::Trans &t)
+{
+  transform_deep_layer (deep_layer (), t);
+  invalidate_bbox ();
+}
+
+void DeepEdgePairs::do_transform (const db::ICplxTrans &t)
+{
+  transform_deep_layer (deep_layer (), t);
+  invalidate_bbox ();
+}
+
+void DeepEdgePairs::do_transform (const db::IMatrix2d &t)
+{
+  transform_deep_layer (deep_layer (), t);
+  invalidate_bbox ();
+}
+
+void DeepEdgePairs::do_transform (const db::IMatrix3d &t)
+{
+  transform_deep_layer (deep_layer (), t);
+  invalidate_bbox ();
+}
+
+void DeepEdgePairs::reserve (size_t)
+{
+  //  Not implemented for deep regions
+}
+
+void DeepEdgePairs::flatten ()
+{
+  db::Layout &layout = deep_layer ().layout ();
+  if (layout.begin_top_down () != layout.end_top_down ()) {
+
+    db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+
+    db::Shapes flat_shapes (layout.is_editable ());
+    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer ().layer ()); !iter.at_end (); ++iter) {
+      flat_shapes.insert (iter->edge_pair ().transformed (iter.trans ()));
+    }
+
+    layout.clear_layer (deep_layer ().layer ());
+    top_cell.shapes (deep_layer ().layer ()).swap (flat_shapes);
+
+  }
 }
 
 EdgePairsIteratorDelegate *DeepEdgePairs::begin () const

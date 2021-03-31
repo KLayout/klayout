@@ -24,6 +24,7 @@
 #include "dbDeepEdges.h"
 #include "dbOriginalLayerEdges.h"
 #include "dbEmptyEdges.h"
+#include "dbMutableEdges.h"
 #include "dbFlatEdges.h"
 #include "dbEdgesUtils.h"
 #include "dbRegion.h"
@@ -133,7 +134,7 @@ Edges::clear ()
 void
 Edges::reserve (size_t n)
 {
-  flat_edges ()->reserve (n);
+  mutable_edges ()->reserve (n);
 }
 
 void Edges::processed (Region &output, const EdgeToPolygonProcessorBase &filter) const
@@ -166,10 +167,16 @@ Edges Edges::centers (length_type length, double fraction) const
   return Edges (mp_delegate->processed (EdgeSegmentSelector (0, length, fraction)));
 }
 
+void
+Edges::flatten ()
+{
+  mutable_edges ()->flatten ();
+}
+
 template <class T>
 Edges &Edges::transform (const T &trans)
 {
-  flat_edges ()->transform (trans);
+  mutable_edges ()->transform (trans);
   return *this;
 }
 
@@ -183,7 +190,7 @@ template DB_PUBLIC Edges &Edges::transform (const db::IMatrix3d &);
 template <class Sh>
 void Edges::insert (const Sh &shape)
 {
-  flat_edges ()->insert (shape);
+  mutable_edges ()->insert (shape);
 }
 
 template DB_PUBLIC void Edges::insert (const db::Box &);
@@ -194,24 +201,25 @@ template DB_PUBLIC void Edges::insert (const db::Edge &);
 
 void Edges::insert (const db::Shape &shape)
 {
-  flat_edges ()->insert (shape);
+  mutable_edges ()->insert (shape);
 }
 
 template <class T>
 void Edges::insert (const db::Shape &shape, const T &trans)
 {
-  flat_edges ()->insert (shape, trans);
+  mutable_edges ()->insert (shape, trans);
 }
 
 template DB_PUBLIC void Edges::insert (const db::Shape &, const db::ICplxTrans &);
 template DB_PUBLIC void Edges::insert (const db::Shape &, const db::Trans &);
 template DB_PUBLIC void Edges::insert (const db::Shape &, const db::Disp &);
 
-FlatEdges *
-Edges::flat_edges ()
+MutableEdges *
+Edges::mutable_edges ()
 {
-  FlatEdges *edges = dynamic_cast<FlatEdges *> (mp_delegate);
+  MutableEdges *edges = dynamic_cast<MutableEdges *> (mp_delegate);
   if (! edges) {
+
     edges = new FlatEdges ();
     if (mp_delegate) {
       edges->EdgesDelegate::operator= (*mp_delegate);

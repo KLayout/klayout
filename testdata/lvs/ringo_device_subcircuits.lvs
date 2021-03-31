@@ -116,7 +116,7 @@ connect_global(bulk, "SUBSTRATE")
 connect_global(ptie, "SUBSTRATE")
 
 # Test same_device_classes
-same_device_classes("PMOS", "XPMOS")
+same_device_classes("PMOS", $change_case ? "xpMos" : "XPMOS")
 
 # Compare section
 

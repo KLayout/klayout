@@ -36,7 +36,7 @@ namespace db
 {
 
 class EdgePairFilterBase;
-class FlatEdgePairs;
+class MutableEdgePairs;
 class EmptyEdgePairs;
 class Edges;
 class Region;
@@ -469,10 +469,7 @@ public:
    *
    *  This method will turn any edge pair collection into a flat one.
    */
-  void flatten ()
-  {
-    flat_edge_pairs ();
-  }
+  void flatten ();
 
   /**
    *  @brief Returns true, if the edge pair set has valid edges stored within itself
@@ -615,7 +612,7 @@ private:
   EdgePairsDelegate *mp_delegate;
 
   void set_delegate (EdgePairsDelegate *delegate);
-  FlatEdgePairs *flat_edge_pairs ();
+  MutableEdgePairs *mutable_edge_pairs ();
 };
 
 }

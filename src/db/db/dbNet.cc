@@ -204,6 +204,16 @@ Net::~Net ()
   clear ();
 }
 
+Netlist *Net::netlist ()
+{
+  return mp_circuit ? mp_circuit->netlist () : 0;
+}
+
+const Netlist *Net::netlist () const
+{
+  return mp_circuit ? mp_circuit->netlist () : 0;
+}
+
 void Net::clear ()
 {
   m_name.clear ();

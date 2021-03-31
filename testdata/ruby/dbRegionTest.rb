@@ -95,7 +95,7 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.count, 1)
     assert_equal(r.hier_count, 1)
     assert_equal(r.bbox.to_s, "(10,20;100,200)")
-    assert_equal(r.is_merged?, false)
+    assert_equal(r.is_merged?, true)
     
     r = RBA::Region::new(RBA::SimplePolygon::new(RBA::Box::new(10, 20, 100, 200)))
     assert_equal(r.to_s, "(10,20;10,200;100,200;100,20)")
@@ -107,7 +107,7 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.area, 90*180)
     assert_equal(r.perimeter, 2*90+2*180)
     assert_equal(r.perimeter(RBA::Box::new(0, 0, 50, 50)), 30+40)
-    assert_equal(r.is_merged?, false)
+    assert_equal(r.is_merged?, true)
     
     r = RBA::Region::new(RBA::Path::new([ RBA::Point::new(0, 0), RBA::Point::new(100, 0) ], 20))
     assert_equal(r.to_s, "(0,-10;0,10;100,10;100,-10)")
@@ -116,7 +116,7 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.count, 1)
     assert_equal(r.hier_count, 1)
     assert_equal(r.bbox.to_s, "(0,-10;100,10)")
-    assert_equal(r.is_merged?, false)
+    assert_equal(r.is_merged?, true)
     
     r = RBA::Region::new( [
         RBA::Polygon::new(RBA::Box::new(10, 20, 100, 200)),
@@ -1002,7 +1002,7 @@ class DBRegion_TestClass < TestBase
     assert_equal(RBA::Region::new(target.cell("TRANS").shapes(target_li)).to_s, "")
 
     r.flatten
-    assert_equal(r.is_deep?, false)
+    assert_equal(r.is_deep?, true)
     assert_equal(r.area, 53120000)
 
     # force destroy, so the unit tests pass on the next iteration

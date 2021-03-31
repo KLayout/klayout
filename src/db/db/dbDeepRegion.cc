@@ -127,14 +127,14 @@ private:
 //  DeepRegion implementation
 
 DeepRegion::DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, double area_ratio, size_t max_vertex_count)
-  : AsIfFlatRegion (), m_merged_polygons ()
+  : MutableRegion (), m_merged_polygons ()
 {
   set_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count));
   init ();
 }
 
 DeepRegion::DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool merged_semantics, double area_ratio, size_t max_vertex_count)
-  : AsIfFlatRegion (), m_merged_polygons ()
+  : MutableRegion (), m_merged_polygons ()
 {
   set_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count, trans));
   init ();
@@ -142,7 +142,7 @@ DeepRegion::DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, c
 }
 
 DeepRegion::DeepRegion (const db::Region &other, DeepShapeStore &dss)
-  : AsIfFlatRegion (), m_merged_polygons ()
+  : MutableRegion (), m_merged_polygons ()
 {
   set_deep_layer (dss.create_from_flat (other, false));
 
@@ -151,13 +151,13 @@ DeepRegion::DeepRegion (const db::Region &other, DeepShapeStore &dss)
 }
 
 DeepRegion::DeepRegion ()
-  : AsIfFlatRegion ()
+  : MutableRegion ()
 {
   init ();
 }
 
 DeepRegion::DeepRegion (const DeepLayer &dl)
-  : AsIfFlatRegion ()
+  : MutableRegion ()
 {
   set_deep_layer (dl);
   init ();
@@ -169,7 +169,7 @@ DeepRegion::~DeepRegion ()
 }
 
 DeepRegion::DeepRegion (const DeepRegion &other)
-  : AsIfFlatRegion (other), DeepShapeCollectionDelegateBase (other),
+  : MutableRegion (other), DeepShapeCollectionDelegateBase (other),
     m_merged_polygons_valid (other.m_merged_polygons_valid),
     m_is_merged (other.m_is_merged)
 {
@@ -218,6 +218,90 @@ void DeepRegion::merged_semantics_changed ()
 void DeepRegion::min_coherence_changed ()
 {
   set_is_merged (false);
+}
+
+void DeepRegion::do_insert (const db::Polygon &polygon)
+{
+  db::Layout &layout = deep_layer ().layout ();
+  if (layout.begin_top_down () != layout.end_top_down ()) {
+    db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+    top_cell.shapes (deep_layer ().layer ()).insert (db::PolygonRef (polygon, layout.shape_repository ()));
+  }
+
+  invalidate_bbox ();
+  set_is_merged (false);
+}
+
+template <class Trans>
+static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
+{
+  //  TODO: this is a pretty cheap implementation. At least a plain move can be done with orientation variants.
+
+  db::Layout &layout = deep_layer.layout ();
+  if (layout.begin_top_down () != layout.end_top_down ()) {
+
+    db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+
+    db::Shapes flat_shapes (layout.is_editable ());
+    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); !iter.at_end (); ++iter) {
+      db::Polygon poly;
+      iter->polygon (poly);
+      flat_shapes.insert (poly.transformed (iter.trans ()).transformed (t));
+    }
+
+    layout.clear_layer (deep_layer.layer ());
+    top_cell.shapes (deep_layer.layer ()).swap (flat_shapes);
+
+  }
+}
+
+void DeepRegion::do_transform (const db::Trans &t)
+{
+  transform_deep_layer (deep_layer (), t);
+  invalidate_bbox ();
+}
+
+void DeepRegion::do_transform (const db::ICplxTrans &t)
+{
+  transform_deep_layer (deep_layer (), t);
+  invalidate_bbox ();
+}
+
+void DeepRegion::do_transform (const db::IMatrix2d &t)
+{
+  transform_deep_layer (deep_layer (), t);
+  invalidate_bbox ();
+}
+
+void DeepRegion::do_transform (const db::IMatrix3d &t)
+{
+  transform_deep_layer (deep_layer (), t);
+  invalidate_bbox ();
+}
+
+void DeepRegion::reserve (size_t)
+{
+  //  Not implemented for deep regions
+}
+
+void DeepRegion::flatten ()
+{
+  db::Layout &layout = deep_layer ().layout ();
+  if (layout.begin_top_down () != layout.end_top_down ()) {
+
+    db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+
+    db::Shapes flat_shapes (layout.is_editable ());
+    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer ().layer ()); !iter.at_end (); ++iter) {
+      db::Polygon poly;
+      iter->polygon (poly);
+      flat_shapes.insert (poly.transformed (iter.trans ()));
+    }
+
+    layout.clear_layer (deep_layer ().layer ());
+    top_cell.shapes (deep_layer ().layer ()).swap (flat_shapes);
+
+  }
 }
 
 RegionIteratorDelegate *

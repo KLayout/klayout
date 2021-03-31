@@ -28,7 +28,7 @@
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
-void run_test (tl::TestBase *_this, const std::string &suffix, const std::string &layout, bool with_l2n = false, const std::string &top = std::string ())
+void run_test (tl::TestBase *_this, const std::string &suffix, const std::string &layout, bool with_l2n = false, const std::string &top = std::string (), bool change_case = false)
 {
   std::string rs = tl::testsrc ();
   rs += "/testdata/lvs/" + suffix + ".lvs";
@@ -58,7 +58,8 @@ void run_test (tl::TestBase *_this, const std::string &suffix, const std::string
         "$lvs_test_target_cir = '%s'\n"
         "$lvs_test_target_l2n = '%s'\n"
         "$lvs_test_top = '%s'\n"
-      , src, output_lvsdb, output_cir, output_l2n, top)
+        "$change_case = %s\n"
+      , src, output_lvsdb, output_cir, output_l2n, top, change_case ? "true" : "false")
     );
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
@@ -108,11 +109,15 @@ TEST(5_simple_same_device_classes)
 TEST(6_simple_pin_swapping)
 {
   run_test (_this, "ringo_simple_pin_swapping", "ringo.gds");
+  //  change case
+  run_test (_this, "ringo_simple_pin_swapping", "ringo.gds", false, std::string (), true);
 }
 
 TEST(7_net_and_circuit_equivalence)
 {
   run_test (_this, "ringo_simple_net_and_circuit_equivalence", "ringo_renamed.gds");
+  //  change case
+  run_test (_this, "ringo_simple_net_and_circuit_equivalence", "ringo_renamed.gds", false, std::string (), true);
 }
 
 TEST(8_simplification)
@@ -143,6 +148,8 @@ TEST(12_simple_dmos)
 TEST(13_simple_ringo_device_subcircuits)
 {
   run_test (_this, "ringo_device_subcircuits", "ringo.gds");
+  //  change case
+  run_test (_this, "ringo_device_subcircuits", "ringo.gds", false, std::string (), true);
 }
 
 TEST(14_simple_ringo_mixed_hierarchy)

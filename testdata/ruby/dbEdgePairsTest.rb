@@ -179,12 +179,11 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(r.is_deep?, true)
 
     r.flatten
-    assert_equal(r.has_valid_edge_pairs?, true)
-    assert_equal(r[1].to_s, "(0,101;2,103)/(10,111;12,113)")
-    assert_equal(r[100].inspect, "nil")
+    assert_equal(r.has_valid_edge_pairs?, false)
+    assert_equal(r.to_s, "(0,1;2,3)/(10,11;12,13);(0,101;2,103)/(10,111;12,113);(200,101;202,103)/(210,111;212,113)")
     assert_equal(r.bbox.to_s, "(0,1;212,113)")
 
-    assert_equal(r.is_deep?, false)
+    assert_equal(r.is_deep?, true)
 
   end
 

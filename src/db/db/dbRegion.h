@@ -37,7 +37,7 @@
 namespace db {
 
 class EdgeFilterBase;
-class FlatRegion;
+class MutableRegion;
 class EmptyRegion;
 class DeepShapeStore;
 class TransformationReducer;
@@ -1644,11 +1644,7 @@ public:
    *
    *  This method will turn any region into a flat shape collection.
    */
-  db::Region &flatten ()
-  {
-    flat_region ();
-    return *this;
-  }
+  db::Region &flatten ();
 
   /**
    *  @brief Returns true, if the region has valid polygons stored within itself
@@ -1776,7 +1772,7 @@ private:
   RegionDelegate *mp_delegate;
 
   void set_delegate (RegionDelegate *delegate, bool keep_attributes = true);
-  FlatRegion *flat_region ();
+  db::MutableRegion *mutable_region();
 };
 
 /**

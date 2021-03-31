@@ -93,25 +93,27 @@ Texts::Texts (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::I
 template <class Sh>
 void Texts::insert (const Sh &shape)
 {
-  flat_texts ()->insert (shape);
+  mutable_texts ()->insert (shape);
 }
 
 template DB_PUBLIC void Texts::insert (const db::Text &);
 
 void Texts::insert (const db::Shape &shape)
 {
-  flat_texts ()->insert (shape);
+  mutable_texts ()->insert (shape);
 }
 
 template <class T>
 void Texts::insert (const db::Shape &shape, const T &trans)
 {
-  flat_texts ()->insert (shape, trans);
+  mutable_texts ()->insert (shape, trans);
 }
 
 template DB_PUBLIC void Texts::insert (const db::Shape &, const db::ICplxTrans &);
 template DB_PUBLIC void Texts::insert (const db::Shape &, const db::Trans &);
 template DB_PUBLIC void Texts::insert (const db::Shape &, const db::Disp &);
+template DB_PUBLIC void Texts::insert (const db::Shape &, const db::IMatrix2d &);
+template DB_PUBLIC void Texts::insert (const db::Shape &, const db::IMatrix3d &);
 
 void Texts::clear ()
 {
@@ -120,13 +122,18 @@ void Texts::clear ()
 
 void Texts::reserve (size_t n)
 {
-  flat_texts ()->reserve (n);
+  mutable_texts ()->reserve (n);
+}
+
+void Texts::flatten ()
+{
+  mutable_texts ()->flatten ();
 }
 
 template <class T>
 Texts &Texts::transform (const T &trans)
 {
-  flat_texts ()->transform (trans);
+  mutable_texts ()->transform (trans);
   return *this;
 }
 
@@ -161,9 +168,9 @@ void Texts::set_delegate (TextsDelegate *delegate)
   }
 }
 
-FlatTexts *Texts::flat_texts ()
+MutableTexts *Texts::mutable_texts ()
 {
-  FlatTexts *texts = dynamic_cast<FlatTexts *> (mp_delegate);
+  MutableTexts *texts = dynamic_cast<MutableTexts *> (mp_delegate);
   if (! texts) {
     texts = new FlatTexts ();
     if (mp_delegate) {

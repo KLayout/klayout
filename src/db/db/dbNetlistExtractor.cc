@@ -35,14 +35,24 @@ NetlistExtractor::NetlistExtractor ()
   //  .. nothing yet ..
 }
 
-void NetlistExtractor::set_joined_net_names (const std::string &jnn)
+void NetlistExtractor::set_joined_net_names (const std::list<tl::GlobPattern>  &jnn)
 {
   m_joined_net_names = jnn;
 }
 
-void NetlistExtractor::set_joined_net_names (const std::string &cellname, const std::string &jnn)
+void NetlistExtractor::set_joined_net_names (const std::string &cellname, const std::list<tl::GlobPattern> &jnn)
 {
   m_joined_net_names_per_cell.push_back (std::make_pair (cellname, jnn));
+}
+
+void NetlistExtractor::set_joined_nets (const std::list<std::set<std::string> > &jnn)
+{
+  m_joined_nets = jnn;
+}
+
+void NetlistExtractor::set_joined_nets (const std::string &cell_name, const std::list<std::set<std::string> > &jnn)
+{
+  m_joined_nets_per_cell.push_back (std::make_pair (cell_name, jnn));
 }
 
 void NetlistExtractor::set_include_floating_subcircuits (bool f)
@@ -51,17 +61,18 @@ void NetlistExtractor::set_include_floating_subcircuits (bool f)
 }
 
 static void
-build_net_name_equivalence (const db::Layout *layout, const db::Connectivity &conn, db::property_names_id_type net_name_id, const std::string &joined_net_names, tl::equivalence_clusters<size_t> &eq)
+build_net_name_equivalence (const db::Layout *layout, const db::Connectivity &conn, db::property_names_id_type net_name_id, const std::list<tl::GlobPattern> &jn_pattern, tl::equivalence_clusters<size_t> &eq)
 {
   std::map<std::string, std::set<size_t> > prop_by_name;
-  tl::GlobPattern jn_pattern (joined_net_names);
 
   for (db::PropertiesRepository::iterator i = layout->properties_repository ().begin (); i != layout->properties_repository ().end (); ++i) {
     for (db::PropertiesRepository::properties_set::const_iterator p = i->second.begin (); p != i->second.end (); ++p) {
       if (p->first == net_name_id) {
         std::string nn = p->second.to_string ();
-        if (jn_pattern.match (nn)) {
-          prop_by_name [nn].insert (db::prop_id_to_attr (i->first));
+        for (std::list<tl::GlobPattern>::const_iterator jp = jn_pattern.begin (); jp != jn_pattern.end (); ++jp) {
+          if (jp->match (nn)) {
+            prop_by_name [nn].insert (db::prop_id_to_attr (i->first));
+          }
         }
       }
     }
@@ -70,16 +81,20 @@ build_net_name_equivalence (const db::Layout *layout, const db::Connectivity &co
   //  include pseudo-attributes for global nets to implement "join_with" for global nets
   for (size_t gid = 0; gid < conn.global_nets (); ++gid) {
     const std::string &gn = conn.global_net_name (gid);
-    if (jn_pattern.match (gn)) {
-      prop_by_name [gn].insert (db::global_net_id_to_attr (gid));
+    for (std::list<tl::GlobPattern>::const_iterator jp = jn_pattern.begin (); jp != jn_pattern.end (); ++jp) {
+      if (jp->match (gn)) {
+        prop_by_name [gn].insert (db::global_net_id_to_attr (gid));
+      }
     }
   }
 
   const db::repository<db::Text> &text_repository = layout->shape_repository ().repository (db::object_tag<db::Text> ());
   for (db::repository<db::Text>::iterator t = text_repository.begin (); t != text_repository.end (); ++t) {
     std::string nn = t->string ();
-    if (jn_pattern.match (nn)) {
-      prop_by_name [nn].insert (db::text_ref_to_attr (t.operator-> ()));
+    for (std::list<tl::GlobPattern>::const_iterator jp = jn_pattern.begin (); jp != jn_pattern.end (); ++jp) {
+      if (jp->match (nn)) {
+        prop_by_name [nn].insert (db::text_ref_to_attr (t.operator-> ()));
+      }
     }
   }
 
@@ -89,6 +104,58 @@ build_net_name_equivalence (const db::Layout *layout, const db::Connectivity &co
     while (p != pn->second.end ()) {
       eq.same (*p0, *p);
       ++p;
+    }
+  }
+}
+
+static void
+build_net_name_equivalence_for_explicit_connections (const db::Layout *layout, const db::Connectivity &conn, db::property_names_id_type net_name_id, const std::set<std::string> &nets_to_join, tl::equivalence_clusters<size_t> &eq)
+{
+  std::map<std::string, std::set<size_t> > prop_by_name;
+
+  for (db::PropertiesRepository::iterator i = layout->properties_repository ().begin (); i != layout->properties_repository ().end (); ++i) {
+    for (db::PropertiesRepository::properties_set::const_iterator p = i->second.begin (); p != i->second.end (); ++p) {
+      if (p->first == net_name_id) {
+        std::string nn = p->second.to_string ();
+        if (nets_to_join.find (nn) != nets_to_join.end ()) {
+          prop_by_name [nn].insert (db::prop_id_to_attr (i->first));
+        }
+      }
+    }
+  }
+
+  //  include pseudo-attributes for global nets to implement "join_with" for global nets
+  for (size_t gid = 0; gid < conn.global_nets (); ++gid) {
+    const std::string &gn = conn.global_net_name (gid);
+    if (nets_to_join.find (gn) != nets_to_join.end ()) {
+      prop_by_name [gn].insert (db::global_net_id_to_attr (gid));
+    }
+  }
+
+  const db::repository<db::Text> &text_repository = layout->shape_repository ().repository (db::object_tag<db::Text> ());
+  for (db::repository<db::Text>::iterator t = text_repository.begin (); t != text_repository.end (); ++t) {
+    std::string nn = t->string ();
+    if (nets_to_join.find (nn) != nets_to_join.end ()) {
+      prop_by_name [nn].insert (db::text_ref_to_attr (t.operator-> ()));
+    }
+  }
+
+  //  first inter-name equivalence (this implies implicit connections for all n1 and n2 labels)
+  for (std::map<std::string, std::set<size_t> >::const_iterator pn = prop_by_name.begin (); pn != prop_by_name.end (); ++pn) {
+    std::set<size_t>::const_iterator p = pn->second.begin ();
+    std::set<size_t>::const_iterator p0 = p;
+    while (p != pn->second.end ()) {
+      eq.same (*p0, *p);
+      ++p;
+    }
+  }
+
+  //  second intra-name equivalence
+  for (std::map<std::string, std::set<size_t> >::const_iterator pn1 = prop_by_name.begin (); pn1 != prop_by_name.end (); ++pn1) {
+    std::map<std::string, std::set<size_t> >::const_iterator pn2 = pn1;
+    ++pn2;
+    for ( ; pn2 != prop_by_name.end (); ++pn2) {
+      eq.same (*pn1->second.begin (), *pn2->second.begin ());
     }
   }
 }
@@ -114,15 +181,31 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
   std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > net_name_equivalence;
   if (m_text_annot_name_id.first) {
+
     if (! m_joined_net_names.empty ()) {
       build_net_name_equivalence (mp_layout, conn, m_text_annot_name_id.second, m_joined_net_names, net_name_equivalence [hier_clusters_type::top_cell_index]);
     }
-    for (std::list<std::pair<std::string, std::string> >::const_iterator m = m_joined_net_names_per_cell.begin (); m != m_joined_net_names_per_cell.end (); ++m) {
+    for (std::list<std::pair<std::string, std::list<tl::GlobPattern> > >::const_iterator m = m_joined_net_names_per_cell.begin (); m != m_joined_net_names_per_cell.end (); ++m) {
       std::pair<bool, db::cell_index_type> cp = mp_layout->cell_by_name (m->first.c_str ());
       if (cp.first) {
         build_net_name_equivalence (mp_layout, conn, m_text_annot_name_id.second, m->second, net_name_equivalence [cp.second]);
       }
     }
+
+    if (! m_joined_nets.empty ()) {
+      for (std::list<std::set<std::string> >::const_iterator n = m_joined_nets.begin (); n != m_joined_nets.end (); ++n) {
+        build_net_name_equivalence_for_explicit_connections (mp_layout, conn, m_text_annot_name_id.second, *n, net_name_equivalence [hier_clusters_type::top_cell_index]);
+      }
+    }
+    for (std::list<std::pair<std::string, std::list<std::set<std::string> > > >::const_iterator m = m_joined_nets_per_cell.begin (); m != m_joined_nets_per_cell.end (); ++m) {
+      std::pair<bool, db::cell_index_type> cp = mp_layout->cell_by_name (m->first.c_str ());
+      if (cp.first) {
+        for (std::list<std::set<std::string> >::const_iterator n = m->second.begin (); n != m->second.end (); ++n) {
+          build_net_name_equivalence_for_explicit_connections (mp_layout, conn, m_text_annot_name_id.second, *n, net_name_equivalence [cp.second]);
+        }
+      }
+    }
+
   }
 
   //  the big part: actually extract the nets

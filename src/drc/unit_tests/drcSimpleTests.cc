@@ -1222,3 +1222,13 @@ TEST(45_fillWithOverlappingBoxesTiled)
 {
   run_test (_this, "45", false);
 }
+
+TEST(46_fillWithOverlappingBoxes)
+{
+  run_test (_this, "46", false);
+}
+
+TEST(47_fillWithOverlappingBoxesTiled)
+{
+  run_test (_this, "47", false);
+}

@@ -730,9 +730,9 @@ fill_region_skew (const db::Region *fr, db::Cell *cell, db::cell_index_type fill
 
 static void
 fill_region_multi (const db::Region *fr, db::Cell *cell, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step,
-                   const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Point &origin, const db::Box &glue_box)
+                   const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
 {
-  db::fill_region_repeat (cell, *fr, fill_cell_index, fc_box, row_step, column_step, fill_margin, remaining_polygons, origin, glue_box);
+  db::fill_region_repeat (cell, *fr, fill_cell_index, fc_box, row_step, column_step, fill_margin, remaining_polygons, glue_box);
 }
 
 static db::Point default_origin;
@@ -2921,7 +2921,6 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
                                                      gsi::arg ("column_step"),
                                                      gsi::arg ("fill_margin", db::Vector ()),
                                                      gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
-                                                     gsi::arg ("origin", db::Point ()),
                                                      gsi::arg ("glue_box", db::Box ()),
     "@brief A mapping of \\Cell#fill_region to the Region class\n"
     "\n"

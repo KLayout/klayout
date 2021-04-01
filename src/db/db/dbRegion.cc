@@ -131,13 +131,13 @@ Region::clear ()
 void
 Region::reserve (size_t n)
 {
-  flat_region ()->reserve (n);
+  mutable_region ()->reserve (n);
 }
 
 template <class T>
 Region &Region::transform (const T &trans)
 {
-  flat_region ()->transform (trans);
+  mutable_region ()->transform (trans);
   return *this;
 }
 
@@ -151,7 +151,7 @@ template DB_PUBLIC Region &Region::transform (const db::IMatrix3d &);
 template <class Sh>
 void Region::insert (const Sh &shape)
 {
-  flat_region ()->insert (shape);
+  mutable_region ()->insert (shape);
 }
 
 template DB_PUBLIC void Region::insert (const db::Box &);
@@ -161,31 +161,36 @@ template DB_PUBLIC void Region::insert (const db::Path &);
 
 void Region::insert (const db::Shape &shape)
 {
-  flat_region ()->insert (shape);
+  mutable_region ()->insert (shape);
 }
 
 template <class T>
 void Region::insert (const db::Shape &shape, const T &trans)
 {
-  flat_region ()->insert (shape, trans);
+  mutable_region ()->insert (shape, trans);
 }
 
 template DB_PUBLIC void Region::insert (const db::Shape &, const db::ICplxTrans &);
 template DB_PUBLIC void Region::insert (const db::Shape &, const db::Trans &);
 template DB_PUBLIC void Region::insert (const db::Shape &, const db::Disp &);
 
-FlatRegion *
-Region::flat_region ()
+MutableRegion *
+Region::mutable_region ()
 {
-  FlatRegion *region = dynamic_cast<FlatRegion *> (mp_delegate);
+  MutableRegion *region = dynamic_cast<MutableRegion *> (mp_delegate);
   if (! region) {
-    region = new FlatRegion ();
+
+    FlatRegion *flat_region = new FlatRegion ();
+    region = flat_region;
+
     if (mp_delegate) {
-      region->RegionDelegate::operator= (*mp_delegate);   //  copy basic flags
-      region->insert_seq (begin ());
-      region->set_is_merged (mp_delegate->is_merged ());
+      flat_region->RegionDelegate::operator= (*mp_delegate);   //  copy basic flags
+      flat_region->insert_seq (begin ());
+      flat_region->set_is_merged (mp_delegate->is_merged ());
     }
-    set_delegate (region);
+
+    set_delegate (flat_region);
+
   }
 
   return region;
@@ -274,6 +279,13 @@ Region
 Region::smoothed (coord_type d, bool keep_hv) const
 {
   return processed (SmoothingProcessor (d, keep_hv));
+}
+
+db::Region &
+Region::flatten ()
+{
+  mutable_region ()->flatten ();
+  return *this;
 }
 
 void

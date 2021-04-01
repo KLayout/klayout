@@ -27,6 +27,7 @@
 #include "dbCellMapping.h"
 #include "dbNetlistExtractor.h"
 #include "dbNetlistDeviceExtractor.h"
+#include "tlGlobPattern.h"
 
 namespace db
 {
@@ -423,20 +424,106 @@ public:
   size_t global_net_id (const std::string &name);
 
   /**
-   *  @brief Runs the netlist extraction
-   *  See the class description for more details.
+   *  @brief Sets a flag indicating whether to include floating subcircuits
    */
-  void extract_netlist (const std::string &joined_net_names = std::string (), bool include_floating_subcircuits = false);
+  void set_include_floating_subcircuits (bool f);
+
+  /**
+   *  @brief Sets a flag indicating whether to include floating subcircuits
+   */
+  bool include_floating_subcircuits () const
+  {
+    return m_include_floating_subcircuits;
+  }
+
+  /**
+   *  @brief Clears the "join net names" settings
+   */
+  void clear_join_net_names ();
+
+  /**
+   *  @brief Joins net names matching the given expression
+   *
+   *  Using this function will *add* one more rule. To clear all registered rules, use "clear_join_net_names".
+   *  These pattern will only act on top level cells.
+   */
+  void join_net_names (const tl::GlobPattern &gp);
+
+  /**
+   *  @brief Joins net names matching the given expression
+   *
+   *  Using this function will *add* one more rule specific to cells matching the first glob pattern. To clear all registered rules, use "clear_join_net_names".
+   *  Pattern registered with this function will act on the given cells, regardless of whether it's top level or not.
+   */
+  void join_net_names (const tl::GlobPattern &cell, const tl::GlobPattern &gp);
+
+  /**
+   *  @brief Gets the joined net names for top level
+   *
+   *  This method is mainly provided to test purposes.
+   */
+  const std::list<tl::GlobPattern> &joined_net_names () const
+  {
+    return m_joined_net_names;
+  }
+
+  /**
+   *  @brief Gets the joined net names per cell
+   *
+   *  This method is mainly provided to test purposes.
+   */
+  const std::list<std::pair<tl::GlobPattern, tl::GlobPattern> > &joined_net_names_per_cell () const
+  {
+    return m_joined_net_names_per_cell;
+  }
+
+  /**
+   *  @brief Clears the "join nets" settings
+   */
+  void clear_join_nets ();
+
+  /**
+   *  @brief Joins the given nets for the top level cell
+   *
+   *  This method will make an explicit connection between the nets given in the name set.
+   *  This applies implicit joining of different nets with the same label (intra-net joining)
+   *  and of nets with different names (inter-net joining). Intra-net joining is implied always.
+   */
+  void join_nets (const std::set<std::string> &jn);
+
+  /**
+   *  @brief Joins the given nets for cells matching the given pattern
+   *
+   *  Using this function will *add* one more rule specific to cells matching the first glob pattern. To clear all registered rules, use "clear_join_nets".
+   *  Pattern registered with this function will act on the given cells, regardless of whether it's top level or not.
+   */
+  void join_nets (const tl::GlobPattern &cell, const std::set<std::string> &gp);
+
+  /**
+   *  @brief Gets the joined nets for top level
+   *
+   *  This method is mainly provided to test purposes.
+   */
+  const std::list<std::set<std::string> > &joined_nets () const
+  {
+    return m_joined_nets;
+  }
+
+  /**
+   *  @brief Gets the joined nets per cell
+   *
+   *  This method is mainly provided to test purposes.
+   */
+  const std::list<std::pair<tl::GlobPattern, std::set<std::string> > > &joined_nets_per_cell () const
+  {
+    return m_joined_nets_per_cell;
+  }
 
   /**
    *  @brief Runs the netlist extraction
-   *  In addition to the previous version, this extraction method allows specification of a per-cell list of
-   *  joined (labelled) net names.
-   *  The key of the "joined_net_names_per_cell" is a cell name or a glob expression for cells. On all matching cells,
-   *  the value is applied as a label selector for labels that are joined together. The "joined_net_names" expressions
-   *  is only applied to the top cell.
+   *  See the class description for more details.
    */
-  void extract_netlist (const std::string &joined_net_names, const std::map<std::string, std::string> &joined_net_names_per_cell, bool include_floating_subcircuits = false);
+  void extract_netlist ();
 
   /**
    *  @brief Marks the netlist as extracted
@@ -830,6 +917,11 @@ private:
   double m_device_scaling;
   db::DeepLayer m_dummy_layer;
   std::string m_generator;
+  bool m_include_floating_subcircuits;
+  std::list<tl::GlobPattern> m_joined_net_names;
+  std::list<std::pair<tl::GlobPattern, tl::GlobPattern> > m_joined_net_names_per_cell;
+  std::list<std::set<std::string> > m_joined_nets;
+  std::list<std::pair<tl::GlobPattern, std::set<std::string> > > m_joined_nets_per_cell;
 
   struct CellReuseTableKey
   {

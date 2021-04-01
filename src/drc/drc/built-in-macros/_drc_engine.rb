@@ -1855,6 +1855,14 @@ CODE
     # See \Netter#connect_implicit for a description of that function.
 
     # %DRC%
+    # @name connect_explicit
+    # @brief Specifies explicit net connections
+    # @synopsis connect_explicit(net_names)
+    # @synopsis connect_explicit(cell_pattern, net_names)
+    # See \Netter#connect_explicit for a description of that function.
+    # Net names is an array (use square brackets to list the net names).
+
+    # %DRC%
     # @name antenna_check
     # @brief Performs an antenna check
     # @synopsis antenna_check(gate, metal, ratio, [ diode_specs ... ])
@@ -1892,6 +1900,7 @@ CODE
       connect
       connect_global
       connect_implicit
+      connect_explicit
       device_scaling
       extract_devices
       l2n_data

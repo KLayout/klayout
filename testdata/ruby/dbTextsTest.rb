@@ -186,12 +186,10 @@ class DBTexts_TestClass < TestBase
     assert_equal(r.is_deep?, true)
 
     r.flatten
-    assert_equal(r.has_valid_texts?, true)
-    assert_equal(r[1].to_s, "('abc',r0 100,-100)")
-    assert_equal(r[100].inspect, "nil")
+    assert_equal(r.to_s, "('abc',r0 100,-200);('abc',r0 100,-100);('abc',r0 300,-100)")
     assert_equal(r.bbox.to_s, "(100,-200;300,-100)")
 
-    assert_equal(r.is_deep?, false)
+    assert_equal(r.is_deep?, true)
 
   end
 

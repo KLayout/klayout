@@ -496,10 +496,7 @@ public:
    *
    *  If the name is not valid, null is returned.
    */
-  Net *net_by_name (const std::string &name)
-  {
-    return m_net_by_name.object_by (name);
-  }
+  Net *net_by_name (const std::string &name);
 
   /**
    *  @brief Adds a device to this circuit
@@ -556,10 +553,7 @@ public:
    *
    *  If the name is not valid, null is returned.
    */
-  Device *device_by_name (const std::string &name)
-  {
-    return m_device_by_name.object_by (name);
-  }
+  Device *device_by_name (const std::string &name);
 
   /**
    *  @brief Begin iterator for the devices of the circuit (non-const version)
@@ -648,10 +642,7 @@ public:
    *
    *  If the name is not valid, null is returned.
    */
-  SubCircuit *subcircuit_by_name (const std::string &name)
-  {
-    return m_subcircuit_by_name.object_by (name);
-  }
+  SubCircuit *subcircuit_by_name (const std::string &name);
 
   /**
    *  @brief Begin iterator for the subcircuits of the circuit (non-const version)

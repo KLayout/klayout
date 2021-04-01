@@ -140,6 +140,68 @@ static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &pol
   return antenna_check3 (l2n, poly, 1, 0, metal, 1, 0, ratio, diodes);
 }
 
+static void join_net_names (db::LayoutToNetlist *l2n, const std::string &s)
+{
+  l2n->join_net_names (tl::GlobPattern (s));
+}
+
+static std::string dump_joined_net_names (const db::LayoutToNetlist *l2n)
+{
+  const std::list<tl::GlobPattern> &jn = l2n->joined_net_names ();
+  std::vector<std::string> s;
+  for (std::list<tl::GlobPattern>::const_iterator j = jn.begin (); j != jn.end (); ++j) {
+    s.push_back (j->pattern ());
+  }
+  return tl::join (s, ",");
+}
+
+static void join_net_names2 (db::LayoutToNetlist *l2n, const std::string &c, const std::string &s)
+{
+  l2n->join_net_names (tl::GlobPattern (c), tl::GlobPattern (s));
+}
+
+static std::string dump_joined_net_names_per_cell (const db::LayoutToNetlist *l2n)
+{
+  const std::list<std::pair<tl::GlobPattern, tl::GlobPattern> > &jn = l2n->joined_net_names_per_cell ();
+  std::vector<std::string> s;
+  for (std::list<std::pair<tl::GlobPattern, tl::GlobPattern> >::const_iterator i = jn.begin (); i != jn.end (); ++i) {
+    s.push_back (i->first.pattern () + ":" + i->second.pattern ());
+  }
+  return tl::join (s, ",");
+}
+
+static void join_nets (db::LayoutToNetlist *l2n, const std::set<std::string> &s)
+{
+  l2n->join_nets (s);
+}
+
+static std::string dump_joined_nets (const db::LayoutToNetlist *l2n)
+{
+  const std::list<std::set<std::string> > &jn = l2n->joined_nets ();
+  std::vector<std::string> s;
+  for (std::list<std::set<std::string> >::const_iterator j = jn.begin (); j != jn.end (); ++j) {
+    std::vector<std::string> t (j->begin (), j->end ());
+    s.push_back (tl::join (t, "+"));
+  }
+  return tl::join (s, ",");
+}
+
+static void join_nets2 (db::LayoutToNetlist *l2n, const std::string &c, const std::set<std::string> &s)
+{
+  l2n->join_nets (tl::GlobPattern (c), s);
+}
+
+static std::string dump_joined_nets_per_cell (const db::LayoutToNetlist *l2n)
+{
+  const std::list<std::pair<tl::GlobPattern, std::set<std::string> > > &jn = l2n->joined_nets_per_cell ();
+  std::vector<std::string> s;
+  for (std::list<std::pair<tl::GlobPattern, std::set<std::string> > >::const_iterator i = jn.begin (); i != jn.end (); ++i) {
+    std::vector<std::string> t (i->second.begin (), i->second.end ());
+    s.push_back (i->first.pattern () + ":" + tl::join (t, "+"));
+  }
+  return tl::join (s, ",");
+}
+
 Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::constructor ("new", &make_l2n, gsi::arg ("iter"),
     "@brief Creates a new extractor connected to an original layout\n"
@@ -334,7 +396,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   ) +
   gsi::method ("connect", (void (db::LayoutToNetlist::*) (const db::Region &)) &db::LayoutToNetlist::connect, gsi::arg ("l"),
     "@brief Defines an intra-layer connection for the given layer.\n"
-    "The layer is either an original layer created with \\make_layer and it's variants or\n"
+    "The layer is either an original layer created with \\make_incluidelayer and it's variants or\n"
     "a derived layer. Certain limitations apply. It's safe to use\n"
     "boolean operations for deriving layers. Other operations are applicable as long as they are\n"
     "capable of delivering hierarchical layers.\n"
@@ -372,13 +434,38 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("global_net_name", &db::LayoutToNetlist::global_net_name, gsi::arg ("global_net_id"),
     "@brief Gets the global net name for the given global net ID."
   ) +
-  gsi::method ("extract_netlist", &db::LayoutToNetlist::extract_netlist, gsi::arg ("join_net_names", std::string (), "\"\""), gsi::arg ("include_floating_subcircuits", false),
-    "@brief Runs the netlist extraction\n"
-    "'join_net_names' is a glob expression for labels. Nets on top level carrying the same label which matches this glob "
-    "expression will be connected implicitly even if there is no physical connection. This feature is useful to simulate a connection "
-    "which will be made later when integrating the component.\n"
+  gsi::method ("include_floating_subcircuits=", &db::LayoutToNetlist::set_include_floating_subcircuits, gsi::arg ("flag"),
+    "@brief Sets a flag indicating whether to include floating subcircuits in the netlist.\n"
     "\n"
-    "Valid glob expressions are:\n"
+    "With 'include_floating_subcircuits' set to true, subcircuits with no connection to their parent "
+    "circuit are still included in the circuit as floating subcircuits. Specifically on flattening this "
+    "means that these subcircuits are properly propagated to their parent instead of appearing as "
+    "additional top circuits.\n"
+    "\n"
+    "This attribute has been introduced in version 0.27 and replaces the arguments of \\extract_netlist."
+  ) +
+  gsi::method ("include_floating_subcircuits", &db::LayoutToNetlist::include_floating_subcircuits,
+    "@brief Gets a flag indicating whether to include floating subcircuits in the netlist.\n"
+    "See \\include_floating_subcircuits= for details.\n"
+    "\n"
+    "This attribute has been introduced in version 0.27.\n"
+  ) +
+  gsi::method ("clear_join_net_names", &db::LayoutToNetlist::clear_join_net_names,
+    "@brief Clears all implicit net joining expressions.\n"
+    "See \\extract_netlist for more details about this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.27 and replaces the arguments of \\extract_netlist."
+  ) +
+  gsi::method_ext ("join_net_names", &join_net_names, gsi::arg ("pattern"),
+    "@brief Specifies another pattern for implicit joining of nets for the top level cell.\n"
+    "Use this method to register a pattern for net labels considered in implicit net joining. Implicit net joining "
+    "allows connecting multiple parts of the same nets (e.g. supply rails) without need for a physical connection. "
+    "The pattern specifies labels to look for. When parts are labelled with a name matching the expression, "
+    "the parts carrying the same name are joined.\n"
+    "\n"
+    "This method adds a new pattern. Use \\clear_join_net_names to clear the registered pattern.\n"
+    "\n"
+    "Each pattern is a glob expression. Valid glob expressions are:\n"
     "@ul\n"
     "@li \"\" no implicit connections.@/li\n"
     "@li \"*\" to make all labels candidates for implicit connections.@/li\n"
@@ -389,27 +476,45 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "Label matching is case sensitive.\n"
     "\n"
-    "With 'include_floating_subcircuits' set to true, subcircuits with no connection to their parent "
-    "circuit are still included in the circuit as floating subcircuits. Specifically on flattening this "
-    "means that these subcircuits are property propagated to their parent instead of appearing as "
-    "additional top circuits.\n"
+    "This method has been introduced in version 0.27 and replaces the arguments of \\extract_netlist."
+  ) +
+  gsi::method_ext ("join_net_names", &join_net_names2, gsi::arg ("cell_pattern"), gsi::arg ("pattern"),
+    "@brief Specifies another pattern for implicit joining of nets for the cells from the given cell pattern.\n"
+    "This method allows applying implicit net joining for specific cells, not only for the top cell.\n"
+    "\n"
+    "This method adds a new pattern. Use \\clear_join_net_names to clear the registered pattern.\n"
+    "\n"
+    "This method has been introduced in version 0.27 and replaces the arguments of \\extract_netlist."
+  ) +
+  gsi::method ("clear_join_nets", &db::LayoutToNetlist::clear_join_nets,
+    "@brief Clears all explicit net joining expressions.\n"
+    "See \\extract_netlist for more details about this feature.\n"
+    "\n"
+    "Explicit net joining has been introduced in version 0.27."
+  ) +
+  gsi::method_ext ("join_nets", &join_nets, gsi::arg ("net_names"),
+    "@brief Specifies another name list for explicit joining of nets for the top level cell.\n"
+    "Use this method to join nets from the set of net names. All these nets will be connected together forming a single net.\n"
+    "Explicit joining will imply implicit joining for the involved nets - partial nets involved will be connected too (intra-net joining).\n"
+    "\n"
+    "This method adds a new name list. Use \\clear_join_nets to clear the registered pattern.\n"
+    "\n"
+    "Explicit net joining has been introduced in version 0.27."
+  ) +
+  gsi::method_ext ("join_nets", &join_nets2, gsi::arg ("cell_pattern"), gsi::arg ("net_names"),
+    "@brief Specifies another name list for explicit joining of nets for the cells from the given cell pattern.\n"
+    "This method allows applying explicit net joining for specific cells, not only for the top cell.\n"
+    "\n"
+    "This method adds a new name list. Use \\clear_join_nets to clear the registered pattern.\n"
+    "\n"
+    "Explicit net joining has been introduced in version 0.27."
+  ) +
+  gsi::method ("extract_netlist", &db::LayoutToNetlist::extract_netlist,
+    "@brief Runs the netlist extraction\n"
     "\n"
     "See the class description for more details.\n"
     "\n"
-    "The 'include_floating_subcircuits' argument has been introduced in version 0.26.2."
-  ) +
-  gsi::method ("extract_netlist", &db::LayoutToNetlist::extract_netlist, gsi::arg ("join_net_names"), gsi::arg ("join_net_names_per_cell"), gsi::arg ("include_floating_subcircuits", false),
-    "@brief Runs the netlist extraction\n"
-    "This method runs the netlist extraction like the two-parameter version. In addition to the latter, this method "
-    "can be given a per-cell net label joining specification in 'join_net_names_per_cell'. The keys of this array "
-    "are cell names or cell names or cell name match expressions (glob style). The values are label match expressions.\n"
-    "\n"
-    "If not an empty string, the 'join_net_names' label match expression is applied to the top cell. For all non-top cells "
-    "the per-cell label match expression is applied and determines what labels are joined into single nets. "
-    "As the keys of 'join_net_names_per_cell' are glob expressions, a single cell may fall into more than one category. In this "
-    "case, the label match pattern are combined. In any case, the 'join_net_names' has priority for the top cell.\n"
-    "\n"
-    "This variant of 'extract_netlist' has been introduced in version 0.26.2."
+    "This method has been made parameter-less in version 0.27. Use \\include_floating_subcircuits= and \\join_net_names as substitutes for the arguments of previous versions."
   ) +
   gsi::method_ext ("internal_layout", &l2n_internal_layout,
     "@brief Gets the internal layout\n"
@@ -658,7 +763,13 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
    "considered.\n"
    "\n"
    "This variant has been introduced in version 0.26.6.\n"
-  ),
+  ) +
+  //  test API
+  gsi::method_ext ("dump_joined_net_names", &dump_joined_net_names, "@hide") +
+  gsi::method_ext ("dump_joined_net_names_per_cell", &dump_joined_net_names_per_cell, "@hide") +
+  gsi::method_ext ("dump_joined_nets", &dump_joined_nets, "@hide") +
+  gsi::method_ext ("dump_joined_nets_per_cell", &dump_joined_nets_per_cell, "@hide")
+  ,
   "@brief A generic framework for extracting netlists from layouts\n"
   "\n"
   "This class wraps various concepts from db::NetlistExtractor and db::NetlistDeviceExtractor\n"
@@ -674,7 +785,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   "    hierarchy and the layout taken as input.\n"
   "@/li\n"
   "@li Preparation\n"
-  "    In this step, the device recognitions and extraction layers are drawn from\n"
+  "    In this step, the device recognition and extraction layers are drawn from\n"
   "    the framework. Derived can now be computed using boolean operations.\n"
   "    Methods to use in this step are \\make_layer and it's variants.\n"
   "    Layer preparation is not necessarily required to happen before all\n"

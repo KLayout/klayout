@@ -399,6 +399,18 @@ DeepShapeStoreState::max_vertex_count () const
 
 static size_t s_instance_count = 0;
 
+static unsigned int init_layer (db::Layout &layout, const db::RecursiveShapeIterator &si)
+{
+  unsigned int layer_index = layout.insert_layer ();
+
+  if (si.layout () && si.layer () < si.layout ()->layers ()) {
+    //  try to preserve the layer properties
+    layout.set_properties (layer_index, si.layout ()->get_properties (si.layer ()));
+  }
+
+  return layer_index;
+}
+
 DeepShapeStore::DeepShapeStore ()
 {
   ++s_instance_count;
@@ -433,7 +445,9 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, bool for_n
 
   require_singular ();
 
-  unsigned int layer = layout ().insert_layer ();
+  unsigned int layer = init_layer (layout (), region.iter ());
+
+  //  attempt to initialize the layer properties
 
   if (max_area_ratio == 0.0) {
     max_area_ratio = m_state.max_area_ratio ();
@@ -480,7 +494,7 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Edges &edges, const db::IC
 
   require_singular ();
 
-  unsigned int layer = layout ().insert_layer ();
+  unsigned int layer = init_layer (layout (), edges.iter ());
 
   db::Shapes *shapes = &initial_cell ().shapes (layer);
   db::Box world = db::Box::world ();
@@ -510,7 +524,7 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Texts &texts, const db::IC
 
   require_singular ();
 
-  unsigned int layer = layout ().insert_layer ();
+  unsigned int layer = init_layer (layout (), texts.iter ());
 
   db::Shapes *shapes = &initial_cell ().shapes (layer);
   db::Box world = db::Box::world ();
@@ -778,18 +792,6 @@ void DeepShapeStore::make_layout (unsigned int layout_index, const db::Recursive
   }
 
   m_layout_map[std::make_pair (si, trans)] = layout_index;
-}
-
-static unsigned int init_layer (db::Layout &layout, const db::RecursiveShapeIterator &si)
-{
-  unsigned int layer_index = layout.insert_layer ();
-
-  if (si.layout () && si.layer () < si.layout ()->layers ()) {
-    //  try to preserve the layer properties
-    layout.set_properties (layer_index, si.layout ()->get_properties (si.layer ()));
-  }
-
-  return layer_index;
 }
 
 DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio, size_t max_vertex_count, const db::ICplxTrans &trans)

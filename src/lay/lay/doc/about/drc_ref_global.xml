@@ -312,6 +312,17 @@ l1 = input(1, 0)
 <p>
 See <a href="/about/drc_ref_netter.xml#connect">Netter#connect</a> for a description of that function.
 </p>
+<a name="connect_explicit"/><h2>"connect_explicit" - Specifies explicit net connections</h2>
+<keyword name="connect_explicit"/>
+<p>Usage:</p>
+<ul>
+<li><tt>connect_explicit(net_names)</tt></li>
+<li><tt>connect_explicit(cell_pattern, net_names)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_netter.xml#connect_explicit">Netter#connect_explicit</a> for a description of that function.
+Net names is an array (use square brackets to list the net names).
+</p>
 <a name="connect_global"/><h2>"connect_global" - Specifies a connection to a global net</h2>
 <keyword name="connect_global"/>
 <p>Usage:</p>

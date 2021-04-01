@@ -519,6 +519,9 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
     "@brief Sets the maximum seach depth\n"
     "This value limits the search depth of the backtracking algorithm to the\n"
     "given number of jumps.\n"
+    "\n"
+    "By default, from version 0.27 on the depth is unlimited and can be reduced in cases where runtimes need to be limited at the cost "
+    "less elaborate matching evaluation.\n"
   ) +
   gsi::method ("max_depth", &db::NetlistComparer::max_depth,
     "@brief Gets the maximum seach depth\n"
@@ -530,6 +533,9 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
     "The complexity is the accumulated number of branch options with ambiguous\n"
     "net matches. Backtracking will stop when the maximum number of options\n"
     "has been exceeded.\n"
+    "\n"
+    "By default, from version 0.27 on the complexity is unlimited and can be reduced in cases where runtimes need to be limited at the cost "
+    "less elaborate matching evaluation.\n"
     "\n"
     "As the computational complexity is the square of the branch count,\n"
     "this value should be adjusted carefully.\n"

@@ -26,7 +26,7 @@
 
 #include "dbCommon.h"
 
-#include "dbAsIfFlatEdgePairs.h"
+#include "dbMutableEdgePairs.h"
 #include "dbShapes.h"
 #include "dbGenericShapeIterator.h"
 #include "tlCopyOnWrite.h"
@@ -42,7 +42,7 @@ typedef generic_shapes_iterator_delegate<db::EdgePair> FlatEdgePairsIterator;
  *  @brief The delegate for the actual edge pair set implementation
  */
 class DB_PUBLIC FlatEdgePairs
-  : public AsIfFlatEdgePairs
+  : public MutableEdgePairs
 {
 public:
   typedef db::layer<db::EdgePair, db::unstable_layer_tag> edge_pair_layer_type;
@@ -82,41 +82,29 @@ public:
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
   virtual void insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const;
 
-  void insert (const db::EdgePair &edge_pair);
-  void insert (const db::Shape &shape);
+  virtual void do_insert (const db::EdgePair &edge_pair);
 
-  template <class T>
-  void insert (const db::Shape &shape, const T &trans)
+  virtual void do_transform (const db::Trans &t)
   {
-    if (shape.is_edge_pair ()) {
-
-      db::EdgePair ep;
-      shape.edge_pair (ep);
-      ep.transform (trans);
-      insert (ep);
-
-    }
+    transform_generic (t);
   }
 
-  template <class Iter>
-  void insert_seq (const Iter &seq)
+  virtual void do_transform (const db::ICplxTrans &t)
   {
-    for (Iter i = seq; ! i.at_end (); ++i) {
-      insert (*i);
-    }
+    transform_generic (t);
   }
 
-  template <class Trans>
-  void transform (const Trans &trans)
+  virtual void do_transform (const db::IMatrix2d &t)
   {
-    if (! trans.is_unity ()) {
-      db::Shapes &ep = *mp_edge_pairs;
-      for (edge_pair_iterator_type p = ep.template get_layer<db::EdgePair, db::unstable_layer_tag> ().begin (); p != ep.template get_layer<db::EdgePair, db::unstable_layer_tag> ().end (); ++p) {
-        ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
-      }
-      invalidate_cache ();
-    }
+    transform_generic (t);
   }
+
+  virtual void do_transform (const db::IMatrix3d &t)
+  {
+    transform_generic (t);
+  }
+
+  virtual void flatten () { }
 
   db::Shapes &raw_edge_pairs () { return *mp_edge_pairs; }
   const db::Shapes &raw_edge_pairs () const { return *mp_edge_pairs; }
@@ -131,6 +119,18 @@ private:
   FlatEdgePairs &operator= (const FlatEdgePairs &other);
 
   mutable tl::copy_on_write_ptr<db::Shapes> mp_edge_pairs;
+
+  template <class Trans>
+  void transform_generic (const Trans &trans)
+  {
+    if (! trans.is_unity ()) {
+      db::Shapes &ep = *mp_edge_pairs;
+      for (edge_pair_iterator_type p = ep.template get_layer<db::EdgePair, db::unstable_layer_tag> ().begin (); p != ep.template get_layer<db::EdgePair, db::unstable_layer_tag> ().end (); ++p) {
+        ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      }
+      invalidate_cache ();
+    }
+  }
 };
 
 }

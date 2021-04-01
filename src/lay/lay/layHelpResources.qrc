@@ -92,6 +92,7 @@
         <file alias="lvs_symm_nodes.png">doc/manual/lvs_symm_nodes.png</file>
         <file alias="lvs_connect.xml">doc/manual/lvs_connect.xml</file>
         <file alias="inv.png">doc/manual/inv.png</file>
+        <file alias="inv_explicit.png">doc/manual/inv_explicit.png</file>
         <file alias="inv_no_transistors.png">doc/manual/inv_no_transistors.png</file>
         <file alias="inv_transistors.png">doc/manual/inv_transistors.png</file>
         <file alias="inv_with_diodes.png">doc/manual/inv_with_diodes.png</file>

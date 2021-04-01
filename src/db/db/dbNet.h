@@ -41,6 +41,7 @@ class Circuit;
 class DeviceTerminalDefinition;
 class DeviceClass;
 class Pin;
+class Netlist;
 
 /**
  *  @brief A reference to a terminal of a device
@@ -417,6 +418,18 @@ public:
   {
     return mp_circuit;
   }
+
+  /**
+   *  @brief Gets the netlist the net lives in
+   *  This pointer is 0 if the net is not part of a netlist.
+   */
+  Netlist *netlist ();
+
+  /**
+   *  @brief Gets the netlist the net lives in (const version)
+   *  This pointer is 0 if the net is not part of a netlist.
+   */
+  const Netlist *netlist () const;
 
   /**
    *  @brief Clears the circuit

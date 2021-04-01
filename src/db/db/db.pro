@@ -50,6 +50,10 @@ SOURCES = \
   dbManager.cc \
   dbMatrix.cc \
   dbMemStatistics.cc \
+  dbMutableEdgePairs.cc \
+  dbMutableEdges.cc \
+  dbMutableRegion.cc \
+  dbMutableTexts.cc \
   dbObject.cc \
   dbPath.cc \
   dbPCellDeclaration.cc \
@@ -258,6 +262,10 @@ HEADERS = \
   dbMatrix.h \
   dbMemStatistics.h \
   dbMetaInfo.h \
+  dbMutableEdgePairs.h \
+  dbMutableEdges.h \
+  dbMutableRegion.h \
+  dbMutableTexts.h \
   dbObject.h \
   dbObjectTag.h \
   dbObjectWithProperties.h \

@@ -55,7 +55,7 @@ TEST(1)
   EXPECT_EQ (r.bbox ().to_string (), "(0,0;100,200)");
   EXPECT_EQ (r.transformed (db::Trans (db::Vector (1, 2))).bbox ().to_string (), "(1,2;101,202)");
   EXPECT_EQ (r.empty (), false);
-  EXPECT_EQ (r.is_merged (), true);
+  EXPECT_EQ (r.is_merged (), false);
   EXPECT_EQ (r.begin ().at_end (), false);
 
   db::Edges r1 = r;

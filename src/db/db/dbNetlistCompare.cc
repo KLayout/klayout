@@ -48,15 +48,12 @@ struct GlobalCompareOptions
       debug_netcompare = tl::app_flag ("netlist-compare-debug-netcompare");
       //  $KLAYOUT_NETLIST_COMPARE_DEBUG_NETGRAPH
       debug_netgraph = tl::app_flag ("netlist-compare-debug-netgraph");
-      //  $KLAYOUT_NETLIST_COMPARE_CASE_SENSITIVE
-      compare_case_sensitive = tl::app_flag ("netlist-compare-case-sensitive");
       m_is_initialized = true;
     }
   }
 
   bool debug_netcompare;
   bool debug_netgraph;
-  bool compare_case_sensitive;
 
 private:
   bool m_is_initialized;
@@ -90,28 +87,18 @@ namespace db
 // --------------------------------------------------------------------------------------------------------------------
 //  A generic string compare
 
-static int name_compare (const std::string &n1, const std::string &n2)
+bool combined_case_sensitive (const db::Netlist *a, const db::Netlist *b)
 {
-  //  TODO: unicode support?
-  if (options ()->compare_case_sensitive) {
-    return strcmp (n1.c_str (), n2.c_str ());
-  } else {
-#if defined(_WIN32)
-    return _stricmp (n1.c_str (), n2.c_str ());
-#else
-    return strcasecmp (n1.c_str (), n2.c_str ());
-#endif
-  }
+  bool csa = a ? a->is_case_sensitive () : true;
+  bool csb = b ? b->is_case_sensitive () : true;
+  return csa && csb;
 }
 
-static inline std::string normalize_name (const std::string &n)
+int name_compare (const db::Net *a, const db::Net *b)
 {
-  if (options ()->compare_case_sensitive) {
-    return n;
-  } else {
-    return tl::to_upper_case (n);
-  }
+  return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), a->name (), b->name ());
 }
+
 
 // --------------------------------------------------------------------------------------------------------------------
 //  DeviceCompare definition and implementation
@@ -404,9 +391,14 @@ class generic_categorizer
 {
 public:
   generic_categorizer (bool with_name = true)
-    : m_next_cat (0), m_with_name (with_name)
+    : m_next_cat (0), m_with_name (with_name), m_case_sensitive (true)
   {
     //  .. nothing yet ..
+  }
+
+  void set_case_sensitive (bool f)
+  {
+    m_case_sensitive = f;
   }
 
   void same (const Obj *ca, const Obj *cb)
@@ -471,7 +463,7 @@ public:
 
     if (m_with_name) {
 
-      std::string cls_name = normalize_name (cls->name ());
+      std::string cls_name = db::Netlist::normalize_name (m_case_sensitive, cls->name ());
 
       std::map<std::string, size_t>::const_iterator c = m_cat_by_name.find (cls_name);
       if (c != m_cat_by_name.end ()) {
@@ -498,6 +490,7 @@ public:
   std::map<std::string, size_t> m_cat_by_name;
   size_t m_next_cat;
   bool m_with_name;
+  bool m_case_sensitive;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -559,6 +552,11 @@ public:
     return m_strict_device_categories.find (cat) != m_strict_device_categories.end ();
   }
 
+  void set_case_sensitive (bool f)
+  {
+    generic_categorizer::set_case_sensitive (f);
+  }
+
 private:
   std::set<size_t> m_strict_device_categories;
 };
@@ -605,6 +603,11 @@ public:
   size_t cat_for_circuit (const db::Circuit *cr)
   {
     return generic_categorizer<db::Circuit>::cat_for (cr);
+  }
+
+  void set_case_sensitive (bool f)
+  {
+    generic_categorizer::set_case_sensitive (f);
   }
 };
 
@@ -1461,7 +1464,7 @@ NetGraphNode::net_less (const db::Net *a, const db::Net *b)
       const std::string &pna = a->begin_pins ()->pin ()->name ();
       const std::string &pnb = b->begin_pins ()->pin ()->name ();
       if (! pna.empty () && ! pnb.empty ()) {
-        return name_compare (pna, pnb) < 0;
+        return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), pna, pnb) < 0;
       }
     }
     return false;
@@ -1484,7 +1487,7 @@ NetGraphNode::edge_equal (const db::Net *a, const db::Net *b)
       const std::string &pna = a->begin_pins ()->pin ()->name ();
       const std::string &pnb = b->begin_pins ()->pin ()->name ();
       if (! pna.empty () && ! pnb.empty ()) {
-        return name_compare (pna, pnb) == 0;
+        return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), pna, pnb) == 0;
       }
     }
     return true;
@@ -2028,7 +2031,7 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
 
   }
 
-  //  propagate pairing in picky mode: this means we only accept exact a match if the node set
+  //  propagate pairing in picky mode: this means we only accept a match if the node set
   //  is exactly identical and no ambiguous nodes are present when ambiguous nodes are forbidden
 
   size_t bt_count = derive_node_identities_from_node_set (nodes, other_nodes, depth, n_branch, tentative, data);
@@ -2256,7 +2259,7 @@ namespace {
       bool operator() (const std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> &a, const std::pair<const NetGraphNode *, NetGraphNode::edge_iterator>b) const
       {
         tl_assert (a.first->net () && b.first->net ());
-        return name_compare (a.first->net ()->name (), b.first->net ()->name ()) < 0;
+        return name_compare (a.first->net (), b.first->net ()) < 0;
       }
   };
 
@@ -2317,7 +2320,7 @@ static bool net_names_are_different (const db::Net *a, const db::Net *b)
   if (! a || ! b || a->name ().empty () || b->name ().empty ()) {
     return false;
   } else {
-    return name_compare (a->name (), b->name ()) != 0;
+    return name_compare (a, b) != 0;
   }
 }
 
@@ -2326,7 +2329,7 @@ static bool net_names_are_equal (const db::Net *a, const db::Net *b)
   if (! a || ! b || a->name ().empty () || b->name ().empty ()) {
     return false;
   } else {
-    return name_compare (a->name (), b->name ()) == 0;
+    return name_compare (a, b) == 0;
   }
 }
 
@@ -2354,7 +2357,7 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
   {
 
     //  marks the nodes from the ambiguity group as unknown so we don't revisit them (causing deep recursion)
-    TentativeNodeMapping tn2unknown;
+    TentativeNodeMapping tn_temp;
 
     //  collect and mark the ambiguity combinations to consider
     std::vector<std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator> iters1, iters2;
@@ -2363,7 +2366,7 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
       if (! i1->first->has_any_other ()) {
         iters1.push_back (i1);
         size_t ni = node_index_for_net (i1->first->net ());
-        TentativeNodeMapping::map_to_unknown (&tn2unknown, this, ni);
+        TentativeNodeMapping::map_to_unknown (&tn_temp, this, ni);
       }
     }
 
@@ -2371,7 +2374,7 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
       if (! i2->first->has_any_other ()) {
         iters2.push_back (i2);
         size_t other_ni = data->other->node_index_for_net (i2->first->net ());
-        TentativeNodeMapping::map_to_unknown (&tn2unknown, data->other, other_ni);
+        TentativeNodeMapping::map_to_unknown (&tn_temp, data->other, other_ni);
       }
     }
 
@@ -2460,7 +2463,22 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
       }
 
       if (to_remove != iters2.end ()) {
+
+        //  Add the new pair to the temporary mapping (even in tentative mode)
+        //  Reasoning: doing the mapping may render other nets incompatible, so to ensure "edges_are_compatible" works properly we
+        //  need to lock the current pairs resources such as devices by listing them in the mapping. This is doing by "derive_*_equivalence" inside
+        //  TentativeNodeMapping::map_pair
+
+        std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i2 = *to_remove;
+
+        size_t ni = node_index_for_net (i1->first->net ());
+        size_t other_ni = data->other->node_index_for_net (i2->first->net ());
+
+        TentativeNodeMapping::map_pair (&tn_temp, this, ni, data->other, other_ni, dm, dm_other, *data->device_equivalence, scm, scm_other, *data->subcircuit_equivalence, depth);
+
+        //  now we can get rid of the node and reduce the "other" list of ambiguous nodes
         iters2.erase (to_remove);
+
       }
 
       if (! any && tentative) {
@@ -2631,7 +2649,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
     indent_s += "*" + tl::to_string (n_branch) + " ";
   }
 
-  if (depth > data->max_depth) {
+  if (data->max_depth != std::numeric_limits<size_t>::max() && depth > data->max_depth) {
     if (options ()->debug_netcompare) {
       tl::info << indent_s << "max. depth exhausted (" << depth + 1 << ">" << data->max_depth << ")";
     }
@@ -2765,7 +2783,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
 
       new_nodes += n;
 
-    } else if (nr->num * n_branch > data->max_n_branch) {
+    } else if (data->max_n_branch != std::numeric_limits<size_t>::max () && double (nr->num) * double (n_branch) > double (data->max_n_branch)) {
 
       if (options ()->debug_netcompare) {
         tl::info << indent_s << "max. complexity exhausted (" << nr->num << "*" << n_branch << ">" << data->max_n_branch << ") - mismatch.";
@@ -2810,11 +2828,18 @@ NetlistComparer::NetlistComparer (NetlistCompareLogger *logger)
   m_cap_threshold = -1.0;   //  not set
   m_res_threshold = -1.0;   //  not set
 
-  m_max_depth = 50;
-  m_max_n_branch = 500;
+  //  NOTE: as the backtracking algorithm is recursive, we need to limit the number of steps to follow
+  //  Long chains can happen in case of depth-first because the backtracking algorithm will follow
+  //  each successful path further to the very end. Depending on the circuit's complexity a long chain of
+  //  jumps is possible leading to a deep stack. A value of 500 is compatible with 4M stack depth on a
+  //  64bit machine which is considered acceptable for now.
+  m_max_depth = 500;
+
+  m_max_n_branch = std::numeric_limits<size_t>::max ();
   m_depth_first = true;
 
   m_dont_consider_net_names = false;
+  m_case_sensitive = false;
 }
 
 NetlistComparer::~NetlistComparer ()
@@ -2887,6 +2912,7 @@ NetlistComparer::unmatched_circuits (db::Netlist *a, db::Netlist *b, std::vector
 {
   //  we need to create a copy because this method is supposed to be const.
   db::CircuitCategorizer circuit_categorizer = *mp_circuit_categorizer;
+  circuit_categorizer.set_case_sensitive (m_case_sensitive);
 
   std::map<size_t, std::pair<std::vector<db::Circuit *>, std::vector<db::Circuit *> > > cat2circuits;
 
@@ -2928,10 +2954,15 @@ NetlistComparer::unmatched_circuits (db::Netlist *a, db::Netlist *b, std::vector
 bool
 NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 {
+  m_case_sensitive = combined_case_sensitive (a, b);
+
   //  we need to create a copy because this method is supposed to be const.
   db::CircuitCategorizer circuit_categorizer = *mp_circuit_categorizer;
   db::DeviceCategorizer device_categorizer = *mp_device_categorizer;
   db::CircuitPinMapper circuit_pin_mapper = *mp_circuit_pin_mapper;
+
+  circuit_categorizer.set_case_sensitive (m_case_sensitive);
+  device_categorizer.set_case_sensitive (m_case_sensitive);
 
   bool good = true;
 
@@ -3008,7 +3039,7 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 
   }
 
-  //  device whether to use a device category in strict mode
+  //  decide whether to use a device category in strict mode
 
   device_categorizer.clear_strict_device_categories ();
 
@@ -3745,14 +3776,14 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
   for (db::Circuit::const_pin_iterator p = c2->begin_pins (); p != c2->end_pins (); ++p) {
     const db::Net *net = c2->net_for_pin (p->id ());
     if (!net && !p->name ().empty ()) {
-      abstract_pins_by_name.insert (std::make_pair (normalize_name (p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.second = p.operator-> ();
+      abstract_pins_by_name.insert (std::make_pair (db::Netlist::normalize_name (m_case_sensitive, p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.second = p.operator-> ();
     }
   }
 
   for (db::Circuit::const_pin_iterator p = c1->begin_pins (); p != c1->end_pins (); ++p) {
     const db::Net *net = c1->net_for_pin (p->id ());
     if (!net && !p->name ().empty ()) {
-      abstract_pins_by_name.insert (std::make_pair (normalize_name (p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.first = p.operator-> ();
+      abstract_pins_by_name.insert (std::make_pair (db::Netlist::normalize_name (m_case_sensitive, p->name ()), std::make_pair ((const db::Pin *) 0, (const db::Pin *) 0))).first->second.first = p.operator-> ();
     }
   }
 

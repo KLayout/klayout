@@ -183,4 +183,76 @@ connect(metal2, metal2_labels)</pre>
   statements.
   </p>
 
+  <h2>Explicit connections</h2>
+
+  <p>
+  Explicit connections can be useful to enforce a connection in the layout 
+  which is made in the schematic, but not physically on the level of the cell.
+  For example consider the following layout for an inverter:
+  </p>
+
+  <p>
+  <img src="/manual/inv.png"/>
+  </p>
+
+  <p>
+  In the layout there are no tie-down diodes, hence there is no physical 
+  connection to the n-well region and no physical connection to the bulk
+  substrate. This saves space, but these diodes need to be added by other 
+  ways.
+  Usually this is done when the standard cells are combined into 
+  macros. Filler cells will be added which include these substrate and
+  well contacts.
+  </p>
+
+  <p>
+  On the inverter level however, there is no such connection. Therefore
+  the inverter has separate bulk and n-well pins. The schematic sometimes
+  is a simplified version which does not offer these pins. Hence there is
+  an intrinsic mismatch between layout and schematic.
+  </p>
+
+  <p>
+  <img src="/manual/inv_explicit.png"/>
+  </p>
+
+  <p>
+  To align layout and schematics, bulk and VSS pins can be connected
+  explicitly. Same for n-well and VDD.
+  There is a certain risk to forget making these connections later. 
+  But this risk can be mitigated by implementing DRC rules which
+  demand at least one tie-down diode for each isolated n-well island
+  or the bulk.
+  </p>
+
+  <p>
+  To establish an explicit connection, make sure that n-well and 
+  bulk have proper names. For the n-well this can be done by creating
+  labels on the n-well islands giving them a proper name - e.g. "NWELL".
+  The bulk isn't a real layout layer with polygons on it. Using "connect_global"
+  will both connect everthing on this layer and give it a name.
+  </p>
+
+  <p>
+  The following code will connect the bulk net with "VSS" inside the cell "INV":
+  </p>
+
+  <pre>connect_global(bulk, "BULK")
+...
+connect_explicit("INV", [ "BULK", "VSS" ])
+</pre>
+
+  <p>
+  The cell name can be a pattern. For example "INV*" will apply this rule on all 
+  cells starting with "INV".
+  The cell is not mandatory: if it is omitted, the rule is applied to top level only
+  to avoid introducing rules in subcells where they would mask layout errors.
+  </p>
+
+  <p>
+  An explicit connection will also imply implicit connections on the nets 
+  listed in the net names. So in the example above, different pieces of "VSS"
+  are connected even if they are not physically connected.
+  </p>
+
 </doc>

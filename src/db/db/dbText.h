@@ -688,7 +688,8 @@ public:
   text<C> &transform (const Tr &t)
   {
     typedef typename Tr::target_coord_type target_coord_type;
-    m_trans = simple_trans<target_coord_type> ((t.fp_trans () * m_trans.fp_trans ()).rot (), t (point_type () + m_trans.disp ()) - point<target_coord_type> ());
+    fixpoint_trans<coord_type> fp (t);
+    m_trans = simple_trans<target_coord_type> ((fp * m_trans.fp_trans ()).rot (), t (point_type () + m_trans.disp ()) - point<target_coord_type> ());
     m_size = t.ctrans (m_size);
     return *this;
   }
@@ -708,13 +709,14 @@ public:
   text<typename Tr::target_coord_type> transformed (const Tr &t) const
   {
     typedef typename Tr::target_coord_type target_coord_type;
+    fixpoint_trans<coord_type> fp (t);
     size_t p = (size_t) mp_ptr;
     if (p & 1) {
-      return text<target_coord_type> (reinterpret_cast<StringRef *> (p - 1), simple_trans<target_coord_type> ((t.fp_trans () * m_trans.fp_trans ()).rot (), t (point_type () + m_trans.disp ()) - point<target_coord_type> ()), t.ctrans (m_size), m_font, m_halign, m_valign);
+      return text<target_coord_type> (reinterpret_cast<StringRef *> (p - 1), simple_trans<target_coord_type> ((fp * m_trans.fp_trans ()).rot (), t (point_type () + m_trans.disp ()) - point<target_coord_type> ()), t.ctrans (m_size), m_font, m_halign, m_valign);
     } else if (mp_ptr) {
-      return text<target_coord_type> (mp_ptr, simple_trans<target_coord_type> ((t.fp_trans () * m_trans.fp_trans ()).rot (), t (point_type () + m_trans.disp ()) - point<target_coord_type> ()), t.ctrans (m_size), m_font, m_halign, m_valign);
+      return text<target_coord_type> (mp_ptr, simple_trans<target_coord_type> ((fp * m_trans.fp_trans ()).rot (), t (point_type () + m_trans.disp ()) - point<target_coord_type> ()), t.ctrans (m_size), m_font, m_halign, m_valign);
     } else {
-      return text<target_coord_type> (simple_trans<target_coord_type> ((t.fp_trans () * m_trans.fp_trans ()).rot (), t (point_type () + m_trans.disp ()) - point<target_coord_type> ()), t.ctrans (m_size), m_font, m_halign, m_valign);
+      return text<target_coord_type> (simple_trans<target_coord_type> ((fp * m_trans.fp_trans ()).rot (), t (point_type () + m_trans.disp ()) - point<target_coord_type> ()), t.ctrans (m_size), m_font, m_halign, m_valign);
     }
   }
 

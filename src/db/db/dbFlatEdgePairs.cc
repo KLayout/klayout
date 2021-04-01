@@ -32,7 +32,7 @@ namespace db
 //  FlatEdgePairs implementation
 
 FlatEdgePairs::FlatEdgePairs ()
-  : AsIfFlatEdgePairs (), mp_edge_pairs (new db::Shapes (false))
+  : MutableEdgePairs (), mp_edge_pairs (new db::Shapes (false))
 {
   //  .. nothing yet ..
 }
@@ -43,13 +43,13 @@ FlatEdgePairs::~FlatEdgePairs ()
 }
 
 FlatEdgePairs::FlatEdgePairs (const FlatEdgePairs &other)
-  : AsIfFlatEdgePairs (other), mp_edge_pairs (other.mp_edge_pairs)
+  : MutableEdgePairs (other), mp_edge_pairs (other.mp_edge_pairs)
 {
   //  .. nothing yet ..
 }
 
 FlatEdgePairs::FlatEdgePairs (const db::Shapes &edge_pairs)
-  : AsIfFlatEdgePairs (), mp_edge_pairs (new db::Shapes (edge_pairs))
+  : MutableEdgePairs (), mp_edge_pairs (new db::Shapes (edge_pairs))
 {
   //  .. nothing yet ..
 }
@@ -205,22 +205,10 @@ FlatEdgePairs::insert_into (Layout *layout, db::cell_index_type into_cell, unsig
 }
 
 void
-FlatEdgePairs::insert (const db::EdgePair &ep)
+FlatEdgePairs::do_insert (const db::EdgePair &ep)
 {
   mp_edge_pairs->insert (ep);
   invalidate_cache ();
-}
-
-void
-FlatEdgePairs::insert (const db::Shape &shape)
-{
-  if (shape.is_edge_pair ()) {
-
-    db::EdgePair ep;
-    shape.edge_pair (ep);
-    insert (ep);
-
-  }
 }
 
 }

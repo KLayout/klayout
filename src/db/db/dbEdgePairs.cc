@@ -93,20 +93,20 @@ EdgePairs::EdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss, con
 template <class Sh>
 void EdgePairs::insert (const Sh &shape)
 {
-  flat_edge_pairs ()->insert (shape);
+  mutable_edge_pairs ()->insert (shape);
 }
 
 template DB_PUBLIC void EdgePairs::insert (const db::EdgePair &);
 
 void EdgePairs::insert (const db::Shape &shape)
 {
-  flat_edge_pairs ()->insert (shape);
+  mutable_edge_pairs ()->insert (shape);
 }
 
 template <class T>
 void EdgePairs::insert (const db::Shape &shape, const T &trans)
 {
-  flat_edge_pairs ()->insert (shape, trans);
+  mutable_edge_pairs ()->insert (shape, trans);
 }
 
 template DB_PUBLIC void EdgePairs::insert (const db::Shape &, const db::ICplxTrans &);
@@ -120,13 +120,18 @@ void EdgePairs::clear ()
 
 void EdgePairs::reserve (size_t n)
 {
-  flat_edge_pairs ()->reserve (n);
+  mutable_edge_pairs ()->reserve (n);
+}
+
+void EdgePairs::flatten ()
+{
+  mutable_edge_pairs ()->flatten ();
 }
 
 template <class T>
 EdgePairs &EdgePairs::transform (const T &trans)
 {
-  flat_edge_pairs ()->transform (trans);
+  mutable_edge_pairs ()->transform (trans);
   return *this;
 }
 
@@ -183,9 +188,9 @@ void EdgePairs::set_delegate (EdgePairsDelegate *delegate)
   }
 }
 
-FlatEdgePairs *EdgePairs::flat_edge_pairs ()
+MutableEdgePairs *EdgePairs::mutable_edge_pairs ()
 {
-  FlatEdgePairs *edge_pairs = dynamic_cast<FlatEdgePairs *> (mp_delegate);
+  MutableEdgePairs *edge_pairs = dynamic_cast<MutableEdgePairs *> (mp_delegate);
   if (! edge_pairs) {
     edge_pairs = new FlatEdgePairs ();
     if (mp_delegate) {

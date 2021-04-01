@@ -114,13 +114,15 @@ netter.equivalent_pins("NAND2", 0, 1)
 </pre>
 </p><p>
 The circuit argument is either a circuit name (a string) or a Circuit object
-from the schematic netlist.
+from the schematic netlist. 
+</p><p>
+Names are case sensitive for layout-derived netlists and case-insensitive for SPICE schematic netlists.
 </p><p>
 The pin arguments are zero-based pin numbers, where 0 is the first number, 1 the second etc.
-If the netlist provides named pins, names can be used instead of numbers.
+If the netlist provides named pins, names can be used instead of numbers. Again, use upper
+case pin names for SPICE netlists.
 </p><p>
-Before this method can be used, a schematic netlist needs to be loaded with
-<a href="#schematic">schematic</a>.
+Use this method andwhere in the script before the <a href="#compare">compare</a> call.
 </p>
 <a name="join_symmetric_nets"/><h2>"join_symmetric_nets" - Joins symmetric nets of selected circuits on the extracted netlist</h2>
 <keyword name="join_symmetric_nets"/>
@@ -174,6 +176,12 @@ with inherent ambiguity such as decoders, the complexity
 can be increased at the expense of potentially larger runtimes.
 The runtime penality is roughly proportional to the branch
 complexity.
+</p><p>
+By default, the branch complexity is unlimited, but it may
+be reduced in order to limit the compare runtimes at the cost
+of a less elaborate compare attempt. The preferred solution 
+however is to use labels for net name hints which also reduces
+the depth.
 </p>
 <a name="max_depth"/><h2>"max_depth" - Configures the maximum search depth for net match deduction</h2>
 <keyword name="max_depth"/>
@@ -191,6 +199,12 @@ the next net. With higher values for the depth, the algorithm
 pursues this "deduction path" in greater depth while with 
 smaller values, the algorithm prefers picking nets in a random fashion
 as the seeds for this deduction path. The default value is 8. 
+</p><p>
+By default, the depth is unlimited, but it may
+be reduced in order to limit the compare runtimes at the cost
+of a less elaborate compare attempt. The preferred solution 
+however is to use labels for net name hints which also reduces
+the branch complexity.
 </p>
 <a name="max_res"/><h2>"max_res" - Ignores resistors with a resistance above a certain value</h2>
 <keyword name="max_res"/>
@@ -223,11 +237,13 @@ This method will force an equivalence between the two circuits.
 By default, circuits are identified by name. If names are different, this
 method allows establishing an explicit correspondence.
 </p><p>
+circuit_a is for the layout netlist, circuit_b for the schematic netlist.
+Names are case sensitive for layout-derived netlists and case-insensitive for SPICE schematic netlists.
+</p><p>
 One of the circuits may be nil. In this case, the corresponding
 other circuit is mapped to "nothing", i.e. ignored.
 </p><p>
-Before this method can be used, a schematic netlist needs to be loaded with
-<a href="#schematic">schematic</a>.
+Use this method andwhere in the script before the <a href="#compare">compare</a> call.
 </p>
 <a name="same_device_classes"/><h2>"same_device_classes" - Establishes an equivalence between the device classes</h2>
 <keyword name="same_device_classes"/>
@@ -243,6 +259,9 @@ method allows establishing an explicit correspondence.
 </p><p>
 Before this method can be used, a schematic netlist needs to be loaded with
 <a href="#schematic">schematic</a>.
+</p><p>
+class_a is for the layout netlist, class_b for the schematic netlist.
+Names are case sensitive for layout-derived netlists and case-insensitive for SPICE schematic netlists.
 </p><p>
 One of the device classes may be "nil". In this case, the corresponding
 other device class is mapped to "nothing", i.e. ignored.
@@ -260,7 +279,11 @@ schematic side.
 </p><p>
 Once a device class is mentioned with "same_device_classes", matching by
 name is disabled for this class. So after using 'same_device_classes("A", "B")'
-"A" is no longer equivalent to "A" on the other side.
+"A" is no longer equivalent to "A" on the other side. If you want "A" to 
+stay equivalent to "A" too, you need to use 'same_device_classes("A", "A")' 
+in addition.
+</p><p>
+Use this method andwhere in the script before the <a href="#compare">compare</a> call.
 </p>
 <a name="same_nets"/><h2>"same_nets" - Establishes an equivalence between the nets</h2>
 <keyword name="same_nets"/>
@@ -281,8 +304,10 @@ After using this function, the compare algorithm will consider these nets equiva
 Use this method to provide hints for the comparer in cases which are difficult to
 resolve otherwise.
 </p><p>
-Before this method can be used, a schematic netlist needs to be loaded with
-<a href="#schematic">schematic</a>.
+circuit_a and net_a are for the layout netlist, circuit_b and net_b for the schematic netlist.
+Names are case sensitive for layout-derived netlists and case-insensitive for SPICE schematic netlists.
+</p><p>
+Use this method andwhere in the script before the <a href="#compare">compare</a> call.
 </p>
 <a name="schematic"/><h2>"schematic" - Gets, sets or reads the reference netlist</h2>
 <keyword name="schematic"/>

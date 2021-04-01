@@ -46,7 +46,7 @@ matrix_2d<C>::to_string () const
 
 template <class C>
 std::pair<double, double>
-matrix_2d<C>::mag () const
+matrix_2d<C>::mag2 () const
 {
   double s1 = sqrt (m_m11 * m_m11 + m_m21 * m_m21);
   double s2 = sqrt (m_m12 * m_m12 + m_m22 * m_m22);
@@ -65,7 +65,7 @@ template <class C>
 double
 matrix_2d<C>::angle () const
 {
-  std::pair <double, double> m = mag ();
+  std::pair <double, double> m = mag2 ();
   double u1 = m.first;
   double u2 = is_mirror () ? -m.second : m.second;
   double n11 = m_m11 / u1;
@@ -98,7 +98,7 @@ template <class C>
 bool
 matrix_2d<C>::has_shear () const
 {
-  std::pair <double, double> m = mag ();
+  std::pair <double, double> m = mag2 ();
   double u1 = m.first;
   double u2 = is_mirror () ? -m.second : m.second;
   double n11 = m_m11 / u1;
@@ -114,7 +114,7 @@ template <class C>
 double
 matrix_2d<C>::shear_angle () const
 {
-  std::pair <double, double> m = mag ();
+  std::pair <double, double> m = mag2 ();
   double u1 = m.first;
   double u2 = is_mirror () ? -m.second : m.second;
   double n11 = m_m11 / u1;

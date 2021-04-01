@@ -33,7 +33,7 @@ namespace db
 //  FlatEdges implementation
 
 FlatEdges::FlatEdges ()
-  : AsIfFlatEdges (), mp_edges (new db::Shapes (false)), mp_merged_edges (new db::Shapes (false))
+  : MutableEdges (), mp_edges (new db::Shapes (false)), mp_merged_edges (new db::Shapes (false))
 {
   init ();
 }
@@ -44,7 +44,7 @@ FlatEdges::~FlatEdges ()
 }
 
 FlatEdges::FlatEdges (const FlatEdges &other)
-  : AsIfFlatEdges (other), mp_edges (other.mp_edges), mp_merged_edges (other.mp_merged_edges)
+  : MutableEdges (other), mp_edges (other.mp_edges), mp_merged_edges (other.mp_merged_edges)
 {
   init ();
 
@@ -53,7 +53,7 @@ FlatEdges::FlatEdges (const FlatEdges &other)
 }
 
 FlatEdges::FlatEdges (const db::Shapes &edges, bool is_merged)
-  : AsIfFlatEdges (), mp_edges (new db::Shapes (edges)), mp_merged_edges (new db::Shapes (false))
+  : MutableEdges (), mp_edges (new db::Shapes (edges)), mp_merged_edges (new db::Shapes (false))
 {
   init ();
 
@@ -61,7 +61,7 @@ FlatEdges::FlatEdges (const db::Shapes &edges, bool is_merged)
 }
 
 FlatEdges::FlatEdges (bool is_merged)
-  : AsIfFlatEdges (), mp_edges (new db::Shapes (false)), mp_merged_edges (new db::Shapes (false))
+  : MutableEdges (), mp_edges (new db::Shapes (false)), mp_merged_edges (new db::Shapes (false))
 {
   init ();
 
@@ -320,69 +320,7 @@ const db::RecursiveShapeIterator *FlatEdges::iter () const
 }
 
 void
-FlatEdges::insert (const db::Box &box)
-{
-  if (! box.empty () && box.width () > 0 && box.height () > 0) {
-
-    bool was_empty = empty ();
-
-    db::Shapes &e = *mp_edges;
-    e.insert (db::Edge (box.lower_left (), box.upper_left ()));
-    e.insert (db::Edge (box.upper_left (), box.upper_right ()));
-    e.insert (db::Edge (box.upper_right (), box.lower_right ()));
-    e.insert (db::Edge (box.lower_right (), box.lower_left ()));
-
-    if (was_empty) {
-
-      m_is_merged = true;
-      update_bbox (box);
-
-    } else {
-
-      m_is_merged = false;
-      invalidate_cache ();
-
-    }
-
-  }
-}
-
-void
-FlatEdges::insert (const db::Path &path)
-{
-  if (path.points () > 0) {
-    insert (path.polygon ());
-  }
-}
-
-void
-FlatEdges::insert (const db::Polygon &polygon)
-{
-  if (polygon.holes () > 0 || polygon.vertices () > 0) {
-    db::Shapes &edges = *mp_edges;
-    for (db::Polygon::polygon_edge_iterator e = polygon.begin_edge (); ! e.at_end (); ++e) {
-      edges.insert (*e);
-    }
-    m_is_merged = false;
-    invalidate_cache ();
-  }
-}
-
-void
-FlatEdges::insert (const db::SimplePolygon &polygon)
-{
-  if (polygon.vertices () > 0) {
-    db::Shapes &edges = *mp_edges;
-    for (db::SimplePolygon::polygon_edge_iterator e = polygon.begin_edge (); ! e.at_end (); ++e) {
-      edges.insert (*e);
-    }
-    m_is_merged = false;
-    invalidate_cache ();
-  }
-}
-
-void
-FlatEdges::insert (const db::Edge &edge)
+FlatEdges::do_insert (const db::Edge &edge)
 {
   if (! empty ()) {
     m_is_merged = false;
@@ -390,24 +328,6 @@ FlatEdges::insert (const db::Edge &edge)
 
   mp_edges->insert (edge);
   invalidate_cache ();
-}
-
-void
-FlatEdges::insert (const db::Shape &shape)
-{
-  if (shape.is_polygon () || shape.is_path () || shape.is_box ()) {
-
-    db::Polygon poly;
-    shape.polygon (poly);
-    insert (poly);
-
-  } else if (shape.is_edge ()) {
-
-    db::Edge edge;
-    shape.edge (edge);
-    insert (edge);
-
-  }
 }
 
 }

@@ -170,22 +170,22 @@ D25TechnologyComponent::D25TechnologyComponent ()
 D25TechnologyComponent::D25TechnologyComponent (const D25TechnologyComponent &d)
   : db::TechnologyComponent (d25_component_name (), d25_description ())
 {
-  m_layers = d.m_layers;
   m_src = d.m_src;
 }
 
-void
-D25TechnologyComponent::compile_from_source (const std::string &src)
+D25TechnologyComponent::layers_type
+D25TechnologyComponent::compile_from_source () const
 {
+  layers_type layers;
+
   int current_line = 0;
-  m_layers.clear ();
 
   try {
 
     tl::Eval eval;
     std::vector<bool> conditional_stack;
 
-    std::vector<std::string> lines = tl::split (src, "\n");
+    std::vector<std::string> lines = tl::split (m_src, "\n");
     for (std::vector<std::string>::const_iterator l = lines.begin (); l != lines.end (); ++l) {
 
       ++current_line;
@@ -254,12 +254,28 @@ D25TechnologyComponent::compile_from_source (const std::string &src)
 
         ex.expect_end ();
 
+      } else if (ex.test ("print")) {
+
+        tl::Expression x;
+        eval.parse (x, ex);
+        ex.expect_end ();
+
+        tl::info << x.execute ().to_string ();
+
+      } else if (ex.test ("error")) {
+
+        tl::Expression x;
+        eval.parse (x, ex);
+        ex.expect_end ();
+
+        throw tl::Exception (x.execute ().to_string ());
+
       } else {
 
         db::D25LayerInfo info;
-        if (! m_layers.empty ()) {
-          info.set_zstart (m_layers.back ().zstop ());
-          info.set_zstop (m_layers.back ().zstop ());
+        if (! layers.empty ()) {
+          info.set_zstart (layers.back ().zstop ());
+          info.set_zstop (layers.back ().zstop ());
         }
 
         tl::Variant z0, z1, h;
@@ -308,7 +324,7 @@ D25TechnologyComponent::compile_from_source (const std::string &src)
         if (args.size () == 0) {
           if (z0.is_nil () && z1.is_nil ()) {
             if (! h.is_nil ()) {
-              info.set_zstop (info.zstart () + h.to_double ());
+              info.set_zstop (info.zstop () + h.to_double ());
             }
           } else if (z0.is_nil ()) {
             info.set_zstop (z1.to_double ());
@@ -356,6 +372,8 @@ D25TechnologyComponent::compile_from_source (const std::string &src)
           throw tl::Exception (tl::to_string (tr ("Too many parameters (max 2)")));
         }
 
+        layers.push_back (info);
+
       }
 
     }
@@ -368,15 +386,16 @@ D25TechnologyComponent::compile_from_source (const std::string &src)
     throw tl::Exception (ex.msg () + tl::sprintf (tl::to_string (tr (" in line %d")), current_line));
   }
 
-  m_src = src;
+  return layers;
 }
 
 std::string
 D25TechnologyComponent::to_string () const
 {
+  layers_type layers = compile_from_source ();
   std::string res;
 
-  for (const_iterator i = begin (); i != end (); ++i) {
+  for (layers_type::const_iterator i = layers.begin (); i != layers.end (); ++i) {
     if (! res.empty ()) {
       res += "\n";
     }
@@ -407,11 +426,6 @@ public:
   virtual tl::XMLElementBase *xml_element () const
   {
     return new db::TechnologyComponentXMLElement<D25TechnologyComponent> (d25_component_name (),
-      tl::make_element ((D25TechnologyComponent::const_iterator (D25TechnologyComponent::*) () const) &D25TechnologyComponent::begin, (D25TechnologyComponent::const_iterator (D25TechnologyComponent::*) () const) &D25TechnologyComponent::end, &D25TechnologyComponent::add, "layer",
-        tl::make_member (&D25LayerInfo::layer_as_string, &D25LayerInfo::set_layer_from_string, "layer") +
-        tl::make_member (&D25LayerInfo::zstart, &D25LayerInfo::set_zstart, "zstart") +
-        tl::make_member (&D25LayerInfo::zstop, &D25LayerInfo::set_zstop, "zstop")
-      ) +
       tl::make_member (&D25TechnologyComponent::src, &D25TechnologyComponent::set_src, "src")
     );
   }

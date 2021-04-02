@@ -72,7 +72,13 @@ D25TechnologyComponentEditor::commit ()
   }
 
   std::string src = tl::to_string (src_te->toPlainText ());
-  data->compile_from_source (src);
+
+  //  test-compile before setting it
+  db::D25TechnologyComponent tc;
+  tc.set_src (src);
+  tc.compile_from_source ();
+
+  data->set_src (src);
 }
 
 void

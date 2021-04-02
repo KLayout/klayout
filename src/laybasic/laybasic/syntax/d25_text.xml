@@ -24,6 +24,8 @@
 				<RegExpr attribute="Normal" String="\s*" context="#stay"/>
 
 				<StringDetect attribute="Symbol" String="var" context="Expect Assignment"/>
+				<StringDetect attribute="Symbol" String="print" context="Expression"/>
+				<StringDetect attribute="Symbol" String="error" context="Expression"/>
 				<StringDetect attribute="Symbol" String="if" context="Expression"/>
 				<StringDetect attribute="Symbol" String="elsif" context="Expression"/>
 				<StringDetect attribute="Symbol" String="else" context="Expect Lineend"/>

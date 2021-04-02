@@ -418,17 +418,17 @@ namespace {
 
     const db::D25LayerInfo *operator() (lay::LayoutView *view, int cv_index, int layer_index)
     {
-      std::map<int, std::map<int, const db::D25LayerInfo *> >::const_iterator c = m_cache.find (cv_index);
+      std::map<int, std::map<int, db::D25LayerInfo> >::const_iterator c = m_cache.find (cv_index);
       if (c != m_cache.end ()) {
-        std::map<int, const db::D25LayerInfo *>::const_iterator l = c->second.find (layer_index);
+        std::map<int, db::D25LayerInfo>::const_iterator l = c->second.find (layer_index);
         if (l != c->second.end ()) {
-          return l->second;
+          return &l->second;
         } else {
           return 0;
         }
       }
 
-      std::map<int, const db::D25LayerInfo *> &lcache = m_cache [cv_index];
+      std::map<int, db::D25LayerInfo> &lcache = m_cache [cv_index];
 
       const db::D25TechnologyComponent *comp = 0;
 
@@ -440,16 +440,18 @@ namespace {
 
       if (comp) {
 
-        std::map<db::LayerProperties, const db::D25LayerInfo *, db::LPLogicalLessFunc> zi_by_lp;
-        for (db::D25TechnologyComponent::const_iterator i = comp->begin (); i != comp->end (); ++i) {
-          zi_by_lp.insert (std::make_pair (i->layer (), i.operator-> ()));
+        std::map<db::LayerProperties, db::D25LayerInfo, db::LPLogicalLessFunc> zi_by_lp;
+
+        db::D25TechnologyComponent::layers_type layers = comp->compile_from_source ();
+        for (db::D25TechnologyComponent::layers_type::const_iterator i = layers.begin (); i != layers.end (); ++i) {
+          zi_by_lp.insert (std::make_pair (i->layer (), *i));
         }
 
         const db::Layout &ly = cv->layout ();
         for (int l = 0; l < int (ly.layers ()); ++l) {
           if (ly.is_valid_layer (l)) {
             const db::LayerProperties &lp = ly.get_properties (l);
-            std::map<db::LayerProperties, const db::D25LayerInfo *, db::LPLogicalLessFunc>::const_iterator z = zi_by_lp.find (lp);
+            std::map<db::LayerProperties, db::D25LayerInfo, db::LPLogicalLessFunc>::const_iterator z = zi_by_lp.find (lp);
             if (z == zi_by_lp.end () && ! lp.name.empty ()) {
               //  If possible, try by name only
               z = zi_by_lp.find (db::LayerProperties (lp.name));
@@ -468,7 +470,7 @@ namespace {
 
 
   private:
-    std::map<int, std::map<int, const db::D25LayerInfo *> > m_cache;
+    std::map<int, std::map<int, db::D25LayerInfo> > m_cache;
   };
 
 }

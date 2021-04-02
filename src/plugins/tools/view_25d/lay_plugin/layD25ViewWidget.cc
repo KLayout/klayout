@@ -256,7 +256,7 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
       t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
       QVector3D cd = t.inverted ().map (QVector3D (0, 0, cam_dist ()));
 
-      m_displacement += (d / m_scale_factor) * cd;
+      m_displacement += d * cd;
 
     } else {
 
@@ -277,8 +277,65 @@ void
 D25ViewWidget::keyPressEvent (QKeyEvent *event)
 {
   if (event->key () == Qt::Key_Shift) {
+
     mp_mode.reset (0);
     set_top_view (true);
+
+  } else if (event->key () == Qt::Key_Up || event->key () == Qt::Key_Down) {
+
+    if (! top_view () && (event->modifiers () & Qt::ControlModifier) != 0) {
+
+      //  Ctrl + up/down changes elevation
+
+      double d = (event->key () == Qt::Key_Up ? 2 : -2);
+
+      set_cam_elevation (std::max (-90.0, std::min (90.0, cam_elevation () + d)));
+
+    } else {
+
+      //  Move "into" or "out"
+
+      double d = (event->key () == Qt::Key_Up ? 0.1 : -0.1);
+
+      QMatrix4x4 t;
+      t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
+      QVector3D cd = t.inverted ().map (QVector3D (0, 0, cam_dist ()));
+
+      set_displacement (displacement () + d * cd);
+
+    }
+
+  } else if (event->key () == Qt::Key_Left || event->key () == Qt::Key_Right) {
+
+    if (! top_view () && (event->modifiers () & Qt::ControlModifier) != 0) {
+
+      //  Ctrl + left/right changes azumith
+
+      double d = (event->key () == Qt::Key_Right ? 2 : -2);
+
+      double a = cam_azimuth () + d;
+      if (a < -180.0) {
+        a += 360.0;
+      } else if (a > 180.0) {
+        a -= 360.0;
+      }
+
+      set_cam_azimuth (a);
+
+    } else {
+
+      //  Move "left" and "right"
+
+      double d = (event->key () == Qt::Key_Left ? 0.1 : -0.1);
+
+      QMatrix4x4 t;
+      t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
+      QVector3D cd = t.inverted ().map (QVector3D (cam_dist (), 0, 0));
+
+      set_displacement (displacement () + d * cd);
+
+    }
+
   }
 }
 
@@ -940,9 +997,12 @@ D25ViewWidget::paintGL ()
 
   vertexes.add (-0.25 * compass_rad, 0.0, 0.6 * compass_rad);
   vertexes.add (0.0, 0.0, -0.8 * compass_rad);
+  vertexes.add (0.0, 0.0, -0.8 * compass_rad);
   vertexes.add (0.25 * compass_rad, 0.0, 0.6 * compass_rad);
+  vertexes.add (0.25 * compass_rad, 0.0, 0.6 * compass_rad);
+  vertexes.add (-0.25 * compass_rad, 0.0, 0.6 * compass_rad);
 
-  vertexes.draw_to (this, positions, GL_TRIANGLES);
+  vertexes.draw_to (this, positions, GL_LINES);
 
   //  draw base plane
 

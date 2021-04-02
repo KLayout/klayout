@@ -5,13 +5,33 @@
 
 	<highlighting>
 
+    <list name="Control Keywords">
+      <item> zstart </item>
+      <item> zstop </item>
+      <item> height </item>
+    </list>
+
+    <list name="Expression Keywords">
+      <item> true </item>
+      <item> false </item>
+      <item> nil </item>
+    </list>
+
 		<contexts>
 
-			<context name="Normal" attribute="Normal Text">
+			<context name="Normal" attribute="Normal Text" fallthrough="true" fallthroughContext="Error" lineEndContext="Normal">
+
+				<RegExpr attribute="Normal" String="\s*" context="#stay"/>
+
+				<StringDetect attribute="Symbol" String="var" context="Expect Assignment"/>
+				<StringDetect attribute="Symbol" String="if" context="Expression"/>
+				<StringDetect attribute="Symbol" String="elsif" context="Expression"/>
+				<StringDetect attribute="Symbol" String="else" context="Expect Lineend"/>
+				<StringDetect attribute="Symbol" String="end" context="Expect Lineend"/>
 
 				<DetectChar attribute="String" char="&quot;" context="Quoted String"/>
+				<DetectChar attribute="String" char="'" context="Apostrophed String"/>
 				<DetectChar attribute="Comment" char="#" context="Comment"/>
-				<DetectChar attribute="Raw String" char="'" context="Apostrophed String"/>
 
 				<RegExpr attribute="Normal" String=":" context="After LD"/>
 
@@ -22,22 +42,52 @@
 				<DetectChar attribute="Normal" char="/" context="#stay"/>
 				<RegExpr attribute="Raw String" String="[_a-zA-Z]\w*" context="#stay"/>
 
-				<RegExpr attribute="Error" String="[^\s]" context="Error"/>
-
 			</context>
 
 			<context name="Comment" attribute="Comment" lineEndContext="Normal">
       </context>
 
-			<context name="After LD" attribute="Normal" lineEndContext="Normal">
+			<context name="Expect Lineend" attribute="Normal" lineEndContext="Normal" fallthrough="true" fallthroughContext="Error">
+				<RegExpr attribute="Normal" String="\s*" context="#stay"/>
 				<DetectChar attribute="Comment" char="#" context="Comment"/>
+      </context>
+
+      <context name="Expression" fallthrough="true" fallthroughContext="Error" lineEndContext="Normal">
+
+				<RegExpr attribute="Normal" String="\s*" context="#stay"/>
+				<DetectChar attribute="Comment" char="#" context="Comment"/>
+
+        <keyword attribute="Symbol" String="Expression Keywords" context="#stay"/>
+        <keyword attribute="Symbol" String="Control Keywords" context="Expect Expression"/>
+
+				<DetectChar attribute="String" char="&quot;" context="Quoted String"/>
+				<DetectChar attribute="String" char="'" context="Apostrophed String"/>
+				<RegExpr attribute="Name" String="[_a-zA-Z]\w*" context="#stay"/>
 				<RegExpr attribute="Float" String="\-?[0-9]([0-9]|_[0-9])*(\.[0-9]([0-9]|_[0-9])*)?([eE]\-?[1-9]([0-9]|_[0-9])*(\.[0-9]*)?)?" context="#stay"/>
+
 				<DetectChar attribute="Normal" char="," context="#stay"/>
-				<DetectChar attribute="Normal" char="=" context="#stay"/>
-				<StringDetect attribute="Symbol" String="zstart" context="#stay"/>
-				<StringDetect attribute="Symbol" String="zstop" context="#stay"/>
-				<StringDetect attribute="Symbol" String="height" context="#stay"/>
-				<RegExpr attribute="Error" String="[^\s]" context="Error"/>
+				<DetectChar attribute="Normal" char="(" context="#stay"/>
+				<DetectChar attribute="Normal" char=")" context="#stay"/>
+				<DetectChar attribute="Normal" char="[" context="#stay"/>
+				<DetectChar attribute="Normal" char="]" context="#stay"/>
+
+				<RegExpr attribute="Normal" String="[\^\*\.\+\-%/!=&lt;&gt;&amp;|,\?:]" context="#stay"/>
+
+      </context>
+
+      <context name="Expect Expression" attribute="Normal" lineEndContext="Error" fallthrough="true" fallthroughContext="Error">
+				<RegExpr attribute="Normal" String="\s*" context="#stay"/>
+				<DetectChar attribute="Normal" char="=" context="Expression"/>
+      </context>
+
+      <context name="Expect Assignment" attribute="Normal" lineEndContext="Error" fallthrough="true" fallthroughContext="Error">
+				<RegExpr attribute="Normal" String="\s*" context="#stay"/>
+				<RegExpr attribute="Name" String="[_a-zA-Z]\w*" context="Expect Expression"/>
+      </context>
+
+			<context name="After LD" attribute="Normal" lineEndContext="Error" fallthrough="true" fallthroughContext="Expression">
+				<RegExpr attribute="Normal" String="\s*" context="#stay"/>
+				<DetectChar attribute="Comment" char="#" context="Error"/>
       </context>
 
 			<context name="Error" attribute="Error" lineEndContext="Normal">
@@ -46,19 +96,21 @@
 			<context name="Quoted String" attribute="String" lineEndContext="Error">
 				<StringDetect attribute="String" String="\\" context="#stay"/>
 				<RegExpr attribute="String" String="\\\&quot;" context="#stay"/>
-				<DetectChar char="&quot;" attribute="String" context="Normal"/>
+				<DetectChar char="&quot;" attribute="String" context="#pop"/>
 			</context>
 
 			<context name="Apostrophed String" attribute="Raw String" lineEndContext="Error">
 				<StringDetect attribute="String" String="\\" context="#stay"/>
 				<RegExpr attribute="String" String="\\\'" context="#stay"/>
-				<DetectChar char="'" attribute="Raw String" context="Normal"/>
+				<DetectChar char="'" attribute="Raw String" context="#pop"/>
 			</context>
 
     </contexts>
 
 		<itemDatas>
+
 			<itemData name="Normal Text" defStyleNum="dsNormal"/>
+			<itemData name="Name" defStyleNum="dsNormal"/>
 
 			<itemData name="Comment" defStyleNum="dsComment"/>
 			<itemData name="Float" defStyleNum="dsFloat"/>
@@ -73,4 +125,12 @@
 		</itemDatas>
 
 	</highlighting>
+
+	<general>
+		<comments>
+			<comment name="singleLine" start="#"/>
+		</comments>
+		<keywords casesensitive="1" weakDeliminator="!?"/>
+	</general>
+
 </language>

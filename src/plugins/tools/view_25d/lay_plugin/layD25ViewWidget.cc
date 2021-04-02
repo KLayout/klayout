@@ -246,40 +246,23 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
 
   } else {
 
-    //  compute vector of line of sight
-    std::pair<QVector3D, QVector3D> ray = camera_normal (cam_perspective () * cam_trans (), px, py);
-
-    //  by definition the ray goes through the camera position
-    QVector3D hp = hit_point_with_scene (ray.second);
+    double d = event->angleDelta ().y () * (1.0 / (90 * 16));
 
     if (! (event->modifiers () & Qt::ControlModifier)) {
 
-      //  No Ctrl is closeup
+      //  No Ctrl is "move horizontally along the azimuth axis"
 
-      double f = event->angleDelta ().y () * (1.0 / (90 * 8));
-      m_displacement += -((f / m_scale_factor) * std::min (cam_dist (), double ((cam_position () - hp).length ()))) * ray.second;
+      QMatrix4x4 t;
+      t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
+      QVector3D cd = t.inverted ().map (QVector3D (0, 0, cam_dist ()));
+
+      m_displacement += (d / m_scale_factor) * cd;
 
     } else {
 
       //  "Ctrl" is zoom
 
-      double f = exp (event->angleDelta ().y () * (1.0 / (90 * 8)));
-
-      QVector3D initial_displacement = m_displacement;
-      QVector3D displacement = m_displacement;
-
-      m_scale_factor *= f;
-      displacement += hp * (1.0 - f) / m_scale_factor;
-
-      //  normalize the scene translation so the scene does not "flee"
-
-      QMatrix4x4 ct = cam_trans ();
-      initial_displacement = ct.map (initial_displacement);
-      displacement = ct.map (displacement);
-
-      lay::normalize_scene_trans (cam_perspective (), displacement, m_scale_factor, initial_displacement.z ());
-
-      m_displacement = ct.inverted ().map (displacement);
+      m_scale_factor *= exp (d);
 
       emit scale_factor_changed (m_scale_factor);
 

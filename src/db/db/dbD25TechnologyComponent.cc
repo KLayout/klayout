@@ -119,6 +119,7 @@ D25TechnologyComponent::D25TechnologyComponent ()
   //  provide some explanation for the initialization
   m_src =
     "# Provide z stack information here\n"
+    "#\n"
     "# Each line is one layer. The specification consists of a layer specification, a colon and arguments.\n"
     "# The arguments are named (like \"x=...\") or in serial. Parameters are separated by comma or blanks.\n"
     "# Named arguments are:\n"
@@ -127,7 +128,7 @@ D25TechnologyComponent::D25TechnologyComponent ()
     "#   zstop    The upper z position of the extruded layer in µm\n"
     "#   height   The height of the extruded layer in µm\n"
     "#\n"
-    "# 'height', 'zstart' and 'zstop' can be used in any combination. If no value is given for 'zstart', "
+    "# 'height', 'zstart' and 'zstop' can be used in any combination. If no value is given for 'zstart',\n"
     "# the upper level of the previous layer will be used.\n"
     "#\n"
     "# If a single unnamed parameter is given, it corresponds to 'height'. Two parameters correspond to\n"
@@ -139,6 +140,30 @@ D25TechnologyComponent::D25TechnologyComponent ()
     "#   1: zstop=1.5, zstart=0.5      # same with named parameters\n"
     "#   1: height=1.0, zstop=1.5      # same with z stop minus height\n"
     "#   1: 1.0 zstop=1.5              # same with height as unnamed parameter\n"
+    "#\n"
+    "# VARIABLES\n"
+    "#\n"
+    "# You can declare variables with:\n"
+    "#   var name = value\n"
+    "#\n"
+    "# You can use variables inside numeric expressions.\n"
+    "# Example:\n"
+    "#   var hmetal = 0.48\n"
+    "#   7/0: 0.5 0.5+hmetal*2        # 2x thick metal\n"
+    "#\n"
+    "# You cannot use variables inside layer specifications currently.\n"
+    "#\n"
+    "# CONDITIONALS\n"
+    "#\n"
+    "# You can enable or disable branches of the table using 'if', 'else', 'elseif' and 'end':\n"
+    "# Example:\n"
+    "#   var thick_m1 = true\n"
+    "#   if thickm1\n"
+    "#     1: 0.5 1.5\n"
+    "#   else\n"
+    "#     1: 0.5 1.2\n"
+    "#   end\n"
+    "\n"
   ;
 }
 
@@ -157,6 +182,9 @@ D25TechnologyComponent::compile_from_source (const std::string &src)
 
   try {
 
+    tl::Eval eval;
+    std::vector<bool> conditional_stack;
+
     std::vector<std::string> lines = tl::split (src, "\n");
     for (std::vector<std::string>::const_iterator l = lines.begin (); l != lines.end (); ++l) {
 
@@ -168,6 +196,64 @@ D25TechnologyComponent::compile_from_source (const std::string &src)
         //  ignore comments
       } else if (ex.at_end ()) {
         //  ignore empty lines
+
+      } else if (ex.test ("if")) {
+
+        tl::Expression x;
+        eval.parse (x, ex);
+        conditional_stack.push_back (x.execute ().to_bool ());
+
+        ex.expect_end ();
+
+      } else if (ex.test ("else")) {
+
+        if (conditional_stack.empty ()) {
+          throw tl::Exception (tl::to_string (tr ("'else' without 'if'")));
+        }
+
+        conditional_stack.back () = ! conditional_stack.back ();
+
+        ex.expect_end ();
+
+      } else if (ex.test ("end")) {
+
+        if (conditional_stack.empty ()) {
+          throw tl::Exception (tl::to_string (tr ("'end' without 'if'")));
+        }
+
+        conditional_stack.pop_back ();
+
+        ex.expect_end ();
+
+      } else if (ex.test ("elsif")) {
+
+        if (conditional_stack.empty ()) {
+          throw tl::Exception (tl::to_string (tr ("'elsif' without 'if'")));
+        }
+
+        tl::Expression x;
+        eval.parse (x, ex);
+        conditional_stack.back () = x.execute ().to_bool ();
+
+        ex.expect_end ();
+
+      } else if (! conditional_stack.empty () && ! conditional_stack.back ()) {
+
+        continue;
+
+      } else if (ex.test ("var")) {
+
+        std::string n;
+        ex.read_name (n);
+
+        ex.expect ("=");
+
+        tl::Expression x;
+        eval.parse (x, ex);
+        eval.set_var (n, x.execute ());
+
+        ex.expect_end ();
+
       } else {
 
         db::D25LayerInfo info;
@@ -191,15 +277,17 @@ D25TechnologyComponent::compile_from_source (const std::string &src)
             break;
           }
 
-          double pv = 0.0;
+          tl::Expression pvx;
 
           std::string pn;
           if (ex.try_read_name (pn)) {
             ex.expect ("=");
-            ex.read (pv);
+            eval.parse (pvx, ex);
           } else {
-            ex.read (pv);
+            eval.parse (pvx, ex);
           }
+
+          double pv = pvx.execute ().to_double ();
 
           ex.test (",");
 
@@ -239,28 +327,28 @@ D25TechnologyComponent::compile_from_source (const std::string &src)
         } else if (args.size () == 1) {
           if (! h.is_nil ()) {
             if (! z0.is_nil ()) {
-              throw tl::Exception (tl::to_string (tr ("Rundundant parameters: zstart already given")));
+              throw tl::Exception (tl::to_string (tr ("Redundant parameters: zstart already given")));
             }
             if (! z1.is_nil ()) {
-              throw tl::Exception (tl::to_string (tr ("Rundundant parameters: zstop implicitly given")));
+              throw tl::Exception (tl::to_string (tr ("Redundant parameters: zstop implicitly given")));
             }
             info.set_zstart (args[0]);
             info.set_zstop (args[0] + h.to_double ());
           } else {
             if (! z1.is_nil ()) {
-              throw tl::Exception (tl::to_string (tr ("Rundundant parameters: zstop implicitly given")));
+              throw tl::Exception (tl::to_string (tr ("Redundant parameters: zstop implicitly given")));
             }
             info.set_zstop ((! z0.is_nil () ? z0.to_double () : info.zstart ()) + args[0]);
           }
         } else if (args.size () == 2) {
           if (! z0.is_nil ()) {
-            throw tl::Exception (tl::to_string (tr ("Rundundant parameters: zstart already given")));
+            throw tl::Exception (tl::to_string (tr ("Redundant parameters: zstart already given")));
           }
           if (! z1.is_nil ()) {
-            throw tl::Exception (tl::to_string (tr ("Rundundant parameters: zstop already given")));
+            throw tl::Exception (tl::to_string (tr ("Redundant parameters: zstop already given")));
           }
           if (! h.is_nil ()) {
-            throw tl::Exception (tl::to_string (tr ("Rundundant parameters: height implicitly given")));
+            throw tl::Exception (tl::to_string (tr ("Redundant parameters: height implicitly given")));
           }
           info.set_zstart (args[0]);
           info.set_zstop (args[1]);
@@ -268,10 +356,12 @@ D25TechnologyComponent::compile_from_source (const std::string &src)
           throw tl::Exception (tl::to_string (tr ("Too many parameters (max 2)")));
         }
 
-        m_layers.push_back (info);
-
       }
 
+    }
+
+    if (! conditional_stack.empty ()) {
+      throw tl::Exception (tl::to_string (tr ("'if', 'else' or 'elsif' without matching 'end'")));
     }
 
   } catch (tl::Exception &ex) {

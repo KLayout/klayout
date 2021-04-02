@@ -1074,8 +1074,8 @@ D25ViewWidget::paintGL ()
 
     glDisable (GL_DEPTH_TEST);
 
-    int cube_size = 64;
-    int cube_margin = 20;
+    int cube_size = 32;
+    int cube_margin = 40;
 
     QMatrix4x4 into_top_right_corner;
     into_top_right_corner.translate (1.0 - 2.0 / width () * (cube_margin + cube_size / 2), 1.0 - 2.0 / height () * (cube_margin + cube_size / 2));

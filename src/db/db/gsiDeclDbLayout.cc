@@ -1349,11 +1349,13 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "This method is provided to ensure this explicitly. This can be useful while using \\start_changes and \\end_changes to wrap a performance-critical operation. "
     "See \\start_changes for more details."
   ) +
-  gsi::method ("cleanup", &db::Layout::cleanup,
+  gsi::method ("cleanup", &db::Layout::cleanup, gsi::arg ("cell_indexes_to_keep", std::set<db::cell_index_type> (), "[]"),
     "@brief Cleans up the layout\n"
     "This method will remove proxy objects that are no longer in use. After changing PCell parameters such "
-    "proxy objects may still be present in the layout and are cached for later reuse. Usually they are cleaned up automatically occasionally, "
+    "proxy objects may still be present in the layout and are cached for later reuse. Usually they are cleaned up automatically, "
     "but in a scripting context it may be useful to clean up these cells explicitly.\n"
+    "\n"
+    "Use 'cell_indexes_to_keep' for specifying a list of cell indexes of PCell variants or library proxies you don't want to be cleaned up.\n"
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +

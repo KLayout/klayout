@@ -118,6 +118,6 @@ fill_region (db::Cell *cell, const db::Region &fp, db::cell_index_type fill_cell
 DB_PUBLIC void
 fill_region_repeat (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index,
                     const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step,
-                    const db::Vector &fill_margin, db::Region *remaining_polygons = 0, const db::Point &origin = db::Point (), const db::Box &glue_box = db::Box ());
+                    const db::Vector &fill_margin, db::Region *remaining_polygons = 0, const db::Box &glue_box = db::Box ());
 
 }

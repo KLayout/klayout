@@ -259,6 +259,10 @@ module DRC
       DRCFillOrigin::new
     end
 
+    def multi_origin
+      DRCFillOrigin::new(nil, nil, true)
+    end
+
     def origin(x, y)
       DRCFillOrigin::new(x, y)
     end

@@ -835,9 +835,9 @@ Class<lay::LayerProperties> decl_LayerProperties ("lay", "LayerProperties",
     "If the layer index is positive, the shapes drawn are taken from this layer rather than "
     "searched for by layer and datatype. This property is stronger than the layer/datatype or "
     "name specification.\n\n"
-    "The similar method \\layer_index "
-    "returns the actual layer index used, not the given one. The latter may be negative indicating "
-    "that layer/datatype or name specifications are used.\n\n"
+    "A different method is \\layer_index which indicates the ID of the layer actually used. "
+    "While \"source_layer_index\" is one of several ways to address the layer drawn, \"layer_index\" is the ID (index) "
+    "of the layer matching the source specification and is >= 0 if such a layer is found.\n\n"
     "If \"real\" is true, the effective value is returned."
   ) +
   method_ext ("source_layer_index", &get_layer_index_1, 

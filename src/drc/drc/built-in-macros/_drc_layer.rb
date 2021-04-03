@@ -4251,7 +4251,9 @@ CODE
     # @li @b origin(x, y) @/b: specifies a fixed point to align the pattern with. This point specifies the location
     #     of the reference point for one pattern cell. @/li
     # @li @b auto_origin @/b: lets the algorithm choose the origin. This may result is a slightly better fill coverage
-    #     as the algorithm is able to determine a pattern origin per fill island. @/li
+    #     as the algorithm is able to determine a pattern origin per island to fill. @/li
+    # @li @b multi_origin @/b: lets the algorithm choose the origin and repeats the fill with different origins
+    #     until no further fill cell can be fitted. @/li
     # @li @b fill_pattern(..) @/b: specifies the fill pattern. @/li
     # @/ul
     #
@@ -4355,6 +4357,7 @@ CODE
       column_step = nil
       pattern = nil
       origin = RBA::DPoint::new
+      repeat = false
 
       args.each_with_index do |a,ai|
         if a.is_a?(DRCSource)
@@ -4381,6 +4384,7 @@ CODE
           end
         elsif a.is_a?(DRCFillOrigin)
           origin = a.origin
+          repeat = a.repeat
         else
           raise("Argument ##{ai+1} not understood for '#{m}'")
         end
@@ -4435,31 +4439,22 @@ CODE
         tp.var("cs", cs)
         tp.var("origin", origin)
         tp.var("fc_index", fc_index)
+        tp.var("repeat", repeat)
+        tp.var("with_left", with_left)
 
-        if with_left
-          tp.queue(<<"END")
-            var tc_box = _frame.bbox;
-            var tile_box = _tile ? (tc_box & _tile.bbox) : tc_box;
-            !tile_box.empty && (
-              tile_box = tile_box.enlarged(Vector.new(max(rs.x, fc_box.width), max(cs.y, fc_box.height)));
-              tile_box = tile_box & tc_box;
-              var left = Region.new;
+        tp.queue(<<"END")
+          var tc_box = _frame.bbox;
+          var tile_box = _tile ? (tc_box & _tile.bbox) : tc_box;
+          !tile_box.empty && (
+            tile_box = tile_box.enlarged(Vector.new(max(rs.x, fc_box.width), max(cs.y, fc_box.height)));
+            tile_box = tile_box & tc_box;
+            var left = with_left ? Region.new : nil;
+            repeat ? 
+              (region & tile_box).fill_multi(top_cell, fc_index, fc_box, rs, cs, Vector.new, left, _tile.bbox) :
               (region & tile_box).fill(top_cell, fc_index, fc_box, rs, cs, origin, left, Vector.new, left, _tile.bbox);
-              _output(#{result_arg}, left)
-            )
+            with_left && _output(#{result_arg}, left)
+          )
 END
-        else
-          tp.queue(<<"END")
-            var tc_box = _frame.bbox;
-            var tile_box = _tile ? (tc_box & _tile.bbox) : tc_box;
-            !tile_box.empty && (
-              tile_box.right = tile_box.right + rs.x - 1;
-              tile_box.top = tile_box.top + cs.y - 1;
-              tile_box = tile_box & tc_box;
-              (region & tile_box).fill(top_cell, fc_index, fc_box, rs, cs, origin, nil, Vector.new, nil, _tile.bbox)
-            )
-END
-        end
           
         begin
           @engine._output_layout.start_changes
@@ -4477,9 +4472,18 @@ END
         end
 
         @engine.run_timed("\"#{m}\" in: #{@engine.src_line}", self.data) do
-          self.data.fill(top_cell, fc_index, fc_box, rs, cs, origin, result, RBA::Vector::new, result)
+          if repeat
+            self.data.fill_multi(top_cell, fc_index, fc_box, rs, cs, RBA::Vector::new, result)
+          else
+            self.data.fill(top_cell, fc_index, fc_box, rs, cs, origin, result, RBA::Vector::new, result)
+          end
         end
 
+      end
+
+      if fill_cell.parent_cells == 0
+        # fill cell not required (not placed) -> remove
+        fill_cell.delete
       end
           
       self.data.disable_progress

@@ -39,6 +39,7 @@ GenericReaderOptions::GenericReaderOptions ()
 
   m_common_enable_text_objects = load_options.get_option_by_name ("text_enabled").to_bool ();
   m_common_enable_properties = load_options.get_option_by_name ("properties_enabled").to_bool ();
+  m_cell_conflict_resolution = load_options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution;
 
   m_gds2_box_mode = load_options.get_option_by_name ("gds2_box_mode").to_uint ();
   m_gds2_allow_big_records = load_options.get_option_by_name ("gds2_allow_big_records").to_bool ();
@@ -196,6 +197,15 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "This option specifies the layer selection or mapping like -" + m_prefix + "m, but takes the mapping from the given file. "
                     "Each line in this file is read as one layer mapping expression. "
                     "Empty lines or lines starting with a hash (#) character or with double slashes (//) are ignored."
+                   )
+        << tl::arg (group +
+                    "--" + m_long_prefix + "blend-mode=mode", &m_cell_conflict_resolution, "Specifies how cell conflicts are resolved when using file concatenation",
+                    "When concatenating file with '+', the reader will handle cells with the same names according to this mode:\n"
+                    "\n"
+                    "* 0: joins everything (default, risk of spoiling layouts)\n"
+                    "* 1: overwrite\n"
+                    "* 2: skip new cell\n"
+                    "* 3: create a variant with a new name"
                    )
       ;
   }
@@ -684,6 +694,7 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options) const
   load_options.set_option_by_name ("create_other_layers", m_create_other_layers);
   load_options.set_option_by_name ("text_enabled", m_common_enable_text_objects);
   load_options.set_option_by_name ("properties_enabled", m_common_enable_properties);
+  load_options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CellConflictResolution (m_cell_conflict_resolution);
 
   load_options.set_option_by_name ("gds2_box_mode", m_gds2_box_mode);
   load_options.set_option_by_name ("gds2_allow_big_records", m_gds2_allow_big_records);

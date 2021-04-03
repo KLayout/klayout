@@ -101,6 +101,7 @@ private:
   bool m_create_other_layers;
   double m_dbu;
   bool m_keep_layer_names;
+  unsigned int m_cell_conflict_resolution;
 
   //  common GDS2+OASIS
   bool m_common_enable_text_objects;

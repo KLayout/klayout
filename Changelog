@@ -1,19 +1,276 @@
-0.27            (2020-xx-xx):
 
-* Enhancement: %GITHUB%/issues/521
-      Enhanced API for ObjectInstPath
+0.27            (2021-04-xx):
+
+* Enhancements: Numerous new functions for the RBA and pya API
+      Some highlights:
+       * "Texts" for text collections (similar for Edges/EdgePairs/Region)
+       * New modes for blending layout files - see GitHub issue #666
+       * New function Cell#transform - see GitHub issue #598
+       * New functions for Image (read, write, clear)
+       * New functions for Region and Edges correlating with the new DRC features
+       * Multi-cell hierarchical copy/move of trees - will maintain shared instances
+       * RBA: iterators are now automatically made available as Enumerable
+       * All functions having a void return specification now return self (allows chaining) 
+       * More functions for manipulating selections (LayoutView#select_all etc.)
+       * Spline interpolation code available in new "Utils" namespace
+       * QByteArray support, mapping to Python byte arrays
+       * MainWindow#set_key_bindings, MainWindow#get_key_bindings, MainWindow#set_menu_items_hidden etc.
+       * New class RecursiveInstanceIterator (similar to RecursiveShapeIterator, but acts on instances)
+       * Deep vs. flat operations do not always flatten out now (flat vs. deep does however)
+       * Global transformations for inputs
+* Enhancements: New DRC features
+      Some highlights:
+       * Better support for texts - "text layers"
+       * Combined AND+NOT feature for separating regions into inside and outside part
+       * "max_vertex_count" and "max_area_ratio" configuration options
+       * "forget" for memory optimization
+       * Shielding is optional now for some DRC functions
+       * "interact" now has a count filter
+       * In verbose more, figure counts and more information is printed
+       * Generic DRC function and complex DRC operations: for details search "Universal DRC" in documentation
+       * "not_opposite" and "rect_filter" options for some DRC functions
+       * "enclosing" (selects polygons entirely enclosing others)
+       * New filters for polygons: squares, non_squares, area ratio, bbox aspect ratio
+       * More intuitive specification of projection limits ("projecting < 2.um")
+       * "with_holes" and "without_holes", also with count
+       * Density check is included now ("with_densitiy", "without_density")
+       * "split_..." functions give interacting/non-interacting sets in one step
+       * Better support for generic transformations as Matrix2d and Matrix3d
+       * "fill" and "fill_with_left" functions for dummy fill
+       * NO "connected" feature yet. Sorry. Had to drop it to finish this release.
+* Enhancements: new LVS features
+      Some highlights:
+       * Improved netlist and LVS result browser (infinite-depth browsing)
+       * Improved circuit match algorithm
+       * Case insensitive handling of object names for SPICE netlists
+       * Probe feature fixed in flat mode
+       * "connect_explicit": for details search "connect_explicit" in documentation
+* Enhancements: New features for images
+      Some highlights:
+       * New menu item: show and hide all images - see GitHub issue #535
+       * False color nodes now can have a left and right color allowing color steps
+       * Persistance of images through a special file format: "lyimg" (XML based)
+* Enhancements: LEF/DEF reader
+      Some highlights:
+       * Support for layer map files
+       * More complete spec support (e.g. FILL, MASK, FOREIGN, DO/BY/STEP ...)
+       * Several bug fixes, e.g. routing layer switch for VIAs
+       * Some functions also act on the transient selection (less mouse clicks)
+* Enhancements: Layout editing and rulers
+      Some highlights:
+       * Object properties now are changed without having to commit the dialogs
+       * Dockable editor options windows
+       * "Recently used" list
+       * A "distribute objects" feature (Edit/Selection/Distribute)
+       * Snap highlighting
+       * Mouse tracking cursor indicates grid- and object-snapped location
+* Enhancements: Help browser
+       * Bookmarks
+       * Search in page (Ctrl+F)
+* Enhancement: Improved fill tool
+      The fill tool now also supports skewed fill pattern repetitions
+* Enhancement: Ability to utilize a LayoutView as a Widget
+      Standalone instantiation of a LayoutView object is 
+      supported now. So it becomes possible to create
+      custom MainWindow UIs and embed a layout view there.
+* Enhancement: Improved layer and cell list filtering and searching
+* Enhancement: Experimental 3d (called 2.5d) view of layout
+      For details search "2.5d View" in documentation.
+* Enhancement: Improved performance on sea of instances for OASIS files
+      Iterated OASIS instances are stored and handled in a leaner way in viewer mode
+* Enhancement: Buddy scripts can concatenate files with "+" for input
+      Concatenation happens by "blending files". Beware of the risk this implies.
+* Enhancement: Layer maps now support n:m layer mapping
+      This allows mapping n input layers to one logical layer (merging) and also
+      one input layer to m logical ones (clone layer). This applies to the 
+      buddy scripts and layer maps inside KLayout's reader.
+* Enhancement: include mechanism for easy include of files into DRC/LVS scripts
+      This is a plain text substitution feature. Don't use it for Ruby or Python
+      scripts (the preferred way is still require/import). But it's a quick way
+      to include partial DRC and LVS scripts without having to worry about variable
+      scope. For details see "Including other files" in the documentation under:
+      KLayout User Manual/Design Rule Check (DRC)/DRC Runsets.
+* Bugfix: %GITHUB%/issues/750
+      PCB gerber import: Incorrect handling of D02 operations.
+* Bugfix: %GITHUB%/issues/740
+      Bug in the "smooth" function.
+* Enhancement: %GITHUB%/issues/691
+      Technology specific libraries: library name resolution based on technology.
+* Enhancement: %GITHUB%/issues/666
+      Controlling the way a layout reader integrates cells into an existing layout.
+* Bugfix: %GITHUB%/issues/663
+      Deep mode DRC: separation from "inside" gives wrong errors.
+* Enhancement: %GITHUB%/issues/648
+      LVS could not do "connect_implicit" with global nets.
+* Bugfix: %GITHUB%/issues/609
+      Internal error on net extraction.
+* Enhancement: %GITHUB%/issues/598
+      Plain transformation of cell missing.
+* Enhancement: %GITHUB%/issues/588
+      RBA/PYA: Provide event when a net is selected in the netlist browser.
+* Enhancement: %GITHUB%/issues/563
+      True support for text objects in DRC/LVS (text layers).
 * Enhancement: %GITHUB%/issues/558
       Edges#extents, Texts#extents and EdgePairs#extents now
       work hierarchically in deep mode. In DRC, this means,
       "extents" is a deep-enabled method now.
-* Enhancement: %GITHUB%/issues/563
-      True support for text objects in DRC/LVS (text layers)
-* Enhancement: ability to utilize a LayoutView as a Widget
-      Standalone instantiation of a LayoutView object is 
-      supported now. So it becomes possible to create
-      custom MainWindow UIs and embed a layout view there.
+* Enhancement: %GITHUB%/issues/535
+      Image handling enhancements.
+* Enhancement: %GITHUB%/issues/521
+      Enhanced API for ObjectInstPath.
+* Enhancement: %GITHUB%/issues/487
+      Difficult to select specific labels for net name assignment in net extraction.
+      Solution involves a more elaborate handling of texts through "text layers.
 
-0.26.5          (2020-xx-xx):
+0.26.11         (2021-02-27):
+
+* Bugfix: %GITHUB%/issues/733
+  Relative path resolution in session files fails when the session file's path contains "+" characters
+* Enhancement: %GITHUB%/issues/730
+  Support of class 'QUiLoader' in PYA and RBA
+* Bugfix: %GITHUB%/issues/728
+  Fails to build on Debian hppa: uses non-standard sa_restorer field of struct sigaction
+* Bugfix: %GITHUB%/issues/726
+  Crash on LayoutView#clear_selection on Linux.
+* Bugfix: %GITHUB%/issues/723
+  Backup scheme wasn't working correctly with a single file without path
+  given as command line argument.
+
+0.26.10         (2020-02-02):
+
+* Enhancement: %GITHUB%/issues/720
+  "Safe save" and backups: when saving files, the file is only overwritten after
+  the save terminated successfully. This will avoid loss of data for full volumes
+  or network share dropouts. In addition, a configurable number of back files can 
+  be kept (see File/Setup: Application/General).
+* Bugfix: %GITHUB%/issues/718
+  GDS export issue fixed (breaking of polygons was filling holes)
+* Bugfix: %GITHUB%/issues/709
+  LVS compare enters infinite loop when it encounters two entirely identical subcircuits
+* Bugfix: %GITHUB%/issues/708
+  Qt binding: missing support for binary strings as QByteArray representative
+* Bugfix: %GITHUB%/issues/707
+  QJsonValue's string constructor is ambiguous
+* Bugfix: %GITHUB%/issues/704
+  Rational Splines not supported DXF
+* Bugfix: %GITHUB%/issues/693
+  MAGIC files won't find subcells when reading from command line
+* Bugfix: HTTP stream reading issue with redirect
+  At least on MacOS a segfault happened when reading HTTP stream data
+  (e.g. for package manager) from addresses which are redirected.
+* Enhancement: Removed %APPDATA% from DLL search path on Windows
+  This will avoid installation poisoning by the one from %APPDATA%
+  (which ironically is the default installation path). Eventually
+  multiple versions can be used in parallel.
+
+0.26.9          (2020-11-27):
+
+* Bugfix: %GITHUB%/issues/658
+      Menu items were not put into the right place on MacOS.
+* Bugfix: %GITHUB%/issues/652
+      "M" factor scaling was not working for Spice reader.
+* Bugfix: %GITHUB%/issues/651
+      Fixed an issue with DRC "select".
+* Bugfix: %GITHUB%/issues/647
+      Text orientation was not considered properly in search & replace
+* Bugfix: %GITHUB%/issues/646
+      A potential crash was fixed happening when a PCell 
+      library is deleted
+* Bugfix: Display bug
+      Cell placements with small magnification factors (such that the
+      viewport dimensions exceeded the DBU space when seem from inside
+      the cell) lead to display errors.
+
+0.26.8          (2020-09-15):
+
+* Enhancement: %GITHUB%/issues/639
+      A new method is available which enables copying of multiple cells
+      into a target layout while maintaining common subcells are single
+      cells.
+* Bugfix: %GITHUB%/issues/637
+      Points have not been selected properly when inside mirrored subcells
+      in partial edit mode.
+* Bugfix: %GITHUB%/issues/629
+      Qt5 QTimer timeout signal was not available to Python or Ruby.
+      This also applied to all "private" signals of Qt5. QTimer is just
+      one important example for this case.
+* Bugfix: %GITHUB%/issues/617
+      A problem with pseudo-const Python/Ruby objects in the netlist API
+      was fixed.
+* Bugfix: %GITHUB%/issues/615
+      Basic authentication for package manager now uses UTF-8 encoding.
+      Most servers expect this kind of encoding today. UTF password 
+      characters are supported this way.
+
+0.26.7          (2020-07-07):
+
+* Bugfix: %GITHUB%/issues/381 and more
+      Some bugs fixed that happened specifically on MacOS.
+      1.) A segfault that happened in LVS
+      2.) Some classes were not properly registered for usage in scripts.
+* Bugfix: %GITHUB%/issues/493
+      LVS asserted on MacOS
+* Enhancement: %GITHUB%/issues/586
+      As a safety feature, the stream writers now refuse to write layouts 
+      with cells carrying the same names. Writing such layers would result
+      in corrupted or invalid layout files.
+* Bugfix: %GITHUB%/issues/589 (tentative)
+      On Anaconda-based builds for MacOS 10.15 (Catalina) a loss of instances
+      was observed. This could be traced down to compiler/library incompatibilities
+      but not further. 
+* Enhancements: %GITHUB%/issues/591
+      Two enhancements in the macro editor: 
+      1.) A crash happening when adding a new location was fixed
+      2.) The template selection popup can now be disabled by dismissing the 
+          tip dialog.
+* Bugfix: %GITHUB%/issues/592
+      Reading a file into a layout with unnamed layers caused problems with
+      layer mapping specs. 
+* Bugfix: %GITHUB%/issues/596
+      Library#_destroy was crashing the application. As this function must not 
+      be called, it's rerouted to "nothing" for backward compatibility.
+* Enhancement: %GITHUB%/issues/603
+      The "adjust origin" feature now allows specifying the target 
+      coordinates for the adjustment.
+* Bugfix: %GITHUB%/issues/610
+      An internal error happened for certain hierarchical configurations on 
+      netlist extraction.
+* Enhancement: LVS netlist compare
+      The algorithm was improved to provide better reproducibility. The
+      detection of matching paths in the presence of ambiguities was 
+      improved.
+      In addition, the netlist compare now favours net names for resolving
+      ambiguities. So if nets are named the same in the layout and the
+      schematic, ambiguities are resolved based on these names. This is 
+      usually more efficient. A new function is available to turn this
+      feature off: "consider_net_names(false)".
+
+0.26.6          (2020-06-05):
+
+* Enhancement: %GITHUB%/issues/522
+      Skip comment lines with // in RVE DB reader
+* Bugfix: %GITHUB%/issues/547
+      Doc fixes, better error messages on some Shape methods
+* Bugfix: %GITHUB%/issues/554
+      Using 64bit coordinates on RVE reader to avoid overflow
+* Bugfix: %GITHUB%/issues/565
+      Spice reader: .global should not add pin if the signal 
+      isn't used in a subcircuit
+* Bugfix: %GITHUB%/issues/568 and %GITHUB%/issues/578
+      A CIF reader and writer bug was fixed
+* Bugfix: %GITHUB%/issues/570 and %GITHUB%/issues/579
+      Perimenter can be included in antenna area for the
+      antenna check. This also includes a mode in which only
+      the perimeter is considered.
+* Enhancement: %GITHUB%/issues/560
+      A library can be associated with multiple technologies now.
+* Bugfix: width of cell and library side panels could not be 
+      reduced below the width of the selection boxes in the
+      header
+* Bugfix: cell view selection header text did not get updated
+      when saving the layout to a different file
+
+0.26.5          (2020-05-02):
 
 * Bugfix: %GITHUB%/issues/539
       An internal error happened on netlist flatten sometimes
@@ -28,6 +285,8 @@
 * Bugfix: %GITHUB%/issues/544
       Duplicate .global statements in SPICE netlists created
       duplicate pins
+* Bugfix: %GITHUB%/issues/548
+      A shielding issue was fixed for DRC space measurements
 * Bugfix: diff tool bug with paths
       Differences in path points where no reported
 * Enhancement: documentation clarifications and typos fixed

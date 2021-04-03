@@ -23,6 +23,7 @@
 
 #include "layD25View.h"
 #include "layLayoutView.h"
+#include "layQtTools.h"
 
 #include "ui_D25View.h"
 
@@ -53,6 +54,8 @@ D25View::D25View (QWidget *parent)
   connect (mp_ui->d25_view, SIGNAL (init_failed ()), this, SLOT (init_failed ()));
 
   mp_ui->gl_stack->setCurrentIndex (0);
+
+  lay::activate_help_links (mp_ui->doc_label);
 }
 
 D25View::~D25View ()

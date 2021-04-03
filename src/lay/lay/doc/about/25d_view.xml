@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>The 2.5d View</title>
+  <keyword name="2.5d"/>
+  <keyword name="3d"/>
+  <keyword name="2.5d View"/>
+  <keyword name="z-Stack"/>
+
+  <h2-index/>
+
+  <p>
+  The "2.5d view" offers a semi-3d view of the layout. It's not a full 3d view as the layers are only extruded vertically
+  into layers with a certain thickness. The view cannot model process topology, but it can visualize
+  wiring congestions in a three-dimensional space or the vertical relative dimensions of features of the process stack.
+  </p>
+
+  <p>
+  To open the view, use "Tools/2.5d View". Currently, the performance is limited, a rough number for a
+  practical limit is around 100k polygons. The 2.5d view is only available, if KLayout was compiled with
+  OpenGL support.
+  </p>
+
+  <p>
+  <img src="/about/25d_screenshot.png"/>
+  </p>
+
+  <h2>Setup</h2>
+
+  <p>
+  The 2.5d view needs a technology setup explaining the way the layers are transformed into planes.
+  The setup is provided within a technology. Open the technology manager (File/Manage Technologies) and
+  navigate to the "Z Stack (2.5d)" component. The setup is basically a list of entries listing the 
+  layer from which to take the shapes and the depth information.
+  </p>
+
+  <p>
+  Each entry is a single line. Empty lines are ignored. Everything after a '#' character is 
+  considered a comment.
+  </p>
+
+  <p>
+  Each specification line consists of a layer specification, a colon and arguments.
+  The arguments are named (like "x=...") or in serial. Parameters are separated by comma or blanks.
+  Named arguments are:
+  </p>
+
+  <ul>
+    <li> <b>zstart</b>:  The lower z position of the extruded layer in µm </li>
+    <li> <b>zstop</b>: The upper z position of the extruded layer in µm </li>
+    <li> <b>height</b>:  The height of the extruded layer in µm </li>
+  </ul>
+
+  <p>
+  'height', 'zstart' and 'zstop' can be used in any combination. If no value is given for 'zstart',
+  the upper level of the previous layer will be used.
+  </p>
+
+  <p>
+  If a single unnamed parameter is given, it corresponds to 'height'. Two parameters correspond to
+  'zstart' and 'zstop'.
+  </p>
+
+  <p>
+  Here are some examples:
+  </p>
+
+  <pre>1: 0.5 1.5                    # extrude layer 1/0 from 0.5 to 1.5 vertically\n"
+1/0: 0.5 1.5                  # same with explicit datatype\n"
+1: zstop=1.5, zstart=0.5      # same with named parameters\n"
+1: height=1.0, zstop=1.5      # same with z stop minus height\n"
+1: 1.0 zstop=1.5              # same with height as unnamed parameter\n"
+  </pre>
+
+  <h4>Variables</h4>
+
+  <p>
+  You can declare variables inside the setup files and use them in formulas for
+  computed values. Variables are defined and set with the "var" keyword on a single line.
+  The notation follows the "expression" syntax used in many other places inside KLayout
+  (<link href="/about/expressions.xml"/>).
+  </p>
+
+  <p>
+  Here is an example:
+  </p>
+
+  <pre>var hmetal = 0.48\n"
+7/0: 0.5 0.5+hmetal*2        # 2x thick metal\n"
+</pre>
+
+  <h4>Conditionals</h4>
+
+  <p>
+  For more flexibility, but of little practical use for now, conditionals are provided.
+  "if", "else", "elsif" and "end" for as in other languages, e.g. Ruby:
+  </p>
+
+  <pre>var thick_m1 = true
+if thickm1
+  1: 0.5 1.5
+else
+  1: 0.5 1.2
+end
+</pre>
+
+  <h2>Navigating the 2.5d View</h2>
+  <keyword>navigation</keyword>
+  <keyword>2.5d navigation</keyword>
+
+  <p>
+  The navigation is based on the movement of the camera while the scene is 
+  formed by the extruded layout. The scene can be scaled to provide zoom features.
+  Scaling and rotation is relative to the pivot point which is indicated by the 
+  compass icon on the ground plane.
+  </p>
+
+  <p>
+  This is a short list of the navigation controls which act on the camera:
+  </p>
+
+  <ul>
+    <li> Dragging with the right mouse button down: change azimuth and elevation angle </li>
+    <li> Dragging with the middle mouse button down: move the pivot up and down or left and right </li>
+    <li> Mouse wheel: moves the pivot forward and backward </li>
+    <li> Control key + mouse wheel: magnify or shrink the layout </li>
+    <li> Press and hold shift key: switch to top level view (see below) </li>
+    <li> Up/down keys: move the pivot forward or backward </li>
+    <li> Left/right keys: move the pivot to the left or the right </li>
+    <li> Control + up/down keys: change the elevation angle </li>
+    <li> Control + left/right keys: change the azimuth angle </li>
+  </ul>
+
+  <p>
+  In top level view, the navigation is slightly different:
+  </p>
+
+  <ul>
+    <li> Dragging with the right mouse button down: change azimuth angle </li>
+    <li> mouse wheel: magnify or shrink the layout </li>
+    <li> Up/down/left/right keys: move the pivot on the horizontal plane </li>
+  </ul>
+
+</doc>
+

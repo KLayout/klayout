@@ -43,7 +43,7 @@ D25Camera::~D25Camera ()
 void
 D25Camera::init ()
 {
-  m_fov = 90.0;
+  m_fov = 45.0;
   m_cam_azimuth = m_cam_elevation = 0.0;
   m_top_view = false;
 }

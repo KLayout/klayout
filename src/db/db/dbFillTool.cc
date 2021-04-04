@@ -212,11 +212,6 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
     throw tl::Exception (tl::to_string (tr ("Invalid row or column step vectors in fill_region: row_step x column_step vector vector product must be > 0")));
   }
 
-  //  disable enhanced mode an obey the origin if the polygon is not entirely inside and not at the boundary of the glue box
-  if (enhanced_fill && ! glue_box.empty () && ! fp0.box ().enlarged (db::Vector (1, 1)).inside (glue_box)) {
-    enhanced_fill = false;
-  }
-
   db::Vector kernel_origin (fc_bbox.left (), fc_bbox.bottom ());
 
   std::vector <db::Polygon> filled_regions;
@@ -256,12 +251,20 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
       continue;
     }
 
-    size_t ninsts = 0;
+    //  disable enhanced mode an obey the origin if the polygon is not entirely inside and not at the boundary of the glue box
+    bool ef = enhanced_fill;
+    if (ef && ! glue_box.empty () && ! fp->box ().enlarged (db::Vector (1, 1)).inside (glue_box)) {
+      ef = false;
+    }
 
+    //  pick a heuristic "good" starting point in enhanced mode
+    //  TODO: this is a pretty weak optimization.
     db::Point o = origin;
-    if (enhanced_fill) {
+    if (ef) {
       o = fp->hull () [0];
     }
+
+    size_t ninsts = 0;
 
     GenericRasterizer am (*fp, row_step, column_step, o, fc_bbox.p2 () - fc_bbox.p1 ());
 
@@ -454,7 +457,7 @@ fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell
 DB_PUBLIC void
 fill_region_repeat (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index,
                     const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step,
-                    const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Point &origin, const db::Box &glue_box)
+                    const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
 {
   const db::Region *fill_region = &fr;
 
@@ -468,7 +471,7 @@ fill_region_repeat (db::Cell *cell, const db::Region &fr, db::cell_index_type fi
     ++iteration;
 
     remaining.clear ();
-    fill_region_impl (cell, *fill_region, fill_cell_index, fc_box, row_step, column_step, origin, true, &remaining, fill_margin, remaining_polygons, iteration, glue_box);
+    fill_region_impl (cell, *fill_region, fill_cell_index, fc_box, row_step, column_step, db::Point (), true, &remaining, fill_margin, remaining_polygons, iteration, glue_box);
 
     new_fill_region.swap (remaining);
     fill_region = &new_fill_region;

@@ -95,6 +95,7 @@ BookmarkItem::to_string () const
 BrowserPanel::BrowserPanel (QWidget *parent)
   : QWidget (parent),
     m_back_dm (this, &BrowserPanel::back),
+    m_new_url_dm (this, &BrowserPanel::new_url),
     mp_dispatcher (0)
 {
   init ();
@@ -125,6 +126,7 @@ BrowserPanel::init ()
 
   mp_ui->browser->addAction (mp_ui->action_find);
   mp_ui->browser->addAction (mp_ui->action_bookmark);
+  mp_ui->browser->setOpenLinks (false);
 
   mp_ui->browser_bookmark_view->addAction (mp_ui->action_delete_bookmark);
   mp_ui->browser_bookmark_view->setContextMenuPolicy (Qt::ActionsContextMenu);
@@ -138,7 +140,8 @@ BrowserPanel::init ()
   connect (mp_ui->search_edit, SIGNAL (textEdited (const QString &)), this, SLOT (search_text_changed (const QString &)));
   connect (mp_ui->search_edit, SIGNAL (returnPressed ()), this, SLOT (search_edited ()));
   connect (mp_ui->search_button, SIGNAL (clicked ()), this, SLOT (search_edited ()));
-  connect (mp_ui->browser, SIGNAL (textChanged ()), this, SLOT (text_changed ()));
+  connect (mp_ui->browser, SIGNAL (sourceChanged (const QUrl &)), this, SLOT (source_changed ()));
+  connect (mp_ui->browser, SIGNAL (anchorClicked (const QUrl &)), this, SLOT (anchor_clicked (const QUrl &)));
   connect (mp_ui->browser, SIGNAL (backwardAvailable (bool)), mp_ui->back_pb, SLOT (setEnabled (bool)));
   connect (mp_ui->browser, SIGNAL (forwardAvailable (bool)), mp_ui->forward_pb, SLOT (setEnabled (bool)));
   connect (mp_ui->outline_tree, SIGNAL (itemActivated (QTreeWidgetItem *, int)), this, SLOT (outline_item_clicked (QTreeWidgetItem *)));
@@ -218,7 +221,7 @@ BrowserPanel::title () const
 std::string
 BrowserPanel::url () const
 {
-  return m_cached_url;
+  return tl::to_string (mp_ui->browser->source ().toString ());
 }
 
 void
@@ -416,13 +419,24 @@ BrowserPanel::search_text_changed (const QString &text)
 }
 
 void
-BrowserPanel::text_changed ()
+BrowserPanel::source_changed ()
+{
+  m_new_url_dm ();
+}
+
+void
+BrowserPanel::anchor_clicked (const QUrl &url)
+{
+  mp_ui->browser->setSource (url);
+  source_changed ();
+}
+
+void
+BrowserPanel::new_url ()
 {
   QString title = mp_ui->browser->document ()->metaInformation (QTextDocument::DocumentTitle);
-  if (title != m_current_title) {
-    m_current_title = title;
-    emit title_changed (title);
-  }
+  m_current_title = title;
+  emit title_changed (title);
 
   //  refresh on-page search
   page_search_edited ();

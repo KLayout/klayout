@@ -441,7 +441,9 @@ protected slots:
   void page_search_next();
   void search_text_changed(const QString &text);
   void search_edited ();
-  void text_changed ();
+  void source_changed ();
+  void anchor_clicked (const QUrl &url);
+  void new_url ();
   void outline_item_clicked (QTreeWidgetItem *item);
   void bookmark_item_selected (QTreeWidgetItem *item);
   void delete_bookmark ();
@@ -462,6 +464,7 @@ private:
   Ui::BrowserPanel *mp_ui;
   bool m_schedule_back;
   tl::DeferredMethod<BrowserPanel> m_back_dm;
+  tl::DeferredMethod<BrowserPanel> m_new_url_dm;
   std::string m_search_url, m_search_query_item;
   QString m_current_title;
   QList<QTextEdit::ExtraSelection> m_search_selection;

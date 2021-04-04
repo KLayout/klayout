@@ -350,9 +350,9 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="doc_label">
         <property name="text">
-         <string>Press and hold SHIFT for top view</string>
+         <string>Press and hold SHIFT for top view (&lt;a href=&quot;int:/about/25d_view.xml&quot;&gt;more&lt;/a&gt;)</string>
         </property>
        </widget>
       </item>

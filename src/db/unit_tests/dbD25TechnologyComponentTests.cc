@@ -30,44 +30,73 @@ TEST(1)
 {
   db::D25TechnologyComponent comp;
 
-  comp.compile_from_source ("1/0: 1.0 1.5 # a comment");
+  comp.set_src ("1/0: 1.0 1.5 # a comment");
+  comp.compile_from_source ();
   EXPECT_EQ (comp.to_string (), "1/0: zstart=1, zstop=1.5");
 
-  comp.compile_from_source ("1/0: zstart=1.0 zstop=1.5");
+  comp.set_src ("1/0: zstart=1.0 zstop=1.5");
+  comp.compile_from_source ();
   EXPECT_EQ (comp.to_string (), "1/0: zstart=1, zstop=1.5");
 
-  comp.compile_from_source ("1/0: zstart=1.0 height=0.5");
+  comp.set_src ("1/0: zstart=1.0 height=0.5");
+  comp.compile_from_source ();
   EXPECT_EQ (comp.to_string (), "1/0: zstart=1, zstop=1.5");
 
-  comp.compile_from_source ("1/0: 1.0 height=0.5");
+  comp.set_src ("1/0: 1.0 height=0.5");
+  comp.compile_from_source ();
   EXPECT_EQ (comp.to_string (), "1/0: zstart=1, zstop=1.5");
 
-  comp.compile_from_source ("1/0: zstop=1.5 height=0.5");
+  comp.set_src ("1/0: zstop=1.5 height=0.5");
+  comp.compile_from_source ();
   EXPECT_EQ (comp.to_string (), "1/0: zstart=1, zstop=1.5");
 
-  comp.compile_from_source ("1/0: zstart=1.0 zstop=1.5\nname: height=3");
+  comp.set_src ("1/0: zstart=1.0 zstop=1.5\nname: height=3");
+  comp.compile_from_source ();
   EXPECT_EQ (comp.to_string (), "1/0: zstart=1, zstop=1.5\nname: zstart=1.5, zstop=4.5");
 
-  comp.compile_from_source ("1/0: zstart=1.0 zstop=1.5\nname: zstart=4.0 height=3\n\n# a comment line");
+  comp.set_src ("1/0: zstart=1.0 zstop=1.5\nname: zstart=4.0 height=3\n\n# a comment line");
+  comp.compile_from_source ();
   EXPECT_EQ (comp.to_string (), "1/0: zstart=1, zstop=1.5\nname: zstart=4, zstop=7");
 
+  comp.set_src ("var x=1.0\n1/0: zstart=x zstop=x+0.5\nname: zstart=4.0 height=3\n\n# a comment line");
+  comp.compile_from_source ();
+  EXPECT_EQ (comp.to_string (), "1/0: zstart=1, zstop=1.5\nname: zstart=4, zstop=7");
+
+  comp.set_src ("var x=1.0\nif x == 1.0\n1/0: zstart=x zstop=x+0.5\nelse\n1/0: zstart=0 zstop=0\nend\nname: zstart=4.0 height=3\n\n# a comment line");
+  comp.compile_from_source ();
+  EXPECT_EQ (comp.to_string (), "1/0: zstart=1, zstop=1.5\nname: zstart=4, zstop=7");
+
+  comp.set_src ("var x=2.0\nif x == 1.0\n1/0: zstart=x zstop=x+0.5\nelse\n1/0: zstart=0 zstop=0\nend\nname: zstart=4.0 height=3\n\n# a comment line");
+  comp.compile_from_source ();
+  EXPECT_EQ (comp.to_string (), "1/0: zstart=0, zstop=0\nname: zstart=4, zstop=7");
+
   try {
-    comp.compile_from_source ("blabla");
+    comp.set_src ("blabla");
+    comp.compile_from_source ();
     EXPECT_EQ (false, true);
   } catch (...) { }
 
   try {
-    comp.compile_from_source ("1/0: 1 2 3");
+    comp.set_src ("1/0: 1 2 3");
+    comp.compile_from_source ();
     EXPECT_EQ (false, true);
   } catch (...) { }
 
   try {
-    comp.compile_from_source ("1/0: foo=1 bar=2");
+    comp.set_src ("1/0: foo=1 bar=2");
+    comp.compile_from_source ();
     EXPECT_EQ (false, true);
   } catch (...) { }
 
   try {
-    comp.compile_from_source ("1/0: 1;2");
+    comp.set_src ("1/0: 1;*2");
+    comp.compile_from_source ();
+    EXPECT_EQ (false, true);
+  } catch (...) { }
+
+  try {
+    comp.set_src ("error 42");
+    comp.compile_from_source ();
     EXPECT_EQ (false, true);
   } catch (...) { }
 }

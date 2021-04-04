@@ -3942,7 +3942,7 @@ MainWindow::menu_activated (const std::string &symbol)
     if (current_view ()) {
       current_view ()->menu_activated (symbol);
     } else {
-      throw tl::Exception (tl::to_string (QObject::tr ("No view is active")));
+      throw tl::Exception (tl::to_string (QObject::tr ("This function needs a layout but none was available")));
     }
 
   }

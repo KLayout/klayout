@@ -642,7 +642,6 @@ static void collect_classes (const gsi::ClassBase *cls, std::list<const gsi::Cla
   unsorted_classes.push_back (cls);
 
   for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
-    tl_assert (cc->declaration () != 0);
     collect_classes (cc.operator-> (), unsorted_classes);
   }
 }
@@ -678,7 +677,7 @@ ClassBase::classes_in_definition_order (const char *mod_name)
         continue;
       }
 
-      if ((*c)->declaration () != *c && taken.find ((*c)->declaration ()) == taken.end ()) {
+      if ((*c)->declaration () && (*c)->declaration () != *c && taken.find ((*c)->declaration ()) == taken.end ()) {
         //  can't produce this class yet - it's a reference to another class which is not produced yet.
         tl_assert ((*c)->declaration () != 0);
         more_classes.push_back (*c);
@@ -710,8 +709,8 @@ ClassBase::classes_in_definition_order (const char *mod_name)
         //  don't handle classes twice
         if (taken.find (*c) != taken.end ()) {
           //  not considered.
-        } else if ((*c)->declaration () != *c && taken.find ((*c)->declaration ()) == taken.end ()) {
-          //  can't produce this class yet - it's a child of a parent that is not produced yet.
+        } else if ((*c)->declaration () && (*c)->declaration () != *c && taken.find ((*c)->declaration ()) == taken.end ()) {
+          //  can't produce this class yet - it refers to a class whic is not available.
           tl::error << tl::sprintf ("class %s.%s refers to another class (%s.%s) which is not available", (*c)->module (), (*c)->name (), (*c)->declaration ()->module (), (*c)->declaration ()->name ());
         } else if ((*c)->parent () != 0 && taken.find ((*c)->parent ()) == taken.end ()) {
           //  can't produce this class yet - it's a child of a parent that is not produced yet.

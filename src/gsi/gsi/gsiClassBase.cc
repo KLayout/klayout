@@ -679,7 +679,6 @@ ClassBase::classes_in_definition_order (const char *mod_name)
 
       if ((*c)->declaration () && (*c)->declaration () != *c && taken.find ((*c)->declaration ()) == taken.end ()) {
         //  can't produce this class yet - it's a reference to another class which is not produced yet.
-        tl_assert ((*c)->declaration () != 0);
         more_classes.push_back (*c);
         continue;
       }

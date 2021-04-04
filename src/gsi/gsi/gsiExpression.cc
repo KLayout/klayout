@@ -1077,10 +1077,13 @@ initialize_expressions ()
   std::list<const gsi::ClassBase *> classes = gsi::ClassBase::classes_in_definition_order ();
   for (std::list<const gsi::ClassBase *>::const_iterator c = classes.begin (); c != classes.end (); ++c) {
 
-    //  we might encounter a child class which is a reference to a top-level class (e.g.
-    //  duplication of enums into child classes). In this case we should create a reference inside the
-    //  target class.
-    if ((*c)->declaration () != *c) {
+    if ((*c)->is_external ()) {
+      //  skip external classes
+      continue;
+    } else if ((*c)->declaration () != *c) {
+      //  we might encounter a child class which is a reference to a top-level class (e.g.
+      //  duplication of enums into child classes). In this case we should create a reference inside the
+      //  target class.
       tl_assert ((*c)->parent () != 0);  //  top-level classes should be merged
       //  TODO: implement (see rba.cc:1544 for example)
       continue;

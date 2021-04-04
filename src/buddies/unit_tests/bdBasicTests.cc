@@ -294,3 +294,22 @@ TEST(10)
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_expect_strict_mode").to_int (), 1);
 }
 
+
+//  Testing reader options - blend mode "Rename" is default
+TEST(11)
+{
+  bd::GenericReaderOptions opt;
+  tl::CommandLineOptions cmd;
+
+  opt.add_options (cmd);
+
+  const char *argv[] = { "x" };
+
+  cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
+
+  db::LoadLayoutOptions stream_opt;
+  opt.configure (stream_opt);
+
+  EXPECT_EQ (stream_opt.get_option_by_name ("cell_conflict_resolution").to_string (), "RenameCell");
+}
+

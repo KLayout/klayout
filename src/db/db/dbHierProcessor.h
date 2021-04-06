@@ -479,6 +479,16 @@ public:
     return m_area_ratio;
   }
 
+  void set_boolean_core (double boolean_core)
+  {
+    m_boolean_core = boolean_core;
+  }
+
+  double boolean_core () const
+  {
+    return m_boolean_core;
+  }
+
 private:
   template<typename, typename, typename> friend class local_processor_cell_contexts;
   template<typename, typename, typename> friend class local_processor_context_computation_task;
@@ -494,6 +504,7 @@ private:
   unsigned int m_nthreads;
   size_t m_max_vertex_count;
   double m_area_ratio;
+  bool m_boolean_core;
   int m_base_verbosity;
   mutable std::unique_ptr<tl::Job<local_processor_context_computation_worker<TS, TI, TR> > > mp_cc_job;
   mutable size_t m_progress;

@@ -1070,56 +1070,163 @@ DeepRegion::snapped (db::Coord gx, db::Coord gy)
   return res.release ();
 }
 
+namespace
+{
+
+class PolygonToEdgeLocalOperation
+  : public local_operation<db::PolygonRef, db::PolygonRef, db::Edge>
+{
+public:
+  PolygonToEdgeLocalOperation ()
+    : local_operation<db::PolygonRef, db::PolygonRef, db::Edge> ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual db::Coord dist () const { return 1; }
+  virtual bool requests_single_subjects () const { return true; }
+  virtual std::string description () const { return std::string ("polygon to edges"); }
+
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  {
+    db::EdgeProcessor ep;
+
+    for (shape_interactions<db::PolygonRef, db::PolygonRef>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
+      ep.insert (s->second);
+    }
+
+    if (interactions.num_intruders () == 0) {
+
+      db::EdgeToEdgeSetGenerator eg (results.front ());
+      db::MergeOp op (0);
+      ep.process (eg, op);
+
+    } else {
+
+      //  With intruders: to compute our local contribution we take the edges without and with intruders
+      //  and deliver what is in both sets
+
+      db::MergeOp op (0);
+
+      std::vector<Edge> edges1;
+      db::EdgeContainer ec1 (edges1);
+      ep.process (ec1, op);
+
+      ep.clear ();
+
+      for (shape_interactions<db::PolygonRef, db::PolygonRef>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
+        ep.insert (s->second);
+      }
+      for (shape_interactions<db::PolygonRef, db::PolygonRef>::intruder_iterator i = interactions.begin_intruders (); i != interactions.end_intruders (); ++i) {
+        ep.insert (i->second.second);
+      }
+
+      std::vector<Edge> edges2;
+      db::EdgeContainer ec2 (edges2);
+      ep.process (ec2, op);
+
+      //  Runs the boolean AND between the result with and without intruders
+
+      db::box_scanner<db::Edge, size_t> scanner;
+      scanner.reserve (edges1.size () + edges2.size ());
+
+      for (std::vector<Edge>::const_iterator i = edges1.begin (); i != edges1.end (); ++i) {
+        scanner.insert (i.operator-> (), 0);
+      }
+      for (std::vector<Edge>::const_iterator i = edges2.begin (); i != edges2.end (); ++i) {
+        scanner.insert (i.operator-> (), 1);
+      }
+
+      EdgeBooleanClusterCollector<std::unordered_set<db::Edge> > cluster_collector (&results.front (), EdgeAnd);
+      scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
+
+    }
+
+  }
+};
+
+}
+
 EdgesDelegate *
 DeepRegion::edges (const EdgeFilterBase *filter) const
 {
-  const db::DeepLayer &polygons = merged_deep_layer ();
+  if (! filter && merged_semantics ()) {
 
-  std::unique_ptr<VariantsCollectorBase> vars;
+    //  Hierarchical edge detector - no pre-merge required
 
-  if (filter && filter->vars ()) {
+    const db::DeepLayer &polygons = deep_layer ();
 
-    vars.reset (new db::VariantsCollectorBase (filter->vars ()));
+    db::PolygonToEdgeLocalOperation op;
 
-    vars->collect (polygons.layout (), polygons.initial_cell ());
+    db::local_processor<db::PolygonRef, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&polygons.layout ()),
+                                                                        const_cast<db::Cell *> (&polygons.initial_cell ()),
+                                                                        polygons.breakout_cells ());
 
-    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-    const_cast<db::DeepLayer &> (polygons).separate_variants (*vars);
+    proc.set_description (progress_desc ());
+    proc.set_report_progress (report_progress ());
+    proc.set_base_verbosity (base_verbosity ());
+    proc.set_threads (polygons.store ()->threads ());
 
-  }
+    //  a boolean core makes somewhat better hierarchy
+    proc.set_boolean_core (true);
 
-  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
+    std::unique_ptr<db::DeepEdges> res (new db::DeepEdges (polygons.derived ()));
 
-  std::unique_ptr<db::DeepEdges> res (new db::DeepEdges (polygons.derived ()));
-  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+    proc.run (&op, polygons.layer (), foreign_idlayer (), res->deep_layer ().layer ());
 
-    db::ICplxTrans tr;
-    if (vars.get ()) {
-      const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
-      tl_assert (v.size () == size_t (1));
-      tr = v.begin ()->first;
+    return res.release ();
+
+  } else {
+
+    const db::DeepLayer &polygons = merged_deep_layer ();
+
+    std::unique_ptr<VariantsCollectorBase> vars;
+
+    if (filter && filter->vars ()) {
+
+      vars.reset (new db::VariantsCollectorBase (filter->vars ()));
+
+      vars->collect (polygons.layout (), polygons.initial_cell ());
+
+      //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+      const_cast<db::DeepLayer &> (polygons).separate_variants (*vars);
+
     }
 
-    const db::Shapes &s = c->shapes (polygons.layer ());
-    db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+    db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
-    for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+    std::unique_ptr<db::DeepEdges> res (new db::DeepEdges (polygons.derived ()));
+    for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-      db::Polygon poly;
-      si->polygon (poly);
+      db::ICplxTrans tr;
+      if (vars.get ()) {
+        const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
+        tl_assert (v.size () == size_t (1));
+        tr = v.begin ()->first;
+      }
 
-      for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-        if (! filter || filter->selected ((*e).transformed (tr))) {
-          st.insert (*e);
+      const db::Shapes &s = c->shapes (polygons.layer ());
+      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+
+        db::Polygon poly;
+        si->polygon (poly);
+
+        for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
+          if (! filter || filter->selected ((*e).transformed (tr))) {
+            st.insert (*e);
+          }
         }
+
       }
 
     }
 
-  }
+    res->set_is_merged (merged_semantics () || is_merged ());
+    return res.release ();
 
-  res->set_is_merged (merged_semantics () || is_merged ());
-  return res.release ();
+  }
 }
 
 RegionDelegate *

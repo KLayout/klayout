@@ -542,6 +542,9 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
     try {
       tl::from_string (tl::to_string (rows_le->text ()), rows);
+      if (rows < 1) {
+        throw tl::Exception (tl::to_string (tr ("Rows count can't be zero")));
+      }
       lay::indicate_error (rows_le, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (rows_le, &ex);
@@ -550,6 +553,9 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
     try {
       tl::from_string (tl::to_string (columns_le->text ()), cols);
+      if (cols < 1) {
+        throw tl::Exception (tl::to_string (tr ("Columns count can't be zero")));
+      }
       lay::indicate_error (columns_le, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (columns_le, &ex);

@@ -108,11 +108,33 @@ struct layer
   }
 
   /**
+   *  @brief The move constructor
+   */
+  layer (const layer &&d)
+  {
+    operator= (d);
+  }
+
+  /**
    *  @brief The assignment operator
    *
    *  The manager attachement is not copied.
    */
   layer &operator= (const layer &d)
+  {
+    if (&d != this) {
+      m_box_tree = d.m_box_tree;
+      m_bbox = d.m_bbox;
+      m_bbox_dirty = d.m_bbox_dirty;
+      m_tree_dirty = d.m_tree_dirty;
+    }
+    return *this;
+  }
+
+  /**
+   *  @brief The assignment operator (move semantics)
+   */
+  layer &operator= (const layer &&d)
   {
     if (&d != this) {
       m_box_tree = d.m_box_tree;
@@ -208,6 +230,18 @@ struct layer
   }
 
   /**
+   *  @brief Insert a new shape object (move semantics)
+   */
+  iterator insert (const Sh &&sh)
+  {
+    //  inserting will make the bbox and the tree "dirty" - i.e.
+    //  it will need to be updated.
+    m_bbox_dirty = true;
+    m_tree_dirty = true;
+    return m_box_tree.insert (sh);
+  }
+
+  /**
    *  @brief Replace the given element with a new one
    *
    *  Replace the element at the position "pos" with the new
@@ -219,6 +253,19 @@ struct layer
    *  @return A reference to the new element
    */
   Sh &replace (iterator pos, const Sh &sh)
+  {
+    m_bbox_dirty = true;
+    m_tree_dirty = true;
+    non_const_iterator ncpos;
+    to_non_const_box_tree_iter (pos, ncpos, StableTag ());
+    *ncpos = sh;
+    return *ncpos;
+  }
+
+  /**
+   *  @brief Replace the given element with a new one (move semantics)
+   */
+  Sh &replace (iterator pos, const Sh &&sh)
   {
     m_bbox_dirty = true;
     m_tree_dirty = true;

@@ -357,10 +357,7 @@ CompoundRegionMultiInputOperationNode::init ()
 
 CompoundRegionMultiInputOperationNode::~CompoundRegionMultiInputOperationNode ()
 {
-  for (tl::shared_collection<CompoundRegionOperationNode>::iterator i = m_children.begin (); i != m_children.end (); ++i) {
-    delete i.operator-> ();
-  }
-  m_children.clear ();
+  //  .. nothing yet ..
 }
 
 void

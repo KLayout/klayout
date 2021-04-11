@@ -45,6 +45,12 @@ namespace edt
 // -------------------------------------------------------------------------
 //  InstPropertiesPage implementation
 
+static bool is_orthogonal (const db::DVector &rv, const db::DVector &cv)
+{
+  return (db::coord_traits<db::DCoord>::equal (rv.x (), 0) && db::coord_traits<db::DCoord>::equal (cv.y (), 0)) ||
+         (db::coord_traits<db::DCoord>::equal (rv.y (), 0) && db::coord_traits<db::DCoord>::equal (cv.x (), 0));
+}
+
 InstPropertiesPage::InstPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
   : lay::PropertiesPage (parent, manager, service), mp_service (service), m_enable_cb_callback (true), mp_pcell_parameters (0)
 {
@@ -323,6 +329,8 @@ InstPropertiesPage::update ()
 
     }
 
+    ortho_warning_frame->setEnabled (! is_orthogonal (db::CplxTrans (dbu) * rowv, db::CplxTrans (dbu) * columnv));
+
   } else {
 
     array_grp->setChecked (false);
@@ -333,6 +341,8 @@ InstPropertiesPage::update ()
     column_x_le->setText (QString ());
     column_y_le->setText (QString ());
     inst_lbl->setText (QString ());
+
+    ortho_warning_frame->setEnabled (false);
 
   }
 
@@ -562,8 +572,10 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
       has_error = true;
     }
 
-    db::DVector rv = db::DVector (dpoint_from_dpoint (db::DPoint (rx, ry), dbu, du, t));
-    db::DVector cv = db::DVector (dpoint_from_dpoint (db::DPoint (cx, cy), dbu, du, t));
+    db::DVector rv = dvector_from_dvector (db::DVector (rx, ry), dbu, du, t);
+    db::DVector cv = dvector_from_dvector (db::DVector (cx, cy), dbu, du, t);
+
+    ortho_warning_frame->setEnabled (! is_orthogonal (rv, cv));
 
     bool set_a = (! rv.equal (a_org * dbu) || ! is_array_org);
     bool set_na = (rows != na_org || ! is_array_org);

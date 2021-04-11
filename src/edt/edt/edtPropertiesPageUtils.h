@@ -439,6 +439,20 @@ db::DCoord dcoord_from_dcoord (double d, double dbu, bool du, const db::CplxTran
 db::DPoint dpoint_from_dpoint (const db::DPoint &dp, double dbu, bool du, const db::DCplxTrans &t);
 
 /**
+ *  @brief Converts a micron or DBU vector to a micron point
+ *
+ *  @param dp The point to convert
+ *  @param dbu The database unit
+ *  @param du A flag indicating whether the input point is given in database units (du = true) or micron (du = false)
+ *  @param t A transformation (in DBU space) to apply to the point
+ *  @return The micron-unit point
+ *
+ *  The transformation is intended to be a global-to-local transformation so the output value is
+ *  a point in local-cell micron units.
+ */
+db::DVector dvector_from_dvector (const db::DVector &dp, double dbu, bool du, const db::DCplxTrans &t);
+
+/**
  *  @brief Gets a dimension value from a string
  *
  *  See dcoord_from_dcoord for a description of the arguments.

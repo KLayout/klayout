@@ -1274,8 +1274,9 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
           //  compute moved object and replace
           ant::Object *rnew = new ant::Object (*robj);
           rnew->transform (m_trans);
+          int new_id = rnew->id ();
           mp_view->annotation_shapes ().replace (s->first, db::DUserObject (rnew));
-          annotation_changed_event (rnew->id ());
+          annotation_changed_event (new_id);
 
         }
 

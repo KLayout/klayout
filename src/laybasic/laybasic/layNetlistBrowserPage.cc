@@ -1027,6 +1027,8 @@ NetlistBrowserPage::adjust_view ()
         ebox += bbox_for_device_abstract (layout, a->device_abstract, a->trans);
       }
 
+      trans *= device->trans ();
+
     } else if (net) {
 
       db::cell_index_type cell_index = net->circuit ()->cell_index ();

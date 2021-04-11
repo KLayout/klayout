@@ -122,7 +122,6 @@ PropertiesPage::swap_points_clicked ()
   y1->setText (ty1);
   y2->setText (ty2);
 
-  db::Transaction t (manager (), tl::to_string (QObject::tr ("Swap ruler points")));
   emit edited ();
 }
 
@@ -224,7 +223,6 @@ PropertiesPage::snap_to_layout_clicked ()
           y2->setText (ys);
         }
 
-        db::Transaction t (manager (), tl::to_string (snap_p1 ? QObject::tr ("Snap first ruler point") : QObject::tr ("Snap second ruler point")));
         emit edited ();
 
         break;
@@ -249,7 +247,6 @@ PropertiesPage::snap_to_layout_clicked ()
       x2->setText (tl::to_qstring (tl::micron_to_string (ee.second.x ())));
       y2->setText (tl::to_qstring (tl::micron_to_string (ee.second.y ())));
 
-      db::Transaction t (manager (), tl::to_string (QObject::tr ("Snap both ruler points")));
       emit edited ();
 
     }

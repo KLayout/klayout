@@ -61,9 +61,25 @@ public:
   explicit vector (const tl::vector<T> &d) : base (d) { }
 
   /**
+   *  @brief Move constructor
+   */
+  explicit vector (const tl::vector<T> &&d) : base (d) { }
+
+  /**
    *  @brief Assignment
    */
   vector &operator= (const tl::vector<T> &d)
+  {
+    if (&d != this) {
+      base::operator= (d);
+    }
+    return *this;
+  }
+
+  /**
+   *  @brief Assignment (Move)
+   */
+  vector &operator= (const tl::vector<T> &&d)
   {
     if (&d != this) {
       base::operator= (d);

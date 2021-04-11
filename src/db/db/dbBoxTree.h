@@ -761,6 +761,15 @@ public:
   }
 
   /**
+   *  @brief Move constructor
+   */
+  box_tree (box_tree &&b)
+    : m_objects (b.m_objects), m_elements (b.m_elements), mp_root (b.mp_root)
+  {
+    b.mp_root = 0;
+  }
+
+  /**
    *  @brief Assignment 
    */
   box_tree &operator= (const box_tree &b)
@@ -770,6 +779,21 @@ public:
     m_elements = b.m_elements;
     if (b.mp_root) {
       mp_root = b.mp_root->clone ();
+    }
+    return *this;
+  }
+
+  /**
+   *  @brief Assignment (move)
+   */
+  box_tree &operator= (box_tree &&b)
+  {
+    clear ();
+    m_objects = b.m_objects;
+    m_elements = b.m_elements;
+    if (b.mp_root) {
+      mp_root = b.mp_root;
+      b.mp_root = 0;
     }
     return *this;
   }
@@ -1730,6 +1754,15 @@ public:
   }
 
   /**
+   *  @brief Move constructor
+   */
+  unstable_box_tree (unstable_box_tree &&b)
+    : m_objects (b.m_objects), mp_root (b.mp_root)
+  {
+    b.mp_root = 0;
+  }
+
+  /**
    *  @brief Assignment 
    */
   unstable_box_tree &operator= (const unstable_box_tree &b)
@@ -1738,6 +1771,20 @@ public:
     m_objects = b.m_objects;
     if (b.mp_root) {
       mp_root = b.mp_root->clone ();
+    }
+    return *this;
+  }
+
+  /**
+   *  @brief Assignment (move)
+   */
+  unstable_box_tree &operator= (unstable_box_tree &&b)
+  {
+    clear ();
+    m_objects = b.m_objects;
+    if (b.mp_root) {
+      mp_root = b.mp_root;
+      b.mp_root = 0;
     }
     return *this;
   }

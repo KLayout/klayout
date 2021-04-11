@@ -741,7 +741,7 @@
              <item>
               <widget class="QLabel" name="label_13">
                <property name="text">
-                <string>Although row and column vectors can be arbitrary combination, some design systems and mask makers only accept arrays where row and column vectors are orthogonal and parallel to x and y axes.</string>
+                <string>Although row and column vectors can be arbitrary combinations, some design systems and mask makers only accept arrays where row and column vectors are orthogonal and parallel to x and y axes.</string>
                </property>
                <property name="wordWrap">
                 <bool>true</bool>

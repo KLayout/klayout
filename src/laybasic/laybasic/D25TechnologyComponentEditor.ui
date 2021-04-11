@@ -44,6 +44,12 @@
        <family>Monospace</family>
       </font>
      </property>
+     <property name="lineWrapMode">
+      <enum>QTextEdit::NoWrap</enum>
+     </property>
+     <property name="acceptRichText">
+      <bool>false</bool>
+     </property>
     </widget>
    </item>
   </layout>

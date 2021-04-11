@@ -89,6 +89,12 @@ AnnotationShapes::AnnotationShapes (const AnnotationShapes &d)
   operator= (d);
 }
 
+AnnotationShapes::AnnotationShapes (const AnnotationShapes &&d)
+  : db::LayoutStateModel (true /*busy*/), db::Object (d)
+{
+  operator= (d);
+}
+
 AnnotationShapes::~AnnotationShapes ()
 {
   clear ();
@@ -106,7 +112,21 @@ AnnotationShapes::operator= (const AnnotationShapes &d)
   }
   return *this;
 }
-void 
+
+AnnotationShapes &
+AnnotationShapes::operator= (const AnnotationShapes &&d)
+{
+  if (&d != this) {
+    clear ();
+    if (manager () && manager ()->transacting ()) {
+      manager ()->queue (this, new AnnotationLayerOp (true /*insert*/, d.m_layer.begin (), d.m_layer.end ()));
+    }
+    m_layer = d.m_layer;
+  }
+  return *this;
+}
+
+void
 AnnotationShapes::clear ()
 {
   if (manager () && manager ()->transacting ()) {
@@ -126,7 +146,17 @@ AnnotationShapes::insert (const shape_type &sh)
   return *m_layer.insert (sh);
 }
 
-void 
+const AnnotationShapes::shape_type &
+AnnotationShapes::insert (const shape_type &&sh)
+{
+  if (manager () && manager ()->transacting ()) {
+    manager ()->queue (this, new AnnotationLayerOp (true /*insert*/, sh));
+  }
+  invalidate_state ();  //  HINT: must come before the change is done!
+  return *m_layer.insert (sh);
+}
+
+void
 AnnotationShapes::reserve (size_t n)
 {
   m_layer.reserve (n);
@@ -156,7 +186,21 @@ AnnotationShapes::replace (iterator pos, const shape_type &sh)
   return *pos;
 }
 
-void 
+const AnnotationShapes::shape_type &
+AnnotationShapes::replace (iterator pos, const shape_type &&sh)
+{
+  if (&*pos != &sh && *pos != sh) {
+    if (manager () && manager ()->transacting ()) {
+      manager ()->queue (this, new AnnotationLayerOp (false /*not insert*/, *pos));
+      manager ()->queue (this, new AnnotationLayerOp (true /*insert*/, sh));
+    }
+    invalidate_state ();  //  HINT: must come before the change is done!
+    m_layer.replace (pos, sh);
+  }
+  return *pos;
+}
+
+void
 AnnotationShapes::redo (db::Op *op)
 {
   AnnotationLayerOp *layop = dynamic_cast<AnnotationLayerOp *> (op);

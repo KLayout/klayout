@@ -99,6 +99,7 @@ void run_test1 (tl::TestBase *_this, bool deep)
   unsigned int l1002 = ly.get_layer (db::LayerProperties (1002, 0));
   res.insert_into (&ly, *ly.begin_top_down (), l1002);
 
+  primary = new db::CompoundRegionOperationPrimaryNode ();
   db::CompoundRegionCheckOperationNode space_check (primary, db::SpaceRelation, false /*==all polygons*/, 1050, check_options);
 
   res = r.cop_to_edge_pairs (space_check);

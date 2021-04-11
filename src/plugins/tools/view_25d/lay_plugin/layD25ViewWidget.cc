@@ -246,40 +246,23 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
 
   } else {
 
-    //  compute vector of line of sight
-    std::pair<QVector3D, QVector3D> ray = camera_normal (cam_perspective () * cam_trans (), px, py);
-
-    //  by definition the ray goes through the camera position
-    QVector3D hp = hit_point_with_scene (ray.second);
+    double d = event->angleDelta ().y () * (1.0 / (90 * 16));
 
     if (! (event->modifiers () & Qt::ControlModifier)) {
 
-      //  No Ctrl is closeup
+      //  No Ctrl is "move horizontally along the azimuth axis"
 
-      double f = event->angleDelta ().y () * (1.0 / (90 * 8));
-      m_displacement += -((f / m_scale_factor) * std::min (cam_dist (), double ((cam_position () - hp).length ()))) * ray.second;
+      QMatrix4x4 t;
+      t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
+      QVector3D cd = t.inverted ().map (QVector3D (0, 0, cam_dist ()));
+
+      m_displacement += d * cd;
 
     } else {
 
       //  "Ctrl" is zoom
 
-      double f = exp (event->angleDelta ().y () * (1.0 / (90 * 8)));
-
-      QVector3D initial_displacement = m_displacement;
-      QVector3D displacement = m_displacement;
-
-      m_scale_factor *= f;
-      displacement += hp * (1.0 - f) / m_scale_factor;
-
-      //  normalize the scene translation so the scene does not "flee"
-
-      QMatrix4x4 ct = cam_trans ();
-      initial_displacement = ct.map (initial_displacement);
-      displacement = ct.map (displacement);
-
-      lay::normalize_scene_trans (cam_perspective (), displacement, m_scale_factor, initial_displacement.z ());
-
-      m_displacement = ct.inverted ().map (displacement);
+      m_scale_factor *= exp (d);
 
       emit scale_factor_changed (m_scale_factor);
 
@@ -294,8 +277,65 @@ void
 D25ViewWidget::keyPressEvent (QKeyEvent *event)
 {
   if (event->key () == Qt::Key_Shift) {
+
     mp_mode.reset (0);
     set_top_view (true);
+
+  } else if (event->key () == Qt::Key_Up || event->key () == Qt::Key_Down) {
+
+    if (! top_view () && (event->modifiers () & Qt::ControlModifier) != 0) {
+
+      //  Ctrl + up/down changes elevation
+
+      double d = (event->key () == Qt::Key_Up ? 2 : -2);
+
+      set_cam_elevation (std::max (-90.0, std::min (90.0, cam_elevation () + d)));
+
+    } else {
+
+      //  Move "into" or "out"
+
+      double d = (event->key () == Qt::Key_Up ? 0.1 : -0.1);
+
+      QMatrix4x4 t;
+      t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
+      QVector3D cd = t.inverted ().map (QVector3D (0, 0, cam_dist ()));
+
+      set_displacement (displacement () + d * cd);
+
+    }
+
+  } else if (event->key () == Qt::Key_Left || event->key () == Qt::Key_Right) {
+
+    if (! top_view () && (event->modifiers () & Qt::ControlModifier) != 0) {
+
+      //  Ctrl + left/right changes azumith
+
+      double d = (event->key () == Qt::Key_Right ? 2 : -2);
+
+      double a = cam_azimuth () + d;
+      if (a < -180.0) {
+        a += 360.0;
+      } else if (a > 180.0) {
+        a -= 360.0;
+      }
+
+      set_cam_azimuth (a);
+
+    } else {
+
+      //  Move "left" and "right"
+
+      double d = (event->key () == Qt::Key_Left ? 0.1 : -0.1);
+
+      QMatrix4x4 t;
+      t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
+      QVector3D cd = t.inverted ().map (QVector3D (cam_dist (), 0, 0));
+
+      set_displacement (displacement () + d * cd);
+
+    }
+
   }
 }
 
@@ -435,17 +475,17 @@ namespace {
 
     const db::D25LayerInfo *operator() (lay::LayoutView *view, int cv_index, int layer_index)
     {
-      std::map<int, std::map<int, const db::D25LayerInfo *> >::const_iterator c = m_cache.find (cv_index);
+      std::map<int, std::map<int, db::D25LayerInfo> >::const_iterator c = m_cache.find (cv_index);
       if (c != m_cache.end ()) {
-        std::map<int, const db::D25LayerInfo *>::const_iterator l = c->second.find (layer_index);
+        std::map<int, db::D25LayerInfo>::const_iterator l = c->second.find (layer_index);
         if (l != c->second.end ()) {
-          return l->second;
+          return &l->second;
         } else {
           return 0;
         }
       }
 
-      std::map<int, const db::D25LayerInfo *> &lcache = m_cache [cv_index];
+      std::map<int, db::D25LayerInfo> &lcache = m_cache [cv_index];
 
       const db::D25TechnologyComponent *comp = 0;
 
@@ -457,16 +497,18 @@ namespace {
 
       if (comp) {
 
-        std::map<db::LayerProperties, const db::D25LayerInfo *, db::LPLogicalLessFunc> zi_by_lp;
-        for (db::D25TechnologyComponent::const_iterator i = comp->begin (); i != comp->end (); ++i) {
-          zi_by_lp.insert (std::make_pair (i->layer (), i.operator-> ()));
+        std::map<db::LayerProperties, db::D25LayerInfo, db::LPLogicalLessFunc> zi_by_lp;
+
+        db::D25TechnologyComponent::layers_type layers = comp->compile_from_source ();
+        for (db::D25TechnologyComponent::layers_type::const_iterator i = layers.begin (); i != layers.end (); ++i) {
+          zi_by_lp.insert (std::make_pair (i->layer (), *i));
         }
 
         const db::Layout &ly = cv->layout ();
         for (int l = 0; l < int (ly.layers ()); ++l) {
           if (ly.is_valid_layer (l)) {
             const db::LayerProperties &lp = ly.get_properties (l);
-            std::map<db::LayerProperties, const db::D25LayerInfo *, db::LPLogicalLessFunc>::const_iterator z = zi_by_lp.find (lp);
+            std::map<db::LayerProperties, db::D25LayerInfo, db::LPLogicalLessFunc>::const_iterator z = zi_by_lp.find (lp);
             if (z == zi_by_lp.end () && ! lp.name.empty ()) {
               //  If possible, try by name only
               z = zi_by_lp.find (db::LayerProperties (lp.name));
@@ -485,7 +527,7 @@ namespace {
 
 
   private:
-    std::map<int, std::map<int, const db::D25LayerInfo *> > m_cache;
+    std::map<int, std::map<int, db::D25LayerInfo> > m_cache;
   };
 
 }
@@ -955,9 +997,12 @@ D25ViewWidget::paintGL ()
 
   vertexes.add (-0.25 * compass_rad, 0.0, 0.6 * compass_rad);
   vertexes.add (0.0, 0.0, -0.8 * compass_rad);
+  vertexes.add (0.0, 0.0, -0.8 * compass_rad);
   vertexes.add (0.25 * compass_rad, 0.0, 0.6 * compass_rad);
+  vertexes.add (0.25 * compass_rad, 0.0, 0.6 * compass_rad);
+  vertexes.add (-0.25 * compass_rad, 0.0, 0.6 * compass_rad);
 
-  vertexes.draw_to (this, positions, GL_TRIANGLES);
+  vertexes.draw_to (this, positions, GL_LINES);
 
   //  draw base plane
 
@@ -1029,8 +1074,8 @@ D25ViewWidget::paintGL ()
 
     glDisable (GL_DEPTH_TEST);
 
-    int cube_size = 64;
-    int cube_margin = 20;
+    int cube_size = 32;
+    int cube_margin = 40;
 
     QMatrix4x4 into_top_right_corner;
     into_top_right_corner.translate (1.0 - 2.0 / width () * (cube_margin + cube_size / 2), 1.0 - 2.0 / height () * (cube_margin + cube_size / 2));

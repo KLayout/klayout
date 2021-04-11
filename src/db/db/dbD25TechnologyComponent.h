@@ -76,55 +76,8 @@ public:
   D25TechnologyComponent (const D25TechnologyComponent &d);
 
   typedef std::list<D25LayerInfo> layers_type;
-  typedef layers_type::const_iterator const_iterator;
-  typedef layers_type::iterator iterator;
 
-  void compile_from_source (const std::string &src);
-
-  const_iterator begin () const
-  {
-    return m_layers.begin ();
-  }
-
-  iterator begin ()
-  {
-    return m_layers.begin ();
-  }
-
-  const_iterator end () const
-  {
-    return m_layers.end ();
-  }
-
-  iterator end ()
-  {
-    return m_layers.end ();
-  }
-
-  void clear ()
-  {
-    m_layers.clear ();
-  }
-
-  void erase (iterator p)
-  {
-    m_layers.erase (p);
-  }
-
-  void insert (iterator p, const D25LayerInfo &info)
-  {
-    m_layers.insert (p, info);
-  }
-
-  void add (const D25LayerInfo &info)
-  {
-    m_layers.push_back (info);
-  }
-
-  size_t size () const
-  {
-    return m_layers.size ();
-  }
+  layers_type compile_from_source () const;
 
   const std::string &src () const
   {
@@ -145,7 +98,6 @@ public:
   }
 
 private:
-  layers_type m_layers;
   std::string m_src;
 };
 

@@ -536,6 +536,19 @@ public:
   }
 
   /**
+   *  @brief Move constructor
+   *
+   *  See operator= for a description of the copy operation.
+   */
+  reuse_vector (reuse_vector &&d)
+  {
+    mp_start = d.mp_start; d.mp_start = 0;
+    mp_finish = d.mp_finish; d.mp_finish = 0;
+    mp_capacity = d.mp_capacity; d.mp_capacity = 0;
+    mp_rdata = d.mp_rdata; d.mp_rdata = 0;
+  }
+
+  /**
    *  @brief Destructor
    */
   ~reuse_vector ()
@@ -558,6 +571,20 @@ public:
       for (const_iterator i = d.begin (); i != d.end (); ++i) {
         insert (*i);
       }
+    }
+    return *this;
+  }
+
+  /**
+   *  @brief Assignment (move)
+   */
+  reuse_vector &operator= (reuse_vector &&d)
+  {
+    if (&d != this) {
+      mp_start = d.mp_start; d.mp_start = 0;
+      mp_finish = d.mp_finish; d.mp_finish = 0;
+      mp_capacity = d.mp_capacity; d.mp_capacity = 0;
+      mp_rdata = d.mp_rdata; d.mp_rdata = 0;
     }
     return *this;
   }

@@ -1044,7 +1044,9 @@ a positive value. A horizontal displacement component can be specified too, whic
 <li><b>origin(x, y) </b>: specifies a fixed point to align the pattern with. This point specifies the location
 of the reference point for one pattern cell. </li>
 <li><b>auto_origin </b>: lets the algorithm choose the origin. This may result is a slightly better fill coverage
-as the algorithm is able to determine a pattern origin per fill island. </li>
+as the algorithm is able to determine a pattern origin per island to fill. </li>
+<li><b>multi_origin </b>: lets the algorithm choose the origin and repeats the fill with different origins
+until no further fill cell can be fitted. </li>
 <li><b>fill_pattern(..) </b>: specifies the fill pattern. </li>
 </ul>
 </p><p>

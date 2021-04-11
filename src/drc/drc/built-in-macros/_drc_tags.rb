@@ -334,7 +334,8 @@ module DRC
 
   # A wrapper for the fill origin definition
   class DRCFillOrigin
-    def initialize(x = nil, y = nil)
+    def initialize(x = nil, y = nil, repeat = false)
+      @repeat = repeat
       if !x && !y
         @origin = nil
       else
@@ -349,6 +350,9 @@ module DRC
     end
     def origin
       @origin
+    end
+    def repeat
+      @repeat
     end
   end
 

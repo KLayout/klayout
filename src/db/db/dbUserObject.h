@@ -207,12 +207,38 @@ public:
   }
 
   /**
+   *  @brief The move constructor
+   */
+  user_object (user_object<C> &&d)
+    : mp_obj (0)
+  {
+    if (d.mp_obj) {
+      set_ptr (d.mp_obj);
+      d.mp_obj = 0;
+    }
+  }
+
+  /**
    *  @brief Assignment operator
    */
   user_object<C> &operator= (const user_object<C> &d)
   {
     if (d.mp_obj) {
       set_ptr (d.mp_obj->clone ());
+    } else {
+      set_ptr (0);
+    }
+    return *this;
+  }
+
+  /**
+   *  @brief Assignment operator (move)
+   */
+  user_object<C> &operator= (user_object<C> &&d)
+  {
+    if (d.mp_obj) {
+      set_ptr (d.mp_obj);
+      d.mp_obj = 0;
     } else {
       set_ptr (0);
     }

@@ -1626,7 +1626,7 @@ AreaMap::reinitialize (const db::Point &p0, const db::Vector &d, const db::Vecto
     m_ny = ny;
 
     if (mp_av) {
-      delete mp_av;
+      delete[] mp_av;
     }
 
     mp_av = new area_type [nx * ny];

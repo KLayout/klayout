@@ -206,7 +206,13 @@ GDS2Reader::get_string ()
 void
 GDS2Reader::get_string (std::string &s) const
 {
-  s.assign ((const char *) mp_rec_buf, 0, m_reclen);
+  if (m_reclen == 0) {
+    s.clear ();
+  } else if (mp_rec_buf [m_reclen - 1] != 0) {
+    s.assign ((const char *) mp_rec_buf, m_reclen);
+  } else {
+    s.assign ((const char *) mp_rec_buf, m_reclen - 1);
+  }
 }
 
 void

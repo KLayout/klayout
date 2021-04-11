@@ -1074,21 +1074,29 @@ initialize_expressions ()
   gsi::initialize ();
 
   //  Go through all classes (maybe again)
-  for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
+  std::list<const gsi::ClassBase *> classes = gsi::ClassBase::classes_in_definition_order ();
+  for (std::list<const gsi::ClassBase *>::const_iterator c = classes.begin (); c != classes.end (); ++c) {
 
-    //  Skip external classes
-    if (c->is_external ()) {
+    if ((*c)->is_external ()) {
+      //  skip external classes
+      continue;
+    } else if ((*c)->declaration () != *c) {
+      //  we might encounter a child class which is a reference to a top-level class (e.g.
+      //  duplication of enums into child classes). In this case we should create a reference inside the
+      //  target class.
+      tl_assert ((*c)->parent () != 0);  //  top-level classes should be merged
+      //  TODO: implement (see rba.cc:1544 for example)
       continue;
     }
 
     //  install the method table:
-    ExpressionMethodTable::initialize_class (&*c);
+    ExpressionMethodTable::initialize_class (*c);
 
     //  register a function that creates a class object (use a function to avoid issues with
     //  late destruction of global variables which the class object is already gone)
-    const tl::VariantUserClassBase *cc = c->var_cls_cls ();
+    const tl::VariantUserClassBase *cc = (*c)->var_cls_cls ();
     if (cc) {
-      tl::Eval::define_global_function (c->name (), new EvalClassFunction (cc));
+      tl::Eval::define_global_function ((*c)->name (), new EvalClassFunction (cc));
     }
 
   }

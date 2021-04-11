@@ -235,6 +235,7 @@ TEST(10)
                          //  General
                          "-im=1/0 3,4/0-255 A:17/0",
                          "-is",
+                         "--blend-mode=1",
                          //  OASIS
                          "--expect-strict-mode=1"
                        };
@@ -258,6 +259,7 @@ TEST(10)
   EXPECT_EQ (stream_opt.get_option_by_name ("dxf_text_scaling").to_int (), 100);
   EXPECT_EQ (stream_opt.get_option_by_name ("layer_map").to_user<db::LayerMap> ().to_string (), "layer_map()");
   EXPECT_EQ (stream_opt.get_option_by_name ("create_other_layers").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("cell_conflict_resolution").to_string (), "AddToCell");
   EXPECT_EQ (stream_opt.get_option_by_name ("properties_enabled").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("text_enabled").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_box_mode").to_uint (), (unsigned int) 1);
@@ -283,11 +285,31 @@ TEST(10)
   EXPECT_EQ (stream_opt.get_option_by_name ("dxf_text_scaling").to_int (), 75);
   EXPECT_EQ (stream_opt.get_option_by_name ("layer_map").to_user<db::LayerMap> ().to_string (), "layer_map('1/0';'3-4/0-255';'A : 17/0')");
   EXPECT_EQ (stream_opt.get_option_by_name ("create_other_layers").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("cell_conflict_resolution").to_string (), "OverwriteCell");
   EXPECT_EQ (stream_opt.get_option_by_name ("properties_enabled").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("text_enabled").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_box_mode").to_uint (), (unsigned int) 3);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_allow_big_records").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_allow_multi_xy_records").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_expect_strict_mode").to_int (), 1);
+}
+
+
+//  Testing reader options - blend mode "Rename" is default
+TEST(11)
+{
+  bd::GenericReaderOptions opt;
+  tl::CommandLineOptions cmd;
+
+  opt.add_options (cmd);
+
+  const char *argv[] = { "x" };
+
+  cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
+
+  db::LoadLayoutOptions stream_opt;
+  opt.configure (stream_opt);
+
+  EXPECT_EQ (stream_opt.get_option_by_name ("cell_conflict_resolution").to_string (), "RenameCell");
 }
 

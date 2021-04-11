@@ -694,8 +694,8 @@ TEST(10_HullsAndHoles)
 
   db::Region hulls = r1_sized.hulls ();
   db::Region holes = r1_sized.holes ();
-  EXPECT_EQ (hulls.is_merged (), true);
-  EXPECT_EQ (holes.is_merged (), true);
+  EXPECT_EQ (hulls.is_merged (), false);
+  EXPECT_EQ (holes.is_merged (), false);
 
   db::Layout target;
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));

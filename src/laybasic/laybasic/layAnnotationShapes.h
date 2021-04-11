@@ -136,14 +136,35 @@ public:
   AnnotationShapes (const AnnotationShapes &d);
 
   /**
+   *  @brief Copy ctor
+   */
+  AnnotationShapes (const AnnotationShapes &&d);
+
+  /**
    *  @brief Assignment operator
    */
   AnnotationShapes &operator= (const AnnotationShapes &d);
 
   /**
+   *  @brief Assignment operator (move)
+   */
+  AnnotationShapes &operator= (const AnnotationShapes &&d);
+
+  /**
    *  @brief Insert a shape_type
    */
   const shape_type &insert (const shape_type &sh);
+
+  /**
+   *  @brief Insert a sequence of DUserObject shapes
+   *
+   *  Inserts a sequence of shapes [from,to)
+   */
+
+  /**
+   *  @brief Insert a shape_type (move semantics)
+   */
+  const shape_type &insert (const shape_type &&sh);
 
   /**
    *  @brief Insert a sequence of DUserObject shapes
@@ -211,6 +232,11 @@ public:
    *  @return A reference to the object created
    */
   const shape_type &replace (iterator pos, const shape_type &sh);
+
+  /**
+   *  @brief Replace an element at the given position with another shape (move semantics)
+   */
+  const shape_type &replace (iterator pos, const shape_type &&sh);
 
   /**
    *  @brief updates the bbox 

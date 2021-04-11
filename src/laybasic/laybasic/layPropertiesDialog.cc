@@ -265,7 +265,7 @@ PropertiesDialog::apply ()
 {
 BEGIN_PROTECTED
 
-  db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Auto-apply changes")), m_transaction_id);
+  db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
 
   try {
 

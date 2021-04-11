@@ -80,6 +80,8 @@
       Iterated OASIS instances are stored and handled in a leaner way in viewer mode
 * Enhancement: Buddy scripts can concatenate files with "+" for input
       Concatenation happens by "blending files". Beware of the risk this implies.
+      A new option "--blend-mode" has been introduced for supporting overwrite, skip
+      and variant formation in case of cell name conflicts. See buddy script help.
 * Enhancement: Layer maps now support n:m layer mapping
       This allows mapping n input layers to one logical layer (merging) and also
       one input layer to m logical ones (clone layer). This applies to the 

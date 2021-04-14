@@ -80,6 +80,7 @@ plugins.depends += lib rdb db
     SUBDIRS += gsiqt
     gsiqt.depends += gsi db
     laybasic.depends += gsiqt
+    lay.depends += gsiqt
 
     equals(HAVE_PYTHON, "1") {
       pymod.depends += gsiqt

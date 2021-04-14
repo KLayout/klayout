@@ -247,6 +247,14 @@ if not exist "%option-build%" (
 echo on
 "%option-qmake%" ^
   HAVE_QT5=1 ^
+  HAVE_QT_UITOOLS=1 ^
+  HAVE_QT_NETWORK=1 ^
+  HAVE_QT_SQL=1 ^
+  HAVE_QT_SVG=1 ^
+  HAVE_QT_PRINTSUPPORT=1 ^
+  HAVE_QT_MULTIMEDIA=1 ^
+  HAVE_QT_DESIGNER=1 ^
+  HAVE_QT_XML=1 ^
   -recursive ^
   -spec win32-msvc ^
   "CONFIG+=%CONFIG%" ^

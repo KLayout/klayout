@@ -2382,6 +2382,25 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
 
       std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i1 = *ii1;
 
+      //  in tentative mode, reject this choice if nets are named and all other nets in the ambiguity group differ -> this favors net matching by name
+      if (! data->dont_consider_net_names && tentative) {
+
+        bool any_matching = false;
+        for (std::vector<std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator>::iterator ii2 = iters2.begin (); ii2 != iters2.end () && ! any_matching; ++ii2) {
+          std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i2 = *ii2;
+          any_matching = !net_names_are_different (i1->first->net (), i2->first->net ());
+        }
+
+        if (! any_matching) {
+          if (options ()->debug_netcompare) {
+            tl::info << indent_s << "ambiguity group rejected - all ambiguous other net names are mismatching for: " << i1->first->net ()->expanded_name ();
+          }
+          //  a mismatch - stop here.
+          return failed_match;
+        }
+
+      }
+
       bool any = false;
       std::vector<std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator>::iterator to_remove = iters2.end ();
 

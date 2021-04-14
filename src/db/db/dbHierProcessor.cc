@@ -409,11 +409,26 @@ local_processor_cell_contexts<TS, TI, TR>::create (const context_key_type &intru
   return &m_contexts[intruders];
 }
 
+template <class TR>
+static void
+subtract_set (std::unordered_set<TR> &res, const std::unordered_set<TR> &other)
+{
+  //  for everything else, we don't use a boolean core but just set intersection
+  for (typename std::unordered_set<TR>::const_iterator o = other.begin (); o != other.end (); ++o) {
+    res.erase (*o);
+  }
+}
+
 template <class TS, class TI>
 static void
 subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::PolygonRef> &other, db::Layout *layout, const db::local_processor<TS, TI, db::PolygonRef> *proc)
 {
   if (other.empty ()) {
+    return;
+  }
+
+  if (! proc->boolean_core ()) {
+    subtract_set (res, other);
     return;
   }
 
@@ -449,14 +464,60 @@ subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::
   ep.process (pg, op);
 }
 
+template <class TS, class TI>
+static void
+subtract (std::unordered_set<db::Edge> &res, const std::unordered_set<db::Edge> &other, db::Layout *layout, const db::local_processor<TS, TI, db::Edge> *proc)
+{
+  if (other.empty ()) {
+    return;
+  }
+
+  if (! proc->boolean_core ()) {
+    subtract_set (res, other);
+    return;
+  }
+
+  db::box_scanner<db::Edge, size_t> scanner;
+  scanner.reserve (res.size () + other.size ());
+
+  for (std::unordered_set<Edge>::const_iterator i = res.begin (); i != res.end (); ++i) {
+    scanner.insert (i.operator-> (), 0);
+  }
+  for (std::unordered_set<Edge>::const_iterator i = other.begin (); i != other.end (); ++i) {
+    scanner.insert (i.operator-> (), 1);
+  }
+
+  std::unordered_set<db::Edge> result;
+  EdgeBooleanClusterCollector<std::unordered_set<db::Edge> > cluster_collector (&result, EdgeNot);
+  scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
+
+  res.swap (result);
+}
+
 template <class TS, class TI, class TR>
 static void
 subtract (std::unordered_set<TR> &res, const std::unordered_set<TR> &other, db::Layout * /*layout*/, const db::local_processor<TS, TI, TR> * /*proc*/)
 {
-  //  for edges, we don't use a boolean core but just set intersection
-  for (typename std::unordered_set<TR>::const_iterator o = other.begin (); o != other.end (); ++o) {
-    res.erase (*o);
-  }
+  subtract_set (res, other);
+}
+
+//  determines the default boolean core flag per result type
+
+namespace
+{
+
+template <class TR>
+struct default_boolean_core
+{
+  bool operator() () const { return false; }
+};
+
+template <>
+struct default_boolean_core<db::PolygonRef>
+{
+  bool operator() () const { return true; }
+};
+
 }
 
 namespace {
@@ -1221,7 +1282,7 @@ local_processor<TS, TI, TR>::local_processor (db::Layout *layout, db::Cell *top,
   : mp_subject_layout (layout), mp_intruder_layout (layout),
     mp_subject_top (top), mp_intruder_top (top),
     mp_subject_breakout_cells (breakout_cells), mp_intruder_breakout_cells (breakout_cells),
-    m_report_progress (true), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30), m_progress (0), mp_progress (0)
+    m_report_progress (true), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_boolean_core (default_boolean_core<TR> () ()), m_base_verbosity (30), m_progress (0), mp_progress (0)
 {
   //  .. nothing yet ..
 }
@@ -1231,7 +1292,7 @@ local_processor<TS, TI, TR>::local_processor (db::Layout *subject_layout, db::Ce
   : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout),
     mp_subject_top (subject_top), mp_intruder_top (intruder_top),
     mp_subject_breakout_cells (subject_breakout_cells), mp_intruder_breakout_cells (intruder_breakout_cells),
-    m_report_progress (true), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_base_verbosity (30), m_progress (0), mp_progress (0)
+    m_report_progress (true), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_boolean_core (default_boolean_core<TR> () ()), m_base_verbosity (30), m_progress (0), mp_progress (0)
 {
   //  .. nothing yet ..
 }
@@ -1535,6 +1596,11 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
       scanner.process (rec, dist, inst_bcs, db::box_convert<TI> ());
     }
 
+    //  this cache should reduce the effort of checking array vs. array
+    typedef std::pair<unsigned int, std::pair<db::cell_index_type, db::ICplxTrans> > effective_instance_cache_key_type;
+    typedef std::map<effective_instance_cache_key_type, std::pair<bool, db::CellInstArray> > effective_instance_cache_type;
+    effective_instance_cache_type effective_instance_cache;
+
     for (typename std::unordered_map<const db::CellInstArray *, interaction_value_type>::const_iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
       db::Cell &subject_child_cell = mp_subject_layout->cell (i->first->object ().cell_index ());
@@ -1568,17 +1634,28 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
             db::box_convert <db::CellInst, true> inst_bcii (*mp_intruder_layout, ail);
 
             for (std::unordered_set<const db::CellInstArray *>::const_iterator j = i->second.first.begin (); j != i->second.first.end (); ++j) {
+
               for (db::CellInstArray::iterator k = (*j)->begin_touching (safe_box_enlarged (nbox, -1, -1), inst_bcii); ! k.at_end (); ++k) {
+
                 db::ICplxTrans tk = (*j)->complex_trans (*k);
                 //  NOTE: no self-interactions
                 if (i->first != *j || tn != tk) {
+
                   //  optimize the intruder instance so it will be as low as possible
-                  std::pair<bool, db::CellInstArray> ei = effective_instance (contexts.subject_layer (), i->first->object ().cell_index (), ail, (*j)->object ().cell_index (), tni * tk, dist);
-                  if (ei.first) {
-                    intruders_below.first.insert (ei.second);
+                  effective_instance_cache_key_type key (ail, std::make_pair ((*j)->object ().cell_index (), tni * tk));
+                  effective_instance_cache_type::iterator cached = effective_instance_cache.find (key);
+                  if (cached == effective_instance_cache.end ()) {
+                    std::pair<bool, db::CellInstArray> ei = effective_instance (contexts.subject_layer (), i->first->object ().cell_index (), ail, (*j)->object ().cell_index (), tni * tk, dist);
+                    cached = effective_instance_cache.insert (std::make_pair (key, ei)).first;
                   }
+                  if (cached->second.first) {
+                    intruders_below.first.insert (cached->second.second);
+                  }
+
                 }
+
               }
+
             }
 
           }

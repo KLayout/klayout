@@ -800,7 +800,7 @@ TEST(13_Edges)
 
   db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
   db::Edges r3edges = r3.edges ();
-  EXPECT_EQ (r3edges.is_merged (), true);
+  EXPECT_EQ (r3edges.is_merged (), false);
 
   db::EdgeLengthFilter f (0, 500, true);
   db::Edges r3edges_filtered = r3.edges (f);
@@ -814,6 +814,46 @@ TEST(13_Edges)
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au13.gds");
+}
+
+TEST(13b_Edges)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_edges.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::Edges r1edges = r1.edges ();
+  EXPECT_EQ (r1edges.is_merged (), false);
+
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Edges r2edges = r2.edges ();
+  EXPECT_EQ (r2edges.is_merged (), false);
+
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1edges);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r2edges);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au13b.gds");
 }
 
 TEST(14_Interacting)
@@ -936,7 +976,7 @@ TEST(14_Interacting)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), r6r.selected_interacting (r1er));
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (33, 0)), r6r.selected_not_interacting (r1er));
 
-    EXPECT_EQ (r6.selected_interacting (r1e).is_merged (), true);
+    EXPECT_EQ (r6.selected_interacting (r1e).is_merged (), false);
     EXPECT_EQ (r6.selected_interacting (r1er).is_merged (), false);
     EXPECT_EQ (r6r.selected_interacting (r1e).is_merged (), false);
     EXPECT_EQ (r6r.selected_interacting (r1er).is_merged (), false);

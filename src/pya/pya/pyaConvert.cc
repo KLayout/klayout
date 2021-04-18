@@ -496,6 +496,8 @@ PyObject *c2python_func<const tl::Variant &>::operator() (const tl::Variant &c)
     return c2python (c.to_bool ());
   } else if (c.is_a_string ()) {
     return c2python (c.to_string ());
+  } else if (c.is_a_bytearray ()) {
+    return c2python (c.to_bytearray ());
   } else if (c.is_long ()) {
     return c2python (c.to_long ());
   } else if (c.is_ulong ()) {

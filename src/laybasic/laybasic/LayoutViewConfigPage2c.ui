@@ -214,7 +214,7 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -227,28 +227,14 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Capture range to mouse cursor</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="search_range_spinbx">
-        <property name="maximum">
-         <number>9999</number>
-        </property>
-       </widget>
-      </item>
-      <item>
+      <item row="0" column="2">
        <widget class="QLabel" name="label_3">
         <property name="text">
          <string>pixel</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="3">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -260,6 +246,41 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="search_range_spinbx">
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Capture range to mouse cursor (single click)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Capture range to mouse cursor (box)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="search_range_box_spinbx">
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>pixel</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

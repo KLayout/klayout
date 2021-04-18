@@ -2349,7 +2349,13 @@ PartialService::catch_distance ()
   return double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
 }
 
-db::DPoint 
+double
+PartialService::catch_distance_box ()
+{
+  return double (view ()->search_range_box ()) / widget ()->mouse_event_trans ().mag ();
+}
+
+db::DPoint
 PartialService::single_selected_point () const
 {
   //  build the transformation variants cache and 
@@ -2576,7 +2582,7 @@ PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMod
   clear_partial_transient_selection ();
 
   //  compute search box
-  double l = catch_distance ();
+  double l = box.is_point () ? catch_distance () : catch_distance_box ();
   db::DBox search_box = box.enlarged (db::DVector (l, l));
 
   bool needs_update = false;

@@ -76,3 +76,8 @@ TEST(2)
 {
   run_rve_test (_this, "rve2.db", "rve2_au.txt");
 }
+
+TEST(3)
+{
+  run_rve_test (_this, "rve3.db", "rve3_au.txt");
+}

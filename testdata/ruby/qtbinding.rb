@@ -744,6 +744,17 @@ class QtBinding_TestClass < TestBase
 
   end
 
+  def test_53
+
+    # issue #771 (QMimeData not working)
+
+    mimeData = RBA::QMimeData::new
+    mimeData.setData("application/json", '{"test":"test"}')
+    jsonData = mimeData.data("application/json");
+    assert_equal(jsonData.to_s, '{"test":"test"}')
+
+  end
+
 end 
 
 load("test_epilogue.rb")

@@ -629,6 +629,16 @@ class QtBindingTest(unittest.TestCase):
     self.assertEqual(len(buf.data) > 100, True)
     self.assertEqual(buf.data[0:8], b'\x89PNG\r\n\x1a\n')
 
+  def test_53(self):
+
+    # issue #771 (QMimeData not working)
+    mimeData = pya.QMimeData()
+    mimeData.setData("application/json",'{"test":"test"}')
+    jsonData = mimeData.data("application/json");
+    if sys.version_info < (3, 0):
+      self.assertEqual(str(jsonData), '{"test":"test"}')
+    else:
+      self.assertEqual(str(jsonData), 'b\'{"test":"test"}\'')
 
 # run unit tests
 if __name__ == '__main__':

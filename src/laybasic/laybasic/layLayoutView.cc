@@ -463,6 +463,7 @@ LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
   m_always_show_ld = true;
   m_always_show_layout_index = false;
   m_search_range = 5;
+  m_search_range_box = 0;
 
   m_layer_properties_lists.push_back (new LayerPropertiesList ());
   m_layer_properties_lists.back ()->attach_view (this, (unsigned int) (m_layer_properties_lists.size () - 1));
@@ -1248,6 +1249,13 @@ LayoutView::configure (const std::string &name, const std::string &value)
     unsigned int n;
     tl::from_string (value, n);
     set_search_range (n);
+    return true;
+
+  } else if (name == cfg_search_range_box) {
+
+    unsigned int n;
+    tl::from_string (value, n);
+    set_search_range_box (n);
     return true;
 
   } else if (name == cfg_abstract_mode_enabled) {
@@ -5880,6 +5888,18 @@ void
 LayoutView::set_search_range (unsigned int sr)
 {
   m_search_range = sr;
+}
+
+unsigned int
+LayoutView::search_range_box ()
+{
+  return m_search_range_box;
+}
+
+void
+LayoutView::set_search_range_box (unsigned int sr)
+{
+  m_search_range_box = sr;
 }
 
 void

@@ -1304,6 +1304,13 @@ class BasicTest(unittest.TestCase):
     self.assertEqual( str(b.b22c()), "hallo" )
     self.assertEqual( type(b.b22c()).__name__, "LayerInfo" )
 
+    # byte arrays through Variants
+    if sys.version_info >= (3, 0):
+      self.assertEqual( b.b22a( [ bytes('abc', 'utf-8') ] ), 1 )
+      self.assertEqual( str(b.b22c()), "b'abc'" )
+      self.assertEqual( str(b.b22d()), "b'abc'" )
+      self.assertEqual( str(b.var()), "b'abc'" )
+
   def test_23(self):
 
     b = pya.B()

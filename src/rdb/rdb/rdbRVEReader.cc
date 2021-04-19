@@ -146,7 +146,7 @@ public:
           error (tl::to_string (tr ("Unexpected end of file")));
         }
 
-        std::string l = get_line ();
+        std::string l = m_input_stream.get_line ();
         if (l.size () > 3 && l[0] == 'W' && l[1] == 'E' && isdigit (l[2])) {
 
           size_t n = 0;

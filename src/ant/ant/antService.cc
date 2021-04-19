@@ -887,7 +887,13 @@ Service::catch_distance ()
   return double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
 }
 
-void 
+double
+Service::catch_distance_box ()
+{
+  return double (view ()->search_range_box ()) / widget ()->mouse_event_trans ().mag ();
+}
+
+void
 Service::drag_cancel () 
 {
   if (m_drawing) {
@@ -2037,7 +2043,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
   } else {
 
     //  compute search box
-    double l = catch_distance ();
+    double l = box.is_point () ? catch_distance () : catch_distance_box ();
     db::DBox search_dbox = box.enlarged (db::DVector (l, l));
 
     if (! box.is_point ()) {

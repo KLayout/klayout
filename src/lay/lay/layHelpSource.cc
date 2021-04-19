@@ -283,7 +283,7 @@ HelpSource::initialize_index ()
       try {
         tl::XMLFileSource in (*c);
         help_index_structure.parse (in, *this);
-        if (m_klayout_version == lay::ApplicationBase::instance ()->version ()) {
+        if (m_klayout_version == lay::ApplicationBase::version ()) {
           ok = true;
         }
       } catch (tl::Exception &ex) {
@@ -352,7 +352,7 @@ HelpSource::create_index_file (const std::string &path)
 std::string
 HelpSource::klayout_version () const
 {
-  return lay::ApplicationBase::instance ()->version ();
+  return lay::ApplicationBase::version ();
 }
 
 void

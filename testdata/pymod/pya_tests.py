@@ -2,6 +2,7 @@
 import sys
 import os
 import unittest
+import testprep
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "python"))
 

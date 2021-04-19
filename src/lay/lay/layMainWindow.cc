@@ -3543,9 +3543,9 @@ MainWindow::update_window_title ()
     if (current_view ()->is_dirty ()) {
       sep += "[+] ";
     }
-    setWindowTitle (tl::to_qstring (lay::ApplicationBase::instance ()->version () + sep + current_view ()->title ()));
+    setWindowTitle (tl::to_qstring (lay::ApplicationBase::version () + sep + current_view ()->title ()));
   } else {
-    setWindowTitle (tl::to_qstring (lay::ApplicationBase::instance ()->version ()));
+    setWindowTitle (tl::to_qstring (lay::ApplicationBase::version ()));
   }
 }
 

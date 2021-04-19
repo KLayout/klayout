@@ -100,12 +100,12 @@ public:
   /**
    *  @brief Return the program's version
    */
-  std::string version () const;
+  static std::string version ();
 
   /**
    *  @brief Return the program's usage string
    */
-  std::string usage ();
+  static std::string usage ();
 
   /**
    *  @brief Returns the main window's reference

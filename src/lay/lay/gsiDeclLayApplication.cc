@@ -82,6 +82,12 @@ static std::string arch (C *)
 }
 
 template <class C>
+static std::string version (C *)
+{
+  return C::version ();
+}
+
+template <class C>
 static gsi::Methods application_methods ()
 {
   return
@@ -213,7 +219,7 @@ static gsi::Methods application_methods ()
       "\n"
       "This method has been added in version 0.22."
     ) +
-    method<C, std::string> ("version", &C::version,
+    method_ext<C, std::string> ("version", &version<C>,
       "@brief Returns the application's version string\n"
     ) +
     method_ext<C, std::string> ("arch", &arch<C>,

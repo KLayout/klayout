@@ -203,20 +203,6 @@ static int klayout_main_cont (int &argc, char **argv);
 int
 klayout_main (int &argc, char **argv)
 {
-  //  This special initialization is required by the Ruby interpreter because it wants to mark the stack
-  int ret = rba::RubyInterpreter::initialize (argc, argv, &klayout_main_cont);
-
-  //  clean up all static data now, since we don't trust the static destructors.
-  //  NOTE: this needs to happen after the Ruby interpreter went down since otherwise the GC will
-  //  access objects that are already cleaned up.
-  tl::StaticObjects::cleanup ();
-
-  return ret;
-}
-
-int 
-klayout_main_cont (int &argc, char **argv)
-{
   //  install the version strings
   lay::Version::set_exe_name (prg_exe_name);
   lay::Version::set_name (prg_name);
@@ -237,6 +223,37 @@ klayout_main_cont (int &argc, char **argv)
   about_text += prg_about_text;
   lay::Version::set_about_text (about_text.c_str ());
 
+  //  Capture the shortcut command line arguments
+  for (int i = 1; i < argc; ++i) {
+
+    if (argv [i] == std::string ("-v")) {
+
+      tl::info << lay::ApplicationBase::version ();
+      return 0;
+
+    } else if (argv [i] == std::string ("-h")) {
+
+      tl::info << lay::ApplicationBase::usage () << tl::noendl;
+      return 0;
+
+    }
+
+  }
+
+  //  This special initialization is required by the Ruby interpreter because it wants to mark the stack
+  int ret = rba::RubyInterpreter::initialize (argc, argv, &klayout_main_cont);
+
+  //  clean up all static data now, since we don't trust the static destructors.
+  //  NOTE: this needs to happen after the Ruby interpreter went down since otherwise the GC will
+  //  access objects that are already cleaned up.
+  tl::StaticObjects::cleanup ();
+
+  return ret;
+}
+
+int 
+klayout_main_cont (int &argc, char **argv)
+{
 #if QT_VERSION >= 0x050000
   qInstallMessageHandler (myMessageOutput);
 #else

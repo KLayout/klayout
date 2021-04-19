@@ -262,6 +262,8 @@ VALUE c2ruby<tl::Variant> (const tl::Variant &c)
     return c2ruby<bool> (c.to_bool ());
   } else if (c.is_a_string ()) {
     return c2ruby<std::string> (c.to_string ());
+  } else if (c.is_a_bytearray ()) {
+    return c2ruby<std::vector<char> > (c.to_bytearray ());
   } else if (c.is_long () || c.is_char ()) {
     return c2ruby<long> (c.to_long ());
   } else if (c.is_ulong ()) {

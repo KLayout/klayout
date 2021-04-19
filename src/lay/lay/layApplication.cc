@@ -483,16 +483,6 @@ ApplicationBase::parse_cmd (int &argc, char **argv)
 
       m_packages_with_dep = true;
 
-    } else if (a == "-v") {
-
-      tl::info << lay::Version::name () << " " << lay::Version::version ();
-      exit (0);
-
-    } else if (a == "-h") {
-
-      tl::info << usage () << tl::noendl;
-      exit (0);
-
     } else if (a == "-m" && (i + 1) < argc) {
 
       m_files.push_back (std::make_pair (rdb_file, std::make_pair (std::string (args [++i]), std::string ())));
@@ -929,7 +919,7 @@ ApplicationBase::instance ()
 }
 
 std::string
-ApplicationBase::version () const
+ApplicationBase::version ()
 {
   return std::string (lay::Version::name ()) + " " + lay::Version::version ();
 }

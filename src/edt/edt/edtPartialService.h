@@ -235,11 +235,16 @@ public:
   virtual void transform (const db::DCplxTrans &tr);
 
   /**
-   *  @brief Gets the catch distance
+   *  @brief Gets the catch distance (for single click)
    */
   virtual double catch_distance ();
 
-  /** 
+  /**
+   *  @brief Gets the catch distance (for box)
+   */
+  virtual double catch_distance_box ();
+
+  /**
    *  @brief Indicates whether objects are selected
    */
   virtual bool has_selection ();

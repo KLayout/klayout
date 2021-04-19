@@ -282,10 +282,12 @@ tl::Variant python2c_func<tl::Variant>::operator() (PyObject *rval)
     return tl::Variant (python2c<std::string> (rval));
 #else
   } else if (PyBytes_Check (rval)) {
-    return tl::Variant (python2c<std::string> (rval));
+    return tl::Variant (python2c<std::vector<char> > (rval));
 #endif
-  } else if (PyUnicode_Check (rval) || PyByteArray_Check (rval)) {
+  } else if (PyUnicode_Check (rval)) {
     return tl::Variant (python2c<std::string> (rval));
+  } else if (PyByteArray_Check (rval)) {
+    return tl::Variant (python2c<std::vector<char> > (rval));
   } else if (PyList_Check (rval)) {
 
     size_t len = PyList_Size (rval);
@@ -496,6 +498,8 @@ PyObject *c2python_func<const tl::Variant &>::operator() (const tl::Variant &c)
     return c2python (c.to_bool ());
   } else if (c.is_a_string ()) {
     return c2python (c.to_string ());
+  } else if (c.is_a_bytearray ()) {
+    return c2python (c.to_bytearray ());
   } else if (c.is_long ()) {
     return c2python (c.to_long ());
   } else if (c.is_ulong ()) {

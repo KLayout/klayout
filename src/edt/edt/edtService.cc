@@ -895,7 +895,13 @@ Service::catch_distance ()
   return double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
 }
 
-double 
+double
+Service::catch_distance_box ()
+{
+  return double (view ()->search_range_box ()) / widget ()->mouse_event_trans ().mag ();
+}
+
+double
 Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mode)
 {
   //  compute search box
@@ -1231,7 +1237,7 @@ bool
 Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 {
   //  compute search box
-  double l = catch_distance ();
+  double l = box.is_point () ? catch_distance () : catch_distance_box ();
   db::DBox search_box = box.enlarged (db::DVector (l, l));
 
   bool needs_update = false;

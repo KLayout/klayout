@@ -374,6 +374,10 @@ LayoutViewConfigPage2c::setup (lay::Dispatcher *root)
   unsigned int sr = 0;
   root->config_get (cfg_search_range, sr);
   mp_ui->search_range_spinbx->setValue (sr);
+
+  unsigned int srbox = 0;
+  root->config_get (cfg_search_range_box, srbox);
+  mp_ui->search_range_box_spinbx->setValue (srbox);
 }
 
 void 
@@ -388,6 +392,7 @@ LayoutViewConfigPage2c::commit (lay::Dispatcher *root)
   root->config_set (cfg_sel_transient_mode, mp_ui->transient_mode_cb->isChecked ());
   root->config_set (cfg_sel_inside_pcells_mode, mp_ui->sel_inside_pcells_cb->isChecked ());
   root->config_set (cfg_search_range, (unsigned int) mp_ui->search_range_spinbx->value ());
+  root->config_set (cfg_search_range_box, (unsigned int) mp_ui->search_range_box_spinbx->value ());
 }
 
 // ------------------------------------------------------------
@@ -1564,6 +1569,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_child_ctx_hollow, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_child_ctx_enabled, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_search_range, "5"));
+    options.push_back (std::pair<std::string, std::string> (cfg_search_range_box, "0"));
     options.push_back (std::pair<std::string, std::string> (cfg_abstract_mode_width, "10.0"));
     options.push_back (std::pair<std::string, std::string> (cfg_abstract_mode_enabled, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_fit_new_cell, "true"));

@@ -179,11 +179,16 @@ public:
   virtual double click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mode);
 
   /**
-   *  @brief Gets the catch distance
+   *  @brief Gets the catch distance (for single click)
    */
   virtual double catch_distance ();
 
-  /** 
+  /**
+   *  @brief Gets the catch distance (for box)
+   */
+  virtual double catch_distance_box ();
+
+  /**
    *  @brief "select" operation
    */
   virtual bool select (const db::DBox &box, lay::Editable::SelectionMode mode);

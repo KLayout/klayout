@@ -156,12 +156,23 @@ public:
   }
 
   /**
-   *  @brief The catch distance
+   *  @brief The catch distance (for single click)
    *
    *  The catch distance is a typical value for the "fuzzyness" of a mouse click.
    *  It is given in micron.
    */
   virtual double catch_distance ()
+  {
+    return 0.0;
+  }
+
+  /**
+   *  @brief The catch distance (for box)
+   *
+   *  The catch distance is a typical value for the "fuzzyness" of a box selection.
+   *  It is given in micron.
+   */
+  virtual double catch_distance_box ()
   {
     return 0.0;
   }

@@ -640,6 +640,85 @@ draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay
   }
 }
 
+static bool
+is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double &distance)
+{
+  if (ruler.outline () == ant::Object::OL_ellipse) {
+
+    //  special handling of the (non-degenerated) ellipse case
+    db::DBox b (ruler.p1 (), ruler.p2 ());
+
+    if (b.height () > 1e-6 && b.width () > 1e-6) {
+
+      double dx = (pos.x () - b.center ().x ()) / (b.width () * 0.5);
+      double dy = (pos.y () - b.center ().y ()) / (b.height () * 0.5);
+      double dd = sqrt (dx * dx + dy * dy);
+
+      if (dd > 1e-6) {
+        //  ref is the cutpoint between the ray between pos and the ellipse center and the ellipse itself
+        db::DPoint ref = b.center () + db::DVector (dx * b.width () * 0.5 / dd, dy * b.height () * 0.5 / dd);
+        double d = ref.distance (pos);
+        if (d < enl) {
+          distance = d;
+          return true;
+        }
+      }
+
+      return false;
+
+    }
+
+  }
+
+  db::DBox b (ruler.p1 (), ruler.p2 ());
+
+  //  enlarge this box by some pixels
+  b.enlarge (db::DVector (enl, enl));
+
+  if (! b.contains (pos)) {
+    return false;
+  }
+
+  db::DEdge edges[4];
+  unsigned int nedges = 0;
+
+  if (ruler.outline () == ant::Object::OL_diag ||
+      ruler.outline () == ant::Object::OL_diag_xy ||
+      ruler.outline () == ant::Object::OL_diag_yx) {
+    edges [nedges++] = db::DEdge (ruler.p1 (), ruler.p2 ());
+  }
+  if (ruler.outline () == ant::Object::OL_xy ||
+      ruler.outline () == ant::Object::OL_diag_xy ||
+      ruler.outline () == ant::Object::OL_box ||
+      ruler.outline () == ant::Object::OL_ellipse) {
+    edges [nedges++] = db::DEdge (ruler.p1 (), db::DPoint (ruler.p2 ().x (), ruler.p1 ().y ()));
+    edges [nedges++] = db::DEdge (db::DPoint (ruler.p2 ().x (), ruler.p1 ().y ()), ruler.p2 ());
+  }
+  if (ruler.outline () == ant::Object::OL_yx ||
+      ruler.outline () == ant::Object::OL_diag_yx ||
+      ruler.outline () == ant::Object::OL_box ||
+      ruler.outline () == ant::Object::OL_ellipse) {
+    edges [nedges++] = db::DEdge (ruler.p1 (), db::DPoint (ruler.p1 ().x (), ruler.p2 ().y ()));
+    edges [nedges++] = db::DEdge (db::DPoint (ruler.p1 ().x (), ruler.p2 ().y ()), ruler.p2 ());
+  }
+
+  for (unsigned int i = 0; i < nedges; ++i) {
+    double d = edges [i].distance_abs (pos);
+    if (d <= enl) {
+      distance = d;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+static bool
+is_selected (const ant::Object &ruler, const db::DBox &box, double /*enl*/)
+{
+  return (box.contains (ruler.p1 ()) && box.contains (ruler.p2 ()));
+}
+
 
 // -------------------------------------------------------------
 
@@ -1051,12 +1130,31 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
     double l = catch_distance ();
     db::DBox search_dbox = db::DBox (p, p).enlarged (db::DVector (l, l));
 
-    //  test, whether we are moving a handle of one selected object
+    //  point selection: look for the "closest" ruler
+
+    double dmin = std::numeric_limits <double>::max ();
+
+    const ant::Object *robj_min = 0;
+    for (std::map<obj_iterator, unsigned int>::const_iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
+      const ant::Object *robj = dynamic_cast<const ant::Object *> ((*r->first).ptr ());
+      if (robj) {
+        double d;
+        if (is_selected (*robj, p, l, d)) {
+          if (! robj_min || d < dmin) {
+            robj_min = robj;
+            dmin = d;
+          }
+        }
+      }
+    }
+
+    //  further investigate what part to drag
+
     for (std::map<obj_iterator, unsigned int>::const_iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
 
       obj_iterator ri = r->first;
       const ant::Object *robj = dynamic_cast <const ant::Object *> ((*ri).ptr ());
-      if (robj) {
+      if (robj && (! robj_min || robj == robj_min)) {
         
         if (dragging_what (robj, search_dbox, m_move_mode, m_p1) && m_move_mode != MoveRuler) {
           
@@ -1086,32 +1184,52 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
     double l = catch_distance ();
     db::DBox search_dbox = db::DBox (p, p).enlarged (db::DVector (l, l));
 
-    //  box-selection
+    //  point selection: look for the "closest" ruler
+
+    double dmin = std::numeric_limits <double>::max ();
 
     lay::AnnotationShapes::touching_iterator r = mp_view->annotation_shapes ().begin_touching (search_dbox);
+    const ant::Object *robj_min = 0;
+    while (! r.at_end ()) {
+      const ant::Object *robj = dynamic_cast<const ant::Object *> ((*r).ptr ());
+      if (robj) {
+        double d;
+        if (is_selected (*robj, p, l, d)) {
+          if (! robj_min || d < dmin) {
+            robj_min = robj;
+            dmin = d;
+          }
+        }
+      }
+      ++r;
+    }
+
+    //  further investigate what part to drag
+
+    r = mp_view->annotation_shapes ().begin_touching (search_dbox);
 
     while (m_move_mode == MoveNone && ! r.at_end ()) {
-      
+
       const ant::Object *robj = dynamic_cast <const ant::Object *> ((*r).ptr ());
-      if (robj) {
-        
+      if (robj && (! robj_min || robj == robj_min)) {
+
         if (dragging_what (robj, search_dbox, m_move_mode, m_p1)) {
-          
+
           //  found anything: make the moved ruler the selection
           clear_selection ();
           m_selected.insert (std::make_pair (mp_view->annotation_shapes ().iterator_from_pointer (&*r), 0));
           m_current = *robj;
-          m_original = m_current; 
+          m_original = m_current;
           m_rulers.push_back (new ant::View (this, &m_current, true));
           m_rulers.back ()->thaw ();
           return true;
-          
+
         }
 
       }
-      
+
       ++r;
-      
+
     }
 
     //  nothing was found
@@ -1783,85 +1901,6 @@ void
 Service::clear_selection ()
 {
   select (db::DBox (), lay::Editable::Reset);
-}
-
-static bool 
-is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double &distance) 
-{
-  if (ruler.outline () == ant::Object::OL_ellipse) {
-
-    //  special handling of the (non-degenerated) ellipse case
-    db::DBox b (ruler.p1 (), ruler.p2 ());
-
-    if (b.height () > 1e-6 && b.width () > 1e-6) {
-
-      double dx = (pos.x () - b.center ().x ()) / (b.width () * 0.5);
-      double dy = (pos.y () - b.center ().y ()) / (b.height () * 0.5);
-      double dd = sqrt (dx * dx + dy * dy);
-
-      if (dd > 1e-6) {
-        //  ref is the cutpoint between the ray between pos and the ellipse center and the ellipse itself
-        db::DPoint ref = b.center () + db::DVector (dx * b.width () * 0.5 / dd, dy * b.height () * 0.5 / dd);
-        double d = ref.distance (pos);
-        if (d < enl) {
-          distance = d;
-          return true;
-        }
-      }
-
-      return false;
-
-    }
-
-  }
-
-  db::DBox b (ruler.p1 (), ruler.p2 ());
-
-  //  enlarge this box by some pixels
-  b.enlarge (db::DVector (enl, enl));
-
-  if (! b.contains (pos)) {
-    return false;
-  }
-  
-  db::DEdge edges[4];
-  unsigned int nedges = 0;
-  
-  if (ruler.outline () == ant::Object::OL_diag || 
-      ruler.outline () == ant::Object::OL_diag_xy ||
-      ruler.outline () == ant::Object::OL_diag_yx) {
-    edges [nedges++] = db::DEdge (ruler.p1 (), ruler.p2 ());
-  }
-  if (ruler.outline () == ant::Object::OL_xy ||
-      ruler.outline () == ant::Object::OL_diag_xy ||     
-      ruler.outline () == ant::Object::OL_box ||
-      ruler.outline () == ant::Object::OL_ellipse) {
-    edges [nedges++] = db::DEdge (ruler.p1 (), db::DPoint (ruler.p2 ().x (), ruler.p1 ().y ()));
-    edges [nedges++] = db::DEdge (db::DPoint (ruler.p2 ().x (), ruler.p1 ().y ()), ruler.p2 ());
-  }
-  if (ruler.outline () == ant::Object::OL_yx ||
-      ruler.outline () == ant::Object::OL_diag_yx ||     
-      ruler.outline () == ant::Object::OL_box ||
-      ruler.outline () == ant::Object::OL_ellipse) {
-    edges [nedges++] = db::DEdge (ruler.p1 (), db::DPoint (ruler.p1 ().x (), ruler.p2 ().y ()));
-    edges [nedges++] = db::DEdge (db::DPoint (ruler.p1 ().x (), ruler.p2 ().y ()), ruler.p2 ());
-  }
-    
-  for (unsigned int i = 0; i < nedges; ++i) {
-    double d = edges [i].distance_abs (pos);
-    if (d <= enl) {
-      distance = d;
-      return true;
-    } 
-  }  
-
-  return false;
-}
-
-static bool 
-is_selected (const ant::Object &ruler, const db::DBox &box, double /*enl*/)
-{
-  return (box.contains (ruler.p1 ()) && box.contains (ruler.p2 ()));
 }
 
 double

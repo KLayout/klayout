@@ -92,10 +92,16 @@
       to include partial DRC and LVS scripts without having to worry about variable
       scope. For details see "Including other files" in the documentation under:
       KLayout User Manual/Design Rule Check (DRC)/DRC Runsets.
+* Bugfix: %GITHUB%/issues/771
+      Fixed an issue with QByteArray/QVariant transformation in Qt binding
 * Bugfix: %GITHUB%/issues/750
       PCB gerber import: Incorrect handling of D02 operations.
+* Bugfix: %GITHUB%/issues/747
+      Proper handling of comments in RVE DB reader
 * Bugfix: %GITHUB%/issues/740
       Bug in the "smooth" function.
+* Enhancement: %GITHUB%/issues/715
+      A separate search range can be specified for box selections now
 * Enhancement: %GITHUB%/issues/691
       Technology specific libraries: library name resolution based on technology.
 * Enhancement: %GITHUB%/issues/666

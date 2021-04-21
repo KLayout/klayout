@@ -130,6 +130,13 @@
       Difficult to select specific labels for net name assignment in net extraction.
       Solution involves a more elaborate handling of texts through "text layers.
 
+0.26.12         (2021-04-21):
+
+* Bugfix: %GITHUB%/issues/747
+  Result browser gives error message with // lines in RVE files
+* Bugfix: %GITHUB%/issues/771
+  Problem with QMimeData binding
+
 0.26.11         (2021-02-27):
 
 * Bugfix: %GITHUB%/issues/733

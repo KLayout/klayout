@@ -1,3 +1,10 @@
+klayout (0.26.12-1) unstable; urgency=low
+
+  * New features and bugfixes
+    - See changelog
+
+ -- Matthias Köfferlein <matthias@koefferlein.de>  Wed, 21 Apr 2021 21:39:50 +0200
+
 klayout (0.26.11-1) unstable; urgency=low
 
   * New features and bugfixes

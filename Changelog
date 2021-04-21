@@ -1,4 +1,11 @@
 
+0.26.12         (2021-04-18):
+
+* Bugfix: %GITHUB%/issues/747
+  Result browser gives error message with // lines in RVE files
+* Bugfix: %GITHUB%/issues/771
+  Problem with QMimeData binding
+
 0.26.11         (2021-02-27):
 
 * Bugfix: %GITHUB%/issues/733

@@ -634,8 +634,6 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "Use a comma-separated list of file names here to specify which layout files to use for resolving LEF macros. "
                     "This applies when LEF macros are specified with FOREIGN. By using '--" + m_long_prefix + "lefdef-macro-resolution-mode' you "
                     "can force external resolution (assume FOREIGN always) or turn it off (ignore FOREIGN).\n"
-                    "\n"
-                    "Relative paths are resolved based on the location of the DEF file which is read."
                    )
         << tl::arg (group +
                     "!--" + m_long_prefix + "lefdef-no-implicit-lef", &m_lefdef_read_lef_with_def, "Disables reading all LEF files together with DEF files",

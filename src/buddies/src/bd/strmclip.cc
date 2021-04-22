@@ -63,7 +63,7 @@ struct ClipData
 };
 
 
-void clip (const ClipData &data)
+void clip (ClipData &data)
 {
   db::Layout layout;
   db::Layout target_layout;

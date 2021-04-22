@@ -124,7 +124,7 @@ GenericReaderOptions::GenericReaderOptions ()
   m_lefdef_read_lef_with_def = load_options.get_option_by_name ("lefdef_config.read_lef_with_def").to_bool ();
   m_lefdef_separate_groups = load_options.get_option_by_name ("lefdef_config.separate_groups").to_bool ();
   m_lefdef_map_file = load_options.get_option_by_name ("lefdef_config.map_file").to_string ();
-  m_lefdef_produce_lef_macros = (load_options.get_option_by_name ("lefdef_config.macro_resolution_mode").to_int () == 0);
+  m_lefdef_macro_resolution_mode = load_options.get_option_by_name ("lefdef_config.macro_resolution_mode").to_int ();
 }
 
 void
@@ -615,13 +615,27 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "If a map file is used, only the layers present in the map file are generated. No other layers are produced."
                    )
         << tl::arg (group +
-                    "!--" + m_long_prefix + "lefdef-no-lef-macros", &m_lefdef_produce_lef_macros, "Don't produce LEF macro geometry",
+                    "!--" + m_long_prefix + "lefdef-macro-resolution-mode", &m_lefdef_macro_resolution_mode, "Specify how to generate layout from LEF macros",
                     "This option applies when reading DEF files.\n"
                     "\n"
-                    "If this option is present, no geometry will be produced for LEF macros. Instead, a ghost cell with the name of the LEF "
-                    "macro will be produced. If this option is not given, the LEF macros will be inserted in to these cells "
-                    "unless a FOREIGN specification is present in the LEF macro. If a FOREIGN specification is given, LEF geometry is never "
-                    "inserted into a DEF file. Instead ghost cells are created."
+                    "The following values are accepted for this option:\n"
+                    "\n"
+                    "* 0: produce LEF geometry unless a FOREIGN cell is specified\n"
+                    "* 1: produce LEF geometry always and ignore FOREIGN\n"
+                    "* 2: Never produce LEF geometry and assume FOREIGN always\n"
+                    "\n"
+                    "In case of FOREIGN macros in mode 1 or always in mode 2, the '--" + m_long_prefix + "lefdef-lef-layouts' option is available to specify "
+                    "external layout files for providing the LEF macro layouts.\n"
+                   )
+        << tl::arg (group +
+                    "--" + m_long_prefix + "lefdef-lef-layouts", &m_lefdef_lef_layout_files, "Layout files for resolving FOREIGN LEF cells from",
+                    "This option applies when reading DEF files.\n"
+                    "\n"
+                    "Use a comma-separated list of file names here to specify which layout files to use for resolving LEF macros. "
+                    "This applies when LEF macros are specified with FOREIGN. By using '--" + m_long_prefix + "lefdef-macro-resolution-mode' you "
+                    "can force external resolution (assume FOREIGN always) or turn it off (ignore FOREIGN).\n"
+                    "\n"
+                    "Relative paths are resolved based on the location of the DEF file which is read."
                    )
         << tl::arg (group +
                     "!--" + m_long_prefix + "lefdef-no-implicit-lef", &m_lefdef_read_lef_with_def, "Disables reading all LEF files together with DEF files",
@@ -678,7 +692,7 @@ void GenericReaderOptions::set_dbu (double dbu)
 }
 
 void
-GenericReaderOptions::configure (db::LoadLayoutOptions &load_options) const
+GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
 {
   load_options.set_option_by_name ("layer_map", tl::Variant::make_variant (m_layer_map));
   load_options.set_option_by_name ("create_other_layers", m_create_other_layers);
@@ -763,7 +777,31 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options) const
   load_options.set_option_by_name ("lefdef_config.read_lef_with_def", m_lefdef_read_lef_with_def);
   load_options.set_option_by_name ("lefdef_config.separate_groups", m_lefdef_separate_groups);
   load_options.set_option_by_name ("lefdef_config.map_file", m_lefdef_map_file);
-  load_options.set_option_by_name ("lefdef_config.macro_resolution_mode", m_lefdef_produce_lef_macros ? 0 : 2);
+  load_options.set_option_by_name ("lefdef_config.macro_resolution_mode", m_lefdef_macro_resolution_mode);
+
+  m_lef_layouts.clear ();
+  tl::Variant lef_layout_ptrs = tl::Variant::empty_list ();
+  for (std::vector<std::string>::const_iterator l = m_lefdef_lef_layout_files.begin (); l != m_lefdef_lef_layout_files.end (); ++l) {
+
+    try {
+
+      std::unique_ptr<db::Layout> ly (new db::Layout ());
+
+      tl::InputStream stream (*l);
+      db::Reader reader (stream);
+      db::LoadLayoutOptions load_options;
+      reader.read (*ly, load_options);
+
+      lef_layout_ptrs.push (tl::Variant::make_variant_ref (ly.get ()));
+      m_lef_layouts.push_back (ly.release ());
+
+    } catch (tl::Exception &ex) {
+      tl::warn << ex.msg ();
+    }
+
+  }
+
+  load_options.set_option_by_name ("lefdef_config.macro_layouts", lef_layout_ptrs);
 }
 
 }

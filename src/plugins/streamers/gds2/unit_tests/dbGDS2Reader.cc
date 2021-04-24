@@ -541,6 +541,78 @@ TEST(4_CollectModeRename)
   db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
 }
 
+TEST(4_CollectModeRenameWithGhost)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  db::LoadLayoutOptions options;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::RenameCell;
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic_ag.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic_b.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  std::string fn_au (tl::testsrc () + "/testdata/gds/collect_rename_au2.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}
+
+TEST(4_CollectModeRenameWithGhostReverse)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  db::LoadLayoutOptions options;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::RenameCell;
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic_a.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic_bg.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  std::string fn_au (tl::testsrc () + "/testdata/gds/collect_rename_au3.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}
+
+TEST(4_CollectModeRenameWithGhostBoth)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  db::LoadLayoutOptions options;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::RenameCell;
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic_ag.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/collect_basic_bg.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  std::string fn_au (tl::testsrc () + "/testdata/gds/collect_rename_au4.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}
+
 TEST(4_CollectModeOverwrite)
 {
   db::Manager m (false);

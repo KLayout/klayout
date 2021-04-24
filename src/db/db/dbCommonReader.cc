@@ -239,6 +239,7 @@ CommonReader::merge_cell (db::Layout &layout, db::cell_index_type target_cell_in
 {
   const db::Cell &src_cell = layout.cell (src_cell_index);
   db::Cell &target_cell = layout.cell (target_cell_index);
+  target_cell.set_ghost_cell (src_cell.is_ghost_cell () && target_cell.is_ghost_cell ());
 
   //  copy over the instances
   for (db::Cell::const_iterator i = src_cell.begin (); ! i.at_end (); ++i) {
@@ -347,7 +348,7 @@ CommonReader::finish (db::Layout &layout)
 
     //  no conflict - plain rename
 
-    for (std::map<std::string, std::pair<size_t, db::cell_index_type> >::const_iterator i = m_name_map.begin (); i != m_name_map.end () && ! has_conflict; ++i) {
+    for (std::map<std::string, std::pair<size_t, db::cell_index_type> >::const_iterator i = m_name_map.begin (); i != m_name_map.end (); ++i) {
       layout.rename_cell (i->second.second, i->first.c_str ());
     }
 
@@ -379,7 +380,8 @@ CommonReader::finish (db::Layout &layout)
       db::cell_index_type ci_org = c2n.second;
 
       //  NOTE: proxy cells are never resolved. "RenameCell" is a plain and simple case.
-      if (c2n.first && m_cc_resolution != RenameCell && ! layout.cell (ci_org).is_proxy ()) {
+      //  Ghost cells are merged rendering the new cell a non-ghost cell.
+      if (c2n.first && (m_cc_resolution != RenameCell || layout.cell (ci_org).is_ghost_cell () || layout.cell (ci_new).is_ghost_cell ()) && ! layout.cell (ci_org).is_proxy ()) {
         cells_with_conflict.push_back (std::make_pair (ci_new, ci_org));
       } else {
         layout.rename_cell (ci_new, layout.uniquify_cell_name (i->second.c_str ()).c_str ());

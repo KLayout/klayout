@@ -159,11 +159,10 @@ Manager::cancel ()
       ++m_current;
       undo ();
 
-    } else {
-      //  empty transactions .. just delete
-      erase_transactions (m_current, m_transactions.end ());
-      m_current = m_transactions.end ();
     }
+
+    erase_transactions (m_current, m_transactions.end ());
+    m_current = m_transactions.end ();
 
   }
 }

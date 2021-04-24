@@ -25,6 +25,7 @@
 
 #include "bdCommon.h"
 #include "dbCommonReader.h"
+#include "tlObject.h"
 
 #include <string>
 
@@ -36,6 +37,7 @@ namespace tl
 namespace db
 {
   class LoadLayoutOptions;
+  class Layout;
 }
 
 namespace bd
@@ -61,7 +63,7 @@ public:
   /**
    *  @brief Configures the reader options object with the options stored in this object
    */
-  void configure (db::LoadLayoutOptions &load_options) const;
+  void configure (db::LoadLayoutOptions &load_options);
 
   /**
    *  @brief Sets the option prefix for the short option name
@@ -184,7 +186,10 @@ private:
   bool m_lefdef_read_lef_with_def;
   bool m_lefdef_separate_groups;
   std::string m_lefdef_map_file;
-  bool m_lefdef_produce_lef_macros;
+  int m_lefdef_macro_resolution_mode;
+  std::vector<std::string> m_lefdef_lef_layout_files;
+
+  tl::shared_collection<db::Layout> m_lef_layouts;
 };
 
 }

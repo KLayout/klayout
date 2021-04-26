@@ -1563,13 +1563,9 @@ private:
     db::ICplxTrans i1t, i2t;
     bool fill_cache = false;
 
-    //  Cache is only used for single instances or simple arrays.
-    //  Other schemes make the cache taking a lot of memory - because array vs. array testing may result in
-    //  N x N cache entries when the arrayed cells contain child cells.
-    //  We still allow the case of array vs. array when i1.size == i2.size as this efficiently caches
-    //  array/array interactions.
-    if ((! i1element.at_end () || i1.size () == 1 || i1.size () == i2.size ()) &&
-        (! i2element.at_end () || i2.size () == 1 || i1.size () == i2.size ())) {
+    //  Cache is only used for single instances or simple and regular arrays.
+    if ((! i1element.at_end () || i1.size () == 1 || ! i1.is_iterated_array ()) &&
+        (! i2element.at_end () || i2.size () == 1 || ! i2.is_iterated_array ())) {
 
       i1t = i1element.at_end () ? i1.complex_trans () : i1.complex_trans (*i1element);
       db::ICplxTrans tt1 = t1 * i1t;
@@ -1653,31 +1649,26 @@ private:
 
           }
 
+          //  dive into cell of ii1
+          const db::Cell &cell1 = mp_layout->cell (i1.cell_index ());
+          for (db::Cell::touching_iterator jj1 = cell1.begin_touching (common12.transformed (tt1.inverted ())); ! jj1.at_end (); ++jj1) {
+
+            std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
+            consider_instance_pair (common12, *jj1, tt1, db::CellInstArray::iterator (), i2, t2, ii2, ii_interactions);
+
+            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
+              propagate_cluster_inst (i->first, i1.cell_index (), i1t, i1.prop_id ());
+            }
+
+            ii_interactions.unique ();
+            interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
+
+          }
+
         }
 
         if (! i2element.at_end ()) {
           break;
-        }
-
-      }
-
-      box_type common1 = ib1 & b2 & common;
-      if (! common1.empty ()) {
-
-        //  dive into cell of ii1
-        const db::Cell &cell1 = mp_layout->cell (i1.cell_index ());
-        for (db::Cell::touching_iterator jj1 = cell1.begin_touching (common1.transformed (tt1.inverted ())); ! jj1.at_end (); ++jj1) {
-
-          std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
-          consider_instance_pair (common1, *jj1, tt1, db::CellInstArray::iterator (), i2, t2, i2element, ii_interactions);
-
-          for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
-            propagate_cluster_inst (i->first, i1.cell_index (), i1t, i1.prop_id ());
-          }
-
-          ii_interactions.unique ();
-          interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
-
         }
 
       }
@@ -2245,11 +2236,9 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
     build_hier_connections_for_cells (cbc, layout, todo, conn, breakout_cells, progress, instance_interaction_cache);
   }
 
-  // @@@
-  if (tl::verbosity () >= 0) {
+  if (tl::verbosity () >= 51) {
     tl::info << "Cluster build cache statistics: size=" << instance_interaction_cache.size () << ", hits=" << instance_interaction_cache.hits () << ", misses=" << instance_interaction_cache.misses ();
   }
-  // @@@
 }
 
 template <class T>

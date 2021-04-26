@@ -397,13 +397,11 @@ void LayoutToNetlist::extract_netlist ()
   netex.set_include_floating_subcircuits (m_include_floating_subcircuits);
   netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters);
 
-  // @@@
-  if (tl::verbosity () >= 0) {
+  if (tl::verbosity () >= 41) {
     MemStatisticsCollector m (false);
     mem_stat (&m, db::MemStatistics::None, 0);
     m.print ();
   }
-  // @@@
 
   m_netlist_extracted = true;
 }

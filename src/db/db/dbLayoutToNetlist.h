@@ -893,6 +893,11 @@ public:
    */
   static db::LayoutToNetlist *create_from_file (const std::string &path);
 
+  /**
+   *  @brief Generate memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const;
+
 private:
   //  no copying
   LayoutToNetlist (const db::LayoutToNetlist &other);
@@ -970,6 +975,14 @@ private:
   virtual size_t link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &trans);
   virtual void link_nets (const db::Net *net, const db::Net *with);
 };
+
+/**
+ *  @brief Memory statistics for LayoutToNetlist
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const LayoutToNetlist &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 }
 

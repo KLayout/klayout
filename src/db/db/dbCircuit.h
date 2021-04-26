@@ -31,6 +31,7 @@
 #include "dbSubCircuit.h"
 #include "dbNetlistUtils.h"
 #include "dbPolygon.h"
+#include "dbMemStatistics.h"
 
 #include "tlObject.h"
 #include "tlObjectCollection.h"
@@ -749,6 +750,32 @@ public:
    */
   void blank ();
 
+  /**
+   *  @brief Generate memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
+  {
+    if (! no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+
+    db::mem_stat (stat, purpose, cat, m_name, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_boundary, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_nets, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_pins, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_pin_by_id, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_devices, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_subcircuits, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_pin_refs, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_device_by_id, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_subcircuit_by_id, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_net_by_cluster_id, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_device_by_name, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_subcircuit_by_name, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_net_by_name, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_refs, true, (void *) this);
+  }
+
 private:
   friend class Netlist;
   friend class Net;
@@ -797,6 +824,14 @@ private:
   void subcircuits_changed ();
   void nets_changed ();
 };
+
+/**
+ *  @brief Memory statistics for Circuit
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const Circuit &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 }
 

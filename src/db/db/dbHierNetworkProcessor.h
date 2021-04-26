@@ -365,6 +365,11 @@ public:
    */
   void set_global_nets (const global_nets &gn);
 
+  /**
+   *  @brief Collect memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const;
+
 private:
   template <typename> friend class local_clusters;
   template <typename> friend class hnp_interaction_receiver;
@@ -391,6 +396,15 @@ private:
   global_nets m_global_nets;
   size_t m_size;
 };
+
+/**
+ *  @brief Memory statistics for local_cluster<T>
+ */
+template <class T>
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const local_cluster<T> &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 /**
  *  @brief A box converter for the local_cluster class
@@ -533,6 +547,19 @@ public:
     return id > m_clusters.size ();
   }
 
+  /**
+   *  @brief Gets the number of clusters
+   */
+  size_t size () const
+  {
+    return m_clusters.size ();
+  }
+
+  /**
+   *  @brief Collect memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const;
+
 private:
   void ensure_sorted ();
 
@@ -543,6 +570,15 @@ private:
 
   void apply_attr_equivalences (const tl::equivalence_clusters<size_t> &attr_equivalence);
 };
+
+/**
+ *  @brief Memory statistics for local_clusters<T>
+ */
+template <class T>
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const local_clusters<T> &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 /**
  *  @brief The instance information for a cluster
@@ -859,8 +895,6 @@ struct InstanceToInstanceInteraction
   db::ICplxTrans t21;
 };
 
-typedef std::map<InstanceToInstanceInteraction, cluster_instance_pair_list_type> instance_interaction_cache_type;
-
 template <class T> class hier_clusters;
 template <class T> class connected_clusters;
 
@@ -1013,6 +1047,11 @@ public:
     m_connected_clusters.insert (id);
   }
 
+  /**
+   *  @brief Collect memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const;
+
 private:
   template<typename> friend class connected_clusters_iterator;
 
@@ -1020,6 +1059,15 @@ private:
   std::map<ClusterInstance, typename local_cluster<T>::id_type> m_rev_connections;
   std::set<id_type> m_connected_clusters;
 };
+
+/**
+ *  @brief Memory statistics for connected_clusters<T>
+ */
+template <class T>
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const connected_clusters<T> &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 template <typename> class cell_clusters_box_converter;
 
@@ -1034,7 +1082,55 @@ class DB_PUBLIC_TEMPLATE hier_clusters
 {
 public:
   typedef typename local_cluster<T>::box_type box_type;
-  typedef std::map<InstanceToInstanceInteraction, cluster_instance_pair_list_type> instance_interaction_cache_type;
+
+  /**
+   *  @brief An object representing the instance interaction cache
+   */
+  class instance_interaction_cache
+  {
+  public:
+    instance_interaction_cache ()
+      : m_hits (0), m_misses (0)
+    { }
+
+    size_t size () const
+    {
+      return m_map.size ();
+    }
+
+    size_t hits () const
+    {
+      return m_hits;
+    }
+
+    size_t misses () const
+    {
+      return m_misses;
+    }
+
+    const cluster_instance_pair_list_type *find (const InstanceToInstanceInteraction &key) const
+    {
+      std::map<InstanceToInstanceInteraction, cluster_instance_pair_list_type>::const_iterator i = m_map.find (key);
+      if (i == m_map.end ()) {
+        ++m_misses;
+        return 0;
+      } else {
+        ++m_hits;
+        return &i->second;
+      }
+    }
+
+    cluster_instance_pair_list_type &insert (const InstanceToInstanceInteraction &key)
+    {
+      return m_map [key];
+    }
+
+  private:
+    mutable size_t m_hits, m_misses;
+    std::map<InstanceToInstanceInteraction, cluster_instance_pair_list_type> m_map;
+  };
+
+  typedef instance_interaction_cache instance_interaction_cache_type;
 
   /**
    *  @brief Creates an empty set of clusters
@@ -1093,6 +1189,11 @@ public:
    *  there is not connection made for this instance.
    */
   size_t propagate_cluster_inst (const db::Layout &layout, const Cell &cell, const ClusterInstance &ci, db::cell_index_type parent_ci, bool with_self);
+
+  /**
+   *  @brief Collect memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const;
 
 private:
   void build_local_cluster (const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence);

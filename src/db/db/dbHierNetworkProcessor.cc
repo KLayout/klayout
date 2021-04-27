@@ -44,6 +44,11 @@ namespace db
 
 // ------------------------------------------------------------------------------
 
+//  Don't cache instance to instance interaction sets beyond this size
+const size_t instance_to_instance_cache_set_size_threshold = 10000;
+
+// ------------------------------------------------------------------------------
+
 template <class Shape, class Trans> void insert_transformed (db::Layout &layout, db::Shapes &shapes, const Shape &s, const Trans &t);
 
 template <class Trans> void insert_transformed (db::Layout &layout, db::Shapes &shapes, const db::PolygonRef &s, const Trans &t)
@@ -311,6 +316,54 @@ bool Connectivity::interacts (const T &a, unsigned int la, const T &b, unsigned 
   }
 }
 
+bool Connectivity::interacts (const std::set<unsigned int> &la, const std::set<unsigned int> &lb) const
+{
+  for (std::set<unsigned int>::const_iterator i = la.begin (); i != la.end (); ++i) {
+    db::Connectivity::layer_iterator je = end_connected (*i);
+    for (db::Connectivity::layer_iterator j = begin_connected (*i); j != je; ++j) {
+      if (lb.find (*j) != lb.end ()) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+bool Connectivity::interact (const db::Cell &a, const db::Cell &b) const
+{
+  for (std::map<unsigned int, layers_type>::const_iterator i = m_connected.begin (); i != m_connected.end (); ++i) {
+    if (! a.bbox (i->first).empty ()) {
+      for (layers_type::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
+        if (! b.bbox (*j).empty ()) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+template <class T>
+bool Connectivity::interact (const db::Cell &a, const T &ta, const db::Cell &b, const T &tb) const
+{
+  for (std::map<unsigned int, layers_type>::const_iterator i = m_connected.begin (); i != m_connected.end (); ++i) {
+    db::Box ba = a.bbox (i->first);
+    if (! ba.empty ()) {
+      ba.transform (ta);
+      for (layers_type::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
+        db::Box bb = b.bbox (*j);
+        if (! bb.empty () && bb.transformed (tb).touches (ba)) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
 //  explicit instantiations
 template DB_PUBLIC bool Connectivity::interacts<db::NetShape> (const db::NetShape &a, unsigned int la, const db::NetShape &b, unsigned int lb, const db::UnitTrans &trans) const;
 template DB_PUBLIC bool Connectivity::interacts<db::NetShape> (const db::NetShape &a, unsigned int la, const db::NetShape &b, unsigned int lb, const db::ICplxTrans &trans) const;
@@ -318,6 +371,7 @@ template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::Polyg
 template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::PolygonRef &a, unsigned int la, const db::PolygonRef &b, unsigned int lb, const db::ICplxTrans &trans) const;
 template DB_PUBLIC bool Connectivity::interacts<db::Edge> (const db::Edge &a, unsigned int la, const db::Edge &b, unsigned int lb, const db::UnitTrans &trans) const;
 template DB_PUBLIC bool Connectivity::interacts<db::Edge> (const db::Edge &a, unsigned int la, const db::Edge &b, unsigned int lb, const db::ICplxTrans &trans) const;
+template DB_PUBLIC bool Connectivity::interact<db::ICplxTrans> (const db::Cell &a, const db::ICplxTrans &ta, const db::Cell &b, const db::ICplxTrans &tb) const;
 
 // ------------------------------------------------------------------------------
 //  local_cluster implementation
@@ -556,15 +610,7 @@ local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans
     return false;
   }
 
-  bool any = false;
-
-  for (std::set<unsigned int>::const_iterator i = ll1.begin (); i != ll1.end () && !any; ++i) {
-    db::Connectivity::layer_iterator je = conn.end_connected (*i);
-    for (db::Connectivity::layer_iterator j = conn.begin_connected (*i); j != je && !any; ++j) {
-      any = (ll2.find (*j) != ll2.end ());
-    }
-  }
-  if (! any) {
+  if (! conn.interacts (ll1, ll2)) {
     return false;
   }
 
@@ -1392,9 +1438,35 @@ public:
    *  @brief Constructor
    */
   hc_receiver (const db::Layout &layout, const db::Cell &cell, db::connected_clusters<T> &cell_clusters, hier_clusters<T> &tree, const cell_clusters_box_converter<T> &cbc, const db::Connectivity &conn, const std::set<db::cell_index_type> *breakout_cells, typename hier_clusters<T>::instance_interaction_cache_type *instance_interaction_cache)
-    : mp_layout (&layout), mp_cell (&cell), mp_tree (&tree), mp_cbc (&cbc), mp_conn (&conn), mp_breakout_cells (breakout_cells), mp_instance_interaction_cache (instance_interaction_cache)
+    : mp_layout (&layout), mp_cell (&cell), mp_tree (&tree), mp_cbc (&cbc), mp_conn (&conn), mp_breakout_cells (breakout_cells), m_cluster_cache_misses (0), m_cluster_cache_hits (0), mp_instance_interaction_cache (instance_interaction_cache)
   {
     mp_cell_clusters = &cell_clusters;
+  }
+
+  /**
+   *  @brief Gets the cache size
+   */
+  size_t cluster_cache_size () const
+  {
+    db::MemStatisticsSimple ms;
+    ms << m_interaction_cache_for_clusters;
+    return ms.used ();
+  }
+
+  /**
+   *  @brief Gets the cache hits
+   */
+  size_t cluster_cache_hits () const
+  {
+    return m_cluster_cache_hits;
+  }
+
+  /**
+   *  @brief Gets the cache misses
+   */
+  size_t cluster_cache_misses () const
+  {
+    return m_cluster_cache_misses;
   }
 
   /**
@@ -1519,7 +1591,8 @@ private:
   std::map<id_type, typename join_set_list::iterator> m_cm2join_map;
   join_set_list m_cm2join_sets;
   std::list<ClusterInstanceInteraction> m_ci_interactions;
-  std::map<InteractionKeyForClustersType, std::vector<std::pair<size_t, size_t> > > m_interaction_cache_for_clusters;
+  std::map<InteractionKeyForClustersType, std::list<std::pair<size_t, size_t> > > m_interaction_cache_for_clusters;
+  size_t m_cluster_cache_misses, m_cluster_cache_hits;
   typename hier_clusters<T>::instance_interaction_cache_type *mp_instance_interaction_cache;
 
   /**
@@ -1559,13 +1632,21 @@ private:
       return;
     }
 
+    //  gross shortcut: the cells do no comprise a constallation which will ever interact
+    if (! mp_conn->interact (mp_layout->cell (i1.cell_index ()), mp_layout->cell (i2.cell_index ()))) {
+      return;
+    }
+
     InstanceToInstanceInteraction ii_key;
     db::ICplxTrans i1t, i2t;
     bool fill_cache = false;
 
+    size_t n1 = i1element.at_end () ? i1.size () : 1;
+    size_t n2 = i2element.at_end () ? i2.size () : 1;
+
     //  Cache is only used for single instances or simple and regular arrays.
-    if ((! i1element.at_end () || i1.size () == 1 || ! i1.is_iterated_array ()) &&
-        (! i2element.at_end () || i2.size () == 1 || ! i2.is_iterated_array ())) {
+    if ((n1 == 1 || ! i1.is_iterated_array ()) &&
+        (n2 == 1 || ! i2.is_iterated_array ())) {
 
       i1t = i1element.at_end () ? i1.complex_trans () : i1.complex_trans (*i1element);
       db::ICplxTrans tt1 = t1 * i1t;
@@ -1595,8 +1676,33 @@ private:
 
       }
 
+      //  avoid caching few-to-many interactions as this typically does not contribute anything
       fill_cache = true;
 
+    }
+
+    //  shortcut: if the instances cannot interact because their bounding boxes do no comprise a valid constellation,
+    //  reject the pair
+
+    bool any = false;
+    for (db::Connectivity::layer_iterator la = mp_conn->begin_layers (); la != mp_conn->end_layers () && ! any; ++la) {
+      db::box_convert<db::CellInst, true> bca (*mp_layout, *la);
+      box_type bb1 = i1.cell_inst ().bbox (bca).transformed (t1);
+      if (! bb1.empty ()) {
+        db::Connectivity::layer_iterator lbe = mp_conn->end_connected (*la);
+        for (db::Connectivity::layer_iterator lb = mp_conn->begin_connected (*la); lb != lbe && ! any; ++lb) {
+          db::box_convert<db::CellInst, true> bcb (*mp_layout, *lb);
+          box_type bb2 = i2.cell_inst ().bbox (bcb).transformed (t2);
+          any = bb1.touches (bb2);
+        }
+      }
+    }
+
+    if (! any) {
+      if (fill_cache) {
+        mp_instance_interaction_cache->insert (ii_key);
+      }
+      return;
     }
 
     //  array interactions
@@ -1625,9 +1731,9 @@ private:
         box_type common12 = ib1 & ib2 & common;
         if (! common12.empty ()) {
 
-          const std::vector<std::pair<size_t, size_t> > &i2i_interactions = compute_instance_interactions (common12, i1.cell_index (), tt1, i2.cell_index (), tt2);
+          const std::list<std::pair<size_t, size_t> > &i2i_interactions = compute_instance_interactions (common12, i1.cell_index (), tt1, i2.cell_index (), tt2);
 
-          for (std::vector<std::pair<size_t, size_t> >::const_iterator ii = i2i_interactions.begin (); ii != i2i_interactions.end (); ++ii) {
+          for (std::list<std::pair<size_t, size_t> >::const_iterator ii = i2i_interactions.begin (); ii != i2i_interactions.end (); ++ii) {
             ClusterInstance k1 (ii->first, i1.cell_index (), i1t, i1.prop_id ());
             ClusterInstance k2 (ii->second, i2.cell_index (), i2t, i2.prop_id ());
             interacting_clusters.push_back (std::make_pair (k1, k2));
@@ -1692,7 +1798,7 @@ private:
     //  return the list of unique interactions
     interacting_clusters.insert (interacting_clusters.end (), sorted_interactions.begin (), sorted_interactions.end ());
 
-    if (fill_cache) {
+    if (fill_cache && sorted_interactions.size () < instance_to_instance_cache_set_size_threshold) {
 
       //  normalize transformations for cache
       db::ICplxTrans i1ti = i1t.inverted (), i2ti = i2t.inverted ();
@@ -1710,13 +1816,13 @@ private:
   /**
    *  @brief Computes a list of interacting clusters for two instances
    */
-  const std::vector<std::pair<size_t, size_t> > &
+  const std::list<std::pair<size_t, size_t> > &
   compute_instance_interactions (const box_type &common,
                                  db::cell_index_type ci1, const db::ICplxTrans &t1,
                                  db::cell_index_type ci2, const db::ICplxTrans &t2)
   {
     if (is_breakout_cell (mp_breakout_cells, ci1) || is_breakout_cell (mp_breakout_cells, ci2)) {
-      static const std::vector<std::pair<size_t, size_t> > empty;
+      static const std::list<std::pair<size_t, size_t> > empty;
       return empty;
     }
 
@@ -1728,7 +1834,7 @@ private:
 
     InteractionKeyForClustersType ikey (ci1, ci2, t1i, t21, common2);
 
-    typename std::map<InteractionKeyForClustersType, std::vector<std::pair<size_t, size_t> > >::const_iterator ici = m_interaction_cache_for_clusters.find (ikey);
+    typename std::map<InteractionKeyForClustersType, std::list<std::pair<size_t, size_t> > >::const_iterator ici = m_interaction_cache_for_clusters.find (ikey);
     if (ici != m_interaction_cache_for_clusters.end ()) {
 
       return ici->second;
@@ -1740,7 +1846,7 @@ private:
       const db::local_clusters<T> &cl1 = mp_tree->clusters_per_cell (ci1);
       const db::local_clusters<T> &cl2 = mp_tree->clusters_per_cell (ci2);
 
-      std::vector<std::pair<size_t, size_t> > &new_interactions = m_interaction_cache_for_clusters [ikey];
+      std::list<std::pair<size_t, size_t> > &new_interactions = m_interaction_cache_for_clusters [ikey];
       db::ICplxTrans t12 = t2i * t1;
 
       for (typename db::local_clusters<T>::touching_iterator i = cl1.begin_touching (common2.transformed (t21)); ! i.at_end (); ++i) {
@@ -1806,8 +1912,8 @@ private:
           cluster_instance_pair_list_type interacting_clusters;
 
           box_type common = (ib & ib2);
-          const std::vector<std::pair<size_t, size_t> > &i2i_interactions = compute_instance_interactions (common, i.cell_index (), tt, i.cell_index (), tt2);
-          for (std::vector<std::pair<size_t, size_t> >::const_iterator ii = i2i_interactions.begin (); ii != i2i_interactions.end (); ++ii) {
+          const std::list<std::pair<size_t, size_t> > &i2i_interactions = compute_instance_interactions (common, i.cell_index (), tt, i.cell_index (), tt2);
+          for (std::list<std::pair<size_t, size_t> >::const_iterator ii = i2i_interactions.begin (); ii != i2i_interactions.end (); ++ii) {
             ClusterInstance k1 (ii->first, i.cell_index (), tt, i.prop_id ());
             ClusterInstance k2 (ii->second, i.cell_index (), tt2, i.prop_id ());
             interacting_clusters.push_back (std::make_pair (k1, k2));
@@ -2236,8 +2342,8 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
     build_hier_connections_for_cells (cbc, layout, todo, conn, breakout_cells, progress, instance_interaction_cache);
   }
 
-  if (tl::verbosity () >= 51) {
-    tl::info << "Cluster build cache statistics: size=" << instance_interaction_cache.size () << ", hits=" << instance_interaction_cache.hits () << ", misses=" << instance_interaction_cache.misses ();
+  if (tl::verbosity () >= m_base_verbosity + 20) {
+    tl::info << "Cluster build cache statistics (instance to instance cache): size=" << instance_interaction_cache.size () << ", hits=" << instance_interaction_cache.hits () << ", misses=" << instance_interaction_cache.misses ();
   }
 }
 
@@ -2430,6 +2536,11 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
 
   //  join local clusters which got connected by child clusters
   rec->finish_cluster_to_instance_interactions ();
+
+  if (tl::verbosity () >= m_base_verbosity + 20) {
+    tl::info << "Cluster build cache statistics (instance to shape cache): size=" << rec->cluster_cache_size () << ", hits=" << rec->cluster_cache_hits () << ", misses=" << rec->cluster_cache_misses ();
+  }
+
   rec.reset (0);
 
   //  finally connect global nets

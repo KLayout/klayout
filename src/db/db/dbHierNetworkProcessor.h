@@ -187,6 +187,22 @@ public:
     return interacts (a, la, b, lb, UnitTrans ());
   }
 
+  /**
+   *  @brief Returns true, if two sets of layers interact
+   */
+  bool interacts (const std::set<unsigned int> &la, const std::set<unsigned int> &lb) const;
+
+  /**
+   *  @brief Returns true, if two cells basically (without considering transformation) interact
+   */
+  bool interact (const db::Cell &a, const db::Cell &b) const;
+
+  /**
+   *  @brief Returns true, if two cells with the given transformations interact
+   */
+  template <class T>
+  bool interact (const db::Cell &a, const T &ta, const db::Cell &b, const T &tb) const;
+
 private:
   layers_type m_all_layers;
   std::map<unsigned int, layers_type> m_connected;
@@ -1095,7 +1111,9 @@ public:
 
     size_t size () const
     {
-      return m_map.size ();
+      MemStatisticsSimple ms;
+      ms << m_map;
+      return ms.used ();
     }
 
     size_t hits () const

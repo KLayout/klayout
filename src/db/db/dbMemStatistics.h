@@ -26,6 +26,7 @@
 #define HDR_dbMemStatistics
 
 #include "dbCommon.h"
+#include "tlObjectCollection.h"
 
 #include <stdio.h>
 #include <string>
@@ -33,6 +34,8 @@
 #include <map>
 #include <set>
 #include <list>
+#include <unordered_map>
+#include <unordered_set>
 #include <typeinfo>
 #include "tlReuseVector.h"
 
@@ -64,7 +67,9 @@ public:
     InstTrees,
     ShapesInfo,
     ShapesCache,
-    ShapeTrees
+    ShapeTrees,
+    Netlist,
+    LayoutToNetlist
   };
 
   /**
@@ -120,7 +125,7 @@ template <class X>
 void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const tl::reuse_vector<X> &v, bool no_self = false, void *parent = 0)
 {
   if (! no_self) {
-    stat->add (typeid (tl::reuse_vector<X>), (void *) &v, sizeof (tl::reuse_vector<X>), sizeof (tl::reuse_vector<X>), parent, purpose, cat);
+    stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
   }
   if (! v.empty ()) {
     stat->add (typeid (X[]), (void *) v.begin ().operator-> (), sizeof (X) * v.capacity (), sizeof (X) * v.size (), (void *) &v, purpose, cat);
@@ -137,7 +142,7 @@ template <class X>
 void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const tl::vector<X> &v, bool no_self = false, void *parent = 0)
 {
   if (! no_self) {
-    stat->add (typeid (tl::vector<X>), (void *) &v, sizeof (tl::vector<X>), sizeof (tl::vector<X>), parent, purpose, cat);
+    stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
   }
   if (! v.empty ()) {
     stat->add (typeid (X[]), (void *) &v.front (), sizeof (X) * v.capacity (), sizeof (X) * v.size (), (void *) &v, purpose, cat);
@@ -151,7 +156,7 @@ template <class X>
 void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const std::vector<X> &v, bool no_self = false, void *parent = 0)
 {
   if (! no_self) {
-    stat->add (typeid (std::vector<X>), (void *) &v, sizeof (std::vector<X>), sizeof (std::vector<X>), parent, purpose, cat);
+    stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
   }
   if (! v.empty ()) {
     stat->add (typeid (X[]), (void *) &v.front (), sizeof (X) * v.capacity (), sizeof (X) * v.size (), (void *) &v, purpose, cat);
@@ -167,14 +172,27 @@ template <class X, class Y>
 void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const std::map<X, Y> &v, bool no_self = false, void *parent = 0)
 {
   if (! no_self) {
-    stat->add (typeid (std::map<X, Y>), (void *) &v, sizeof (std::map<X, Y>), sizeof (std::map<X, Y>), parent, purpose, cat);
+    stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
   }
   for (typename std::map<X, Y>::const_iterator i = v.begin (); i != v.end (); ++i) {
     mem_stat (stat, purpose, cat, i->first, false, (void *) &v);
     mem_stat (stat, purpose, cat, i->second, false, (void *) &v);
-#ifdef __GNUCC__
-    stat->add (std::_Rb_tree_node_base, (void *) &i->first, sizeof (std::_Rb_tree_node_base), sizeof (std::_Rb_tree_node_base), (void *) &v, purpose, cat);
+#ifdef __GLIBCXX__
+    stat->add (typeid (std::_Rb_tree_node_base), (void *) &i->first, sizeof (std::_Rb_tree_node_base), sizeof (std::_Rb_tree_node_base), (void *) &v, purpose, cat);
 #endif
+  }
+}
+
+template <class X, class Y>
+void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const std::unordered_map<X, Y> &v, bool no_self = false, void *parent = 0)
+{
+  if (! no_self) {
+    stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
+  }
+  for (typename std::unordered_map<X, Y>::const_iterator i = v.begin (); i != v.end (); ++i) {
+    mem_stat (stat, purpose, cat, i->first, false, (void *) &v);
+    mem_stat (stat, purpose, cat, i->second, false, (void *) &v);
+    //  TODO: add intrinsic overhead
   }
 }
 
@@ -182,13 +200,26 @@ template <class X>
 void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const std::set<X> &v, bool no_self = false, void *parent = 0)
 {
   if (! no_self) {
-    stat->add (typeid (std::set<X>), (void *) &v, sizeof (std::set<X>), sizeof (std::set<X>), parent, purpose, cat);
+    stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
   }
   for (typename std::set<X>::const_iterator i = v.begin (); i != v.end (); ++i) {
     mem_stat (stat, purpose, cat, *i, false, (void *) &v);
-#ifdef __GNUCC__
-    stat->add (std::_Rb_tree_node_base, (void *) &i.operator-> (), sizeof (std::_Rb_tree_node_base), sizeof (std::_Rb_tree_node_base), (void *) &v, purpose, cat);
+#ifdef __GLIBCXX__
+    //  NOTE: the pointer is only an approximation
+    stat->add (typeid (std::_Rb_tree_node_base), (void *) i.operator-> (), sizeof (std::_Rb_tree_node_base), sizeof (std::_Rb_tree_node_base), (void *) &v, purpose, cat);
 #endif
+  }
+}
+
+template <class X>
+void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const std::unordered_set<X> &v, bool no_self = false, void *parent = 0)
+{
+  if (! no_self) {
+    stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
+  }
+  for (typename std::unordered_set<X>::const_iterator i = v.begin (); i != v.end (); ++i) {
+    mem_stat (stat, purpose, cat, *i, false, (void *) &v);
+    //  TODO: add intrinsic overhead
   }
 }
 
@@ -196,12 +227,13 @@ template <class X>
 void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const std::list<X> &v, bool no_self = false, void *parent = 0)
 {
   if (! no_self) {
-    stat->add (typeid (std::list<X>), (void *) &v, sizeof (std::list<X>), sizeof (std::list<X>), parent, purpose, cat);
+    stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
   }
   for (typename std::list<X>::const_iterator i = v.begin (); i != v.end (); ++i) {
     mem_stat (stat, purpose, cat, *i, false, (void *) &v);
-#ifdef __GNUCC__
-    stat->add (std::_List_node_base, (void *) &i.operator-> (), sizeof (std::_List_node_base), sizeof (std::_List_node_base), (void *) &v, purpose, cat);
+#ifdef __GLIBCXX__
+    //  NOTE: the pointer is only an approximation
+    stat->add (typeid (std::__detail::_List_node_base), (void *) i.operator-> (), sizeof (std::__detail::_List_node_base), sizeof (std::__detail::_List_node_base), (void *) &v, purpose, cat);
 #endif
   }
 }
@@ -210,10 +242,33 @@ template <class X, class Y>
 void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const std::pair<X, Y> &v, bool no_self = false, void *parent = 0)
 {
   if (! no_self) {
-    stat->add (typeid (std::pair<X, Y>), (void *) &v, sizeof (std::pair<X, Y>), sizeof (std::pair<X, Y>), parent, purpose, cat);
+    stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
   }
   mem_stat (stat, purpose, cat, v.first, true, (void *) &v);
   mem_stat (stat, purpose, cat, v.second, true, (void *) &v);
+}
+
+template <class X>
+void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const tl::shared_collection<X> &v, bool no_self = false, void *parent = 0)
+{
+  if (! no_self) {
+    stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
+  }
+  size_t intrinsic = sizeof (typename tl::shared_collection<X>::holder_type) * v.size ();
+  stat->add (typeid (typename tl::shared_collection<X>::holder_type), (void *) &v, intrinsic, intrinsic, (void *) &v, purpose, cat);
+  for (typename tl::shared_collection<X>::const_iterator i = v.begin (); i != v.end (); ++i) {
+    mem_stat (stat, purpose, cat, *i, false, (void *) &v);
+  }
+}
+
+template <class X>
+void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const tl::weak_collection <X> &v, bool no_self = false, void *parent = 0)
+{
+  if (! no_self) {
+    stat->add (typeid (v), (void *) &v, sizeof (v), sizeof (v), parent, purpose, cat);
+  }
+  size_t intrinsic = sizeof (typename tl::weak_collection<X>::holder_type) * v.size ();
+  stat->add (typeid (typename tl::weak_collection<X>::holder_type), (void *) &v, intrinsic, intrinsic, (void *) &v, purpose, cat);
 }
 
 }

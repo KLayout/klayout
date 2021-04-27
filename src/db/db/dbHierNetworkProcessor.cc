@@ -415,6 +415,19 @@ local_cluster<T>::ensure_sorted ()
 }
 
 template <class T>
+void
+local_cluster<T>::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+{
+  if (! no_self) {
+    stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+  }
+
+  db::mem_stat (stat, purpose, cat, m_shapes, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_attrs, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_global_nets, true, (void *) this);
+}
+
+template <class T>
 class DB_PUBLIC hnp_interaction_receiver
   : public box_scanner_receiver2<T, unsigned int, T, unsigned int>
 {
@@ -784,6 +797,20 @@ local_clusters<T>::ensure_sorted ()
   }
 
   m_needs_update = false;
+}
+
+template <class T>
+void
+local_clusters<T>::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+{
+  if (! no_self) {
+    stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+  }
+
+  db::mem_stat (stat, purpose, cat, m_needs_update, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_bbox, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_clusters, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_next_dummy_id, true, (void *) this);
 }
 
 namespace
@@ -1210,6 +1237,21 @@ connected_clusters<T>::find_cluster_with_connection (const ClusterInstance &inst
   }
 }
 
+template <class T>
+void
+connected_clusters<T>::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+{
+  if (! no_self) {
+    stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+  }
+
+  local_clusters<T>::mem_stat (stat, purpose, cat, true, parent);
+
+  db::mem_stat (stat, purpose, cat, m_connections, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_rev_connections, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_connected_clusters, true, (void *) this);
+}
+
 //  explicit instantiations
 template class DB_PUBLIC connected_clusters<db::NetShape>;
 template class DB_PUBLIC connected_clusters<db::PolygonRef>;
@@ -1288,6 +1330,17 @@ template <class T>
 void hier_clusters<T>::clear ()
 {
   m_per_cell_clusters.clear ();
+}
+
+template <class T>
+void
+hier_clusters<T>::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+{
+  if (! no_self) {
+    stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+  }
+
+  db::mem_stat (stat, purpose, cat, m_per_cell_clusters, true, (void *) this);
 }
 
 template <class T>
@@ -1467,7 +1520,7 @@ private:
   join_set_list m_cm2join_sets;
   std::list<ClusterInstanceInteraction> m_ci_interactions;
   std::map<InteractionKeyForClustersType, std::vector<std::pair<size_t, size_t> > > m_interaction_cache_for_clusters;
-  instance_interaction_cache_type *mp_instance_interaction_cache;
+  typename hier_clusters<T>::instance_interaction_cache_type *mp_instance_interaction_cache;
 
   /**
    *  @brief Investigate a pair of instances
@@ -1488,7 +1541,7 @@ private:
   void consider_instance_pair (const box_type &common,
                                const db::Instance &i1, const db::ICplxTrans &t1, const db::CellInstArray::iterator &i1element,
                                const db::Instance &i2, const db::ICplxTrans &t2, const db::CellInstArray::iterator &i2element,
-                               std::list<std::pair<ClusterInstance, ClusterInstance> > &interacting_clusters)
+                               cluster_instance_pair_list_type &interacting_clusters)
   {
     if (is_breakout_cell (mp_breakout_cells, i1.cell_index ()) || is_breakout_cell (mp_breakout_cells, i2.cell_index ())) {
       return;
@@ -1510,7 +1563,7 @@ private:
     db::ICplxTrans i1t, i2t;
     bool fill_cache = false;
 
-    //  Cache is only used for single instances, non-iterated, simple or regular arrays.
+    //  Cache is only used for single instances or simple and regular arrays.
     if ((! i1element.at_end () || i1.size () == 1 || ! i1.is_iterated_array ()) &&
         (! i2element.at_end () || i2.size () == 1 || ! i2.is_iterated_array ())) {
 
@@ -1525,12 +1578,12 @@ private:
                                               i2.cell_index (), (! i2element.at_end () || i2.size () == 1) ? 0 : i2.cell_inst ().delegate (),
                                               cache_norm, cache_norm * tt2);
 
-      instance_interaction_cache_type::iterator ii = mp_instance_interaction_cache->find (ii_key);
-      if (ii != mp_instance_interaction_cache->end ()) {
+      const cluster_instance_pair_list_type *cached = mp_instance_interaction_cache->find (ii_key);
+      if (cached) {
 
         //  use cached interactions
-        interacting_clusters = ii->second;
-        for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = interacting_clusters.begin (); i != interacting_clusters.end (); ++i) {
+        interacting_clusters = *cached;
+        for (cluster_instance_pair_list_type::iterator i = interacting_clusters.begin (); i != interacting_clusters.end (); ++i) {
           //  translate the property IDs
           i->first.set_inst_prop_id (i1.prop_id ());
           i->first.transform (i1t);
@@ -1596,31 +1649,26 @@ private:
 
           }
 
+          //  dive into cell of ii1
+          const db::Cell &cell1 = mp_layout->cell (i1.cell_index ());
+          for (db::Cell::touching_iterator jj1 = cell1.begin_touching (common12.transformed (tt1.inverted ())); ! jj1.at_end (); ++jj1) {
+
+            std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
+            consider_instance_pair (common12, *jj1, tt1, db::CellInstArray::iterator (), i2, t2, ii2, ii_interactions);
+
+            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
+              propagate_cluster_inst (i->first, i1.cell_index (), i1t, i1.prop_id ());
+            }
+
+            ii_interactions.unique ();
+            interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
+
+          }
+
         }
 
         if (! i2element.at_end ()) {
           break;
-        }
-
-      }
-
-      box_type common1 = ib1 & b2 & common;
-      if (! common1.empty ()) {
-
-        //  dive into cell of ii1
-        const db::Cell &cell1 = mp_layout->cell (i1.cell_index ());
-        for (db::Cell::touching_iterator jj1 = cell1.begin_touching (common1.transformed (tt1.inverted ())); ! jj1.at_end (); ++jj1) {
-
-          std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
-          consider_instance_pair (common1, *jj1, tt1, db::CellInstArray::iterator (), i2, t2, i2element, ii_interactions);
-
-          for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
-            propagate_cluster_inst (i->first, i1.cell_index (), i1t, i1.prop_id ());
-          }
-
-          ii_interactions.unique ();
-          interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
-
         }
 
       }
@@ -1653,7 +1701,7 @@ private:
         i->second.transform (i2ti);
       }
 
-      cluster_instance_pair_list_type &cached = (*mp_instance_interaction_cache) [ii_key];
+      cluster_instance_pair_list_type &cached = mp_instance_interaction_cache->insert (ii_key);
       cached.insert (cached.end (), sorted_interactions.begin (), sorted_interactions.end ());
 
     }
@@ -2186,6 +2234,10 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
     }
 
     build_hier_connections_for_cells (cbc, layout, todo, conn, breakout_cells, progress, instance_interaction_cache);
+  }
+
+  if (tl::verbosity () >= 51) {
+    tl::info << "Cluster build cache statistics: size=" << instance_interaction_cache.size () << ", hits=" << instance_interaction_cache.hits () << ", misses=" << instance_interaction_cache.misses ();
   }
 }
 

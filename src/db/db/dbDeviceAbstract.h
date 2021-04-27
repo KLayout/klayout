@@ -26,6 +26,7 @@
 #include "dbCommon.h"
 #include "dbNet.h"
 #include "dbPoint.h"
+#include "dbMemStatistics.h"
 
 #include "tlObject.h"
 
@@ -144,6 +145,19 @@ public:
    */
   void set_cluster_id_for_terminal (size_t terminal_id, size_t cluster_id);
 
+  /**
+   *  @brief Generate memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
+  {
+    if (! no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+
+    db::mem_stat (stat, purpose, cat, m_name, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_terminal_cluster_ids, true, (void *) this);
+  }
+
 private:
   friend class Netlist;
 
@@ -158,6 +172,14 @@ private:
    */
   void set_netlist (Netlist *netlist);
 };
+
+/**
+ *  @brief Memory statistics for LayoutToNetlist
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const DeviceAbstract &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 }
 

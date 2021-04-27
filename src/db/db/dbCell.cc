@@ -598,15 +598,7 @@ Cell::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, 
   }
   db::mem_stat (stat, purpose, cat, m_bboxes, true, (void *) this);
   db::mem_stat (stat, MemStatistics::Instances, cat, m_instances, true, (void *) this);
-
-  //  iterate the shapes separately so we can use the layer for the category
-  for (shapes_map::const_iterator i = m_shapes_map.begin (); i != m_shapes_map.end (); ++i) {
-    db::mem_stat (stat, MemStatistics::ShapesInfo, (int) i->first, i->first, false, (void *) this);
-    db::mem_stat (stat, MemStatistics::ShapesInfo, (int) i->first, i->second, false, (void *) this);
-#ifdef __GNUCC__
-    stat->add (std::_Rb_tree_node_base, (void *) &i->first, sizeof (std::_Rb_tree_node_base), sizeof (std::_Rb_tree_node_base), (void *) &v, purpose, cat);
-#endif
-  }
+  db::mem_stat (stat, MemStatistics::ShapesInfo, cat, m_shapes_map, true, (void *) this);
 }
 
 void 

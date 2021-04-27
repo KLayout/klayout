@@ -397,7 +397,39 @@ void LayoutToNetlist::extract_netlist ()
   netex.set_include_floating_subcircuits (m_include_floating_subcircuits);
   netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters);
 
+  if (tl::verbosity () >= 41) {
+    MemStatisticsCollector m (false);
+    mem_stat (&m, db::MemStatistics::None, 0);
+    m.print ();
+  }
+
   m_netlist_extracted = true;
+}
+
+void LayoutToNetlist::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+{
+  if (! no_self) {
+    stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+  }
+
+  db::mem_stat (stat, purpose, cat, m_description, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_name, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_original_file, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_filename, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_net_clusters, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, mp_netlist, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_dlrefs, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_named_regions, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_name_of_layer, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_joined_net_names, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_joined_net_names_per_cell, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_joined_nets, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_joined_nets_per_cell, true, (void *) this);
+
+  m_net_clusters.mem_stat (stat, MemStatistics::LayoutToNetlist, cat, true, (void *) this);
+  if (mp_netlist.get ()) {
+    db::mem_stat (stat, MemStatistics::Netlist, cat, *mp_netlist, false, (void *) this);
+  }
 }
 
 void LayoutToNetlist::set_netlist_extracted ()

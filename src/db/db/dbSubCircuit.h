@@ -26,6 +26,7 @@
 #include "dbCommon.h"
 #include "dbTrans.h"
 #include "dbNet.h"
+#include "dbMemStatistics.h"
 
 #include "tlObject.h"
 
@@ -194,6 +195,20 @@ public:
    */
   void connect_pin (size_t pin_id, Net *net);
 
+  /**
+   *  @brief Generate memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
+  {
+    if (! no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+
+    db::mem_stat (stat, purpose, cat, m_name, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_trans, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_pin_refs, true, (void *) this);
+  }
+
 private:
   friend class Circuit;
   friend class Net;
@@ -231,6 +246,14 @@ private:
     m_id = id;
   }
 };
+
+/**
+ *  @brief Memory statistics for SubCircuit
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const SubCircuit &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 }
 

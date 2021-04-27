@@ -103,6 +103,24 @@ Netlist &Netlist::operator= (const Netlist &other)
   return *this;
 }
 
+void Netlist::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+{
+  if (! no_self) {
+    stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+  }
+
+  db::mem_stat (stat, purpose, cat, m_circuits, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_device_classes, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_device_abstracts, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_top_down_circuits, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_child_circuits, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_parent_circuits, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_circuit_by_name, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_circuit_by_cell_index, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_device_abstract_by_name, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_device_abstract_by_cell_index, true, (void *) this);
+}
+
 void Netlist::set_case_sensitive (bool f)
 {
   m_case_sensitive = f;

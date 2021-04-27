@@ -100,14 +100,16 @@ void
 MemStatisticsCollector::print ()
 {
   std::map<purpose_t, std::string> p2s;
-  p2s[None]        = "(none)         ";
-  p2s[LayoutInfo]  = "Layout info    ";
-  p2s[CellInfo]    = "Cell info      ";
-  p2s[Instances]   = "Instances      ";
-  p2s[InstTrees]   = "Instance trees ";
-  p2s[ShapesInfo]  = "Shapes info    ";
-  p2s[ShapesCache] = "Shapes cache   ";
-  p2s[ShapeTrees]  = "Shape trees    ";
+  p2s[None]            = "(none)         ";
+  p2s[LayoutInfo]      = "Layout info    ";
+  p2s[CellInfo]        = "Cell info      ";
+  p2s[Instances]       = "Instances      ";
+  p2s[InstTrees]       = "Instance trees ";
+  p2s[ShapesInfo]      = "Shapes info    ";
+  p2s[ShapesCache]     = "Shapes cache   ";
+  p2s[ShapeTrees]      = "Shape trees    ";
+  p2s[Netlist]         = "Netlist        ";
+  p2s[LayoutToNetlist] = "Netlist layout ";
 
   if (m_detailed) {
 

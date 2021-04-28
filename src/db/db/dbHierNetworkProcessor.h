@@ -812,10 +812,10 @@ inline bool less_array_delegates (const db::ArrayBase *a, const db::ArrayBase *b
 /**
  *  @brief A helper struct to describe a pair of cell instances with a specific relative transformation
  */
-struct InstanceToInstanceInteraction
+struct DB_PUBLIC InstanceToInstanceInteraction
 {
-  InstanceToInstanceInteraction (db::cell_index_type _ci1, const db::ArrayBase *_array1, db::cell_index_type _ci2, const db::ArrayBase *_array2, const db::ICplxTrans &_tn, const db::ICplxTrans &_t21)
-    : ci1 (_ci1), ci2 (_ci2), array1 (0), array2 (0), t21 (_t21)
+  InstanceToInstanceInteraction (const db::ArrayBase *_array1, const db::ArrayBase *_array2, const db::ICplxTrans &_tn, const db::ICplxTrans &_t21)
+    : array1 (0), array2 (0), t21 (_t21)
   {
     if (_array1) {
       array1 = _array1->basic_clone ();
@@ -829,14 +829,13 @@ struct InstanceToInstanceInteraction
   }
 
   InstanceToInstanceInteraction ()
-    : ci1 (0), ci2 (0), array1 (0), array2 (0)
+    : array1 (0), array2 (0)
   {
     //  .. nothing yet ..
   }
 
   InstanceToInstanceInteraction (const InstanceToInstanceInteraction &other)
-    : ci1 (other.ci1), ci2 (other.ci2),
-      array1 (other.array1 ? other.array1->basic_clone () : 0),
+    : array1 (other.array1 ? other.array1->basic_clone () : 0),
       array2 (other.array2 ? other.array2->basic_clone () : 0),
       t21 (other.t21)
   {
@@ -846,9 +845,6 @@ struct InstanceToInstanceInteraction
   InstanceToInstanceInteraction &operator= (const InstanceToInstanceInteraction &other)
   {
     if (this != &other) {
-
-      ci1 = other.ci1;
-      ci2 = other.ci2;
 
       if (array1) {
         delete array1;
@@ -882,19 +878,13 @@ struct InstanceToInstanceInteraction
 
   bool operator== (const InstanceToInstanceInteraction &other) const
   {
-    return ci1 == other.ci1 && ci2 == other.ci2 && t21.equal (other.t21) &&
+    return t21.equal (other.t21) &&
             equal_array_delegates (array1, other.array1) &&
             equal_array_delegates (array2, other.array2);
   }
 
   bool operator< (const InstanceToInstanceInteraction &other) const
   {
-    if (ci1 != other.ci1) {
-      return ci1 < other.ci1;
-    }
-    if (ci2 != other.ci2) {
-      return ci2 < other.ci2;
-    }
     if (! t21.equal (other.t21)) {
       return t21.less (other.t21);
     }
@@ -906,9 +896,108 @@ struct InstanceToInstanceInteraction
     return less_array_delegates (array2, other.array2);
   }
 
-  db::cell_index_type ci1, ci2;
   db::ArrayBase *array1, *array2;
   db::ICplxTrans t21;
+};
+
+template <class Box>
+struct DB_PUBLIC_TEMPLATE interaction_key_for_clusters
+  : public InstanceToInstanceInteraction
+{
+  interaction_key_for_clusters (const db::ICplxTrans &_t1, const db::ICplxTrans &_t21, const Box &_box)
+    : InstanceToInstanceInteraction (0, 0, _t1, _t21), box (_box)
+  { }
+
+  bool operator== (const interaction_key_for_clusters &other) const
+  {
+    return InstanceToInstanceInteraction::operator== (other) && box == other.box;
+  }
+
+  bool operator< (const interaction_key_for_clusters &other) const
+  {
+    if (! InstanceToInstanceInteraction::operator== (other)) {
+      return InstanceToInstanceInteraction::operator< (other);
+    }
+    if (box != other.box) {
+      return box < other.box;
+    }
+    return false;
+  }
+
+  Box box;
+};
+
+/**
+ *  @brief An object representing the instance interaction cache
+ */
+template <class Key, class Value>
+class DB_PUBLIC_TEMPLATE instance_interaction_cache
+{
+public:
+  instance_interaction_cache ()
+    : m_hits (0), m_misses (0)
+  { }
+
+  size_t size () const
+  {
+    MemStatisticsSimple ms;
+    ms << m_map;
+    return ms.used ();
+  }
+
+  size_t hits () const
+  {
+    return m_hits;
+  }
+
+  size_t misses () const
+  {
+    return m_misses;
+  }
+
+  const Value *find (db::cell_index_type ci1, db::cell_index_type ci2, const Key &key) const
+  {
+    typename std::map <std::pair<db::cell_index_type, db::cell_index_type>, std::list <std::pair<Key, Value> > >::iterator i1 = m_map.find (std::make_pair (ci1, ci2));
+    if (i1 == m_map.end ()) {
+      ++m_misses;
+      return 0;
+    }
+
+    //  NOTE: the number of entries is low, so we can afford a linear search
+    typename std::list <std::pair<Key, Value> >::iterator i = i1->second.begin ();
+    while (i != i1->second.end () && ! (i->first == key)) {
+      ++i;
+    }
+
+    if (i == i1->second.end ()) {
+      ++m_misses;
+      return 0;
+    } else {
+      //  move the element to the front so the most frequently used ones are at the front
+      if (i != i1->second.begin ()) {
+        i1->second.splice (i1->second.begin(), i1->second, i, std::next (i));
+      }
+      ++m_hits;
+      return &i->second;
+    }
+  }
+
+  Value &insert (db::cell_index_type ci1, db::cell_index_type ci2, const Key &key)
+  {
+    const size_t instance_cache_variant_threshold = 20;
+
+    std::list <std::pair<Key, Value> > &m = m_map [std::make_pair (ci1, ci2)];
+    if (m.size () >= instance_cache_variant_threshold) {
+      m.pop_back ();
+    }
+
+    m.push_front (std::make_pair (key, Value ()));
+    return m.front ().second;
+  }
+
+private:
+  mutable size_t m_hits, m_misses;
+  mutable std::map <std::pair<db::cell_index_type, db::cell_index_type>, std::list <std::pair<Key, Value> > > m_map;
 };
 
 template <class T> class hier_clusters;
@@ -1099,56 +1188,7 @@ class DB_PUBLIC_TEMPLATE hier_clusters
 public:
   typedef typename local_cluster<T>::box_type box_type;
 
-  /**
-   *  @brief An object representing the instance interaction cache
-   */
-  class instance_interaction_cache
-  {
-  public:
-    instance_interaction_cache ()
-      : m_hits (0), m_misses (0)
-    { }
-
-    size_t size () const
-    {
-      MemStatisticsSimple ms;
-      ms << m_map;
-      return ms.used ();
-    }
-
-    size_t hits () const
-    {
-      return m_hits;
-    }
-
-    size_t misses () const
-    {
-      return m_misses;
-    }
-
-    const cluster_instance_pair_list_type *find (const InstanceToInstanceInteraction &key) const
-    {
-      std::map<InstanceToInstanceInteraction, cluster_instance_pair_list_type>::const_iterator i = m_map.find (key);
-      if (i == m_map.end ()) {
-        ++m_misses;
-        return 0;
-      } else {
-        ++m_hits;
-        return &i->second;
-      }
-    }
-
-    cluster_instance_pair_list_type &insert (const InstanceToInstanceInteraction &key)
-    {
-      return m_map [key];
-    }
-
-  private:
-    mutable size_t m_hits, m_misses;
-    std::map<InstanceToInstanceInteraction, cluster_instance_pair_list_type> m_map;
-  };
-
-  typedef instance_interaction_cache instance_interaction_cache_type;
+  typedef instance_interaction_cache<InstanceToInstanceInteraction, cluster_instance_pair_list_type> instance_interaction_cache_type;
 
   /**
    *  @brief Creates an empty set of clusters

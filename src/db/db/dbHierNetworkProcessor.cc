@@ -1554,32 +1554,6 @@ public:
   void finalize (bool) { }
 
 private:
-  struct InteractionKeyForClustersType
-    : public InstanceToInstanceInteraction
-  {
-    InteractionKeyForClustersType (db::cell_index_type _ci1, db::cell_index_type _ci2, const db::ICplxTrans &_t1, const db::ICplxTrans &_t21, const box_type &_box)
-      : InstanceToInstanceInteraction (_ci1, 0, _ci2, 0, _t1, _t21), box (_box)
-    { }
-
-    bool operator== (const InteractionKeyForClustersType &other) const
-    {
-      return InstanceToInstanceInteraction::operator== (other) && box == other.box;
-    }
-
-    bool operator< (const InteractionKeyForClustersType &other) const
-    {
-      if (! InstanceToInstanceInteraction::operator== (other)) {
-        return InstanceToInstanceInteraction::operator< (other);
-      }
-      if (box != other.box) {
-        return box < other.box;
-      }
-      return false;
-    }
-
-    box_type box;
-  };
-
   const db::Layout *mp_layout;
   const db::Cell *mp_cell;
   db::connected_clusters<T> *mp_cell_clusters;
@@ -1591,7 +1565,7 @@ private:
   std::map<id_type, typename join_set_list::iterator> m_cm2join_map;
   join_set_list m_cm2join_sets;
   std::list<ClusterInstanceInteraction> m_ci_interactions;
-  std::map<InteractionKeyForClustersType, std::list<std::pair<size_t, size_t> > > m_interaction_cache_for_clusters;
+  instance_interaction_cache<interaction_key_for_clusters<box_type>, std::list<std::pair<size_t, size_t> > > m_interaction_cache_for_clusters;
   size_t m_cluster_cache_misses, m_cluster_cache_hits;
   typename hier_clusters<T>::instance_interaction_cache_type *mp_instance_interaction_cache;
 
@@ -1655,11 +1629,11 @@ private:
       db::ICplxTrans tt2 = t2 * i2t;
 
       db::ICplxTrans cache_norm = tt1.inverted ();
-      ii_key = InstanceToInstanceInteraction (i1.cell_index (), (! i1element.at_end () || i1.size () == 1) ? 0 : i1.cell_inst ().delegate (),
-                                              i2.cell_index (), (! i2element.at_end () || i2.size () == 1) ? 0 : i2.cell_inst ().delegate (),
+      ii_key = InstanceToInstanceInteraction ((! i1element.at_end () || i1.size () == 1) ? 0 : i1.cell_inst ().delegate (),
+                                              (! i2element.at_end () || i2.size () == 1) ? 0 : i2.cell_inst ().delegate (),
                                               cache_norm, cache_norm * tt2);
 
-      const cluster_instance_pair_list_type *cached = mp_instance_interaction_cache->find (ii_key);
+      const cluster_instance_pair_list_type *cached = mp_instance_interaction_cache->find (i1.cell_index (), i2.cell_index (), ii_key);
       if (cached) {
 
         //  use cached interactions
@@ -1700,7 +1674,7 @@ private:
 
     if (! any) {
       if (fill_cache) {
-        mp_instance_interaction_cache->insert (ii_key);
+        mp_instance_interaction_cache->insert (i1.cell_index (), i2.cell_index (), ii_key);
       }
       return;
     }
@@ -1807,7 +1781,7 @@ private:
         i->second.transform (i2ti);
       }
 
-      cluster_instance_pair_list_type &cached = mp_instance_interaction_cache->insert (ii_key);
+      cluster_instance_pair_list_type &cached = mp_instance_interaction_cache->insert (i1.cell_index (), i2.cell_index (), ii_key);
       cached.insert (cached.end (), sorted_interactions.begin (), sorted_interactions.end ());
 
     }
@@ -1832,12 +1806,12 @@ private:
 
     box_type common2 = common.transformed (t2i);
 
-    InteractionKeyForClustersType ikey (ci1, ci2, t1i, t21, common2);
+    interaction_key_for_clusters<box_type> ikey (t1i, t21, common2);
 
-    typename std::map<InteractionKeyForClustersType, std::list<std::pair<size_t, size_t> > >::const_iterator ici = m_interaction_cache_for_clusters.find (ikey);
-    if (ici != m_interaction_cache_for_clusters.end ()) {
+    const std::list<std::pair<size_t, size_t> > *ici = m_interaction_cache_for_clusters.find (ci1, ci2, ikey);
+    if (ici) {
 
-      return ici->second;
+      return *ici;
 
     } else {
 
@@ -1846,7 +1820,7 @@ private:
       const db::local_clusters<T> &cl1 = mp_tree->clusters_per_cell (ci1);
       const db::local_clusters<T> &cl2 = mp_tree->clusters_per_cell (ci2);
 
-      std::list<std::pair<size_t, size_t> > &new_interactions = m_interaction_cache_for_clusters [ikey];
+      std::list<std::pair<size_t, size_t> > &new_interactions = m_interaction_cache_for_clusters.insert (ci1, ci2, ikey);
       db::ICplxTrans t12 = t2i * t1;
 
       for (typename db::local_clusters<T>::touching_iterator i = cl1.begin_touching (common2.transformed (t21)); ! i.at_end (); ++i) {
@@ -2156,6 +2130,7 @@ private:
 
         //  for instance-to-instance interactions the number of connections is more important for the
         //  cost of the join operation: make the one with more connections the target
+        //  TODO: this will be SLOW for STL's not providing a fast size()
         if (mp_cell_clusters->connections_for_cluster (x1).size () < mp_cell_clusters->connections_for_cluster (x2).size ()) {
           std::swap (x1, x2);
         }

@@ -108,6 +108,45 @@ private:
   std::map<purpose_t, std::pair<size_t, size_t> > m_per_purpose;
 };
 
+/**
+ *  @brief A simple memory statistics collector
+ *  This collector will simply add the size required
+ */
+class DB_PUBLIC MemStatisticsSimple
+  : public MemStatistics
+{
+public:
+  MemStatisticsSimple ()
+    : m_size (0), m_used (0)
+  { }
+
+  size_t size () const
+  {
+    return m_size;
+  }
+
+  size_t used () const
+  {
+    return m_used;
+  }
+
+  virtual void add (const std::type_info & /*ti*/, void * /*ptr*/, size_t size, size_t used, void * /*parent*/, purpose_t /*purpose*/, int /*cat*/)
+  {
+    m_size += size;
+    m_used += used;
+  }
+
+  template <class T>
+  MemStatisticsSimple &operator<< (const T &x)
+  {
+    mem_stat (this, None, 0, x);
+    return *this;
+  }
+
+private:
+  size_t m_size, m_used;
+};
+
 //  Some standard templates to collect the information
 template <class X>
 void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const X &x, bool no_self = false, void *parent = 0)

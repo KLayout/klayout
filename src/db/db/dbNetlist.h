@@ -533,6 +533,11 @@ public:
     return normalize_name (is_case_sensitive (), n);
   }
 
+  /**
+   *  @brief Generate memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const;
+
 private:
   friend class Circuit;
   friend class DeviceAbstract;
@@ -566,6 +571,14 @@ private:
   const tl::vector<Circuit *> &child_circuits (Circuit *circuit);
   const tl::vector<Circuit *> &parent_circuits (Circuit *circuit);
 };
+
+/**
+ *  @brief Memory statistics for LayoutToNetlist
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const Netlist &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 /**
  *  @brief A helper class using RAII for safe locking/unlocking

@@ -24,6 +24,7 @@
 #define _HDR_dbDeviceClass
 
 #include "dbCommon.h"
+#include "dbMemStatistics.h"
 
 #include "gsiObject.h"
 #include "tlObject.h"
@@ -102,6 +103,19 @@ public:
     return m_id;
   }
 
+  /**
+   *  @brief Generate memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
+  {
+    if (! no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+
+    db::mem_stat (stat, purpose, cat, m_name, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_description, true, (void *) this);
+  }
+
 private:
   friend class DeviceClass;
 
@@ -113,6 +127,14 @@ private:
     m_id = id;
   }
 };
+
+/**
+ *  @brief Memory statistics for DeviceTerminalDefinition
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const DeviceTerminalDefinition &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 /**
  *  @brief A device parameter definition
@@ -224,6 +246,19 @@ public:
     return m_id;
   }
 
+  /**
+   *  @brief Generate memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
+  {
+    if (! no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+
+    db::mem_stat (stat, purpose, cat, m_name, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_description, true, (void *) this);
+  }
+
 private:
   friend class DeviceClass;
 
@@ -238,6 +273,14 @@ private:
     m_id = id;
   }
 };
+
+/**
+ *  @brief Memory statistics for DeviceParameterDefinition
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const DeviceParameterDefinition &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 /**
  *  @brief A device parameter compare delegate
@@ -598,6 +641,21 @@ public:
     return mp_pc_delegate.get ();
   }
 
+  /**
+   *  @brief Generate memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
+  {
+    if (! no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+
+    db::mem_stat (stat, purpose, cat, m_name, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_description, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_terminal_definitions, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_parameter_definitions, true, (void *) this);
+  }
+
 private:
   friend class Netlist;
 
@@ -613,6 +671,14 @@ private:
     mp_netlist = nl;
   }
 };
+
+/**
+ *  @brief Memory statistics for DeviceClass
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const DeviceClass &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 /**
  *  @brief A device class template

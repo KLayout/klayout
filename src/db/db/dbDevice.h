@@ -28,6 +28,7 @@
 #include "dbPoint.h"
 #include "dbVector.h"
 #include "dbTrans.h"
+#include "dbMemStatistics.h"
 
 #include "tlObject.h"
 
@@ -349,6 +350,23 @@ public:
     return m_other_abstracts;
   }
 
+  /**
+   *  @brief Generate memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
+  {
+    if (! no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+
+    db::mem_stat (stat, purpose, cat, m_name, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_trans, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_terminal_refs, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_parameters, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_other_abstracts, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_reconnected_terminals, true, (void *) this);
+  }
+
 private:
   friend class Circuit;
   friend class Net;
@@ -395,6 +413,14 @@ private:
   void add_others_terminals (unsigned int this_terminal, db::Device *other, unsigned int other_terminal);
   void init_terminal_routes ();
 };
+
+/**
+ *  @brief Memory statistics for Device
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const Device &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 }
 

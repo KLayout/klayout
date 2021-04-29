@@ -12,13 +12,24 @@
 #===============================================================================
 import os
 import glob
+import platform
 
-#-----------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 # [0] Xcode's tools
-#-----------------------------------------------------
+#       and
+#     Default Homebrew root
+#       Ref. https://github.com/Homebrew/brew/blob/master/docs/Installation.md#alternative-installs
+#---------------------------------------------------------------------------------------------------
 XcodeToolChain = { 'nameID': '/usr/bin/install_name_tool -id ',
                    'nameCH': '/usr/bin/install_name_tool -change '
                  }
+
+(System, Node, Release, MacVersion, Machine, Processor) = platform.uname()
+if Machine == "arm64": # Apple Silicon!
+  DefaultHomebrewRoot = '/opt/homebrew'
+else:
+  DefaultHomebrewRoot = '/usr/local'
+del System, Node, Release, MacVersion, Machine, Processor
 
 #-----------------------------------------------------
 # [1] Qt
@@ -38,8 +49,8 @@ Qt5MacPorts = { 'qmake' : '/opt/local/libexec/qt5/bin/qmake',
 # Qt5 from Homebrew (https://brew.sh/)
 #   install with 'brew install qt'
 # [Key Type Name] = 'Qt5Brew'
-Qt5Brew = { 'qmake' : '/usr/local/opt/qt/bin/qmake',
-            'deploy': '/usr/local/opt/qt/bin/macdeployqt'
+Qt5Brew = { 'qmake' : '%s/opt/qt/bin/qmake' % DefaultHomebrewRoot,
+            'deploy': '%s/opt/qt/bin/macdeployqt' %DefaultHomebrewRoot
           }
 
 # Qt5 bundled with anaconda3 installed under /Applications/anaconda3/
@@ -145,7 +156,7 @@ Ruby27MacPorts  = { 'exe': '/opt/local/bin/ruby2.7',
 # Ruby 2.7 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
 #   install with 'brew install ruby'
 # [Key Type Name] = 'HB27'
-HBRuby27Path    = '/usr/local/opt/ruby'
+HBRuby27Path    = '%s/opt/ruby' % DefaultHomebrewRoot
 Ruby27Brew      = { 'exe': '%s/bin/ruby' % HBRuby27Path,
                     'inc': '%s/include/ruby-2.7.0' % HBRuby27Path,
                     'lib': '%s/lib/libruby.2.7.dylib' % HBRuby27Path
@@ -247,7 +258,7 @@ Python38MacPorts= { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versi
 # Python 3.8 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
 #   install with 'brew install python'
 # [Key Type Name] = 'HB38'
-HBPython38FrameworkPath = '/usr/local/opt/python@3.8/Frameworks/Python.framework'
+HBPython38FrameworkPath = '%s/opt/python@3.8/Frameworks/Python.framework' % DefaultHomebrewRoot
 Python38Brew    = { 'exe': '%s/Versions/3.8/bin/python3.8' % HBPython38FrameworkPath,
                     'inc': '%s/Versions/3.8/include/python3.8' % HBPython38FrameworkPath,
                     'lib': '%s/Versions/3.8/lib/libpython3.8.dylib' % HBPython38FrameworkPath
@@ -270,7 +281,7 @@ PythonAnaconda3 = { 'exe': '/Applications/anaconda3/bin/python3.8',
 HBPythonAutoFrameworkPath = ""
 HBPythonAutoVersion       = ""
 try:
-    HBPythonAutoFrameworkPath = glob.glob( "/usr/local/opt/python*/Frameworks/Python.framework" )[-1]
+    HBPythonAutoFrameworkPath = glob.glob( "%s/opt/python*/Frameworks/Python.framework" % DefaultHomebrewRoot )[-1]
     # expand 3* into HBPythonAutoVersion, there should be only one, but I am taking no chances.
     HBAutoFrameworkVersionPath, HBPythonAutoVersion = os.path.split( glob.glob( "%s/Versions/3*" % HBPythonAutoFrameworkPath )[0] )
     PythonAutoBrew  = { 'exe': '%s/%s/bin/python%s' % ( HBAutoFrameworkVersionPath, HBPythonAutoVersion, HBPythonAutoVersion ),

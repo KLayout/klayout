@@ -54,7 +54,8 @@ bindir="usr/bin"
 libdir="usr/lib/klayout"
 
 # TODO: is there a better way to produce this path?
-pylibdir="usr/lib/python3/dist-packages/klayout"
+distpackdir="usr/lib/python3/dist-packages"
+pylibdir="$distpackdir/klayout"
 
 # clean bin directory
 rm -rf $bininstdir
@@ -114,6 +115,7 @@ for d in db tl rdb; do
   mkdir -p makedeb-tmp/${pylibdir}/$d
   cp -pd $bininstdir/pymod/klayout/$d/*py makedeb-tmp/${pylibdir}/$d
 done
+cp -pd scripts/klayout*.egg-info makedeb-tmp/${distpackdir}
 
 cd makedeb-tmp
 

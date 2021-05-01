@@ -5,7 +5,7 @@
 KLAYOUT_VERSION="0.27"
 
 # The version used for PyPI (don't use variables here!)
-KLAYOUT_PYPI_VERSION="0.27"
+KLAYOUT_PYPI_VERSION="0.27.0"
 
 # The build date
 KLAYOUT_VERSION_DATE=$(date "+%Y-%m-%d")

@@ -1,0 +1,17 @@
+Metadata-Version: 1.1
+Name: klayout
+Version: %VERSION%
+Summary: KLayout standalone Python package
+Home-page: https://github.com/klayout/klayout
+Author: Matthias Koefferlein
+Author-email: matthias@klayout.de
+License: GNU GPLv3
+Description: KLayout Mask Layout Tool
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)

@@ -40,8 +40,8 @@ compare_ref (tl::TestBase *_this, const char *test, const db::Layout &layout)
   writer.write (layout);
   std::string oss = os.string ();
 
-  std::string fn_au (tl::testsrc ());
-  fn_au += "/testdata/oasis/t";
+  std::string fn_au (tl::testdata ());
+  fn_au += "/oasis/t";
   fn_au += test;
   fn_au += "_au.txt";
 
@@ -83,8 +83,8 @@ run_test (tl::TestBase *_this, const char *test)
 {
   db::Manager m (false);
   db::Layout layout (&m);
-  std::string fn (tl::testsrc ());
-  fn += "/testdata/oasis/t";
+  std::string fn (tl::testdata ());
+  fn += "/oasis/t";
   fn += test;
   fn += ".oas";
   tl::InputStream stream (fn);
@@ -108,8 +108,8 @@ run_test_error (tl::TestBase *_this, const char *test, const char *msg_au)
 {
   db::Manager m (false);
   db::Layout layout (&m);
-  std::string fn (tl::testsrc ());
-  fn += "/testdata/oasis/t";
+  std::string fn (tl::testdata ());
+  fn += "/oasis/t";
   fn += test;
   fn += ".oas";
   tl::InputStream stream (fn);
@@ -444,8 +444,8 @@ TEST(99)
   db::Layout layout (&m);
 
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/oasis/t9.2.oas";
+    std::string fn (tl::testdata ());
+    fn += "/oasis/t9.2.oas";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.set_warnings_as_errors (true);
@@ -461,8 +461,8 @@ TEST(99)
   }
 
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/oasis/t8.7.oas";
+    std::string fn (tl::testdata ());
+    fn += "/oasis/t8.7.oas";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.set_warnings_as_errors (true);
@@ -527,8 +527,8 @@ TEST(100)
   db::Layout layout (&m);
 
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/oasis/xgeometry_test.oas";
+    std::string fn (tl::testdata ());
+    fn += "/oasis/xgeometry_test.oas";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.set_warnings_as_errors (true);
@@ -549,18 +549,18 @@ TEST(Bug_121_1)
   db::Layout layout (&m);
 
   {
-    tl::InputStream file (tl::testsrc () + "/testdata/oasis/bug_121a.oas");
+    tl::InputStream file (tl::testdata () + "/oasis/bug_121a.oas");
     db::OASISReader reader (file);
     reader.read (layout);
   }
 
   {
-    tl::InputStream file (tl::testsrc () + "/testdata/oasis/bug_121b.oas");
+    tl::InputStream file (tl::testdata () + "/oasis/bug_121b.oas");
     db::OASISReader reader (file);
     reader.read (layout);
   }
 
-  std::string fn_au (tl::testsrc () + "/testdata/oasis/bug_121_au1.gds");
+  std::string fn_au (tl::testdata () + "/oasis/bug_121_au1.gds");
   db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
 }
 
@@ -570,17 +570,17 @@ TEST(Bug_121_2)
   db::Layout layout (&m);
 
   {
-    tl::InputStream file (tl::testsrc () + "/testdata/oasis/bug_121a.oas");
+    tl::InputStream file (tl::testdata () + "/oasis/bug_121a.oas");
     db::OASISReader reader (file);
     reader.read (layout);
   }
 
   {
-    tl::InputStream file (tl::testsrc () + "/testdata/oasis/bug_121c.oas");
+    tl::InputStream file (tl::testdata () + "/oasis/bug_121c.oas");
     db::OASISReader reader (file);
     reader.read (layout);
   }
 
-  std::string fn_au (tl::testsrc () + "/testdata/oasis/bug_121_au2.gds");
+  std::string fn_au (tl::testdata () + "/oasis/bug_121_au2.gds");
   db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
 }

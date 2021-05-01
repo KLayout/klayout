@@ -185,8 +185,7 @@ TEST(1_DeviceAndNetExtraction)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l1.gds");
 
@@ -393,8 +392,7 @@ TEST(1_DeviceAndNetExtraction)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au1.gds");
 
@@ -423,8 +421,7 @@ TEST(1a_DeviceAndNetExtractionWithTextsAsLabels)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l1.gds");
 
@@ -592,8 +589,7 @@ TEST(1a_DeviceAndNetExtractionWithTextsAsLabels)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au1a.gds");
 
@@ -622,8 +618,7 @@ TEST(2_DeviceAndNetExtractionFlat)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l1.gds");
 
@@ -800,8 +795,7 @@ TEST(2_DeviceAndNetExtractionFlat)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au1_flat.gds");
 
@@ -857,8 +851,7 @@ TEST(3_DeviceAndNetExtractionWithImplicitConnections)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l1_implicit_nets.gds");
 
@@ -1079,8 +1072,7 @@ TEST(3_DeviceAndNetExtractionWithImplicitConnections)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au1_implicit_nets.gds");
 
@@ -1111,8 +1103,7 @@ TEST(4_ResAndCapExtraction)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "devices_test.oas");
 
@@ -1319,8 +1310,7 @@ TEST(4_ResAndCapExtraction)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_capres_nets.gds");
 
@@ -1351,8 +1341,7 @@ TEST(5_ResAndCapWithBulkExtraction)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "devices_with_bulk_test.oas");
 
@@ -1596,8 +1585,7 @@ TEST(5_ResAndCapWithBulkExtraction)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_capres_with_bulk_nets.gds");
 
@@ -1628,8 +1616,7 @@ TEST(6_BJT3TransistorExtraction)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "bipolar_devices_test.oas");
 
@@ -1842,8 +1829,7 @@ TEST(6_BJT3TransistorExtraction)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "bipolar_devices_nets.gds");
 
@@ -1868,8 +1854,7 @@ TEST(7_DiodeExtraction)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "diode_devices_test.oas");
 
@@ -1978,8 +1963,7 @@ TEST(7_DiodeExtraction)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "diode_devices_nets.gds");
 
@@ -2004,8 +1988,7 @@ TEST(8_DiodeExtractionScaled)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "diode_devices_test.oas");
 
@@ -2113,8 +2096,7 @@ TEST(8_DiodeExtractionScaled)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "diode_devices_nets.gds");
 
@@ -2144,8 +2126,7 @@ TEST(9_StrictDeviceExtraction)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l9.gds");
 
@@ -2356,8 +2337,7 @@ TEST(9_StrictDeviceExtraction)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au9.gds");
 
@@ -2386,8 +2366,7 @@ TEST(10_DeviceExtractionWithBreakoutCells)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l10.gds");
 
@@ -2551,8 +2530,7 @@ TEST(10_DeviceExtractionWithBreakoutCells)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au10.gds");
 
@@ -2575,8 +2553,7 @@ TEST(11_DeviceExtractionWithSameClass)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l11.gds");
 
@@ -2688,8 +2665,7 @@ TEST(12_FloatingSubcircuitExtraction)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l1_floating_subcircuits.gds");
 
@@ -2842,8 +2818,7 @@ TEST(13_RemoveDummyPins)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "issue-425.gds");
 
@@ -2973,8 +2948,7 @@ TEST(14_JoinNets)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l1_join_nets.gds");
 
@@ -3195,8 +3169,7 @@ TEST(14_JoinNets)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au1_join_nets.gds");
 

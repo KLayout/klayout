@@ -30,11 +30,11 @@
 
 TEST(1)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_1.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_1.drc";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au1.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au1.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -67,14 +67,14 @@ TEST(1)
 
 TEST(2)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_2.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_2.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drctest.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drctest.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au2.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au2.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -107,14 +107,14 @@ TEST(2)
 
 TEST(3_Flat)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_3.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_3.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drctest.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drctest.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au3.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au3.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -147,14 +147,14 @@ TEST(3_Flat)
 
 TEST(4_Hierarchical)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_4.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_4.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drctest.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drctest.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au4.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au4.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -187,14 +187,14 @@ TEST(4_Hierarchical)
 
 TEST(5_FlatAntenna)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_5.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_5.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/antenna_l1.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/antenna_l1.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au5.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au5.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -227,14 +227,14 @@ TEST(5_FlatAntenna)
 
 TEST(6_HierarchicalAntenna)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_6.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_6.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/antenna_l1.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/antenna_l1.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au6.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au6.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -267,14 +267,14 @@ TEST(6_HierarchicalAntenna)
 
 TEST(7_AntennaWithDiodes)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_7.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_7.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/antenna_l1.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/antenna_l1.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au7.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au7.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -307,14 +307,14 @@ TEST(7_AntennaWithDiodes)
 
 TEST(8_TextsAndPolygons)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_8.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_8.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/texts.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/texts.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au8.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au8.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -368,17 +368,17 @@ static void compare_netlists (tl::TestBase *_this, const std::string &cir, const
 
 TEST(9_NetlistExtraction)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_9.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_9.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/ringo.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/ringo.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au9a.cir";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au9a.cir";
 
-  std::string au_simplified = tl::testsrc ();
-  au_simplified += "/testdata/drc/drcSimpleTests_au9b.cir";
+  std::string au_simplified = tl::testdata ();
+  au_simplified += "/drc/drcSimpleTests_au9b.cir";
 
   std::string output = this->tmp_file ("tmp.cir");
   std::string output_simplified = this->tmp_file ("tmp_simplified.cir");
@@ -412,17 +412,17 @@ TEST(9_NetlistExtraction)
 
 TEST(10_NetlistExtractionFlat)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_10.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_10.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/ringo.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/ringo.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au10a.cir";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au10a.cir";
 
-  std::string au_simplified = tl::testsrc ();
-  au_simplified += "/testdata/drc/drcSimpleTests_au10b.cir";
+  std::string au_simplified = tl::testdata ();
+  au_simplified += "/drc/drcSimpleTests_au10b.cir";
 
   std::string output = this->tmp_file ("tmp.cir");
   std::string output_simplified = this->tmp_file ("tmp_simplified.cir");
@@ -456,17 +456,17 @@ TEST(10_NetlistExtractionFlat)
 
 TEST(11_CustomDevices)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_11.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_11.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/vdiv.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/vdiv.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au11a.cir";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au11a.cir";
 
-  std::string au_simplified = tl::testsrc ();
-  au_simplified += "/testdata/drc/drcSimpleTests_au11b.cir";
+  std::string au_simplified = tl::testdata ();
+  au_simplified += "/drc/drcSimpleTests_au11b.cir";
 
   std::string output = this->tmp_file ("tmp.cir");
   std::string output_simplified = this->tmp_file ("tmp_simplified.cir");
@@ -500,14 +500,14 @@ TEST(11_CustomDevices)
 
 TEST(12_NetlistJoinLabels)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_12.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_12.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/implicit_nets.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/implicit_nets.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au12a.cir";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au12a.cir";
 
   std::string output = this->tmp_file ("tmp.cir");
 
@@ -536,14 +536,14 @@ TEST(12_NetlistJoinLabels)
 
 TEST(13a_KissingCorners)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_13a.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_13a.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/kissing_corners.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/kissing_corners.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au13a.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au13a.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -579,14 +579,14 @@ TEST(13a_KissingCorners)
 
 TEST(13b_KissingCornersDeep)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_13b.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_13b.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/kissing_corners.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/kissing_corners.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au13b.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au13b.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -622,17 +622,17 @@ TEST(13b_KissingCornersDeep)
 
 TEST(14_SwitchingTargets)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_14.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_14.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drcSimpleTests_14.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_14.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au14.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au14.gds";
 
-  std::string au2 = tl::testsrc ();
-  au2 += "/testdata/drc/drcSimpleTests_au14_2.gds";
+  std::string au2 = tl::testdata ();
+  au2 += "/drc/drcSimpleTests_au14_2.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
   std::string output2 = this->tmp_file ("tmp2.gds");
@@ -677,14 +677,14 @@ TEST(14_SwitchingTargets)
 
 TEST(15_issue548)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_15.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_15.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drcSimpleTests_15.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_15.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au15.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au15.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -718,14 +718,14 @@ TEST(15_issue548)
 //  Edges::extents isn't deep-enabled
 TEST(16_issue570)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_16.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_16.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drcSimpleTests_16.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_16.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au16.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au16.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -759,14 +759,14 @@ TEST(16_issue570)
 //  Problems with Source#select
 TEST(17_issue570)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_17.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_17.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drcSimpleTests_17.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_17.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au17.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au17.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -799,14 +799,14 @@ TEST(17_issue570)
 
 TEST(18_forget)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_18.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_18.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drcSimpleTests_18.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_18.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au18.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au18.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -839,14 +839,14 @@ TEST(18_forget)
 
 TEST(19_shielding)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_19.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_19.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drcSimpleTests_19.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_19.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au19.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au19.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -879,14 +879,14 @@ TEST(19_shielding)
 
 TEST(20_interact_with_count)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_20.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_20.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drcSimpleTests_20.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_20.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au20.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au20.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -919,14 +919,14 @@ TEST(20_interact_with_count)
 
 TEST(21_breaking)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_21.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_21.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drcSimpleTests_21.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_21.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au21.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au21.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -959,14 +959,14 @@ TEST(21_breaking)
 
 TEST(22_opposite_filter)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_22.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_22.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drcSimpleTests_22.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_22.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au22.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au22.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -999,14 +999,14 @@ TEST(22_opposite_filter)
 
 TEST(23_rect_filter)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_23.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_23.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drcSimpleTests_23.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_23.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au23.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au23.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -1039,14 +1039,14 @@ TEST(23_rect_filter)
 
 TEST(24_enclosing)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_24.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_24.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drcSimpleTests_24.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_24.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au24.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au24.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -1079,14 +1079,14 @@ TEST(24_enclosing)
 
 static void run_test (tl::TestBase *_this, const std::string &number, bool deep)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSimpleTests_" + number + ".drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_" + number + ".drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drcSimpleTests_" + number + ".gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_" + number + ".gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au" + number + std::string (deep ? "d" : "") + ".gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au" + number + std::string (deep ? "d" : "") + ".gds";
 
   std::string output = _this->tmp_file ("tmp.gds");
 

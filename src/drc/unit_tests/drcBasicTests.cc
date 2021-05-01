@@ -27,10 +27,10 @@
 
 TEST(1)
 {
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drctest.gds";
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcBasicTests_au.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drctest.gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcBasicTests_au.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
 

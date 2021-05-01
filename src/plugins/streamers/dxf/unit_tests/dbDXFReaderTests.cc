@@ -62,16 +62,16 @@ static void do_run_test (tl::TestBase *_this, const std::string &fn, const std::
 
 static void run_test (tl::TestBase *_this, const char *file, const char *file_au, const db::DXFReaderOptions &opt = db::DXFReaderOptions (), bool as_oas = false)
 {
-  std::string fn = tl::testsrc_private () + "/testdata/dxf/" + file;
-  std::string fn_au = tl::testsrc_private () + std::string ("/testdata/dxf/") + file_au;
+  std::string fn = tl::testdata_private () + "/dxf/" + file;
+  std::string fn_au = tl::testdata_private () + std::string ("/dxf/") + file_au;
 
   do_run_test (_this, fn, fn_au, opt, as_oas);
 }
 
 static void run_test_public (tl::TestBase *_this, const char *file, const char *file_au, const db::DXFReaderOptions &opt = db::DXFReaderOptions (), bool as_oas = false)
 {
-  std::string fn = tl::testsrc () + "/testdata/dxf/" + file;
-  std::string fn_au = tl::testsrc () + std::string ("/testdata/dxf/") + file_au;
+  std::string fn = tl::testdata () + "/dxf/" + file;
+  std::string fn_au = tl::testdata () + std::string ("/dxf/") + file_au;
 
   do_run_test (_this, fn, fn_au, opt, as_oas);
 }

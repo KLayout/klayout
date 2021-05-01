@@ -36,8 +36,8 @@ TEST(1_Basics)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_texts_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_texts_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -83,15 +83,15 @@ TEST(1_Basics)
   texts2_copy.insert_into_as_polygons (&target, target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), 1);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_texts_au1.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_texts_au1.gds");
 }
 
 TEST(2_Interactions)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_texts_l2.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_texts_l2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -143,15 +143,15 @@ TEST(2_Interactions)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_texts_au2.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_texts_au2.gds");
 }
 
 TEST(3_Filtering)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_texts_l3.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_texts_l3.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -177,5 +177,5 @@ TEST(3_Filtering)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), texts2);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_texts_au3.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_texts_au3.gds");
 }

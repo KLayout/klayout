@@ -47,8 +47,8 @@ void run_test_bool (tl::TestBase *_this, const char *file, int mode, bool min_co
   db::Layout layout_org;
 
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/bool/";
+    std::string fn (tl::testdata ());
+    fn += "/bool/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -78,12 +78,12 @@ void run_test_bool (tl::TestBase *_this, const char *file, int mode, bool min_co
     reader.read (layout_org, options);
   }
 
-  std::string au_fn1 (tl::testsrc ());
-  au_fn1 += "/testdata/bool/";
+  std::string au_fn1 (tl::testdata ());
+  au_fn1 += "/bool/";
   au_fn1 += au_file1 ? au_file1 : file;
 
-  std::string au_fn2 (tl::testsrc ());
-  au_fn2 += "/testdata/bool/";
+  std::string au_fn2 (tl::testdata ());
+  au_fn2 += "/bool/";
   au_fn2 += au_file2 ? au_file2 : (au_file1 ? au_file1 : file);
 
   int la = -1;
@@ -169,8 +169,8 @@ void run_test_bool (tl::TestBase *_this, const char *file, int mode, bool min_co
   //  Use this opportunity to test trapezoid decomposition
   if (au_file3) {
 
-    std::string au_fn3 (tl::testsrc ());
-    au_fn3 += "/testdata/bool/";
+    std::string au_fn3 (tl::testdata ());
+    au_fn3 += "/bool/";
     au_fn3 += au_file3;
 
     db::EdgeProcessor ep;
@@ -424,8 +424,8 @@ void run_test_size (tl::TestBase *_this, const char *file, const char *au_file, 
   db::Layout layout_au (&m);
 
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/bool/";
+    std::string fn (tl::testdata ());
+    fn += "/bool/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -450,8 +450,8 @@ void run_test_size (tl::TestBase *_this, const char *file, const char *au_file, 
     reader.read (layout_org, options);
   }
 
-  std::string au_fn (tl::testsrc ());
-  au_fn += "/testdata/bool/";
+  std::string au_fn (tl::testdata ());
+  au_fn += "/bool/";
   au_fn += au_file;
 
   int la = -1;
@@ -508,8 +508,8 @@ void run_test_twobool (tl::TestBase *_this, const char *file, const char *au_fil
   db::Layout layout_au (&m);
 
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/bool/";
+    std::string fn (tl::testdata ());
+    fn += "/bool/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -544,8 +544,8 @@ void run_test_twobool (tl::TestBase *_this, const char *file, const char *au_fil
     reader.read (layout_org, options);
   }
 
-  std::string au_fn (tl::testsrc ());
-  au_fn += "/testdata/bool/";
+  std::string au_fn (tl::testdata ());
+  au_fn += "/bool/";
   au_fn += au_file;
 
   int la = -1;
@@ -2349,8 +2349,8 @@ TEST(100)
   unsigned int l2_l1d0 = 0, l2_l2d0 = 0;
 
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/bool/";
+    std::string fn (tl::testdata ());
+    fn += "/bool/";
     fn += "sp1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -2375,8 +2375,8 @@ TEST(100)
   }
 
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/bool/";
+    std::string fn (tl::testdata ());
+    fn += "/bool/";
     fn += "sp2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -2448,8 +2448,8 @@ TEST(100)
   proc.merge (layout_1, layout_1.cell (*layout_1.begin_top_down ()), l1_l1d0, 
               lr_top->shapes (lr_l123d0), false /*hierarchical*/, 1, true /*resolve holes*/, true /*min coherence*/);
 
-  std::string au_fn (tl::testsrc ());
-  au_fn += "/testdata/bool/";
+  std::string au_fn (tl::testdata ());
+  au_fn += "/bool/";
   au_fn += "sp_au.gds";
 
   db::compare_layouts (_this, lr, au_fn);

@@ -29,11 +29,11 @@ BD_PUBLIC int strmclip (int argc, char *argv[]);
 
 TEST(1A)
 {
-  std::string input = tl::testsrc ();
-  input += "/testdata/bd/strm2clip_in.gds";
+  std::string input = tl::testdata ();
+  input += "/bd/strm2clip_in.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strm2clip_au1.gds";
+  std::string au = tl::testdata ();
+  au += "/bd/strm2clip_au1.gds";
 
   std::string output = this->tmp_file ();
 
@@ -54,11 +54,11 @@ TEST(1A)
 
 TEST(1B)
 {
-  std::string input = tl::testsrc ();
-  input += "/testdata/bd/strm2clip_in.gds";
+  std::string input = tl::testdata ();
+  input += "/bd/strm2clip_in.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strm2clip_au1.gds";
+  std::string au = tl::testdata ();
+  au += "/bd/strm2clip_au1.gds";
 
   std::string output = this->tmp_file ();
 
@@ -79,11 +79,11 @@ TEST(1B)
 
 TEST(2)
 {
-  std::string input = tl::testsrc ();
-  input += "/testdata/bd/strm2clip_in.gds";
+  std::string input = tl::testdata ();
+  input += "/bd/strm2clip_in.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strm2clip_au2.gds";
+  std::string au = tl::testdata ();
+  au += "/bd/strm2clip_au2.gds";
 
   std::string output = this->tmp_file ();
 

@@ -30,8 +30,8 @@
 //  Testing the converter main implementation (CIF)
 TEST(1)
 {
-  std::string input = tl::testsrc ();
-  input += "/testdata/gds/t10.gds";
+  std::string input = tl::testdata ();
+  input += "/gds/t10.gds";
 
   std::string output = this->tmp_file ();
 
@@ -55,8 +55,8 @@ TEST(1)
 //  Testing the converter main implementation (DXF)
 TEST(2)
 {
-  std::string input = tl::testsrc ();
-  input += "/testdata/gds/t10.gds";
+  std::string input = tl::testdata ();
+  input += "/gds/t10.gds";
 
   std::string output = this->tmp_file ();
 
@@ -86,8 +86,8 @@ TEST(2)
 //  Testing the converter main implementation (GDS2)
 TEST(3)
 {
-  std::string input = tl::testsrc ();
-  input += "/testdata/gds/t10.gds";
+  std::string input = tl::testdata ();
+  input += "/gds/t10.gds";
 
   std::string output = this->tmp_file ();
 
@@ -111,8 +111,8 @@ TEST(3)
 //  Testing the converter main implementation (GDS2Text)
 TEST(4)
 {
-  std::string input = tl::testsrc ();
-  input += "/testdata/gds/t10.gds";
+  std::string input = tl::testdata ();
+  input += "/gds/t10.gds";
 
   std::string output = this->tmp_file ();
 
@@ -136,8 +136,8 @@ TEST(4)
 //  Testing the converter main implementation (OASIS)
 TEST(5)
 {
-  std::string input = tl::testsrc ();
-  input += "/testdata/gds/t10.gds";
+  std::string input = tl::testdata ();
+  input += "/gds/t10.gds";
 
   std::string output = this->tmp_file ();
 
@@ -161,11 +161,11 @@ TEST(5)
 //  Testing the converter main implementation (MAG)
 TEST(6)
 {
-  std::string input = tl::testsrc ();
-  input += "/testdata/gds/t10.gds";
+  std::string input = tl::testdata ();
+  input += "/gds/t10.gds";
 
-  std::string input_au = tl::testsrc ();
-  input_au += "/testdata/magic/strm2mag_au.gds";
+  std::string input_au = tl::testdata ();
+  input_au += "/magic/strm2mag_au.gds";
 
   std::string output = this->tmp_file ("RINGO.mag");
 

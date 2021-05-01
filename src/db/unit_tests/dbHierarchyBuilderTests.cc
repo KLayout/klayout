@@ -32,8 +32,8 @@ TEST(1)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/hierarchy_builder_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/hierarchy_builder_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -56,15 +56,15 @@ TEST(1)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au1.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au1.gds");
 }
 
 TEST(1_WithEmptyLayer)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/hierarchy_builder_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/hierarchy_builder_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -91,15 +91,15 @@ TEST(1_WithEmptyLayer)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au1.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au1.gds");
 }
 
 TEST(2_WithoutClip)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/hierarchy_builder_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/hierarchy_builder_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -128,15 +128,15 @@ TEST(2_WithoutClip)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au2a.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au2a.gds");
 }
 
 TEST(2_WithClip)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/hierarchy_builder_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/hierarchy_builder_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -166,15 +166,15 @@ TEST(2_WithClip)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au2b.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au2b.gds");
 }
 
 TEST(2_WithClipAndSimplification)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/hierarchy_builder_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/hierarchy_builder_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -205,15 +205,15 @@ TEST(2_WithClipAndSimplification)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au2c.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au2c.gds");
 }
 
 TEST(2_WithClipAndRefGeneration)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/hierarchy_builder_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/hierarchy_builder_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -244,15 +244,15 @@ TEST(2_WithClipAndRefGeneration)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au2d.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au2d.gds");
 }
 
 TEST(2_WithEmptyResult)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/hierarchy_builder_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/hierarchy_builder_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -283,15 +283,15 @@ TEST(2_WithEmptyResult)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au2e.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au2e.gds");
 }
 
 TEST(2_WithClipAndSimplificationAndEmptyLayer)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/hierarchy_builder_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/hierarchy_builder_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -333,15 +333,15 @@ TEST(2_WithClipAndSimplificationAndEmptyLayer)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au2f.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au2f.gds");
 }
 
 TEST(3_ComplexRegionWithClip)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/hierarchy_builder_l2.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/hierarchy_builder_l2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -375,15 +375,15 @@ TEST(3_ComplexRegionWithClip)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au3a.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au3a.gds");
 }
 
 TEST(4_ComplexRegionAndLayoutWithClip)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/hierarchy_builder_l3.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/hierarchy_builder_l3.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -417,7 +417,7 @@ TEST(4_ComplexRegionAndLayoutWithClip)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au4a.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au4a.gds");
 }
 
 TEST(5_CompareRecursiveShapeIterators)
@@ -556,8 +556,8 @@ TEST(6_DisjunctLayersPerHierarchyBranch)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/hierarchy_builder_l4.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/hierarchy_builder_l4.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -580,7 +580,7 @@ TEST(6_DisjunctLayersPerHierarchyBranch)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au_l4.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au_l4.gds");
 }
 
 TEST(7_DetachFromOriginalLayout)
@@ -590,8 +590,8 @@ TEST(7_DetachFromOriginalLayout)
   //  translated or resolved in the hierarchy builder.
   std::unique_ptr<db::Layout> ly (new db::Layout (false));
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/hierarchy_builder_l5.oas.gz";
+    std::string fn (tl::testdata ());
+    fn += "/algo/hierarchy_builder_l5.oas.gz";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (*ly);
@@ -617,15 +617,15 @@ TEST(7_DetachFromOriginalLayout)
   ly.reset (0);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au_l5.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au_l5.gds");
 }
 
 TEST(8a_SimpleWithTrans)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/hierarchy_builder_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/hierarchy_builder_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -648,15 +648,15 @@ TEST(8a_SimpleWithTrans)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au8a.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au8a.gds");
 }
 
 TEST(8b_ComplexRegionWithTransformation)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/hierarchy_builder_l2.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/hierarchy_builder_l2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -690,6 +690,6 @@ TEST(8b_ComplexRegionWithTransformation)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au8b.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/hierarchy_builder_au8b.gds");
 }
 

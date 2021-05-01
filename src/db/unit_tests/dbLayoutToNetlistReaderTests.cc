@@ -36,7 +36,7 @@ TEST(1_ReaderBasic)
 {
   db::LayoutToNetlist l2n;
 
-  std::string in_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_in.txt");
+  std::string in_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_in.txt");
   tl::InputStream is_in (in_path);
 
   db::LayoutToNetlistStandardReader reader (is_in);
@@ -51,7 +51,7 @@ TEST(1_ReaderBasic)
     writer.write (&l2n);
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_in.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_in.txt");
 
   compare_text_files (path, au_path);
 
@@ -76,8 +76,7 @@ TEST(1_ReaderBasic)
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, "DEVICE_");
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "l2n_reader_au_1.gds");
 
@@ -107,8 +106,7 @@ TEST(1_ReaderBasic)
 
     l2n.build_nets (&nets, cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, "DEVICE_");
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "l2n_reader_au_1b.gds");
 
@@ -138,8 +136,7 @@ TEST(1_ReaderBasic)
 
     l2n.build_nets (&nets, cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_Flatten, 0, "DEVICE_");
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "l2n_reader_au_1c.gds");
 
@@ -169,8 +166,7 @@ TEST(1_ReaderBasic)
 
     l2n.build_nets (&nets, cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "l2n_reader_au_1d.gds");
 
@@ -201,8 +197,7 @@ TEST(1_ReaderBasic)
 
     l2n.build_nets (&nets, cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", 0);
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "l2n_reader_au_1e.gds");
 
@@ -233,8 +228,7 @@ TEST(1_ReaderBasic)
 
     l2n.build_nets (&nets, cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "l2n_reader_au_1f.gds");
 
@@ -246,7 +240,7 @@ TEST(1b_ReaderBasicShort)
 {
   db::LayoutToNetlist l2n;
 
-  std::string in_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_in_s.txt");
+  std::string in_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_in_s.txt");
   tl::InputStream is_in (in_path);
 
   db::LayoutToNetlistStandardReader reader (is_in);
@@ -261,7 +255,7 @@ TEST(1b_ReaderBasicShort)
     writer.write (&l2n);
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_in_s.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_in_s.txt");
 
   compare_text_files (path, au_path);
 }
@@ -270,7 +264,7 @@ TEST(1c_ReaderBasicShortWithProps)
 {
   db::LayoutToNetlist l2n;
 
-  std::string in_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_in_p.txt");
+  std::string in_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_in_p.txt");
   tl::InputStream is_in (in_path);
 
   db::LayoutToNetlistStandardReader reader (is_in);
@@ -285,7 +279,7 @@ TEST(1c_ReaderBasicShortWithProps)
     writer.write (&l2n);
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_in_p.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_in_p.txt");
 
   compare_text_files (path, au_path);
 
@@ -311,8 +305,7 @@ TEST(1c_ReaderBasicShortWithProps)
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, "DEVICE_");
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "l2n_reader_au_p.oas");
 
@@ -324,7 +317,7 @@ TEST(2_ReaderWithGlobalNets)
 {
   db::LayoutToNetlist l2n;
 
-  std::string in_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_au.txt");
+  std::string in_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_au.txt");
   tl::InputStream is_in (in_path);
 
   db::LayoutToNetlistStandardReader reader (is_in);
@@ -339,7 +332,7 @@ TEST(2_ReaderWithGlobalNets)
     writer.write (&l2n);
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_au.txt");
 
   compare_text_files (path, au_path);
 
@@ -368,8 +361,7 @@ TEST(2_ReaderWithGlobalNets)
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "l2n_reader_au_2r.gds");
 
@@ -381,7 +373,7 @@ TEST(3_ReaderAbsoluteCoordinates)
 {
   db::LayoutToNetlist l2n;
 
-  std::string in_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_au_abs.txt");
+  std::string in_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_au_abs.txt");
   tl::InputStream is_in (in_path);
 
   db::LayoutToNetlistStandardReader reader (is_in);
@@ -396,7 +388,7 @@ TEST(3_ReaderAbsoluteCoordinates)
     writer.write (&l2n);
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_au.txt");
 
   compare_text_files (path, au_path);
 
@@ -425,8 +417,7 @@ TEST(3_ReaderAbsoluteCoordinates)
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "l2n_reader_au_2r.gds");
 
@@ -440,7 +431,7 @@ TEST(4_ReaderCombinedDevices)
 
   //  build from: testdata/algo/l2n_reader_4.gds
 
-  std::string in_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_4.l2n");
+  std::string in_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_4.l2n");
   tl::InputStream is_in (in_path);
 
   db::LayoutToNetlistStandardReader reader (is_in);
@@ -455,7 +446,7 @@ TEST(4_ReaderCombinedDevices)
     writer.write (&l2n);
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_reader_au_4.l2n");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_au_4.l2n");
 
   compare_text_files (path, au_path);
 
@@ -472,8 +463,7 @@ TEST(4_ReaderCombinedDevices)
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "l2n_reader_au_4.gds");
 

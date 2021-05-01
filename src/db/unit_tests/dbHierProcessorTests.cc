@@ -34,7 +34,7 @@
 
 static std::string testdata (const std::string &fn)
 {
-  return tl::testsrc () + "/testdata/algo/" + fn;
+  return tl::testdata () + "/algo/" + fn;
 }
 
 enum TestMode

@@ -36,8 +36,8 @@ TEST(1)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -90,15 +90,15 @@ TEST(1)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au1.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au1.gds");
 }
 
 TEST(2_MergeEdges)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -124,15 +124,15 @@ TEST(2_MergeEdges)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r3_merged);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au2.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au2.gds");
 }
 
 TEST(3_Edge2EdgeBooleans)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -168,15 +168,15 @@ TEST(3_Edge2EdgeBooleans)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 0)), e3.intersections(e2));
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au3.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au3.gds");
 }
 
 TEST(4_Edge2PolygonBooleans)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -213,15 +213,15 @@ TEST(4_Edge2PolygonBooleans)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), e3.outside_part (r2and3));
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au4.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au4.gds");
 }
 
 TEST(5_Filters)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_area_peri_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -250,7 +250,7 @@ TEST(5_Filters)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e2.filtered (elf2));
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au5a.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au5a.gds");
   }
 
   {
@@ -266,7 +266,7 @@ TEST(5_Filters)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e2.filtered (eof2));
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au5b.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au5b.gds");
   }
 }
 
@@ -274,8 +274,8 @@ TEST(6_Extended)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_area_peri_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -314,15 +314,15 @@ TEST(6_Extended)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), e2e4);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au6.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au6.gds");
 }
 
 TEST(7_Partial)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_area_peri_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -362,15 +362,15 @@ TEST(7_Partial)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (33, 0)), e2f.centers (0, 0.2));
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au7.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au7.gds");
 }
 
 TEST(8_SelectInteracting)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -460,15 +460,15 @@ TEST(8_SelectInteracting)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (103, 0)), e3r.selected_not_interacting (r2r));
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au8.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au8.gds");
 }
 
 TEST(9_DRCChecks)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -507,7 +507,7 @@ TEST(9_DRCChecks)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), e6.enclosing_check (e4, 100, db::EdgesCheckOptions (true, db::Projection, 90, 0)));
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au9.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au9.gds");
   }
 }
 
@@ -515,8 +515,8 @@ TEST(10_PullInteracting)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -587,6 +587,6 @@ TEST(10_PullInteracting)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (29, 0)), o);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_edges_au10.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au10.gds");
 }
 

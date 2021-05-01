@@ -30,14 +30,14 @@
 
 static void run_test (tl::TestBase *_this, const std::string &number, bool deep)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcGenericTests_" + number + ".drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcGenericTests_" + number + ".drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drcGenericTests_" + number + ".gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drcGenericTests_" + number + ".gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcGenericTests_au" + number + std::string (deep ? "d" : "") + ".gds";
+  std::string au = tl::testdata ();
+  au += "/drc/drcGenericTests_au" + number + std::string (deep ? "d" : "") + ".gds";
 
   std::string output = _this->tmp_file ("tmp.gds");
 

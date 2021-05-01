@@ -76,8 +76,7 @@ TEST(1_BasicFlow)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "lvs_test_1.gds");
 
@@ -210,8 +209,7 @@ TEST(1_BasicFlow)
   {
     db::NetlistSpiceReader reader;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "lvs_test_1.spi");
 
@@ -232,7 +230,7 @@ TEST(1_BasicFlow)
   std::string path = tmp_file ("tmp_lvstest1.lvsdb");
   lvs.save (path, false);
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test1_au.lvsdb");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "lvs_test1_au.lvsdb");
 
   compare_lvsdbs (_this, path, au_path);
 
@@ -244,7 +242,7 @@ TEST(1_BasicFlow)
   lvs2.load (path);
   lvs2.save (path2, false);
 
-  std::string au_path2 = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test1b_au.lvsdb");
+  std::string au_path2 = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "lvs_test1b_au.lvsdb");
 
   compare_lvsdbs (_this, path2, au_path2);
 }
@@ -274,8 +272,7 @@ TEST(2_FlowWithErrors)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "lvs_test_1.gds");
 
@@ -408,8 +405,7 @@ TEST(2_FlowWithErrors)
   {
     db::NetlistSpiceReader reader;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "lvs_test_2.spi");
 
@@ -430,7 +426,7 @@ TEST(2_FlowWithErrors)
   std::string path = tmp_file ("tmp_lvstest2.lvsdb");
   lvs.save (path, false);
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test2_au.lvsdb");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "lvs_test2_au.lvsdb");
 
   compare_lvsdbs (_this, path, au_path);
 
@@ -442,7 +438,7 @@ TEST(2_FlowWithErrors)
   lvs2.load (path);
   lvs2.save (path2, false);
 
-  std::string au_path2 = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "lvs_test2b_au.lvsdb");
+  std::string au_path2 = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "lvs_test2b_au.lvsdb");
 
   compare_lvsdbs (_this, path2, au_path2);
 }

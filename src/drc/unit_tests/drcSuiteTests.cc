@@ -27,14 +27,14 @@
 
 void runtest (tl::TestBase *_this, int mode)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/drc/drcSuiteTests.drc";
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSuiteTests.drc";
 
-  std::string input = tl::testsrc ();
-  input += "/testdata/drc/drctest.gds";
+  std::string input = tl::testdata ();
+  input += "/drc/drctest.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSuiteTests_au";
+  std::string au = tl::testdata ();
+  au += "/drc/drcSuiteTests_au";
   au += tl::to_string (mode);
   au += ".oas";
 

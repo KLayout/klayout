@@ -52,8 +52,8 @@ static db::LEFDEFReaderOptions default_options ()
 
 static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *filename, const db::LEFDEFReaderOptions &options, bool priv = true)
 {
-  std::string fn_path (priv ? tl::testsrc_private () : tl::testsrc ());
-  fn_path += "/testdata/lefdef/";
+  std::string fn_path (priv ? tl::testdata_private () : tl::testdata ());
+  fn_path += "/lefdef/";
   fn_path += lef_dir;
   fn_path += "/";
 
@@ -178,8 +178,8 @@ static db::LayerMap run_test (tl::TestBase *_this, const char *lef_dir, const ch
 
   if (au) {
 
-    std::string fn (priv ? tl::testsrc_private () : tl::testsrc ());
-    fn += "/testdata/lefdef/";
+    std::string fn (priv ? tl::testdata_private () : tl::testdata ());
+    fn += "/lefdef/";
     fn += lef_dir;
     fn += "/";
     fn += au;
@@ -777,8 +777,8 @@ TEST(200_lefdef_plugin)
 {
   db::Layout ly;
 
-  std::string fn_path (tl::testsrc ());
-  fn_path += "/testdata/lefdef/masks-1/";
+  std::string fn_path (tl::testdata ());
+  fn_path += "/lefdef/masks-1/";
 
   db::LEFDEFReaderOptions lefdef_opt = default_options ();
   lefdef_opt.set_map_file ("in.map");
@@ -798,8 +798,8 @@ TEST(201_lefdef_plugin_explicit_lef)
 {
   db::Layout ly;
 
-  std::string fn_path (tl::testsrc ());
-  fn_path += "/testdata/lefdef/masks-1/";
+  std::string fn_path (tl::testdata ());
+  fn_path += "/lefdef/masks-1/";
 
   db::LEFDEFReaderOptions lefdef_opt = default_options ();
   lefdef_opt.set_map_file ("in.map");

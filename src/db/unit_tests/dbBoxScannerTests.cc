@@ -799,8 +799,8 @@ struct BooleanAndInteractionClusterCollector
 
 TEST(100)
 {
-  std::string fn (tl::testsrc_private ());
-  fn += "/testdata/other/";
+  std::string fn (tl::testdata_private ());
+  fn += "/other/";
   fn += "bs100.oas.gz";
 
   db::Layout layout;

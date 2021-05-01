@@ -97,8 +97,7 @@ TEST(10_MOS3DeviceExtractorTest)
   {
     db::LoadLayoutOptions options;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "mos3_1.gds");
 
@@ -153,8 +152,7 @@ TEST(11_MOS3DeviceExtractorTestNotRectangularGate)
   {
     db::LoadLayoutOptions options;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "mos3_2.gds");
 
@@ -209,8 +207,7 @@ TEST(12_MOS3DeviceExtractorTestCircular)
   {
     db::LoadLayoutOptions options;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "mos3_3.gds");
 
@@ -265,8 +262,7 @@ TEST(20_MOS4DeviceExtractorTest)
   {
     db::LoadLayoutOptions options;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "mos4_1.gds");
 
@@ -326,8 +322,7 @@ TEST(21_MOS4DeviceExtractorTestNotRectangularGate)
   {
     db::LoadLayoutOptions options;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "mos4_2.gds");
 
@@ -387,8 +382,7 @@ TEST(22_MOS4DeviceExtractorTestCircular)
   {
     db::LoadLayoutOptions options;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "mos4_3.gds");
 
@@ -448,8 +442,7 @@ TEST(30_DMOS3DeviceExtractorTest)
   {
     db::LoadLayoutOptions options;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "dmos3_1.gds");
 
@@ -506,8 +499,7 @@ TEST(31_DMOS3DeviceExtractorTestNotRectangularGate)
   {
     db::LoadLayoutOptions options;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "dmos3_2.gds");
 
@@ -564,8 +556,7 @@ TEST(32_DMOS3DeviceExtractorTestCircular)
   {
     db::LoadLayoutOptions options;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "dmos3_3.gds");
 
@@ -622,8 +613,7 @@ TEST(40_DMOS4DeviceExtractorTest)
   {
     db::LoadLayoutOptions options;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "dmos4_1.gds");
 
@@ -685,8 +675,7 @@ TEST(41_DMOS4DeviceExtractorTestNotRectangularGate)
   {
     db::LoadLayoutOptions options;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "dmos4_2.gds");
 
@@ -748,8 +737,7 @@ TEST(42_DMOS4DeviceExtractorTestCircular)
   {
     db::LoadLayoutOptions options;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "dmos4_3.gds");
 

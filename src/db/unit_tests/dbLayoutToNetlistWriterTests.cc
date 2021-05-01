@@ -60,8 +60,7 @@ TEST(1_WriterBasic)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l1.gds");
 
@@ -174,7 +173,7 @@ TEST(1_WriterBasic)
     writer.write (&l2n);
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_writer_au.txt");
 
   compare_text_files (path, au_path);
 
@@ -185,7 +184,7 @@ TEST(1_WriterBasic)
     writer.write (&l2n);
   }
 
-  au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_s.txt");
+  au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_writer_au_s.txt");
 
   compare_text_files (path, au_path);
 
@@ -210,8 +209,7 @@ TEST(1_WriterBasic)
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, "DEVICE_");
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "l2n_writer_au.gds");
 
@@ -241,7 +239,7 @@ TEST(1_WriterBasic)
     writer.write (&l2n);
   }
 
-  au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_p.txt");
+  au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_writer_au_p.txt");
 
   compare_text_files (path, au_path);
 }
@@ -270,8 +268,7 @@ TEST(2_WriterWithGlobalNets)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l3.gds");
 
@@ -405,7 +402,7 @@ TEST(2_WriterWithGlobalNets)
     writer.write (&l2n);
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_2b.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_writer_au_2b.txt");
 
   compare_text_files (path, au_path);
 
@@ -416,7 +413,7 @@ TEST(2_WriterWithGlobalNets)
     writer.write (&l2n);
   }
 
-  au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "l2n_writer_au_2s.txt");
+  au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_writer_au_2s.txt");
 
   compare_text_files (path, au_path);
 
@@ -445,8 +442,7 @@ TEST(2_WriterWithGlobalNets)
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "l2n_writer_au_2.gds");
 

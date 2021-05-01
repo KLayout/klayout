@@ -31,7 +31,7 @@ void run_rve_test (tl::TestBase *_this, const std::string &fn_rve, const std::st
   rdb::Database db;
 
   {
-    tl::InputFile input (tl::testsrc_private () + "/testdata/rve/" + fn_rve);
+    tl::InputFile input (tl::testdata_private () + "/rve/" + fn_rve);
     tl::InputStream is (input);
     rdb::Reader reader (is);
     reader.read (db);
@@ -40,7 +40,7 @@ void run_rve_test (tl::TestBase *_this, const std::string &fn_rve, const std::st
   std::string tmp = _this->tmp_file ();
   db.save (tmp);
 
-  std::string au_path = tl::absolute_file_path (tl::testsrc_private () + "/testdata/rve/" + fn_au);
+  std::string au_path = tl::absolute_file_path (tl::testdata_private () + "/rve/" + fn_au);
 
   std::string txt, au_txt;
 

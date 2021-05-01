@@ -26,7 +26,7 @@
 TEST (1)
 {
   db::LayoutToNetlist l2n;
-  l2n.load (tl::testsrc () + "/testdata/lay/l2n_browser.l2n");
+  l2n.load (tl::testdata () + "/lay/l2n_browser.l2n");
 
   std::unique_ptr<lay::NetlistBrowserTreeModel> model (new lay::NetlistBrowserTreeModel (0, &l2n));
 
@@ -58,7 +58,7 @@ TEST (1)
 TEST (2)
 {
   db::LayoutVsSchematic lvs;
-  lvs.load (tl::testsrc () + "/testdata/lay/lvsdb_browser.lvsdb");
+  lvs.load (tl::testdata () + "/lay/lvsdb_browser.lvsdb");
 
   std::unique_ptr<lay::NetlistBrowserTreeModel> model (new lay::NetlistBrowserTreeModel (0, &lvs));
 

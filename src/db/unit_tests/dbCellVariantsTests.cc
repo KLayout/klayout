@@ -374,8 +374,8 @@ TEST(100_OrientationVariantsWithLayout)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -390,15 +390,15 @@ TEST(100_OrientationVariantsWithLayout)
   vb.separate_variants (ly, top_cell);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/cell_variants_au1.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/cell_variants_au1.gds");
 }
 
 TEST(101_Propagation)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/cell_variants_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/cell_variants_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -434,5 +434,5 @@ TEST(101_Propagation)
   vb.commit_shapes (ly, top_cell, l2, to_commit);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/cell_variants_au2.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/cell_variants_au2.gds");
 }

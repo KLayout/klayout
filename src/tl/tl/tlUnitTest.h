@@ -86,18 +86,24 @@ TL_PUBLIC bool is_debug_mode ();
 TL_PUBLIC void set_debug_mode (bool f);
 
 /**
- *  @brief Gets the path of the test data
+ *  @brief Gets the path of the test source directory
  *  This path is specified through the environment variable $TESTSRC
  */
 TL_PUBLIC std::string testsrc ();
 
 /**
+ *  @brief Gets the path of the test data
+ *  This path is given by "$TESTSRC/testdata"
+ */
+TL_PUBLIC std::string testdata ();
+
+/**
  *  @brief Gets the path of the private test data
- *  This path is specified through the environment variable $TESTSRC and the
+ *  This path is specified through the environment variable $TESTSRC, "testdata" subdirectory and the
  *  private testdata directory. If no private test data is available, this
  *  method will throw a CancelException which makes the test skipped.
  */
-TL_PUBLIC std::string testsrc_private ();
+TL_PUBLIC std::string testdata_private ();
 
 /**
  *  @brief Gets the path to the temporary data

@@ -115,7 +115,7 @@ for d in db tl rdb; do
   mkdir -p makedeb-tmp/${pylibdir}/$d
   cp -pd $bininstdir/pymod/klayout/$d/*py makedeb-tmp/${pylibdir}/$d
 done
-cp -pd scripts/klayout*.egg-info makedeb-tmp/${distpackdir}
+sed "s/%VERSION%/$KLAYOUT_VERSION/g" <scripts/klayout.egg-info >makedeb-tmp/${distpackdir}/klayout.egg-info
 
 cd makedeb-tmp
 

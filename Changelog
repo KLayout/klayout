@@ -3,70 +3,70 @@
 
 * Enhancements: Numerous new functions for the RBA and pya API
       Some highlights:
-       * "Texts" for text collections (similar for Edges/EdgePairs/Region)
-       * New modes for blending layout files - see GitHub issue #666
-       * New function Cell#transform - see GitHub issue #598
-       * New functions for Image (read, write, clear)
-       * New functions for Region and Edges correlating with the new DRC features
-       * Multi-cell hierarchical copy/move of trees - will maintain shared instances
-       * RBA: iterators are now automatically made available as Enumerable
-       * All functions having a void return specification now return self (allows chaining) 
-       * More functions for manipulating selections (LayoutView#select_all etc.)
-       * Spline interpolation code available in new "Utils" namespace
-       * QByteArray support, mapping to Python byte arrays
-       * MainWindow#set_key_bindings, MainWindow#get_key_bindings, MainWindow#set_menu_items_hidden etc.
-       * New class RecursiveInstanceIterator (similar to RecursiveShapeIterator, but acts on instances)
-       * Deep vs. flat operations do not always flatten out now (flat vs. deep does however)
-       * Global transformations for inputs
+       - "Texts" for text collections (similar for Edges/EdgePairs/Region)
+       - New modes for blending layout files - see GitHub issue #666
+       - New function Cell#transform - see GitHub issue #598
+       - New functions for Image (read, write, clear)
+       - New functions for Region and Edges correlating with the new DRC features
+       - Multi-cell hierarchical copy/move of trees - will maintain shared instances
+       - RBA: iterators are now automatically made available as Enumerable
+       - All functions having a void return specification now return self (allows chaining) 
+       - More functions for manipulating selections (LayoutView#select_all etc.)
+       - Spline interpolation code available in new "Utils" namespace
+       - QByteArray support, mapping to Python byte arrays
+       - MainWindow#set_key_bindings, MainWindow#get_key_bindings, MainWindow#set_menu_items_hidden etc.
+       - New class RecursiveInstanceIterator (similar to RecursiveShapeIterator, but acts on instances)
+       - Deep vs. flat operations do not always flatten out now (flat vs. deep does however)
+       - Global transformations for inputs
 * Enhancements: New DRC features
       Some highlights:
-       * Better support for texts - "text layers"
-       * Combined AND+NOT feature for separating regions into inside and outside part
-       * "max_vertex_count" and "max_area_ratio" configuration options
-       * "forget" for memory optimization
-       * Shielding is optional now for some DRC functions
-       * "interact" now has a count filter
-       * In verbose more, figure counts and more information is printed
-       * Generic DRC function and complex DRC operations: for details search "Universal DRC" in documentation
-       * "not_opposite" and "rect_filter" options for some DRC functions
-       * "enclosing" (selects polygons entirely enclosing others)
-       * New filters for polygons: squares, non_squares, area ratio, bbox aspect ratio
-       * More intuitive specification of projection limits ("projecting < 2.um")
-       * "with_holes" and "without_holes", also with count
-       * Density check is included now ("with_densitiy", "without_density")
-       * "split_..." functions give interacting/non-interacting sets in one step
-       * Better support for generic transformations as Matrix2d and Matrix3d
-       * "fill" and "fill_with_left" functions for dummy fill
-       * NO "connected" feature yet. Sorry. Had to drop it to finish this release.
+       - Better support for texts - "text layers"
+       - Combined AND+NOT feature for separating regions into inside and outside part
+       - "max_vertex_count" and "max_area_ratio" configuration options
+       - "forget" for memory optimization
+       - Shielding is optional now for some DRC functions
+       - "interact" now has a count filter
+       - In verbose more, figure counts and more information is printed
+       - Generic DRC function and complex DRC operations: for details search "Universal DRC" in documentation
+       - "not_opposite" and "rect_filter" options for some DRC functions
+       - "enclosing" (selects polygons entirely enclosing others)
+       - New filters for polygons: squares, non_squares, area ratio, bbox aspect ratio
+       - More intuitive specification of projection limits ("projecting < 2.um")
+       - "with_holes" and "without_holes", also with count
+       - Density check is included now ("with_densitiy", "without_density")
+       - "split_..." functions give interacting/non-interacting sets in one step
+       - Better support for generic transformations as Matrix2d and Matrix3d
+       - "fill" and "fill_with_left" functions for dummy fill
+       - NO "connected" feature yet. Sorry. Had to drop it to finish this release.
 * Enhancements: new LVS features
       Some highlights:
-       * Improved netlist and LVS result browser (infinite-depth browsing)
-       * Improved circuit match algorithm
-       * Case insensitive handling of object names for SPICE netlists
-       * Probe feature fixed in flat mode
-       * "connect_explicit": for details search "connect_explicit" in documentation
+       - Improved netlist and LVS result browser (infinite-depth browsing)
+       - Improved circuit match algorithm
+       - Case insensitive handling of object names for SPICE netlists
+       - Probe feature fixed in flat mode
+       - "connect_explicit": for details search "connect_explicit" in documentation
 * Enhancements: New features for images
       Some highlights:
-       * New menu item: show and hide all images - see GitHub issue #535
-       * False color nodes now can have a left and right color allowing color steps
-       * Persistance of images through a special file format: "lyimg" (XML based)
+       - New menu item: show and hide all images - see GitHub issue #535
+       - False color nodes now can have a left and right color allowing color steps
+       - Persistance of images through a special file format: "lyimg" (XML based)
 * Enhancements: LEF/DEF reader
       Some highlights:
-       * Support for layer map files
-       * More complete spec support (e.g. FILL, MASK, FOREIGN, DO/BY/STEP ...)
-       * Several bug fixes, e.g. routing layer switch for VIAs
-       * Some functions also act on the transient selection (less mouse clicks)
+       - Support for layer map files
+       - More complete spec support (e.g. FILL, MASK, FOREIGN, DO/BY/STEP ...)
+       - Several bug fixes, e.g. routing layer switch for VIAs
+       - Some functions also act on the transient selection (less mouse clicks)
 * Enhancements: Layout editing and rulers
       Some highlights:
-       * Object properties now are changed without having to commit the dialogs
-       * Dockable editor options windows
-       * "Recently used" list
-       * A "distribute objects" feature (Edit/Selection/Distribute)
-       * Snap highlighting
-       * Mouse tracking cursor indicates grid- and object-snapped location
+       - Object properties now are changed without having to commit the dialogs
+       - Dockable editor options windows
+       - "Recently used" list
+       - A "distribute objects" feature (Edit/Selection/Distribute)
+       - Snap highlighting
+       - Mouse tracking cursor indicates grid- and object-snapped location
 * Enhancements: Help browser
-       * Bookmarks
-       * Search in page (Ctrl+F)
+       - Bookmarks
+       - Search in page (Ctrl+F)
 * Enhancement: Improved fill tool
       The fill tool now also supports skewed fill pattern repetitions
 * Enhancement: Ability to utilize a LayoutView as a Widget

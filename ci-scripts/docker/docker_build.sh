@@ -16,18 +16,18 @@ echo DOCKER_IMAGE=$DOCKER_IMAGE
 
 # sometimes the epel server is down. retry 5 times
 for i in $(seq 1 5); do 
-    yum install -y zlib-devel ccache zip git && s=0 && break || s=$? && sleep 15; 
+    yum install -y zlib-devel curl-devel expat-devel ccache zip git && s=0 && break || s=$? && sleep 15; 
 done
 
 [ $s -eq 0 ] || exit $s
 
-if [[ $DOCKER_IMAGE == "quay.io/pypa/manylinux1_x86_64" ]]; then
+if [[ $DOCKER_IMAGE == "quay.io/pypa/manylinux2014_x86_64" ]]; then
     ln -s /usr/bin/ccache /usr/lib64/ccache/c++
     ln -s /usr/bin/ccache /usr/lib64/ccache/cc
     ln -s /usr/bin/ccache /usr/lib64/ccache/gcc
     ln -s /usr/bin/ccache /usr/lib64/ccache/g++
     export PATH="/usr/lib64/ccache/:$PATH"
-elif [[ $DOCKER_IMAGE == "quay.io/pypa/manylinux1_i686" ]]; then
+elif [[ $DOCKER_IMAGE == "quay.io/pypa/manylinux2014_i686" ]]; then
     ln -s /usr/bin/ccache /usr/lib/ccache/c++
     ln -s /usr/bin/ccache /usr/lib/ccache/cc
     ln -s /usr/bin/ccache /usr/lib/ccache/gcc
@@ -38,13 +38,15 @@ echo $PATH
 export CCACHE_DIR="/io/ccache"
 ccache -M 5 G  # set cache size to 5 G
 
-# Download proper auditwheel program
-git clone https://github.com/thomaslima/auditwheel.git /tmp/auditwheel
-cd /tmp/auditwheel
-git checkout 87f5306ec02cc68020afaa9933543c898b1d47c1  # patched version
-AUDITWHEEL_PYTHON=$(cat `which auditwheel` | head -1 | sed -e 's/#!\(.*\)/\1/')
-# Install auditwheel, replacing the system's auditwheel binary
-$AUDITWHEEL_PYTHON -m pip install .
+if false; then
+  # Download proper auditwheel program
+  git clone https://github.com/thomaslima/auditwheel.git /tmp/auditwheel
+  cd /tmp/auditwheel
+  git checkout 87f5306ec02cc68020afaa9933543c898b1d47c1  # patched version
+  AUDITWHEEL_PYTHON=$(cat `which auditwheel` | head -1 | sed -e 's/#!\(.*\)/\1/')
+  # Install auditwheel, replacing the system's auditwheel binary
+  $AUDITWHEEL_PYTHON -m pip install .
+fi
 
 # Show ccache stats
 echo "Cache stats:"

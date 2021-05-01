@@ -24,20 +24,6 @@ matrix:
         directories:
         - ccache
 
-    - name: "cp39-cp39m-manylinux2014_i686.whl"
-      os: linux
-      sudo: true
-      services:
-        - docker
-      env:
-        - DOCKER_IMAGE="quay.io/pypa/manylinux2014_i686"
-        - PY_VERSION="cp39-cp39"
-        - DOCKER_BUILD=true
-        - MATRIX_EVAL=""
-      cache:
-        directories:
-        - ccache
-
     - name: "cp38-cp38m-manylinux2014_x86_64.whl"
       os: linux
       sudo: true
@@ -50,20 +36,6 @@ matrix:
         - PY_VERSION="cp38-cp38"
         - DOCKER_BUILD=true
         - TEST_IN_HOST=true
-        - MATRIX_EVAL=""
-      cache:
-        directories:
-        - ccache
-
-    - name: "cp38-cp38m-manylinux2014_i686.whl"
-      os: linux
-      sudo: true
-      services:
-        - docker
-      env:
-        - DOCKER_IMAGE="quay.io/pypa/manylinux2014_i686"
-        - PY_VERSION="cp38-cp38"
-        - DOCKER_BUILD=true
         - MATRIX_EVAL=""
       cache:
         directories:
@@ -86,20 +58,6 @@ matrix:
         directories:
         - ccache
 
-    - name: "cp37-cp37m-manylinux2014_i686.whl"
-      os: linux
-      sudo: true
-      services:
-        - docker
-      env:
-        - DOCKER_IMAGE="quay.io/pypa/manylinux2014_i686"
-        - PY_VERSION="cp37-cp37m"
-        - DOCKER_BUILD=true
-        - MATRIX_EVAL=""
-      cache:
-        directories:
-        - ccache
-
     - name: "cp36-cp36m-manylinux2014_x86_64.whl"
       os: linux
       sudo: true
@@ -112,20 +70,6 @@ matrix:
         - PY_VERSION="cp36-cp36m"
         - DOCKER_BUILD=true
         - TEST_IN_HOST=true
-        - MATRIX_EVAL=""
-      cache:
-        directories:
-        - ccache
-
-    - name: "cp36-cp36m-manylinux2014_i686.whl"
-      os: linux
-      sudo: true
-      services:
-        - docker
-      env:
-        - DOCKER_IMAGE="quay.io/pypa/manylinux2014_i686"
-        - PY_VERSION="cp36-cp36m"
-        - DOCKER_BUILD=true
         - MATRIX_EVAL=""
       cache:
         directories:
@@ -148,51 +92,6 @@ matrix:
         directories:
         - ccache
 
-    - name: "cp35-cp35m-manylinux2014_i686.whl"
-      os: linux
-      sudo: true
-      services:
-        - docker
-      env:
-        - DOCKER_IMAGE="quay.io/pypa/manylinux2014_i686"
-        - PY_VERSION="cp35-cp35m"
-        - DOCKER_BUILD=true
-        - MATRIX_EVAL=""
-      cache:
-        directories:
-        - ccache
-
-    - name: "cp27-cp27mu-manylinux2014_x86_64.whl"
-      os: linux
-      sudo: true
-      language: python
-      python: '2.7'
-      services:
-        - docker
-      env:
-        - DOCKER_IMAGE="quay.io/pypa/manylinux2014_x86_64"
-        - PY_VERSION="cp27-cp27mu"
-        - DOCKER_BUILD=true
-        - TEST_IN_HOST=true
-        - MATRIX_EVAL=""
-      cache:
-        directories:
-        - ccache
-
-    - name: "cp27-cp27mu-manylinux2014_i686.whl"
-      os: linux
-      sudo: true
-      services:
-        - docker
-      env:
-        - DOCKER_IMAGE="quay.io/pypa/manylinux2014_i686"
-        - PY_VERSION="cp27-cp27mu"
-        - DOCKER_BUILD=true
-        - MATRIX_EVAL=""
-      cache:
-        directories:
-        - ccache
-
     - name: "cp27-cp27m-manylinux2014_x86_64.whl"
       os: linux
       sudo: true
@@ -205,20 +104,6 @@ matrix:
         - PY_VERSION="cp27-cp27m"
         - DOCKER_BUILD=true
         - TEST_IN_HOST=false  # travis's python 2.7 uses ucs4 (mu), so this test fails.
-        - MATRIX_EVAL=""
-      cache:
-        directories:
-        - ccache
-
-    - name: "cp27-cp27m-manylinux2014_i686.whl"
-      os: linux
-      sudo: true
-      services:
-        - docker
-      env:
-        - DOCKER_IMAGE="quay.io/pypa/manylinux2014_i686"
-        - PY_VERSION="cp27-cp27m"
-        - DOCKER_BUILD=true
         - MATRIX_EVAL=""
       cache:
         directories:

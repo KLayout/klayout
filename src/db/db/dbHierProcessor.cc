@@ -398,7 +398,7 @@ template <class TS, class TI, class TR>
 db::local_processor_cell_context<TS, TI, TR> *
 local_processor_cell_contexts<TS, TI, TR>::find_context (const context_key_type &intruders)
 {
-  typename std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR> >::iterator c = m_contexts.find (intruders);
+  typename context_map_type::iterator c = m_contexts.find (intruders);
   return c != m_contexts.end () ? &c->second : 0;
 }
 
@@ -552,7 +552,7 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
   //  strict ordering is a more robust choice.
   std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> > sorted_contexts;
   sorted_contexts.reserve (m_contexts.size ());
-  for (typename std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR> >::iterator c = m_contexts.begin (); c != m_contexts.end (); ++c) {
+  for (typename context_map_type::iterator c = m_contexts.begin (); c != m_contexts.end (); ++c) {
     sorted_contexts.push_back (std::make_pair (&c->first, &c->second));
   }
 

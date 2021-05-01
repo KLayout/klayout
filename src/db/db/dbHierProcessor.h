@@ -212,12 +212,21 @@ private:
   tl::Mutex m_lock;
 };
 
+template <class TI>
+struct DB_PUBLIC context_key_hash
+{
+  size_t operator() (const std::pair<std::set<CellInstArray>, std::map<unsigned int, std::set<TI> > > &v) const
+  {
+    return std::hash<std::pair<std::set<CellInstArray>, std::map<unsigned int, std::set<TI> > > > () (v);
+  }
+};
+
 template <class TS, class TI, class TR>
 class DB_PUBLIC local_processor_cell_contexts
 {
 public:
   typedef std::pair<std::set<CellInstArray>, std::map<unsigned int, std::set<TI> > > context_key_type;
-  typedef std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR> > context_map_type;
+  typedef std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR>, context_key_hash<TI> > context_map_type;
   typedef typename context_map_type::const_iterator iterator;
 
   local_processor_cell_contexts ();
@@ -244,7 +253,7 @@ public:
 
 private:
   const db::Cell *mp_intruder_cell;
-  std::unordered_map<context_key_type, db::local_processor_cell_context<TS, TI, TR> > m_contexts;
+  context_map_type m_contexts;
 };
 
 template <class TS, class TI, class TR>

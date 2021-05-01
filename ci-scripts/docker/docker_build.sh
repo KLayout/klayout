@@ -38,13 +38,15 @@ echo $PATH
 export CCACHE_DIR="/io/ccache"
 ccache -M 5 G  # set cache size to 5 G
 
-# Download proper auditwheel program
-git clone https://github.com/thomaslima/auditwheel.git /tmp/auditwheel
-cd /tmp/auditwheel
-git checkout 87f5306ec02cc68020afaa9933543c898b1d47c1  # patched version
-AUDITWHEEL_PYTHON=$(cat `which auditwheel` | head -1 | sed -e 's/#!\(.*\)/\1/')
-# Install auditwheel, replacing the system's auditwheel binary
-$AUDITWHEEL_PYTHON -m pip install .
+if false; then
+  # Download proper auditwheel program
+  git clone https://github.com/thomaslima/auditwheel.git /tmp/auditwheel
+  cd /tmp/auditwheel
+  git checkout 87f5306ec02cc68020afaa9933543c898b1d47c1  # patched version
+  AUDITWHEEL_PYTHON=$(cat `which auditwheel` | head -1 | sed -e 's/#!\(.*\)/\1/')
+  # Install auditwheel, replacing the system's auditwheel binary
+  $AUDITWHEEL_PYTHON -m pip install .
+fi
 
 # Show ccache stats
 echo "Cache stats:"

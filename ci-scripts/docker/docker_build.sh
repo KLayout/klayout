@@ -16,7 +16,7 @@ echo DOCKER_IMAGE=$DOCKER_IMAGE
 
 # sometimes the epel server is down. retry 5 times
 for i in $(seq 1 5); do 
-    yum install -y zlib-devel ccache zip git && s=0 && break || s=$? && sleep 15; 
+    yum install -y zlib-devel curl-devel expat-devel ccache zip git && s=0 && break || s=$? && sleep 15; 
 done
 
 [ $s -eq 0 ] || exit $s

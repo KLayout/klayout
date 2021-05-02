@@ -1189,3 +1189,24 @@ TEST(19)
   v = e.parse ("# A comment\nvar i=CellInstArray.new(17,tr,a,b,100,200); i.to_s(); # A final comment").execute ();
   EXPECT_EQ (v.to_string (), std::string ("#17 r90 10,20 [1,2*100;11,22*200]"));
 }
+
+// issue-787
+TEST(20)
+{
+  tl::Eval e;
+  e.parse ("var ly=Layout.new(true)").execute ();
+  e.parse ("var top=ly.create_cell('TOP')").execute ();
+  e.parse ("var cell=ly.create_cell('CHILD')").execute ();
+  e.parse ("var i1 = top.insert(CellInstArray.new(cell.cell_index,Trans.new(Vector.new(100,200))))").execute ();
+  e.parse ("var i2 = top.insert(CellInstArray.new(cell.cell_index,Trans.new(Vector.new(-100,300))))").execute ();
+
+  tl::Variant v;
+  v = e.parse ("i1.dtrans.disp.x").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("0.1"));
+  v = e.parse ("i1.dtrans.disp.y").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("0.2"));
+  v = e.parse ("i2.dtrans.disp.x").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("-0.1"));
+  v = e.parse ("i2.dtrans.disp.y").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("0.3"));
+}

@@ -82,6 +82,16 @@ struct edge_defs
     }
   }
 
+  static tl::Variant cut_point (const C *e, const C &ee)
+  {
+    std::pair<bool, point_type> ip = e->cut_point (ee);
+    if (ip.first) {
+      return tl::Variant (ip.second);
+    } else {
+      return tl::Variant ();
+    }
+  }
+
   static point_type crossing_point (const C *e, const C &ee)
   {
     return e->crossed_by_point (ee).second;
@@ -494,13 +504,24 @@ struct edge_defs
     method_ext ("intersection_point", &intersect_point, gsi::arg ("e"),
       "@brief Returns the intersection point of two edges. \n"
       "\n"
-      "This method delivers the intersection point. If the edges do not intersect, the result is undefined.\n"
+      "This method delivers the intersection point. If the edges do not intersect, the result will be nil.\n"
       "\n"
       "@param e The edge to test.\n"
       "@return The point where the edges intersect.\n"
       "\n"
       "This method has been introduced in version 0.19.\n"
       "From version 0.26.2, this method will return nil in case of non-intersection.\n"
+    ) +
+    method_ext ("cut_point", &cut_point, gsi::arg ("e"),
+      "@brief Returns the intersection point of the lines through the two edges.\n"
+      "\n"
+      "This method delivers the intersection point between the lines through the two edges. If the lines are parallel and do not intersect, the result will be nil.\n"
+      "In contrast to \\intersection_point, this method will regard the edges as infinitely extended and intersection is not confined to the edge span.\n"
+      "\n"
+      "@param e The edge to test.\n"
+      "@return The point where the lines intersect.\n"
+      "\n"
+      "This method has been introduced in version 0.27.1.\n"
     ) +
     method_ext ("clipped", &clipped, gsi::arg ("box"),
       "@brief Returns the edge clipped at the given box\n"

@@ -80,112 +80,108 @@ static bool is_def_format (const std::string &fn)
   return false;
 }
 
-class LEFDEFReader
-  : public db::ReaderBase
+// ---------------------------------------------------------------
+//  LEFDEFReader implementation
+
+LEFDEFReader::LEFDEFReader (tl::InputStream &s)
+  : m_stream (s)
 {
-public:
+  //  .. nothing yet ..
+}
 
-  LEFDEFReader (tl::InputStream &s)
-    : m_stream (s)
-  {
-    //  .. nothing yet ..
+const db::LayerMap &
+LEFDEFReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
+{
+  return read_lefdef (layout, options, is_lef_format (m_stream.filename ()));
+}
+
+const db::LayerMap &
+LEFDEFReader::read (db::Layout &layout)
+{
+  return read_lefdef (layout, db::LoadLayoutOptions (), is_lef_format (m_stream.filename ()));
+}
+
+const char *
+LEFDEFReader::format () const
+{
+  return "LEFDEF";
+}
+
+const db::LayerMap &
+LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &options, bool import_lef)
+{
+  const db::LEFDEFReaderOptions *lefdef_options = dynamic_cast<const db::LEFDEFReaderOptions *> (options.get_options (format ()));
+  db::LEFDEFReaderOptions effective_options;
+  if (lefdef_options) {
+    effective_options = *lefdef_options;
   }
 
-  virtual const db::LayerMap &read (db::Layout &layout, const db::LoadLayoutOptions &options)
-  {
-    return read_lefdef (layout, options, is_lef_format (m_stream.filename ()));
-  }
+  db::LEFDEFReaderState state (&effective_options, layout, tl::dirname (m_stream.absolute_path ()));
 
-  virtual const db::LayerMap &read (db::Layout &layout)
-  {
-    return read_lefdef (layout, db::LoadLayoutOptions (), is_lef_format (m_stream.filename ()));
-  }
+  layout.dbu (effective_options.dbu ());
 
-  virtual const char *format () const
-  {
-    return "LEFDEF";
-  }
+  if (import_lef) {
 
-private:
-  tl::InputStream &m_stream;
-  db::LayerMap m_layer_map;
+    //  Always produce LEF geometry when reading LEF
+    effective_options.set_macro_resolution_mode (1);
 
-  const db::LayerMap &read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &options, bool import_lef)
-  {
-    const db::LEFDEFReaderOptions *lefdef_options = dynamic_cast<const db::LEFDEFReaderOptions *> (options.get_options (format ()));
-    db::LEFDEFReaderOptions effective_options;
-    if (lefdef_options) {
-      effective_options = *lefdef_options;
+    tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file")));
+
+    db::LEFImporter importer;
+
+    for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
+
+      std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
+
+      tl::InputStream lef_stream (lp);
+      tl::log << tl::to_string (tr ("Reading")) << " " << lp;
+      importer.read (lef_stream, layout, state);
+
     }
 
-    db::LEFDEFReaderState state (&effective_options, layout, tl::dirname (m_stream.absolute_path ()));
+    tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
+    importer.read (m_stream, layout, state);
 
-    layout.dbu (effective_options.dbu ());
+    importer.finish_lef (layout);
 
-    if (import_lef) {
+  } else {
 
-      //  Always produce LEF geometry when reading LEF
-      effective_options.set_macro_resolution_mode (1);
+    tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading DEF file")));
 
-      tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file")));
+    DEFImporter importer;
 
-      db::LEFImporter importer;
+    for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
 
-      for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
+      std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
 
-        std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
+      tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
 
-        tl::InputStream lef_stream (lp);
-        tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-        importer.read (lef_stream, layout, state);
+      tl::InputStream lef_stream (lp);
+      tl::log << tl::to_string (tr ("Reading")) << " " << lp;
+      importer.read_lef (lef_stream, layout, state);
 
-      }
+    }
 
-      tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
-      importer.read (m_stream, layout, state);
+    //  Additionally read all LEF files next to the DEF file
 
-      importer.finish_lef (layout);
+    if (effective_options.read_lef_with_def ()) {
 
-    } else {
+      std::string input_dir = tl::absolute_path (m_stream.absolute_path ());
 
-      tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading DEF file")));
+      if (tl::file_exists (input_dir)) {
 
-      DEFImporter importer;
+        std::vector<std::string> entries = tl::dir_entries (input_dir, true, false, true);
+        for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
 
-      for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
+          if (is_lef_format (*e)) {
 
-        std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
+            std::string lp = tl::combine_path (input_dir, *e);
 
-        tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
+            tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
 
-        tl::InputStream lef_stream (lp);
-        tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-        importer.read_lef (lef_stream, layout, state);
-
-      }
-
-      //  Additionally read all LEF files next to the DEF file
-
-      if (effective_options.read_lef_with_def ()) {
-
-        std::string input_dir = tl::absolute_path (m_stream.absolute_path ());
-
-        if (tl::file_exists (input_dir)) {
-
-          std::vector<std::string> entries = tl::dir_entries (input_dir, true, false, true);
-          for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
-
-            if (is_lef_format (*e)) {
-
-              std::string lp = tl::combine_path (input_dir, *e);
-
-              tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
-
-              tl::InputStream lef_stream (lp);
-              tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-              importer.read_lef (lef_stream, layout, state);
-
-            }
+            tl::InputStream lef_stream (lp);
+            tl::log << tl::to_string (tr ("Reading")) << " " << lp;
+            importer.read_lef (lef_stream, layout, state);
 
           }
 
@@ -193,46 +189,69 @@ private:
 
       }
 
-      tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
-      importer.read (m_stream, layout, state);
+    }
 
-      //  Resolve unresolved COMPONENT cells
+    tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
+    importer.read (m_stream, layout, state);
 
-      std::map<std::string, db::cell_index_type> foreign_cells = state.foreign_cells ();
-      db::cell_index_type seen = std::numeric_limits<db::cell_index_type>::max ();
+    //  Resolve unresolved COMPONENT cells
 
-      std::vector<db::Layout *> macro_layouts = effective_options.macro_layouts ();
-      for (std::vector<db::Layout *>::const_iterator m = macro_layouts.begin (); m != macro_layouts.end (); ++m) {
+    std::map<std::string, db::cell_index_type> foreign_cells = state.foreign_cells ();
+    db::cell_index_type seen = std::numeric_limits<db::cell_index_type>::max ();
 
-        std::vector<db::cell_index_type> target_cells, source_cells;
+    std::vector<db::Layout *> macro_layouts = effective_options.macro_layouts ();
 
-        //  collect the cells to pull in
-        for (std::map<std::string, db::cell_index_type>::iterator f = foreign_cells.begin (); f != foreign_cells.end (); ++f) {
-          if (f->second != seen) {
-            std::pair<bool, db::cell_index_type> cp = (*m)->cell_by_name (f->first.c_str ());
-            if (cp.first) {
-              target_cells.push_back (f->second);
-              source_cells.push_back (cp.second);
-              layout.cell (f->second).set_ghost_cell (false);
-              f->second = seen;
-            }
-          }
-        }
+    //  Additionally read the layouts from the given paths
+    tl::shared_collection<db::Layout> macro_layout_object_holder;
+    for (std::vector<std::string>::const_iterator l = effective_options.begin_macro_layout_files (); l != effective_options.end_macro_layout_files (); ++l) {
 
-        db::CellMapping cm;
-        cm.create_multi_mapping_full (layout, target_cells, **m, source_cells);
-        layout.copy_tree_shapes (**m, cm);
+      std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
 
-      }
+      tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF macro layout file: ")) + lp);
+
+      tl::InputStream macro_layout_stream (lp);
+      tl::log << tl::to_string (tr ("Reading")) << " " << lp;
+      db::Layout *new_layout = new db::Layout (false);
+      macro_layout_object_holder.push_back (new_layout);
+      macro_layouts.push_back (new_layout);
+
+      db::Reader reader (macro_layout_stream);
+      reader.read (*new_layout, options);
 
     }
 
-    state.finish (layout);
+    for (std::vector<db::Layout *>::const_iterator m = macro_layouts.begin (); m != macro_layouts.end (); ++m) {
 
-    m_layer_map = state.layer_map ();
-    return m_layer_map;
+      std::vector<db::cell_index_type> target_cells, source_cells;
+
+      //  collect the cells to pull in
+      for (std::map<std::string, db::cell_index_type>::iterator f = foreign_cells.begin (); f != foreign_cells.end (); ++f) {
+        if (f->second != seen) {
+          std::pair<bool, db::cell_index_type> cp = (*m)->cell_by_name (f->first.c_str ());
+          if (cp.first) {
+            target_cells.push_back (f->second);
+            source_cells.push_back (cp.second);
+            layout.cell (f->second).set_ghost_cell (false);
+            f->second = seen;
+          }
+        }
+      }
+
+      db::CellMapping cm;
+      cm.create_multi_mapping_full (layout, target_cells, **m, source_cells);
+      layout.copy_tree_shapes (**m, cm);
+
+    }
+
   }
-};
+
+  state.finish (layout);
+
+  m_layer_map = state.layer_map ();
+  return m_layer_map;
+}
+
+// ---------------------------------------------------------------
 
 namespace {
 
@@ -371,6 +390,7 @@ class LEFDEFFormatDeclaration
       tl::make_member (&LEFDEFReaderOptions::special_routing_datatype_str, &LEFDEFReaderOptions::set_special_routing_datatype_str, "special-routing-datatype-string") +
       tl::make_member (&LEFDEFReaderOptions::via_cellname_prefix, &LEFDEFReaderOptions::set_via_cellname_prefix, "via-cellname-prefix") +
       tl::make_member (&LEFDEFReaderOptions::begin_lef_files, &LEFDEFReaderOptions::end_lef_files, &LEFDEFReaderOptions::push_lef_file, "lef-files") +
+      tl::make_member (&LEFDEFReaderOptions::begin_macro_layout_files, &LEFDEFReaderOptions::end_macro_layout_files, &LEFDEFReaderOptions::push_macro_layout_file, "macro_layout-files") +
       tl::make_member (&LEFDEFReaderOptions::read_lef_with_def, &LEFDEFReaderOptions::set_read_lef_with_def, "read-lef-with-def") +
       tl::make_member (&LEFDEFReaderOptions::macro_resolution_mode, &LEFDEFReaderOptions::set_macro_resolution_mode, "macro-resolution-mode", MacroResolutionModeConverter ()) +
       tl::make_member (&LEFDEFReaderOptions::separate_groups, &LEFDEFReaderOptions::set_separate_groups, "separate-groups") +

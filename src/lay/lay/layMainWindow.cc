@@ -394,34 +394,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
 
 
   //  layout file dialog
-  std::string fmts = tl::to_string (QObject::tr ("All layout files ("));
-  for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end (); ++rdr) {
-    if (rdr != tl::Registrar<db::StreamFormatDeclaration>::begin ()) {
-      fmts += " ";
-    }
-    std::string f = rdr->file_format ();
-    if (!f.empty ()) {
-      const char *fp = f.c_str ();
-      while (*fp && *fp != '(') {
-        ++fp;
-      }
-      if (*fp) {
-        ++fp;
-      }
-      while (*fp && *fp != ')') {
-        fmts += *fp++;
-      }
-    }
-  }
-  fmts += ");;";
-  for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end (); ++rdr) {
-    if (!rdr->file_format ().empty ()) {
-      fmts += rdr->file_format ();
-      fmts += ";;";
-    }
-  }
-  fmts += tl::to_string (QObject::tr ("All files (*)"));
-  mp_layout_fdia = new lay::FileDialog (this, tl::to_string (QObject::tr ("Layout File")), fmts);
+  mp_layout_fdia = new lay::FileDialog (this, tl::to_string (QObject::tr ("Layout File")), all_layout_file_formats ());
 
   //  save & load layout options
   mp_layout_save_as_options = new lay::SaveLayoutAsOptionsDialog (this, tl::to_string (QObject::tr ("Save Layout Options")));
@@ -476,6 +449,40 @@ MainWindow::~MainWindow ()
 
   delete mp_assistant;
   mp_assistant = 0;
+}
+
+std::string
+MainWindow::all_layout_file_formats () const
+{
+  std::string fmts = tl::to_string (QObject::tr ("All layout files ("));
+  for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end (); ++rdr) {
+    if (rdr != tl::Registrar<db::StreamFormatDeclaration>::begin ()) {
+      fmts += " ";
+    }
+    std::string f = rdr->file_format ();
+    if (!f.empty ()) {
+      const char *fp = f.c_str ();
+      while (*fp && *fp != '(') {
+        ++fp;
+      }
+      if (*fp) {
+        ++fp;
+      }
+      while (*fp && *fp != ')') {
+        fmts += *fp++;
+      }
+    }
+  }
+  fmts += ");;";
+  for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end (); ++rdr) {
+    if (!rdr->file_format ().empty ()) {
+      fmts += rdr->file_format ();
+      fmts += ";;";
+    }
+  }
+  fmts += tl::to_string (QObject::tr ("All files (*)"));
+
+  return fmts;
 }
 
 void

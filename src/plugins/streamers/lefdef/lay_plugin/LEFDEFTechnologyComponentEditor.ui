@@ -35,11 +35,11 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
-       <string>LEF Files</string>
+       <string>LEF+Macro Files</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -47,6 +47,69 @@
          <property name="text">
           <string>for DEF: also read all LEF files in the same directory than the DEF file</string>
          </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame_7">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>LEF macro geometry</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="macro_resolution_mode">
+            <item>
+             <property name="text">
+              <string>Produce LEF geometry or use macro layout files for LEF FOREIGN</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Always produce LEF geometry and ignore LEF FOREIGN</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Always use macro layout files (assume LEF FOREIGN)</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
@@ -138,19 +201,18 @@
              <property name="spacing">
               <number>6</number>
              </property>
-             <item row="1" column="1">
-              <widget class="QToolButton" name="del_lef_files">
-               <property name="toolTip">
-                <string>Delete selected files</string>
+             <item row="4" column="1">
+              <spacer>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
                </property>
-               <property name="text">
-                <string>...</string>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>0</height>
+                </size>
                </property>
-               <property name="icon">
-                <iconset resource="../../../../lay/lay/layResources.qrc">
-                 <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
-               </property>
-              </widget>
+              </spacer>
              </item>
              <item row="0" column="0" rowspan="5">
               <widget class="QListWidget" name="lef_files">
@@ -179,18 +241,19 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="1">
-              <spacer>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
+             <item row="1" column="1">
+              <widget class="QToolButton" name="del_lef_files">
+               <property name="toolTip">
+                <string>Delete selected files</string>
                </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>0</height>
-                </size>
+               <property name="text">
+                <string>...</string>
                </property>
-              </spacer>
+               <property name="icon">
+                <iconset resource="../../../../lay/lay/layResources.qrc">
+                 <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+               </property>
+              </widget>
              </item>
              <item row="0" column="1">
               <widget class="QToolButton" name="add_lef_file">
@@ -226,6 +289,120 @@
          </layout>
         </widget>
        </item>
+       <item>
+        <widget class="QFrame" name="frame_8">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="0" colspan="2">
+           <widget class="QLabel" name="label_31">
+            <property name="text">
+             <string>Macro Layout Files
+(used instead of LEF geometry if requested, resolution priority follows order)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" rowspan="5">
+           <widget class="QListWidget" name="macro_layout_files">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::ExtendedSelection</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QToolButton" name="add_macro_layout_file">
+            <property name="toolTip">
+             <string>Add LEF file</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../../../lay/lay/layResources.qrc">
+              <normaloff>:/add.png</normaloff>:/add.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QToolButton" name="del_macro_layout_files">
+            <property name="toolTip">
+             <string>Delete selected files</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../../../lay/lay/layResources.qrc">
+              <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QToolButton" name="move_macro_layout_files_up">
+            <property name="toolTip">
+             <string>Move selected files up</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../../../lay/lay/layResources.qrc">
+              <normaloff>:/up.png</normaloff>:/up.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QToolButton" name="move_macro_layout_files_down">
+            <property name="toolTip">
+             <string>Move selected files down</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../../../lay/lay/layResources.qrc">
+              <normaloff>:/down.png</normaloff>:/down.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <spacer name="spacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>196</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_4">
@@ -248,51 +425,10 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Layout DBU</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="prefix_via_cellname">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1" colspan="2">
-           <widget class="QCheckBox" name="separate_groups">
-            <property name="text">
-             <string>Produce a parent cell per group</string>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_21">
             <property name="text">
              <string>Via cell name prefix</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>LEF import into DEF</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="dbu">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
             </property>
            </widget>
           </item>
@@ -316,7 +452,54 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="1" colspan="3">
+          <item row="0" column="3" rowspan="3">
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="1" colspan="2">
+           <widget class="QCheckBox" name="separate_groups">
+            <property name="text">
+             <string>Produce a parent cell per group</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Layout DBU</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="prefix_via_cellname">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="dbu">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" colspan="3">
            <widget class="QFrame" name="frame_3">
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
@@ -340,38 +523,30 @@
             </layout>
            </widget>
           </item>
-          <item row="0" column="3" rowspan="3">
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="3" column="1" colspan="3">
-           <widget class="QComboBox" name="macro_resolution_mode">
-            <item>
-             <property name="text">
-              <string>Produce LEF geometry unless FOREIGN is used</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Always produce LEF geometry and ignore FOREIGN</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Never produce LEF geometry and assume FOREIGN always</string>
-             </property>
-            </item>
-           </widget>
-          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame_6">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
          </layout>
         </widget>
        </item>

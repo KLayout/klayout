@@ -33,8 +33,8 @@ TEST(1)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/fill_tool1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/fill_tool1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -49,15 +49,15 @@ TEST(1)
   db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, ly.cell (fill_cell).bbox (), db::Point (), false);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au1.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au1.gds");
 }
 
 TEST(2)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/fill_tool2.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/fill_tool2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -79,15 +79,15 @@ TEST(2)
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au2.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au2.gds");
 }
 
 TEST(3)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/fill_tool3.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/fill_tool3.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -113,15 +113,15 @@ TEST(3)
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au3.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au3.gds");
 }
 
 TEST(3a)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/fill_tool3.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/fill_tool3.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -147,15 +147,15 @@ TEST(3a)
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au3a.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au3a.gds");
 }
 
 TEST(3b)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/fill_tool3.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/fill_tool3.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -181,15 +181,15 @@ TEST(3b)
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au3b.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au3b.gds");
 }
 
 TEST(3c)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/fill_tool3.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/fill_tool3.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -215,15 +215,15 @@ TEST(3c)
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au3c.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au3c.gds");
 }
 
 TEST(4)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/fill_tool4.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/fill_tool4.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -247,15 +247,15 @@ TEST(4)
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au4.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au4.gds");
 }
 
 TEST(4b)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/fill_tool4.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/fill_tool4.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -279,15 +279,15 @@ TEST(4b)
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au4b.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au4b.gds");
 }
 
 TEST(4c)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/fill_tool4.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/fill_tool4.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -311,5 +311,5 @@ TEST(4c)
   remaining_polygons.insert_into (&ly, top_cell, l101);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/fill_tool_au4c.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au4c.gds");
 }

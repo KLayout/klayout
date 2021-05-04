@@ -1598,8 +1598,8 @@ TEST(32a_snap)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/scale_and_snap.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/scale_and_snap.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1616,15 +1616,15 @@ TEST(32a_snap)
   r2.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/region_au32.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/region_au32.gds");
 }
 
 TEST(32b_snap)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/scale_and_snap.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/scale_and_snap.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1641,15 +1641,15 @@ TEST(32b_snap)
   r1.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/region_au32.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/region_au32.gds");
 }
 
 TEST(33a_snap)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/scale_and_snap.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/scale_and_snap.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1666,15 +1666,15 @@ TEST(33a_snap)
   r2.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/region_au33.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/region_au33.gds");
 }
 
 TEST(33b_snap)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/scale_and_snap.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/scale_and_snap.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1691,7 +1691,7 @@ TEST(33b_snap)
   r1.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/region_au33.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/region_au33.gds");
 }
 
 TEST(34a)

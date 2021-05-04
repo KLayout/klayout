@@ -32,8 +32,8 @@
 
 void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string &au_netlist, const std::string &layout, bool priv = false, const std::string &au_lvsdb_name = std::string ())
 {
-  std::string testsrc = priv ? tl::testsrc_private () : tl::testsrc ();
-  testsrc = tl::combine_path (tl::combine_path (testsrc, "testdata"), "lvs");
+  std::string testsrc = priv ? tl::testdata_private () : tl::testdata ();
+  testsrc = tl::combine_path (testsrc, "lvs");
 
   std::string rs = tl::combine_path (testsrc, lvs_rs);
   std::string ly = tl::combine_path (testsrc, layout);

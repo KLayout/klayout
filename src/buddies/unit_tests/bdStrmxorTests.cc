@@ -34,11 +34,11 @@ TEST(0_Basic_Flat)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in1.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in1.gds";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -55,11 +55,11 @@ TEST(0_Basic_Deep)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in1.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in1.gds";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -76,14 +76,14 @@ TEST(1A_Flat)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strmxor_au1.oas";
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au1.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -118,14 +118,14 @@ TEST(1A_Deep)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strmxor_au1d.oas";
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au1d.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -160,11 +160,11 @@ TEST(1B_Flat)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -190,11 +190,11 @@ TEST(1B_Deep)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -220,11 +220,11 @@ TEST(1C_Flat)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -241,11 +241,11 @@ TEST(1C_Deep)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -262,11 +262,11 @@ TEST(1D_Flat)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -280,11 +280,11 @@ TEST(1D_Deep)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -298,14 +298,14 @@ TEST(2_Flat)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strmxor_au2.oas";
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au2.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -331,14 +331,14 @@ TEST(2_Deep)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strmxor_au2d.oas";
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au2d.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -364,14 +364,14 @@ TEST(3_Flat)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strmxor_au3.oas";
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au3.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -397,14 +397,14 @@ TEST(3_Deep)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strmxor_au3d.oas";
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au3d.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -431,14 +431,14 @@ TEST(4_Flat)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strmxor_au4.oas";
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au4.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -464,14 +464,14 @@ TEST(4_Deep)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strmxor_au4d.oas";
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au4d.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -497,14 +497,14 @@ TEST(5_Flat)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strmxor_au5.oas";
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au5.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -530,14 +530,14 @@ TEST(5_Deep)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strmxor_au5d.oas";
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au5d.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -563,14 +563,14 @@ TEST(6_Flat)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strmxor_au6.oas";
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au6.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
 
@@ -596,14 +596,14 @@ TEST(6_Deep)
 {
   tl::CaptureChannel cap;
 
-  std::string input_a = tl::testsrc ();
-  input_a += "/testdata/bd/strmxor_in1.gds";
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_in1.gds";
 
-  std::string input_b = tl::testsrc ();
-  input_b += "/testdata/bd/strmxor_in2.gds";
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_in2.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strmxor_au6d.oas";
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au6d.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
 

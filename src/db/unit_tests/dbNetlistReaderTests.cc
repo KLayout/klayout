@@ -32,7 +32,7 @@ TEST(1_BasicReader)
 {
   db::Netlist nl;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader1.cir");
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader1.cir");
 
   db::NetlistSpiceReader reader;
   tl::InputStream is (path);
@@ -52,7 +52,7 @@ TEST(1b_BasicReader_ResistorModels)
 {
   db::Netlist nl;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader1b.cir");
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader1b.cir");
 
   db::NetlistSpiceReader reader;
   tl::InputStream is (path);
@@ -72,7 +72,7 @@ TEST(2_ReaderWithSubcircuits)
 {
   db::Netlist nl;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader2.cir");
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader2.cir");
 
   db::NetlistSpiceReader reader;
   tl::InputStream is (path);
@@ -110,7 +110,7 @@ TEST(3_ReaderWithSubcircuitsAltOrder)
 {
   db::Netlist nl;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader3.cir");
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader3.cir");
 
   db::NetlistSpiceReader reader;
   tl::InputStream is (path);
@@ -148,7 +148,7 @@ TEST(4_ReaderWithUnconnectedPins)
 {
   db::Netlist nl;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader4.cir");
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader4.cir");
 
   db::NetlistSpiceReader reader;
   tl::InputStream is (path);
@@ -177,7 +177,7 @@ TEST(5_CircuitParameters)
 {
   db::Netlist nl;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader5.cir");
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader5.cir");
 
   db::NetlistSpiceReader reader;
   tl::InputStream is (path);
@@ -254,7 +254,7 @@ TEST(6_ReaderWithDelegate)
 {
   db::Netlist nl;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader6.cir");
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader6.cir");
 
   MyNetlistReaderDelegate delegate;
   db::NetlistSpiceReader reader (&delegate);
@@ -280,7 +280,7 @@ TEST(7_GlobalNets)
 {
   db::Netlist nl;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader7.cir");
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader7.cir");
 
   MyNetlistReaderDelegate delegate;
   db::NetlistSpiceReader reader (&delegate);
@@ -319,7 +319,7 @@ TEST(8_Include)
 {
   db::Netlist nl;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader8.cir");
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader8.cir");
 
   db::NetlistSpiceReader reader;
   tl::InputStream is (path);
@@ -357,7 +357,7 @@ TEST(9_DeviceMultipliers)
 {
   db::Netlist nl;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader9.cir");
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader9.cir");
 
   {
     db::NetlistSpiceReader reader;
@@ -434,7 +434,7 @@ TEST(10_SubcircuitsNoPins)
 {
   db::Netlist nl;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader10.cir");
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader10.cir");
 
   db::NetlistSpiceReader reader;
   tl::InputStream is (path);
@@ -455,7 +455,7 @@ TEST(11_ErrorOnCircuitRedefinition)
 {
   db::Netlist nl;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader11.cir");
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader11.cir");
 
   std::string msg;
   try {
@@ -473,7 +473,7 @@ TEST(12_IgnoreDuplicateGlobals)
 {
   db::Netlist nl;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader12.cir");
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader12.cir");
 
   db::NetlistSpiceReader reader;
   tl::InputStream is (path);
@@ -494,7 +494,7 @@ TEST(13_NoGlobalNetsIfNotUsed)
 {
   db::Netlist nl;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nreader13.cir");
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader13.cir");
 
   db::NetlistSpiceReader reader;
   tl::InputStream is (path);

@@ -30,20 +30,20 @@
 
 void run_test (tl::TestBase *_this, const std::string &suffix, const std::string &layout, bool with_l2n = false, const std::string &top = std::string (), bool change_case = false)
 {
-  std::string rs = tl::testsrc ();
-  rs += "/testdata/lvs/" + suffix + ".lvs";
+  std::string rs = tl::testdata ();
+  rs += "/lvs/" + suffix + ".lvs";
 
-  std::string src = tl::testsrc ();
-  src += "/testdata/lvs/" + layout;
+  std::string src = tl::testdata ();
+  src += "/lvs/" + layout;
 
-  std::string au_lvsdb = tl::testsrc ();
-  au_lvsdb += "/testdata/lvs/" + suffix + ".lvsdb";
+  std::string au_lvsdb = tl::testdata ();
+  au_lvsdb += "/lvs/" + suffix + ".lvsdb";
 
-  std::string au_cir = tl::testsrc ();
-  au_cir += "/testdata/lvs/" + suffix + ".cir";
+  std::string au_cir = tl::testdata ();
+  au_cir += "/lvs/" + suffix + ".cir";
 
-  std::string au_l2n = tl::testsrc ();
-  au_l2n += "/testdata/lvs/" + suffix + ".l2n";
+  std::string au_l2n = tl::testdata ();
+  au_l2n += "/lvs/" + suffix + ".l2n";
 
   std::string output_lvsdb = _this->tmp_file ("tmp.lvsdb");
   std::string output_cir = _this->tmp_file ("tmp.cir");

@@ -56,8 +56,8 @@ void run_test (tl::TestBase *_this, const std::string &file, const db::NetTracer
 
   db::Layout layout_org (&m);
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/net_tracer/";
+    std::string fn (tl::testdata ());
+    fn += "/net_tracer/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -80,8 +80,8 @@ void run_test (tl::TestBase *_this, const std::string &file, const db::NetTracer
 
   l2ndb.build_all_nets (cm, layout_nets, l2ndb.create_layermap (layout_nets, 1000), "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", 0);
 
-  std::string fn (tl::testsrc ());
-  fn += "/testdata/net_tracer/";
+  std::string fn (tl::testdata ());
+  fn += "/net_tracer/";
   fn += file_au;
 
   CHECKPOINT ();

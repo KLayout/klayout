@@ -189,8 +189,7 @@ TEST(1_BasicExtraction)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l1.gds");
 
@@ -329,8 +328,7 @@ TEST(1_BasicExtraction)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au1_with_rec_nets.gds");
 
@@ -399,8 +397,7 @@ TEST(1_BasicExtraction)
 
     l2n.build_all_nets (cm, ly2, lmap, 0, tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, 0);
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "device_extract_au1_rebuild_ff.gds");
 
@@ -426,8 +423,7 @@ TEST(1_BasicExtraction)
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, 0);
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "device_extract_au1_rebuild_nf.gds");
 
@@ -453,8 +449,7 @@ TEST(1_BasicExtraction)
 
     l2n.build_all_nets (cm, ly2, lmap, 0, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", 0);
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "device_extract_au1_rebuild_fr.gds");
 
@@ -480,8 +475,7 @@ TEST(1_BasicExtraction)
 
     l2n.build_all_nets (cm, ly2, lmap, 0, tl::Variant (42), db::LayoutToNetlist::BNH_Flatten, 0, 0);
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "device_extract_au1_rebuild_pf.gds");
 
@@ -507,8 +501,7 @@ TEST(1_BasicExtraction)
 
     l2n.build_all_nets (cm, ly2, lmap, 0, tl::Variant (42), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", 0);
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "device_extract_au1_rebuild_pr.gds");
 
@@ -534,8 +527,7 @@ TEST(1_BasicExtraction)
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "device_extract_au1_rebuild_nr.gds");
 
@@ -646,8 +638,7 @@ TEST(1_BasicExtraction)
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
-    std::string au = tl::testsrc ();
-    au = tl::combine_path (au, "testdata");
+    std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "device_extract_au1_joined_nets.gds");
 
@@ -677,8 +668,7 @@ TEST(2_Probing)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l2.gds");
 
@@ -842,8 +832,7 @@ TEST(2_Probing)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au2_with_rec_nets.gds");
 
@@ -929,8 +918,7 @@ TEST(3_GlobalNetConnections)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l3.gds");
 
@@ -1122,8 +1110,7 @@ TEST(3_GlobalNetConnections)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au3_with_rec_nets.gds");
 
@@ -1209,8 +1196,7 @@ TEST(4_GlobalNetDeviceExtraction)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l3.gds");
 
@@ -1408,8 +1394,7 @@ TEST(4_GlobalNetDeviceExtraction)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au4_with_rec_nets.gds");
 
@@ -1495,8 +1480,7 @@ TEST(5_DeviceExtractionWithDeviceCombination)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l5.gds");
 
@@ -1694,8 +1678,7 @@ TEST(5_DeviceExtractionWithDeviceCombination)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au5_with_rec_nets.gds");
 
@@ -1773,8 +1756,7 @@ TEST(6_MoreDeviceTypes)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l6.gds");
 
@@ -1930,8 +1912,7 @@ TEST(7_MoreByEmptyDeviceTypes)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l6.gds");
 
@@ -2087,8 +2068,7 @@ TEST(8_FlatExtraction)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l6.gds");
 
@@ -2266,8 +2246,7 @@ TEST(9_FlatExtractionWithExternalDSS)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l6.gds");
 
@@ -2443,8 +2422,7 @@ TEST(10_Antenna)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "antenna_l1.gds");
 
@@ -2691,8 +2669,7 @@ TEST(10_Antenna)
     b6_9.insert_into (&ly2, top2.cell_index (), ly2.insert_layer (db::LayerProperties (652, 0)));
   }
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "antenna_au1.gds");
 
@@ -2721,8 +2698,7 @@ TEST(11_DuplicateInstances)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l1_dup_inst.gds");
 
@@ -2861,8 +2837,7 @@ TEST(11_DuplicateInstances)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au1_dup_inst_with_rec_nets.gds");
 
@@ -2926,8 +2901,7 @@ TEST(12_FlattenCircuitDoesFlattenLayout)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l5.gds");
 
@@ -3148,8 +3122,7 @@ TEST(12_FlattenCircuitDoesFlattenLayout)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au5_flattened_circuits.gds");
 
@@ -3180,8 +3153,7 @@ TEST(13_JoinNetNames)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l13.gds");
 
@@ -3378,8 +3350,7 @@ TEST(13_JoinNetNames)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au13_circuits.gds");
 
@@ -3412,8 +3383,7 @@ TEST(14_JoinNets)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn = tl::combine_path (fn, "testdata");
+    std::string fn (tl::testdata ());
     fn = tl::combine_path (fn, "algo");
     fn = tl::combine_path (fn, "device_extract_l14.gds");
 
@@ -3624,8 +3594,7 @@ TEST(14_JoinNets)
 
   //  compare the collected test data
 
-  std::string au = tl::testsrc ();
-  au = tl::combine_path (au, "testdata");
+  std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au14_circuits.gds");
 

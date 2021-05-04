@@ -26,7 +26,7 @@
 TEST (1)
 {
   db::LayoutToNetlist l2n;
-  l2n.load (tl::testsrc () + "/testdata/lay/l2n_browser.l2n");
+  l2n.load (tl::testdata () + "/lay/l2n_browser.l2n");
 
   lay::NetColorizer colorizer;
   std::unique_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &l2n, &colorizer));
@@ -243,7 +243,7 @@ TEST (1)
 TEST (2)
 {
   db::LayoutVsSchematic lvs;
-  lvs.load (tl::testsrc () + "/testdata/lay/lvsdb_browser.lvsdb");
+  lvs.load (tl::testdata () + "/lay/lvsdb_browser.lvsdb");
 
   lay::NetColorizer colorizer;
   std::unique_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &lvs, &colorizer));
@@ -409,7 +409,7 @@ TEST (2)
 TEST (3)
 {
   db::LayoutToNetlist l2n;
-  l2n.load (tl::testsrc () + "/testdata/lay/l2n_browser.l2n");
+  l2n.load (tl::testdata () + "/lay/l2n_browser.l2n");
 
   lay::NetColorizer colorizer;
   std::unique_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &l2n, &colorizer));
@@ -436,7 +436,7 @@ TEST (3)
 TEST (4)
 {
   db::LayoutToNetlist l2n;
-  l2n.load (tl::testsrc () + "/testdata/lay/l2n_browser.l2n");
+  l2n.load (tl::testdata () + "/lay/l2n_browser.l2n");
 
   lay::NetColorizer colorizer;
   std::unique_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &l2n, &colorizer));
@@ -466,7 +466,7 @@ TEST (4)
 TEST (5)
 {
   db::LayoutVsSchematic lvs;
-  lvs.load (tl::testsrc () + "/testdata/lay/lvsdb_browser.lvsdb");
+  lvs.load (tl::testdata () + "/lay/lvsdb_browser.lvsdb");
 
   lay::NetColorizer colorizer;
   std::unique_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &lvs, &colorizer));
@@ -524,7 +524,7 @@ TEST (5)
 TEST (6)
 {
   db::LayoutVsSchematic lvs;
-  lvs.load (tl::testsrc () + "/testdata/lay/lvsdb_browser.lvsdb");
+  lvs.load (tl::testdata () + "/lay/lvsdb_browser.lvsdb");
 
   lay::NetColorizer colorizer;
   std::unique_ptr<lay::NetlistBrowserModel> model (new lay::NetlistBrowserModel (0, &lvs, &colorizer));

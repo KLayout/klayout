@@ -47,8 +47,8 @@ int run_pymodtest (tl::TestBase *_this, const std::string &fn)
 #endif
   tl::info << pypath;
 
-  std::string fp (tl::testsrc ());
-  fp += "/testdata/pymod/";
+  std::string fp (tl::testdata ());
+  fp += "/pymod/";
   fp += fn;
 
   std::string text;

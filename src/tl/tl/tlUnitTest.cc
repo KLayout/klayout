@@ -88,14 +88,21 @@ std::string testsrc ()
 {
   std::string ts = tl::get_env ("TESTSRC");
   if (ts.empty ()) {
-    throw tl::Exception ("TESTSRC undefined");
+    tl::warn << "TESTSRC undefined";
+    ts = ".";
   }
   return ts;
 }
 
-std::string testsrc_private ()
+std::string testdata ()
+{
+  return tl::combine_path (tl::testsrc (), "testdata");
+}
+
+std::string testdata_private ()
 {
   std::string pp = tl::combine_path (tl::testsrc (), "private");
+  pp = tl::combine_path (pp, "testdata");
   if (! tl::file_exists (pp)) {
     throw tl::CancelException ();
   }

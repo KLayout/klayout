@@ -37,8 +37,8 @@ TEST(1)
   db::Manager m (false);
   db::Layout layout_org (&m);
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/other/d1.oas.gz";
+    std::string fn (tl::testdata ());
+    fn += "/other/d1.oas.gz";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (layout_org);

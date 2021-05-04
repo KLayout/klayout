@@ -96,8 +96,8 @@ void run_test (tl::TestBase *_this, const std::string &file, const db::NetTracer
 
   db::Layout layout_org (&m);
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/net_tracer/";
+    std::string fn (tl::testdata ());
+    fn += "/net_tracer/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -122,8 +122,8 @@ void run_test (tl::TestBase *_this, const std::string &file, const db::NetTracer
   db::Layout layout_net;
   net.export_net (layout_net, layout_net.cell (layout_net.add_cell ("NET")));
 
-  std::string fn (tl::testsrc ());
-  fn += "/testdata/net_tracer/";
+  std::string fn (tl::testdata ());
+  fn += "/net_tracer/";
   fn += file_au;
 
   CHECKPOINT ();
@@ -136,8 +136,8 @@ void run_test2 (tl::TestBase *_this, const std::string &file, const db::NetTrace
 
   db::Layout layout_org (&m);
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/net_tracer/";
+    std::string fn (tl::testdata ());
+    fn += "/net_tracer/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -156,8 +156,8 @@ void run_test2 (tl::TestBase *_this, const std::string &file, const db::NetTrace
   db::Layout layout_net;
   net.export_net (layout_net, layout_net.cell (layout_net.add_cell ("NET")));
 
-  std::string fn (tl::testsrc ());
-  fn += "/testdata/net_tracer/";
+  std::string fn (tl::testdata ());
+  fn += "/net_tracer/";
   fn += file_au;
 
   CHECKPOINT ();

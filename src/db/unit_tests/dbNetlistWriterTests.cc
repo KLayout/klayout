@@ -104,7 +104,7 @@ TEST(1_WriterResistorDevices)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter1_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter1_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -162,7 +162,7 @@ TEST(1_WriterResistorDevicesWithBulk)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter1_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter1_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -219,7 +219,7 @@ TEST(2_WriterCapacitorDevices)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter2_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter2_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -278,7 +278,7 @@ TEST(2_WriterCapacitorDevicesWithBulk)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter2_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter2_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -350,7 +350,7 @@ TEST(3_WriterInductorDevices)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter3_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter3_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -422,7 +422,7 @@ TEST(4_WriterDiodeDevices)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter4_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter4_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -511,7 +511,7 @@ TEST(5_WriterMOS3Devices)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter5_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter5_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -607,7 +607,7 @@ TEST(6_WriterMOS4Devices)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter6_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter6_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -669,7 +669,7 @@ TEST(7_WriterAnyDevices)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter7_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter7_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -812,7 +812,7 @@ TEST(8_WriterSubcircuits)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter8_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter8_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -902,7 +902,7 @@ TEST(9_WriterNetNamesInsteadOfNumbers)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter9_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter9_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -951,7 +951,7 @@ TEST(10_WriterLongLines)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter10_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter10_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -1096,7 +1096,7 @@ TEST(11_WriterNonConnectedPins)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter11_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter11_au.txt");
 
   compare_netlists (_this, path, au_path);
 
@@ -1108,7 +1108,7 @@ TEST(11_WriterNonConnectedPins)
     writer.write (stream, nl, "written by unit test");
   }
 
-  au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter11b_au.txt");
+  au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter11b_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -1116,7 +1116,7 @@ TEST(11_WriterNonConnectedPins)
 TEST(12_UniqueNetNames)
 {
   db::LayoutToNetlist l2n;
-  std::string l2n_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "same_net_names.l2n");
+  std::string l2n_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "same_net_names.l2n");
   l2n.load (l2n_path);
 
   //  verify against the input
@@ -1128,7 +1128,7 @@ TEST(12_UniqueNetNames)
     writer.write (stream, *l2n.netlist (), "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter12_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter12_au.txt");
 
   compare_netlists (_this, path, au_path);
 
@@ -1140,7 +1140,7 @@ TEST(12_UniqueNetNames)
     writer.write (stream, *l2n.netlist (), "written by unit test");
   }
 
-  au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter12b_au.txt");
+  au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter12b_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -1229,7 +1229,7 @@ TEST(13_WriterBJT3Devices)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter13_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter13_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -1325,7 +1325,7 @@ TEST(14_WriterBJT4Devices)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter14_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter14_au.txt");
 
   compare_netlists (_this, path, au_path);
 }
@@ -1429,7 +1429,7 @@ TEST(20_Delegate)
     writer.write (stream, nl, "written by unit test");
   }
 
-  std::string au_path = tl::combine_path (tl::combine_path (tl::combine_path (tl::testsrc (), "testdata"), "algo"), "nwriter20_au.txt");
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nwriter20_au.txt");
 
   compare_netlists (_this, path, au_path);
 }

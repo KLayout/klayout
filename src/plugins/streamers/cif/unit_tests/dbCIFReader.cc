@@ -54,7 +54,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
 
   {
     std::string fn (base);
-    fn += "/testdata/cif/";
+    fn += "/cif/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -115,7 +115,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
 
   {
     std::string fn (base);
-    fn += "/testdata/cif/";
+    fn += "/cif/";
     fn += file_au;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -135,74 +135,74 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
 
 TEST(1a)
 {
-  run_test (_this, tl::testsrc_private (), "t1.cif.gz", "t1a_au.gds.gz");
+  run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1a_au.gds.gz");
 }
 
 TEST(1b)
 {
-  run_test (_this, tl::testsrc_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01);
+  run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01);
 }
 
 TEST(1c)
 {
-  run_test (_this, tl::testsrc_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01, true);
+  run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01, true);
 }
 
 TEST(1d)
 {
-  run_test (_this, tl::testsrc_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01, false, true);
+  run_test (_this, tl::testdata_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01, false, true);
 }
 
 TEST(2)
 {
-  run_test (_this, tl::testsrc_private (), "t2.cif.gz", "t2_au.gds.gz");
+  run_test (_this, tl::testdata_private (), "t2.cif.gz", "t2_au.gds.gz");
 }
 
 TEST(3a)
 {
-  run_test (_this, tl::testsrc_private (), "t3.cif.gz", "t3a_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26");
+  run_test (_this, tl::testdata_private (), "t3.cif.gz", "t3a_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26");
 }
 
 TEST(3b)
 {
-  run_test (_this, tl::testsrc_private (), "t3.cif.gz", "t3b_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26", 0.00012);
+  run_test (_this, tl::testdata_private (), "t3.cif.gz", "t3b_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26", 0.00012);
 }
 
 TEST(3c)
 {
-  run_test (_this, tl::testsrc_private (), "t3.cif.gz", "t3c_au.gds.gz", "(CPG:1/0) +(CPG:1000/0) (CCP:1/0) (CMF:2/0) +(CMF:1000/0) (CVA:3/0)", 0.00012);
+  run_test (_this, tl::testdata_private (), "t3.cif.gz", "t3c_au.gds.gz", "(CPG:1/0) +(CPG:1000/0) (CCP:1/0) (CMF:2/0) +(CMF:1000/0) (CVA:3/0)", 0.00012);
 }
 
 TEST(4)
 {
-  run_test (_this, tl::testsrc_private (), "t4.cif.gz", "t4_au.gds.gz");
+  run_test (_this, tl::testdata_private (), "t4.cif.gz", "t4_au.gds.gz");
 }
 
 TEST(5)
 {
-  run_test (_this, tl::testsrc_private (), "t5.cif.gz", "t5_au.gds.gz");
+  run_test (_this, tl::testdata_private (), "t5.cif.gz", "t5_au.gds.gz");
 }
 
 //  Issue #28
 TEST(lasi)
 {
-  run_test (_this, tl::testsrc (), "lasi.cif.gz", "lasi_au.gds.gz");
+  run_test (_this, tl::testdata (), "lasi.cif.gz", "lasi_au.gds.gz");
 }
 
 //  Issue #305
 TEST(rot_boxes)
 {
-  run_test (_this, tl::testsrc (), "issue_305.cif", "issue_305_au.gds");
+  run_test (_this, tl::testdata (), "issue_305.cif", "issue_305_au.gds");
 }
 
 //  Issue #568
 TEST(rot_instances)
 {
-  run_test (_this, tl::testsrc (), "issue_568.cif", "issue_568_au.gds");
+  run_test (_this, tl::testdata (), "issue_568.cif", "issue_568_au.gds");
 }
 
 //  Issue #578
 TEST(rot_instances2)
 {
-  run_test (_this, tl::testsrc (), "issue_578.cif", "issue_578_au.gds");
+  run_test (_this, tl::testdata (), "issue_578.cif", "issue_578_au.gds");
 }

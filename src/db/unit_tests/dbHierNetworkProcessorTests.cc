@@ -987,8 +987,8 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/";
+    std::string fn (tl::testdata ());
+    fn += "/algo/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -1074,7 +1074,7 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/" + au_file);
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/" + au_file);
 }
 
 static void run_hc_test_with_backannotation (tl::TestBase *_this, const std::string &file, const std::string &au_file)
@@ -1120,8 +1120,8 @@ static void run_hc_test_with_backannotation (tl::TestBase *_this, const std::str
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/";
+    std::string fn (tl::testdata ());
+    fn += "/algo/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -1165,7 +1165,7 @@ static void run_hc_test_with_backannotation (tl::TestBase *_this, const std::str
   hc.return_to_hierarchy (ly, lm);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/" + au_file);
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/" + au_file);
 }
 
 TEST(101_HierClusters)
@@ -1323,8 +1323,8 @@ TEST(200_issue609)
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/issue-609.oas.gz";
+    std::string fn (tl::testdata ());
+    fn += "/algo/issue-609.oas.gz";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly, options);

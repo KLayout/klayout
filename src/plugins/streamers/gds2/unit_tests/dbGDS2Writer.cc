@@ -36,8 +36,8 @@ void run_test (tl::TestBase *_this, const char *file, const char *file_ref, bool
   db::Manager m (false);
   db::Layout layout_org (&m);
   {
-    std::string fn (priv ? tl::testsrc_private () : tl::testsrc ());
-    fn += "/testdata/gds/";
+    std::string fn (priv ? tl::testdata_private () : tl::testdata ());
+    fn += "/gds/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -64,8 +64,8 @@ void run_test (tl::TestBase *_this, const char *file, const char *file_ref, bool
 
   db::Layout layout_ref (&m);
   {
-    std::string fn (priv ? tl::testsrc_private () : tl::testsrc ());
-    fn += "/testdata/gds/";
+    std::string fn (priv ? tl::testdata_private () : tl::testdata ());
+    fn += "/gds/";
     fn += file_ref;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -134,8 +134,8 @@ TEST(3)
   db::Manager m (false);
   db::Layout layout_org (&m);
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/other/d1.oas.gz";
+    std::string fn (tl::testdata ());
+    fn += "/other/d1.oas.gz";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (layout_org);
@@ -193,8 +193,8 @@ TEST(4)
   db::Manager m (false);
   db::Layout layout_org (&m);
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/other/d1.oas.gz";
+    std::string fn (tl::testdata ());
+    fn += "/other/d1.oas.gz";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (layout_org);

@@ -230,8 +230,8 @@ static bool compare_vs_au (const tl::TestBase *tb, const db::Layout &layout, con
 {
   db::Layout layout_au;
 
-  std::string fn (tl::testsrc ());
-  fn += "/testdata/gds/";
+  std::string fn (tl::testdata ());
+  fn += "/gds/";
   fn += filename;
   tl::InputStream stream (fn);
   db::Reader reader (stream);

@@ -40,8 +40,8 @@ TEST(1_Basic)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -90,7 +90,7 @@ TEST(1_Basic)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au1.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au1.gds");
 
   //  some operations
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
@@ -117,8 +117,8 @@ TEST(2)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -152,15 +152,15 @@ TEST(2)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au2.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au2.gds");
 }
 
 TEST(3_BoolAndNot)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -229,7 +229,7 @@ TEST(3_BoolAndNot)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 0)), r42and42);
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au3.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au3.gds");
   }
 
   {
@@ -251,7 +251,7 @@ TEST(3_BoolAndNot)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 0)), tr42and42);
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au3b.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au3b.gds");
   }
 }
 
@@ -259,8 +259,8 @@ TEST(4_Add)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -305,7 +305,7 @@ TEST(4_Add)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), rnew42);
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au4a.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au4a.gds");
   }
 
   //  inter-layout
@@ -322,7 +322,7 @@ TEST(4_Add)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2 + box);
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au4b.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au4b.gds");
   }
 }
 
@@ -330,8 +330,8 @@ TEST(5_BoolXOR)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -371,15 +371,15 @@ TEST(5_BoolXOR)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), r42xor42);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au5.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au5.gds");
 }
 
 TEST(6_Reduction)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -422,15 +422,15 @@ TEST(6_Reduction)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), r42xor42);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au6.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au6.gds");
 }
 
 TEST(7_Merge)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -464,15 +464,15 @@ TEST(7_Merge)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), r6_merged_minwc);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au7.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au7.gds");
 }
 
 TEST(8_AreaAndPerimeter)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_area_peri_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -503,8 +503,8 @@ TEST(9_SizingSimple)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -539,15 +539,15 @@ TEST(9_SizingSimple)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r6_sized_aniso_plus);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au9a.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au9a.gds");
 }
 
 TEST(9_SizingWithScaleVariants)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_area_peri_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -578,15 +578,15 @@ TEST(9_SizingWithScaleVariants)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1b.merged ());
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au9b.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au9b.gds");
 }
 
 TEST(9_SizingWithScaleAndXYVariants)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_area_peri_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -619,7 +619,7 @@ TEST(9_SizingWithScaleAndXYVariants)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1b.merged ());
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au9c.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au9c.gds");
 
   //  merge back to original - this challenges the ability to map back the variants
 
@@ -627,15 +627,15 @@ TEST(9_SizingWithScaleAndXYVariants)
   ly.insert (top_cell_index, ly.get_layer (db::LayerProperties (12, 0)), r1_sized_aniso);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au9d.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_au9d.gds");
 }
 
 TEST(9_SizingWithBoolean)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_area_peri_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -665,15 +665,15 @@ TEST(9_SizingWithBoolean)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r1_sized_aniso);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au9e.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au9e.gds");
 }
 
 TEST(10_HullsAndHoles)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_area_peri_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -705,15 +705,15 @@ TEST(10_HullsAndHoles)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), holes);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au10.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au10.gds");
 }
 
 TEST(11_RoundAndSmoothed)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_area_peri_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -745,15 +745,15 @@ TEST(11_RoundAndSmoothed)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), smoothed_keep_hv);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au11.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au11.gds");
 }
 
 TEST(12_GridSnap)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -777,15 +777,15 @@ TEST(12_GridSnap)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r3snapped);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au12.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au12.gds");
 }
 
 TEST(13_Edges)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -813,15 +813,15 @@ TEST(13_Edges)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r3edges_filtered);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au13.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au13.gds");
 }
 
 TEST(13b_Edges)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_edges.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_edges.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -853,15 +853,15 @@ TEST(13b_Edges)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r2edges);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au13b.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au13b.gds");
 }
 
 TEST(14_Interacting)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -955,7 +955,7 @@ TEST(14_Interacting)
     EXPECT_EQ (r2r.selected_interacting (r1r).is_merged (), false);
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au14a.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au14a.gds");
   }
 
   db::Edges r1e = r1.edges ();
@@ -982,7 +982,7 @@ TEST(14_Interacting)
     EXPECT_EQ (r6r.selected_interacting (r1er).is_merged (), false);
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au14b.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au14b.gds");
   }
 }
 
@@ -990,8 +990,8 @@ TEST(15_Filtered)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_area_peri_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1021,7 +1021,7 @@ TEST(15_Filtered)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), af1_else);
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au15a.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au15a.gds");
   }
 
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
@@ -1041,7 +1041,7 @@ TEST(15_Filtered)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r2_bhf);
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au15b.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au15b.gds");
   }
 }
 
@@ -1049,8 +1049,8 @@ TEST(16_MergeWithMinWC)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_area_peri_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1081,7 +1081,7 @@ TEST(16_MergeWithMinWC)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r1_merged_wc2);
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au16.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au16.gds");
   }
 }
 
@@ -1089,8 +1089,8 @@ TEST(17_SinglePolygonChecks)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1123,7 +1123,7 @@ TEST(17_SinglePolygonChecks)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r6.notch_check (1300, db::RegionCheckOptions (false, db::Euclidian, 90, 0)));
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au17.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au17.gds");
   }
 }
 
@@ -1131,8 +1131,8 @@ TEST(18_MultiPolygonChecks)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1167,7 +1167,7 @@ TEST(18_MultiPolygonChecks)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r6.enclosing_check (r4, 100, db::RegionCheckOptions (true, db::Projection, 90, 0)));
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au18.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au18.gds");
   }
 }
 
@@ -1175,8 +1175,8 @@ TEST(19_GridCheck)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1203,15 +1203,15 @@ TEST(19_GridCheck)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r3_gc2);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au19.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au19.gds");
 }
 
 TEST(20_AngleCheck)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/angle_check_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/angle_check_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1236,15 +1236,15 @@ TEST(20_AngleCheck)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (3, 0)), ep1_ac2);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au20.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au20.gds");
 }
 
 TEST(21_Processors)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_area_peri_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1287,15 +1287,15 @@ TEST(21_Processors)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 0)), r1.processed (db::ConvexDecomposition (db::PO_horizontal)));
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au21.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au21.gds");
 }
 
 TEST(22_TwoLayoutsWithDifferentDBU)
 {
   db::Layout ly1;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_area_peri_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_area_peri_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly1);
@@ -1306,8 +1306,8 @@ TEST(22_TwoLayoutsWithDifferentDBU)
 
   db::Layout ly2;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_area_peri_l1_dbu2.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_area_peri_l1_dbu2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly2);
@@ -1330,15 +1330,15 @@ TEST(22_TwoLayoutsWithDifferentDBU)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r11.sized (1000) ^ r12);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au22.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au22.gds");
 }
 
 TEST(23_Texts)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1380,7 +1380,7 @@ TEST(23_Texts)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), rf8dots);
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au23.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au23.gds");
   }
 }
 
@@ -1388,8 +1388,8 @@ TEST(24_TextsFromDeep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1433,7 +1433,7 @@ TEST(24_TextsFromDeep)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), rf8dots);
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au24.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au24.gds");
   }
 }
 
@@ -1441,8 +1441,8 @@ TEST(25_Pull)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1505,7 +1505,7 @@ TEST(25_Pull)
     EXPECT_EQ (r2r.pull_interacting (r6r).is_merged (), false);
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au25a.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au25a.gds");
   }
 
   db::Edges r1e = r1.edges ();
@@ -1543,7 +1543,7 @@ TEST(25_Pull)
     EXPECT_EQ (r6.pull_interacting (r1er).is_merged (), false);
 
     CHECKPOINT();
-    db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au25b.gds");
+    db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au25b.gds");
   }
 }
 
@@ -1551,8 +1551,8 @@ TEST(26_BreakoutCells)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l26.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l26.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1582,15 +1582,15 @@ TEST(26_BreakoutCells)
   ly.insert (top_cell.cell_index (), ly.get_layer (db::LayerProperties (103, 0)), r2m1);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au26.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_au26.gds");
 }
 
 TEST(27a_snap)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/scale_and_snap.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/scale_and_snap.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1609,15 +1609,15 @@ TEST(27a_snap)
   r2.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au27.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_au27.gds");
 }
 
 TEST(27b_snap)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/scale_and_snap.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/scale_and_snap.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1636,15 +1636,15 @@ TEST(27b_snap)
   r1.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au27.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_au27.gds");
 }
 
 TEST(28a_snap)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/scale_and_snap.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/scale_and_snap.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1663,15 +1663,15 @@ TEST(28a_snap)
   r2.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au28.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_au28.gds");
 }
 
 TEST(28b_snap)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/scale_and_snap.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/scale_and_snap.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1690,15 +1690,15 @@ TEST(28b_snap)
   r1.insert_into (&ly, top_cell_index, ly.get_layer (db::LayerProperties (100, 0)));
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au28.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_au28.gds");
 }
 
 TEST(29_InteractionsWithTexts)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_texts_l2.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_texts_l2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -1743,7 +1743,7 @@ TEST(29_InteractionsWithTexts)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au29.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au29.gds");
 }
 
 TEST(30a_interact_with_count_region)
@@ -2022,8 +2022,8 @@ TEST(100_Integration)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/vexriscv_clocked_r.oas.gz";
+    std::string fn (tl::testdata ());
+    fn += "/algo/vexriscv_clocked_r.oas.gz";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -2101,15 +2101,15 @@ TEST(100_Integration)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (105, 0)), diff_cont);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au100.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au100.gds");
 }
 
 TEST(101_DeepFlatCollaboration)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/deep_region_l1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -2138,7 +2138,7 @@ TEST(101_DeepFlatCollaboration)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r2minus3f);
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au101.gds");
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au101.gds");
 }
 
 TEST(issue_277)
@@ -2173,8 +2173,8 @@ TEST(issue_400)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/gds/t10.gds";
+    std::string fn (tl::testdata ());
+    fn += "/gds/t10.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -2201,15 +2201,15 @@ TEST(issue_400)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au400a.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_au400a.gds");
 }
 
 TEST(issue_400_dont_keep_regions)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/gds/t10.gds";
+    std::string fn (tl::testdata ());
+    fn += "/gds/t10.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -2234,15 +2234,15 @@ TEST(issue_400_dont_keep_regions)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au400b.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_au400b.gds");
 }
 
 TEST(issue_400_with_region)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/gds/t10.gds";
+    std::string fn (tl::testdata ());
+    fn += "/gds/t10.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -2269,15 +2269,15 @@ TEST(issue_400_with_region)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au400c.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_au400c.gds");
 }
 
 TEST(issue_663_separation_from_inside)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/algo/issue-663.oas.gz";
+    std::string fn (tl::testdata ());
+    fn += "/algo/issue-663.oas.gz";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -2306,5 +2306,5 @@ TEST(issue_663_separation_from_inside)
   ep_deep.insert_into_as_polygons (&ly, top_cell_index, l11, 0);
 
   CHECKPOINT();
-  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/deep_region_au663.gds");
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_au663.gds");
 }

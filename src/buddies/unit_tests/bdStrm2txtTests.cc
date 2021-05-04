@@ -27,11 +27,11 @@ BD_PUBLIC int strm2txt (int argc, char *argv[]);
 
 TEST(1)
 {
-  std::string input = tl::testsrc ();
-  input += "/testdata/gds/t10.gds";
+  std::string input = tl::testdata ();
+  input += "/gds/t10.gds";
 
-  std::string au = tl::testsrc ();
-  au += "/testdata/bd/strm2txt_au.txt";
+  std::string au = tl::testdata ();
+  au += "/bd/strm2txt_au.txt";
 
   std::string output = this->tmp_file ();
 

@@ -38,8 +38,8 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
   {
     db::Manager m (false);
     db::Layout layout_org (&m);
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/oasis/";
+    std::string fn (tl::testdata ());
+    fn += "/oasis/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -83,8 +83,8 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
   {
     db::Manager m (false);
     db::Layout layout_org (&m);
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/oasis/";
+    std::string fn (tl::testdata ());
+    fn += "/oasis/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -139,8 +139,8 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
   {
     db::Manager m (false);
     db::Layout layout_org (&m);
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/oasis/";
+    std::string fn (tl::testdata ());
+    fn += "/oasis/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -188,8 +188,8 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
   {
     db::Manager m (false);
     db::Layout layout_org (&m);
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/oasis/";
+    std::string fn (tl::testdata ());
+    fn += "/oasis/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -239,8 +239,8 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
 
     db::Manager m (false);
     db::Layout layout (&m);
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/oasis/";
+    std::string fn (tl::testdata ());
+    fn += "/oasis/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -1740,8 +1740,8 @@ TEST(119_WithAndWithoutContext)
   //  Note: this sample requires the BASIC lib
 
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/oasis/pcell_test.gds";
+    std::string fn (tl::testdata ());
+    fn += "/oasis/pcell_test.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (g);
@@ -1772,7 +1772,7 @@ TEST(119_WithAndWithoutContext)
     EXPECT_EQ (text_cell.get_display_name (), "Basic.TEXT(l=1/0,'KLAYOUT RULES')");
 
     CHECKPOINT ();
-    db::compare_layouts (_this, gg, tl::testsrc () + "/testdata/oasis/dbOASISWriter119_au.gds", db::NoNormalization);
+    db::compare_layouts (_this, gg, tl::testdata () + "/oasis/dbOASISWriter119_au.gds", db::NoNormalization);
   }
 
   tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter119b.oas"));
@@ -1801,7 +1801,7 @@ TEST(119_WithAndWithoutContext)
     EXPECT_EQ (text_cell.get_display_name (), "TEXT");
 
     CHECKPOINT ();
-    db::compare_layouts (_this, gg, tl::testsrc () + "/testdata/oasis/dbOASISWriter119_au.gds", db::NoNormalization);
+    db::compare_layouts (_this, gg, tl::testdata () + "/oasis/dbOASISWriter119_au.gds", db::NoNormalization);
   }
 
 }

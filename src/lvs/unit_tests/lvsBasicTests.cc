@@ -27,13 +27,13 @@
 
 TEST(1)
 {
-  std::string input = tl::testsrc ();
-  input += "/testdata/lvs/inv.oas";
+  std::string input = tl::testdata ();
+  input += "/lvs/inv.oas";
   std::string schematic = "inv.cir";   //  relative to inv.oas
-  std::string au_cir = tl::testsrc ();
-  au_cir += "/testdata/lvs/inv_layout.cir";
-  std::string au_lvsdb = tl::testsrc ();
-  au_lvsdb += "/testdata/lvs/inv.lvsdb";
+  std::string au_cir = tl::testdata ();
+  au_cir += "/lvs/inv_layout.cir";
+  std::string au_lvsdb = tl::testdata ();
+  au_lvsdb += "/lvs/inv.lvsdb";
 
   std::string output_cir = this->tmp_file ("tmp.cir");
   std::string output_lvsdb = this->tmp_file ("tmp.lvsdb");
@@ -126,13 +126,13 @@ TEST(1)
 
 TEST(2)
 {
-  std::string input = tl::testsrc ();
-  input += "/testdata/lvs/inv2.oas";
+  std::string input = tl::testdata ();
+  input += "/lvs/inv2.oas";
   std::string schematic = "inv2.cir";   //  relative to inv2.oas
-  std::string au_cir = tl::testsrc ();
-  au_cir += "/testdata/lvs/inv2_layout.cir";
-  std::string au_lvsdb = tl::testsrc ();
-  au_lvsdb += "/testdata/lvs/inv2.lvsdb";
+  std::string au_cir = tl::testdata ();
+  au_cir += "/lvs/inv2_layout.cir";
+  std::string au_lvsdb = tl::testdata ();
+  au_lvsdb += "/lvs/inv2.lvsdb";
 
   std::string output_cir = this->tmp_file ("tmp.cir");
   std::string output_lvsdb = this->tmp_file ("tmp.lvsdb");

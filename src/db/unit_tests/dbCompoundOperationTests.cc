@@ -50,9 +50,9 @@ static void prep_layer (db::Layout &ly, int gds_layer, db::Region &r, db::DeepSh
 static std::string make_au (const std::string &num, bool deep)
 {
   if (deep) {
-    return tl::testsrc () + "/testdata/drc/compound_au" + num + "d.gds";
+    return tl::testdata () + "/drc/compound_au" + num + "d.gds";
   } else {
-    return tl::testsrc () + "/testdata/drc/compound_au" + num + ".gds";
+    return tl::testdata () + "/drc/compound_au" + num + ".gds";
   }
 }
 
@@ -60,8 +60,8 @@ void run_test1 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_1.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -125,8 +125,8 @@ void run_test2 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_2.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -179,8 +179,8 @@ void run_test3 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_3.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_3.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -226,8 +226,8 @@ void run_test4 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_4.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_4.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -273,8 +273,8 @@ void run_test5 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_5.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_5.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -316,8 +316,8 @@ void run_test6 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_6.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_6.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -361,8 +361,8 @@ void run_test7 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_7.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_7.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -405,8 +405,8 @@ void run_test8 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_8.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_8.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -450,8 +450,8 @@ void run_test9 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_9.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_9.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -516,8 +516,8 @@ void run_test10 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_10.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_10.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -592,8 +592,8 @@ void run_test11 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_11.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_11.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -642,8 +642,8 @@ void run_test12 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_12.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_12.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -717,8 +717,8 @@ void run_test13 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_13.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_13.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -761,8 +761,8 @@ void run_test14 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_14.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_14.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -818,8 +818,8 @@ void run_test15 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_15.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_15.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -873,8 +873,8 @@ void run_test16 (tl::TestBase *_this, bool deep)
 {
   db::Layout ly;
   {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/drc/compound_16.gds";
+    std::string fn (tl::testdata ());
+    fn += "/drc/compound_16.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);

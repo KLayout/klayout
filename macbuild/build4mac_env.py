@@ -49,8 +49,8 @@ Qt5MacPorts = { 'qmake' : '/opt/local/libexec/qt5/bin/qmake',
 # Qt5 from Homebrew (https://brew.sh/)
 #   install with 'brew install qt'
 # [Key Type Name] = 'Qt5Brew'
-Qt5Brew = { 'qmake' : '%s/opt/qt/bin/qmake' % DefaultHomebrewRoot,
-            'deploy': '%s/opt/qt/bin/macdeployqt' %DefaultHomebrewRoot
+Qt5Brew = { 'qmake' : '%s/opt/qt@5/bin/qmake' % DefaultHomebrewRoot,
+            'deploy': '%s/opt/qt@5/bin/macdeployqt' % DefaultHomebrewRoot
           }
 
 # Qt5 bundled with anaconda3 installed under /Applications/anaconda3/
@@ -156,7 +156,7 @@ Ruby27MacPorts  = { 'exe': '/opt/local/bin/ruby2.7',
 # Ruby 2.7 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
 #   install with 'brew install ruby'
 # [Key Type Name] = 'HB27'
-HBRuby27Path    = '%s/opt/ruby' % DefaultHomebrewRoot
+HBRuby27Path    = '%s/opt/ruby@2.7' % DefaultHomebrewRoot
 Ruby27Brew      = { 'exe': '%s/bin/ruby' % HBRuby27Path,
                     'inc': '%s/include/ruby-2.7.0' % HBRuby27Path,
                     'lib': '%s/lib/libruby.2.7.dylib' % HBRuby27Path

@@ -34,7 +34,7 @@ def Get_Default_Config():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'build4mac.py' >>\n"
-    Usage += "       for building KLayout 0.26.11 or later on different Apple Mac OSX platforms.\n"
+    Usage += "       for building KLayout 0.26.12 or later on different Apple Mac OSX / macOS platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./build4mac.py \n"
     Usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value\n"
@@ -55,11 +55,11 @@ def Get_Default_Config():
     Usage += "                        :    Sys: use OS-bundled Python 2.7 [ElCapitan -- BigSur]        | \n"
     Usage += "                        :   MP38: use Python 3.8 from MacPorts                           | \n"
     Usage += "                        :   HB38: use Python 3.8 from Homebrew                           | \n"
-    Usage += "                        :   Ana3: use Python 3.7 from Anaconda3                          | \n"
+    Usage += "                        :   Ana3: use Python 3.8 from Anaconda3                          | \n"
     Usage += "                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew  | \n"
     Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled \n"
     Usage += "   [-u|--noqtuitools]   : don't include uitools in Qt binding                            | disabled \n"
-    Usage += "   [-m|--make <option>] : option passed to 'make'                                        | '-j4' \n"
+    Usage += "   [-m|--make <option>] : option passed to 'make'                                        | '--jobs=4' \n"
     Usage += "   [-d|--debug]         : enable debug mode build                                        | disabled \n"
     Usage += "   [-c|--checkcom]      : check command-line and exit without building                   | disabled \n"
     Usage += "   [-y|--deploy]        : deploy executables and dylibs including Qt's Frameworks        | disabled \n"
@@ -107,10 +107,15 @@ def Get_Default_Config():
         sys.exit(1)
 
     if not Machine == "x86_64":
-        print("")
-        print( "!!! Sorry. Only x86_64 architecture machine is supported but found <%s>" % Machine, file=sys.stderr )
-        print(Usage)
-        sys.exit(1)
+        if Machine == "arm64" and Platform == "BigSur": # with an Apple Silicon Chip
+            print("")
+            print( "### Your Mac equips an Apple Silicon Chip ###" )
+            print("")
+        else:
+            print("")
+            print( "!!! Sorry. Only x86_64/arm64 architecture machine is supported but found <%s>" % Machine, file=sys.stderr )
+            print(Usage)
+            sys.exit(1)
 
     # Set the default modules
     ModuleQt = "Qt5MacPorts"
@@ -139,7 +144,7 @@ def Get_Default_Config():
     NonOSStdLang  = False
     NoQtBindings  = False
     NoQtUiTools   = False
-    MakeOptions   = "-j4"
+    MakeOptions   = "--jobs=4"
     DebugMode     = False
     CheckComOnly  = False
     DeploymentF   = False
@@ -279,7 +284,7 @@ def Parse_CLI_Args(config):
                     type_python    = "sys",
                     no_qt_binding  = False,
                     no_qt_uitools  = False,
-                    make_option    = "-j4",
+                    make_option    = "--jobs=4",
                     debug_build    = False,
                     check_command  = False,
                     deploy_full    = False,

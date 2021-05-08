@@ -901,6 +901,13 @@ struct reader<ObjectType>
 
       tl_assert (cls != 0);
       *out = tl::Variant ();
+
+      //  consider prefer_copy
+      if (! owner && atype.prefer_copy () && !clsact->is_managed () && clsact->can_copy ()) {
+        obj = clsact->clone (obj);
+        owner = true;
+      }
+
       out->set_user (obj, cls, owner);
 
     }

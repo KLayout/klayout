@@ -877,6 +877,36 @@ public:
     return res;
   }
 
+  void clear_macro_layout_files ()
+  {
+    m_macro_layout_files.clear ();
+  }
+
+  void push_macro_layout_file (const std::string &l)
+  {
+    m_macro_layout_files.push_back (l);
+  }
+
+  std::vector<std::string>::const_iterator begin_macro_layout_files () const
+  {
+    return m_macro_layout_files.begin ();
+  }
+
+  std::vector<std::string>::const_iterator end_macro_layout_files () const
+  {
+    return m_macro_layout_files.end ();
+  }
+
+  std::vector<std::string> macro_layout_files () const
+  {
+    return m_macro_layout_files;
+  }
+
+  void set_macro_layout_files (const std::vector<std::string> &lf)
+  {
+    m_macro_layout_files = lf;
+  }
+
 private:
   bool m_read_all_layers;
   db::LayerMap m_layer_map;
@@ -939,6 +969,7 @@ private:
   bool m_read_lef_with_def;
   std::vector<std::string> m_lef_files;
   tl::weak_collection<db::Layout> m_macro_layouts;
+  std::vector<std::string> m_macro_layout_files;
 };
 
 /**
@@ -1597,6 +1628,24 @@ private:
   db::LEFDEFReaderOptions m_options;
 
   const std::string &next ();
+};
+
+class DB_PLUGIN_PUBLIC LEFDEFReader
+  : public db::ReaderBase
+{
+public:
+  LEFDEFReader (tl::InputStream &s);
+
+  virtual const db::LayerMap &read (db::Layout &layout, const db::LoadLayoutOptions &options);
+  virtual const db::LayerMap &read (db::Layout &layout);
+
+  virtual const char *format () const;
+
+  const db::LayerMap &read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &options, bool import_lef);
+
+private:
+  tl::InputStream &m_stream;
+  db::LayerMap m_layer_map;
 };
 
 }

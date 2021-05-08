@@ -580,6 +580,7 @@ LEFDEFReaderOptions &LEFDEFReaderOptions::operator= (const LEFDEFReaderOptions &
     m_map_file = d.m_map_file;
     m_macro_resolution_mode = d.m_macro_resolution_mode;
     m_lef_files = d.m_lef_files;
+    m_macro_layout_files = d.m_macro_layout_files;
     m_read_lef_with_def = d.m_read_lef_with_def;
     set_macro_layouts (d.macro_layouts ());
   }

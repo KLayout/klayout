@@ -77,7 +77,7 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "--------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.26.1 or later on different Apple Mac OSX platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.26.12 or later on different Apple Mac OSX / macOS platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py \n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
@@ -89,8 +89,8 @@ def SetGlobals():
     Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
     Usage += "   [-b|--bundle <name>] : forcibly use this bundle name in the DMG                   | '' \n"
     Usage += "   [-s|--serial <num>]  : DMG serial number                                          | 1 \n"
-    Usage += "   <-u|--unsafe>        : Ignores a few checks (use with caution)                    | disabled \n"
-    Usage += "   <-t|--targetdmg>     : Specify output .dmg filename                               | chosen by script \n"
+    Usage += "   [-u|--unsafe]        : Ignores a few checks (use with caution)                    | disabled \n"
+    Usage += "   [-t|--targetdmg]     : Specify output .dmg filename                               | chosen by script \n"
     Usage += "   [-?|--?]             : print this usage and exit                                  | disabled \n"
     Usage += "-------------------------------------------------------------------------------------+------------------\n"
 
@@ -133,10 +133,15 @@ def SetGlobals():
         sys.exit(1)
 
     if not Machine == "x86_64":
-        print("")
-        print( "!!! Sorry. Only x86_64 architecture machine is supported but found <%s>" % Machine, file=sys.stderr )
-        print(Usage)
-        sys.exit(1)
+        if Machine == "arm64" and Platform == "BigSur": # with an Apple Silicon Chip
+            print("")
+            print( "### Your Mac equips an Apple Silicon Chip ###" )
+            print("")
+        else:
+            print("")
+            print( "!!! Sorry. Only x86_64/arm64 architecture machine is supported but found <%s>" % Machine, file=sys.stderr )
+            print(Usage)
+            sys.exit(1)
 
     PkgDir            = ""
     UnsafePkg         = False
@@ -358,6 +363,7 @@ def ParseCommandLineArguments():
     global KLVersion
     global OccupiedDS
     global TargetDMG
+    global Machine
 
     p = optparse.OptionParser( usage=Usage )
     p.add_option( '-p', '--pkg',
@@ -448,6 +454,8 @@ def ParseCommandLineArguments():
     else:
         TargetDMG = "%s-klayout-%s-%s-%s-%d-%s-%s.dmg" \
                         % (PackagePrefix, KLVersion, GenOSName, Platform, DMGSerialNum, QtIdentification, RubyPythonID)
+        if Machine == "arm64": # with an Apple Silicon Chip
+            TargetDMG = Machine + TargetDMG
     return
 
 #------------------------------------------------------------------------------

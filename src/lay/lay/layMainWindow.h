@@ -527,6 +527,11 @@ public:
   void open (int mode);
 
   /**
+   *  @brief Gets a format string with all registered layout formats
+   */
+  std::string all_layout_file_formats () const;
+
+  /**
    *  @brief An event indicating that the current view has changed
    *  This event is fired if the current view was changed.
    *  The current view's reference is updated if the event is issued.

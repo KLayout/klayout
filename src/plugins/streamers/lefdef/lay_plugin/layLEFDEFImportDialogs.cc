@@ -364,6 +364,10 @@ LEFDEFReaderOptionsEditor::LEFDEFReaderOptionsEditor (QWidget *parent)
   connect (del_lef_files, SIGNAL (clicked ()), this, SLOT (del_lef_files_clicked ()));
   connect (move_lef_files_up, SIGNAL (clicked ()), this, SLOT (move_lef_files_up_clicked ()));
   connect (move_lef_files_down, SIGNAL (clicked ()), this, SLOT (move_lef_files_down_clicked ()));
+  connect (add_macro_layout_file, SIGNAL (clicked ()), this, SLOT (add_macro_layout_file_clicked ()));
+  connect (del_macro_layout_files, SIGNAL (clicked ()), this, SLOT (del_macro_layout_files_clicked ()));
+  connect (move_macro_layout_files_up, SIGNAL (clicked ()), this, SLOT (move_macro_layout_files_up_clicked ()));
+  connect (move_macro_layout_files_down, SIGNAL (clicked ()), this, SLOT (move_macro_layout_files_down_clicked ()));
   connect (browse_mapfile, SIGNAL (clicked ()), this, SLOT (browse_mapfile_clicked ()));
 
   lay::activate_help_links (help_label);
@@ -521,6 +525,11 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   for (int i = 0; i < lef_files->count (); ++i) {
     data->push_lef_file (tl::to_string (lef_files->item (i)->text ()));
   }
+
+  data->clear_macro_layout_files ();
+  for (int i = 0; i < macro_layout_files->count (); ++i) {
+    data->push_macro_layout_file (tl::to_string (macro_layout_files->item (i)->text ()));
+  }
 }
 
 void 
@@ -597,6 +606,18 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   for (int i = 0; i < lef_files->count (); ++i) {
     lef_files->item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
   }
+
+  macro_layout_files->clear ();
+  for (std::vector <std::string>::const_iterator f = data->begin_macro_layout_files (); f != data->end_macro_layout_files (); ++f) {
+    if (mp_tech) {
+      macro_layout_files->addItem (tl::to_qstring (mp_tech->correct_path (*f)));
+    } else {
+      macro_layout_files->addItem (tl::to_qstring (*f));
+    }
+  }
+  for (int i = 0; i < macro_layout_files->count (); ++i) {
+    macro_layout_files->item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+  }
 }
 
 void  
@@ -657,114 +678,171 @@ LEFDEFReaderOptionsEditor::add_lef_file_clicked ()
   }
 
   QStringList files = QFileDialog::getOpenFileNames (this, tl::to_qstring (title), tl::to_qstring (dir), tl::to_qstring (filters));
-  for (QStringList::const_iterator f = files.begin (); f != files.end (); ++f) {
-    if (mp_tech) {
-      lef_files->addItem (tl::to_qstring (mp_tech->correct_path (tl::to_string (*f))));
-    } else {
-      lef_files->addItem (*f);
-    }
-  }
-  for (int i = 0; i < lef_files->count (); ++i) {
-    lef_files->item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
-  }
+  add_files (lef_files, files, mp_tech.get ());
 }
 
 void
 LEFDEFReaderOptionsEditor::del_lef_files_clicked ()
 {
-  QStringList files;
-  for (int i = 0; i < lef_files->count (); ++i) {
-    if (! lef_files->item (i)->isSelected ()) {
-      files.push_back (lef_files->item (i)->text ());
-    }
-  }
-
-  lef_files->clear ();
-  for (QStringList::const_iterator f = files.begin (); f != files.end (); ++f) {
-    lef_files->addItem (*f);
-  }
-  for (int i = 0; i < lef_files->count (); ++i) {
-    lef_files->item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
-  }
+  del_files (lef_files);
 }
 
 void
 LEFDEFReaderOptionsEditor::move_lef_files_up_clicked ()
 {
-  std::set<QString> selected;
-  for (int i = 0; i < lef_files->count (); ++i) {
-    if (lef_files->item (i)->isSelected ()) {
-      selected.insert (lef_files->item (i)->text ());
-    }
-  }
-
-  QStringList files;
-  int j = -1;
-  for (int i = 0; i < lef_files->count (); ++i) {
-    if (lef_files->item (i)->isSelected ()) {
-      files.push_back (lef_files->item (i)->text ());
-    } else {
-      if (j >= 0) {
-        files.push_back (lef_files->item (j)->text ());
-      }
-      j = i;
-    }
-  }
-  if (j >= 0) {
-    files.push_back (lef_files->item (j)->text ());
-  }
-
-  lef_files->clear ();
-  for (QStringList::const_iterator f = files.begin (); f != files.end (); ++f) {
-    lef_files->addItem (*f);
-    if (selected.find (*f) != selected.end ()) {
-      lef_files->item (lef_files->count () - 1)->setSelected (true);
-    }
-  }
-  for (int i = 0; i < lef_files->count (); ++i) {
-    lef_files->item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
-  }
+  move_files_up (lef_files);
 }
 
 void
 LEFDEFReaderOptionsEditor::move_lef_files_down_clicked ()
 {
+  move_files_down (lef_files);
+}
+
+void
+LEFDEFReaderOptionsEditor::add_macro_layout_file_clicked ()
+{
+  std::string title, filters;
+  title = tl::to_string (QObject::tr ("Add Macro Layout Files"));
+  filters = lay::MainWindow::instance ()->all_layout_file_formats ();
+
+  std::string dir;
+  if (mp_tech) {
+    dir = mp_tech->base_path ();
+  }
+
+  QStringList files = QFileDialog::getOpenFileNames (this, tl::to_qstring (title), tl::to_qstring (dir), tl::to_qstring (filters));
+  add_files (macro_layout_files, files, mp_tech.get ());
+}
+
+void
+LEFDEFReaderOptionsEditor::del_macro_layout_files_clicked ()
+{
+  del_files (macro_layout_files);
+}
+
+void
+LEFDEFReaderOptionsEditor::move_macro_layout_files_up_clicked ()
+{
+  move_files_up (macro_layout_files);
+}
+
+void
+LEFDEFReaderOptionsEditor::move_macro_layout_files_down_clicked ()
+{
+  move_files_down (macro_layout_files);
+}
+
+void
+LEFDEFReaderOptionsEditor::add_files (QListWidget *list, const QStringList &files, const db::Technology *tech)
+{
+  for (QStringList::const_iterator f = files.begin (); f != files.end (); ++f) {
+    if (tech) {
+      list->addItem (tl::to_qstring (tech->correct_path (tl::to_string (*f))));
+    } else {
+      list->addItem (*f);
+    }
+  }
+  for (int i = 0; i < list->count (); ++i) {
+    list->item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+  }
+}
+
+void
+LEFDEFReaderOptionsEditor::del_files (QListWidget *list)
+{
+  QStringList files;
+  for (int i = 0; i < list->count (); ++i) {
+    if (! list->item (i)->isSelected ()) {
+      files.push_back (list->item (i)->text ());
+    }
+  }
+
+  list->clear ();
+  for (QStringList::const_iterator f = files.begin (); f != files.end (); ++f) {
+    list->addItem (*f);
+  }
+  for (int i = 0; i < list->count (); ++i) {
+    list->item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+  }
+}
+
+void
+LEFDEFReaderOptionsEditor::move_files_up (QListWidget *list)
+{
   std::set<QString> selected;
-  for (int i = 0; i < lef_files->count (); ++i) {
-    if (lef_files->item (i)->isSelected ()) {
-      selected.insert (lef_files->item (i)->text ());
+  for (int i = 0; i < list->count (); ++i) {
+    if (list->item (i)->isSelected ()) {
+      selected.insert (list->item (i)->text ());
     }
   }
 
   QStringList files;
   int j = -1;
-  for (int i = lef_files->count (); i > 0; ) {
-    --i;
-    if (lef_files->item (i)->isSelected ()) {
-      files.push_back (lef_files->item (i)->text ());
+  for (int i = 0; i < list->count (); ++i) {
+    if (list->item (i)->isSelected ()) {
+      files.push_back (list->item (i)->text ());
     } else {
       if (j >= 0) {
-        files.push_back (lef_files->item (j)->text ());
+        files.push_back (list->item (j)->text ());
       }
       j = i;
     }
   }
   if (j >= 0) {
-    files.push_back (lef_files->item (j)->text ());
+    files.push_back (list->item (j)->text ());
   }
 
-  lef_files->clear ();
-  for (QStringList::const_iterator f = files.end (); f != files.begin (); ) {
-    --f;
-    lef_files->addItem (*f);
+  list->clear ();
+  for (QStringList::const_iterator f = files.begin (); f != files.end (); ++f) {
+    list->addItem (*f);
     if (selected.find (*f) != selected.end ()) {
-      lef_files->item (lef_files->count () - 1)->setSelected (true);
+      list->item (list->count () - 1)->setSelected (true);
     }
   }
-  for (int i = 0; i < lef_files->count (); ++i) {
-    lef_files->item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+  for (int i = 0; i < list->count (); ++i) {
+    list->item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+  }
+}
+
+void
+LEFDEFReaderOptionsEditor::move_files_down (QListWidget *list)
+{
+  std::set<QString> selected;
+  for (int i = 0; i < list->count (); ++i) {
+    if (list->item (i)->isSelected ()) {
+      selected.insert (list->item (i)->text ());
+    }
+  }
+
+  QStringList files;
+  int j = -1;
+  for (int i = list->count (); i > 0; ) {
+    --i;
+    if (list->item (i)->isSelected ()) {
+      files.push_back (list->item (i)->text ());
+    } else {
+      if (j >= 0) {
+        files.push_back (list->item (j)->text ());
+      }
+      j = i;
+    }
+  }
+  if (j >= 0) {
+    files.push_back (list->item (j)->text ());
+  }
+
+  list->clear ();
+  for (QStringList::const_iterator f = files.end (); f != files.begin (); ) {
+    --f;
+    list->addItem (*f);
+    if (selected.find (*f) != selected.end ()) {
+      list->item (list->count () - 1)->setSelected (true);
+    }
+  }
+  for (int i = 0; i < list->count (); ++i) {
+    list->item (i)->setFlags (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
   }
 }
 
 }
-

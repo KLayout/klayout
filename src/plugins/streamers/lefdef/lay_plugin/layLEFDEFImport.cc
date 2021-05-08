@@ -131,68 +131,15 @@ public:
         if (! db::Technologies::instance ()->has_technology (tech_name)) {
           tech_name.clear (); // use default technology
         }
+
+        db::LoadLayoutOptions options;
         const db::Technology *tech = db::Technologies::instance ()->technology_by_name (tech_name);
-        db::LEFDEFReaderOptions options;
         if (tech) {
-          const db::LEFDEFReaderOptions *tech_options = dynamic_cast<const db::LEFDEFReaderOptions *>(tech->load_layout_options ().get_options ("LEFDEF"));
-          if (tech_options) {
-            options = *tech_options;
-          }
+          options = tech->load_layout_options ();
         }
 
-        db::LEFDEFReaderState state (&options, *layout);
-        layout->dbu (options.dbu ());
-
-        if (import_lef) {
-
-          tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Reading LEF file")));
-
-          db::LEFImporter importer;
-
-          for (std::vector<std::string>::const_iterator l = options.begin_lef_files (); l != options.end_lef_files (); ++l) {
-            tl::InputStream lef_stream (*l);
-            tl::log << tl::to_string (QObject::tr ("Reading")) << " " << *l;
-            importer.read (lef_stream, *layout, state);
-          }
-
-          tl::log << tl::to_string (QObject::tr ("Reading")) << " " << data.file;
-          importer.read (stream, *layout, state);
-
-        } else {
-
-          tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Reading DEF file")));
-
-          db::DEFImporter importer;
-
-          QFileInfo def_fi (tl::to_qstring (data.file));
-
-          std::vector<std::string> lef_files;
-          lef_files.insert (lef_files.end (), options.begin_lef_files (), options.end_lef_files ());
-          lef_files.insert (lef_files.end (), data.lef_files.begin (), data.lef_files.end ());
-
-          for (std::vector<std::string>::const_iterator l = lef_files.begin (); l != lef_files.end (); ++l) {
-
-            QFileInfo fi (tl::to_qstring (*l));
-            if (fi.isAbsolute ()) {
-              tl::InputStream lef_stream (*l);
-              tl::log << tl::to_string (QObject::tr ("Reading")) << " " << *l;
-              importer.read_lef (lef_stream, *layout, state);
-            } else {
-              std::string ex_l = tl::to_string (def_fi.absoluteDir ().absoluteFilePath (tl::to_qstring (*l)));
-              tl::InputStream lef_stream (ex_l);
-              tl::log << tl::to_string (QObject::tr ("Reading")) << " " << *l;
-              importer.read_lef (lef_stream, *layout, state);
-            }
-
-          }
-
-          tl::log << tl::to_string (QObject::tr ("Reading")) << " " << data.file;
-
-          importer.read (stream, *layout, state);
-
-        }
-
-        state.finish (*layout);
+        db::LEFDEFReader reader (stream);
+        reader.read_lefdef (*layout, options, import_lef);
 
         lay::LayoutView *view = lay::LayoutView::current ();
         if (! view || data.mode == 1) {

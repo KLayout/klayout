@@ -119,7 +119,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "The setter is \\layer_map=. \\create_other_layers= is available to control whether layers "
     "not specified in the layer mapping table shall be created automatically."
   ) +
-  gsi::method ("layer_map=", &db::LEFDEFReaderOptions::set_layer_map,
+  gsi::method ("layer_map=", &db::LEFDEFReaderOptions::set_layer_map, gsi::arg ("m"),
     "@brief Sets the layer map to be used for the LEF/DEF reader\n"
     "See \\layer_map for details."
   ) +
@@ -127,7 +127,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "@brief Gets a value indicating whether layers not mapped in the layer map shall be created too\n"
     "See \\layer_map for details."
   ) +
-  gsi::method ("create_other_layers=", &db::LEFDEFReaderOptions::set_read_all_layers,
+  gsi::method ("create_other_layers=", &db::LEFDEFReaderOptions::set_read_all_layers, gsi::arg ("f"),
     "@brief Sets a value indicating whether layers not mapped in the layer map shall be created too\n"
     "See \\layer_map for details."
   ) +
@@ -216,7 +216,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "This string can be either a layer number, a layer/datatype pair, a name or a combination of both. See \\LayerInfo for details."
     "The setter for this attribute is \\placement_blockage_layer=. See also \\produce_placement_blockages."
   ) +
-  gsi::method ("placement_blockage_layer=", &db::LEFDEFReaderOptions::set_placement_blockage_layer,
+  gsi::method ("placement_blockage_layer=", &db::LEFDEFReaderOptions::set_placement_blockage_layer, gsi::arg ("layer"),
     "@brief Sets the layer on which to produce the placement blockage.\n"
     "See \\placement_blockage_layer for details.\n"
   ) +
@@ -240,7 +240,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n"
     "The attribute has been introduced in version 0.27."
   ) +
-  gsi::method ("region_layer=", &db::LEFDEFReaderOptions::set_region_layer,
+  gsi::method ("region_layer=", &db::LEFDEFReaderOptions::set_region_layer, gsi::arg ("layer"),
     "@brief Sets the layer on which to produce the regions.\n"
     "See \\region_layer for details.\n"
     "\n"
@@ -312,7 +312,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n\n"
     "Mask specific rules have been introduced in version 0.27."
   ) +
-  gsi::method ("via_geometry_datatype", &db::LEFDEFReaderOptions::via_geometry_datatype_per_mask,
+  gsi::method ("via_geometry_datatype", &db::LEFDEFReaderOptions::via_geometry_datatype_per_mask, gsi::arg ("mask"),
     "@brief Gets the via geometry layer datatype value per mask.\n"
     "See \\produce_via_geometry for details about this property.\n"
     "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
@@ -400,7 +400,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n\n"
     "Mask specific rules have been introduced in version 0.27."
   ) +
-  gsi::method ("pins_datatype", &db::LEFDEFReaderOptions::pins_datatype_per_mask,
+  gsi::method ("pins_datatype", &db::LEFDEFReaderOptions::pins_datatype_per_mask, gsi::arg ("mask"),
     "@brief Gets the pin geometry layer datatype value per mask.\n"
     "See \\produce_via_geometry for details about the layer production rules."
     "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
@@ -476,7 +476,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n\n"
     "Mask specific rules have been introduced in version 0.27."
   ) +
-  gsi::method ("lef_pins_datatype", &db::LEFDEFReaderOptions::lef_pins_datatype_per_mask,
+  gsi::method ("lef_pins_datatype", &db::LEFDEFReaderOptions::lef_pins_datatype_per_mask, gsi::arg ("mask"),
     "@brief Gets the LEF pin geometry layer datatype value per mask.\n"
     "See \\produce_via_geometry for details about the layer production rules."
     "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
@@ -564,7 +564,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n\n"
     "Mask specific rules have been introduced in version 0.27."
   ) +
-  gsi::method ("fills_datatype", &db::LEFDEFReaderOptions::fills_datatype_per_mask,
+  gsi::method ("fills_datatype", &db::LEFDEFReaderOptions::fills_datatype_per_mask, gsi::arg ("mask"),
     "@brief Gets the fill geometry layer datatype value per mask.\n"
     "See \\produce_via_geometry for details about the layer production rules."
     "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
@@ -712,7 +712,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n\n"
     "Mask specific rules have been introduced in version 0.27."
   ) +
-  gsi::method ("routing_datatype", &db::LEFDEFReaderOptions::routing_datatype_per_mask,
+  gsi::method ("routing_datatype", &db::LEFDEFReaderOptions::routing_datatype_per_mask, gsi::arg ("mask"),
     "@brief Gets the routing geometry layer datatype value per mask.\n"
     "See \\produce_via_geometry for details about the layer production rules."
     "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
@@ -800,7 +800,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n\n"
     "Mask specific rules have been introduced in version 0.27."
   ) +
-  gsi::method ("special_routing_datatype", &db::LEFDEFReaderOptions::special_routing_datatype_per_mask,
+  gsi::method ("special_routing_datatype", &db::LEFDEFReaderOptions::special_routing_datatype_per_mask, gsi::arg ("mask"),
     "@brief Gets the special routing geometry layer datatype value per mask.\n"
     "See \\produce_via_geometry for details about the layer production rules."
     "The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...)."
@@ -885,11 +885,13 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "LEF macros. The \\macro_resolution_mode controls whether to use LEF geometry. If LEF geometry is not "
     "used, the DEF reader will look up macro cells from the \\macro_layouts and pull cell layouts from there.\n"
     "\n"
-    "The LEF cells are looked up by name from the macro layouts in the order these are given in this array.\n"
+    "The LEF cells are looked up as cells by name from the macro layouts in the order these are given in this array.\n"
+    "\n"
+    "\\macro_layout_files is another way of specifying such substitution layouts. This method accepts file names instead of layout objects.\n"
     "\n"
     "This property has been added in version 0.27.\n"
   ) +
-  gsi::method ("macro_layouts=", &db::LEFDEFReaderOptions::set_macro_layouts,
+  gsi::method ("macro_layouts=", &db::LEFDEFReaderOptions::set_macro_layouts, gsi::arg ("layouts"),
     "@brief Sets the layout objects used for resolving LEF macros in the DEF reader.\n"
     "See \\macro_layouts for more details about this property.\n"
     "\n"
@@ -898,14 +900,33 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n"
     "This property has been added in version 0.27.\n"
   ) +
+  gsi::method ("macro_layout_files", &db::LEFDEFReaderOptions::macro_layout_files,
+    "@brief Gets the list of layout files to read for substituting macros in DEF\n"
+    "These files play the same role than the macro layouts (see \\macro_layouts), except that this property specifies a list of file names. "
+    "The given files are loaded automatically to resolve macro layouts instead of LEF geometry. See \\macro_resolution_mode for details when this happens. "
+    "Relative paths are resolved relative to the DEF file to read or relative to the technology base path.\n"
+    "Macros in need for substitution are looked up in the layout files by searching for cells with the same name. "
+    "The files are scanned in the order they are given in the file list.\n"
+    "The files from \\macro_layout_files are scanned after the layout objects specified with \\macro_layouts.\n"
+    "\n"
+    "The setter for this property is \\macro_layout_files=.\n"
+    "\n"
+    "This property has been added in version 0.27.1.\n"
+  ) +
+  gsi::method ("macro_layout_files=", &db::LEFDEFReaderOptions::set_macro_layout_files, gsi::arg ("file_paths"),
+    "@brief Sets the list of layout files to read for substituting macros in DEF\n"
+    "See \\macro_layout_files for details.\n"
+    "\n"
+    "This property has been added in version 0.27.1.\n"
+  ) +
   gsi::method ("lef_files", &db::LEFDEFReaderOptions::lef_files,
     "@brief Gets the list technology LEF files to additionally import\n"
     "Returns a list of path names for technology LEF files to read in addition to the primary file. "
-    "Relative paths are resolved relative to the file to read.\n"
+    "Relative paths are resolved relative to the file to read or relative to the technology base path.\n"
     "\n"
     "The setter for this property is \\lef_files=."
   ) +
-  gsi::method ("lef_files=", &db::LEFDEFReaderOptions::set_lef_files,
+  gsi::method ("lef_files=", &db::LEFDEFReaderOptions::set_lef_files, gsi::arg ("lef_file_paths"),
     "@brief Sets the list technology LEF files to additionally import\n"
     "See \\lef_files for details."
   ) +

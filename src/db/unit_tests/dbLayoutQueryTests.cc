@@ -1488,3 +1488,24 @@ TEST(63)
 
   EXPECT_EQ (g.under_construction (), false);
 }
+
+//  issue-787
+TEST(64)
+{
+  db::Layout g;
+  init_layout (g);
+
+  {
+    db::LayoutQuery q ("select inst.dtrans from instances of .*.*");
+    db::LayoutQueryIterator iq (q, &g);
+    std::string s = q2s_var (iq, "data");
+    EXPECT_EQ (s, "r0 0.01,-0.02,m45 -0.01,0.02,m45 -0.01,0.02,m45 -0.01,0.02,r0 0.01,-0.02,m45 -0.01,0.02");
+  }
+
+  {
+    db::LayoutQuery q ("select inst.dtrans.disp.x,inst.dtrans.disp.y from instances of .*.*");
+    db::LayoutQueryIterator iq (q, &g);
+    std::string s = q2s_var (iq, "data");
+    EXPECT_EQ (s, "0.01,-0.02,-0.01,0.02,-0.01,0.02,-0.01,0.02,0.01,-0.02,-0.01,0.02");
+  }
+}

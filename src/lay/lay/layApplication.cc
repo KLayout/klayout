@@ -1486,6 +1486,11 @@ GuiApplication::process_events_impl (QEventLoop::ProcessEventsFlags flags, bool 
 {
   if (mp_mw) {
 
+    //  prevent recursive process_events
+    if (mp_mw->is_busy ()) {
+      return;
+    }
+
     if (silent && tl::DeferredMethodScheduler::instance ()) {
       tl::DeferredMethodScheduler::instance ()->enable (false);
     }

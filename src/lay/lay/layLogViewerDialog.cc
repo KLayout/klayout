@@ -41,7 +41,7 @@ namespace lay
 //  LogReceiver implementation
 
 LogReceiver::LogReceiver (LogFile *file, int verbosity, void (LogFile::*method)(const std::string &, bool)) 
-    : mp_file (file), m_method (method), m_continued (false), m_verbosity (verbosity)
+    : mp_file (file), m_method (method), m_verbosity (verbosity)
 { 
   // .. nothing yet ..  
 }
@@ -64,7 +64,9 @@ LogReceiver::puts (const char *s)
       }
 
       if (*s == '\n') {
-        endl ();
+        QMutexLocker locker (&m_lock);
+        (mp_file->*m_method) (m_text, true);
+        m_text.clear ();
         ++s;
       }
 
@@ -78,9 +80,8 @@ LogReceiver::endl ()
 { 
   if (tl::verbosity () >= m_verbosity) {
     QMutexLocker locker (&m_lock);
-    (mp_file->*m_method) (m_text, m_continued);
+    (mp_file->*m_method) (m_text, false);
     m_text.clear ();
-    m_continued = true;
   }
 }
 
@@ -99,9 +100,7 @@ LogReceiver::end ()
 void 
 LogReceiver::begin () 
 { 
-  QMutexLocker locker (&m_lock);
-  m_continued = false;
-  m_text.clear ();
+  //  .. nothing yet ..
 }
 
 // -----------------------------------------------------------------

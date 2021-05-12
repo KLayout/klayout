@@ -254,6 +254,12 @@ LogFile::add (LogFileEntry::mode_type mode, const std::string &msg, bool continu
 void
 LogFile::yield ()
 {
+#if 0
+  //  This looked like a good idea, but in fact it introduces a hell lot of instability
+  //  as it potentially leads to a recursion of events inside innocent functions. Remember
+  //  that log output may be generated from every function called in response of an event
+  //  and not every such function may process further events
+
   bool can_yield = false;
 
   {
@@ -268,10 +274,10 @@ LogFile::yield ()
   //  use this opportunity to process events
   //  NOTE: as process events may trigger further log output, it's necessary to do process events outside any other
   //  method (e.g. add) which is subject to locking. Hence we avoid deadlocks.
-  //  We accept the risk of recursion inside process_events as we have a timeout before accepting new yield calls.
   if (can_yield) {
-    lay::ApplicationBase::instance ()->process_events (QEventLoop::AllEvents);
+    lay::ApplicationBase::instance ()->process_events (QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers, true /*silent*/);
   }
+#endif
 }
 
 int 

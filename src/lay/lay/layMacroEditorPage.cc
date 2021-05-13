@@ -929,7 +929,7 @@ void MacroEditorPage::set_font (const std::string &family, int size)
   if (! family.empty ()) {
     f.setFamily (tl::to_qstring (family));
   } else {
-    f.setFamily (QString::fromUtf8 ("Monospace"));
+    f.setFamily (lay::monospace_font ().family ());
   }
   f.setFixedPitch (true);
   if (size > 0) {

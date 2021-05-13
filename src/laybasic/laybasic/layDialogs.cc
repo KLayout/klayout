@@ -1062,7 +1062,7 @@ UserPropertiesForm::UserPropertiesForm (QWidget *parent)
   mp_ui = new Ui::UserPropertiesForm ();
   mp_ui->setupUi (this);
 
-  mp_ui->text_edit->setFont (QFont ("Monospace"));
+  mp_ui->text_edit->setFont (monospace_font ());
   mp_ui->text_edit->setAcceptRichText (false);
 
   connect (mp_ui->add_pb, SIGNAL (clicked ()), this, SLOT (add ()));

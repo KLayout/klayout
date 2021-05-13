@@ -22,6 +22,7 @@
 
 
 #include "layCrashMessage.h"
+#include "layQtTools.h"
 
 #include <QPushButton>
 
@@ -34,6 +35,7 @@ CrashMessage::CrashMessage (QWidget *parent, bool can_resume, const QString &t)
   setupUi (this);
   m_cancel_pressed = false;
 
+  text->setFont (monospace_font ());
   text->setPlainText (t);
   set_can_resume (can_resume);
 

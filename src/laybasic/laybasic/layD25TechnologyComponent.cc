@@ -24,6 +24,7 @@
 #include "laybasicConfig.h"
 #include "dbD25TechnologyComponent.h"
 #include "layD25TechnologyComponent.h"
+#include "layQtTools.h"
 
 #include <QResource>
 #include <QBuffer>
@@ -36,7 +37,9 @@ D25TechnologyComponentEditor::D25TechnologyComponentEditor (QWidget *parent)
 {
   setupUi (this);
 
-  //  TODO: activate_help_links (mp_ui->help_label);
+  src_te->setFont (monospace_font ());
+
+  activate_help_links (label);
 
   QResource res (tl::to_qstring (":/syntax/d25_text.xml"));
   QByteArray data ((const char *) res.data (), int (res.size ()));

@@ -40,6 +40,62 @@ namespace db
 
 // ------------------------------------------------------------------------------------------------------
 
+static const char *allowed_name_chars = "_.:,!+$/&\\#[]|<>";
+
+inline static int hex_num (char c)
+{
+  if (c >= '0' && c <= '9') {
+    return (int (c - '0'));
+  } else if (c >= 'a' && c <= 'f') {
+    return (int (c - 'f') + 10);
+  } else {
+    return -1;
+  }
+}
+
+static std::string unescape_name (const std::string &n)
+{
+  std::string nn;
+  nn.reserve (n.size ());
+
+  const char *cp = n.c_str ();
+  while (*cp) {
+
+    if (*cp == '\\' && cp[1]) {
+
+      if (tolower (cp[1]) == 'x') {
+
+        cp += 2;
+
+        char c = 0;
+        for (int i = 0; i < 2 && *cp; ++i) {
+          int n = hex_num (*cp);
+          if (n >= 0) {
+            ++cp;
+            c = c * 16 + char (n);
+          } else {
+            break;
+          }
+        }
+
+        nn += c;
+
+      } else {
+        ++cp;
+        nn += *cp++;
+      }
+
+    } else {
+      nn += *cp++;
+    }
+
+  }
+
+  return nn;
+}
+
+// ------------------------------------------------------------------------------------------------------
+
 NetlistSpiceReaderDelegate::NetlistSpiceReaderDelegate ()
 {
   //  .. nothing yet ..
@@ -60,9 +116,19 @@ void NetlistSpiceReaderDelegate::finish (db::Netlist * /*netlist*/)
   //  .. nothing yet ..
 }
 
+bool NetlistSpiceReaderDelegate::control_statement(const std::string & /*line*/)
+{
+  return false;
+}
+
 bool NetlistSpiceReaderDelegate::wants_subcircuit (const std::string & /*circuit_name*/)
 {
   return false;
+}
+
+std::string NetlistSpiceReaderDelegate::translate_net_name (const std::string &nn)
+{
+  return unescape_name (nn);
 }
 
 void NetlistSpiceReaderDelegate::error (const std::string &msg)
@@ -87,6 +153,270 @@ static db::DeviceClass *make_device_class (db::Circuit *circuit, const std::stri
   return cls;
 }
 
+static std::string parse_component (tl::Extractor &ex)
+{
+  const char *cp = ex.skip ();
+  const char *cp0 = cp;
+
+  char quote = 0;
+  unsigned int brackets = 0;
+
+  while (*cp) {
+    if (quote) {
+      if (*cp == quote) {
+        quote = 0;
+      } else if (*cp == '\\' && cp[1]) {
+        ++cp;
+      }
+    } else if ((isspace (*cp) || *cp == '=') && ! brackets) {
+      break;
+    } else if (*cp == '"' || *cp == '\'') {
+      quote = *cp;
+    } else if (*cp == '(') {
+      ++brackets;
+    } else if (*cp == ')') {
+      if (brackets > 0) {
+        --brackets;
+      }
+    }
+    ++cp;
+  }
+
+  ex = tl::Extractor (cp);
+  return std::string (cp0, cp - cp0);
+}
+
+void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, double> &pv)
+{
+  tl::Extractor ex (s.c_str ());
+  bool in_params = false;
+
+  while (! ex.at_end ()) {
+
+    if (ex.test_without_case ("params:")) {
+
+      in_params = true;
+
+    } else {
+
+      tl::Extractor ex0 = ex;
+      std::string n;
+
+      if (ex.try_read_word (n) && ex.test ("=")) {
+        //  a parameter. Note that parameter names are always made upper case.
+        pv.insert (std::make_pair (tl::to_upper_case (n), read_value (ex)));
+      } else {
+        ex = ex0;
+        if (in_params) {
+          ex.error (tl::to_string (tr ("Invalid syntax for parameter assignment - needs keyword followed by '='")));
+        }
+        strings.push_back (parse_component (ex));
+      }
+
+    }
+
+  }
+}
+
+double NetlistSpiceReaderDelegate::read_atomic_value (tl::Extractor &ex)
+{
+  if (ex.test ("(")) {
+
+    double v = read_dot_expr (ex);
+    ex.expect (")");
+    return v;
+
+  } else {
+
+    double v = 0.0;
+    ex.read (v);
+
+    double f = 1.0;
+    if (*ex == 't' || *ex == 'T') {
+      f = 1e12;
+    } else if (*ex == 'g' || *ex == 'G') {
+      f = 1e9;
+    } else if (*ex == 'k' || *ex == 'K') {
+      f = 1e3;
+    } else if (*ex == 'm' || *ex == 'M') {
+      f = 1e-3;
+      if (ex.test_without_case ("meg")) {
+        f = 1e6;
+      }
+    } else if (*ex == 'u' || *ex == 'U') {
+      f = 1e-6;
+    } else if (*ex == 'n' || *ex == 'N') {
+      f = 1e-9;
+    } else if (*ex == 'p' || *ex == 'P') {
+      f = 1e-12;
+    } else if (*ex == 'f' || *ex == 'F') {
+      f = 1e-15;
+    } else if (*ex == 'a' || *ex == 'A') {
+      f = 1e-18;
+    }
+    while (*ex && isalpha (*ex)) {
+      ++ex;
+    }
+
+    v *= f;
+    return v;
+
+  }
+}
+
+double NetlistSpiceReaderDelegate::read_bar_expr (tl::Extractor &ex)
+{
+  double v = read_atomic_value (ex);
+  while (true) {
+    if (ex.test ("+")) {
+      double vv = read_atomic_value (ex);
+      v += vv;
+    } else if (ex.test ("+")) {
+      double vv = read_atomic_value (ex);
+      v -= vv;
+    } else {
+      break;
+    }
+  }
+  return v;
+}
+
+double NetlistSpiceReaderDelegate::read_dot_expr (tl::Extractor &ex)
+{
+  double v = read_bar_expr (ex);
+  while (true) {
+    if (ex.test ("*")) {
+      double vv = read_bar_expr (ex);
+      v *= vv;
+    } else if (ex.test ("/")) {
+      double vv = read_bar_expr (ex);
+      v /= vv;
+    } else {
+      break;
+    }
+  }
+  return v;
+}
+
+double NetlistSpiceReaderDelegate::read_value (tl::Extractor &ex)
+{
+  return read_dot_expr (ex);
+}
+
+bool NetlistSpiceReaderDelegate::try_read_value (const std::string &s, double &value)
+{
+  tl::Extractor ve (s.c_str ());
+  double vv = 0;
+  if (ve.try_read (vv) || ve.test ("(")) {
+    ve = tl::Extractor (s.c_str ());
+    value = read_value (ve);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, double> &pv)
+{
+  parse_element_components (s, nn, pv);
+
+  //  interpret the parameters according to the code
+  if (element == "X") {
+
+    //  subcircuit call:
+    //  Xname n1 n2 ... nn circuit [params]
+
+    if (nn.empty ()) {
+      error (tl::to_string (tr ("No circuit name given for subcircuit call")));
+    }
+
+    model = nn.back ();
+    nn.pop_back ();
+
+  } else if (element == "R" || element == "C" || element == "L") {
+
+    //  resistor, cap, inductor: two-terminal devices with a value
+    //  Rname n1 n2 value
+    //  Rname n1 n2 n3 value
+    //  Rname n1 n2 value model [params]
+    //  Rname n1 n2 n3 value model [params]
+    //  Rname n1 n2 [params]
+    //  Rname n1 n2 model [params]
+    //  Rname n1 n2 n3 model [params]
+    //  NOTE: there is no "Rname n1 n2 n3 [params]"!
+    //  (same for C, L instead of R)
+
+    if (nn.size () < 2) {
+      error (tl::to_string (tr ("Not enough specs for a R, C or L device")));
+    }
+
+    std::map<std::string, double>::const_iterator rv = pv.find (element);
+    if (rv != pv.end ()) {
+
+      //  value given by parameter
+      value = rv->second;
+
+      if (nn.size () >= 3) {
+        //  Rname n1 n2 model [params]
+        //  Rname n1 n2 n3 model [params]
+        model = nn.back ();
+        nn.pop_back ();
+      }
+
+    } else if (nn.size () >= 3) {
+
+      if (try_read_value (nn.back (), value)) {
+
+        //  Rname n1 n2 value
+        //  Rname n1 n2 n3 value
+        nn.pop_back ();
+
+      } else {
+
+        //  Rname n1 n2 value model [params]
+        //  Rname n1 n2 n3 value model [params]
+        model = nn.back ();
+        nn.pop_back ();
+        if (! try_read_value (nn.back (), value)) {
+          error (tl::to_string (tr ("Can't find a value for a R, C or L device")));
+        } else {
+          nn.pop_back ();
+        }
+
+      }
+
+    }
+
+  } else {
+
+    //  others: n-terminal devices with a model (last node)
+
+    if (nn.empty ()) {
+      error (tl::sprintf (tl::to_string (tr ("No model name given for element '%s'")), element));
+    }
+
+    model = nn.back ();
+    nn.pop_back ();
+
+    if (element == "M") {
+      if (nn.size () != 4) {
+        error (tl::to_string (tr ("'M' element must have four nodes")));
+      }
+    } else if (element == "Q") {
+      if (nn.size () != 3 && nn.size () != 4) {
+        error (tl::to_string (tr ("'Q' element must have three or four nodes")));
+      }
+    } else if (element == "D") {
+      if (nn.size () != 2) {
+        error (tl::to_string (tr ("'D' element must have two nodes")));
+      }
+    }
+
+    //  TODO: other devices?
+
+  }
+}
+
 bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &pv)
 {
   std::map<std::string, double> params = pv;
@@ -106,15 +436,30 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
   if (element == "R") {
 
-    if (cls) {
-      if (! dynamic_cast<db::DeviceClassResistor *>(cls)) {
-        error (tl::sprintf (tl::to_string (tr ("Class %s not a resistor device class as required by 'R' element")), cn));
+    if (nets.size () == 2) {
+      if (cls) {
+        if (! dynamic_cast<db::DeviceClassResistor *>(cls)) {
+          error (tl::sprintf (tl::to_string (tr ("Class %s is not a resistor device class as required by 'R' element")), cn));
+        }
+      } else {
+        if (cn.empty ()) {
+          cn = "RES";
+        }
+        cls = make_device_class<db::DeviceClassResistor> (circuit, cn);
+      }
+    } else if (nets.size () == 3) {
+      if (cls) {
+        if (! dynamic_cast<db::DeviceClassResistorWithBulk *>(cls)) {
+          error (tl::sprintf (tl::to_string (tr ("Class %s is not a three-terminal resistor device class as required by 'R' element")), cn));
+        }
+      } else {
+        if (cn.empty ()) {
+          cn = "RES";
+        }
+        cls = make_device_class<db::DeviceClassResistorWithBulk> (circuit, cn);
       }
     } else {
-      if (cn.empty ()) {
-        cn = "RES";
-      }
-      cls = make_device_class<db::DeviceClassResistor> (circuit, cn);
+      error (tl::to_string (tr ("A 'R' element requires two or three nets")));
     }
 
     //  Apply multiplier
@@ -122,15 +467,19 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
   } else if (element == "L") {
 
-    if (cls) {
-      if (! dynamic_cast<db::DeviceClassInductor *>(cls)) {
-        error (tl::sprintf (tl::to_string (tr ("Class %s not a inductor device class as required by 'L' element")), cn));
+    if (nets.size () == 2) {
+      if (cls) {
+        if (! dynamic_cast<db::DeviceClassInductor *>(cls)) {
+          error (tl::sprintf (tl::to_string (tr ("Class %s is not a inductor device class as required by 'L' element")), cn));
+        }
+      } else {
+        if (cn.empty ()) {
+          cn = "IND";
+        }
+        cls = make_device_class<db::DeviceClassInductor> (circuit, cn);
       }
     } else {
-      if (cn.empty ()) {
-        cn = "IND";
-      }
-      cls = make_device_class<db::DeviceClassInductor> (circuit, cn);
+      error (tl::to_string (tr ("A 'L' element requires two nets")));
     }
 
     //  Apply multiplier
@@ -138,15 +487,30 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
   } else if (element == "C") {
 
-    if (cls) {
-      if (! dynamic_cast<db::DeviceClassCapacitor *>(cls)) {
-        error (tl::sprintf (tl::to_string (tr ("Class %s not a capacitor device class as required by 'C' element")), cn));
+    if (nets.size () == 2) {
+      if (cls) {
+        if (! dynamic_cast<db::DeviceClassCapacitor *>(cls)) {
+          error (tl::sprintf (tl::to_string (tr ("Class %s is not a capacitor device class as required by 'C' element")), cn));
+        }
+      } else {
+        if (cn.empty ()) {
+          cn = "CAP";
+        }
+        cls = make_device_class<db::DeviceClassCapacitor> (circuit, cn);
+      }
+    } else if (nets.size () == 3) {
+      if (cls) {
+        if (! dynamic_cast<db::DeviceClassCapacitorWithBulk *>(cls)) {
+          error (tl::sprintf (tl::to_string (tr ("Class %s is not a three-terminal capacitor device class as required by 'C' element")), cn));
+        }
+      } else {
+        if (cn.empty ()) {
+          cn = "CAP";
+        }
+        cls = make_device_class<db::DeviceClassCapacitorWithBulk> (circuit, cn);
       }
     } else {
-      if (cn.empty ()) {
-        cn = "CAP";
-      }
-      cls = make_device_class<db::DeviceClassCapacitor> (circuit, cn);
+      error (tl::to_string (tr ("A 'C' element requires two or three nets")));
     }
 
     //  Apply multiplier
@@ -156,7 +520,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
     if (cls) {
       if (! dynamic_cast<db::DeviceClassDiode *>(cls)) {
-        error (tl::sprintf (tl::to_string (tr ("Class %s not a diode device class as required by 'D' element")), cn));
+        error (tl::sprintf (tl::to_string (tr ("Class %s is not a diode device class as required by 'D' element")), cn));
       }
     } else {
       if (cn.empty ()) {
@@ -179,11 +543,11 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     } else if (cls) {
       if (nets.size () == 3) {
         if (! dynamic_cast<db::DeviceClassBJT3Transistor *>(cls)) {
-          error (tl::sprintf (tl::to_string (tr ("Class %s not a 3-terminal BJT device class as required by 'Q' element")), cn));
+          error (tl::sprintf (tl::to_string (tr ("Class %s is not a 3-terminal BJT device class as required by 'Q' element")), cn));
         }
       } else {
         if (! dynamic_cast<db::DeviceClassBJT4Transistor *>(cls)) {
-          error (tl::sprintf (tl::to_string (tr ("Class %s not a 4-terminal BJT device class as required by 'Q' element")), cn));
+          error (tl::sprintf (tl::to_string (tr ("Class %s is not a 4-terminal BJT device class as required by 'Q' element")), cn));
         }
       }
     } else {
@@ -211,7 +575,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
     if (cls) {
       if (! dynamic_cast<db::DeviceClassMOS4Transistor *>(cls)) {
-        error (tl::sprintf (tl::to_string (tr ("Class %s not a 4-terminal MOS device class as required by 'M' element")), cn));
+        error (tl::sprintf (tl::to_string (tr ("Class %s is not a 4-terminal MOS device class as required by 'M' element")), cn));
       }
     } else {
       if (nets.size () == 4) {
@@ -270,8 +634,6 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 }
 
 // ------------------------------------------------------------------------------------------------------
-
-static const char *allowed_name_chars = "_.:,!+$/&\\#[]|<>";
 
 NetlistSpiceReader::NetlistSpiceReader (NetlistSpiceReaderDelegate *delegate)
   : mp_netlist (0), mp_stream (), mp_delegate (delegate)
@@ -450,7 +812,8 @@ std::string NetlistSpiceReader::get_line ()
     tl::Extractor ex (l.c_str ());
     if (ex.test_without_case (".include") || ex.test_without_case (".inc")) {
 
-      std::string path = read_name_with_case (ex);
+      std::string path;
+      ex.read_word_or_quoted (path, allowed_name_chars);
 
       push_stream (path);
 
@@ -504,7 +867,7 @@ bool NetlistSpiceReader::read_card ()
     } else if (ex.test_without_case ("global")) {
 
       while (! ex.at_end ()) {
-        std::string n = read_name (ex);
+        std::string n = mp_delegate->translate_net_name (read_name (ex));
         if (m_global_net_names.find (n) == m_global_net_names.end ()) {
           m_global_nets.push_back (n);
           m_global_net_names.insert (n);
@@ -528,7 +891,7 @@ bool NetlistSpiceReader::read_card ()
 
       //  ignore end statements
 
-    } else {
+    } else if (! mp_delegate->control_statement (l)) {
 
       std::string s;
       ex.read_word (s);
@@ -551,8 +914,6 @@ bool NetlistSpiceReader::read_card ()
       warn (tl::sprintf (tl::to_string (tr ("Element type '%c' ignored")), next_char));
     }
 
-    ex.expect_end ();
-
   } else {
     warn (tl::to_string (tr ("Line ignored")));
   }
@@ -569,91 +930,6 @@ void NetlistSpiceReader::warn (const std::string &msg)
 {
   std::string fmt_msg = tl::sprintf ("%s in %s, line %d", msg, mp_stream->source (), mp_stream->line_number () - 1);
   tl::warn << fmt_msg;
-}
-
-double NetlistSpiceReader::read_atomic_value (tl::Extractor &ex)
-{
-  if (ex.test ("(")) {
-
-    double v = read_dot_expr (ex);
-    ex.expect (")");
-    return v;
-
-  } else {
-
-    double v = 0.0;
-    ex.read (v);
-
-    double f = 1.0;
-    if (*ex == 't' || *ex == 'T') {
-      f = 1e12;
-    } else if (*ex == 'g' || *ex == 'G') {
-      f = 1e9;
-    } else if (*ex == 'k' || *ex == 'K') {
-      f = 1e3;
-    } else if (*ex == 'm' || *ex == 'M') {
-      f = 1e-3;
-      if (ex.test_without_case ("meg")) {
-        f = 1e6;
-      }
-    } else if (*ex == 'u' || *ex == 'U') {
-      f = 1e-6;
-    } else if (*ex == 'n' || *ex == 'N') {
-      f = 1e-9;
-    } else if (*ex == 'p' || *ex == 'P') {
-      f = 1e-12;
-    } else if (*ex == 'f' || *ex == 'F') {
-      f = 1e-15;
-    } else if (*ex == 'a' || *ex == 'A') {
-      f = 1e-18;
-    }
-    while (*ex && isalpha (*ex)) {
-      ++ex;
-    }
-
-    v *= f;
-    return v;
-
-  }
-}
-
-double NetlistSpiceReader::read_bar_expr (tl::Extractor &ex)
-{
-  double v = read_atomic_value (ex);
-  while (true) {
-    if (ex.test ("+")) {
-      double vv = read_atomic_value (ex);
-      v += vv;
-    } else if (ex.test ("+")) {
-      double vv = read_atomic_value (ex);
-      v -= vv;
-    } else {
-      break;
-    }
-  }
-  return v;
-}
-
-double NetlistSpiceReader::read_dot_expr (tl::Extractor &ex)
-{
-  double v = read_atomic_value (ex);
-  while (true) {
-    if (ex.test ("*")) {
-      double vv = read_atomic_value (ex);
-      v *= vv;
-    } else if (ex.test ("/")) {
-      double vv = read_atomic_value (ex);
-      v /= vv;
-    } else {
-      break;
-    }
-  }
-  return v;
-}
-
-double NetlistSpiceReader::read_value (tl::Extractor &ex)
-{
-  return read_dot_expr (ex);
 }
 
 void NetlistSpiceReader::ensure_circuit ()
@@ -693,92 +969,11 @@ db::Net *NetlistSpiceReader::make_net (const std::string &name)
   return net;
 }
 
-void NetlistSpiceReader::read_pin_and_parameters (tl::Extractor &ex, std::vector<std::string> &nn, std::map<std::string, double> &pv)
-{
-  bool in_params = false;
-
-  while (! ex.at_end ()) {
-
-    if (ex.test_without_case ("params:")) {
-
-      in_params = true;
-
-    } else {
-
-      std::string n = read_name (ex);
-
-      if (ex.test ("=")) {
-        //  a parameter
-        pv.insert (std::make_pair (n, read_value (ex)));
-      } else {
-        if (in_params) {
-          error (tl::to_string (tr ("Missing '=' in parameter assignment")));
-        }
-        nn.push_back (n);
-      }
-
-    }
-
-  }
-}
-
-inline static int hex_num (char c)
-{
-  if (c >= '0' && c <= '9') {
-    return (int (c - '0'));
-  } else if (c >= 'a' && c <= 'f') {
-    return (int (c - 'f') + 10);
-  } else {
-    return -1;
-  }
-}
-
-std::string NetlistSpiceReader::read_name_with_case (tl::Extractor &ex)
+std::string NetlistSpiceReader::read_name (tl::Extractor &ex)
 {
   std::string n;
   ex.read_word_or_quoted (n, allowed_name_chars);
-
-  std::string nn;
-  nn.reserve (n.size ());
-  const char *cp = n.c_str ();
-  while (*cp) {
-
-    if (*cp == '\\' && cp[1]) {
-
-      if (tolower (cp[1]) == 'x') {
-
-        cp += 2;
-
-        char c = 0;
-        for (int i = 0; i < 2 && *cp; ++i) {
-          int n = hex_num (*cp);
-          if (n >= 0) {
-            ++cp;
-            c = c * 16 + char (n);
-          } else {
-            break;
-          }
-        }
-
-        nn += c;
-
-      } else {
-        ++cp;
-        nn += *cp++;
-      }
-
-    } else {
-      nn += *cp++;
-    }
-
-  }
-
-  return nn;
-}
-
-std::string NetlistSpiceReader::read_name (tl::Extractor &ex)
-{
-  return mp_netlist->normalize_name (read_name_with_case (ex));
+  return mp_netlist->normalize_name (n);
 }
 
 bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &element, const std::string &name)
@@ -786,99 +981,16 @@ bool NetlistSpiceReader::read_element (tl::Extractor &ex, const std::string &ele
   //  generic parse
   std::vector<std::string> nn;
   std::map<std::string, double> pv;
-
   std::string model;
   double value = 0.0;
 
-  //  interpret the parameters according to the code
-  if (element == "X") {
+  mp_delegate->parse_element (ex.skip (), element, model, value, nn, pv);
 
-    //  subcircuit call:
-    //  Xname n1 n2 ... nn circuit [params]
-
-    read_pin_and_parameters (ex, nn, pv);
-
-    if (nn.empty ()) {
-      error (tl::to_string (tr ("No circuit name given for subcircuit call")));
-    }
-
-    model = nn.back ();
-    nn.pop_back ();
-
-  } else if (element == "R" || element == "C" || element == "L") {
-
-    //  resistor, cap, inductor: two-terminal devices with a value
-    //  Rname n1 n2 value
-    //  Rname n1 n2 value model [params]
-    //  Rname n1 n2 model [params]
-    //  (same for C, L instead of R)
-
-    while (! ex.at_end () && nn.size () < 2) {
-      nn.push_back (read_name (ex));
-    }
-
-    if (nn.size () != 2) {
-      error (tl::to_string (tr ("Two-terminal device needs two nets")));
-    }
-
-    tl::Extractor ve (ex);
-    double vv = 0.0;
-    if (ve.try_read (vv) || ve.test ("(")) {
-      value = read_value (ex);
-    }
-
-    while (! ex.at_end ()) {
-      std::string n = read_name (ex);
-      if (ex.test ("=")) {
-        pv [n] = read_value (ex);
-      } else if (! model.empty ()) {
-        error (tl::sprintf (tl::to_string (tr ("Too many arguments for two-terminal device (additional argumen is '%s')")), n));
-      } else {
-        model = n;
-      }
-    }
-
-  } else {
-
-    //  others: n-terminal devices with a model (last node)
-
-    while (! ex.at_end ()) {
-      std::string n = read_name (ex);
-      if (ex.test ("=")) {
-        pv [n] = read_value (ex);
-      } else {
-        nn.push_back (n);
-      }
-    }
-
-    if (nn.empty ()) {
-      error (tl::sprintf (tl::to_string (tr ("No model name given for element '%s'")), element));
-    }
-
-    model = nn.back ();
-    nn.pop_back ();
-
-    if (element == "M") {
-      if (nn.size () != 4) {
-        error (tl::to_string (tr ("'M' element must have four nodes")));
-      }
-    } else if (element == "Q") {
-      if (nn.size () != 3 && nn.size () != 4) {
-        error (tl::to_string (tr ("'Q' element must have three or four nodes")));
-      }
-    } else if (element == "D") {
-      if (nn.size () != 2) {
-        error (tl::to_string (tr ("'D' element must have two nodes")));
-      }
-    }
-
-    //  TODO: other devices?
-
-  }
+  model = mp_netlist->normalize_name (model);
 
   std::vector<db::Net *> nets;
   for (std::vector<std::string>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
-    nets.push_back (make_net (*i));
+    nets.push_back (make_net (mp_delegate->translate_net_name (mp_netlist->normalize_name (*i))));
   }
 
   if (element == "X" && ! subcircuit_captured (model)) {
@@ -946,7 +1058,11 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex, const std::string &nc)
 {
   std::vector<std::string> nn;
   std::map<std::string, double> pv;
-  read_pin_and_parameters (ex, nn, pv);
+  mp_delegate->parse_element_components (ex.skip (), nn, pv);
+
+  for (std::vector<std::string>::iterator i = nn.begin (); i != nn.end (); ++i) {
+    *i = mp_delegate->translate_net_name (mp_netlist->normalize_name (*i));
+  }
 
   if (! pv.empty ()) {
     warn (tl::to_string (tr ("Circuit parameters are not allowed currently")));
@@ -999,8 +1115,6 @@ void NetlistSpiceReader::read_circuit (tl::Extractor &ex, const std::string &nc)
 
   mp_nets_by_name.reset (n2n.release ());
   std::swap (cc, mp_circuit);
-
-  ex.expect_end ();
 }
 
 }

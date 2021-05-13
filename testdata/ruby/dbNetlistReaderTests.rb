@@ -74,6 +74,34 @@ class MyNetlistSpiceReaderDelegate < RBA::NetlistSpiceReaderDelegate
 
 end
 
+class MyNetlistSpiceReaderDelegate2 < MyNetlistSpiceReaderDelegate
+
+  def start(netlist)
+    netlist.description = "Read by MyDelegate2"
+  end
+
+  def finish(netlist)
+    netlist.description = "Read by MyDelegate2 (sucessfully)"
+  end
+
+  alias translate_net_name_org translate_net_name
+
+  def translate_net_name(n)
+    return n == "VDD" ? "VXX" : translate_net_name_org(n)
+  end
+
+  alias parse_element_org parse_element
+
+  def parse_element(s, element)
+    data = parse_element_org(s, element)
+    if element == "R"
+      data.model_name = "WIDERSTAND"
+    end
+    data
+  end
+
+end
+
 class DBNetlistReaderTests_TestClass < TestBase
 
   def test_1_Basic
@@ -107,6 +135,37 @@ END
 
   end
 
+  def test_1b_Basic
+
+    nl = RBA::Netlist::new
+
+    input = File.join($ut_testsrc, "testdata", "algo", "nreader6.cir")
+
+    mydelegate = MyNetlistSpiceReaderDelegate2::new
+    reader = RBA::NetlistSpiceReader::new(mydelegate)
+    # the delegate is kept by the SPICE writer ..
+    mydelegate = nil
+    GC.start
+    nl.read(input, reader)
+
+    assert_equal(nl.description, "Read by MyDelegate2 (sucessfully)")
+
+    assert_equal(nl.to_s, <<"END")
+circuit SUBCKT ($1=$1,A=A,VXX=VXX,Z=Z,GND=GND,GND$1=GND$1);
+  device HVPMOS $1 (S=VXX,G=$3,D=Z,B=$1) (L=0.3,W=1.5,AS=0.27,AD=0.27,PS=3.24,PD=3.24);
+  device HVPMOS $2 (S=VXX,G=A,D=$3,B=$1) (L=0.3,W=1.5,AS=0.27,AD=0.27,PS=3.24,PD=3.24);
+  device HVNMOS $3 (S=GND,G=$3,D=GND,B=GND$1) (L=1.695,W=3.18,AS=0,AD=0,PS=9,PD=9);
+  device HVNMOS $4 (S=GND,G=$3,D=Z,B=GND$1) (L=0.6,W=0.6,AS=0.285,AD=0.285,PS=1.74,PD=1.74);
+  device HVNMOS $5 (S=GND,G=A,D=$3,B=GND$1) (L=0.6,W=0.6,AS=0.285,AD=0.285,PS=2.64,PD=2.64);
+  device WIDERSTAND $1 (A=A,B=Z) (R=100000,L=0,W=0,A=0,P=0);
+end;
+circuit .TOP ();
+  subcircuit SUBCKT SUBCKT ($1=IN,A=OUT,VXX=VXX,Z=Z,GND=VSS,GND$1=VSS);
+end;
+END
+
+  end
+
   def test_2_WithError
 
     nl = RBA::Netlist::new
@@ -133,6 +192,50 @@ END
     assert_equal(msg.sub(input, "<INPUT>"), "Nothing implemented in <INPUT>, line 22 in Netlist::read")
 
     assert_equal(nl.description, "Read by MyDelegate")
+
+  end
+
+  def test_3_delegateHelpers
+
+    dg = RBA::NetlistSpiceReaderDelegate::new
+    assert_equal(dg.value_from_string("xy").inspect, "nil")
+    assert_equal(dg.value_from_string("17.5").inspect, "17.5")
+    assert_equal(dg.value_from_string("1k").inspect, "1000.0")
+    assert_equal(dg.value_from_string("1pF*2.5").inspect, "2.5e-12")
+    assert_equal(dg.value_from_string("(1+3)*2").inspect, "8.0")
+
+  end
+
+  def test_4_ParseElementData
+
+    pd = RBA::ParseElementData::new
+    pd.model_name = "a"
+    assert_equal(pd.model_name, "a")
+    pd.value = 42
+    assert_equal(pd.value, 42)
+    pd.net_names = [ "x", "y", "z" ]
+    assert_equal(pd.net_names.join(","), "x,y,z")
+    pd.parameters = { "A" => 17.5, "B" => 1 }
+    assert_equal(pd.parameters.inspect, "{\"A\"=>17.5, \"B\"=>1.0}")
+
+  end
+
+  def test_5_ParseElementComponentsData
+
+    pd = RBA::ParseElementComponentsData::new
+    pd.strings = [ "x", "y", "z" ]
+    assert_equal(pd.strings.join(","), "x,y,z")
+    pd.parameters = { "A" => 17.5, "B" => 1 }
+    assert_equal(pd.parameters.inspect, "{\"A\"=>17.5, \"B\"=>1.0}")
+
+  end
+
+  def test_6_delegateHelpers2
+
+    dg = RBA::NetlistSpiceReaderDelegate::new
+    pd = dg.parse_element_components("17 5 1e-9 a=17 b=1k")
+    assert_equal(pd.strings.join(","), "17,5,1e-9")
+    assert_equal(pd.parameters.inspect, "{\"A\"=>17.0, \"B\"=>1000.0}")
 
   end
 

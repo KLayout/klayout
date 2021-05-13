@@ -409,6 +409,14 @@ public:
   }
 
   /**
+   *  @brief Returns true if the application is busy
+   */
+  bool is_busy () const
+  {
+    return m_busy;
+  }
+
+  /**
    *  @brief Enable synchronous mode or disable it
    *
    *  In synchronous mode, the program waits until the drawing has finished.

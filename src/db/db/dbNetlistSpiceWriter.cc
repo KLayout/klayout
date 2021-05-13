@@ -94,8 +94,10 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
 {
   const db::DeviceClass *dc = dev.device_class ();
   const db::DeviceClassCapacitor *cap = dynamic_cast<const db::DeviceClassCapacitor *> (dc);
+  const db::DeviceClassCapacitor *cap3 = dynamic_cast<const db::DeviceClassCapacitorWithBulk *> (dc);
   const db::DeviceClassInductor *ind = dynamic_cast<const db::DeviceClassInductor *> (dc);
   const db::DeviceClassResistor *res = dynamic_cast<const db::DeviceClassResistor *> (dc);
+  const db::DeviceClassResistor *res3 = dynamic_cast<const db::DeviceClassResistorWithBulk *> (dc);
   const db::DeviceClassDiode *diode = dynamic_cast<const db::DeviceClassDiode *> (dc);
   const db::DeviceClassMOS3Transistor *mos3 = dynamic_cast<const db::DeviceClassMOS3Transistor *> (dc);
   const db::DeviceClassMOS4Transistor *mos4 = dynamic_cast<const db::DeviceClassMOS4Transistor *> (dc);
@@ -104,13 +106,17 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
 
   std::ostringstream os;
 
-  if (cap) {
+  if (cap || cap3) {
 
     os << "C";
     os << format_name (dev.expanded_name ());
-    os << format_terminals (dev, size_t (2));
+    os << format_terminals (dev, size_t (3));
     os << " ";
     os << tl::sprintf ("%.12g", dev.parameter_value (db::DeviceClassCapacitor::param_id_C));
+    if (! dev.device_class ()->name ().empty ()) {
+      os << " ";
+      os << format_name (dev.device_class ()->name ());
+    }
 
   } else if (ind) {
 
@@ -119,14 +125,22 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
     os << format_terminals (dev, size_t (2));
     os << " ";
     os << tl::sprintf ("%.12g", dev.parameter_value (db::DeviceClassInductor::param_id_L));
+    if (! dev.device_class ()->name ().empty ()) {
+      os << " ";
+      os << format_name (dev.device_class ()->name ());
+    }
 
   } else if (res) {
 
     os << "R";
     os << format_name (dev.expanded_name ());
-    os << format_terminals (dev, size_t (2));
+    os << format_terminals (dev, size_t (3));
     os << " ";
     os << tl::sprintf ("%.12g", dev.parameter_value (db::DeviceClassResistor::param_id_R));
+    if (! dev.device_class ()->name ().empty ()) {
+      os << " ";
+      os << format_name (dev.device_class ()->name ());
+    }
 
   } else if (diode) {
 

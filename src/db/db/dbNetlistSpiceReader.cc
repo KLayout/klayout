@@ -454,7 +454,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
         }
       } else {
         if (cn.empty ()) {
-          cn = "RES";
+          cn = "RES3";
         }
         cls = make_device_class<db::DeviceClassResistorWithBulk> (circuit, cn);
       }
@@ -505,7 +505,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
         }
       } else {
         if (cn.empty ()) {
-          cn = "CAP";
+          cn = "CAP3";
         }
         cls = make_device_class<db::DeviceClassCapacitorWithBulk> (circuit, cn);
       }

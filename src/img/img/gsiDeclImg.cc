@@ -1282,7 +1282,7 @@ public:
   typedef ImageRef value_type;
   typedef std::map<img::Service::obj_iterator, unsigned int>::const_iterator iterator_type;
   typedef void pointer; 
-  typedef const value_type &reference;
+  typedef value_type reference;
   typedef std::forward_iterator_tag iterator_category;
   typedef void difference_type;
 

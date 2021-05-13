@@ -96,7 +96,6 @@ private:
   LogFile *mp_file;
   void (LogFile::*m_method)(const std::string &, bool);
   std::string m_text;
-  bool m_continued;
   int m_verbosity;
   QMutex m_lock;
 };

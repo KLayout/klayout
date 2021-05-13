@@ -67,7 +67,7 @@ verbosity ()
 //  Channel implementation
 
 Channel::Channel ()
-  : m_no_endl (false), m_active (false)
+  : m_no_endl (false), m_active (false), m_in_yield (false)
 {
   //  .. nothing else ..
 }
@@ -98,10 +98,19 @@ Channel::release_proxy ()
   end ();
   m_active = false;
   m_no_endl = false;
+  bool in_yield = m_in_yield;
+  m_in_yield = true;
   m_lock.unlock ();
 
-  //  after we have released the lock we give the receivers an opportunity to process events
-  yield ();
+  //  after we have released the lock we give the receivers an opportunity to process events. Note that we allow only one thread to yield
+  //  at the same time and no recursive yields.
+  if (! in_yield) {
+    yield ();
+    //  this should be atomic, but execution reordering may place it before yield(). Hence the lock.
+    m_lock.lock ();
+    m_in_yield = false;
+    m_lock.unlock ();
+  }
 }
 
 ChannelEndl endl;

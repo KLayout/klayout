@@ -154,6 +154,7 @@ private:
 
   bool m_no_endl;
   bool m_active;
+  bool m_in_yield;
 };
 
 /**

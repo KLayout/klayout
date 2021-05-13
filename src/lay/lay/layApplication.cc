@@ -1486,16 +1486,20 @@ GuiApplication::process_events_impl (QEventLoop::ProcessEventsFlags flags, bool 
 {
   if (mp_mw) {
 
-    if (silent && tl::DeferredMethodScheduler::instance ()) {
-      tl::DeferredMethodScheduler::instance ()->enable (false);
+    //  prevent recursive process_events
+    if (mp_mw->is_busy ()) {
+      return;
     }
 
-#if QT_VERSION < 0x050000
-    QApplication::syncX ();
-#endif
+    if (silent) {
+      tl::DeferredMethodScheduler::enable (false);
+    }
 
     mp_mw->enter_busy_mode (true);
     try {
+#if QT_VERSION < 0x050000
+      QApplication::syncX ();
+#endif
       QApplication::processEvents (flags);
       //  Qt seems not to send posted UserEvents in some cases (e.g. in the unit test application with GLib?
       //  Glib not doing this without a main window visible?). Hence we do this explicitly here.
@@ -1505,8 +1509,8 @@ GuiApplication::process_events_impl (QEventLoop::ProcessEventsFlags flags, bool 
     }
     mp_mw->enter_busy_mode (false);
 
-    if (silent && tl::DeferredMethodScheduler::instance ()) {
-      tl::DeferredMethodScheduler::instance ()->enable (true);
+    if (silent) {
+      tl::DeferredMethodScheduler::enable (true);
     }
 
   }

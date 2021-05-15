@@ -28,6 +28,7 @@
 #include "tlThreads.h"
 
 #include <list>
+#include <set>
 
 namespace tl
 {
@@ -141,7 +142,8 @@ protected:
 private:
   int m_disabled;
   bool m_scheduled;
-  std::list<DeferredMethodBase *> m_methods;
+  std::list<DeferredMethodBase *> m_methods, m_executing;
+  std::set<DeferredMethodBase *> m_unqueued;
   tl::Mutex m_lock;
 
   void do_enable (bool en);
@@ -263,8 +265,6 @@ public:
    */
   void execute ()
   {
-    //  cancel execution which might be pending
-    cancel ();
     (mp_t->*m_method) ();
   }
 

@@ -736,6 +736,7 @@ ClassBase::classes_in_definition_order (const char *mod_name)
 void
 ClassBase::initialize ()
 {
+// @@@ tl::error << "@@@ registration of class " << name () << " (type " << type().name () << ")";
   //  don't initialize again
   if (m_initialized) {
     return;
@@ -825,6 +826,8 @@ static void add_class_to_map (const gsi::ClassBase *c)
   if (! ti) {
     ti = &c->type ();
   }
+// tl::warn << "@@@  -> registering " << c->name() << " (as " << ti->name() << " with p=" << size_t((void*)ti) << ")";
+// @@@ tl::warn << "@@@  X2 " << c->is_of_type (*ti) << " " << size_t((void*)ti) << " " << size_t((void*)&c->type()) << " " << (*ti==c->type()) << " adapted_type_info=" << size_t((void*)c->adapted_type_info());
 
   if (! sp_ti_to_class) {
     sp_ti_to_class = new ti_to_class_map_t ();
@@ -833,7 +836,7 @@ static void add_class_to_map (const gsi::ClassBase *c)
     sp_tname_to_class = new tname_to_class_map_t ();
   }
 
-  if (ti && c->is_of_type (*ti)) {
+  if (ti /*@@@&& c->is_of_type (*ti)*/) {
     if (!sp_ti_to_class->insert (std::make_pair (ti, c)).second) {
       //  Duplicate registration of this class
       tl::error << "Duplicate registration of class " << c->name () << " (type " << ti->name () << ")";
@@ -869,6 +872,7 @@ const ClassBase *class_by_typeinfo_no_assert (const std::type_info &ti)
         sp_ti_to_class->insert (std::make_pair (&ti, cn->second));
         return cn->second;
       } else {
+// @@@ tl::warn << "@@@  -> could not find ti with p=" << size_t((void*)&ti);
         return 0;
       }
     }

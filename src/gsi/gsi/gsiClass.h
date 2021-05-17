@@ -585,10 +585,12 @@ public:
     set_name (name);
   }
 
-  virtual bool is_of_type (const std::type_info &ti) const 
+#if 0 // @@@
+  virtual bool is_of_type (const std::type_info & /*ti*/) const 
   {
     return (ti == typeid (X));
   }
+#endif
 
   virtual const std::type_info &type () const
   {
@@ -865,7 +867,8 @@ public:
     return m_subclass_tester.get () && m_subclass_tester->can_upcast (p);
   }
 
-  virtual bool is_of_type (const std::type_info &ti) const 
+#if 0 // @@@
+  virtual bool is_of_type (const std::type_info & /*ti*/) const 
   {
     if (adapted_type_info ()) {
       //  A class matches the typeinfo of the adapted type. We'll sort this out later
@@ -875,6 +878,7 @@ public:
       return (ti == typeid (X));
     }
   }
+#endif
 
   virtual const std::type_info &type () const
   {

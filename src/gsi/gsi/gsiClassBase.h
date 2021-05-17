@@ -445,6 +445,7 @@ public:
     return false;
   }
 
+#if 0 // @@@
   /**
    *  @brief Class implementation: check C++ type of object
    *
@@ -456,6 +457,7 @@ public:
     tl_assert (false);
     return false;
   }
+#endif
 
   /**
    *  @brief Returns true, if the given object can be cast to this class

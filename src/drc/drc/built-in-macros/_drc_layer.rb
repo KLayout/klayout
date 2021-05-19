@@ -842,18 +842,23 @@ CODE
     # @name smoothed
     # @brief Smoothes the polygons of the region
     # @synopsis layer.smoothed(d)
+    # @synopsis layer.smoothed(d, hv_keep)
     #
     # "Smoothing" returns a simplified version of the polygons. Simplification is 
     # achieved by removing vertices unless the resulting polygon deviates by more
     # than the given distance d from the original polygon.
     #
+    # "hv_keep" is a boolean parameter which makes the smoothing function maintain
+    # horizontal or vertical edges. The default is false, meaning horizontal or
+    # vertical edges may be changed into tilted ones.
+    #
     # This method return a layer wit the modified polygons. Merged semantics applies for this
     # method (see \raw and \clean).
     
-    def smoothed(d)
+    def smoothed(d, hv_keep = false)
       @engine._context("smoothed") do
         requires_region
-        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :smoothed, @engine._make_value(d)))
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :smoothed, @engine._make_value(d), hv_keep))
       end
     end
     

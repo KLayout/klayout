@@ -446,12 +446,9 @@ public:
   }
 
   /**
-   *  @brief Class implementation: check C++ type of object
-   *
-   *  This method returns true, if objects of this class are compatible with 
-   *  the given C++ type.
+   *  @brief Class implementation: returns true if this class binds to a script class
    */
-  virtual bool is_of_type (const std::type_info & /*ti*/) const 
+  virtual bool binds () const
   {
     tl_assert (false);
     return false;

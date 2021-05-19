@@ -585,9 +585,9 @@ public:
     set_name (name);
   }
 
-  virtual bool is_of_type (const std::type_info &ti) const 
+  virtual bool binds () const
   {
-    return (ti == typeid (X));
+    return false;
   }
 
   virtual const std::type_info &type () const
@@ -865,15 +865,9 @@ public:
     return m_subclass_tester.get () && m_subclass_tester->can_upcast (p);
   }
 
-  virtual bool is_of_type (const std::type_info &ti) const 
+  virtual bool binds () const
   {
-    if (adapted_type_info ()) {
-      //  A class matches the typeinfo of the adapted type. We'll sort this out later
-      //  on the client side. 
-      return (ti == *adapted_type_info ());
-    } else {
-      return (ti == typeid (X));
-    }
+    return true;
   }
 
   virtual const std::type_info &type () const

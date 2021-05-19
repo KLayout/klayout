@@ -84,16 +84,12 @@ class MyNetlistSpiceReaderDelegate2 < MyNetlistSpiceReaderDelegate
     netlist.description = "Read by MyDelegate2 (sucessfully)"
   end
 
-  alias translate_net_name_org translate_net_name
-
   def translate_net_name(n)
-    return n == "VDD" ? "VXX" : translate_net_name_org(n)
+    return n == "VDD" ? "VXX" : super
   end
 
-  alias parse_element_org parse_element
-
   def parse_element(s, element)
-    data = parse_element_org(s, element)
+    data = super
     if element == "R"
       data.model_name = "WIDERSTAND"
     end

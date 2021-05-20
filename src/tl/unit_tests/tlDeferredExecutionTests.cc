@@ -186,3 +186,29 @@ TEST(1)
 
 }
 
+static int y_inst = 0;
+
+class Y
+{
+public:
+  Y () : da (this, &Y::a), db (this, &Y::b) { ++y_inst; }
+  ~Y () { --y_inst; }
+
+  void a () { delete this; }
+  void b () { tl_assert(false); }
+
+  tl::DeferredMethod<Y> da, db;
+};
+
+TEST(2)
+{
+  //  execution of a deletes db which must not be executed
+  y_inst = 0;
+  Y *y = new Y ();
+  y->da ();
+  y->db ();
+
+  QCoreApplication::instance ()->processEvents ();
+
+  EXPECT_EQ (y_inst, 0);
+}

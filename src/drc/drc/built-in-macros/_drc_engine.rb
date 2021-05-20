@@ -545,6 +545,7 @@ module DRC
       else
         str = ("    " * indent) + arg
         RBA::Logger::log(str)
+        self._process_events
       end
     end
     
@@ -563,6 +564,7 @@ module DRC
         @log_file.puts(str)
       else
         RBA::Logger::info(str)
+        self._process_events
       end
     end
     
@@ -577,6 +579,7 @@ module DRC
         @log_file.puts("ERROR: " + arg)
       else
         RBA::Logger::error(arg)
+        self._process_events
       end
     end
     
@@ -591,6 +594,7 @@ module DRC
         @log_file.puts("WARNING: " + arg)
       else
         RBA::Logger::warn(arg)
+        self._process_events
       end
     end
     
@@ -1988,6 +1992,7 @@ CODE
       
       t = RBA::Timer::new
       t.start
+      self._process_events
       GC.start # force a garbage collection before the operation to free unused memory
       res = yield
       t.stop
@@ -2552,6 +2557,12 @@ CODE
       if !@used_output_layers[li]
         @output_layers.push(li)
         @used_output_layers[li] = true
+      end
+    end
+
+    def _process_events
+      if RBA::Application.instance
+        RBA::Application.instance.process_events
       end
     end
     

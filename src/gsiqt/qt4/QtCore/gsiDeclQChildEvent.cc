@@ -60,7 +60,7 @@
       virtual bool can_upcast (const void *) const { return false; }
 
       //  Does not bind to a particular type
-      virtual bool is_of_type (const std::type_info & /*ti*/) const { return false; }
+      virtual bool binds () const { return false; }
       virtual const std::type_info &type () const { return typeid (DummyQObject); }
     };
   }

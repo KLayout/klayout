@@ -79,11 +79,25 @@ public:
   virtual void finish (db::Netlist *netlist);
 
   /**
+   *  @brief Called when an unknown control statement is encountered
+   *
+   *  Returns true if the statement is understood.
+   */
+  virtual bool control_statement (const std::string &line);
+
+  /**
    *  @brief Returns true, if the delegate wants subcircuit elements with this name
    *
    *  The name is always upper case.
    */
   virtual bool wants_subcircuit (const std::string &circuit_name);
+
+  /**
+   *  @brief This method translates a raw net name to a valid net name
+   *
+   *  The default implementation will unescape backslash sequences into plain characters.
+   */
+  virtual std::string translate_net_name (const std::string &nn);
 
   /**
    *  @brief Makes a device from an element line
@@ -104,9 +118,41 @@ public:
   virtual bool element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params);
 
   /**
+   *  @brief Parses an element from a line
+   *
+   *  @param s The line to parse (the part after the element and name)
+   *  @param model Out parameter: the model name if given
+   *  @param value Out parameter: the value if given (for R, L, C)
+   *  @param nn Out parameter: the net names
+   *  @param pv Out parameter: the parameter values (key/value pairs)
+   */
+  virtual void parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, double> &pv);
+
+  /**
    *  @brief Produces an error with the given message
    */
   virtual void error (const std::string &msg);
+
+  /**
+   *  @brief Reads a set of string components and parameters from the string
+   *  A special key "param:" is recognized for starting a parameter list.
+   */
+  void parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, double> &pv);
+
+  /**
+   *  @brief Reads a value from the extractor (with formula evaluation)
+   */
+  double read_value (tl::Extractor &ex);
+
+  /**
+   *  @brief Tries to read a value from the extractor (with formula evaluation)
+   */
+  bool try_read_value (const std::string &s, double &v);
+
+private:
+  double read_atomic_value (tl::Extractor &ex);
+  double read_dot_expr (tl::Extractor &ex);
+  double read_bar_expr (tl::Extractor &ex);
 };
 
 /**
@@ -138,18 +184,12 @@ private:
   void push_stream (const std::string &path);
   void pop_stream ();
   bool at_end ();
-  void read_pin_and_parameters (tl::Extractor &ex, std::vector<std::string> &nn, std::map<std::string, double> &pv);
   bool read_element (tl::Extractor &ex, const std::string &element, const std::string &name);
   void read_subcircuit (const std::string &sc_name, const std::string &nc_name, const std::vector<db::Net *> &nets);
   void read_circuit (tl::Extractor &ex, const std::string &name);
   void skip_circuit (tl::Extractor &ex);
   bool read_card ();
-  double read_value (tl::Extractor &ex);
-  std::string read_name_with_case (tl::Extractor &ex);
   std::string read_name (tl::Extractor &ex);
-  double read_atomic_value (tl::Extractor &ex);
-  double read_dot_expr (tl::Extractor &ex);
-  double read_bar_expr (tl::Extractor &ex);
   std::string get_line ();
   void unget_line (const std::string &l);
   void error (const std::string &msg);

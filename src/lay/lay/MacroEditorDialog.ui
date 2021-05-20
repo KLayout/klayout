@@ -1350,12 +1350,7 @@ p, li { white-space: pre-wrap; }
         </spacer>
        </item>
        <item>
-        <widget class="QFrame" name="consoleTextFrame">
-         <property name="font">
-          <font>
-           <family>Monospace</family>
-          </font>
-         </property>
+        <widget class="QFrame" name="console_text_frame">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -1366,11 +1361,6 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="QComboBox" name="input_field">
-         <property name="font">
-          <font>
-           <family>Monospace</family>
-          </font>
-         </property>
          <property name="editable">
           <bool>true</bool>
          </property>

@@ -32,6 +32,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QPalette>
+#include <QFontDatabase>
 
 #include <stdio.h>
 
@@ -187,6 +188,17 @@ indicate_error (QWidget *le, bool f)
     pl.setColor (QPalette::Active, QPalette::Base, pw->palette ().color (QPalette::Base));
   }
   le->setPalette (pl);
+}
+
+QFont monospace_font ()
+{
+#if QT_VERSION >= 0x050200
+  return QFont (QFontDatabase::systemFont (QFontDatabase::FixedFont).family ());
+#else
+  QFont f = QFont (QString::fromUtf8 ("Monospace"));
+  f.setStyleHint (QFont::TypeWriter);
+  return f;
+#endif
 }
 
 #if QT_VERSION < 0x050000

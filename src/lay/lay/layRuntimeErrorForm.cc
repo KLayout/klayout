@@ -22,6 +22,7 @@
 
 
 #include "layRuntimeErrorForm.h"
+#include "layQtTools.h"
 #include "tlScriptError.h"
 
 #include <QMessageBox>
@@ -40,6 +41,7 @@ RuntimeErrorForm::RuntimeErrorForm (QWidget *parent, const char *name, const tl:
 
   msg_label->setText (tl::to_qstring (error->basic_msg ()));
   details_text->setText (tl::to_qstring (error->msg ()));
+  details_text->setFont (lay::monospace_font ());
   details_frame->hide ();
 
   //  "borrow" the error pixmap from the message box

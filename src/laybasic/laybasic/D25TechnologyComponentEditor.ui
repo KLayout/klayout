@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>2.5d Vertical Stack Information</string>
+      <string>&lt;html&gt;2.5d Vertical stack information (see &lt;a href=&quot;int:/about/25d_view.xml&quot;&gt;here&lt;/a&gt; for details)&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
@@ -39,11 +39,6 @@
    </item>
    <item row="1" column="0" colspan="2">
     <widget class="QTextEdit" name="src_te">
-     <property name="font">
-      <font>
-       <family>Monospace</family>
-      </font>
-     </property>
      <property name="lineWrapMode">
       <enum>QTextEdit::NoWrap</enum>
      </property>

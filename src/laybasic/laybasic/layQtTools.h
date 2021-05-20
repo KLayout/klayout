@@ -27,6 +27,7 @@
 #include "laybasicCommon.h"
 
 #include <string>
+#include <QFont>
 
 class QLabel;
 class QWidget;
@@ -81,6 +82,12 @@ LAYBASIC_PUBLIC void indicate_error (QWidget *le, const tl::Exception *ex);
  *  @brief Configures a QLineEdit or other widget to indicate an error
  */
 LAYBASIC_PUBLIC void indicate_error (QWidget *le, bool error);
+
+/**
+ *  @brief Gets the system monospace font
+ */
+LAYBASIC_PUBLIC QFont monospace_font ();
+
 
 #if QT_VERSION < 0x050000
 

@@ -270,6 +270,9 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
 
   Ui::MacroEditorDialog::setupUi (this);
 
+  input_field->setFont (monospace_font ());
+  console_text_frame->setFont (monospace_font ());
+
   connect (mp_root, SIGNAL (macro_changed (lym::Macro *)), this, SLOT (macro_changed (lym::Macro *)));
   connect (mp_root, SIGNAL (macro_deleted (lym::Macro *)), this, SLOT (macro_deleted (lym::Macro *)));
   connect (mp_root, SIGNAL (macro_collection_deleted (lym::MacroCollection *)), this, SLOT (macro_collection_deleted (lym::MacroCollection *)));
@@ -332,16 +335,16 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
 
   setObjectName (QString::fromUtf8 ("MacroEditorDialog"));
 
-  QHBoxLayout *layout = new QHBoxLayout(consoleTextFrame);
+  QHBoxLayout *layout = new QHBoxLayout (console_text_frame);
   layout->setMargin (0);
-  consoleTextFrame->setLayout(layout);
-  mp_console_text = new TextEditWidget(consoleTextFrame);
-  mp_console_text->setReadOnly(true);
-  mp_console_text->setFont(consoleTextFrame->font());
-  mp_console_text->setWordWrapMode(QTextOption::NoWrap);
-  layout->addWidget(mp_console_text);
+  console_text_frame->setLayout (layout);
+  mp_console_text = new TextEditWidget (console_text_frame);
+  mp_console_text->setReadOnly (true);
+  mp_console_text->setFont (monospace_font ());
+  mp_console_text->setWordWrapMode (QTextOption::NoWrap);
+  layout->addWidget (mp_console_text);
 
-  m_stdout_format = mp_console_text->currentCharFormat();
+  m_stdout_format = mp_console_text->currentCharFormat ();
   m_echo_format = m_stdout_format;
   m_echo_format.setForeground (QColor (0, 0, 255));
   m_stderr_format = m_stdout_format;

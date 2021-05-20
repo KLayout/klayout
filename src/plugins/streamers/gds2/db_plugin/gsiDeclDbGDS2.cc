@@ -65,6 +65,16 @@ static bool get_gds2_multi_xy_records (const db::SaveLayoutOptions *options)
   return options->get_options<db::GDS2WriterOptions> ().multi_xy_records;
 }
 
+static void set_gds2_resolve_skew_arrays (db::SaveLayoutOptions *options, bool n)
+{
+  options->get_options<db::GDS2WriterOptions> ().resolve_skew_arrays = n;
+}
+
+static bool get_gds2_resolve_skew_arrays (const db::SaveLayoutOptions *options)
+{
+  return options->get_options<db::GDS2WriterOptions> ().resolve_skew_arrays;
+}
+
 static void set_gds2_write_file_properties (db::SaveLayoutOptions *options, bool n)
 {
   options->get_options<db::GDS2WriterOptions> ().write_file_properties = n;
@@ -129,7 +139,7 @@ static double get_gds2_user_units (const db::SaveLayoutOptions *options)
 static
 gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
   gsi::method_ext ("gds2_max_vertex_count=", &set_gds2_max_vertex_count, gsi::arg ("count"),
-    "@brief Set the maximum number of vertices for polygons to write\n"
+    "@brief Sets the maximum number of vertices for polygons to write\n"
     "This property describes the maximum number of point for polygons in GDS2 files.\n"
     "Polygons with more points will be split.\n"
     "The minimum value for this property is 4. The maximum allowed value is about 4000 or 8000, depending on the\n"
@@ -138,24 +148,37 @@ gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
     "\nThis property has been added in version 0.18.\n"
   ) +
   gsi::method_ext ("gds2_max_vertex_count", &get_gds2_max_vertex_count,
-    "@brief Get the maximum number of vertices for polygons to write\n"
+    "@brief Gets the maximum number of vertices for polygons to write\n"
     "See \\gds2_max_vertex_count= method for a description of the maximum vertex count."
     "\nThis property has been added in version 0.18.\n"
   ) +
   gsi::method_ext ("gds2_multi_xy_records=", &set_gds2_multi_xy_records, gsi::arg ("flag"),
-    "@brief Use multiple XY records in BOUNDARY elements for unlimited large polygons\n"
+    "@brief Uses multiple XY records in BOUNDARY elements for unlimited large polygons\n"
     "\n"
     "Setting this property to true allows producing polygons with an unlimited number of points \n"
     "at the cost of incompatible formats. Setting it to true disables the \\gds2_max_vertex_count setting.\n"
     "\nThis property has been added in version 0.18.\n"
   ) +
   gsi::method_ext ("gds2_multi_xy_records?", &get_gds2_multi_xy_records,
-    "@brief Get the property enabling multiple XY records for BOUNDARY elements\n"
+    "@brief Gets the property enabling multiple XY records for BOUNDARY elements\n"
     "See \\gds2_multi_xy_records= method for a description of this property."
     "\nThis property has been added in version 0.18.\n"
   ) +
+  gsi::method_ext ("gds2_resolve_skew_arrays=", &set_gds2_resolve_skew_arrays, gsi::arg ("flag"),
+    "@brief Resolves skew arrays into single instances\n"
+    "\n"
+    "Setting this property to true will make skew (non-orthongonal) arrays being resolved into single instances.\n"
+    "Skew arrays happen if either the row or column vector isn't paralell to x or y axis. Such arrays can cause problems with "
+    "some legacy software and can be disabled with this option.\n"
+    "\nThis property has been added in version 0.27.1.\n"
+  ) +
+  gsi::method_ext ("gds2_resolve_skew_arrays?", &get_gds2_resolve_skew_arrays,
+    "@brief Gets a value indicating whether to resolve skew arrays into single instances\n"
+    "See \\gds2_resolve_skew_arrays= method for a description of this property."
+    "\nThis property has been added in version 0.27.1.\n"
+  ) +
   gsi::method_ext ("gds2_write_timestamps=", &set_gds2_write_timestamps, gsi::arg ("flag"),
-    "@brief Write the current time into the GDS2 timestamps if set to true\n"
+    "@brief Writes the current time into the GDS2 timestamps if set to true\n"
     "\n"
     "If this property is set to false, the time fields will all be zero. This somewhat simplifies compare and diff "
     "applications.\n"

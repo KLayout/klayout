@@ -109,6 +109,7 @@ public:
     : max_vertex_count (8000),
       no_zero_length_paths (false),
       multi_xy_records (false),
+      resolve_skew_arrays (false),
       max_cellname_length (32000),
       libname ("LIB"),
       user_units (1.0),
@@ -145,6 +146,13 @@ public:
    *  at the cost of incompatible formats.
    */
   bool multi_xy_records;
+
+  /**
+   *  @brief Resolve skew arrays into single instances
+   *
+   *  Setting this property to true will resolve skew (non-orthogonal) arrays into single instances.
+   */
+  bool resolve_skew_arrays;
 
   /**
    *  @brief Maximum length of cell names

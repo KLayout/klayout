@@ -130,6 +130,7 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
   size_t max_cellname_length = std::max (gds2_options.max_cellname_length, (unsigned int)8);
   size_t max_vertex_count = std::max (gds2_options.max_vertex_count, (unsigned int)4);
   bool no_zero_length_paths = gds2_options.no_zero_length_paths;
+  bool resolve_skew_arrays = gds2_options.resolve_skew_arrays;
 
   m_cell_name_map = db::WriterCellNameMap (max_cellname_length);
   m_cell_name_map.replacement ('$');
@@ -281,7 +282,7 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
         if (options.keep_instances () || cell_set.find (inst->cell_index ()) != cell_set.end ()) {
 
           progress_checkpoint ();
-          write_inst (sf, *inst, true /*normalize*/, layout, inst->prop_id ());
+          write_inst (sf, *inst, true /*normalize*/, resolve_skew_arrays, layout, inst->prop_id ());
 
         }
 
@@ -346,13 +347,23 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
   progress_checkpoint ();
 }
 
+static bool is_orthogonal (const db::Vector &rv, const db::Vector &cv)
+{
+  return (rv.x () == 0 && cv.y () == 0) || (rv.y () == 0 && cv.x () == 0);
+}
+
 void
-GDS2WriterBase::write_inst (double sf, const db::Instance &instance, bool normalize, const db::Layout &layout, db::properties_id_type prop_id)
+GDS2WriterBase::write_inst (double sf, const db::Instance &instance, bool normalize, bool resolve_skew_arrays, const db::Layout &layout, db::properties_id_type prop_id)
 {
   db::Vector a, b;
   unsigned long amax, bmax;
 
   bool is_reg = instance.is_regular_array (a, b, amax, bmax);
+
+  //  skew arrays are resolved if required
+  if (is_reg && ! is_orthogonal (a, b) != 0 && resolve_skew_arrays) {
+    is_reg = false;
+  }
 
   for (db::CellInstArray::iterator ii = instance.begin (); ! ii.at_end (); ++ii) {
 

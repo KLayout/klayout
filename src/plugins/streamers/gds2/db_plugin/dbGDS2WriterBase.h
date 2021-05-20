@@ -122,7 +122,7 @@ protected:
   /**
    *  @brief Write an instance 
    */
-  void write_inst (double sf, const db::Instance &instance, bool normalize, const db::Layout &layout, db::properties_id_type prop_id);
+  void write_inst (double sf, const db::Instance &instance, bool normalize, bool resolve_skew_arrays, const db::Layout &layout, db::properties_id_type prop_id);
 
   /**
    *  @brief Write a shape as box

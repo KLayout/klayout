@@ -1635,7 +1635,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@param dest The layer index of the destination layer\n"
   ) +
   gsi::method_ext ("move", &move_from_other_cell, gsi::arg ("src_cell"), gsi::arg ("src_layer"), gsi::arg ("dest"),
-    "@brief Moves shapes from another cell to the target layern this cell\n"
+    "@brief Moves shapes from another cell to the target layer in this cell\n"
     "\n"
     "This method will move all shapes on layer 'src_layer' of cell 'src_cell' to the layer 'dest' of this cell.\n"
     "The destination layer is not overwritten. Instead, the shapes are added to the shapes of the destination layer.\n"

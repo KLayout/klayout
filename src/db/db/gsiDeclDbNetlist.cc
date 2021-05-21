@@ -2123,6 +2123,54 @@ Class<db::NetlistReader> db_NetlistReader ("db", "NetlistReader",
 );
 
 /**
+ *  @brief A helper class wrapping the return values for NetlistSpiceReaderDelegateImpl::parse_element
+ */
+class ParseElementData
+{
+public:
+  ParseElementData () : m_value (0.0) { }
+
+  const std::string &model_name () const { return m_model; }
+  std::string &model_name_nc () { return m_model; }
+  void set_model_name (const std::string &model) { m_model = model; }
+  double value () const { return m_value; }
+  double &value_nc () { return m_value; }
+  void set_value (double value) { m_value = value; }
+  const std::vector<std::string> &net_names () const { return m_net_names; }
+  std::vector<std::string> &net_names_nc () { return m_net_names; }
+  void set_net_names (const std::vector<std::string> &nn) { m_net_names = nn; }
+  const std::map<std::string, double> &parameters () const { return m_parameters; }
+  std::map<std::string, double> &parameters_nc () { return m_parameters; }
+  void set_parameters (const std::map<std::string, double> &parameters) { m_parameters = parameters; }
+
+private:
+  std::string m_model;
+  double m_value;
+  std::vector<std::string> m_net_names;
+  std::map<std::string, double> m_parameters;
+};
+
+/**
+ *  @brief A helper class for the return values of NetlistSpiceReaderDelegateImpl::parse_element_components
+ */
+class ParseElementComponentsData
+{
+public:
+  ParseElementComponentsData () { }
+
+  const std::vector<std::string> &strings () const { return m_strings; }
+  std::vector<std::string> &strings_nc () { return m_strings; }
+  void set_strings (const std::vector<std::string> &nn) { m_strings = nn; }
+  const std::map<std::string, double> &parameters () const { return m_parameters; }
+  std::map<std::string, double> &parameters_nc () { return m_parameters; }
+  void set_parameters (const std::map<std::string, double> &parameters) { m_parameters = parameters; }
+
+private:
+  std::vector<std::string> m_strings;
+  std::map<std::string, double> m_parameters;
+};
+
+/**
  *  @brief A SPICE reader delegate base class for reimplementation
  */
 class NetlistSpiceReaderDelegateImpl
@@ -2180,6 +2228,25 @@ public:
     }
   }
 
+  virtual bool control_statement (const std::string &line)
+  {
+    try {
+      m_error.clear ();
+      if (cb_control_statement.can_issue ()) {
+        return cb_control_statement.issue<db::NetlistSpiceReaderDelegate, bool, const std::string &> (&db::NetlistSpiceReaderDelegate::control_statement, line);
+      } else {
+        return db::NetlistSpiceReaderDelegate::control_statement (line);
+      }
+    } catch (tl::Exception &) {
+      if (! m_error.empty ()) {
+        db::NetlistSpiceReaderDelegate::error (m_error);
+      } else {
+        throw;
+      }
+      return false;
+    }
+  }
+
   virtual bool wants_subcircuit (const std::string &circuit_name)
   {
     try {
@@ -2196,6 +2263,59 @@ public:
         throw;
       }
       return false;
+    }
+  }
+
+  virtual std::string translate_net_name (const std::string &nn)
+  {
+    try {
+      m_error.clear ();
+      if (cb_translate_net_name.can_issue ()) {
+        return cb_translate_net_name.issue<db::NetlistSpiceReaderDelegate, std::string, const std::string &> (&db::NetlistSpiceReaderDelegate::translate_net_name, nn);
+      } else {
+        return db::NetlistSpiceReaderDelegate::translate_net_name (nn);
+      }
+    } catch (tl::Exception &) {
+      if (! m_error.empty ()) {
+        db::NetlistSpiceReaderDelegate::error (m_error);
+      } else {
+        throw;
+      }
+      return std::string ();
+    }
+  }
+
+  ParseElementData parse_element_helper (const std::string &s, const std::string &element)
+  {
+    ParseElementData data;
+    db::NetlistSpiceReaderDelegate::parse_element (s, element, data.model_name_nc (), data.value_nc (), data.net_names_nc (), data.parameters_nc ());
+    return data;
+  }
+
+  virtual void parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, double> &pv)
+  {
+    try {
+
+      m_error.clear ();
+
+      ParseElementData data;
+      if (cb_parse_element.can_issue ()) {
+        data = cb_parse_element.issue<NetlistSpiceReaderDelegateImpl, ParseElementData, const std::string &, const std::string &> (&NetlistSpiceReaderDelegateImpl::parse_element_helper, s, element);
+      } else {
+        data = parse_element_helper (s, element);
+      }
+
+      model = data.model_name ();
+      value = data.value ();
+      nn = data.net_names ();
+      pv = data.parameters ();
+
+    } catch (tl::Exception &) {
+      if (! m_error.empty ()) {
+        db::NetlistSpiceReaderDelegate::error (m_error);
+      } else {
+        throw;
+      }
     }
   }
 
@@ -2220,38 +2340,128 @@ public:
 
   gsi::Callback cb_start;
   gsi::Callback cb_finish;
+  gsi::Callback cb_control_statement;
   gsi::Callback cb_wants_subcircuit;
+  gsi::Callback cb_translate_net_name;
   gsi::Callback cb_element;
+  gsi::Callback cb_parse_element;
 
 private:
   std::string m_error;
 };
 
-static void start_fb (db::NetlistSpiceReaderDelegate *delegate, db::Netlist *netlist)
+static void start_fb (NetlistSpiceReaderDelegateImpl *delegate, db::Netlist *netlist)
 {
   delegate->db::NetlistSpiceReaderDelegate::start (netlist);
 }
 
-static void finish_fb (db::NetlistSpiceReaderDelegate *delegate, db::Netlist *netlist)
+static void finish_fb (NetlistSpiceReaderDelegateImpl *delegate, db::Netlist *netlist)
 {
   delegate->db::NetlistSpiceReaderDelegate::finish (netlist);
 }
 
-static bool wants_subcircuit_fb (db::NetlistSpiceReaderDelegate *delegate, const std::string &model)
+static bool wants_subcircuit_fb (NetlistSpiceReaderDelegateImpl *delegate, const std::string &model)
 {
   return delegate->db::NetlistSpiceReaderDelegate::wants_subcircuit (model);
 }
 
-static bool element_fb (db::NetlistSpiceReaderDelegate *delegate, db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params)
+static bool control_statement_fb (NetlistSpiceReaderDelegateImpl *delegate, const std::string &line)
+{
+  return delegate->db::NetlistSpiceReaderDelegate::control_statement (line);
+}
+
+static std::string translate_net_name_fb (NetlistSpiceReaderDelegateImpl *delegate, const std::string &name)
+{
+  return delegate->db::NetlistSpiceReaderDelegate::translate_net_name (name);
+}
+
+static bool element_fb (NetlistSpiceReaderDelegateImpl *delegate, db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params)
 {
   return delegate->db::NetlistSpiceReaderDelegate::element (circuit, element, name, model, value, nets, params);
 }
+
+static ParseElementData parse_element_fb (NetlistSpiceReaderDelegateImpl *delegate, const std::string &s, const std::string &element)
+{
+  return delegate->parse_element_helper (s, element);
+}
+
+static tl::Variant value_from_string (NetlistSpiceReaderDelegateImpl *delegate, const std::string &s)
+{
+  tl::Variant res;
+  double v = 0.0;
+  if (delegate->try_read_value (s, v)) {
+    res = v;
+  }
+  return res;
+}
+
+static ParseElementComponentsData parse_element_components (NetlistSpiceReaderDelegateImpl *delegate, const std::string &s)
+{
+  ParseElementComponentsData data;
+  delegate->parse_element_components (s, data.strings_nc (), data.parameters_nc ());
+  return data;
+}
+
+Class<ParseElementComponentsData> db_ParseElementComponentsData ("db", "ParseElementComponentsData",
+  gsi::method ("strings", &ParseElementComponentsData::strings,
+    "@brief Gets the string parameters\n"
+  ) +
+  gsi::method ("strings=", &ParseElementComponentsData::set_strings, gsi::arg ("list"),
+    "@brief Sets the string parameters\n"
+  ) +
+  gsi::method ("parameters", &ParseElementComponentsData::parameters,
+    "@brief Gets the (named) numerical parameters\n"
+  ) +
+  gsi::method ("parameters=", &ParseElementComponentsData::set_parameters, gsi::arg ("dict"),
+    "@brief Sets the (named) numerical parameters\n"
+  ),
+  "@brief Supplies the return value for \\NetlistSpiceReaderDelegate#parse_element_components.\n"
+  "This is a structure with two members: 'strings' for the string arguments and 'parameters' for the "
+  "named numerical arguments.\n"
+  "\n"
+  "This helper class has been introduced in version 0.27.1.\n"
+);
+
+Class<ParseElementData> db_ParseElementData ("db", "ParseElementData",
+  gsi::method ("value", &ParseElementData::value,
+    "@brief Gets the value\n"
+  ) +
+  gsi::method ("value=", &ParseElementData::set_value, gsi::arg ("v"),
+    "@brief Sets the value\n"
+  ) +
+  gsi::method ("model_name", &ParseElementData::model_name,
+    "@brief Gets the model name\n"
+  ) +
+  gsi::method ("model_name=", &ParseElementData::set_model_name, gsi::arg ("m"),
+    "@brief Sets the model name\n"
+  ) +
+  gsi::method ("net_names", &ParseElementData::net_names,
+    "@brief Gets the net names\n"
+  ) +
+  gsi::method ("net_names=", &ParseElementData::set_net_names, gsi::arg ("list"),
+    "@brief Sets the net names\n"
+  ) +
+  gsi::method ("parameters", &ParseElementData::parameters,
+    "@brief Gets the (named) numerical parameters\n"
+  ) +
+  gsi::method ("parameters=", &ParseElementData::set_parameters, gsi::arg ("dict"),
+    "@brief Sets the (named) numerical parameters\n"
+  ),
+  "@brief Supplies the return value for \\NetlistSpiceReaderDelegate#parse_element.\n"
+  "This is a structure with four members: 'model_name' for the model name, 'value' for the default numerical value, 'net_names' for the net names and 'parameters' for the "
+  "named numerical parameters.\n"
+  "\n"
+  "This helper class has been introduced in version 0.27.1.\n"
+);
 
 Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "NetlistSpiceReaderDelegate",
   gsi::method_ext ("start", &start_fb, "@hide") +
   gsi::method_ext ("finish", &finish_fb, "@hide") +
   gsi::method_ext ("wants_subcircuit", &wants_subcircuit_fb, "@hide") +
   gsi::method_ext ("element", &element_fb, "@hide") +
+  gsi::method_ext ("parse_element", &parse_element_fb, "@hide") +
+  gsi::method_ext ("control_statement", &control_statement_fb, "@hide") +
+  gsi::method_ext ("translate_net_name", &translate_net_name_fb, "@hide") +
   gsi::callback ("start", &NetlistSpiceReaderDelegateImpl::start, &NetlistSpiceReaderDelegateImpl::cb_start, gsi::arg ("netlist"),
     "@brief This method is called when the reader starts reading a netlist\n"
   ) +
@@ -2261,6 +2471,36 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
   gsi::callback ("wants_subcircuit", &NetlistSpiceReaderDelegateImpl::wants_subcircuit, &NetlistSpiceReaderDelegateImpl::cb_wants_subcircuit, gsi::arg ("circuit_name"),
     "@brief Returns true, if the delegate wants subcircuit elements with this name\n"
     "The name is always upper case.\n"
+  ) +
+  gsi::callback ("control_statement", &NetlistSpiceReaderDelegateImpl::control_statement, &NetlistSpiceReaderDelegateImpl::cb_control_statement, gsi::arg ("line"),
+    "@brief Receives control statements not understood by the standard reader\n"
+    "When the reader encounters a control statement not understood by the parser, it will pass the line to the delegate using this method.\n"
+    "The delegate can decide if it wants to read this statement. It should return true in this case.\n"
+    "\n"
+    "This method has been introduced in version 0.27.1\n"
+  ) +
+  gsi::callback ("translate_net_name", &NetlistSpiceReaderDelegateImpl::translate_net_name, &NetlistSpiceReaderDelegateImpl::cb_translate_net_name, gsi::arg ("net_name"),
+    "@brief Translates a net name from the raw net name to the true net name\n"
+    "The default implementation will replace backslash sequences by the corresponding character.\n"
+    "'translate_net_name' is called before a net name is turned into a net object.\n"
+    "The method can be reimplemented to supply a different translation scheme for net names. For example, to translate special characters.\n"
+    "\n"
+    "This method has been introduced in version 0.27.1\n"
+  ) +
+  gsi::callback ("parse_element", &NetlistSpiceReaderDelegateImpl::parse_element_helper, &NetlistSpiceReaderDelegateImpl::cb_parse_element,
+    gsi::arg ("s"), gsi::arg ("element"),
+    "@brief Parses an element card\n"
+    "@param s The specification part of the element line (the part after element code and name).\n"
+    "@param element The upper-case element code (\"M\", \"R\", ...).\n"
+    "@return A \\ParseElementData object with the parts of the element.\n"
+    "\n"
+    "This method receives a string with the element specification and the element code. It is supposed to "
+    "parse the element line and return a model name, a value, a list of net names and a parameter value dictionary.\n"
+    "\n"
+    "'parse_element' is called one every element card. The results of this call go into the \\element method "
+    "to actually create the device. This method can be reimplemented to support other flavors of SPICE.\n"
+    "\n"
+    "This method has been introduced in version 0.27.1\n"
   ) +
   gsi::callback ("element", &NetlistSpiceReaderDelegateImpl::element, &NetlistSpiceReaderDelegateImpl::cb_element,
     gsi::arg ("circuit"), gsi::arg ("element"), gsi::arg ("name"), gsi::arg ("model"), gsi::arg ("value"), gsi::arg ("nets"), gsi::arg ("parameters"),
@@ -2281,6 +2521,23 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
   gsi::method ("error", &NetlistSpiceReaderDelegateImpl::error, gsi::arg ("msg"),
     "@brief Issues an error with the given message.\n"
     "Use this method to generate an error."
+  ) +
+  gsi::method_ext ("value_from_string", &value_from_string, gsi::arg ("s"),
+    "@brief Translates a string into a value\n"
+    "This function simplifies the implementation of SPICE readers by providing a translation of a unit-annotated string "
+    "into double values. For example, '1k' is translated to 1000.0. In addition, simple formula evaluation is supported, e.g "
+    "'(1+3)*2' is translated into 8.0.\n"
+    "\n"
+    "This method has been introduced in version 0.27.1\n"
+  ) +
+  gsi::method_ext ("parse_element_components", &parse_element_components, gsi::arg ("s"),
+    "@brief Parses a string into string and parameter components.\n"
+    "This method is provided for simplifying the implementation of 'parse_element'. It takes a string and splits it into "
+    "string arguments and parameter values. For example, 'a b c=6' renders two string arguments in 'nn' and one parameter in pv ('C'->6.0). "
+    "It returns data \\ParseElementComponentsData object with the strings and parameters.\n"
+    "The parameter names are already translated to upper case.\n"
+    "\n"
+    "This method has been introduced in version 0.27.1\n"
   ),
   "@brief Provides a delegate for the SPICE reader for translating device statements\n"
   "Supply a customized class to provide a specialized reading scheme for devices. "
@@ -2396,7 +2653,21 @@ Class<db::NetlistSpiceReader> db_NetlistSpiceReader (db_NetlistReader, "db", "Ne
   "nl.read(input_file, reader)\n"
   "@/code\n"
   "\n"
-  "This class has been introduced in version 0.26."
+  "A somewhat contrived example for using the delegate to translate net names is this:\n"
+  "\n"
+  "@code\n"
+  "class MyDelegate < RBA::NetlistSpiceReaderDelegate\n"
+  "\n"
+  "  # translates 'VDD' to 'VXX' and leave all other net names as is:\n"
+  "  alias translate_net_name_org translate_net_name\n"
+  "  def translate_net_name(n)\n"
+  "    return n == \"VDD\" ? \"VXX\" : translate_net_name_org(n)}\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.26. It has been extended in version 0.27.1."
 );
 
 }

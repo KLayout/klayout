@@ -26,6 +26,7 @@
 #include "layMacroEditorDialog.h"
 #include "layGenericSyntaxHighlighter.h"
 #include "layDispatcher.h"
+#include "layQtTools.h"
 
 #include "lymMacro.h"
 
@@ -218,7 +219,7 @@ MacroEditorSetupPage::setup (Dispatcher *root)
 
   if (mp_data->font_size <= 0) {
     mp_data->font_size = font ().pointSize ();
-    mp_data->font_family = "Monospace";
+    mp_data->font_family = tl::to_string (monospace_font ().family ());
   }
 
   QFont f;

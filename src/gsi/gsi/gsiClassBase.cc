@@ -816,7 +816,7 @@ bool has_class (const std::string &name)
 
 static void add_class_to_map (const gsi::ClassBase *c)
 {
-  if (c->declaration () != c) {
+  if (c->declaration () != c || ! c->binds ()) {
     //  only consider non-extensions
     return;
   }
@@ -833,14 +833,12 @@ static void add_class_to_map (const gsi::ClassBase *c)
     sp_tname_to_class = new tname_to_class_map_t ();
   }
 
-  if (ti && c->is_of_type (*ti)) {
-    if (!sp_ti_to_class->insert (std::make_pair (ti, c)).second) {
-      //  Duplicate registration of this class
-      tl::error << "Duplicate registration of class " << c->name () << " (type " << ti->name () << ")";
-      tl_assert (false);
-    } else {
-      sp_tname_to_class->insert (std::make_pair (std::string (ti->name ()), c));
-    }
+  if (!sp_ti_to_class->insert (std::make_pair (ti, c)).second) {
+    //  Duplicate registration of this class
+    tl::error << "Duplicate registration of class " << c->name () << " (type " << ti->name () << ")";
+    tl_assert (false);
+  } else {
+    sp_tname_to_class->insert (std::make_pair (std::string (ti->name ()), c));
   }
 }
 

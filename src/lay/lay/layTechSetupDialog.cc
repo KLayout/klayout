@@ -32,6 +32,7 @@
 #include "layMacroEditorTree.h"
 #include "layMacroController.h"
 #include "layTechnologyController.h"
+#include "layQtTools.h"
 #include "lymMacro.h"
 #include "tlAssert.h"
 #include "tlStream.h"
@@ -408,7 +409,7 @@ TechMacrosPage::TechMacrosPage (QWidget *parent, const std::string &cat, const s
 
   QFont f = mp_ui->macro_text->font ();
   f.setFixedPitch (true);
-  f.setFamily (tl::to_qstring ("Monospace"));
+  f.setFamily (monospace_font ().family ());
   mp_ui->macro_text->setFont (f);
 
   connect (mp_ui->create_folder_button, SIGNAL (clicked ()), this, SLOT (create_folder_clicked ()));

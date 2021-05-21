@@ -85,6 +85,12 @@ DeferredMethodScheduler::unqueue (DeferredMethodBase *method)
     }
     m = mm;
   }
+  for (std::list<DeferredMethodBase *>::iterator m = m_executing.begin (); m != m_executing.end (); ++m) {
+    if (*m == method) {
+      m_unqueued.insert (method);
+      break;
+    }
+  }
 }
 
 void 
@@ -102,19 +108,31 @@ DeferredMethodScheduler::do_enable (bool en)
 void
 DeferredMethodScheduler::do_execute ()
 {
-  std::list<DeferredMethodBase *> methods;
-
   m_lock.lock ();
-  methods.swap (m_methods);
+  m_executing.clear ();
+  m_unqueued.clear ();
+  m_executing.swap (m_methods);
   m_scheduled = false;
   m_lock.unlock ();
 
   //  do the execution outside the locked range to avoid deadlocks if the method's execution
   //  schedules another call.
-  for (std::list<DeferredMethodBase *>::iterator m = methods.begin (); m != methods.end (); ++m) {
-    (*m)->m_scheduled = false;
-    (*m)->execute ();
+  for (std::list<DeferredMethodBase *>::iterator m = m_executing.begin (); m != m_executing.end (); ++m) {
+    bool still_valid;
+    m_lock.lock ();
+    //  during execution a method may be unqueued - make sure this is not executed
+    still_valid = (m_unqueued.find (*m) == m_unqueued.end ());
+    m_lock.unlock ();
+    if (still_valid) {
+      (*m)->m_scheduled = false;
+      (*m)->execute ();
+    }
   }
+
+  m_lock.lock ();
+  m_unqueued.clear ();
+  m_executing.clear ();
+  m_lock.unlock ();
 }
 
 }

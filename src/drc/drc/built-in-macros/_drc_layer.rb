@@ -1613,6 +1613,9 @@ CODE
     #     @td @img(/images/drc_or2.png) @/td
     #   @/tr
     # @/table
+    # 
+    # In deep mode, "or" or "|" does not imply merging. In deep mode,
+    # "or" is an alias for "+" ("add").
     
     def or(other)
       @engine._context("or") do

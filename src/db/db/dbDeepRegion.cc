@@ -651,6 +651,13 @@ DeepRegion::not_with (const Region &other) const
   }
 }
 
+RegionDelegate *
+DeepRegion::or_with (const Region &other) const
+{
+  //  NOTE: this is somewhat different from the as if flat case because it does not merge
+  return add (other);
+}
+
 std::pair<RegionDelegate *, RegionDelegate *>
 DeepRegion::andnot_with (const Region &other) const
 {
@@ -1090,6 +1097,7 @@ public:
   virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
     db::EdgeProcessor ep;
+    ep.set_base_verbosity (50);
 
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
       ep.insert (s->second);

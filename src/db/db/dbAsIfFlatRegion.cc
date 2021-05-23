@@ -167,22 +167,6 @@ AsIfFlatRegion::in (const Region &other, bool invert) const
   return new_region.release ();
 }
 
-size_t
-AsIfFlatRegion::count () const
-{
-  size_t n = 0;
-  for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-    ++n;
-  }
-  return n;
-}
-
-size_t
-AsIfFlatRegion::hier_count () const
-{
-  return count ();
-}
-
 bool
 AsIfFlatRegion::is_box () const
 {

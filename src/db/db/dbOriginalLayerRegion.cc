@@ -29,6 +29,7 @@
 #include "dbDeepEdges.h"
 #include "dbDeepRegion.h"
 #include "dbDeepShapeStore.h"
+#include "dbCellGraphUtils.h"
 #include "tlGlobPattern.h"
 
 namespace db
@@ -184,6 +185,78 @@ OriginalLayerRegion::min_coherence_changed ()
   m_is_merged = false;
   m_merged_polygons.clear ();
   m_merged_polygons_valid = false;
+}
+
+size_t
+OriginalLayerRegion::count () const
+{
+  if (m_iter.has_complex_region () || m_iter.region () != db::Box::world ()) {
+
+    //  complex case with a search region - use the iterator to determine the count (expensive)
+    size_t n = 0;
+    for (db::RecursiveShapeIterator i = m_iter; ! i.at_end (); ++i) {
+      ++n;
+    }
+
+    return n;
+
+  } else {
+
+    //  otherwise we can utilize the CellCounter
+
+    size_t n = 0;
+
+    const db::Layout &layout = *m_iter.layout ();
+
+    std::set<db::cell_index_type> cells;
+    m_iter.top_cell ()->collect_called_cells (cells);
+
+    db::CellCounter cc (&layout);
+    for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+      if (cells.find (*c) == cells.end ()) {
+        continue;
+      }
+      size_t nn = 0;
+      for (std::vector<unsigned int>::const_iterator l = m_iter.layers ().begin (); l != m_iter.layers ().end (); ++l) {
+        nn += layout.cell (*c).shapes (*l).size (m_iter.shape_flags ());
+      }
+      n += cc.weight (*c) * nn;
+    }
+
+    return n;
+
+  }
+}
+
+size_t
+OriginalLayerRegion::hier_count () const
+{
+  if (m_iter.has_complex_region () || m_iter.region () != db::Box::world ()) {
+
+    //  TODO: how to establish a "hierarchical" interpretation in this case?
+    return count ();
+
+  } else {
+
+    size_t n = 0;
+
+    const db::Layout &layout = *m_iter.layout ();
+
+    std::set<db::cell_index_type> cells;
+    m_iter.top_cell ()->collect_called_cells (cells);
+
+    for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+      if (cells.find (*c) == cells.end ()) {
+        continue;
+      }
+      for (std::vector<unsigned int>::const_iterator l = m_iter.layers ().begin (); l != m_iter.layers ().end (); ++l) {
+        n += layout.cell (*c).shapes (*l).size (m_iter.shape_flags ());
+      }
+    }
+
+    return n;
+
+  }
 }
 
 RegionIteratorDelegate *

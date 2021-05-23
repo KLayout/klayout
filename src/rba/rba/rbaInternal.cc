@@ -941,6 +941,13 @@ bool is_registered (const gsi::ClassBase *cls)
 
 const gsi::ClassBase *find_cclass (VALUE k)
 {
+  const gsi::ClassBase *cls = find_cclass_maybe_null (k);
+  tl_assert (cls != 0);
+  return cls;
+}
+
+const gsi::ClassBase *find_cclass_maybe_null (VALUE k)
+{
   std::map <VALUE, const gsi::ClassBase *>::const_iterator cls;
 
   //  find the class that is bound to C++ (maybe a super class)
@@ -954,8 +961,7 @@ const gsi::ClassBase *find_cclass (VALUE k)
     }
   }
 
-  tl_assert (cls != cls_map.end ());
-  return cls->second;
+  return cls != cls_map.end () ? cls->second : 0;
 }
 
 }

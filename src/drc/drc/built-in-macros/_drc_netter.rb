@@ -64,7 +64,6 @@ module DRC
 
     def initialize(engine)
       @engine = engine
-      @netlisted = false
       @connect_implicit = []
       @connect_implicit_per_cell = {}
       @connect_explicit = []
@@ -240,7 +239,6 @@ module DRC
     # See \connect for more details.
 
     def clear_connections
-      @netlisted = false
       @connect_implicit = []
       @connect_implicit_per_cell = {}
       @connect_explicit = []
@@ -544,7 +542,7 @@ module DRC
         ensure_data
 
         # run extraction in a timed environment
-        if ! @netlisted
+        if ! @l2n.is_extracted?
 
           # configure implicit net connections
           @l2n.clear_join_net_names
@@ -569,7 +567,6 @@ module DRC
           end
 
           @engine._cmd(@l2n, :extract_netlist)
-          @netlisted = true
 
         end
 
@@ -609,13 +606,13 @@ module DRC
     end
 
     def _l2n_data
-      @netlisted && self.l2n_data
+      @l2n && @l2n.is_extracted? && self.l2n_data
     end
 
   private
 
     def cleanup
-      @netlisted && clear_connections
+      @l2n && @l2n.is_extracted? && clear_connections
     end
     
     def ensure_data
@@ -644,13 +641,12 @@ module DRC
     def register_layer(data)
 
       id = data.data_id 
+      ensure_data
 
       if @layers && @layers[id]
         # already registered
         return
       end
-
-      ensure_data
 
       @layers[id] = data
       @lnum += 1

@@ -394,6 +394,18 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "If errors occur, the device extractor will contain theses errors.\n"
   ) +
+  gsi::method ("reset_extracted", &db::LayoutToNetlist::reset_extracted,
+    "@brief Resets the extracted netlist and enables re-extraction\n"
+    "This method is implicitly called when using \\connect or \\connect_global after a netlist has been extracted.\n"
+    "This enables incremental connect with re-extraction.\n"
+    "\n"
+    "This method has been introduced in version 0.27.1.\n"
+  ) +
+  gsi::method ("is_extracted?", &db::LayoutToNetlist::is_netlist_extracted,
+    "@brief Gets a value indicating whether the netlist has been extracted\n"
+    "\n"
+    "This method has been introduced in version 0.27.1.\n"
+  ) +
   gsi::method ("connect", (void (db::LayoutToNetlist::*) (const db::Region &)) &db::LayoutToNetlist::connect, gsi::arg ("l"),
     "@brief Defines an intra-layer connection for the given layer.\n"
     "The layer is either an original layer created with \\make_incluidelayer and it's variants or\n"

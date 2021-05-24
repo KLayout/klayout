@@ -246,11 +246,21 @@ void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, co
   extractor.extract (dss (), m_layout_index, layers, *mp_netlist, m_net_clusters, m_device_scaling);
 }
 
-void LayoutToNetlist::connect (const db::Region &l)
+void LayoutToNetlist::reset_extracted ()
 {
   if (m_netlist_extracted) {
-    throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
+
+    m_net_clusters.clear ();
+    mp_netlist.reset (0);
+
+    m_netlist_extracted = false;
+
   }
+}
+
+void LayoutToNetlist::connect (const db::Region &l)
+{
+  reset_extracted ();
 
   if (! is_persisted (l)) {
     register_layer (l, make_new_name ());
@@ -265,9 +275,8 @@ void LayoutToNetlist::connect (const db::Region &l)
 
 void LayoutToNetlist::connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b)
 {
-  if (m_netlist_extracted) {
-    throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
-  }
+  reset_extracted ();
+
   if (! is_persisted (a)) {
     register_layer (a, make_new_name ());
   }
@@ -286,9 +295,8 @@ void LayoutToNetlist::connect_impl (const db::ShapeCollection &a, const db::Shap
 
 size_t LayoutToNetlist::connect_global_impl (const db::ShapeCollection &l, const std::string &gn)
 {
-  if (m_netlist_extracted) {
-    throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
-  }
+  reset_extracted ();
+
   if (! is_persisted (l)) {
     register_layer (l, make_new_name ());
   }

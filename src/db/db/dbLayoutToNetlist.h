@@ -360,6 +360,14 @@ public:
   void extract_devices (db::NetlistDeviceExtractor &extractor, const std::map<std::string, db::ShapeCollection *> &layers);
 
   /**
+   *  @brief Resets the extracted netlist
+   *
+   *  This method will invalidate the netlist and extraction. It is called automatically when
+   *  cone of the connect methods is called.
+   */
+  void reset_extracted ();
+
+  /**
    *  @brief Defines an intra-layer connection for the given layer.
    *  The layer is either an original layer created with "make_layer" and it's variants or
    *  a derived layer. Certain limitations apply. It's safe to use
@@ -531,6 +539,14 @@ public:
    *  use it.
    */
   void set_netlist_extracted ();
+
+  /**
+   *  @brief Gets a value indicating whether the netlist has been extracted
+   */
+  bool is_netlist_extracted () const
+  {
+    return m_netlist_extracted;
+  }
 
   /**
    *  @brief Gets the internal DeepShapeStore object

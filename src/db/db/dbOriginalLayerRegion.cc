@@ -190,7 +190,7 @@ OriginalLayerRegion::min_coherence_changed ()
 size_t
 OriginalLayerRegion::count () const
 {
-  if (m_iter.has_complex_region () || m_iter.region () != db::Box::world ()) {
+  if (m_iter.has_complex_region () || m_iter.region () != db::Box::world () || ! m_iter.enables ().empty () || ! m_iter.disables ().empty ()) {
 
     //  complex case with a search region - use the iterator to determine the count (expensive)
     size_t n = 0;
@@ -210,6 +210,7 @@ OriginalLayerRegion::count () const
 
     std::set<db::cell_index_type> cells;
     m_iter.top_cell ()->collect_called_cells (cells);
+    cells.insert (m_iter.top_cell ()->cell_index ());
 
     db::CellCounter cc (&layout);
     for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
@@ -217,8 +218,12 @@ OriginalLayerRegion::count () const
         continue;
       }
       size_t nn = 0;
-      for (std::vector<unsigned int>::const_iterator l = m_iter.layers ().begin (); l != m_iter.layers ().end (); ++l) {
-        nn += layout.cell (*c).shapes (*l).size (m_iter.shape_flags ());
+      if (m_iter.multiple_layers ()) {
+        for (std::vector<unsigned int>::const_iterator l = m_iter.layers ().begin (); l != m_iter.layers ().end (); ++l) {
+          nn += layout.cell (*c).shapes (*l).size (m_iter.shape_flags ());
+        }
+      } else {
+        nn += layout.cell (*c).shapes (m_iter.layer ()).size (m_iter.shape_flags ());
       }
       n += cc.weight (*c) * nn;
     }
@@ -244,13 +249,18 @@ OriginalLayerRegion::hier_count () const
 
     std::set<db::cell_index_type> cells;
     m_iter.top_cell ()->collect_called_cells (cells);
+    cells.insert (m_iter.top_cell ()->cell_index ());
 
     for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
       if (cells.find (*c) == cells.end ()) {
         continue;
       }
-      for (std::vector<unsigned int>::const_iterator l = m_iter.layers ().begin (); l != m_iter.layers ().end (); ++l) {
-        n += layout.cell (*c).shapes (*l).size (m_iter.shape_flags ());
+      if (m_iter.multiple_layers ()) {
+        for (std::vector<unsigned int>::const_iterator l = m_iter.layers ().begin (); l != m_iter.layers ().end (); ++l) {
+          n += layout.cell (*c).shapes (*l).size (m_iter.shape_flags ());
+        }
+      } else {
+        n += layout.cell (*c).shapes (m_iter.layer ()).size (m_iter.shape_flags ());
       }
     }
 

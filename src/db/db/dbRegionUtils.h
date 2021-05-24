@@ -601,7 +601,7 @@ public:
    *  @brief Before the scanner is run, this method must be called to feed additional edges into the scanner
    *  (required for negative edge output - cancellation of perpendicular edges)
    */
-  void feed_pseudo_edges (db::box_scanner<db::Edge, size_t> &scanner);
+  bool feed_pseudo_edges (db::box_scanner<db::Edge, size_t> &scanner);
 
   /**
    *  @brief Reimplementation of the box_scanner_receiver interface
@@ -642,11 +642,27 @@ public:
   }
 
   /**
+   *  @brief Gets a flag indicating that this class wants negative edge output
+   */
+  bool has_negative_edge_output () const
+  {
+    return m_has_negative_edge_output;
+  }
+
+  /**
    *  @brief Sets a flag indicating that this class wants normal edge pair output
    */
   void set_has_edge_pair_output (bool f)
   {
     m_has_edge_pair_output = f;
+  }
+
+  /**
+   *  @brief Gets a flag indicating that this class wants normal edge pair output
+   */
+  bool has_edge_pair_output () const
+  {
+    return m_has_edge_pair_output;
   }
 
   /**

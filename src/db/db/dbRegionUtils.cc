@@ -154,13 +154,16 @@ Edge2EdgeCheckBase::finish (const Edge *o, const size_t &p)
   }
 }
 
-void
+bool
 Edge2EdgeCheckBase::feed_pseudo_edges (db::box_scanner<db::Edge, size_t> &scanner)
 {
   if (m_pass == 1) {
     for (std::set<std::pair<db::Edge, size_t> >::const_iterator e = m_pseudo_edges.begin (); e != m_pseudo_edges.end (); ++e) {
       scanner.insert (&e->first, e->second);
     }
+    return ! m_pseudo_edges.empty ();
+  } else {
+    return false;
   }
 }
 
@@ -442,11 +445,33 @@ poly2poly_check<PolygonType>::add (const PolygonType *o1, size_t p1, const Polyg
   enter (*o1, p1, *o2, p2);
 }
 
+static bool interact (const db::Box &box, const db::Edge &e)
+{
+  if (! e.bbox ().touches (box)) {
+    return false;
+  } else if (e.is_ortho ()) {
+    return true;
+  } else {
+    return e.clipped (box).first;
+  }
+}
+
 template <class PolygonType>
 void
 poly2poly_check<PolygonType>::enter (const PolygonType &o1, size_t p1, const PolygonType &o2, size_t p2)
 {
-  if ((! mp_output->different_polygons () || p1 != p2) && (! mp_output->requires_different_layers () || ((p1 ^ p2) & 1) != 0)) {
+  if (p1 != p2 && (! mp_output->requires_different_layers () || ((p1 ^ p2) & 1) != 0)) {
+
+    bool take_all = mp_output->has_negative_edge_output ();
+
+    db::Box common_box;
+    if (! take_all) {
+      db::Vector e (mp_output->distance (), mp_output->distance ());
+      common_box = o1.box ().enlarged (e) & o2.box ().enlarged (e);
+      if (common_box.empty ()) {
+        return;
+      }
+    }
 
     m_scanner.clear ();
     m_scanner.reserve (vertices (o1) + vertices (o2));
@@ -454,19 +479,29 @@ poly2poly_check<PolygonType>::enter (const PolygonType &o1, size_t p1, const Pol
     m_edges.clear ();
     m_edges.reserve (vertices (o1) + vertices (o2));
 
+    bool any_o1 = false, any_o2 = false;
+
     for (typename PolygonType::polygon_edge_iterator e = o1.begin_edge (); ! e.at_end (); ++e) {
-      m_edges.push_back (*e);
-      m_scanner.insert (& m_edges.back (), p1);
+      if (take_all || interact (common_box, *e)) {
+        m_edges.push_back (*e);
+        m_scanner.insert (& m_edges.back (), p1);
+        any_o1 = true;
+      }
     }
 
     for (typename PolygonType::polygon_edge_iterator e = o2.begin_edge (); ! e.at_end (); ++e) {
-      m_edges.push_back (*e);
-      m_scanner.insert (& m_edges.back (), p2);
+      if (take_all || interact (common_box, *e)) {
+        m_edges.push_back (*e);
+        m_scanner.insert (& m_edges.back (), p2);
+        any_o2 = true;
+      }
+    }
+
+    if (! take_all && (! any_o1 || ! any_o2)) {
+      return;
     }
 
     mp_output->feed_pseudo_edges (m_scanner);
-
-    tl_assert (m_edges.size () == vertices (o1) + vertices (o2));
 
     //  temporarily disable intra-polygon check in that step .. we do that later in finish()
     //  if required (#650).

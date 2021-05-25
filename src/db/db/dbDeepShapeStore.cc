@@ -406,7 +406,9 @@ static unsigned int init_layer (db::Layout &layout, const db::RecursiveShapeIter
   if (si.layout ()) {
     //  try to preserve the layer properties
     if (! si.multiple_layers ()) {
-      layout.set_properties (layer_index, si.layout ()->get_properties (si.layer ()));
+      if (si.layer () < si.layout ()->layers ()) {
+        layout.set_properties (layer_index, si.layout ()->get_properties (si.layer ()));
+      }
     } else if (! si.layers ().empty ()) {
       layout.set_properties (layer_index, si.layout ()->get_properties (si.layers ().front ()));
     }

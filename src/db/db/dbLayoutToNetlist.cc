@@ -1414,32 +1414,6 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_a
         continue;
       }
 
-      db::Polygon::area_type agate_int = 0;
-      db::Polygon::perimeter_type pgate_int = 0;
-
-      compute_area_and_perimeter_of_net_shapes (m_net_clusters, *cid, *c, layer_of (gate), agate_int, pgate_int);
-
-      db::Polygon::area_type ametal_int = 0;
-      db::Polygon::perimeter_type pmetal_int = 0;
-
-      compute_area_and_perimeter_of_net_shapes (m_net_clusters, *cid, *c, layer_of (metal), ametal_int, pmetal_int);
-
-      double agate = 0.0;
-      if (fabs (gate_area_factor) > 1e-6) {
-        agate += agate_int * dbu * dbu * gate_area_factor;
-      }
-      if (fabs (gate_perimeter_factor) > 1e-6) {
-        agate += pgate_int * dbu * gate_perimeter_factor;
-      }
-
-      double ametal = 0.0;
-      if (fabs (metal_area_factor) > 1e-6) {
-        ametal += ametal_int * dbu * dbu * metal_area_factor;
-      }
-      if (fabs (metal_perimeter_factor) > 1e-6) {
-        ametal += pmetal_int * dbu * metal_perimeter_factor;
-      }
-
       double r = ratio;
       bool skip = false;
 
@@ -1462,13 +1436,43 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_a
 
       if (! skip) {
 
-        if (tl::verbosity () >= 50) {
-          tl::info << "cell [" << ly.cell_name (*cid) << "]: agate=" << tl::to_string (agate) << ", ametal=" << tl::to_string (ametal) << ", r=" << tl::sprintf ("%.12g", r);
+        db::Polygon::area_type agate_int = 0;
+        db::Polygon::perimeter_type pgate_int = 0;
+
+        compute_area_and_perimeter_of_net_shapes (m_net_clusters, *cid, *c, layer_of (gate), agate_int, pgate_int);
+
+        double agate = 0.0;
+        if (fabs (gate_area_factor) > 1e-6) {
+          agate += agate_int * dbu * dbu * gate_area_factor;
+        }
+        if (fabs (gate_perimeter_factor) > 1e-6) {
+          agate += pgate_int * dbu * gate_perimeter_factor;
         }
 
-        if (agate > dbu * dbu && ametal / agate > r + db::epsilon) {
-          db::Shapes &shapes = ly.cell (*cid).shapes (dl.layer ());
-          get_merged_shapes_of_net (m_net_clusters, *cid, *c, layer_of (metal), shapes);
+        if (agate > dbu * dbu) {
+
+          db::Polygon::area_type ametal_int = 0;
+          db::Polygon::perimeter_type pmetal_int = 0;
+
+          compute_area_and_perimeter_of_net_shapes (m_net_clusters, *cid, *c, layer_of (metal), ametal_int, pmetal_int);
+
+          double ametal = 0.0;
+          if (fabs (metal_area_factor) > 1e-6) {
+            ametal += ametal_int * dbu * dbu * metal_area_factor;
+          }
+          if (fabs (metal_perimeter_factor) > 1e-6) {
+            ametal += pmetal_int * dbu * metal_perimeter_factor;
+          }
+
+          if (tl::verbosity () >= 50) {
+            tl::info << "cell [" << ly.cell_name (*cid) << "]: agate=" << tl::to_string (agate) << ", ametal=" << tl::to_string (ametal) << ", r=" << tl::sprintf ("%.12g", r);
+          }
+
+          if (ametal / agate > r + db::epsilon) {
+            db::Shapes &shapes = ly.cell (*cid).shapes (dl.layer ());
+            get_merged_shapes_of_net (m_net_clusters, *cid, *c, layer_of (metal), shapes);
+          }
+
         }
 
       }

@@ -586,7 +586,7 @@ These markers indicate the presence of the specified condition.
 </p><p>
 With a lower and upper limit, the results are edges marking the positions on the 
 primary shape where the condition is met.
-With a lower limit alone, these markers are formed by two, identical but opposite edges attached to 
+With a lower limit alone, the results are edge pairs which are formed by two identical, but opposite edges attached to 
 the primary shape. Without an upper limit only, the first edge of the marker is attached to the 
 primary shape while the second edge is attached to the shape of the "other" layer.
 </p><p>
@@ -596,6 +596,11 @@ primary shape while the second edge is attached to the shape of the "other" laye
 <td><img src="/images/drc_enc2u.png"/></td>
 </tr>
 </table>
+</p><p>
+When "larger than" constraints are used, this function will produce the edges from the
+first layer only. The result will still be edge pairs for consistency, but each edge pair holds one edge from
+the original polygon plus a reverse copy of that edge in the second member. Use "first_edges" to extract the 
+actual edges from the first input (see <a href="#separation">separation</a> for an example).
 </p>
 <a name="error"/><h2>"error" - Prints an error</h2>
 <keyword name="error"/>
@@ -1216,6 +1221,11 @@ errors = in.drc(overlap(other) &lt; 0.2.um)
 <td><img src="/images/drc_overlap2u.png"/></td>
 </tr>
 </table>
+</p><p>
+When "larger than" constraints are used, this function will produce the edges from the
+first layer only. The result will still be edge pairs for consistency, but each edge pair holds one edge from
+the original polygon plus a reverse copy of that edge in the second member. Use "first_edges" to extract the 
+actual edges from the first input (see <a href="#separation">separation</a> for an example).
 </p>
 <a name="overlapping"/><h2>"overlapping" - Selects shapes overlapping with other shapes</h2>
 <keyword name="overlapping"/>
@@ -1509,6 +1519,23 @@ work in generating error markers.
 <table>
 <tr>
 <td><img src="/images/drc_separation1u.png"/></td>
+</tr>
+</table>
+</p><p>
+When "larger than" constraints are used, this function will produce the edges from the
+first layer only. The result will still be edge pairs for consistency, but each edge pair holds one edge from
+the original polygon plus a reverse copy of that edge in the second member. Use "first_edges" to extract the 
+actual edges from the first input:
+</p><p>
+<pre>
+l1_edges_without_l2 = l1.drc((separation(l2) &gt;= 1.0).first_edges)
+</pre>
+</p><p>
+The following image shows the effect of such a negative-output separation check:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_separation1un.png"/></td>
 </tr>
 </table>
 </p>
@@ -1863,7 +1890,7 @@ errors = in.drc(0.1.um &lt;= width &lt; 0.2.um)
 </p><p>
 With a lower and upper limit or with the "equal" condition, the results are edges marking the positions on the 
 primary shape where the condition is met.
-With a lower limit alone, these markers are formed by two, identical but opposite edges attached to 
+With a lower limit alone, the results are edge pairs which are formed by two identical, but opposite edges attached to 
 the primary shape. Without an upper limit only, both edges are attached to different sides of the primary
 shape.
 </p><p>

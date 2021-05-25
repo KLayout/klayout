@@ -1024,7 +1024,7 @@ CODE
     # 
     # With a lower and upper limit, the results are edges marking the positions on the 
     # primary shape where the condition is met.
-    # With a lower limit alone, these markers are formed by two, identical but opposite edges attached to 
+    # With a lower limit alone, the results are edge pairs which are formed by two identical, but opposite edges attached to 
     # the primary shape. Without an upper limit only, the first edge of the marker is attached to the 
     # primary shape while the second edge is attached to the shape of the "other" layer.
     #
@@ -1034,6 +1034,12 @@ CODE
     #     @td @img(/images/drc_enc2u.png) @/td
     #   @/tr
     # @/table
+    #
+    # When "larger than" constraints are used, this function will produce the edges from the
+    # first layer only. The result will still be edge pairs for consistency, but each edge pair holds one edge from
+    # the original polygon plus a reverse copy of that edge in the second member. Use "first_edges" to extract the 
+    # actual edges from the first input (see \separation for an example).
+    #
     
     # %DRC%
     # @name separation
@@ -1049,10 +1055,6 @@ CODE
     # opposite and rectangle filtering. See \Layer#separation for details about opposite and
     # rectangle error filtering.
     # 
-    # When "larger than" constraints are used, this function will produce the edges from the
-    # first layer. The result will still be edge pairs for consistency, but each edge pair holds one edge from
-    # the original polygon plus a reverse copy of that edge in the second member.
-    #
     # @h3 Classic mode @/h3
     #
     # Like \enclosing, this function is available as a classic DRC function with a layer as the first
@@ -1083,6 +1085,23 @@ CODE
     # @table
     #   @tr 
     #     @td @img(/images/drc_separation1u.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # When "larger than" constraints are used, this function will produce the edges from the
+    # first layer only. The result will still be edge pairs for consistency, but each edge pair holds one edge from
+    # the original polygon plus a reverse copy of that edge in the second member. Use "first_edges" to extract the 
+    # actual edges from the first input:
+    #
+    # @code
+    # l1_edges_without_l2 = l1.drc((separation(l2) >= 1.0).first_edges)
+    # @/code
+    #
+    # The following image shows the effect of such a negative-output separation check:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_separation1un.png) @/td
     #   @/tr
     # @/table
     
@@ -1128,6 +1147,12 @@ CODE
     #     @td @img(/images/drc_overlap2u.png) @/td
     #   @/tr
     # @/table
+    #
+    # When "larger than" constraints are used, this function will produce the edges from the
+    # first layer only. The result will still be edge pairs for consistency, but each edge pair holds one edge from
+    # the original polygon plus a reverse copy of that edge in the second member. Use "first_edges" to extract the 
+    # actual edges from the first input (see \separation for an example).
+    #
     
     # %DRC%
     # @name width
@@ -1184,7 +1209,7 @@ CODE
     #
     # With a lower and upper limit or with the "equal" condition, the results are edges marking the positions on the 
     # primary shape where the condition is met.
-    # With a lower limit alone, these markers are formed by two, identical but opposite edges attached to 
+    # With a lower limit alone, the results are edge pairs which are formed by two identical, but opposite edges attached to 
     # the primary shape. Without an upper limit only, both edges are attached to different sides of the primary
     # shape.
     #

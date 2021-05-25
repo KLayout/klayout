@@ -214,7 +214,7 @@ new_layer = layer.collect { |polygon| polygon.transformed(t) }
 <keyword name="collect_to_edge_pairs"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.collect { |object| ... }</tt></li>
+<li><tt>layer.collect_to_edge_pairs { |object| ... }</tt></li>
 </ul>
 <p>
 This method is similar to <a href="#collect">collect</a>, but creates an edge pair layer. It expects the block to 
@@ -224,7 +224,7 @@ deliver <class_doc href="EdgePair">EdgePair</class_doc>, <class_doc href="DEdgeP
 <keyword name="collect_to_edges"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.collect { |object| ... }</tt></li>
+<li><tt>layer.collect_to_edges { |object| ... }</tt></li>
 </ul>
 <p>
 This method is similar to <a href="#collect">collect</a>, but creates an edge layer. It expects the block to 
@@ -235,7 +235,7 @@ contours will be turned into edge sequences.
 <keyword name="collect_to_region"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.collect { |object| ... }</tt></li>
+<li><tt>layer.collect_to_region { |object| ... }</tt></li>
 </ul>
 <p>
 This method is similar to <a href="#collect">collect</a>, but creates a polygon layer. It expects the block to 
@@ -1438,7 +1438,7 @@ See <a href="#clean">clean</a> for a discussion of the raw state.
 <p>
 See <a href="#isolated">isolated</a> for a description of that method
 </p>
-<a name="isolated"/><h2>"isolated" - An isolation check</h2>
+<a name="isolated"/><h2>"isolated" - An inter-polygon isolation check</h2>
 <keyword name="isolated"/>
 <p>Usage:</p>
 <ul>
@@ -1449,8 +1449,8 @@ See <a href="#isolated">isolated</a> for a description of that method
 <b>Note: </b>"isolated" and "iso" are available as operators for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
 the <a href="#DRC">DRC</a> framework. These variants have more options and are more intuitive to use. See <a href="/about/drc_ref_global.xml#isolated">isolated</a> for more details.
 </p><p>
-See <a href="#space">space</a> for a description of this method. 
-In contrast to <a href="#space">space</a>, this
+See <a href="#space">space</a> for a description of this method. "isolated" is the space check variant which checks different polygons only.
+In contrast to <a href="#space">space</a>, the "isolated"
 method is available for polygon layers only, since only on such layers 
 different polygons can be identified.
 </p><p>
@@ -1845,7 +1845,7 @@ This method is available for polygons only.
 It returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_not_overlapping">select_not_overlapping</a>.
 </p>
-<a name="notch"/><h2>"notch" - An intra-region spacing check</h2>
+<a name="notch"/><h2>"notch" - An intra-polygon spacing check</h2>
 <keyword name="notch"/>
 <p>Usage:</p>
 <ul>
@@ -1855,8 +1855,9 @@ is <a href="#select_not_overlapping">select_not_overlapping</a>.
 <b>Note: </b>"notch" is available as an operator for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
 the <a href="#DRC">DRC</a> framework. This variant has more options and is more intuitive to use. See <a href="/about/drc_ref_global.xml#notch">notch</a> for more details.
 </p><p>
-See <a href="#space">space</a> for a description of this method.
-In contrast to <a href="#space">space</a>, this
+See <a href="#space">space</a> for a description of this method. 
+"notch" is the space check variant which finds space violations within a single polygon, but not against other polygons.
+In contrast to <a href="#space">space</a>, the "notch"
 method is available for polygon layers only, since only on such layers 
 different polygons can be identified. Also, opposite and rectangle error
 filtering is not available for this method.
@@ -1918,6 +1919,9 @@ on polygons and edges (input1: red, input2: blue):
 <td><img src="/images/drc_or2.png"/></td>
 </tr>
 </table>
+</p><p>
+In deep mode, "or" or "|" does not imply merging. In deep mode,
+"or" is an alias for "+" ("add").
 </p>
 <a name="output"/><h2>"output" - Outputs the content of the layer</h2>
 <keyword name="output"/>
@@ -2688,11 +2692,16 @@ The following images show the effect of various forms of the "sized" method:
 <p>Usage:</p>
 <ul>
 <li><tt>layer.smoothed(d)</tt></li>
+<li><tt>layer.smoothed(d, hv_keep)</tt></li>
 </ul>
 <p>
 "Smoothing" returns a simplified version of the polygons. Simplification is 
 achieved by removing vertices unless the resulting polygon deviates by more
 than the given distance d from the original polygon.
+</p><p>
+"hv_keep" is a boolean parameter which makes the smoothing function maintain
+horizontal or vertical edges. The default is false, meaning horizontal or
+vertical edges may be changed into tilted ones.
 </p><p>
 This method return a layer wit the modified polygons. Merged semantics applies for this
 method (see <a href="#raw">raw</a> and <a href="#clean">clean</a>).

@@ -550,11 +550,13 @@ public:
   }
 
   /**
-   *  @brief Get the layer of the current shape
+   *  @brief Gets the layer of the current shape
    */
   unsigned int layer () const
   {
-    validate (0);
+    if (m_has_layers) {
+      validate (0);
+    }
     return m_layer;
   }
 
@@ -562,7 +564,7 @@ public:
    *  @brief Gets the layers from which the shapes are taken from
    *
    *  The returned layers are useful only if \multiple_layers is
-   *  true.
+   *  true. Otherwise use \layer to get the iterated layer.
    */
   const std::vector<unsigned int> &layers () const
   {

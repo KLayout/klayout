@@ -190,11 +190,15 @@ OriginalLayerRegion::min_coherence_changed ()
 size_t
 OriginalLayerRegion::count () const
 {
-  if (m_iter.has_complex_region () || m_iter.region () != db::Box::world () || ! m_iter.enables ().empty () || ! m_iter.disables ().empty ()) {
+  //  NOTE: we should to make sure the iterator isn't validated as this would spoil the usability or OriginalLayerRegion upon
+  //  layout changes
+  db::RecursiveShapeIterator iter = m_iter;
+
+  if (iter.has_complex_region () || iter.region () != db::Box::world () || ! iter.enables ().empty () || ! iter.disables ().empty ()) {
 
     //  complex case with a search region - use the iterator to determine the count (expensive)
     size_t n = 0;
-    for (db::RecursiveShapeIterator i = m_iter; ! i.at_end (); ++i) {
+    for (db::RecursiveShapeIterator i = iter; ! i.at_end (); ++i) {
       ++n;
     }
 
@@ -206,11 +210,11 @@ OriginalLayerRegion::count () const
 
     size_t n = 0;
 
-    const db::Layout &layout = *m_iter.layout ();
+    const db::Layout &layout = *iter.layout ();
 
     std::set<db::cell_index_type> cells;
-    m_iter.top_cell ()->collect_called_cells (cells);
-    cells.insert (m_iter.top_cell ()->cell_index ());
+    iter.top_cell ()->collect_called_cells (cells);
+    cells.insert (iter.top_cell ()->cell_index ());
 
     db::CellCounter cc (&layout);
     for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
@@ -218,12 +222,12 @@ OriginalLayerRegion::count () const
         continue;
       }
       size_t nn = 0;
-      if (m_iter.multiple_layers ()) {
-        for (std::vector<unsigned int>::const_iterator l = m_iter.layers ().begin (); l != m_iter.layers ().end (); ++l) {
-          nn += layout.cell (*c).shapes (*l).size (m_iter.shape_flags ());
+      if (iter.multiple_layers ()) {
+        for (std::vector<unsigned int>::const_iterator l = iter.layers ().begin (); l != iter.layers ().end (); ++l) {
+          nn += layout.cell (*c).shapes (*l).size (iter.shape_flags ());
         }
       } else {
-        nn += layout.cell (*c).shapes (m_iter.layer ()).size (m_iter.shape_flags ());
+        nn += layout.cell (*c).shapes (iter.layer ()).size (iter.shape_flags ());
       }
       n += cc.weight (*c) * nn;
     }
@@ -236,7 +240,11 @@ OriginalLayerRegion::count () const
 size_t
 OriginalLayerRegion::hier_count () const
 {
-  if (m_iter.has_complex_region () || m_iter.region () != db::Box::world ()) {
+  //  NOTE: we should to make sure the iterator isn't validated as this would spoil the usability or OriginalLayerRegion upon
+  //  layout changes
+  db::RecursiveShapeIterator iter = m_iter;
+
+  if (iter.has_complex_region () || iter.region () != db::Box::world ()) {
 
     //  TODO: how to establish a "hierarchical" interpretation in this case?
     return count ();
@@ -245,22 +253,22 @@ OriginalLayerRegion::hier_count () const
 
     size_t n = 0;
 
-    const db::Layout &layout = *m_iter.layout ();
+    const db::Layout &layout = *iter.layout ();
 
     std::set<db::cell_index_type> cells;
-    m_iter.top_cell ()->collect_called_cells (cells);
-    cells.insert (m_iter.top_cell ()->cell_index ());
+    iter.top_cell ()->collect_called_cells (cells);
+    cells.insert (iter.top_cell ()->cell_index ());
 
     for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
       if (cells.find (*c) == cells.end ()) {
         continue;
       }
-      if (m_iter.multiple_layers ()) {
-        for (std::vector<unsigned int>::const_iterator l = m_iter.layers ().begin (); l != m_iter.layers ().end (); ++l) {
-          n += layout.cell (*c).shapes (*l).size (m_iter.shape_flags ());
+      if (iter.multiple_layers ()) {
+        for (std::vector<unsigned int>::const_iterator l = iter.layers ().begin (); l != iter.layers ().end (); ++l) {
+          n += layout.cell (*c).shapes (*l).size (iter.shape_flags ());
         }
       } else {
-        n += layout.cell (*c).shapes (m_iter.layer ()).size (m_iter.shape_flags ());
+        n += layout.cell (*c).shapes (iter.layer ()).size (iter.shape_flags ());
       }
     }
 

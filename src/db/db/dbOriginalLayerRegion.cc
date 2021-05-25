@@ -224,10 +224,10 @@ OriginalLayerRegion::count () const
       size_t nn = 0;
       if (iter.multiple_layers ()) {
         for (std::vector<unsigned int>::const_iterator l = iter.layers ().begin (); l != iter.layers ().end (); ++l) {
-          nn += layout.cell (*c).shapes (*l).size (iter.shape_flags ());
+          nn += layout.cell (*c).shapes (*l).size (iter.shape_flags () & db::ShapeIterator::Regions);
         }
-      } else {
-        nn += layout.cell (*c).shapes (iter.layer ()).size (iter.shape_flags ());
+      } else if (iter.layer () < layout.layers ()) {
+        nn += layout.cell (*c).shapes (iter.layer ()).size (iter.shape_flags () & db::ShapeIterator::Regions);
       }
       n += cc.weight (*c) * nn;
     }
@@ -265,10 +265,10 @@ OriginalLayerRegion::hier_count () const
       }
       if (iter.multiple_layers ()) {
         for (std::vector<unsigned int>::const_iterator l = iter.layers ().begin (); l != iter.layers ().end (); ++l) {
-          n += layout.cell (*c).shapes (*l).size (iter.shape_flags ());
+          n += layout.cell (*c).shapes (*l).size (iter.shape_flags () & db::ShapeIterator::Regions);
         }
-      } else {
-        n += layout.cell (*c).shapes (iter.layer ()).size (iter.shape_flags ());
+      } else if (iter.layer () < layout.layers ()) {
+        n += layout.cell (*c).shapes (iter.layer ()).size (iter.shape_flags () & db::ShapeIterator::Regions);
       }
     }
 

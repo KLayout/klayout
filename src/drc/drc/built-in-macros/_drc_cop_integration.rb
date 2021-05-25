@@ -1048,6 +1048,10 @@ CODE
     # as metrics, projection and angle constraints etc. This check also features
     # opposite and rectangle filtering. See \Layer#separation for details about opposite and
     # rectangle error filtering.
+    # 
+    # When "larger than" constraints are used, this function will produce the edges from the
+    # first layer. The result will still be edge pairs for consistency, but each edge pair holds one edge from
+    # the original polygon plus a reverse copy of that edge in the second member.
     #
     # @h3 Classic mode @/h3
     #

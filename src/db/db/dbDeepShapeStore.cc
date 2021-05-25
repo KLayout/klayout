@@ -402,11 +402,14 @@ static size_t s_instance_count = 0;
 static unsigned int init_layer (db::Layout &layout, const db::RecursiveShapeIterator &si)
 {
   unsigned int layer_index = layout.insert_layer ();
-  unsigned int iter_layer = si.multiple_layers () ? si.layers ().front () : si.layer ();
 
-  if (si.layout () && iter_layer < si.layout ()->layers ()) {
+  if (si.layout ()) {
     //  try to preserve the layer properties
-    layout.set_properties (layer_index, si.layout ()->get_properties (iter_layer));
+    if (! si.multiple_layers ()) {
+      layout.set_properties (layer_index, si.layout ()->get_properties (si.layer ()));
+    } else if (! si.layers ().empty ()) {
+      layout.set_properties (layer_index, si.layout ()->get_properties (si.layers ().front ()));
+    }
   }
 
   return layer_index;

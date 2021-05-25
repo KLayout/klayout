@@ -1335,7 +1335,7 @@ CODE
     # %DRC%
     # @name collect_to_region
     # @brief Transforms a layer into polygon objects
-    # @synopsis layer.collect { |object| ... }
+    # @synopsis layer.collect_to_region { |object| ... }
     # This method is similar to \collect, but creates a polygon layer. It expects the block to 
     # deliver objects that can be converted into polygons. Such objects are of class RBA::DPolygon,
     # RBA::DBox, RBA::DPath, RBA::Polygon, RBA::Path, RBA::Box and RBA::Region.
@@ -1343,7 +1343,7 @@ CODE
     # %DRC%
     # @name collect_to_edges
     # @brief Transforms a layer into edge objects
-    # @synopsis layer.collect { |object| ... }
+    # @synopsis layer.collect_to_edges { |object| ... }
     # This method is similar to \collect, but creates an edge layer. It expects the block to 
     # deliver objects that can be converted into edges. If polygon-like objects are returned, their
     # contours will be turned into edge sequences.
@@ -1351,7 +1351,7 @@ CODE
     # %DRC%
     # @name collect_to_edge_pairs
     # @brief Transforms a layer into edge pair objects
-    # @synopsis layer.collect { |object| ... }
+    # @synopsis layer.collect_to_edge_pairs { |object| ... }
     # This method is similar to \collect, but creates an edge pair layer. It expects the block to 
     # deliver RBA::EdgePair, RBA::DEdgePair or RBA::EdgePairs objects.
     
@@ -3347,15 +3347,15 @@ CODE
     
     # %DRC%
     # @name isolated
-    # @brief An isolation check
+    # @brief An inter-polygon isolation check
     # @synopsis layer.isolated(value [, options])
     # @synopsis layer.iso(value [, options])
     #
     # @b Note: @/b "isolated" and "iso" are available as operators for the "universal DRC" function \Layer#drc within
     # the \DRC framework. These variants have more options and are more intuitive to use. See \global#isolated for more details.
     #
-    # See \space for a description of this method. 
-    # In contrast to \space, this
+    # See \space for a description of this method. "isolated" is the space check variant which checks different polygons only.
+    # In contrast to \space, the "isolated"
     # method is available for polygon layers only, since only on such layers 
     # different polygons can be identified.
     #
@@ -3371,14 +3371,15 @@ CODE
     
     # %DRC%
     # @name notch
-    # @brief An intra-region spacing check
+    # @brief An intra-polygon spacing check
     # @synopsis layer.notch(value [, options])
     #
     # @b Note: @/b "notch" is available as an operator for the "universal DRC" function \Layer#drc within
     # the \DRC framework. This variant has more options and is more intuitive to use. See \global#notch for more details.
     #
-    # See \space for a description of this method.
-    # In contrast to \space, this
+    # See \space for a description of this method. 
+    # "notch" is the space check variant which finds space violations within a single polygon, but not against other polygons.
+    # In contrast to \space, the "notch"
     # method is available for polygon layers only, since only on such layers 
     # different polygons can be identified. Also, opposite and rectangle error
     # filtering is not available for this method.

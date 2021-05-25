@@ -385,6 +385,25 @@ module DRC
     # errors = antenna_check(gate, metal1, 50.0)
     # @/code
     #
+    # Usually antenna checks apply to multiple metal layers. In this case,
+    # the connectivity needs to be extended after the first check to include
+    # the next metal layers. This can be achieved with incremental connects:
+    #
+    # @code
+    # # provide connections up to metal1
+    # connect(gate, poly)
+    # connect(poly, contact)
+    # connect(contact, metal1)
+    # metal1_errors = antenna_check(gate, metal1, 50.0)
+    #
+    # # now *add* connections up to metal2
+    # connect(metal1, via1)
+    # connect(via1, metal2)
+    # metal2_errors = antenna_check(gate, metal2, 50.0)
+    #
+    # ... continue this scheme with further metal layers ...
+    # @/code 
+    #
     # Plasma induced damage can be rectified by including diodes
     # which create a safe current path for discharging the metal
     # islands. Such diodes can be identified with a recognition layer

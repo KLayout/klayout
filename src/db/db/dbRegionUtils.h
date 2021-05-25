@@ -844,9 +844,13 @@ protected:
     if (layer == 0) {
       edge2edge_check<Output>::put (db::EdgePair (edge, edge.swapped_points ()), false);
     }
+#if 0
+    //  NOTE: second-input negative edge output isn't worth a lot as the second input often is not merged, hence
+    //  the outer edges to not represent the actual contour.
     if (layer == 1) {
       edge2edge_check<Output>::put (db::EdgePair (edge.swapped_points (), edge), false);
     }
+#endif
   }
 };
 

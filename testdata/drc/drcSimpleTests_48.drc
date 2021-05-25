@@ -1,0 +1,44 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+l1.drc(separation(l2, projection) < 1.0).output(100, 0)
+l1.drc(separation(l2, whole_edges, projection) < 1.0).output(101, 0)
+l1.drc(separation(l2, projection) >= 1.0).output(102, 0)
+l1.separation(l2, projection, 1.0).output(110, 0)
+l1.separation(l2, projection, 1.0, whole_edges).output(111, 0)
+
+l2.drc(separation(l1, projection) < 1.0).output(200, 0)
+l2.drc(separation(l1, whole_edges, projection) < 1.0).output(201, 0)
+l2.drc(separation(l1, projection) >= 1.0).output(202, 0)
+l2.separation(l1, projection, 1.0).output(210, 0)
+l2.separation(l1, projection, 1.0, whole_edges).output(211, 0)
+
+(l1 + l2).drc(space(projection) < 1.0).output(300, 0)
+(l1 + l2).drc(space(whole_edges, projection) < 1.0).output(301, 0)
+(l1 + l2).drc(space(projection) >= 1.0).output(302, 0)
+(l1 + l2).space(projection, 1.0).output(310, 0)
+(l1 + l2).space(projection, 1.0, whole_edges).output(311, 0)
+
+l1.drc(enclosing(l2, projection) < 1.0).output(400, 0)
+l1.drc(enclosing(l2, whole_edges, projection) < 1.0).output(401, 0)
+l1.drc(enclosing(l2, projection) >= 1.0).output(402, 0)
+l1.enclosing(l2, projection, 1.0).output(410, 0)
+l1.enclosing(l2, projection, 1.0, whole_edges).output(411, 0)
+
+l1.drc(overlap(l2, projection) < 1.0).output(500, 0)
+l1.drc(overlap(l2, whole_edges, projection) < 1.0).output(501, 0)
+l1.drc(overlap(l2, projection) >= 1.0).output(502, 0)
+l1.overlap(l2, projection, 1.0).output(510, 0)
+l1.overlap(l2, projection, 1.0, whole_edges).output(511, 0)
+

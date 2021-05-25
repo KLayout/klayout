@@ -1645,8 +1645,14 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
     if (! other_deep) {
       return db::AsIfFlatRegion::run_check (rel, different_polygons, other, d, options);
     }
-    other_layer = other_deep->deep_layer ().layer ();
-    other_is_merged = other->is_merged ();
+    if (options.whole_edges) {
+      //  NOTE: whole edges needs both inputs merged
+      other_layer = other_deep->merged_deep_layer ().layer ();
+      other_is_merged = true;
+    } else {
+      other_layer = other_deep->deep_layer ().layer ();
+      other_is_merged = other->is_merged ();
+    }
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();

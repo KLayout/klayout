@@ -843,15 +843,6 @@ public:
     }
   }
 
-  virtual bool equal (const db::Device &a, const db::Device &b) const
-  {
-    if (cb_equal.can_issue ()) {
-      return cb_equal.issue<db::EqualDeviceParameters, bool, const db::Device &, const db::Device &> (&db::EqualDeviceParameters::equal, a, b);
-    } else {
-      return db::EqualDeviceParameters::equal (a, b);
-    }
-  }
-
   gsi::Callback cb_less, cb_equal;
 };
 
@@ -903,13 +894,12 @@ Class<db::EqualDeviceParameters> decl_dbEqualDeviceParameters ("db", "EqualDevic
 );
 
 Class<GenericDeviceParameterCompare> decl_GenericDeviceParameterCompare (decl_dbEqualDeviceParameters, "db", "GenericDeviceParameterCompare",
-  gsi::callback ("equal", &GenericDeviceParameterCompare::equal, &GenericDeviceParameterCompare::cb_equal, gsi::arg ("device_a"), gsi::arg ("device_b"),
-    "@brief Compares the parameters of two devices for equality. "
-    "Returns true, if the parameters of device a and b are considered equal."
-  ) +
   gsi::callback ("less", &GenericDeviceParameterCompare::less, &GenericDeviceParameterCompare::cb_less, gsi::arg ("device_a"), gsi::arg ("device_b"),
     "@brief Compares the parameters of two devices for a begin less than b. "
     "Returns true, if the parameters of device a are considered less than those of device b."
+    "The 'less' implementation needs to ensure strict weak ordering. Specifically, less(a,b) == false and less(b,a) implies that a is equal to b and "
+    "less(a,b) == true implies that less(b,a) is false and vice versa. If not, an internal error "
+    "will be encountered on netlist compare."
   ),
   "@brief A class implementing the comparison of device parameters.\n"
   "Reimplement this class to provide a custom device parameter compare scheme.\n"
@@ -919,7 +909,7 @@ Class<GenericDeviceParameterCompare> decl_GenericDeviceParameterCompare (decl_db
   "This class is intended for special cases. In most scenarios it is easier to use \\EqualDeviceParameters instead of "
   "implementing a custom comparer class.\n"
   "\n"
-  "This class has been added in version 0.26."
+  "This class has been added in version 0.26. The 'equal' method has been dropped in 0.27.1 as it can be expressed as !less(a,b) && !less(b,a)."
 );
 
 static tl::id_type id_of_device_class (const db::DeviceClass *cls)

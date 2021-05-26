@@ -1,0 +1,111 @@
+#%lvsdb-klayout
+
+# Layout
+layout(
+ top(TOP)
+ unit(0.001)
+
+ # Layer section
+ # This section lists the mask layers (drawing or derived) and their connections.
+
+ # Mask layers
+ layer(l3 '8/0')
+ layer(l1)
+
+ # Mask layer connectivity
+ connect(l3 l3 l1)
+ connect(l1 l3 l1)
+
+ # Device class section
+ class(RES RES)
+
+ # Device abstracts section
+ # Device abstracts list the pin shapes of the devices.
+ device(D$RES RES
+  terminal(A
+   rect(l1 (2225 -675) (200 250))
+  )
+  terminal(B
+   rect(l1 (-2425 425) (200 250))
+  )
+ )
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(TOP
+
+  # Circuit boundary
+  rect((0 0) (10255 5900))
+
+  # Nets with their geometries
+  net(1
+   rect(l3 (4850 4600) (180 180))
+   rect(l1 (-245 -250) (310 320))
+   rect(l1 (0 -250) (200 250))
+  )
+  net(2
+   rect(l3 (10010 3500) (180 180))
+   rect(l1 (-245 -250) (310 320))
+   rect(l1 (-510 -250) (200 250))
+  )
+
+  # Devices and their connections
+  device(1 D$RES
+   location(7520 4175)
+   param(R 51)
+   param(L 25.5)
+   param(W 0.5)
+   param(A 3.1875)
+   param(P 26)
+   terminal(A 2)
+   terminal(B 1)
+  )
+
+ )
+)
+
+# Reference netlist
+reference(
+
+ # Device class section
+ class(RES RES)
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(TOP
+
+  # Nets
+  net(1 name(R1))
+  net(2 name(R2))
+
+  # Outgoing pins and their connections to nets
+  pin(1 name(R1))
+  pin(2 name(R2))
+
+  # Devices and their connections
+  device(1 RES
+   name('5')
+   param(R 50.1)
+   param(L 0)
+   param(W 0)
+   param(A 0)
+   param(P 0)
+   terminal(A 1)
+   terminal(B 2)
+  )
+
+ )
+)
+
+# Cross reference
+xref(
+ circuit(TOP TOP match
+  xref(
+   net(1 1 warning)
+   net(2 2 warning)
+   pin(() 0 match)
+   pin(() 1 match)
+   device(1 1 match)
+  )
+ )
+)

@@ -3052,7 +3052,7 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
       db::DeviceClass *db = const_cast<db::DeviceClass *> (i->second.second);
 
       const db::DeviceParameterCompareDelegate *cmp = da->parameter_compare_delegate ();
-      db->set_parameter_compare_delegate (cmp ? cmp->clone () : 0);
+      db->set_parameter_compare_delegate (const_cast<db::DeviceParameterCompareDelegate *> (cmp));
 
     }
 

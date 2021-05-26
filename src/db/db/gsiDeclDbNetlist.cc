@@ -627,7 +627,7 @@ Class<db::Net> decl_dbNet (decl_dbNetlistObject, "db", "Net",
   ) +
   gsi::method ("name=", &db::Net::set_name, gsi::arg ("name"),
     "@brief Sets the name of the net.\n"
-    "The name of the net is used for nameing the net in schematic files for example. "
+    "The name of the net is used for naming the net in schematic files for example. "
     "The name of the net has to be unique."
   ) +
   gsi::method ("name", &db::Net::name,
@@ -1176,7 +1176,7 @@ Class<GenericDeviceClass> decl_GenericDeviceClass (decl_dbDeviceClass, "db", "Ge
     "Note that terminal equivalence is not effective if the device class operates in strict mode (see \\DeviceClass#strict=)."
   ),
   "@brief A generic device class\n"
-  "This class allows building generic device classes. Specificially, terminals can be defined "
+  "This class allows building generic device classes. Specifically, terminals can be defined "
   "by adding terminal definitions. Terminal definitions should not be added dynamically. To create "
   "your own device, instantiate the \\GenericDeviceClass object, set name and description and "
   "specify the terminals. Then add this new device class to the \\Netlist object where it will live "
@@ -1857,7 +1857,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "This method will eliminate all nets that make less than two connections."
   ) +
   gsi::method ("simplify", &db::Netlist::simplify,
-    "@brief Convience method that combines the simplification.\n"
+    "@brief Convenience method that combines the simplification.\n"
     "This method is a convenience method that runs \\make_top_level_pins, \\purge, \\combine_devices and \\purge_nets."
   ) +
   gsi::method_ext ("read", &read_netlist, gsi::arg ("file"), gsi::arg ("reader"),
@@ -1908,7 +1908,7 @@ public:
     reimpl_write_device_intro (const_cast<db::DeviceClass &> (ccls));
   }
 
-  //  NOTE: we pass non-const refs to Ruby/Python - everthing else is a bit of a nightmare.
+  //  NOTE: we pass non-const refs to Ruby/Python - everything else is a bit of a nightmare.
   //  Still that's not really clean. Just say, the implementation promises not to change the objects.
   void reimpl_write_device_intro (db::DeviceClass &cls) const
   {
@@ -2509,7 +2509,7 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
     "@param element The upper-case element code (\"M\", \"R\", ...).\n"
     "@param name The element's name.\n"
     "@param model The upper-case model name (may be empty).\n"
-    "@param value The default value (e.g. registance for resistors) and may be zero.\n"
+    "@param value The default value (e.g. resistance for resistors) and may be zero.\n"
     "@param nets The nets given in the element line.\n"
     "@param parameters The parameters of the element statement (parameter names are upper case).\n"
     "\n"

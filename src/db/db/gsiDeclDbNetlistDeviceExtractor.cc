@@ -158,7 +158,7 @@ Class<db::NetlistDeviceExtractorError> decl_dbNetlistDeviceExtractorError ("db",
   "The device extractor will keep errors that occurred during extraction of the devices. "
   "It does not by using this error class.\n"
   "\n"
-  "An error is basically described by the cell/circuit it occures in and the message. "
+  "An error is basically described by the cell/circuit it occurs in and the message. "
   "In addition, a geometry may be attached forming a marker that can be shown when the error is selected. "
   "The geometry is given as a \\DPolygon object. If no geometry is specified, this polygon is empty.\n"
   "\n"
@@ -346,7 +346,7 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
   ) +
   gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &, const db::Polygon &)) &GenericDeviceExtractor::error,
     gsi::arg ("message"), gsi::arg ("geometry"),
-   "@brief Issues an error with the given message and databse-unit polygon geometry\n"
+   "@brief Issues an error with the given message and database-unit polygon geometry\n"
   ) +
   gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &, const std::string &, const std::string &)) &GenericDeviceExtractor::error,
     gsi::arg ("category_name"), gsi::arg ("category_description"), gsi::arg ("message"),
@@ -358,7 +358,7 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
   ) +
   gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &, const std::string &, const std::string &, const db::Polygon &)) &GenericDeviceExtractor::error,
     gsi::arg ("category_name"), gsi::arg ("category_description"), gsi::arg ("message"), gsi::arg ("geometry"),
-   "@brief Issues an error with the given category name and description, message and databse-unit polygon geometry\n"
+   "@brief Issues an error with the given category name and description, message and database-unit polygon geometry\n"
   ),
   "@brief The basic class for implementing custom device extractors.\n"
   "\n"
@@ -376,7 +376,7 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
   "  @li The layers used for the device extraction. These are input layers for the extraction as well as "
   "      output layers for defining the terminals. Terminals are the poins at which the nets connect to the devices.\n"
   "      Layers are defined using \\define_layer. Initially, layers are abstract definitions with a name and a description.\n"
-  "      Concrete layers will be given when defining the connectivitiy. @/li\n"
+  "      Concrete layers will be given when defining the connectivity. @/li\n"
   "@/ul\n"
   "\n"
   "When the device extraction is started, the device extraction algorithm will first ask the device extractor "
@@ -386,7 +386,7 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
   "implemented to produce the connectivity.\n"
   "\n"
   "Finally, the individual devices need to be extracted. Each cluster of connected shapes is presented to the "
-  "device extractor. A cluster may include more than one device. It's the device extractor's responsibilty to "
+  "device extractor. A cluster may include more than one device. It's the device extractor's responsibility to "
   "extract the devices from this cluster and deliver the devices through \\create_device. In addition, terminals "
   "have to be defined, so the net extractor can connect to the devices. Terminal definitions are made through "
   "\\define_terminal. The device extraction is implemented in the \\extract_devices method.\n"

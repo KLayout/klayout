@@ -516,7 +516,7 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
     "To reset this constraint, set this attribute to zero."
   ) +
   gsi::method ("max_depth=", &db::NetlistComparer::set_max_depth, gsi::arg ("n"),
-    "@brief Sets the maximum seach depth\n"
+    "@brief Sets the maximum search depth\n"
     "This value limits the search depth of the backtracking algorithm to the\n"
     "given number of jumps.\n"
     "\n"
@@ -524,7 +524,7 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
     "less elaborate matching evaluation.\n"
   ) +
   gsi::method ("max_depth", &db::NetlistComparer::max_depth,
-    "@brief Gets the maximum seach depth\n"
+    "@brief Gets the maximum search depth\n"
     "See \\max_depth= for details."
   ) +
   gsi::method ("max_branch_complexity=", &db::NetlistComparer::set_max_branch_complexity, gsi::arg ("n"),

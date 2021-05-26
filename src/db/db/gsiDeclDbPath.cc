@@ -422,7 +422,7 @@ Class<db::DPath> decl_DPath ("db", "DPath",
     "@param accuracy The numerical accuracy of the computation\n"
     "\n"
     "The accuracy parameter controls the numerical resolution of the approximation process and should be in the "
-    "order of half the database unit. This accuracy is used for suppressing redundant points and simplication of the "
+    "order of half the database unit. This accuracy is used for suppressing redundant points and simplification of the "
     "resulting path.\n"
     "\n"
     "This method has been introduced in version 0.25."

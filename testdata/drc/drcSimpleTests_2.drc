@@ -2,6 +2,15 @@
 target($drc_test_target, "TOP")
 source($drc_test_source, "TOP")
 
+def self.expect_count(layer, c, hc, where)
+  if layer.count != c 
+    raise(where + ": Layer count #{layer.count} does not equal #{c}")
+  end
+  if layer.hier_count != hc 
+    raise(where + ": Layer hier count #{layer.hier_count} does not equal #{c}")
+  end
+end
+
 a1 = input(1)
 b1 = input(2)
 c1 = input(3)
@@ -88,4 +97,7 @@ a1.edges.collect_to_region { |p| p.length < 0.8 && p.bbox.transformed(RBA::VCplx
 # edge pair collect
 a1.width(1.5).collect { |p| p.transformed(RBA::VCplxTrans::new(1000.0)) }.output(1120, 0)
 a1.width(1.5).collect_to_edge_pairs { |p| p.transformed(RBA::VCplxTrans::new(1000.0)) }.output(1121, 0)
+
+expect_count(a1.edges, 9, 9, "a1.edges")
+expect_count(a1.width(1.5), 5, 5, "a1.width(1.5)")
 

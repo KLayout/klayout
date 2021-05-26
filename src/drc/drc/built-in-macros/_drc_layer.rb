@@ -276,16 +276,37 @@ module DRC
     end
     
     # %DRC%
-    # @name size 
+    # @name count 
     # @brief Returns the number of objects on the layer
-    # @synopsis layer.size
+    # @synopsis layer.count
     #
-    # The number of objects is the number of raw objects, not merged
-    # regions or edges. It is more efficent to call this method on output layers than
-    # on input layers.
+    # The count is the number of raw objects, not merged
+    # regions or edges. This is the flat count - the number of polygons,
+    # edges or edge pairs seen from the top cell.
+    # "count" can be computationally expensive for original layers with
+    # clip regions or cell tree filters.
+    #
+    # See \hier_count for a hierarchical (each cell counts once) count.
 
-    def size
-      self.data.size
+    def count
+      self.data.count
+    end
+    
+    # %DRC%
+    # @name hier_count 
+    # @brief Returns the hierarchical number of objects on the layer
+    # @synopsis layer.hier_count
+    #
+    # The hier_count is the number of raw objects, not merged
+    # regions or edges, with each cell counting once. 
+    # A high \count to hier_count (flat to hierarchical) ratio is an indication
+    # of a good hierarchical compression.
+    # "hier_count" applies only to original layers without clip regions or
+    # cell filters and to layers in \deep mode. Otherwise, hier_count gives 
+    # the same value than \count.
+
+    def hier_count
+      self.data.hier_count
     end
     
     # %DRC%

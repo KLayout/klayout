@@ -64,6 +64,10 @@ module DRC
 
     end
 
+    def both
+      DRCBothEdges::new
+    end
+    
     def shift(x, y)
       self._context("shift") do
         RBA::DCplxTrans::new(RBA::DVector::new(_make_value(x) * self.dbu, _make_value(y) * self.dbu))
@@ -1793,6 +1797,7 @@ CODE
       with_bbox_min
       with_bbox_width
       with_length
+      with_distance
       without_angle
       without_area
       without_area_ratio

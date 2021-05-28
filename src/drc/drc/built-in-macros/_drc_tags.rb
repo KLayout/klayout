@@ -16,6 +16,10 @@ module DRC
     end
   end
   
+  # A wrapper for the "both edges" flag for EdgePair#with_length or EdgePair#with_angle
+  class DRCBothEdges
+  end
+  
   # A wrapper for the sizing mode value
   class DRCSizingMode
     attr_accessor :value

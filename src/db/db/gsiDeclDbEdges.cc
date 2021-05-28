@@ -575,10 +575,10 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "edges which have the given angle to the x-axis are returned. If \"inverse\" is true, "
     "edges not having the given angle are returned.\n"
     "\n"
-    "This will filter horizontal edges:\n"
+    "This will select horizontal edges:\n"
     "\n"
     "@code\n"
-    "horizontal = edges.with_orientation(0, true)\n"
+    "horizontal = edges.with_orientation(0, false)\n"
     "@/code\n"
   ) +
   method_ext ("with_angle", with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),

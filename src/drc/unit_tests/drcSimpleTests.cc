@@ -1282,3 +1282,13 @@ TEST(48d_drcWithFragments)
 {
   run_test (_this, "48", true);
 }
+
+TEST(49_drcWithFragments)
+{
+  run_test (_this, "49", false);
+}
+
+TEST(49d_drcWithFragments)
+{
+  run_test (_this, "49", true);
+}

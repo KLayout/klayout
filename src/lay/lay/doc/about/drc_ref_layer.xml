@@ -3158,6 +3158,7 @@ Shielding is enabled by default, but can be switched off with the "transparent" 
 <li><tt>layer.with_angle(min .. max)</tt></li>
 <li><tt>layer.with_angle(value)</tt></li>
 <li><tt>layer.with_angle(min, max)</tt></li>
+<li><tt>edge_pairlayer.with_angle(min, max [, both])</tt></li>
 </ul>
 <p>
 When called on an edge layer, the method selects edges by their angle, 
@@ -3175,6 +3176,11 @@ version is identical to the first one.
 When called on a polygon layer, this method selects corners which match the 
 given angle or is within the given angle interval. The angle is measured between the edges forming the corner.
 For each corner, an edge pair containing the edges forming in the angle is returned.
+</p><p>
+When called on an edge pair layer, this method selects edge pairs with one or both edges
+meeting the angle criterion. In this case an additional argument is accepted which can be
+either "both" (plain word) to indicate that both edges have to be within the given interval.
+Without this argument, it is sufficient for one edge to meet the criterion.
 </p><p>
 A method delivering all objects not matching the angle criterion is <a href="#without_angle">without_angle</a>.
 </p><p>
@@ -3369,6 +3375,27 @@ low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), tile_origin(0.0,
 </p><p>
 The complementary version of "with_density" is <a href="#without_density">without_density</a>.
 </p>
+<a name="with_distance"/><h2>"with_distance" - Selects edge pairs by the distance of the edges</h2>
+<keyword name="with_distance"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.with_distance(min .. max)</tt></li>
+<li><tt>layer.with_distance(value)</tt></li>
+<li><tt>layer.with_distance(min, max)</tt></li>
+</ul>
+<p>
+The method selects edge pairs by the distance of their edges. The first version selects
+edge pairs with a distance larger or equal to min and less than max (but not equal).
+The second version selects edge pairs with exactly the given distance. The third
+version is similar to the first one, but allows specification of nil for min or
+max indicating that there is no lower or upper limit. 
+</p><p>
+The distance of the edges is defined by the minimum distance of all points from the 
+edges involved. For edge pairs generated in geometrical checks this is equivalent
+to the actual distance of the original edges.
+</p><p>
+This method is available for edge pair layers only.
+</p>
 <a name="with_holes"/><h2>"with_holes" - Selects all polygons with the specified number of holes</h2>
 <keyword name="with_holes"/>
 <p>Usage:</p>
@@ -3388,15 +3415,21 @@ which have the specified number of holes.
 <li><tt>layer.with_length(min .. max)</tt></li>
 <li><tt>layer.with_length(value)</tt></li>
 <li><tt>layer.with_length(min, max)</tt></li>
+<li><tt>edge_pairlayer.with_length(min, max [, both])</tt></li>
 </ul>
 <p>
-The method selects edges by their length. The first version selected
+The method selects edges by their length. The first version selects
 edges with a length larger or equal to min and less than max (but not equal).
 The second version selects edges with exactly the given length. The third
 version is similar to the first one, but allows specification of nil for min or
 max indicating that there is no lower or upper limit. 
 </p><p>
-This method is available for edge layers only.
+When called on an edge pair layer, this method will select edge pairs if one 
+or both of the edges meet the length criterion. Use the additional argument 
+and pass "both" (plain word) to specify that both edges need to be within the given interval.
+By default, it's sufficient for one edge to meet the criterion.
+</p><p>
+This method is available for edge and edge pair layers.
 </p>
 <a name="with_perimeter"/><h2>"with_perimeter" - Selects polygons by perimeter</h2>
 <keyword name="with_perimeter"/>
@@ -3441,6 +3474,7 @@ This method is available for polygon layers only.
 <li><tt>layer.without_angle(min .. max)</tt></li>
 <li><tt>layer.without_angle(value)</tt></li>
 <li><tt>layer.without_angle(min, max)</tt></li>
+<li><tt>edge_pairlayer.without_angle(min, max [, both])</tt></li>
 </ul>
 <p>
 The method basically is the inverse of <a href="#with_angle">with_angle</a>. It selects all edges
@@ -3546,6 +3580,21 @@ This method is available for polygon layers only.
 For details about the operations and the operation see <a href="#with_density">with_density</a>. This version will return the
 tiles where the density is not within the given range.
 </p>
+<a name="without_distance"/><h2>"without_distance" - Selects edge pairs by the distance of the edges</h2>
+<keyword name="without_distance"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.without_distance(min .. max)</tt></li>
+<li><tt>layer.without_distance(value)</tt></li>
+<li><tt>layer.without_distance(min, max)</tt></li>
+</ul>
+<p>
+The method basically is the inverse of <a href="#with_distance">with_distance</a>. It selects all edge pairs
+of the edge pair layer which do not have the given distance (second form) or are
+not inside the given interval (first and third form).
+</p><p>
+This method is available for edge pair layers only.
+</p>
 <a name="without_holes"/><h2>"without_holes" - Selects all polygons with the specified number of holes</h2>
 <keyword name="without_holes"/>
 <p>Usage:</p>
@@ -3565,13 +3614,14 @@ which do not have the specified number of holes.
 <li><tt>layer.without_length(min .. max)</tt></li>
 <li><tt>layer.without_length(value)</tt></li>
 <li><tt>layer.without_length(min, max)</tt></li>
+<li><tt>edge_pairlayer.with_length(min, max [, both])</tt></li>
 </ul>
 <p>
 The method basically is the inverse of <a href="#with_length">with_length</a>. It selects all edges
 of the edge layer which do not have the given length (second form) or are
 not inside the given interval (first and third form).
 </p><p>
-This method is available for edge layers only.
+This method is available for edge and edge pair layers.
 </p>
 <a name="without_perimeter"/><h2>"without_perimeter" - Selects polygons by perimeter</h2>
 <keyword name="without_perimeter"/>

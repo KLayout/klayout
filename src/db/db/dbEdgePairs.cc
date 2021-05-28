@@ -38,6 +38,9 @@
 namespace db
 {
 
+// ---------------------------------------------------------------------------------------------------
+//  EdgePairs implementation
+
 EdgePairs::EdgePairs ()
   : mp_delegate (new EmptyEdgePairs ())
 {

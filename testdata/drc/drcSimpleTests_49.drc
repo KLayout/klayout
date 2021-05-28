@@ -1,0 +1,41 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+ep = input(1, 0).drc(space(projection) < 0.5)
+
+ep.polygons(0).output(100, 0)
+
+ep.with_distance(0..0.1).polygons(0).output(110, 0)
+ep.with_distance(0.25, nil).polygons(0).output(111, 0)
+ep.without_distance(0..0.1).polygons(0).output(120, 0)
+ep.without_distance(0.25, nil).polygons(0).output(121, 0)
+
+ep.with_angle(45.0).polygons(0).output(200, 0)
+ep.with_angle(0.0).polygons(0).output(201, 0)
+ep.with_angle(45.0..91.0).polygons(0).output(202, 0)
+ep.with_angle(45.0, both).polygons(0).output(210, 0)
+ep.with_angle(0.0, both).polygons(0).output(211, 0)
+ep.with_angle(45.0..91.0, both).polygons(0).output(212, 0)
+
+ep.without_angle(45.0).polygons(0).output(220, 0)
+ep.without_angle(0.0).polygons(0).output(221, 0)
+ep.without_angle(45.0..91.0).polygons(0).output(222, 0)
+ep.without_angle(45.0, both).polygons(0).output(230, 0)
+ep.without_angle(0.0, both).polygons(0).output(231, 0)
+ep.without_angle(45.0..91.0, both).polygons(0).output(232, 0)
+
+ep.with_length(0.5).polygons(0).output(300, 0)
+ep.with_length(0.4..0.51).polygons(0).output(301, 0)
+ep.with_length(0.5, both).polygons(0).output(310, 0)
+ep.with_length(0.4..0.51, both).polygons(0).output(311, 0)
+
+ep.without_length(0.5).polygons(0).output(320, 0)
+ep.without_length(0.4..0.51).polygons(0).output(321, 0)
+ep.without_length(0.5, both).polygons(0).output(330, 0)
+ep.without_length(0.4..0.51, both).polygons(0).output(331, 0)
+

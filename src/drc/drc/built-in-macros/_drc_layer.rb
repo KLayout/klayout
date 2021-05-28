@@ -699,13 +699,19 @@ CODE
     # @synopsis layer.with_length(min .. max)
     # @synopsis layer.with_length(value)
     # @synopsis layer.with_length(min, max)
-    # The method selects edges by their length. The first version selected
+    # @synopsis edge_pairlayer.with_length(min, max [, both])
+    # The method selects edges by their length. The first version selects
     # edges with a length larger or equal to min and less than max (but not equal).
     # The second version selects edges with exactly the given length. The third
     # version is similar to the first one, but allows specification of nil for min or
     # max indicating that there is no lower or upper limit. 
     #
-    # This method is available for edge layers only.
+    # When called on an edge pair layer, this method will select edge pairs if one 
+    # or both of the edges meet the length criterion. Use the additional argument 
+    # and pass "both" (plain word) to specify that both edges need to be within the given interval.
+    # By default, it's sufficient for one edge to meet the criterion.
+    #
+    # This method is available for edge and edge pair layers.
 
     # %DRC%
     # @name without_length
@@ -713,11 +719,12 @@ CODE
     # @synopsis layer.without_length(min .. max)
     # @synopsis layer.without_length(value)
     # @synopsis layer.without_length(min, max)
+    # @synopsis edge_pairlayer.with_length(min, max [, both])
     # The method basically is the inverse of \with_length. It selects all edges
     # of the edge layer which do not have the given length (second form) or are
     # not inside the given interval (first and third form).
     #
-    # This method is available for edge layers only.
+    # This method is available for edge and edge pair layers.
     
     %w(length).each do |f|
       [true, false].each do |inv|
@@ -727,18 +734,96 @@ CODE
 
           @engine._context("#{mn}") do
 
-            requires_edges
+            requires_edges_or_edge_pairs
+
+            result_class = self.data.class
+
+            f = :with_#{f} 
+            args = args.select do |a|
+              if a.is_a?(DRCBothEdges)
+                if !self.data.is_a?(RBA::EdgePairs)
+                  raise("'both' keyword only available for edge pair layers")
+                end
+                f = :with_#{f}_both
+                false
+              else
+                true
+              end
+            end
+
             if args.size == 1
               a = args[0]
               if a.is_a?(Range)
-                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._make_value_with_nil(a.begin), @engine._make_value_with_nil(a.end), #{inv.inspect}))
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, @engine._make_value_with_nil(a.begin), @engine._make_value_with_nil(a.end), #{inv.inspect}))
               else
-                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._make_value(a), #{inv.inspect}))
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, @engine._make_value(a), #{inv.inspect}))
               end
             elsif args.size == 2
-              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :with_#{f}, @engine._make_value_with_nil(args[0]), @engine._make_value_with_nil(args[1]), #{inv.inspect}))
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, @engine._make_value_with_nil(args[0]), @engine._make_value_with_nil(args[1]), #{inv.inspect}))
             else
-              raise("Invalid number of arguments (1 or 2 expected)")
+              raise("Invalid number of range arguments (1 or 2 expected)")
+            end
+
+          end
+
+        end
+CODE
+      end
+    end
+    
+    # %DRC%
+    # @name with_distance
+    # @brief Selects edge pairs by the distance of the edges
+    # @synopsis layer.with_distance(min .. max)
+    # @synopsis layer.with_distance(value)
+    # @synopsis layer.with_distance(min, max)
+    # The method selects edge pairs by the distance of their edges. The first version selects
+    # edge pairs with a distance larger or equal to min and less than max (but not equal).
+    # The second version selects edge pairs with exactly the given distance. The third
+    # version is similar to the first one, but allows specification of nil for min or
+    # max indicating that there is no lower or upper limit. 
+    # 
+    # The distance of the edges is defined by the minimum distance of all points from the 
+    # edges involved. For edge pairs generated in geometrical checks this is equivalent
+    # to the actual distance of the original edges.
+    #
+    # This method is available for edge pair layers only.
+
+    # %DRC%
+    # @name without_distance
+    # @brief Selects edge pairs by the distance of the edges
+    # @synopsis layer.without_distance(min .. max)
+    # @synopsis layer.without_distance(value)
+    # @synopsis layer.without_distance(min, max)
+    # The method basically is the inverse of \with_distance. It selects all edge pairs
+    # of the edge pair layer which do not have the given distance (second form) or are
+    # not inside the given interval (first and third form).
+    #
+    # This method is available for edge pair layers only.
+    
+    %w(distance).each do |f|
+      [true, false].each do |inv|
+        mn = (inv ? "without" : "with") + "_" + f
+        eval <<"CODE"
+        def #{mn}(*args)
+
+          @engine._context("#{mn}") do
+
+            requires_edge_pairs
+
+            result_class = RBA::EdgePairs
+
+            if args.size == 1
+              a = args[0]
+              if a.is_a?(Range)
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_#{f}, @engine._make_value_with_nil(a.begin), @engine._make_value_with_nil(a.end), #{inv.inspect}))
+              else
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_#{f}, @engine._make_value(a), #{inv.inspect}))
+              end
+            elsif args.size == 2
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_#{f}, @engine._make_value_with_nil(args[0]), @engine._make_value_with_nil(args[1]), #{inv.inspect}))
+            else
+              raise("Invalid number of range arguments (1 or 2 expected)")
             end
 
           end
@@ -754,6 +839,7 @@ CODE
     # @synopsis layer.with_angle(min .. max)
     # @synopsis layer.with_angle(value)
     # @synopsis layer.with_angle(min, max)
+    # @synopsis edge_pairlayer.with_angle(min, max [, both])
     #
     # When called on an edge layer, the method selects edges by their angle, 
     # measured against the horizontal axis in the mathematical sense. 
@@ -770,6 +856,11 @@ CODE
     # When called on a polygon layer, this method selects corners which match the 
     # given angle or is within the given angle interval. The angle is measured between the edges forming the corner.
     # For each corner, an edge pair containing the edges forming in the angle is returned.
+    #
+    # When called on an edge pair layer, this method selects edge pairs with one or both edges
+    # meeting the angle criterion. In this case an additional argument is accepted which can be
+    # either "both" (plain word) to indicate that both edges have to be within the given interval.
+    # Without this argument, it is sufficient for one edge to meet the criterion.
     #
     # A method delivering all objects not matching the angle criterion is \without_angle.
     #
@@ -792,37 +883,52 @@ CODE
     # @synopsis layer.without_angle(min .. max)
     # @synopsis layer.without_angle(value)
     # @synopsis layer.without_angle(min, max)
+    # @synopsis edge_pairlayer.without_angle(min, max [, both])
     #
     # The method basically is the inverse of \with_angle. It selects all edges
     # of the edge layer or corners of the polygons which do not have the given angle (second form) or whose angle
     # is not inside the given interval (first and third form).
     
-    [true, false].each do |inv|
-      mn = (inv ? "without" : "with") + "_angle"
-      eval <<"CODE"
-      def #{mn}(*args)
+    %w(angle).each do |f|
+      [true, false].each do |inv|
+        mn = (inv ? "without" : "with") + "_" + f
+        eval <<"CODE"
+        def #{mn}(*args)
 
-        @engine._context("#{mn}") do
+          @engine._context("#{mn}") do
 
-          requires_edges_or_region
-          result_class = self.data.is_a?(RBA::Region) ? RBA::EdgePairs : RBA::Edges
-          if args.size == 1
-            a = args[0]
-            if a.is_a?(Range)
-              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_angle, a.begin, a.end, #{inv.inspect}))
-            else
-              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_angle, a, #{inv.inspect}))
+            f = :with_#{f}
+            args = args.select do |a|
+              if a.is_a?(DRCBothEdges)
+                if !self.data.is_a?(RBA::EdgePairs)
+                  raise("'both' keyword only available for edge pair layers")
+                end
+                f = :with_#{f}_both
+                false
+              else
+                true
+              end
             end
-          elsif args.size == 2
-            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, :with_angle, args[0], args[1], #{inv.inspect}))
-          else
-            raise("Invalid number of arguments (1 or 2 expected)")
+
+            result_class = self.data.is_a?(RBA::Edges) ? RBA::Edges : RBA::EdgePairs
+            if args.size == 1
+              a = args[0]
+              if a.is_a?(Range)
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.begin, a.end, #{inv.inspect}))
+              else
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a, #{inv.inspect}))
+              end
+            elsif args.size == 2
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, args[0], args[1], #{inv.inspect}))
+            else
+              raise("Invalid number of range arguments (1 or 2 expected)")
+            end
+
           end
 
         end
-
-      end
 CODE
+      end
     end
     
     # %DRC%
@@ -4565,6 +4671,10 @@ END
     
     def requires_edges
       self.data.is_a?(RBA::Edges) || raise("Requires an edge layer")
+    end
+    
+    def requires_edges_or_edge_pairs
+      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs) || raise("Requires an edge or edge pair layer")
     end
     
     def requires_edges_or_region

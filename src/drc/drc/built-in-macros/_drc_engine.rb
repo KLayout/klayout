@@ -226,15 +226,19 @@ module DRC
     end
 
     def as_dots
-      DRCAsDots::new(true)
+      DRCOutputMode::new(:dots)
     end
     
     def as_edges
-      DRCAsDots::new(true)
+      DRCOutputMode::new(:edges)
     end
     
     def as_boxes
-      DRCAsDots::new(false)
+      DRCOutputMode::new(:boxes)
+    end
+    
+    def as_edge_pairs
+      DRCOutputMode::new(:edge_pairs)
     end
     
     def area_only(r)

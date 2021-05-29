@@ -123,6 +123,11 @@ static db::Region corners_to_boxes (const db::Region *r, double angle_start, dou
   return r->processed (db::CornersAsRectangles (angle_start, include_angle_start, angle_end, include_angle_end, dim));
 }
 
+static db::EdgePairs corners_to_edge_pairs (const db::Region *r, double angle_start, double angle_end, bool include_angle_start, bool include_angle_end)
+{
+  return r->processed (db::CornersAsEdgePairs (angle_start, include_angle_start, angle_end, include_angle_end));
+}
+
 static db::Region *new_si (const db::RecursiveShapeIterator &si)
 {
   return new db::Region (si);
@@ -1373,14 +1378,22 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "A similar function that reports corners as point-like edges is \\corners_dots.\n"
     "\n"
-    "This function has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27.\n"
+    "This method has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27.\n"
   ) +
   method_ext ("corners_dots", &corners_to_dots, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", true),
     "@brief This method will select all corners whose attached edges satisfy the angle condition.\n"
     "\n"
     "This method is similar to \\corners, but delivers an \\Edges collection with dot-like edges for each corner.\n"
     "\n"
-    "This function has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27.\n"
+    "This method has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27.\n"
+  ) +
+  method_ext ("corners_edge_pairs", &corners_to_edge_pairs, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", true),
+    "@brief This method will select all corners whose attached edges satisfy the angle condition.\n"
+    "\n"
+    "This method is similar to \\corners, but delivers an \\EdgePairs collection with an edge pairs for each corner.\n"
+    "The first edge is the incoming edge of the corner, the second one the outgoing edge.\n"
+    "\n"
+    "This method has been introduced in version 0.27.1.\n"
   ) +
   method ("merge", (db::Region &(db::Region::*) ()) &db::Region::merge,
     "@brief Merge the region\n"

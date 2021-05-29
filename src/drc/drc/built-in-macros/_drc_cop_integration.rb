@@ -781,7 +781,7 @@ CODE
     
     # %DRC%
     # @name corners
-    # @brief Selects all polygons which are rectilinear
+    # @brief Selects corners of polygons
     # @synopsis corners([ options ]) (in condition)
     # @synopsis corners(layer [, options ])
     #
@@ -791,15 +791,16 @@ CODE
     # \DRC# expressions (see \Layer#drc and \DRC#corners for more details).
     #
     # Like the layer-based version, the "corners" operator accepts the 
-    # output type option: "as_dots" for dot-like edges and "as_boxes" for
-    # small (2x2 DBU) box markers.
+    # output type option: "as_dots" for dot-like edges, "as_boxes" for
+    # small (2x2 DBU) box markers and "as_edge_pairs" for edge pairs.
+    # The default output type is "as_boxes".
     # 
     # The "corners" operator can be put into a condition which means it's
     # applied to corners meeting a particular angle constraint.
 
-    def _cop_corners(as_dots = DRCAsDots::new(false))
+    def _cop_corners(output_mode = DRCOutputMode::new(:boxes))
       # NOTE: this method is a fallback for the respective global ones which route to DRCLayer or here.
-      return primary.corners(as_dots)
+      return primary.corners(output_mode)
     end
     
     # %DRC%

@@ -342,7 +342,7 @@ See <a href="/about/drc_ref_netter.xml#connect_global">Netter#connect_global</a>
 <p>
 See <a href="/about/drc_ref_netter.xml#connect_implicit">Netter#connect_implicit</a> for a description of that function.
 </p>
-<a name="corners"/><h2>"corners" - Selects all polygons which are rectilinear</h2>
+<a name="corners"/><h2>"corners" - Selects corners of polygons</h2>
 <keyword name="corners"/>
 <p>Usage:</p>
 <ul>
@@ -356,8 +356,9 @@ argument, "corners" represents the corner generator/filter in primary shapes for
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#corners">DRC#corners</a> for more details).
 </p><p>
 Like the layer-based version, the "corners" operator accepts the 
-output type option: "as_dots" for dot-like edges and "as_boxes" for
-small (2x2 DBU) box markers.
+output type option: "as_dots" for dot-like edges, "as_boxes" for
+small (2x2 DBU) box markers and "as_edge_pairs" for edge pairs.
+The default output type is "as_boxes".
 </p><p>
 The "corners" operator can be put into a condition which means it's
 applied to corners meeting a particular angle constraint.

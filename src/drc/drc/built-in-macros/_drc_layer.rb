@@ -1118,8 +1118,8 @@ CODE
         elsif a.is_a?(DRCPattern)
           as_pattern = a.as_pattern
           pattern = a.pattern
-        elsif a.is_a?(DRCAsDots)
-          as_dots = a.value
+        elsif a.is_a?(DRCOutputMode)
+          as_dots = (a.value == :edges || a.value == :dots)
         else
           raise("Invalid argument type #{a.inspect}")
         end
@@ -1167,6 +1167,8 @@ CODE
     # @ul
     #   @li @b as_boxes @/b: with this option, small boxes will be produced as markers @/li  
     #   @li @b as_dots @/b: with this option, point-like edges will be produced instead of small boxes @/li  
+    #   @li @b as_edge_pairs @/b: with this option, an edge pair is produced for each corner selected. The first edge 
+    #                             is the incoming edge to the corner, the second edge the outgoing edge. @/li  
     # @/ul
     #
     # The following images show the effect of this method:
@@ -1185,7 +1187,7 @@ CODE
 
         requires_region
 
-        as_dots = false
+        output_mode = :boxes
         amin = -180.0
         amax = 180.0
 
@@ -1199,14 +1201,23 @@ CODE
           elsif a.is_a?(1.0.class) || a.is_a?(1.class)
             amin = a.to_f
             amax = a.to_f
-          elsif a.is_a?(DRCAsDots)
-            as_dots = a.value
+          elsif a.is_a?(DRCOutputMode)
+            output_mode = a.value
           else
             raise("Invalid argument #{a.inspect}")
           end
         end
 
-        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, as_dots ? :corners_dots : :corners, amin, amax))
+        f = :corners
+        cls = RBA::Region
+        if output_mode == :edges || output_mode == :dots
+          f = :corners_dots
+          cls = RBA::Edges
+        elsif output_mode == :edge_pairs
+          f = :corners_edge_pairs
+          cls = RBA::EdgePairs
+        end
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, cls, f, amin, amax))
 
       end
 
@@ -1375,8 +1386,8 @@ CODE
           args.each do |a|
             if a.is_a?(1.0.class) && :#{f} != :middle
               f << a 
-            elsif a.is_a?(DRCAsDots)
-              as_edges = a.value
+            elsif a.is_a?(DRCOutputMode)
+              as_edges = (a.value == :edges || a.value == :dots)
             elsif @@std_refs[a] && :#{f} != :middle
               f = @@std_refs[a]
             else
@@ -4736,7 +4747,7 @@ END
     end
     
     def requires_edge_pairs
-      self.data.is_a?(RBA::EdgePairs) || raise("Requires a edge pair layer")
+      self.data.is_a?(RBA::EdgePairs) || raise("Requires an edge pair layer")
     end
     
     def requires_edges

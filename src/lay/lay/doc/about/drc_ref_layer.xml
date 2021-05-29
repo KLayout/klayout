@@ -263,6 +263,8 @@ The options available are:
 <ul>
 <li><b>as_boxes </b>: with this option, small boxes will be produced as markers </li>
 <li><b>as_dots </b>: with this option, point-like edges will be produced instead of small boxes </li>
+<li><b>as_edge_pairs </b>: with this option, an edge pair is produced for each corner selected. The first edge 
+is the incoming edge to the corner, the second edge the outgoing edge. </li>
 </ul>
 </p><p>
 The following images show the effect of this method:

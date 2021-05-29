@@ -147,7 +147,7 @@ Class<db::DeviceClassDiode> decl_dbDeviceClassDiode (decl_dbDeviceClass, "db", "
     "@brief A constant giving the parameter ID for parameter P"
   ),
   "@brief A device class for a diode.\n"
-  "This class descibes a diode.\n"
+  "This class describes a diode.\n"
   "A diode has two terminals, A (anode) and C (cathode).\n"
   "It has two parameters: The diode area in square micrometers (A) and the diode area perimeter in micrometers (P).\n"
   "\n"

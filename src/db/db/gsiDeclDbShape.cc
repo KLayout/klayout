@@ -1588,7 +1588,7 @@ Class<db::Shape> decl_Shape ("db", "Shape",
   gsi::method_ext ("dsimple_polygon", &get_dsimple_polygon,
     "@brief Returns the simple polygon object in micrometer units\n"
     "\n"
-    "Returns the simplep olygon object that this shape refers to or converts the object to a simplepolygon. "
+    "Returns the simple polygon object that this shape refers to or converts the object to a simple polygon. "
     "The method returns the same object than \\simple_polygon, but translates it to micrometer units internally.\n"
     "\n"
     "This method has been introduced in version 0.25.\n"

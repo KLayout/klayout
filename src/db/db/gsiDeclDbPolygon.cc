@@ -281,7 +281,7 @@ struct simple_polygon_defs
       "@param box The box to convert to a polygon\n"
     ) +
     constructor ("ellipse", &ellipse, gsi::arg ("box"), gsi::arg ("n"),
-      "@brief Creates a simple polygon appoximating an ellipse\n"
+      "@brief Creates a simple polygon approximating an ellipse\n"
       "\n"
       "@param box The bounding box of the ellipse\n"
       "@param n The number of points that will be used to approximate the ellipse\n"
@@ -1125,7 +1125,7 @@ struct polygon_defs
       "@param box The box to convert to a polygon\n"
     ) +
     constructor ("ellipse", &ellipse, gsi::arg ("box"), gsi::arg ("n"),
-      "@brief Creates a simple polygon appoximating an ellipse\n"
+      "@brief Creates a simple polygon approximating an ellipse\n"
       "\n"
       "@param box The bounding box of the ellipse\n"
       "@param n The number of points that will be used to approximate the ellipse\n"
@@ -1666,27 +1666,27 @@ static gsi::Methods make_po_constants ()
 {
   return
     constant ("PO_any", po_any,
-      "@brief A value for the preferred orienation parameter of \\decompose_convex\n"
+      "@brief A value for the preferred orientation parameter of \\decompose_convex\n"
       "This value indicates that there is not cut preference\n"
       "This constant has been introduced in version 0.25."
     ) +
     constant ("PO_horizontal", po_horizontal,
-      "@brief A value for the preferred orienation parameter of \\decompose_convex\n"
+      "@brief A value for the preferred orientation parameter of \\decompose_convex\n"
       "This value indicates that there only horizontal cuts are allowed\n"
       "This constant has been introduced in version 0.25."
     ) +
     constant ("PO_vertical", po_vertical,
-      "@brief A value for the preferred orienation parameter of \\decompose_convex\n"
+      "@brief A value for the preferred orientation parameter of \\decompose_convex\n"
       "This value indicates that there only vertical cuts are allowed\n"
       "This constant has been introduced in version 0.25."
     ) +
     constant ("PO_htrapezoids", po_htrapezoids,
-      "@brief A value for the preferred orienation parameter of \\decompose_convex\n"
+      "@brief A value for the preferred orientation parameter of \\decompose_convex\n"
       "This value indicates that cuts shall favor decomposition into horizontal trapezoids\n"
       "This constant has been introduced in version 0.25."
     ) +
     constant ("PO_vtrapezoids", po_vtrapezoids,
-      "@brief A value for the preferred orienation parameter of \\decompose_convex\n"
+      "@brief A value for the preferred orientation parameter of \\decompose_convex\n"
       "This value indicates that cuts shall favor decomposition into vertical trapezoids\n"
       "This constant has been introduced in version 0.25."
     );

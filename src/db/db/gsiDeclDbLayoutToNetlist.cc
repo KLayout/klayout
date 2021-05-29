@@ -360,7 +360,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "The name is optional. If given, the layer will already be named accordingly (see \\register).\n"
   ) +
   gsi::factory ("make_layer", (db::Region *(db::LayoutToNetlist::*) (unsigned int, const std::string &)) &db::LayoutToNetlist::make_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
-    "@brief Creates a new hierarchical region reprfesenting an original layer\n"
+    "@brief Creates a new hierarchical region representing an original layer\n"
     "'layer_index' is the layer index of the desired layer in the original layout.\n"
     "This variant produces polygons and takes texts for net name annotation.\n"
     "A variant not taking texts is \\make_polygon_layer. A Variant only taking\n"
@@ -396,7 +396,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   ) +
   gsi::method ("connect", (void (db::LayoutToNetlist::*) (const db::Region &)) &db::LayoutToNetlist::connect, gsi::arg ("l"),
     "@brief Defines an intra-layer connection for the given layer.\n"
-    "The layer is either an original layer created with \\make_incluidelayer and it's variants or\n"
+    "The layer is either an original layer created with \\make_includelayer and it's variants or\n"
     "a derived layer. Certain limitations apply. It's safe to use\n"
     "boolean operations for deriving layers. Other operations are applicable as long as they are\n"
     "capable of delivering hierarchical layers.\n"
@@ -726,7 +726,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
    "\n"
    "@code\n"
    "...\n"
-   "# diode_layer1 increases the ratio by 50 per sqaure micrometer area:\n"
+   "# diode_layer1 increases the ratio by 50 per square micrometer area:\n"
    "errors = l2n.antenna(poly, metal, 10.0 [ [ diode_layer, 50.0 ] ])\n"
    "@/code\n"
   ) +

@@ -432,7 +432,7 @@ Class<db::RecursiveInstanceIterator> decl_RecursiveInstanceIterator ("db", "Recu
     "This moves the iterator to the next instance inside the search scope."
   ) +
   gsi::method ("path", &db::RecursiveInstanceIterator::path,
-    "@brief Gets the instantatiation path of the instance addressed currently\n"
+    "@brief Gets the instantiation path of the instance addressed currently\n"
     "\n"
     "This attribute is a sequence of \\InstElement objects describing the cell instance path from the initial "
     "cell to the current instance. The path is empty if the current instance is in the top cell.\n"

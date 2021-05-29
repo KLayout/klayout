@@ -71,28 +71,9 @@ EdgePairFilterByDistance::EdgePairFilterByDistance (distance_type min_distance, 
   //  .. nothing yet ..
 }
 
-static db::coord_traits<db::Coord>::distance_type
-distance_of_point_from_edge (const db::Edge &e, const db::Point &p)
-{
-  if (db::sprod_sign (p - e.p1 (), e.d ()) < 0) {
-    return e.p1 ().distance (p);
-  } else if (db::sprod_sign (p - e.p2 (), e.d ()) > 0) {
-    return e.p2 ().distance (p);
-  } else {
-    return e.distance (p);
-  }
-}
-
 bool EdgePairFilterByDistance::selected (const db::EdgePair &edge_pair) const
 {
-  distance_type dist = 0;
-  db::Edge e1 = edge_pair.first (), e2 = edge_pair.second ();
-  if (! e1.intersect (e2)) {
-    distance_type d12 = std::min (distance_of_point_from_edge (e2, e1.p1 ()), distance_of_point_from_edge (e2, e1.p2 ()));
-    distance_type d21 = std::min (distance_of_point_from_edge (e1, e2.p1 ()), distance_of_point_from_edge (e1, e2.p2 ()));
-    dist = std::min (d12, d21);
-  }
-
+  distance_type dist = edge_pair.distance ();
   bool sel = (dist >= m_min_distance && dist < m_max_distance);
   return m_inverted ? !sel : sel;
 }

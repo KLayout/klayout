@@ -46,7 +46,17 @@ AsIfFlatEdgePairs::AsIfFlatEdgePairs ()
 AsIfFlatEdgePairs::AsIfFlatEdgePairs (const AsIfFlatEdgePairs &other)
   : EdgePairsDelegate (other), m_bbox_valid (other.m_bbox_valid), m_bbox (other.m_bbox)
 {
-  //  .. nothing yet ..
+  operator= (other);
+}
+
+AsIfFlatEdgePairs &
+AsIfFlatEdgePairs::operator= (const AsIfFlatEdgePairs &other)
+{
+  if (this != &other) {
+    m_bbox_valid = other.m_bbox_valid;
+    m_bbox = other.m_bbox;
+  }
+  return *this;
 }
 
 AsIfFlatEdgePairs::~AsIfFlatEdgePairs ()

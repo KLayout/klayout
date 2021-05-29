@@ -532,4 +532,14 @@ void DeepEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type
   deep_layer ().insert_into_as_polygons (layout, into_cell, into_layer, enl);
 }
 
+DeepEdgePairs &DeepEdgePairs::operator= (const DeepEdgePairs &other)
+{
+  if (this != &other) {
+    AsIfFlatEdgePairs::operator= (other);
+    DeepShapeCollectionDelegateBase::operator= (other);
+  }
+
+  return *this;
+}
+
 }

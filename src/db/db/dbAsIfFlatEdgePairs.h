@@ -81,6 +81,8 @@ protected:
   void invalidate_bbox ();
 
 private:
+  friend class DeepEdgePairs;
+
   AsIfFlatEdgePairs &operator= (const AsIfFlatEdgePairs &other);
 
   mutable bool m_bbox_valid;

@@ -706,12 +706,21 @@ CODE
     # version is similar to the first one, but allows specification of nil for min or
     # max indicating that there is no lower or upper limit. 
     #
+    # This method is available for edge and edge pair layers.
+    #
     # When called on an edge pair layer, this method will select edge pairs if one 
     # or both of the edges meet the length criterion. Use the additional argument 
     # and pass "both" (plain word) to specify that both edges need to be within the given interval.
     # By default, it's sufficient for one edge to meet the criterion.
+    # 
+    # Here are examples for "with_length" on edge pair layers:
     #
-    # This method is available for edge and edge pair layers.
+    # @code
+    # # at least one edge needs to have a length of 1.0 <= l < 2.0
+    # ep1 = edge_pairs.with_length(1.um .. 2.um)
+    # # both edges need to have a length of exactly 2 um
+    # ep2 = edge_pairs.with_length(2.um, both)
+    # @/code
 
     # %DRC%
     # @name without_length
@@ -725,6 +734,15 @@ CODE
     # not inside the given interval (first and third form).
     #
     # This method is available for edge and edge pair layers.
+    #
+    # A note on the "both" modifier (without_length called on edge pairs): "both" means that
+    # both edges need to be "without_length". For example
+    #
+    # @code
+    # # both edges are not exactly 1 um in length, or:
+    # # the edge pair is skipped if one edge has a length of exactly 1 um
+    # ep = edge_pairs.without_length(1.um, both)
+    # @/code
     
     %w(length).each do |f|
       [true, false].each do |inv|
@@ -862,6 +880,15 @@ CODE
     # either "both" (plain word) to indicate that both edges have to be within the given interval.
     # Without this argument, it is sufficient for one edge to meet the criterion.
     #
+    # Here are examples for "with_angle" on edge pair layers:
+    #
+    # @code
+    # # at least one edge needs to be horizontal
+    # ep1 = edge_pairs.with_angle(0)
+    # # both edges need to vertical
+    # ep2 = edge_pairs.with_angle(90, both)
+    # @/code
+    #
     # A method delivering all objects not matching the angle criterion is \without_angle.
     #
     # The following images demonstrate some use cases of \with_angle and \without_angle:
@@ -888,6 +915,16 @@ CODE
     # The method basically is the inverse of \with_angle. It selects all edges
     # of the edge layer or corners of the polygons which do not have the given angle (second form) or whose angle
     # is not inside the given interval (first and third form).
+    #
+    # A note on the "both" modifier (without_angle called on edge pairs): "both" means that
+    # both edges need to be "without_angle". For example
+    #
+    # @code
+    # # both edges are not horizontal or:
+    # # the edge pair is skipped if one edge is horizontal
+    # ep = edge_pairs.without_angle(0, both)
+    # @/code
+    # 
     
     %w(angle).each do |f|
       [true, false].each do |inv|

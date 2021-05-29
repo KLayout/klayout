@@ -488,7 +488,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
   gsi::method_ext ("dtrans", &gsi::si_dtrans,
     "@brief Gets the transformation into the initial cell applicable for floating point types\n"
     "\n"
-    "This transformation corresponds to the one deliverd by \\trans, but is applicable for "
+    "This transformation corresponds to the one delivered by \\trans, but is applicable for "
     "the floating-point shape types in micron unit space.\n"
     "\n"
     "This method has been introduced in version 0.25.3."
@@ -522,7 +522,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
     "This method has been introduced in version 0.23."
   ) +
   gsi::method ("path", &db::RecursiveShapeIterator::path,
-    "@brief Gets the instantatiation path of the shape addressed currently\n"
+    "@brief Gets the instantiation path of the shape addressed currently\n"
     "\n"
     "This attribute is a sequence of \\InstElement objects describing the cell instance path from the initial "
     "cell to the current cell containing the current shape.\n"
@@ -556,7 +556,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
   "while !iter.at_end?\n"
   "  if iter.shape.renders_polygon?\n"
   "    polygon = iter.shape.polygon.transformed(iter.itrans)\n"
-  "    puts \"In cell #{iter.cell.name}: \" + polyon.to_s\n"
+  "    puts \"In cell #{iter.cell.name}: \" + polygon.to_s\n"
   "  end\n"
   "  iter.next\n"
   "end\n"

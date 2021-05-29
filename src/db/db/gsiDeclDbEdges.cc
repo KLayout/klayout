@@ -631,7 +631,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
   method_ext ("insert", &insert_s, gsi::arg ("shapes"),
     "@brief Inserts all edges from the shape collection into this edge collection\n"
     "This method takes each edge from the shape collection and "
-    "insertes it into the region. \"Polygon-like\" objects are inserted as edges forming the contours of the polygons.\n"
+    "inserts it into the region. \"Polygon-like\" objects are inserted as edges forming the contours of the polygons.\n"
     "Text objects are ignored.\n"
     "\n"
     "This method has been introduced in version 0.25."
@@ -1313,7 +1313,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "@param b the parallel extension at the start point of the edge\n"
     "@param e the parallel extension at the end point of the edge\n"
     "@param o the perpendicular extension to the \"outside\" (left side as seen in the direction of the edge)\n"
-    "@param i the perpendicular extension to the \"inside\" (right side as seen in the dleftirection of the edge)\n"
+    "@param i the perpendicular extension to the \"inside\" (right side as seen in the direction of the edge)\n"
     "@param join If true, connected edges are joined before the extension is applied\n"
     "@return A region containing the polygons representing these extended edges\n"
     "This is a generic version of \\extended_in and \\extended_out. It allows one to specify extensions for all four "

@@ -1102,7 +1102,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_aspect_ratio", with_bbox_aspect_ratio1, gsi::arg ("ratio"), gsi::arg ("inverse"),
     "@brief Filters the polygons by the aspect ratio of their bounding boxes\n"
-    "Filters the polygons of the region by the apspect ratio of their bounding boxes. "
+    "Filters the polygons of the region by the aspect ratio of their bounding boxes. "
     "The aspect ratio is the ratio of larger to smaller dimension of the bounding box. "
     "A square has an aspect ratio of 1.\n"
     "\n"
@@ -1115,7 +1115,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("with_bbox_aspect_ratio", with_bbox_aspect_ratio2, gsi::arg ("min_ratio"), gsi::arg ("max_ratio"), gsi::arg ("inverse"), gsi::arg ("min_included", true), gsi::arg ("max_included", true),
     "@brief Filters the polygons by the aspect ratio of their bounding boxes\n"
-    "Filters the polygons of the region by the apspect ratio of their bounding boxes. "
+    "Filters the polygons of the region by the aspect ratio of their bounding boxes. "
     "The aspect ratio is the ratio of larger to smaller dimension of the bounding box. "
     "A square has an aspect ratio of 1.\n"
     "\n"
@@ -1159,7 +1159,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method has been introduced in version 0.27.\n"
   ) +
   method_ext ("with_relative_height", with_relative_height1, gsi::arg ("ratio"), gsi::arg ("inverse"),
-    "@brief Filters the polygons by the ratio of heigth to width\n"
+    "@brief Filters the polygons by the ratio of height to width\n"
     "This method filters the polygons of the region by the ratio of height vs. width of their bounding boxes. "
     "'Tall' polygons have a large value while 'flat' polygons have a small value. A square has a relative height of 1.\n"
     "\n"
@@ -1300,7 +1300,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   method_ext ("insert", &insert_s, gsi::arg ("shapes"),
     "@brief Inserts all polygons from the shape collection into this region\n"
     "This method takes each \"polygon-like\" shape from the shape collection and "
-    "insertes this shape into the region. Paths and boxes are converted to polygons during this process. "
+    "inserts this shape into the region. Paths and boxes are converted to polygons during this process. "
     "Edges and text objects are ignored.\n"
     "\n"
     "This method has been introduced in version 0.25."
@@ -1308,7 +1308,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   method_ext ("insert", &insert_st<db::Trans>, gsi::arg ("shapes"), gsi::arg ("trans"),
     "@brief Inserts all polygons from the shape collection into this region with transformation\n"
     "This method takes each \"polygon-like\" shape from the shape collection and "
-    "insertes this shape into the region after applying the given transformation. "
+    "inserts this shape into the region after applying the given transformation. "
     "Paths and boxes are converted to polygons during this process. "
     "Edges and text objects are ignored.\n"
     "\n"
@@ -1317,7 +1317,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   method_ext ("insert", &insert_st<db::ICplxTrans>, gsi::arg ("shapes"), gsi::arg ("trans"),
     "@brief Inserts all polygons from the shape collection into this region with complex transformation\n"
     "This method takes each \"polygon-like\" shape from the shape collection and "
-    "insertes this shape into the region after applying the given complex transformation. "
+    "inserts this shape into the region after applying the given complex transformation. "
     "Paths and boxes are converted to polygons during this process. "
     "Edges and text objects are ignored.\n"
     "\n"
@@ -2158,7 +2158,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method ("hulls", &db::Region::hulls,
     "@brief Returns the hulls of the region\n"
-    "This method returns all hulls as polygons. The holes will be removed (filles). "
+    "This method returns all hulls as polygons. The holes will be removed (filled). "
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "If merge semantics is not enabled, the hull may also enclose holes if the polygons "
@@ -2806,7 +2806,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This returns the number of raw polygons (not merged polygons if merged semantics is enabled).\n"
     "The count is computed 'as if flat', i.e. polygons inside a cell are multiplied by the number of times a cell is instantiated.\n"
     "\n"
-    "The 'count' alias has been provided in version 0.26 to avoid ambiguitiy with the 'size' method which applies a geometrical bias."
+    "The 'count' alias has been provided in version 0.26 to avoid ambiguity with the 'size' method which applies a geometrical bias."
   ) +
   method ("hier_count", (size_t (db::Region::*) () const) &db::Region::hier_count,
     "@brief Returns the (hierarchical) number of polygons in the region\n"
@@ -2979,7 +2979,7 @@ gsi::EnumIn<db::Region, db::metrics_type> decl_Region_Metrics ("db", "Metrics",
   gsi::enum_const ("Square", db::Square,
     "@brief Specifies square metrics for the check functions\n"
     "This value can be used for the metrics parameter in the check functions, i.e. \\width_check. "
-    "This value specifies sqaure metrics, i.e. the distance between two points is measured by:\n"
+    "This value specifies square metrics, i.e. the distance between two points is measured by:\n"
     "\n"
     "@code\n"
     "d = max(abs(dx), abs(dy))\n"

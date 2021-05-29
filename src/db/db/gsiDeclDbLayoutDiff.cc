@@ -440,22 +440,22 @@ gsi::Class<LayoutDiff> decl_LayoutDiff ("db", "LayoutDiff",
     "full compare.\n"
     "\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other contants to form a flag set."
+    "compared with other constants to form a flag set."
   ) +
   gsi::constant ("NoTextOrientation", &f_no_text_orientation,
     "@brief Ignore text orientation\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other contants to form a flag set."
+    "compared with other constants to form a flag set."
   ) +
   gsi::constant ("NoProperties", &f_no_properties,
     "@brief Ignore properties\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other contants to form a flag set."
+    "compared with other constants to form a flag set."
   ) +
   gsi::constant ("NoLayerNames", &f_no_layer_names,
     "@brief Do not compare layer names\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other contants to form a flag set."
+    "compared with other constants to form a flag set."
   ) +
   gsi::constant ("Verbose", &f_verbose,
     "@brief Enables verbose mode (gives details about the differences)\n"
@@ -463,22 +463,22 @@ gsi::Class<LayoutDiff> decl_LayoutDiff ("db", "LayoutDiff",
     "See the event descriptions for details about the differences in verbose and non-verbose mode.\n"
     "\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other contants to form a flag set."
+    "compared with other constants to form a flag set."
   ) +
   gsi::constant ("BoxesAsPolygons", &f_boxes_as_polygons,
     "@brief Compare boxes to polygons\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other contants to form a flag set."
+    "compared with other constants to form a flag set."
   ) +
   gsi::constant ("FlattenArrayInsts", &f_flatten_array_insts,
     "@brief Compare array instances instance by instance\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other contants to form a flag set."
+    "compared with other constants to form a flag set."
   ) +
   gsi::constant ("PathsAsPolygons", &f_paths_as_polygons,
     "@brief Compare paths to polygons\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other contants to form a flag set."
+    "compared with other constants to form a flag set."
   ) +
   gsi::constant ("SmartCellMapping", &f_smart_cell_mapping,
     "@brief Derive smart cell mapping instead of name mapping (available only if top cells are specified)\n"
@@ -486,7 +486,7 @@ gsi::Class<LayoutDiff> decl_LayoutDiff ("db", "LayoutDiff",
     "cells are compared (with \\LayoutDiff#compare with cells instead of layout objects).\n"
     "\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other contants to form a flag set.\n"
+    "compared with other constants to form a flag set.\n"
   ) +
   gsi::constant ("DontSummarizeMissingLayers", &f_dont_summarize_missing_layers,
     "@brief Don't summarize missing layers\n"
@@ -494,12 +494,12 @@ gsi::Class<LayoutDiff> decl_LayoutDiff ("db", "LayoutDiff",
     "layer will be reported as difference.\n"
     "\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other contants to form a flag set."
+    "compared with other constants to form a flag set."
   ) +
   gsi::constant ("NoTextDetails", &f_no_text_details,
     "@brief Ignore text details (font, size, presentation)\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other contants to form a flag set."
+    "compared with other constants to form a flag set."
   ) +
   gsi::method ("compare", &LayoutDiff::compare_layouts,
     gsi::arg("a"),

@@ -162,7 +162,7 @@ LibraryClass decl_Library ("db", "Library",
     "\n"
     "This method will set the libraries' name.\n"
     "\n"
-    "The technology specific bahvior has been introduced in version 0.27."
+    "The technology specific behaviour has been introduced in version 0.27."
   ) +
   gsi::method_ext ("delete", &delete_lib,
     "@brief Deletes the library\n"

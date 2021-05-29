@@ -106,7 +106,7 @@ Class<db::TextGenerator> decl_TextGenerator ("db", "TextGenerator",
   ) +
   method ("glyph", &db::TextGenerator::glyph_as_region, arg ("char"),
     "@brief Gets the glyph of the given character as a region\n"
-    "The region represents the glyph's outline and is deliverd in the generator's database units ."
+    "The region represents the glyph's outline and is delivered in the generator's database units ."
     "A more elaborate way to getting the text's outline is \\text."
   ) +
   method_ext ("dline_width", &dline_width,

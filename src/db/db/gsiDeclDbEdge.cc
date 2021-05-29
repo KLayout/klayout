@@ -537,7 +537,7 @@ struct edge_defs
       "@param box The clip box.\n"
       "@return The part of the line through the box or nil if the line does not intersect with the box.\n"
       "\n"
-      "In contrast to \\clipped, this method will consider the edge exended infinitely (a \"line\"). "
+      "In contrast to \\clipped, this method will consider the edge extended infinitely (a \"line\"). "
       "The returned edge will be the part of this line going through the box.\n"
       "\n"
       "This method has been introduced in version 0.26.2.\n"

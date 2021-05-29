@@ -284,23 +284,34 @@ void DeepRegion::reserve (size_t)
   //  Not implemented for deep regions
 }
 
-void DeepRegion::flatten ()
+static void
+flatten_layer (db::DeepLayer &deep_layer)
 {
-  db::Layout &layout = deep_layer ().layout ();
+  db::Layout &layout = deep_layer.layout ();
   if (layout.begin_top_down () != layout.end_top_down ()) {
 
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
 
     db::Shapes flat_shapes (layout.is_editable ());
-    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer ().layer ()); !iter.at_end (); ++iter) {
-      db::Polygon poly;
-      iter->polygon (poly);
-      flat_shapes.insert (poly.transformed (iter.trans ()));
+    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); !iter.at_end (); ++iter) {
+      if (iter->is_polygon ()) {
+        db::Polygon poly;
+        iter->polygon (poly);
+        flat_shapes.insert (db::PolygonRef (poly.transformed (iter.trans ()), layout.shape_repository ()));
+      }
     }
 
-    layout.clear_layer (deep_layer ().layer ());
-    top_cell.shapes (deep_layer ().layer ()).swap (flat_shapes);
+    layout.clear_layer (deep_layer.layer ());
+    top_cell.shapes (deep_layer.layer ()).swap (flat_shapes);
 
+  }
+}
+
+void DeepRegion::flatten ()
+{
+  flatten_layer (deep_layer ());
+  if (m_merged_polygons_valid) {
+    flatten_layer (const_cast<db::DeepLayer &> (merged_deep_layer ()));
   }
 }
 

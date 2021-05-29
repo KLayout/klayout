@@ -85,6 +85,6 @@ expect_count(l1, 15, 15, "l1 after flatten")
 r = l1.space(0.5)
 r.output(1011, 0)
 r.extents.output(1111, 0)
-expect_count(r, 3, 1, "r on l1.flatten")
+expect_count(r, 3, 3, "r on l1.flatten")
 
 

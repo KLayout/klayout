@@ -214,7 +214,7 @@ new_layer = layer.collect { |polygon| polygon.transformed(t) }
 <keyword name="collect_to_edge_pairs"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.collect { |object| ... }</tt></li>
+<li><tt>layer.collect_to_edge_pairs { |object| ... }</tt></li>
 </ul>
 <p>
 This method is similar to <a href="#collect">collect</a>, but creates an edge pair layer. It expects the block to 
@@ -224,7 +224,7 @@ deliver <class_doc href="EdgePair">EdgePair</class_doc>, <class_doc href="DEdgeP
 <keyword name="collect_to_edges"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.collect { |object| ... }</tt></li>
+<li><tt>layer.collect_to_edges { |object| ... }</tt></li>
 </ul>
 <p>
 This method is similar to <a href="#collect">collect</a>, but creates an edge layer. It expects the block to 
@@ -235,7 +235,7 @@ contours will be turned into edge sequences.
 <keyword name="collect_to_region"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.collect { |object| ... }</tt></li>
+<li><tt>layer.collect_to_region { |object| ... }</tt></li>
 </ul>
 <p>
 This method is similar to <a href="#collect">collect</a>, but creates a polygon layer. It expects the block to 
@@ -263,6 +263,8 @@ The options available are:
 <ul>
 <li><b>as_boxes </b>: with this option, small boxes will be produced as markers </li>
 <li><b>as_dots </b>: with this option, point-like edges will be produced instead of small boxes </li>
+<li><b>as_edge_pairs </b>: with this option, an edge pair is produced for each corner selected. The first edge 
+is the incoming edge to the corner, the second edge the outgoing edge. </li>
 </ul>
 </p><p>
 The following images show the effect of this method:
@@ -274,6 +276,21 @@ The following images show the effect of this method:
 <td><img src="/images/drc_corners3.png"/></td>
 </tr>
 </table>
+</p>
+<a name="count"/><h2>"count" - Returns the number of objects on the layer</h2>
+<keyword name="count"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.count</tt></li>
+</ul>
+<p>
+The count is the number of raw objects, not merged
+regions or edges. This is the flat count - the number of polygons,
+edges or edge pairs seen from the top cell.
+"count" can be computationally expensive for original layers with
+clip regions or cell tree filters.
+</p><p>
+See <a href="#hier_count">hier_count</a> for a hierarchical (each cell counts once) count.
 </p>
 <a name="covering"/><h2>"covering" - Selects shapes or regions of self which completely cover (enclose) one or more shapes from the other region</h2>
 <keyword name="covering"/>
@@ -1187,6 +1204,21 @@ l = nil
 </p><p>
 By setting the layer to nil, it is ensured that it can no longer be accessed.
 </p>
+<a name="hier_count"/><h2>"hier_count" - Returns the hierarchical number of objects on the layer</h2>
+<keyword name="hier_count"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.hier_count</tt></li>
+</ul>
+<p>
+The hier_count is the number of raw objects, not merged
+regions or edges, with each cell counting once. 
+A high <a href="#count">count</a> to hier_count (flat to hierarchical) ratio is an indication
+of a good hierarchical compression.
+"hier_count" applies only to original layers without clip regions or
+cell filters and to layers in <a href="#deep">deep</a> mode. Otherwise, hier_count gives 
+the same value than <a href="#count">count</a>.
+</p>
 <a name="holes"/><h2>"holes" - Selects all polygon holes from the input</h2>
 <keyword name="holes"/>
 <p>Usage:</p>
@@ -1438,7 +1470,7 @@ See <a href="#clean">clean</a> for a discussion of the raw state.
 <p>
 See <a href="#isolated">isolated</a> for a description of that method
 </p>
-<a name="isolated"/><h2>"isolated" - An isolation check</h2>
+<a name="isolated"/><h2>"isolated" - An inter-polygon isolation check</h2>
 <keyword name="isolated"/>
 <p>Usage:</p>
 <ul>
@@ -1449,8 +1481,8 @@ See <a href="#isolated">isolated</a> for a description of that method
 <b>Note: </b>"isolated" and "iso" are available as operators for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
 the <a href="#DRC">DRC</a> framework. These variants have more options and are more intuitive to use. See <a href="/about/drc_ref_global.xml#isolated">isolated</a> for more details.
 </p><p>
-See <a href="#space">space</a> for a description of this method. 
-In contrast to <a href="#space">space</a>, this
+See <a href="#space">space</a> for a description of this method. "isolated" is the space check variant which checks different polygons only.
+In contrast to <a href="#space">space</a>, the "isolated"
 method is available for polygon layers only, since only on such layers 
 different polygons can be identified.
 </p><p>
@@ -1845,7 +1877,7 @@ This method is available for polygons only.
 It returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_not_overlapping">select_not_overlapping</a>.
 </p>
-<a name="notch"/><h2>"notch" - An intra-region spacing check</h2>
+<a name="notch"/><h2>"notch" - An intra-polygon spacing check</h2>
 <keyword name="notch"/>
 <p>Usage:</p>
 <ul>
@@ -1855,8 +1887,9 @@ is <a href="#select_not_overlapping">select_not_overlapping</a>.
 <b>Note: </b>"notch" is available as an operator for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
 the <a href="#DRC">DRC</a> framework. This variant has more options and is more intuitive to use. See <a href="/about/drc_ref_global.xml#notch">notch</a> for more details.
 </p><p>
-See <a href="#space">space</a> for a description of this method.
-In contrast to <a href="#space">space</a>, this
+See <a href="#space">space</a> for a description of this method. 
+"notch" is the space check variant which finds space violations within a single polygon, but not against other polygons.
+In contrast to <a href="#space">space</a>, the "notch"
 method is available for polygon layers only, since only on such layers 
 different polygons can be identified. Also, opposite and rectangle error
 filtering is not available for this method.
@@ -1918,6 +1951,9 @@ on polygons and edges (input1: red, input2: blue):
 <td><img src="/images/drc_or2.png"/></td>
 </tr>
 </table>
+</p><p>
+In deep mode, "or" or "|" does not imply merging. In deep mode,
+"or" is an alias for "+" ("add").
 </p>
 <a name="output"/><h2>"output" - Outputs the content of the layer</h2>
 <keyword name="output"/>
@@ -2688,11 +2724,16 @@ The following images show the effect of various forms of the "sized" method:
 <p>Usage:</p>
 <ul>
 <li><tt>layer.smoothed(d)</tt></li>
+<li><tt>layer.smoothed(d, hv_keep)</tt></li>
 </ul>
 <p>
 "Smoothing" returns a simplified version of the polygons. Simplification is 
 achieved by removing vertices unless the resulting polygon deviates by more
 than the given distance d from the original polygon.
+</p><p>
+"hv_keep" is a boolean parameter which makes the smoothing function maintain
+horizontal or vertical edges. The default is false, meaning horizontal or
+vertical edges may be changed into tilted ones.
 </p><p>
 This method return a layer wit the modified polygons. Merged semantics applies for this
 method (see <a href="#raw">raw</a> and <a href="#clean">clean</a>).
@@ -3119,6 +3160,7 @@ Shielding is enabled by default, but can be switched off with the "transparent" 
 <li><tt>layer.with_angle(min .. max)</tt></li>
 <li><tt>layer.with_angle(value)</tt></li>
 <li><tt>layer.with_angle(min, max)</tt></li>
+<li><tt>edge_pairlayer.with_angle(min, max [, both])</tt></li>
 </ul>
 <p>
 When called on an edge layer, the method selects edges by their angle, 
@@ -3136,6 +3178,20 @@ version is identical to the first one.
 When called on a polygon layer, this method selects corners which match the 
 given angle or is within the given angle interval. The angle is measured between the edges forming the corner.
 For each corner, an edge pair containing the edges forming in the angle is returned.
+</p><p>
+When called on an edge pair layer, this method selects edge pairs with one or both edges
+meeting the angle criterion. In this case an additional argument is accepted which can be
+either "both" (plain word) to indicate that both edges have to be within the given interval.
+Without this argument, it is sufficient for one edge to meet the criterion.
+</p><p>
+Here are examples for "with_angle" on edge pair layers:
+</p><p>
+<pre>
+# at least one edge needs to be horizontal
+ep1 = edge_pairs.with_angle(0)
+# both edges need to vertical
+ep2 = edge_pairs.with_angle(90, both)
+</pre>
 </p><p>
 A method delivering all objects not matching the angle criterion is <a href="#without_angle">without_angle</a>.
 </p><p>
@@ -3328,7 +3384,42 @@ direction. With the "tile_origin" option this allows full control over the area 
 low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), tile_origin(0.0, 0.0), tile_count(100, 150))
 </pre>
 </p><p>
+The "padding mode" indicates how the area outside the layout's bounding box is considered.
+There are two modes:
+</p><p>
+<ul>
+<li><b>padding_zero </b>: the outside area is considered zero density. This is the default mode. </li>
+<li><b>padding_ignore </b>: the outside area is ignored for the density computation. </li>
+</ul>
+</p><p>
+Example:
+</p><p>
+<pre>
+low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), padding_ignore)
+</pre>
+</p><p>
 The complementary version of "with_density" is <a href="#without_density">without_density</a>.
+</p>
+<a name="with_distance"/><h2>"with_distance" - Selects edge pairs by the distance of the edges</h2>
+<keyword name="with_distance"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.with_distance(min .. max)</tt></li>
+<li><tt>layer.with_distance(value)</tt></li>
+<li><tt>layer.with_distance(min, max)</tt></li>
+</ul>
+<p>
+The method selects edge pairs by the distance of their edges. The first version selects
+edge pairs with a distance larger or equal to min and less than max (but not equal).
+The second version selects edge pairs with exactly the given distance. The third
+version is similar to the first one, but allows specification of nil for min or
+max indicating that there is no lower or upper limit. 
+</p><p>
+The distance of the edges is defined by the minimum distance of all points from the 
+edges involved. For edge pairs generated in geometrical checks this is equivalent
+to the actual distance of the original edges.
+</p><p>
+This method is available for edge pair layers only.
 </p>
 <a name="with_holes"/><h2>"with_holes" - Selects all polygons with the specified number of holes</h2>
 <keyword name="with_holes"/>
@@ -3349,15 +3440,30 @@ which have the specified number of holes.
 <li><tt>layer.with_length(min .. max)</tt></li>
 <li><tt>layer.with_length(value)</tt></li>
 <li><tt>layer.with_length(min, max)</tt></li>
+<li><tt>edge_pairlayer.with_length(min, max [, both])</tt></li>
 </ul>
 <p>
-The method selects edges by their length. The first version selected
+The method selects edges by their length. The first version selects
 edges with a length larger or equal to min and less than max (but not equal).
 The second version selects edges with exactly the given length. The third
 version is similar to the first one, but allows specification of nil for min or
 max indicating that there is no lower or upper limit. 
 </p><p>
-This method is available for edge layers only.
+This method is available for edge and edge pair layers.
+</p><p>
+When called on an edge pair layer, this method will select edge pairs if one 
+or both of the edges meet the length criterion. Use the additional argument 
+and pass "both" (plain word) to specify that both edges need to be within the given interval.
+By default, it's sufficient for one edge to meet the criterion.
+</p><p>
+Here are examples for "with_length" on edge pair layers:
+</p><p>
+<pre>
+# at least one edge needs to have a length of 1.0 &lt;= l &lt; 2.0
+ep1 = edge_pairs.with_length(1.um .. 2.um)
+# both edges need to have a length of exactly 2 um
+ep2 = edge_pairs.with_length(2.um, both)
+</pre>
 </p>
 <a name="with_perimeter"/><h2>"with_perimeter" - Selects polygons by perimeter</h2>
 <keyword name="with_perimeter"/>
@@ -3402,11 +3508,21 @@ This method is available for polygon layers only.
 <li><tt>layer.without_angle(min .. max)</tt></li>
 <li><tt>layer.without_angle(value)</tt></li>
 <li><tt>layer.without_angle(min, max)</tt></li>
+<li><tt>edge_pairlayer.without_angle(min, max [, both])</tt></li>
 </ul>
 <p>
 The method basically is the inverse of <a href="#with_angle">with_angle</a>. It selects all edges
 of the edge layer or corners of the polygons which do not have the given angle (second form) or whose angle
 is not inside the given interval (first and third form).
+</p><p>
+A note on the "both" modifier (without_angle called on edge pairs): "both" means that
+both edges need to be "without_angle". For example
+</p><p>
+<pre>
+# both edges are not horizontal or:
+# the edge pair is skipped if one edge is horizontal
+ep = edge_pairs.without_angle(0, both)
+</pre>
 </p>
 <a name="without_area"/><h2>"without_area" - Selects polygons by area</h2>
 <keyword name="without_area"/>
@@ -3507,6 +3623,21 @@ This method is available for polygon layers only.
 For details about the operations and the operation see <a href="#with_density">with_density</a>. This version will return the
 tiles where the density is not within the given range.
 </p>
+<a name="without_distance"/><h2>"without_distance" - Selects edge pairs by the distance of the edges</h2>
+<keyword name="without_distance"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.without_distance(min .. max)</tt></li>
+<li><tt>layer.without_distance(value)</tt></li>
+<li><tt>layer.without_distance(min, max)</tt></li>
+</ul>
+<p>
+The method basically is the inverse of <a href="#with_distance">with_distance</a>. It selects all edge pairs
+of the edge pair layer which do not have the given distance (second form) or are
+not inside the given interval (first and third form).
+</p><p>
+This method is available for edge pair layers only.
+</p>
 <a name="without_holes"/><h2>"without_holes" - Selects all polygons with the specified number of holes</h2>
 <keyword name="without_holes"/>
 <p>Usage:</p>
@@ -3526,13 +3657,23 @@ which do not have the specified number of holes.
 <li><tt>layer.without_length(min .. max)</tt></li>
 <li><tt>layer.without_length(value)</tt></li>
 <li><tt>layer.without_length(min, max)</tt></li>
+<li><tt>edge_pairlayer.with_length(min, max [, both])</tt></li>
 </ul>
 <p>
 The method basically is the inverse of <a href="#with_length">with_length</a>. It selects all edges
 of the edge layer which do not have the given length (second form) or are
 not inside the given interval (first and third form).
 </p><p>
-This method is available for edge layers only.
+This method is available for edge and edge pair layers.
+</p><p>
+A note on the "both" modifier (without_length called on edge pairs): "both" means that
+both edges need to be "without_length". For example
+</p><p>
+<pre>
+# both edges are not exactly 1 um in length, or:
+# the edge pair is skipped if one edge has a length of exactly 1 um
+ep = edge_pairs.without_length(1.um, both)
+</pre>
 </p>
 <a name="without_perimeter"/><h2>"without_perimeter" - Selects polygons by perimeter</h2>
 <keyword name="without_perimeter"/>

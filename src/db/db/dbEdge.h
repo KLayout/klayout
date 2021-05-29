@@ -856,6 +856,9 @@ public:
    *  line through the edge. If the edge is degenerated, the distance
    *  is not defined.
    *
+   *  The distance is through as a distance of the point from the line
+   *  through the edge.
+   *
    *  @param p The point to test.
    *
    *  @return The distance
@@ -874,6 +877,27 @@ public:
       double d = double (axb) / double (length ());
       //  and round
       return coord_traits::rounded (d);
+    }
+  }
+
+  /**
+   *  @brief Gets the distance of the point from the edge.
+   *
+   *  The distance is computed as the minimum distance of the point to any of the edge's
+   *  points.
+   *
+   *  @param p The point whose distance is to be computed
+   *
+   *  @return The distance
+   */
+  distance_type euclidian_distance (const db::point<C> &p)
+  {
+    if (db::sprod_sign (p - p1 (), d ()) < 0) {
+      return p1 ().distance (p);
+    } else if (db::sprod_sign (p - p2 (), d ()) > 0) {
+      return p2 ().distance (p);
+    } else {
+      return std::abs (distance (p));
     }
   }
 

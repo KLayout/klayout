@@ -27,6 +27,8 @@
 #include "dbEdges.h"
 #include "dbRegion.h"
 #include "dbDeepEdgePairs.h"
+#include "dbEdgesUtils.h"
+#include "dbEdgePairFilters.h"
 
 namespace gsi
 {
@@ -174,6 +176,74 @@ static bool is_deep (const db::EdgePairs *ep)
 static size_t id (const db::EdgePairs *ep)
 {
   return tl::id_of (ep->delegate ());
+}
+
+static db::EdgePairs with_distance1 (const db::EdgePairs *r, db::EdgePairs::distance_type length, bool inverse)
+{
+  db::EdgePairFilterByDistance ef (length, length + 1, inverse);
+  return r->filtered (ef);
+}
+
+static db::EdgePairs with_distance2 (const db::EdgePairs *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
+{
+  db::EdgePairFilterByDistance ef (min.is_nil () ? db::Edges::distance_type (0) : min.to<db::Edges::distance_type> (), max.is_nil () ? std::numeric_limits <db::Edges::distance_type>::max () : max.to<db::Edges::distance_type> (), inverse);
+  return r->filtered (ef);
+}
+
+static db::EdgePairs with_length1 (const db::EdgePairs *r, db::EdgePairs::distance_type length, bool inverse)
+{
+  db::EdgeLengthFilter f (length, length + 1, inverse);
+  db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
+  return r->filtered (ef);
+}
+
+static db::EdgePairs with_length2 (const db::EdgePairs *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
+{
+  db::EdgeLengthFilter f (min.is_nil () ? db::Edges::distance_type (0) : min.to<db::Edges::distance_type> (), max.is_nil () ? std::numeric_limits <db::Edges::distance_type>::max () : max.to<db::Edges::distance_type> (), inverse);
+  db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
+  return r->filtered (ef);
+}
+
+static db::EdgePairs with_length_both1 (const db::EdgePairs *r, db::EdgePairs::distance_type length, bool inverse)
+{
+  db::EdgeLengthFilter f (length, length + 1, inverse);
+  db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
+  return r->filtered (ef);
+}
+
+static db::EdgePairs with_length_both2 (const db::EdgePairs *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
+{
+  db::EdgeLengthFilter f (min.is_nil () ? db::Edges::distance_type (0) : min.to<db::Edges::distance_type> (), max.is_nil () ? std::numeric_limits <db::Edges::distance_type>::max () : max.to<db::Edges::distance_type> (), inverse);
+  db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
+  return r->filtered (ef);
+}
+
+static db::EdgePairs with_angle1 (const db::EdgePairs *r, double a, bool inverse)
+{
+  db::EdgeOrientationFilter f (a, inverse);
+  db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
+  return r->filtered (ef);
+}
+
+static db::EdgePairs with_angle2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
+{
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse);
+  db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
+  return r->filtered (ef);
+}
+
+static db::EdgePairs with_angle_both1 (const db::EdgePairs *r, double a, bool inverse)
+{
+  db::EdgeOrientationFilter f (a, inverse);
+  db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
+  return r->filtered (ef);
+}
+
+static db::EdgePairs with_angle_both2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
+{
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse);
+  db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
+  return r->filtered (ef);
 }
 
 extern Class<db::ShapeCollection> decl_dbShapeCollection;
@@ -502,6 +572,112 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "The boxes will not be merged, so it is possible to determine overlaps "
     "of these boxes for example.\n"
   ) + 
+  method_ext ("with_length", with_length1, gsi::arg ("length"), gsi::arg ("inverse"),
+    "@brief Filters the edge pairs by length of one of their edges\n"
+    "Filters the edge pairs in the edge pair collection by length of at least one of their edges. If \"inverse\" is false, only "
+    "edge pairs with at least one edge having the given length are returned. If \"inverse\" is true, "
+    "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "This method has been added in version 0.27.1.\n"
+  ) +
+  method_ext ("with_length", with_length2, gsi::arg ("min_length"), gsi::arg ("max_length"), gsi::arg ("inverse"),
+    "@brief Filters the edge pairs by length of one of their edges\n"
+    "Filters the edge pairs in the edge pair collection by length of at least one of their edges. If \"inverse\" is false, only "
+    "edge pairs with at least one edge having a length between min_length and max_length (excluding max_length itself) are returned. If \"inverse\" is true, "
+    "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
+    "\n"
+    "This method has been added in version 0.27.1.\n"
+  ) +
+  method_ext ("with_length_both", with_length_both1, gsi::arg ("length"), gsi::arg ("inverse"),
+    "@brief Filters the edge pairs by length of both of their edges\n"
+    "Filters the edge pairs in the edge pair collection by length of both of their edges. If \"inverse\" is false, only "
+    "edge pairs where both edges have the given length are returned. If \"inverse\" is true, "
+    "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "This method has been added in version 0.27.1.\n"
+  ) +
+  method_ext ("with_length_both", with_length_both2, gsi::arg ("min_length"), gsi::arg ("max_length"), gsi::arg ("inverse"),
+    "@brief Filters the edge pairs by length of both of their edges\n"
+    "Filters the edge pairs in the edge pair collection by length of both of their edges. If \"inverse\" is false, only "
+    "edge pairs with both edges having a length between min_length and max_length (excluding max_length itself) are returned. If \"inverse\" is true, "
+    "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
+    "\n"
+    "This method has been added in version 0.27.1.\n"
+  ) +
+  method_ext ("with_distance", with_distance1, gsi::arg ("distance"), gsi::arg ("inverse"),
+    "@brief Filters the edge pairs by the distance of the edges\n"
+    "Filters the edge pairs in the edge pair collection by distance of the edges. If \"inverse\" is false, only "
+    "edge pairs where both edges have the given distance are returned. If \"inverse\" is true, "
+    "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "Distance is measured as the shortest distance between any of the points on the edges.\n"
+    "\n"
+    "This method has been added in version 0.27.1.\n"
+  ) +
+  method_ext ("with_distance", with_distance2, gsi::arg ("min_distance"), gsi::arg ("max_distance"), gsi::arg ("inverse"),
+    "@brief Filters the edge pairs by the distance of the edges\n"
+    "Filters the edge pairs in the edge pair collection by distance of the edges. If \"inverse\" is false, only "
+    "edge pairs where both edges have a distance between min_distance and max_distance (max_distance itself is excluded). If \"inverse\" is true, "
+    "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "Distance is measured as the shortest distance between any of the points on the edges.\n"
+    "\n"
+    "This method has been added in version 0.27.1.\n"
+  ) +
+  method_ext ("with_angle", with_angle1, gsi::arg ("angle"), gsi::arg ("inverse"),
+    "@brief Filter the edge pairs by orientation of their edges\n"
+    "Filters the edge pairs in the edge pair collection by orientation. If \"inverse\" is false, only "
+    "edge pairs with at least one edge having the given angle to the x-axis are returned. If \"inverse\" is true, "
+    "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "This will filter edge pairs with at least one horizontal edge:\n"
+    "\n"
+    "@code\n"
+    "horizontal = edge_pairs.with_orientation(0, false)\n"
+    "@/code\n"
+    "\n"
+    "This method has been added in version 0.27.1.\n"
+  ) +
+  method_ext ("with_angle", with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+    "@brief Filter the edge pairs by orientation of their edges\n"
+    "Filters the edge pairs in the edge pair collection by orientation. If \"inverse\" is false, only "
+    "edge pairs with at least one edge having an angle between min_angle and max_angle are returned. If \"inverse\" is true, "
+    "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "With \"include_min_angle\" set to true (the default), the minimum angle is included in the criterion while with false, the "
+    "minimum angle itself is not included. Same for \"include_max_angle\" where the default is false, meaning the maximum angle is not included in the range.\n"
+    "\n"
+    "This method has been added in version 0.27.1.\n"
+  ) +
+  method_ext ("with_angle_both", with_angle_both1, gsi::arg ("angle"), gsi::arg ("inverse"),
+    "@brief Filter the edge pairs by orientation of both of their edges\n"
+    "Filters the edge pairs in the edge pair collection by orientation. If \"inverse\" is false, only "
+    "edge pairs with both edges having the given angle to the x-axis are returned. If \"inverse\" is true, "
+    "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "This will filter edge pairs with at least one horizontal edge:\n"
+    "\n"
+    "@code\n"
+    "horizontal = edge_pairs.with_orientation(0, false)\n"
+    "@/code\n"
+    "\n"
+    "This method has been added in version 0.27.1.\n"
+  ) +
+  method_ext ("with_angle_both", with_angle_both2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+    "@brief Filter the edge pairs by orientation of both of their edges\n"
+    "Filters the edge pairs in the edge pair collection by orientation. If \"inverse\" is false, only "
+    "edge pairs with both edges having an angle between min_angle and max_angle are returned. If \"inverse\" is true, "
+    "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "With \"include_min_angle\" set to true (the default), the minimum angle is included in the criterion while with false, the "
+    "minimum angle itself is not included. Same for \"include_max_angle\" where the default is false, meaning the maximum angle is not included in the range.\n"
+    "\n"
+    "This method has been added in version 0.27.1.\n"
+  ) +
   method_ext ("polygons", &polygons1,
     "@brief Converts the edge pairs to polygons\n"
     "This method creates polygons from the edge pairs. Each polygon will be a triangle or quadrangle "

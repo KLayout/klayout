@@ -787,14 +787,14 @@ CODE
   # The "corners" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.corners".
 
-  def corners(as_dots = DRCAsDots::new(false))
+  def corners(output_mode = DRCOutputMode::new(:dots))
     @engine._context("corners") do
-      if as_dots.is_a?(DRCAsDots)
-        as_dots = as_dots.value
+      if output_mode.is_a?(DRCOutputMode)
+        output_mode = output_mode.value
       else
         raise("Invalid argument (#{as_dots.inspect}) for 'corners' method")
       end
-      DRCOpNodeCornersFilter::new(@engine, as_dots, self)
+      DRCOpNodeCornersFilter::new(@engine, output_mode, self)
     end
   end
   
@@ -859,8 +859,8 @@ CODE
         args.each_with_index do |a,ia|
           if a.is_a?(1.0.class) && :#{f} != :middle
             f << a 
-          elsif a.is_a?(DRCAsDots)
-            as_edges = a.value
+          elsif a.is_a?(DRCOutputMode)
+            as_edges = (a.value == :edges || a.value == :dots)
           elsif @@std_refs[a] && :#{f} != :middle
             f = @@std_refs[a]
           else
@@ -1996,11 +1996,11 @@ end
 class DRCOpNodeCornersFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
-  attr_accessor :as_dots
+  attr_accessor :output_mode
   
-  def initialize(engine, as_dots, input)
+  def initialize(engine, output_mode, input)
     super(engine)
-    self.as_dots = as_dots
+    self.output_mode = output_mode
     self.input = input
     self.description = "corners"
   end
@@ -2011,8 +2011,10 @@ class DRCOpNodeCornersFilter < DRCOpNodeWithCompare
     args << (self.gt ? false : true)
     args << (self.lt ? self.lt : (self.le ? self.le : 180.0))
     args << (self.lt ? false : true)
-    if self.as_dots
+    if self.output_mode == :dots || self.output_mode == :edges
       RBA::CompoundRegionOperationNode::new_corners_as_dots(*args)
+    elsif self.output_mode == :edge_pairs
+      RBA::CompoundRegionOperationNode::new_corners_as_edge_pairs(*args)
     else
       args << 2 # dimension is 2x2 DBU
       RBA::CompoundRegionOperationNode::new_corners_as_rectangles(*args)

@@ -58,6 +58,8 @@ public:
   virtual bool empty () const;
 
   virtual bool is_merged () const;
+  virtual size_t count () const;
+  virtual size_t hier_count () const;
 
   virtual const db::Polygon *nth (size_t n) const;
   virtual bool has_valid_polygons () const;

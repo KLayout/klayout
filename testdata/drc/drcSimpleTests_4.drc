@@ -4,6 +4,15 @@
 source($drc_test_source, "TOPTOP_SMALL")
 target($drc_test_target)
 
+def self.expect_count(layer, c, hc, where)
+  if layer.count != c 
+    raise(where + ": Layer count #{layer.count} does not equal #{c}")
+  end
+  if layer.hier_count != hc 
+    raise(where + ": Layer hier count #{layer.hier_count} does not equal #{c}")
+  end
+end
+
 cell("TOPTOP_SMALL")
 
 l1_flat = input(1)
@@ -66,12 +75,16 @@ r.output(1023, 0)
 r.extents.output(1123, 0)
 
 r = l1.space(0.5)
+expect_count(r, 3, 1, "r on l1")
 r.output(1010, 0)
 r.extents.output(1110, 0)
 
+expect_count(l1, 15, 5, "l1 before flatten")
 l1.flatten
+expect_count(l1, 15, 15, "l1 after flatten")
 r = l1.space(0.5)
 r.output(1011, 0)
 r.extents.output(1111, 0)
+expect_count(r, 3, 3, "r on l1.flatten")
 
 

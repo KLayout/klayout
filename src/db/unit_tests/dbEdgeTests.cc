@@ -106,6 +106,17 @@ TEST(2)
   EXPECT_EQ (db::Edge (10,20,110,222).distance_abs (db::Point (100, 200)), db::Edge::distance_type (1));
   EXPECT_EQ (db::Edge (10,20,110,222).contains (db::Point (0, 0)), false);
   EXPECT_EQ (db::Edge (10,20,110,222).contains (db::Point (100, 200)), false);
+
+  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (100, 120)), 100);
+  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (100, -80)), 100);
+  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (-90, 120)), 141);
+  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (-90, -80)), 141);
+  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (210, 120)), 141);
+  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (210, -80)), 141);
+  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (-90, 20)), 100);
+  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (10, 20)), 0);
+  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (50, 20)), 0);
+  EXPECT_EQ (db::Edge (10,20,110,20).euclidian_distance (db::Point (110, 20)), 0);
 }
 
 TEST(3) 

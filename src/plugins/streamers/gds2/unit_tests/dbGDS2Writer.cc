@@ -83,6 +83,19 @@ TEST(1)
   run_test (_this, "arefs.gds", "arefs_ref.gds");
 }
 
+TEST(1a)
+{
+  db::GDS2WriterOptions opt;
+  run_test (_this, "arefs_skew.gds", "arefs_skew1.gds", false, opt);
+}
+
+TEST(1b)
+{
+  db::GDS2WriterOptions opt;
+  opt.resolve_skew_arrays = true;
+  run_test (_this, "arefs_skew.gds", "arefs_skew2.gds", false, opt);
+}
+
 TEST(2)
 {
   db::Manager m (false);

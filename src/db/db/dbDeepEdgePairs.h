@@ -104,6 +104,7 @@ private:
 
   void init ();
   EdgesDelegate *generic_edges (bool first, bool second) const;
+  DeepEdgePairs *apply_filter (const EdgePairFilterBase &filter) const;
 };
 
 }

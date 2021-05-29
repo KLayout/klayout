@@ -52,7 +52,7 @@ void CornerDetectorCore::detect_corners (const db::Polygon &poly, const CornerPo
         db::Point pn = ctr [j];
 
         if (m_checker (pt - pp, pn - pt)) {
-          delivery.make_point (pt);
+          delivery.make_point (pt, db::Edge (pp, pt), db::Edge (pt, pn));
         }
 
         pp = pt;

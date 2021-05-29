@@ -22,6 +22,7 @@ l1.drc(-90 < corners(as_dots) <= 90.0).output(101, 0)
 l1.drc(corners(as_boxes) == -90).output(102, 0)  # outer corners
 l1.drc(corners(as_boxes) == 90).output(103, 0)  # inner corners
 l1.drc(corners(as_boxes) <= -90).output(104, 0)
+l1.drc(corners(as_edge_pairs) == 90).output(105, 0)
 
 l1.drc(middle).output(110, 0)
 l1.drc(middle(as_dots)).output(111, 0)

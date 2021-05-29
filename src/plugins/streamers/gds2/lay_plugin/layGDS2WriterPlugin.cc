@@ -61,6 +61,7 @@ GDS2WriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db:
     mp_ui->write_file_properties->setChecked (options->write_file_properties);
     mp_ui->no_zero_length_paths->setChecked (options->no_zero_length_paths);
     mp_ui->multi_xy_cbx->setChecked (options->multi_xy_records);
+    mp_ui->resolve_skew_arrays_cbx->setChecked (options->resolve_skew_arrays);
     mp_ui->max_vertex_le->setEnabled (! options->multi_xy_records);
     mp_ui->max_vertex_le->setText (tl::to_qstring (tl::to_string (options->max_vertex_count)));
     mp_ui->cell_name_length_le->setText (tl::to_qstring (tl::to_string (options->max_cellname_length)));
@@ -76,6 +77,7 @@ GDS2WriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Tech
 
     unsigned int n;
     options->multi_xy_records = mp_ui->multi_xy_cbx->isChecked ();
+    options->resolve_skew_arrays = mp_ui->resolve_skew_arrays_cbx->isChecked ();
     options->write_timestamps = mp_ui->write_timestamps->isChecked ();
     options->write_cell_properties = mp_ui->write_cell_properties->isChecked ();
     options->write_file_properties = mp_ui->write_file_properties->isChecked ();

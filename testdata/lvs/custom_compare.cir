@@ -1,0 +1,7 @@
+* Extracted by KLayout
+
+* cell TOP
+.SUBCKT TOP
+* device instance $1 r0 *1 7.52,4.175 RES
+R$1 2 1 51 RES
+.ENDS TOP

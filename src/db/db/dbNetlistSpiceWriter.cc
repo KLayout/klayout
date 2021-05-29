@@ -130,7 +130,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
       os << format_name (dev.device_class ()->name ());
     }
 
-  } else if (res) {
+  } else if (res || res3) {
 
     os << "R";
     os << format_name (dev.expanded_name ());

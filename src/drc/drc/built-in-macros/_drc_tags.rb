@@ -16,6 +16,18 @@ module DRC
     end
   end
   
+  # A wrapper for the "both edges" flag for EdgePair#with_length or EdgePair#with_angle
+  class DRCBothEdges
+  end
+  
+  # A wrapper for the padding modes of with_density
+  class DRCDensityPadding
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+  
   # A wrapper for the sizing mode value
   class DRCSizingMode
     attr_accessor :value
@@ -65,7 +77,7 @@ module DRC
   # A wrapper for the "as_dots" or "as_boxes" flag for
   # some DRC functions. The purpose of this class
   # is to identify the value by the class.
-  class DRCAsDots
+  class DRCOutputMode
     attr_accessor :value
     def initialize(v)
       self.value = v

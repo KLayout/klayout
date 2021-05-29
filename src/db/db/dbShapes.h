@@ -1251,6 +1251,20 @@ public:
   }
 
   /**
+   *  @brief Report the number of shapes stored for a given type mask
+   */
+  size_t size (unsigned int flags) const
+  {
+    size_t n = 0;
+    for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+      if ((flags & (*l)->type_mask ()) != 0) {
+        n += (*l)->size ();
+      }
+    }
+    return n;
+  }
+
+  /**
    *  @brief Report the shape count for a certain type
    */
   template <class Tag, class StableTag> 

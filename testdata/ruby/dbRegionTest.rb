@@ -166,7 +166,7 @@ class DBRegion_TestClass < TestBase
     assert_equal(csort(r.to_s), csort("(-10,-20;-10,20;10,20;10,-20);(-10,80;-10,120;10,120;10,80);(190,80;190,120;210,120;210,80)"))
     assert_equal(r.is_empty?, false)
     assert_equal(r.count, 3)
-    assert_equal(r.hier_count, 3)
+    assert_equal(r.hier_count, 1)
     assert_equal(r.bbox.to_s, "(-10,-20;210,120)")
     assert_equal(r.is_merged?, false)
     assert_equal(r.has_valid_polygons?, false)
@@ -195,7 +195,7 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.is_empty?, false)
     assert_equal(r.is_box?, false)
     assert_equal(r.count, 3)
-    assert_equal(r.hier_count, 3)
+    assert_equal(r.hier_count, 1)
     assert_equal(r.bbox.to_s, "(0,0;220,140)")
     assert_equal(r.is_merged?, false)
 
@@ -972,7 +972,7 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.hier_count, 1)
     assert_equal(rf.area, 53120000)
     assert_equal(rf.count, 10)
-    assert_equal(rf.hier_count, 10)
+    assert_equal(rf.hier_count, 1)
 
     ly_new = RBA::Layout::new
     tc = ly_new.add_cell("TOP")

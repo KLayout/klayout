@@ -781,7 +781,7 @@ CODE
     
     # %DRC%
     # @name corners
-    # @brief Selects all polygons which are rectilinear
+    # @brief Selects corners of polygons
     # @synopsis corners([ options ]) (in condition)
     # @synopsis corners(layer [, options ])
     #
@@ -791,15 +791,16 @@ CODE
     # \DRC# expressions (see \Layer#drc and \DRC#corners for more details).
     #
     # Like the layer-based version, the "corners" operator accepts the 
-    # output type option: "as_dots" for dot-like edges and "as_boxes" for
-    # small (2x2 DBU) box markers.
+    # output type option: "as_dots" for dot-like edges, "as_boxes" for
+    # small (2x2 DBU) box markers and "as_edge_pairs" for edge pairs.
+    # The default output type is "as_boxes".
     # 
     # The "corners" operator can be put into a condition which means it's
     # applied to corners meeting a particular angle constraint.
 
-    def _cop_corners(as_dots = DRCAsDots::new(false))
+    def _cop_corners(output_mode = DRCOutputMode::new(:boxes))
       # NOTE: this method is a fallback for the respective global ones which route to DRCLayer or here.
-      return primary.corners(as_dots)
+      return primary.corners(output_mode)
     end
     
     # %DRC%
@@ -1024,7 +1025,7 @@ CODE
     # 
     # With a lower and upper limit, the results are edges marking the positions on the 
     # primary shape where the condition is met.
-    # With a lower limit alone, these markers are formed by two, identical but opposite edges attached to 
+    # With a lower limit alone, the results are edge pairs which are formed by two identical, but opposite edges attached to 
     # the primary shape. Without an upper limit only, the first edge of the marker is attached to the 
     # primary shape while the second edge is attached to the shape of the "other" layer.
     #
@@ -1034,6 +1035,12 @@ CODE
     #     @td @img(/images/drc_enc2u.png) @/td
     #   @/tr
     # @/table
+    #
+    # When "larger than" constraints are used, this function will produce the edges from the
+    # first layer only. The result will still be edge pairs for consistency, but each edge pair holds one edge from
+    # the original polygon plus a reverse copy of that edge in the second member. Use "first_edges" to extract the 
+    # actual edges from the first input (see \separation for an example).
+    #
     
     # %DRC%
     # @name separation
@@ -1048,7 +1055,7 @@ CODE
     # as metrics, projection and angle constraints etc. This check also features
     # opposite and rectangle filtering. See \Layer#separation for details about opposite and
     # rectangle error filtering.
-    #
+    # 
     # @h3 Classic mode @/h3
     #
     # Like \enclosing, this function is available as a classic DRC function with a layer as the first
@@ -1079,6 +1086,23 @@ CODE
     # @table
     #   @tr 
     #     @td @img(/images/drc_separation1u.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # When "larger than" constraints are used, this function will produce the edges from the
+    # first layer only. The result will still be edge pairs for consistency, but each edge pair holds one edge from
+    # the original polygon plus a reverse copy of that edge in the second member. Use "first_edges" to extract the 
+    # actual edges from the first input:
+    #
+    # @code
+    # l1_edges_without_l2 = l1.drc((separation(l2) >= 1.0).first_edges)
+    # @/code
+    #
+    # The following image shows the effect of such a negative-output separation check:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_separation1un.png) @/td
     #   @/tr
     # @/table
     
@@ -1124,6 +1148,12 @@ CODE
     #     @td @img(/images/drc_overlap2u.png) @/td
     #   @/tr
     # @/table
+    #
+    # When "larger than" constraints are used, this function will produce the edges from the
+    # first layer only. The result will still be edge pairs for consistency, but each edge pair holds one edge from
+    # the original polygon plus a reverse copy of that edge in the second member. Use "first_edges" to extract the 
+    # actual edges from the first input (see \separation for an example).
+    #
     
     # %DRC%
     # @name width
@@ -1180,7 +1210,7 @@ CODE
     #
     # With a lower and upper limit or with the "equal" condition, the results are edges marking the positions on the 
     # primary shape where the condition is met.
-    # With a lower limit alone, these markers are formed by two, identical but opposite edges attached to 
+    # With a lower limit alone, the results are edge pairs which are formed by two identical, but opposite edges attached to 
     # the primary shape. Without an upper limit only, both edges are attached to different sides of the primary
     # shape.
     #

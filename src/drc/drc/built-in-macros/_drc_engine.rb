@@ -64,6 +64,10 @@ module DRC
 
     end
 
+    def both
+      DRCBothEdges::new
+    end
+    
     def shift(x, y)
       self._context("shift") do
         RBA::DCplxTrans::new(RBA::DVector::new(_make_value(x) * self.dbu, _make_value(y) * self.dbu))
@@ -98,6 +102,14 @@ module DRC
       DRCJoinFlag::new(true)
     end
     
+    def padding_zero
+      DRCDensityPadding::new(:zero)
+    end
+
+    def padding_ignore
+      DRCDensityPadding::new(:ignore)
+    end
+
     def diamond_limit
       DRCSizingMode::new(0)
     end
@@ -214,15 +226,19 @@ module DRC
     end
 
     def as_dots
-      DRCAsDots::new(true)
+      DRCOutputMode::new(:dots)
     end
     
     def as_edges
-      DRCAsDots::new(true)
+      DRCOutputMode::new(:edges)
     end
     
     def as_boxes
-      DRCAsDots::new(false)
+      DRCOutputMode::new(:boxes)
+    end
+    
+    def as_edge_pairs
+      DRCOutputMode::new(:edge_pairs)
     end
     
     def area_only(r)
@@ -1793,6 +1809,7 @@ CODE
       with_bbox_min
       with_bbox_width
       with_length
+      with_distance
       without_angle
       without_area
       without_area_ratio

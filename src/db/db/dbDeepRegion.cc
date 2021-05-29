@@ -284,23 +284,34 @@ void DeepRegion::reserve (size_t)
   //  Not implemented for deep regions
 }
 
-void DeepRegion::flatten ()
+static void
+flatten_layer (db::DeepLayer &deep_layer)
 {
-  db::Layout &layout = deep_layer ().layout ();
+  db::Layout &layout = deep_layer.layout ();
   if (layout.begin_top_down () != layout.end_top_down ()) {
 
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
 
     db::Shapes flat_shapes (layout.is_editable ());
-    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer ().layer ()); !iter.at_end (); ++iter) {
-      db::Polygon poly;
-      iter->polygon (poly);
-      flat_shapes.insert (poly.transformed (iter.trans ()));
+    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); !iter.at_end (); ++iter) {
+      if (iter->is_polygon ()) {
+        db::Polygon poly;
+        iter->polygon (poly);
+        flat_shapes.insert (db::PolygonRef (poly.transformed (iter.trans ()), layout.shape_repository ()));
+      }
     }
 
-    layout.clear_layer (deep_layer ().layer ());
-    top_cell.shapes (deep_layer ().layer ()).swap (flat_shapes);
+    layout.clear_layer (deep_layer.layer ());
+    top_cell.shapes (deep_layer.layer ()).swap (flat_shapes);
 
+  }
+}
+
+void DeepRegion::flatten ()
+{
+  flatten_layer (deep_layer ());
+  if (m_merged_polygons_valid) {
+    flatten_layer (const_cast<db::DeepLayer &> (merged_deep_layer ()));
   }
 }
 
@@ -649,6 +660,13 @@ DeepRegion::not_with (const Region &other) const
     return new DeepRegion (and_or_not_with (other_deep, false));
 
   }
+}
+
+RegionDelegate *
+DeepRegion::or_with (const Region &other) const
+{
+  //  NOTE: this is somewhat different from the as if flat case because it does not merge
+  return add (other);
 }
 
 std::pair<RegionDelegate *, RegionDelegate *>
@@ -1090,6 +1108,7 @@ public:
   virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
     db::EdgeProcessor ep;
+    ep.set_base_verbosity (50);
 
     for (shape_interactions<db::PolygonRef, db::PolygonRef>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
       ep.insert (s->second);
@@ -1637,8 +1656,14 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
     if (! other_deep) {
       return db::AsIfFlatRegion::run_check (rel, different_polygons, other, d, options);
     }
-    other_layer = other_deep->deep_layer ().layer ();
-    other_is_merged = other->is_merged ();
+    if (options.whole_edges) {
+      //  NOTE: whole edges needs both inputs merged
+      other_layer = other_deep->merged_deep_layer ().layer ();
+      other_is_merged = true;
+    } else {
+      other_layer = other_deep->deep_layer ().layer ();
+      other_is_merged = other->is_merged ();
+    }
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();

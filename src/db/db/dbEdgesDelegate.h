@@ -32,6 +32,7 @@
 #include "dbShapeCollection.h"
 #include "dbShapeCollectionUtils.h"
 #include "dbGenericShapeIterator.h"
+#include "dbHash.h"
 
 #include <list>
 #include <unordered_set>

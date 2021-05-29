@@ -34,8 +34,10 @@
 #include "dbShapeCollection.h"
 #include "dbGenericShapeIterator.h"
 #include "dbRegionLocalOperations.h"
+#include "dbHash.h"
 
 #include <list>
+#include <unordered_set>
 
 namespace db {
 

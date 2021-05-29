@@ -3897,6 +3897,20 @@ CODE
     # # (100 and 150 tiles of 20 um each are used in horizontal and vertical direction):
     # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), tile_origin(0.0, 0.0), tile_count(100, 150))
     # @/code
+    #
+    # The "padding mode" indicates how the area outside the layout's bounding box is considered.
+    # There are two modes:
+    #
+    # @ul
+    #   @li @b padding_zero @/b: the outside area is considered zero density. This is the default mode. @/li
+    #   @li @b padding_ignore @/b: the outside area is ignored for the density computation. @/li
+    # @/ul
+    #
+    # Example:
+    #
+    # @code
+    # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), padding_ignore)
+    # @/code
     # 
     # The complementary version of "with_density" is \without_density.
     
@@ -3920,6 +3934,7 @@ CODE
       tile_origin = nil
       tile_count = nil
       tile_boundary = nil
+      padding_mode = :zero
 
       n = 1
       args.each do |a|
@@ -3933,6 +3948,8 @@ CODE
           tile_count = a.get
         elsif a.is_a?(DRCTileBoundary)
           tile_boundary = a.get
+        elsif a.is_a?(DRCDensityPadding)
+          padding_mode = a.value
         elsif a.is_a?(Float) || a.is_a?(1.class) || a == nil
           nlimits < 2 || raise("Too many values specified")
           limits[nlimits] = @engine._make_numeric_value_with_nil(a)
@@ -3977,18 +3994,34 @@ CODE
       tp.threads = (@engine.threads || 1)
       if tile_boundary
         tp.input("boundary", tile_boundary.data)
+      else
+        tp.input("boundary", RBA::Region::new(self.data.bbox))
       end
 
       tp.var("vmin", limits[0] || 0.0)
       tp.var("vmax", limits[1] || 1.0)
       tp.var("inverse", inverse)
-      tp.queue(<<"TP_SCRIPT")
-        _tile && (
-          var bx = _tile.bbox.enlarged(xoverlap, yoverlap);
-          var d = to_f(input.area(bx)) / to_f(bx.area);
-          ((d > vmin - 1e-10 && d < vmax + 1e-10) != inverse) && _output(res, bx, false)
-        )
+
+      if padding_mode == :zero
+        tp.queue(<<"TP_SCRIPT")
+          _tile && (
+            var bx = _tile.bbox.enlarged(xoverlap, yoverlap);
+            var d = to_f(input.area(bx)) / to_f(bx.area);
+            ((d > vmin - 1e-10 && d < vmax + 1e-10) != inverse) && _output(res, bx, false)
+          )
 TP_SCRIPT
+      elsif padding_mode == :ignore
+        tp.queue(<<"TP_SCRIPT")
+          _tile && (
+            var bx = _tile.bbox.enlarged(xoverlap, yoverlap);
+            var ba = boundary.area(bx);
+            ba > 0 && (
+              var d = to_f(input.area(bx)) / to_f(ba);
+              ((d > vmin - 1e-10 && d < vmax + 1e-10) != inverse) && _output(res, bx, false)
+            )
+          )
+TP_SCRIPT
+      end
 
       @engine.run_timed("\"#{method}\" in: #{@engine.src_line}", self.data) do
         tp.execute("Tiled \"#{method}\" in: #{@engine.src_line}")

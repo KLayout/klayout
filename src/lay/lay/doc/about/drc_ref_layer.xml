@@ -3382,6 +3382,20 @@ direction. With the "tile_origin" option this allows full control over the area 
 low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), tile_origin(0.0, 0.0), tile_count(100, 150))
 </pre>
 </p><p>
+The "padding mode" indicates how the area outside the layout's bounding box is considered.
+There are two modes:
+</p><p>
+<ul>
+<li><b>padding_zero </b>: the outside area is considered zero density. This is the default mode. </li>
+<li><b>padding_ignore </b>: the outside area is ignored for the density computation. </li>
+</ul>
+</p><p>
+Example:
+</p><p>
+<pre>
+low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), padding_ignore)
+</pre>
+</p><p>
 The complementary version of "with_density" is <a href="#without_density">without_density</a>.
 </p>
 <a name="with_distance"/><h2>"with_distance" - Selects edge pairs by the distance of the edges</h2>

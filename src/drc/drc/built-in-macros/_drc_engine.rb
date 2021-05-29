@@ -102,6 +102,14 @@ module DRC
       DRCJoinFlag::new(true)
     end
     
+    def padding_zero
+      DRCDensityPadding::new(:zero)
+    end
+
+    def padding_ignore
+      DRCDensityPadding::new(:ignore)
+    end
+
     def diamond_limit
       DRCSizingMode::new(0)
     end

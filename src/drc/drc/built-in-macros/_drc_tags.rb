@@ -20,6 +20,14 @@ module DRC
   class DRCBothEdges
   end
   
+  # A wrapper for the padding modes of with_density
+  class DRCDensityPadding
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+  
   # A wrapper for the sizing mode value
   class DRCSizingMode
     attr_accessor :value

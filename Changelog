@@ -1,4 +1,43 @@
 
+0.27.1          (2021-05-31):
+
+* Enhancement: %GITHUB%/issues/809 
+        "without_density" goes outside the boundary of the input layer.
+        A new keyword ("padding_ignore") can be added to with_density/without_density
+        to ignore parts outside the boundary instead of treating them as zero 
+        density.
+* Enhancement: %GITHUB%/issues/808 
+        Feature suggestion: DRC to report edges attached to corners as edge pairs.
+        There is a new output mode "as_edge_pairs" in addition to "as_dots" and
+        "as_boxes" now.
+* Bugfix: %GITHUB%/issues/807 DRC: clear_connections and incremental connect was not working
+        This is an important feature for correctly implementing antenna checks
+* Bugfix: %GITHUB%/issues/806 LVS: CustomComparer is not working
+* Bugfix: %GITHUB%/issues/801 DRC Layer#smoothed lacks the "keep_hv" argument
+* Enhancement: %GITHUB%/issues/798 More flexibility on Spice reader
+        A number of new features has been provided for the spice reader delegate
+* Bugfix: %GITHUB%/issues/795 Unstable application with verbose log output 
+* Bugfix: %GITHUB%/issues/793 Bug on each_image_selected
+* Bugfix: %GITHUB%/issues/787 Query issue (or general: expression issue)
+        A problem with memory corruption in certain scenarios was causes
+        an application crash.
+* Bugfix: %GITHUB%/issues/778 Use system font instead of hard coded "Monospace"
+* Bugfix: DRC "flatten" did not always flatten, but kept layers hierarchically
+* Enhancement: DRC: a couple of new filters on edge pair layers:
+        - with_angle/without_angle: filter by angle of the edges (one or both)
+        - with_length/without_length: filter by length of the edges (one or both)
+        - with_distance/without_distance: filter by distance of the edges
+* Enhancement: Added Edge#cut_point method
+* Enhancement: LEF macro layouts now can be specified in UI
+* Bugfix: full_edge, negative output for fragmented polygon vs. small ones (space, enclosure, overlap)
+        In some cases, only parts of the edges were reported and negative output was
+        incorrect. In addition, negative output for two-layer checks - such as "l1.drc(sep(l2) > 0.2)" - now 
+        only is produced for the primary layer. With both outputs it was difficult to separate the 
+        components.
+* Bugfix: computed layers were printed with layer properties in lvsdb files sometimes.
+* Enhancement: Performance improvements and memory footprint reduction for OpenRAM test case
+* Bugfix: a number of typos fixed and documentation clarifications
+
 0.27            (2021-05-02):
 
 * Enhancements: Numerous new functions for the RBA and pya API

@@ -29,6 +29,7 @@
 #include "dbDeepEdges.h"
 #include "dbDeepRegion.h"
 #include "dbDeepShapeStore.h"
+#include "dbCellGraphUtils.h"
 #include "tlGlobPattern.h"
 
 namespace db
@@ -184,6 +185,96 @@ OriginalLayerRegion::min_coherence_changed ()
   m_is_merged = false;
   m_merged_polygons.clear ();
   m_merged_polygons_valid = false;
+}
+
+size_t
+OriginalLayerRegion::count () const
+{
+  //  NOTE: we should to make sure the iterator isn't validated as this would spoil the usability or OriginalLayerRegion upon
+  //  layout changes
+  db::RecursiveShapeIterator iter = m_iter;
+
+  if (iter.has_complex_region () || iter.region () != db::Box::world () || ! iter.enables ().empty () || ! iter.disables ().empty ()) {
+
+    //  complex case with a search region - use the iterator to determine the count (expensive)
+    size_t n = 0;
+    for (db::RecursiveShapeIterator i = iter; ! i.at_end (); ++i) {
+      ++n;
+    }
+
+    return n;
+
+  } else {
+
+    //  otherwise we can utilize the CellCounter
+
+    size_t n = 0;
+
+    const db::Layout &layout = *iter.layout ();
+
+    std::set<db::cell_index_type> cells;
+    iter.top_cell ()->collect_called_cells (cells);
+    cells.insert (iter.top_cell ()->cell_index ());
+
+    db::CellCounter cc (&layout);
+    for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+      if (cells.find (*c) == cells.end ()) {
+        continue;
+      }
+      size_t nn = 0;
+      if (iter.multiple_layers ()) {
+        for (std::vector<unsigned int>::const_iterator l = iter.layers ().begin (); l != iter.layers ().end (); ++l) {
+          nn += layout.cell (*c).shapes (*l).size (iter.shape_flags () & db::ShapeIterator::Regions);
+        }
+      } else if (iter.layer () < layout.layers ()) {
+        nn += layout.cell (*c).shapes (iter.layer ()).size (iter.shape_flags () & db::ShapeIterator::Regions);
+      }
+      n += cc.weight (*c) * nn;
+    }
+
+    return n;
+
+  }
+}
+
+size_t
+OriginalLayerRegion::hier_count () const
+{
+  //  NOTE: we should to make sure the iterator isn't validated as this would spoil the usability or OriginalLayerRegion upon
+  //  layout changes
+  db::RecursiveShapeIterator iter = m_iter;
+
+  if (iter.has_complex_region () || iter.region () != db::Box::world ()) {
+
+    //  TODO: how to establish a "hierarchical" interpretation in this case?
+    return count ();
+
+  } else {
+
+    size_t n = 0;
+
+    const db::Layout &layout = *iter.layout ();
+
+    std::set<db::cell_index_type> cells;
+    iter.top_cell ()->collect_called_cells (cells);
+    cells.insert (iter.top_cell ()->cell_index ());
+
+    for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+      if (cells.find (*c) == cells.end ()) {
+        continue;
+      }
+      if (iter.multiple_layers ()) {
+        for (std::vector<unsigned int>::const_iterator l = iter.layers ().begin (); l != iter.layers ().end (); ++l) {
+          n += layout.cell (*c).shapes (*l).size (iter.shape_flags () & db::ShapeIterator::Regions);
+        }
+      } else if (iter.layer () < layout.layers ()) {
+        n += layout.cell (*c).shapes (iter.layer ()).size (iter.shape_flags () & db::ShapeIterator::Regions);
+      }
+    }
+
+    return n;
+
+  }
 }
 
 RegionIteratorDelegate *

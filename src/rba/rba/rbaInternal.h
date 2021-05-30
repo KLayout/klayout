@@ -219,6 +219,11 @@ void register_class (VALUE ruby_cls, const gsi::ClassBase *gsi_cls);
 const gsi::ClassBase *find_cclass (VALUE k);
 
 /**
+ *  @brief Find the class declaration from the Ruby object
+ */
+const gsi::ClassBase *find_cclass_maybe_null (VALUE k);
+
+/**
  *  @brief Finds the Ruby class for a gsi class
  */
 VALUE ruby_cls (const gsi::ClassBase *cls);

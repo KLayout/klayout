@@ -346,16 +346,87 @@ EdgePairsDelegate *DeepEdgePairs::add (const EdgePairs &other) const
   }
 }
 
-EdgePairsDelegate *DeepEdgePairs::filter_in_place (const EdgePairFilterBase &filter)
+EdgePairsDelegate *
+DeepEdgePairs::filter_in_place (const EdgePairFilterBase &filter)
 {
-  //  TODO: implement
-  return AsIfFlatEdgePairs::filter_in_place (filter);
+  //  TODO: implement to be really in-place
+  *this = *apply_filter (filter);
+  return this;
 }
 
-EdgePairsDelegate *DeepEdgePairs::filtered (const EdgePairFilterBase &filter) const
+EdgePairsDelegate *
+DeepEdgePairs::filtered (const EdgePairFilterBase &filter) const
 {
-  //  TODO: implement
-  return AsIfFlatEdgePairs::filtered (filter);
+  return apply_filter (filter);
+}
+
+DeepEdgePairs *
+DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter) const
+{
+  const db::DeepLayer &edge_pairs = deep_layer ();
+
+  std::unique_ptr<VariantsCollectorBase> vars;
+  if (filter.vars ()) {
+
+    vars.reset (new db::VariantsCollectorBase (filter.vars ()));
+
+    vars->collect (edge_pairs.layout (), edge_pairs.initial_cell ());
+
+    if (filter.wants_variants ()) {
+      const_cast<db::DeepLayer &> (edge_pairs).separate_variants (*vars);
+    }
+
+  }
+
+  db::Layout &layout = const_cast<db::Layout &> (edge_pairs.layout ());
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
+
+  std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (edge_pairs.derived ()));
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const db::Shapes &s = c->shapes (edge_pairs.layer ());
+
+    if (vars.get ()) {
+
+      const std::map<db::ICplxTrans, size_t> &vv = vars->variants (c->cell_index ());
+      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+
+        db::Shapes *st;
+        if (vv.size () == 1) {
+          st = & c->shapes (res->deep_layer ().layer ());
+        } else {
+          st = & to_commit [c->cell_index ()] [v->first];
+        }
+
+        const db::ICplxTrans &tr = v->first;
+
+        for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::EdgePairs); ! si.at_end (); ++si) {
+          if (filter.selected (si->edge_pair ().transformed (tr))) {
+            st->insert (*si);
+          }
+        }
+
+      }
+
+    } else {
+
+      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::EdgePairs); ! si.at_end (); ++si) {
+        if (filter.selected (si->edge_pair ())) {
+          st.insert (*si);
+        }
+      }
+
+    }
+
+  }
+
+  if (! to_commit.empty () && vars.get ()) {
+    res->deep_layer ().commit_shapes (*vars, to_commit);
+  }
+
+  return res.release ();
 }
 
 RegionDelegate *
@@ -459,6 +530,16 @@ void DeepEdgePairs::insert_into (Layout *layout, db::cell_index_type into_cell, 
 void DeepEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
 {
   deep_layer ().insert_into_as_polygons (layout, into_cell, into_layer, enl);
+}
+
+DeepEdgePairs &DeepEdgePairs::operator= (const DeepEdgePairs &other)
+{
+  if (this != &other) {
+    AsIfFlatEdgePairs::operator= (other);
+    DeepShapeCollectionDelegateBase::operator= (other);
+  }
+
+  return *this;
 }
 
 }

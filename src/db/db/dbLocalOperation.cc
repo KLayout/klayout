@@ -56,7 +56,6 @@ void local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape
     }
 
     for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-
       const TS &subject_shape = interactions.subject_shape (i->first);
 
       shape_interactions<TS, TI> single_interactions;

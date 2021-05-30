@@ -338,7 +338,7 @@ public:
     : m_obj (obj), mp_cls (0), m_members (Qnil)
   {
     rb_gc_register_address (&m_obj);
-    mp_cls = find_cclass (rb_class_of (m_obj));
+    mp_cls = find_cclass_maybe_null (rb_class_of (m_obj));
     m_members = rb_obj_instance_variables (m_obj);
     rb_gc_register_address (&m_members);
 

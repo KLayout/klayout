@@ -38,6 +38,7 @@ GenericWriterOptions::GenericWriterOptions ()
     m_gds2_max_vertex_count (8000),
     m_gds2_no_zero_length_paths (false),
     m_gds2_multi_xy_records (false),
+    m_gds2_resolve_skew_arrays (false),
     m_gds2_max_cellname_length (32000),
     m_gds2_libname ("LIB"),
     m_gds2_user_units (1.0),
@@ -149,6 +150,12 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                     "#--multi-xy-records", &m_gds2_multi_xy_records, "Allows unlimited number of points",
                     "If this option is given, multiple XY records will be written to accommodate an unlimited number "
                     "of points per polygon or path. However, such files may not be compatible with some consumers."
+                   )
+        << tl::arg (group +
+                    "-ow|--resolve-skew-arrays", &m_gds2_resolve_skew_arrays, "Resolve skew (non-orthogonal) arrays",
+                    "If this option is given, skew arrays are resolved into single instances. Skew arrays "
+                    "are ones where the row or column vectors are not horizontal or vertical. Such arrays can cause problems "
+                    "in legacy software. This option will eliminate them at the expense of bigger files and loss of the array instance property."
                    )
         << tl::arg (group +
                     "#--no-zero-length-paths", &m_gds2_no_zero_length_paths, "Converts zero-length paths to polygons",
@@ -349,6 +356,7 @@ GenericWriterOptions::configure (db::SaveLayoutOptions &save_options, const db::
   save_options.set_option_by_name ("gds2_max_vertex_count", m_gds2_max_vertex_count);
   save_options.set_option_by_name ("gds2_no_zero_length_paths", m_gds2_no_zero_length_paths);
   save_options.set_option_by_name ("gds2_multi_xy_records", m_gds2_multi_xy_records);
+  save_options.set_option_by_name ("gds2_resolve_skew_arrays", m_gds2_resolve_skew_arrays);
   save_options.set_option_by_name ("gds2_max_cellname_length", m_gds2_max_cellname_length);
   save_options.set_option_by_name ("gds2_libname", m_gds2_libname);
   save_options.set_option_by_name ("gds2_user_units", m_gds2_user_units);

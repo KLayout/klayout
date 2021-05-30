@@ -24,6 +24,7 @@ SOURCES = \
   dbCompoundOperation.cc \
   dbEdge.cc \
   dbEdgePair.cc \
+  dbEdgePairFilters.cc \
   dbEdgePairRelations.cc \
   dbEdgePairs.cc \
   dbEdgeProcessor.cc \
@@ -233,6 +234,7 @@ HEADERS = \
   dbCompoundOperation.h \
   dbEdge.h \
   dbEdgePair.h \
+  dbEdgePairFilters.h \
   dbEdgePairRelations.h \
   dbEdgePairs.h \
   dbEdgeProcessor.h \

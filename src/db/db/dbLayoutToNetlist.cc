@@ -32,6 +32,7 @@
 #include "dbLayoutVsSchematic.h"
 #include "dbLayoutToNetlistFormatDefs.h"
 #include "dbLayoutVsSchematicFormatDefs.h"
+#include "dbShapeProcessor.h"
 #include "tlGlobPattern.h"
 
 namespace db
@@ -246,11 +247,21 @@ void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, co
   extractor.extract (dss (), m_layout_index, layers, *mp_netlist, m_net_clusters, m_device_scaling);
 }
 
-void LayoutToNetlist::connect (const db::Region &l)
+void LayoutToNetlist::reset_extracted ()
 {
   if (m_netlist_extracted) {
-    throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
+
+    m_net_clusters.clear ();
+    mp_netlist.reset (0);
+
+    m_netlist_extracted = false;
+
   }
+}
+
+void LayoutToNetlist::connect (const db::Region &l)
+{
+  reset_extracted ();
 
   if (! is_persisted (l)) {
     register_layer (l, make_new_name ());
@@ -265,9 +276,8 @@ void LayoutToNetlist::connect (const db::Region &l)
 
 void LayoutToNetlist::connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b)
 {
-  if (m_netlist_extracted) {
-    throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
-  }
+  reset_extracted ();
+
   if (! is_persisted (a)) {
     register_layer (a, make_new_name ());
   }
@@ -286,9 +296,8 @@ void LayoutToNetlist::connect_impl (const db::ShapeCollection &a, const db::Shap
 
 size_t LayoutToNetlist::connect_global_impl (const db::ShapeCollection &l, const std::string &gn)
 {
-  if (m_netlist_extracted) {
-    throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
-  }
+  reset_extracted ();
+
   if (! is_persisted (l)) {
     register_layer (l, make_new_name ());
   }
@@ -1293,6 +1302,93 @@ db::Net *LayoutToNetlist::probe_net (const db::Region &of_region, const db::Poin
   }
 }
 
+namespace
+{
+
+class PolygonAreaAndPerimeterCollector
+  : public db::PolygonSink
+{
+public:
+  typedef db::Polygon polygon_type;
+  typedef polygon_type::perimeter_type perimeter_type;
+  typedef polygon_type::area_type area_type;
+
+  PolygonAreaAndPerimeterCollector ()
+    : m_area (0), m_perimeter (0)
+  { }
+
+  area_type area () const
+  {
+    return m_area;
+  }
+
+  perimeter_type perimeter () const
+  {
+    return m_perimeter;
+  }
+
+  virtual void put (const db::Polygon &poly)
+  {
+    m_area += poly.area ();
+    m_perimeter += poly.perimeter ();
+  }
+
+public:
+  area_type m_area;
+  perimeter_type m_perimeter;
+};
+
+}
+
+static void
+compute_area_and_perimeter_of_net_shapes (const db::hier_clusters<db::NetShape> &clusters, db::cell_index_type ci, size_t cid, unsigned int layer_id, db::Polygon::area_type &area, db::Polygon::perimeter_type &perimeter)
+{
+  db::EdgeProcessor ep;
+
+  //  count vertices and reserve space
+  size_t n = 0;
+  for (db::recursive_cluster_shape_iterator<db::NetShape> rci (clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
+    n += rci->polygon_ref ().vertices ();
+  }
+  ep.reserve (n);
+
+  size_t p = 0;
+  for (db::recursive_cluster_shape_iterator<db::NetShape> rci (clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
+    ep.insert (rci.trans () * rci->polygon_ref (), ++p);
+  }
+
+  PolygonAreaAndPerimeterCollector ap_collector;
+  db::PolygonGenerator pg (ap_collector, false);
+  db::SimpleMerge op;
+  ep.process (pg, op);
+
+  area = ap_collector.area ();
+  perimeter = ap_collector.perimeter ();
+}
+
+static void
+get_merged_shapes_of_net (const db::hier_clusters<db::NetShape> &clusters, db::cell_index_type ci, size_t cid, unsigned int layer_id, db::Shapes &shapes)
+{
+  db::EdgeProcessor ep;
+
+  //  count vertices and reserve space
+  size_t n = 0;
+  for (db::recursive_cluster_shape_iterator<db::NetShape> rci (clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
+    n += rci->polygon_ref ().vertices ();
+  }
+  ep.reserve (n);
+
+  size_t p = 0;
+  for (db::recursive_cluster_shape_iterator<db::NetShape> rci (clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
+    ep.insert (rci.trans () * rci->polygon_ref (), ++p);
+  }
+
+  db::ShapeGenerator sg (shapes);
+  db::PolygonGenerator pg (sg, false);
+  db::SimpleMerge op;
+  ep.process (pg, op);
+}
+
 db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_area_factor, double gate_perimeter_factor, const db::Region &metal, double metal_area_factor, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes)
 {
   //  TODO: that's basically too much .. we only need the clusters
@@ -1318,56 +1414,65 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_a
         continue;
       }
 
-      db::Region rgate, rmetal;
-
-      deliver_shapes_of_net_recursive (0, m_net_clusters, *cid, *c, layer_of (gate), db::ICplxTrans (), rgate, 0);
-      deliver_shapes_of_net_recursive (0, m_net_clusters, *cid, *c, layer_of (metal), db::ICplxTrans (), rmetal, 0);
-
-      double agate = 0.0;
-      if (fabs (gate_area_factor) > 1e-6) {
-        agate += rgate.area () * dbu * dbu * gate_area_factor;
-      }
-      if (fabs (gate_perimeter_factor) > 1e-6) {
-        agate += rgate.perimeter () * dbu * gate_perimeter_factor;
-      }
-
-      double ametal = 0.0;
-      if (fabs (metal_area_factor) > 1e-6) {
-        ametal += rmetal.area () * dbu * dbu * metal_area_factor;
-      }
-      if (fabs (metal_perimeter_factor) > 1e-6) {
-        ametal += rmetal.perimeter () * dbu * metal_perimeter_factor;
-      }
-
       double r = ratio;
       bool skip = false;
 
       for (std::vector<std::pair<const db::Region *, double> >::const_iterator d = diodes.begin (); d != diodes.end () && ! skip; ++d) {
 
-        db::Region rdiode;
-        deliver_shapes_of_net_recursive (0, m_net_clusters, *cid, *c, layer_of (*d->first), db::ICplxTrans (), rdiode, 0);
+        db::Polygon::area_type adiode_int = 0;
+        db::Polygon::perimeter_type pdiode_int = 0;
+
+        compute_area_and_perimeter_of_net_shapes (m_net_clusters, *cid, *c, layer_of (*d->first), adiode_int, pdiode_int);
 
         if (fabs (d->second) < db::epsilon) {
-          if (rdiode.area () > 0) {
+          if (adiode_int > 0) {
             skip = true;
           }
         } else {
-          r += rdiode.area () * dbu * dbu * d->second;
+          r += adiode_int * dbu * dbu * d->second;
         }
 
       }
 
       if (! skip) {
 
-        if (tl::verbosity () >= 50) {
-          tl::info << "cell [" << ly.cell_name (*cid) << "]: agate=" << tl::to_string (agate) << ", ametal=" << tl::to_string (ametal) << ", r=" << tl::sprintf ("%.12g", r);
+        db::Polygon::area_type agate_int = 0;
+        db::Polygon::perimeter_type pgate_int = 0;
+
+        compute_area_and_perimeter_of_net_shapes (m_net_clusters, *cid, *c, layer_of (gate), agate_int, pgate_int);
+
+        double agate = 0.0;
+        if (fabs (gate_area_factor) > 1e-6) {
+          agate += agate_int * dbu * dbu * gate_area_factor;
+        }
+        if (fabs (gate_perimeter_factor) > 1e-6) {
+          agate += pgate_int * dbu * gate_perimeter_factor;
         }
 
-        if (agate > dbu * dbu && ametal / agate > r + db::epsilon) {
-          db::Shapes &shapes = ly.cell (*cid).shapes (dl.layer ());
-          for (db::Region::const_iterator r = rmetal.begin_merged (); ! r.at_end (); ++r) {
-            shapes.insert (*r);
+        if (agate > dbu * dbu) {
+
+          db::Polygon::area_type ametal_int = 0;
+          db::Polygon::perimeter_type pmetal_int = 0;
+
+          compute_area_and_perimeter_of_net_shapes (m_net_clusters, *cid, *c, layer_of (metal), ametal_int, pmetal_int);
+
+          double ametal = 0.0;
+          if (fabs (metal_area_factor) > 1e-6) {
+            ametal += ametal_int * dbu * dbu * metal_area_factor;
           }
+          if (fabs (metal_perimeter_factor) > 1e-6) {
+            ametal += pmetal_int * dbu * metal_perimeter_factor;
+          }
+
+          if (tl::verbosity () >= 50) {
+            tl::info << "cell [" << ly.cell_name (*cid) << "]: agate=" << tl::to_string (agate) << ", ametal=" << tl::to_string (ametal) << ", r=" << tl::sprintf ("%.12g", r);
+          }
+
+          if (ametal / agate > r + db::epsilon) {
+            db::Shapes &shapes = ly.cell (*cid).shapes (dl.layer ());
+            get_merged_shapes_of_net (m_net_clusters, *cid, *c, layer_of (metal), shapes);
+          }
+
         }
 
       }

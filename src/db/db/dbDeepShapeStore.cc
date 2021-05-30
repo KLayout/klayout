@@ -403,9 +403,15 @@ static unsigned int init_layer (db::Layout &layout, const db::RecursiveShapeIter
 {
   unsigned int layer_index = layout.insert_layer ();
 
-  if (si.layout () && si.layer () < si.layout ()->layers ()) {
+  if (si.layout ()) {
     //  try to preserve the layer properties
-    layout.set_properties (layer_index, si.layout ()->get_properties (si.layer ()));
+    if (! si.multiple_layers ()) {
+      if (si.layer () < si.layout ()->layers ()) {
+        layout.set_properties (layer_index, si.layout ()->get_properties (si.layer ()));
+      }
+    } else if (! si.layers ().empty ()) {
+      layout.set_properties (layer_index, si.layout ()->get_properties (si.layers ().front ()));
+    }
   }
 
   return layer_index;

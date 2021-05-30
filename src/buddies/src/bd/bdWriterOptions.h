@@ -116,6 +116,7 @@ private:
   unsigned int m_gds2_max_vertex_count;
   bool m_gds2_no_zero_length_paths;
   bool m_gds2_multi_xy_records;
+  bool m_gds2_resolve_skew_arrays;
   unsigned int m_gds2_max_cellname_length;
   std::string m_gds2_libname;
   double m_gds2_user_units;

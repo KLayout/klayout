@@ -64,6 +64,11 @@ class DBReadersTests(unittest.TestCase):
     opt.gds2_allow_multi_xy_records = False
     self.assertEqual(opt.gds2_allow_multi_xy_records, False)
 
+    opt.gds2_resolve_skew_arrays = True
+    self.assertEqual(opt.gds2_resolve_skew_arrays, True)
+    opt.gds2_resolve_skew_arrays = False
+    self.assertEqual(opt.gds2_resolve_skew_arrays, False)
+
     opt.gds2_allow_big_records = True
     self.assertEqual(opt.gds2_allow_big_records, True)
     opt.gds2_allow_big_records = False

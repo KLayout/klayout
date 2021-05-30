@@ -202,3 +202,17 @@ TEST(3_symmetric)
   eh.insert (db::EdgePair (e2, e1, true));
   EXPECT_EQ (int (eh.size ()), 1);
 }
+
+TEST(4_distance)
+{
+  db::Edge e1 (db::Point (0, 0), db::Point (0, 100));
+  db::Edge e2 (db::Point (200, 100), db::Point (200, 0));
+  db::Edge e3 (db::Point (0, 0), db::Point (100, 0));
+  db::Edge e4 (db::Point (200, 0), db::Point (300, 0));
+  db::Edge e5 (db::Point (200, 100), db::Point (300, 100));
+
+  EXPECT_EQ (db::EdgePair (e1, e1).distance (), 0);
+  EXPECT_EQ (db::EdgePair (e1, e2).distance (), 200);
+  EXPECT_EQ (db::EdgePair (e3, e2).distance (), 100);
+  EXPECT_EQ (db::EdgePair (e3, e5).distance (), 141);
+}

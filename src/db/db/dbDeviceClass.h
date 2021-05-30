@@ -297,7 +297,6 @@ public:
 
   virtual DeviceParameterCompareDelegate *clone () const = 0;
   virtual bool less (const db::Device &a, const db::Device &b) const = 0;
-  virtual bool equal (const db::Device &a, const db::Device &b) const = 0;
 };
 
 /**
@@ -315,7 +314,6 @@ public:
   EqualDeviceParameters (size_t parameter_id, double relative, double absolute);
 
   virtual bool less (const db::Device &a, const db::Device &b) const;
-  virtual bool equal (const db::Device &a, const db::Device &b) const;
 
   virtual DeviceParameterCompareDelegate *clone () const
   {
@@ -345,7 +343,6 @@ public:
   AllDeviceParametersAreEqual (double relative);
 
   virtual bool less (const db::Device &a, const db::Device &b) const;
-  virtual bool equal (const db::Device &a, const db::Device &b) const;
 
   virtual DeviceParameterCompareDelegate *clone () const
   {

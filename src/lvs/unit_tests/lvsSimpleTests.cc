@@ -206,3 +206,8 @@ TEST(23_issue709)
   run_test (_this, "empty_subcells", "empty_subcells.gds");
 }
 
+//  empty gds
+TEST(24_issue806)
+{
+  run_test (_this, "custom_compare", "custom_compare.gds");
+}

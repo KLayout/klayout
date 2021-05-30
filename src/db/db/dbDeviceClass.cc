@@ -79,18 +79,6 @@ bool EqualDeviceParameters::less (const db::Device &a, const db::Device &b) cons
   return false;
 }
 
-bool EqualDeviceParameters::equal (const db::Device &a, const db::Device &b) const
-{
-  for (std::vector<std::pair<size_t, std::pair<double, double> > >::const_iterator c = m_compare_set.begin (); c != m_compare_set.end (); ++c) {
-    int cmp = compare_parameters (a.parameter_value (c->first), b.parameter_value (c->first), c->second.first, c->second.second);
-    if (cmp != 0) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 EqualDeviceParameters &EqualDeviceParameters::operator+= (const EqualDeviceParameters &other)
 {
   for (std::vector<std::pair<size_t, std::pair<double, double> > >::const_iterator c = other.m_compare_set.begin (); c != other.m_compare_set.end (); ++c) {
@@ -119,19 +107,6 @@ bool AllDeviceParametersAreEqual::less (const db::Device &a, const db::Device &b
   }
 
   return false;
-}
-
-bool AllDeviceParametersAreEqual::equal (const db::Device &a, const db::Device &b) const
-{
-  const std::vector<db::DeviceParameterDefinition> &parameters = a.device_class ()->parameter_definitions ();
-  for (std::vector<db::DeviceParameterDefinition>::const_iterator c = parameters.begin (); c != parameters.end (); ++c) {
-    int cmp = compare_parameters (a.parameter_value (c->id ()), b.parameter_value (c->id ()), 0.0, m_relative);
-    if (cmp != 0) {
-      return false;
-    }
-  }
-
-  return true;
 }
 
 // --------------------------------------------------------------------------------
@@ -293,7 +268,7 @@ bool DeviceClass::equal (const db::Device &a, const db::Device &b)
   }
 
   if (pcd != 0) {
-    return pcd->equal (a, b);
+    return ! pcd->less (a, b) && ! pcd->less (b, a);
   } else {
 
     const std::vector<db::DeviceParameterDefinition> &pd = a.device_class ()->parameter_definitions ();

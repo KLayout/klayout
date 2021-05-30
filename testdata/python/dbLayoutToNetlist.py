@@ -576,6 +576,54 @@ end;
     self.assertEqual(str(a1_10.flatten() ^ pya.Region(ly_au.top_cell().begin_shapes_rec(ly_au.layer(101, 0)))), "")
     self.assertEqual(str(a1_30.flatten() ^ pya.Region(ly_au.top_cell().begin_shapes_rec(ly_au.layer(102, 0)))), "")
 
+    # --- simple incremental antenna check with metal1 + metal2
+
+    l2n._destroy()
+    l2n = pya.LayoutToNetlist(dss)
+
+    l2n.register(rdiode, "diode")
+    l2n.register(rpoly, "poly")
+    l2n.register(rcont, "cont")
+    l2n.register(rmetal1, "metal1")
+    l2n.register(rvia1, "via1")
+    l2n.register(rmetal2, "metal2")
+
+    l2n.connect(rpoly)
+    l2n.connect(rcont)
+    l2n.connect(rmetal1)
+    l2n.connect(rmetal2)
+    l2n.connect(rpoly, rcont)
+    l2n.connect(rcont, rmetal1)
+
+    self.assertEqual(l2n.is_extracted(), False)
+    l2n.extract_netlist()
+    self.assertEqual(l2n.is_extracted(), True)
+
+    a1_3 = l2n.antenna_check(rpoly, rmetal1, 3)
+    a1_10 = l2n.antenna_check(rpoly, rmetal1, 10)
+    a1_30 = l2n.antenna_check(rpoly, rmetal1, 30)
+
+    # Note: flatten.merged performs some normalization
+    self.assertEqual(str(a1_3.flatten() ^ pya.Region(ly_au.top_cell().begin_shapes_rec(ly_au.layer(100, 0)))), "")
+    self.assertEqual(str(a1_10.flatten() ^ pya.Region(ly_au.top_cell().begin_shapes_rec(ly_au.layer(101, 0)))), "")
+    self.assertEqual(str(a1_30.flatten() ^ pya.Region(ly_au.top_cell().begin_shapes_rec(ly_au.layer(102, 0)))), "")
+
+    l2n.connect(rmetal1, rvia1)
+    l2n.connect(rvia1, rmetal2)
+
+    self.assertEqual(l2n.is_extracted(), False)
+    l2n.extract_netlist()
+    self.assertEqual(l2n.is_extracted(), True)
+
+    a2_5 = l2n.antenna_check(rpoly, rmetal2, 5)
+    a2_10 = l2n.antenna_check(rpoly, rmetal2, 10)
+    a2_17 = l2n.antenna_check(rpoly, rmetal2, 17)
+
+    # Note: flatten.merged performs some normalization
+    self.assertEqual(str(a2_5.flatten() ^ pya.Region(ly_au.top_cell().begin_shapes_rec(ly_au.layer(200, 0)))), "")
+    self.assertEqual(str(a2_10.flatten() ^ pya.Region(ly_au.top_cell().begin_shapes_rec(ly_au.layer(201, 0)))), "")
+    self.assertEqual(str(a2_17.flatten() ^ pya.Region(ly_au.top_cell().begin_shapes_rec(ly_au.layer(202, 0)))), "")
+
     # --- simple antenna check with metal2
 
     l2n._destroy()

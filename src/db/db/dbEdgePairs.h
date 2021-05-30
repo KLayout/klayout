@@ -42,16 +42,12 @@ class Edges;
 class Region;
 class DeepShapeStore;
 class TransformationReducer;
+class EdgeFilterBase;
 
 /**
  *  @brief An edge pair set iterator
  *
  *  The iterator delivers the edge pairs of the edge pair set
- */
-/**
- *  @brief An edge set iterator
- *
- *  The iterator delivers the edges of the edge set
  */
 class DB_PUBLIC EdgePairsIterator
   : public generic_shape_iterator<db::EdgePair>
@@ -117,7 +113,7 @@ public:
   EdgePairFilterBase () { }
   virtual ~EdgePairFilterBase () { }
 
-  virtual bool selected (const db::EdgePair &edge) const = 0;
+  virtual bool selected (const db::EdgePair &edge_pair) const = 0;
   virtual const TransformationReducer *vars () const = 0;
   virtual bool wants_variants () const = 0;
 };

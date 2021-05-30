@@ -167,22 +167,6 @@ AsIfFlatRegion::in (const Region &other, bool invert) const
   return new_region.release ();
 }
 
-size_t
-AsIfFlatRegion::count () const
-{
-  size_t n = 0;
-  for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-    ++n;
-  }
-  return n;
-}
-
-size_t
-AsIfFlatRegion::hier_count () const
-{
-  return count ();
-}
-
 bool
 AsIfFlatRegion::is_box () const
 {
@@ -1077,8 +1061,14 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
     others.push_back (begin_merged ());
   } else {
     foreign.push_back (false);
-    others.push_back (other->begin ());
-    other_is_merged = other->is_merged ();
+    if (options.whole_edges) {
+      //  NOTE: whole edges needs both inputs merged
+      others.push_back (other->begin_merged ());
+      other_is_merged = true;
+    } else {
+      others.push_back (other->begin ());
+      other_is_merged = other->is_merged ();
+    }
     has_other = true;
   }
 

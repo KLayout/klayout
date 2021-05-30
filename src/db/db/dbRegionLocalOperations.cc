@@ -240,6 +240,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       //  the processor. Reason: the search range is limited, hence not all necessary components may have been
       //  captured.
       db::EdgeProcessor ep;
+      ep.set_base_verbosity (50);
 
       ep.clear ();
       size_t i = 0;
@@ -561,6 +562,7 @@ void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*l
   }
 
   db::EdgeProcessor ep;
+  ep.set_base_verbosity (50);
 
   std::set<TI> others;
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -597,6 +599,7 @@ void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*l
 
     //  in counted mode we need to merge the shapes because they might overlap
     db::EdgeProcessor ep_merge;
+    ep_merge.set_base_verbosity (50);
 
     size_t i = 0;
     for (typename std::set<TI>::const_iterator o = others.begin (); o != others.end (); ++o) {
@@ -730,6 +733,7 @@ void pull_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/
   std::unordered_set<TR> &result = results.front ();
 
   db::EdgeProcessor ep;
+  ep.set_base_verbosity (50);
 
   std::set<TI> others;
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {

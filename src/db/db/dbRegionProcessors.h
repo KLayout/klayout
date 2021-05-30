@@ -41,7 +41,7 @@ namespace db
 class DB_PUBLIC CornerPointDelivery
 {
 public:
-  virtual void make_point (const db::Point &pt) const = 0;
+  virtual void make_point (const db::Point &pt, const db::Edge &e1, const db::Edge &e2) const = 0;
 };
 
 /**
@@ -55,7 +55,7 @@ public:
     : m_d (dim, dim), mp_result (&result)
   { }
 
-  virtual void make_point (const db::Point &pt) const
+  virtual void make_point (const db::Point &pt, const db::Edge &, const db::Edge &) const
   {
     mp_result->push_back (db::Polygon (db::Box (pt - m_d, pt + m_d)));
   }
@@ -76,7 +76,7 @@ public:
     : mp_result (&result)
   { }
 
-  virtual void make_point (const db::Point &pt) const
+  virtual void make_point (const db::Point &pt, const db::Edge &, const db::Edge &) const
   {
     mp_result->push_back (db::Edge (pt, pt));
   }
@@ -84,6 +84,26 @@ public:
 private:
   db::Vector m_d;
   std::vector<db::Edge> *mp_result;
+};
+
+/**
+ *  @brief An interface to accept corners and turns them into edge pairs
+ */
+class DB_PUBLIC CornerEdgePairDelivery
+  : public CornerPointDelivery
+{
+public:
+  CornerEdgePairDelivery (std::vector<db::EdgePair> &result)
+    : mp_result (&result)
+  { }
+
+  virtual void make_point (const db::Point &, const db::Edge &e1, const db::Edge &e2) const
+  {
+    mp_result->push_back (db::EdgePair (e1, e2));
+  }
+
+private:
+  std::vector<db::EdgePair> *mp_result;
 };
 
 /**
@@ -146,6 +166,31 @@ public:
   void process (const db::Polygon &poly, std::vector<db::Edge> &result) const
   {
     detect_corners (poly, CornerDotDelivery (result));
+  }
+
+  virtual const TransformationReducer *vars () const { return 0; }
+  virtual bool result_is_merged () const { return false; }
+  virtual bool result_must_not_be_merged () const { return true; }  //  to preserve dots
+  virtual bool requires_raw_input () const { return false; }
+  virtual bool wants_variants () const { return false; }
+};
+
+/**
+ *  @brief A corner detector delivering edge pairs for the corners
+ */
+class DB_PUBLIC CornersAsEdgePairs
+  : public db::PolygonToEdgePairProcessorBase, private CornerDetectorCore
+{
+public:
+  CornersAsEdgePairs (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end)
+    : CornerDetectorCore (angle_start, include_angle_start, angle_end, include_angle_end)
+  {
+    //  .. nothing yet ..
+  }
+
+  void process (const db::Polygon &poly, std::vector<db::EdgePair> &result) const
+  {
+    detect_corners (poly, CornerEdgePairDelivery (result));
   }
 
   virtual const TransformationReducer *vars () const { return 0; }

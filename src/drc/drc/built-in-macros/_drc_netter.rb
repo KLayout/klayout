@@ -64,7 +64,6 @@ module DRC
 
     def initialize(engine)
       @engine = engine
-      @netlisted = false
       @connect_implicit = []
       @connect_implicit_per_cell = {}
       @connect_explicit = []
@@ -240,7 +239,6 @@ module DRC
     # See \connect for more details.
 
     def clear_connections
-      @netlisted = false
       @connect_implicit = []
       @connect_implicit_per_cell = {}
       @connect_explicit = []
@@ -386,6 +384,25 @@ module DRC
     # connect(contact, metal1)
     # errors = antenna_check(gate, metal1, 50.0)
     # @/code
+    #
+    # Usually antenna checks apply to multiple metal layers. In this case,
+    # the connectivity needs to be extended after the first check to include
+    # the next metal layers. This can be achieved with incremental connects:
+    #
+    # @code
+    # # provide connections up to metal1
+    # connect(gate, poly)
+    # connect(poly, contact)
+    # connect(contact, metal1)
+    # metal1_errors = antenna_check(gate, metal1, 50.0)
+    #
+    # # now *add* connections up to metal2
+    # connect(metal1, via1)
+    # connect(via1, metal2)
+    # metal2_errors = antenna_check(gate, metal2, 50.0)
+    #
+    # ... continue this scheme with further metal layers ...
+    # @/code 
     #
     # Plasma induced damage can be rectified by including diodes
     # which create a safe current path for discharging the metal
@@ -544,7 +561,7 @@ module DRC
         ensure_data
 
         # run extraction in a timed environment
-        if ! @netlisted
+        if ! @l2n.is_extracted?
 
           # configure implicit net connections
           @l2n.clear_join_net_names
@@ -569,7 +586,6 @@ module DRC
           end
 
           @engine._cmd(@l2n, :extract_netlist)
-          @netlisted = true
 
         end
 
@@ -609,13 +625,13 @@ module DRC
     end
 
     def _l2n_data
-      @netlisted && self.l2n_data
+      @l2n && @l2n.is_extracted? && self.l2n_data
     end
 
   private
 
     def cleanup
-      @netlisted && clear_connections
+      @l2n && @l2n.is_extracted? && clear_connections
     end
     
     def ensure_data
@@ -644,13 +660,12 @@ module DRC
     def register_layer(data)
 
       id = data.data_id 
+      ensure_data
 
       if @layers && @layers[id]
         # already registered
         return
       end
-
-      ensure_data
 
       @layers[id] = data
       @lnum += 1

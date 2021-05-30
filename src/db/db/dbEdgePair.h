@@ -205,6 +205,24 @@ public:
   }
 
   /**
+   *  @brief Computes the distance of the edges in the edge pair
+   *
+   *  The distance is the minimum distance of any of the points from
+   *  each edge.
+   */
+  distance_type distance () const
+  {
+    db::edge<C> e1 = first (), e2 = second ();
+    if (! e1.intersect (e2)) {
+      distance_type d12 = std::min (e2.euclidian_distance (e1.p1 ()), e2.euclidian_distance (e1.p2 ()));
+      distance_type d21 = std::min (e1.euclidian_distance (e2.p1 ()), e1.euclidian_distance (e2.p2 ()));
+      return std::min (d12, d21);
+    } else {
+      return 0;
+    }
+  }
+
+  /**
    *  @brief A method binding of operator* (mainly for automation purposes)
    */
   edge_pair<C> scaled (double s) const

@@ -1,0 +1,72 @@
+
+source($lvs_test_source)
+report_lvs($lvs_test_target_lvsdb, true)
+target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
+
+schematic("custom_compare_sch.cir")
+
+deep
+
+# -------------------------------------------------------------------
+# Layers
+
+# Drawing layers
+nwell       = input(1, 0)
+active      = input(2, 0)
+pplus       = input(3, 0)
+nplus       = input(4, 0)
+poly        = input(5, 0)
+thickox     = input(6, 0)
+polyres     = input(7, 0)
+contact     = input(8, 0)
+metal1      = input(9, 0)   # includes labels
+via1        = input(10, 0)
+metal2      = input(11, 0)  # includes labels
+
+# Bulk layer for terminal provisioning
+bulk        = polygon_layer
+
+# Computed layers
+poly_not_res  = poly - polyres
+poly_in_res   = poly & polyres
+
+# Resistor Definition
+res_ex = resistor("RES", 1.0)
+extract_devices(res_ex, { "C" => poly_not_res, "R" => poly_in_res })
+
+
+# -------------------------------------------------------------------
+# Connectivity
+
+# Inter-layer
+connect(poly_not_res,   contact)
+
+# -------------------------------------------------------------------
+# Netlist and compare
+
+class ResistorComparator < RBA::GenericDeviceParameterCompare
+  
+  def less(device_a, device_b)
+    delta = 1
+    param_id = RBA::DeviceClassResistor::PARAM_R
+    param = "R"
+    if (device_a.parameter(param_id) - device_b.parameter(param_id)).abs > delta
+      result = device_a.parameter(param_id) < device_b.parameter(param_id)
+      return result
+    else
+      return false
+    end
+  end
+  
+end
+
+netlist.device_class_by_name("RES").equal_parameters = ResistorComparator::new()
+
+# Netlist normalization
+netlist.simplify
+
+# Hierarchy alignment (flatten out unmatched cells)
+align
+
+# Netlist vs. netlist
+compare

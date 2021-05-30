@@ -226,6 +226,12 @@ static db::CompoundRegionOperationNode *new_corners_as_dots (db::CompoundRegionO
   return new db::CompoundRegionToEdgeProcessingOperationNode (new db::CornersAsDots (angle_start, include_angle_start, angle_end, include_angle_end), input, true /*processor is owned*/);
 }
 
+static db::CompoundRegionOperationNode *new_corners_as_edge_pairs (db::CompoundRegionOperationNode *input, double angle_start, bool include_angle_start, double angle_end, bool include_angle_end)
+{
+  check_non_null (input, "input");
+  return new db::CompoundRegionToEdgePairProcessingOperationNode (new db::CornersAsEdgePairs (angle_start, include_angle_start, angle_end, include_angle_end), input, true /*processor is owned*/);
+}
+
 static db::CompoundRegionOperationNode *new_extents (db::CompoundRegionOperationNode *input, db::Coord e)
 {
   check_non_null (input, "input");
@@ -602,6 +608,12 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   ) +
   gsi::constructor ("new_corners_as_dots", &new_corners_as_dots, gsi::arg ("input"), gsi::arg ("angle_min"), gsi::arg ("include_angle_min"), gsi::arg ("angle_max"), gsi::arg ("include_angle_max"),
     "@brief Creates a node turning corners into dots (single-point edges).\n"
+  ) +
+  gsi::constructor ("new_corners_as_edge_pairs", &new_corners_as_edge_pairs, gsi::arg ("input"), gsi::arg ("angle_min"), gsi::arg ("include_angle_min"), gsi::arg ("angle_max"), gsi::arg ("include_angle_max"),
+    "@brief Creates a node turning corners into edge pairs containing the two edges adjacent to the corner.\n"
+    "The first edge will be the incoming edge and the second one the outgoing edge.\n"
+    "\n"
+    "This feature has been introduced in version 0.27.1.\n"
   ) +
   gsi::constructor ("new_extents", &new_extents, gsi::arg ("input"), gsi::arg ("e", 0),
     "@brief Creates a node returning the extents of the objects.\n"

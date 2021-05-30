@@ -273,21 +273,30 @@ void DeepEdges::reserve (size_t)
   //  Not implemented for deep regions
 }
 
-void DeepEdges::flatten ()
+static
+void flatten_layer (db::DeepLayer &deep_layer)
 {
-  db::Layout &layout = deep_layer ().layout ();
+  db::Layout &layout = deep_layer.layout ();
   if (layout.begin_top_down () != layout.end_top_down ()) {
 
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
 
     db::Shapes flat_shapes (layout.is_editable ());
-    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer ().layer ()); !iter.at_end (); ++iter) {
+    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); !iter.at_end (); ++iter) {
       flat_shapes.insert (iter->edge ().transformed (iter.trans ()));
     }
 
-    layout.clear_layer (deep_layer ().layer ());
-    top_cell.shapes (deep_layer ().layer ()).swap (flat_shapes);
+    layout.clear_layer (deep_layer.layer ());
+    top_cell.shapes (deep_layer.layer ()).swap (flat_shapes);
 
+  }
+}
+
+void DeepEdges::flatten ()
+{
+  flatten_layer (deep_layer ());
+  if (m_merged_edges_valid) {
+    flatten_layer (const_cast<db::DeepLayer &> (merged_deep_layer ()));
   }
 }
 
@@ -518,7 +527,7 @@ DeepEdges::ensure_merged_edges_valid () const
 
       m_merged_edges = deep_layer ().derived ();
 
-      tl::SelfTimer timer (tl::verbosity () > base_verbosity (), "Ensure merged polygons");
+      tl::SelfTimer timer (tl::verbosity () > base_verbosity (), "Ensure merged edges");
 
       db::Layout &layout = const_cast<db::Layout &> (deep_layer ().layout ());
 

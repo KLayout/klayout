@@ -269,6 +269,7 @@ gen = Gen::new
 
 run_demo gen, "input1.separation(input2, 1.2, euclidian)", "drc_separation1.png"
 run_demo gen, "input1.drc(separation(input2, euclidian) < 1.2)", "drc_separation1u.png"
+run_demo gen, "input1.drc((separation(input2) >= 1.2).first_edges)", "drc_separation1un.png"
 
 class Gen
   def produce(s1, s2)

@@ -1951,9 +1951,6 @@ on polygons and edges (input1: red, input2: blue):
 <td><img src="/images/drc_or2.png"/></td>
 </tr>
 </table>
-</p><p>
-In deep mode, "or" or "|" does not imply merging. In deep mode,
-"or" is an alias for "+" ("add").
 </p>
 <a name="output"/><h2>"output" - Outputs the content of the layer</h2>
 <keyword name="output"/>

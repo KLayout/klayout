@@ -37,6 +37,7 @@
 * Bugfix: computed layers were printed with layer properties in lvsdb files sometimes.
 * Enhancement: Performance improvements and memory footprint reduction for OpenRAM test case
 * Bugfix: a number of typos fixed and documentation clarifications
+* Bugfix: DRC "or" was producing flat output in deep mode
 
 0.27            (2021-05-02):
 

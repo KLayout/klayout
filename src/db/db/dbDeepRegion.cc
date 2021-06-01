@@ -665,8 +665,8 @@ DeepRegion::not_with (const Region &other) const
 RegionDelegate *
 DeepRegion::or_with (const Region &other) const
 {
-  //  NOTE: this is somewhat different from the as if flat case because it does not merge
-  return add (other);
+  RegionDelegate *res = add (other);
+  return res->merged_in_place ();
 }
 
 std::pair<RegionDelegate *, RegionDelegate *>

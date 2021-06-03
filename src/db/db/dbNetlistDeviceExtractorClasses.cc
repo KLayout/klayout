@@ -468,8 +468,16 @@ void NetlistDeviceExtractorResistor::extract_devices (const std::vector<db::Regi
     device->set_parameter_value (db::DeviceClassResistor::param_id_A, sdbu () * sdbu () * p->area ());
     device->set_parameter_value (db::DeviceClassResistor::param_id_P, sdbu () * p->perimeter ());
 
+    //  collect and normalize the contact polygons (gives better reproducibility)
+    std::vector<db::Polygon> contact_poly;
+    contact_poly.reserve (2);
+    for (db::Region::const_iterator d = contacts_per_res.begin (); !d.at_end (); ++d) {
+      contact_poly.push_back (*d);
+    }
+    std::sort (contact_poly.begin (), contact_poly.end ());
+
     int cont_index = 0;
-    for (db::Region::const_iterator d = contacts_per_res.begin (); !d.at_end () && cont_index < 2; ++d, ++cont_index) {
+    for (std::vector<db::Polygon>::const_iterator d = contact_poly.begin (); d != contact_poly.end () && cont_index < 2; ++d, ++cont_index) {
       size_t terminal_geometry_index = cont_index == 0 ? a_terminal_geometry_index : b_terminal_geometry_index;
       define_terminal (device, cont_index == 0 ? db::DeviceClassResistor::terminal_id_A : db::DeviceClassResistor::terminal_id_B, terminal_geometry_index, *d);
     }

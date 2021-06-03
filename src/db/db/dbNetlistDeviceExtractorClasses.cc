@@ -144,13 +144,18 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
           continue;
         }
 
-        std::vector<db::Edges::length_type> widths;
+        //  normalize the diffusion polygons so that the S/D assignment is more predicable
+        std::vector<db::Polygon> diffpoly;
+        diffpoly.reserve (2);
         for (db::Region::const_iterator d2g = rdiff2gate.begin (); ! d2g.at_end (); ++d2g) {
+          diffpoly.push_back (*d2g);
+        }
+        std::sort (diffpoly.begin (), diffpoly.end ());
 
-          db::Region rd2g;
-          rd2g.insert (*d2g);
+        std::vector<db::Edges::length_type> widths;
+        for (std::vector<db::Polygon>::const_iterator d2g = diffpoly.begin (); d2g != diffpoly.end (); ++d2g) {
 
-          db::Edges edges (rgate.edges () & rd2g.edges ());
+          db::Edges edges (rgate.edges () & db::Edges (*d2g));
           db::Edges::length_type l = edges.length ();
           if (l == 0) {
             error (tl::to_string (tr ("Vanishing edges for interaction gate/diff (corner interaction) - gate shape ignored")));
@@ -179,18 +184,18 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
         device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, param_l);
 
         int diff_index = 0;
-        for (db::Region::const_iterator d = rdiff2gate.begin (); !d.at_end () && diff_index < 2; ++d, ++diff_index) {
+        for (std::vector<db::Polygon>::const_iterator d2g = diffpoly.begin (); d2g != diffpoly.end () && diff_index < 2; ++d2g, ++diff_index) {
 
           //  count the number of gate shapes attached to this shape and distribute the area of the
           //  diffusion region to the number of gates
-          size_t n = rgates.selected_interacting (db::Region (*d)).count ();
+          size_t n = rgates.selected_interacting (db::Region (*d2g)).count ();
           tl_assert (n > 0);
 
-          device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, sdbu () * sdbu () * d->area () / double (n));
-          device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_PS : db::DeviceClassMOS3Transistor::param_id_PD, sdbu () * d->perimeter () / double (n));
+          device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, sdbu () * sdbu () * d2g->area () / double (n));
+          device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_PS : db::DeviceClassMOS3Transistor::param_id_PD, sdbu () * d2g->perimeter () / double (n));
 
           unsigned int sd_index = diff_index == 0 ? source_terminal_geometry_index : drain_terminal_geometry_index;
-          define_terminal (device, diff_index == 0 ? db::DeviceClassMOS3Transistor::terminal_id_S : db::DeviceClassMOS3Transistor::terminal_id_D, sd_index, *d);
+          define_terminal (device, diff_index == 0 ? db::DeviceClassMOS3Transistor::terminal_id_S : db::DeviceClassMOS3Transistor::terminal_id_D, sd_index, *d2g);
 
         }
 

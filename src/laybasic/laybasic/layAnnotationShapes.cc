@@ -56,7 +56,7 @@ AnnotationLayerOp::erase (AnnotationShapes *shapes)
     std::vector<AnnotationShapes::layer_type::iterator> to_erase;
     to_erase.reserve (m_shapes.size ());
 
-    //  This is not quite effective but seems to be the simpliest way
+    //  This is not quite effective but seems to be the simplest way
     //  of implementing this: search for each element and erase these.
     for (AnnotationShapes::layer_type::iterator lsh = shapes->begin (); lsh != shapes->end (); ++lsh) {
       std::vector<shape_type>::const_iterator s = std::lower_bound (s_begin, s_end, *lsh);

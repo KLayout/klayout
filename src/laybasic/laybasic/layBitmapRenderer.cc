@@ -53,7 +53,7 @@ BitmapRenderer::reserve_texts (size_t n)
 void 
 BitmapRenderer::clear ()
 {
-  //  this implementation is efficent but does not free memory - 
+  //  this implementation is efficient but does not free memory - 
   //  the idea is to let the BitmapRenderer object manage it's workspace.
   m_edges.erase (m_edges.begin (), m_edges.end ());
   //  might be manhattan
@@ -151,7 +151,7 @@ BitmapRenderer::insert (const db::DEdge &e)
     m_ymax = std::max (m_ymax, std::max (e.y1 (), e.y2 ()));
   }
 
-  //  check, if the edge is neigther horizontal nor vertical - 
+  //  check, if the edge is neither horizontal nor vertical - 
   //  reset the orthogonal flag in this case.
   if (m_ortho && fabs (e.x1 () - e.x2 ()) > render_epsilon 
               && fabs (e.y1 () - e.y2 ()) > render_epsilon) {

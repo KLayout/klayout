@@ -186,8 +186,8 @@ public:
    *  @brief Load the log file
    *
    *  This method parses the given file and stores the events internally.
-   *  If the file is not a valid log file or an error occures, an exception
-   *  is thown. 
+   *  If the file is not a valid log file or an error occurs, an exception
+   *  is thrown. 
    */
   void load (const std::string &filename, bool no_spontaneous = false);
 
@@ -372,8 +372,8 @@ public:
    *  @brief Load the log file
    *
    *  This method parses the given file and stores the events internally.
-   *  If the file is not a valid log file or an error occures, an exception
-   *  is thown. 
+   *  If the file is not a valid log file or an error occurs, an exception
+   *  is thrown. 
    */
   void load (const std::string &filename, bool no_spontaneous = false)
   {

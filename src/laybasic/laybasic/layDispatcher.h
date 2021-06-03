@@ -142,7 +142,7 @@ public:
   /**
    *  @brief Read the configuration from a file
    *
-   *  This method siletly does nothing, if the config file does not
+   *  This method silently does nothing, if the config file does not
    *  exist. If it does and an error occurred, the error message is printed
    *  on stderr. In both cases, false is returned.
    *

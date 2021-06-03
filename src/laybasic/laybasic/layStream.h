@@ -172,7 +172,7 @@ private:
 };
   
 /**
- *  @brief A specialisation of Plugin declaration for stream reader plugins
+ *  @brief A specialization of Plugin declaration for stream reader plugins
  */
 class LAYBASIC_PUBLIC StreamReaderPluginDeclaration
   : public StreamPluginDeclarationBase
@@ -212,7 +212,7 @@ public:
 };
 
 /**
- *  @brief A specialisation of Plugin declaration for stream reader plugins
+ *  @brief A specialization of Plugin declaration for stream reader plugins
  */
 class LAYBASIC_PUBLIC StreamWriterPluginDeclaration
   : public StreamPluginDeclarationBase

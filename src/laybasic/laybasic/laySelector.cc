@@ -113,7 +113,7 @@ SelectionService::reset_box ()
 }
 
 bool
-SelectionService::wheel_event (int /*delta*/, bool /*horizonal*/, const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
+SelectionService::wheel_event (int /*delta*/, bool /*horizontal*/, const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
 {
   return false;
 }

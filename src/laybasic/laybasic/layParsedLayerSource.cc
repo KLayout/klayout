@@ -422,7 +422,7 @@ extract_base (tl::Extractor &ex)
 }
 
 /**
- *  @brief Expression parser: parse complex elements (brackted expressions)
+ *  @brief Expression parser: parse complex elements (bracketed expressions)
  */
 static PropertySelectorBase *
 extract_element (tl::Extractor &ex)

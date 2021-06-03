@@ -49,8 +49,8 @@ static const char *dither_strings [] = {
   "*.\n"
   ".*",
 
-  // 3: coarsly dotted
-  "coarsly dotted",
+  // 3: coarsely dotted
+  "coarsely dotted",
   "*...\n"
   "....\n"
   "..*.\n"

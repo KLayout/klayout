@@ -679,7 +679,7 @@ LayoutView::~LayoutView ()
   stop ();
 
   //  because LayoutView and LayoutCanvas both control lifetimes of
-  //  ruler objects for example, it is safer to explictly delete the
+  //  ruler objects for example, it is safer to explicitly delete the
   //  LayoutCanvas object here:
   delete mp_canvas;
   mp_canvas = 0;
@@ -725,7 +725,7 @@ lay::EditorOptionsPages *LayoutView::editor_options_pages ()
 
 void LayoutView::do_setup_editor_options_pages ()
 {
-  //  intialize the editor option pages
+  //  initialize the editor option pages
   lay::EditorOptionsPages *eo_pages = editor_options_pages ();
   if (eo_pages) {
     for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
@@ -2003,7 +2003,7 @@ LayoutView::merge_dither_pattern (lay::LayerPropertiesList &props)
 void 
 LayoutView::set_properties (unsigned int index, const LayerPropertiesList &props)
 {
-  //  If index is not a valid tab index, don't do anythign except for the case of
+  //  If index is not a valid tab index, don't do anything except for the case of
   //  index 0 in which the first entry is created (this can happen as a result of
   //  delete_properties).
   if (index >= layer_lists ()) {
@@ -4295,7 +4295,7 @@ LayoutView::set_view_ops ()
           // blinking
           animate_visible = ((m_phase & 1) == 0);
         } else {
-          // inversly blinking
+          // inversely blinking
           animate_visible = ((m_phase & 1) != 0);
         }
 

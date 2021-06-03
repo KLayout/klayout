@@ -149,7 +149,7 @@ public:
   }
 
   /**
-   *  @brief Set the framee pattern index for the marker
+   *  @brief Set the frame pattern index for the marker
    *
    *  The default pattern is 0 (solid)
    */

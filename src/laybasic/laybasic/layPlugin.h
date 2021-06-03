@@ -291,7 +291,7 @@ public:
    *  Reimplementation of this method offers a chance to initialize static resources such as 
    *  dialogs etc.
    *  While initialize is called before any configuration is loaded, "initialized" will be
-   *  called after the pugin system has been initially configured.
+   *  called after the plugin system has been initially configured.
    */
   virtual void initialized (lay::Dispatcher * /*dispatcher*/)
   {
@@ -321,7 +321,7 @@ public:
    *  @brief Fetches the menu objects for this plugin
    *
    *  The implementation of this method is supposed to call the base
-   *  class'es "get_menu_entries" method and add it's own entries.
+   *  classes "get_menu_entries" method and add it's own entries.
    */
   virtual void get_menu_entries (std::vector<lay::MenuEntry> & /*menu_entries*/) const
   {
@@ -600,7 +600,7 @@ public:
   }
 
   /**
-   *  @brief Terminat a sequence of configuration setups
+   *  @brief Terminate a sequence of configuration setups
    *
    *  In order to make configuration changes effective, this method
    *  must be called. It calls config_finalize recursively on the 

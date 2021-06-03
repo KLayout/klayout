@@ -39,7 +39,7 @@ const unsigned int wordbits = 5;
 const unsigned int wordones = 0xffffffff;
 
 /**
- *  @brief The operator that decribes how a bitmap is combined with the others on the stack
+ *  @brief The operator that describes how a bitmap is combined with the others on the stack
  *
  *  Each operator is described by these properties:
  *    - a mode (copy, or, and, xor) which describes what boolean operation to use
@@ -48,7 +48,7 @@ const unsigned int wordones = 0xffffffff;
  *    - a bitmap index
  *  
  *  The bitmap index describes which bitmap to take the data from.
- *  Usually bitmaps and combination operators are organised in two vectors: one for the
+ *  Usually bitmaps and combination operators are organized in two vectors: one for the
  *  bitmaps and one for the operators. By default, each operator is associated with the
  *  corresponding bitmap. 
  *

@@ -394,7 +394,7 @@ LayoutViewFunctions::cm_cell_user_properties ()
     lay::UserPropertiesForm props_form (view ());
     if (props_form.show (view (), cv_index, prop_id)) {
 
-      view ()->transaction (tl::to_string (QObject::tr ("Edit cell's user propertes")));
+      view ()->transaction (tl::to_string (QObject::tr ("Edit cell's user properties")));
       cell.prop_id (prop_id);
       view ()->commit ();
 

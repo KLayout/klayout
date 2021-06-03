@@ -2342,7 +2342,7 @@ public:
   void remove_unused_layers ();
 
   /**
-   *  @brief Returns true, if the layer shource shall be shown always in the layer properties tree
+   *  @brief Returns true, if the layer source shall be shown always in the layer properties tree
    */
   bool always_show_source () const
   {

@@ -372,7 +372,7 @@ Plugin::config_set (const std::string &name, const std::string &value)
 void 
 Plugin::config_end ()
 {
-  //  finish static conifgurations for plugins if the root is addressed
+  //  finish static configurations for plugins if the root is addressed
   if (! mp_parent && ! m_standalone) {
     for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
       (const_cast<lay::PluginDeclaration *> (&*cls))->config_finalize ();

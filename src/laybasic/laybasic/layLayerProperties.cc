@@ -813,7 +813,7 @@ LayerPropertiesNode::attach_view (LayoutView *view, unsigned int list_index)
     c->attach_view (view, list_index);
   }
   //  Attachment of a view is a strong indication that something significant changed - 
-  //  recompute the source specfications on next request
+  //  recompute the source specifications on next request.
   m_realize_needed_source = true;
 }
 

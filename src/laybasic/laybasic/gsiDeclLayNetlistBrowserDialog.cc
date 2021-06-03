@@ -154,7 +154,7 @@ Class<lay::NetlistObjectsPath> decl_NetlistObjectsPath ("lay", "NetlistObjectsPa
   gsi::method_ext ("second", &second,
     "@brief Gets the second object's path.\n"
     "In cases of paired netlists (LVS database), the first path points to the schematic netlist object.\n"
-    "For the single netlist, the scecond path is always a null path."
+    "For the single netlist, the second path is always a null path."
   ),
   "@brief An object describing the instantiation of a single netlist object or a pair of those.\n"
   "This class is basically a pair of netlist object paths (see \\NetlistObjectPath). When derived from a single netlist view, "

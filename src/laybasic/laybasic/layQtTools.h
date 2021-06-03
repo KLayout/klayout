@@ -43,7 +43,7 @@ namespace lay
 {
 
 /**
- *  @brief Save the given Widget's (dialog) state to the string
+ *  @brief Save the given widget's (dialog) state to the string
  *
  *  The state can be recovered from the string using restore_dialog_state;
  */

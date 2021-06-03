@@ -225,7 +225,7 @@ snap_angle (const db::DVector &in, lay::angle_constraint_type ac)
  *  @brief A finder for a point on a contour
  *
  *  This is an object to look up a point on a contour.
- *  It will start from a gvein point and look into the direction of given cutlines.
+ *  It will start from a given point and look into the direction of given cutlines.
  *  It will try to find the closest snapping point while also considering snapping.
  *
  *  There are basically three modes:
@@ -242,7 +242,7 @@ snap_angle (const db::DVector &in, lay::angle_constraint_type ac)
  *  guaranteed to sit on an edge.
  *
  *  The finder will deliver two solutions if available: an exact one where the
- *  point sits exactly on the constraint and a more generic one where the resoluting
+ *  point sits exactly on the constraint and a more generic one where the resulting
  *  point is allowed to deviate a little from that direction. The exact solution is
  *  priority in the generic case.
  */
@@ -489,7 +489,7 @@ private:
     } else {
 
       //  Test, if there is a crossing between a cut line and the vertical
-      //  or horizonal lines through the given point. Take this as the
+      //  or horizontal lines through the given point. Take this as the
       //  test point.
       for (std::vector <db::DEdge>::const_iterator cl = m_cutlines.begin (); cl != m_cutlines.end (); ++cl) {
         std::pair<bool, db::DPoint> ret;
@@ -753,7 +753,7 @@ do_obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &gri
     }
   }
 
-  //  if both the projection and the finder are sucessful, decide by a heuristic criterion which to take
+  //  if both the projection and the finder are successful, decide by a heuristic criterion which to take
   //  (the projection gets a penalty (of the snap range) to make it count less than the finder's choice)
   //  This avoids extreme distortions of the ruler due to projection on long edges.
   if (finder.any () && anyp && (dp.distance (closest) + snap_range) * 5.0 < dp.distance (finder.get_found ())) {

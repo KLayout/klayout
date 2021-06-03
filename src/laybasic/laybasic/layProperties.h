@@ -126,7 +126,7 @@ public:
   virtual bool at_end () const = 0;
 
   /**
-   *  @brief Step one elemement back 
+   *  @brief Step one element back 
    *
    *  This method is supposed to move the current pointer one position
    *  back. If at_begin () was true before, the result may be unpredictable.

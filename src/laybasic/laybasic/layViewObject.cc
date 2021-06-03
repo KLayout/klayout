@@ -126,9 +126,9 @@ CellDragDropData::deserialize (const QByteArray &ba)
 static unsigned int 
 qt_to_buttons (Qt::MouseButtons b, Qt::KeyboardModifiers m)
 {
-  // this is a straightforward conversion with the excepton that
-  // MetaModifyer+LeftButton is taken as a RightButton
-  // This is useful on MAC OX for people wizh a one-button mouse.
+  // this is a straightforward conversion with the exception that
+  // MetaModifier+LeftButton is taken as a RightButton
+  // This is useful on MAC OX for people with a one-button mouse.
   // They can do a right click by doing a ctrl-leftclick.
   // BTW: On a MAC's keyboard, the cmd-key is received here as a ControlModifier
   // while the ctrl-key is received as a MetaModifier
@@ -769,31 +769,31 @@ BEGIN_PROTECTED
   bool done = false; 
 
   unsigned int buttons = qt_to_buttons (e->buttons (), e->modifiers ());
-  bool horizonal = (e->orientation () == Qt::Horizontal);
+  bool horizontal = (e->orientation () == Qt::Horizontal);
 
   db::DPoint p = pixel_to_um (e->pos ());
 
   for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
     std::list<ViewService *>::iterator gg = g;
     ++gg;
-    done = ((*g)->enabled () && (*g)->wheel_event (e->delta (), horizonal, p, buttons, true));
+    done = ((*g)->enabled () && (*g)->wheel_event (e->delta (), horizontal, p, buttons, true));
     g = gg;
   }
 
   if (! done && mp_active_service) {
-    done = (mp_active_service->enabled () && mp_active_service->wheel_event (e->delta (), horizonal, p, buttons, true));
+    done = (mp_active_service->enabled () && mp_active_service->wheel_event (e->delta (), horizontal, p, buttons, true));
   }
 
   service_iterator svc = begin_services ();
   while (svc != end_services () && !done) {
     service_iterator next = svc;
     ++next;
-    done = ((*svc)->enabled () && (*svc)->wheel_event (e->delta (), horizonal, p, buttons, false));
+    done = ((*svc)->enabled () && (*svc)->wheel_event (e->delta (), horizontal, p, buttons, false));
     svc = next;
   }
 
   if (! done) {
-    wheel_event (e->delta (), horizonal, p, buttons);
+    wheel_event (e->delta (), horizontal, p, buttons);
   }
 
   end_mouse_event ();

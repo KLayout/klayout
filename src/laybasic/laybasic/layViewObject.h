@@ -286,7 +286,7 @@ public:
   /** 
    *  @brief Mouse single-click event handler
    *
-   *  Analogeous to mouse_press_event (see above), but sent if the mouse was not moved.
+   *  Analogous to mouse_press_event (see above), but sent if the mouse was not moved.
    *  The click event is coincident with the release of the mouse button.
    */
   virtual bool mouse_click_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) { return false; }
@@ -294,7 +294,7 @@ public:
   /** 
    *  @brief Mouse double-click event handler
    *
-   *  Analogeous to mouse_press_event (see above), but sent if a double-click was detected.
+   *  Analogous to mouse_press_event (see above), but sent if a double-click was detected.
    */
   virtual bool mouse_double_click_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) { return false; }
 
@@ -311,24 +311,24 @@ public:
   /** 
    *  @brief Mouse move event handler
    *
-   *  Analogeous to mouse_press_event (see above).
+   *  Analogous to mouse_press_event (see above).
    */
   virtual bool mouse_move_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) { return false; }
 
   /** 
    *  @brief Mouse release event handler
    *
-   *  Analogeous to mouse_press_event (see above).
+   *  Analogous to mouse_press_event (see above).
    */
   virtual bool mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) { return false; }
 
   /** 
    *  @brief Wheel event handler
    *
-   *  Analogeous to mouse_press_event (see above).
+   *  Analogous to mouse_press_event (see above).
    *
-   *  @param delta The rotation angle in eigths of a degree
-   *  @param horizonal True, if the horizontal wheel was turned
+   *  @param delta The rotation angle in eights of a degree
+   *  @param horizontal True, if the horizontal wheel was turned
    *  @param p The position where the mouse currently is at (in micron units)
    */
   virtual bool wheel_event (int /*delta*/, bool /*horizontal*/, const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) { return false; }
@@ -381,7 +381,7 @@ public:
   virtual void drag_cancel () { }
 
   /**
-   *  @brief Enable or disable a sevice 
+   *  @brief Enable or disable a service 
    *
    *  If a service is disabled, it will not receive mouse events 
    */

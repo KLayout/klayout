@@ -495,7 +495,7 @@ public:
   bool operator== (const PropertySelector &sel) const;
 
   /**
-   *  @brief Inquality 
+   *  @brief Inequality 
    */
   bool operator!= (const PropertySelector &sel) const
   {
@@ -541,7 +541,7 @@ public:
    *  A set of properties ids is determined that each satisfies the given 
    *  selection. The set should be empty on enter. Otherwise the results are
    *  not defined.
-   *  The return value is true if the ids are to be interpretated inversely (every properties id
+   *  The return value is true if the ids are to be interpreted inversely (every properties id
    *  matches that is not in the set). This allows optimizing the computation of the set.
    */
   bool matching (const db::PropertiesRepository &rep, std::set<db::properties_id_type> &matching) const;

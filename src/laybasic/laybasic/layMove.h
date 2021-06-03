@@ -57,7 +57,7 @@ private:
   virtual bool mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_release_event (const db::DPoint &p, unsigned int /*buttons*/, bool prio);
-  virtual bool wheel_event (int delta, bool horizonal, const db::DPoint &p, unsigned int buttons, bool prio);
+  virtual bool wheel_event (int delta, bool horizontal, const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool key_event (unsigned int key, unsigned int buttons);
   virtual void drag_cancel ();
   virtual void deactivated ();

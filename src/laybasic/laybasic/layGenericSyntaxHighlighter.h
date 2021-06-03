@@ -502,7 +502,7 @@ public:
   }
 
   /**
-   *  @brief Gets a context by name and creates the context if it does not exist alread
+   *  @brief Gets a context by name and creates the context if it does not exist already.
    *
    *  If a new context is created, a new ID is assigned.
    */

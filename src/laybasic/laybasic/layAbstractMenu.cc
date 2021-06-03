@@ -49,7 +49,7 @@ namespace lay
 #if defined(__APPLE__)
 
 //  On MacOS, the main menu bar and it's decendent children
-//  can't be modified using "removeAction", followrd by "addAction"
+//  can't be modified using "removeAction", followed by "addAction"
 //  to achieve a move operation.If we try to do so, segmentation faults happen
 //  in the timer event that presumably tries to merge the menu bar
 //  with the application menu.
@@ -832,7 +832,7 @@ ConfigureAction::ConfigureAction (const std::string &title, const std::string &c
   : Action (title), m_cname (cname), m_cvalue (cvalue), m_type (ConfigureAction::setter_type)
 {
   if (cvalue == "?") {
-    //  A "?" notation indicates a boolean toogle entry
+    //  A "?" notation indicates a boolean toggle entry
     m_type = boolean_type;
     set_checkable (true);
   } else if (! cvalue.empty () && cvalue[0] == '?') {
@@ -1029,7 +1029,7 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
           c->set_action (new Action (menu), true);
         }
 
-        //  prepare a detached menu which can be used as context menues
+        //  prepare a detached menu which can be used as context menus
         build (c->menu (), c->children);
 
       } else if (mbar) {
@@ -1361,7 +1361,7 @@ AbstractMenu::delete_item (const std::string &p)
       if (p->second == p->first->children.end ()) {
         break;
       } else if (p != path.rbegin () && (! p->second->remove_on_empty () || ! p->second->children.empty ())) {
-        //  stop on non-empty parent menues
+        //  stop on non-empty parent menus
         break;
       }
 

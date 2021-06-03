@@ -191,7 +191,7 @@ Class<lay::AbstractMenu> decl_AbstractMenu ("lay", "AbstractMenu",
     "@param group The group name\n"
     "@param A vector of all members (by path) of the group\n"
   ),
-  "@brief An abstraction for the application menues\n"
+  "@brief An abstraction for the application menus\n"
   "\n"
   "The abstract menu is a class that stores a main menu and several popup menus\n"
   "in a generic form such that they can be manipulated and converted into GUI objects.\n"
@@ -383,7 +383,7 @@ Class<ActionStub> decl_Action (decl_ActionBase, "lay", "Action",
   ),
   "@brief The abstraction for an action (i.e. used inside menus)\n"
   "\n"
-  "Actions act as a generalisation of menu entries. The action provides the appearance of a menu "
+  "Actions act as a generalization of menu entries. The action provides the appearance of a menu "
   "entry such as title, key shortcut etc. and dispatches the menu events. The action can be manipulated "
   "to change to appearance of a menu entry and can be attached an observer that receives the events "
   "when the menu item is selected.\n"

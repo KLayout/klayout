@@ -48,7 +48,7 @@ namespace lay {
  *  @brief A class encapsulating an instantiation path and the element addressed by it
  *
  *  This class either addresses an instance (in which case the path is that to the instance 
- *  adressed) or a shape (in which case the path leads to the cell that has this shape and
+ *  addressed) or a shape (in which case the path leads to the cell that has this shape and
  *  the layer and shape is specified additionally).
  */
 

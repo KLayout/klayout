@@ -947,7 +947,7 @@ Class<lay::Dispatcher> decl_Dispatcher ("lay", "Dispatcher",
     "@brief Reads the configuration from a file\n"
     "@return A value indicating whether the operation was successful\n"
     "\n"
-    "This method siletly does nothing, if the config file does not\n"
+    "This method silently does nothing, if the config file does not\n"
     "exist. If it does and an error occurred, the error message is printed\n"
     "on stderr. In both cases, false is returned.\n"
   ) +

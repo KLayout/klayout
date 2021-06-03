@@ -34,7 +34,7 @@
       <item>
        <widget class="QCheckBox" name="alt_mouse_wheel_mode_cbx" >
         <property name="text" >
-         <string>Mouse wheel alternative mode (No button: vertical, Ctrl: zoom, Shift: horizonal)</string>
+         <string>Mouse wheel alternative mode (No button: vertical, Ctrl: zoom, Shift: horizontal)</string>
         </property>
        </widget>
       </item>

@@ -351,7 +351,7 @@ void signal_handler (int signo, siginfo_t *si, void *)
 
       if (has_addr2line) {
 
-        //  two tries: one with the relativew address (for shared object) and one with
+        //  two tries: one with the relative address (for shared object) and one with
         //  absolute address.
         //  TODO: is there a better way to decide how to use addr2line (with executables)?
         for (int abs_addr = 0; abs_addr < 2; ++abs_addr) {

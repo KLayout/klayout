@@ -645,7 +645,7 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "Starting from version 0.25, this method enables/disables edits on the current view only. \n"
     "Use LayoutView#enable_edits instead.\n"
   ) +
-  gsi::method ("synchronous=|#synchroneous", &lay::MainWindow::set_synchronous, gsi::arg ("sync_mode"),
+  gsi::method ("synchronous=|#synchronous", &lay::MainWindow::set_synchronous, gsi::arg ("sync_mode"),
     "@brief Puts the main window into synchronous mode\n"
     "\n"
     "@param sync_mode 'true' if the application should behave synchronously\n"

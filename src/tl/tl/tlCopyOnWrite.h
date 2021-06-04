@@ -125,7 +125,7 @@ public:
   explicit copy_on_write_ptr (const copy_on_write_ptr<X, Dup> &other)
     : mp_holder (other.mp_holder)
   {
-    aquire ();
+    acquire ();
   }
 
   copy_on_write_ptr &operator= (const copy_on_write_ptr<X, Dup> &other)
@@ -133,7 +133,7 @@ public:
     if (this != &other) {
       release ();
       mp_holder = other.mp_holder;
-      aquire ();
+      acquire ();
     }
     return *this;
   }
@@ -250,7 +250,7 @@ private:
     }
   }
 
-  void aquire ()
+  void acquire ()
   {
     if (mp_holder) {
       tl::MutexLocker locker (&ms_lock);

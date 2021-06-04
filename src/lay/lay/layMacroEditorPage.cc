@@ -1711,7 +1711,7 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
 
       } else if (is_find_next_key (ke)) {
 
-        //  Jump to the next occurence of the search string
+        //  Jump to the next occurrence of the search string
 
         if (m_current_search != QRegExp ()) {
           if ((ke->modifiers () & Qt::ShiftModifier) != 0) {

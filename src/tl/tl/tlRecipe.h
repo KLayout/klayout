@@ -107,7 +107,7 @@ private:
 };
 
 /**
- *  @brief A facility for providing reproducable recipes
+ *  @brief A facility for providing reproducible recipes
  *
  *  The idea of this facility is to provide a service by which an object
  *  can be reproduced in a parametrized way. The intended use case is a 

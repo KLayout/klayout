@@ -97,7 +97,7 @@ public:
   static bool is_available ();
 
   /**
-   *  @brief Polling: call this function regularily to explicitly establish polling
+   *  @brief Polling: call this function regularly to explicitly establish polling
    *  (in the Qt framework, this is done automatically within the event loop)
    */
   void tick ();
@@ -147,7 +147,7 @@ public:
 
   /**
    *  @brief Gets the "ready" event
-   *  Connect to this event for the asynchroneous interface.
+   *  Connect to this event for the asynchronous interface.
    *  This event is fired when data becomes available or the
    *  connection has terminated with an error.
    */

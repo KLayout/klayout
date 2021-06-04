@@ -317,7 +317,7 @@ TL_PUBLIC std::string to_quoted_string (const std::string &s);
  *  @brief Escape special characters in a string
  *
  *  Special characters are replaced by escape sequences with a backslash.
- *  The format of the sequence is \xxx where x is the ocal number of the 
+ *  The format of the sequence is \xxx where x is the octal number of the 
  *  character and \r, \n and \t representing the CR, LF and TAB character.
  */
 TL_PUBLIC std::string escape_string (const std::string &value);
@@ -326,7 +326,7 @@ TL_PUBLIC std::string escape_string (const std::string &value);
  *  @brief Remove escape sequences from a string
  *
  *  Special characters are replaced by escape sequences with a backslash.
- *  The format of the sequence is \xxx where x is the ocal number of the 
+ *  The format of the sequence is \xxx where x is the octal number of the 
  *  character and \r, \n and \t representing the CR, LF and TAB character.
  */
 TL_PUBLIC std::string unescape_string (const std::string &value);
@@ -362,7 +362,7 @@ TL_PUBLIC std::string escaped_to_html (const std::string &in, bool replace_newli
 
 /**
  *  @brief Replaces the "before" string by "after" in the "subject" string and returns the new string
- *  All occurances are replaced.
+ *  All occurrences are replaced.
  */
 TL_PUBLIC std::string replaced (const std::string &subject, const std::string &before, const std::string &after);
 
@@ -458,7 +458,7 @@ public:
   /**
    *  @brief Read an unsigned integer
    *
-   *  A helper method to implement parsers on the chararacter-by-character basis.
+   *  A helper method to implement parsers on the character-by-character basis.
    *  This method reads an unsigned integer and returns the value past the last
    *  valid character. It skips blanks at the beginning but not at the end.
    *  On error, an exception is thrown.
@@ -713,7 +713,7 @@ public:
   /**
    *  @brief Skip blanks
    *
-   *  A helper method to implement parsers on the chararacter-by-character basis.
+   *  A helper method to implement parsers on the character-by-character basis.
    *  
    *  @param cp The current pointer (is being moved)
    *  @return The value of cp on return
@@ -921,7 +921,7 @@ TL_PUBLIC uint32_t utf32_upcase (uint32_t c32);
 /**
  *  @brief Parses the next UTF32 character from an UTF-8 string
  *  @param cp The input character's position, will be set to the next character.
- *  @paran cpe The end of the string of 0 for "no end"
+ *  @param cpe The end of the string of 0 for "no end"
  */
 TL_PUBLIC uint32_t utf32_from_utf8 (const char *&cp, const char *cpe = 0);
 

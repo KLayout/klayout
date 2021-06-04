@@ -213,7 +213,7 @@ static QString topic_element = QString::fromUtf8 ("topic");
 static QString topics_element = QString::fromUtf8 ("topics");
 
 /**
- *  @brief A specialisation of tl::make_element that is capable of taking a std::map::const_iterator 
+ *  @brief A specialization of tl::make_element that is capable of taking a std::map::const_iterator 
  *
  *  The original tl::make_element gives a compiler warning (taking address of temporary)
  *  TODO: consolidate this version and tl::make_element.
@@ -601,7 +601,7 @@ HelpSource::produce_main_index ()
 
   os << "<p>" << tl::to_string (QObject::tr ("Welcome to KLayout's documentation")) << "</p>" << std::endl;
   os << "<p>" << tl::to_string (QObject::tr (
-    "The documentation is organised in chapters.\n"
+    "The documentation is organized in chapters.\n"
     "For a brief introduction read the User Manual. 'Various Topics' is a collection of brief articles about specific topics.\n"
     "For Ruby programming see the 'Programming Ruby Scripts' chapter and for a complete Ruby class reference see the 'Class Index'.\n"
   ));

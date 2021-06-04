@@ -68,7 +68,7 @@ public:
    *  @brief Read a block of n bytes
    *
    *  Read the requested number of bytes or less.
-   *  May throw an exception if a read error occures.
+   *  May throw an exception if a read error occurs.
    *  
    *  @param b The buffer where to write to
    *  @param n The number of bytes to read (or less)
@@ -421,7 +421,7 @@ public:
    *  
    *  This implementation obtains data through the 
    *  protected read call and buffers the data accordingly so
-   *  a contigous memory block can be returned.
+   *  a contigious memory block can be returned.
    *  If inline deflating is enabled, the method will return
    *  inflate data unless "bypass_inflate" is set to true.
    *
@@ -680,7 +680,7 @@ public:
   /**
    *  @brief Write a block a n bytes
    *
-   *  May throw an exception if a write error occures.
+   *  May throw an exception if a write error occurs.
    *
    *  @param b What to write
    *  @param n The number of bytes to write 
@@ -847,7 +847,7 @@ private:
  *  This class mainly provides safety services for the file writer.
  *  When writing a file, it will keep a backup until the file actually
  *  has been written. This way, a network or disk full error will not
- *  comprimise the file's content. The backup file name is created
+ *  compromise the file's content. The backup file name is created
  *  by appending ".~backup" to the original file path.
  *
  *  In addition, a specified number or persistent backup files can

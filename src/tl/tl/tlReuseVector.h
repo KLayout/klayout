@@ -773,7 +773,7 @@ public:
   void insert (const Iter &from, const Iter &to)
   {
     if (! (from == to)) {
-      //  don't reservce if the first element of the sequence comes from ourself.
+      //  don't reserve if the first element of the sequence comes from ourself.
       //  This implies that we try to duplicate our own elements which would invalidate
       //  the source upon reservation.
       if (! (&*from >= mp_start && &*from < mp_finish)) {
@@ -884,7 +884,7 @@ public:
   /**
    *  @brief Reserve space for a given number of elements
    *
-   *  This guarantees that for the next n-size() inserts no reallocation will occure
+   *  This guarantees that for the next n-size() inserts no reallocation will occur
    *  No resizing will happen, if n is less than the current capacity.
    */
   void reserve (size_type n)

@@ -92,7 +92,7 @@ TL_PUBLIC void handle_event_exception (std::exception &ex);
  *
  *  @endcode
  *
- *  Events can be given a disamibguation or client data parameter:
+ *  Events can be given a disambiguation or client data parameter:
  *
  *  @code
  *

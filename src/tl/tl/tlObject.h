@@ -44,7 +44,7 @@ class WeakOrSharedPtr;
  *  formation. tl::Object is a neutral and empty class. It only provides
  *  the infrastructure for the shared pointer management.
  *
- *  The shared and weak pointer infracstructure contains of
+ *  The shared and weak pointer infrastructure contains of
  *
  *  1.) A shared pointer class (tl::shared_ptr<T>). All shared pointers
  *      share ownership of the contained object. When the last shared

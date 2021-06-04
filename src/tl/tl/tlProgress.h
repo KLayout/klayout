@@ -67,7 +67,7 @@ template <> struct type_traits<tl::AbsoluteProgress> : public type_traits<void> 
  *  @brief A helper class to clean up pending progress objects
  *
  *  Pending progress objects may be created in scripts. If scripts are aborted
- *  (e.g. in the debugger), progress objects may stay behing a block the application.
+ *  (e.g. in the debugger), progress objects may stay behind a block the application.
  *  To prevent this, this object keeps track of progress objects created between
  *  it's constructor and destructor and cleans up the objects created but not
  *  destroyed.

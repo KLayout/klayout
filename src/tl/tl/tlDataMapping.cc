@@ -429,7 +429,7 @@ DataMappingLookupTable::update_table (double xmin, double xmax, double delta_y, 
       mp_y[i] = interpolate (table, t, x);
     }
 
-    //  add one item for satefy (rounding problems in operator[] implementation)
+    //  add one item for safety (rounding problems in operator[] implementation)
     mp_y[i] = mp_y[i - 1];
     m_xmin = xmin - delta_x * 0.5;
     m_dxinv = 1.0 / delta_x;

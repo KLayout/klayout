@@ -125,7 +125,7 @@ private:
  *  @brief This object represents a job
  *
  *  A job can be delegated to multiple workers. 
- *  A job is organised in tasks, which are scheduled to the job. Upon \start,
+ *  A job is organized in tasks, which are scheduled to the job. Upon \start,
  *  the job takes the tasks from a queue and sends them to the workers for
  *  being processed.
  */
@@ -362,7 +362,7 @@ protected:
   /**
    *  @brief Perform one task
    *
-   *  The implementation of this method is supposed to regularily call \checkpoint in order to
+   *  The implementation of this method is supposed to regularly call \checkpoint in order to
    *  receive asynchronous abort requests. The scheduler uses this feature to stop operations
    *  asynchronously.
    */
@@ -371,7 +371,7 @@ protected:
   /**
    *  @brief Check for stop requests
    *
-   *  This method should be called regularily. It does nothing if no stop request if present. 
+   *  This method should be called regularly. It does nothing if no stop request if present. 
    *  Otherwise it throws an exception which is supposed to make \perform_task exit.
    */
   void checkpoint ();
@@ -506,7 +506,7 @@ public:
   }
 
   /**
-   *  @brief Send an aynchronous stop to all jobs registered at the Boss
+   *  @brief Send an asynchronous stop to all jobs registered at the Boss
    */
   void stop_all ();
 

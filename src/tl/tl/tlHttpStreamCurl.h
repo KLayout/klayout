@@ -103,7 +103,7 @@ public:
 
   /**
    *  @brief Gets the "ready" event
-   *  Connect to this event for the asynchroneous interface.
+   *  Connect to this event for the asynchronous interface.
    *  This event is fired when the request has finished.
    */
   tl::Event &ready ()
@@ -121,7 +121,7 @@ public:
 
   /**
    *  @brief Gets the "data available" event
-   *  Connect to this event for the asynchroneous interface.
+   *  Connect to this event for the asynchronous interface.
    *  This event is fired when data becomes available for read.
    *  It is just fired once.
    */

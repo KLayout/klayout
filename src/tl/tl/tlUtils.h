@@ -195,7 +195,7 @@ private:
 };
 
 /**
- *  @brief A specialisation of assoc_map using a std::map as associative container
+ *  @brief A specialization of assoc_map using a std::map as associative container
  */
 template <class Value>
 struct map_map 
@@ -277,7 +277,7 @@ struct is_equal_type
 };
 
 /**
- *  @brief A type comparison operator (specialisation for equal classes)
+ *  @brief A type comparison operator (specialization for equal classes)
  */
 template <class A>
 struct is_equal_type<A, A>

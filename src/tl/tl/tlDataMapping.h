@@ -36,7 +36,7 @@ namespace tl
  *  @brief A generic class that maps some scalar value to another scalar values
  * 
  *  The mapping is given by a table of sorted values x and associated y which are
- *  interpolated linearily. A data mapping object must be capable of generating 
+ *  interpolated linearly. A data mapping object must be capable of generating 
  *  such a table. 
  *  Data mapping expressions can be built by concatenating data mapping operators.
  */
@@ -219,7 +219,7 @@ private:
 };
 
 /**
- *  @brief Linar combination of two data mappings
+ *  @brief Linear combination of two data mappings
  *
  *  This data mapping is composed of two mappings a and b and offers two coefficients ca and cb and a constant c. 
  *  The result is:

@@ -145,7 +145,7 @@ public:
    *  @brief Destructor
    *
    *  Note that this method will not flush the stream since that may 
-   *  throw an exception. flush() has to be called explcitly.
+   *  throw an exception. flush() has to be called explicitly.
    */
   ~DeflateFilter ();
 

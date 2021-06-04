@@ -199,7 +199,7 @@ Salt::validate ()
       m_grains_by_name.insert (std::make_pair ((*i)->name (), *i));
     }
 
-    //  Compute a set of topological indexes. Packages which serve depedencies of other packages have a higher
+    //  Compute a set of topological indexes. Packages which serve dependencies of other packages have a higher
     //  topological index. Later we sort the packages by descending topo index to ensure the packages which are
     //  input to others come first.
 

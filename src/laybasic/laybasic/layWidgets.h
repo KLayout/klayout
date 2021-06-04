@@ -280,7 +280,7 @@ private:
 };
 
 /**
- *  @brief Simpl color chooser button
+ *  @brief Simple color chooser button
  *
  *  This class implements a special button that can replace a 
  *  usual push button and supplies a color chooser without the
@@ -465,7 +465,7 @@ private:
 };
 
 /**
- *  @brief An interactive liste widget which offers slots to delete and move items and interfaces to std::vector<std::string>
+ *  @brief An interactive list widget which offers slots to delete and move items and interfaces to std::vector<std::string>
  */
 class LAYBASIC_PUBLIC InteractiveListWidget
   : public QListWidget

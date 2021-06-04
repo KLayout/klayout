@@ -835,7 +835,7 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
   lay::RedrawThread redraw_thread (&rd_canvas, mp_view);
 
   //  render the layout
-  redraw_thread.start (0 /*synchroneous*/, m_layers, vp, resolution, true);
+  redraw_thread.start (0 /*synchronous*/, m_layers, vp, resolution, true);
   redraw_thread.stop (); // safety
 
   //  paint the background objects. It uses "img" to paint on.

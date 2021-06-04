@@ -681,7 +681,7 @@ LayoutViewConfigPage4::LayoutViewConfigPage4 (QWidget *parent)
 
 LayoutViewConfigPage4::~LayoutViewConfigPage4 ()
 {
-  //  deinstall the manager
+  //  uninstall the manager
   manager (0);
 
   delete mp_ui;
@@ -1015,7 +1015,7 @@ LayoutViewConfigPage6::LayoutViewConfigPage6 (QWidget *parent)
 
 LayoutViewConfigPage6::~LayoutViewConfigPage6 ()
 {
-  //  deinstall the manager
+  //  uninstall the manager
   manager (0);
 
   delete mp_ui;
@@ -1300,7 +1300,7 @@ LayoutViewConfigPage6a::LayoutViewConfigPage6a (QWidget *parent)
 
 LayoutViewConfigPage6a::~LayoutViewConfigPage6a ()
 {
-  //  deinstall the manager
+  //  uninstall the manager
   manager (0);
 
   delete mp_ui;

@@ -287,7 +287,7 @@ widget_to_path (QWidget *w, const char *pf = 0)
   } else {
     QWidgetList tlw = QApplication::topLevelWidgets ();
     for (QWidgetList::const_iterator itl = tlw.begin (); itl != tlw.end (); ++itl) {
-      //  only QDialog or QMainWindow anchestors count as valid top level widgets
+      //  only QDialog or QMainWindow ancestors count as valid top level widgets
       if (dynamic_cast<QDialog *> (*itl) != 0 || dynamic_cast<QMainWindow *> (*itl) != 0 || dynamic_cast <QWidget *> (*itl) != 0) { 
         if (*itl == w) {
           break;

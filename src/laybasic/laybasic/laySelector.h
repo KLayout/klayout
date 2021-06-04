@@ -62,7 +62,7 @@ public:
   virtual bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
-  virtual bool wheel_event (int delta, bool horizonal, const db::DPoint &p, unsigned int buttons, bool prio);
+  virtual bool wheel_event (int delta, bool horizontal, const db::DPoint &p, unsigned int buttons, bool prio);
 
   /**
    *  @brief Reset the hover timer for the transient selection

@@ -63,7 +63,7 @@ public:
   /**
    *  @brief Signal that a transfer has been done
    *
-   *  This method is called (from the redraw thread) if a transfer has been performed ansynchreously
+   *  This method is called (from the redraw thread) if a transfer has been performed asynchronously
    */
   virtual void signal_transfer_done () { }
 

@@ -824,7 +824,7 @@ LayerTreeModel::data (const QModelIndex &index, int role) const
             // blinking
             animate_visible = ((m_phase & 1) == 0);
           } else {
-            // inversly blinking
+            // inversely blinking
             animate_visible = ((m_phase & 1) != 0);
           }
         }

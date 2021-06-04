@@ -155,7 +155,7 @@ LayoutPropertiesForm::prop_pb_clicked ()
   lay::UserPropertiesForm props_form (this);
   if (props_form.show (mp_view, m_index, prop_id)) {
 
-    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Edit layout's user propertes"))); 
+    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Edit layout's user properties"))); 
     layout.prop_id (prop_id);
     mp_view->manager ()->commit ();
 

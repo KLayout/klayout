@@ -259,7 +259,7 @@ private:
 };
 
 /**
- *  @brief A specialisation of QTextBrowser that allows loading a specific resource through BrowserPanel
+ *  @brief A specialization of QTextBrowser that allows loading a specific resource through BrowserPanel
  */
 class LAYBASIC_PUBLIC BrowserTextWidget
   : public QTextBrowser
@@ -303,7 +303,7 @@ struct LAYBASIC_PUBLIC BookmarkItem
 };
 
 /**
- *  @brief A specialisation of QWidget around a TextBrowser that allows loading a specific resource
+ *  @brief A specialization of QWidget around a TextBrowser that allows loading a specific resource
  */
 class LAYBASIC_PUBLIC BrowserPanel
   : public QWidget

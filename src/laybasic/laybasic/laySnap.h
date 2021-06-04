@@ -47,7 +47,7 @@ namespace lay
    *  Any: no angle constraint
    *  Diagonal: vertical, horizontal and 45 degree diagonals
    *  Ortho: vertical and horizontal
-   *  Horizonal: horizontal only
+   *  Horizontal: horizontal only
    *  Vertical: vertical only
    *  Global: use global setting (templates and ruler specific setting only)
    */

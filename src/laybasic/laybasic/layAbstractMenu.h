@@ -70,7 +70,7 @@ LAYBASIC_PUBLIC std::string pack_key_binding (const std::vector<std::pair<std::s
 LAYBASIC_PUBLIC std::vector<std::pair<std::string, bool> > unpack_menu_items_hidden (const std::string &packed);
 
 /**
- *  @brief A utility function to convert the hidde flags (as path/bool pair vector) to a packed string for cfg_menu_items_hidden
+ *  @brief A utility function to convert the hidden flags (as path/bool pair vector) to a packed string for cfg_menu_items_hidden
  */
 LAYBASIC_PUBLIC std::string pack_menu_items_hidden (const std::vector<std::pair<std::string, bool> > &unpacked);
 
@@ -359,7 +359,7 @@ private:
 };
 
 /**
- *  @brief A specialisation for the Action to issue a "configure" request on "triggered"
+ *  @brief A specialization for the Action to issue a "configure" request on "triggered"
  *
  *  When this action is triggered, a "configure" request is issued to the Dispatcher instance
  *  (which is the root of the configuration hierarchy). The name and value is given by the

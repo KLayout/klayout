@@ -1113,7 +1113,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
   gsi::method ("get_screenshot", &lay::LayoutView::get_screenshot,
     "@brief Gets a screenshot as a \\QImage\n"
     "\n"
-    "Getting the image requires the drawing to be complete. Ideally, synchroneous mode is switched on "
+    "Getting the image requires the drawing to be complete. Ideally, synchronous mode is switched on "
     "for the application to guarantee this condition. The image will have the size of the viewport "
     "showing the current layout."
   ) +
@@ -1124,7 +1124,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@param height The height of the image to render in pixel.\n"
     "\n"
     "The image contains the current scene (layout, annotations etc.).\n"
-    "The image is drawn synchroneously with the given width and height. Drawing may take some time. "
+    "The image is drawn synchronously with the given width and height. Drawing may take some time. "
   ) +
   gsi::method_ext ("get_image_with_options", &get_image_with_options, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth"), gsi::arg ("oversampling"), gsi::arg ("resolution"), gsi::arg ("target"), gsi::arg ("monochrome"),
     "@brief Gets the layout image as a \\QImage (with options)\n"
@@ -1139,7 +1139,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "The image contains the current scene (layout, annotations etc.).\n"
     "The image is written as a PNG file to the given file. "
-    "The image is drawn synchroneously with the given width and height. Drawing may take some time. "
+    "The image is drawn synchronously with the given width and height. Drawing may take some time. "
     "Monochrome images don't have background or annotation objects currently.\n"
     "\n"
     "This method has been introduced in 0.23.10.\n"
@@ -1151,7 +1151,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@param filename The file to which to write the screenshot to.\n"
     "\n"
     "The screenshot is written as a PNG file to the given file. "
-    "This requires the drawing to be complete. Ideally, synchroneous mode is switched on "
+    "This requires the drawing to be complete. Ideally, synchronous mode is switched on "
     "for the application to guarantee this condition. The image will have the size of the viewport "
     "showing the current layout."
   ) +
@@ -1164,7 +1164,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "The image contains the current scene (layout, annotations etc.).\n"
     "The image is written as a PNG file to the given file. "
-    "The image is drawn synchroneously with the given width and height. Drawing may take some time. "
+    "The image is drawn synchronously with the given width and height. Drawing may take some time. "
   ) +
   gsi::method_ext ("save_image_with_options", &save_image_with_options, gsi::arg ("filename"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth"), gsi::arg ("oversampling"), gsi::arg ("resolution"), gsi::arg ("target"), gsi::arg ("monochrome"),
     "@brief Saves the layout as an image to the given file (with options)\n"
@@ -1180,7 +1180,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "The image contains the current scene (layout, annotations etc.).\n"
     "The image is written as a PNG file to the given file. "
-    "The image is drawn synchroneously with the given width and height. Drawing may take some time. "
+    "The image is drawn synchronously with the given width and height. Drawing may take some time. "
     "Monochrome images don't have background or annotation objects currently.\n"
     "\n"
     "This method has been introduced in 0.23.10.\n"
@@ -2279,7 +2279,7 @@ Class<lay::CellViewRef> decl_CellView ("lay", "CellView",
   "The hierarchy levels are counted from the context cell, which is on level 0.\n"
   "If the context path is empty, the context cell is identical with the target cell.\n"
   "\n"
-  "Starting with version 0.25, the cellview can be modified directly. This will have an immdiate "
+  "Starting with version 0.25, the cellview can be modified directly. This will have an immediate "
   "effect on the display. For example, the following code will select a different cell:\n"
   "\n"
   "@code\n"

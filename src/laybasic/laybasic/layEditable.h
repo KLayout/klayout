@@ -217,7 +217,7 @@ public:
    *  This method is used by the single-point selection cycling protocol to clear the 
    *  plugin's single-point selection state. The cycling protocol is used when a certain
    *  point is clicked at multiple times. A plugin is supposed to remember such selections and
-   *  exlcude them from further checks. If all objects in question are selected, no further 
+   *  exclude them from further checks. If all objects in question are selected, no further 
    *  object would be selected. clear_previous_selection is called in that case to indicate that
    *  the previous selection should be cleared and a new cycle is about to begin
    */

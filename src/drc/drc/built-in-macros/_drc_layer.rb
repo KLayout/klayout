@@ -3859,7 +3859,7 @@ CODE
     #
     # @code
     # # reports areas where layer 1/0 density is below 10% on 20x20 um tiles
-    # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um))
+    # low_density = input(1, 0).with_density(0.0 .. 0.1, tile_size(20.um))
     # @/code
     #
     # Anisotropic tiles can be specified by giving two values, like "tile_size(10.um, 20.um)".
@@ -3873,7 +3873,7 @@ CODE
     # @code
     # # reports areas where layer 1/0 density is below 10% on 30x30 um tiles
     # # with a tile step of 20x20 um:
-    # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(30.um), tile_step(20.um))
+    # low_density = input(1, 0).with_density(0.0 .. 0.1, tile_size(30.um), tile_step(20.um))
     # @/code
     #
     # For "tile_step", anisotropic values can be given as well by using two values: the first for the
@@ -3891,7 +3891,7 @@ CODE
     # # reports density of layer 1/0 below 10% on 20x20 um tiles. The layout's boundary is taken from
     # # layer 0/0:
     # cell_frame = input(0, 0)
-    # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), tile_boundary(cell_frame))
+    # low_density = input(1, 0).with_density(0.0 .. 0.1, tile_size(20.um), tile_boundary(cell_frame))
     # @/code
     #
     # Note that the layer given in "tile_boundary" adds to the input layer for computing the bounding box.
@@ -3903,7 +3903,7 @@ CODE
     # @code
     # # reports density of layer 1/0 below 10% on 20x20 um tiles in the region 0,0 .. 2000,3000
     # # (100 and 150 tiles of 20 um each are used in horizontal and vertical direction):
-    # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), tile_origin(0.0, 0.0), tile_count(100, 150))
+    # low_density = input(1, 0).with_density(0.0 .. 0.1, tile_size(20.um), tile_origin(0.0, 0.0), tile_count(100, 150))
     # @/code
     #
     # The "padding mode" indicates how the area outside the layout's bounding box is considered.
@@ -3917,7 +3917,7 @@ CODE
     # Example:
     #
     # @code
-    # low_density = input(1, 0).density(0.0 .. 0.1, tile_size(20.um), padding_ignore)
+    # low_density = input(1, 0).with_density(0.0 .. 0.1, tile_size(20.um), padding_ignore)
     # @/code
     # 
     # The complementary version of "with_density" is \without_density.

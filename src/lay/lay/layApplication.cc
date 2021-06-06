@@ -954,7 +954,7 @@ ApplicationBase::usage ()
   r += tl::to_string (QObject::tr ("  -p <plugin>         Load the plugin (can be used multiple times)")) + "\n";
   r += tl::to_string (QObject::tr ("  -r <script>         Execute main script on startup (after having loaded files etc.)")) + "\n";
   r += tl::to_string (QObject::tr ("  -rm <script>        Execute module on startup (can be used multiple times)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -rd <name>=<value>  Specify skript variable")) + "\n";
+  r += tl::to_string (QObject::tr ("  -rd <name>=<value>  Specify script variable")) + "\n";
   r += tl::to_string (QObject::tr ("  -rx                 Ignore all implicit macros (*.rbm, rbainit, *.lym)")) + "\n";
   r += tl::to_string (QObject::tr ("  -s                  Load files into same view")) + "\n";
   r += tl::to_string (QObject::tr ("  -t                  Don't update the configuration file on exit")) + "\n";

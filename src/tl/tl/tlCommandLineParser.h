@@ -79,7 +79,7 @@ public:
    *    "[group]..."              - List the option under this group (group = group title)
    *    "#..."                    - Advanced option - listed with --help-all only
    *    "/..."                    - Non-advanced option - listed with -h|--help only
-   *    "*..."                    - Multiple occurances allowed - values needs to be
+   *    "*..."                    - Multiple occurrences allowed - values needs to be
    *                                an array and values are accumulated. Without *, the
    *                                value string is evaluated to a comma-separated list.
    *                                "*" means one occurrence at least unless combined with "?".

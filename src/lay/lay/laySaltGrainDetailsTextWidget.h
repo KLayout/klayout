@@ -34,7 +34,7 @@ namespace lay
 class SaltGrain;
 
 /**
- *  @brief A specialisation of QTextBrowser that displays the details of the salt grain
+ *  @brief A specialization of QTextBrowser that displays the details of the salt grain
  */
 class SaltGrainDetailsTextWidget
   : public QTextBrowser

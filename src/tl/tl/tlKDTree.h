@@ -543,9 +543,9 @@ public:
    *  @brief search initiation
    *
    *  The model used in the search follows the usual begin..end 
-   *  iterator semantics. However, begin and end are assymmetric:
+   *  iterator semantics. However, begin and end are asymmetric:
    *  While "sel_begin" creates, initializes and delivers a iterator
-   *  which walks through the tree skipping irrelvant items, the
+   *  which walks through the tree skipping irrelevant items, the
    *  "sel_end" methods just delivers a "token" which is matched by
    *  the iterators comparison operator against the "done" state.
    *  

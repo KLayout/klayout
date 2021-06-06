@@ -359,7 +359,7 @@ MacroEditorSetupPage::commit_attributes (QListWidgetItem *to_item)
 
   }
 
-  //  update all list styles (because we may modifiy a basic entry, we have to update dependent ones as well)
+  //  update all list styles (because we may modify a basic entry, we have to update dependent ones as well)
   for (int i = 0; i < styles_list->count (); ++i) {
 
     QListWidgetItem *item = styles_list->item (i);

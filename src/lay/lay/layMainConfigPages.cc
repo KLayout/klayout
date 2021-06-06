@@ -418,7 +418,7 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
     m_hidden_flags.insert (std::make_pair (kb->first, hh != h.end () && hh->second));
   }
 
-  //  extract the top level menues
+  //  extract the top level menus
   std::map <std::string, std::string> top_level_menus;
   top_level_menus.insert (std::make_pair (std::string (), tl::to_string (QObject::tr ("Main Menu"))));
   top_level_menus.insert (std::make_pair (std::string ("secrets"), tl::to_string (QObject::tr ("Key Binding Targets"))));

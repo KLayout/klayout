@@ -2487,7 +2487,7 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
     "This method receives a string with the element specification and the element code. It is supposed to "
     "parse the element line and return a model name, a value, a list of net names and a parameter value dictionary.\n"
     "\n"
-    "'parse_element' is called one every element card. The results of this call go into the \\element method "
+    "'parse_element' is called on every element card. The results of this call go into the \\element method "
     "to actually create the device. This method can be reimplemented to support other flavors of SPICE.\n"
     "\n"
     "This method has been introduced in version 0.27.1\n"
@@ -2522,8 +2522,8 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
   ) +
   gsi::method_ext ("parse_element_components", &parse_element_components, gsi::arg ("s"),
     "@brief Parses a string into string and parameter components.\n"
-    "This method is provided for simplifying the implementation of 'parse_element'. It takes a string and splits it into "
-    "string arguments and parameter values. For example, 'a b c=6' renders two string arguments in 'nn' and one parameter in pv ('C'->6.0). "
+    "This method is provided to simplify the implementation of 'parse_element'. It takes a string and splits it into "
+    "string arguments and parameter values. For example, 'a b c=6' renders two string arguments in 'nn' and one parameter ('C'->6.0). "
     "It returns data \\ParseElementComponentsData object with the strings and parameters.\n"
     "The parameter names are already translated to upper case.\n"
     "\n"

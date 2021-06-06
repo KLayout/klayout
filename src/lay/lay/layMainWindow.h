@@ -649,13 +649,13 @@ public slots:
 
   /**
    *  @brief shows the given URL as a non-modal help window
-   *  Intended as a connection target for QLabel linkVisisted signals.
+   *  Intended as a connection target for QLabel linkVisited signals.
    */
   void show_help (const QString &url);
 
   /**
    *  @brief shows the given URL as a modal help window
-   *  Intended as a connection target for QLabel linkVisisted signals.
+   *  Intended as a connection target for QLabel linkVisited signals.
    */
   void show_modal_help (const QString &url);
 

@@ -35,7 +35,7 @@ namespace tl
 TL_PUBLIC void usleep (unsigned long us);
 
 /**
- *  @brief Slees the given number of milliseconds
+ *  @brief Sleeps the given number of milliseconds
  */
 TL_PUBLIC void msleep (unsigned long ms);
 

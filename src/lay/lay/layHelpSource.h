@@ -68,7 +68,7 @@ struct IndexEntry
 std::string escape_xml (const std::string &s);
 
 /**
- *  @brief A specialisation of BrowserSource for delivering the generated documentation
+ *  @brief A specialization of BrowserSource for delivering the generated documentation
  */
 class HelpSource
   : public BrowserSource

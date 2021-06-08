@@ -335,6 +335,13 @@ TEST(22)
   run_test (_this, "def13", "map:test.map+lef:test.lef_5.8+def:top.def.gz", "au2.oas.gz", opt);
 }
 
+TEST(23)
+{
+  db::LEFDEFReaderOptions opt = default_options ();
+  opt.set_macro_resolution_mode (1);
+  run_test (_this, "def14", "map:test.map+lef:tech.lef+lef:stdlib.lef+def:test.def", "au.oas.gz", opt);
+}
+
 TEST(100)
 {
   run_test (_this, "issue-172", "lef:in.lef+def:in.def", "au.oas.gz", default_options (), false);
@@ -726,11 +733,11 @@ TEST(117_mapfile_all)
       "'\\'M1.FILLOPC:2\\' : \\'M1.FILLOPC:2\\' (11/0)';"
       "'\\'M1.VIA:SIZE0.05X0.05\\' : \\'M1.VIA:SIZE0.05X0.05\\' (20/0)';"
       "'\\'M1.VIA:SIZE3X3\\' : \\'M1.VIA:SIZE3X3\\' (21/0)';"
-      "'+M1.LABEL : M1.LABEL (26/0)';"
-      "'+M1.LABEL : M1.LABEL (27/0)';"
-      "'+M1.LABEL : M1.LABEL (28/1)';"
+      "'M1.LABEL : M1.LABEL (26/0)';"
+      // NAME M1/NET not supported: "'+M1.LABEL : M1.LABEL (27/0)';"
+      // NAME M1/SPNET not supported: "'+M1.LABEL : M1.LABEL (28/1)';"
       "'+M1.BLK : M1.BLK (13/0)';"
-      "'M1_TEXT.LABEL : M1_TEXT.LABEL (29/0)'"
+      "'M1_TEXT.LABEL;M1_TEXT.LEFLABEL : \\'M1_TEXT.LABEL/M1_TEXT.LEFLABEL\\' (29/0)'"
     ")"
   )
 }

@@ -998,39 +998,60 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
         //  into a canonical name mapping like
         //    "(M1/LABELS): M1.LABEL"
         //    "(M2/LABELS): M2.LABEL"
+        //  supported purposes: PINS(->Label), LEFPINS(->LEFLabels)
 
-        LayerPurpose label_purpose = Pins;
+        std::vector< std::pair<std::string, LayerPurpose> > layer_defs;
 
-        std::vector<std::string> layer_names;
         std::vector<std::string> purposes = tl::split (w2, ",");
         for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
+
           if (*p == "DIEAREA" || *p == "ALL" || *p == "COMP") {
+
             tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NAME record ignored for entity: %s")), path, ts.line_number (), *p);
+
           } else {
+
             std::vector<std::string> lp = tl::split (*p, "/");
+
             if (lp.size () > 1) {
+
+              LayerPurpose label_purpose = Pins;
               std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.find (lp[1]);
               if (i != purpose_translation.end ()) {
                 label_purpose = i->second;
               }
+
+              if (label_purpose == Pins || label_purpose == LEFPins) {
+                layer_defs.push_back (std::make_pair (lp.front (), label_purpose == Pins ? Label : LEFLabel));
+              } else {
+                tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NAME record ignored for purpose: %s")), path, ts.line_number (), purpose_to_name (label_purpose));
+              }
+
+            } else {
+
+              layer_defs.push_back (std::make_pair (lp.front (), Label));
+              layer_defs.push_back (std::make_pair (lp.front (), LEFLabel));
+
             }
-            layer_names.push_back (lp.front ());
+
           }
+
         }
 
-        if (label_purpose == Pins || label_purpose == LEFPins) {
+        std::string final_name;
+        for (std::vector< std::pair<std::string, LayerPurpose> >::const_iterator i = layer_defs.begin (); i != layer_defs.end (); ++i) {
+          if (! final_name.empty ()) {
+            final_name += "/";
+          }
+          final_name += i->first + "." + purpose_to_name (i->second);
+        }
 
-          LayerPurpose layer_purpose = label_purpose == Pins ? Label : LEFLabel;
-
-          std::string final_name = tl::join (layer_names, "/") + "." + purpose_to_name (layer_purpose);
-          for (std::vector<std::string>::const_iterator ln = layer_names.begin (); ln != layer_names.end (); ++ln) {
-            for (std::vector<int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-              for (std::vector<int>::const_iterator d = datatypes.begin (); d != datatypes.end (); ++d) {
-                layer_map [std::make_pair (*ln, LayerDetailsKey (layer_purpose))].push_back (db::LayerProperties (*l, *d, final_name));
-              }
+        for (std::vector< std::pair<std::string, LayerPurpose> >::const_iterator i = layer_defs.begin (); i != layer_defs.end (); ++i) {
+          for (std::vector<int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+            for (std::vector<int>::const_iterator d = datatypes.begin (); d != datatypes.end (); ++d) {
+              layer_map [std::make_pair (i->first, LayerDetailsKey (i->second))].push_back (db::LayerProperties (*l, *d, final_name));
             }
           }
-
         }
 
       } else if (w1 == "COMP") {

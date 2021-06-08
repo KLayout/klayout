@@ -56,7 +56,7 @@ public:
 /**
  *  @brief A delegate to handle various forms of devices and translates them
  *
- *  The reader delegate can be configured to recieve subcircuit elements too.
+ *  The reader delegate can be configured to receive subcircuit elements too.
  *  In this case, parameters are allowed.
  *  For receiving subcircuit elements, the delegate needs to indicate
  *  this by returning true upon "wants_subcircuit".
@@ -106,7 +106,7 @@ public:
    *  @param element The upper-case element code ("M", "R", ...).
    *  @param name The element's name.
    *  @param model The upper-case model name (may be empty).
-   *  @param value The default value (e.g. registance for resistors) and may be zero.
+   *  @param value The default value (e.g. resistance for resistors) and may be zero.
    *  @param nets The nets given in the element line.
    *  @param parameters The parameters of the element statement (parameter names are upper case).
    *

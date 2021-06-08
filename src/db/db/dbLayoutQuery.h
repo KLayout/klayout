@@ -87,8 +87,8 @@ public:
   /**
    *  @brief Create the state object for this filter
    *
-   *  This method must be implementated by a filter to provide the state object.
-   *  The state object is bascially the selector and acts as a iterator for the property that this
+   *  This method must be implemented by a filter to provide the state object.
+   *  The state object is basically the selector and acts as a iterator for the property that this
    *  filter represents.
    *  This method is provided for implementation by FilterBracket mainly. 
    *  Custom classes should implement do_create_state.
@@ -139,8 +139,8 @@ protected:
   /**
    *  @brief Create the state object for this filter
    *
-   *  This method must be implementated by a filter to provide the state object.
-   *  The state object is bascially the selector and acts as a iterator for the property that this
+   *  This method must be implemented by a filter to provide the state object.
+   *  The state object is basically the selector and acts as a iterator for the property that this
    *  filter represents.
    *
    *  @param layout The layout that this query refers to.
@@ -170,7 +170,7 @@ private:
 /** 
  *  @brief A filter bracket
  *
- *  A bracket is a bracket around a filter graph. In addition, brackets can specify a multiplity
+ *  A bracket is a bracket around a filter graph. In addition, brackets can specify a multiplicity
  *  (loopmin to loopmax). 
  *  A bracket defines two virtual nodes: the entry and the exit node. 
  *  The entry node is the input of the filter and internally connected to the inputs of the children.
@@ -181,12 +181,12 @@ class DB_PUBLIC FilterBracket :
 {
 public:
   /**
-   *  @brief Constructor (multiplity 1)
+   *  @brief Constructor (multiplicity 1)
    */
   FilterBracket (LayoutQuery *q);
 
   /**
-   *  @brief Constructor (multiplity loopmin..loopmax)
+   *  @brief Constructor (multiplicity loopmin..loopmax)
    */
   FilterBracket (LayoutQuery *q, unsigned int loopmin, unsigned int loopmax);
 
@@ -196,7 +196,7 @@ public:
   ~FilterBracket ();
 
   /**
-   *  @brief Set the min multiplity explicitly
+   *  @brief Set the min multiplicity explicitly
    */
   void set_loopmin (unsigned int v)
   {
@@ -204,7 +204,7 @@ public:
   }
 
   /**
-   *  @brief Set the max multiplity explicitly
+   *  @brief Set the max multiplicity explicitly
    */
   void set_loopmax (unsigned int v)
   {

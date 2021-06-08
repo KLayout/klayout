@@ -126,7 +126,7 @@ public:
    *  on the layout object beside inserting the objects.
    *  It can be passed options with a layer map which tells which
    *  OASIS layer(s) to read on which logical layers.
-   *  In addition, a flag can be passed that tells wheter to create 
+   *  In addition, a flag can be passed that tells whether to create 
    *  new layers. The returned map will contain all layers, the passed
    *  ones and the newly created ones.
    *

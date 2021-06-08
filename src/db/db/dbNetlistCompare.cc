@@ -2599,7 +2599,7 @@ NetGraph::derive_node_identities_from_singular_match (const NetGraphNode *n, con
       return failed_match;
     }
 
-    //  A single candiate: just take this one -> this may render
+    //  A single candidate: just take this one -> this may render
     //  inexact matches, but further propagates net pairing
 
     size_t ni = node_index_for_net (n->net ());
@@ -3975,7 +3975,7 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
       }
       good = false;
     } else {
-      //  TODO: report devices which cannot be distiguished topologically?
+      //  TODO: report devices which cannot be distinguished topologically?
       device_map.insert (std::make_pair (k, std::make_pair (d.operator-> (), device_cat)));
     }
 
@@ -4181,7 +4181,7 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
       }
       good = false;
     } else if (valid) {
-      //  TODO: report devices which cannot be distiguished topologically?
+      //  TODO: report devices which cannot be distinguished topologically?
       subcircuit_map.insert (std::make_pair (k, std::make_pair (sc.operator-> (), sc_cat)));
     }
 
@@ -4268,7 +4268,7 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
 
           } else {
 
-            //  no unqiue match
+            //  no unique match
             if (mp_logger) {
               mp_logger->subcircuit_mismatch (0, sc.operator-> ());
             }

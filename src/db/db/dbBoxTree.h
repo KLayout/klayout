@@ -72,7 +72,7 @@ private:
 
 
 /// @brief a helper class providing a linear-time iterator difference which is not necessarily 
-///        the actual difference but monotoneous
+///        the actual difference but monotonous
 
 template <class X>
 size_t box_tree_lt_difference (const tl::reuse_vector_const_iterator<X> &a, const tl::reuse_vector_const_iterator<X> &b)
@@ -329,7 +329,7 @@ private:
  *  Unlike the primitive iterator, which is based on the container inside
  *  the box tree, this iterator iterates "registered" elements, i.e. such that
  *  are within the sorted list. Since this list is maintained even if elements 
- *  are insered, this iterator is less susceptible to changes in the container, 
+ *  are inserted, this iterator is less susceptible to changes in the container, 
  *  i.e. by inserting or deleting elements while iterating.
  *  This iterator is therefore recommended for being used in interleaved access/change
  *  operations.
@@ -842,7 +842,7 @@ public:
   /** 
    *  @brief Insert a range of objects
    *
-   *  Analogeous to the other insert method, but accepting
+   *  Analogous to the other insert method, but accepting
    *  and range of objects [start,end).
    */
   template <class I> 
@@ -1357,7 +1357,7 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
  *  Unlike the primitive iterator, which is based on the container inside
  *  the box tree, this iterator iterates "registered" elements, i.e. such that
  *  are within the sorted list. Since this list is maintained even if elements 
- *  are insered, this iterator is less susceptible to changes in the container, 
+ *  are inserted, this iterator is less susceptible to changes in the container, 
  *  i.e. by inserting or deleting elements while iterating.
  *  This iterator is therefore recommended for being used in interleaved access/change
  *  operations.
@@ -1834,7 +1834,7 @@ public:
   /** 
    *  @brief Insert a range of objects
    *
-   *  Analogeous to the other insert method, but accepting
+   *  Analogous to the other insert method, but accepting
    *  and range of objects [start,end).
    */
   template <class I> 

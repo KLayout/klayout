@@ -89,7 +89,7 @@ public:
    *
    *  For a detailed description of this method see db::Manager::queue.
    *  This method has been declared to be no-throwing since it is
-   *  assumed that once the operation is sucessfully queued it can be undone
+   *  assumed that once the operation is successfully queued it can be undone
    *  in every case.
    */
   virtual void undo (db::Op * /*op*/) 
@@ -100,7 +100,7 @@ public:
    *
    *  For a detailed description of this method see db::Manager::queue.
    *  This method has been declared to be no-throwing since it is
-   *  assumed that once the operation is sucessfully queued it can be redone
+   *  assumed that once the operation is successfully queued it can be redone
    *  in every case.
    */
   virtual void redo (db::Op * /*op*/)

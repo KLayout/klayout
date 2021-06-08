@@ -858,7 +858,7 @@ public:
    *  May create invalid (self-overlapping, reverse oriented) contours. 
    *  The sign of dx and dy should be identical.
    *
-   *  The mode defines at which bending angle cutoff occures
+   *  The mode defines at which bending angle cutoff occurs
    *    0: >0
    *    1: >45
    *    2: >90
@@ -2331,7 +2331,7 @@ public:
    *  algorithm using a merge step. 
    *  The sign of dx and dy should be identical.
    *
-   *  The mode defines at which bending angle cutoff occures
+   *  The mode defines at which bending angle cutoff occurs
    *    0: >0
    *    1: >45
    *    2: >90

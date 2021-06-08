@@ -147,7 +147,7 @@ public:
   /**
    *  @brief Standard constructor for "world" iteration
    *
-   *  This iterator delivers all shapes recursively. The same effect can be acchieved by using a "world" region.
+   *  This iterator delivers all shapes recursively. The same effect can be achieved by using a "world" region.
    *
    *  @param layout The layout from which to get the cell hierarchy
    *  @param cell The starting cell
@@ -220,7 +220,7 @@ public:
   /**
    *  @brief Standard constructor for "world" iteration with a layer set
    *
-   *  This iterator delivers all shapes recursively. The same effect can be acchieved by using a "world" region.
+   *  This iterator delivers all shapes recursively. The same effect can be achieved by using a "world" region.
    *
    *  @param layout The layout from which to get the cell hierarchy
    *  @param cell The starting cell
@@ -231,7 +231,7 @@ public:
   /**
    *  @brief Standard constructor for "world" iteration with a layer set
    *
-   *  This iterator delivers all shapes recursively. The same effect can be acchieved by using a "world" region.
+   *  This iterator delivers all shapes recursively. The same effect can be achieved by using a "world" region.
    *
    *  @param layout The layout from which to get the cell hierarchy
    *  @param cell The starting cell

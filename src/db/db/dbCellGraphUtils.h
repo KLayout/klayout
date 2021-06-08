@@ -69,7 +69,7 @@ public:
    *  @brief Determine the instance count of the cell with index "ci"
    *
    *  The instance count is the number of "flat" instances of the cell in all
-   *  top cells of the graph. A top cell has a multiplicty of 1.
+   *  top cells of the graph. A top cell has a multiplicity of 1.
    */
   size_t weight (db::cell_index_type ci);
 

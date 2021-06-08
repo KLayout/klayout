@@ -548,7 +548,7 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
   int total = int (m_contexts.size ());
 
   //  NOTE: we use the ordering provided by key_type::operator< rather than the unordered map to achieve
-  //  reproducability across different platforms. unordered_map is faster, but for processing them,
+  //  reproducibility across different platforms. unordered_map is faster, but for processing them,
   //  strict ordering is a more robust choice.
   std::vector<std::pair<const context_key_type *, db::local_processor_cell_context<TS, TI, TR> *> > sorted_contexts;
   sorted_contexts.reserve (m_contexts.size ());
@@ -1045,7 +1045,7 @@ instances_interact (const db::Layout *layout1, const db::CellInstArray *inst1, u
 
         db::ICplxTrans tn2 = inst2->complex_trans (*k);
 
-        //  NOTE: we need to enlarge both subject *and* intruder boxes - either ubject comes close to intruder or the other way around
+        //  NOTE: we need to enlarge both subject *and* intruder boxes - either object comes close to intruder or the other way around
         db::Box ibox2 = tn2 * cell2.bbox (layer2).enlarged (db::Vector (dist, dist));
 
         db::ICplxTrans tn21 = tni1 * tn2;

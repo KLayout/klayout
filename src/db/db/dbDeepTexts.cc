@@ -697,7 +697,7 @@ DeepTexts::selected_interacting_generic (const Region &other, bool inverse) cons
   std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
-    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
     dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
     other_deep = dr_holder.get ();
   }
@@ -722,7 +722,7 @@ RegionDelegate *DeepTexts::pull_generic (const Region &other) const
   std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
-    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
     dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
     other_deep = dr_holder.get ();
   }

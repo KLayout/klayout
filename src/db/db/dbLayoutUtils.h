@@ -131,7 +131,7 @@ const db::cell_index_type DropCell = std::numeric_limits<db::cell_index_type>::m
  *  in the cell mapping, a new cell is created. If non-null, final_cell_mapping will hold of list of target layout cells
  *  vs. source layout cells.
  *  Instances are only copied for cells which are created new. 
- *  The layer mapping table indentifies target layers for source layout layers.
+ *  The layer mapping table identifies target layers for source layout layers.
  */
 void DB_PUBLIC 
 merge_layouts (db::Layout &target, const db::Layout &source, const db::ICplxTrans &trans,

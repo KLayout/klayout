@@ -44,10 +44,10 @@ namespace db
  *  knots.size == control_points.size + degree + 1
  *  @/code
  *
- *  The accuracy parameters allow tuing the resolution of the curve to target a specific approximation quality.
+ *  The accuracy parameters allow tuning the resolution of the curve to target a specific approximation quality.
  *  "relative_accuracy" gives the accuracy relative to the local curvature radius, "absolute" accuracy gives the
  *  absolute accuracy. "accuracy" is the allowed deviation of polygon approximation from the ideal curve.
- *  The computed curve should meet at least one of the accurcay criteria. Setting both limits to a very small
+ *  The computed curve should meet at least one of the accuracy criteria. Setting both limits to a very small
  *  value will result in long run times and a large number of points returned.
  *
  *  This function supports both rational splines (NURBS) and non-rational splines. The latter use weights of
@@ -60,7 +60,7 @@ DB_PUBLIC std::list<P>
 spline_interpolation (const std::vector<std::pair<P, double> > &control_points, int degree, const std::vector<double> &knots, double relative_accuracy, double absolute_accuracy);
 
 /**
- *  @brief A convencience version of the previous function
+ *  @brief A convenience version of the previous function
  *
  *  This version takes separate vectors for point and weights for the control points.
  */
@@ -69,7 +69,7 @@ DB_PUBLIC std::list<P>
 spline_interpolation (const std::vector<P> &control_points, const std::vector<double> &weights, int degree, const std::vector<double> &knots, double relative_accuracy, double absolute_accuracy);
 
 /**
- *  @brief A convencience version of the previous function
+ *  @brief A convenience version of the previous function
  *
  *  This version provides non-rational splines and does not take a weight vector.
  */

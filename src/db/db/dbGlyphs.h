@@ -203,7 +203,7 @@ public:
 
   /**
    *  @brief Returns the font with the given name
-   *  If no font with that name exsist, 0 is returned.
+   *  If no font with that name exists, 0 is returned.
    */
   static const TextGenerator *generator_by_name (const std::string &name);
 

@@ -390,7 +390,7 @@ public:
    *
    *  Ordering of instances is not specified by the identity of the objects but by the
    *  order of the pointers.
-   *  Since pointers are volatile objects, the ordering is not strictly reproducable!
+   *  Since pointers are volatile objects, the ordering is not strictly reproducible!
    *  The order is designed such that different types of instances are separated in
    *  an order sequence of instance proxies. This is an important fact for the 
    *  "erase" functionality of the instances container when erasing a set of objects.

@@ -114,7 +114,7 @@ public:
    *  @brief Insert the given cell name for the given cell id
    *
    *  The name is checked for length and compliance with the character map.
-   *  If the name does not comply, it is adjusted acoordingly.
+   *  If the name does not comply, it is adjusted accordingly.
    */
   void insert (db::cell_index_type id, const std::string &cell_name);
 

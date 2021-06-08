@@ -489,7 +489,7 @@ public:
    *  This requires the bboxes of the child cells to be computed
    *  before. Practically this will be done by computing the
    *  bboxes bottom-up in the hierarchy.
-   *  In addition, the number of hierarchy leves below is also
+   *  In addition, the number of hierarchy levels below is also
    *  updated.
    *
    *  @param layers The max. number of layers in the child cells
@@ -958,8 +958,8 @@ public:
    *
    *  If the source and target layout are different ones, the whole cell tree of the source cell
    *  will be copied.
-   *  This will create new cells in the target layout to accomodate the source cell tree.
-   *  Returns an array with the freshly created cells which acommodate the cell tree.
+   *  This will create new cells in the target layout to accommodate the source cell tree.
+   *  Returns an array with the freshly created cells which accommodate the cell tree.
    */
   std::vector<db::cell_index_type> copy_tree (const db::Cell &source_cell);
 
@@ -997,8 +997,8 @@ public:
    *
    *  If the source and target layout are different ones, the whole cell tree of the source cell
    *  will be copied.
-   *  This will create new cells in the target layout to accomodate the source cell tree.
-   *  Returns an array with the freshly created cells which acommodate the cell tree.
+   *  This will create new cells in the target layout to accommodate the source cell tree.
+   *  Returns an array with the freshly created cells which accommodate the cell tree.
    */
   std::vector<db::cell_index_type> move_tree (db::Cell &source_cell);
 

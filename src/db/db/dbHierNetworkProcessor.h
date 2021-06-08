@@ -215,7 +215,7 @@ private:
  *  @brief Represents a cluster of shapes
  *
  *  A cluster of shapes is a set of shapes of type T which are connected in terms
- *  of a given connectivity. The shapes will still be organised in layers.
+ *  of a given connectivity. The shapes will still be organized in layers.
  */
 template <class T>
 class DB_PUBLIC_TEMPLATE local_cluster

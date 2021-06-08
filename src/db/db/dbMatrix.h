@@ -678,7 +678,7 @@ public:
   /**
    *  @brief Transforms a vector
    *
-   *  Basically the transformation of a vector is ambiguous for pespective transformation because
+   *  Basically the transformation of a vector is ambiguous for perspective transformation because
    *  in that case the vector will transform differently depending on the point where the
    *  vector started.
    *
@@ -1032,7 +1032,7 @@ struct MatrixAdjustFlags
 {
   enum Flags
   {
-    None = 0,                 //  Don'd adjust anything
+    None = 0,                 //  Don't adjust anything
     Displacement = 1,         //  Adjust displacement only (needs at least one point)
     Rotation = 2,             //  Adjust displacement plus rotation (needs two points at least)
     RotationMirror = 3,       //  Adjust displacement plus rotation and allow mirror (needs three points at least)

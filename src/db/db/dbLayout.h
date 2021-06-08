@@ -539,7 +539,7 @@ public:
    *  @brief The copy ctor
    *
    *  This copy constructor inherits the attachment to a manager.
-   *  For copying without attachement, create a layout without a manager attached
+   *  For copying without attachment, create a layout without a manager attached
    *  and use the assignment operator.
    */
   Layout (const Layout &d);
@@ -1118,7 +1118,7 @@ public:
   /**
    *  @brief Delete a cell plus the subcells not used otherwise
    *
-   *  All subcells referenced directy or indirectly but not used otherwise
+   *  All subcells referenced directly or indirectly but not used otherwise
    *  are deleted as well. This basically prunes the cell tree by this cell.
    *  All instances of this cell are deleted as well.
    *
@@ -1130,10 +1130,10 @@ public:
   /**
    *  @brief Delete cells plus their subcells not used otherwise
    *
-   *  All subcells referenced directy or indirectly but not used otherwise
+   *  All subcells referenced directly or indirectly but not used otherwise
    *  are deleted as well. This basically prunes the cell tree by this cell.
    *  All instances of this cell are deleted as well.
-   *  This method is more efficent than calling prune_cell multiple times.
+   *  This method is more efficient than calling prune_cell multiple times.
    *
    *  @param from A begin iterator delivering the cell id's to delete
    *  @param to An end iterator delivering the cell id's to delete
@@ -1150,10 +1150,10 @@ public:
   /**
    *  @brief Delete cells plus their subcells not used otherwise
    *
-   *  All subcells referenced directy or indirectly but not used otherwise
+   *  All subcells referenced directly or indirectly but not used otherwise
    *  are deleted as well. This basically prunes the cell tree by this cell.
    *  All instances of this cell are deleted as well.
-   *  This method is more efficent than calling prune_cell multiple times.
+   *  This method is more efficient than calling prune_cell multiple times.
    *
    *  @param cells A set of cell id's to prune
    *  @param levels The number of hierarchy levels to look for (-1: all, 0: none, 1: one level etc.)
@@ -1163,7 +1163,7 @@ public:
   /**
    *  @brief Delete the subcells of the given cell which are not used otherwise
    *
-   *  All subcells of the given cell which are referenced directy or indirectly but not used otherwise
+   *  All subcells of the given cell which are referenced directly or indirectly but not used otherwise
    *  are deleted. 
    *
    *  @param id The index whose subcells to delete
@@ -1174,9 +1174,9 @@ public:
   /**
    *  @brief Delete the subcells of the given cells which are not used otherwise
    *
-   *  All subcells referenced directy or indirectly but not used otherwise
+   *  All subcells referenced directly or indirectly but not used otherwise
    *  are deleted as well.
-   *  This method is more efficent than calling prune_subcells for single cells multiple times.
+   *  This method is more efficient than calling prune_subcells for single cells multiple times.
    *
    *  @param from A begin iterator delivering the cell id's to delete
    *  @param to An end iterator delivering the cell id's to delete
@@ -1193,9 +1193,9 @@ public:
   /**
    *  @brief Delete the subcells of the given cells which are not used otherwise
    *
-   *  All subcells referenced directy or indirectly but not used otherwise
+   *  All subcells referenced directly or indirectly but not used otherwise
    *  are deleted as well.
-   *  This method is more efficent than calling prune_subcells for single cells multiple times.
+   *  This method is more efficient than calling prune_subcells for single cells multiple times.
    *
    *  @param cells A set of cell id's to prune
    *  @param levels The number of hierarchy levels to look for (-1: all, 0: none, 1: one level etc.)
@@ -1262,7 +1262,7 @@ public:
   /**
    *  @brief Delete a cell plus all subcells 
    *
-   *  All subcells referenced directy or indirectly are deleted as well.
+   *  All subcells referenced directly or indirectly are deleted as well.
    *  All instances of these cells are deleted as well.
    *
    *  @param id The index of the cell to delete
@@ -1428,7 +1428,7 @@ public:
    *  @brief Query the number of layers defined so far
    *  
    *  TODO: the list of 0 to nlayers-1 also contains the free layers -
-   *  we should get a vector containing the layers that are acually
+   *  we should get a vector containing the layers that are actually
    *  allocated.
    */
   unsigned int layers () const
@@ -1705,7 +1705,7 @@ public:
    *  about to be brought into an invalid state. After calling
    *  this method, "under_construction" returns false which 
    *  tells foreign code (such as update which might be called
-   *  asynchroneously for example because of a repaint event)
+   *  asynchronously for example because of a repaint event)
    *  not to use this layout object.
    *  This state is cancelled by the end_changes () method.
    *  The start_changes () method can be called multiple times

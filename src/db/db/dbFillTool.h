@@ -59,7 +59,7 @@ class Region;
  *
  *    p(i,j) = p0 + i * row_step + j * column_step
  *
- *  p0 is a position chosen by the fill alogorithm or the "origin", if enhanced_fill is false.
+ *  p0 is a position chosen by the fill algorithm or the "origin", if enhanced_fill is false.
  *
  *  This pattern is overlaid with the polygon to fill and all instances where the fill box moved by p(i,j) is entirely inside
  *  the polygon generate a fill cell instance with a displacement of p.
@@ -108,7 +108,7 @@ fill_region (db::Cell *cell, const db::Region &fp, db::cell_index_type fill_cell
 /**
  *  @brief An iterative version for enhanced fill
  *
- *  This version operates like the region-based fill_region version, but repeates the fill step until no further fill cells can be placed.
+ *  This version operates like the region-based fill_region version, but repeats the fill step until no further fill cells can be placed.
  *  The remaining parts will be placed inside "remaining_polygons" unless this pointer is null.
  *
  *  This version implies enhanced_mode (see "fill_region").

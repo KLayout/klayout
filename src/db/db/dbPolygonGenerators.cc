@@ -474,7 +474,7 @@ void PolygonGenerator::eliminate_hole ()
     return;
   }
 
-  //  We found the intial edges of a new hole: connect the (partial) hole with a stitch line to the left.
+  //  We found the initial edges of a new hole: connect the (partial) hole with a stitch line to the left.
   //  This way we can turn the hole into a non-hole contour.
   tl_assert (m_open_pos != m_open.begin ());
   --m_open_pos;

@@ -164,7 +164,7 @@ public:
   db::cell_index_type make_cell (db::Layout &layout, size_t id);
 
   /**
-   *  @brief Returns true, if there is a cell with the given ID alreay
+   *  @brief Returns true, if there is a cell with the given ID already
    */
   bool has_cell (size_t id) const;
 

@@ -1982,7 +1982,7 @@ struct array
    *  The raw bounding boxes can be accumulated for all arrays having the same
    *  orientation, magnification and object. 
    *  bbox_from_raw_bbox can be used to compute the total bbox from such an
-   *  accumulated raw bounding box. This is for example exploitet in the 
+   *  accumulated raw bounding box. This is for example exploited in the 
    *  update_bbox method of db::cell.
    */
   box_type raw_bbox () const

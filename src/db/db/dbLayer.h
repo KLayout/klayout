@@ -118,7 +118,7 @@ struct layer
   /**
    *  @brief The assignment operator
    *
-   *  The manager attachement is not copied.
+   *  The manager attachment is not copied.
    */
   layer &operator= (const layer &d)
   {

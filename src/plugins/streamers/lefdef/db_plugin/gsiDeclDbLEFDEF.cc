@@ -662,6 +662,42 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "@brief Sets the labels layer datatype value.\n"
     "See \\produce_via_geometry for details about the layer production rules."
   ) +
+  gsi::method ("produce_lef_labels", &db::LEFDEFReaderOptions::produce_lef_labels,
+    "@brief Gets a value indicating whether lef_labels shall be produced.\n"
+    "See \\produce_via_geometry for details about the layer production rules.\n"
+    "\n"
+    "This method has been introduced in version 0.27.2\n"
+  ) +
+  gsi::method ("produce_lef_labels=", &db::LEFDEFReaderOptions::set_produce_lef_labels, gsi::arg ("produce"),
+    "@brief Sets a value indicating whether lef_labels shall be produced.\n"
+    "See \\produce_via_geometry for details about the layer production rules.\n"
+    "\n"
+    "This method has been introduced in version 0.27.2\n"
+  ) +
+  gsi::method ("lef_labels_suffix", &db::LEFDEFReaderOptions::lef_labels_suffix,
+    "@brief Gets the label layer name suffix.\n"
+    "See \\produce_via_geometry for details about the layer production rules.\n"
+    "\n"
+    "This method has been introduced in version 0.27.2\n"
+  ) +
+  gsi::method ("lef_labels_suffix=", &db::LEFDEFReaderOptions::set_lef_labels_suffix, gsi::arg ("suffix"),
+    "@brief Sets the label layer name suffix.\n"
+    "See \\produce_via_geometry for details about the layer production rules.\n"
+    "\n"
+    "This method has been introduced in version 0.27.2\n"
+  ) +
+  gsi::method ("lef_labels_datatype", &db::LEFDEFReaderOptions::lef_labels_datatype,
+    "@brief Gets the lef_labels layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules.\n"
+    "\n"
+    "This method has been introduced in version 0.27.2\n"
+  ) +
+  gsi::method ("lef_labels_datatype=", &db::LEFDEFReaderOptions::set_lef_labels_datatype, gsi::arg ("datatype"),
+    "@brief Sets the lef_labels layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules.\n"
+    "\n"
+    "This method has been introduced in version 0.27.2\n"
+  ) +
   gsi::method ("produce_routing", &db::LEFDEFReaderOptions::produce_routing,
     "@brief Gets a value indicating whether routing geometry shall be produced.\n"
     "See \\produce_via_geometry for details about the layer production rules."

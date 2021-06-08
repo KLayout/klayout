@@ -127,6 +127,8 @@ static std::string purpose_to_name (LayerPurpose purpose)
     return "VIA";
   case Label:
     return "LABEL";
+  case LEFLabel:
+    return "LEFLABEL";
   case Pins:
     return "PIN";
   case Fills:
@@ -497,6 +499,9 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_produce_labels (true),
     m_labels_suffix (".LABEL"),
     m_labels_datatype (1),
+    m_produce_lef_labels (true),
+    m_lef_labels_suffix (".LABEL"),
+    m_lef_labels_datatype (1),
     m_produce_routing (true),
     m_routing_suffix (""),
     m_routing_datatype (0),
@@ -566,6 +571,9 @@ LEFDEFReaderOptions &LEFDEFReaderOptions::operator= (const LEFDEFReaderOptions &
     m_produce_labels = d.m_produce_labels;
     m_labels_suffix = d.m_labels_suffix;
     m_labels_datatype = d.m_labels_datatype;
+    m_produce_lef_labels = d.m_produce_lef_labels;
+    m_lef_labels_suffix = d.m_lef_labels_suffix;
+    m_lef_labels_datatype = d.m_lef_labels_datatype;
     m_produce_routing = d.m_produce_routing;
     m_routing_suffix = d.m_routing_suffix;
     m_routing_suffixes = d.m_routing_suffixes;
@@ -991,23 +999,38 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
         //    "(M1/LABELS): M1.LABEL"
         //    "(M2/LABELS): M2.LABEL"
 
+        LayerPurpose label_purpose = Pins;
+
         std::vector<std::string> layer_names;
         std::vector<std::string> purposes = tl::split (w2, ",");
         for (std::vector<std::string>::const_iterator p = purposes.begin (); p != purposes.end (); ++p) {
           if (*p == "DIEAREA" || *p == "ALL" || *p == "COMP") {
             tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NAME record ignored for entity: %s")), path, ts.line_number (), *p);
           } else {
-            layer_names.push_back (tl::split (*p, "/").front ());
+            std::vector<std::string> lp = tl::split (*p, "/");
+            if (lp.size () > 1) {
+              std::map<std::string, LayerPurpose>::const_iterator i = purpose_translation.find (lp[1]);
+              if (i != purpose_translation.end ()) {
+                label_purpose = i->second;
+              }
+            }
+            layer_names.push_back (lp.front ());
           }
         }
 
-        std::string final_name = tl::join (layer_names, "/") + ".LABEL";
-        for (std::vector<std::string>::const_iterator ln = layer_names.begin (); ln != layer_names.end (); ++ln) {
-          for (std::vector<int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-            for (std::vector<int>::const_iterator d = datatypes.begin (); d != datatypes.end (); ++d) {
-              layer_map [std::make_pair (*ln, LayerDetailsKey (Label))].push_back (db::LayerProperties (*l, *d, final_name));
+        if (label_purpose == Pins || label_purpose == LEFPins) {
+
+          LayerPurpose layer_purpose = label_purpose == Pins ? Label : LEFLabel;
+
+          std::string final_name = tl::join (layer_names, "/") + "." + purpose_to_name (layer_purpose);
+          for (std::vector<std::string>::const_iterator ln = layer_names.begin (); ln != layer_names.end (); ++ln) {
+            for (std::vector<int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+              for (std::vector<int>::const_iterator d = datatypes.begin (); d != datatypes.end (); ++d) {
+                layer_map [std::make_pair (*ln, LayerDetailsKey (layer_purpose))].push_back (db::LayerProperties (*l, *d, final_name));
+              }
             }
           }
+
         }
 
       } else if (w1 == "COMP") {
@@ -1320,6 +1343,9 @@ std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout
       case Label:
         produce = mp_tech_comp->produce_labels ();
         break;
+      case LEFLabel:
+        produce = mp_tech_comp->produce_lef_labels ();
+        break;
       case Pins:
         produce = mp_tech_comp->produce_pins ();
         break;
@@ -1363,6 +1389,10 @@ std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout
       case Label:
         name_suffix = mp_tech_comp->labels_suffix ();
         dt = mp_tech_comp->labels_datatype ();
+        break;
+      case LEFLabel:
+        name_suffix = mp_tech_comp->lef_labels_suffix ();
+        dt = mp_tech_comp->lef_labels_datatype ();
         break;
       case Pins:
         name_suffix = mp_tech_comp->pins_suffix_per_mask (mask);

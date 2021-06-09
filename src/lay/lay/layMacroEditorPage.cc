@@ -1135,7 +1135,11 @@ MacroEditorPage::replace_and_find_next (const QString &replace)
 
   QTextCursor c = mp_text->textCursor ();
   if (c.hasSelection ()) {
-    c.insertText (interpolate_string (replace, m_current_search));
+    QTextBlock b = c.block ();
+    int o = std::max (0, c.position () - b.position ());
+    if (m_current_search.indexIn (b.text (), o) == o) {
+      c.insertText (interpolate_string (replace, m_current_search));
+    }
   }
 
   find_next ();

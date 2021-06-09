@@ -1720,7 +1720,13 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
       } else if (is_find_key (ke)) {
 
         QTextCursor c = mp_text->textCursor ();
-        emit search_requested (c.selectedText ());
+        if (c.selectionStart () != c.selectionEnd ()) {
+          QTextBlock s = mp_text->document ()->findBlock (c.selectionStart ());
+          QTextBlock e = mp_text->document ()->findBlock (c.selectionEnd ());
+          if (e == s) {
+            emit search_requested (c.selectedText ());
+          }
+        }
 
         return true;
 

@@ -628,30 +628,16 @@ static bool valid_element (const SyntaxHighlighterElement &e)
   return e.basic_attribute_id != lay::dsComment && e.basic_attribute_id != lay::dsString;
 }
 
-void MacroEditorPage::complete ()
+QTextCursor MacroEditorPage::get_completer_cursor (int &pos0, int &pos)
 {
   QTextCursor c = mp_text->textCursor ();
   if (c.selectionStart () != c.selectionEnd ()) {
-    return;
+    return QTextCursor ();
   }
 
+  pos = c.anchor ();
   c.select (QTextCursor::WordUnderCursor);
-  if (mp_completer_list->currentItem ()) {
-    QString s = mp_completer_list->currentItem ()->text ();
-    c.insertText (s);
-  }
-}
-
-void MacroEditorPage::fill_completer_list ()
-{
-  QTextCursor c = mp_text->textCursor ();
-  if (c.selectionStart () != c.selectionEnd ()) {
-    return;
-  }
-
-  int pos = c.anchor ();
-  c.select (QTextCursor::WordUnderCursor);
-  int pos0 = c.selectionStart ();
+  pos0 = c.selectionStart ();
 
   if (pos0 >= pos) {
     //  if there is no word before, move to left to catch one
@@ -662,31 +648,77 @@ void MacroEditorPage::fill_completer_list ()
   }
 
   if (pos0 >= pos) {
+    return QTextCursor ();
+  } else {
+    return c;
+  }
+}
+
+void MacroEditorPage::complete ()
+{
+  int pos0 = 0, pos = 0;
+  QTextCursor c = get_completer_cursor (pos0, pos);
+  if (c.isNull ()) {
+    return;
+  }
+
+  if (mp_completer_list->currentItem ()) {
+    QString s = mp_completer_list->currentItem ()->text ();
+    c.insertText (s);
+  }
+}
+
+void MacroEditorPage::fill_completer_list ()
+{
+  int pos0 = 0, pos = 0;
+  QTextCursor c = get_completer_cursor (pos0, pos);
+  if (c.isNull ()) {
     return;
   }
 
   QString ssel = c.selectedText ();
   QString s = ssel.mid (0, pos - pos0);
 
+  if (! s[0].isLetter () && s[0].toLatin1 () != '_') {
+    return;  // not a word
+  }
+
   QString text = mp_text->toPlainText ();
 
   std::set<QString> words;
 
-  int i = 0;
-  while (i >= 0) {
-    i = text.indexOf (s, i);
-    if (i >= 0) {
-      QString::iterator c = text.begin () + i;
-      QString w;
-      while (c->isLetterOrNumber () || c->toLatin1 () == '_') {
-        w += *c;
-        ++c;
-      }
-      if (! w.isEmpty () && w != s && w != ssel) {
-        words.insert (w);
-      }
-      ++i;
+  int i = -1;
+  while (true) {
+
+    i = text.indexOf (s, i + 1);
+    if (i < 0) {
+      //  no more occurance
+      break;
     }
+    if (i == pos0) {
+      //  same position than we are at currently
+      continue;
+    }
+    if (i > 0 && (text [i - 1].isLetterOrNumber () || text [i - 1].toLatin1 () == '_')) {
+      //  not at the beginning of the word
+      continue;
+    }
+
+    QString::iterator c = text.begin () + i;
+    QString w;
+    while (c->isLetterOrNumber () || c->toLatin1 () == '_') {
+      w += *c;
+      ++c;
+    }
+
+    if (w == ssel) {
+      //  the selected word is present already - assume it's the right one
+      words.clear ();
+      break;
+    } else if (! w.isEmpty () && w != s) {
+      words.insert (w);
+    }
+
   }
 
   for (std::set<QString>::const_iterator w = words.begin (); w != words.end (); ++w) {

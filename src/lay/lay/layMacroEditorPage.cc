@@ -652,6 +652,15 @@ void MacroEditorPage::fill_completer_list ()
   int pos = c.anchor ();
   c.select (QTextCursor::WordUnderCursor);
   int pos0 = c.selectionStart ();
+
+  if (pos0 >= pos) {
+    //  if there is no word before, move to left to catch one
+    c = mp_text->textCursor ();
+    c.movePosition (QTextCursor::WordLeft, QTextCursor::KeepAnchor);
+    pos = c.anchor ();
+    pos0 = c.selectionStart ();
+  }
+
   if (pos0 >= pos) {
     return;
   }

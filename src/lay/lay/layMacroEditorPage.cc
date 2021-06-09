@@ -1150,10 +1150,21 @@ MacroEditorPage::replace_all (const QString &replace)
 
   const QTextDocument *doc = mp_text->document ();
 
+  QTextBlock bs = doc->begin (), be = doc->end ();
+
   QTextCursor c = mp_text->textCursor ();
+  if (c.hasSelection ()) {
+    QTextBlock s = mp_text->document ()->findBlock (mp_text->textCursor ().selectionStart ());
+    QTextBlock e = mp_text->document ()->findBlock (mp_text->textCursor ().selectionEnd ());
+    if (e != s) {
+      bs = s;
+      be = e;
+    }
+  }
+
   c.beginEditBlock ();
 
-  for (QTextBlock b = doc->begin(); b != doc->end(); b = b.next()) {
+  for (QTextBlock b = bs; b != be; b = b.next()) {
 
     int o = 0;
 

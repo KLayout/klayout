@@ -522,7 +522,7 @@ TEST(113_masks_1)
     "'M0PO.SPNET:2' : 'M0PO.SPNET:2' (1/201)\n"
     "'M0PO.VIA:1' : 'M0PO.VIA:1' (1/102)\n"
     "'M0PO.VIA:2' : 'M0PO.VIA:2' (1/202)\n"
-    "M0PO.LABEL : M0PO.LABEL (1/1)\n"
+    "M0PO.LABEL;M0PO.LEFLABEL : 'M0PO.LABEL/M0PO.LEFLABEL' (1/1)\n"
     "'M1.NET:1' : 'M1.NET:1' (3/100)\n"
     "'M1.NET:2' : 'M1.NET:2' (3/200)\n"
     "M1.PIN : M1.PIN (3/2)\n"
@@ -532,7 +532,7 @@ TEST(113_masks_1)
     "'M1.SPNET:2' : 'M1.SPNET:2' (3/201)\n"
     "'M1.VIA:1' : 'M1.VIA:1' (3/102)\n"
     "'M1.VIA:2' : 'M1.VIA:2' (3/202)\n"
-    "M1.LABEL : M1.LABEL (3/1)\n"
+    "M1.LABEL;M1.LEFLABEL : 'M1.LABEL/M1.LEFLABEL' (3/1)\n"
     "'VIA0.NET:1' : 'VIA0.NET:1' (2/100)\n"
     "'VIA0.NET:2' : 'VIA0.NET:2' (2/200)\n"
     "VIA0.PIN : VIA0.PIN (2/2)\n"
@@ -542,7 +542,7 @@ TEST(113_masks_1)
     "'VIA0.SPNET:2' : 'VIA0.SPNET:2' (2/201)\n"
     "'VIA0.VIA:1' : 'VIA0.VIA:1' (2/102)\n"
     "'VIA0.VIA:2' : 'VIA0.VIA:2' (2/202)\n"
-    "VIA0.LABEL : VIA0.LABEL (2/1)\n"
+    "VIA0.LABEL;VIA0.LEFLABEL : 'VIA0.LABEL/VIA0.LEFLABEL' (2/1)\n"
   )
 }
 

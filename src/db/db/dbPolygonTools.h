@@ -130,9 +130,9 @@ template <class PolygonType>
 void DB_PUBLIC split_polygon (const PolygonType &polygon, std::vector<PolygonType> &output);
 
 /**
- *  @brief Determines wheter a polygon and a box interact
+ *  @brief Determines whether a polygon and a box interact
  *
- *  This function determines wheter the polygon and the box share at least on common point
+ *  This function determines whether the polygon and the box share at least on common point
  *  and returns true in this case.
  */
 template<class Polygon, class Box>
@@ -649,22 +649,22 @@ private:
 bool DB_PUBLIC rasterize (const db::Polygon &polygon, db::AreaMap &am);
 
 /**
- *  @brief Minkowsky sum of an edge and a polygon
+ *  @brief Minkowski sum of an edge and a polygon
  */
 db::Polygon DB_PUBLIC minkowsky_sum (const db::Polygon &a, const db::Edge &b, bool resolve_holes = false);
 
 /**
- *  @brief Minkowsky sum of a polygon and a polygon
+ *  @brief Minkowski sum of a polygon and a polygon
  */
 db::Polygon DB_PUBLIC minkowsky_sum (const db::Polygon &a, const db::Polygon &b, bool resolve_holes = false);
 
 /**
- *  @brief Minkowsky sum of a polygon and a box
+ *  @brief Minkowski sum of a polygon and a box
  */
 db::Polygon DB_PUBLIC minkowsky_sum (const db::Polygon &a, const db::Box &b, bool resolve_holes = false);
 
 /**
- *  @brief Minkowsky sum of a polygon and a contour
+ *  @brief Minkowski sum of a polygon and a contour
  */
 db::Polygon DB_PUBLIC minkowsky_sum (const db::Polygon &a, const std::vector<db::Point> &c, bool resolve_holes = false);
 
@@ -688,7 +688,7 @@ db::SimplePolygon DB_PUBLIC polygon_to_simple_polygon (const db::Polygon &a);
  *  This mode controls how the polygon is being cut to take off parts.
  *  "PO_any" will deliver a "best" cut. "PO_horizontal" will only apply
  *  horizontal cuts, "PO_vertical" only vertical ones. "PO_htrapezoids" will
- *  apply horizontal cuts to favor horizontal trapzoids. "PO_vtrapezoids"
+ *  apply horizontal cuts to favor horizontal trapezoids. "PO_vtrapezoids"
  *  will favor vertical trapezoids.
  */
 enum PreferredOrientation
@@ -746,7 +746,7 @@ bool DB_PUBLIC is_convex (const db::SimplePolygon &poly);
 /**
  *  @brief Decomposes the given polygon into trapezoids
  *
- *  @param horizontal If true, delivers htrapzeoid objects, otherwise vtrapezoids
+ *  @param horizontal If true, delivers htrapezoid objects, otherwise vtrapezoids
  *
  *  The resulting single polygons will be sent to the sink. Only "put" events will be
  *  generated on the sink.

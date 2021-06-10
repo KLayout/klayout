@@ -432,7 +432,7 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
     "The \"pull_...\" method is similar to \"select_...\" but works the opposite way: it "
     "selects shapes from the argument region rather than self. In a deep (hierarchical) context "
     "the output region will be hierarchically aligned with self, so the \"pull_...\" method "
-    "provide a way for rehierarchisation.\n"
+    "provide a way for re-hierarchization.\n"
     "\n"
     "@return The region after the polygons have been selected (from other)\n"
     "\n"

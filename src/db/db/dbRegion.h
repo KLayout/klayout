@@ -854,7 +854,7 @@ public:
    *  @brief Scales and grid-snaps the region
    *
    *  This method will scale the region by mx/dx in horizontal and by my/dy in vertical
-   *  direction and then snape to gx and gy respectively.
+   *  direction and then snap to gx and gy respectively.
    */
   void scale_and_snap (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy);
 
@@ -1097,7 +1097,7 @@ public:
   }
 
   /**
-   *  @brief Selects all polygons of this region which are completly outside polygons from the other region
+   *  @brief Selects all polygons of this region which are completely outside polygons from the other region
    *
    *  Merged semantics applies.
    */
@@ -1108,7 +1108,7 @@ public:
   }
 
   /**
-   *  @brief Selects all polygons of this region which are not completly outside polygons from the other region
+   *  @brief Selects all polygons of this region which are not completely outside polygons from the other region
    *
    *  Merged semantics applies.
    */
@@ -1119,7 +1119,7 @@ public:
   }
 
   /**
-   *  @brief Returns all polygons of this which are completly outside polygons from the other region
+   *  @brief Returns all polygons of this which are completely outside polygons from the other region
    *
    *  This method is an out-of-place version of select_outside.
    *
@@ -1131,7 +1131,7 @@ public:
   }
 
   /**
-   *  @brief Returns all polygons of this which are not completly outside polygons from the other region
+   *  @brief Returns all polygons of this which are not completely outside polygons from the other region
    *
    *  This method is an out-of-place version of select_not_outside.
    *
@@ -1143,7 +1143,7 @@ public:
   }
 
   /**
-   *  @brief Returns all polygons of this which are completly outside polygons from the other region and the opposite ones at the same time
+   *  @brief Returns all polygons of this which are completely outside polygons from the other region and the opposite ones at the same time
    *
    *  This method is equivalent to calling selected_outside and selected_not_outside, but faster.
    *
@@ -1156,7 +1156,7 @@ public:
   }
 
   /**
-   *  @brief Selects all polygons of this region which are completly inside polygons from the other region
+   *  @brief Selects all polygons of this region which are completely inside polygons from the other region
    *
    *  Merged semantics applies.
    */
@@ -1167,7 +1167,7 @@ public:
   }
 
   /**
-   *  @brief Selects all polygons of this region which are not completly inside polygons from the other region
+   *  @brief Selects all polygons of this region which are not completely inside polygons from the other region
    *
    *  Merged semantics applies.
    */
@@ -1178,7 +1178,7 @@ public:
   }
 
   /**
-   *  @brief Returns all polygons of this which are completly inside polygons from the other region
+   *  @brief Returns all polygons of this which are completely inside polygons from the other region
    *
    *  This method is an out-of-place version of select_inside.
    *
@@ -1190,7 +1190,7 @@ public:
   }
 
   /**
-   *  @brief Returns all polygons of this which are not completly inside polygons from the other region
+   *  @brief Returns all polygons of this which are not completely inside polygons from the other region
    *
    *  This method is an out-of-place version of select_not_inside.
    *
@@ -1202,7 +1202,7 @@ public:
   }
 
   /**
-   *  @brief Returns all polygons of this which are completly inside polygons from the other region and the opposite ones at the same time
+   *  @brief Returns all polygons of this which are completely inside polygons from the other region and the opposite ones at the same time
    *
    *  This method is equivalent to calling selected_inside and selected_not_inside, but faster.
    *
@@ -1261,7 +1261,7 @@ public:
   }
 
   /**
-   *  @brief Returns all polygons of this which are completly enclosing polygons from the other region and the opposite ones at the same time
+   *  @brief Returns all polygons of this which are completely enclosing polygons from the other region and the opposite ones at the same time
    *
    *  This method is equivalent to calling selected_enclosing and selected_not_enclosing, but faster.
    *
@@ -1617,7 +1617,7 @@ public:
   Region rounded_corners (double rinner, double router, unsigned int n) const;
 
   /**
-   *  @brief Smoothes the region (in-place)
+   *  @brief Smooths the region (in-place)
    */
   void smooth (coord_type d, bool keep_hv);
 

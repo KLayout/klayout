@@ -862,7 +862,7 @@ public:
   }
 
   /**
-   *  @brief Variant of the antennna check not using the perimeter
+   *  @brief Variant of the antenna check not using the perimeter
    *  This version uses 0 for the perimeter factor hence not taking into account the perimeter at all.
    */
   db::Region antenna_check (const db::Region &gate, const db::Region &metal, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > ())

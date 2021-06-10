@@ -351,7 +351,7 @@ struct coord_traits
 };
 
 /** 
- *  @brief Coord_traits specialisation for 32 bit coordinates 
+ *  @brief Coord_traits specialization for 32 bit coordinates 
  */
 template <>
 struct coord_traits<int32_t>
@@ -360,7 +360,7 @@ struct coord_traits<int32_t>
 };
 
 /** 
- *  @brief Coord_traits specialisation for 16 bit coordinates 
+ *  @brief Coord_traits specialization for 16 bit coordinates 
  */
 template <>
 struct coord_traits<int16_t>
@@ -370,7 +370,7 @@ struct coord_traits<int16_t>
 
 #if defined(HAVE_64BIT_COORD)
 /** 
- *  @brief Coord_traits specialisation for 64 bit coordinates 
+ *  @brief Coord_traits specialization for 64 bit coordinates 
  */
 template <>
 struct coord_traits<int64_t>
@@ -380,7 +380,7 @@ struct coord_traits<int64_t>
 #endif
 
 /** 
- *  @brief Coord_traits specialisation for double coordinates 
+ *  @brief Coord_traits specialization for double coordinates 
  *
  *  The precision is chosen such that the double coordinate
  *  can represent "micrometers" with a physical resolution limit of 0.01 nm.
@@ -557,7 +557,7 @@ struct epsilon_f
 };
 
 /**
- *  @brief And the specialisation of epsilon_f for double 
+ *  @brief And the specialization of epsilon_f for double 
  */
 template <>
 struct epsilon_f<double>
@@ -566,7 +566,7 @@ struct epsilon_f<double>
 };
 
 /**
- *  @brief And the specialisation of epsilon_f for float
+ *  @brief And the specialization of epsilon_f for float
  */
 template <>
 struct epsilon_f<float>

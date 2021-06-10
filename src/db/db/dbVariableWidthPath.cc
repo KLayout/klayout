@@ -199,7 +199,7 @@ void create_shifted_points (C /*c*/, bool forward, Iter from, Iter to, WIter wfr
       eed *= 1.0 / eed.double_length ();
 
       //  Points in between are determined from taking two
-      //  edges being shifted perpendicular from the orginal
+      //  edges being shifted perpendicular from the original
       //  and being slightly extended. The intersection point
       //  of both gives the new vertex. If there is no intersection,
       //  the edges are simply connected.
@@ -259,7 +259,7 @@ void create_shifted_points (C /*c*/, bool forward, Iter from, Iter to, WIter wfr
             //  Segments are too short - the won't intersect: In this case we create a loop of three
             //  points which define the area in self-overlapping way but confined to the path within
             //  the limits of it's width.
-            //  HINT: the execution of this code is a pretty strong evidence for the existance to loops
+            //  HINT: the execution of this code is a pretty strong evidence for the existence to loops
             //  in the contour delivered. A proof however is missing ..
             *pts++ = *pp + vector<C> (nd2);
             *pts++ = *pp;

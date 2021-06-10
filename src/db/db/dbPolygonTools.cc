@@ -1888,7 +1888,7 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
 }
 
 // -------------------------------------------------------------------------
-//  Implementation of minkowsky_sum
+//  Implementation of Minkowski sum
 
 /**
  *  @brief A helper class that produces edges into an EdgeProcessor from a sequence of points
@@ -1939,7 +1939,7 @@ private:
 };
 
 /**
- *  @brief Produce edges for the partial Minkowsky sum of an edge with an input polygon
+ *  @brief Produce edges for the partial Minkowski sum of an edge with an input polygon
  */
 static void
 ms_production (const db::Polygon &a, const db::Point &p1, const db::Point &p2, db::EdgeProcessor &ep)

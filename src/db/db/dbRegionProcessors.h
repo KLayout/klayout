@@ -406,7 +406,7 @@ private:
 };
 
 /**
- *  @brief Computes the Minkowsky sum between the polygons and the given object
+ *  @brief Computes the Minkowski sum between the polygons and the given object
  *  The object can be Edge, Polygon, Box and std::vector<Point>
  */
 template <class K>

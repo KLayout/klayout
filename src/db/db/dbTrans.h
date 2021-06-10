@@ -2561,7 +2561,7 @@ typedef complex_trans<db::Coord, db::DCoord> CplxTrans;
  *  @brief Specialization: concatenation of CplxTrans
  *
  *  The combination of two of these objects is basically not allowed, since the
- *  output and input types in not compatible. For sake of similicity however, we
+ *  output and input types in not compatible. For sake of simplicity however, we
  *  allow this now.
  */
 inline CplxTrans operator* (const CplxTrans &a, const CplxTrans &b)
@@ -2578,7 +2578,7 @@ typedef complex_trans<db::DCoord, db::Coord> VCplxTrans;
  *  @brief Specialization: concatenation of VCplxTrans
  *
  *  The combination of two of these objects is basically not allowed, since the
- *  output and input types in not compatible. For sake of similicity however, we
+ *  output and input types in not compatible. For sake of simplicity however, we
  *  allow this now.
  */
 inline VCplxTrans operator* (const VCplxTrans &a, const VCplxTrans &b)

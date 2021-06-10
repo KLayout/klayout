@@ -369,7 +369,7 @@ namespace gsi
     "lm.mmap(\"1/17\", 1)\n"
     "@/code\n"
     "\n"
-    "'unmapping' allows removing a mapping. This allows creating 'holes' in mapping ranges. The followin example maps "
+    "'unmapping' allows removing a mapping. This allows creating 'holes' in mapping ranges. The following example maps "
     "layer 1, datatypes 0 to 16 and 18 to 255 to logical layer 0:"
     "\n"
     "@code"

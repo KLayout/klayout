@@ -463,7 +463,7 @@ private:
 };
 
 /**
- *  @brief A helper class for shape generalisation
+ *  @brief A helper class for shape generalization
  *
  *  This class serves first as a RTTI token for the 
  *  various shape-specific layer implementations and 
@@ -1569,7 +1569,7 @@ private:
   template <class Trans>
   shape_type do_insert (const shape_type &shape, const Trans &trans, tl::func_delegate_base <db::properties_id_type> &pm);
 
-  //  The insert delegate, specialisation for unit_trans
+  //  The insert delegate, specialization for unit_trans
   shape_type do_insert (const shape_type &shape, const unit_trans_type &trans, tl::func_delegate_base <db::properties_id_type> &pm);
 
   template <class Sh>

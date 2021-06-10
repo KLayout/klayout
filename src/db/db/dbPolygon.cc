@@ -130,7 +130,7 @@ compute_normals (const db::vector<C> &d, C dx, C dy, int nsign, db::DVector &ed,
 
 /**
  *  @brief Provides a special DVector vprod sign for the purpose of representing integer-coordinate vectors
- *  The "zero" criterion is somewhat tigher than that of the normal integer value vectors.
+ *  The "zero" criterion is somewhat tighter than that of the normal integer value vectors.
  *  Hence, parallelity is somewhat more strict which makes the size function produce a
  *  better approximation to the desired target contour.
  */
@@ -158,7 +158,7 @@ vprod_sign_for (const db::DVector &a, const db::DVector &b, const db::DVector &)
 
 /**
  *  @brief Provides a special DVector sprod sign for the purpose of representing integer-coordinate vectors
- *  The "zero" criterion is somewhat tigher than that of the normal integer value vectors.
+ *  The "zero" criterion is somewhat tighter than that of the normal integer value vectors.
  *  Hence, orthogonality is somewhat more strict which makes the size function produce a
  *  better approximation to the desired target contour.
  */

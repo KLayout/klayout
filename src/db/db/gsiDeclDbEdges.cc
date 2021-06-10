@@ -801,7 +801,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "without merging, the + operator is more efficient."
   ) + 
   method ("\\|=", &db::Edges::operator|=, gsi::arg ("other"),
-    "@brief Performs the boolean OR between self and the other redge set\n"
+    "@brief Performs the boolean OR between self and the other edge set\n"
     "\n"
     "@return The edge collection after modification (self)\n"
     "\n"
@@ -893,7 +893,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "The \"pull_...\" methods are similar to \"select_...\" but work the opposite way: they "
     "select shapes from the argument region rather than self. In a deep (hierarchical) context "
     "the output region will be hierarchically aligned with self, so the \"pull_...\" methods "
-    "provide a way for rehierarchisation.\n"
+    "provide a way for re-hierarchization.\n"
     "\n"
     "@return The region after the polygons have been selected (from other)\n"
     "\n"

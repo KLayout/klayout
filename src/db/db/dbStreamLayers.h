@@ -612,7 +612,7 @@ public:
    *  @brief Read a layer mapping from a one-entry-per-line file format
    *
    *  The format is one expression per line (see map_expr):
-   *    <exp> [#commment|//comment]
+   *    <exp> [#comment|//comment]
    *  The layer indexes are assigned incrementally starting with 0.
    *  Use "prepare" to assign real indexes for an existing layout.
    */

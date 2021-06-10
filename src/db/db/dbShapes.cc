@@ -113,7 +113,7 @@ layer_op<Sh, StableTag>::erase (Shapes *shapes)
     std::vector<typename db::layer<Sh, StableTag>::iterator> to_erase;
     to_erase.reserve (m_shapes.size ());
 
-    //  This is not quite effective but seems to be the simpliest way
+    //  This is not quite effective but seems to be the simplest way
     //  of implementing this: search for each element and erase these.
     for (typename db::layer<Sh, StableTag>::iterator lsh = shapes->begin (typename Sh::tag (), StableTag ()); lsh != shapes->end (typename Sh::tag (), StableTag ()); ++lsh) {
       typename std::vector<Sh>::const_iterator s = std::lower_bound (s_begin, s_end, *lsh);

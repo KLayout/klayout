@@ -457,7 +457,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
         for (std::multimap<size_t, db::cell_index_type>::const_iterator bb = b; bb != cm_b.end () && bb->first == w; ++bb) {
           ++nb;
         }
-        tl::info << "Multiplity group (" << w << " instances) - " << na << " vs. " << nb << " cells";
+        tl::info << "Multiplicity group (" << w << " instances) - " << na << " vs. " << nb << " cells";
       }
 
       unsigned int g = 0;

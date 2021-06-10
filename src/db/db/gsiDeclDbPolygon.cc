@@ -639,42 +639,42 @@ Class<db::SimplePolygon> decl_SimplePolygon ("db", "SimplePolygon",
     "This method has been introduced in version 0.25."
   ) +
   method_ext ("minkowsky_sum", &sp_minkowsky_sum_pe, gsi::arg ("e"), gsi::arg ("resolve_holes"),
-    "@brief Computes the Minkowsky sum of a polygon and an edge\n"
+    "@brief Computes the Minkowski sum of a polygon and an edge\n"
     "\n"
     "@param e The edge.\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
     "\n"
-    "@return The new polygon representing the Minkowsky sum of self and e.\n"
+    "@return The new polygon representing the Minkowski sum of self and e.\n"
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
   method_ext ("minkowsky_sum", &sp_minkowsky_sum_pp, gsi::arg ("p"), gsi::arg ("resolve_holes"),
-    "@brief Computes the Minkowsky sum of a polygon and a polygon\n"
+    "@brief Computes the Minkowski sum of a polygon and a polygon\n"
     "\n"
     "@param p The other polygon.\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
     "\n"
-    "@return The new polygon representing the Minkowsky sum of self and p.\n"
+    "@return The new polygon representing the Minkowski sum of self and p.\n"
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
   method_ext ("minkowsky_sum", &sp_minkowsky_sum_pb, gsi::arg ("b"), gsi::arg ("resolve_holes"),
-    "@brief Computes the Minkowsky sum of a polygon and a box\n"
+    "@brief Computes the Minkowski sum of a polygon and a box\n"
     "\n"
     "@param b The box.\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
     "\n"
-    "@return The new polygon representing the Minkowsky sum of self and b.\n"
+    "@return The new polygon representing the Minkowski sum of self and b.\n"
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
   method_ext ("minkowsky_sum", &sp_minkowsky_sum_pc, gsi::arg ("c"), gsi::arg ("resolve_holes"),
-    "@brief Computes the Minkowsky sum of a polygon and a contour of points (a trace)\n"
+    "@brief Computes the Minkowski sum of a polygon and a contour of points (a trace)\n"
     "\n"
     "@param c The contour (a series of points forming the trace).\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
     "\n"
-    "@return The new polygon representing the Minkowsky sum of self and c.\n"
+    "@return The new polygon representing the Minkowski sum of self and c.\n"
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
@@ -1788,7 +1788,7 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "This method was introduced in version 0.22.\n"
   ) +
   method_ext ("smooth", &smooth, gsi::arg ("d"), gsi::arg ("keep_hv", false),
-    "@brief Smoothes a polygon\n"
+    "@brief Smooths a polygon\n"
     "\n"
     "Remove vertices that deviate by more than the distance d from the average contour.\n"
     "The value d is basically the roughness which is removed.\n"
@@ -1801,46 +1801,46 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "This method was introduced in version 0.23. The 'keep_hv' optional parameter was added in version 0.27.\n"
   ) +
   method_ext ("minkowsky_sum", &minkowsky_sum_pe, gsi::arg ("e"), gsi::arg ("resolve_holes"),
-    "@brief Computes the Minkowsky sum of the polygon and an edge\n"
+    "@brief Computes the Minkowski sum of the polygon and an edge\n"
     "\n"
     "@param e The edge.\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
     "\n"
-    "@return The new polygon representing the Minkowsky sum with the edge e.\n"
+    "@return The new polygon representing the Minkowski sum with the edge e.\n"
     "\n"
-    "The Minkowsky sum of a polygon and an edge basically results in the area covered when "
+    "The Minkowski sum of a polygon and an edge basically results in the area covered when "
     "\"dragging\" the polygon along the line given by the edge. The effect is similar to drawing the line "
     "with a pencil that has the shape of the given polygon.\n"
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
   method_ext ("minkowsky_sum", &minkowsky_sum_pp, gsi::arg ("b"), gsi::arg ("resolve_holes"),
-    "@brief Computes the Minkowsky sum of the polygon and a polygon\n"
+    "@brief Computes the Minkowski sum of the polygon and a polygon\n"
     "\n"
     "@param p The first argument.\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
     "\n"
-    "@return The new polygon representing the Minkowsky sum of self and p.\n"
+    "@return The new polygon representing the Minkowski sum of self and p.\n"
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
   method_ext ("minkowsky_sum", &minkowsky_sum_pb, gsi::arg ("b"), gsi::arg ("resolve_holes"),
-    "@brief Computes the Minkowsky sum of the polygon and a box\n"
+    "@brief Computes the Minkowski sum of the polygon and a box\n"
     "\n"
     "@param b The box.\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
     "\n"
-    "@return The new polygon representing the Minkowsky sum of self and the box.\n"
+    "@return The new polygon representing the Minkowski sum of self and the box.\n"
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
   method_ext ("minkowsky_sum", &minkowsky_sum_pc, gsi::arg ("b"), gsi::arg ("resolve_holes"),
-    "@brief Computes the Minkowsky sum of the polygon and a contour of points (a trace)\n"
+    "@brief Computes the Minkowski sum of the polygon and a contour of points (a trace)\n"
     "\n"
     "@param b The contour (a series of points forming the trace).\n"
     "@param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.\n"
     "\n"
-    "@return The new polygon representing the Minkowsky sum of self and the contour.\n"
+    "@return The new polygon representing the Minkowski sum of self and the contour.\n"
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +

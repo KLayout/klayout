@@ -325,7 +325,7 @@ public:
    *  @brief Sets up the extractor
    *
    *  This method is supposed to set up the device extractor. This involves two basic steps:
-   *  defining the device classe and setting up the device layers.
+   *  defining the device classes and setting up the device layers.
    *
    *  Use "register_device_class" to register the device class you need.
    *

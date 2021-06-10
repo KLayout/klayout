@@ -1079,7 +1079,7 @@ LayoutToNetlist::build_nets (const std::vector<const db::Net *> *nets, const db:
 
     for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
 
-      //  exlude local nets in recursive mode except if they are explicitly selected
+      //  exclude local nets in recursive mode except if they are explicitly selected
       if (! nets && hier_mode != BNH_Disconnected && ! is_top_circuit && n->pin_count () > 0) {
         continue;
       }

@@ -368,7 +368,7 @@ public:
  *  @brief A helper class allowing delivery of addressable edges
  *
  *  In some applications (i.e. box scanner), shapes need to be taken
- *  by address. An iterator cannot always deliver adressable objects.
+ *  by address. An iterator cannot always deliver addressable objects.
  *  This class help providing this ability by keeping a temporary copy
  *  if required.
  */

@@ -147,7 +147,7 @@ InstOp<Inst, ET>::erase (Instances *insts)
     std::vector<bool> done;
     done.resize (m_insts.size (), false);
 
-    //  This is not quite effective but seems to be the simpliest way
+    //  This is not quite effective but seems to be the simplest way
     //  of implementing this: search for each element and erase these.
     //  The alternative would be to store the iterator along with the object.
     std::vector<typename tree_type::const_iterator> to_erase;

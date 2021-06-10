@@ -239,7 +239,7 @@ SaveLayoutOptions::get_valid_layers (const db::Layout &layout, std::vector <std:
 
   if (m_all_layers) {
 
-    //  collect all layers if neccessary
+    //  collect all layers if necessary
     for (unsigned int l = 0; l < layout.layers (); ++l) {
       if (layout.is_valid_layer (l)) {
         const db::LayerProperties &prop = layout.get_properties (l);

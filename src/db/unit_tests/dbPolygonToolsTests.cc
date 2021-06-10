@@ -1094,27 +1094,27 @@ TEST(41)
   db::Polygon p;
   p.assign_hull (&pattern[0], &pattern[0] + sizeof (pattern) / sizeof (pattern[0]));
 
-  db::Polygon pout = minkowsky_sum (p, db::Edge (db::Point (10, 10), db::Point (210, 110)), true);
+  db::Polygon pout = minkowski_sum (p, db::Edge (db::Point (10, 10), db::Point (210, 110)), true);
 
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-40;-90,-65;10,110;210,210;260,160;310,185;310,60)");
 
-  pout = minkowsky_sum (p, db::Edge (db::Point (10, 10), db::Point (10, 110)), true);
+  pout = minkowski_sum (p, db::Edge (db::Point (10, 10), db::Point (10, 110)), true);
 
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-40;-90,-65;-90,35;10,210;60,160;110,185;110,-40)");
 
-  pout = minkowsky_sum (p, db::Edge (db::Point (10, 110), db::Point (10, 10)), true);
+  pout = minkowski_sum (p, db::Edge (db::Point (10, 110), db::Point (10, 10)), true);
 
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-40;-90,-65;-90,35;10,210;60,160;110,185;110,-40)");
 
-  pout = minkowsky_sum (p, db::Edge (db::Point (10, 10), db::Point (210, 10)), true);
+  pout = minkowski_sum (p, db::Edge (db::Point (10, 10), db::Point (210, 10)), true);
 
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-65;-90,-65;10,110;210,110;235,85;310,85;310,-40;210,-90)");
 
-  pout = minkowsky_sum (p, db::Edge (db::Point (210, 10), db::Point (10, 10)), true);
+  pout = minkowski_sum (p, db::Edge (db::Point (210, 10), db::Point (10, 10)), true);
 
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-65;-90,-65;10,110;210,110;235,85;310,85;310,-40;210,-90)");
 
-  pout = minkowsky_sum (p, db::Edge (db::Point (10, 10), db::Point (210, -90)), true);
+  pout = minkowski_sum (p, db::Edge (db::Point (10, 10), db::Point (210, -90)), true);
 
   EXPECT_EQ (pout.to_string (), "(210,-190;143,-157;110,-165;-90,-65;10,110;85,72;110,85;310,-15;310,-140)");
 
@@ -1125,7 +1125,7 @@ TEST(41)
   c.push_back (db::Point (210, 10));
   c.push_back (db::Point (10, 10));
 
-  pout = minkowsky_sum (p, c, true);
+  pout = minkowski_sum (p, c, true);
 
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-65;-90,-65;-90,35;10,210;210,210;235,185;310,185;310,-40;210,-90)");
 
@@ -1136,7 +1136,7 @@ TEST(41)
   c.push_back (db::Point (510, 10));
   c.push_back (db::Point (10, 10));
 
-  pout = minkowsky_sum (p, c, true);
+  pout = minkowski_sum (p, c, true);
 
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-65;-90,-65;-90,210;110,210;110,110;410,110;410,210;-90,210;-90,235;10,410;510,410;535,385;610,385;610,-40;510,-90)");
 
@@ -1144,7 +1144,7 @@ TEST(41)
   EXPECT_EQ (db::resolve_holes (pout).to_string (), "(10,-90;10,-65;-90,-65;-90,210;110,210;110,110;410,110;410,210;-90,210;-90,235;10,410;510,410;535,385;610,385;610,-40;510,-90)");
   EXPECT_EQ (db::polygon_to_simple_polygon (pout).to_string (), "(10,-90;10,-65;-90,-65;-90,210;110,210;110,110;410,110;410,210;-90,210;-90,235;10,410;510,410;535,385;610,385;610,-40;510,-90)");
 
-  pout = minkowsky_sum (p, c, false);
+  pout = minkowski_sum (p, c, false);
 
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-65;-90,-65;-90,235;10,410;510,410;535,385;610,385;610,-40;510,-90/110,110;410,110;410,210;110,210)");
 
@@ -1153,11 +1153,11 @@ TEST(41)
   EXPECT_EQ (db::polygon_to_simple_polygon (pout).to_string (), "(10,-90;10,-65;-90,-65;-90,210;110,210;110,110;410,110;410,210;-90,210;-90,235;10,410;510,410;535,385;610,385;610,-40;510,-90)");
   EXPECT_EQ (db::simple_polygon_to_polygon (db::polygon_to_simple_polygon (pout)).to_string (), "(10,-90;10,-65;-90,-65;-90,210;110,210;110,110;410,110;410,210;-90,210;-90,235;10,410;510,410;535,385;610,385;610,-40;510,-90)");
 
-  pout = minkowsky_sum (p, db::Box (db::Point (10, 10), db::Point (210, 110)), true);
+  pout = minkowski_sum (p, db::Box (db::Point (10, 10), db::Point (210, 110)), true);
 
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-65;-90,-65;-90,35;10,210;210,210;235,185;310,185;310,-40;210,-90)");
 
-  pout = minkowsky_sum (p, db::Box (db::Point (10, 10), db::Point (510, 310)), false);
+  pout = minkowski_sum (p, db::Box (db::Point (10, 10), db::Point (510, 310)), false);
 
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-65;-90,-65;-90,235;10,410;510,410;535,385;610,385;610,-40;510,-90)");
 }
@@ -1191,15 +1191,15 @@ TEST(42)
 
   p.insert_hole (&hole[0], &hole[0] + sizeof (hole) / sizeof (hole[0]));
   
-  db::Polygon pout = minkowsky_sum (p, db::Edge (db::Point (10, 10), db::Point (30, 10)), true);
+  db::Polygon pout = minkowski_sum (p, db::Edge (db::Point (10, 10), db::Point (30, 10)), true);
 
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-45;-70,-65;-90,-65;-15,65;27,65;-27,-29;25,-16;45,-16;50,-20;50,-47;90,-27;90,43;76,36;56,36;27,65;-15,65;-8,78;10,110;30,110;73,67;110,85;130,85;130,-40;30,-90)");
 
-  pout = minkowsky_sum (p, db::Edge (db::Point (10, 10), db::Point (110, 110)), true);
+  pout = minkowski_sum (p, db::Edge (db::Point (10, 10), db::Point (110, 110)), true);
 
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-40;-90,-65;-8,78;10,110;110,210;160,160;210,185;210,60;110,-40)");
 
-  pout = minkowsky_sum (p, db::Edge (db::Point (10, 10), db::Point (50, 10)), true);
+  pout = minkowski_sum (p, db::Edge (db::Point (10, 10), db::Point (50, 10)), true);
 
   EXPECT_EQ (pout.to_string (), "(10,-90;10,-50;-50,-65;-90,-65;-23,52;40,52;-3,-23;25,-16;65,-16;70,-20;70,-37;90,-27;90,36;56,36;40,52;-23,52;-8,78;10,110;50,110;87,73;110,85;150,85;150,-40;50,-90)");
 }

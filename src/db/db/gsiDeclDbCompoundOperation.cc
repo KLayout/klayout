@@ -289,28 +289,28 @@ static db::CompoundRegionOperationNode *new_merged (db::CompoundRegionOperationN
   return new db::CompoundRegionMergeOperationNode (min_coherence, min_wc, input);
 }
 
-static db::CompoundRegionOperationNode *new_minkowsky_sum_node1 (db::CompoundRegionOperationNode *input, const db::Edge &e)
+static db::CompoundRegionOperationNode *new_minkowski_sum_node1 (db::CompoundRegionOperationNode *input, const db::Edge &e)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionProcessingOperationNode (new db::minkowsky_sum_computation<db::Edge> (e), input, true /*processor is owned*/);
+  return new db::CompoundRegionProcessingOperationNode (new db::minkowski_sum_computation<db::Edge> (e), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_minkowsky_sum_node2 (db::CompoundRegionOperationNode *input, const db::Polygon &p)
+static db::CompoundRegionOperationNode *new_minkowski_sum_node2 (db::CompoundRegionOperationNode *input, const db::Polygon &p)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionProcessingOperationNode (new db::minkowsky_sum_computation<db::Polygon> (p), input, true /*processor is owned*/);
+  return new db::CompoundRegionProcessingOperationNode (new db::minkowski_sum_computation<db::Polygon> (p), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_minkowsky_sum_node3 (db::CompoundRegionOperationNode *input, const db::Box &p)
+static db::CompoundRegionOperationNode *new_minkowski_sum_node3 (db::CompoundRegionOperationNode *input, const db::Box &p)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionProcessingOperationNode (new db::minkowsky_sum_computation<db::Box> (p), input, true /*processor is owned*/);
+  return new db::CompoundRegionProcessingOperationNode (new db::minkowski_sum_computation<db::Box> (p), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_minkowsky_sum_node4 (db::CompoundRegionOperationNode *input, const std::vector<db::Point> &p)
+static db::CompoundRegionOperationNode *new_minkowski_sum_node4 (db::CompoundRegionOperationNode *input, const std::vector<db::Point> &p)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionProcessingOperationNode (new db::minkowsky_sum_computation<std::vector<db::Point> > (p), input, true /*processor is owned*/);
+  return new db::CompoundRegionProcessingOperationNode (new db::minkowski_sum_computation<std::vector<db::Point> > (p), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_edges (db::CompoundRegionOperationNode *input)
@@ -640,16 +640,16 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_merged", &new_merged, gsi::arg ("input"), gsi::arg ("min_coherence", false), gsi::arg ("min_wc", 0),
     "@brief Creates a node providing merged input polygons.\n"
   ) +
-  gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node1, gsi::arg ("input"), gsi::arg ("e"),
+  gsi::constructor ("new_minkowski_sum|#new_minkowsky_sum", &new_minkowski_sum_node1, gsi::arg ("input"), gsi::arg ("e"),
     "@brief Creates a node providing a Minkowski sum with an edge.\n"
   ) +
-  gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node2, gsi::arg ("input"), gsi::arg ("p"),
+  gsi::constructor ("new_minkowski_sum|#new_minkowsky_sum", &new_minkowski_sum_node2, gsi::arg ("input"), gsi::arg ("p"),
     "@brief Creates a node providing a Minkowski sum with a polygon.\n"
   ) +
-  gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node3, gsi::arg ("input"), gsi::arg ("p"),
+  gsi::constructor ("new_minkowski_sum|#new_minkowsky_sum", &new_minkowski_sum_node3, gsi::arg ("input"), gsi::arg ("p"),
     "@brief Creates a node providing a Minkowski sum with a box.\n"
   ) +
-  gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node4, gsi::arg ("input"), gsi::arg ("p"),
+  gsi::constructor ("new_minkowski_sum|#new_minkowsky_sum", &new_minkowski_sum_node4, gsi::arg ("input"), gsi::arg ("p"),
     "@brief Creates a node providing a Minkowski sum with a point sequence forming a contour.\n"
   ) +
   gsi::constructor ("new_width_check", &new_width_check, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("negative", false),

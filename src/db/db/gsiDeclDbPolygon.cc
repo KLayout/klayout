@@ -567,34 +567,34 @@ struct simple_polygon_defs
   }
 };
 
-static db::Polygon sp_minkowsky_sum_pe (const db::SimplePolygon *sp, const db::Edge &e, bool rh)
+static db::Polygon sp_minkowski_sum_pe (const db::SimplePolygon *sp, const db::Edge &e, bool rh)
 {
   db::Polygon p;
   p.assign_hull (sp->begin_hull (), sp->end_hull (), false);
-  return db::minkowsky_sum (p, e, rh);
+  return db::minkowski_sum (p, e, rh);
 }
 
-static db::Polygon sp_minkowsky_sum_pp (const db::SimplePolygon *sp, const db::SimplePolygon &spp, bool rh)
+static db::Polygon sp_minkowski_sum_pp (const db::SimplePolygon *sp, const db::SimplePolygon &spp, bool rh)
 {
   db::Polygon p;
   p.assign_hull (sp->begin_hull (), sp->end_hull (), false);
   db::Polygon pp;
   pp.assign_hull (spp.begin_hull (), spp.end_hull (), false);
-  return db::minkowsky_sum (p, pp, rh);
+  return db::minkowski_sum (p, pp, rh);
 }
 
-static db::Polygon sp_minkowsky_sum_pb (const db::SimplePolygon *sp, const db::Box &b, bool rh)
+static db::Polygon sp_minkowski_sum_pb (const db::SimplePolygon *sp, const db::Box &b, bool rh)
 {
   db::Polygon p;
   p.assign_hull (sp->begin_hull (), sp->end_hull (), false);
-  return db::minkowsky_sum (p, b, rh);
+  return db::minkowski_sum (p, b, rh);
 }
 
-static db::Polygon sp_minkowsky_sum_pc (const db::SimplePolygon *sp, const std::vector<db::Point> &c, bool rh)
+static db::Polygon sp_minkowski_sum_pc (const db::SimplePolygon *sp, const std::vector<db::Point> &c, bool rh)
 {
   db::Polygon p;
   p.assign_hull (sp->begin_hull (), sp->end_hull (), false);
-  return db::minkowsky_sum (p, c, rh);
+  return db::minkowski_sum (p, c, rh);
 }
 
 static db::DSimplePolygon *transform_cplx_sp (db::DSimplePolygon *p, const db::DCplxTrans &t)
@@ -638,7 +638,7 @@ Class<db::SimplePolygon> decl_SimplePolygon ("db", "SimplePolygon",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method_ext ("minkowsky_sum", &sp_minkowsky_sum_pe, gsi::arg ("e"), gsi::arg ("resolve_holes"),
+  method_ext ("minkowski_sum|#minkowsky_sum", &sp_minkowski_sum_pe, gsi::arg ("e"), gsi::arg ("resolve_holes"),
     "@brief Computes the Minkowski sum of a polygon and an edge\n"
     "\n"
     "@param e The edge.\n"
@@ -648,7 +648,7 @@ Class<db::SimplePolygon> decl_SimplePolygon ("db", "SimplePolygon",
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("minkowsky_sum", &sp_minkowsky_sum_pp, gsi::arg ("p"), gsi::arg ("resolve_holes"),
+  method_ext ("minkowski_sum|#minkowsky_sum", &sp_minkowski_sum_pp, gsi::arg ("p"), gsi::arg ("resolve_holes"),
     "@brief Computes the Minkowski sum of a polygon and a polygon\n"
     "\n"
     "@param p The other polygon.\n"
@@ -658,7 +658,7 @@ Class<db::SimplePolygon> decl_SimplePolygon ("db", "SimplePolygon",
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("minkowsky_sum", &sp_minkowsky_sum_pb, gsi::arg ("b"), gsi::arg ("resolve_holes"),
+  method_ext ("minkowski_sum|#minkowsky_sum", &sp_minkowski_sum_pb, gsi::arg ("b"), gsi::arg ("resolve_holes"),
     "@brief Computes the Minkowski sum of a polygon and a box\n"
     "\n"
     "@param b The box.\n"
@@ -668,7 +668,7 @@ Class<db::SimplePolygon> decl_SimplePolygon ("db", "SimplePolygon",
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("minkowsky_sum", &sp_minkowsky_sum_pc, gsi::arg ("c"), gsi::arg ("resolve_holes"),
+  method_ext ("minkowski_sum|#minkowsky_sum", &sp_minkowski_sum_pc, gsi::arg ("c"), gsi::arg ("resolve_holes"),
     "@brief Computes the Minkowski sum of a polygon and a contour of points (a trace)\n"
     "\n"
     "@param c The contour (a series of points forming the trace).\n"
@@ -1607,24 +1607,24 @@ static db::Polygon smooth (const db::Polygon *p, db::Coord d, bool keep_hv)
   return db::smooth (*p, d, keep_hv);
 }
 
-static db::Polygon minkowsky_sum_pe (const db::Polygon *p, const db::Edge &e, bool rh)
+static db::Polygon minkowski_sum_pe (const db::Polygon *p, const db::Edge &e, bool rh)
 {
-  return db::minkowsky_sum (*p, e, rh);
+  return db::minkowski_sum (*p, e, rh);
 }
 
-static db::Polygon minkowsky_sum_pp (const db::Polygon *p, const db::Polygon &pp, bool rh)
+static db::Polygon minkowski_sum_pp (const db::Polygon *p, const db::Polygon &pp, bool rh)
 {
-  return db::minkowsky_sum (*p, pp, rh);
+  return db::minkowski_sum (*p, pp, rh);
 }
 
-static db::Polygon minkowsky_sum_pb (const db::Polygon *p, const db::Box &b, bool rh)
+static db::Polygon minkowski_sum_pb (const db::Polygon *p, const db::Box &b, bool rh)
 {
-  return db::minkowsky_sum (*p, b, rh);
+  return db::minkowski_sum (*p, b, rh);
 }
 
-static db::Polygon minkowsky_sum_pc (const db::Polygon *p, const std::vector<db::Point> &c, bool rh)
+static db::Polygon minkowski_sum_pc (const db::Polygon *p, const std::vector<db::Point> &c, bool rh)
 {
-  return db::minkowsky_sum (*p, c, rh);
+  return db::minkowski_sum (*p, c, rh);
 }
 
 static db::Polygon *polygon_from_dpolygon (const db::DPolygon &p)
@@ -1800,7 +1800,7 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "\n"
     "This method was introduced in version 0.23. The 'keep_hv' optional parameter was added in version 0.27.\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pe, gsi::arg ("e"), gsi::arg ("resolve_holes"),
+  method_ext ("minkowski_sum|#minkowsky_sum", &minkowski_sum_pe, gsi::arg ("e"), gsi::arg ("resolve_holes"),
     "@brief Computes the Minkowski sum of the polygon and an edge\n"
     "\n"
     "@param e The edge.\n"
@@ -1814,7 +1814,7 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pp, gsi::arg ("b"), gsi::arg ("resolve_holes"),
+  method_ext ("minkowski_sum|#minkowsky_sum", &minkowski_sum_pp, gsi::arg ("b"), gsi::arg ("resolve_holes"),
     "@brief Computes the Minkowski sum of the polygon and a polygon\n"
     "\n"
     "@param p The first argument.\n"
@@ -1824,7 +1824,7 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pb, gsi::arg ("b"), gsi::arg ("resolve_holes"),
+  method_ext ("minkowski_sum|#minkowsky_sum", &minkowski_sum_pb, gsi::arg ("b"), gsi::arg ("resolve_holes"),
     "@brief Computes the Minkowski sum of the polygon and a box\n"
     "\n"
     "@param b The box.\n"
@@ -1834,7 +1834,7 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pc, gsi::arg ("b"), gsi::arg ("resolve_holes"),
+  method_ext ("minkowski_sum|#minkowsky_sum", &minkowski_sum_pc, gsi::arg ("b"), gsi::arg ("resolve_holes"),
     "@brief Computes the Minkowski sum of the polygon and a contour of points (a trace)\n"
     "\n"
     "@param b The contour (a series of points forming the trace).\n"

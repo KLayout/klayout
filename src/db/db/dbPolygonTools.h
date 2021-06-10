@@ -651,22 +651,22 @@ bool DB_PUBLIC rasterize (const db::Polygon &polygon, db::AreaMap &am);
 /**
  *  @brief Minkowski sum of an edge and a polygon
  */
-db::Polygon DB_PUBLIC minkowsky_sum (const db::Polygon &a, const db::Edge &b, bool resolve_holes = false);
+db::Polygon DB_PUBLIC minkowski_sum (const db::Polygon &a, const db::Edge &b, bool resolve_holes = false);
 
 /**
  *  @brief Minkowski sum of a polygon and a polygon
  */
-db::Polygon DB_PUBLIC minkowsky_sum (const db::Polygon &a, const db::Polygon &b, bool resolve_holes = false);
+db::Polygon DB_PUBLIC minkowski_sum (const db::Polygon &a, const db::Polygon &b, bool resolve_holes = false);
 
 /**
  *  @brief Minkowski sum of a polygon and a box
  */
-db::Polygon DB_PUBLIC minkowsky_sum (const db::Polygon &a, const db::Box &b, bool resolve_holes = false);
+db::Polygon DB_PUBLIC minkowski_sum (const db::Polygon &a, const db::Box &b, bool resolve_holes = false);
 
 /**
  *  @brief Minkowski sum of a polygon and a contour
  */
-db::Polygon DB_PUBLIC minkowsky_sum (const db::Polygon &a, const std::vector<db::Point> &c, bool resolve_holes = false);
+db::Polygon DB_PUBLIC minkowski_sum (const db::Polygon &a, const std::vector<db::Point> &c, bool resolve_holes = false);
 
 /**
  *  @brief Resolve holes 

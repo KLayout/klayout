@@ -423,7 +423,7 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
         db::Polygon k;
         k.assign_hull (octagon, octagon + sizeof (octagon) / sizeof (octagon[0]));
 
-        db::Polygon p = db::minkowsky_sum (k, db::Edge (*pt0, *pt));
+        db::Polygon p = db::minkowski_sum (k, db::Edge (*pt0, *pt));
         if (prop_id != 0) {
           design.shapes (layer).insert (db::object_with_properties<db::Polygon> (p, prop_id));
         } else {
@@ -439,7 +439,7 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
   } else {
 
     for (size_t i = 0; i < pts.size () - 1; ++i) {
-      db::Polygon p = db::minkowsky_sum (*style, db::Edge (pts [i], pts [i + 1]));
+      db::Polygon p = db::minkowski_sum (*style, db::Edge (pts [i], pts [i + 1]));
       if (prop_id != 0) {
         design.shapes (layer).insert (db::object_with_properties<db::Polygon> (p, prop_id));
       } else {

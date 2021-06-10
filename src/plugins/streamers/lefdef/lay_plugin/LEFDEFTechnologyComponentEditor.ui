@@ -1272,7 +1272,7 @@ suffix ...</string>
                   <item row="2" column="0">
                    <widget class="QCheckBox" name="produce_pins">
                     <property name="text">
-                     <string>Pins (*)</string>
+                     <string>DEF Pins (*)</string>
                     </property>
                    </widget>
                   </item>
@@ -1453,7 +1453,7 @@ type ...</string>
                   <item row="3" column="5">
                    <widget class="QCheckBox" name="produce_labels">
                     <property name="text">
-                     <string>Pin labels</string>
+                     <string>DEF pin labels</string>
                     </property>
                    </widget>
                   </item>

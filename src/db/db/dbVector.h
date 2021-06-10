@@ -156,7 +156,7 @@ public:
   /**
    *  @brief Assignment which also converts
    *
-   *  This assignment operator will convert the coordinate types if possibel
+   *  This assignment operator will convert the coordinate types if possible
    *
    *  @param d The source from which to take the data
    */
@@ -296,7 +296,7 @@ public:
   /**
    *  @brief Division by some divisor.
    *
-   *  Scaline involves rounding which in our case is simply handled
+   *  Scaling involves rounding which in our case is simply handled
    *  with the coord_traits scheme.
    */
 

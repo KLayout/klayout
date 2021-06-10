@@ -107,7 +107,7 @@ public:
 
   /**
    *  @brief Indicate the end of the execution
-   *  @param sucess Will be true if all tiles executed successfully
+   *  @param success Will be true if all tiles executed successfully
    */
   virtual void finish (bool /*success*/) { }
 

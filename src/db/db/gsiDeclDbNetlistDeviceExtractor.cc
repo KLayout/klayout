@@ -239,7 +239,7 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
   gsi::callback ("setup", &GenericDeviceExtractor::setup, &GenericDeviceExtractor::cb_setup,
     "@brief Sets up the extractor.\n"
     "This method is supposed to set up the device extractor. This involves three basic steps:\n"
-    "defining the name, the device classe and setting up the device layers.\n"
+    "defining the name, the device class and setting up the device layers.\n"
     "\n"
     "Use \\name= to give the extractor and it's device class a name.\n"
     "Use \\register_device_class to register the device class you need.\n"
@@ -374,7 +374,7 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
   "      The name is set using \\name=. @/li\n"
   "  @li The device class of the devices to produce. The device class is registered using \\register_device_class. @/li\n"
   "  @li The layers used for the device extraction. These are input layers for the extraction as well as "
-  "      output layers for defining the terminals. Terminals are the poins at which the nets connect to the devices.\n"
+  "      output layers for defining the terminals. Terminals are the points at which the nets connect to the devices.\n"
   "      Layers are defined using \\define_layer. Initially, layers are abstract definitions with a name and a description.\n"
   "      Concrete layers will be given when defining the connectivity. @/li\n"
   "@/ul\n"

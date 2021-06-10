@@ -609,7 +609,7 @@ public:
   /**
    *  @brief Registers a compare delegate
    *
-   *  The reasoning behind chosing a delegate is that a delegate is efficient
+   *  The reasoning behind choosing a delegate is that a delegate is efficient
    *  also in scripts if one of the standard delegates is taken.
    *
    *  The device class takes ownership of the delegate.

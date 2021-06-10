@@ -359,7 +359,7 @@ public:
   }
 
   /**
-   *  @brief Fuzzy qquality test
+   *  @brief Fuzzy equality test
    */
   bool equal (const path<C> &b) const
   {
@@ -1109,7 +1109,7 @@ typedef path_ref<Path, UnitTrans> PathPtr;
 typedef path_ref<DPath, DUnitTrans> DPathPtr;
 
 /**
- *  @brief Rounds the path by smooting the corners with a circle approximation
+ *  @brief Rounds the path by smoothing the corners with a circle approximation
  *  @param input The input path
  *  @param rad The radius applied to all corners
  *  @param npoints The number of points per full circle used for the circle approximation
@@ -1119,7 +1119,7 @@ typedef path_ref<DPath, DUnitTrans> DPathPtr;
 DB_PUBLIC DPath round_path_corners (const DPath &input, double rad, int npoints, double accuracy);
 
 /**
- *  @brief Rounds the path by smooting the corners with a circle approximation
+ *  @brief Rounds the path by smoothing the corners with a circle approximation
  *  @param input The input path
  *  @param rad The radius applied to all corners
  *  @param npoints The number of points per full circle used for the circle approximation

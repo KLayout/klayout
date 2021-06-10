@@ -101,7 +101,7 @@ public:
   /**
    *  @brief Deliver an edge set forming a closed sequence
    *
-   *  See description of "crossing_egde" for details.
+   *  See description of "crossing_edge" for details.
    */
   virtual void skip_n (size_t /*n*/) { }
 
@@ -843,7 +843,7 @@ public:
    *
    *  This method sizes a set of polygons. Before the sizing is applied, the polygons are merged. After that, sizing is applied 
    *  on the individual result polygons of the merge step. The result may contain overlapping polygons, but no self-overlapping ones. 
-   *  Polygon overlap occures if the polygons are close enough, so a positive sizing makes polygons overlap.
+   *  Polygon overlap occurs if the polygons are close enough, so a positive sizing makes polygons overlap.
    *  
    *  dx and dy describe the sizing. A positive value indicates oversize (outwards) while a negative one describes undersize (inwards).
    *  The sizing applied can be chosen differently in x and y direction. In this case, the sign must be identical for both

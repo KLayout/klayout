@@ -102,7 +102,7 @@ public:
   /**
    *  @brief Get the id for a name 
    * 
-   *  This method checks wheter the given name is present as a name and returns the 
+   *  This method checks whether the given name is present as a name and returns the 
    *  id in the second member of the pair. The first member is true, if the name is
    *  present.
    */

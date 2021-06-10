@@ -1406,7 +1406,7 @@ namespace
  *
  *  This receiver is both used for the instance-to-instance and the local-to-instance
  *  interactions. It is employed on cell level for in two box scanners: one
- *  investigating the instance-to-instance interactions and another one invesitating
+ *  investigating the instance-to-instance interactions and another one investigating
  *  local cluster to instance interactions.
  */
 template <class T>
@@ -1574,10 +1574,10 @@ private:
    *
    *  @param common The common box of both instances
    *  @param i1 The first instance to investigate
-   *  @param t1 The parent instances' culmulated transformation
+   *  @param t1 The parent instances' cumulated transformation
    *  @param i1element selects a specific instance from i1 (unless == db::CellInstArray::iterator())
-   *  @param i2 The second instance to investiage
-   *  @param t2 The parent instances' culmulated transformation
+   *  @param i2 The second instance to investigate
+   *  @param t2 The parent instances' cumulated transformation
    *  @param i2element selects a specific instance from i2 (unless == db::CellInstArray::iterator())
    *  @param interacting_clusters_out Receives the cluster interaction descriptors
    *
@@ -1606,7 +1606,7 @@ private:
       return;
     }
 
-    //  gross shortcut: the cells do no comprise a constallation which will ever interact
+    //  gross shortcut: the cells do no comprise a constellation which will ever interact
     if (! mp_conn->interact (mp_layout->cell (i1.cell_index ()), mp_layout->cell (i2.cell_index ()))) {
       return;
     }

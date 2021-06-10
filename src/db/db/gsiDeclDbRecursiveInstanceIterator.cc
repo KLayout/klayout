@@ -389,7 +389,7 @@ Class<db::RecursiveInstanceIterator> decl_RecursiveInstanceIterator ("db", "Recu
     "@brief Gets the accumulated transformation of the current instance parent cell to the top cell\n"
     "\n"
     "This transformation represents how the current instance is seen in the top cell.\n"
-    "This version returns the micon-unit transformation.\n"
+    "This version returns the micron-unit transformation.\n"
   ) +
   gsi::method ("at_end?", &db::RecursiveInstanceIterator::at_end,
     "@brief End of iterator predicate\n"

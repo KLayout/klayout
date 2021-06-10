@@ -218,7 +218,7 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
 
   if (pp == to) {
 
-    //  Special case of degenerated path with one point: treat as infinitly small segment with direction (1,0)
+    //  Special case of degenerated path with one point: treat as infinitely small segment with direction (1,0)
     db::DVector ed (forward ? 1.0 : -1.0, 0.0);
     db::DVector nd (-ed.y (), ed.x ());
     db::DVector edd, ndd;
@@ -350,7 +350,7 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
     } else {
 
       //  Points in between are determined from taking two 
-      //  edges being shifted perpendicular from the orginal
+      //  edges being shifted perpendicular from the original
       //  and being slightly extended. The intersection point
       //  of both gives the new vertex. If there is no intersection,
       //  the edges are simply connected.
@@ -384,7 +384,7 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
           //  Segments are too short - the won't intersect: In this case we create a loop of three 
           //  points which define the area in self-overlapping way but confined to the path within
           //  the limits of it's width. 
-          //  HINT: the execution of this code is a pretty strong evidence for the existance to loops 
+          //  HINT: the execution of this code is a pretty strong evidence for the existence to loops 
           //  in the contour delivered. A proof however is missing ..
           *pts++ = *pp + vector<C> (nd);
           *pts++ = *pp;
@@ -525,7 +525,7 @@ round_path_corners (const db::DPath &input, double r, int n, double accuracy)
           //  is supposed to create a centerline with roughly the
           //  same length that the ideal line and end segments which are
           //  in the direction of the tangent, so they merge smoothly with
-          //  adjancent line segments.
+          //  adjacent line segments.
           double f0 = 1.0 / 3.0;
           double nn = npts - 1.0 + 2.0 * f0;
           double ract_outer = ract / cos (f0 * ac / nn);

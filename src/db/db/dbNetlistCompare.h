@@ -291,7 +291,7 @@ public:
    *  @brief Sets a value indicating depth-first traversal
    *
    *  With depth first (the default), the algorithm looks for further identities before moving to another
-   *  node. With breadth first (false), the algorithm will work in "waves" rather than digging deerly
+   *  node. With breadth first (false), the algorithm will work in "waves" rather than digging deeply
    *  into the direction of a node.
    */
   void set_depth_first (bool df)

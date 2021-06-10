@@ -101,7 +101,7 @@ struct DB_PUBLIC_TEMPLATE box
    *
    *  As the four coordinate constructor but accepting two
    *  point objects. The coordinates are sorted so the points
-   *  do not neccessarily need to be lower/left or upper/right.
+   *  do not necessarily need to be lower/left or upper/right.
    *
    *  @param p1 The first point
    *  @param p2 The second point
@@ -337,7 +337,7 @@ struct DB_PUBLIC_TEMPLATE box
   /**
    *  @brief Reduce the box
    *
-   *  This method is mainly provided for template argument substituition
+   *  This method is mainly provided for template argument substitution
    *  of path and polygon objects by boxes. It basically moves the box.
    *
    *  @param tr Receives the transformation that must be applied to render the original box
@@ -352,7 +352,7 @@ struct DB_PUBLIC_TEMPLATE box
   /**
    *  @brief Reduce the box
    *
-   *  This method is mainly provided for template argument substituition
+   *  This method is mainly provided for template argument substitution
    *  of path and polygon objects by boxes. It basically moves the box.
    *
    *  @param tr Receives the transformation that must be applied to render the original box
@@ -367,7 +367,7 @@ struct DB_PUBLIC_TEMPLATE box
   /**
    *  @brief Reduce the box
    *
-   *  This method is mainly provided for template argument substituition
+   *  This method is mainly provided for template argument substitution
    *  of path and polygon objects by boxes. It basically does nothing (like the same methods in path etc.)
    */
   void reduce (unit_trans<coord_type> &)

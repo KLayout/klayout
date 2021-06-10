@@ -310,7 +310,7 @@ gsi::Class<db::Matrix2d> decl_Matrix2d ("db", "Matrix2d",
   "In that case, the assumed execution order of the basic transformations is "
   "mirroring at the x axis, rotation, magnification and shear.\n"
   "\n"
-  "The matrix is a generalisation of the transformations and is of limited use in a layout database context. "
+  "The matrix is a generalization of the transformations and is of limited use in a layout database context. "
   "It is useful however to implement shear transformations on polygons, edges and polygon or edge collections."
   "\n\n"
   "This class was introduced in version 0.22.\n"

@@ -1241,7 +1241,7 @@ Layout::take_cell (cell_index_type ci)
   //  Using free cell indices does have one significant drawback:
   //  The cellview references cannot be uniquely classified as being invalid - because the
   //  ID might be reused. This causes problems, when a cell is being deleted and subsequently a
-  //  cell is being created - a crash occures. Therefore the free index feature is disabled.
+  //  cell is being created - a crash occurs. Therefore the free index feature is disabled.
   //  If this causes memory consumption problems, it should be considered to use a map and
   //  an arbitrary ID.
   // m_free_cell_indices.push_back (ci);

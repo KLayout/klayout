@@ -641,16 +641,16 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
     "@brief Creates a node providing merged input polygons.\n"
   ) +
   gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node1, gsi::arg ("input"), gsi::arg ("e"),
-    "@brief Creates a node providing a Minkowsky sum with an edge.\n"
+    "@brief Creates a node providing a Minkowski sum with an edge.\n"
   ) +
   gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node2, gsi::arg ("input"), gsi::arg ("p"),
-    "@brief Creates a node providing a Minkowsky sum with a polygon.\n"
+    "@brief Creates a node providing a Minkowski sum with a polygon.\n"
   ) +
   gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node3, gsi::arg ("input"), gsi::arg ("p"),
-    "@brief Creates a node providing a Minkowsky sum with a box.\n"
+    "@brief Creates a node providing a Minkowski sum with a box.\n"
   ) +
   gsi::constructor ("new_minkowsky_sum", &new_minkowsky_sum_node4, gsi::arg ("input"), gsi::arg ("p"),
-    "@brief Creates a node providing a Minkowsky sum with a point sequence forming a contour.\n"
+    "@brief Creates a node providing a Minkowski sum with a point sequence forming a contour.\n"
   ) +
   gsi::constructor ("new_width_check", &new_width_check, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max."), gsi::arg ("shielded", true), gsi::arg ("negative", false),
     "@brief Creates a node providing a width check.\n"

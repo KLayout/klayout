@@ -299,7 +299,7 @@ struct DB_PUBLIC RecursiveShapeIteratorCompareForTargetHierarchy
  *  for the actual shapes.
  *
  *  The deep shape store provides the basis for working with deep regions. On preparation,
- *  shapes are copied into the deep shape store. After fininishing, the shapes are copied
+ *  shapes are copied into the deep shape store. After finishing, the shapes are copied
  *  back into the original layout. The deep shape store provides the methods and
  *  algorithms for doing the preparation and transfer.
  */

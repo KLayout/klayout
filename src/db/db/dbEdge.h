@@ -869,7 +869,7 @@ public:
     //    d = (a x b) / sqrt (a * a)
     //  where b = p - p1, a = p2 - p1
     if (is_degenerate ()) {
-      //  for safty handle this case - without a reasonable result
+      //  for safety handle this case - without a reasonable result
       return 0;
     } else {
       //  compute the distance as described above 
@@ -917,7 +917,7 @@ public:
     //    d = (a x b) / sqrt (a * a)
     //  where b = p - p1, a = p2 - p1
     if (is_degenerate ()) {
-      //  for safty handle this case - without a reasonable result
+      //  for safety handle this case - without a reasonable result
       return 0;
     } else {
       //  compute the side as the sign of the distance as in "distance"
@@ -940,7 +940,7 @@ public:
     //    d = (a x b) / sqrt (a * a)
     //  where b = p - p1, a = p2 - p1
     if (is_degenerate ()) {
-      //  for safty handle this case - without a reasonable result
+      //  for safety handle this case - without a reasonable result
       return 0;
     } else {
       //  compute the distance as described above 
@@ -1459,7 +1459,7 @@ inline C edge_xmax_at_yinterval (const db::edge<C> &e, C y1, C y2)
 /**
  *  @brief Functor that compares two edges by their left bound for a given interval [y1..y2].
  *
- *  This function is intended for use in scanline scenarious to determine what edges are 
+ *  This function is intended for use in scanline scenarios to determine what edges are 
  *  interacting in a certain y interval.
  */
 template <class C>

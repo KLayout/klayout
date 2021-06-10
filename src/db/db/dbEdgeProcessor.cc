@@ -712,7 +712,7 @@ InteractionDetector::edge (bool north, bool enter, property_type p)
           for (std::set <property_type>::const_iterator i = inside->begin (); i != inside->end (); ++i) {
             if (*i > m_last_primary_id) {
               if (m_mode < -1) {
-                //  enclosing mode: an opening primary (= enclosing one) whith open secondaries means the secondary
+                //  enclosing mode: an opening primary (= enclosing one) with open secondaries means the secondary
                 //  has been opened before and did not close. Because we sort by property ID this must have happened
                 //  before, hence the secondary is overlapping. Make them non-interactions. We still have to record them
                 //  as interactions because this is how we skip the primaries later.
@@ -1297,7 +1297,7 @@ inline C edge_xmax_at_yinterval_double (const db::edge<C> &e, double y1, double 
 /**
  *  @brief Functor that compares two edges by their left bound for a given interval [y1..y2].
  *
- *  This function is intended for use in scanline scenarious to determine what edges are 
+ *  This function is intended for use in scanline scenarios to determine what edges are 
  *  interacting in a certain y interval.
  */
 template <class C>
@@ -1764,7 +1764,7 @@ public:
   /**
    *  @brief A structure holding the "skip information"
    *
-   *  Skipping intervals with a known behavior is an optimization to improvee
+   *  Skipping intervals with a known behavior is an optimization to improve
    *  the scanner's performance. This object keeps the information required to
    *  properly implement the skipping. It keeps both the edge skip count per
    *  interval ("skip") as well as the corresponding skip count for the
@@ -2451,7 +2451,7 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
               ++f;
             }
 
-            //  compute edges that occure at this vertex
+            //  compute edges that occur at this vertex
             
             gs.next_vertex (x);
             
@@ -2517,7 +2517,7 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
 
               //  report the closing or opening edges in the opposite order 
               //  than the other ones (see previous loop). Hence we have some
-              //  symmetry of events which simplify implementatin of the 
+              //  symmetry of events which simplify implementation of the 
               //  InteractionDetector for example.
               do {
 

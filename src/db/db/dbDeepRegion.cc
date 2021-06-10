@@ -1804,7 +1804,7 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
   std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
-    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
     dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
     other_deep = dr_holder.get ();
   }
@@ -1844,7 +1844,7 @@ DeepRegion::selected_interacting_generic (const Edges &other, InteractingOutputM
   std::unique_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
   if (! other_deep) {
-    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
     dr_holder.reset (new db::DeepEdges (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
     other_deep = dr_holder.get ();
   }
@@ -1880,7 +1880,7 @@ DeepRegion::pull_generic (const Region &other, int mode, bool touching) const
   std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
-    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
     dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
     other_deep = dr_holder.get ();
   }
@@ -1918,7 +1918,7 @@ DeepRegion::pull_generic (const Edges &other) const
   std::unique_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
   if (! other_deep) {
-    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
     dr_holder.reset (new db::DeepEdges (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
     other_deep = dr_holder.get ();
   }
@@ -1949,7 +1949,7 @@ DeepRegion::pull_generic (const Texts &other) const
   std::unique_ptr<db::DeepTexts> dr_holder;
   const db::DeepTexts *other_deep = dynamic_cast<const db::DeepTexts *> (other.delegate ());
   if (! other_deep) {
-    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
     dr_holder.reset (new db::DeepTexts (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
     other_deep = dr_holder.get ();
   }
@@ -1984,7 +1984,7 @@ DeepRegion::selected_interacting_generic (const Texts &other, InteractingOutputM
   std::unique_ptr<db::DeepTexts> dr_holder;
   const db::DeepTexts *other_deep = dynamic_cast<const db::DeepTexts *> (other.delegate ());
   if (! other_deep) {
-    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchisation
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
     dr_holder.reset (new db::DeepTexts (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
     other_deep = dr_holder.get ();
   }

@@ -1247,7 +1247,7 @@ public:
   void register_macro_cell (const std::string &mn, LEFDEFLayoutGenerator *generator);
 
   /**
-   *  @brief Gets the macro cell for the given macro name or 0 if no such maco is registered
+   *  @brief Gets the macro cell for the given macro name or 0 if no such macro is registered
    */
   std::pair<db::Cell *, db::Trans> macro_cell (const std::string &mn, Layout &layout, const std::vector<std::string> &maskshift_layers, const std::vector<unsigned int> &masks, const MacroDesc &macro_desc, const LEFDEFNumberOfMasks *nm);
 
@@ -1427,7 +1427,7 @@ public:
 
 protected:
   /**
-   *  @brief Actually does the readong
+   *  @brief Actually does the reading
    *
    *  Reimplement that method for the LEF and DEF implementation
    */
@@ -1581,7 +1581,7 @@ protected:
   }
 
   /**
-   *  @brief Gets a flag indicating whether pinance names shall be produced as properties
+   *  @brief Gets a flag indicating whether pin names shall be produced as properties
    */
   bool produce_pin_props () const
   {
@@ -1589,7 +1589,7 @@ protected:
   }
 
   /**
-   *  @brief Gets the property name id of the pinance name property
+   *  @brief Gets the property name id of the pin name property
    */
   db::property_names_id_type pin_prop_name_id () const
   {

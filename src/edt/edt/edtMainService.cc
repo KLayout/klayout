@@ -120,7 +120,7 @@ lay::FlattenInstOptionsDialog *
 MainService::flatten_inst_options_dialog ()
 {
   if (! mp_flatten_inst_options_dialog) {
-    mp_flatten_inst_options_dialog = new lay::FlattenInstOptionsDialog (view (), false /*don't allow prunining*/);
+    mp_flatten_inst_options_dialog = new lay::FlattenInstOptionsDialog (view (), false /*don't allow pruning*/);
   }
   return mp_flatten_inst_options_dialog;
 }
@@ -196,7 +196,7 @@ class CommonInsts
 {
 public:
   CommonInsts () 
-    : m_valid (true), m_first (true), m_ambigous (false), m_cv_index (0) 
+    : m_valid (true), m_first (true), m_ambiguous (false), m_cv_index (0) 
   { 
     //  .. nothing yet ..  
   }
@@ -229,7 +229,7 @@ public:
         ++i1; ++i2;
       }
       if (i1 != m_common_inst.end ()) {
-        m_ambigous = true;
+        m_ambiguous = true;
         m_common_inst.erase (i1, m_common_inst.end ());
       }
 
@@ -251,9 +251,9 @@ public:
     return ! m_first;
   }
 
-  bool ambigous () const
+  bool ambiguous () const
   {
-    return m_ambigous && m_common_inst.empty ();
+    return m_ambiguous && m_common_inst.empty ();
   }
 
   bool empty () const
@@ -275,7 +275,7 @@ private:
   std::vector<db::InstElement> m_common_inst;
   bool m_valid;
   bool m_first;
-  bool m_ambigous;
+  bool m_ambiguous;
   unsigned int m_cv_index;
 };
 
@@ -300,7 +300,7 @@ MainService::cm_descend ()
   if (! common_inst.anything ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Select an object to determine into which instance to descend")));
   }
-  if (! common_inst.valid () || common_inst.ambigous ()) {
+  if (! common_inst.valid () || common_inst.ambiguous ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Selection is ambiguous - cannot determine into which instance to descend")));
   }
 

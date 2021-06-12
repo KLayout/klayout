@@ -53,7 +53,7 @@ namespace db
 struct GerberMetaData
 {
   /**
-   *  @brief Identfies the function of the layer
+   *  @brief Identifies the function of the layer
    */
   enum Function
   {
@@ -69,7 +69,7 @@ struct GerberMetaData
   };
 
   /**
-   *  @brief Identfies the position of the layer
+   *  @brief Identifies the position of the layer
    */
   enum Position
   {
@@ -501,7 +501,7 @@ protected:
   /**
    *  @brief This method updates the progress counter
    *
-   *  This method should be called regularily
+   *  This method should be called regularly
    */
   void progress_checkpoint ();
 

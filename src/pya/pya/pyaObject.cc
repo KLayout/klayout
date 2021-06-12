@@ -376,7 +376,7 @@ PYAObjectBase::initialize_callbacks ()
 
   PythonRef type_ref ((PyObject *) Py_TYPE (py_object ()), false /*borrowed*/);
 
-  //  Locate the callback-enabled methods set by Python tpye object (pointer)
+  //  Locate the callback-enabled methods set by Python type object (pointer)
   //  NOTE: I'm not quite sure whether the type object pointer is a good key
   //  for the cache. It may change since class objects may expire too if
   //  classes are put on the heap. Hence we have to keep a reference which is
@@ -409,7 +409,7 @@ PYAObjectBase::initialize_callbacks ()
           //  possible to reimplement a method through instance attributes (rare case, I hope).
           //  In addition, if we'd use instance attributes we create circular references 
           //  (self/callback to method, method to self).
-          //  TOOD: That may happen too often, i.e. if the Python class does not reimplement the virtual
+          //  TODO: That may happen too often, i.e. if the Python class does not reimplement the virtual
           //  method, but the C++ class defines a method hook that the reimplementation can call. 
           //  We don't want to produce a lot of overhead for the Qt classes here.
           PythonRef py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (py_object ()), nstr);
@@ -476,7 +476,7 @@ PYAObjectBase::initialize_callbacks ()
         //  possible to reimplement a method through instance attributes (rare case, I hope).
         //  In addition, if we'd use instance attributes we create circular references 
         //  (self/callback to method, method to self).
-        //  TOOD: That may happen too often, i.e. if the Python class does not reimplement the virtual
+        //  TODO: That may happen too often, i.e. if the Python class does not reimplement the virtual
         //  method, but the C++ class defines a method hook that the reimplementation can call. 
         //  We don't want to produce a lot of overhead for the Qt classes here.
         PythonRef py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (py_object ()), nstr);

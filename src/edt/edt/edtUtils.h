@@ -53,7 +53,7 @@ class Service;
 std::string pcell_parameters_to_string (const std::map<std::string, tl::Variant> &parameters);
 
 /**
- *  @brief Deerializes PCell parameters from a string
+ *  @brief Deserializes PCell parameters from a string
  */
 std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::string &s);
 

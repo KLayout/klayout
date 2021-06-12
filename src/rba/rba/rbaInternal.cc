@@ -219,7 +219,7 @@ inline void destroy_object (const gsi::ClassBase *cls, void *obj)
 
 /**
  *  @brief A GC disabler
- *  By instantiating this object, the gc is disabled while the object is alife.
+ *  By instantiating this object, the gc is disabled while the object is alive.
  *  Specifically in callbacks it's important to disable the GC to avoid undesired
  *  side effects.
  */

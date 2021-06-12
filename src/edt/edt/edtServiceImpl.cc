@@ -209,7 +209,7 @@ ShapeEditService::tap (const db::DPoint &initial)
  *  An edge is searched that emerges from p and intersects with the m->o edge in a way that the intersection
  *  point is closest to o.
  *
- *  This method returns the intersection point ("new o") and a flag if the search was sucessful (.first of return value).
+ *  This method returns the intersection point ("new o") and a flag if the search was successful (.first of return value).
  */
 std::pair <bool, db::DPoint>
 ShapeEditService::interpolate (const db::DPoint &m, const db::DPoint &o, const db::DPoint &p) const

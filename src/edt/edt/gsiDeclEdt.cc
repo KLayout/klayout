@@ -266,7 +266,7 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
   gsi::method_ext ("layer", &ip_layer,
     "@brief Gets the layer index that describes which layer the selected shape is on\n"
     "\n"
-    "Startiong with version 0.27, this method returns nil for this property if \\is_cell_inst? is false - "
+    "Starting with version 0.27, this method returns nil for this property if \\is_cell_inst? is false - "
     "i.e. the selection does not represent a shape."
   ) + 
   gsi::method ("layer=", &lay::ObjectInstPath::set_layer, gsi::arg ("layer_index"),
@@ -284,7 +284,7 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "the selection must be set in the view using \\LayoutView#object_selection= or \\LayoutView#select_object.\n"
     "\n"
     "This method delivers valid results only for object selections that represent shapes. "
-    "Startiong with version 0.27, this method returns nil for this property if \\is_cell_inst? is false."
+    "Starting with version 0.27, this method returns nil for this property if \\is_cell_inst? is false."
   ) +
   gsi::method ("shape=", &lay::ObjectInstPath::set_shape, gsi::arg ("shape"),
     "@brief Sets the shape object that describes the selected shape geometrically\n"

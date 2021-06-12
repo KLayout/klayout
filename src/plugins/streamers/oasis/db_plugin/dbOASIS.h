@@ -197,7 +197,7 @@ public:
   bool is_regular (db::Vector &a, db::Vector &b, size_t &n, size_t &m) const;
 
   /**
-   *  @brief Check, if the repepetition is a iterated one
+   *  @brief Check, if the repetition is a iterated one
    *
    *  @return 0 if not, otherwise a pointer to a vector of points
    */

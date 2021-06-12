@@ -580,7 +580,7 @@ MAGReader::read_cell_instance (tl::Extractor &ex, tl::TextInputStream &stream, L
       lib_path = lp->second;
     }
   } else {
-    //  give precendence to lib_path
+    //  give precedence to lib_path
     filename = tl::filename (filename);
     //  save for next use
     m_use_lib_paths.insert (std::make_pair (filename, lib_path));

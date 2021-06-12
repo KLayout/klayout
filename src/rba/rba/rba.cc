@@ -703,7 +703,7 @@ struct RubyInterpreterPrivateData
     } \
   } \
   if (__exc != Qnil) { \
-    /* Reraise the exception without blocking in the debugger */ \
+    /* Re-raise the exception without blocking in the debugger */ \
     /* TODO: should not access private data */ \
     RubyInterpreter::instance ()->d->block_exceptions = true; \
     rb_exc_raise (__exc); \
@@ -836,7 +836,7 @@ special_method_impl (const gsi::MethodBase *meth, int argc, VALUE *argv, VALUE s
     return destroyed (self);
   } else if (smt == gsi::MethodBase::Assign) {
 
-    //  this is either assign or dup in diguise
+    //  this is either assign or dup in disguise
     tl_assert (argc == 1);
     return assign (self, argv [0]);
 

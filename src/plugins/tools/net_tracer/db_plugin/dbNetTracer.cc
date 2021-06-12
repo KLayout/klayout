@@ -1067,7 +1067,7 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
           db::Box b = c->first.bbox ();
           double a = c->first.shape ().area ();
 
-          //  The ratio theshold of 20 for box/shape area was determined empirically
+          //  The ratio threshold of 20 for box/shape area was determined empirically
           if ((combined_box + b).area () > (asum + a) * 20.0) {
             ++c;
             --n;
@@ -1221,7 +1221,7 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
       const NetTracerShape *stop = &m_shapes_graph.find (m_stop_shape)->first;
       const NetTracerShape *start = &m_shapes_graph.find (m_start_shape)->first;
 
-      //  find the shortest path with Dijkstras algorithm
+      //  find the shortest path with Dijkstra's algorithm
 
       std::map<const NetTracerShape *, const NetTracerShape *> previous;
       std::map<const NetTracerShape *, size_t> cost;

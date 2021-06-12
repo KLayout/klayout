@@ -167,8 +167,8 @@ gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
   gsi::method_ext ("gds2_resolve_skew_arrays=", &set_gds2_resolve_skew_arrays, gsi::arg ("flag"),
     "@brief Resolves skew arrays into single instances\n"
     "\n"
-    "Setting this property to true will make skew (non-orthongonal) arrays being resolved into single instances.\n"
-    "Skew arrays happen if either the row or column vector isn't paralell to x or y axis. Such arrays can cause problems with "
+    "Setting this property to true will make skew (non-orthogonal) arrays being resolved into single instances.\n"
+    "Skew arrays happen if either the row or column vector isn't parallel to x or y axis. Such arrays can cause problems with "
     "some legacy software and can be disabled with this option.\n"
     "\nThis property has been added in version 0.27.1.\n"
   ) +

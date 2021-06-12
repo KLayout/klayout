@@ -21,8 +21,8 @@
 */
 
 
-#ifndef _HDR_gsiSerialisation
-#define _HDR_gsiSerialisation
+#ifndef _HDR_gsiSerialization
+#define _HDR_gsiSerialization
 
 #include "gsiTypes.h"
 #include "tlHeap.h"

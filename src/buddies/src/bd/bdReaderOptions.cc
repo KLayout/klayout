@@ -110,6 +110,9 @@ GenericReaderOptions::GenericReaderOptions ()
   m_lefdef_produce_labels = load_options.get_option_by_name ("lefdef_config.produce_labels").to_bool ();
   m_lefdef_label_suffix = load_options.get_option_by_name ("lefdef_config.labels_suffix").to_string ();
   m_lefdef_label_datatype = load_options.get_option_by_name ("lefdef_config.labels_datatype").to_int ();
+  m_lefdef_produce_lef_labels = load_options.get_option_by_name ("lefdef_config.produce_lef_labels").to_bool ();
+  m_lefdef_lef_label_suffix = load_options.get_option_by_name ("lefdef_config.lef_labels_suffix").to_string ();
+  m_lefdef_lef_label_datatype = load_options.get_option_by_name ("lefdef_config.lef_labels_datatype").to_int ();
   m_lefdef_produce_routing = load_options.get_option_by_name ("lefdef_config.produce_routing").to_bool ();
   m_lefdef_routing_suffix = load_options.get_option_by_name ("lefdef_config.routing_suffix_str").to_string ();
   m_lefdef_routing_datatype = load_options.get_option_by_name ("lefdef_config.routing_datatype_str").to_string ();
@@ -584,16 +587,30 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
                    )
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-labels", &m_lefdef_produce_labels, "Skips label when producing geometry",
-                    "If this option is given, no blockage geometry will be produced."
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-labels", &m_lefdef_produce_labels, "Skips DEF pin label when producing geometry",
+                    "If this option is given, no DEF pin label will be produced."
                    )
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-label-suffix", &m_lefdef_label_suffix, "Specifies the label markers layer suffix in pattern-based mode",
+                    "#--" + m_long_prefix + "lefdef-label-suffix", &m_lefdef_label_suffix, "Specifies the DEF pin label layer suffix in pattern-based mode",
                     "The label marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
                     "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
                    )
         << tl::arg (group +
-                    "#--" + m_long_prefix + "lefdef-label-datatype", &m_lefdef_label_datatype, "Specifies the label markers layer datatype in pattern-based mode",
+                    "#--" + m_long_prefix + "lefdef-label-datatype", &m_lefdef_label_datatype, "Specifies the DEF pin label layer datatype in pattern-based mode",
+                    "The label marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#!--" + m_long_prefix + "lefdef-dont-produce-lef-labels", &m_lefdef_produce_lef_labels, "Skips LEF pin label when producing geometry",
+                    "If this option is given, no LEF pin label will be produced."
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-lef-label-suffix", &m_lefdef_lef_label_suffix, "Specifies the LEF pin label layer suffix in pattern-based mode",
+                    "The label marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
+                    "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-lef-label-datatype", &m_lefdef_lef_label_datatype, "Specifies the LEF pin label layer datatype in pattern-based mode",
                     "The label marker generation and layer mapping is designed in the same way than via geometry mapping, except the option to use mask specific target layers. "
                     "See '--" + m_long_prefix + "lefdef-via-geometry-suffix' for a description of the mapping scheme.\n"
                    )
@@ -776,6 +793,9 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
   load_options.set_option_by_name ("lefdef_config.produce_labels", m_lefdef_produce_labels);
   load_options.set_option_by_name ("lefdef_config.labels_suffix", m_lefdef_label_suffix);
   load_options.set_option_by_name ("lefdef_config.labels_datatype", m_lefdef_label_datatype);
+  load_options.set_option_by_name ("lefdef_config.produce_lef_labels", m_lefdef_produce_lef_labels);
+  load_options.set_option_by_name ("lefdef_config.lef_labels_suffix", m_lefdef_lef_label_suffix);
+  load_options.set_option_by_name ("lefdef_config.lef_labels_datatype", m_lefdef_lef_label_datatype);
   load_options.set_option_by_name ("lefdef_config.produce_routing", m_lefdef_produce_routing);
   load_options.set_option_by_name ("lefdef_config.routing_suffix_str", m_lefdef_routing_suffix);
   load_options.set_option_by_name ("lefdef_config.routing_datatype_str", m_lefdef_routing_datatype);

@@ -607,7 +607,7 @@ public:
     return m_produce_labels;
   }
 
-  void set_produce_labels (bool f) 
+  void set_produce_labels (bool f)
   {
     m_produce_labels = f;
   }
@@ -630,6 +630,36 @@ public:
   void set_labels_datatype (int s) 
   {
     m_labels_datatype = s;
+  }
+
+  bool produce_lef_labels () const
+  {
+    return m_produce_lef_labels;
+  }
+
+  void set_produce_lef_labels (bool f)
+  {
+    m_produce_lef_labels = f;
+  }
+
+  const std::string &lef_labels_suffix () const
+  {
+    return m_lef_labels_suffix;
+  }
+
+  void set_lef_labels_suffix (const std::string &s)
+  {
+    m_lef_labels_suffix = s;
+  }
+
+  int lef_labels_datatype () const
+  {
+    return m_lef_labels_datatype;
+  }
+
+  void set_lef_labels_datatype (int s)
+  {
+    m_lef_labels_datatype = s;
   }
 
   bool produce_routing () const
@@ -953,6 +983,9 @@ private:
   bool m_produce_labels;
   std::string m_labels_suffix;
   int m_labels_datatype;
+  bool m_produce_lef_labels;
+  std::string m_lef_labels_suffix;
+  int m_lef_labels_datatype;
   bool m_produce_routing;
   std::string m_routing_suffix;
   int m_routing_datatype;
@@ -984,7 +1017,8 @@ enum LayerPurpose
   SpecialRouting,     //  from DEF only
   LEFPins,            //  from LEF
   ViaGeometry,        //  from LEF+DEF
-  Label,              //  from LEF+DEF
+  Label,              //  from DEF
+  LEFLabel,           //  from LEF
   Obstructions,       //  from LEF only
   Outline,            //  from LEF+DEF
   Blockage,           //  from DEF only

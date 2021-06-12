@@ -35,7 +35,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
@@ -1037,8 +1037,8 @@ Otherwise it's looked up relative to the LEF or DEF file.
                   <property name="bottomMargin">
                    <number>0</number>
                   </property>
-                  <item row="3" column="2">
-                   <widget class="QLineEdit" name="suffix_lef_pins">
+                  <item row="2" column="8">
+                   <widget class="QLineEdit" name="datatype_special_routing">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1047,8 +1047,56 @@ Otherwise it's looked up relative to the LEF or DEF file.
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="6">
-                   <widget class="QLabel" name="label_16">
+                  <item row="2" column="2">
+                   <widget class="QLineEdit" name="suffix_pins">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QLabel" name="lbl1">
+                    <property name="text">
+                     <string>Layer name
+suffix ...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="5">
+                   <widget class="QCheckBox" name="produce_routing">
+                    <property name="text">
+                     <string>Routing (*)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="6">
+                   <widget class="QLabel" name="label_17">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="pixmap">
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="5">
+                   <widget class="QCheckBox" name="produce_special_routing">
+                    <property name="text">
+                     <string>Special routing (*)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLabel" name="label_13">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                       <horstretch>0</horstretch>
@@ -1073,6 +1121,16 @@ Otherwise it's looked up relative to the LEF or DEF file.
                     </property>
                    </widget>
                   </item>
+                  <item row="3" column="3">
+                   <widget class="QLineEdit" name="datatype_lef_pins">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="1" column="6">
                    <widget class="QLabel" name="label_23">
                     <property name="sizePolicy">
@@ -1086,174 +1144,6 @@ Otherwise it's looked up relative to the LEF or DEF file.
                     </property>
                     <property name="pixmap">
                      <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="2">
-                   <widget class="QLineEdit" name="suffix_via_geometry">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="0">
-                   <widget class="QCheckBox" name="produce_fills">
-                    <property name="text">
-                     <string>Fills (*)</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="7">
-                   <widget class="QLabel" name="lbl1_2">
-                    <property name="text">
-                     <string>Layer name
-suffix ...</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="3">
-                   <widget class="QLineEdit" name="datatype_obstructions">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="8">
-                   <widget class="QLineEdit" name="datatype_routing">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="0">
-                   <widget class="QCheckBox" name="produce_lef_pins">
-                    <property name="text">
-                     <string>LEF Pins (*)</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="2">
-                   <widget class="QLabel" name="lbl1">
-                    <property name="text">
-                     <string>Layer name
-suffix ...</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="1">
-                   <widget class="QLabel" name="label_30">
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QCheckBox" name="produce_via_geometry">
-                    <property name="text">
-                     <string>Via geometry (*)</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="8">
-                   <widget class="QLineEdit" name="datatype_labels">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="2">
-                   <widget class="QLineEdit" name="suffix_pins">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="7">
-                   <widget class="QLineEdit" name="suffix_labels">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="7">
-                   <widget class="QLineEdit" name="suffix_routing">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="3">
-                   <widget class="QLabel" name="label_3">
-                    <property name="text">
-                     <string>GDS data-
-type ...</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="2">
-                   <widget class="QLineEdit" name="suffix_fills">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="6">
-                   <widget class="QLabel" name="label_24">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="7">
-                   <widget class="QLineEdit" name="suffix_special_routing">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QCheckBox" name="produce_pins">
-                    <property name="text">
-                     <string>Pins (*)</string>
                     </property>
                    </widget>
                   </item>
@@ -1273,8 +1163,177 @@ type ...</string>
                     </property>
                    </widget>
                   </item>
+                  <item row="5" column="8">
+                   <widget class="QLineEdit" name="datatype_blockages">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="3">
+                   <widget class="QLineEdit" name="datatype_fills">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLabel" name="label_12">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="pixmap">
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="6">
+                   <widget class="QLabel" name="label_24">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="pixmap">
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="4" rowspan="6">
+                   <widget class="Line" name="line_3">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLabel" name="label_30">
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="pixmap">
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QCheckBox" name="produce_fills">
+                    <property name="text">
+                     <string>Fills (*)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QCheckBox" name="produce_via_geometry">
+                    <property name="text">
+                     <string>Via geometry (*)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0">
+                   <widget class="QCheckBox" name="produce_obstructions">
+                    <property name="text">
+                     <string>Obstructions</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="6">
+                   <widget class="QLabel" name="label_16">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="pixmap">
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QCheckBox" name="produce_pins">
+                    <property name="text">
+                     <string>DEF Pins (*)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="2">
+                   <widget class="QLineEdit" name="suffix_fills">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="5" column="2">
                    <widget class="QLineEdit" name="suffix_obstructions">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="3">
+                   <widget class="QLineEdit" name="datatype_obstructions">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="8">
+                   <widget class="QLabel" name="label_27">
+                    <property name="text">
+                     <string>GDS data-
+type ...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="8">
+                   <widget class="QLineEdit" name="datatype_routing">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="7">
+                   <widget class="QLabel" name="lbl1_2">
+                    <property name="text">
+                     <string>Layer name
+suffix ...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="7">
+                   <widget class="QLineEdit" name="suffix_special_routing">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1309,22 +1368,8 @@ type ...</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="5">
-                   <widget class="QCheckBox" name="produce_special_routing">
-                    <property name="text">
-                     <string>Special routing (*)</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="0">
-                   <widget class="QCheckBox" name="produce_obstructions">
-                    <property name="text">
-                     <string>Obstructions</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="3">
-                   <widget class="QLineEdit" name="datatype_lef_pins">
+                  <item row="1" column="7">
+                   <widget class="QLineEdit" name="suffix_routing">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1333,46 +1378,8 @@ type ...</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="1">
-                   <widget class="QLabel" name="label_13">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="5">
-                   <widget class="QCheckBox" name="produce_labels">
-                    <property name="text">
-                     <string>Pin labels</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="8">
-                   <widget class="QLabel" name="label_27">
-                    <property name="text">
-                     <string>GDS data-
-type ...</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="5">
-                   <widget class="QCheckBox" name="produce_routing">
-                    <property name="text">
-                     <string>Routing (*)</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="8">
-                   <widget class="QLineEdit" name="datatype_special_routing">
+                  <item row="3" column="8">
+                   <widget class="QLineEdit" name="datatype_labels">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1381,31 +1388,8 @@ type ...</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="1">
-                   <widget class="QLabel" name="label_12">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="4" rowspan="6">
-                   <widget class="Line" name="line_3">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="3">
-                   <widget class="QLineEdit" name="datatype_fills">
+                  <item row="1" column="2">
+                   <widget class="QLineEdit" name="suffix_via_geometry">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1414,30 +1398,24 @@ type ...</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="4" column="5">
-                   <widget class="QCheckBox" name="produce_blockages">
+                  <item row="3" column="0">
+                   <widget class="QCheckBox" name="produce_lef_pins">
                     <property name="text">
-                     <string>Blockages</string>
+                     <string>LEF Pins (*)</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="4" column="6">
-                   <widget class="QLabel" name="label_17">
+                  <item row="3" column="2">
+                   <widget class="QLineEdit" name="suffix_lef_pins">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
-                    </property>
                    </widget>
                   </item>
-                  <item row="4" column="7">
+                  <item row="5" column="7">
                    <widget class="QLineEdit" name="suffix_blockages">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
@@ -1447,8 +1425,8 @@ type ...</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="4" column="8">
-                   <widget class="QLineEdit" name="datatype_blockages">
+                  <item row="3" column="7">
+                   <widget class="QLineEdit" name="suffix_labels">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1456,6 +1434,51 @@ type ...</string>
                      </sizepolicy>
                     </property>
                    </widget>
+                  </item>
+                  <item row="0" column="3">
+                   <widget class="QLabel" name="label_3">
+                    <property name="text">
+                     <string>GDS data-
+type ...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="5">
+                   <widget class="QCheckBox" name="produce_blockages">
+                    <property name="text">
+                     <string>Blockages</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="5">
+                   <widget class="QCheckBox" name="produce_labels">
+                    <property name="text">
+                     <string>DEF pin labels</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="5">
+                   <widget class="QCheckBox" name="produce_lef_labels">
+                    <property name="text">
+                     <string>LEF pin labels</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="6">
+                   <widget class="QLabel" name="label_32">
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="pixmap">
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="7">
+                   <widget class="QLineEdit" name="suffix_lef_labels"/>
+                  </item>
+                  <item row="4" column="8">
+                   <widget class="QLineEdit" name="datatype_lef_labels"/>
                   </item>
                  </layout>
                 </widget>
@@ -1613,9 +1636,6 @@ type ...</string>
   <tabstop>produce_labels</tabstop>
   <tabstop>suffix_labels</tabstop>
   <tabstop>datatype_labels</tabstop>
-  <tabstop>produce_blockages</tabstop>
-  <tabstop>suffix_blockages</tabstop>
-  <tabstop>datatype_blockages</tabstop>
   <tabstop>read_all_cbx</tabstop>
  </tabstops>
  <resources>

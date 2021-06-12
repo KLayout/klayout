@@ -313,6 +313,7 @@ private:
   bool tab_key_pressed ();
   void fill_completer_list ();
   void complete ();
+  QTextCursor get_completer_cursor (int &pos0, int &pos);
 
   bool eventFilter (QObject *watched, QEvent *event);
 };

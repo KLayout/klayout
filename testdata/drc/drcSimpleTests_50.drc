@@ -1,0 +1,14 @@
+
+source $drc_test_source
+target $drc_test_target
+
+# Problem of #826 was deep-mode universal DRC with threading
+
+deep
+threads(4)
+
+l7 = input(7, 0)
+l7.output(7, 0)
+
+l7.drc((angle == 0) & (length < 12.0)).extended_out(1.dbu).output(100, 0)
+

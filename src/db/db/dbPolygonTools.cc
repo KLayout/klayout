@@ -2140,7 +2140,7 @@ ms_extraction (db::EdgeProcessor &ep, bool resolve_holes)
 }
 
 static db::Polygon 
-do_minkowsky_sum (const db::Polygon &a, const db::Edge &b, bool resolve_holes)
+do_minkowski_sum (const db::Polygon &a, const db::Edge &b, bool resolve_holes)
 {
   db::EdgeProcessor ep;
   db::ms_production (a, b.p1 (), b.p2 (), ep);
@@ -2148,17 +2148,17 @@ do_minkowsky_sum (const db::Polygon &a, const db::Edge &b, bool resolve_holes)
 }
 
 db::Polygon 
-minkowsky_sum (const db::Polygon &a, const db::Edge &b, bool rh)
+minkowski_sum (const db::Polygon &a, const db::Edge &b, bool rh)
 {
   if (a.holes () > 0) {
-    return do_minkowsky_sum (db::resolve_holes (a), b, rh);
+    return do_minkowski_sum (db::resolve_holes (a), b, rh);
   } else {
-    return do_minkowsky_sum (a, b, rh);
+    return do_minkowski_sum (a, b, rh);
   }
 }
 
 static db::Polygon 
-do_minkowsky_sum (const db::Polygon &a, const db::Polygon &b, bool resolve_holes)
+do_minkowski_sum (const db::Polygon &a, const db::Polygon &b, bool resolve_holes)
 {
   tl_assert (a.begin_hull () != a.end_hull ());
 
@@ -2174,33 +2174,33 @@ do_minkowsky_sum (const db::Polygon &a, const db::Polygon &b, bool resolve_holes
 }
 
 db::Polygon 
-minkowsky_sum (const db::Polygon &a, const db::Polygon &b, bool rh)
+minkowski_sum (const db::Polygon &a, const db::Polygon &b, bool rh)
 {
   if (a.holes () > 0) {
-    return do_minkowsky_sum (db::resolve_holes (a), b, rh);
+    return do_minkowski_sum (db::resolve_holes (a), b, rh);
   } else {
-    return do_minkowsky_sum (a, b, rh);
+    return do_minkowski_sum (a, b, rh);
   }
 }
 
 static db::Polygon 
-do_minkowsky_sum (const db::Polygon &a, const db::Box &b, bool resolve_holes)
+do_minkowski_sum (const db::Polygon &a, const db::Box &b, bool resolve_holes)
 {
-  return minkowsky_sum (a, db::Polygon (b), resolve_holes);
+  return minkowski_sum (a, db::Polygon (b), resolve_holes);
 }
 
 db::Polygon 
-minkowsky_sum (const db::Polygon &a, const db::Box &b, bool rh)
+minkowski_sum (const db::Polygon &a, const db::Box &b, bool rh)
 {
   if (a.holes () > 0) {
-    return do_minkowsky_sum (db::resolve_holes (a), b, rh);
+    return do_minkowski_sum (db::resolve_holes (a), b, rh);
   } else {
-    return do_minkowsky_sum (a, b, rh);
+    return do_minkowski_sum (a, b, rh);
   }
 }
 
 static db::Polygon 
-do_minkowsky_sum (const db::Polygon &a, const std::vector<db::Point> &c, bool resolve_holes)
+do_minkowski_sum (const db::Polygon &a, const std::vector<db::Point> &c, bool resolve_holes)
 {
   db::EdgeProcessor ep;
   for (size_t i = 1; i < c.size (); ++i) {
@@ -2211,12 +2211,12 @@ do_minkowsky_sum (const db::Polygon &a, const std::vector<db::Point> &c, bool re
 }
 
 db::Polygon 
-minkowsky_sum (const db::Polygon &a, const std::vector<db::Point> &c, bool rh)
+minkowski_sum (const db::Polygon &a, const std::vector<db::Point> &c, bool rh)
 {
   if (a.holes () > 0) {
-    return do_minkowsky_sum (db::resolve_holes (a), c, rh);
+    return do_minkowski_sum (db::resolve_holes (a), c, rh);
   } else {
-    return do_minkowsky_sum (a, c, rh);
+    return do_minkowski_sum (a, c, rh);
   }
 }
 

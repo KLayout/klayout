@@ -628,14 +628,40 @@ static bool valid_element (const SyntaxHighlighterElement &e)
   return e.basic_attribute_id != lay::dsComment && e.basic_attribute_id != lay::dsString;
 }
 
-void MacroEditorPage::complete ()
+QTextCursor MacroEditorPage::get_completer_cursor (int &pos0, int &pos)
 {
   QTextCursor c = mp_text->textCursor ();
   if (c.selectionStart () != c.selectionEnd ()) {
+    return QTextCursor ();
+  }
+
+  pos = c.anchor ();
+  c.select (QTextCursor::WordUnderCursor);
+  pos0 = c.selectionStart ();
+
+  if (pos0 >= pos) {
+    //  if there is no word before, move to left to catch one
+    c = mp_text->textCursor ();
+    c.movePosition (QTextCursor::WordLeft, QTextCursor::KeepAnchor);
+    pos = c.anchor ();
+    pos0 = c.selectionStart ();
+  }
+
+  if (pos0 >= pos) {
+    return QTextCursor ();
+  } else {
+    return c;
+  }
+}
+
+void MacroEditorPage::complete ()
+{
+  int pos0 = 0, pos = 0;
+  QTextCursor c = get_completer_cursor (pos0, pos);
+  if (c.isNull ()) {
     return;
   }
 
-  c.select (QTextCursor::WordUnderCursor);
   if (mp_completer_list->currentItem ()) {
     QString s = mp_completer_list->currentItem ()->text ();
     c.insertText (s);
@@ -644,40 +670,55 @@ void MacroEditorPage::complete ()
 
 void MacroEditorPage::fill_completer_list ()
 {
-  QTextCursor c = mp_text->textCursor ();
-  if (c.selectionStart () != c.selectionEnd ()) {
-    return;
-  }
-
-  int pos = c.anchor ();
-  c.select (QTextCursor::WordUnderCursor);
-  int pos0 = c.selectionStart ();
-  if (pos0 >= pos) {
+  int pos0 = 0, pos = 0;
+  QTextCursor c = get_completer_cursor (pos0, pos);
+  if (c.isNull ()) {
     return;
   }
 
   QString ssel = c.selectedText ();
   QString s = ssel.mid (0, pos - pos0);
 
+  if (! s[0].isLetter () && s[0].toLatin1 () != '_') {
+    return;  // not a word
+  }
+
   QString text = mp_text->toPlainText ();
 
   std::set<QString> words;
 
-  int i = 0;
-  while (i >= 0) {
-    i = text.indexOf (s, i);
-    if (i >= 0) {
-      QString::iterator c = text.begin () + i;
-      QString w;
-      while (c->isLetterOrNumber () || c->toLatin1 () == '_') {
-        w += *c;
-        ++c;
-      }
-      if (! w.isEmpty () && w != s && w != ssel) {
-        words.insert (w);
-      }
-      ++i;
+  int i = -1;
+  while (true) {
+
+    i = text.indexOf (s, i + 1);
+    if (i < 0) {
+      //  no more occurance
+      break;
     }
+    if (i == pos0) {
+      //  same position than we are at currently
+      continue;
+    }
+    if (i > 0 && (text [i - 1].isLetterOrNumber () || text [i - 1].toLatin1 () == '_')) {
+      //  not at the beginning of the word
+      continue;
+    }
+
+    QString::iterator c = text.begin () + i;
+    QString w;
+    while (c->isLetterOrNumber () || c->toLatin1 () == '_') {
+      w += *c;
+      ++c;
+    }
+
+    if (w == ssel) {
+      //  the selected word is present already - assume it's the right one
+      words.clear ();
+      break;
+    } else if (! w.isEmpty () && w != s) {
+      words.insert (w);
+    }
+
   }
 
   for (std::set<QString>::const_iterator w = words.begin (); w != words.end (); ++w) {
@@ -1135,7 +1176,11 @@ MacroEditorPage::replace_and_find_next (const QString &replace)
 
   QTextCursor c = mp_text->textCursor ();
   if (c.hasSelection ()) {
-    c.insertText (interpolate_string (replace, m_current_search));
+    QTextBlock b = c.block ();
+    int o = std::max (0, c.position () - b.position ());
+    if (m_current_search.indexIn (b.text (), o) == o) {
+      c.insertText (interpolate_string (replace, m_current_search));
+    }
   }
 
   find_next ();
@@ -1150,10 +1195,21 @@ MacroEditorPage::replace_all (const QString &replace)
 
   const QTextDocument *doc = mp_text->document ();
 
+  QTextBlock bs = doc->begin (), be = doc->end ();
+
   QTextCursor c = mp_text->textCursor ();
+  if (c.hasSelection ()) {
+    QTextBlock s = mp_text->document ()->findBlock (mp_text->textCursor ().selectionStart ());
+    QTextBlock e = mp_text->document ()->findBlock (mp_text->textCursor ().selectionEnd ());
+    if (e != s) {
+      bs = s;
+      be = e;
+    }
+  }
+
   c.beginEditBlock ();
 
-  for (QTextBlock b = doc->begin(); b != doc->end(); b = b.next()) {
+  for (QTextBlock b = bs; b != be; b = b.next()) {
 
     int o = 0;
 
@@ -1705,7 +1761,13 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
       } else if (is_find_key (ke)) {
 
         QTextCursor c = mp_text->textCursor ();
-        emit search_requested (c.selectedText ());
+        if (c.selectionStart () != c.selectionEnd ()) {
+          QTextBlock s = mp_text->document ()->findBlock (c.selectionStart ());
+          QTextBlock e = mp_text->document ()->findBlock (c.selectionEnd ());
+          if (e == s) {
+            emit search_requested (c.selectedText ());
+          }
+        }
 
         return true;
 

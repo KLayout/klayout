@@ -295,7 +295,7 @@ inline unsigned long long ruby2c<unsigned long long> (VALUE rval)
 template <>
 inline __int128 ruby2c<__int128> (VALUE rval)
 {
-  // TOOD: this is pretty simplistic
+  // TODO: this is pretty simplistic
   return rba_safe_num2dbl (rval);
 }
 #endif
@@ -442,7 +442,7 @@ inline VALUE c2ruby<unsigned long long> (const unsigned long long &c)
 template <>
 inline VALUE c2ruby<__int128> (const __int128 &c)
 {
-  // TOOD: this is pretty simplistic
+  // TODO: this is pretty simplistic
   return rb_float_new (double (c));
 }
 #endif

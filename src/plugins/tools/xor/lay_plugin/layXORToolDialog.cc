@@ -806,7 +806,7 @@ XORWorker::do_perform_deep (const XORTask *xor_task)
         rr.size (((*t + 1) / 2), (unsigned int)2, false);
       }
 
-      //  TODO: no clipping for hieararchical mode yet
+      //  TODO: no clipping for hierarchical mode yet
       mp_job->issue_region (tol_index, xor_task->layer_index (), rr);
 
       mp_job->add_results (xor_task->lp (), *t, rr.count (), xor_task->ix (), xor_task->iy ());

@@ -86,14 +86,14 @@ Class<gsi::MacroExecutionContext> decl_MacroExecutionContext ("lay", "MacroExecu
   gsi::method ("ignore_next_exception", &gsi::MacroExecutionContext::ignore_next_exception,
     "@brief Ignores the next exception in the debugger\n"
     "The next exception thrown will be ignored in the debugger. That feature is useful when "
-    "reraising exceptions if those new exception shall not appear in the debugger."
+    "re-raising exceptions if those new exception shall not appear in the debugger."
   ),
   "@brief Support for various debugger features\n"
   "\n"
   "This class implements some features that allow customization of the debugger behavior, specifically "
   "the generation of back traces and the handling of exception. These functions are particular useful "
   "for implementing DSL interpreters and providing proper error locations in the back traces or to "
-  "suppress exceptions when reraising them."
+  "suppress exceptions when re-raising them."
 );
 
 class MacroInterpreter
@@ -334,7 +334,7 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
     "\n"
     "Use this attribute setter in the initializer before registering the interpreter.\n"
     "\n"
-    "Before version 0.25 this attribute was a reimplementable method. It has been turned into an attribute for "
+    "Before version 0.25 this attribute was a re-implementable method. It has been turned into an attribute for "
     "performance reasons in version 0.25.\n"
   ) +
   gsi::method ("debugger_scheme=", &gsi::MacroInterpreter::set_debugger_scheme, gsi::arg ("scheme"),
@@ -344,7 +344,7 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
     "\n"
     "Use this attribute setter in the initializer before registering the interpreter.\n"
     "\n"
-    "Before version 0.25 this attribute was a reimplementable method. It has been turned into an attribute for "
+    "Before version 0.25 this attribute was a re-implementable method. It has been turned into an attribute for "
     "performance reasons in version 0.25.\n"
   ) +
   gsi::method ("storage_scheme=", &gsi::MacroInterpreter::set_storage_scheme, gsi::arg ("scheme"),
@@ -355,7 +355,7 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
     "\n"
     "Use this attribute setter in the initializer before registering the interpreter.\n"
     "\n"
-    "Before version 0.25 this attribute was a reimplementable method. It has been turned into an attribute for "
+    "Before version 0.25 this attribute was a re-implementable method. It has been turned into an attribute for "
     "performance reasons in version 0.25.\n"
   ) +
   gsi::method ("description=", &gsi::MacroInterpreter::set_description, gsi::arg ("description"),
@@ -366,7 +366,7 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
     "\n"
     "Use this attribute setter in the initializer before registering the interpreter.\n"
     "\n"
-    "Before version 0.25 this attribute was a reimplementable method. It has been turned into an attribute for "
+    "Before version 0.25 this attribute was a re-implementable method. It has been turned into an attribute for "
     "performance reasons in version 0.25.\n"
   ) +
   gsi::method ("suffix=", &gsi::MacroInterpreter::set_suffix, gsi::arg ("suffix"),
@@ -377,7 +377,7 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
     "\n"
     "Use this attribute setter in the initializer before registering the interpreter.\n"
     "\n"
-    "Before version 0.25 this attribute was a reimplementable method. It has been turned into an attribute for "
+    "Before version 0.25 this attribute was a re-implementable method. It has been turned into an attribute for "
     "performance reasons in version 0.25.\n"
   ) +
   gsi::callback ("executable", &gsi::MacroInterpreter::executable, &gsi::MacroInterpreter::f_executable, gsi::arg ("macro"),

@@ -762,7 +762,7 @@ Class<Recipe_Impl> decl_Recipe_Impl ("tl", "Recipe",
     "\n"
     "This method has been introduced in version 0.27 and replaces 'execute'."
   ),
-  "@brief A facility for providing reproducable recipes\n"
+  "@brief A facility for providing reproducible recipes\n"
   "The idea of this facility is to provide a service by which an object\n"
   "can be reproduced in a parametrized way. The intended use case is a \n"
   "DRC report for example, where the DRC script is the generator.\n"

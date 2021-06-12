@@ -54,7 +54,7 @@ class OASISWriter;
  *  This object will collect objects  of the given kind and create
  *  OASIS repetitions then. For this, it creates a hash map collecting all 
  *  equivalent objects on "add" and their displacements. When "emit" is called,
- *  these displacements are converted to OASIS repetions and
+ *  these displacements are converted to OASIS repetitions and
  *  emitted to the writer.
  */
 

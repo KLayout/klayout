@@ -410,11 +410,11 @@ private:
  *  The object can be Edge, Polygon, Box and std::vector<Point>
  */
 template <class K>
-class DB_PUBLIC_TEMPLATE minkowsky_sum_computation
+class DB_PUBLIC_TEMPLATE minkowski_sum_computation
   : public db::PolygonProcessorBase
 {
 public:
-  minkowsky_sum_computation (const K &q)
+  minkowski_sum_computation (const K &q)
     : m_q (q)
   {
     //  .. nothing yet ..
@@ -422,7 +422,7 @@ public:
 
   void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
   {
-    result.push_back (db::minkowsky_sum (poly, m_q, false));
+    result.push_back (db::minkowski_sum (poly, m_q, false));
   }
 
   //  TODO: could be less if the object is symmetric

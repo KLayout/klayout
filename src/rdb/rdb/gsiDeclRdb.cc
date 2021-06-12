@@ -176,7 +176,7 @@ Class<rdb::Cell> decl_RdbCell ("rdb", "RdbCell",
     "This method has been introduced in version 0.23."
   ) +
   gsi::iterator_ext ("each_item", &cell_items_begin, &cell_items_end,
-    "@brief Iterates over all iterms inside the database which are associated with this cell\n"
+    "@brief Iterates over all items inside the database which are associated with this cell\n"
     "\n"
     "This method has been introduced in version 0.23."
   ) +
@@ -299,7 +299,7 @@ Class<rdb::Category> decl_RdbCategory ("rdb", "RdbCategory",
     "This method has been introduced in version 0.23."
   ) +
   gsi::iterator_ext ("each_item", &category_items_begin, &category_items_end,
-    "@brief Iterates over all iterms inside the database which are associated with this category\n"
+    "@brief Iterates over all items inside the database which are associated with this category\n"
     "\n"
     "This method has been introduced in version 0.23."
   ) +
@@ -402,7 +402,7 @@ Class<rdb::Category> decl_RdbCategory ("rdb", "RdbCategory",
   ),
   "@brief A category inside the report database\n"
   "Every item in the report database is assigned to a category. A category is a DRC rule check for example. "
-  "Categories can be organised hierarchically, i.e. a category may have sub-categories. Item counts are summarized "
+  "Categories can be organized hierarchically, i.e. a category may have sub-categories. Item counts are summarized "
   "for categories and items belonging to sub-categories of one category can be browsed together for example. "
   "As a general rule, categories not being leaf categories (having child categories) may not have items. "
 );
@@ -1339,18 +1339,18 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@brief Reset the modified flag\n"
   ) +
   gsi::iterator_ext ("each_item", &database_items_begin, &database_items_end,
-    "@brief Iterates over all iterms inside the database\n"
+    "@brief Iterates over all items inside the database\n"
   ) +
   gsi::iterator_ext ("each_item_per_cell", &database_items_begin_cell, &database_items_end_cell, gsi::arg ("cell_id"),
-    "@brief Iterates over all iterms inside the database which are associated with the given cell\n"
+    "@brief Iterates over all items inside the database which are associated with the given cell\n"
     "@param cell_id The ID of the cell for which all associated items should be retrieved\n"
   ) +
   gsi::iterator_ext ("each_item_per_category", &database_items_begin_cat, &database_items_end_cat, gsi::arg ("category_id"),
-    "@brief Iterates over all iterms inside the database which are associated with the given category\n"
+    "@brief Iterates over all items inside the database which are associated with the given category\n"
     "@param category_id The ID of the category for which all associated items should be retrieved\n"
   ) +
   gsi::iterator_ext ("each_item_per_cell_and_category", &database_items_begin_cc, &database_items_end_cc, gsi::arg ("cell_id"), gsi::arg ("category_id"),
-    "@brief Iterates over all iterms inside the database which are associated with the given cell and category\n"
+    "@brief Iterates over all items inside the database which are associated with the given cell and category\n"
     "@param cell_id The ID of the cell for which all associated items should be retrieved\n"
     "@param category_id The ID of the category for which all associated items should be retrieved\n"
   ) +
@@ -1371,13 +1371,13 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "The database is always saved in KLayout's XML-based format.\n"
   ),
   "@brief The report database object\n"
-  "A report database is organised around a set of items which are associated with cells and categories. "
-  "Categories can be organised hierarchically by created sub-categories of other categories. "
+  "A report database is organized around a set of items which are associated with cells and categories. "
+  "Categories can be organized hierarchically by created sub-categories of other categories. "
   "Cells are associated with layout database cells and can come with a example instantiation if the layout "
   "database does not allow a unique association of the cells.\n"
   "Items in the database can have a variety of attributes: values, tags and an image object. Values are "
   "geometrical objects for example. Tags are a set of boolean flags and an image can be attached to an item "
-  "to provide a screenshot for visualisation for example.\n"
+  "to provide a screenshot for visualization for example.\n"
   "This is the main report database object. The basic use case of this object is to create one inside a \\LayoutView and "
   "populate it with items, cell and categories or load it from a file. Another use case is to create a standalone "
   "ReportDatabase object and use the methods provided to perform queries or to populate it.\n"

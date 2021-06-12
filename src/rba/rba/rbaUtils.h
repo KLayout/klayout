@@ -164,7 +164,7 @@ inline void rb_set_progname (VALUE pn)
  *  functionality, the rb_sourcefile () variable is copied into the RNode object, as this
  *  variable is usually updated with the current sourcefile name.
  *  In effect, the string referenced by this variable participates in the GC mark&sweep
- *  steps which leads to unpredicable results, if this variable is not set to a valid
+ *  steps which leads to unpredictable results, if this variable is not set to a valid
  *  string (ruby) buffer or 0.
  *
  *  As a consequence, this function must be called before rb_protect and likely other xx_protect

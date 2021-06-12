@@ -1292,3 +1292,9 @@ TEST(49d_drcWithFragments)
 {
   run_test (_this, "49", true);
 }
+
+TEST(50_issue826)
+{
+  run_test (_this, "50", false);
+}
+

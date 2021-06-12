@@ -887,7 +887,7 @@ LEFImporter::read_macro (Layout &layout)
             read_geometries (mg, layout.dbu (), LEFPins, &boxes_for_labels, prop_id);
 
             for (std::map <std::string, db::Box>::const_iterator b = boxes_for_labels.begin (); b != boxes_for_labels.end (); ++b) {
-              mg->add_text (b->first, Label, db::Text (label.c_str (), db::Trans (b->second.center () - db::Point ())), 0, 0);
+              mg->add_text (b->first, LEFLabel, db::Text (label.c_str (), db::Trans (b->second.center () - db::Point ())), 0, 0);
             }
 
           } else {

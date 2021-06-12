@@ -134,7 +134,7 @@ unsigned long long python2c_func<unsigned long long>::operator() (PyObject *rval
 template <>
 __int128 python2c_func<__int128>::operator() (PyObject *rval)
 {
-  // TOOD: this is pretty simplistic
+  // TODO: this is pretty simplistic
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
     return PyInt_AsLong (rval);
@@ -393,7 +393,7 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ArgType &atype)
  *  @brief Correct constness if a reference is const and a non-const reference is required
  *  HINT: this is a workaround for the fact that unlike C++, Python does not have const or non-const
  *  references. Since a reference is identical with the object it points to, there are only const or non-const
- *  objects. We deliver const objects first, but if a non-const version is requestes, the
+ *  objects. We deliver const objects first, but if a non-const version is requested, the
  *  object turns into a non-const one. This may be confusing but provides a certain level
  *  of "constness", at least until there is another non-const reference for that object.
  */
@@ -607,7 +607,7 @@ PyObject *c2python_func<const QString &>::operator() (const QString &qs)
   if (qs.isNull ()) {
     Py_RETURN_NONE;
   } else {
-    //  TODO: can be done more efficently
+    //  TODO: can be done more efficiently
     std::string c (tl::to_string (qs));
     return c2python (c);
   }

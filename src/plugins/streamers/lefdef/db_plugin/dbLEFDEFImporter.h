@@ -607,7 +607,7 @@ public:
     return m_produce_labels;
   }
 
-  void set_produce_labels (bool f) 
+  void set_produce_labels (bool f)
   {
     m_produce_labels = f;
   }
@@ -630,6 +630,36 @@ public:
   void set_labels_datatype (int s) 
   {
     m_labels_datatype = s;
+  }
+
+  bool produce_lef_labels () const
+  {
+    return m_produce_lef_labels;
+  }
+
+  void set_produce_lef_labels (bool f)
+  {
+    m_produce_lef_labels = f;
+  }
+
+  const std::string &lef_labels_suffix () const
+  {
+    return m_lef_labels_suffix;
+  }
+
+  void set_lef_labels_suffix (const std::string &s)
+  {
+    m_lef_labels_suffix = s;
+  }
+
+  int lef_labels_datatype () const
+  {
+    return m_lef_labels_datatype;
+  }
+
+  void set_lef_labels_datatype (int s)
+  {
+    m_lef_labels_datatype = s;
   }
 
   bool produce_routing () const
@@ -953,6 +983,9 @@ private:
   bool m_produce_labels;
   std::string m_labels_suffix;
   int m_labels_datatype;
+  bool m_produce_lef_labels;
+  std::string m_lef_labels_suffix;
+  int m_lef_labels_datatype;
   bool m_produce_routing;
   std::string m_routing_suffix;
   int m_routing_datatype;
@@ -984,7 +1017,8 @@ enum LayerPurpose
   SpecialRouting,     //  from DEF only
   LEFPins,            //  from LEF
   ViaGeometry,        //  from LEF+DEF
-  Label,              //  from LEF+DEF
+  Label,              //  from DEF
+  LEFLabel,           //  from LEF
   Obstructions,       //  from LEF only
   Outline,            //  from LEF+DEF
   Blockage,           //  from DEF only
@@ -1247,7 +1281,7 @@ public:
   void register_macro_cell (const std::string &mn, LEFDEFLayoutGenerator *generator);
 
   /**
-   *  @brief Gets the macro cell for the given macro name or 0 if no such maco is registered
+   *  @brief Gets the macro cell for the given macro name or 0 if no such macro is registered
    */
   std::pair<db::Cell *, db::Trans> macro_cell (const std::string &mn, Layout &layout, const std::vector<std::string> &maskshift_layers, const std::vector<unsigned int> &masks, const MacroDesc &macro_desc, const LEFDEFNumberOfMasks *nm);
 
@@ -1427,7 +1461,7 @@ public:
 
 protected:
   /**
-   *  @brief Actually does the readong
+   *  @brief Actually does the reading
    *
    *  Reimplement that method for the LEF and DEF implementation
    */
@@ -1581,7 +1615,7 @@ protected:
   }
 
   /**
-   *  @brief Gets a flag indicating whether pinance names shall be produced as properties
+   *  @brief Gets a flag indicating whether pin names shall be produced as properties
    */
   bool produce_pin_props () const
   {
@@ -1589,7 +1623,7 @@ protected:
   }
 
   /**
-   *  @brief Gets the property name id of the pinance name property
+   *  @brief Gets the property name id of the pin name property
    */
   db::property_names_id_type pin_prop_name_id () const
   {

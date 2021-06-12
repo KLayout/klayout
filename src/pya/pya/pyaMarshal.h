@@ -75,7 +75,7 @@ test_arg (const gsi::ArgType &atype, PyObject *arg, bool loose);
  *  @brief Correct constness if a reference is const and a non-const reference is required
  *  HINT: this is a workaround for the fact that unlike C++, Python does not have const or non-const
  *  references. Since a reference is identical with the object it points to, there are only const or non-const
- *  objects. We deliver const objects first, but if a non-const version is requestes, the
+ *  objects. We deliver const objects first, but if a non-const version is requested, the
  *  object turns into a non-const one. This may be confusing but provides a certain level
  *  of "constness", at least until there is another non-const reference for that object.
  */

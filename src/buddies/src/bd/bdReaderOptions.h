@@ -176,6 +176,9 @@ private:
   bool m_lefdef_produce_labels;
   std::string m_lefdef_label_suffix;
   int m_lefdef_label_datatype;
+  bool m_lefdef_produce_lef_labels;
+  std::string m_lefdef_lef_label_suffix;
+  int m_lefdef_lef_label_datatype;
   bool m_lefdef_produce_routing;
   std::string m_lefdef_routing_suffix;
   std::string m_lefdef_routing_datatype;

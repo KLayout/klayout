@@ -198,8 +198,8 @@ box = RBA::Box::new(dbox)
 
   <p>
   <class_doc href="SimplePolygon#compress"/> will remove points that connect two collinear edges. It has a parameter that controls whether to remove
-  reflecting edges (spikes) as well. <class_doc href="SimplePolygon#inside?"/> returns true, if a given point is inside the polygon. <class_doc href="SimplePolygon#minkowsky_sum"/>
-  computes the Minkowsky sum between a polygon and another object in various flavors. <class_doc href="SimplePolygon#move"/> will displace the polygon
+  reflecting edges (spikes) as well. <class_doc href="SimplePolygon#inside?"/> returns true, if a given point is inside the polygon. <class_doc href="SimplePolygon#minkowski_sum"/>
+  computes the Minkowski sum between a polygon and another object in various flavors. <class_doc href="SimplePolygon#move"/> will displace the polygon
   by the distance given by the Point argument. <class_doc href="SimplePolygon#moved"/> will return the moved polygon without modifying the 
   polygon it is called on (out-of-place operation). <class_doc href="SimplePolygon#transformed"/> will return the 
   transformed polygon, either with a simple or a complex transformation (see the description of the Box object and the
@@ -652,7 +652,7 @@ ly.top_cell.shapes(ly.layer(100, 0)).insert(r11 &amp; r21)
     way in another region.</p>
   <p><class_doc href="Region#merge"/> and <class_doc href="Region#merged"/> merge the polygons. This feature allows selecting overlapping polygons
     (minimum wrap count parameter).</p>
-  <p><class_doc href="Region#minkowsky_sum"/> computes the Minkowsky sum of the region with other objects (edges, single polygons and other regions).</p>
+  <p><class_doc href="Region#minkowski_sum"/> computes the Minkowski sum of the region with other objects (edges, single polygons and other regions).</p>
   <p><class_doc href="Region#move"/>, <class_doc href="Region#moved"/>, <class_doc href="Region#transform"/> and
     <class_doc href="Region#transformed"/> apply geometrical transformations.</p>
   <p><class_doc href="Region#rectangles"/>, <class_doc href="Region#rectilinear"/>, <class_doc href="Region#non_rectangles"/> and

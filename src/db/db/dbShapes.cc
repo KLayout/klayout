@@ -384,7 +384,7 @@ Shapes::do_insert (const Shapes::shape_type &shape, const Shapes::unit_trans_typ
       if (shape.text_ref ().obj ().string_ref () != 0) {
         return safe_insert_text (*this, shape, pm);
       } else {
-        return (insert_by_tag (shape_type::text_ref_type::tag (), shape, pm));
+        return (insert_by_tag (shape_type::text_ref_type::tag (), shape, shape_repository (), pm));
       }
     }
   case shape_type::TextPtrArrayMember:

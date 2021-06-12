@@ -212,7 +212,7 @@ gsi::ClassExt<db::LoadLayoutOptions> mag_reader_options (
   gsi::method_ext ("mag_lambda=", &set_mag_lambda, gsi::arg ("lambda"),
     "@brief Specifies the lambda value to used for reading\n"
     "\n"
-    "The lamdba value is the basic unit of the layout. Magic draws layout as multiples of this basic unit. "
+    "The lambda value is the basic unit of the layout. Magic draws layout as multiples of this basic unit. "
     "The layout read by the MAG reader will use the database unit specified by \\mag_dbu, but the physical layout "
     "coordinates will be multiples of \\mag_lambda.\n"
     "\nThis property has been added in version 0.26.2.\n"
@@ -276,7 +276,7 @@ gsi::ClassExt<db::SaveLayoutOptions> mag_writer_options (
   gsi::method_ext ("mag_lambda=", &set_mag_lambda_w, gsi::arg ("lambda"),
     "@brief Specifies the lambda value to used for writing\n"
     "\n"
-    "The lamdba value is the basic unit of the layout.\n"
+    "The lambda value is the basic unit of the layout.\n"
     "The layout is brought to units of this value. If the layout is not on-grid on this unit, snapping will happen. "
     "If the value is less or equal to zero, KLayout will use the lambda value stored inside the layout set by a previous read operation "
     "of a MAGIC file. The lambda value is stored in the Layout object as the \"lambda\" metadata attribute.\n"

@@ -52,7 +52,7 @@ static QBrush right_diff_brush_dep (QColor (64, 192, 64), Qt::Dense4Pattern);
  *    "o1" those that only appear in stream 1, "o2" only those that appear in stream 2,
  *    "d" will receive std::pair's of elements that differ between 1 and 2.
  *  Two parameters govern the algorithm:
- *    "max_lookahead": tell how far to look into the future to find "synchronised" parts.
+ *    "max_lookahead": tell how far to look into the future to find "synchronized" parts.
  *    "min_sync": how many elements must be equal (in sequence) to resync.
  */
 template <class I, class O1, class O2, class O3, class O4, class EQ> 

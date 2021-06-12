@@ -210,7 +210,7 @@ public:
   /**
    *  @brief Ignores the next exception
    *
-   *  This is useful for suppressing reraised exceptions in the debugger.
+   *  This is useful for suppressing re-raised exceptions in the debugger.
    */
   virtual void ignore_next_exception () = 0;
 

@@ -93,7 +93,7 @@ RS274XApertureBase::produce_linear (const db::DCplxTrans &d, const db::DVector &
 
   if (! do_produce_linear (from, to)) {
 
-    // fallback: produce flash and employ a Minkowsky sum to generate the resulting structure
+    // fallback: produce flash and employ a Minkowski sum to generate the resulting structure
     do_produce_flash ();
 
     double dbu = mp_reader->dbu ();

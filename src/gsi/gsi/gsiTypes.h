@@ -1714,7 +1714,7 @@ public:
   }
 
   /**
-   *  @brief Returns a value indicating that the ownership of a passed object is transfered to the receiver
+   *  @brief Returns a value indicating that the ownership of a passed object is transferred to the receiver
    */
   bool pass_obj () const
   {
@@ -1722,7 +1722,7 @@ public:
   }
 
   /**
-   *  @brief Sets a value indicating that the ownership of a passed object is transfered to the receiver
+   *  @brief Sets a value indicating that the ownership of a passed object is transferred to the receiver
    */
   void set_pass_obj (bool b) 
   {

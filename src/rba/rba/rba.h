@@ -95,7 +95,7 @@ public:
   /**
    *  @brief Ignores the next exception
    *
-   *  This is useful for suppressing reraised exceptions in the debugger.
+   *  This is useful for suppressing re-raised exceptions in the debugger.
    */
   void ignore_next_exception ();
 
@@ -105,17 +105,17 @@ public:
   void load_file (const std::string &filename);
 
   /**
-   *  @brief Implementatiom of gsi::Interpreter::eval_string
+   *  @brief Implementation of gsi::Interpreter::eval_string
    */
   void eval_string (const char *string, const char *filename = 0, int line = 1, int context = -1);
 
   /**
-   *  @brief Implementatiom of gsi::Interpreter::eval_expr
+   *  @brief Implementation of gsi::Interpreter::eval_expr
    */
   tl::Variant eval_expr (const char *string, const char *filename = 0, int line = 1, int context = -1);
  
   /**
-   *  @brief Implementatiom of gsi::Interpreter::eval_string_and_print
+   *  @brief Implementation of gsi::Interpreter::eval_string_and_print
    */ 
   void eval_string_and_print (const char *string, const char *filename = 0, int line = 1, int context = -1);
 

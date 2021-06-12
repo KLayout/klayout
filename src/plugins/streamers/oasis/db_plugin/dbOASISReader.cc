@@ -1952,7 +1952,7 @@ OASISReader::do_read_text (bool xy_absolute,
 
       const std::vector<db::Vector> *points = 0;
 
-      //  If the repetion is a regular one, convert the repetition into
+      //  If the repetition is a regular one, convert the repetition into
       //  a shape array
       db::Vector a, b;
       size_t na, nb;
@@ -2085,7 +2085,7 @@ OASISReader::do_read_rectangle (bool xy_absolute,
 
       const std::vector<db::Vector> *points = 0;
 
-      //  If the repetion is a regular one, convert the repetition into
+      //  If the repetition is a regular one, convert the repetition into
       //  a box array
       db::Vector a, b;
       size_t na, nb;
@@ -2207,7 +2207,7 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
 
         const std::vector<db::Vector> *points = 0;
 
-        //  If the repetion is a regular one, convert the repetition into
+        //  If the repetition is a regular one, convert the repetition into
         //  a shape array
         db::Vector a, b;
         size_t na, nb;
@@ -2376,7 +2376,7 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
 
         const std::vector<db::Vector> *points = 0;
 
-        //  If the repetion is a regular one, convert the repetition into
+        //  If the repetition is a regular one, convert the repetition into
         //  a shape array
         db::Vector a, b;
         size_t na, nb;
@@ -2545,7 +2545,7 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
 
       const std::vector<db::Vector> *points = 0;
 
-      //  If the repetion is a regular one, convert the repetition into
+      //  If the repetition is a regular one, convert the repetition into
       //  a shape array
       db::Vector a, b;
       size_t na, nb;
@@ -2905,7 +2905,7 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
 
       const std::vector<db::Vector> *points = 0;
 
-      //  If the repetion is a regular one, convert the repetition into
+      //  If the repetition is a regular one, convert the repetition into
       //  a shape array
       db::Vector a, b;
       size_t na, nb;
@@ -3044,7 +3044,7 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
 
       const std::vector<db::Vector> *points = 0;
 
-      //  If the repetion is a regular one, convert the repetition into
+      //  If the repetition is a regular one, convert the repetition into
       //  a shape array
       db::Vector a, b;
       size_t na, nb;

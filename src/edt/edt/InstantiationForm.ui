@@ -179,7 +179,7 @@ Bottom</string>
    <item row="3" column="1" >
     <widget class="QLabel" name="label" >
      <property name="text" >
-      <string>Topcell
+      <string>Top cell
 :</string>
      </property>
      <property name="alignment" >

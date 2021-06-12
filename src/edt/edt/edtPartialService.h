@@ -199,7 +199,7 @@ public:
   /**
    *  @brief Implement the wheel event (for resetting hove state)
    */
-  virtual bool wheel_event (int delta, bool horizonal, const db::DPoint &p, unsigned int buttons, bool prio);
+  virtual bool wheel_event (int delta, bool horizontal, const db::DPoint &p, unsigned int buttons, bool prio);
 
   /**
    *  @brief Implement the mouse mode: move event

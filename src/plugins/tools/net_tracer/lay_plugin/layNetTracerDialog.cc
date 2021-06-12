@@ -824,7 +824,7 @@ NetTracerDialog::update_info ()
             db::coord_traits<db::Coord>::area_type area = 0;
             db::coord_traits<db::Coord>::perimeter_type perimeter = 0;
 
-            //  Despite merging, a multitude of seperate non-touching polygons can exist.
+            //  Despite merging, a multitude of separate non-touching polygons can exist.
             for (std::vector <db::Polygon>::iterator j = merged.begin (); j != merged.end (); ++j) {
               //  Sum area 
               area += j->area ();

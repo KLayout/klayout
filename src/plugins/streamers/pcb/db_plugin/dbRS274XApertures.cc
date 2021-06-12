@@ -111,7 +111,7 @@ RS274XApertureBase::produce_linear (const db::DCplxTrans &d, const db::DVector &
     }
 
     for (std::vector<db::Polygon>::const_iterator f = p.begin (); f != p.end (); ++f) {
-      m_polygons.push_back (db::minkowsky_sum (*f, db::Edge (ifrom, ito), true /*resolve holes*/));
+      m_polygons.push_back (db::minkowski_sum (*f, db::Edge (ifrom, ito), true /*resolve holes*/));
     }
     
   }

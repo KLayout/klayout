@@ -223,24 +223,24 @@ static void insert_si2 (db::Region *r, db::RecursiveShapeIterator si, db::ICplxT
   }
 }
 
-static db::Region minkowsky_sum_pe (const db::Region *r, const db::Edge &e)
+static db::Region minkowski_sum_pe (const db::Region *r, const db::Edge &e)
 {
-  return r->processed (db::minkowsky_sum_computation<db::Edge> (e));
+  return r->processed (db::minkowski_sum_computation<db::Edge> (e));
 }
 
-static db::Region minkowsky_sum_pp (const db::Region *r, const db::Polygon &q)
+static db::Region minkowski_sum_pp (const db::Region *r, const db::Polygon &q)
 {
-  return r->processed (db::minkowsky_sum_computation<db::Polygon> (q));
+  return r->processed (db::minkowski_sum_computation<db::Polygon> (q));
 }
 
-static db::Region minkowsky_sum_pb (const db::Region *r, const db::Box &q)
+static db::Region minkowski_sum_pb (const db::Region *r, const db::Box &q)
 {
-  return r->processed (db::minkowsky_sum_computation<db::Box> (q));
+  return r->processed (db::minkowski_sum_computation<db::Box> (q));
 }
 
-static db::Region minkowsky_sum_pc (const db::Region *r, const std::vector<db::Point> &q)
+static db::Region minkowski_sum_pc (const db::Region *r, const std::vector<db::Point> &q)
 {
-  return r->processed (db::minkowsky_sum_computation<std::vector<db::Point> > (q));
+  return r->processed (db::minkowski_sum_computation<std::vector<db::Point> > (q));
 }
 
 static db::Region &move_p (db::Region *r, const db::Vector &p)
@@ -2237,7 +2237,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.26."
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pe, gsi::arg ("e"),
+  method_ext ("minkowski_sum|#minkowsky_sum", &minkowski_sum_pe, gsi::arg ("e"),
     "@brief Compute the Minkowski sum of the region and an edge\n"
     "\n"
     "@param e The edge.\n"
@@ -2251,7 +2251,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The resulting polygons are not merged. In order to remove overlaps, use the \\merge or \\merged method."
     "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pp, gsi::arg ("p"),
+  method_ext ("minkowski_sum|#minkowsky_sum", &minkowski_sum_pp, gsi::arg ("p"),
     "@brief Compute the Minkowski sum of the region and a polygon\n"
     "\n"
     "@param p The first argument.\n"
@@ -2264,7 +2264,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The resulting polygons are not merged. In order to remove overlaps, use the \\merge or \\merged method."
     "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pb, gsi::arg ("b"),
+  method_ext ("minkowski_sum|#minkowsky_sum", &minkowski_sum_pb, gsi::arg ("b"),
     "@brief Compute the Minkowski sum of the region and a box\n"
     "\n"
     "@param b The box.\n"
@@ -2277,7 +2277,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The resulting polygons are not merged. In order to remove overlaps, use the \\merge or \\merged method."
     "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
-  method_ext ("minkowsky_sum", &minkowsky_sum_pc, gsi::arg ("b"),
+  method_ext ("minkowski_sum|#minkowsky_sum", &minkowski_sum_pc, gsi::arg ("b"),
     "@brief Compute the Minkowski sum of the region and a contour of points (a trace)\n"
     "\n"
     "@param b The contour (a series of points forming the trace).\n"

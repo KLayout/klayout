@@ -2044,8 +2044,8 @@ TEST(100_Processors)
   EXPECT_EQ (db::compare (r.processed (db::RelativeExtentsAsEdges (0.5, 0.5, 0.5, 0.5)), "(50,100;50,100);(100,400;100,400)"), true);
   EXPECT_EQ (db::compare (r.processed (db::RelativeExtentsAsEdges (0.25, 0.4, 0.75, 0.6)), "(25,80;75,120);(50,380;150,420)"), true);
 
-  EXPECT_EQ (db::compare (r.processed (db::minkowsky_sum_computation<db::Box> (db::Box (-10, -20, 30, 40))), "(-10,-20;-10,240;130,240;130,-20);(-10,280;-10,440;90,440;90,540;230,540;230,280)"), true);
-  EXPECT_EQ (db::compare (r.processed (db::minkowsky_sum_computation<db::Edge> (db::Edge (-10, 0, 30, 0))), "(-10,0;-10,200;130,200;130,0);(-10,300;-10,400;90,400;90,500;230,500;230,300)"), true);
+  EXPECT_EQ (db::compare (r.processed (db::minkowski_sum_computation<db::Box> (db::Box (-10, -20, 30, 40))), "(-10,-20;-10,240;130,240;130,-20);(-10,280;-10,440;90,440;90,540;230,540;230,280)"), true);
+  EXPECT_EQ (db::compare (r.processed (db::minkowski_sum_computation<db::Edge> (db::Edge (-10, 0, 30, 0))), "(-10,0;-10,200;130,200;130,0);(-10,300;-10,400;90,400;90,500;230,500;230,300)"), true);
 
   EXPECT_EQ (db::compare (r.processed (db::TrapezoidDecomposition (db::TD_htrapezoids)), "(0,0;0,200;100,200;100,0);(100,300;100,500;200,500;200,300);(0,300;0,400;100,400;100,300)"), true);
   EXPECT_EQ (r.processed (db::ConvexDecomposition (db::PO_vertical)).to_string (),       "(0,0;0,200;100,200;100,0);(100,300;100,500;200,500;200,300);(0,300;0,400;100,400;100,300)");

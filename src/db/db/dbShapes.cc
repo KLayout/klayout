@@ -381,7 +381,15 @@ Shapes::do_insert (const Shapes::shape_type &shape, const Shapes::unit_trans_typ
     }
   case shape_type::TextRef:
     {
-      if (shape.text_ref ().obj ().string_ref () != 0) {
+      if (! layout ()) {
+        shape_type::text_type t;
+        shape.text (t);
+        if (! shape.has_prop_id ()) {
+          return insert (t);
+        } else {
+          return insert (db::object_with_properties<shape_type::text_type> (t, pm (shape.prop_id ())));
+        }
+      } else if (shape.text_ref ().obj ().string_ref () != 0) {
         return safe_insert_text (*this, shape, pm);
       } else {
         return (insert_by_tag (shape_type::text_ref_type::tag (), shape, shape_repository (), pm));

@@ -672,9 +672,9 @@ public:
   }
 
   /**
-   *  @brief Clear all edges stored currently in this processor
+   *  @brief Clears all edges stored currently in this processor
    */
-  void clear (); 
+  void clear ();
 
   /**
    *  @brief Performs the actual processing
@@ -692,6 +692,24 @@ public:
    *  edge sink.
    */
   void process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > &gen);
+
+  /**
+   *  @brief Performs the actual processing again
+   *
+   *  This method can be called after "process" was used and will re-run the
+   *  scanline algorithm. This is somewhat more efficient as the initial
+   *  sorting and edge clipping can be skipped.
+   */
+  void redo (db::EdgeSink &es, EdgeEvaluatorBase &op);
+
+  /**
+   *  @brief Performs the actual processing again
+   *
+   *  This method can be called after "process" was used and will re-run the
+   *  scanline algorithm. This is somewhat more efficient as the initial
+   *  sorting and edge clipping can be skipped.
+   */
+  void redo (const std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > &gen);
 
   /**
    *  @brief Merge the given polygons in a simple "non-zero wrapcount" fashion
@@ -996,6 +1014,8 @@ private:
     }
     return n;
   }
+
+  void redo_or_process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > &gen, bool redo);
 };
 
 }

@@ -1595,6 +1595,14 @@ EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
   process (procs);
 }
 
+void
+EdgeProcessor::redo (db::EdgeSink &es, EdgeEvaluatorBase &op)
+{
+  std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > procs;
+  procs.push_back (std::make_pair (&es, &op));
+  redo (procs);
+}
+
 namespace
 {
 
@@ -2138,7 +2146,19 @@ private:
 }
 
 void
+EdgeProcessor::redo (const std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > &gen)
+{
+  redo_or_process (gen, true);
+}
+
+void
 EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > &gen)
+{
+  redo_or_process (gen, false);
+}
+
+void
+EdgeProcessor::redo_or_process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > &gen, bool redo)
 {
   tl::SelfTimer timer (tl::verbosity () >= m_base_verbosity, "EdgeProcessor: process");
 
@@ -2160,6 +2180,8 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
 
   mp_cpvector->clear ();
 
+  //  count the properties
+
   property_type n_props = 0;
   for (std::vector <WorkEdge>::iterator e = mp_work_edges->begin (); e != mp_work_edges->end (); ++e) {
     if (e->prop > n_props) {
@@ -2167,6 +2189,8 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
     }
   }
   ++n_props;
+
+  //  prepare progress
 
   size_t todo_max = 1000000;
 
@@ -2186,119 +2210,149 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
   todo_next += (todo_max - todo) / 5;
 
 
-  //  step 2: find intersections
-  std::sort (mp_work_edges->begin (), mp_work_edges->end (), edge_ymin_compare<db::Coord> ());
+  if (redo) {
 
-  y = edge_ymin ((*mp_work_edges) [0]);
-  future = mp_work_edges->begin ();
+    //  redo mode: skip the intersection detection step and clear the data
 
-  for (std::vector <WorkEdge>::iterator current = mp_work_edges->begin (); current != mp_work_edges->end (); ) {
-
-    if (m_report_progress) {
-      double p = double (std::distance (mp_work_edges->begin (), current)) / double (mp_work_edges->size ());
-      progress->set (size_t (double (todo_next - todo) * p) + todo);
+    for (std::vector <WorkEdge>::iterator c = mp_work_edges->begin (); c != mp_work_edges->end (); ++c) {
+      c->data = 0;
     }
 
-    size_t n = std::distance (current, future);
-    db::Coord yy = y;
+    todo = todo_next;
+    todo_next += (todo_max - todo) / 5;
 
-    //  Use as many scanlines as to fetch approx. 50% new edges into the scanline (this
-    //  is an empirically determined factor)
-    do {
+  } else {
 
-      while (future != mp_work_edges->end () && edge_ymin (*future) <= yy) {
-        ++future;
+    //  step 2: find intersections
+    std::sort (mp_work_edges->begin (), mp_work_edges->end (), edge_ymin_compare<db::Coord> ());
+
+    y = edge_ymin ((*mp_work_edges) [0]);
+    future = mp_work_edges->begin ();
+
+    for (std::vector <WorkEdge>::iterator current = mp_work_edges->begin (); current != mp_work_edges->end (); ) {
+
+      if (m_report_progress) {
+        double p = double (std::distance (mp_work_edges->begin (), current)) / double (mp_work_edges->size ());
+        progress->set (size_t (double (todo_next - todo) * p) + todo);
       }
 
-      if (future != mp_work_edges->end ()) {
-        yy = edge_ymin (*future);
-      } else {
-        yy = std::numeric_limits <db::Coord>::max ();
+      size_t n = std::distance (current, future);
+      db::Coord yy = y;
+
+      //  Use as many scanlines as to fetch approx. 50% new edges into the scanline (this
+      //  is an empirically determined factor)
+      do {
+
+        while (future != mp_work_edges->end () && edge_ymin (*future) <= yy) {
+          ++future;
+        }
+
+        if (future != mp_work_edges->end ()) {
+          yy = edge_ymin (*future);
+        } else {
+          yy = std::numeric_limits <db::Coord>::max ();
+        }
+
+      } while (future != mp_work_edges->end () && std::distance (current, future) < long (n + n / 2));
+
+      bool is90 = true;
+
+      if (current != future) {
+
+        for (std::vector <WorkEdge>::iterator c = current; c != future && is90; ++c) {
+          if (c->dx () != 0 && c->dy () != 0) {
+            is90 = false;
+          }
+        }
+
+        if (is90) {
+          get_intersections_per_band_90 (*mp_cpvector, current, future, y, yy, selects_edges);
+        } else {
+          get_intersections_per_band_any (*mp_cpvector, current, future, y, yy, selects_edges);
+        }
+
       }
 
-    } while (future != mp_work_edges->end () && std::distance (current, future) < long (n + n / 2));
-
-    bool is90 = true;
-
-    if (current != future) {
-
-      for (std::vector <WorkEdge>::iterator c = current; c != future && is90; ++c) {
-        if (c->dx () != 0 && c->dy () != 0) {
-          is90 = false;
+      y = yy;
+      for (std::vector <WorkEdge>::iterator c = current; c != future; ++c) {
+        //  Hint: we have to keep the edges ending a y (the new lower band limit) in the all angle case because these edges
+        //  may receive cutpoints because the enter the -0.5DBU region below the band
+        if ((!is90 && edge_ymax (*c) < y) || (is90 && edge_ymax (*c) <= y)) {
+          if (current != c) {
+            std::swap (*current, *c);
+          }
+          ++current;
         }
       }
 
-      if (is90) {
-        get_intersections_per_band_90 (*mp_cpvector, current, future, y, yy, selects_edges);
-      } else {
-        get_intersections_per_band_any (*mp_cpvector, current, future, y, yy, selects_edges);
+    }
+
+    //  step 3: create new edges from the ones with cutpoints
+    //
+    //  Hint: when we create the edges from the cutpoints we use the projection to sort the cutpoints along the
+    //  edge. However, we have some freedom to connect the points which we use to avoid "z" configurations which could
+    //  create new intersections in a 1x1 pixel box.
+
+    todo = todo_next;
+    todo_next += (todo_max - todo) / 5;
+
+    size_t n_work = mp_work_edges->size ();
+    size_t nw = 0;
+    for (size_t n = 0; n < n_work; ++n) {
+
+      if (m_report_progress) {
+        double p = double (n) / double (n_work);
+        progress->set (size_t (double (todo_next - todo) * p) + todo);
       }
 
-    }
+      WorkEdge &ew = (*mp_work_edges) [n];
 
-    y = yy;
-    for (std::vector <WorkEdge>::iterator c = current; c != future; ++c) {
-      //  Hint: we have to keep the edges ending a y (the new lower band limit) in the all angle case because these edges
-      //  may receive cutpoints because the enter the -0.5DBU region below the band
-      if ((!is90 && edge_ymax (*c) < y) || (is90 && edge_ymax (*c) <= y)) {
-        if (current != c) {
-          std::swap (*current, *c);
-        }
-        ++current;
-      }
-    }
-    
-  }
+      CutPoints *cut_points = ew.data ? & ((*mp_cpvector) [ew.data - 1]) : 0;
+      ew.data = 0;
 
-  //  step 3: create new edges from the ones with cutpoints
-  //
-  //  Hint: when we create the edges from the cutpoints we use the projection to sort the cutpoints along the
-  //  edge. However, we have some freedom to connect the points which we use to avoid "z" configurations which could
-  //  create new intersections in a 1x1 pixel box.
-  
-  todo = todo_next;
-  todo_next += (todo_max - todo) / 5;
+      if (ew.dy () == 0 && ! selects_edges) {
 
-  size_t n_work = mp_work_edges->size ();
-  size_t nw = 0;
-  for (size_t n = 0; n < n_work; ++n) {
+        //  don't care about horizontal edges
 
-    if (m_report_progress) {
-      double p = double (n) / double (n_work);
-      progress->set (size_t (double (todo_next - todo) * p) + todo);
-    }
+      } else if (cut_points) {
 
-    WorkEdge &ew = (*mp_work_edges) [n];
+        if (cut_points->has_cutpoints && ! cut_points->cut_points.empty ()) {
 
-    CutPoints *cut_points = ew.data ? & ((*mp_cpvector) [ew.data - 1]) : 0;
-    ew.data = 0;
+          db::Edge e = ew;
+          property_type p = ew.prop;
+          std::sort (cut_points->cut_points.begin (), cut_points->cut_points.end (), ProjectionCompare (e));
 
-    if (ew.dy () == 0 && ! selects_edges) {
+          db::Point pll = e.p1 ();
+          db::Point pl = e.p1 ();
 
-      //  don't care about horizontal edges 
+          for (std::vector <db::Point>::iterator cp = cut_points->cut_points.begin (); cp != cut_points->cut_points.end (); ++cp) {
+            if (*cp != pl) {
+              WorkEdge ne = WorkEdge (db::Edge (pl, *cp), p);
+              if (pl.y () == pll.y () && ne.p2 ().x () != pl.x () && ne.p2 ().x () == pll.x ()) {
+                ne = db::Edge (pll, ne.p2 ());
+              } else if (pl.x () == pll.x () && ne.p2 ().y () != pl.y () && ne.p2 ().y () == pll.y ()) {
+                ne = db::Edge (ne.p1 (), pll);
+              } else {
+                pll = pl;
+              }
+              pl = *cp;
+              if (selects_edges || ne.dy () != 0) {
+                if (nw <= n) {
+                  (*mp_work_edges) [nw++] = ne;
+                } else {
+                  mp_work_edges->push_back (ne);
+                }
+              }
+            }
+          }
 
-    } else if (cut_points) {
-
-      if (cut_points->has_cutpoints && ! cut_points->cut_points.empty ()) {
-
-        db::Edge e = ew;
-        property_type p = ew.prop;
-        std::sort (cut_points->cut_points.begin (), cut_points->cut_points.end (), ProjectionCompare (e));
-
-        db::Point pll = e.p1 ();
-        db::Point pl = e.p1 ();
-
-        for (std::vector <db::Point>::iterator cp = cut_points->cut_points.begin (); cp != cut_points->cut_points.end (); ++cp) {
-          if (*cp != pl) {
-            WorkEdge ne = WorkEdge (db::Edge (pl, *cp), p);
+          if (cut_points->cut_points.back () != e.p2 ()) {
+            WorkEdge ne = WorkEdge (db::Edge (pl, e.p2 ()), p);
             if (pl.y () == pll.y () && ne.p2 ().x () != pl.x () && ne.p2 ().x () == pll.x ()) {
               ne = db::Edge (pll, ne.p2 ());
             } else if (pl.x () == pll.x () && ne.p2 ().y () != pl.y () && ne.p2 ().y () == pll.y ()) {
               ne = db::Edge (ne.p1 (), pll);
-            } else {
-              pll = pl;
             }
-            pl = *cp;
             if (selects_edges || ne.dy () != 0) {
               if (nw <= n) {
                 (*mp_work_edges) [nw++] = ne;
@@ -2307,22 +2361,14 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
               }
             }
           }
-        }
 
-        if (cut_points->cut_points.back () != e.p2 ()) {
-          WorkEdge ne = WorkEdge (db::Edge (pl, e.p2 ()), p);
-          if (pl.y () == pll.y () && ne.p2 ().x () != pl.x () && ne.p2 ().x () == pll.x ()) {
-            ne = db::Edge (pll, ne.p2 ());
-          } else if (pl.x () == pll.x () && ne.p2 ().y () != pl.y () && ne.p2 ().y () == pll.y ()) {
-            ne = db::Edge (ne.p1 (), pll);
+        } else {
+
+          if (nw < n) {
+            (*mp_work_edges) [nw] = (*mp_work_edges) [n];
           }
-          if (selects_edges || ne.dy () != 0) {
-            if (nw <= n) {
-              (*mp_work_edges) [nw++] = ne;
-            } else {
-              mp_work_edges->push_back (ne);
-            }
-          }
+          ++nw;
+
         }
 
       } else {
@@ -2334,27 +2380,20 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
 
       }
 
-    } else {
-
-      if (nw < n) {
-        (*mp_work_edges) [nw] = (*mp_work_edges) [n];
-      }
-      ++nw;
-
     }
 
-  }
-
-  if (nw != n_work) {
-    mp_work_edges->erase (mp_work_edges->begin () + nw, mp_work_edges->begin () + n_work);
-  }
+    if (nw != n_work) {
+      mp_work_edges->erase (mp_work_edges->begin () + nw, mp_work_edges->begin () + n_work);
+    }
 
 #ifdef DEBUG_EDGE_PROCESSOR
-  printf ("Output edges:\n");
-  for (std::vector <WorkEdge>::iterator c1 = mp_work_edges->begin (); c1 != mp_work_edges->end (); ++c1) { 
-    printf ("%s\n", c1->to_string().c_str ()); 
-  } 
+    printf ("Output edges:\n");
+    for (std::vector <WorkEdge>::iterator c1 = mp_work_edges->begin (); c1 != mp_work_edges->end (); ++c1) {
+      printf ("%s\n", c1->to_string().c_str ());
+    }
 #endif
+
+  }
 
 
   tl::SelfTimer timer2 (tl::verbosity () >= m_base_verbosity + 10, "EdgeProcessor: production");
@@ -2558,7 +2597,7 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
       y = yy;
 
 #ifdef DEBUG_EDGE_PROCESSOR
-      for (std::vector <WorkEdge>::iterator c = current; c != future; ++c) { 
+      for (std::vector <WorkEdge>::iterator c = current; c != future; ++c) {
         printf ("%ld-", long (c->data)); 
       } 
       printf ("\n");
@@ -2579,7 +2618,7 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
         if (ymax >= y) {
           --current;
           if (current != c) {
-            *current = *c;
+            std::swap (*current, *c);
           }
         }
         if (ymax <= y) {
@@ -2603,7 +2642,7 @@ EdgeProcessor::process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEval
 
       }
 #ifdef DEBUG_EDGE_PROCESSOR
-      for (std::vector <WorkEdge>::iterator c = current; c != future; ++c) { 
+      for (std::vector <WorkEdge>::iterator c = current; c != future; ++c) {
         printf ("%ld-", long (c->data)); 
       } 
       printf ("\n");

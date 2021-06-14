@@ -335,6 +335,13 @@ TEST(22)
   run_test (_this, "def13", "map:test.map+lef:test.lef_5.8+def:top.def.gz", "au2.oas.gz", opt);
 }
 
+TEST(23)
+{
+  db::LEFDEFReaderOptions opt = default_options ();
+  opt.set_macro_resolution_mode (1);
+  run_test (_this, "def14", "map:test.map+lef:tech.lef+lef:stdlib.lef+def:test.def", "au.oas.gz", opt);
+}
+
 TEST(100)
 {
   run_test (_this, "issue-172", "lef:in.lef+def:in.def", "au.oas.gz", default_options (), false);
@@ -515,7 +522,7 @@ TEST(113_masks_1)
     "'M0PO.SPNET:2' : 'M0PO.SPNET:2' (1/201)\n"
     "'M0PO.VIA:1' : 'M0PO.VIA:1' (1/102)\n"
     "'M0PO.VIA:2' : 'M0PO.VIA:2' (1/202)\n"
-    "M0PO.LABEL : M0PO.LABEL (1/1)\n"
+    "M0PO.LABEL;M0PO.LEFLABEL : 'M0PO.LABEL/M0PO.LEFLABEL' (1/1)\n"
     "'M1.NET:1' : 'M1.NET:1' (3/100)\n"
     "'M1.NET:2' : 'M1.NET:2' (3/200)\n"
     "M1.PIN : M1.PIN (3/2)\n"
@@ -525,7 +532,7 @@ TEST(113_masks_1)
     "'M1.SPNET:2' : 'M1.SPNET:2' (3/201)\n"
     "'M1.VIA:1' : 'M1.VIA:1' (3/102)\n"
     "'M1.VIA:2' : 'M1.VIA:2' (3/202)\n"
-    "M1.LABEL : M1.LABEL (3/1)\n"
+    "M1.LABEL;M1.LEFLABEL : 'M1.LABEL/M1.LEFLABEL' (3/1)\n"
     "'VIA0.NET:1' : 'VIA0.NET:1' (2/100)\n"
     "'VIA0.NET:2' : 'VIA0.NET:2' (2/200)\n"
     "VIA0.PIN : VIA0.PIN (2/2)\n"
@@ -535,7 +542,7 @@ TEST(113_masks_1)
     "'VIA0.SPNET:2' : 'VIA0.SPNET:2' (2/201)\n"
     "'VIA0.VIA:1' : 'VIA0.VIA:1' (2/102)\n"
     "'VIA0.VIA:2' : 'VIA0.VIA:2' (2/202)\n"
-    "VIA0.LABEL : VIA0.LABEL (2/1)\n"
+    "VIA0.LABEL;VIA0.LEFLABEL : 'VIA0.LABEL/VIA0.LEFLABEL' (2/1)\n"
   )
 }
 
@@ -726,11 +733,11 @@ TEST(117_mapfile_all)
       "'\\'M1.FILLOPC:2\\' : \\'M1.FILLOPC:2\\' (11/0)';"
       "'\\'M1.VIA:SIZE0.05X0.05\\' : \\'M1.VIA:SIZE0.05X0.05\\' (20/0)';"
       "'\\'M1.VIA:SIZE3X3\\' : \\'M1.VIA:SIZE3X3\\' (21/0)';"
-      "'+M1.LABEL : M1.LABEL (26/0)';"
-      "'+M1.LABEL : M1.LABEL (27/0)';"
-      "'+M1.LABEL : M1.LABEL (28/1)';"
+      "'M1.LABEL : M1.LABEL (26/0)';"
+      // NAME M1/NET not supported: "'+M1.LABEL : M1.LABEL (27/0)';"
+      // NAME M1/SPNET not supported: "'+M1.LABEL : M1.LABEL (28/1)';"
       "'+M1.BLK : M1.BLK (13/0)';"
-      "'M1_TEXT.LABEL : M1_TEXT.LABEL (29/0)'"
+      "'M1_TEXT.LABEL;M1_TEXT.LEFLABEL : \\'M1_TEXT.LABEL/M1_TEXT.LEFLABEL\\' (29/0)'"
     ")"
   )
 }

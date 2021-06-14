@@ -192,7 +192,7 @@ gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
     "@return The number of entries.\n"
   ) +
   gsi::method_ext ("colormap_value", &gsi::colormap_value, gsi::arg ("n"),
-    "@brief Returns the vlue for a given color map entry.\n"
+    "@brief Returns the value for a given color map entry.\n"
     "@param n The index of the entry (0..\\num_colormap_entries-1)\n"
     "@return The value (see \\add_colormap_entry for a description).\n"
   ) +
@@ -1001,7 +1001,7 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@brief Forces an update of the view\n"
     "Usually it is not required to call this method. The image object is automatically synchronized "
     "with the view's image objects. For performance reasons this update is delayed to collect multiple "
-    "update requests. Calling 'update' will ensure immdiate updates.\n"
+    "update requests. Calling 'update' will ensure immediate updates.\n"
     "\n"
     "This method has been introduced in version 0.25."
   ) +
@@ -1408,7 +1408,7 @@ gsi::ClassExt<db::TilingProcessor> tiling_processor_ext (
     "@brief Specifies output to an image\n"
     "This method will establish an output channel which delivers float data to image data. "
     "The image is a monochrome image where each pixel corresponds to a single tile. This "
-    "method for example is useful to collect densitity information into an image. The "
+    "method for example is useful to collect density information into an image. The "
     "image is configured such that each pixel covers one tile.\n"
     "\n"
     "The name is the name which must be used in the _output function of the scripts in order to "

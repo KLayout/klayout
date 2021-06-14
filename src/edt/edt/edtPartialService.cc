@@ -1520,7 +1520,7 @@ PartialService::edit_cancel ()
 }
 
 bool 
-PartialService::wheel_event (int /*delta*/, bool /*horizonal*/, const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
+PartialService::wheel_event (int /*delta*/, bool /*horizontal*/, const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
 {
   hover_reset ();
   return false;
@@ -2665,7 +2665,7 @@ PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMod
     //  check, if there is a selected instance inside the box - in this case, we do not do a new selection
     if (! box.is_point ()) {
 
-      lay::InstFinder inst_finder (box.is_point (), m_top_level_sel, true /*full arrays*/, true /*enclose*/, 0 /*no exludes*/, true /*visible layers*/);
+      lay::InstFinder inst_finder (box.is_point (), m_top_level_sel, true /*full arrays*/, true /*enclose*/, 0 /*no excludes*/, true /*visible layers*/);
       inst_finder.find (view (), search_box);
 
       //  collect the founds from the finder

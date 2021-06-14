@@ -194,7 +194,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   ) +
   gsi::method ("cell_outline_layer", &db::LEFDEFReaderOptions::cell_outline_layer,
     "@brief Gets the layer on which to produce the cell outline (diearea).\n"
-    "This attribute is a string correspondig to the string representation of \\LayerInfo. "
+    "This attribute is a string corresponding to the string representation of \\LayerInfo. "
     "This string can be either a layer number, a layer/datatype pair, a name or a combination of both. See \\LayerInfo for details.\n"
     "The setter for this attribute is \\cell_outline_layer=. See also \\produce_cell_outlines."
   ) +
@@ -212,7 +212,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   ) +
   gsi::method ("placement_blockage_layer", &db::LEFDEFReaderOptions::placement_blockage_layer,
     "@brief Gets the layer on which to produce the placement blockage.\n"
-    "This attribute is a string correspondig to the string representation of \\LayerInfo. "
+    "This attribute is a string corresponding to the string representation of \\LayerInfo. "
     "This string can be either a layer number, a layer/datatype pair, a name or a combination of both. See \\LayerInfo for details."
     "The setter for this attribute is \\placement_blockage_layer=. See also \\produce_placement_blockages."
   ) +
@@ -234,7 +234,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   ) +
   gsi::method ("region_layer", &db::LEFDEFReaderOptions::region_layer,
     "@brief Gets the layer on which to produce the regions.\n"
-    "This attribute is a string correspondig to the string representation of \\LayerInfo. "
+    "This attribute is a string corresponding to the string representation of \\LayerInfo. "
     "This string can be either a layer number, a layer/datatype pair, a name or a combination of both. See \\LayerInfo for details."
     "The setter for this attribute is \\region_layer=. See also \\produce_regions.\n"
     "\n"
@@ -662,6 +662,42 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "@brief Sets the labels layer datatype value.\n"
     "See \\produce_via_geometry for details about the layer production rules."
   ) +
+  gsi::method ("produce_lef_labels", &db::LEFDEFReaderOptions::produce_lef_labels,
+    "@brief Gets a value indicating whether lef_labels shall be produced.\n"
+    "See \\produce_via_geometry for details about the layer production rules.\n"
+    "\n"
+    "This method has been introduced in version 0.27.2\n"
+  ) +
+  gsi::method ("produce_lef_labels=", &db::LEFDEFReaderOptions::set_produce_lef_labels, gsi::arg ("produce"),
+    "@brief Sets a value indicating whether lef_labels shall be produced.\n"
+    "See \\produce_via_geometry for details about the layer production rules.\n"
+    "\n"
+    "This method has been introduced in version 0.27.2\n"
+  ) +
+  gsi::method ("lef_labels_suffix", &db::LEFDEFReaderOptions::lef_labels_suffix,
+    "@brief Gets the label layer name suffix.\n"
+    "See \\produce_via_geometry for details about the layer production rules.\n"
+    "\n"
+    "This method has been introduced in version 0.27.2\n"
+  ) +
+  gsi::method ("lef_labels_suffix=", &db::LEFDEFReaderOptions::set_lef_labels_suffix, gsi::arg ("suffix"),
+    "@brief Sets the label layer name suffix.\n"
+    "See \\produce_via_geometry for details about the layer production rules.\n"
+    "\n"
+    "This method has been introduced in version 0.27.2\n"
+  ) +
+  gsi::method ("lef_labels_datatype", &db::LEFDEFReaderOptions::lef_labels_datatype,
+    "@brief Gets the lef_labels layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules.\n"
+    "\n"
+    "This method has been introduced in version 0.27.2\n"
+  ) +
+  gsi::method ("lef_labels_datatype=", &db::LEFDEFReaderOptions::set_lef_labels_datatype, gsi::arg ("datatype"),
+    "@brief Sets the lef_labels layer datatype value.\n"
+    "See \\produce_via_geometry for details about the layer production rules.\n"
+    "\n"
+    "This method has been introduced in version 0.27.2\n"
+  ) +
   gsi::method ("produce_routing", &db::LEFDEFReaderOptions::produce_routing,
     "@brief Gets a value indicating whether routing geometry shall be produced.\n"
     "See \\produce_via_geometry for details about the layer production rules."
@@ -836,7 +872,7 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
   ) +
   gsi::method ("separate_groups=", &db::LEFDEFReaderOptions::set_separate_groups, gsi::arg ("flag"),
     "@brief Sets a value indicating whether to create separate parent cells for individual groups.\n"
-    "See \\seperate_groups for details about this property.\n"
+    "See \\separate_groups for details about this property.\n"
     "\n"
     "This property has been added in version 0.27.\n"
   ) +

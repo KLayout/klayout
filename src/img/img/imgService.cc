@@ -499,7 +499,7 @@ Service::insert_image (const img::Object &image)
   img::Object *new_image = new img::Object (image);
   const db::DUserObject &s = mp_view->annotation_shapes ().insert (db::DUserObject (new_image));
 
-  //  NOTE: the const_cast will allow us to modfiy the object begin the DUserObject - that is not really clean
+  //  NOTE: the const_cast will allow us to modify the object begin the DUserObject - that is not really clean
   return const_cast <img::Object *> (dynamic_cast <const img::Object *> (s.ptr ()));
 }
 
@@ -885,7 +885,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
       int id = obj2id (mp_view->annotation_shapes ().replace (m_selected.begin ()->first, db::DUserObject (inew)));
       image_changed_event (id);
 
-      //  clear the selection (that was artifically created before)
+      //  clear the selection (that was artificially created before)
       if (! m_keep_selection_for_landmark) {
         clear_selection ();
       } else {
@@ -899,7 +899,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
       int id = obj2id (mp_view->annotation_shapes ().replace (m_selected.begin ()->first, db::DUserObject (inew)));
       image_changed_event (id);
 
-      //  clear the selection (that was artifically created before)
+      //  clear the selection (that was artificially created before)
       clear_selection ();
 
     }

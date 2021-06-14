@@ -547,7 +547,7 @@ public:
    *
    *  This method will be called by the GSI system to provide initialization after 
    *  the static initialization. Some schemes cannot be implementation statically, plus
-   *  the initialization order is indetermined for static initialization.
+   *  the initialization order is undetermined for static initialization.
    *  In that case, this initialization step is useful. It will call the initialize
    *  method on all method declarations.
    */

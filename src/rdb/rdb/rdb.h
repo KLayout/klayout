@@ -69,7 +69,7 @@ class Items;
  *  An item is member of exactly one category. This can be a check for example. 
  *  A category is described by a name and a description string. An Id is provided
  *  to reference this category from actual report items.
- *  Categories can be organised hierarchically for which a category collection 
+ *  Categories can be organized hierarchically for which a category collection 
  *  is provided and member of the individual category.
  *
  *  A category can only be created by the database object, since the

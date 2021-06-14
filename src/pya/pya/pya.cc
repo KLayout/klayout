@@ -331,7 +331,7 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 #endif
 
   //  Build two objects that provide a way to redirect stdout, stderr
-  //  and instatiate them two times for stdout and stderr.
+  //  and instantiate them two times for stdout and stderr.
   PYAChannelObject::make_class (module);
   m_stdout_channel = PythonRef (PYAChannelObject::create (gsi::Console::OS_stdout));
   m_stdout = PythonPtr (m_stdout_channel.get ());
@@ -401,7 +401,7 @@ PythonInterpreter::remove_package_location (const std::string & /*package_path*/
 void
 PythonInterpreter::require (const std::string & /*filename*/)
 {
-  //  TOOD: is there a way to implement that?
+  //  TODO: is there a way to implement that?
   throw tl::Exception (tl::to_string (tr ("'require' not implemented for Python interpreter")));
 }
 

@@ -60,7 +60,7 @@ public:
   /**
    *  @brief Indicates that the reader expects strict mode or note
    *
-   *  This is mainly a debugging an testing option but it may be used to verifiy
+   *  This is mainly a debugging an testing option but it may be used to verify
    *  the compliance of a file with string or non-strict mode.
    *
    *  The values are:

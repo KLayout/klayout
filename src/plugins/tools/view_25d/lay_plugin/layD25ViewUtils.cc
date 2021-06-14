@@ -180,7 +180,7 @@ normalize_scene_trans (const QMatrix4x4 &cam_trans, QVector3D &displacement, dou
   //
   //  this is image invariant (only x,y results are considered) against changes of s (s->s') if
   //
-  //    1.) (p*d*s+z)/s = (p*d'*s'+z)/s'  (because x and y will be devided by this value)
+  //    1.) (p*d*s+z)/s = (p*d'*s'+z)/s'  (because x and y will be divided by this value)
   //    2.) (M*d*s+t)/s = (M*d'*s'+t)/s'  for  [x] and [y]
   //
   //  or

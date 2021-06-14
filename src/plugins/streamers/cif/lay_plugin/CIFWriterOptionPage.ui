@@ -39,7 +39,7 @@
         </property>
         <property name="text">
          <string>If checked, a blank character is used as x/y coordinate
-separator. Otherweise a comma is used.</string>
+separator. Otherwise a comma is used.</string>
         </property>
        </widget>
       </item>

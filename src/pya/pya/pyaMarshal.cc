@@ -446,7 +446,7 @@ struct writer<gsi::MapType>
 
 /**
  *  @brief A serialization wrapper (write mode)
- *  Specialisation for objects
+ *  Specialization for objects
  */
 template <>
 struct writer<gsi::ObjectType>
@@ -530,7 +530,7 @@ struct writer<gsi::ObjectType>
 
 /**
  *  @brief A serialization wrapper (write mode)
- *  Specialisation for void
+ *  Specialization for void
  */
 template <>
 struct writer<gsi::VoidType>
@@ -548,7 +548,7 @@ push_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PyObject *arg, tl
 }
 
 /**
- *  @brief Deseralisation wrapper
+ *  @brief Deserialization wrapper
  *
  *  The default implementation is for POD types, strings and variants
  */
@@ -582,7 +582,7 @@ struct reader
 };
 
 /**
- *  @brief Deseralisation wrapper: specialization for const char *
+ *  @brief Deserialization wrapper: specialization for const char *
  *
  *  Without that would would have to handle void *&, void * const &, ...
  *  TODO: right now these types are not supported.
@@ -601,7 +601,7 @@ struct reader<void *>
 };
 
 /**
- *  @brief Deseralisation wrapper: specialization for strings
+ *  @brief Deserialization wrapper: specialization for strings
  */
 template <>
 struct reader<gsi::StringType>
@@ -618,7 +618,7 @@ struct reader<gsi::StringType>
 };
 
 /**
- *  @brief Deseralisation wrapper: specialization for byte arrays
+ *  @brief Deserialization wrapper: specialization for byte arrays
  */
 template <>
 struct reader<gsi::ByteArrayType>
@@ -699,7 +699,7 @@ PyObject *object_from_variant (tl::Variant &var, PYAObjectBase *self, const gsi:
 }
 
 /**
- *  @brief Deseralisation wrapper: specialization for variants
+ *  @brief Deserialization wrapper: specialization for variants
  */
 template <>
 struct reader<gsi::VariantType>
@@ -723,7 +723,7 @@ struct reader<gsi::VariantType>
 };
 
 /**
- *  @brief Deseralisation wrapper: specialization for vectors
+ *  @brief Deserialization wrapper: specialization for vectors
  */
 template <>
 struct reader<gsi::VectorType>
@@ -743,7 +743,7 @@ struct reader<gsi::VectorType>
 };
 
 /**
- *  @brief Deseralisation wrapper: specialization for maps
+ *  @brief Deserialization wrapper: specialization for maps
  */
 template <>
 struct reader<gsi::MapType>
@@ -764,7 +764,7 @@ struct reader<gsi::MapType>
 };
 
 /**
- *  @brief Deseralisation wrapper: specialization for object
+ *  @brief Deserialization wrapper: specialization for object
  */
 template <>
 struct reader<gsi::ObjectType>
@@ -781,7 +781,7 @@ struct reader<gsi::ObjectType>
 };
 
 /**
- *  @brief Deseralisation wrapper: specialization for void
+ *  @brief Deserialization wrapper: specialization for void
  */
 template <>
 struct reader<gsi::VoidType>

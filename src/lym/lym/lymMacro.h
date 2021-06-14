@@ -831,7 +831,7 @@ public:
    *  
    *  The collection becomes the owner of the object passed to this method
    *
-   *  @return true, if the macro could be added sucessfully.
+   *  @return true, if the macro could be added successfully.
    */
   bool add (lym::Macro *m);
 
@@ -883,7 +883,7 @@ public:
    * 
    *  If a name is given, it is used as a prefix to create a unique name.
    *  This method will also create the directory for this folder.
-   *  If not sucessful, it will return 0.
+   *  If not successful, it will return 0.
    */
   lym::MacroCollection *create_folder (const char *name = 0, bool mkdir = true);
 

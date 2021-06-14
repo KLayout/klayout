@@ -709,7 +709,7 @@ ClassBase::classes_in_definition_order (const char *mod_name)
         if (taken.find (*c) != taken.end ()) {
           //  not considered.
         } else if ((*c)->declaration () && (*c)->declaration () != *c && taken.find ((*c)->declaration ()) == taken.end ()) {
-          //  can't produce this class yet - it refers to a class whic is not available.
+          //  can't produce this class yet - it refers to a class which is not available.
           tl::error << tl::sprintf ("class %s.%s refers to another class (%s.%s) which is not available", (*c)->module (), (*c)->name (), (*c)->declaration ()->module (), (*c)->declaration ()->name ());
         } else if ((*c)->parent () != 0 && taken.find ((*c)->parent ()) == taken.end ()) {
           //  can't produce this class yet - it's a child of a parent that is not produced yet.

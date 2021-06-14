@@ -14,5 +14,6 @@ M1      BLOCKAGEFILL                     12       150
 M1      BLOCKAGE                         12       151
 M1      FILL                             12       152
 NAME    M1/PIN                           12       10
+NAME    M1/LEFPIN                        12       10
 VIA1    LEFPIN,LEFOBS,VIA,PIN,NET,SPNET  13       0
 M2      LEFPIN,LEFOBS,PIN,NET,SPNET,VIA  14       0

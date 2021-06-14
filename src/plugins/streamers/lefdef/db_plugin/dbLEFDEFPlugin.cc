@@ -374,6 +374,9 @@ class LEFDEFFormatDeclaration
       tl::make_member (&LEFDEFReaderOptions::produce_labels, &LEFDEFReaderOptions::set_produce_labels, "produce-labels") +
       tl::make_member (&LEFDEFReaderOptions::labels_suffix, &LEFDEFReaderOptions::set_labels_suffix, "labels-suffix") +
       tl::make_member (&LEFDEFReaderOptions::labels_datatype, &LEFDEFReaderOptions::set_labels_datatype, "labels-datatype") +
+      tl::make_member (&LEFDEFReaderOptions::produce_lef_labels, &LEFDEFReaderOptions::set_produce_lef_labels, "produce-lef-labels") +
+      tl::make_member (&LEFDEFReaderOptions::lef_labels_suffix, &LEFDEFReaderOptions::set_lef_labels_suffix, "lef-labels-suffix") +
+      tl::make_member (&LEFDEFReaderOptions::lef_labels_datatype, &LEFDEFReaderOptions::set_lef_labels_datatype, "lef-labels-datatype") +
       tl::make_member (&LEFDEFReaderOptions::produce_routing, &LEFDEFReaderOptions::set_produce_routing, "produce-routing") +
       //  for backward compatibility
       tl::make_member (&LEFDEFReaderOptions::set_routing_suffix, "special-routing-suffix") +

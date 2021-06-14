@@ -309,7 +309,7 @@ D25ViewWidget::keyPressEvent (QKeyEvent *event)
 
     if (! top_view () && (event->modifiers () & Qt::ControlModifier) != 0) {
 
-      //  Ctrl + left/right changes azumith
+      //  Ctrl + left/right changes azimuths
 
       double d = (event->key () == Qt::Key_Right ? 2 : -2);
 

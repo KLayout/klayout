@@ -481,7 +481,7 @@ struct writer<gsi::MapType>
 };
 
 /**
- *  @brief A specialisation of the write function for vector types
+ *  @brief A specialization of the write function for vector types
  */
 template <>
 struct writer <gsi::ObjectType>
@@ -576,7 +576,7 @@ push_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, VALUE arg, tl::He
 }
 
 /**
- *  @brief Deseralisation wrapper
+ *  @brief Deserialization wrapper
  *
  *  The default implementation is for POD types, strings and variants
  */
@@ -610,7 +610,7 @@ struct reader
 };
 
 /**
- *  @brief Deseralisation wrapper: specialization for void *
+ *  @brief Deserialization wrapper: specialization for void *
  *
  *  Without that would would have to handle void *&, void * const &, ...
  *  TODO: right now these types are not supported.
@@ -629,7 +629,7 @@ struct reader<void *>
 };
 
 /**
- *  @brief Deseralisation wrapper: specialization for strings
+ *  @brief Deserialization wrapper: specialization for strings
  */
 template <>
 struct reader<gsi::StringType>
@@ -646,7 +646,7 @@ struct reader<gsi::StringType>
 };
 
 /**
- *  @brief Deseralisation wrapper: specialization for strings
+ *  @brief Deserialization wrapper: specialization for strings
  */
 template <>
 struct reader<gsi::ByteArrayType>
@@ -720,7 +720,7 @@ static VALUE object_from_variant (tl::Variant &var, Proxy *self, const gsi::ArgT
 }
 
 /**
- *  @brief Deseralisation wrapper: specialization for variants
+ *  @brief Deserialization wrapper: specialization for variants
  */
 template <>
 struct reader<gsi::VariantType>
@@ -744,7 +744,7 @@ struct reader<gsi::VariantType>
 };
 
 /**
- *  @brief Deseralisation wrapper: specialization for vectors
+ *  @brief Deserialization wrapper: specialization for vectors
  */
 template <>
 struct reader<gsi::VectorType>
@@ -764,7 +764,7 @@ struct reader<gsi::VectorType>
 };
 
 /**
- *  @brief Deseralisation wrapper: specialization for maps
+ *  @brief Deserialization wrapper: specialization for maps
  */
 template <>
 struct reader<gsi::MapType>
@@ -785,7 +785,7 @@ struct reader<gsi::MapType>
 };
 
 /**
- *  @brief Deseralisation wrapper: specialization for objects
+ *  @brief Deserialization wrapper: specialization for objects
  */
 template <>
 struct reader<gsi::ObjectType>

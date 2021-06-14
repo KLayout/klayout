@@ -516,6 +516,9 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_produce_labels (produce_labels->isChecked ());
   data->set_labels_suffix (tl::to_string (suffix_labels->text ()));
   data->set_labels_datatype (datatype_labels->text ().toInt ());
+  data->set_produce_lef_labels (produce_lef_labels->isChecked ());
+  data->set_lef_labels_suffix (tl::to_string (suffix_lef_labels->text ()));
+  data->set_lef_labels_datatype (datatype_lef_labels->text ().toInt ());
   data->set_separate_groups (separate_groups->isChecked ());
   data->set_read_lef_with_def (read_lef_with_def->isChecked ());
   data->set_map_file (tl::to_string (mapfile_path->text ()));
@@ -587,6 +590,9 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   produce_labels->setChecked (data->produce_labels ());
   suffix_labels->setText (tl::to_qstring (data->labels_suffix ()));
   datatype_labels->setText (QString::number (data->labels_datatype ()));
+  produce_lef_labels->setChecked (data->produce_lef_labels ());
+  suffix_lef_labels->setText (tl::to_qstring (data->lef_labels_suffix ()));
+  datatype_lef_labels->setText (QString::number (data->lef_labels_datatype ()));
   separate_groups->setChecked (data->separate_groups ());
   read_lef_with_def->setChecked (data->read_lef_with_def ());
   mapfile_path->setText (tl::to_qstring (data->map_file ()));

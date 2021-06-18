@@ -3262,3 +3262,63 @@ TEST(100)
   );
 }
 
+//  Bug #835
+TEST(101)
+{
+  db::Layout a, b;
+
+  unsigned int la = a.insert_layer ();
+  db::cell_index_type topa = a.add_cell ("TOP");
+  db::Shapes &sa = a.cell (topa).shapes (la);
+
+  unsigned int lb = b.insert_layer ();
+  db::cell_index_type topb = b.add_cell ("TOP");
+  db::Shapes &sb = b.cell (topb).shapes (lb);
+
+  db::TextRef tr (db::Text ("TEXT", db::Trans ()), a.shape_repository ());
+
+  db::PolygonRef pr (db::Polygon (db::Box (0, 0, 100, 200)), a.shape_repository ());
+
+  db::Point pp[] = { db::Point (0, 0), db::Point (100, 200) };
+  db::PathRef qr (db::Path (&pp[0], &pp[0] + 2, 20), a.shape_repository ());
+
+  db::Shape st = sa.insert (tr);
+  db::Shape sp = sa.insert (pr);
+  db::Shape sq = sa.insert (qr);
+
+  //  text sits in "a" shape repo now.
+  db::TextRef tr1 = st.text_ref ();
+  const db::Text &tr1_obj = *a.shape_repository ().repository (db::Text::tag ()).begin ();
+  EXPECT_EQ (& tr1.obj () == &tr1_obj, true);
+
+  //  polygon sits in "a" shape repo now.
+  db::PolygonRef pr1 = sp.polygon_ref ();
+  const db::Polygon &pr1_obj = *a.shape_repository ().repository (db::Polygon::tag ()).begin ();
+  EXPECT_EQ (& pr1.obj () == &pr1_obj, true);
+
+  //  path sits in "a" shape repo now.
+  db::PathRef qr1 = sq.path_ref ();
+  const db::Path &qr1_obj = *a.shape_repository ().repository (db::Path::tag ()).begin ();
+  EXPECT_EQ (& qr1.obj () == &qr1_obj, true);
+
+  //  Now insert into sb
+
+  db::Shape st2 = sb.insert (st);
+  db::Shape sp2 = sb.insert (sp);
+  db::Shape sq2 = sb.insert (sq);
+
+  //  text sits in "b" shape repo now.
+  db::TextRef tr2 = st2.text_ref ();
+  const db::Text &tr2_obj = *b.shape_repository ().repository (db::Text::tag ()).begin ();
+  EXPECT_EQ (& tr2.obj () == &tr2_obj, true);
+
+  //  polygon sits in "b" shape repo now.
+  db::PolygonRef pr2 = sp2.polygon_ref ();
+  const db::Polygon &pr2_obj = *b.shape_repository ().repository (db::Polygon::tag ()).begin ();
+  EXPECT_EQ (& pr2.obj () == &pr2_obj, true);
+
+  //  path sits in "b" shape repo now.
+  db::PathRef qr2 = sq2.path_ref ();
+  const db::Path &qr2_obj = *b.shape_repository ().repository (db::Path::tag ()).begin ();
+  EXPECT_EQ (& qr2.obj () == &qr2_obj, true);
+}

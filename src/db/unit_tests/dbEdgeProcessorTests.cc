@@ -2632,14 +2632,12 @@ TEST(103)
 
   //  test "redo" on this occasion
 
-// @@@
   db::PolygonContainer pc2 (out);
   db::PolygonGenerator pg2 (pc2, true, true);
   db::BooleanOp op2 (db::BooleanOp::ANotB);
 
   out.clear ();
   ep.redo (pg2, op2);
-// @@@
 
   EXPECT_EQ (out.size (), size_t (1));
 #if 1

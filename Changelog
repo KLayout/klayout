@@ -1,4 +1,13 @@
 
+0.27.2          (2021-06-20):
+
+* Bugfix: %GITHUB%/issues/835 Crash on layout save after deep copy + close of other
+* Bugfix: %GITHUB%/issues/839 Crash after PCell code exception is handled in Macro IDE
+* Bugfix: %GITHUB%/issues/824 LEF/DEF flow - duplicate text label generated
+* Bugfix: %GITHUB%/issues/826 Crash on deep, threaded DRC mode with universal DRC function
+* Bugfix: Package names can contain dash characters ("-") too
+* Enhancement: a lot of typos fixed in documentation and code (thanks to Eugene)
+
 0.27.1          (2021-05-31):
 
 * Enhancement: %GITHUB%/issues/809 

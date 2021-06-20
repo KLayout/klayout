@@ -30,6 +30,7 @@
 #include "dbEdgeProcessor.h"
 #include "dbPolygonGenerators.h"
 #include "dbPolygonTools.h"
+#include "dbClip.h"
 
 #include "tlException.h"
 
@@ -538,7 +539,6 @@ D25ViewWidget::prepare_view ()
   m_layers.clear ();
   m_vertex_chunks.clear ();
 
-  m_bbox = db::DBox ();
   bool zset = false;
   m_zmin = m_zmax = 0.0;
 
@@ -546,6 +546,8 @@ D25ViewWidget::prepare_view ()
     m_bbox = db::DBox (-1.0, -1.0, 1.0, 1.0);
     return false;
   }
+
+  m_bbox = mp_view->viewport ().box ();
 
   ZDataCache zdata;
   bool any = false;
@@ -577,9 +579,7 @@ D25ViewWidget::prepare_view ()
       m_layers.push_back (info);
 
       const lay::CellView &cv = mp_view->cellview ((unsigned int) lp->cellview_index ());
-      render_layout (m_vertex_chunks.back (), cv->layout (), *cv.cell (), (unsigned int) lp->layer_index (), z0, z1);
-
-      m_bbox += db::DBox (cv.cell ()->bbox ((unsigned int) lp->layer_index ())) * cv->layout ().dbu ();
+      render_layout (m_vertex_chunks.back (), cv->layout (), *cv.cell (), db::CplxTrans (cv->layout ().dbu ()).inverted () * m_bbox, (unsigned int) lp->layer_index (), z0, z1);
 
       if (! zset) {
         m_zmin = z0;
@@ -600,7 +600,22 @@ D25ViewWidget::prepare_view ()
 void
 D25ViewWidget::render_polygon (D25ViewWidget::chunks_type &chunks, const db::Polygon &poly, double dbu, double zstart, double zstop)
 {
-  if (poly.hull ().size () > 4) {
+  if (poly.holes () > 0) {
+
+    std::vector<db::Polygon> poly_heap;
+
+    db::EdgeProcessor ep;
+    ep.insert_sequence (poly.begin_edge ());
+    db::PolygonContainer pc (poly_heap);
+    db::PolygonGenerator out (pc, true /*resolve holes*/, true /*min coherence*/);
+    db::SimpleMerge op;
+    ep.process (out, op);
+
+    for (std::vector<db::Polygon>::const_iterator p = poly_heap.begin (); p != poly_heap.end (); ++p) {
+      render_polygon (chunks, *p, dbu, zstart, zstop);
+    }
+
+  } else if (poly.hull ().size () > 4) {
 
     std::vector<db::Polygon> poly_heap;
 
@@ -654,13 +669,13 @@ D25ViewWidget::render_wall (D25ViewWidget::chunks_type &chunks, const db::Edge &
 }
 
 void
-D25ViewWidget::render_layout (D25ViewWidget::chunks_type &chunks, const db::Layout &layout, const db::Cell &cell, unsigned int layer, double zstart, double zstop)
+D25ViewWidget::render_layout (D25ViewWidget::chunks_type &chunks, const db::Layout &layout, const db::Cell &cell, const db::Box &clip_box, unsigned int layer, double zstart, double zstop)
 {
-  db::EdgeProcessor ep;
   std::vector<db::Polygon> poly_heap;
 
   //  TODO: hidden cells, hierarchy depth ...
-  db::RecursiveShapeIterator s (layout, cell, layer);
+
+  db::RecursiveShapeIterator s (layout, cell, layer, clip_box);
   s.shape_flags (db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes);
   for ( ; ! s.at_end (); ++s) {
 
@@ -668,46 +683,15 @@ D25ViewWidget::render_layout (D25ViewWidget::chunks_type &chunks, const db::Layo
     s->polygon (polygon);
     polygon.transform (s.trans ());
 
-    if (polygon.holes () == 0 && polygon.hull ().size () <= 4) {
+    poly_heap.clear ();
+    db::clip_poly (polygon, clip_box, poly_heap, false /*keep holes*/);
 
-      render_polygon (chunks, polygon, layout.dbu (), zstart, zstop);
+    for (std::vector<db::Polygon>::const_iterator p = poly_heap.begin (); p != poly_heap.end (); ++p) {
 
-      for (db::Polygon::polygon_edge_iterator e = polygon.begin_edge (); ! e.at_end (); ++e) {
+      render_polygon (chunks, *p, layout.dbu (), zstart, zstop);
+
+      for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
         render_wall (chunks, *e, layout.dbu (), zstart, zstop);
-      }
-
-    } else {
-
-      poly_heap.clear ();
-      ep.clear ();
-
-      ep.insert_sequence (polygon.begin_edge ());
-      {
-        db::PolygonContainer pc (poly_heap);
-        db::PolygonGenerator out (pc, true /*resolve holes*/, false /*min coherence for splitting*/);
-        db::SimpleMerge op;
-        ep.process (out, op);
-      }
-
-      for (std::vector<db::Polygon>::const_iterator p = poly_heap.begin (); p != poly_heap.end (); ++p) {
-        render_polygon (chunks, *p, layout.dbu (), zstart, zstop);
-      }
-
-      poly_heap.clear ();
-      ep.clear ();
-
-      ep.insert_sequence (polygon.begin_edge ());
-      {
-        db::PolygonContainer pc (poly_heap);
-        db::PolygonGenerator out (pc, false /*don't resolve holes*/, false /*min coherence for splitting*/);
-        db::SimpleMerge op;
-        ep.process (out, op);
-      }
-
-      for (std::vector<db::Polygon>::const_iterator p = poly_heap.begin (); p != poly_heap.end (); ++p) {
-        for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
-          render_wall (chunks, *e, layout.dbu (), zstart, zstop);
-        }
       }
 
     }

@@ -2629,6 +2629,26 @@ TEST(103)
   //  elaborate hole treatment
   EXPECT_EQ (out[0].to_string (), "(0,0;0,400;100,400;100,100;400,100;400,400;0,400;0,500;1500,500;1500,0;1000,0;1000,400;1100,400;1100,100;1400,100;1400,400;500,400;500,0)");
 #endif
+
+  //  test "redo" on this occasion
+
+// @@@
+  db::PolygonContainer pc2 (out);
+  db::PolygonGenerator pg2 (pc2, true, true);
+  db::BooleanOp op2 (db::BooleanOp::ANotB);
+
+  out.clear ();
+  ep.redo (pg2, op2);
+// @@@
+
+  EXPECT_EQ (out.size (), size_t (1));
+#if 1
+  //  fast hole treatment
+  EXPECT_EQ (out[0].to_string (), "(0,0;0,400;100,400;100,100;400,100;400,400;1100,400;1100,100;1400,100;1400,400;0,400;0,500;1500,500;1500,0;1000,0;1000,400;500,400;500,0)");
+#else
+  //  elaborate hole treatment
+  EXPECT_EQ (out[0].to_string (), "(0,0;0,400;100,400;100,100;400,100;400,400;0,400;0,500;1500,500;1500,0;1000,0;1000,400;1100,400;1100,100;1400,100;1400,400;500,400;500,0)");
+#endif
 }
 
 //  Bug 134

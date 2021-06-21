@@ -51,13 +51,7 @@ public:
   void menu_activated (const std::string &symbol) 
   {
     if (symbol == "lay::d25_view") {
-
-      if (mp_dialog->exec_dialog (mp_view)) {
-
-        // ... implementation is in layD25ToolDialog.cc ...
-
-      }
-
+      mp_dialog->exec_dialog (mp_view);
     }
   }
 

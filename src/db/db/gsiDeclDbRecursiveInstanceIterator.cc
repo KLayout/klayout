@@ -226,37 +226,37 @@ Class<db::RecursiveInstanceIterator> decl_RecursiveInstanceIterator ("db", "Recu
     "@brief Gets the top cell this iterator is connected to\n"
   ) +
   gsi::method ("region", &db::RecursiveInstanceIterator::region,
-    "@brief Gets the basic region that is iterator is using\n"
+    "@brief Gets the basic region that this iterator is using\n"
     "The basic region is the overall box the region iterator iterates over. "
     "There may be an additional complex region that confines the region iterator. "
     "See \\complex_region for this attribute.\n"
   ) +
   gsi::method_ext ("complex_region", &complex_region,
-    "@brief Gets the complex region that is iterator is using\n"
+    "@brief Gets the complex region that this iterator is using\n"
     "The complex region is the effective region (a \\Region object) that the "
     "iterator is selecting from the layout. This region can be a single box "
     "or a complex region.\n"
   ) +
   gsi::method ("region=", (void (db::RecursiveInstanceIterator::*)(const db::RecursiveInstanceIterator::box_type &)) &db::RecursiveInstanceIterator::set_region, gsi::arg ("box_region"),
-    "@brief Sets the rectangular region that is iterator is iterating over\n"
+    "@brief Sets the rectangular region that this iterator is iterating over\n"
     "See \\region for a description of this attribute.\n"
     "Setting a simple region will reset the complex region to a rectangle and reset the iterator to "
     "the beginning of the sequence."
   ) +
   gsi::method ("region=", (void (db::RecursiveInstanceIterator::*)(const db::RecursiveInstanceIterator::region_type &)) &db::RecursiveInstanceIterator::set_region, gsi::arg ("complex_region"),
-    "@brief Sets the complex region that is iterator is using\n"
+    "@brief Sets the complex region that this iterator is using\n"
     "See \\complex_region for a description of this attribute. Setting the complex region will "
     "reset the basic region (see \\region) to the bounding box of the complex region and "
     "reset the iterator to the beginning of the sequence.\n"
   ) +
   gsi::method ("confine_region", (void (db::RecursiveInstanceIterator::*)(const db::RecursiveInstanceIterator::box_type &)) &db::RecursiveInstanceIterator::confine_region, gsi::arg ("box_region"),
-    "@brief Confines the region that is iterator is iterating over\n"
+    "@brief Confines the region that this iterator is iterating over\n"
     "This method is similar to setting the region (see \\region=), but will confine any region (complex or simple) already set. "
     "Essentially it does a logical AND operation between the existing and given region. "
     "Hence this method can only reduce a region, not extend it.\n"
   ) +
   gsi::method ("confine_region", (void (db::RecursiveInstanceIterator::*)(const db::RecursiveInstanceIterator::region_type &)) &db::RecursiveInstanceIterator::confine_region, gsi::arg ("complex_region"),
-    "@brief Confines the region that is iterator is iterating over\n"
+    "@brief Confines the region that this iterator is iterating over\n"
     "This method is similar to setting the region (see \\region=), but will confine any region (complex or simple) already set. "
     "Essentially it does a logical AND operation between the existing and given region. "
     "Hence this method can only reduce a region, not extend it.\n"

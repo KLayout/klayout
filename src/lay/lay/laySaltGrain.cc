@@ -280,7 +280,7 @@ SaltGrain::valid_name (const std::string &n)
   }
 
   std::string s;
-  if (! ex.try_read_word (s, "_.")) {
+  if (! ex.try_read_word (s, "_.-")) {
     return false;
   }
   res += s;
@@ -293,7 +293,7 @@ SaltGrain::valid_name (const std::string &n)
     if (ex.test (".")) {
       return false;
     }
-    if (! ex.try_read_word (s, "_.")) {
+    if (! ex.try_read_word (s, "_.-")) {
       return false;
     }
     res += "/";

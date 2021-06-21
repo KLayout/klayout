@@ -25,6 +25,7 @@
 #define HDR_dbEdgePairFilters
 
 #include "dbEdgePairs.h"
+#include "dbEdgesUtils.h"
 
 namespace db
 {
@@ -69,12 +70,57 @@ public:
   EdgePairFilterByDistance (distance_type min_distance, distance_type max_distance, bool inverted);
 
   virtual bool selected (const db::EdgePair &edge_pair) const;
-  virtual const TransformationReducer *vars () const { return 0; }
-  virtual bool wants_variants () const { return false; }
+  virtual const TransformationReducer *vars () const { return &m_vars; }
+  virtual bool wants_variants () const { return true; }
 
 private:
   distance_type m_min_distance, m_max_distance;
   bool m_inverted;
+  db::MagnificationReducer m_vars;
+};
+
+/**
+ *  @brief Filters edge pairs based on the distance of the edges.
+ *
+ *  The distance is measured as the smallest distance between each of the points of the two edges.
+ */
+class DB_PUBLIC EdgePairFilterByArea
+  : public EdgePairFilterBase
+{
+public:
+  typedef db::coord_traits<db::Coord>::area_type area_type;
+
+  EdgePairFilterByArea (area_type min_area, area_type max_area, bool inverted);
+
+  virtual bool selected (const db::EdgePair &edge_pair) const;
+  virtual const TransformationReducer *vars () const { return &m_vars; }
+  virtual bool wants_variants () const { return true; }
+
+private:
+  area_type m_min_area, m_max_area;
+  bool m_inverted;
+  db::MagnificationReducer m_vars;
+};
+
+/**
+ *  @brief Filters edge pairs based on the distance of the edges.
+ *
+ *  The distance is measured as the smallest distance between each of the points of the two edges.
+ */
+class DB_PUBLIC InternalAngleEdgePairFilter
+  : public EdgePairFilterBase
+{
+public:
+  InternalAngleEdgePairFilter (double a, bool inverted);
+  InternalAngleEdgePairFilter (double amin, bool include_amin, double amax, bool include_amax, bool inverted);
+
+  virtual bool selected (const db::EdgePair &edge_pair) const;
+  virtual const TransformationReducer *vars () const { return 0; }
+  virtual bool wants_variants () const { return false; }
+
+private:
+  bool m_inverted;
+  db::EdgeAngleChecker m_checker;
 };
 
 }

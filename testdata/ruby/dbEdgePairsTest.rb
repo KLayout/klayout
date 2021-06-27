@@ -283,7 +283,7 @@ class DBEdgePairs_TestClass < TestBase
 
     assert_equal(r1.with_internal_angle(0, false).to_s, "(0,0;0,10)/(10,20;10,0)")
     assert_equal(r1.with_internal_angle(90, false).to_s, "(0,0;0,10)/(20,0;30,0);(0,0;0,10)/(-20,0;-30,0)")
-    assert_equal(r1.with_internal_angle(-90, false).to_s, "(0,0;0,10)/(20,0;30,0);(0,0;0,10)/(-20,0;-30,0)")
+    assert_equal(r1.with_internal_angle(-90, false).to_s, "")
 
     assert_equal(r1.with_angle(90, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(20,0;30,0);(0,0;0,10)/(-20,0;-30,0)")
     assert_equal(r1.with_angle(0, false).to_s, "(0,0;0,10)/(20,0;30,0);(0,0;0,10)/(-20,0;-30,0)")

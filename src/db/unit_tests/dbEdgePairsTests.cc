@@ -24,6 +24,7 @@
 #include "tlUnitTest.h"
 
 #include "dbEdgePairs.h"
+#include "dbEdgePairFilters.h"
 #include "dbEdges.h"
 #include "dbRegion.h"
 #include "dbTestSupport.h"
@@ -159,4 +160,43 @@ TEST(4)
 
   db::Region r (db::RecursiveShapeIterator (ly, ly.cell (top_cell), l1));
   EXPECT_EQ (db::compare (r, "(-10,-21;9,20;50,51;91,80);(-10,-21;9,20;110,121;91,80)"), true);
+}
+
+TEST(5_InternalAngleFilter)
+{
+  db::EdgePair ep0 (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 0), db::Point (0, 0)));
+  db::EdgePair ep45 (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 0), db::Point (100, 100)));
+  db::EdgePair ep180 (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 0), db::Point (100, 0)));
+  db::EdgePair ep90 (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 0), db::Point (0, 100)));
+  db::EdgePair epm90 (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 100), db::Point (0, 0)));
+
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (ep0), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (ep180), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (ep90), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (epm90), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (ep45), false);
+
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (ep0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (ep180), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (ep90), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (epm90), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (ep45), false);
+
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep180), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep90), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (epm90), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep45), true);
+
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (ep0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (ep180), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (ep90), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (epm90), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (ep45), true);
+
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep0), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep180), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep90), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (epm90), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep45), true);
 }

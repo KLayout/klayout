@@ -776,8 +776,9 @@ public:
     {
       if (is_for_subcircuit ()) {
         const db::SubCircuit *sc = subcircuit_pair ().first;
+        size_t pin_id = std::numeric_limits<size_t>::max () - m_id1;
         const db::Circuit *c = sc->circuit_ref ();
-        return std::string ("X") + sc->expanded_name () + " " + c->name ();
+        return std::string ("X") + sc->expanded_name () + " " + c->name () + " " + c->pin_by_id (pin_id)->expanded_name () + " (virtual)";
      } else {
         size_t term_id1 = m_id1;
         size_t term_id2 = m_id2;
@@ -3168,14 +3169,16 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 }
 
 static
-std::vector<size_t> collect_pins_with_empty_nets (const db::Circuit *c, CircuitPinMapper *circuit_pin_mapper)
+std::vector<size_t> collect_anonymous_empty_pins (const db::Circuit *c, CircuitPinMapper *circuit_pin_mapper)
 {
   std::vector<size_t> pins;
 
   for (db::Circuit::const_pin_iterator p = c->begin_pins (); p != c->end_pins (); ++p) {
-    const db::Net *net = c->net_for_pin (p->id ());
-    if ((! net || net->is_passive ()) && ! circuit_pin_mapper->is_mapped (c, p->id ())) {
-      pins.push_back (p->id ());
+    if (p->name ().empty () && ! circuit_pin_mapper->is_mapped (c, p->id ())) {
+      const db::Net *net = c->net_for_pin (p->id ());
+      if (! net || net->is_passive ()) {
+        pins.push_back (p->id ());
+      }
     }
   }
 
@@ -3185,13 +3188,11 @@ std::vector<size_t> collect_pins_with_empty_nets (const db::Circuit *c, CircuitP
 void
 NetlistComparer::derive_pin_equivalence (const db::Circuit *ca, const db::Circuit *cb, CircuitPinMapper *circuit_pin_mapper)
 {
-  //  TODO: All pins with empty nets are treated as equivalent - this as a quick way to
-  //  treat circuits abstracts, although it's not really valid. By doing this, we
-  //  don't capture the case of multiple (abstract) subcircuits wired in different ways.
+  //  NOTE: All unnamed pins with empty nets are treated as equivalent. There is no other criterion to match these pins.
 
   std::vector<size_t> pa, pb;
-  pa = collect_pins_with_empty_nets (ca, circuit_pin_mapper);
-  pb = collect_pins_with_empty_nets (cb, circuit_pin_mapper);
+  pa = collect_anonymous_empty_pins (ca, circuit_pin_mapper);
+  pb = collect_anonymous_empty_pins (cb, circuit_pin_mapper);
 
   circuit_pin_mapper->map_pins (ca, pa);
   circuit_pin_mapper->map_pins (cb, pb);
@@ -3537,7 +3538,13 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   //  NOTE: for normalization we map all subcircuits of c1 to c2.
   //  Also, pin swapping will only happen there.
+  if (options ()->debug_netgraph) {
+    tl::info << "Netlist graph:";
+  }
   g1.build (c1, device_categorizer, circuit_categorizer, device_filter, &c12_circuit_and_pin_mapping, &circuit_pin_mapper);
+  if (options ()->debug_netgraph) {
+    tl::info << "Other netlist graph:";
+  }
   g2.build (c2, device_categorizer, circuit_categorizer, device_filter, &c22_circuit_and_pin_mapping, &circuit_pin_mapper);
 
   //  Match dummy nodes for null nets
@@ -3851,7 +3858,7 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
           mp_logger->match_pins (p.operator-> (), fp->second);
         }
         c12_pin_mapping.map_pin (p->id (), fp->second->id ());
-        c22_pin_mapping.map_pin (fp->second->id (), p->id ());
+        c22_pin_mapping.map_pin (fp->second->id (), fp->second->id ());
 
       } else if (next_abstract != abstract_pins2.end ()) {
 
@@ -3861,7 +3868,7 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
           mp_logger->match_pins (p.operator-> (), *next_abstract);
         }
         c12_pin_mapping.map_pin (p->id (), (*next_abstract)->id ());
-        c22_pin_mapping.map_pin ((*next_abstract)->id (), p->id ());
+        c22_pin_mapping.map_pin ((*next_abstract)->id (), (*next_abstract)->id ());
 
         ++next_abstract;
 

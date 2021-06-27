@@ -233,11 +233,11 @@ static QString escaped (const std::string &s)
 }
 
 template <class Obj>
-static std::string str_from_expanded_name (const Obj *obj, bool dash_for_empty = false)
+static std::string str_from_expanded_name (const Obj *obj, bool indicate_empty = false)
 {
   if (obj) {
     return obj->expanded_name ();
-  } else if (dash_for_empty) {
+  } else if (indicate_empty) {
     return std::string ("-");
   } else {
     return std::string ();
@@ -245,11 +245,11 @@ static std::string str_from_expanded_name (const Obj *obj, bool dash_for_empty =
 }
 
 template <class Obj>
-static std::string str_from_name (const Obj *obj, bool dash_for_empty = false)
+static std::string str_from_name (const Obj *obj, bool indicate_empty = false)
 {
   if (obj) {
     return obj->name ();
-  } else if (dash_for_empty) {
+  } else if (indicate_empty) {
     return std::string ("-");
   } else {
     return std::string ();
@@ -264,7 +264,7 @@ static std::string str_from_expanded_names (const std::pair<const Obj *, const O
   std::string s = str_from_expanded_name (objs.first, ! is_single);
   if (! is_single) {
     std::string t = str_from_expanded_name (objs.second, ! is_single);
-    if (t != s) {
+    if (t != s || ! objs.first || ! objs.second) {
       s += var_sep;
       s += t;
     }
@@ -278,7 +278,7 @@ static std::string str_from_names (const std::pair<const Obj *, const Obj *> &ob
   std::string s = str_from_name (objs.first, ! is_single);
   if (! is_single) {
     std::string t = str_from_name (objs.second, ! is_single);
-    if (t != s) {
+    if (t != s || ! objs.first || ! objs.second) {
       s += var_sep;
       s += t;
     }

@@ -64,10 +64,8 @@ module DRC
 
     def initialize(engine)
       @engine = engine
-      @connect_implicit = []
-      @connect_implicit_per_cell = {}
-      @connect_explicit = []
-      @connect_explicit_per_cell = {}
+      @pre_extract_config = []
+      @post_extract_config = []
       @l2n = nil
       @lnum = 0
       @device_scaling = 1.0
@@ -239,10 +237,8 @@ module DRC
     # See \connect for more details.
 
     def clear_connections
-      @connect_implicit = []
-      @connect_implicit_per_cell = {}
-      @connect_explicit = []
-      @connect_explicit_per_cell = {}
+      @pre_extract_config = []
+      @post_extract_config = []
       _clear_data
     end
     
@@ -277,11 +273,10 @@ module DRC
         if arg2
           (arg2.is_a?(String) && arg2 != "") || raise("The second argument has to be a non-empty string")
           arg1.is_a?(String) || raise("The first argument has to be a string")
-          @connect_implicit_per_cell[arg1] ||= []
-          @connect_implicit_per_cell[arg1] << arg2
+          @pre_extract_config << lambda { |l2n| l2n.join_net_names(arg1, arg2) }
         else
           arg1.is_a?(String) || raise("The argument has to be a string")
-          @connect_implicit << arg1
+          @pre_extract_config << lambda { |l2n| l2n.join_net_names(arg1) }
         end
 
       end
@@ -338,11 +333,10 @@ module DRC
           arg2.is_a?(Array) || raise("The second argument has to be an array of strings")
           arg2.find { |a| !a.is_a?(String) } && raise("The second argument has to be an array of strings")
           arg1.is_a?(String) || raise("The first argument has to be a string")
-          @connect_explicit_per_cell[arg1] ||= []
-          @connect_explicit_per_cell[arg1] << arg2
+          @pre_extract_config << lambda { |l2n| l2n.join_nets(arg1, arg2) }
         else
           arg1.is_a?(String) || raise("The argument has to be a string")
-          @connect_explicit << arg1
+          @pre_extract_config << lambda { |l2n| l2n.join_nets(arg1) }
         end
 
       end
@@ -563,29 +557,20 @@ module DRC
         # run extraction in a timed environment
         if ! @l2n.is_extracted?
 
-          # configure implicit net connections
           @l2n.clear_join_net_names
-          @connect_implicit.each do |label_pattern|
-            @l2n.join_net_names(label_pattern)
-          end
-          @connect_implicit_per_cell.each do |cell_pattern,label_pattern|
-            label_pattern.each do |lp|
-              @l2n.join_net_names(cell_pattern, lp)
-            end
-          end
-
-          # configure explicit net connections
           @l2n.clear_join_nets
-          @connect_explicit.each do |names|
-            @l2n.join_nets(names)
-          end
-          @connect_explicit_per_cell.each do |cell_pattern,name_lists|
-            name_lists.each do |names|
-              @l2n.join_nets(cell_pattern, names)
-            end
+
+          # configure the netter
+          @pre_extract_config.each do |cfg|
+            cfg.call(@l2n)
           end
 
           @engine._cmd(@l2n, :extract_netlist)
+
+          # configure the netter, post-extraction
+          @post_extract_config.each do |cfg|
+            cfg.call(@l2n)
+          end
 
         end
 

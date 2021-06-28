@@ -49,6 +49,7 @@ module LVS
     def initialize(engine)
       super
       @comparer_config = []
+      @comparer_miniconfig = []
     end
 
     def _make_data
@@ -140,7 +141,18 @@ module LVS
       abs_tol ||= 0.0
       rel_tol ||= 0.0
 
-      dc = netlist.device_class_by_name(device_class_name)
+      if self._l2n_data
+        # already extracted
+        self._tolerance(self._l2n_data, device_class_name, parameter_name, abs_tol, rel_tol)
+      else
+        @post_extract_config << lambda { |l2n| self._tolerance(l2n, device_class_name, parameter_name, abs_tol, rel_tol) }
+      end
+
+    end
+
+    def _tolerance(l2n, device_class_name, parameter_name, abs_tol, rel_tol)
+
+      dc = l2n.netlist.device_class_by_name(device_class_name)
       if dc && dc.has_parameter?(parameter_name)
         ep = RBA::EqualDeviceParameters::new(dc.parameter_id(parameter_name), abs_tol, rel_tol)
         if dc.equal_parameters == nil
@@ -250,12 +262,24 @@ module LVS
 
       circuit_pattern.is_a?(String) || raise("Circuit pattern argument of 'join_symmetric_nets' must be a string")
 
-      comparer = self._comparer 
+      if self._l2n_data
+        # already extracted
+        self._join_symmetric_nets(self._l2n_data, circuit_pattern)
+      else
+        @post_extract_config << lambda { |l2n| self._join_symmetric_nets(l2n, circuit_pattern) }
+      end
 
-      netlist || raise("No netlist present (not extracted?)")
-      netlist.circuits_by_name(circuit_pattern).each do |c|
+    end
+
+    def _join_symmetric_nets(l2n, circuit_pattern)
+
+      comparer = self._comparer_mini
+
+      l2n.netlist.circuits_by_name(circuit_pattern).each do |c|
         comparer.join_symmetric_nets(c)
       end
+
+      comparer._destroy
 
     end
 
@@ -265,6 +289,19 @@ module LVS
 
       # execute the configuration commands
       @comparer_config.each do |cc|
+        cc.call(comparer)
+      end
+
+      return comparer
+
+    end
+
+    def _comparer_mini
+
+      comparer = RBA::NetlistComparer::new
+
+      # execute the configuration commands
+      @comparer_miniconfig.each do |cc|
         cc.call(comparer)
       end
 
@@ -589,6 +626,7 @@ module LVS
     def min_caps(value)
       v = value.to_f
       @comparer_config << lambda { |comparer| comparer.min_capacitance = v }
+      @comparer_miniconfig << lambda { |comparer| comparer.min_capacitance = v }
     end
       
     # %LVS%
@@ -601,6 +639,7 @@ module LVS
     def max_res(value)
       v = value.to_f
       @comparer_config << lambda { |comparer| comparer.max_resistance = v }
+      @comparer_miniconfig << lambda { |comparer| comparer.max_resistance = v }
     end
 
     # %LVS%

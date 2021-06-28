@@ -4477,7 +4477,9 @@ NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
   std::map<const db::Circuit *, CircuitMapper> circuit_and_pin_mapping;
 
   db::NetGraph graph;
-  graph.build (circuit, *mp_device_categorizer, *mp_circuit_categorizer, device_filter, &circuit_and_pin_mapping, &circuit_pin_mapper);
+  db::CircuitCategorizer circuit_categorizer;
+  db::DeviceCategorizer device_categorizer;
+  graph.build (circuit, device_categorizer, circuit_categorizer, device_filter, &circuit_and_pin_mapping, &circuit_pin_mapper);
 
   //  sort the nodes so we can easily identify the identical ones (in terms of topology)
   //  nodes are identical if the attached devices and circuits are of the same kind and with the same parameters

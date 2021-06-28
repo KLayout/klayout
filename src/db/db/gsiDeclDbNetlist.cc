@@ -1709,7 +1709,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "This method will erase everything from inside the circuits matching the given pattern. It will only leave pins which are "
     "not connected to any net. Hence, this method forms 'abstract' or black-box circuits which can be instantiated through "
     "subcircuits like the former ones, but are empty shells.\n"
-    "The name pattern is a glob expression. For example, 'flatten_circuit(\"np*\")' will blank out all circuits with names "
+    "The name pattern is a glob expression. For example, 'blank_circuit(\"np*\")' will blank out all circuits with names "
     "starting with 'np'.\n"
     "\n"
     "For more details see \\Circuit#blank which is the corresponding method on the actual object."

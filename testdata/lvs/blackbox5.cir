@@ -1,0 +1,26 @@
+* Extracted by KLayout
+
+* cell TOP
+.SUBCKT TOP
+* net 2 3
+* net 3 4
+* net 4 2
+* net 5 1
+* net 6 8
+* net 7 5,7
+* net 8 6
+* cell instance $1 r0 *1 0,0
+X$1 2 3 7 4 5 6 8 1 CHIP
+.ENDS TOP
+
+* cell CHIP
+* pin pad3
+* pin pad4
+* pin pad5
+* pin pad2
+* pin pad1
+* pin pad8
+* pin pad6
+* pin pad7
+.SUBCKT CHIP 1 2 3 4 5 6 7 8
+.ENDS CHIP

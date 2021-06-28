@@ -153,10 +153,11 @@
 
   <p>
   A useful method in this context is the "blank_circuit" method. It clears
-  a circuit's innards and leaves only the pins. You can use this method to 
-  ensure abstracts in both the layout netlist and the schematic. After this,
+  a circuit's innards from a netlist.  After this,
   the compare algorithm will identify both circuits as identical, provided
-  they feature the same number of pins.
+  they feature the same number of pins. Named pins are required to match exactly
+  unless declared equivalent. Unnamed pins are treated as equivalent. To name
+  pins use labels on the pin's nets inside the circuit's layout.
   </p>
 
   <p>
@@ -166,14 +167,20 @@
   <pre>netlist.blank_circuit("CIRCUIT_NAME")
 schematic.blank_circuit("CIRCUIT_NAME")</pre>
 
+  <p><b>NOTE:</b> In this version, use "blank_circuit" before "purge" or "simplify" (see below). "blank_circuit"
+  sets a flag (<class_doc href="Circuit#dont_purge"/>) which prevents purging of abstract circuits.</p>
+
   <p>
-  The argument to "blank_circuit" is a glob pattern (shell-like).
-  For example, "MEMORY*" will blank out all circuits starting with "MEMORY".
+  There is a short form for this too (<a href="/about/lvs_ref_netter.xml#blank_circuit">blank_circuit</a>). 
+  In contrast to netlist-based "blank_circuit", this method can be used anywhere in the LVS script:
   </p>
 
-  <p><b>NOTE:</b> Use "blank_circuit" before "purge" or "simplify" (see below). This method
-  sets a flag (<class_doc href="Circuit#dont_purge"/>) which prevents purging of abstract
-  circuits.</p>
+  <pre>blank_circuit("CIRCUIT_NAME")</pre>
+
+  <p>
+  The argument to "blank_circuit" in both cases is a glob pattern (shell-like).
+  For example, "MEMORY*" will blank out all circuits starting with the word "MEMORY".
+  </p>
 
   <h2>Joining of symmetric nodes</h2>
 
@@ -201,8 +208,8 @@ schematic.blank_circuit("CIRCUIT_NAME")</pre>
   </p>
 
   <p>
-  KLayout provides a feature which will add such connections after extraction
-  of the netlist:
+  KLayout provides a feature (<a href="/about/lvs_ref_netter.xml#join_symmetric_nets">join_symmetric_nets</a>) 
+  which will add such connections after extraction of the netlist:
   </p>
 
   <pre>join_symmetric_nets("NAND2")</pre>
@@ -219,6 +226,10 @@ schematic.blank_circuit("CIRCUIT_NAME")</pre>
   modify all circuits, but at the price of potentially introducing unwanted connections.
   Hence the recommendation is to use this feature on circuits which are known to 
   need it.
+  </p>
+
+  <p> 
+  "join_symmetric_nets" can be used anywhere in the LVS script.
   </p>
 
   <h2>Purging (elimination of redundancy)</h2>

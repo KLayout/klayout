@@ -135,6 +135,11 @@ TEST(9_blackboxing)
   run_test (_this, "ringo_simple_blackboxing", "ringo_for_blackboxing.gds");
 }
 
+TEST(9b_blackboxing_netter)
+{
+  run_test (_this, "ringo_simple_blackboxing_netter", "ringo_for_blackboxing.gds");
+}
+
 TEST(10_simplification_with_align)
 {
   run_test (_this, "ringo_simple_simplification_with_align", "ringo_for_simplification.gds");

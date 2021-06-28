@@ -101,6 +101,12 @@ module LVS
     # See \Netter#join_symmetric_nets for a description of that function.
  
     # %LVS%
+    # @name blank_circuit
+    # @brief Removes the content from the given circuits (blackboxing)
+    # @synopsis blank_circuit(circuit_filter)
+    # See \Netter#blank_circuit for a description of that function.
+ 
+    # %LVS%
     # @name align
     # @brief Aligns the extracted netlist vs. the schematic by flattening circuits where required
     # @synopsis align
@@ -168,7 +174,7 @@ module LVS
     # @synopsis tolerance(device_class_name, parameter_name [, :absolute => absolute_tolerance] [, :relative => relative_tolerance])
     # See \Netter#tolerance for a description of that function.
 
-    %w(schematic compare join_symmetric_nets tolerance align same_nets same_circuits same_device_classes equivalent_pins min_caps max_res max_depth max_branch_complexity consider_net_names).each do |f|
+    %w(schematic compare join_symmetric_nets tolerance blank_circuit align same_nets same_circuits same_device_classes equivalent_pins min_caps max_res max_depth max_branch_complexity consider_net_names).each do |f|
       eval <<"CODE"
         def #{f}(*args)
           _netter.#{f}(*args)

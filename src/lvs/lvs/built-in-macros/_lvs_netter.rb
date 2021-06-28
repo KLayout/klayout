@@ -283,6 +283,55 @@ module LVS
 
     end
 
+    # %LVS%
+    # @name blank_circuit
+    # @brief Removes the content from the given circuits (blackboxing)
+    # @synopsis blank_circuit(circuit_filter)
+    # This method will erase all content from the circuits matching the filter.
+    # The filter is a glob expression.
+    #
+    # This has the following effects:
+    #
+    # @ul
+    # @li The circuits are no longer compared (netlist vs. schematic) @/li
+    # @li Named pins are required to match (use labels on the nets to name pins in the layout) @/li
+    # @li Unnamed pins are treated as equivalent and can be swapped @/li
+    # @li The selected circuits will not be purged on netlist simplification @/li
+    # @/ul
+    #
+    # Using this method can be useful to reduce the verification overhead for 
+    # blocks which are already verifified by other ways or for which no schematic
+    # is available - e.g. hard macros.
+    #
+    # Example:
+    # 
+    # @code
+    # # skips all MEMORY* circuits from compare
+    # blank_circuit("MEMORY*")
+    # @/code
+
+    def blank_circuit(circuit_pattern)
+
+      circuit_pattern.is_a?(String) || raise("Circuit pattern argument of 'blank_circuit' must be a string")
+
+      if self._l2n_data
+        # already extracted
+        self._blank_circuit(self._l2n_data, circuit_pattern)
+      else
+        @post_extract_config << lambda { |l2n| self._blank_circuit(l2n, circuit_pattern) }
+      end
+
+    end
+
+    def _blank_circuit(l2n, circuit_pattern)
+
+      (n, s) = _ensure_two_netlists
+
+      n.blank_circuit(circuit_pattern)
+      s.blank_circuit(circuit_pattern)
+
+    end
+
     def _comparer
 
       comparer = RBA::NetlistComparer::new

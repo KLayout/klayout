@@ -68,6 +68,34 @@ are other (explicit) ways to flatten circuits.
 Please note that flattening circuits has some side effects such 
 as loss of details in the cross reference and net layout.
 </p>
+<a name="blank_circuit"/><h2>"blank_circuit" - Removes the content from the given circuits (blackboxing)</h2>
+<keyword name="blank_circuit"/>
+<p>Usage:</p>
+<ul>
+<li><tt>blank_circuit(circuit_filter)</tt></li>
+</ul>
+<p>
+This method will erase all content from the circuits matching the filter.
+The filter is a glob expression.
+</p><p>
+This has the following effects:
+</p><p>
+<ul>
+<li>The circuits are no longer compared against each other </li>
+<li>Named pins are required to match (use labels on the nets to name pins in the layout) </li>
+<li>Unnamed pins are treated as equivalent and can be swapped </li>
+<li>The selected circuits will not be purged on netlist simplification </li>
+</ul>
+</p><p>
+Using this method can be useful to reduce the verification overhead for 
+blocks which are already verifified by other ways or for which no schematic
+is available - e.g. hard macros.
+</p><p>
+<pre>
+# skips all MEMORY* circuits from compare
+blank_circuit("MEMORY*")
+</pre>
+</p>
 <a name="compare"/><h2>"compare" - Compares the extracted netlist vs. the schematic</h2>
 <keyword name="compare"/>
 <p>Usage:</p>

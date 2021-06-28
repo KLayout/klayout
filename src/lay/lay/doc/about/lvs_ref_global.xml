@@ -28,6 +28,15 @@ For more details about the DRC functions see <a href="/about/drc_ref_global.xml"
 <p>
 See <a href="/about/lvs_ref_netter.xml#align">Netter#align</a> for a description of that function.
 </p>
+<a name="blank_circuit"/><h2>"blank_circuit" - Removes the content from the given circuits (blackboxing)</h2>
+<keyword name="blank_circuit"/>
+<p>Usage:</p>
+<ul>
+<li><tt>blank_circuit(circuit_filter)</tt></li>
+</ul>
+<p>
+See <a href="/about/lvs_ref_netter.xml#blank_circuit">Netter#blank_circuit</a> for a description of that function.
+</p>
 <a name="compare"/><h2>"compare" - Compares the extracted netlist vs. the schematic</h2>
 <keyword name="compare"/>
 <p>Usage:</p>

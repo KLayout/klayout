@@ -698,7 +698,9 @@ class DBNetlist_TestClass < TestBase
     assert_equal(c.net_by_cluster_id(17).name, "NET1")
     assert_equal(c.net_by_cluster_id(42).inspect, "nil")
     assert_equal(c.net_by_name("NET1").name, "NET1")
+    assert_equal(c.nets_by_name("NET*").collect(&:name), ["NET1"])
     assert_equal(c.net_by_name("DOESNOTEXIST").inspect, "nil")
+    assert_equal(c.nets_by_name("DOESNOTEXIST").collect(&:name), [])
 
     net2 = c.create_net
     net2.name = "NET2"
@@ -706,6 +708,7 @@ class DBNetlist_TestClass < TestBase
     names = []
     c.each_net { |n| names << n.name }
     assert_equal(names, [ "NET1", "NET2" ])
+    assert_equal(c.nets_by_name("NET*").collect(&:name), ["NET1", "NET2"])
 
     assert_equal(net1.pin_count, 0)
     c.connect_pin(pina1, net1)

@@ -1234,6 +1234,38 @@ static db::Pin *create_pin (db::Circuit *circuit, const std::string &name)
   return & circuit->add_pin (name);
 }
 
+static std::vector<db::Net *>
+nets_by_name (db::Circuit *circuit, const std::string &name_pattern)
+{
+  std::vector<db::Net *> res;
+
+  tl::GlobPattern glob (name_pattern);
+  for (db::Circuit::net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
+    db::Net *net = n.operator-> ();
+    if (glob.match (net->name ())) {
+      res.push_back (net);
+    }
+  }
+
+  return res;
+}
+
+static std::vector<const db::Net *>
+nets_by_name_const (const db::Circuit *circuit, const std::string &name_pattern)
+{
+  std::vector<const db::Net *> res;
+
+  tl::GlobPattern glob (name_pattern);
+  for (db::Circuit::const_net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
+    const db::Net *net = n.operator-> ();
+    if (glob.match (net->name ())) {
+      res.push_back (net);
+    }
+  }
+
+  return res;
+}
+
 Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
   gsi::method_ext ("create_pin", &create_pin, gsi::arg ("name"),
     "@brief Creates a new \\Pin object inside the circuit\n"
@@ -1346,6 +1378,18 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
     "If the ID is not a valid net name, nil is returned."
     "\n\n"
     "This constness variant has been introduced in version 0.26.8"
+  ) +
+  gsi::method_ext ("nets_by_name", &nets_by_name, gsi::arg ("name_pattern"),
+    "@brief Gets the net objects for a given name filter.\n"
+    "The name filter is a glob pattern. This method will return all \\Net objects matching the glob pattern.\n"
+    "\n"
+    "This method has been introduced in version 0.27.3.\n"
+  ) +
+  gsi::method_ext ("nets_by_name", &nets_by_name_const, gsi::arg ("name_pattern"),
+    "@brief Gets the net objects for a given name filter (const version).\n"
+    "The name filter is a glob pattern. This method will return all \\Net objects matching the glob pattern.\n"
+    "\n\n"
+    "This constness variant has been introduced in version 0.27.3"
   ) +
   gsi::method ("pin_by_id", (db::Pin *(db::Circuit::*) (size_t)) &db::Circuit::pin_by_id, gsi::arg ("id"),
     "@brief Gets the \\Pin object corresponding to a specific ID\n"

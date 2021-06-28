@@ -63,6 +63,13 @@ class DBNetlist_TestClass < TestBase
     assert_equal(nl.circuit_by_cell_index(17).inspect, "nil")
     assert_equal(nl.circuit_by_name("DOESNOTEXIST").inspect, "nil")
 
+    assert_equal(nl.is_case_sensitive?, true)
+    assert_equal(nl.circuit_by_name("xyz").inspect, "nil")
+    nl.case_sensitive = false
+    assert_equal(nl.is_case_sensitive?, false)
+    assert_equal(nl.circuit_by_name("xyz").name, "XYZ")
+    nl.case_sensitive = true
+
     cc = RBA::Circuit::new
     assert_equal(cc.dont_purge, false)
     cc.dont_purge = true
@@ -103,6 +110,11 @@ class DBNetlist_TestClass < TestBase
     assert_equal(names, [ c.name, cc.name ])
 
     assert_equal(nl.circuits_by_name("X*").collect { |x| x.name }, [ "XYZ" ])
+    assert_equal(nl.circuits_by_name("x*").collect { |x| x.name }, [])
+    nl.case_sensitive = false
+    assert_equal(nl.circuits_by_name("X*").collect { |x| x.name }, [ "XYZ" ])
+    assert_equal(nl.circuits_by_name("x*").collect { |x| x.name }, [ "XYZ" ])
+    nl.case_sensitive = true
     assert_equal(nl.circuits_by_name("???").collect { |x| x.name }, [ "XYZ", "UVW" ])
     assert_equal(nl.circuits_by_name("*").collect { |x| x.name }, [ "XYZ", "UVW" ])
     assert_equal(nl.circuits_by_name("P*").collect { |x| x.name }, [])
@@ -702,6 +714,11 @@ class DBNetlist_TestClass < TestBase
     assert_equal(c.net_by_name("DOESNOTEXIST").inspect, "nil")
     assert_equal(c.nets_by_name("DOESNOTEXIST").collect(&:name), [])
 
+    assert_equal(c.net_by_name("net1").inspect, "nil")
+    nl.case_sensitive = false
+    assert_equal(c.net_by_name("net1").name, "NET1")
+    nl.case_sensitive = true
+
     net2 = c.create_net
     net2.name = "NET2"
 
@@ -709,6 +726,11 @@ class DBNetlist_TestClass < TestBase
     c.each_net { |n| names << n.name }
     assert_equal(names, [ "NET1", "NET2" ])
     assert_equal(c.nets_by_name("NET*").collect(&:name), ["NET1", "NET2"])
+    assert_equal(c.nets_by_name("net*").collect(&:name), [])
+    nl.case_sensitive = false
+    assert_equal(c.nets_by_name("NET*").collect(&:name), ["NET1", "NET2"])
+    assert_equal(c.nets_by_name("net*").collect(&:name), ["NET1", "NET2"])
+    nl.case_sensitive = true
 
     assert_equal(net1.pin_count, 0)
     c.connect_pin(pina1, net1)

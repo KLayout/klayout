@@ -1238,8 +1238,14 @@ static std::vector<db::Net *>
 nets_by_name (db::Circuit *circuit, const std::string &name_pattern)
 {
   std::vector<db::Net *> res;
+  if (! circuit) {
+    return res;
+  }
 
   tl::GlobPattern glob (name_pattern);
+  if (circuit->netlist ()) {
+    glob.set_case_sensitive (circuit->netlist ()->is_case_sensitive ());
+  }
   for (db::Circuit::net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
     db::Net *net = n.operator-> ();
     if (glob.match (net->name ())) {
@@ -1254,8 +1260,14 @@ static std::vector<const db::Net *>
 nets_by_name_const (const db::Circuit *circuit, const std::string &name_pattern)
 {
   std::vector<const db::Net *> res;
+  if (! circuit) {
+    return res;
+  }
 
   tl::GlobPattern glob (name_pattern);
+  if (circuit->netlist ()) {
+    glob.set_case_sensitive (circuit->netlist ()->is_case_sensitive ());
+  }
   for (db::Circuit::const_net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
     const db::Net *net = n.operator-> ();
     if (glob.match (net->name ())) {
@@ -1681,8 +1693,13 @@ static std::vector<db::Circuit *>
 circuits_by_name (db::Netlist *netlist, const std::string &name_pattern)
 {
   std::vector<db::Circuit *> res;
+  if (! netlist) {
+    return res;
+  }
 
   tl::GlobPattern glob (name_pattern);
+  glob.set_case_sensitive (netlist->is_case_sensitive ());
+
   for (db::Netlist::circuit_iterator c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
     db::Circuit *circuit = c.operator-> ();
     if (glob.match (circuit->name ())) {
@@ -1697,8 +1714,13 @@ static std::vector<const db::Circuit *>
 circuits_by_name_const (const db::Netlist *netlist, const std::string &name_pattern)
 {
   std::vector<const db::Circuit *> res;
+  if (! netlist) {
+    return res;
+  }
 
   tl::GlobPattern glob (name_pattern);
+  glob.set_case_sensitive (netlist->is_case_sensitive ());
+
   for (db::Netlist::const_circuit_iterator c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
     const db::Circuit *circuit = c.operator-> ();
     if (glob.match (circuit->name ())) {
@@ -1710,6 +1732,14 @@ circuits_by_name_const (const db::Netlist *netlist, const std::string &name_patt
 }
 
 Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
+  gsi::method ("is_case_sensitive?", &db::Netlist::is_case_sensitive,
+    "@brief Returns a value indicating whether the netlist names are case sensitive\n"
+    "This method has been added in version 0.27.3.\n"
+  ) +
+  gsi::method ("case_sensitive=", &db::Netlist::set_case_sensitive, gsi::arg ("cs"),
+    "@brief Sets a value indicating whether the netlist names are case sensitive\n"
+    "This method has been added in version 0.27.3.\n"
+  ) +
   gsi::method_ext ("add", &gsi::add_circuit, gsi::arg ("circuit"),
     "@brief Adds the circuit to the netlist\n"
     "This method will add the given circuit object to the netlist. "

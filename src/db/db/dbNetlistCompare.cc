@@ -1014,6 +1014,14 @@ public:
   }
 
   /**
+   *  @brief Gets a value indicating whether there is a node for the given net
+   */
+  bool has_node_index_for_net (const db::Net *net) const
+  {
+    return m_net_index.find (net) != m_net_index.end ();
+  }
+
+  /**
    *  @brief Gets the node for a given node index
    */
   const db::NetGraphNode &node (size_t net_index) const
@@ -2880,9 +2888,16 @@ NetlistComparer::exclude_resistors (double threshold)
 }
 
 void
-NetlistComparer::same_nets (const db::Net *na, const db::Net *nb)
+NetlistComparer::same_nets (const db::Net *na, const db::Net *nb, bool must_match)
 {
-  m_same_nets [std::make_pair (na->circuit (), nb->circuit ())].push_back (std::make_pair (na, nb));
+  tl_assert (na && na);
+  m_same_nets [std::make_pair (na->circuit (), nb->circuit ())].push_back (std::make_pair (std::make_pair (na, nb), must_match));
+}
+
+void
+NetlistComparer::same_nets (const db::Circuit *ca, const db::Circuit *cb, const db::Net *na, const db::Net *nb, bool must_match)
+{
+  m_same_nets [std::make_pair (ca, cb)].push_back (std::make_pair (std::make_pair (na, nb), must_match));
 }
 
 void
@@ -3114,9 +3129,9 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
     tl_assert (i->second.second.size () == size_t (1));
     const db::Circuit *cb = i->second.second.front ();
 
-    std::vector<std::pair<const Net *, const Net *> > empty;
-    const std::vector<std::pair<const Net *, const Net *> > *net_identity = &empty;
-    std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<const Net *, const Net *> > >::const_iterator sn = m_same_nets.find (std::make_pair (ca, cb));
+    std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > empty;
+    const std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > *net_identity = &empty;
+    std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > >::const_iterator sn = m_same_nets.find (std::make_pair (ca, cb));
     if (sn != m_same_nets.end ()) {
       net_identity = &sn->second;
     }
@@ -3525,7 +3540,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
                                    db::DeviceCategorizer &device_categorizer,
                                    db::CircuitCategorizer &circuit_categorizer,
                                    db::CircuitPinMapper &circuit_pin_mapper,
-                                   const std::vector<std::pair<const Net *, const Net *> > &net_identity,
+                                   const std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > &net_identity,
                                    bool &pin_mismatch,
                                    std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping,
                                    std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const
@@ -3551,11 +3566,39 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
   g1.identify (0, 0);
   g2.identify (0, 0);
 
-  for (std::vector<std::pair<const Net *, const Net *> >::const_iterator p = net_identity.begin (); p != net_identity.end (); ++p) {
-    size_t ni1 = g1.node_index_for_net (p->first);
-    size_t ni2 = g2.node_index_for_net (p->second);
-    g1.identify (ni1, ni2);
-    g2.identify (ni2, ni1);
+  for (std::vector<std::pair<std::pair<const Net *, const Net *>, bool> >::const_iterator p = net_identity.begin (); p != net_identity.end (); ++p) {
+
+    //  NOTE: nets may vanish, hence there
+    if (g1.has_node_index_for_net (p->first.first) && g2.has_node_index_for_net (p->first.second)) {
+
+      size_t ni1 = g1.node_index_for_net (p->first.first);
+      size_t ni2 = g2.node_index_for_net (p->first.second);
+      g1.identify (ni1, ni2);
+      g2.identify (ni2, ni1);
+
+      //  in must_match mode, check if the nets are identical
+      if (p->second && ! (g1.node(ni1) == g2.node(ni2))) {
+        mp_logger->net_mismatch (p->first.first, p->first.second);
+      } else {
+        mp_logger->match_nets (p->first.first, p->first.second);
+      }
+
+    } else if (p->second && g1.has_node_index_for_net (p->first.first)) {
+
+      mp_logger->net_mismatch (p->first.first, 0);
+
+      size_t ni1 = g1.node_index_for_net (p->first.first);
+      g1.identify (ni1, 0);
+
+    } else if (p->second && g2.has_node_index_for_net (p->first.second)) {
+
+      mp_logger->net_mismatch (0, p->first.second);
+
+      size_t ni2 = g2.node_index_for_net (p->first.second);
+      g2.identify (ni2, 0);
+
+    }
+
   }
 
   int iter = 0;

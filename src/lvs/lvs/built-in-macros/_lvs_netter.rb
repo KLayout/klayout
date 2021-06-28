@@ -370,14 +370,24 @@ module LVS
     # %LVS%
     # @name same_nets
     # @brief Establishes an equivalence between the nets
-    # @synopsis same_nets(circuit, net_a, net_b)
+    # @synopsis same_nets(circuit_pattern, net_pattern)
+    # @synopsis same_nets(circuit_pattern, net_a, net_b)
     # @synopsis same_nets(circuit_a, net_a, circuit_b, net_b)
     # This method will force an equivalence between the net_a and net_b from circuit_a
     # and circuit_b (circuit in the three-argument form is for both circuit_a and circuit_b).
-    #
+    # 
     # In the four-argument form, the circuits can be either given by name or as Circuit
-    # objects. In the three-argument form, the circuit has to be given by name. 
+    # objects. In the three-argument form, the circuits have to be given by name pattern. 
     # Nets can be either given by name or as Net objects.
+    # In the two-argument form, the circuits and nets have to be given as name pattern.
+    #
+    # "name pattern" are glob-style pattern - e.g. the following will identify the 
+    # all nets starting with "A" from the extracted netlist with the same net from 
+    # the schematic netlist for all circuits starting with "INV":
+    #
+    # @code
+    # same_nets("INV*", "A*")
+    # @/code
     #
     # After using this function, the compare algorithm will consider these nets equivalent.
     # Use this method to provide hints for the comparer in cases which are difficult to
@@ -389,65 +399,125 @@ module LVS
     # Use this method andwhere in the script before the \compare call.
 
     def same_nets(*args)
+      _same_nets_impl(false, *args)
+    end
 
-      if args.size < 3 
-        raise("Too few arguments to 'same_nets' (need at least 3)")
+    # %LVS%
+    # @name same_nets!
+    # @brief Establishes an equivalence between the nets with matching requirement
+    # @synopsis same_nets!(circuit_pattern, net_pattern)
+    # @synopsis same_nets!(circuit_pattern, net_a, net_b)
+    # @synopsis same_nets!(circuit_a, net_a, circuit_b, net_b)
+    # This method is equivalent to \same_nets, but requires identity of the given nets.
+    # If the specified nets do not match, an error is reported.
+    
+    def same_nets!(*args)
+      _same_nets_impl(true, *args)
+    end
+
+    def _same_nets_impl(force, *args)
+
+      if args.size < 2 
+        raise("Too few arguments to 'same_nets' (need at least 2)")
       end
       if args.size > 4 
         raise("Too many arguments to 'same_nets' (need max 4)")
       end
 
       if args.size == 3
-        ( ca, a, b ) = args
-        cb = ca
+        ( ca, a ) = args
+        cb = nil
         ca.is_a?(String) || raise("Circuit argument of 'same_nets' must be a string")
+        b = nil
+        a.is_a?(String) || raise("Net argument of 'same_nets' must be a string")
+      elsif args.size == 3
+        ( ca, a, b ) = args
+        cb = nil
+        ca.is_a?(String) || raise("Circuit argument of 'same_nets' must be a string")
+        [ a, b ].each do |n|
+          n.is_a?(String) || n.is_a?(RBA::Net) || raise("Net arguments of 'same_nets' must be strings or Net objects")
+        end
       else
         ( ca, a, cb, b ) = args
         [ ca, cb ].each do |n|
-          n.is_a?(String) || n.is_a?(RBA::Net) || raise("Circuit arguments of 'same_nets' must be strings or Net objects")
+          n.is_a?(String) || n.is_a?(RBA::Circuit) || raise("Circuit arguments of 'same_nets' must be strings or Circuit objects")
+        end
+        [ a, b ].each do |n|
+          n.is_a?(String) || n.is_a?(RBA::Net) || raise("Net arguments of 'same_nets' must be strings or Net objects")
         end
       end
 
-      [ a, b ].each do |n|
-        n.is_a?(String) || n.is_a?(RBA::Net) || raise("Net arguments of 'same_nets' must be strings or Net objects")
-      end
-
-      @comparer_config << lambda { |comparer| self._same_nets(comparer, ca, a, cb, b) }
+      @comparer_config << lambda { |comparer| self._same_nets(comparer, ca, a, cb, b, force) }
 
     end
 
-    def _same_nets(comparer, ca, a, cb, b)
+    def _same_nets(comparer, ca, a, cb, b, force)
 
       ( nl_a, nl_b ) = _ensure_two_netlists
 
-      if ca.is_a?(String)
-        circuit_a = nl_a.circuit_by_name(ca)
+      cs = !(nl_a.is_case_sensitive? && nl_b.is_case_sensitive?)
+
+      if ca.is_a?(String) && !cb
+
+        n2c = {}
+        nl_a.circuits_by_name(ca).each { |c| name = cs ? c.name.upcase : c.name; n2c[name] ||= [ nil, nil ]; n2c[name][0] = c }
+        nl_b.circuits_by_name(ca).each { |c| name = cs ? c.name.upcase : c.name; n2c[name] ||= [ nil, nil ]; n2c[name][1] = c }
+
+        circuits = []
+        n2c.keys.sort.each do |n|
+          if n2c[n][0] && n2c[n][1]
+            circuits << n2c[n]
+          end
+        end
+          
       else 
-        circuit_a = ca
-      end
 
-      if cb.is_a?(String)
-        circuit_b = nl_b.circuit_by_name(cb)
-      else
-        circuit_b = cb
-      end
+        circuit_a = ca.is_a?(String) ? nl_a.circuit_by_name(ca) : ca
+        circuit_b = cb.is_a?(String) ? nl_b.circuit_by_name(cb) : cb
 
-      if circuit_a && circuit_b
-
-        if a.is_a?(String)
-          net_a = circuit_a.net_by_name(a) || raise("Not a valid net name in extracted netlist in 'same_nets': #{a} (for circuit #{circuit_a})")
-        else
-          net_a = a
+        circuits = []
+        if circuit_a && circuit_b
+          circuits << [ circuit_a, circuit_b ]
         end
 
-        if b.is_a?(String)
-          net_b = circuit_b.net_by_name(b) || raise("Not a valid net name in extracted netlist in 'same_nets': #{b} (for circuit #{circuit_b})")
+      end
+
+      circuits.each do |circuit_a, circuit_b|
+
+        if a.is_a?(String) && !b
+
+          n2n = {}
+          circuit_a.nets_by_name(a).each { |n| name = cs ? n.name.upcase : n.name; n2n[name] ||= [ nil, nil ]; n2n[name][0] = n }
+          circuit_b.nets_by_name(a).each { |n| name = cs ? n.name.upcase : n.name; n2n[name] ||= [ nil, nil ]; n2n[name][1] = n }
+
+          nets = []
+          n2n.keys.sort.each do |n|
+            nets << n2n[n]
+          end
+
         else
-          net_b = b
+
+          if a.is_a?(String)
+            net_a = circuit_a.net_by_name(a) || raise("Not a valid net name in extracted netlist in 'same_nets': #{a} (for circuit #{circuit_a})")
+          else
+            net_a = a
+          end
+
+          if b.is_a?(String)
+            net_b = circuit_b.net_by_name(b) || raise("Not a valid net name in extracted netlist in 'same_nets': #{b} (for circuit #{circuit_b})")
+          else
+            net_b = b
+          end
+          
+          nets = []
+          if net_a && net_b
+            nets << [ net_a, net_b ]
+          end
+
         end
 
-        if net_a && net_b
-          comparer.same_nets(net_a, net_b)
+        nets.each do |net_a, net_b|
+          comparer.same_nets(circuit_a, circuit_b, net_a, net_b, force)
         end
 
       end

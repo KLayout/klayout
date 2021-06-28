@@ -181,7 +181,17 @@ public:
    *  net nb in netlist b.
    *  By default nets are not identical expect through their topology.
    */
-  void same_nets (const db::Net *na, const db::Net *nb);
+  void same_nets (const db::Net *na, const db::Net *nb, bool must_match = false);
+
+  /**
+   *  @brief Mark two nets as identical
+   *
+   *  This makes a net na in netlist a identical to the corresponding
+   *  net nb in netlist b.
+   *  By default nets are not identical expect through their topology.
+   *  This version allows mapping one net to a null net because the circuits are explicitly specified.
+   */
+  void same_nets (const db::Circuit *ca, const db::Circuit *cb, const db::Net *na, const db::Net *nb, bool must_match);
 
   /**
    *  @brief Mark two pins as equivalent (i.e. can be swapped)
@@ -344,7 +354,7 @@ private:
   NetlistComparer &operator= (const NetlistComparer &);
 
 protected:
-  bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, db::CircuitPinMapper &circuit_pin_mapper, const std::vector<std::pair<const Net *, const Net *> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const;
+  bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, db::CircuitPinMapper &circuit_pin_mapper, const std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const;
   bool all_subcircuits_verified (const db::Circuit *c, const std::set<const db::Circuit *> &verified_circuits) const;
   std::string generate_subcircuits_not_verified_warning (const db::Circuit *ca, const std::set<const db::Circuit *> &verified_circuits_a, const db::Circuit *cb, const std::set<const db::Circuit *> &verified_circuits_b) const;
   static void derive_pin_equivalence (const db::Circuit *ca, const db::Circuit *cb, CircuitPinMapper *circuit_pin_mapper);
@@ -354,7 +364,7 @@ protected:
   bool handle_pin_mismatch (const NetGraph &g1, const db::Circuit *c1, const db::Pin *pin1, const NetGraph &g2, const db::Circuit *c2, const db::Pin *p2) const;
 
   mutable NetlistCompareLogger *mp_logger;
-  std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<const Net *, const Net *> > > m_same_nets;
+  std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > > m_same_nets;
   std::unique_ptr<CircuitPinMapper> mp_circuit_pin_mapper;
   std::unique_ptr<DeviceCategorizer> mp_device_categorizer;
   std::unique_ptr<CircuitCategorizer> mp_circuit_categorizer;

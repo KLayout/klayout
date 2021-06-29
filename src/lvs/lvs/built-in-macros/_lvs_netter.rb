@@ -492,7 +492,9 @@ module LVS
 
           nets = []
           n2n.keys.sort.each do |n|
-            nets << n2n[n]
+            if force || (n2n[n][0] && n2n[n][1])
+              nets << n2n[n]
+            end
           end
 
         else

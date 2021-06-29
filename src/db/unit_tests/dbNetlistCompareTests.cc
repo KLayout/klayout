@@ -766,16 +766,18 @@ TEST(2_SimpleInverterWithForcedNetAssignment)
   bool good = comp.compare (&nl1, &nl2);
 
   EXPECT_EQ (logger.text (),
-     "begin_circuit INV INV\n"
-     "match_nets OUT OUT\n"
-     "match_nets IN IN\n"
-     "match_pins $0 $1\n"
-     "match_pins $1 $3\n"
-     "match_pins $2 $0\n"
-     "match_pins $3 $2\n"
-     "match_devices $2 $1\n"
-     "match_devices $1 $2\n"
-     "end_circuit INV INV MATCH"
+    "begin_circuit INV INV\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
+    "match_nets OUT OUT\n"
+    "match_nets IN IN\n"
+    "match_pins $0 $1\n"
+    "match_pins $1 $3\n"
+    "match_pins $2 $0\n"
+    "match_pins $3 $2\n"
+    "match_devices $2 $1\n"
+    "match_devices $1 $2\n"
+    "end_circuit INV INV MATCH"
   );
   EXPECT_EQ (good, true);
 }
@@ -933,6 +935,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
 
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
     "match_nets OUT OUT\n"
     "match_nets INT $10\n"
     "net_mismatch IN IN\n"
@@ -959,6 +963,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
 
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
     "match_nets OUT OUT\n"
     "match_nets IN IN\n"
     "match_ambiguous_nets INT $10\n"
@@ -985,6 +991,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
 
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
     "match_nets OUT OUT\n"
     "match_nets INT $10\n"
     "net_mismatch IN IN\n"
@@ -1011,6 +1019,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
 
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
     "match_nets OUT OUT\n"
     "match_nets INT $10\n"
     "net_mismatch IN IN\n"
@@ -1037,6 +1047,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
 
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
     "match_nets OUT OUT\n"
     "match_nets IN IN\n"
     "match_ambiguous_nets INT $10\n"
@@ -1064,6 +1076,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
 
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
     "match_nets OUT OUT\n"
     "match_nets IN IN\n"
     "match_ambiguous_nets INT $10\n"
@@ -1091,6 +1105,8 @@ TEST(5_BufferTwoPathsDifferentParameters)
 
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
     "match_nets OUT OUT\n"
     "match_nets INT $10\n"
     "net_mismatch IN IN\n"
@@ -1156,6 +1172,8 @@ TEST(5_BufferTwoPathsDifferentDeviceClasses)
 
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
     "match_nets INT $10\n"
     "match_nets IN IN\n"
     "net_mismatch INT2 $11\n"
@@ -1222,6 +1240,8 @@ TEST(6_BufferTwoPathsAdditionalResistor)
 
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
     "net_mismatch INT $10\n"
     "match_nets IN IN\n"
     "net_mismatch INT2 $11\n"
@@ -1249,6 +1269,8 @@ TEST(6_BufferTwoPathsAdditionalResistor)
 
   EXPECT_EQ (logger.text (),
     "begin_circuit BUF BUF\n"
+    "match_nets VDD VDD\n"
+    "match_nets VSS VSS\n"
     "net_mismatch INT $10\n"
     "match_nets OUT OUT\n"
     "net_mismatch INT2 $11\n"
@@ -2704,6 +2726,7 @@ TEST(17_InherentlyAmbiguousDecoder)
     "match_devices $4 $4\n"
     "end_circuit NAND NAND MATCH\n"
     "begin_circuit DECODER DECODER\n"
+    "match_nets A A\n"
     "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
     "match_nets B B\n"
@@ -2755,6 +2778,7 @@ TEST(17_InherentlyAmbiguousDecoder)
     "match_devices $4 $4\n"
     "end_circuit NAND NAND MATCH\n"
     "begin_circuit DECODER DECODER\n"
+    "match_nets A A\n"
     "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
     "match_nets NA NA\n"

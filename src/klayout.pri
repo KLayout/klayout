@@ -154,11 +154,9 @@ msvc {
   # because we use unordered_map/unordered_set:
   QMAKE_CXXFLAGS += -std=c++0x
 
-  # needed for Ruby 3.0
-  QMAKE_CXXFLAGS += -fdeclspec
-
   win32 {
     QMAKE_LFLAGS += -Wl,--exclude-all-symbols
+    QMAKE_CXXFLAGS += -fdeclspec
   } else {
     QMAKE_CXXFLAGS += -fvisibility=hidden
   }

@@ -72,9 +72,9 @@ public:
   virtual void parallel (Device *a, Device *b) const;
   virtual void serial (Device *a, Device *b) const;
 
-  virtual size_t normalize_terminal_id (size_t) const
+  virtual size_t normalize_terminal_id (size_t id) const
   {
-    return terminal_id_A;
+    return id == terminal_id_B ? terminal_id_A : id;
   }
 };
 

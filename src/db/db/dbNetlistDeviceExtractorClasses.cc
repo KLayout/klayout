@@ -454,17 +454,17 @@ void NetlistDeviceExtractorResistor::extract_devices (const std::vector<db::Regi
     db::Edges eperp = rres.edges ();
     eperp &= contacts_per_res.edges ();
 
-    db::Coord length = eparallel.length ();
-    db::Coord width = eperp.length ();
+    db::Coord length2 = eparallel.length ();
+    db::Coord width2 = eperp.length ();
 
-    if (width < 1) {
+    if (width2 < 1) {
       error (tl::to_string (tr ("Invalid contact geometry - resistor shape ignored")), *p);
       continue;
     }
 
-    device->set_parameter_value (db::DeviceClassResistor::param_id_R, m_sheet_rho * double (length) / double (width));
-    device->set_parameter_value (db::DeviceClassResistor::param_id_L, sdbu () * length);
-    device->set_parameter_value (db::DeviceClassResistor::param_id_W, sdbu () * width);
+    device->set_parameter_value (db::DeviceClassResistor::param_id_R, m_sheet_rho * double (length2) / double (width2));
+    device->set_parameter_value (db::DeviceClassResistor::param_id_L, sdbu () * 0.5 * length2);
+    device->set_parameter_value (db::DeviceClassResistor::param_id_W, sdbu () * 0.5 * width2);
     device->set_parameter_value (db::DeviceClassResistor::param_id_A, sdbu () * sdbu () * p->area ());
     device->set_parameter_value (db::DeviceClassResistor::param_id_P, sdbu () * p->perimeter ());
 

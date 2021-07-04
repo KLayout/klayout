@@ -24,6 +24,7 @@
 #include "dbLayoutToNetlist.h"
 #include "dbLayoutToNetlistFormatDefs.h"
 #include "dbPolygonTools.h"
+#include "tlMath.h"
 
 namespace db
 {
@@ -110,6 +111,47 @@ void std_writer_impl<Keys>::write (const db::Netlist *netlist, const db::LayoutT
     mp_netlist = 0;
     mp_l2n = 0;
     throw;
+  }
+}
+
+static bool same_parameter (const DeviceParameterDefinition &a, const DeviceParameterDefinition &b)
+{
+  if (a.is_primary () != b.is_primary ()) {
+    return false;
+  }
+  if (! tl::equal (a.default_value (), b.default_value ())) {
+    return false;
+  }
+  return true;
+}
+
+template <class Keys>
+void std_writer_impl<Keys>::write_device_class (const std::string &indent, const db::DeviceClass *cls, const std::string &temp_name, const db::DeviceClass *temp_class)
+{
+  *mp_stream << indent << Keys::class_key << "(" << tl::to_word_or_quoted_string (cls->name ()) << " " << tl::to_word_or_quoted_string (temp_name);
+
+  bool any_def = false;
+
+  const std::vector<DeviceParameterDefinition> &pd = cls->parameter_definitions ();
+  for (std::vector<DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+    if (! temp_class->has_parameter_with_name (p->name ()) || !same_parameter (*p, *temp_class->parameter_definition (temp_class->parameter_id_for_name (p->name ())))) {
+      *mp_stream << endl << indent << indent1 << Keys::param_key << "(" << tl::to_word_or_quoted_string (p->name ()) << " " << tl::to_string (p->is_primary () ? 1 : 0) << " " << tl::to_string (p->default_value ()) << ")";
+      any_def = true;
+    }
+  }
+
+  const std::vector<DeviceTerminalDefinition> &td = cls->terminal_definitions ();
+  for (std::vector<DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
+    if (! temp_class->has_terminal_with_name (t->name ())) {
+      *mp_stream << endl << indent << indent1 << Keys::terminal_key << "(" << tl::to_word_or_quoted_string (t->name ()) << ")";
+      any_def = true;
+    }
+  }
+
+  if (any_def) {
+    *mp_stream << endl << indent << ")" << endl;
+  } else {
+    *mp_stream << ")" << endl;
   }
 }
 
@@ -203,9 +245,13 @@ void std_writer_impl<Keys>::write (bool nested, std::map<const db::Circuit *, st
   for (db::Netlist::const_device_class_iterator c = mp_netlist->begin_device_classes (); c != mp_netlist->end_device_classes (); ++c) {
     db::DeviceClassTemplateBase *temp = db::DeviceClassTemplateBase::is_a (c.operator-> ());
     if (temp) {
-      *mp_stream << indent << Keys::class_key << "(" << tl::to_word_or_quoted_string (c->name ()) << " " << tl::to_word_or_quoted_string (temp->name ()) << ")" << endl;
-      m_progress.set (mp_stream->pos ());
+      std::unique_ptr<db::DeviceClass> temp_class (temp->create ());
+      write_device_class (indent, c.operator-> (), temp->name (), temp_class.get ());
+    } else {
+      db::DeviceClass empty;
+      write_device_class (indent, c.operator-> (), std::string (), &empty);
     }
+    m_progress.set (mp_stream->pos ());
   }
 
   if (mp_netlist->begin_device_abstracts () != mp_netlist->end_device_abstracts () && ! Keys::is_short ()) {

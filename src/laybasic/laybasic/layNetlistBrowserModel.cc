@@ -25,6 +25,7 @@
 #include "layIndexedNetlistModel.h"
 #include "layNetlistCrossReferenceModel.h"
 #include "dbNetlistDeviceClasses.h"
+#include "tlMath.h"
 
 #include <QPainter>
 #include <QIcon>
@@ -324,7 +325,8 @@ std::string device_parameter_string (const db::Device *device)
   bool first = true;
   const std::vector<db::DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();
   for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-    if (p->is_primary ()) {
+    double v = device->parameter_value (p->id ());
+    if (! tl::equal (v, p->default_value ())) {
       if (first) {
         s += " [";
         first = false;
@@ -333,7 +335,7 @@ std::string device_parameter_string (const db::Device *device)
       }
       s += p->name ();
       s += "=";
-      s += formatted_value (device->parameter_value (p->id ()));
+      s += formatted_value (v);
     }
   }
   if (! first) {

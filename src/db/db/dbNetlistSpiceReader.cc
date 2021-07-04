@@ -625,8 +625,6 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     std::map<std::string, double>::const_iterator v = params.find (i->name ());
     if (v != params.end ()) {
       device->set_parameter_value (i->id (), v->second / i->si_scaling ());
-      //  parameters read from the netlist are made primary so they are shown in the netlist browser
-      cls->parameter_definition_non_const (i->id ())->set_is_primary (true);
     } else if (i->id () == defp) {
       device->set_parameter_value (i->id (), value / i->si_scaling ());
     }

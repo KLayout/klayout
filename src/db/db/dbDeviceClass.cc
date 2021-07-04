@@ -110,6 +110,52 @@ bool AllDeviceParametersAreEqual::less (const db::Device &a, const db::Device &b
 }
 
 // --------------------------------------------------------------------------------
+//  PrimaryDeviceParametersAreEqual class implementation
+
+class DB_PUBLIC PrimaryDeviceParametersAreEqual
+  : public DeviceParameterCompareDelegate
+{
+public:
+  PrimaryDeviceParametersAreEqual (double relative);
+
+  virtual bool less (const db::Device &a, const db::Device &b) const;
+
+  virtual DeviceParameterCompareDelegate *clone () const
+  {
+    return new PrimaryDeviceParametersAreEqual (*this);
+  }
+
+private:
+  double m_relative;
+};
+
+PrimaryDeviceParametersAreEqual::PrimaryDeviceParametersAreEqual (double relative)
+  : m_relative (relative)
+{
+  //  .. nothing yet ..
+}
+
+bool PrimaryDeviceParametersAreEqual::less (const db::Device &a, const db::Device &b) const
+{
+  const std::vector<db::DeviceParameterDefinition> &pd = a.device_class ()->parameter_definitions ();
+  for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+    const db::DeviceParameterDefinition *pdb = b.device_class ()->parameter_definition (p->id ());
+    if (! pdb) {
+      continue;
+    }
+    if (! pdb->is_primary () && ! p->is_primary ()) {
+      continue;
+    }
+    int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()), 0.0, m_relative);
+    if (cmp != 0) {
+      return cmp < 0;
+    }
+  }
+
+  return false;
+}
+
+// --------------------------------------------------------------------------------
 //  DeviceClass class implementation
 
 DeviceClass::DeviceClass ()
@@ -236,6 +282,9 @@ size_t DeviceClass::terminal_id_for_name (const std::string &name) const
 //  a default relative tolerance.
 const double relative_tolerance = 1e-6;
 
+//  The default compare delegate
+static PrimaryDeviceParametersAreEqual default_compare (relative_tolerance);
+
 bool DeviceClass::less (const db::Device &a, const db::Device &b)
 {
   tl_assert (a.device_class () != 0);
@@ -245,25 +294,11 @@ bool DeviceClass::less (const db::Device &a, const db::Device &b)
   if (! pcd) {
     pcd = b.device_class ()->mp_pc_delegate.get ();
   }
-
-  if (pcd != 0) {
-    return pcd->less (a, b);
-  } else {
-
-    const std::vector<db::DeviceParameterDefinition> &pd = a.device_class ()->parameter_definitions ();
-    for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-      if (! p->is_primary ()) {
-        continue;
-      }
-      int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()), 0.0, relative_tolerance);
-      if (cmp != 0) {
-        return cmp < 0;
-      }
-    }
-
-    return false;
-
+  if (! pcd) {
+    pcd = &default_compare;
   }
+
+  return pcd->less (a, b);
 }
 
 bool DeviceClass::equal (const db::Device &a, const db::Device &b)
@@ -275,25 +310,11 @@ bool DeviceClass::equal (const db::Device &a, const db::Device &b)
   if (! pcd) {
     pcd = b.device_class ()->mp_pc_delegate.get ();
   }
-
-  if (pcd != 0) {
-    return ! pcd->less (a, b) && ! pcd->less (b, a);
-  } else {
-
-    const std::vector<db::DeviceParameterDefinition> &pd = a.device_class ()->parameter_definitions ();
-    for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-      if (! p->is_primary ()) {
-        continue;
-      }
-      int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()), 0.0, relative_tolerance);
-      if (cmp != 0) {
-        return false;
-      }
-    }
-
-    return true;
-
+  if (! pcd) {
+    pcd = &default_compare;
   }
+
+  return ! pcd->less (a, b) && ! pcd->less (b, a);
 }
 
 // --------------------------------------------------------------------------------

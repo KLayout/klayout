@@ -355,15 +355,14 @@ extract_devices(bjt3(model_name), { "C" => collector, "B" => base, "E" => emitte
 
   <p>
   Most device extractors extract more parameters than they give you by default.
-  For example, the resitor extractor will not just extract the resistance, but also the length (L)
+  For example, the resistor extractor will not just extract the resistance, but also the length (L)
   and width (W) of the resistor stripe and its area (A) and perimeter (P).
-  By default these additional parameters are declared "secondary" - i.e. they will not
-  show up in the netlist browser, they will not participate in the device compare and
-  will not be netlisted.
+  By default these additional parameters are declared "secondary" - i.e. they will not 
+  participate in the device compare and will not be netlisted.
   </p>
 
   <p>
-  Parameters can be declared primary ones by using "enable_parameter" on the device class.
+  Parameters can be fully enabled by using "enable_parameter" on the device class.
   Hence it is possible to enable "W" and "L" on a resistor type using the following code:
   </p>
 
@@ -371,6 +370,11 @@ extract_devices(bjt3(model_name), { "C" => collector, "B" => base, "E" => emitte
 dc.enable_parameter("W", true)
 dc.enable_parameter("L", true)
 </pre>
+
+  <p>
+  This will modify the parameters of the generated device class such that "W" and "L" are
+  fully enabled parameters.
+  </p>
 
 </doc>
 

@@ -30,7 +30,9 @@ namespace db
 //  The built-in device class templates
 
 static tl::RegisteredClass<db::DeviceClassTemplateBase> dct_cap (new db::device_class_template<db::DeviceClassCapacitor> ("CAP"));
+static tl::RegisteredClass<db::DeviceClassTemplateBase> dct_cap_with_bulk (new db::device_class_template<db::DeviceClassCapacitorWithBulk> ("CAP3"));
 static tl::RegisteredClass<db::DeviceClassTemplateBase> dct_res (new db::device_class_template<db::DeviceClassResistor> ("RES"));
+static tl::RegisteredClass<db::DeviceClassTemplateBase> dct_res_with_bulk (new db::device_class_template<db::DeviceClassResistorWithBulk> ("RES3"));
 static tl::RegisteredClass<db::DeviceClassTemplateBase> dct_ind (new db::device_class_template<db::DeviceClassInductor> ("IND"));
 static tl::RegisteredClass<db::DeviceClassTemplateBase> dct_diode (new db::device_class_template<db::DeviceClassDiode> ("DIODE"));
 static tl::RegisteredClass<db::DeviceClassTemplateBase> dct_mos3 (new db::device_class_template<db::DeviceClassMOS3Transistor> ("MOS3"));

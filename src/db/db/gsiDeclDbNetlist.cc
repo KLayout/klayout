@@ -927,6 +927,36 @@ static db::EqualDeviceParameters *get_equal_parameters (db::DeviceClass *cls)
   return dynamic_cast<db::EqualDeviceParameters *> (cls->parameter_compare_delegate ());
 }
 
+static void enable_parameter (db::DeviceClass *cls, size_t id, bool en)
+{
+  db::DeviceParameterDefinition *pd = cls->parameter_definition_non_const (id);
+  if (pd) {
+    pd->set_is_primary (en);
+  }
+}
+
+static void enable_parameter2 (db::DeviceClass *cls, const std::string &name, bool en)
+{
+  if (! cls->has_parameter_with_name (name)) {
+    return;
+  }
+
+  size_t id = cls->parameter_id_for_name (name);
+  db::DeviceParameterDefinition *pd = cls->parameter_definition_non_const (id);
+  if (pd) {
+    pd->set_is_primary (en);
+  }
+}
+
+static const db::DeviceParameterDefinition *parameter_definition2 (const db::DeviceClass *cls, const std::string &name)
+{
+  if (! cls->has_parameter_with_name (name)) {
+    return 0;
+  } else {
+    return cls->parameter_definition (cls->parameter_id_for_name (name));
+  }
+}
+
 Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
   gsi::method ("name", &db::DeviceClass::name,
     "@brief Gets the name of the device class."
@@ -980,6 +1010,33 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "@brief Gets the parameter definition object for a given ID.\n"
     "Parameter definition IDs are used in some places to reference a specific parameter of a device. "
     "This method obtains the corresponding definition object."
+  ) +
+  gsi::method_ext ("parameter_definition", &parameter_definition2, gsi::arg ("parameter_name"),
+    "@brief Gets the parameter definition object for a given ID.\n"
+    "Parameter definition IDs are used in some places to reference a specific parameter of a device. "
+    "This method obtains the corresponding definition object."
+    "\n"
+    "This version accepts a parameter name.\n"
+    "\n"
+    "This method has been introduced in version 0.27.3.\n"
+  ) +
+  gsi::method_ext ("enable_parameter", &enable_parameter, gsi::arg ("parameter_id"), gsi::arg ("enable"),
+    "@brief Enables or disables a parameter.\n"
+    "Some parameters are 'secondary' parameters which are extracted but not handled in device compare and are not shown in the netlist browser. "
+    "For example, the 'W' parameter of the resistor is such a secondary parameter. This method allows turning a parameter in a primary one ('enable') or "
+    "into a secondary one ('disable').\n"
+    "\n"
+    "This method has been introduced in version 0.27.3.\n"
+  ) +
+  gsi::method_ext ("enable_parameter", &enable_parameter2, gsi::arg ("parameter_name"), gsi::arg ("enable"),
+    "@brief Enables or disables a parameter.\n"
+    "Some parameters are 'secondary' parameters which are extracted but not handled in device compare and are not shown in the netlist browser. "
+    "For example, the 'W' parameter of the resistor is such a secondary parameter. This method allows turning a parameter in a primary one ('enable') or "
+    "into a secondary one ('disable').\n"
+    "\n"
+    "This version accepts a parameter name.\n"
+    "\n"
+    "This method has been introduced in version 0.27.3.\n"
   ) +
   gsi::method ("has_parameter?", &db::DeviceClass::has_parameter_with_name, gsi::arg ("name"),
     "@brief Returns true, if the device class has a parameter with the given name.\n"

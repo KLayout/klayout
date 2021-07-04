@@ -509,6 +509,11 @@ public:
   const DeviceParameterDefinition *parameter_definition (size_t id) const;
 
   /**
+   *  @brief Gets the parameter definition from the ID (non-const version)
+   */
+  DeviceParameterDefinition *parameter_definition_non_const (size_t id);
+
+  /**
    *  @brief Returns true, if the device has a parameter with the given name
    */
   bool has_parameter_with_name (const std::string &name) const;

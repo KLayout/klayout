@@ -214,6 +214,13 @@ Class<db::NetlistDeviceExtractor> decl_dbNetlistDeviceExtractor ("db", "DeviceEx
   gsi::method ("name", &db::NetlistDeviceExtractor::name,
     "@brief Gets the name of the device extractor and the device class."
   ) +
+  gsi::method ("device_class", &db::NetlistDeviceExtractor::device_class,
+    "@brief Gets the device class used during extraction\n"
+    "The attribute will hold the actual device class used in the device extraction. It "
+    "is valid only after 'extract_devices'.\n"
+    "\n"
+    "This method has been added in version 0.27.3.\n"
+  ) +
   gsi::iterator ("each_layer_definition", &db::NetlistDeviceExtractor::begin_layer_definitions, &db::NetlistDeviceExtractor::end_layer_definitions,
     "@brief Iterates over all layer definitions."
   ) +
@@ -251,9 +258,13 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
     "This method shall raise an error, if the input layer are not properly defined (e.g.\n"
     "too few etc.)\n"
     "\n"
+    "This is not a connectivity definition in the electrical sense, but defines the cluster of shapes "
+    "which generates a specific device. In this case, 'connectivity' means 'definition of shapes that need to touch to form the device'.\n"
+    "\n"
     "The 'layers' argument specifies the actual layer layouts for the logical device layers (see \\define_layer). "
     "The list of layers corresponds to the number of layers defined. Use the layer indexes from this list "
-    "to build the connectivity with \\Connectivity#connect."
+    "to build the connectivity with \\Connectivity#connect. Note, that in order to capture a connected cluster of shapes on the "
+    "same layer you'll need to include a self-connection like 'connectivity.connect(layers[0], layers[0])'."
   ) +
   gsi::callback ("extract_devices", &GenericDeviceExtractor::extract_devices, &GenericDeviceExtractor::cb_extract_devices,
     gsi::arg ("layer_geometry"),

@@ -179,6 +179,15 @@ const DeviceParameterDefinition *DeviceClass::parameter_definition (size_t id) c
   }
 }
 
+DeviceParameterDefinition *DeviceClass::parameter_definition_non_const (size_t id)
+{
+  if (id < m_parameter_definitions.size ()) {
+    return & m_parameter_definitions [id];
+  } else {
+    return 0;
+  }
+}
+
 bool DeviceClass::has_parameter_with_name (const std::string &name) const
 {
   const std::vector<db::DeviceParameterDefinition> &pd = parameter_definitions ();

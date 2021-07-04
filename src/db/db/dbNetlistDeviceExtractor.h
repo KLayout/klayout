@@ -388,6 +388,16 @@ public:
   Device *create_device ();
 
   /**
+   *  @brief Gets the device class used during extraction
+   *
+   *  This member is set in 'extract_devices' and holds the device class object used during extraction.
+   */
+  DeviceClass *device_class ()
+  {
+    return mp_device_class.get ();
+  }
+
+  /**
    *  @brief Defines a device terminal in the layout (a region)
    */
   void define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Region &region);
@@ -535,7 +545,7 @@ private:
   const std::set<db::cell_index_type> *mp_breakout_cells;
   double m_device_scaling;
   db::Circuit *mp_circuit;
-  db::DeviceClass *mp_device_class;
+  tl::weak_ptr<db::DeviceClass> mp_device_class;
   std::string m_name;
   layer_definitions m_layer_definitions;
   std::vector<unsigned int> m_layers;

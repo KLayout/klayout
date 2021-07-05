@@ -503,6 +503,13 @@ public:
    */
   std::string cell_name () const;
 
+  /**
+   *  @brief Initializes the extractor
+   *  This method will produce the device classes required for the device extraction.
+   *  It is mainly provided for test purposes. Don't call it directly.
+   */
+  void initialize (db::Netlist *nl);
+
 private:
   struct DeviceCellKey
   {
@@ -556,12 +563,6 @@ private:
   //  no copying
   NetlistDeviceExtractor (const NetlistDeviceExtractor &);
   NetlistDeviceExtractor &operator= (const NetlistDeviceExtractor &);
-
-  /**
-   *  @brief Initializes the extractor
-   *  This method will produce the device classes required for the device extraction.
-   */
-  void initialize (db::Netlist *nl);
 
   void extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers, double device_scaling, const std::set<cell_index_type> *breakout_cells);
   void push_new_devices (const Vector &disp_cache);

@@ -143,20 +143,34 @@ public:
 Class<DeviceClassFactoryImpl> decl_dbDeviceClassFactoryBase ("db", "DeviceClassFactory",
   gsi::factory_callback ("create_class", &DeviceClassFactoryImpl::create_class, &DeviceClassFactoryImpl::cb_create_class,
     "@brief Creates the DeviceClass object\n"
+    "Reimplement this method to create the desired device class."
   ),
   "@brief A factory for creating specific device classes for the standard device extractors\n"
   "Use a reimplementation of this class to provide a device class generator for built-in device extractors "
   "such as \\DeviceExtractorMOS3Transistor. The constructor of this extractor has a 'factory' parameter "
-  "which takes an object of \\DeviceClassFactory type. If such an object is provided, this factory is used "
-  "to create the actual device class.\n"
+  "which takes an object of \\DeviceClassFactory type.\n"
+  "\n"
+  "If such an object is provided, this factory is used "
+  "to create the actual device class. The following code shows an example:\n"
   "\n"
   "@code\n"
-  "class MyFactory < RBA::DeviceClassMOS3Transistor\n"
+  "class MyClass < RBA::DeviceClassMOS3Transistor\n"
   "  ... overrides some methods ...\n"
   "end\n"
   "\n"
-  "extractor = RBA::DeviceExtractorMOS3Transistor::new(\"NMOS\", false, MyFactor.new)\n"
+  "class MyFactory < RBA::DeviceClassFactory\n"
+  "  def create_class\n"
+  "    MyClass.new\n"
+  "  end\n"
+  "end\n"
+  "\n"
+  "extractor = RBA::DeviceExtractorMOS3Transistor::new(\"NMOS\", false, MyFactory.new)\n"
   "@/code\n"
+  "\n"
+  "When using a factory with a device extractor, make sure it creates a corresponding device class, e.g. "
+  "for the \\DeviceExtractorMOS3Transistor extractor create a device class derived from \\DeviceClassMOS3Transistor.\n"
+  "\n"
+  "This class has been introduced in version 0.27.3.\n"
 );
 
 Class<db::NetlistDeviceExtractorError> decl_dbNetlistDeviceExtractorError ("db", "NetlistDeviceExtractorError",
@@ -259,6 +273,12 @@ Class<db::NetlistDeviceExtractorLayerDefinition> decl_dbNetlistDeviceExtractorLa
   "This class has been introduced in version 0.26."
 );
 
+//  for test only
+static void test_initialize (db::NetlistDeviceExtractor *ex, db::Netlist *nl)
+{
+  ex->initialize (nl);
+}
+
 Class<db::NetlistDeviceExtractor> decl_dbNetlistDeviceExtractor ("db", "DeviceExtractorBase",
   gsi::method ("name", &db::NetlistDeviceExtractor::name,
     "@brief Gets the name of the device extractor and the device class."
@@ -270,6 +290,7 @@ Class<db::NetlistDeviceExtractor> decl_dbNetlistDeviceExtractor ("db", "DeviceEx
     "\n"
     "This method has been added in version 0.27.3.\n"
   ) +
+  gsi::method_ext ("test_initialize", &test_initialize, gsi::arg ("netlist"), "@hide") +   //  for test only
   gsi::iterator ("each_layer_definition", &db::NetlistDeviceExtractor::begin_layer_definitions, &db::NetlistDeviceExtractor::end_layer_definitions,
     "@brief Iterates over all layer definitions."
   ) +
@@ -457,13 +478,13 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
   "This class has been introduced in version 0.26."
 );
 
-static db::NetlistDeviceExtractorMOS3Transistor *make_mos3_extractor (const std::string &name, bool strict, db::DeviceClassFactory *factory)
+static db::NetlistDeviceExtractorMOS3Transistor *make_mos3_extractor (const std::string &name, bool strict, DeviceClassFactoryImpl *factory)
 {
   return new db::NetlistDeviceExtractorMOS3Transistor (name, strict, factory);
 }
 
 Class<db::NetlistDeviceExtractorMOS3Transistor> decl_NetlistDeviceExtractorMOS3Transistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorMOS3Transistor",
-  gsi::constructor ("new", &make_mos3_extractor, gsi::arg ("name"), gsi::arg ("strict", false), gsi::arg ("factory", (db::DeviceClassFactory *)0, "none"),
+  gsi::constructor ("new", &make_mos3_extractor, gsi::arg ("name"), gsi::arg ("strict", false), gsi::arg ("factory", (DeviceClassFactoryImpl *)0, "none"),
     "@brief Creates a new device extractor with the given name.\n"
     "If \\strict is true, the MOS device extraction will happen in strict mode. That is, source and drain "
     "are not interchangeable.\n"
@@ -516,13 +537,13 @@ Class<db::NetlistDeviceExtractorMOS3Transistor> decl_NetlistDeviceExtractorMOS3T
   "This class has been introduced in version 0.26."
 );
 
-static db::NetlistDeviceExtractorMOS4Transistor *make_mos4_extractor (const std::string &name, bool strict, db::DeviceClassFactory *factory)
+static db::NetlistDeviceExtractorMOS4Transistor *make_mos4_extractor (const std::string &name, bool strict, DeviceClassFactoryImpl *factory)
 {
   return new db::NetlistDeviceExtractorMOS4Transistor (name, strict, factory);
 }
 
 Class<db::NetlistDeviceExtractorMOS4Transistor> decl_NetlistDeviceExtractorMOS4Transistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorMOS4Transistor",
-  gsi::constructor ("new", &make_mos4_extractor, gsi::arg ("name"), gsi::arg ("strict", false), gsi::arg ("factory", (db::DeviceClassFactory *)0, "none"),
+  gsi::constructor ("new", &make_mos4_extractor, gsi::arg ("name"), gsi::arg ("strict", false), gsi::arg ("factory", (DeviceClassFactoryImpl *)0, "none"),
     "@brief Creates a new device extractor with the given name\n"
     "For the 'factory' parameter see \\DeviceClassFactory. It has been added in version 0.27.3.\n"
   ),
@@ -555,13 +576,13 @@ Class<db::NetlistDeviceExtractorMOS4Transistor> decl_NetlistDeviceExtractorMOS4T
   "This class has been introduced in version 0.26."
 );
 
-db::NetlistDeviceExtractorResistor *make_res_extractor (const std::string &name, double sheet_rho, db::DeviceClassFactory *factory)
+db::NetlistDeviceExtractorResistor *make_res_extractor (const std::string &name, double sheet_rho, DeviceClassFactoryImpl *factory)
 {
   return new db::NetlistDeviceExtractorResistor (name, sheet_rho, factory);
 }
 
 Class<db::NetlistDeviceExtractorResistor> decl_NetlistDeviceExtractorResistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorResistor",
-  gsi::constructor ("new", &make_res_extractor, gsi::arg ("name"), gsi::arg ("sheet_rho"), gsi::arg ("factory", (db::DeviceClassFactory *)0, "none"),
+  gsi::constructor ("new", &make_res_extractor, gsi::arg ("name"), gsi::arg ("sheet_rho"), gsi::arg ("factory", (DeviceClassFactoryImpl *)0, "none"),
     "@brief Creates a new device extractor with the given name\n"
     "For the 'factory' parameter see \\DeviceClassFactory. It has been added in version 0.27.3.\n"
   ),
@@ -606,13 +627,13 @@ Class<db::NetlistDeviceExtractorResistor> decl_NetlistDeviceExtractorResistor (d
   "This class has been introduced in version 0.26."
 );
 
-db::NetlistDeviceExtractorResistorWithBulk *make_res_with_bulk_extractor (const std::string &name, double sheet_rho, db::DeviceClassFactory *factory)
+db::NetlistDeviceExtractorResistorWithBulk *make_res_with_bulk_extractor (const std::string &name, double sheet_rho, DeviceClassFactoryImpl *factory)
 {
   return new db::NetlistDeviceExtractorResistorWithBulk (name, sheet_rho, factory);
 }
 
 Class<db::NetlistDeviceExtractorResistorWithBulk> decl_NetlistDeviceExtractorResistorWithBulk (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorResistorWithBulk",
-  gsi::constructor ("new", &make_res_with_bulk_extractor, gsi::arg ("name"), gsi::arg ("sheet_rho"), gsi::arg ("factory", (db::DeviceClassFactory *)0, "none"),
+  gsi::constructor ("new", &make_res_with_bulk_extractor, gsi::arg ("name"), gsi::arg ("sheet_rho"), gsi::arg ("factory", (DeviceClassFactoryImpl *)0, "none"),
     "@brief Creates a new device extractor with the given name\n"
     "For the 'factory' parameter see \\DeviceClassFactory. It has been added in version 0.27.3.\n"
   ),
@@ -652,13 +673,13 @@ Class<db::NetlistDeviceExtractorResistorWithBulk> decl_NetlistDeviceExtractorRes
   "This class has been introduced in version 0.26."
 );
 
-db::NetlistDeviceExtractorCapacitor *make_cap_extractor (const std::string &name, double area_cap, db::DeviceClassFactory *factory)
+db::NetlistDeviceExtractorCapacitor *make_cap_extractor (const std::string &name, double area_cap, DeviceClassFactoryImpl *factory)
 {
   return new db::NetlistDeviceExtractorCapacitor (name, area_cap, factory);
 }
 
 Class<db::NetlistDeviceExtractorCapacitor> decl_NetlistDeviceExtractorCapacitor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorCapacitor",
-  gsi::constructor ("new", &make_cap_extractor, gsi::arg ("name"), gsi::arg ("area_cap"), gsi::arg ("factory", (db::DeviceClassFactory *)0, "none"),
+  gsi::constructor ("new", &make_cap_extractor, gsi::arg ("name"), gsi::arg ("area_cap"), gsi::arg ("factory", (DeviceClassFactoryImpl *)0, "none"),
     "@brief Creates a new device extractor with the given name\n"
     "For the 'factory' parameter see \\DeviceClassFactory. It has been added in version 0.27.3.\n"
   ),
@@ -698,13 +719,13 @@ Class<db::NetlistDeviceExtractorCapacitor> decl_NetlistDeviceExtractorCapacitor 
   "This class has been introduced in version 0.26."
 );
 
-db::NetlistDeviceExtractorCapacitorWithBulk *make_cap_with_bulk_extractor (const std::string &name, double area_cap, db::DeviceClassFactory *factory)
+db::NetlistDeviceExtractorCapacitorWithBulk *make_cap_with_bulk_extractor (const std::string &name, double area_cap, DeviceClassFactoryImpl *factory)
 {
   return new db::NetlistDeviceExtractorCapacitorWithBulk (name, area_cap, factory);
 }
 
 Class<db::NetlistDeviceExtractorCapacitorWithBulk> decl_NetlistDeviceExtractorCapacitorWithBulk (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorCapacitorWithBulk",
-  gsi::constructor ("new", &make_cap_with_bulk_extractor, gsi::arg ("name"), gsi::arg ("sheet_rho"), gsi::arg ("factory", (db::DeviceClassFactory *)0, "none"),
+  gsi::constructor ("new", &make_cap_with_bulk_extractor, gsi::arg ("name"), gsi::arg ("sheet_rho"), gsi::arg ("factory", (DeviceClassFactoryImpl *)0, "none"),
     "@brief Creates a new device extractor with the given name\n"
     "For the 'factory' parameter see \\DeviceClassFactory. It has been added in version 0.27.3.\n"
   ),
@@ -743,13 +764,13 @@ Class<db::NetlistDeviceExtractorCapacitorWithBulk> decl_NetlistDeviceExtractorCa
   "This class has been introduced in version 0.26."
 );
 
-db::NetlistDeviceExtractorBJT3Transistor *make_bjt3_extractor (const std::string &name, db::DeviceClassFactory *factory)
+db::NetlistDeviceExtractorBJT3Transistor *make_bjt3_extractor (const std::string &name, DeviceClassFactoryImpl *factory)
 {
   return new db::NetlistDeviceExtractorBJT3Transistor (name, factory);
 }
 
 Class<db::NetlistDeviceExtractorBJT3Transistor> decl_dbNetlistDeviceExtractorBJT3Transistor (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorBJT3Transistor",
-  gsi::constructor ("new", &make_bjt3_extractor, gsi::arg ("name"), gsi::arg ("factory", (db::DeviceClassFactory *)0, "none"),
+  gsi::constructor ("new", &make_bjt3_extractor, gsi::arg ("name"), gsi::arg ("factory", (DeviceClassFactoryImpl *)0, "none"),
     "@brief Creates a new device extractor with the given name\n"
     "For the 'factory' parameter see \\DeviceClassFactory. It has been added in version 0.27.3.\n"
   ),
@@ -797,13 +818,13 @@ Class<db::NetlistDeviceExtractorBJT3Transistor> decl_dbNetlistDeviceExtractorBJT
   "This class has been introduced in version 0.26."
 );
 
-db::NetlistDeviceExtractorBJT4Transistor *make_bjt4_extractor (const std::string &name, db::DeviceClassFactory *factory)
+db::NetlistDeviceExtractorBJT4Transistor *make_bjt4_extractor (const std::string &name, DeviceClassFactoryImpl *factory)
 {
   return new db::NetlistDeviceExtractorBJT4Transistor (name, factory);
 }
 
 Class<db::NetlistDeviceExtractorBJT4Transistor> decl_NetlistDeviceExtractorBJT4Transistor (decl_dbNetlistDeviceExtractorBJT3Transistor, "db", "DeviceExtractorBJT4Transistor",
-  gsi::constructor ("new", &make_bjt4_extractor, gsi::arg ("name"), gsi::arg ("factory", (db::DeviceClassFactory *)0, "none"),
+  gsi::constructor ("new", &make_bjt4_extractor, gsi::arg ("name"), gsi::arg ("factory", (DeviceClassFactoryImpl *)0, "none"),
     "@brief Creates a new device extractor with the given name\n"
     "For the 'factory' parameter see \\DeviceClassFactory. It has been added in version 0.27.3.\n"
   ),
@@ -832,13 +853,13 @@ Class<db::NetlistDeviceExtractorBJT4Transistor> decl_NetlistDeviceExtractorBJT4T
   "This class has been introduced in version 0.26."
 );
 
-db::NetlistDeviceExtractorDiode *make_diode_extractor (const std::string &name, db::DeviceClassFactory *factory)
+db::NetlistDeviceExtractorDiode *make_diode_extractor (const std::string &name, DeviceClassFactoryImpl *factory)
 {
   return new db::NetlistDeviceExtractorDiode (name, factory);
 }
 
 Class<db::NetlistDeviceExtractorDiode> decl_NetlistDeviceExtractorDiode (decl_dbNetlistDeviceExtractor, "db", "DeviceExtractorDiode",
-  gsi::constructor ("new", &make_diode_extractor, gsi::arg ("name"), gsi::arg ("factory", (db::DeviceClassFactory *)0, "none"),
+  gsi::constructor ("new", &make_diode_extractor, gsi::arg ("name"), gsi::arg ("factory", (DeviceClassFactoryImpl *)0, "none"),
     "@brief Creates a new device extractor with the given name\n"
     "For the 'factory' parameter see \\DeviceClassFactory. It has been added in version 0.27.3.\n"
   ),

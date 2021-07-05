@@ -1,0 +1,11 @@
+* Extracted by KLayout
+
+* cell Rre
+* pin gnd!
+* pin vdd!
+.SUBCKT Rre 1 2
+* net 1 gnd!
+* net 2 vdd!
+* device instance $1 r0 *1 8.43,1.51 RR1
+R$1 1 2 RR1 10 W=0.6 L=6
+.ENDS Rre

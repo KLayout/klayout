@@ -1,0 +1,4 @@
+.SUBCKT Rre 
+RR0 vdd! gnd! 10 RR1 W=600n L=7u M=1
+.ENDS
+

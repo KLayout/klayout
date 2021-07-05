@@ -376,5 +376,33 @@ dc.enable_parameter("L", true)
   fully enabled parameters.
   </p>
 
+  <p>
+  Another way of customizing the built-in device extractors is to
+  supply a custom device class. The following code creates a new 
+  resistor class which changes the preconfigured device parameter definitions
+  to enable "W" and "L".
+  </p>
+
+  <pre>class MyResistor &lt; RBA::DeviceClassResistor
+  def initialize
+    super
+    enable_parameter("W", true)
+    enable_parameter("L", true)
+  end
+end
+
+...
+
+extract_devices(resistor("RES", 1, MyResistor), ...)
+</pre>
+
+  <p>
+  The effect of this code is the same than the first one, but using a custom
+  device class opens the option to supply additional parameters for example
+  or to implement some entirely new device while using the extraction
+  mechanics of the resistor extractor. The only requirement is compatibility of
+  the parameter and terminal definitions.
+  </p>
+
 </doc>
 

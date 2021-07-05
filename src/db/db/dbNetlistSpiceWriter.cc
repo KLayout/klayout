@@ -117,6 +117,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
       os << " ";
       os << format_name (dev.device_class ()->name ());
     }
+    os << format_params (dev, db::DeviceClassCapacitor::param_id_C);
 
   } else if (ind) {
 
@@ -129,6 +130,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
       os << " ";
       os << format_name (dev.device_class ()->name ());
     }
+    os << format_params (dev, db::DeviceClassInductor::param_id_L);
 
   } else if (res || res3) {
 
@@ -141,6 +143,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
       os << " ";
       os << format_name (dev.device_class ()->name ());
     }
+    os << format_params (dev, db::DeviceClassResistor::param_id_R);
 
   } else if (diode) {
 

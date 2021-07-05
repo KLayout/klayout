@@ -30,8 +30,8 @@ namespace db
 // ---------------------------------------------------------------------------------
 //  NetlistDeviceExtractorMOS3Transistor implementation
 
-NetlistDeviceExtractorMOS3Transistor::NetlistDeviceExtractorMOS3Transistor (const std::string &name, bool strict)
-  : db::NetlistDeviceExtractor (name),
+NetlistDeviceExtractorMOS3Transistor::NetlistDeviceExtractorMOS3Transistor (const std::string &name, bool strict, db::DeviceClassFactory *factory)
+  : db::NetlistDeviceExtractorImplBase (name, factory ? factory : new db::device_class_factory<DeviceClassMOS3Transistor> ()),
     m_strict (strict)
 {
   //  .. nothing yet ..
@@ -66,7 +66,7 @@ void NetlistDeviceExtractorMOS3Transistor::setup ()
 
   }
 
-  db::DeviceClass *cls = new db::DeviceClassMOS3Transistor ();
+  db::DeviceClass *cls = make_class ();
   cls->set_strict (m_strict);
   register_device_class (cls);
 }
@@ -322,8 +322,8 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
 // ---------------------------------------------------------------------------------
 //  NetlistDeviceExtractorMOS4Transistor implementation
 
-NetlistDeviceExtractorMOS4Transistor::NetlistDeviceExtractorMOS4Transistor (const std::string &name, bool strict)
-  : NetlistDeviceExtractorMOS3Transistor (name, strict)
+NetlistDeviceExtractorMOS4Transistor::NetlistDeviceExtractorMOS4Transistor (const std::string &name, bool strict, db::DeviceClassFactory *factory)
+  : NetlistDeviceExtractorMOS3Transistor (name, strict, factory ? factory : new db::device_class_factory<db::DeviceClassMOS4Transistor> ())
 {
   //  .. nothing yet ..
 }
@@ -367,7 +367,7 @@ void NetlistDeviceExtractorMOS4Transistor::setup ()
 
   }
 
-  db::DeviceClass *cls = new db::DeviceClassMOS4Transistor ();
+  db::DeviceClass *cls = make_class ();
   cls->set_strict (is_strict ());
   register_device_class (cls);
 }
@@ -383,8 +383,8 @@ void NetlistDeviceExtractorMOS4Transistor::modify_device (const db::Polygon &rga
 // ---------------------------------------------------------------------------------
 //  NetlistDeviceExtractorResistor implementation
 
-NetlistDeviceExtractorResistor::NetlistDeviceExtractorResistor (const std::string &name, double sheet_rho)
-  : db::NetlistDeviceExtractor (name), m_sheet_rho (sheet_rho)
+NetlistDeviceExtractorResistor::NetlistDeviceExtractorResistor (const std::string &name, double sheet_rho, db::DeviceClassFactory *factory)
+  : db::NetlistDeviceExtractorImplBase (name, factory ? factory : new db::device_class_factory<db::DeviceClassResistor> ()), m_sheet_rho (sheet_rho)
 {
   //  .. nothing yet ..
 }
@@ -396,7 +396,7 @@ void NetlistDeviceExtractorResistor::setup ()
   define_layer ("tA", 1, "A terminal output");    // #2 -> C
   define_layer ("tB", 1, "B terminal output");    // #3 -> C
 
-  register_device_class (new db::DeviceClassResistor ());
+  register_device_class (make_class ());
 }
 
 db::Connectivity NetlistDeviceExtractorResistor::get_connectivity (const db::Layout & /*layout*/, const std::vector<unsigned int> &layers) const
@@ -494,8 +494,8 @@ void NetlistDeviceExtractorResistor::extract_devices (const std::vector<db::Regi
 // ---------------------------------------------------------------------------------
 //  NetlistDeviceExtractorResistorWithBulk implementation
 
-NetlistDeviceExtractorResistorWithBulk::NetlistDeviceExtractorResistorWithBulk (const std::string &name, double sheet_rho)
-  : NetlistDeviceExtractorResistor (name, sheet_rho)
+NetlistDeviceExtractorResistorWithBulk::NetlistDeviceExtractorResistorWithBulk (const std::string &name, double sheet_rho, db::DeviceClassFactory *factory)
+  : NetlistDeviceExtractorResistor (name, sheet_rho, factory ? factory : new db::device_class_factory<db::DeviceClassResistorWithBulk> ())
 {
   //  .. nothing yet ..
 }
@@ -509,7 +509,7 @@ void NetlistDeviceExtractorResistorWithBulk::setup ()
   define_layer ("W", "Well/Bulk");                // #4
   define_layer ("tW", 4, "W terminal output");    // #5 -> W
 
-  register_device_class (new db::DeviceClassResistorWithBulk ());
+  register_device_class (make_class ());
 }
 
 void NetlistDeviceExtractorResistorWithBulk::modify_device (const db::Polygon &res, const std::vector<db::Region> & /*layer_geometry*/, db::Device *device)
@@ -521,8 +521,8 @@ void NetlistDeviceExtractorResistorWithBulk::modify_device (const db::Polygon &r
 // ---------------------------------------------------------------------------------
 //  NetlistDeviceExtractorCapacitor implementation
 
-NetlistDeviceExtractorCapacitor::NetlistDeviceExtractorCapacitor (const std::string &name, double area_cap)
-  : db::NetlistDeviceExtractor (name), m_area_cap (area_cap)
+NetlistDeviceExtractorCapacitor::NetlistDeviceExtractorCapacitor (const std::string &name, double area_cap, db::DeviceClassFactory *factory)
+  : db::NetlistDeviceExtractorImplBase (name, factory ? factory : new db::device_class_factory<db::DeviceClassCapacitor> ()), m_area_cap (area_cap)
 {
   //  .. nothing yet ..
 }
@@ -534,7 +534,7 @@ void NetlistDeviceExtractorCapacitor::setup ()
   define_layer ("tA", 0, "A terminal output");      // #2 -> P1
   define_layer ("tB", 1, "B terminal output");      // #3 -> P2
 
-  register_device_class (new db::DeviceClassCapacitor ());
+  register_device_class (make_class ());
 }
 
 db::Connectivity NetlistDeviceExtractorCapacitor::get_connectivity (const db::Layout & /*layout*/, const std::vector<unsigned int> &layers) const
@@ -596,8 +596,8 @@ void NetlistDeviceExtractorCapacitor::extract_devices (const std::vector<db::Reg
 // ---------------------------------------------------------------------------------
 //  NetlistDeviceExtractorCapacitorWithBulk implementation
 
-NetlistDeviceExtractorCapacitorWithBulk::NetlistDeviceExtractorCapacitorWithBulk (const std::string &name, double area_cap)
-  : NetlistDeviceExtractorCapacitor (name, area_cap)
+NetlistDeviceExtractorCapacitorWithBulk::NetlistDeviceExtractorCapacitorWithBulk (const std::string &name, double area_cap, db::DeviceClassFactory *factory)
+  : NetlistDeviceExtractorCapacitor (name, area_cap, factory ? factory : new db::device_class_factory<db::DeviceClassCapacitorWithBulk> ())
 {
   //  .. nothing yet ..
 }
@@ -611,7 +611,7 @@ void NetlistDeviceExtractorCapacitorWithBulk::setup ()
   define_layer ("W", "Well/Bulk");                  // #4
   define_layer ("tW", 4, "W terminal output");      // #5 -> W
 
-  register_device_class (new db::DeviceClassCapacitorWithBulk ());
+  register_device_class (make_class ());
 }
 
 void NetlistDeviceExtractorCapacitorWithBulk::modify_device (const db::Polygon &cap, const std::vector<db::Region> & /*layer_geometry*/, db::Device *device)
@@ -623,8 +623,8 @@ void NetlistDeviceExtractorCapacitorWithBulk::modify_device (const db::Polygon &
 // ---------------------------------------------------------------------------------
 //  NetlistDeviceExtractorBJT3Transistor implementation
 
-NetlistDeviceExtractorBJT3Transistor::NetlistDeviceExtractorBJT3Transistor (const std::string &name)
-  : db::NetlistDeviceExtractor (name)
+NetlistDeviceExtractorBJT3Transistor::NetlistDeviceExtractorBJT3Transistor (const std::string &name, db::DeviceClassFactory *factory)
+  : db::NetlistDeviceExtractorImplBase (name, factory ? factory : new db::device_class_factory<db::DeviceClassBJT3Transistor> ())
 {
   //  .. nothing yet ..
 }
@@ -640,7 +640,7 @@ void NetlistDeviceExtractorBJT3Transistor::setup ()
   define_layer ("tB", 1, "Base terminal output");                       // #4 -> B
   define_layer ("tE", 2, "Emitter terminal output");                    // #5 -> E
 
-  register_device_class (new db::DeviceClassBJT3Transistor ());
+  register_device_class (make_class ());
 }
 
 db::Connectivity NetlistDeviceExtractorBJT3Transistor::get_connectivity (const db::Layout & /*layout*/, const std::vector<unsigned int> &layers) const
@@ -750,8 +750,8 @@ void NetlistDeviceExtractorBJT3Transistor::extract_devices (const std::vector<db
 // ---------------------------------------------------------------------------------
 //  NetlistDeviceExtractorBJT4Transistor implementation
 
-NetlistDeviceExtractorBJT4Transistor::NetlistDeviceExtractorBJT4Transistor (const std::string &name)
-  : NetlistDeviceExtractorBJT3Transistor (name)
+NetlistDeviceExtractorBJT4Transistor::NetlistDeviceExtractorBJT4Transistor (const std::string &name, db::DeviceClassFactory *factory)
+  : NetlistDeviceExtractorBJT3Transistor (name, factory ? factory : new db::device_class_factory<db::DeviceClassBJT4Transistor> ())
 {
   //  .. nothing yet ..
 }
@@ -772,7 +772,7 @@ void NetlistDeviceExtractorBJT4Transistor::setup ()
 
   define_layer ("tS", 6, "Substrate (bulk) terminal output");           // #7 -> S
 
-  register_device_class (new db::DeviceClassBJT4Transistor ());
+  register_device_class (make_class ());
 }
 
 void NetlistDeviceExtractorBJT4Transistor::modify_device (const db::Polygon &emitter, const std::vector<db::Region> & /*layer_geometry*/, db::Device *device)
@@ -784,8 +784,8 @@ void NetlistDeviceExtractorBJT4Transistor::modify_device (const db::Polygon &emi
 // ---------------------------------------------------------------------------------
 //  NetlistDeviceExtractorDiode implementation
 
-NetlistDeviceExtractorDiode::NetlistDeviceExtractorDiode (const std::string &name)
-  : db::NetlistDeviceExtractor (name)
+NetlistDeviceExtractorDiode::NetlistDeviceExtractorDiode (const std::string &name, db::DeviceClassFactory *factory)
+  : db::NetlistDeviceExtractorImplBase (name, factory ? factory : new db::device_class_factory<db::DeviceClassDiode> ())
 {
   //  .. nothing yet ..
 }
@@ -797,7 +797,7 @@ void NetlistDeviceExtractorDiode::setup ()
   define_layer ("tA", 0, "A terminal output");      // #2 -> P
   define_layer ("tC", 1, "C terminal output");      // #3 -> N
 
-  register_device_class (new db::DeviceClassDiode ());
+  register_device_class (make_class ());
 }
 
 db::Connectivity NetlistDeviceExtractorDiode::get_connectivity (const db::Layout & /*layout*/, const std::vector<unsigned int> &layers) const

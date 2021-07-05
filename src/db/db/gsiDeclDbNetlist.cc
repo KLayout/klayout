@@ -843,7 +843,7 @@ public:
     }
   }
 
-  gsi::Callback cb_less, cb_equal;
+  gsi::Callback cb_less;
 };
 
 }

@@ -3,5 +3,5 @@
 * cell TOP
 .SUBCKT TOP
 * device instance $1 r0 *1 7.52,4.175 RES
-R$1 2 1 51 RES L=12.75U W=0.25U A=3.1875P P=26U
+R$1 2 1 51 RES
 .ENDS TOP

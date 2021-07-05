@@ -117,7 +117,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
       os << " ";
       os << format_name (dev.device_class ()->name ());
     }
-    os << format_params (dev, db::DeviceClassCapacitor::param_id_C);
+    os << format_params (dev, db::DeviceClassCapacitor::param_id_C, true);
 
   } else if (ind) {
 
@@ -130,7 +130,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
       os << " ";
       os << format_name (dev.device_class ()->name ());
     }
-    os << format_params (dev, db::DeviceClassInductor::param_id_L);
+    os << format_params (dev, db::DeviceClassInductor::param_id_L, true);
 
   } else if (res || res3) {
 
@@ -143,7 +143,7 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
       os << " ";
       os << format_name (dev.device_class ()->name ());
     }
-    os << format_params (dev, db::DeviceClassResistor::param_id_R);
+    os << format_params (dev, db::DeviceClassResistor::param_id_R, true);
 
   } else if (diode) {
 
@@ -212,13 +212,13 @@ std::string NetlistSpiceWriterDelegate::format_terminals (const db::Device &dev,
   return os.str ();
 }
 
-std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev, size_t without_id) const
+std::string NetlistSpiceWriterDelegate::format_params (const db::Device &dev, size_t without_id, bool only_primary) const
 {
   std::ostringstream os;
 
   const std::vector<db::DeviceParameterDefinition> &pd = dev.device_class ()->parameter_definitions ();
   for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
-    if (i->id () != without_id) {
+    if (i->id () != without_id && (! only_primary || i->is_primary ())) {
       double sis = i->si_scaling ();
       os << " " << i->name () << "=";
       //  for compatibility

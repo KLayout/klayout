@@ -1,0 +1,22 @@
+source($lvs_test_source)
+report_lvs($lvs_test_target_lvsdb, true)
+target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
+
+schematic("blackbox_schematic.cir")
+
+deep
+
+same_nets!("TOP", "*", "*")
+
+m1          = input(1, 0)
+via         = input(2, 0)
+m2          = input(3, 0)
+pad         = input(10, 0)
+
+connect(m1, pad)
+connect(m1, via)
+connect(via, m2)
+
+blank_circuit("CHIP")
+
+compare

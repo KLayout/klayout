@@ -476,13 +476,32 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
     "The logger is a delegate or event receiver which the comparer will send compare events to. "
     "See the class description for more details."
   ) +
-  gsi::method ("same_nets", &db::NetlistComparer::same_nets, gsi::arg ("net_a"), gsi::arg ("net_b"),
+  gsi::method ("same_nets", (void (db::NetlistComparer::*) (const db::Net *, const db::Net *, bool)) &db::NetlistComparer::same_nets, gsi::arg ("net_a"), gsi::arg ("net_b"), gsi::arg ("must_match", false),
     "@brief Marks two nets as identical.\n"
     "This makes a net net_a in netlist a identical to the corresponding\n"
     "net net_b in netlist b (see \\compare).\n"
     "Otherwise, the algorithm will try to identify nets according to their topology. "
     "This method can be used to supply hints to the compare algorithm. It will use "
-    "these hints to derive further identities."
+    "these hints to derive further identities.\n"
+    "\n"
+    "If 'must_match' is true, the nets are required to match. If they don't, an error is reported.\n"
+    "\n"
+    "The 'must_match' optional argument has been added in version 0.27.3.\n"
+  ) +
+  gsi::method ("same_nets", (void (db::NetlistComparer::*) (const db::Circuit *, const db::Circuit *, const db::Net *, const db::Net *, bool)) &db::NetlistComparer::same_nets, gsi::arg ("circuit_a"), gsi::arg ("circuit_b"), gsi::arg ("net_a"), gsi::arg ("net_b"), gsi::arg ("must_match", false),
+    "@brief Marks two nets as identical.\n"
+    "This makes a net net_a in netlist a identical to the corresponding\n"
+    "net net_b in netlist b (see \\compare).\n"
+    "Otherwise, the algorithm will try to identify nets according to their topology. "
+    "This method can be used to supply hints to the compare algorithm. It will use "
+    "these hints to derive further identities.\n"
+    "\n"
+    "If 'must_match' is true, the nets are required to match. If they don't, an error is reported.\n"
+    "\n"
+    "This variant allows specifying nil for the nets indicating the nets are mismatched by definition. "
+    "with 'must_match' this will render a net mismatch error.\n"
+    "\n"
+    "This variant has been added in version 0.27.3.\n"
   ) +
   gsi::method ("equivalent_pins", (void (db::NetlistComparer::*) (const db::Circuit *, size_t, size_t)) &db::NetlistComparer::equivalent_pins, gsi::arg ("circuit_b"), gsi::arg ("pin_id1"), gsi::arg ("pin_id2"),
     "@brief Marks two pins of the given circuit as equivalent (i.e. they can be swapped).\n"

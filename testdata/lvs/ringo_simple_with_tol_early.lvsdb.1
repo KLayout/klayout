@@ -2,7 +2,7 @@
 
 # Layout
 layout(
- top(top)
+ top(RINGO)
  unit(0.001)
 
  # Layer section
@@ -131,7 +131,7 @@ layout(
 
  # Circuit section
  # Circuits are the hierarchical building blocks of the netlist.
- circuit(nd2X1
+ circuit(ND2X1
 
   # Circuit boundary
   rect((-100 400) (2600 7600))
@@ -268,7 +268,7 @@ layout(
   )
 
  )
- circuit(INV
+ circuit(INVX1
 
   # Circuit boundary
   rect((-100 400) (2000 7600))
@@ -355,7 +355,7 @@ layout(
   )
 
  )
- circuit(top
+ circuit(RINGO
 
   # Circuit boundary
   rect((0 350) (25800 7650))
@@ -465,7 +465,7 @@ layout(
   pin(15 name(VSS))
 
   # Subcircuits and their connections
-  circuit(1 nd2X1 location(1800 0)
+  circuit(1 ND2X1 location(1800 0)
    pin(0 12)
    pin(1 1)
    pin(2 15)
@@ -474,7 +474,7 @@ layout(
    pin(5 14)
    pin(6 15)
   )
-  circuit(2 INV location(4200 0)
+  circuit(2 INVX1 location(4200 0)
    pin(0 12)
    pin(1 2)
    pin(2 15)
@@ -482,7 +482,7 @@ layout(
    pin(4 1)
    pin(5 15)
   )
-  circuit(3 INV location(6000 0)
+  circuit(3 INVX1 location(6000 0)
    pin(0 12)
    pin(1 3)
    pin(2 15)
@@ -490,7 +490,7 @@ layout(
    pin(4 2)
    pin(5 15)
   )
-  circuit(4 INV location(7800 0)
+  circuit(4 INVX1 location(7800 0)
    pin(0 12)
    pin(1 4)
    pin(2 15)
@@ -498,7 +498,7 @@ layout(
    pin(4 3)
    pin(5 15)
   )
-  circuit(5 INV location(9600 0)
+  circuit(5 INVX1 location(9600 0)
    pin(0 12)
    pin(1 5)
    pin(2 15)
@@ -506,7 +506,7 @@ layout(
    pin(4 4)
    pin(5 15)
   )
-  circuit(6 INV location(11400 0)
+  circuit(6 INVX1 location(11400 0)
    pin(0 12)
    pin(1 6)
    pin(2 15)
@@ -514,7 +514,7 @@ layout(
    pin(4 5)
    pin(5 15)
   )
-  circuit(7 INV location(13200 0)
+  circuit(7 INVX1 location(13200 0)
    pin(0 12)
    pin(1 7)
    pin(2 15)
@@ -522,7 +522,7 @@ layout(
    pin(4 6)
    pin(5 15)
   )
-  circuit(8 INV location(15000 0)
+  circuit(8 INVX1 location(15000 0)
    pin(0 12)
    pin(1 8)
    pin(2 15)
@@ -530,7 +530,7 @@ layout(
    pin(4 7)
    pin(5 15)
   )
-  circuit(9 INV location(16800 0)
+  circuit(9 INVX1 location(16800 0)
    pin(0 12)
    pin(1 9)
    pin(2 15)
@@ -538,7 +538,7 @@ layout(
    pin(4 8)
    pin(5 15)
   )
-  circuit(10 INV location(18600 0)
+  circuit(10 INVX1 location(18600 0)
    pin(0 12)
    pin(1 10)
    pin(2 15)
@@ -546,7 +546,7 @@ layout(
    pin(4 9)
    pin(5 15)
   )
-  circuit(11 INV location(20400 0)
+  circuit(11 INVX1 location(20400 0)
    pin(0 12)
    pin(1 11)
    pin(2 15)
@@ -554,7 +554,7 @@ layout(
    pin(4 10)
    pin(5 15)
   )
-  circuit(12 INV location(22200 0)
+  circuit(12 INVX1 location(22200 0)
    pin(0 12)
    pin(1 13)
    pin(2 15)
@@ -599,8 +599,8 @@ reference(
   # Devices and their connections
   device(1 PMOS
    name($1)
-   param(L 0.25)
-   param(W 1.5)
+   param(L 0.251)
+   param(W 1.6)
    param(AS 0)
    param(AD 0)
    param(PS 0)
@@ -625,8 +625,8 @@ reference(
   )
   device(3 NMOS
    name($3)
-   param(L 0.25)
-   param(W 0.95)
+   param(L 0.26)
+   param(W 1)
    param(AS 0)
    param(AD 0)
    param(PS 0)
@@ -828,7 +828,7 @@ reference(
 
 # Cross reference
 xref(
- circuit(INV INVX1 match
+ circuit(INVX1 INVX1 match
   xref(
    net(4 4 match)
    net(5 5 match)
@@ -846,7 +846,7 @@ xref(
    device(1 1 match)
   )
  )
- circuit(nd2X1 ND2X1 match
+ circuit(ND2X1 ND2X1 match
   xref(
    net(8 8 match)
    net(4 4 match)
@@ -869,7 +869,7 @@ xref(
    device(2 2 match)
   )
  )
- circuit(top RINGO match
+ circuit(RINGO RINGO match
   xref(
    net(1 6 match)
    net(10 15 match)

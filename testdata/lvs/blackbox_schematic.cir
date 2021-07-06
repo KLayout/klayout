@@ -1,0 +1,9 @@
+
+.subckt chip pad1 pad2 pad3 pad4 pad5 pad6 pad7 pad8
+* This chip is an abstract
+.ends
+
+.subckt TOP
+X1 1 2 3 4 5 6 7 8 chip
+.ends
+

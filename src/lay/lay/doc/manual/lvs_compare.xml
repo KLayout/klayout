@@ -52,7 +52,44 @@
   </p>
 
   <p>
-  For more information about "same_nets" see <a href="/about/lvs_ref_global.xml#same_nets">same_nets</a>.
+  "same_nets" can also be used to require a matching between specific nets.
+  This is useful on top level to check for matching nets assigned to specific pads.
+  This allows checking correct pad assignment. For example to check whether the
+  same net is attached to the "VDD" pad, label the net "VDD" in the layout and
+  specify:
+  </p>
+
+  <pre>same_nets!("CHIP", "VDD", "VDD")</pre>
+
+  <p>
+  The exclamation-mark version will report a net mismatch if either there is no
+  "VDD" net in either layout or schematic or if these nets to not match.
+  The above specification can be abbreviated as layout and schematic net name are identical:
+  </p>
+
+  <pre>same_nets!("CHIP", "VDD")</pre>
+
+  <p>
+  It's also possible to specify pattern for circuit names or net names. 
+  This example requires all nets starting with "PAD" to have a counterpart
+  in layout and schematic for circuit "TOP" and each of these pairs has to match:
+  </p>
+
+  <pre>same_nets!("TOP", "PAD*")</pre>
+
+  <p>
+  So it is an error if there is a PAD1 net in layout but none in the schematic.
+  It is also an error if a net called PAD2 is there is layout and schematic but they
+  do not match.
+  </p>
+
+  <p>
+  "same_nets" and "same_nets!" can appear anywhere in the LVS script.
+  </p>
+
+  <p>
+  For more information about "same_nets" see <a href="/about/lvs_ref_global.xml#same_nets">same_nets</a> and
+  <a href="/about/lvs_ref_global.xml#same_nets!">same_nets!</a>.
   </p>
 
   <h2>Circuit equivalence hint</h2>

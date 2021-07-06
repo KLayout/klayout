@@ -112,7 +112,17 @@ InternalAngleEdgePairFilter::InternalAngleEdgePairFilter (double amin, bool incl
 bool
 InternalAngleEdgePairFilter::selected (const db::EdgePair &edge_pair) const
 {
-  return m_checker (edge_pair.first ().d (), -edge_pair.second ().d ()) != m_inverted;
+  db::Vector d1 = edge_pair.first ().d ();
+  db::Vector d2 = edge_pair.second ().d ();
+
+  if (db::sprod_sign (d1, d2) < 0) {
+    d1 = -d1;
+  }
+  if (db::vprod_sign (d1, d2) < 0) {
+    std::swap (d1, d2);
+  }
+
+  return m_checker (d1, d2) != m_inverted;
 }
 
 }

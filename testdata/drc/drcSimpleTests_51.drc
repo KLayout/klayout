@@ -1,0 +1,26 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+ep = input(1, 0).drc(sep(input(2, 0), angle_limit(91)) < 0.5)
+
+input(1, 0).output(1, 0)
+input(2, 0).output(2, 0)
+
+ep.polygons(0).output(100, 0)
+
+ep.with_internal_angle(45.0).polygons(0).output(200, 0)
+ep.with_internal_angle(0.0).polygons(0).output(201, 0)
+ep.with_internal_angle(45.0..91.0).polygons(0).output(202, 0)
+
+ep.without_internal_angle(45.0).polygons(0).output(220, 0)
+ep.without_internal_angle(0.0).polygons(0).output(221, 0)
+ep.without_internal_angle(45.0..91.0).polygons(0).output(222, 0)
+
+ep.with_area(0 .. 0.1).polygons(0).output(300, 0)
+ep.without_area(0 .. 0.1).polygons(0).output(301, 0)
+

@@ -158,8 +158,8 @@ xref(
  )
  circuit(empty_subcells EMPTY_SUBCELLS match
   xref(
-   net(1 1 warning)
-   net(2 2 warning)
+   net(1 1 match)
+   net(2 2 match)
    circuit(2 1 match)
    circuit(1 2 match)
   )

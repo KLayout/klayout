@@ -3157,7 +3157,7 @@ Shielding is enabled by default, but can be switched off with the "transparent" 
 <li><tt>layer.with_angle(min .. max)</tt></li>
 <li><tt>layer.with_angle(value)</tt></li>
 <li><tt>layer.with_angle(min, max)</tt></li>
-<li><tt>edge_pairlayer.with_angle(min, max [, both])</tt></li>
+<li><tt>edge_pair_layer.with_angle(min, max [, both])</tt></li>
 </ul>
 <p>
 When called on an edge layer, the method selects edges by their angle, 
@@ -3171,10 +3171,6 @@ The first version of this method selects
 edges with a angle larger or equal to min and less than max (but not equal).
 The second version selects edges with exactly the given angle. The third
 version is identical to the first one. 
-</p><p>
-When called on a polygon layer, this method selects corners which match the 
-given angle or is within the given angle interval. The angle is measured between the edges forming the corner.
-For each corner, an edge pair containing the edges forming in the angle is returned.
 </p><p>
 When called on an edge pair layer, this method selects edge pairs with one or both edges
 meeting the angle criterion. In this case an additional argument is accepted which can be
@@ -3204,8 +3200,11 @@ The following images demonstrate some use cases of <a href="#with_angle">with_an
 <td><img src="/images/drc_with_angle4.png"/></td>
 </tr>
 </table>
+</p><p>
+Note that in former versions, with_angle could be used on polygon layers selecting corners with specific angles.
+This feature has been deprecated. Use <a href="#corners">corners</a> instead.
 </p>
-<a name="with_area"/><h2>"with_area" - Selects polygons by area</h2>
+<a name="with_area"/><h2>"with_area" - Selects polygons or edge pairs by area</h2>
 <keyword name="with_area"/>
 <p>Usage:</p>
 <ul>
@@ -3214,12 +3213,14 @@ The following images demonstrate some use cases of <a href="#with_angle">with_an
 <li><tt>layer.with_area(min, max)</tt></li>
 </ul>
 <p>
-The first form will select all polygons with an area larger or
+The first form will select all polygons or edge pairs with an area larger or
 equal to min and less (but not equal to) max. The second form
-will select the polygons with exactly the given area.
+will select the polygons or edge pairs with exactly the given area.
 The third form basically is equivalent to the first form, but
 allows specification of nil for min or max indicating no lower or 
 upper limit.
+</p><p>
+This method is available for polygon or edge pair layers.
 </p>
 <a name="with_area_ratio"/><h2>"with_area_ratio" - Selects polygons by the ratio of the bounding box area vs. polygon area</h2>
 <keyword name="with_area_ratio"/>
@@ -3430,6 +3431,29 @@ This method is available for edge pair layers only.
 This method is available for polygon layers. It will select all polygons from the input layer
 which have the specified number of holes.
 </p>
+<a name="with_internal_angle"/><h2>"with_internal_angle" - Selects edge pairs by their internal angle</h2>
+<keyword name="with_internal_angle"/>
+<p>Usage:</p>
+<ul>
+<li><tt>edge_pair_layer.with_internal_angle(min .. max)</tt></li>
+<li><tt>edge_pair_layer.with_internal_angle(value)</tt></li>
+<li><tt>edge_pair_layer.with_internal_angle(min, max)</tt></li>
+</ul>
+<p>
+This method selects edge pairs by the angle enclosed by their edges.
+The angle is between 0 (parallel or anti-parallel edges) and 90 degree (perpendicular edges).
+If an interval or two values are given, the angle is checked to be within the given
+range.
+</p><p>
+Here are examples for "with_internal_angle" on edge pair layers:
+</p><p>
+<pre>
+# selects edge pairs with parallel edges
+ep1 = edge_pairs.with_internal_angle(0)
+# selects edge pairs with perpendicular edges
+ep2 = edge_pairs.with_internal_angle(90)
+</pre>
+</p>
 <a name="with_length"/><h2>"with_length" - Selects edges by their length</h2>
 <keyword name="with_length"/>
 <p>Usage:</p>
@@ -3505,12 +3529,13 @@ This method is available for polygon layers only.
 <li><tt>layer.without_angle(min .. max)</tt></li>
 <li><tt>layer.without_angle(value)</tt></li>
 <li><tt>layer.without_angle(min, max)</tt></li>
-<li><tt>edge_pairlayer.without_angle(min, max [, both])</tt></li>
+<li><tt>edge_pair_layer.without_angle(min, max [, both])</tt></li>
 </ul>
 <p>
 The method basically is the inverse of <a href="#with_angle">with_angle</a>. It selects all edges
 of the edge layer or corners of the polygons which do not have the given angle (second form) or whose angle
-is not inside the given interval (first and third form).
+is not inside the given interval (first and third form). When called on edge pairs, it selects
+edge pairs by the angles of their edges.
 </p><p>
 A note on the "both" modifier (without_angle called on edge pairs): "both" means that
 both edges need to be "without_angle". For example
@@ -3520,8 +3545,11 @@ both edges need to be "without_angle". For example
 # the edge pair is skipped if one edge is horizontal
 ep = edge_pairs.without_angle(0, both)
 </pre>
+</p><p>
+See <a href="#with_internal_angle">with_internal_angle</a> and <a href="#without_internal_angle">without_internal_angle</a> to select edge pairs by the
+angle between the edges.
 </p>
-<a name="without_area"/><h2>"without_area" - Selects polygons by area</h2>
+<a name="without_area"/><h2>"without_area" - Selects polygons or edge pairs by area</h2>
 <keyword name="without_area"/>
 <p>Usage:</p>
 <ul>
@@ -3531,10 +3559,10 @@ ep = edge_pairs.without_angle(0, both)
 </ul>
 <p>
 This method is the inverse of "with_area". It will select 
-polygons without an area equal to the given one or outside
+polygons or edge pairs without an area equal to the given one or outside
 the given interval.
 </p><p>
-This method is available for polygon layers only.
+This method is available for polygon or edge pair layers.
 </p>
 <a name="without_area_ratio"/><h2>"without_area_ratio" - Selects polygons by the aspect ratio of their bounding box</h2>
 <keyword name="without_area_ratio"/>
@@ -3646,6 +3674,18 @@ This method is available for edge pair layers only.
 <p>
 This method is available for polygon layers. It will select all polygons from the input layer
 which do not have the specified number of holes.
+</p>
+<a name="without_internal_angle"/><h2>"without_internal_angle" - Selects edge pairs by their internal angle</h2>
+<keyword name="without_internal_angle"/>
+<p>Usage:</p>
+<ul>
+<li><tt>edge_pair_layer.without_internal_angle(min .. max)</tt></li>
+<li><tt>edge_pair_layer.without_internal_angle(value)</tt></li>
+<li><tt>edge_pair_layer.without_internal_angle(min, max)</tt></li>
+</ul>
+<p>
+The method basically is the inverse of <a href="#with_internal_angle">with_internal_angle</a>. It selects all 
+edge pairs by the angle enclosed by their edges, applying the opposite criterion than <a href="#with_internal_angle">with_internal_angle</a>.
 </p>
 <a name="without_length"/><h2>"without_length" - Selects edges by the their length</h2>
 <keyword name="without_length"/>

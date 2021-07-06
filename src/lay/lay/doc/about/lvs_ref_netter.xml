@@ -68,6 +68,36 @@ are other (explicit) ways to flatten circuits.
 Please note that flattening circuits has some side effects such 
 as loss of details in the cross reference and net layout.
 </p>
+<a name="blank_circuit"/><h2>"blank_circuit" - Removes the content from the given circuits (blackboxing)</h2>
+<keyword name="blank_circuit"/>
+<p>Usage:</p>
+<ul>
+<li><tt>blank_circuit(circuit_filter)</tt></li>
+</ul>
+<p>
+This method will erase all content from the circuits matching the filter.
+The filter is a glob expression.
+</p><p>
+This has the following effects:
+</p><p>
+<ul>
+<li>The circuits are no longer compared (netlist vs. schematic) </li>
+<li>Named pins are required to match (use labels on the nets to name pins in the layout) </li>
+<li>Unnamed pins are treated as equivalent and can be swapped </li>
+<li>The selected circuits will not be purged on netlist simplification </li>
+</ul>
+</p><p>
+Using this method can be useful to reduce the verification overhead for 
+blocks which are already verifified by other ways or for which no schematic
+is available - e.g. hard macros.
+</p><p>
+Example:
+</p><p>
+<pre>
+# skips all MEMORY* circuits from compare
+blank_circuit("MEMORY*")
+</pre>
+</p>
 <a name="compare"/><h2>"compare" - Compares the extracted netlist vs. the schematic</h2>
 <keyword name="compare"/>
 <p>Usage:</p>
@@ -289,7 +319,8 @@ Use this method andwhere in the script before the <a href="#compare">compare</a>
 <keyword name="same_nets"/>
 <p>Usage:</p>
 <ul>
-<li><tt>same_nets(circuit, net_a, net_b)</tt></li>
+<li><tt>same_nets(circuit_pattern, net_pattern)</tt></li>
+<li><tt>same_nets(circuit_pattern, net_a, net_b)</tt></li>
 <li><tt>same_nets(circuit_a, net_a, circuit_b, net_b)</tt></li>
 </ul>
 <p>
@@ -297,8 +328,17 @@ This method will force an equivalence between the net_a and net_b from circuit_a
 and circuit_b (circuit in the three-argument form is for both circuit_a and circuit_b).
 </p><p>
 In the four-argument form, the circuits can be either given by name or as Circuit
-objects. In the three-argument form, the circuit has to be given by name. 
+objects. In the three-argument form, the circuits have to be given by name pattern. 
 Nets can be either given by name or as Net objects.
+In the two-argument form, the circuits and nets have to be given as name pattern.
+</p><p>
+"name pattern" are glob-style pattern - e.g. the following will identify the 
+all nets starting with "A" from the extracted netlist with the same net from 
+the schematic netlist for all circuits starting with "INV":
+</p><p>
+<pre>
+same_nets("INV*", "A*")
+</pre>
 </p><p>
 After using this function, the compare algorithm will consider these nets equivalent.
 Use this method to provide hints for the comparer in cases which are difficult to
@@ -308,6 +348,18 @@ circuit_a and net_a are for the layout netlist, circuit_b and net_b for the sche
 Names are case sensitive for layout-derived netlists and case-insensitive for SPICE schematic netlists.
 </p><p>
 Use this method andwhere in the script before the <a href="#compare">compare</a> call.
+</p>
+<a name="same_nets!"/><h2>"same_nets!" - Establishes an equivalence between the nets with matching requirement</h2>
+<keyword name="same_nets!"/>
+<p>Usage:</p>
+<ul>
+<li><tt>same_nets!(circuit_pattern, net_pattern)</tt></li>
+<li><tt>same_nets!(circuit_pattern, net_a, net_b)</tt></li>
+<li><tt>same_nets!(circuit_a, net_a, circuit_b, net_b)</tt></li>
+</ul>
+<p>
+This method is equivalent to <a href="#same_nets">same_nets</a>, but requires identity of the given nets.
+If the specified nets do not match, an error is reported.
 </p>
 <a name="schematic"/><h2>"schematic" - Gets, sets or reads the reference netlist</h2>
 <keyword name="schematic"/>

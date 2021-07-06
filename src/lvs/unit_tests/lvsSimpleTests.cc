@@ -86,6 +86,11 @@ TEST(1b_simple_with_tolerance)
   run_test (_this, "ringo_simple_with_tol", "ringo.gds");
 }
 
+TEST(1c_simple_with_tolerance_early)
+{
+  run_test (_this, "ringo_simple_with_tol_early", "ringo.gds");
+}
+
 TEST(2_simple_io)
 {
   run_test (_this, "ringo_simple_io", "ringo.gds");
@@ -128,6 +133,11 @@ TEST(8_simplification)
 TEST(9_blackboxing)
 {
   run_test (_this, "ringo_simple_blackboxing", "ringo_for_blackboxing.gds");
+}
+
+TEST(9b_blackboxing_netter)
+{
+  run_test (_this, "ringo_simple_blackboxing_netter", "ringo_for_blackboxing.gds");
 }
 
 TEST(10_simplification_with_align)
@@ -200,6 +210,11 @@ TEST(22_split_gate)
   run_test (_this, "nand2_split_gate", "nand2_split_gate.oas");
 }
 
+TEST(22b_split_gate_early)
+{
+  run_test (_this, "nand2_split_gate_early", "nand2_split_gate.oas");
+}
+
 //  empty gds
 TEST(23_issue709)
 {
@@ -211,7 +226,15 @@ TEST(24_issue806)
   run_test (_this, "custom_compare", "custom_compare.gds");
 }
 
-TEST(25_enableWandL)
+TEST(25_blackbox)
+{
+  run_test (_this, "blackbox1", "blackbox.gds");
+  run_test (_this, "blackbox2", "blackbox_swapped.gds");
+  run_test (_this, "blackbox3", "blackbox_open.gds");
+  run_test (_this, "blackbox4", "blackbox_short.gds");
+  run_test (_this, "blackbox5", "blackbox_short_and_open.gds");
+
+TEST(26_enableWandL)
 {
   run_test (_this, "enable_wl1", "resistor.gds");
   run_test (_this, "enable_wl2", "resistor.gds");

@@ -225,6 +225,86 @@ class DBEdgePairs_TestClass < TestBase
 
   end
 
+  def test_5
+
+    # filters
+
+    ep1 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(10, 20, 10, 0))
+    ep2 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(10, 0, 10, 20))
+    ep3 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 20), RBA::Edge::new(10, 20, 10, 0))
+    ep4 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(10, 0, 10, 10))
+
+    r1 = RBA::EdgePairs::new([ ep1, ep2, ep3, ep4 ])
+
+    assert_equal(r1.with_distance(10, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_distance(5, 20, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_distance(15, 20, false).to_s, "")
+    assert_equal(r1.with_distance(15, 20, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+
+    assert_equal(r1.with_length(10, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_length(10, 20, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_length(10, 21, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_length(10, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0)")
+    assert_equal(r1.with_length_both(10, false).to_s, "(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_length_both(10, 20, false).to_s, "(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_length_both(10, 21, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_length_both(10, true).to_s, "(0,0;0,20)/(10,20;10,0)")
+
+    assert_equal(r1.with_angle(0, false).to_s, "")
+    assert_equal(r1.with_angle(0, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_angle(90, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_angle(0, 90, false).to_s, "")
+    assert_equal(r1.with_angle(0, 90, false, true, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_angle_both(0, false).to_s, "")
+    assert_equal(r1.with_angle_both(0, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_angle_both(90, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_angle_both(0, 90, false).to_s, "")
+    assert_equal(r1.with_angle_both(0, 90, false, true, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+
+    assert_equal(r1.with_area(0, false).to_s, "(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_area(150, false).to_s, "(0,0;0,10)/(10,20;10,0)")
+    assert_equal(r1.with_area(0, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0)")
+    assert_equal(r1.with_area(150, 151, false).to_s, "(0,0;0,10)/(10,20;10,0)")
+    assert_equal(r1.with_area(150, 150, false).to_s, "")
+    assert_equal(r1.with_area(150, 151, true).to_s, "(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+
+    assert_equal(r1.with_internal_angle(0, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.with_internal_angle(0, 0, false).to_s, "")
+    assert_equal(r1.with_internal_angle(0, true).to_s, "")
+
+    ep1 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(10, 20, 10, 0))
+    ep2 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(20, 0, 30, 0))
+    ep3 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(-20, 0, -30, 0))
+
+    r1 = RBA::EdgePairs::new([ ep1, ep2, ep3 ])
+
+    assert_equal(r1.with_distance(20, false).to_s, "(0,0;0,10)/(20,0;30,0);(0,0;0,10)/(-20,0;-30,0)")
+    assert_equal(r1.with_distance(20, true).to_s, "(0,0;0,10)/(10,20;10,0)")
+
+    assert_equal(r1.with_internal_angle(0, false).to_s, "(0,0;0,10)/(10,20;10,0)")
+    assert_equal(r1.with_internal_angle(90, false).to_s, "(0,0;0,10)/(20,0;30,0);(0,0;0,10)/(-20,0;-30,0)")
+    assert_equal(r1.with_internal_angle(-90, false).to_s, "")
+
+    assert_equal(r1.with_angle(90, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(20,0;30,0);(0,0;0,10)/(-20,0;-30,0)")
+    assert_equal(r1.with_angle(0, false).to_s, "(0,0;0,10)/(20,0;30,0);(0,0;0,10)/(-20,0;-30,0)")
+    assert_equal(r1.with_angle(0, 90, false, true, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(20,0;30,0);(0,0;0,10)/(-20,0;-30,0)")
+    assert_equal(r1.with_angle_both(90, false).to_s, "(0,0;0,10)/(10,20;10,0)")
+    assert_equal(r1.with_angle_both(0, false).to_s, "")
+
+    ep1 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(10, 20, 10, 0))
+    ep2 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(20, 10, 30, 0))
+
+    r1 = RBA::EdgePairs::new([ ep1, ep2 ])
+
+    assert_equal(r1.with_internal_angle(0, false).to_s, "(0,0;0,10)/(10,20;10,0)")
+    assert_equal(r1.with_internal_angle(90, false).to_s, "")
+    assert_equal(r1.with_internal_angle(90, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(20,10;30,0)")
+    assert_equal(r1.with_internal_angle(45, false).to_s, "(0,0;0,10)/(20,10;30,0)")
+    assert_equal(r1.with_internal_angle(0, 45, false, true, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(20,10;30,0)")
+    assert_equal(r1.with_internal_angle(0, 45, true, true, true).to_s, "")
+
+  end
+
 end
 
 

@@ -236,7 +236,6 @@ struct DB_PUBLIC EdgeOrientationFilter
   }
 
 private:
-  db::DVector m_emin, m_emax;
   bool m_inverse;
   db::MagnificationAndOrientationReducer m_vars;
   EdgeAngleChecker m_checker;

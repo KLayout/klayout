@@ -330,28 +330,30 @@ module DRC
 
     # %DRC%
     # @name with_area
-    # @brief Selects polygons by area
+    # @brief Selects polygons or edge pairs by area
     # @synopsis layer.with_area(min .. max)
     # @synopsis layer.with_area(value)
     # @synopsis layer.with_area(min, max)
-    # The first form will select all polygons with an area larger or
+    # The first form will select all polygons or edge pairs with an area larger or
     # equal to min and less (but not equal to) max. The second form
-    # will select the polygons with exactly the given area.
+    # will select the polygons or edge pairs with exactly the given area.
     # The third form basically is equivalent to the first form, but
     # allows specification of nil for min or max indicating no lower or 
     # upper limit.
+    #
+    # This method is available for polygon or edge pair layers.
     
     # %DRC%
     # @name without_area
-    # @brief Selects polygons by area
+    # @brief Selects polygons or edge pairs by area
     # @synopsis layer.without_area(min .. max)
     # @synopsis layer.without_area(value)
     # @synopsis layer.without_area(min, max)
     # This method is the inverse of "with_area". It will select 
-    # polygons without an area equal to the given one or outside
+    # polygons or edge pairs without an area equal to the given one or outside
     # the given interval.
     #
-    # This method is available for polygon layers only.
+    # This method is available for polygon or edge pair layers.
     
     %w(area).each do |f|
       [true, false].each do |inv|
@@ -361,7 +363,8 @@ module DRC
 
           @engine._context("#{mn}") do
 
-            requires_region
+            self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::EdgePairs) || raise("Requires an edge pair or polygon layer")
+
             if args.size == 1
               a = args[0]
               if a.is_a?(Range)
@@ -857,7 +860,7 @@ CODE
     # @synopsis layer.with_angle(min .. max)
     # @synopsis layer.with_angle(value)
     # @synopsis layer.with_angle(min, max)
-    # @synopsis edge_pairlayer.with_angle(min, max [, both])
+    # @synopsis edge_pair_layer.with_angle(min, max [, both])
     #
     # When called on an edge layer, the method selects edges by their angle, 
     # measured against the horizontal axis in the mathematical sense. 
@@ -870,10 +873,6 @@ CODE
     # edges with a angle larger or equal to min and less than max (but not equal).
     # The second version selects edges with exactly the given angle. The third
     # version is identical to the first one. 
-    #
-    # When called on a polygon layer, this method selects corners which match the 
-    # given angle or is within the given angle interval. The angle is measured between the edges forming the corner.
-    # For each corner, an edge pair containing the edges forming in the angle is returned.
     #
     # When called on an edge pair layer, this method selects edge pairs with one or both edges
     # meeting the angle criterion. In this case an additional argument is accepted which can be
@@ -903,6 +902,9 @@ CODE
     #     @td @img(/images/drc_with_angle4.png) @/td
     #   @/tr
     # @/table
+    #
+    # Note that in former versions, with_angle could be used on polygon layers selecting corners with specific angles.
+    # This feature has been deprecated. Use \corners instead.
 
     # %DRC%
     # @name without_angle
@@ -910,11 +912,12 @@ CODE
     # @synopsis layer.without_angle(min .. max)
     # @synopsis layer.without_angle(value)
     # @synopsis layer.without_angle(min, max)
-    # @synopsis edge_pairlayer.without_angle(min, max [, both])
+    # @synopsis edge_pair_layer.without_angle(min, max [, both])
     #
     # The method basically is the inverse of \with_angle. It selects all edges
     # of the edge layer or corners of the polygons which do not have the given angle (second form) or whose angle
-    # is not inside the given interval (first and third form).
+    # is not inside the given interval (first and third form). When called on edge pairs, it selects
+    # edge pairs by the angles of their edges.
     #
     # A note on the "both" modifier (without_angle called on edge pairs): "both" means that
     # both edges need to be "without_angle". For example
@@ -925,8 +928,41 @@ CODE
     # ep = edge_pairs.without_angle(0, both)
     # @/code
     # 
+    # See \with_internal_angle and \without_internal_angle to select edge pairs by the
+    # angle between the edges.
     
-    %w(angle).each do |f|
+    # %DRC%
+    # @name with_internal_angle
+    # @brief Selects edge pairs by their internal angle
+    # @synopsis edge_pair_layer.with_internal_angle(min .. max)
+    # @synopsis edge_pair_layer.with_internal_angle(value)
+    # @synopsis edge_pair_layer.with_internal_angle(min, max)
+    #
+    # This method selects edge pairs by the angle enclosed by their edges.
+    # The angle is between 0 (parallel or anti-parallel edges) and 90 degree (perpendicular edges).
+    # If an interval or two values are given, the angle is checked to be within the given
+    # range.
+    #
+    # Here are examples for "with_internal_angle" on edge pair layers:
+    #
+    # @code
+    # # selects edge pairs with parallel edges
+    # ep1 = edge_pairs.with_internal_angle(0)
+    # # selects edge pairs with perpendicular edges
+    # ep2 = edge_pairs.with_internal_angle(90)
+    # @/code
+
+    # %DRC%
+    # @name without_internal_angle
+    # @brief Selects edge pairs by their internal angle
+    # @synopsis edge_pair_layer.without_internal_angle(min .. max)
+    # @synopsis edge_pair_layer.without_internal_angle(value)
+    # @synopsis edge_pair_layer.without_internal_angle(min, max)
+    #
+    # The method basically is the inverse of \with_internal_angle. It selects all 
+    # edge pairs by the angle enclosed by their edges, applying the opposite criterion than \with_internal_angle.
+    
+    %w(angle internal_angle).each do |f|
       [true, false].each do |inv|
         mn = (inv ? "without" : "with") + "_" + f
         eval <<"CODE"
@@ -935,16 +971,22 @@ CODE
           @engine._context("#{mn}") do
 
             f = :with_#{f}
-            args = args.select do |a|
-              if a.is_a?(DRCBothEdges)
-                if !self.data.is_a?(RBA::EdgePairs)
-                  raise("'both' keyword only available for edge pair layers")
+
+            if "#{f}" == "angle"
+              self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs) || raise("Requires an edge, edge pair or polygon layer")
+              args = args.select do |a|
+                if a.is_a?(DRCBothEdges)
+                  if !self.data.is_a?(RBA::EdgePairs)
+                    raise("'both' keyword only available for edge pair layers")
+                  end
+                  f = :with_#{f}_both
+                  false
+                else
+                  true
                 end
-                f = :with_#{f}_both
-                false
-              else
-                true
               end
+            else
+              requires_edge_pairs
             end
 
             result_class = self.data.is_a?(RBA::Edges) ? RBA::Edges : RBA::EdgePairs

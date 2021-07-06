@@ -156,7 +156,6 @@ msvc {
 
   win32 {
     QMAKE_LFLAGS += -Wl,--exclude-all-symbols
-    QMAKE_CXXFLAGS += -fdeclspec
   } else {
     QMAKE_CXXFLAGS += -fvisibility=hidden
   }

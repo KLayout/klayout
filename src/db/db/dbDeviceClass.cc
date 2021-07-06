@@ -120,11 +120,6 @@ public:
 
   virtual bool less (const db::Device &a, const db::Device &b) const;
 
-  virtual DeviceParameterCompareDelegate *clone () const
-  {
-    return new PrimaryDeviceParametersAreEqual (*this);
-  }
-
 private:
   double m_relative;
 };
@@ -159,13 +154,13 @@ bool PrimaryDeviceParametersAreEqual::less (const db::Device &a, const db::Devic
 //  DeviceClass class implementation
 
 DeviceClass::DeviceClass ()
-  : m_strict (false), mp_netlist (0)
+  : m_strict (false), mp_netlist (0), m_supports_parallel_combination (false), m_supports_serial_combination (false)
 {
   // .. nothing yet ..
 }
 
 DeviceClass::DeviceClass (const DeviceClass &other)
-  : gsi::ObjectBase (other), tl::Object (other), tl::UniqueId (other), m_strict (false), mp_netlist (0)
+  : gsi::ObjectBase (other), tl::Object (other), tl::UniqueId (other), m_strict (false), mp_netlist (0), m_supports_parallel_combination (false), m_supports_serial_combination (false)
 {
   operator= (other);
 }
@@ -173,12 +168,18 @@ DeviceClass::DeviceClass (const DeviceClass &other)
 DeviceClass &DeviceClass::operator= (const DeviceClass &other)
 {
   if (this != &other) {
+
     m_terminal_definitions = other.m_terminal_definitions;
     m_parameter_definitions = other.m_parameter_definitions;
     m_name = other.m_name;
     m_description = other.m_description;
     m_strict = other.m_strict;
     mp_pc_delegate.reset (const_cast<DeviceParameterCompareDelegate *> (other.mp_pc_delegate.get ()));
+    mp_device_combiner.reset (const_cast<DeviceCombiner *> (other.mp_device_combiner.get ()));
+    m_supports_serial_combination = other.m_supports_serial_combination;
+    m_supports_parallel_combination = other.m_supports_parallel_combination;
+    m_equivalent_terminal_ids = other.m_equivalent_terminal_ids;
+
   }
   return *this;
 }

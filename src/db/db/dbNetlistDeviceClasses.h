@@ -30,27 +30,12 @@ namespace db
 {
 
 /**
- *  @brief A basic two-terminal device class
- */
-class DB_PUBLIC DeviceClassTwoTerminalDevice
-  : public db::DeviceClass
-{
-public:
-  virtual bool combine_devices (Device *a, Device *b) const;
-
-  virtual void parallel (Device *a, Device *b) const = 0;
-  virtual void serial (Device *a, Device *b) const = 0;
-  virtual bool supports_parallel_combination () const { return true; }
-  virtual bool supports_serial_combination () const { return true; }
-};
-
-/**
  *  @brief A basic resistor device class
  *  A resistor defines a single parameter, "R", which is the resistance in Ohm.
  *  It defines two terminals, "A" and "B" for the two terminals.
  */
 class DB_PUBLIC DeviceClassResistor
-  : public db::DeviceClassTwoTerminalDevice
+  : public db::DeviceClass
 {
 public:
   DeviceClassResistor ();
@@ -68,14 +53,6 @@ public:
 
   static size_t terminal_id_A;
   static size_t terminal_id_B;
-
-  virtual void parallel (Device *a, Device *b) const;
-  virtual void serial (Device *a, Device *b) const;
-
-  virtual size_t normalize_terminal_id (size_t id) const
-  {
-    return id == terminal_id_B ? terminal_id_A : id;
-  }
 };
 
 /**
@@ -95,8 +72,6 @@ public:
   }
 
   static size_t terminal_id_W;
-
-  virtual bool combine_devices (Device *a, Device *b) const;
 };
 
 /**
@@ -105,7 +80,7 @@ public:
  *  It defines two terminals, "A" and "B" for the two terminals.
  */
 class DB_PUBLIC DeviceClassCapacitor
-  : public db::DeviceClassTwoTerminalDevice
+  : public db::DeviceClass
 {
 public:
   DeviceClassCapacitor ();
@@ -121,14 +96,6 @@ public:
 
   static size_t terminal_id_A;
   static size_t terminal_id_B;
-
-  virtual void parallel (Device *a, Device *b) const;
-  virtual void serial (Device *a, Device *b) const;
-
-  virtual size_t normalize_terminal_id (size_t id) const
-  {
-    return id == terminal_id_B ? terminal_id_A : id;
-  }
 };
 
 /**
@@ -148,8 +115,6 @@ public:
   }
 
   static size_t terminal_id_W;
-
-  virtual bool combine_devices (Device *a, Device *b) const;
 };
 
 /**
@@ -158,7 +123,7 @@ public:
  *  It defines two terminals, "A" and "B" for the two terminals.
  */
 class DB_PUBLIC DeviceClassInductor
-  : public db::DeviceClassTwoTerminalDevice
+  : public db::DeviceClass
 {
 public:
   DeviceClassInductor ();
@@ -172,14 +137,6 @@ public:
 
   static size_t terminal_id_A;
   static size_t terminal_id_B;
-
-  virtual void parallel (Device *a, Device *b) const;
-  virtual void serial (Device *a, Device *b) const;
-
-  virtual size_t normalize_terminal_id (size_t id) const
-  {
-    return id == terminal_id_B ? terminal_id_A : id;
-  }
 };
 
 /**
@@ -204,9 +161,6 @@ public:
   {
     return new DeviceClassDiode (*this);
   }
-
-  virtual bool combine_devices (Device *a, Device *b) const;
-  virtual bool supports_parallel_combination () const { return true; }
 };
 
 /**
@@ -237,14 +191,6 @@ public:
     return new DeviceClassMOS3Transistor (*this);
   }
 
-  virtual bool combine_devices (Device *a, Device *b) const;
-  virtual bool supports_parallel_combination () const { return true; }
-
-  virtual size_t normalize_terminal_id (size_t tid) const
-  {
-    return tid == terminal_id_D ? terminal_id_S : tid;
-  }
-
 protected:
   void combine_parameters (Device *a, Device *b) const;
 };
@@ -266,13 +212,6 @@ public:
   {
     return new DeviceClassMOS4Transistor (*this);
   }
-
-  virtual size_t normalize_terminal_id (size_t tid) const
-  {
-    return tid == terminal_id_D ? terminal_id_S : tid;
-  }
-
-  virtual bool combine_devices (Device *a, Device *b) const;
 };
 
 /**
@@ -303,12 +242,6 @@ public:
   {
     return new DeviceClassBJT3Transistor (*this);
   }
-
-  virtual bool combine_devices (Device *a, Device *b) const;
-  virtual bool supports_parallel_combination () const { return true; }
-
-protected:
-  void combine_parameters (Device *a, Device *b) const;
 };
 
 /**
@@ -328,8 +261,6 @@ public:
   {
     return new DeviceClassBJT4Transistor (*this);
   }
-
-  virtual bool combine_devices (Device *a, Device *b) const;
 };
 
 }

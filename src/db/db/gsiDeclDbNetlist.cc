@@ -876,6 +876,31 @@ public:
   gsi::Callback cb_less;
 };
 
+/**
+ *  @brief A DeviceCombiner implementation that allows reimplementation of the virtual methods
+ */
+class GenericDeviceCombiner
+  : public db::DeviceCombiner
+{
+public:
+  GenericDeviceCombiner ()
+    : db::DeviceCombiner ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual bool combine_devices (db::Device *a, db::Device *b) const
+  {
+    if (cb_combine.can_issue ()) {
+      return cb_combine.issue<db::DeviceCombiner, bool, db::Device *, db::Device *> (&db::DeviceCombiner::combine_devices, a, b);
+    } else {
+      return false;
+    }
+  }
+
+  gsi::Callback cb_combine;
+};
+
 }
 
 db::EqualDeviceParameters *make_equal_dp (size_t param_id, double absolute, double relative)
@@ -942,6 +967,29 @@ Class<GenericDeviceParameterCompare> decl_GenericDeviceParameterCompare (decl_db
   "This class has been added in version 0.26. The 'equal' method has been dropped in 0.27.1 as it can be expressed as !less(a,b) && !less(b,a)."
 );
 
+Class<GenericDeviceCombiner> decl_GenericDeviceCombiner ("db", "GenericDeviceCombiner",
+  gsi::callback ("combine_devices", &GenericDeviceCombiner::combine_devices, &GenericDeviceCombiner::cb_combine, gsi::arg ("device_a"), gsi::arg ("device_b"),
+    "@brief Combines two devices if possible.\n"
+    "This method needs to test, whether the two devices can be combined. Both devices "
+    "are guaranteed to share the same device class. "
+    "If they cannot be combined, this method shall do nothing and return false. "
+    "If they can be combined, this method shall reconnect the nets of the first "
+    "device and entirely disconnect the nets of the second device. "
+    "The second device will be deleted afterwards. "
+  ),
+  "@brief A class implementing the combination of two devices (parallel or serial mode).\n"
+  "Reimplement this class to provide a custom device combiner.\n"
+  "Device combination requires 'supports_paralell_combination' or 'supports_serial_combination' to be set "
+  "to true for the device class. In the netlist device combination step, the algorithm will try to identify "
+  "devices which can be combined into single devices and use the combiner object to implement the actual "
+  "joining of such devices.\n"
+  "\n"
+  "Attach this object to a device class with \\DeviceClass#combiner= to make the device "
+  "class use this combiner.\n"
+  "\n"
+  "This class has been added in version 0.27.3."
+);
+
 static tl::id_type id_of_device_class (const db::DeviceClass *cls)
 {
   return tl::id_of (cls);
@@ -955,6 +1003,16 @@ static void equal_parameters (db::DeviceClass *cls, db::EqualDeviceParameters *c
 static db::EqualDeviceParameters *get_equal_parameters (db::DeviceClass *cls)
 {
   return dynamic_cast<db::EqualDeviceParameters *> (cls->parameter_compare_delegate ());
+}
+
+static void set_combiner (db::DeviceClass *cls, GenericDeviceCombiner *combiner)
+{
+  cls->set_device_combiner (combiner);
+}
+
+static GenericDeviceCombiner *get_combiner (db::DeviceClass *cls)
+{
+  return dynamic_cast<GenericDeviceCombiner *> (cls->device_combiner ());
 }
 
 static void enable_parameter (db::DeviceClass *cls, size_t id, bool en)
@@ -984,6 +1042,20 @@ static const db::DeviceParameterDefinition *parameter_definition2 (const db::Dev
     return 0;
   } else {
     return cls->parameter_definition (cls->parameter_id_for_name (name));
+  }
+}
+
+static void dc_add_terminal_definition (db::DeviceClass *cls, db::DeviceTerminalDefinition *terminal_def)
+{
+  if (terminal_def) {
+    *terminal_def = cls->add_terminal_definition (*terminal_def);
+  }
+}
+
+static void dc_add_parameter_definition (db::DeviceClass *cls, db::DeviceParameterDefinition *parameter_def)
+{
+  if (parameter_def) {
+    *parameter_def = cls->add_parameter_definition (*parameter_def);
   }
 }
 
@@ -1088,7 +1160,7 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "@brief Gets the device parameter comparer for netlist verification or nil if no comparer is registered.\n"
     "See \\equal_parameters= for the setter.\n"
     "\n"
-    "This getter has been introduced in version 0.26.4.\n"
+    "This method has been moved from 'GenericDeviceClass' to 'DeviceClass' in version 0.27.3.\n"
   ) +
   gsi::method_ext ("equal_parameters=", &equal_parameters, gsi::arg ("comparer"),
     "@brief Specifies a device parameter comparer for netlist verification.\n"
@@ -1099,7 +1171,85 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
     "\n"
     "You can assign nil for the parameter comparer to remove it.\n"
     "\n"
-    "In special cases, you can even implement a custom compare scheme by deriving your own comparer from the \\GenericDeviceParameterCompare class."
+    "In special cases, you can even implement a custom compare scheme by deriving your own comparer from the \\GenericDeviceParameterCompare class.\n"
+    "\n"
+    "This method has been moved from 'GenericDeviceClass' to 'DeviceClass' in version 0.27.3.\n"
+  ) +
+  gsi::method_ext ("add_terminal", &gsi::dc_add_terminal_definition, gsi::arg ("terminal_def"),
+    "@brief Adds the given terminal definition to the device class\n"
+    "This method will define a new terminal. The new terminal is added at the end of existing terminals. "
+    "The terminal definition object passed as the argument is modified to contain the "
+    "new ID of the terminal.\n"
+    "\n"
+    "The terminal is copied into the device class. Modifying the terminal object later "
+    "does not have the effect of changing the terminal definition.\n"
+    "\n"
+    "This method has been moved from 'GenericDeviceClass' to 'DeviceClass' in version 0.27.3.\n"
+  ) +
+  gsi::method ("clear_terminals", &db::DeviceClass::clear_terminal_definitions,
+    "@brief Clears the list of terminals\n"
+    "\n"
+    "This method has been moved from 'GenericDeviceClass' to 'DeviceClass' in version 0.27.3.\n"
+  ) +
+  gsi::method_ext ("add_parameter", &gsi::dc_add_parameter_definition, gsi::arg ("parameter_def"),
+    "@brief Adds the given parameter definition to the device class\n"
+    "This method will define a new parameter. The new parameter is added at the end of existing parameters. "
+    "The parameter definition object passed as the argument is modified to contain the "
+    "new ID of the parameter."
+    "\n"
+    "The parameter is copied into the device class. Modifying the parameter object later "
+    "does not have the effect of changing the parameter definition.\n"
+    "\n"
+    "This method has been moved from 'GenericDeviceClass' to 'DeviceClass' in version 0.27.3.\n"
+  ) +
+  gsi::method ("clear_parameters", &db::DeviceClass::clear_parameter_definitions,
+    "@brief Clears the list of parameters\n"
+    "\n"
+    "This method has been added in version 0.27.3.\n"
+  ) +
+  gsi::method_ext ("combiner=", &set_combiner, gsi::arg ("combiner"),
+    "@brief Specifies a device combiner (parallel or serial device combination).\n"
+    "\n"
+    "You can assign nil for the combiner to remove it.\n"
+    "\n"
+    "In special cases, you can even implement a custom combiner by deriving your own comparer from the \\GenericDeviceCombiner class.\n"
+    "\n"
+    "This method has been added in version 0.27.3.\n"
+  ) +
+  gsi::method_ext ("combiner", &get_combiner,
+    "@brief Gets a device combiner or nil if none is registered.\n"
+    "\n"
+    "This method has been added in version 0.27.3.\n"
+  ) +
+  gsi::method ("supports_parallel_combination=", &db::DeviceClass::set_supports_parallel_combination, gsi::arg ("f"),
+    "@brief Specifies whether the device supports parallel device combination.\n"
+    "Parallel device combination means that all terminals of two combination candidates are connected to the same nets. "
+    "If the device does not support this combination mode, this predicate can be set to false. This will make the device "
+    "extractor skip the combination test in parallel mode and improve performance somewhat.\n"
+    "\n"
+    "This method has been moved from 'GenericDeviceClass' to 'DeviceClass' in version 0.27.3.\n"
+  ) +
+  gsi::method ("supports_serial_combination=", &db::DeviceClass::set_supports_serial_combination, gsi::arg ("f"),
+    "@brief Specifies whether the device supports serial device combination.\n"
+    "Serial device combination means that the devices are connected by internal nodes. "
+    "If the device does not support this combination mode, this predicate can be set to false. This will make the device "
+    "extractor skip the combination test in serial mode and improve performance somewhat.\n"
+    "\n"
+    "This method has been moved from 'GenericDeviceClass' to 'DeviceClass' in version 0.27.3.\n"
+  ) +
+  gsi::method ("equivalent_terminal_id", &db::DeviceClass::equivalent_terminal_id, gsi::arg ("original_id"), gsi::arg ("equivalent_id"),
+    "@brief Specifies a terminal to be equivalent to another.\n"
+    "Use this method to specify two terminals to be exchangeable. For example to make S and D of a MOS transistor equivalent, "
+    "call this method with S and D terminal IDs. In netlist matching, S will be translated to D and thus made equivalent to D.\n"
+    "\n"
+    "Note that terminal equivalence is not effective if the device class operates in strict mode (see \\DeviceClass#strict=).\n"
+    "\n"
+    "This method has been moved from 'GenericDeviceClass' to 'DeviceClass' in version 0.27.3.\n"
+  ) +
+  gsi::method ("clear_equivalent_terminal_ids", &db::DeviceClass::clear_equivalent_terminal_ids,
+    "@brief Clears all equivalent terminal ids\n"
+    "\n"
+    "This method has been added in version 0.27.3.\n"
   ),
   "@brief A class describing a specific type of device.\n"
   "Device class objects live in the context of a \\Netlist object. After a "
@@ -1109,7 +1259,8 @@ Class<db::DeviceClass> decl_dbDeviceClass ("db", "DeviceClass",
   "\n"
   "The \\DeviceClass class is the base class for other device classes.\n"
   "\n"
-  "This class has been added in version 0.26."
+  "This class has been added in version 0.26. In version 0.27.3, the 'GenericDeviceClass' has been integrated with \\DeviceClass "
+  "and the device class was made writeable in most respects. This enables manipulating built-in device classes."
 );
 
 namespace {
@@ -1183,87 +1334,6 @@ private:
 };
 
 }
-
-static void gdc_add_terminal_definition (GenericDeviceClass *cls, db::DeviceTerminalDefinition *terminal_def)
-{
-  if (terminal_def) {
-    *terminal_def = cls->add_terminal_definition (*terminal_def);
-  }
-}
-
-static void gdc_add_parameter_definition (GenericDeviceClass *cls, db::DeviceParameterDefinition *parameter_def)
-{
-  if (parameter_def) {
-    *parameter_def = cls->add_parameter_definition (*parameter_def);
-  }
-}
-
-Class<GenericDeviceClass> decl_GenericDeviceClass (decl_dbDeviceClass, "db", "GenericDeviceClass",
-  gsi::method_ext ("add_terminal", &gsi::gdc_add_terminal_definition, gsi::arg ("terminal_def"),
-    "@brief Adds the given terminal definition to the device class\n"
-    "This method will define a new terminal. The new terminal is added at the end of existing terminals. "
-    "The terminal definition object passed as the argument is modified to contain the "
-    "new ID of the terminal.\n"
-    "\n"
-    "The terminal is copied into the device class. Modifying the terminal object later "
-    "does not have the effect of changing the terminal definition."
-  ) +
-  gsi::method ("clear_terminals", &GenericDeviceClass::clear_terminal_definitions,
-    "@brief Clears the list of terminals\n"
-  ) +
-  gsi::method_ext ("add_parameter", &gsi::gdc_add_parameter_definition, gsi::arg ("parameter_def"),
-    "@brief Adds the given parameter definition to the device class\n"
-    "This method will define a new parameter. The new parameter is added at the end of existing parameters. "
-    "The parameter definition object passed as the argument is modified to contain the "
-    "new ID of the parameter."
-    "\n"
-    "The parameter is copied into the device class. Modifying the parameter object later "
-    "does not have the effect of changing the parameter definition."
-  ) +
-  gsi::method ("clear_parameters", &GenericDeviceClass::clear_parameter_definitions,
-    "@brief Clears the list of parameters\n"
-  ) +
-  gsi::callback ("combine_devices", &GenericDeviceClass::combine_devices, &GenericDeviceClass::cb_combine_devices, gsi::arg ("a"), gsi::arg ("b"),
-    "@brief Combines two devices.\n"
-    "This method shall test, whether the two devices can be combined. Both devices "
-    "are guaranteed to share the same device class (self). "
-    "If they cannot be combined, this method shall do nothing and return false. "
-    "If they can be combined, this method shall reconnect the nets of the first "
-    "device and entirely disconnect the nets of the second device. "
-    "It shall combine the parameters of both devices into the first. "
-    "The second device will be deleted afterwards.\n"
-  ) +
-  gsi::method ("supports_parallel_combination=", &GenericDeviceClass::set_supports_parallel_combination, gsi::arg ("f"),
-    "@brief Specifies whether the device supports parallel device combination.\n"
-    "Parallel device combination means that all terminals of two combination candidates are connected to the same nets. "
-    "If the device does not support this combination mode, this predicate can be set to false. This will make the device "
-    "extractor skip the combination test in parallel mode and improve performance somewhat."
-  ) +
-  gsi::method ("supports_serial_combination=", &GenericDeviceClass::set_supports_serial_combination, gsi::arg ("f"),
-    "@brief Specifies whether the device supports serial device combination.\n"
-    "Serial device combination means that the devices are connected by internal nodes. "
-    "If the device does not support this combination mode, this predicate can be set to false. This will make the device "
-    "extractor skip the combination test in serial mode and improve performance somewhat."
-  ) +
-  gsi::method ("equivalent_terminal_id", &GenericDeviceClass::equivalent_terminal_id, gsi::arg ("original_id"), gsi::arg ("equivalent_id"),
-    "@brief Specifies a terminal to be equivalent to another.\n"
-    "Use this method to specify two terminals to be exchangeable. For example to make S and D of a MOS transistor equivalent, "
-    "call this method with S and D terminal IDs. In netlist matching, S will be translated to D and thus made equivalent to D.\n"
-    "\n"
-    "Note that terminal equivalence is not effective if the device class operates in strict mode (see \\DeviceClass#strict=)."
-  ),
-  "@brief A generic device class\n"
-  "This class allows building generic device classes. Specifically, terminals can be defined "
-  "by adding terminal definitions. Terminal definitions should not be added dynamically. To create "
-  "your own device, instantiate the \\GenericDeviceClass object, set name and description and "
-  "specify the terminals. Then add this new device class to the \\Netlist object where it will live "
-  "and be used to define device instances (\\Device objects).\n"
-  "\n"
-  "In addition, parameters can be defined which correspond to values stored inside the "
-  "specific device instance (\\Device object)."
-  "\n"
-  "This class has been added in version 0.26."
-);
 
 static db::Net *create_net (db::Circuit *c, const std::string &name)
 {

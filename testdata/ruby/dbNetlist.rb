@@ -124,13 +124,13 @@ class DBNetlist_TestClass < TestBase
   def test_2_NetlistBasicDeviceClass
 
     nl = RBA::Netlist::new
-    c = RBA::GenericDeviceClass::new
+    c = RBA::DeviceClass::new
     nl.add(c)
 
     c.name = "XYZ"
     assert_equal(c.name, "XYZ")
 
-    cc = RBA::GenericDeviceClass::new
+    cc = RBA::DeviceClass::new
 
     begin
       nl.remove(cc) # not in netlist yet
@@ -158,7 +158,7 @@ class DBNetlist_TestClass < TestBase
     nl.each_device_class { |i| names << i.name }
     assert_equal(names, [ c.name ])
 
-    cc = RBA::GenericDeviceClass::new
+    cc = RBA::DeviceClass::new
     nl.add(cc)
     cc.name = "UVW"
 
@@ -239,7 +239,7 @@ class DBNetlist_TestClass < TestBase
 
     nl = RBA::Netlist::new
 
-    dc = RBA::GenericDeviceClass::new
+    dc = RBA::DeviceClass::new
     nl.add(dc)
     assert_equal(dc.netlist.object_id, nl.object_id)
     dc.name = "DC"
@@ -576,11 +576,11 @@ class DBNetlist_TestClass < TestBase
 
   end
 
-  def test_7_GenericDeviceClass
+  def test_7_DeviceClass
 
     nl = RBA::Netlist::new
 
-    dc = RBA::GenericDeviceClass::new
+    dc = RBA::DeviceClass::new
     nl.add(dc)
     dc.name = "DC"
     assert_equal(dc.name, "DC")
@@ -758,7 +758,7 @@ class DBNetlist_TestClass < TestBase
 
     nl = RBA::Netlist::new
 
-    dc = RBA::GenericDeviceClass::new
+    dc = RBA::DeviceClass::new
     dc.name = "DC"
     nl.add(dc)
 

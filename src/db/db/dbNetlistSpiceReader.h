@@ -31,6 +31,7 @@
 #include <set>
 #include <map>
 #include <memory>
+#include <list>
 
 namespace db
 {

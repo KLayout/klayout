@@ -221,7 +221,6 @@ TEST(23_issue709)
   run_test (_this, "empty_subcells", "empty_subcells.gds");
 }
 
-//  empty gds
 TEST(24_issue806)
 {
   run_test (_this, "custom_compare", "custom_compare.gds");
@@ -234,4 +233,10 @@ TEST(25_blackbox)
   run_test (_this, "blackbox3", "blackbox_open.gds");
   run_test (_this, "blackbox4", "blackbox_short.gds");
   run_test (_this, "blackbox5", "blackbox_short_and_open.gds");
+
+TEST(26_enableWandL)
+{
+  run_test (_this, "enable_wl1", "resistor.gds");
+  run_test (_this, "enable_wl2", "resistor.gds");
+  run_test (_this, "enable_wl3", "resistor.gds");
 }

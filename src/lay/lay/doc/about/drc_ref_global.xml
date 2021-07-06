@@ -107,6 +107,7 @@ See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#bbox_height"
 <p>Usage:</p>
 <ul>
 <li><tt>bjt3(name)</tt></li>
+<li><tt>bjt3(name, class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
@@ -120,6 +121,7 @@ about this extractor.
 <p>Usage:</p>
 <ul>
 <li><tt>bjt4(name)</tt></li>
+<li><tt>bjt4(name, class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
@@ -143,6 +145,7 @@ This function creates a box object. The arguments are the same than for the
 <p>Usage:</p>
 <ul>
 <li><tt>capacitor(name, area_cap)</tt></li>
+<li><tt>capacitor(name, area_cap, class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a capacitor.
@@ -156,6 +159,7 @@ about this extractor.
 <p>Usage:</p>
 <ul>
 <li><tt>capacitor_with_bulk(name, area_cap)</tt></li>
+<li><tt>capacitor_with_bulk(name, area_cap, class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a capacitor 
@@ -442,6 +446,7 @@ See <a href="/about/drc_ref_netter.xml#device_scaling">Netter#device_scaling</a>
 <p>Usage:</p>
 <ul>
 <li><tt>diode(name)</tt></li>
+<li><tt>diode(name, class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
@@ -455,6 +460,7 @@ about this extractor.
 <p>Usage:</p>
 <ul>
 <li><tt>dmos3(name)</tt></li>
+<li><tt>dmos3(name, class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
@@ -470,6 +476,7 @@ about this extractor (strict mode applies for 'dmos3').
 <p>Usage:</p>
 <ul>
 <li><tt>dmos4(name)</tt></li>
+<li><tt>dmos4(name, class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
@@ -1054,6 +1061,7 @@ argument, "middle" represents the bounding box center marker generator on primar
 <p>Usage:</p>
 <ul>
 <li><tt>mos3(name)</tt></li>
+<li><tt>mos3(name, class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
@@ -1067,6 +1075,7 @@ about this extractor (non-strict mode applies for 'mos3').
 <p>Usage:</p>
 <ul>
 <li><tt>mos4(name)</tt></li>
+<li><tt>mos4(name, class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a 
@@ -1402,6 +1411,7 @@ version of the L2N DB format will be used.
 <p>Usage:</p>
 <ul>
 <li><tt>resistor(name, sheet_rho)</tt></li>
+<li><tt>resistor(name, sheet_rho, class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a resistor.
@@ -1417,6 +1427,7 @@ about this extractor.
 <p>Usage:</p>
 <ul>
 <li><tt>resistor_with_bulk(name, sheet_rho)</tt></li>
+<li><tt>resistor_with_bulk(name, sheet_rho, class)</tt></li>
 </ul>
 <p>
 Use this class with <a href="#extract_devices">extract_devices</a> to specify extraction of a resistor 
@@ -1922,6 +1933,7 @@ shape.
 <p>Usage:</p>
 <ul>
 <li><tt>write_spice([ use_net_names [, with_comments ] ])</tt></li>
+<li><tt>write_spice(writer_delegate [, use_net_names [, with_comments ] ])</tt></li>
 </ul>
 <p>
 Use this option in <a href="#target_netlist">target_netlist</a> for the format parameter to 
@@ -1929,5 +1941,8 @@ specify SPICE format.
 "use_net_names" and "with_comments" are boolean parameters indicating
 whether to use named nets (numbers if false) and whether to add 
 information comments such as instance coordinates or pin names.
+</p><p>
+"writer_delegate" allows using a <a href="#NetlistSpiceWriterDelegate">NetlistSpiceWriterDelegate</a> object to 
+control the actual writing.
 </p>
 </doc>

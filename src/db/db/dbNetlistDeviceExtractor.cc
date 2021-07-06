@@ -391,7 +391,7 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
       std::string cell_name = "D$" + mp_device_class->name ();
       db::Cell &device_cell = mp_layout->cell (mp_layout->add_cell (cell_name.c_str ()));
 
-      db::DeviceAbstract *dm = new db::DeviceAbstract (mp_device_class, mp_layout->cell_name (device_cell.cell_index ()));
+      db::DeviceAbstract *dm = new db::DeviceAbstract (mp_device_class.get (), mp_layout->cell_name (device_cell.cell_index ()));
       m_netlist->add_device_abstract (dm);
       dm->set_cell_index (device_cell.cell_index ());
 
@@ -487,7 +487,7 @@ void NetlistDeviceExtractor::register_device_class (DeviceClass *device_class)
   tl_assert (device_class != 0);
   tl_assert (m_netlist.get () != 0);
 
-  if (mp_device_class != 0) {
+  if (mp_device_class.get () != 0) {
     throw tl::Exception (tl::to_string (tr ("Device class already set")));
   }
   if (m_name.empty ()) {
@@ -526,12 +526,12 @@ const db::NetlistDeviceExtractorLayerDefinition &NetlistDeviceExtractor::define_
 
 Device *NetlistDeviceExtractor::create_device ()
 {
-  if (mp_device_class == 0) {
+  if (mp_device_class.get () == 0) {
     throw tl::Exception (tl::to_string (tr ("No device class registered")));
   }
 
   tl_assert (mp_circuit != 0);
-  Device *device = new Device (mp_device_class);
+  Device *device = new Device (mp_device_class.get ());
   mp_circuit->add_device (device);
   return device;
 }

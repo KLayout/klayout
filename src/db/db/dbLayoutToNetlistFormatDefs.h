@@ -58,7 +58,7 @@ namespace db
  *                                  - connects the shapes of the layer with the given global
  *                                    nets [short key: G]
  *    circuit(<name> [circuit-def]) - circuit (cell) [short key: X]
- *    class(<name> <template>)      - a device class definition (template: RES,CAP,...) [short key: K]
+ *    class(<name> <template> [template-def])  - a device class definition (template: RES,CAP,...) [short key: K]
  *    device(<name> <class> [device-abstract-def])
  *                                  - device abstract [short key: D]
  *
@@ -127,7 +127,17 @@ namespace db
  *    (<x> <y>)                     - relative coordinates (reference is reset to 0,0
  *                                    for each net or terminal in device abstract)
  *
+ *  [template-def]:
+ *
+ *    param(<name> <primary>? <default-value>*)    - defines a template parameter [short key: E]
+ *                                    ('primary' is a value: 0 or 1)
+ *    terminal(<name>)              - defines a terminal [short key: T]
+ *
  *  [device-abstract-def]:
+ *
+ *    [device-abstract-terminal-def]*
+ *
+ *  [device-abstract-terminal-def]:
  *
  *    terminal(<terminal-name> [geometry-def]*)
  *                                  - specifies the terminal geometry [short key: T]

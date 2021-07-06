@@ -35,7 +35,7 @@ namespace tl
  *  @brief A generic less operator
  */
 template <class T>
-bool less (T a, T b)
+inline bool less (T a, T b)
 {
   return a < b;
 }
@@ -44,7 +44,7 @@ bool less (T a, T b)
  *  @brief A generic equal operator
  */
 template <class T>
-bool equal (T a, T b)
+inline bool equal (T a, T b)
 {
   return a == b;
 }
@@ -53,7 +53,7 @@ bool equal (T a, T b)
  *  @brief A generalization of the modulo operator
  */
 template <class T>
-T modulo (T a, T b)
+inline T modulo (T a, T b)
 {
   return a % b;
 }
@@ -68,7 +68,7 @@ const double epsilon = 1e-10;
 /**
  *  @brief A specialization for double values
  */
-bool less (double a, double b)
+inline bool less (double a, double b)
 {
   return a < b - tl::epsilon;
 }
@@ -76,7 +76,7 @@ bool less (double a, double b)
 /**
  *  @brief A specialization for double values
  */
-bool equal (double a, double b)
+inline bool equal (double a, double b)
 {
   return fabs (a - b) < tl::epsilon;
 }
@@ -85,7 +85,7 @@ bool equal (double a, double b)
  *  @brief A specialization of the modulo operator for doubles
  *  a % b == a - b * floor (a / b)
  */
-double modulo (double a, double b)
+inline double modulo (double a, double b)
 {
   return a - b * floor (a / b + tl::epsilon);
 }
@@ -94,6 +94,7 @@ double modulo (double a, double b)
  *  @brief Compute the greatest common divider of two numbers using the euclidian method
  */
 template <class T>
+inline
 T gcd (T a, T b)
 {
   while (! equal (b, T (0))) {
@@ -108,6 +109,7 @@ T gcd (T a, T b)
  *  @brief Compute the lowest common multiple of two numbers using the euclidian method
  */
 template <class T>
+inline
 T lcm (T a, T b)
 {
   return a * (b / gcd (a, b));
@@ -116,7 +118,7 @@ T lcm (T a, T b)
 /**
  *  @brief Rounding down to the closest multiple of g
  */
-double round_down (double x, double g)
+inline double round_down (double x, double g)
 {
   return g * floor (x / g + tl::epsilon);
 }
@@ -124,7 +126,7 @@ double round_down (double x, double g)
 /**
  *  @brief Rounding up to the closest multiple of g
  */
-double round_up (double x, double g)
+inline double round_up (double x, double g)
 {
   return g * ceil (x / g - tl::epsilon);
 }
@@ -133,7 +135,7 @@ double round_up (double x, double g)
  *  @brief Rounding to the closest multiple of g
  *  A value of (n+1/2)*g is rounded down.
  */
-double round (double x, double g)
+inline double round (double x, double g)
 {
   return g * floor (0.5 + x / g - tl::epsilon);
 }

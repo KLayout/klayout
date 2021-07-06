@@ -190,6 +190,9 @@ module DRC
     #
     # extract_devices(mos4("NMOS4"), { :SD => nsd, :G => gate, :P => poly, :W => bulk })
     # @/code
+    #
+    # The return value of this method will be the device class of the devices
+    # generated in the extraction step (see \DeviceClass).
     
     def extract_devices(devex, layer_selection)
     
@@ -212,6 +215,8 @@ module DRC
         @engine._cmd(@l2n, :extract_devices, devex, ls) 
 
       end
+
+      devex.device_class
 
     end
 

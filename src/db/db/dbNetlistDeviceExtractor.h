@@ -388,6 +388,16 @@ public:
   Device *create_device ();
 
   /**
+   *  @brief Gets the device class used during extraction
+   *
+   *  This member is set in 'extract_devices' and holds the device class object used during extraction.
+   */
+  DeviceClass *device_class ()
+  {
+    return mp_device_class.get ();
+  }
+
+  /**
    *  @brief Defines a device terminal in the layout (a region)
    */
   void define_terminal (Device *device, size_t terminal_id, size_t layer_index, const db::Region &region);
@@ -493,6 +503,13 @@ public:
    */
   std::string cell_name () const;
 
+  /**
+   *  @brief Initializes the extractor
+   *  This method will produce the device classes required for the device extraction.
+   *  It is mainly provided for test purposes. Don't call it directly.
+   */
+  void initialize (db::Netlist *nl);
+
 private:
   struct DeviceCellKey
   {
@@ -535,7 +552,7 @@ private:
   const std::set<db::cell_index_type> *mp_breakout_cells;
   double m_device_scaling;
   db::Circuit *mp_circuit;
-  db::DeviceClass *mp_device_class;
+  tl::weak_ptr<db::DeviceClass> mp_device_class;
   std::string m_name;
   layer_definitions m_layer_definitions;
   std::vector<unsigned int> m_layers;
@@ -546,12 +563,6 @@ private:
   //  no copying
   NetlistDeviceExtractor (const NetlistDeviceExtractor &);
   NetlistDeviceExtractor &operator= (const NetlistDeviceExtractor &);
-
-  /**
-   *  @brief Initializes the extractor
-   *  This method will produce the device classes required for the device extraction.
-   */
-  void initialize (db::Netlist *nl);
 
   void extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers, double device_scaling, const std::set<cell_index_type> *breakout_cells);
   void push_new_devices (const Vector &disp_cache);

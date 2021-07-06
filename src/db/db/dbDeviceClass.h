@@ -295,7 +295,6 @@ public:
   DeviceParameterCompareDelegate () { }
   virtual ~DeviceParameterCompareDelegate () { }
 
-  virtual DeviceParameterCompareDelegate *clone () const = 0;
   virtual bool less (const db::Device &a, const db::Device &b) const = 0;
 };
 
@@ -314,11 +313,6 @@ public:
   EqualDeviceParameters (size_t parameter_id, double relative, double absolute);
 
   virtual bool less (const db::Device &a, const db::Device &b) const;
-
-  virtual DeviceParameterCompareDelegate *clone () const
-  {
-    return new EqualDeviceParameters (*this);
-  }
 
   EqualDeviceParameters &operator+= (const EqualDeviceParameters &other);
 
@@ -344,13 +338,33 @@ public:
 
   virtual bool less (const db::Device &a, const db::Device &b) const;
 
-  virtual DeviceParameterCompareDelegate *clone () const
-  {
-    return new AllDeviceParametersAreEqual (*this);
-  }
-
 private:
   double m_relative;
+};
+
+/**
+ *  @brief A device combiner
+ *
+ *  The device combiner is a delegate that combines devices
+ */
+class DB_PUBLIC DeviceCombiner
+  : public gsi::ObjectBase, public tl::Object
+{
+public:
+  DeviceCombiner () { }
+  virtual ~DeviceCombiner () { }
+
+  /**
+   *  @brief Combines two devices
+   *
+   *  This method shall test, whether the two devices can be combined. Both devices
+   *  are guaranteed to share the same device class.
+   *  If they cannot be combined, this method shall do nothing and return false.
+   *  If they can be combined, this method shall reconnect the nets of the first
+   *  device and entirely disconnect the nets of the second device.
+   *  The second device will be deleted afterwards.
+   */
+  virtual bool combine_devices (db::Device *a, db::Device *b) const = 0;
 };
 
 /**
@@ -509,6 +523,11 @@ public:
   const DeviceParameterDefinition *parameter_definition (size_t id) const;
 
   /**
+   *  @brief Gets the parameter definition from the ID (non-const version)
+   */
+  DeviceParameterDefinition *parameter_definition_non_const (size_t id);
+
+  /**
    *  @brief Returns true, if the device has a parameter with the given name
    */
   bool has_parameter_with_name (const std::string &name) const;
@@ -548,25 +567,57 @@ public:
    *  device and entirely disconnect the nets of the second device.
    *  The second device will be deleted afterwards.
    */
-  virtual bool combine_devices (db::Device * /*a*/, db::Device * /*b*/) const
+  bool combine_devices (db::Device *a, db::Device *b) const
   {
-    return false;
+    return mp_device_combiner.get () ? mp_device_combiner->combine_devices (a, b) : false;
   }
 
   /**
    *  @brief Returns true if the device class supports device combination in parallel mode
    */
-  virtual bool supports_parallel_combination () const
+  bool supports_parallel_combination () const
   {
-    return false;
+    return m_supports_parallel_combination;
   }
 
   /**
    *  @brief Returns true if the device class supports device combination in serial mode
    */
-  virtual bool supports_serial_combination () const
+  bool supports_serial_combination () const
   {
-    return false;
+    return m_supports_serial_combination;
+  }
+
+  /**
+   *  @brief Sets a value indicating that the class supports device combination in parallel mode
+   */
+  void set_supports_parallel_combination (bool f)
+  {
+    m_supports_parallel_combination = f;
+  }
+
+  /**
+   *  @brief Sets a value indicating that the class supports device combination in serial mode
+   */
+  void set_supports_serial_combination (bool f)
+  {
+    m_supports_serial_combination = f;
+  }
+
+  /**
+   *  @brief Marks two terminals as equivalent (swappable)
+   */
+  void equivalent_terminal_id (size_t tid, size_t equiv_tid)
+  {
+    m_equivalent_terminal_ids.insert (std::make_pair (tid, equiv_tid));
+  }
+
+  /**
+   *  @brief Clears all equivalent terminal ids
+   */
+  void clear_equivalent_terminal_ids ()
+  {
+    m_equivalent_terminal_ids.clear ();
   }
 
   /**
@@ -575,9 +626,14 @@ public:
    *  This method returns a "normalized" terminal ID. For example, for MOS
    *  transistors where S and D can be exchanged, D will be mapped to S.
    */
-  virtual size_t normalize_terminal_id (size_t tid) const
+  size_t normalize_terminal_id (size_t tid) const
   {
-    return tid;
+    std::map<size_t, size_t>::const_iterator ntid = m_equivalent_terminal_ids.find (tid);
+    if (ntid != m_equivalent_terminal_ids.end ()) {
+      return ntid->second;
+    } else {
+      return tid;
+    }
   }
 
   /**
@@ -639,6 +695,35 @@ public:
   }
 
   /**
+   *  @brief Registers a device combiner
+   *
+   *  The device class takes ownership of the combiner.
+   */
+  void set_device_combiner (db::DeviceCombiner *combiner)
+  {
+    if (combiner) {
+      combiner->keep ();  //  assume transfer of ownership for scripts
+    }
+    mp_device_combiner.reset (combiner);
+  }
+
+  /**
+   *  @brief Gets the device combiner or null if no such delegate is registered
+   */
+  const db::DeviceCombiner *device_combiner () const
+  {
+    return mp_device_combiner.get ();
+  }
+
+  /**
+   *  @brief Gets the device combiner or null if no such delegate is registered (non-const version)
+   */
+  db::DeviceCombiner *device_combiner ()
+  {
+    return mp_device_combiner.get ();
+  }
+
+  /**
    *  @brief Generate memory statistics
    */
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
@@ -662,6 +747,10 @@ private:
   bool m_strict;
   db::Netlist *mp_netlist;
   tl::shared_ptr<db::DeviceParameterCompareDelegate> mp_pc_delegate;
+  tl::shared_ptr<db::DeviceCombiner> mp_device_combiner;
+  bool m_supports_parallel_combination;
+  bool m_supports_serial_combination;
+  std::map<size_t, size_t> m_equivalent_terminal_ids;
 
   void set_netlist (db::Netlist *nl)
   {

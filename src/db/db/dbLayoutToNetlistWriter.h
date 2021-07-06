@@ -37,6 +37,7 @@ namespace db
 class Circuit;
 class SubCircuit;
 class Device;
+class DeviceClass;
 class DeviceAbstract;
 class Net;
 class Netlist;
@@ -78,6 +79,7 @@ private:
   void write (const db::DeviceAbstract &device_abstract, const std::string &indent);
   void write (const db::NetShape *s, const db::ICplxTrans &tr, const std::string &lname, bool relative);
   void write (const db::DCplxTrans &trans);
+  void write_device_class (const std::string &indent, const db::DeviceClass *cls, const std::string &name, const db::DeviceClass *temp_class);
   void reset_geometry_ref ();
 
   //  implementation of CircuitCallback

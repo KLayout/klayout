@@ -635,8 +635,108 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
 // ------------------------------------------------------------------------------------------------------
 
+NetlistSpiceReader::SpiceReaderStream::SpiceReaderStream ()
+  : mp_stream (0), m_owns_stream (false), mp_text_stream (0), m_line_number (0), m_stored_line (), m_has_stored_line (false)
+{
+  //  .. nothing yet ..
+}
+
+NetlistSpiceReader::SpiceReaderStream::~SpiceReaderStream ()
+{
+  close ();
+}
+
+void
+NetlistSpiceReader::SpiceReaderStream::close ()
+{
+  delete mp_text_stream;
+  mp_text_stream = 0;
+
+  if (m_owns_stream) {
+    delete mp_stream;
+    mp_stream = 0;
+    m_owns_stream = false;
+  }
+}
+
+std::pair<std::string, bool>
+NetlistSpiceReader::SpiceReaderStream::get_line ()
+{
+  if (mp_text_stream->at_end ()) {
+    return std::make_pair (std::string (), false);
+  }
+
+  ++m_line_number;
+
+  std::string l = m_has_stored_line ? m_stored_line : mp_text_stream->get_line ();
+
+  m_has_stored_line = false;
+  m_stored_line.clear ();
+
+  while (! mp_text_stream->at_end ()) {
+
+    std::string ll = mp_text_stream->get_line ();
+
+    tl::Extractor ex (ll.c_str ());
+    if (! ex.test ("+")) {
+      m_stored_line = ll;
+      m_has_stored_line = true;
+      break;
+    } else {
+      ++m_line_number;
+      l += " ";
+      l += ex.get ();
+    }
+
+  }
+
+  return std::make_pair (l, true);
+}
+
+int
+NetlistSpiceReader::SpiceReaderStream::line_number () const
+{
+  return m_line_number;
+}
+
+std::string
+NetlistSpiceReader::SpiceReaderStream::source () const
+{
+  return mp_stream->source ();
+}
+
+bool
+NetlistSpiceReader::SpiceReaderStream::at_end () const
+{
+  return mp_text_stream->at_end ();
+}
+
+void
+NetlistSpiceReader::SpiceReaderStream::set_stream (tl::InputStream &stream)
+{
+  close ();
+  mp_stream = &stream;
+  mp_text_stream = new tl::TextInputStream (stream);
+  m_owns_stream = false;
+  m_has_stored_line = false;
+  m_line_number = 0;
+}
+
+void
+NetlistSpiceReader::SpiceReaderStream::set_stream (tl::InputStream *stream)
+{
+  close ();
+  mp_stream = stream;
+  mp_text_stream = new tl::TextInputStream (*stream);
+  m_owns_stream = true;
+  m_has_stored_line = false;
+  m_line_number = 0;
+}
+
+// ------------------------------------------------------------------------------------------------------
+
 NetlistSpiceReader::NetlistSpiceReader (NetlistSpiceReaderDelegate *delegate)
-  : mp_netlist (0), mp_stream (), mp_delegate (delegate)
+  : mp_netlist (0), mp_delegate (delegate), m_stream ()
 {
   static NetlistSpiceReaderDelegate std_delegate;
   if (! delegate) {
@@ -653,7 +753,8 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading netlist ")) + stream.source ());
 
-  mp_stream.reset (new tl::TextInputStream (stream));
+  m_stream.set_stream (stream);
+
   mp_netlist = &netlist;
   mp_circuit = 0;
   mp_anonymous_top_circuit = 0;
@@ -681,7 +782,7 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
 
     //  NOTE: because we do a peek to capture the "+" line continuation character, we're
     //  one line ahead.
-    std::string fmt_msg = tl::sprintf ("%s in %s, line %d", ex.msg (), mp_stream->source (), mp_stream->line_number () - 1);
+    std::string fmt_msg = tl::sprintf ("%s in %s, line %d", ex.msg (), m_stream.source (), m_stream.line_number ());
     finish ();
     throw tl::Exception (fmt_msg);
 
@@ -737,11 +838,9 @@ void NetlistSpiceReader::build_global_nets ()
 
 void NetlistSpiceReader::finish ()
 {
-  while (! m_streams.empty ()) {
-    pop_stream ();
-  }
+  m_streams.clear ();
+  m_stream.close ();
 
-  mp_stream.reset (0);
   mp_netlist = 0;
   mp_circuit = 0;
   mp_nets_by_name.reset (0);
@@ -749,7 +848,7 @@ void NetlistSpiceReader::finish ()
 
 void NetlistSpiceReader::push_stream (const std::string &path)
 {
-  tl::URI current_uri (mp_stream->source ());
+  tl::URI current_uri (m_stream.source ());
   tl::URI new_uri (path);
 
   tl::InputStream *istream;
@@ -757,80 +856,68 @@ void NetlistSpiceReader::push_stream (const std::string &path)
     if (tl::is_absolute (path)) {
       istream = new tl::InputStream (path);
     } else {
-      istream = new tl::InputStream (tl::combine_path (tl::dirname (mp_stream->source ()), path));
+      istream = new tl::InputStream (tl::combine_path (tl::dirname (m_stream.source ()), path));
     }
   } else {
     istream = new tl::InputStream (current_uri.resolved (new_uri).to_abstract_path ());
   }
 
-  m_streams.push_back (std::make_pair (istream, mp_stream.release ()));
-  mp_stream.reset (new tl::TextInputStream (*istream));
+  m_streams.push_back (SpiceReaderStream ());
+  m_streams.back ().swap (m_stream);
+  m_stream.set_stream (istream);
 }
 
 void NetlistSpiceReader::pop_stream ()
 {
   if (! m_streams.empty ()) {
-
-    mp_stream.reset (m_streams.back ().second);
-    delete m_streams.back ().first;
-
+    m_stream.swap (m_streams.back ());
     m_streams.pop_back ();
-
   }
 }
 
 bool NetlistSpiceReader::at_end ()
 {
-  return mp_stream->at_end () && m_streams.empty ();
+  return m_stream.at_end () && m_streams.empty ();
 }
 
 std::string NetlistSpiceReader::get_line ()
 {
-  if (! m_stored_line.empty ()) {
-    std::string l;
-    l.swap (m_stored_line);
-    return l;
+  std::pair<std::string, bool> lp;
+
+  while (true) {
+
+    lp = m_stream.get_line ();
+    if (! lp.second) {
+
+      if (m_streams.empty ()) {
+        break;
+      } else {
+        pop_stream ();
+      }
+
+    } else {
+
+      tl::Extractor ex (lp.first.c_str ());
+      if (ex.test_without_case (".include") || ex.test_without_case (".inc")) {
+
+        std::string path;
+        ex.read_word_or_quoted (path, allowed_name_chars);
+
+        push_stream (path);
+
+      } else if (ex.at_end () || ex.test ("*")) {
+
+        //  skip empty and comment lines
+
+      } else {
+        break;
+      }
+
+    }
+
   }
 
-  std::string l;
-
-  do {
-
-    while (mp_stream->at_end ()) {
-      if (m_streams.empty ()) {
-        return std::string ();
-      }
-      pop_stream ();
-    }
-
-    l = mp_stream->get_line ();
-    while (! mp_stream->at_end () && mp_stream->peek_char () == '+') {
-      mp_stream->get_char ();
-      l += mp_stream->get_line ();
-    }
-
-    tl::Extractor ex (l.c_str ());
-    if (ex.test_without_case (".include") || ex.test_without_case (".inc")) {
-
-      std::string path;
-      ex.read_word_or_quoted (path, allowed_name_chars);
-
-      push_stream (path);
-
-      l.clear ();
-
-    } else if (ex.at_end () || ex.test ("*")) {
-      l.clear ();
-    }
-
-  } while (l.empty ());
-
-  return l;
-}
-
-void NetlistSpiceReader::unget_line (const std::string &l)
-{
-  m_stored_line = l;
+  return lp.first;
 }
 
 bool NetlistSpiceReader::subcircuit_captured (const std::string &nc_name)
@@ -928,7 +1015,7 @@ void NetlistSpiceReader::error (const std::string &msg)
 
 void NetlistSpiceReader::warn (const std::string &msg)
 {
-  std::string fmt_msg = tl::sprintf ("%s in %s, line %d", msg, mp_stream->source (), mp_stream->line_number () - 1);
+  std::string fmt_msg = tl::sprintf ("%s in %s, line %d", msg, m_stream.source (), m_stream.line_number ());
   tl::warn << fmt_msg;
 }
 

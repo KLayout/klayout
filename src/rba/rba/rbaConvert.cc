@@ -224,7 +224,7 @@ object_to_ruby (void *obj, Proxy *self, const gsi::ClassBase *cls, bool pass_obj
     //  a Ruby object. If it already has, we simply return a reference to this.
     ret = rba_data->self ();
 
-#if HAVE_RUBY_VERSION_CODE >= 20200
+#if HAVE_RUBY_VERSION_CODE >= 20200 && HAVE_RUBY_VERSION_CODE < 30000
     //  Mark the returned object - the original one may have been already
     //  scheduled for sweeping. This happens at least for Ruby 2.3 which
     //  has a two-phase GC (mark and sweep in separate steps). If by chance

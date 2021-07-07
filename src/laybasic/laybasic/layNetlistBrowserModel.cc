@@ -25,6 +25,7 @@
 #include "layIndexedNetlistModel.h"
 #include "layNetlistCrossReferenceModel.h"
 #include "dbNetlistDeviceClasses.h"
+#include "tlMath.h"
 
 #include <QPainter>
 #include <QIcon>
@@ -233,11 +234,11 @@ static QString escaped (const std::string &s)
 }
 
 template <class Obj>
-static std::string str_from_expanded_name (const Obj *obj, bool dash_for_empty = false)
+static std::string str_from_expanded_name (const Obj *obj, bool indicate_empty = false)
 {
   if (obj) {
     return obj->expanded_name ();
-  } else if (dash_for_empty) {
+  } else if (indicate_empty) {
     return std::string ("-");
   } else {
     return std::string ();
@@ -245,11 +246,11 @@ static std::string str_from_expanded_name (const Obj *obj, bool dash_for_empty =
 }
 
 template <class Obj>
-static std::string str_from_name (const Obj *obj, bool dash_for_empty = false)
+static std::string str_from_name (const Obj *obj, bool indicate_empty = false)
 {
   if (obj) {
     return obj->name ();
-  } else if (dash_for_empty) {
+  } else if (indicate_empty) {
     return std::string ("-");
   } else {
     return std::string ();
@@ -264,7 +265,7 @@ static std::string str_from_expanded_names (const std::pair<const Obj *, const O
   std::string s = str_from_expanded_name (objs.first, ! is_single);
   if (! is_single) {
     std::string t = str_from_expanded_name (objs.second, ! is_single);
-    if (t != s) {
+    if (t != s || ! objs.first || ! objs.second) {
       s += var_sep;
       s += t;
     }
@@ -278,7 +279,7 @@ static std::string str_from_names (const std::pair<const Obj *, const Obj *> &ob
   std::string s = str_from_name (objs.first, ! is_single);
   if (! is_single) {
     std::string t = str_from_name (objs.second, ! is_single);
-    if (t != s) {
+    if (t != s || ! objs.first || ! objs.second) {
       s += var_sep;
       s += t;
     }
@@ -324,7 +325,8 @@ std::string device_parameter_string (const db::Device *device)
   bool first = true;
   const std::vector<db::DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();
   for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-    if (p->is_primary ()) {
+    double v = device->parameter_value (p->id ());
+    if (! tl::equal (v, p->default_value ())) {
       if (first) {
         s += " [";
         first = false;
@@ -333,7 +335,7 @@ std::string device_parameter_string (const db::Device *device)
       }
       s += p->name ();
       s += "=";
-      s += formatted_value (device->parameter_value (p->id ()));
+      s += formatted_value (v);
     }
   }
   if (! first) {

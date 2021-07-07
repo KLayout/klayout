@@ -246,6 +246,30 @@ static db::EdgePairs with_angle_both2 (const db::EdgePairs *r, double amin, doub
   return r->filtered (ef);
 }
 
+static db::EdgePairs with_internal_angle1 (const db::EdgePairs *r, double a, bool inverse)
+{
+  db::InternalAngleEdgePairFilter f (a, inverse);
+  return r->filtered (f);
+}
+
+static db::EdgePairs with_internal_angle2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
+{
+  db::InternalAngleEdgePairFilter f (amin, include_amin, amax, include_amax, inverse);
+  return r->filtered (f);
+}
+
+static db::EdgePairs with_area1 (const db::EdgePairs *r, db::EdgePair::area_type a, bool inverse)
+{
+  db::EdgePairFilterByArea f (a, a + 1, inverse);
+  return r->filtered (f);
+}
+
+static db::EdgePairs with_area2 (const db::EdgePairs *r, db::EdgePair::area_type amin, db::EdgePair::area_type amax, bool inverse)
+{
+  db::EdgePairFilterByArea f (amin, amax, inverse);
+  return r->filtered (f);
+}
+
 extern Class<db::ShapeCollection> decl_dbShapeCollection;
 
 Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
@@ -621,7 +645,7 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
   method_ext ("with_distance", with_distance2, gsi::arg ("min_distance"), gsi::arg ("max_distance"), gsi::arg ("inverse"),
     "@brief Filters the edge pairs by the distance of the edges\n"
     "Filters the edge pairs in the edge pair collection by distance of the edges. If \"inverse\" is false, only "
-    "edge pairs where both edges have a distance between min_distance and max_distance (max_distance itself is excluded). If \"inverse\" is true, "
+    "edge pairs where both edges have a distance between min_distance and max_distance (max_distance itself is excluded) are returned. If \"inverse\" is true, "
     "edge pairs not fulfilling this criterion are returned.\n"
     "\n"
     "Distance is measured as the shortest distance between any of the points on the edges.\n"
@@ -677,6 +701,45 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "minimum angle itself is not included. Same for \"include_max_angle\" where the default is false, meaning the maximum angle is not included in the range.\n"
     "\n"
     "This method has been added in version 0.27.1.\n"
+  ) +
+  method_ext ("with_area", with_area1, gsi::arg ("area"), gsi::arg ("inverse"),
+    "@brief Filters the edge pairs by the enclosed area\n"
+    "Filters the edge pairs in the edge pair collection by enclosed area. If \"inverse\" is false, only "
+    "edge pairs with the given area are returned. If \"inverse\" is true, "
+    "edge pairs not with the given area are returned.\n"
+    "\n"
+    "This method has been added in version 0.27.2.\n"
+  ) +
+  method_ext ("with_area", with_area2, gsi::arg ("min_area"), gsi::arg ("max_area"), gsi::arg ("inverse"),
+    "@brief Filters the edge pairs by the enclosed area\n"
+    "Filters the edge pairs in the edge pair collection by enclosed area. If \"inverse\" is false, only "
+    "edge pairs with an area between min_area and max_area (max_area itself is excluded) are returned. If \"inverse\" is true, "
+    "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "This method has been added in version 0.27.2.\n"
+  ) +
+  method_ext ("with_internal_angle", with_internal_angle1, gsi::arg ("angle"), gsi::arg ("inverse"),
+    "@brief Filters the edge pairs by the angle between their edges\n"
+    "Filters the edge pairs in the edge pair collection by the angle between their edges. If \"inverse\" is false, only "
+    "edge pairs with the given angle are returned. If \"inverse\" is true, "
+    "edge pairs not with the given angle are returned.\n"
+    "\n"
+    "The angle is measured between the two edges. It is between 0 (parallel or anti-parallel edges) and 90 degree (perpendicular edges).\n"
+    "\n"
+    "This method has been added in version 0.27.2.\n"
+  ) +
+  method_ext ("with_internal_angle", with_internal_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+    "@brief Filters the edge pairs by the angle between their edges\n"
+    "Filters the edge pairs in the edge pair collection by the angle between their edges. If \"inverse\" is false, only "
+    "edge pairs with an angle between min_angle and max_angle (max_angle itself is excluded) are returned. If \"inverse\" is true, "
+    "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "The angle is measured between the two edges. It is between 0 (parallel or anti-parallel edges) and 90 degree (perpendicular edges).\n"
+    "\n"
+    "With \"include_min_angle\" set to true (the default), the minimum angle is included in the criterion while with false, the "
+    "minimum angle itself is not included. Same for \"include_max_angle\" where the default is false, meaning the maximum angle is not included in the range.\n"
+    "\n"
+    "This method has been added in version 0.27.2.\n"
   ) +
   method_ext ("polygons", &polygons1,
     "@brief Converts the edge pairs to polygons\n"

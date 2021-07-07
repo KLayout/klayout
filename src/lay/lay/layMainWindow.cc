@@ -2540,6 +2540,7 @@ MainWindow::cm_new_layout ()
   if (dialog.exec_dialog (technology, s_new_cell_cell_name, dbu, s_new_cell_window_size, s_layers, m_new_layout_current_panel)) {
 
     std::unique_ptr <lay::LayoutHandle> handle (new lay::LayoutHandle (new db::Layout (& manager ()), std::string ()));
+    handle->layout ().set_technology_name (technology);
     handle->rename ("new");
 
     if (dbu > 1e-10) {

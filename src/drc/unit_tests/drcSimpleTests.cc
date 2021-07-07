@@ -1283,12 +1283,12 @@ TEST(48d_drcWithFragments)
   run_test (_this, "48", true);
 }
 
-TEST(49_drcWithFragments)
+TEST(49_epAngle)
 {
   run_test (_this, "49", false);
 }
 
-TEST(49d_drcWithFragments)
+TEST(49d_epAngle)
 {
   run_test (_this, "49", true);
 }
@@ -1296,5 +1296,10 @@ TEST(49d_drcWithFragments)
 TEST(50_issue826)
 {
   run_test (_this, "50", false);
+}
+
+TEST(51_epInternalAngle)
+{
+  run_test (_this, "51", false);
 }
 

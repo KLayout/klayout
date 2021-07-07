@@ -31,6 +31,7 @@
 #include <set>
 #include <map>
 #include <memory>
+#include <list>
 
 namespace db
 {
@@ -168,14 +169,48 @@ public:
   virtual void read (tl::InputStream &stream, db::Netlist &netlist);
 
 private:
+
+  class SpiceReaderStream
+  {
+  public:
+    SpiceReaderStream ();
+    ~SpiceReaderStream ();
+
+    void set_stream (tl::InputStream &stream);
+    void set_stream (tl::InputStream *stream);
+    void close ();
+
+    std::pair<std::string, bool> get_line();
+    int line_number () const;
+    std::string source () const;
+    bool at_end () const;
+
+    void swap (SpiceReaderStream &other)
+    {
+      std::swap (mp_stream, other.mp_stream);
+      std::swap (m_owns_stream, other.m_owns_stream);
+      std::swap (mp_text_stream, other.mp_text_stream);
+      std::swap (m_line_number, other.m_line_number);
+      std::swap (m_stored_line, other.m_stored_line);
+      std::swap (m_has_stored_line, other.m_has_stored_line);
+    }
+
+  private:
+    tl::InputStream *mp_stream;
+    bool m_owns_stream;
+    tl::TextInputStream *mp_text_stream;
+    int m_line_number;
+    std::string m_stored_line;
+    bool m_has_stored_line;
+  };
+
   db::Netlist *mp_netlist;
   db::Circuit *mp_circuit;
   db::Circuit *mp_anonymous_top_circuit;
-  std::unique_ptr<tl::TextInputStream> mp_stream;
   tl::weak_ptr<NetlistSpiceReaderDelegate> mp_delegate;
-  std::vector<std::pair<tl::InputStream *, tl::TextInputStream *> > m_streams;
+  std::list<SpiceReaderStream> m_streams;
+  SpiceReaderStream m_stream;
   std::unique_ptr<std::map<std::string, db::Net *> > mp_nets_by_name;
-  std::string m_stored_line;
   std::map<std::string, bool> m_captured;
   std::vector<std::string> m_global_nets;
   std::set<std::string> m_global_net_names;
@@ -191,7 +226,6 @@ private:
   bool read_card ();
   std::string read_name (tl::Extractor &ex);
   std::string get_line ();
-  void unget_line (const std::string &l);
   void error (const std::string &msg);
   void warn (const std::string &msg);
   void finish ();

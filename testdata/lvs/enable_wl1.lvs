@@ -1,0 +1,52 @@
+
+# test spice writer delegate on this occasion
+class MyWriterDelegate < RBA::NetlistSpiceWriterDelegate
+  def write_device(device)
+    if device.device_class.name == "RR1"
+      line = "R"
+      line += format_name(device.expanded_name)
+      line += " "
+      line += net_to_string(device.net_for_terminal("A"))
+      line += " "
+      line += net_to_string(device.net_for_terminal("B"))
+      line += " "
+      line += format_name(device.device_class.name)
+      line += " "
+      line += "%.12g" % device.parameter("R")
+      line += " W="
+      line += "%.12g" % device.parameter("W")
+      line += " L="
+      line += "%.12g" % device.parameter("L")
+      emit_line(line) 
+    else
+      super
+    end
+  end
+end
+
+source($lvs_test_source)
+report_lvs($lvs_test_target_lvsdb, true)
+target_netlist($lvs_test_target_cir, write_spice(MyWriterDelegate::new), "Extracted by KLayout")
+
+schematic("resistor.cir")
+
+deep
+
+contact     = input(15, 0)
+metal1      = input(16, 0)  
+metal1_ver  = input(16, 5)
+metal1_lbl  = labels(16, 3) 
+res = metal1 & metal1_ver
+metal1_not_res = metal1 - metal1_ver
+
+dc = extract_devices(resistor("RR1", 1),  { "R" => res , "C" => metal1_not_res})
+dc.enable_parameter("W", true)
+dc.enable_parameter("L", true)
+
+connect(contact, metal1_not_res)
+connect(metal1_not_res, metal1_lbl)
+
+align
+netlist.simplify
+compare
+

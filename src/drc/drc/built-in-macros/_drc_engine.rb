@@ -4,6 +4,15 @@ require 'pathname'
 
 module DRC
 
+  class CustomDeviceClassFactory < RBA::DeviceClassFactory
+    def initialize(cls)
+      @cls = cls
+    end
+    def create_class
+      @cls.new
+    end
+  end
+
   # The DRC engine
   
   # %DRC%
@@ -308,22 +317,57 @@ module DRC
     # @brief Defines SPICE output format (with options) 
     # @name write_spice
     # @synopsis write_spice([ use_net_names [, with_comments ] ])
+    # @synopsis write_spice(writer_delegate [, use_net_names [, with_comments ] ])
     # Use this option in \target_netlist for the format parameter to 
     # specify SPICE format.
     # "use_net_names" and "with_comments" are boolean parameters indicating
     # whether to use named nets (numbers if false) and whether to add 
     # information comments such as instance coordinates or pin names.
+    #
+    # "writer_delegate" allows using a \NetlistSpiceWriterDelegate object to 
+    # control the actual writing.
 
-    def write_spice(use_net_names = nil, with_comments = nil)
+    def write_spice(*args)
+
       self._context("write_spice") do
-        writer = RBA::NetlistSpiceWriter::new
+
+        delegate = nil
+        use_net_names = nil
+        with_comments = nil
+        args.each do |a|
+          if (a == false || a == true) && (use_net_names == nil || with_comments == nil)
+            if use_net_names == nil
+              use_net_names = a
+            else
+              with_comments = a
+            end
+          elsif a.is_a?(RBA::NetlistSpiceWriterDelegate)
+            delegate = a
+          else
+            raise("Too many arguments specified or argument is of wrong type: " + a.inspect)
+          end
+        end
+            
+        writer = RBA::NetlistSpiceWriter::new(delegate)
         if use_net_names != nil
           writer.use_net_names = use_net_names
         end
         if with_comments != nil
           writer.with_comments = with_comments
         end
+
         writer
+
+      end
+    end
+
+    def _make_factory(cls)
+      if !cls
+        return nil
+      elsif !cls.is_a?(Class)
+        raise("Expected a class object for the 'class' argument of device extractors")
+      else
+        CustomDeviceClassFactory::new(cls)
       end
     end
 
@@ -331,15 +375,16 @@ module DRC
     # @brief Supplies the MOS3 transistor extractor class
     # @name mos3
     # @synopsis mos3(name)
+    # @synopsis mos3(name, class)
     # Use this class with \extract_devices to specify extraction of a 
     # three-terminal MOS transistor.
     #
     # See RBA::DeviceExtractorMOS3Transistor for more details
     # about this extractor (non-strict mode applies for 'mos3').
 
-    def mos3(name)
+    def mos3(name, cls = nil)
       self._context("mos3") do
-        RBA::DeviceExtractorMOS3Transistor::new(name)
+        RBA::DeviceExtractorMOS3Transistor::new(name, false, _make_factory(cls))
       end
     end
 
@@ -347,15 +392,16 @@ module DRC
     # @brief Supplies the MOS4 transistor extractor class
     # @name mos4
     # @synopsis mos4(name)
+    # @synopsis mos4(name, class)
     # Use this class with \extract_devices to specify extraction of a 
     # four-terminal MOS transistor.
     #
     # See RBA::DeviceExtractorMOS4Transistor for more details
     # about this extractor (non-strict mode applies for 'mos4').
 
-    def mos4(name)
+    def mos4(name, cls = nil)
       self._context("mos4") do
-        RBA::DeviceExtractorMOS4Transistor::new(name)
+        RBA::DeviceExtractorMOS4Transistor::new(name, false, _make_factory(cls))
       end
     end
 
@@ -363,6 +409,7 @@ module DRC
     # @brief Supplies the DMOS3 transistor extractor class
     # @name dmos3
     # @synopsis dmos3(name)
+    # @synopsis dmos3(name, class)
     # Use this class with \extract_devices to specify extraction of a 
     # three-terminal DMOS transistor. A DMOS transistor is essentially
     # the same than a MOS transistor, but source and drain are 
@@ -371,9 +418,9 @@ module DRC
     # See RBA::DeviceExtractorMOS3Transistor for more details
     # about this extractor (strict mode applies for 'dmos3').
 
-    def dmos3(name)
+    def dmos3(name, cls = nil)
       self._context("dmos3") do
-        RBA::DeviceExtractorMOS3Transistor::new(name, true)
+        RBA::DeviceExtractorMOS3Transistor::new(name, true, _make_factory(cls))
       end
     end
 
@@ -381,6 +428,7 @@ module DRC
     # @brief Supplies the MOS4 transistor extractor class
     # @name dmos4
     # @synopsis dmos4(name)
+    # @synopsis dmos4(name, class)
     # Use this class with \extract_devices to specify extraction of a 
     # four-terminal DMOS transistor. A DMOS transistor is essentially
     # the same than a MOS transistor, but source and drain are 
@@ -389,9 +437,9 @@ module DRC
     # See RBA::DeviceExtractorMOS4Transistor for more details
     # about this extractor (strict mode applies for 'dmos4').
 
-    def dmos4(name)
+    def dmos4(name, cls = nil)
       self._context("dmos4") do
-        RBA::DeviceExtractorMOS4Transistor::new(name, true)
+        RBA::DeviceExtractorMOS4Transistor::new(name, true, _make_factory(cls))
       end
     end
 
@@ -399,15 +447,16 @@ module DRC
     # @brief Supplies the BJT3 transistor extractor class
     # @name bjt3
     # @synopsis bjt3(name)
+    # @synopsis bjt3(name, class)
     # Use this class with \extract_devices to specify extraction of a 
     # bipolar junction transistor
     #
     # See RBA::DeviceExtractorBJT3Transistor for more details
     # about this extractor.
 
-    def bjt3(name)
+    def bjt3(name, cls = nil)
       self._context("bjt3") do
-        RBA::DeviceExtractorBJT3Transistor::new(name)
+        RBA::DeviceExtractorBJT3Transistor::new(name, _make_factory(cls))
       end
     end
 
@@ -415,15 +464,16 @@ module DRC
     # @brief Supplies the BJT4 transistor extractor class
     # @name bjt4
     # @synopsis bjt4(name)
+    # @synopsis bjt4(name, class)
     # Use this class with \extract_devices to specify extraction of a 
     # bipolar junction transistor with a substrate terminal
     #
     # See RBA::DeviceExtractorBJT4Transistor for more details
     # about this extractor.
 
-    def bjt4(name)
+    def bjt4(name, cls = nil)
       self._context("bjt4") do
-        RBA::DeviceExtractorBJT4Transistor::new(name)
+        RBA::DeviceExtractorBJT4Transistor::new(name, _make_factory(cls))
       end
     end
 
@@ -431,15 +481,16 @@ module DRC
     # @brief Supplies the diode extractor class
     # @name diode
     # @synopsis diode(name)
+    # @synopsis diode(name, class)
     # Use this class with \extract_devices to specify extraction of a 
     # planar diode 
     #
     # See RBA::DeviceExtractorDiode for more details
     # about this extractor.
 
-    def diode(name)
+    def diode(name, cls = nil)
       self._context("diode") do
-        RBA::DeviceExtractorDiode::new(name)
+        RBA::DeviceExtractorDiode::new(name, _make_factory(cls))
       end
     end
 
@@ -447,6 +498,7 @@ module DRC
     # @brief Supplies the resistor extractor class
     # @name resistor
     # @synopsis resistor(name, sheet_rho)
+    # @synopsis resistor(name, sheet_rho, class)
     # Use this class with \extract_devices to specify extraction of a resistor.
     #
     # The sheet_rho value is the sheet resistance in ohms/square. It is used
@@ -455,9 +507,9 @@ module DRC
     # See RBA::DeviceExtractorResistor for more details
     # about this extractor.
 
-    def resistor(name, sheet_rho)
+    def resistor(name, sheet_rho, cls = nil)
       self._context("resistor") do
-        RBA::DeviceExtractorResistor::new(name, sheet_rho)
+        RBA::DeviceExtractorResistor::new(name, sheet_rho, _make_factory(cls))
       end
     end
 
@@ -465,6 +517,7 @@ module DRC
     # @brief Supplies the resistor extractor class that includes a bulk terminal
     # @name resistor_with_bulk
     # @synopsis resistor_with_bulk(name, sheet_rho)
+    # @synopsis resistor_with_bulk(name, sheet_rho, class)
     # Use this class with \extract_devices to specify extraction of a resistor 
     # with a bulk terminal.
     # The sheet_rho value is the sheet resistance in ohms/square.
@@ -472,9 +525,9 @@ module DRC
     # See RBA::DeviceExtractorResistorWithBulk for more details
     # about this extractor.
 
-    def resistor_with_bulk(name, sheet_rho)
+    def resistor_with_bulk(name, sheet_rho, cls = nil)
       self._context("resistor_with_bulk") do
-        RBA::DeviceExtractorResistorWithBulk::new(name, sheet_rho)
+        RBA::DeviceExtractorResistorWithBulk::new(name, sheet_rho, _make_factory(cls))
       end
     end
 
@@ -482,15 +535,16 @@ module DRC
     # @brief Supplies the capacitor extractor class
     # @name capacitor
     # @synopsis capacitor(name, area_cap)
+    # @synopsis capacitor(name, area_cap, class)
     # Use this class with \extract_devices to specify extraction of a capacitor.
     # The area_cap argument is the capacitance in Farad per square micrometer.
     #
     # See RBA::DeviceExtractorCapacitor for more details
     # about this extractor.
 
-    def capacitor(name, area_cap)
+    def capacitor(name, area_cap, cls = nil)
       self._context("capacitor") do
-        RBA::DeviceExtractorCapacitor::new(name, area_cap)
+        RBA::DeviceExtractorCapacitor::new(name, area_cap, _make_factory(cls))
       end
     end
 
@@ -498,6 +552,7 @@ module DRC
     # @brief Supplies the capacitor extractor class that includes a bulk terminal
     # @name capacitor_with_bulk
     # @synopsis capacitor_with_bulk(name, area_cap)
+    # @synopsis capacitor_with_bulk(name, area_cap, class)
     # Use this class with \extract_devices to specify extraction of a capacitor 
     # with a bulk terminal.
     # The area_cap argument is the capacitance in Farad per square micrometer.
@@ -505,9 +560,9 @@ module DRC
     # See RBA::DeviceExtractorCapacitorWithBulk for more details
     # about this extractor.
 
-    def capacitor_with_bulk(name, area_cap)
+    def capacitor_with_bulk(name, area_cap, cls = nil)
       self._context("capacitor_with_bulk") do
-        RBA::DeviceExtractorCapacitorWithBulk::new(name, area_cap)
+        RBA::DeviceExtractorCapacitorWithBulk::new(name, area_cap, _make_factory(cls))
       end
     end
 

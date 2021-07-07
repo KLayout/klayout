@@ -1192,6 +1192,7 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
     while (! shapes.at_end ()) {
 
       if (shapes->type () != db::NetShape::Polygon) {
+        ++shapes;
         continue;
       }
 

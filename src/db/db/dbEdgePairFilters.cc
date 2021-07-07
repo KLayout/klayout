@@ -78,4 +78,51 @@ bool EdgePairFilterByDistance::selected (const db::EdgePair &edge_pair) const
   return m_inverted ? !sel : sel;
 }
 
+// ---------------------------------------------------------------------------------------------------
+//  EdgePairFilterByArea implementation
+
+EdgePairFilterByArea::EdgePairFilterByArea (area_type min_area, area_type max_area, bool inverted)
+  : m_min_area (min_area), m_max_area (max_area), m_inverted (inverted)
+{
+  //  .. nothing yet ..
+}
+
+bool EdgePairFilterByArea::selected (const db::EdgePair &edge_pair) const
+{
+  area_type dist = edge_pair.to_simple_polygon (0).area ();
+  bool sel = (dist >= m_min_area && dist < m_max_area);
+  return m_inverted ? !sel : sel;
+}
+
+// ---------------------------------------------------------------------------------------------------
+//  EdgePairFilterByArea implementation
+
+InternalAngleEdgePairFilter::InternalAngleEdgePairFilter (double a, bool inverted)
+  : m_inverted (inverted), m_checker (a, true, a, true)
+{
+  //  .. nothing yet ..
+}
+
+InternalAngleEdgePairFilter::InternalAngleEdgePairFilter (double amin, bool include_amin, double amax, bool include_amax, bool inverted)
+  : m_inverted (inverted), m_checker (amin, include_amin, amax, include_amax)
+{
+  //  .. nothing yet ..
+}
+
+bool
+InternalAngleEdgePairFilter::selected (const db::EdgePair &edge_pair) const
+{
+  db::Vector d1 = edge_pair.first ().d ();
+  db::Vector d2 = edge_pair.second ().d ();
+
+  if (db::sprod_sign (d1, d2) < 0) {
+    d1 = -d1;
+  }
+  if (db::vprod_sign (d1, d2) < 0) {
+    std::swap (d1, d2);
+  }
+
+  return m_checker (d1, d2) != m_inverted;
+}
+
 }

@@ -1301,8 +1301,8 @@ TEST(4_ResAndCapExtraction)
     "  device PMOS $2 (S=VDD,G=IN,D=$3) (L=0.4,W=2.3,AS=1.38,AD=1.38,PS=5.8,PD=5.8);\n"
     "  device NMOS $3 (S=VSS,G=$4,D=OUT) (L=0.4,W=4.6,AS=2.185,AD=2.185,PS=8.8,PD=8.8);\n"
     "  device MIM_CAP $5 (A=$4,B=VSS) (C=2.622e-14,A=26.22,P=29.8);\n"
-    "  device POLY_RES $7 (A=$3,B=$4) (R=750,L=12,W=0.8,A=2.4,P=13.6);\n"
-    "  device POLY_RES $9 (A=$4,B=VSS) (R=1825,L=29.2,W=0.8,A=5.84,P=30);\n"
+    "  device POLY_RES $7 (A=$3,B=$4) (R=750,L=6,W=0.4,A=2.4,P=13.6);\n"
+    "  device POLY_RES $9 (A=$4,B=VSS) (R=1825,L=14.6,W=0.4,A=5.84,P=30);\n"
     "  device NMOS $10 (S=VSS,G=IN,D=$3) (L=0.4,W=3.1,AS=1.86,AD=1.86,PS=7.4,PD=7.4);\n"
     "end;\n",
     true /*exact parameter compare*/
@@ -1576,8 +1576,8 @@ TEST(5_ResAndCapWithBulkExtraction)
     "  device NMOS $3 (S=VSS,G=$4,D=OUT,B=BULK) (L=0.4,W=4.6,AS=2.185,AD=2.185,PS=8.8,PD=8.8);\n"
     "  device MIM_CAP_SUBSTRATE $5 (A=$4,B=VSS,W=BULK) (C=1.334e-14,A=13.34,P=15);\n"
     "  device MIM_CAP_NWELL $6 (A=$4,B=VSS,W=NWELL) (C=1.288e-14,A=12.88,P=14.8);\n"
-    "  device POLY_RES_NWELL $7 (A=$3,B=$4,W=NWELL) (R=750,L=12,W=0.8,A=2.4,P=13.6);\n"
-    "  device POLY_RES_SUBSTRATE $9 (A=$4,B=VSS,W=BULK) (R=1825,L=29.2,W=0.8,A=5.84,P=30);\n"
+    "  device POLY_RES_NWELL $7 (A=$3,B=$4,W=NWELL) (R=750,L=6,W=0.4,A=2.4,P=13.6);\n"
+    "  device POLY_RES_SUBSTRATE $9 (A=$4,B=VSS,W=BULK) (R=1825,L=14.6,W=0.4,A=5.84,P=30);\n"
     "  device NMOS $10 (S=VSS,G=IN,D=$3,B=BULK) (L=0.4,W=3.1,AS=1.86,AD=1.86,PS=7.4,PD=7.4);\n"
     "end;\n",
     true /*exact parameter compare*/

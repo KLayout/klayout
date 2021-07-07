@@ -1,0 +1,33 @@
+
+source($lvs_test_source)
+report_lvs($lvs_test_target_lvsdb, true)
+target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
+
+schematic("resistor.cir")
+
+deep
+
+contact     = input(15, 0)
+metal1      = input(16, 0)  
+metal1_ver  = input(16, 5)
+metal1_lbl  = labels(16, 3) 
+res = metal1 & metal1_ver
+metal1_not_res = metal1 - metal1_ver
+
+class MyResistorClass < RBA::DeviceClassResistor
+  def initialize
+    super
+    enable_parameter("W", true)
+    enable_parameter("L", true)
+  end
+end
+
+extract_devices(resistor("RR1", 1, MyResistorClass), { "R" => res , "C" => metal1_not_res})
+
+connect(contact, metal1_not_res)
+connect(metal1_not_res, metal1_lbl)
+
+align
+netlist.simplify
+compare
+

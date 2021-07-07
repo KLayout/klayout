@@ -1,0 +1,196 @@
+#%lvsdb-klayout
+
+# Layout
+layout(
+ top(TOP)
+ unit(0.001)
+
+ # Layer section
+ # This section lists the mask layers (drawing or derived) and their connections.
+
+ # Mask layers
+ layer(l1 '1/0')
+ layer(l3 '2/0')
+ layer(l4 '3/0')
+ layer(l2 '10/0')
+
+ # Mask layer connectivity
+ connect(l1 l1 l3 l2)
+ connect(l3 l1 l3 l4)
+ connect(l4 l3 l4)
+ connect(l2 l1 l2)
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(CHIP
+
+  # Circuit boundary
+  rect((-4000 -6000) (11000 9000))
+
+  # Outgoing pins and their connections to nets
+  pin(name(pad3))
+  pin(name(pad4))
+  pin(name(pad5))
+  pin(name(pad2))
+  pin(name(pad1))
+  pin(name(pad8))
+  pin(name(pad6))
+  pin(name(pad7))
+
+ )
+ circuit(TOP
+
+  # Circuit boundary
+  rect((-18500 -14000) (44500 28000))
+
+  # Nets with their geometries
+  net(1 name('3')
+   rect(l1 (-10500 2000) (7500 1000))
+   rect(l1 (-7500 0) (1000 4000))
+   rect(l1 (-6000 0) (6000 1000))
+   rect(l1 (-9000 -2000) (3500 3000))
+   rect(l1 (-1501 -1501) (2 2))
+   rect(l2 (12499 -5501) (1000 1000))
+  )
+  net(2 name('4')
+   rect(l1 (1000 2000) (1000 10000))
+   rect(l1 (-17500 0) (17500 1000))
+   rect(l1 (-20500 -2000) (3500 3000))
+   rect(l1 (-1501 -1501) (2 2))
+   rect(l2 (17499 -10501) (1000 1000))
+  )
+  net(3 name('2')
+   rect(l1 (-15500 -2000) (12500 1000))
+   rect(l1 (-15500 -2000) (3500 3000))
+   rect(l1 (-1501 -1501) (2 2))
+   rect(l2 (12499 -501) (1000 1000))
+  )
+  net(4 name('1')
+   rect(l1 (-15500 -13000) (6000 1000))
+   rect(l1 (-1000 0) (1000 6000))
+   rect(l1 (-9000 -8000) (3500 3000))
+   rect(l1 (4500 5000) (7500 1000))
+   rect(l1 (-13501 -7501) (2 2))
+   rect(l2 (12499 6499) (1000 1000))
+  )
+  net(5 name('8')
+   rect(l1 (1000 -13000) (22000 1000))
+   rect(l1 (-22000 0) (1000 7000))
+   rect(l1 (20500 -9000) (3500 3000))
+   rect(l1 (-1501 -1501) (2 2))
+   rect(l2 (-23501 6499) (1000 1000))
+  )
+  net(6 name('7')
+   rect(l1 (6000 -6000) (7000 1000))
+   rect(l1 (-1000 0) (1000 12000))
+   rect(l1 (-1000 0) (11000 1000))
+   rect(l1 (-500 -2000) (3500 3000))
+   rect(l1 (-1501 -1501) (2 2))
+   rect(l2 (-18501 -13501) (1000 1000))
+  )
+  net(7 name('5')
+   rect(l1 (6000 2000) (1000 10000))
+   rect(l1 (-1000 0) (17000 1000))
+   rect(l1 (-500 -2000) (3500 3000))
+   rect(l1 (-1501 -1501) (2 2))
+   rect(l2 (-18501 -10501) (1000 1000))
+  )
+  net(8 name('6')
+   rect(l1 (16000 -2000) (7000 1000))
+   rect(l1 (-500 -2000) (3500 3000))
+   rect(l1 (-1501 -1501) (2 2))
+   rect(l1 (-18501 -501) (3500 1000))
+   rect(l3 (6500 -1000) (1000 1000))
+   rect(l3 (-8500 -1000) (1000 1000))
+   rect(l4 (-1000 -1000) (8500 1000))
+   rect(l2 (-11000 -1000) (1000 1000))
+  )
+
+  # Subcircuits and their connections
+  circuit(1 CHIP location(0 0)
+   pin(0 1)
+   pin(1 2)
+   pin(2 7)
+   pin(3 3)
+   pin(4 4)
+   pin(5 5)
+   pin(6 8)
+   pin(7 6)
+  )
+
+ )
+)
+
+# Reference netlist
+reference(
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(CHIP
+
+  # Outgoing pins and their connections to nets
+  pin(name(PAD1))
+  pin(name(PAD2))
+  pin(name(PAD3))
+  pin(name(PAD4))
+  pin(name(PAD5))
+  pin(name(PAD6))
+  pin(name(PAD7))
+  pin(name(PAD8))
+
+ )
+ circuit(TOP
+
+  # Nets
+  net(1 name('1'))
+  net(2 name('2'))
+  net(3 name('3'))
+  net(4 name('4'))
+  net(5 name('5'))
+  net(6 name('6'))
+  net(7 name('7'))
+  net(8 name('8'))
+
+  # Subcircuits and their connections
+  circuit(1 CHIP name('1')
+   pin(0 1)
+   pin(1 2)
+   pin(2 3)
+   pin(3 4)
+   pin(4 5)
+   pin(5 6)
+   pin(6 7)
+   pin(7 8)
+  )
+
+ )
+)
+
+# Cross reference
+xref(
+ circuit(CHIP CHIP match
+  xref(
+   pin(4 0 match)
+   pin(3 1 match)
+   pin(0 2 match)
+   pin(1 3 match)
+   pin(2 4 match)
+   pin(6 5 match)
+   pin(7 6 match)
+   pin(5 7 match)
+  )
+ )
+ circuit(TOP TOP match
+  xref(
+   net(4 1 match)
+   net(3 2 match)
+   net(1 3 match)
+   net(2 4 match)
+   net(7 5 match)
+   net(8 6 match)
+   net(6 7 match)
+   net(5 8 match)
+   circuit(1 1 match)
+  )
+ )
+)

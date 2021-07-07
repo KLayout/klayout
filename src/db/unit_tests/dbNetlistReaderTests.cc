@@ -550,3 +550,43 @@ TEST(13_NoGlobalNetsIfNotUsed)
   );
 }
 
+TEST(14_IncludeWithError)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader14.cir");
+
+  try {
+    db::NetlistSpiceReader reader;
+    tl::InputStream is (path);
+    reader.read (is, nl);
+    EXPECT_EQ (true, false);  //  must not happen
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "'M' element must have four nodes in " + std::string (tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader14x.cir")) + ", line 3");
+  }
+}
+
+TEST(15_ContinuationWithBlanks)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader15.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit SUBCKT ($1=$1,'A[5]<1>'='A[5]<1>','V42(%)'='V42(%)',Z=Z,GND=GND,GND$1=GND$1);\n"
+    "  subcircuit HVPMOS D_$1 ($1='V42(%)',$2=$3,$3=Z,$4=$1);\n"
+    "  subcircuit HVPMOS D_$2 ($1='V42(%)',$2='A[5]<1>',$3=$3,$4=$1);\n"
+    "  subcircuit HVNMOS D_$3 ($1=GND,$2=$3,$3=GND,$4=GND$1);\n"
+    "  subcircuit HVNMOS D_$4 ($1=GND,$2=$3,$3=Z,$4=GND$1);\n"
+    "  subcircuit HVNMOS D_$5 ($1=GND,$2='A[5]<1>',$3=$3,$4=GND$1);\n"
+    "end;\n"
+    "circuit HVPMOS ($1=(null),$2=(null),$3=(null),$4=(null));\n"
+    "end;\n"
+    "circuit HVNMOS ($1=(null),$2=(null),$3=(null),$4=(null));\n"
+    "end;\n"
+  );
+}

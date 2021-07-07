@@ -113,6 +113,10 @@ NetlistCrossReference::other_net_for (const db::Net *net) const
 const NetlistCrossReference::PerNetData *
 NetlistCrossReference::per_net_data_for (const std::pair<const db::Net *, const db::Net *> &nets) const
 {
+  if (! nets.first && ! nets.second) {
+    return 0;
+  }
+
   std::map<std::pair<const db::Net *, const db::Net *>, PerNetData>::iterator i = m_per_net_data.find (nets);
   if (i == m_per_net_data.end ()) {
     i = m_per_net_data.insert (std::make_pair (nets, PerNetData ())).first;
@@ -628,11 +632,13 @@ NetlistCrossReference::build_subcircuit_pin_refs (const std::pair<const db::Net 
 void
 NetlistCrossReference::build_per_net_info (const std::pair<const db::Net *, const db::Net *> &nets, PerNetData &data) const
 {
-  if (! nets.second) {
+  if (! nets.first && ! nets.second) {
+    //  .. nothing ..
+  } else if (! nets.second) {
     init_data_from_single (nets.first, data, true);
   } else if (! nets.first) {
     init_data_from_single (nets.second, data, false);
-  } else if (nets.first) {
+  } else {
     build_terminal_refs (nets, data);
     build_pin_refs (nets, data);
     build_subcircuit_pin_refs (nets, data);

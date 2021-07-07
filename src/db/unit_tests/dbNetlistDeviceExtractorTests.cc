@@ -25,6 +25,7 @@
 #include "dbReader.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbNetlistDeviceExtractorClasses.h"
+#include "dbNetlistDeviceClasses.h"
 
 #include "tlUnitTest.h"
 #include "tlFileUtils.h"
@@ -88,6 +89,67 @@ TEST(2_NetlistDeviceExtractorErrors)
   EXPECT_EQ (error2string (errors [1]), ":::(0,1;0,3;2,3;2,1):msg2");
   EXPECT_EQ (error2string (errors [2]), ":cat1:desc1:():msg1");
   EXPECT_EQ (error2string (errors [3]), ":cat1:desc1:(10,11;10,13;12,13;12,11):msg3");
+}
+
+namespace {
+
+class MyDeviceClass
+  : public db::DeviceClassMOS3Transistor
+{
+public:
+  MyDeviceClass () : db::DeviceClassMOS3Transistor () { }
+};
+
+}
+
+TEST(3_ClassFactoryTest)
+{
+  db::Layout ly;
+
+  {
+    db::LoadLayoutOptions options;
+
+    std::string fn (tl::testdata ());
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "mos3_1.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("LABEL"));
+
+  //  original layers
+  db::Region l1 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(1, 0))), dss);
+  db::Region l2 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(2, 0))), dss);
+  db::Region o1 (dss);
+  db::Region o2 (dss);
+  db::Region o3 (dss);
+
+  //  perform the extraction
+
+  db::Netlist nl;
+  db::hier_clusters<db::NetShape> cl;
+
+  db::NetlistDeviceExtractorMOS3Transistor ex ("MOS3", false, new db::device_class_factory<MyDeviceClass> ());
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["SD"] = &l1;
+  dl["G"] = &l2;
+  dl["tS"] = &o1;
+  dl["tD"] = &o2;
+  dl["tG"] = &o3;
+  ex.extract (dss, 0, dl, nl, cl);
+
+  //  the generated objects are of MyDeviceClassType
+  EXPECT_EQ (dynamic_cast<const MyDeviceClass *> (ex.device_class ()) != 0, true);
+  EXPECT_EQ (dynamic_cast<const MyDeviceClass *> (nl.device_class_by_name ("MOS3")) != 0, true);
 }
 
 TEST(10_MOS3DeviceExtractorTest)

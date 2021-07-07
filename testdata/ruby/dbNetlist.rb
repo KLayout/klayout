@@ -63,6 +63,13 @@ class DBNetlist_TestClass < TestBase
     assert_equal(nl.circuit_by_cell_index(17).inspect, "nil")
     assert_equal(nl.circuit_by_name("DOESNOTEXIST").inspect, "nil")
 
+    assert_equal(nl.is_case_sensitive?, true)
+    assert_equal(nl.circuit_by_name("xyz").inspect, "nil")
+    nl.case_sensitive = false
+    assert_equal(nl.is_case_sensitive?, false)
+    assert_equal(nl.circuit_by_name("xyz").name, "XYZ")
+    nl.case_sensitive = true
+
     cc = RBA::Circuit::new
     assert_equal(cc.dont_purge, false)
     cc.dont_purge = true
@@ -103,6 +110,11 @@ class DBNetlist_TestClass < TestBase
     assert_equal(names, [ c.name, cc.name ])
 
     assert_equal(nl.circuits_by_name("X*").collect { |x| x.name }, [ "XYZ" ])
+    assert_equal(nl.circuits_by_name("x*").collect { |x| x.name }, [])
+    nl.case_sensitive = false
+    assert_equal(nl.circuits_by_name("X*").collect { |x| x.name }, [ "XYZ" ])
+    assert_equal(nl.circuits_by_name("x*").collect { |x| x.name }, [ "XYZ" ])
+    nl.case_sensitive = true
     assert_equal(nl.circuits_by_name("???").collect { |x| x.name }, [ "XYZ", "UVW" ])
     assert_equal(nl.circuits_by_name("*").collect { |x| x.name }, [ "XYZ", "UVW" ])
     assert_equal(nl.circuits_by_name("P*").collect { |x| x.name }, [])
@@ -124,13 +136,13 @@ class DBNetlist_TestClass < TestBase
   def test_2_NetlistBasicDeviceClass
 
     nl = RBA::Netlist::new
-    c = RBA::GenericDeviceClass::new
+    c = RBA::DeviceClass::new
     nl.add(c)
 
     c.name = "XYZ"
     assert_equal(c.name, "XYZ")
 
-    cc = RBA::GenericDeviceClass::new
+    cc = RBA::DeviceClass::new
 
     begin
       nl.remove(cc) # not in netlist yet
@@ -158,7 +170,7 @@ class DBNetlist_TestClass < TestBase
     nl.each_device_class { |i| names << i.name }
     assert_equal(names, [ c.name ])
 
-    cc = RBA::GenericDeviceClass::new
+    cc = RBA::DeviceClass::new
     nl.add(cc)
     cc.name = "UVW"
 
@@ -239,7 +251,7 @@ class DBNetlist_TestClass < TestBase
 
     nl = RBA::Netlist::new
 
-    dc = RBA::GenericDeviceClass::new
+    dc = RBA::DeviceClass::new
     nl.add(dc)
     assert_equal(dc.netlist.object_id, nl.object_id)
     dc.name = "DC"
@@ -331,6 +343,8 @@ class DBNetlist_TestClass < TestBase
     assert_equal(net.terminal_count, 1)
 
     assert_equal(d1.net_for_terminal(1).name, "NET")
+    assert_equal(d1.net_for_terminal("B").name, "NET")
+    assert_equal(d1.net_for_terminal("X").inspect, "nil")
     assert_equal(d1.net_for_terminal(0).inspect, "nil")
 
     d1.disconnect_terminal("B")
@@ -574,11 +588,11 @@ class DBNetlist_TestClass < TestBase
 
   end
 
-  def test_7_GenericDeviceClass
+  def test_7_DeviceClass
 
     nl = RBA::Netlist::new
 
-    dc = RBA::GenericDeviceClass::new
+    dc = RBA::DeviceClass::new
     nl.add(dc)
     dc.name = "DC"
     assert_equal(dc.name, "DC")
@@ -698,7 +712,14 @@ class DBNetlist_TestClass < TestBase
     assert_equal(c.net_by_cluster_id(17).name, "NET1")
     assert_equal(c.net_by_cluster_id(42).inspect, "nil")
     assert_equal(c.net_by_name("NET1").name, "NET1")
+    assert_equal(c.nets_by_name("NET*").collect(&:name), ["NET1"])
     assert_equal(c.net_by_name("DOESNOTEXIST").inspect, "nil")
+    assert_equal(c.nets_by_name("DOESNOTEXIST").collect(&:name), [])
+
+    assert_equal(c.net_by_name("net1").inspect, "nil")
+    nl.case_sensitive = false
+    assert_equal(c.net_by_name("net1").name, "NET1")
+    nl.case_sensitive = true
 
     net2 = c.create_net
     net2.name = "NET2"
@@ -706,6 +727,12 @@ class DBNetlist_TestClass < TestBase
     names = []
     c.each_net { |n| names << n.name }
     assert_equal(names, [ "NET1", "NET2" ])
+    assert_equal(c.nets_by_name("NET*").collect(&:name), ["NET1", "NET2"])
+    assert_equal(c.nets_by_name("net*").collect(&:name), [])
+    nl.case_sensitive = false
+    assert_equal(c.nets_by_name("NET*").collect(&:name), ["NET1", "NET2"])
+    assert_equal(c.nets_by_name("net*").collect(&:name), ["NET1", "NET2"])
+    nl.case_sensitive = true
 
     assert_equal(net1.pin_count, 0)
     c.connect_pin(pina1, net1)
@@ -756,7 +783,7 @@ class DBNetlist_TestClass < TestBase
 
     nl = RBA::Netlist::new
 
-    dc = RBA::GenericDeviceClass::new
+    dc = RBA::DeviceClass::new
     dc.name = "DC"
     nl.add(dc)
 

@@ -3,9 +3,9 @@
 
 <doc>
 
-  <title>LVS Devices Extractors</title>
+  <title>LVS Device Extractors</title>
   <keyword name="LVS"/>
-  <keyword name="LVS Devices Extractors"/>
+  <keyword name="LVS Device Extractors"/>
 
   <h2-index/>
 
@@ -343,6 +343,65 @@ extract_devices(bjt3(model_name), { "C" => collector, "B" => base, "E" => emitte
 
   <p>
   <img src="/manual/bjtlat_ex_ts.png"/>
+  </p>
+
+  <h2>Device extractors and device classes</h2>
+
+  <p>
+  "extract_devices" will return the <class_doc href="DeviceClass">DeviceClass</class_doc> object of the devices generated.
+  This object can be useful to apply some basic modifications.
+  The most important of them is enabling or disabling certain parameters.
+  </p>
+
+  <p>
+  Most device extractors extract more parameters than they give you by default.
+  For example, the resistor extractor will not just extract the resistance, but also the length (L)
+  and width (W) of the resistor stripe and its area (A) and perimeter (P).
+  By default these additional parameters are declared "secondary" - i.e. they will not 
+  participate in the device compare and will not be netlisted.
+  </p>
+
+  <p>
+  Parameters can be fully enabled by using "enable_parameter" on the device class.
+  Hence it is possible to enable "W" and "L" on a resistor type using the following code:
+  </p>
+
+  <pre>dc = extract_devices(resistor("RES", 1), ...)
+dc.enable_parameter("W", true)
+dc.enable_parameter("L", true)
+</pre>
+
+  <p>
+  This will modify the parameters of the generated device class such that "W" and "L" are
+  fully enabled parameters.
+  </p>
+
+  <p>
+  Another way of customizing the built-in device extractors is to
+  supply a custom device class. The following code creates a new 
+  resistor class which changes the preconfigured device parameter definitions
+  to enable "W" and "L".
+  </p>
+
+  <pre>class MyResistor &lt; RBA::DeviceClassResistor
+  def initialize
+    super
+    enable_parameter("W", true)
+    enable_parameter("L", true)
+  end
+end
+
+...
+
+extract_devices(resistor("RES", 1, MyResistor), ...)
+</pre>
+
+  <p>
+  The effect of this code is the same than the first one, but using a custom
+  device class opens the option to supply additional parameters for example
+  or to implement some entirely new device while using the extraction
+  mechanics of the resistor extractor. The only requirement is compatibility of
+  the parameter and terminal definitions.
   </p>
 
 </doc>

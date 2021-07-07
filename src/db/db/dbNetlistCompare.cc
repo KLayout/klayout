@@ -776,8 +776,9 @@ public:
     {
       if (is_for_subcircuit ()) {
         const db::SubCircuit *sc = subcircuit_pair ().first;
+        size_t pin_id = std::numeric_limits<size_t>::max () - m_id1;
         const db::Circuit *c = sc->circuit_ref ();
-        return std::string ("X") + sc->expanded_name () + " " + c->name ();
+        return std::string ("X") + sc->expanded_name () + " " + c->name () + " " + c->pin_by_id (pin_id)->expanded_name () + " (virtual)";
      } else {
         size_t term_id1 = m_id1;
         size_t term_id2 = m_id2;
@@ -1010,6 +1011,14 @@ public:
     std::map<const db::Net *, size_t>::const_iterator j = m_net_index.find (net);
     tl_assert (j != m_net_index.end ());
     return j->second;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether there is a node for the given net
+   */
+  bool has_node_index_for_net (const db::Net *net) const
+  {
+    return m_net_index.find (net) != m_net_index.end ();
   }
 
   /**
@@ -2879,9 +2888,16 @@ NetlistComparer::exclude_resistors (double threshold)
 }
 
 void
-NetlistComparer::same_nets (const db::Net *na, const db::Net *nb)
+NetlistComparer::same_nets (const db::Net *na, const db::Net *nb, bool must_match)
 {
-  m_same_nets [std::make_pair (na->circuit (), nb->circuit ())].push_back (std::make_pair (na, nb));
+  tl_assert (na && na);
+  m_same_nets [std::make_pair (na->circuit (), nb->circuit ())].push_back (std::make_pair (std::make_pair (na, nb), must_match));
+}
+
+void
+NetlistComparer::same_nets (const db::Circuit *ca, const db::Circuit *cb, const db::Net *na, const db::Net *nb, bool must_match)
+{
+  m_same_nets [std::make_pair (ca, cb)].push_back (std::make_pair (std::make_pair (na, nb), must_match));
 }
 
 void
@@ -3113,9 +3129,9 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
     tl_assert (i->second.second.size () == size_t (1));
     const db::Circuit *cb = i->second.second.front ();
 
-    std::vector<std::pair<const Net *, const Net *> > empty;
-    const std::vector<std::pair<const Net *, const Net *> > *net_identity = &empty;
-    std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<const Net *, const Net *> > >::const_iterator sn = m_same_nets.find (std::make_pair (ca, cb));
+    std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > empty;
+    const std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > *net_identity = &empty;
+    std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > >::const_iterator sn = m_same_nets.find (std::make_pair (ca, cb));
     if (sn != m_same_nets.end ()) {
       net_identity = &sn->second;
     }
@@ -3168,14 +3184,16 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 }
 
 static
-std::vector<size_t> collect_pins_with_empty_nets (const db::Circuit *c, CircuitPinMapper *circuit_pin_mapper)
+std::vector<size_t> collect_anonymous_empty_pins (const db::Circuit *c, CircuitPinMapper *circuit_pin_mapper)
 {
   std::vector<size_t> pins;
 
   for (db::Circuit::const_pin_iterator p = c->begin_pins (); p != c->end_pins (); ++p) {
-    const db::Net *net = c->net_for_pin (p->id ());
-    if ((! net || net->is_passive ()) && ! circuit_pin_mapper->is_mapped (c, p->id ())) {
-      pins.push_back (p->id ());
+    if (p->name ().empty () && ! circuit_pin_mapper->is_mapped (c, p->id ())) {
+      const db::Net *net = c->net_for_pin (p->id ());
+      if (! net || net->is_passive ()) {
+        pins.push_back (p->id ());
+      }
     }
   }
 
@@ -3185,13 +3203,11 @@ std::vector<size_t> collect_pins_with_empty_nets (const db::Circuit *c, CircuitP
 void
 NetlistComparer::derive_pin_equivalence (const db::Circuit *ca, const db::Circuit *cb, CircuitPinMapper *circuit_pin_mapper)
 {
-  //  TODO: All pins with empty nets are treated as equivalent - this as a quick way to
-  //  treat circuits abstracts, although it's not really valid. By doing this, we
-  //  don't capture the case of multiple (abstract) subcircuits wired in different ways.
+  //  NOTE: All unnamed pins with empty nets are treated as equivalent. There is no other criterion to match these pins.
 
   std::vector<size_t> pa, pb;
-  pa = collect_pins_with_empty_nets (ca, circuit_pin_mapper);
-  pb = collect_pins_with_empty_nets (cb, circuit_pin_mapper);
+  pa = collect_anonymous_empty_pins (ca, circuit_pin_mapper);
+  pb = collect_anonymous_empty_pins (cb, circuit_pin_mapper);
 
   circuit_pin_mapper->map_pins (ca, pa);
   circuit_pin_mapper->map_pins (cb, pb);
@@ -3524,7 +3540,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
                                    db::DeviceCategorizer &device_categorizer,
                                    db::CircuitCategorizer &circuit_categorizer,
                                    db::CircuitPinMapper &circuit_pin_mapper,
-                                   const std::vector<std::pair<const Net *, const Net *> > &net_identity,
+                                   const std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > &net_identity,
                                    bool &pin_mismatch,
                                    std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping,
                                    std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const
@@ -3537,18 +3553,52 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   //  NOTE: for normalization we map all subcircuits of c1 to c2.
   //  Also, pin swapping will only happen there.
+  if (options ()->debug_netgraph) {
+    tl::info << "Netlist graph:";
+  }
   g1.build (c1, device_categorizer, circuit_categorizer, device_filter, &c12_circuit_and_pin_mapping, &circuit_pin_mapper);
+  if (options ()->debug_netgraph) {
+    tl::info << "Other netlist graph:";
+  }
   g2.build (c2, device_categorizer, circuit_categorizer, device_filter, &c22_circuit_and_pin_mapping, &circuit_pin_mapper);
 
   //  Match dummy nodes for null nets
   g1.identify (0, 0);
   g2.identify (0, 0);
 
-  for (std::vector<std::pair<const Net *, const Net *> >::const_iterator p = net_identity.begin (); p != net_identity.end (); ++p) {
-    size_t ni1 = g1.node_index_for_net (p->first);
-    size_t ni2 = g2.node_index_for_net (p->second);
-    g1.identify (ni1, ni2);
-    g2.identify (ni2, ni1);
+  for (std::vector<std::pair<std::pair<const Net *, const Net *>, bool> >::const_iterator p = net_identity.begin (); p != net_identity.end (); ++p) {
+
+    //  NOTE: nets may vanish, hence there
+    if (g1.has_node_index_for_net (p->first.first) && g2.has_node_index_for_net (p->first.second)) {
+
+      size_t ni1 = g1.node_index_for_net (p->first.first);
+      size_t ni2 = g2.node_index_for_net (p->first.second);
+      g1.identify (ni1, ni2);
+      g2.identify (ni2, ni1);
+
+      //  in must_match mode, check if the nets are identical
+      if (p->second && ! (g1.node(ni1) == g2.node(ni2))) {
+        mp_logger->net_mismatch (p->first.first, p->first.second);
+      } else {
+        mp_logger->match_nets (p->first.first, p->first.second);
+      }
+
+    } else if (p->second && g1.has_node_index_for_net (p->first.first)) {
+
+      mp_logger->net_mismatch (p->first.first, 0);
+
+      size_t ni1 = g1.node_index_for_net (p->first.first);
+      g1.identify (ni1, 0);
+
+    } else if (p->second && g2.has_node_index_for_net (p->first.second)) {
+
+      mp_logger->net_mismatch (0, p->first.second);
+
+      size_t ni2 = g2.node_index_for_net (p->first.second);
+      g2.identify (ni2, 0);
+
+    }
+
   }
 
   int iter = 0;
@@ -3851,7 +3901,7 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
           mp_logger->match_pins (p.operator-> (), fp->second);
         }
         c12_pin_mapping.map_pin (p->id (), fp->second->id ());
-        c22_pin_mapping.map_pin (fp->second->id (), p->id ());
+        c22_pin_mapping.map_pin (fp->second->id (), fp->second->id ());
 
       } else if (next_abstract != abstract_pins2.end ()) {
 
@@ -3861,7 +3911,7 @@ NetlistComparer::do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g
           mp_logger->match_pins (p.operator-> (), *next_abstract);
         }
         c12_pin_mapping.map_pin (p->id (), (*next_abstract)->id ());
-        c22_pin_mapping.map_pin ((*next_abstract)->id (), p->id ());
+        c22_pin_mapping.map_pin ((*next_abstract)->id (), (*next_abstract)->id ());
 
         ++next_abstract;
 
@@ -4470,7 +4520,9 @@ NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
   std::map<const db::Circuit *, CircuitMapper> circuit_and_pin_mapping;
 
   db::NetGraph graph;
-  graph.build (circuit, *mp_device_categorizer, *mp_circuit_categorizer, device_filter, &circuit_and_pin_mapping, &circuit_pin_mapper);
+  db::CircuitCategorizer circuit_categorizer;
+  db::DeviceCategorizer device_categorizer;
+  graph.build (circuit, device_categorizer, circuit_categorizer, device_filter, &circuit_and_pin_mapping, &circuit_pin_mapper);
 
   //  sort the nodes so we can easily identify the identical ones (in terms of topology)
   //  nodes are identical if the attached devices and circuits are of the same kind and with the same parameters

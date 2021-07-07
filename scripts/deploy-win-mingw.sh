@@ -141,7 +141,9 @@ echo "Installing plugins .."
 for p in $plugins; do
   cp -R $mingw_inst/share/qt5/plugins/$p $target
   # remove the debug versions - otherwise they pull in the debug Qt libs
-  rm $target/$p/*d.dll
+  shopt -s nullglob
+  rm -f $target/$p/*d.dll $target/$p/*.dll.debug
+  shopt -u nullglob
 done
 
 # ----------------------------------------------------------

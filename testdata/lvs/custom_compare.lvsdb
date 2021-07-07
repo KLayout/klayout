@@ -53,8 +53,8 @@ layout(
   device(1 D$RES
    location(7520 4175)
    param(R 51)
-   param(L 25.5)
-   param(W 0.5)
+   param(L 12.75)
+   param(W 0.25)
    param(A 3.1875)
    param(P 26)
    terminal(A 2)

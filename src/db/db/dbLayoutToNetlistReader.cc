@@ -236,10 +236,9 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
       std::string class_name, templ_name;
       read_word_or_quoted (class_name);
       read_word_or_quoted (templ_name);
-      br.done ();
 
       if (netlist->device_class_by_name (class_name) != 0) {
-        throw tl::Exception (tl::to_string (tr ("Device class must be defined before being used in device")));
+        throw tl::Exception (tl::to_string (tr ("Duplicate definition of device class: ")) + class_name);
       }
 
       db::DeviceClassTemplateBase *dct = db::DeviceClassTemplateBase::template_by_name (templ_name);
@@ -250,6 +249,52 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
       db::DeviceClass *dc = dct->create ();
       dc->set_name (class_name);
       netlist->add_device_class (dc);
+
+      while (br) {
+
+        if (test (skeys::terminal_key) || test (lkeys::terminal_key)) {
+
+          Brace br (this);
+
+          std::string terminal_name;
+          read_word_or_quoted (terminal_name);
+          if (! dc->has_terminal_with_name (terminal_name)) {
+            db::DeviceTerminalDefinition td;
+            td.set_name (terminal_name);
+            dc->add_terminal_definition (td);
+          }
+
+          br.done ();
+
+        } else if (test (skeys::param_key) || test (lkeys::param_key)) {
+
+          Brace br (this);
+
+          std::string param_name;
+          read_word_or_quoted (param_name);
+          int primary = read_int ();
+          int default_value = read_double ();
+          if (! dc->has_parameter_with_name (param_name)) {
+            db::DeviceParameterDefinition pd;
+            pd.set_name (param_name);
+            pd.set_is_primary (primary);
+            pd.set_default_value (default_value);
+            dc->add_parameter_definition (pd);
+          } else {
+            db::DeviceParameterDefinition *pd = dc->parameter_definition_non_const (dc->parameter_id_for_name (param_name));
+            pd->set_default_value (default_value);
+            pd->set_is_primary (primary);
+          }
+
+          br.done ();
+
+        } else {
+          throw tl::Exception (tl::to_string (tr ("Invalid keyword")));
+        }
+
+      }
+
+      br.done ();
 
     } else if (l2n && (test (skeys::connect_key) || test (lkeys::connect_key))) {
 

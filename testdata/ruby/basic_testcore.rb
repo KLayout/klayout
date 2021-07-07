@@ -894,8 +894,10 @@ class Basic_TestClass < TestBase
 
   end
 
-  # TODO: this class is going to be deprecated
-  class X < Data
+  if RUBY_VERSION < "3.0.0"
+    # TODO: this class is going to be deprecated
+    class X < Data
+    end
   end
   class Y < Object
   end
@@ -907,12 +909,14 @@ class Basic_TestClass < TestBase
     end
 
     # Test, if this throws an error (object of class X passed to A argument):
-    begin
-      b = RBA::B.new
-      assert_equal( b.b4( X.new ), "b4_result: -6" )
-      assert_equal( false, true )  # this must never hit
-    rescue
-      assert_equal( $!.to_s(), "allocator undefined for Basic_TestClass::X" );
+    if RUBY_VERSION < "3.0.0"
+      begin
+        b = RBA::B.new
+        assert_equal( b.b4( X.new ), "b4_result: -6" )
+        assert_equal( false, true )  # this must never hit
+      rescue
+        assert_equal( $!.to_s(), "allocator undefined for Basic_TestClass::X" );
+      end
     end
   
     # Test, if this throws an error (object of class X passed to A argument):

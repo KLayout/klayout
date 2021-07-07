@@ -1,0 +1,118 @@
+#%lvsdb-klayout
+
+# Layout
+layout(
+ top(Rre)
+ unit(0.001)
+
+ # Layer section
+ # This section lists the mask layers (drawing or derived) and their connections.
+
+ # Mask layers
+ layer(l3 '15/0')
+ layer(l4 '16/3')
+ layer(l1)
+
+ # Mask layer connectivity
+ connect(l3 l3 l1)
+ connect(l4 l1)
+ connect(l1 l3 l4 l1)
+
+ # Device class section
+ class(RR1 RES
+  param(L 1 0)
+  param(W 1 0)
+ )
+
+ # Device abstracts section
+ # Device abstracts list the pin shapes of the devices.
+ device(D$RR1 RR1
+  terminal(A
+   rect(l1 (-3160 -300) (160 600))
+  )
+  terminal(B
+   rect(l1 (3000 -300) (160 600))
+  )
+ )
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(Rre
+
+  # Circuit boundary
+  rect((5270 1210) (6320 600))
+
+  # Nets with their geometries
+  net(1 name('gnd!')
+   rect(l3 (5295 1230) (120 560))
+   text(l4 'gnd!' (-60 -60))
+   rect(l1 (-70 -505) (125 570))
+   rect(l1 (-140 -585) (160 600))
+  )
+  net(2 name('vdd!')
+   rect(l3 (11455 1240) (120 540))
+   text(l4 'vdd!' (-65 -60))
+   rect(l1 (-65 -495) (125 560))
+   rect(l1 (-140 -575) (160 600))
+  )
+
+  # Outgoing pins and their connections to nets
+  pin(1 name('gnd!'))
+  pin(2 name('vdd!'))
+
+  # Devices and their connections
+  device(1 D$RR1
+   location(8430 1510)
+   param(R 10)
+   param(L 6)
+   param(W 0.6)
+   param(A 3.6)
+   param(P 13.2)
+   terminal(A 1)
+   terminal(B 2)
+  )
+
+ )
+)
+
+# Reference netlist
+reference(
+
+ # Device class section
+ class(RR1 RES)
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(RRE
+
+  # Nets
+  net(1 name('VDD!'))
+  net(2 name('GND!'))
+
+  # Devices and their connections
+  device(1 RR1
+   name(R0)
+   param(R 10)
+   param(L 6)
+   param(W 0.6)
+   param(A 0)
+   param(P 0)
+   terminal(A 1)
+   terminal(B 2)
+  )
+
+ )
+)
+
+# Cross reference
+xref(
+ circuit(Rre RRE match
+  xref(
+   net(1 2 match)
+   net(2 1 match)
+   pin(0 () match)
+   pin(1 () match)
+   device(1 1 match)
+  )
+ )
+)

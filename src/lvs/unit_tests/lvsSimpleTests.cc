@@ -233,6 +233,7 @@ TEST(25_blackbox)
   run_test (_this, "blackbox3", "blackbox_open.gds");
   run_test (_this, "blackbox4", "blackbox_short.gds");
   run_test (_this, "blackbox5", "blackbox_short_and_open.gds");
+}
 
 TEST(26_enableWandL)
 {

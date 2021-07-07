@@ -45,7 +45,7 @@ public:
  *  @brief A specific factory
  */
 template <class C>
-class DB_PUBLIC device_class_factory
+class DB_PUBLIC_TEMPLATE device_class_factory
   : public DeviceClassFactory
 {
 public:

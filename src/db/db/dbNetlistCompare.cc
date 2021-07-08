@@ -94,11 +94,43 @@ bool combined_case_sensitive (const db::Netlist *a, const db::Netlist *b)
   return csa && csb;
 }
 
-int name_compare (const db::Net *a, const db::Net *b)
+// --------------------------------------------------------------------------------------------------------------------
+//  Net name compare
+
+//  for comparing the net names also employ the pin name if one is given
+static const std::string &extended_net_name (const db::Net *n)
 {
-  return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), a->name (), b->name ());
+  if (! n->name ().empty ()) {
+    return n->name ();
+  } else if (n->begin_pins () != n->end_pins ()) {
+    return n->begin_pins ()->pin ()->name ();
+  } else {
+    return n->name ();
+  }
 }
 
+int name_compare (const db::Net *a, const db::Net *b)
+{
+  return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), extended_net_name (a), extended_net_name (b));
+}
+
+static bool net_names_are_different (const db::Net *a, const db::Net *b)
+{
+  if (! a || ! b || extended_net_name (a).empty () || extended_net_name (b).empty ()) {
+    return false;
+  } else {
+    return name_compare (a, b) != 0;
+  }
+}
+
+static bool net_names_are_equal (const db::Net *a, const db::Net *b)
+{
+  if (! a || ! b || extended_net_name (a).empty () || extended_net_name (b).empty ()) {
+    return false;
+  } else {
+    return name_compare (a, b) == 0;
+  }
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 //  DeviceCompare definition and implementation
@@ -1466,17 +1498,7 @@ NetGraphNode::net_less (const db::Net *a, const db::Net *b)
     return (a != 0) < (b != 0);
   }
   if (a != 0) {
-    if (a->pin_count () != b->pin_count ()) {
-      return a->pin_count () < b->pin_count ();
-    }
-    if (a->pin_count () > 0) {
-      const std::string &pna = a->begin_pins ()->pin ()->name ();
-      const std::string &pnb = b->begin_pins ()->pin ()->name ();
-      if (! pna.empty () && ! pnb.empty ()) {
-        return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), pna, pnb) < 0;
-      }
-    }
-    return false;
+    return a->pin_count () < b->pin_count ();
   } else {
     return false;
   }
@@ -1489,17 +1511,7 @@ NetGraphNode::edge_equal (const db::Net *a, const db::Net *b)
     return false;
   }
   if (a != 0) {
-    if (a->pin_count () != b->pin_count ()) {
-      return false;
-    }
-    if (a->pin_count () > 0) {
-      const std::string &pna = a->begin_pins ()->pin ()->name ();
-      const std::string &pnb = b->begin_pins ()->pin ()->name ();
-      if (! pna.empty () && ! pnb.empty ()) {
-        return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), pna, pnb) == 0;
-      }
-    }
-    return true;
+    return a->pin_count () == b->pin_count ();
   } else {
     return true;
   }
@@ -2324,24 +2336,6 @@ static void sort_node_range_by_best_match (const NodeRange &nr)
   }
 }
 
-static bool net_names_are_different (const db::Net *a, const db::Net *b)
-{
-  if (! a || ! b || a->name ().empty () || b->name ().empty ()) {
-    return false;
-  } else {
-    return name_compare (a, b) != 0;
-  }
-}
-
-static bool net_names_are_equal (const db::Net *a, const db::Net *b)
-{
-  if (! a || ! b || a->name ().empty () || b->name ().empty ()) {
-    return false;
-  } else {
-    return name_compare (a, b) == 0;
-  }
-}
-
 size_t
 NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, DeviceMapperForTargetNode &dm, DeviceMapperForTargetNode &dm_other, SubCircuitMapperForTargetNode &scm, SubCircuitMapperForTargetNode &scm_other, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data)
 {
@@ -2391,8 +2385,13 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
 
       std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i1 = *ii1;
 
+      //  use net names to resolve ambiguities or for passive nets
+      //  (Rationale for the latter: passive nets cannot be told apart topologically and are typical for blackbox models.
+      //  So the net name is the only differentiator)
+      bool use_name = ! data->dont_consider_net_names || i1->first->net ()->is_passive ();
+
       //  in tentative mode, reject this choice if nets are named and all other nets in the ambiguity group differ -> this favors net matching by name
-      if (! data->dont_consider_net_names && tentative) {
+      if (use_name && tentative) {
 
         bool any_matching = false;
         for (std::vector<std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator>::iterator ii2 = iters2.begin (); ii2 != iters2.end () && ! any_matching; ++ii2) {
@@ -2431,7 +2430,7 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
           continue;
         }
 
-        if (! data->dont_consider_net_names && net_names_are_equal (i1->first->net (), i2->first->net ())) {
+        if (use_name && net_names_are_equal (i1->first->net (), i2->first->net ())) {
 
           if (options ()->debug_netcompare) {
             tl::info << indent_s << "=> accepted for identical names";
@@ -2525,6 +2524,9 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
 
     //  issue the matching pairs
 
+    //  ambiguous pins
+    std::vector<size_t> pa, pb;
+
     for (std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin (); p != pairs.end (); ++p) {
 
       size_t ni = node_index_for_net (p->first->net ());
@@ -2532,25 +2534,41 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
 
       TentativeNodeMapping::map_pair (0, this, ni, data->other, other_ni, dm, dm_other, *data->device_equivalence, scm, scm_other, *data->subcircuit_equivalence, depth);
 
+      bool ambiguous = equivalent_other_nodes.has_attribute (p->second);
+
       if (options ()->debug_netcompare) {
-        if (equivalent_other_nodes.has_attribute (p->second)) {
+        if (ambiguous) {
           tl::info << indent_s << "deduced ambiguous match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
         } else {
           tl::info << indent_s << "deduced match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
         }
       }
 
-      if (data->logger) {
-        bool ambiguous = equivalent_other_nodes.has_attribute (p->second);
-        if (ambiguous) {
+      if (ambiguous) {
+        if (data->logger) {
           data->logger->match_ambiguous_nets (p->first->net (), p->second->net ());
-        } else {
-          data->logger->match_nets (p->first->net (), p->second->net ());
         }
+        for (db::Net::const_pin_iterator i = p->first->net ()->begin_pins (); i != p->first->net ()->end_pins (); ++i) {
+          pa.push_back (i->pin ()->id ());
+        }
+        for (db::Net::const_pin_iterator i = p->second->net ()->begin_pins (); i != p->second->net ()->end_pins (); ++i) {
+          pb.push_back (i->pin ()->id ());
+        }
+      } else if (data->logger) {
+        data->logger->match_nets (p->first->net (), p->second->net ());
       }
 
       ++*data->progress;
 
+    }
+
+    //  marks pins on ambiguous nets as swappable
+
+    if (! pa.empty ()) {
+      data->circuit_pin_mapper->map_pins (circuit (), pa);
+    }
+    if (! pb.empty ()) {
+      data->circuit_pin_mapper->map_pins (data->other->circuit (), pb);
     }
 
     //  And seek further from these pairs

@@ -126,31 +126,41 @@ echo Analysing installation ...
 echo.
 
 rem ----------------------------------------------------------
-rem locate MSVC 2017 on the system
+rem locate MSVC on the system
 
-set MSVC2017_COMPILER_INST=notfound
+set MSVC_COMPILER_INST=notfound
 rem VS 2017 sets exactly one install as the "main" install, so we may find MSBuild in there.
 reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\SxS\VS7" /v 15.0 /reg:32 >nul 2>nul
 if NOT ERRORLEVEL 1 (
-  for /F "tokens=1,2*" %%i in ('reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\SxS\VS7" /v 15.0 /reg:32') DO (
+  for /F "tokens=1,2*" %%i in ('reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\SxS\VS7" /v 15.0 /reg:32') do (
     if "%%i"=="15.0" (
       if exist "%%k\VC\Auxiliary\Build" (
-        set "MSVC2017_COMPILER_INST=%%k\VC\Auxiliary\Build"
-        set "msg=Found MSVC installation at !MSVC2017_COMPILER_INST!"
+        set "MSVC_COMPILER_INST=%%k\VC\Auxiliary\Build"
+        set "msg=Found MSVC installation at !MSVC_COMPILER_INST!"
         echo !msg!
       )
     )
   )
 )
 
-if "%MSVC2017_COMPILER_INST%" == "notfound" (
-  echo ERROR: Unable to find MSVC 2017 installation
+rem alternative way (VS2019)
+if "%MSVC_COMPILER_INST%" == "notfound" (
+  set vs_path=notfound
+  for /f "delims=" %%i in ('"c:\program files (x86)\microsoft visual studio\installer\vswhere" -latest -prerelease -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath -products *') do (
+    set "vs_path=%%i"
+  )
+  if not "vs_path" == "notfound" (
+    set "MSVC_COMPILER_INST=!vs_path!\vc\Auxiliary\Build"
+  )
+)
+if "%MSVC_COMPILER_INST%" == "notfound" (
+  echo ERROR: Unable to find MSVC installation
   goto :eof
 )
 if %arch% equ x64 (
-  call "%MSVC2017_COMPILER_INST%\vcvars64"
+  call "%MSVC_COMPILER_INST%\vcvars64"
 ) else (
-  call "%MSVC2017_COMPILER_INST%\vcvars32"
+  call "%MSVC_COMPILER_INST%\vcvars32"
 )
 
 rem ----------------------------------------------------------

@@ -753,23 +753,10 @@ inline unsigned int iterator_type_mask (db::object_tag< db::object_with_properti
 }
 
 template <class Sh, class StableTag>
-void 
-layer_class<Sh, StableTag>::clear (Shapes *target, db::Manager *manager)
-{
-  if (manager && manager->transacting ()) {
-    manager->queue (target, new db::layer_op<Sh, StableTag> (false /*not insert*/, m_layer.begin (), m_layer.end ()));
-  }
-  m_layer.clear ();
-}
-
-template <class Sh, class StableTag>
 LayerBase *
-layer_class<Sh, StableTag>::clone (Shapes *target, db::Manager *manager) const 
+layer_class<Sh, StableTag>::clone () const
 {
   layer_class<Sh, StableTag> *r = new layer_class<Sh, StableTag> ();
-  if (manager && manager->transacting ()) {
-    manager->queue (target, new db::layer_op<Sh, StableTag> (true /*insert*/, m_layer.begin (), m_layer.end ()));
-  }
   r->m_layer = m_layer;
   return r;
 }
@@ -877,7 +864,6 @@ layer_class<Sh, StableTag>::deref_and_transform_into (Shapes *target, const Tran
 {
   deref_and_transform_into_shapes deref_op (target);
   for (typename layer_type::iterator s = m_layer.begin (); s != m_layer.end (); ++s) {
-
     deref_op (*s, trans, pm);
   }
 }

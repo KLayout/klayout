@@ -246,12 +246,7 @@ static void insert_iter_with_trans (db::Shapes *sh, const db::RecursiveShapeIter
 
 static void insert_shapes (db::Shapes *sh, const db::Shapes &s)
 {
-  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
-  //  lock the layout against updates while inserting
-  db::LayoutLocker locker (sh->layout ());
-  for (db::Shapes::shape_iterator i = s.begin (db::ShapeIterator::All); !i.at_end(); ++i) {
-    sh->insert (*i);
-  }
+  sh->insert (s);
 }
 
 static void insert_shapes_with_flags (db::Shapes *sh, const db::Shapes &s, unsigned int flags)

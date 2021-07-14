@@ -132,6 +132,36 @@ layer_op<Sh, StableTag>::erase (Shapes *shapes)
 }
 
 // ---------------------------------------------------------------------------------------
+//  FullLayerOp implementation
+
+void
+FullLayerOp::insert (Shapes *shapes)
+{
+  for (tl::vector<LayerBase *>::iterator l = shapes->get_layers ().end (); l != shapes->get_layers ().begin (); ) {
+    --l;
+    if (*l == mp_layer) {
+      return;
+    }
+  }
+  shapes->get_layers ().push_back (mp_layer);
+  shapes->invalidate_state ();
+  m_owns_layer = false;
+}
+
+void
+FullLayerOp::erase (Shapes *shapes)
+{
+  for (tl::vector<LayerBase *>::iterator l = shapes->get_layers ().begin (); l != shapes->get_layers ().end (); ++l) {
+    if (*l == mp_layer) {
+      shapes->get_layers ().erase (l);
+      shapes->invalidate_state ();
+      m_owns_layer = true;
+      break;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------
 //  Shapes implementation
 
 Shapes &
@@ -156,10 +186,16 @@ Shapes::layout () const
 }
 
 void
+Shapes::check_is_editable_for_undo_redo () const
+{
+  if (! is_editable ()) {
+    throw tl::Exception (tl::to_string (tr ("No undo/redo support on non-editable shape lists")));
+  }
+}
+
+void
 Shapes::insert (const Shapes &d)
 {
-  //  no undo support for this currently
-  tl_assert (! manager () || ! manager ()->transacting ());
   do_insert (d);
 }
 
@@ -175,10 +211,18 @@ Shapes::do_insert (const Shapes &d)
 
     //  both shape containers reside in the same repository space - simply copy
     if (m_layers.empty ()) {
+
       m_layers.reserve (d.m_layers.size ());
       for (tl::vector<LayerBase *>::const_iterator l = d.m_layers.begin (); l != d.m_layers.end (); ++l) {
-        m_layers.push_back ((*l)->clone (this, manager ()));
+        m_layers.push_back ((*l)->clone ());
+        if (manager () && manager ()->transacting ()) {
+          check_is_editable_for_undo_redo ();
+          manager ()->queue (this, new FullLayerOp (true, m_layers.back ()));
+        }
       }
+
+      invalidate_state ();
+
     } else {
       for (tl::vector<LayerBase *>::const_iterator l = d.m_layers.begin (); l != d.m_layers.end (); ++l) {
         (*l)->insert_into (this);
@@ -939,12 +983,19 @@ void
 Shapes::clear ()
 {
   if (!m_layers.empty ()) {
+
     for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-      (*l)->clear (this, manager ());
-      delete *l;
+      if (manager () && manager ()->transacting ()) {
+        check_is_editable_for_undo_redo ();
+        manager ()->queue (this, new FullLayerOp (false, (*l)));
+      } else {
+        delete *l;
+      }
     }
+
     invalidate_state ();  //  HINT: must come before the change is done!
     m_layers.clear ();
+
   }
 }
 
@@ -1104,6 +1155,7 @@ Shapes::replace_prop_id (const Sh *pos, db::properties_id_type prop_id)
       throw tl::Exception (tl::to_string (tr ("Function 'replace' is permitted only in editable mode")));
     }
     if (manager () && manager ()->transacting ()) {
+      check_is_editable_for_undo_redo ();
       db::layer_op<Sh, db::stable_layer_tag>::queue_or_append (manager (), this, false /*not insert*/, *pos);
     }
     invalidate_state ();  //  HINT: must come before the change is done!
@@ -1123,6 +1175,7 @@ Shapes::replace_prop_id_iter (typename db::object_tag<Sh>, const Iter &iter, db:
   }
 
   if (manager () && manager ()->transacting ()) {
+    check_is_editable_for_undo_redo ();
     db::layer_op<Sh, db::stable_layer_tag>::queue_or_append (manager (), this, false /*not insert*/, *iter);
   }
   db::object_with_properties <Sh> wp (*iter, prop_id);
@@ -1190,6 +1243,7 @@ Shapes::replace_member_with_props (typename db::object_tag<Sh> tag, const shape_
       //  simple replace case
 
       if (manager () && manager ()->transacting ()) {
+        check_is_editable_for_undo_redo ();
         db::layer_op<Sh, db::stable_layer_tag>::queue_or_append (manager (), this, false /*not insert*/, *ref.basic_ptr (tag));
       }
 
@@ -1214,6 +1268,7 @@ Shapes::replace_member_with_props (typename db::object_tag<Sh> tag, const shape_
     if (! ref.with_props ()) {
 
       if (manager () && manager ()->transacting ()) {
+        check_is_editable_for_undo_redo ();
         db::layer_op<Sh, db::stable_layer_tag>::queue_or_append (manager (), this, false /*not insert*/, *ref.basic_ptr (tag));
       }
 
@@ -1234,6 +1289,7 @@ Shapes::replace_member_with_props (typename db::object_tag<Sh> tag, const shape_
         get_layer<Sh, db::stable_layer_tag> ().replace (ref.basic_iter (tag), sh);
 
         if (manager () && manager ()->transacting ()) {
+          check_is_editable_for_undo_redo ();
           db::layer_op<Sh, db::stable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, sh);
         }
 
@@ -1242,6 +1298,7 @@ Shapes::replace_member_with_props (typename db::object_tag<Sh> tag, const shape_
     } else {
 
       if (manager () && manager ()->transacting ()) {
+        check_is_editable_for_undo_redo ();
         db::layer_op<db::object_with_properties<Sh>, db::stable_layer_tag>::queue_or_append (manager (), this, false /*not insert*/, *ref.basic_ptr (typename db::object_with_properties<Sh>::tag ()));
       }
 

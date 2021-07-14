@@ -141,8 +141,7 @@ public:
     m_layer.sort ();
   }
 
-  virtual void clear (Shapes *target, db::Manager *manager);
-  virtual LayerBase *clone (Shapes *target, db::Manager *manager) const;
+  virtual LayerBase *clone () const;
   virtual void translate_into (Shapes *target, GenericRepository &rep, ArrayRepository &array_rep) const;
   virtual void translate_into (Shapes *target, GenericRepository &rep, ArrayRepository &array_rep, pm_delegate_type &pm) const;
   virtual void transform_into (Shapes *target, const Trans &trans, GenericRepository &rep, ArrayRepository &array_rep) const;

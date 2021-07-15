@@ -557,9 +557,13 @@ TEST(5)
   EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nbox 1 0 {0 0} {100 200}\nend_cell\nend_lib\n");
 
   //  switch to another LIBCELL, this time using layer 2/0
-  m.transaction ("switch_to_b");
-  l.set_technology_name ("B");
-  m.commit ();
+  if (l.is_editable ()) {
+    m.transaction ("switch_to_b");
+    l.set_technology_name ("B");
+    m.commit ();
+  } else {
+    l.set_technology_name ("B");
+  }
 
   EXPECT_EQ (l.technology_name (), "B");
   cell = &l.cell (l.cell_by_name ("LIBCELL").second);
@@ -609,9 +613,13 @@ TEST(6)
   info.pcell_parameters ["npoints"] = tl::Variant (8);
   info.pcell_parameters ["layer"] = tl::Variant (db::LayerProperties (1, 0));
 
-  m.transaction ("import");
+  if (l.is_editable ()) {
+    m.transaction ("import");
+  }
   cell = l.recover_proxy (info);
-  m.commit ();
+  if (l.is_editable ()) {
+    m.commit ();
+  }
   EXPECT_EQ (cell->get_qualified_name (), "Basic.CIRCLE");
   EXPECT_EQ (cell->get_basic_name (), "CIRCLE");
   EXPECT_EQ (cell->get_display_name (), "Basic.CIRCLE(l=1/0,r=10,n=8)");
@@ -622,10 +630,14 @@ TEST(6)
   l.get_context_info (cell->cell_index (), info2);
   info2.pcell_parameters ["actual_radius"] = tl::Variant (5.0);
 
-  m.transaction ("modify");
+  if (l.is_editable ()) {
+    m.transaction ("modify");
+  }
   db::cell_index_type ci = cell->cell_index ();
   l.recover_proxy_as (ci, info2);
-  m.commit ();
+  if (l.is_editable ()) {
+    m.commit ();
+  }
   cell = &l.cell (ci);
   EXPECT_EQ (cell->get_qualified_name (), "Basic.CIRCLE");
   EXPECT_EQ (cell->get_basic_name (), "CIRCLE");

@@ -487,6 +487,7 @@ public:
   virtual bool empty () const = 0;
   virtual void sort () = 0;
   virtual LayerBase *clone () const = 0;
+  virtual bool is_same_type (const LayerBase *other) const = 0;
   virtual void translate_into (Shapes *target, GenericRepository &rep, ArrayRepository &array_rep) const = 0;
   virtual void translate_into (Shapes *target, GenericRepository &rep, ArrayRepository &array_rep, pm_delegate_type &pm) const = 0;
   virtual void transform_into (Shapes *target, const Trans &trans, GenericRepository &rep, ArrayRepository &array_rep) const = 0;

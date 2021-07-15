@@ -333,21 +333,13 @@ void
 Cell::copy (unsigned int src, unsigned int dest)
 {
   if (src != dest) {
-    db::Shapes &dest_shapes = shapes (dest);
-    db::Cell::shape_iterator src_shape = begin (src, db::Shapes::shape_iterator::All);
-    while (! src_shape.at_end ()) {
-      dest_shapes.insert (*src_shape);
-      ++src_shape;
-    }
+    shapes (dest).insert (shapes (src));
   } else {
     //  When duplicating the layer, first create a copy to avoid problems with non-stable containers
     //  Hint: using the assignment and not the copy ctor does not copy the db::Manager association.
     db::Shapes shape_copy;
     shape_copy = shapes (src);
-    db::Shapes &dest_shapes = shapes (dest);
-    for (db::Cell::shape_iterator src_shape = shape_copy.begin (db::Shapes::shape_iterator::All); ! src_shape.at_end (); ++src_shape) {
-      dest_shapes.insert (*src_shape);
-    }
+    shapes (dest).insert (shape_copy);
   }
 }
 

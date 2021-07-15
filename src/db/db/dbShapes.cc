@@ -138,11 +138,25 @@ void
 FullLayerOp::insert (Shapes *shapes)
 {
   for (tl::vector<LayerBase *>::iterator l = shapes->get_layers ().end (); l != shapes->get_layers ().begin (); ) {
+
     --l;
+
     if (*l == mp_layer) {
+
       return;
+
+    } else if ((*l)->is_same_type (mp_layer)) {
+
+      delete (*l);
+      *l = mp_layer;
+      m_owns_layer = false;
+      shapes->invalidate_state ();
+      return;
+
     }
+
   }
+
   shapes->get_layers ().push_back (mp_layer);
   shapes->invalidate_state ();
   m_owns_layer = false;
@@ -984,7 +998,10 @@ Shapes::clear ()
 {
   if (!m_layers.empty ()) {
 
-    for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+    for (tl::vector<LayerBase *>::const_iterator l = m_layers.end (); l != m_layers.begin (); ) {
+      //  because the undo stack will do a push, we need to remove layers from the back (this is the last undo
+      //  element to be executed)
+      --l;
       if (manager () && manager ()->transacting ()) {
         check_is_editable_for_undo_redo ();
         manager ()->queue (this, new FullLayerOp (false, (*l)));

@@ -26,6 +26,7 @@
 #include "tlStaticObjects.h"
 #include "tlDeferredExecution.h"
 #include "tlObject.h"
+#include "tlTimer.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -412,12 +413,25 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
     issue_request (QUrl (tl::to_qstring (m_url)));
   }
 
-  //  TODO: progress, timeout
-  while (mp_reply == 0) {
+  //  TODO: progress
+  tl::Clock start_time = tl::Clock::current ();
+  double timeout = 10;  //  TODO: make variable
+  while (mp_reply == 0 && (tl::Clock::current() - start_time).seconds () < timeout) {
     QCoreApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
   }
 
-  if (mp_reply->error () != QNetworkReply::NoError) {
+  if (! mp_reply) {
+
+    //  Reason for this may be HTTPS initialization failure (OpenSSL)
+
+    std::string em = tl::to_string (QObject::tr ("Request creation failed"));
+    if (tl::verbosity() >= 30) {
+      tl::info << "HTTP request creation failed";
+    }
+
+    throw HttpErrorException (em, 0, m_url);
+
+  } else if (mp_reply->error () != QNetworkReply::NoError) {
 
     //  throw an error
     std::string em = tl::to_string (mp_reply->attribute (QNetworkRequest::HttpReasonPhraseAttribute).toString ());

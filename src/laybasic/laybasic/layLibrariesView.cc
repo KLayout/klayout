@@ -669,8 +669,8 @@ LibrariesView::do_update_content (int lib_index)
     mp_cell_lists.pop_back ();
   }
 
-  for (unsigned int i = imin; i < m_libraries.size () && i < (unsigned int) mp_selector->count () && i <= imax; ++i) {
-    mp_selector->setItemText (i, tl::to_qstring (display_string (i)));
+  for (size_t i = imin; i < m_libraries.size () && i < mp_selector->count () && i <= imax; ++i) {
+    mp_selector->setItemText (int (i), tl::to_qstring (display_string (int (i))));
   }
   while (mp_selector->count () < int (m_libraries.size ())) {
     mp_selector->addItem (tl::to_qstring (display_string (mp_selector->count ())));
@@ -687,11 +687,11 @@ LibrariesView::do_update_content (int lib_index)
   mp_selector->setCurrentIndex (m_active_index);
   mp_selector->setVisible (mp_cell_lists.size () > 1 && ! split_mode);
 
-  for (unsigned int i = imin; i < m_libraries.size () && i <= imax; ++i) {
+  for (size_t i = imin; i < m_libraries.size () && i <= imax; ++i) {
 
     if (m_needs_update [i]) {
 
-      mp_cell_list_headers [i]->setText (tl::to_qstring (display_string (i)));
+      mp_cell_list_headers [i]->setText (tl::to_qstring (display_string (int (i))));
 
       //  draw the cells in the level of the current cell,
       //  add an "above" entry if there is a level above.

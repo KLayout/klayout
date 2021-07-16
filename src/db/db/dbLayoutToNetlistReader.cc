@@ -797,7 +797,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
       size_t touter_id = terminal_id (dm.second, touter);
       size_t tinner_id = terminal_id (dm.second, tinner);
 
-      device->reconnected_terminals () [touter_id].push_back (db::DeviceReconnectedTerminal (size_t (device_comp_index), tinner_id));
+      device->reconnected_terminals () [(unsigned int) touter_id].push_back (db::DeviceReconnectedTerminal (size_t (device_comp_index), (unsigned int) tinner_id));
 
     } else if (test (skeys::terminal_key) || test (lkeys::terminal_key)) {
 
@@ -859,7 +859,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
   br.done ();
 
   if (id > 0) {
-    map.id2device.insert (std::make_pair (id, device.get ()));
+    map.id2device.insert (std::make_pair ((unsigned int) id, device.get ()));
   }
 
   device->set_trans (trans);
@@ -896,7 +896,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
 
       if (! device->reconnected_terminals ().empty ()) {
 
-        const std::vector<db::DeviceReconnectedTerminal> *tr = device->reconnected_terminals_for (tid);
+        const std::vector<db::DeviceReconnectedTerminal> *tr = device->reconnected_terminals_for ((unsigned int) tid);
         if (tr) {
 
           for (std::vector<db::DeviceReconnectedTerminal>::const_iterator i = tr->begin (); i != tr->end (); ++i) {
@@ -1040,7 +1040,7 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
   br.done ();
 
   if (id > 0) {
-    map.id2subcircuit.insert (std::make_pair (id, subcircuit.get ()));
+    map.id2subcircuit.insert (std::make_pair ((unsigned int) id, subcircuit.get ()));
   }
 
   subcircuit->set_name (name);

@@ -49,7 +49,7 @@ public:
    *
    *  The constructor gets the parameters that are unique for this variant.
    */
-  PCellVariant (db::cell_index_type ci, db::Layout &layout, size_t pcell_id, const pcell_parameters_type &parameters);
+  PCellVariant (db::cell_index_type ci, db::Layout &layout, db::pcell_id_type pcell_id, const pcell_parameters_type &parameters);
 
   /**
    *  @brief The destructor
@@ -83,7 +83,7 @@ public:
   /**
    *  @brief Get the PCell Id for this variant
    */
-  size_t pcell_id () const
+  db::pcell_id_type pcell_id () const
   {
     return m_pcell_id;
   }
@@ -151,7 +151,7 @@ protected:
 private:
   pcell_parameters_type m_parameters;
   mutable std::string m_display_name;
-  size_t m_pcell_id;
+  db::pcell_id_type m_pcell_id;
   bool m_registered;
 };
   

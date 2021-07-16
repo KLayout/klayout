@@ -86,13 +86,13 @@ struct cmp_cell_tree_item_vs_name_f
 // --------------------------------------------------------------------
 //  CellTreeItem implementation
 
-CellTreeItem::CellTreeItem (const db::Layout *layout, bool is_pcell, size_t cell_or_pcell_index, bool flat, CellTreeModel::Sorting s)
+CellTreeItem::CellTreeItem (const db::Layout *layout, bool is_pcell, unsigned int cell_or_pcell_index, bool flat, CellTreeModel::Sorting s)
   : mp_layout (layout), mp_parent (0), m_sorting (s), m_is_pcell (is_pcell),
     m_index (0), m_tree_index (0),
     m_children (), m_cell_or_pcell_index (cell_or_pcell_index)
 {
   if (! flat && ! is_pcell) {
-    m_child_count = int (mp_layout->cell (cell_or_pcell_index).child_cells ());
+    m_child_count = int (mp_layout->cell (db::cell_index_type (cell_or_pcell_index)).child_cells ());
   } else {
     m_child_count = 0;
   }
@@ -143,7 +143,7 @@ CellTreeItem::children () const
 int
 CellTreeItem::children_in (const std::set<const CellTreeItem *> &sel) const
 {
-  size_t count = 0;
+  int count = 0;
   for (std::vector<CellTreeItem *>::const_iterator c = m_children.begin (); c != m_children.end (); ++c) {
     if (sel.find (*c) != sel.end ()) {
       ++count;
@@ -885,7 +885,7 @@ CellTreeModel::rowCount (const QModelIndex &parent) const
     }
   } else {
     if (m_filter_mode && m_is_filtered) {
-      size_t n = 0;
+      int n = 0;
       for (std::vector <CellTreeItem *>::const_iterator i = m_toplevel.begin (); i != m_toplevel.end (); ++i) {
         if (m_visible_cell_set.find (*i) != m_visible_cell_set.end ()) {
           ++n;

@@ -253,7 +253,7 @@ TEST (2)
   EXPECT_EQ (model->rowCount (QModelIndex ()), 4);
 
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, QModelIndex ()), Qt::UserRole).toString ()), "INV2PAIRX");
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, QModelIndex ()), Qt::DisplayRole).toString ()), "- ⇔ INV2PAIRX");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, QModelIndex ()), Qt::DisplayRole).toString ()), "- \u21D4 INV2PAIRX");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, QModelIndex ()), Qt::DisplayRole).toString ()), "");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 3, QModelIndex ()), Qt::DisplayRole).toString ()), "INV2PAIRX");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, QModelIndex ()), Qt::DisplayRole).toString ()), "INV2");
@@ -308,7 +308,7 @@ TEST (2)
 
   //  first of nets in INV2 circuit
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, sn_nets), Qt::UserRole).toString ()), "$1|1");
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, sn_nets), Qt::DisplayRole).toString ()), "$1 ⇔ 1");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, sn_nets), Qt::DisplayRole).toString ()), "$1 \u21D4 1");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, sn_nets), Qt::DisplayRole).toString ()), "$1 (2)");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 3, sn_nets), Qt::DisplayRole).toString ()), "1 (2)");
 
@@ -349,7 +349,7 @@ TEST (2)
 
   //  second of nets in INV2 circuit
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, sn_nets), Qt::UserRole).toString ()), "BULK|6");
-  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, sn_nets), Qt::DisplayRole).toString ()), "BULK ⇔ 6");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, sn_nets), Qt::DisplayRole).toString ()), "BULK \u21D4 6");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 2, sn_nets), Qt::DisplayRole).toString ()), "BULK (2)");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 3, sn_nets), Qt::DisplayRole).toString ()), "6 (2)");
 
@@ -371,13 +371,13 @@ TEST (2)
 
   //  first of pins in INV2 circuit
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, sn_pins), Qt::UserRole).toString ()), "$4");
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, sn_pins), Qt::DisplayRole).toString ()), "- ⇔ $4");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, sn_pins), Qt::DisplayRole).toString ()), "- \u21D4 $4");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, sn_pins), Qt::DisplayRole).toString ()), "");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 3, sn_pins), Qt::DisplayRole).toString ()), "");
 
   //  first of nets in INV2 circuit
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, sn_nets), Qt::UserRole).toString ()), "$4");
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, sn_nets), Qt::DisplayRole).toString ()), "$4 ⇔ -");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, sn_nets), Qt::DisplayRole).toString ()), "$4 \u21D4 -");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, sn_nets), Qt::DisplayRole).toString ()), "$4 (3)");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 3, sn_nets), Qt::DisplayRole).toString ()), "");
 
@@ -401,7 +401,7 @@ TEST (2)
 
   //  The first subcircuit
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2PairNet0Index), Qt::UserRole).toString ()), "OUT|INV2|$1");
-  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2PairNet0Index), Qt::DisplayRole).toString ()), "OUT ⇔ - / <a href='int:netlist?path=1'>INV2 ⇔ -</a>");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2PairNet0Index), Qt::DisplayRole).toString ()), "OUT \u21D4 - / <a href='int:netlist?path=1'>INV2 \u21D4 -</a>");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 2, inv2PairNet0Index), Qt::DisplayRole).toString ()), "<a href='int:netlist?path=2,2,1'>$1</a>");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 3, inv2PairNet0Index), Qt::DisplayRole).toString ()), "");
 }

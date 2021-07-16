@@ -981,9 +981,9 @@ CompoundRegionLogicalCaseSelectOperationNode::result_type () const
   ResultType result = Region;
   for (size_t i = 1; i < children (); i += 2) {
     if (i == 1) {
-      result = child (i)->result_type ();
+      result = child ((unsigned int) i)->result_type ();
     } else {
-      tl_assert (result == child (i)->result_type ());
+      tl_assert (result == child ((unsigned int) i)->result_type ());
     }
   }
   return result;
@@ -1136,9 +1136,9 @@ CompoundRegionJoinOperationNode::result_type () const
   ResultType result = Region;
   for (size_t i = 0; i < children (); ++i) {
     if (i == 0) {
-      result = child (i)->result_type ();
+      result = child ((unsigned int) i)->result_type ();
     } else {
-      tl_assert (result == child (i)->result_type ());
+      tl_assert (result == child ((unsigned int) i)->result_type ());
     }
   }
   return result;

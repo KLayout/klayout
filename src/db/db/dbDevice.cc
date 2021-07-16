@@ -218,7 +218,7 @@ void Device::init_terminal_routes ()
 
   size_t n = device_class ()->terminal_definitions ().size ();
   for (size_t i = 0; i < n; ++i) {
-    m_reconnected_terminals [i].push_back (DeviceReconnectedTerminal (0, i));
+    m_reconnected_terminals [(unsigned int) i].push_back (DeviceReconnectedTerminal (0, (unsigned int) i));
   }
 }
 

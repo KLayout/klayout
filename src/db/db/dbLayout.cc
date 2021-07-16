@@ -2253,7 +2253,7 @@ Layout::register_pcell (const std::string &name, pcell_declaration_type *declara
 
   } else {
 
-    id = m_pcells.size ();
+    id = (unsigned int) m_pcells.size ();
     m_pcells.push_back (new pcell_header_type (id, name, declaration));
     m_pcell_ids.insert (std::make_pair (std::string (name), id));
 

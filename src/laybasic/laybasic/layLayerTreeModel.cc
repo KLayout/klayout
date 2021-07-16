@@ -440,7 +440,7 @@ LayerTreeModel::signal_layers_changed ()
   for (QModelIndexList::const_iterator i = indexes.begin (); i != indexes.end (); ++i) {
     lay::LayerPropertiesConstIterator li = iterator (*i);
     if (! li.at_end ()) {
-      new_indexes.push_back (createIndex (li.child_index (), i->column (), (void *) (li.uint () + m_id_start)));
+      new_indexes.push_back (createIndex (int (li.child_index ()), i->column (), (void *) (li.uint () + m_id_start)));
     } else {
       new_indexes.push_back (QModelIndex ());
     }

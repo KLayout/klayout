@@ -37,7 +37,7 @@ namespace lay
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserTreeModel implementation
 
-const std::string var_sep (" ⇔ ");
+const std::string var_sep (" \u21D4 ");
 
 static inline size_t pop (void *&idp, size_t n)
 {
@@ -287,7 +287,7 @@ NetlistBrowserTreeModel::index_from_netpath (const NetlistObjectsPath &path) con
       std::pair<const db::Circuit *, const db::Circuit *> cc = mp_indexer->child_circuit_from_index (circuit, n).first;
       if (is_compatible (sc, cc)) {
         circuit = cc;
-        idx = index (n, 0, idx);
+        idx = index (int (n), 0, idx);
         break;
       }
     }
@@ -388,7 +388,7 @@ NetlistBrowserTreeModel::index (int row, int column, const QModelIndex &parent) 
 {
   if (! parent.isValid ()) {
 
-    return createIndex (row, column, reinterpret_cast<void *> (row + 1));
+    return createIndex (row, column, reinterpret_cast<void *> (size_t (row + 1)));
 
   } else {
 

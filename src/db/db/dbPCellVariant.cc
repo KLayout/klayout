@@ -29,15 +29,15 @@
 namespace db
 {
 
-PCellVariant::PCellVariant (db::cell_index_type ci, db::Layout &layout, size_t pcell_id, const pcell_parameters_type &parameters)
+PCellVariant::PCellVariant (db::cell_index_type ci, db::Layout &layout, db::pcell_id_type pcell_id, const pcell_parameters_type &parameters)
   : Cell (ci, layout), m_parameters (parameters), m_pcell_id (pcell_id), m_registered (false)
 {
-  reregister (); // actually, no "re-register", but the first registration ..
+  PCellVariant::reregister (); // actually, no "re-register", but the first registration ..
 }
 
 PCellVariant::~PCellVariant ()
 {
-  unregister ();
+  PCellVariant::unregister ();
 }
 
 Cell *

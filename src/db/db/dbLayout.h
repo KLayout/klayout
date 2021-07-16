@@ -503,7 +503,7 @@ public:
   typedef cell_index_vector::const_iterator top_down_const_iterator;
   typedef tl::vector<cell_type *> cell_ptr_vector;
   typedef db::properties_id_type properties_id_type;
-  typedef size_t pcell_id_type;
+  typedef db::pcell_id_type pcell_id_type;
   typedef std::map<std::string, pcell_id_type> pcell_name_map;
   typedef pcell_name_map::const_iterator pcell_iterator;
   typedef std::map<std::pair<lib_id_type, cell_index_type>, cell_index_type> lib_proxy_map;

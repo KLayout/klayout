@@ -4243,12 +4243,12 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
     bool mapped = true, valid = true;
     std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_this (*sc, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, mapped, valid);
 
-    if (! mapped) {
+    if (! mapped || ! valid) {
       if (mp_logger) {
         mp_logger->subcircuit_mismatch (sc.operator-> (), 0);
       }
       good = false;
-    } else if (valid) {
+    } else {
       //  TODO: report devices which cannot be distinguished topologically?
       subcircuit_map.insert (std::make_pair (k, std::make_pair (sc.operator-> (), sc_cat)));
     }

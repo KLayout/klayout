@@ -837,6 +837,14 @@ Instance::bbox () const
 // -------------------------------------------------------------------------------------
 //  Instances implementation
 
+static void
+check_is_editable_for_undo_redo (const Instances *instances)
+{
+  if (! instances->is_editable ()) {
+    throw tl::Exception (tl::to_string (tr ("No undo/redo support on non-editable instance lists")));
+  }
+}
+
 Instances::Instances (cell_type *cell)
   : mp_cell (cell)
 {
@@ -957,6 +965,10 @@ Instances::erase_positions (Tag tag, ET editable_tag, I first, I last)
   if (mp_cell) { 
     mp_cell->invalidate_insts ();  //  HINT: must come before the change is done!
     if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+      check_is_editable_for_undo_redo (this);
+      if (! is_editable ()) {
+        throw tl::Exception (tl::to_string (tr ("No undo/redo support for non-editable instance lists in 'erase_positions'")));
+      }
       mp_cell->manager ()->queue (mp_cell, new db::InstOp<typename Tag::object_type, ET> (false /*not insert*/, first, last, true /*dummy*/));
     }
   }
@@ -973,6 +985,7 @@ Instances::insert (const InstArray &inst)
 
   if (mp_cell) {
     if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+      check_is_editable_for_undo_redo (this);
       if (editable) {
         mp_cell->manager ()->queue (mp_cell, new db::InstOp<InstArray, InstancesEditableTag> (true /*insert*/, inst));
       } else {
@@ -999,6 +1012,7 @@ Instances::insert (I from, I to)
 
   if (mp_cell) {
     if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+      check_is_editable_for_undo_redo (this);
       mp_cell->manager ()->queue (mp_cell, new db::InstOp<typename it_traits::value_type, ET> (true /*insert*/, from, to));
     }
     mp_cell->invalidate_insts ();
@@ -1049,6 +1063,7 @@ Instances::replace (const InstArray *replace, const InstArray &with)
 {
   if (mp_cell) {
     if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+      check_is_editable_for_undo_redo (this);
       if (is_editable ()) {
         mp_cell->manager ()->queue (mp_cell, new db::InstOp<InstArray, InstancesEditableTag> (false /*not insert*/, *replace));
         mp_cell->manager ()->queue (mp_cell, new db::InstOp<InstArray, InstancesEditableTag> (true /*insert*/, with));
@@ -1138,6 +1153,7 @@ Instances::erase_inst_by_iter (Tag tag, ET editable_tag, I iter)
   if (mp_cell) {
     mp_cell->invalidate_insts ();
     if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+      check_is_editable_for_undo_redo (this);
       mp_cell->manager ()->queue (mp_cell, new db::InstOp<typename Tag::object_type, ET> (false /*not insert*/, *iter));
     }
   }
@@ -1152,6 +1168,7 @@ Instances::erase_inst_by_tag (Tag tag, ET editable_tag, const typename Tag::obje
   if (mp_cell) {
     mp_cell->invalidate_insts ();
     if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+      check_is_editable_for_undo_redo (this);
       mp_cell->manager ()->queue (mp_cell, new db::InstOp<typename Tag::object_type, ET> (false /*not insert*/, obj));
     }
   }
@@ -1183,6 +1200,7 @@ Instances::clear_insts (ET editable_tag)
   if (mp_cell) {
     mp_cell->invalidate_insts ();
     if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+      check_is_editable_for_undo_redo (this);
       const Instances *const_this = this;
       if (! const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).empty ()) {
         mp_cell->manager ()->queue (mp_cell, new db::InstOp<cell_inst_array_type, ET> (false /*not insert*/, const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).begin (), const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).end ()));
@@ -1588,6 +1606,7 @@ void Instances::apply_op (const Op &op, ET editable_tag)
   if (mp_cell) {
     mp_cell->invalidate_insts ();
     if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+      check_is_editable_for_undo_redo (this);
       transacting = true;
       if (has_insts) {
         mp_cell->manager ()->queue (mp_cell, new db::InstOp<cell_inst_array_type, ET> (false /*not insert*/, const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).begin (), const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).end ()));

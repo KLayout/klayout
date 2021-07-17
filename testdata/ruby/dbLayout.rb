@@ -901,103 +901,98 @@ class DBLayout_TestClass < TestBase
     assert_equal(dump_layer(lll, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (1200,0;2200,1100); (1200,0;2200,1100); (-1200,0;-100,1000); (-1200,0;-100,1000)")
     assert_equal(dump_layer(lll, 1, "c0"), "(0,100;1000,1200); (100,0;1100,1100)")
 
-    # TODO: undo tests crashes in non-editable mode! Should be checked properly.
-    if lll.is_editable?
+    assert_equal(m.has_undo?, true)
+    assert_equal(m.has_redo?, false)
+    assert_equal(m.transaction_for_undo, "9")
 
-      assert_equal(m.has_undo?, true)
-      assert_equal(m.has_redo?, false)
-      assert_equal(m.transaction_for_undo, "9")
+    m.undo
+    assert_equal(m.has_undo?, true)
+    assert_equal(m.has_redo?, true)
+    assert_equal(m.transaction_for_undo, "8")
 
-      m.undo
-      assert_equal(m.has_undo?, true)
-      assert_equal(m.has_redo?, true)
-      assert_equal(m.transaction_for_undo, "8")
+    assert_equal(dump_layer(l, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (1200,0;2200,1100); (1200,0;2200,1100); (-1200,0;-100,1000); (-1200,0;-100,1000)")
+    assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (100,0;1100,1100)")
 
-      assert_equal(dump_layer(l, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (1200,0;2200,1100); (1200,0;2200,1100); (-1200,0;-100,1000); (-1200,0;-100,1000)")
-      assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (100,0;1100,1100)")
+    m.undo
+    assert_equal(m.has_undo?, true)
+    assert_equal(m.has_redo?, true)
+    assert_equal(m.transaction_for_undo, "7")
 
-      m.undo
-      assert_equal(m.has_undo?, true)
-      assert_equal(m.has_redo?, true)
-      assert_equal(m.transaction_for_undo, "7")
+    assert_equal(dump_layer(l, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (1200,0;2200,1100); (-1200,0;-100,1000)")
+    assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (100,0;1100,1100)")
 
-      assert_equal(dump_layer(l, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (1200,0;2200,1100); (-1200,0;-100,1000)")
-      assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (100,0;1100,1100)")
+    m.undo
+    assert_equal(m.has_undo?, true)
+    assert_equal(m.has_redo?, true)
+    assert_equal(m.transaction_for_undo, "6")
 
-      m.undo
-      assert_equal(m.has_undo?, true)
-      assert_equal(m.has_redo?, true)
-      assert_equal(m.transaction_for_undo, "6")
+    assert_equal(dump_layer(l, 0, "c0"), "(0,100;1000,1200); (1200,0;2200,1100); (-1200,0;-100,1000)")
+    assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100)")
 
-      assert_equal(dump_layer(l, 0, "c0"), "(0,100;1000,1200); (1200,0;2200,1100); (-1200,0;-100,1000)")
-      assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100)")
+    m.undo
+    assert_equal(m.has_undo?, true)
+    assert_equal(m.has_redo?, true)
+    assert_equal(m.transaction_for_undo, "5")
 
-      m.undo
-      assert_equal(m.has_undo?, true)
-      assert_equal(m.has_redo?, true)
-      assert_equal(m.transaction_for_undo, "5")
+    assert_equal(dump_layer(l, 0, "c0"), "(1200,0;2200,1100); (-1200,0;-100,1000)")
+    assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100)")
 
-      assert_equal(dump_layer(l, 0, "c0"), "(1200,0;2200,1100); (-1200,0;-100,1000)")
-      assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100)")
+    m.undo
+    assert_equal(m.has_undo?, true)
+    assert_equal(m.has_redo?, true)
+    assert_equal(m.transaction_for_undo, "4")
 
-      m.undo
-      assert_equal(m.has_undo?, true)
-      assert_equal(m.has_redo?, true)
-      assert_equal(m.transaction_for_undo, "4")
+    assert_equal(dump_layer(l, 0, "c0"), "")
+    assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
 
-      assert_equal(dump_layer(l, 0, "c0"), "")
-      assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
+    m.undo
+    assert_equal(m.has_undo?, true)
+    assert_equal(m.has_redo?, true)
+    assert_equal(m.transaction_for_undo, "3")
 
-      m.undo
-      assert_equal(m.has_undo?, true)
-      assert_equal(m.has_redo?, true)
-      assert_equal(m.transaction_for_undo, "3")
+    assert_equal(dump_layer(l, 1, "c0"), "")
+    assert_equal(dump_layer(l, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
 
-      assert_equal(dump_layer(l, 1, "c0"), "")
-      assert_equal(dump_layer(l, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
+    m.undo
+    assert_equal(m.has_undo?, true)
+    assert_equal(m.has_redo?, true)
+    assert_equal(m.transaction_for_undo, "2")
 
-      m.undo
-      assert_equal(m.has_undo?, true)
-      assert_equal(m.has_redo?, true)
-      assert_equal(m.transaction_for_undo, "2")
+    assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
+    assert_equal(dump_layer(l, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
 
-      assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
-      assert_equal(dump_layer(l, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
+    m.undo
+    assert_equal(m.has_undo?, true)
+    assert_equal(m.has_redo?, true)
+    assert_equal(m.transaction_for_undo, "1")
 
-      m.undo
-      assert_equal(m.has_undo?, true)
-      assert_equal(m.has_redo?, true)
-      assert_equal(m.transaction_for_undo, "1")
+    assert_equal(dump_layer(l, 0, "c0"), "")
+    assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
 
-      assert_equal(dump_layer(l, 0, "c0"), "")
-      assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
+    m.undo
+    assert_equal(m.has_undo?, false)
+    assert_equal(m.has_redo?, true)
+    assert_equal(m.transaction_for_redo, "1")
 
-      m.undo
-      assert_equal(m.has_undo?, false)
-      assert_equal(m.has_redo?, true)
-      assert_equal(m.transaction_for_redo, "1")
+    assert_equal(dump_layer(l, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
+    assert_equal(dump_layer(l, 1, "c0"), "")
 
-      assert_equal(dump_layer(l, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
-      assert_equal(dump_layer(l, 1, "c0"), "")
+    m.redo
+    assert_equal(m.has_undo?, true)
+    assert_equal(m.has_redo?, true)
+    assert_equal(m.transaction_for_redo, "2")
 
-      m.redo
-      assert_equal(m.has_undo?, true)
-      assert_equal(m.has_redo?, true)
-      assert_equal(m.transaction_for_redo, "2")
+    assert_equal(dump_layer(l, 0, "c0"), "")
+    assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
 
-      assert_equal(dump_layer(l, 0, "c0"), "")
-      assert_equal(dump_layer(l, 1, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
+    assert_equal(dump_layer(ll, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (1200,0;2200,1100); (1200,0;2200,1100); (-1200,0;-100,1000); (-1200,0;-100,1000)")
+    assert_equal(dump_layer(ll, 1, "c0"), "(0,100;1000,1200); (100,0;1100,1100)")
 
-      assert_equal(dump_layer(ll, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (1200,0;2200,1100); (1200,0;2200,1100); (-1200,0;-100,1000); (-1200,0;-100,1000)")
-      assert_equal(dump_layer(ll, 1, "c0"), "(0,100;1000,1200); (100,0;1100,1100)")
+    l.destroy
+    m.destroy
 
-      l.destroy
-      m.destroy
-
-      assert_equal(dump_layer(lll, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (1200,0;2200,1100); (1200,0;2200,1100); (-1200,0;-100,1000); (-1200,0;-100,1000)")
-      assert_equal(dump_layer(lll, 1, "c0"), "(0,100;1000,1200); (100,0;1100,1100)")
-
-    end
+    assert_equal(dump_layer(lll, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (1200,0;2200,1100); (1200,0;2200,1100); (-1200,0;-100,1000); (-1200,0;-100,1000)")
+    assert_equal(dump_layer(lll, 1, "c0"), "(0,100;1000,1200); (100,0;1100,1100)")
 
   end
 

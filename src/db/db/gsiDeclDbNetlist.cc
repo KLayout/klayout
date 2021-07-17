@@ -112,7 +112,7 @@ static size_t get_other_terminal_id (const db::DeviceReconnectedTerminal *obj)
   return obj->other_terminal_id;
 }
 
-static void set_other_terminal_id (db::DeviceReconnectedTerminal *obj, size_t other_terminal_id)
+static void set_other_terminal_id (db::DeviceReconnectedTerminal *obj, unsigned int other_terminal_id)
 {
   obj->other_terminal_id = other_terminal_id;
 }
@@ -201,7 +201,7 @@ static std::vector<db::DeviceReconnectedTerminal>::const_iterator begin_reconnec
 {
   static std::vector<db::DeviceReconnectedTerminal> empty;
 
-  const std::vector<db::DeviceReconnectedTerminal> *ti = device->reconnected_terminals_for (terminal_id);
+  const std::vector<db::DeviceReconnectedTerminal> *ti = device->reconnected_terminals_for ((unsigned int) terminal_id);
   if (! ti) {
     return empty.begin ();
   } else {
@@ -213,7 +213,7 @@ static std::vector<db::DeviceReconnectedTerminal>::const_iterator end_reconnecte
 {
   static std::vector<db::DeviceReconnectedTerminal> empty;
 
-  const std::vector<db::DeviceReconnectedTerminal> *ti = device->reconnected_terminals_for (terminal_id);
+  const std::vector<db::DeviceReconnectedTerminal> *ti = device->reconnected_terminals_for ((unsigned int) terminal_id);
   if (! ti) {
     return empty.end ();
   } else {
@@ -228,7 +228,7 @@ static void clear_reconnected_terminals (db::Device *device)
 
 static void add_reconnected_terminals (db::Device *device, size_t outer_terminal, const db::DeviceReconnectedTerminal &t)
 {
-  device->reconnected_terminals () [outer_terminal].push_back (t);
+  device->reconnected_terminals () [(unsigned int) outer_terminal].push_back (t);
 }
 
 static std::vector<db::DeviceAbstractRef>::const_iterator begin_other_abstracts (const db::Device *device)

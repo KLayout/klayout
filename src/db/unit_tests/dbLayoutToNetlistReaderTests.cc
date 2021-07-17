@@ -238,6 +238,8 @@ TEST(1_ReaderBasic)
 
 TEST(1b_ReaderBasicShort)
 {
+  EXPECT_EQ (true, true);   //  removes "unreferenced _this" compiler warning
+
   db::LayoutToNetlist l2n;
 
   std::string in_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_in_s.txt");

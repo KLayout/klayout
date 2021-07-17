@@ -137,8 +137,8 @@ public:
 
       for (unsigned int ir = 0; ir < (unsigned int) std::abs (rows_per_columns); ++ir) {
 
-        db::Vector dr = m_row_step * long ((rows_per_columns > 0 ? -(ir + 1) : ir) + m_row_steps);
-        db::Vector dc = m_column_step * long ((columns_per_rows > 0 ? -(ic + 1) : ic) + m_column_steps);
+        db::Vector dr = m_row_step * long ((rows_per_columns > 0 ? -int (ir + 1) : ir) + m_row_steps);
+        db::Vector dc = m_column_step * long ((columns_per_rows > 0 ? -int (ic + 1) : ic) + m_column_steps);
 
         am.reinitialize (db::Point (fp_left, fp_bottom) + dr + dc, db::Vector (ddx, ddy), m_dim, nx, ny);
 
@@ -183,7 +183,7 @@ public:
 
   unsigned int area_maps () const
   {
-    return m_area_maps.size ();
+    return (unsigned int) m_area_maps.size ();
   }
 
   const db::AreaMap &area_map (unsigned int i) const
@@ -308,7 +308,7 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
             if (remaining_parts) {
               if (am1.d ().y () == am1.p ().y ()) {
-                filled_regions.push_back (db::Polygon (db::Box (db::Point (), db::Point (am1.p ().x (), am1.p ().y () * (jj - j))).moved (kernel_origin + p0)));
+                filled_regions.push_back (db::Polygon (db::Box (db::Point (), db::Point (am1.p ().x (), am1.p ().y () * db::Coord (jj - j))).moved (kernel_origin + p0)));
               } else {
                 for (size_t k = 0; k < jj - j; ++k) {
                   filled_regions.push_back (db::Polygon (db::Box (db::Point (), db::Point () + am1.p ()).moved (kernel_origin + p0 + db::Vector (0, am1.d ().y () * db::Coord (k)))));

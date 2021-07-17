@@ -114,13 +114,15 @@ bool bs_boxes_overlap (const Box &b1, const Box &b2, typename Box::coord_type en
 template <class Obj, class Prop>
 struct box_scanner_receiver
 {
+  virtual ~box_scanner_receiver () { }
+
   /**
    *  @brief Indicates that the given object is no longer used
    *
    *  The finish method is called when an object is no longer in the queue and can be
    *  discarded.
    */
-  void finish (const Obj * /*obj*/, const Prop & /*prop*/) { }
+  virtual void finish (const Obj * /*obj*/, const Prop & /*prop*/) { }
 
   /**
    *  @brief Callback for an interaction of o1 with o2.
@@ -128,7 +130,7 @@ struct box_scanner_receiver
    *  This method is called when the object o1 interacts with o2 within the current 
    *  definition.
    */
-  void add (const Obj * /*o1*/, const Prop & /*p1*/, const Obj * /*o2*/, const Prop & /*p2*/) { }
+  virtual void add (const Obj * /*o1*/, const Prop & /*p1*/, const Obj * /*o2*/, const Prop & /*p2*/) { }
 
   /**
    *  @brief Indicates whether the scanner may stop
@@ -136,14 +138,14 @@ struct box_scanner_receiver
    *  The scanner will stop if this method returns true. This feature can be used to
    *  terminate the scan process early if the outcome is known.
    */
-  bool stop () const { return false; }
+ virtual  bool stop () const { return false; }
 
   /**
    *  @brief Pre-scanning operations
    *
    *  This method is called before the scanning starts.
    */
-  void initialize () { }
+  virtual void initialize () { }
 
   /**
    *  @brief Post-scanning operations
@@ -151,7 +153,7 @@ struct box_scanner_receiver
    *  This method is called after the scan has finished (without exception). The argument is the
    *  return value (false if "stop" stopped the process).
    */
-  void finalize (bool) { }
+  virtual void finalize (bool) { }
 };
 
 /**

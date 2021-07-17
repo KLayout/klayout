@@ -592,7 +592,7 @@ typedef size_t property_names_id_type;
 /**
  *  @brief The type of the PCell id
  */
-typedef size_t pcell_id_type;
+typedef unsigned int pcell_id_type;
 
 /**
  *  @brief The type of the library id

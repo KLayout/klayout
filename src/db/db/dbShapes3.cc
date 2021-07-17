@@ -344,6 +344,7 @@ Shapes::erase_shape_by_tag_ws (Tag /*tag*/, StableTag /*stable_tag*/, const shap
     db::layer<typename Tag::object_type, StableTag> &l = get_layer<typename Tag::object_type, StableTag> ();
     typename db::layer<typename Tag::object_type, StableTag>::iterator i = iterator_from_shape (l, shape);
     if (manager () && manager ()->transacting ()) {
+      check_is_editable_for_undo_redo ();
       db::layer_op<typename Tag::object_type, StableTag>::queue_or_append (manager (), this, false /*not insert*/, *i);
     }
     invalidate_state ();  //  HINT: must come before the change is done!
@@ -356,6 +357,7 @@ Shapes::erase_shape_by_tag_ws (Tag /*tag*/, StableTag /*stable_tag*/, const shap
     db::layer<swp_type, StableTag> &l = get_layer<swp_type, StableTag> ();
     typename db::layer<swp_type, StableTag>::iterator i = iterator_from_shape (l, shape);
     if (manager () && manager ()->transacting ()) {
+      check_is_editable_for_undo_redo ();
       db::layer_op<swp_type, StableTag>::queue_or_append (manager (), this, false /*not insert*/, *i);
     }
     invalidate_state ();  //  HINT: must come before the change is done!

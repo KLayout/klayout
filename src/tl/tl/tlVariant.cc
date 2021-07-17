@@ -1568,7 +1568,7 @@ Variant::to_qbytearray () const
   if (m_type == t_qbytearray) {
     return *m_var.m_qbytearray;
   } else if (m_type == t_bytearray) {
-    return QByteArray (&m_var.m_bytearray->front (), m_var.m_bytearray->size ());
+    return QByteArray (&m_var.m_bytearray->front (), int (m_var.m_bytearray->size ()));
   } else if (m_type == t_qstring) {
     return m_var.m_qstring->toUtf8 ();
   } else if (m_type == t_stdstring) {

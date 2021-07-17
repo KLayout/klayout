@@ -1373,7 +1373,7 @@ TEST(62)
     return;
   }
 
-  size_t text_id = basic_lib->layout ().pcell_by_name ("TEXT").second;
+  db::pcell_id_type text_id = basic_lib->layout ().pcell_by_name ("TEXT").second;
   const db::PCellDeclaration *text_decl = basic_lib->layout ().pcell_declaration (text_id);
 
   std::vector<tl::Variant> values;
@@ -1389,7 +1389,7 @@ TEST(62)
     }
   }
 
-  size_t v1t1 = basic_lib->layout ().get_pcell_variant (text_id, values);
+  db::cell_index_type v1t1 = basic_lib->layout ().get_pcell_variant (text_id, values);
 
   values.clear ();
   for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
@@ -1402,13 +1402,13 @@ TEST(62)
     }
   }
 
-  size_t v1t2 = basic_lib->layout ().get_pcell_variant (text_id, values);
+  db::cell_index_type v1t2 = basic_lib->layout ().get_pcell_variant (text_id, values);
 
   db::Layout g;
   init_layout (g);
 
-  size_t c3index = g.get_lib_proxy (basic_lib, db::cell_index_type (v1t1));
-  size_t c4index = g.get_lib_proxy (basic_lib, db::cell_index_type (v1t2));
+  size_t c3index = g.get_lib_proxy (basic_lib, v1t1);
+  size_t c4index = g.get_lib_proxy (basic_lib, v1t2);
 
   db::Cell &c1 (g.cell (g.add_cell ("c1")));
   db::Cell &c2 (g.cell (g.add_cell ("c2")));

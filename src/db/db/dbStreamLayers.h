@@ -87,7 +87,7 @@ inline ld_type relative_ld (ld_type ld)
   }
 }
 
-inline ld_type is_relative_ld (ld_type ld)
+inline bool is_relative_ld (ld_type ld)
 {
   return ld < 0;
 }

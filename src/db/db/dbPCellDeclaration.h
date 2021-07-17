@@ -34,11 +34,10 @@
 namespace db
 {
 
-typedef size_t pcell_id_type;
 typedef std::vector<tl::Variant> pcell_parameters_type;
     
-  /**
-   *  @brief A declaration for one PCell parameter
+/**
+ *  @brief A declaration for one PCell parameter
  *
  *  A parameter is described by a name (potentially a variable name), a description text (for a UI label),
  *  a default value (a variant), a type (requested type for the variant), a choice list (if the parameter can

@@ -154,7 +154,7 @@ struct A
     return int (x.size ());
   }
   int a3_ba (const std::vector<char> &x) {
-    return x.size ();
+    return int (x.size ());
   }
 #if defined(HAVE_QT)
   int a3_qstr (const QString &x) { 

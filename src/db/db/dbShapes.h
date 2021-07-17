@@ -486,8 +486,8 @@ public:
   virtual size_t size () const = 0;
   virtual bool empty () const = 0;
   virtual void sort () = 0;
-  virtual void clear (Shapes *target, db::Manager *manager) = 0;
-  virtual LayerBase *clone (Shapes *target, db::Manager *manager) const = 0;
+  virtual LayerBase *clone () const = 0;
+  virtual bool is_same_type (const LayerBase *other) const = 0;
   virtual void translate_into (Shapes *target, GenericRepository &rep, ArrayRepository &array_rep) const = 0;
   virtual void translate_into (Shapes *target, GenericRepository &rep, ArrayRepository &array_rep, pm_delegate_type &pm) const = 0;
   virtual void transform_into (Shapes *target, const Trans &trans, GenericRepository &rep, ArrayRepository &array_rep) const = 0;
@@ -682,6 +682,8 @@ public:
 
     if (manager () && manager ()->transacting ()) {
 
+      check_is_editable_for_undo_redo ();
+
       tl::ident_map<db::properties_id_type> pm;
 
       //  for undo support iterate over the elements
@@ -721,6 +723,8 @@ public:
 
     if (manager () && manager ()->transacting ()) {
 
+      check_is_editable_for_undo_redo ();
+
       //  for undo support iterate over the elements
       for (ShapeIterator s = d.begin (ShapeIterator::All); ! s.at_end (); ++s) {
         insert (*s, trans, pm);
@@ -759,6 +763,8 @@ public:
     tl_assert (&d != this);
 
     if (manager () && manager ()->transacting ()) {
+
+      check_is_editable_for_undo_redo ();
 
       //  for undo support iterate over the elements
       for (ShapeIterator s = d.begin (ShapeIterator::All); ! s.at_end (); ++s) {
@@ -806,6 +812,7 @@ public:
   shape_type insert (const Sh &sh)
   {
     if (manager () && manager ()->transacting ()) {
+      check_is_editable_for_undo_redo ();
       if (is_editable ()) {
         db::layer_op<Sh, db::stable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, sh);
       } else {
@@ -849,6 +856,7 @@ public:
 
       //  insert the array as a whole in non-editable mode
       if (manager () && manager ()->transacting ()) {
+        check_is_editable_for_undo_redo ();
         db::layer_op<db::array<Obj, Trans>, db::unstable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, arr);
       }
       invalidate_state ();  //  HINT: must come before the change is done!
@@ -886,6 +894,7 @@ public:
 
       //  insert the array as a whole in non-editable mode
       if (manager () && manager ()->transacting ()) {
+        check_is_editable_for_undo_redo ();
         db::layer_op< db::object_with_properties< db::array<Obj, Trans> >, db::unstable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, arr);
       }
       invalidate_state ();  //  HINT: must come before the change is done!
@@ -906,6 +915,7 @@ public:
   {
     typedef typename std::iterator_traits <Iter>::value_type value_type;
     if (manager () && manager ()->transacting ()) {
+      check_is_editable_for_undo_redo ();
       if (is_editable ()) {
         db::layer_op<value_type, db::stable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, from, to);
       } else {
@@ -1001,6 +1011,7 @@ public:
       throw tl::Exception (tl::to_string (tr ("Function 'erase' is permitted only in editable mode")));
     }
     if (manager () && manager ()->transacting ()) {
+      check_is_editable_for_undo_redo ();
       db::layer_op<typename Tag::object_type, StableTag>::queue_or_append (manager (), this, false /*not insert*/, *pos);
     }
     invalidate_state ();  //  HINT: must come before the change is done!
@@ -1064,6 +1075,7 @@ public:
       throw tl::Exception (tl::to_string (tr ("Function 'erase' is permitted only in editable mode")));
     }
     if (manager () && manager ()->transacting ()) {
+      check_is_editable_for_undo_redo ();
       db::layer_op<typename Tag::object_type, StableTag>::queue_or_append (manager (), this, false /*not insert*/, from, to);
     }
     invalidate_state ();  //  HINT: must come before the change is done!
@@ -1090,6 +1102,7 @@ public:
       throw tl::Exception (tl::to_string (tr ("Function 'erase' is permitted only in editable mode")));
     }
     if (manager () && manager ()->transacting ()) {
+      check_is_editable_for_undo_redo ();
       db::layer_op<typename Tag::object_type, StableTag>::queue_or_append (manager (), this, false /*not insert*/, first, last, true /*dummy*/);
     }
     invalidate_state ();  //  HINT: must come before the change is done!
@@ -1480,12 +1493,20 @@ public:
 
 private:
   friend class ShapeIterator;
+  friend class FullLayerOp;
 
   tl::vector<LayerBase *> m_layers;
   db::Cell *mp_cell;  //  HINT: contains "dirty" in bit 0 and "editable" in bit 1
 
   void invalidate_state ();
   void do_insert (const Shapes &d);
+  void check_is_editable_for_undo_redo () const;
+
+  //  gets the layers array
+  tl::vector<LayerBase *> &get_layers ()
+  {
+    return m_layers;
+  }
 
   //  extract dirty flag from mp_cell
   bool is_dirty () const 
@@ -1604,6 +1625,7 @@ private:
     for (typename Array::iterator a = arr.begin (); ! a.at_end (); ++a) {
       res_wp_type obj_wp (*a * arr.object (), arr.properties_id ());
       if (manager () && manager ()->transacting ()) {
+        check_is_editable_for_undo_redo ();
         db::layer_op<res_wp_type, db::stable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, obj_wp);
       }
       l.insert (obj_wp);
@@ -1618,6 +1640,7 @@ private:
     db::layer<ResType, db::stable_layer_tag> &l = get_layer<ResType, db::stable_layer_tag> ();
     for (typename Array::iterator a = arr.begin (); ! a.at_end (); ++a) {
       if (manager () && manager ()->transacting ()) {
+        check_is_editable_for_undo_redo ();
         db::layer_op<ResType, db::stable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, *a * arr.object ());
       }
       l.insert (*a * arr.object ());
@@ -1738,6 +1761,51 @@ public:
 private:
   bool m_insert;
   std::vector<Sh> m_shapes;
+
+  void insert (Shapes *shapes);
+  void erase (Shapes *shapes);
+};
+
+class FullLayerOp
+  : public LayerOpBase
+{
+public:
+  FullLayerOp (bool insert, LayerBase *layer)
+    : m_insert (insert), mp_layer (layer), m_owns_layer (! insert)
+  {
+    //  .. nothing yet ..
+  }
+
+  ~FullLayerOp ()
+  {
+    if (m_owns_layer) {
+      delete mp_layer;
+      mp_layer = 0;
+    }
+  }
+
+  virtual void undo (Shapes *shapes)
+  {
+    if (m_insert) {
+      erase (shapes);
+    } else {
+      insert (shapes);
+    }
+  }
+
+  virtual void redo (Shapes *shapes)
+  {
+    if (m_insert) {
+      insert (shapes);
+    } else {
+      erase (shapes);
+    }
+  }
+
+private:
+  bool m_insert;
+  LayerBase *mp_layer;
+  bool m_owns_layer;
 
   void insert (Shapes *shapes);
   void erase (Shapes *shapes);

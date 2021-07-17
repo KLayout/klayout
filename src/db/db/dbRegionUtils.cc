@@ -127,7 +127,7 @@ Edge2EdgeCheckBase::finish (const Edge *o, const size_t &p)
 
     if (! any) {
 
-      put_negative (*o, p);
+      put_negative (*o, (int) p);
 
     } else if (! fully_removed) {
 
@@ -146,7 +146,7 @@ Edge2EdgeCheckBase::finish (const Edge *o, const size_t &p)
       ec.finish ();
 
       for (std::set<db::Edge>::const_iterator e = partial_edges.begin (); e != partial_edges.end (); ++e) {
-        put_negative (*e, p);
+        put_negative (*e, (int) p);
       }
 
     }

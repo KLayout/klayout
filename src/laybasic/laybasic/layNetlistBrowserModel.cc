@@ -257,7 +257,7 @@ static std::string str_from_name (const Obj *obj, bool indicate_empty = false)
   }
 }
 
-const std::string var_sep (" ⇔ ");
+const std::string var_sep (" \u21D4 ");
 
 template <class Obj>
 static std::string str_from_expanded_names (const std::pair<const Obj *, const Obj *> &objs, bool is_single)
@@ -3049,7 +3049,7 @@ NetlistBrowserModel::parent (const QModelIndex &index) const
   if (! d || ! d->parent ()) {
     return QModelIndex ();
   } else {
-    return createIndex (d->parent ()->index (), 0, (void *) d->parent ());
+    return createIndex ((int) d->parent ()->index (), 0, (void *) d->parent ());
   }
 }
 

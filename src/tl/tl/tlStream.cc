@@ -465,7 +465,7 @@ TextInputStream::read_all (size_t max_count)
 const std::string &
 TextInputStream::get_line ()
 {
-  int line = m_next_line;
+  size_t line = m_next_line;
   m_line_buffer.clear ();
 
   while (! at_end ()) {

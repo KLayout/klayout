@@ -24,6 +24,7 @@
 #include "dbNetlistDeviceClasses.h"
 #include "dbNetlistCompare.h"
 #include "dbNetlistCrossReference.h"
+#include "dbNetlistSpiceReader.h"
 
 class NetlistCompareTestLogger
   : public db::NetlistCompareLogger
@@ -2317,7 +2318,7 @@ TEST(15_EmptySubCircuitTest)
     "  subcircuit TRANS $3 (G=OUT,S=$5,D=$2);\n"
     "  subcircuit TRANS $4 (G=OUT,S=$4,D=$2);\n"
     "end;\n"
-    //  This circuit is an abstract and it's pins are defined by the pin names
+    //  This circuit is an abstract and its pins are defined by the pin names
     "circuit TRANS (G=$1,S=$2,D=$3);\n"
     "end;\n";
 
@@ -3540,22 +3541,22 @@ TEST(20_BusLikeConnections)
     "begin_circuit INV8_WRAP INV8_WRAP\n"
     "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
-    "match_nets IN8 A8\n"
     "match_nets OUT8 Q8\n"
-    "match_nets IN7 A7\n"
     "match_nets OUT7 Q7\n"
-    "match_nets IN6 A6\n"
     "match_nets OUT6 Q6\n"
-    "match_nets IN5 A5\n"
     "match_nets OUT5 Q5\n"
-    "match_nets IN4 A4\n"
     "match_nets OUT4 Q4\n"
-    "match_nets IN3 A3\n"
     "match_nets OUT3 Q3\n"
-    "match_nets IN2 A2\n"
     "match_nets OUT2 Q2\n"
-    "match_nets IN1 A1\n"
     "match_nets OUT1 Q1\n"
+    "match_ambiguous_nets IN1 A1\n"
+    "match_ambiguous_nets IN2 A2\n"
+    "match_ambiguous_nets IN3 A3\n"
+    "match_ambiguous_nets IN4 A4\n"
+    "match_ambiguous_nets IN5 A5\n"
+    "match_ambiguous_nets IN6 A6\n"
+    "match_ambiguous_nets IN7 A7\n"
+    "match_ambiguous_nets IN8 A8\n"
     "match_pins IN1 A1\n"
     "match_pins OUT1 Q1\n"
     "match_pins IN2 A2\n"
@@ -3579,22 +3580,22 @@ TEST(20_BusLikeConnections)
     "begin_circuit TOP TOP\n"
     "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
-    "match_nets IN8 A8\n"
     "match_nets OUT8 Q8\n"
-    "match_nets IN7 A7\n"
     "match_nets OUT7 Q7\n"
-    "match_nets IN6 A6\n"
     "match_nets OUT6 Q6\n"
-    "match_nets IN5 A5\n"
     "match_nets OUT5 Q5\n"
-    "match_nets IN4 A4\n"
     "match_nets OUT4 Q4\n"
-    "match_nets IN3 A3\n"
     "match_nets OUT3 Q3\n"
-    "match_nets IN2 A2\n"
     "match_nets OUT2 Q2\n"
-    "match_nets IN1 A1\n"
     "match_nets OUT1 Q1\n"
+    "match_ambiguous_nets IN1 A1\n"
+    "match_ambiguous_nets IN2 A2\n"
+    "match_ambiguous_nets IN3 A3\n"
+    "match_ambiguous_nets IN4 A4\n"
+    "match_ambiguous_nets IN5 A5\n"
+    "match_ambiguous_nets IN6 A6\n"
+    "match_ambiguous_nets IN7 A7\n"
+    "match_ambiguous_nets IN8 A8\n"
     "match_pins IN1 A1\n"
     "match_pins OUT1 Q1\n"
     "match_pins IN2 A2\n"
@@ -3687,22 +3688,22 @@ TEST(20_BusLikeConnections)
     "begin_circuit INV8_WRAP INV8_WRAP\n"
     "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
-    "match_nets IN8 A8\n"
     "match_nets OUT8 Q8\n"
-    "match_nets IN7 A7\n"
     "match_nets OUT7 Q7\n"
-    "match_nets IN6 A6\n"
     "match_nets OUT6 Q6\n"
-    "match_nets IN5 A5\n"
     "match_nets OUT5 Q5\n"
-    "match_nets IN4 A4\n"
     "match_nets OUT4 Q4\n"
-    "match_nets IN3 A3\n"
     "match_nets OUT3 Q3\n"
-    "match_nets IN2 A2\n"
     "match_nets OUT2 Q2\n"
-    "match_nets IN1 A1\n"
     "match_nets OUT1 Q1\n"
+    "match_ambiguous_nets IN1 A1\n"
+    "match_ambiguous_nets IN2 A2\n"
+    "match_ambiguous_nets IN3 A3\n"
+    "match_ambiguous_nets IN4 A4\n"
+    "match_ambiguous_nets IN5 A5\n"
+    "match_ambiguous_nets IN6 A6\n"
+    "match_ambiguous_nets IN7 A7\n"
+    "match_ambiguous_nets IN8 A8\n"
     "match_pins IN1 A1\n"
     "match_pins OUT1 Q1\n"
     "match_pins IN2 A2\n"
@@ -3726,22 +3727,22 @@ TEST(20_BusLikeConnections)
     "begin_circuit TOP TOP\n"
     "match_nets VSS VSS\n"
     "match_nets VDD VDD\n"
-    "match_nets IN8 A8\n"
     "match_nets OUT8 Q8\n"
-    "match_nets IN7 A7\n"
     "match_nets OUT7 Q7\n"
-    "match_nets IN6 A6\n"
     "match_nets OUT6 Q6\n"
-    "match_nets IN5 A5\n"
     "match_nets OUT5 Q5\n"
-    "match_nets IN4 A4\n"
     "match_nets OUT4 Q4\n"
-    "match_nets IN3 A3\n"
     "match_nets OUT3 Q3\n"
-    "match_nets IN2 A2\n"
     "match_nets OUT2 Q2\n"
-    "match_nets IN1 A1\n"
     "match_nets OUT1 Q1\n"
+    "match_ambiguous_nets IN1 A1\n"
+    "match_ambiguous_nets IN2 A2\n"
+    "match_ambiguous_nets IN3 A3\n"
+    "match_ambiguous_nets IN4 A4\n"
+    "match_ambiguous_nets IN5 A5\n"
+    "match_ambiguous_nets IN6 A6\n"
+    "match_ambiguous_nets IN7 A7\n"
+    "match_ambiguous_nets IN8 A8\n"
     "match_pins IN1 A1\n"
     "match_pins OUT1 Q1\n"
     "match_pins IN2 A2\n"
@@ -4560,3 +4561,20 @@ TEST(28_JoinSymmetricNets)
   )
 }
 
+TEST(29_EmptySubCircuitsFromSPICE)
+{
+  db::Netlist a, b, c;
+
+  tl::InputStream fa (tl::testdata () + "/algo/nl_compare_29_a.cir");
+  tl::InputStream fb (tl::testdata () + "/algo/nl_compare_29_b.cir");
+  tl::InputStream fc (tl::testdata () + "/algo/nl_compare_29_c.cir");
+
+  db::NetlistSpiceReader reader;
+  reader.read (fa, a);
+  reader.read (fb, b);
+  reader.read (fc, c);
+
+  db::NetlistComparer comp;
+  EXPECT_EQ (comp.compare (&a, &b), true);
+  EXPECT_EQ (comp.compare (&a, &c), false);
+}

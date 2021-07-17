@@ -3235,6 +3235,193 @@ TEST(23)
   EXPECT_EQ (shapes_to_string_norm (_this, s2), "edge_pair (0,0;1,1)/(10,10;11,11) #17\n");
 }
 
+//  Shape insert and clear and undo/redo
+TEST(24a)
+{
+  db::Manager m;
+  db::Shapes s1 (&m, 0, true), s2;
+
+  s2.insert (db::Edge (db::Point (0, 0), db::Point (100, 200)));
+  s2.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+
+  m.transaction ("test");
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+  s1.insert (s2);
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nedge (0,0;100,200) #0\n");
+  m.commit ();
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+
+  m.redo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nedge (0,0;100,200) #0\n");
+
+  m.undo ();
+  s1.insert (db::Box (db::Point (1, 1), db::Point (101, 201)));
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+
+  m.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+
+  m.transaction ("test");
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+  s1.insert (s2);
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+  m.commit ();
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+
+  m.redo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+
+  m.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+
+  m.transaction ("test");
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+  s1.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+  m.commit ();
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+
+  m.redo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+
+  m.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+}
+
+//  Shape insert and clear and undo/redo - different layers, same layout
+TEST(24b)
+{
+  db::Manager m;
+  db::Layout l (true, &m);
+  db::Cell &cell = l.cell (l.add_cell ("top"));
+  l.insert_layer (1);
+  l.insert_layer (2);
+  db::Shapes &s1 = cell.shapes (1);
+  db::Shapes &s2 = cell.shapes (2);
+
+  s2.insert (db::Edge (db::Point (0, 0), db::Point (100, 200)));
+  s2.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+
+  m.transaction ("test");
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+  s1.insert (s2);
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nedge (0,0;100,200) #0\n");
+  m.commit ();
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+
+  m.redo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nedge (0,0;100,200) #0\n");
+
+  m.undo ();
+  s1.insert (db::Box (db::Point (1, 1), db::Point (101, 201)));
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+
+  m.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+
+  m.transaction ("test");
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+  s1.insert (s2);
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+  m.commit ();
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+
+  m.redo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+
+  m.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+
+  m.transaction ("test");
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+  s1.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+  m.commit ();
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+
+  m.redo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+
+  m.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+}
+
+//  Shape insert and clear and undo/redo - no layout on target
+TEST(24c)
+{
+  db::Manager m;
+  db::Layout l;
+  db::Cell &cell = l.cell (l.add_cell ("top"));
+  l.insert_layer (1);
+  l.insert_layer (2);
+  db::Shapes s1 (&m, 0, true);
+  db::Shapes &s2 = cell.shapes (2);
+
+  s2.insert (db::Edge (db::Point (0, 0), db::Point (100, 200)));
+  s2.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+
+  m.transaction ("test");
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+  s1.insert (s2);
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nedge (0,0;100,200) #0\n");
+  m.commit ();
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+
+  m.redo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nedge (0,0;100,200) #0\n");
+
+  m.undo ();
+  s1.insert (db::Box (db::Point (1, 1), db::Point (101, 201)));
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+
+  m.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+
+  m.transaction ("test");
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+  s1.insert (s2);
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+  m.commit ();
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+
+  m.redo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+
+  m.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+
+  m.transaction ("test");
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+  s1.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+  m.commit ();
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+
+  m.redo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+
+  m.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+}
+
 //  Bug #107
 TEST(100)
 {
@@ -3260,6 +3447,72 @@ TEST(100)
   EXPECT_EQ (shapes_to_string_norm (_this, shapes1),
     ""
   );
+}
+
+//  Shape insert and clear and undo/redo - different layouts
+TEST(24d)
+{
+  db::Manager m;
+  db::Layout l1 (true, &m);
+  db::Cell &cell1 = l1.cell (l1.add_cell ("top"));
+  l1.insert_layer (1);
+  db::Layout l2 (true, &m);
+  db::Cell &cell2 = l2.cell (l2.add_cell ("top"));
+  l2.insert_layer (2);
+  db::Shapes &s1 = cell1.shapes (1);
+  db::Shapes &s2 = cell2.shapes (2);
+
+  s2.insert (db::Edge (db::Point (0, 0), db::Point (100, 200)));
+  s2.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+
+  m.transaction ("test");
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+  s1.insert (s2);
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nedge (0,0;100,200) #0\n");
+  m.commit ();
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+
+  m.redo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nedge (0,0;100,200) #0\n");
+
+  m.undo ();
+  s1.insert (db::Box (db::Point (1, 1), db::Point (101, 201)));
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+
+  m.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+
+  m.transaction ("test");
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+  s1.insert (s2);
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+  m.commit ();
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (1,1;101,201) #0\n");
+
+  m.redo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+
+  m.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+
+  m.transaction ("test");
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+  s1.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+  m.commit ();
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "box (0,0;100,200) #0\nbox (1,1;101,201) #0\nedge (0,0;100,200) #0\n");
+
+  m.redo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+
+  m.clear ();
+  EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
 }
 
 //  Bug #835
@@ -3322,3 +3575,4 @@ TEST(101)
   const db::Path &qr2_obj = *b.shape_repository ().repository (db::Path::tag ()).begin ();
   EXPECT_EQ (& qr2.obj () == &qr2_obj, true);
 }
+

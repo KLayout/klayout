@@ -283,7 +283,7 @@ private:
 class CellTreeItem
 {
 public:
-  CellTreeItem (const db::Layout *layout, bool is_pcell, size_t cell_or_pcell_index, bool flat, CellTreeModel::Sorting sorting);
+  CellTreeItem (const db::Layout *layout, bool is_pcell, unsigned int cell_or_pcell_index, bool flat, CellTreeModel::Sorting sorting);
   ~CellTreeItem ();
 
   int children () const;
@@ -338,7 +338,7 @@ private:
   size_t m_index, m_tree_index;
   std::vector<CellTreeItem *> m_children;
   int m_child_count;
-  size_t m_cell_or_pcell_index;
+  unsigned int m_cell_or_pcell_index;
 
   const char *name () const;
   void ensure_children ();

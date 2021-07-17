@@ -501,7 +501,7 @@ protected:
 
   unsigned int children () const
   {
-    return m_children.size ();
+    return (unsigned int) m_children.size ();
   }
 
   CompoundRegionOperationNode *child (unsigned int index);

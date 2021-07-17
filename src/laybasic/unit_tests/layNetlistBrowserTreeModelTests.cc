@@ -66,7 +66,7 @@ TEST (2)
   //  two top circuits
   EXPECT_EQ (model->rowCount (QModelIndex ()), 2);
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, QModelIndex ()), Qt::UserRole).toString ()), "INV2PAIRX");
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, QModelIndex ()), Qt::DisplayRole).toString ()), "- ⇔ INV2PAIRX");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, QModelIndex ()), Qt::DisplayRole).toString ()), "- \u21D4 INV2PAIRX");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, QModelIndex ()), Qt::UserRole).toString ()), "RINGO|RINGO");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, QModelIndex ()), Qt::DisplayRole).toString ()), "RINGO");
   EXPECT_EQ (model->parent (model->index (0, 0, QModelIndex ())).isValid (), false);
@@ -92,9 +92,9 @@ TEST (2)
   EXPECT_EQ (model->parent (inv2PairIndex) == ringoIndex, true);
 
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2PairIndex), Qt::UserRole).toString ()), "INV2");
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2PairIndex), Qt::DisplayRole).toString ()), "- ⇔ INV2");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2PairIndex), Qt::DisplayRole).toString ()), "- \u21D4 INV2");
   EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2PairIndex), Qt::UserRole).toString ()), "INV2");
-  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2PairIndex), Qt::DisplayRole).toString ()), "INV2 ⇔ -");
+  EXPECT_EQ (tl::to_string (model->data (model->index (1, 0, inv2PairIndex), Qt::DisplayRole).toString ()), "INV2 \u21D4 -");
 
   EXPECT_EQ (model->hasChildren (model->index (0, 0, inv2PairIndex)), false);
   EXPECT_EQ (model->rowCount (model->index (0, 0, inv2PairIndex)), 0);

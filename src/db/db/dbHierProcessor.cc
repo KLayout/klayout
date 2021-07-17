@@ -466,7 +466,7 @@ subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::
 
 template <class TS, class TI>
 static void
-subtract (std::unordered_set<db::Edge> &res, const std::unordered_set<db::Edge> &other, db::Layout *layout, const db::local_processor<TS, TI, db::Edge> *proc)
+subtract (std::unordered_set<db::Edge> &res, const std::unordered_set<db::Edge> &other, db::Layout * /*layout*/, const db::local_processor<TS, TI, db::Edge> *proc)
 {
   if (other.empty ()) {
     return;

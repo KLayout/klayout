@@ -81,7 +81,7 @@ CommonReader::cell_by_name (const std::string &cn) const
   if (iname != m_name_map.end ()) {
     return std::make_pair (true, iname->second.second);
   } else {
-    return std::make_pair (false, size_t (0));
+    return std::make_pair (false, db::cell_index_type (0));
   }
 }
 
@@ -126,7 +126,7 @@ CommonReader::cell_by_id (size_t id) const
   if (iid != m_id_map.end ()) {
     return std::make_pair (true, iid->second.second);
   } else {
-    return std::make_pair (false, size_t (0));
+    return std::make_pair (false, db::cell_index_type (0));
   }
 }
 

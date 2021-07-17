@@ -251,7 +251,7 @@ public:
   {
     for (iterator c = begin (); c != end (); ++c) {
       ctx->glVertexAttribPointer (location, 3, gl_type2enum<Obj> () (), GL_FALSE, 0, c->front ());
-      ctx->glDrawArrays (mode, 0, c->size () / 3);
+      ctx->glDrawArrays (mode, 0, GLsizei (c->size () / 3));
     }
   }
 

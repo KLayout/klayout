@@ -337,7 +337,7 @@ MAGWriter::write_single_instance (db::cell_index_type ci, db::ICplxTrans trans, 
     throw tl::Exception (tl::to_string (tr ("Cannot write magnified instance to MAG files: ")) + trans.to_string () + tl::to_string (tr (" of cell ")) + layout.cell_name (ci));
   }
 
-  int id = (m_cell_id [ci] += 1);
+  int id = int (m_cell_id [ci] += 1);
   std::string cn = layout.cell_name (ci);
   os << "use " << make_string (cn) << " " << make_string (cn + "_" + tl::to_string (id)) << "\n";
 

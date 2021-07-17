@@ -1113,49 +1113,49 @@ D25ViewWidget::paintGL ()
     vertexes.clear ();
 
     //  A "K" at the front
-    vertexes.add (-0.8, -0.8, 1.0);
-    vertexes.add (-0.8, 0.8, 1.0);
-    vertexes.add (-0.2, 0.8, 1.0);
+    vertexes.add (-0.8f, -0.8f, 1.0f);
+    vertexes.add (-0.8f, 0.8f, 1.0f);
+    vertexes.add (-0.2f, 0.8f, 1.0f);
 
-    vertexes.add (-0.8, -0.8, 1.0);
-    vertexes.add (-0.2, -0.8, 1.0);
-    vertexes.add (-0.2, 0.8, 1.0);
+    vertexes.add (-0.8f, -0.8f, 1.0f);
+    vertexes.add (-0.2f, -0.8f, 1.0f);
+    vertexes.add (-0.2f, 0.8f, 1.0f);
 
-    vertexes.add (0.2, 0.8, 1.0);
-    vertexes.add (0.8, 0.8, 1.0);
-    vertexes.add (0.8, 0.6, 1.0);
+    vertexes.add (0.2f, 0.8f, 1.0f);
+    vertexes.add (0.8f, 0.8f, 1.0f);
+    vertexes.add (0.8f, 0.6f, 1.0f);
 
-    vertexes.add (0.2, 0.8, 1.0);
-    vertexes.add (0.8, 0.6, 1.0);
-    vertexes.add (0.6, 0.4, 1.0);
+    vertexes.add (0.2f, 0.8f, 1.0f);
+    vertexes.add (0.8f, 0.6f, 1.0f);
+    vertexes.add (0.6f, 0.4f, 1.0f);
 
-    vertexes.add (-0.2, 0.4, 1.0);
-    vertexes.add (0.2, 0.8, 1.0);
-    vertexes.add (0.6, 0.4, 1.0);
+    vertexes.add (-0.2f, 0.4f, 1.0f);
+    vertexes.add (0.2f, 0.8f, 1.0f);
+    vertexes.add (0.6f, 0.4f, 1.0f);
 
-    vertexes.add (-0.2, 0.4, 1.0);
-    vertexes.add (0.6, 0.4, 1.0);
-    vertexes.add (0.2, 0.0, 1.0);
+    vertexes.add (-0.2f, 0.4f, 1.0f);
+    vertexes.add (0.6f, 0.4f, 1.0f);
+    vertexes.add (0.2f, 0.0f, 1.0f);
 
-    vertexes.add (-0.2, 0.4, 1.0);
-    vertexes.add (0.2, 0.0, 1.0);
-    vertexes.add (-0.2, -0.4, 1.0);
+    vertexes.add (-0.2f, 0.4f, 1.0f);
+    vertexes.add (0.2f, 0.0f, 1.0f);
+    vertexes.add (-0.2f, -0.4f, 1.0f);
 
-    vertexes.add (-0.2, -0.4, 1.0);
-    vertexes.add (0.6, -0.4, 1.0);
-    vertexes.add (0.2, -0.0, 1.0);
+    vertexes.add (-0.2f, -0.4f, 1.0f);
+    vertexes.add (0.6f, -0.4f, 1.0f);
+    vertexes.add (0.2f, -0.0f, 1.0f);
 
-    vertexes.add (-0.2, -0.4, 1.0);
-    vertexes.add (0.2, -0.8, 1.0);
-    vertexes.add (0.6, -0.4, 1.0);
+    vertexes.add (-0.2f, -0.4f, 1.0f);
+    vertexes.add (0.2f, -0.8f, 1.0f);
+    vertexes.add (0.6f, -0.4f, 1.0f);
 
-    vertexes.add (0.2, -0.8, 1.0);
-    vertexes.add (0.8, -0.6, 1.0);
-    vertexes.add (0.6, -0.4, 1.0);
+    vertexes.add (0.2f, -0.8f, 1.0f);
+    vertexes.add (0.8f, -0.6f, 1.0f);
+    vertexes.add (0.6f, -0.4f, 1.0f);
 
-    vertexes.add (0.2, -0.8, 1.0);
-    vertexes.add (0.8, -0.8, 1.0);
-    vertexes.add (0.8, -0.6, 1.0);
+    vertexes.add (0.2f, -0.8f, 1.0f);
+    vertexes.add (0.8f, -0.8f, 1.0f);
+    vertexes.add (0.8f, -0.6f, 1.0f);
 
     m_gridplane_program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.3f);
 

@@ -149,7 +149,7 @@ public:
   TechSetupDialog (QWidget *parent);
   ~TechSetupDialog ();
 
-  int exec (db::Technologies &technologies);
+  int exec_dialog (db::Technologies &technologies);
 
 protected slots:
   void current_tech_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous);

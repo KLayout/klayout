@@ -708,7 +708,7 @@ TechSetupDialog::update ()
 }
 
 int
-TechSetupDialog::exec (db::Technologies &technologies)
+TechSetupDialog::exec_dialog (db::Technologies &technologies)
 {
   if (s_first_show) {
     TipDialog td (this,

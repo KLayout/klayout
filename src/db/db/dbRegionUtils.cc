@@ -108,7 +108,7 @@ static inline bool shields (const db::EdgePair &ep, const db::Edge &q)
 }
 
 void
-Edge2EdgeCheckBase::finish (const Edge *o, const size_t &p)
+Edge2EdgeCheckBase::finish (const Edge *o, size_t p)
 {
   if (m_has_negative_edge_output && m_pass == 1 && m_pseudo_edges.find (std::make_pair (*o, p)) == m_pseudo_edges.end ()) {
 

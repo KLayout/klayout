@@ -738,6 +738,11 @@ public:
     m_id2 = pin2_id;
   }
 
+  static size_t first_unique_pin_id ()
+  {
+    return std::numeric_limits<size_t>::max () / 4;
+  }
+
   CatAndIds make_key () const
   {
     if (is_for_subcircuit ()) {
@@ -912,12 +917,12 @@ public:
   /**
    *  @brief Builds a node for a net
    */
-  NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map);
+  NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t &unique_pin_id);
 
   /**
    *  @brief Builds a virtual node for a subcircuit
    */
-  NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map);
+  NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t &unique_pin_id);
 
   void expand_subcircuit_nodes (NetGraph *graph);
 
@@ -1218,7 +1223,7 @@ private:
 
 // --------------------------------------------------------------------------------------------------------------------
 
-NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
+NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t &unique_pin_id)
   : mp_net (net), m_other_net_index (invalid_id)
 {
   if (! net) {
@@ -1254,7 +1259,12 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
 
     if (! cm->has_other_pin_for_this_pin (pin_id)) {
 
-      continue;
+      //  isolated pins are ignored, others are considered for the matching
+      if (net->pin_count () == 0 && net->terminal_count () == 0 && net->subcircuit_pin_count () == 1) {
+        continue;
+      } else {
+        pin_id = unique_pin_id++;
+      }
 
     } else {
 
@@ -1330,7 +1340,7 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
   }
 }
 
-NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
+NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t &unique_pin_id)
   : mp_net (0), m_other_net_index (invalid_id)
 {
   std::map<const db::Net *, size_t> n2entry;
@@ -1360,7 +1370,12 @@ NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circui
 
     if (! cm->has_other_pin_for_this_pin (pin_id)) {
 
-      continue;
+      //  isolated pins are ignored, others are considered for the matching
+      if (net_at_pin->pin_count () == 0 && net_at_pin->terminal_count () == 0 && net_at_pin->subcircuit_pin_count () == 1) {
+        continue;
+      } else {
+        pin_id = unique_pin_id++;
+      }
 
     } else {
 
@@ -1865,8 +1880,10 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
   m_nodes.clear ();
   m_net_index.clear ();
 
+  size_t unique_pin_id = Transition::first_unique_pin_id ();
+
   //  create a dummy node for a null net
-  m_nodes.push_back (NetGraphNode (0, device_categorizer, circuit_categorizer, device_filter, circuit_and_pin_mapping, circuit_pin_mapper));
+  m_nodes.push_back (NetGraphNode (0, device_categorizer, circuit_categorizer, device_filter, circuit_and_pin_mapping, circuit_pin_mapper, unique_pin_id));
 
   size_t nets = 0;
   for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
@@ -1875,7 +1892,7 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
   m_nodes.reserve (nets);
 
   for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
-    NetGraphNode node (n.operator-> (), device_categorizer, circuit_categorizer, device_filter, circuit_and_pin_mapping, circuit_pin_mapper);
+    NetGraphNode node (n.operator-> (), device_categorizer, circuit_categorizer, device_filter, circuit_and_pin_mapping, circuit_pin_mapper, unique_pin_id);
     if (! node.empty () || n->pin_count () > 0) {
       m_nodes.push_back (node);
     }
@@ -1910,7 +1927,7 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
       continue;
     }
 
-    m_virtual_nodes.insert (std::make_pair (i.operator-> (), NetGraphNode (i.operator-> (), circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper)));
+    m_virtual_nodes.insert (std::make_pair (i.operator-> (), NetGraphNode (i.operator-> (), circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper, unique_pin_id)));
 
   }
 

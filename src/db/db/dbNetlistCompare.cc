@@ -1233,6 +1233,11 @@ private:
 
 // --------------------------------------------------------------------------------------------------------------------
 
+static bool is_non_trivial_net (const db::Net *net)
+{
+  return net->pin_count () == 0 && net->terminal_count () == 0 && net->subcircuit_pin_count () == 1;
+}
+
 NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t *unique_pin_id)
   : mp_net (net), m_other_net_index (invalid_id)
 {
@@ -1270,9 +1275,7 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
     if (! cm->has_other_pin_for_this_pin (pin_id)) {
 
       //  isolated pins are ignored, others are considered for the matching
-      if (net->pin_count () == 0 && net->terminal_count () == 0 && net->subcircuit_pin_count () == 1) {
-        continue;
-      } else if (! unique_pin_id) {
+      if (! unique_pin_id || is_non_trivial_net (net)) {
         continue;
       } else {
         pin_id = (*unique_pin_id)++;
@@ -1383,9 +1386,7 @@ NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circui
     if (! cm->has_other_pin_for_this_pin (pin_id)) {
 
       //  isolated pins are ignored, others are considered for the matching
-      if (net_at_pin->pin_count () == 0 && net_at_pin->terminal_count () == 0 && net_at_pin->subcircuit_pin_count () == 1) {
-        continue;
-      } else if (! unique_pin_id) {
+      if (! unique_pin_id || is_non_trivial_net (net_at_pin)) {
         continue;
       } else {
         pin_id = (*unique_pin_id)++;

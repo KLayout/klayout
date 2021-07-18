@@ -723,6 +723,7 @@ public:
   {
     m_ptr = (void *) device;
     m_cat = device_category;
+    tl_assert (terminal1_id < std::numeric_limits<size_t>::max () / 2);
     m_id1 = terminal1_id;
     m_id2 = terminal2_id;
   }
@@ -731,13 +732,19 @@ public:
   {
     m_ptr = (void *) subcircuit;
     m_cat = subcircuit_category;
+    //  m_id1 between max/2 and max indicates subcircuit
+    tl_assert (pin1_id < std::numeric_limits<size_t>::max () / 2);
     m_id1 = std::numeric_limits<size_t>::max () - pin1_id;
     m_id2 = pin2_id;
   }
 
   CatAndIds make_key () const
   {
-    return CatAndIds (m_cat, m_id1, m_id2);
+    if (is_for_subcircuit ()) {
+      return CatAndIds (m_cat, m_id1, size_t (0));
+    } else {
+      return CatAndIds (m_cat, m_id1, m_id2);
+    }
   }
 
   bool operator< (const Transition &other) const
@@ -759,6 +766,8 @@ public:
         }
       }
 
+      return m_id1 < other.m_id1;
+
     } else {
 
       if ((device () != 0) != (other.device () != 0)) {
@@ -772,12 +781,12 @@ public:
         }
       }
 
-    }
+      if (m_id1 != other.m_id1) {
+        return m_id1 < other.m_id1;
+      }
+      return m_id2 < other.m_id2;
 
-    if (m_id1 != other.m_id1) {
-      return m_id1 < other.m_id1;
     }
-    return m_id2 < other.m_id2;
   }
 
   bool operator== (const Transition &other) const
@@ -799,6 +808,8 @@ public:
         }
       }
 
+      return (m_id1 == other.m_id1);
+
     } else {
 
       if ((device () != 0) != (other.device () != 0)) {
@@ -812,18 +823,17 @@ public:
         }
       }
 
-    }
+      return (m_id1 == other.m_id1 && m_id2 == other.m_id2);
 
-    return (m_id1 == other.m_id1 && m_id2 == other.m_id2);
+    }
   }
 
   std::string to_string () const
   {
     if (is_for_subcircuit ()) {
       const db::SubCircuit *sc = subcircuit ();
-      size_t pin_id = std::numeric_limits<size_t>::max () - m_id1;
       const db::Circuit *c = sc->circuit_ref ();
-      return std::string ("X") + sc->expanded_name () + " " + c->name () + " " + c->pin_by_id (pin_id)->expanded_name () + " (virtual)";
+      return std::string ("X") + sc->expanded_name () + " " + c->name () + " " + c->pin_by_id (m_id2)->expanded_name () + " (virtual)";
    } else {
       size_t term_id1 = m_id1;
       size_t term_id2 = m_id2;
@@ -1238,25 +1248,31 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
 
     const CircuitMapper *cm = & icm->second;
 
-    //  A pin assignment may be missing because there is no net for a pin -> skip this
+    //  A pin assignment may be missing because there is no (real) net for a pin -> skip this pin
+
+    size_t original_pin_id = pin_id;
 
     if (! cm->has_other_pin_for_this_pin (pin_id)) {
+
       continue;
+
+    } else {
+
+      //  NOTE: if cm is given, cr and pin_id are given in terms of the canonical "other" circuit.
+      //  For c1 this is the c1->c2 mapper, for c2 this is the c2->c2 dummy mapper.
+
+      pin_id = cm->other_pin_from_this_pin (pin_id);
+
+      //  realize pin swapping by normalization of pin ID
+
+      pin_id = pin_map->normalize_pin_id (cm->other (), pin_id);
+
     }
-
-    //  NOTE: if cm is given, cr and pin_id are given in terms of the canonical "other" circuit.
-    //  For c1 this is the c1->c2 mapper, for c2 this is the c2->c2 dummy mapper.
-
-    pin_id = cm->other_pin_from_this_pin (pin_id);
-
-    //  realize pin swapping by normalization of pin ID
-
-    pin_id = pin_map->normalize_pin_id (cm->other (), pin_id);
 
     //  Subcircuits are routed to a null node and descend from a virtual node inside the subcircuit.
     //  The reasoning is that this way we don't need #pins*(#pins-1) edges but rather #pins.
 
-    Transition ed (sc, circuit_cat, pin_id, pin_id);
+    Transition ed (sc, circuit_cat, pin_id, original_pin_id);
 
     std::map<const void *, size_t>::const_iterator in = n2entry.find ((const void *) sc);
     if (in == n2entry.end ()) {
@@ -1338,24 +1354,30 @@ NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circui
       continue;
     }
 
-    //  A pin assignment may be missing because there is no net for a pin -> skip this
+    //  A pin assignment may be missing because there is no (real) net for a pin -> skip this pin
+
+    size_t original_pin_id = pin_id;
 
     if (! cm->has_other_pin_for_this_pin (pin_id)) {
+
       continue;
+
+    } else {
+
+      //  NOTE: if cm is given, cr and pin_id are given in terms of the canonical "other" circuit.
+      //  For c1 this is the c1->c2 mapper, for c2 this is the c2->c2 dummy mapper.
+
+      pin_id = cm->other_pin_from_this_pin (pin_id);
+
+      //  realize pin swapping by normalization of pin ID
+
+      pin_id = pin_map->normalize_pin_id (cm->other (), pin_id);
+
     }
-
-    //  NOTE: if cm is given, cr and pin_id are given in terms of the canonical "other" circuit.
-    //  For c1 this is the c1->c2 mapper, for c2 this is the c2->c2 dummy mapper.
-
-    pin_id = cm->other_pin_from_this_pin (pin_id);
-
-    //  realize pin swapping by normalization of pin ID
-
-    pin_id = pin_map->normalize_pin_id (cm->other (), pin_id);
 
     //  Make the other endpoint
 
-    Transition ed (sc, circuit_cat, pin_id, pin_id);
+    Transition ed (sc, circuit_cat, pin_id, original_pin_id);
 
     std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (net_at_pin);
     if (in == n2entry.end ()) {

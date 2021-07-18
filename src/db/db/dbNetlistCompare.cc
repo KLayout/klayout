@@ -1604,19 +1604,22 @@ NetGraphNode::net_equal (const db::Net *a, const db::Net *b, bool with_name)
  */
 struct NodeRange
 {
-  NodeRange (size_t _num, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _n1, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _nn1,
-                          std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _n2, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _nn2)
-    : num (_num), n1 (_n1), nn1 (_nn1), n2 (_n2), nn2 (_nn2)
+  NodeRange (size_t _num1, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _n1, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _nn1,
+             size_t _num2, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _n2, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _nn2)
+    : num1 (_num1), num2 (_num2), n1 (_n1), nn1 (_nn1), n2 (_n2), nn2 (_nn2)
   {
     //  .. nothing yet ..
   }
 
   bool operator< (const NodeRange &other) const
   {
-    return num < other.num;
+    if (num1 != other.num1) {
+      return num1 < other.num1;
+    }
+    return num2 < other.num2;
   }
 
-  size_t num;
+  size_t num1, num2;
   std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator n1, nn1, n2, nn2;
 };
 
@@ -2399,7 +2402,7 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
   }
 
   size_t new_nodes = 0;
-  size_t complexity = nr.num;
+  size_t complexity = std::max (nr.num1, nr.num2);
 
   //  sort the ambiguity group such that net names match best
 
@@ -2802,30 +2805,32 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
 
     std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator nn1 = n1, nn2 = n2;
 
-    size_t num = 1;
     ++nn1;
     ++nn2;
-    while (nn1 != nodes.end () && nn2 != other_nodes.end ()) {
-      if (nn1->first->has_other ()) {
-        ++nn1;
-      } else if (nn2->first->has_other ()) {
-        ++nn2;
-      } else if (! (*nn1->first == *n1->first) || ! (*nn2->first == *n2->first)) {
-        break;
-      } else {
-        ++num;
-        ++nn1;
-        ++nn2;
+
+    size_t num1 = 1;
+    while (nn1 != nodes.end () && *nn1->first == *n1->first) {
+      if (! nn1->first->has_other ()) {
+        ++num1;
       }
+      ++nn1;
     }
 
-    if (num == 1 || data->with_ambiguous) {
-      node_ranges.push_back (NodeRange (num, n1, nn1, n2, nn2));
+    size_t num2 = 1;
+    while (nn2 != other_nodes.end () && *nn2->first == *n2->first) {
+      if (! nn2->first->has_other ()) {
+        ++num2;
+      }
+      ++nn2;
+    }
+
+    if ((num1 == 1 && num2 == 1) || data->with_ambiguous) {
+      node_ranges.push_back (NodeRange (num1, n1, nn1, num2, n2, nn2));
     }
 
     //  in tentative mode ambiguous nodes don't make a match without
     //  with_ambiguous
-    if (num > 1 && tentative && ! data->with_ambiguous) {
+    if ((num1 > 1 || num2 > 1) && tentative && ! data->with_ambiguous) {
       return failed_match;
     }
 
@@ -2852,26 +2857,25 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
       }
     }
 
-    nr->num = 0;
-    std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i1 = nr->n1, i2 = nr->n2;
-
-    while (i1 != nr->nn1 && i2 != nr->nn2) {
-      if (i1->first->has_other ()) {
-        ++i1;
-      } else if (i2->first->has_other ()) {
-        ++i2;
-      } else {
-        ++nr->num;
-        ++i1;
-        ++i2;
+    nr->num1 = 0;
+    for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i = nr->n1; i != nr->nn1; ++i) {
+      if (! i->first->has_other ()) {
+        ++nr->num1;
       }
     }
 
-    if (nr->num < 1) {
+    nr->num2 = 0;
+    for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i = nr->n2; i != nr->nn2; ++i) {
+      if (! i->first->has_other ()) {
+        ++nr->num2;
+      }
+    }
+
+    if (nr->num1 < 1 || nr->num2 < 1) {
 
       //  ignore this - it got obsolete.
 
-    } else if (nr->num == 1) {
+    } else if (nr->num1 == 1 && nr->num2 == 1) {
 
       size_t n = derive_node_identities_from_singular_match (nr->n1->first, nr->n1->second, nr->n2->first, nr->n2->second, dm, dm_other, scm, scm_other, depth, n_branch, tentative, data, ! data->dont_consider_net_names);
       if (n == failed_match) {
@@ -2880,17 +2884,17 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
 
       new_nodes += n;
 
-    } else if (data->max_n_branch != std::numeric_limits<size_t>::max () && double (nr->num) * double (n_branch) > double (data->max_n_branch)) {
+    } else if (data->max_n_branch != std::numeric_limits<size_t>::max () && double (std::max (nr->num1, nr->num2)) * double (n_branch) > double (data->max_n_branch)) {
 
       if (options ()->debug_netcompare) {
-        tl::info << indent_s << "max. complexity exhausted (" << nr->num << "*" << n_branch << ">" << data->max_n_branch << ") - mismatch.";
+        tl::info << indent_s << "max. complexity exhausted (" << std::max (nr->num1, nr->num2) << "*" << n_branch << ">" << data->max_n_branch << ") - mismatch.";
       }
       return failed_match;
 
     } else {
 
       if (options ()->debug_netcompare) {
-        tl::info << indent_s << "analyzing ambiguity group with " << nr->num << " members";
+        tl::info << indent_s << "analyzing ambiguity group with " << nr->num1 << "/" << nr->num2 << " members";
       }
 
       size_t n = derive_node_identities_from_ambiguity_group (*nr, dm, dm_other, scm, scm_other, depth, n_branch, tentative, data);
@@ -2901,7 +2905,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
       new_nodes += n;
 
       if (options ()->debug_netcompare) {
-        tl::info << indent_s << "finished analysis of ambiguity group with " << nr->num << " members";
+        tl::info << indent_s << "finished analysis of ambiguity group with " << nr->num1 << "/" << nr->num2 << " members";
       }
 
     }

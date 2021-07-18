@@ -917,12 +917,12 @@ public:
   /**
    *  @brief Builds a node for a net
    */
-  NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t &unique_pin_id);
+  NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t *unique_pin_id);
 
   /**
    *  @brief Builds a virtual node for a subcircuit
    */
-  NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t &unique_pin_id);
+  NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t *unique_pin_id);
 
   void expand_subcircuit_nodes (NetGraph *graph);
 
@@ -970,8 +970,18 @@ public:
 
   void apply_net_index (const std::map<const db::Net *, size_t> &ni);
 
-  bool operator< (const NetGraphNode &node) const;
-  bool operator== (const NetGraphNode &node) const;
+  bool less (const NetGraphNode &node, bool with_name) const;
+  bool equal (const NetGraphNode &node, bool with_name) const;
+
+  bool operator== (const NetGraphNode &node) const
+  {
+    return equal (node, false);
+  }
+
+  bool operator< (const NetGraphNode &node) const
+  {
+    return less (node, false);
+  }
 
   void swap (NetGraphNode &other)
   {
@@ -1009,13 +1019,13 @@ private:
    *  @brief Compares edges as "less"
    *  Edge comparison is based on the pins attached (name of the first pin).
    */
-  static bool net_less (const db::Net *a, const db::Net *b);
+  static bool net_less (const db::Net *a, const db::Net *b, bool with_name);
 
   /**
    *  @brief Compares edges as "equal"
    *  See edge_less for the comparison details.
    */
-  static bool edge_equal (const db::Net *a, const db::Net *b);
+  static bool net_equal (const db::Net *a, const db::Net *b, bool with_name);
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1038,7 +1048,7 @@ struct CompareNodePtr
 {
   bool operator() (const std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> &a, const std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> &b) const
   {
-    return *a.first < *b.first;
+    return a.first->less (*b.first, true);
   }
 };
 
@@ -1072,7 +1082,7 @@ public:
   /**
    *  @brief Builds the net graph
    */
-  void build (const db::Circuit *c, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const db::DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinMapper *circuit_pin_mapper);
+  void build (const db::Circuit *c, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const db::DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinMapper *circuit_pin_mapper, size_t *unique_pin_id);
 
   /**
    *  @brief Gets the node index for the given net
@@ -1223,7 +1233,7 @@ private:
 
 // --------------------------------------------------------------------------------------------------------------------
 
-NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t &unique_pin_id)
+NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t *unique_pin_id)
   : mp_net (net), m_other_net_index (invalid_id)
 {
   if (! net) {
@@ -1262,8 +1272,10 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
       //  isolated pins are ignored, others are considered for the matching
       if (net->pin_count () == 0 && net->terminal_count () == 0 && net->subcircuit_pin_count () == 1) {
         continue;
+      } else if (! unique_pin_id) {
+        continue;
       } else {
-        pin_id = unique_pin_id++;
+        pin_id = (*unique_pin_id)++;
       }
 
     } else {
@@ -1340,7 +1352,7 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
   }
 }
 
-NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t &unique_pin_id)
+NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t *unique_pin_id)
   : mp_net (0), m_other_net_index (invalid_id)
 {
   std::map<const db::Net *, size_t> n2entry;
@@ -1373,8 +1385,10 @@ NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circui
       //  isolated pins are ignored, others are considered for the matching
       if (net_at_pin->pin_count () == 0 && net_at_pin->terminal_count () == 0 && net_at_pin->subcircuit_pin_count () == 1) {
         continue;
+      } else if (! unique_pin_id) {
+        continue;
       } else {
-        pin_id = unique_pin_id++;
+        pin_id = (*unique_pin_id)++;
       }
 
     } else {
@@ -1517,7 +1531,7 @@ NetGraphNode::apply_net_index (const std::map<const db::Net *, size_t> &ni)
 }
 
 bool
-NetGraphNode::operator< (const NetGraphNode &node) const
+NetGraphNode::less (const NetGraphNode &node, bool with_name) const
 {
   if (m_edges.size () != node.m_edges.size ()) {
     return m_edges.size () < node.m_edges.size ();
@@ -1529,13 +1543,13 @@ NetGraphNode::operator< (const NetGraphNode &node) const
   }
   if (m_edges.empty ()) {
     //  do a more detailed analysis on the nets involved
-    return net_less (net (), node.net ());
+    return net_less (net (), node.net (), with_name);
   }
   return false;
 }
 
 bool
-NetGraphNode::operator== (const NetGraphNode &node) const
+NetGraphNode::equal (const NetGraphNode &node, bool with_name) const
 {
   if (m_edges.size () != node.m_edges.size ()) {
     return false;
@@ -1547,13 +1561,13 @@ NetGraphNode::operator== (const NetGraphNode &node) const
   }
   if (m_edges.empty ()) {
     //  do a more detailed analysis on the edges
-    return edge_equal (net (), node.net ());
+    return net_equal (net (), node.net (), with_name);
   }
   return true;
 }
 
 bool
-NetGraphNode::net_less (const db::Net *a, const db::Net *b)
+NetGraphNode::net_less (const db::Net *a, const db::Net *b, bool with_name)
 {
   if ((a != 0) != (b != 0)) {
     return (a != 0) < (b != 0);
@@ -1564,14 +1578,11 @@ NetGraphNode::net_less (const db::Net *a, const db::Net *b)
   if (a->pin_count () != b->pin_count ()) {
     return a->pin_count () < b->pin_count ();
   }
-  if (a->pin_count () == 0) {
-    return true;
-  }
-  return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), a->begin_pins ()->pin ()->name (), b->begin_pins ()->pin ()->name ()) < 0;
+  return with_name ? name_compare (a, b) < 0 : false;
 }
 
 bool
-NetGraphNode::edge_equal (const db::Net *a, const db::Net *b)
+NetGraphNode::net_equal (const db::Net *a, const db::Net *b, bool with_name)
 {
   if ((a != 0) != (b != 0)) {
     return false;
@@ -1582,10 +1593,7 @@ NetGraphNode::edge_equal (const db::Net *a, const db::Net *b)
   if (a->pin_count () != b->pin_count ()) {
     return false;
   }
-  if (a->pin_count () == 0) {
-    return true;
-  }
-  return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), a->begin_pins ()->pin ()->name (), b->begin_pins ()->pin ()->name ()) == 0;
+  return with_name ? name_compare (a, b) == 0 : true;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1871,7 +1879,7 @@ private:
 //  NetGraph implementation
 
 void
-NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const db::DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinMapper *circuit_pin_mapper)
+NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const db::DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinMapper *circuit_pin_mapper, size_t *unique_pin_id)
 {
   tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("Building net graph for circuit: ")) + c->name ());
 
@@ -1879,8 +1887,6 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
 
   m_nodes.clear ();
   m_net_index.clear ();
-
-  size_t unique_pin_id = Transition::first_unique_pin_id ();
 
   //  create a dummy node for a null net
   m_nodes.push_back (NetGraphNode (0, device_categorizer, circuit_categorizer, device_filter, circuit_and_pin_mapping, circuit_pin_mapper, unique_pin_id));
@@ -3613,16 +3619,21 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   db::NetGraph g1, g2;
 
+  size_t unique_pin_id = Transition::first_unique_pin_id ();
+
   //  NOTE: for normalization we map all subcircuits of c1 to c2.
   //  Also, pin swapping will only happen there.
   if (options ()->debug_netgraph) {
     tl::info << "Netlist graph:";
   }
-  g1.build (c1, device_categorizer, circuit_categorizer, device_filter, &c12_circuit_and_pin_mapping, &circuit_pin_mapper);
+  g1.build (c1, device_categorizer, circuit_categorizer, device_filter, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, (size_t *)0);
+
   if (options ()->debug_netgraph) {
     tl::info << "Other netlist graph:";
   }
-  g2.build (c2, device_categorizer, circuit_categorizer, device_filter, &c22_circuit_and_pin_mapping, &circuit_pin_mapper);
+  //  NOTE: the second netlist graph is the reference (schematic). We treat it a little more carefully by using pins from subcircuits which
+  //  lead to passive nets but connect to non-trivial nets on the outside. This is done by specifying a unique_pin_id counter for the last argument.
+  g2.build (c2, device_categorizer, circuit_categorizer, device_filter, &c22_circuit_and_pin_mapping, &circuit_pin_mapper, &unique_pin_id);
 
   //  Match dummy nodes for null nets
   g1.identify (0, 0);
@@ -4287,14 +4298,19 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
     bool mapped = true, valid = true;
     std::vector<std::pair<size_t, size_t> > k = compute_subcircuit_key_for_this (*sc, g1, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, mapped, valid);
 
-    if (! mapped || ! valid) {
+    if (! mapped) {
       if (mp_logger) {
         mp_logger->subcircuit_mismatch (sc.operator-> (), 0);
       }
       good = false;
-    } else {
+    } else if (valid) {
       //  TODO: report devices which cannot be distinguished topologically?
       subcircuit_map.insert (std::make_pair (k, std::make_pair (sc.operator-> (), sc_cat)));
+    } else {
+      //  emit a mismatch event but do not consider that an error - this may happen if the circuit has been dropped intentionally (e.g. via cells)
+      if (mp_logger) {
+        mp_logger->subcircuit_mismatch (sc.operator-> (), 0);
+      }
     }
 
   }
@@ -4584,7 +4600,7 @@ NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
   db::NetGraph graph;
   db::CircuitCategorizer circuit_categorizer;
   db::DeviceCategorizer device_categorizer;
-  graph.build (circuit, device_categorizer, circuit_categorizer, device_filter, &circuit_and_pin_mapping, &circuit_pin_mapper);
+  graph.build (circuit, device_categorizer, circuit_categorizer, device_filter, &circuit_and_pin_mapping, &circuit_pin_mapper, (size_t *) 0);
 
   //  sort the nodes so we can easily identify the identical ones (in terms of topology)
   //  nodes are identical if the attached devices and circuits are of the same kind and with the same parameters

@@ -1543,11 +1543,16 @@ NetGraphNode::net_less (const db::Net *a, const db::Net *b)
   if ((a != 0) != (b != 0)) {
     return (a != 0) < (b != 0);
   }
-  if (a != 0) {
-    return a->pin_count () < b->pin_count ();
-  } else {
+  if (a == 0) {
     return false;
   }
+  if (a->pin_count () != b->pin_count ()) {
+    return a->pin_count () < b->pin_count ();
+  }
+  if (a->pin_count () == 0) {
+    return true;
+  }
+  return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), a->begin_pins ()->pin ()->name (), b->begin_pins ()->pin ()->name ()) < 0;
 }
 
 bool
@@ -1556,11 +1561,16 @@ NetGraphNode::edge_equal (const db::Net *a, const db::Net *b)
   if ((a != 0) != (b != 0)) {
     return false;
   }
-  if (a != 0) {
-    return a->pin_count () == b->pin_count ();
-  } else {
+  if (a == 0) {
     return true;
   }
+  if (a->pin_count () != b->pin_count ()) {
+    return false;
+  }
+  if (a->pin_count () == 0) {
+    return true;
+  }
+  return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), a->begin_pins ()->pin ()->name (), b->begin_pins ()->pin ()->name ()) == 0;
 }
 
 // --------------------------------------------------------------------------------------------------------------------

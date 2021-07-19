@@ -1104,6 +1104,10 @@ MacroEditorPage::find_next ()
   }
 
   QTextCursor c = mp_text->textCursor ();
+  if (c.isNull ()) {
+    c = QTextCursor (mp_text->document ());
+    mp_text->setTextCursor (c);
+  }
 
   bool first = true;
   for (QTextBlock b = c.block (); true; ) {

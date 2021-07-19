@@ -464,8 +464,8 @@ begin_circuit BUF BUF
 match_nets VDD VDD
 match_nets VSS VSS
 match_nets OUT OUT
-match_nets INT $10
 net_mismatch IN IN
+match_nets INT $10
 net_mismatch INT2 $11
 match_pins $0 $1
 match_pins $1 $3
@@ -524,8 +524,8 @@ begin_circuit BUF BUF
 match_nets VDD VDD
 match_nets VSS VSS
 match_nets OUT OUT
-match_nets INT $10
 net_mismatch IN IN
+match_nets INT $10
 net_mismatch INT2 $11
 match_pins $0 $1
 match_pins $1 $3

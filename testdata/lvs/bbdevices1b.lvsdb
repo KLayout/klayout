@@ -1,0 +1,340 @@
+#%lvsdb-klayout
+
+# Layout
+layout(
+ top(testall)
+ unit(0.001)
+
+ # Layer section
+ # This section lists the mask layers (drawing or derived) and their connections.
+
+ # Mask layers
+ layer(l1 '73/0')
+ layer(l3 '44/0')
+ layer(l2 '37/0')
+ layer(l4 '36/0')
+ layer(l5 '35/0')
+ layer(l6 '34/0')
+ layer(l7 '33/0')
+ layer(l8 '32/0')
+ layer(l9 '31/0')
+ layer(l10 '30/0')
+ layer(l11 '75/0')
+ layer(l12 '19/0')
+ layer(l13 '50/0')
+ layer(l14 '51/0')
+ layer(l15 '64/0')
+ layer(l16 '78/0')
+
+ # Mask layer connectivity
+ connect(l1 l1 l2)
+ connect(l3 l3 l2)
+ connect(l2 l1 l3 l2 l4)
+ connect(l4 l2 l4 l5)
+ connect(l5 l4 l5 l6)
+ connect(l6 l5 l6 l7)
+ connect(l7 l6 l7 l8)
+ connect(l8 l7 l8 l9)
+ connect(l9 l8 l9 l10)
+ connect(l10 l9 l10 l11 l12)
+ connect(l11 l10 l11)
+ connect(l12 l10 l12 l13)
+ connect(l13 l12 l13 l14)
+ connect(l14 l13 l14 l15 l16)
+ connect(l15 l14 l15)
+ connect(l16 l14 l16)
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(BWBTEST
+
+  # Circuit boundary
+  rect((554500 -276000) (403000 162001))
+
+  # Outgoing pins and their connections to nets
+  pin(name(A))
+
+ )
+ circuit(FWBTEST
+
+  # Circuit boundary
+  rect((536500 386500) (404000 179001))
+
+  # Outgoing pins and their connections to nets
+  pin(name(A))
+
+ )
+ circuit(FBGATEST
+
+  # Circuit boundary
+  rect((-449500 412500) (390500 198001))
+
+  # Outgoing pins and their connections to nets
+  pin(name(B))
+
+ )
+ circuit(BBGATEST
+
+  # Circuit boundary
+  rect((-468000 -313001) (442500 226001))
+
+  # Outgoing pins and their connections to nets
+  pin(name(A))
+
+ )
+ circuit(BDPTEST
+
+  # Circuit boundary
+  rect((71500 -290000) (371500 194000))
+
+  # Outgoing pins and their connections to nets
+  pin(name(A))
+  pin(name(B))
+
+ )
+ circuit(DPTEST
+
+  # Circuit boundary
+  rect((64500 86000) (371500 214500))
+
+  # Outgoing pins and their connections to nets
+  pin(name(B))
+  pin(name(A))
+
+ )
+ circuit(FDPTEST
+
+  # Circuit boundary
+  rect((59500 359500) (375500 241000))
+
+  # Outgoing pins and their connections to nets
+  pin(name(B))
+  pin(name(A))
+
+ )
+ circuit(testall
+
+  # Circuit boundary
+  rect((-577500 -1123000) (1868000 1796000))
+
+  # Nets with their geometries
+  net(1
+   rect(l2 (345500 455000) (256500 25000))
+   rect(l2 (-256500 -146000) (25000 146000))
+   rect(l2 (-47000 -183500) (75000 75000))
+   rect(l4 (-50000 -50000) (25000 25000))
+   rect(l5 (-134000 -25000) (134000 25000))
+   rect(l5 (-50000 -50000) (75000 75000))
+   rect(l5 (-184000 -78500) (75000 75000))
+   rect(l6 (-50000 -50000) (25000 25000))
+   rect(l7 (-133500 -21500) (134500 25000))
+   rect(l7 (-51000 -53500) (75000 75000))
+   rect(l7 (-183500 -73000) (75000 75000))
+   rect(l8 (-50000 -50000) (25000 25000))
+   rect(l9 (-25000 -152000) (25000 152000))
+   rect(l9 (-50000 -50000) (75000 75000))
+   rect(l9 (-80500 -217500) (90000 90000))
+   rect(l10 (-57500 -57500) (25000 25000))
+   rect(l11 (-25000 -25000) (25000 25000))
+  )
+  net(2
+   rect(l2 (-148000 463000) (300000 25000))
+  )
+  net(3
+   rect(l9 (348500 26500) (25000 179000))
+   rect(l9 (-57500 -58000) (90000 90000))
+   rect(l9 (-86000 -288500) (90000 90000))
+   rect(l10 (-61500 141000) (25000 25000))
+   rect(l10 (-21000 -223500) (25000 25000))
+   rect(l11 (-29000 173500) (25000 25000))
+   rect(l12 (-58500 -261000) (100000 100000))
+   rect(l12 (-100000 -100000) (100000 100000))
+   rect(l13 (-62500 -62500) (25000 25000))
+   rect(l14 (-24000 -225500) (269500 25000))
+   rect(l14 (-270500 7500) (25000 193000))
+   rect(l14 (-87500 -87500) (150000 150000))
+  )
+  net(4
+   rect(l14 (-126000 -195000) (292000 25000))
+  )
+
+  # Subcircuits and their connections
+  circuit(2 FDPTEST location(0 0)
+   pin(0 1)
+   pin(1 2)
+  )
+  circuit(3 FWBTEST location(0 0) pin(0 1))
+  circuit(7 DPTEST location(0 0)
+   pin(0 3)
+   pin(1 1)
+  )
+  circuit(8 FBGATEST location(0 0) pin(0 2))
+  circuit(9 BDPTEST location(0 0)
+   pin(0 3)
+   pin(1 4)
+  )
+  circuit(10 BWBTEST location(0 0) pin(0 3))
+  circuit(14 BBGATEST location(0 0) pin(0 4))
+
+ )
+)
+
+# Reference netlist
+reference(
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(FBGATEST
+
+  # Outgoing pins and their connections to nets
+  pin(name(A))
+  pin(name(B))
+
+ )
+ circuit(FWBTEST
+
+  # Outgoing pins and their connections to nets
+  pin(name(A))
+  pin(name(B))
+
+ )
+ circuit(FDPTEST
+
+  # Outgoing pins and their connections to nets
+  pin(name(A))
+  pin(name(B))
+
+ )
+ circuit(DPTEST
+
+  # Outgoing pins and their connections to nets
+  pin(name(A))
+  pin(name(B))
+
+ )
+ circuit(BDPTEST
+
+  # Outgoing pins and their connections to nets
+  pin(name(A))
+  pin(name(B))
+
+ )
+ circuit(BWBTEST
+
+  # Outgoing pins and their connections to nets
+  pin(name(A))
+  pin(name(B))
+
+ )
+ circuit(BBGATEST
+
+  # Outgoing pins and their connections to nets
+  pin(name(A))
+  pin(name(B))
+
+ )
+ circuit(TESTALL
+
+  # Nets
+  net(1 name(A1))
+  net(2 name(B1))
+  net(3 name(C1))
+  net(4 name(G1))
+  net(5 name(D1))
+  net(6 name(E1))
+  net(7 name(H1))
+  net(8 name(F1))
+
+  # Subcircuits and their connections
+  circuit(1 FBGATEST name(UFBGA)
+   pin(0 1)
+   pin(1 2)
+  )
+  circuit(2 FWBTEST name(UFWB)
+   pin(0 3)
+   pin(1 4)
+  )
+  circuit(3 FDPTEST name(UFDP)
+   pin(0 2)
+   pin(1 3)
+  )
+  circuit(4 DPTEST name(UDP)
+   pin(0 3)
+   pin(1 5)
+  )
+  circuit(5 BDPTEST name(UBDP)
+   pin(0 5)
+   pin(1 6)
+  )
+  circuit(6 BWBTEST name(UBWB)
+   pin(0 5)
+   pin(1 7)
+  )
+  circuit(7 BBGATEST name(UBBGA)
+   pin(0 6)
+   pin(1 8)
+  )
+
+ )
+)
+
+# Cross reference
+xref(
+ circuit(BBGATEST BBGATEST match
+  xref(
+   pin(() 1 match)
+   pin(0 0 match)
+  )
+ )
+ circuit(BDPTEST BDPTEST match
+  xref(
+   pin(0 0 match)
+   pin(1 1 match)
+  )
+ )
+ circuit(BWBTEST BWBTEST match
+  xref(
+   pin(() 1 match)
+   pin(0 0 match)
+  )
+ )
+ circuit(DPTEST DPTEST match
+  xref(
+   pin(1 0 match)
+   pin(0 1 match)
+  )
+ )
+ circuit(FBGATEST FBGATEST match
+  xref(
+   pin(() 0 match)
+   pin(0 1 match)
+  )
+ )
+ circuit(FDPTEST FDPTEST match
+  xref(
+   pin(1 0 match)
+   pin(0 1 match)
+  )
+ )
+ circuit(FWBTEST FWBTEST match
+  xref(
+   pin(() 1 match)
+   pin(0 0 match)
+  )
+ )
+ circuit(testall TESTALL match
+  xref(
+   net(2 2 match)
+   net(1 3 match)
+   net(3 5 match)
+   net(4 6 match)
+   circuit(14 7 match)
+   circuit(9 5 match)
+   circuit(10 6 match)
+   circuit(7 4 match)
+   circuit(8 1 match)
+   circuit(2 3 match)
+   circuit(3 2 match)
+  )
+ )
+)

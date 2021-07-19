@@ -241,3 +241,23 @@ TEST(26_enableWandL)
   run_test (_this, "enable_wl2", "resistor.gds");
   run_test (_this, "enable_wl3", "resistor.gds");
 }
+
+TEST(27_BlackBoxDevicesWithAlign)
+{
+  run_test (_this, "bbdevices1", "bbdevices1.gds");
+  run_test (_this, "bbdevices2", "bbdevices2.gds");
+  run_test (_this, "bbdevices3", "bbdevices3.gds");
+  run_test (_this, "bbdevices4", "bbdevices4.gds");
+  run_test (_this, "bbdevices5", "bbdevices5.gds");
+  run_test (_this, "bbdevices6", "bbdevices6.gds");
+}
+
+TEST(28_BlackBoxDevicesWithBlank)
+{
+  run_test (_this, "bbdevices1b", "bbdevices1.gds");
+  run_test (_this, "bbdevices2b", "bbdevices2.gds");
+  run_test (_this, "bbdevices3b", "bbdevices3.gds");
+  run_test (_this, "bbdevices4b", "bbdevices4.gds");
+  run_test (_this, "bbdevices5b", "bbdevices5.gds");
+  run_test (_this, "bbdevices6b", "bbdevices6.gds");
+}

@@ -1,0 +1,75 @@
+source($lvs_test_source)
+report_lvs($lvs_test_target_lvsdb, true)
+target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
+
+schematic("bbdevices.net")
+
+deep
+
+class Layers 
+  attr_accessor :selected, :fdpPad, :fdp, :fsm, :ftp, :fm7, :fv7, :fm6, :fv6, :fm5, :fv5, :fm4, :fv4, :fm3, :fv3, :fm2, :fv2, :fm1, :fv1, :dpPad, :dp, :package, :tsv, :bv1, :bm1, :bv2, :bm2, :bv3, :bm3, :bv4, :bm4, :bv5, :bm5, :bv6, :bm6, :bv7, :bm7, :btp, :bsm, :bdpPad, :bdp, :text, :fm, :fv, :bm, :bv
+end
+
+layer = Layers.new
+layer.package = input(20,0)
+layer.fdp = input(70,0)
+layer.fdpPad = input(73,0)
+layer.fsm = input(45,0)
+layer.ftp = input(44,0)
+layer.fm7 = input(43,0)
+layer.fv7 = input(42,0)
+layer.fm6 = input(41,0)
+layer.fv6 = input(40,0)
+layer.fm5 = input(39,0)
+layer.fv5 = input(38,0)
+layer.fm4 = input(37,0)
+layer.fv4 = input(36,0)
+layer.fm3 = input(35,0)
+layer.fv3 = input(34,0)
+layer.fm2 = input(33,0)
+layer.fv2 = input(32,0)
+layer.fm1 = input(31,0)
+layer.fv1 = input(30,0)
+layer.dpPad = input(75,0)
+layer.dp = input(21,0)
+layer.tsv = input(19,0)
+layer.bv1 = input(50,0)
+layer.bm1 = input(51,0)
+layer.bv2 = input(52,0)
+layer.bm2 = input(53,0)
+layer.bv3 = input(54,0)
+layer.bm3 = input(55,0)
+layer.bv4 = input(56,0)
+layer.bm4 = input(57,0)
+layer.bv5 = input(58,0)
+layer.bm5 = input(59,0)
+layer.bv6 = input(60,0)
+layer.bm6 = input(61,0)
+layer.bv7 = input(62,0)
+layer.bm7 = input(63,0)
+layer.btp = input(64,0)
+layer.bsm = input(65,0)
+layer.bdpPad = input(78,0)
+layer.bdp = input(71,0)
+layer.text = input(230,0)
+
+connect(layer.fdpPad, layer.fm4)
+connect(layer.ftp, layer.fm4)
+connect(layer.fm4, layer.fv4)
+connect(layer.fv4, layer.fm3)
+connect(layer.fm3, layer.fv3)
+connect(layer.fv3, layer.fm2)
+connect(layer.fm2, layer.fv2)
+connect(layer.fv2, layer.fm1)
+connect(layer.fm1, layer.fv1)
+connect(layer.dpPad, layer.fv1)
+connect(layer.fv1, layer.tsv)
+connect(layer.tsv, layer.bv1)
+connect(layer.bv1, layer.bm1)
+connect(layer.btp, layer.bm1)
+connect(layer.bdpPad, layer.bm1)
+
+blank_circuit("*TEST")
+netlist.simplify
+
+compare

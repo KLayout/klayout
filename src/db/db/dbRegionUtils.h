@@ -611,7 +611,7 @@ public:
   /**
    *  @brief Reimplementation of the box_scanner_receiver interface
    */
-  void finish (const Edge *o, const size_t &);
+  void finish (const Edge *o, size_t);
 
   /**
    *  @brief Gets a value indicating whether the check requires different layers

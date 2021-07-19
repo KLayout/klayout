@@ -436,7 +436,7 @@ TechnologyController::show_editor ()
 {
   db::Technologies new_tech = *db::Technologies ().instance ();
 
-  if (mp_editor && mp_editor->exec (new_tech)) {
+  if (mp_editor && mp_editor->exec_dialog (new_tech)) {
 
     std::string err_msg;
 

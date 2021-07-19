@@ -1,0 +1,57 @@
+* Extracted by KLayout
+
+* cell testall
+.SUBCKT testall
+* cell instance $2 r0 *1 0,0
+X$2 1 2 FDPTEST
+* cell instance $3 r0 *1 0,0
+X$3 1 FWBTEST
+* cell instance $7 r0 *1 0,0
+X$7 3 1 DPTEST
+* cell instance $8 r0 *1 0,0
+X$8 2 FBGATEST
+* cell instance $9 r0 *1 0,0
+X$9 3 4 BDPTEST
+* cell instance $10 r0 *1 0,0
+X$10 3 BWBTEST
+* cell instance $14 r0 *1 0,0
+X$14 4 BBGATEST
+.ENDS testall
+
+* cell FDPTEST
+* pin B
+* pin A
+.SUBCKT FDPTEST 1 2
+.ENDS FDPTEST
+
+* cell DPTEST
+* pin B
+* pin A
+.SUBCKT DPTEST 1 2
+.ENDS DPTEST
+
+* cell BDPTEST
+* pin A
+* pin B
+.SUBCKT BDPTEST 1 2
+.ENDS BDPTEST
+
+* cell BBGATEST
+* pin A
+.SUBCKT BBGATEST 1
+.ENDS BBGATEST
+
+* cell FBGATEST
+* pin B
+.SUBCKT FBGATEST 1
+.ENDS FBGATEST
+
+* cell FWBTEST
+* pin A
+.SUBCKT FWBTEST 1
+.ENDS FWBTEST
+
+* cell BWBTEST
+* pin B
+.SUBCKT BWBTEST 1
+.ENDS BWBTEST

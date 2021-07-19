@@ -122,7 +122,7 @@ struct box_scanner_receiver
    *  The finish method is called when an object is no longer in the queue and can be
    *  discarded.
    */
-  virtual void finish (const Obj * /*obj*/, const Prop & /*prop*/) { }
+  virtual void finish (const Obj * /*obj*/, Prop /*prop*/) { }
 
   /**
    *  @brief Callback for an interaction of o1 with o2.
@@ -130,7 +130,7 @@ struct box_scanner_receiver
    *  This method is called when the object o1 interacts with o2 within the current 
    *  definition.
    */
-  virtual void add (const Obj * /*o1*/, const Prop & /*p1*/, const Obj * /*o2*/, const Prop & /*p2*/) { }
+  virtual void add (const Obj * /*o1*/, Prop /*p1*/, const Obj * /*o2*/, Prop /*p2*/) { }
 
   /**
    *  @brief Indicates whether the scanner may stop
@@ -1043,7 +1043,7 @@ public:
   /**
    *  @brief Implementation of the box scanner receiver class
    */
-  void finish (const Obj *obj, const Prop &prop)
+  void finish (const Obj *obj, Prop prop)
   {
     om_iterator_type omi = m_om.find (om_key_type (obj, prop));
     if (omi != m_om.end ()) {
@@ -1089,7 +1089,7 @@ public:
   /**
    *  @brief Implementation of the box scanner receiver class
    */
-  void add (const Obj *o1, const Prop &p1, const Obj *o2, const Prop &p2)
+  void add (const Obj *o1, Prop p1, const Obj *o2, Prop p2)
   {
     om_iterator_type om1 = m_om.find (om_key_type (o1, p1));
     om_iterator_type om2 = m_om.find (om_key_type (o2, p2));

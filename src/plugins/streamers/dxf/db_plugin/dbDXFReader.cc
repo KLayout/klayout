@@ -3037,7 +3037,7 @@ DXFReader::read_int64 ()
     if (! ex.try_read (x) || ! ex.at_end ()) {
       error ("Expected an ASCII numerical value");
     }
-    if (x < std::numeric_limits<long long>::min() || x > std::numeric_limits<long long>::max()) {
+    if (x < double (std::numeric_limits<long long>::min()) || x > double (std::numeric_limits<long long>::max())) {
       error ("Value is out of limits for a 64 bit signed integer");
     }
     return (long long) x;

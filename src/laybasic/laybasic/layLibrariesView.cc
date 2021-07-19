@@ -669,7 +669,7 @@ LibrariesView::do_update_content (int lib_index)
     mp_cell_lists.pop_back ();
   }
 
-  for (size_t i = imin; i < m_libraries.size () && i < mp_selector->count () && i <= imax; ++i) {
+  for (size_t i = imin; i < m_libraries.size () && i < size_t (mp_selector->count ()) && i <= imax; ++i) {
     mp_selector->setItemText (int (i), tl::to_qstring (display_string (int (i))));
   }
   while (mp_selector->count () < int (m_libraries.size ())) {

@@ -669,12 +669,211 @@ struct CompareData
 };
 
 // --------------------------------------------------------------------------------------------------------------------
+//  A generic triplet of object category and two IDs
+//  Used as a key for device terminal edges and subcircuit edges
+
+class CatAndIds
+{
+public:
+  CatAndIds (size_t cat, size_t id1, size_t id2)
+    : m_cat (cat), m_id1 (id1), m_id2 (id2)
+  { }
+
+  bool operator== (const CatAndIds &other) const
+  {
+    return m_cat == other.m_cat && m_id1 == other.m_id1 && m_id2 == other.m_id2;
+  }
+
+  bool operator< (const CatAndIds &other) const
+  {
+    if (m_cat != other.m_cat) {
+      return m_cat < other.m_cat;
+    }
+    if (m_id1 != other.m_id1) {
+      return m_id1 < other.m_id1;
+    }
+    if (m_id2 != other.m_id2) {
+      return m_id2 < other.m_id2;
+    }
+    return false;
+  }
+
+private:
+  size_t m_cat, m_id1, m_id2;
+};
+
+// --------------------------------------------------------------------------------------------------------------------
 //  NetGraphNode definition and implementation
 
 static size_t translate_terminal_id (size_t tid, const db::Device *device)
 {
   return device->device_class () ? device->device_class ()->normalize_terminal_id (tid) : tid;
 }
+
+/**
+ *  @brief Represents one transition within a net graph edge
+ *
+ *  Each transition connects two pins of subcircuits or terminals of devices.
+ *  An edge is basically a collection of transitions.
+ */
+class Transition
+{
+public:
+  Transition (const db::Device *device, size_t device_category, size_t terminal1_id, size_t terminal2_id)
+  {
+    m_ptr = (void *) device;
+    m_cat = device_category;
+    tl_assert (terminal1_id < std::numeric_limits<size_t>::max () / 2);
+    m_id1 = terminal1_id;
+    m_id2 = terminal2_id;
+  }
+
+  Transition (const db::SubCircuit *subcircuit, size_t subcircuit_category, size_t pin1_id, size_t pin2_id)
+  {
+    m_ptr = (void *) subcircuit;
+    m_cat = subcircuit_category;
+    //  m_id1 between max/2 and max indicates subcircuit
+    tl_assert (pin1_id < std::numeric_limits<size_t>::max () / 2);
+    m_id1 = std::numeric_limits<size_t>::max () - pin1_id;
+    m_id2 = pin2_id;
+  }
+
+  static size_t first_unique_pin_id ()
+  {
+    return std::numeric_limits<size_t>::max () / 4;
+  }
+
+  CatAndIds make_key () const
+  {
+    if (is_for_subcircuit ()) {
+      return CatAndIds (m_cat, m_id1, size_t (0));
+    } else {
+      return CatAndIds (m_cat, m_id1, m_id2);
+    }
+  }
+
+  bool operator< (const Transition &other) const
+  {
+    if (is_for_subcircuit () != other.is_for_subcircuit ()) {
+      return is_for_subcircuit () < other.is_for_subcircuit ();
+    }
+
+    if (is_for_subcircuit ()) {
+
+      if ((subcircuit () != 0) != (other.subcircuit () != 0)) {
+        return (subcircuit () != 0) < (other.subcircuit () != 0);
+      }
+
+      if (subcircuit () != 0) {
+        SubCircuitCompare scc;
+        if (! scc.equals (std::make_pair (subcircuit (), cat ()), std::make_pair (other.subcircuit (), other.cat ()))) {
+          return scc (std::make_pair (subcircuit (), cat ()), std::make_pair (other.subcircuit (), other.cat ()));
+        }
+      }
+
+      return m_id1 < other.m_id1;
+
+    } else {
+
+      if ((device () != 0) != (other.device () != 0)) {
+        return (device () != 0) < (other.device () != 0);
+      }
+
+      if (device () != 0) {
+        DeviceCompare dc;
+        if (! dc.equals (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()))) {
+          return dc (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()));
+        }
+      }
+
+      if (m_id1 != other.m_id1) {
+        return m_id1 < other.m_id1;
+      }
+      return m_id2 < other.m_id2;
+
+    }
+  }
+
+  bool operator== (const Transition &other) const
+  {
+    if (is_for_subcircuit () != other.is_for_subcircuit ()) {
+      return false;
+    }
+
+    if (is_for_subcircuit ()) {
+
+      if ((subcircuit () != 0) != (other.subcircuit () != 0)) {
+        return false;
+      }
+
+      if (subcircuit () != 0) {
+        SubCircuitCompare scc;
+        if (! scc.equals (std::make_pair (subcircuit (), cat ()), std::make_pair (other.subcircuit (), other.cat ()))) {
+          return false;
+        }
+      }
+
+      return (m_id1 == other.m_id1);
+
+    } else {
+
+      if ((device () != 0) != (other.device () != 0)) {
+        return false;
+      }
+
+      if (device () != 0) {
+        DeviceCompare dc;
+        if (! dc.equals (std::make_pair (device (), cat ()), std::make_pair (other.device (), other.cat ()))) {
+          return false;
+        }
+      }
+
+      return (m_id1 == other.m_id1 && m_id2 == other.m_id2);
+
+    }
+  }
+
+  std::string to_string () const
+  {
+    if (is_for_subcircuit ()) {
+      const db::SubCircuit *sc = subcircuit ();
+      const db::Circuit *c = sc->circuit_ref ();
+      return std::string ("X") + sc->expanded_name () + " " + c->name () + " " + c->pin_by_id (m_id2)->expanded_name () + " (virtual)";
+   } else {
+      size_t term_id1 = m_id1;
+      size_t term_id2 = m_id2;
+      const db::Device *d = device ();
+      const db::DeviceClass *dc = d->device_class ();
+      return std::string ("D") + d->expanded_name () + " " + dc->name () + " "
+        + "(" + dc->terminal_definitions () [term_id1].name () + ")->(" + dc->terminal_definitions () [term_id2].name () + ")";
+    }
+  }
+
+  inline bool is_for_subcircuit () const
+  {
+    return m_id1 > std::numeric_limits<size_t>::max () / 2;
+  }
+
+  const db::Device *device () const
+  {
+    return (const db::Device *) m_ptr;
+  }
+
+  const db::SubCircuit *subcircuit () const
+  {
+    return (const db::SubCircuit *) m_ptr;
+  }
+
+  size_t cat () const
+  {
+    return m_cat;
+  }
+
+private:
+  void *m_ptr;
+  size_t m_cat;
+  size_t m_id1, m_id2;
+};
 
 /**
  *  @brief A node within the net graph
@@ -691,166 +890,6 @@ static size_t translate_terminal_id (size_t tid, const db::Device *device)
 class NetGraphNode
 {
 public:
-  /**
-   *  @brief Represents one transition within an edge_iterator
-   *
-   *  Each transition connects two pins of subcircuits or terminals
-   *  of devices.
-   *  An edge is basically a collection of transitions.
-   */
-  struct Transition
-  {
-
-    Transition (const db::Device *device, size_t device_category, size_t terminal1_id, size_t terminal2_id)
-    {
-      device_pair ().first = device;
-      device_pair ().second = device_category;
-      m_id1 = terminal1_id;
-      m_id2 = terminal2_id;
-    }
-
-    Transition (const db::SubCircuit *subcircuit, size_t subcircuit_category, size_t pin1_id, size_t pin2_id)
-    {
-      subcircuit_pair ().first = subcircuit;
-      subcircuit_pair ().second = subcircuit_category;
-      m_id1 = std::numeric_limits<size_t>::max () - pin1_id;
-      m_id2 = pin2_id;
-    }
-
-    size_t id1 () const
-    {
-      return m_id1;
-    }
-
-    size_t id2 () const
-    {
-      return m_id2;
-    }
-
-    bool operator< (const Transition &other) const
-    {
-      if (is_for_subcircuit () != other.is_for_subcircuit ()) {
-        return is_for_subcircuit () < other.is_for_subcircuit ();
-      }
-
-      if (is_for_subcircuit ()) {
-
-        if ((subcircuit_pair ().first != 0) != (other.subcircuit_pair ().first != 0)) {
-          return (subcircuit_pair ().first != 0) < (other.subcircuit_pair ().first != 0);
-        }
-
-        if (subcircuit_pair ().first != 0) {
-          SubCircuitCompare scc;
-          if (! scc.equals (subcircuit_pair (), other.subcircuit_pair ())) {
-            return scc (subcircuit_pair (), other.subcircuit_pair ());
-          }
-        }
-
-      } else {
-
-        if ((device_pair ().first != 0) != (other.device_pair ().first != 0)) {
-          return (device_pair ().first != 0) < (other.device_pair ().first != 0);
-        }
-
-        if (device_pair ().first != 0) {
-          DeviceCompare dc;
-          if (! dc.equals (device_pair (), other.device_pair ())) {
-            return dc (device_pair (), other.device_pair ());
-          }
-        }
-
-      }
-
-      if (m_id1 != other.m_id1) {
-        return m_id1 < other.m_id1;
-      }
-      return m_id2 < other.m_id2;
-    }
-
-    bool operator== (const Transition &other) const
-    {
-      if (is_for_subcircuit () != other.is_for_subcircuit ()) {
-        return false;
-      }
-
-      if (is_for_subcircuit ()) {
-
-        if ((subcircuit_pair ().first != 0) != (other.subcircuit_pair ().first != 0)) {
-          return false;
-        }
-
-        if (subcircuit_pair ().first != 0) {
-          SubCircuitCompare scc;
-          if (! scc.equals (subcircuit_pair (), other.subcircuit_pair ())) {
-            return false;
-          }
-        }
-
-      } else {
-
-        if ((device_pair ().first != 0) != (other.device_pair ().first != 0)) {
-          return false;
-        }
-
-        if (device_pair ().first != 0) {
-          DeviceCompare dc;
-          if (! dc.equals (device_pair (), other.device_pair ())) {
-            return false;
-          }
-        }
-
-      }
-
-      return (m_id1 == other.m_id1 && m_id2 == other.m_id2);
-    }
-
-    std::string to_string () const
-    {
-      if (is_for_subcircuit ()) {
-        const db::SubCircuit *sc = subcircuit_pair ().first;
-        size_t pin_id = std::numeric_limits<size_t>::max () - m_id1;
-        const db::Circuit *c = sc->circuit_ref ();
-        return std::string ("X") + sc->expanded_name () + " " + c->name () + " " + c->pin_by_id (pin_id)->expanded_name () + " (virtual)";
-     } else {
-        size_t term_id1 = m_id1;
-        size_t term_id2 = m_id2;
-        const db::Device *d = device_pair ().first;
-        const db::DeviceClass *dc = d->device_class ();
-        return std::string ("D") + d->expanded_name () + " " + dc->name () + " "
-          + "(" + dc->terminal_definitions () [term_id1].name () + ")->(" + dc->terminal_definitions () [term_id2].name () + ")";
-      }
-    }
-
-    inline bool is_for_subcircuit () const
-    {
-      return m_id1 > std::numeric_limits<size_t>::max () / 2;
-    }
-
-    std::pair<const db::Device *, size_t> &device_pair ()
-    {
-      return *reinterpret_cast<std::pair<const db::Device *, size_t> *> ((void *) &m_ref);
-    }
-
-    const std::pair<const db::Device *, size_t> &device_pair () const
-    {
-      return *reinterpret_cast<const std::pair<const db::Device *, size_t> *> ((const void *) &m_ref);
-    }
-
-    std::pair<const db::SubCircuit *, size_t> &subcircuit_pair ()
-    {
-      return *reinterpret_cast<std::pair<const db::SubCircuit *, size_t> *> ((void *) &m_ref);
-    }
-
-    const std::pair<const db::SubCircuit *, size_t> &subcircuit_pair () const
-    {
-      return *reinterpret_cast<const std::pair<const db::SubCircuit *, size_t> *> ((const void *) &m_ref);
-    }
-
-  private:
-    char m_ref [sizeof (std::pair<const void *, size_t>)];
-    size_t m_id1, m_id2;
-  };
-
   typedef std::pair<std::vector<Transition>, std::pair<size_t, const db::Net *> > edge_type;
 
   static void swap_edges (edge_type &e1, edge_type &e2)
@@ -878,12 +917,12 @@ public:
   /**
    *  @brief Builds a node for a net
    */
-  NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map);
+  NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t *unique_pin_id);
 
   /**
    *  @brief Builds a virtual node for a subcircuit
    */
-  NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map);
+  NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t *unique_pin_id);
 
   void expand_subcircuit_nodes (NetGraph *graph);
 
@@ -931,8 +970,18 @@ public:
 
   void apply_net_index (const std::map<const db::Net *, size_t> &ni);
 
-  bool operator< (const NetGraphNode &node) const;
-  bool operator== (const NetGraphNode &node) const;
+  bool less (const NetGraphNode &node, bool with_name) const;
+  bool equal (const NetGraphNode &node, bool with_name) const;
+
+  bool operator== (const NetGraphNode &node) const
+  {
+    return equal (node, false);
+  }
+
+  bool operator< (const NetGraphNode &node) const
+  {
+    return less (node, false);
+  }
 
   void swap (NetGraphNode &other)
   {
@@ -953,7 +1002,7 @@ public:
 
   edge_iterator find_edge (const std::vector<Transition> &edge) const
   {
-    edge_iterator res = std::lower_bound (begin (), end (), edge, NetGraphNode::EdgeToEdgeOnlyCompare ());
+    edge_iterator res = std::lower_bound (begin (), end (), edge, EdgeToEdgeOnlyCompare ());
     if (res == end () || res->first != edge) {
       return end ();
     } else {
@@ -970,13 +1019,13 @@ private:
    *  @brief Compares edges as "less"
    *  Edge comparison is based on the pins attached (name of the first pin).
    */
-  static bool net_less (const db::Net *a, const db::Net *b);
+  static bool net_less (const db::Net *a, const db::Net *b, bool with_name);
 
   /**
    *  @brief Compares edges as "equal"
    *  See edge_less for the comparison details.
    */
-  static bool edge_equal (const db::Net *a, const db::Net *b);
+  static bool net_equal (const db::Net *a, const db::Net *b, bool with_name);
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -999,7 +1048,7 @@ struct CompareNodePtr
 {
   bool operator() (const std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> &a, const std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> &b) const
   {
-    return *a.first < *b.first;
+    return a.first->less (*b.first, true);
   }
 };
 
@@ -1033,7 +1082,7 @@ public:
   /**
    *  @brief Builds the net graph
    */
-  void build (const db::Circuit *c, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const db::DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinMapper *circuit_pin_mapper);
+  void build (const db::Circuit *c, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const db::DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinMapper *circuit_pin_mapper, size_t *unique_pin_id);
 
   /**
    *  @brief Gets the node index for the given net
@@ -1184,7 +1233,12 @@ private:
 
 // --------------------------------------------------------------------------------------------------------------------
 
-NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
+static bool is_non_trivial_net (const db::Net *net)
+{
+  return net->pin_count () == 0 && net->terminal_count () == 0 && net->subcircuit_pin_count () == 1;
+}
+
+NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t *unique_pin_id)
   : mp_net (net), m_other_net_index (invalid_id)
 {
   if (! net) {
@@ -1214,25 +1268,36 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
 
     const CircuitMapper *cm = & icm->second;
 
-    //  A pin assignment may be missing because there is no net for a pin -> skip this
+    //  A pin assignment may be missing because there is no (real) net for a pin -> skip this pin
+
+    size_t original_pin_id = pin_id;
 
     if (! cm->has_other_pin_for_this_pin (pin_id)) {
-      continue;
+
+      //  isolated pins are ignored, others are considered for the matching
+      if (! unique_pin_id || is_non_trivial_net (net)) {
+        continue;
+      } else {
+        pin_id = (*unique_pin_id)++;
+      }
+
+    } else {
+
+      //  NOTE: if cm is given, cr and pin_id are given in terms of the canonical "other" circuit.
+      //  For c1 this is the c1->c2 mapper, for c2 this is the c2->c2 dummy mapper.
+
+      pin_id = cm->other_pin_from_this_pin (pin_id);
+
+      //  realize pin swapping by normalization of pin ID
+
+      pin_id = pin_map->normalize_pin_id (cm->other (), pin_id);
+
     }
-
-    //  NOTE: if cm is given, cr and pin_id are given in terms of the canonical "other" circuit.
-    //  For c1 this is the c1->c2 mapper, for c2 this is the c2->c2 dummy mapper.
-
-    pin_id = cm->other_pin_from_this_pin (pin_id);
-
-    //  realize pin swapping by normalization of pin ID
-
-    pin_id = pin_map->normalize_pin_id (cm->other (), pin_id);
 
     //  Subcircuits are routed to a null node and descend from a virtual node inside the subcircuit.
     //  The reasoning is that this way we don't need #pins*(#pins-1) edges but rather #pins.
 
-    Transition ed (sc, circuit_cat, pin_id, pin_id);
+    Transition ed (sc, circuit_cat, pin_id, original_pin_id);
 
     std::map<const void *, size_t>::const_iterator in = n2entry.find ((const void *) sc);
     if (in == n2entry.end ()) {
@@ -1290,7 +1355,7 @@ NetGraphNode::NetGraphNode (const db::Net *net, DeviceCategorizer &device_catego
   }
 }
 
-NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map)
+NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circuit_categorizer, const std::map<const db::Circuit *, CircuitMapper> *circuit_map, const CircuitPinMapper *pin_map, size_t *unique_pin_id)
   : mp_net (0), m_other_net_index (invalid_id)
 {
   std::map<const db::Net *, size_t> n2entry;
@@ -1314,24 +1379,35 @@ NetGraphNode::NetGraphNode (const db::SubCircuit *sc, CircuitCategorizer &circui
       continue;
     }
 
-    //  A pin assignment may be missing because there is no net for a pin -> skip this
+    //  A pin assignment may be missing because there is no (real) net for a pin -> skip this pin
+
+    size_t original_pin_id = pin_id;
 
     if (! cm->has_other_pin_for_this_pin (pin_id)) {
-      continue;
+
+      //  isolated pins are ignored, others are considered for the matching
+      if (! unique_pin_id || is_non_trivial_net (net_at_pin)) {
+        continue;
+      } else {
+        pin_id = (*unique_pin_id)++;
+      }
+
+    } else {
+
+      //  NOTE: if cm is given, cr and pin_id are given in terms of the canonical "other" circuit.
+      //  For c1 this is the c1->c2 mapper, for c2 this is the c2->c2 dummy mapper.
+
+      pin_id = cm->other_pin_from_this_pin (pin_id);
+
+      //  realize pin swapping by normalization of pin ID
+
+      pin_id = pin_map->normalize_pin_id (cm->other (), pin_id);
+
     }
-
-    //  NOTE: if cm is given, cr and pin_id are given in terms of the canonical "other" circuit.
-    //  For c1 this is the c1->c2 mapper, for c2 this is the c2->c2 dummy mapper.
-
-    pin_id = cm->other_pin_from_this_pin (pin_id);
-
-    //  realize pin swapping by normalization of pin ID
-
-    pin_id = pin_map->normalize_pin_id (cm->other (), pin_id);
 
     //  Make the other endpoint
 
-    Transition ed (sc, circuit_cat, pin_id, pin_id);
+    Transition ed (sc, circuit_cat, pin_id, original_pin_id);
 
     std::map<const db::Net *, size_t>::const_iterator in = n2entry.find (net_at_pin);
     if (in == n2entry.end ()) {
@@ -1373,9 +1449,9 @@ NetGraphNode::expand_subcircuit_nodes (NetGraph *graph)
     for (std::vector<Transition>::const_iterator t = e->first.begin (); t != e->first.end (); ++t) {
       tl_assert (t->is_for_subcircuit ());
       if (! sc) {
-        sc = t->subcircuit_pair ().first;
+        sc = t->subcircuit ();
       } else {
-        tl_assert (sc == t->subcircuit_pair ().first);
+        tl_assert (sc == t->subcircuit ());
       }
     }
 
@@ -1456,7 +1532,7 @@ NetGraphNode::apply_net_index (const std::map<const db::Net *, size_t> &ni)
 }
 
 bool
-NetGraphNode::operator< (const NetGraphNode &node) const
+NetGraphNode::less (const NetGraphNode &node, bool with_name) const
 {
   if (m_edges.size () != node.m_edges.size ()) {
     return m_edges.size () < node.m_edges.size ();
@@ -1468,13 +1544,13 @@ NetGraphNode::operator< (const NetGraphNode &node) const
   }
   if (m_edges.empty ()) {
     //  do a more detailed analysis on the nets involved
-    return net_less (net (), node.net ());
+    return net_less (net (), node.net (), with_name);
   }
   return false;
 }
 
 bool
-NetGraphNode::operator== (const NetGraphNode &node) const
+NetGraphNode::equal (const NetGraphNode &node, bool with_name) const
 {
   if (m_edges.size () != node.m_edges.size ()) {
     return false;
@@ -1486,35 +1562,39 @@ NetGraphNode::operator== (const NetGraphNode &node) const
   }
   if (m_edges.empty ()) {
     //  do a more detailed analysis on the edges
-    return edge_equal (net (), node.net ());
+    return net_equal (net (), node.net (), with_name);
   }
   return true;
 }
 
 bool
-NetGraphNode::net_less (const db::Net *a, const db::Net *b)
+NetGraphNode::net_less (const db::Net *a, const db::Net *b, bool with_name)
 {
   if ((a != 0) != (b != 0)) {
     return (a != 0) < (b != 0);
   }
-  if (a != 0) {
-    return a->pin_count () < b->pin_count ();
-  } else {
+  if (a == 0) {
     return false;
   }
+  if (a->pin_count () != b->pin_count ()) {
+    return a->pin_count () < b->pin_count ();
+  }
+  return with_name ? name_compare (a, b) < 0 : false;
 }
 
 bool
-NetGraphNode::edge_equal (const db::Net *a, const db::Net *b)
+NetGraphNode::net_equal (const db::Net *a, const db::Net *b, bool with_name)
 {
   if ((a != 0) != (b != 0)) {
     return false;
   }
-  if (a != 0) {
-    return a->pin_count () == b->pin_count ();
-  } else {
+  if (a == 0) {
     return true;
   }
+  if (a->pin_count () != b->pin_count ()) {
+    return false;
+  }
+  return with_name ? name_compare (a, b) == 0 : true;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1524,52 +1604,26 @@ NetGraphNode::edge_equal (const db::Net *a, const db::Net *b)
  */
 struct NodeRange
 {
-  NodeRange (size_t _num, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _n1, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _nn1,
-                          std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _n2, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _nn2)
-    : num (_num), n1 (_n1), nn1 (_nn1), n2 (_n2), nn2 (_nn2)
+  NodeRange (size_t _num1, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _n1, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _nn1,
+             size_t _num2, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _n2, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator _nn2)
+    : num1 (_num1), num2 (_num2), n1 (_n1), nn1 (_nn1), n2 (_n2), nn2 (_nn2)
   {
     //  .. nothing yet ..
   }
 
   bool operator< (const NodeRange &other) const
   {
-    return num < other.num;
+    if (num1 != other.num1) {
+      return num1 < other.num1;
+    }
+    return num2 < other.num2;
   }
 
-  size_t num;
+  size_t num1, num2;
   std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator n1, nn1, n2, nn2;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
-
-struct CatAndIds
-{
-public:
-  CatAndIds (size_t _cat, size_t _id1, size_t _id2)
-    : cat (_cat), id1 (_id1), id2 (_id2)
-  { }
-
-  bool operator== (const CatAndIds &other) const
-  {
-    return cat == other.cat && id1 == other.id1 && id2 == other.id2;
-  }
-
-  bool operator< (const CatAndIds &other) const
-  {
-    if (cat != other.cat) {
-      return cat < other.cat;
-    }
-    if (id1 != other.id1) {
-      return id1 < other.id1;
-    }
-    if (id2 != other.id2) {
-      return id2 < other.id2;
-    }
-    return false;
-  }
-
-  size_t cat, id1, id2;
-};
 
 template <class Obj>
 class generic_mapper_for_target_node
@@ -1659,9 +1713,9 @@ public:
 
     size_t ni = e.second.first;
     std::set<std::pair<CatAndIds, const Device *> > &dev = for_node_nc (ni);
-    for (std::vector<NetGraphNode::Transition>::const_iterator j = e.first.begin (); j != e.first.end (); ++j) {
+    for (std::vector<Transition>::const_iterator j = e.first.begin (); j != e.first.end (); ++j) {
       if (! j->is_for_subcircuit ()) {
-        dev.insert (std::make_pair (CatAndIds (j->device_pair ().second, j->id1 (), j->id2 ()), j->device_pair ().first));
+        dev.insert (std::make_pair (j->make_key (), j->device ()));
       }
     }
   }
@@ -1686,9 +1740,9 @@ public:
 
     size_t ni = e.second.first;
     std::set<std::pair<CatAndIds, const SubCircuit *> > &sc = for_node_nc (ni);
-    for (std::vector<NetGraphNode::Transition>::const_iterator j = e.first.begin (); j != e.first.end (); ++j) {
+    for (std::vector<Transition>::const_iterator j = e.first.begin (); j != e.first.end (); ++j) {
       if (j->is_for_subcircuit ()) {
-        sc.insert (std::make_pair (CatAndIds (j->subcircuit_pair ().second, j->id1 (), j->id2 ()), j->subcircuit_pair ().first));
+        sc.insert (std::make_pair (j->make_key (), j->subcircuit ()));
       }
     }
   }
@@ -1829,7 +1883,7 @@ private:
 //  NetGraph implementation
 
 void
-NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const db::DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinMapper *circuit_pin_mapper)
+NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, CircuitCategorizer &circuit_categorizer, const db::DeviceFilter &device_filter, const std::map<const db::Circuit *, CircuitMapper> *circuit_and_pin_mapping, const CircuitPinMapper *circuit_pin_mapper, size_t *unique_pin_id)
 {
   tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("Building net graph for circuit: ")) + c->name ());
 
@@ -1839,7 +1893,7 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
   m_net_index.clear ();
 
   //  create a dummy node for a null net
-  m_nodes.push_back (NetGraphNode (0, device_categorizer, circuit_categorizer, device_filter, circuit_and_pin_mapping, circuit_pin_mapper));
+  m_nodes.push_back (NetGraphNode (0, device_categorizer, circuit_categorizer, device_filter, circuit_and_pin_mapping, circuit_pin_mapper, unique_pin_id));
 
   size_t nets = 0;
   for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
@@ -1848,7 +1902,7 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
   m_nodes.reserve (nets);
 
   for (db::Circuit::const_net_iterator n = c->begin_nets (); n != c->end_nets (); ++n) {
-    NetGraphNode node (n.operator-> (), device_categorizer, circuit_categorizer, device_filter, circuit_and_pin_mapping, circuit_pin_mapper);
+    NetGraphNode node (n.operator-> (), device_categorizer, circuit_categorizer, device_filter, circuit_and_pin_mapping, circuit_pin_mapper, unique_pin_id);
     if (! node.empty () || n->pin_count () > 0) {
       m_nodes.push_back (node);
     }
@@ -1883,7 +1937,7 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
       continue;
     }
 
-    m_virtual_nodes.insert (std::make_pair (i.operator-> (), NetGraphNode (i.operator-> (), circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper)));
+    m_virtual_nodes.insert (std::make_pair (i.operator-> (), NetGraphNode (i.operator-> (), circuit_categorizer, circuit_and_pin_mapping, circuit_pin_mapper, unique_pin_id)));
 
   }
 
@@ -1903,21 +1957,21 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
  */
 static bool edges_are_compatible (const NetGraphNode::edge_type &e, const NetGraphNode::edge_type &e_other, const DeviceEquivalenceTracker &device_eq, const SubCircuitEquivalenceTracker &sc_eq)
 {
-  std::vector<NetGraphNode::Transition>::const_iterator t1 = e.first.begin (), tt1 = e.first.end ();
-  std::vector<NetGraphNode::Transition>::const_iterator t2 = e_other.first.begin (), tt2 = e_other.first.end ();
+  std::vector<Transition>::const_iterator t1 = e.first.begin (), tt1 = e.first.end ();
+  std::vector<Transition>::const_iterator t2 = e_other.first.begin (), tt2 = e_other.first.end ();
 
   std::vector<void *> p1, p2;
 
   while (t1 != tt1 && t2 != tt2) {
 
-    std::vector<NetGraphNode::Transition>::const_iterator t10 = t1, t20 = t2;
+    std::vector<Transition>::const_iterator t10 = t1, t20 = t2;
 
     p1.clear ();
     while (t1 != tt1 && *t1 == *t10) {
       if (t1->is_for_subcircuit ()) {
-        p1.push_back ((void *) sc_eq.other (t1->subcircuit_pair ().first));
+        p1.push_back ((void *) sc_eq.other (t1->subcircuit ()));
       } else {
-        p1.push_back ((void *) device_eq.other (t1->device_pair ().first));
+        p1.push_back ((void *) device_eq.other (t1->device ()));
       }
       ++t1;
     }
@@ -1925,9 +1979,9 @@ static bool edges_are_compatible (const NetGraphNode::edge_type &e, const NetGra
     p2.clear ();
     while (t2 != tt2 && *t2 == *t20) {
       if (t2->is_for_subcircuit ()) {
-        p2.push_back ((void *) (sc_eq.other (t2->subcircuit_pair ().first) ? t2->subcircuit_pair ().first : 0));
+        p2.push_back ((void *) (sc_eq.other (t2->subcircuit ()) ? t2->subcircuit () : 0));
       } else {
-        p2.push_back ((void *) (device_eq.other (t2->device_pair ().first) ? t2->device_pair ().first : 0));
+        p2.push_back ((void *) (device_eq.other (t2->device ()) ? t2->device () : 0));
       }
       ++t2;
     }
@@ -2004,7 +2058,7 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
         first = false;
       }
       tl::info << indent (depth) << "    " << (nn->net () ? nn->net ()->expanded_name ().c_str() : "(null)") << " via: " << tl::noendl;
-      for (std::vector<NetGraphNode::Transition>::const_iterator t = i->second->first.begin (); t != i->second->first.end(); ++t) {
+      for (std::vector<Transition>::const_iterator t = i->second->first.begin (); t != i->second->first.end(); ++t) {
         tl::info << (t != i->second->first.begin () ? "; " : "") << t->to_string() << tl::noendl;
       }
       tl::info << "";
@@ -2019,7 +2073,7 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
         first = false;
       }
       tl::info << indent(depth) << "    " << (nn->net() ? nn->net()->expanded_name().c_str() : "(null)") << " via: " << tl::noendl;
-      for (std::vector<NetGraphNode::Transition>::const_iterator t = i->second->first.begin (); t != i->second->first.end(); ++t) {
+      for (std::vector<Transition>::const_iterator t = i->second->first.begin (); t != i->second->first.end(); ++t) {
         tl::info << (t != i->second->first.begin () ? "; " : "") << t->to_string() << tl::noendl;
       }
       tl::info << "";
@@ -2079,7 +2133,7 @@ NetGraph::derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGr
 static bool has_subcircuits (db::NetGraphNode::edge_iterator e, db::NetGraphNode::edge_iterator ee)
 {
   while (e != ee) {
-    for (std::vector<NetGraphNode::Transition>::const_iterator t = e->first.begin (); t != e->first.end (); ++t) {
+    for (std::vector<Transition>::const_iterator t = e->first.begin (); t != e->first.end (); ++t) {
       if (t->is_for_subcircuit ()) {
         return true;
       }
@@ -2348,7 +2402,7 @@ NetGraph::derive_node_identities_from_ambiguity_group (const NodeRange &nr, Devi
   }
 
   size_t new_nodes = 0;
-  size_t complexity = nr.num;
+  size_t complexity = std::max (nr.num1, nr.num2);
 
   //  sort the ambiguity group such that net names match best
 
@@ -2751,30 +2805,32 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
 
     std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::iterator nn1 = n1, nn2 = n2;
 
-    size_t num = 1;
     ++nn1;
     ++nn2;
-    while (nn1 != nodes.end () && nn2 != other_nodes.end ()) {
-      if (nn1->first->has_other ()) {
-        ++nn1;
-      } else if (nn2->first->has_other ()) {
-        ++nn2;
-      } else if (! (*nn1->first == *n1->first) || ! (*nn2->first == *n2->first)) {
-        break;
-      } else {
-        ++num;
-        ++nn1;
-        ++nn2;
+
+    size_t num1 = 1;
+    while (nn1 != nodes.end () && *nn1->first == *n1->first) {
+      if (! nn1->first->has_other ()) {
+        ++num1;
       }
+      ++nn1;
     }
 
-    if (num == 1 || data->with_ambiguous) {
-      node_ranges.push_back (NodeRange (num, n1, nn1, n2, nn2));
+    size_t num2 = 1;
+    while (nn2 != other_nodes.end () && *nn2->first == *n2->first) {
+      if (! nn2->first->has_other ()) {
+        ++num2;
+      }
+      ++nn2;
+    }
+
+    if ((num1 == 1 && num2 == 1) || data->with_ambiguous) {
+      node_ranges.push_back (NodeRange (num1, n1, nn1, num2, n2, nn2));
     }
 
     //  in tentative mode ambiguous nodes don't make a match without
     //  with_ambiguous
-    if (num > 1 && tentative && ! data->with_ambiguous) {
+    if ((num1 > 1 || num2 > 1) && tentative && ! data->with_ambiguous) {
       return failed_match;
     }
 
@@ -2801,26 +2857,25 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
       }
     }
 
-    nr->num = 0;
-    std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i1 = nr->n1, i2 = nr->n2;
-
-    while (i1 != nr->nn1 && i2 != nr->nn2) {
-      if (i1->first->has_other ()) {
-        ++i1;
-      } else if (i2->first->has_other ()) {
-        ++i2;
-      } else {
-        ++nr->num;
-        ++i1;
-        ++i2;
+    nr->num1 = 0;
+    for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i = nr->n1; i != nr->nn1; ++i) {
+      if (! i->first->has_other ()) {
+        ++nr->num1;
       }
     }
 
-    if (nr->num < 1) {
+    nr->num2 = 0;
+    for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator i = nr->n2; i != nr->nn2; ++i) {
+      if (! i->first->has_other ()) {
+        ++nr->num2;
+      }
+    }
+
+    if (nr->num1 < 1 || nr->num2 < 1) {
 
       //  ignore this - it got obsolete.
 
-    } else if (nr->num == 1) {
+    } else if (nr->num1 == 1 && nr->num2 == 1) {
 
       size_t n = derive_node_identities_from_singular_match (nr->n1->first, nr->n1->second, nr->n2->first, nr->n2->second, dm, dm_other, scm, scm_other, depth, n_branch, tentative, data, ! data->dont_consider_net_names);
       if (n == failed_match) {
@@ -2829,17 +2884,17 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
 
       new_nodes += n;
 
-    } else if (data->max_n_branch != std::numeric_limits<size_t>::max () && double (nr->num) * double (n_branch) > double (data->max_n_branch)) {
+    } else if (data->max_n_branch != std::numeric_limits<size_t>::max () && double (std::max (nr->num1, nr->num2)) * double (n_branch) > double (data->max_n_branch)) {
 
       if (options ()->debug_netcompare) {
-        tl::info << indent_s << "max. complexity exhausted (" << nr->num << "*" << n_branch << ">" << data->max_n_branch << ") - mismatch.";
+        tl::info << indent_s << "max. complexity exhausted (" << std::max (nr->num1, nr->num2) << "*" << n_branch << ">" << data->max_n_branch << ") - mismatch.";
       }
       return failed_match;
 
     } else {
 
       if (options ()->debug_netcompare) {
-        tl::info << indent_s << "analyzing ambiguity group with " << nr->num << " members";
+        tl::info << indent_s << "analyzing ambiguity group with " << nr->num1 << "/" << nr->num2 << " members";
       }
 
       size_t n = derive_node_identities_from_ambiguity_group (*nr, dm, dm_other, scm, scm_other, depth, n_branch, tentative, data);
@@ -2850,7 +2905,7 @@ NetGraph::derive_node_identities_from_node_set (std::vector<std::pair<const NetG
       new_nodes += n;
 
       if (options ()->debug_netcompare) {
-        tl::info << indent_s << "finished analysis of ambiguity group with " << nr->num << " members";
+        tl::info << indent_s << "finished analysis of ambiguity group with " << nr->num1 << "/" << nr->num2 << " members";
       }
 
     }
@@ -3569,16 +3624,21 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   db::NetGraph g1, g2;
 
+  size_t unique_pin_id = Transition::first_unique_pin_id ();
+
   //  NOTE: for normalization we map all subcircuits of c1 to c2.
   //  Also, pin swapping will only happen there.
   if (options ()->debug_netgraph) {
     tl::info << "Netlist graph:";
   }
-  g1.build (c1, device_categorizer, circuit_categorizer, device_filter, &c12_circuit_and_pin_mapping, &circuit_pin_mapper);
+  g1.build (c1, device_categorizer, circuit_categorizer, device_filter, &c12_circuit_and_pin_mapping, &circuit_pin_mapper, (size_t *)0);
+
   if (options ()->debug_netgraph) {
     tl::info << "Other netlist graph:";
   }
-  g2.build (c2, device_categorizer, circuit_categorizer, device_filter, &c22_circuit_and_pin_mapping, &circuit_pin_mapper);
+  //  NOTE: the second netlist graph is the reference (schematic). We treat it a little more carefully by using pins from subcircuits which
+  //  lead to passive nets but connect to non-trivial nets on the outside. This is done by specifying a unique_pin_id counter for the last argument.
+  g2.build (c2, device_categorizer, circuit_categorizer, device_filter, &c22_circuit_and_pin_mapping, &circuit_pin_mapper, &unique_pin_id);
 
   //  Match dummy nodes for null nets
   g1.identify (0, 0);
@@ -4251,6 +4311,11 @@ NetlistComparer::do_subcircuit_assignment (const db::Circuit *c1, const db::NetG
     } else if (valid) {
       //  TODO: report devices which cannot be distinguished topologically?
       subcircuit_map.insert (std::make_pair (k, std::make_pair (sc.operator-> (), sc_cat)));
+    } else {
+      //  emit a mismatch event but do not consider that an error - this may happen if the circuit has been dropped intentionally (e.g. via cells)
+      if (mp_logger) {
+        mp_logger->subcircuit_mismatch (sc.operator-> (), 0);
+      }
     }
 
   }
@@ -4540,7 +4605,7 @@ NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
   db::NetGraph graph;
   db::CircuitCategorizer circuit_categorizer;
   db::DeviceCategorizer device_categorizer;
-  graph.build (circuit, device_categorizer, circuit_categorizer, device_filter, &circuit_and_pin_mapping, &circuit_pin_mapper);
+  graph.build (circuit, device_categorizer, circuit_categorizer, device_filter, &circuit_and_pin_mapping, &circuit_pin_mapper, (size_t *) 0);
 
   //  sort the nodes so we can easily identify the identical ones (in terms of topology)
   //  nodes are identical if the attached devices and circuits are of the same kind and with the same parameters

@@ -2188,6 +2188,22 @@ Class<lay::CellViewRef> decl_CellView ("lay", "CellView",
     "fashion, i.e. describing each instance in detail, not just by cell indexes. If "
     "the context and target cell are identical, the context path is empty."
   ) +
+  method ("context_trans", &lay::CellViewRef::context_trans,
+    "@brief Gets the accumulated transformation of the context path\n"
+    "This is the transformation applied to the target cell before it is shown in the context cell\n"
+    "Technically this is the product of all transformations over the context path.\n"
+    "See \\context_dtrans for a version delivering a micron-unit space transformation.\n"
+    "\n"
+    "This method has been introduced in version 0.27.3.\n"
+  ) +
+  method ("context_dtrans", &lay::CellViewRef::context_dtrans,
+    "@brief Gets the accumulated transformation of the context path in micron unit space\n"
+    "This is the transformation applied to the target cell before it is shown in the context cell\n"
+    "Technically this is the product of all transformations over the context path.\n"
+    "See \\context_trans for a version delivering an integer-unit space transformation.\n"
+    "\n"
+    "This method has been introduced in version 0.27.3.\n"
+  ) +
   event_ext ("on_technology_changed", &get_technology_changed_event,
     "@brief An event indicating that the technology has changed\n"
     "This event is triggered when the CellView is attached to a different technology.\n"

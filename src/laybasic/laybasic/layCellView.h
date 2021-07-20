@@ -735,6 +735,11 @@ public:
    */
   db::ICplxTrans context_trans () const;
 
+  /**
+   *  @brief Retrive the accumulated transformation induced by the context part of the path in micron units
+   */
+  db::DCplxTrans context_dtrans() const;
+
 private:
   tl::weak_ptr<lay::CellView> mp_cv;
   tl::weak_ptr<lay::LayoutView> mp_view;

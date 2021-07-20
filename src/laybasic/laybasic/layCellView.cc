@@ -834,5 +834,15 @@ CellViewRef::context_trans () const
   }
 }
 
+db::DCplxTrans
+CellViewRef::context_dtrans () const
+{
+  if (is_valid ()) {
+    return mp_cv->context_dtrans ();
+  } else {
+    return db::DCplxTrans ();
+  }
+}
+
 }
 

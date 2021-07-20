@@ -1909,17 +1909,21 @@ RedrawThreadWorker::draw_layer (int from_level, int to_level, db::cell_index_typ
     if ((dbbox.width () < 2.5 && dbbox.height () < 1.5) || 
         (dbbox.width () < 1.5 && dbbox.height () < 2.5)) {
 
-      bool anything = true;
-      if (level == 0 && cell_bbox.inside (vp)) {
-        //  Hint: on levels below 0 we know that there is anything. Otherwise we would not enter this procedure
-        //  Hint: don't use any_text_shapes on partially visible cells because that will degrade performance 
-        anything = any_shapes (ci, m_to_level - level);
-      }
+      if (bbox.overlaps (vp)) {
 
-      if (anything) {
-        //  any shapes here: paint bbox for simplification
-        mp_renderer->draw (dbbox, 0, frame, vertex, 0);
-      } 
+        bool anything = true;
+        if (level == 0) {
+          //  Hint: on levels below 0 we know that there is anything. Otherwise we would not enter this procedure
+          //  Hint: don't use any_text_shapes on partially visible cells because that will degrade performance
+          anything = any_shapes (ci, m_to_level - level);
+        }
+
+        if (anything) {
+          //  any shapes here: paint bbox for simplification
+          mp_renderer->draw (dbbox, 0, frame, vertex, 0);
+        }
+
+      }
 
     } else {
 

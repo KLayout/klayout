@@ -96,17 +96,30 @@ Use the global version of "edges" without a source object to address the default
 </p><p>
 This method has been introduced in version 0.27.
 </p>
-<a name="extent"/><h2>"extent" - Returns a layer with the bounding box of the selected layout</h2>
+<a name="extent"/><h2>"extent" - Returns a layer with the bounding box of the selected layout or cells</h2>
 <keyword name="extent"/>
 <p>Usage:</p>
 <ul>
 <li><tt>source.extent</tt></li>
+<li><tt>source.extent(cell_filter)</tt></li>
 </ul>
 <p>
+Without an argument, the extent method returns a layer with the bounding box
+of the top cell. With a cell filter argument, the method returns a layer
+with the bounding boxes of the selected cells. The cell filter is a glob
+pattern.
+</p><p>
 The extent function is useful to invert a layer:
 </p><p>
 <pre>
 inverse_1 = extent.sized(100.0) - input(1, 0)
+</pre>
+</p><p>
+The following example returns the bounding boxes of all cells whose
+names start with "A":
+</p><p>
+<pre>
+a_cells = extent("A*")
 </pre>
 </p>
 <a name="global_transform"/><h2>"global_transform" - Gets or sets a global transformation</h2>

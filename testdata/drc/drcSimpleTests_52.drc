@@ -1,0 +1,14 @@
+
+source $drc_test_source
+target $drc_test_target
+
+extent.output(2000)
+extent("PMOS*").output(2001)
+extent("NMOS*").output(2002)
+
+deep
+
+extent.output(2100)
+extent("PMOS*").output(2101)
+extent("NMOS*").output(2102)
+

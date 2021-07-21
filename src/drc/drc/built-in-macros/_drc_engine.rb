@@ -1484,13 +1484,14 @@ module DRC
     
     # %DRC%
     # @name extent 
-    # @brief Creates a new layer with the bounding box of the default source
+    # @brief Creates a new layer with the bounding box of the default source or cell bounding boxes
     # @synopsis extent
+    # @synopsis extent(cell_filter)
     # See \Source#extent for a description of that function.
  
-    def extent
+    def extent(cell_filter = nil)
       self._context("extent") do
-        layout.extent
+        layout.extent(cell_filter)
       end
     end
     
@@ -1615,6 +1616,8 @@ CODE
     # # shapes now will be taken from the given rectangle and clipped to it
     # l1 = input(1, 0)
     # @/code
+    # 
+    # To remove the clip condition, call "clip" without any arguments.
  
     def clip(*args)
       self._context("clip") do
@@ -2638,16 +2641,6 @@ CODE
       end
     end
     
-  private
-
-    def _make_string(v)
-      if v.class.respond_to?(:from_s)
-        v.class.to_s + "::from_s(" + v.to_s.inspect + ")"
-      else
-        v.inspect
-      end
-    end
-
     def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags, global_trans, cls)
     
       if layers.empty? && ! @deep
@@ -2714,6 +2707,16 @@ CODE
 
     end
     
+  private
+
+    def _make_string(v)
+      if v.class.respond_to?(:from_s)
+        v.class.to_s + "::from_s(" + v.to_s.inspect + ")"
+      else
+        v.inspect
+      end
+    end
+
     def _layout(name)
       @layout_sources[name].layout
     end

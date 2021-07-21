@@ -379,6 +379,12 @@ OriginalLayerRegion::init ()
 void
 OriginalLayerRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
+  //  explicitly update the layout if the source is equal to the target
+  //  (needed because we lock the layout below and no update would happen)
+  if (layout == m_iter.layout ()) {
+    layout->update ();
+  }
+
   db::Shapes &sh = layout->cell (into_cell).shapes (into_layer);
 
   //  NOTE: if the source (r) is from the same layout than the shapes live in, we better

@@ -1804,9 +1804,9 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
 
                   }
 
-                  ++p;
-
                 } 
+
+                ++p;
 
               }
 

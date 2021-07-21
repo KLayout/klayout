@@ -656,6 +656,16 @@ CellView::context_trans () const
   return trans;
 }
 
+db::DCplxTrans
+CellView::context_dtrans () const
+{
+  tl_assert (m_layout_href.get () != 0);
+
+  db::CplxTrans dbu_trans (m_layout_href->layout ().dbu ());
+  return dbu_trans * context_trans () * dbu_trans.inverted ();
+}
+
+
 // -------------------------------------------------------------
 //  CellView implementation
 
@@ -821,6 +831,16 @@ CellViewRef::context_trans () const
     return mp_cv->context_trans ();
   } else {
     return db::ICplxTrans ();
+  }
+}
+
+db::DCplxTrans
+CellViewRef::context_dtrans () const
+{
+  if (is_valid ()) {
+    return mp_cv->context_dtrans ();
+  } else {
+    return db::DCplxTrans ();
   }
 }
 

@@ -242,6 +242,8 @@ class LAYLayoutView_TestClass < TestBase
     assert_equal(view.cellview(1).cell.name, "INV2")
     assert_equal(cv2.path.collect { |p| cv2.layout.cell(p).name }.join(","), "RINGO,INV2")
     assert_equal(cv2.context_path.collect { |p| p.to_s }.join(","), "")
+    assert_equal(cv2.context_trans.to_s, "r0 *1 0,0")
+    assert_equal(cv2.context_dtrans.to_s, "r0 *1 0,0")
 
     assert_equal(active_cellview_changed, 0)
     assert_equal(cellviews_changed, 0)
@@ -294,6 +296,8 @@ class LAYLayoutView_TestClass < TestBase
     cv2.context_path = sp
 
     assert_equal(cv2.context_path.collect { |p| p.inst.cell.name + ":" + p.specific_cplx_trans.to_s }.join(","), "TRANS:r0 *1 -400,0")
+    assert_equal(cv2.context_trans.to_s, "r0 *1 -400,0")
+    assert_equal(cv2.context_dtrans.to_s, "r0 *1 -0.4,0")
     assert_equal(cv2.cell_name, "TRANS")
     assert_equal(cv2.ctx_cell.name, "INV2")
 

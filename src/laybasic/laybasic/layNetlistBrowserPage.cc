@@ -69,10 +69,11 @@ inline const db::Circuit *deref_circuit (const db::Circuit *obj)
 }
 
 template <class Obj>
-static db::DCplxTrans
+static std::pair<bool, db::DCplxTrans>
 trans_for (const Obj *objs, const db::Layout &ly, const db::Cell &cell, db::ContextCache &cc, const db::DCplxTrans &initial = db::DCplxTrans ())
 {
   db::DCplxTrans t = initial;
+  bool good = true;
 
   const db::Circuit *circuit = deref_circuit (objs);
   while (circuit) {
@@ -98,10 +99,12 @@ trans_for (const Obj *objs, const db::Layout &ly, const db::Cell &cell, db::Cont
     std::pair<bool, db::ICplxTrans> tc = cc.find_layout_context (circuit->cell_index (), cell.cell_index ());
     if (tc.first) {
       t = dbu_trans * tc.second * dbu_trans.inverted () * t;
+    } else {
+      good = false;
     }
   }
 
-  return t;
+  return std::make_pair (good, t);
 }
 
 NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
@@ -978,11 +981,14 @@ NetlistBrowserPage::adjust_view ()
     return;
   }
 
-  const db::Layout &original_layout = mp_view->cellview (m_cv_index)->layout ();
-  const db::Circuit *top_circuit = mp_database->netlist ()->circuit_by_name (original_layout.cell_name (mp_view->cellview (m_cv_index).cell_index ()));
+  const db::Layout &original_layout = cv->layout ();
+  const db::Circuit *top_circuit = mp_database->netlist ()->circuit_by_name (original_layout.cell_name (cv.cell_index ()));
+  if (! top_circuit) {
+    return;
+  }
 
   const db::Layout *layout = mp_database->internal_layout ();
-  const db::Cell *cell = (top_circuit && layout->is_valid_cell_index (top_circuit->cell_index ()) ? &layout->cell (top_circuit->cell_index ()) : mp_database->internal_top_cell ());
+  const db::Cell *cell = layout->is_valid_cell_index (top_circuit->cell_index ()) ? &layout->cell (top_circuit->cell_index ()) : mp_database->internal_top_cell ();
   if (! layout || ! cell) {
     return;
   }
@@ -996,9 +1002,12 @@ NetlistBrowserPage::adjust_view ()
       continue;
     }
 
-    db::DCplxTrans trans;
+    std::pair<bool, db::DCplxTrans> tr = trans_for (circuit, *layout, *cell, m_cell_context_cache, cv.context_dtrans ());
+    if (! tr.first) {
+      continue;
+    }
 
-    trans = trans_for (circuit, *layout, *cell, m_cell_context_cache, db::DCplxTrans ());
+    db::DCplxTrans trans = tr.second;
 
     for (std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> >::const_iterator p = path->path.begin (); p != path->path.end () && circuit; ++p) {
       if (p->first) {
@@ -1273,11 +1282,19 @@ NetlistBrowserPage::update_highlights ()
     return;
   }
 
-  const db::Layout &original_layout = mp_view->cellview (m_cv_index)->layout ();
-  const db::Circuit *top_circuit = mp_database->netlist ()->circuit_by_name (original_layout.cell_name (mp_view->cellview (m_cv_index).cell_index ()));
+  const lay::CellView &cv = mp_view->cellview (m_cv_index);
+  if (! cv.is_valid ()) {
+    return;
+  }
+
+  const db::Layout &original_layout = cv->layout ();
+  const db::Circuit *top_circuit = mp_database->netlist ()->circuit_by_name (original_layout.cell_name (cv.cell_index ()));
+  if (! top_circuit) {
+    return;
+  }
 
   const db::Layout *layout = mp_database->internal_layout ();
-  const db::Cell *cell = (top_circuit && layout->is_valid_cell_index (top_circuit->cell_index ()) ? &layout->cell (top_circuit->cell_index ()) : mp_database->internal_top_cell ());
+  const db::Cell *cell = layout->is_valid_cell_index (top_circuit->cell_index ()) ? &layout->cell (top_circuit->cell_index ()) : mp_database->internal_top_cell ();
   if (! layout || ! cell) {
     return;
   }
@@ -1301,7 +1318,12 @@ NetlistBrowserPage::update_highlights ()
 
     //  computes the transformation supplied by the path
 
-    db::DCplxTrans trans = trans_for (circuit, *layout, *cell, m_cell_context_cache, db::DCplxTrans ());
+    std::pair<bool, db::DCplxTrans> tr = trans_for (circuit, *layout, *cell, m_cell_context_cache, cv.context_dtrans ());
+    if (! tr.first) {
+      continue;
+    }
+
+    db::DCplxTrans trans = tr.second;
 
     for (std::list<std::pair<const db::SubCircuit *, const db::SubCircuit *> >::const_iterator p = path->path.begin (); p != path->path.end () && circuit; ++p) {
       if (p->first) {

@@ -1707,8 +1707,7 @@ NetTracerDialog::trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView
   l2ndb->clear_join_nets ();
   l2ndb->clear_join_net_names ();
 
-  //  include floating subcircuits for netlist to flatten
-  l2ndb->set_include_floating_subcircuits (flat);
+  l2ndb->set_include_floating_subcircuits (true);
   l2ndb->extract_netlist ();
 
   if (flat) {

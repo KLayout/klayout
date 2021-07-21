@@ -523,6 +523,11 @@ public:
   db::ICplxTrans context_trans () const;
 
   /**
+   *  @brief Retrive the accumulated transformation induced by the context part of the path as a micron-unit transformation
+   */
+  db::DCplxTrans context_dtrans () const;
+
+  /**
    *  @brief Deep copy of the cellview
    *
    *  This method performs a deep copy on the cellview.
@@ -729,6 +734,11 @@ public:
    *  @brief Retrive the accumulated transformation induced by the context part of the path
    */
   db::ICplxTrans context_trans () const;
+
+  /**
+   *  @brief Retrive the accumulated transformation induced by the context part of the path in micron units
+   */
+  db::DCplxTrans context_dtrans() const;
 
 private:
   tl::weak_ptr<lay::CellView> mp_cv;

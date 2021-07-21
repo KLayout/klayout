@@ -101,7 +101,9 @@ module DRC
       @engine._context(method) do
 
         box = nil
-        if args.size == 1
+        if args.size == 0
+          # unclip
+        elsif args.size == 1
           box = args[0]
           box.is_a?(RBA::DBox) || raise("Method requires a box specification")
         elsif args.size == 2
@@ -112,7 +114,7 @@ module DRC
         else 
           raise("Invalid number of arguments (1, 2 or 4 expected)")
         end
-        @box = RBA::Box::from_dbox(box * (1.0 / @layout.dbu))
+        @box = box && RBA::Box::from_dbox(box * (1.0 / @layout.dbu))
 
         self
 
@@ -311,24 +313,55 @@ CODE
 
     # %DRC%
     # @name extent
-    # @brief Returns a layer with the bounding box of the selected layout
+    # @brief Returns a layer with the bounding box of the selected layout or cells
     # @synopsis source.extent
+    # @synopsis source.extent(cell_filter)
+    #
+    # Without an argument, the extent method returns a layer with the bounding box
+    # of the top cell. With a cell filter argument, the method returns a layer
+    # with the bounding boxes of the selected cells. The cell filter is a glob
+    # pattern.
+    # 
     # The extent function is useful to invert a layer:
     # 
     # @code
     # inverse_1 = extent.sized(100.0) - input(1, 0)
     # @/code
+    #
+    # The following example returns the bounding boxes of all cells whose
+    # names start with "A":
+    #
+    # @code
+    # a_cells = extent("A*")
+    # @/code
     
-    def extent
+    def extent(cell_filter = nil)
+
       @engine._context("extent") do
-        layer = input
-        if @box
-          layer.insert(RBA::DBox::from_ibox(@box) * @layout.dbu)
-        else
-          layer.insert((RBA::DBox::from_ibox(@cell.bbox) * @layout.dbu).transformed(@global_trans))
+
+        if cell_filter
+          cell_filter.is_a?(String) || raise("Invalid cell filter argument - must be a string")
         end
+
+        if cell_filter
+          tmp = @layout_var.insert_layer(RBA::LayerInfo::new)
+          @tmp_layers << tmp
+          @layout_var.cells(cell_filter).each do |cell|
+            cell.shapes(tmp).insert(cell.bbox)
+          end
+          layer = DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, [tmp], @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, @global_trans, RBA::Region))
+        else
+          layer = input
+          layer.insert((RBA::DBox::from_ibox(@cell.bbox) * @layout.dbu).transformed(@global_trans))
+          if @box
+            layer.data &= RBA::Region::new(@box)
+          end
+        end
+
         layer
+
       end
+
     end
           
     # %DRC%

@@ -306,6 +306,8 @@ clip(0.mm, 0.mm, 0.5.mm, 0.6.mm)
 # shapes now will be taken from the given rectangle and clipped to it
 l1 = input(1, 0)
 </pre>
+</p><p>
+To remove the clip condition, call "clip" without any arguments.
 </p>
 <a name="connect"/><h2>"connect" - Specifies a connection between two layers</h2>
 <keyword name="connect"/>
@@ -619,11 +621,12 @@ actual edges from the first input (see <a href="#separation">separation</a> for 
 <p>
 Similar to <a href="#log">log</a>, but the message is printed formatted as an error
 </p>
-<a name="extent"/><h2>"extent" - Creates a new layer with the bounding box of the default source</h2>
+<a name="extent"/><h2>"extent" - Creates a new layer with the bounding box of the default source or cell bounding boxes</h2>
 <keyword name="extent"/>
 <p>Usage:</p>
 <ul>
 <li><tt>extent</tt></li>
+<li><tt>extent(cell_filter)</tt></li>
 </ul>
 <p>
 See <a href="/about/drc_ref_source.xml#extent">Source#extent</a> for a description of that function.

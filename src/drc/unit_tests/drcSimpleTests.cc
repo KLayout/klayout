@@ -1303,3 +1303,12 @@ TEST(51_epInternalAngle)
   run_test (_this, "51", false);
 }
 
+TEST(52_cellWiseExtent)
+{
+  run_test (_this, "52", false);
+}
+
+TEST(53_cellWiseExtentWithClip)
+{
+  run_test (_this, "53", false);
+}

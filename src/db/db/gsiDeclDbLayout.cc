@@ -41,6 +41,7 @@
 #include "dbCellMapping.h"
 #include "dbTechnology.h"
 #include "tlStream.h"
+#include "tlGlobPattern.h"
 
 namespace gsi
 {
@@ -706,6 +707,22 @@ static db::Cell *cell_from_name (db::Layout *ly, const std::string &name)
   } else {
     return 0;
   }
+}
+
+static std::vector<db::Cell *> cells_from_name (db::Layout *layout, const std::string &filter)
+{
+  tl::GlobPattern gp (filter);
+
+  std::vector<db::Cell *> result;
+  db::Layout::top_down_iterator td = layout->begin_top_down ();
+  while (td != layout->end_top_down ()) {
+    if (gp.match (layout->cell_name (*td))) {
+      result.push_back (&layout->cell (*td));
+    }
+    ++td;
+  }
+
+  return result;
 }
 
 static std::vector<db::Cell *> top_cells (db::Layout *layout)
@@ -1487,6 +1504,14 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@brief Returns the number of cells\n"
     "\n"
     "@return The number of cells (the maximum cell index)\n"
+  ) +
+  gsi::method_ext ("cells", &cells_from_name, gsi::arg ("name_filter"),
+    "@brief Gets the cell objects for a given name filter\n"
+    "\n"
+    "@param name_filter The cell name filter (glob pattern)\n"
+    "@return A list of \\Cell object of the cells matching the pattern\n"
+    "\n"
+    "This method has been introduced in version 0.27.3.\n"
   ) +
   gsi::method_ext ("cell", &cell_from_name, gsi::arg ("name"),
     "@brief Gets a cell object from the cell name\n"

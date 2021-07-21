@@ -79,6 +79,7 @@ class DBLayout_TestClass < TestBase
     assert_equal( ly.cell_name(ci), "new_cell" )
 
     assert_equal( ly.cell_by_name("new_cell"), ci )
+    assert_equal( ly.cells("A*"), [] )
     assert_equal( ly.cell("new_cell").name, "new_cell" )
     assert_equal( ly.cell("x").inspect, "nil" )
 
@@ -1172,6 +1173,23 @@ class DBLayout_TestClass < TestBase
 
     c0.transform(ti)
     assert_equal(inst.to_s, "cell_index=1 r135 *2.5 -616,-606")
+
+  end
+
+  # Layout#cells
+  def test_15
+
+    g = RBA::Layout::new
+    c1 = g.create_cell("B1")
+    c2 = g.create_cell("B2")
+    c0 = g.create_cell("A")
+    c0.insert(RBA::CellInstArray::new(c1.cell_index, RBA::Trans::new))
+    c0.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new))
+
+    assert_equal(g.cells("B*").collect(&:name).join(","), "B1,B2")
+    assert_equal(g.cells("*").collect(&:name).join(","), "A,B1,B2")
+    assert_equal(g.cells("A").collect(&:name).join(","), "A")
+    assert_equal(g.cells("X").collect(&:name).join(","), "")
 
   end
 

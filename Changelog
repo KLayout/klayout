@@ -1,5 +1,5 @@
 
-0.27.3          (2021-07-25):
+0.27.3          (2021-07-23):
 * Enhancement: DRC - more filters for edge pair collections
         As there are now: with(out)_area and with(out)_internal_angle
 * Bugfix: %GITHUB%/issues/846 Crash in netlist browser
@@ -30,6 +30,10 @@
         - CellView#context_trans and CellView#context_dtrans
 * Enhancement: Ruby 3.0 basic enabling
 * Enhancement: DRC "extent" accepts a cell name pattern now to deliver cell bounding boxes
+* Bugfix: reverted change of #796
+        DXF version is back to AC1006 which seems to be more compatible with most consumers of
+        DXF files. Using 1016 AC1014 seems to require much more meta information I cannot
+        provide without deeper insight into the DXF structure.
 
 0.27.2          (2021-06-20):
 

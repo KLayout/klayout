@@ -137,7 +137,7 @@ DXFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
   *this << 2 << endl << "HEADER" << endl;
   //  fake a dummy AutoCAD version (apparent required by some tools)
   *this << 9 << endl << "$ACADVER" << endl;
-  *this << 1 << endl << "AC1014" << endl;
+  *this << 1 << endl << "AC1006" << endl;
   *this << 0 << endl << "ENDSEC" << endl;
 
   //  layer table

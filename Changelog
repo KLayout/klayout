@@ -1,4 +1,40 @@
 
+0.27.3          (2021-07-23):
+* Enhancement: DRC - more filters for edge pair collections
+        As there are now: with(out)_area and with(out)_internal_angle
+* Bugfix: %GITHUB%/issues/846 Crash in netlist browser
+* Bugfix: %GITHUB%/issues/851 KLayout stalls in net browser net highlighting when net shapes contain texts 
+* Bugfix: %GITHUB%/issues/854 Resistor Device extractor extracts W and L 2 times too large
+* Bugfix: %GITHUB%/issues/856 LVS: Resistor with bulk: bulk terminal swaps with A terminal
+* Bugfix: %GITHUB%/issues/858 "+" line continuation in Spice reader only effective when at beginning of line
+* Bugfix: %GITHUB%/issues/859 Technology was not assigned on new layout
+* Bugfix: %GITHUB%/issues/864 Shapes#copy_shapes does not support undo/redo
+* Bugfix: %GITHUB%/issues/866 Probe net not working for floating subcircuits in hierarchical net tracer
+* Bugfix: %GITHUB%/issues/867 Macro editor freeze after search next
+* Bugfix: %GITHUB%/issues/871 Application stalls with 'draw only border instances' mode with AREFs
+* Bugfix: %GITHUB%/issues/875 Drawing glitch
+* Enhancement: LVS features
+        - "extract_devices" returns the device class object
+        - Device class object can be used to enable parameters (make them primary)
+        - Spice writer delegate enabled in LVS for customization of output
+        - "blank_circuit" specifies circuits as black boxes and skips compare
+        - Better propagation of symmetric nets through swappable pins
+        - "tolerance" and "join_symmetric_nets" can be used anywhere in the LVS script now
+        - "same_nets!" (with exclamation mark) for strong matching of nets
+        - "same_nets" accepts glob pattern now
+* Enhancements: RBA/pya
+        - Device#net_for_terminal with terminal name
+        - Circuit#nets_by_name with glob pattern
+        - Netlist#is_case_sensitive?, Netlist#case_sensitive=
+        - Netlist#nets_by_name to get nets from pattern
+        - CellView#context_trans and CellView#context_dtrans
+* Enhancement: Ruby 3.0 basic enabling
+* Enhancement: DRC "extent" accepts a cell name pattern now to deliver cell bounding boxes
+* Bugfix: reverted change of #796
+        DXF version is back to AC1006 which seems to be more compatible with most consumers of
+        DXF files. Using 1016 AC1014 seems to require much more meta information I cannot
+        provide without deeper insight into the DXF structure.
+
 0.27.2          (2021-06-20):
 
 * Enhancement: %GITHUB%/issues/818 2.5d view shows view area instead of full layout

@@ -620,11 +620,14 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     defp = db::DeviceClassInductor::param_id_L;
   }
 
-  const std::vector<db::DeviceParameterDefinition> &pd = cls->parameter_definitions ();
-  for (std::vector<db::DeviceParameterDefinition>::const_iterator i = pd.begin (); i != pd.end (); ++i) {
+  std::vector<db::DeviceParameterDefinition> &pd = cls->parameter_definitions_non_const ();
+  for (std::vector<db::DeviceParameterDefinition>::iterator i = pd.begin (); i != pd.end (); ++i) {
     std::map<std::string, double>::const_iterator v = params.find (i->name ());
     if (v != params.end ()) {
       device->set_parameter_value (i->id (), v->second / i->si_scaling ());
+      //  Make given parameters primary. This way they are netlisted again and participate in netlist compare when
+      //  they are made primary in the extracted netlist too.
+      i->set_is_primary (true);
     } else if (i->id () == defp) {
       device->set_parameter_value (i->id (), value / i->si_scaling ());
     }

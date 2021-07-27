@@ -30,8 +30,20 @@ namespace db
 // --------------------------------------------------------------------------------
 //  EqualDeviceParameters implementation
 
-static int compare_parameters (double pa, double pb, double absolute, double relative)
+//  NOTE: to allow rounding errors for parameter comparison, we use
+//  a default relative tolerance.
+const double default_relative_tolerance = 1e-6;
+
+const double default_absolute_tolerance = 0.0;
+
+
+static int compare_parameters (double pa, double pb, double absolute = default_absolute_tolerance, double relative = default_relative_tolerance)
 {
+  //  absolute value < 0 means: ignore this parameter (= always match)
+  if (absolute < 0.0) {
+    return 0;
+  }
+
   double pa_min = pa - absolute;
   double pa_max = pa + absolute;
 
@@ -57,14 +69,31 @@ EqualDeviceParameters::EqualDeviceParameters ()
   //  .. nothing yet ..
 }
 
-EqualDeviceParameters::EqualDeviceParameters (size_t parameter_id)
+EqualDeviceParameters::EqualDeviceParameters (size_t parameter_id, bool ignore)
 {
-  m_compare_set.push_back (std::make_pair (parameter_id, std::make_pair (0.0, 0.0)));
+  m_compare_set.push_back (std::make_pair (parameter_id, std::make_pair (ignore ? -1.0 : 0.0, 0.0)));
 }
 
-EqualDeviceParameters::EqualDeviceParameters (size_t parameter_id, double relative, double absolute)
+EqualDeviceParameters::EqualDeviceParameters (size_t parameter_id, double absolute, double relative)
 {
-  m_compare_set.push_back (std::make_pair (parameter_id, std::make_pair (relative, absolute)));
+  m_compare_set.push_back (std::make_pair (parameter_id, std::make_pair (std::max (0.0, absolute), std::max (0.0, relative))));
+}
+
+std::string EqualDeviceParameters::to_string () const
+{
+  std::string res;
+  for (std::vector<std::pair<size_t, std::pair<double, double> > >::const_iterator c = m_compare_set.begin (); c != m_compare_set.end (); ++c) {
+    if (!res.empty ()) {
+      res += ";";
+    }
+    res += "#" + tl::to_string (c->first) + ":";
+    if (c->second.first < 0.0) {
+      res += "ignore";
+    } else {
+      res += "A" + tl::to_string (c->second.first) + "/R" + tl::to_string (c->second.second);
+    }
+  }
+  return res;
 }
 
 bool EqualDeviceParameters::less (const db::Device &a, const db::Device &b) const
@@ -74,6 +103,30 @@ bool EqualDeviceParameters::less (const db::Device &a, const db::Device &b) cons
     if (cmp != 0) {
       return cmp < 0;
     }
+  }
+
+  //  compare the remaining parameters with a default precision
+
+  std::set<size_t> seen;
+  for (std::vector<std::pair<size_t, std::pair<double, double> > >::const_iterator c = m_compare_set.begin (); c != m_compare_set.end (); ++c) {
+    seen.insert (c->first);
+  }
+
+  const std::vector<db::DeviceParameterDefinition> &pd = a.device_class ()->parameter_definitions ();
+  for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+
+    if (seen.find (p->id ()) != seen.end ()) {
+      continue;
+    }
+
+    const db::DeviceParameterDefinition *pdb = b.device_class ()->parameter_definition (p->id ());
+    if (pdb && pdb->is_primary () && p->is_primary ()) {
+      int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()));
+      if (cmp != 0) {
+        return cmp < 0;
+      }
+    }
+
   }
 
   return false;
@@ -101,47 +154,6 @@ bool AllDeviceParametersAreEqual::less (const db::Device &a, const db::Device &b
   const std::vector<db::DeviceParameterDefinition> &parameters = a.device_class ()->parameter_definitions ();
   for (std::vector<db::DeviceParameterDefinition>::const_iterator c = parameters.begin (); c != parameters.end (); ++c) {
     int cmp = compare_parameters (a.parameter_value (c->id ()), b.parameter_value (c->id ()), 0.0, m_relative);
-    if (cmp != 0) {
-      return cmp < 0;
-    }
-  }
-
-  return false;
-}
-
-// --------------------------------------------------------------------------------
-//  PrimaryDeviceParametersAreEqual class implementation
-
-class DB_PUBLIC PrimaryDeviceParametersAreEqual
-  : public DeviceParameterCompareDelegate
-{
-public:
-  PrimaryDeviceParametersAreEqual (double relative);
-
-  virtual bool less (const db::Device &a, const db::Device &b) const;
-
-private:
-  double m_relative;
-};
-
-PrimaryDeviceParametersAreEqual::PrimaryDeviceParametersAreEqual (double relative)
-  : m_relative (relative)
-{
-  //  .. nothing yet ..
-}
-
-bool PrimaryDeviceParametersAreEqual::less (const db::Device &a, const db::Device &b) const
-{
-  const std::vector<db::DeviceParameterDefinition> &pd = a.device_class ()->parameter_definitions ();
-  for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-    const db::DeviceParameterDefinition *pdb = b.device_class ()->parameter_definition (p->id ());
-    if (! pdb) {
-      continue;
-    }
-    if (! pdb->is_primary () && ! p->is_primary ()) {
-      continue;
-    }
-    int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()), 0.0, m_relative);
     if (cmp != 0) {
       return cmp < 0;
     }
@@ -279,12 +291,8 @@ size_t DeviceClass::terminal_id_for_name (const std::string &name) const
   throw tl::Exception (tl::to_string (tr ("Invalid terminal name")) + ": '" + name + "'");
 }
 
-//  NOTE: to allow rounding errors for parameter comparison, we use
-//  a default relative tolerance.
-const double relative_tolerance = 1e-6;
-
 //  The default compare delegate
-static PrimaryDeviceParametersAreEqual default_compare (relative_tolerance);
+static EqualDeviceParameters default_compare;
 
 bool DeviceClass::less (const db::Device &a, const db::Device &b)
 {

@@ -309,10 +309,13 @@ class DB_PUBLIC EqualDeviceParameters
 {
 public:
   EqualDeviceParameters ();
-  EqualDeviceParameters (size_t parameter_id);
+  EqualDeviceParameters (size_t parameter_id, bool ignore = false);
   EqualDeviceParameters (size_t parameter_id, double relative, double absolute);
 
   virtual bool less (const db::Device &a, const db::Device &b) const;
+
+  //  for test purposes
+  std::string to_string () const;
 
   EqualDeviceParameters &operator+= (const EqualDeviceParameters &other);
 
@@ -503,6 +506,14 @@ public:
    *  @brief Gets the parameter definitions
    */
   const std::vector<DeviceParameterDefinition> &parameter_definitions () const
+  {
+    return m_parameter_definitions;
+  }
+
+  /**
+   *  @brief Gets the parameter definitions
+   */
+  std::vector<DeviceParameterDefinition> &parameter_definitions_non_const ()
   {
     return m_parameter_definitions;
   }

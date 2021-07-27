@@ -165,6 +165,83 @@ module LVS
     end
 
     # %LVS%
+    # @name ignore_parameter
+    # @brief Indicates whether not to compare a specific parameter for a given device class name
+    # @synopsis ignore_parameter(device_class_name, parameter_name)
+
+    def ignore_parameter(device_class_name, parameter_name)
+
+      device_class_name.is_a?(String) || raise("Device class argument of 'ignore_parameter' must be a string")
+      parameter_name.is_a?(String) || raise("Parameter name argument of 'ignore_parameter' must be a string")
+
+      if self._l2n_data
+        # already extracted
+        self._ignore_parameter(self._l2n_data, device_class_name, parameter_name)
+      else
+        @post_extract_config << lambda { |l2n| self._ignore_parameter(l2n, device_class_name, parameter_name) }
+      end
+
+    end
+
+    def _ignore_parameter(l2n, device_class_name, parameter_name)
+
+      dc = l2n.netlist.device_class_by_name(device_class_name)
+      if dc && dc.has_parameter?(parameter_name)
+        ep = RBA::EqualDeviceParameters::ignore(dc.parameter_id(parameter_name))
+        if dc.equal_parameters == nil
+          dc.equal_parameters = ep
+        else
+          dc.equal_parameters += ep
+        end
+      end
+
+    end
+
+    # %LVS%
+    # @name enable_parameter
+    # @brief Indicates whether to enable a specific parameter for a given device
+    # @synopsis enable_parameter(device_class_name, parameter_name)
+    # Enabling a parameter has two effects: first the parameter is netlisted and second
+    # the parameter is compared in the netlist compare - provided it is given in the schematic.
+    # Setting a tolerance or using a custom device comparer will override the last rule.
+
+    # %LVS%
+    # @name disable_parameter
+    # @brief Indicates whether to disable a specific parameter for a given device
+    # @synopsis disable_parameter(device_class_name, parameter_name)
+    # Disabling a parameter has two effects: first the parameter is not netlisted and second
+    # the parameter is compared in the netlist compare - provided it is given in the schematic.
+    # Setting a tolerance or using a custom device comparer will override the last rule.
+    # To disable a parameter for compare only, \ignore_parameter can be used.
+
+    [ :enable_parameter, :disable_parameter ].each do |mn|
+      eval <<"CODE"
+      def #{mn}(device_class_name, parameter_name)
+
+        device_class_name.is_a?(String) || raise("Device class argument of '#{mn}' must be a string")
+        parameter_name.is_a?(String) || raise("Parameter name argument of '#{mn}' must be a string")
+
+        if self._l2n_data
+          # already extracted
+          self._enable_parameter(self._l2n_data, device_class_name, parameter_name, :#{mn} == :enable_parameter)
+        else
+          @post_extract_config << lambda { |l2n| self._enable_parameter(l2n, device_class_name, parameter_name, :#{mn} == :enable_parameter) }
+        end
+
+      end
+CODE
+    end
+
+    def _enable_parameter(l2n, device_class_name, parameter_name, enable)
+
+      dc = l2n.netlist.device_class_by_name(device_class_name)
+      if dc && dc.has_parameter?(parameter_name)
+        dc.enable_parameter(parameter_name, enable)
+      end
+
+    end
+
+    # %LVS%
     # @name align
     # @brief Aligns the extracted netlist vs. the schematic
     # @synopsis align

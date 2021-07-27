@@ -310,7 +310,7 @@ class DB_PUBLIC EqualDeviceParameters
 public:
   EqualDeviceParameters ();
   EqualDeviceParameters (size_t parameter_id, bool ignore = false);
-  EqualDeviceParameters (size_t parameter_id, double relative, double absolute);
+  EqualDeviceParameters (size_t parameter_id, double absolute, double relative);
 
   virtual bool less (const db::Device &a, const db::Device &b) const;
 

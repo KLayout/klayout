@@ -205,6 +205,57 @@ same_device_classes("POLYRES", nil)</pre>
   <pre>tolerance("NMOS", "L", 0.05, 0.01)
 tolerance("NMOS", "L", :absolute => 0.05, :relative => 0.01)</pre>
 
+  <h2>Ignoring parameters</h2>
+
+  <p>
+  Some device parameters can be ignore in the compare.
+  For example, if you don't want to compare the "L" parameter of the "NMOS" devices, use this statement:
+  </p>
+
+  <pre>ignore_parameter("NMOS", "L")</pre>
+
+  <p>
+  This statement can be put into the script anywhere before the "compare" statement.
+  </p>
+
+  <p>
+  By default, only "primary" parameters are compared. For a resistor for example, "R" is a primary parameter, the other ones
+  like "L", "W", "A" and "P" are not. Using "tolerance" will implicitly enable a parameter while "ignore_parameter" will disable
+  it for compare.
+  </p>
+
+  <h2>Enabling and disabling parameters</h2>
+
+  <p>
+  As mentioned before, some device parameters are primary while other are not. For example, for the resistor device,
+  "R" (the resistance value) is a primary parameter while the device length ("L") is not. You can make the "L" parameter 
+  primary for a device class called "RES" by using:
+  </p>
+
+  <pre>enable_parameter("RES", "L")</pre>
+
+  <p>
+  This has two effects: first, the "L" parameter is written into the Spice output netlist and second, it is compare against
+  the schematic "L" parameter, provided that one is given in the netlist. No compare happens if no "L" parameter is present in the
+  netlist. 
+  </p>
+
+  <p>
+  This behavior is overridden by a "tolerance" or "ignore_parameter" specification for that parameter or if a customer
+  device comparer is installed.
+  </p>
+
+  <p>
+  Correspondingly, a primary parameter can be disabled using:
+  </p>
+
+  <pre>disable_parameter("RES", "R")</pre>
+
+  <p>
+  As this will make the parameter to disappear from the netlist, it's often more useful to use "ignore_parameter" instead
+  which has the same effect on the compare step, but will keep it in the netlist.
+  </p>
+
   <h2>Pin swapping</h2>
 
   <p>

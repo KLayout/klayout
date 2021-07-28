@@ -22,10 +22,33 @@
 
 #include "dbDeviceClass.h"
 #include "dbDevice.h"
+#include "dbNetlist.h"
 #include "tlClassRegistry.h"
 
 namespace db
 {
+
+// --------------------------------------------------------------------------------
+
+/**
+ *  @brief Returns the primary device class for both given devices
+ *  One of the devices lives in a primary netlist. This one is taken for the device class.
+ */
+static const db::DeviceClass *primary_device_class (const db::Device &a, const db::Device &b)
+{
+  tl_assert (a.device_class () != 0);
+  tl_assert (b.device_class () != 0);
+
+  const db::DeviceClass *dca = a.device_class ()->primary_class () ? a.device_class ()->primary_class () : a.device_class ();
+  const db::DeviceClass *dcb = b.device_class ()->primary_class () ? b.device_class ()->primary_class () : b.device_class ();
+
+  if (dca != dcb) {
+    //  different devices, same category while sorting devices - take the one with the "lower" name
+    return dca->name () < dcb->name () ? dca : dcb;
+  } else {
+    return dca;
+  }
+}
 
 // --------------------------------------------------------------------------------
 //  EqualDeviceParameters implementation
@@ -35,7 +58,6 @@ namespace db
 const double default_relative_tolerance = 1e-6;
 
 const double default_absolute_tolerance = 0.0;
-
 
 static int compare_parameters (double pa, double pb, double absolute = default_absolute_tolerance, double relative = default_relative_tolerance)
 {
@@ -112,21 +134,14 @@ bool EqualDeviceParameters::less (const db::Device &a, const db::Device &b) cons
     seen.insert (c->first);
   }
 
-  const std::vector<db::DeviceParameterDefinition> &pd = a.device_class ()->parameter_definitions ();
+  const std::vector<db::DeviceParameterDefinition> &pd = primary_device_class (a, b)->parameter_definitions ();
   for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-
-    if (seen.find (p->id ()) != seen.end ()) {
-      continue;
-    }
-
-    const db::DeviceParameterDefinition *pdb = b.device_class ()->parameter_definition (p->id ());
-    if (pdb && pdb->is_primary () && p->is_primary ()) {
+    if (p->is_primary () && seen.find (p->id ()) == seen.end ()) {
       int cmp = compare_parameters (a.parameter_value (p->id ()), b.parameter_value (p->id ()));
       if (cmp != 0) {
         return cmp < 0;
       }
     }
-
   }
 
   return false;
@@ -166,13 +181,13 @@ bool AllDeviceParametersAreEqual::less (const db::Device &a, const db::Device &b
 //  DeviceClass class implementation
 
 DeviceClass::DeviceClass ()
-  : m_strict (false), mp_netlist (0), m_supports_parallel_combination (false), m_supports_serial_combination (false)
+  : m_strict (false), mp_netlist (0), m_supports_parallel_combination (false), m_supports_serial_combination (false), mp_primary_class (0)
 {
   // .. nothing yet ..
 }
 
 DeviceClass::DeviceClass (const DeviceClass &other)
-  : gsi::ObjectBase (other), tl::Object (other), tl::UniqueId (other), m_strict (false), mp_netlist (0), m_supports_parallel_combination (false), m_supports_serial_combination (false)
+  : gsi::ObjectBase (other), tl::Object (other), tl::UniqueId (other), m_strict (false), mp_netlist (0), m_supports_parallel_combination (false), m_supports_serial_combination (false), mp_primary_class (0)
 {
   operator= (other);
 }
@@ -299,10 +314,7 @@ bool DeviceClass::less (const db::Device &a, const db::Device &b)
   tl_assert (a.device_class () != 0);
   tl_assert (b.device_class () != 0);
 
-  const db::DeviceParameterCompareDelegate *pcd = a.device_class ()->mp_pc_delegate.get ();
-  if (! pcd) {
-    pcd = b.device_class ()->mp_pc_delegate.get ();
-  }
+  const db::DeviceParameterCompareDelegate *pcd = primary_device_class (a, b)->parameter_compare_delegate ();
   if (! pcd) {
     pcd = &default_compare;
   }
@@ -315,10 +327,7 @@ bool DeviceClass::equal (const db::Device &a, const db::Device &b)
   tl_assert (a.device_class () != 0);
   tl_assert (b.device_class () != 0);
 
-  const db::DeviceParameterCompareDelegate *pcd = a.device_class ()->mp_pc_delegate.get ();
-  if (! pcd) {
-    pcd = b.device_class ()->mp_pc_delegate.get ();
-  }
+  const db::DeviceParameterCompareDelegate *pcd = primary_device_class (a, b)->parameter_compare_delegate ();
   if (! pcd) {
     pcd = &default_compare;
   }

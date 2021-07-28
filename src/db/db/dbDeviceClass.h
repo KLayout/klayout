@@ -735,6 +735,22 @@ public:
   }
 
   /**
+   *  @brief Internally used by the netlist comparer to temporarily attach a device class pointing to the primary one
+   */
+  void set_primary_class (const db::DeviceClass *primary) const
+  {
+    mp_primary_class = primary;
+  }
+
+  /**
+   *  @brief Internally used by the netlist comparer to temporarily attach a device class pointing to the primary one
+   */
+  const db::DeviceClass *primary_class () const
+  {
+    return mp_primary_class;
+  }
+
+  /**
    *  @brief Generate memory statistics
    */
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
@@ -762,6 +778,7 @@ private:
   bool m_supports_parallel_combination;
   bool m_supports_serial_combination;
   std::map<size_t, size_t> m_equivalent_terminal_ids;
+  mutable const db::DeviceClass *mp_primary_class;
 
   void set_netlist (db::Netlist *nl)
   {

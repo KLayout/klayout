@@ -354,6 +354,7 @@ private:
   NetlistComparer &operator= (const NetlistComparer &);
 
 protected:
+  bool compare_impl (const db::Netlist *a, const db::Netlist *b) const;
   bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, db::CircuitPinMapper &circuit_pin_mapper, const std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const;
   bool all_subcircuits_verified (const db::Circuit *c, const std::set<const db::Circuit *> &verified_circuits) const;
   std::string generate_subcircuits_not_verified_warning (const db::Circuit *ca, const std::set<const db::Circuit *> &verified_circuits_a, const db::Circuit *cb, const std::set<const db::Circuit *> &verified_circuits_b) const;

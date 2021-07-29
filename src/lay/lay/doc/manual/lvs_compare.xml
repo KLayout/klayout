@@ -208,7 +208,7 @@ tolerance("NMOS", "L", :absolute => 0.05, :relative => 0.01)</pre>
   <h2>Ignoring parameters</h2>
 
   <p>
-  Some device parameters can be ignore in the compare.
+  It is possible to ignore certain parameters from certain devices in the netlist compare.
   For example, if you don't want to compare the "L" parameter of the "NMOS" devices, use this statement:
   </p>
 
@@ -220,8 +220,8 @@ tolerance("NMOS", "L", :absolute => 0.05, :relative => 0.01)</pre>
 
   <p>
   By default, only "primary" parameters are compared. For a resistor for example, "R" is a primary parameter, the other ones
-  like "L", "W", "A" and "P" are not. Using "tolerance" will implicitly enable a parameter while "ignore_parameter" will disable
-  it for compare.
+  like "L", "W", "A" and "P" are not. Using "tolerance" will implicitly enable a parameter - even if it is not a primary one - while "ignore_parameter" will disable
+  a parameter for compare - even if it is a primary one.
   </p>
 
   <h2>Enabling and disabling parameters</h2>
@@ -235,7 +235,7 @@ tolerance("NMOS", "L", :absolute => 0.05, :relative => 0.01)</pre>
   <pre>enable_parameter("RES", "L")</pre>
 
   <p>
-  This has two effects: first, the "L" parameter is written into the Spice output netlist and second, it is compare against
+  This has two effects: first, the "L" parameter is written into the Spice output netlist and in addition it is compared against
   the schematic "L" parameter.
   </p>
 
@@ -246,7 +246,7 @@ tolerance("NMOS", "L", :absolute => 0.05, :relative => 0.01)</pre>
   <pre>disable_parameter("RES", "R")</pre>
 
   <p>
-  This behavior is overridden by a "tolerance" or "ignore_parameter" specification for that parameter or if a customer
+  This behavior is overridden by a "tolerance" or "ignore_parameter" specification for that parameter or if a custom
   device comparer is installed. Netlisting is affected only for the elementary devices (R, C and L) and any Spice writer
   delegate can choose to ignore the primary flag. A custom device comparer may also ignore this flag. 
   So after all, enabling or disabling a parameter is not a strong concept but rather a hint.

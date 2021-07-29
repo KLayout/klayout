@@ -55,6 +55,24 @@ See <a href="/about/lvs_ref_netter.xml#compare">Netter#compare</a> for a descrip
 <p>
 See <a href="/about/lvs_ref_netter.xml#consider_net_names">Netter#consider_net_names</a> for a description of that function.
 </p>
+<a name="disable_parameter"/><h2>"disable_parameter" - Specifies whether to disable a parameter from a given device class for netlisting and default compare</h2>
+<keyword name="disable_parameter"/>
+<p>Usage:</p>
+<ul>
+<li><tt>disable_parameter(device_class_name, parameter_name)</tt></li>
+</ul>
+<p>
+See <a href="/about/lvs_ref_netter.xml#disable_parameter">Netter#disable_parameter</a> for a description of that function.
+</p>
+<a name="enable_parameter"/><h2>"enable_parameter" - Specifies whether to enable a parameter from a given device class for netlisting and default compare</h2>
+<keyword name="enable_parameter"/>
+<p>Usage:</p>
+<ul>
+<li><tt>enable_parameter(device_class_name, parameter_name)</tt></li>
+</ul>
+<p>
+See <a href="/about/lvs_ref_netter.xml#enable_parameter">Netter#enable_parameter</a> for a description of that function.
+</p>
 <a name="equivalent_pins"/><h2>"equivalent_pins" - Marks pins as equivalent</h2>
 <keyword name="equivalent_pins"/>
 <p>Usage:</p>
@@ -63,6 +81,15 @@ See <a href="/about/lvs_ref_netter.xml#consider_net_names">Netter#consider_net_n
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml#equivalent_pins">Netter#equivalent_pins</a> for a description of that function.
+</p>
+<a name="ignore_parameter"/><h2>"ignore_parameter" - Specifies whether to ignore a parameter from a given device class for the compare</h2>
+<keyword name="ignore_parameter"/>
+<p>Usage:</p>
+<ul>
+<li><tt>ignore_parameter(device_class_name, parameter_name)</tt></li>
+</ul>
+<p>
+See <a href="/about/lvs_ref_netter.xml#ignore_parameter">Netter#ignore_parameter</a> for a description of that function.
 </p>
 <a name="join_symmetric_nets"/><h2>"join_symmetric_nets" - Joins symmetric nets of selected circuits on the extracted netlist</h2>
 <keyword name="join_symmetric_nets"/>

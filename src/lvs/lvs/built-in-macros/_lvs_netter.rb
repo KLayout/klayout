@@ -110,6 +110,15 @@ module LVS
     # The relative tolerance is given as a factor, so 0.1 is a 10% tolerance.
     # Absolute and relative tolerances add, so specifying both allows for a larger
     # deviation.
+    #
+    # Some device parameters - like the resistor's "L" and "W" parameters - are not compared by default.
+    # These are "secondary" device parameters. Using a tolerance on such parameters will make these parameters
+    # being compared even if they are secondary ones.
+    #
+    # A function is skip a parameter during the device compare is "ignore_parameter".
+    #
+    # "tolerance" and "ignore_parameter" only have an effect with the default device comparer. Using a custom device comparer
+    # will override the definitions by "ignore_parameter" or "tolerance".
 
     def tolerance(device_class_name, parameter_name, *args)
 
@@ -166,8 +175,15 @@ module LVS
 
     # %LVS%
     # @name ignore_parameter
-    # @brief Indicates whether not to compare a specific parameter for a given device class name
+    # @brief Skip a specific parameter for a given device class name during device compare
     # @synopsis ignore_parameter(device_class_name, parameter_name)
+    # 
+    # Use this function is ignore a parameter for a particular device class during the netlist compare.
+    # Some parameters - for example "L" and "W" parameters of the resistor device - are "secondary" parameters
+    # which are not ignored by default. Using "ignore_parameter" on such devices does not have an effect.
+    #
+    # "ignore_parameter" and "tolerance" only have an effect with the default device comparer. Using a custom device comparer
+    # will override the definitions by "ignore_parameter" or "tolerance".
 
     def ignore_parameter(device_class_name, parameter_name)
 
@@ -202,8 +218,9 @@ module LVS
     # @brief Indicates whether to enable a specific parameter for a given device
     # @synopsis enable_parameter(device_class_name, parameter_name)
     # The parameter is made "primary" which enables further applications - e.g. it is netlisted
-    # for some elements which normally would suppress additional parameters and the parameter
+    # for some elements which normally would not print that parameter, and the parameter
     # is compared in the default device compare scheme during netlist matching.
+    #
     # Enabling a parameter is rather a hint for the system and the effects can be controlled
     # by other means, so this is not a strong concept. For example, once a \tolerance is 
     # specified for a parameter, the "primary" flag of the parameter is not considered anymore.
@@ -215,7 +232,9 @@ module LVS
     # @synopsis disable_parameter(device_class_name, parameter_name)
     # Disabling a parameter is the inverse of \enable_parameter. Disabling a parameter will
     # reset the "primary" flag of the parameter. This has several effects - e.g. the parameter will not be 
-    # used in device compare during netlist matching by default. This is not a strong concept but rather
+    # used in device compare during netlist matching by default. 
+    #
+    # This is not a strong concept but rather
     # a hint for the system. Disabling a parameter for netlist compare without side effects
     # is possible with the \ignore_parameter function. In the same way, \tolerance will enable a parameter for
     # netlist compare regardless of the "primary" status of the parameter.

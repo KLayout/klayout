@@ -590,34 +590,3 @@ TEST(15_ContinuationWithBlanks)
     "end;\n"
   );
 }
-
-TEST(16_PrimaryParametersFromSpice)
-{
-  db::Netlist nl;
-
-  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader16.cir");
-
-  db::NetlistSpiceReader reader;
-  tl::InputStream is (path);
-  reader.read (is, nl);
-
-  const db::DeviceClass *dc;
-
-  //  RMODEL1 does not have L and W parameters
-  dc = nl.device_class_by_name ("RMODEL1");
-  EXPECT_EQ (dc->parameter_definition (db::DeviceClassResistor::param_id_W)->is_primary (), false);
-  EXPECT_EQ (dc->parameter_definition (db::DeviceClassResistor::param_id_L)->is_primary (), false);
-  EXPECT_EQ (dc->parameter_definition (db::DeviceClassResistor::param_id_R)->is_primary (), true);
-
-  //  RMODEL2 has L and W parameters
-  dc = nl.device_class_by_name ("RMODEL2");
-  EXPECT_EQ (dc->parameter_definition (db::DeviceClassResistor::param_id_W)->is_primary (), true);
-  EXPECT_EQ (dc->parameter_definition (db::DeviceClassResistor::param_id_L)->is_primary (), true);
-  EXPECT_EQ (dc->parameter_definition (db::DeviceClassResistor::param_id_R)->is_primary (), true);
-
-  //  RMODEL3 has W parameter only
-  dc = nl.device_class_by_name ("RMODEL3");
-  EXPECT_EQ (dc->parameter_definition (db::DeviceClassResistor::param_id_W)->is_primary (), true);
-  EXPECT_EQ (dc->parameter_definition (db::DeviceClassResistor::param_id_L)->is_primary (), false);
-  EXPECT_EQ (dc->parameter_definition (db::DeviceClassResistor::param_id_R)->is_primary (), true);
-}

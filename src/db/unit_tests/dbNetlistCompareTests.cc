@@ -4855,24 +4855,6 @@ TEST(30_ComparePrimaryAndOtherParameters)
 
   EXPECT_EQ (good, false);
 
-  //  disabling the parameter in the second netlist will make it match too
-
-  dc2->parameter_definition_non_const (db::DeviceClassResistor::param_id_R)->set_is_primary (false);
-
-  logger.clear ();
-  good = comp.compare (&nl1, &nl2);
-
-  EXPECT_EQ (good, true);
-
-  //  enabling the parameter again will make it mismatch again
-
-  dc2->parameter_definition_non_const (db::DeviceClassResistor::param_id_R)->set_is_primary (true);
-
-  logger.clear ();
-  good = comp.compare (&nl1, &nl2);
-
-  EXPECT_EQ (good, false);
-
   //  we can install an ignore handler to make it match again
 
   dc1->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassResistor::param_id_R, true));
@@ -4882,16 +4864,9 @@ TEST(30_ComparePrimaryAndOtherParameters)
 
   EXPECT_EQ (good, true);
 
-  //  if we enable the L parameter we'll get a mismatch again (but we have to enable it in both netlists)
+  //  if we enable the L parameter we'll get a mismatch again
 
   dc1->parameter_definition_non_const (db::DeviceClassResistor::param_id_L)->set_is_primary (true);
-
-  logger.clear ();
-  good = comp.compare (&nl1, &nl2);
-
-  EXPECT_EQ (good, true);
-
-  dc2->parameter_definition_non_const (db::DeviceClassResistor::param_id_L)->set_is_primary (true);
 
   logger.clear ();
   good = comp.compare (&nl1, &nl2);

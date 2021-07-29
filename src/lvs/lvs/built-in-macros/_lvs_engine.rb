@@ -191,13 +191,13 @@ module LVS
 
     # %LVS%
     # @name enable_parameter
-    # @brief Specifies whether to enable a parameter from a given device class for the netlisting and default compare
+    # @brief Specifies whether to enable a parameter from a given device class for netlisting and default compare
     # @synopsis enable_parameter(device_class_name, parameter_name)
     # See \Netter#enable_parameter for a description of that function.
 
     # %LVS%
     # @name disable_parameter
-    # @brief Specifies whether to disable a parameter from a given device class for the netlisting and default compare
+    # @brief Specifies whether to disable a parameter from a given device class for netlisting and default compare
     # @synopsis disable_parameter(device_class_name, parameter_name)
     # See \Netter#disable_parameter for a description of that function.
 

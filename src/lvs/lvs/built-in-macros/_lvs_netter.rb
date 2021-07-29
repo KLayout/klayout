@@ -201,18 +201,24 @@ module LVS
     # @name enable_parameter
     # @brief Indicates whether to enable a specific parameter for a given device
     # @synopsis enable_parameter(device_class_name, parameter_name)
-    # Enabling a parameter has two effects: first the parameter is netlisted and second
-    # the parameter is compared in the netlist compare - provided it is given in the schematic.
-    # Setting a tolerance or using a custom device comparer will override the last rule.
+    # The parameter is made "primary" which enables further applications - e.g. it is netlisted
+    # for some elements which normally would suppress additional parameters and the parameter
+    # is compared in the default device compare scheme during netlist matching.
+    # Enabling a parameter is rather a hint for the system and the effects can be controlled
+    # by other means, so this is not a strong concept. For example, once a \tolerance is 
+    # specified for a parameter, the "primary" flag of the parameter is not considered anymore.
+    # The inverse the this function is \disable_parameter.
 
     # %LVS%
     # @name disable_parameter
     # @brief Indicates whether to disable a specific parameter for a given device
     # @synopsis disable_parameter(device_class_name, parameter_name)
-    # Disabling a parameter has two effects: first the parameter is not netlisted and second
-    # the parameter is compared in the netlist compare - provided it is given in the schematic.
-    # Setting a tolerance or using a custom device comparer will override the last rule.
-    # To disable a parameter for compare only, \ignore_parameter can be used.
+    # Disabling a parameter is the inverse of \enable_parameter. Disabling a parameter will
+    # reset the "primary" flag of the parameter. This has several effects - e.g. the parameter will not be 
+    # used in device compare during netlist matching by default. This is not a strong concept but rather
+    # a hint for the system. Disabling a parameter for netlist compare without side effects
+    # is possible with the \ignore_parameter function. In the same way, \tolerance will enable a parameter for
+    # netlist compare regardless of the "primary" status of the parameter.
 
     [ :enable_parameter, :disable_parameter ].each do |mn|
       eval <<"CODE"

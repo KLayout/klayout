@@ -236,13 +236,7 @@ tolerance("NMOS", "L", :absolute => 0.05, :relative => 0.01)</pre>
 
   <p>
   This has two effects: first, the "L" parameter is written into the Spice output netlist and second, it is compare against
-  the schematic "L" parameter, provided that one is given in the netlist. No compare happens if no "L" parameter is present in the
-  netlist. 
-  </p>
-
-  <p>
-  This behavior is overridden by a "tolerance" or "ignore_parameter" specification for that parameter or if a customer
-  device comparer is installed.
+  the schematic "L" parameter.
   </p>
 
   <p>
@@ -252,8 +246,10 @@ tolerance("NMOS", "L", :absolute => 0.05, :relative => 0.01)</pre>
   <pre>disable_parameter("RES", "R")</pre>
 
   <p>
-  As this will make the parameter to disappear from the netlist, it's often more useful to use "ignore_parameter" instead
-  which has the same effect on the compare step, but will keep it in the netlist.
+  This behavior is overridden by a "tolerance" or "ignore_parameter" specification for that parameter or if a customer
+  device comparer is installed. Netlisting is affected only for the elementary devices (R, C and L) and any Spice writer
+  delegate can choose to ignore the primary flag. A custom device comparer may also ignore this flag. 
+  So after all, enabling or disabling a parameter is not a strong concept but rather a hint.
   </p>
 
   <h2>Pin swapping</h2>

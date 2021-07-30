@@ -51,7 +51,7 @@ enum RectFilter
   /**
    *  @brief No filter
    */
-  NoSideAllowed = 0,
+  NoRectFilter = 0,
 
   /**
    *  @brief Allow errors on one side
@@ -122,7 +122,7 @@ struct DB_PUBLIC RegionCheckOptions
                       distance_type _max_projection = std::numeric_limits<distance_type>::max (),
                       bool _shielded = true,
                       OppositeFilter _opposite_filter = NoOppositeFilter,
-                      RectFilter _rect_filter = NoSideAllowed,
+                      RectFilter _rect_filter = NoRectFilter,
                       bool _negative = false)
     : whole_edges (_whole_edges),
       metrics (_metrics),

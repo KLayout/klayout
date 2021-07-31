@@ -404,6 +404,13 @@ TEST(0_EqualDeviceParameters)
   d1.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 0.5);
   d2.set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 0.2);
 
+  EXPECT_EQ (dc.equal (d1, d2), false);
+  EXPECT_EQ (dc.equal (d2, d1), false);
+  EXPECT_EQ (dc.less (d1, d2), false);
+  EXPECT_EQ (dc.less (d2, d1), true);
+
+  *eqp += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_W, true);  //  ignore W
+
   EXPECT_EQ (dc.equal (d1, d2), true);
   EXPECT_EQ (dc.equal (d2, d1), true);
   EXPECT_EQ (dc.less (d1, d2), false);
@@ -959,7 +966,9 @@ TEST(5_BufferTwoPathsDifferentParameters)
   EXPECT_EQ (good, false);
 
   logger.clear ();
-  nl1.device_class_by_name ("NMOS")->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 1.5, 0.0));
+  db::EqualDeviceParameters *eql = new db::EqualDeviceParameters ();
+  *eql += db::EqualDeviceParameters (db::DeviceClassMOS3Transistor::param_id_L, 1.5, 0.0);
+  nl1.device_class_by_name ("NMOS")->set_parameter_compare_delegate (eql);
   good = comp.compare (&nl1, &nl2);
 
   EXPECT_EQ (logger.text (),
@@ -4711,4 +4720,165 @@ TEST(29_EmptySubCircuitsFromSPICE)
   db::NetlistComparer comp;
   EXPECT_EQ (comp.compare (&a, &b), true);
   EXPECT_EQ (comp.compare (&a, &c), false);
+}
+
+TEST(30_ComparePrimaryAndOtherParameters)
+{
+  db::Netlist nl1, nl2;
+  db::DeviceClass *dc1, *dc2;
+  db::Circuit *circuit;
+  db::Device *d;
+  db::Net *n;
+  std::string txt;
+  bool good;
+
+  dc1 = new db::DeviceClassResistor ();
+  dc1->set_name ("RES");
+  nl1.add_device_class (dc1);
+  circuit = new db::Circuit ();
+  circuit->set_name ("X");
+  d = new db::Device ();
+  d->set_device_class (dc1);
+  d->set_name ("D");
+  d->set_parameter_value (db::DeviceClassResistor::param_id_L, 1.0);
+  d->set_parameter_value (db::DeviceClassResistor::param_id_R, 10.0);
+  d->set_parameter_value (db::DeviceClassResistor::param_id_W, 0.25);
+  circuit->add_device (d);
+  n = new db::Net ();
+  circuit->add_net (n);
+  n->set_name ("1");
+  d->connect_terminal (db::DeviceClassResistor::terminal_id_A, n);
+  n->add_pin (db::NetPinRef (circuit->add_pin ("1").id ()));
+  n = new db::Net ();
+  circuit->add_net (n);
+  n->set_name ("2");
+  d->connect_terminal (db::DeviceClassResistor::terminal_id_B, n);
+  n->add_pin (db::NetPinRef (circuit->add_pin ("2").id ()));
+  nl1.add_circuit (circuit);
+
+  dc2 = new db::DeviceClassResistor ();
+  dc2->set_name ("RES");
+  nl2.add_device_class (dc2);
+  circuit = new db::Circuit ();
+  circuit->set_name ("X");
+  d = new db::Device ();
+  d->set_device_class (dc2);
+  d->set_name ("D");
+  d->set_parameter_value (db::DeviceClassResistor::param_id_L, 1.1);   //  differs
+  d->set_parameter_value (db::DeviceClassResistor::param_id_R, 10.0);
+  d->set_parameter_value (db::DeviceClassResistor::param_id_W, 0.20);  //  differs
+  circuit->add_device (d);
+  n = new db::Net ();
+  circuit->add_net (n);
+  n->set_name ("1");
+  d->connect_terminal (db::DeviceClassResistor::terminal_id_A, n);
+  n->add_pin (db::NetPinRef (circuit->add_pin ("1").id ()));
+  n = new db::Net ();
+  circuit->add_net (n);
+  n->set_name ("2");
+  d->connect_terminal (db::DeviceClassResistor::terminal_id_B, n);
+  n->add_pin (db::NetPinRef (circuit->add_pin ("2").id ()));
+  nl2.add_circuit (circuit);
+
+  NetlistCompareTestLogger logger;
+  db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
+
+  good = comp.compare (&nl1, &nl2);
+
+  txt = logger.text ();
+
+  //  we did not enable L and W, hence that works
+  EXPECT_EQ (good, true);
+
+  EXPECT_EQ (txt,
+    "begin_circuit X X\n"
+    "match_ambiguous_nets 1 1\n"
+    "match_ambiguous_nets 2 2\n"
+    "match_pins 1 1\n"
+    "match_pins 2 2\n"
+    "match_devices D D\n"
+    "end_circuit X X MATCH"
+  );
+
+  //  changing R will make the compare fail
+
+  d->set_parameter_value (db::DeviceClassResistor::param_id_R, 12.0);
+
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (good, false);
+
+  //  if we install a delegate which introduces a tolerance (absolute 1) it will still not match
+
+  dc1->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassResistor::param_id_R, 1.0, 0.0));
+
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (good, false);
+
+  //  if we install a delegate which introduces a tolerance (absolute 2.0) it will match
+
+  dc1->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassResistor::param_id_R, 2.0, 0.0));
+
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (good, true);
+
+  //  removing the comparer will make it non-matching
+
+  dc1->set_parameter_compare_delegate (0);
+
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (good, false);
+
+  //  disabling the parameter will make it match too
+
+  dc1->parameter_definition_non_const (db::DeviceClassResistor::param_id_R)->set_is_primary (false);
+
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (good, true);
+
+  //  enabling the parameter again will make it mismatch again
+
+  dc1->parameter_definition_non_const (db::DeviceClassResistor::param_id_R)->set_is_primary (true);
+
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (good, false);
+
+  //  we can install an ignore handler to make it match again
+
+  dc1->set_parameter_compare_delegate (new db::EqualDeviceParameters (db::DeviceClassResistor::param_id_R, true));
+
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (good, true);
+
+  //  if we enable the L parameter we'll get a mismatch again
+
+  dc1->parameter_definition_non_const (db::DeviceClassResistor::param_id_L)->set_is_primary (true);
+
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (good, false);
+
+  //  until we install another tolerance
+
+  *dynamic_cast<db::EqualDeviceParameters *> (dc1->parameter_compare_delegate ()) += db::EqualDeviceParameters (db::DeviceClassResistor::param_id_L, 0.11, 0.0);
+
+  logger.clear ();
+  good = comp.compare (&nl1, &nl2);
+
+  EXPECT_EQ (good, true);
 }

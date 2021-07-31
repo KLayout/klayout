@@ -261,3 +261,10 @@ TEST(28_BlackBoxDevicesWithBlank)
   run_test (_this, "bbdevices5b", "bbdevices5.gds");
   run_test (_this, "bbdevices6b", "bbdevices6.gds");
 }
+
+TEST(29_DeviceCombineAndTolerances)
+{
+  run_test (_this, "res_combine1", "res_combine.gds");
+  run_test (_this, "res_combine2", "res_combine.gds");
+  run_test (_this, "res_combine3", "res_combine.gds");
+}

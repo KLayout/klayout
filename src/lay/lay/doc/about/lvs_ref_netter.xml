@@ -127,6 +127,38 @@ will employ net names to resolve ambiguities. If set to false,
 ambiguities will be resolved based on the topology alone. Topology
 resolution is more expensive.
 </p>
+<a name="disable_parameter"/><h2>"disable_parameter" - Indicates whether to disable a specific parameter for a given device</h2>
+<keyword name="disable_parameter"/>
+<p>Usage:</p>
+<ul>
+<li><tt>disable_parameter(device_class_name, parameter_name)</tt></li>
+</ul>
+<p>
+Disabling a parameter is the inverse of <a href="#enable_parameter">enable_parameter</a>. Disabling a parameter will
+reset the "primary" flag of the parameter. This has several effects - e.g. the parameter will not be 
+used in device compare during netlist matching by default. 
+</p><p>
+This is not a strong concept but rather
+a hint for the system. Disabling a parameter for netlist compare without side effects
+is possible with the <a href="#ignore_parameter">ignore_parameter</a> function. In the same way, <a href="#tolerance">tolerance</a> will enable a parameter for
+netlist compare regardless of the "primary" status of the parameter.
+</p>
+<a name="enable_parameter"/><h2>"enable_parameter" - Indicates whether to enable a specific parameter for a given device</h2>
+<keyword name="enable_parameter"/>
+<p>Usage:</p>
+<ul>
+<li><tt>enable_parameter(device_class_name, parameter_name)</tt></li>
+</ul>
+<p>
+The parameter is made "primary" which enables further applications - e.g. it is netlisted
+for some elements which normally would not print that parameter, and the parameter
+is compared in the default device compare scheme during netlist matching.
+</p><p>
+Enabling a parameter is rather a hint for the system and the effects can be controlled
+by other means, so this is not a strong concept. For example, once a <a href="#tolerance">tolerance</a> is 
+specified for a parameter, the "primary" flag of the parameter is not considered anymore.
+The inverse the this function is <a href="#disable_parameter">disable_parameter</a>.
+</p>
 <a name="equivalent_pins"/><h2>"equivalent_pins" - Marks pins as equivalent</h2>
 <keyword name="equivalent_pins"/>
 <p>Usage:</p>
@@ -153,6 +185,20 @@ If the netlist provides named pins, names can be used instead of numbers. Again,
 case pin names for SPICE netlists.
 </p><p>
 Use this method andwhere in the script before the <a href="#compare">compare</a> call.
+</p>
+<a name="ignore_parameter"/><h2>"ignore_parameter" - Skip a specific parameter for a given device class name during device compare</h2>
+<keyword name="ignore_parameter"/>
+<p>Usage:</p>
+<ul>
+<li><tt>ignore_parameter(device_class_name, parameter_name)</tt></li>
+</ul>
+<p>
+Use this function is ignore a parameter for a particular device class during the netlist compare.
+Some parameters - for example "L" and "W" parameters of the resistor device - are "secondary" parameters
+which are not ignored by default. Using "ignore_parameter" on such devices does not have an effect.
+</p><p>
+"ignore_parameter" and "tolerance" only have an effect with the default device comparer. Using a custom device comparer
+will override the definitions by "ignore_parameter" or "tolerance".
 </p>
 <a name="join_symmetric_nets"/><h2>"join_symmetric_nets" - Joins symmetric nets of selected circuits on the extracted netlist</h2>
 <keyword name="join_symmetric_nets"/>
@@ -395,5 +441,14 @@ Tolerances can be given in absolute units or relative or both.
 The relative tolerance is given as a factor, so 0.1 is a 10% tolerance.
 Absolute and relative tolerances add, so specifying both allows for a larger
 deviation.
+</p><p>
+Some device parameters - like the resistor's "L" and "W" parameters - are not compared by default.
+These are "secondary" device parameters. Using a tolerance on such parameters will make these parameters
+being compared even if they are secondary ones.
+</p><p>
+A function is skip a parameter during the device compare is "ignore_parameter".
+</p><p>
+"tolerance" and "ignore_parameter" only have an effect with the default device comparer. Using a custom device comparer
+will override the definitions by "ignore_parameter" or "tolerance".
 </p>
 </doc>

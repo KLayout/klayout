@@ -1,0 +1,31 @@
+
+.SUBCKT res1 MINUS PLUS
+*.PININFO MINUS:B PLUS:B
+RR7 net5 net3 1565.15 RPP1 W=2u L=10u M=1
+RR8 net3 net6 1565.15 RPP1 W=2u L=10u M=1
+RR9 net6 net7 1565.15 RPP1 W=2u L=10u M=1
+RR10 net7 MINUS 1565.15 RPP1 W=2u L=10u M=1
+RR6 net4 net5 1565.15 RPP1 W=2u L=10u M=1
+RR0 PLUS net4 1565.15 RPP1 W=2u L=10u M=1
+.ENDS
+
+
+.SUBCKT res2_ MINUS PLUS
+*.PININFO MINUS:B PLUS:B
+XI106 net3 PLUS res1
+XI104 net7 net8 res1
+XI100 net6 MINUS res1
+XI105 net3 net7 res1
+XI107 net3 PLUS res1
+XI108 net3 PLUS res1
+XI101 net9 net6 res1
+XI102 net10 net9 res1
+XI103 net8 net10 res1
+.ENDS
+
+
+.SUBCKT Res2 gnd vdd
+*.PININFO gnd:B vdd:B
+XI0 gnd vdd res2_
+.ENDS
+

@@ -1168,6 +1168,19 @@ END
 
   end
 
+  def test_15_deviceParameterCompare
+    
+    dpc = RBA::EqualDeviceParameters::new(1)
+    assert_equal(dpc.to_string, "#1:A0/R0")
+
+    dpc += RBA::EqualDeviceParameters::new(2, 1.0, 0.25)
+    assert_equal(dpc.to_string, "#1:A0/R0;#2:A1/R0.25")
+
+    dpc += RBA::EqualDeviceParameters::ignore(3)
+    assert_equal(dpc.to_string, "#1:A0/R0;#2:A1/R0.25;#3:ignore")
+
+  end
+
 end
 
 load("test_epilogue.rb")

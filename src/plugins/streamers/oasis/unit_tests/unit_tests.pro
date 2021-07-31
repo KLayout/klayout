@@ -7,7 +7,6 @@ include($$PWD/../../../../lib_ut.pri)
 
 SOURCES = \
   dbOASISReaderTests.cc \
-  \ \
   dbOASISWriter2Tests.cc \
   dbOASISWriterTests.cc
 

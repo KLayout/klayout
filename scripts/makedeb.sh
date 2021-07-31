@@ -39,7 +39,6 @@ version="${KLAYOUT_VERSION//-*/}"
 exe_name="klayout"
 bits=64
 
-
 umask 0022
 
 echo "Checking $bits installation"
@@ -101,8 +100,8 @@ mkdir -p makedeb-tmp/${bindir}
 cp etc/klayout.desktop makedeb-tmp/${sharedir}/applications
 cp etc/logo.png makedeb-tmp/${sharedir}/pixmaps/klayout.png
 cp Changelog makedeb-tmp/${sharedir}/doc/klayout/changelog
-cp Changelog.Debian makedeb-tmp/${sharedir}/doc/klayout/changelog.Debian
-cp COPYRIGHT makedeb-tmp/${sharedir}/doc/klayout/copyright
+sed "s/%NOW%/$now/;s/%VERSION%/$version/" <Changelog.Debian.templ >makedeb-tmp/${sharedir}/doc/klayout/changelog.Debian
+sed "s/%VERSION%/$version/" <COPYRIGHT >makedeb-tmp/${sharedir}/doc/klayout/copyright
 
 cp -pd $bininstdir/strm* makedeb-tmp/${bindir}
 cp -pd $bininstdir/klayout makedeb-tmp/${bindir}
@@ -115,7 +114,7 @@ for d in db tl rdb; do
   mkdir -p makedeb-tmp/${pylibdir}/$d
   cp -pd $bininstdir/pymod/klayout/$d/*py makedeb-tmp/${pylibdir}/$d
 done
-sed "s/%VERSION%/${KLAYOUT_VERSION//-*/}/g" <scripts/klayout.egg-info >makedeb-tmp/${distpackdir}/klayout.egg-info
+sed "s/%VERSION%/$version/g" <scripts/klayout.egg-info >makedeb-tmp/${distpackdir}/klayout.egg-info
 
 cd makedeb-tmp
 

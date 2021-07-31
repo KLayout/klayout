@@ -908,6 +908,11 @@ db::EqualDeviceParameters *make_equal_dp (size_t param_id, double absolute, doub
   return new db::EqualDeviceParameters (param_id, absolute, relative);
 }
 
+db::EqualDeviceParameters *make_ignore_dp (size_t param_id)
+{
+  return new db::EqualDeviceParameters (param_id, true);
+}
+
 Class<db::EqualDeviceParameters> decl_dbEqualDeviceParameters ("db", "EqualDeviceParameters",
   gsi::constructor ("new", &make_equal_dp, gsi::arg ("param_id"), gsi::arg ("absolute", 0.0), gsi::arg ("relative", 0.0),
     "@brief Creates a device parameter comparer for a single parameter.\n"
@@ -921,6 +926,15 @@ Class<db::EqualDeviceParameters> decl_dbEqualDeviceParameters ("db", "EqualDevic
     "For example, when comparing parameter values of 40 and 60, a relative deviation of 0.35 means an absolute "
     "deviation of 17.5 (= 0.35 * average of 40 and 60) which does not make both values match."
   ) +
+  gsi::constructor ("ignore", &make_ignore_dp, gsi::arg ("param_id"),
+    "@brief Creates a device parameter comparer which ignores the parameter.\n"
+    "\n"
+    "This specification can be used to make a parameter ignored. Starting with version 0.27.4, all primary parameters "
+    "are compared. Before 0.27.4, giving a tolerance meant only those parameters are compared. To exclude a primary "
+    "parameter from the compare, use the 'ignore' specification for that parameter.\n"
+    "\n"
+    "This constructor has been introduced in version 0.27.4.\n"
+  ) +
   gsi::method ("+", &db::EqualDeviceParameters::operator+, gsi::arg ("other"),
     "@brief Combines two parameters for comparison.\n"
     "The '+' operator will join the parameter comparers and produce one that checks the combined parameters.\n"
@@ -928,7 +942,8 @@ Class<db::EqualDeviceParameters> decl_dbEqualDeviceParameters ("db", "EqualDevic
   gsi::method ("+=", &db::EqualDeviceParameters::operator+, gsi::arg ("other"),
     "@brief Combines two parameters for comparison (in-place).\n"
     "The '+=' operator will join the parameter comparers and produce one that checks the combined parameters.\n"
-  ),
+  ) +
+  gsi::method ("to_string", &db::EqualDeviceParameters::to_string, "@hide"),
   "@brief A device parameter equality comparer.\n"
   "Attach this object to a device class with \\DeviceClass#equal_parameters= to make the device "
   "class use this comparer:\n"

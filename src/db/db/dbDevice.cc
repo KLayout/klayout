@@ -90,6 +90,16 @@ void Device::set_circuit (Circuit *circuit)
   mp_circuit = circuit;
 }
 
+const Netlist *Device::netlist () const
+{
+  return mp_circuit ? mp_circuit->netlist () : 0;
+}
+
+Netlist *Device::netlist ()
+{
+  return mp_circuit ? mp_circuit->netlist () : 0;
+}
+
 void Device::set_name (const std::string &n)
 {
   m_name = n;

@@ -183,7 +183,27 @@ module LVS
     # @synopsis tolerance(device_class_name, parameter_name [, :absolute => absolute_tolerance] [, :relative => relative_tolerance])
     # See \Netter#tolerance for a description of that function.
 
-    %w(schematic compare join_symmetric_nets tolerance blank_circuit align same_nets same_nets! same_circuits same_device_classes equivalent_pins min_caps max_res max_depth max_branch_complexity consider_net_names).each do |f|
+    # %LVS%
+    # @name ignore_parameter
+    # @brief Specifies whether to ignore a parameter from a given device class for the compare
+    # @synopsis ignore_parameter(device_class_name, parameter_name)
+    # See \Netter#ignore_parameter for a description of that function.
+
+    # %LVS%
+    # @name enable_parameter
+    # @brief Specifies whether to enable a parameter from a given device class for netlisting and default compare
+    # @synopsis enable_parameter(device_class_name, parameter_name)
+    # See \Netter#enable_parameter for a description of that function.
+
+    # %LVS%
+    # @name disable_parameter
+    # @brief Specifies whether to disable a parameter from a given device class for netlisting and default compare
+    # @synopsis disable_parameter(device_class_name, parameter_name)
+    # See \Netter#disable_parameter for a description of that function.
+
+    %w(schematic compare join_symmetric_nets tolerance ignore_parameter enable_parameter disable_parameter 
+       blank_circuit align same_nets same_nets! same_circuits same_device_classes equivalent_pins 
+       min_caps max_res max_depth max_branch_complexity consider_net_names).each do |f|
       eval <<"CODE"
         def #{f}(*args)
           _netter.#{f}(*args)

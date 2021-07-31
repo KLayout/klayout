@@ -194,6 +194,16 @@ public:
   }
 
   /**
+   *  @brief Gets the netlist, the device lives in
+   */
+  const Netlist *netlist () const;
+
+  /**
+   *  @brief Gets the netlist, the device lives in
+   */
+  Netlist *netlist ();
+
+  /**
    *  @brief Sets the name
    */
   void set_name (const std::string &n);

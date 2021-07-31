@@ -3059,9 +3059,37 @@ NetlistComparer::unmatched_circuits (db::Netlist *a, db::Netlist *b, std::vector
   }
 }
 
+static void clear_primary_classes (const db::Netlist *nl)
+{
+  for (db::Netlist::const_device_class_iterator dc = nl->begin_device_classes (); dc != nl->end_device_classes (); ++dc) {
+    dc->set_primary_class (0);
+  }
+}
+
 bool
 NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
 {
+  bool res = false;
+
+  try {
+    res = compare_impl (a, b);
+    clear_primary_classes (a);
+    clear_primary_classes (b);
+  } catch (...) {
+    clear_primary_classes (a);
+    clear_primary_classes (b);
+    throw;
+  }
+
+  return res;
+}
+
+bool
+NetlistComparer::compare_impl (const db::Netlist *a, const db::Netlist *b) const
+{
+  clear_primary_classes (a);
+  clear_primary_classes (b);
+
   m_case_sensitive = combined_case_sensitive (a, b);
 
   //  we need to create a copy because this method is supposed to be const.
@@ -3130,21 +3158,12 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
     }
   }
 
-  //  impose the compare tolerances of the layout (first netlist) on the schematic (second netlist)
-  //  TODO: this is kind of clumsy. But it's very important to use the same device sorting for both netlists, so we play this trick.
-  //  A better solution was to have a common compare framework for both netlists.
+  //  Register the primary netlist's device classes as primary ones for the second netlist's device classes.
+  //  This way, the tolerances and parameter definitions are imposed on the second netlist, creating a common basis.
   for (std::map<size_t, std::pair<const db::DeviceClass *, const db::DeviceClass *> >::const_iterator i = cat2dc.begin (); i != cat2dc.end (); ++i) {
-
     if (i->second.first && i->second.second) {
-
-      const db::DeviceClass *da = i->second.first;
-      db::DeviceClass *db = const_cast<db::DeviceClass *> (i->second.second);
-
-      const db::DeviceParameterCompareDelegate *cmp = da->parameter_compare_delegate ();
-      db->set_parameter_compare_delegate (const_cast<db::DeviceParameterCompareDelegate *> (cmp));
-
+      i->second.second->set_primary_class (i->second.first);
     }
-
   }
 
   //  decide whether to use a device category in strict mode

@@ -362,18 +362,11 @@ extract_devices(bjt3(model_name), { "C" => collector, "B" => base, "E" => emitte
   </p>
 
   <p>
-  Parameters can be fully enabled by using "enable_parameter" on the device class.
-  Hence it is possible to enable "W" and "L" on a resistor type using the following code:
-  </p>
-
-  <pre>dc = extract_devices(resistor("RES", 1), ...)
-dc.enable_parameter("W", true)
-dc.enable_parameter("L", true)
-</pre>
-
-  <p>
-  This will modify the parameters of the generated device class such that "W" and "L" are
-  fully enabled parameters.
+  Parameters can be fully enabled by using <a href="/about/lvs_ref_global.xml#enable_parameter">enable_parameter</a> 
+  or disabled using <a href="/about/lvs_ref_global.xml#disable_parameter">disable_parameter</a>.
+  <a href="/about/lvs_ref_global.xml#tolerance">tolerance</a> can be used to enable a parameter for compare 
+  and to specify a compare tolerance.
+  <a href="/about/lvs_ref_global.xml#ignore_parameter">ignore_parameter</a> can be used to ignore a parameter in the compare step.
   </p>
 
   <p>
@@ -397,8 +390,7 @@ extract_devices(resistor("RES", 1, MyResistor), ...)
 </pre>
 
   <p>
-  The effect of this code is the same than the first one, but using a custom
-  device class opens the option to supply additional parameters for example
+  Using a custom device class opens the option to supply additional parameters for example
   or to implement some entirely new device while using the extraction
   mechanics of the resistor extractor. The only requirement is compatibility of
   the parameter and terminal definitions.

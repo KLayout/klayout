@@ -203,7 +203,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
   std::unordered_set<db::EdgePair> result, intra_polygon_result;
 
   //  NOTE: the rectangle and opposite filters are unsymmetric
-  bool symmetric_edge_pairs = ! m_has_other && m_options.opposite_filter == db::NoOppositeFilter && m_options.rect_filter == RectFilter::NoSideAllowed;
+  bool symmetric_edge_pairs = ! m_has_other && m_options.opposite_filter == db::NoOppositeFilter && m_options.rect_filter == RectFilter::NoRectFilter;
 
   edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check (m_check, result, intra_polygon_result, m_options.negative, m_different_polygons, m_has_other, m_options.shielded, symmetric_edge_pairs);
   poly2poly_check<TS> poly_check (edge_check);
@@ -436,7 +436,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
   }
 
   //  implements error filtering on rectangles
-  if (m_options.rect_filter != RectFilter::NoSideAllowed && ! result.empty ()) {
+  if (m_options.rect_filter != RectFilter::NoRectFilter && ! result.empty ()) {
 
     std::unordered_set<db::EdgePair> waived;
 

@@ -145,7 +145,7 @@ TEST(15_private)
 
 TEST(16_private)
 {
-  // test_is_long_runner ();
+  // test_is_long_runner ();lvs-blackbox
   run_test (_this, "test_16.lvs", "test_16.cir.gz", "test_16.gds.gz", true);
 }
 

@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
 # Run this script with 
 #
@@ -35,7 +35,7 @@ esac
 
 . ./version.sh
 
-version="$KLAYOUT_VERSION"
+version="${KLAYOUT_VERSION//-*/}"
 exe_name="klayout"
 bits=64
 
@@ -115,7 +115,7 @@ for d in db tl rdb; do
   mkdir -p makedeb-tmp/${pylibdir}/$d
   cp -pd $bininstdir/pymod/klayout/$d/*py makedeb-tmp/${pylibdir}/$d
 done
-sed "s/%VERSION%/$KLAYOUT_VERSION/g" <scripts/klayout.egg-info >makedeb-tmp/${distpackdir}/klayout.egg-info
+sed "s/%VERSION%/${KLAYOUT_VERSION//-*/}/g" <scripts/klayout.egg-info >makedeb-tmp/${distpackdir}/klayout.egg-info
 
 cd makedeb-tmp
 

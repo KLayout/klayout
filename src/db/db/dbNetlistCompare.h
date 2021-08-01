@@ -32,7 +32,7 @@
 namespace db
 {
 
-class CircuitPinMapper;
+class CircuitPinCategorizer;
 class DeviceFilter;
 class DeviceCategorizer;
 class CircuitCategorizer;
@@ -355,18 +355,18 @@ private:
 
 protected:
   bool compare_impl (const db::Netlist *a, const db::Netlist *b) const;
-  bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, db::CircuitPinMapper &circuit_pin_mapper, const std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const;
+  bool compare_circuits (const db::Circuit *c1, const db::Circuit *c2, db::DeviceCategorizer &device_categorizer, db::CircuitCategorizer &circuit_categorizer, db::CircuitPinCategorizer &circuit_pin_mapper, const std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > &net_identity, bool &pin_mismatch, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const;
   bool all_subcircuits_verified (const db::Circuit *c, const std::set<const db::Circuit *> &verified_circuits) const;
   std::string generate_subcircuits_not_verified_warning (const db::Circuit *ca, const std::set<const db::Circuit *> &verified_circuits_a, const db::Circuit *cb, const std::set<const db::Circuit *> &verified_circuits_b) const;
-  static void derive_pin_equivalence (const db::Circuit *ca, const db::Circuit *cb, CircuitPinMapper *circuit_pin_mapper);
+  static void derive_pin_equivalence (const db::Circuit *ca, const db::Circuit *cb, CircuitPinCategorizer *circuit_pin_mapper);
   void do_pin_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, bool &pin_mismatch, bool &good) const;
   void do_device_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, const db::DeviceFilter &device_filter, DeviceCategorizer &device_categorizer, db::DeviceEquivalenceTracker &device_eq, bool &good) const;
-  void do_subcircuit_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, CircuitCategorizer &circuit_categorizer, const db::CircuitPinMapper &circuit_pin_mapper, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, db::SubCircuitEquivalenceTracker &subcircuit_eq, bool &good) const;
+  void do_subcircuit_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, CircuitCategorizer &circuit_categorizer, const db::CircuitPinCategorizer &circuit_pin_mapper, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, db::SubCircuitEquivalenceTracker &subcircuit_eq, bool &good) const;
   bool handle_pin_mismatch (const NetGraph &g1, const db::Circuit *c1, const db::Pin *pin1, const NetGraph &g2, const db::Circuit *c2, const db::Pin *p2) const;
 
   mutable NetlistCompareLogger *mp_logger;
   std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > > m_same_nets;
-  std::unique_ptr<CircuitPinMapper> mp_circuit_pin_mapper;
+  std::unique_ptr<CircuitPinCategorizer> mp_circuit_pin_categorizer;
   std::unique_ptr<DeviceCategorizer> mp_device_categorizer;
   std::unique_ptr<CircuitCategorizer> mp_circuit_categorizer;
   double m_cap_threshold;

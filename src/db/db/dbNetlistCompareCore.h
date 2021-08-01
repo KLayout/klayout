@@ -36,30 +36,6 @@ namespace db
 {
 
 // --------------------------------------------------------------------------------------------------------------------
-//  A structure to keep the data during compare
-
-struct DB_PUBLIC CompareData
-{
-  CompareData ()
-    : graph (0), other_graph (0), max_depth (0), max_n_branch (0), depth_first (true), dont_consider_net_names (false), with_ambiguous (false), logger (0),
-      circuit_pin_mapper (0), subcircuit_equivalence (0), device_equivalence (0), progress (0)
-  { }
-
-  NetGraph *graph;
-  NetGraph *other_graph;
-  size_t max_depth;
-  size_t max_n_branch;
-  bool depth_first;
-  bool dont_consider_net_names;
-  bool with_ambiguous;
-  NetlistCompareLogger *logger;
-  CircuitPinCategorizer *circuit_pin_mapper;
-  SubCircuitEquivalenceTracker *subcircuit_equivalence;
-  DeviceEquivalenceTracker *device_equivalence;
-  tl::RelativeProgress *progress;
-};
-
-// --------------------------------------------------------------------------------------------------------------------
 //  NetlistCompareCore definition
 
 class TentativeNodeMapping;
@@ -74,6 +50,8 @@ class DB_PUBLIC NetlistCompareCore
 {
 public:
   typedef std::vector<NetGraphNode>::const_iterator node_iterator;
+
+  NetlistCompareCore (NetGraph *graph, NetGraph *other_graph);
 
   /**
    *  @brief Implementation of the backtracking algorithm
@@ -97,7 +75,7 @@ public:
    *  If "tentative" is non-null, assignments will be recorded in the TentativeMapping
    *  audit object and can be undone afterwards when backtracking recursion happens.
    */
-  static size_t derive_node_identities (size_t net_index, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data);
+  size_t derive_node_identities (size_t net_index) const;
 
   /**
    *  @brief The backtracking driver
@@ -105,13 +83,28 @@ public:
    *  This method will analyze the given nodes and call "derive_node_identities" for all nodes
    *  with a proposed identity.
    */
-  static size_t derive_node_identities_from_node_set (std::vector<NodeEdgePair> &nodes, std::vector<NodeEdgePair> &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data);
+  size_t derive_node_identities_from_node_set (std::vector<NodeEdgePair> &nodes, std::vector<NodeEdgePair> &other_nodes) const;
+
+  size_t max_depth;
+  size_t max_n_branch;
+  bool depth_first;
+  bool dont_consider_net_names;
+  bool with_ambiguous;
+  NetlistCompareLogger *logger;
+  CircuitPinCategorizer *circuit_pin_mapper;
+  SubCircuitEquivalenceTracker *subcircuit_equivalence;
+  DeviceEquivalenceTracker *device_equivalence;
+  tl::RelativeProgress *progress;
 
 private:
+  NetGraph *mp_graph;
+  NetGraph *mp_other_graph;
 
-  static size_t derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGraphNode::edge_iterator ee, NetGraphNode::edge_iterator e_other, NetGraphNode::edge_iterator ee_other, size_t net_index, size_t other_net_index, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data);
-  static size_t derive_node_identities_from_ambiguity_group (const NodeRange &nr, DeviceMapperForTargetNode &dm, DeviceMapperForTargetNode &dm_other, SubCircuitMapperForTargetNode &scm, SubCircuitMapperForTargetNode &scm_other, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data);
-  static size_t derive_node_identities_from_singular_match (const NetGraphNode *n, const NetGraphNode::edge_iterator &e, const NetGraphNode *n_other, const NetGraphNode::edge_iterator &e_other, DeviceMapperForTargetNode &dm, DeviceMapperForTargetNode &dm_other, SubCircuitMapperForTargetNode &scm, SubCircuitMapperForTargetNode &scm_other, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data, bool consider_net_names);
+  size_t derive_node_identities (size_t net_index, size_t depth, size_t n_branch, TentativeNodeMapping *tentative) const;
+  size_t derive_node_identities_from_node_set (std::vector<NodeEdgePair> &nodes, std::vector<NodeEdgePair> &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative) const;
+  size_t derive_node_identities_for_edges (NetGraphNode::edge_iterator e, NetGraphNode::edge_iterator ee, NetGraphNode::edge_iterator e_other, NetGraphNode::edge_iterator ee_other, size_t net_index, size_t other_net_index, size_t depth, size_t n_branch, TentativeNodeMapping *tentative) const;
+  size_t derive_node_identities_from_ambiguity_group (const NodeRange &nr, DeviceMapperForTargetNode &dm, DeviceMapperForTargetNode &dm_other, SubCircuitMapperForTargetNode &scm, SubCircuitMapperForTargetNode &scm_other, size_t depth, size_t n_branch, TentativeNodeMapping *tentative) const;
+  size_t derive_node_identities_from_singular_match (const NetGraphNode *n, const NetGraphNode::edge_iterator &e, const NetGraphNode *n_other, const NetGraphNode::edge_iterator &e_other, DeviceMapperForTargetNode &dm, DeviceMapperForTargetNode &dm_other, SubCircuitMapperForTargetNode &scm, SubCircuitMapperForTargetNode &scm_other, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, bool consider_net_names) const;
 };
 
 }

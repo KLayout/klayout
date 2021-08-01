@@ -840,6 +840,18 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       }
     }
 
+    NetlistCompareCore compare (&g1, &g2);
+    compare.max_depth = m_max_depth;
+    compare.max_n_branch = m_max_n_branch;
+    compare.depth_first = m_depth_first;
+    compare.dont_consider_net_names = m_dont_consider_net_names;
+    compare.with_ambiguous = (pass > 0);
+    compare.circuit_pin_mapper = &circuit_pin_mapper;
+    compare.subcircuit_equivalence = &subcircuit_equivalence;
+    compare.device_equivalence = &device_equivalence;
+    compare.logger = mp_logger;
+    compare.progress = &progress;
+
     good = true;
     while (true) {
 
@@ -855,21 +867,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
         if (i1->has_other () && i1->net ()) {
 
-          CompareData data;
-          data.graph = &g1;
-          data.other_graph = &g2;
-          data.max_depth = m_max_depth;
-          data.max_n_branch = m_max_n_branch;
-          data.depth_first = m_depth_first;
-          data.dont_consider_net_names = m_dont_consider_net_names;
-          data.with_ambiguous = (pass > 0);
-          data.circuit_pin_mapper = &circuit_pin_mapper;
-          data.subcircuit_equivalence = &subcircuit_equivalence;
-          data.device_equivalence = &device_equivalence;
-          data.logger = mp_logger;
-          data.progress = &progress;
-
-          size_t ni = NetlistCompareCore::derive_node_identities (i1 - g1.begin (), 0, 1, 0 /*not tentative*/, &data);
+          size_t ni = compare.derive_node_identities (i1 - g1.begin ());
           if (ni > 0 && ni != failed_match) {
             new_identities += ni;
             if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
@@ -924,20 +922,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       std::sort (nodes.begin (), nodes.end (), CompareNodeEdgePair ());
       std::sort (other_nodes.begin (), other_nodes.end (), CompareNodeEdgePair ());
 
-      CompareData data;
-      data.graph = &g1;
-      data.other_graph = &g2;
-      data.max_depth = m_max_depth;
-      data.max_n_branch = m_max_n_branch;
-      data.dont_consider_net_names = m_dont_consider_net_names;
-      data.with_ambiguous = (pass > 0);
-      data.circuit_pin_mapper = &circuit_pin_mapper;
-      data.subcircuit_equivalence = &subcircuit_equivalence;
-      data.device_equivalence = &device_equivalence;
-      data.logger = mp_logger;
-      data.progress = &progress;
-
-      size_t ni = NetlistCompareCore::derive_node_identities_from_node_set (nodes, other_nodes, 0, 1, 0 /*not tentatively*/, &data);
+      size_t ni = compare.derive_node_identities_from_node_set (nodes, other_nodes);
       if (ni > 0 && ni != failed_match) {
         new_identities += ni;
         if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {

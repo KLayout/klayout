@@ -105,7 +105,7 @@ public:
    *  This method will analyze the given nodes and call "derive_node_identities" for all nodes
    *  with a proposed identity.
    */
-  static size_t derive_node_identities_from_node_set (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > &nodes, std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data);
+  static size_t derive_node_identities_from_node_set (std::vector<NodeEdgePair> &nodes, std::vector<NodeEdgePair> &other_nodes, size_t depth, size_t n_branch, TentativeNodeMapping *tentative, CompareData *data);
 
 private:
 

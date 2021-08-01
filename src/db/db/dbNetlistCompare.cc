@@ -887,7 +887,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
       //  derive new identities through topology: first collect all nets with the same topological signature
 
-      std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > nodes, other_nodes;
+      std::vector<NodeEdgePair> nodes, other_nodes;
 
       std::vector<NetGraphNode::edge_type> no_edges;
       no_edges.push_back (NetGraphNode::edge_type ());
@@ -895,24 +895,24 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       nodes.reserve (g1.end () - g1.begin ());
       for (db::NetGraph::node_iterator i1 = g1.begin (); i1 != g1.end (); ++i1) {
         if (! i1->has_other () && i1->net ()) {
-          nodes.push_back (std::make_pair (i1.operator-> (), no_edges.begin ()));
+          nodes.push_back (NodeEdgePair (i1.operator-> (), no_edges.begin ()));
         }
       }
 
       other_nodes.reserve (g2.end () - g2.begin ());
       for (db::NetGraph::node_iterator i2 = g2.begin (); i2 != g2.end (); ++i2) {
         if (! i2->has_other () && i2->net ()) {
-          other_nodes.push_back (std::make_pair (i2.operator-> (), no_edges.begin ()));
+          other_nodes.push_back (NodeEdgePair (i2.operator-> (), no_edges.begin ()));
         }
       }
 
       if (nodes.empty () || other_nodes.empty ()) {
         //  active mismatched nodes give an error
-        for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator>  >::const_iterator n = nodes.begin (); n != nodes.end () && good; ++n) {
-          good = is_passive_net (n->first->net (), c12_circuit_and_pin_mapping);
+        for (std::vector<NodeEdgePair>::const_iterator n = nodes.begin (); n != nodes.end () && good; ++n) {
+          good = is_passive_net (n->node->net (), c12_circuit_and_pin_mapping);
         }
-        for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator>  >::const_iterator n = other_nodes.begin (); n != other_nodes.end () && good; ++n) {
-          good = is_passive_net (n->first->net (), c22_circuit_and_pin_mapping);
+        for (std::vector<NodeEdgePair  >::const_iterator n = other_nodes.begin (); n != other_nodes.end () && good; ++n) {
+          good = is_passive_net (n->node->net (), c22_circuit_and_pin_mapping);
         }
         if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
           tl::info << "Stopped with " << nodes.size () << "/" << other_nodes.size () << " nodes left unresolved " << (good ? "(accepted)" : "(not accepted)");
@@ -921,8 +921,8 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
         break;
       }
 
-      std::sort (nodes.begin (), nodes.end (), CompareNodePtrFromNodeEdgePair ());
-      std::sort (other_nodes.begin (), other_nodes.end (), CompareNodePtrFromNodeEdgePair ());
+      std::sort (nodes.begin (), nodes.end (), CompareNodeEdgePair ());
+      std::sort (other_nodes.begin (), other_nodes.end (), CompareNodeEdgePair ());
 
       CompareData data;
       data.graph = &g1;
@@ -1758,7 +1758,7 @@ NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
   //  nodes are identical if the attached devices and circuits are of the same kind and with the same parameters
   //  and connect to other nodes in identical configurations.
 
-  std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> > nodes;
+  std::vector<NodeEdgePair> nodes;
 
   std::vector<NetGraphNode::edge_type> no_edges;
   no_edges.push_back (NetGraphNode::edge_type ());
@@ -1766,28 +1766,28 @@ NetlistComparer::join_symmetric_nets (db::Circuit *circuit)
   nodes.reserve (graph.end () - graph.begin ());
   for (db::NetGraph::node_iterator i = graph.begin (); i != graph.end (); ++i) {
     if (! i->has_other () && i->net ()) {
-      nodes.push_back (std::make_pair (i.operator-> (), no_edges.begin ()));
+      nodes.push_back (NodeEdgePair (i.operator-> (), no_edges.begin ()));
     }
   }
 
-  std::sort (nodes.begin (), nodes.end (), CompareNodePtrFromNodeEdgePair ());
+  std::sort (nodes.begin (), nodes.end (), CompareNodeEdgePair ());
 
   //  Identical nodes leading to the same nodes on the other side are candidates for symmetry.
 
   tl::equivalence_clusters<const NetGraphNode *> identical_nodes;
 
-  for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator np = nodes.begin (); np + 1 != nodes.end (); ++np) {
-    if (*np[0].first == *np[1].first) {
-      identical_nodes.same (np[0].first, np[1].first);
+  for (std::vector<NodeEdgePair>::const_iterator np = nodes.begin (); np + 1 != nodes.end (); ++np) {
+    if (*np[0].node == *np[1].node) {
+      identical_nodes.same (np[0].node, np[1].node);
     }
   }
 
   std::vector<std::set<size_t> > symmetry_groups;
   std::set<size_t> visited;
 
-  for (std::vector<std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> >::const_iterator np = nodes.begin (); np != nodes.end (); ++np) {
+  for (std::vector<NodeEdgePair>::const_iterator np = nodes.begin (); np != nodes.end (); ++np) {
 
-    size_t node_id = graph.node_index_for_net (np[0].first->net ());
+    size_t node_id = graph.node_index_for_net (np[0].node->net ());
     if (visited.find (node_id) != visited.end ()) {
       continue;
     }

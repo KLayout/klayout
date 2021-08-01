@@ -272,13 +272,28 @@ private:
 };
 
 /**
+ *  @brief A combination of a node and an edge reference
+ */
+struct NodeEdgePair
+{
+public:
+  NodeEdgePair (const NetGraphNode *_node, NetGraphNode::edge_iterator _edge)
+    : node (_node), edge (_edge)
+  { }
+
+public:
+  const NetGraphNode *node;
+  NetGraphNode::edge_iterator edge;
+};
+
+/**
  *  @brief A comparator comparing the first node pointer from a node/edge pair
  */
-struct CompareNodePtrFromNodeEdgePair
+struct CompareNodeEdgePair
 {
-  bool operator() (const std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> &a, const std::pair<const NetGraphNode *, NetGraphNode::edge_iterator> &b) const
+  bool operator() (const NodeEdgePair &a, const NodeEdgePair &b) const
   {
-    return a.first->less (*b.first, true);
+    return a.node->less (*b.node, true);
   }
 };
 

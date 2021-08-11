@@ -87,7 +87,7 @@ uint 23
   uint 50       ;# height
   int 20        ;# delta-a
   int 40        ;# delta-b
-  int 300       ;# geometry-y (absolute)
+  int 300       ;# geometry-y (relative)
 
 uint 23
   bits 11001001 ;# OWHXYRDL
@@ -95,7 +95,7 @@ uint 23
   uint 150      ;# width
   int 20        ;# delta-a
   int -20       ;# delta-b
-  int 300       ;# geometry-y (absolute)
+  int 300       ;# geometry-y (relative)
 
 uint 23
   bits 01001101 ;# OWHXYRDL
@@ -103,7 +103,7 @@ uint 23
   uint 150      ;# width
   int 20        ;# delta-a
   int -20       ;# delta-b
-  int 300       ;# geometry-y (absolute)
+  int 300       ;# geometry-y (relative)
   uint 1        ;# repetition (3x4 matrix)
     uint 1       
     uint 2
@@ -130,21 +130,21 @@ uint 24
   uint 2        ;# datatype
   uint 50       ;# height
   int 20        ;# delta-a
-  int 300       ;# geometry-y (absolute)
+  int 300       ;# geometry-y (relative)
 
 uint 24
   bits 11001001 ;# OWHXYRDL
   uint 1        ;# layer
   uint 150      ;# width
   int 20        ;# delta-a
-  int 300       ;# geometry-y (absolute)
+  int 300       ;# geometry-y (relative)
 
 uint 24
   bits 01001101 ;# OWHXYRDL
   uint 1        ;# layer
   uint 150      ;# width
   int 20        ;# delta-a
-  int 300       ;# geometry-y (absolute)
+  int 300       ;# geometry-y (relative)
   uint 1        ;# repetition (3x4 matrix)
     uint 1       
     uint 2
@@ -171,21 +171,21 @@ uint 25
   uint 2        ;# datatype
   uint 50       ;# height
   int 40        ;# delta-b
-  int 300       ;# geometry-y (absolute)
+  int 300       ;# geometry-y (relative)
 
 uint 25
   bits 11001001 ;# OWHXYRDL
   uint 1        ;# layer
   uint 150      ;# width
   int -20       ;# delta-b
-  int 300       ;# geometry-y (absolute)
+  int 300       ;# geometry-y (relative)
 
 uint 25
   bits 01001101 ;# OWHXYRDL
   uint 1        ;# layer
   uint 150      ;# width
   int -20       ;# delta-b
-  int 300       ;# geometry-y (absolute)
+  int 300       ;# geometry-y (relative)
   uint 1        ;# repetition (3x4 matrix)
     uint 1       
     uint 2

@@ -60,13 +60,13 @@ record RECTANGLE
   uint 2        ;# datatype
   uint 100      ;# width
   uint 200      ;# height
-  int 0   
-  int 1000
+  int 0         ;# geometry-x (relative)
+  int 1000      ;# geometry-y (relative)
   uint 0        ;# repetition (reuse)
 
 record PROPERTY 
   bits 00010110 ;# property info byte UUUUVCNS
-  uint 0
+  uint 0        ;# propname-id
   real 1 -5     ;# prop value #0
 
 record RECTANGLE
@@ -75,8 +75,8 @@ record RECTANGLE
   uint 2        ;# datatype
   uint 100      ;# width
   uint 200      ;# height
-  int 0   
-  int 1000
+  int 0         ;# geometry-x (relative)
+  int 1000      ;# geometry-y (relative)
   uint 0        ;# repetition (reuse)
 
 record PROPERTY 
@@ -97,8 +97,8 @@ record RECTANGLE
   uint 2        ;# datatype
   uint 100      ;# width
   uint 200      ;# height
-  int 0   
-  int 1000
+  int 0         ;# geometry-x (relative)
+  int 1000      ;# geometry-y (relative)
   uint 0        ;# repetition (reuse)
 
 record PROPERTY 
@@ -117,8 +117,8 @@ record RECTANGLE
   uint 2        ;# datatype
   uint 100      ;# width
   uint 200      ;# height
-  int 0   
-  int 1000
+  int 0         ;# geometry-x (relative)
+  int 1000      ;# geometry-y (relative)
   uint 0        ;# repetition (reuse)
 
 record PROPERTY 
@@ -131,8 +131,8 @@ record TEXT
   str A         ;# text-string
   uint 2        ;# text-layer
   uint 1        ;# text-datatype
-  int 1000
-  int 0
+  int 1000      ;# text-x (absolute)
+  int 0         ;# text-y (absolute)
   uint 0        ;# repetition (reuse)
 
 record PROPERTY_REP
@@ -150,8 +150,8 @@ record PATH
     int 150
     int 50
     int -50
-  int 2000      ;# geometry-x 
-  int 0         ;# geometry-y 
+  int 2000      ;# geometry-x (absolute)
+  int 0         ;# geometry-y (absolute)
   uint 0        ;# repetition (reuse)
 
 record PROPERTY_REP
@@ -166,8 +166,8 @@ record POLYGON
     int 50
     int -50
     int 50
-  int 3000      ;# geometry-x 
-  int 0         ;# geometry-y 
+  int 3000      ;# geometry-x (absolute)
+  int 0         ;# geometry-y (absolute)
   uint 0        ;# repetition (reuse)
 
 record PROPERTY_REP

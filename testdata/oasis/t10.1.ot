@@ -146,8 +146,8 @@ uint 17         ;# PLACEMENT (no mag, manhattan angles)
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00110000 ;# CNXYRAAF
-  int 50        ;# placement-x
-  int 50        ;# placement-y
+  int 50        ;# placement-x (rel.)
+  int 50        ;# placement-y (rel.)
 
 # Cell TOP
 record CELL_STR

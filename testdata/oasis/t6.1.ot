@@ -140,7 +140,7 @@ record XYRELATIVE
 
 record PATH
   bits 00010101 ;# EWPXYRDL
-  uint 1        ;# datatype
+  uint 1        ;# layer
   int 1000      ;# geometry-x (relative)
   uint 0        ;# repetition (reuse)
 

@@ -28,7 +28,7 @@
 #   </content>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
@@ -54,7 +54,7 @@ uint 18         ;# PLACEMENT (no mag, manhattan angles)
 
 # Cell TOP
 record CELL_STR
-  str TOP 
+  str TOP
 
 record XYRELATIVE
 
@@ -100,7 +100,7 @@ uint 18         ;# PLACEMENT (no mag, manhattan angles)
 
 # Cell A
 record CELL_STR
-  str A 
+  str A
 
 record RECTANGLE
   bits 01111011 ;# SWHXYRDL

@@ -49,21 +49,21 @@
 #   </content>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
 
 # Cell ABC
 record CELL_STR
-  str ABC 
+  str ABC
 
 record POLYGON
   bits 00111011 ;# 00PXYRDL
   uint 1        ;# layer
   uint 2        ;# datatype
   uint 0        ;# pointlist: 1-delta (hor. first)
-    uint 4   
+    uint 4
     int 150
     int 50
     int -50
@@ -78,7 +78,7 @@ record POLYGON
   uint 1        ;# layer
   uint 2        ;# datatype
   uint 0        ;# pointlist: 1-delta (hor. first)
-    uint 4   
+    uint 4
     int 150
     int 50
     int -50
@@ -93,7 +93,7 @@ record POLYGON
   uint 2        ;# layer
   uint 3        ;# datatype
   uint 0        ;# pointlist: 1-delta (hor. first)
-    uint 4   
+    uint 4
     int 150
     int 50
     int -50
@@ -109,7 +109,7 @@ record POLYGON
   uint 2        ;# layer
   uint 3        ;# datatype
   uint 1        ;# pointlist: 1-delta (ver. first)
-    uint 4   
+    uint 4
     int 150
     int 50
     int -50
@@ -120,8 +120,8 @@ record POLYGON
   bits 00110011 ;# 00PXYRDL
   uint 2        ;# layer
   uint 3        ;# datatype
-  uint 2        ;# pointlist: 2-delta 
-    uint 7   
+  uint 2        ;# pointlist: 2-delta
+    uint 7
     uint [ expr 150*4+0 ]
     uint [ expr 50*4+1 ]
     uint [ expr 50*4+2 ]
@@ -135,8 +135,8 @@ record POLYGON
   bits 00110011 ;# 00PXYRDL
   uint 2        ;# layer
   uint 3        ;# datatype
-  uint 3        ;# pointlist: 3-delta 
-    uint 8   
+  uint 3        ;# pointlist: 3-delta
+    uint 8
     uint [ expr 25*8+0 ]
     uint [ expr 50*8+4 ]
     uint [ expr 50*8+1 ]
@@ -151,8 +151,8 @@ record POLYGON
   bits 00110011 ;# 00PXYRDL
   uint 2        ;# layer
   uint 3        ;# datatype
-  uint 4        ;# pointlist: g-delta 
-    uint 8   
+  uint 4        ;# pointlist: g-delta
+    uint 8
     uint [ expr 25*16+0*2 ]
     uint [ expr 50*16+4*2 ]
     uint [ expr 50*16+1*2 ]
@@ -168,7 +168,7 @@ record POLYGON
   uint 2        ;# layer
   uint 3        ;# datatype
   uint 5        ;# pointlist: g-delta, double delta
-    uint 8   
+    uint 8
     uint [ expr 25*16+0*2 ]
     uint [ expr 50*16+4*2 ]
     uint [ expr 50*16+1*2 ]
@@ -184,7 +184,7 @@ record POLYGON
   uint 2        ;# layer
   uint 3        ;# datatype
   uint 1        ;# pointlist: 1-delta (ver. first)
-    uint 4   
+    uint 4
     int 150
     int 50
     int -50
@@ -192,7 +192,7 @@ record POLYGON
   int 0         ;# geometry-x (absolute)
   int 2000      ;# geometry-y (absolute)
   uint 1        ;# repetition (3x4 matrix)
-    uint 1       
+    uint 1
     uint 2
     uint 200
     uint 300
@@ -203,7 +203,7 @@ record POLYGON
   bits 00110110 ;# 00PXYRDL
   uint 1        ;# datatype
   uint 1        ;# pointlist: 1-delta (ver. first)
-    uint 4   
+    uint 4
     int 150
     int 50
     int -50
@@ -215,14 +215,14 @@ record POLYGON
   bits 00110110 ;# 00PXYRDL
   uint 1        ;# datatype
   uint 1        ;# pointlist: 1-delta (ver. first)
-    uint 4   
+    uint 4
     int 150
     int 50
     int -50
     int 50
   int 1000      ;# geometry-x (relative)
   uint 6        ;# repetition (vertical 3 times)
-    uint 1       
+    uint 1
     uint 200
     uint 300
 

@@ -13,14 +13,14 @@
 #   </content>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
 
 # Cell ABC
 record CELL_STR
-  str ABC 
+  str ABC
 
 record XYABSOLUTE
 
@@ -28,8 +28,8 @@ record POLYGON
   bits 00110011 ;# 00PXYRDL
   uint 2        ;# layer
   uint 3        ;# datatype
-  uint 4        ;# pointlist: g-delta 
-    uint 8002   
+  uint 4        ;# pointlist: g-delta
+    uint 8002
     uint 4003; int 0
     for { set i 0 } { $i < 4000 } { incr i } {
       uint 41; int 20

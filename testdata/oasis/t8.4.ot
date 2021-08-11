@@ -24,14 +24,14 @@
 #   </content>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
 
-record CELLNAME 
+record CELLNAME
   str A
-record CELLNAME 
+record CELLNAME
   str TOP
 
 # Cell TOP
@@ -46,7 +46,7 @@ uint 17         ;# PLACEMENT (no mag, manhattan angles)
   int -300      ;# placement-x (relative)
   int 400       ;# placement-y (relative)
   uint 1        ;# repetition (3x4 matrix)
-    uint 1       
+    uint 1
     uint 2
     uint 20
     uint 30

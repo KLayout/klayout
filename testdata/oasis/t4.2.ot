@@ -8,7 +8,7 @@
 #   <test-intention>Property attachement to rectangles in various combinations</test-intention>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
@@ -19,7 +19,7 @@ record PROPNAME
 
 # Cell ABC
 record CELL_STR
-  str ABC 
+  str ABC
 
 record RECTANGLE
   bits 01111011 ;# SWHXYRDL
@@ -112,7 +112,7 @@ record RECTANGLE
   bits 00001100 ;# SWHXYRDL
   int 500       ;# geometry-y (absolute)
   uint 1        ;# repetition (3x4 matrix)
-    uint 1       
+    uint 1
     uint 2
     uint 200
     uint 300
@@ -123,7 +123,7 @@ record RECTANGLE
   bits 00001100 ;# SWHXYRDL
   int 2000      ;# geometry-y (absolute)
   uint 4        ;# non-regular repetition (3 placements with specified x-delta)
-    uint 1       
+    uint 1
     uint 200
     uint 300
 

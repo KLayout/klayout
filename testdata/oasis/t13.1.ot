@@ -6,7 +6,7 @@
 #   <test-intention>Mapping of layer and datatype ranges to names</test-intention>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
@@ -31,7 +31,7 @@ record LAYERNAME
 
 record LAYERNAME
   str E5A
-  uint 3   ;# layer 5 
+  uint 3   ;# layer 5
   uint 5
   uint 0   ;# all datatypes
 
@@ -60,7 +60,7 @@ record LAYERNAME
   str E5E4
   uint 3   ;# layer 5 to 5
   uint 5
-  uint 3   ;# datatype 4 
+  uint 3   ;# datatype 4
   uint 4
 
 record LAYERNAME
@@ -73,7 +73,7 @@ record LAYERNAME
 
 # Cell A
 record CELL_STR
-  str A 
+  str A
 
 record CIRCLE
   bits 00111011 ;# 00rXYRDL

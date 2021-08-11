@@ -33,14 +33,14 @@
 #   </content>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
 
 # Cell A
 record CELL_STR
-  str A 
+  str A
 
 record RECTANGLE
   bits 01111011 ;# SWHXYRDL
@@ -53,7 +53,7 @@ record RECTANGLE
 
 # Cell TOP
 record CELL_STR
-  str TOP 
+  str TOP
 
 record XYRELATIVE
 
@@ -100,7 +100,7 @@ uint 17         ;# PLACEMENT (no mag, manhattan angles)
   int 2000      ;# placement-x (absolute)
   int 0         ;# placement-y (absolute)
   uint 1        ;# repetition (3x4 matrix)
-    uint 1       
+    uint 1
     uint 2
     uint 300
     uint 300
@@ -118,7 +118,7 @@ uint 17         ;# PLACEMENT (no mag, manhattan angles)
   int 2000      ;# placement-x (relative)
   int 0         ;# placement-y (relative)
   uint 2        ;# repetition (3 columns)
-    uint 1       
+    uint 1
     uint 320
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
@@ -126,7 +126,7 @@ uint 17         ;# PLACEMENT (no mag, manhattan angles)
   int 2000      ;# placement-x (relative)
   int 0         ;# placement-y (relative)
   uint 3        ;# repetition (4 columns)
-    uint 2       
+    uint 2
     uint 310
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
@@ -134,7 +134,7 @@ uint 17         ;# PLACEMENT (no mag, manhattan angles)
   int 2000      ;# placement-x (relative)
   int 0         ;# placement-y (relative)
   uint 4        ;# repetition (4 columns, arbitrary spacing)
-    uint 2       
+    uint 2
     uint 320
     uint 330
     uint 340
@@ -144,9 +144,9 @@ uint 17         ;# PLACEMENT (no mag, manhattan angles)
   int 2000      ;# placement-x (relative)
   int 0         ;# placement-y (relative)
   uint 8        ;# repetition (3x4 matrix, arbitrary displacement vectors)
-    uint 1      ;# n-dimension 
-    uint 2      ;# m-dimension 
-    uint [ expr 4*310+1 ]    ;# n-displacement (g-delta: 310,320) 
+    uint 1      ;# n-dimension
+    uint 2      ;# m-dimension
+    uint [ expr 4*310+1 ]    ;# n-displacement (g-delta: 310,320)
     int 320
     uint [ expr 16*330+10 ]  ;# n-displacement (g-delta: 330-northwest=-330,330)
 

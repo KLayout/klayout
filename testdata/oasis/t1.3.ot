@@ -10,7 +10,7 @@
 #   </content>
 # </test>
 
-header 
+header
 # parts of START record
 real 4 10.0 4.0
 uint 0 ;# offset table is in start record

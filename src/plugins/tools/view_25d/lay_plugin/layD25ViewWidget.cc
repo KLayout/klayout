@@ -257,7 +257,7 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
       t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
       QVector3D cd = t.inverted ().map (QVector3D (0, 0, cam_dist ()));
 
-      m_displacement += d * cd;
+      m_displacement += d * cd / m_scale_factor;
 
     } else {
 
@@ -474,19 +474,19 @@ namespace {
   public:
     ZDataCache () { }
 
-    const db::D25LayerInfo *operator() (lay::LayoutView *view, int cv_index, int layer_index)
+    std::vector<db::D25LayerInfo> operator() (lay::LayoutView *view, int cv_index, int layer_index)
     {
-      std::map<int, std::map<int, db::D25LayerInfo> >::const_iterator c = m_cache.find (cv_index);
+      std::map<int, std::map<int, std::vector<db::D25LayerInfo> > >::const_iterator c = m_cache.find (cv_index);
       if (c != m_cache.end ()) {
-        std::map<int, db::D25LayerInfo>::const_iterator l = c->second.find (layer_index);
+        std::map<int, std::vector<db::D25LayerInfo> >::const_iterator l = c->second.find (layer_index);
         if (l != c->second.end ()) {
-          return &l->second;
+          return l->second;
         } else {
-          return 0;
+          return std::vector<db::D25LayerInfo> ();
         }
       }
 
-      std::map<int, db::D25LayerInfo> &lcache = m_cache [cv_index];
+      std::map<int, std::vector<db::D25LayerInfo> > &lcache = m_cache [cv_index];
 
       const db::D25TechnologyComponent *comp = 0;
 
@@ -498,7 +498,7 @@ namespace {
 
       if (comp) {
 
-        std::map<db::LayerProperties, db::D25LayerInfo, db::LPLogicalLessFunc> zi_by_lp;
+        std::multimap<db::LayerProperties, db::D25LayerInfo, db::LPLogicalLessFunc> zi_by_lp;
 
         db::D25TechnologyComponent::layers_type layers = comp->compile_from_source ();
         for (db::D25TechnologyComponent::layers_type::const_iterator i = layers.begin (); i != layers.end (); ++i) {
@@ -508,27 +508,32 @@ namespace {
         const db::Layout &ly = cv->layout ();
         for (int l = 0; l < int (ly.layers ()); ++l) {
           if (ly.is_valid_layer (l)) {
-            const db::LayerProperties &lp = ly.get_properties (l);
-            std::map<db::LayerProperties, db::D25LayerInfo, db::LPLogicalLessFunc>::const_iterator z = zi_by_lp.find (lp);
-            if (z == zi_by_lp.end () && ! lp.name.empty ()) {
+            db::LayerProperties lp = ly.get_properties (l);
+            std::multimap<db::LayerProperties, db::D25LayerInfo, db::LPLogicalLessFunc>::const_iterator z = zi_by_lp.find (lp);
+            if ((z == zi_by_lp.end () || ! z->first.log_equal (lp)) && ! lp.name.empty ()) {
               //  If possible, try by name only
-              z = zi_by_lp.find (db::LayerProperties (lp.name));
+              lp = db::LayerProperties (lp.name);
+              z = zi_by_lp.find (lp);
             }
-            if (z != zi_by_lp.end ()) {
-              lcache[l] = z->second;
+            while (z != zi_by_lp.end () && z->first.log_equal (lp)) {
+              lcache[l].push_back (z->second);
+              ++z;
             }
           }
         }
 
       }
 
-      return operator() (view, cv_index, layer_index);
-
+      std::map<int, std::vector<db::D25LayerInfo> >::const_iterator l = lcache.find (layer_index);
+      if (l != lcache.end ()) {
+        return l->second;
+      } else {
+        return std::vector<db::D25LayerInfo> ();
+      }
     }
 
-
   private:
-    std::map<int, std::map<int, db::D25LayerInfo> > m_cache;
+    std::map<int, std::map<int, std::vector<db::D25LayerInfo> > > m_cache;
   };
 
 }
@@ -554,12 +559,12 @@ D25ViewWidget::prepare_view ()
 
   for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
 
-    const db::D25LayerInfo *zi = 0;
+    std::vector<db::D25LayerInfo> zinfo;
     if (! lp->has_children () && lp->visible (true)) {
-      zi = zdata (mp_view, lp->cellview_index (), lp->layer_index ());
+      zinfo = zdata (mp_view, lp->cellview_index (), lp->layer_index ());
     }
 
-    if (zi) {
+    for (std::vector<db::D25LayerInfo>::const_iterator zi = zinfo.begin (); zi != zinfo.end (); ++zi) {
 
       any = true;
 

@@ -6,7 +6,7 @@
 #   <test-intention>Mapping of layer and datatype ranges to names, mapping of textlayer and texttype ranges to names in the same context but to different names</test-intention>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
@@ -31,7 +31,7 @@ record LAYERNAME_TXT
 
 record LAYERNAME_TXT
   str TE5A
-  uint 3   ;# layer 5 
+  uint 3   ;# layer 5
   uint 5
   uint 0   ;# all datatypes
 
@@ -62,7 +62,7 @@ record LAYERNAME
 
 record LAYERNAME
   str E5A
-  uint 3   ;# layer 5 
+  uint 3   ;# layer 5
   uint 5
   uint 0   ;# all datatypes
 
@@ -75,7 +75,7 @@ record LAYERNAME
 
 # Cell A
 record CELL_STR
-  str A 
+  str A
 
 record TEXT
   bits 01011011 ;# 0CNXYRTL

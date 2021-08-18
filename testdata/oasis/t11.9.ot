@@ -3,7 +3,7 @@
 #   <content-description>File-Level properties</content-description>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
@@ -30,7 +30,7 @@ record PROPERTY
   bits 00010110 ;# UUUUVCNS
   uint 13
   uint 8        ;# prop-value #0 (unsigned int)
-    uint 17   
+    uint 17
 
 # property string 12
 record PROPSTRING_ID
@@ -44,7 +44,7 @@ record PROPERTY
   uint 13
 
 # A cellname records
-record CELLNAME 
+record CELLNAME
   str A
 
 # property associated with cell A through CELLNAME
@@ -63,7 +63,7 @@ record PROPERTY
   bits 00010100 ;# UUUUVCNS
   str CellProp1
   uint 10       ;# prop-value #0 (string)
-    str CPValue    
+    str CPValue
 
 # property associated with cell A
 record PROPERTY

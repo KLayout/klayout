@@ -10,17 +10,17 @@
 #   </content>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
 
-# ABC gets assigned 1 
+# ABC gets assigned 1
 record CELLNAME_ID
-  str ABC 
+  str ABC
   uint 1
 
-# XYZ gets assigned 0 
+# XYZ gets assigned 0
 record CELLNAME_ID
   str XYZ
   uint 0

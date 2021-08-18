@@ -28,7 +28,7 @@
 #   </content>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
@@ -44,17 +44,17 @@ uint 18         ;# PLACEMENT (mag 0.5, manhattan angles)
   str TOP
   real 6 0.5
   real 7 90.0
-  int 100       ;# placement-x
-  int 0         ;# placement-y
+  int 100       ;# placement-x (relative)
+  int 0         ;# placement-y (relative)
 
 uint 18         ;# PLACEMENT (no mag, manhattan angles)
   bits 00110000 ;# CNXYRMAF
-  int 100       ;# placement-x
-  int 1000      ;# placement-y
+  int 100       ;# placement-x (relative)
+  int 1000      ;# placement-y (relative)
 
 # Cell TOP
 record CELL_STR
-  str TOP 
+  str TOP
 
 record XYRELATIVE
 
@@ -63,44 +63,44 @@ uint 18         ;# PLACEMENT (mag 0.5, manhattan angles)
   str A
   real 6 0.5
   real 7 0.0
-  int -150      ;# placement-x
-  int 200       ;# placement-y
+  int -150      ;# placement-x (relative)
+  int 200       ;# placement-y (relative)
 
 uint 18         ;# PLACEMENT (no mag, manhattan angles)
   bits 00110000 ;# CNXYRMAF
-  int -150      ;# placement-x
-  int 600       ;# placement-y
+  int -150      ;# placement-x (relative)
+  int 600       ;# placement-y (relative)
 
 uint 18         ;# PLACEMENT (no mag, manhattan angles)
   bits 00010000 ;# CNXYRMAF
-  int 400       ;# placement-y
+  int 400       ;# placement-y (relative)
 
 uint 18         ;# PLACEMENT (no mag, manhattan angles)
   bits 00100000 ;# CNXYRMAF
-  int 300       ;# placement-x
+  int 300       ;# placement-x (relative)
 
 record XYABSOLUTE
 
 uint 18         ;# PLACEMENT (no mag, manhattan angles)
   bits 00110001 ;# CNXYRMAF
-  int 700       ;# placement-x
-  int 400       ;# placement-y
+  int 700       ;# placement-x (absolute)
+  int 400       ;# placement-y (absolute)
 
 record XYRELATIVE
 
 uint 18         ;# PLACEMENT (no mag, manhattan angles)
   bits 00010010 ;# CNXYRMAF
   real 0 90.0
-  int 1000      ;# placement-y
+  int 1000      ;# placement-y (relative)
 
 uint 18         ;# PLACEMENT (no mag, manhattan angles)
   bits 00010011 ;# CNXYRMAF
   real 1 -90.0
-  int 1000      ;# placement-y
+  int 1000      ;# placement-y (relative)
 
 # Cell A
 record CELL_STR
-  str A 
+  str A
 
 record RECTANGLE
   bits 01111011 ;# SWHXYRDL

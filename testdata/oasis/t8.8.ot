@@ -29,7 +29,7 @@
 #   </content>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
@@ -45,44 +45,44 @@ uint 18         ;# PLACEMENT (mag 0.5, manhattan angles)
   str TOP
   real 6 0.5
   real 7 22.5
-  int 100       ;# placement-x
-  int 0         ;# placement-y
+  int 100       ;# placement-x (absolute)
+  int 0         ;# placement-y (absolute)
 
 uint 18         ;# PLACEMENT (mag 0.5, manhattan angles)
   bits 10110110 ;# CNXYRMAF
   str TOP
   real 6 1.0
   real 7 0.0
-  int 1100      ;# placement-x
-  int 0         ;# placement-y
+  int 1100      ;# placement-x (absolute)
+  int 0         ;# placement-y (absolute)
 
 # Cell TOP
 record CELL_STR
-  str TOP 
+  str TOP
 
 uint 18         ;# PLACEMENT (mag 0.5, manhattan angles)
   bits 10110110 ;# CNXYRMAF
   str A
   real 6 2.0
   real 7 0.0
-  int -100      ;# placement-x
-  int 100       ;# placement-y
+  int -100      ;# placement-x (absolute)
+  int 100       ;# placement-y (absolute)
 
 uint 18         ;# PLACEMENT (mag 0.5, manhattan angles)
   bits 10110110 ;# CNXYRMAF
   str A
   real 6 1.0
   real 7 45.0
-  int -150      ;# placement-x
-  int 1100      ;# placement-y
+  int -150      ;# placement-x (absolute)
+  int 1100      ;# placement-y (absolute)
 
 uint 18         ;# PLACEMENT (mag 0.5, manhattan angles)
   bits 10111111 ;# CNXYRMAF
   str A
   real 6 0.5
   real 7 135.0
-  int -200      ;# placement-x
-  int 2100      ;# placement-y
+  int -200      ;# placement-x (absolute)
+  int 2100      ;# placement-y (absolute)
   uint 1        ;# repetition (3x4 matrix)
     uint 1
     uint 2
@@ -91,7 +91,7 @@ uint 18         ;# PLACEMENT (mag 0.5, manhattan angles)
 
 # Cell A
 record CELL_STR
-  str A 
+  str A
 
 record RECTANGLE
   bits 01111011 ;# SWHXYRDL

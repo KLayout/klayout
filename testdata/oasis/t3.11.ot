@@ -7,7 +7,7 @@
 #   <must-fail>Modal variable accessed before being defined: text-string</must-fail>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
@@ -15,10 +15,10 @@ header
 # Text definition
 record TEXTSTRING
   str A
-  
+
 # Cell ABC
 record CELL_STR
-  str ABC 
+  str ABC
 
 record TEXT
   bits 00011011 ;# 0CNXYRTL
@@ -27,5 +27,5 @@ record TEXT
   int 100       ;# text-x (abs)
   int -200      ;# text-y (abs)
 
-tail 
+tail
 

@@ -10,7 +10,7 @@
 #   <test-intention>Instances with properties</test-intention>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
@@ -27,11 +27,11 @@ record PROPSTRING_ID
 
 # property name 0
 record PROPNAME
-  str S_GDS_PROPERTY 
+  str S_GDS_PROPERTY
 
 # Cell A
 record CELL_STR
-  str A 
+  str A
 
 record RECTANGLE
   bits 01111011 ;# SWHXYRDL
@@ -44,75 +44,75 @@ record RECTANGLE
 
 # Cell TOP
 record CELL_STR
-  str TOP 
+  str TOP
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 10110000 ;# CNXYRAAF
   str A
-  int -300      ;# placement-x
-  int 400       ;# placement-y
+  int -300      ;# placement-x (absolute)
+  int 400       ;# placement-y (absolute)
 
-record PROPERTY 
+record PROPERTY
   bits 00100111 ;# property info byte UUUUVCNS
   uint 0        ;# propname-id
   uint 8        ;# prop-value #0 (unsigned int)
-    uint 25   
+    uint 25
   uint 10       ;# prop-value #2 (a-string)
     str PROP_VALUE2
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00110000 ;# CNXYRAAF
-  int 0         ;# placement-x
-  int 200       ;# placement-y
+  int 0         ;# placement-x (absolute)
+  int 200       ;# placement-y (absolute)
 
-record PROPERTY 
+record PROPERTY
   bits 11110001 ;# property info byte UUUUVCNS
   uint 2        ;# number of values
   uint 8        ;# prop-value #0 (unsigned int)
-    uint 10   
+    uint 10
   uint 14       ;# prop-value #2 (prop-string reference number)
     uint 13
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00010000 ;# CNXYRAAF
-  int 400       ;# placement-y
+  int 400       ;# placement-y (absolute)
 
-record PROPERTY 
+record PROPERTY
   bits 00001001 ;# property info byte UUUUVCNS
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00100000 ;# CNXYRAAF
-  int 300       ;# placement-x
+  int 300       ;# placement-x (absolute)
 
-record PROPERTY_REP 
+record PROPERTY_REP
 
 record XYABSOLUTE
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00110001 ;# CNXYRAAF
-  int 700       ;# placement-x
-  int 400       ;# placement-y
+  int 700       ;# placement-x (absolute)
+  int 400       ;# placement-y (absolute)
 
-record PROPERTY 
+record PROPERTY
   bits 00001001 ;# property info byte UUUUVCNS
 
 record XYRELATIVE
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00010010 ;# CNXYRAAF
-  int 1000      ;# placement-y
+  int 1000      ;# placement-y (relative)
 
-record PROPERTY 
+record PROPERTY
   bits 00100111 ;# property info byte UUUUVCNS
   uint 0        ;# propname-id
   uint 8        ;# prop-value #0 (unsigned int)
-    uint 25   
+    uint 25
   uint 10       ;# prop-value #2 (a-string)
     str PROP_VALUE2
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00010011 ;# CNXYRAAF
-  int 1000      ;# placement-y
+  int 1000      ;# placement-y (relative)
 
 record PROPERTY_REP
 
@@ -120,10 +120,10 @@ record XYABSOLUTE
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00111111 ;# CNXYRAAF
-  int 2000      ;# placement-x
-  int 0         ;# placement-y
+  int 2000      ;# placement-x (absolute)
+  int 0         ;# placement-y (absolute)
   uint 1        ;# repetition (3x4 matrix)
-    uint 1       
+    uint 1
     uint 2
     uint 300
     uint 300
@@ -134,38 +134,38 @@ record XYRELATIVE
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00111111 ;# CNXYRAAF
-  int 2000      ;# placement-x
-  int 0         ;# placement-y
+  int 2000      ;# placement-x (relative)
+  int 0         ;# placement-y (relative)
   uint 0        ;# repetition (reuse)
 
 record PROPERTY_REP
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00111111 ;# CNXYRAAF
-  int 2000      ;# placement-x
-  int 0         ;# placement-y
+  int 2000      ;# placement-x (relative)
+  int 0         ;# placement-y (relative)
   uint 2        ;# repetition (3 columns)
-    uint 1       
+    uint 1
     uint 320
 
 record PROPERTY_REP
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00111111 ;# CNXYRAAF
-  int 2000      ;# placement-x
-  int 0         ;# placement-y
+  int 2000      ;# placement-x (relative)
+  int 0         ;# placement-y (relative)
   uint 3        ;# repetition (4 columns)
-    uint 2       
+    uint 2
     uint 310
 
 record PROPERTY_REP
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00111111 ;# CNXYRAAF
-  int 2000      ;# placement-x
-  int 0         ;# placement-y
+  int 2000      ;# placement-x (relative)
+  int 0         ;# placement-y (relative)
   uint 4        ;# repetition (4 columns, arbitrary spacing)
-    uint 2       
+    uint 2
     uint 320
     uint 330
     uint 340
@@ -174,12 +174,12 @@ record PROPERTY_REP
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00111111 ;# CNXYRAAF
-  int 2000      ;# placement-x
-  int 0         ;# placement-y
+  int 2000      ;# placement-x (relative)
+  int 0         ;# placement-y (relative)
   uint 8        ;# repetition (3x4 matrix, arbitrary displacement vectors)
-    uint 1      ;# n-dimension 
-    uint 2      ;# m-dimension 
-    uint [ expr 4*310+1 ]    ;# n-displacement (g-delta: 310,320) 
+    uint 1      ;# n-dimension
+    uint 2      ;# m-dimension
+    uint [ expr 4*310+1 ]    ;# n-displacement (g-delta: 310,320)
     int 320
     uint [ expr 16*330+10 ]  ;# n-displacement (g-delta: 330-northwest=-330,330)
 

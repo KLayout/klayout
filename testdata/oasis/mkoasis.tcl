@@ -167,7 +167,10 @@ proc header { } {
 proc tail {} {
   global output
   record END
-  puts -nonewline $output [ binary format {x255} ]
+  # 254-byte padding string (uint 0 written as 0x80 0x80 ... 0x80 0x00)
+  for { set i 0 } { $i < 253 } { incr i } { byte 128 }
+  byte 0;
+  uint 0;   # Validation scheme: No validation
 }
 
 

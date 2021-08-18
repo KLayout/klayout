@@ -120,7 +120,7 @@
 #   </content>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
@@ -129,7 +129,7 @@ header
 record TEXTSTRING_ID
   str A
   uint 1
-  
+
 # Text definition
 record TEXTSTRING_ID
   str B
@@ -137,7 +137,7 @@ record TEXTSTRING_ID
 
 # Cell ABC
 record CELL_STR
-  str ABC 
+  str ABC
 
 record TEXT
   bits 01111011 ;# 0CNXYRTL
@@ -174,7 +174,7 @@ record TEXT
   uint 1        ;# text-id
   int -200      ;# text-y (relative)
   uint 1        ;# repetition (3x4 matrix)
-    uint 1       
+    uint 1
     uint 2
     uint 10
     uint 12
@@ -188,21 +188,21 @@ record TEXT
   bits 00001100 ;# 0CNXYRTL
   int -200      ;# text-y (relative)
   uint 2        ;# repetition (3 columns)
-    uint 1       
+    uint 1
     uint 10
 
 record TEXT
   bits 00001100 ;# 0CNXYRTL
   int -200      ;# text-y (relative)
   uint 3        ;# repetition (4 columns)
-    uint 2       
+    uint 2
     uint 12
 
 record TEXT
   bits 00001100 ;# 0CNXYRTL
   int -200      ;# text-y (relative)
   uint 4        ;# repetition (4 columns, arbitrary spacing)
-    uint 2       
+    uint 2
     uint 12
     uint 13
     uint 14
@@ -211,7 +211,7 @@ record TEXT
   bits 00001100 ;# 0CNXYRTL
   int -200      ;# text-y (relative)
   uint 5        ;# repetition (4 columns, arbitrary spacing, grid 3)
-    uint 2       
+    uint 2
     uint 3
     uint 4
     uint 5
@@ -221,7 +221,7 @@ record TEXT
   bits 00001100 ;# 0CNXYRTL
   int -200      ;# text-y (relative)
   uint 6        ;# repetition (3 columns, arbitrary spacing)
-    uint 1       
+    uint 1
     uint 10
     uint 11
 
@@ -229,7 +229,7 @@ record TEXT
   bits 00001100 ;# 0CNXYRTL
   int -200      ;# text-y (relative)
   uint 7        ;# repetition (3 columns, arbitrary spacing, grid 5)
-    uint 1       
+    uint 1
     uint 5
     uint 2
     uint 3
@@ -238,19 +238,19 @@ record TEXT
   bits 00001100 ;# 0CNXYRTL
   int -200      ;# text-y (relative)
   uint 8        ;# repetition (3x4 matrix, arbitrary displacement vectors)
-    uint 1      ;# n-dimension 
-    uint 2      ;# m-dimension 
+    uint 1      ;# n-dimension
+    uint 2      ;# m-dimension
     uint [ expr 16*10 ]      ;# n-displacement (g-delta: 10-east=10,0)
-    uint [ expr 4*11+3 ]     ;# m-displacement (g-delta: -11,-12) 
+    uint [ expr 4*11+3 ]     ;# m-displacement (g-delta: -11,-12)
     int -12
 
 record TEXT
   bits 00001100 ;# 0CNXYRTL
   int -200      ;# text-y (relative)
   uint 8        ;# repetition (3x4 matrix, arbitrary displacement vectors)
-    uint 1      ;# n-dimension 
-    uint 2      ;# m-dimension 
-    uint [ expr 4*11+1 ]     ;# n-displacement (g-delta: 11,12) 
+    uint 1      ;# n-dimension
+    uint 2      ;# m-dimension
+    uint [ expr 4*11+1 ]     ;# n-displacement (g-delta: 11,12)
     int 12
     uint [ expr 16*10+10 ]   ;# n-displacement (g-delta: 10-northwest=-10,10)
 
@@ -258,22 +258,22 @@ record TEXT
   bits 00001100 ;# 0CNXYRTL
   int -200      ;# text-y (relative)
   uint 9        ;# repetition (3 times, arbitrary displacement vectors)
-    uint 1      ;# dimension 
-    uint [ expr 4*11+1 ]     ;# n-displacement (g-delta: 11,12) 
+    uint 1      ;# dimension
+    uint [ expr 4*11+1 ]     ;# n-displacement (g-delta: 11,12)
     int 12
 
 record TEXT
   bits 00001100 ;# 0CNXYRTL
   int -200      ;# text-y (relative)
   uint 9        ;# repetition (4 times, arbitrary displacement vectors)
-    uint 2      ;# dimension 
+    uint 2      ;# dimension
     uint [ expr 16*10+10 ]   ;# n-displacement (g-delta: 10-northwest=-10,10)
 
 record TEXT
   bits 00001100 ;# 0CNXYRTL
   int -200      ;# text-y (relative)
   uint 10       ;# repetition (9 times, once in the middle, others displaced)
-    uint 7      ;# dimension 
+    uint 7      ;# dimension
     uint [ expr 16*10+0 ]    ;# n-displacement (g-delta: 10-east=10,0)
     uint [ expr 16*10+2 ]    ;# n-displacement (g-delta: 10-north=0,10)
     uint [ expr 16*10+4 ]    ;# n-displacement (g-delta: 10-west=-10,0)
@@ -287,8 +287,8 @@ record TEXT
   bits 00001100 ;# 0CNXYRTL
   int -200      ;# text-y (relative)
   uint 10       ;# repetition (3 times, once in the middle, two displaced)
-    uint 1      ;# dimension 
-    uint [ expr 4*11+3 ]     ;# n-displacement (g-delta: -11,12) 
+    uint 1      ;# dimension
+    uint [ expr 4*11+3 ]     ;# n-displacement (g-delta: -11,12)
     int 12
     uint [ expr 16*10+14 ]   ;# n-displacement (g-delta: 10-southeast=10,-10)
 
@@ -311,9 +311,9 @@ record TEXT
   bits 00001100 ;# 0CNXYRTL
   int -200      ;# text-y (relative)
   uint 11       ;# repetition (3 times, once in the middle, two displaced)
-    uint 1      ;# dimension 
+    uint 1      ;# dimension
     uint 3      ;# grid (3)
-    uint [ expr 4*4+3 ]     ;# n-displacement (g-delta: -12,12) 
+    uint [ expr 4*4+3 ]     ;# n-displacement (g-delta: -12,12)
     int 4
     uint [ expr 16*3+14 ]   ;# n-displacement (g-delta: 10-southeast=12,-12)
 

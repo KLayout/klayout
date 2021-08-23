@@ -208,10 +208,13 @@ GDS2Reader::get_string (std::string &s) const
 {
   if (m_reclen == 0) {
     s.clear ();
-  } else if (mp_rec_buf [m_reclen - 1] != 0) {
-    s.assign ((const char *) mp_rec_buf, m_reclen);
   } else {
-    s.assign ((const char *) mp_rec_buf, m_reclen - 1);
+    //  strip padding 0 characters
+    unsigned long n = m_reclen;
+    while (n > 0 && mp_rec_buf [n - 1] == 0) {
+      --n;
+    }
+    s.assign ((const char *) mp_rec_buf, n);
   }
 }
 

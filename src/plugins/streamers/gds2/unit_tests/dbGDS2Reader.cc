@@ -685,3 +685,22 @@ TEST(4_CollectModeAdd)
   db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
 }
 
+//  border case with multiple padding 0 for SNAME and STRING records
+TEST(5_issue893)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  db::LoadLayoutOptions options;
+  options.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::AddToCell;
+
+  {
+    tl::InputStream file (tl::testdata () + "/gds/issue_893.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  std::string fn_au (tl::testdata () + "/gds/issue_893_au.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}
+

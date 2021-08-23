@@ -202,6 +202,11 @@ public:
   static void set_font_paths (const std::vector<std::string> &paths);
 
   /**
+   *  @brief Gets the font search paths
+   */
+  static std::vector<std::string> font_paths ();
+
+  /**
    *  @brief Returns the font with the given name
    *  If no font with that name exists, 0 is returned.
    */

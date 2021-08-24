@@ -173,6 +173,20 @@ Class<db::TextGenerator> decl_TextGenerator ("db", "TextGenerator",
   method ("default_generator", &db::TextGenerator::default_generator,
     "@brief Gets the default text generator (a standard font)\n"
     "This method delivers the default generator or nil if no such generator is installed."
+  ) +
+  method ("set_font_paths", &db::TextGenerator::set_font_paths,
+    "@brief Sets the paths where to look for font files\n"
+    "This function sets the paths where to look for font files. After setting such a path, each font found will render a "
+    "specific generator. The generator can be found under the font file's name. As the text generator is also the basis "
+    "for the Basic.TEXT PCell, using this function also allows configuring custom fonts for this library cell.\n"
+    "\n"
+    "This method has been introduced in version 0.27.4."
+  ) +
+  method ("font_paths", &db::TextGenerator::font_paths,
+    "@brief Gets the paths where to look for font files\n"
+    "See \\set_font_paths for a description of this function.\n"
+    "\n"
+    "This method has been introduced in version 0.27.4."
   ),
   "@brief A text generator class\n"
   "\n"

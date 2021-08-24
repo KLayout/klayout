@@ -1,8 +1,9 @@
 recursive-include src/tl/tl *.cc *.h
-recursive-include src/db/db *.cc *.h
+recursive-include src/db/db *.cc *.cc_gen *.h
 recursive-include src/gsi/gsi *.cc *.h
 recursive-include src/rdb/rdb *.cc *.h
 recursive-include src/pya/pya *.cc *.h
+recursive-include src/lib/lib *.cc *.h
 recursive-include src/pymod *.cc *.h
 include src/plugins/*/db_plugin/*.cc
 include src/plugins/*/*/db_plugin/*.cc

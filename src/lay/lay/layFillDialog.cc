@@ -198,8 +198,6 @@ FillDialog::generate_fill (const FillParameters &fp)
     tl::info << "Collecting fill regions";
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Fill")));
-
   db::Region fill_region;
   if (fp.fill_region_mode == FillParameters::Region) {
     fill_region = fp.fill_region;

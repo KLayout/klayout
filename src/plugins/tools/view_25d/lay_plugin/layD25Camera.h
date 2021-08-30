@@ -123,6 +123,11 @@ public:
    */
   void camera_reset ();
 
+  /**
+   *  @brief Resets the camera's orientation but does not call "camera_changed"
+   */
+  void camera_init ();
+
 protected:
   virtual void camera_changed () { }
   virtual double aspect_ratio () const { return 1.0; }
@@ -133,7 +138,6 @@ private:
   QVector3D m_displacement;
   double m_fov;
 
-  void init ();
 };
 
 }

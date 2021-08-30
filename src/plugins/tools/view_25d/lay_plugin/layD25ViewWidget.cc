@@ -200,6 +200,8 @@ D25ViewWidget::D25ViewWidget (QWidget *parent)
 
   m_zmin = m_zmax = 0.0;
   mp_view = 0;
+
+  reset_viewport ();
 }
 
 D25ViewWidget::~D25ViewWidget ()
@@ -214,12 +216,22 @@ D25ViewWidget::~D25ViewWidget ()
 }
 
 void
-D25ViewWidget::reset ()
+D25ViewWidget::reset_viewport ()
 {
   m_scale_factor = 1.0;
+  m_vscale_factor = 1.0;
   mp_mode.reset (0);
 
-  camera_reset ();
+  camera_init ();
+}
+
+void
+D25ViewWidget::reset ()
+{
+  reset_viewport ();
+  emit scale_factor_changed (m_scale_factor);
+  emit vscale_factor_changed (m_vscale_factor);
+  refresh ();
 }
 
 void
@@ -435,6 +447,13 @@ D25ViewWidget::fit ()
 void
 D25ViewWidget::refresh ()
 {
+  update ();
+}
+
+void
+D25ViewWidget::showEvent (QShowEvent *)
+{
+  //  NOTE: This should happen automatically, but apparently the OpenGL widget doesn't do an automatic refresh:
   update ();
 }
 
@@ -898,7 +917,7 @@ D25ViewWidget::paintGL ()
   QMatrix4x4 scene_trans, scene_trans_wo_y;
 
   //  provide the displacement and scaling (in this order!)
-  scene_trans.scale (m_scale_factor);
+  scene_trans.scale (m_scale_factor, m_scale_factor * m_vscale_factor, m_scale_factor);
   scene_trans.translate (m_displacement);
   //  this way we can use y as z coordinate when drawing
   scene_trans.scale (1.0, 1.0, -1.0);

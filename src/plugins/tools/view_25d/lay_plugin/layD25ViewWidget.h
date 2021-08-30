@@ -104,6 +104,14 @@ public:
     refresh ();
   }
 
+  double vscale_factor () const { return m_vscale_factor; }
+
+  void set_vscale_factor (double f)
+  {
+    m_vscale_factor = f;
+    refresh ();
+  }
+
   const std::string &error () const
   {
     return m_error;
@@ -111,11 +119,13 @@ public:
 
 signals:
   void scale_factor_changed (double f);
+  void vscale_factor_changed (double f);
   void init_failed ();
 
 protected:
   virtual void camera_changed ();
   virtual double aspect_ratio () const;
+  virtual void showEvent (QShowEvent *);
 
 public slots:
   void fit ();
@@ -127,6 +137,7 @@ private:
   QOpenGLShaderProgram *m_shapes_program, *m_gridplane_program;
   std::string m_error;
   double m_scale_factor;
+  double m_vscale_factor;
   QVector3D m_displacement;
   lay::LayoutView *mp_view;
   db::DBox m_bbox;
@@ -152,6 +163,7 @@ private:
   void render_layout (D25ViewWidget::chunks_type &chunks, const db::Layout &layout, const db::Cell &cell, const db::Box &clip_box, unsigned int layer, double zstart, double zstop);
   void render_polygon (D25ViewWidget::chunks_type &chunks, const db::Polygon &poly, double dbu, double zstart, double zstop);
   void render_wall (D25ViewWidget::chunks_type &chunks, const db::Edge &poly, double dbu, double zstart, double zstop);
+  void reset_viewport ();
 };
 
 }

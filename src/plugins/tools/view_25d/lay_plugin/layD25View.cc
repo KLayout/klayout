@@ -50,7 +50,9 @@ D25View::D25View (QWidget *parent)
   connect (mp_ui->fit_top, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
   connect (mp_ui->fit_bottom, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
   connect (mp_ui->zoom_slider, SIGNAL (valueChanged (int)), this, SLOT (scale_slider_changed (int)));
+  connect (mp_ui->vzoom_slider, SIGNAL (valueChanged (int)), this, SLOT (vscale_slider_changed (int)));
   connect (mp_ui->d25_view, SIGNAL (scale_factor_changed (double)), this, SLOT (scale_factor_changed (double)));
+  connect (mp_ui->d25_view, SIGNAL (vscale_factor_changed (double)), this, SLOT (vscale_factor_changed (double)));
   connect (mp_ui->d25_view, SIGNAL (init_failed ()), this, SLOT (init_failed ()));
 
   mp_ui->gl_stack->setCurrentIndex (0);
@@ -67,7 +69,7 @@ D25View::~D25View ()
 static QString scale_factor_to_string (double f)
 {
   QString s;
-  s.sprintf ("x %.3g", f);
+  s.sprintf ("%.3g", f);
   return s;
 }
 
@@ -96,7 +98,25 @@ D25View::scale_factor_changed (double f)
   mp_ui->zoom_slider->blockSignals (false);
 }
 
-int 
+void
+D25View::vscale_slider_changed (int value)
+{
+  double f = exp (log (10.0) * -0.01 * value);
+  mp_ui->vzoom_factor->setText (scale_factor_to_string (f));
+  mp_ui->d25_view->set_vscale_factor (f);
+}
+
+void
+D25View::vscale_factor_changed (double f)
+{
+  mp_ui->vzoom_factor->setText (scale_factor_to_string (f));
+  int v = floor (0.5 - log10 (f) * 100.0);
+  mp_ui->vzoom_slider->blockSignals (true);
+  mp_ui->vzoom_slider->setValue (v);
+  mp_ui->vzoom_slider->blockSignals (false);
+}
+
+int
 D25View::exec_dialog (lay::LayoutView *view)
 {
   mp_view.reset (view);

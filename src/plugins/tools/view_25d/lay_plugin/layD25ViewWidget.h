@@ -96,6 +96,11 @@ public:
     refresh ();
   }
 
+  QVector3D scale_factors () const
+  {
+    return QVector3D (scale_factor (), scale_factor () * vscale_factor (), scale_factor ());
+  }
+
   double scale_factor () const { return m_scale_factor; }
 
   void set_scale_factor (double f)

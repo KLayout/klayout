@@ -58,8 +58,10 @@ private slots:
   void fit_button_clicked ();
   void scale_factor_changed (double f);
   void scale_slider_changed (int value);
+  void scale_value_edited ();
   void vscale_factor_changed (double f);
   void vscale_slider_changed (int value);
+  void vscale_value_edited ();
   void init_failed ();
 
 private:

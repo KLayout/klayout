@@ -100,7 +100,7 @@ public:
     QVector3D yv (-re * xv.z (), cos (view ()->cam_elevation () * M_PI / 180.0), re * xv.x ());
     QVector3D drag = xv * dx + yv * dy;
 
-    view ()->set_displacement (m_start_displacement + drag / view ()->scale_factor ());
+    view ()->set_displacement (m_start_displacement + drag / view ()->scale_factors ());
   }
 
 private:
@@ -366,8 +366,8 @@ D25ViewWidget::hit_point_with_scene (const QVector3D &line_dir)
 {
   double min_focus_dist = 0.5;
 
-  QVector3D corner = (QVector3D (m_bbox.left (), m_zmin, -(m_bbox.bottom () + m_bbox.height ())) + m_displacement) * m_scale_factor;
-  QVector3D dim = QVector3D (m_bbox.width (), m_zmax - m_zmin, m_bbox.height ()) * m_scale_factor;
+  QVector3D corner = (QVector3D (m_bbox.left (), m_zmin, -(m_bbox.bottom () + m_bbox.height ())) + m_displacement) * scale_factors ();
+  QVector3D dim = QVector3D (m_bbox.width (), m_zmax - m_zmin, m_bbox.height ()) * scale_factors ();
   QVector3D line = cam_position ();
 
   std::pair<bool, QVector3D> hp = lay::hit_point_with_cuboid (line, line_dir, corner, dim);

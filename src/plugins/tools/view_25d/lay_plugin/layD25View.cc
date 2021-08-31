@@ -51,6 +51,8 @@ D25View::D25View (QWidget *parent)
   connect (mp_ui->fit_bottom, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
   connect (mp_ui->zoom_slider, SIGNAL (valueChanged (int)), this, SLOT (scale_slider_changed (int)));
   connect (mp_ui->vzoom_slider, SIGNAL (valueChanged (int)), this, SLOT (vscale_slider_changed (int)));
+  connect (mp_ui->zoom_factor, SIGNAL (editingFinished ()), this, SLOT (scale_value_edited ()));
+  connect (mp_ui->vzoom_factor, SIGNAL (editingFinished ()), this, SLOT (vscale_value_edited ()));
   connect (mp_ui->d25_view, SIGNAL (scale_factor_changed (double)), this, SLOT (scale_factor_changed (double)));
   connect (mp_ui->d25_view, SIGNAL (vscale_factor_changed (double)), this, SLOT (vscale_factor_changed (double)));
   connect (mp_ui->d25_view, SIGNAL (init_failed ()), this, SLOT (init_failed ()));
@@ -78,6 +80,34 @@ D25View::init_failed ()
 {
   mp_ui->error_text->setPlainText (tl::to_qstring (mp_ui->d25_view->error ()));
   mp_ui->gl_stack->setCurrentIndex (1);
+}
+
+void
+D25View::scale_value_edited ()
+{
+  double f = mp_ui->d25_view->scale_factor ();
+  try {
+    tl::from_string (tl::to_string (mp_ui->zoom_factor->text ()), f);
+    f = std::min (1e6, std::max (1e-6, f));
+  } catch (...) {
+    //  ignore exceptions
+  }
+  mp_ui->d25_view->set_scale_factor (f);
+  scale_factor_changed (f);
+}
+
+void
+D25View::vscale_value_edited ()
+{
+  double f = mp_ui->d25_view->vscale_factor ();
+  try {
+    tl::from_string (tl::to_string (mp_ui->vzoom_factor->text ()), f);
+    f = std::min (1e6, std::max (1e-6, f));
+  } catch (...) {
+    //  ignore exceptions
+  }
+  mp_ui->d25_view->set_vscale_factor (f);
+  vscale_factor_changed (f);
 }
 
 void

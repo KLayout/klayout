@@ -117,15 +117,11 @@ hit_point_with_cuboid (const QVector3D &line, const QVector3D &line_dir, const Q
 
     double min_dist = 0.0;
     int min_dist_index = -1;
-    QVector3D ld_norm = line_dir.normalized ();
 
     for (std::vector<std::pair<bool, QVector3D> >::const_iterator i = cutpoints.begin (); i != cutpoints.end (); ++i) {
       if (i->first) {
-        double dist = QVector3D::dotProduct (i->second - line, ld_norm);
-        if (min_dist_index < 0) {
-          min_dist = dist;
-          min_dist_index = int (i - cutpoints.begin ());
-        } else if (dist < min_dist) {
+        double dist = QVector3D::dotProduct (i->second - line, line_dir);
+        if (min_dist_index < 0 || dist < min_dist) {
           min_dist = dist;
           min_dist_index = int (i - cutpoints.begin ());
         }

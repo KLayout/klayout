@@ -149,27 +149,36 @@ D25View::vscale_factor_changed (double f)
 int
 D25View::exec_dialog (lay::LayoutView *view)
 {
-  mp_view.reset (view);
-  bool any = mp_ui->d25_view->attach_view (view);
+  int ret = 0;
 
-  if (! any) {
+  try {
 
-    mp_view.reset (0);
+    mp_view.reset (view);
+    bool any = mp_ui->d25_view->attach_view (view);
+
+    if (! any) {
+
+      mp_view.reset (0);
+      mp_ui->d25_view->attach_view (0);
+
+      throw tl::Exception (tl::to_string (tr ("No z data configured for the layers in the view.\nUse \"Tools/Manage Technologies\" to set up a z stack.")));
+
+    }
+
+    mp_ui->d25_view->reset ();
+    mp_ui->d25_view->set_cam_azimuth (0.0);
+    mp_ui->d25_view->set_cam_elevation (-initial_elevation);
+    mp_ui->d25_view->fit ();
+
+    ret = QDialog::exec ();
+
     mp_ui->d25_view->attach_view (0);
+    mp_view.reset (0);
 
-    throw tl::Exception (tl::to_string (tr ("No z data configured for the layers in the view.\nUse \"Tools/Manage Technologies\" to set up a z stack.")));
-
+  } catch (...) {
+    mp_ui->d25_view->attach_view (0);
+    mp_view.reset (0);
   }
-
-  mp_ui->d25_view->reset ();
-  mp_ui->d25_view->set_cam_azimuth (0.0);
-  mp_ui->d25_view->set_cam_elevation (-initial_elevation);
-  mp_ui->d25_view->fit ();
-
-  int ret = QDialog::exec ();
-
-  mp_ui->d25_view->attach_view (0);
-  mp_view.reset (0);
 
   return ret;
 }

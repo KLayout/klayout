@@ -33,6 +33,7 @@
 #include "dbClip.h"
 
 #include "tlException.h"
+#include "tlProgress.h"
 
 #include <QWheelEvent>
 #include <QMouseEvent>
@@ -416,28 +417,47 @@ inline double square (double x) { return x * x; }
 void
 D25ViewWidget::fit ()
 {
-  //  we pick a scale factor to adjust the z dimension roughly to 1/4 of the screen height at a focus distance of 2
-  double norm_height = 0.5;
-  double in_focus = 2.0;
-  m_scale_factor = (tan (cam_fov () * M_PI / 180.0 / 2.0) * 2.0) * in_focus * norm_height / std::max (0.001, (m_zmax - m_zmin));
+  if (m_bbox.empty ()) {
 
-  QVector3D dim = QVector3D (m_bbox.width (), m_zmax - m_zmin, m_bbox.height ()) * m_scale_factor;
-  QVector3D bll = QVector3D (m_bbox.left (), m_zmin, -(m_bbox.bottom () + m_bbox.height ()));
+    m_scale_factor = 1.0;
+    m_displacement = QVector3D ();
 
-  //  now we pick a displacement which moves the center to y = 0 and x, y in a way that the dimension covers the field of
-  //  view and is centered.
-  //  (we use the elliptic approximation which works exactly for azimuth angles which are a multiple of 90 degree)
+  } else {
 
-  double dh = sqrt (square (cos (cam_azimuth () * M_PI / 180.0) * dim.x ()) + square (sin (cam_azimuth () * M_PI / 180.0) * dim.z ()));
-  double dv = sqrt (square (cos (cam_azimuth () * M_PI / 180.0) * dim.z ()) + square (sin (cam_azimuth () * M_PI / 180.0) * dim.x ()));
+    QVector3D dim = QVector3D (m_bbox.width (), (m_zmax - m_zmin) * m_vscale_factor, m_bbox.height ());
+    QVector3D bll = QVector3D (m_bbox.left (), m_zmin * m_vscale_factor, -(m_bbox.bottom () + m_bbox.height ()));
 
-  double d = std::max (dh, fabs (sin (cam_elevation ()) * dv));
+    m_scale_factor = 1e6;
+    double tfov = tan (cam_fov () / 360.0 * M_PI);
+    double tfovh = double (width ()) / double (height ()) * tfov;
 
-  QVector3D new_center (0.0, 0.0, -dv / 2.0 + std::max (0.0, -d / (2.0 * tan (cam_fov () * M_PI / 180.0 / 2.0)) + cam_dist ()));
-  QVector3D new_center_in_scene = cam_trans ().inverted ().map (new_center);
+    for (unsigned int i = 0; i < 8; ++i) {
 
-  m_displacement = (new_center_in_scene - dim * 0.5) / m_scale_factor - bll;
-  m_displacement.setY (0.0);
+      QVector3D p ((i & 1) == 0 ? -0.5 * dim.x () : 0.5 * dim.x (), bll.y () + ((i & 2) == 0 ? 0.0 : dim.y ()), (i & 4) == 0 ? -0.5 * dim.z () : 0.5 * dim.z ());
+      p = cam_trans () * p;
+
+      double d;
+
+      d = std::abs (p.x ()) + tfovh * p.z ();
+      if (d > 1e-6) {
+        m_scale_factor = std::min (m_scale_factor, cam_dist () * tfovh / d);
+      }
+
+      d = std::abs (p.y ()) + tfov * p.z ();
+      if (d > 1e-6) {
+        m_scale_factor = std::min (m_scale_factor, cam_dist () * tfov / d);
+      }
+
+    }
+
+    //  create some margin
+    m_scale_factor *= 0.95;
+
+    //  Reset displacement to center the scene
+    m_displacement = -(bll + dim * 0.5);
+    m_displacement.setY (0.0);
+
+  }
 
   refresh ();
 
@@ -472,16 +492,10 @@ D25ViewWidget::aspect_ratio () const
 bool
 D25ViewWidget::attach_view (LayoutView *view)
 {
-  bool any = false;
+  mp_view = view;
 
-  if (mp_view != view) {
-
-    mp_view = view;
-
-    any = prepare_view ();
-    reset ();
-
-  }
+  bool any = prepare_view ();
+  reset ();
 
   return any;
 }
@@ -574,7 +588,31 @@ D25ViewWidget::prepare_view ()
   m_bbox = mp_view->viewport ().box ();
 
   ZDataCache zdata;
+
+  //  collect and confine to cell bbox
+  db::DBox cell_bbox;
+  for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
+
+    std::vector<db::D25LayerInfo> zinfo;
+    if (! lp->has_children () && lp->visible (true)) {
+      zinfo = zdata (mp_view, lp->cellview_index (), lp->layer_index ());
+    }
+
+    for (std::vector<db::D25LayerInfo>::const_iterator zi = zinfo.begin (); zi != zinfo.end (); ++zi) {
+      const lay::CellView &cv = mp_view->cellview ((unsigned int) lp->cellview_index ());
+      cell_bbox += db::CplxTrans (cv->layout ().dbu ()) * cv.cell ()->bbox ((unsigned int) lp->layer_index ());
+    }
+
+  }
+
+  m_bbox &= cell_bbox;
+  if (m_bbox.empty ()) {
+    return false;
+  }
+
   bool any = false;
+
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Rendering ...")));
 
   for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
 
@@ -603,7 +641,8 @@ D25ViewWidget::prepare_view ()
       m_layers.push_back (info);
 
       const lay::CellView &cv = mp_view->cellview ((unsigned int) lp->cellview_index ());
-      render_layout (m_vertex_chunks.back (), cv->layout (), *cv.cell (), db::CplxTrans (cv->layout ().dbu ()).inverted () * m_bbox, (unsigned int) lp->layer_index (), z0, z1);
+
+      render_layout (progress, m_vertex_chunks.back (), cv->layout (), *cv.cell (), db::CplxTrans (cv->layout ().dbu ()).inverted () * m_bbox, (unsigned int) lp->layer_index (), z0, z1);
 
       if (! zset) {
         m_zmin = z0;
@@ -693,7 +732,7 @@ D25ViewWidget::render_wall (D25ViewWidget::chunks_type &chunks, const db::Edge &
 }
 
 void
-D25ViewWidget::render_layout (D25ViewWidget::chunks_type &chunks, const db::Layout &layout, const db::Cell &cell, const db::Box &clip_box, unsigned int layer, double zstart, double zstop)
+D25ViewWidget::render_layout (tl::AbsoluteProgress &progress, D25ViewWidget::chunks_type &chunks, const db::Layout &layout, const db::Cell &cell, const db::Box &clip_box, unsigned int layer, double zstart, double zstop)
 {
   std::vector<db::Polygon> poly_heap;
 
@@ -711,6 +750,8 @@ D25ViewWidget::render_layout (D25ViewWidget::chunks_type &chunks, const db::Layo
     db::clip_poly (polygon, clip_box, poly_heap, false /*keep holes*/);
 
     for (std::vector<db::Polygon>::const_iterator p = poly_heap.begin (); p != poly_heap.end (); ++p) {
+
+      ++progress;
 
       render_polygon (chunks, *p, layout.dbu (), zstart, zstop);
 

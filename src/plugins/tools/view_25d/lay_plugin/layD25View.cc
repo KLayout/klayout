@@ -221,5 +221,11 @@ D25View::accept ()
   QDialog::accept ();
 }
 
+void
+D25View::reject ()
+{
+  QDialog::reject ();
+}
+
 }
 

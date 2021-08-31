@@ -73,6 +73,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="minimum">
          <number>-300</number>
         </property>
@@ -150,6 +153,9 @@
       </item>
       <item>
        <widget class="QSlider" name="vzoom_slider">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="minimum">
          <number>-300</number>
         </property>
@@ -444,12 +450,25 @@
        </widget>
       </item>
       <item>
-       <widget class="QDialogButtonBox" name="buttonBox">
+       <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="standardButtons">
-         <set>QDialogButtonBox::Close</set>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>Close</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -470,18 +489,18 @@
  </resources>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
    <receiver>D25View</receiver>
-   <slot>accept()</slot>
+   <slot>hide()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>530</x>
-     <y>626</y>
+     <x>808</x>
+     <y>634</y>
     </hint>
     <hint type="destinationlabel">
-     <x>443</x>
-     <y>643</y>
+     <x>767</x>
+     <y>659</y>
     </hint>
    </hints>
   </connection>

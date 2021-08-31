@@ -53,6 +53,7 @@ public:
 
 protected:
   void accept ();
+  void reject ();
 
 private slots:
   void fit_button_clicked ();

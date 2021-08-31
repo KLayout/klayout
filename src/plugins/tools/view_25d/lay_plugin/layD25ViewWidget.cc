@@ -429,7 +429,7 @@ D25ViewWidget::fit ()
 
     m_scale_factor = 1e6;
     double tfov = tan (cam_fov () / 360.0 * M_PI);
-    double tfovh = double (width ()) / double (height ()) * tfov;
+    double tfovh = aspect_ratio () * tfov;
 
     for (unsigned int i = 0; i < 8; ++i) {
 

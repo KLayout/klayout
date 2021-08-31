@@ -154,11 +154,9 @@ private:
   double m_zmin, m_zmax;
 
   std::list<chunks_type> m_vertex_chunks;
-  std::list<chunks_type> m_normals_chunks;
 
   struct LayerInfo {
     const chunks_type *vertex_chunk;
-    const chunks_type *normals_chunk;
     GLfloat color [4];
   };
 

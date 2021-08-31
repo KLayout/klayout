@@ -57,7 +57,6 @@ struct gl_type2enum<float>
  */
 template <class Obj, size_t ChunkLen = 1024>
 class mem_chunks
-  : public QDialog
 {
 public:
 

@@ -763,6 +763,8 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
                                    std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping,
                                    std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping) const
 {
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Comparing circuits ")) + c1->name () + "/" + c2->name ());
+
   db::DeviceFilter device_filter (m_cap_threshold, m_res_threshold);
   SubCircuitEquivalenceTracker subcircuit_equivalence;
   DeviceEquivalenceTracker device_equivalence;
@@ -946,7 +948,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   for (db::NetGraph::node_iterator i = g1.begin (); i != g1.end (); ++i) {
     if (! i->has_other ()) {
-      if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
+      if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare || tl::verbosity () >= 40) {
         tl::info << "Unresolved net from left: " << i->net ()->expanded_name () << " " << (good ? "(accepted)" : "(not accepted)");
       }
       if (mp_logger) {

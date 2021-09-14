@@ -986,7 +986,7 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
 
       bool ambiguous = equivalent_other_nodes.has_attribute (p->second);
 
-      if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
+      if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare || tl::verbosity () >= 40) {
         if (ambiguous) {
           tl::info << indent_s << "deduced ambiguous match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
         } else {
@@ -1084,16 +1084,19 @@ NetlistCompareCore::derive_node_identities_from_singular_match (const NetGraphNo
 
     TentativeNodeMapping::map_pair (tentative, mp_graph, ni, mp_other_graph, other_ni, dm, dm_other, *device_equivalence, scm, scm_other, *subcircuit_equivalence, depth);
 
-    if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
-      tl::info << indent_s << "deduced match (singular): " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
-    }
     if (! tentative) {
       ++*progress;
       if (logger) {
         if (! (mp_graph->node (ni) == mp_other_graph->node (other_ni))) {
           //  this is a mismatch, but we continue with this
+          if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare || tl::verbosity () >= 40) {
+            tl::info << indent_s << "deduced mismatch (singular): " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+          }
           logger->net_mismatch (n->net (), n_other->net ());
         } else {
+          if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare || tl::verbosity () >= 40) {
+            tl::info << indent_s << "deduced match (singular): " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+          }
           logger->match_nets (n->net (), n_other->net ());
         }
       }
@@ -1101,7 +1104,7 @@ NetlistCompareCore::derive_node_identities_from_singular_match (const NetGraphNo
 
     size_t new_nodes = 1;
 
-    if (depth_first || tentative) {
+    if ((depth_first || tentative) && (max_depth == std::numeric_limits<size_t>::max() || depth < max_depth)) {
       size_t bt_count = derive_node_identities (ni, depth + 1, n_branch, tentative);
       if (bt_count == failed_match) {
         if (tentative) {
@@ -1151,13 +1154,6 @@ NetlistCompareCore::derive_node_identities_from_node_set (std::vector<NodeEdgePa
     indent_s += "*" + tl::to_string (n_branch) + " ";
   }
 
-  if (max_depth != std::numeric_limits<size_t>::max() && depth > max_depth) {
-    if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
-      tl::info << indent_s << "max. depth exhausted (" << depth + 1 << ">" << max_depth << ")";
-    }
-    return failed_match;
-  }
-
   DeviceMapperForTargetNode dm;
   SubCircuitMapperForTargetNode scm;
   for (std::vector<NodeEdgePair>::const_iterator i = nodes.begin (); i != nodes.end (); ++i) {
@@ -1177,6 +1173,13 @@ NetlistCompareCore::derive_node_identities_from_node_set (std::vector<NodeEdgePa
     return derive_node_identities_from_singular_match (nodes.front ().node, nodes.front ().edge, other_nodes.front ().node, other_nodes.front ().edge,
                                                        dm, dm_other, scm, scm_other, depth, n_branch, tentative, false /*don't consider net names*/);
 
+  }
+
+  if (max_depth != std::numeric_limits<size_t>::max() && depth > max_depth) {
+    if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
+      tl::info << indent_s << "max. depth exhausted (" << depth << ">" << max_depth << ")";
+    }
+    return failed_match;
   }
 
   //  Determine the range of nodes with same identity

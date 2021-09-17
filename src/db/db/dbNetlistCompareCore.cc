@@ -428,10 +428,19 @@ NetlistCompareCore::derive_node_identities_for_edges (NetGraphNode::edge_iterato
     return 0;
   }
 
+  if (tentative) {
+
+    if (nodes.size () != other_nodes.size ()) {
+      if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
+        tl::info << nl_compare_debug_indent(depth) << "=> rejected branch.";
+      }
+      return failed_match;
+    }
+
+  }
+
   std::sort (nodes.begin (), nodes.end (), CompareNodeEdgePair ());
   std::sort (other_nodes.begin (), other_nodes.end (), CompareNodeEdgePair ());
-
-  size_t new_nodes = 0;
 
   if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
 
@@ -475,15 +484,8 @@ NetlistCompareCore::derive_node_identities_for_edges (NetGraphNode::edge_iterato
 
   if (tentative) {
 
-    if (nodes.size () != other_nodes.size ()) {
-      if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
-        tl::info << nl_compare_debug_indent(depth) << "=> rejected branch.";
-      }
-      return failed_match;
-    }
-
     //  1:1 pairing is less strict
-    if (nodes.size () > 1 || other_nodes.size () > 1) {
+    if (nodes.size () > 1) {
       for (size_t i = 0; i < nodes.size (); ++i) {
         if (! (*nodes[i].node == *other_nodes[i].node)) {
           if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
@@ -506,18 +508,17 @@ NetlistCompareCore::derive_node_identities_for_edges (NetGraphNode::edge_iterato
       if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
         tl::info << nl_compare_debug_indent(depth) << "=> rejected branch.";
       }
-      return bt_count;
+    } else {
+      bt_count = 0;
     }
-  } else {
-    new_nodes += bt_count;
   }
 
   if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
-    if (! new_nodes) {
+    if (! bt_count) {
       tl::info << nl_compare_debug_indent(depth) << "=> no updates.";
     }
   }
-  return new_nodes;
+  return bt_count;
 }
 
 static bool has_subcircuits (db::NetGraphNode::edge_iterator e, db::NetGraphNode::edge_iterator ee)
@@ -591,7 +592,7 @@ NetlistCompareCore::derive_node_identities (size_t net_index, size_t depth, size
       nodes.reserve (ee - e);
 
       std::vector<const NetGraphNode *> other_nodes_translated;
-      other_nodes_translated.reserve (ee - e);
+      other_nodes_translated.reserve (ee_other - e_other);
 
       tl_assert (e->first == e_other->first);
 

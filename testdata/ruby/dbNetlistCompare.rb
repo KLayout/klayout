@@ -816,8 +816,8 @@ match_pins $3 (null)
 match_pins (null) $2
 match_pins (null) $3
 match_devices $1 $1
-device_mismatch $3 $2
 device_mismatch $5 $3
+device_mismatch $3 $2
 device_mismatch (null) $4
 device_mismatch $6 $5
 device_mismatch $4 $6

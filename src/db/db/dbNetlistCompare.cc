@@ -753,86 +753,87 @@ static bool is_passive_net (const db::Net *net, const std::map<const db::Circuit
   return true;
 }
 
-// @@@
 namespace
 {
 
-struct CompareNodePtrSimple
+/**
+ *  @brief A class for eliminating redundant nodes from the next-generation deduction step
+ *
+ *  The purpose of this class is to reduce the number of attempts to derive new relationships from
+ *  already matched nodes. Such nodes may be redundant - specifically in bus-like configurations
+ *  where many nets attach to the same devices or subcircuits, but different terminals or pins.
+ *  Such nodes are redundant - they do not contribute new knowledge about additional matches.
+ *
+ *  This cache is intended to filter these out. It is built from a graph with "fill". "is_redundant" can
+ *  be used to check whether any node is redundant to different node (one of them will not be marked
+ *  as redundant).
+ *
+ *  Redundancy is defined in terms of attached subcircuits or devices, not by the type of pin or
+ *  terminal which the node's net attaches to.
+ */
+class RedundantNodeCache
 {
-  int compare_transition (const Transition &a, const Transition &b) const
+public:
+  RedundantNodeCache ()
   {
-    if (a.is_for_subcircuit () != b.is_for_subcircuit ()) {
-      return a.is_for_subcircuit () < b.is_for_subcircuit () ? -1 : 1;
-    }
+    //  .. nothing yet ..
+  }
 
-    if (a.is_for_subcircuit ()) {
+  void fill (const db::NetGraph &g)
+  {
+    std::set<std::pair<subcircuit_signature_t, device_signature_t> > signatures;
 
-      if ((a.subcircuit () != 0) != (b.subcircuit () != 0)) {
-        return (a.subcircuit () != 0) < (b.subcircuit () != 0) ? -1 : 1;
+    for (db::NetGraph::node_iterator n = g.begin (); n != g.end (); ++n) {
+      std::pair<subcircuit_signature_t, device_signature_t> key (subcircuit_signature (*n), device_signature (*n));
+      if (signatures.find (key) == signatures.end ()) {
+        signatures.insert (key);
+      } else {
+        m_redundant.insert (n->net ());
       }
-
-      if (a.subcircuit () != 0) {
-        SubCircuitCompare scc;
-        if (! scc.equals (std::make_pair (a.subcircuit (), a.cat ()), std::make_pair (b.subcircuit (), b.cat ()))) {
-          return scc (std::make_pair (a.subcircuit (), a.cat ()), std::make_pair (b.subcircuit (), b.cat ())) ? -1 : 1;
-        }
-      }
-
-      return a.id1 () < b.id1 ();
-
-    } else {
-
-      if ((a.device () != 0) != (b.device () != 0)) {
-        return (a.device () != 0) < (b.device () != 0) ? -1 : 1;
-      }
-
-      if (a.device () != 0) {
-        DeviceCompare dc;
-        if (! dc.equals (std::make_pair (a.device (), a.cat ()), std::make_pair (b.device (), b.cat ()))) {
-          return dc (std::make_pair (a.device (), a.cat ()), std::make_pair (b.device (), b.cat ())) ? -1 : 1;
-        }
-      }
-
-      if (a.id1 () != b.id1 ()) {
-        return a.id1 () < b.id1 ();
-      }
-      return a.id2 () < b.id2 ();
-
     }
   }
 
-  int compare_transitions (const std::vector<Transition> &ta, const std::vector<Transition> &tb) const
+  bool is_redundant (const db::NetGraphNode &n) const
   {
-    if (ta.size () != tb.size ()) {
-      return ta.size () < tb.size () ? -1 : 1;
-    }
-    for (std::vector<Transition>::const_iterator i = ta.begin (), j = tb.begin (); i != ta.end (); ++i, ++j) {
-      int c = compare_transition (*i, *j);
-      if (c != 0) {
-        return c;
-      }
-    }
-    return 0;
+    return m_redundant.find (n.net ()) != m_redundant.end ();
   }
 
-  bool operator() (const NetGraphNode *a, const NetGraphNode *b) const
-  {
-    if ((a->end () - a->begin ()) != (b->end () - b->begin ())) {
-      return (a->end () - a->begin ()) < (b->end () - b->begin ());
-    }
+private:
+  typedef std::vector<std::pair<const db::SubCircuit *, size_t> > subcircuit_signature_t;
+  typedef std::vector<std::pair<const db::Device *, size_t> > device_signature_t;
 
-    for (NetGraphNode::edge_iterator i = a->begin (), j = b->begin (); i != a->end (); ++i, ++j) {
-      int c = compare_transitions (i->first, j->first);
-      if (c != 0) {
-        return c < 0;
+  std::set<const db::Net *> m_redundant;
+
+  subcircuit_signature_t subcircuit_signature (const db::NetGraphNode &n) const
+  {
+    std::map<const db::SubCircuit *, size_t> count;
+    for (db::NetGraphNode::edge_iterator e = n.begin (); e != n.end (); ++e) {
+      for (std::vector<Transition>::const_iterator t = e->first.begin (); t != e->first.end (); ++t) {
+        if (t->is_for_subcircuit ()) {
+          count [t->subcircuit ()] += 1;
+        }
       }
     }
-    return false;
+
+    return subcircuit_signature_t (count.begin (), count.end ());
+  }
+
+  device_signature_t device_signature (const db::NetGraphNode &n) const
+  {
+    std::map<const db::Device *, size_t> count;
+    for (db::NetGraphNode::edge_iterator e = n.begin (); e != n.end (); ++e) {
+      for (std::vector<Transition>::const_iterator t = e->first.begin (); t != e->first.end (); ++t) {
+        if (! t->is_for_subcircuit ()) {
+          count [t->device ()] += 1;
+        }
+      }
+    }
+
+    return device_signature_t (count.begin (), count.end ());
   }
 };
 
 }
-// @@@
 
 bool
 NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
@@ -936,6 +937,11 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     good = true;
   }
 
+  //  build the redundant node cache
+
+  RedundantNodeCache redundant_nodes;
+  redundant_nodes.fill (g1);
+
   //  two passes: one without ambiguities, the second one with
 
   for (int pass = 0; pass < 2 && ! good; ++pass) {
@@ -971,26 +977,32 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
       size_t new_identities = 0;
 
-      std::set<const db::NetGraphNode *, CompareNodePtr> seen;
+      printf("@@@1\n"); fflush(stdout);
 
       for (db::NetGraph::node_iterator i1 = g1.begin (); i1 != g1.end (); ++i1) {
 
         //  note: ambiguous nodes don't contribute additional paths, so skip them
-        if (i1->has_other () && i1->net () /*@@@&& i1->other_net_index () > 0 && i1->exact_match ()*/ /*@@@&& seen.find (i1.operator-> ()) == seen.end ()*/) {
+        if (i1->has_other () && i1->net () && i1->other_net_index () > 0 && i1->exact_match ()) {
 
-          seen.insert (i1.operator-> ());
+          if (! redundant_nodes.is_redundant (*i1)) {
 
-          size_t ni = compare.derive_node_identities (i1 - g1.begin ());
-          if (ni > 0 && ni != failed_match) {
-            new_identities += ni;
-            if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
-              tl::info << ni << " new identities.";
+            size_t ni = compare.derive_node_identities (i1 - g1.begin ());
+            if (ni > 0 && ni != failed_match) {
+              new_identities += ni;
+              if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
+                tl::info << ni << " new identities.";
+              }
             }
+
+          } else {
+            printf("@@@ skipped redundant node: %s\n", i1->net()->expanded_name ().c_str()); fflush(stdout);
           }
 
         }
 
       }
+
+      printf("@@@2\n"); fflush(stdout);
 
       if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
         tl::info << "checking topological identity ...";

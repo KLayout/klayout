@@ -977,8 +977,6 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
       size_t new_identities = 0;
 
-      printf("@@@1\n"); fflush(stdout);
-
       for (db::NetGraph::node_iterator i1 = g1.begin (); i1 != g1.end (); ++i1) {
 
         //  note: ambiguous nodes don't contribute additional paths, so skip them
@@ -994,15 +992,13 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
               }
             }
 
-          } else {
-            printf("@@@ skipped redundant node: %s\n", i1->net()->expanded_name ().c_str()); fflush(stdout);
+          } else if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
+            tl::info << "skipped redundant node: " << i1->net()->expanded_name ();
           }
 
         }
 
       }
-
-      printf("@@@2\n"); fflush(stdout);
 
       if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
         tl::info << "checking topological identity ...";

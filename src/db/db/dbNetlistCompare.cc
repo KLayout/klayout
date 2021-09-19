@@ -753,6 +753,87 @@ static bool is_passive_net (const db::Net *net, const std::map<const db::Circuit
   return true;
 }
 
+// @@@
+namespace
+{
+
+struct CompareNodePtrSimple
+{
+  int compare_transition (const Transition &a, const Transition &b) const
+  {
+    if (a.is_for_subcircuit () != b.is_for_subcircuit ()) {
+      return a.is_for_subcircuit () < b.is_for_subcircuit () ? -1 : 1;
+    }
+
+    if (a.is_for_subcircuit ()) {
+
+      if ((a.subcircuit () != 0) != (b.subcircuit () != 0)) {
+        return (a.subcircuit () != 0) < (b.subcircuit () != 0) ? -1 : 1;
+      }
+
+      if (a.subcircuit () != 0) {
+        SubCircuitCompare scc;
+        if (! scc.equals (std::make_pair (a.subcircuit (), a.cat ()), std::make_pair (b.subcircuit (), b.cat ()))) {
+          return scc (std::make_pair (a.subcircuit (), a.cat ()), std::make_pair (b.subcircuit (), b.cat ())) ? -1 : 1;
+        }
+      }
+
+      return a.id1 () < b.id1 ();
+
+    } else {
+
+      if ((a.device () != 0) != (b.device () != 0)) {
+        return (a.device () != 0) < (b.device () != 0) ? -1 : 1;
+      }
+
+      if (a.device () != 0) {
+        DeviceCompare dc;
+        if (! dc.equals (std::make_pair (a.device (), a.cat ()), std::make_pair (b.device (), b.cat ()))) {
+          return dc (std::make_pair (a.device (), a.cat ()), std::make_pair (b.device (), b.cat ())) ? -1 : 1;
+        }
+      }
+
+      if (a.id1 () != b.id1 ()) {
+        return a.id1 () < b.id1 ();
+      }
+      return a.id2 () < b.id2 ();
+
+    }
+  }
+
+  int compare_transitions (const std::vector<Transition> &ta, const std::vector<Transition> &tb) const
+  {
+    if (ta.size () != tb.size ()) {
+      return ta.size () < tb.size () ? -1 : 1;
+    }
+    for (std::vector<Transition>::const_iterator i = ta.begin (), j = tb.begin (); i != ta.end (); ++i, ++j) {
+      int c = compare_transition (*i, *j);
+      if (c != 0) {
+        return c;
+      }
+    }
+    return 0;
+  }
+
+  bool operator() (const NetGraphNode *a, const NetGraphNode *b) const
+  {
+    if ((a->end () - a->begin ()) != (b->end () - b->begin ())) {
+      return (a->end () - a->begin ()) < (b->end () - b->begin ());
+    }
+
+    for (NetGraphNode::edge_iterator i = a->begin (), j = b->begin (); i != a->end (); ++i, ++j) {
+      int c = compare_transitions (i->first, j->first);
+      if (c != 0) {
+        return c < 0;
+      }
+    }
+    return false;
+  }
+};
+
+}
+// @@@
+
 bool
 NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
                                    db::DeviceCategorizer &device_categorizer,
@@ -798,26 +879,35 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
       size_t ni1 = g1.node_index_for_net (p->first.first);
       size_t ni2 = g2.node_index_for_net (p->first.second);
-      g1.identify (ni1, ni2);
-      g2.identify (ni2, ni1);
+
+      bool exact_match = (g1.node (ni1) == g2.node (ni2));
+
+      g1.identify (ni1, ni2, exact_match);
+      g2.identify (ni2, ni1, exact_match);
 
       //  in must_match mode, check if the nets are identical
-      if (p->second && ! (g1.node(ni1) == g2.node(ni2))) {
-        mp_logger->net_mismatch (p->first.first, p->first.second);
-      } else {
-        mp_logger->match_nets (p->first.first, p->first.second);
+      if (mp_logger) {
+        if (p->second && ! exact_match) {
+          mp_logger->net_mismatch (p->first.first, p->first.second);
+        } else {
+          mp_logger->match_nets (p->first.first, p->first.second);
+        }
       }
 
     } else if (p->second && g1.has_node_index_for_net (p->first.first)) {
 
-      mp_logger->net_mismatch (p->first.first, 0);
+      if (mp_logger) {
+        mp_logger->net_mismatch (p->first.first, 0);
+      }
 
       size_t ni1 = g1.node_index_for_net (p->first.first);
       g1.identify (ni1, 0);
 
     } else if (p->second && g2.has_node_index_for_net (p->first.second)) {
 
-      mp_logger->net_mismatch (0, p->first.second);
+      if (mp_logger) {
+        mp_logger->net_mismatch (0, p->first.second);
+      }
 
       size_t ni2 = g2.node_index_for_net (p->first.second);
       g2.identify (ni2, 0);
@@ -830,9 +920,23 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   tl::RelativeProgress progress (tl::to_string (tr ("Comparing circuits ")) + c1->name () + "/" + c2->name (), std::max (g1.end () - g1.begin (), g2.end () - g2.begin ()), 1);
 
-  //  two passes: one without ambiguities, the second one with
-
   bool good = false;
+
+  //  check if there is anything to do
+
+  bool has_any_unresolved = false;
+  for (db::NetGraph::node_iterator i1 = g1.begin (); i1 != g1.end () && ! has_any_unresolved; ++i1) {
+    has_any_unresolved = (! i1->has_other () && i1->net ());
+  }
+  for (db::NetGraph::node_iterator i2 = g2.begin (); i2 != g2.end () && ! has_any_unresolved; ++i2) {
+    has_any_unresolved = (! i2->has_other () && i2->net ());
+  }
+
+  if (! has_any_unresolved) {
+    good = true;
+  }
+
+  //  two passes: one without ambiguities, the second one with
 
   for (int pass = 0; pass < 2 && ! good; ++pass) {
 
@@ -863,11 +967,18 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
         tl::info << "deducing from present nodes ...";
       }
 
+      //  deduce new identities from known nodes if possible
+
       size_t new_identities = 0;
+
+      std::set<const db::NetGraphNode *, CompareNodePtr> seen;
 
       for (db::NetGraph::node_iterator i1 = g1.begin (); i1 != g1.end (); ++i1) {
 
-        if (i1->has_other () && i1->net ()) {
+        //  note: ambiguous nodes don't contribute additional paths, so skip them
+        if (i1->has_other () && i1->net () /*@@@&& i1->other_net_index () > 0 && i1->exact_match ()*/ /*@@@&& seen.find (i1.operator-> ()) == seen.end ()*/) {
+
+          seen.insert (i1.operator-> ());
 
           size_t ni = compare.derive_node_identities (i1 - g1.begin ());
           if (ni > 0 && ni != failed_match) {

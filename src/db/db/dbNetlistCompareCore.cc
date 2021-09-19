@@ -191,10 +191,10 @@ public:
   static void map_pair (TentativeNodeMapping *nm, NetGraph *g1, size_t n1, NetGraph *g2, size_t n2,
                         const DeviceMapperForTargetNode &dm1, const DeviceMapperForTargetNode &dm2, DeviceEquivalenceTracker &device_eq,
                         const SubCircuitMapperForTargetNode &scm1, const SubCircuitMapperForTargetNode &scm2, SubCircuitEquivalenceTracker &subcircuit_eq,
-                        size_t depth)
+                        size_t depth, bool exact_match = true)
   {
-    g1->identify (n1, n2);
-    g2->identify (n2, n1);
+    g1->identify (n1, n2, exact_match);
+    g2->identify (n2, n1, exact_match);
 
     if (nm) {
       nm->keep (g1, n1);
@@ -398,7 +398,7 @@ NetlistCompareCore::derive_node_identities_for_edges (NetGraphNode::edge_iterato
   nodes.reserve (ee - e);
 
   std::vector<NodeEdgePair> other_nodes;
-  other_nodes.reserve (ee - e);
+  other_nodes.reserve (ee_other - e_other);
 
   tl_assert (e->first == e_other->first);
 
@@ -1024,12 +1024,16 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
 
     //  And seek further from these pairs
 
-    for (std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin (); p != pairs.end (); ++p) {
+    if (depth_first) {
 
-      size_t ni = mp_graph->node_index_for_net (p->first->net ());
+      for (std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin (); p != pairs.end (); ++p) {
 
-      size_t bt_count = derive_node_identities (ni, depth + 1, complexity * n_branch, tentative);
-      tl_assert (bt_count != failed_match);
+        size_t ni = mp_graph->node_index_for_net (p->first->net ());
+
+        size_t bt_count = derive_node_identities (ni, depth + 1, complexity * n_branch, tentative);
+        tl_assert (bt_count != failed_match);
+
+      }
 
     }
 
@@ -1083,12 +1087,14 @@ NetlistCompareCore::derive_node_identities_from_singular_match (const NetGraphNo
     size_t ni = mp_graph->node_index_for_net (n->net ());
     size_t other_ni = mp_other_graph->node_index_for_net (n_other->net ());
 
-    TentativeNodeMapping::map_pair (tentative, mp_graph, ni, mp_other_graph, other_ni, dm, dm_other, *device_equivalence, scm, scm_other, *subcircuit_equivalence, depth);
+    bool exact_match = (mp_graph->node (ni) == mp_other_graph->node (other_ni));
+
+    TentativeNodeMapping::map_pair (tentative, mp_graph, ni, mp_other_graph, other_ni, dm, dm_other, *device_equivalence, scm, scm_other, *subcircuit_equivalence, depth, exact_match);
 
     if (! tentative) {
       ++*progress;
       if (logger) {
-        if (! (mp_graph->node (ni) == mp_other_graph->node (other_ni))) {
+        if (! exact_match) {
           //  this is a mismatch, but we continue with this
           if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare || tl::verbosity () >= 40) {
             tl::info << indent_s << "deduced mismatch (singular): " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();

@@ -112,6 +112,16 @@ public:
     return m_cat;
   }
 
+  size_t id1 () const
+  {
+    return m_id1;
+  }
+
+  size_t id2 () const
+  {
+    return m_id2;
+  }
+
 private:
   void *m_ptr;
   size_t m_cat;
@@ -152,7 +162,7 @@ public:
   typedef std::vector<edge_type>::const_iterator edge_iterator;
 
   NetGraphNode ()
-    : mp_net (0)
+    : mp_net (0), m_other_net_index (invalid_id)
   {
     //  .. nothing yet ..
   }
@@ -193,12 +203,21 @@ public:
 
   size_t other_net_index () const
   {
-    return m_other_net_index;
+    return (m_other_net_index == invalid_id || m_other_net_index == unknown_id) ? m_other_net_index : m_other_net_index / 2;
   }
 
-  void set_other_net (size_t index)
+  bool exact_match () const
   {
-    m_other_net_index = index;
+    return (m_other_net_index == invalid_id || m_other_net_index == unknown_id) ? false : (m_other_net_index & 1) != 0;
+  }
+
+  void set_other_net (size_t index, bool exact_match)
+  {
+    if (index == invalid_id || index == unknown_id) {
+      m_other_net_index = index;
+    } else {
+      m_other_net_index = (index * 2) + size_t (exact_match ? 1 : 0);
+    }
   }
 
   void unset_other_net ()
@@ -294,6 +313,17 @@ struct CompareNodeEdgePair
   bool operator() (const NodeEdgePair &a, const NodeEdgePair &b) const
   {
     return a.node->less (*b.node, true);
+  }
+};
+
+/**
+ *  @brief A comparator comparing two node pointers
+ */
+struct CompareNodePtr
+{
+  bool operator() (const NetGraphNode *a, const NetGraphNode *b) const
+  {
+    return a->less (*b, true);
   }
 };
 
@@ -395,9 +425,9 @@ public:
   /**
    *  @brief Establishes an equivalence between two nodes of netlist A (this) and B (other)
    */
-  void identify (size_t net_index, size_t other_net_index)
+  void identify (size_t net_index, size_t other_net_index, bool exact_match = true)
   {
-    m_nodes [net_index].set_other_net (other_net_index);
+    m_nodes [net_index].set_other_net (other_net_index, exact_match);
   }
 
   /**

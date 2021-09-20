@@ -133,6 +133,7 @@ public:
   virtual QString search_text () = 0;
   virtual std::string tooltip (NetlistBrowserModel *model) = 0;
   virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model) = 0;
+  virtual bool has_children (NetlistBrowserModel *model) = 0;
 
   void ensure_children (NetlistBrowserModel *model);
 

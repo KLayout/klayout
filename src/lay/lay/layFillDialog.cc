@@ -198,8 +198,6 @@ FillDialog::generate_fill (const FillParameters &fp)
     tl::info << "Collecting fill regions";
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Fill")));
-
   db::Region fill_region;
   if (fp.fill_region_mode == FillParameters::Region) {
     fill_region = fp.fill_region;
@@ -310,7 +308,7 @@ FillDialog::get_fill_parameters ()
 
     //  visible layers
     for (lay::LayerPropertiesConstIterator l = mp_view->begin_layers (); ! l.at_end (); ++l) {
-      if (! l->has_children () && l->visible (true)) {
+      if (! l->has_children () && l->visible (true) && cv->layout ().is_valid_layer (l->layer_index ())) {
         fp.exclude_layers.push_back (cv->layout ().get_properties (l->layer_index ()));
       }
     }
@@ -320,7 +318,7 @@ FillDialog::get_fill_parameters ()
     //  selected layers
     std::vector<lay::LayerPropertiesConstIterator> s = mp_view->selected_layers ();
     for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = s.begin (); l != s.end (); ++l) {
-      if (! (*l)->has_children ()) {
+      if (! (*l)->has_children () && cv->layout ().is_valid_layer ((*l)->layer_index ())) {
         fp.exclude_layers.push_back (cv->layout ().get_properties ((*l)->layer_index ()));
       }
     }

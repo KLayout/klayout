@@ -204,6 +204,16 @@ OriginalLayerRegion::count () const
 
     return n;
 
+  } else if (! iter.layout ()) {
+
+    //  for Shapes-based iterators just use the shape count
+
+    if (iter.shapes ()) {
+      return iter.shapes ()->size (iter.shape_flags () & db::ShapeIterator::Regions);
+    } else {
+      return 0;
+    }
+
   } else {
 
     //  otherwise we can utilize the CellCounter

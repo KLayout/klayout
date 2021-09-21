@@ -55,6 +55,9 @@ SOURCES = \
   dbMutableEdges.cc \
   dbMutableRegion.cc \
   dbMutableTexts.cc \
+  dbNetlistCompareCore.cc \
+  dbNetlistCompareGraph.cc \
+  dbNetlistCompareUtils.cc \
   dbObject.cc \
   dbPath.cc \
   dbPCellDeclaration.cc \
@@ -268,6 +271,9 @@ HEADERS = \
   dbMutableEdges.h \
   dbMutableRegion.h \
   dbMutableTexts.h \
+  dbNetlistCompareCore.h \
+  dbNetlistCompareGraph.h \
+  dbNetlistCompareUtils.h \
   dbObject.h \
   dbObjectTag.h \
   dbObjectWithProperties.h \

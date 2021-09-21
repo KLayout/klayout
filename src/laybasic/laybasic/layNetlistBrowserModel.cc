@@ -910,6 +910,7 @@ public:
   virtual QString search_text ();
   virtual std::string tooltip (NetlistBrowserModel *model);
   virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
+  virtual bool has_children (NetlistBrowserModel *) { return true; }
 
   CircuitItemData *circuit_item (NetlistBrowserModel *model, const IndexedNetlistModel::circuit_pair &cp);
 };
@@ -928,6 +929,7 @@ public:
   virtual QString search_text ();
   virtual std::string tooltip (NetlistBrowserModel *model);
   virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
+  virtual bool has_children (NetlistBrowserModel *model);
 
   virtual std::pair<const db::Circuit *, const db::Circuit *> circuits_of_this ()
   {
@@ -980,6 +982,7 @@ public:
   virtual QString search_text ();
   virtual std::string tooltip (NetlistBrowserModel *model);
   virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
+  virtual bool has_children (NetlistBrowserModel *model);
 
   CircuitNetItemData *circuit_net_item (NetlistBrowserModel *model, const IndexedNetlistModel::net_pair &np);
   CircuitDeviceItemData *circuit_device_item (NetlistBrowserModel *model, const IndexedNetlistModel::device_pair &dp);
@@ -1003,6 +1006,7 @@ public:
   virtual QString search_text ();
   virtual std::string tooltip (NetlistBrowserModel *model);
   virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
+  virtual bool has_children (NetlistBrowserModel *) { return true; }
 
   const IndexedNetlistModel::net_pair &np ()
   {
@@ -1038,6 +1042,7 @@ public:
   virtual QString search_text ();
   virtual std::string tooltip (NetlistBrowserModel *model);
   virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
+  virtual bool has_children (NetlistBrowserModel *) { return true; }
 
   const IndexedNetlistModel::net_pair &np ()
   {
@@ -1096,6 +1101,7 @@ public:
   virtual QString search_text ();
   virtual std::string tooltip (NetlistBrowserModel *model);
   virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
+  virtual bool has_children (NetlistBrowserModel *) { return true; }
 
   const IndexedNetlistModel::net_pair &np ()
   {
@@ -1149,6 +1155,7 @@ public:
   virtual QString search_text ();
   virtual std::string tooltip (NetlistBrowserModel *model);
   virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
+  virtual bool has_children (NetlistBrowserModel *) { return false; }
 
   virtual std::pair<const db::Pin *, const db::Pin *> pins_of_this ()
   {
@@ -1173,6 +1180,7 @@ public:
   virtual QString search_text ();
   virtual std::string tooltip (NetlistBrowserModel *model);
   virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
+  virtual bool has_children (NetlistBrowserModel *) { return true; }
 
   const IndexedNetlistModel::subcircuit_pair &sp ()
   {
@@ -1224,6 +1232,7 @@ public:
   virtual QString search_text ();
   virtual std::string tooltip (NetlistBrowserModel *model);
   virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
+  virtual bool has_children (NetlistBrowserModel *model);
 
   const IndexedNetlistModel::subcircuit_pair &sp ()
   {
@@ -1274,6 +1283,7 @@ public:
   virtual QString search_text ();
   virtual std::string tooltip (NetlistBrowserModel *model);
   virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model);
+  virtual bool has_children (NetlistBrowserModel *) { return true; }
 
   const IndexedNetlistModel::device_pair &dp ()
   {
@@ -1594,6 +1604,25 @@ CircuitItemData::do_ensure_children (NetlistBrowserModel *model)
   }
 }
 
+bool
+CircuitItemData::has_children (NetlistBrowserModel *model)
+{
+  if (model->indexer ()->pin_count (circuits ()) > 0) {
+    return true;
+  }
+  if (model->indexer ()->net_count (circuits ()) > 0) {
+    return true;
+  }
+  if (model->indexer ()->subcircuit_count (circuits ()) > 0) {
+    return true;
+  }
+  if (model->indexer ()->device_count (circuits ()) > 0) {
+    return true;
+  }
+  return false;
+}
+
+
 QIcon
 CircuitItemData::icon (NetlistBrowserModel * /*model*/)
 {
@@ -1716,6 +1745,13 @@ CircuitItemForSubCircuitData::status (NetlistBrowserModel * /*model*/)
 CircuitItemNodeData::CircuitItemNodeData (NetlistModelItemData *parent, CircuitItemNodeData::type t)
   : NetlistModelItemData (parent), m_type (t)
 { }
+
+bool
+CircuitItemNodeData::has_children (NetlistBrowserModel *)
+{
+  //  the node only exists if it has children
+  return true;
+}
 
 void
 CircuitItemNodeData::do_ensure_children (NetlistBrowserModel *model)
@@ -2215,6 +2251,12 @@ CircuitNetPinItemData::status (NetlistBrowserModel * /*model*/)
 CircuitSubCircuitPinsItemData::CircuitSubCircuitPinsItemData (NetlistModelItemData *parent, const IndexedNetlistModel::subcircuit_pair &sp)
   : NetlistModelItemData (parent), m_sp (sp)
 { }
+
+bool
+CircuitSubCircuitPinsItemData::has_children (NetlistBrowserModel *model)
+{
+  return model->indexer ()->subcircuit_pin_count (sp ()) > 0;
+}
 
 void
 CircuitSubCircuitPinsItemData::do_ensure_children (NetlistBrowserModel *model)
@@ -2887,8 +2929,7 @@ NetlistBrowserModel::hasChildren (const QModelIndex &parent) const
     d = mp_root.get ();
   }
   if (d) {
-    d->ensure_children (const_cast<NetlistBrowserModel *> (this));
-    return d->begin () != d->end ();
+    return d->has_children (const_cast<NetlistBrowserModel *> (this));
   } else {
     return false;
   }
@@ -3071,7 +3112,7 @@ NetlistBrowserModel::rowCount (const QModelIndex &parent) const
 }
 
 void
-NetlistBrowserModel::show_or_hide_items (QTreeView *view, const QModelIndex &parent, bool show_all, bool with_warnings, bool with_children)
+NetlistBrowserModel::show_or_hide_items (QTreeView *view, const QModelIndex &parent, bool show_all, bool with_warnings, int levels)
 {
   int n = rowCount (parent);
   for (int i = 0; i < n; ++i) {
@@ -3082,8 +3123,8 @@ NetlistBrowserModel::show_or_hide_items (QTreeView *view, const QModelIndex &par
     bool visible = (show_all || (st != db::NetlistCrossReference::Match && (with_warnings || st != db::NetlistCrossReference::MatchWithWarning)));
     view->setRowHidden (int (i), parent, ! visible);
 
-    if (visible && with_children) {
-      show_or_hide_items (view, idx, show_all, with_warnings, false /*just two levels of recursion*/);
+    if (visible && levels > 1) {
+      show_or_hide_items (view, idx, show_all, with_warnings, levels - 1);
     }
 
   }
@@ -3093,7 +3134,7 @@ void
 NetlistBrowserModel::set_item_visibility (QTreeView *view, bool show_all, bool with_warnings)
 {
   //  TODO: this implementation is based on the model but is fairly inefficient
-  show_or_hide_items (view, QModelIndex (), show_all, with_warnings, true);
+  show_or_hide_items (view, QModelIndex (), show_all, with_warnings, 3);
 }
 
 }

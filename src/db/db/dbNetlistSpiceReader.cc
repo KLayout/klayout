@@ -662,7 +662,7 @@ NetlistSpiceReader::SpiceReaderStream::close ()
 std::pair<std::string, bool>
 NetlistSpiceReader::SpiceReaderStream::get_line ()
 {
-  if (mp_text_stream->at_end ()) {
+  if (at_end ()) {
     return std::make_pair (std::string (), false);
   }
 
@@ -708,7 +708,7 @@ NetlistSpiceReader::SpiceReaderStream::source () const
 bool
 NetlistSpiceReader::SpiceReaderStream::at_end () const
 {
-  return mp_text_stream->at_end ();
+  return !m_has_stored_line && mp_text_stream->at_end ();
 }
 
 void

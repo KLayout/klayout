@@ -34,8 +34,8 @@ namespace lay
 
 const double initial_elevation = 15.0;
 
-D25View::D25View (QWidget *parent)
-  : QDialog (parent)
+D25View::D25View (lay::Dispatcher *root, lay::LayoutView *view)
+  : lay::Browser (root, view, "d25_view")
 {
   mp_ui = new Ui::D25View ();
   mp_ui->setupUi (this);
@@ -66,6 +66,24 @@ D25View::~D25View ()
 {
   delete mp_ui;
   mp_ui = 0;
+}
+
+void
+D25View::menu_activated (const std::string &symbol)
+{
+  if (symbol == "lay::net_trace") {
+
+    const lay::CellView &cv = view ()->cellview (view ()->active_cellview_index ());
+    if (cv.is_valid ()) {
+      show ();
+      activateWindow ();
+      raise ();
+      activate ();
+    }
+
+  } else {
+    lay::Browser::menu_activated (symbol);
+  }
 }
 
 static QString scale_factor_to_string (double f)
@@ -181,6 +199,27 @@ D25View::exec_dialog (lay::LayoutView *view)
   }
 
   return ret;
+}
+
+D25View::deactivated ()
+{
+  mp_ui->d25_view->attach_view (0);
+}
+
+void
+D25View::activated ()
+{
+  bool any = mp_ui->d25_view->attach_view (view ());
+  if (! any) {
+    // @@@
+    mp_ui->d25_view->attach_view (0);
+    throw tl::Exception (tl::to_string (tr ("No z data configured for the layers in the view.\nUse \"Tools/Manage Technologies\" to set up a z stack.")));
+  }
+
+  mp_ui->d25_view->reset ();
+  mp_ui->d25_view->set_cam_azimuth (0.0);
+  mp_ui->d25_view->set_cam_elevation (-initial_elevation);
+  mp_ui->d25_view->fit ();
 }
 
 void

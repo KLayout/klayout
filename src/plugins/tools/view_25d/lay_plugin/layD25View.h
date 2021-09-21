@@ -26,6 +26,7 @@
 #include <QDialog>
 
 #include "tlObject.h"
+#include "layBrowser.h"
 
 namespace Ui
 {
@@ -41,15 +42,17 @@ namespace lay
 {
 
 class D25View
-  : public QDialog
+  : public lay::Browser
 {
 Q_OBJECT 
 
 public:
-  D25View (QWidget *parent);
+  D25View (lay::Dispatcher *root, lay::LayoutView *view);
   ~D25View ();
 
-  int exec_dialog (lay::LayoutView *view);
+  virtual void menu_activated (const std::string &symbol);
+  virtual void deactivated ();
+  virtual void activated ();
 
 protected:
   void accept ();
@@ -67,7 +70,6 @@ private slots:
 
 private:
   Ui::D25View *mp_ui;
-  tl::weak_ptr<lay::LayoutView> mp_view;
 };
 
 }

@@ -938,6 +938,10 @@ D25ViewWidget::do_initialize_gl ()
 void
 D25ViewWidget::paintGL ()
 {
+  if (! mp_view) {
+    return;
+  }
+
   const qreal retina_scale = devicePixelRatio ();
   glViewport (0, 0, width () * retina_scale, height () * retina_scale);
 

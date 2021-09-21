@@ -71,14 +71,22 @@ D25View::~D25View ()
 void
 D25View::menu_activated (const std::string &symbol)
 {
-  if (symbol == "lay::net_trace") {
+  if (symbol == "lay::d25_view") {
 
     const lay::CellView &cv = view ()->cellview (view ()->active_cellview_index ());
     if (cv.is_valid ()) {
+
       show ();
       activateWindow ();
       raise ();
-      activate ();
+
+      try {
+        activate ();
+      } catch (...) {
+        deactivate ();
+        throw;
+      }
+
     }
 
   } else {
@@ -164,43 +172,7 @@ D25View::vscale_factor_changed (double f)
   mp_ui->vzoom_slider->blockSignals (false);
 }
 
-int
-D25View::exec_dialog (lay::LayoutView *view)
-{
-  int ret = 0;
-
-  try {
-
-    mp_view.reset (view);
-    bool any = mp_ui->d25_view->attach_view (view);
-
-    if (! any) {
-
-      mp_view.reset (0);
-      mp_ui->d25_view->attach_view (0);
-
-      throw tl::Exception (tl::to_string (tr ("No z data configured for the layers in the view.\nUse \"Tools/Manage Technologies\" to set up a z stack.")));
-
-    }
-
-    mp_ui->d25_view->reset ();
-    mp_ui->d25_view->set_cam_azimuth (0.0);
-    mp_ui->d25_view->set_cam_elevation (-initial_elevation);
-    mp_ui->d25_view->fit ();
-
-    ret = QDialog::exec ();
-
-    mp_ui->d25_view->attach_view (0);
-    mp_view.reset (0);
-
-  } catch (...) {
-    mp_ui->d25_view->attach_view (0);
-    mp_view.reset (0);
-  }
-
-  return ret;
-}
-
+void
 D25View::deactivated ()
 {
   mp_ui->d25_view->attach_view (0);
@@ -211,7 +183,6 @@ D25View::activated ()
 {
   bool any = mp_ui->d25_view->attach_view (view ());
   if (! any) {
-    // @@@
     mp_ui->d25_view->attach_view (0);
     throw tl::Exception (tl::to_string (tr ("No z data configured for the layers in the view.\nUse \"Tools/Manage Technologies\" to set up a z stack.")));
   }

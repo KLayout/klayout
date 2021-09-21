@@ -31,9 +31,9 @@
 #include <QBuffer>
 #include <QByteArray>
 #include <QTimer>
+#include <QNetworkAccessManager>
 #include <memory>
 
-class QNetworkAccessManager;
 class QNetworkReply;
 class QNetworkProxy;
 class QAuthenticator;
@@ -105,6 +105,7 @@ public:
 private slots:
   void finished (QNetworkReply *);
   void resend ();
+  void sslErrors (QNetworkReply *reply, const QList<QSslError> &errors);
 
 private:
   std::string m_url;
@@ -116,6 +117,7 @@ private:
   std::map<std::string, std::string> m_headers;
   tl::Event m_ready;
   QTimer *mp_resend_timer;
+  std::string m_ssl_errors;
 
   void issue_request (const QUrl &url);
 };

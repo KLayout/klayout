@@ -22,4 +22,6 @@ h.with_holes(1..3).output(103, 0)
 h.with_holes(1..1).output(104, 0)
 h.with_holes(2, nil).output(105, 0)
 h.with_holes(0, nil).output(106, 0)
+h.with_holes.output(107, 0)
+h.without_holes.output(108, 0)
 

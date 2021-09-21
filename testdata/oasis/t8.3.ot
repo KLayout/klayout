@@ -23,14 +23,14 @@
 #   </content>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
 
-record CELLNAME 
+record CELLNAME
   str A
-record CELLNAME 
+record CELLNAME
   str TOP
 
 # Cell A
@@ -55,38 +55,38 @@ record XYRELATIVE
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 11110000 ;# CNXYRAAF
   uint 0
-  int -300      ;# placement-x
-  int 400       ;# placement-y
+  int -300      ;# placement-x (relative)
+  int 400       ;# placement-y (relative)
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00110000 ;# CNXYRAAF
-  int 0         ;# placement-x
-  int 400       ;# placement-y
+  int 0         ;# placement-x (relative)
+  int 400       ;# placement-y (relative)
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00010000 ;# CNXYRAAF
-  int 400       ;# placement-y
+  int 400       ;# placement-y (relative)
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00100000 ;# CNXYRAAF
-  int 300       ;# placement-x
+  int 300       ;# placement-x (relative)
 
 record XYABSOLUTE
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00110001 ;# CNXYRAAF
-  int 700       ;# placement-x
-  int 400       ;# placement-y
+  int 700       ;# placement-x (absolute)
+  int 400       ;# placement-y (absolute)
 
 record XYRELATIVE
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00010010 ;# CNXYRAAF
-  int 1000      ;# placement-y
+  int 1000      ;# placement-y (relative)
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00010011 ;# CNXYRAAF
-  int 1000      ;# placement-y
+  int 1000      ;# placement-y (relative)
 
 tail
 

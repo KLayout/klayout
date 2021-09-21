@@ -3423,13 +3423,14 @@ This method is available for edge pair layers only.
 <keyword name="with_holes"/>
 <p>Usage:</p>
 <ul>
+<li><tt>layer.with_holes</tt></li>
 <li><tt>layer.with_holes(count)</tt></li>
 <li><tt>layer.with_holes(min_count, max_count)</tt></li>
 <li><tt>layer.with_holes(min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method is available for polygon layers. It will select all polygons from the input layer
-which have the specified number of holes.
+which have the specified number of holes. Without any argument, all polygons with holes are selected.
 </p>
 <a name="with_internal_angle"/><h2>"with_internal_angle" - Selects edge pairs by their internal angle</h2>
 <keyword name="with_internal_angle"/>
@@ -3667,13 +3668,14 @@ This method is available for edge pair layers only.
 <keyword name="without_holes"/>
 <p>Usage:</p>
 <ul>
+<li><tt>layer.without_holes</tt></li>
 <li><tt>layer.without_holes(count)</tt></li>
 <li><tt>layer.without_holes(min_count, max_count)</tt></li>
 <li><tt>layer.without_holes(min_count .. max_count)</tt></li>
 </ul>
 <p>
 This method is available for polygon layers. It will select all polygons from the input layer
-which do not have the specified number of holes.
+which do not have the specified number of holes. Without any arguments, all polygons without holes are selected.
 </p>
 <a name="without_internal_angle"/><h2>"without_internal_angle" - Selects edge pairs by their internal angle</h2>
 <keyword name="without_internal_angle"/>

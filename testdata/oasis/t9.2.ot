@@ -14,14 +14,14 @@
 #   </content>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
 
 # Cell A
 record CELL_STR
-  str A 
+  str A
 
 # This test is supposed to test, if the H modal variable is not tested
 # if the CTRAPEZOID does not need it.
@@ -42,7 +42,7 @@ record CTRAPEZOID
 
 # Cell B
 record CELL_STR
-  str B 
+  str B
 
 # This test is supposed to test, if the W modal variable is not tested
 # if the CTRAPEZOID does not need it.

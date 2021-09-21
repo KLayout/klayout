@@ -700,3 +700,54 @@ TEST(4)
   }
 }
 
+namespace {
+
+class PCell1Declaration :
+  public db::PCellDeclaration
+{
+  void produce (const db::Layout & /*layout*/, const std::vector<unsigned int> & /*layer_ids*/, const db::pcell_parameters_type & /*parameters*/, db::Cell & /*cell*/) const
+  {
+    // ...
+  }
+};
+
+class PCell2Declaration :
+  public db::PCellDeclaration
+{
+  void produce (const db::Layout & /*layout*/, const std::vector<unsigned int> & /*layer_ids*/, const db::pcell_parameters_type & /*parameters*/, db::Cell &cell) const
+  {
+    //  NOTE: this is the self-reference: we use the library which defines the PCell and create a proxy to itself
+    std::pair<bool, db::lib_id_type> l = db::LibraryManager::instance ().lib_by_name ("__PCellLibrary");
+    tl_assert (l.first);
+    db::Library *lib = db::LibraryManager::instance ().lib (l.second);
+    std::pair<bool, db::pcell_id_type> pcell_id = lib->layout ().pcell_by_name ("PCell1");
+    tl_assert (pcell_id.first);
+    db::cell_index_type pcell_var = lib->layout ().get_pcell_variant_dict (pcell_id.second, std::map<std::string, tl::Variant> ());
+
+    db::cell_index_type lib_cell = cell.layout ()->get_lib_proxy (lib, pcell_var);
+    cell.insert (db::CellInstArray (lib_cell, db::Trans ()));
+  }
+};
+
+}
+
+//  self-referencing libraries
+TEST(5_issue905)
+{
+  std::unique_ptr<db::Library> lib;
+  lib.reset (new db::Library ());
+  lib->set_name ("__PCellLibrary");
+  lib->layout ().register_pcell ("PCell1", new PCell1Declaration ());
+  lib->layout ().register_pcell ("PCell2", new PCell2Declaration ());
+  db::LibraryManager::instance ().register_lib (lib.get ());
+
+  db::Layout ly;
+  std::pair<bool, db::pcell_id_type> pc = lib->layout ().pcell_by_name ("PCell2");
+  tl_assert (pc.first);
+
+  db::cell_index_type lib_cell = lib->layout ().get_pcell_variant_dict (pc.second, std::map<std::string, tl::Variant> ());
+  ly.get_lib_proxy (lib.get (), lib_cell);
+
+  db::LibraryManager::instance ().delete_lib (lib.release ());
+  EXPECT (true);
+}

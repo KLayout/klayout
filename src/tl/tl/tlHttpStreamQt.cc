@@ -246,6 +246,7 @@ InputHttpStreamPrivateData::InputHttpStreamPrivateData (const std::string &url)
     s_auth_handler = new AuthenticationHandler ();
     connect (s_network_manager, SIGNAL (authenticationRequired (QNetworkReply *, QAuthenticator *)), s_auth_handler, SLOT (authenticationRequired (QNetworkReply *, QAuthenticator *)));
     connect (s_network_manager, SIGNAL (proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *)), s_auth_handler, SLOT (proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *)));
+    connect (s_network_manager, SIGNAL (sslErrors (QNetworkReply *, const QList<QSslError> &)), this, SLOT (sslErrors (QNetworkReply *, const QList<QSslError> &)));
 
     tl::StaticObjects::reg (&s_network_manager);
     tl::StaticObjects::reg (&s_auth_handler);
@@ -345,6 +346,8 @@ InputHttpStreamPrivateData::issue_request (const QUrl &url)
 {
   delete mp_buffer;
   mp_buffer = 0;
+
+  m_ssl_errors.clear ();
 
   //  remove old request (important for redirect)
   close ();
@@ -462,13 +465,18 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
         break;
       default:
         em = tl::to_string (QObject::tr ("Network API error"));
+        if (! m_ssl_errors.empty ()) {
+          em += tl::to_string (QObject::tr (" (with SSL errors: "));
+          em += m_ssl_errors;
+          em += ")";
+        }
       }
       ec = int (mp_reply->error ());
     }
 
     QByteArray data = mp_reply->readAll ();
 
-    throw HttpErrorException (em, ec, tl::to_string (mp_reply->url ().toString ()), tl::to_string (data.constData (), (int)data.size ()));
+    throw HttpErrorException (em, ec, tl::to_string (mp_reply->url ().toString ()), tl::to_string (data.constData (), (int) data.size ()));
 
   }
 
@@ -478,6 +486,20 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
     tl::info << "HTTP response data read: " << data.constData ();
   }
   return data.size ();
+}
+
+void
+InputHttpStreamPrivateData::sslErrors (QNetworkReply *, const QList<QSslError> &errors)
+{
+  //  log SSL errors
+  for (QList<QSslError>::const_iterator e = errors.begin (); e != errors.end (); ++e) {
+    if (! m_ssl_errors.empty ()) {
+      m_ssl_errors += ", ";
+    }
+    m_ssl_errors += "\"";
+    m_ssl_errors += tl::to_string (e->errorString ());
+    m_ssl_errors += "\"";
+  }
 }
 
 void

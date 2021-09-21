@@ -324,6 +324,12 @@ TextGenerator::set_font_paths (const std::vector<std::string> &paths)
   s_fonts_loaded = false;
 }
 
+std::vector<std::string>
+TextGenerator::font_paths ()
+{
+  return s_font_paths;
+}
+
 const std::vector<TextGenerator> &
 TextGenerator::generators ()
 {

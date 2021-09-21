@@ -11,7 +11,7 @@
 # </test>
 
 
-header 
+header
 # parts of START record
 real 7 12.5
 uint 0 ;# offset table is in start record

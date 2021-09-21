@@ -8,7 +8,7 @@
 #   <must-fail>Explicit and implicit TEXTSTRING modes cannot be mixed</must-fail>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
@@ -17,14 +17,14 @@ header
 record TEXTSTRING_ID
   str A
   uint 1
-  
+
 # Text definition
 record TEXTSTRING
   str B           ;# FAILS
 
 # Cell ABC
 record CELL_STR
-  str ABC 
+  str ABC
 
 record TEXT
   bits 01111011 ;# 0CNXYRTL

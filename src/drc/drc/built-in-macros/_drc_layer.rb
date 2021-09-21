@@ -544,22 +544,24 @@ CODE
     # %DRC%
     # @name with_holes
     # @brief Selects all polygons with the specified number of holes 
+    # @synopsis layer.with_holes
     # @synopsis layer.with_holes(count)
     # @synopsis layer.with_holes(min_count, max_count)
     # @synopsis layer.with_holes(min_count .. max_count)
     #
     # This method is available for polygon layers. It will select all polygons from the input layer
-    # which have the specified number of holes.
+    # which have the specified number of holes. Without any argument, all polygons with holes are selected.
 
     # %DRC%
     # @name without_holes
     # @brief Selects all polygons with the specified number of holes 
+    # @synopsis layer.without_holes
     # @synopsis layer.without_holes(count)
     # @synopsis layer.without_holes(min_count, max_count)
     # @synopsis layer.without_holes(min_count .. max_count)
     #
     # This method is available for polygon layers. It will select all polygons from the input layer
-    # which do not have the specified number of holes.
+    # which do not have the specified number of holes. Without any arguments, all polygons without holes are selected.
 
     %w(holes).each do |f|
       [true, false].each do |inv|
@@ -570,7 +572,9 @@ CODE
           @engine._context("#{mn}") do
 
             requires_region
-            if args.size == 1
+            if args.size == 0
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Region, :with_#{f}, 1, nil, #{inv.inspect}))
+            elsif args.size == 1
               a = args[0]
               if a.is_a?(Range)
                 min = @engine._make_numeric_value_with_nil(a.begin)

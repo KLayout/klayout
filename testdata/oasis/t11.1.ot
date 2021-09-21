@@ -9,7 +9,7 @@
 #   <test-intention>Property name references by ID</test-intention>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
@@ -26,15 +26,15 @@ record PROPSTRING_ID
 
 # property name 0
 record PROPNAME
-  str PROP0 
+  str PROP0
 
 # property name 1
 record PROPNAME
-  str PROP1 
+  str PROP1
 
 # Cell A
 record CELL_STR
-  str A 
+  str A
 
 record XYRELATIVE
 
@@ -45,7 +45,7 @@ record RECTANGLE
   uint 100      ;# width
   uint 200      ;# height
 
-record PROPERTY 
+record PROPERTY
   bits 00000100 ;# property info byte UUUUVCNS
   str PROPX
 
@@ -55,12 +55,12 @@ record RECTANGLE
   uint 2        ;# datatype
   uint 100      ;# width
   uint 200      ;# height
-  int 0   
-  int 1000
+  int 0         ;# geometry-x (relative)
+  int 1000      ;# geometry-y (relative)
 
-record PROPERTY 
+record PROPERTY
   bits 00010110 ;# property info byte UUUUVCNS
-  uint 0
+  uint 0        ;# propname-id
   real 1 -5     ;# prop value #0
 
 record RECTANGLE
@@ -69,14 +69,14 @@ record RECTANGLE
   uint 2        ;# datatype
   uint 100      ;# width
   uint 200      ;# height
-  int 0   
-  int 1000
+  int 0         ;# geometry-x (relative)
+  int 1000      ;# geometry-y (relative)
 
-record PROPERTY 
+record PROPERTY
   bits 01000110 ;# property info byte UUUUVCNS
   uint 0        ;# propname-id
   uint 8        ;# prop-value #0 (unsigned int)
-    uint 25   
+    uint 25
   uint 9        ;# prop-value #1 (signed int)
     int -124
   uint 10       ;# prop-value #2 (a-string)
@@ -90,14 +90,14 @@ record RECTANGLE
   uint 2        ;# datatype
   uint 100      ;# width
   uint 200      ;# height
-  int 0   
-  int 1000
+  int 0         ;# geometry-x (relative)
+  int 1000      ;# geometry-y (relative)
 
-record PROPERTY 
+record PROPERTY
   bits 11110000 ;# property info byte UUUUVCNS
   uint 3        ;# number of values
   uint 0        ;# prop-value #0 (real as unsigned int)
-    uint 25   
+    uint 25
   uint 9        ;# prop-value #1 (signed int)
     int -124
   uint 14       ;# prop-value #2 (prop-string reference number)
@@ -109,10 +109,10 @@ record RECTANGLE
   uint 2        ;# datatype
   uint 100      ;# width
   uint 200      ;# height
-  int 0   
-  int 1000
+  int 0         ;# geometry-x (relative)
+  int 1000      ;# geometry-y (relative)
 
-record PROPERTY 
+record PROPERTY
   bits 00001000 ;# property info byte UUUUVCNS
 
 record XYABSOLUTE
@@ -122,8 +122,8 @@ record TEXT
   str A         ;# text-string
   uint 2        ;# text-layer
   uint 1        ;# text-datatype
-  int 1000
-  int 0
+  int 1000      ;# text-x (absolute)
+  int 0         ;# text-y (absolute)
 
 record PROPERTY_REP
 
@@ -133,15 +133,15 @@ record PATH
   uint 2        ;# datatype
   uint 10       ;# half-width
   bits 00001111 ;# extension-scheme SSEE
-    int 5      
+    int 5
     int -5
   uint 0        ;# pointlist: 1-delta (hor. first)
-    uint 3 
+    uint 3
     int 150
     int 50
     int -50
-  int 2000      ;# geometry-x 
-  int 0         ;# geometry-y 
+  int 2000      ;# geometry-x (absolute)
+  int 0         ;# geometry-y (absolute)
 
 record PROPERTY_REP
 
@@ -150,17 +150,17 @@ record POLYGON
   uint 1        ;# layer
   uint 2        ;# datatype
   uint 0        ;# pointlist: 1-delta (hor. first)
-    uint 4   
+    uint 4
     int 150
     int 50
     int -50
     int 50
-  int 3000      ;# geometry-x 
-  int 0         ;# geometry-y 
+  int 3000      ;# geometry-x (absolute)
+  int 0         ;# geometry-y (absolute)
 
 record PROPERTY_REP
 
-record PROPERTY 
+record PROPERTY
   bits 00000110 ;# property info byte UUUUVCNS
   uint 1        ;# propname-id
 

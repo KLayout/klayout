@@ -133,6 +133,7 @@ public:
   virtual QString search_text () = 0;
   virtual std::string tooltip (NetlistBrowserModel *model) = 0;
   virtual db::NetlistCrossReference::Status status (NetlistBrowserModel *model) = 0;
+  virtual bool has_children (NetlistBrowserModel *model) = 0;
 
   void ensure_children (NetlistBrowserModel *model);
 
@@ -372,7 +373,7 @@ private:
     return std::pair<const db::Netlist *, const db::Netlist *> (mp_l2ndb->netlist (), (const db::Netlist *)0);
   }
 
-  void show_or_hide_items (QTreeView *view, const QModelIndex &parent, bool show_all, bool with_warnings, bool with_children);
+  void show_or_hide_items (QTreeView *view, const QModelIndex &parent, bool show_all, bool with_warnings, int levels);
 
   db::LayoutToNetlist *mp_l2ndb;
   db::LayoutVsSchematic *mp_lvsdb;

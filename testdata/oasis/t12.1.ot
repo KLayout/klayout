@@ -7,14 +7,14 @@
 #   <test-intention>Circle-related modal variables</test-intention>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
 
 # Cell A
 record CELL_STR
-  str A 
+  str A
 
 record CIRCLE
   bits 00111011 ;# 00rXYRDL
@@ -55,7 +55,7 @@ record CIRCLE
   uint 100      ;# radius
   int 400       ;# geometry-y (relative)
   uint 1        ;# repetition (3x4 matrix)
-    uint 1       
+    uint 1
     uint 2
     uint 400
     uint 300

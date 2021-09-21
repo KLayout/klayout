@@ -24,14 +24,14 @@
 #   </content>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
 
-record CELLNAME 
+record CELLNAME
   str A
-record CELLNAME 
+record CELLNAME
   str TOP
 
 # Cell TOP
@@ -43,48 +43,48 @@ record XYRELATIVE
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 11111000 ;# CNXYRAAF
   uint 0
-  int -300      ;# placement-x
-  int 400       ;# placement-y
+  int -300      ;# placement-x (relative)
+  int 400       ;# placement-y (relative)
   uint 1        ;# repetition (3x4 matrix)
-    uint 1       
+    uint 1
     uint 2
     uint 20
     uint 30
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00111000 ;# CNXYRAAF
-  int 0         ;# placement-x
-  int 400       ;# placement-y
+  int 0         ;# placement-x (relative)
+  int 400       ;# placement-y (relative)
   uint 0        ;# repetition (reuse)
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00011000 ;# CNXYRAAF
-  int 400       ;# placement-y
+  int 400       ;# placement-y (relative)
   uint 0        ;# repetition (reuse)
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00101000 ;# CNXYRAAF
-  int 300       ;# placement-x
+  int 300       ;# placement-x (relative)
   uint 0        ;# repetition (reuse)
 
 record XYABSOLUTE
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00111001 ;# CNXYRAAF
-  int 700       ;# placement-x
-  int 400       ;# placement-y
+  int 700       ;# placement-x (absolute)
+  int 400       ;# placement-y (absolute)
   uint 0        ;# repetition (reuse)
 
 record XYRELATIVE
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00011010 ;# CNXYRAAF
-  int 1000      ;# placement-y
+  int 1000      ;# placement-y (relative)
   uint 0        ;# repetition (reuse)
 
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00011011 ;# CNXYRAAF
-  int 1000      ;# placement-y
+  int 1000      ;# placement-y (relative)
   uint 0        ;# repetition (reuse)
 
 # Cell A

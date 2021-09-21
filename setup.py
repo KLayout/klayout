@@ -564,7 +564,6 @@ rdb_sources = set(glob.glob(os.path.join(rdb_path, "*.cc")))
 
 rdb = Extension(config.root + '.rdbcore',
                 define_macros=config.macros(),
-
                 include_dirs=[_rdb_path, _tl_path, _gsi_path, _pya_path],
                 extra_objects=[config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
                 extra_link_args=config.link_args('rdbcore'),

@@ -171,7 +171,7 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext & /*ctx*/, const Q
     abort();
   case QtInfoMsg:
     fprintf(stderr, "Info: %s\n", msg.toLocal8Bit ().constData ());
-    abort();
+    break;
   }
 }
 #else

@@ -43,14 +43,14 @@
 #   </content>
 # </test>
 
-header 
+header
   real 0 1000.0
   uint 0 ;# offset table is in start record
   for { set i 0 } { $i < 12 } { incr i } { uint 0 }
 
 # Cell ABC
 record CELL_STR
-  str ABC 
+  str ABC
 
 record PATH
   bits 11111011 ;# EWPXYRDL
@@ -58,10 +58,10 @@ record PATH
   uint 2        ;# datatype
   uint 10       ;# half-width
   bits 00001111 ;# extension-scheme SSEE
-    int 5      
+    int 5
     int -5
   uint 0        ;# pointlist: 1-delta (hor. first)
-    uint 3 
+    uint 3
     int 150
     int 50
     int -50
@@ -77,7 +77,7 @@ record PATH
   uint 10       ;# half-width
   bits 00000000 ;# extension-scheme SSEE
   uint 0        ;# pointlist: 1-delta (hor. first)
-    uint 3 
+    uint 3
     int 150
     int 50
     int -50
@@ -89,7 +89,7 @@ record PATH
   uint 10       ;# half-width
   bits 00000100 ;# extension-scheme SSEE
   uint 0        ;# pointlist: 1-delta (hor. first)
-    uint 3 
+    uint 3
     int 150
     int 50
     int -50
@@ -101,7 +101,7 @@ record PATH
   uint 12       ;# half-width
   bits 00000101 ;# extension-scheme SSEE
   uint 0        ;# pointlist: 1-delta (hor. first)
-    uint 3 
+    uint 3
     int 150
     int 50
     int -50
@@ -113,7 +113,7 @@ record PATH
   uint 2        ;# datatype
   bits 00001010 ;# extension-scheme SSEE
   uint 0        ;# pointlist: 1-delta (hor. first)
-    uint 3 
+    uint 3
     int 150
     int 50
     int -50
@@ -131,7 +131,7 @@ record PATH
   uint 3        ;# datatype
   int 200       ;# geometry-y (relative)
   uint 1        ;# repetition (3x4 matrix)
-    uint 1       
+    uint 1
     uint 2
     uint 200
     uint 300
@@ -140,7 +140,7 @@ record XYRELATIVE
 
 record PATH
   bits 00010101 ;# EWPXYRDL
-  uint 1        ;# datatype
+  uint 1        ;# layer
   int 1000      ;# geometry-x (relative)
   uint 0        ;# repetition (reuse)
 

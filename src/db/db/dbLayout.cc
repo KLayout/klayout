@@ -1420,12 +1420,21 @@ Layout::topological_sort ()
 {
   m_top_cells = 0;
   m_top_down_list.clear ();
-  m_top_down_list.reserve (m_cells_size);
+
+  //  NOTE: we explicitly count the cells here and do not rely on "m_cell_size".
+  //  Reason is that this is somewhat safer, specifically directly after take() when
+  //  the cell list is already reduced, but the cell pointers are still containing the cell
+  //  (issue #905)
+  size_t ncells = 0;
+  for (const_iterator c = begin (); c != end (); ++c) {
+    ++ncells;
+  }
+  m_top_down_list.reserve (ncells);
 
   std::vector<size_t> num_parents (m_cell_ptrs.size (), 0);
 
   //  while there are cells to treat ..
-  while (m_top_down_list.size () != m_cells_size) {
+  while (m_top_down_list.size () != ncells) {
 
     size_t n_top_down_cells = m_top_down_list.size ();
 

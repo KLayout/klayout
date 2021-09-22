@@ -54,6 +54,7 @@ namespace lay
 {
 
 class LayoutView;
+class LayerPropertiesNode;
 class D25ViewWidget;
 
 class D25InteractionMode
@@ -142,10 +143,11 @@ public slots:
   void fit ();
 
 private:
-  typedef lay::mem_chunks<GLfloat, 1024 * 18> chunks_type;
+  typedef lay::mem_chunks<GLfloat, 1024 * 18> triangle_chunks_type;
+  typedef lay::mem_chunks<GLfloat, 1024 * 6> line_chunks_type;
 
   std::unique_ptr<D25InteractionMode> mp_mode;
-  QOpenGLShaderProgram *m_shapes_program, *m_gridplane_program;
+  QOpenGLShaderProgram *m_shapes_program, *m_lines_program, *m_gridplane_program;
   std::string m_error;
   double m_scale_factor;
   double m_vscale_factor;
@@ -154,11 +156,14 @@ private:
   db::DBox m_bbox;
   double m_zmin, m_zmax;
 
-  std::list<chunks_type> m_vertex_chunks;
+  std::list<triangle_chunks_type> m_vertex_chunks;
+  std::list<line_chunks_type> m_line_chunks;
 
   struct LayerInfo {
-    const chunks_type *vertex_chunk;
+    const triangle_chunks_type *vertex_chunk;
+    const line_chunks_type *line_chunk;
     GLfloat color [4];
+    GLfloat frame_color [4];
     bool visible;
   };
 
@@ -171,10 +176,11 @@ private:
 
   void do_initialize_gl ();
   bool prepare_view();
-  void render_layout (tl::AbsoluteProgress &progress, D25ViewWidget::chunks_type &chunks, const db::Layout &layout, const db::Cell &cell, const db::Box &clip_box, unsigned int layer, double zstart, double zstop);
-  void render_polygon (D25ViewWidget::chunks_type &chunks, const db::Polygon &poly, double dbu, double zstart, double zstop);
-  void render_wall (D25ViewWidget::chunks_type &chunks, const db::Edge &poly, double dbu, double zstart, double zstop);
+  void render_layout (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Layout &layout, const db::Cell &cell, const db::Box &clip_box, unsigned int layer, double zstart, double zstop);
+  void render_polygon (D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Polygon &poly, double dbu, double zstart, double zstop);
+  void render_wall (D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Edge &poly, double dbu, double zstart, double zstop);
   void reset_viewport ();
+  static void lp_to_info (const lay::LayerPropertiesNode &lp, D25ViewWidget::LayerInfo &info);
 };
 
 }

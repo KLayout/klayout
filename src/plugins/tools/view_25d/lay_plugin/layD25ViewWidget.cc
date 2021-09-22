@@ -191,7 +191,7 @@ private:
 
 D25ViewWidget::D25ViewWidget (QWidget *parent)
   : QOpenGLWidget (parent),
-    m_shapes_program (0), m_gridplane_program (0)
+    m_shapes_program (0), m_lines_program (0), m_gridplane_program (0)
 {
   QSurfaceFormat format;
   format.setDepthBufferSize (24);
@@ -212,6 +212,8 @@ D25ViewWidget::~D25ViewWidget ()
   makeCurrent ();
 
   delete m_shapes_program;
+  delete m_lines_program;
+  delete m_gridplane_program;
 
   doneCurrent ();
 }
@@ -579,12 +581,30 @@ static void color_to_gl (color_t color, GLfloat (&gl_color) [4])
   gl_color[3] = 1.0f;
 }
 
+void
+D25ViewWidget::lp_to_info (const lay::LayerPropertiesNode &lp, LayerInfo &info)
+{
+  color_to_gl (lp.fill_color (true), info.color);
+  if (lp.dither_pattern (true) == 1 /*hollow*/) {
+    info.color [3] = 0.0f;
+  }
+
+  color_to_gl (lp.frame_color (true), info.frame_color);
+  if (lp.frame_color (true) == lp.fill_color (true) && info.color [3] > 0.5) {
+    //  optimize: don't draw wire frame unless required
+    info.frame_color [3] = 0.0f;
+  }
+
+  info.visible = lp.visible (true);
+}
+
 bool
 D25ViewWidget::prepare_view ()
 {
   m_layers.clear ();
   m_layer_to_info.clear ();
   m_vertex_chunks.clear ();
+  m_line_chunks.clear ();
 
   bool zset = false;
   m_zmin = m_zmax = 0.0;
@@ -639,19 +659,20 @@ D25ViewWidget::prepare_view ()
 
       lay::color_t color = lp->fill_color (true);
 
-      m_vertex_chunks.push_back (chunks_type ());
+      m_vertex_chunks.push_back (triangle_chunks_type ());
+      m_line_chunks.push_back (line_chunks_type ());
 
       LayerInfo info;
-      color_to_gl (color, info.color);
+      lp_to_info (*lp, info);
       info.vertex_chunk = &m_vertex_chunks.back ();
-      info.visible = lp->visible (true);
+      info.line_chunk = &m_line_chunks.back ();
 
       m_layer_to_info [std::make_pair (lp->cellview_index (), lp->layer_index ())] = m_layers.size ();
       m_layers.push_back (info);
 
       const lay::CellView &cv = mp_view->cellview ((unsigned int) lp->cellview_index ());
 
-      render_layout (progress, m_vertex_chunks.back (), cv->layout (), *cv.cell (), db::CplxTrans (cv->layout ().dbu ()).inverted () * m_bbox, (unsigned int) lp->layer_index (), z0, z1);
+      render_layout (progress, m_vertex_chunks.back (), m_line_chunks.back (), cv->layout (), *cv.cell (), db::CplxTrans (cv->layout ().dbu ()).inverted () * m_bbox, (unsigned int) lp->layer_index (), z0, z1);
 
       if (! zset) {
         m_zmin = z0;
@@ -677,30 +698,23 @@ D25ViewWidget::refresh_view ()
   }
 
   for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
-
     std::map<std::pair<size_t, size_t>, size_t>::const_iterator l = m_layer_to_info.find (std::make_pair (lp->cellview_index (), lp->layer_index ()));
     if (l != m_layer_to_info.end ()) {
-
       if (l->second < m_layers.size ()) {
-
-        LayerInfo &info = m_layers [l->second];
-
-        color_to_gl (lp->fill_color (true), info.color);
-        info.visible = lp->visible (true);
-
+        lp_to_info (*lp, m_layers [l->second]);
       }
-
     }
-
   }
 
   refresh ();
 }
 
 void
-D25ViewWidget::render_polygon (D25ViewWidget::chunks_type &chunks, const db::Polygon &poly, double dbu, double zstart, double zstop)
+D25ViewWidget::render_polygon (D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Polygon &poly, double dbu, double zstart, double zstop)
 {
   if (poly.holes () > 0) {
+
+    //  NOTE: line_chunks isn't really used as of now. "render_wall" does the job.
 
     std::vector<db::Polygon> poly_heap;
 
@@ -712,7 +726,7 @@ D25ViewWidget::render_polygon (D25ViewWidget::chunks_type &chunks, const db::Pol
     ep.process (out, op);
 
     for (std::vector<db::Polygon>::const_iterator p = poly_heap.begin (); p != poly_heap.end (); ++p) {
-      render_polygon (chunks, *p, dbu, zstart, zstop);
+      render_polygon (chunks, line_chunks, *p, dbu, zstart, zstop);
     }
 
   } else if (poly.hull ().size () > 4) {
@@ -721,7 +735,7 @@ D25ViewWidget::render_polygon (D25ViewWidget::chunks_type &chunks, const db::Pol
 
     db::split_polygon (poly, poly_heap);
     for (std::vector<db::Polygon>::const_iterator p = poly_heap.begin (); p != poly_heap.end (); ++p) {
-      render_polygon (chunks, *p, dbu, zstart, zstop);
+      render_polygon (chunks, line_chunks, *p, dbu, zstart, zstop);
     }
 
   } else if (poly.hull ().size () >= 3) {
@@ -758,7 +772,7 @@ D25ViewWidget::render_polygon (D25ViewWidget::chunks_type &chunks, const db::Pol
 }
 
 void
-D25ViewWidget::render_wall (D25ViewWidget::chunks_type &chunks, const db::Edge &edge, double dbu, double zstart, double zstop)
+D25ViewWidget::render_wall (D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Edge &edge, double dbu, double zstart, double zstop)
 {
   chunks.add (edge.p1 ().x () * dbu, zstart, edge.p1 ().y () * dbu);
   chunks.add (edge.p2 ().x () * dbu, zstop, edge.p2 ().y () * dbu);
@@ -766,10 +780,17 @@ D25ViewWidget::render_wall (D25ViewWidget::chunks_type &chunks, const db::Edge &
   chunks.add (edge.p1 ().x () * dbu, zstart, edge.p1 ().y () * dbu);
   chunks.add (edge.p2 ().x () * dbu, zstart, edge.p2 ().y () * dbu);
   chunks.add (edge.p2 ().x () * dbu, zstop, edge.p2 ().y () * dbu);
+
+  line_chunks.add (edge.p1 ().x () * dbu, zstart, edge.p1 ().y () * dbu);
+  line_chunks.add (edge.p2 ().x () * dbu, zstart, edge.p2 ().y () * dbu);
+  line_chunks.add (edge.p2 ().x () * dbu, zstart, edge.p2 ().y () * dbu);
+  line_chunks.add (edge.p2 ().x () * dbu, zstop, edge.p2 ().y () * dbu);
+  line_chunks.add (edge.p2 ().x () * dbu, zstop, edge.p2 ().y () * dbu);
+  line_chunks.add (edge.p1 ().x () * dbu, zstop, edge.p1 ().y () * dbu);
 }
 
 void
-D25ViewWidget::render_layout (tl::AbsoluteProgress &progress, D25ViewWidget::chunks_type &chunks, const db::Layout &layout, const db::Cell &cell, const db::Box &clip_box, unsigned int layer, double zstart, double zstop)
+D25ViewWidget::render_layout (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Layout &layout, const db::Cell &cell, const db::Box &clip_box, unsigned int layer, double zstart, double zstop)
 {
   std::vector<db::Polygon> poly_heap;
 
@@ -790,10 +811,10 @@ D25ViewWidget::render_layout (tl::AbsoluteProgress &progress, D25ViewWidget::chu
 
       ++progress;
 
-      render_polygon (chunks, *p, layout.dbu (), zstart, zstop);
+      render_polygon (chunks, line_chunks, *p, layout.dbu (), zstart, zstop);
 
       for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
-        render_wall (chunks, *e, layout.dbu (), zstart, zstop);
+        render_wall (chunks, line_chunks, *e, layout.dbu (), zstart, zstop);
       }
 
     }
@@ -826,6 +847,7 @@ D25ViewWidget::initializeGL ()
 {
   tl_assert (m_shapes_program == 0);
   tl_assert (m_gridplane_program == 0);
+  tl_assert (m_lines_program == 0);
 
   bool error = false;
 
@@ -846,6 +868,8 @@ D25ViewWidget::initializeGL ()
 
     delete m_shapes_program;
     m_shapes_program = 0;
+    delete m_lines_program;
+    m_lines_program = 0;
     delete m_gridplane_program;
     m_gridplane_program = 0;
 
@@ -939,6 +963,53 @@ D25ViewWidget::do_initialize_gl ()
     throw tl::Exception (std::string ("Shapes shader program linking failed failed:\n") + tl::to_string (m_shapes_program->log ()));
   }
 
+  static const char *lines_vertex_shader_source =
+      "#version 150\n"
+      "\n"
+      "in vec4 posAttr;\n"
+      "uniform mat4 matrix;\n"
+      "\n"
+      "void main() {\n"
+      "   gl_Position = matrix * posAttr;\n"
+      "}\n";
+
+  static const char *lines_fragment_shader_source =
+      "#version 150\n"
+      "\n"
+      "uniform lowp vec4 color;\n"
+      "out lowp vec4 fragColor;\n"
+      "uniform highp float mist_factor;\n"
+      "uniform highp float mist_add;\n"
+      "\n"
+      "lowp vec4 color_by_z(lowp vec4 c, highp float z) {\n"
+      "  highp float mist_rgb = c.g * mist_factor + mist_add;\n"
+      "  lowp vec4 mist_color = vec4(mist_rgb, mist_rgb, mist_rgb, 1.0);\n"
+      "  highp float d = 0.12;\n" //  d + dd/2 = 0.15 = 1/?
+      "  highp float dd = 0.06;\n"
+      "  highp float f = 1.0;\n"
+      "  if (z < d - dd) {\n"
+      "    f = 0.0;\n"
+      "  } else if (z < d + dd) {\n"
+      "    f = (z - (d - dd)) / (2.0 * dd);\n"
+      "  }\n"
+      "  return (1.0 - f) * mist_color + f * c;\n"
+      "};\n"
+      "\n"
+      "void main() {\n"
+      "   fragColor = color_by_z(color, gl_FragCoord.w);\n"
+      "}\n";
+
+  m_lines_program = new QOpenGLShaderProgram (this);
+  if (! m_lines_program->addShaderFromSourceCode (QOpenGLShader::Vertex, lines_vertex_shader_source)) {
+    throw tl::Exception (std::string ("Lines vertex shader compilation failed:\n") + tl::to_string (m_lines_program->log ()));
+  }
+  if (! m_lines_program->addShaderFromSourceCode (QOpenGLShader::Fragment, lines_fragment_shader_source)) {
+    throw tl::Exception (std::string ("Lines fragment shader compilation failed:\n") + tl::to_string (m_lines_program->log ()));
+  }
+  if (! m_lines_program->link ()) {
+    throw tl::Exception (std::string ("Lines shader program linking failed failed:\n") + tl::to_string (m_lines_program->log ()));
+  }
+
   //  grid plane shader source
 
   static const char *gridplan_vertex_shader_source =
@@ -990,7 +1061,7 @@ D25ViewWidget::paintGL ()
   glClearColor (float (c.red ()) / 255.0f, float (c.green ()) / 255.0f, float (c.blue ()) / 255.0f, 1.0);
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  if (! m_shapes_program || ! m_gridplane_program) {
+  if (! m_shapes_program || ! m_lines_program || ! m_gridplane_program) {
     return;
   }
 
@@ -1024,7 +1095,7 @@ D25ViewWidget::paintGL ()
   glEnableVertexAttribArray (positions);
 
   for (std::vector<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    if (l->visible) {
+    if (l->visible && l->color [3] > 0.5) {
       m_shapes_program->setUniformValue ("color", l->color [0], l->color [1], l->color [2], l->color [3]);
       l->vertex_chunk->draw_to (this, positions, GL_TRIANGLES);
     }
@@ -1033,6 +1104,35 @@ D25ViewWidget::paintGL ()
   glDisableVertexAttribArray (positions);
 
   m_shapes_program->release ();
+
+
+  //  wire lines
+
+  m_lines_program->bind ();
+
+  m_lines_program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans);
+
+  //  NOTE: z axis of illum points towards the scene because we include the z inversion in the scene transformation matrix
+  m_lines_program->setUniformValue ("illum", QVector3D (-3.0, -4.0, 2.0).normalized ());
+
+  m_lines_program->setUniformValue ("ambient", QVector4D (ambient, ambient, ambient, 1.0));
+  m_lines_program->setUniformValue ("mist_factor", mist_factor);
+  m_lines_program->setUniformValue ("mist_add", mist_add);
+
+  glEnable (GL_DEPTH_TEST);
+  glEnableVertexAttribArray (positions);
+  glLineWidth (1.0);
+
+  for (std::vector<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+    if (l->visible && l->frame_color [3] > 0.5) {
+      m_lines_program->setUniformValue ("color", l->frame_color [0], l->frame_color [1], l->frame_color [2], l->frame_color [3]);
+      l->line_chunk->draw_to (this, positions, GL_LINES);
+    }
+  }
+
+  glDisableVertexAttribArray (positions);
+
+  m_lines_program->release ();
 
 
   //  decoration

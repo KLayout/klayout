@@ -280,7 +280,7 @@ public:
     menu_entries.push_back (lay::menu_item ("edt::sel_make_array", "make_array:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Make Array"))));
     menu_entries.push_back (lay::separator ("selection_group:edit_mode", "edit_menu.selection_menu.end"));
     menu_entries.push_back (lay::menu_item ("edt::sel_change_layer", "change_layer:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Change Layer"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_tap", "tap:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Tap")) + "(T)"));
+    menu_entries.push_back (lay::menu_item ("edt::sel_tap", "tap", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Tap")) + "(T)"));
     menu_entries.push_back (lay::menu_item ("edt::sel_align", "align:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Align"))));
     menu_entries.push_back (lay::menu_item ("edt::sel_distribute", "distribute:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Distribute"))));
     menu_entries.push_back (lay::menu_item ("edt::sel_round_corners", "round_corners:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Round Corners"))));

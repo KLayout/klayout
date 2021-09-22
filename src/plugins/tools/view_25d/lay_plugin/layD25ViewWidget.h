@@ -88,6 +88,7 @@ public:
   void mouseMoveEvent (QMouseEvent *event);
 
   bool attach_view(lay::LayoutView *view);
+  void refresh_view ();
 
   QVector3D hit_point_with_scene(const QVector3D &line_dir);
   void refresh ();
@@ -158,9 +159,11 @@ private:
   struct LayerInfo {
     const chunks_type *vertex_chunk;
     GLfloat color [4];
+    bool visible;
   };
 
-  std::list<LayerInfo> m_layers;
+  std::vector<LayerInfo> m_layers;
+  std::map<std::pair<size_t, size_t>, size_t> m_layer_to_info;
 
   void initializeGL ();
   void paintGL ();

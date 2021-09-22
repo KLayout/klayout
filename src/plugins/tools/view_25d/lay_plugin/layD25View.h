@@ -70,6 +70,9 @@ private slots:
 
 private:
   Ui::D25View *mp_ui;
+
+  void cellviews_changed ();
+  void layer_properties_changed (int);
 };
 
 }

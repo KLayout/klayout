@@ -60,12 +60,31 @@ D25View::D25View (lay::Dispatcher *root, lay::LayoutView *view)
   mp_ui->gl_stack->setCurrentIndex (0);
 
   lay::activate_help_links (mp_ui->doc_label);
+
+  view->cellviews_changed_event.add (this, &D25View::cellviews_changed);
+  view->layer_list_changed_event.add (this, &D25View::layer_properties_changed);
 }
 
 D25View::~D25View ()
 {
   delete mp_ui;
   mp_ui = 0;
+
+  if (view ()) {
+    view ()->cellviews_changed_event.remove (this, &D25View::cellviews_changed);
+  }
+}
+
+void
+D25View::cellviews_changed ()
+{
+  deactivate ();
+}
+
+void
+D25View::layer_properties_changed (int)
+{
+  mp_ui->d25_view->refresh_view ();
 }
 
 void

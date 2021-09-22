@@ -571,10 +571,19 @@ namespace {
 
 }
 
+static void color_to_gl (color_t color, GLfloat (&gl_color) [4])
+{
+  gl_color[0] = ((color >> 16) & 0xff) / 255.0f;
+  gl_color[1] = ((color >> 8) & 0xff) / 255.0f;
+  gl_color[2] = (color & 0xff) / 255.0f;
+  gl_color[3] = 1.0f;
+}
+
 bool
 D25ViewWidget::prepare_view ()
 {
   m_layers.clear ();
+  m_layer_to_info.clear ();
   m_vertex_chunks.clear ();
 
   bool zset = false;
@@ -594,7 +603,7 @@ D25ViewWidget::prepare_view ()
   for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
 
     std::vector<db::D25LayerInfo> zinfo;
-    if (! lp->has_children () && lp->visible (true)) {
+    if (! lp->has_children ()) {
       zinfo = zdata (mp_view, lp->cellview_index (), lp->layer_index ());
     }
 
@@ -617,7 +626,7 @@ D25ViewWidget::prepare_view ()
   for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
 
     std::vector<db::D25LayerInfo> zinfo;
-    if (! lp->has_children () && lp->visible (true)) {
+    if (! lp->has_children ()) {
       zinfo = zdata (mp_view, lp->cellview_index (), lp->layer_index ());
     }
 
@@ -633,11 +642,11 @@ D25ViewWidget::prepare_view ()
       m_vertex_chunks.push_back (chunks_type ());
 
       LayerInfo info;
-      info.color[0] = ((color >> 16) & 0xff) / 255.0f;
-      info.color[1] = ((color >> 8) & 0xff) / 255.0f;
-      info.color[2] = (color & 0xff) / 255.0f;
+      color_to_gl (color, info.color);
       info.vertex_chunk = &m_vertex_chunks.back ();
+      info.visible = lp->visible (true);
 
+      m_layer_to_info [std::make_pair (lp->cellview_index (), lp->layer_index ())] = m_layers.size ();
       m_layers.push_back (info);
 
       const lay::CellView &cv = mp_view->cellview ((unsigned int) lp->cellview_index ());
@@ -658,6 +667,34 @@ D25ViewWidget::prepare_view ()
   }
 
   return any;
+}
+
+void
+D25ViewWidget::refresh_view ()
+{
+  if (! mp_view) {
+    return;
+  }
+
+  for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
+
+    std::map<std::pair<size_t, size_t>, size_t>::const_iterator l = m_layer_to_info.find (std::make_pair (lp->cellview_index (), lp->layer_index ()));
+    if (l != m_layer_to_info.end ()) {
+
+      if (l->second < m_layers.size ()) {
+
+        LayerInfo &info = m_layers [l->second];
+
+        color_to_gl (lp->fill_color (true), info.color);
+        info.visible = lp->visible (true);
+
+      }
+
+    }
+
+  }
+
+  refresh ();
 }
 
 void
@@ -986,9 +1023,11 @@ D25ViewWidget::paintGL ()
   glEnable (GL_DEPTH_TEST);
   glEnableVertexAttribArray (positions);
 
-  for (std::list<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    m_shapes_program->setUniformValue ("color", l->color [0], l->color [1], l->color [2], l->color [3]);
-    l->vertex_chunk->draw_to (this, positions, GL_TRIANGLES);
+  for (std::vector<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+    if (l->visible) {
+      m_shapes_program->setUniformValue ("color", l->color [0], l->color [1], l->color [2], l->color [3]);
+      l->vertex_chunk->draw_to (this, positions, GL_TRIANGLES);
+    }
   }
 
   glDisableVertexAttribArray (positions);

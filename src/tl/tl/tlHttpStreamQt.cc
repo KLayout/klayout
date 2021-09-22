@@ -37,6 +37,7 @@
 #include <QDateTime>
 #include <QFileInfo>
 #include <QDialog>
+#include <QSslError>
 
 namespace tl
 {

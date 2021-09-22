@@ -168,7 +168,7 @@ private:
   };
 
   std::vector<LayerInfo> m_layers;
-  std::map<std::pair<size_t, size_t>, size_t> m_layer_to_info;
+  std::multimap<std::pair<size_t, size_t>, size_t> m_layer_to_info;
 
   void initializeGL ();
   void paintGL ();

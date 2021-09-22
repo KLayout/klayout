@@ -657,8 +657,6 @@ D25ViewWidget::prepare_view ()
       double z0 = zi->zstart ();
       double z1 = zi->zstop ();
 
-      lay::color_t color = lp->fill_color (true);
-
       m_vertex_chunks.push_back (triangle_chunks_type ());
       m_line_chunks.push_back (line_chunks_type ());
 
@@ -667,7 +665,7 @@ D25ViewWidget::prepare_view ()
       info.vertex_chunk = &m_vertex_chunks.back ();
       info.line_chunk = &m_line_chunks.back ();
 
-      m_layer_to_info [std::make_pair (lp->cellview_index (), lp->layer_index ())] = m_layers.size ();
+      m_layer_to_info.insert (std::make_pair (std::make_pair (lp->cellview_index (), lp->layer_index ()), m_layers.size ()));
       m_layers.push_back (info);
 
       const lay::CellView &cv = mp_view->cellview ((unsigned int) lp->cellview_index ());
@@ -698,12 +696,17 @@ D25ViewWidget::refresh_view ()
   }
 
   for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
-    std::map<std::pair<size_t, size_t>, size_t>::const_iterator l = m_layer_to_info.find (std::make_pair (lp->cellview_index (), lp->layer_index ()));
-    if (l != m_layer_to_info.end ()) {
+
+    std::pair<size_t, size_t> key = std::make_pair (lp->cellview_index (), lp->layer_index ());
+
+    std::multimap<std::pair<size_t, size_t>, size_t>::const_iterator l = m_layer_to_info.find (key);
+    while (l != m_layer_to_info.end () && l->first == key) {
       if (l->second < m_layers.size ()) {
         lp_to_info (*lp, m_layers [l->second]);
       }
+      ++l;
     }
+
   }
 
   refresh ();

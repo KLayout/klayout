@@ -2094,3 +2094,16 @@ TEST(issue_277)
   r.set_min_coherence (false);  //  needs to merge again
   EXPECT_EQ (r.sized (1).merged (false, 1).to_string (), "");
 }
+
+TEST(issue_909)
+{
+  db::Shapes s1;
+  s1.insert(db::Box(0, 0, 100, 100));
+  db::Shapes s2;
+  s2.insert(db::Box(0, 0, 200, 300));
+  db::Region r1 = db::Region (db::RecursiveShapeIterator (s1));
+  db::Region r2 = db::Region (db::RecursiveShapeIterator (s2));
+
+  db::Region r = r1 + r2;
+  EXPECT_EQ (r.to_string (), "(0,0;0,100;100,100;100,0);(0,0;0,300;200,300;200,0)");
+}

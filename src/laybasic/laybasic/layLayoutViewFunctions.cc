@@ -1242,11 +1242,16 @@ LayoutViewFunctions::do_cm_paste (bool interactive)
 void
 LayoutViewFunctions::cm_new_cell ()
 {
+  lay::CellView cv = view ()->cellview (view ()->active_cellview_index ());
+  if (! cv.is_valid ()) {
+    throw tl::Exception (tl::to_string (tr ("No layout present to add a cell to")));
+  }
+
   static double s_new_cell_window_size = 2.0;
   static std::string s_new_cell_cell_name;
 
   NewCellPropertiesDialog cell_prop_dia (view ());
-  if (cell_prop_dia.exec_dialog (& view ()->cellview (view ()->active_cellview_index ())->layout (), s_new_cell_cell_name, s_new_cell_window_size)) {
+  if (cell_prop_dia.exec_dialog (& cv->layout (), s_new_cell_cell_name, s_new_cell_window_size)) {
 
     db::cell_index_type new_ci = view ()->new_cell (view ()->active_cellview_index (), s_new_cell_cell_name.c_str ());
     view ()->select_cell (new_ci, view ()->active_cellview_index ());

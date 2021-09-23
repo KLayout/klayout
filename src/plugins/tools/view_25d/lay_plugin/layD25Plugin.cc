@@ -32,34 +32,6 @@
 namespace lay
 {
 
-class D25Plugin
-  : public lay::Plugin
-{
-public:
-  D25Plugin (Plugin *parent, lay::LayoutView *view)
-    : lay::Plugin (parent), mp_view (view)
-  {
-    mp_dialog = new lay::D25View (0);
-  }
-
-  ~D25Plugin ()
-  {
-    delete mp_dialog;
-    mp_dialog = 0;
-  }
-
-  void menu_activated (const std::string &symbol) 
-  {
-    if (symbol == "lay::d25_view") {
-      mp_dialog->exec_dialog (mp_view);
-    }
-  }
-
-private:
-  lay::LayoutView *mp_view;
-  lay::D25View *mp_dialog;
-};
-
 class D25PluginDeclaration
   : public lay::PluginDeclaration
 {
@@ -98,7 +70,7 @@ public:
 
   lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
   {
-    return new D25Plugin (root, view);
+    return new D25View (root, view);
   }
 };
 

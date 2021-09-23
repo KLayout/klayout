@@ -32,7 +32,7 @@ namespace lay
 
 D25Camera::D25Camera ()
 {
-  init ();
+  camera_init ();
 }
 
 D25Camera::~D25Camera ()
@@ -41,7 +41,7 @@ D25Camera::~D25Camera ()
 }
 
 void
-D25Camera::init ()
+D25Camera::camera_init ()
 {
   m_fov = 45.0;
   m_cam_azimuth = m_cam_elevation = 0.0;
@@ -51,7 +51,7 @@ D25Camera::init ()
 void
 D25Camera::camera_reset ()
 {
-  init ();
+  camera_init ();
   camera_changed ();
 }
 

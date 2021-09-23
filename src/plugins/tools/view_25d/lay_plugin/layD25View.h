@@ -26,6 +26,7 @@
 #include <QDialog>
 
 #include "tlObject.h"
+#include "layBrowser.h"
 
 namespace Ui
 {
@@ -41,28 +42,37 @@ namespace lay
 {
 
 class D25View
-  : public QDialog
+  : public lay::Browser
 {
 Q_OBJECT 
 
 public:
-  D25View (QWidget *parent);
+  D25View (lay::Dispatcher *root, lay::LayoutView *view);
   ~D25View ();
 
-  int exec_dialog (lay::LayoutView *view);
+  virtual void menu_activated (const std::string &symbol);
+  virtual void deactivated ();
+  virtual void activated ();
 
 protected:
   void accept ();
+  void reject ();
 
 private slots:
   void fit_button_clicked ();
   void scale_factor_changed (double f);
   void scale_slider_changed (int value);
+  void scale_value_edited ();
+  void vscale_factor_changed (double f);
+  void vscale_slider_changed (int value);
+  void vscale_value_edited ();
   void init_failed ();
 
 private:
   Ui::D25View *mp_ui;
-  tl::weak_ptr<lay::LayoutView> mp_view;
+
+  void cellviews_changed ();
+  void layer_properties_changed (int);
 };
 
 }

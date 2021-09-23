@@ -34,8 +34,8 @@ namespace lay
 
 const double initial_elevation = 15.0;
 
-D25View::D25View (QWidget *parent)
-  : QDialog (parent)
+D25View::D25View (lay::Dispatcher *root, lay::LayoutView *view)
+  : lay::Browser (root, view, "d25_view")
 {
   mp_ui = new Ui::D25View ();
   mp_ui->setupUi (this);
@@ -50,24 +50,73 @@ D25View::D25View (QWidget *parent)
   connect (mp_ui->fit_top, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
   connect (mp_ui->fit_bottom, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
   connect (mp_ui->zoom_slider, SIGNAL (valueChanged (int)), this, SLOT (scale_slider_changed (int)));
+  connect (mp_ui->vzoom_slider, SIGNAL (valueChanged (int)), this, SLOT (vscale_slider_changed (int)));
+  connect (mp_ui->zoom_factor, SIGNAL (editingFinished ()), this, SLOT (scale_value_edited ()));
+  connect (mp_ui->vzoom_factor, SIGNAL (editingFinished ()), this, SLOT (vscale_value_edited ()));
   connect (mp_ui->d25_view, SIGNAL (scale_factor_changed (double)), this, SLOT (scale_factor_changed (double)));
+  connect (mp_ui->d25_view, SIGNAL (vscale_factor_changed (double)), this, SLOT (vscale_factor_changed (double)));
   connect (mp_ui->d25_view, SIGNAL (init_failed ()), this, SLOT (init_failed ()));
 
   mp_ui->gl_stack->setCurrentIndex (0);
 
   lay::activate_help_links (mp_ui->doc_label);
+
+  view->cellviews_changed_event.add (this, &D25View::cellviews_changed);
+  view->layer_list_changed_event.add (this, &D25View::layer_properties_changed);
 }
 
 D25View::~D25View ()
 {
   delete mp_ui;
   mp_ui = 0;
+
+  if (view ()) {
+    view ()->cellviews_changed_event.remove (this, &D25View::cellviews_changed);
+  }
+}
+
+void
+D25View::cellviews_changed ()
+{
+  deactivate ();
+}
+
+void
+D25View::layer_properties_changed (int)
+{
+  mp_ui->d25_view->refresh_view ();
+}
+
+void
+D25View::menu_activated (const std::string &symbol)
+{
+  if (symbol == "lay::d25_view") {
+
+    const lay::CellView &cv = view ()->cellview (view ()->active_cellview_index ());
+    if (cv.is_valid ()) {
+
+      show ();
+      activateWindow ();
+      raise ();
+
+      try {
+        activate ();
+      } catch (...) {
+        deactivate ();
+        throw;
+      }
+
+    }
+
+  } else {
+    lay::Browser::menu_activated (symbol);
+  }
 }
 
 static QString scale_factor_to_string (double f)
 {
   QString s;
-  s.sprintf ("x %.3g", f);
+  s.sprintf ("%.3g", f);
   return s;
 }
 
@@ -76,6 +125,34 @@ D25View::init_failed ()
 {
   mp_ui->error_text->setPlainText (tl::to_qstring (mp_ui->d25_view->error ()));
   mp_ui->gl_stack->setCurrentIndex (1);
+}
+
+void
+D25View::scale_value_edited ()
+{
+  double f = mp_ui->d25_view->scale_factor ();
+  try {
+    tl::from_string (tl::to_string (mp_ui->zoom_factor->text ()), f);
+    f = std::min (1e6, std::max (1e-6, f));
+  } catch (...) {
+    //  ignore exceptions
+  }
+  mp_ui->d25_view->set_scale_factor (f);
+  scale_factor_changed (f);
+}
+
+void
+D25View::vscale_value_edited ()
+{
+  double f = mp_ui->d25_view->vscale_factor ();
+  try {
+    tl::from_string (tl::to_string (mp_ui->vzoom_factor->text ()), f);
+    f = std::min (1e6, std::max (1e-6, f));
+  } catch (...) {
+    //  ignore exceptions
+  }
+  mp_ui->d25_view->set_vscale_factor (f);
+  vscale_factor_changed (f);
 }
 
 void
@@ -96,32 +173,43 @@ D25View::scale_factor_changed (double f)
   mp_ui->zoom_slider->blockSignals (false);
 }
 
-int 
-D25View::exec_dialog (lay::LayoutView *view)
+void
+D25View::vscale_slider_changed (int value)
 {
-  mp_view.reset (view);
-  bool any = mp_ui->d25_view->attach_view (view);
+  double f = exp (log (10.0) * -0.01 * value);
+  mp_ui->vzoom_factor->setText (scale_factor_to_string (f));
+  mp_ui->d25_view->set_vscale_factor (f);
+}
 
+void
+D25View::vscale_factor_changed (double f)
+{
+  mp_ui->vzoom_factor->setText (scale_factor_to_string (f));
+  int v = floor (0.5 - log10 (f) * 100.0);
+  mp_ui->vzoom_slider->blockSignals (true);
+  mp_ui->vzoom_slider->setValue (v);
+  mp_ui->vzoom_slider->blockSignals (false);
+}
+
+void
+D25View::deactivated ()
+{
+  mp_ui->d25_view->attach_view (0);
+}
+
+void
+D25View::activated ()
+{
+  bool any = mp_ui->d25_view->attach_view (view ());
   if (! any) {
-
-    mp_view.reset (0);
     mp_ui->d25_view->attach_view (0);
-
     throw tl::Exception (tl::to_string (tr ("No z data configured for the layers in the view.\nUse \"Tools/Manage Technologies\" to set up a z stack.")));
-
   }
 
   mp_ui->d25_view->reset ();
   mp_ui->d25_view->set_cam_azimuth (0.0);
   mp_ui->d25_view->set_cam_elevation (-initial_elevation);
   mp_ui->d25_view->fit ();
-
-  int ret = QDialog::exec ();
-
-  mp_ui->d25_view->attach_view (0);
-  mp_view.reset (0);
-
-  return ret;
 }
 
 void
@@ -160,6 +248,12 @@ void
 D25View::accept ()
 {
   QDialog::accept ();
+}
+
+void
+D25View::reject ()
+{
+  QDialog::reject ();
 }
 
 }

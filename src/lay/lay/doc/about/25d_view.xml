@@ -143,5 +143,38 @@ end
     <li> Up/down/left/right keys: move the pivot on the horizontal plane </li>
   </ul>
 
+  <p>
+  Note: if the Shift key does not switch to top level view, click into the 
+  scene view once.
+  </p>
+
+  <h2>Colors in the 2.5d View</h2>
+
+  <p>
+  While the 2.5d view window is open, the layout view is still active. Layer 
+  colors are applied also to the 2.5d view. Changing the fill color will change
+  the 2.5d view's face color. The frame color will be applied to the wire frame.
+  If a hollow stipple is selected, only the wire frame is shown. If a layer is
+  made invisible in the layout view, the corresponding blocks will also be
+  made invisible in the 2.5d view.
+  </p>
+
+  <h2>Other controls</h2>
+
+  <p>
+  The left zoom slider changes the overall scale factor. The right slider only changes the z (height) axis zoom factor.
+  This is useful as in many cases, the real height profile will result in a rather flat arrangement. Increasing the 
+  z zoom factor will exaggerate the vertical axis hence making height variations more pronounced.
+  </p>
+
+  <p>
+  The edit boxes next to the scale sliders allow entering the scale factors manually.
+  </p>
+
+  <p>
+  The button bar at the top right side holds the view presets. Use them to reset the window to 
+  front view, top view etc.
+  </p>
+
 </doc>
 

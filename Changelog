@@ -1,6 +1,19 @@
 
-0.27.4          (2021-xx-xx):
-TODO
+0.27.4          (2021-09-25):
+* Enhancements: Some enhancements on the 2.5d view (e.g. live layer color update, z only scaling, wire frames, etc.)
+* Enhancement: simple versions of DRC with_holes/without_holes without parameters
+* Enhancement: LVS netlist compare performance improvements in certain cases
+* Enhancement: %GITHUB%/issues/914 Make "tap" function available in reader mode
+* Bugfix: %GITHUB%/issues/912 Decent error message (not crashing) when trying to create a cell or layer on an empty panel
+* Bugfix: %GITHUB%/issues/909 DRC crash
+* Bugfix: %GITHUB%/issues/905 Crash when deleting a hierarchical PCell library from Python
+* Bugfix: %GITHUB%/issues/898 Spice reader ignores last line
+* Bugfix: %GITHUB%/issues/897 Fill Tool crashes
+* Bugfix: %GITHUB%/issues/894 border case GDS file behavior restored
+* Bugfix: %GITHUB%/issues/892 Font path can be selected for standalone "Basic" library
+* Bugfix: %GITHUB%/issues/886 Python module does not build from sources
+* Bugfix: %GITHUB%/issues/881 Typo in separation_check signature
+* Bugfix: %GITHUB%/issues/880 Clarification of device parameter compare on LVS
 
 0.27.3          (2021-07-23):
 * Enhancement: DRC - more filters for edge pair collections

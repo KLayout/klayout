@@ -56,6 +56,7 @@ EditorOptionsPages::EditorOptionsPages (QWidget *parent, const std::vector<lay::
   ly1->setMargin (0);
 
   mp_pages = new QTabWidget (this);
+  mp_pages->setSizePolicy (QSizePolicy (QSizePolicy::Ignored, QSizePolicy::Ignored));
   ly1->addWidget (mp_pages);
 
   m_pages = pages;

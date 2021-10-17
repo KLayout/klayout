@@ -13,6 +13,6 @@ LIBS += -lklayout_QtCore -lklayout_QtXml
 # Because of stupid dependency of QtCore on QtGui and this on QtWidgets:
 LIBS += -lklayout_QtGui
 
-equals(HAVE_QT5, "1") {
+greaterThan(QT_MAJOR, "4") {
   LIBS += -lklayout_QtWidgets
 }

@@ -256,7 +256,6 @@ if not exist "%option-build%" (
 
 echo on
 "%option-qmake%" ^
-  HAVE_QT5=1 ^
   HAVE_QT_UITOOLS=1 ^
   HAVE_QT_NETWORK=1 ^
   HAVE_QT_SQL=1 ^

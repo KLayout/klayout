@@ -45,7 +45,7 @@ equals(HAVE_QTBINDINGS, "1") {
     LIBS += -lklayout_QtUiTools
   }
 
-  equals(HAVE_QT5, "1") {
+  greaterThan(QT_MAJOR, "4") {
 
     LIBS += -lklayout_QtWidgets
 

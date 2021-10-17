@@ -3,7 +3,7 @@ TEMPLATE = subdirs
 
 contains(QT_CONFIG, opengl) {
 
-  equals(HAVE_QT5, "1") {
+  greaterThan(QT_MAJOR, "4") {
     SUBDIRS = lay_plugin unit_tests
   }
 

@@ -80,7 +80,7 @@ main (int argc, char *argv [])
 
       QFontMetrics fm (f);
 
-      int w = fm.width (QChar::fromLatin1 ('W'));
+      int w = fm.averageCharWidth ();
 
       printf ("\n// Font: %s\n", f.toString ().toLatin1 ().constData ());
       printf ("const unsigned int ff%d_height = %d;\nconst unsigned int ff%d_line_height = %d;\nconst unsigned int ff%d_width = %d;\nconst unsigned int ff%d_stride = %d;\n",

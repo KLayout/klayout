@@ -36,7 +36,6 @@ HAVE_QT_DESIGNER=1
 HAVE_QT_XML=1
 HAVE_64BIT_COORD=0
 HAVE_QT=1
-HAVE_QT5="" # not set
 HAVE_CURL=0
 HAVE_EXPAT=0
 
@@ -197,12 +196,6 @@ while [ "$*" != "" ]; do
     RPATH="$1"
     shift
     ;;
-  -qt4)
-    HAVE_QT5=0
-    ;;
-  -qt5)
-    HAVE_QT5=1
-    ;;
   -dry-run)
     RUN_MAKE=0
     ;;
@@ -300,19 +293,6 @@ fi
 if [ "$QMAKE" = "" ]; then
   echo "*** ERROR: unable to find qmake tool in path"
   exit 1
-fi
-
-# if not given, try to detect the qt major version to use
-if [ "$HAVE_QT5" = "" ]; then
-  qt_major=`$QMAKE -v | grep 'Using Qt version' | sed 's/.*version  *\([0-9][0-9]*\).*/\1/'`
-  if [ "$qt_major" = "4" ]; then
-    HAVE_QT5=0
-  elif [ "$qt_major" = "5" ]; then
-    HAVE_QT5=1
-  else
-    echo "*** ERROR: could not determine Qt version from '$QMAKE -v'"
-    exit 1
-  fi
 fi
 
 echo "Using qmake: $QMAKE"
@@ -492,11 +472,7 @@ if [ $HAVE_QT = 0 ]; then
   echo "    Qt not used at all"
 fi
 if [ $HAVE_QTBINDINGS != 0 ]; then
-  if [ "$HAVE_QT5" != "0" ]; then
-    echo "    Qt bindings enabled (Qt 5 API)"
-  else
-    echo "    Qt bindings enabled (Qt 4 API)"
-  fi
+  echo "    Qt bindings enabled"
 fi
 if [ $HAVE_64BIT_COORD != 0 ]; then
   echo "    64 bit coordinates enabled"
@@ -613,13 +589,6 @@ echo ""
 echo "Running $QMAKE .."
 cd $BUILD
 
-# chose the right qmake
-if [ $HAVE_QT5 = 0 ]; then
-  export QT_SELECT=4
-else
-  export QT_SELECT=5
-fi
-
 $QMAKE -v
 
 # Force a minimum rebuild because of version info
@@ -647,7 +616,6 @@ qmake_options=(
   HAVE_QT_XML="$HAVE_QT_XML"
   HAVE_64BIT_COORD="$HAVE_64BIT_COORD"
   HAVE_QT="$HAVE_QT"
-  HAVE_QT5="$HAVE_QT5"
   HAVE_CURL="$HAVE_CURL"
   HAVE_EXPAT="$HAVE_EXPAT"
   PREFIX="$BIN"

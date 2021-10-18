@@ -2025,41 +2025,44 @@ MainWindow::cm_load_layer_props ()
   if (current_view ()) {
     std::string fn;
     if (mp_lprops_fdia->get_open (fn, tl::to_string (QObject::tr ("Load Layer Properties File")))) {
-
-      int target_cv_index = -2;
-
-      if (current_view ()->cellviews () > 1 && is_single_cv_layer_properties_file (fn)) {
-
-        QStringList items;
-        items << QString (QObject::tr ("Take it as it is"));
-        items << QString (QObject::tr ("Apply to all layouts"));
-        for (unsigned int i = 0; i < current_view ()->cellviews (); ++i) {
-          items << QString (tl::to_qstring (tl::to_string (QObject::tr ("Apply to ")) + current_view ()->cellview (i)->name () + " (@" + tl::to_string (i + 1) + ")"));
-        }
-
-        bool ok;
-        QString item = QInputDialog::getItem(this, QObject::tr ("Apply Layer Properties File"),
-                                                   QObject::tr ("There are multiple layouts in that panel but the layer properties file contains properties for a single one.\nWhat should be done?"),
-                                                   items, 1, false, &ok);
-        if (!ok || item.isEmpty()) {
-          return;
-        }
-
-        target_cv_index = items.indexOf (item) - 2;
-
-      }
-
-      if (target_cv_index > -2) {
-        load_layer_properties (fn, target_cv_index, false /*current view only*/, false /*don't add default*/);
-      } else {
-        load_layer_properties (fn, false /*current view only*/, false /*don't add default*/);
-      }
-
+      load_layer_props_from_file (fn);
       add_to_other_mru (fn, cfg_mru_layer_properties);
-
     }
   } else {
     throw tl::Exception (tl::to_string (QObject::tr ("No view open to load the layer properties for")));
+  }
+}
+
+void
+MainWindow::load_layer_props_from_file (const std::string &fn)
+{
+  int target_cv_index = -2;
+
+  if (current_view ()->cellviews () > 1 && is_single_cv_layer_properties_file (fn)) {
+
+    QStringList items;
+    items << QString (QObject::tr ("Take it as it is"));
+    items << QString (QObject::tr ("Apply to all layouts"));
+    for (unsigned int i = 0; i < current_view ()->cellviews (); ++i) {
+      items << QString (tl::to_qstring (tl::to_string (QObject::tr ("Apply to ")) + current_view ()->cellview (i)->name () + " (@" + tl::to_string (i + 1) + ")"));
+    }
+
+    bool ok;
+    QString item = QInputDialog::getItem(this, QObject::tr ("Apply Layer Properties File"),
+                                               QObject::tr ("There are multiple layouts in that panel but the layer properties file contains properties for a single one.\nWhat should be done?"),
+                                               items, 1, false, &ok);
+    if (!ok || item.isEmpty()) {
+      return;
+    }
+
+    target_cv_index = items.indexOf (item) - 2;
+
+  }
+
+  if (target_cv_index > -2) {
+    load_layer_properties (fn, target_cv_index, false /*current view only*/, false /*don't add default*/);
+  } else {
+    load_layer_properties (fn, false /*current view only*/, false /*don't add default*/);
   }
 }
 
@@ -3238,7 +3241,7 @@ MainWindow::open_recent_layer_properties (size_t n)
 
   if (n < m_mru_layer_properties.size ()) {
     std::string fn = m_mru_layer_properties [n];
-    load_layer_properties (fn, false /*current view only*/, false /*don't add default*/);
+    load_layer_props_from_file (fn);
     add_to_other_mru (fn, cfg_mru_layer_properties);  //  make it the latest
   }
 

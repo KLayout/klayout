@@ -805,6 +805,7 @@ private:
 
   int dirty_files (std::string &dirty_files);
 
+  void load_layer_props_from_file (const std::string &fn);
   void interactive_close_view (int index, bool all_cellviews);
   void call_on_current_view (void (lay::LayoutView::*func) (), const std::string &op_desc);
   void current_view_changed ();

@@ -136,6 +136,18 @@ RDB_PUBLIC_TEMPLATE void create_items_from_sequence (rdb::Database *db, rdb::id_
   }
 }
 
+/**
+ *  @brief Creates a value from a tl::Variant
+ *
+ *  This produces values which reflect some values the variant can assume - specifically
+ *  shapes are converted into corresponding RDB values. The database unit is used to
+ *  translate integer-type values. Using a database unit of 0 will disable the conversion of
+ *  such types.
+ *
+ *  Unknown types are converted to strings.
+ */
+RDB_PUBLIC void add_item_value (rdb::Item *item, const tl::Variant &v, double dbu = 0.0);
+
 }
 
 #endif

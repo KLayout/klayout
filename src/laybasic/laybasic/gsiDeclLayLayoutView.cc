@@ -690,6 +690,11 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "In 0.25, this method has been moved from MainWindow to LayoutView.\n"
   ) +
+  gsi::method ("is_editable?", &lay::LayoutView::is_editable,
+    "@brief Returns true if the view is in editable mode\n"
+    "\n"
+    "This read-only attribute has been added in version 0.27.5.\n"
+  ) +
   gsi::method ("reload_layout", &lay::LayoutView::reload_layout, gsi::arg ("cv"),
     "@brief Reloads the given cellview\n"
     "\n"

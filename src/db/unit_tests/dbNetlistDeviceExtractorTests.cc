@@ -853,3 +853,295 @@ TEST(42_DMOS4DeviceExtractorTestCircular)
   EXPECT_EQ (o3.to_string (), "(-100,-500;-100,900;1000,900;1000,-500/200,-200;700,-200;700,600;200,600)");
   EXPECT_EQ (o4.to_string (), "(-100,-500;-100,900;1000,900;1000,-500/200,-200;700,-200;700,600;200,600)");
 }
+
+TEST(50_BJT3DeviceExtractorTest)
+{
+  db::Layout ly;
+
+  {
+    db::LoadLayoutOptions options;
+
+    std::string fn (tl::testdata ());
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "bjt3_1.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("LABEL"));
+
+  //  original layers
+  db::Region l0 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(0, 0))), dss);
+  db::Region l1 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(1, 0))), dss);
+  db::Region l2 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(2, 0))), dss);
+  db::Region o1 (dss);
+  db::Region o2 (dss);
+  db::Region o3 (dss);
+
+  //  perform the extraction
+
+  db::Netlist nl;
+  db::hier_clusters<db::NetShape> cl;
+
+  db::NetlistDeviceExtractorBJT3Transistor ex ("BJT3");
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["E"] = &l0;
+  dl["B"] = &l1;
+  dl["C"] = &l2;
+  dl["tE"] = &o1;
+  dl["tB"] = &o2;
+  dl["tC"] = &o3;
+  ex.extract (dss, 0, dl, nl, cl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP ();\n"
+    "  device BJT3 $1 (C=(null),B=(null),E=(null)) (AE=0.81,PE=3.6,AB=5,PB=9,AC=5,PC=9,NE=1);\n"
+    "end;\n"
+  );
+  EXPECT_EQ (o1.to_string (), "(700,400;700,1300;1600,1300;1600,400)");
+  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;2500,2000;2500,0/700,400;1600,400;1600,1300;700,1300)");
+  EXPECT_EQ (o3.to_string (), "(0,0;0,2000;2500,2000;2500,0/700,400;1600,400;1600,1300;700,1300)");
+}
+
+TEST(51_BJT3DeviceExtractorTest)
+{
+  db::Layout ly;
+
+  {
+    db::LoadLayoutOptions options;
+
+    std::string fn (tl::testdata ());
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "bjt3_2.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("LABEL"));
+
+  //  original layers
+  db::Region l0 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(0, 0))), dss);
+  db::Region l1 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(1, 0))), dss);
+  db::Region l2 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(2, 0))), dss);
+  db::Region o1 (dss);
+  db::Region o2 (dss);
+  db::Region o3 (dss);
+
+  //  perform the extraction
+
+  db::Netlist nl;
+  db::hier_clusters<db::NetShape> cl;
+
+  db::NetlistDeviceExtractorBJT3Transistor ex ("BJT3");
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["E"] = &l0;
+  dl["B"] = &l1;
+  dl["C"] = &l2;
+  dl["tE"] = &o1;
+  dl["tB"] = &o2;
+  dl["tC"] = &o3;
+  ex.extract (dss, 0, dl, nl, cl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP ();\n"
+    "  device BJT3 $1 (C=(null),B=(null),E=(null)) (AE=0.81,PE=3.6,AB=5,PB=9,AC=5,PC=9,NE=1);\n"
+    "end;\n"
+  );
+  EXPECT_EQ (o1.to_string (), "(700,400;700,1300;1600,1300;1600,400)");
+  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;2500,2000;2500,0/700,400;1600,400;1600,1300;700,1300)");
+  EXPECT_EQ (o3.to_string (), "(-1000,-500;-1000,2500;3000,2500;3000,-500/0,0;2500,0;2500,2000;0,2000)");
+}
+
+TEST(52_BJT3DeviceExtractorTestLateral)
+{
+  db::Layout ly;
+
+  {
+    db::LoadLayoutOptions options;
+
+    std::string fn (tl::testdata ());
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "bjt3_3.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("LABEL"));
+
+  //  original layers
+  db::Region l0 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(0, 0))), dss);
+  db::Region l1 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(1, 0))), dss);
+  db::Region l2 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(2, 0))), dss);
+  db::Region o1 (dss);
+  db::Region o2 (dss);
+  db::Region o3 (dss);
+
+  //  perform the extraction
+
+  db::Netlist nl;
+  db::hier_clusters<db::NetShape> cl;
+
+  db::NetlistDeviceExtractorBJT3Transistor ex ("BJT3");
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["E"] = &l0;
+  dl["B"] = &l1;
+  dl["C"] = &l2;
+  dl["tE"] = &o1;
+  dl["tB"] = &o2;
+  dl["tC"] = &o3;
+  ex.extract (dss, 0, dl, nl, cl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP ();\n"
+    "  device BJT3 $1 (C=(null),B=(null),E=(null)) (AE=0.81,PE=3.6,AB=5,PB=9,AC=0.8,PC=4.8,NE=1);\n"
+    "end;\n"
+  );
+  EXPECT_EQ (o1.to_string (), "(700,400;700,1300;1600,1300;1600,400)");
+  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;2100,2000;2100,0/700,400;1600,400;1600,1300;700,1300)");
+  EXPECT_EQ (o3.to_string (), "(2100,0;2100,2000;2500,2000;2500,0)");
+}
+
+TEST(53_BJT3DeviceExtractorTestMultEmitter)
+{
+  db::Layout ly;
+
+  {
+    db::LoadLayoutOptions options;
+
+    std::string fn (tl::testdata ());
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "bjt3_4.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("LABEL"));
+
+  //  original layers
+  db::Region l0 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(0, 0))), dss);
+  db::Region l1 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(1, 0))), dss);
+  db::Region l2 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(2, 0))), dss);
+  db::Region o1 (dss);
+  db::Region o2 (dss);
+  db::Region o3 (dss);
+
+  //  perform the extraction
+
+  db::Netlist nl;
+  db::hier_clusters<db::NetShape> cl;
+
+  db::NetlistDeviceExtractorBJT3Transistor ex ("BJT3");
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["E"] = &l0;
+  dl["B"] = &l1;
+  dl["C"] = &l2;
+  dl["tE"] = &o1;
+  dl["tB"] = &o2;
+  dl["tC"] = &o3;
+  ex.extract (dss, 0, dl, nl, cl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP ();\n"
+    "  device BJT3 $1 (C=(null),B=(null),E=(null)) (AE=0.5,PE=3,AB=10,PB=14,AC=10,PC=14,NE=1);\n"
+    "  device BJT3 $2 (C=(null),B=(null),E=(null)) (AE=0.5,PE=3,AB=10,PB=14,AC=10,PC=14,NE=1);\n"
+    "end;\n"
+  );
+  EXPECT_EQ (o1.to_string (), "(1000,500;1000,1500;1500,1500;1500,500);(3500,500;3500,1500;4000,1500;4000,500)");
+  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;5000,2000;5000,0/1000,500;1500,500;1500,1500;1000,1500/3500,500;4000,500;4000,1500;3500,1500);(0,0;0,2000;5000,2000;5000,0/1000,500;1500,500;1500,1500;1000,1500/3500,500;4000,500;4000,1500;3500,1500)");
+  EXPECT_EQ (o3.to_string (), "(-500,-500;-500,2500;5500,2500;5500,-500/0,0;5000,0;5000,2000;0,2000);(-500,-500;-500,2500;5500,2500;5500,-500/0,0;5000,0;5000,2000;0,2000)");
+}
+
+TEST(54_BJT4DeviceExtractorTest)
+{
+  db::Layout ly;
+
+  {
+    db::LoadLayoutOptions options;
+
+    std::string fn (tl::testdata ());
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "bjt4_1.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("LABEL"));
+
+  //  original layers
+  db::Region l0 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(0, 0))), dss);
+  db::Region l1 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(1, 0))), dss);
+  db::Region l2 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(2, 0))), dss);
+  db::Region l3 (db::RecursiveShapeIterator (ly, tc, ly.get_layer (db::LayerProperties(3, 0))), dss);
+  db::Region o1 (dss);
+  db::Region o2 (dss);
+  db::Region o3 (dss);
+  db::Region o4 (dss);
+
+  //  perform the extraction
+
+  db::Netlist nl;
+  db::hier_clusters<db::NetShape> cl;
+
+  db::NetlistDeviceExtractorBJT4Transistor ex ("BJT4");
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["E"] = &l0;
+  dl["B"] = &l1;
+  dl["C"] = &l2;
+  dl["S"] = &l3;
+  dl["tE"] = &o1;
+  dl["tB"] = &o2;
+  dl["tC"] = &o3;
+  dl["tS"] = &o4;
+  ex.extract (dss, 0, dl, nl, cl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP ();\n"
+    "  device BJT4 $1 (C=(null),B=(null),E=(null),S=(null)) (AE=0.81,PE=3.6,AB=5,PB=9,AC=5,PC=9,NE=1);\n"
+    "end;\n"
+  );
+  EXPECT_EQ (o1.to_string (), "(700,400;700,1300;1600,1300;1600,400)");
+  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;2500,2000;2500,0/700,400;1600,400;1600,1300;700,1300)");
+  EXPECT_EQ (o3.to_string (), "(-1000,-500;-1000,2500;3000,2500;3000,-500/0,0;2500,0;2500,2000;0,2000)");
+  EXPECT_EQ (o4.to_string (), "(0,0;0,2000;2500,2000;2500,0)");
+}
+

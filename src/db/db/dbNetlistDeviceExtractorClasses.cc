@@ -694,12 +694,15 @@ void NetlistDeviceExtractorBJT3Transistor::extract_devices (const std::vector<db
         rcollector = rbase;
       } else if ((rbase - rcollector2base).empty ()) {
         //  vertical transistor: collector entirely covers base -> collector terminal is collector outside base
-        rcollector = rcollector2base - rbase;
+        rcollector = rcollectors.selected_interacting (rbase) - rbase;
       } else {
         //  lateral transistor: base is reduced by collector area
         rcollector = rcollector2base;
         rbase -= rcollector2base;
       }
+
+      //  TODO: rbase - rcollector2base above could basically split a base region into different
+      //  subregions potentially forming one transistor each.
 
       //  this is what is the true base contact
       rbase -= remitter2base;

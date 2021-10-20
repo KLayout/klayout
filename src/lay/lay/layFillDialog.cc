@@ -220,7 +220,7 @@ FillDialog::generate_fill (const FillParameters &fp)
 
     //  preprocess fill regions
     if (distance_x != 0 || distance_y != 0) {
-      fill_region.size (distance_x, distance_y);
+      fill_region.size (-distance_x, -distance_y);
     } else {
       fill_region.merge ();
     }

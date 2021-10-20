@@ -203,7 +203,7 @@ D25View::activated ()
   bool any = mp_ui->d25_view->attach_view (view ());
   if (! any) {
     mp_ui->d25_view->attach_view (0);
-    throw tl::Exception (tl::to_string (tr ("No z data configured for the layers in the view.\nUse \"Tools/Manage Technologies\" to set up a z stack.")));
+    throw tl::Exception (tl::to_string (tr ("No z data configured for the layers in this view.\nUse \"Tools/Manage Technologies\" to set up a z stack or check if it applies to the layers here.")));
   }
 
   mp_ui->d25_view->reset ();

@@ -180,7 +180,8 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
       << tl::arg ("input_b",                   &infile_b,   "The second input file (any format, may be gzip compressed)")
       << tl::arg ("?output",                   &output,     "The output file to which the XOR differences are written",
                   "This argument is optional. If not given, the exit status alone will indicate whether the layouts "
-                  "are identical or not."
+                  "are identical or not. The output is a layout file. The format of the file is derived "
+                  "from the file name's suffix (.oas[.gz] for (gzipped) OASIS, .gds[.gz] for (gzipped) GDS2 etc.)."
                  )
       << tl::arg ("-ta|--top-a=name",          &top_a,      "Specifies the top cell for the first layout",
                   "Use this option to take a specific cell as the top cell from the first layout. All "
@@ -248,6 +249,8 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   db::Layout layout_b;
 
   {
+    tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Loading file (A): ")) + infile_a);
+
     db::LoadLayoutOptions load_options;
     generic_reader_options_a.configure (load_options);
 
@@ -257,6 +260,8 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   }
 
   {
+    tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Loading file (B): ")) + infile_b);
+
     db::LoadLayoutOptions load_options;
     generic_reader_options_b.configure (load_options);
 

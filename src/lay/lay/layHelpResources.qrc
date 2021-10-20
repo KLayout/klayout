@@ -158,6 +158,7 @@
         <file alias="landmarks.xml">doc/manual/landmarks.xml</file>
         <file alias="layer_animation.xml">doc/manual/layer_animation.xml</file>
         <file alias="layer_boolean.xml">doc/manual/layer_boolean.xml</file>
+        <file alias="layer_views.xml">doc/manual/layer_views.xml</file>
         <file alias="layer_color.xml">doc/manual/layer_color.xml</file>
         <file alias="layer_content.xml">doc/manual/layer_content.xml</file>
         <file alias="layer_fill.xml">doc/manual/layer_fill.xml</file>

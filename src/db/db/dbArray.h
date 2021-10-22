@@ -964,9 +964,7 @@ struct iterated_array
   virtual std::pair <basic_array_iterator <Coord> *, bool>
   begin_touching (const box_type &b) const
   {
-    if (b.empty ()) {
-      return std::make_pair (new iterated_array_iterator <Coord> (m_v.begin (), m_v.end ()), false);
-    } else if (! b.touches (m_box)) {
+    if (b.empty () || ! b.touches (m_box)) {
       return std::make_pair (new iterated_array_iterator <Coord> (m_v.end (), m_v.end ()), false);
     } else {
       box_convert_type bc;

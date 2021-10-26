@@ -722,6 +722,11 @@ public:
   }
 
   /**
+   *  @brief A quick, recursive test whether the cell has shapes touching the given box on the given layer
+   */
+  bool has_shapes_touching (unsigned int layer, const db::Box &box) const;
+
+  /**
    *  @brief Collect all calling cells (either calling this cell directly or indirectly)
    *
    *  This method adds all cell indices of all cells that either directly or indirectly 

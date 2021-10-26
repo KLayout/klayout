@@ -1104,7 +1104,7 @@ printf("@@@  -> #%d\n", int(inst1->size()));
           db::Box ibox2 = tn2 * cell2.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
 
           db::Box cbox = ibox1 & ibox2;
-          if (! cbox.empty () && ! db::RecursiveShapeIterator (*mp_subject_layout, cell1, m_subject_layer, safe_box_enlarged (tni1 * cbox, -1, -1), false).at_end ()) {
+          if (! cbox.empty () && cell1.has_shapes_touching (m_subject_layer, safe_box_enlarged (tni1 * cbox, -1, -1))) {
 
             db::ICplxTrans tn21 = tni1 * tn2;
 
@@ -1151,14 +1151,14 @@ printf("@@@  -> #%d\n", int(inst1->size()));
 
       const db::Cell &ic = mp_intruder_layout->cell (i->cell_index ());
 
-      for (db::CellInstArray::iterator ia = i->begin_touching (tbox2, mp_intruder_layout); ! ia.at_end (); ++ia) {
+      for (db::CellInstArray::iterator ia = i->cell_inst ().begin_touching (tbox2, db::box_convert<db::CellInst> (*mp_intruder_layout, m_intruder_layer)); ! ia.at_end (); ++ia) {
 
         db::ICplxTrans it = i->complex_trans (*ia);
 
         db::Box ibox2 = tni2.inverted () * it * ic.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
         db::Box ccbox = cbox & ibox2;
 
-        if (! ccbox.empty () && ! db::RecursiveShapeIterator (*mp_subject_layout, subject_cell, m_subject_layer, safe_box_enlarged (tni1 * ccbox, -1, -1), false).at_end ()) {
+        if (! ccbox.empty ()) {
           collect_intruder_tree_interactions (subject_cell, ic, tni1, tn21 * it, ccbox, interactions);
         }
 

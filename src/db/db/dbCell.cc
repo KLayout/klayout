@@ -487,6 +487,41 @@ Cell::hierarchy_levels () const
   return m_hier_levels;
 }
 
+static bool
+has_shapes_touching_impl (const db::Cell &cell, unsigned int layer, const db::Box &box)
+{
+  if (! cell.shapes (layer).begin_touching (box, db::ShapeIterator::All).at_end ()) {
+    return true;
+  }
+
+  for (db::Cell::touching_iterator i = cell.begin_touching (box); ! i.at_end (); ++i) {
+
+    for (db::CellInstArray::iterator ia = i->cell_inst ().begin_touching (box, db::box_convert<db::CellInst> (*cell.layout (), layer)); ! ia.at_end (); ++ia) {
+
+      db::Box cbox;
+      if (i->is_complex ()) {
+        cbox = i->complex_trans (*ia).inverted () * box;
+      } else {
+        cbox = (*ia).inverted () * box;
+      }
+
+      if (has_shapes_touching_impl (cell.layout ()->cell (i->cell_index ()), layer, cbox)) {
+        return true;
+      }
+
+    }
+
+  }
+
+  return false;
+}
+
+bool
+Cell::has_shapes_touching (unsigned int layer, const db::Box &box) const
+{
+  return has_shapes_touching_impl (*this, layer, box);
+}
+
 void 
 Cell::collect_caller_cells (std::set<cell_index_type> &callers) const
 {

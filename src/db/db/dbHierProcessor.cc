@@ -1076,6 +1076,9 @@ printf("@@@ check instance interactions %s (#%d, %s) <-> %s (#%d, %s)\n",
 
     std::unordered_map<db::ICplxTrans, std::list<std::pair<db::cell_index_type, db::ICplxTrans> > > interactions_cache;
 
+#if 0
+printf("@@@  -> #%d\n", int(inst1->size()));
+#endif
     for (db::CellInstArray::iterator n = inst1->begin (); ! n.at_end (); ++n) {
 
       db::ICplxTrans tn1 = inst1->complex_trans (*n);
@@ -1131,51 +1134,8 @@ printf("@@@ check instance interactions %s (#%d, %s) <-> %s (#%d, %s)\n",
     }
   }
 
-// @@@
-  bool has_intruder_tree_interactions (const db::Cell &subject_cell, const db::Cell &intruder_cell, const db::ICplxTrans &tni1, const db::ICplxTrans &tn21, const db::Box &cbox)
-  {
-    db::ICplxTrans tni2 = tn21.inverted () * tni1;
-    db::Box tbox2 = safe_box_enlarged (tni2 * cbox, -1, -1);
-
-    if (! intruder_cell.shapes (m_intruder_layer).begin_touching (tbox2, ShapeIterator::All).at_end ()) {
-
-      //  we're overlapping with shapes from the intruder - do not recursive further
-      return true;
-
-    }
-
-    for (db::Cell::touching_iterator i = intruder_cell.begin_touching (tbox2); ! i.at_end (); ++i) {
-
-      const db::Cell &ic = mp_intruder_layout->cell (i->cell_index ());
-
-      for (db::CellInstArray::iterator ia = i->begin_touching (tbox2, mp_intruder_layout); ! ia.at_end (); ++ia) {
-
-        db::ICplxTrans it = i->complex_trans (*ia);
-
-        db::Box ibox2 = tni2.inverted () * it * ic.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
-        db::Box ccbox = cbox & ibox2;
-
-        if (! ccbox.empty () && ! db::RecursiveShapeIterator (*mp_subject_layout, subject_cell, m_subject_layer, safe_box_enlarged (tni1 * ccbox, -1, -1), false).at_end ()) {
-          if (has_intruder_tree_interactions (subject_cell, ic, tni1, tn21 * it, ccbox)) {
-            return true;
-          }
-        }
-
-      }
-
-    }
-
-    return false;
-  }
-// @@@
-
   void collect_intruder_tree_interactions (const db::Cell &subject_cell, const db::Cell &intruder_cell, const db::ICplxTrans &tni1, const db::ICplxTrans &tn21, const db::Box &cbox, std::list<std::pair<db::cell_index_type, db::ICplxTrans> > &interactions)
   {
-#if 0
-    if (has_intruder_tree_interactions (subject_cell, intruder_cell, tni1, tn21, cbox)) {
-      interactions.push_back (std::make_pair (intruder_cell.cell_index (), tn21));
-    }
-#elif 1
     db::ICplxTrans tni2 = tn21.inverted () * tni1;
     db::Box tbox2 = safe_box_enlarged (tni2 * cbox, -1, -1);
 
@@ -1205,20 +1165,6 @@ printf("@@@ check instance interactions %s (#%d, %s) <-> %s (#%d, %s)\n",
       }
 
     }
-#else
-    //  not very strong, but already useful: the cells interact if there is a layer1 in cell1
-    //  in the common box and a layer2 in the cell2 in the common box
-    //  NOTE: don't use overlap mode for the RecursiveShapeIterator as this would not capture dot-like
-    //  objects like texts. Instead safe-shrink the search box and use touching mode ("false" for the last
-    //  argument)
-    db::ICplxTrans tni2 = tn21.inverted () * tni1;
-    bool interacts = (! db::RecursiveShapeIterator (*mp_subject_layout, subject_cell, m_subject_layer, safe_box_enlarged (tni1 * cbox, -1, -1), false).at_end () &&
-                      ! db::RecursiveShapeIterator (*mp_intruder_layout, intruder_cell, m_intruder_layer, safe_box_enlarged (tni2 * cbox, -1, -1), false).at_end ());
-
-    if (interacts) {
-      interactions.push_back (std::make_pair (intruder_cell.cell_index (), tn21));
-    }
-#endif
   }
 };
 
@@ -1668,8 +1614,6 @@ printf("@@@ --- compute_contexts (%s @ %s)\n", mp_subject_layout->cell_name (sub
         }
 
       }
-
-      std::list<db::CellInstArray> instance_heap;
 
       for (std::set<db::CellInstArray>::const_iterator i = intruders.first.begin (); i != intruders.first.end (); ++i) {
         if (! inst_bci (*i).empty ()) {

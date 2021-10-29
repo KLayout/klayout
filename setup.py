@@ -65,7 +65,13 @@ from distutils.errors import CompileError
 import distutils.command.build_ext
 import setuptools.command.build_ext
 import multiprocessing
-N_cores = multiprocessing.cpu_count()
+
+# for Jenkins we do not want to be greedy
+multicore = os.getenv("KLAYOUT_SETUP_MULTICORE")
+if multicore:
+  N_cores = int(multicore)
+else:
+  N_cores = multiprocessing.cpu_count()
 
 
 # monkey-patch for parallel compilation

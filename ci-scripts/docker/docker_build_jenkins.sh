@@ -8,6 +8,9 @@ fi
 
 echo PY_VERSION=$PY_VERSION
 
+# Use single cores only so we do not overload the Jenkins host
+export KLAYOUT_SETUP_MULTICORE=1
+
 # Compile wheel and build source distribution
 cd /io
 "/opt/python/$PY_VERSION/bin/python" setup.py bdist_wheel -d /io/wheelhouse/ || exit 1

@@ -1,0 +1,82 @@
+
+@Library("platform") _
+
+properties([disableConcurrentBuilds()])
+
+//  from shared library - uses tags to set the platform name
+//  (this is a pretty stupid way to set a parameter, but I don't
+//  know of a better way to parameterize a multibranch pipeline)
+platform = pypi_platform()
+
+currentBuild.description = "PyPI deployment " + platform
+
+python = ""
+docker_image = ""
+py_version = ""
+target = ""
+
+if (platform.equals("cp39-cp39m-manylinux2014_x86_64")) {
+
+  target = platform + ".whl"
+  docker_image = "quay.io/pypa/manylinux2014_x86_64"
+  py_version = "cp39-cp39"
+
+} else if (platform.equals("cp38-cp38m-manylinux2014_x86_64")) {
+
+  target = platform + ".whl"
+  docker_image = "quay.io/pypa/manylinux2014_x86_64"
+  py_version = "cp38-cp38"
+
+} else if (platform.equals("cp37-cp37m-manylinux2014_x86_64")) {
+
+  target = platform + ".whl"
+  docker_image = "quay.io/pypa/manylinux2014_x86_64"
+  py_version = "cp37-cp37m"
+
+} else if (platform.equals("cp36-cp36m-manylinux2014_x86_64")) {
+
+  target = platform + ".whl"
+  docker_image = "quay.io/pypa/manylinux2014_x86_64"
+  py_version = "cp36-cp36m"
+
+} else if (platform.equals("cp35-cp35m-manylinux2014_x86_64")) {
+
+  target = platform + ".whl"
+  docker_image = "quay.io/pypa/manylinux2014_x86_64"
+  py_version = "cp35-cp35m"
+
+} else if (platform.equals("cp27-cp27m-manylinux2014_x86_64")) {
+
+  target = platform + ".whl"
+  docker_image = "quay.io/pypa/manylinux2014_x86_64"
+  py_version = "cp27-cp27m"
+
+}
+
+node("master") {
+
+  stage("Checkout sources") {
+    checkout scm
+  }
+
+  stage("Building target ${target}") {
+
+    sh("rm -rf wheelhouse ; mkdir -p ccache wheelhouse")
+
+    withDockerContainer(image: docker_image, args: "-v " + pwd() + ":/io -u 0:0") {
+      sh("PY_VERSION=" + py_version + " DOCKER_IMAGE=" + docker_image + " /io/ci-scripts/docker/docker_build.sh")
+    }
+
+  }
+        
+  stage("Publish and test") {
+        
+    //  publish for release tags
+    if (BRANCH_NAME.startsWith('v')) {
+      sh("twine upload --skip-existing dist/{*.whl,*.zip}")
+    }
+
+  }
+        
+}
+

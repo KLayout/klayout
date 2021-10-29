@@ -11,46 +11,22 @@ platform = pypi_platform()
 currentBuild.description = "PyPI deployment " + platform
 
 python = ""
-docker_image = ""
+docker_image = "jenkins-manylinux2014_x86_64-pypi"
 py_version = ""
-target = ""
+target = platform + ".whl"
 
 if (platform.equals("cp39-cp39m-manylinux2014_x86_64")) {
-
-  target = platform + ".whl"
-  docker_image = "quay.io/pypa/manylinux2014_x86_64"
   py_version = "cp39-cp39"
-
 } else if (platform.equals("cp38-cp38m-manylinux2014_x86_64")) {
-
-  target = platform + ".whl"
-  docker_image = "quay.io/pypa/manylinux2014_x86_64"
   py_version = "cp38-cp38"
-
 } else if (platform.equals("cp37-cp37m-manylinux2014_x86_64")) {
-
-  target = platform + ".whl"
-  docker_image = "quay.io/pypa/manylinux2014_x86_64"
   py_version = "cp37-cp37m"
-
 } else if (platform.equals("cp36-cp36m-manylinux2014_x86_64")) {
-
-  target = platform + ".whl"
-  docker_image = "quay.io/pypa/manylinux2014_x86_64"
   py_version = "cp36-cp36m"
-
 } else if (platform.equals("cp35-cp35m-manylinux2014_x86_64")) {
-
-  target = platform + ".whl"
-  docker_image = "quay.io/pypa/manylinux2014_x86_64"
   py_version = "cp35-cp35m"
-
 } else if (platform.equals("cp27-cp27m-manylinux2014_x86_64")) {
-
-  target = platform + ".whl"
-  docker_image = "quay.io/pypa/manylinux2014_x86_64"
   py_version = "cp27-cp27m"
-
 }
 
 node("master") {
@@ -61,10 +37,10 @@ node("master") {
 
   stage("Building target ${target}") {
 
-    sh("rm -rf wheelhouse ; mkdir -p ccache wheelhouse")
+    sh("rm -rf wheelhouse ; mkdir -p wheelhouse")
 
-    withDockerContainer(image: docker_image, args: "-v " + pwd() + ":/io -u 0:0") {
-      sh("PY_VERSION=" + py_version + " DOCKER_IMAGE=" + docker_image + " /io/ci-scripts/docker/docker_build.sh")
+    withDockerContainer(image: docker_image, args: "-v " + pwd() + ":/io") {
+      sh("PY_VERSION=" + py_version + " /io/ci-scripts/docker/docker_build_jenkins.sh")
     }
 
   }

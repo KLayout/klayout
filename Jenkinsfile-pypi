@@ -7,27 +7,12 @@ properties([disableConcurrentBuilds()])
 //  (this is a pretty stupid way to set a parameter, but I don't
 //  know of a better way to parameterize a multibranch pipeline)
 platform = pypi_platform()
+py_version = pypi_py_version()
 
 currentBuild.description = "PyPI deployment " + platform
 
-python = ""
 docker_image = "jenkins-manylinux2014_x86_64-pypi"
-py_version = ""
 target = platform + ".whl"
-
-if (platform.equals("cp39-cp39m-manylinux2014_x86_64")) {
-  py_version = "cp39-cp39"
-} else if (platform.equals("cp38-cp38m-manylinux2014_x86_64")) {
-  py_version = "cp38-cp38"
-} else if (platform.equals("cp37-cp37m-manylinux2014_x86_64")) {
-  py_version = "cp37-cp37m"
-} else if (platform.equals("cp36-cp36m-manylinux2014_x86_64")) {
-  py_version = "cp36-cp36m"
-} else if (platform.equals("cp35-cp35m-manylinux2014_x86_64")) {
-  py_version = "cp35-cp35m"
-} else if (platform.equals("cp27-cp27m-manylinux2014_x86_64")) {
-  py_version = "cp27-cp27m"
-}
 
 node("master") {
 

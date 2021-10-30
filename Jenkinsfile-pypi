@@ -49,7 +49,7 @@ node("master") {
         
     //  publish for release tags
     if (BRANCH_NAME.startsWith('v')) {
-      sh("twine upload --skip-existing wheelhouse/{klayout-*manylinux2014*.whl,*.zip}")
+      sh("twine upload --skip-existing wheelhouse/klayout-*manylinux2014*.whl wheelhouse/*.zip")
     }
 
   }

@@ -409,9 +409,9 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
 void 
 CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Cell mapping")));
+  tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("Cell mapping")));
 
-  if (tl::verbosity () >= 20) {
+  if (tl::verbosity () >= 40) {
     tl::info << "Cell mapping - first step: mapping instance count and instance identity";
   }
 
@@ -449,7 +449,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
       ++a;
     } else {
 
-      if (tl::verbosity () >= 30) {
+      if (tl::verbosity () >= 50) {
         size_t na = 0, nb = 0;
         for (std::multimap<size_t, db::cell_index_type>::const_iterator aa = a; aa != cm_a.end () && aa->first == w; ++aa) {
           ++na;
@@ -497,7 +497,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
 
         }
 
-        if (tl::verbosity () >= 40) {
+        if (tl::verbosity () >= 60) {
           tl::info << "Checked cell " << layout_a.cell_name (a->second) << ": " << candidates [a->second].size () << " candidates remaining.";
         }
           
@@ -519,7 +519,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
     ++a;
   }
 
-  if (tl::verbosity () >= 40) {
+  if (tl::verbosity () >= 60) {
     tl::info << "Mapping candidates:";
     dump_mapping (candidates, layout_a, layout_b);
   }
@@ -536,7 +536,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
     reduction = false;
     ++iteration;
 
-    if (tl::verbosity () >= 20) {
+    if (tl::verbosity () >= 40) {
       tl::info << "Cell mapping - iteration " << iteration << ": cross-instance cone reduction";
     }
 
@@ -553,7 +553,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
         refined_cand.clear ();
         refined_cand.insert (refined_cand.end (), cand->second.begin (), cand->second.end ());
 
-        if (tl::verbosity () >= 50) {
+        if (tl::verbosity () >= 70) {
           tl::info << "--- Cell: " << layout_a.cell_name (cand->first);
           tl::info << "Before reduction: " << tl::noendl; 
           for (size_t i = 0; i < refined_cand.size (); ++i) { 
@@ -582,7 +582,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
                 }
               }
 
-              if (tl::verbosity () >= 50 && cout != refined_cand.end ()) {
+              if (tl::verbosity () >= 70 && cout != refined_cand.end ()) {
                 tl::info << "Reduction because of caller mapping: " << layout_a.cell_name (*c) << " <-> " << layout_b.cell_name (others[0]);
                 tl::info << "  -> " << tl::noendl; 
                 for (size_t i = 0; i < size_t (cout - refined_cand.begin ()); ++i) { 
@@ -619,7 +619,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
                 }
               }
 
-              if (tl::verbosity () >= 50 && cout != refined_cand.end ()) {
+              if (tl::verbosity () >= 70 && cout != refined_cand.end ()) {
                 tl::info << "Reduction because of callee mapping: " << layout_a.cell_name (*c) << " <-> " << layout_b.cell_name (others[0]);
                 tl::info << "  -> " << tl::noendl; 
                 for (size_t i = 0; i < size_t (cout - refined_cand.begin ()); ++i) { 
@@ -646,7 +646,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
                 int ed = tl::edit_distance (layout_a.cell_name (ca), layout_b.cell_name (cb));
                 if (ed < uc->second.second) {
                   uc->second = std::make_pair (ca, ed);
-                  if (tl::verbosity () >= 40) {
+                  if (tl::verbosity () >= 60) {
                     tl::info << "Choosing " << layout_b.cell_name (cb) << " (layout_b) as new unique mapping for " << layout_a.cell_name (ca) << " (layout_a)";
                   }
                 }
@@ -654,7 +654,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
             } else {
               int ed = tl::edit_distance (layout_a.cell_name (ca), layout_b.cell_name (cb));
               unique_candidates.insert (std::make_pair (cb, std::make_pair (ca, ed)));
-              if (tl::verbosity () >= 40) {
+              if (tl::verbosity () >= 60) {
                 tl::info << "Choosing " << layout_b.cell_name (cb) << " (layout_b) as unique mapping for " << layout_a.cell_name (ca) << " (layout_a)";
               }
             }
@@ -679,12 +679,12 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
 
     }
 
-    if (tl::verbosity () >= 40) {
+    if (tl::verbosity () >= 60) {
       tl::info << "Further refined candidates:";
       dump_mapping (candidates, layout_a, layout_b);
     }
     
-    if (tl::verbosity () >= 20) {
+    if (tl::verbosity () >= 40) {
       tl::info << "Cell mapping - iteration " << iteration << ": removal of uniquely mapped cells on B side";
     }
 
@@ -709,15 +709,15 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
       }
 
     }
-    
-    if (tl::verbosity () >= 40) {
+
+    if (tl::verbosity () >= 60) {
       tl::info << "After reduction of mapped cells on b side:";
       dump_mapping (candidates, layout_a, layout_b);
     }
     
   }
 
-  if (tl::verbosity () >= 20) {
+  if (tl::verbosity () >= 40) {
 
     int total = 0;
     int not_mapped = 0;
@@ -747,7 +747,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
 
   //  Resolve mapping according to string match
 
-  if (tl::verbosity () >= 20) {
+  if (tl::verbosity () >= 40) {
     tl::info << "Cell mapping - string mapping as last resort";
   }
 
@@ -784,7 +784,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
 
   }
 
-  if (tl::verbosity () >= 20) {
+  if (tl::verbosity () >= 40) {
 
     int total = 0;
     int not_mapped = 0;
@@ -795,7 +795,7 @@ CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_ty
     for (std::map <db::cell_index_type, std::vector<db::cell_index_type> >::iterator cand = candidates.begin (); cand != candidates.end (); ++cand) {
       ++total;
       if (cand->second.size () == 0) {
-        if (tl::verbosity () >= 30) {
+        if (tl::verbosity () >= 50) {
           tl::info << "Unmapped cell: " << layout_a.cell_name (cand->first);
         }
         ++not_mapped;
@@ -823,12 +823,12 @@ CellMapping::extract_unique (std::map <db::cell_index_type, std::vector<db::cell
 {
   if (cand->second.size () == 1) {
 
-    if (tl::verbosity () >= 20) {
+    if (tl::verbosity () >= 40) {
       tl::info << "  (U) " << layout_a.cell_name (cand->first) << " -> " << layout_b.cell_name (cand->second.front ()) << " (" << cand->first << " -> " << cand->second.front () << ")";
     }
     unique_mapping.insert (std::make_pair (cand->second.front (), cand->first));
 
-  } else if (tl::verbosity () >= 30) {
+  } else if (tl::verbosity () >= 50) {
 
     tl::info << "      " << layout_a.cell_name (cand->first) << " ->" << tl::noendl;
     int n = 5;

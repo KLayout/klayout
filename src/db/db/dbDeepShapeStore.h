@@ -340,6 +340,25 @@ public:
   bool is_singular () const;
 
   /**
+   *  @brief Sets a value indicating whether to keep layouts
+   *
+   *  If this value is set to true, layouts are not released when their reference count
+   *  goes down to zero.
+   */
+  void set_keep_layouts (bool f)
+  {
+    m_keep_layouts = f;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether to keep layouts
+   */
+  bool keep_layouts () const
+  {
+    return m_keep_layouts;
+  }
+
+  /**
    *  @brief Creates a new layer from a flat region (or the region is made flat)
    *
    *  This method is intended for use with singular-created DSS objects (see
@@ -480,6 +499,11 @@ public:
   const db::CellMapping &cell_mapping_to_original (unsigned int layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells = 0, const std::set<db::cell_index_type> *included_cells = 0);
 
   /**
+   *  @brief Gets the cell mapping from one internal layout to another
+   */
+  const db::CellMapping &internal_cell_mapping (unsigned int from_layout_index, unsigned int into_layout_index);
+
+  /**
    *  @brief Create cell variants from the given variant collector
    *
    *  To use this method, first create a variant collector (db::cell_variant_collector) with the required
@@ -543,6 +567,11 @@ public:
    *  Don't try to mess too much with the cell object, you'll screw up the internals.
    */
   db::Cell &initial_cell (unsigned int n);
+
+  /**
+   *  @brief Gets the layout index for a given internal layout
+   */
+  unsigned int layout_index (const db::Layout *layout) const;
 
   /**
    *  @brief Gets the singular layout (const version)
@@ -752,6 +781,7 @@ private:
   layout_map_type m_layout_map;
   DeepShapeStoreState m_state;
   std::list<DeepShapeStoreState> m_state_stack;
+  bool m_keep_layouts;
   tl::Mutex m_lock;
 
   struct DeliveryMappingCacheKey
@@ -781,6 +811,7 @@ private:
   };
 
   std::map<DeliveryMappingCacheKey, db::CellMapping> m_delivery_mapping_cache;
+  std::map<std::pair<unsigned int, unsigned int>, db::CellMapping> m_internal_mapping_cache;
 };
 
 template <class VarCollector>

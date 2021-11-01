@@ -381,14 +381,16 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
 
   } else {
 
-    db::Box cell_bbox = iter->layout ()->cell (inst.object ().cell_index ()).bbox ();
+    db::cell_index_type inst_cell = inst.object ().cell_index ();
+
+    db::Box cell_bbox = iter->cell_bbox (inst_cell);
     std::pair<bool, std::set<db::Box> > clip_variant = compute_clip_variant (cell_bbox, trans, region, complex_region);
     if (! clip_variant.first) {
       return false;
     }
 
-    CellMapKey key (inst.object ().cell_index (), iter->is_child_inactive (inst.object ().cell_index ()), clip_variant.second);
-    db::cell_index_type new_cell = make_cell_variant (key, iter->layout ()->cell_name (inst.object ().cell_index ()));
+    CellMapKey key (inst.object ().cell_index (), iter->is_child_inactive (inst_cell), clip_variant.second);
+    db::cell_index_type new_cell = make_cell_variant (key, iter->layout ()->cell_name (inst_cell));
 
     //  for a new cell, create this instance
     if (m_cell_stack.back ().first) {

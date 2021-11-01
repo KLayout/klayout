@@ -666,6 +666,16 @@ public:
   }
 
   /**
+   *  @brief Gets the current cell's bounding box
+   *
+   *  The returned box is limited to the selected layer if applicable.
+   */
+  box_type cell_bbox (db::cell_index_type cell_index) const
+  {
+    return m_box_convert (db::CellInst (cell_index));
+  }
+
+  /**
    *  @brief Increments the iterator (operator version)
    */
   RecursiveShapeIterator &operator++() 

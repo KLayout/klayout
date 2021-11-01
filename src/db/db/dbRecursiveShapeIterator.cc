@@ -646,7 +646,7 @@ RecursiveShapeIterator::skip_inst_iter_for_complex_region () const
 
     //  skip insts outside the complex region
     if (! m_inst.at_end ()) {
-      if (! is_outside_complex_region (m_inst->bbox ())) {
+      if (! is_outside_complex_region (m_inst->bbox (m_box_convert))) {
         break;
       } else {
         ++m_inst;
@@ -775,7 +775,7 @@ RecursiveShapeIterator::down (RecursiveShapeReceiver *receiver) const
   //  compute the region inside the new cell
   if (new_region != m_region) {
     new_region = m_trans.inverted () * m_region;
-    new_region &= cell ()->bbox ();
+    new_region &= m_box_convert (db::CellInst (cell ()->cell_index ()));
   }
   m_local_region_stack.push_back (new_region);
 

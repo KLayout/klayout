@@ -269,6 +269,11 @@ void CellMapping::clear ()
   m_b2a_mapping.clear ();
 }
 
+void CellMapping::swap (CellMapping &other)
+{
+  m_b2a_mapping.swap (other.m_b2a_mapping);
+}
+
 std::vector<db::cell_index_type> CellMapping::source_cells () const
 {
   std::vector<db::cell_index_type> s;

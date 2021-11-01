@@ -32,6 +32,7 @@
 #include "dbLayout.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbHierarchyBuilder.h"
+#include "dbCellMapping.h"
 #include "gsiObject.h"
 
 #include <set>
@@ -289,6 +290,41 @@ struct DB_PUBLIC RecursiveShapeIteratorCompareForTargetHierarchy
     }
     return a.second < b.second;
   }
+};
+
+/**
+ *  @brief An object holding a cell mapping with the hierarchy generation Ids of the involved layouts
+ */
+class DB_PUBLIC CellMappingWithGenerationIds
+  : public db::CellMapping
+{
+public:
+  CellMappingWithGenerationIds ()
+    : db::CellMapping (), m_into_generation_id (0), m_from_generation_id (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  void swap (CellMappingWithGenerationIds &other)
+  {
+    db::CellMapping::swap (other);
+    std::swap (m_into_generation_id, other.m_into_generation_id);
+    std::swap (m_from_generation_id, other.m_from_generation_id);
+  }
+
+  bool is_valid (const db::Layout &into_layout, const db::Layout &from_layout) const
+  {
+    return into_layout.hier_generation_id () == m_into_generation_id && from_layout.hier_generation_id () == m_from_generation_id;
+  }
+
+  void set_generation_ids (const db::Layout &into_layout, const db::Layout &from_layout)
+  {
+    m_into_generation_id = into_layout.hier_generation_id ();
+    m_from_generation_id = from_layout.hier_generation_id ();
+  }
+
+private:
+  size_t m_into_generation_id, m_from_generation_id;
 };
 
 /**
@@ -759,7 +795,6 @@ private:
 
   struct LayoutHolder;
 
-  void invalidate_hier ();
   void add_ref (unsigned int layout, unsigned int layer);
   void remove_ref (unsigned int layout, unsigned int layer);
 
@@ -810,8 +845,8 @@ private:
     db::cell_index_type into_cell;
   };
 
-  std::map<DeliveryMappingCacheKey, db::CellMapping> m_delivery_mapping_cache;
-  std::map<std::pair<unsigned int, unsigned int>, db::CellMapping> m_internal_mapping_cache;
+  std::map<DeliveryMappingCacheKey, CellMappingWithGenerationIds> m_delivery_mapping_cache;
+  std::map<std::pair<unsigned int, unsigned int>, CellMappingWithGenerationIds> m_internal_mapping_cache;
 };
 
 template <class VarCollector>

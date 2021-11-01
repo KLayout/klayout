@@ -261,12 +261,15 @@ TEST(2)
   db::cell_index_type ci;
   db::Cell *top;
 
+  EXPECT_EQ (g.hier_generation_id (), size_t (0));
+
   ci = g.add_cell ("TOP");
 
   EXPECT_EQ (el.flags, (unsigned int) 0);
   EXPECT_EQ (el.bboxes_dirty, false);
   EXPECT_EQ (el.bboxes_all_dirty, false);
   EXPECT_EQ (el.hier_dirty, true);
+  EXPECT_EQ (g.hier_generation_id (), size_t (1));
 
   el.reset ();
   top = &g.cell (ci);
@@ -276,6 +279,7 @@ TEST(2)
   EXPECT_EQ (el.bboxes_dirty, false);
   EXPECT_EQ (el.bboxes_all_dirty, false);
   EXPECT_EQ (el.hier_dirty, false);  //  needs g.update() before being issues again
+  EXPECT_EQ (g.hier_generation_id (), size_t (2));
 
   el.reset ();
   top->insert (db::CellInstArray (ci, db::Trans ()));
@@ -284,10 +288,12 @@ TEST(2)
   EXPECT_EQ (el.bboxes_dirty, true);
   EXPECT_EQ (el.bboxes_all_dirty, true);
   EXPECT_EQ (el.hier_dirty, false);  //  needs g.update() before being issues again
+  EXPECT_EQ (g.hier_generation_id (), size_t (3));
 
   g.clear ();
   g.update ();
   el.reset ();
+  EXPECT_EQ (g.hier_generation_id (), size_t (4));
 
   ci = g.add_cell ("TOP");
 
@@ -295,6 +301,7 @@ TEST(2)
   EXPECT_EQ (el.bboxes_dirty, false);
   EXPECT_EQ (el.bboxes_all_dirty, false);
   EXPECT_EQ (el.hier_dirty, true);
+  EXPECT_EQ (g.hier_generation_id (), size_t (5));
 
   el.reset ();
   g.update ();
@@ -305,6 +312,7 @@ TEST(2)
   EXPECT_EQ (el.bboxes_dirty, false);
   EXPECT_EQ (el.bboxes_all_dirty, false);
   EXPECT_EQ (el.hier_dirty, true);  //  OK - see above
+  EXPECT_EQ (g.hier_generation_id (), size_t (6));
 
   el.reset ();
   g.update ();
@@ -314,6 +322,7 @@ TEST(2)
   EXPECT_EQ (el.bboxes_dirty, true);
   EXPECT_EQ (el.bboxes_all_dirty, true);
   EXPECT_EQ (el.hier_dirty, true);  //  OK - see above
+  EXPECT_EQ (g.hier_generation_id (), size_t (7));
 
   //  busy mode will make events issued always
   g.clear ();
@@ -326,6 +335,7 @@ TEST(2)
   EXPECT_EQ (el.bboxes_dirty, false);
   EXPECT_EQ (el.bboxes_all_dirty, false);
   EXPECT_EQ (el.hier_dirty, true);
+  EXPECT_EQ (g.hier_generation_id (), size_t (9));
 
   el.reset ();
   top = &g.cell (ci);
@@ -335,6 +345,7 @@ TEST(2)
   EXPECT_EQ (el.bboxes_dirty, false);
   EXPECT_EQ (el.bboxes_all_dirty, false);
   EXPECT_EQ (el.hier_dirty, true);  //  OK - see above
+  EXPECT_EQ (g.hier_generation_id (), size_t (10));
 
   el.reset ();
   top->insert (db::CellInstArray (ci, db::Trans ()));
@@ -343,6 +354,7 @@ TEST(2)
   EXPECT_EQ (el.bboxes_dirty, true);
   EXPECT_EQ (el.bboxes_all_dirty, true);
   EXPECT_EQ (el.hier_dirty, true);  //  OK - see above
+  EXPECT_EQ (g.hier_generation_id (), size_t (11));
 
 }
 

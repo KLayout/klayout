@@ -806,8 +806,8 @@ The enclosing method can be applied to both edge or polygon layers. On edge laye
 the orientation of the edges matters and only edges looking into the same direction
 are checked.
 </p><p>
-As for the other DRC methods, merged semantics applies. The options available 
-are the same than for <a href="#width">width</a>.  
+As for the other DRC methods, merged semantics applies.
+</p><p>
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
 </p><p>
@@ -2046,8 +2046,8 @@ The overlap method can be applied to both edge or polygon layers. On edge layers
 the orientation of the edges matters: only edges which run back to back with their
 inside side pointing towards each other are checked for distance.
 </p><p>
-As for the other DRC methods, merged semantics applies. The options available 
-are the same than for <a href="#width">width</a>.  
+As for the other DRC methods, merged semantics applies. 
+</p><p>
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
 </p><p>
@@ -2569,6 +2569,7 @@ layers touch are also reported. More specifically, the case of zero spacing
 will also trigger an error while for <a href="#space">space</a> it will not.
 </p><p>
 As for the other DRC methods, merged semantics applies.
+</p><p>
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
 </p><p>
@@ -2789,7 +2790,7 @@ The <a href="#notch">notch</a> method is similar, but will only report self-spac
 method will only report space violations to other polygons. <a href="#separation">separation</a> is a two-layer 
 space check where space is checked against polygons of another layer.
 </p><p>
-Like for the <a href="#width">width</a> method, merged semantics applies.
+As for the other DRC methods, merged semantics applies.
 </p><p>
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.

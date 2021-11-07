@@ -3547,7 +3547,7 @@ CODE
     # method will only report space violations to other polygons. \separation is a two-layer 
     # space check where space is checked against polygons of another layer.
     #
-    # Like for the \width method, merged semantics applies.
+    # As for the other DRC methods, merged semantics applies.
     #
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
@@ -3632,6 +3632,7 @@ CODE
     # will also trigger an error while for \space it will not.
     # 
     # As for the other DRC methods, merged semantics applies.
+    #
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
@@ -3739,8 +3740,8 @@ CODE
     # the orientation of the edges matters: only edges which run back to back with their
     # inside side pointing towards each other are checked for distance.
     #
-    # As for the other DRC methods, merged semantics applies. The options available 
-    # are the same than for \width.  
+    # As for the other DRC methods, merged semantics applies. 
+    #
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
@@ -3779,8 +3780,8 @@ CODE
     # the orientation of the edges matters and only edges looking into the same direction
     # are checked.
     # 
-    # As for the other DRC methods, merged semantics applies. The options available 
-    # are the same than for \width.  
+    # As for the other DRC methods, merged semantics applies.
+    #
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #

@@ -28,6 +28,7 @@
 #include "dbEdgePairRelations.h"
 #include "dbLocalOperation.h"
 #include "dbEdgeProcessor.h"
+#include "dbRegionCheckUtils.h"
 
 #include <vector>
 #include <unordered_set>
@@ -218,6 +219,7 @@ private:
   bool m_has_other;
   bool m_other_is_merged;
   db::RegionCheckOptions m_options;
+  mutable poly2poly_check<TS> m_poly_check;
 };
 
 typedef check_local_operation<db::PolygonRef, db::PolygonRef> CheckLocalOperation;

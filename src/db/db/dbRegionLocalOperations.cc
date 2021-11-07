@@ -21,8 +21,8 @@
 */
 
 
-#include "dbRegionUtils.h"
 #include "dbRegionLocalOperations.h"
+#include "dbRegionUtils.h"
 #include "dbLocalOperationUtils.h"
 #include "dbHierProcessor.h"
 
@@ -123,7 +123,7 @@ static bool shields_interaction (const db::EdgePair &ep, const P &poly)
 
 template <class TS, class TI>
 check_local_operation<TS, TI>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options)
-  : m_check (check), m_different_polygons (different_polygons), m_has_other (has_other), m_other_is_merged (other_is_merged), m_options (options)
+  : m_check (check), m_different_polygons (different_polygons), m_has_other (has_other), m_other_is_merged (other_is_merged), m_options (options), m_poly_check ()
 {
   //  .. nothing yet ..
 }
@@ -206,10 +206,9 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
   bool symmetric_edge_pairs = ! m_has_other && m_options.opposite_filter == db::NoOppositeFilter && m_options.rect_filter == RectFilter::NoRectFilter;
 
   edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check (m_check, result, intra_polygon_result, m_options.negative, m_different_polygons, m_has_other, m_options.shielded, symmetric_edge_pairs);
-  poly2poly_check<TS> poly_check (edge_check);
+  m_poly_check.connect (edge_check);
 
   std::list<TS> heap;
-  db::box_scanner<TS, size_t> scanner;
   std::unordered_set<TI> polygons;
 
   std::set<unsigned int> ids;
@@ -224,7 +223,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
     size_t n = 0;
     for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       const TS &subject = interactions.subject_shape (i->first);
-      scanner.insert (push_polygon_to_heap (layout, subject, heap), n);
+      m_poly_check.enter (subject, n);
       n += 2;
     }
 
@@ -262,7 +261,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
 
       n = 1;
       for (typename std::unordered_set<TI>::const_iterator o = polygons.begin (); o != polygons.end (); ++o) {
-        scanner.insert (push_polygon_to_heap (layout, *o, heap), n);
+        m_poly_check.enter (*o, n);
         n += 2;
       }
 
@@ -270,7 +269,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
 
       n = 1;
       for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
-        scanner.insert (push_polygon_to_heap (layout, interactions.intruder_shape (*id).second, heap), n);
+        m_poly_check.enter (interactions.intruder_shape (*id).second, n);
         n += 2;
       }
 
@@ -286,7 +285,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       //  we can't directly insert because TS may be != TI
       const TS &ts = interactions.subject_shape (i->first);
       insert_into_hash (polygons, ts);
-      scanner.insert (push_polygon_to_heap (layout, ts, heap), n);
+      m_poly_check.enter (ts, n);
       n += 2;
     }
 
@@ -295,7 +294,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
     for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
       const TI &ti = interactions.intruder_shape (*id).second;
       if (polygons.find (ti) == polygons.end ()) {
-        scanner.insert (push_polygon_to_heap (layout, ti, heap), n);
+        m_poly_check.enter (ti, n);
         n += 2;
       }
     }
@@ -303,7 +302,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
   }
 
   do {
-    scanner.process (poly_check, m_check.distance (), db::box_convert<TS> ());
+    m_poly_check.process ();
   } while (edge_check.prepare_next_pass ());
 
   //  detect and remove parts of the result which have or do not have results "opposite"

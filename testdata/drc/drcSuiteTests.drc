@@ -134,6 +134,10 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   a.enclosing(b, 0.5, whole_edges).second_edges.extended_out(0.01).output(lb + 1, dm)
   a.enclosing(b, 0.5, whole_edges).edges.extended_out(0.01).output(lb + 2, dm)
   
+  b.enclosed(a, 0.5, whole_edges).second_edges.extended_out(0.01).output(lb + 3, dm)
+  b.enclosed(a, 0.5, whole_edges).first_edges.extended_out(0.01).output(lb + 4, dm)
+  b.enclosed(a, 0.5, whole_edges).edges.extended_out(0.01).output(lb + 5, dm)
+  
   lb += 10 #150
   message "--- hulls, holes #{lb}"
   
@@ -323,6 +327,8 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   else
     a.enclosing(b, 0.5, euclidian, projection_limits(0, 0.4)).polygons.output(lb + 7, dm)
   end
+
+  b.enclosed(a, 0.5, euclidian, projection_limits(nil, 0.4)).polygons.output(lb + 8, dm)
   
   lb += 10 #220
   message "--- enclosing (edges) #{lb}"
@@ -343,6 +349,8 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
     ae.enclosing(be, 0.5, euclidian, projection_limits(0, 0.4)).polygons.output(lb + 7, dm)
   end
   
+  be.enclosed(ae, 0.5, euclidian, whole_edges).polygons.output(lb + 8, dm)
+
   lb += 10 #230
   message "--- isolated #{lb}"
   

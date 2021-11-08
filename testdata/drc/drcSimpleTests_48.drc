@@ -33,8 +33,16 @@ l2.separation(l1, projection, 1.0, whole_edges).output(211, 0)
 l1.drc(enclosing(l2, projection) < 1.0).output(400, 0)
 l1.drc(enclosing(l2, whole_edges, projection) < 1.0).output(401, 0)
 l1.drc(enclosing(l2, projection) >= 1.0).output(402, 0)
+
+l2.drc(enclosed(l1, projection) < 1.0).output(403, 0)
+l2.drc(enclosed(l1, whole_edges, projection) < 1.0).output(404, 0)
+l2.drc(enclosed(l1, projection) >= 1.0).output(405, 0)
+
 l1.enclosing(l2, projection, 1.0).output(410, 0)
 l1.enclosing(l2, projection, 1.0, whole_edges).output(411, 0)
+
+l2.enclosed(l1, projection, 1.0).output(412, 0)
+l2.enclosed(l1, projection, 1.0, whole_edges).output(413, 0)
 
 l1.drc(overlap(l2, projection) < 1.0).output(500, 0)
 l1.drc(overlap(l2, whole_edges, projection) < 1.0).output(501, 0)

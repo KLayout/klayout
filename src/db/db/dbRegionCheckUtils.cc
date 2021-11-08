@@ -231,12 +231,21 @@ Edge2EdgeCheckBase::add (const db::Edge *o1, size_t p1, const db::Edge *o2, size
         m_e2ep.insert (std::make_pair (std::make_pair (*o2, p2), n * 2 + 1));
 
         if (m_has_negative_edge_output) {
-          m_pseudo_edges.insert (std::make_pair (db::Edge (ep.first ().p1 (), ep.second ().p2 ()), p1));
-          m_pseudo_edges.insert (std::make_pair (db::Edge (ep.second ().p1 (), ep.first ().p2 ()), p1));
+
+          bool antiparallel = (mp_check->relation () == WidthRelation || mp_check->relation () == SpaceRelation);
+
+          //  pseudo1 and pseudo2 are the connecting edges of the edge pairs. Together with the
+          //  original edges they form a quadrangle.
+          db::Edge pseudo1 (ep.first ().p1 (), antiparallel ? ep.second ().p2 () : ep.second ().p1 ());
+          db::Edge pseudo2 (antiparallel ? ep.second ().p1 () : ep.second ().p2 (), ep.first ().p2 ());
+
+          m_pseudo_edges.insert (std::make_pair (pseudo1, p1));
+          m_pseudo_edges.insert (std::make_pair (pseudo2, p1));
           if (p1 != p2) {
-            m_pseudo_edges.insert (std::make_pair (db::Edge (ep.first ().p1 (), ep.second ().p2 ()), p2));
-            m_pseudo_edges.insert (std::make_pair (db::Edge (ep.second ().p1 (), ep.first ().p2 ()), p2));
+            m_pseudo_edges.insert (std::make_pair (pseudo1, p2));
+            m_pseudo_edges.insert (std::make_pair (pseudo2, p2));
           }
+
         }
 
       }

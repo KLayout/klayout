@@ -1888,7 +1888,7 @@ class DRCOpNodeCheck < DRCOpNodeWithCompare
     factory = { :width => :new_width_check, :space => :new_space_check,
                 :notch => :new_notch_check, :separation => :new_separation_check,
                 :isolated => :new_isolated_check, :overlap => :new_overlap_check, 
-                :enclosing => :new_enclosing_check }[self.check]
+                :enclosing => :new_enclosing_check, :enclosed => :new_enclosed_check }[self.check]
 
     oargs = []
     if self.other

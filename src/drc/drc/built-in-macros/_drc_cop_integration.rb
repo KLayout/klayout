@@ -1043,6 +1043,84 @@ CODE
     #
     
     # %DRC%
+    # @name enclosed
+    # @brief Performs an enclosing check (other enclosing layer)
+    # @synopsis enclosed(other [, options ]) (in conditions)
+    # @synopsis enclosed(layer, other [, options ])
+    #
+    # This check verifies if the polygons of the input layer are enclosed by shapes
+    # of the other input layer by a certain distance.
+    # It has manifold options. See \Layer#width for the basic options such
+    # as metrics, projection and angle constraints etc. This check also features
+    # opposite and rectangle filtering. See \Layer#separation for details about opposite and
+    # rectangle error filtering.
+    #
+    # This function is essentially the reverse of \enclosing. In case of
+    # "enclosed", the other layer must be bigger than the primary layer.
+    #
+    # @h3 Classic mode @/h3
+    #
+    # This function can be used in classic mode with a layer argument. In this case it
+    # is equivalent to "layer.enclosed" (see \Layer#enclosed). 
+    #
+    # @code
+    # # classic "enclosed" check for < 0.2 um
+    # in = layer(1, 0)
+    # other = layer(2, 0)
+    # errors = enclosed(in, other, 0.2.um)
+    # @/code
+    #
+    # @h3 Universal DRC @/h3
+    #
+    # The version without a first layer is intended for use within \DRC# expressions
+    # together with the "universal DRC" method \Layer#drc. In this case, this function needs to be 
+    # put into a condition to specify the check constraints. The other options
+    # of \Layer#enclosed (e.g. metrics, projection constraints, angle limits etc.)
+    # apply to this version too:
+    #
+    # @code
+    # # universal DRC "enclosed" check for < 0.2 um
+    # in = layer(1, 0)
+    # other = layer(2, 0)
+    # errors = in.drc(enclosed(other) < 0.2.um)
+    # @/code
+    #
+    # The conditions may involve an upper and lower limit. The following examples
+    # illustrate the use of this function with conditions:
+    #
+    # @code
+    # out = in.drc(enclosed(other) < 0.2.um)
+    # out = in.drc(enclosed(other) <= 0.2.um)
+    # out = in.drc(enclosed(other) > 0.2.um)
+    # out = in.drc(enclosed(other) >= 0.2.um)
+    # out = in.drc(enclosed(other) == 0.2.um)
+    # out = in.drc(enclosed(other) != 0.2.um)
+    # out = in.drc(0.1.um <= enclosed(other) < 0.2.um)
+    # @/code
+    #
+    # The result of the enclosed check are edges or edge pairs forming the markers.
+    # These markers indicate the presence of the specified condition.
+    # 
+    # With a lower and upper limit, the results are edges marking the positions on the 
+    # primary shape where the condition is met.
+    # With a lower limit alone, the results are edge pairs which are formed by two identical, but opposite edges attached to 
+    # the primary shape. Without an upper limit only, the first edge of the marker is attached to the 
+    # primary shape while the second edge is attached to the shape of the "other" layer.
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_encd1u.png) @/td
+    #     @td @img(/images/drc_encd2u.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # When "larger than" constraints are used, this function will produce the edges from the
+    # first layer only. The result will still be edge pairs for consistency, but each edge pair holds one edge from
+    # the original polygon plus a reverse copy of that edge in the second member. Use "first_edges" to extract the 
+    # actual edges from the first input (see \separation for an example).
+    #
+    
+    # %DRC%
     # @name separation
     # @brief Performs a separation check
     # @synopsis separation(other [, options ]) (in conditions)
@@ -1367,6 +1445,7 @@ CODE
     
     %w(
       enclosing
+      enclosed
       isolated
       notch
       overlap

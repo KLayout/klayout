@@ -36,6 +36,10 @@
   <file alias="drc_enc2.png">doc/images/drc_enc2.png</file>
   <file alias="drc_enc1u.png">doc/images/drc_enc1u.png</file>
   <file alias="drc_enc2u.png">doc/images/drc_enc2u.png</file>
+  <file alias="drc_encd1.png">doc/images/drc_encd1.png</file>
+  <file alias="drc_encd2.png">doc/images/drc_encd2.png</file>
+  <file alias="drc_encd1u.png">doc/images/drc_encd1u.png</file>
+  <file alias="drc_encd2u.png">doc/images/drc_encd2u.png</file>
   <file alias="drc_overlap1.png">doc/images/drc_overlap1.png</file>
   <file alias="drc_overlap2.png">doc/images/drc_overlap2.png</file>
   <file alias="drc_overlap1u.png">doc/images/drc_overlap1u.png</file>

@@ -468,6 +468,34 @@ poly2poly_check<PolygonType>::enter (const PolygonType &o, size_t p)
   }
 }
 
+//  TODO: move to generic header
+static bool interact (const db::Box &box, const db::Edge &e)
+{
+  if (! e.bbox ().touches (box)) {
+    return false;
+  } else if (e.is_ortho ()) {
+    return true;
+  } else {
+    return e.clipped (box).first;
+  }
+}
+
+template <class PolygonType>
+void
+poly2poly_check<PolygonType>::enter (const PolygonType &o, size_t p, const poly2poly_check<PolygonType>::box_type &box)
+{
+  if (box.empty ()) {
+    return;
+  }
+
+  for (typename PolygonType::polygon_edge_iterator e = o.begin_edge (); ! e.at_end (); ++e) {
+    if (interact (box, *e)) {
+      m_edge_heap.push_back (*e);
+      m_scanner.insert (& m_edge_heap.back (), p);
+    }
+  }
+}
+
 template <class PolygonType>
 void
 poly2poly_check<PolygonType>::process ()

@@ -123,7 +123,7 @@ static void _call_f_critical_c1731 (const qt_gsi::GenericMethod * /*decl*/, void
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMessageLogger *)cls)->critical (arg1);
+  ((QMessageLogger *)cls)->critical ("%s", arg1);
 }
 
 
@@ -146,7 +146,7 @@ static void _call_f_critical_c4558 (const qt_gsi::GenericMethod * /*decl*/, void
   const QLoggingCategory &arg1 = gsi::arg_reader<const QLoggingCategory & >() (args, heap);
   const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMessageLogger *)cls)->critical (arg1, arg2);
+  ((QMessageLogger *)cls)->critical (arg1, "%s", arg2);
 }
 
 
@@ -200,7 +200,7 @@ static void _call_f_debug_c1731 (const qt_gsi::GenericMethod * /*decl*/, void *c
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMessageLogger *)cls)->debug (arg1);
+  ((QMessageLogger *)cls)->debug ("%s", arg1);
 }
 
 
@@ -223,7 +223,7 @@ static void _call_f_debug_c4558 (const qt_gsi::GenericMethod * /*decl*/, void *c
   const QLoggingCategory &arg1 = gsi::arg_reader<const QLoggingCategory & >() (args, heap);
   const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMessageLogger *)cls)->debug (arg1, arg2);
+  ((QMessageLogger *)cls)->debug (arg1, "%s", arg2);
 }
 
 
@@ -277,7 +277,7 @@ static void _call_f_fatal_c1731 (const qt_gsi::GenericMethod * /*decl*/, void *c
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMessageLogger *)cls)->fatal (arg1);
+  ((QMessageLogger *)cls)->fatal ("%s", arg1);
 }
 
 
@@ -297,7 +297,7 @@ static void _call_f_info_c1731 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMessageLogger *)cls)->info (arg1);
+  ((QMessageLogger *)cls)->info ("%s", arg1);
 }
 
 
@@ -320,7 +320,7 @@ static void _call_f_info_c4558 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   const QLoggingCategory &arg1 = gsi::arg_reader<const QLoggingCategory & >() (args, heap);
   const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMessageLogger *)cls)->info (arg1, arg2);
+  ((QMessageLogger *)cls)->info (arg1, "%s", arg2);
 }
 
 
@@ -374,7 +374,7 @@ static void _call_f_noDebug_c1731 (const qt_gsi::GenericMethod * /*decl*/, void 
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMessageLogger *)cls)->noDebug (arg1);
+  ((QMessageLogger *)cls)->noDebug ("%s", arg1);
 }
 
 
@@ -409,7 +409,7 @@ static void _call_f_warning_c1731 (const qt_gsi::GenericMethod * /*decl*/, void 
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMessageLogger *)cls)->warning (arg1);
+  ((QMessageLogger *)cls)->warning ("%s", arg1);
 }
 
 
@@ -432,7 +432,7 @@ static void _call_f_warning_c4558 (const qt_gsi::GenericMethod * /*decl*/, void 
   const QLoggingCategory &arg1 = gsi::arg_reader<const QLoggingCategory & >() (args, heap);
   const char *arg2 = gsi::arg_reader<const char * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMessageLogger *)cls)->warning (arg1, arg2);
+  ((QMessageLogger *)cls)->warning (arg1, "%s", arg2);
 }
 
 

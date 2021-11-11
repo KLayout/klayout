@@ -94,7 +94,9 @@ plugins.depends += lib rdb db
   ant.depends += laybasic
   img.depends += laybasic
   edt.depends += laybasic
+
   lay.depends += laybasic ant img edt
+
   klayout_main.depends += plugins $$MAIN_DEPENDS
 
 }

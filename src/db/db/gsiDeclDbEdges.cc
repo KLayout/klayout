@@ -1160,7 +1160,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
   ) +
-  method_ext ("inside_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
+  method_ext ("inside_check|enclosed_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
     "@brief Performs an inside check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
@@ -1186,6 +1186,8 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "It is sufficient if the projection of one edge on the other matches the specified condition. "
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
+    "\n"
+    "The 'enclosed_check' alias was introduced in version 0.27.5.\n"
   ) +
   method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
     "@brief Performs an enclosing check with options\n"

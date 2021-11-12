@@ -23,7 +23,7 @@
 
 #include "dbLayoutUtils.h"
 #include "dbCellVariants.h"
-#include "dbRegionUtils.h"
+#include "dbPolygonTools.h"
 #include "tlProgress.h"
 
 namespace db

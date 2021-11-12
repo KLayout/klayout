@@ -554,6 +554,7 @@ bool run_deep_xor (const XORData &xor_data)
 {
   db::DeepShapeStore dss;
   dss.set_threads (xor_data.threads);
+  dss.set_keep_layouts (true);  //  avoids excessive cell mapping
 
   double dbu = std::min (xor_data.layout_a->dbu (), xor_data.layout_b->dbu ());
 
@@ -598,6 +599,8 @@ bool run_deep_xor (const XORData &xor_data)
 
     } else {
 
+      tl::SelfTimer timer (tl::verbosity () >= 11, "XOR on layer " + ll->first.to_string ());
+
       db::RecursiveShapeIterator ri_a, ri_b;
 
       if (ll->second.first >= 0) {
@@ -612,14 +615,13 @@ bool run_deep_xor (const XORData &xor_data)
       db::Region in_b (ri_b, dss, db::ICplxTrans (xor_data.layout_b->dbu () / dbu));
 
       db::Region xor_res;
-      xor_res = in_a ^ in_b;
+      {
+        tl::SelfTimer timer (tl::verbosity () >= 21, "Basic XOR on layer " + ll->first.to_string ());
+        xor_res = in_a ^ in_b;
+      }
 
       int tol_index = 0;
       for (std::vector<double>::const_iterator t = xor_data.tolerances.begin (); t != xor_data.tolerances.end (); ++t) {
-
-        if (tl::verbosity () >= 20) {
-          tl::log << "Running XOR on layer " << ll->first.to_string () << " with tolerance " << *t;
-        }
 
         db::LayerProperties lp = ll->first;
         if (lp.layer >= 0) {
@@ -633,6 +635,7 @@ bool run_deep_xor (const XORData &xor_data)
         result.top_cell = xor_data.output_cell;
 
         if (*t > db::epsilon) {
+          tl::SelfTimer timer (tl::verbosity () >= 21, "Tolerance " + tl::to_string (*t) + " on layer " + ll->first.to_string ());
           xor_res.size (-db::coord_traits<db::Coord>::rounded (0.5 * *t / dbu));
           xor_res.size (db::coord_traits<db::Coord>::rounded (0.5 * *t / dbu));
         }

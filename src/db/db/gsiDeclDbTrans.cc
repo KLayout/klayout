@@ -916,7 +916,7 @@ struct cplx_trans_defs
       "@brief Gets the magnification\n"
     ) +
     method ("is_mag?", &C::is_mag,
-      "@brief Test, if the transformation is a magnifying one\n"
+      "@brief Tests, if the transformation is a magnifying one\n"
       "\n"
       "This is the recommended test for checking if the transformation represents\n"
       "a magnification.\n"
@@ -924,6 +924,15 @@ struct cplx_trans_defs
     method ("mag=", (void (C::*) (double)) &C::mag, arg ("m"),
       "@brief Sets the magnification\n"
       "@param m The new magnification"
+    ) +
+    method ("is_complex?", &C::is_complex,
+      "@brief Returns true if the transformation is a complex one\n"
+      "\n"
+      "If this predicate is false, the transformation can safely be converted to a simple transformation.\n"
+      "Otherwise, this conversion will be lossy.\n"
+      "The predicate value is equivalent to 'is_mag || !is_ortho'.\n"
+      "\n"
+      "This method has been introduced in version 0.27.5."
     ) +
     method ("R0", &trans_r0,
       "@brief A constant giving \"unrotated\" (unit) transformation\n"

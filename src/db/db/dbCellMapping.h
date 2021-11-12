@@ -65,6 +65,11 @@ public:
   void clear ();
 
   /**
+   *  @brief Swaps the cell mapping with another one
+   */
+  void swap (CellMapping &other);
+
+  /**
    *  @brief Create a single cell mapping 
    *
    *  A single cell mapping will not map the child cells. When used for hierarchical copy this will basically 

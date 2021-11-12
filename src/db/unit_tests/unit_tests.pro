@@ -10,7 +10,7 @@ SOURCES = \
   dbCompoundOperationTests.cc \
   dbFillToolTests.cc \
   dbRecursiveInstanceIteratorTests.cc \
-  dbRegionUtilsTests.cc \
+  dbRegionCheckUtilsTests.cc \
   dbUtilsTests.cc \
   dbWriterTools.cc \
     dbLoadLayoutOptionsTests.cc \

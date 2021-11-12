@@ -1015,79 +1015,15 @@ private:
   }
 };
 
-static bool
-instances_interact (const db::Layout *layout1, const db::CellInstArray *inst1, unsigned int layer1, const db::Layout *layout2, const db::CellInstArray *inst2, unsigned int layer2, db::Coord dist)
-{
-  //  TODO: this algorithm is not in particular effective for identical arrays
-
-  const db::Cell &cell1 = layout1->cell (inst1->object ().cell_index ());
-  const db::Cell &cell2 = layout2->cell (inst2->object ().cell_index ());
-  db::box_convert <db::CellInst, true> inst2_bc (*layout2, layer2);
-
-  std::unordered_set<db::ICplxTrans> relative_trans_seen;
-
-  for (db::CellInstArray::iterator n = inst1->begin (); ! n.at_end (); ++n) {
-
-    db::ICplxTrans tn1 = inst1->complex_trans (*n);
-    db::ICplxTrans tni1 = tn1.inverted ();
-    db::Box ibox1 = tn1 * cell1.bbox (layer1).enlarged (db::Vector (dist, dist));
-
-    if (! ibox1.empty ()) {
-
-      //  TODO: in some cases, it may be possible to optimize this for arrays
-
-      for (db::CellInstArray::iterator k = inst2->begin_touching (safe_box_enlarged (ibox1, -1, -1), inst2_bc); ! k.at_end (); ++k) {
-
-        if (inst1 == inst2 && *n == *k) {
-          //  skip self-interactions - this is handled inside the cell
-          continue;
-        }
-
-        db::ICplxTrans tn2 = inst2->complex_trans (*k);
-
-        //  NOTE: we need to enlarge both subject *and* intruder boxes - either object comes close to intruder or the other way around
-        db::Box ibox2 = tn2 * cell2.bbox (layer2).enlarged (db::Vector (dist, dist));
-
-        db::ICplxTrans tn21 = tni1 * tn2;
-        if (! relative_trans_seen.insert (tn21).second) {
-          //  this relative transformation was already seen
-          continue;
-        }
-
-        db::Box cbox = ibox1 & ibox2;
-        if (! cbox.empty ()) {
-
-          db::ICplxTrans tni2 = tn2.inverted ();
-
-          //  not very strong, but already useful: the cells interact if there is a layer1 in cell1
-          //  in the common box and a layer2 in the cell2 in the common box
-          //  NOTE: don't use overlap mode for the RecursiveShapeIterator as this would not capture dot-like
-          //  objects like texts. Instead safe-shrink the search box and use touching mode ("false" for the last
-          //  argument)
-          if (! db::RecursiveShapeIterator (*layout1, cell1, layer1, safe_box_enlarged (tni1 * cbox, -1, -1), false).at_end () &&
-              ! db::RecursiveShapeIterator (*layout2, cell2, layer2, safe_box_enlarged (tni2 * cbox, -1, -1), false).at_end ()) {
-            return true;
-          }
-
-        }
-
-      }
-
-    }
-
-  }
-
-  return false;
-}
-
-template <class T>
+template <class TS, class TI, class TR>
 struct interaction_registration_inst2inst
   : db::box_scanner_receiver2<db::CellInstArray, unsigned int, db::CellInstArray, unsigned int>
 {
 public:
-  typedef std::pair<std::unordered_set<const db::CellInstArray *>, std::map<unsigned int, std::unordered_set<T> > > interaction_value_type;
+  typedef typename local_processor_cell_contexts<TS, TI, TR>::context_key_type interactions_value_type;
+  typedef std::unordered_map<std::pair<db::cell_index_type, db::ICplxTrans>, interactions_value_type> interactions_type;
 
-  interaction_registration_inst2inst (const db::Layout *subject_layout, unsigned int subject_layer, const db::Layout *intruder_layout, unsigned int intruder_layer, bool foreign, db::Coord dist, std::unordered_map<const db::CellInstArray *, interaction_value_type> *result)
+  interaction_registration_inst2inst (const db::Layout *subject_layout, unsigned int subject_layer, const db::Layout *intruder_layout, unsigned int intruder_layer, bool foreign, db::Coord dist, interactions_type *result)
     : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), m_subject_layer (subject_layer), m_intruder_layer (intruder_layer), m_dist (dist), mp_result (result), m_foreign (foreign)
   {
     //  nothing yet ..
@@ -1109,8 +1045,8 @@ public:
         }
       }
 
-      if (! ignore && instances_interact (mp_subject_layout, inst1, m_subject_layer, mp_intruder_layout, inst2, m_intruder_layer, m_dist)) {
-        (*mp_result) [inst1].first.insert (inst2);
+      if (! ignore) {
+        collect_instance_interactions (inst1, inst2);
       }
 
     }
@@ -1120,66 +1056,176 @@ private:
   const db::Layout *mp_subject_layout, *mp_intruder_layout;
   unsigned int m_subject_layer, m_intruder_layer;
   db::Coord m_dist;
-  std::unordered_map<const db::CellInstArray *, std::pair<std::unordered_set<const db::CellInstArray *>, std::map<unsigned int, std::unordered_set<T> > > > *mp_result;
+  interactions_type *mp_result;
   std::unordered_set<std::pair<unsigned int, unsigned int> > m_interactions;
   bool m_foreign;
-};
 
-template <class T>
-static bool
-instance_shape_interacts (const db::Layout *layout, const db::CellInstArray *inst, unsigned int layer, const T &ref, db::Coord dist)
-{
-  const db::Cell &cell = layout->cell (inst->object ().cell_index ());
-  db::box_convert <db::CellInst, true> inst_bc (*layout, layer);
-  db::Box rbox = db::box_convert<T> () (ref);
+  void
+  collect_instance_interactions (const db::CellInstArray *inst1, const db::CellInstArray *inst2)
+  {
+#if 0
+printf("@@@ check instance interactions %s (#%d, %s) <-> %s (#%d, %s)\n",
+    mp_subject_layout->cell_name (inst1->object ().cell_index ()), int (inst1->size ()), (inst1->bbox(db::box_convert<db::CellInst> (*mp_subject_layout)).to_string()).c_str(),
+    mp_intruder_layout->cell_name (inst2->object ().cell_index ()), int (inst2->size ()), (inst2->bbox(db::box_convert<db::CellInst> (*mp_intruder_layout)).to_string()).c_str()); // @@@
+#endif
+    //  TODO: this algorithm is not in particular effective for identical arrays
 
-  for (db::CellInstArray::iterator n = inst->begin_touching (safe_box_enlarged (rbox, dist - 1, dist - 1), inst_bc); ! n.at_end (); ++n) {
+    const db::Cell &cell1 = mp_subject_layout->cell (inst1->object ().cell_index ());
+    const db::Cell &cell2 = mp_intruder_layout->cell (inst2->object ().cell_index ());
+    db::box_convert <db::CellInst, true> inst2_bc (*mp_intruder_layout, m_intruder_layer);
 
-    db::ICplxTrans tn = inst->complex_trans (*n);
-    db::Box cbox = (tn * cell.bbox (layer)).enlarged (db::Vector (dist, dist)) & rbox.enlarged (db::Vector (dist, dist));
+    std::unordered_map<db::ICplxTrans, std::list<std::pair<db::cell_index_type, db::ICplxTrans> > > interactions_cache;
 
-    if (! cbox.empty ()) {
+#if 0
+printf("@@@  -> #%d\n", int(inst1->size()));
+#endif
+    for (db::CellInstArray::iterator n = inst1->begin (); ! n.at_end (); ++n) {
 
-      db::ICplxTrans tni = tn.inverted ();
+      db::ICplxTrans tn1 = inst1->complex_trans (*n);
+      db::ICplxTrans tni1 = tn1.inverted ();
+      db::Box ibox1 = tn1 * cell1.bbox (m_subject_layer).enlarged (db::Vector (m_dist, m_dist));
 
-      //  not very strong, but already useful: the cells interact if there is a layer in cell
-      //  in the common box
-      //  NOTE: don't use overlapping mode here, because this will not select point-like objects as texts or
-      //  dot edges. Instead safe-shrink the search box and use touching mode.
-      if (! db::RecursiveShapeIterator (*layout, cell, layer, safe_box_enlarged (tni * cbox, -1, -1), false).at_end ()) {
-        return true;
+      std::set<db::CellInstArray> *insts = 0;
+
+      if (! ibox1.empty ()) {
+
+        //  TODO: in some cases, it may be possible to optimize this for arrays
+
+        for (db::CellInstArray::iterator k = inst2->begin_touching (safe_box_enlarged (ibox1, -1, -1), inst2_bc); ! k.at_end (); ++k) {
+
+          if (inst1 == inst2 && *n == *k) {
+            //  skip self-interactions - this is handled inside the cell
+            continue;
+          }
+
+          db::ICplxTrans tn2 = inst2->complex_trans (*k);
+
+          //  NOTE: we need to enlarge both subject *and* intruder boxes - either object comes close to intruder or the other way around
+          db::Box ibox2 = tn2 * cell2.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
+
+          db::Box cbox = ibox1 & ibox2;
+          if (! cbox.empty () && cell1.has_shapes_touching (m_subject_layer, safe_box_enlarged (tni1 * cbox, -1, -1))) {
+
+            db::ICplxTrans tn21 = tni1 * tn2;
+
+            std::list<std::pair<db::cell_index_type, db::ICplxTrans> > *interactions = 0;
+
+            std::unordered_map<db::ICplxTrans, std::list<std::pair<db::cell_index_type, db::ICplxTrans> > >::iterator ic = interactions_cache.find (tn21);
+            if (ic != interactions_cache.end ()) {
+              interactions = &ic->second;
+            } else {
+              interactions = &interactions_cache [tn21];
+              collect_intruder_tree_interactions (cell1, cell2, tni1, tn21, cbox, *interactions);
+            }
+
+            for (std::list<std::pair<db::cell_index_type, db::ICplxTrans> >::const_iterator i = interactions->begin (); i != interactions->end (); ++i) {
+              if (! insts) {
+                insts = & (*mp_result) [std::make_pair (cell1.cell_index (), tn1)].first;
+              }
+              insts->insert (db::CellInstArray (db::CellInst (i->first), i->second));
+            }
+
+          }
+
+        }
+
       }
 
     }
-
   }
 
-  return false;
-}
+  void collect_intruder_tree_interactions (const db::Cell &subject_cell, const db::Cell &intruder_cell, const db::ICplxTrans &tni1, const db::ICplxTrans &tn21, const db::Box &cbox, std::list<std::pair<db::cell_index_type, db::ICplxTrans> > &interactions)
+  {
+    db::ICplxTrans tni2 = tn21.inverted () * tni1;
+    db::Box tbox2 = safe_box_enlarged (tni2 * cbox, -1, -1);
 
-template <class T>
+    if (! intruder_cell.shapes (m_intruder_layer).begin_touching (tbox2, ShapeIterator::All).at_end ()) {
+
+      //  we're overlapping with shapes from the intruder - do not recursive further
+      interactions.push_back (std::make_pair (intruder_cell.cell_index (), tn21));
+      return;
+
+    }
+
+    for (db::Cell::touching_iterator i = intruder_cell.begin_touching (tbox2); ! i.at_end (); ++i) {
+
+      const db::Cell &ic = mp_intruder_layout->cell (i->cell_index ());
+
+      for (db::CellInstArray::iterator ia = i->cell_inst ().begin_touching (tbox2, db::box_convert<db::CellInst> (*mp_intruder_layout, m_intruder_layer)); ! ia.at_end (); ++ia) {
+
+        db::ICplxTrans it = i->complex_trans (*ia);
+
+        db::Box ibox2 = tni2.inverted () * it * ic.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
+        db::Box ccbox = cbox & ibox2;
+
+        if (! ccbox.empty ()) {
+          collect_intruder_tree_interactions (subject_cell, ic, tni1, tn21 * it, ccbox, interactions);
+        }
+
+      }
+
+    }
+  }
+};
+
+template <class TS, class TI, class TR>
 struct interaction_registration_inst2shape
-  : db::box_scanner_receiver2<db::CellInstArray, unsigned int, T, unsigned int>
+  : db::box_scanner_receiver2<db::CellInstArray, unsigned int, TI, unsigned int>
 {
 public:
-  interaction_registration_inst2shape (const db::Layout *subject_layout, unsigned int subject_layer, db::Coord dist, std::unordered_map<const db::CellInstArray *, std::pair<std::unordered_set<const db::CellInstArray *>, std::map<unsigned int, std::unordered_set<T> > > > *result)
+  typedef typename local_processor_cell_contexts<TS, TI, TR>::context_key_type interactions_value_type;
+  typedef std::unordered_map<std::pair<db::cell_index_type, db::ICplxTrans>, interactions_value_type> interactions_type;
+
+  interaction_registration_inst2shape (db::Layout *subject_layout, unsigned int subject_layer, db::Coord dist, interactions_type *result)
     : mp_subject_layout (subject_layout), m_subject_layer (subject_layer), m_dist (dist), mp_result (result)
   {
     //  nothing yet ..
   }
 
-  void add (const db::CellInstArray *inst, unsigned int, const T *ref, unsigned int layer)
+  void add (const db::CellInstArray *inst, unsigned int, const TI *ref, unsigned int layer)
   {
-    if (instance_shape_interacts (mp_subject_layout, inst, m_subject_layer, *ref, m_dist)) {
-      (*mp_result) [inst].second [layer].insert (*ref);
-    }
+    collect_instance_shape_interactions (inst, layer, *ref, m_dist);
   }
 
 private:
-  const db::Layout *mp_subject_layout;
+  db::Layout *mp_subject_layout;
   unsigned int m_subject_layer;
   db::Coord m_dist;
-  std::unordered_map<const db::CellInstArray *, std::pair<std::unordered_set<const db::CellInstArray *>, std::map<unsigned int, std::unordered_set<T> > > > *mp_result;
+  interactions_type *mp_result;
+
+  void
+  collect_instance_shape_interactions (const db::CellInstArray *inst, unsigned int layer, const TI &ref, db::Coord dist)
+  {
+    const db::Cell &cell = mp_subject_layout->cell (inst->object ().cell_index ());
+    db::box_convert <db::CellInst, true> inst_bc (*mp_subject_layout, m_subject_layer);
+    db::Box rbox = db::box_convert<TI> () (ref);
+
+    for (db::CellInstArray::iterator n = inst->begin_touching (safe_box_enlarged (rbox, dist - 1, dist - 1), inst_bc); ! n.at_end (); ++n) {
+
+      db::ICplxTrans tn = inst->complex_trans (*n);
+      db::Box cbox = (tn * cell.bbox (m_subject_layer)).enlarged (db::Vector (dist, dist)) & rbox.enlarged (db::Vector (dist, dist));
+
+      if (! cbox.empty ()) {
+
+        db::ICplxTrans tni = tn.inverted ();
+        db::shape_reference_translator_with_trans<TI, db::ICplxTrans> rt (mp_subject_layout, tni);
+
+        std::set<TI> *shapes = 0;
+
+        //  not very strong, but already useful: the cells interact if there is a layer in cell
+        //  in the common box
+        //  NOTE: don't use overlapping mode here, because this will not select point-like objects as texts or
+        //  dot edges. Instead safe-shrink the search box and use touching mode.
+        for (db::RecursiveShapeIterator s (*mp_subject_layout, cell, m_subject_layer, safe_box_enlarged (tni * cbox, -1, -1), false); !s.at_end (); ++s) {
+          if (! shapes) {
+            shapes = & (*mp_result) [std::make_pair (cell.cell_index (), tn)].second [layer];
+          }
+          shapes->insert (rt (ref));
+        }
+      }
+
+    }
+  }
 };
 
 }
@@ -1436,6 +1482,9 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
                                                     const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders,
                                                     db::Coord dist) const
 {
+#if 0 // @@@
+printf("@@@ --- compute_contexts (%s @ %s)\n", mp_subject_layout->cell_name (subject_cell->cell_index ()), subject_cell_inst.to_string().c_str()); fflush(stdout);
+#endif
   CRONOLOGY_COLLECTION_BRACKET(event_compute_contexts)
 
   if (tl::verbosity () >= m_base_verbosity + 20) {
@@ -1504,26 +1553,32 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
 
   if (! subject_cell->begin ().at_end ()) {
 
-    typedef std::pair<std::unordered_set<const db::CellInstArray *>, std::map<unsigned int, std::unordered_set<TI> > > interaction_value_type;
-
-    std::unordered_map<const db::CellInstArray *, interaction_value_type> interactions;
+    //  Key: single instance given by cell index and transformation
+    //  Value the contexts for the child cell for this instance
+    typedef typename local_processor_cell_contexts<TS, TI, TR>::context_key_type interactions_value_type;
+    typedef std::unordered_map<std::pair<db::cell_index_type, db::ICplxTrans>, interactions_value_type> interactions_type;
+    interactions_type interactions;
 
     //  insert dummy interactions to handle at least the child cell vs. itself
     //  - this is important so we will always handle the instances unless they are
     //  entirely empty in the subject layer
     for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
       if (! inst_bcs (i->cell_inst ()).empty ()) {
-        interactions.insert (std::make_pair (&i->cell_inst (), interaction_value_type ()));
+        db::cell_index_type ci = i->cell_inst ().object ().cell_index ();
+        for (db::CellInstArray::iterator n = i->begin (); ! n.at_end (); ++n) {
+          db::ICplxTrans tn = i->complex_trans (*n);
+          interactions.insert (std::make_pair (std::make_pair (ci, tn), interactions_value_type ()));
+        }
       }
     }
 
-//  TODO: can we shortcut this if interactions is empty?
+    //  TODO: can we shortcut this if interactions is empty?
     for (std::vector<unsigned int>::const_iterator il = contexts.intruder_layers ().begin (); il != contexts.intruder_layers ().end (); ++il) {
 
       db::box_convert <db::CellInstArray, true> inst_bci (*mp_intruder_layout, contexts.actual_intruder_layer (*il));
 
       db::box_scanner2<db::CellInstArray, int, db::CellInstArray, int> scanner;
-      interaction_registration_inst2inst<TI> rec (mp_subject_layout, contexts.subject_layer (), mp_intruder_layout, contexts.actual_intruder_layer (*il), contexts.is_foreign (*il), dist, &interactions);
+      interaction_registration_inst2inst<TS, TI, TR> rec (mp_subject_layout, contexts.subject_layer (), mp_intruder_layout, contexts.actual_intruder_layer (*il), contexts.is_foreign (*il), dist, &interactions);
 
       unsigned int id = 0;
 
@@ -1570,10 +1625,10 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
 
     }
 
-//  TODO: can we shortcut this if interactions is empty?
+    //  TODO: can we shortcut this if interactions is empty?
     {
       db::box_scanner2<db::CellInstArray, int, TI, int> scanner;
-      interaction_registration_inst2shape<TI> rec (mp_subject_layout, contexts.subject_layer (), dist, &interactions);
+      interaction_registration_inst2shape<TS, TI, TR> rec (mp_subject_layout, contexts.subject_layer (), dist, &interactions);
 
       for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
         if (! inst_bcs (i->cell_inst ()).empty () && ! subject_cell_is_breakout (i->cell_index ())) {
@@ -1596,138 +1651,18 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
       scanner.process (rec, dist, inst_bcs, db::box_convert<TI> ());
     }
 
-    //  this cache should reduce the effort of checking array vs. array
-    typedef std::pair<unsigned int, std::pair<db::cell_index_type, db::ICplxTrans> > effective_instance_cache_key_type;
-    typedef std::map<effective_instance_cache_key_type, std::pair<bool, db::CellInstArray> > effective_instance_cache_type;
-    effective_instance_cache_type effective_instance_cache;
+    //  produce the tasks for computing the next-level interactions
+    for (typename interactions_type::iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
-    for (typename std::unordered_map<const db::CellInstArray *, interaction_value_type>::const_iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      db::Cell *subject_child_cell = &mp_subject_layout->cell (i->first.first);
+      db::Cell *intruder_child_cell = (subject_cell == intruder_cell ? subject_child_cell : 0);
 
-      db::Cell &subject_child_cell = mp_subject_layout->cell (i->first->object ().cell_index ());
-
-      for (db::CellInstArray::iterator n = i->first->begin (); ! n.at_end (); ++n) {
-
-        db::ICplxTrans tn = i->first->complex_trans (*n);
-        db::ICplxTrans tni = tn.inverted ();
-        db::Box nbox = tn * subject_child_cell.bbox (contexts.subject_layer ()).enlarged (db::Vector (dist, dist));
-
-        if (! nbox.empty ()) {
-
-          typename local_processor_cell_contexts<TS, TI, TR>::context_key_type intruders_below;
-
-          db::shape_reference_translator_with_trans<TI, db::ICplxTrans> rt (mp_subject_layout, tni);
-
-          for (typename std::map<unsigned int, std::unordered_set<TI> >::const_iterator pl = i->second.second.begin (); pl != i->second.second.end (); ++pl) {
-            std::set<TI> &out = intruders_below.second [pl->first];
-            for (typename std::unordered_set<TI>::const_iterator p = pl->second.begin (); p != pl->second.end (); ++p) {
-              if (nbox.overlaps (db::box_convert<TI> () (*p))) {
-                out.insert (rt (*p));
-              }
-            }
-          }
-
-          //  TODO: in some cases, it may be possible to optimize this for arrays
-
-          for (std::vector<unsigned int>::const_iterator il = contexts.intruder_layers ().begin (); il != contexts.intruder_layers ().end (); ++il) {
-
-            unsigned int ail = contexts.actual_intruder_layer (*il);
-            db::box_convert <db::CellInst, true> inst_bcii (*mp_intruder_layout, ail);
-
-            for (std::unordered_set<const db::CellInstArray *>::const_iterator j = i->second.first.begin (); j != i->second.first.end (); ++j) {
-
-              for (db::CellInstArray::iterator k = (*j)->begin_touching (safe_box_enlarged (nbox, -1, -1), inst_bcii); ! k.at_end (); ++k) {
-
-                db::ICplxTrans tk = (*j)->complex_trans (*k);
-                //  NOTE: no self-interactions
-                if (i->first != *j || tn != tk) {
-
-                  //  optimize the intruder instance so it will be as low as possible
-                  effective_instance_cache_key_type key (ail, std::make_pair ((*j)->object ().cell_index (), tni * tk));
-                  effective_instance_cache_type::iterator cached = effective_instance_cache.find (key);
-                  if (cached == effective_instance_cache.end ()) {
-                    std::pair<bool, db::CellInstArray> ei = effective_instance (contexts.subject_layer (), i->first->object ().cell_index (), ail, (*j)->object ().cell_index (), tni * tk, dist);
-                    cached = effective_instance_cache.insert (std::make_pair (key, ei)).first;
-                  }
-                  if (cached->second.first) {
-                    intruders_below.first.insert (cached->second.second);
-                  }
-
-                }
-
-              }
-
-            }
-
-          }
-
-          db::Cell *intruder_child_cell = (subject_cell == intruder_cell ? &subject_child_cell : 0);
-          issue_compute_contexts (contexts, cell_context, subject_cell, &subject_child_cell, tn, intruder_child_cell, intruders_below, dist);
-
-        }
-
-      }
+      issue_compute_contexts (contexts, cell_context, subject_cell, subject_child_cell, i->first.second, intruder_child_cell, i->second, dist);
 
     }
 
   }
 
-}
-
-/**
- *  @brief Returns a cell instance array suitable for adding as intruder
- *
- *  The given intruder cell with the transformation ti2s - which transforms the intruder instance into
- *  the coordinate system of the subject cell - is analysed and either this instance or a sub-instance
- *  is chosen.
- *  Sub-instances are chosen if the intruder cell does not have shapes which interact with the subject
- *  cell and there is exactly one sub-instance interacting with the subject cell.
- */
-template <class TS, class TI, class TR>
-std::pair<bool, db::CellInstArray>
-local_processor<TS, TI, TR>::effective_instance (unsigned int subject_layer, db::cell_index_type subject_cell_index, unsigned int intruder_layer, db::cell_index_type intruder_cell_index, const db::ICplxTrans &ti2s, db::Coord dist) const
-{
-  db::Box bbox = safe_box_enlarged (mp_subject_layout->cell (subject_cell_index).bbox (subject_layer), dist - 1, dist - 1);
-  if (bbox.empty ()) {
-    //  should not happen, but skip if it does
-    return std::make_pair (false, db::CellInstArray ());
-  }
-
-  db::Box ibbox = bbox.transformed (ti2s.inverted ());
-
-  const db::Cell &intruder_cell = mp_intruder_layout->cell (intruder_cell_index);
-  const db::Shapes &intruder_shapes = intruder_cell.shapes (intruder_layer);
-  if (! intruder_shapes.empty () && ! intruder_shapes.begin_touching (ibbox, db::ShapeIterator::All).at_end ()) {
-    return std::make_pair (true, db::CellInstArray (db::CellInst (intruder_cell_index), ti2s));
-  }
-
-  db::box_convert <db::CellInst, true> inst_bcii (*mp_intruder_layout, intruder_layer);
-
-  size_t ni = 0;
-  db::cell_index_type eff_cell_index = 0;
-  db::ICplxTrans eff_trans;
-
-  for (db::Cell::touching_iterator i = intruder_cell.begin_touching (ibbox); ! i.at_end() && ni < 2; ++i) {
-    const db::CellInstArray &ci = i->cell_inst ();
-    db::Box cbox = mp_intruder_layout->cell (ci.object ().cell_index ()).bbox (intruder_layer);
-    for (db::CellInstArray::iterator k = ci.begin_touching (ibbox, inst_bcii); ! k.at_end () && ni < 2; ++k) {
-      db::ICplxTrans tk = ci.complex_trans (*k);
-      if (ibbox.overlaps (cbox.transformed (tk))) {
-        eff_trans = tk;
-        eff_cell_index = ci.object ().cell_index ();
-        ++ni;
-      }
-    }
-  }
-
-  if (ni == 0) {
-    //  should not happen, but skip if it does
-    return std::make_pair (false, db::CellInstArray ());
-  } else if (ni == 1) {
-    //  one instance - dive down
-    return effective_instance (subject_layer, subject_cell_index, intruder_layer, eff_cell_index, ti2s * eff_trans, dist);
-  } else {
-    return std::make_pair (true, db::CellInstArray (db::CellInst (intruder_cell_index), ti2s));
-  }
 }
 
 template <class TS, class TI, class TR>

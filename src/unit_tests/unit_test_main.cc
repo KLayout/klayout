@@ -246,7 +246,8 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
             timer.stop();
 
             ut::noctrl << "Time: " << timer.sec_wall () << "s (wall) " << timer.sec_user () << "s (user) " << timer.sec_sys () << "s (sys)";
-            ut::ctrl << "<x-testcase-times wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\"/>";
+            ut::noctrl << "Memory: " << timer.memory_size () / 1024 << "k";
+            ut::ctrl << "<x-testcase-times wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\" memory=\"" << timer.memory_size () << "\"/>";
 
           } catch (tl::CancelException &) {
 

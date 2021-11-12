@@ -528,12 +528,12 @@ public:
    *
    *  The editable mode will be taken from db::default_editable_mode.
    */
-  Layout (db::Manager *manager = 0);
+  explicit Layout (db::Manager *manager = 0);
 
   /**
    *  @brief Standard constructor which allows one to specify editable mode
    */
-  Layout (bool editable, db::Manager *manager = 0);
+  explicit Layout (bool editable, db::Manager *manager = 0);
 
   /**
    *  @brief The copy ctor

@@ -28,6 +28,7 @@
 #include "dbEdgePairRelations.h"
 #include "dbLocalOperation.h"
 #include "dbEdgeProcessor.h"
+#include "dbRegionCheckUtils.h"
 
 #include <vector>
 #include <unordered_set>

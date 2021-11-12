@@ -3547,7 +3547,7 @@ CODE
     # method will only report space violations to other polygons. \separation is a two-layer 
     # space check where space is checked against polygons of another layer.
     #
-    # Like for the \width method, merged semantics applies.
+    # As for the other DRC methods, merged semantics applies.
     #
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
@@ -3632,6 +3632,7 @@ CODE
     # will also trigger an error while for \space it will not.
     # 
     # As for the other DRC methods, merged semantics applies.
+    #
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
@@ -3739,8 +3740,8 @@ CODE
     # the orientation of the edges matters: only edges which run back to back with their
     # inside side pointing towards each other are checked for distance.
     #
-    # As for the other DRC methods, merged semantics applies. The options available 
-    # are the same than for \width.  
+    # As for the other DRC methods, merged semantics applies. 
+    #
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
@@ -3755,7 +3756,7 @@ CODE
     
     # %DRC% 
     # @name enclosing
-    # @brief An enclosing check
+    # @brief An enclosing check (layer enclosing other_layer)
     # @synopsis layer.enclosing(other_layer, value [, options])
     # @synopsis layer.enc(other_layer, value [, options])
     #
@@ -3763,8 +3764,8 @@ CODE
     # the \DRC framework. These variants have more options and are more intuitive to use. 
     # See \global#enclosing for more details.
     #
-    # This method checks whether layer encloses (is bigger than) other_layer by the
-    # given dimension. Locations, where this is not the case will be reported in form
+    # This method checks whether layer encloses (is bigger than) other_layer by not less than the
+    # given distance value. Locations, where the distance is less will be reported in form
     # of edge pair error markers.
     # Locations, where both edges coincide will be reported as errors as well. Formally
     # such locations form an enclosure with a distance of 0. Locations, where other_layer
@@ -3779,8 +3780,8 @@ CODE
     # the orientation of the edges matters and only edges looking into the same direction
     # are checked.
     # 
-    # As for the other DRC methods, merged semantics applies. The options available 
-    # are the same than for \width.  
+    # As for the other DRC methods, merged semantics applies.
+    #
     # Distance values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
@@ -3793,13 +3794,48 @@ CODE
     #   @/tr
     # @/table
     
-    %w(width space overlap enclosing separation isolated notch).each do |f|
+    # %DRC% 
+    # @name enclosed
+    # @brief An enclosing check (other_layer enclosing layer)
+    # @synopsis layer.enclosed(other_layer, value [, options])
+    #
+    # @b Note: @/b "enclosed" is available as operators for the "universal DRC" function \drc within
+    # the \DRC framework. These variants have more options and are more intuitive to use. 
+    # See \global#enclosed for more details.
+    #
+    # This method checks whether layer is enclosed by (is inside of) other_layer by not less than the
+    # given distance value. Locations, where the distance is less will be reported in form
+    # of edge pair error markers.
+    # Locations, where both edges coincide will be reported as errors as well. Formally
+    # such locations form an enclosure with a distance of 0. Locations, where other_layer
+    # is inside layer will not be reported as errors. Such regions can be detected
+    # by \inside or a boolean "not" operation.
+    #
+    # The options are the same as for \separation.
+    #
+    # This method is available for edge and polygon layers.
+    #
+    # As for the other DRC methods, merged semantics applies.
+    #
+    # Distance values can be given as floating-point values (in micron) or integer values (in
+    # database units). To explicitly specify the unit, use the unit denominators.
+    #
+    # The following images show the effect of two enclosed checks (red: input1, blue: input2):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_encd1.png) @/td
+    #     @td @img(/images/drc_encd2.png) @/td
+    #   @/tr
+    # @/table
+    
+    %w(width space overlap enclosing enclosed separation isolated notch).each do |f|
       eval <<"CODE"
       def #{f}(*args)
 
         @engine._context("#{f}") do
 
-          if :#{f} == :width || :#{f} == :space || :#{f} == :overlap || :#{f} == :enclosing || :#{f} == :separation
+          if :#{f} == :width || :#{f} == :space || :#{f} == :overlap || :#{f} == :enclosed || :#{f} == :enclosing || :#{f} == :separation
             requires_edges_or_region
           else
             requires_region

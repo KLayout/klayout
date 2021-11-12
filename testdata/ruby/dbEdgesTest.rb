@@ -398,6 +398,8 @@ class DBEdges_TestClass < TestBase
     r3b = RBA::Edges::new(RBA::Box::new(-10, -10, 10, 10))
 
     assert_equal(r2.inside_check(r3, 15).to_s, "(120,20;120,380)/(110,9;110,391)")
+    # "enclosed" alias
+    assert_equal(r2.enclosed_check(r3, 15).to_s, "(120,20;120,380)/(110,9;110,391)")
     assert_equal(r2.inside_check(r3, 15, false, RBA::Edges::Projection, nil, nil, nil).to_s, "(120,20;120,380)/(110,20;110,380)")
     assert_equal(r2.inside_check(r3, 15, true, RBA::Edges::Projection, nil, nil, nil).to_s, "(120,20;120,380)/(110,0;110,400)")
     assert_equal(r2.inside_check(r3, 15, true, RBA::Edges::Projection, 0.0, nil, nil).to_s, "")

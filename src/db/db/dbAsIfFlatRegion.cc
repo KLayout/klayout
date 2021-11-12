@@ -1150,7 +1150,7 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
 
     size_t n = 0;
     for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
-      poly_check.enter (*p, n);
+      poly_check.single (*p, n);
       n += 2;
     }
 

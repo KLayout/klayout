@@ -778,7 +778,44 @@ individual ones unless raw mode is chosen.
 <p>
 See <a href="#enclosing">enclosing</a> for a description of that method
 </p>
-<a name="enclosing"/><h2>"enclosing" - An enclosing check</h2>
+<a name="enclosed"/><h2>"enclosed" - An enclosing check (other_layer enclosing layer)</h2>
+<keyword name="enclosed"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.enclosed(other_layer, value [, options])</tt></li>
+</ul>
+<p>
+<b>Note: </b>"enclosed" is available as operators for the "universal DRC" function <a href="#drc">drc</a> within
+the <a href="#DRC">DRC</a> framework. These variants have more options and are more intuitive to use. 
+See <a href="/about/drc_ref_global.xml#enclosed">enclosed</a> for more details.
+</p><p>
+This method checks whether layer is enclosed by (is inside of) other_layer by not less than the
+given distance value. Locations, where the distance is less will be reported in form
+of edge pair error markers.
+Locations, where both edges coincide will be reported as errors as well. Formally
+such locations form an enclosure with a distance of 0. Locations, where other_layer
+is inside layer will not be reported as errors. Such regions can be detected
+by <a href="#inside">inside</a> or a boolean "not" operation.
+</p><p>
+The options are the same as for <a href="#separation">separation</a>.
+</p><p>
+This method is available for edge and polygon layers.
+</p><p>
+As for the other DRC methods, merged semantics applies.
+</p><p>
+Distance values can be given as floating-point values (in micron) or integer values (in
+database units). To explicitly specify the unit, use the unit denominators.
+</p><p>
+The following images show the effect of two enclosed checks (red: input1, blue: input2):
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_encd1.png"/></td>
+<td><img src="/images/drc_encd2.png"/></td>
+</tr>
+</table>
+</p>
+<a name="enclosing"/><h2>"enclosing" - An enclosing check (layer enclosing other_layer)</h2>
 <keyword name="enclosing"/>
 <p>Usage:</p>
 <ul>
@@ -790,8 +827,8 @@ See <a href="#enclosing">enclosing</a> for a description of that method
 the <a href="#DRC">DRC</a> framework. These variants have more options and are more intuitive to use. 
 See <a href="/about/drc_ref_global.xml#enclosing">enclosing</a> for more details.
 </p><p>
-This method checks whether layer encloses (is bigger than) other_layer by the
-given dimension. Locations, where this is not the case will be reported in form
+This method checks whether layer encloses (is bigger than) other_layer by not less than the
+given distance value. Locations, where the distance is less will be reported in form
 of edge pair error markers.
 Locations, where both edges coincide will be reported as errors as well. Formally
 such locations form an enclosure with a distance of 0. Locations, where other_layer
@@ -806,8 +843,8 @@ The enclosing method can be applied to both edge or polygon layers. On edge laye
 the orientation of the edges matters and only edges looking into the same direction
 are checked.
 </p><p>
-As for the other DRC methods, merged semantics applies. The options available 
-are the same than for <a href="#width">width</a>.  
+As for the other DRC methods, merged semantics applies.
+</p><p>
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
 </p><p>
@@ -2046,8 +2083,8 @@ The overlap method can be applied to both edge or polygon layers. On edge layers
 the orientation of the edges matters: only edges which run back to back with their
 inside side pointing towards each other are checked for distance.
 </p><p>
-As for the other DRC methods, merged semantics applies. The options available 
-are the same than for <a href="#width">width</a>.  
+As for the other DRC methods, merged semantics applies. 
+</p><p>
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
 </p><p>
@@ -2569,6 +2606,7 @@ layers touch are also reported. More specifically, the case of zero spacing
 will also trigger an error while for <a href="#space">space</a> it will not.
 </p><p>
 As for the other DRC methods, merged semantics applies.
+</p><p>
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
 </p><p>
@@ -2789,7 +2827,7 @@ The <a href="#notch">notch</a> method is similar, but will only report self-spac
 method will only report space violations to other polygons. <a href="#separation">separation</a> is a two-layer 
 space check where space is checked against polygons of another layer.
 </p><p>
-Like for the <a href="#width">width</a> method, merged semantics applies.
+As for the other DRC methods, merged semantics applies.
 </p><p>
 Distance values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.

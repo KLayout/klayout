@@ -42,14 +42,18 @@ LibraryProxy::LibraryProxy (db::cell_index_type ci, db::Layout &layout, lib_id_t
 
 LibraryProxy::~LibraryProxy ()
 {
-  if (layout ()) {
-    layout ()->unregister_lib_proxy (this);
-  }
-  if (db::LibraryManager::initialized ()) {
-    db::Library *lib = db::LibraryManager::instance ().lib (m_lib_id);
-    if (lib) {
-      lib->unregister_proxy (this, layout ());
+  try {
+    if (layout ()) {
+      layout ()->unregister_lib_proxy (this);
     }
+    if (db::LibraryManager::initialized ()) {
+      db::Library *lib = db::LibraryManager::instance ().lib (m_lib_id);
+      if (lib) {
+        lib->unregister_proxy (this, layout ());
+      }
+    }
+  } catch (...) {
+    //  ignore exceptions (may happen due to broken PCell instantiations)
   }
 }
 

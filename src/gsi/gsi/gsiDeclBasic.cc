@@ -22,11 +22,23 @@
 
 
 #include "gsiDeclBasic.h"
+#include "gsiInterpreter.h"
 #include "gsiDecl.h"
+#include "tlTypeTraits.h"
+
+namespace tl
+{
+  template <> struct tl::type_traits<gsi::Interpreter>
+    : tl::type_traits<void>
+  {
+    typedef false_tag has_copy_constructor;
+    typedef false_tag has_default_constructor;
+    typedef false_tag has_public_destructor;
+  };
+}
 
 namespace gsi
 {
-
 
 // ---------------------------------------------------------------------------------
 //  A generic value wrapper that allows wrapping a plain data type into an object
@@ -64,6 +76,77 @@ Class<Value> decl_Value ("tl", "Value",
   "'out parameter' semantics. The value may be 'nil' which acts as a null pointer in pointer type arguments."
   "\n"
   "This class has been introduced in version 0.22."
+);
+
+static void eval_string_impl (Interpreter *ip, const char *string, const char *filename, int line)
+{
+  ip->eval_string (string, filename, line);
+}
+
+static tl::Variant eval_expr_impl (Interpreter *ip, const char *string, const char *filename, int line)
+{
+  return ip->eval_expr (string, filename, line);
+}
+
+static void define_variable_impl (Interpreter *ip, const std::string &name, const tl::Variant &value)
+{
+  ip->define_variable (name, value);
+}
+
+static gsi::Interpreter *interpreter_by_name (const std::string &name)
+{
+  for (tl::Registrar<gsi::Interpreter>::iterator i = gsi::interpreters.begin (); i != gsi::interpreters.end (); ++i) {
+    if (i.current_name () == name) {
+      return i->available () ? i.operator-> () : 0;
+    }
+  }
+  return 0;
+}
+
+static gsi::Interpreter *python_interpreter ()
+{
+  return interpreter_by_name ("pya");
+}
+
+static gsi::Interpreter *ruby_interpreter ()
+{
+  return interpreter_by_name ("rba");
+}
+
+Class<Interpreter> decl_Macro ("tl", "Interpreter",
+  gsi::method ("load_file", &Interpreter::load_file, gsi::arg ("path"),
+    "@brief Loads the given file into the interpreter\n"
+    "This will execute the code inside the file.\n"
+  ) +
+  gsi::method_ext ("eval_string", &eval_string_impl, gsi::arg ("string"), gsi::arg ("filename", (const char *) 0, "nil"), gsi::arg ("line", 1),
+    "@brief Executes the code inside the given string\n"
+    "Use 'filename' and 'line' to indicate the original source for the error messages.\n"
+  ) +
+  gsi::method_ext ("eval_expr", &eval_expr_impl, gsi::arg ("string"), gsi::arg ("filename", (const char *) 0, "nil"), gsi::arg ("line", 1),
+    "@brief Executes the expression inside the given string and returns the result value\n"
+    "Use 'filename' and 'line' to indicate the original source for the error messages.\n"
+  ) +
+  gsi::method_ext ("define_variable", &define_variable_impl, gsi::arg ("name"), gsi::arg ("value"),
+    "@brief Defines A (global) variable with the given name and value\n"
+    "You can use the \\Value class to provide 'out' parameters which can be modified by code executed inside the interpreter."
+  ) +
+  gsi::method ("python_interpreter", &python_interpreter,
+    "@brief Gets the instance of the Python interpreter\n"
+  ) +
+  gsi::method ("ruby_interpreter", &ruby_interpreter,
+    "@brief Gets the instance of the Ruby interpreter\n"
+  ),
+  "@brief A generalization of script interpreters\n"
+  "The main purpose of this class is to provide cross-language call options. "
+  "Using the Python interpreter, it is possible to execute Python code from Ruby and vice versa.\n"
+  "\n"
+  "@code\n"
+  "pya = RBA::Interpreter::python_interpreter\n"
+  "out_param = RBA::Value::new(17)\n"
+  "pya.define_variable(\"out_param\", out_param)\n"
+  "pya.eval_string(\"print(\"This is Python now!\")\nout_param.value = out_param.value + 25\")\n"
+  "puts out_param.value  # gives '42'"
+  "@/code\n"
 );
 
 }

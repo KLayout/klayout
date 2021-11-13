@@ -24,6 +24,7 @@
 #include "gsiDecl.h"
 #include "gsiDeclBasic.h"
 #include "gsiInterpreter.h"
+#include "gsiEnums.h"
 #include "lymMacroInterpreter.h"
 #include "lymMacro.h"
 #include "rba.h"
@@ -161,9 +162,9 @@ public:
     return m_supports_include_expansion;
   }
 
-  void set_storage_scheme (int scheme)
+  void set_storage_scheme (lym::Macro::Format scheme)
   {
-    m_storage_scheme = lym::Macro::Format (scheme);
+    m_storage_scheme = scheme;
   }
 
   virtual lym::Macro::Format storage_scheme () const
@@ -171,9 +172,9 @@ public:
     return m_storage_scheme;
   }
 
-  void set_debugger_scheme (int scheme)
+  void set_debugger_scheme (lym::Macro::Interpreter scheme)
   {
-    m_debugger_scheme = lym::Macro::Interpreter (scheme);
+    m_debugger_scheme = scheme;
   }
 
   virtual lym::Macro::Interpreter debugger_scheme () const
@@ -256,43 +257,51 @@ private:
   bool m_supports_include_expansion;
 };
 
-int const_PlainTextFormat ()
+gsi::EnumIn<lym::Macro, lym::Macro::Format> decl_FormatEnum ("lay", "MacroFormat",
+  gsi::enum_const ("PlainTextFormat", lym::Macro::PlainTextFormat,
+    "@brief The macro has plain text format"
+  ) +
+  gsi::enum_const ("PlainTextWithHashAnnotationsFormat", lym::Macro::PlainTextWithHashAnnotationsFormat,
+    "@brief The macro has plain text format with special pseudo-comment annotations"
+  ) +
+  gsi::enum_const ("MacroFormat", lym::Macro::MacroFormat,
+    "@brief The macro has macro (XML) format"
+  ),
+  "@brief Specifies the format of a macro\n"
+  "This enum has been introduced in version 0.27.5."
+);
+
+gsi::EnumIn<lym::Macro, lym::Macro::Interpreter> decl_InterpreterEnum ("lay", "MacroInterpreter",
+  gsi::enum_const ("Ruby", lym::Macro::Ruby,
+    "@brief The interpreter is Ruby"
+  ) +
+  gsi::enum_const ("Python", lym::Macro::Python,
+    "@brief The interpreter is Python"
+  ) +
+  gsi::enum_const ("Text", lym::Macro::Text,
+    "@brief Plain text"
+  ) +
+  gsi::enum_const ("DSLInterpreter", lym::Macro::DSLInterpreter,
+    "@brief A domain-specific interpreter (DSL)"
+  ) +
+  gsi::enum_const ("None", lym::Macro::None,
+    "@brief No specific interpreter"
+  ),
+  "@brief Specifies the interpreter used for executing a macro\n"
+  "This enum has been introduced in version 0.27.5."
+);
+
+lym::Macro::Interpreter const_RubyDebugger ()
 {
-  return int (lym::Macro::PlainTextFormat);
+  return lym::Macro::Ruby;
 }
 
-int const_PlainTextWithHashAnnotationsFormat ()
+lym::Macro::Interpreter const_NoDebugger ()
 {
-  return int (lym::Macro::PlainTextWithHashAnnotationsFormat);
-}
-
-int const_MacroFormat ()
-{
-  return int (lym::Macro::MacroFormat);
-}
-
-int const_RubyDebugger ()
-{
-  return int (lym::Macro::Ruby);
-}
-
-int const_NoDebugger ()
-{
-  return int (lym::Macro::None);
+  return lym::Macro::None;
 }
 
 Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
-  gsi::method ("PlainTextFormat", &const_PlainTextFormat,
-    "@brief Indicates plain text format for \\storage_scheme\n"
-  ) +
-  gsi::method ("PlainTextWithHashAnnotationsFormat", &const_PlainTextWithHashAnnotationsFormat,
-    "@brief Indicates plain text format for \\storage_scheme\n"
-    "This format is identical to \\PlainTextFormat but indicates that it is possible "
-    "to insert annotations (properties) into the text in a hash-commented header."
-  ) +
-  gsi::method ("MacroFormat", &const_MacroFormat,
-    "@brief Indicates macro (XML) format for \\storage_scheme\n"
-  ) +
   gsi::method ("RubyDebugger", &const_RubyDebugger,
     "@brief Indicates Ruby debugger for \\debugger_scheme\n"
   ) +
@@ -469,6 +478,9 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
   "This class has been introduced in version 0.23 and modified in 0.27.\n"
 );
 
+//  Inject the Macro::Format declarations into MacroInterpreter:
+gsi::ClassExt<lym::MacroInterpreter> inject_Format_in_parent (decl_FormatEnum.defs ());
+
 static lym::Macro *macro_by_path (const std::string &path)
 {
   return lym::MacroCollection::root ().find_macro (path);
@@ -492,7 +504,132 @@ static int real_line (const std::string &path, int line)
   }
 }
 
+lym::Macro *new_from_path (const std::string &path)
+{
+  std::unique_ptr<lym::Macro> m (new lym::Macro ());
+  m->set_is_file ();
+  m->set_file_path (path);
+  m->load_from (path);
+  return m.release ();
+}
+
 Class<lym::Macro> decl_Macro ("lay", "Macro",
+  gsi::constructor ("new", &new_from_path,
+    "@brief Loads the macro from the given file path\n"
+    "\n"
+    "This constructor has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("run", &lym::Macro::run,
+    "@brief Executes the macro\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("save_to", &lym::Macro::save_to, gsi::arg ("path"),
+    "@brief Saves the macro to the given file\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("interpreter_name", &lym::Macro::interpreter_name,
+    "@brief Gets the macro interpreter name\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("version", &lym::Macro::version,
+    "@brief Gets the macro's version\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("version=", &lym::Macro::set_version, gsi::arg ("version"),
+    "@brief Sets the macro's version\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("doc", &lym::Macro::doc,
+    "@brief Gets the macro's documentation string\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("doc=", &lym::Macro::set_version, gsi::arg ("doc"),
+    "@brief Sets the macro's documentation string\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("shortcut", &lym::Macro::shortcut,
+    "@brief Gets the macro's keyboard shortcut\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("shortcut=", &lym::Macro::set_shortcut, gsi::arg ("shortcut"),
+    "@brief Sets the macro's keyboard shortcut\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("is_autorun?", &lym::Macro::is_autorun,
+    "@brief Gets a flag indicating whether the macro is automatically executed on startup\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("is_autorun=", &lym::Macro::set_autorun, gsi::arg ("flag"),
+    "@brief Sets a flag indicating whether the macro is automatically executed on startup\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("is_autorun_early?", &lym::Macro::is_autorun_early,
+    "@brief Gets a flag indicating whether the macro is automatically executed early on startup\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("is_autorun_early=", &lym::Macro::set_autorun_early, gsi::arg ("flag"),
+    "@brief Sets a flag indicating whether the macro is automatically executed early on startup\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("format", &lym::Macro::format,
+    "@brief Gets the macro's storage format\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("format=", &lym::Macro::set_format, gsi::arg ("format"),
+    "@brief Sets the macro's storage format\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("interpreter", &lym::Macro::interpreter,
+    "@brief Gets the macro's interpreter\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("interpreter=", &lym::Macro::set_interpreter, gsi::arg ("interpreter"),
+    "@brief Sets the macro's interpreter\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("dsl_interpreter", &lym::Macro::dsl_interpreter,
+    "@brief Gets the macro's DSL interpreter name (if interpreter is DSLInterpreter)\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("dsl_interpreter=", &lym::Macro::set_dsl_interpreter, gsi::arg ("dsl_interpreter"),
+    "@brief Sets the macro's DSL interpreter name (if interpreter is DSLInterpreter)\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("sync_text_with_properties=", &lym::Macro::sync_text_with_properties,
+    "@brief Synchronizes the macro text with the properties\n"
+    "\n"
+    "This method applies to PlainTextWithHashAnnotationsFormat format. The macro text will "
+    "be enhanced with pseudo-comments reflecting the macro properties. This way, the macro "
+    "properties can be stored in plain files.\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
+  gsi::method ("sync_properties_with_text=", &lym::Macro::sync_properties_with_text,
+    "@brief Synchronizes the macro properties with the text\n"
+    "\n"
+    "This method performs the reverse process of \\sync_text_with_properties.\n"
+    "\n"
+    "This method has been introduced in version 0.27.5.\n"
+  ) +
   gsi::method ("path", &lym::Macro::path,
     "@brief Gets the path of the macro\n"
     "\n"
@@ -589,7 +726,7 @@ Class<lym::Macro> decl_Macro ("lay", "Macro",
     "@brief Sets the menu path\n"
     "See \\menu_path for details.\n"
   ) +
-  gsi::method ("real_path", &real_path,
+  gsi::method ("real_path", &real_path, gsi::arg ("path"), gsi::arg ("line"),
     "@brief Gets the real path for an include-encoded path and line number\n"
     "\n"
     "When using KLayout's include scheme based on '# %include ...', __FILE__ and __LINE__ (Ruby) will "
@@ -614,7 +751,7 @@ Class<lym::Macro> decl_Macro ("lay", "Macro",
     "\n"
     "This feature has been introduced in version 0.27."
   ) +
-  gsi::method ("real_line", &real_line,
+  gsi::method ("real_line", &real_line, gsi::arg ("path"), gsi::arg ("line"),
     "@brief Gets the real line number for an include-encoded path and line number\n"
     "\n"
     "When using KLayout's include scheme based on '# %include ...', __FILE__ and __LINE__ (Ruby) will "
@@ -648,6 +785,10 @@ Class<lym::Macro> decl_Macro ("lay", "Macro",
   "DSL interpreter framework provided by \\MacroInterpreter. The implementation may be "
   "enhanced in future versions and provide access to macros stored inside KLayout's macro repository."
 );
+
+//  Inject the Macro::Format declarations into MacroInterpreter:
+gsi::ClassExt<lym::Macro> inject_Format_in_macro (decl_FormatEnum.defs ());
+gsi::ClassExt<lym::Macro> inject_Interprert_in_macro (decl_InterpreterEnum.defs ());
 
 }
 

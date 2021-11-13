@@ -127,8 +127,8 @@ Class<Interpreter> decl_Macro ("tl", "Interpreter",
     "Use 'filename' and 'line' to indicate the original source for the error messages.\n"
   ) +
   gsi::method_ext ("define_variable", &define_variable_impl, gsi::arg ("name"), gsi::arg ("value"),
-    "@brief Defines A (global) variable with the given name and value\n"
-    "You can use the \\Value class to provide 'out' parameters which can be modified by code executed inside the interpreter."
+    "@brief Defines a (global) variable with the given name and value\n"
+    "You can use the \\Value class to provide 'out' or 'inout' parameters which can be modified by code executed inside the interpreter and read back by the caller."
   ) +
   gsi::method ("python_interpreter", &python_interpreter,
     "@brief Gets the instance of the Python interpreter\n"
@@ -138,15 +138,20 @@ Class<Interpreter> decl_Macro ("tl", "Interpreter",
   ),
   "@brief A generalization of script interpreters\n"
   "The main purpose of this class is to provide cross-language call options. "
-  "Using the Python interpreter, it is possible to execute Python code from Ruby and vice versa.\n"
+  "Using the Python interpreter, it is possible to execute Python code from Ruby for example.\n"
+  "\n"
+  "The following example shows how to use the interpreter class to execute Python code from Ruby "
+  "and how to pass values from Ruby to Python and back using the \\Value wrapper object:\n"
   "\n"
   "@code\n"
   "pya = RBA::Interpreter::python_interpreter\n"
   "out_param = RBA::Value::new(17)\n"
   "pya.define_variable(\"out_param\", out_param)\n"
-  "pya.eval_string(\"print(\"This is Python now!\")\nout_param.value = out_param.value + 25\")\n"
+  "pya.eval_string(\"print(\\\"This is Python now!\\\")\\nout_param.value = out_param.value + 25\")\n"
   "puts out_param.value  # gives '42'"
   "@/code\n"
+  "\n"
+  "This class was introduced in version 0.27.5.\n"
 );
 
 }

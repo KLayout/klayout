@@ -514,7 +514,7 @@ lym::Macro *new_from_path (const std::string &path)
 }
 
 Class<lym::Macro> decl_Macro ("lay", "Macro",
-  gsi::constructor ("new", &new_from_path,
+  gsi::constructor ("new", &new_from_path, gsi::arg ("path"),
     "@brief Loads the macro from the given file path\n"
     "\n"
     "This constructor has been introduced in version 0.27.5.\n"

@@ -111,7 +111,7 @@ public:
   /**
    *  @brief Defines a global variable with the given name and value 
    */
-  void define_variable (const std::string &name, const std::string &value);
+  void define_variable (const std::string &name, const tl::Variant &value);
 
   /**
    *  @brief Gets a value indicating whether the interpreter is available

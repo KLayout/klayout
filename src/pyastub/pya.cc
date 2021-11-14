@@ -35,6 +35,7 @@ static void fail (const char *file, int line)
 static PythonInterpreter *sp_pya_interpreter = 0;
 
 PythonInterpreter::PythonInterpreter ()
+  : gsi::Interpreter (0, "pya")
 {
   tl_assert (! sp_pya_interpreter);
   sp_pya_interpreter = this;
@@ -118,7 +119,7 @@ PythonInterpreter::inspector (int)
 }
 
 void
-PythonInterpreter::define_variable (const std::string &, const std::string &)
+PythonInterpreter::define_variable (const std::string &, const tl::Variant &)
 {
   // .. nothing ..
 }

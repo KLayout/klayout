@@ -1,4 +1,24 @@
 
+0.27.5          (2021-11-14):
+* Enhancements: Better support for execution (also cross-interpreter) of macro code from scripts
+  - New methods for the Macro class like "run" and loading from file
+  - New class Interpreter for accessing Ruby interpreter state from Python and vice versa
+* Enhancement: New DRC function "enclosed" as the reverse of "enclosing"
+  - Allows using the rectangle filters with "via enclosed by metal"
+  - Usually better performance than "metal enclosing via"
+* Enhancements: Usability
+  - Navigation in the 2.5d view
+  - "tap" function shows layer names and details from layer view
+  - Documentation about layer views
+* Enhancement: CentOS7 RPM's use Python 3 now
+* Enhancement: Sending custom query shape objects to RDB produces shape markers now
+* Enhancement: New method LayoutView#is_editable?
+* Bugfix: %GITHUB%/issues/918 Editor options tab window too big
+* Bugfix: %GITHUB%/issues/920 Fill tool border parameter sign issue
+* Bugfix: %GITHUB%/issues/921 BJT3 extraction with collector shape fixed
+* Bugfix: %GITHUB%/issues/933 QMessageLogger methods safe now with "%" characters
+* Bugfix: %GITHUB%/issues/935 Cell#insert (of cell instances) now checks their cell indexes
+
 0.27.4          (2021-09-25):
 * Enhancements: Some enhancements on the 2.5d view (e.g. live layer color update, z only scaling, wire frames, etc.)
 * Enhancement: simple versions of DRC with_holes/without_holes without parameters

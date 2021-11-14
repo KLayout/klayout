@@ -2024,6 +2024,55 @@ class DBLayout_TestClass < TestBase
 
   end
 
+  def test_22
+
+    # invalid cell indexes
+   
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    assert_equal(c0.cell_index, 0)
+    assert_equal(c1.cell_index, 1)
+
+    tt = RBA::Trans.new
+
+    error = 0
+    begin
+      c0.insert(RBA::CellInstArray.new(2, tt))
+    rescue
+      error = 1
+    end
+    assert_equal(error, 1)
+
+    error = 0
+    begin
+      c0.insert(RBA::CellInstArray.new(2, tt), 17)
+    rescue
+      error = 1
+    end
+    assert_equal(error, 1)
+
+    dtt = RBA::DTrans.new
+
+    error = 0
+    begin
+      c0.insert(RBA::DCellInstArray.new(2, dtt))
+    rescue
+      error = 1
+    end
+    assert_equal(error, 1)
+
+    error = 0
+    begin
+      c0.insert(RBA::DCellInstArray.new(2, dtt), 42)
+    rescue
+      error = 1
+    end
+    assert_equal(error, 1)
+
+  end
+
   # Iterating while flatten
   def test_issue200
 

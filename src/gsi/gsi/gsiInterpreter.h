@@ -25,6 +25,7 @@
 
 #include "tlScriptError.h"
 #include "tlClassRegistry.h"
+#include "tlVariant.h"
 #include "gsiCommon.h"
 
 namespace gsi
@@ -267,7 +268,7 @@ public:
   /**
    *  @brief Defines a global variable with the given name and value 
    */
-  virtual void define_variable (const std::string &name, const std::string &value) = 0;
+  virtual void define_variable (const std::string &name, const tl::Variant &value) = 0;
 
   /**
    *  @brief Installs the given console for output

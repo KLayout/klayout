@@ -38,6 +38,10 @@ class DBLibrary_TestClass < TestBase
     lib_id = lib.id
     assert_equal(lib_id != 0, true)
 
+    # the layout inside the library knows the library
+    assert_equal(lib.layout.library.id == lib.id, true)
+    assert_equal(lib.layout.library.name, "RBA-unit-test")
+
     assert_equal(RBA::Library::library_names.member?("RBA-unit-test"), true)
     assert_equal(RBA::Library::library_by_name("RBA-unit-test").id, lib_id)
 

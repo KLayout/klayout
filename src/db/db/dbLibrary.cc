@@ -32,13 +32,13 @@ namespace db
 Library::Library()
   : m_id (0), m_layout (true)
 {
-  // .. nothing yet ..
+  m_layout.set_library (this);
 }
 
 Library::Library(const Library &d)
   : gsi::ObjectBase (), tl::Object (), m_name (d.m_name), m_description (d.m_description), m_id (0), m_layout (d.m_layout)
 {
-  // .. nothing yet ..
+  m_layout.set_library (this);
 }
 
 Library::~Library ()

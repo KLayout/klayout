@@ -28,7 +28,7 @@
 
 namespace tl
 {
-  template <> struct tl::type_traits<gsi::Interpreter>
+  template <> struct type_traits<gsi::Interpreter>
     : tl::type_traits<void>
   {
     typedef false_tag has_copy_constructor;

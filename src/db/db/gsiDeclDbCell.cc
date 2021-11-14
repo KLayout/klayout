@@ -708,8 +708,19 @@ static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_overlappi
   return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_overlapping (layer_index, db::CplxTrans (layout->dbu ()).inverted () * box, db::ShapeIterator::All));
 }
 
+static db::Instance insert_inst (db::Cell *c, const db::Cell::cell_inst_array_type &inst)
+{
+  if (c->layout () && ! c->layout ()->is_valid_cell_index (inst.object ().cell_index ())) {
+    throw tl::Exception (tl::to_string (tr ("Cell index is not valid")));
+  }
+  return c->insert (inst);
+}
+
 static db::Instance insert_inst_with_props (db::Cell *c, const db::Cell::cell_inst_array_type &inst, db::properties_id_type id)
 {
+  if (c->layout () && ! c->layout ()->is_valid_cell_index (inst.object ().cell_index ())) {
+    throw tl::Exception (tl::to_string (tr ("Cell index is not valid")));
+  }
   if (id) {
     return c->insert (db::CellInstArrayWithProperties (inst, id));
   } else {
@@ -2393,7 +2404,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "It has been added in version 0.16."
   ) +
-  gsi::method ("insert", (db::Instance (db::Cell::*)(const db::Cell::cell_inst_array_type &)) &db::Cell::insert, gsi::arg ("cell_inst_array"),
+  gsi::method_ext ("insert", &insert_inst, gsi::arg ("cell_inst_array"),
     "@brief Inserts a cell instance (array)\n"
     "@return An Instance object representing the new instance\n"
     "With version 0.16, this method returns an Instance object that represents the new instance.\n"

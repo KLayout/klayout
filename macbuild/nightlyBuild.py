@@ -17,14 +17,16 @@ import subprocess
 #
 # @return matching platform name on success; "" on failure
 #------------------------------------------------------------------------------
-def Test_My_Platform( platforms=['Catalina', 'BigSur'] ):
+def Test_My_Platform( platforms=['Catalina', 'BigSur', 'Monterey' ] ):
     (System, Node, Release, MacVersion, Machine, Processor) = platform.uname()
 
     if not System == "Darwin":
         return ""
 
     release = int( Release.split(".")[0] ) # take the first of ['19', '0', '0']
-    if   release == 20:
+    if   release == 21:
+        Platform = "Monterey"
+    elif release == 20:
         Platform = "BigSur"
     elif release == 19:
         Platform = "Catalina"
@@ -173,15 +175,23 @@ def Parse_CommandLine_Arguments():
     global SrlDMG    # DMG serial number
     global Dropbox   # Dropbox directory
 
+    platform = Test_My_Platform()
+    if platform in [ "Monterey", "BigSur" ]:
+        targetopt = "1,2,3,4"
+    elif platform in ["Catalina"]:
+        targetopt = "0,1,2,3,4"
+    else:
+        targetopt = ""
+
     Usage  = "\n"
-    Usage += "--------------------------------------------------------------------------------------------\n"
+    Usage += "--------------------------------------------------------------------------------------------------\n"
     Usage += " nightlyBuild.py [EXPERIMENTAL] \n"
-    Usage += "   << To execute the jobs for making KLayout's DMGs for macOS Catalina or Big Sur >> \n"
+    Usage += "   << To execute the jobs for making KLayout's DMGs for macOS Catalina, Big Sur, or Monterey >>\n"
     Usage += "\n"
     Usage += "$ [python] nightlyBuild.py \n"
     Usage += "   option & argument : comment on option if any                            | default value\n"
     Usage += "   ------------------------------------------------------------------------+--------------\n"
-    Usage += "   [--target <list>] : 0='std', 1='ports', 2='brew', 3='brewHW', 4='ana3', | '0,1,2,3,4'\n"
+    Usage += "   [--target <list>] : 0='std', 1='ports', 2='brew', 3='brewHW', 4='ana3', | '%s'\n" % targetopt
     Usage += "                       5='brewA', 6='brewAHW'                              | \n"
     Usage += "   [--build] : build and deploy                                            | disabled\n"
     Usage += "   [--test]  : run the QA Test                                             | disabled\n"
@@ -199,9 +209,9 @@ def Parse_CommandLine_Arguments():
     Usage += "          (3) $ ./nightlyBuild.py  --test                                  | \n"
     Usage += "          (4) $ ./nightlyBuild.py  --check (confirm the QA Test results)   | \n"
     Usage += "          (5) $ ./nightlyBuild.py  --makedmg  1                            | \n"
-    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.26.12'                     | \n"
+    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.27.4'                      | \n"
     Usage += "          (7) $ ./nightlyBuild.py  --cleandmg 1                            | \n"
-    Usage += "---------------------------------------------------------------------------+----------------\n"
+    Usage += "---------------------------------------------------------------------------+----------------------\n"
 
     p = optparse.OptionParser( usage=Usage )
     p.add_option( '--target',
@@ -244,7 +254,7 @@ def Parse_CommandLine_Arguments():
                     default=False,
                     help='check usage' )
 
-    p.set_defaults( targets    = "0,1,2,3,4",
+    p.set_defaults( targets    = "%s" % targetopt,
                     build      = False,
                     qa_test    = False,
                     qa_check   = False,
@@ -258,9 +268,9 @@ def Parse_CommandLine_Arguments():
         print(Usage)
         quit()
 
-    myPlatform = Test_My_Platform( ['Catalina', 'BigSur'] )
+    myPlatform = Test_My_Platform( ['Catalina', 'BigSur', 'Monterey' ] )
     if myPlatform == "":
-        print( "! Current platform is not ['Catalina', 'BigSur']" )
+        print( "! Current platform is not ['Catalina', 'BigSur', 'Monterey' ]" )
         print(Usage)
         quit()
 

@@ -26,56 +26,76 @@ from build4mac_env  import *
 from build4mac_util import *
 
 #-------------------------------------------------------------------------------
+## To generate the OS-wise usage strings and the default module set
+#
+# @param[in] platform   platform name
+#
+# @return (usage, moduleset)-tuple
+#-------------------------------------------------------------------------------
+def GenerateUsage(platform):
+    if platform.upper() in [ "MONTEREY", "BIGSUR" ]: # with Xcode [13.1 .. ]
+        myQt5     = "qt5brew"
+        myRuby    = "hb27"
+        myPython  = "hb38"
+        moduleset = ('qt5Brew', 'HB27', 'HB38')
+    else: # with Xcode [ .. 12.4]
+        myQt5     = "qt5macports"
+        myRuby    = "sys"
+        myPython  = "sys"
+        moduleset = ('qt5MP', 'Sys', 'Sys')
+
+    usage  = "\n"
+    usage += "---------------------------------------------------------------------------------------------------------\n"
+    usage += "<< Usage of 'build4mac.py' >>\n"
+    usage += "       for building KLayout 0.27.4 or later on different Apple macOS / Mac OSX platforms.\n"
+    usage += "\n"
+    usage += "$ [python] ./build4mac.py \n"
+    usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value\n"
+    usage += "   --------------------------------------------------------------------------------------+---------------\n"
+    usage += "   [-q|--qt <type>]     : case-insensitive type=['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']    | %s \n" % myQt5
+    usage += "                        :   Qt5MacPorts: use Qt5 from MacPorts                           | \n"
+    usage += "                        :       Qt5Brew: use Qt5 from Homebrew                           | \n"
+    usage += "                        :       Qt5Ana3: use Qt5 from Anaconda3                          | \n"
+    usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP27', 'HB27', 'Ana3']   | %s \n" % myRuby
+    usage += "                        :    nil: don't bind Ruby                                        | \n"
+    usage += "                        :    Sys: use OS-bundled Ruby [2.0 - 2.6] depending on OS        | \n"
+    usage += "                        :   MP27: use Ruby 2.7 from MacPorts                             | \n"
+    usage += "                        :   HB27: use Ruby 2.7 from Homebrew                             | \n"
+    usage += "                        :   Ana3: use Ruby 2.5 from Anaconda3                            | \n"
+    usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3',   | %s \n" % myPython
+    usage += "                        :                        'HBAuto']                               | \n"
+    usage += "                        :    nil: don't bind Python                                      | \n"
+    usage += "                        :    Sys: use OS-bundled Python 2.7 [ElCapitan -- Catalina]      | \n"
+    usage += "                        :   MP38: use Python 3.8 from MacPorts                           | \n"
+    usage += "                        :   HB38: use Python 3.8 from Homebrew                           | \n"
+    usage += "                        :   Ana3: use Python 3.8 from Anaconda3                          | \n"
+    usage += "                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew  | \n"
+    usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled \n"
+    usage += "   [-u|--noqtuitools]   : don't include uitools in Qt binding                            | disabled \n"
+    usage += "   [-m|--make <option>] : option passed to 'make'                                        | '--jobs=4' \n"
+    usage += "   [-d|--debug]         : enable debug mode build                                        | disabled \n"
+    usage += "   [-c|--checkcom]      : check command-line and exit without building                   | disabled \n"
+    usage += "   [-y|--deploy]        : deploy executables and dylibs including Qt's Frameworks        | disabled \n"
+    usage += "   [-Y|--DEPLOY]        : deploy executables and dylibs for those who built KLayout      | disabled \n"
+    usage += "                        : from the source code and use the tools in the same machine     | \n"
+    usage += "                        : ! After confirmation of successful build of 'klayout.app',     | \n"
+    usage += "                        :   rerun this script with BOTH:                                 | \n"
+    usage += "                        :     1) the same options used for building AND                  | \n"
+    usage += "                        :     2) <-y|--deploy> OR <-Y|--DEPLOY>                          | \n"
+    usage += "                        :   optionally with [-v|--verbose <0-3>]                         | \n"
+    usage += "   [-v|--verbose <0-3>] : verbose level of `macdeployqt' (effective with -y only)        | 1 \n"
+    usage += "                        : 0 = no output, 1 = error/warning (default),                    | \n"
+    usage += "                        : 2 = normal,    3 = debug                                       | \n"
+    usage += "   [-?|--?]             : print this usage and exit                                      | disabled \n"
+    usage += "-----------------------------------------------------------------------------------------+---------------\n"
+    return (usage, moduleset)
+
+#-------------------------------------------------------------------------------
 ## To get the default configurations
 #
 # @return a dictionary containing the default configuration for the macOS build
 #-------------------------------------------------------------------------------
 def Get_Default_Config():
-    Usage  = "\n"
-    Usage += "---------------------------------------------------------------------------------------------------------\n"
-    Usage += "<< Usage of 'build4mac.py' >>\n"
-    Usage += "       for building KLayout 0.26.12 or later on different Apple Mac OSX / macOS platforms.\n"
-    Usage += "\n"
-    Usage += "$ [python] ./build4mac.py \n"
-    Usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value\n"
-    Usage += "   --------------------------------------------------------------------------------------+---------------\n"
-    Usage += "   [-q|--qt <type>]     : case-insensitive type=['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']    | qt5macports \n"
-    Usage += "                        :   Qt5MacPorts: use Qt5 from MacPorts                           | \n"
-    Usage += "                        :       Qt5Brew: use Qt5 from Homebrew                           | \n"
-    Usage += "                        :       Qt5Ana3: use Qt5 from Anaconda3                          | \n"
-    Usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP27', 'HB27', 'Ana3']   | sys \n"
-    Usage += "                        :    nil: don't bind Ruby                                        | \n"
-    Usage += "                        :    Sys: use OS-bundled Ruby [2.0 - 2.7] depending on OS        | \n"
-    Usage += "                        :   MP27: use Ruby 2.7 from MacPorts                             | \n"
-    Usage += "                        :   HB27: use Ruby 2.7 from Homebrew                             | \n"
-    Usage += "                        :   Ana3: use Ruby 2.5 from Anaconda3                            | \n"
-    Usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3',   | sys \n"
-    Usage += "                        :                        'HBAuto']                               | \n"
-    Usage += "                        :    nil: don't bind Python                                      | \n"
-    Usage += "                        :    Sys: use OS-bundled Python 2.7 [ElCapitan -- BigSur]        | \n"
-    Usage += "                        :   MP38: use Python 3.8 from MacPorts                           | \n"
-    Usage += "                        :   HB38: use Python 3.8 from Homebrew                           | \n"
-    Usage += "                        :   Ana3: use Python 3.8 from Anaconda3                          | \n"
-    Usage += "                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew  | \n"
-    Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled \n"
-    Usage += "   [-u|--noqtuitools]   : don't include uitools in Qt binding                            | disabled \n"
-    Usage += "   [-m|--make <option>] : option passed to 'make'                                        | '--jobs=4' \n"
-    Usage += "   [-d|--debug]         : enable debug mode build                                        | disabled \n"
-    Usage += "   [-c|--checkcom]      : check command-line and exit without building                   | disabled \n"
-    Usage += "   [-y|--deploy]        : deploy executables and dylibs including Qt's Frameworks        | disabled \n"
-    Usage += "   [-Y|--DEPLOY]        : deploy executables and dylibs for those who built KLayout      | disabled \n"
-    Usage += "                        : from the source code and use the tools in the same machine     | \n"
-    Usage += "                        : ! After confirmation of successful build of 'klayout.app',     | \n"
-    Usage += "                        :   rerun this script with BOTH:                                 | \n"
-    Usage += "                        :     1) the same options used for building AND                  | \n"
-    Usage += "                        :     2) <-y|--deploy> OR <-Y|--DEPLOY>                          | \n"
-    Usage += "                        :   optionally with [-v|--verbose <0-3>]                         | \n"
-    Usage += "   [-v|--verbose <0-3>] : verbose level of `macdeployqt' (effective with -y only)        | 1 \n"
-    Usage += "                        : 0 = no output, 1 = error/warning (default),                    | \n"
-    Usage += "                        : 2 = normal,    3 = debug                                       | \n"
-    Usage += "   [-?|--?]             : print this usage and exit                                      | disabled \n"
-    Usage += "-----------------------------------------------------------------------------------------+---------------\n"
-
     ProjectDir = os.getcwd()
     BuildBash  = "./build.sh"
     (System, Node, Release, MacVersion, Machine, Processor) = platform.uname()
@@ -83,11 +103,13 @@ def Get_Default_Config():
     if not System == "Darwin":
         print("")
         print( "!!! Sorry. Your system <%s> looks like non-Mac" % System, file=sys.stderr )
-        print(Usage)
+        print( GenerateUsage("")[0] )
         sys.exit(1)
 
     release = int( Release.split(".")[0] ) # take the first of ['19', '0', '0']
-    if   release == 20:
+    if   release == 21:
+        Platform = "Monterey"
+    elif release == 20:
         Platform = "BigSur"
     elif release == 19:
         Platform = "Catalina"
@@ -103,23 +125,29 @@ def Get_Default_Config():
         Platform = ""
         print("")
         print( "!!! Sorry. Unsupported major OS release <%d>" % release, file=sys.stderr )
-        print(Usage)
+        print( GenerateUsage("")[0] )
         sys.exit(1)
 
     if not Machine == "x86_64":
-        if Machine == "arm64" and Platform == "BigSur": # with an Apple Silicon Chip
+        if Machine == "arm64" and (Platform == "Monterey" or Platform == "BigSur"): # with an Apple Silicon Chip
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print("")
         else:
             print("")
             print( "!!! Sorry. Only x86_64/arm64 architecture machine is supported but found <%s>" % Machine, file=sys.stderr )
-            print(Usage)
+            print( GenerateUsage("")[0] )
             sys.exit(1)
+
+    # Set the OS-wise usage and module set
+    Usage, ModuleSet = GenerateUsage(Platform)
 
     # Set the default modules
     ModuleQt = "Qt5MacPorts"
-    if   Platform == "BigSur":
+    if   Platform == "Monterey":
+        ModuleRuby   = "RubyMonterey"
+        ModulePython = "PythonMonterey"
+    elif Platform == "BigSur":
         ModuleRuby   = "RubyBigSur"
         ModulePython = "PythonBigSur"
     elif Platform == "Catalina":
@@ -152,7 +180,6 @@ def Get_Default_Config():
     PackagePrefix = ""
     DeployVerbose = 1
     Version       = GetKLayoutVersionFrom( "./version.sh" )
-    ModuleSet     = ( 'qt5MP', 'Sys', 'Sys' )
 
     config = dict()
     config['ProjectDir']    = ProjectDir        # project directory where "build.sh" exists
@@ -341,7 +368,9 @@ def Parse_CLI_Args(config):
             ModuleRuby = 'nil'
         elif choiceRuby == "Sys":
             choiceRuby = "Sys"
-            if Platform == "BigSur":
+            if Platform == "Monterey":
+                ModuleRuby = 'RubyMonterey'
+            elif Platform == "BigSur":
                 ModuleRuby = 'RubyBigSur'
             elif Platform == "Catalina":
                 ModuleRuby = 'RubyCatalina'
@@ -387,7 +416,9 @@ def Parse_CLI_Args(config):
         if choicePython ==  "nil":
             ModulePython = 'nil'
         elif choicePython == "Sys":
-            if Platform == "BigSur":
+            if Platform == "Monterey":
+                ModulePython = 'PythonMonterey'
+            elif Platform == "BigSur":
                 ModulePython = 'PythonBigSur'
             elif Platform == "Catalina":
                 ModulePython = 'PythonCatalina'
@@ -1098,7 +1129,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             cmd06 = "rm -rf %s" % binTarget
 
             cmd07 = "mkdir %s" % sitepackagesTarget
-            cmd08 = "cp -RL %s/{pip*,pkg_resources,setuptools*,wheel*} %s" % (sitepackagesSource, sitepackagesTarget)
+            cmd08 = "cp -RL %s/{*distutils*,pip*,pkg_resources,setuptools*,wheel*} %s" % (sitepackagesSource, sitepackagesTarget)
 
             shell_commands = list()
             shell_commands.append(cmd01)

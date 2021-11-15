@@ -77,7 +77,7 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "--------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.26.12 or later on different Apple Mac OSX / macOS platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.26.12 or later on different Apple macOS / Mac OSX platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py \n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
@@ -105,7 +105,11 @@ def SetGlobals():
 
     release = int( Release.split(".")[0] ) # take the first of ['19', '0', '0']
     LatestOS = ""
-    if release == 20:
+    if release == 21:
+        GenOSName = "macOS"
+        Platform  = "Monterey"
+        LatestOS  = Platform
+    elif release == 20:
         GenOSName = "macOS"
         Platform  = "BigSur"
         LatestOS  = Platform

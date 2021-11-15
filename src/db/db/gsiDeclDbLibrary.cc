@@ -277,6 +277,10 @@ Class<db::PCellDeclaration> decl_PCellDeclaration_Native ("db", "PCellDeclaratio
   gsi::method ("parameters_from_shape", &db::PCellDeclaration::parameters_from_shape) +
   gsi::method ("transformation_from_shape", &db::PCellDeclaration::transformation_from_shape) +
   gsi::method ("display_text", &db::PCellDeclaration::get_display_name) +
+  gsi::method ("layout", &db::PCellDeclaration::layout,
+    "@brief Gets the Layout object the PCell is registered in or nil if it is not registered yet.\n"
+    "This attribute has been added in version 0.27.5."
+  ) +
   gsi::method ("id", &db::PCellDeclaration::id,
     "@brief Gets the integer ID of the PCell declaration\n"
     "This ID is used to identify the PCell in the context of a Layout object for example"

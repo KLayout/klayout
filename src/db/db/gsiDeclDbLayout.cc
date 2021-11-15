@@ -980,6 +980,10 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method was introduced in version 0.22.\n"
   ) +
+  gsi::method ("library", &db::Layout::library,
+    "@brief Gets the library this layout lives in or nil if the layout is not part of a library\n"
+    "This attribute has been introduced in version 0.27.5."
+  ) +
   gsi::method ("add_meta_info", &db::Layout::add_meta_info, gsi::arg ("info"),
     "@brief Adds meta information to the layout\n"
     "See \\LayoutMetaInfo for details about layouts and meta information."

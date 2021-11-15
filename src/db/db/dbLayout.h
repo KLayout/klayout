@@ -583,6 +583,22 @@ public:
   }
 
   /**
+   *  @brief Gets the library the layout lives in or NULL if the layout is not part of a library
+   */
+  Library *library () const
+  {
+    return mp_library;
+  }
+
+  /**
+   *  @brief Sets the library pointer
+   */
+  void set_library (db::Library *library)
+  {
+    mp_library = library;
+  }
+
+  /**
    *  @brief Gets the technology object the layout is associated with or null if no valid technology is associated
    */
   const db::Technology *technology () const;
@@ -1843,6 +1859,7 @@ protected:
 private:
   enum LayerState { Normal, Free, Special };
 
+  db::Library *mp_library;
   cell_list m_cells;
   size_t m_cells_size;
   cell_ptr_vector m_cell_ptrs;

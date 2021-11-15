@@ -28,7 +28,7 @@ namespace db
 {
 
 PCellDeclaration::PCellDeclaration ()
-  : m_ref_count (0), m_id (0), m_has_parameter_declarations (false)
+  : m_ref_count (0), m_id (0), mp_layout (0), m_has_parameter_declarations (false)
 { 
   // .. nothing yet ..
 }

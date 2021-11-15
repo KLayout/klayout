@@ -430,6 +430,14 @@ public:
   }
 
   /**
+   *  @brief Gets the Layout object the PCell is registered inside or NULL if it is not registered
+   */
+  db::Layout *layout () const
+  {
+    return mp_layout;
+  }
+
+  /**
    *  @brief Add a reference to this object
    *
    *  Since the declaration is supposed to be a static object, it can be shared between 
@@ -518,6 +526,7 @@ private:
   int m_ref_count;
   pcell_id_type m_id;
   std::string m_name;
+  db::Layout *mp_layout;
   mutable bool m_has_parameter_declarations;
   mutable std::vector<PCellParameterDeclaration> m_parameter_declarations;
 

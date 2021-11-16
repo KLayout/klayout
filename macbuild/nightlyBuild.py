@@ -188,7 +188,7 @@ def Parse_CommandLine_Arguments():
     Usage += " nightlyBuild.py [EXPERIMENTAL] \n"
     Usage += "   << To execute the jobs for making KLayout's DMGs for macOS Catalina, Big Sur, or Monterey >>\n"
     Usage += "\n"
-    Usage += "$ [python] nightlyBuild.py \n"
+    Usage += "$ [python] nightlyBuild.py\n"
     Usage += "   option & argument : comment on option if any                            | default value\n"
     Usage += "   ------------------------------------------------------------------------+--------------\n"
     Usage += "   [--target <list>] : 0='std', 1='ports', 2='brew', 3='brewHW', 4='ana3', | '%s'\n" % targetopt
@@ -305,7 +305,7 @@ def Parse_CommandLine_Arguments():
         Dropbox = opt.upload
 
     if not (Build or QATest or QACheck or MakeDMG or CleanDMG or Upload):
-        print( "! No option selected" )
+        print( "! No action selected" )
         print(Usage)
         quit()
 

@@ -75,24 +75,24 @@ def SetGlobals():
     global Bit                # machine bit-size
 
     Usage  = "\n"
-    Usage += "--------------------------------------------------------------------------------------------------------\n"
+    Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.26.12 or later on different Apple macOS / Mac OSX platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.27.4 or later on different Apple macOS / Mac OSX platforms.\n"
     Usage += "\n"
-    Usage += "$ [python] ./makeDMG4mac.py \n"
+    Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
-    Usage += "   ----------------------------------------------------------------------------------+---------------\n"
-    Usage += "   <-p|--pkg <dir>>     : package directory created by `build4mac.py` with [-y|-Y]   | `` \n"
+    Usage += "   ----------------------------------------------------------------------------------+-----------------\n"
+    Usage += "   <-p|--pkg <dir>>     : package directory created by `build4mac.py` with [-y|-Y]   | ``\n"
     Usage += "                        : like 'ST-qt5MP.pkg.macos-Catalina-release-RsysPsys'        | \n"
-    Usage += "   <-c|--clean>         : clean the work directory                                   | disabled \n"
-    Usage += "   <-m|--make>          : make a compressed DMG file                                 | disabled \n"
+    Usage += "   <-c|--clean>         : clean the work directory                                   | disabled\n"
+    Usage += "   <-m|--make>          : make a compressed DMG file                                 | disabled\n"
     Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
-    Usage += "   [-b|--bundle <name>] : forcibly use this bundle name in the DMG                   | '' \n"
-    Usage += "   [-s|--serial <num>]  : DMG serial number                                          | 1 \n"
-    Usage += "   [-u|--unsafe]        : Ignores a few checks (use with caution)                    | disabled \n"
-    Usage += "   [-t|--targetdmg]     : Specify output .dmg filename                               | chosen by script \n"
-    Usage += "   [-?|--?]             : print this usage and exit                                  | disabled \n"
-    Usage += "-------------------------------------------------------------------------------------+------------------\n"
+    Usage += "   [-b|--bundle <name>] : forcibly use this bundle name in the DMG                   | ''\n"
+    Usage += "   [-s|--serial <num>]  : DMG serial number                                          | 1\n"
+    Usage += "   [-u|--unsafe]        : Ignores a few checks (use with caution)                    | disabled\n"
+    Usage += "   [-t|--targetdmg]     : Specify output .dmg filename                               | chosen by script\n"
+    Usage += "   [-?|--?]             : print this usage and exit                                  | disabled\n"
+    Usage += "-------------------------------------------------------------------------------------+-------------------\n"
 
     ProjectDir = os.getcwd()
     (System, Node, Release, Version, Machine, Processor) = platform.uname()
@@ -137,7 +137,7 @@ def SetGlobals():
         sys.exit(1)
 
     if not Machine == "x86_64":
-        if Machine == "arm64" and Platform == "BigSur": # with an Apple Silicon Chip
+        if Machine == "arm64" and (Platform == "Monterey" or Platform == "BigSur"): # with an Apple Silicon Chip
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print("")

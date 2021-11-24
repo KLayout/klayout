@@ -37,7 +37,7 @@ LIBS += -lklayout_gsi_test
     !equals(HAVE_QT_XML, "0") {
       LIBS += -lklayout_QtXml
     }
-    greaterThan(QT_MAJOR, "4") {
+    greaterThan(QT_MAJOR_VERSION, 4) {
       LIBS += -lklayout_QtWidgets
     }
   }

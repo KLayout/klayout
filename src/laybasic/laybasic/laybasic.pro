@@ -310,7 +310,7 @@ DEPENDPATH += $$QTBASIC_INC
 
 equals(HAVE_QTBINDINGS, "1") {
   LIBS += -lklayout_qtbasic -lklayout_QtGui -lklayout_QtCore
-  greaterThan(QT_MAJOR, "4") {
+  greaterThan(QT_MAJOR_VERSION, 4) {
     LIBS += -lklayout_QtWidgets
   }
 }

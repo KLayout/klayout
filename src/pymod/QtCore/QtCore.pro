@@ -10,6 +10,6 @@ HEADERS += \
 
 LIBS += -lklayout_QtCore -lklayout_QtGui
 
-greaterThan(QT_MAJOR, "4") {
+greaterThan(QT_MAJOR_VERSION, 4) {
   LIBS += -lklayout_QtWidgets
 }

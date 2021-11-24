@@ -17,7 +17,7 @@ win32 {
   QMAKE_POST_LINK += $(COPY) $(DESTDIR)$(TARGET) $$DESTDIR_UT/$${TARGET}.ut
 }
 
-greaterThan(QT_MAJOR, "4") {
+greaterThan(QT_MAJOR_VERSION, 4) {
   QT += testlib
 } else {
   CONFIG += qtestlib

@@ -171,6 +171,10 @@ equals(HAVE_QT, "0") {
   DEFINES += HAVE_QT
   QT += core xml network
 
+  greaterThan(QT_MAJOR_VERSION, 5) {
+    QT += core5compat
+  }
+
   equals(HAVE_QTBINDINGS, "1") {
     # sql isn't needed by the base application
     !equals(HAVE_QT_SQL, "0") {
@@ -178,9 +182,13 @@ equals(HAVE_QT, "0") {
     }
   }
 
-  greaterThan(QT_MAJOR, "4") {
+  greaterThan(QT_MAJOR_VERSION, 4) {
 
-    QT += widgets gui printsupport xmlpatterns
+    QT += widgets gui printsupport
+
+    lessThan(QT_MAJOR_VERSION, 6) {
+      QT += xmlpatterns
+    }
 
     equals(HAVE_QTBINDINGS, "1") {
       !equals(HAVE_QT_DESIGNER, "0") {

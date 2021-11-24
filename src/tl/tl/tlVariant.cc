@@ -402,9 +402,11 @@ Variant::Variant (const QVariant &v)
   case QVariant::RectF:
     operator= (tl::Variant (v.value<QRectF> ()));
     break;
+#if QT_VERSION < 0x60000
   case QVariant::RegExp:
     operator= (tl::Variant (v.value<QRegExp> ()));
     break;
+#endif
   case QVariant::Region:
     operator= (tl::Variant (v.value<QRegion> ()));
     break;

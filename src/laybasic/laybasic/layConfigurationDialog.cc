@@ -110,7 +110,7 @@ ConfigurationDialog::init (const lay::PluginDeclaration *decl)
 
   for (std::vector <lay::ConfigPage *>::iterator p = m_config_pages.begin (); p != m_config_pages.end (); ++p) {
     if ((*p)->layout ()) {
-      (*p)->layout ()->setMargin (0);
+      (*p)->layout ()->setContentsMargins (0, 0, 0, 0);
     } 
     (*p)->setup (mp_root);
   }

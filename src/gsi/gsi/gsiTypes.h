@@ -749,6 +749,7 @@ struct type_traits< QSet<X> * >
   typedef X inner_type;
 };
 
+#if QT_VERSION < 0x60000
 template <class X>
 struct type_traits< QVector<X> >
   : generic_type_traits<vector_tag, VectorAdaptor, T_vector>
@@ -783,6 +784,7 @@ struct type_traits< QVector<X> * >
 {
   typedef X inner_type;
 };
+#endif
 
 template <class X, class Y>
 struct type_traits< QHash<X, Y> >

@@ -110,7 +110,7 @@ InstPropertiesPage::InstPropertiesPage (edt::Service *service, db::Manager *mana
   }
 
   QHBoxLayout *layout = new QHBoxLayout (pcell_tab);
-  layout->setMargin (0);
+  layout->setContentsMargins (0, 0, 0, 0);
   pcell_tab->setLayout (layout);
 }
 

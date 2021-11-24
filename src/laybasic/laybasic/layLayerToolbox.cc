@@ -108,7 +108,7 @@ LCPDitherPalette::LCPDitherPalette (QWidget *parent, const char *name)
 
   int n = 0;
   QVBoxLayout *l = new QVBoxLayout (this);
-  l->setMargin (0);
+  l->setContentsMargins (0, 0, 0, 0);
   l->setSpacing (0);
 
   for (unsigned int i = 0; i < 4; ++i) {
@@ -117,7 +117,7 @@ LCPDitherPalette::LCPDitherPalette (QWidget *parent, const char *name)
     f->setObjectName (QString::fromUtf8 ("dp_f"));
     l->addWidget (f);
     QHBoxLayout *ll = new QHBoxLayout (f);
-    ll->setMargin (0);
+    ll->setContentsMargins (0, 0, 0, 0);
     ll->setSpacing (0);
 
     for (unsigned int j = 0; j < 4; ++j) {
@@ -151,7 +151,7 @@ LCPDitherPalette::LCPDitherPalette (QWidget *parent, const char *name)
     f->setObjectName (QString::fromUtf8 ("dp_ll"));
     l->addWidget (f);
     QHBoxLayout *ll = new QHBoxLayout (f);
-    ll->setMargin (0);
+    ll->setContentsMargins (0, 0, 0, 0);
     ll->setSpacing (0);
 
     LCPActiveLabel *b;
@@ -292,7 +292,7 @@ LCPVisibilityPalette::LCPVisibilityPalette (QWidget *parent, const char *name)
   setObjectName (QString::fromUtf8 (name));
 
   QVBoxLayout *l = new QVBoxLayout (this);
-  l->setMargin (0);
+  l->setContentsMargins (0, 0, 0, 0);
   l->setSpacing (0);
 
   QFrame *f;
@@ -307,7 +307,7 @@ LCPVisibilityPalette::LCPVisibilityPalette (QWidget *parent, const char *name)
   f->setObjectName (QString::fromUtf8 ("vis_f"));
   l->addWidget (f);
   ll = new QHBoxLayout (f);
-  ll->setMargin (0);
+  ll->setContentsMargins (0, 0, 0, 0);
   ll->setSpacing (0);
 
   b = new LCPActiveLabel (0, f);
@@ -331,7 +331,7 @@ LCPVisibilityPalette::LCPVisibilityPalette (QWidget *parent, const char *name)
   f = new QFrame (this);
   l->addWidget (f);
   ll = new QHBoxLayout (f);
-  ll->setMargin (0);
+  ll->setContentsMargins (0, 0, 0, 0);
   ll->setSpacing (0);
 
   b = new LCPActiveLabel (2, f);
@@ -376,7 +376,7 @@ LCPAnimationPalette::LCPAnimationPalette (QWidget *parent, const char *name)
   setObjectName (QString::fromUtf8 (name));
 
   QVBoxLayout *l = new QVBoxLayout (this);
-  l->setMargin (0);
+  l->setContentsMargins (0, 0, 0, 0);
   l->setSpacing (0);
 
   QFrame *f;
@@ -391,7 +391,7 @@ LCPAnimationPalette::LCPAnimationPalette (QWidget *parent, const char *name)
   f->setObjectName (QString::fromUtf8 ("anim_f"));
   l->addWidget (f);
   ll = new QHBoxLayout (f);
-  ll->setMargin (0);
+  ll->setContentsMargins (0, 0, 0, 0);
   ll->setSpacing (0);
 
   b = new LCPActiveLabel (0, f);
@@ -415,7 +415,7 @@ LCPAnimationPalette::LCPAnimationPalette (QWidget *parent, const char *name)
   f = new QFrame (this);
   l->addWidget (f);
   ll = new QHBoxLayout (f);
-  ll->setMargin (0);
+  ll->setContentsMargins (0, 0, 0, 0);
   ll->setSpacing (0);
 
   b = new LCPActiveLabel (2, f);
@@ -452,7 +452,7 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   setObjectName (QString::fromUtf8 (name));
 
   QVBoxLayout *l = new QVBoxLayout (this);
-  l->setMargin (0);
+  l->setContentsMargins (0, 0, 0, 0);
   l->setSpacing (0);
 
   QFrame *f;
@@ -466,7 +466,7 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   f = new QFrame (this);
   l->addWidget (f);
   ll = new QHBoxLayout (f);
-  ll->setMargin (0);
+  ll->setContentsMargins (0, 0, 0, 0);
   ll->setSpacing (0);
 
   for (int i = 0; i < 4; ++i) {
@@ -489,7 +489,7 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   f->setObjectName (QString::fromUtf8 ("ls_ll"));
   l->addWidget (f);
   ll = new QHBoxLayout (f);
-  ll->setMargin (0);
+  ll->setContentsMargins (0, 0, 0, 0);
   ll->setSpacing (0);
 
   //  No style
@@ -523,7 +523,7 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   f->setObjectName (QString::fromUtf8 ("style_f"));
   l->addWidget (f);
   ll = new QHBoxLayout (f);
-  ll->setMargin (0);
+  ll->setContentsMargins (0, 0, 0, 0);
   ll->setSpacing (0);
 
   b = new LCPActiveLabel (0, f);
@@ -561,7 +561,7 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   f = new QFrame (this);
   l->addWidget (f);
   ll = new QHBoxLayout (f);
-  ll->setMargin (0);
+  ll->setContentsMargins (0, 0, 0, 0);
   ll->setSpacing (0);
 
   b = new LCPActiveLabel (200, f);
@@ -583,7 +583,7 @@ LCPStylePalette::LCPStylePalette (QWidget *parent, const char *name)
   f = new QFrame (this);
   l->addWidget (f);
   ll = new QHBoxLayout (f);
-  ll->setMargin (0);
+  ll->setContentsMargins (0, 0, 0, 0);
   ll->setSpacing (0);
 
   b = new LCPActiveLabel (100, f);
@@ -716,7 +716,7 @@ LCPColorPalette::LCPColorPalette (QWidget *parent, const char *name)
   sp.setVerticalStretch (0);
 
   QVBoxLayout *l = new QVBoxLayout (this);
-  l->setMargin (0);
+  l->setContentsMargins (0, 0, 0, 0);
   l->setSpacing (0);
   for (unsigned int i = 0; i < 6; ++i) {
 
@@ -724,7 +724,7 @@ LCPColorPalette::LCPColorPalette (QWidget *parent, const char *name)
     f->setObjectName (QString::fromUtf8 ("color_f"));
     l->addWidget (f);
     QHBoxLayout *ll = new QHBoxLayout (f);
-    ll->setMargin (0);
+    ll->setContentsMargins (0, 0, 0, 0);
     ll->setSpacing (0);
 
     for (unsigned int j = 0; j < 7; ++j) {
@@ -754,7 +754,7 @@ LCPColorPalette::LCPColorPalette (QWidget *parent, const char *name)
     f->setObjectName (QString::fromUtf8 ("color_l1"));
     l->addWidget (f);
     QHBoxLayout *ll = new QHBoxLayout (f);
-    ll->setMargin (0);
+    ll->setContentsMargins (0, 0, 0, 0);
     ll->setSpacing (0);
 
     LCPActiveLabel *b;
@@ -784,7 +784,7 @@ LCPColorPalette::LCPColorPalette (QWidget *parent, const char *name)
     f->setObjectName (QString::fromUtf8 ("color_l2"));
     l->addWidget (f);
     QHBoxLayout *ll = new QHBoxLayout (f);
-    ll->setMargin (0);
+    ll->setContentsMargins (0, 0, 0, 0);
     ll->setSpacing (0);
 
     LCPActiveLabel *b;
@@ -956,7 +956,7 @@ LayerToolbox::add_panel (QWidget *panel_widget, const char *text)
   b->setFocusPolicy (Qt::NoFocus);
   b->setBackgroundRole (QPalette::Highlight);
   QPalette pl (b->palette ());
-  pl.setColor (QPalette::Foreground, pl.color (QPalette::Active, QPalette::HighlightedText));
+  pl.setColor (QPalette::WindowText, pl.color (QPalette::Active, QPalette::HighlightedText));
   b->setPalette (pl);
   b->setText (tl::to_qstring (text));
   b->setMaximumSize (QSize (b->maximumSize ().width (), b->sizeHint ().height () - 4));

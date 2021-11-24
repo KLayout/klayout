@@ -336,7 +336,7 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   setObjectName (QString::fromUtf8 ("MacroEditorDialog"));
 
   QHBoxLayout *layout = new QHBoxLayout (console_text_frame);
-  layout->setMargin (0);
+  layout->setContentsMargins (0, 0, 0, 0);
   console_text_frame->setLayout (layout);
   mp_console_text = new TextEditWidget (console_text_frame);
   mp_console_text->setReadOnly (true);
@@ -467,7 +467,11 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   //  add standard templates
   QResource res (QString::fromUtf8 (":/macro-templates/index.txt"));
   QByteArray data;
+#if QT_VERSION >= 0x60000
+  if (res.compressionAlgorithm () == QResource::ZlibCompression) {
+#else
   if (res.isCompressed ()) {
+#endif
     data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
   } else {
     data = QByteArray ((const char *)res.data (), (int)res.size ());

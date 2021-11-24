@@ -1075,7 +1075,11 @@ UserPropertiesForm::UserPropertiesForm (QWidget *parent)
 
   QResource res (tl::to_qstring (":/syntax/ur_text.xml"));
   QByteArray data ((const char *) res.data (), int (res.size ()));
+#if QT_VERSION >= 0x60000
+  if (res.compressionAlgorithm () == QResource::ZlibCompression) {
+#else
   if (res.isCompressed ()) {
+#endif
     data = qUncompress (data);
   }
 

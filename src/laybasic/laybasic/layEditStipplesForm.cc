@@ -181,7 +181,11 @@ EditStipplesForm::update ()
       name = tl::sprintf ("#%d", std::distance (m_pattern.begin (), i));
     }
     QListWidgetItem *item = new QListWidgetItem (icon_from_data (i->pattern ()), tl::to_qstring (name), mp_ui->stipple_items);
+#if QT_VERSION >= 0x60000
+    item->setForeground (cdis);
+#else
     item->setTextColor (cdis);
+#endif
   }
   for (std::vector <lay::DitherPattern::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
     if ((*i)->order_index () > 0) {

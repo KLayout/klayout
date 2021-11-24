@@ -30,6 +30,7 @@
 #include "gsi.h"
 
 #include <QAction>
+#include <QActionGroup>
 #include <QMenu>
 #include <QMenuBar>
 #include <QShortcutEvent>
@@ -921,7 +922,7 @@ AbstractMenu::build_detached (const std::string &name, QFrame *mbar)
   }
 
   QHBoxLayout *menu_layout = new QHBoxLayout (mbar);
-  menu_layout->setMargin (0);
+  menu_layout->setContentsMargins (0, 0, 0, 0);
   mbar->setLayout (menu_layout);
 
   AbstractMenuItem *item = find_item_exact ("@@" + name);

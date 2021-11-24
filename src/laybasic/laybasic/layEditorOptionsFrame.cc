@@ -37,7 +37,7 @@ EditorOptionsFrame::EditorOptionsFrame (QWidget *parent)
   setObjectName (QString::fromUtf8 ("editor_options_frame"));
 
   QVBoxLayout *left_frame_ly = new QVBoxLayout (this);
-  left_frame_ly->setMargin (0);
+  left_frame_ly->setContentsMargins (0, 0, 0, 0);
   left_frame_ly->setSpacing (0);
 }
 

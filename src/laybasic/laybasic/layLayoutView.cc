@@ -470,7 +470,7 @@ LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
   m_current_layer_list = 0;
 
   QVBoxLayout *vbl = new QVBoxLayout (this);
-  vbl->setMargin (0);
+  vbl->setContentsMargins (0, 0, 0, 0);
   vbl->setSpacing (0);
 
   mp_canvas = new lay::LayoutCanvas (this, this);
@@ -490,7 +490,7 @@ LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
     hierarchy_frame->setObjectName (QString::fromUtf8 ("left"));
     mp_hierarchy_frame = hierarchy_frame;
     QVBoxLayout *left_frame_ly = new QVBoxLayout (hierarchy_frame);
-    left_frame_ly->setMargin (0);
+    left_frame_ly->setContentsMargins (0, 0, 0, 0);
     left_frame_ly->setSpacing (0);
 
     mp_hierarchy_panel = new lay::HierarchyControlPanel (this, hierarchy_frame, "hcp");
@@ -504,7 +504,7 @@ LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
     levels_frame->setObjectName (QString::fromUtf8 ("lvl_frame"));
     left_frame_ly->addWidget (levels_frame);
     QHBoxLayout *levels_frame_ly = new QHBoxLayout (levels_frame);
-    levels_frame_ly->setMargin (1);
+    levels_frame_ly->setContentsMargins (1, 1, 1, 1);
     QLabel *level_l1 = new QLabel (tl::to_qstring (" " + tl::to_string (QObject::tr ("Levels"))), levels_frame);
     levels_frame_ly->addWidget (level_l1);
     mp_min_hier_spbx = new QSpinBox (levels_frame);
@@ -537,7 +537,7 @@ LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
     bookmarks_frame->setObjectName (QString::fromUtf8 ("bookmarks_frame"));
     mp_bookmarks_frame = bookmarks_frame;
     QVBoxLayout *left_frame_ly = new QVBoxLayout (bookmarks_frame);
-    left_frame_ly->setMargin (0);
+    left_frame_ly->setContentsMargins (0, 0, 0, 0);
     left_frame_ly->setSpacing (0);
 
     mp_bookmarks_view = new lay::BookmarksView (this, bookmarks_frame, "bookmarks");
@@ -552,7 +552,7 @@ LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
     mp_libraries_frame = new QFrame (0);
     mp_libraries_frame->setObjectName (QString::fromUtf8 ("libs_frame"));
     QVBoxLayout *left_frame_ly = new QVBoxLayout (mp_libraries_frame);
-    left_frame_ly->setMargin (0);
+    left_frame_ly->setContentsMargins (0, 0, 0, 0);
     left_frame_ly->setSpacing (0);
 
     mp_libraries_view = new lay::LibrariesView (this, mp_libraries_frame, "libs");

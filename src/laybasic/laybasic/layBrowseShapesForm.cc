@@ -297,7 +297,11 @@ public:
 
     for (int col = 0; col < 3; ++col) {
       setFont (col, f);
+#if QT_VERSION >= 0x60000
+      setForeground (col, tc);
+#else
       setTextColor (col, tc);
+#endif
     }
   }
 };
@@ -627,7 +631,7 @@ BrowseShapesForm::cell_changed (QTreeWidgetItem *item, QTreeWidgetItem *)
   lv_shape_instance->addTopLevelItems (items);
 
   if (lv_shape_instance->topLevelItemCount () > 0) {
-    lv_shape_instance->setItemSelected (lv_shape_instance->topLevelItem (0), true);
+    lv_shape_instance->topLevelItem (0)->setSelected (true);
     lv_shape_instance->setCurrentItem (lv_shape_instance->topLevelItem (0));
   }
 
@@ -814,7 +818,7 @@ BrowseShapesForm::update_cell_list ()
 
   if (sel_item) {
     lv_cell->setCurrentItem (sel_item);
-    lv_cell->setItemSelected (sel_item, true);
+    sel_item->setSelected (true);
     lv_cell->scrollToItem (sel_item);
   }
 }
@@ -992,7 +996,7 @@ BrowseShapesForm::adv_cell (bool up)
         if (litem) {
           QTreeWidgetItem *ni = litem->child (0);
           lv_cell->setCurrentItem (ni);
-          lv_cell->setItemSelected (ni, true);
+          ni->setSelected (true);
           lv_cell->scrollToItem (ni);
         }
       } else if (current->parent () == litem) {
@@ -1008,12 +1012,12 @@ BrowseShapesForm::adv_cell (bool up)
         if (litem) {
           QTreeWidgetItem *ni = litem->child (litem->childCount () - 1);
           lv_cell->setCurrentItem (ni);
-          lv_cell->setItemSelected (ni, true);
+          ni->setSelected (true);
           lv_cell->scrollToItem (ni);
         } else {
           //  revert to the original
           lv_cell->setCurrentItem (current);
-          lv_cell->setItemSelected (current, true);
+          current->setSelected (true);
           lv_cell->scrollToItem (current);
         }
       }
@@ -1047,7 +1051,7 @@ BrowseShapesForm::adv_shape (bool up)
         QTreeWidgetItem *ni = lv_shape_instance->topLevelItem (lv_shape_instance->topLevelItemCount () - 1);
         if (ni) {
           lv_shape_instance->setCurrentItem (ni);
-          lv_shape_instance->setItemSelected (ni, true);
+          ni->setSelected (true);
           lv_shape_instance->scrollToItem (ni);
         }
       }
@@ -1089,7 +1093,7 @@ BrowseShapesForm::adv_cell_inst (bool up)
       }
       if (ni) {
         lv_cell_instance->setCurrentItem (ni);
-        lv_cell_instance->setItemSelected (ni, true);
+        ni->setSelected (true);
         lv_cell_instance->scrollToItem (ni);
       }
 

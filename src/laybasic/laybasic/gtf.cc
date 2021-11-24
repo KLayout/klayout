@@ -58,6 +58,7 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <memory>
 
 // --------------------------------------------------------------
 //  A helper class that allows putting a QImage into a tl::Variant
@@ -376,14 +377,14 @@ MouseTrackerWidget::set (const QMouseEvent &me)
 
   if (me.button () == Qt::RightButton) {
     mp_current_pixmap = &m_rb_pm;
-  } else if (me.button () == Qt::MidButton) {
+  } else if (me.button () == Qt::MiddleButton) {
     mp_current_pixmap = &m_mb_pm;
   } else if (me.button () == Qt::LeftButton) {
     mp_current_pixmap = &m_lb_pm;
   } else if (me.type () == QEvent::MouseMove) {
     if (me.buttons () & Qt::RightButton) {
       mp_current_pixmap = &m_rb_pm;
-    } else if (me.buttons () & Qt::MidButton) {
+    } else if (me.buttons () & Qt::MiddleButton) {
       mp_current_pixmap = &m_mb_pm;
     } else if (me.buttons () & Qt::LeftButton) {
       mp_current_pixmap = &m_lb_pm;
@@ -578,7 +579,12 @@ class LogMouseEvent
 {
 public:
   LogMouseEvent (const std::string &target, const QMouseEvent &me, int xml_line = 0)
-    : LogTargetedEvent (target, xml_line), m_mouse_event (me)
+    : LogTargetedEvent (target, xml_line),
+#if QT_VERSION >= 0x60000
+      m_mouse_event (new QMouseEvent (me.type (), me.position (), me.globalPosition (), me.button (), me.buttons (), me.modifiers ()))
+#else
+      m_mouse_event (new QMouseEvent (me.type (), me.pos (), me.button (), me.buttons (), me.modifiers ()))
+#endif
   {
     //  .. nothing yet ..
   }
@@ -587,11 +593,11 @@ public:
   {
     QWidget *target = target_widget ();
     
-    if (m_mouse_event.type () == QEvent::MouseButtonPress) {
+    if (m_mouse_event->type () == QEvent::MouseButtonPress) {
       target->setFocus (); 
     }
 
-    QMouseEvent me (m_mouse_event.type (), m_mouse_event.pos (), target->mapToGlobal (m_mouse_event.pos ()), m_mouse_event.button (), m_mouse_event.buttons (), m_mouse_event.modifiers ());
+    QMouseEvent me (m_mouse_event->type (), m_mouse_event->pos (), m_mouse_event->globalPos (), m_mouse_event->button (), m_mouse_event->buttons (), m_mouse_event->modifiers ());
     MouseTrackerWidget::instance ()->set (me);
     Player::instance ()->issue_event (target, &me);
   }
@@ -599,13 +605,13 @@ public:
   virtual const char *name () const
   { 
     const char *event_name = "";
-    if (m_mouse_event.type () == QEvent::MouseMove) {
+    if (m_mouse_event->type () == QEvent::MouseMove) {
       event_name = "mouse_move";
-    } else if (m_mouse_event.type() == QEvent::MouseButtonDblClick) {
+    } else if (m_mouse_event->type() == QEvent::MouseButtonDblClick) {
       event_name = "mouse_button_dbl_click";
-    } else if (m_mouse_event.type() == QEvent::MouseButtonPress) {
+    } else if (m_mouse_event->type() == QEvent::MouseButtonPress) {
       event_name = "mouse_button_press";
-    } else if (m_mouse_event.type() == QEvent::MouseButtonRelease) {
+    } else if (m_mouse_event->type() == QEvent::MouseButtonRelease) {
       event_name = "mouse_button_release";
     }
     return event_name;
@@ -615,29 +621,29 @@ public:
   {
     LogTargetedEvent::attributes (attr);
 
-    attr.push_back (std::make_pair (std::string ("xpos"), tl::to_string (m_mouse_event.x ())));
-    attr.push_back (std::make_pair (std::string ("ypos"), tl::to_string (m_mouse_event.y ())));
-    if (m_mouse_event.type () == QEvent::MouseMove) {
-      attr.push_back (std::make_pair (std::string ("buttons"), tl::sprintf ("%x", int (m_mouse_event.buttons ()))));
+    attr.push_back (std::make_pair (std::string ("xpos"), tl::to_string (m_mouse_event->x ())));
+    attr.push_back (std::make_pair (std::string ("ypos"), tl::to_string (m_mouse_event->y ())));
+    if (m_mouse_event->type () == QEvent::MouseMove) {
+      attr.push_back (std::make_pair (std::string ("buttons"), tl::sprintf ("%x", int (m_mouse_event->buttons ()))));
     } else {
-      attr.push_back (std::make_pair (std::string ("button"), tl::sprintf ("%x", int (m_mouse_event.button ()))));
+      attr.push_back (std::make_pair (std::string ("button"), tl::sprintf ("%x", int (m_mouse_event->button ()))));
     }
-    attr.push_back (std::make_pair (std::string ("modifiers"), tl::sprintf ("%x", int (m_mouse_event.modifiers ()))));
+    attr.push_back (std::make_pair (std::string ("modifiers"), tl::sprintf ("%x", int (m_mouse_event->modifiers ()))));
   }
 
   const QMouseEvent &event () const
   {
-    return m_mouse_event;
+    return *m_mouse_event;
   }
 
   void move (const QPoint &p)
   {
-    m_mouse_event = QMouseEvent (m_mouse_event.type (),
-                                 m_mouse_event.pos () + p,
-                                 m_mouse_event.globalPos () + p,
-                                 m_mouse_event.button (),
-                                 m_mouse_event.buttons (),
-                                 m_mouse_event.modifiers ());
+    m_mouse_event.reset (new QMouseEvent (m_mouse_event->type (),
+                                          m_mouse_event->pos () + p,
+                                          m_mouse_event->globalPos () + p,
+                                          m_mouse_event->button (),
+                                          m_mouse_event->buttons (),
+                                          m_mouse_event->modifiers ()));
   }
 
   bool equals (const LogEventBase &b) const
@@ -648,14 +654,14 @@ public:
     }
 
     return LogTargetedEvent::equals (b) && 
-           m_mouse_event.type () == be->m_mouse_event.type () &&
-           m_mouse_event.pos () == be->m_mouse_event.pos () &&
-           m_mouse_event.modifiers () == be->m_mouse_event.modifiers () &&
-           m_mouse_event.buttons () == be->m_mouse_event.buttons ();
+           m_mouse_event->type () == be->m_mouse_event->type () &&
+           m_mouse_event->pos () == be->m_mouse_event->pos () &&
+           m_mouse_event->modifiers () == be->m_mouse_event->modifiers () &&
+           m_mouse_event->buttons () == be->m_mouse_event->buttons ();
   }
 
 private:
-  QMouseEvent m_mouse_event;
+  std::unique_ptr<QMouseEvent> m_mouse_event;
 };
 
 class LogKeyEvent 
@@ -663,20 +669,20 @@ class LogKeyEvent
 {
 public:
   LogKeyEvent (const std::string &target, const QKeyEvent &ke, int xml_line = 0)
-    : LogTargetedEvent (target, xml_line), m_key_event (ke)
+    : LogTargetedEvent (target, xml_line), m_key_event (new QKeyEvent (ke.type (), ke.key (), ke.modifiers ()))
   {
     //  .. nothing yet ..
   }
 
   virtual void issue_event () 
   {
-    QKeyEvent ke (m_key_event);
-    Player::instance ()->issue_event (target_widget (), &ke);
+    std::unique_ptr<QKeyEvent> ke (new QKeyEvent (m_key_event->type (), m_key_event->key (), m_key_event->modifiers ()));
+    Player::instance ()->issue_event (target_widget (), ke.get ());
   }
 
   virtual const char *name () const
   {
-    if (m_key_event.type() == QEvent::KeyPress) {
+    if (m_key_event->type() == QEvent::KeyPress) {
       return "key_press";
     } else {
       return "key_release";
@@ -688,13 +694,13 @@ public:
     LogTargetedEvent::attributes (attr);
 
     QChar ch;
-    if (! m_key_event.text ().isEmpty ()) {
-      ch = m_key_event.text ().at (0);
+    if (! m_key_event->text ().isEmpty ()) {
+      ch = m_key_event->text ().at (0);
     }
 
-    attr.push_back (std::make_pair (std::string ("key"), tl::sprintf ("%x", int (m_key_event.key ()))));
+    attr.push_back (std::make_pair (std::string ("key"), tl::sprintf ("%x", int (m_key_event->key ()))));
     attr.push_back (std::make_pair (std::string ("code"), tl::sprintf ("%x", int (ch.unicode ()))));
-    attr.push_back (std::make_pair (std::string ("modifiers"), tl::sprintf ("%x", int (m_key_event.modifiers ()))));
+    attr.push_back (std::make_pair (std::string ("modifiers"), tl::sprintf ("%x", int (m_key_event->modifiers ()))));
   }
 
   bool equals (const LogEventBase &b) const
@@ -705,12 +711,12 @@ public:
     }
 
     return LogTargetedEvent::equals (b) && 
-           m_key_event.modifiers () == be->m_key_event.modifiers () &&
-           m_key_event.key () == be->m_key_event.key ();
+           m_key_event->modifiers () == be->m_key_event->modifiers () &&
+           m_key_event->key () == be->m_key_event->key ();
   }
 
 private:
-  QKeyEvent m_key_event;
+  std::unique_ptr<QKeyEvent> m_key_event;
 };
 
 class LogActionEvent 

@@ -220,7 +220,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   mp_main_stack_widget->setCurrentIndex (0);
 
   QVBoxLayout *vbl = new QVBoxLayout (mp_main_frame);
-  vbl->setMargin (0);
+  vbl->setContentsMargins (0, 0, 0, 0);
   vbl->setSpacing (0);
 
   mp_tab_bar = new QTabBar (mp_main_frame);
@@ -348,7 +348,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   mp_status_bar->addWidget (mp_cp_frame);
 
   QHBoxLayout *cp_frame_ly = new QHBoxLayout (mp_cp_frame);
-  cp_frame_ly->setMargin (0);
+  cp_frame_ly->setContentsMargins (0, 0, 0, 0);
   cp_frame_ly->setSpacing (0);
   mp_cpx_label = new QLabel (mp_cp_frame);
   mp_cpx_label->setObjectName (QString::fromUtf8 ("cpx_label"));

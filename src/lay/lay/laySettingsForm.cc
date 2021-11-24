@@ -97,7 +97,7 @@ SettingsForm::SettingsForm (QWidget *parent, lay::Dispatcher *dispatcher, const 
       if (config_page->layout () == 0) {
         tl::warn << "No layout in configuration page " << p->first;
       } else {
-        config_page->layout ()->setMargin (0);
+        config_page->layout ()->setContentsMargins (0, 0, 0, 0);
       }
 
       m_config_pages.push_back (config_page);

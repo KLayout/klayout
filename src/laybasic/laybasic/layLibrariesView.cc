@@ -165,7 +165,7 @@ LibraryTreeWidget::mouseDoubleClickEvent (QMouseEvent *event)
 void
 LibraryTreeWidget::mousePressEvent (QMouseEvent *event)
 {
-  if (event->button () == Qt::MidButton) {
+  if (event->button () == Qt::MiddleButton) {
     //  eat this event.
   } else {
     QModelIndex index (indexAt (event->pos ()));
@@ -179,7 +179,7 @@ LibraryTreeWidget::mousePressEvent (QMouseEvent *event)
 void
 LibraryTreeWidget::mouseReleaseEvent (QMouseEvent *event)
 {
-  if (event->button () == Qt::MidButton) {
+  if (event->button () == Qt::MiddleButton) {
     QModelIndex index (indexAt (event->pos ()));
     if (index.isValid ()) {
       emit cell_middle_clicked (index);
@@ -225,7 +225,6 @@ LibrariesView::LibrariesView (lay::LayoutView *view, QWidget *parent, const char
   mp_search_frame->setBackgroundRole (QPalette::Highlight);
 
   QHBoxLayout *sf_ly = new QHBoxLayout (mp_search_frame);
-  sf_ly->setMargin (0);
   sf_ly->setContentsMargins (0, 0, 0, 0);
   sf_ly->setSpacing (0);
 
@@ -236,7 +235,7 @@ LibrariesView::LibrariesView (lay::LayoutView *view, QWidget *parent, const char
   mp_search_close_cb->setBackgroundRole (QPalette::Highlight);
   mp_search_close_cb->setSizePolicy (QSizePolicy (QSizePolicy::Fixed, QSizePolicy::Preferred));
   QPalette pl (mp_search_close_cb->palette ());
-  pl.setColor (QPalette::Foreground, pl.color (QPalette::Active, QPalette::HighlightedText));
+  pl.setColor (QPalette::WindowText, pl.color (QPalette::Active, QPalette::HighlightedText));
   mp_search_close_cb->setPalette (pl);
   mp_search_close_cb->setMaximumSize (QSize (mp_search_close_cb->maximumSize ().width (), mp_search_close_cb->sizeHint ().height () - 4));
   connect (mp_search_close_cb, SIGNAL (clicked ()), this, SLOT (search_editing_finished ()));

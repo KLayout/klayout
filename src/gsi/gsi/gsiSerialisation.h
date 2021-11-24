@@ -1644,11 +1644,13 @@ void push_vector (std::set<X> &v, const X &x)
 
 #if defined(HAVE_QT)
 
+#if QT_VERSION < 0x60000
 template <class X>
 void push_vector (QVector<X> &v, const X &x)
 {
   v.push_back (x);
 }
+#endif
 
 inline void push_vector (QStringList &v, const QString &x)
 {

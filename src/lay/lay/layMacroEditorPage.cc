@@ -119,7 +119,11 @@ MacroEditorHighlighters::highlighter_for_scheme (QObject *parent, const std::str
     QResource res (tl::to_qstring (":/syntax/" + scheme + ".xml"));
 
     QByteArray data;
+#if QT_VERSION >= 0x60000
+    if (res.compressionAlgorithm () == QResource::ZlibCompression) {
+#else
     if (res.isCompressed ()) {
+#endif
       data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
     } else {
       data = QByteArray ((const char *)res.data (), (int)res.size ());
@@ -514,7 +518,7 @@ MacroEditorPage::MacroEditorPage (QWidget * /*parent*/, MacroEditorHighlighters 
   mp_completer_popup = new QWidget (window (), Qt::ToolTip);
   mp_completer_popup->setWindowModality (Qt::NonModal);
   QHBoxLayout *ly = new QHBoxLayout (mp_completer_popup);
-  ly->setMargin (0);
+  ly->setContentsMargins (0, 0, 0, 0);
   mp_completer_list = new QListWidget (mp_completer_popup);
   ly->addWidget (mp_completer_list);
   mp_completer_popup->hide ();

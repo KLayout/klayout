@@ -336,7 +336,11 @@ public:
           }
 
           QByteArray data;
+#if QT_VERSION >= 0x60000
+          if (child_res.compressionAlgorithm () == QResource::ZlibCompression) {
+#else
           if (child_res.isCompressed ()) {
+#endif
             data = qUncompress ((const unsigned char *)child_res.data (), (int)child_res.size ());
           } else {
             data = QByteArray ((const char *)child_res.data (), (int)child_res.size ());

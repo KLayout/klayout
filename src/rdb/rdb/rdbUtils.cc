@@ -317,5 +317,52 @@ void create_items_from_edge_pairs (rdb::Database *db, rdb::id_type cell_id, rdb:
   }
 }
 
+void add_item_value (rdb::Item *item, const tl::Variant &v, double dbu)
+{
+  if (dbu > 0 && v.is_user<db::Box> ()) {
+    item->add_value (db::CplxTrans (dbu) * v.to_user<db::Box> ());
+  } else if (dbu > 0 && v.is_user<db::Point> ()) {
+    db::DPoint p = db::CplxTrans (dbu) * v.to_user<db::Point> ();
+    item->add_value (db::DEdge (p, p));
+  } else if (dbu > 0 && v.is_user<db::Polygon> ()) {
+    item->add_value (db::CplxTrans (dbu) * v.to_user<db::Polygon> ());
+  } else if (dbu > 0 && v.is_user<db::SimplePolygon> ()) {
+    db::DPolygon p;
+    db::DSimplePolygon sp = db::CplxTrans (dbu) * v.to_user<db::SimplePolygon> ();
+    p.assign_hull (sp.begin_hull (), sp.end_hull ());
+    item->add_value (p);
+  } else if (dbu > 0 && v.is_user<db::Edge> ()) {
+    item->add_value (db::CplxTrans (dbu) * v.to_user<db::Edge> ());
+  } else if (dbu > 0 && v.is_user<db::EdgePair> ()) {
+    item->add_value (db::CplxTrans (dbu) * v.to_user<db::EdgePair> ());
+  } else if (dbu > 0 && v.is_user<db::Path> ()) {
+    item->add_value (db::CplxTrans (dbu) * v.to_user<db::Path> ());
+  } else if (dbu > 0 && v.is_user<db::Text> ()) {
+    item->add_value (db::CplxTrans (dbu) * v.to_user<db::Text> ());
+  } else if (v.is_user<db::DBox> ()) {
+    item->add_value (v.to_user<db::DBox> ());
+  } else if (v.is_user<db::DPoint> ()) {
+    db::DPoint p = v.to_user<db::DPoint> ();
+    item->add_value (db::DEdge (p, p));
+  } else if (v.is_user<db::DPolygon> ()) {
+    item->add_value (v.to_user<db::DPolygon> ());
+  } else if (v.is_user<db::DSimplePolygon> ()) {
+    db::DPolygon p;
+    db::DSimplePolygon sp = v.to_user<db::DSimplePolygon> ();
+    p.assign_hull (sp.begin_hull (), sp.end_hull ());
+    item->add_value (p);
+  } else if (v.is_user<db::DEdge> ()) {
+    item->add_value (v.to_user<db::DEdge> ());
+  } else if (v.is_user<db::DEdgePair> ()) {
+    item->add_value (v.to_user<db::DEdgePair> ());
+  } else if (v.is_user<db::DPath> ()) {
+    item->add_value (v.to_user<db::DPath> ());
+  } else if (v.is_user<db::DText> ()) {
+    item->add_value (v.to_user<db::DText> ());
+  } else {
+    item->add_value (std::string (v.to_string ()));
+  }
+}
+
 }
 

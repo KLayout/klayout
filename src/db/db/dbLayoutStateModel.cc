@@ -29,13 +29,13 @@ namespace db
 {
 
 LayoutStateModel::LayoutStateModel (bool busy)
-  : m_hier_dirty (false), m_all_bboxes_dirty (false), m_busy (busy)
+  : m_hier_dirty (false), m_hier_generation_id (0), m_all_bboxes_dirty (false), m_busy (busy)
 {
   //  .. nothing yet ..
 }
 
 LayoutStateModel::LayoutStateModel (const LayoutStateModel &d)
-  : m_hier_dirty (d.m_hier_dirty), m_bboxes_dirty (d.m_bboxes_dirty), m_all_bboxes_dirty (d.m_all_bboxes_dirty), m_busy (d.m_busy)
+  : m_hier_dirty (d.m_hier_dirty), m_hier_generation_id (d.m_hier_generation_id), m_bboxes_dirty (d.m_bboxes_dirty), m_all_bboxes_dirty (d.m_all_bboxes_dirty), m_busy (d.m_busy)
 {
   //  .. nothing yet ..
 }
@@ -44,6 +44,7 @@ LayoutStateModel &
 LayoutStateModel::operator= (const LayoutStateModel &d)
 {
   m_hier_dirty = d.m_hier_dirty;
+  m_hier_generation_id = d.m_hier_generation_id;
   m_bboxes_dirty = d.m_bboxes_dirty;
   m_all_bboxes_dirty = d.m_all_bboxes_dirty;
   m_busy = d.m_busy;

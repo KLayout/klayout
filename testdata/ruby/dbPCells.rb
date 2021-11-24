@@ -588,6 +588,21 @@ class DBPCell_TestClass < TestBase
 
   end
 
+  def test_9
+
+    layout = RBA::Layout::new
+
+    pcell = BoxPCell::new 
+    assert_equal(pcell.layout == nil, true)
+    
+    # sets the layout reference of the PCell declaration:
+    layout.register_pcell("Box", pcell)
+
+    assert_equal(pcell.layout == nil, false)
+    assert_equal(pcell.layout.object_id == layout.object_id, true)
+
+  end
+
 end
 
 load("test_epilogue.rb")

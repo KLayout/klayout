@@ -30,6 +30,7 @@
 #include <iostream>
 
 #include "tlVariant.h"
+#include "gsiObject.h"
 
 namespace gsi
 {
@@ -38,6 +39,7 @@ namespace gsi
  *  @brief Provides a basic implementation for a "boxed" plain value using a Variant as the basic type
  */
 class GSI_PUBLIC Value
+  : public gsi::ObjectBase
 {
 public:
   /**

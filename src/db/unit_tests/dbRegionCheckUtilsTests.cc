@@ -25,7 +25,7 @@
 #include "tlUnitTest.h"
 #include "tlStringEx.h"
 
-#include "dbRegionUtils.h"
+#include "dbRegionCheckUtils.h"
 
 TEST(1_SimpleLShape)
 {
@@ -52,7 +52,7 @@ TEST(1_SimpleLShape)
 
   do {
     //  single polygon check
-    poly_check.enter (poly, 0);
+    poly_check.single (poly, 0);
   } while (e2e.prepare_next_pass ());
 
   EXPECT_EQ (tl::to_string (ep), "(0,0;0,1000)|(1000,1000;1000,0),(2000,1000;1000,1000)|(1000,2000;2000,2000)");
@@ -85,7 +85,7 @@ TEST(1s_SimpleLShape)
 
   do {
     //  single polygon check
-    poly_check.enter (poly, 0);
+    poly_check.single (poly, 0);
   } while (e2e.prepare_next_pass ());
 
   EXPECT_EQ (tl::to_string (ep), "(0,0;0,1000)/(1000,1000;1000,0),(1000,2000;2000,2000)/(2000,1000;1000,1000)");
@@ -118,7 +118,7 @@ TEST(2_SimpleLWithBigPart)
 
   do {
     //  single polygon check
-    poly_check.enter (poly, 0);
+    poly_check.single (poly, 0);
   } while (e2e.prepare_next_pass ());
 
   EXPECT_EQ (tl::to_string (ep), "(0,0;0,1000)|(1000,1000;1000,0)");
@@ -153,7 +153,7 @@ TEST(3_SimpleTWithBigPart)
 
   do {
     //  single polygon check
-    poly_check.enter (poly, 0);
+    poly_check.single (poly, 0);
   } while (e2e.prepare_next_pass ());
 
   EXPECT_EQ (tl::to_string (ep), "(0,0;0,1000)|(1000,1000;1000,0),(0,2500;0,3500)|(1000,3500;1000,2500)");
@@ -188,7 +188,7 @@ TEST(4_SimpleNotch)
 
   do {
     //  single polygon check
-    poly_check.enter (poly, 0);
+    poly_check.single (poly, 0);
   } while (e2e.prepare_next_pass ());
 
   EXPECT_EQ (tl::to_string (ep), "(1000,1000;2000,1000)|(2000,2000;1000,2000)");
@@ -225,7 +225,7 @@ TEST(5_LShapeNotch)
 
   do {
     //  single polygon check
-    poly_check.enter (poly, 0);
+    poly_check.single (poly, 0);
   } while (e2e.prepare_next_pass ());
 
   EXPECT_EQ (tl::to_string (ep), "(1500,500;2000,500)|(2000,1500;1500,1500),(1500,1500;1500,2500)|(500,2500;500,1500)");
@@ -264,14 +264,12 @@ TEST(6_SeparationLvsBox)
   db::Polygon poly2;
   poly2.assign_hull (pts2, pts2 + sizeof (pts2) / sizeof (pts2[0]));
 
-  db::box_scanner<db::Polygon, size_t> scanner;
-  scanner.insert (&poly1, 0);  //  layer 0
-  scanner.insert (&poly2, 1);  //  layer 1
-
   db::poly2poly_check<db::Polygon> poly_check (e2e);
+  poly_check.enter (poly1, 0);  //  layer 0
+  poly_check.enter (poly2, 1);  //  layer 1
 
   do {
-    scanner.process (poly_check, er.distance (), db::box_convert<db::Polygon> ());
+    poly_check.process ();
   } while (e2e.prepare_next_pass ());
 
   EXPECT_EQ (tl::to_string (ep), "(1000,1000;1000,0)/(2000,0;2000,1000),(3000,2000;2000,2000)/(2000,1000;3000,1000)");

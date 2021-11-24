@@ -38,6 +38,7 @@
 #include "tlLog.h"
 #include "tlProgress.h"
 #include "tlTimer.h"
+#include "rdbUtils.h"
 
 #include <QInputDialog>
 #include <QHeaderView>
@@ -537,10 +538,10 @@ SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu)
       rdb::Item *item = rdb.create_item (cell->id (), cat->id ());
 
       if (! v->is_list ()) {
-        item->add_value (std::string (v->to_string ()));
+        rdb::add_item_value (item, *v, dbu);
       } else {
         for (std::vector<tl::Variant>::const_iterator i = v->get_list ().begin (); i != v->get_list ().end (); ++i) {
-          item->add_value (std::string (i->to_string ()));
+          rdb::add_item_value (item, *i, dbu);
         }
       } 
 

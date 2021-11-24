@@ -2115,7 +2115,7 @@ MainService::cm_tap ()
   QPoint mp = view ()->view_object_widget ()->mapToGlobal (view ()->view_object_widget ()->mouse_position ());
 
   for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = tapped_layers.begin (); l != tapped_layers.end (); ++l) {
-    QAction *a = menu->addAction (lay::LayerTreeModel::icon_for_layer (*l, view (), icon_size, icon_size, 0, true), tl::to_qstring ((*l)->source (true).to_string ()));
+    QAction *a = menu->addAction (lay::LayerTreeModel::icon_for_layer (*l, view (), icon_size, icon_size, 0, true), tl::to_qstring ((*l)->display_string (view (), true, true /*with source*/)));
     a->setData (int (l - tapped_layers.begin ()));
   }
 

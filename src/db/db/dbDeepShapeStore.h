@@ -32,6 +32,7 @@
 #include "dbLayout.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbHierarchyBuilder.h"
+#include "dbCellMapping.h"
 #include "gsiObject.h"
 
 #include <set>
@@ -292,6 +293,41 @@ struct DB_PUBLIC RecursiveShapeIteratorCompareForTargetHierarchy
 };
 
 /**
+ *  @brief An object holding a cell mapping with the hierarchy generation Ids of the involved layouts
+ */
+class DB_PUBLIC CellMappingWithGenerationIds
+  : public db::CellMapping
+{
+public:
+  CellMappingWithGenerationIds ()
+    : db::CellMapping (), m_into_generation_id (0), m_from_generation_id (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  void swap (CellMappingWithGenerationIds &other)
+  {
+    db::CellMapping::swap (other);
+    std::swap (m_into_generation_id, other.m_into_generation_id);
+    std::swap (m_from_generation_id, other.m_from_generation_id);
+  }
+
+  bool is_valid (const db::Layout &into_layout, const db::Layout &from_layout) const
+  {
+    return into_layout.hier_generation_id () == m_into_generation_id && from_layout.hier_generation_id () == m_from_generation_id;
+  }
+
+  void set_generation_ids (const db::Layout &into_layout, const db::Layout &from_layout)
+  {
+    m_into_generation_id = into_layout.hier_generation_id ();
+    m_from_generation_id = from_layout.hier_generation_id ();
+  }
+
+private:
+  size_t m_into_generation_id, m_from_generation_id;
+};
+
+/**
  *  @brief The "deep shape store" is a working model for the hierarchical ("deep") processor
  *
  *  The deep shape store keeps temporary data for the deep shape processor.
@@ -338,6 +374,25 @@ public:
    *  only layout.
    */
   bool is_singular () const;
+
+  /**
+   *  @brief Sets a value indicating whether to keep layouts
+   *
+   *  If this value is set to true, layouts are not released when their reference count
+   *  goes down to zero.
+   */
+  void set_keep_layouts (bool f)
+  {
+    m_keep_layouts = f;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether to keep layouts
+   */
+  bool keep_layouts () const
+  {
+    return m_keep_layouts;
+  }
 
   /**
    *  @brief Creates a new layer from a flat region (or the region is made flat)
@@ -480,6 +535,11 @@ public:
   const db::CellMapping &cell_mapping_to_original (unsigned int layout_index, db::Layout *into_layout, db::cell_index_type into_cell, const std::set<db::cell_index_type> *excluded_cells = 0, const std::set<db::cell_index_type> *included_cells = 0);
 
   /**
+   *  @brief Gets the cell mapping from one internal layout to another
+   */
+  const db::CellMapping &internal_cell_mapping (unsigned int from_layout_index, unsigned int into_layout_index);
+
+  /**
    *  @brief Create cell variants from the given variant collector
    *
    *  To use this method, first create a variant collector (db::cell_variant_collector) with the required
@@ -543,6 +603,11 @@ public:
    *  Don't try to mess too much with the cell object, you'll screw up the internals.
    */
   db::Cell &initial_cell (unsigned int n);
+
+  /**
+   *  @brief Gets the layout index for a given internal layout
+   */
+  unsigned int layout_index (const db::Layout *layout) const;
 
   /**
    *  @brief Gets the singular layout (const version)
@@ -730,7 +795,6 @@ private:
 
   struct LayoutHolder;
 
-  void invalidate_hier ();
   void add_ref (unsigned int layout, unsigned int layer);
   void remove_ref (unsigned int layout, unsigned int layer);
 
@@ -752,6 +816,7 @@ private:
   layout_map_type m_layout_map;
   DeepShapeStoreState m_state;
   std::list<DeepShapeStoreState> m_state_stack;
+  bool m_keep_layouts;
   tl::Mutex m_lock;
 
   struct DeliveryMappingCacheKey
@@ -780,7 +845,8 @@ private:
     db::cell_index_type into_cell;
   };
 
-  std::map<DeliveryMappingCacheKey, db::CellMapping> m_delivery_mapping_cache;
+  std::map<DeliveryMappingCacheKey, CellMappingWithGenerationIds> m_delivery_mapping_cache;
+  std::map<std::pair<unsigned int, unsigned int>, CellMappingWithGenerationIds> m_internal_mapping_cache;
 };
 
 template <class VarCollector>

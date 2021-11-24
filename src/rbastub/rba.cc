@@ -34,6 +34,7 @@ static void fail (const char *file, int line)
 static RubyInterpreter *sp_rba_interpreter = 0;
 
 RubyInterpreter::RubyInterpreter ()
+  : gsi::Interpreter (0, "rba")
 {
   tl_assert (! sp_rba_interpreter);
   sp_rba_interpreter = this;
@@ -110,7 +111,7 @@ RubyInterpreter::eval_string_and_print (const char *, const char *file, int line
 }
 
 void
-RubyInterpreter::define_variable (const std::string &, const std::string &)
+RubyInterpreter::define_variable (const std::string &, const tl::Variant &)
 {
   // .. nothing ..
 }

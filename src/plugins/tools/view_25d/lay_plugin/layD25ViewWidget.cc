@@ -311,13 +311,13 @@ D25ViewWidget::keyPressEvent (QKeyEvent *event)
 
       //  Move "into" or "out"
 
-      double d = (event->key () == Qt::Key_Up ? 0.1 : -0.1);
+      double d = (event->key () == Qt::Key_Up ? 0.05 : -0.05);
 
       QMatrix4x4 t;
       t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
       QVector3D cd = t.inverted ().map (QVector3D (0, 0, cam_dist ()));
 
-      set_displacement (displacement () + d * cd);
+      set_displacement (displacement () + d * cd / m_scale_factor);
 
     }
 
@@ -327,7 +327,7 @@ D25ViewWidget::keyPressEvent (QKeyEvent *event)
 
       //  Ctrl + left/right changes azimuths
 
-      double d = (event->key () == Qt::Key_Right ? 2 : -2);
+      double d = (event->key () == Qt::Key_Right ? 1 : -1);
 
       double a = cam_azimuth () + d;
       if (a < -180.0) {
@@ -348,7 +348,7 @@ D25ViewWidget::keyPressEvent (QKeyEvent *event)
       t.rotate (cam_azimuth (), 0.0, 1.0, 0.0);
       QVector3D cd = t.inverted ().map (QVector3D (cam_dist (), 0, 0));
 
-      set_displacement (displacement () + d * cd);
+      set_displacement (displacement () + d * cd / m_scale_factor);
 
     }
 
@@ -632,11 +632,6 @@ D25ViewWidget::prepare_view ()
       cell_bbox += db::CplxTrans (cv->layout ().dbu ()) * cv.cell ()->bbox ((unsigned int) lp->layer_index ());
     }
 
-  }
-
-  m_bbox &= cell_bbox;
-  if (m_bbox.empty ()) {
-    return false;
   }
 
   bool any = false;

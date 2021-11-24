@@ -85,6 +85,7 @@ public:
    */
   void invalidate_hier ()
   {
+    ++m_hier_generation_id;
     if (! m_hier_dirty || m_busy) {
       do_invalidate_hier ();  //  must be called before the hierarchy is invalidated (stopping of redraw thread requires this)
       m_hier_dirty = true;
@@ -125,6 +126,17 @@ public:
   bool hier_dirty () const
   {
     return m_hier_dirty;
+  }
+
+  /**
+   *  @brief Gets the hierarchy generation ID
+   *
+   *  The hierarchy generation ID is a number which is incremented on every hierarchy
+   *  change.
+   */
+  size_t hier_generation_id () const
+  {
+    return m_hier_generation_id;
   }
 
   /**
@@ -195,6 +207,7 @@ public:
 
 private:
   bool m_hier_dirty;
+  size_t m_hier_generation_id;
   std::vector<bool> m_bboxes_dirty;
   bool m_all_bboxes_dirty;
   bool m_busy;

@@ -1725,7 +1725,7 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, c
       s->polygon (poly);
 
       do {
-        poly_check.enter (poly, 0);
+        poly_check.single (poly, 0);
       } while (edge_check.prepare_next_pass ());
 
     }

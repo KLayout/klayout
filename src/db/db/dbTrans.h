@@ -2011,6 +2011,15 @@ public:
     m_mag = m_mag < 0.0 ? -m : m;
   }
 
+  /**
+   *  @brief Returns a value indicating whether the transformation is a complex one
+   *  The transformation can safely be converted to a simple transformation if this value is false.
+   */
+  bool is_complex () const
+  {
+    return is_mag () || ! is_ortho ();
+  }
+
   /** 
    *  @brief Test, if the transformation is mirroring
    */

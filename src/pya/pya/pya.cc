@@ -175,7 +175,8 @@ static void reset_interpreter ()
 }
 
 PythonInterpreter::PythonInterpreter (bool embedded)
-  : mp_current_console (0), mp_current_exec_handler (0), m_current_exec_level (0),
+  : gsi::Interpreter (0, "pya"),
+    mp_current_console (0), mp_current_exec_handler (0), m_current_exec_level (0),
     m_in_trace (false), m_block_exceptions (false), m_ignore_next_exception (false),
     mp_current_frame (NULL), mp_py3_app_name (0), m_embedded (embedded)
 {
@@ -572,7 +573,7 @@ PythonInterpreter::inspector (int context)
 }
 
 void
-PythonInterpreter::define_variable (const std::string &name, const std::string &value)
+PythonInterpreter::define_variable (const std::string &name, const tl::Variant &value)
 {
   PythonPtr main_module (PyImport_AddModule ("__main__"));
   PythonPtr dict (PyModule_GetDict (main_module.get ()));

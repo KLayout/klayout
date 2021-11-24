@@ -452,6 +452,22 @@ run_demo gen, "input1.drc(enclosing(input2) < 2.0.um)", "drc_enc1u.png"
 run_demo gen, "input1.drc(enclosing(input2,\n"+
               "                     projection) < 2.0.um)", "drc_enc2u.png"
 
+class Gen
+  def produce(s1, s2)
+    s1.insert(RBA::Box::new(3000, 0, 6000, 6000))
+    s2.insert(RBA::Box::new(0, 1000, 6000, 7000))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.enclosed(input2, 2.0.um)", "drc_encd1.png"
+run_demo gen, "input1.enclosed(input2, 2.0.um, projection)", "drc_encd2.png"
+
+run_demo gen, "input1.drc(enclosed(input2) < 2.0.um)", "drc_encd1u.png"
+run_demo gen, "input1.drc(enclosed(input2,\n"+
+              "                    projection) < 2.0.um)", "drc_encd2u.png"
+
 
 class Gen
   def produce(s1, s2)

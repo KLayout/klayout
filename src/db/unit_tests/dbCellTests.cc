@@ -1014,3 +1014,49 @@ TEST(6)
 
 }
 
+TEST(10_HasShapesTouching)
+{
+  db::Layout ly;
+  unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
+
+  db::Cell &a = ly.cell (ly.add_cell ("A"));
+
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box ()), false);
+
+  a.shapes (l1).insert (db::Box (-100, -100, 0, 0));
+
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box ()), false);
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box (0, 0, 100, 100)), true);
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box (0, 1, 100, 100)), false);
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box (0, -1, 100, 100)), true);
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box (-1, -1, -1, -1)), true);
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box (1, 1, 1, 1)), false);
+}
+
+TEST(11_HasShapesTouchingWithHier)
+{
+  db::Layout ly;
+  unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.insert_layer (db::LayerProperties (2, 0));
+
+  db::Cell &a = ly.cell (ly.add_cell ("A"));
+  db::Cell &b = ly.cell (ly.add_cell ("B"));
+
+  a.insert (db::CellInstArray (b.cell_index (), db::Trans (db::Vector (100, 100)), db::Vector (0, 200), db::Vector (200, 0), 2, 2));
+
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box ()), false);
+  EXPECT_EQ (a.has_shapes_touching (l2, db::Box ()), false);
+
+  b.shapes (l1).insert (db::Box (0, 0, 10, 10));
+
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box ()), false);
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box (0, 0, 100, 100)), true);
+  EXPECT_EQ (a.has_shapes_touching (l2, db::Box (0, 0, 100, 100)), false);
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box (0, 0, 99, 100)), false);
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box (0, 0, 100, 99)), false);
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box (100, 100, 110, 110)), true);
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box (150, 150, 160, 160)), false);
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box (300, 300, 310, 310)), true);
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box (300, 100, 310, 110)), true);
+  EXPECT_EQ (a.has_shapes_touching (l1, db::Box (300, 400, 310, 410)), false);
+}

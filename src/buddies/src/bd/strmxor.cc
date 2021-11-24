@@ -180,7 +180,8 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
       << tl::arg ("input_b",                   &infile_b,   "The second input file (any format, may be gzip compressed)")
       << tl::arg ("?output",                   &output,     "The output file to which the XOR differences are written",
                   "This argument is optional. If not given, the exit status alone will indicate whether the layouts "
-                  "are identical or not."
+                  "are identical or not. The output is a layout file. The format of the file is derived "
+                  "from the file name's suffix (.oas[.gz] for (gzipped) OASIS, .gds[.gz] for (gzipped) GDS2 etc.)."
                  )
       << tl::arg ("-ta|--top-a=name",          &top_a,      "Specifies the top cell for the first layout",
                   "Use this option to take a specific cell as the top cell from the first layout. All "
@@ -248,6 +249,8 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   db::Layout layout_b;
 
   {
+    tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Loading file (A): ")) + infile_a);
+
     db::LoadLayoutOptions load_options;
     generic_reader_options_a.configure (load_options);
 
@@ -257,6 +260,8 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   }
 
   {
+    tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Loading file (B): ")) + infile_b);
+
     db::LoadLayoutOptions load_options;
     generic_reader_options_b.configure (load_options);
 
@@ -549,6 +554,7 @@ bool run_deep_xor (const XORData &xor_data)
 {
   db::DeepShapeStore dss;
   dss.set_threads (xor_data.threads);
+  dss.set_keep_layouts (true);  //  avoids excessive cell mapping
 
   double dbu = std::min (xor_data.layout_a->dbu (), xor_data.layout_b->dbu ());
 
@@ -593,6 +599,8 @@ bool run_deep_xor (const XORData &xor_data)
 
     } else {
 
+      tl::SelfTimer timer (tl::verbosity () >= 11, "XOR on layer " + ll->first.to_string ());
+
       db::RecursiveShapeIterator ri_a, ri_b;
 
       if (ll->second.first >= 0) {
@@ -607,14 +615,13 @@ bool run_deep_xor (const XORData &xor_data)
       db::Region in_b (ri_b, dss, db::ICplxTrans (xor_data.layout_b->dbu () / dbu));
 
       db::Region xor_res;
-      xor_res = in_a ^ in_b;
+      {
+        tl::SelfTimer timer (tl::verbosity () >= 21, "Basic XOR on layer " + ll->first.to_string ());
+        xor_res = in_a ^ in_b;
+      }
 
       int tol_index = 0;
       for (std::vector<double>::const_iterator t = xor_data.tolerances.begin (); t != xor_data.tolerances.end (); ++t) {
-
-        if (tl::verbosity () >= 20) {
-          tl::log << "Running XOR on layer " << ll->first.to_string () << " with tolerance " << *t;
-        }
 
         db::LayerProperties lp = ll->first;
         if (lp.layer >= 0) {
@@ -628,6 +635,7 @@ bool run_deep_xor (const XORData &xor_data)
         result.top_cell = xor_data.output_cell;
 
         if (*t > db::epsilon) {
+          tl::SelfTimer timer (tl::verbosity () >= 21, "Tolerance " + tl::to_string (*t) + " on layer " + ll->first.to_string ());
           xor_res.size (-db::coord_traits<db::Coord>::rounded (0.5 * *t / dbu));
           xor_res.size (db::coord_traits<db::Coord>::rounded (0.5 * *t / dbu));
         }

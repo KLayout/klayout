@@ -21,8 +21,8 @@
 */
 
 
-#include "dbRegionUtils.h"
 #include "dbRegionLocalOperations.h"
+#include "dbRegionUtils.h"
 #include "dbLocalOperationUtils.h"
 #include "dbHierProcessor.h"
 
@@ -209,7 +209,6 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
   poly2poly_check<TS> poly_check (edge_check);
 
   std::list<TS> heap;
-  db::box_scanner<TS, size_t> scanner;
   std::unordered_set<TI> polygons;
 
   std::set<unsigned int> ids;
@@ -219,12 +218,40 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
     }
   }
 
+  bool take_all = edge_check.has_negative_edge_output () || interactions.num_intruders () == 0;
+
+  db::Box common_box;
+  if (! take_all) {
+
+    db::Vector e (edge_check.distance (), edge_check.distance ());
+
+    db::Box subject_box;
+    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      subject_box += db::box_convert<TS> () (interactions.subject_shape (i->first));
+    }
+
+    if (edge_check.requires_different_layers ()) {
+      db::Box intruder_box;
+      for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
+        intruder_box += db::box_convert<TI> () (interactions.intruder_shape (*id).second);
+      }
+      common_box = subject_box.enlarged (e) & intruder_box.enlarged (e);
+    } else {
+      common_box = subject_box.enlarged (e);
+    }
+
+  }
+
   if (m_has_other) {
 
     size_t n = 0;
     for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
       const TS &subject = interactions.subject_shape (i->first);
-      scanner.insert (push_polygon_to_heap (layout, subject, heap), n);
+      if (! take_all) {
+        poly_check.enter (subject, n, common_box);
+      } else {
+        poly_check.enter (subject, n);
+      }
       n += 2;
     }
 
@@ -262,7 +289,11 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
 
       n = 1;
       for (typename std::unordered_set<TI>::const_iterator o = polygons.begin (); o != polygons.end (); ++o) {
-        scanner.insert (push_polygon_to_heap (layout, *o, heap), n);
+        if (! take_all) {
+          poly_check.enter (*o, n, common_box);
+        } else {
+          poly_check.enter (*o, n);
+        }
         n += 2;
       }
 
@@ -270,7 +301,11 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
 
       n = 1;
       for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
-        scanner.insert (push_polygon_to_heap (layout, interactions.intruder_shape (*id).second, heap), n);
+        if (! take_all) {
+          poly_check.enter (interactions.intruder_shape (*id).second, n, common_box);
+        } else {
+          poly_check.enter (interactions.intruder_shape (*id).second, n);
+        }
         n += 2;
       }
 
@@ -286,7 +321,11 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       //  we can't directly insert because TS may be != TI
       const TS &ts = interactions.subject_shape (i->first);
       insert_into_hash (polygons, ts);
-      scanner.insert (push_polygon_to_heap (layout, ts, heap), n);
+      if (! take_all) {
+        poly_check.enter (ts, n, common_box);
+      } else {
+        poly_check.enter (ts, n);
+      }
       n += 2;
     }
 
@@ -295,7 +334,11 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
     for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
       const TI &ti = interactions.intruder_shape (*id).second;
       if (polygons.find (ti) == polygons.end ()) {
-        scanner.insert (push_polygon_to_heap (layout, ti, heap), n);
+        if (! take_all) {
+          poly_check.enter (ti, n, common_box);
+        } else {
+          poly_check.enter (ti, n);
+        }
         n += 2;
       }
     }
@@ -303,7 +346,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
   }
 
   do {
-    scanner.process (poly_check, m_check.distance (), db::box_convert<TS> ());
+    poly_check.process ();
   } while (edge_check.prepare_next_pass ());
 
   //  detect and remove parts of the result which have or do not have results "opposite"

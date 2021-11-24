@@ -43,4 +43,5 @@ l1.drc(isolated(projection, not_opposite) < 1.0).output(144, 0)
 # enclosing, overlap
 l2.drc(enclosing(l1, projection) < 1.0).polygons.output(150, 0)
 l1.drc(overlap(l2, projection) < 2.0).polygons.output(151, 0)
+l1.drc(enclosed(l2, projection) < 1.0).polygons.output(152, 0)
 

@@ -1758,7 +1758,8 @@ rba_init (RubyInterpreterPrivateData *d)
 }
 
 RubyInterpreter::RubyInterpreter ()
-  : d (new RubyInterpreterPrivateData ())
+  : gsi::Interpreter (0, "rba"),
+    d (new RubyInterpreterPrivateData ())
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, "Initializing Ruby");
 
@@ -2057,9 +2058,9 @@ RubyInterpreter::eval_string_and_print (const char *expr, const char *file, int 
 }
 
 void
-RubyInterpreter::define_variable (const std::string &name, const std::string &value)
+RubyInterpreter::define_variable (const std::string &name, const tl::Variant &value)
 {
-  rb_gv_set (name.c_str (), rb_str_new (value.c_str (), long (value.size ())));
+  rb_gv_set (name.c_str (), c2ruby (value));
 }
 
 gsi::Inspector *

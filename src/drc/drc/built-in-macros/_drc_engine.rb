@@ -1751,6 +1751,7 @@ CODE
     %w(
       enc
       enclosing
+      enclosed
       overlap
       sep
       separation

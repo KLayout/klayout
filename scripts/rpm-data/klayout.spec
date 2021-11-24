@@ -52,10 +52,10 @@ Requires: qt5-qttools-devel >= 5.11.1
 # CentOS7 requirements
 %if "%{target_system}" == "centos7"
 Requires:	ruby >= 2.0.0
-Requires:	python >= 2.7.5
+Requires:	python3 >= 3.6.0
 Requires: qt-x11 >= 4.8.5
 %define buildopt -j2
-%define pylib %{python_sitearch}
+%define pylib %{python3_sitearch}
 %endif
 
 %if "%{target_system}" == "centos6"

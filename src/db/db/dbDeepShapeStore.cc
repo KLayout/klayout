@@ -154,17 +154,25 @@ DeepLayer::add_from (const DeepLayer &dl)
     db::cell_index_type source_cell = dl.initial_cell ().cell_index ();
     const db::Layout *source_layout = &dl.layout ();
 
-    db::CellMapping cm;
-    cm.create_from_geometry_full (*into_layout, into_cell, *source_layout, source_cell);
+    //  create or reuse a layout mapping
 
-    //  Actually copy the shapes
+    const db::CellMapping *cell_mapping = 0;
+    db::CellMapping cm;
+    if (store () == dl.store ()) {
+      cell_mapping = &const_cast<db::DeepShapeStore *> (mp_store.get ())->internal_cell_mapping (layout_index (), dl.layout_index ());
+    } else {
+      cm.create_from_geometry_full (*into_layout, into_cell, *source_layout, source_cell);
+      cell_mapping = &cm;
+    }
+
+    //  actually copy the shapes
 
     std::map<unsigned int, unsigned int> lm;
     lm.insert (std::make_pair (dl.layer (), layer ()));
 
     std::vector <db::cell_index_type> source_cells;
     source_cells.push_back (source_cell);
-    db::copy_shapes (*into_layout, *source_layout, db::ICplxTrans (), source_cells, cm.table (), lm);
+    db::copy_shapes (*into_layout, *source_layout, db::ICplxTrans (), source_cells, cell_mapping->table (), lm);
 
   }
 }
@@ -418,11 +426,13 @@ static unsigned int init_layer (db::Layout &layout, const db::RecursiveShapeIter
 }
 
 DeepShapeStore::DeepShapeStore ()
+  : m_keep_layouts (false)
 {
   ++s_instance_count;
 }
 
 DeepShapeStore::DeepShapeStore (const std::string &topcell_name, double dbu)
+  : m_keep_layouts (false)
 {
   ++s_instance_count;
 
@@ -711,6 +721,16 @@ db::Layout &DeepShapeStore::layout (unsigned int n)
   return m_layouts [n]->layout;
 }
 
+unsigned int DeepShapeStore::layout_index (const db::Layout *layout) const
+{
+  for (std::vector<LayoutHolder *>::const_iterator i = m_layouts.begin (); i != m_layouts.end (); ++i) {
+    if (&(*i)->layout == layout) {
+      return (unsigned int) (i - m_layouts.begin ());
+    }
+  }
+  tl_assert (false);
+}
+
 size_t DeepShapeStore::instance_count ()
 {
   return s_instance_count;
@@ -743,7 +763,7 @@ void DeepShapeStore::remove_ref (unsigned int layout, unsigned int layer)
 
   }
 
-  if ((m_layouts[layout]->refs -= 1) <= 0) {
+  if ((m_layouts[layout]->refs -= 1) <= 0 && ! m_keep_layouts) {
     delete m_layouts[layout];
     m_layouts[layout] = 0;
     clear_breakout_cells (layout);
@@ -768,7 +788,6 @@ DeepShapeStore::layout_for_iter (const db::RecursiveShapeIterator &si, const db:
     }
 
     db::Layout &layout = m_layouts[layout_index]->layout;
-    layout.hier_changed_event.add (this, &DeepShapeStore::invalidate_hier);
     if (si.layout ()) {
       layout.dbu (si.layout ()->dbu () / trans.mag ());
     }
@@ -792,7 +811,6 @@ void DeepShapeStore::make_layout (unsigned int layout_index, const db::Recursive
   m_layouts[layout_index] = new LayoutHolder (trans);
 
   db::Layout &layout = m_layouts[layout_index]->layout;
-  layout.hier_changed_event.add (this, &DeepShapeStore::invalidate_hier);
   if (si.layout ()) {
     layout.dbu (si.layout ()->dbu () / trans.mag ());
   }
@@ -916,22 +934,36 @@ DeepLayer DeepShapeStore::create_text_layer (const db::RecursiveShapeIterator &s
 }
 
 void
-DeepShapeStore::invalidate_hier ()
-{
-  m_delivery_mapping_cache.clear ();
-}
-
-void
 DeepShapeStore::issue_variants (unsigned int layout_index, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_map)
 {
-  invalidate_hier ();
-
   db::HierarchyBuilder &builder = m_layouts [layout_index]->builder;
   for (std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> >::const_iterator i = var_map.begin (); i != var_map.end (); ++i) {
     for (std::map<db::ICplxTrans, db::cell_index_type>::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
       builder.register_variant (i->first, j->second);
     }
   }
+}
+
+const db::CellMapping &
+DeepShapeStore::internal_cell_mapping (unsigned int into_layout_index, unsigned int from_layout_index)
+{
+  db::Layout &into_layout = layout (into_layout_index);
+  db::cell_index_type into_cell = initial_cell (into_layout_index).cell_index ();
+  const db::Layout &source_layout = layout (from_layout_index);
+  db::cell_index_type source_cell = initial_cell (from_layout_index).cell_index ();
+
+  std::map<std::pair<unsigned int, unsigned int>, CellMappingWithGenerationIds>::iterator cm = m_internal_mapping_cache.find (std::make_pair (from_layout_index, into_layout_index));
+  if (cm == m_internal_mapping_cache.end () || ! cm->second.is_valid (into_layout, source_layout)) {
+
+    cm = m_internal_mapping_cache.insert (std::make_pair (std::make_pair (from_layout_index, into_layout_index), CellMappingWithGenerationIds ())).first;
+
+    cm->second.clear ();
+    cm->second.create_from_geometry_full (into_layout, into_cell, source_layout, source_cell);
+    cm->second.set_generation_ids (into_layout, source_layout);
+
+  }
+
+  return cm->second;
 }
 
 const db::CellMapping &
@@ -953,10 +985,11 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
   DeliveryMappingCacheKey key (layout_index, tl::id_of (into_layout), into_cell);
 
-  std::map<DeliveryMappingCacheKey, db::CellMapping>::iterator cm = m_delivery_mapping_cache.find (key);
-  if (cm == m_delivery_mapping_cache.end ()) {
+  std::map<DeliveryMappingCacheKey, CellMappingWithGenerationIds>::iterator cm = m_delivery_mapping_cache.find (key);
+  if (cm == m_delivery_mapping_cache.end () || ! cm->second.is_valid (*into_layout, *source_layout)) {
 
-    cm = m_delivery_mapping_cache.insert (std::make_pair (key, db::CellMapping ())).first;
+    cm = m_delivery_mapping_cache.insert (std::make_pair (key, CellMappingWithGenerationIds ())).first;
+    cm->second.clear ();
 
     //  collects the cell mappings we skip because they are variants (variant building or box variants)
     std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey> cm_skipped_variants;
@@ -1044,6 +1077,8 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
     if (! cells_to_delete.empty ()) {
       into_layout->delete_cells (cells_to_delete);
     }
+
+    cm->second.set_generation_ids (*into_layout, *source_layout);
 
   }
 

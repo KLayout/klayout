@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>The Layer List (Layer Views)</title>
+  <keyword name="Layer list"/>
+  <keyword name="Layer views"/>
+
+  <p>
+  An important concept in KLayout are the layer views. KLayout displays the layers
+  of a layout by default in a list on the right side of the main window.
+  This list however, does not directly reflect the layers in the layout database.
+  Instead this list is a collection of "views". A view is a description of what is 
+  to be displayed and how.
+  </p>
+  
+  <p>
+  Essentially, the entries in the layer list are pointers to layers in the
+  database, together with a description how to paint the shapes on these layers (the 
+  "layer properties").
+  </p>
+
+  <p>
+  The pointer is the "source" of a layer view. This is typically a GDS layer and datatype, 
+  but can be a layer name (for DXF for example). There are also abstract sources (such as
+  cell boundaries) and the sources can include selectors or modifiers. Selectors are
+  used to only display shapes with certain user properties or from certain hierarchy 
+  levels. Modifiers transform the shapes before they are drawn for example.
+  The source is defined by a "source specification" - this is a string describing the
+  database layer and selectors and modifiers. A simple source string is "1/0" which is
+  for GDS layer 1, datatype 0 without and selectors or modifiers.
+  To change the source, use "Change Source" from the layer list's context menu.
+  </p>
+
+  <p>
+  See <link href="/manual/layer_source_expert.xml"/> for some source specification string applications
+  and more details.
+  </p>
+
+  <p>
+  Beside the source, a layer entry has a display name. This is an arbitrary text
+  providing a description for the user. By default - when no such name is present - 
+  the source of the layer will be displayed. 
+  To change the display name, use "Rename" from the layer list's context menu.
+  </p>
+
+  <p>
+  Plus of course, the layer views have many options to specify the drawing style,
+  animations and decorations.
+  </p>
+
+  <p>
+  The concept of separating views from the database layers opens some interesting options:
+  </p>
+
+  <ul>
+    <li>Layer views can refer to individual layouts from multi-layout views (through the "@1", "@2", ... notation in the source).
+        Hence, multiple layouts can be mixed in a single layer list.</li>
+    <li>Layers can be present in the list which do not need to be present in the database. Such a layer is shown as empty.
+        This is important as in GDS an empty layer is equivalent to non-existing. Still you may want to have it shown in the
+        layer list - the views offer this option.</li>
+    <li>Vice versa, database layer may not be listed in the layer list if no corresponding layer view is present. This
+        way, auxiliary or debug layers can be omitted from the layer list. A "wildcard specification" is available to make
+        sure, all layers are shown if you need to see all.</li>
+    <li>Multiple tabs can be present to provide multiple views on the same layouts. This is just an alternative set of
+        layer views.</li>
+    <li>Layer grouping, sorting etc. are just operations on the views, no database change is involved.</li>
+  </ul>
+
+  <p>
+  The concept on the other hand is slightly counter-intuitive at first.
+  Here are some hints:
+  </p>
+
+  <ul>
+    <li>Renaming a layer does not change the source - if you rename a layer to something like "1/0", you are likely to fool yourself thinking this is layer 1, datatype 0.</li>
+    <li>Changing a layer view's source does not change the database too - it will just change the pointer. To change a layer's information in the database, use Edit/Layer/Edit Layer Specification.</li>
+    <li>Deleting a layer from the layer list does <b>not delete</b> the layer from the database. Use Edit/Layer/Delete Layer instead.</li>
+    <li>Additing a new layer does not immediately create the layer in the database. Only once you draw something on that layer, it is generated in the database.</li>
+  </ul>
+
+</doc>
+

@@ -72,6 +72,7 @@ SOURCES = \
   dbRecursiveInstanceIterator.cc \
   dbRecursiveShapeIterator.cc \
   dbRegion.cc \
+  dbRegionCheckUtils.cc \
   dbRegionLocalOperations.cc \
   dbSaveLayoutOptions.cc \
   dbShape.cc \
@@ -290,6 +291,7 @@ HEADERS = \
   dbRecursiveInstanceIterator.h \
   dbRecursiveShapeIterator.h \
   dbRegion.h \
+  dbRegionCheckUtils.h \
   dbRegionLocalOperations.h \
   dbSaveLayoutOptions.h \
   dbShape.h \

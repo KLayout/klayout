@@ -528,12 +528,12 @@ public:
    *
    *  The editable mode will be taken from db::default_editable_mode.
    */
-  Layout (db::Manager *manager = 0);
+  explicit Layout (db::Manager *manager = 0);
 
   /**
    *  @brief Standard constructor which allows one to specify editable mode
    */
-  Layout (bool editable, db::Manager *manager = 0);
+  explicit Layout (bool editable, db::Manager *manager = 0);
 
   /**
    *  @brief The copy ctor
@@ -580,6 +580,22 @@ public:
   const std::string &technology_name () const
   {
     return m_tech_name;
+  }
+
+  /**
+   *  @brief Gets the library the layout lives in or NULL if the layout is not part of a library
+   */
+  Library *library () const
+  {
+    return mp_library;
+  }
+
+  /**
+   *  @brief Sets the library pointer
+   */
+  void set_library (db::Library *library)
+  {
+    mp_library = library;
   }
 
   /**
@@ -1843,6 +1859,7 @@ protected:
 private:
   enum LayerState { Normal, Free, Special };
 
+  db::Library *mp_library;
   cell_list m_cells;
   size_t m_cells_size;
   cell_ptr_vector m_cell_ptrs;

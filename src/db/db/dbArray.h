@@ -964,9 +964,7 @@ struct iterated_array
   virtual std::pair <basic_array_iterator <Coord> *, bool>
   begin_touching (const box_type &b) const
   {
-    if (b.empty ()) {
-      return std::make_pair (new iterated_array_iterator <Coord> (m_v.begin (), m_v.end ()), false);
-    } else if (! b.touches (m_box)) {
+    if (b.empty () || ! b.touches (m_box)) {
       return std::make_pair (new iterated_array_iterator <Coord> (m_v.end (), m_v.end ()), false);
     } else {
       box_convert_type bc;
@@ -1699,7 +1697,7 @@ struct array
    *  an appropriate basic_array object using a complex transformation.
    */
   array (const Obj &obj, const complex_trans_type &ct, const vector_type &a, const vector_type &b, unsigned long amax, unsigned long bmax)
-    : m_obj (obj), m_trans (ct), mp_base (new regular_complex_array <coord_type> (ct.rcos (), ct.mag (), a, b, amax, bmax))
+    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? new regular_complex_array <coord_type> (ct.rcos (), ct.mag (), a, b, amax, bmax) : new regular_array <coord_type> (a, b, amax, bmax))
   {
     //  .. nothing yet ..
   }
@@ -1727,7 +1725,7 @@ struct array
    *  it's own storage.
    */
   array (const Obj &obj, const complex_trans_type &ct, ArrayRepository &rep, const vector_type &a, const vector_type &b, unsigned long amax, unsigned long bmax)
-    : m_obj (obj), m_trans (ct), mp_base (rep.insert (regular_complex_array <coord_type> (ct.rcos (), ct.mag (), a, b, amax, bmax)))
+    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? rep.insert (regular_complex_array <coord_type> (ct.rcos (), ct.mag (), a, b, amax, bmax)) : rep.insert (regular_array <coord_type> (a, b, amax, bmax)))
   {
     //  .. nothing yet ..
   }
@@ -1766,7 +1764,7 @@ struct array
    */
   template <class Iter>
   array (const Obj &obj, const complex_trans_type &ct, Iter from, Iter to)
-    : m_obj (obj), m_trans (ct), mp_base (new iterated_complex_array <coord_type> (ct.rcos (), ct.mag (), from, to))
+    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? new iterated_complex_array <coord_type> (ct.rcos (), ct.mag (), from, to) : new iterated_array <coord_type> (from, to))
   {
     //  .. nothing yet ..
   }
@@ -1779,7 +1777,7 @@ struct array
    */
   explicit 
   array (const Obj &obj, const complex_trans_type &ct)
-    : m_obj (obj), m_trans (ct), mp_base (new single_complex_inst <coord_type> (ct.rcos (), ct.mag ()))
+    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? new single_complex_inst <coord_type> (ct.rcos (), ct.mag ()) : 0)
   {
     //  .. nothing yet ..
   }
@@ -1809,7 +1807,7 @@ struct array
    */
   explicit 
   array (const Obj &obj, const complex_trans_type &ct, ArrayRepository &rep)
-    : m_obj (obj), m_trans (ct), mp_base (rep.insert (single_complex_inst <coord_type> (ct.rcos (), ct.mag ())))
+    : m_obj (obj), m_trans (ct), mp_base (ct.is_complex () ? rep.insert (single_complex_inst <coord_type> (ct.rcos (), ct.mag ())) : 0)
   {
     //  .. nothing yet ..
   }
@@ -1890,17 +1888,13 @@ struct array
   array_iterator <coord_type, Trans> begin_touching (const box_type &b, const BoxConv &bc) const 
   {
     if (b.empty ()) {
-      if (mp_base) {
-        return array_iterator <coord_type, Trans> (m_trans, mp_base->begin_touching (box_type ()));
-      } else {
-        return array_iterator <coord_type, Trans> (m_trans, true); 
-      }
+      return array_iterator <coord_type, Trans> (m_trans, true);
     } else if (b == box_type::world ()) {
       return begin ();
     } else if (mp_base) {
       box_type ob (bc (m_obj));
       if (ob.empty ()) {
-        return array_iterator <coord_type, Trans> (m_trans, mp_base->begin_touching (box_type ()));
+        return array_iterator <coord_type, Trans> (m_trans, true);
       } else {
         if (mp_base->is_complex ()) {
           complex_trans_type ct = mp_base->complex_trans (simple_trans_type (m_trans));

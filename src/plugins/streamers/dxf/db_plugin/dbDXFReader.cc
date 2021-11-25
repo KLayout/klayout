@@ -51,6 +51,30 @@ namespace db
 {
 
 // ---------------------------------------------------------------
+
+#if defined(HAVE_QT)
+
+static int fm_width (const QFontMetrics &fm, const QString &s)
+{
+#if QT_VERSION >= 0x60000
+  return fm.horizontalAdvance (s);
+#else
+  return fm.width (s);
+#endif
+}
+
+static int fm_width (const QFontMetrics &fm, const QChar &s)
+{
+#if QT_VERSION >= 0x60000
+  return fm.horizontalAdvance (s);
+#else
+  return fm.width (s);
+#endif
+}
+
+#endif
+
+// ---------------------------------------------------------------
 //  DXFReader
 
 static std::string zero_layer_name ("0");
@@ -1279,7 +1303,7 @@ DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCp
 
     //  The m_text_scaling divider is the letter width in percent of the height.
     //  92 is the default letter pitch in percent of the text height.
-    int pixel_size_ref = int (floor (0.5 + 100.0 * fm.width (QChar::fromLatin1 ('X')) / (0.92 * m_text_scaling)));
+    int pixel_size_ref = int (floor (0.5 + 100.0 * fm_width (fm, QChar::fromLatin1 ('X')) / (0.92 * m_text_scaling)));
 
     //  split text into lines
     QStringList lines = QString::fromUtf8 (s.c_str ()).split (QString::fromUtf8 ("\n"));
@@ -1302,7 +1326,7 @@ DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCp
       lines.clear ();
       for (QStringList::const_iterator l = ll.begin (); l != ll.end (); ++l) {
 
-        if (fm.width (*l) * h / pixel_size_ref > w) {
+        if (fm_width (fm, *l) * h / pixel_size_ref > w) {
 
           //  wrapping required
           QString line;
@@ -1321,7 +1345,7 @@ DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCp
               ++i;
             }
 
-            double wc = fm.width (ls) * h / pixel_size_ref;
+            double wc = fm_width (fm, ls) * h / pixel_size_ref;
             if (wl + wc > w) {
               lines.push_back (line);
               line.clear ();
@@ -1351,9 +1375,9 @@ DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCp
       double x0 = 0.0;
       if (ha == HAlignLeft || ha == NoHAlign) {
       } else if (ha == HAlignCenter) {
-        x0 -= fm.width (*l) * 0.5 * h / pixel_size_ref;
+        x0 -= fm_width (fm, *l) * 0.5 * h / pixel_size_ref;
       } else {
-        x0 -= fm.width (*l) * h / pixel_size_ref;
+        x0 -= fm_width (fm, *l) * h / pixel_size_ref;
       }
 
       QPainterPath pp;

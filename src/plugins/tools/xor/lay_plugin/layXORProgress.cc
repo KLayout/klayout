@@ -109,8 +109,13 @@ public:
     QFontMetrics fm (font ());
     m_line_height = std::max (fm.height (), m_pixmap_size + 4);
     m_font_height = fm.height () * 3 / 2;
+ #if QT_VERSION >= 0x60000
+    m_first_column_width = fm.horizontalAdvance (QString::fromUtf8 ("LAYERNAME"));
+    m_column_width = m_pixmap_size + 4 + m_spacing + fm.horizontalAdvance (QString::fromUtf8 ("1.00G "));
+#else
     m_first_column_width = fm.width (QString::fromUtf8 ("LAYERNAME"));
     m_column_width = m_pixmap_size + 4 + m_spacing + fm.width (QString::fromUtf8 ("1.00G "));
+#endif
   }
 
   QSize sizeHint () const

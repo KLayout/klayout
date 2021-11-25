@@ -31,6 +31,7 @@
 #include <cstdio>
 
 #include <QDomDocument>
+#include <QRegExp>
 
 // #define DEBUG_HIGHLIGHTER
 
@@ -98,7 +99,7 @@ GenericSyntaxHighlighterRuleStringList::GenericSyntaxHighlighterRuleStringList (
   m_min_length = std::numeric_limits<int>::max ();
   for (QList<QString>::const_iterator s = sl.begin (); s != sl.end (); ++s) {
     m_s.insert (*s);
-    m_min_length = std::min (m_min_length, s->length ());
+    m_min_length = std::min (m_min_length, int (s->length ()));
   }
 }
 

@@ -106,7 +106,7 @@ SelectCellViewForm::selected_cellviews () const
   std::vector <int> res;
 
   for (int i = 0; i < int (cvs_lb->count ()); ++i) {
-    if (cvs_lb->isItemSelected (cvs_lb->item (i))) {
+    if (cvs_lb->item (i)->isSelected ()) {
       res.push_back (i);
     }
   }
@@ -118,7 +118,7 @@ int
 SelectCellViewForm::selected_cellview () const
 {
   for (int i = 0; i < int (cvs_lb->count ()); ++i) {
-    if (cvs_lb->isItemSelected (cvs_lb->item (i))) {
+    if (cvs_lb->item (i)->isSelected ()) {
       return i;
     }
   }

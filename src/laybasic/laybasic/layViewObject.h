@@ -993,6 +993,11 @@ public:
   db::DPoint pixel_to_um (const QPoint &pt) const;
 
   /**
+   *  @brief Translates a screen coordinate in micrometer coordinates
+   */
+  db::DPoint pixel_to_um (const QPointF &pt) const;
+
+  /**
    *  @brief Gets a flag indicating whether the mouse is inside the window
    */
   bool mouse_in_window () const

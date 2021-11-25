@@ -90,8 +90,13 @@ HTMLItemDelegate::set_text_width (int w)
 void
 HTMLItemDelegate::paint (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+#if QT_VERSION >= 0x60000
+  QStyleOptionViewItem option_v4 = option;
+#else
   QStyleOptionViewItemV4 option_v4 = option;
+#endif
   initStyleOption (&option_v4, index);
+
   //  let the text take all the available space (fixes #144)
   option_v4.showDecorationSelected = true;
 
@@ -140,7 +145,11 @@ HTMLItemDelegate::paint (QPainter *painter, const QStyleOptionViewItem &option, 
 QSize
 HTMLItemDelegate::sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+#if QT_VERSION >= 0x60000
+  QStyleOptionViewItem option_v4 = option;
+#else
   QStyleOptionViewItemV4 option_v4 = option;
+#endif
   initStyleOption (&option_v4, index);
 
   const QAbstractItemView *view = dynamic_cast<const QAbstractItemView *> (option_v4.widget);
@@ -169,7 +178,11 @@ HTMLItemDelegate::editorEvent (QEvent *event, QAbstractItemModel * /*model*/, co
 
     QMouseEvent *mouse_event = static_cast<QMouseEvent *> (event);
 
+#if QT_VERSION >= 0x60000
+    QStyleOptionViewItem option_v4 = option;
+#else
     QStyleOptionViewItemV4 option_v4 = option;
+#endif
     initStyleOption (&option_v4, index);
 
     QTextDocument doc;

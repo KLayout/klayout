@@ -343,7 +343,13 @@ void MacroEditorSidePanel::set_debugging_on (bool on)
 
 QSize MacroEditorSidePanel::sizeHint () const
 {
-  return QSize (QFontMetrics (mp_text->font ()).width (QString::fromUtf8 ("12345")) + 3 * sidePanelMargin + m_breakpoint_pixmap.width (), 0);
+  int w;
+#if QT_VERSION >= 0x60000
+  w = QFontMetrics (mp_text->font ()).horizontalAdvance (QString::fromUtf8 ("12345"));
+#else
+  w = QFontMetrics (mp_text->font ()).width (QString::fromUtf8 ("12345"));
+#endif
+  return QSize (w + 3 * sidePanelMargin + m_breakpoint_pixmap.width (), 0);
 }
 
 void MacroEditorSidePanel::mousePressEvent (QMouseEvent *event)
@@ -502,7 +508,11 @@ MacroEditorPage::MacroEditorPage (QWidget * /*parent*/, MacroEditorHighlighters 
   hlayout->addWidget (mp_text);
 
   mp_text->setWordWrapMode(QTextOption::NoWrap);
+#if QT_VERSION >= 0x60000
+  mp_text->setTabStopDistance (m_ntab * QFontMetrics (mp_text->font ()).horizontalAdvance (QString::fromUtf8 ("x")));
+#else
   mp_text->setTabStopWidth (m_ntab * QFontMetrics (mp_text->font ()).width (QString::fromUtf8 ("x")));
+#endif
   m_is_modified = false;
  
   connect (mp_text, SIGNAL (textChanged ()), this, SLOT (text_changed ()));
@@ -959,7 +969,11 @@ void MacroEditorPage::set_ntab (int n)
 {
   if (n != m_ntab)  {
     m_ntab = n;
+#if QT_VERSION >= 0x60000
+    mp_text->setTabStopDistance (m_ntab * QFontMetrics (mp_text->font ()).horizontalAdvance (QString::fromUtf8 ("x")));
+#else
     mp_text->setTabStopWidth (m_ntab * QFontMetrics (mp_text->font ()).width (QString::fromUtf8 ("x")));
+#endif
   }
 }
 

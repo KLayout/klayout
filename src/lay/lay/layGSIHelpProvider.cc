@@ -33,6 +33,7 @@
 #include <QColor>
 #include <QPalette>
 #include <QApplication>
+#include <QRegExp>
 
 #include <cstdio>
 #include <cctype>

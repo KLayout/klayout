@@ -1550,7 +1550,11 @@ int
 MacroEditorDialog::columns ()
 {
   QFontMetrics fm (mp_console_text->font ());
+#if QT_VERSION >= 0x60000
+  int cw = fm.horizontalAdvance (QString::fromUtf8 ("X"));
+#else
   int cw = fm.width (QString::fromUtf8 ("X"));
+#endif
   if (cw > 0) {
     return mp_console_text->viewport ()->width () / cw;
   } else {

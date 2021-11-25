@@ -20,8 +20,6 @@
 
 */
 
-
-
 #ifndef HDR_layMacroEditorPage
 #define HDR_layMacroEditorPage
 
@@ -32,6 +30,7 @@
 
 #include <QDialog>
 #include <QPixmap>
+#include <QRegExp>
 
 #include <set>
 

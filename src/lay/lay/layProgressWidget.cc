@@ -90,7 +90,11 @@ QSize
 ProgressBarWidget::sizeHint () const
 {
   QFontMetrics fm (font ());
+#if QT_VERSION >= 0x60000
+  return QSize (fm.horizontalAdvance (QString::fromUtf8("100%")) * 4, fm.height () + 2);
+#else
   return QSize (fm.width (QString::fromUtf8("100%")) * 4, fm.height () + 2);
+#endif
 }
 
 QSize

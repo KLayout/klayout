@@ -43,6 +43,7 @@
 #include <QMessageBox>
 #include <QAbstractItemModel>
 #include <QStyledItemDelegate>
+#include <QRegExp>
 
 namespace lay
 {

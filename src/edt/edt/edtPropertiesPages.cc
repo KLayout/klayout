@@ -388,6 +388,12 @@ PolygonPropertiesPage::PolygonPropertiesPage (edt::Service *service, db::Manager
   setupUi (this);
   setup ();
 
+#if QT_VERSION >= 0x60000
+  pointListEdit->setTabStopDistance (100);
+#else
+  pointListEdit->setTabStopWidth (100);
+#endif
+
   connect (inst_pb, SIGNAL (clicked ()), this, SLOT (show_inst ()));
   connect (prop_pb, SIGNAL (clicked ()), this, SLOT (show_props ()));
 
@@ -905,6 +911,12 @@ PathPropertiesPage::PathPropertiesPage (edt::Service *service, db::Manager *mana
   setupUi (this);
   setup ();
 
+#if QT_VERSION >= 0x60000
+  ptlist_le->setTabStopDistance (100);
+#else
+  ptlist_le->setTabStopWidth (100);
+#endif
+
   connect (inst_pb, SIGNAL (clicked ()), this, SLOT (show_inst ()));
   connect (prop_pb, SIGNAL (clicked ()), this, SLOT (show_props ()));
 
@@ -965,6 +977,12 @@ EditablePathPropertiesPage::EditablePathPropertiesPage (edt::Service *service, d
 {
   setupUi (this);
   setup ();
+
+#if QT_VERSION >= 0x60000
+  ptlist_le->setTabStopDistance (100);
+#else
+  ptlist_le->setTabStopWidth (100);
+#endif
 
   connect (inst_pb, SIGNAL (clicked ()), this, SLOT (show_inst ()));
   connect (prop_pb, SIGNAL (clicked ()), this, SLOT (show_props ()));

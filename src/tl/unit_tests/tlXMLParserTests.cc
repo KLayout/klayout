@@ -573,6 +573,7 @@ TEST (10)
   EXPECT_EQ (child.txt, "H\xc3\xa4llo");
 }
 
+#if defined(HAVE_EXPAT) || QT_VERSION < 0x60000   // #QTBUG-98656 (XML reader does not read encoding properly)
 TEST (11)
 {
   //  iso8859-1 encoding
@@ -597,6 +598,7 @@ TEST (11)
   EXPECT_EQ (error, "");
   EXPECT_EQ (child.txt, "H\xc3\xa4llo");
 }
+#endif
 
 TEST (12)
 {
@@ -625,6 +627,7 @@ TEST (12)
   EXPECT_EQ (child.txt, "H\xc3\xa4llo");
 }
 
+#if defined(HAVE_EXPAT) || QT_VERSION < 0x60000   // #QTBUG-98656 (XML reader does not read encoding properly)
 TEST (13)
 {
   //  iso8859 encoding
@@ -651,5 +654,6 @@ TEST (13)
   EXPECT_EQ (error, "");
   EXPECT_EQ (child.txt, "H\xc3\xa4llo");
 }
+#endif
 
 #endif

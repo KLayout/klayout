@@ -7,10 +7,6 @@ contains(QT_CONFIG, opengl) {
     SUBDIRS = lay_plugin unit_tests
   }
 
-  greaterThan(QT_MAJOR_VERSION, 5) {
-    QT += openglwidgets
-  }
-
   unit_tests.depends += lay_plugin
 
 }

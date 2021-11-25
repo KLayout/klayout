@@ -115,9 +115,7 @@ D25View::menu_activated (const std::string &symbol)
 
 static QString scale_factor_to_string (double f)
 {
-  QString s;
-  s.sprintf ("%.3g", f);
-  return s;
+  return QString (QString::fromUtf8 ("%.3g").arg (f));
 }
 
 void

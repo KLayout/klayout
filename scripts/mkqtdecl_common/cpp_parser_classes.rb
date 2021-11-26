@@ -404,13 +404,7 @@ end
 
 module PClassTemplateArg
   def cpp
-    CPPClassTemplateArg::new(id.text_value, dtspec.nonterminal? ? dtspec.cpp : nil)
-  end
-end
-
-module PDirectTemplateArg
-  def cpp
-    CPPDirectTemplateArg::new(t.cpp, initspec.nonterminal? ? initspec.text_value : nil)
+    CPPClassTemplateArg::new(t.cpp, dtspec.nonterminal? ? dtspec.cpp : nil)
   end
 end
 

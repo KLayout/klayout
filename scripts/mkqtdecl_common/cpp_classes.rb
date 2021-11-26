@@ -469,29 +469,19 @@ class CPPFriendDecl < CPPObject
 end
 
 # @brief A type template argument (with an optional initializer)
-# @attribute id The name of the argument (a string)
+# @attribute type The template argument (a type)
 # @attribute def_type The default type (nil or a CPPType object) 
 class CPPClassTemplateArg < CPPObject
 
-  attr_accessor :id, :def_type
-  def_initializer :id, :def_type
+  attr_accessor :type, :def_type
+  def_initializer :type, :def_type
 
   def to_s
-    self.id + (self.def_type ? ("=" + self.def_type.to_s) : "")
-  end
-
-end
-
-# @brief A value template argument (with an optional initializer)
-# @attribute type A CPPType object describing the type
-# @attribute def_expr The initializer expression (a string) or nil if no initializer is given
-class CPPDirectTemplateArg < CPPObject
-
-  attr_accessor :type, :def_expr
-  def_initializer :type, :def_expr
-
-  def to_s
-    self.type.to_s + (self.def_expr ? ("=" + self.def_expr.to_s) : "")
+    if self.def_type
+      self.type.to_s + "=" + self.def_type.to_s
+    else
+      self.type.to_s
+    end
   end
 
 end

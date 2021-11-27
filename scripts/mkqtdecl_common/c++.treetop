@@ -289,11 +289,11 @@ grammar CPP
   end
 
   rule func_spec
-    "(" s fa:( a:func_args )? s ")" cvspec:( s cv:cv )? ( s "throw" s "(" s ( type_wo_comma s )? ")" / s noexcept_spec / s override_key )* a <PFuncSpec>
+    "(" s fa:( a:func_args )? s ")" cvspec:( s cv:cv )? refspec:( s ref:( "&" !"&" / "&&" ) )? ( s "throw" s "(" s ( type_wo_comma s )? ")" / s noexcept_spec / s override_key )* a <PFuncSpec>
   end
 
   rule member_pointer
-    cspec:( qid:qualified_id s "::*" s ) itspec:( it:inner_type )? cvspec:( s cv:cv )? <PMemberPointer> 
+    cspec:( qid:qualified_id s "::*" s ) itspec:( it:inner_type )? cvspec:( s cv:cv )? refspec:( s ref:( "&" !"&" / "&&" ) )? <PMemberPointer> 
   end
 
   rule inner_type_with_cv

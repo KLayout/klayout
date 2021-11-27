@@ -73,6 +73,10 @@ class CPPDeclaration
     self.type.func.cv == :const
   end
 
+  def ref
+    self.type.func.ref
+  end
+
   def hash_str
 
     # TODO: this is a hack for making the hash values unique:
@@ -83,6 +87,13 @@ class CPPDeclaration
     nmax = func.max_args
 
     hk = (self.is_const? ? "c" : "")
+    if self.ref
+      if self.ref == "&"
+        hk += "r"
+      elsif self.ref == "&&"
+        hk += "rr"
+      end
+    end
 
     if nmax > 0
 
@@ -111,17 +122,28 @@ class CPPDeclaration
     nmax = func.max_args
     args = nmax.times.collect { |ia| func.args[ia].anonymous_type.to_s }.join(", ")
 
+    res = "(" + args + ")"
     if self.is_const?
-      "(" + args + ") const"
-    else
-      "(" + args + ")"
+      res += " const"
     end
+    if self.ref
+      res += " " + self.ref
+    end
+
+    res
 
   end
 
   def sig(cls)
+    self.type.name_substituted_type(CPPQualifiedId::new(false, [ cls, self.type.func.func_name ])).to_s
+  end
+
+  def raw_sig(cls)
     # backward compatibility for signature computation
     s = self.type.name_substituted_type(CPPQualifiedId::new(false, [ cls, self.type.func.func_name ])).to_s
+    if self.ref
+      s = s.sub(/\s+&+$/, "")
+    end
     if self.is_const?
       s = s.sub(/\s+const$/, "")
     end
@@ -739,7 +761,13 @@ class CPPType
       return "#{self.anonymous_type.to_s}(" + expr + ")"
     elsif self.is_special(decl_obj)
       ta = self.anonymous_type.to_s
-      if ta =~ /^const (.*) &$/
+      if ta =~ /^const (.*) &&$/
+        ta = $1
+        acc = ".cmove()"
+      elsif ta =~ /^(.*) &&$/
+        ta = $1
+        acc = ".move()"
+      elsif ta =~ /^const (.*) &$/
         ta = $1
         acc = ".cref()"
       elsif ta =~ /^(.*) &$/
@@ -775,6 +803,8 @@ class CPPType
       # Handle references and pointers in returns as copies - we loose the ability to write,
       # but can at least read them.
       if ta =~ /^const (.*) &$/ || ta =~ /^(.*) &$/
+        ta = $1
+      elsif ta =~ /^const (.*) &&$/ || ta =~ /^(.*) &&$/
         ta = $1
       elsif ta =~ /^const (.*) \*$/ || ta =~ /^(.*) \*$/
         ta = $1
@@ -1140,6 +1170,7 @@ class Configurator
     # static and non-static methods
     if bd.storage_class == :static
       sig = "static " + sig 
+      sig2 = "static " + sig2
     end
 
     if is_dropped?(cls, sig) || is_dropped?(cls2, sig2)
@@ -1832,7 +1863,7 @@ END
 
       # create a default ctor if there is no ctor at all and we can have one
       if ctors.empty? && conf.has_default_ctor?(cls)
-        func = CPPFunc::new(CPPQualifiedId::new(false, [ CPPId::new(decl_obj.myself, nil) ]), [], nil)
+        func = CPPFunc::new(CPPQualifiedId::new(false, [ CPPId::new(decl_obj.myself, nil) ]), [], nil, nil)
         type = CPPType::new(nil, func, nil)
         def_ctor = CPPDeclaration::new(type, nil, :public, nil, false, false)
         def_ctor.parent = decl_obj
@@ -1905,6 +1936,7 @@ END
         func = bd.type.func
         hk = bd.hash_str
         sig = bd.sig(cls)
+        rsig = bd.raw_sig(cls)
         mn = decl_obj.myself # ctor!
 
         mn_name = conf.target_name(cls, bd, mn)
@@ -1923,7 +1955,7 @@ END
         qt_alist = n_args.times.collect { |ia| func.args[ia].renamed_type(alist[ia]).access_qt_arg(decl_obj) }
 
         ofile.puts("")
-        ofile.puts("//  Constructor #{sig}")
+        ofile.puts("//  Constructor #{rsig}")
         ofile.puts("")
 
         ofile.puts("")
@@ -1951,7 +1983,7 @@ END
         ofile.puts("}")
         ofile.puts("")
 
-        mdecl_ctors << "new qt_gsi::GenericStaticMethod (\"#{mn_name}\", \"@brief Constructor #{sig}\\nThis method creates an object of class #{cls}.\", &_init_ctor_#{clsn}_#{hk}, &_call_ctor_#{clsn}_#{hk});"
+        mdecl_ctors << "new qt_gsi::GenericStaticMethod (\"#{mn_name}\", \"@brief Constructor #{rsig}\\nThis method creates an object of class #{cls}.\", &_init_ctor_#{clsn}_#{hk}, &_call_ctor_#{clsn}_#{hk});"
 
       end
 
@@ -1978,6 +2010,7 @@ END
         const = bd.is_const?
         hk = bd.hash_str
         sig = bd.sig(cls)
+        rsig = bd.raw_sig(cls)
 
         if conf.event_args(cls, sig) && bd.type.return_type.is_void?
           # don't produce bindings for signals (which are public in Qt5)
@@ -2005,7 +2038,7 @@ END
         qt_alist = n_args.times.collect { |ia| func.args[ia].renamed_type(alist[ia]).access_qt_arg(decl_obj) }
 
         ofile.puts("")
-        ofile.puts("// #{sig}")
+        ofile.puts("// #{rsig}")
         ofile.puts("")
 
         ofile.puts("")
@@ -2030,7 +2063,7 @@ END
         ofile.puts("}")
         ofile.puts("")
 
-        mdecl << "new qt_gsi::GenericMethod (\"#{mn_name}\", \"@brief Method #{sig}\\n" + (is_reimp ? "This is a reimplementation of #{is_reimp.parent.myself}::#{mid}" : "") + "\", #{const.to_s}, &_init_f_#{mn}_#{hk}, &_call_f_#{mn}_#{hk});"
+        mdecl << "new qt_gsi::GenericMethod (\"#{mn_name}\", \"@brief Method #{rsig}\\n" + (is_reimp ? "This is a reimplementation of #{is_reimp.parent.myself}::#{mid}" : "") + "\", #{const.to_s}, &_init_f_#{mn}_#{hk}, &_call_f_#{mn}_#{hk});"
 
       end
 
@@ -2065,6 +2098,7 @@ END
             end
               
             sig = bd_short.sig(cls)
+            rsig = bd_short.raw_sig(cls)
 
             hk = bd_short.hash_str
             n_args = func.max_args
@@ -2078,7 +2112,7 @@ END
             al       = ant.collect { |a| a.to_s }.join(", ")
             aln      = ren_args.collect { |a| a.to_s }.join(", ")
 
-            sig_wo_void = sig.sub(/^void /, "")
+            rsig_wo_void = rsig.sub(/^void /, "")
 
             al_subst = al
             SignalSubstitutions.each do |t,s|
@@ -2087,9 +2121,9 @@ END
 
             argspecs = argnames.collect { |a| "gsi::arg(\"#{a}\"), " }.join("")
             if gsi_args.empty?
-              mdecl << "gsi::qt_signal (\"#{mid}(#{al_subst})\", \"#{mn_name}\", \"@brief Signal declaration for #{sig_wo_void}\\nYou can bind a procedure to this signal.\");"
+              mdecl << "gsi::qt_signal (\"#{mid}(#{al_subst})\", \"#{mn_name}\", \"@brief Signal declaration for #{rsig_wo_void}\\nYou can bind a procedure to this signal.\");"
             else
-              mdecl << "gsi::qt_signal<#{event_al} > (\"#{mid}(#{al_subst})\", \"#{mn_name}\", #{argspecs}\"@brief Signal declaration for #{sig_wo_void}\\nYou can bind a procedure to this signal.\");"
+              mdecl << "gsi::qt_signal<#{event_al} > (\"#{mid}(#{al_subst})\", \"#{mn_name}\", #{argspecs}\"@brief Signal declaration for #{rsig_wo_void}\\nYou can bind a procedure to this signal.\");"
             end
 
           end
@@ -2114,6 +2148,7 @@ END
         const = bd.is_const?
         hk = bd.hash_str
         sig = bd.sig(cls)
+        rsig = bd.raw_sig(cls)
 
         mn = conf.mid2str(mid)
         mn_name = conf.target_name(cls, bd, mid, all_methods_by_name, bd)
@@ -2132,7 +2167,7 @@ END
         qt_alist = n_args.times.collect { |ia| func.args[ia].renamed_type(alist[ia]).access_qt_arg(decl_obj) }
 
         ofile.puts("")
-        ofile.puts("// static #{sig}")
+        ofile.puts("// static #{rsig}")
         ofile.puts("")
 
         ofile.puts("")
@@ -2156,7 +2191,7 @@ END
         ofile.puts("}")
         ofile.puts("")
 
-        mdecl << "new qt_gsi::GenericStaticMethod (\"#{mn_name}\", \"@brief Static method #{sig}\\nThis method is static and can be called without an instance.\", &_init_f_#{mn}_#{hk}, &_call_f_#{mn}_#{hk});"
+        mdecl << "new qt_gsi::GenericStaticMethod (\"#{mn_name}\", \"@brief Static method #{rsig}\\nThis method is static and can be called without an instance.\", &_init_f_#{mn}_#{hk}, &_call_f_#{mn}_#{hk});"
 
       end
 
@@ -2173,6 +2208,7 @@ END
       const = bd.is_const?
       hk = bd.hash_str
       sig = bd.sig("")
+      rsig = bd.raw_sig("")
 
       # operators may be present twice with the same signature
       # (here: same hash key)
@@ -2206,7 +2242,7 @@ END
       args     = rnt.collect { |t| t.gsi_decl_arg(decl_obj) }.join(", ")
 
       ofile.puts("")
-      ofile.puts("//  #{sig}")
+      ofile.puts("//  #{rsig}")
       ofile.puts("static #{rt.gsi_decl_return(decl_obj)} op_#{clsn}_#{mn}_#{hk}(#{args}) {")
 
       if !rt.is_void?
@@ -2219,7 +2255,7 @@ END
 
       argspecs = argnames[1..-1].collect { |a| "gsi::arg (\"#{a}\"), " }.join("")
 
-      mdecl << "gsi::method_ext(\"#{mn_name}\", &::op_#{clsn}_#{mn}_#{hk}, #{argspecs}\"@brief Operator #{sig}\\nThis is the mapping of the global operator to the instance method.\");"
+      mdecl << "gsi::method_ext(\"#{mn_name}\", &::op_#{clsn}_#{mn}_#{hk}, #{argspecs}\"@brief Operator #{rsig}\\nThis is the mapping of the global operator to the instance method.\");"
 
     end
 
@@ -2383,6 +2419,7 @@ END
         func = bd.type.func
         hk = bd.hash_str
         sig = bd.sig(cls)
+        rsig = bd.raw_sig(cls)
         mn = decl_obj.myself # ctor!
 
         mn_name = conf.target_name(cls, bd, mn)
@@ -2406,7 +2443,7 @@ END
           args = rnt.collect { |t| t.to_s }.join(", ")
 
           ofile.puts("")
-          ofile.puts("  //  [adaptor ctor] #{sig}")
+          ofile.puts("  //  [adaptor ctor] #{rsig}")
           ofile.puts("  #{clsn}_Adaptor(#{args}) : #{cls}(#{argnames.join(', ')})")
           ofile.puts("  {")
           ofile.puts("    qt_gsi::QtObjectBase::init (this);")
@@ -2430,6 +2467,7 @@ END
           func = bd.type.func
           hk = bd.hash_str
           sig = bd.sig(cls)
+          rsig = bd.raw_sig(cls)
           const = bd.is_const?
 
           # exclude events
@@ -2453,7 +2491,7 @@ END
           argexpr  = rnt.collect { |t| t.access_qt_arg(decl_obj) }.join(", ")
 
           ofile.puts("")
-          ofile.puts("  //  [expose] #{sig}")
+          ofile.puts("  //  [expose] #{rsig}")
           ofile.puts("  " + (bd.storage_class == :static ? "static " : "") + "#{rt.gsi_decl_return(decl_obj)} fp_#{clsn}_#{mn}_#{hk} (#{args}) " + (const ? "const " : "") + "{")
           if rt.is_void?
             ofile.puts("    #{cls}::#{mid}(#{argexpr});")
@@ -2481,6 +2519,7 @@ END
             func = bd.type.func
             hk = bd.hash_str
             sig = bd.sig(cls)
+            rsig = bd.raw_sig(cls)
             const = bd.is_const?
             rt = bd.type.return_type
 
@@ -2504,6 +2543,7 @@ END
               end
 
               sig = bd_short.sig(cls)
+              rsig = bd_short.raw_sig(cls)
 
               # for events produce an emitter function
 
@@ -2517,7 +2557,7 @@ END
               call_args = argnames.join(", ")
 
               ofile.puts("")
-              ofile.puts("  //  [emitter impl] #{sig}")
+              ofile.puts("  //  [emitter impl] #{rsig}")
               ofile.puts("  #{rt.to_s} emitter_#{clsn}_#{mn}_#{hk}(#{raw_args})")
               ofile.puts("  {")
               if is_private
@@ -2560,7 +2600,7 @@ END
               call_args = argnames.join(", ")
 
               ofile.puts("")
-              ofile.puts("  //  [adaptor impl] #{sig}")
+              ofile.puts("  //  [adaptor impl] #{rsig}")
               ofile.puts("  #{rt.gsi_decl_return(decl_obj)} cbs_#{mn}_#{hk}_#{i_var}(#{args})" + (const ? " const" : ""))
               ofile.puts("  {")
               if abstract
@@ -2625,6 +2665,7 @@ END
         func = bd.type.func
         hk = bd.hash_str
         sig = bd.sig(cls)
+        rsig = bd.raw_sig(cls)
         mn = decl_obj.myself # ctor!
 
         mn_name = conf.target_name(cls, bd, mn)
@@ -2642,7 +2683,7 @@ END
         qt_alist = n_args.times.collect { |ia| func.args[ia].renamed_type(alist[ia]).access_qt_arg(decl_obj) }
 
         ofile.puts("")
-        ofile.puts("//  Constructor #{sig} (adaptor class)")
+        ofile.puts("//  Constructor #{rsig} (adaptor class)")
         ofile.puts("")
         ofile.puts("static void _init_ctor_#{clsn}_Adaptor_#{hk} (qt_gsi::GenericStaticMethod *decl)")
         ofile.puts("{")
@@ -2664,7 +2705,7 @@ END
         ofile.puts("}")
         ofile.puts("")
 
-        mdecl << "new qt_gsi::GenericStaticMethod (\"#{mn_name}\", \"@brief Constructor #{sig}\\nThis method creates an object of class #{cls}.\", &_init_ctor_#{clsn}_Adaptor_#{hk}, &_call_ctor_#{clsn}_Adaptor_#{hk});"
+        mdecl << "new qt_gsi::GenericStaticMethod (\"#{mn_name}\", \"@brief Constructor #{rsig}\\nThis method creates an object of class #{cls}.\", &_init_ctor_#{clsn}_Adaptor_#{hk}, &_call_ctor_#{clsn}_Adaptor_#{hk});"
 
       end
 
@@ -2677,6 +2718,7 @@ END
           func = bd.type.func
           hk = bd.hash_str
           sig = bd.sig(cls)
+          rsig = bd.raw_sig(cls)
           const = bd.is_const?
           rt = bd.type.return_type
 
@@ -2698,6 +2740,7 @@ END
             end
 
             sig = bd_short.sig(cls)
+            rsig = bd_short.raw_sig(cls)
 
             n_args = func.max_args
             n_min_args = func.min_args
@@ -2707,7 +2750,7 @@ END
             ifc_obj = "GenericMethod"
 
             ofile.puts("")
-            ofile.puts("// emitter #{sig}")
+            ofile.puts("// emitter #{rsig}")
             ofile.puts("")
             ofile.puts("static void _init_emitter_#{mn}_#{hk} (qt_gsi::#{ifc_obj} *decl)")
             ofile.puts("{")
@@ -2728,7 +2771,7 @@ END
             if bd_short.storage_class != :static
               const_flag = ", " + const.to_s
             end
-            mdecl << "new qt_gsi::#{ifc_obj} (\"emit_#{mn_name}\", \"@brief Emitter for signal #{sig}\\nCall this method to emit this signal.\"#{const_flag}, &_init_emitter_#{mn}_#{hk}, &_call_emitter_#{mn}_#{hk});"
+            mdecl << "new qt_gsi::#{ifc_obj} (\"emit_#{mn_name}\", \"@brief Emitter for signal #{rsig}\\nCall this method to emit this signal.\"#{const_flag}, &_init_emitter_#{mn}_#{hk}, &_call_emitter_#{mn}_#{hk});"
 
           elsif !bd.virtual && bd.visibility == :protected
 
@@ -2742,7 +2785,7 @@ END
             ifc_obj = bd.storage_class == :static ? "GenericStaticMethod" : "GenericMethod"
 
             ofile.puts("")
-            ofile.puts("// exposed #{sig}")
+            ofile.puts("// exposed #{rsig}")
             ofile.puts("")
             ofile.puts("static void _init_fp_#{mn}_#{hk} (qt_gsi::#{ifc_obj} *decl)")
             ofile.puts("{")
@@ -2781,7 +2824,7 @@ END
             if bd.storage_class != :static
               const_flag = ", " + const.to_s
             end
-            mdecl << "new qt_gsi::#{ifc_obj} (\"*#{mn_name}\", \"@brief Method #{sig}\\nThis method is protected and can only be called from inside a derived class.\"#{const_flag}, &_init_fp_#{mn}_#{hk}, &_call_fp_#{mn}_#{hk});"
+            mdecl << "new qt_gsi::#{ifc_obj} (\"*#{mn_name}\", \"@brief Method #{rsig}\\nThis method is protected and can only be called from inside a derived class.\"#{const_flag}, &_init_fp_#{mn}_#{hk}, &_call_fp_#{mn}_#{hk});"
 
           elsif bd.virtual
 
@@ -2798,7 +2841,7 @@ END
             alist    = n_args.times.collect { |ia| "arg#{ia + 1}" }
 
             ofile.puts("")
-            ofile.puts("// #{sig}")
+            ofile.puts("// #{rsig}")
             ofile.puts("")
             ofile.puts("static void _init_cbs_#{mn}_#{hk}_#{i_var} (qt_gsi::GenericMethod *decl)")
             ofile.puts("{")
@@ -2834,7 +2877,7 @@ END
             ofile.puts("}")
             ofile.puts("")
 
-            mdecl << "new qt_gsi::GenericMethod (\"#{pp}#{mn_name}\", \"@brief Virtual method #{sig}\\nThis method can be reimplemented in a derived class.\", #{const.to_s}, &_init_cbs_#{mn}_#{hk}_#{i_var}, &_call_cbs_#{mn}_#{hk}_#{i_var});"
+            mdecl << "new qt_gsi::GenericMethod (\"#{pp}#{mn_name}\", \"@brief Virtual method #{rsig}\\nThis method can be reimplemented in a derived class.\", #{const.to_s}, &_init_cbs_#{mn}_#{hk}_#{i_var}, &_call_cbs_#{mn}_#{hk}_#{i_var});"
             mdecl << "new qt_gsi::GenericMethod (\"#{pp}#{mn_name}\", \"@hide\", #{const.to_s}, &_init_cbs_#{mn}_#{hk}_#{i_var}, &_call_cbs_#{mn}_#{hk}_#{i_var}, &_set_callback_cbs_#{mn}_#{hk}_#{i_var});"
 
           end

@@ -241,7 +241,7 @@ end
 
 module PFuncSpec
   def cpp
-    CPPFunc::new(nil, (fa.nonterminal? && fa.text_value != "void") ? (fa.a.cpp || []) : [], cvspec.nonterminal? && cvspec.cv.to_symbol)
+    CPPFunc::new(nil, (fa.nonterminal? && fa.text_value != "void") ? (fa.a.cpp || []) : [], cvspec.nonterminal? && cvspec.cv.to_symbol, refspec.nonterminal? && refspec.ref.text_value)
   end
 end
 

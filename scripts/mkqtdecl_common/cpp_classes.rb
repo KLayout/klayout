@@ -87,8 +87,8 @@ end
 # "cv" is a CPPCV object.
 class CPPFunc < CPPOuterType
 
-  attr_accessor :inner, :args, :cv
-  def_initializer :inner, :args, :cv 
+  attr_accessor :inner, :args, :cv, :ref
+  def_initializer :inner, :args, :cv, :ref
 
   def to_s
     a = self.args
@@ -96,12 +96,13 @@ class CPPFunc < CPPOuterType
     if !a.is_a?(Array)
       a = [a]
     end
-    self.inner.to_s + " (" + a.join(", ") + ")" + (self.cv ? " " + self.cv.to_s : "") 
+    self.inner.to_s + " (" + a.join(", ") + ")" + (self.cv ? " " + self.cv.to_s : "") + (self.ref ? " " + self.ref.to_s : "")
   end
 
   def dump(i)
     i + "CPPFunc\n" + i + " inner:\n" + self.inner.dump(i + "  ") + "\n" + 
     i + " cv: " + self.cv.to_s + "\n" + 
+    i + " ref: " + self.ref.to_s + "\n" + 
     i + " args:\n" + (self.args || []).collect { |f| f.dump(i + "  ") }.join("\n")
   end
 

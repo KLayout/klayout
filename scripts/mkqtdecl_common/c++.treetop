@@ -286,12 +286,8 @@ grammar CPP
     "noexcept" ( s "(" s block s ")" )?
   end
 
-  rule func_assign_spec
-    "=" s ( "delete" / "0" )?
-  end
-
   rule func_spec
-    "(" s fa:( a:func_args )? s ")" cvspec:( s cv:cv )? ( s "throw" s "(" s ( type_wo_comma s )? ")" / s noexcept_spec / s func_assign_spec / s override_key )* a <PFuncSpec>
+    "(" s fa:( a:func_args )? s ")" cvspec:( s cv:cv )? ( s "throw" s "(" s ( type_wo_comma s )? ")" / s noexcept_spec / s override_key )* a <PFuncSpec>
   end
 
   rule member_pointer
@@ -315,15 +311,19 @@ grammar CPP
     <PInnerType>
   end
 
+  rule init_spec
+    block_wo_comma / "delete" / "0"
+  end
+
   rule type
     cvspec:( cv:cv s )? 
     a
     ( "typename" ![a-zA-Z0-9_] s )? 
     ct:concrete_type 
     a
-    il:( s t1:inner_type i1:(s "=" s is1:block_wo_comma)? tt:( s "," s t2:inner_type i2:(s "=" s is2:block_wo_comma)? )* )? 
+    il:( s t1:inner_type i1:(s "=" s is1:init_spec)? tt:( s "," s t2:inner_type i2:(s "=" s is2:init_spec)? )* )? 
     # alternative initialization if only a concrete type is given:
-    pi:( s "=" s is:block_wo_comma )? 
+    pi:( s "=" s is:init_spec )? 
     <PType>
   end
 
@@ -332,9 +332,9 @@ grammar CPP
     a
     ( "typename" ![a-zA-Z0-9_] s )? 
     ct:concrete_type 
-    il:( s t:inner_type i:(s "=" s is:block_wo_comma)? )? 
+    il:( s t:inner_type i:(s "=" s is:init_spec)? )? 
     # alternative initialization if only a concrete type is given:
-    pi:( s "=" s is:block_wo_comma )? 
+    pi:( s "=" s is:init_spec )? 
     <PTypeWoComma>
   end
 

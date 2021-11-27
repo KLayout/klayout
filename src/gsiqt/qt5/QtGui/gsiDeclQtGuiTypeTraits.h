@@ -2052,12 +2052,6 @@ template <> struct type_traits<QPictureFormatPlugin_Adaptor> : public type_trait
 };
 }
 
-class QPixelFormat;
-namespace tl {
-template <> struct type_traits<QPixelFormat> : public type_traits<void> {
-};
-}
-
 class QPixmap;
 namespace tl {
 template <> struct type_traits<QPixmap> : public type_traits<void> {

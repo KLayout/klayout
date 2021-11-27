@@ -238,7 +238,7 @@ static void _call_f_constScanLine_c767 (const qt_gsi::GenericMethod * /*decl*/, 
 // QImage QImage::convertToFormat(QImage::Format f, QFlags<Qt::ImageConversionFlag> flags)
 
 
-static void _init_f_convertToFormat_c4993 (qt_gsi::GenericMethod *decl)
+static void _init_f_convertToFormat_cr4993 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("f");
   decl->add_arg<const qt_gsi::Converter<QImage::Format>::target_type & > (argspec_0);
@@ -247,7 +247,7 @@ static void _init_f_convertToFormat_c4993 (qt_gsi::GenericMethod *decl)
   decl->set_return<QImage > ();
 }
 
-static void _call_f_convertToFormat_c4993 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_convertToFormat_cr4993 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
@@ -729,7 +729,7 @@ static void _call_f_loadFromData_3932 (const qt_gsi::GenericMethod * /*decl*/, v
 // QImage QImage::mirrored(bool horizontally, bool vertically)
 
 
-static void _init_f_mirrored_c1620 (qt_gsi::GenericMethod *decl)
+static void _init_f_mirrored_cr1620 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("horizontally", true, "false");
   decl->add_arg<bool > (argspec_0);
@@ -738,7 +738,7 @@ static void _init_f_mirrored_c1620 (qt_gsi::GenericMethod *decl)
   decl->set_return<QImage > ();
 }
 
-static void _call_f_mirrored_c1620 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_mirrored_cr1620 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
@@ -950,12 +950,12 @@ static void _call_f_rect_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 // QImage QImage::rgbSwapped()
 
 
-static void _init_f_rgbSwapped_c0 (qt_gsi::GenericMethod *decl)
+static void _init_f_rgbSwapped_cr0 (qt_gsi::GenericMethod *decl)
 {
   decl->set_return<QImage > ();
 }
 
-static void _call_f_rgbSwapped_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_rgbSwapped_cr0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QImage > ((QImage)((QImage *)cls)->rgbSwapped ());
@@ -1665,7 +1665,7 @@ static gsi::Methods methods_QImage () {
   methods += new qt_gsi::GenericMethod ("colorTable", "@brief Method QVector<QRgb> QImage::colorTable()\n", true, &_init_f_colorTable_c0, &_call_f_colorTable_c0);
   methods += new qt_gsi::GenericMethod ("constBits", "@brief Method const unsigned char *QImage::constBits()\n", true, &_init_f_constBits_c0, &_call_f_constBits_c0);
   methods += new qt_gsi::GenericMethod ("constScanLine", "@brief Method const unsigned char *QImage::constScanLine(int)\n", true, &_init_f_constScanLine_c767, &_call_f_constScanLine_c767);
-  methods += new qt_gsi::GenericMethod ("convertToFormat", "@brief Method QImage QImage::convertToFormat(QImage::Format f, QFlags<Qt::ImageConversionFlag> flags)\n", true, &_init_f_convertToFormat_c4993, &_call_f_convertToFormat_c4993);
+  methods += new qt_gsi::GenericMethod ("convertToFormat", "@brief Method QImage QImage::convertToFormat(QImage::Format f, QFlags<Qt::ImageConversionFlag> flags)\n", true, &_init_f_convertToFormat_cr4993, &_call_f_convertToFormat_cr4993);
   methods += new qt_gsi::GenericMethod ("convertToFormat", "@brief Method QImage QImage::convertToFormat(QImage::Format f, const QVector<QRgb> &colorTable, QFlags<Qt::ImageConversionFlag> flags)\n", true, &_init_f_convertToFormat_c7392, &_call_f_convertToFormat_c7392);
   methods += new qt_gsi::GenericMethod ("copy", "@brief Method QImage QImage::copy(const QRect &rect)\n", true, &_init_f_copy_c1792, &_call_f_copy_c1792);
   methods += new qt_gsi::GenericMethod ("copy", "@brief Method QImage QImage::copy(int x, int y, int w, int h)\n", true, &_init_f_copy_c2744, &_call_f_copy_c2744);
@@ -1691,7 +1691,7 @@ static gsi::Methods methods_QImage () {
   methods += new qt_gsi::GenericMethod ("load", "@brief Method bool QImage::load(const QString &fileName, const char *format)\n", false, &_init_f_load_3648, &_call_f_load_3648);
   methods += new qt_gsi::GenericMethod ("loadFromData", "@brief Method bool QImage::loadFromData(const unsigned char *buf, int len, const char *format)\n", false, &_init_f_loadFromData_5018, &_call_f_loadFromData_5018);
   methods += new qt_gsi::GenericMethod ("loadFromData", "@brief Method bool QImage::loadFromData(const QByteArray &data, const char *aformat)\n", false, &_init_f_loadFromData_3932, &_call_f_loadFromData_3932);
-  methods += new qt_gsi::GenericMethod ("mirrored", "@brief Method QImage QImage::mirrored(bool horizontally, bool vertically)\n", true, &_init_f_mirrored_c1620, &_call_f_mirrored_c1620);
+  methods += new qt_gsi::GenericMethod ("mirrored", "@brief Method QImage QImage::mirrored(bool horizontally, bool vertically)\n", true, &_init_f_mirrored_cr1620, &_call_f_mirrored_cr1620);
   methods += new qt_gsi::GenericMethod (":offset", "@brief Method QPoint QImage::offset()\n", true, &_init_f_offset_c0, &_call_f_offset_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QImage::operator!=(const QImage &)\n", true, &_init_f_operator_excl__eq__c1877, &_call_f_operator_excl__eq__c1877);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QImage &QImage::operator=(const QImage &)\n", false, &_init_f_operator_eq__1877, &_call_f_operator_eq__1877);
@@ -1703,7 +1703,7 @@ static gsi::Methods methods_QImage () {
   methods += new qt_gsi::GenericMethod ("pixelIndex", "@brief Method int QImage::pixelIndex(int x, int y)\n", true, &_init_f_pixelIndex_c1426, &_call_f_pixelIndex_c1426);
   methods += new qt_gsi::GenericMethod ("pixelIndex", "@brief Method int QImage::pixelIndex(const QPoint &pt)\n", true, &_init_f_pixelIndex_c1916, &_call_f_pixelIndex_c1916);
   methods += new qt_gsi::GenericMethod ("rect", "@brief Method QRect QImage::rect()\n", true, &_init_f_rect_c0, &_call_f_rect_c0);
-  methods += new qt_gsi::GenericMethod ("rgbSwapped", "@brief Method QImage QImage::rgbSwapped()\n", true, &_init_f_rgbSwapped_c0, &_call_f_rgbSwapped_c0);
+  methods += new qt_gsi::GenericMethod ("rgbSwapped", "@brief Method QImage QImage::rgbSwapped()\n", true, &_init_f_rgbSwapped_cr0, &_call_f_rgbSwapped_cr0);
   methods += new qt_gsi::GenericMethod ("save", "@brief Method bool QImage::save(const QString &fileName, const char *format, int quality)\n", true, &_init_f_save_c4307, &_call_f_save_c4307);
   methods += new qt_gsi::GenericMethod ("save", "@brief Method bool QImage::save(QIODevice *device, const char *format, int quality)\n", true, &_init_f_save_c3729, &_call_f_save_c3729);
   methods += new qt_gsi::GenericMethod ("scaled", "@brief Method QImage QImage::scaled(int w, int h, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)\n", true, &_init_f_scaled_c6100, &_call_f_scaled_c6100);

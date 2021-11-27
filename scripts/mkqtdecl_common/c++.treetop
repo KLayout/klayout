@@ -49,31 +49,35 @@ grammar CPP
     "(" ( s ( "," s )? attribute_value )* s ")" / numeric_const / string_const / id
   end
 
+  rule ignored_attr
+    "__attribute__" s attribute_value / 
+    "__asm" s attribute_value / 
+    "constexpr" ![a-zA-Z0-9_] / 
+    "__extension__" / 
+    "__inline" / 
+    "__m64" / 
+    "__m128" / 
+    "__m128d" / 
+    "__m128i" / 
+    "__m256" / 
+    "__m256d" / 
+    "__m256i" / 
+    "__m512" / 
+    "__m512d" / 
+    "__m512i" / 
+    "__mmask8" / 
+    "__mmask16" / 
+    "__v8df" / 
+    "__v8di" / 
+    "__v16sf" / 
+    "__v16si" / 
+    "decltype" s attribute_value / 
+    "alignas" s "(" s block s ")" / 
+    "[[" s block s "]]"
+  end
+
   rule a
-    s ( "__attribute__" s attribute_value s / 
-        "__asm" s attribute_value s / 
-        "constexpr" ![a-zA-Z0-9_] s / 
-        "__extension__" s / 
-        "__inline" s / 
-        "__m64" s / 
-        "__m128" s / 
-        "__m128d" s / 
-        "__m128i" s / 
-        "__m256" s / 
-        "__m256d" s / 
-        "__m256i" s / 
-        "__m512" s / 
-        "__m512d" s / 
-        "__m512i" s / 
-        "__mmask8" s / 
-        "__mmask16" s / 
-        "__v8df" s / 
-        "__v8di" s / 
-        "__v16sf" s / 
-        "__v16si" s / 
-        "decltype" s attribute_value s / 
-        "alignas" s "(" s block s ")" s / 
-        "[[" s block s "]]" s )* 
+    s ( ignored_attr s )*
   end
 
   rule unary_op
@@ -170,8 +174,7 @@ grammar CPP
 
   rule member_declaration_wo_semicolon
     template:( d:template_decl s )?
-    a
-    attr:( ( explicit_key / mutable_key / storage_class / inline_spec / virtual_spec ) s )*
+    attr:( ( explicit_key / mutable_key / storage_class / inline_spec / virtual_spec / ignored_attr ) s )*
     t:type 
     # type declaration ends with a } .. does not need a semicolon
     # (i.e. nested struct or enum)
@@ -188,8 +191,7 @@ grammar CPP
 
   rule member_declaration_w_semicolon
     template:( d:template_decl s )?
-    a
-    attr:( ( explicit_key / mutable_key / storage_class / inline_spec / virtual_spec ) s )*
+    attr:( ( explicit_key / mutable_key / storage_class / inline_spec / virtual_spec / ignored_attr ) s )*
     t:type 
     # opposite case (member_see declaration_wo_semicolon)
     # (i.e. nested struct or enum)
@@ -416,9 +418,7 @@ grammar CPP
   rule declaration_w_semicolon
     template:( d:template_decl s )?
     template_member:( d_member:template_decl s )?
-    a
-    attr:( ( storage_class / inline_spec ) s )*
-    a
+    attr:( ( storage_class / inline_spec / ignored_attr ) s )*
     t:type 
     # type declaration ends with a } .. does not need a semicolon
     # (i.e. nested struct or enum)
@@ -434,9 +434,7 @@ grammar CPP
 
   rule declaration_wo_semicolon
     template:( d:template_decl s )?
-    a
-    attr:( ( storage_class / inline_spec ) s )*
-    a
+    attr:( ( storage_class / inline_spec / ignored_attr ) s )*
     t:type 
     # opposite case (see declaration_wo_semicolon)
     # (i.e. nested struct or enum)

@@ -498,7 +498,7 @@ def Parse_CLI_Args(config):
         message = "### You are going to make "
         if DeploymentP:
             PackagePrefix = "LW-"
-            message      += "a lightweight (LW-) package excluding Qt5, Ruby, and Python..."
+            message      += "a lightweight (LW-) package excluding Qt[6|5], Ruby, and Python..."
         elif DeploymentF:
             if (ModuleRuby in RubySys) and (ModulePython in PythonSys):
                 PackagePrefix = "ST-"
@@ -1231,18 +1231,15 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             #----------------------------------------------------------------------------------
             # Typical usage of 'pip' after installation of the DMG package
             #
-            # $ /Applications/klayout.app/Contents/MacOS/start-console.py
-            # Warning: Populating font family aliases took 195 ms. Replace uses of missing font\
-            # family "Monospace" with one that exists to avoid this cost.
-            # Python 3.7.8 (default, Jul  4 2020, 10:17:17)
-            # [Clang 11.0.3 (clang-1103.0.32.62)] on darwin
+            # $ cd /Applications/klayout.app/Contents/MacOS/
+            # $ ./start-console.py
+            #
+            # Python 3.8.12 (default, Oct 13 2021, 06:42:19)
+            # [Clang 12.0.0 (clang-1200.0.32.29)] on darwin
             # Type "help", "copyright", "credits" or "license" for more information.
             # (KLayout Python Console)
             # >>> import pip
-            # >>> pip.main( ['install', 'numpy'] )
-            # >>> pip.main( ['install', 'scipy'] )
-            # >>> pip.main( ['install', 'pandas'] )
-            # >>> pip.main( ['install', 'matplotlib'] )
+            # >>> pip.main( ['install', 'numpy', 'scipy', 'pandas', 'matplotlib'] )
             #----------------------------------------------------------------------------------
             pip_module = "%s/Versions/%s/lib/python%s/site-packages/pip/__init__.py" % \
                                      (pythonFrameworkPath, pythonHBVer, pythonHBVer)
@@ -1279,7 +1276,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             print( "         Ruby2.7 from Homebrew is not yet supported." )
             print( "         Since you have Homebrew development environment, there two options:" )
             print( "           (1) Retry to make a package with '-Y|--DEPLOY' option." )
-            print( "               This will not deploy any of Qt5, Python, and Ruby from Homebrew." )
+            print( "               This will not deploy any of Qt[6|5], Python, and Ruby from Homebrew." )
             print( "               Instead, the package will directly use those Frameworks and libraries" )
             print( "               in your Homebrew environment." )
             print( "           (2) Rebuild KLayout with '-r|--ruby <nil|Sys>' option depending on your preference." )

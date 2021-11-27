@@ -149,15 +149,15 @@ grammar CPP
   end
 
   rule enum_spec
-    id:id initspec:( s "=" s init:block_wo_comma )? <PEnumSpec>
+    a id:id a initspec:( s "=" s init:block_wo_comma )? <PEnumSpec>
   end
 
   rule enum_body
-    enum_spec ( s "," s enum_spec )*
+    enum_spec ( s "," s enum_spec )* ","?
   end
 
   rule enum_type
-    "enum" ![a-zA-Z0-9_] a s id:id? bodyspec:( s "{" s body:enum_body s "}" )? <PEnumType>
+    "enum" ![a-zA-Z0-9_] a "class"? s id:id? ( s ":" s type )? bodyspec:( s "{" s body:enum_body s "}" )? <PEnumType>
   end
 
   rule virtual_spec

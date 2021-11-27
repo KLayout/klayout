@@ -166,6 +166,19 @@ class CPPNamespace
 
 end
 
+class CPPEnum
+
+  def resolve_typedefs(scope)
+  end
+
+  def rescope(prev_scope, other_scope, idpath)
+  end
+
+  def each_qid(&block)
+  end
+
+end
+
 class CPPStruct
 
   def resolve_typedefs(scope)
@@ -448,7 +461,7 @@ class CPPStruct
         end
 
       elsif bc_obj
-        raise("#{bc.class_id.to_s} is not a base class in #{self.id.to_s}")
+        puts("Warning: #{bc.class_id.to_s} is not a base class in #{self.id.to_s}")
       else
         puts("Cannot find base class: #{bc.class_id.to_s} of #{self.parent.myself} - declaration ignored")
       end
@@ -1817,7 +1830,7 @@ END
     bc_methods_by_name = {}
     base_classes.each do |bc|
       bc_decl_obj = decl_obj.resolve_qid(bc.class_id)
-      bc_decl_obj && bc_decl_obj.struct.collect_all_methods(bc_methods_by_name, conf)
+      bc_decl_obj && bc_decl_obj.respond_to?(:struct) && bc_decl_obj.struct.collect_all_methods(bc_methods_by_name, conf)
     end
 
     mmap = {}

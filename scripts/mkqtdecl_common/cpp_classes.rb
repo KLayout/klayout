@@ -615,15 +615,15 @@ end
 # @attribute specs the enum members (an array of CPPEnumSpec objects)
 class CPPEnum < CPPObject
 
-  attr_accessor :name, :specs
-  def_initializer :name, :specs
+  attr_accessor :name, :specs, :is_class
+  def_initializer :name, :specs, :is_class
 
   def to_s
     "enum " + (self.name || "")
   end
 
   def dump(i)
-    l = i + self.to_s + " {\n"
+    l = i + self.to_s + (self.is_class ? " class" : "") + " {\n"
     l += (self.specs || []).collect { |s| i + "  " + s.to_s + "\n" }.join("")
     l += i + "}"
   end

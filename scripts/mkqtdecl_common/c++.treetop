@@ -157,7 +157,7 @@ grammar CPP
   end
 
   rule enum_type
-    "enum" ![a-zA-Z0-9_] a "class"? s id:id? ( s ":" s type )? bodyspec:( s "{" s body:enum_body s "}" )? <PEnumType>
+    "enum" ![a-zA-Z0-9_] a is_class:(s "class" )? s id:id? ( s ":" s type )? bodyspec:( s "{" s body:enum_body s "}" )? <PEnumType>
   end
 
   rule virtual_spec

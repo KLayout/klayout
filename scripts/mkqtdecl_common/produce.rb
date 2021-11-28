@@ -1677,7 +1677,11 @@ END
         next
       end
 
-      edecl << "  gsi::enum_const (\"#{ei_name}\", #{cls}::#{ei}, \"@brief Enum constant #{cls}::#{ei}\")"
+      if ed.enum.is_class
+        edecl << "  gsi::enum_const (\"#{ei_name}\", #{cls}::#{en}::#{ei}, \"@brief Enum constant #{cls}::#{en}::#{ei}\")"
+      else
+        edecl << "  gsi::enum_const (\"#{ei_name}\", #{cls}::#{ei}, \"@brief Enum constant #{cls}::#{ei}\")"
+      end
 
     end
 
@@ -1688,8 +1692,6 @@ END
     ofile.puts("static gsi::QFlagsClass<#{cls}::#{en} > decl_#{clsn}_#{en}_Enums (\"#{modn}\", \"#{clsn}_QFlags_#{en}\",")
     ofile.puts("  \"@qt\\n@brief This class represents the QFlags<#{cls}::#{en}> flag set\");")
     ofile.puts("")
-
-    ofile.puts("//  Inject the declarations into the parent")
 
     # inject the declarations into the parent namespace or class
     pdecl_obj = ed.parent
@@ -1706,7 +1708,12 @@ END
       pname = pcls + "_Namespace"
     end
 
-    ofile.puts("static gsi::ClassExt<#{pname}> inject_#{clsn}_#{en}_Enum_in_parent (decl_#{clsn}_#{en}_Enum.defs ());")
+    if ! ed.enum.is_class
+      ofile.puts("//  Inject the declarations into the parent")
+      ofile.puts("static gsi::ClassExt<#{pname}> inject_#{clsn}_#{en}_Enum_in_parent (decl_#{clsn}_#{en}_Enum.defs ());")
+    end
+
+
     ofile.puts("static gsi::ClassExt<#{pname}> decl_#{clsn}_#{en}_Enum_as_child (decl_#{clsn}_#{en}_Enum, \"#{en}\");")
     ofile.puts("static gsi::ClassExt<#{pname}> decl_#{clsn}_#{en}_Enums_as_child (decl_#{clsn}_#{en}_Enums, \"QFlags_#{en}\");")
 

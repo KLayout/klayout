@@ -128,7 +128,7 @@ module PEnumType
   def cpp
     name = id ? id.text_value : nil
     specs = bodyspec.nonterminal? ? bodyspec.body.cpp : nil
-    CPPEnum::new(name, specs)
+    CPPEnum::new(name, specs, is_class.nonterminal?)
   end
 end
 

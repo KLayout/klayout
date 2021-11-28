@@ -387,6 +387,7 @@ public:
   static target_type toc (source_type qc) { return target_type (qc); }
 };
 
+#if QT_VERSION < 0x060000
 template <>
 struct Converter<Q_PID>
 {
@@ -396,6 +397,7 @@ public:
   static source_type toq (target_type c) { return source_type (c); }
   static target_type toc (source_type qc) { return target_type (qc); }
 };
+#endif
 
 template <>
 struct Converter<QChar>

@@ -314,7 +314,7 @@ grammar CPP
   end
 
   rule init_spec
-    block_wo_comma / "delete" / "0"
+    block_wo_comma / "default" / "delete" / "0"
   end
 
   rule type

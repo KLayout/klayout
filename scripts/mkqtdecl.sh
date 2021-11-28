@@ -55,7 +55,7 @@ src_name5=gsiqt/qt5
 src_name6=gsiqt/qt6
 qt_mods4="QtCore QtGui QtDesigner QtNetwork QtSql QtXml QtUiTools"
 qt_mods5="QtCore QtGui QtWidgets QtDesigner QtNetwork QtPrintSupport QtSql QtSvg QtXml QtXmlPatterns QtMultimedia QtUiTools"
-qt_mods6="QtCore QtGui QtWidgets QtDesigner QtNetwork QtPrintSupport QtSql QtSvg QtXml QtMultimedia QtUiTools QtCore5Compat"
+qt_mods6="QtCore QtGui QtWidgets QtNetwork QtPrintSupport QtSql QtSvg QtXml QtMultimedia QtUiTools QtCore5Compat"
 
 src_name=$src_name4
 inst_dir=$inst_dir4

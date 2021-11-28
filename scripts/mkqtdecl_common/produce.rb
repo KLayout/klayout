@@ -1195,6 +1195,11 @@ class Configurator
     
     # replace assignment operator
     if name == "="
+      # drop assignment if the class does not have a copy ctor ("no copy semantics")
+      # (required because otherwise operator= is exposed for adaptor classes)
+      if !has_copy_ctor?(cls)
+        return nil
+      end
       name = "assign"
     end
 

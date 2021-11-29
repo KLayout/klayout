@@ -452,6 +452,8 @@ private:
   std::unique_ptr<tl::Expression> mp_expr;
 };
 
+}
+
 static tl::Variant eval_expr (const std::string &e)
 {
   ExpressionWrapper expr;
@@ -475,6 +477,9 @@ static ExpressionWrapper *new_expr2 (const std::string &e, const std::map<std::s
   expr->parse (e);
   return expr.release ();
 }
+
+namespace gsi
+{
 
 Class<tl::Eval> decl_ExpressionContext ("tl", "ExpressionContext",
   gsi::method ("var", &tl::Eval::set_var, gsi::arg ("name"), gsi::arg ("value"),
@@ -635,16 +640,6 @@ public:
   gsi::Callback cleanup_cb;
 };
 
-}
-
-namespace tl
-{
-  template <> struct type_traits<gsi::Executable_Impl> : public type_traits<tl::Executable> { };
-}
-
-namespace gsi
-{
-
 Class<tl::Executable> decl_Executable ("tl", "ExecutableBase",
   gsi::Methods (),
   "@hide\n@alias Executable"
@@ -692,16 +687,6 @@ public:
 
   gsi::Callback executable_cb;
 };
-
-}
-
-namespace tl
-{
-  template <> struct type_traits<gsi::Recipe_Impl> : public type_traits<tl::Recipe> { };
-}
-
-namespace gsi
-{
 
 static Recipe_Impl *make_recipe (const std::string &name, const std::string &description)
 {

@@ -3114,10 +3114,10 @@ END
         end
 
       end
-      end
 
       ttfile.puts("")
       ttfile.puts("#endif")
+      end
 
       puts("#{ttfile_name} written.")
 

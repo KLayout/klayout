@@ -93,9 +93,6 @@ public:
   gsi::Callback cb_extract_devices;
 };
 
-namespace
-{
-
 /**
  *  @brief A DeviceClassFactory implementation that allows reimplementation of the virtual methods
  */
@@ -122,6 +119,9 @@ public:
 };
 
 }
+
+namespace gsi
+{
 
 Class<DeviceClassFactoryImpl> decl_dbDeviceClassFactoryBase ("db", "DeviceClassFactory",
   gsi::factory_callback ("create_class", &DeviceClassFactoryImpl::create_class, &DeviceClassFactoryImpl::cb_create_class,

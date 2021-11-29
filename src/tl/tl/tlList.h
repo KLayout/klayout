@@ -100,7 +100,7 @@ public:
   }
 
 private:
-  template <class Type, class CanCopy> friend class list_impl;
+  template <class Type, bool copy_constructible> friend class list_impl;
   template <class Type> friend class list;
   template <class Type> friend class list_iterator;
   template <class Type> friend class reverse_list_iterator;

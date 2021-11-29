@@ -139,27 +139,27 @@ public:
 
   virtual bool equal (const void *a, const void *b) const
   { 
-    return _var_user_equal_impl<T, tl::has_equal_operator<T>::value> ((const T *) a, (const T *) b);
+    return _var_user_equal_impl<T, tl::has_equal_operator<T>::value>::call ((const T *) a, (const T *) b);
   }
 
   virtual bool less (const void *a, const void *b) const
   { 
-    return _var_user_less_impl<T, tl::has_less_operator<T>::value> ((const T *) a, (const T *) b);
+    return _var_user_less_impl<T, tl::has_less_operator<T>::value>::call ((const T *) a, (const T *) b);
   }
 
   virtual void *clone (const void *a) const
   { 
-    return _var_user_clone_impl<T, std::is_copy_constructible<T>::value> ((const T *) a);
+    return _var_user_clone_impl<T, std::is_copy_constructible<T>::value>::call ((const T *) a);
   }
 
   virtual void assign (void *a, const void *b) const
   {
-    _var_user_assign_impl<T, std::is_copy_assignable<T>::value> ((T *) a, (const T *)b);
+    _var_user_assign_impl<T, std::is_copy_assignable<T>::value>::call ((T *) a, (const T *)b);
   }
 
   virtual std::string to_string (const void *a) const
   { 
-    return _var_user_to_string_impl<T, tl::has_to_string<T>::value> ((const T *) a);
+    return _var_user_to_string_impl<T, tl::has_to_string<T>::value>::call ((const T *) a);
   }
 
   virtual void read (void *a, tl::Extractor &ex) const 

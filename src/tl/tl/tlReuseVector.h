@@ -191,7 +191,7 @@ public:
   }
 
 private:
-  template <class V> friend class reuse_vector_const_iterator;
+  template <class, bool> friend class reuse_vector_const_iterator;
 
   reuse_vector<Value, trivial_relocate> *mp_v;
   size_type m_n;
@@ -360,7 +360,7 @@ public:
   }
 
 private:
-  template <class V> friend class reuse_vector_iterator;
+  template <class, bool> friend class reuse_vector_iterator;
 
   const reuse_vector<Value, trivial_relocate> *mp_v;
   size_type m_n;
@@ -955,8 +955,8 @@ private:
   value_type *mp_start, *mp_finish, *mp_capacity;
   ReuseData *mp_rdata;
 
-  template<class V> friend class reuse_vector_iterator;
-  template<class V> friend class reuse_vector_const_iterator;
+  template<class, bool> friend class reuse_vector_iterator;
+  template<class, bool> friend class reuse_vector_const_iterator;
 
   void init ()
   {

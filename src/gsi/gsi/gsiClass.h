@@ -188,7 +188,7 @@ public:
 
   void read (void *a, tl::Extractor &ex) const
   {
-    const T *t = a;
+    T *t = (T *) a;
     ex.read (*t);
   }
 

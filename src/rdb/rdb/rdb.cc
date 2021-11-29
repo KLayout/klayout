@@ -299,7 +299,7 @@ ValueWrapper::to_string (const Database *rdb) const
   std::string r;
   r.reserve (200);
 
-  if (tag_id () > 0) {
+  if (tag_id () > 0 && rdb) {
     r += "[";
     const Tag &tag = rdb->tags ().tag (tag_id ());
     if (tag.is_user_tag ()) {

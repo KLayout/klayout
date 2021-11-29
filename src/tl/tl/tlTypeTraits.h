@@ -98,7 +98,7 @@ struct has_equal_operator
 /**
  *  @brief Detects whether a class has a less operator
  */
-template <typename T> static __yes_type &__test_less_func (decltype (&T::operator==));
+template <typename T> static __yes_type &__test_less_func (decltype (&T::operator<));
 template <typename> static __no_type &__test_less_func (...);
 
 template <typename T>

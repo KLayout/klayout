@@ -44,6 +44,11 @@ public:
   tl::Event on_triggered_event;
 };
 
+}
+
+namespace gsi
+{
+
 static std::string pack_key_binding (const std::map<std::string, std::string> &kb)
 {
   std::vector<std::pair<std::string, std::string> > v;

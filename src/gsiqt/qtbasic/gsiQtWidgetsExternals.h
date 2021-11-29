@@ -20,7 +20,9 @@
 
 */
 
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= 0x060000
+#  include "../qt6/QtWidgets/gsiQtExternals.h"
+#elif QT_VERSION >= 0x050000
 #  include "../qt5/QtWidgets/gsiQtExternals.h"
 #else
 //  no present in Qt4

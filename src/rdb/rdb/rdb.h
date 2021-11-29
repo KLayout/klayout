@@ -626,7 +626,7 @@ public:
   /**
    *  @brief Convert the values collection to a string 
    */
-  std::string to_string (const Database *rdb) const;
+  std::string to_string (const Database *rdb = 0) const;
 
   /**
    *  @brief Fill the values collection from the string

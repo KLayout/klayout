@@ -27,18 +27,6 @@
 #include "layNetlistBrowserDialog.h"
 #include "layLayoutView.h"
 
-namespace tl
-{
-
-//  disable copy and default constructor for NetlistBrowserDialog
-template <> struct type_traits<lay::NetlistBrowserDialog> : public type_traits<void>
-{
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-};
-
-}
-
 namespace gsi
 {
 

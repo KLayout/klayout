@@ -44,18 +44,6 @@ public:
   tl::Event on_triggered_event;
 };
 
-}
-
-namespace tl
-{
-  template <> struct type_traits<ActionStub> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-  };
-}
-
-namespace gsi
-{
-
 static std::string pack_key_binding (const std::map<std::string, std::string> &kb)
 {
   std::vector<std::pair<std::string, std::string> > v;

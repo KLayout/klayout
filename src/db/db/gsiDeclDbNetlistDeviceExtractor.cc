@@ -93,23 +93,6 @@ public:
   gsi::Callback cb_extract_devices;
 };
 
-}
-
-namespace tl
-{
-
-template<> struct type_traits<GenericDeviceExtractor> : public tl::type_traits<void>
-{
-  //  mark "NetlistDeviceExtractor" as having a default ctor and no copy ctor
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::true_tag has_default_constructor;
-};
-
-}
-
-namespace gsi
-{
-
 namespace
 {
 

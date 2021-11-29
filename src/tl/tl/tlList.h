@@ -29,11 +29,12 @@
 
 #include <iterator>
 #include <algorithm>
+#include <type_traits>
 
 namespace tl
 {
 
-template <class C, class CanCopy> class list_impl;
+template <class C, bool copy_constructible> class list_impl;
 
 /**
  *  @brief A base class for objects that can be kept in the linked list
@@ -109,7 +110,7 @@ private:
 };
 
 template <class C>
-class list_impl<C, tl::false_tag>
+class list_impl<C, false>
 {
 public:
   list_impl () : m_head (), m_back ()
@@ -142,7 +143,7 @@ public:
     }
   }
 
-  void swap (list_impl<C, tl::false_tag> &other)
+  void swap (list_impl<C, false> &other)
   {
     std::swap (m_head.mp_next, other.m_head.mp_next);
     if (m_head.mp_next) {
@@ -308,21 +309,21 @@ private:
 };
 
 template <class C>
-class list_impl<C, tl::true_tag>
-  : public list_impl<C, tl::false_tag>
+class list_impl<C, true>
+  : public list_impl<C, false>
 {
 public:
-  using list_impl<C, tl::false_tag>::insert;
-  using list_impl<C, tl::false_tag>::push_back;
-  using list_impl<C, tl::false_tag>::pop_back;
-  using list_impl<C, tl::false_tag>::insert_before;
-  using list_impl<C, tl::false_tag>::push_front;
-  using list_impl<C, tl::false_tag>::pop_front;
+  using list_impl<C, false>::insert;
+  using list_impl<C, false>::push_back;
+  using list_impl<C, false>::pop_back;
+  using list_impl<C, false>::insert_before;
+  using list_impl<C, false>::push_front;
+  using list_impl<C, false>::pop_front;
 
   list_impl () { }
 
   list_impl (const list_impl &other)
-    : list_impl<C, tl::false_tag> ()
+    : list_impl<C, false> ()
   {
     operator= (other);
   }
@@ -330,7 +331,7 @@ public:
   list_impl &operator= (const list_impl &other)
   {
     if (this != &other) {
-      list_impl<C, tl::false_tag>::clear ();
+      list_impl<C, false>::clear ();
       for (const C *p = other.first (); p; p = p->next ()) {
         push_back (*p);
       }
@@ -444,7 +445,7 @@ private:
  */
 template <class C>
 class list
-  : public list_impl<C, typename tl::type_traits<C>::has_copy_constructor>
+  : public list_impl<C, std::is_copy_constructible<C>::value>
 {
 public:
   typedef list_iterator<C> iterator;
@@ -454,17 +455,17 @@ public:
 
   typedef C value_type;
 
-  using list_impl<C, typename tl::type_traits<C>::has_copy_constructor>::first;
-  using list_impl<C, typename tl::type_traits<C>::has_copy_constructor>::last;
-  using list_impl<C, typename tl::type_traits<C>::has_copy_constructor>::head;
-  using list_impl<C, typename tl::type_traits<C>::has_copy_constructor>::back;
+  using list_impl<C, std::is_copy_constructible<C>::value>::first;
+  using list_impl<C, std::is_copy_constructible<C>::value>::last;
+  using list_impl<C, std::is_copy_constructible<C>::value>::head;
+  using list_impl<C, std::is_copy_constructible<C>::value>::back;
 
   list () { }
-  list (const list &other) : list_impl<C, typename tl::type_traits<C>::has_copy_constructor> (other) { }
+  list (const list &other) : list_impl<C, std::is_copy_constructible<C>::value> (other) { }
 
   list &operator= (const list &other)
   {
-    list_impl<C, typename tl::type_traits<C>::has_copy_constructor>::operator= (other);
+    list_impl<C, std::is_copy_constructible<C>::value>::operator= (other);
     return *this;
   }
 

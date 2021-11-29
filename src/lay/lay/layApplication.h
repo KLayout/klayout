@@ -494,20 +494,6 @@ private:
 
 } // namespace lay
 
-namespace tl {
-
-  template <> struct type_traits<lay::GuiApplication> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::false_tag has_default_constructor;
-  };
-
-  template <> struct type_traits<lay::NonGuiApplication> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::false_tag has_default_constructor;
-  };
-
-}
-
 #endif
 
 

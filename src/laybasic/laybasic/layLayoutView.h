@@ -2934,12 +2934,4 @@ private:
 
 }
 
-namespace tl {
-  template <> struct type_traits<lay::LayoutView> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::false_tag has_default_constructor;
-  };
-}
-
 #endif
-

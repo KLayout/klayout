@@ -1273,17 +1273,5 @@ private:
 
 }
 
-namespace tl
-{
-  template <> struct type_traits<gsi_test::A_NC> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-  };
-#if defined(HAVE_QT)
-  template <> struct type_traits<gsi_test::SQ> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-  };
-#endif
-}
-
 #endif
 

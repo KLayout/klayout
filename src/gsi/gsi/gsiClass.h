@@ -44,74 +44,53 @@ namespace gsi
 /**
  *  @brief A helper function to implement equal as efficiently as possible
  */
-template<class T, class I>
-bool _var_user_equal_impl (const T *a, const T *b, const VariantUserClassImpl *delegate, I);
+template<class T, bool> struct _var_user_equal_impl;
 
 template<class T>
-bool _var_user_equal_impl (const T *a, const T *b, const VariantUserClassImpl * /*delegate*/, tl::true_tag)
+struct _var_user_equal_impl<T, true>
 {
-  return *a == *b;
-}
+  static bool call (const T *a, const T *b, const VariantUserClassImpl * /*delegate*/) { return *a == *b; }
+};
 
 template<class T>
-bool _var_user_equal_impl (const T *a, const T *b, const VariantUserClassImpl *delegate, tl::false_tag)
+struct _var_user_equal_impl<T, false>
 {
-  return delegate->equal_impl ((void *) a, (void *) b);
-}
+  static bool call (const T *a, const T *b, const VariantUserClassImpl *delegate) { return delegate->equal_impl ((void *) a, (void *) b); }
+};
 
 /**
- *  @brief A helper function to implement less as efficiently as possible
+ *  @brief A helper function to implement equal as efficiently as possible
  */
-template<class T, class I>
-bool _var_user_less_impl (const T *a, const T *b, const VariantUserClassImpl *delegate, I);
+template<class T, bool> struct _var_user_less_impl;
 
 template<class T>
-bool _var_user_less_impl (const T *a, const T *b, const VariantUserClassImpl * /*delegate*/, tl::true_tag)
+struct _var_user_less_impl<T, true>
 {
-  return *a < *b;
-}
+  static bool call (const T *a, const T *b, const VariantUserClassImpl * /*delegate*/) { return *a < *b; }
+};
 
 template<class T>
-bool _var_user_less_impl (const T *a, const T *b, const VariantUserClassImpl *delegate, tl::false_tag)
+struct _var_user_less_impl<T, false>
 {
-  return delegate->less_impl ((void *) a, (void *) b);
-}
+  static bool call (const T *a, const T *b, const VariantUserClassImpl *delegate) { return delegate->less_impl ((void *) a, (void *) b); }
+};
 
 /**
- *  @brief A helper function to implement to_string as efficiently as possible
+ *  @brief A helper function to implement equal as efficiently as possible
  */
-template<class T, class I>
-std::string _var_user_to_string_impl (const T *a, const VariantUserClassImpl *delegate, I);
+template<class T, bool> struct _var_user_to_string_impl;
 
 template<class T>
-std::string _var_user_to_string_impl (const T *a, const VariantUserClassImpl * /*delegate*/, tl::true_tag)
+struct _var_user_to_string_impl<T, true>
 {
-  return a->to_string ();
-}
+  static std::string call (const T *a, const VariantUserClassImpl * /*delegate*/) { return a->to_string (); }
+};
 
 template<class T>
-std::string _var_user_to_string_impl (const T *a, const VariantUserClassImpl *delegate, tl::false_tag)
+struct _var_user_to_string_impl<T, false>
 {
-  return delegate->to_string_impl ((void *) a);
-}
-
-/**
- *  @brief A helper function to implement read as efficiently as possible
- */
-template<class T, class I>
-void _var_user_read_impl (T *a, tl::Extractor &ex, I);
-
-template<class T>
-void _var_user_read_impl (T *a, tl::Extractor &ex, tl::true_tag)
-{
-  ex.read (*a);
-}
-
-template<class T>
-void _var_user_read_impl (T * /*a*/, tl::Extractor & /*ex*/, tl::false_tag)
-{
-  tl_assert (false);
-}
+  static std::string call (const T *a, const VariantUserClassImpl *delegate) { return delegate->to_string_impl ((void *) a); }
+};
 
 /**
  *  @brief A VariantUserClassBase specialization that links GSI classes and Variant classes
@@ -165,20 +144,17 @@ public:
 
   virtual bool equal (const void *a, const void *b) const
   {
-    typename tl::type_traits<T>::has_equal_operator f;
-    return gsi::_var_user_equal_impl ((const T *) a, (const T *) b, this, f);
+    return gsi::_var_user_equal_impl<T, tl::has_equal_operator<T>::value>::call ((const T *) a, (const T *) b, this);
   }
 
   virtual bool less (const void *a, const void *b) const
   {
-    typename tl::type_traits<T>::has_less_operator f;
-    return gsi::_var_user_less_impl ((const T *) a, (const T *) b, this, f);
+    return gsi::_var_user_less_impl<T, tl::has_less_operator<T>::value>::call ((const T *) a, (const T *) b, this);
   }
 
   virtual std::string to_string (const void *a) const
   {
-    typename tl::type_traits<T>::supports_to_string f;
-    return gsi::_var_user_to_string_impl ((const T *) a, this, f);
+    return gsi::_var_user_to_string_impl<T, tl::has_to_string<T>::value>::call ((const T *) a, this);
   }
 
   void *clone (const void *obj) const
@@ -212,8 +188,8 @@ public:
 
   void read (void *a, tl::Extractor &ex) const
   {
-    typename tl::type_traits<T>::supports_extractor f;
-    gsi::_var_user_read_impl ((T *) a, ex, f);
+    const T *t = a;
+    ex.read (*t);
   }
 
   const gsi::ClassBase *gsi_cls () const
@@ -244,256 +220,21 @@ private:
 // -----------------------------------------------------------------------------
 //  GSI implementation
 
-template <class X> 
-void *_get_vector_of (SerialArgs & /*from*/, const ArgType & /*a*/, void * /*data*/, void (* /*cb*/) (void * /*data*/, void * /*obj*/), tl::false_tag /*has_copy_ctor*/) 
-{
-  tl_assert (false); // cannot copy object of this type
-  return 0;
-}
+template <class X, bool> struct _destroy;
+template <class X> struct _destroy<X, false> { static void call (X *) { tl_assert (false); } };
+template <class X> struct _destroy<X, true> { static void call (X *x) { delete x; } };
 
-template <class X> 
-void _get_vector_of (SerialArgs &from, const ArgType &a, void *data, void (*cb) (void *data, void *obj), tl::true_tag /*has_copy_ctor*/) 
-{
-  std::vector<X> vv;
-  const std::vector<X> *v = &vv;
-  if (a.is_cref ()) {
-    v = &from.template read<const std::vector<X> &> ();
-  } else if (a.is_cptr ()) {
-    v = from.template read<const std::vector<X> *> ();
-  } else if (a.is_ref ()) {
-    v = &from.template read<std::vector<X> &> ();
-  } else if (a.is_ptr ()) {
-    v = from.template read<std::vector<X> *> ();
-  } else {
-    vv = from.template read< std::vector<X> > ();
-  }
-  for (typename std::vector<X>::const_iterator o = v->begin (); o != v->end (); ++o) {
-    (*cb) (data, new X (*o));
-  }
-}
+template <class X, bool> struct _create;
+template <class X> struct _create<X, false> { static void *call () { throw tl::Exception (tl::to_string (tr ("Object cannot be created here"))); } };
+template <class X> struct _create<X, true> { static void *call () { return new X (); } };
 
-template <class X> 
-void _get_cptr_vector_of (SerialArgs &from, const ArgType &a, void *data, void (*cb) (void *data, void *obj))
-{
-  std::vector<const X *> vv;
-  const std::vector<const X *> *v = &vv;
-  if (a.is_cref ()) {
-    v = &from.template read<const std::vector<const X *> &> ();
-  } else if (a.is_cptr ()) {
-    v = from.template read<const std::vector<const X *> *> ();
-  } else if (a.is_ref ()) {
-    v = &from.template read<std::vector<const X *> &> ();
-  } else if (a.is_ptr ()) {
-    v = from.template read<std::vector<const X *> *> ();
-  } else {
-    vv = from.template read< std::vector<const X *> > ();
-  }
-  for (typename std::vector<const X *>::const_iterator o = v->begin (); o != v->end (); ++o) {
-    (*cb) (data, (void *) *o);
-  }
-}
+template <class X, bool> struct _clone;
+template <class X> struct _clone<X, false> { static void *call (const void *) { throw tl::Exception (tl::to_string (tr ("Object cannot be copied here"))); } };
+template <class X> struct _clone<X, true> { static void *call (const void *other) { new X (*(const X *)other); } };
 
-template <class X> 
-void _get_ptr_vector_of (SerialArgs &from, const ArgType &a, void *data, void (*cb) (void *data, void *obj))
-{
-  std::vector<X *> vv;
-  const std::vector<X *> *v = &vv;
-  if (a.is_cref ()) {
-    v = &from.template read<const std::vector<X *> &> ();
-  } else if (a.is_cptr ()) {
-    v = from.template read<const std::vector<X *> *> ();
-  } else if (a.is_ref ()) {
-    v = &from.template read<std::vector<X *> &> ();
-  } else if (a.is_ptr ()) {
-    v = from.template read<std::vector<X *> *> ();
-  } else {
-    vv = from.template read< std::vector<X *> > ();
-  }
-  for (typename std::vector<X *>::const_iterator o = v->begin (); o != v->end (); ++o) {
-    (*cb) (data, *o);
-  }
-}
-
-template <class X> 
-void _destroy (X *, tl::false_tag /*has public dtor*/)
-{
-  tl_assert (false); // cannot delete object of this type
-}
-
-template <class X> 
-void _destroy (X *x, tl::true_tag /*has public dtor*/)
-{
-  delete x;
-}
-
-template <class X> 
-void _push_vector_of (SerialArgs & /*to*/, const ArgType & /*a*/, tl::Heap & /*heap*/, const std::vector<void *> & /*objects*/, tl::false_tag /*has_copy_ctor*/) 
-{
-  tl_assert (false); // cannot copy object of this type
-}
-
-template <class X> 
-void _push_vector_of (SerialArgs &to, const ArgType &a, tl::Heap &heap, const std::vector<void *> &objects, tl::true_tag /*has_copy_ctor*/) 
-{
-  tl_assert (a.inner () != 0);
-
-  std::vector<X> vv;
-  std::vector<X> *v;
-  if (a.is_ref () || a.is_cref () || a.is_ptr () || a.is_cptr ()) {
-    v = new std::vector<X> ();
-    heap.push (v);
-  } else {
-    v = &vv;
-  }
-
-  v->reserve (objects.size ());
-  for (std::vector<void *>::const_iterator o = objects.begin (); o != objects.end (); ++o) {
-    v->push_back (*(X *)*o);
-  }
-
-  if (a.is_cref ()) {
-    to.write<const std::vector<X> &> (*v);
-  } else if (a.is_cptr ()) {
-    to.write<const std::vector<X> *> (v);
-  } else if (a.is_ref ()) {
-    to.write<std::vector<X> &> (*v);
-  } else if (a.is_ptr ()) {
-    to.write<std::vector<X> *> (v);
-  } else {
-    to.write<std::vector<X> > (vv);
-  }
-}
-
-template <class X> 
-void _push_cptr_vector_of (SerialArgs &to, const ArgType &a, tl::Heap &heap, const std::vector<void *> &objects)
-{
-  tl_assert (a.inner () != 0);
-
-  std::vector<const X *> vv;
-  std::vector<const X *> *v;
-  if (a.is_ref () || a.is_cref () || a.is_ptr () || a.is_cptr ()) {
-    v = new std::vector<const X *> ();
-    heap.push (v);
-  } else {
-    v = &vv;
-  }
-
-  v->reserve (objects.size ());
-  for (std::vector<void *>::const_iterator o = objects.begin (); o != objects.end (); ++o) {
-    v->push_back ((const X *)*o);
-  }
-
-  if (a.is_cref ()) {
-    to.write<const std::vector<const X *> &> (*v);
-  } else if (a.is_cptr ()) {
-    to.write<const std::vector<const X *> *> (v);
-  } else if (a.is_ref ()) {
-    to.write<std::vector<const X *> &> (*v);
-  } else if (a.is_ptr ()) {
-    to.write<std::vector<const X *> *> (v);
-  } else {
-    to.write<std::vector<const X *> > (vv);
-  }
-}
-
-template <class X> 
-void _push_ptr_vector_of (SerialArgs &to, const ArgType &a, tl::Heap &heap, const std::vector<void *> &objects)
-{
-  tl_assert (a.inner () != 0);
-
-  std::vector<X *> vv;
-  std::vector<X *> *v;
-  if (a.is_ref () || a.is_cref () || a.is_ptr () || a.is_cptr ()) {
-    v = new std::vector<X *> ();
-    heap.push (v);
-  } else {
-    v = &vv;
-  }
-
-  v->reserve (objects.size ());
-  for (std::vector<void *>::const_iterator o = objects.begin (); o != objects.end (); ++o) {
-    v->push_back ((X *)*o);
-  }
-
-  if (a.is_cref ()) {
-    to.write<const std::vector<X *> &> (*v);
-  } else if (a.is_cptr ()) {
-    to.write<const std::vector<X *> *> (v);
-  } else if (a.is_ref ()) {
-    to.write<std::vector<X *> &> (*v);
-  } else if (a.is_ptr ()) {
-    to.write<std::vector<X *> *> (v);
-  } else {
-    to.write<std::vector<X *> > (vv);
-  }
-}
-
-template <class X> 
-void *_create (tl::false_tag)
-{
-  throw tl::Exception (tl::to_string (tr ("Object cannot be created here")));
-  return 0;
-}
-
-template <class X> 
-void *_create (tl::true_tag)
-{
-  return new X ();
-}
-
-template <class X> 
-void *_clone (tl::false_tag, const void * /*other*/)
-{
-  throw tl::Exception (tl::to_string (tr ("Object cannot be copied here")));
-  return 0;
-}
-
-template <class X> 
-void *_clone (tl::true_tag, const void *other)
-{
-  return new X (*(const X *)other);
-}
-
-template <class X> 
-void _assign (tl::false_tag /*has_copy_ctor*/, void *, const void *)
-{
-  throw tl::Exception (tl::to_string (tr ("Object cannot be copied here")));
-}
-
-template <class X> 
-void _assign (tl::true_tag /*has_copy_ctor*/, void *dest, const void *src)
-{
-  *(X *)dest = *(const X *)src;
-}
-
-/**
- *  @brief A class predicate telling us whether X is polymorphic
- *
- *  The trick was taken from boost - if a class is made polymorphic and it
- *  has not been before, the size of the object changes since a virtual 
- *  function table will be added.
- */
-template <class X>
-struct is_polymorphic
-{
-private:
-  struct P1 : public X
-  {
-    P1 ();
-    ~P1 ();
-    int something;
-  };
-
-  struct P2 : public X
-  {
-    P2 ();
-    virtual ~P2 ();
-    int something;
-  };
-
-public:
-  typedef typename tl::boolean_value<sizeof (P1) == sizeof (P2)>::value value;
-};
+template <class X, bool> struct _assign;
+template <class X> struct _assign<X, false> { static void call (void *, const void *) { throw tl::Exception (tl::to_string (tr ("Object cannot be copied here"))); } };
+template <class X> struct _assign<X, true> { static void call (void *dest, const void *src) { *(X *)dest = *(const X *)src; } };
 
 /**
  *  @brief A helper class which tests whether a given object can be upcast 
@@ -513,14 +254,14 @@ public:
  *  The can_upcast method will return true, if the object (which has at least to 
  *  be of type B) can be upcast to X.
  */
-template <class X, class B, class B_IS_POLYMORPHIC>
+template <class X, class B, bool B_IS_POLYMORPHIC>
 class SubClassTester;
 
 /**
  *  @brief Specialization for polymorphic types - we can use dynamic_cast to tests whether B object can be cast to X
  */
 template <class X, class B>
-class SubClassTester<X, B, tl::true_tag>
+class SubClassTester<X, B, true>
   : public SubClassTesterBase 
 {
 public:
@@ -534,7 +275,7 @@ public:
  *  @brief Specialization for non-polymorphic types
  */
 template <class X, class B>
-class SubClassTester<X, B, tl::false_tag>
+class SubClassTester<X, B, false>
   : public SubClassTesterBase 
 {
 public:
@@ -556,10 +297,6 @@ class GSI_PUBLIC_TEMPLATE ClassExt
   : public ClassBase
 {
 public:
-  typedef typename tl::type_traits<X>::has_copy_constructor has_copy_ctor;
-  typedef typename tl::type_traits<X>::has_default_constructor has_default_ctor;
-  typedef typename tl::type_traits<X>::has_public_destructor has_public_dtor;
-
   ClassExt (const Methods &mm, const std::string &doc = std::string ())
     : ClassBase (doc, mm), mp_declaration (0)
   {
@@ -713,10 +450,6 @@ class GSI_PUBLIC_TEMPLATE Class
   : public ClassBase
 {
 public:
-  typedef typename tl::type_traits<X>::has_copy_constructor has_copy_ctor;
-  typedef typename tl::type_traits<X>::has_default_constructor has_default_ctor;
-  typedef typename tl::type_traits<X>::has_public_destructor has_public_dtor;
-
   Class (const std::string &module, const std::string &name, const Methods &mm, const std::string &doc = std::string (), bool do_register = true)
     : ClassBase (doc, mm, do_register)
   {
@@ -726,7 +459,7 @@ public:
 
   template <class B>
   Class (const Class<B> &base, const std::string &module, const std::string &name, const Methods &mm, const std::string &doc = std::string (), bool do_register = true)
-    : ClassBase (doc, mm, do_register), m_subclass_tester (new SubClassTester<X, B, typename is_polymorphic<B>::value> ())
+    : ClassBase (doc, mm, do_register), m_subclass_tester (new SubClassTester<X, B, std::is_polymorphic<B>::value> ())
   {
     set_module (module);
     set_name (name);
@@ -742,7 +475,7 @@ public:
 
   template <class B>
   Class (const Class<B> &base, const std::string &module, const std::string &name, const std::string &doc = std::string (), bool do_register = true)
-    : ClassBase (doc, Methods (), do_register), m_subclass_tester (new SubClassTester<X, B, typename is_polymorphic<B>::value> ())
+    : ClassBase (doc, Methods (), do_register), m_subclass_tester (new SubClassTester<X, B, std::is_polymorphic<B>::value> ())
   {
     set_module (module);
     set_name (name);
@@ -785,15 +518,12 @@ public:
   virtual void destroy (void *p) const
   {
     X *x = (X *)p;
-    has_public_dtor hpd;
-    _destroy (x, hpd);
+    _destroy<X, std::is_destructible<X>::value>::call (x);
   }
 
   virtual void *create () const
   {
-    has_default_ctor cst;
-    void *r = _create<X> (cst);
-    return r;
+    return _create<X, std::is_default_constructible<X>::value>::call ();
   }
 
   virtual void *create_from_adapted (const void *x) const
@@ -818,33 +548,27 @@ public:
 
   virtual void *clone (const void *other) const
   {
-    has_copy_ctor cst;
-    void *r = _clone<X> (cst, other);
-    return r;
+    return _clone<X, std::is_copy_constructible<X>::value>::call (other);
   }
 
   virtual void assign (void *dest, const void *src) const
   {
-    has_copy_ctor cst;
-    _assign<X> (cst, dest, src);
+    _assign<X, std::is_copy_assignable<X>::value>::call (dest, src);
   }
 
   virtual bool can_destroy () const
   {
-    has_public_dtor hpd;
-    return tl::value_of (hpd);
+    return std::is_destructible<X>::value;
   }
 
   virtual bool can_copy () const
   {
-    has_copy_ctor cpt;
-    return tl::value_of (cpt);
+    return std::is_copy_constructible<X>::value;
   }
 
   virtual bool can_default_create () const
   {
-    has_default_ctor cpt;
-    return tl::value_of (cpt);
+    return std::is_default_constructible<X>::value;
   }
 
   virtual const ClassBase *subclass_decl (const void *p) const 

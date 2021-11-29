@@ -77,18 +77,6 @@ public:
   }
 };
 
-}
-
-namespace tl {
-  template <> struct type_traits<gsi::Logger> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::false_tag has_default_constructor;
-  };
-}
-
-namespace gsi
-{
-
 Class<Logger> decl_Logger ("tl", "Logger",
   gsi::method ("info", &Logger::info, gsi::arg ("msg"),
     "@brief Writes the given string to the info channel\n"
@@ -487,20 +475,6 @@ static ExpressionWrapper *new_expr2 (const std::string &e, const std::map<std::s
   expr->parse (e);
   return expr.release ();
 }
-
-}
-
-namespace tl {
-
-  template <> struct type_traits<ExpressionWrapper> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::true_tag has_default_constructor;
-  };
-
-}
-
-namespace gsi
-{
 
 Class<tl::Eval> decl_ExpressionContext ("tl", "ExpressionContext",
   gsi::method ("var", &tl::Eval::set_var, gsi::arg ("name"), gsi::arg ("value"),

@@ -99,19 +99,6 @@ class CircuitNetItemData;
 class CircuitDeviceItemData;
 class CircuitSubCircuitItemData;
 
-}
-
-namespace tl {
-  //  disable copying for NetlistModelItemData
-  template<> struct type_traits<lay::NetlistModelItemData>
-  {
-    typedef false_tag has_copy_constructor;
-  };
-}
-
-namespace lay
-{
-
 /**
  *  @brief A base class for the item data object
  */

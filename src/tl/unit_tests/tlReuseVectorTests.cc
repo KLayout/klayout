@@ -210,13 +210,6 @@ int A::dc = 0;
 
 }
 
-namespace tl
-{
-  template <> struct type_traits<A> : public type_traits<void> {
-    typedef trivial_relocate_required relocate_requirements;
-  };
-}
-
 namespace {
 
 class B {
@@ -238,18 +231,11 @@ int B::dc = 0;
 
 }
 
-namespace tl
-{
-  template <> struct type_traits<B> : public type_traits<void> {
-    typedef complex_relocate_required relocate_requirements;
-  };
-}
-
 //  Test: relocate strategy
 TEST(4) 
 {
-  tl::reuse_vector<A> va;
-  tl::reuse_vector<B> vb;
+  tl::reuse_vector<A, true> va;
+  tl::reuse_vector<B, false> vb;
   A::reset ();
   B::reset ();
 
@@ -259,11 +245,11 @@ TEST(4)
   }
 
   int i = 0;
-  for (tl::reuse_vector<A>::const_iterator n = va.begin (); n != va.end (); ++n, ++i) {
+  for (tl::reuse_vector<A, true>::const_iterator n = va.begin (); n != va.end (); ++n, ++i) {
     EXPECT_EQ (n->x, 100 - i * 10);
   }
   i = 0;
-  for (tl::reuse_vector<B>::const_iterator n = vb.begin (); n != vb.end (); ++n, ++i) {
+  for (tl::reuse_vector<B, false>::const_iterator n = vb.begin (); n != vb.end (); ++n, ++i) {
     EXPECT_EQ (n->x, 100 - i * 10);
   }
 

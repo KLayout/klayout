@@ -2396,6 +2396,7 @@ END
       # forward decl
       @ext_decls << "#{struct.kind.to_s} #{cls};\n\n"
 
+      if false # @@@ no longer needed
       # type traits included ...
       tt = "namespace tl { template <> struct type_traits<#{cls}> : public type_traits<void> {\n"
       if !conf.has_copy_ctor?(cls) || is_abstract || (eq_op && eq_op.visibility == :private)
@@ -2409,6 +2410,7 @@ END
       end
       tt += "}; }\n\n"
       @ext_decls << tt
+      end
 
       # only for top-level classes external declarations are produced currently
       @ext_decls << "namespace gsi { GSI_#{modn.upcase}_PUBLIC gsi::Class<#{cls}> &qtdecl_#{clsn} (); }\n\n"
@@ -2993,6 +2995,7 @@ END
       ttfile.puts("#{struct.kind.to_s} #{cls};")
     end
 
+    if false # @@@ no longer needed
     ttfile.puts("namespace tl {")
     ttfile.puts "template <> struct type_traits<#{cls}> : public type_traits<void> {"
     if !conf.has_copy_ctor?(cls) || is_abstract || (eq_op && eq_op.visibility == :private)
@@ -3007,9 +3010,11 @@ END
     ttfile.puts "};"
     ttfile.puts "}"
     ttfile.puts ""
+    end
 
     if struct.needs_adaptor(conf) 
 
+      if false # @@@ no longer needed
       ttfile.puts("class #{clsn}_Adaptor;")
       ttfile.puts("namespace tl {")
       ttfile.puts "template <> struct type_traits<#{clsn}_Adaptor> : public type_traits<void> {"
@@ -3022,6 +3027,7 @@ END
       ttfile.puts "};"
       ttfile.puts "}"
       ttfile.puts ""
+      end
 
     end
 
@@ -3075,6 +3081,8 @@ END
       ttfile.puts("*  This file has been created automatically")
       ttfile.puts("*/")
       ttfile.puts("")
+
+      if false # @@@ no longer required
       ttfile.puts("#ifndef _HDR_gsiDecl#{modn}TypeTraits")
       ttfile.puts("#define _HDR_gsiDecl#{modn}TypeTraits")
       ttfile.puts("")
@@ -3092,6 +3100,7 @@ END
         elsif decl_obj.is_a?(CPPNamespace)
 
           cls = decl_obj.myself
+          if false # no longer required
           ttfile.puts("class #{cls}_Namespace;")
           ttfile.puts("namespace tl {")
           ttfile.puts "template <> struct type_traits<#{cls}_Namespace> : public type_traits<void> {"
@@ -3100,9 +3109,11 @@ END
           ttfile.puts "};"
           ttfile.puts("}")
           ttfile.puts ""
+          end
 
         end
 
+      end
       end
 
       ttfile.puts("")

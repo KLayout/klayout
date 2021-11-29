@@ -2388,48 +2388,4 @@ private:
 
 }
 
-namespace tl
-{
-  /**
-   *  @brief Type traits for Cell
-   */
-  template <> struct type_traits<rdb::Cell> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::false_tag has_default_constructor;
-  };
-
-  /**
-   *  @brief Type traits for Category
-   */
-  template <> struct type_traits<rdb::Category> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::false_tag has_default_constructor;
-  };
-
-  /**
-   *  @brief Type traits for Categories
-   */
-  template <> struct type_traits<rdb::Categories> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::false_tag has_default_constructor;
-  };
-
-  /**
-   *  @brief Type traits for Item
-   */
-  template <> struct type_traits<rdb::Item> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::false_tag has_default_constructor;
-  };
-
-  /**
-   *  @brief Type traits for Database
-   */
-  template <> struct type_traits<rdb::Database> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::false_tag has_default_constructor;
-  };
-}
-
 #endif
-

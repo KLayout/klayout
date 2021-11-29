@@ -312,15 +312,4 @@ private:
 
 }
 
-namespace tl
-{
-
-template<> struct type_traits<db::NetlistCrossReference> : public tl::type_traits<void>
-{
-  //  mark "NetlistDeviceExtractor" as having a default ctor and no copy ctor
-  typedef tl::false_tag has_copy_constructor;
-};
-
-}
-
 #endif

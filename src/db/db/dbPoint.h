@@ -750,16 +750,6 @@ inline bool equal (const tl::vector<point<C> > &a, const tl::vector<point<C> > &
 
 namespace tl 
 {
-  template <class C>
-  struct type_traits <db::point<C> > : public type_traits<void> 
-  {
-    typedef trivial_relocate_required relocate_requirements;
-    typedef true_tag supports_extractor;
-    typedef true_tag supports_to_string;
-    typedef true_tag has_less_operator;
-    typedef true_tag has_equal_operator;
-  };
-
   template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Point &p);
   template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPoint &p);
 

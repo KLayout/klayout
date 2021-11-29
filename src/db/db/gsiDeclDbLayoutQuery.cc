@@ -24,29 +24,6 @@
 #include "gsiDecl.h"
 #include "dbLayoutQuery.h"
 
-namespace tl
-{
-
-//  Disable copy and default ctor for layout query
-template <>
-struct type_traits<db::LayoutQuery>
-  : public type_traits<void>
-{
-  typedef false_tag has_copy_constructor;
-  typedef false_tag has_default_constructor;
-};
-
-//  Disable copy and default ctor for layout query
-template <>
-struct type_traits<db::LayoutQueryIterator>
-  : public type_traits<void>
-{
-  typedef false_tag has_copy_constructor;
-  typedef false_tag has_default_constructor;
-};
-
-}
-
 namespace gsi
 {
 

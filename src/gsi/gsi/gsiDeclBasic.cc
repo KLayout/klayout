@@ -26,17 +26,6 @@
 #include "gsiDecl.h"
 #include "tlTypeTraits.h"
 
-namespace tl
-{
-  template <> struct type_traits<gsi::Interpreter>
-    : tl::type_traits<void>
-  {
-    typedef false_tag has_copy_constructor;
-    typedef false_tag has_default_constructor;
-    typedef false_tag has_public_destructor;
-  };
-}
-
 namespace gsi
 {
 

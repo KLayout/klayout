@@ -67,50 +67,56 @@ inline bool value_of (true_tag) { return true; }
  */
 inline bool value_of (false_tag) { return false; }
 
-/**
- *  @brief A tag class which defines a object to require complex relocation.
- */
-struct complex_relocate_required { };
+//  SFINAE boolean types
+typedef char __yes_type [1];
+typedef char __no_type [2];
 
 /**
- *  @brief A tag class which defines a object to allow trivial relocation.
+ *  @brief Detects whether a class has a "to_string" method with a matching signature
  */
-struct trivial_relocate_required { };
+template <typename T> static __yes_type &__test_to_string_func (decltype (&T::to_string));
+template <typename> static __no_type &__test_to_string_func (...);
 
-/**
- *  @brief The type traits struct that defines some requirements for the given type T
- *
- *  Specifically the following typedefs must be provided:
- *
- *  "relocate_requirements" specifies how the object needs to be relocated. 
- *  This typdef can be complex_relocate_required or trivial_relocate_required. 
- *  Complex relocation is implemented by a copy construction and destruction of the 
- *  source object. Trivial relocation is implemented by a memcpy.
- *  The default is complex relocation.
- *
- *  "has_copy_constructor" specifies if a class has a copy constructor.
- *  This typedef can be true_tag or false_tag. The default is "true_tag".
- *
- *  "has_default_constructor" specifies if a class has a default constructor.
- *  This typedef can be true_tag or false_tag. The default is "true_tag".
- *
- *  "has_efficient_swap" specifies that it is beneficial to use std::swap
- *  on those objects because it is implemented very efficiently. The default is "false_tag".
- *
- *  TODO: further requirements shall go here.
- */
-template <class T>
-struct type_traits
+template <typename T>
+struct has_to_string
 {
-  typedef complex_relocate_required relocate_requirements;
-  typedef true_tag has_copy_constructor;
-  typedef true_tag has_default_constructor;
-  typedef true_tag has_public_destructor;
-  typedef false_tag has_efficient_swap;
-  typedef false_tag supports_extractor;
-  typedef false_tag supports_to_string;
-  typedef false_tag has_less_operator;
-  typedef false_tag has_equal_operator;
+  static constexpr bool value = sizeof (__test_to_string_func<T> (nullptr)) == sizeof (__yes_type);
+};
+
+/**
+ *  @brief Detects whether a class has an equal operator
+ */
+template <typename T> static __yes_type &__test_equal_func (decltype (&T::operator==));
+template <typename> static __no_type &__test_equal_func (...);
+
+template <typename T>
+struct has_equal_operator
+{
+  static constexpr bool value = sizeof (__test_equal_func<T> (nullptr)) == sizeof (__yes_type);
+};
+
+/**
+ *  @brief Detects whether a class has a less operator
+ */
+template <typename T> static __yes_type &__test_less_func (decltype (&T::operator==));
+template <typename> static __no_type &__test_less_func (...);
+
+template <typename T>
+struct has_less_operator
+{
+  static constexpr bool value = sizeof (__test_less_func<T> (nullptr)) == sizeof (__yes_type);
+};
+
+/**
+ *  @brief Detects whether a class has a "swap" method with a matching signature
+ */
+template <typename T> static __yes_type &__test_swap_func (decltype (&T::swap));
+template <typename> static __no_type &__test_swap_func (...);
+
+template <typename T>
+struct has_swap
+{
+  static constexpr bool value = sizeof (__test_swap_func<T> (nullptr)) == sizeof (__yes_type);
 };
 
 }

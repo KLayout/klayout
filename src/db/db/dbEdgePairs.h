@@ -613,21 +613,5 @@ private:
 
 }
 
-namespace tl 
-{
-  /**
-   *  @brief The type traits for the box type
-   */
-  template <>
-  struct type_traits <db::EdgePairs> : public type_traits<void> 
-  {
-    typedef true_tag supports_extractor;
-    typedef true_tag supports_to_string;
-    typedef true_tag has_less_operator;
-    typedef true_tag has_equal_operator;
-  };
-
-}
-
 #endif
 

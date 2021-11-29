@@ -63,15 +63,6 @@
 // --------------------------------------------------------------
 //  A helper class that allows putting a QImage into a tl::Variant
 
-namespace tl
-{
-  template <>
-  struct type_traits <QImage> : public type_traits<void> 
-  {
-    typedef true_tag has_equal_operator;
-  };
-}
-
 namespace gtf
 {
 

@@ -1144,7 +1144,7 @@ public:
 /**
  *  @brief An implementation helper that provides a switch between classes having and having no copy ctor 
  */
-template <class T, class CC>
+template <class T, bool>
 class ArgSpecImpl 
   : public ArgSpecBase
 {
@@ -1189,7 +1189,7 @@ public:
  *  @brief A specialization for classes with default and copy ctor
  */
 template <class T>
-class ArgSpecImpl<T, tl::true_tag>
+class ArgSpecImpl<T, true>
   : public ArgSpecBase
 {
 public:
@@ -1289,30 +1289,30 @@ private:
  */
 template <class T>
 class ArgSpec
-  : public ArgSpecImpl<T, typename tl::type_traits<T>::has_copy_constructor>
+  : public ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_destructible<T>::value>
 {
 public:
-  typedef typename tl::type_traits<T>::has_copy_constructor cc_type;
+  typedef ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_destructible<T>::value> Base;
 
   ArgSpec () 
-    : ArgSpecImpl<T, cc_type> ()
+    : Base ()
   { }
 
   ArgSpec (const ArgSpec<void> &other)
-    : ArgSpecImpl<T, cc_type> (other)
+    : Base (other)
   { }
 
   template <class Q>
   ArgSpec (const ArgSpec<Q> &other)
-    : ArgSpecImpl<T, cc_type> (other)
+    : Base (other)
   { }
 
   ArgSpec (const std::string &name)
-    : ArgSpecImpl<T, cc_type> (name)
+    : Base (name)
   { }
 
   ArgSpec (const std::string &name, const T &init, const std::string &init_doc = std::string ())
-    : ArgSpecImpl<T, cc_type> (name, init, init_doc)
+    : Base (name, init, init_doc)
   { }
 
   virtual ArgSpecBase *clone () const
@@ -1326,30 +1326,30 @@ public:
  */
 template <class T>
 class ArgSpec<const T &>
-  : public ArgSpecImpl<T, typename tl::type_traits<T>::has_copy_constructor>
+  : public ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_destructible<T>::value>
 {
 public:
-  typedef typename tl::type_traits<T>::has_copy_constructor cc_type;
+  typedef ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_destructible<T>::value> Base;
 
-  ArgSpec () 
-    : ArgSpecImpl<T, cc_type> ()
+  ArgSpec ()
+    : Base ()
   { }
 
   ArgSpec (const ArgSpec<void> &other)
-    : ArgSpecImpl<T, cc_type> (other)
+    : Base (other)
   { }
 
   template <class Q>
   ArgSpec (const ArgSpec<Q> &other)
-    : ArgSpecImpl<T, cc_type> (other)
+    : Base (other)
   { }
 
   ArgSpec (const std::string &name)
-    : ArgSpecImpl<T, cc_type> (name)
+    : Base (name)
   { }
 
   ArgSpec (const std::string &name, const T &init, const std::string &init_doc = std::string ())
-    : ArgSpecImpl<T, cc_type> (name, init, init_doc)
+    : Base (name, init, init_doc)
   { }
 
   virtual ArgSpecBase *clone () const
@@ -1363,37 +1363,37 @@ public:
  */
 template <class T>
 class ArgSpec<T &>
-  : public ArgSpecImpl<T, typename tl::type_traits<T>::has_copy_constructor>
+  : public ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_destructible<T>::value>
 {
 public:
+  typedef ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_destructible<T>::value> Base;
   typedef T &init_type;
-  typedef typename tl::type_traits<T>::has_copy_constructor cc_type;
 
   ArgSpec () 
-    : ArgSpecImpl<T, cc_type> ()
+    : Base ()
   { }
 
   ArgSpec (const ArgSpec<void> &other)
-    : ArgSpecImpl<T, cc_type> (other)
+    : Base (other)
   { }
 
   template <class Q>
   ArgSpec (const ArgSpec<Q> &other)
-    : ArgSpecImpl<T, cc_type> (other)
+    : Base (other)
   { }
 
   ArgSpec (const std::string &name)
-    : ArgSpecImpl<T, cc_type> (name)
+    : Base (name)
   { }
 
   ArgSpec (const std::string &name, const T &init, const std::string &init_doc = std::string ())
-    : ArgSpecImpl<T, cc_type> (name, init, init_doc)
+    : Base (name, init, init_doc)
   { }
 
   T &init () const
   {
     //  this simplifies the implementation, but it's not really clean since the caller may modify the default.
-    return const_cast<T &> (ArgSpecImpl<T, cc_type>::init ());
+    return const_cast<T &> (ArgSpecImpl<T, std::is_copy_constructible<T>::value>::init ());
   }
 
   virtual ArgSpecBase *clone () const

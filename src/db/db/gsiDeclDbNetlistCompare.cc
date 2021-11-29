@@ -316,11 +316,6 @@ private:
 
 }
 
-namespace tl
-{
-  template<> struct type_traits<GenericNetlistCompareLogger> : public tl::type_traits<db::NetlistCompareLogger> { };
-}
-
 namespace gsi
 {
 

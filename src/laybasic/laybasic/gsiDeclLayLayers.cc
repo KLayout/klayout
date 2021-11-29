@@ -24,18 +24,6 @@
 #include "gsiDecl.h"
 #include "layLayoutView.h"
 
-namespace tl
-{
-  //  NOTE: we don't want references to be passed around and be default-constructed.
-  //  References are only meant as return values for the layer properties iterator and
-  //  be short-living. Hence we disable copying (which will also disable the default
-  //  "assign" implementation) and default construction.
-  template <> struct type_traits<lay::LayerPropertiesNodeRef> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::false_tag has_default_constructor;
-  };
-}
-
 namespace gsi
 {
 

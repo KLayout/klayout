@@ -874,16 +874,5 @@ public:
 
 }
 
-namespace tl
-{
-  /**
-   *  @brief Type traits
-   */
-  template <> struct type_traits <db::TechnologyComponent> : public type_traits<void> {
-    typedef tl::false_tag has_default_constructor;
-    typedef tl::false_tag has_copy_constructor;
-  };
-}
-
 #endif
 

@@ -44,7 +44,7 @@ namespace tl {
 /**
  *  @brief An exception indicating that string extraction is not available for a certain type
  */
-class ExtractorNotImplementedException
+class TL_PUBLIC ExtractorNotImplementedException
   : tl::Exception
 {
 public:
@@ -54,7 +54,7 @@ public:
 /**
  *  @brief An exception indicating that string conversion is not available for a certain type
  */
-class StringConversionException
+class TL_PUBLIC StringConversionException
   : tl::Exception
 {
 public:

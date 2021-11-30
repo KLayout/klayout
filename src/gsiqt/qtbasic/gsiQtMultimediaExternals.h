@@ -22,6 +22,8 @@
 
 #if !defined(HAVE_QT_MULTIMEDIA)
 #  define FORCE_LINK_GSI_QTMULTIMEDIA
+#elif QT_VERSION >= 0x060000
+#  include "../qt6/QtMultimedia/gsiQtExternals.h"
 #elif QT_VERSION >= 0x050000
 #  include "../qt5/QtMultimedia/gsiQtExternals.h"
 #else

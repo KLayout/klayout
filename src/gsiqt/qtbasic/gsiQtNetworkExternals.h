@@ -22,6 +22,8 @@
 
 #if !defined(HAVE_QT_NETWORK)
 #  define FORCE_LINK_GSI_QTNETWORK
+#elif QT_VERSION >= 0x060000
+#  include "../qt6/QtNetwork/gsiQtExternals.h"
 #elif QT_VERSION >= 0x050000
 #  include "../qt5/QtNetwork/gsiQtExternals.h"
 #else

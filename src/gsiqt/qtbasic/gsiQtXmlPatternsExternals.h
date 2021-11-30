@@ -22,6 +22,9 @@
 
 #if !defined(HAVE_QT_XML)
 #  define FORCE_LINK_GSI_QTXMLPATTERNS
+#elif QT_VERSION >= 0x060000
+//  Not present in Qt6
+#  define FORCE_LINK_GSI_QTXMLPATTERNS
 #elif QT_VERSION >= 0x050000
 #  include "../qt5/QtXmlPatterns/gsiQtExternals.h"
 #else

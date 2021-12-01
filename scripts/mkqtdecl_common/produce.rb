@@ -954,6 +954,7 @@ class Configurator
     @dropped_methods = {}
     @dropped_classes = {}
     @dropped_enums = {}
+    @included_enums = {}
     @renamed_methods = {}
     @kept_args = {}
     @owner_args = {}
@@ -1272,6 +1273,16 @@ class Configurator
         gsub(/&/, "_amp_").
         gsub(/\|/, "_pipe_").
         gsub(/\s+/, "")
+  end
+
+  def include_enum(cls, sig)
+    @included_enums[cls] ||= []
+    @included_enums[cls] << sig
+  end
+
+  def is_enum_included?(cls, sig)
+    dm = (@included_enums[:all_classes] || []) + (@included_enums[cls] || [])
+    dm.find { |d| sig =~ d } != nil
   end
 
   def drop_enum(cls, sig)
@@ -1847,7 +1858,7 @@ END
     mmap = {}
     struct.collect_methods(methods_by_name)
     struct.collect_all_methods(all_methods_by_name, conf)
-    struct.collect_enum_decls(enum_decls_by_name) { |bd| self.is_enum_used?(bd) }
+    struct.collect_enum_decls(enum_decls_by_name) { |bd| self.is_enum_used?(bd) || conf.is_enum_included?(cls, bd.myself) }
 
     # if one method is abstract, omit ctors for example
     is_abstract = all_methods_by_name.values.find do |m|

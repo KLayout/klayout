@@ -1542,16 +1542,16 @@ public:
   /**
    *  @brief Sets the variant's value
    */
-  virtual void set (const tl::Variant &v) = 0;
+  virtual void set (const tl::Variant &v, tl::Heap & /*heap*/) = 0;
 
   /**
    *  @brief Implementation of copy_to
    */
-  virtual void copy_to (AdaptorBase *target, tl::Heap & /*heap*/) const
+  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
   {
     VariantAdaptor *v = dynamic_cast<VariantAdaptor *>(target);
     tl_assert (v);
-    v->set (var ());
+    v->set (var (), heap);
   }
 };
 
@@ -1613,7 +1613,7 @@ public:
     return *mp_v;
   }
 
-  virtual void set (const tl::Variant &v) 
+  virtual void set (const tl::Variant &v, tl::Heap & /*heap*/)
   {
     if (! m_is_const) {
       *mp_v = v.to_qvariant ();
@@ -1634,6 +1634,89 @@ private:
   QVariant *mp_v;
   bool m_is_const;
   QVariant m_v;
+};
+
+/**
+ *  @brief Specialization for QVariant
+ */
+template <typename T>
+class GSI_PUBLIC VariantAdaptorImpl<QPointer<T> >
+  : public VariantAdaptor
+{
+public:
+  VariantAdaptorImpl (QPointer<T> *v)
+    : mp_v (v), m_is_const (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  VariantAdaptorImpl (const QPointer<T> *v)
+    : mp_v (const_cast<QPointer<T> *> (v)), m_is_const (true)
+  {
+    //  .. nothing yet ..
+  }
+
+  VariantAdaptorImpl (const QPointer<T> &v)
+    : m_is_const (true), m_v (v)
+  {
+    mp_v = &m_v;
+  }
+
+  VariantAdaptorImpl ()
+    : m_is_const (false)
+  {
+    mp_v = &m_v;
+  }
+
+  virtual ~VariantAdaptorImpl ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual tl::Variant var () const
+  {
+    return tl::Variant::make_variant_ref (mp_v->get ());
+  }
+
+  virtual void set (const tl::Variant &v, tl::Heap & /*heap*/)
+  {
+    if (m_is_const) {
+      //  .. can't change
+    } else if (v.is_nil ()) {
+      mp_v->clear ();
+    } else if (v.is_user<T> ()) {
+      if (v.user_is_ref ()) {
+        *mp_v = (T *) v.to_user ();
+      } else {
+        //  basically should not happen as the QPointer cannot hold anything other than a reference
+        //  (a tl::Variant terminology)
+        tl_assert (false);
+      }
+    } else {
+      //  basically should not happen as the QPointer cannot hold anything other than a user object
+      //  (a tl::Variant terminology)
+      tl_assert (false);
+    }
+  }
+
+  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
+  {
+    VariantAdaptorImpl<QPointer<T>> *v = dynamic_cast<VariantAdaptorImpl<QPointer<T>> *>(target);
+    if (v) {
+      if (mp_v->isNull ()) {
+        v->mp_v->clear ();
+      } else {
+        *v->mp_v = QPointer<T> (*mp_v);
+      }
+    } else {
+      VariantAdaptor::copy_to (target, heap);
+    }
+  }
+
+private:
+  QPointer<T> *mp_v;
+  bool m_is_const;
+  QPointer<T> m_v;
 };
 
 #endif
@@ -1690,7 +1773,7 @@ public:
     return *mp_v;
   }
 
-  virtual void set (const tl::Variant &v)
+  virtual void set (const tl::Variant &v, tl::Heap & /*heap*/)
   {
     if (! m_is_const) {
       *mp_v = v;
@@ -1711,6 +1794,81 @@ private:
   tl::Variant *mp_v;
   bool m_is_const;
   tl::Variant m_v;
+};
+
+/**
+ *  @brief Specialization for std::optional
+ */
+template <typename T>
+class GSI_PUBLIC VariantAdaptorImpl<std::optional<T> >
+  : public VariantAdaptor
+{
+public:
+  VariantAdaptorImpl (std::optional<T> *v)
+    : mp_v (v), m_is_const (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  VariantAdaptorImpl (const std::optional<T> *v)
+    : mp_v (const_cast<std::optional<T> *> (v)), m_is_const (true)
+  {
+    //  .. nothing yet ..
+  }
+
+  VariantAdaptorImpl (const std::optional<T> &v)
+    : m_is_const (true), m_v (v)
+  {
+    mp_v = &m_v;
+  }
+
+  VariantAdaptorImpl ()
+    : m_is_const (false)
+  {
+    mp_v = &m_v;
+  }
+
+  virtual ~VariantAdaptorImpl ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual tl::Variant var () const
+  {
+    return tl::Variant (mp_v->value ());
+  }
+
+  virtual void set (const tl::Variant &v, tl::Heap & /*heap*/)
+  {
+    if (m_is_const) {
+      //  .. can't change
+    } else if (v.is_nil ()) {
+      mp_v->reset ();
+    } else if (v.is_user<T> ()) {
+      *mp_v = v.to_user<T> ();
+    } else {
+      *mp_v = v.to<T> ();
+    }
+  }
+
+  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
+  {
+    VariantAdaptorImpl<std::optional<T>> *v = dynamic_cast<VariantAdaptorImpl<std::optional<T>> *>(target);
+    if (v) {
+      if (*mp_v) {
+        v->mp_v->reset ();
+      } else {
+        *v->mp_v = mp_v->value ();
+      }
+    } else {
+      VariantAdaptor::copy_to (target, heap);
+    }
+  }
+
+private:
+  std::optional<T> *mp_v;
+  bool m_is_const;
+  std::optional<T> m_v;
 };
 
 // ------------------------------------------------------------

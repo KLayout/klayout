@@ -333,8 +333,11 @@ struct trans_defs
       "\n"
       "This method has been added in version 0.23.\n"
     ) +
-    method ("to_s", (std::string (C::*) () const) &C::to_string,
+    method ("to_s", &C::to_string, gsi::arg ("dbu", 0.0),
       "@brief String conversion\n"
+      "If a DBU is given, the output units will be micrometers.\n"
+      "\n"
+      "The DBU argument has been added in version 0.27.6.\n"
     ) +
     method ("disp", (const vector_type &(C::*) () const) &C::disp,
       "@brief Gets to the displacement vector\n"
@@ -853,8 +856,12 @@ struct cplx_trans_defs
       "\n"
       "This method has been added in version 0.23.\n"
     ) +
-    method ("to_s", (std::string (C::*) () const) &C::to_string,
+    method ("to_s", &C::to_string, gsi::arg ("lazy", false), gsi::arg ("dbu", 0.0),
       "@brief String conversion\n"
+      "If 'lazy' is true, some parts are omitted when not required.\n"
+      "If a DBU is given, the output units will be micrometers.\n"
+      "\n"
+      "The lazy and DBU arguments have been added in version 0.27.6.\n"
     ) +
     method ("disp", (displacement_type (C::*)() const) &C::disp,
       "@brief Gets the displacement\n"

@@ -97,7 +97,7 @@ grammar CPP
   rule id
     "operator" s "," /
     "operator" s ( bin_op / unary_op / "," ) /
-    "operator" sp [a-zA-Z\*\& \t\n\r]+ &( s "(" ) /
+    "operator" sp [a-zA-Z_0-9\*\& \t\n\r]+ &( s "(" ) /
     "~"? [a-zA-Z_] [a-zA-Z_0-9]*
   end
 

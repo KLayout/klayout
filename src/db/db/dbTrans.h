@@ -1472,10 +1472,10 @@ public:
   /**
    *  @brief String conversion
    */
-  std::string to_string () const
+  std::string to_string (double dbu = 0.0) const
   {
     std::string s1 = fixpoint_trans<C>::to_string ();
-    std::string s2 = m_u.to_string ();
+    std::string s2 = m_u.to_string (dbu);
     if (! s1.empty () && ! s2.empty ()) {
       return s1 + " " + s2;
     } else {
@@ -2243,21 +2243,13 @@ public:
   }
 
   /**
-   *  @brief Default string conversion
-   */
-  std::string to_string () const
-  {
-    return to_string (false);
-  }
-
-  /**
    *  @brief String conversion
    *
    *  The lazy and micron flags allow customization of the output to some degree.
    *  When lazy is set to true, output that is not required (i.e. magnification when 1)
    *  is dropped. If dbu is set, the coordinates are multiplied with this factor to render micron units.
    */
-  std::string to_string (bool lazy, double dbu = 0.0) const
+  std::string to_string (bool lazy = false, double dbu = 0.0) const
   {
     std::string s;
     if (is_mirror ()) {

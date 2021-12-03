@@ -99,6 +99,7 @@ struct A
   static tl::Variant new_a_by_variant ();
 
 #if defined(HAVE_QT)
+
   /**
    *  @brief Byte sequences: tests access to QByteArray
    */
@@ -108,11 +109,84 @@ struct A
   static std::vector<int> qba_ptr_to_ia (QByteArray *ba)           { return qba_cref_to_ia (*ba); }
   static std::vector<int> qba_to_ia (QByteArray ba)                { return qba_cref_to_ia (ba); }
 
+#if QT_VERSION >= 0x60000
+
+  /**
+   *  @brief Byte sequences: tests access to QByteArrayView
+   */
+  static std::vector<int> qbav_cref_to_ia (const QByteArrayView &ba);
+  static std::vector<int> qbav_ref_to_ia (QByteArrayView &ba)           { return qbav_cref_to_ia (ba); }
+  static std::vector<int> qbav_cptr_to_ia (const QByteArrayView *ba)    { return qbav_cref_to_ia (*ba); }
+  static std::vector<int> qbav_ptr_to_ia (QByteArrayView *ba)           { return qbav_cref_to_ia (*ba); }
+  static std::vector<int> qbav_to_ia (QByteArrayView ba)                { return qbav_cref_to_ia (ba); }
+
+#endif
+
+  /**
+   *  @brief Byte sequences: tests access to QString
+   */
+  static std::vector<int> qs_cref_to_ia (const QString &qs);
+  static std::vector<int> qs_ref_to_ia (QString &qs)                    { return qs_cref_to_ia (qs); }
+  static std::vector<int> qs_cptr_to_ia (const QString *qs)             { return qs_cref_to_ia (*qs); }
+  static std::vector<int> qs_ptr_to_ia (QString *qs)                    { return qs_cref_to_ia (*qs); }
+  static std::vector<int> qs_to_ia (QString qs)                         { return qs_cref_to_ia (qs); }
+
+#if QT_VERSION >= 0x60000
+
+  /**
+   *  @brief Byte sequences: tests access to QStringView
+   */
+  static std::vector<int> qsv_cref_to_ia (const QStringView &qs);
+  static std::vector<int> qsv_ref_to_ia (QStringView &qs)               { return qsv_cref_to_ia (qs); }
+  static std::vector<int> qsv_cptr_to_ia (const QStringView *qs)        { return qsv_cref_to_ia (*qs); }
+  static std::vector<int> qsv_ptr_to_ia (QStringView *qs)               { return qsv_cref_to_ia (*qs); }
+  static std::vector<int> qsv_to_ia (QStringView qs)                    { return qsv_cref_to_ia (qs); }
+
+#endif
+
   /**
    *  @brief Byte sequences: tests return of QByteArray
    */
   static QByteArray ia_cref_to_qba (const std::vector<int> &ia);
-  static const QByteArray &ia_cref_to_qba_cref (const std::vector<int> &ia);
+  static QByteArray &ia_cref_to_qba_ref (const std::vector<int> &ia);
+  static const QByteArray &ia_cref_to_qba_cref (const std::vector<int> &ia)         { return ia_cref_to_qba_ref (ia); }
+  static const QByteArray *ia_cref_to_qba_cptr (const std::vector<int> &ia)         { return &ia_cref_to_qba_ref (ia); }
+  static QByteArray *ia_cref_to_qba_ptr (const std::vector<int> &ia)                { return &ia_cref_to_qba_ref (ia); }
+
+#if QT_VERSION >= 0x60000
+
+  /**
+   *  @brief Byte sequences: tests return of QByteArrayView (uses a static buffer)
+   */
+  static QByteArrayView ia_cref_to_qbav (const std::vector<int> &ia);
+  static QByteArrayView &ia_cref_to_qbav_ref (const std::vector<int> &ia);
+  static const QByteArrayView &ia_cref_to_qbav_cref (const std::vector<int> &ia)   { return ia_cref_to_qbav_ref (ia); }
+  static const QByteArrayView *ia_cref_to_qbav_cptr (const std::vector<int> &ia)   { return &ia_cref_to_qbav_ref (ia); }
+  static QByteArrayView *ia_cref_to_qbav_ptr (const std::vector<int> &ia)          { return &ia_cref_to_qbav_ref (ia); }
+
+#endif
+
+  /**
+   *  @brief Byte sequences: tests return of QString
+   */
+  static QString ia_cref_to_qs (const std::vector<int> &ia);
+  static QString &ia_cref_to_qs_ref (const std::vector<int> &ia);
+  static const QString &ia_cref_to_qs_cref (const std::vector<int> &ia)           { return ia_cref_to_qs_ref (ia); }
+  static const QString *ia_cref_to_qs_cptr (const std::vector<int> &ia)           { return &ia_cref_to_qs_ref (ia); }
+  static QString *ia_cref_to_qs_ptr (const std::vector<int> &ia)                  { return &ia_cref_to_qs_ref (ia); }
+
+#if QT_VERSION >= 0x60000
+
+  /**
+   *  @brief Byte sequences: tests return of QStringView (uses a static buffer)
+   */
+  static QStringView ia_cref_to_qsv (const std::vector<int> &ia);
+  static QStringView &ia_cref_to_qsv_ref (const std::vector<int> &ia);
+  static const QStringView &ia_cref_to_qsv_cref (const std::vector<int> &ia)     { return ia_cref_to_qsv_ref (ia); }
+  static const QStringView *ia_cref_to_qsv_cptr (const std::vector<int> &ia)     { return &ia_cref_to_qsv_ref (ia); }
+  static QStringView *ia_cref_to_qsv_ptr (const std::vector<int> &ia)            { return &ia_cref_to_qsv_ref (ia); }
+
+#endif
 
 #endif
 
@@ -207,11 +281,13 @@ struct A
 
   std::string a10_d (double f) { return tl::to_string (f); }
   std::vector<char> a10_d_ba (double f) { std::string s = tl::to_string (f); return std::vector<char> (s.begin (), s.end ()); }
+
 #if defined(HAVE_QT)
   QByteArray a10_d_qba (double f) { return tl::to_qstring (tl::to_string (f)).toUtf8 (); }
   QString a10_d_qstr (double f) { return tl::to_qstring (tl::to_string (f)); }
   QStringRef a10_d_qstrref (double f) { m_s = tl::to_qstring (tl::to_string (f)); return QStringRef (&m_s); }
 #endif
+
   std::string a10_f (float f) { return tl::to_string(f); }
   std::string a10_s (short l) { return tl::to_string(int (l)); }
   std::string a10_us (unsigned short l) { return tl::to_string(int (l)); }

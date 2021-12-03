@@ -2807,16 +2807,22 @@ class Basic_TestClass < TestBase
 
     # binary strings
 
-    qba = RBA::A::ia_cref_to_qba([ 17, 42, 0, 8 ])
-    assert_equal(qba.inspect, "\"\\x11*\\x00\\b\"")
     assert_equal(RBA::A::qba_to_ia(qba), [ 17, 42, 0, 8 ])
     assert_equal(RBA::A::qba_cref_to_ia(qba), [ 17, 42, 0, 8 ])
     assert_equal(RBA::A::qba_cptr_to_ia(qba), [ 17, 42, 0, 8 ])
     assert_equal(RBA::A::qba_ref_to_ia(qba), [ 17, 42, 0, 8 ])
     assert_equal(RBA::A::qba_ptr_to_ia(qba), [ 17, 42, 0, 8 ])
 
+    qba = RBA::A::ia_cref_to_qba([ 16, 42, 0, 8 ])
+    assert_equal(qba.inspect, "\"\\x10*\\x00\\b\"")
     qba = RBA::A::ia_cref_to_qba_cref([ 17, 42, 0, 8 ])
     assert_equal(qba.inspect, "\"\\x11*\\x00\\b\"")
+    qba = RBA::A::ia_cref_to_qba_ref([ 18, 42, 0, 8 ])
+    assert_equal(qba.inspect, "\"\\x12*\\x00\\b\"")
+    qba = RBA::A::ia_cref_to_qba_cptr([ 19, 42, 0, 8 ])
+    assert_equal(qba.inspect, "\"\\x13*\\x00\\b\"")
+    qba = RBA::A::ia_cref_to_qba_ptr([ 20, 42, 0, 8 ])
+    assert_equal(qba.inspect, "\"\\x14*\\x00\\b\"")
 
     assert_equal(RBA::A::qba_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
 

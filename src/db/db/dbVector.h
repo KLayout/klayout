@@ -328,21 +328,13 @@ public:
   double sq_double_length () const;
 
   /**
-   *  @brief Default conversion to string
-   */
-  std::string to_string () const
-  {
-    return to_string (0.0);
-  }
-
-  /**
    *  @brief String conversion
    *
    *  If dbu is set, it determines the factor by which the coordinates are multiplied to render
    *  micron units. In addition, a micron format is chosen for output of these coordinates.
    */
   std::string
-  to_string (double dbu) const 
+  to_string (double dbu = 0.0) const
   {
     if (dbu == 1.0) {
       return tl::db_to_string (m_x) + "," + tl::db_to_string (m_y);

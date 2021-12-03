@@ -230,7 +230,7 @@ template <class X> struct _create<X, true> { static void *call () { return new X
 
 template <class X, bool> struct _clone;
 template <class X> struct _clone<X, false> { static void *call (const void *) { throw tl::Exception (tl::to_string (tr ("Object cannot be copied here"))); } };
-template <class X> struct _clone<X, true> { static void *call (const void *other) { new X (*(const X *)other); } };
+template <class X> struct _clone<X, true> { static void *call (const void *other) { return new X (*(const X *)other); } };
 
 template <class X, bool> struct _assign;
 template <class X> struct _assign<X, false> { static void call (void *, const void *) { throw tl::Exception (tl::to_string (tr ("Object cannot be copied here"))); } };

@@ -170,6 +170,25 @@ static void _call_f_isTransparent_c0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
+// QRgba64 &QRgba64::operator=(quint64 _rgba)
+
+
+static void _init_f_operator_eq__1103 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("_rgba");
+  decl->add_arg<quint64 > (argspec_0);
+  decl->set_return<QRgba64 & > ();
+}
+
+static void _call_f_operator_eq__1103 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  quint64 arg1 = gsi::arg_reader<quint64 >() (args, heap);
+  ret.write<QRgba64 & > ((QRgba64 &)((QRgba64 *)cls)->operator= (arg1));
+}
+
+
 // QRgba64 QRgba64::premultiplied()
 
 
@@ -387,6 +406,25 @@ static void _call_f_fromRgba_3888 (const qt_gsi::GenericStaticMethod * /*decl*/,
 }
 
 
+// static QRgba64 QRgba64::fromRgba64(quint64 c)
+
+
+static void _init_f_fromRgba64_1103 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("c");
+  decl->add_arg<quint64 > (argspec_0);
+  decl->set_return<QRgba64 > ();
+}
+
+static void _call_f_fromRgba64_1103 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  quint64 arg1 = gsi::arg_reader<quint64 >() (args, heap);
+  ret.write<QRgba64 > ((QRgba64)QRgba64::fromRgba64 (arg1));
+}
+
+
 // static QRgba64 QRgba64::fromRgba64(quint16 red, quint16 green, quint16 blue, quint16 alpha)
 
 
@@ -430,6 +468,7 @@ static gsi::Methods methods_QRgba64 () {
   methods += new qt_gsi::GenericMethod ("green8", "@brief Method quint8 QRgba64::green8()\n", true, &_init_f_green8_c0, &_call_f_green8_c0);
   methods += new qt_gsi::GenericMethod ("isOpaque?", "@brief Method bool QRgba64::isOpaque()\n", true, &_init_f_isOpaque_c0, &_call_f_isOpaque_c0);
   methods += new qt_gsi::GenericMethod ("isTransparent?", "@brief Method bool QRgba64::isTransparent()\n", true, &_init_f_isTransparent_c0, &_call_f_isTransparent_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QRgba64 &QRgba64::operator=(quint64 _rgba)\n", false, &_init_f_operator_eq__1103, &_call_f_operator_eq__1103);
   methods += new qt_gsi::GenericMethod ("premultiplied", "@brief Method QRgba64 QRgba64::premultiplied()\n", true, &_init_f_premultiplied_c0, &_call_f_premultiplied_c0);
   methods += new qt_gsi::GenericMethod ("red", "@brief Method quint16 QRgba64::red()\n", true, &_init_f_red_c0, &_call_f_red_c0);
   methods += new qt_gsi::GenericMethod ("red8", "@brief Method quint8 QRgba64::red8()\n", true, &_init_f_red8_c0, &_call_f_red8_c0);
@@ -442,6 +481,7 @@ static gsi::Methods methods_QRgba64 () {
   methods += new qt_gsi::GenericMethod ("unpremultiplied", "@brief Method QRgba64 QRgba64::unpremultiplied()\n", true, &_init_f_unpremultiplied_c0, &_call_f_unpremultiplied_c0);
   methods += new qt_gsi::GenericStaticMethod ("fromArgb32", "@brief Static method QRgba64 QRgba64::fromArgb32(unsigned int rgb)\nThis method is static and can be called without an instance.", &_init_f_fromArgb32_1772, &_call_f_fromArgb32_1772);
   methods += new qt_gsi::GenericStaticMethod ("fromRgba", "@brief Static method QRgba64 QRgba64::fromRgba(quint8 red, quint8 green, quint8 blue, quint8 alpha)\nThis method is static and can be called without an instance.", &_init_f_fromRgba_3888, &_call_f_fromRgba_3888);
+  methods += new qt_gsi::GenericStaticMethod ("fromRgba64", "@brief Static method QRgba64 QRgba64::fromRgba64(quint64 c)\nThis method is static and can be called without an instance.", &_init_f_fromRgba64_1103, &_call_f_fromRgba64_1103);
   methods += new qt_gsi::GenericStaticMethod ("fromRgba64", "@brief Static method QRgba64 QRgba64::fromRgba64(quint16 red, quint16 green, quint16 blue, quint16 alpha)\nThis method is static and can be called without an instance.", &_init_f_fromRgba64_4076, &_call_f_fromRgba64_4076);
   return methods;
 }

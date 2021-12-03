@@ -34,18 +34,6 @@
 # define QT_EXTERNAL_BASE(x)
 #endif
 
-namespace tl
-{
-
-//  type traits for HelpDialog
-template <> 
-struct type_traits<lay::HelpDialog> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-  typedef tl::false_tag has_copy_constructor;
-};
-
-}
-
 namespace gsi
 {
 

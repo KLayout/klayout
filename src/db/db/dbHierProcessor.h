@@ -532,18 +532,5 @@ private:
 
 }
 
-namespace tl
-{
-
-template <class TS, class TI, class TR>
-struct type_traits<db::local_processor<TS, TI, TR> > : public tl::type_traits<void>
-{
-  //  mark "LocalProcessor" as not having a default ctor and no copy ctor
-  typedef tl::false_tag has_default_constructor;
-  typedef tl::false_tag has_copy_constructor;
-};
-
-}
-
 #endif
 

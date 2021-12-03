@@ -46,13 +46,6 @@ public:
 
 }
 
-namespace tl
-{
-  template <> struct type_traits<ActionStub> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-  };
-}
-
 namespace gsi
 {
 

@@ -351,15 +351,5 @@ private:
 
 } // namespace db
 
-namespace tl
-{
-  template <>
-  struct type_traits <db::Manager> : public type_traits<void> 
-  {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::true_tag has_default_constructor;
-  };
-}
-
 #endif
 

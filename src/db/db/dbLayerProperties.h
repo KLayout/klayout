@@ -229,27 +229,5 @@ inline LayerProperties &operator+= (LayerProperties &props, const LayerOffset &o
 
 }
 
-//  tl namespace support for db::LayerProperties
-namespace tl
-{
-  template <>
-  struct type_traits <db::LayerProperties> : public type_traits<void> 
-  {
-    typedef true_tag supports_extractor;
-    typedef true_tag supports_to_string;
-    typedef true_tag has_less_operator;
-    typedef true_tag has_equal_operator;
-  };
-
-  template <>
-  struct type_traits <db::LayerOffset> : public type_traits<void> 
-  {
-    typedef true_tag supports_extractor;
-    typedef true_tag supports_to_string;
-    typedef true_tag has_less_operator;
-    typedef true_tag has_equal_operator;
-  };
-}
-
 #endif
 

@@ -183,12 +183,6 @@ private:
   std::string m_description;
 };
 
-template<> struct type_traits<tl::Recipe> : public type_traits<void>
-{
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-};
-
 } // namespace tl
 
 #endif

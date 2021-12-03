@@ -713,15 +713,6 @@ struct from_double_vector
 
 namespace tl 
 {
-  template <class C>
-  struct type_traits <db::vector<C> > : public type_traits<void> 
-  {
-    typedef true_tag supports_extractor;
-    typedef true_tag supports_to_string;
-    typedef true_tag has_less_operator;
-    typedef true_tag has_equal_operator;
-  };
-
   template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Vector &p);
   template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DVector &p);
 

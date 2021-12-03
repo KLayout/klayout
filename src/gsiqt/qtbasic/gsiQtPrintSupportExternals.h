@@ -22,6 +22,8 @@
 
 #if !defined(HAVE_QT_PRINTSUPPORT)
 #  define FORCE_LINK_GSI_QTPRINTSUPPORT
+#elif QT_VERSION >= 0x060000
+#  include "../qt6/QtPrintSupport/gsiQtExternals.h"
 #elif QT_VERSION >= 0x050000
 #  include "../qt5/QtPrintSupport/gsiQtExternals.h"
 #else

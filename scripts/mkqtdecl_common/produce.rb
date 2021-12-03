@@ -73,6 +73,10 @@ class CPPDeclaration
     self.type.func.cv == :const
   end
 
+  def ref
+    self.type.func.ref
+  end
+
   def hash_str
 
     # TODO: this is a hack for making the hash values unique:
@@ -83,6 +87,13 @@ class CPPDeclaration
     nmax = func.max_args
 
     hk = (self.is_const? ? "c" : "")
+    if self.ref
+      if self.ref == "&"
+        hk += "r"
+      elsif self.ref == "&&"
+        hk += "rr"
+      end
+    end
 
     if nmax > 0
 
@@ -111,17 +122,28 @@ class CPPDeclaration
     nmax = func.max_args
     args = nmax.times.collect { |ia| func.args[ia].anonymous_type.to_s }.join(", ")
 
+    res = "(" + args + ")"
     if self.is_const?
-      "(" + args + ") const"
-    else
-      "(" + args + ")"
+      res += " const"
     end
+    if self.ref
+      res += " " + self.ref
+    end
+
+    res
 
   end
 
   def sig(cls)
+    self.type.name_substituted_type(CPPQualifiedId::new(false, [ cls, self.type.func.func_name ])).to_s
+  end
+
+  def raw_sig(cls)
     # backward compatibility for signature computation
     s = self.type.name_substituted_type(CPPQualifiedId::new(false, [ cls, self.type.func.func_name ])).to_s
+    if self.ref
+      s = s.sub(/\s+&+$/, "")
+    end
     if self.is_const?
       s = s.sub(/\s+const$/, "")
     end
@@ -140,6 +162,19 @@ class CPPNamespace
       end
     end
 
+  end
+
+end
+
+class CPPEnum
+
+  def resolve_typedefs(scope)
+  end
+
+  def rescope(prev_scope, other_scope, idpath)
+  end
+
+  def each_qid(&block)
   end
 
 end
@@ -426,7 +461,7 @@ class CPPStruct
         end
 
       elsif bc_obj
-        raise("#{bc.class_id.to_s} is not a base class in #{self.id.to_s}")
+        puts("Warning: #{bc.class_id.to_s} is not a base class in #{self.id.to_s}")
       else
         puts("Cannot find base class: #{bc.class_id.to_s} of #{self.parent.myself} - declaration ignored")
       end
@@ -739,7 +774,13 @@ class CPPType
       return "#{self.anonymous_type.to_s}(" + expr + ")"
     elsif self.is_special(decl_obj)
       ta = self.anonymous_type.to_s
-      if ta =~ /^const (.*) &$/
+      if ta =~ /^const (.*) &&$/
+        ta = $1
+        acc = ".cmove()"
+      elsif ta =~ /^(.*) &&$/
+        ta = $1
+        acc = ".move()"
+      elsif ta =~ /^const (.*) &$/
         ta = $1
         acc = ".cref()"
       elsif ta =~ /^(.*) &$/
@@ -775,6 +816,8 @@ class CPPType
       # Handle references and pointers in returns as copies - we loose the ability to write,
       # but can at least read them.
       if ta =~ /^const (.*) &$/ || ta =~ /^(.*) &$/
+        ta = $1
+      elsif ta =~ /^const (.*) &&$/ || ta =~ /^(.*) &&$/
         ta = $1
       elsif ta =~ /^const (.*) \*$/ || ta =~ /^(.*) \*$/
         ta = $1
@@ -911,6 +954,7 @@ class Configurator
     @dropped_methods = {}
     @dropped_classes = {}
     @dropped_enums = {}
+    @included_enums = {}
     @renamed_methods = {}
     @kept_args = {}
     @owner_args = {}
@@ -1140,6 +1184,7 @@ class Configurator
     # static and non-static methods
     if bd.storage_class == :static
       sig = "static " + sig 
+      sig2 = "static " + sig2
     end
 
     if is_dropped?(cls, sig) || is_dropped?(cls2, sig2)
@@ -1151,6 +1196,11 @@ class Configurator
     
     # replace assignment operator
     if name == "="
+      # drop assignment if the class does not have a copy ctor ("no copy semantics")
+      # (required because otherwise operator= is exposed for adaptor classes)
+      if !has_copy_ctor?(cls)
+        return nil
+      end
       name = "assign"
     end
 
@@ -1223,6 +1273,16 @@ class Configurator
         gsub(/&/, "_amp_").
         gsub(/\|/, "_pipe_").
         gsub(/\s+/, "")
+  end
+
+  def include_enum(cls, sig)
+    @included_enums[cls] ||= []
+    @included_enums[cls] << sig
+  end
+
+  def is_enum_included?(cls, sig)
+    dm = (@included_enums[:all_classes] || []) + (@included_enums[cls] || [])
+    dm.find { |d| sig =~ d } != nil
   end
 
   def drop_enum(cls, sig)
@@ -1559,7 +1619,6 @@ END
 
     ofile.puts("#include \"gsiQt.h\"")
     ofile.puts("#include \"gsi#{modn}Common.h\"")
-    ofile.puts("#include \"gsiDecl#{modn}TypeTraits.h\"")
 
   end
 
@@ -1633,7 +1692,11 @@ END
         next
       end
 
-      edecl << "  gsi::enum_const (\"#{ei_name}\", #{cls}::#{ei}, \"@brief Enum constant #{cls}::#{ei}\")"
+      if ed.enum.is_class
+        edecl << "  gsi::enum_const (\"#{ei_name}\", #{cls}::#{en}::#{ei}, \"@brief Enum constant #{cls}::#{en}::#{ei}\")"
+      else
+        edecl << "  gsi::enum_const (\"#{ei_name}\", #{cls}::#{ei}, \"@brief Enum constant #{cls}::#{ei}\")"
+      end
 
     end
 
@@ -1644,8 +1707,6 @@ END
     ofile.puts("static gsi::QFlagsClass<#{cls}::#{en} > decl_#{clsn}_#{en}_Enums (\"#{modn}\", \"#{clsn}_QFlags_#{en}\",")
     ofile.puts("  \"@qt\\n@brief This class represents the QFlags<#{cls}::#{en}> flag set\");")
     ofile.puts("")
-
-    ofile.puts("//  Inject the declarations into the parent")
 
     # inject the declarations into the parent namespace or class
     pdecl_obj = ed.parent
@@ -1662,7 +1723,12 @@ END
       pname = pcls + "_Namespace"
     end
 
-    ofile.puts("static gsi::ClassExt<#{pname}> inject_#{clsn}_#{en}_Enum_in_parent (decl_#{clsn}_#{en}_Enum.defs ());")
+    if ! ed.enum.is_class
+      ofile.puts("//  Inject the declarations into the parent")
+      ofile.puts("static gsi::ClassExt<#{pname}> inject_#{clsn}_#{en}_Enum_in_parent (decl_#{clsn}_#{en}_Enum.defs ());")
+    end
+
+
     ofile.puts("static gsi::ClassExt<#{pname}> decl_#{clsn}_#{en}_Enum_as_child (decl_#{clsn}_#{en}_Enum, \"#{en}\");")
     ofile.puts("static gsi::ClassExt<#{pname}> decl_#{clsn}_#{en}_Enums_as_child (decl_#{clsn}_#{en}_Enums, \"QFlags_#{en}\");")
 
@@ -1786,13 +1852,13 @@ END
     bc_methods_by_name = {}
     base_classes.each do |bc|
       bc_decl_obj = decl_obj.resolve_qid(bc.class_id)
-      bc_decl_obj && bc_decl_obj.struct.collect_all_methods(bc_methods_by_name, conf)
+      bc_decl_obj && bc_decl_obj.respond_to?(:struct) && bc_decl_obj.struct.collect_all_methods(bc_methods_by_name, conf)
     end
 
     mmap = {}
     struct.collect_methods(methods_by_name)
     struct.collect_all_methods(all_methods_by_name, conf)
-    struct.collect_enum_decls(enum_decls_by_name) { |bd| self.is_enum_used?(bd) }
+    struct.collect_enum_decls(enum_decls_by_name) { |bd| self.is_enum_used?(bd) || conf.is_enum_included?(cls, bd.myself) }
 
     # if one method is abstract, omit ctors for example
     is_abstract = all_methods_by_name.values.find do |m|
@@ -1832,7 +1898,7 @@ END
 
       # create a default ctor if there is no ctor at all and we can have one
       if ctors.empty? && conf.has_default_ctor?(cls)
-        func = CPPFunc::new(CPPQualifiedId::new(false, [ CPPId::new(decl_obj.myself, nil) ]), [], nil)
+        func = CPPFunc::new(CPPQualifiedId::new(false, [ CPPId::new(decl_obj.myself, nil) ]), [], nil, nil)
         type = CPPType::new(nil, func, nil)
         def_ctor = CPPDeclaration::new(type, nil, :public, nil, false, false)
         def_ctor.parent = decl_obj
@@ -1905,6 +1971,7 @@ END
         func = bd.type.func
         hk = bd.hash_str
         sig = bd.sig(cls)
+        rsig = bd.raw_sig(cls)
         mn = decl_obj.myself # ctor!
 
         mn_name = conf.target_name(cls, bd, mn)
@@ -1923,7 +1990,7 @@ END
         qt_alist = n_args.times.collect { |ia| func.args[ia].renamed_type(alist[ia]).access_qt_arg(decl_obj) }
 
         ofile.puts("")
-        ofile.puts("//  Constructor #{sig}")
+        ofile.puts("//  Constructor #{rsig}")
         ofile.puts("")
 
         ofile.puts("")
@@ -1951,7 +2018,7 @@ END
         ofile.puts("}")
         ofile.puts("")
 
-        mdecl_ctors << "new qt_gsi::GenericStaticMethod (\"#{mn_name}\", \"@brief Constructor #{sig}\\nThis method creates an object of class #{cls}.\", &_init_ctor_#{clsn}_#{hk}, &_call_ctor_#{clsn}_#{hk});"
+        mdecl_ctors << "new qt_gsi::GenericStaticMethod (\"#{mn_name}\", \"@brief Constructor #{rsig}\\nThis method creates an object of class #{cls}.\", &_init_ctor_#{clsn}_#{hk}, &_call_ctor_#{clsn}_#{hk});"
 
       end
 
@@ -1978,6 +2045,7 @@ END
         const = bd.is_const?
         hk = bd.hash_str
         sig = bd.sig(cls)
+        rsig = bd.raw_sig(cls)
 
         if conf.event_args(cls, sig) && bd.type.return_type.is_void?
           # don't produce bindings for signals (which are public in Qt5)
@@ -2005,7 +2073,7 @@ END
         qt_alist = n_args.times.collect { |ia| func.args[ia].renamed_type(alist[ia]).access_qt_arg(decl_obj) }
 
         ofile.puts("")
-        ofile.puts("// #{sig}")
+        ofile.puts("// #{rsig}")
         ofile.puts("")
 
         ofile.puts("")
@@ -2030,7 +2098,7 @@ END
         ofile.puts("}")
         ofile.puts("")
 
-        mdecl << "new qt_gsi::GenericMethod (\"#{mn_name}\", \"@brief Method #{sig}\\n" + (is_reimp ? "This is a reimplementation of #{is_reimp.parent.myself}::#{mid}" : "") + "\", #{const.to_s}, &_init_f_#{mn}_#{hk}, &_call_f_#{mn}_#{hk});"
+        mdecl << "new qt_gsi::GenericMethod (\"#{mn_name}\", \"@brief Method #{rsig}\\n" + (is_reimp ? "This is a reimplementation of #{is_reimp.parent.myself}::#{mid}" : "") + "\", #{const.to_s}, &_init_f_#{mn}_#{hk}, &_call_f_#{mn}_#{hk});"
 
       end
 
@@ -2065,6 +2133,7 @@ END
             end
               
             sig = bd_short.sig(cls)
+            rsig = bd_short.raw_sig(cls)
 
             hk = bd_short.hash_str
             n_args = func.max_args
@@ -2078,7 +2147,7 @@ END
             al       = ant.collect { |a| a.to_s }.join(", ")
             aln      = ren_args.collect { |a| a.to_s }.join(", ")
 
-            sig_wo_void = sig.sub(/^void /, "")
+            rsig_wo_void = rsig.sub(/^void /, "")
 
             al_subst = al
             SignalSubstitutions.each do |t,s|
@@ -2087,9 +2156,9 @@ END
 
             argspecs = argnames.collect { |a| "gsi::arg(\"#{a}\"), " }.join("")
             if gsi_args.empty?
-              mdecl << "gsi::qt_signal (\"#{mid}(#{al_subst})\", \"#{mn_name}\", \"@brief Signal declaration for #{sig_wo_void}\\nYou can bind a procedure to this signal.\");"
+              mdecl << "gsi::qt_signal (\"#{mid}(#{al_subst})\", \"#{mn_name}\", \"@brief Signal declaration for #{rsig_wo_void}\\nYou can bind a procedure to this signal.\");"
             else
-              mdecl << "gsi::qt_signal<#{event_al} > (\"#{mid}(#{al_subst})\", \"#{mn_name}\", #{argspecs}\"@brief Signal declaration for #{sig_wo_void}\\nYou can bind a procedure to this signal.\");"
+              mdecl << "gsi::qt_signal<#{event_al} > (\"#{mid}(#{al_subst})\", \"#{mn_name}\", #{argspecs}\"@brief Signal declaration for #{rsig_wo_void}\\nYou can bind a procedure to this signal.\");"
             end
 
           end
@@ -2114,6 +2183,7 @@ END
         const = bd.is_const?
         hk = bd.hash_str
         sig = bd.sig(cls)
+        rsig = bd.raw_sig(cls)
 
         mn = conf.mid2str(mid)
         mn_name = conf.target_name(cls, bd, mid, all_methods_by_name, bd)
@@ -2132,7 +2202,7 @@ END
         qt_alist = n_args.times.collect { |ia| func.args[ia].renamed_type(alist[ia]).access_qt_arg(decl_obj) }
 
         ofile.puts("")
-        ofile.puts("// static #{sig}")
+        ofile.puts("// static #{rsig}")
         ofile.puts("")
 
         ofile.puts("")
@@ -2156,7 +2226,7 @@ END
         ofile.puts("}")
         ofile.puts("")
 
-        mdecl << "new qt_gsi::GenericStaticMethod (\"#{mn_name}\", \"@brief Static method #{sig}\\nThis method is static and can be called without an instance.\", &_init_f_#{mn}_#{hk}, &_call_f_#{mn}_#{hk});"
+        mdecl << "new qt_gsi::GenericStaticMethod (\"#{mn_name}\", \"@brief Static method #{rsig}\\nThis method is static and can be called without an instance.\", &_init_f_#{mn}_#{hk}, &_call_f_#{mn}_#{hk});"
 
       end
 
@@ -2173,6 +2243,7 @@ END
       const = bd.is_const?
       hk = bd.hash_str
       sig = bd.sig("")
+      rsig = bd.raw_sig("")
 
       # operators may be present twice with the same signature
       # (here: same hash key)
@@ -2206,7 +2277,7 @@ END
       args     = rnt.collect { |t| t.gsi_decl_arg(decl_obj) }.join(", ")
 
       ofile.puts("")
-      ofile.puts("//  #{sig}")
+      ofile.puts("//  #{rsig}")
       ofile.puts("static #{rt.gsi_decl_return(decl_obj)} op_#{clsn}_#{mn}_#{hk}(#{args}) {")
 
       if !rt.is_void?
@@ -2219,7 +2290,7 @@ END
 
       argspecs = argnames[1..-1].collect { |a| "gsi::arg (\"#{a}\"), " }.join("")
 
-      mdecl << "gsi::method_ext(\"#{mn_name}\", &::op_#{clsn}_#{mn}_#{hk}, #{argspecs}\"@brief Operator #{sig}\\nThis is the mapping of the global operator to the instance method.\");"
+      mdecl << "gsi::method_ext(\"#{mn_name}\", &::op_#{clsn}_#{mn}_#{hk}, #{argspecs}\"@brief Operator #{rsig}\\nThis is the mapping of the global operator to the instance method.\");"
 
     end
 
@@ -2335,20 +2406,6 @@ END
       # forward decl
       @ext_decls << "#{struct.kind.to_s} #{cls};\n\n"
 
-      # type traits included ...
-      tt = "namespace tl { template <> struct type_traits<#{cls}> : public type_traits<void> {\n"
-      if !conf.has_copy_ctor?(cls) || is_abstract || (eq_op && eq_op.visibility == :private)
-        tt += "  typedef tl::false_tag has_copy_constructor;\n"
-      end
-      if !conf.has_default_ctor?(cls) || is_abstract
-        tt += "  typedef tl::false_tag has_default_constructor;\n"
-      end
-      if (dtor = struct.get_dtor) && dtor.visibility != :public
-        tt += "  typedef tl::false_tag has_public_destructor;\n"
-      end
-      tt += "}; }\n\n"
-      @ext_decls << tt
-
       # only for top-level classes external declarations are produced currently
       @ext_decls << "namespace gsi { GSI_#{modn.upcase}_PUBLIC gsi::Class<#{cls}> &qtdecl_#{clsn} (); }\n\n"
 
@@ -2383,6 +2440,7 @@ END
         func = bd.type.func
         hk = bd.hash_str
         sig = bd.sig(cls)
+        rsig = bd.raw_sig(cls)
         mn = decl_obj.myself # ctor!
 
         mn_name = conf.target_name(cls, bd, mn)
@@ -2406,7 +2464,7 @@ END
           args = rnt.collect { |t| t.to_s }.join(", ")
 
           ofile.puts("")
-          ofile.puts("  //  [adaptor ctor] #{sig}")
+          ofile.puts("  //  [adaptor ctor] #{rsig}")
           ofile.puts("  #{clsn}_Adaptor(#{args}) : #{cls}(#{argnames.join(', ')})")
           ofile.puts("  {")
           ofile.puts("    qt_gsi::QtObjectBase::init (this);")
@@ -2430,6 +2488,7 @@ END
           func = bd.type.func
           hk = bd.hash_str
           sig = bd.sig(cls)
+          rsig = bd.raw_sig(cls)
           const = bd.is_const?
 
           # exclude events
@@ -2453,7 +2512,7 @@ END
           argexpr  = rnt.collect { |t| t.access_qt_arg(decl_obj) }.join(", ")
 
           ofile.puts("")
-          ofile.puts("  //  [expose] #{sig}")
+          ofile.puts("  //  [expose] #{rsig}")
           ofile.puts("  " + (bd.storage_class == :static ? "static " : "") + "#{rt.gsi_decl_return(decl_obj)} fp_#{clsn}_#{mn}_#{hk} (#{args}) " + (const ? "const " : "") + "{")
           if rt.is_void?
             ofile.puts("    #{cls}::#{mid}(#{argexpr});")
@@ -2481,6 +2540,7 @@ END
             func = bd.type.func
             hk = bd.hash_str
             sig = bd.sig(cls)
+            rsig = bd.raw_sig(cls)
             const = bd.is_const?
             rt = bd.type.return_type
 
@@ -2504,6 +2564,7 @@ END
               end
 
               sig = bd_short.sig(cls)
+              rsig = bd_short.raw_sig(cls)
 
               # for events produce an emitter function
 
@@ -2517,7 +2578,7 @@ END
               call_args = argnames.join(", ")
 
               ofile.puts("")
-              ofile.puts("  //  [emitter impl] #{sig}")
+              ofile.puts("  //  [emitter impl] #{rsig}")
               ofile.puts("  #{rt.to_s} emitter_#{clsn}_#{mn}_#{hk}(#{raw_args})")
               ofile.puts("  {")
               if is_private
@@ -2560,7 +2621,7 @@ END
               call_args = argnames.join(", ")
 
               ofile.puts("")
-              ofile.puts("  //  [adaptor impl] #{sig}")
+              ofile.puts("  //  [adaptor impl] #{rsig}")
               ofile.puts("  #{rt.gsi_decl_return(decl_obj)} cbs_#{mn}_#{hk}_#{i_var}(#{args})" + (const ? " const" : ""))
               ofile.puts("  {")
               if abstract
@@ -2625,6 +2686,7 @@ END
         func = bd.type.func
         hk = bd.hash_str
         sig = bd.sig(cls)
+        rsig = bd.raw_sig(cls)
         mn = decl_obj.myself # ctor!
 
         mn_name = conf.target_name(cls, bd, mn)
@@ -2642,7 +2704,7 @@ END
         qt_alist = n_args.times.collect { |ia| func.args[ia].renamed_type(alist[ia]).access_qt_arg(decl_obj) }
 
         ofile.puts("")
-        ofile.puts("//  Constructor #{sig} (adaptor class)")
+        ofile.puts("//  Constructor #{rsig} (adaptor class)")
         ofile.puts("")
         ofile.puts("static void _init_ctor_#{clsn}_Adaptor_#{hk} (qt_gsi::GenericStaticMethod *decl)")
         ofile.puts("{")
@@ -2664,7 +2726,7 @@ END
         ofile.puts("}")
         ofile.puts("")
 
-        mdecl << "new qt_gsi::GenericStaticMethod (\"#{mn_name}\", \"@brief Constructor #{sig}\\nThis method creates an object of class #{cls}.\", &_init_ctor_#{clsn}_Adaptor_#{hk}, &_call_ctor_#{clsn}_Adaptor_#{hk});"
+        mdecl << "new qt_gsi::GenericStaticMethod (\"#{mn_name}\", \"@brief Constructor #{rsig}\\nThis method creates an object of class #{cls}.\", &_init_ctor_#{clsn}_Adaptor_#{hk}, &_call_ctor_#{clsn}_Adaptor_#{hk});"
 
       end
 
@@ -2677,6 +2739,7 @@ END
           func = bd.type.func
           hk = bd.hash_str
           sig = bd.sig(cls)
+          rsig = bd.raw_sig(cls)
           const = bd.is_const?
           rt = bd.type.return_type
 
@@ -2698,6 +2761,7 @@ END
             end
 
             sig = bd_short.sig(cls)
+            rsig = bd_short.raw_sig(cls)
 
             n_args = func.max_args
             n_min_args = func.min_args
@@ -2707,7 +2771,7 @@ END
             ifc_obj = "GenericMethod"
 
             ofile.puts("")
-            ofile.puts("// emitter #{sig}")
+            ofile.puts("// emitter #{rsig}")
             ofile.puts("")
             ofile.puts("static void _init_emitter_#{mn}_#{hk} (qt_gsi::#{ifc_obj} *decl)")
             ofile.puts("{")
@@ -2728,7 +2792,7 @@ END
             if bd_short.storage_class != :static
               const_flag = ", " + const.to_s
             end
-            mdecl << "new qt_gsi::#{ifc_obj} (\"emit_#{mn_name}\", \"@brief Emitter for signal #{sig}\\nCall this method to emit this signal.\"#{const_flag}, &_init_emitter_#{mn}_#{hk}, &_call_emitter_#{mn}_#{hk});"
+            mdecl << "new qt_gsi::#{ifc_obj} (\"emit_#{mn_name}\", \"@brief Emitter for signal #{rsig}\\nCall this method to emit this signal.\"#{const_flag}, &_init_emitter_#{mn}_#{hk}, &_call_emitter_#{mn}_#{hk});"
 
           elsif !bd.virtual && bd.visibility == :protected
 
@@ -2742,7 +2806,7 @@ END
             ifc_obj = bd.storage_class == :static ? "GenericStaticMethod" : "GenericMethod"
 
             ofile.puts("")
-            ofile.puts("// exposed #{sig}")
+            ofile.puts("// exposed #{rsig}")
             ofile.puts("")
             ofile.puts("static void _init_fp_#{mn}_#{hk} (qt_gsi::#{ifc_obj} *decl)")
             ofile.puts("{")
@@ -2781,7 +2845,7 @@ END
             if bd.storage_class != :static
               const_flag = ", " + const.to_s
             end
-            mdecl << "new qt_gsi::#{ifc_obj} (\"*#{mn_name}\", \"@brief Method #{sig}\\nThis method is protected and can only be called from inside a derived class.\"#{const_flag}, &_init_fp_#{mn}_#{hk}, &_call_fp_#{mn}_#{hk});"
+            mdecl << "new qt_gsi::#{ifc_obj} (\"*#{mn_name}\", \"@brief Method #{rsig}\\nThis method is protected and can only be called from inside a derived class.\"#{const_flag}, &_init_fp_#{mn}_#{hk}, &_call_fp_#{mn}_#{hk});"
 
           elsif bd.virtual
 
@@ -2798,7 +2862,7 @@ END
             alist    = n_args.times.collect { |ia| "arg#{ia + 1}" }
 
             ofile.puts("")
-            ofile.puts("// #{sig}")
+            ofile.puts("// #{rsig}")
             ofile.puts("")
             ofile.puts("static void _init_cbs_#{mn}_#{hk}_#{i_var} (qt_gsi::GenericMethod *decl)")
             ofile.puts("{")
@@ -2834,7 +2898,7 @@ END
             ofile.puts("}")
             ofile.puts("")
 
-            mdecl << "new qt_gsi::GenericMethod (\"#{pp}#{mn_name}\", \"@brief Virtual method #{sig}\\nThis method can be reimplemented in a derived class.\", #{const.to_s}, &_init_cbs_#{mn}_#{hk}_#{i_var}, &_call_cbs_#{mn}_#{hk}_#{i_var});"
+            mdecl << "new qt_gsi::GenericMethod (\"#{pp}#{mn_name}\", \"@brief Virtual method #{rsig}\\nThis method can be reimplemented in a derived class.\", #{const.to_s}, &_init_cbs_#{mn}_#{hk}_#{i_var}, &_call_cbs_#{mn}_#{hk}_#{i_var});"
             mdecl << "new qt_gsi::GenericMethod (\"#{pp}#{mn_name}\", \"@hide\", #{const.to_s}, &_init_cbs_#{mn}_#{hk}_#{i_var}, &_call_cbs_#{mn}_#{hk}_#{i_var}, &_set_callback_cbs_#{mn}_#{hk}_#{i_var});"
 
           end
@@ -2897,152 +2961,6 @@ END
 
     # don't continue
     return false
-
-  end
-
-  def produce_ttfile_traits(ttfile, conf, decl_obj)
-
-    (cls, clsn) = make_cls_names(decl_obj)
-
-    struct = decl_obj.struct
-
-    mm = {}
-    struct.collect_all_methods(mm, conf)
-
-    # if one method is abstract, omit ctors for example
-    is_abstract = mm.values.find do |m|
-      m.find { |bd| bd.virtual && bd.type.init == "0" } != nil
-    end
-
-    eq_op = (mm["operator="] || [])[0]
-
-    # Note: right now, there is no way to specify type traits globally for nested
-    # classes because there is no forward declaration of inner classes. In that case we
-    # use the header
-    if cls =~ /^(.*?)::/
-      ttfile.puts("#include <#{$1}>")
-    else
-      ttfile.puts("#{struct.kind.to_s} #{cls};")
-    end
-
-    ttfile.puts("namespace tl {")
-    ttfile.puts "template <> struct type_traits<#{cls}> : public type_traits<void> {"
-    if !conf.has_copy_ctor?(cls) || is_abstract || (eq_op && eq_op.visibility == :private)
-      ttfile.puts "  typedef tl::false_tag has_copy_constructor;"
-    end
-    if !conf.has_default_ctor?(cls) || is_abstract
-      ttfile.puts "  typedef tl::false_tag has_default_constructor;"
-    end
-    if (dtor = struct.get_dtor) && dtor.visibility != :public
-      ttfile.puts "  typedef tl::false_tag has_public_destructor;"
-    end
-    ttfile.puts "};"
-    ttfile.puts "}"
-    ttfile.puts ""
-
-    if struct.needs_adaptor(conf) 
-
-      ttfile.puts("class #{clsn}_Adaptor;")
-      ttfile.puts("namespace tl {")
-      ttfile.puts "template <> struct type_traits<#{clsn}_Adaptor> : public type_traits<void> {"
-      if !conf.has_copy_ctor?(cls) || (eq_op && eq_op.visibility == :private)
-        ttfile.puts "  typedef tl::false_tag has_copy_constructor;"
-      end
-      if !conf.has_default_ctor?(cls) 
-        ttfile.puts "  typedef tl::false_tag has_default_constructor;"
-      end
-      ttfile.puts "};"
-      ttfile.puts "}"
-      ttfile.puts ""
-
-    end
-
-    # walk through the subclasses
-
-    (struct.body_decl || []).each do |bd| 
-      if bd.is_a?(CPPStructDeclaration) && bd.visibility == :public && bd.struct.body_decl && bd.myself != "" && !conf.is_class_dropped?(cls, bd.myself) 
-        produce_ttfile_traits(ttfile, conf, bd)
-      end
-    end
-
-  end
-
-  def produce_ttfile(conf)
-
-    ttfile_name = "gsiDecl#{modn}TypeTraits.h"
-    ttfile_path = $gen_dir + "/" + ttfile_name
-
-    ttfile_path && File.open(ttfile_path, "w") do |ttfile|
-
-      ttfile.puts(<<"END");
-
-/*
-
-  KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-*/
-
-END
-
-      ttfile.puts("/**")
-      ttfile.puts("*  @file #{ttfile_path}")
-      ttfile.puts("*  @brief Type traits for the Qt binding classes")
-      ttfile.puts("*")
-      ttfile.puts("*  DO NOT EDIT THIS FILE. ")
-      ttfile.puts("*  This file has been created automatically")
-      ttfile.puts("*/")
-      ttfile.puts("")
-      ttfile.puts("#ifndef _HDR_gsiDecl#{modn}TypeTraits")
-      ttfile.puts("#define _HDR_gsiDecl#{modn}TypeTraits")
-      ttfile.puts("")
-      ttfile.puts("#include \"gsiTypes.h\"")
-      ttfile.puts("")
-
-      ttfile.puts("")
-
-      prod_list(conf).each do |decl_obj|
-
-        if decl_obj.is_a?(CPPStructDeclaration)
-
-          decl_obj.myself && produce_ttfile_traits(ttfile, conf, decl_obj)
-
-        elsif decl_obj.is_a?(CPPNamespace)
-
-          cls = decl_obj.myself
-          ttfile.puts("class #{cls}_Namespace;")
-          ttfile.puts("namespace tl {")
-          ttfile.puts "template <> struct type_traits<#{cls}_Namespace> : public type_traits<void> {"
-          ttfile.puts "  typedef tl::false_tag has_copy_constructor;"
-          ttfile.puts "  typedef tl::false_tag has_default_constructor;"
-          ttfile.puts "};"
-          ttfile.puts("}")
-          ttfile.puts ""
-
-        end
-
-      end
-
-      ttfile.puts("")
-      ttfile.puts("#endif")
-
-      puts("#{ttfile_name} written.")
-
-    end
 
   end
 
@@ -3252,9 +3170,6 @@ end
 
 puts("Producing class list")
 bp.produce_class_list
-
-puts("Producing type traits file ..")
-bp.produce_ttfile(conf)
 
 puts("Producing main source file ..")
 bp.produce_main_source

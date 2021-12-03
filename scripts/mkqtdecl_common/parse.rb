@@ -29,7 +29,7 @@ $:.push(File.dirname($0))
 require 'oj'
 require 'treetop'
 
-Treetop.load "c++"
+Treetop.load File.join(File.dirname($0), "c++")
 
 input="all.e"
 output="all.db"

@@ -35,112 +35,89 @@ namespace tl
 class EvalClass;
 
 /**
- *  @brief A helper function to implement equal as efficiently as possible
- */
-template<class T, class I>
-bool _var_user_equal_impl (const T *a, const T *b, I);
-
-template<class T>
-bool _var_user_equal_impl (const T *a, const T *b, tl::true_tag)
-{
-  return *a == *b;
-}
-
-template<class T>
-bool _var_user_equal_impl (const T * /*a*/, const T * /*b*/, tl::false_tag)
-{
-  tl_assert (false);
-}
-
-/**
  *  @brief A helper function to implement clone as efficiently as possible
  */
-template<class T, class I>
-T *_var_user_clone_impl (const T *a, I);
+template<class T, bool> struct _var_user_clone_impl;
 
 template<class T>
-T *_var_user_clone_impl (const T *a, tl::true_tag)
+struct _var_user_clone_impl<T, true>
 {
-  return new T (*a);
-}
+  static T *call (const T *a) { new T (*a); }
+};
 
 template<class T>
-T *_var_user_clone_impl (const T * /*a*/, tl::false_tag)
+struct _var_user_clone_impl<T, false>
 {
-  tl_assert (false);
-}
+  static T *call (const T *) { tl_assert (false); }
+};
 
 /**
- *  @brief A helper function to implement assignment as efficiently as possible
+ *  @brief A helper function to implement assign as efficiently as possible
  */
-template<class T, class I>
-void _var_user_assign_impl (T *a, const T *b, I);
+template<class T, bool> struct _var_user_assign_impl;
 
 template<class T>
-void _var_user_assign_impl (T *a, const T *b, tl::true_tag)
+struct _var_user_assign_impl<T, true>
 {
-  *a = *b;
-}
+  static void call (T *a, const T *b) { *a = *b; }
+};
 
 template<class T>
-void _var_user_assign_impl (T * /*a*/, const T * /*b*/, tl::false_tag)
+struct _var_user_assign_impl<T, false>
 {
-  tl_assert (false);
-}
+  static void call (T *, const T *) { tl_assert (false); }
+};
 
 /**
- *  @brief A helper function to implement less as efficiently as possible
+ *  @brief A helper function to implement equal as efficiently as possible
  */
-template<class T, class I>
-bool _var_user_less_impl (const T *a, const T *b, I);
+template<class T, bool> struct _var_user_equal_impl;
 
 template<class T>
-bool _var_user_less_impl (const T *a, const T *b, tl::true_tag)
+struct _var_user_equal_impl<T, true>
 {
-  return *a < *b;
-}
+  static bool call (const T *a, const T *b) { return *a == *b; }
+};
 
 template<class T>
-bool _var_user_less_impl (const T *, const T *, tl::false_tag)
+struct _var_user_equal_impl<T, false>
 {
-  tl_assert (false);
-}
+  static bool call (const T *, const T *) { tl_assert (false); }
+};
 
 /**
- *  @brief A helper function to implement to_string as efficiently as possible
+ *  @brief A helper function to implement equal as efficiently as possible
  */
-template<class T, class I>
-std::string _var_user_to_string_impl (const T *a, I);
+template<class T, bool> struct _var_user_less_impl;
 
 template<class T>
-std::string _var_user_to_string_impl (const T *a, tl::true_tag)
+struct _var_user_less_impl<T, true>
 {
-  return a->to_string ();
-}
+  static bool call (const T *a, const T *b) { return *a < *b; }
+};
 
 template<class T>
-std::string _var_user_to_string_impl (const T *, tl::false_tag)
+struct _var_user_less_impl<T, false>
 {
-  tl_assert (false);
-}
+  static bool call (const T *, const T *) { tl_assert (false); }
+};
 
 /**
- *  @brief A helper function to implement read as efficiently as possible
+ *  @brief A helper function to implement equal as efficiently as possible
  */
-template<class T, class I>
-void _var_user_read_impl (T *a, tl::Extractor &ex, I);
+template<class T, bool> struct _var_user_to_string_impl;
 
 template<class T>
-void _var_user_read_impl (T *a, tl::Extractor &ex, tl::true_tag)
+struct _var_user_to_string_impl<T, true>
 {
-  ex.read (*a);
-}
+  static std::string call (const T *a) { return a->to_string (); }
+};
 
 template<class T>
-void _var_user_read_impl (T *, tl::Extractor &, tl::false_tag)
+struct _var_user_to_string_impl<T, false>
 {
-  tl_assert (false);
-}
+  static std::string call (const T *) { tl_assert (false); }
+};
 
 /**
  *  @brief A utility implementation of tl::VariantUserClass using type traits for the implementation
@@ -162,39 +139,32 @@ public:
 
   virtual bool equal (const void *a, const void *b) const
   { 
-    typename tl::type_traits<T>::has_equal_operator f;
-    return _var_user_equal_impl ((T *) a, (T *) b, f);
+    return _var_user_equal_impl<T, tl::has_equal_operator<T>::value>::call ((const T *) a, (const T *) b);
   }
 
   virtual bool less (const void *a, const void *b) const
   { 
-    typename tl::type_traits<T>::has_less_operator f;
-    return _var_user_less_impl ((T *) a, (T *) b, f);
+    return _var_user_less_impl<T, tl::has_less_operator<T>::value>::call ((const T *) a, (const T *) b);
   }
 
   virtual void *clone (const void *a) const
   { 
-    typename tl::type_traits<T>::has_copy_constructor f;
-    return _var_user_clone_impl ((const T *) a, f);
+    return _var_user_clone_impl<T, std::is_copy_constructible<T>::value>::call ((const T *) a);
   }
 
   virtual void assign (void *a, const void *b) const
   {
-    //  TODO: we assume (for now) that objects with a copy constructor do have an assignment operator too
-    typename tl::type_traits<T>::has_copy_constructor f;
-    _var_user_assign_impl ((T *) a, (const T *) b, f);
+    _var_user_assign_impl<T, std::is_copy_assignable<T>::value>::call ((T *) a, (const T *)b);
   }
 
   virtual std::string to_string (const void *a) const
   { 
-    typename tl::type_traits<T>::supports_to_string f;
-    return _var_user_to_string_impl ((const T *) a, f);
+    return _var_user_to_string_impl<T, tl::has_to_string<T>::value>::call ((const T *) a);
   }
 
   virtual void read (void *a, tl::Extractor &ex) const 
   { 
-    typename tl::type_traits<T>::supports_extractor f;
-    _var_user_read_impl ((T *) a, ex, f);
+    ex.read (*(T *)a);
   }
 
   virtual const char *name () const 

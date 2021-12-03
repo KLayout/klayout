@@ -865,15 +865,5 @@ void DeepLayer::commit_shapes (VarCollector &collector, std::map<db::cell_index_
 
 }
 
-namespace tl
-{
-
-  //  disable copying of the deep shape store object
-  template <> struct type_traits <db::DeepShapeStore> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-  };
-
-}
-
 #endif
 

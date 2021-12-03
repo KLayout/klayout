@@ -43,26 +43,6 @@ class RelativeProgress;
 class AbstractProgress;
 class AbsoluteProgress;
 
-template <> struct type_traits<tl::Progress> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-};
-
-template <> struct type_traits<tl::RelativeProgress> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-};
-
-template <> struct type_traits<tl::AbstractProgress> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-};
-
-template <> struct type_traits<tl::AbsoluteProgress> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-};
-
 /**
  *  @brief A helper class to clean up pending progress objects
  *

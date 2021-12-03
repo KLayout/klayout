@@ -53,15 +53,6 @@ public:
 
 }
 
-namespace tl
-{
-  template <>
-  struct type_traits<MyClass2> : public tl::type_traits<void>
-  {
-    typedef tl::false_tag has_copy_constructor;
-  };
-}
-
 template <class C>
 static std::string l2s (const tl::list<C> &l)
 {

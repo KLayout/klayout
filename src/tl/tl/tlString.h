@@ -33,6 +33,7 @@
 
 #include "tlException.h"
 #include "tlVariant.h"
+#include "tlTypeTraits.h"
 
 #if defined(HAVE_QT)
 class QImage;
@@ -40,9 +41,29 @@ class QImage;
 
 namespace tl {
 
+/**
+ *  @brief An exception indicating that string extraction is not available for a certain type
+ */
+class TL_PUBLIC ExtractorNotImplementedException
+  : tl::Exception
+{
+public:
+  ExtractorNotImplementedException ();
+};
+
+/**
+ *  @brief An exception indicating that string conversion is not available for a certain type
+ */
+class TL_PUBLIC StringConversionException
+  : tl::Exception
+{
+public:
+  StringConversionException ();
+};
+
 class Extractor;
-template <class T> void extractor_impl (tl::Extractor &, T &);
-template <class T> bool test_extractor_impl (tl::Extractor &, T &);
+template <class T> void extractor_impl (tl::Extractor &, T &) { throw ExtractorNotImplementedException (); }
+template <class T> bool test_extractor_impl (tl::Extractor &, T &) { throw ExtractorNotImplementedException (); }
 
 /**
  *  @brief Another string class
@@ -266,7 +287,11 @@ TL_PUBLIC std::string to_string (const char *cp, int length);
 TL_PUBLIC std::string to_string_from_local (const char *cp);
 TL_PUBLIC std::string to_local (const std::string &s);
 
-template <class T> inline std::string to_string (const T &o) { return o.to_string (); }
+template <class T, bool> struct __redirect_to_string;
+template <class T> struct __redirect_to_string<T, true> { static std::string to_string (const T &t) { return t.to_string (); } };
+template <class T> struct __redirect_to_string<T, false> { static std::string to_string  (const T &) { throw StringConversionException (); } };
+template <class T> inline std::string to_string (const T &o) { return __redirect_to_string<T, tl::has_to_string<T>::value>::to_string (o); }
+
 template <> inline std::string to_string (const double &d) { return to_string (d, 12); }
 template <> inline std::string to_string (const float &d) { return to_string (d, 6); }
 template <> TL_PUBLIC std::string to_string (const int &d);

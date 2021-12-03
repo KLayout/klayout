@@ -813,13 +813,6 @@ namespace tl { template <> struct type_traits<QPictureFormatPlugin> : public typ
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPictureFormatPlugin> &qtdecl_QPictureFormatPlugin (); }
 
-class QPixelFormat;
-
-namespace tl { template <> struct type_traits<QPixelFormat> : public type_traits<void> {
-}; }
-
-namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPixelFormat> &qtdecl_QPixelFormat (); }
-
 class QPixmap;
 
 namespace tl { template <> struct type_traits<QPixmap> : public type_traits<void> {

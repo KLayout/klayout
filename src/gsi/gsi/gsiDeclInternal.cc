@@ -23,21 +23,6 @@
 
 #include "gsiDecl.h"
 
-namespace tl
-{
-
-template <> struct type_traits<gsi::ClassBase> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-};
-
-template <> struct type_traits<gsi::MethodBase> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-};
-
-}
-
 namespace gsi
 {
 

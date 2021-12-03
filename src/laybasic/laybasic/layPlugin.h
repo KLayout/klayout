@@ -883,14 +883,6 @@ inline bool test_and_set (T &target, const T &source)
 
 }
 
-namespace tl
-{
-  //  disable copy ctor for Plugin
-  template <> struct type_traits<lay::Plugin> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-  };
-}
-
 #endif
 
 

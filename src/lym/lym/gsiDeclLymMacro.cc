@@ -35,17 +35,6 @@
 
 #include <cstdio>
 
-namespace tl
-{
-
-//  type traits for BrowserDialog_Stub
-template <> 
-struct type_traits<lym::Macro> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-};
-
-}
-
 namespace gsi
 {
 

@@ -520,19 +520,6 @@ typedef tl::RegisteredClass<user_object_factory_base<db::DCoord> > DUserObjectDe
 
 } // namespace db
 
-namespace tl 
-{
-  /**
-   *  @brief The type traits for the user object type
-   */
-  template <class C>
-  struct type_traits <db::user_object<C> > : public type_traits<void> 
-  {
-    typedef trivial_relocate_required relocate_requirements;
-    typedef true_tag has_efficient_swap;
-  };
-}
-
 //  inject a swap specialization into the std namespace:
 namespace std 
 {  

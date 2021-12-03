@@ -622,19 +622,6 @@ typedef edge_pair<db::DCoord> DEdgePair;
 
 namespace tl 
 {
-  /**
-   *  @brief The type traits for the edge type
-   */
-  template <class C>
-  struct type_traits <db::edge_pair<C> > : public type_traits<void> 
-  {
-    typedef trivial_relocate_required relocate_requirements;
-    typedef true_tag supports_extractor;
-    typedef true_tag supports_to_string;
-    typedef true_tag has_less_operator;
-    typedef true_tag has_equal_operator;
-  };
-
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::EdgePair &b);
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DEdgePair &b);
 

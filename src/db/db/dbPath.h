@@ -224,7 +224,6 @@ public:
   typedef typename coord_traits::area_type area_type; 
   typedef object_tag< path<C> > tag;
   typedef tl::vector<point_type> pointlist_type;
-  typedef typename tl::type_traits<pointlist_type>::relocate_requirements relocate_requirements;
   typedef db::path_point_iterator<path <C>, db::unit_trans<C> > iterator;
 
   /**
@@ -1132,20 +1131,6 @@ Path round_path_corners (const Path &input, int rad, int npoints);
 
 namespace tl 
 {
-  /**
-   *  @brief The type traits for the path type
-   */
-  template <class C>
-  struct type_traits <db::path<C> > : public type_traits<void> 
-  {
-    typedef typename db::path<C>::relocate_requirements relocate_requirements;
-    typedef true_tag has_efficient_swap;
-    typedef true_tag supports_extractor;
-    typedef true_tag supports_to_string;
-    typedef true_tag has_less_operator;
-    typedef true_tag has_equal_operator;
-  };
-
   /**
    *  @brief Special extractors for the paths
    */

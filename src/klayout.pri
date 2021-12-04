@@ -178,7 +178,7 @@ equals(HAVE_QT, "0") {
     }
   }
 
-  equals(HAVE_QT5, "1") {
+  greaterThan(QT_MAJOR_VERSION, 4) {
 
     QT += widgets gui printsupport xmlpatterns
 

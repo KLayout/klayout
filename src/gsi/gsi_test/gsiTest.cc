@@ -237,7 +237,7 @@ A::qsv_cref_to_ia (const QStringView &qs)
 QStringView
 A::ia_cref_to_qsv (const std::vector<int> &ia)
 {
-  QString s;
+  static QString s;
   for (std::vector<int>::const_iterator i = ia.begin (); i != ia.end (); ++i) {
     s.push_back (char (*i));
   }
@@ -281,8 +281,8 @@ A::ia_cref_to_ba (const std::vector<int> &ia)
   return ba;
 }
 
-const std::vector<char> &
-A::ia_cref_to_ba_cref (const std::vector<int> &ia)
+std::vector<char> &
+A::ia_cref_to_ba_ref (const std::vector<int> &ia)
 {
   static std::vector<char> ba;
   ba.clear ();
@@ -1002,8 +1002,8 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("ia_cref_to_qba", &A::ia_cref_to_qba) +
   gsi::method ("ia_cref_to_qba_cref", &A::ia_cref_to_qba_cref) +
   gsi::method ("ia_cref_to_qba_ref", &A::ia_cref_to_qba_ref) +
-  gsi::method ("ia_cptr_to_qba_cptr", &A::ia_cref_to_qba_cptr) +
-  gsi::method ("ia_cptr_to_qba_ptr", &A::ia_cref_to_qba_ptr) +
+  gsi::method ("ia_cref_to_qba_cptr", &A::ia_cref_to_qba_cptr) +
+  gsi::method ("ia_cref_to_qba_ptr", &A::ia_cref_to_qba_ptr) +
 
   gsi::method ("qs_cref_to_ia", &A::qs_cref_to_ia) +
   gsi::method ("qs_ref_to_ia", &A::qs_ref_to_ia) +
@@ -1013,8 +1013,8 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("ia_cref_to_qs", &A::ia_cref_to_qs) +
   gsi::method ("ia_cref_to_qs_cref", &A::ia_cref_to_qs_cref) +
   gsi::method ("ia_cref_to_qs_ref", &A::ia_cref_to_qs_ref) +
-  gsi::method ("ia_cptr_to_qs_cptr", &A::ia_cref_to_qs_cptr) +
-  gsi::method ("ia_cptr_to_qs_ptr", &A::ia_cref_to_qs_ptr) +
+  gsi::method ("ia_cref_to_qs_cptr", &A::ia_cref_to_qs_cptr) +
+  gsi::method ("ia_cref_to_qs_ptr", &A::ia_cref_to_qs_ptr) +
 
 #if QT_VERSION >= 0x60000
 
@@ -1026,8 +1026,8 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("ia_cref_to_qbav", &A::ia_cref_to_qbav) +
   gsi::method ("ia_cref_to_qbav_cref", &A::ia_cref_to_qbav_cref) +
   gsi::method ("ia_cref_to_qbav_ref", &A::ia_cref_to_qbav_ref) +
-  gsi::method ("ia_cptr_to_qbav_cptr", &A::ia_cref_to_qbav_cptr) +
-  gsi::method ("ia_cptr_to_qbav_ptr", &A::ia_cref_to_qbav_ptr) +
+  gsi::method ("ia_cref_to_qbav_cptr", &A::ia_cref_to_qbav_cptr) +
+  gsi::method ("ia_cref_to_qbav_ptr", &A::ia_cref_to_qbav_ptr) +
 
   gsi::method ("qsv_cref_to_ia", &A::qsv_cref_to_ia) +
   gsi::method ("qsv_ref_to_ia", &A::qsv_ref_to_ia) +
@@ -1037,8 +1037,8 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("ia_cref_to_qsv", &A::ia_cref_to_qsv) +
   gsi::method ("ia_cref_to_qsv_cref", &A::ia_cref_to_qsv_cref) +
   gsi::method ("ia_cref_to_qsv_ref", &A::ia_cref_to_qsv_ref) +
-  gsi::method ("ia_cptr_to_qsv_cptr", &A::ia_cref_to_qsv_cptr) +
-  gsi::method ("ia_cptr_to_qsv_ptr", &A::ia_cref_to_qsv_ptr) +
+  gsi::method ("ia_cref_to_qsv_cptr", &A::ia_cref_to_qsv_cptr) +
+  gsi::method ("ia_cref_to_qsv_ptr", &A::ia_cref_to_qsv_ptr) +
 
 #endif
 
@@ -1049,8 +1049,12 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("ba_cptr_to_ia", &A::ba_cptr_to_ia) +
   gsi::method ("ba_ptr_to_ia", &A::ba_ptr_to_ia) +
   gsi::method ("ba_to_ia", &A::ba_to_ia) +
+
   gsi::method ("ia_cref_to_ba", &A::ia_cref_to_ba) +
+  gsi::method ("ia_cref_to_ba_ref", &A::ia_cref_to_ba_ref) +
   gsi::method ("ia_cref_to_ba_cref", &A::ia_cref_to_ba_cref) +
+  gsi::method ("ia_cref_to_ba_ptr", &A::ia_cref_to_ba_ptr) +
+  gsi::method ("ia_cref_to_ba_cptr", &A::ia_cref_to_ba_cptr) +
 
   gsi::method ("br", &A::br) +
   gsi::method ("get_e", &A::get_e) +

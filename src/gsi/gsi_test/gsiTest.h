@@ -203,7 +203,10 @@ struct A
    *  @brief Byte sequences: tests return of std::vector<char>
    */
   static std::vector<char> ia_cref_to_ba (const std::vector<int> &ia);
-  static const std::vector<char> &ia_cref_to_ba_cref (const std::vector<int> &ia);
+  static std::vector<char> &ia_cref_to_ba_ref (const std::vector<int> &ia);
+  static const std::vector<char> &ia_cref_to_ba_cref (const std::vector<int> &ia)   { return ia_cref_to_ba_ref (ia); }
+  static std::vector<char> *ia_cref_to_ba_ptr (const std::vector<int> &ia)          { return &ia_cref_to_ba_ref (ia); }
+  static const std::vector<char> *ia_cref_to_ba_cptr (const std::vector<int> &ia)   { return &ia_cref_to_ba_ref (ia); }
 
   /*
    *  @brief A dummy method providing a chance to set a breakpoint in the script

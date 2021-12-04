@@ -1799,6 +1799,8 @@ private:
   tl::Variant m_v;
 };
 
+#if __cplusplus >= 201703L
+
 /**
  *  @brief Specialization for std::optional
  */
@@ -1873,6 +1875,8 @@ private:
   bool m_is_const;
   std::optional<T> m_v;
 };
+
+#endif
 
 // ------------------------------------------------------------
 //  Vector adaptor framework

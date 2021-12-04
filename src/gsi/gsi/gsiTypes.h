@@ -439,7 +439,9 @@ template <> struct type_traits<__int128>                    : generic_type_trait
 template <> struct type_traits<double>                      : generic_type_traits<double_tag, double, T_double> { };
 template <> struct type_traits<float>                       : generic_type_traits<float_tag, float, T_float> { };
 template <> struct type_traits<std::string>                 : generic_type_traits<string_tag, StringAdaptor, T_string> { };
+#if __cplusplus >= 201703L
 template <typename T> struct type_traits<std::optional<T> > : generic_type_traits<var_tag, VariantAdaptor, T_var> { };
+#endif
 #if defined(HAVE_QT)
 template <> struct type_traits<QString>                     : generic_type_traits<string_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringRef>                  : generic_type_traits<string_tag, StringAdaptor, T_string> { };
@@ -479,7 +481,9 @@ template <> struct type_traits<const __int128 &>            : generic_type_trait
 template <> struct type_traits<const double &>              : generic_type_traits<double_cref_tag, double, T_double> { };
 template <> struct type_traits<const float &>               : generic_type_traits<float_cref_tag, float, T_float> { };
 template <> struct type_traits<const std::string &>         : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
+#if __cplusplus >= 201703L
 template <typename T> struct type_traits<const std::optional<T> &>  : generic_type_traits<var_cref_tag, VariantAdaptor, T_var> { };
+#endif
 #if defined(HAVE_QT)
 template <> struct type_traits<const QString &>             : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QStringRef &>          : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
@@ -516,7 +520,9 @@ template <> struct type_traits<__int128 &>                  : generic_type_trait
 template <> struct type_traits<double &>                    : generic_type_traits<double_ref_tag, double, T_double> { };
 template <> struct type_traits<float &>                     : generic_type_traits<float_ref_tag, float, T_float> { };
 template <> struct type_traits<std::string &>               : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
+#if __cplusplus >= 201703L
 template <typename T> struct type_traits<std::optional<T> &>  : generic_type_traits<var_ref_tag, VariantAdaptor, T_var> { };
+#endif
 #if defined(HAVE_QT)
 template <> struct type_traits<QString &>                   : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringRef &>                : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
@@ -554,7 +560,9 @@ template <> struct type_traits<const __int128 *>            : generic_type_trait
 template <> struct type_traits<const double *>              : generic_type_traits<double_cptr_tag, double, T_double> { };
 template <> struct type_traits<const float *>               : generic_type_traits<float_cptr_tag, float, T_float> { };
 template <> struct type_traits<const std::string *>         : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
+#if __cplusplus >= 201703L
 template <typename T> struct type_traits<const std::optional<T> *>  : generic_type_traits<var_cptr_tag, VariantAdaptor, T_var> { };
+#endif
 #if defined(HAVE_QT)
 template <> struct type_traits<const QString *>             : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QStringRef *>          : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
@@ -592,7 +600,9 @@ template <> struct type_traits<__int128 *>                  : generic_type_trait
 template <> struct type_traits<double *>                    : generic_type_traits<double_ptr_tag, double, T_double> { };
 template <> struct type_traits<float *>                     : generic_type_traits<float_ptr_tag, float, T_float> { };
 template <> struct type_traits<std::string *>               : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
+#if __cplusplus >= 201703L
 template <typename T> struct type_traits<std::optional<T> *>    : generic_type_traits<var_ptr_tag, VariantAdaptor, T_var> { };
+#endif
 #if defined(HAVE_QT)
 template <> struct type_traits<QString *>                   : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringRef *>                : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };

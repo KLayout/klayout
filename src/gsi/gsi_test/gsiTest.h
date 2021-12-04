@@ -591,6 +591,7 @@ struct B
    */
   static tl::Variant new_b_by_variant ();
 
+#if __cplusplus >= 201703L
   /**
    *  @brief std::optional for simple and complex types
    */
@@ -609,7 +610,7 @@ struct B
   static int optional_a_ref_to_int (std::optional<A> &optional, int def)            { return optional_a_to_int (optional, def); }
   static int optional_a_cptr_to_int (const std::optional<A> *optional, int def)     { return optional_a_to_int (*optional, def); }
   static int optional_a_ptr_to_int (std::optional<A> optional, int def)             { return optional_a_to_int (*optional, def); }
-
+#endif
 
   std::string addr () const;
 

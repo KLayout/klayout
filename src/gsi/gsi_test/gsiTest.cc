@@ -220,6 +220,42 @@ A::ia_cref_to_qs_ref (const std::vector<int> &ia)
   return s;
 }
 
+std::vector<int>
+A::ql1s_cref_to_ia (const QLatin1String &ql1s)
+{
+  const char *cp = ql1s.data ();
+  size_t n = ql1s.size ();
+  std::vector<int> ia;
+  for (size_t i = 0; i < n; ++i) {
+    ia.push_back (*cp++);
+  }
+  return ia;
+}
+
+QLatin1String
+A::ia_cref_to_ql1s (const std::vector<int> &ia)
+{
+  static std::string str;
+  str.clear ();
+  for (std::vector<int>::const_iterator i = ia.begin (); i != ia.end (); ++i) {
+    str += char (*i);
+  }
+  return QLatin1String (str.c_str (), str.size ());
+}
+
+QLatin1String &
+A::ia_cref_to_ql1s_ref (const std::vector<int> &ia)
+{
+  static std::string str;
+  str.clear ();
+  for (std::vector<int>::const_iterator i = ia.begin (); i != ia.end (); ++i) {
+    str += char (*i);
+  }
+  static QLatin1String s;
+  s = QLatin1String (str.c_str (), str.size ());
+  return s;
+}
+
 #if QT_VERSION >= 0x60000
 
 std::vector<int>
@@ -238,6 +274,7 @@ QStringView
 A::ia_cref_to_qsv (const std::vector<int> &ia)
 {
   static QString s;
+  s.clear ();
   for (std::vector<int>::const_iterator i = ia.begin (); i != ia.end (); ++i) {
     s.push_back (char (*i));
   }
@@ -1016,6 +1053,17 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("ia_cref_to_qs_cptr", &A::ia_cref_to_qs_cptr) +
   gsi::method ("ia_cref_to_qs_ptr", &A::ia_cref_to_qs_ptr) +
 
+  gsi::method ("ql1s_cref_to_ia", &A::ql1s_cref_to_ia) +
+  gsi::method ("ql1s_ref_to_ia", &A::ql1s_ref_to_ia) +
+  gsi::method ("ql1s_cptr_to_ia", &A::ql1s_cptr_to_ia) +
+  gsi::method ("ql1s_ptr_to_ia", &A::ql1s_ptr_to_ia) +
+  gsi::method ("ql1s_to_ia", &A::ql1s_to_ia) +
+  gsi::method ("ia_cref_to_ql1s", &A::ia_cref_to_ql1s) +
+  gsi::method ("ia_cref_to_ql1s_cref", &A::ia_cref_to_ql1s_cref) +
+  gsi::method ("ia_cref_to_ql1s_ref", &A::ia_cref_to_ql1s_ref) +
+  gsi::method ("ia_cref_to_ql1s_cptr", &A::ia_cref_to_ql1s_cptr) +
+  gsi::method ("ia_cref_to_ql1s_ptr", &A::ia_cref_to_ql1s_ptr) +
+
 #if QT_VERSION >= 0x60000
 
   gsi::method ("qbav_cref_to_ia", &A::qbav_cref_to_ia) +
@@ -1180,6 +1228,18 @@ static gsi::Class<A> decl_a ("", "A",
 static gsi::Class<A_NC> decl_a_nc (decl_a, "", "A_NC");
 
 static gsi::Class<B> decl_b ("", "B",
+  gsi::method ("int_to_optional", &B::int_to_optional) +
+  gsi::method ("int_to_optional_a", &B::int_to_optional_a) +
+  gsi::method ("optional_to_int", &B::optional_to_int) +
+  gsi::method ("optional_cref_to_int", &B::optional_cref_to_int) +
+  gsi::method ("optional_ref_to_int", &B::optional_ref_to_int) +
+  gsi::method ("optional_cptr_to_int", &B::optional_cptr_to_int) +
+  gsi::method ("optional_ptr_to_int", &B::optional_ptr_to_int) +
+  gsi::method ("optional_a_to_int", &B::optional_a_to_int) +
+  gsi::method ("optional_a_cref_to_int", &B::optional_a_cref_to_int) +
+  gsi::method ("optional_a_ref_to_int", &B::optional_a_ref_to_int) +
+  gsi::method ("optional_a_cptr_to_int", &B::optional_a_cptr_to_int) +
+  gsi::method ("optional_a_ptr_to_int", &B::optional_a_ptr_to_int) +
   gsi::method ("inst", &B::inst) +
   gsi::method ("has_inst", &B::has_inst) +
   gsi::method ("set_inst", &B::set_inst) +

@@ -35,11 +35,6 @@
 
 // -----------------------------------------------------------------------
 // class QFont
-  static unsigned int font_const_light () { return (unsigned int) QFont::Light; }
-  static unsigned int font_const_normal () { return (unsigned int) QFont::Normal; }
-  static unsigned int font_const_demibold () { return (unsigned int) QFont::DemiBold; }
-  static unsigned int font_const_bold () { return (unsigned int) QFont::Bold; }
-  static unsigned int font_const_black () { return (unsigned int) QFont::Black; }
 
 //  Constructor QFont::QFont()
 
@@ -1462,12 +1457,6 @@ static gsi::Methods methods_QFont () {
 }
 
 gsi::Class<QFont> decl_QFont ("QtGui", "QFont",
-  gsi::method("Light", &font_const_light, "@brief Font weight constant 'QFont::Light'.") +
-  gsi::method("Normal", &font_const_normal, "@brief Font weight constant 'QFont::Normal'.") +
-  gsi::method("DemiBold", &font_const_demibold, "@brief Font weight constant 'QFont::DemiBold'.") +
-  gsi::method("Bold", &font_const_bold, "@brief Font weight constant 'QFont::Bold'.") +
-  gsi::method("Black", &font_const_black, "@brief Font weight constant 'QFont::Black'.")
-+
   methods_QFont (),
   "@qt\n@brief Binding of QFont");
 

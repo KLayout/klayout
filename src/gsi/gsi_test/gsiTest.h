@@ -131,6 +131,15 @@ struct A
   static std::vector<int> qs_ptr_to_ia (QString *qs)                    { return qs_cref_to_ia (*qs); }
   static std::vector<int> qs_to_ia (QString qs)                         { return qs_cref_to_ia (qs); }
 
+  /**
+   *  @brief Byte sequences: tests access to QLatin1String
+   */
+  static std::vector<int> ql1s_cref_to_ia (const QLatin1String &qs);
+  static std::vector<int> ql1s_ref_to_ia (QLatin1String &qs)            { return ql1s_cref_to_ia (qs); }
+  static std::vector<int> ql1s_cptr_to_ia (const QLatin1String *qs)     { return ql1s_cref_to_ia (*qs); }
+  static std::vector<int> ql1s_ptr_to_ia (QLatin1String *qs)            { return ql1s_cref_to_ia (*qs); }
+  static std::vector<int> ql1s_to_ia (QLatin1String qs)                 { return ql1s_cref_to_ia (qs); }
+
 #if QT_VERSION >= 0x60000
 
   /**
@@ -174,6 +183,15 @@ struct A
   static const QString &ia_cref_to_qs_cref (const std::vector<int> &ia)           { return ia_cref_to_qs_ref (ia); }
   static const QString *ia_cref_to_qs_cptr (const std::vector<int> &ia)           { return &ia_cref_to_qs_ref (ia); }
   static QString *ia_cref_to_qs_ptr (const std::vector<int> &ia)                  { return &ia_cref_to_qs_ref (ia); }
+
+  /**
+   *  @brief Byte sequences: tests return of QString
+   */
+  static QLatin1String ia_cref_to_ql1s (const std::vector<int> &ia);
+  static QLatin1String &ia_cref_to_ql1s_ref (const std::vector<int> &ia);
+  static const QLatin1String &ia_cref_to_ql1s_cref (const std::vector<int> &ia)   { return ia_cref_to_ql1s_ref (ia); }
+  static const QLatin1String *ia_cref_to_ql1s_cptr (const std::vector<int> &ia)   { return &ia_cref_to_ql1s_ref (ia); }
+  static QLatin1String *ia_cref_to_ql1s_ptr (const std::vector<int> &ia)          { return &ia_cref_to_ql1s_ref (ia); }
 
 #if QT_VERSION >= 0x60000
 
@@ -572,6 +590,26 @@ struct B
    *  @brief Construction through tl::Variant
    */
   static tl::Variant new_b_by_variant ();
+
+  /**
+   *  @brief std::optional for simple and complex types
+   */
+
+  static std::optional<int> int_to_optional (int value, bool exists)                { return exists ? std::optional<int> (value) : std::optional<int> (); }
+  static std::optional<A> int_to_optional_a (int value, bool exists)                { return exists ? std::optional<A> (A (value)) : std::optional<A> (); }
+
+  static int optional_to_int (std::optional<int> optional, int def)                 { return optional ? optional.value () : def; }
+  static int optional_cref_to_int (const std::optional<int> &optional, int def)     { return optional_to_int (optional, def); }
+  static int optional_ref_to_int (std::optional<int> &optional, int def)            { return optional_to_int (optional, def); }
+  static int optional_cptr_to_int (const std::optional<int> *optional, int def)     { return optional_to_int (*optional, def); }
+  static int optional_ptr_to_int (std::optional<int> optional, int def)             { return optional_to_int (*optional, def); }
+
+  static int optional_a_to_int (std::optional<A> optional, int def)                 { return optional ? optional.value ().a1 () : def; }
+  static int optional_a_cref_to_int (const std::optional<A> &optional, int def)     { return optional_a_to_int (optional, def); }
+  static int optional_a_ref_to_int (std::optional<A> &optional, int def)            { return optional_a_to_int (optional, def); }
+  static int optional_a_cptr_to_int (const std::optional<A> *optional, int def)     { return optional_a_to_int (*optional, def); }
+  static int optional_a_ptr_to_int (std::optional<A> optional, int def)             { return optional_a_to_int (*optional, def); }
+
 
   std::string addr () const;
 

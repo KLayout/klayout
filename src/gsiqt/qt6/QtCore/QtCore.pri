@@ -96,6 +96,7 @@ SOURCES += \
   $$PWD/gsiDeclQMetaObject_Connection.cc \
   $$PWD/gsiDeclQMetaProperty.cc \
   $$PWD/gsiDeclQMetaSequence.cc \
+  $$PWD/gsiDeclQMetaType.cc \
   $$PWD/gsiDeclQMethodRawArguments.cc \
   $$PWD/gsiDeclQMimeData.cc \
   $$PWD/gsiDeclQMimeDatabase.cc \
@@ -178,6 +179,7 @@ SOURCES += \
   $$PWD/gsiDeclQUrl.cc \
   $$PWD/gsiDeclQUrlQuery.cc \
   $$PWD/gsiDeclQVariantAnimation.cc \
+  $$PWD/gsiDeclQVersionNumber.cc \
   $$PWD/gsiDeclQWaitCondition.cc \
   $$PWD/gsiDeclQWriteLocker.cc \
   $$PWD/gsiDeclQXmlStreamAttribute.cc \

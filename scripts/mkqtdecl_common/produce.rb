@@ -1927,6 +1927,7 @@ END
     native_impl = conf.native_impl(cls)
 
     has_metaobject = ((struct.body_decl || []).find { |bd| bd.is_a?(CPPDeclaration) && bd.type.name == "metaObject" } != nil)
+    has_metaobject = has_metaobject && !conf.is_dropped?(cls, cls + "::staticMetaObject")
 
     mdecl = []
     mdecl_ctors = []

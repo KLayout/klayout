@@ -215,7 +215,7 @@ grammar CPP
   end
 
   rule class_struct_body_declarations
-    ( s ";" / s friend_decl / s using / s typedef / s !( "public" / "private" / "protected" ) member_declaration )* 
+    ( s ";" / s static_assert / s friend_decl / s using / s typedef / s !( "public" / "private" / "protected" ) member_declaration )* 
   end
 
   rule class_struct_body
@@ -230,8 +230,8 @@ grammar CPP
   rule class_id 
     # In order to easily distinguish between constructor methods without 
     # a return type and class or typedef names we assume that all "name("
-    # constructs are considered constructor names but "name (*func_ptr) ()" is not.
-    qualified_id s ( "..." s )? !( "(" !( s "*" ) )
+    # constructs are considered constructor names but "name (*func_ptr) ()" or "name (class::*method_ptr) ()" is not.
+    qualified_id s ( "..." s )? !( "(" !( s "*" / s qualified_id s "::*" ) )
   end
 
   rule typeof 

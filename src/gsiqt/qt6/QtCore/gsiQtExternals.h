@@ -349,6 +349,10 @@ class QMetaSequence;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QMetaSequence> &qtdecl_QMetaSequence (); }
 
+class QMetaType;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QMetaType> &qtdecl_QMetaType (); }
+
 struct QMethodRawArguments;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QMethodRawArguments> &qtdecl_QMethodRawArguments (); }
@@ -668,6 +672,10 @@ namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QUrlQuery> &qtdecl_QUrlQuery (); }
 class QVariantAnimation;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QVariantAnimation> &qtdecl_QVariantAnimation (); }
+
+class QVersionNumber;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QVersionNumber> &qtdecl_QVersionNumber (); }
 
 class QWaitCondition;
 

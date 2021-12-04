@@ -549,9 +549,12 @@ private:
   {
     check_data (as);
 
-    std::unique_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
+    AdaptorBase *p = *(AdaptorBase **)mp_read;
     mp_read += item_size<AdaptorBase *> ();
-    tl_assert (p.get () != 0);
+
+    tl_assert (p != 0);
+    //  late-destroy the adaptor since the new X object may still need data from there (e.g. QLatin1String)
+    heap.push (p);
 
     X x = X ();
     copy_to<X> (*p, x, heap);
@@ -565,9 +568,12 @@ private:
 
     check_data (as);
 
-    std::unique_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
+    AdaptorBase *p = *(AdaptorBase **)mp_read;
     mp_read += item_size<AdaptorBase *> ();
-    tl_assert (p.get () != 0);
+
+    tl_assert (p != 0);
+    //  late-destroy the adaptor since the new X object may still need data from there (e.g. QLatin1String)
+    heap.push (p);
 
     x_type *x = new x_type ();
     heap.push (x);
@@ -601,14 +607,19 @@ private:
 
     check_data (as);
 
-    std::unique_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
+    AdaptorBase *p = *(AdaptorBase **) mp_read;
     mp_read += item_size<AdaptorBase *> ();
 
     x_type *x = 0;
-    if (p.get () != 0) {
+    if (p != 0) {
+
+      //  late-destroy the adaptor since the new X object may still need data from there (e.g. QLatin1String)
+      heap.push (p);
+
       x = new x_type ();
       heap.push (x);
       copy_to<x_type> (*p, *x, heap);
+
     }
 
     return x;
@@ -1024,17 +1035,8 @@ public:
   virtual void set (const char *c_str, size_t s, tl::Heap &)
   {
     if (! m_is_const) {
-      *mp_s = QLatin1String (QString::fromUtf8 (c_str, int (s)).toLatin1 ());
-    }
-  }
-
-  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
-  {
-    StringAdaptorImpl<QLatin1String> *s = dynamic_cast<StringAdaptorImpl<QLatin1String> *>(target);
-    if (s) {
-      *s->mp_s = *mp_s;
-    } else {
-      StringAdaptor::copy_to (target, heap);
+      m_latin1_holder = QString::fromUtf8 (c_str, int (s)).toLatin1 ();
+      *mp_s = QLatin1String (m_latin1_holder.constData (), m_latin1_holder.size ());
     }
   }
 
@@ -1042,6 +1044,7 @@ private:
   QLatin1String *mp_s;
   bool m_is_const;
   QLatin1String m_s;
+  QByteArray m_latin1_holder;
   mutable QByteArray m_s_utf8;
 };
 
@@ -1835,7 +1838,7 @@ public:
 
   virtual tl::Variant var () const
   {
-    return tl::Variant (mp_v->value ());
+    return *mp_v ? tl::Variant (mp_v->value ()) : tl::Variant ();
   }
 
   virtual void set (const tl::Variant &v, tl::Heap & /*heap*/)

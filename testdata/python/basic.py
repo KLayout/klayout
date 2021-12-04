@@ -2993,6 +2993,35 @@ class BasicTest(unittest.TestCase):
 
       self.assertEqual(pya.A.qsv_to_ia('\x00\x01\x02'), [ 0, 1, 2 ])
 
+  def test_QLatin1String(self):
+
+    # QLatin1String
+
+    if "ia_cref_to_ql1s" in pya.A.__dict__:
+
+      ql1s = pya.A.ia_cref_to_ql1s([ 16, 42, 0, 8 ])
+      self.assertEqual(repr(ql1s), "'\\x10*\\x00\\x08'")
+
+      self.assertEqual(pya.A.ql1s_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.ql1s_cref_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.ql1s_cptr_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.ql1s_ref_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.ql1s_ptr_to_ia(ql1s), [ 16, 42, 0, 8 ])
+  
+      ql1s = pya.A.ia_cref_to_ql1s_cref([ 17, 42, 0, 8 ])
+      self.assertEqual(repr(ql1s), "'\\x11*\\x00\\x08'")
+
+      ql1s = pya.A.ia_cref_to_ql1s_ref([ 18, 42, 0, 8 ])
+      self.assertEqual(repr(ql1s), "'\\x12*\\x00\\x08'")
+
+      ql1s = pya.A.ia_cref_to_ql1s_cptr([ 19, 42, 0, 8 ])
+      self.assertEqual(repr(ql1s), "'\\x13*\\x00\\x08'")
+
+      ql1s = pya.A.ia_cref_to_ql1s_ptr([ 20, 42, 0, 8 ])
+      self.assertEqual(repr(ql1s), "'\\x14*\\x00\\x08'")
+
+      self.assertEqual(pya.A.ql1s_to_ia('\x00\x01\x02'), [ 0, 1, 2 ])
+
   def test_binaryStrings(self):
 
     # binary strings (non-Qt)

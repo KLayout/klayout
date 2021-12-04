@@ -2893,6 +2893,36 @@ class Basic_TestClass < TestBase
 
   end
 
+  def test_QLatin1String
+
+    # QLatin1String
+
+    if RBA::A.respond_to?(:ia_cref_to_ql1s)
+
+      ql1s = RBA::A::ia_cref_to_ql1s([ 16, 42, 0, 8 ])
+      assert_equal(ql1s.inspect, "\"\\x10*\\x00\\b\"")
+
+      assert_equal(RBA::A::ql1s_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::ql1s_cref_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::ql1s_cptr_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::ql1s_ref_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::ql1s_ptr_to_ia(ql1s), [ 16, 42, 0, 8 ])
+
+      ql1s = RBA::A::ia_cref_to_ql1s_cref([ 17, 42, 0, 8 ])
+      assert_equal(ql1s.inspect, "\"\\x11*\\x00\\b\"")
+      ql1s = RBA::A::ia_cref_to_ql1s_ref([ 18, 42, 0, 8 ])
+      assert_equal(ql1s.inspect, "\"\\x12*\\x00\\b\"")
+      ql1s = RBA::A::ia_cref_to_ql1s_cptr([ 19, 42, 0, 8 ])
+      assert_equal(ql1s.inspect, "\"\\x13*\\x00\\b\"")
+      ql1s = RBA::A::ia_cref_to_ql1s_ptr([ 20, 42, 0, 8 ])
+      assert_equal(ql1s.inspect, "\"\\x14*\\x00\\b\"")
+
+      assert_equal(RBA::A::ql1s_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
+
+    end
+
+  end
+
   def test_QStringView
 
     # QStringView
@@ -2946,6 +2976,35 @@ class Basic_TestClass < TestBase
     assert_equal(ba.inspect, "\"\\x14*\\x00\\b\"")
 
     assert_equal(RBA::A::ba_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
+
+  end
+
+  def test_optional
+
+    assert_equal(RBA::B::int_to_optional(1, true), 1)
+    assert_equal(RBA::B::int_to_optional(1, false), nil)
+    assert_equal(RBA::B::int_to_optional_a(1, true).a1, 1)
+    assert_equal(RBA::B::int_to_optional_a(1, false), nil)
+
+    assert_equal(RBA::B::optional_to_int(1, -1), 1)
+    assert_equal(RBA::B::optional_to_int(nil, -1), -1)
+    assert_equal(RBA::B::optional_cref_to_int(2, -1), 2)
+    assert_equal(RBA::B::optional_cref_to_int(nil, -1), -1)
+    assert_equal(RBA::B::optional_ref_to_int(3, -1), 3)
+    assert_equal(RBA::B::optional_ref_to_int(nil, -1), -1)
+
+    assert_equal(RBA::B::optional_cptr_to_int(4, -1), 4)
+    assert_equal(RBA::B::optional_ptr_to_int(5, -1), 5)
+
+    assert_equal(RBA::B::optional_a_to_int(RBA::A::new(1), -1), 1)
+    assert_equal(RBA::B::optional_a_to_int(nil, -1), -1)
+    assert_equal(RBA::B::optional_a_cref_to_int(RBA::A::new(2), -1), 2)
+    assert_equal(RBA::B::optional_a_cref_to_int(nil, -1), -1)
+    assert_equal(RBA::B::optional_a_ref_to_int(RBA::A::new(3), -1), 3)
+    assert_equal(RBA::B::optional_a_ref_to_int(nil, -1), -1)
+
+    assert_equal(RBA::B::optional_a_cptr_to_int(RBA::A::new(4), -1), 4)
+    assert_equal(RBA::B::optional_a_ptr_to_int(RBA::A::new(5), -1), 5)
 
   end
 

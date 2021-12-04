@@ -1350,10 +1350,10 @@ private:
  */
 template <class T>
 class ArgSpec
-  : public ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_destructible<T>::value>
+  : public ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_default_constructible<T>::value>
 {
 public:
-  typedef ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_destructible<T>::value> Base;
+  typedef ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_default_constructible<T>::value> Base;
 
   ArgSpec () 
     : Base ()
@@ -1387,10 +1387,10 @@ public:
  */
 template <class T>
 class ArgSpec<const T &>
-  : public ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_destructible<T>::value>
+  : public ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_default_constructible<T>::value>
 {
 public:
-  typedef ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_destructible<T>::value> Base;
+  typedef ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_default_constructible<T>::value> Base;
 
   ArgSpec ()
     : Base ()
@@ -1424,10 +1424,10 @@ public:
  */
 template <class T>
 class ArgSpec<T &>
-  : public ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_destructible<T>::value>
+  : public ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_default_constructible<T>::value>
 {
 public:
-  typedef ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_destructible<T>::value> Base;
+  typedef ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_default_constructible<T>::value> Base;
   typedef T &init_type;
 
   ArgSpec () 
@@ -1454,7 +1454,7 @@ public:
   T &init () const
   {
     //  this simplifies the implementation, but it's not really clean since the caller may modify the default.
-    return const_cast<T &> (ArgSpecImpl<T, std::is_copy_constructible<T>::value>::init ());
+    return const_cast<T &> (Base::init ());
   }
 
   virtual ArgSpecBase *clone () const

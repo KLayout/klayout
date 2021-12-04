@@ -39,6 +39,7 @@ namespace tl
 {
 
 class Progress;
+class ProgressAdaptor;
 class RelativeProgress;
 class AbstractProgress;
 class AbsoluteProgress;
@@ -61,57 +62,6 @@ public:
 
 private:
   std::set<tl::Progress *> mp_valid_objects;
-};
-
-/**
- *  @brief The receivers for progress reports
- *
- *  The progress adaptors form a thread-local stack of receivers. New receivers can override the
- *  previous receivers. It is important that receivers are always created in a nested fashion inside
- *  a single thread.
- */
-
-class TL_PUBLIC ProgressAdaptor
-{
-public:
-  typedef tl::list<tl::Progress>::iterator iterator;
-
-  ProgressAdaptor ();
-  virtual ~ProgressAdaptor ();
-
-  virtual void register_object (Progress *progress);
-  virtual void unregister_object (Progress *progress);
-  virtual void trigger (Progress *progress) = 0;
-  virtual void yield (Progress *progress) = 0;
-
-  void prev (ProgressAdaptor *pa);
-  ProgressAdaptor *prev ();
-
-  bool is_busy () const
-  {
-    return !mp_objects.empty ();
-  }
-
-  tl::Progress *first ();
-
-  void signal_break ();
-
-protected:
-  iterator begin ()
-  {
-    return mp_objects.begin ();
-  }
-
-  iterator end ()
-  {
-    return mp_objects.end ();
-  }
-
-private:
-  friend class ProgressGarbageCollector;
-
-  ProgressAdaptor *mp_prev;
-  tl::list<tl::Progress> mp_objects;
 };
 
 /**
@@ -306,6 +256,57 @@ private:
 
   static tl::ProgressAdaptor *adaptor ();
   static void register_adaptor (tl::ProgressAdaptor *pa);
+};
+
+/**
+ *  @brief The receivers for progress reports
+ *
+ *  The progress adaptors form a thread-local stack of receivers. New receivers can override the
+ *  previous receivers. It is important that receivers are always created in a nested fashion inside
+ *  a single thread.
+ */
+
+class TL_PUBLIC ProgressAdaptor
+{
+public:
+  typedef tl::list<tl::Progress>::iterator iterator;
+
+  ProgressAdaptor ();
+  virtual ~ProgressAdaptor ();
+
+  virtual void register_object (Progress *progress);
+  virtual void unregister_object (Progress *progress);
+  virtual void trigger (Progress *progress) = 0;
+  virtual void yield (Progress *progress) = 0;
+
+  void prev (ProgressAdaptor *pa);
+  ProgressAdaptor *prev ();
+
+  bool is_busy () const
+  {
+    return !mp_objects.empty ();
+  }
+
+  tl::Progress *first ();
+
+  void signal_break ();
+
+protected:
+  iterator begin ()
+  {
+    return mp_objects.begin ();
+  }
+
+  iterator end ()
+  {
+    return mp_objects.end ();
+  }
+
+private:
+  friend class ProgressGarbageCollector;
+
+  ProgressAdaptor *mp_prev;
+  tl::list<tl::Progress> mp_objects;
 };
 
 /**

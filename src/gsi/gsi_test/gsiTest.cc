@@ -220,12 +220,13 @@ A::ia_cref_to_qs_ref (const std::vector<int> &ia)
   return s;
 }
 
+#if QT_VERSION >= 0x50000
+
 std::vector<int>
 A::ql1s_cref_to_ia (const QLatin1String &ql1s)
 {
   const char *cp = ql1s.data ();
   size_t n = ql1s.size ();
-  std::vector<int> ia;
   for (size_t i = 0; i < n; ++i) {
     ia.push_back (*cp++);
   }
@@ -251,10 +252,12 @@ A::ia_cref_to_ql1s_ref (const std::vector<int> &ia)
   for (std::vector<int>::const_iterator i = ia.begin (); i != ia.end (); ++i) {
     str += char (*i);
   }
-  static QLatin1String s;
+  static QLatin1String s (0);
   s = QLatin1String (str.c_str (), str.size ());
   return s;
 }
+
+#endif
 
 #if QT_VERSION >= 0x60000
 
@@ -1053,6 +1056,8 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("ia_cref_to_qs_cptr", &A::ia_cref_to_qs_cptr) +
   gsi::method ("ia_cref_to_qs_ptr", &A::ia_cref_to_qs_ptr) +
 
+#if QT_VERSION >= 0x50000
+
   gsi::method ("ql1s_cref_to_ia", &A::ql1s_cref_to_ia) +
   gsi::method ("ql1s_ref_to_ia", &A::ql1s_ref_to_ia) +
   gsi::method ("ql1s_cptr_to_ia", &A::ql1s_cptr_to_ia) +
@@ -1063,6 +1068,8 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("ia_cref_to_ql1s_ref", &A::ia_cref_to_ql1s_ref) +
   gsi::method ("ia_cref_to_ql1s_cptr", &A::ia_cref_to_ql1s_cptr) +
   gsi::method ("ia_cref_to_ql1s_ptr", &A::ia_cref_to_ql1s_ptr) +
+
+#endif
 
 #if QT_VERSION >= 0x60000
 

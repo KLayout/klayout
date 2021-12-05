@@ -1029,7 +1029,11 @@ protected:
   /**
    *  @brief Qt mouse enter event handler
    */
+#if QT_VERSION >= 0x60000
+  void enterEvent (QEnterEvent *e);
+#else
   void enterEvent (QEvent *e);
+#endif
 
   /**
    *  @brief Qt mouse button press event handler

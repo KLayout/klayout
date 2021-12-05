@@ -684,7 +684,11 @@ END_PROTECTED
 }
 
 void 
+#if QT_VERSION >= 0x60000
+ViewObjectWidget::enterEvent (QEnterEvent * /*event*/)
+#else
 ViewObjectWidget::enterEvent (QEvent * /*event*/)
+#endif
 {
 BEGIN_PROTECTED  
   m_mouse_inside = true;

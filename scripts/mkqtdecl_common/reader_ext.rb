@@ -366,7 +366,7 @@ class CPPStructDeclaration
 
     # add enum constants (CPPEnumSpec)
     (self.struct.body_decl || []).each do |bd|
-      if bd.is_a?(CPPEnumDeclaration) && bd.enum && bd.enum.specs
+      if bd.is_a?(CPPEnumDeclaration) && bd.enum && bd.enum.specs && !bd.enum.is_class
         c += bd.enum.specs
       end
     end

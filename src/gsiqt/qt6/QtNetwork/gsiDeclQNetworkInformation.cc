@@ -107,13 +107,13 @@ static void _call_f_isBehindCaptivePortalChanged_864 (const qt_gsi::GenericMetho
 
 static void _init_f_reachability_c0 (qt_gsi::GenericMethod *decl)
 {
-  decl->set_return<QNetworkInformation::Reachability > ();
+  decl->set_return<qt_gsi::Converter<QNetworkInformation::Reachability>::target_type > ();
 }
 
 static void _call_f_reachability_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QNetworkInformation::Reachability > ((QNetworkInformation::Reachability)((QNetworkInformation *)cls)->reachability ());
+  ret.write<qt_gsi::Converter<QNetworkInformation::Reachability>::target_type > ((qt_gsi::Converter<QNetworkInformation::Reachability>::target_type)qt_gsi::CppToQtAdaptor<QNetworkInformation::Reachability>(((QNetworkInformation *)cls)->reachability ()));
 }
 
 
@@ -123,7 +123,7 @@ static void _call_f_reachability_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 static void _init_f_reachabilityChanged_3770 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("newReachability");
-  decl->add_arg<QNetworkInformation::Reachability > (argspec_0);
+  decl->add_arg<const qt_gsi::Converter<QNetworkInformation::Reachability>::target_type & > (argspec_0);
   decl->set_return<void > ();
 }
 
@@ -131,9 +131,9 @@ static void _call_f_reachabilityChanged_3770 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QNetworkInformation::Reachability arg1 = gsi::arg_reader<QNetworkInformation::Reachability >() (args, heap);
+  const qt_gsi::Converter<QNetworkInformation::Reachability>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNetworkInformation::Reachability>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QNetworkInformation *)cls)->reachabilityChanged (arg1);
+  ((QNetworkInformation *)cls)->reachabilityChanged (qt_gsi::QtToCppAdaptor<QNetworkInformation::Reachability>(arg1).cref());
 }
 
 
@@ -296,6 +296,27 @@ static gsi::QFlagsClass<QNetworkInformation::Feature > decl_QNetworkInformation_
 
 static gsi::ClassExt<QNetworkInformation> decl_QNetworkInformation_Feature_Enum_as_child (decl_QNetworkInformation_Feature_Enum, "Feature");
 static gsi::ClassExt<QNetworkInformation> decl_QNetworkInformation_Feature_Enums_as_child (decl_QNetworkInformation_Feature_Enums, "QFlags_Feature");
+
+}
+
+
+//  Implementation of the enum wrapper class for QNetworkInformation::Reachability
+namespace qt_gsi
+{
+
+static gsi::Enum<QNetworkInformation::Reachability> decl_QNetworkInformation_Reachability_Enum ("QtNetwork", "QNetworkInformation_Reachability",
+    gsi::enum_const ("Unknown", QNetworkInformation::Reachability::Unknown, "@brief Enum constant QNetworkInformation::Reachability::Unknown") +
+    gsi::enum_const ("Disconnected", QNetworkInformation::Reachability::Disconnected, "@brief Enum constant QNetworkInformation::Reachability::Disconnected") +
+    gsi::enum_const ("Local", QNetworkInformation::Reachability::Local, "@brief Enum constant QNetworkInformation::Reachability::Local") +
+    gsi::enum_const ("Site", QNetworkInformation::Reachability::Site, "@brief Enum constant QNetworkInformation::Reachability::Site") +
+    gsi::enum_const ("Online", QNetworkInformation::Reachability::Online, "@brief Enum constant QNetworkInformation::Reachability::Online"),
+  "@qt\n@brief This class represents the QNetworkInformation::Reachability enum");
+
+static gsi::QFlagsClass<QNetworkInformation::Reachability > decl_QNetworkInformation_Reachability_Enums ("QtNetwork", "QNetworkInformation_QFlags_Reachability",
+  "@qt\n@brief This class represents the QFlags<QNetworkInformation::Reachability> flag set");
+
+static gsi::ClassExt<QNetworkInformation> decl_QNetworkInformation_Reachability_Enum_as_child (decl_QNetworkInformation_Reachability_Enum, "Reachability");
+static gsi::ClassExt<QNetworkInformation> decl_QNetworkInformation_Reachability_Enums_as_child (decl_QNetworkInformation_Reachability_Enums, "QFlags_Reachability");
 
 }
 

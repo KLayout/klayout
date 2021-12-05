@@ -225,6 +225,7 @@ A::ia_cref_to_qs_ref (const std::vector<int> &ia)
 std::vector<int>
 A::ql1s_cref_to_ia (const QLatin1String &ql1s)
 {
+  std::vector<int> ia;
   const char *cp = ql1s.data ();
   size_t n = ql1s.size ();
   for (size_t i = 0; i < n; ++i) {

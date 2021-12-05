@@ -2837,7 +2837,7 @@ class Basic_TestClass < TestBase
 
     # QByteArrayView
 
-    if RBA::A.respond_to?(:ia_cref_to_qba)
+    if RBA::A.respond_to?(:ia_cref_to_qbav)
 
       qbav = RBA::A::ia_cref_to_qbav([ 16, 42, 0, 8 ])
       assert_equal(qbav.inspect, "\"\\x10*\\x00\\b\"")
@@ -2867,7 +2867,7 @@ class Basic_TestClass < TestBase
 
     # QString
 
-    if RBA::A.respond_to?(:ia_cref_to_qba)
+    if RBA::A.respond_to?(:ia_cref_to_qs)
 
       qs = RBA::A::ia_cref_to_qs([ 16, 42, 0, 8 ])
       assert_equal(qs.inspect, "\"\\x10*\\x00\\b\"")
@@ -2927,7 +2927,7 @@ class Basic_TestClass < TestBase
 
     # QStringView
 
-    if RBA::A.respond_to?(:ia_cref_to_qs)
+    if RBA::A.respond_to?(:ia_cref_to_qsv)
 
       qsv = RBA::A::ia_cref_to_qsv([ 16, 42, 0, 8 ])
       assert_equal(qsv.inspect, "\"\\x10*\\x00\\b\"")
@@ -2981,30 +2981,34 @@ class Basic_TestClass < TestBase
 
   def test_optional
 
-    assert_equal(RBA::B::int_to_optional(1, true), 1)
-    assert_equal(RBA::B::int_to_optional(1, false), nil)
-    assert_equal(RBA::B::int_to_optional_a(1, true).a1, 1)
-    assert_equal(RBA::B::int_to_optional_a(1, false), nil)
+    if RBA::B.respond_to?(:int_to_optional)
 
-    assert_equal(RBA::B::optional_to_int(1, -1), 1)
-    assert_equal(RBA::B::optional_to_int(nil, -1), -1)
-    assert_equal(RBA::B::optional_cref_to_int(2, -1), 2)
-    assert_equal(RBA::B::optional_cref_to_int(nil, -1), -1)
-    assert_equal(RBA::B::optional_ref_to_int(3, -1), 3)
-    assert_equal(RBA::B::optional_ref_to_int(nil, -1), -1)
+      assert_equal(RBA::B::int_to_optional(1, true), 1)
+      assert_equal(RBA::B::int_to_optional(1, false), nil)
+      assert_equal(RBA::B::int_to_optional_a(1, true).a1, 1)
+      assert_equal(RBA::B::int_to_optional_a(1, false), nil)
 
-    assert_equal(RBA::B::optional_cptr_to_int(4, -1), 4)
-    assert_equal(RBA::B::optional_ptr_to_int(5, -1), 5)
+      assert_equal(RBA::B::optional_to_int(1, -1), 1)
+      assert_equal(RBA::B::optional_to_int(nil, -1), -1)
+      assert_equal(RBA::B::optional_cref_to_int(2, -1), 2)
+      assert_equal(RBA::B::optional_cref_to_int(nil, -1), -1)
+      assert_equal(RBA::B::optional_ref_to_int(3, -1), 3)
+      assert_equal(RBA::B::optional_ref_to_int(nil, -1), -1)
 
-    assert_equal(RBA::B::optional_a_to_int(RBA::A::new(1), -1), 1)
-    assert_equal(RBA::B::optional_a_to_int(nil, -1), -1)
-    assert_equal(RBA::B::optional_a_cref_to_int(RBA::A::new(2), -1), 2)
-    assert_equal(RBA::B::optional_a_cref_to_int(nil, -1), -1)
-    assert_equal(RBA::B::optional_a_ref_to_int(RBA::A::new(3), -1), 3)
-    assert_equal(RBA::B::optional_a_ref_to_int(nil, -1), -1)
+      assert_equal(RBA::B::optional_cptr_to_int(4, -1), 4)
+      assert_equal(RBA::B::optional_ptr_to_int(5, -1), 5)
 
-    assert_equal(RBA::B::optional_a_cptr_to_int(RBA::A::new(4), -1), 4)
-    assert_equal(RBA::B::optional_a_ptr_to_int(RBA::A::new(5), -1), 5)
+      assert_equal(RBA::B::optional_a_to_int(RBA::A::new(1), -1), 1)
+      assert_equal(RBA::B::optional_a_to_int(nil, -1), -1)
+      assert_equal(RBA::B::optional_a_cref_to_int(RBA::A::new(2), -1), 2)
+      assert_equal(RBA::B::optional_a_cref_to_int(nil, -1), -1)
+      assert_equal(RBA::B::optional_a_ref_to_int(RBA::A::new(3), -1), 3)
+      assert_equal(RBA::B::optional_a_ref_to_int(nil, -1), -1)
+
+      assert_equal(RBA::B::optional_a_cptr_to_int(RBA::A::new(4), -1), 4)
+      assert_equal(RBA::B::optional_a_ptr_to_int(RBA::A::new(5), -1), 5)
+
+    end
 
   end
 

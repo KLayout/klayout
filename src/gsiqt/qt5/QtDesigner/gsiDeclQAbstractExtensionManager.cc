@@ -32,7 +32,6 @@
 #include <QObject>
 #include "gsiQt.h"
 #include "gsiQtDesignerCommon.h"
-#include "gsiDeclQtDesignerTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

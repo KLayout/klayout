@@ -984,6 +984,8 @@ private:
   mutable QByteArray m_s_utf8;
 };
 
+#endif
+
 /**
  *  @brief Specialization for QLatin1String
  */
@@ -1023,12 +1025,12 @@ public:
 
   virtual size_t size () const
   {
-    return mp_s->toString ().toUtf8 ().size ();
+    return QString::fromLatin1 (mp_s->data (), mp_s->size ()).toUtf8 ().size ();
   }
 
   virtual const char *c_str () const
   {
-    m_s_utf8 = mp_s->toString ().toUtf8 ();
+    m_s_utf8 = QString::fromLatin1 (mp_s->data (), mp_s->size ()).toUtf8 ();
     return m_s_utf8.constData ();
   }
 
@@ -1047,8 +1049,6 @@ private:
   QByteArray m_latin1_holder;
   mutable QByteArray m_s_utf8;
 };
-
-#endif
 
 #endif
 

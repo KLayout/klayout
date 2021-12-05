@@ -106,7 +106,7 @@ class NetlistModelItemData
   : public tl::list_node<NetlistModelItemData>
 {
 public:
-  typedef tl::list<NetlistModelItemData>::iterator iterator;
+  typedef tl::list<NetlistModelItemData, false>::iterator iterator;
 
   NetlistModelItemData ();
   NetlistModelItemData (NetlistModelItemData *parent);
@@ -155,8 +155,11 @@ public:
   bool derived_from_nets (const std::pair<const db::Net *, const db::Net *> &np);
 
 private:
+  NetlistModelItemData (const NetlistModelItemData &);
+  NetlistModelItemData &operator= (const NetlistModelItemData &);
+
   NetlistModelItemData *mp_parent;
-  tl::list<NetlistModelItemData> m_children;
+  tl::list<NetlistModelItemData, false> m_children;
   std::vector<NetlistModelItemData *> m_children_per_index;
   bool m_children_made;
   size_t m_index;

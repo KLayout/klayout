@@ -38,7 +38,6 @@
 #include <QSize>
 #include "gsiQt.h"
 #include "gsiQtSvgCommon.h"
-#include "gsiDeclQtSvgTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

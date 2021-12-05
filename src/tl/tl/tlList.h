@@ -101,7 +101,7 @@ public:
 
 private:
   template <class Type, bool copy_constructible> friend class list_impl;
-  template <class Type> friend class list;
+  template <class Type, bool CanCopy> friend class list;
   template <class Type> friend class list_iterator;
   template <class Type> friend class reverse_list_iterator;
 
@@ -443,9 +443,9 @@ private:
  *  tl::list<MyClass> list;
  *  list.push_back (new MyClass ());
  */
-template <class C>
+template <class C, bool CanCopy = std::is_copy_constructible<C>::value>
 class list
-  : public list_impl<C, std::is_copy_constructible<C>::value>
+  : public list_impl<C, CanCopy>
 {
 public:
   typedef list_iterator<C> iterator;
@@ -455,17 +455,17 @@ public:
 
   typedef C value_type;
 
-  using list_impl<C, std::is_copy_constructible<C>::value>::first;
-  using list_impl<C, std::is_copy_constructible<C>::value>::last;
-  using list_impl<C, std::is_copy_constructible<C>::value>::head;
-  using list_impl<C, std::is_copy_constructible<C>::value>::back;
+  using list_impl<C, CanCopy>::first;
+  using list_impl<C, CanCopy>::last;
+  using list_impl<C, CanCopy>::head;
+  using list_impl<C, CanCopy>::back;
 
   list () { }
-  list (const list &other) : list_impl<C, std::is_copy_constructible<C>::value> (other) { }
+  list (const list &other) : list_impl<C, CanCopy> (other) { }
 
   list &operator= (const list &other)
   {
-    list_impl<C, std::is_copy_constructible<C>::value>::operator= (other);
+    list_impl<C, CanCopy>::operator= (other);
     return *this;
   }
 

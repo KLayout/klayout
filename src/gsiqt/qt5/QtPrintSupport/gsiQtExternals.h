@@ -35,66 +35,33 @@
 
 class QAbstractPrintDialog;
 
-namespace tl { template <> struct type_traits<QAbstractPrintDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTPRINTSUPPORT_PUBLIC gsi::Class<QAbstractPrintDialog> &qtdecl_QAbstractPrintDialog (); }
 
 class QPageSetupDialog;
-
-namespace tl { template <> struct type_traits<QPageSetupDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTPRINTSUPPORT_PUBLIC gsi::Class<QPageSetupDialog> &qtdecl_QPageSetupDialog (); }
 
 class QPrintDialog;
 
-namespace tl { template <> struct type_traits<QPrintDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTPRINTSUPPORT_PUBLIC gsi::Class<QPrintDialog> &qtdecl_QPrintDialog (); }
 
 class QPrintEngine;
-
-namespace tl { template <> struct type_traits<QPrintEngine> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTPRINTSUPPORT_PUBLIC gsi::Class<QPrintEngine> &qtdecl_QPrintEngine (); }
 
 class QPrintPreviewDialog;
 
-namespace tl { template <> struct type_traits<QPrintPreviewDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTPRINTSUPPORT_PUBLIC gsi::Class<QPrintPreviewDialog> &qtdecl_QPrintPreviewDialog (); }
 
 class QPrintPreviewWidget;
-
-namespace tl { template <> struct type_traits<QPrintPreviewWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTPRINTSUPPORT_PUBLIC gsi::Class<QPrintPreviewWidget> &qtdecl_QPrintPreviewWidget (); }
 
 class QPrinter;
 
-namespace tl { template <> struct type_traits<QPrinter> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTPRINTSUPPORT_PUBLIC gsi::Class<QPrinter> &qtdecl_QPrinter (); }
 
 class QPrinterInfo;
-
-namespace tl { template <> struct type_traits<QPrinterInfo> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTPRINTSUPPORT_PUBLIC gsi::Class<QPrinterInfo> &qtdecl_QPrinterInfo (); }
 

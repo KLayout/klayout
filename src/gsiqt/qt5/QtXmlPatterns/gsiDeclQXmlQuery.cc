@@ -40,7 +40,6 @@
 #include <QXmlResultItems>
 #include "gsiQt.h"
 #include "gsiQtXmlPatternsCommon.h"
-#include "gsiDeclQtXmlPatternsTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

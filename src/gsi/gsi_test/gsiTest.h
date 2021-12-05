@@ -131,6 +131,8 @@ struct A
   static std::vector<int> qs_ptr_to_ia (QString *qs)                    { return qs_cref_to_ia (*qs); }
   static std::vector<int> qs_to_ia (QString qs)                         { return qs_cref_to_ia (qs); }
 
+#if QT_VERSION >= 0x50000
+
   /**
    *  @brief Byte sequences: tests access to QLatin1String
    */
@@ -139,6 +141,8 @@ struct A
   static std::vector<int> ql1s_cptr_to_ia (const QLatin1String *qs)     { return ql1s_cref_to_ia (*qs); }
   static std::vector<int> ql1s_ptr_to_ia (QLatin1String *qs)            { return ql1s_cref_to_ia (*qs); }
   static std::vector<int> ql1s_to_ia (QLatin1String qs)                 { return ql1s_cref_to_ia (qs); }
+
+#endif
 
 #if QT_VERSION >= 0x60000
 
@@ -184,14 +188,18 @@ struct A
   static const QString *ia_cref_to_qs_cptr (const std::vector<int> &ia)           { return &ia_cref_to_qs_ref (ia); }
   static QString *ia_cref_to_qs_ptr (const std::vector<int> &ia)                  { return &ia_cref_to_qs_ref (ia); }
 
+#if QT_VERSION >= 0x50000
+
   /**
-   *  @brief Byte sequences: tests return of QString
+   *  @brief Byte sequences: tests return of QLatin1String
    */
   static QLatin1String ia_cref_to_ql1s (const std::vector<int> &ia);
   static QLatin1String &ia_cref_to_ql1s_ref (const std::vector<int> &ia);
   static const QLatin1String &ia_cref_to_ql1s_cref (const std::vector<int> &ia)   { return ia_cref_to_ql1s_ref (ia); }
   static const QLatin1String *ia_cref_to_ql1s_cptr (const std::vector<int> &ia)   { return &ia_cref_to_ql1s_ref (ia); }
   static QLatin1String *ia_cref_to_ql1s_ptr (const std::vector<int> &ia)          { return &ia_cref_to_ql1s_ref (ia); }
+
+#endif
 
 #if QT_VERSION >= 0x60000
 

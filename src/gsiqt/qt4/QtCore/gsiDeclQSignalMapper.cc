@@ -36,7 +36,6 @@
 #include <QWidget>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
-#include "gsiDeclQtCoreTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

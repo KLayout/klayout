@@ -986,6 +986,8 @@ private:
 
 #endif
 
+#if QT_VERSION >= 0x50000
+
 /**
  *  @brief Specialization for QLatin1String
  */
@@ -1049,6 +1051,8 @@ private:
   QByteArray m_latin1_holder;
   mutable QByteArray m_s_utf8;
 };
+
+#endif
 
 #endif
 
@@ -1639,6 +1643,8 @@ private:
   QVariant m_v;
 };
 
+#if QT_VERSION >= 0x50000
+
 /**
  *  @brief Specialization for QVariant
  */
@@ -1721,6 +1727,8 @@ private:
   bool m_is_const;
   QPointer<T> m_v;
 };
+
+#endif
 
 #endif
 

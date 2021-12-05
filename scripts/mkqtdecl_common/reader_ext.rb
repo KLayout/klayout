@@ -296,7 +296,8 @@ class CPPEnumDeclaration
   end
 
   def myself
-    self.enum.name.to_s
+    # exclude forward declarations
+    self.enum.specs && self.enum.name.to_s
   end
 
 end

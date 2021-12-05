@@ -19,6 +19,7 @@ SOURCES += \
   $$PWD/gsiDeclQDtls.cc \
   $$PWD/gsiDeclQDtlsClientVerifier.cc \
   $$PWD/gsiDeclQDtlsClientVerifier_GeneratorParameters.cc \
+  $$PWD/gsiDeclQDtlsError.cc \
   $$PWD/gsiDeclQHostAddress.cc \
   $$PWD/gsiDeclQHostInfo.cc \
   $$PWD/gsiDeclQHstsPolicy.cc \
@@ -42,6 +43,8 @@ SOURCES += \
   $$PWD/gsiDeclQNetworkProxyQuery.cc \
   $$PWD/gsiDeclQNetworkReply.cc \
   $$PWD/gsiDeclQNetworkRequest.cc \
+  $$PWD/gsiDeclQOcspCertificateStatus.cc \
+  $$PWD/gsiDeclQOcspRevocationReason.cc \
   $$PWD/gsiDeclQPasswordDigestor.cc \
   $$PWD/gsiDeclQSsl.cc \
   $$PWD/gsiDeclQSslCertificate.cc \

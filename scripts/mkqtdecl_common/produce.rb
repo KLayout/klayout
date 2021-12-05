@@ -166,6 +166,20 @@ class CPPNamespace
 
 end
 
+class CPPModule
+
+  def collect_enum_decls(map, &filter)
+
+    self.decls.each do |bd|
+      if bd.is_a?(CPPEnumDeclaration) 
+        bd.enum && filter.call(bd) && (map[bd.enum.name] ||= bd)
+      end
+    end
+
+  end
+
+end
+
 class CPPEnum
 
   def resolve_typedefs(scope)
@@ -1360,7 +1374,7 @@ end
 
 class BindingProducer
 
-  attr_accessor :modn
+  attr_accessor :modn, :root
 
   # @brief Read the input file (JSON)
   # 
@@ -1454,7 +1468,7 @@ class BindingProducer
 
   def produce_cpp_from_decl(conf, decl_obj)
 
-    if !decl_obj.is_a?(CPPStructDeclaration) && !decl_obj.is_a?(CPPNamespace)
+    if !decl_obj.is_a?(CPPStructDeclaration) && !decl_obj.is_a?(CPPNamespace) && !decl_obj.is_a?(CPPEnumDeclaration)
       return
     end
 
@@ -1515,6 +1529,8 @@ END
           cont = produce_class(conf, decl_obj, ofile, index)
         elsif decl_obj.is_a?(CPPNamespace)
           cont = produce_namespace(conf, decl_obj, ofile, index)
+        elsif decl_obj.is_a?(CPPEnumDeclaration)
+          cont = produce_enum(conf, decl_obj, ofile, index)
         end
 
         puts("#{ofile_name} written.")
@@ -1622,6 +1638,26 @@ END
 
   end
 
+  def produce_enum(conf, decl_obj, ofile, index)
+
+    ( cls, clsn ) = make_cls_names(decl_obj)
+
+    produce_class_include(conf, decl_obj, ofile)
+    ofile.puts("#include <memory>")
+
+    ofile.puts("")
+    ofile.puts("// -----------------------------------------------------------------------")
+    ofile.puts("// enum #{cls}")
+
+    ofile.puts("")
+
+    # emit enum wrapper classes (top level, hence container class is nil)
+    produce_enum_wrapper_class(ofile, conf, nil, cls, decl_obj) 
+
+    return false
+
+  end
+
   def produce_namespace(conf, decl_obj, ofile, index)
 
     ( cls, clsn ) = make_cls_names(decl_obj)
@@ -1670,7 +1706,7 @@ END
 
   def produce_enum_wrapper_class(ofile, conf, cls, en, ed) 
 
-    clsn = make_cls_name(cls)
+    clsn = cls && make_cls_name(cls)
 
     # emit enum wrapper classes
   
@@ -1679,60 +1715,86 @@ END
     ofile.puts("namespace qt_gsi")
     ofile.puts("{")
     ofile.puts("")
-    ofile.puts("static gsi::Enum<#{cls}::#{en}> decl_#{clsn}_#{en}_Enum (\"#{modn}\", \"#{clsn}_#{en}\",")
+    if cls
+      ofile.puts("static gsi::Enum<#{cls}::#{en}> decl_#{clsn}_#{en}_Enum (\"#{modn}\", \"#{clsn}_#{en}\",")
+    else
+      ofile.puts("static gsi::Enum<#{en}> decl_#{en}_Enum (\"#{modn}\", \"#{en}\",")
+    end
 
     edecl = []
 
     ec = ed.enum.specs.collect { |s| s.name }
     ec.each_with_index do |ei,i|
 
-      ei_name = conf.target_name_for_enum_const(cls, "#{en}::#{ei}", ei)
+      ei_name = conf.target_name_for_enum_const(cls ? cls : "::", "#{en}::#{ei}", ei)
       if ! ei_name
         # enum dropped
         next
       end
 
-      if ed.enum.is_class
-        edecl << "  gsi::enum_const (\"#{ei_name}\", #{cls}::#{en}::#{ei}, \"@brief Enum constant #{cls}::#{en}::#{ei}\")"
+      if cls
+        if ed.enum.is_class
+          edecl << "  gsi::enum_const (\"#{ei_name}\", #{cls}::#{en}::#{ei}, \"@brief Enum constant #{cls}::#{en}::#{ei}\")"
+        else
+          edecl << "  gsi::enum_const (\"#{ei_name}\", #{cls}::#{ei}, \"@brief Enum constant #{cls}::#{ei}\")"
+        end
       else
-        edecl << "  gsi::enum_const (\"#{ei_name}\", #{cls}::#{ei}, \"@brief Enum constant #{cls}::#{ei}\")"
+        if ed.enum.is_class
+          edecl << "  gsi::enum_const (\"#{ei_name}\", #{en}::#{ei}, \"@brief Enum constant #{en}::#{ei}\")"
+        else
+          edecl << "  gsi::enum_const (\"#{ei_name}\", #{ei}, \"@brief Enum constant #{ei}\")"
+        end
       end
 
     end
 
     ofile.puts("  " + edecl.join(" +\n  ") + ",\n")
-    ofile.puts("  \"@qt\\n@brief This class represents the #{cls}::#{en} enum\");")
+    if cls
+      ofile.puts("  \"@qt\\n@brief This class represents the #{cls}::#{en} enum\");")
+    else
+      ofile.puts("  \"@qt\\n@brief This class represents the #{en} enum\");")
+    end
     ofile.puts("")
 
-    ofile.puts("static gsi::QFlagsClass<#{cls}::#{en} > decl_#{clsn}_#{en}_Enums (\"#{modn}\", \"#{clsn}_QFlags_#{en}\",")
-    ofile.puts("  \"@qt\\n@brief This class represents the QFlags<#{cls}::#{en}> flag set\");")
-    ofile.puts("")
-
-    # inject the declarations into the parent namespace or class
-    pdecl_obj = ed.parent
-
-    pcls = pdecl_obj.myself
-    o = pdecl_obj
-    while o.parent && o.parent.myself
-      o = o.parent
-      pcls = o.myself + "::" + pcls
+    if cls
+      ofile.puts("static gsi::QFlagsClass<#{cls}::#{en} > decl_#{clsn}_#{en}_Enums (\"#{modn}\", \"#{clsn}_QFlags_#{en}\",")
+      ofile.puts("  \"@qt\\n@brief This class represents the QFlags<#{cls}::#{en}> flag set\");")
+      ofile.puts("")
+    else
+      ofile.puts("static gsi::QFlagsClass<#{en} > decl_#{en}_Enums (\"#{modn}\", \"QFlags_#{en}\",")
+      ofile.puts("  \"@qt\\n@brief This class represents the QFlags<#{en}> flag set\");")
+      ofile.puts("")
     end
 
-    pname = pcls
-    if pdecl_obj.is_a?(CPPNamespace)
-      pname = pcls + "_Namespace"
+    if cls
+
+      # inject the declarations into the parent namespace or class
+      pdecl_obj = ed.parent
+
+      pcls = pdecl_obj.myself
+      o = pdecl_obj
+      while o.parent && o.parent.myself
+        o = o.parent
+        pcls = o.myself + "::" + pcls
+      end
+
+      pname = pcls
+      if pdecl_obj.is_a?(CPPNamespace)
+        pname = pcls + "_Namespace"
+      end
+
+      if ! ed.enum.is_class
+        ofile.puts("//  Inject the declarations into the parent")
+        ofile.puts("static gsi::ClassExt<#{pname}> inject_#{clsn}_#{en}_Enum_in_parent (decl_#{clsn}_#{en}_Enum.defs ());")
+      end
+
+      ofile.puts("static gsi::ClassExt<#{pname}> decl_#{clsn}_#{en}_Enum_as_child (decl_#{clsn}_#{en}_Enum, \"#{en}\");")
+      ofile.puts("static gsi::ClassExt<#{pname}> decl_#{clsn}_#{en}_Enums_as_child (decl_#{clsn}_#{en}_Enums, \"QFlags_#{en}\");")
+
+      ofile.puts("")
+
     end
 
-    if ! ed.enum.is_class
-      ofile.puts("//  Inject the declarations into the parent")
-      ofile.puts("static gsi::ClassExt<#{pname}> inject_#{clsn}_#{en}_Enum_in_parent (decl_#{clsn}_#{en}_Enum.defs ());")
-    end
-
-
-    ofile.puts("static gsi::ClassExt<#{pname}> decl_#{clsn}_#{en}_Enum_as_child (decl_#{clsn}_#{en}_Enum, \"#{en}\");")
-    ofile.puts("static gsi::ClassExt<#{pname}> decl_#{clsn}_#{en}_Enums_as_child (decl_#{clsn}_#{en}_Enums, \"QFlags_#{en}\");")
-
-    ofile.puts("")
     ofile.puts("}")
     ofile.puts("")
 

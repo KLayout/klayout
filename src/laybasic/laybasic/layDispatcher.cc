@@ -36,7 +36,6 @@ static Dispatcher *ms_dispatcher_instance = 0;
 
 Dispatcher::Dispatcher (Plugin *parent, bool standalone)
   : Plugin (parent, standalone),
-    m_menu (this),
     mp_menu_parent_widget (0),
     mp_delegate (0)
 {
@@ -45,13 +44,38 @@ Dispatcher::Dispatcher (Plugin *parent, bool standalone)
   }
 }
 
+Dispatcher::Dispatcher (QWidget *menu_parent_widget, Plugin *parent, bool standalone)
+  : Plugin (parent, standalone),
+    mp_menu_parent_widget (menu_parent_widget),
+    mp_delegate (0)
+{
+  if (mp_menu_parent_widget) {
+    mp_menu.reset (new lay::AbstractMenu (this));
+  }
+  if (! parent && ! ms_dispatcher_instance) {
+    ms_dispatcher_instance = this;
+  }
+}
+
 Dispatcher::Dispatcher (DispatcherDelegate *delegate, Plugin *parent, bool standalone)
   : Plugin (parent, standalone),
-    m_menu (this),
     mp_menu_parent_widget (0),
     mp_delegate (delegate)
 {
-  if (! ms_dispatcher_instance) {
+  if (! parent && ! ms_dispatcher_instance) {
+    ms_dispatcher_instance = this;
+  }
+}
+
+Dispatcher::Dispatcher (QWidget *menu_parent_widget, DispatcherDelegate *delegate, Plugin *parent, bool standalone)
+  : Plugin (parent, standalone),
+    mp_menu_parent_widget (menu_parent_widget),
+    mp_delegate (delegate)
+{
+  if (mp_menu_parent_widget) {
+    mp_menu.reset (new lay::AbstractMenu (this));
+  }
+  if (! parent && ! ms_dispatcher_instance) {
     ms_dispatcher_instance = this;
   }
 }
@@ -66,9 +90,11 @@ Dispatcher::~Dispatcher ()
 bool
 Dispatcher::configure (const std::string &name, const std::string &value)
 {
-  std::vector<lay::ConfigureAction *> ca = m_menu.configure_actions (name);
-  for (std::vector<lay::ConfigureAction *>::const_iterator a = ca.begin (); a != ca.end (); ++a) {
-    (*a)->configure (value);
+  if (mp_menu) {
+    std::vector<lay::ConfigureAction *> ca = mp_menu->configure_actions (name);
+    for (std::vector<lay::ConfigureAction *>::const_iterator a = ca.begin (); a != ca.end (); ++a) {
+      (*a)->configure (value);
+    }
   }
 
   if (mp_delegate) {

@@ -118,11 +118,28 @@ public:
   Dispatcher (Plugin *parent = 0, bool standalone = false);
 
   /**
+   *  @brief The constructor
+   *
+   *  @param menu_parent_widget If not 0, indicates that this is a GUI mode dispatcher providing an abstract menu
+   *  @param parent Usually 0, but a dispatcher may have parents. In this case, the dispatcher is not the actual dispatcher, but the real plugin chain's root is.
+   *  @param standalone The standalone flag passed to the plugin constructor.
+   */
+  Dispatcher (QWidget *menu_parent_widget, Plugin *parent = 0, bool standalone = false);
+
+  /**
    *  @brief The root constructor
    *
    *  @param delegate The notification receiver for dispatcher events
    */
   Dispatcher (DispatcherDelegate *delegate, Plugin *parent = 0, bool standalone = false);
+
+  /**
+   *  @brief The root constructor
+   *
+   *  @param menu_parent_widget If not 0, indicates that this is a GUI mode dispatcher providing an abstract menu
+   *  @param delegate The notification receiver for dispatcher events
+   */
+  Dispatcher (QWidget *menu_parent_widget, DispatcherDelegate *delegate, Plugin *parent = 0, bool standalone = false);
 
   /**
    *  @brief Destructor
@@ -208,14 +225,6 @@ public:
   }
 
   /**
-   *  @brief Gets the parent widget
-   */
-  void set_menu_parent_widget (QWidget *w)
-  {
-    mp_menu_parent_widget = w;
-  }
-
-  /**
    *  @brief Returns true, if the dispatcher supplies a user interface
    */
   bool has_ui () { return menu_parent_widget () != 0; }
@@ -227,7 +236,7 @@ public:
    */
   AbstractMenu *menu ()
   {
-    return (dispatcher () == this) ? &m_menu : dispatcher ()->menu ();
+    return (dispatcher () == this) ? mp_menu.get () : dispatcher ()->menu ();
   }
 
 protected:
@@ -239,7 +248,7 @@ private:
   Dispatcher (const Dispatcher &);
   Dispatcher &operator= (const Dispatcher &);
 
-  lay::AbstractMenu m_menu;
+  std::unique_ptr<lay::AbstractMenu> mp_menu;
   QWidget *mp_menu_parent_widget;
   DispatcherDelegate *mp_delegate;
 };

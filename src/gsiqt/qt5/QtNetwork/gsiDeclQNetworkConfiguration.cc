@@ -30,7 +30,6 @@
 #include <QNetworkConfiguration>
 #include "gsiQt.h"
 #include "gsiQtNetworkCommon.h"
-#include "gsiDeclQtNetworkTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

@@ -33,7 +33,6 @@
 #include <QRectF>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
-#include "gsiDeclQtGuiTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------
@@ -93,52 +92,52 @@
 
   static void f_QPolygonF_clear (QPolygonF *m)
   {
-    return m->clear();
+    m->clear();
   }
 
   static void f_QPolygonF_remove (QPolygonF *m, int i)
   {
-    return m->remove (i);
+    m->remove (i);
   }
 
   static void f_QPolygonF_insert (QPolygonF *m, int i, const QPointF &p)
   {
-    return m->insert (i, p);
+    m->insert (i, p);
   }
 
   static void f_QPolygonF_replace (QPolygonF *m, int i, const QPointF &p)
   {
-    return m->replace (i, p);
+    m->replace (i, p);
   }
 
   static void f_QPolygonF_pop_front (QPolygonF *m)
   {
-    return m->pop_front ();
+    m->pop_front ();
   }
 
   static void f_QPolygonF_pop_back (QPolygonF *m)
   {
-    return m->pop_back ();
+    m->pop_back ();
   }
 
   static void f_QPolygonF_push_front (QPolygonF *m, const QPointF &p)
   {
-    return m->push_front (p);
+    m->push_front (p);
   }
 
   static void f_QPolygonF_push_back (QPolygonF *m, const QPointF &p)
   {
-    return m->push_back (p);
+    m->push_back (p);
   }
 
   static void f_QPolygonF_reserve (QPolygonF *m, int n)
   {
-    return m->reserve (n);
+    m->reserve (n);
   }
 
   static void f_QPolygonF_resize (QPolygonF *m, int n)
   {
-    return m->resize (n);
+    m->resize (n);
   }
 
   static void f_QPolygonF_fill (QPolygonF *m, const QPointF &p, int n)

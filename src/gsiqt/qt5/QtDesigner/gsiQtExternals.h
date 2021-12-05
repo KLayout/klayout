@@ -35,35 +35,17 @@
 
 class QAbstractExtensionFactory;
 
-namespace tl { template <> struct type_traits<QAbstractExtensionFactory> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTDESIGNER_PUBLIC gsi::Class<QAbstractExtensionFactory> &qtdecl_QAbstractExtensionFactory (); }
 
 class QAbstractExtensionManager;
-
-namespace tl { template <> struct type_traits<QAbstractExtensionManager> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTDESIGNER_PUBLIC gsi::Class<QAbstractExtensionManager> &qtdecl_QAbstractExtensionManager (); }
 
 class QAbstractFormBuilder;
 
-namespace tl { template <> struct type_traits<QAbstractFormBuilder> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTDESIGNER_PUBLIC gsi::Class<QAbstractFormBuilder> &qtdecl_QAbstractFormBuilder (); }
 
 class QFormBuilder;
-
-namespace tl { template <> struct type_traits<QFormBuilder> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTDESIGNER_PUBLIC gsi::Class<QFormBuilder> &qtdecl_QFormBuilder (); }
 

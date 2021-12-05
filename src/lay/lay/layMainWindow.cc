@@ -798,7 +798,7 @@ static int fm_width (const QFontMetrics &fm, const QString &s)
 #if QT_VERSION >= 0x60000
   return fm.horizontalAdvance (s);
 #else
-  return fm.width (QString::fromUtf8 (s));
+  return fm.width (s);
 #endif
 }
 

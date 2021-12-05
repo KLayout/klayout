@@ -1228,6 +1228,7 @@ static gsi::Class<A> decl_a ("", "A",
 static gsi::Class<A_NC> decl_a_nc (decl_a, "", "A_NC");
 
 static gsi::Class<B> decl_b ("", "B",
+#if __cplusplus >= 201703L
   gsi::method ("int_to_optional", &B::int_to_optional) +
   gsi::method ("int_to_optional_a", &B::int_to_optional_a) +
   gsi::method ("optional_to_int", &B::optional_to_int) +
@@ -1240,6 +1241,7 @@ static gsi::Class<B> decl_b ("", "B",
   gsi::method ("optional_a_ref_to_int", &B::optional_a_ref_to_int) +
   gsi::method ("optional_a_cptr_to_int", &B::optional_a_cptr_to_int) +
   gsi::method ("optional_a_ptr_to_int", &B::optional_a_ptr_to_int) +
+#endif
   gsi::method ("inst", &B::inst) +
   gsi::method ("has_inst", &B::has_inst) +
   gsi::method ("set_inst", &B::set_inst) +

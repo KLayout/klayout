@@ -32,15 +32,21 @@
 #include <QModelIndex>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
-#include "gsiDeclQtCoreTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------
 // class QPersistentModelIndex
+#if QT_VERSION < 0x60000
   static const QModelIndex &castToQModelIndex(const QPersistentModelIndex *m)
   {
     return m->operator const QModelIndex &();
   }
+#else
+  static QModelIndex castToQModelIndex(const QPersistentModelIndex *m)
+  {
+    return m->operator QModelIndex();
+  }
+#endif
 
 //  Constructor QPersistentModelIndex::QPersistentModelIndex()
 

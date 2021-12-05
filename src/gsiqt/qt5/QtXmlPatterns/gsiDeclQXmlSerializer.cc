@@ -29,9 +29,9 @@
 
 #include <QXmlSerializer>
 #include <QXmlQuery>
+#include <QTextCodec>
 #include "gsiQt.h"
 #include "gsiQtXmlPatternsCommon.h"
-#include "gsiDeclQtXmlPatternsTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

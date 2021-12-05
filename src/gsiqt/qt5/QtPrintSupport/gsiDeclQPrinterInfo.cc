@@ -33,7 +33,6 @@
 #include <QSizeF>
 #include "gsiQt.h"
 #include "gsiQtPrintSupportCommon.h"
-#include "gsiDeclQtPrintSupportTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

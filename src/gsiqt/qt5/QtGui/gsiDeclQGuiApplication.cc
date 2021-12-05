@@ -33,9 +33,10 @@
 #include <QClipboard>
 #include <QWindow>
 #include <QStyleHints>
+#include <QFont>
+#include <QPalette>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
-#include "gsiDeclQtGuiTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

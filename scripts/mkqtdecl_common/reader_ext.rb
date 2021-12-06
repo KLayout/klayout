@@ -296,7 +296,8 @@ class CPPEnumDeclaration
   end
 
   def myself
-    self.enum.name.to_s
+    # exclude forward declarations
+    self.enum.specs && self.enum.name.to_s
   end
 
 end
@@ -366,7 +367,7 @@ class CPPStructDeclaration
 
     # add enum constants (CPPEnumSpec)
     (self.struct.body_decl || []).each do |bd|
-      if bd.is_a?(CPPEnumDeclaration) && bd.enum && bd.enum.specs
+      if bd.is_a?(CPPEnumDeclaration) && bd.enum && bd.enum.specs && !bd.enum.is_class
         c += bd.enum.specs
       end
     end

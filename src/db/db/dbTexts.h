@@ -618,5 +618,11 @@ private:
 
 }
 
+namespace tl
+{
+  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Texts &b);
+  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Texts &b);
+}
+
 #endif
 

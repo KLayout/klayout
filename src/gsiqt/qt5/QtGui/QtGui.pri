@@ -112,6 +112,7 @@ SOURCES += \
   $$PWD/gsiDeclQPen.cc \
   $$PWD/gsiDeclQPicture.cc \
   $$PWD/gsiDeclQPictureFormatPlugin.cc \
+  $$PWD/gsiDeclQPixelFormat.cc \
   $$PWD/gsiDeclQPixmap.cc \
   $$PWD/gsiDeclQPixmapCache.cc \
   $$PWD/gsiDeclQPlatformSurfaceEvent.cc \

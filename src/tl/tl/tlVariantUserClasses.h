@@ -42,7 +42,7 @@ template<class T, bool> struct _var_user_clone_impl;
 template<class T>
 struct _var_user_clone_impl<T, true>
 {
-  static T *call (const T *a) { new T (*a); }
+  static T *call (const T *a) { return new T (*a); }
 };
 
 template<class T>

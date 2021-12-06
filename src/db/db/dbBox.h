@@ -612,21 +612,13 @@ struct DB_PUBLIC_TEMPLATE box
    */
   double double_area () const;
   
-  /**
-   *  @brief Default conversion to string
-   */
-  std::string to_string () const
-  {
-    return to_string (0.0);
-  }
-
   /** 
    *  @brief Conversion to string
    *
    *  If dbu is set, it determines the factor by which the coordinates are multiplied to render
    *  micron units. In addition, a micron format is chosen for output of these coordinates.
    */
-  std::string to_string (double dbu) const
+  std::string to_string (double dbu = 0.0) const
   {
     if (empty ()) {
       return "()";

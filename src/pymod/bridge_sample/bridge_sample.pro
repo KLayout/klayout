@@ -48,6 +48,9 @@ equals(HAVE_QT, "0") {
 } else {
   # Include QtCore required for some includes
   QT = core
+  greaterThan (QT_MAJOR_VERSION, 5) {
+    QT += core5compat
+  }
   DEFINES += HAVE_QT
 }
 

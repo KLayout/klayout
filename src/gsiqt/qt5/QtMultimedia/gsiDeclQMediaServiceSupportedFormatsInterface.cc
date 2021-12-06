@@ -30,7 +30,6 @@
 #include <QMediaServiceSupportedFormatsInterface>
 #include "gsiQt.h"
 #include "gsiQtMultimediaCommon.h"
-#include "gsiDeclQtMultimediaTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

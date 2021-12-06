@@ -587,20 +587,12 @@ public:
   }
 
   /**
-   *  @brief Default conversion to string
-   */
-  std::string to_string () const
-  {
-    return to_string (0.0);
-  }
-
-  /**
    *  @brief Conversion to a string.
    *
    *  If dbu is set, it determines the factor by which the coordinates are multiplied to render
    *  micron units. In addition, a micron format is chosen for output of these coordinates.
    */
-  std::string to_string (double dbu) const
+  std::string to_string (double dbu = 0.0) const
   {
     return "(" + m_p1.to_string (dbu) + ";" + m_p2.to_string (dbu) + ")";
   }

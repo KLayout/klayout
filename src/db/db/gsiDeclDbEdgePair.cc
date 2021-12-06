@@ -156,8 +156,11 @@ struct edge_pair_defs
       "\n"
       "This method has been added in version 0.23.\n"
     ) +
-    method ("to_s", (std::string (C::*) () const) &C::to_string, 
-      "@brief Returns a string representing the edge pair\n"
+    method ("to_s", &C::to_string, gsi::arg ("dbu", 0.0),
+      "@brief Returns a string representing the edge pair\n "
+      "If a DBU is given, the output units will be micrometers.\n"
+      "\n"
+      "The DBU argument has been added in version 0.27.6.\n"
     ) +
     method ("bbox", &C::bbox, 
       "@brief Gets the bounding box of the edge pair\n"

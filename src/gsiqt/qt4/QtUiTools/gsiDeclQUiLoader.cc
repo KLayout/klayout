@@ -38,7 +38,6 @@
 #include <QTimerEvent>
 #include "gsiQt.h"
 #include "gsiQtUiToolsCommon.h"
-#include "gsiDeclQtUiToolsTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

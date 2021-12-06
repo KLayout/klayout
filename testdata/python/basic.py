@@ -2847,22 +2847,23 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(sc.got_s0a, 0)
     self.assertEqual(sc.got_s0b, 0)
 
-  def test_74(self):
+  def test_QByteArray(self):
 
-    # binary strings
+    # QByteArray
 
     if "ia_cref_to_qba" in pya.A.__dict__:
 
-      qba = pya.A.ia_cref_to_qba([ 17, 42, 0, 8 ])
+      qba = pya.A.ia_cref_to_qba([ 16, 42, 0, 8 ])
       if sys.version_info < (3, 0):
-        self.assertEqual(repr(qba), "bytearray(b'\\x11*\\x00\\x08')")
+        self.assertEqual(repr(qba), "bytearray(b'\\x10*\\x00\\x08')")
       else:
-        self.assertEqual(repr(qba), "b'\\x11*\\x00\\x08'")
-      self.assertEqual(pya.A.qba_to_ia(qba), [ 17, 42, 0, 8 ])
-      self.assertEqual(pya.A.qba_cref_to_ia(qba), [ 17, 42, 0, 8 ])
-      self.assertEqual(pya.A.qba_cptr_to_ia(qba), [ 17, 42, 0, 8 ])
-      self.assertEqual(pya.A.qba_ref_to_ia(qba), [ 17, 42, 0, 8 ])
-      self.assertEqual(pya.A.qba_ptr_to_ia(qba), [ 17, 42, 0, 8 ])
+        self.assertEqual(repr(qba), "b'\\x10*\\x00\\x08'")
+
+      self.assertEqual(pya.A.qba_to_ia(qba), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qba_cref_to_ia(qba), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qba_cptr_to_ia(qba), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qba_ref_to_ia(qba), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qba_ptr_to_ia(qba), [ 16, 42, 0, 8 ])
   
       qba = pya.A.ia_cref_to_qba_cref([ 17, 42, 0, 8 ])
       if sys.version_info < (3, 0):
@@ -2870,7 +2871,160 @@ class BasicTest(unittest.TestCase):
       else:
         self.assertEqual(repr(qba), "b'\\x11*\\x00\\x08'")
 
+      qba = pya.A.ia_cref_to_qba_ref([ 18, 42, 0, 8 ])
+      if sys.version_info < (3, 0):
+        self.assertEqual(repr(qba), "bytearray(b'\\x12*\\x00\\x08')")
+      else:
+        self.assertEqual(repr(qba), "b'\\x12*\\x00\\x08'")
+
+      qba = pya.A.ia_cref_to_qba_cptr([ 19, 42, 0, 8 ])
+      if sys.version_info < (3, 0):
+        self.assertEqual(repr(qba), "bytearray(b'\\x13*\\x00\\x08')")
+      else:
+        self.assertEqual(repr(qba), "b'\\x13*\\x00\\x08'")
+
+      qba = pya.A.ia_cref_to_qba_ptr([ 20, 42, 0, 8 ])
+      if sys.version_info < (3, 0):
+        self.assertEqual(repr(qba), "bytearray(b'\\x14*\\x00\\x08')")
+      else:
+        self.assertEqual(repr(qba), "b'\\x14*\\x00\\x08'")
+
       self.assertEqual(pya.A.qba_to_ia(b'\x00\x01\x02'), [ 0, 1, 2 ])
+
+  def test_QByteArrayView(self):
+
+    # QByteArrayView
+
+    if "ia_cref_to_qbav" in pya.A.__dict__:
+
+      qbav = pya.A.ia_cref_to_qbav([ 16, 42, 0, 8 ])
+      if sys.version_info < (3, 0):
+        self.assertEqual(repr(qbav), "bytearray(b'\\x10*\\x00\\x08')")
+      else:
+        self.assertEqual(repr(qbav), "b'\\x10*\\x00\\x08'")
+
+      self.assertEqual(pya.A.qbav_to_ia(qbav), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qbav_cref_to_ia(qbav), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qbav_cptr_to_ia(qbav), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qbav_ref_to_ia(qbav), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qbav_ptr_to_ia(qbav), [ 16, 42, 0, 8 ])
+  
+      qbav = pya.A.ia_cref_to_qbav_cref([ 17, 42, 0, 8 ])
+      if sys.version_info < (3, 0):
+        self.assertEqual(repr(qbav), "bytearray(b'\\x11*\\x00\\x08')")
+      else:
+        self.assertEqual(repr(qbav), "b'\\x11*\\x00\\x08'")
+
+      qbav = pya.A.ia_cref_to_qbav_ref([ 18, 42, 0, 8 ])
+      if sys.version_info < (3, 0):
+        self.assertEqual(repr(qbav), "bytearray(b'\\x12*\\x00\\x08')")
+      else:
+        self.assertEqual(repr(qbav), "b'\\x12*\\x00\\x08'")
+
+      qbav = pya.A.ia_cref_to_qbav_cptr([ 19, 42, 0, 8 ])
+      if sys.version_info < (3, 0):
+        self.assertEqual(repr(qbav), "bytearray(b'\\x13*\\x00\\x08')")
+      else:
+        self.assertEqual(repr(qbav), "b'\\x13*\\x00\\x08'")
+
+      qbav = pya.A.ia_cref_to_qbav_ptr([ 20, 42, 0, 8 ])
+      if sys.version_info < (3, 0):
+        self.assertEqual(repr(qbav), "bytearray(b'\\x14*\\x00\\x08')")
+      else:
+        self.assertEqual(repr(qbav), "b'\\x14*\\x00\\x08'")
+
+      self.assertEqual(pya.A.qbav_to_ia(b'\x00\x01\x02'), [ 0, 1, 2 ])
+
+  def test_QString(self):
+
+    # QString
+
+    if "ia_cref_to_qs" in pya.A.__dict__:
+
+      qs = pya.A.ia_cref_to_qs([ 16, 42, 0, 8 ])
+      self.assertEqual(repr(qs), "'\\x10*\\x00\\x08'")
+
+      self.assertEqual(pya.A.qs_to_ia(qs), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qs_cref_to_ia(qs), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qs_cptr_to_ia(qs), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qs_ref_to_ia(qs), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qs_ptr_to_ia(qs), [ 16, 42, 0, 8 ])
+  
+      qs = pya.A.ia_cref_to_qs_cref([ 17, 42, 0, 8 ])
+      self.assertEqual(repr(qs), "'\\x11*\\x00\\x08'")
+
+      qs = pya.A.ia_cref_to_qs_ref([ 18, 42, 0, 8 ])
+      self.assertEqual(repr(qs), "'\\x12*\\x00\\x08'")
+
+      qs = pya.A.ia_cref_to_qs_cptr([ 19, 42, 0, 8 ])
+      self.assertEqual(repr(qs), "'\\x13*\\x00\\x08'")
+
+      qs = pya.A.ia_cref_to_qs_ptr([ 20, 42, 0, 8 ])
+      self.assertEqual(repr(qs), "'\\x14*\\x00\\x08'")
+
+      self.assertEqual(pya.A.qs_to_ia('\x00\x01\x02'), [ 0, 1, 2 ])
+
+  def test_QStringView(self):
+
+    # QStringView
+
+    if "ia_cref_to_qsv" in pya.A.__dict__:
+
+      qsv = pya.A.ia_cref_to_qsv([ 16, 42, 0, 8 ])
+      self.assertEqual(repr(qsv), "'\\x10*\\x00\\x08'")
+
+      self.assertEqual(pya.A.qsv_to_ia(qsv), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qsv_cref_to_ia(qsv), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qsv_cptr_to_ia(qsv), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qsv_ref_to_ia(qsv), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qsv_ptr_to_ia(qsv), [ 16, 42, 0, 8 ])
+  
+      qsv = pya.A.ia_cref_to_qsv_cref([ 17, 42, 0, 8 ])
+      self.assertEqual(repr(qsv), "'\\x11*\\x00\\x08'")
+
+      qsv = pya.A.ia_cref_to_qsv_ref([ 18, 42, 0, 8 ])
+      self.assertEqual(repr(qsv), "'\\x12*\\x00\\x08'")
+
+      qsv = pya.A.ia_cref_to_qsv_cptr([ 19, 42, 0, 8 ])
+      self.assertEqual(repr(qsv), "'\\x13*\\x00\\x08'")
+
+      qsv = pya.A.ia_cref_to_qsv_ptr([ 20, 42, 0, 8 ])
+      self.assertEqual(repr(qsv), "'\\x14*\\x00\\x08'")
+
+      self.assertEqual(pya.A.qsv_to_ia('\x00\x01\x02'), [ 0, 1, 2 ])
+
+  def test_QLatin1String(self):
+
+    # QLatin1String
+
+    if "ia_cref_to_ql1s" in pya.A.__dict__:
+
+      ql1s = pya.A.ia_cref_to_ql1s([ 16, 42, 0, 8 ])
+      self.assertEqual(repr(ql1s), "'\\x10*\\x00\\x08'")
+
+      self.assertEqual(pya.A.ql1s_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.ql1s_cref_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.ql1s_cptr_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.ql1s_ref_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.ql1s_ptr_to_ia(ql1s), [ 16, 42, 0, 8 ])
+  
+      ql1s = pya.A.ia_cref_to_ql1s_cref([ 17, 42, 0, 8 ])
+      self.assertEqual(repr(ql1s), "'\\x11*\\x00\\x08'")
+
+      ql1s = pya.A.ia_cref_to_ql1s_ref([ 18, 42, 0, 8 ])
+      self.assertEqual(repr(ql1s), "'\\x12*\\x00\\x08'")
+
+      ql1s = pya.A.ia_cref_to_ql1s_cptr([ 19, 42, 0, 8 ])
+      self.assertEqual(repr(ql1s), "'\\x13*\\x00\\x08'")
+
+      ql1s = pya.A.ia_cref_to_ql1s_ptr([ 20, 42, 0, 8 ])
+      self.assertEqual(repr(ql1s), "'\\x14*\\x00\\x08'")
+
+      self.assertEqual(pya.A.ql1s_to_ia('\x00\x01\x02'), [ 0, 1, 2 ])
+
+  def test_binaryStrings(self):
+
+    # binary strings (non-Qt)
 
     ba = pya.A.ia_cref_to_ba([ 17, 42, 0, 8 ])
     if sys.version_info < (3, 0):
@@ -2892,7 +3046,9 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(pya.A.ba_to_ia(b'\x00\x01\x02'), [ 0, 1, 2 ])
 
   # Custom factory implemented in Python
+#
   def test_80(self):
+
     gc = pya.GObject.g_inst_count()
     gf = PyGFactory()
     go = pya.GFactory.create_f(gf, 17)

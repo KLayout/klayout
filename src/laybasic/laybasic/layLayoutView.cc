@@ -252,7 +252,7 @@ static LayoutView *ms_current = 0;
 
 LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
   : QFrame (parent), 
-    lay::Dispatcher (plugin_parent, false /*not standalone*/),
+    lay::Dispatcher (this, plugin_parent, false /*not standalone*/),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager),
@@ -261,7 +261,6 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
 {
   //  either it's us or the parent has a dispatcher
   tl_assert (dispatcher () != 0);
-  set_menu_parent_widget (this);
 
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();

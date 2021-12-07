@@ -2492,6 +2492,7 @@ END
     # Produce the mixin base classes
 
     if ! mixin_base_classes.empty?
+      ofile.puts("")
       ofile.puts("//  Additional base classes")
       ofile.puts("")
       mixin_base_classes.each do |bc|

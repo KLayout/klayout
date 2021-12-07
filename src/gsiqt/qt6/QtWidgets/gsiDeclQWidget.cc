@@ -4981,6 +4981,7 @@ gsi::Class<QObject> &qtdecl_QObject ();
 qt_gsi::QtNativeClass<QWidget> decl_QWidget (qtdecl_QObject (), "QtWidgets", "QWidget_Native",
   methods_QWidget (),
   "@hide\n@alias QWidget");
+
 //  Additional base classes
 
 gsi::Class<QPaintDevice> &qtdecl_QPaintDevice ();

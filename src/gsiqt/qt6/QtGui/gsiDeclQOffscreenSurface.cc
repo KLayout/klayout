@@ -313,6 +313,7 @@ gsi::Class<QObject> &qtdecl_QObject ();
 qt_gsi::QtNativeClass<QOffscreenSurface> decl_QOffscreenSurface (qtdecl_QObject (), "QtGui", "QOffscreenSurface_Native",
   methods_QOffscreenSurface (),
   "@hide\n@alias QOffscreenSurface");
+
 //  Additional base classes
 
 gsi::Class<QSurface> &qtdecl_QSurface ();

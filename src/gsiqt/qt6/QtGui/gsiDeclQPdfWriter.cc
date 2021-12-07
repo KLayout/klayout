@@ -382,6 +382,7 @@ gsi::Class<QObject> &qtdecl_QObject ();
 qt_gsi::QtNativeClass<QPdfWriter> decl_QPdfWriter (qtdecl_QObject (), "QtGui", "QPdfWriter_Native",
   methods_QPdfWriter (),
   "@hide\n@alias QPdfWriter");
+
 //  Additional base classes
 
 gsi::Class<QPagedPaintDevice> &qtdecl_QPagedPaintDevice ();

@@ -776,6 +776,7 @@ gsi::Class<QXmlContentHandler> &qtdecl_QXmlContentHandler ();
 gsi::Class<QXmlDefaultHandler> decl_QXmlDefaultHandler (qtdecl_QXmlContentHandler (), "QtCore5Compat", "QXmlDefaultHandler_Native",
   methods_QXmlDefaultHandler (),
   "@hide\n@alias QXmlDefaultHandler");
+
 //  Additional base classes
 
 gsi::Class<QXmlErrorHandler> &qtdecl_QXmlErrorHandler ();

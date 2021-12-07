@@ -243,6 +243,7 @@ gsi::Class<QObject> &qtdecl_QObject ();
 qt_gsi::QtNativeClass<QGraphicsObject> decl_QGraphicsObject (qtdecl_QObject (), "QtWidgets", "QGraphicsObject_Native",
   methods_QGraphicsObject (),
   "@hide\n@alias QGraphicsObject");
+
 //  Additional base classes
 
 gsi::Class<QGraphicsItem> &qtdecl_QGraphicsItem ();

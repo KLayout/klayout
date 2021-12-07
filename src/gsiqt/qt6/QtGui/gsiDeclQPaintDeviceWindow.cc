@@ -297,6 +297,7 @@ gsi::Class<QWindow> &qtdecl_QWindow ();
 qt_gsi::QtNativeClass<QPaintDeviceWindow> decl_QPaintDeviceWindow (qtdecl_QWindow (), "QtGui", "QPaintDeviceWindow_Native",
   methods_QPaintDeviceWindow (),
   "@hide\n@alias QPaintDeviceWindow");
+
 //  Additional base classes
 
 gsi::Class<QPaintDevice> &qtdecl_QPaintDevice ();

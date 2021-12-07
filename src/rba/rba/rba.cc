@@ -1111,7 +1111,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
             }
 
-          } catch (tl::CancelException) {
+          } catch (tl::CancelException &) {
             //  break encountered
           }
 
@@ -1521,52 +1521,112 @@ rba_add_path (const std::string &path)
   }
 }
 
-static void
-rba_init (RubyInterpreterPrivateData *d)
+namespace
 {
-  VALUE module = rb_define_module ("RBA");
 
-  //  initialize the locked object vault as a fast replacement for rb_gc_register_address/rb_gc_unregister_address.
-  rba::make_locked_object_vault (module);
+class RubyClassGenerator
+{
+public:
+  RubyClassGenerator (VALUE module)
+    : m_module (module)
+  {
+    //  .. nothing yet ..
+  }
 
-  //  save all constants for later (we cannot declare them while we are still producing classes
-  //  because of the enum representative classes and enum constants are important)
-  std::vector <RubyConstDescriptor> constants;
+  //  needs to be called before for each extension before the classes are made
+  void register_extension (const gsi::ClassBase *cls)
+  {
+    if (cls->name ().empty ()) {
 
-  std::list<const gsi::ClassBase *> sorted_classes = gsi::ClassBase::classes_in_definition_order ();
-  for (std::list<const gsi::ClassBase *>::const_iterator c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
+      //  got an extension
+      tl_assert (cls->parent ());
+      m_extensions_for [cls->parent ()->declaration ()].push_back (cls->declaration ());
+      m_extensions.insert (cls->declaration ());
 
-    //  we might encounter a child class which is a reference to a top-level class (e.g.
-    //  duplication of enums into child classes). In this case we create a constant inside the
-    //  target class.
-    if ((*c)->declaration () != *c) {
-      tl_assert ((*c)->parent () != 0);  //  top-level classes should be merged
-      rb_define_const (ruby_cls ((*c)->parent ()->declaration ()), (*c)->name ().c_str (), ruby_cls ((*c)->declaration ()));
-      continue;
+    } else {
+
+      m_links_for [cls->parent ()->declaration ()].push_back (std::make_pair (cls->name (), cls->declaration ()));
+
+    }
+  }
+
+  VALUE make_class (const gsi::ClassBase *cls)
+  {
+    if (is_registered (cls)) {
+      return ruby_cls (cls);
     }
 
+    bool is_extension = (m_extensions.find (cls) != m_extensions.end ());
+
+    bool base_class_is_extension = (m_extensions.find (cls->base ()) != m_extensions.end ());
+
     VALUE super = rb_cObject;
-    if ((*c)->base () != 0) {
-      tl_assert (is_registered ((*c)->base ()));
-      super = ruby_cls ((*c)->base ());
+    if (cls->base () != 0) {
+      super = make_class (cls->base ());
     }
 
     VALUE klass;
-    if ((*c)->parent ()) {
-      tl_assert (is_registered ((*c)->parent ()->declaration ()));
-      VALUE parent_class = ruby_cls ((*c)->parent ()->declaration ());
-      klass = rb_define_class_under (parent_class, (*c)->name ().c_str (), super);
+    if (is_extension) {
+
+      if (tl::verbosity () >= 20) {
+        tl::log << tl::to_string (tr ("Registering class as Ruby module:) ")) << cls->name ();
+      }
+      if (cls->base () && ! base_class_is_extension) {
+        tl::warn << tl::to_string (tr ("Base class of mixin module ignored: ")) << cls->name ();
+      }
+
+      if (cls->parent ()) {
+        VALUE parent_class = make_class (cls->parent ()->declaration ());
+        klass = rb_define_module_under (parent_class, cls->name ().c_str ());
+      } else {
+        klass = rb_define_module_under (m_module, cls->name ().c_str ());
+      }
+
     } else {
-      klass = rb_define_class_under (module, (*c)->name ().c_str (), super);
+
+      VALUE direct_super = base_class_is_extension ? rb_cObject : super;
+      if (cls->parent ()) {
+        VALUE parent_class = make_class (cls->parent ()->declaration ());
+        klass = rb_define_class_under (parent_class, cls->name ().c_str (), direct_super);
+      } else {
+        klass = rb_define_class_under (m_module, cls->name ().c_str (), direct_super);
+      }
+
+      rb_define_alloc_func (klass, alloc_proxy);
+
     }
 
-    register_class (klass, *c);
+    //  if the base class is an extension (mixin), we cannot use it as superclass because it's a module
+    if (cls->base () != 0 && base_class_is_extension) {
+      rb_include_module (klass, super);
+    }
 
-    rb_define_alloc_func (klass, alloc_proxy);
+    register_class (klass, cls);
 
-    MethodTable *mt = MethodTable::method_table_by_class (*c, true /*force init*/);
+    //  mix-in unnamed extensions
 
-    for (gsi::ClassBase::method_iterator m = (*c)->begin_methods (); m != (*c)->end_methods (); ++m) {
+    auto exts = m_extensions_for.find (cls);
+    if (exts != m_extensions_for.end ()) {
+      for (auto ie = exts->second.begin (); ie != exts->second.end (); ++ie) {
+        VALUE ext_module = make_class (*ie);
+        rb_include_module (klass, ext_module);
+        rb_extend_object (klass, ext_module);
+      }
+    }
+
+    //  add named extensions
+
+    auto links = m_links_for.find (cls);
+    if (links != m_links_for.end ()) {
+      for (auto il = links->second.begin (); il != links->second.end (); ++il) {
+        VALUE linked_class = make_class (il->second);
+        rb_define_const (klass, il->first.c_str (), linked_class);
+      }
+    }
+
+    MethodTable *mt = MethodTable::method_table_by_class (cls, true /*force init*/);
+
+    for (auto m = (cls)->begin_methods (); m != (cls)->end_methods (); ++m) {
 
       if (! (*m)->is_callback ()) {
 
@@ -1582,7 +1642,7 @@ rba_init (RubyInterpreterPrivateData *d)
 
           if (! drop_method) {
 
-            for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
+            for (auto syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
               if (syn->is_predicate) {
                 mt->add_method (syn->name, *m);
                 mt->add_method (syn->name + "?", *m);
@@ -1597,17 +1657,17 @@ rba_init (RubyInterpreterPrivateData *d)
 
         } else {
 
-          for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
+          for (auto syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
 
             if (isupper (syn->name [0]) && (*m)->begin_arguments () == (*m)->end_arguments ()) {
 
               //  Static const methods are constants.
               //  Methods without arguments which start with a capital letter are treated as constants
               //  for backward compatibility
-              constants.push_back (RubyConstDescriptor ());
-              constants.back ().klass = klass;
-              constants.back ().meth = *m;
-              constants.back ().name = (*m)->begin_synonyms ()->name;
+              m_constants.push_back (RubyConstDescriptor ());
+              m_constants.back ().klass = klass;
+              m_constants.back ().meth = *m;
+              m_constants.back ().name = (*m)->begin_synonyms ()->name;
 
             } else if ((*m)->ret_type ().type () == gsi::T_object && (*m)->ret_type ().pass_obj () && syn->name == "new") {
 
@@ -1640,96 +1700,150 @@ rba_init (RubyInterpreterPrivateData *d)
     //  clean up the method table
     mt->finish ();
 
-    //  Hint: we need to do static methods before the non-static ones because
-    //  rb_define_module_function creates an private instance method.
-    //  If we do the non-static methods afterwards we will make it a public once again.
-    //  The order of the names will be "name(non-static), name(static), ..." because
-    //  the static flag is the second member of the key (string, bool) pair.
-    for (size_t mid = mt->bottom_mid (); mid < mt->top_mid (); ++mid) {
+    //  NOTE: extensions can't carry methods - this is due to the method numbering scheme
+    //  which can only handle direct base classes. So only constants are carried forward.
+    if (! is_extension) {
 
-      if (mt->is_static (mid)) {
+      //  Hint: we need to do static methods before the non-static ones because
+      //  rb_define_module_function creates an private instance method.
+      //  If we do the non-static methods afterwards we will make it a public once again.
+      //  The order of the names will be "name(non-static), name(static), ..." because
+      //  the static flag is the second member of the key (string, bool) pair.
+      for (size_t mid = mt->bottom_mid (); mid < mt->top_mid (); ++mid) {
 
-        tl_assert (mid < size_t (sizeof (method_adaptors) / sizeof (method_adaptors [0])));
+        if (mt->is_static (mid)) {
 
-        /* Note: Ruby does not support static protected functions, hence we have them (i.e. QThread::usleep).
-         *       Do we silently create public ones from them:
-        if (mt->is_protected (mid)) {
-          tl::warn << "static '" << mt->name (mid) << "' method cannot be protected in class " << c->name ();
+          tl_assert (mid < size_t (sizeof (method_adaptors) / sizeof (method_adaptors [0])));
+
+          /* Note: Ruby does not support static protected functions, hence we have them (i.e. QThread::usleep).
+           *       Do we silently create public ones from them:
+          if (mt->is_protected (mid)) {
+            tl::warn << "static '" << mt->name (mid) << "' method cannot be protected in class " << c->name ();
+          }
+          */
+
+          rb_define_module_function (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
+
         }
-        */
 
-        rb_define_module_function (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
+      }
+
+      for (size_t mid = mt->bottom_mid (); mid < mt->top_mid (); ++mid) {
+
+        if (mt->is_ctor (mid)) {
+
+          tl_assert (mid < size_t (sizeof (method_adaptors_ctor) / sizeof (method_adaptors_ctor [0])));
+
+          if (! mt->is_protected (mid)) {
+            rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
+          } else {
+            //  a protected constructor needs to be provided in both protected and non-protected mode
+            rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
+            rb_define_protected_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
+          }
+
+        } else if (! mt->is_static (mid)) {
+
+          tl_assert (mid < size_t (sizeof (method_adaptors) / sizeof (method_adaptors [0])));
+
+          if (! mt->is_protected (mid)) {
+            rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
+          } else {
+            rb_define_protected_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
+          }
+
+        }
+
+        if (mt->is_signal (mid)) {
+
+          //  We alias the signal name to an assignment, so the following can be done:
+          //    x = object with signal "signal"
+          //    x.signal = proc
+          //  this will basically map to
+          //    x.signal(proc)
+          //  which will make proc the only receiver for the signal
+          rb_define_alias (klass, (mt->name (mid) + "=").c_str (), mt->name (mid).c_str ());
+
+        }
+
+        if (mt->name (mid) == "to_s") {
+    #if HAVE_RUBY_VERSION_CODE>=20000 && defined(GSI_ALIAS_INSPECT)
+        //  Ruby 2.x does no longer alias "inspect" to "to_s" automatically, so we have to do this:
+          rb_define_alias (klass, "inspect", "to_s");
+    #endif
+        } else if (mt->name (mid) == "==") {
+          rb_define_alias (klass, "eql?", "==");
+        }
 
       }
 
     }
 
-    for (size_t mid = mt->bottom_mid (); mid < mt->top_mid (); ++mid) {
+    return klass;
+  }
 
-      if (mt->is_ctor (mid)) {
+  void make_constants ()
+  {
+    for (auto c = m_constants.begin (); c != m_constants.end (); ++c) {
 
-        tl_assert (mid < size_t (sizeof (method_adaptors_ctor) / sizeof (method_adaptors_ctor [0])));
+      try {
 
-        if (! mt->is_protected (mid)) {
-          rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
-        } else {
-          //  a protected constructor needs to be provided in both protected and non-protected mode
-          rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
-          rb_define_protected_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors_ctor[mid], -1);
-        }
+        gsi::SerialArgs retlist (c->meth->retsize ());
+        gsi::SerialArgs arglist (c->meth->argsize ());
+        c->meth->call (0, arglist, retlist);
+        tl::Heap heap;
+        VALUE ret = pop_arg (c->meth->ret_type (), 0, retlist, heap);
+        rb_define_const (c->klass, c->name.c_str (), ret);
 
-      } else if (! mt->is_static (mid)) {
-
-        tl_assert (mid < size_t (sizeof (method_adaptors) / sizeof (method_adaptors [0])));
-
-        if (! mt->is_protected (mid)) {
-          rb_define_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
-        } else {
-          rb_define_protected_method (klass, mt->name (mid).c_str (), (ruby_func) method_adaptors[mid], -1);
-        }
-
-      }
-
-      if (mt->is_signal (mid)) {
-        //  We alias the signal name to an assignment, so the following can be done:
-        //    x = object with signal "signal"
-        //    x.signal = proc
-        //  this will basically map to
-       //    x.signal(proc)
-        //  which will make proc the only receiver for the signal
-        rb_define_alias (klass, (mt->name (mid) + "=").c_str (), mt->name (mid).c_str ());
-      }
-
-      if (mt->name (mid) == "to_s") {
-#if HAVE_RUBY_VERSION_CODE>=20000 && defined(GSI_ALIAS_INSPECT)
-      //  Ruby 2.x does no longer alias "inspect" to "to_s" automatically, so we have to do this:
-        rb_define_alias (klass, "inspect", "to_s");
-#endif
-      } else if (mt->name (mid) == "==") {
-        rb_define_alias (klass, "eql?", "==");
+      } catch (tl::Exception &ex) {
+        tl::warn << "Got exception '" << ex.msg () << "' while defining constant " << c->name;
       }
 
     }
+  }
 
+private:
+  VALUE m_module;
+  std::vector <RubyConstDescriptor> m_constants;
+  std::map<const gsi::ClassBase *, std::vector<const gsi::ClassBase *> > m_extensions_for;
+  std::set<const gsi::ClassBase *> m_extensions;
+  std::map<const gsi::ClassBase *, std::vector<std::pair<std::string, const gsi::ClassBase *> > > m_links_for;
+};
+
+}
+
+static void
+rba_init (RubyInterpreterPrivateData *d)
+{
+  VALUE module = rb_define_module ("RBA");
+
+  //  initialize the locked object vault as a fast replacement for rb_gc_register_address/rb_gc_unregister_address.
+  rba::make_locked_object_vault (module);
+
+  //  save all constants for later (we cannot declare them while we are still producing classes
+  //  because of the enum representative classes and enum constants are important)
+  std::vector <RubyConstDescriptor> constants;
+
+  std::list<const gsi::ClassBase *> sorted_classes = gsi::ClassBase::classes_in_definition_order ();
+
+  RubyClassGenerator gen (module);
+
+  //  first pass: register the extensions
+  for (auto c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
+    if ((*c)->declaration () != *c) {
+      gen.register_extension (*c);
+    }
+  }
+
+  //  second pass: make the classes
+  for (auto c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
+    if ((*c)->declaration () == *c) {
+      gen.make_class (*c);
+    }
   }
 
   //  now make the constants
-  for (std::vector <RubyConstDescriptor>::const_iterator c = constants.begin (); c != constants.end (); ++c) {
-
-    try {
-
-      gsi::SerialArgs retlist (c->meth->retsize ());
-      gsi::SerialArgs arglist (c->meth->argsize ());
-      c->meth->call (0, arglist, retlist);
-      tl::Heap heap;
-      VALUE ret = pop_arg (c->meth->ret_type (), 0, retlist, heap);
-      rb_define_const (c->klass, c->name.c_str (), ret);
-
-    } catch (tl::Exception &ex) {
-      tl::warn << "Got exception '" << ex.msg () << "' while defining constant " << c->name;
-    }
-
-  }
+  gen.make_constants ();
 
   //  define a signal representative class RBASignal
   SignalHandler::define_class (module, "RBASignal");

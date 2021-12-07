@@ -450,6 +450,11 @@ gsi::Class<QAccessibleWidget> decl_QAccessibleWidget (qtdecl_QAccessibleObject (
   methods_QAccessibleWidget (),
   "@qt\n@brief Binding of QAccessibleWidget");
 
+//  Additional base classes
+
+gsi::Class<QAccessibleActionInterface> &qtdecl_QAccessibleActionInterface ();
+
+gsi::ClassExt<QAccessibleWidget> base_class_QAccessibleActionInterface_in_QAccessibleWidget (qtdecl_QAccessibleActionInterface ());
 
 GSI_QTWIDGETS_PUBLIC gsi::Class<QAccessibleWidget> &qtdecl_QAccessibleWidget () { return decl_QAccessibleWidget; }
 

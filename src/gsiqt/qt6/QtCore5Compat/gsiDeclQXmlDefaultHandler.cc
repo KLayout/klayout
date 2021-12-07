@@ -776,6 +776,19 @@ gsi::Class<QXmlContentHandler> &qtdecl_QXmlContentHandler ();
 gsi::Class<QXmlDefaultHandler> decl_QXmlDefaultHandler (qtdecl_QXmlContentHandler (), "QtCore5Compat", "QXmlDefaultHandler_Native",
   methods_QXmlDefaultHandler (),
   "@hide\n@alias QXmlDefaultHandler");
+//  Additional base classes
+
+gsi::Class<QXmlErrorHandler> &qtdecl_QXmlErrorHandler ();
+gsi::Class<QXmlDTDHandler> &qtdecl_QXmlDTDHandler ();
+gsi::Class<QXmlEntityResolver> &qtdecl_QXmlEntityResolver ();
+gsi::Class<QXmlLexicalHandler> &qtdecl_QXmlLexicalHandler ();
+gsi::Class<QXmlDeclHandler> &qtdecl_QXmlDeclHandler ();
+
+gsi::ClassExt<QXmlDefaultHandler> base_class_QXmlErrorHandler_in_QXmlDefaultHandler (qtdecl_QXmlErrorHandler ());
+gsi::ClassExt<QXmlDefaultHandler> base_class_QXmlDTDHandler_in_QXmlDefaultHandler (qtdecl_QXmlDTDHandler ());
+gsi::ClassExt<QXmlDefaultHandler> base_class_QXmlEntityResolver_in_QXmlDefaultHandler (qtdecl_QXmlEntityResolver ());
+gsi::ClassExt<QXmlDefaultHandler> base_class_QXmlLexicalHandler_in_QXmlDefaultHandler (qtdecl_QXmlLexicalHandler ());
+gsi::ClassExt<QXmlDefaultHandler> base_class_QXmlDeclHandler_in_QXmlDefaultHandler (qtdecl_QXmlDeclHandler ());
 
 GSI_QTCORE5COMPAT_PUBLIC gsi::Class<QXmlDefaultHandler> &qtdecl_QXmlDefaultHandler () { return decl_QXmlDefaultHandler; }
 

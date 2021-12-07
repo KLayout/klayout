@@ -846,6 +846,11 @@ qt_gsi::QtNativeClass<QIODevice> decl_QIODevice (qtdecl_QObject (), "QtCore", "Q
   methods_QIODevice (),
   "@qt\n@brief Binding of QIODevice");
 
+//  Additional base classes
+
+gsi::Class<QIODeviceBase> &qtdecl_QIODeviceBase ();
+
+gsi::ClassExt<QIODevice> base_class_QIODeviceBase_in_QIODevice (qtdecl_QIODeviceBase ());
 
 GSI_QTCORE_PUBLIC gsi::Class<QIODevice> &qtdecl_QIODevice () { return decl_QIODevice; }
 

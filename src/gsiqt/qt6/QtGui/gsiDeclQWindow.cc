@@ -2206,6 +2206,11 @@ gsi::Class<QObject> &qtdecl_QObject ();
 qt_gsi::QtNativeClass<QWindow> decl_QWindow (qtdecl_QObject (), "QtGui", "QWindow_Native",
   methods_QWindow (),
   "@hide\n@alias QWindow");
+//  Additional base classes
+
+gsi::Class<QSurface> &qtdecl_QSurface ();
+
+gsi::ClassExt<QWindow> base_class_QSurface_in_QWindow (qtdecl_QSurface ());
 
 GSI_QTGUI_PUBLIC gsi::Class<QWindow> &qtdecl_QWindow () { return decl_QWindow; }
 

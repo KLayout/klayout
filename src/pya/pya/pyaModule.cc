@@ -2384,6 +2384,10 @@ PythonModule::make_classes (const char *mod_name)
   PYASignal::make_class (module);
 
   std::list<const gsi::ClassBase *> sorted_classes = gsi::ClassBase::classes_in_definition_order (mod_name);
+
+  // ... @@@ find all extensions for a class ...
+
+  // ... @@@ reverse this order ...
   for (std::list<const gsi::ClassBase *>::const_iterator c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
 
     if (mod_name && (*c)->module () != mod_name) {
@@ -2398,6 +2402,7 @@ PythonModule::make_classes (const char *mod_name)
     //  duplication of enums into child classes). In this case we create a constant inside the
     //  target class.
     if ((*c)->declaration () != *c) {
+      // ... @@@ continue if named ...
       tl_assert ((*c)->parent () != 0);  //  top-level classes should be merged
       PyTypeObject *parent_type = PythonClassClientData::py_type (*(*c)->parent ()->declaration ());
       PyTypeObject *type = PythonClassClientData::py_type (*(*c)->declaration ());
@@ -2414,6 +2419,7 @@ PythonModule::make_classes (const char *mod_name)
     m_classes.push_back (*c);
 
     PythonRef bases;
+    // ... @@@ collect bases (from this base and extensions) ...
     if ((*c)->base () != 0) {
       bases = PythonRef (PyTuple_New (1));
       PyTypeObject *pt = PythonClassClientData::py_type (*(*c)->base ());
@@ -2464,6 +2470,8 @@ PythonModule::make_classes (const char *mod_name)
       PyList_Append (all_list.get (), PythonRef (c2python ((*c)->name ())).get ());
       PyModule_AddObject (module, (*c)->name ().c_str (), (PyObject *) type);
     }
+
+    // ... @@@ add the named extensions as attributes (see above) ...
 
     //  Build the attributes now ...
 

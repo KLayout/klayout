@@ -1397,6 +1397,37 @@ private:
   int m_tag;
 };
 
+class B1
+{
+public:
+  B1 () : m_value (0) {}
+
+  int get1 () { return m_value; }
+  void set1 (int v) { m_value = v; }
+private:
+  int m_value;
+};
+
+class B2
+{
+public:
+  B2 () {}
+};
+
+class B3
+{
+public:
+  B3 () {}
+  enum E { E3A = 100, E3B = 101, E3C = 102 };
+};
+
+class BB
+  : public B1, public B2, public B3
+{
+public:
+  int d3 (B3::E a, B3::E b) { return b - a; }
+};
+
 }
 
 #endif

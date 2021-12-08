@@ -2308,6 +2308,12 @@ PythonModule::add_python_doc (const gsi::ClassBase & /*cls*/, const MethodTable 
   }
 }
 
+void
+PythonModule::add_python_doc (const gsi::MethodBase *m, const std::string &doc)
+{
+  m_python_doc [m] += doc;
+}
+
 std::string
 PythonModule::python_doc (const gsi::MethodBase *method)
 {
@@ -2354,90 +2360,81 @@ PythonModule::check (const char *mod_name)
   }
 }
 
-void
-PythonModule::make_classes (const char *mod_name)
+namespace
 {
-  PyObject *module = mp_module.get ();
 
-  //  Prepare an __all__ index for the module
-
-  PythonRef all_list;
-  if (! PyObject_HasAttrString (module, "__all__")) {
-    all_list = PythonRef (PyList_New (0));
-    PyObject_SetAttrString (module, "__all__", all_list.get ());
-  } else {
-    all_list = PythonRef (PyObject_GetAttrString (module, "__all__"));
+class PythonClassGenerator
+{
+public:
+  PythonClassGenerator (PythonModule *module, PyObject *all_list)
+    : mp_module (module), m_all_list (all_list)
+  {
+    //  .. nothing yet ..
   }
 
-  PyObject_SetAttrString (module, "__doc__", PythonRef (c2python (m_mod_description)).get ());
+  //  needs to be called before for each extension before the classes are made
+  void register_extension (const gsi::ClassBase *cls)
+  {
+    if (cls->name ().empty ()) {
 
-  //  Build a class for descriptors for static attributes
-  PYAStaticAttributeDescriptorObject::make_class (module);
+      //  got an extension
+      tl_assert (cls->parent ());
+      m_extensions_for [cls->parent ()->declaration ()].push_back (cls->declaration ());
+      m_extensions.insert (cls->declaration ());
 
-  //  Build a class for static/non-static dispatching descriptors
-  PYAAmbiguousMethodDispatcher::make_class (module);
+    } else {
 
-  //  Build a class for iterators
-  PYAIteratorObject::make_class (module);
+      m_links_for [cls->parent ()->declaration ()].push_back (std::make_pair (cls->name (), cls->declaration ()));
 
-  //  Build a class for signals
-  PYASignal::make_class (module);
-
-  std::list<const gsi::ClassBase *> sorted_classes = gsi::ClassBase::classes_in_definition_order (mod_name);
-
-  // ... @@@ find all extensions for a class ...
-
-  // ... @@@ reverse this order ...
-  for (std::list<const gsi::ClassBase *>::const_iterator c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
-
-    if (mod_name && (*c)->module () != mod_name) {
-      //  don't handle classes outside this module, but require them to be present
-      if (! PythonClassClientData::py_type (**c)) {
-        throw tl::Exception (tl::sprintf ("class %s.%s required from outside the module %s, but that module is not loaded", (*c)->module (), (*c)->name (), mod_name));
-      }
-      continue;
     }
+  }
 
-    //  we might encounter a child class which is a reference to a top-level class (e.g.
-    //  duplication of enums into child classes). In this case we create a constant inside the
-    //  target class.
-    if ((*c)->declaration () != *c) {
-      // ... @@@ continue if named ...
-      tl_assert ((*c)->parent () != 0);  //  top-level classes should be merged
-      PyTypeObject *parent_type = PythonClassClientData::py_type (*(*c)->parent ()->declaration ());
-      PyTypeObject *type = PythonClassClientData::py_type (*(*c)->declaration ());
-      tl_assert (type != 0);
-      PythonRef attr ((PyObject *) type, false /*borrowed*/);
-      set_type_attr (parent_type, (*c)->name ().c_str (), attr);
-      continue;
+  PyTypeObject *make_class (const gsi::ClassBase *cls)
+  {
+    PyTypeObject *pt = PythonClassClientData::py_type (*cls);
+    if (pt != 0) {
+      return pt;
     }
-
-    //  NOTE: we create the class as a heap object, since that way we can dynamically extend the objects
-
-    //  Create the actual class
-
-    m_classes.push_back (*c);
 
     PythonRef bases;
-    // ... @@@ collect bases (from this base and extensions) ...
-    if ((*c)->base () != 0) {
-      bases = PythonRef (PyTuple_New (1));
-      PyTypeObject *pt = PythonClassClientData::py_type (*(*c)->base ());
-      tl_assert (pt != 0);
-      PyObject *base = (PyObject *) pt;
-      Py_INCREF (base);
-      PyTuple_SetItem (bases.get (), 0, base);
-    } else {
-      bases = PythonRef (PyTuple_New (0));
+
+    //  mix-in unnamed extensions and get the base classes
+
+    int n_bases = (cls->base () != 0 ? 1 : 0);
+    auto exts = m_extensions_for.find (cls);
+    if (exts != m_extensions_for.end ()) {
+//  @@@      n_bases += int (exts->second.size ());
     }
 
+    bases = PythonRef (PyTuple_New (n_bases));
+
+    int ibase = 0;
+    if (cls->base () != 0) {
+      PyTypeObject *pt = make_class (cls->base ());
+      PyObject *base = (PyObject *) pt;
+      Py_INCREF (base);
+      PyTuple_SetItem (bases.get (), ibase++, base);
+    }
+
+/*@@@
+    if (exts != m_extensions_for.end ()) {
+      for (auto ie = exts->second.begin (); ie != exts->second.end (); ++ie) {
+        PyObject *base = (PyObject *) make_class (*ie);
+        Py_INCREF (base);
+        PyTuple_SetItem (bases.get (), ibase++, base);
+      }
+    }
+@@@*/
+
+    //  creates the type object
+
     PythonRef dict (PyDict_New ());
-    PyDict_SetItemString (dict.get (), "__module__", PythonRef (c2python (m_mod_name)).get ());
-    PyDict_SetItemString (dict.get (), "__doc__", PythonRef (c2python ((*c)->doc ())).get ());
-    PyDict_SetItemString (dict.get (), "__gsi_id__", PythonRef (c2python (m_classes.size () - 1)).get ());
+    PyDict_SetItemString (dict.get (), "__module__", PythonRef (c2python (mp_module->mod_name ())).get ());
+    PyDict_SetItemString (dict.get (), "__doc__", PythonRef (c2python (cls->doc ())).get ());
+    PyDict_SetItemString (dict.get (), "__gsi_id__", PythonRef (c2python (mp_module->next_class_id ())).get ());
 
     PythonRef args (PyTuple_New (3));
-    PyTuple_SetItem (args.get (), 0, c2python ((*c)->name ()));
+    PyTuple_SetItem (args.get (), 0, c2python (cls->name ()));
     PyTuple_SetItem (args.get (), 1, bases.release ());
     PyTuple_SetItem (args.get (), 2, dict.release ());
 
@@ -2455,30 +2452,41 @@ PythonModule::make_classes (const char *mod_name)
     type->tp_setattro = PyObject_GenericSetAttr;
     type->tp_getattro = PyObject_GenericGetAttr;
 
-    PythonClassClientData::initialize (**c, type);
+    PythonClassClientData::initialize (*cls, type);
 
-    tl_assert (cls_for_type (type) == *c);
+    mp_module->register_class (cls);
+
+    tl_assert (mp_module->cls_for_type (type) == cls);
 
     //  Add to the parent class as child class or add to module
 
-    if ((*c)->parent ()) {
-      tl_assert ((*c)->parent ()->declaration () != 0);
-      PyTypeObject *parent_type = PythonClassClientData::py_type (*(*c)->parent ()->declaration ());
+    if (cls->parent ()) {
+      tl_assert (cls->parent ()->declaration () != 0);
+      PyTypeObject *parent_type = make_class (cls->parent ()->declaration ());
       PythonRef attr ((PyObject *) type);
-      set_type_attr (parent_type, (*c)->name ().c_str (), attr);
+      set_type_attr (parent_type, cls->name ().c_str (), attr);
     } else {
-      PyList_Append (all_list.get (), PythonRef (c2python ((*c)->name ())).get ());
-      PyModule_AddObject (module, (*c)->name ().c_str (), (PyObject *) type);
+      PyList_Append (m_all_list, PythonRef (c2python (cls->name ())).get ());
+      PyModule_AddObject (mp_module->module (), cls->name ().c_str (), (PyObject *) type);
     }
 
-    // ... @@@ add the named extensions as attributes (see above) ...
+    //  add named extensions
+
+    auto links = m_links_for.find (cls);
+    if (links != m_links_for.end ()) {
+      for (auto il = links->second.begin (); il != links->second.end (); ++il) {
+        PyTypeObject *linked_type = make_class (il->second);
+        PythonRef attr ((PyObject *) linked_type, false /*borrowed*/);
+        set_type_attr (type, il->first.c_str (), attr);
+      }
+    }
 
     //  Build the attributes now ...
 
-    MethodTable *mt = MethodTable::method_table_by_class (*c);
+    MethodTable *mt = MethodTable::method_table_by_class (cls);
 
     //  signals are translated into the setters and getters
-    for (gsi::ClassBase::method_iterator m = (*c)->begin_methods (); m != (*c)->end_methods (); ++m) {
+    for (gsi::ClassBase::method_iterator m = cls->begin_methods (); m != cls->end_methods (); ++m) {
       if ((*m)->is_signal ()) {
         for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
           mt->add_getter (syn->name, *m);
@@ -2488,7 +2496,7 @@ PythonModule::make_classes (const char *mod_name)
     }
 
     //  first add getters and setters
-    for (gsi::ClassBase::method_iterator m = (*c)->begin_methods (); m != (*c)->end_methods (); ++m) {
+    for (gsi::ClassBase::method_iterator m = cls->begin_methods (); m != cls->end_methods (); ++m) {
       if (! (*m)->is_callback ()) {
         for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
           if (syn->is_getter) {
@@ -2501,7 +2509,7 @@ PythonModule::make_classes (const char *mod_name)
     }
 
     //  then add normal methods - on name clash with properties make them a getter
-    for (gsi::ClassBase::method_iterator m = (*c)->begin_methods (); m != (*c)->end_methods (); ++m) {
+    for (gsi::ClassBase::method_iterator m = cls->begin_methods (); m != cls->end_methods (); ++m) {
       if (! (*m)->is_callback () && ! (*m)->is_signal ()) {
         for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
           if (! syn->is_getter && ! syn->is_setter) {
@@ -2536,10 +2544,10 @@ PythonModule::make_classes (const char *mod_name)
       const std::string &name = mt->property_name (mid);
 
       //  look for the real getter and setter, also look in the base classes
-      const gsi::ClassBase *cls = *c;
-      while ((cls = cls->base ()) != 0 && (begin_setters == end_setters || begin_getters == end_getters)) {
+      const gsi::ClassBase *icls = cls;
+      while ((icls = icls->base ()) != 0 && (begin_setters == end_setters || begin_getters == end_getters)) {
 
-        const MethodTable *mt_base = MethodTable::method_table_by_class (cls);
+        const MethodTable *mt_base = MethodTable::method_table_by_class (icls);
         tl_assert (mt_base);
         std::pair<bool, size_t> t = mt_base->find_property (is_static, name);
         if (t.first) {
@@ -2566,7 +2574,7 @@ PythonModule::make_classes (const char *mod_name)
           doc += "\n\n";
         }
         doc += (*m)->doc ();
-        m_python_doc [*m] += tl::sprintf (tl::to_string (tr ("The object exposes a readable attribute '%s'. This is the getter.\n\n")), name);
+        mp_module->add_python_doc (*m, tl::sprintf (tl::to_string (tr ("The object exposes a readable attribute '%s'. This is the getter.\n\n")), name));
       }
 
       for (MethodTableEntry::method_iterator m = begin_setters; m != end_setters; ++m) {
@@ -2574,7 +2582,7 @@ PythonModule::make_classes (const char *mod_name)
           doc += "\n\n";
         }
         doc += (*m)->doc ();
-        m_python_doc [*m] += tl::sprintf (tl::to_string (tr ("The object exposes a writable attribute '%s'. This is the setter.\n\n")), name);
+        mp_module->add_python_doc (*m, tl::sprintf (tl::to_string (tr ("The object exposes a writable attribute '%s'. This is the setter.\n\n")), name));
       }
 
       PythonRef attr;
@@ -2582,18 +2590,18 @@ PythonModule::make_classes (const char *mod_name)
       if (! is_static) {
 
         //  non-static attribute getters/setters
-        PyGetSetDef *getset = make_getset_def ();
-        getset->name = make_string (name);
+        PyGetSetDef *getset = mp_module->make_getset_def ();
+        getset->name = mp_module->make_string (name);
         getset->get = begin_getters != end_getters ? &property_getter_func : NULL;
         getset->set = begin_setters != end_setters ? &property_setter_func : NULL;
-        getset->doc = make_string (doc);
+        getset->doc = mp_module->make_string (doc);
         getset->closure = make_closure (getter_mid, setter_mid);
 
         attr = PythonRef (PyDescr_NewGetSet (type, getset));
 
       } else {
 
-        PYAStaticAttributeDescriptorObject *desc = PYAStaticAttributeDescriptorObject::create (make_string (name));
+        PYAStaticAttributeDescriptorObject *desc = PYAStaticAttributeDescriptorObject::create (mp_module->make_string (name));
 
         desc->type = type;
         desc->getter = begin_getters != end_getters ? property_getter_adaptors[getter_mid] : NULL;
@@ -2628,10 +2636,10 @@ PythonModule::make_classes (const char *mod_name)
 
         //  drop non-standard names
         if (tl::verbosity () >= 20) {
-          tl::warn << tl::to_string (tr ("Class ")) << (*c)->name () << ": " << tl::to_string (tr ("no Python mapping for method ")) << mt->name (mid);
+          tl::warn << tl::to_string (tr ("Class ")) << cls->name () << ": " << tl::to_string (tr ("no Python mapping for method ")) << mt->name (mid);
         }
 
-        add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is not available for Python")));
+        mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is not available for Python")));
 
       } else {
 
@@ -2658,7 +2666,7 @@ PythonModule::make_classes (const char *mod_name)
 
           //  drop non-standard names
           if (tl::verbosity () >= 20) {
-            tl::warn << tl::to_string (tr ("Class ")) << (*c)->name () << ": " << tl::to_string (tr ("no Python mapping for method (reserved word) ")) << name;
+            tl::warn << tl::to_string (tr ("Class ")) << cls->name () << ": " << tl::to_string (tr ("no Python mapping for method (reserved word) ")) << name;
           }
 
           name += "_";
@@ -2666,7 +2674,7 @@ PythonModule::make_classes (const char *mod_name)
         }
 
         if (name != raw_name) {
-          add_python_doc (**c, mt, int (mid), tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), name));
+          mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), name));
         }
 
         //  create documentation
@@ -2695,41 +2703,41 @@ PythonModule::make_classes (const char *mod_name)
             bool alias_inspect = false;
 #endif
             if (alias_inspect) {
-              add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as 'str(object)' and 'repr(object)'")));
+              mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is also available as 'str(object)' and 'repr(object)'")));
               alt_names.push_back ("__repr__");
             } else {
-              add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as 'str(object)'")));
+              mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is also available as 'str(object)'")));
             }
 
           } else if (name == "hash" && m_first->compatible_with_num_args (0)) {
 
             //  The hash method is also routed via the tp_hash implementation
             alt_names.push_back ("__hash__");
-            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as 'hash(object)'")));
+            mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is also available as 'hash(object)'")));
 
           } else if (name == "inspect" && m_first->compatible_with_num_args (0)) {
 
             //  The str method is also routed via the tp_str implementation
-            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as 'repr(object)'")));
+            mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is also available as 'repr(object)'")));
             alt_names.push_back ("__repr__");
 
           } else if (name == "size" && m_first->compatible_with_num_args (0)) {
 
             //  The size method is also routed via the sequence methods protocol if there
             //  is a [] function
-            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as 'len(object)'")));
+            mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is also available as 'len(object)'")));
             alt_names.push_back ("__len__");
 
           } else if (name == "each" && m_first->compatible_with_num_args (0) && m_first->ret_type ().is_iter ()) {
 
             //  each makes the object iterable
-            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method enables iteration of the object")));
+            mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method enables iteration of the object")));
             alt_names.push_back ("__iter__");
 
           } else if (name == "__mul__") {
             // Adding right multiplication
             // Rationale: if pyaObj * x works, so should x * pyaObj
-            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as '__mul__'")));
+            mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is also available as '__mul__'")));
             alt_names.push_back ("__rmul__");
           }
 
@@ -2737,10 +2745,10 @@ PythonModule::make_classes (const char *mod_name)
 
             //  needs registration under an alternative name to enable special protocols
 
-            PyMethodDef *method = make_method_def ();
-            method->ml_name = make_string (*an);
+            PyMethodDef *method = mp_module->make_method_def ();
+            method->ml_name = mp_module->make_string (*an);
             method->ml_meth = (PyCFunction) method_adaptors[mid];
-            method->ml_doc = make_string (doc);
+            method->ml_doc = mp_module->make_string (doc);
             method->ml_flags = METH_VARARGS;
 
             PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
@@ -2748,10 +2756,10 @@ PythonModule::make_classes (const char *mod_name)
 
           }
 
-          PyMethodDef *method = make_method_def ();
-          method->ml_name = make_string (name);
+          PyMethodDef *method = mp_module->make_method_def ();
+          method->ml_name = mp_module->make_string (name);
           method->ml_meth = (PyCFunction) method_adaptors[mid];
-          method->ml_doc = make_string (doc);
+          method->ml_doc = mp_module->make_string (doc);
           method->ml_flags = METH_VARARGS;
 
           PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
@@ -2762,7 +2770,7 @@ PythonModule::make_classes (const char *mod_name)
           if ((mt->end (mid) - mt->begin (mid)) == 1 && m_first->begin_arguments () == m_first->end_arguments ()) {
 
             //  static methods without arguments which start with a capital letter are treated as constants
-            PYAStaticAttributeDescriptorObject *desc = PYAStaticAttributeDescriptorObject::create (make_string (name));
+            PYAStaticAttributeDescriptorObject *desc = PYAStaticAttributeDescriptorObject::create (mp_module->make_string (name));
             desc->type = type;
             desc->getter = method_adaptors[mid];
 
@@ -2770,8 +2778,8 @@ PythonModule::make_classes (const char *mod_name)
             set_type_attr (type, name, attr);
 
           } else if (tl::verbosity () >= 20) {
-            tl::warn << "Upper case method name encountered which cannot be used as a Python constant (more than one overload or at least one argument): " << (*c)->name () << "." << name;
-            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This attribute is not available for Python")));
+            tl::warn << "Upper case method name encountered which cannot be used as a Python constant (more than one overload or at least one argument): " << cls->name () << "." << name;
+            mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This attribute is not available for Python")));
           }
 
         } else {
@@ -2779,12 +2787,12 @@ PythonModule::make_classes (const char *mod_name)
           if (m_first->ret_type ().type () == gsi::T_object && m_first->ret_type ().pass_obj () && name == "new") {
 
             //  The constructor is also routed via the pya_object_init implementation
-            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is the default initializer of the object")));
+            mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is the default initializer of the object")));
 
-            PyMethodDef *method = make_method_def ();
+            PyMethodDef *method = mp_module->make_method_def ();
             method->ml_name = "__init__";
             method->ml_meth = (PyCFunction) method_init_adaptors[mid];
-            method->ml_doc = make_string (doc);
+            method->ml_doc = mp_module->make_string (doc);
             method->ml_flags = METH_VARARGS;
 
             PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
@@ -2792,10 +2800,10 @@ PythonModule::make_classes (const char *mod_name)
 
           }
 
-          PyMethodDef *method = make_method_def ();
-          method->ml_name = make_string (name);
+          PyMethodDef *method = mp_module->make_method_def ();
+          method->ml_name = mp_module->make_string (name);
           method->ml_meth = (PyCFunction) method_adaptors[mid];
-          method->ml_doc = make_string (doc);
+          method->ml_doc = mp_module->make_string (doc);
           method->ml_flags = METH_VARARGS | METH_CLASS;
 
           PythonRef attr = PythonRef (PyDescr_NewClassMethod (type, method));
@@ -2831,7 +2839,7 @@ PythonModule::make_classes (const char *mod_name)
       if (! has_ne) {
 
         //  Add a definition for "__ne__"
-        PyMethodDef *method = make_method_def ();
+        PyMethodDef *method = mp_module->make_method_def ();
         method->ml_name = "__ne__";
         method->ml_meth = &object_default_ne_impl;
         method->ml_flags = METH_VARARGS;
@@ -2844,7 +2852,7 @@ PythonModule::make_classes (const char *mod_name)
       if (has_lt && ! has_le) {
 
         //  Add a definition for "__le__"
-        PyMethodDef *method = make_method_def ();
+        PyMethodDef *method = mp_module->make_method_def ();
         method->ml_name = "__le__";
         method->ml_meth = &object_default_le_impl;
         method->ml_flags = METH_VARARGS;
@@ -2857,7 +2865,7 @@ PythonModule::make_classes (const char *mod_name)
       if (has_lt && ! has_gt) {
 
         //  Add a definition for "__gt__"
-        PyMethodDef *method = make_method_def ();
+        PyMethodDef *method = mp_module->make_method_def ();
         method->ml_name = "__gt__";
         method->ml_meth = &object_default_gt_impl;
         method->ml_flags = METH_VARARGS;
@@ -2870,7 +2878,7 @@ PythonModule::make_classes (const char *mod_name)
       if (has_lt && ! has_ge) {
 
         //  Add a definition for "__ge__"
-        PyMethodDef *method = make_method_def ();
+        PyMethodDef *method = mp_module->make_method_def ();
         method->ml_name = "__ge__";
         method->ml_meth = &object_default_ge_impl;
         method->ml_flags = METH_VARARGS;
@@ -2895,7 +2903,7 @@ PythonModule::make_classes (const char *mod_name)
         Py_XDECREF (attr_class);
         PyErr_Clear ();
 
-        tl::warn << "Unable to install a static/non-static disambiguator for " << *a << " in class " << (*c)->name ();
+        tl::warn << "Unable to install a static/non-static disambiguator for " << *a << " in class " << cls->name ();
 
       } else {
 
@@ -2910,6 +2918,75 @@ PythonModule::make_classes (const char *mod_name)
 
     mt->finish ();
 
+    return type;
+  }
+
+private:
+  PythonModule *mp_module;
+  PyObject *m_all_list;
+  std::map<const gsi::ClassBase *, std::vector<const gsi::ClassBase *> > m_extensions_for;
+  std::set<const gsi::ClassBase *> m_extensions;
+  std::map<const gsi::ClassBase *, std::vector<std::pair<std::string, const gsi::ClassBase *> > > m_links_for;
+};
+
+}
+
+void
+PythonModule::make_classes (const char *mod_name)
+{
+  PyObject *module = mp_module.get ();
+
+  //  Prepare an __all__ index for the module
+
+  PythonRef all_list;
+  if (! PyObject_HasAttrString (module, "__all__")) {
+    all_list = PythonRef (PyList_New (0));
+    PyObject_SetAttrString (module, "__all__", all_list.get ());
+  } else {
+    all_list = PythonRef (PyObject_GetAttrString (module, "__all__"));
+  }
+
+  PyObject_SetAttrString (module, "__doc__", PythonRef (c2python (m_mod_description)).get ());
+
+  //  Build a class for descriptors for static attributes
+  PYAStaticAttributeDescriptorObject::make_class (module);
+
+  //  Build a class for static/non-static dispatching descriptors
+  PYAAmbiguousMethodDispatcher::make_class (module);
+
+  //  Build a class for iterators
+  PYAIteratorObject::make_class (module);
+
+  //  Build a class for signals
+  PYASignal::make_class (module);
+
+  std::list<const gsi::ClassBase *> sorted_classes = gsi::ClassBase::classes_in_definition_order (mod_name);
+
+  PythonClassGenerator gen (this, all_list.get ());
+
+  if (mod_name) {
+    for (std::list<const gsi::ClassBase *>::const_iterator c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
+      if ((*c)->module () != mod_name) {
+        //  don't handle classes outside this module, but require them to be present
+        if (! PythonClassClientData::py_type (**c)) {
+          throw tl::Exception (tl::sprintf ("class %s.%s required from outside the module %s, but that module is not loaded", (*c)->module (), (*c)->name (), mod_name));
+        }
+      }
+    }
+  }
+
+  //  first pass: register the extensions
+  for (auto c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
+    if ((*c)->declaration () != *c && (! mod_name || (*c)->module () == mod_name)) {
+      gen.register_extension (*c);
+    }
+  }
+
+  //  second pass: make the classes
+  for (auto c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
+    if ((*c)->declaration () == *c && (! mod_name || (*c)->module () == mod_name)) {
+      gen.make_class (*c);
+    }
   }
 }
 

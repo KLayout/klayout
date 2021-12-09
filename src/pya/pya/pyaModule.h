@@ -158,8 +158,6 @@ public:
   }
 
 private:
-  static void check (const char *mod_name);
-
   std::list<std::string> m_string_heap;
   std::vector<PyMethodDef *> m_methods_heap;
   std::vector<PyGetSetDef *> m_getseters_heap;

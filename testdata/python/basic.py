@@ -3045,8 +3045,23 @@ class BasicTest(unittest.TestCase):
 
     self.assertEqual(pya.A.ba_to_ia(b'\x00\x01\x02'), [ 0, 1, 2 ])
 
+  # Tests multi-base mixins (only constants and enums available)
+  def test_multiBaseMixins(self):
+    
+    bb = pya.BB()  # base classes B1,B2,B3
+    bb.set1(17)                                          # B1
+    self.assertEqual(bb.get1(), 17)                      # B1
+    bb.set1(21)                                          # B1
+
+    self.assertEqual(bb.get1(), 21)                      # B1
+    self.assertEqual(pya.BB.C2, 17)                      # B2
+    self.assertEqual(pya.BB.C3, -1)                      # B3
+    self.assertEqual(pya.BB.E.E3B.to_i(), 101)           # B3
+    self.assertEqual(bb.d3(pya.BB.E.E3C, pya.BB.E.E3A), -2)  # BB with B3 enums
+    self.assertEqual(bb.d3(pya.BB.E.E3A, pya.BB.E.E3C), 2)   # BB with B3 enums
+
   # Custom factory implemented in Python
-#
+
   def test_80(self):
 
     gc = pya.GObject.g_inst_count()

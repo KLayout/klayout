@@ -1560,9 +1560,6 @@ public:
       super = make_class (cls->base (), as_static);
     }
 
-if (cls->name() == "ViewMode") {// @@@
-  printf("@@@ BANG!\n"); fflush(stdout);
-}// @@@
     VALUE klass;
     if (as_static) {
 

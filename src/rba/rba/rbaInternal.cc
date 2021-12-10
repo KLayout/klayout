@@ -919,24 +919,24 @@ void SignalHandler::call (const gsi::MethodBase *meth, gsi::SerialArgs &args, gs
 //  Class map management
 
 static std::map <VALUE, const gsi::ClassBase *> cls_map;
-static std::map <const gsi::ClassBase *, VALUE> rev_cls_map;
+static std::map <std::pair<const gsi::ClassBase *, bool>, VALUE> rev_cls_map;
 
-void register_class (VALUE ruby_cls, const gsi::ClassBase *gsi_cls)
+void register_class (VALUE ruby_cls, const gsi::ClassBase *gsi_cls, bool as_static)
 {
   cls_map.insert (std::make_pair (ruby_cls, gsi_cls));
-  rev_cls_map.insert (std::make_pair (gsi_cls, ruby_cls));
+  rev_cls_map.insert (std::make_pair (std::make_pair (gsi_cls, as_static), ruby_cls));
 }
 
-VALUE ruby_cls (const gsi::ClassBase *cls)
+VALUE ruby_cls (const gsi::ClassBase *cls, bool as_static)
 {
-  std::map <const gsi::ClassBase *, VALUE>::const_iterator c = rev_cls_map.find (cls);
+  auto c = rev_cls_map.find (std::make_pair (cls, as_static));
   tl_assert (c != rev_cls_map.end ());
   return c->second;
 }
 
-bool is_registered (const gsi::ClassBase *cls)
+bool is_registered (const gsi::ClassBase *cls, bool as_static)
 {
-  return rev_cls_map.find (cls) != rev_cls_map.end ();
+  return rev_cls_map.find (std::make_pair (cls, as_static)) != rev_cls_map.end ();
 }
 
 const gsi::ClassBase *find_cclass (VALUE k)

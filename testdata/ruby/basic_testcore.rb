@@ -3019,6 +3019,7 @@ class Basic_TestClass < TestBase
     bb.set1(17)                                          # B1
     assert_equal(bb.get1, 17)                            # B1
     bb.set1(21)                                          # B1
+    assert_equal(RBA::B3::E::E3B.to_i, 101)              # B3
 
     assert_equal(bb.get1, 21)                            # B1
     assert_equal(RBA::BB::C2, 17)                        # B2

@@ -1541,7 +1541,6 @@ public:
       //  got an extension
       tl_assert (cls->parent ());
       m_extensions_for [cls->parent ()->declaration ()].push_back (cls->declaration ());
-      m_extensions.insert (cls->declaration ());
 
     } else {
 
@@ -1550,67 +1549,75 @@ public:
     }
   }
 
-  VALUE make_class (const gsi::ClassBase *cls)
+  VALUE make_class (const gsi::ClassBase *cls, bool as_static, VALUE parent_class = (VALUE) 0, const gsi::ClassBase *parent = 0)
   {
-    if (is_registered (cls)) {
-      return ruby_cls (cls);
+    if (is_registered (cls, as_static)) {
+      return ruby_cls (cls, as_static);
     }
-
-    bool is_extension = (m_extensions.find (cls) != m_extensions.end ());
-
-    bool base_class_is_extension = (m_extensions.find (cls->base ()) != m_extensions.end ());
 
     VALUE super = rb_cObject;
     if (cls->base () != 0) {
-      super = make_class (cls->base ());
+      super = make_class (cls->base (), as_static);
     }
 
+if (cls->name() == "ViewMode") {// @@@
+  printf("@@@ BANG!\n"); fflush(stdout);
+}// @@@
     VALUE klass;
-    if (is_extension) {
+    if (as_static) {
 
       if (tl::verbosity () >= 20) {
         tl::log << tl::to_string (tr ("Registering class as Ruby module:) ")) << cls->name ();
       }
-      if (cls->base () && ! base_class_is_extension) {
-        tl::warn << tl::to_string (tr ("Base class of mixin module ignored: ")) << cls->name ();
+
+      std::string mixin_name = cls->name () + "_Mixin";
+
+      if (parent) {
+        klass = rb_define_module_under (parent_class, mixin_name.c_str ());
+      } else {
+        klass = rb_define_module_under (m_module, mixin_name.c_str ());
       }
 
-      if (cls->parent ()) {
-        VALUE parent_class = make_class (cls->parent ()->declaration ());
-        klass = rb_define_module_under (parent_class, cls->name ().c_str ());
-      } else {
-        klass = rb_define_module_under (m_module, cls->name ().c_str ());
+      //  if the base class is an extension (mixin), we cannot use it as superclass because it's a module
+      if (cls->base () != 0) {
+        rb_include_module (klass, super);
       }
 
     } else {
 
-      VALUE direct_super = base_class_is_extension ? rb_cObject : super;
-      if (cls->parent ()) {
-        VALUE parent_class = make_class (cls->parent ()->declaration ());
-        klass = rb_define_class_under (parent_class, cls->name ().c_str (), direct_super);
+      if (parent) {
+        klass = rb_define_class_under (parent_class, cls->name ().c_str (), super);
       } else {
-        klass = rb_define_class_under (m_module, cls->name ().c_str (), direct_super);
+        klass = rb_define_class_under (m_module, cls->name ().c_str (), super);
       }
 
       rb_define_alloc_func (klass, alloc_proxy);
 
     }
 
-    //  if the base class is an extension (mixin), we cannot use it as superclass because it's a module
-    if (cls->base () != 0 && base_class_is_extension) {
-      rb_include_module (klass, super);
-    }
-
-    register_class (klass, cls);
+    register_class (klass, cls, as_static);
 
     //  mix-in unnamed extensions
 
     auto exts = m_extensions_for.find (cls);
     if (exts != m_extensions_for.end ()) {
       for (auto ie = exts->second.begin (); ie != exts->second.end (); ++ie) {
-        VALUE ext_module = make_class (*ie);
+        VALUE ext_module = make_class (*ie, true);
         rb_include_module (klass, ext_module);
         rb_extend_object (klass, ext_module);
+      }
+    }
+
+    //  produce the child classes
+
+    for (auto cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
+      if (cc->declaration () == cc.operator-> ()) {
+        if (! is_registered (cc->declaration (), false)) {
+          make_class (cc->declaration (), false, klass, cc->declaration ());
+        } else {
+          VALUE child_class = ruby_cls (cc->declaration (), false);
+          rb_define_const (klass, cc->name ().c_str (), child_class);
+        }
       }
     }
 
@@ -1619,7 +1626,7 @@ public:
     auto links = m_links_for.find (cls);
     if (links != m_links_for.end ()) {
       for (auto il = links->second.begin (); il != links->second.end (); ++il) {
-        VALUE linked_class = make_class (il->second);
+        VALUE linked_class = make_class (il->second, false);
         rb_define_const (klass, il->first.c_str (), linked_class);
       }
     }
@@ -1702,7 +1709,7 @@ public:
 
     //  NOTE: extensions can't carry methods - this is due to the method numbering scheme
     //  which can only handle direct base classes. So only constants are carried forward.
-    if (! is_extension) {
+    if (! as_static) {
 
       //  Hint: we need to do static methods before the non-static ones because
       //  rb_define_module_function creates an private instance method.
@@ -1838,7 +1845,7 @@ rba_init (RubyInterpreterPrivateData *d)
   //  second pass: make the classes
   for (auto c = sorted_classes.begin (); c != sorted_classes.end (); ++c) {
     if ((*c)->declaration () == *c) {
-      gen.make_class (*c);
+      gen.make_class (*c, false);
     }
   }
 

@@ -2488,9 +2488,11 @@ public:
     //  produce the child classes
 
     for (auto cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
-      PyTypeObject *child_class = make_class (cc.operator-> (), as_static);
-      PythonRef attr ((PyObject *) child_class, false /*borrowed*/);
-      set_type_attr (type, cc->name ().c_str (), attr);
+      if (cc->declaration () == cc.operator-> ()) {
+        PyTypeObject *child_class = make_class (cc.operator-> (), as_static);
+        PythonRef attr ((PyObject *) child_class, false /*borrowed*/);
+        set_type_attr (type, cc->name ().c_str (), attr);
+      }
     }
 
     //  add named extensions

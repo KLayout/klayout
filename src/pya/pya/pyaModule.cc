@@ -2387,15 +2387,9 @@ public:
   void register_extension (const gsi::ClassBase *cls)
   {
     if (cls->name ().empty ()) {
-
       //  got an extension
       tl_assert (cls->parent ());
       m_extensions_for [cls->parent ()->declaration ()].push_back (cls->declaration ());
-
-    } else {
-
-      m_links_for [cls->parent ()->declaration ()].push_back (std::make_pair (cls->name (), cls->declaration ()));
-
     }
   }
 
@@ -2488,21 +2482,10 @@ public:
     //  produce the child classes
 
     for (auto cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
-      if (cc->declaration () == cc.operator-> ()) {
+      if (! cc->name ().empty ()) {
         PyTypeObject *child_class = make_class (cc.operator-> (), as_static);
         PythonRef attr ((PyObject *) child_class, false /*borrowed*/);
         set_type_attr (type, cc->name ().c_str (), attr);
-      }
-    }
-
-    //  add named extensions
-
-    auto links = m_links_for.find (cls);
-    if (links != m_links_for.end ()) {
-      for (auto il = links->second.begin (); il != links->second.end (); ++il) {
-        PyTypeObject *linked_type = make_class (il->second, false);
-        PythonRef attr ((PyObject *) linked_type, false /*borrowed*/);
-        set_type_attr (type, il->first.c_str (), attr);
       }
     }
 
@@ -2922,7 +2905,6 @@ private:
   PythonModule *mp_module;
   PyObject *m_all_list;
   std::map<const gsi::ClassBase *, std::vector<const gsi::ClassBase *> > m_extensions_for;
-  std::map<const gsi::ClassBase *, std::vector<std::pair<std::string, const gsi::ClassBase *> > > m_links_for;
 };
 
 }

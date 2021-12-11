@@ -1537,15 +1537,9 @@ public:
   void register_extension (const gsi::ClassBase *cls)
   {
     if (cls->name ().empty ()) {
-
       //  got an extension
       tl_assert (cls->parent ());
       m_extensions_for [cls->parent ()->declaration ()].push_back (cls->declaration ());
-
-    } else {
-
-      m_links_for [cls->parent ()->declaration ()].push_back (std::make_pair (cls->name (), cls->declaration ()));
-
     }
   }
 
@@ -1608,23 +1602,13 @@ public:
     //  produce the child classes
 
     for (auto cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
-      if (cc->declaration () == cc.operator-> ()) {
+      if (! cc->name ().empty ()) {
         if (! is_registered (cc->declaration (), false)) {
           make_class (cc->declaration (), false, klass, cc->declaration ());
         } else {
           VALUE child_class = ruby_cls (cc->declaration (), false);
           rb_define_const (klass, cc->name ().c_str (), child_class);
         }
-      }
-    }
-
-    //  add named extensions
-
-    auto links = m_links_for.find (cls);
-    if (links != m_links_for.end ()) {
-      for (auto il = links->second.begin (); il != links->second.end (); ++il) {
-        VALUE linked_class = make_class (il->second, false);
-        rb_define_const (klass, il->first.c_str (), linked_class);
       }
     }
 
@@ -1811,7 +1795,6 @@ private:
   std::vector <RubyConstDescriptor> m_constants;
   std::map<const gsi::ClassBase *, std::vector<const gsi::ClassBase *> > m_extensions_for;
   std::set<const gsi::ClassBase *> m_extensions;
-  std::map<const gsi::ClassBase *, std::vector<std::pair<std::string, const gsi::ClassBase *> > > m_links_for;
 };
 
 }

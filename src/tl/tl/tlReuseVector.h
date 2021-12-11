@@ -27,6 +27,7 @@
 
 #include <stdlib.h>
 #include <iterator>
+#include <type_traits>
 #include <vector>
 #include <cstring>
 
@@ -491,7 +492,12 @@ private:
  *  One requirement is that sizeof(C) >= sizeof(void *).
  */
 
+#if __GNUC__ >= 5
 template <class Value, bool trivial_relocate = std::is_trivially_copy_constructible<Value>::value>
+#else
+//  no support for extended type traits in gcc 4.x
+template <class Value, bool trivial_relocate = false>
+#endif
 class reuse_vector
 {
 public:

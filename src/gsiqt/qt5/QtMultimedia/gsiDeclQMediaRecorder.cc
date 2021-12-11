@@ -1159,6 +1159,12 @@ qt_gsi::QtNativeClass<QMediaRecorder> decl_QMediaRecorder (qtdecl_QObject (), "Q
   methods_QMediaRecorder (),
   "@hide\n@alias QMediaRecorder");
 
+//  Additional base classes
+
+gsi::Class<QMediaBindableInterface> &qtdecl_QMediaBindableInterface ();
+
+gsi::ClassExt<QMediaRecorder> base_class_QMediaBindableInterface_in_QMediaRecorder (qtdecl_QMediaBindableInterface ());
+
 GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaRecorder> &qtdecl_QMediaRecorder () { return decl_QMediaRecorder; }
 
 }

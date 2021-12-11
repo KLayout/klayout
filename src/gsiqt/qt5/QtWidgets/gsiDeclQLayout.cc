@@ -1020,6 +1020,12 @@ qt_gsi::QtNativeClass<QLayout> decl_QLayout (qtdecl_QObject (), "QtWidgets", "QL
   methods_QLayout (),
   "@hide\n@alias QLayout");
 
+//  Additional base classes
+
+gsi::Class<QLayoutItem> &qtdecl_QLayoutItem ();
+
+gsi::ClassExt<QLayout> base_class_QLayoutItem_in_QLayout (qtdecl_QLayoutItem ());
+
 GSI_QTWIDGETS_PUBLIC gsi::Class<QLayout> &qtdecl_QLayout () { return decl_QLayout; }
 
 }

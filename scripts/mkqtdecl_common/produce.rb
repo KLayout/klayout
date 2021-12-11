@@ -1107,9 +1107,9 @@ class Configurator
     else
       dc = (@dropped_classes[:all_classes] || []) + (@dropped_classes[cls] || [])
       if sig != :whole_class
-        return dc.find { |d| sig =~ d } != nil
+        return dc.find { |d| d == :whole_class || sig =~ d } != nil
       else
-        return dc.find { |d| sig == d } != nil
+        return dc.find { |d| d == :whole_class || sig == d } != nil
       end
     end
   end

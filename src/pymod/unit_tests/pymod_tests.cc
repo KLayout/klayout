@@ -138,7 +138,7 @@ PYMODTEST (import_QtSvg, "import_QtSvg.py")
 PYMODTEST (import_QtXmlPatterns, "import_QtXmlPatterns.py")
 #endif
 
-#if QT_VERSION >= 0x50000
+#if QT_VERSION >= 0x60000
 PYMODTEST (import_QtCore5Compat, "import_QtCore5Compat.py")
 #endif
 

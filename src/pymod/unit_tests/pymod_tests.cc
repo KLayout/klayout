@@ -93,7 +93,11 @@ PYMODTEST (import_rdb, "import_rdb.py")
 PYMODTEST (import_lay, "import_lay.py")
 
 PYMODTEST (import_QtCore, "import_QtCore.py")
+#if QT_VERSION >= 0x60000
+PYMODTEST (import_QtGui, "import_QtGui_Qt6.py")
+#else
 PYMODTEST (import_QtGui, "import_QtGui.py")
+#endif
 #if defined(HAVE_QT_XML)
 PYMODTEST (import_QtXml, "import_QtXml.py")
 #endif
@@ -103,7 +107,7 @@ PYMODTEST (import_QtSql, "import_QtSql.py")
 #if defined(HAVE_QT_NETWORK)
 PYMODTEST (import_QtNetwork, "import_QtNetwork.py")
 #endif
-#if defined(HAVE_QT_DESIGNER)
+#if defined(HAVE_QT_DESIGNER) && QT_VERSION < 0x60000
 PYMODTEST (import_QtDesigner, "import_QtDesigner.py")
 #endif
 #if defined(HAVE_QT_UITOOLS)
@@ -112,7 +116,11 @@ PYMODTEST (import_QtUiTools, "import_QtUiTools.py")
 
 #if QT_VERSION >= 0x50000
 
+#if QT_VERSION >= 0x60000
+PYMODTEST (import_QtWidgets, "import_QtWidgets_Qt6.py")
+#else
 PYMODTEST (import_QtWidgets, "import_QtWidgets.py")
+#endif
 #if defined(HAVE_QT_MULTIMEDIA)
 PYMODTEST (import_QtMultimedia, "import_QtMultimedia.py")
 #endif
@@ -120,10 +128,18 @@ PYMODTEST (import_QtMultimedia, "import_QtMultimedia.py")
 PYMODTEST (import_QtPrintSupport, "import_QtPrintSupport.py")
 #endif
 #if defined(HAVE_QT_SVG)
+#if QT_VERSION >= 0x60000
+PYMODTEST (import_QtSvg, "import_QtSvg_Qt6.py")
+#else
 PYMODTEST (import_QtSvg, "import_QtSvg.py")
 #endif
-#if defined(HAVE_QT_XML)
+#endif
+#if defined(HAVE_QT_XML) && QT_VERSION < 0x60000
 PYMODTEST (import_QtXmlPatterns, "import_QtXmlPatterns.py")
+#endif
+
+#if QT_VERSION >= 0x60000
+PYMODTEST (import_QtCore5Compat, "import_QtCore5Compat.py")
 #endif
 
 #endif

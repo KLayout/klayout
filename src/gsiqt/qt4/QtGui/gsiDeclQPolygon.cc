@@ -27,11 +27,8 @@
 *  This file has been created automatically
 */
 
-#include <QPolygon>
-#include <QPoint>
-#include <QRect>
-#include <QMatrix>
 #include <QTransform>
+#include <QMatrix>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
 #include <memory>

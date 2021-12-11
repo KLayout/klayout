@@ -586,5 +586,17 @@ PYAObjectBase::obj ()
   return m_obj;
 }
 
+PYAObjectBase *
+PYAObjectBase::from_pyobject (PyObject *py_object)
+{
+  if (Py_TYPE (py_object)->tp_init == NULL) {
+    throw tl::Exception (tl::to_string (tr ("Extension classes do not support instance methods or properties")));
+  }
+
+  PYAObjectBase *pya_object = from_pyobject_unsafe (py_object);
+  tl_assert (pya_object->py_object () == py_object);
+  return pya_object;
+}
+
 }
 

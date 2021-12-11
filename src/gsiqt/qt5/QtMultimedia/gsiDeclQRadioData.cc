@@ -499,6 +499,12 @@ qt_gsi::QtNativeClass<QRadioData> decl_QRadioData (qtdecl_QObject (), "QtMultime
   methods_QRadioData (),
   "@hide\n@alias QRadioData");
 
+//  Additional base classes
+
+gsi::Class<QMediaBindableInterface> &qtdecl_QMediaBindableInterface ();
+
+gsi::ClassExt<QRadioData> base_class_QMediaBindableInterface_in_QRadioData (qtdecl_QMediaBindableInterface ());
+
 GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QRadioData> &qtdecl_QRadioData () { return decl_QRadioData; }
 
 }

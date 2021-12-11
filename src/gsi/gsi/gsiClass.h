@@ -316,7 +316,7 @@ public:
    *  This feature is not quite useful usually and is reserved for special use cases
    *  such as including enums into a declaration namespace.
    */
-  ClassExt (const ClassBase &import, const std::string &name, const std::string &doc = std::string ())
+  ClassExt (const ClassBase &import, const std::string &name = std::string (), const std::string &doc = std::string ())
     : ClassBase (doc, Methods ()), mp_declaration (&import)
   {
     set_name (name);

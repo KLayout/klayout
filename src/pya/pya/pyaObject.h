@@ -72,22 +72,18 @@ public:
 
   /**
    *  @brief Gets the PYAObjectBase pointer from a PyObject pointer
-   */
-  static PYAObjectBase *from_pyobject (PyObject *py_object)
-  {
-    PYAObjectBase *pya_object = (PYAObjectBase *)((char *) py_object + Py_TYPE (py_object)->tp_basicsize - sizeof (PYAObjectBase));
-    tl_assert (pya_object->py_object () == py_object);
-    return pya_object;
-  }
-
-  /**
-   *  @brief Gets the PYAObjectBase pointer from a PyObject pointer
    *  This version doesn't check anything.
    */
   static PYAObjectBase *from_pyobject_unsafe (PyObject *py_object)
   {
+    //  the objects must not be a pure static extension
     return (PYAObjectBase *)((char *) py_object + Py_TYPE (py_object)->tp_basicsize - sizeof (PYAObjectBase));
   }
+
+  /**
+   *  @brief Gets the PYAObjectBase pointer from a PyObject pointer
+   */
+  static PYAObjectBase *from_pyobject (PyObject *py_object);
 
   /**
    *  @brief Indicates that a C++ object is present

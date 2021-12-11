@@ -565,3 +565,27 @@ TEST(9)
   EXPECT_EQ (collect_func->values[1], 14400);
   EXPECT_EQ (collect_func->values[2], 19600);
 }
+
+TEST(10)
+{
+  tl::Eval e;
+  tl::Variant v;
+
+  v = e.parse ("var b3 = B3.new(); b3.E.E3B").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("E3B"));
+  v = e.parse ("B3.E.E3B").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("E3B"));
+  v = e.parse ("var bb = BB.new(); bb.C1").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("42"));
+  v = e.parse ("var bb = BB.new(); bb.C2").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("17"));
+  v = e.parse ("var bb = BB.new(); bb.C3").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("-1"));
+  v = e.parse ("var bb = BB.new(); bb.E.E3A").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("E3A"));
+  v = e.parse ("BB.E.E3C").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("E3C"));
+  v = e.parse ("var bb = BB.new(); bb.d3(BB.E.E3A, BB.E.E3C)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("2"));
+}
+

@@ -265,11 +265,19 @@ class CPPStruct
 
     cls = self.id.to_s
 
-    # collect enums from inner classes
+    # collect used enums from inner classes
     (self.body_decl || []).each do |bd|
       decl = nil
       if bd.is_a?(CPPStructDeclaration) && bd.visibility == :public && bd.struct.body_decl && bd.myself != "" && !conf.is_class_dropped?(cls, bd.myself) 
         bd.struct.collect_used_enums(map, conf)
+      end
+    end
+
+    # collect used enums from base classes
+    (self.base_classes || []).each do |bc|
+      bc_obj = self.parent.resolve_qid(bc.class_id)
+      if bc_obj.is_a?(CPPStructDeclaration) && bc_obj.visibility == :public && bc_obj.struct.body_decl && bc_obj.myself != "" && !conf.is_class_dropped?(cls, bc_obj.myself) 
+        bc_obj.struct.collect_used_enums(map, conf)
       end
     end
 
@@ -315,7 +323,7 @@ class CPPStruct
 
   end
 
-  def collect_methods(map)
+  def collect_methods(map, weak = false)
 
     mmap = {} 
 
@@ -355,6 +363,7 @@ class CPPStruct
     end
 
     #  take non-duplicates (by call signature) for the map
+    #  weak ones do not redefine methods
     mmap.each do |mn,decls|
 
       seen = {}
@@ -362,7 +371,9 @@ class CPPStruct
         s = d.call_sig
         if !seen[s]
           seen[s] = true
-          (map[mn] ||= []) << d
+          if !weak || !map[mn]
+            (map[mn] ||= []) << d
+          end
         end
       end
 
@@ -1096,9 +1107,9 @@ class Configurator
     else
       dc = (@dropped_classes[:all_classes] || []) + (@dropped_classes[cls] || [])
       if sig != :whole_class
-        return dc.find { |d| sig =~ d } != nil
+        return dc.find { |d| d == :whole_class || sig =~ d } != nil
       else
-        return dc.find { |d| sig == d } != nil
+        return dc.find { |d| d == :whole_class || sig == d } != nil
       end
     end
   end
@@ -1907,6 +1918,10 @@ END
     base_cls = base_classes[0] && base_classes[0].class_id.to_s
     base_clsn = base_cls && make_cls_name(base_cls)
 
+    # as we only support single base classes (a tribute to Ruby), we treat all other base classes as
+    # mixins
+    mixin_base_classes = base_classes[1..] || []
+
     methods_by_name = {}
     all_methods_by_name = {}
     enum_decls_by_name = {}
@@ -1918,8 +1933,8 @@ END
     end
 
     mmap = {}
-    struct.collect_methods(methods_by_name)
     struct.collect_all_methods(all_methods_by_name, conf)
+    struct.collect_methods(methods_by_name)
     struct.collect_enum_decls(enum_decls_by_name) { |bd| self.is_enum_used?(bd) || conf.is_enum_included?(cls, bd.myself) }
 
     # if one method is abstract, omit ctors for example
@@ -2365,35 +2380,35 @@ END
 
       base_classes.each do |bc|
 
-      bc_name = bc.class_id.to_s
+        bc_name = bc.class_id.to_s
 
-      ofile.puts("//  base class cast for #{bc_name}")
-      ofile.puts("")
-      ofile.puts("static void _init_f_#{clsn}_as_#{bc_name} (qt_gsi::GenericMethod *decl)")
-      ofile.puts("{")
-      ofile.puts("  decl->set_return<#{bc_name} *> ();")
-      ofile.puts("}")
-      ofile.puts("")
-      ofile.puts("static void _call_f_#{clsn}_as_#{bc_name} (const qt_gsi::GenericMethod *, void *cls, gsi::SerialArgs &, gsi::SerialArgs &ret) ")
-      ofile.puts("{")
-      ofile.puts("  ret.write<#{bc_name} *> ((#{bc_name} *)(#{cls} *)cls);")
-      ofile.puts("}")
-      ofile.puts("")
+        ofile.puts("//  base class cast for #{bc_name}")
+        ofile.puts("")
+        ofile.puts("static void _init_f_#{clsn}_as_#{bc_name} (qt_gsi::GenericMethod *decl)")
+        ofile.puts("{")
+        ofile.puts("  decl->set_return<#{bc_name} *> ();")
+        ofile.puts("}")
+        ofile.puts("")
+        ofile.puts("static void _call_f_#{clsn}_as_#{bc_name} (const qt_gsi::GenericMethod *, void *cls, gsi::SerialArgs &, gsi::SerialArgs &ret) ")
+        ofile.puts("{")
+        ofile.puts("  ret.write<#{bc_name} *> ((#{bc_name} *)(#{cls} *)cls);")
+        ofile.puts("}")
+        ofile.puts("")
 
-      mdecl_bcc << "new qt_gsi::GenericMethod (\"as#{bc_name}\", \"@brief Delivers the base class interface #{bc_name} of #{cls}\\nClass #{cls} is derived from multiple base classes. This method delivers the #{bc_name} base class aspect.\", false, &_init_f_#{clsn}_as_#{bc_name}, &_call_f_#{clsn}_as_#{bc_name});"
+        mdecl_bcc << "new qt_gsi::GenericMethod (\"as#{bc_name}\", \"@brief Delivers the base class interface #{bc_name} of #{cls}\\nClass #{cls} is derived from multiple base classes. This method delivers the #{bc_name} base class aspect.\", false, &_init_f_#{clsn}_as_#{bc_name}, &_call_f_#{clsn}_as_#{bc_name});"
 
-      ofile.puts("static void _init_f_#{clsn}_as_const_#{bc_name} (qt_gsi::GenericMethod *decl)")
-      ofile.puts("{")
-      ofile.puts("  decl->set_return<const #{bc_name} *> ();")
-      ofile.puts("}")
-      ofile.puts("")
-      ofile.puts("static void _call_f_#{clsn}_as_const_#{bc_name} (const qt_gsi::GenericMethod *, void *cls, gsi::SerialArgs &, gsi::SerialArgs &ret) ")
-      ofile.puts("{")
-      ofile.puts("  ret.write<const #{bc_name} *> ((const #{bc_name} *)(const #{cls} *)cls);")
-      ofile.puts("}")
-      ofile.puts("")
+        ofile.puts("static void _init_f_#{clsn}_as_const_#{bc_name} (qt_gsi::GenericMethod *decl)")
+        ofile.puts("{")
+        ofile.puts("  decl->set_return<const #{bc_name} *> ();")
+        ofile.puts("}")
+        ofile.puts("")
+        ofile.puts("static void _call_f_#{clsn}_as_const_#{bc_name} (const qt_gsi::GenericMethod *, void *cls, gsi::SerialArgs &, gsi::SerialArgs &ret) ")
+        ofile.puts("{")
+        ofile.puts("  ret.write<const #{bc_name} *> ((const #{bc_name} *)(const #{cls} *)cls);")
+        ofile.puts("}")
+        ofile.puts("")
 
-      mdecl_bcc << "new qt_gsi::GenericMethod (\"asConst#{bc_name}\", \"@brief Delivers the base class interface #{bc_name} of #{cls}\\nClass #{cls} is derived from multiple base classes. This method delivers the #{bc_name} base class aspect.\\n\\nUse this version if you have a const reference.\", true, &_init_f_#{clsn}_as_const_#{bc_name}, &_call_f_#{clsn}_as_const_#{bc_name});"
+        mdecl_bcc << "new qt_gsi::GenericMethod (\"asConst#{bc_name}\", \"@brief Delivers the base class interface #{bc_name} of #{cls}\\nClass #{cls} is derived from multiple base classes. This method delivers the #{bc_name} base class aspect.\\n\\nUse this version if you have a const reference.\", true, &_init_f_#{clsn}_as_const_#{bc_name}, &_call_f_#{clsn}_as_const_#{bc_name});"
 
       end
 
@@ -2472,6 +2487,24 @@ END
       # only for top-level classes external declarations are produced currently
       @ext_decls << "namespace gsi { GSI_#{modn.upcase}_PUBLIC gsi::Class<#{cls}> &qtdecl_#{clsn} (); }\n\n"
 
+    end
+
+    # Produce the mixin base classes
+
+    if ! mixin_base_classes.empty?
+      ofile.puts("")
+      ofile.puts("//  Additional base classes")
+      ofile.puts("")
+      mixin_base_classes.each do |bc|
+        bc_name = bc.class_id.to_s
+        ofile.puts("gsi::Class<#{bc_name}> &qtdecl_#{bc_name} ();")
+      end
+      ofile.puts("")
+    end
+
+    mixin_base_classes.each do |bc|
+      bc_name = bc.class_id.to_s
+      ofile.puts("gsi::ClassExt<#{cls}> base_class_#{bc_name}_in_#{clsn} (qtdecl_#{bc_name} ());")
     end
 
     ofile.puts("")
@@ -3213,7 +3246,7 @@ bp.read(input_file)
 puts("Collecting used enums ..")
 l = bp.prod_list(conf)
 l.each_with_index do |decl_obj,i|
-  puts "#{decl_obj.myself}: #{i+1}/#{l.size}"
+  decl_obj.myself && puts("#{decl_obj.myself}: #{i+1}/#{l.size}")
   bp.collect_used_enums(conf, decl_obj)
 end
 

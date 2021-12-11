@@ -13,6 +13,8 @@ DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$QTBASIC_INC
 
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_qtbasic
 
+LIBS += -lklayout_QtCore
+
 SOURCES += \
 
 HEADERS += \

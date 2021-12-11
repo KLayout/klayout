@@ -952,6 +952,12 @@ qt_gsi::QtNativeClass<QMediaPlaylist> decl_QMediaPlaylist (qtdecl_QObject (), "Q
   methods_QMediaPlaylist (),
   "@hide\n@alias QMediaPlaylist");
 
+//  Additional base classes
+
+gsi::Class<QMediaBindableInterface> &qtdecl_QMediaBindableInterface ();
+
+gsi::ClassExt<QMediaPlaylist> base_class_QMediaBindableInterface_in_QMediaPlaylist (qtdecl_QMediaBindableInterface ());
+
 GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaPlaylist> &qtdecl_QMediaPlaylist () { return decl_QMediaPlaylist; }
 
 }

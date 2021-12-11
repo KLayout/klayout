@@ -1,4 +1,7 @@
 
+0.27.6          (2021-xx-xx):
+TODO
+
 0.27.5          (2021-11-14):
 * Enhancements: Better support for execution (also cross-interpreter) of macro code from scripts
   - New methods for the Macro class like "run" and loading from file

@@ -256,6 +256,12 @@ qt_gsi::QtNativeClass<QAudioSystemPlugin> decl_QAudioSystemPlugin (qtdecl_QObjec
   methods_QAudioSystemPlugin (),
   "@hide\n@alias QAudioSystemPlugin");
 
+//  Additional base classes
+
+gsi::Class<QAudioSystemFactoryInterface> &qtdecl_QAudioSystemFactoryInterface ();
+
+gsi::ClassExt<QAudioSystemPlugin> base_class_QAudioSystemFactoryInterface_in_QAudioSystemPlugin (qtdecl_QAudioSystemFactoryInterface ());
+
 GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioSystemPlugin> &qtdecl_QAudioSystemPlugin () { return decl_QAudioSystemPlugin; }
 
 }

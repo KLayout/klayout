@@ -327,6 +327,12 @@ gsi::Class<QDropEvent> decl_QDropEvent (qtdecl_QEvent (), "QtGui", "QDropEvent_N
   methods_QDropEvent (),
   "@hide\n@alias QDropEvent");
 
+//  Additional base classes
+
+gsi::Class<QMimeSource> &qtdecl_QMimeSource ();
+
+gsi::ClassExt<QDropEvent> base_class_QMimeSource_in_QDropEvent (qtdecl_QMimeSource ());
+
 GSI_QTGUI_PUBLIC gsi::Class<QDropEvent> &qtdecl_QDropEvent () { return decl_QDropEvent; }
 
 }

@@ -724,6 +724,12 @@ qt_gsi::QtNativeClass<QCameraImageCapture> decl_QCameraImageCapture (qtdecl_QObj
   methods_QCameraImageCapture (),
   "@hide\n@alias QCameraImageCapture");
 
+//  Additional base classes
+
+gsi::Class<QMediaBindableInterface> &qtdecl_QMediaBindableInterface ();
+
+gsi::ClassExt<QCameraImageCapture> base_class_QMediaBindableInterface_in_QCameraImageCapture (qtdecl_QMediaBindableInterface ());
+
 GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraImageCapture> &qtdecl_QCameraImageCapture () { return decl_QCameraImageCapture; }
 
 }

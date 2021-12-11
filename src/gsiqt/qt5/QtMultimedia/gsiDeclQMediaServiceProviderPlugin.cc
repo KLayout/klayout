@@ -212,6 +212,12 @@ qt_gsi::QtNativeClass<QMediaServiceProviderPlugin> decl_QMediaServiceProviderPlu
   methods_QMediaServiceProviderPlugin (),
   "@hide\n@alias QMediaServiceProviderPlugin");
 
+//  Additional base classes
+
+gsi::Class<QMediaServiceProviderFactoryInterface> &qtdecl_QMediaServiceProviderFactoryInterface ();
+
+gsi::ClassExt<QMediaServiceProviderPlugin> base_class_QMediaServiceProviderFactoryInterface_in_QMediaServiceProviderPlugin (qtdecl_QMediaServiceProviderFactoryInterface ());
+
 GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaServiceProviderPlugin> &qtdecl_QMediaServiceProviderPlugin () { return decl_QMediaServiceProviderPlugin; }
 
 }

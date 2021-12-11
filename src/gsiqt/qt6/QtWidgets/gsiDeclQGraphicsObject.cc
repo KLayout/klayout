@@ -58,6 +58,7 @@
 #include <QTimerEvent>
 #include <QTransform>
 #include <QWidget>
+#include <QGraphicsTransform>
 #include "gsiQt.h"
 #include "gsiQtWidgetsCommon.h"
 #include <memory>
@@ -242,6 +243,12 @@ gsi::Class<QObject> &qtdecl_QObject ();
 qt_gsi::QtNativeClass<QGraphicsObject> decl_QGraphicsObject (qtdecl_QObject (), "QtWidgets", "QGraphicsObject_Native",
   methods_QGraphicsObject (),
   "@hide\n@alias QGraphicsObject");
+
+//  Additional base classes
+
+gsi::Class<QGraphicsItem> &qtdecl_QGraphicsItem ();
+
+gsi::ClassExt<QGraphicsObject> base_class_QGraphicsItem_in_QGraphicsObject (qtdecl_QGraphicsItem ());
 
 GSI_QTWIDGETS_PUBLIC gsi::Class<QGraphicsObject> &qtdecl_QGraphicsObject () { return decl_QGraphicsObject; }
 

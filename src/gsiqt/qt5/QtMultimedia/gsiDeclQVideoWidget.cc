@@ -559,6 +559,12 @@ qt_gsi::QtNativeClass<QVideoWidget> decl_QVideoWidget (qtdecl_QWidget (), "QtMul
   methods_QVideoWidget (),
   "@hide\n@alias QVideoWidget");
 
+//  Additional base classes
+
+gsi::Class<QMediaBindableInterface> &qtdecl_QMediaBindableInterface ();
+
+gsi::ClassExt<QVideoWidget> base_class_QMediaBindableInterface_in_QVideoWidget (qtdecl_QMediaBindableInterface ());
+
 GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QVideoWidget> &qtdecl_QVideoWidget () { return decl_QVideoWidget; }
 
 }

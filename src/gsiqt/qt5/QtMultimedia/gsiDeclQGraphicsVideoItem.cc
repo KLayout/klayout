@@ -405,6 +405,12 @@ qt_gsi::QtNativeClass<QGraphicsVideoItem> decl_QGraphicsVideoItem (qtdecl_QGraph
   methods_QGraphicsVideoItem (),
   "@hide\n@alias QGraphicsVideoItem");
 
+//  Additional base classes
+
+gsi::Class<QMediaBindableInterface> &qtdecl_QMediaBindableInterface ();
+
+gsi::ClassExt<QGraphicsVideoItem> base_class_QMediaBindableInterface_in_QGraphicsVideoItem (qtdecl_QMediaBindableInterface ());
+
 GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QGraphicsVideoItem> &qtdecl_QGraphicsVideoItem () { return decl_QGraphicsVideoItem; }
 
 }

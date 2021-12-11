@@ -1664,5 +1664,32 @@ static gsi::Class<GFactory_P> decl_gfactory (decl_gfactory_base, "", "GFactory",
   gsi::factory_callback ("f", &GFactory_P::f, &GFactory_P::f_cb)
 );
 
+static gsi::Class<B1> decl_b1 ("", "B1",
+  gsi::method ("get1", &B1::get1) +
+  gsi::method ("set1", &B1::set1) +
+  gsi::constant ("C1", 42)
+);
+
+static gsi::Class<B2> decl_b2 ("", "B2",
+  gsi::constant ("C2", 17)
+);
+
+static gsi::Class<B3> decl_b3 ("", "B3",
+  gsi::constant ("C3", -1)
+);
+
+gsi::EnumIn<B3, B3::E> enum_in_b3 ("", "E",
+  gsi::enum_const ("E3A", B3::E3A) +
+  gsi::enum_const ("E3B", B3::E3B) +
+  gsi::enum_const ("E3C", B3::E3C)
+);
+
+//  3 base classes
+static gsi::Class<BB> decl_bb (decl_b1, "", "BB",
+  gsi::method ("d3", &BB::d3)
+);
+gsi::ClassExt<BB> b2_in_bb (decl_b2);
+gsi::ClassExt<BB> b3_in_bb (decl_b3);
+
 }
 

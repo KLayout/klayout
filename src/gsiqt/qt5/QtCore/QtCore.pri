@@ -179,8 +179,7 @@ SOURCES += \
   $$PWD/gsiDeclQt_1.cc \
   $$PWD/gsiDeclQt_2.cc \
   $$PWD/gsiDeclQt_3.cc \
-  $$PWD/gsiDeclQt_4.cc \
-  $$PWD/gsiDeclQtMsgType.cc
+  $$PWD/gsiDeclQt_4.cc
 
 HEADERS += gsiQtCoreCommon.h
 

@@ -152,7 +152,7 @@ msvc {
       -Wno-reserved-user-defined-literal \
 
   # because we use unordered_map/unordered_set:
-  QMAKE_CXXFLAGS += -std=c++0x
+  QMAKE_CXXFLAGS += -std=c++11
 
   win32 {
     QMAKE_LFLAGS += -Wl,--exclude-all-symbols

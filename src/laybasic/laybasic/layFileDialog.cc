@@ -25,6 +25,9 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QFileInfo>
+#if QT_VERSION>=0x050000
+#  include <QStandardPaths>
+#endif
 
 #include "layFileDialog.h"
 #include "tlInternational.h"

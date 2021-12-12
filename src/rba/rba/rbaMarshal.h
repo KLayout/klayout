@@ -25,9 +25,10 @@
 
 #ifdef HAVE_RUBY
 
+#include "gsiSerialisation.h"
+
 #include <ruby.h>
 
-#include "gsiSerialisation.h"
 #include "tlHeap.h"
 
 namespace rba

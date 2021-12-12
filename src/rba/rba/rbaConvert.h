@@ -25,10 +25,9 @@
 
 #ifdef HAVE_RUBY
 
-#include "rbaUtils.h"
-
 #include "gsiTypes.h"
 
+#include "rbaUtils.h"
 #include <ruby.h>
 
 namespace rba

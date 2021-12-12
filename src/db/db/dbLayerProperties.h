@@ -229,5 +229,17 @@ inline LayerProperties &operator+= (LayerProperties &props, const LayerOffset &o
 
 }
 
+/**
+ *  @brief Special extractors for LayerProperties and LayerOffset
+ */
+namespace tl
+{
+  template<> DB_PUBLIC void extractor_impl<db::LayerProperties> (tl::Extractor &ex, db::LayerProperties &p);
+  template<> DB_PUBLIC void extractor_impl<db::LayerOffset> (tl::Extractor &ex, db::LayerOffset &p);
+
+  template<> DB_PUBLIC bool test_extractor_impl<db::LayerProperties> (tl::Extractor &ex, db::LayerProperties &p);
+  template<> DB_PUBLIC bool test_extractor_impl<db::LayerOffset> (tl::Extractor &ex, db::LayerOffset &p);
+} // namespace tl
+
 #endif
 

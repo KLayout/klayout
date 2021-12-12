@@ -44,14 +44,14 @@ static std::locale c_locale ("C");
 // -------------------------------------------------------------------------
 //  Exception classes
 
-ExtractorNotImplementedException::ExtractorNotImplementedException ()
-  : Exception (tl::to_string (tr ("No string extractor available")))
+ExtractorNotImplementedException::ExtractorNotImplementedException (const std::type_info &ti)
+  : Exception (tl::to_string (tr ("No string extractor available for type: ")) + ti.name ())
 {
   //  .. nothing yet ..
 }
 
-StringConversionException::StringConversionException ()
-  : Exception (tl::to_string (tr ("No string conversion available")))
+StringConversionException::StringConversionException (const std::type_info &ti)
+  : Exception (tl::to_string (tr ("No string conversion available for type: ")) + ti.name ())
 {
   //  .. nothing yet ..
 }

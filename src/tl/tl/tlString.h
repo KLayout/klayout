@@ -27,6 +27,7 @@
 #include "tlCommon.h"
 
 #include <string>
+#include <typeinfo>
 #include <stdexcept>
 #include <stdint.h>
 #include <stdarg.h>
@@ -48,7 +49,7 @@ class TL_PUBLIC ExtractorNotImplementedException
   : public tl::Exception
 {
 public:
-  ExtractorNotImplementedException ();
+  ExtractorNotImplementedException (const std::type_info &ti);
 };
 
 /**
@@ -58,12 +59,12 @@ class TL_PUBLIC StringConversionException
   : public tl::Exception
 {
 public:
-  StringConversionException ();
+  StringConversionException (const std::type_info &ti);
 };
 
 class Extractor;
-template <class T> void extractor_impl (tl::Extractor &, T &) { throw ExtractorNotImplementedException (); }
-template <class T> bool test_extractor_impl (tl::Extractor &, T &) { throw ExtractorNotImplementedException (); }
+template <class T> void extractor_impl (tl::Extractor &, T &) { throw ExtractorNotImplementedException (typeid (T)); }
+template <class T> bool test_extractor_impl (tl::Extractor &, T &) { throw ExtractorNotImplementedException (typeid (T)); }
 
 /**
  *  @brief Another string class
@@ -289,7 +290,7 @@ TL_PUBLIC std::string to_local (const std::string &s);
 
 template <class T, bool> struct __redirect_to_string;
 template <class T> struct __redirect_to_string<T, true> { static std::string to_string (const T &t) { return t.to_string (); } };
-template <class T> struct __redirect_to_string<T, false> { static std::string to_string  (const T &) { throw StringConversionException (); } };
+template <class T> struct __redirect_to_string<T, false> { static std::string to_string  (const T &) { throw StringConversionException (typeid (T)); } };
 template <class T> inline std::string to_string (const T &o) { return __redirect_to_string<T, tl::has_to_string<T>::value>::to_string (o); }
 
 template <> inline std::string to_string (const double &d) { return to_string (d, 12); }

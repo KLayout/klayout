@@ -2671,6 +2671,7 @@ namespace tl
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::CplxTrans &t);
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::VCplxTrans &t);
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DCplxTrans &t);
+  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::ICplxTrans &t);
 
   template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::UnitTrans &t);
   template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DUnitTrans &t);
@@ -2683,6 +2684,7 @@ namespace tl
   template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::CplxTrans &t);
   template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::VCplxTrans &t);
   template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DCplxTrans &t);
+  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::ICplxTrans &t);
 
 } // namespace tl
 

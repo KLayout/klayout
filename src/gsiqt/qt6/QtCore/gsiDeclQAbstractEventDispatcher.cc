@@ -463,10 +463,6 @@ GSI_QTCORE_PUBLIC gsi::Class<QAbstractEventDispatcher> &qtdecl_QAbstractEventDis
 class QAbstractEventDispatcher_Adaptor : public QAbstractEventDispatcher, public qt_gsi::QtObjectBase
 {
 public:
-#if defined(_WIN32)
-  virtual bool registerEventNotifier(QWinEventNotifier *) { return false; }
-  virtual void unregisterEventNotifier(QWinEventNotifier *) { }
-#endif
 
   virtual ~QAbstractEventDispatcher_Adaptor();
 

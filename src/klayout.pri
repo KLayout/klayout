@@ -121,8 +121,13 @@ msvc {
 
   QMAKE_CXXFLAGS += \
       /bigobj \
-      /wd4251 \                   # Disable "DLL interface required"
-      /source-charset:utf-8 \     # Use UTF-8 for source files
+      /wd4251                     # Disable "DLL interface required"
+
+  lessThan(QT_MAJOR_VERSION, 6) {
+    # MSVC 2017 needs this option:
+    QMAKE_CXXFLAGS += \
+        /source-charset:utf-8 \     # Use UTF-8 for source files
+  }
 
   QMAKE_LFLAGS += \
       /OPT:NOREF \                # preserves functions we want to keep for implementing the "force link" mechanism

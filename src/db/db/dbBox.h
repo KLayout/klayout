@@ -1127,7 +1127,9 @@ box<C, R>::double_area () const
  */
 template <class Box>
 struct box_left 
+#if __cplusplus < 201703L
   : public std::unary_function<Box, typename Box::coord_type>
+#endif
 {
   typename Box::coord_type operator() (const Box &b) const
   {
@@ -1140,7 +1142,9 @@ struct box_left
  */
 template <class Box>
 struct box_right 
+#if __cplusplus < 201703L
   : public std::unary_function<Box, typename Box::coord_type>
+#endif
 {
   typename Box::coord_type operator() (const Box &b) const
   {
@@ -1153,7 +1157,9 @@ struct box_right
  */
 template <class Box>
 struct box_bottom 
+#if __cplusplus < 201703L
   : public std::unary_function<Box, typename Box::coord_type>
+#endif
 {
   typename Box::coord_type operator() (const Box &b) const
   {
@@ -1166,7 +1172,9 @@ struct box_bottom
  */
 template <class Box>
 struct box_top 
+#if __cplusplus < 201703L
   : public std::unary_function<Box, typename Box::coord_type>
+#endif
 {
   typename Box::coord_type operator() (const Box &b) const
   {
@@ -1179,7 +1187,9 @@ struct box_top
  */
 template <class Box>
 struct boxes_overlap
+#if __cplusplus < 201703L
   : public std::binary_function<Box, Box, bool>
+#endif
 {
   bool operator() (const Box &b1, const Box &b2) const
   {
@@ -1192,7 +1202,9 @@ struct boxes_overlap
  */
 template <class Box>
 struct boxes_touch
+#if __cplusplus < 201703L
   : public std::binary_function<Box, Box, bool>
+#endif
 {
   bool operator() (const Box &b1, const Box &b2) const
   {

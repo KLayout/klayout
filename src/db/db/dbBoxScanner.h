@@ -44,7 +44,9 @@ namespace db
  */
 template <class BoxConvert, class Obj, class Prop, class SideOp>
 struct bs_side_compare_func
-  : std::binary_function<std::pair<const Obj *, Prop>, std::pair<const Obj *, Prop>, bool> 
+#if __cplusplus < 201703L
+  : std::binary_function<std::pair<const Obj *, Prop>, std::pair<const Obj *, Prop>, bool>
+#endif
 {
   typedef typename BoxConvert::box_type box_type;
 
@@ -69,7 +71,9 @@ private:
  */
 template <class BoxConvert, class Obj, class Prop, class SideOp>
 struct bs_side_compare_vs_const_func
-  : std::unary_function<std::pair<const Obj *, Prop>, bool> 
+#if __cplusplus < 201703L
+        : std::unary_function<std::pair<const Obj *, Prop>, bool>
+#endif
 {
   typedef typename BoxConvert::box_type box_type;
   typedef typename box_type::coord_type coord_type;

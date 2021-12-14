@@ -328,6 +328,17 @@ local_processor_cell_context<TS, TI, TR>::local_processor_cell_context (const lo
 }
 
 template <class TS, class TI, class TR>
+local_processor_cell_context<TS, TI, TR> &
+local_processor_cell_context<TS, TI, TR>::operator= (const local_processor_cell_context &other)
+{
+    if (this != &other) {
+        m_propagated = other.m_propagated;
+        m_drops = other.m_drops;
+    }
+    return *this;
+}
+
+template <class TS, class TI, class TR>
 void
 local_processor_cell_context<TS, TI, TR>::add (db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *parent, const db::ICplxTrans &cell_inst)
 {

@@ -172,6 +172,8 @@ IncludeExpander::from_string (const std::string &s)
 
   } else if (*ex == '@') {
 
+    ++ex;
+
     while (! ex.at_end ()) {
 
       int ln = 0;

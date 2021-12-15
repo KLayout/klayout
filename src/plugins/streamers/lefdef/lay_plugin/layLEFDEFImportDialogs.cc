@@ -391,7 +391,7 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_produce_pin_names (produce_pin_names->isChecked ());
 
   double dbu_value = 0.0;
-  tl::from_string (tl::to_string (dbu->text ()), dbu_value);
+  tl::from_string_ext (tl::to_string (dbu->text ()), dbu_value);
   if (dbu_value < 1e-7) {
     throw tl::Exception (tl::to_string (tr ("Invalid database unit value (must be non-null and positive)")));
   }

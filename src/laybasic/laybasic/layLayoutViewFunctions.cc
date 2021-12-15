@@ -1423,7 +1423,7 @@ LayoutViewFunctions::cm_lay_free_rot ()
   if (ok) {
 
     double angle = 0.0;
-    tl::from_string (tl::to_string (s), angle);
+    tl::from_string_ext (tl::to_string (s), angle);
 
     transform_layout (db::DCplxTrans (1.0, angle, false, db::DVector ()));
 
@@ -1443,7 +1443,7 @@ LayoutViewFunctions::cm_lay_scale ()
   if (ok) {
 
     double scale = 0.0;
-    tl::from_string (tl::to_string (s), scale);
+    tl::from_string_ext (tl::to_string (s), scale);
 
     transform_layout (db::DCplxTrans (scale));
 
@@ -1516,7 +1516,7 @@ LayoutViewFunctions::cm_sel_free_rot ()
   if (ok) {
 
     double angle = 0.0;
-    tl::from_string (tl::to_string (s), angle);
+    tl::from_string_ext (tl::to_string (s), angle);
 
     db::DCplxTrans tr = db::DCplxTrans (1.0, angle, false, db::DVector ());
     db::DBox sel_bbox (view ()->lay::Editables::selection_bbox ());
@@ -1541,7 +1541,7 @@ LayoutViewFunctions::cm_sel_scale ()
   if (ok) {
 
     double scale = 0.0;
-    tl::from_string (tl::to_string (s), scale);
+    tl::from_string_ext (tl::to_string (s), scale);
 
     db::DCplxTrans tr = db::DCplxTrans (scale);
     db::DBox sel_bbox (view ()->lay::Editables::selection_bbox ());

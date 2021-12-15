@@ -73,7 +73,7 @@ MAGWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Techn
     QString l = mp_ui->lambda_le->text ().trimmed ();
     options->lambda = 0.0;
     if (! l.isEmpty ()) {
-      tl::from_string (tl::to_string (l), options->lambda);
+      tl::from_string_ext (tl::to_string (l), options->lambda);
     }
     options->tech = tl::to_string (mp_ui->tech_le->text ().trimmed ());
     options->write_timestamp = ! mp_ui->zero_ts_cbx->isChecked ();

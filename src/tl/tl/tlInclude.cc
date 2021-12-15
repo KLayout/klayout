@@ -134,7 +134,11 @@ IncludeExpander::to_string () const
     tl_assert (m_sections.begin ()->second.second == 0);
 
     std::string fn = m_sections.begin ()->second.first;
-    return tl::to_word_or_quoted_string (fn, valid_fn_chars);
+    if (! fn.empty () && fn.front () == '@') {
+      return tl::to_quoted_string (fn);
+    } else {
+      return fn;
+    }
 
   } else {
 
@@ -166,7 +170,7 @@ IncludeExpander::from_string (const std::string &s)
 
     ex.read_quoted (ie.m_sections [1].first);
 
-  } else if (ex.test ("@")) {
+  } else if (*ex == '@') {
 
     while (! ex.at_end ()) {
 

@@ -18,7 +18,7 @@ SUBDIRS = \
       QtCore \
       QtGui
 
-    equals(HAVE_QT5, "1") {
+    greaterThan(QT_MAJOR_VERSION, 4) {
 
       SUBDIRS += QtWidgets
 

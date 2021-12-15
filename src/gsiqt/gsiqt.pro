@@ -2,7 +2,7 @@
 TEMPLATE = subdirs
 SUBDIRS = qtbasic 
 
-equals(HAVE_QT5, "1") {
+greaterThan(QT_MAJOR_VERSION, 4) {
   SUBDIRS += qt5
   qt5.depends += qtbasic
 } else {

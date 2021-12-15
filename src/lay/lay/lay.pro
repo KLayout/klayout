@@ -207,7 +207,7 @@ equals(HAVE_QTBINDINGS, "1") {
   !equals(HAVE_QT_XML, "0") {
     LIBS += -lklayout_QtXml
   }
-  equals(HAVE_QT5, "1") {
+  greaterThan(QT_MAJOR_VERSION, 4) {
     LIBS += -lklayout_QtWidgets
   }
 }

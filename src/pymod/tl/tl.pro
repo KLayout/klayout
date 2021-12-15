@@ -12,7 +12,7 @@ HEADERS += \
 # Use this opportunity to provide the __init__.py file
 
 equals(HAVE_QTBINDINGS, "1") {
-  equals(HAVE_QT5, "1") {
+  greaterThan(QT_MAJOR_VERSION, 4) {
     INIT_PY = $$PWD/../__init__.py.qt5
   } else {
     INIT_PY = $$PWD/../__init__.py.qt4

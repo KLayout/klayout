@@ -1427,7 +1427,7 @@ NetTracerDialog::get_trace_depth()
   try {
     QString depth = depth_le->text ().trimmed ();
     if (! depth.isEmpty ()) {
-      tl::from_string (tl::to_string (depth), n);
+      tl::from_string_ext (tl::to_string (depth), n);
       if (n < 0 || n > double (std::numeric_limits<size_t>::max ())) {
         n = 0.0;
       }

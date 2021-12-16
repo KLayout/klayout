@@ -768,7 +768,7 @@ db::DCoord
 dcoord_from_string (const char *txt, double dbu, bool du, const db::DCplxTrans &t)
 {
   double d = 0.0;
-  tl::from_string (txt, d);
+  tl::from_string_ext (txt, d);
   return dcoord_from_dcoord (d, dbu, du, t);
 }
 
@@ -776,7 +776,7 @@ db::Coord
 coord_from_string (const char *txt, double dbu, bool du, const db::VCplxTrans &t)
 {
   double d = 0.0;
-  tl::from_string (txt, d);
+  tl::from_string_ext (txt, d);
   return coord_from_dcoord (d, dbu, du, t);
 }
 

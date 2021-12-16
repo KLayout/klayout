@@ -166,7 +166,7 @@ TechBaseEditorPage::commit ()
   tech ()->set_explicit_base_path (tl::to_string (mp_ui->base_path_le->text ()));
 
   double d = 0.001;
-  tl::from_string (tl::to_string (mp_ui->dbu_le->text ()), d);
+  tl::from_string_ext (tl::to_string (mp_ui->dbu_le->text ()), d);
   tech ()->set_dbu (d);
 
   if (! mp_ui->lyp_grp->isChecked ()) {

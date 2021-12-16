@@ -220,10 +220,10 @@ TEST (6)
   }
 
 #if !defined (HAVE_EXPAT)
-  EXPECT_EQ (error, "XML parser error: Expected end of text at position 1 (..a) in line 2, column 27");
+  EXPECT_EQ (error, "XML parser error: Unexpected text after numeric value: '...a' in line 2, column 27");
 #else
   //  expat delivers cdata at beginning of closing tag
-  EXPECT_EQ (error, "XML parser error: Expected end of text at position 1 (..a) in line 2, column 18");
+  EXPECT_EQ (error, "XML parser error: Unexpected text after numeric value: '...a' in line 2, column 18");
 #endif
 }
 

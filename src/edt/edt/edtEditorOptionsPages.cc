@@ -58,7 +58,7 @@ static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le
 {
   try {
     Value value = Value (0);
-    tl::from_string (tl::to_string (le->text ()), value);
+    tl::from_string_ext (tl::to_string (le->text ()), value);
     dispatcher->config_set (cfg_name, tl::to_string (value));
     lay::indicate_error (le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
@@ -249,7 +249,7 @@ EditorOptionsText::apply (lay::Dispatcher *root)
     root->config_set (cfg_edit_text_size, 0.0);
   } else {
     double sz = 0.0;
-    tl::from_string (tl::to_string (mp_ui->size_le->text ()), sz);
+    tl::from_string_ext (tl::to_string (mp_ui->size_le->text ()), sz);
     root->config_set (cfg_edit_text_size, sz);
   }
 }

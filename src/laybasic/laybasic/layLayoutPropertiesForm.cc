@@ -96,7 +96,7 @@ LayoutPropertiesForm::commit ()
 
   //  get the database unit
   double dbu = 0.001;
-  tl::from_string (tl::to_string (dbu_le->text ()), dbu);
+  tl::from_string_ext (tl::to_string (dbu_le->text ()), dbu);
   if (dbu < 1e-6 || dbu > 1e3) {
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid database unit")));
   }

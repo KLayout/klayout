@@ -608,7 +608,7 @@ BoxPropertiesPage::get_box (int mode) const
     double x1 = 0.0, y1 = 0.0, x2 = 0.0, y2 = 0.0;
 
     try {
-      tl::from_string (tl::to_string (x1_le_1->text ()), x1);
+      tl::from_string_ext (tl::to_string (x1_le_1->text ()), x1);
       lay::indicate_error (x1_le_1, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (x1_le_1, &ex);
@@ -616,7 +616,7 @@ BoxPropertiesPage::get_box (int mode) const
     }
 
     try {
-      tl::from_string (tl::to_string (y1_le_1->text ()), y1);
+      tl::from_string_ext (tl::to_string (y1_le_1->text ()), y1);
       lay::indicate_error (y1_le_1, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (y1_le_1, &ex);
@@ -624,7 +624,7 @@ BoxPropertiesPage::get_box (int mode) const
     }
 
     try {
-      tl::from_string (tl::to_string (x2_le_1->text ()), x2);
+      tl::from_string_ext (tl::to_string (x2_le_1->text ()), x2);
       lay::indicate_error (x2_le_1, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (x2_le_1, &ex);
@@ -632,7 +632,7 @@ BoxPropertiesPage::get_box (int mode) const
     }
 
     try {
-      tl::from_string (tl::to_string (y2_le_1->text ()), y2);
+      tl::from_string_ext (tl::to_string (y2_le_1->text ()), y2);
       lay::indicate_error (y2_le_1, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (y2_le_1, &ex);
@@ -668,7 +668,7 @@ BoxPropertiesPage::get_box (int mode) const
     double cx = 0.0, cy = 0.0, w = 0.0, h = 0.0;
 
     try {
-      tl::from_string (tl::to_string (cx_le_2->text ()), cx);
+      tl::from_string_ext (tl::to_string (cx_le_2->text ()), cx);
       lay::indicate_error (cx_le_2, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (cx_le_2, &ex);
@@ -676,7 +676,7 @@ BoxPropertiesPage::get_box (int mode) const
     }
 
     try {
-      tl::from_string (tl::to_string (cy_le_2->text ()), cy);
+      tl::from_string_ext (tl::to_string (cy_le_2->text ()), cy);
       lay::indicate_error (cy_le_2, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (cy_le_2, &ex);
@@ -684,7 +684,7 @@ BoxPropertiesPage::get_box (int mode) const
     }
 
     try {
-      tl::from_string (tl::to_string (w_le_2->text ()), w);
+      tl::from_string_ext (tl::to_string (w_le_2->text ()), w);
       lay::indicate_error (w_le_2, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (w_le_2, &ex);
@@ -692,7 +692,7 @@ BoxPropertiesPage::get_box (int mode) const
     }
 
     try {
-      tl::from_string (tl::to_string (h_le_2->text ()), h);
+      tl::from_string_ext (tl::to_string (h_le_2->text ()), h);
       lay::indicate_error (h_le_2, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (h_le_2, &ex);
@@ -833,7 +833,7 @@ TextPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
   double x = 0.0, y = 0.0;
 
   try {
-    tl::from_string (tl::to_string (x_le->text ()), x);
+    tl::from_string_ext (tl::to_string (x_le->text ()), x);
     lay::indicate_error (x_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (x_le, &ex);
@@ -841,7 +841,7 @@ TextPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
   }
 
   try {
-    tl::from_string (tl::to_string (y_le->text ()), y);
+    tl::from_string_ext (tl::to_string (y_le->text ()), y);
     lay::indicate_error (y_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (y_le, &ex);

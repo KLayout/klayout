@@ -28,6 +28,7 @@
 
 static std::string np (const std::string &s)
 {
+  return tl::replaced (s, "\\\\", "/");
   return tl::replaced (s, "\\", "/");
 }
 

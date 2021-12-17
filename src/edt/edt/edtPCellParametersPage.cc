@@ -493,7 +493,7 @@ PCellParametersPage::get_parameters (bool *ok)
                 try {
 
                   int v = 0;
-                  tl::from_string (tl::to_string (le->text ()), v);
+                  tl::from_string_ext (tl::to_string (le->text ()), v);
 
                   parameters.back () = tl::Variant (v);
                   lay::indicate_error (le, (tl::Exception *) 0);
@@ -517,7 +517,7 @@ PCellParametersPage::get_parameters (bool *ok)
                 try {
 
                   double v = 0;
-                  tl::from_string (tl::to_string (le->text ()), v);
+                  tl::from_string_ext (tl::to_string (le->text ()), v);
 
                   parameters.back () = tl::Variant (v);
                   lay::indicate_error (le, (tl::Exception *) 0);

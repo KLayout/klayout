@@ -833,6 +833,14 @@ TL_PUBLIC void from_string (const std::string &s, unsigned long &v);
 TL_PUBLIC void from_string (const std::string &s, unsigned long long &v);
 TL_PUBLIC void from_string (const std::string &s, bool &b);
 
+TL_PUBLIC void from_string_ext (const std::string &s, double &v);
+TL_PUBLIC void from_string_ext (const std::string &s, int &v);
+TL_PUBLIC void from_string_ext (const std::string &s, long &v);
+TL_PUBLIC void from_string_ext (const std::string &s, long long &v);
+TL_PUBLIC void from_string_ext (const std::string &s, unsigned int &v);
+TL_PUBLIC void from_string_ext (const std::string &s, unsigned long &v);
+TL_PUBLIC void from_string_ext (const std::string &s, unsigned long long &v);
+
 inline void from_string (const std::string &s, std::string &v) { v = s; }
 
 template <class T> inline void from_string (const std::string &s, T &t)

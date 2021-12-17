@@ -231,13 +231,13 @@ void
 BrowseShapesConfigPage::commit (lay::Dispatcher *root)
 {
   double dim = 1.0;
-  tl::from_string (tl::to_string (le_window->text ()), dim);
+  tl::from_string_ext (tl::to_string (le_window->text ()), dim);
 
   unsigned int max_inst_count = 1000;
-  tl::from_string (tl::to_string (le_max_inst->text ()), max_inst_count);
+  tl::from_string_ext (tl::to_string (le_max_inst->text ()), max_inst_count);
 
   unsigned int max_shape_count = 1000;
-  tl::from_string (tl::to_string (le_max_shapes->text ()), max_shape_count);
+  tl::from_string_ext (tl::to_string (le_max_shapes->text ()), max_shape_count);
 
   root->config_set (cfg_shb_context_cell, tl::to_string (le_cell_name->text ()));
   root->config_set (cfg_shb_context_mode, BrowseShapesForm::mode_type (cbx_context->currentIndex ()), BrowseShapesContextModeConverter ());

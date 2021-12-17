@@ -224,10 +224,10 @@ void
 BrowseInstancesConfigPage::commit (lay::Dispatcher *root)
 {
   double dim = 1.0;
-  tl::from_string (tl::to_string (le_window->text ()), dim);
+  tl::from_string_ext (tl::to_string (le_window->text ()), dim);
 
   unsigned int max_inst_count = 1000;
-  tl::from_string (tl::to_string (le_max_count->text ()), max_inst_count);
+  tl::from_string_ext (tl::to_string (le_max_count->text ()), max_inst_count);
 
   root->config_set (cfg_cib_context_cell, tl::to_string (le_cell_name->text ()));
   root->config_set (cfg_cib_context_mode, BrowseInstancesForm::mode_type (cbx_context->currentIndex ()), BrowseInstancesContextModeConverter ());

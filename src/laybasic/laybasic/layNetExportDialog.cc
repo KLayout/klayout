@@ -151,7 +151,7 @@ int
 NetExportDialog::start_layer_number ()
 {
   int ln = 0;
-  tl::from_string (tl::to_string (ui->layernum->text ()), ln);
+  tl::from_string_ext (tl::to_string (ui->layernum->text ()), ln);
   return ln;
 }
 

@@ -69,7 +69,7 @@ CIFReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Techn
 {
   db::CIFReaderOptions *options = dynamic_cast<db::CIFReaderOptions *> (o);
   if (options) {
-    tl::from_string (tl::to_string (mp_ui->dbu_le->text ()), options->dbu);
+    tl::from_string_ext (tl::to_string (mp_ui->dbu_le->text ()), options->dbu);
     if (options->dbu > 1000.0 || options->dbu < 1e-9) {
       throw tl::Exception (tl::to_string (QObject::tr ("Invalid value for database unit")));
     }

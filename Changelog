@@ -1,6 +1,11 @@
 
-0.27.6          (2021-xx-xx):
-TODO
+0.27.6          (2021-12-18):
+* Bugfix: %GITHUB%/issues/942 Technology file routing suffix string typo
+* Bugfix: %GITHUB%/issues/946 Python: __file__ returns quoted path string
+* Bugfix: less liberal evaluation of expressions in string to numeric conversion
+  This will fix a potential vulnerability which allows someone to sneak 
+  in expression code through malicious configuration, technology or layer properties
+  files.
 
 0.27.5          (2021-11-14):
 * Enhancements: Better support for execution (also cross-interpreter) of macro code from scripts

@@ -456,7 +456,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
   double x = 0.0, y = 0.0;
 
   try {
-    tl::from_string (tl::to_string (pos_x_le->text ()), x);
+    tl::from_string_ext (tl::to_string (pos_x_le->text ()), x);
     lay::indicate_error (pos_x_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (pos_x_le, &ex);
@@ -464,7 +464,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
   }
 
   try {
-    tl::from_string (tl::to_string (pos_y_le->text ()), y);
+    tl::from_string_ext (tl::to_string (pos_y_le->text ()), y);
     lay::indicate_error (pos_y_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (pos_y_le, &ex);
@@ -481,7 +481,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
   bool mirror = mirror_cbx->isChecked ();
   double angle = 0.0;
   try {
-    tl::from_string (tl::to_string (angle_le->text ()), angle);
+    tl::from_string_ext (tl::to_string (angle_le->text ()), angle);
     lay::indicate_error (angle_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (angle_le, &ex);
@@ -490,7 +490,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
   double mag = 0.0;
   try {
-    tl::from_string (tl::to_string (mag_le->text ()), mag);
+    tl::from_string_ext (tl::to_string (mag_le->text ()), mag);
     lay::indicate_error (mag_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (mag_le, &ex);
@@ -519,7 +519,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     unsigned long rows = 0, cols = 0;
 
     try {
-      tl::from_string (tl::to_string (column_x_le->text ()), cx);
+      tl::from_string_ext (tl::to_string (column_x_le->text ()), cx);
       lay::indicate_error (column_x_le, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (column_x_le, &ex);
@@ -527,7 +527,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     }
 
     try {
-      tl::from_string (tl::to_string (column_y_le->text ()), cy);
+      tl::from_string_ext (tl::to_string (column_y_le->text ()), cy);
       lay::indicate_error (column_y_le, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (column_y_le, &ex);
@@ -535,7 +535,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     }
 
     try {
-      tl::from_string (tl::to_string (row_x_le->text ()), rx);
+      tl::from_string_ext (tl::to_string (row_x_le->text ()), rx);
       lay::indicate_error (row_x_le, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (row_x_le, &ex);
@@ -543,7 +543,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     }
 
     try {
-      tl::from_string (tl::to_string (row_y_le->text ()), ry);
+      tl::from_string_ext (tl::to_string (row_y_le->text ()), ry);
       lay::indicate_error (row_y_le, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (row_y_le, &ex);
@@ -551,7 +551,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     }
 
     try {
-      tl::from_string (tl::to_string (rows_le->text ()), rows);
+      tl::from_string_ext (tl::to_string (rows_le->text ()), rows);
       if (rows < 1) {
         throw tl::Exception (tl::to_string (tr ("Rows count can't be zero")));
       }
@@ -562,7 +562,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     }
 
     try {
-      tl::from_string (tl::to_string (columns_le->text ()), cols);
+      tl::from_string_ext (tl::to_string (columns_le->text ()), cols);
       if (cols < 1) {
         throw tl::Exception (tl::to_string (tr ("Columns count can't be zero")));
       }

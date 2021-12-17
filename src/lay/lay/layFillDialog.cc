@@ -354,10 +354,10 @@ FillDialog::get_fill_parameters ()
 
     double x1 = 0.0, y1 = 0.0;
     double x2 = 0.0, y2 = 0.0;
-    tl::from_string (tl::to_string (le_x1->text ()), x1);
-    tl::from_string (tl::to_string (le_x2->text ()), x2);
-    tl::from_string (tl::to_string (le_y1->text ()), y1);
-    tl::from_string (tl::to_string (le_y2->text ()), y2);
+    tl::from_string_ext (tl::to_string (le_x1->text ()), x1);
+    tl::from_string_ext (tl::to_string (le_x2->text ()), x2);
+    tl::from_string_ext (tl::to_string (le_y1->text ()), y1);
+    tl::from_string_ext (tl::to_string (le_y2->text ()), y2);
 
     fp.fill_region.insert (db::Box (db::DBox (db::DPoint (x1, y1), db::DPoint (x2, y2)) * (1.0 / cv->layout ().dbu ())));
 

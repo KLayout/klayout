@@ -276,6 +276,7 @@ Class<db::PCellDeclaration> decl_PCellDeclaration_Native ("db", "PCellDeclaratio
   gsi::method ("can_create_from_shape", &db::PCellDeclaration::can_create_from_shape) +
   gsi::method ("parameters_from_shape", &db::PCellDeclaration::parameters_from_shape) +
   gsi::method ("transformation_from_shape", &db::PCellDeclaration::transformation_from_shape) +
+  gsi::method ("wants_lazy_evaluation", &db::PCellDeclaration::wants_lazy_evaluation) +
   gsi::method ("display_text", &db::PCellDeclaration::get_display_name) +
   gsi::method ("layout", &db::PCellDeclaration::layout,
     "@brief Gets the Layout object the PCell is registered in or nil if it is not registered yet.\n"
@@ -407,6 +408,20 @@ public:
     }
   }
 
+  bool wants_lazy_evaluation_fb () const
+  {
+    return db::PCellDeclaration::wants_lazy_evaluation ();
+  }
+
+  virtual bool wants_lazy_evaluation () const
+  {
+    if (cb_wants_lazy_evaluation.can_issue ()) {
+      return cb_wants_lazy_evaluation.issue<db::PCellDeclaration, bool> (&db::PCellDeclaration::wants_lazy_evaluation);
+    } else {
+      return db::PCellDeclaration::wants_lazy_evaluation ();
+    }
+  }
+
   std::string get_display_name_fb (const db::pcell_parameters_type &parameters) const
   {
     return db::PCellDeclaration::get_display_name (parameters);
@@ -427,6 +442,7 @@ public:
   gsi::Callback cb_can_create_from_shape;
   gsi::Callback cb_parameters_from_shape;
   gsi::Callback cb_transformation_from_shape;
+  gsi::Callback cb_wants_lazy_evaluation;
   gsi::Callback cb_coerce_parameters;
   gsi::Callback cb_get_display_name;
 };
@@ -506,6 +522,16 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
     "KLayout offers a way to convert a shape into a PCell. If \\can_create_from_shape returns true, "
     "it will use this method to derive the transformation for the PCell instance that will replace the shape. "
     "See also \\parameters_from_shape and \\can_create_from_shape."
+  ) +
+  gsi::callback ("wants_lazy_evaluation", &PCellDeclarationImpl::wants_lazy_evaluation, &PCellDeclarationImpl::cb_wants_lazy_evaluation,
+    "@brief Gets a value indicating whether the PCell wants lazy evaluation\n"
+    "In lazy evaluation mode, the PCell UI will not immediately update the layout when a parameter is changed. "
+    "Instead, the user has to commit the changes in order to have the parameters updated. This is "
+    "useful for PCells that take a long time to compute.\n"
+    "\n"
+    "The default implementation will return 'false' indicating immediate updates.\n"
+    "\n"
+    "This method has been added in version 0.27.6.\n"
   ) +
   gsi::callback ("display_text", &PCellDeclarationImpl::get_display_name, &PCellDeclarationImpl::cb_get_display_name, gsi::arg ("parameters"),
     "@brief Returns the display text for this PCell given a certain parameter set\n"

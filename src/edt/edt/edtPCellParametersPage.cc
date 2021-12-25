@@ -227,7 +227,7 @@ PCellParametersPage::init ()
 bool
 PCellParametersPage::lazy_evaluation ()
 {
-  return false; // @@@
+  return mp_pcell_decl.get () && mp_pcell_decl->wants_lazy_evaluation ();
 }
 
 void

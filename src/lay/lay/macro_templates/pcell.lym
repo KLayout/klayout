@@ -71,6 +71,13 @@ module PCellLibModule
     #   TODO: return a RBA::Trans object for the initial transformation of
     #   the instance
     # end
+    #
+    # optional:
+    # def wants_lazy_evaluation
+    #   TODO: return "true" here if the PCell takes a long time to compute.
+    #   In lazy mode, the user has to acknowledge parameter changes before 
+    #   they are executed.
+    # end
     
   end
   

@@ -30,6 +30,7 @@
 #include <QFrame>
 #include <QScrollArea>
 #include <QLabel>
+#include <QToolButton>
 
 namespace lay
 {
@@ -117,11 +118,16 @@ signals:
 
 private slots:
   void parameter_changed ();
+  void update_button_pressed ();
 
 private:
   QScrollArea *mp_parameters_area;
   QLabel *mp_error_label;
   QLabel *mp_error_icon;
+  QLabel *mp_changed_label;
+  QLabel *mp_changed_icon;
+  QToolButton *mp_update_button;
+  QFrame *mp_error_frame, *mp_update_frame;
   tl::weak_ptr<db::PCellDeclaration> mp_pcell_decl;
   std::vector<QWidget *> m_widgets;
   lay::LayoutView *mp_view;
@@ -129,9 +135,13 @@ private:
   db::pcell_parameters_type m_parameters;
   bool m_dense;
   tl::DeferredMethod<PCellParametersPage> dm_parameter_changed;
+  std::vector<tl::Variant> m_current_parameters;
 
   void init ();
   void do_parameter_changed ();
+  bool lazy_evaluation ();
+  void set_parameters_internal (const  std::vector<tl::Variant> &values, bool tentatively);
+  bool update_current_parameters ();
 };
 
 }

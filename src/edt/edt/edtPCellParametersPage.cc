@@ -99,6 +99,8 @@ static void set_value (const db::PCellParameterDeclaration &p, QWidget *widget, 
           db::LayerProperties lp;
           if (value.is_user<db::LayerProperties> ()) {
             lp = value.to_user<db::LayerProperties> ();
+          } else if (value.is_nil ()) {
+            //  empty LayerProperties
           } else {
             std::string s = value.to_string ();
             tl::Extractor ex (s.c_str ());

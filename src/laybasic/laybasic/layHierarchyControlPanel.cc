@@ -1017,6 +1017,9 @@ HierarchyControlPanel::cut ()
   bool needs_to_ask = false;
 
   db::Layout &layout = m_cellviews [m_active_index]->layout ();
+  if (! layout.is_editable ()) {
+    return;
+  }
 
   //  collect the called cells of the cells to copy, so we don't copy a cell twice
 
@@ -1154,6 +1157,9 @@ HierarchyControlPanel::paste ()
   }
 
   db::Layout &layout = m_cellviews [m_active_index]->layout ();
+  if (! layout.is_editable ()) {
+    return;
+  }
 
   std::vector<unsigned int> new_layers;
 

@@ -836,6 +836,8 @@ HierarchyControlPanel::do_update_content (int cv_index)
     if (&m_cellviews [i]->layout () != &mp_view->cellview (i)->layout ()) {
       m_needs_update [i] = true;
       m_force_close [i] = true;
+    } else if (! m_cellviews [i].is_valid ()) {
+      m_needs_update [i] = true;
     } else if (m_cellviews [i].combined_unspecific_path () != mp_view->cellview (i).combined_unspecific_path ()) {
       m_needs_update [i] = true;
     }

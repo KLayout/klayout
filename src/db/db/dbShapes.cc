@@ -1016,15 +1016,12 @@ Shapes::clear ()
   }
 }
 
-void Shapes::update_bbox ()
+void Shapes::reset_bbox_dirty ()
 {
-  for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    (*l)->update_bbox ();
-  }
   set_dirty (false);
 }
 
-void Shapes::update () 
+void Shapes::update ()
 {
   for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
     (*l)->sort ();
@@ -1039,7 +1036,7 @@ bool Shapes::is_bbox_dirty () const
     return true;
   }
   for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    if ((*l)->is_bbox_dirty ()) {
+    if ((*l)->is_tree_dirty ()) {
       return true;
     }
   }
@@ -1050,6 +1047,9 @@ Shapes::box_type Shapes::bbox () const
 {
   box_type box;
   for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+    if ((*l)->is_bbox_dirty ()) {
+      (*l)->update_bbox ();
+    }
     box += (*l)->bbox ();
   }
   return box;

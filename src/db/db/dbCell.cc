@@ -306,7 +306,8 @@ Cell::update_bbox (unsigned int layers)
   //  update the bboxes of the shapes lists
   for (shapes_map::iterator s = m_shapes_map.begin (); s != m_shapes_map.end (); ++s) {
 
-    s->second.update_bbox ();
+    s->second.reset_bbox_dirty ();
+
     box_type sbox (s->second.bbox ());
 
     if (! sbox.empty ()) {

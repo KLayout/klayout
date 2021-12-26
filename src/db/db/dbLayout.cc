@@ -1748,6 +1748,7 @@ Layout::do_update ()
           cp.sort_shapes ();
         }
       }
+
     }
 
     //  sort the instance trees now, since we have computed the bboxes

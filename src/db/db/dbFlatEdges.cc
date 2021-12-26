@@ -181,7 +181,6 @@ bool FlatEdges::is_merged () const
 
 Box FlatEdges::compute_bbox () const
 {
-  mp_edges->update_bbox ();
   return mp_edges->bbox ();
 }
 

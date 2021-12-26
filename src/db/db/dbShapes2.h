@@ -126,6 +126,11 @@ public:
     return m_layer.is_bbox_dirty ();
   }
 
+  virtual bool is_tree_dirty () const
+  {
+    return m_layer.is_tree_dirty ();
+  }
+
   size_t size () const
   {
     return m_layer.size ();

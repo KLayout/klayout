@@ -119,7 +119,6 @@ TEST(2)
   shapes.insert (p2);
   shapes.insert (db::SimplePolygonRef (p2, *rep));
   shapes.sort ();
-  shapes.update_bbox ();
 
   EXPECT_EQ (shapes.bbox () == db::Box (100,-5200,2300,2000), true);
 

@@ -430,6 +430,17 @@ public:
   }
 
   /**
+   *  @brief Returns a value indicating that the PCell wants lazy evaluation
+   *
+   *  In lazy evaluation mode, the PCell is not immediately updated when a parameter is changed in the UI, but only when it is requested
+   *  to be updated.
+   */
+  virtual bool wants_lazy_evaluation () const
+  {
+    return false;
+  }
+
+  /**
    *  @brief Gets the Layout object the PCell is registered inside or NULL if it is not registered
    */
   db::Layout *layout () const

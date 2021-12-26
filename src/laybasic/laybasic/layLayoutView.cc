@@ -4896,6 +4896,7 @@ LayoutView::select_cell_fit (const cell_path_type &path, int index)
 
     set_min_hier_levels (0);
     cancel (); 
+    cellview_iter (index)->set_specific_path (lay::CellView::specific_cell_path_type ());
     cellview_iter (index)->set_unspecific_path (path);
     set_active_cellview_index (index);
     redraw ();
@@ -4985,6 +4986,7 @@ LayoutView::select_cell (const cell_path_type &path, int index)
 
     set_min_hier_levels (0);
     cancel (); 
+    cellview_iter (index)->set_specific_path (lay::CellView::specific_cell_path_type ());
     cellview_iter (index)->set_unspecific_path (path);
     set_active_cellview_index (index);
     redraw ();

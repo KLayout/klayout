@@ -501,13 +501,13 @@ CellView::is_valid () const
   }
 
   //  check, if the path references valid cell indices.
-  for (specific_cell_path_type::const_iterator pp = m_specific_path.begin (); pp != m_specific_path.end (); ++pp) {
-    if (! m_layout_href.get ()->layout ().is_valid_cell_index (pp->inst_ptr.cell_index ())) {
+  for (unspecific_cell_path_type::const_iterator pp = m_unspecific_path.begin (); pp != m_unspecific_path.end (); ++pp) {
+    if (! m_layout_href.get ()->layout ().is_valid_cell_index (*pp)) {
       return false;
     }
   }
-  for (unspecific_cell_path_type::const_iterator pp = m_unspecific_path.begin (); pp != m_unspecific_path.end (); ++pp) {
-    if (! m_layout_href.get ()->layout ().is_valid_cell_index (*pp)) {
+  for (specific_cell_path_type::const_iterator pp = m_specific_path.begin (); pp != m_specific_path.end (); ++pp) {
+    if (! pp->inst_ptr.instances () || ! pp->inst_ptr.instances ()->is_valid (pp->inst_ptr) || ! m_layout_href.get ()->layout ().is_valid_cell_index (pp->inst_ptr.cell_index ())) {
       return false;
     }
   }

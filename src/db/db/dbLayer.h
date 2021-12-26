@@ -459,11 +459,19 @@ struct layer
   }
 
   /**
-   *  @brief Return true if the bounding box is "dirty"
+   *  @brief Return true if the bounding box needs update
    */
   bool is_bbox_dirty () const
   {
     return m_bbox_dirty;
+  }
+
+  /**
+   *  @brief Return true if the tree needs update
+   */
+  bool is_tree_dirty () const
+  {
+    return m_tree_dirty;
   }
 
   /**

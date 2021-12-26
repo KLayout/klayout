@@ -91,7 +91,6 @@ size_t FlatEdgePairs::hier_count () const
 
 Box FlatEdgePairs::compute_bbox () const
 {
-  mp_edge_pairs->update_bbox ();
   return mp_edge_pairs->bbox ();
 }
 

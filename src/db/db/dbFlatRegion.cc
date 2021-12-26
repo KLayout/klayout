@@ -190,7 +190,6 @@ bool FlatRegion::is_merged () const
 
 Box FlatRegion::compute_bbox () const
 {
-  mp_polygons->update_bbox ();
   return mp_polygons->bbox ();
 }
 

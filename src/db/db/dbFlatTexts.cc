@@ -91,7 +91,6 @@ size_t FlatTexts::hier_count () const
 
 Box FlatTexts::compute_bbox () const
 {
-  mp_texts->update_bbox ();
   return mp_texts->bbox ();
 }
 

@@ -1545,11 +1545,12 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
       //  thus, we can bring the point on grid or to an object's edge or vertex
       snap_details = snap2 (p);
       m_current = snap_details.snapped_point;
+      mouse_cursor_from_snap_details (snap_details);
     } else {
       m_current = m_start + snap (p - m_start);
+      clear_mouse_cursors ();
     }
 
-    mouse_cursor_from_snap_details (snap_details);
     selection_to_view ();
 
     m_alt_ac = lay::AC_Global;

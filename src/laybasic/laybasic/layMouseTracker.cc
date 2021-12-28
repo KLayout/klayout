@@ -38,8 +38,20 @@ bool
 MouseTracker::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, bool prio)
 {
   if (prio) {
-    mp_view->current_pos (p.x (), p.y ());
+
+    //  NOTE: because the tracker grabs first and grabbers are registered first gets served last, the
+    //  tracker will receive the event after all other mouse grabbers have been served and had their
+    //  chance to set the tracking position.
+    lay::ViewService *vs = mp_view->view_object_widget ()->active_service ();
+    db::DPoint tp = p;
+    if (vs && vs->enabled () && vs->has_tracking_position ()) {
+      tp = vs->tracking_position ();
+    }
+
+    mp_view->current_pos (tp.x (), tp.y ());
+
   }
+
   return false;
 }
 

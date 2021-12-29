@@ -1903,9 +1903,12 @@ class DRCOpNodeCheck < DRCOpNodeWithCompare
     end
       
     if self.gt || self.ge
-      dmax = self.ge ? @engine._make_value(self.ge) : @engine._make_value(self.gt) + 1
-      max_check = RBA::CompoundRegionOperationNode::send(factory, *(oargs + [ dmax ] + self.args + [ true ]))
-      if res
+      if ! res
+        dmax = self.ge ? @engine._make_value(self.ge) : @engine._make_value(self.gt) + 1
+        res = RBA::CompoundRegionOperationNode::send(factory, *(oargs + [ dmax ] + self.args + [ true ]))
+      elsif self.mode_or
+        dmax = self.ge ? @engine._make_value(self.ge) : @engine._make_value(self.gt) + 1
+        max_check = RBA::CompoundRegionOperationNode::send(factory, *(oargs + [ dmax ] + self.args + [ true ]))
         if self.check == :width || self.check == :notch
           # Same polygon check - we need to take both edges of the result
           other = RBA::CompoundRegionOperationNode::new_edges(res)
@@ -1913,13 +1916,18 @@ class DRCOpNodeCheck < DRCOpNodeWithCompare
           other = RBA::CompoundRegionOperationNode::new_edge_pair_to_first_edges(res)
         end
         res_max = RBA::CompoundRegionOperationNode::new_edge_pair_to_first_edges(max_check)
-        if self.mode_or
-          res = RBA::CompoundRegionOperationNode::new_join([ other, res_max ])
-        else
-          res = RBA::CompoundRegionOperationNode::new_geometrical_boolean(RBA::CompoundRegionOperationNode::GeometricalOp::And, other, res_max)
-        end
+        res = RBA::CompoundRegionOperationNode::new_join([ other, res_max ])
       else
-        res = max_check
+        dmax = self.ge ? @engine._make_value(self.ge) : @engine._make_value(self.gt) + 1
+        max_check_for_not = RBA::CompoundRegionOperationNode::send(factory, *(oargs + [ dmax ] + self.args))
+        if self.check == :width || self.check == :notch
+          # Same polygon check - we need to take both edges of the result
+          other = RBA::CompoundRegionOperationNode::new_edges(res)
+        else
+          other = RBA::CompoundRegionOperationNode::new_edge_pair_to_first_edges(res)
+        end
+        res_max_for_not = RBA::CompoundRegionOperationNode::new_edges(max_check_for_not)
+        res = RBA::CompoundRegionOperationNode::new_geometrical_boolean(RBA::CompoundRegionOperationNode::GeometricalOp::Not, other, res_max_for_not)
       end
     end
     

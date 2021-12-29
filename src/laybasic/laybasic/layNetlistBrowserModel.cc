@@ -326,7 +326,7 @@ std::string device_parameter_string (const db::Device *device)
   const std::vector<db::DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();
   for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
     double v = device->parameter_value (p->id ());
-    if (! tl::equal (v, p->default_value ())) {
+    if (v > 0.0) {
       if (first) {
         s += " [";
         first = false;

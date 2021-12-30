@@ -381,6 +381,16 @@ public:
   virtual void drag_cancel () { }
 
   /**
+   *  @brief Gets a value indicating whether a cursor position it set
+   */
+  virtual bool has_tracking_position () const { return false; }
+
+  /**
+   *  @brief Gets the cursor position if one is set
+   */
+  virtual db::DPoint tracking_position () const { return db::DPoint (); }
+
+  /**
    *  @brief Enable or disable a service 
    *
    *  If a service is disabled, it will not receive mouse events 

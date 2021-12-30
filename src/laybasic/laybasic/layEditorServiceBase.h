@@ -105,6 +105,22 @@ public:
     return m_cursor_enabled;
   }
 
+  /**
+   *  @brief Gets a value indicating whether a cursor position it set
+   */
+  virtual bool has_tracking_position () const
+  {
+    return m_has_tracking_position;
+  }
+
+  /**
+   *  @brief Gets the cursor position if one is set
+   */
+  virtual db::DPoint tracking_position () const
+  {
+    return m_tracking_position;
+  }
+
 protected:
   virtual bool configure (const std::string &name, const std::string &value);
   virtual void deactivated ();
@@ -114,6 +130,9 @@ private:
   std::vector<lay::ViewObject *> m_mouse_cursor_markers;
   QColor m_cursor_color;
   bool m_cursor_enabled;
+  lay::LayoutView *mp_view;
+  bool m_has_tracking_position;
+  db::DPoint m_tracking_position;
 };
 
 }

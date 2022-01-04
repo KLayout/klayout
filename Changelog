@@ -1,5 +1,5 @@
 
-0.27.6          (2021-12-30):
+0.27.6          (2022-01-04):
 * Enhancement: %GITHUB%/issues/963 Display snapped position in main window
 * Bugfix: %GITHUB%/issues/960 Cap values range now shown in netlist browser
 * Bugfix: %GITHUB%/issues/954 Fixed a device extraction glitch

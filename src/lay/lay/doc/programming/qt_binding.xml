@@ -114,7 +114,7 @@ end</pre>
   </p>
 
   <ul>
-    <li>Methods that return or require unsupported containers, for example <tt>QBitArray</tt></li>
+    <li>Methods that return or require unsupported containers</li>
     <li>Methods that return or require function pointers</li>
     <li>Methods that return or require pointers to pointers or references to pointers</li>
     <li>Methods that require pointers to pass arrays (i.e. <tt>QPolygon::putPoints</tt>)</li>

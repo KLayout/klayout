@@ -823,7 +823,7 @@ CellTreeModel::data (const QModelIndex &index, int role) const
       return QVariant ();
     }
 
-  } else if (role == Qt::TextColorRole) {
+  } else if (role == Qt::ForegroundRole) {
 
 #if 0 // do strikeout rather than making the color darker
     if (! mp_view) {

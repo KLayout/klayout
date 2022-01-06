@@ -1620,17 +1620,4 @@ private:
 
 }
 
-namespace tl
-{
-
-template <>
-struct type_traits<db::CompoundRegionOperationNode>
-  : public tl::type_traits<void>
-{
-  typedef false_tag has_copy_constructor;
-  typedef false_tag has_default_constructor;
-};
-
-}
-
 #endif

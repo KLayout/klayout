@@ -264,8 +264,11 @@ struct vector_defs
       "@brief Creates an object from a string\n"
       "Creates the object from a string representation (as returned by \\to_s)\n"
     ) +
-    method ("to_s", (std::string (C::*) () const) &C::to_string,
+    method ("to_s", &C::to_string, gsi::arg ("dbu", 0.0),
       "@brief String conversion\n"
+      "If a DBU is given, the output units will be micrometers.\n"
+      "\n"
+      "The DBU argument has been added in version 0.27.6.\n"
     );
   }
 

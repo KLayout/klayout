@@ -31,7 +31,6 @@
 #include <QStyle>
 #include "gsiQt.h"
 #include "gsiQtWidgetsCommon.h"
-#include "gsiDeclQtWidgetsTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

@@ -571,16 +571,4 @@ private:
 
 }
 
-namespace tl
-{
-
-template<> struct type_traits<db::NetlistDeviceExtractor> : public tl::type_traits<void>
-{
-  //  mark "NetlistDeviceExtractor" as not having a default ctor and no copy ctor
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-};
-
-}
-
 #endif

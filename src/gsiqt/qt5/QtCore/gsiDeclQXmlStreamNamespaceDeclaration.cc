@@ -30,7 +30,6 @@
 #include <QXmlStreamNamespaceDeclaration>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
-#include "gsiDeclQtCoreTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

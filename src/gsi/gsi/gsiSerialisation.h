@@ -549,9 +549,12 @@ private:
   {
     check_data (as);
 
-    std::unique_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
+    AdaptorBase *p = *(AdaptorBase **)mp_read;
     mp_read += item_size<AdaptorBase *> ();
-    tl_assert (p.get () != 0);
+
+    tl_assert (p != 0);
+    //  late-destroy the adaptor since the new X object may still need data from there (e.g. QLatin1String)
+    heap.push (p);
 
     X x = X ();
     copy_to<X> (*p, x, heap);
@@ -565,9 +568,12 @@ private:
 
     check_data (as);
 
-    std::unique_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
+    AdaptorBase *p = *(AdaptorBase **)mp_read;
     mp_read += item_size<AdaptorBase *> ();
-    tl_assert (p.get () != 0);
+
+    tl_assert (p != 0);
+    //  late-destroy the adaptor since the new X object may still need data from there (e.g. QLatin1String)
+    heap.push (p);
 
     x_type *x = new x_type ();
     heap.push (x);
@@ -601,14 +607,19 @@ private:
 
     check_data (as);
 
-    std::unique_ptr<AdaptorBase> p (*(AdaptorBase **)mp_read);
+    AdaptorBase *p = *(AdaptorBase **) mp_read;
     mp_read += item_size<AdaptorBase *> ();
 
     x_type *x = 0;
-    if (p.get () != 0) {
+    if (p != 0) {
+
+      //  late-destroy the adaptor since the new X object may still need data from there (e.g. QLatin1String)
+      heap.push (p);
+
       x = new x_type ();
       heap.push (x);
       copy_to<x_type> (*p, *x, heap);
+
     }
 
     return x;
@@ -894,6 +905,154 @@ private:
   QStringRef m_s;
   mutable QByteArray m_s_utf8;
 };
+
+#if QT_VERSION >= 0x60000
+
+/**
+ *  @brief Specialization for QString
+ */
+template <>
+class GSI_PUBLIC StringAdaptorImpl<QStringView>
+  : public StringAdaptor
+{
+public:
+  StringAdaptorImpl (QStringView *s)
+    : mp_s (s), m_is_const (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  StringAdaptorImpl (const QStringView *s)
+    : mp_s (const_cast<QStringView *> (s)), m_is_const (true)
+  {
+    //  .. nothing yet ..
+  }
+
+  StringAdaptorImpl (const QStringView &s)
+    : m_is_const (false), m_s (s)
+  {
+    mp_s = &m_s;
+  }
+
+  StringAdaptorImpl ()
+    : m_is_const (false)
+  {
+    mp_s = &m_s;
+  }
+
+  virtual ~StringAdaptorImpl ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual size_t size () const
+  {
+    return mp_s->toUtf8 ().size ();
+  }
+
+  virtual const char *c_str () const
+  {
+    m_s_utf8 = mp_s->toUtf8 ();
+    return m_s_utf8.constData ();
+  }
+
+  virtual void set (const char *c_str, size_t s, tl::Heap &heap)
+  {
+    if (! m_is_const) {
+      QString *hstr = heap.create<QString> ();
+      *hstr = QString::fromUtf8 (c_str, int (s));
+      *mp_s = QStringView (hstr->constData (), hstr->size ());
+    }
+  }
+
+  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
+  {
+    StringAdaptorImpl<QStringView> *s = dynamic_cast<StringAdaptorImpl<QStringView> *>(target);
+    if (s) {
+      QString *hstr = heap.create<QString> ();
+      *hstr = mp_s->toString ();
+      *s->mp_s = QStringView (hstr->constData (), hstr->size ());
+    } else {
+      StringAdaptor::copy_to (target, heap);
+    }
+  }
+
+private:
+  QStringView *mp_s;
+  bool m_is_const;
+  QStringView m_s;
+  mutable QByteArray m_s_utf8;
+};
+
+#endif
+
+#if QT_VERSION >= 0x50000
+
+/**
+ *  @brief Specialization for QLatin1String
+ */
+template <>
+class GSI_PUBLIC StringAdaptorImpl<QLatin1String>
+  : public StringAdaptor
+{
+public:
+  StringAdaptorImpl (QLatin1String *s)
+    : mp_s (s), m_is_const (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  StringAdaptorImpl (const QLatin1String *s)
+    : mp_s (const_cast<QLatin1String *> (s)), m_is_const (true)
+  {
+    //  .. nothing yet ..
+  }
+
+  StringAdaptorImpl (const QLatin1String &s)
+    : m_is_const (false), m_s (s)
+  {
+    mp_s = &m_s;
+  }
+
+  StringAdaptorImpl ()
+    : m_is_const (false)
+  {
+    mp_s = &m_s;
+  }
+
+  virtual ~StringAdaptorImpl ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual size_t size () const
+  {
+    return QString::fromLatin1 (mp_s->data (), mp_s->size ()).toUtf8 ().size ();
+  }
+
+  virtual const char *c_str () const
+  {
+    m_s_utf8 = QString::fromLatin1 (mp_s->data (), mp_s->size ()).toUtf8 ();
+    return m_s_utf8.constData ();
+  }
+
+  virtual void set (const char *c_str, size_t s, tl::Heap &)
+  {
+    if (! m_is_const) {
+      m_latin1_holder = QString::fromUtf8 (c_str, int (s)).toLatin1 ();
+      *mp_s = QLatin1String (m_latin1_holder.constData (), m_latin1_holder.size ());
+    }
+  }
+
+private:
+  QLatin1String *mp_s;
+  bool m_is_const;
+  QLatin1String m_s;
+  QByteArray m_latin1_holder;
+  mutable QByteArray m_s_utf8;
+};
+
+#endif
 
 #endif
 
@@ -1211,6 +1370,84 @@ private:
   QByteArray m_s;
 };
 
+#if QT_VERSION > 0x60000
+
+/**
+ *  @brief Specialization for QByteArray
+ */
+template <>
+class GSI_PUBLIC ByteArrayAdaptorImpl<QByteArrayView>
+  : public ByteArrayAdaptor
+{
+public:
+  ByteArrayAdaptorImpl (QByteArrayView *s)
+    : mp_s (s), m_is_const (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  ByteArrayAdaptorImpl (const QByteArrayView *s)
+    : mp_s (const_cast<QByteArrayView *> (s)), m_is_const (true)
+  {
+    //  .. nothing yet ..
+  }
+
+  ByteArrayAdaptorImpl (const QByteArrayView &s)
+    : m_is_const (false), m_s (s)
+  {
+    mp_s = &m_s;
+  }
+
+  ByteArrayAdaptorImpl ()
+    : m_is_const (false)
+  {
+    mp_s = &m_s;
+  }
+
+  virtual ~ByteArrayAdaptorImpl ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual size_t size () const
+  {
+    return mp_s->size ();
+  }
+
+  virtual const char *c_str () const
+  {
+    return mp_s->constData ();
+  }
+
+  virtual void set (const char *c_str, size_t s, tl::Heap &heap)
+  {
+    if (! m_is_const) {
+      QByteArray *str = heap.create<QByteArray> ();
+      *str = QByteArray (c_str, s);
+      *mp_s = QByteArrayView (str->constData (), str->size ());
+    }
+  }
+
+  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
+  {
+    ByteArrayAdaptorImpl<QByteArrayView> *s = dynamic_cast<ByteArrayAdaptorImpl<QByteArrayView> *>(target);
+    if (s) {
+      QByteArray *str = heap.create<QByteArray> ();
+      *str = QByteArray (mp_s->constData (), mp_s->size ());
+      *s->mp_s = *str;
+    } else {
+      ByteArrayAdaptor::copy_to (target, heap);
+    }
+  }
+
+private:
+  QByteArrayView *mp_s;
+  bool m_is_const;
+  QByteArrayView m_s;
+};
+
+#endif
+
 #endif
 
 /**
@@ -1312,16 +1549,16 @@ public:
   /**
    *  @brief Sets the variant's value
    */
-  virtual void set (const tl::Variant &v) = 0;
+  virtual void set (const tl::Variant &v, tl::Heap & /*heap*/) = 0;
 
   /**
    *  @brief Implementation of copy_to
    */
-  virtual void copy_to (AdaptorBase *target, tl::Heap & /*heap*/) const
+  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
   {
     VariantAdaptor *v = dynamic_cast<VariantAdaptor *>(target);
     tl_assert (v);
-    v->set (var ());
+    v->set (var (), heap);
   }
 };
 
@@ -1383,7 +1620,7 @@ public:
     return *mp_v;
   }
 
-  virtual void set (const tl::Variant &v) 
+  virtual void set (const tl::Variant &v, tl::Heap & /*heap*/)
   {
     if (! m_is_const) {
       *mp_v = v.to_qvariant ();
@@ -1405,6 +1642,93 @@ private:
   bool m_is_const;
   QVariant m_v;
 };
+
+#if QT_VERSION >= 0x50000
+
+/**
+ *  @brief Specialization for QVariant
+ */
+template <typename T>
+class GSI_PUBLIC VariantAdaptorImpl<QPointer<T> >
+  : public VariantAdaptor
+{
+public:
+  VariantAdaptorImpl (QPointer<T> *v)
+    : mp_v (v), m_is_const (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  VariantAdaptorImpl (const QPointer<T> *v)
+    : mp_v (const_cast<QPointer<T> *> (v)), m_is_const (true)
+  {
+    //  .. nothing yet ..
+  }
+
+  VariantAdaptorImpl (const QPointer<T> &v)
+    : m_is_const (true), m_v (v)
+  {
+    mp_v = &m_v;
+  }
+
+  VariantAdaptorImpl ()
+    : m_is_const (false)
+  {
+    mp_v = &m_v;
+  }
+
+  virtual ~VariantAdaptorImpl ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual tl::Variant var () const
+  {
+    return tl::Variant::make_variant_ref (mp_v->get ());
+  }
+
+  virtual void set (const tl::Variant &v, tl::Heap & /*heap*/)
+  {
+    if (m_is_const) {
+      //  .. can't change
+    } else if (v.is_nil ()) {
+      mp_v->clear ();
+    } else if (v.is_user<T> ()) {
+      if (v.user_is_ref ()) {
+        *mp_v = (T *) v.to_user ();
+      } else {
+        //  basically should not happen as the QPointer cannot hold anything other than a reference
+        //  (a tl::Variant terminology)
+        tl_assert (false);
+      }
+    } else {
+      //  basically should not happen as the QPointer cannot hold anything other than a user object
+      //  (a tl::Variant terminology)
+      tl_assert (false);
+    }
+  }
+
+  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
+  {
+    VariantAdaptorImpl<QPointer<T>> *v = dynamic_cast<VariantAdaptorImpl<QPointer<T>> *>(target);
+    if (v) {
+      if (mp_v->isNull ()) {
+        v->mp_v->clear ();
+      } else {
+        *v->mp_v = QPointer<T> (*mp_v);
+      }
+    } else {
+      VariantAdaptor::copy_to (target, heap);
+    }
+  }
+
+private:
+  QPointer<T> *mp_v;
+  bool m_is_const;
+  QPointer<T> m_v;
+};
+
+#endif
 
 #endif
 
@@ -1460,7 +1784,7 @@ public:
     return *mp_v;
   }
 
-  virtual void set (const tl::Variant &v)
+  virtual void set (const tl::Variant &v, tl::Heap & /*heap*/)
   {
     if (! m_is_const) {
       *mp_v = v;
@@ -1482,6 +1806,85 @@ private:
   bool m_is_const;
   tl::Variant m_v;
 };
+
+#if __cplusplus >= 201703L
+
+/**
+ *  @brief Specialization for std::optional
+ */
+template <typename T>
+class GSI_PUBLIC VariantAdaptorImpl<std::optional<T> >
+  : public VariantAdaptor
+{
+public:
+  VariantAdaptorImpl (std::optional<T> *v)
+    : mp_v (v), m_is_const (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  VariantAdaptorImpl (const std::optional<T> *v)
+    : mp_v (const_cast<std::optional<T> *> (v)), m_is_const (true)
+  {
+    //  .. nothing yet ..
+  }
+
+  VariantAdaptorImpl (const std::optional<T> &v)
+    : m_is_const (true), m_v (v)
+  {
+    mp_v = &m_v;
+  }
+
+  VariantAdaptorImpl ()
+    : m_is_const (false)
+  {
+    mp_v = &m_v;
+  }
+
+  virtual ~VariantAdaptorImpl ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual tl::Variant var () const
+  {
+    return *mp_v ? tl::Variant (mp_v->value ()) : tl::Variant ();
+  }
+
+  virtual void set (const tl::Variant &v, tl::Heap & /*heap*/)
+  {
+    if (m_is_const) {
+      //  .. can't change
+    } else if (v.is_nil ()) {
+      mp_v->reset ();
+    } else if (v.is_user<T> ()) {
+      *mp_v = v.to_user<T> ();
+    } else {
+      *mp_v = v.to<T> ();
+    }
+  }
+
+  virtual void copy_to (AdaptorBase *target, tl::Heap &heap) const
+  {
+    VariantAdaptorImpl<std::optional<T>> *v = dynamic_cast<VariantAdaptorImpl<std::optional<T>> *>(target);
+    if (v) {
+      if (*mp_v) {
+        v->mp_v->reset ();
+      } else {
+        *v->mp_v = mp_v->value ();
+      }
+    } else {
+      VariantAdaptor::copy_to (target, heap);
+    }
+  }
+
+private:
+  std::optional<T> *mp_v;
+  bool m_is_const;
+  std::optional<T> m_v;
+};
+
+#endif
 
 // ------------------------------------------------------------
 //  Vector adaptor framework
@@ -1644,11 +2047,13 @@ void push_vector (std::set<X> &v, const X &x)
 
 #if defined(HAVE_QT)
 
+#if QT_VERSION < 0x60000
 template <class X>
 void push_vector (QVector<X> &v, const X &x)
 {
   v.push_back (x);
 }
+#endif
 
 inline void push_vector (QStringList &v, const QString &x)
 {

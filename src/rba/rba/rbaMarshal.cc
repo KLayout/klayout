@@ -124,7 +124,7 @@ public:
   ~RubyBasedVariantAdaptor ();
 
   virtual tl::Variant var () const;
-  virtual void set (const tl::Variant &v);
+  virtual void set (const tl::Variant &v, tl::Heap &heap);
 
 private:
   VALUE m_var;
@@ -829,7 +829,7 @@ tl::Variant RubyBasedVariantAdaptor::var () const
   return ruby2c<tl::Variant> (m_var);
 }
 
-void RubyBasedVariantAdaptor::set (const tl::Variant & /*v*/)
+void RubyBasedVariantAdaptor::set (const tl::Variant & /*v*/, tl::Heap & /*heap*/)
 {
   //  TODO: is there a setter for a string?
 }

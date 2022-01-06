@@ -35,10 +35,6 @@
 
 class QUiLoader;
 
-namespace tl { template <> struct type_traits<QUiLoader> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTUITOOLS_PUBLIC gsi::Class<QUiLoader> &qtdecl_QUiLoader (); }
 
 

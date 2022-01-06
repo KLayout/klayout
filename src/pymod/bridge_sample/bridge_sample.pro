@@ -48,6 +48,9 @@ equals(HAVE_QT, "0") {
 } else {
   # Include QtCore required for some includes
   QT = core
+  greaterThan (QT_MAJOR_VERSION, 5) {
+    QT += core5compat
+  }
   DEFINES += HAVE_QT
 }
 
@@ -89,7 +92,7 @@ LIBS += -L$$LIBDIR -lklayout_db
       -Wno-reserved-user-defined-literal \
 
   # because we use unordered_map/unordered_set:
-  QMAKE_CXXFLAGS += -std=c++0x
+  QMAKE_CXXFLAGS += -std=c++11
 
   # Python is somewhat sloppy and relies on the compiler initializing fields
   # of strucs to 0:

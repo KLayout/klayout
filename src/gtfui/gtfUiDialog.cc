@@ -32,6 +32,8 @@
 #include <QScrollBar>
 #include <QPainter>
 #include <QHeaderView>
+#include <QTreeView>
+#include <QTreeWidget>
 
 namespace gtf
 {
@@ -224,7 +226,7 @@ void
 StripedBar::set_treeview (QTreeView *tv)
 {
   mp_tv = tv;
-  connect (mp_tv->verticalScrollBar () /*@@@ Qt4.2 only*/, SIGNAL (valueChanged (int)), this, SLOT (force_update (int)));
+  connect (mp_tv->verticalScrollBar () /* Qt4.2 only*/, SIGNAL (valueChanged (int)), this, SLOT (force_update (int)));
   connect (mp_tv, SIGNAL (expanded (const QModelIndex &)), this, SLOT (force_update (const QModelIndex &)));
   connect (mp_tv, SIGNAL (collapsed (const QModelIndex &)), this, SLOT (force_update (const QModelIndex &)));
 }

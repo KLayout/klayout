@@ -720,7 +720,7 @@ static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const 
     if (has_next) {
 
       QString text = model->data (current, Qt::UserRole).toString ();
-      if (text.indexOf (to_find) >= 0 && ! view->isRowHidden (rows_stack.back ().first, parent_stack.back ())) {
+      if (to_find.indexIn (text) >= 0 && ! view->isRowHidden (rows_stack.back ().first, parent_stack.back ())) {
         return current;
       }
 

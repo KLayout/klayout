@@ -55,6 +55,8 @@ namespace tl
 
 class Extractor;
 class EvalClass;
+template <class T> void extractor_impl (tl::Extractor &, T &);
+template <class T> bool test_extractor_impl (tl::Extractor &, T &);
 
 /**
  *  @brief A base class which describes a class, i.e. an object capable of converting and handling void *
@@ -1661,6 +1663,12 @@ template<> inline bool Variant::can_convert_to<const char *> () const         { 
  *  @brief Initialize the class table (must be called once)
  */
 void initialize_variant_class_table ();
+
+/**
+ *  @brief Special extractors for Variant
+ */
+template<> TL_PUBLIC void extractor_impl<Variant> (tl::Extractor &ex, Variant &v);
+template<> TL_PUBLIC bool test_extractor_impl<Variant> (tl::Extractor &ex, Variant &v);
 
 } // namespace tl
 

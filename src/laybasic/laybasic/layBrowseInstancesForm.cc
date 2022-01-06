@@ -479,7 +479,7 @@ BrowseInstancesForm::cell_changed (QTreeWidgetItem *item, QTreeWidgetItem *)
 
   if (lv_cell_instance->topLevelItemCount () > 0) {
     QTreeWidgetItem *item = lv_cell_instance->topLevelItem (0);
-    lv_cell_instance->setItemSelected (item, true);
+    item->setSelected (true);
     lv_cell_instance->setCurrentItem (item);
     lv_cell_instance->scrollToItem (item);
   }
@@ -612,7 +612,11 @@ BrowseInstancesForm::change_cell (db::cell_index_type cell_index, int cv_index)
 
   for (int col = 0; col < 3; ++col) {
     all->setFont (col, f);
+#if QT_VERSION >= 0x60000
+    all->setForeground (col, tc);
+#else
     all->setTextColor (col, tc);
+#endif
   }
 
   //  create the entries.
@@ -636,7 +640,7 @@ BrowseInstancesForm::change_cell (db::cell_index_type cell_index, int cv_index)
   //  make the first the current one
   if (sel_item) {
     lv_cell->setCurrentItem (sel_item);
-    lv_cell->setItemSelected (sel_item, true);
+    sel_item->setSelected (true);
     lv_cell->scrollToItem (sel_item);
   }
 
@@ -877,7 +881,7 @@ BrowseInstancesForm::adv_cell_inst (bool up)
       }
       if (ni) {
         lv_cell_instance->setCurrentItem (ni);
-        lv_cell_instance->setItemSelected (ni, true);
+        ni->setSelected (true);
         lv_cell_instance->scrollToItem (ni);
       }
 

@@ -1009,10 +1009,9 @@ DecoratedLineEdit::DecoratedLineEdit (QWidget *parent)
   mp_clear_label->setCursor (Qt::ArrowCursor);
   mp_clear_label->setPixmap (QString::fromUtf8 (":/clear_edit.png"));
 
-  int l = 0, t = 0, r = 0, b = 0;
-  getTextMargins (&l, &t, &r, &b);
-  m_default_left_margin = l;
-  m_default_right_margin = r;
+  QMargins margins = textMargins ();
+  m_default_left_margin = margins.left ();
+  m_default_right_margin = margins.right ();
 }
 
 DecoratedLineEdit::~DecoratedLineEdit ()
@@ -1079,14 +1078,13 @@ void DecoratedLineEdit::set_clear_button_enabled (bool en)
     m_clear_button_enabled = en;
     mp_clear_label->setVisible (en);
 
-    int l = 0, t = 0, r = 0, b = 0;
-    getTextMargins (&l, &t, &r, &b);
+    QMargins margins = textMargins ();
     if (! en) {
-      r = m_default_right_margin;
+      margins.setRight (m_default_right_margin);
     } else {
-      r = m_default_right_margin + mp_clear_label->sizeHint ().width () + le_decoration_space;
+      margins.setRight (m_default_right_margin + mp_clear_label->sizeHint ().width () + le_decoration_space);
     }
-    setTextMargins (l, t, r, b);
+    setTextMargins (margins);
 
     resizeEvent (0);
 
@@ -1100,14 +1098,13 @@ void DecoratedLineEdit::set_options_button_enabled (bool en)
     m_options_button_enabled = en;
     mp_options_label->setVisible (en);
 
-    int l = 0, t = 0, r = 0, b = 0;
-    getTextMargins (&l, &t, &r, &b);
+    QMargins margins = textMargins ();
     if (! en) {
-      l = m_default_left_margin;
+      margins.setLeft (m_default_left_margin);
     } else {
-      l = m_default_left_margin + mp_options_label->sizeHint ().width () + le_decoration_space;
+      margins.setLeft (m_default_left_margin + mp_options_label->sizeHint ().width () + le_decoration_space);
     }
-    setTextMargins (l, t, r, b);
+    setTextMargins (margins);
 
     resizeEvent (0);
 

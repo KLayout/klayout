@@ -128,7 +128,7 @@ module PEnumType
   def cpp
     name = id ? id.text_value : nil
     specs = bodyspec.nonterminal? ? bodyspec.body.cpp : nil
-    CPPEnum::new(name, specs)
+    CPPEnum::new(name, specs, is_class.nonterminal?)
   end
 end
 
@@ -241,7 +241,7 @@ end
 
 module PFuncSpec
   def cpp
-    CPPFunc::new(nil, (fa.nonterminal? && fa.text_value != "void") ? (fa.a.cpp || []) : [], cvspec.nonterminal? && cvspec.cv.to_symbol)
+    CPPFunc::new(nil, (fa.nonterminal? && fa.text_value != "void") ? (fa.a.cpp || []) : [], cvspec.nonterminal? && cvspec.cv.to_symbol, refspec.nonterminal? && refspec.ref.text_value)
   end
 end
 
@@ -404,13 +404,7 @@ end
 
 module PClassTemplateArg
   def cpp
-    CPPClassTemplateArg::new(id.text_value, dtspec.nonterminal? ? dtspec.cpp : nil)
-  end
-end
-
-module PDirectTemplateArg
-  def cpp
-    CPPDirectTemplateArg::new(t.cpp, initspec.nonterminal? ? initspec.text_value : nil)
+    CPPClassTemplateArg::new(t.cpp, dtspec.nonterminal? ? dtspec.cpp : nil)
   end
 end
 

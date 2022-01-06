@@ -46,6 +46,13 @@
 #include <QSet>
 #include <QList>
 #include <QStringList>
+#if QT_VERSION >= 0x50000
+#  include <QLatin1String>
+#endif
+#if QT_VERSION >= 0x60000
+#  include <QByteArrayView>
+#  include <QStringView>
+#endif
 #endif
 
 namespace tl
@@ -434,12 +441,23 @@ template <> struct type_traits<__int128>                    : generic_type_trait
 template <> struct type_traits<double>                      : generic_type_traits<double_tag, double, T_double> { };
 template <> struct type_traits<float>                       : generic_type_traits<float_tag, float, T_float> { };
 template <> struct type_traits<std::string>                 : generic_type_traits<string_tag, StringAdaptor, T_string> { };
+#if __cplusplus >= 201703L
+template <typename T> struct type_traits<std::optional<T> > : generic_type_traits<var_tag, VariantAdaptor, T_var> { };
+#endif
 #if defined(HAVE_QT)
 template <> struct type_traits<QString>                     : generic_type_traits<string_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringRef>                  : generic_type_traits<string_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QByteArray>                  : generic_type_traits<byte_array_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<std::vector<char> >          : generic_type_traits<byte_array_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<QVariant>                    : generic_type_traits<var_tag, VariantAdaptor, T_var> { };
+#if QT_VERSION >= 0x50000
+template <typename T> struct type_traits<QPointer<T> >      : generic_type_traits<var_tag, VariantAdaptor, T_var> { };
+template <> struct type_traits<QLatin1String>               : generic_type_traits<string_tag, StringAdaptor, T_string> { };
+#endif
+#if QT_VERSION >= 0x60000
+template <> struct type_traits<QStringView>                 : generic_type_traits<string_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<QByteArrayView>              : generic_type_traits<byte_array_tag, StringAdaptor, T_byte_array> { };
+#endif
 #endif
 template <> struct type_traits<tl::Variant>                 : generic_type_traits<var_tag, VariantAdaptor, T_var> { };
 
@@ -467,12 +485,23 @@ template <> struct type_traits<const __int128 &>            : generic_type_trait
 template <> struct type_traits<const double &>              : generic_type_traits<double_cref_tag, double, T_double> { };
 template <> struct type_traits<const float &>               : generic_type_traits<float_cref_tag, float, T_float> { };
 template <> struct type_traits<const std::string &>         : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
+#if __cplusplus >= 201703L
+template <typename T> struct type_traits<const std::optional<T> &>  : generic_type_traits<var_cref_tag, VariantAdaptor, T_var> { };
+#endif
 #if defined(HAVE_QT)
 template <> struct type_traits<const QString &>             : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QStringRef &>          : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QByteArray &>          : generic_type_traits<byte_array_cref_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<const std::vector<char> &>   : generic_type_traits<byte_array_cref_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<const QVariant &>            : generic_type_traits<var_cref_tag, VariantAdaptor, T_var> { };
+#if QT_VERSION >= 0x50000
+template <typename T> struct type_traits<const QPointer<T> &>   : generic_type_traits<var_cref_tag, VariantAdaptor, T_var> { };
+template <> struct type_traits<const QLatin1String &>       : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
+#endif
+#if QT_VERSION >= 0x60000
+template <> struct type_traits<const QStringView &>         : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<const QByteArrayView &>      : generic_type_traits<byte_array_cref_tag, StringAdaptor, T_byte_array> { };
+#endif
 #endif
 template <> struct type_traits<const tl::Variant &>         : generic_type_traits<var_cref_tag, VariantAdaptor, T_var> { };
 template <> struct type_traits<const char * const &>            : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
@@ -497,12 +526,23 @@ template <> struct type_traits<__int128 &>                  : generic_type_trait
 template <> struct type_traits<double &>                    : generic_type_traits<double_ref_tag, double, T_double> { };
 template <> struct type_traits<float &>                     : generic_type_traits<float_ref_tag, float, T_float> { };
 template <> struct type_traits<std::string &>               : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
+#if __cplusplus >= 201703L
+template <typename T> struct type_traits<std::optional<T> &>  : generic_type_traits<var_ref_tag, VariantAdaptor, T_var> { };
+#endif
 #if defined(HAVE_QT)
 template <> struct type_traits<QString &>                   : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringRef &>                : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QByteArray &>                : generic_type_traits<byte_array_ref_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<std::vector<char> &>         : generic_type_traits<byte_array_ref_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<QVariant &>                  : generic_type_traits<var_ref_tag, VariantAdaptor, T_var> { };
+#if QT_VERSION >= 0x50000
+template <typename T> struct type_traits<QPointer<T> &>     : generic_type_traits<var_ref_tag, VariantAdaptor, T_var> { };
+template <> struct type_traits<QLatin1String &>             : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
+#endif
+#if QT_VERSION >= 0x60000
+template <> struct type_traits<QStringView &>               : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<QByteArrayView &>            : generic_type_traits<byte_array_ref_tag, StringAdaptor, T_byte_array> { };
+#endif
 #endif
 template <> struct type_traits<tl::Variant &>               : generic_type_traits<var_ref_tag, VariantAdaptor, T_var> { };
 template <> struct type_traits<const char * &>              : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
@@ -528,12 +568,23 @@ template <> struct type_traits<const __int128 *>            : generic_type_trait
 template <> struct type_traits<const double *>              : generic_type_traits<double_cptr_tag, double, T_double> { };
 template <> struct type_traits<const float *>               : generic_type_traits<float_cptr_tag, float, T_float> { };
 template <> struct type_traits<const std::string *>         : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
+#if __cplusplus >= 201703L
+template <typename T> struct type_traits<const std::optional<T> *>  : generic_type_traits<var_cptr_tag, VariantAdaptor, T_var> { };
+#endif
 #if defined(HAVE_QT)
 template <> struct type_traits<const QString *>             : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QStringRef *>          : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QByteArray *>          : generic_type_traits<byte_array_cptr_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<const std::vector<char> *>   : generic_type_traits<byte_array_cptr_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<const QVariant *>            : generic_type_traits<var_cptr_tag, VariantAdaptor, T_var> { };
+#if QT_VERSION >= 0x50000
+template <typename T> struct type_traits<const QPointer<T> *>   : generic_type_traits<var_cptr_tag, VariantAdaptor, T_var> { };
+template <> struct type_traits<const QLatin1String *>       : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
+#endif
+#if QT_VERSION >= 0x60000
+template <> struct type_traits<const QStringView *>         : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<const QByteArrayView *>      : generic_type_traits<byte_array_cptr_tag, StringAdaptor, T_byte_array> { };
+#endif
 #endif
 template <> struct type_traits<const tl::Variant *>         : generic_type_traits<var_cptr_tag, VariantAdaptor, T_var> { };
 template <> struct type_traits<const char * const *>            : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
@@ -559,17 +610,49 @@ template <> struct type_traits<__int128 *>                  : generic_type_trait
 template <> struct type_traits<double *>                    : generic_type_traits<double_ptr_tag, double, T_double> { };
 template <> struct type_traits<float *>                     : generic_type_traits<float_ptr_tag, float, T_float> { };
 template <> struct type_traits<std::string *>               : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
+#if __cplusplus >= 201703L
+template <typename T> struct type_traits<std::optional<T> *>    : generic_type_traits<var_ptr_tag, VariantAdaptor, T_var> { };
+#endif
 #if defined(HAVE_QT)
 template <> struct type_traits<QString *>                   : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringRef *>                : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QByteArray *>                : generic_type_traits<byte_array_ptr_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<std::vector<char> *>         : generic_type_traits<byte_array_ptr_tag, StringAdaptor, T_byte_array> { };
 template <> struct type_traits<QVariant *>                  : generic_type_traits<var_ptr_tag, VariantAdaptor, T_var> { };
+#if QT_VERSION >= 0x50000
+template <typename T> struct type_traits<QPointer<T> *>     : generic_type_traits<var_ptr_tag, VariantAdaptor, T_var> { };
+template <> struct type_traits<QLatin1String *>             : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
+#endif
+#if QT_VERSION >= 0x60000
+template <> struct type_traits<QStringView *>               : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
+template <> struct type_traits<QByteArrayView *>            : generic_type_traits<byte_array_ptr_tag, StringAdaptor, T_byte_array> { };
+#endif
 #endif
 template <> struct type_traits<tl::Variant *>               : generic_type_traits<var_ptr_tag, VariantAdaptor, T_var> { };
 template <> struct type_traits<const char * *>              : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const unsigned char * *>     : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const signed char * *>       : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
+
+template <int n> struct __unsigned_type_with_size;
+template <> struct __unsigned_type_with_size<1> { typedef uint8_t type; };
+template <> struct __unsigned_type_with_size<2> { typedef uint16_t type; };
+template <> struct __unsigned_type_with_size<4> { typedef uint32_t type; };
+
+template <> struct type_traits<wchar_t>                     : type_traits<__unsigned_type_with_size<sizeof(wchar_t)>::type> { };
+template <> struct type_traits<char16_t>                    : type_traits<__unsigned_type_with_size<sizeof(char16_t)>::type> { };
+template <> struct type_traits<char32_t>                    : type_traits<__unsigned_type_with_size<sizeof(char32_t)>::type> { };
+template <> struct type_traits<wchar_t *>                   : type_traits<__unsigned_type_with_size<sizeof(wchar_t)>::type *> { };
+template <> struct type_traits<char16_t *>                  : type_traits<__unsigned_type_with_size<sizeof(char16_t)>::type *> { };
+template <> struct type_traits<char32_t *>                  : type_traits<__unsigned_type_with_size<sizeof(char32_t)>::type *> { };
+template <> struct type_traits<const wchar_t *>             : type_traits<const __unsigned_type_with_size<sizeof(wchar_t)>::type *> { };
+template <> struct type_traits<const char16_t *>            : type_traits<const __unsigned_type_with_size<sizeof(char16_t)>::type *> { };
+template <> struct type_traits<const char32_t *>            : type_traits<const __unsigned_type_with_size<sizeof(char32_t)>::type *> { };
+template <> struct type_traits<wchar_t &>                   : type_traits<__unsigned_type_with_size<sizeof(wchar_t)>::type &> { };
+template <> struct type_traits<char16_t &>                  : type_traits<__unsigned_type_with_size<sizeof(char16_t)>::type &> { };
+template <> struct type_traits<char32_t &>                  : type_traits<__unsigned_type_with_size<sizeof(char32_t)>::type &> { };
+template <> struct type_traits<const wchar_t &>             : type_traits<const __unsigned_type_with_size<sizeof(wchar_t)>::type &> { };
+template <> struct type_traits<const char16_t &>            : type_traits<const __unsigned_type_with_size<sizeof(char16_t)>::type &> { };
+template <> struct type_traits<const char32_t &>            : type_traits<const __unsigned_type_with_size<sizeof(char32_t)>::type &> { };
 
 template <class X>
 struct type_traits<const X>
@@ -749,6 +832,7 @@ struct type_traits< QSet<X> * >
   typedef X inner_type;
 };
 
+#if QT_VERSION < 0x60000
 template <class X>
 struct type_traits< QVector<X> >
   : generic_type_traits<vector_tag, VectorAdaptor, T_vector>
@@ -783,6 +867,7 @@ struct type_traits< QVector<X> * >
 {
   typedef X inner_type;
 };
+#endif
 
 template <class X, class Y>
 struct type_traits< QHash<X, Y> >
@@ -1142,7 +1227,7 @@ public:
 /**
  *  @brief An implementation helper that provides a switch between classes having and having no copy ctor 
  */
-template <class T, class CC>
+template <class T, bool>
 class ArgSpecImpl 
   : public ArgSpecBase
 {
@@ -1187,7 +1272,7 @@ public:
  *  @brief A specialization for classes with default and copy ctor
  */
 template <class T>
-class ArgSpecImpl<T, tl::true_tag>
+class ArgSpecImpl<T, true>
   : public ArgSpecBase
 {
 public:
@@ -1287,30 +1372,30 @@ private:
  */
 template <class T>
 class ArgSpec
-  : public ArgSpecImpl<T, typename tl::type_traits<T>::has_copy_constructor>
+  : public ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_default_constructible<T>::value>
 {
 public:
-  typedef typename tl::type_traits<T>::has_copy_constructor cc_type;
+  typedef ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_default_constructible<T>::value> Base;
 
   ArgSpec () 
-    : ArgSpecImpl<T, cc_type> ()
+    : Base ()
   { }
 
   ArgSpec (const ArgSpec<void> &other)
-    : ArgSpecImpl<T, cc_type> (other)
+    : Base (other)
   { }
 
   template <class Q>
   ArgSpec (const ArgSpec<Q> &other)
-    : ArgSpecImpl<T, cc_type> (other)
+    : Base (other)
   { }
 
   ArgSpec (const std::string &name)
-    : ArgSpecImpl<T, cc_type> (name)
+    : Base (name)
   { }
 
   ArgSpec (const std::string &name, const T &init, const std::string &init_doc = std::string ())
-    : ArgSpecImpl<T, cc_type> (name, init, init_doc)
+    : Base (name, init, init_doc)
   { }
 
   virtual ArgSpecBase *clone () const
@@ -1324,30 +1409,30 @@ public:
  */
 template <class T>
 class ArgSpec<const T &>
-  : public ArgSpecImpl<T, typename tl::type_traits<T>::has_copy_constructor>
+  : public ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_default_constructible<T>::value>
 {
 public:
-  typedef typename tl::type_traits<T>::has_copy_constructor cc_type;
+  typedef ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_default_constructible<T>::value> Base;
 
-  ArgSpec () 
-    : ArgSpecImpl<T, cc_type> ()
+  ArgSpec ()
+    : Base ()
   { }
 
   ArgSpec (const ArgSpec<void> &other)
-    : ArgSpecImpl<T, cc_type> (other)
+    : Base (other)
   { }
 
   template <class Q>
   ArgSpec (const ArgSpec<Q> &other)
-    : ArgSpecImpl<T, cc_type> (other)
+    : Base (other)
   { }
 
   ArgSpec (const std::string &name)
-    : ArgSpecImpl<T, cc_type> (name)
+    : Base (name)
   { }
 
   ArgSpec (const std::string &name, const T &init, const std::string &init_doc = std::string ())
-    : ArgSpecImpl<T, cc_type> (name, init, init_doc)
+    : Base (name, init, init_doc)
   { }
 
   virtual ArgSpecBase *clone () const
@@ -1361,37 +1446,37 @@ public:
  */
 template <class T>
 class ArgSpec<T &>
-  : public ArgSpecImpl<T, typename tl::type_traits<T>::has_copy_constructor>
+  : public ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_default_constructible<T>::value>
 {
 public:
+  typedef ArgSpecImpl<T, std::is_copy_constructible<T>::value && std::is_default_constructible<T>::value> Base;
   typedef T &init_type;
-  typedef typename tl::type_traits<T>::has_copy_constructor cc_type;
 
   ArgSpec () 
-    : ArgSpecImpl<T, cc_type> ()
+    : Base ()
   { }
 
   ArgSpec (const ArgSpec<void> &other)
-    : ArgSpecImpl<T, cc_type> (other)
+    : Base (other)
   { }
 
   template <class Q>
   ArgSpec (const ArgSpec<Q> &other)
-    : ArgSpecImpl<T, cc_type> (other)
+    : Base (other)
   { }
 
   ArgSpec (const std::string &name)
-    : ArgSpecImpl<T, cc_type> (name)
+    : Base (name)
   { }
 
   ArgSpec (const std::string &name, const T &init, const std::string &init_doc = std::string ())
-    : ArgSpecImpl<T, cc_type> (name, init, init_doc)
+    : Base (name, init, init_doc)
   { }
 
   T &init () const
   {
     //  this simplifies the implementation, but it's not really clean since the caller may modify the default.
-    return const_cast<T &> (ArgSpecImpl<T, cc_type>::init ());
+    return const_cast<T &> (Base::init ());
   }
 
   virtual ArgSpecBase *clone () const

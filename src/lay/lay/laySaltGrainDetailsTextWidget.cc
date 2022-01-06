@@ -181,7 +181,11 @@ SaltGrainDetailsTextWidget::details_text ()
   QBuffer buffer;
   buffer.open (QIODevice::WriteOnly);
   QTextStream stream (&buffer);
+#if QT_VERSION >= 0x60000
+  stream.setEncoding (QStringConverter::Utf8);
+#else
   stream.setCodec ("UTF-8");
+#endif
 
   stream << "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/></head><body>";
 

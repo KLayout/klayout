@@ -5,7 +5,7 @@ TARGET = klayout_QtCore5Compat
 
 include($$PWD/../../../lib.pri)
 
-DEFINES += MAKE_GSI_QTCORE_LIBRARY
+DEFINES += MAKE_GSI_QTCORE5COMPAT_LIBRARY
 
 # NOTE: db is required since some bridges to db are provided (i.e db::Polygon)
 INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$QTBASIC_INC

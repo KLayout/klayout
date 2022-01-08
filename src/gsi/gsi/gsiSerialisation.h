@@ -1649,7 +1649,7 @@ private:
  *  @brief Specialization for QVariant
  */
 template <typename T>
-class GSI_PUBLIC VariantAdaptorImpl<QPointer<T> >
+class GSI_PUBLIC_TEMPLATE VariantAdaptorImpl<QPointer<T> >
   : public VariantAdaptor
 {
 public:
@@ -1813,7 +1813,7 @@ private:
  *  @brief Specialization for std::optional
  */
 template <typename T>
-class GSI_PUBLIC VariantAdaptorImpl<std::optional<T> >
+class GSI_PUBLIC_TEMPLATE VariantAdaptorImpl<std::optional<T> >
   : public VariantAdaptor
 {
 public:

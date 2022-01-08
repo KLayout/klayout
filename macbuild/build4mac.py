@@ -34,25 +34,28 @@ from build4mac_util import *
 #-------------------------------------------------------------------------------
 def GenerateUsage(platform):
     if platform.upper() in [ "MONTEREY", "BIGSUR" ]: # with Xcode [13.1 .. ]
-        myQt5     = "qt5brew"
+        myQt65    = "qt6brew"
         myRuby    = "hb27"
         myPython  = "hb38"
-        moduleset = ('qt5Brew', 'HB27', 'HB38')
+        moduleset = ('qt6Brew', 'HB27', 'HB38')
     else: # with Xcode [ .. 12.4]
-        myQt5     = "qt5macports"
+        myQt65    = "qt6brew"
         myRuby    = "sys"
         myPython  = "sys"
-        moduleset = ('qt5MP', 'Sys', 'Sys')
+        moduleset = ('qt6Brew', 'Sys', 'Sys')
 
     usage  = "\n"
     usage += "---------------------------------------------------------------------------------------------------------\n"
     usage += "<< Usage of 'build4mac.py' >>\n"
-    usage += "       for building KLayout 0.27.4 or later on different Apple macOS / Mac OSX platforms.\n"
+    usage += "       for building KLayout 0.27.5 or later on different Apple macOS / Mac OSX platforms.\n"
     usage += "\n"
     usage += "$ [python] ./build4mac.py\n"
     usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value\n"
     usage += "   --------------------------------------------------------------------------------------+---------------\n"
-    usage += "   [-q|--qt <type>]     : case-insensitive type=['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']    | %s \n" % myQt5
+    usage += "   [-q|--qt <type>]     : case-insensitive type=['Qt6MacPorts', 'Qt6Brew',               | %s \n" % myQt65
+    usage += "                        :                        'Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']    | \n"
+    usage += "                        :   Qt6MacPorts: use Qt6 from MacPorts                           | \n"
+    usage += "                        :       Qt6Brew: use Qt6 from Homebrew                           | \n"
     usage += "                        :   Qt5MacPorts: use Qt5 from MacPorts                           | \n"
     usage += "                        :       Qt5Brew: use Qt5 from Homebrew                           | \n"
     usage += "                        :       Qt5Ana3: use Qt5 from Anaconda3                          | \n"
@@ -63,12 +66,13 @@ def GenerateUsage(platform):
     usage += "                        :   HB27: use Ruby 2.7 from Homebrew                             | \n"
     usage += "                        :   Ana3: use Ruby 2.5 from Anaconda3                            | \n"
     usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3',   | %s \n" % myPython
-    usage += "                        :                        'HBAuto']                               | \n"
+    usage += "                        :                        'HB39', HBAuto']                        | \n"
     usage += "                        :    nil: don't bind Python                                      | \n"
     usage += "                        :    Sys: use OS-bundled Python 2.7 [ElCapitan -- Catalina]      | \n"
     usage += "                        :   MP38: use Python 3.8 from MacPorts                           | \n"
     usage += "                        :   HB38: use Python 3.8 from Homebrew                           | \n"
     usage += "                        :   Ana3: use Python 3.8 from Anaconda3                          | \n"
+    usage += "                        :   HB39: use Python 3.9 from Homebrew                           | \n"
     usage += "                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew  | \n"
     usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled\n"
     usage += "   [-u|--noqtuitools]   : don't include uitools in Qt binding                            | disabled\n"
@@ -129,7 +133,7 @@ def Get_Default_Config():
         sys.exit(1)
 
     if not Machine == "x86_64":
-        if Machine == "arm64" and (Platform == "Monterey" or Platform == "BigSur"): # with an Apple Silicon Chip
+        if Machine == "arm64" and Platform in ["Monterey", "BigSur"]: # with an Apple Silicon Chip
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print("")
@@ -239,6 +243,7 @@ def Parse_CLI_Args(config):
     PackagePrefix = config['PackagePrefix']
     DeployVerbose = config['DeployVerbose']
     ModuleSet     = config['ModuleSet']
+    qt, ruby, python = ModuleSet
 
     #-----------------------------------------------------
     # [2] Parse the CLI arguments
@@ -246,7 +251,7 @@ def Parse_CLI_Args(config):
     p = optparse.OptionParser(usage=Usage)
     p.add_option( '-q', '--qt',
                     dest='type_qt',
-                    help="Qt type=['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']" )
+                    help="Qt type=['Qt6MacPorts', 'Qt6Brew', 'Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3']" )
 
     p.add_option( '-r', '--ruby',
                     dest='type_ruby',
@@ -254,7 +259,7 @@ def Parse_CLI_Args(config):
 
     p.add_option( '-p', '--python',
                     dest='type_python',
-                    help="Python type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3', 'HBAuto']" )
+                    help="Python type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3', 'HB39', 'HBAuto']" )
 
     p.add_option( '-n', '--noqtbinding',
                     action='store_true',
@@ -306,7 +311,7 @@ def Parse_CLI_Args(config):
                     default=False,
                     help='check usage' )
 
-    p.set_defaults( type_qt        = "qt5macports",
+    p.set_defaults( type_qt        = "%s" % qt,
                     type_ruby      = "sys",
                     type_python    = "sys",
                     no_qt_binding  = False,
@@ -326,6 +331,8 @@ def Parse_CLI_Args(config):
 
     # (A) Determine the Qt type
     candidates                = dict()
+    candidates['QT6MACPORTS'] = 'Qt6MacPorts'
+    candidates['QT6BREW']     = 'Qt6Brew'
     candidates['QT5MACPORTS'] = 'Qt5MacPorts'
     candidates['QT5BREW']     = 'Qt5Brew'
     candidates['QT5ANA3']     = 'Qt5Ana3'
@@ -340,12 +347,16 @@ def Parse_CLI_Args(config):
                         (opt.type_qt, list(candidates.keys())), file=sys.stderr )
         print(Usage)
         sys.exit(1)
+    elif ModuleQt == "Qt6MacPorts":
+        choiceQt65 = 'qt6MP'
+    elif ModuleQt == "Qt6Brew":
+        choiceQt65 = 'qt6Brew'
     elif ModuleQt == "Qt5MacPorts":
-        choiceQt5 = 'qt5MP'
+        choiceQt65 = 'qt5MP'
     elif ModuleQt == "Qt5Brew":
-        choiceQt5 = 'qt5Brew'
+        choiceQt65 = 'qt5Brew'
     elif ModuleQt == "Qt5Ana3":
-        choiceQt5 = 'qt5Ana3'
+        choiceQt65 = 'qt5Ana3'
 
     # By default, OS-standard (-bundled) script languages (Ruby and Python) are used
     NonOSStdLang = False
@@ -405,6 +416,7 @@ def Parse_CLI_Args(config):
     candidates['MP38']   = 'MP38'
     candidates['HB38']   = 'HB38'
     candidates['ANA3']   = 'Ana3'
+    candidates['HB39']   = 'HB39'
     candidates['HBAUTO'] = 'HBAuto'
     try:
         choicePython = candidates[ opt.type_python.upper() ]
@@ -439,6 +451,9 @@ def Parse_CLI_Args(config):
         elif choicePython == "Ana3":
             ModulePython = 'PythonAnaconda3'
             NonOSStdLang = True
+        elif choicePython == "HB39":
+            ModulePython = 'Python39Brew'
+            NonOSStdLang = True
         elif choicePython == "HBAuto":
             ModulePython = 'PythonAutoBrew'
             NonOSStdLang = True
@@ -450,7 +465,7 @@ def Parse_CLI_Args(config):
         sys.exit(1)
 
     # (D) Set of modules chosen
-    ModuleSet = ( choiceQt5, choiceRuby, choicePython )
+    ModuleSet = ( choiceQt65, choiceRuby, choicePython )
 
     NoQtBindings = opt.no_qt_binding
     NoQtUiTools  = opt.no_qt_uitools
@@ -483,14 +498,14 @@ def Parse_CLI_Args(config):
         message = "### You are going to make "
         if DeploymentP:
             PackagePrefix = "LW-"
-            message      += "a lightweight (LW-) package excluding Qt5, Ruby, and Python..."
+            message      += "a lightweight (LW-) package excluding Qt[6|5], Ruby, and Python..."
         elif DeploymentF:
             if (ModuleRuby in RubySys) and (ModulePython in PythonSys):
                 PackagePrefix = "ST-"
-                message      += "a standard (ST-) package including Qt5 and using OS-bundled Ruby and Python..."
-            elif ModulePython == 'Python38Brew' or ModulePython == 'PythonAutoBrew':
+                message      += "a standard (ST-) package including Qt[6|5] and using OS-bundled Ruby and Python..."
+            elif ModulePython in ['Python38Brew', 'Python39Brew', 'PythonAutoBrew']:
                 PackagePrefix = "HW-"
-                message      += "a heavyweight (HW-) package including Qt5 and Python3.8~ from Homebrew..."
+                message      += "a heavyweight (HW-) package including Qt[6|5] and Python3.8~ from Homebrew..."
             else:
                 PackagePrefix = "EX-"
                 message      += "a package with exceptional (EX-) combinations of different modules..."
@@ -563,7 +578,7 @@ def Get_Build_Parameters(config):
         mode = "release"
 
     # (B) Modules
-    (qt, ruby, python) = ModuleSet  # ( 'qt5MP', 'Sys', 'Sys' )
+    (qt, ruby, python) = ModuleSet  # ( 'qt6MP', 'Sys', 'Sys' )
     ruby_python = "R%sP%s" % ( ruby.lower(), python.lower() )
 
     # (C) Target directories and files
@@ -574,8 +589,14 @@ def Get_Build_Parameters(config):
     MacBuildDirQAT        = MacBuildDir + ".macQAT"
     parameters['logfile'] = MacBuildLog
 
-    # (D) Qt5
-    if ModuleQt == 'Qt5MacPorts':
+    # (D) Qt6|5
+    if ModuleQt == 'Qt6MacPorts':
+        parameters['qmake']       = Qt6MacPorts['qmake']
+        parameters['deploy_tool'] = Qt6MacPorts['deploy']
+    elif ModuleQt == 'Qt6Brew':
+        parameters['qmake']       = Qt6Brew['qmake']
+        parameters['deploy_tool'] = Qt6Brew['deploy']
+    elif ModuleQt == 'Qt5MacPorts':
         parameters['qmake']       = Qt5MacPorts['qmake']
         parameters['deploy_tool'] = Qt5MacPorts['deploy']
     elif ModuleQt == 'Qt5Brew':
@@ -584,6 +605,7 @@ def Get_Build_Parameters(config):
     elif ModuleQt == 'Qt5Ana3':
         parameters['qmake']       = Qt5Ana3['qmake']
         parameters['deploy_tool'] = Qt5Ana3['deploy']
+
 
     parameters['bin']   = MacBinDir
     parameters['build'] = MacBuildDir
@@ -647,8 +669,10 @@ def Run_Build_Command(parameters):
     # (C) Target directories and files
     MacBuildDirQAT = parameters['build'] + ".macQAT"
 
-    # (D) Qt5
-    cmd_args += " \\\n  -qt5"
+    # (D) Qt[6|5]
+    # '-qt6' is not yet supported as of 2021-11-27
+    # Passing '-qt5' with the Qt6 environments looks conflict
+    #cmd_args += " \\\n  -qt5"
     cmd_args += " \\\n  -qmake %s" % parameters['qmake']
     cmd_args += " \\\n  -bin   %s" % parameters['bin']
     cmd_args += " \\\n  -build %s" % parameters['build']
@@ -1207,18 +1231,15 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             #----------------------------------------------------------------------------------
             # Typical usage of 'pip' after installation of the DMG package
             #
-            # $ /Applications/klayout.app/Contents/MacOS/start-console.py
-            # Warning: Populating font family aliases took 195 ms. Replace uses of missing font\
-            # family "Monospace" with one that exists to avoid this cost.
-            # Python 3.7.8 (default, Jul  4 2020, 10:17:17)
-            # [Clang 11.0.3 (clang-1103.0.32.62)] on darwin
+            # $ cd /Applications/klayout.app/Contents/MacOS/
+            # $ ./start-console.py
+            #
+            # Python 3.8.12 (default, Oct 13 2021, 06:42:19)
+            # [Clang 12.0.0 (clang-1200.0.32.29)] on darwin
             # Type "help", "copyright", "credits" or "license" for more information.
             # (KLayout Python Console)
             # >>> import pip
-            # >>> pip.main( ['install', 'numpy'] )
-            # >>> pip.main( ['install', 'scipy'] )
-            # >>> pip.main( ['install', 'pandas'] )
-            # >>> pip.main( ['install', 'matplotlib'] )
+            # >>> pip.main( ['install', 'numpy', 'scipy', 'pandas', 'matplotlib'] )
             #----------------------------------------------------------------------------------
             pip_module = "%s/Versions/%s/lib/python%s/site-packages/pip/__init__.py" % \
                                      (pythonFrameworkPath, pythonHBVer, pythonHBVer)
@@ -1255,7 +1276,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             print( "         Ruby2.7 from Homebrew is not yet supported." )
             print( "         Since you have Homebrew development environment, there two options:" )
             print( "           (1) Retry to make a package with '-Y|--DEPLOY' option." )
-            print( "               This will not deploy any of Qt5, Python, and Ruby from Homebrew." )
+            print( "               This will not deploy any of Qt[6|5], Python, and Ruby from Homebrew." )
             print( "               Instead, the package will directly use those Frameworks and libraries" )
             print( "               in your Homebrew environment." )
             print( "           (2) Rebuild KLayout with '-r|--ruby <nil|Sys>' option depending on your preference." )

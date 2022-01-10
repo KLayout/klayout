@@ -147,29 +147,36 @@ def Get_Default_Config():
     Usage, ModuleSet = GenerateUsage(Platform)
 
     # Set the default modules
-    ModuleQt = "Qt5MacPorts"
     if   Platform == "Monterey":
+        ModuleQt     = "Qt6Brew"
         ModuleRuby   = "RubyMonterey"
         ModulePython = "PythonMonterey"
     elif Platform == "BigSur":
+        ModuleQt     = "Qt6Brew"
         ModuleRuby   = "RubyBigSur"
         ModulePython = "PythonBigSur"
     elif Platform == "Catalina":
+        ModuleQt     = "Qt6Brew"
         ModuleRuby   = "RubyCatalina"
         ModulePython = "PythonCatalina"
     elif Platform == "Mojave":
+        ModuleQt     = "Qt6Brew"
         ModuleRuby   = "RubyMojave"
         ModulePython = "PythonMojave"
     elif Platform == "HighSierra":
+        ModuleQt     = "Qt6Brew"
         ModuleRuby   = "RubyHighSierra"
         ModulePython = "PythonHighSierra"
     elif Platform == "Sierra":
+        ModuleQt     = "Qt6Brew"
         ModuleRuby   = "RubySierra"
         ModulePython = "PythonSierra"
     elif Platform == "ElCapitan":
+        ModuleQt     = "Qt6Brew"
         ModuleRuby   = "RubyElCapitan"
         ModulePython = "PythonElCapitan"
     else:
+        ModuleQt     = "Qt6Brew"
         ModuleRuby   = "nil"
         ModulePython = "nil"
 
@@ -243,7 +250,6 @@ def Parse_CLI_Args(config):
     PackagePrefix = config['PackagePrefix']
     DeployVerbose = config['DeployVerbose']
     ModuleSet     = config['ModuleSet']
-    qt, ruby, python = ModuleSet
 
     #-----------------------------------------------------
     # [2] Parse the CLI arguments
@@ -311,18 +317,32 @@ def Parse_CLI_Args(config):
                     default=False,
                     help='check usage' )
 
-    p.set_defaults( type_qt        = "%s" % qt,
-                    type_ruby      = "sys",
-                    type_python    = "sys",
-                    no_qt_binding  = False,
-                    no_qt_uitools  = False,
-                    make_option    = "--jobs=4",
-                    debug_build    = False,
-                    check_command  = False,
-                    deploy_full    = False,
-                    deploy_partial = False,
-                    deploy_verbose = "1",
-                    checkusage     = False )
+    if Platform.upper() in [ "MONTEREY", "BIGSUR" ]: # with Xcode [13.1 .. ]
+        p.set_defaults( type_qt        = "qt6brew",
+                        type_ruby      = "hb27",
+                        type_python    = "hb38",
+                        no_qt_binding  = False,
+                        no_qt_uitools  = False,
+                        make_option    = "--jobs=4",
+                        debug_build    = False,
+                        check_command  = False,
+                        deploy_full    = False,
+                        deploy_partial = False,
+                        deploy_verbose = "1",
+                        checkusage     = False )
+    else: # with Xcode [ .. 12.4]
+        p.set_defaults( type_qt        = "qt6brew",
+                        type_ruby      = "sys",
+                        type_python    = "sys",
+                        no_qt_binding  = False,
+                        no_qt_uitools  = False,
+                        make_option    = "--jobs=4",
+                        debug_build    = False,
+                        check_command  = False,
+                        deploy_full    = False,
+                        deploy_partial = False,
+                        deploy_verbose = "1",
+                        checkusage     = False )
 
     opt, args = p.parse_args()
     if (opt.checkusage):
@@ -578,7 +598,7 @@ def Get_Build_Parameters(config):
         mode = "release"
 
     # (B) Modules
-    (qt, ruby, python) = ModuleSet  # ( 'qt6MP', 'Sys', 'Sys' )
+    (qt, ruby, python) = ModuleSet  # ( 'qt6Brew', 'Sys', 'Sys' )
     ruby_python = "R%sP%s" % ( ruby.lower(), python.lower() )
 
     # (C) Target directories and files

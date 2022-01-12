@@ -201,7 +201,7 @@ PCellParametersPage::init ()
   mp_error_frame->setFrameShape (QFrame::NoFrame);
   frame_layout->addWidget (mp_error_frame, 1, 0, 1, 1);
 
-  QGridLayout *error_frame_layout = new QGridLayout (mp_update_frame);
+  QGridLayout *error_frame_layout = new QGridLayout (mp_error_frame);
   mp_error_frame->setLayout (error_frame_layout);
   if (m_dense) {
     error_frame_layout->setMargin (4);

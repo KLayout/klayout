@@ -594,6 +594,14 @@ std::string current_dir ()
 #endif
 }
 
+bool chdir (const std::string &path)
+{
+#if defined(_WIN32)
+  return _wchdir (tl::to_wstring (path).c_str ()) == 0;
+#else
+  return ::chdir (tl::to_local (path).c_str ()) == 0;
+#endif
+}
 
 static std::pair<std::string, bool> absolute_path_of_existing (const std::string &s)
 {

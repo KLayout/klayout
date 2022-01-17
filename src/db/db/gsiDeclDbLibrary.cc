@@ -455,6 +455,7 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
   gsi::method ("parameters_from_shape", &PCellDeclarationImpl::parameters_from_shape_fb, "@hide") +
   gsi::method ("transformation_from_shape", &PCellDeclarationImpl::transformation_from_shape_fb, "@hide") +
   gsi::method ("display_text", &PCellDeclarationImpl::get_display_name_fb, "@hide") +
+  gsi::method ("wants_lazy_evaluation", &PCellDeclarationImpl::wants_lazy_evaluation_fb, "@hide") +
   gsi::callback ("get_layers", &PCellDeclarationImpl::get_layer_declarations_impl, &PCellDeclarationImpl::cb_get_layer_declarations, gsi::arg ("parameters"),
     "@brief Returns a list of layer declarations\n"
     "Reimplement this method to return a list of layers this PCell wants to create.\n"

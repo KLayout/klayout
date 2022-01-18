@@ -33,6 +33,8 @@
 namespace tl
 {
 
+class InputHttpStreamCallback;
+
 /**
  *  @brief Represents an item in a WebDAV collection
  */
@@ -109,7 +111,7 @@ public:
    *  @brief Populates the collection from the given URL
    *  The depth value can be 0 (self only) or 1 (self + collection members).
    */
-  void read (const std::string &url, int depth);
+  void read (const std::string &url, int depth, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
 
   /**
    *  @brief Gets the items of this collection (begin iterator)
@@ -142,14 +144,14 @@ public:
    *  This method throws an exception if the directory structure could
    *  not be obtained or downloading of one file failed.
    */
-  static bool download (const std::string &url, const std::string &target);
+  static bool download (const std::string &url, const std::string &target, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
 
   /**
    *  @brief Gets a stream object for downloading the single item of the given URL
    *
    *  The stream object returned needs to be deleted by the caller.
    */
-  static tl::InputStream *download_item (const std::string &url);
+  static tl::InputStream *download_item (const std::string &url, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
 
 private:
   container m_items;

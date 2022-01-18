@@ -142,4 +142,17 @@ InputHttpStream::tick ()
   //  .. nothing yet ..
 }
 
+void
+InputHttpStream::set_timeout (double)
+{
+  //  .. nothing yet ..
+}
+
+double
+InputHttpStream::timeout () const
+{
+  return 0.0;
+}
+
+
 }

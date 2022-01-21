@@ -32,7 +32,6 @@
 #include <QDomDocumentType>
 #include "gsiQt.h"
 #include "gsiQtXmlCommon.h"
-#include "gsiDeclQtXmlTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

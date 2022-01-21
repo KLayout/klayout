@@ -133,7 +133,7 @@ qt_to_buttons (Qt::MouseButtons b, Qt::KeyboardModifiers m)
   // BTW: On a MAC's keyboard, the cmd-key is received here as a ControlModifier
   // while the ctrl-key is received as a MetaModifier
   return ((b & Qt::LeftButton) ? ((m & Qt::MetaModifier) ? RightButton : LeftButton) : 0) |
-         ((b & Qt::MidButton) ? MidButton : 0) |
+         ((b & Qt::MiddleButton) ? MidButton : 0) |
          ((b & Qt::RightButton) ? RightButton : 0) |
          ((m & Qt::ShiftModifier) != 0 ? ShiftButton : 0) |
          ((m & Qt::ControlModifier) != 0 ? ControlButton : 0) |
@@ -684,7 +684,11 @@ END_PROTECTED
 }
 
 void 
+#if QT_VERSION >= 0x60000
+ViewObjectWidget::enterEvent (QEnterEvent * /*event*/)
+#else
 ViewObjectWidget::enterEvent (QEvent * /*event*/)
+#endif
 {
 BEGIN_PROTECTED  
   m_mouse_inside = true;
@@ -764,36 +768,43 @@ BEGIN_PROTECTED
   ensure_entered ();
   begin_mouse_event ();
 
+#if QT_VERSION < 0x60000
+  int delta = e->delta ();
+  db::DPoint p = pixel_to_um (e->pos ());
+  bool horizontal = (e->orientation () == Qt::Horizontal);
+#else
+  int delta = e->angleDelta ().y ();
+  db::DPoint p = pixel_to_um (e->position ());
+  bool horizontal = false;
+#endif
+
   e->ignore ();
 
   bool done = false; 
 
   unsigned int buttons = qt_to_buttons (e->buttons (), e->modifiers ());
-  bool horizontal = (e->orientation () == Qt::Horizontal);
-
-  db::DPoint p = pixel_to_um (e->pos ());
 
   for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
     std::list<ViewService *>::iterator gg = g;
     ++gg;
-    done = ((*g)->enabled () && (*g)->wheel_event (e->delta (), horizontal, p, buttons, true));
+    done = ((*g)->enabled () && (*g)->wheel_event (delta, horizontal, p, buttons, true));
     g = gg;
   }
 
   if (! done && mp_active_service) {
-    done = (mp_active_service->enabled () && mp_active_service->wheel_event (e->delta (), horizontal, p, buttons, true));
+    done = (mp_active_service->enabled () && mp_active_service->wheel_event (delta, horizontal, p, buttons, true));
   }
 
   service_iterator svc = begin_services ();
   while (svc != end_services () && !done) {
     service_iterator next = svc;
     ++next;
-    done = ((*svc)->enabled () && (*svc)->wheel_event (e->delta (), horizontal, p, buttons, false));
+    done = ((*svc)->enabled () && (*svc)->wheel_event (delta, horizontal, p, buttons, false));
     svc = next;
   }
 
   if (! done) {
-    wheel_event (e->delta (), horizontal, p, buttons);
+    wheel_event (delta, horizontal, p, buttons);
   }
 
   end_mouse_event ();
@@ -875,6 +886,12 @@ END_PROTECTED
 
 db::DPoint
 ViewObjectWidget::pixel_to_um (const QPoint &pt) const
+{
+  return m_trans.inverted () * db::DPoint (pt.x (), height () - 1 - pt.y ());
+}
+
+db::DPoint
+ViewObjectWidget::pixel_to_um (const QPointF &pt) const
 {
   return m_trans.inverted () * db::DPoint (pt.x (), height () - 1 - pt.y ());
 }

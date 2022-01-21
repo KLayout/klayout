@@ -22,6 +22,8 @@
 
 #if !defined(HAVE_QT_XML)
 #  define FORCE_LINK_GSI_QTXML
+#elif QT_VERSION >= 0x060000
+#  include "../qt6/QtXml/gsiQtExternals.h"
 #elif QT_VERSION >= 0x050000
 #  include "../qt5/QtXml/gsiQtExternals.h"
 #else

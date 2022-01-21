@@ -40,7 +40,6 @@
 #include <QTimerEvent>
 #include "gsiQt.h"
 #include "gsiQtSqlCommon.h"
-#include "gsiDeclQtSqlTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

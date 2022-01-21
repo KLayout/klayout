@@ -204,7 +204,7 @@ object_to_ruby (void *obj, Proxy *self, const gsi::ClassBase *cls, bool pass_obj
 
   }
 
-  if (! pass_obj && prefer_copy && ! clsact->adapted_type_info () && ! clsact->is_managed () && clsact->can_copy ()) {
+  if (! pass_obj && prefer_copy && ! clsact->adapted_type_info () && ! clsact->is_managed () && clsact->can_copy () && clsact->can_default_create ()) {
 
     //  We copy objects passed by const reference if they are not managed.
     //  Such objects are often exposed internals. First we can't
@@ -213,7 +213,7 @@ object_to_ruby (void *obj, Proxy *self, const gsi::ClassBase *cls, bool pass_obj
     //  of the exposed property. Hence copying is safer.
 
     //  create a instance and copy the value
-    ret = rb_obj_alloc (ruby_cls (clsact));
+    ret = rb_obj_alloc (ruby_cls (clsact, false));
     Proxy *p = 0;
     Data_Get_Struct (ret, Proxy, p);
     clsact->assign (p->obj (), obj);
@@ -243,7 +243,7 @@ object_to_ruby (void *obj, Proxy *self, const gsi::ClassBase *cls, bool pass_obj
     //  TODO: we will create a fresh object here, delete it again and link the
     //  reference to the existing object to the Ruby object. This is not quite
     //  efficient - we should avoid creating and deleting a dummy object first.
-    ret = rb_obj_alloc (ruby_cls (clsact));
+    ret = rb_obj_alloc (ruby_cls (clsact, false));
     Proxy *p = 0;
     Data_Get_Struct (ret, Proxy, p);
     p->set (obj, pass_obj, is_const /*const*/, can_destroy /*can_destroy*/, ret);

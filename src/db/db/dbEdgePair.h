@@ -388,20 +388,12 @@ public:
   }
 
   /**
-   *  @brief Default conversion to string
-   */
-  std::string to_string () const
-  {
-    return to_string (0.0);
-  }
-
-  /**
    *  @brief Conversion to a string.
    *
    *  If dbu is set, it determines the factor by which the coordinates are multiplied to render
    *  micron units. In addition, a micron format is chosen for output of these coordinates.
    */
-  std::string to_string (double dbu) const
+  std::string to_string (double dbu = 0.0) const
   {
     return lesser ().to_string (dbu) + (m_symmetric ? "|" : "/") + greater ().to_string (dbu);
   }
@@ -622,19 +614,6 @@ typedef edge_pair<db::DCoord> DEdgePair;
 
 namespace tl 
 {
-  /**
-   *  @brief The type traits for the edge type
-   */
-  template <class C>
-  struct type_traits <db::edge_pair<C> > : public type_traits<void> 
-  {
-    typedef trivial_relocate_required relocate_requirements;
-    typedef true_tag supports_extractor;
-    typedef true_tag supports_to_string;
-    typedef true_tag has_less_operator;
-    typedef true_tag has_equal_operator;
-  };
-
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::EdgePair &b);
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DEdgePair &b);
 

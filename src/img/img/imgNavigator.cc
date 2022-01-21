@@ -58,7 +58,7 @@ Navigator::setup (lay::Dispatcher *root, img::Object *img)
   QVBoxLayout *layout = new QVBoxLayout (this);
   layout->addWidget (mp_view);
   layout->setStretchFactor (mp_view, 1);
-  layout->setMargin (0);
+  layout->setContentsMargins (0, 0, 0, 0);
   layout->setSpacing (0);
   setLayout (layout);
 

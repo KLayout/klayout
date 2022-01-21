@@ -96,7 +96,7 @@ BookmarksView::BookmarksView (LayoutView *view, QWidget *parent, const char *nam
   mp_view = view;
 
   QVBoxLayout *layout = new QVBoxLayout ();
-  layout->setMargin (0);
+  layout->setContentsMargins (0, 0, 0, 0);
   setLayout (layout);
 
   mp_bookmarks = new QListView (this);

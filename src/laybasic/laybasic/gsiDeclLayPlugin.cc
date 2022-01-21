@@ -32,21 +32,6 @@ namespace gsi
 {
   class PluginFactoryBase;
   class PluginBase;
-}
-
-namespace tl
-{
-  template <> struct type_traits<gsi::PluginFactoryBase> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-  };
-
-  template <> struct type_traits<gsi::PluginBase> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-  };
-}
-
-namespace gsi
-{
 
 //  TODO: these static variables are a bad hack!
 //  However it's not easy to pass parameters to a C++ classes constructor in Ruby without

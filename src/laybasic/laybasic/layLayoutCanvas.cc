@@ -303,7 +303,7 @@ LayoutCanvas::LayoutCanvas (QWidget *parent, lay::LayoutView *view, const char *
   mp_redraw_thread = new lay::RedrawThread (this, view);
 
   setBackgroundRole (QPalette::NoRole);
-  set_colors (palette ().color (QPalette::Normal, QPalette::Background),
+  set_colors (palette ().color (QPalette::Normal, QPalette::Window),
               palette ().color (QPalette::Normal, QPalette::Text),
               palette ().color (QPalette::Normal, QPalette::Mid));
   setAttribute (Qt::WA_NoSystemBackground);

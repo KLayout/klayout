@@ -25,9 +25,10 @@
 
 #ifdef HAVE_RUBY
 
-#include <ruby.h>
-
 #include "gsiInterpreter.h"
+#include "gsiSerialisation.h"
+
+#include <ruby.h>
 
 #include "tlScriptError.h"
 

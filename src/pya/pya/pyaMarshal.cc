@@ -113,7 +113,7 @@ public:
   PythonBasedVariantAdaptor (const PythonPtr &var);
 
   virtual tl::Variant var () const;
-  virtual void set (const tl::Variant &v);
+  virtual void set (const tl::Variant &v, tl::Heap & /*heap*/);
 
 private:
   PythonPtr m_var;
@@ -814,7 +814,7 @@ tl::Variant PythonBasedVariantAdaptor::var () const
   return python2c<tl::Variant> (m_var.get ());
 }
 
-void PythonBasedVariantAdaptor::set (const tl::Variant & /*v*/)
+void PythonBasedVariantAdaptor::set (const tl::Variant & /*v*/, tl::Heap & /*heap*/)
 {
   //  TODO: is there a setter for a string?
 }

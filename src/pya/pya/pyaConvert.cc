@@ -445,7 +445,7 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
 
   }
 
-  if (! pass_obj && prefer_copy && ! clsact->adapted_type_info () && ! clsact->is_managed () && clsact->can_copy ()) {
+  if (! pass_obj && prefer_copy && ! clsact->adapted_type_info () && ! clsact->is_managed () && clsact->can_copy () && clsact->can_default_create ()) {
 
     //  We copy objects passed by const reference if they are not managed
     //  (derived from gsi::ObjectBase, in that case, client_data is not 0).

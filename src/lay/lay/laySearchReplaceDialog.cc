@@ -42,6 +42,7 @@
 
 #include <QInputDialog>
 #include <QHeaderView>
+#include <QRegExp>
 
 #include <fstream>
 
@@ -1249,8 +1250,7 @@ SearchReplaceDialog::update_mru_list ()
 
   for (std::vector<std::string>::const_iterator mru = m_mru.begin (); mru != m_mru.end (); ++mru) {
     QString text = tl::to_qstring (*mru);
-    QString display_text = text;
-    display_text.replace (QRegExp (QString::fromUtf8 ("\\s+")), QString::fromUtf8 (" "));
+    QString display_text = text.simplified ();
     int nmax = 50;
     if (display_text.size () > nmax) {
       display_text = display_text.left (nmax) + QString::fromUtf8 ("...");

@@ -90,7 +90,11 @@ QSize
 ProgressBarWidget::sizeHint () const
 {
   QFontMetrics fm (font ());
+#if QT_VERSION >= 0x60000
+  return QSize (fm.horizontalAdvance (QString::fromUtf8("100%")) * 4, fm.height () + 2);
+#else
   return QSize (fm.width (QString::fromUtf8("100%")) * 4, fm.height () + 2);
+#endif
 }
 
 QSize
@@ -192,7 +196,7 @@ ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool fw)
   mp_layout = layout;
 
   layout->setSpacing (4);
-  layout->setMargin (0);
+  layout->setContentsMargins (0, 0, 0, 0);
 
   int col = 0;
 
@@ -212,7 +216,7 @@ ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool fw)
 
   QGridLayout *pbf_layout = new QGridLayout (mp_progress_bar_frame);
   mp_progress_bar_frame->setLayout (pbf_layout);
-  pbf_layout->setMargin (0);
+  pbf_layout->setContentsMargins (0, 0, 0, 0);
   pbf_layout->setSpacing (0);
 
   mp_progress_bar1 = new ProgressBarWidget (mp_progress_bar_frame);

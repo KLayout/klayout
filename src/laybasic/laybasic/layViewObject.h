@@ -1003,6 +1003,11 @@ public:
   db::DPoint pixel_to_um (const QPoint &pt) const;
 
   /**
+   *  @brief Translates a screen coordinate in micrometer coordinates
+   */
+  db::DPoint pixel_to_um (const QPointF &pt) const;
+
+  /**
    *  @brief Gets a flag indicating whether the mouse is inside the window
    */
   bool mouse_in_window () const
@@ -1034,7 +1039,11 @@ protected:
   /**
    *  @brief Qt mouse enter event handler
    */
+#if QT_VERSION >= 0x60000
+  void enterEvent (QEnterEvent *e);
+#else
   void enterEvent (QEvent *e);
+#endif
 
   /**
    *  @brief Qt mouse button press event handler

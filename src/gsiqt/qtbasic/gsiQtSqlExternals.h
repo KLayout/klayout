@@ -22,6 +22,8 @@
 
 #if !defined(HAVE_QT_SQL)
 #  define FORCE_LINK_GSI_QTSQL
+#elif QT_VERSION >= 0x060000
+#  include "../qt6/QtSql/gsiQtExternals.h"
 #elif QT_VERSION >= 0x050000
 #  include "../qt5/QtSql/gsiQtExternals.h"
 #else

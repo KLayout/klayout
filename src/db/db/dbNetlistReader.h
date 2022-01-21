@@ -52,17 +52,4 @@ public:
 
 }
 
-namespace tl
-{
-
-template <>
-struct type_traits<db::NetlistReader>
-  : public tl::type_traits<void>
-{
-  typedef tl::false_tag has_default_constructor;
-  typedef tl::false_tag has_copy_constructor;
-};
-
-}
-
 #endif

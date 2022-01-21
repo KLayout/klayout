@@ -201,9 +201,15 @@ module LVS
     # @synopsis disable_parameter(device_class_name, parameter_name)
     # See \Netter#disable_parameter for a description of that function.
 
+    # %LVS%
+    # @name lvs_data
+    # @brief Gets the \LayoutVsSchematic object after compare was used
+    # @synopsis lvs_data
+    # See \Netter#lvs_data for a description of that function.
+
     %w(schematic compare join_symmetric_nets tolerance ignore_parameter enable_parameter disable_parameter 
        blank_circuit align same_nets same_nets! same_circuits same_device_classes equivalent_pins 
-       min_caps max_res max_depth max_branch_complexity consider_net_names).each do |f|
+       min_caps max_res max_depth max_branch_complexity consider_net_names lvs_data).each do |f|
       eval <<"CODE"
         def #{f}(*args)
           _netter.#{f}(*args)

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -3172,6 +3172,131 @@ TEST(14_JoinNets)
   std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au1_join_nets.gds");
+
+  db::compare_layouts (_this, ly, au);
+}
+
+
+TEST(100_issue954)
+{
+  db::Layout ly;
+  db::LayerMap lmap;
+
+  unsigned int active     = define_layer (ly, lmap, 1);
+  unsigned int poly       = define_layer (ly, lmap, 2);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testdata ());
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "device_extract_issue954.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("LABEL"));
+
+  //  original layers
+  db::Region ractive (db::RecursiveShapeIterator (ly, tc, active), dss);
+  db::Region rpoly (db::RecursiveShapeIterator (ly, tc, poly), dss);
+
+  //  derived regions
+
+  db::Region rpgate   = ractive & rpoly;
+  db::Region rpsd     = ractive - rpgate;
+
+  //  Global
+
+  db::Region bulk (dss);
+
+  //  return the computed layers into the original layout and write it for debugging purposes
+
+  unsigned int lgate  = ly.insert_layer (db::LayerProperties (10, 0));      // 10/0 -> Gate
+  unsigned int lsd    = ly.insert_layer (db::LayerProperties (11, 0));      // 11/0 -> Source/Drain
+  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (12, 0));      // 12/0 -> P Diffusion
+
+  rpgate.insert_into (&ly, tc.cell_index (), lgate);
+  rpsd.insert_into (&ly, tc.cell_index (), lsd);
+  rpsd.insert_into (&ly, tc.cell_index (), lpdiff);
+
+  //  perform the extraction
+
+  db::Netlist nl;
+  db::hier_clusters<db::NetShape> cl;
+
+  db::NetlistDeviceExtractorMOS4Transistor pmos_ex ("PMOS");
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["SD"] = &rpsd;
+  dl["G"] = &rpgate;
+  dl["W"] = &bulk;
+  dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
+  pmos_ex.extract (dss, 0, dl, nl, cl);
+
+  //  perform the net extraction
+
+  db::NetlistExtractor net_ex;
+
+  db::Connectivity conn;
+
+  //  Global nets
+  conn.connect_global (bulk, "BULK");
+
+  //  Intra-layer
+  conn.connect (rpsd);
+  conn.connect (rpoly);
+
+  //  extract the nets
+
+  std::list<std::set<std::string> > jn;
+
+  jn.push_back (std::set<std::string> ());
+  jn.back ().insert ("BULK");
+  jn.back ().insert ("VSS");
+
+  jn.push_back (std::set<std::string> ());
+  jn.back ().insert ("NWELL");
+  jn.back ().insert ("VDD");
+
+  net_ex.set_joined_nets ("INV2", jn);
+
+  std::list<tl::GlobPattern> gp;
+  gp.push_back (tl::GlobPattern ("NEXT"));
+  gp.push_back (tl::GlobPattern ("FB"));
+  net_ex.set_joined_net_names (gp);
+
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
+
+  EXPECT_EQ (all_net_names_unique (nl), true);
+
+  //  debug layers produced for nets
+  //    200/0 -> Poly
+  //    201/0 -> N source/drain
+  //    202/0 -> Bulk
+  std::map<unsigned int, unsigned int> dump_map;
+  dump_map [layer_of (bulk)      ] = ly.insert_layer (db::LayerProperties (202, 0));
+  dump_map [layer_of (rpsd)      ] = ly.insert_layer (db::LayerProperties (201, 0));
+  dump_map [layer_of (rpoly)     ] = ly.insert_layer (db::LayerProperties (200, 0));
+
+  //  write nets to layout
+  db::CellMapping cm = dss.cell_mapping_to_original (0, &ly, tc.cell_index ());
+  dump_nets_to_layout (nl, cl, ly, dump_map, cm, true);
+
+  //  compare the collected test data
+
+  std::string au = tl::testdata ();
+  au = tl::combine_path (au, "algo");
+  au = tl::combine_path (au, "device_extract_issue954_au.gds");
 
   db::compare_layouts (_this, ly, au);
 }

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -124,6 +124,11 @@ public:
   virtual bool is_bbox_dirty () const
   {
     return m_layer.is_bbox_dirty ();
+  }
+
+  virtual bool is_tree_dirty () const
+  {
+    return m_layer.is_tree_dirty ();
   }
 
   size_t size () const

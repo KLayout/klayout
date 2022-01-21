@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -158,8 +158,14 @@ class DB_PUBLIC generic_shapes_iterator_delegate
 {
 public:
   generic_shapes_iterator_delegate (const db::Shapes *shapes)
-    : mp_shapes (shapes), m_iter (mp_shapes->begin (shape_flags<T> ()))
+    : mp_shapes (shapes)
   {
+    //  NOTE: to allow multiple iterators acting on the same Shapes container at once, we always sort before we deliver the iterator -
+    //  also in the non-region case. Without this, sorting may happen while another iterator is progressing.
+    if (mp_shapes->is_bbox_dirty ()) {
+      const_cast<db::Shapes *> (mp_shapes)->update ();
+    }
+    m_iter = mp_shapes->begin (shape_flags<T> ());
     m_is_addressable = shape_flags<T> () == shape_flags_pure<T> () || mp_shapes->begin (shape_flags<T> () - shape_flags_pure<T> ()).at_end ();
     set ();
   }
@@ -171,17 +177,17 @@ public:
 
   virtual void do_reset (const db::Box &box, bool overlapping)
   {
+    //  NOTE: to allow multiple iterators acting on the same Shapes container at once, we always sort before we deliver the iterator -
+    //  also in the non-region case. Without this, sorting may happen while another iterator is progressing.
+    if (mp_shapes->is_bbox_dirty ()) {
+      const_cast<db::Shapes *> (mp_shapes)->update ();
+    }
     if (box == db::Box::world ()) {
       m_iter = mp_shapes->begin (shape_flags<T> ());
+    } else if (overlapping) {
+      m_iter = mp_shapes->begin_overlapping (box, shape_flags<T> ());
     } else {
-      if (mp_shapes->is_bbox_dirty ()) {
-        const_cast<db::Shapes *> (mp_shapes)->update ();
-      }
-      if (overlapping) {
-        m_iter = mp_shapes->begin_overlapping (box, shape_flags<T> ());
-      } else {
-        m_iter = mp_shapes->begin_touching (box, shape_flags<T> ());
-      }
+      m_iter = mp_shapes->begin_touching (box, shape_flags<T> ());
     }
 
     set ();
@@ -214,9 +220,6 @@ public:
 
   virtual db::Box bbox () const
   {
-    if (mp_shapes->is_bbox_dirty ()) {
-      const_cast<db::Shapes *> (mp_shapes)->update ();
-    }
     return mp_shapes->bbox ();
   }
 

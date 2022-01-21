@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -379,6 +379,16 @@ public:
    *  @brief This method is called when a drag operation should be cancelled
    */
   virtual void drag_cancel () { }
+
+  /**
+   *  @brief Gets a value indicating whether a cursor position it set
+   */
+  virtual bool has_tracking_position () const { return false; }
+
+  /**
+   *  @brief Gets the cursor position if one is set
+   */
+  virtual db::DPoint tracking_position () const { return db::DPoint (); }
 
   /**
    *  @brief Enable or disable a service 

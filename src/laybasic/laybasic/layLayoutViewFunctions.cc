@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -41,6 +41,41 @@
 
 namespace lay
 {
+
+static void
+collect_cells_to_delete (const db::Layout &layout, const db::Cell &cell, std::set<db::cell_index_type> &called)
+{
+  //  don't delete proxies - they are deleted later when the layout is cleaned
+  for (db::Cell::child_cell_iterator cc = cell.begin_child_cells (); ! cc.at_end (); ++cc) {
+    if (called.find (*cc) == called.end () && !layout.cell (*cc).is_proxy ()) {
+      called.insert (*cc);
+      collect_cells_to_delete (layout, layout.cell (*cc), called);
+    }
+  }
+}
+
+static bool
+validate_cell_path (const db::Layout &layout, lay::LayoutView::cell_path_type &path)
+{
+  for (size_t i = 0; i < path.size (); ++i) {
+
+    if (! layout.is_valid_cell_index (path [i])) {
+
+      if (layout.is_valid_cell_index (path.back ())) {
+        //  use a stub path
+        path.erase (path.begin (), --path.end ());
+      } else {
+        //  strip everything that is not valid
+        path.erase (path.begin () + i, path.end ());
+      }
+
+      return true;
+
+    }
+  }
+
+  return false;
+}
 
 LayoutViewFunctions::LayoutViewFunctions (db::Manager *manager, LayoutView *view)
   : lay::Plugin (view), mp_view (view), mp_manager (manager)
@@ -493,18 +528,7 @@ LayoutViewFunctions::cm_cell_replace ()
 
         view ()->commit ();
 
-        //  If one of the cells in the path was deleted, establish a valid path
-
-        bool needs_update = false;
-        for (size_t i = cell_path.size (); i > 0; ) {
-          --i;
-          if (! layout.is_valid_cell_index (cell_path [i])) {
-            cell_path.erase (cell_path.begin () + i, cell_path.end ());
-            needs_update = true;
-          }
-        }
-
-        if (needs_update) {
+        if (validate_cell_path (layout, cell_path)) {
           view ()->select_cell (cell_path, cv_index);
         }
 
@@ -613,33 +637,10 @@ LayoutViewFunctions::cm_cell_convert_to_static ()
 
     view ()->commit ();
 
-    //  If one of the cells in the path was deleted, establish a valid path
-
-    bool needs_update = false;
-    for (size_t i = cell_path.size (); i > 0; ) {
-      --i;
-      if (! layout.is_valid_cell_index (cell_path [i])) {
-        cell_path.erase (cell_path.begin () + i, cell_path.end ());
-        needs_update = true;
-      }
-    }
-
-    if (needs_update) {
+    if (validate_cell_path (layout, cell_path)) {
       view ()->select_cell (cell_path, cv_index);
     }
 
-  }
-}
-
-static void
-collect_cells_to_delete (const db::Layout &layout, const db::Cell &cell, std::set<db::cell_index_type> &called)
-{
-  //  don't delete proxies - they are deleted later when the layout is cleaned
-  for (db::Cell::child_cell_iterator cc = cell.begin_child_cells (); ! cc.at_end (); ++cc) {
-    if (called.find (*cc) == called.end () && !layout.cell (*cc).is_proxy ()) {
-      called.insert (*cc);
-      collect_cells_to_delete (layout, layout.cell (*cc), called);
-    }
   }
 }
 
@@ -704,18 +705,7 @@ LayoutViewFunctions::cm_cell_delete ()
 
       view ()->commit ();
 
-      //  If one of the cells in the path was deleted, establish a valid path
-
-      bool needs_update = false;
-      for (size_t i = cell_path.size (); i > 0; ) {
-        --i;
-        if (! layout.is_valid_cell_index (cell_path [i])) {
-          cell_path.erase (cell_path.begin () + i, cell_path.end ());
-          needs_update = true;
-        }
-      }
-
-      if (needs_update) {
+      if (validate_cell_path (layout, cell_path)) {
         view ()->select_cell (cell_path, cv_index);
       }
 

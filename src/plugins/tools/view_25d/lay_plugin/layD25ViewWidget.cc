@@ -244,8 +244,13 @@ D25ViewWidget::wheelEvent (QWheelEvent *event)
     return;
   }
 
+#if QT_VERSION >= 0x60000
+  double px = (event->position ().x () - width () / 2) * 2.0 / width ();
+  double py = -(event->position ().y () - height () / 2) * 2.0 / height ();
+#else
   double px = (event->pos ().x () - width () / 2) * 2.0 / width ();
   double py = -(event->pos ().y () - height () / 2) * 2.0 / height ();
+#endif
 
   if (top_view ()) {
 
@@ -389,7 +394,7 @@ D25ViewWidget::mousePressEvent (QMouseEvent *event)
 {
   mp_mode.reset (0);
 
-  if (event->button () == Qt::MidButton) {
+  if (event->button () == Qt::MiddleButton) {
     mp_mode.reset (new D25PanInteractionMode (this, event->pos ()));
   } else if (event->button () == Qt::LeftButton) {
     if (! top_view ()) {

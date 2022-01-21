@@ -32,22 +32,40 @@ else:
 del System, Node, Release, MacVersion, Machine, Processor
 
 #-----------------------------------------------------
-# [1] Qt
+# [1] Qt6 or Qt5
 #-----------------------------------------------------
-Qts = [ 'Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3' ]
+Qts  = [ 'Qt6MacPorts', 'Qt6Brew' ]
+Qts += [ 'Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3' ]
+
+#-----------------------------------------------------
+# Whereabout of different components of Qt6
+#-----------------------------------------------------
+# Qt6 from MacPorts (https://www.macports.org/)
+#   install with 'sudo port install [qt6|qt6-qttools]'
+# [Key Type Name] = 'Qt6MacPorts'
+Qt6MacPorts = { 'qmake' : '/opt/local/libexec/qt6/bin/qmake',
+                'deploy': '/opt/local/libexec/qt6/bin/macdeployqt'
+              }
+
+# Qt6 from Homebrew (https://brew.sh/)
+#   install with 'brew install qt6'
+# [Key Type Name] = 'Qt6Brew'
+Qt6Brew = { 'qmake' : '%s/opt/qt@6/bin/qmake' % DefaultHomebrewRoot,
+            'deploy': '%s/opt/qt@6/bin/macdeployqt' % DefaultHomebrewRoot
+          }
 
 #-----------------------------------------------------
 # Whereabout of different components of Qt5
 #-----------------------------------------------------
 # Qt5 from MacPorts (https://www.macports.org/)
-#   install with 'sudo port install qt5'
+#   install with 'sudo port install [qt5|qt5-qttools]'
 # [Key Type Name] = 'Qt5MacPorts'
 Qt5MacPorts = { 'qmake' : '/opt/local/libexec/qt5/bin/qmake',
                 'deploy': '/opt/local/libexec/qt5/bin/macdeployqt'
               }
 
 # Qt5 from Homebrew (https://brew.sh/)
-#   install with 'brew install qt'
+#   install with 'brew install qt5'
 # [Key Type Name] = 'Qt5Brew'
 Qt5Brew = { 'qmake' : '%s/opt/qt@5/bin/qmake' % DefaultHomebrewRoot,
             'deploy': '%s/opt/qt@5/bin/macdeployqt' % DefaultHomebrewRoot
@@ -203,7 +221,7 @@ RubyDictionary  = { 'nil'           : None,
 PythonNil  = [ 'nil' ]
 PythonSys  = [ 'PythonElCapitan', 'PythonSierra', 'PythonHighSierra', 'PythonMojave' ]
 PythonSys += [ 'PythonCatalina', 'PythonBigSur', 'PythonMonterey' ]
-PythonExt  = [ 'Python38MacPorts', 'Python38Brew', 'PythonAnaconda3', 'PythonAutoBrew' ]
+PythonExt  = [ 'Python38MacPorts', 'Python38Brew', 'Python39Brew', 'PythonAnaconda3', 'PythonAutoBrew' ]
 Pythons    = PythonNil + PythonSys + PythonExt
 
 #-----------------------------------------------------
@@ -282,12 +300,21 @@ Python38MacPorts= { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versi
                   }
 
 # Python 3.8 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
-#   install with 'brew install python'
+#   install with 'brew install python@3.8'
 # [Key Type Name] = 'HB38'
 HBPython38FrameworkPath = '%s/opt/python@3.8/Frameworks/Python.framework' % DefaultHomebrewRoot
 Python38Brew    = { 'exe': '%s/Versions/3.8/bin/python3.8' % HBPython38FrameworkPath,
                     'inc': '%s/Versions/3.8/include/python3.8' % HBPython38FrameworkPath,
                     'lib': '%s/Versions/3.8/lib/libpython3.8.dylib' % HBPython38FrameworkPath
+                  }
+
+# Python 3.9 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
+#   install with 'brew install python@3.9'
+# [Key Type Name] = 'HB39'
+HBPython39FrameworkPath = '%s/opt/python@3.9/Frameworks/Python.framework' % DefaultHomebrewRoot
+Python39Brew    = { 'exe': '%s/Versions/3.9/bin/python3.9' % HBPython39FrameworkPath,
+                    'inc': '%s/Versions/3.9/include/python3.9' % HBPython39FrameworkPath,
+                    'lib': '%s/Versions/3.9/lib/libpython3.9.dylib' % HBPython39FrameworkPath
                   }
 
 # Python 3.8 bundled with anaconda3 installed under /Applications/anaconda3/ *+*+*+ EXPERIMENTAL *+*+*+
@@ -332,6 +359,7 @@ PythonDictionary = { 'nil'             : None,
                      'PythonMonterey'  : PythonMonterey,
                      'Python38MacPorts': Python38MacPorts,
                      'Python38Brew'    : Python38Brew,
+                     'Python39Brew'    : Python39Brew,
                      'PythonAnaconda3' : PythonAnaconda3
                    }
 if _have_Homebrew_Python:

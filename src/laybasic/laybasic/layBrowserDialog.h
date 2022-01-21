@@ -130,16 +130,5 @@ private:
 
 }
 
-namespace tl
-{
-  template <> struct type_traits<lay::BrowserDialog> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-  };
-
-  template <> struct type_traits<lay::BrowserSource> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-  };
-}
-
 #endif
 

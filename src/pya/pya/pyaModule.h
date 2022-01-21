@@ -108,13 +108,56 @@ public:
    */
   PyObject *take_module ();
 
-private:
-  void add_python_doc (const gsi::ClassBase &cls, const MethodTable *mt, int mid, const std::string &doc);
-  PyMethodDef *make_method_def ();
-  PyGetSetDef *make_getset_def ();
-  char *make_string (const std::string &s);
-  static void check (const char *mod_name);
+  /**
+   *  @brief Gets the module name
+   */
+  const std::string &mod_name () const
+  {
+    return m_mod_name;
+  }
 
+  /**
+   *  @brief Adds the given documentation for the given class and method
+   */
+  void add_python_doc (const gsi::ClassBase &cls, const MethodTable *mt, int mid, const std::string &doc);
+
+  /**
+   *  @brief Adds the given documentation for the given class
+   */
+  void add_python_doc (const gsi::MethodBase *m, const std::string &doc);
+
+  /**
+   *  @brief Creates a method definition
+   */
+  PyMethodDef *make_method_def ();
+
+  /**
+   *  @brief Creates a property getter/setter pair
+   */
+  PyGetSetDef *make_getset_def ();
+
+  /**
+   *  @brief Creates a string with backup storage
+   */
+  char *make_string (const std::string &s);
+
+  /**
+   *  @brief Gets the next available class ID
+   */
+  size_t next_class_id () const
+  {
+    return m_classes.size ();
+  }
+
+  /**
+   *  @brief Register the class
+   */
+  void register_class (const gsi::ClassBase *cls)
+  {
+    m_classes.push_back (cls);
+  }
+
+private:
   std::list<std::string> m_string_heap;
   std::vector<PyMethodDef *> m_methods_heap;
   std::vector<PyGetSetDef *> m_getseters_heap;

@@ -345,8 +345,11 @@ struct text_defs
       "\n"
       "This method has been added in version 0.23.\n"
     ) +
-    method ("to_s", (std::string (C::*) () const) &C::to_string,
-      "@brief Convert to a string\n"
+    method ("to_s", &C::to_string, gsi::arg ("dbu", 0.0),
+      "@brief Convert to a string.\n"
+      "If a DBU is given, the output units will be micrometers.\n"
+      "\n"
+      "The DBU argument has been added in version 0.27.6.\n"
     );
   }
 };

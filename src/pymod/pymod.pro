@@ -35,7 +35,9 @@ SUBDIRS = \
       }
 
       !equals(HAVE_QT_XML, "0") {
-        SUBDIRS += QtXmlPatterns
+        lessThan(QT_MAJOR_VERSION, 6) {
+          SUBDIRS += QtXmlPatterns
+        }
       }
 
     }
@@ -53,11 +55,19 @@ SUBDIRS = \
     }
 
     !equals(HAVE_QT_DESIGNER, "0") {
-      SUBDIRS += QtDesigner
+      lessThan(QT_MAJOR_VERSION, 6) {
+        SUBDIRS += QtDesigner
+      }
     }
 
     !equals(HAVE_QT_UITOOLS, "0") {
       SUBDIRS += QtUiTools
+    }
+
+    greaterThan(QT_MAJOR_VERSION, 5) {
+      !equals(HAVE_QT_CORE5COMPAT, "0") {
+        SUBDIRS += QtCore5Compat
+      }
     }
 
   }

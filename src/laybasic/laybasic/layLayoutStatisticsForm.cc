@@ -138,7 +138,11 @@ public:
     : mp_layout (layout)
   {
     QResource res (QString::fromUtf8 (":/st/") + url.path ());
-    if (res.isCompressed ()) {
+#if QT_VERSION >= 0x60000
+      if (res.compressionAlgorithm () == QResource::ZlibCompression) {
+#else
+      if (res.isCompressed ()) {
+#endif
       m_temp = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
     } else {
       m_temp = QByteArray ((const char *)res.data (), (int)res.size ());

@@ -64,4 +64,12 @@ equals(HAVE_QTBINDINGS, "1") {
 
   }
 
+  greaterThan(QT_MAJOR_VERSION, 5) {
+
+    LIBS += -lklayout_QtCore5Compat
+    LIBS -= -lklayout_QtXmlPatterns
+    LIBS -= -lklayout_QtDesigner
+
+  }
+
 }

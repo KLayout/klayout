@@ -42,6 +42,21 @@ namespace tl
 static std::locale c_locale ("C");
 
 // -------------------------------------------------------------------------
+//  Exception classes
+
+ExtractorNotImplementedException::ExtractorNotImplementedException (const std::type_info &ti)
+  : Exception (tl::to_string (tr ("No string extractor available for type: ")) + ti.name ())
+{
+  //  .. nothing yet ..
+}
+
+StringConversionException::StringConversionException (const std::type_info &ti)
+  : Exception (tl::to_string (tr ("No string conversion available for type: ")) + ti.name ())
+{
+  //  .. nothing yet ..
+}
+
+// -------------------------------------------------------------------------
 //  lower and upper case for wchar_t and uint32_t
 
 #include "utf_casefolding.h"

@@ -851,7 +851,7 @@ LayerTreeModel::data (const QModelIndex &index, int role) const
         return QVariant ();
       }
 
-    } else if (role == Qt::TextColorRole || role == Qt::FontRole) {
+    } else if (role == Qt::ForegroundRole || role == Qt::FontRole) {
 
       if (index.column () == 1) {
 

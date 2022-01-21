@@ -211,7 +211,7 @@ private:
 /**
  *  @brief Registers a Ruby class for a gsi class
  */
-void register_class (VALUE ruby_cls, const gsi::ClassBase *gsi_cls);
+void register_class (VALUE ruby_cls, const gsi::ClassBase *gsi_cls, bool as_static);
 
 /**
  *  @brief Find the class declaration from the Ruby object
@@ -226,12 +226,12 @@ const gsi::ClassBase *find_cclass_maybe_null (VALUE k);
 /**
  *  @brief Finds the Ruby class for a gsi class
  */
-VALUE ruby_cls (const gsi::ClassBase *cls);
+VALUE ruby_cls (const gsi::ClassBase *cls, bool as_static);
 
 /**
  *  @brief Gets a value indicating whether a Ruby class is registered for a GSI class
  */
-bool is_registered (const gsi::ClassBase *gsi_cls);
+bool is_registered (const gsi::ClassBase *gsi_cls, bool as_static);
 
 /**
  *  @brief Locks the Ruby object against destruction by the GC

@@ -1210,20 +1210,10 @@ private:
 
 } // namespace db
 
-namespace tl 
+namespace tl
 {
-  /**
-   *  @brief The type traits for the region type
-   */
-  template <>
-  struct type_traits <db::Edges> : public type_traits<void> 
-  {
-    typedef true_tag supports_extractor;
-    typedef true_tag supports_to_string;
-    typedef true_tag has_less_operator;
-    typedef true_tag has_equal_operator;
-  };
-
+  template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Edges &b);
+  template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Edges &b);
 }
 
 #endif

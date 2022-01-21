@@ -35,7 +35,6 @@
 #include <QSplitter>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
-#include "gsiDeclQtCoreTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------
@@ -98,7 +97,7 @@
 
   static qt_gsi::Converter<QChar>::target_type f_QTextStream_read_qchar(QTextStream *s)
   {
-    QChar v = 0;
+    QChar v = QChar (0);
     *s >> v;
     return qt_gsi::Converter<QChar>::toc (v);
   }

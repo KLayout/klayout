@@ -326,7 +326,7 @@ SpecificLoadLayoutOptionsDialog::SpecificLoadLayoutOptionsDialog (QWidget *paren
 
       QVBoxLayout *layout = new QVBoxLayout (mp_ui->content_frame);
       layout->addWidget (mp_editor);
-      layout->setMargin (0);
+      layout->setContentsMargins (0, 0, 0, 0);
       mp_ui->content_frame->setLayout (layout);
 
       mp_editor->show ();

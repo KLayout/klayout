@@ -75,7 +75,6 @@
 #include <QWidget>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
-#include "gsiDeclQtGuiTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------
@@ -1361,6 +1360,12 @@ gsi::Class<QGraphicsObject> &qtdecl_QGraphicsObject ();
 qt_gsi::QtNativeClass<QGraphicsWidget> decl_QGraphicsWidget (qtdecl_QGraphicsObject (), "QtGui", "QGraphicsWidget_Native",
   methods_QGraphicsWidget (),
   "@hide\n@alias QGraphicsWidget");
+
+//  Additional base classes
+
+gsi::Class<QGraphicsLayoutItem> &qtdecl_QGraphicsLayoutItem ();
+
+gsi::ClassExt<QGraphicsWidget> base_class_QGraphicsLayoutItem_in_QGraphicsWidget (qtdecl_QGraphicsLayoutItem ());
 
 GSI_QTGUI_PUBLIC gsi::Class<QGraphicsWidget> &qtdecl_QGraphicsWidget () { return decl_QGraphicsWidget; }
 

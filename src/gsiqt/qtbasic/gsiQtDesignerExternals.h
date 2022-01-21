@@ -22,6 +22,9 @@
 
 #if !defined(HAVE_QT_DESIGNER)
 #  define FORCE_LINK_GSI_QTDESIGNER
+#elif QT_VERSION >= 0x060000
+//  Not present in Qt6
+#  define FORCE_LINK_GSI_QTDESIGNER
 #elif QT_VERSION >= 0x050000
 #  include "../qt5/QtDesigner/gsiQtExternals.h"
 #else

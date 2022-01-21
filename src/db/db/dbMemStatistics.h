@@ -41,8 +41,8 @@
 
 namespace tl
 {
-  template <class X> class vector;
-  template <class X> class reuse_vector;
+  template <class> class vector;
+  template <class, bool> class reuse_vector;
   class Variant;
 }
 

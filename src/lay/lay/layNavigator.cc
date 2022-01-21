@@ -479,7 +479,7 @@ Navigator::Navigator (MainWindow *main_window)
   layout->addWidget (mp_menu_bar);
   layout->addWidget (mp_placeholder_label);
   layout->setStretchFactor (mp_placeholder_label, 1);
-  layout->setMargin (0);
+  layout->setContentsMargins (0, 0, 0, 0);
   layout->setSpacing (0);
   setLayout (layout);
 

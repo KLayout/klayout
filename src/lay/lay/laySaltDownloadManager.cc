@@ -85,8 +85,8 @@ ConfirmationDialog::mark_fetching (const std::string &name)
   if (i != m_items_by_name.end ()) {
     list->scrollToItem (i->second);
     for (int c = 0; c < list->columnCount (); ++c) {
-      i->second->setData (c, Qt::BackgroundColorRole, QColor (224, 244, 244));
-      i->second->setData (c, Qt::TextColorRole, QColor (Qt::blue));
+      i->second->setData (c, Qt::BackgroundRole, QColor (224, 244, 244));
+      i->second->setData (c, Qt::ForegroundRole, QColor (Qt::blue));
     }
     i->second->setData (1, Qt::DisplayRole, tr ("FETCHING"));
   }
@@ -101,8 +101,8 @@ ConfirmationDialog::mark_error (const std::string &name)
   if (i != m_items_by_name.end ()) {
     list->scrollToItem (i->second);
     for (int c = 0; c < list->columnCount (); ++c) {
-      i->second->setData (c, Qt::BackgroundColorRole, QColor (255, 224, 244));
-      i->second->setData (c, Qt::TextColorRole, QColor (Qt::black));
+      i->second->setData (c, Qt::BackgroundRole, QColor (255, 224, 244));
+      i->second->setData (c, Qt::ForegroundRole, QColor (Qt::black));
     }
     i->second->setData (1, Qt::DisplayRole, tr ("ERROR"));
   }
@@ -117,8 +117,8 @@ ConfirmationDialog::mark_success (const std::string &name)
   if (i != m_items_by_name.end ()) {
     list->scrollToItem (i->second);
     for (int c = 0; c < list->columnCount (); ++c) {
-      i->second->setData (c, Qt::BackgroundColorRole, QColor (160, 255, 160));
-      i->second->setData (c, Qt::TextColorRole, QColor (Qt::black));
+      i->second->setData (c, Qt::BackgroundRole, QColor (160, 255, 160));
+      i->second->setData (c, Qt::ForegroundRole, QColor (Qt::black));
     }
     i->second->setData (1, Qt::DisplayRole, tr ("INSTALLED"));
   }

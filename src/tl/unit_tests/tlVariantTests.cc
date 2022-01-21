@@ -48,18 +48,6 @@ struct AA
 
 int AA::ac = 0;
 
-namespace tl
-{
-  template<> 
-  class type_traits<A>
-    : public type_traits<void>
-  {
-  public:
-    typedef tl::true_tag supports_to_string;
-    typedef tl::true_tag has_copy_constructor;
-  };
-}
-
 struct B 
 {
   int bb;
@@ -68,20 +56,6 @@ struct B
   bool operator< (const B &d) const { return bb < d.bb; }
   const std::string &to_string () const { return b; }
 };
-
-namespace tl
-{
-  template<> 
-  class type_traits<B>
-    : public type_traits<void>
-  {
-  public:
-    typedef tl::true_tag supports_to_string;
-    typedef tl::true_tag has_equal_operator;
-    typedef tl::true_tag has_less_operator;
-    typedef tl::true_tag has_copy_constructor;
-  };
-}
 
 static tl::VariantUserClassImpl<A> a_class_instance;
 static tl::VariantUserClassImpl<AA> aa_class_instance;

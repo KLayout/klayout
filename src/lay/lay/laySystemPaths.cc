@@ -65,7 +65,11 @@ split_path (const std::string &path, std::vector <std::string> &pc)
   sep = QString::fromUtf8 (":");
 #endif
 
+#if QT_VERSION >= 0x60000
+  QStringList pp = tl::to_qstring (path).split (sep, Qt::SkipEmptyParts);
+#else
   QStringList pp = tl::to_qstring (path).split (sep, QString::SkipEmptyParts);
+#endif
   for (QStringList::ConstIterator p = pp.begin (); p != pp.end (); ++p) {
     pc.push_back (tl::to_string (*p));
   }

@@ -235,6 +235,7 @@ RESULT
     assert_equal( menu.action( "file_menu.#3" ).is_checkable?, false )
     assert_equal( menu.action( "file_menu.#3" ).is_enabled?, false )
 
+    $a1.checked = false
     $a1.checkable = true;
     assert_equal( menu.action( "my_menu.new_item" ).is_visible?, false )
     assert_equal( menu.action( "my_menu.new_item" ).is_checked?, false )

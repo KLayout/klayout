@@ -119,7 +119,11 @@ MacroEditorHighlighters::highlighter_for_scheme (QObject *parent, const std::str
     QResource res (tl::to_qstring (":/syntax/" + scheme + ".xml"));
 
     QByteArray data;
+#if QT_VERSION >= 0x60000
+    if (res.compressionAlgorithm () == QResource::ZlibCompression) {
+#else
     if (res.isCompressed ()) {
+#endif
       data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
     } else {
       data = QByteArray ((const char *)res.data (), (int)res.size ());
@@ -339,7 +343,13 @@ void MacroEditorSidePanel::set_debugging_on (bool on)
 
 QSize MacroEditorSidePanel::sizeHint () const
 {
-  return QSize (QFontMetrics (mp_text->font ()).width (QString::fromUtf8 ("12345")) + 3 * sidePanelMargin + m_breakpoint_pixmap.width (), 0);
+  int w;
+#if QT_VERSION >= 0x60000
+  w = QFontMetrics (mp_text->font ()).horizontalAdvance (QString::fromUtf8 ("12345"));
+#else
+  w = QFontMetrics (mp_text->font ()).width (QString::fromUtf8 ("12345"));
+#endif
+  return QSize (w + 3 * sidePanelMargin + m_breakpoint_pixmap.width (), 0);
 }
 
 void MacroEditorSidePanel::mousePressEvent (QMouseEvent *event)
@@ -498,7 +508,11 @@ MacroEditorPage::MacroEditorPage (QWidget * /*parent*/, MacroEditorHighlighters 
   hlayout->addWidget (mp_text);
 
   mp_text->setWordWrapMode(QTextOption::NoWrap);
+#if QT_VERSION >= 0x60000
+  mp_text->setTabStopDistance (m_ntab * QFontMetrics (mp_text->font ()).horizontalAdvance (QString::fromUtf8 ("x")));
+#else
   mp_text->setTabStopWidth (m_ntab * QFontMetrics (mp_text->font ()).width (QString::fromUtf8 ("x")));
+#endif
   m_is_modified = false;
  
   connect (mp_text, SIGNAL (textChanged ()), this, SLOT (text_changed ()));
@@ -514,7 +528,7 @@ MacroEditorPage::MacroEditorPage (QWidget * /*parent*/, MacroEditorHighlighters 
   mp_completer_popup = new QWidget (window (), Qt::ToolTip);
   mp_completer_popup->setWindowModality (Qt::NonModal);
   QHBoxLayout *ly = new QHBoxLayout (mp_completer_popup);
-  ly->setMargin (0);
+  ly->setContentsMargins (0, 0, 0, 0);
   mp_completer_list = new QListWidget (mp_completer_popup);
   ly->addWidget (mp_completer_list);
   mp_completer_popup->hide ();
@@ -955,7 +969,11 @@ void MacroEditorPage::set_ntab (int n)
 {
   if (n != m_ntab)  {
     m_ntab = n;
+#if QT_VERSION >= 0x60000
+    mp_text->setTabStopDistance (m_ntab * QFontMetrics (mp_text->font ()).horizontalAdvance (QString::fromUtf8 ("x")));
+#else
     mp_text->setTabStopWidth (m_ntab * QFontMetrics (mp_text->font ()).width (QString::fromUtf8 ("x")));
+#endif
   }
 }
 

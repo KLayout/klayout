@@ -30,7 +30,6 @@
 #include <QStatusTipEvent>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
-#include "gsiDeclQtGuiTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

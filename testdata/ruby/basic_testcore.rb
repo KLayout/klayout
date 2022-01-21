@@ -2803,35 +2803,230 @@ class Basic_TestClass < TestBase
 
   end
 
-  def test_74
+  def test_QByteArray
 
-    # binary strings
+    # QByteArray
 
-    qba = RBA::A::ia_cref_to_qba([ 17, 42, 0, 8 ])
-    assert_equal(qba.inspect, "\"\\x11*\\x00\\b\"")
-    assert_equal(RBA::A::qba_to_ia(qba), [ 17, 42, 0, 8 ])
-    assert_equal(RBA::A::qba_cref_to_ia(qba), [ 17, 42, 0, 8 ])
-    assert_equal(RBA::A::qba_cptr_to_ia(qba), [ 17, 42, 0, 8 ])
-    assert_equal(RBA::A::qba_ref_to_ia(qba), [ 17, 42, 0, 8 ])
-    assert_equal(RBA::A::qba_ptr_to_ia(qba), [ 17, 42, 0, 8 ])
+    if RBA::A.respond_to?(:ia_cref_to_qba)
 
-    qba = RBA::A::ia_cref_to_qba_cref([ 17, 42, 0, 8 ])
-    assert_equal(qba.inspect, "\"\\x11*\\x00\\b\"")
+      qba = RBA::A::ia_cref_to_qba([ 16, 42, 0, 8 ])
+      assert_equal(qba.inspect, "\"\\x10*\\x00\\b\"")
 
-    assert_equal(RBA::A::qba_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
+      assert_equal(RBA::A::qba_to_ia(qba), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qba_cref_to_ia(qba), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qba_cptr_to_ia(qba), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qba_ref_to_ia(qba), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qba_ptr_to_ia(qba), [ 16, 42, 0, 8 ])
 
-    ba = RBA::A::ia_cref_to_ba([ 17, 42, 0, 8 ])
-    assert_equal(ba.inspect, "\"\\x11*\\x00\\b\"")
-    assert_equal(RBA::A::ba_to_ia(ba), [ 17, 42, 0, 8 ])
-    assert_equal(RBA::A::ba_cref_to_ia(ba), [ 17, 42, 0, 8 ])
-    assert_equal(RBA::A::ba_cptr_to_ia(ba), [ 17, 42, 0, 8 ])
-    assert_equal(RBA::A::ba_ref_to_ia(ba), [ 17, 42, 0, 8 ])
-    assert_equal(RBA::A::ba_ptr_to_ia(ba), [ 17, 42, 0, 8 ])
+      qba = RBA::A::ia_cref_to_qba_cref([ 17, 42, 0, 8 ])
+      assert_equal(qba.inspect, "\"\\x11*\\x00\\b\"")
+      qba = RBA::A::ia_cref_to_qba_ref([ 18, 42, 0, 8 ])
+      assert_equal(qba.inspect, "\"\\x12*\\x00\\b\"")
+      qba = RBA::A::ia_cref_to_qba_cptr([ 19, 42, 0, 8 ])
+      assert_equal(qba.inspect, "\"\\x13*\\x00\\b\"")
+      qba = RBA::A::ia_cref_to_qba_ptr([ 20, 42, 0, 8 ])
+      assert_equal(qba.inspect, "\"\\x14*\\x00\\b\"")
+
+      assert_equal(RBA::A::qba_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
+
+    end
+
+  end
+
+  def test_QByteArrayView
+
+    # QByteArrayView
+
+    if RBA::A.respond_to?(:ia_cref_to_qbav)
+
+      qbav = RBA::A::ia_cref_to_qbav([ 16, 42, 0, 8 ])
+      assert_equal(qbav.inspect, "\"\\x10*\\x00\\b\"")
+
+      assert_equal(RBA::A::qbav_to_ia(qbav), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qbav_cref_to_ia(qbav), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qbav_cptr_to_ia(qbav), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qbav_ref_to_ia(qbav), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qbav_ptr_to_ia(qbav), [ 16, 42, 0, 8 ])
+
+      qbav = RBA::A::ia_cref_to_qbav_cref([ 17, 42, 0, 8 ])
+      assert_equal(qbav.inspect, "\"\\x11*\\x00\\b\"")
+      qbav = RBA::A::ia_cref_to_qbav_ref([ 18, 42, 0, 8 ])
+      assert_equal(qbav.inspect, "\"\\x12*\\x00\\b\"")
+      qbav = RBA::A::ia_cref_to_qbav_cptr([ 19, 42, 0, 8 ])
+      assert_equal(qbav.inspect, "\"\\x13*\\x00\\b\"")
+      qbav = RBA::A::ia_cref_to_qbav_ptr([ 20, 42, 0, 8 ])
+      assert_equal(qbav.inspect, "\"\\x14*\\x00\\b\"")
+
+      assert_equal(RBA::A::qbav_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
+
+    end
+
+  end
+
+  def test_QString
+
+    # QString
+
+    if RBA::A.respond_to?(:ia_cref_to_qs)
+
+      qs = RBA::A::ia_cref_to_qs([ 16, 42, 0, 8 ])
+      assert_equal(qs.inspect, "\"\\x10*\\x00\\b\"")
+
+      assert_equal(RBA::A::qs_to_ia(qs), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qs_cref_to_ia(qs), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qs_cptr_to_ia(qs), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qs_ref_to_ia(qs), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qs_ptr_to_ia(qs), [ 16, 42, 0, 8 ])
+
+      qs = RBA::A::ia_cref_to_qs_cref([ 17, 42, 0, 8 ])
+      assert_equal(qs.inspect, "\"\\x11*\\x00\\b\"")
+      qs = RBA::A::ia_cref_to_qs_ref([ 18, 42, 0, 8 ])
+      assert_equal(qs.inspect, "\"\\x12*\\x00\\b\"")
+      qs = RBA::A::ia_cref_to_qs_cptr([ 19, 42, 0, 8 ])
+      assert_equal(qs.inspect, "\"\\x13*\\x00\\b\"")
+      qs = RBA::A::ia_cref_to_qs_ptr([ 20, 42, 0, 8 ])
+      assert_equal(qs.inspect, "\"\\x14*\\x00\\b\"")
+
+      assert_equal(RBA::A::qs_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
+
+    end
+
+  end
+
+  def test_QLatin1String
+
+    # QLatin1String
+
+    if RBA::A.respond_to?(:ia_cref_to_ql1s)
+
+      ql1s = RBA::A::ia_cref_to_ql1s([ 16, 42, 0, 8 ])
+      assert_equal(ql1s.inspect, "\"\\x10*\\x00\\b\"")
+
+      assert_equal(RBA::A::ql1s_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::ql1s_cref_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::ql1s_cptr_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::ql1s_ref_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::ql1s_ptr_to_ia(ql1s), [ 16, 42, 0, 8 ])
+
+      ql1s = RBA::A::ia_cref_to_ql1s_cref([ 17, 42, 0, 8 ])
+      assert_equal(ql1s.inspect, "\"\\x11*\\x00\\b\"")
+      ql1s = RBA::A::ia_cref_to_ql1s_ref([ 18, 42, 0, 8 ])
+      assert_equal(ql1s.inspect, "\"\\x12*\\x00\\b\"")
+      ql1s = RBA::A::ia_cref_to_ql1s_cptr([ 19, 42, 0, 8 ])
+      assert_equal(ql1s.inspect, "\"\\x13*\\x00\\b\"")
+      ql1s = RBA::A::ia_cref_to_ql1s_ptr([ 20, 42, 0, 8 ])
+      assert_equal(ql1s.inspect, "\"\\x14*\\x00\\b\"")
+
+      assert_equal(RBA::A::ql1s_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
+
+    end
+
+  end
+
+  def test_QStringView
+
+    # QStringView
+
+    if RBA::A.respond_to?(:ia_cref_to_qsv)
+
+      qsv = RBA::A::ia_cref_to_qsv([ 16, 42, 0, 8 ])
+      assert_equal(qsv.inspect, "\"\\x10*\\x00\\b\"")
+
+      assert_equal(RBA::A::qsv_to_ia(qsv), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qsv_cref_to_ia(qsv), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qsv_cptr_to_ia(qsv), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qsv_ref_to_ia(qsv), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qsv_ptr_to_ia(qsv), [ 16, 42, 0, 8 ])
+
+      qsv = RBA::A::ia_cref_to_qsv_cref([ 17, 42, 0, 8 ])
+      assert_equal(qsv.inspect, "\"\\x11*\\x00\\b\"")
+      qsv = RBA::A::ia_cref_to_qsv_ref([ 18, 42, 0, 8 ])
+      assert_equal(qsv.inspect, "\"\\x12*\\x00\\b\"")
+      qsv = RBA::A::ia_cref_to_qsv_cptr([ 19, 42, 0, 8 ])
+      assert_equal(qsv.inspect, "\"\\x13*\\x00\\b\"")
+      qsv = RBA::A::ia_cref_to_qsv_ptr([ 20, 42, 0, 8 ])
+      assert_equal(qsv.inspect, "\"\\x14*\\x00\\b\"")
+
+      assert_equal(RBA::A::qsv_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
+
+    end
+
+  end
+
+  def test_binaryStrings
+
+    # binary strings (non-Qt)
+
+    ba = RBA::A::ia_cref_to_ba([ 16, 42, 1, 8 ])
+    assert_equal(ba.inspect, "\"\\x10*\\x01\\b\"")
+
+    assert_equal(RBA::A::ba_to_ia(ba), [ 16, 42, 1, 8 ])
+    assert_equal(RBA::A::ba_cref_to_ia(ba), [ 16, 42, 1, 8 ])
+    assert_equal(RBA::A::ba_cptr_to_ia(ba), [ 16, 42, 1, 8 ])
+    assert_equal(RBA::A::ba_ref_to_ia(ba), [ 16, 42, 1, 8 ])
+    assert_equal(RBA::A::ba_ptr_to_ia(ba), [ 16, 42, 1, 8 ])
 
     ba = RBA::A::ia_cref_to_ba_cref([ 17, 42, 0, 8 ])
     assert_equal(ba.inspect, "\"\\x11*\\x00\\b\"")
+    ba = RBA::A::ia_cref_to_ba_ref([ 18, 42, 0, 8 ])
+    assert_equal(ba.inspect, "\"\\x12*\\x00\\b\"")
+    ba = RBA::A::ia_cref_to_ba_cptr([ 19, 42, 0, 8 ])
+    assert_equal(ba.inspect, "\"\\x13*\\x00\\b\"")
+    ba = RBA::A::ia_cref_to_ba_ptr([ 20, 42, 0, 8 ])
+    assert_equal(ba.inspect, "\"\\x14*\\x00\\b\"")
 
     assert_equal(RBA::A::ba_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
+
+  end
+
+  def test_optional
+
+    if RBA::B.respond_to?(:int_to_optional)
+
+      assert_equal(RBA::B::int_to_optional(1, true), 1)
+      assert_equal(RBA::B::int_to_optional(1, false), nil)
+      assert_equal(RBA::B::int_to_optional_a(1, true).a1, 1)
+      assert_equal(RBA::B::int_to_optional_a(1, false), nil)
+
+      assert_equal(RBA::B::optional_to_int(1, -1), 1)
+      assert_equal(RBA::B::optional_to_int(nil, -1), -1)
+      assert_equal(RBA::B::optional_cref_to_int(2, -1), 2)
+      assert_equal(RBA::B::optional_cref_to_int(nil, -1), -1)
+      assert_equal(RBA::B::optional_ref_to_int(3, -1), 3)
+      assert_equal(RBA::B::optional_ref_to_int(nil, -1), -1)
+
+      assert_equal(RBA::B::optional_cptr_to_int(4, -1), 4)
+      assert_equal(RBA::B::optional_ptr_to_int(5, -1), 5)
+
+      assert_equal(RBA::B::optional_a_to_int(RBA::A::new(1), -1), 1)
+      assert_equal(RBA::B::optional_a_to_int(nil, -1), -1)
+      assert_equal(RBA::B::optional_a_cref_to_int(RBA::A::new(2), -1), 2)
+      assert_equal(RBA::B::optional_a_cref_to_int(nil, -1), -1)
+      assert_equal(RBA::B::optional_a_ref_to_int(RBA::A::new(3), -1), 3)
+      assert_equal(RBA::B::optional_a_ref_to_int(nil, -1), -1)
+
+      assert_equal(RBA::B::optional_a_cptr_to_int(RBA::A::new(4), -1), 4)
+      assert_equal(RBA::B::optional_a_ptr_to_int(RBA::A::new(5), -1), 5)
+
+    end
+
+  end
+
+  # Tests multi-base mixins (only constants and enums available)
+  def test_multiBaseMixins
+    
+    bb = RBA::BB::new  # base classes B1,B2,B3
+    bb.set1(17)                                          # B1
+    assert_equal(bb.get1, 17)                            # B1
+    bb.set1(21)                                          # B1
+    assert_equal(RBA::B3::E::E3B.to_i, 101)              # B3
+
+    assert_equal(bb.get1, 21)                            # B1
+    assert_equal(RBA::BB::C2, 17)                        # B2
+    assert_equal(RBA::BB::C3, -1)                        # B3
+    assert_equal(RBA::BB::E::E3B.to_i, 101)              # B3
+    assert_equal(bb.d3(RBA::BB::E::E3C, RBA::BB::E::E3A), -2)  # BB with B3 enums
+    assert_equal(bb.d3(RBA::BB::E::E3A, RBA::BB::E::E3C), 2)   # BB with B3 enums
 
   end
 

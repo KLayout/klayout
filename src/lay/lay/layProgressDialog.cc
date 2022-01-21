@@ -32,7 +32,7 @@ ProgressDialog::ProgressDialog (QWidget *parent, ProgressReporter *pr)
   : QDialog (parent), mp_pr (pr)
 {
   QVBoxLayout *vbl = new QVBoxLayout (this);
-  vbl->setMargin (0);
+  vbl->setContentsMargins (0, 0, 0, 0);
   vbl->setSpacing (0);
 
   mp_progress_widget = new ProgressWidget (pr, this, true);

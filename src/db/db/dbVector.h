@@ -328,21 +328,13 @@ public:
   double sq_double_length () const;
 
   /**
-   *  @brief Default conversion to string
-   */
-  std::string to_string () const
-  {
-    return to_string (0.0);
-  }
-
-  /**
    *  @brief String conversion
    *
    *  If dbu is set, it determines the factor by which the coordinates are multiplied to render
    *  micron units. In addition, a micron format is chosen for output of these coordinates.
    */
   std::string
-  to_string (double dbu) const 
+  to_string (double dbu = 0.0) const
   {
     if (dbu == 1.0) {
       return tl::db_to_string (m_x) + "," + tl::db_to_string (m_y);
@@ -713,15 +705,6 @@ struct from_double_vector
 
 namespace tl 
 {
-  template <class C>
-  struct type_traits <db::vector<C> > : public type_traits<void> 
-  {
-    typedef true_tag supports_extractor;
-    typedef true_tag supports_to_string;
-    typedef true_tag has_less_operator;
-    typedef true_tag has_equal_operator;
-  };
-
   template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Vector &p);
   template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DVector &p);
 

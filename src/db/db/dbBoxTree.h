@@ -74,14 +74,14 @@ private:
 /// @brief a helper class providing a linear-time iterator difference which is not necessarily 
 ///        the actual difference but monotonous
 
-template <class X>
-size_t box_tree_lt_difference (const tl::reuse_vector_const_iterator<X> &a, const tl::reuse_vector_const_iterator<X> &b)
+template <class X, bool R>
+size_t box_tree_lt_difference (const tl::reuse_vector_const_iterator<X, R> &a, const tl::reuse_vector_const_iterator<X, R> &b)
 {
   return a.index () - b.index ();
 }
 
-template <class X>
-size_t box_tree_lt_difference_ptr (const X *a, const tl::reuse_vector_const_iterator<X> &b)
+template <class X, bool R>
+size_t box_tree_lt_difference_ptr (const X *a, const tl::reuse_vector_const_iterator<X, R> &b)
 {
   return a - b.unsafe_target_addr ();
 }

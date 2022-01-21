@@ -786,8 +786,8 @@ public:
    *  we would probably create too much constness. Hence we use const_cast to convert it
    *  to a non-const one.
    */
-  template <class Obj>
-  Shape (const db::Shapes *shapes, const tl::reuse_vector_const_iterator<Obj> &tree_iter)
+  template <class Obj, bool R>
+  Shape (const db::Shapes *shapes, const tl::reuse_vector_const_iterator<Obj, R> &tree_iter)
     : mp_shapes (const_cast<db::Shapes *> (shapes)), m_with_props (false), m_stable (true)
   {
     typename Obj::tag tag = typename Obj::tag ();
@@ -800,8 +800,8 @@ public:
   /**
    *  @brief Construct as a proxy to a certain object given by an iterator
    */
-  template <class Obj>
-  Shape (db::Shapes *shapes, const tl::reuse_vector_const_iterator<Obj> &tree_iter)
+  template <class Obj, bool R>
+  Shape (db::Shapes *shapes, const tl::reuse_vector_const_iterator<Obj, R> &tree_iter)
     : mp_shapes (shapes), m_with_props (false), m_stable (true)
   {
     typename Obj::tag tag = typename Obj::tag ();
@@ -818,8 +818,8 @@ public:
    *  we would probably create too much constness. Hence we use const_cast to convert it
    *  to a non-const one.
    */
-  template <class Obj, class Trans>
-  Shape (const db::Shapes *shapes, const tl::reuse_vector_const_iterator<Obj> &tree_iter, const Trans &trans)
+  template <class Obj, bool R, class Trans>
+  Shape (const db::Shapes *shapes, const tl::reuse_vector_const_iterator<Obj, R> &tree_iter, const Trans &trans)
     : mp_shapes (const_cast<db::Shapes *> (shapes)), m_with_props (false), m_stable (true)
   {
     typename Obj::tag tag = typename Obj::tag ();
@@ -832,8 +832,8 @@ public:
   /**
    *  @brief Construct as a proxy to a certain object given by an iterator
    */
-  template <class Obj, class Trans>
-  Shape (db::Shapes *shapes, const tl::reuse_vector_const_iterator<Obj> &tree_iter, const Trans &trans)
+  template <class Obj, bool R, class Trans>
+  Shape (db::Shapes *shapes, const tl::reuse_vector_const_iterator<Obj, R> &tree_iter, const Trans &trans)
     : mp_shapes (shapes), m_with_props (false), m_stable (true)
   {
     typename Obj::tag tag = typename Obj::tag ();

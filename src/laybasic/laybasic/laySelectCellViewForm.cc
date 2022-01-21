@@ -61,11 +61,11 @@ void
 SelectCellViewForm::set_selection (int sel)
 {
   for (int i = 0; i < int (cvs_lb->count ()); ++i) {
-    cvs_lb->setItemSelected (cvs_lb->item (i), false);
+    cvs_lb->item (i)->setSelected (false);
   }
   if (sel >= 0 && sel < int (cvs_lb->count ())) {
     cvs_lb->setCurrentItem (cvs_lb->item (sel));
-    cvs_lb->setItemSelected (cvs_lb->item (sel), true);
+    cvs_lb->item (sel)->setSelected (true);
   }
 }
 
@@ -86,14 +86,14 @@ SelectCellViewForm::tell_cellview (const lay::CellView &cv)
 {
   cvs_lb->addItem (tl::to_qstring (cv->name ()));
   cvs_lb->setCurrentItem (0);
-  cvs_lb->setItemSelected (cvs_lb->item (0), true);
+  cvs_lb->item (0)->setSelected (true);
 }
 
 bool 
 SelectCellViewForm::all_selected () const
 {
   for (int i = 0; i < int (cvs_lb->count ()); ++i) {
-    if (! cvs_lb->isItemSelected (cvs_lb->item (i))) {
+    if (! cvs_lb->item (i)->isSelected ()) {
       return false;
     }
   }
@@ -106,7 +106,7 @@ SelectCellViewForm::selected_cellviews () const
   std::vector <int> res;
 
   for (int i = 0; i < int (cvs_lb->count ()); ++i) {
-    if (cvs_lb->isItemSelected (cvs_lb->item (i))) {
+    if (cvs_lb->item (i)->isSelected ()) {
       res.push_back (i);
     }
   }
@@ -118,7 +118,7 @@ int
 SelectCellViewForm::selected_cellview () const
 {
   for (int i = 0; i < int (cvs_lb->count ()); ++i) {
-    if (cvs_lb->isItemSelected (cvs_lb->item (i))) {
+    if (cvs_lb->item (i)->isSelected ()) {
       return i;
     }
   }

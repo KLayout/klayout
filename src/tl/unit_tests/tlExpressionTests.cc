@@ -569,25 +569,6 @@ EdgeClassClass::execute (const tl::ExpressionParserContext &context, tl::Variant
   }
 }
 
-namespace tl
-{
-
-template <>
-struct type_traits <Box> : public type_traits<void>
-{
-  typedef trivial_relocate_required relocate_requirements;
-  typedef true_tag supports_to_string;
-};
-
-template <>
-struct type_traits <Edge> : public type_traits<void>
-{
-  typedef trivial_relocate_required relocate_requirements;
-  typedef true_tag supports_to_string;
-};
-
-}
-
 // basics: custom objects
 TEST(1b) 
 {

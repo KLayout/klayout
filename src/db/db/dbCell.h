@@ -1144,16 +1144,5 @@ mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const 
 
 } // namespace db
 
-namespace tl
-{
-  /**
-   *  @brief Type traits 
-   */
-  template <> struct type_traits <db::Cell> : public type_traits<void> {
-    typedef tl::false_tag has_copy_constructor;
-    typedef tl::false_tag has_default_constructor;
-  };
-}
-
 #endif
 

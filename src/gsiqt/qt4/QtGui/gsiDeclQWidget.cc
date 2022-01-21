@@ -77,7 +77,6 @@
 #include <QWheelEvent>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
-#include "gsiDeclQtGuiTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------
@@ -4793,6 +4792,12 @@ gsi::Class<QObject> &qtdecl_QObject ();
 qt_gsi::QtNativeClass<QWidget> decl_QWidget (qtdecl_QObject (), "QtGui", "QWidget_Native",
   methods_QWidget (),
   "@hide\n@alias QWidget");
+
+//  Additional base classes
+
+gsi::Class<QPaintDevice> &qtdecl_QPaintDevice ();
+
+gsi::ClassExt<QWidget> base_class_QPaintDevice_in_QWidget (qtdecl_QPaintDevice ());
 
 GSI_QTGUI_PUBLIC gsi::Class<QWidget> &qtdecl_QWidget () { return decl_QWidget; }
 

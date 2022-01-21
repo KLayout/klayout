@@ -369,24 +369,6 @@ private:
   int m_layer_index_b;
 };
 
-}
-
-namespace tl
-{
-
-//  Disable copy and default ctor for layout query
-template <>
-struct type_traits<LayoutDiff>
-  : public type_traits<void>
-{
-  typedef false_tag has_copy_constructor;
-};
-
-}
-
-namespace gsi
-{
-
 static unsigned int f_silent () {
   return db::layout_diff::f_silent;
 }

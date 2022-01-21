@@ -29,9 +29,9 @@
 
 #include <QWindow>
 #include <QScreen>
+#include <QAccessibleInterface>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
-#include "gsiDeclQtGuiTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------
@@ -1827,7 +1827,7 @@ static void _init_f_tr_4013 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("s");
   decl->add_arg<const char * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("c", true, "__null");
+  static gsi::ArgSpecBase argspec_1 ("c", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("n", true, "-1");
   decl->add_arg<int > (argspec_2);
@@ -1839,7 +1839,7 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QWindow::tr (arg1, arg2, arg3));
 }
@@ -1852,7 +1852,7 @@ static void _init_f_trUtf8_4013 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("s");
   decl->add_arg<const char * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("c", true, "__null");
+  static gsi::ArgSpecBase argspec_1 ("c", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("n", true, "-1");
   decl->add_arg<int > (argspec_2);
@@ -1864,7 +1864,7 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (__null, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QWindow::trUtf8 (arg1, arg2, arg3));
 }
@@ -2057,6 +2057,12 @@ gsi::Class<QObject> &qtdecl_QObject ();
 qt_gsi::QtNativeClass<QWindow> decl_QWindow (qtdecl_QObject (), "QtGui", "QWindow_Native",
   methods_QWindow (),
   "@hide\n@alias QWindow");
+
+//  Additional base classes
+
+gsi::Class<QSurface> &qtdecl_QSurface ();
+
+gsi::ClassExt<QWindow> base_class_QSurface_in_QWindow (qtdecl_QSurface ());
 
 GSI_QTGUI_PUBLIC gsi::Class<QWindow> &qtdecl_QWindow () { return decl_QWindow; }
 

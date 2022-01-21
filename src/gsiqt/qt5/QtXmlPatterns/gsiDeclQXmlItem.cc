@@ -31,7 +31,6 @@
 #include <QXmlNodeModelIndex>
 #include "gsiQt.h"
 #include "gsiQtXmlPatternsCommon.h"
-#include "gsiDeclQtXmlPatternsTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

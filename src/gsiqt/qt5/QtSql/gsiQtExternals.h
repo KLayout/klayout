@@ -35,101 +35,53 @@
 
 class QSqlDatabase;
 
-namespace tl { template <> struct type_traits<QSqlDatabase> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTSQL_PUBLIC gsi::Class<QSqlDatabase> &qtdecl_QSqlDatabase (); }
 
 class QSqlDriver;
-
-namespace tl { template <> struct type_traits<QSqlDriver> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTSQL_PUBLIC gsi::Class<QSqlDriver> &qtdecl_QSqlDriver (); }
 
 class QSqlDriverCreatorBase;
 
-namespace tl { template <> struct type_traits<QSqlDriverCreatorBase> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTSQL_PUBLIC gsi::Class<QSqlDriverCreatorBase> &qtdecl_QSqlDriverCreatorBase (); }
 
 class QSqlError;
-
-namespace tl { template <> struct type_traits<QSqlError> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTSQL_PUBLIC gsi::Class<QSqlError> &qtdecl_QSqlError (); }
 
 class QSqlField;
 
-namespace tl { template <> struct type_traits<QSqlField> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTSQL_PUBLIC gsi::Class<QSqlField> &qtdecl_QSqlField (); }
 
 class QSqlIndex;
-
-namespace tl { template <> struct type_traits<QSqlIndex> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTSQL_PUBLIC gsi::Class<QSqlIndex> &qtdecl_QSqlIndex (); }
 
 class QSqlQuery;
 
-namespace tl { template <> struct type_traits<QSqlQuery> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTSQL_PUBLIC gsi::Class<QSqlQuery> &qtdecl_QSqlQuery (); }
 
 class QSqlQueryModel;
-
-namespace tl { template <> struct type_traits<QSqlQueryModel> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTSQL_PUBLIC gsi::Class<QSqlQueryModel> &qtdecl_QSqlQueryModel (); }
 
 class QSqlRecord;
 
-namespace tl { template <> struct type_traits<QSqlRecord> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTSQL_PUBLIC gsi::Class<QSqlRecord> &qtdecl_QSqlRecord (); }
 
 class QSqlRelation;
-
-namespace tl { template <> struct type_traits<QSqlRelation> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTSQL_PUBLIC gsi::Class<QSqlRelation> &qtdecl_QSqlRelation (); }
 
 class QSqlRelationalTableModel;
 
-namespace tl { template <> struct type_traits<QSqlRelationalTableModel> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTSQL_PUBLIC gsi::Class<QSqlRelationalTableModel> &qtdecl_QSqlRelationalTableModel (); }
 
 class QSqlResult;
 
-namespace tl { template <> struct type_traits<QSqlResult> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTSQL_PUBLIC gsi::Class<QSqlResult> &qtdecl_QSqlResult (); }
 
 class QSqlTableModel;
-
-namespace tl { template <> struct type_traits<QSqlTableModel> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTSQL_PUBLIC gsi::Class<QSqlTableModel> &qtdecl_QSqlTableModel (); }
 

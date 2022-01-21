@@ -92,6 +92,7 @@ SOURCES += \
   $$PWD/gsiDeclQMetaObject.cc \
   $$PWD/gsiDeclQMetaObject_Connection.cc \
   $$PWD/gsiDeclQMetaProperty.cc \
+  $$PWD/gsiDeclQMetaType.cc \
   $$PWD/gsiDeclQMimeData.cc \
   $$PWD/gsiDeclQMimeDatabase.cc \
   $$PWD/gsiDeclQMimeType.cc \

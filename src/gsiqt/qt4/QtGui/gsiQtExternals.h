@@ -35,2803 +35,1421 @@
 
 class QAbstractButton;
 
-namespace tl { template <> struct type_traits<QAbstractButton> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAbstractButton> &qtdecl_QAbstractButton (); }
 
 class QAbstractGraphicsShapeItem;
-
-namespace tl { template <> struct type_traits<QAbstractGraphicsShapeItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAbstractGraphicsShapeItem> &qtdecl_QAbstractGraphicsShapeItem (); }
 
 class QAbstractItemDelegate;
 
-namespace tl { template <> struct type_traits<QAbstractItemDelegate> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAbstractItemDelegate> &qtdecl_QAbstractItemDelegate (); }
 
 class QAbstractItemView;
-
-namespace tl { template <> struct type_traits<QAbstractItemView> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAbstractItemView> &qtdecl_QAbstractItemView (); }
 
 class QAbstractPageSetupDialog;
 
-namespace tl { template <> struct type_traits<QAbstractPageSetupDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAbstractPageSetupDialog> &qtdecl_QAbstractPageSetupDialog (); }
 
 class QAbstractPrintDialog;
-
-namespace tl { template <> struct type_traits<QAbstractPrintDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAbstractPrintDialog> &qtdecl_QAbstractPrintDialog (); }
 
 class QAbstractProxyModel;
 
-namespace tl { template <> struct type_traits<QAbstractProxyModel> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAbstractProxyModel> &qtdecl_QAbstractProxyModel (); }
 
 class QAbstractScrollArea;
-
-namespace tl { template <> struct type_traits<QAbstractScrollArea> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAbstractScrollArea> &qtdecl_QAbstractScrollArea (); }
 
 class QAbstractSlider;
 
-namespace tl { template <> struct type_traits<QAbstractSlider> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAbstractSlider> &qtdecl_QAbstractSlider (); }
 
 class QAbstractSpinBox;
-
-namespace tl { template <> struct type_traits<QAbstractSpinBox> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAbstractSpinBox> &qtdecl_QAbstractSpinBox (); }
 
 class QAbstractTextDocumentLayout;
 
-namespace tl { template <> struct type_traits<QAbstractTextDocumentLayout> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAbstractTextDocumentLayout> &qtdecl_QAbstractTextDocumentLayout (); }
 
 class QAbstractUndoItem;
-
-namespace tl { template <> struct type_traits<QAbstractUndoItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAbstractUndoItem> &qtdecl_QAbstractUndoItem (); }
 
 class QAccessible;
 
-namespace tl { template <> struct type_traits<QAccessible> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAccessible> &qtdecl_QAccessible (); }
 
 class QAccessibleApplication;
-
-namespace tl { template <> struct type_traits<QAccessibleApplication> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAccessibleApplication> &qtdecl_QAccessibleApplication (); }
 
 class QAccessibleEvent;
 
-namespace tl { template <> struct type_traits<QAccessibleEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAccessibleEvent> &qtdecl_QAccessibleEvent (); }
 
 class QAccessibleInterface;
-
-namespace tl { template <> struct type_traits<QAccessibleInterface> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAccessibleInterface> &qtdecl_QAccessibleInterface (); }
 
 class QAccessibleObject;
 
-namespace tl { template <> struct type_traits<QAccessibleObject> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-  typedef tl::false_tag has_public_destructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAccessibleObject> &qtdecl_QAccessibleObject (); }
 
 class QAccessibleWidget;
-
-namespace tl { template <> struct type_traits<QAccessibleWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-  typedef tl::false_tag has_public_destructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAccessibleWidget> &qtdecl_QAccessibleWidget (); }
 
 class QAction;
 
-namespace tl { template <> struct type_traits<QAction> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QAction> &qtdecl_QAction (); }
 
 class QActionEvent;
-
-namespace tl { template <> struct type_traits<QActionEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QActionEvent> &qtdecl_QActionEvent (); }
 
 class QActionGroup;
 
-namespace tl { template <> struct type_traits<QActionGroup> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QActionGroup> &qtdecl_QActionGroup (); }
 
 class QApplication;
-
-namespace tl { template <> struct type_traits<QApplication> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QApplication> &qtdecl_QApplication (); }
 
 class QBitmap;
 
-namespace tl { template <> struct type_traits<QBitmap> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QBitmap> &qtdecl_QBitmap (); }
 
 class QBoxLayout;
-
-namespace tl { template <> struct type_traits<QBoxLayout> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QBoxLayout> &qtdecl_QBoxLayout (); }
 
 class QBrush;
 
-namespace tl { template <> struct type_traits<QBrush> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QBrush> &qtdecl_QBrush (); }
 
 class QButtonGroup;
-
-namespace tl { template <> struct type_traits<QButtonGroup> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QButtonGroup> &qtdecl_QButtonGroup (); }
 
 class QCDEStyle;
 
-namespace tl { template <> struct type_traits<QCDEStyle> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QCDEStyle> &qtdecl_QCDEStyle (); }
 
 class QCalendarWidget;
-
-namespace tl { template <> struct type_traits<QCalendarWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QCalendarWidget> &qtdecl_QCalendarWidget (); }
 
 class QCheckBox;
 
-namespace tl { template <> struct type_traits<QCheckBox> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QCheckBox> &qtdecl_QCheckBox (); }
 
 class QCleanlooksStyle;
-
-namespace tl { template <> struct type_traits<QCleanlooksStyle> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QCleanlooksStyle> &qtdecl_QCleanlooksStyle (); }
 
 class QClipboard;
 
-namespace tl { template <> struct type_traits<QClipboard> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-  typedef tl::false_tag has_public_destructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QClipboard> &qtdecl_QClipboard (); }
 
 class QClipboardEvent;
-
-namespace tl { template <> struct type_traits<QClipboardEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QClipboardEvent> &qtdecl_QClipboardEvent (); }
 
 class QCloseEvent;
 
-namespace tl { template <> struct type_traits<QCloseEvent> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QCloseEvent> &qtdecl_QCloseEvent (); }
 
 class QColor;
-
-namespace tl { template <> struct type_traits<QColor> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QColor> &qtdecl_QColor (); }
 
 class QColorDialog;
 
-namespace tl { template <> struct type_traits<QColorDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QColorDialog> &qtdecl_QColorDialog (); }
 
 class QColormap;
-
-namespace tl { template <> struct type_traits<QColormap> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QColormap> &qtdecl_QColormap (); }
 
 class QColumnView;
 
-namespace tl { template <> struct type_traits<QColumnView> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QColumnView> &qtdecl_QColumnView (); }
 
 class QComboBox;
-
-namespace tl { template <> struct type_traits<QComboBox> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QComboBox> &qtdecl_QComboBox (); }
 
 class QCommandLinkButton;
 
-namespace tl { template <> struct type_traits<QCommandLinkButton> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QCommandLinkButton> &qtdecl_QCommandLinkButton (); }
 
 class QCommonStyle;
-
-namespace tl { template <> struct type_traits<QCommonStyle> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QCommonStyle> &qtdecl_QCommonStyle (); }
 
 class QCompleter;
 
-namespace tl { template <> struct type_traits<QCompleter> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QCompleter> &qtdecl_QCompleter (); }
 
 class QConicalGradient;
-
-namespace tl { template <> struct type_traits<QConicalGradient> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QConicalGradient> &qtdecl_QConicalGradient (); }
 
 class QContextMenuEvent;
 
-namespace tl { template <> struct type_traits<QContextMenuEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QContextMenuEvent> &qtdecl_QContextMenuEvent (); }
 
 class QCursor;
-
-namespace tl { template <> struct type_traits<QCursor> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QCursor> &qtdecl_QCursor (); }
 
 class QDataWidgetMapper;
 
-namespace tl { template <> struct type_traits<QDataWidgetMapper> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDataWidgetMapper> &qtdecl_QDataWidgetMapper (); }
 
 class QDateEdit;
-
-namespace tl { template <> struct type_traits<QDateEdit> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDateEdit> &qtdecl_QDateEdit (); }
 
 class QDateTimeEdit;
 
-namespace tl { template <> struct type_traits<QDateTimeEdit> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDateTimeEdit> &qtdecl_QDateTimeEdit (); }
 
 class QDesktopServices;
-
-namespace tl { template <> struct type_traits<QDesktopServices> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDesktopServices> &qtdecl_QDesktopServices (); }
 
 class QDesktopWidget;
 
-namespace tl { template <> struct type_traits<QDesktopWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDesktopWidget> &qtdecl_QDesktopWidget (); }
 
 class QDial;
-
-namespace tl { template <> struct type_traits<QDial> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDial> &qtdecl_QDial (); }
 
 class QDialog;
 
-namespace tl { template <> struct type_traits<QDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDialog> &qtdecl_QDialog (); }
 
 class QDialogButtonBox;
-
-namespace tl { template <> struct type_traits<QDialogButtonBox> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDialogButtonBox> &qtdecl_QDialogButtonBox (); }
 
 class QDirIterator;
 
-namespace tl { template <> struct type_traits<QDirIterator> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDirIterator> &qtdecl_QDirIterator (); }
 
 class QDirModel;
-
-namespace tl { template <> struct type_traits<QDirModel> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDirModel> &qtdecl_QDirModel (); }
 
 class QDockWidget;
 
-namespace tl { template <> struct type_traits<QDockWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDockWidget> &qtdecl_QDockWidget (); }
 
 class QDoubleSpinBox;
-
-namespace tl { template <> struct type_traits<QDoubleSpinBox> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDoubleSpinBox> &qtdecl_QDoubleSpinBox (); }
 
 class QDoubleValidator;
 
-namespace tl { template <> struct type_traits<QDoubleValidator> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDoubleValidator> &qtdecl_QDoubleValidator (); }
 
 class QDrag;
-
-namespace tl { template <> struct type_traits<QDrag> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDrag> &qtdecl_QDrag (); }
 
 class QDragEnterEvent;
 
-namespace tl { template <> struct type_traits<QDragEnterEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDragEnterEvent> &qtdecl_QDragEnterEvent (); }
 
 class QDragLeaveEvent;
-
-namespace tl { template <> struct type_traits<QDragLeaveEvent> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDragLeaveEvent> &qtdecl_QDragLeaveEvent (); }
 
 class QDragMoveEvent;
 
-namespace tl { template <> struct type_traits<QDragMoveEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDragMoveEvent> &qtdecl_QDragMoveEvent (); }
 
 class QDragResponseEvent;
-
-namespace tl { template <> struct type_traits<QDragResponseEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDragResponseEvent> &qtdecl_QDragResponseEvent (); }
 
 class QDropEvent;
 
-namespace tl { template <> struct type_traits<QDropEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QDropEvent> &qtdecl_QDropEvent (); }
 
 class QErrorMessage;
-
-namespace tl { template <> struct type_traits<QErrorMessage> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QErrorMessage> &qtdecl_QErrorMessage (); }
 
 class QFileDialog;
 
-namespace tl { template <> struct type_traits<QFileDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFileDialog> &qtdecl_QFileDialog (); }
 
 class QFileIconProvider;
-
-namespace tl { template <> struct type_traits<QFileIconProvider> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFileIconProvider> &qtdecl_QFileIconProvider (); }
 
 class QFileOpenEvent;
 
-namespace tl { template <> struct type_traits<QFileOpenEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFileOpenEvent> &qtdecl_QFileOpenEvent (); }
 
 class QFileSystemModel;
-
-namespace tl { template <> struct type_traits<QFileSystemModel> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFileSystemModel> &qtdecl_QFileSystemModel (); }
 
 class QFocusEvent;
 
-namespace tl { template <> struct type_traits<QFocusEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFocusEvent> &qtdecl_QFocusEvent (); }
 
 class QFocusFrame;
-
-namespace tl { template <> struct type_traits<QFocusFrame> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFocusFrame> &qtdecl_QFocusFrame (); }
 
 class QFont;
 
-namespace tl { template <> struct type_traits<QFont> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFont> &qtdecl_QFont (); }
 
 class QFontComboBox;
-
-namespace tl { template <> struct type_traits<QFontComboBox> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFontComboBox> &qtdecl_QFontComboBox (); }
 
 class QFontDatabase;
 
-namespace tl { template <> struct type_traits<QFontDatabase> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFontDatabase> &qtdecl_QFontDatabase (); }
 
 class QFontDialog;
-
-namespace tl { template <> struct type_traits<QFontDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFontDialog> &qtdecl_QFontDialog (); }
 
 class QFontInfo;
 
-namespace tl { template <> struct type_traits<QFontInfo> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFontInfo> &qtdecl_QFontInfo (); }
 
 class QFontMetrics;
-
-namespace tl { template <> struct type_traits<QFontMetrics> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFontMetrics> &qtdecl_QFontMetrics (); }
 
 class QFontMetricsF;
 
-namespace tl { template <> struct type_traits<QFontMetricsF> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFontMetricsF> &qtdecl_QFontMetricsF (); }
 
 class QFormLayout;
-
-namespace tl { template <> struct type_traits<QFormLayout> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFormLayout> &qtdecl_QFormLayout (); }
 
 class QFrame;
 
-namespace tl { template <> struct type_traits<QFrame> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QFrame> &qtdecl_QFrame (); }
 
 class QGesture;
-
-namespace tl { template <> struct type_traits<QGesture> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGesture> &qtdecl_QGesture (); }
 
 class QGestureEvent;
 
-namespace tl { template <> struct type_traits<QGestureEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGestureEvent> &qtdecl_QGestureEvent (); }
 
 class QGestureRecognizer;
-
-namespace tl { template <> struct type_traits<QGestureRecognizer> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGestureRecognizer> &qtdecl_QGestureRecognizer (); }
 
 class QGradient;
 
-namespace tl { template <> struct type_traits<QGradient> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGradient> &qtdecl_QGradient (); }
 
 class QGraphicsAnchor;
-
-namespace tl { template <> struct type_traits<QGraphicsAnchor> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsAnchor> &qtdecl_QGraphicsAnchor (); }
 
 class QGraphicsAnchorLayout;
 
-namespace tl { template <> struct type_traits<QGraphicsAnchorLayout> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsAnchorLayout> &qtdecl_QGraphicsAnchorLayout (); }
 
 class QGraphicsBlurEffect;
-
-namespace tl { template <> struct type_traits<QGraphicsBlurEffect> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsBlurEffect> &qtdecl_QGraphicsBlurEffect (); }
 
 class QGraphicsColorizeEffect;
 
-namespace tl { template <> struct type_traits<QGraphicsColorizeEffect> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsColorizeEffect> &qtdecl_QGraphicsColorizeEffect (); }
 
 class QGraphicsDropShadowEffect;
-
-namespace tl { template <> struct type_traits<QGraphicsDropShadowEffect> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsDropShadowEffect> &qtdecl_QGraphicsDropShadowEffect (); }
 
 class QGraphicsEffect;
 
-namespace tl { template <> struct type_traits<QGraphicsEffect> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsEffect> &qtdecl_QGraphicsEffect (); }
 
 class QGraphicsEllipseItem;
-
-namespace tl { template <> struct type_traits<QGraphicsEllipseItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsEllipseItem> &qtdecl_QGraphicsEllipseItem (); }
 
 class QGraphicsGridLayout;
 
-namespace tl { template <> struct type_traits<QGraphicsGridLayout> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsGridLayout> &qtdecl_QGraphicsGridLayout (); }
 
 class QGraphicsItem;
-
-namespace tl { template <> struct type_traits<QGraphicsItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsItem> &qtdecl_QGraphicsItem (); }
 
 class QGraphicsItemAnimation;
 
-namespace tl { template <> struct type_traits<QGraphicsItemAnimation> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsItemAnimation> &qtdecl_QGraphicsItemAnimation (); }
 
 class QGraphicsItemGroup;
-
-namespace tl { template <> struct type_traits<QGraphicsItemGroup> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsItemGroup> &qtdecl_QGraphicsItemGroup (); }
 
 class QGraphicsLayout;
 
-namespace tl { template <> struct type_traits<QGraphicsLayout> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsLayout> &qtdecl_QGraphicsLayout (); }
 
 class QGraphicsLayoutItem;
-
-namespace tl { template <> struct type_traits<QGraphicsLayoutItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsLayoutItem> &qtdecl_QGraphicsLayoutItem (); }
 
 class QGraphicsLineItem;
 
-namespace tl { template <> struct type_traits<QGraphicsLineItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsLineItem> &qtdecl_QGraphicsLineItem (); }
 
 class QGraphicsLinearLayout;
-
-namespace tl { template <> struct type_traits<QGraphicsLinearLayout> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsLinearLayout> &qtdecl_QGraphicsLinearLayout (); }
 
 class QGraphicsObject;
 
-namespace tl { template <> struct type_traits<QGraphicsObject> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsObject> &qtdecl_QGraphicsObject (); }
 
 class QGraphicsOpacityEffect;
-
-namespace tl { template <> struct type_traits<QGraphicsOpacityEffect> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsOpacityEffect> &qtdecl_QGraphicsOpacityEffect (); }
 
 class QGraphicsPathItem;
 
-namespace tl { template <> struct type_traits<QGraphicsPathItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsPathItem> &qtdecl_QGraphicsPathItem (); }
 
 class QGraphicsPixmapItem;
-
-namespace tl { template <> struct type_traits<QGraphicsPixmapItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsPixmapItem> &qtdecl_QGraphicsPixmapItem (); }
 
 class QGraphicsPolygonItem;
 
-namespace tl { template <> struct type_traits<QGraphicsPolygonItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsPolygonItem> &qtdecl_QGraphicsPolygonItem (); }
 
 class QGraphicsProxyWidget;
-
-namespace tl { template <> struct type_traits<QGraphicsProxyWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsProxyWidget> &qtdecl_QGraphicsProxyWidget (); }
 
 class QGraphicsRectItem;
 
-namespace tl { template <> struct type_traits<QGraphicsRectItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsRectItem> &qtdecl_QGraphicsRectItem (); }
 
 class QGraphicsRotation;
-
-namespace tl { template <> struct type_traits<QGraphicsRotation> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsRotation> &qtdecl_QGraphicsRotation (); }
 
 class QGraphicsScale;
 
-namespace tl { template <> struct type_traits<QGraphicsScale> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsScale> &qtdecl_QGraphicsScale (); }
 
 class QGraphicsScene;
-
-namespace tl { template <> struct type_traits<QGraphicsScene> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsScene> &qtdecl_QGraphicsScene (); }
 
 class QGraphicsSceneContextMenuEvent;
 
-namespace tl { template <> struct type_traits<QGraphicsSceneContextMenuEvent> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsSceneContextMenuEvent> &qtdecl_QGraphicsSceneContextMenuEvent (); }
 
 class QGraphicsSceneDragDropEvent;
-
-namespace tl { template <> struct type_traits<QGraphicsSceneDragDropEvent> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsSceneDragDropEvent> &qtdecl_QGraphicsSceneDragDropEvent (); }
 
 class QGraphicsSceneEvent;
 
-namespace tl { template <> struct type_traits<QGraphicsSceneEvent> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsSceneEvent> &qtdecl_QGraphicsSceneEvent (); }
 
 class QGraphicsSceneHelpEvent;
-
-namespace tl { template <> struct type_traits<QGraphicsSceneHelpEvent> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsSceneHelpEvent> &qtdecl_QGraphicsSceneHelpEvent (); }
 
 class QGraphicsSceneHoverEvent;
 
-namespace tl { template <> struct type_traits<QGraphicsSceneHoverEvent> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsSceneHoverEvent> &qtdecl_QGraphicsSceneHoverEvent (); }
 
 class QGraphicsSceneMouseEvent;
-
-namespace tl { template <> struct type_traits<QGraphicsSceneMouseEvent> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsSceneMouseEvent> &qtdecl_QGraphicsSceneMouseEvent (); }
 
 class QGraphicsSceneMoveEvent;
 
-namespace tl { template <> struct type_traits<QGraphicsSceneMoveEvent> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsSceneMoveEvent> &qtdecl_QGraphicsSceneMoveEvent (); }
 
 class QGraphicsSceneResizeEvent;
-
-namespace tl { template <> struct type_traits<QGraphicsSceneResizeEvent> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsSceneResizeEvent> &qtdecl_QGraphicsSceneResizeEvent (); }
 
 class QGraphicsSceneWheelEvent;
 
-namespace tl { template <> struct type_traits<QGraphicsSceneWheelEvent> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsSceneWheelEvent> &qtdecl_QGraphicsSceneWheelEvent (); }
 
 class QGraphicsSimpleTextItem;
-
-namespace tl { template <> struct type_traits<QGraphicsSimpleTextItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsSimpleTextItem> &qtdecl_QGraphicsSimpleTextItem (); }
 
 class QGraphicsTextItem;
 
-namespace tl { template <> struct type_traits<QGraphicsTextItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsTextItem> &qtdecl_QGraphicsTextItem (); }
 
 class QGraphicsTransform;
-
-namespace tl { template <> struct type_traits<QGraphicsTransform> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsTransform> &qtdecl_QGraphicsTransform (); }
 
 class QGraphicsView;
 
-namespace tl { template <> struct type_traits<QGraphicsView> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsView> &qtdecl_QGraphicsView (); }
 
 class QGraphicsWidget;
-
-namespace tl { template <> struct type_traits<QGraphicsWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGraphicsWidget> &qtdecl_QGraphicsWidget (); }
 
 class QGridLayout;
 
-namespace tl { template <> struct type_traits<QGridLayout> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGridLayout> &qtdecl_QGridLayout (); }
 
 class QGroupBox;
-
-namespace tl { template <> struct type_traits<QGroupBox> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QGroupBox> &qtdecl_QGroupBox (); }
 
 class QHBoxLayout;
 
-namespace tl { template <> struct type_traits<QHBoxLayout> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QHBoxLayout> &qtdecl_QHBoxLayout (); }
 
 class QHeaderView;
-
-namespace tl { template <> struct type_traits<QHeaderView> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QHeaderView> &qtdecl_QHeaderView (); }
 
 class QHelpEvent;
 
-namespace tl { template <> struct type_traits<QHelpEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QHelpEvent> &qtdecl_QHelpEvent (); }
 
 class QHideEvent;
-
-namespace tl { template <> struct type_traits<QHideEvent> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QHideEvent> &qtdecl_QHideEvent (); }
 
 class QHoverEvent;
 
-namespace tl { template <> struct type_traits<QHoverEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QHoverEvent> &qtdecl_QHoverEvent (); }
 
 class QIcon;
-
-namespace tl { template <> struct type_traits<QIcon> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QIcon> &qtdecl_QIcon (); }
 
 class QIconDragEvent;
 
-namespace tl { template <> struct type_traits<QIconDragEvent> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QIconDragEvent> &qtdecl_QIconDragEvent (); }
 
 class QIconEngine;
-
-namespace tl { template <> struct type_traits<QIconEngine> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QIconEngine> &qtdecl_QIconEngine (); }
 
 class QIconEnginePlugin;
 
-namespace tl { template <> struct type_traits<QIconEnginePlugin> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QIconEnginePlugin> &qtdecl_QIconEnginePlugin (); }
 
 class QIconEnginePluginV2;
-
-namespace tl { template <> struct type_traits<QIconEnginePluginV2> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QIconEnginePluginV2> &qtdecl_QIconEnginePluginV2 (); }
 
 class QIconEngineV2;
 
-namespace tl { template <> struct type_traits<QIconEngineV2> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QIconEngineV2> &qtdecl_QIconEngineV2 (); }
 
 class QImage;
-
-namespace tl { template <> struct type_traits<QImage> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QImage> &qtdecl_QImage (); }
 
 class QImageIOHandler;
 
-namespace tl { template <> struct type_traits<QImageIOHandler> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QImageIOHandler> &qtdecl_QImageIOHandler (); }
 
 class QImageIOPlugin;
-
-namespace tl { template <> struct type_traits<QImageIOPlugin> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QImageIOPlugin> &qtdecl_QImageIOPlugin (); }
 
 class QImageReader;
 
-namespace tl { template <> struct type_traits<QImageReader> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QImageReader> &qtdecl_QImageReader (); }
 
 class QImageTextKeyLang;
-
-namespace tl { template <> struct type_traits<QImageTextKeyLang> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QImageTextKeyLang> &qtdecl_QImageTextKeyLang (); }
 
 class QImageWriter;
 
-namespace tl { template <> struct type_traits<QImageWriter> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QImageWriter> &qtdecl_QImageWriter (); }
 
 class QInputContext;
-
-namespace tl { template <> struct type_traits<QInputContext> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QInputContext> &qtdecl_QInputContext (); }
 
 class QInputContextFactory;
 
-namespace tl { template <> struct type_traits<QInputContextFactory> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QInputContextFactory> &qtdecl_QInputContextFactory (); }
 
 class QInputContextPlugin;
-
-namespace tl { template <> struct type_traits<QInputContextPlugin> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QInputContextPlugin> &qtdecl_QInputContextPlugin (); }
 
 class QInputDialog;
 
-namespace tl { template <> struct type_traits<QInputDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QInputDialog> &qtdecl_QInputDialog (); }
 
 class QInputEvent;
-
-namespace tl { template <> struct type_traits<QInputEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QInputEvent> &qtdecl_QInputEvent (); }
 
 class QInputMethodEvent;
 
-namespace tl { template <> struct type_traits<QInputMethodEvent> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QInputMethodEvent> &qtdecl_QInputMethodEvent (); }
 
 class QIntValidator;
-
-namespace tl { template <> struct type_traits<QIntValidator> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QIntValidator> &qtdecl_QIntValidator (); }
 
 class QItemDelegate;
 
-namespace tl { template <> struct type_traits<QItemDelegate> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QItemDelegate> &qtdecl_QItemDelegate (); }
 
 class QItemEditorCreatorBase;
-
-namespace tl { template <> struct type_traits<QItemEditorCreatorBase> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QItemEditorCreatorBase> &qtdecl_QItemEditorCreatorBase (); }
 
 class QItemEditorFactory;
 
-namespace tl { template <> struct type_traits<QItemEditorFactory> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QItemEditorFactory> &qtdecl_QItemEditorFactory (); }
 
 class QItemSelection;
-
-namespace tl { template <> struct type_traits<QItemSelection> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QItemSelection> &qtdecl_QItemSelection (); }
 
 class QItemSelectionModel;
 
-namespace tl { template <> struct type_traits<QItemSelectionModel> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QItemSelectionModel> &qtdecl_QItemSelectionModel (); }
 
 class QItemSelectionRange;
-
-namespace tl { template <> struct type_traits<QItemSelectionRange> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QItemSelectionRange> &qtdecl_QItemSelectionRange (); }
 
 class QKeyEvent;
 
-namespace tl { template <> struct type_traits<QKeyEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QKeyEvent> &qtdecl_QKeyEvent (); }
 
 class QKeySequence;
-
-namespace tl { template <> struct type_traits<QKeySequence> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QKeySequence> &qtdecl_QKeySequence (); }
 
 class QLCDNumber;
 
-namespace tl { template <> struct type_traits<QLCDNumber> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QLCDNumber> &qtdecl_QLCDNumber (); }
 
 class QLabel;
-
-namespace tl { template <> struct type_traits<QLabel> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QLabel> &qtdecl_QLabel (); }
 
 class QLayout;
 
-namespace tl { template <> struct type_traits<QLayout> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QLayout> &qtdecl_QLayout (); }
 
 class QLayoutItem;
-
-namespace tl { template <> struct type_traits<QLayoutItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QLayoutItem> &qtdecl_QLayoutItem (); }
 
 class QLineEdit;
 
-namespace tl { template <> struct type_traits<QLineEdit> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QLineEdit> &qtdecl_QLineEdit (); }
 
 class QLinearGradient;
-
-namespace tl { template <> struct type_traits<QLinearGradient> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QLinearGradient> &qtdecl_QLinearGradient (); }
 
 class QListView;
 
-namespace tl { template <> struct type_traits<QListView> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QListView> &qtdecl_QListView (); }
 
 class QListWidget;
-
-namespace tl { template <> struct type_traits<QListWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QListWidget> &qtdecl_QListWidget (); }
 
 class QListWidgetItem;
 
-namespace tl { template <> struct type_traits<QListWidgetItem> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QListWidgetItem> &qtdecl_QListWidgetItem (); }
 
 class QMainWindow;
-
-namespace tl { template <> struct type_traits<QMainWindow> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QMainWindow> &qtdecl_QMainWindow (); }
 
 class QMatrix;
 
-namespace tl { template <> struct type_traits<QMatrix> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QMatrix> &qtdecl_QMatrix (); }
 
 class QMatrix4x4;
-
-namespace tl { template <> struct type_traits<QMatrix4x4> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QMatrix4x4> &qtdecl_QMatrix4x4 (); }
 
 class QMdiArea;
 
-namespace tl { template <> struct type_traits<QMdiArea> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QMdiArea> &qtdecl_QMdiArea (); }
 
 class QMdiSubWindow;
-
-namespace tl { template <> struct type_traits<QMdiSubWindow> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QMdiSubWindow> &qtdecl_QMdiSubWindow (); }
 
 class QMenu;
 
-namespace tl { template <> struct type_traits<QMenu> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QMenu> &qtdecl_QMenu (); }
 
 class QMenuBar;
-
-namespace tl { template <> struct type_traits<QMenuBar> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QMenuBar> &qtdecl_QMenuBar (); }
 
 class QMessageBox;
 
-namespace tl { template <> struct type_traits<QMessageBox> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QMessageBox> &qtdecl_QMessageBox (); }
 
 class QMimeSource;
-
-namespace tl { template <> struct type_traits<QMimeSource> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QMimeSource> &qtdecl_QMimeSource (); }
 
 class QMotifStyle;
 
-namespace tl { template <> struct type_traits<QMotifStyle> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QMotifStyle> &qtdecl_QMotifStyle (); }
 
 class QMouseEvent;
-
-namespace tl { template <> struct type_traits<QMouseEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QMouseEvent> &qtdecl_QMouseEvent (); }
 
 class QMoveEvent;
 
-namespace tl { template <> struct type_traits<QMoveEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QMoveEvent> &qtdecl_QMoveEvent (); }
 
 class QMovie;
-
-namespace tl { template <> struct type_traits<QMovie> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QMovie> &qtdecl_QMovie (); }
 
 class QPageSetupDialog;
 
-namespace tl { template <> struct type_traits<QPageSetupDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPageSetupDialog> &qtdecl_QPageSetupDialog (); }
 
 class QPaintDevice;
-
-namespace tl { template <> struct type_traits<QPaintDevice> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPaintDevice> &qtdecl_QPaintDevice (); }
 
 class QPaintEngine;
 
-namespace tl { template <> struct type_traits<QPaintEngine> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPaintEngine> &qtdecl_QPaintEngine (); }
 
 class QPaintEngineState;
-
-namespace tl { template <> struct type_traits<QPaintEngineState> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPaintEngineState> &qtdecl_QPaintEngineState (); }
 
 class QPaintEvent;
 
-namespace tl { template <> struct type_traits<QPaintEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPaintEvent> &qtdecl_QPaintEvent (); }
 
 class QPainter;
-
-namespace tl { template <> struct type_traits<QPainter> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPainter> &qtdecl_QPainter (); }
 
 class QPainterPath;
 
-namespace tl { template <> struct type_traits<QPainterPath> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPainterPath> &qtdecl_QPainterPath (); }
 
 class QPainterPathStroker;
-
-namespace tl { template <> struct type_traits<QPainterPathStroker> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPainterPathStroker> &qtdecl_QPainterPathStroker (); }
 
 class QPalette;
 
-namespace tl { template <> struct type_traits<QPalette> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPalette> &qtdecl_QPalette (); }
 
 class QPanGesture;
-
-namespace tl { template <> struct type_traits<QPanGesture> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPanGesture> &qtdecl_QPanGesture (); }
 
 class QPen;
 
-namespace tl { template <> struct type_traits<QPen> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPen> &qtdecl_QPen (); }
 
 class QPicture;
-
-namespace tl { template <> struct type_traits<QPicture> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPicture> &qtdecl_QPicture (); }
 
 class QPinchGesture;
 
-namespace tl { template <> struct type_traits<QPinchGesture> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPinchGesture> &qtdecl_QPinchGesture (); }
 
 class QPixmap;
-
-namespace tl { template <> struct type_traits<QPixmap> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPixmap> &qtdecl_QPixmap (); }
 
 class QPixmapCache;
 
-namespace tl { template <> struct type_traits<QPixmapCache> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPixmapCache> &qtdecl_QPixmapCache (); }
 
 class QPlainTextDocumentLayout;
-
-namespace tl { template <> struct type_traits<QPlainTextDocumentLayout> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPlainTextDocumentLayout> &qtdecl_QPlainTextDocumentLayout (); }
 
 class QPlainTextEdit;
 
-namespace tl { template <> struct type_traits<QPlainTextEdit> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPlainTextEdit> &qtdecl_QPlainTextEdit (); }
 
 class QPlastiqueStyle;
-
-namespace tl { template <> struct type_traits<QPlastiqueStyle> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPlastiqueStyle> &qtdecl_QPlastiqueStyle (); }
 
 class QPolygon;
 
-namespace tl { template <> struct type_traits<QPolygon> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPolygon> &qtdecl_QPolygon (); }
 
 class QPolygonF;
-
-namespace tl { template <> struct type_traits<QPolygonF> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPolygonF> &qtdecl_QPolygonF (); }
 
 class QPrintDialog;
 
-namespace tl { template <> struct type_traits<QPrintDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPrintDialog> &qtdecl_QPrintDialog (); }
 
 class QPrintEngine;
-
-namespace tl { template <> struct type_traits<QPrintEngine> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPrintEngine> &qtdecl_QPrintEngine (); }
 
 class QPrintPreviewDialog;
 
-namespace tl { template <> struct type_traits<QPrintPreviewDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPrintPreviewDialog> &qtdecl_QPrintPreviewDialog (); }
 
 class QPrintPreviewWidget;
-
-namespace tl { template <> struct type_traits<QPrintPreviewWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPrintPreviewWidget> &qtdecl_QPrintPreviewWidget (); }
 
 class QPrinter;
 
-namespace tl { template <> struct type_traits<QPrinter> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPrinter> &qtdecl_QPrinter (); }
 
 class QPrinterInfo;
-
-namespace tl { template <> struct type_traits<QPrinterInfo> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPrinterInfo> &qtdecl_QPrinterInfo (); }
 
 class QProgressBar;
 
-namespace tl { template <> struct type_traits<QProgressBar> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QProgressBar> &qtdecl_QProgressBar (); }
 
 class QProgressDialog;
-
-namespace tl { template <> struct type_traits<QProgressDialog> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QProgressDialog> &qtdecl_QProgressDialog (); }
 
 class QPushButton;
 
-namespace tl { template <> struct type_traits<QPushButton> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPushButton> &qtdecl_QPushButton (); }
 
 class QQuaternion;
-
-namespace tl { template <> struct type_traits<QQuaternion> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QQuaternion> &qtdecl_QQuaternion (); }
 
 class QRadialGradient;
 
-namespace tl { template <> struct type_traits<QRadialGradient> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QRadialGradient> &qtdecl_QRadialGradient (); }
 
 class QRadioButton;
-
-namespace tl { template <> struct type_traits<QRadioButton> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QRadioButton> &qtdecl_QRadioButton (); }
 
 class QRegExpValidator;
 
-namespace tl { template <> struct type_traits<QRegExpValidator> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QRegExpValidator> &qtdecl_QRegExpValidator (); }
 
 class QRegion;
-
-namespace tl { template <> struct type_traits<QRegion> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QRegion> &qtdecl_QRegion (); }
 
 class QResizeEvent;
 
-namespace tl { template <> struct type_traits<QResizeEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QResizeEvent> &qtdecl_QResizeEvent (); }
 
 class QRubberBand;
-
-namespace tl { template <> struct type_traits<QRubberBand> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QRubberBand> &qtdecl_QRubberBand (); }
 
 class QScrollArea;
 
-namespace tl { template <> struct type_traits<QScrollArea> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QScrollArea> &qtdecl_QScrollArea (); }
 
 class QScrollBar;
-
-namespace tl { template <> struct type_traits<QScrollBar> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QScrollBar> &qtdecl_QScrollBar (); }
 
 class QShortcut;
 
-namespace tl { template <> struct type_traits<QShortcut> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QShortcut> &qtdecl_QShortcut (); }
 
 class QShortcutEvent;
-
-namespace tl { template <> struct type_traits<QShortcutEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QShortcutEvent> &qtdecl_QShortcutEvent (); }
 
 class QShowEvent;
 
-namespace tl { template <> struct type_traits<QShowEvent> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QShowEvent> &qtdecl_QShowEvent (); }
 
 class QSizeGrip;
-
-namespace tl { template <> struct type_traits<QSizeGrip> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QSizeGrip> &qtdecl_QSizeGrip (); }
 
 class QSizePolicy;
 
-namespace tl { template <> struct type_traits<QSizePolicy> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QSizePolicy> &qtdecl_QSizePolicy (); }
 
 class QSlider;
-
-namespace tl { template <> struct type_traits<QSlider> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QSlider> &qtdecl_QSlider (); }
 
 class QSortFilterProxyModel;
 
-namespace tl { template <> struct type_traits<QSortFilterProxyModel> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QSortFilterProxyModel> &qtdecl_QSortFilterProxyModel (); }
 
 class QSound;
-
-namespace tl { template <> struct type_traits<QSound> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QSound> &qtdecl_QSound (); }
 
 class QSpacerItem;
 
-namespace tl { template <> struct type_traits<QSpacerItem> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QSpacerItem> &qtdecl_QSpacerItem (); }
 
 class QSpinBox;
-
-namespace tl { template <> struct type_traits<QSpinBox> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QSpinBox> &qtdecl_QSpinBox (); }
 
 class QSplashScreen;
 
-namespace tl { template <> struct type_traits<QSplashScreen> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QSplashScreen> &qtdecl_QSplashScreen (); }
 
 class QSplitter;
-
-namespace tl { template <> struct type_traits<QSplitter> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QSplitter> &qtdecl_QSplitter (); }
 
 class QSplitterHandle;
 
-namespace tl { template <> struct type_traits<QSplitterHandle> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QSplitterHandle> &qtdecl_QSplitterHandle (); }
 
 class QStackedLayout;
-
-namespace tl { template <> struct type_traits<QStackedLayout> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStackedLayout> &qtdecl_QStackedLayout (); }
 
 class QStackedWidget;
 
-namespace tl { template <> struct type_traits<QStackedWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStackedWidget> &qtdecl_QStackedWidget (); }
 
 class QStandardItem;
-
-namespace tl { template <> struct type_traits<QStandardItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStandardItem> &qtdecl_QStandardItem (); }
 
 class QStandardItemModel;
 
-namespace tl { template <> struct type_traits<QStandardItemModel> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStandardItemModel> &qtdecl_QStandardItemModel (); }
 
 class QStatusBar;
-
-namespace tl { template <> struct type_traits<QStatusBar> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStatusBar> &qtdecl_QStatusBar (); }
 
 class QStatusTipEvent;
 
-namespace tl { template <> struct type_traits<QStatusTipEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStatusTipEvent> &qtdecl_QStatusTipEvent (); }
 
 class QStringListModel;
-
-namespace tl { template <> struct type_traits<QStringListModel> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStringListModel> &qtdecl_QStringListModel (); }
 
 class QStyle;
 
-namespace tl { template <> struct type_traits<QStyle> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyle> &qtdecl_QStyle (); }
 
 class QStyleFactory;
-
-namespace tl { template <> struct type_traits<QStyleFactory> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleFactory> &qtdecl_QStyleFactory (); }
 
 class QStyleHintReturn;
 
-namespace tl { template <> struct type_traits<QStyleHintReturn> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleHintReturn> &qtdecl_QStyleHintReturn (); }
 
 class QStyleHintReturnMask;
-
-namespace tl { template <> struct type_traits<QStyleHintReturnMask> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleHintReturnMask> &qtdecl_QStyleHintReturnMask (); }
 
 class QStyleHintReturnVariant;
 
-namespace tl { template <> struct type_traits<QStyleHintReturnVariant> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleHintReturnVariant> &qtdecl_QStyleHintReturnVariant (); }
 
 class QStyleOption;
-
-namespace tl { template <> struct type_traits<QStyleOption> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOption> &qtdecl_QStyleOption (); }
 
 class QStyleOptionButton;
 
-namespace tl { template <> struct type_traits<QStyleOptionButton> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionButton> &qtdecl_QStyleOptionButton (); }
 
 class QStyleOptionComboBox;
-
-namespace tl { template <> struct type_traits<QStyleOptionComboBox> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionComboBox> &qtdecl_QStyleOptionComboBox (); }
 
 class QStyleOptionComplex;
 
-namespace tl { template <> struct type_traits<QStyleOptionComplex> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionComplex> &qtdecl_QStyleOptionComplex (); }
 
 class QStyleOptionDockWidget;
-
-namespace tl { template <> struct type_traits<QStyleOptionDockWidget> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionDockWidget> &qtdecl_QStyleOptionDockWidget (); }
 
 class QStyleOptionFocusRect;
 
-namespace tl { template <> struct type_traits<QStyleOptionFocusRect> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionFocusRect> &qtdecl_QStyleOptionFocusRect (); }
 
 class QStyleOptionFrame;
-
-namespace tl { template <> struct type_traits<QStyleOptionFrame> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionFrame> &qtdecl_QStyleOptionFrame (); }
 
 class QStyleOptionFrameV2;
 
-namespace tl { template <> struct type_traits<QStyleOptionFrameV2> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionFrameV2> &qtdecl_QStyleOptionFrameV2 (); }
 
 class QStyleOptionFrameV3;
-
-namespace tl { template <> struct type_traits<QStyleOptionFrameV3> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionFrameV3> &qtdecl_QStyleOptionFrameV3 (); }
 
 class QStyleOptionGraphicsItem;
 
-namespace tl { template <> struct type_traits<QStyleOptionGraphicsItem> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionGraphicsItem> &qtdecl_QStyleOptionGraphicsItem (); }
 
 class QStyleOptionGroupBox;
-
-namespace tl { template <> struct type_traits<QStyleOptionGroupBox> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionGroupBox> &qtdecl_QStyleOptionGroupBox (); }
 
 class QStyleOptionHeader;
 
-namespace tl { template <> struct type_traits<QStyleOptionHeader> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionHeader> &qtdecl_QStyleOptionHeader (); }
 
 class QStyleOptionMenuItem;
-
-namespace tl { template <> struct type_traits<QStyleOptionMenuItem> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionMenuItem> &qtdecl_QStyleOptionMenuItem (); }
 
 class QStyleOptionProgressBar;
 
-namespace tl { template <> struct type_traits<QStyleOptionProgressBar> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionProgressBar> &qtdecl_QStyleOptionProgressBar (); }
 
 class QStyleOptionProgressBarV2;
-
-namespace tl { template <> struct type_traits<QStyleOptionProgressBarV2> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionProgressBarV2> &qtdecl_QStyleOptionProgressBarV2 (); }
 
 class QStyleOptionQ3DockWindow;
 
-namespace tl { template <> struct type_traits<QStyleOptionQ3DockWindow> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionQ3DockWindow> &qtdecl_QStyleOptionQ3DockWindow (); }
 
 class QStyleOptionQ3ListView;
-
-namespace tl { template <> struct type_traits<QStyleOptionQ3ListView> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionQ3ListView> &qtdecl_QStyleOptionQ3ListView (); }
 
 class QStyleOptionQ3ListViewItem;
 
-namespace tl { template <> struct type_traits<QStyleOptionQ3ListViewItem> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionQ3ListViewItem> &qtdecl_QStyleOptionQ3ListViewItem (); }
 
 class QStyleOptionRubberBand;
-
-namespace tl { template <> struct type_traits<QStyleOptionRubberBand> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionRubberBand> &qtdecl_QStyleOptionRubberBand (); }
 
 class QStyleOptionSizeGrip;
 
-namespace tl { template <> struct type_traits<QStyleOptionSizeGrip> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionSizeGrip> &qtdecl_QStyleOptionSizeGrip (); }
 
 class QStyleOptionSlider;
-
-namespace tl { template <> struct type_traits<QStyleOptionSlider> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionSlider> &qtdecl_QStyleOptionSlider (); }
 
 class QStyleOptionSpinBox;
 
-namespace tl { template <> struct type_traits<QStyleOptionSpinBox> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionSpinBox> &qtdecl_QStyleOptionSpinBox (); }
 
 class QStyleOptionTab;
-
-namespace tl { template <> struct type_traits<QStyleOptionTab> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionTab> &qtdecl_QStyleOptionTab (); }
 
 class QStyleOptionTabBarBase;
 
-namespace tl { template <> struct type_traits<QStyleOptionTabBarBase> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionTabBarBase> &qtdecl_QStyleOptionTabBarBase (); }
 
 class QStyleOptionTabBarBaseV2;
-
-namespace tl { template <> struct type_traits<QStyleOptionTabBarBaseV2> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionTabBarBaseV2> &qtdecl_QStyleOptionTabBarBaseV2 (); }
 
 class QStyleOptionTabV2;
 
-namespace tl { template <> struct type_traits<QStyleOptionTabV2> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionTabV2> &qtdecl_QStyleOptionTabV2 (); }
 
 class QStyleOptionTabV3;
-
-namespace tl { template <> struct type_traits<QStyleOptionTabV3> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionTabV3> &qtdecl_QStyleOptionTabV3 (); }
 
 class QStyleOptionTabWidgetFrame;
 
-namespace tl { template <> struct type_traits<QStyleOptionTabWidgetFrame> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionTabWidgetFrame> &qtdecl_QStyleOptionTabWidgetFrame (); }
 
 class QStyleOptionTitleBar;
-
-namespace tl { template <> struct type_traits<QStyleOptionTitleBar> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionTitleBar> &qtdecl_QStyleOptionTitleBar (); }
 
 class QStyleOptionToolBar;
 
-namespace tl { template <> struct type_traits<QStyleOptionToolBar> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionToolBar> &qtdecl_QStyleOptionToolBar (); }
 
 class QStyleOptionToolBox;
-
-namespace tl { template <> struct type_traits<QStyleOptionToolBox> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionToolBox> &qtdecl_QStyleOptionToolBox (); }
 
 class QStyleOptionToolBoxV2;
 
-namespace tl { template <> struct type_traits<QStyleOptionToolBoxV2> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionToolBoxV2> &qtdecl_QStyleOptionToolBoxV2 (); }
 
 class QStyleOptionToolButton;
-
-namespace tl { template <> struct type_traits<QStyleOptionToolButton> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionToolButton> &qtdecl_QStyleOptionToolButton (); }
 
 class QStyleOptionViewItem;
 
-namespace tl { template <> struct type_traits<QStyleOptionViewItem> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionViewItem> &qtdecl_QStyleOptionViewItem (); }
 
 class QStyleOptionViewItemV2;
-
-namespace tl { template <> struct type_traits<QStyleOptionViewItemV2> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionViewItemV2> &qtdecl_QStyleOptionViewItemV2 (); }
 
 class QStyleOptionViewItemV3;
 
-namespace tl { template <> struct type_traits<QStyleOptionViewItemV3> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionViewItemV3> &qtdecl_QStyleOptionViewItemV3 (); }
 
 class QStyleOptionViewItemV4;
-
-namespace tl { template <> struct type_traits<QStyleOptionViewItemV4> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyleOptionViewItemV4> &qtdecl_QStyleOptionViewItemV4 (); }
 
 class QStylePainter;
 
-namespace tl { template <> struct type_traits<QStylePainter> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStylePainter> &qtdecl_QStylePainter (); }
 
 class QStylePlugin;
-
-namespace tl { template <> struct type_traits<QStylePlugin> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStylePlugin> &qtdecl_QStylePlugin (); }
 
 class QStyledItemDelegate;
 
-namespace tl { template <> struct type_traits<QStyledItemDelegate> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QStyledItemDelegate> &qtdecl_QStyledItemDelegate (); }
 
 class QSwipeGesture;
-
-namespace tl { template <> struct type_traits<QSwipeGesture> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QSwipeGesture> &qtdecl_QSwipeGesture (); }
 
 class QSyntaxHighlighter;
 
-namespace tl { template <> struct type_traits<QSyntaxHighlighter> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QSyntaxHighlighter> &qtdecl_QSyntaxHighlighter (); }
 
 class QSystemTrayIcon;
-
-namespace tl { template <> struct type_traits<QSystemTrayIcon> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QSystemTrayIcon> &qtdecl_QSystemTrayIcon (); }
 
 class QTabBar;
 
-namespace tl { template <> struct type_traits<QTabBar> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTabBar> &qtdecl_QTabBar (); }
 
 class QTabWidget;
-
-namespace tl { template <> struct type_traits<QTabWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTabWidget> &qtdecl_QTabWidget (); }
 
 class QTableView;
 
-namespace tl { template <> struct type_traits<QTableView> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTableView> &qtdecl_QTableView (); }
 
 class QTableWidget;
-
-namespace tl { template <> struct type_traits<QTableWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTableWidget> &qtdecl_QTableWidget (); }
 
 class QTableWidgetItem;
 
-namespace tl { template <> struct type_traits<QTableWidgetItem> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTableWidgetItem> &qtdecl_QTableWidgetItem (); }
 
 class QTableWidgetSelectionRange;
-
-namespace tl { template <> struct type_traits<QTableWidgetSelectionRange> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTableWidgetSelectionRange> &qtdecl_QTableWidgetSelectionRange (); }
 
 class QTabletEvent;
 
-namespace tl { template <> struct type_traits<QTabletEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTabletEvent> &qtdecl_QTabletEvent (); }
 
 class QTapAndHoldGesture;
-
-namespace tl { template <> struct type_traits<QTapAndHoldGesture> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTapAndHoldGesture> &qtdecl_QTapAndHoldGesture (); }
 
 class QTapGesture;
 
-namespace tl { template <> struct type_traits<QTapGesture> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTapGesture> &qtdecl_QTapGesture (); }
 
 class QTextBlock;
-
-namespace tl { template <> struct type_traits<QTextBlock> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextBlock> &qtdecl_QTextBlock (); }
 
 class QTextBlockFormat;
 
-namespace tl { template <> struct type_traits<QTextBlockFormat> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextBlockFormat> &qtdecl_QTextBlockFormat (); }
 
 class QTextBlockGroup;
-
-namespace tl { template <> struct type_traits<QTextBlockGroup> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-  typedef tl::false_tag has_public_destructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextBlockGroup> &qtdecl_QTextBlockGroup (); }
 
 class QTextBlockUserData;
 
-namespace tl { template <> struct type_traits<QTextBlockUserData> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextBlockUserData> &qtdecl_QTextBlockUserData (); }
 
 class QTextBrowser;
-
-namespace tl { template <> struct type_traits<QTextBrowser> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextBrowser> &qtdecl_QTextBrowser (); }
 
 class QTextCharFormat;
 
-namespace tl { template <> struct type_traits<QTextCharFormat> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextCharFormat> &qtdecl_QTextCharFormat (); }
 
 class QTextCursor;
-
-namespace tl { template <> struct type_traits<QTextCursor> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextCursor> &qtdecl_QTextCursor (); }
 
 class QTextDocument;
 
-namespace tl { template <> struct type_traits<QTextDocument> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextDocument> &qtdecl_QTextDocument (); }
 
 class QTextDocumentFragment;
-
-namespace tl { template <> struct type_traits<QTextDocumentFragment> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextDocumentFragment> &qtdecl_QTextDocumentFragment (); }
 
 class QTextDocumentWriter;
 
-namespace tl { template <> struct type_traits<QTextDocumentWriter> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextDocumentWriter> &qtdecl_QTextDocumentWriter (); }
 
 class QTextEdit;
-
-namespace tl { template <> struct type_traits<QTextEdit> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextEdit> &qtdecl_QTextEdit (); }
 
 class QTextFormat;
 
-namespace tl { template <> struct type_traits<QTextFormat> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextFormat> &qtdecl_QTextFormat (); }
 
 class QTextFragment;
-
-namespace tl { template <> struct type_traits<QTextFragment> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextFragment> &qtdecl_QTextFragment (); }
 
 class QTextFrame;
 
-namespace tl { template <> struct type_traits<QTextFrame> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextFrame> &qtdecl_QTextFrame (); }
 
 class QTextFrameFormat;
-
-namespace tl { template <> struct type_traits<QTextFrameFormat> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextFrameFormat> &qtdecl_QTextFrameFormat (); }
 
 class QTextImageFormat;
 
-namespace tl { template <> struct type_traits<QTextImageFormat> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextImageFormat> &qtdecl_QTextImageFormat (); }
 
 class QTextInlineObject;
-
-namespace tl { template <> struct type_traits<QTextInlineObject> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextInlineObject> &qtdecl_QTextInlineObject (); }
 
 class QTextItem;
 
-namespace tl { template <> struct type_traits<QTextItem> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextItem> &qtdecl_QTextItem (); }
 
 class QTextLayout;
-
-namespace tl { template <> struct type_traits<QTextLayout> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextLayout> &qtdecl_QTextLayout (); }
 
 class QTextLength;
 
-namespace tl { template <> struct type_traits<QTextLength> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextLength> &qtdecl_QTextLength (); }
 
 class QTextLine;
-
-namespace tl { template <> struct type_traits<QTextLine> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextLine> &qtdecl_QTextLine (); }
 
 class QTextList;
 
-namespace tl { template <> struct type_traits<QTextList> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextList> &qtdecl_QTextList (); }
 
 class QTextListFormat;
-
-namespace tl { template <> struct type_traits<QTextListFormat> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextListFormat> &qtdecl_QTextListFormat (); }
 
 class QTextObject;
 
-namespace tl { template <> struct type_traits<QTextObject> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-  typedef tl::false_tag has_public_destructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextObject> &qtdecl_QTextObject (); }
 
 class QTextObjectInterface;
-
-namespace tl { template <> struct type_traits<QTextObjectInterface> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextObjectInterface> &qtdecl_QTextObjectInterface (); }
 
 class QTextOption;
 
-namespace tl { template <> struct type_traits<QTextOption> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextOption> &qtdecl_QTextOption (); }
 
 class QTextTable;
-
-namespace tl { template <> struct type_traits<QTextTable> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextTable> &qtdecl_QTextTable (); }
 
 class QTextTableCell;
 
-namespace tl { template <> struct type_traits<QTextTableCell> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextTableCell> &qtdecl_QTextTableCell (); }
 
 class QTextTableCellFormat;
-
-namespace tl { template <> struct type_traits<QTextTableCellFormat> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextTableCellFormat> &qtdecl_QTextTableCellFormat (); }
 
 class QTextTableFormat;
 
-namespace tl { template <> struct type_traits<QTextTableFormat> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTextTableFormat> &qtdecl_QTextTableFormat (); }
 
 class QTimeEdit;
-
-namespace tl { template <> struct type_traits<QTimeEdit> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTimeEdit> &qtdecl_QTimeEdit (); }
 
 class QToolBar;
 
-namespace tl { template <> struct type_traits<QToolBar> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QToolBar> &qtdecl_QToolBar (); }
 
 class QToolBarChangeEvent;
-
-namespace tl { template <> struct type_traits<QToolBarChangeEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QToolBarChangeEvent> &qtdecl_QToolBarChangeEvent (); }
 
 class QToolBox;
 
-namespace tl { template <> struct type_traits<QToolBox> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QToolBox> &qtdecl_QToolBox (); }
 
 class QToolButton;
-
-namespace tl { template <> struct type_traits<QToolButton> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QToolButton> &qtdecl_QToolButton (); }
 
 class QToolTip;
 
-namespace tl { template <> struct type_traits<QToolTip> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QToolTip> &qtdecl_QToolTip (); }
 
 class QTouchEvent;
-
-namespace tl { template <> struct type_traits<QTouchEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTouchEvent> &qtdecl_QTouchEvent (); }
 
 class QTransform;
 
-namespace tl { template <> struct type_traits<QTransform> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTransform> &qtdecl_QTransform (); }
 
 class QTreeView;
-
-namespace tl { template <> struct type_traits<QTreeView> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTreeView> &qtdecl_QTreeView (); }
 
 class QTreeWidget;
 
-namespace tl { template <> struct type_traits<QTreeWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTreeWidget> &qtdecl_QTreeWidget (); }
 
 class QTreeWidgetItem;
-
-namespace tl { template <> struct type_traits<QTreeWidgetItem> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTreeWidgetItem> &qtdecl_QTreeWidgetItem (); }
 
 class QTreeWidgetItemIterator;
 
-namespace tl { template <> struct type_traits<QTreeWidgetItemIterator> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QTreeWidgetItemIterator> &qtdecl_QTreeWidgetItemIterator (); }
 
 class QUndoCommand;
-
-namespace tl { template <> struct type_traits<QUndoCommand> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QUndoCommand> &qtdecl_QUndoCommand (); }
 
 class QUndoGroup;
 
-namespace tl { template <> struct type_traits<QUndoGroup> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QUndoGroup> &qtdecl_QUndoGroup (); }
 
 class QUndoStack;
-
-namespace tl { template <> struct type_traits<QUndoStack> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QUndoStack> &qtdecl_QUndoStack (); }
 
 class QUndoView;
 
-namespace tl { template <> struct type_traits<QUndoView> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QUndoView> &qtdecl_QUndoView (); }
 
 class QUnixPrintWidget;
-
-namespace tl { template <> struct type_traits<QUnixPrintWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QUnixPrintWidget> &qtdecl_QUnixPrintWidget (); }
 
 class QVBoxLayout;
 
-namespace tl { template <> struct type_traits<QVBoxLayout> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QVBoxLayout> &qtdecl_QVBoxLayout (); }
 
 class QValidator;
-
-namespace tl { template <> struct type_traits<QValidator> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QValidator> &qtdecl_QValidator (); }
 
 class QVector2D;
 
-namespace tl { template <> struct type_traits<QVector2D> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QVector2D> &qtdecl_QVector2D (); }
 
 class QVector3D;
-
-namespace tl { template <> struct type_traits<QVector3D> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QVector3D> &qtdecl_QVector3D (); }
 
 class QVector4D;
 
-namespace tl { template <> struct type_traits<QVector4D> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QVector4D> &qtdecl_QVector4D (); }
 
 class QWhatsThis;
-
-namespace tl { template <> struct type_traits<QWhatsThis> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QWhatsThis> &qtdecl_QWhatsThis (); }
 
 class QWhatsThisClickedEvent;
 
-namespace tl { template <> struct type_traits<QWhatsThisClickedEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QWhatsThisClickedEvent> &qtdecl_QWhatsThisClickedEvent (); }
 
 class QWheelEvent;
-
-namespace tl { template <> struct type_traits<QWheelEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QWheelEvent> &qtdecl_QWheelEvent (); }
 
 class QWidget;
 
-namespace tl { template <> struct type_traits<QWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QWidget> &qtdecl_QWidget (); }
 
 class QWidgetAction;
-
-namespace tl { template <> struct type_traits<QWidgetAction> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QWidgetAction> &qtdecl_QWidgetAction (); }
 
 class QWidgetItem;
 
-namespace tl { template <> struct type_traits<QWidgetItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QWidgetItem> &qtdecl_QWidgetItem (); }
 
 class QWindowStateChangeEvent;
-
-namespace tl { template <> struct type_traits<QWindowStateChangeEvent> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QWindowStateChangeEvent> &qtdecl_QWindowStateChangeEvent (); }
 
 class QWindowsStyle;
 
-namespace tl { template <> struct type_traits<QWindowsStyle> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QWindowsStyle> &qtdecl_QWindowsStyle (); }
 
 class QWizard;
 
-namespace tl { template <> struct type_traits<QWizard> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QWizard> &qtdecl_QWizard (); }
 
 class QWizardPage;
-
-namespace tl { template <> struct type_traits<QWizardPage> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QWizardPage> &qtdecl_QWizardPage (); }
 

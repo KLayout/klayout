@@ -35,787 +35,369 @@
 
 class QAbstractAudioDeviceInfo;
 
-namespace tl { template <> struct type_traits<QAbstractAudioDeviceInfo> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAbstractAudioDeviceInfo> &qtdecl_QAbstractAudioDeviceInfo (); }
 
 class QAbstractAudioInput;
-
-namespace tl { template <> struct type_traits<QAbstractAudioInput> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAbstractAudioInput> &qtdecl_QAbstractAudioInput (); }
 
 class QAbstractAudioOutput;
 
-namespace tl { template <> struct type_traits<QAbstractAudioOutput> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAbstractAudioOutput> &qtdecl_QAbstractAudioOutput (); }
 
 class QAbstractVideoBuffer;
-
-namespace tl { template <> struct type_traits<QAbstractVideoBuffer> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAbstractVideoBuffer> &qtdecl_QAbstractVideoBuffer (); }
 
 class QAbstractVideoFilter;
 
-namespace tl { template <> struct type_traits<QAbstractVideoFilter> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAbstractVideoFilter> &qtdecl_QAbstractVideoFilter (); }
 
 class QAbstractVideoSurface;
-
-namespace tl { template <> struct type_traits<QAbstractVideoSurface> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAbstractVideoSurface> &qtdecl_QAbstractVideoSurface (); }
 
 class QAudioBuffer;
 
-namespace tl { template <> struct type_traits<QAudioBuffer> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioBuffer> &qtdecl_QAudioBuffer (); }
 
 class QAudioDecoder;
-
-namespace tl { template <> struct type_traits<QAudioDecoder> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioDecoder> &qtdecl_QAudioDecoder (); }
 
 class QAudioDecoderControl;
 
-namespace tl { template <> struct type_traits<QAudioDecoderControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioDecoderControl> &qtdecl_QAudioDecoderControl (); }
 
 class QAudioDeviceInfo;
-
-namespace tl { template <> struct type_traits<QAudioDeviceInfo> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioDeviceInfo> &qtdecl_QAudioDeviceInfo (); }
 
 class QAudioEncoderSettings;
 
-namespace tl { template <> struct type_traits<QAudioEncoderSettings> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioEncoderSettings> &qtdecl_QAudioEncoderSettings (); }
 
 class QAudioEncoderSettingsControl;
-
-namespace tl { template <> struct type_traits<QAudioEncoderSettingsControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioEncoderSettingsControl> &qtdecl_QAudioEncoderSettingsControl (); }
 
 class QAudioFormat;
 
-namespace tl { template <> struct type_traits<QAudioFormat> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioFormat> &qtdecl_QAudioFormat (); }
 
 class QAudioInput;
-
-namespace tl { template <> struct type_traits<QAudioInput> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioInput> &qtdecl_QAudioInput (); }
 
 class QAudioInputSelectorControl;
 
-namespace tl { template <> struct type_traits<QAudioInputSelectorControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioInputSelectorControl> &qtdecl_QAudioInputSelectorControl (); }
 
 class QAudioOutput;
-
-namespace tl { template <> struct type_traits<QAudioOutput> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioOutput> &qtdecl_QAudioOutput (); }
 
 class QAudioOutputSelectorControl;
 
-namespace tl { template <> struct type_traits<QAudioOutputSelectorControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioOutputSelectorControl> &qtdecl_QAudioOutputSelectorControl (); }
 
 class QAudioProbe;
-
-namespace tl { template <> struct type_traits<QAudioProbe> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioProbe> &qtdecl_QAudioProbe (); }
 
 class QAudioRecorder;
 
-namespace tl { template <> struct type_traits<QAudioRecorder> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioRecorder> &qtdecl_QAudioRecorder (); }
 
 struct QAudioSystemFactoryInterface;
-
-namespace tl { template <> struct type_traits<QAudioSystemFactoryInterface> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioSystemFactoryInterface> &qtdecl_QAudioSystemFactoryInterface (); }
 
 class QAudioSystemPlugin;
 
-namespace tl { template <> struct type_traits<QAudioSystemPlugin> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioSystemPlugin> &qtdecl_QAudioSystemPlugin (); }
 
 class QCamera;
-
-namespace tl { template <> struct type_traits<QCamera> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCamera> &qtdecl_QCamera (); }
 
 class QCameraCaptureBufferFormatControl;
 
-namespace tl { template <> struct type_traits<QCameraCaptureBufferFormatControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraCaptureBufferFormatControl> &qtdecl_QCameraCaptureBufferFormatControl (); }
 
 class QCameraCaptureDestinationControl;
-
-namespace tl { template <> struct type_traits<QCameraCaptureDestinationControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraCaptureDestinationControl> &qtdecl_QCameraCaptureDestinationControl (); }
 
 class QCameraControl;
 
-namespace tl { template <> struct type_traits<QCameraControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraControl> &qtdecl_QCameraControl (); }
 
 class QCameraExposure;
-
-namespace tl { template <> struct type_traits<QCameraExposure> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-  typedef tl::false_tag has_public_destructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraExposure> &qtdecl_QCameraExposure (); }
 
 class QCameraExposureControl;
 
-namespace tl { template <> struct type_traits<QCameraExposureControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraExposureControl> &qtdecl_QCameraExposureControl (); }
 
 class QCameraFeedbackControl;
-
-namespace tl { template <> struct type_traits<QCameraFeedbackControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraFeedbackControl> &qtdecl_QCameraFeedbackControl (); }
 
 class QCameraFlashControl;
 
-namespace tl { template <> struct type_traits<QCameraFlashControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraFlashControl> &qtdecl_QCameraFlashControl (); }
 
 class QCameraFocus;
-
-namespace tl { template <> struct type_traits<QCameraFocus> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-  typedef tl::false_tag has_public_destructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraFocus> &qtdecl_QCameraFocus (); }
 
 class QCameraFocusControl;
 
-namespace tl { template <> struct type_traits<QCameraFocusControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraFocusControl> &qtdecl_QCameraFocusControl (); }
 
 class QCameraFocusZone;
-
-namespace tl { template <> struct type_traits<QCameraFocusZone> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraFocusZone> &qtdecl_QCameraFocusZone (); }
 
 class QCameraImageCapture;
 
-namespace tl { template <> struct type_traits<QCameraImageCapture> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraImageCapture> &qtdecl_QCameraImageCapture (); }
 
 class QCameraImageCaptureControl;
-
-namespace tl { template <> struct type_traits<QCameraImageCaptureControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraImageCaptureControl> &qtdecl_QCameraImageCaptureControl (); }
 
 class QCameraImageProcessing;
 
-namespace tl { template <> struct type_traits<QCameraImageProcessing> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-  typedef tl::false_tag has_public_destructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraImageProcessing> &qtdecl_QCameraImageProcessing (); }
 
 class QCameraImageProcessingControl;
-
-namespace tl { template <> struct type_traits<QCameraImageProcessingControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraImageProcessingControl> &qtdecl_QCameraImageProcessingControl (); }
 
 class QCameraInfo;
 
-namespace tl { template <> struct type_traits<QCameraInfo> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraInfo> &qtdecl_QCameraInfo (); }
 
 class QCameraInfoControl;
-
-namespace tl { template <> struct type_traits<QCameraInfoControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraInfoControl> &qtdecl_QCameraInfoControl (); }
 
 class QCameraLocksControl;
 
-namespace tl { template <> struct type_traits<QCameraLocksControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraLocksControl> &qtdecl_QCameraLocksControl (); }
 
 class QCameraViewfinderSettings;
-
-namespace tl { template <> struct type_traits<QCameraViewfinderSettings> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraViewfinderSettings> &qtdecl_QCameraViewfinderSettings (); }
 
 class QCameraViewfinderSettingsControl;
 
-namespace tl { template <> struct type_traits<QCameraViewfinderSettingsControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraViewfinderSettingsControl> &qtdecl_QCameraViewfinderSettingsControl (); }
 
 class QCameraViewfinderSettingsControl2;
-
-namespace tl { template <> struct type_traits<QCameraViewfinderSettingsControl2> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraViewfinderSettingsControl2> &qtdecl_QCameraViewfinderSettingsControl2 (); }
 
 class QCameraZoomControl;
 
-namespace tl { template <> struct type_traits<QCameraZoomControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraZoomControl> &qtdecl_QCameraZoomControl (); }
 
 class QGraphicsVideoItem;
-
-namespace tl { template <> struct type_traits<QGraphicsVideoItem> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QGraphicsVideoItem> &qtdecl_QGraphicsVideoItem (); }
 
 class QImageEncoderControl;
 
-namespace tl { template <> struct type_traits<QImageEncoderControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QImageEncoderControl> &qtdecl_QImageEncoderControl (); }
 
 class QImageEncoderSettings;
-
-namespace tl { template <> struct type_traits<QImageEncoderSettings> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QImageEncoderSettings> &qtdecl_QImageEncoderSettings (); }
 
 class QMediaAudioProbeControl;
 
-namespace tl { template <> struct type_traits<QMediaAudioProbeControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaAudioProbeControl> &qtdecl_QMediaAudioProbeControl (); }
 
 class QMediaAvailabilityControl;
-
-namespace tl { template <> struct type_traits<QMediaAvailabilityControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaAvailabilityControl> &qtdecl_QMediaAvailabilityControl (); }
 
 class QMediaBindableInterface;
 
-namespace tl { template <> struct type_traits<QMediaBindableInterface> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaBindableInterface> &qtdecl_QMediaBindableInterface (); }
 
 class QMediaContainerControl;
-
-namespace tl { template <> struct type_traits<QMediaContainerControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaContainerControl> &qtdecl_QMediaContainerControl (); }
 
 class QMediaContent;
 
-namespace tl { template <> struct type_traits<QMediaContent> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaContent> &qtdecl_QMediaContent (); }
 
 class QMediaControl;
-
-namespace tl { template <> struct type_traits<QMediaControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaControl> &qtdecl_QMediaControl (); }
 
 class QMediaGaplessPlaybackControl;
 
-namespace tl { template <> struct type_traits<QMediaGaplessPlaybackControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaGaplessPlaybackControl> &qtdecl_QMediaGaplessPlaybackControl (); }
 
 class QMediaNetworkAccessControl;
-
-namespace tl { template <> struct type_traits<QMediaNetworkAccessControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaNetworkAccessControl> &qtdecl_QMediaNetworkAccessControl (); }
 
 class QMediaObject;
 
-namespace tl { template <> struct type_traits<QMediaObject> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaObject> &qtdecl_QMediaObject (); }
 
 class QMediaPlayer;
-
-namespace tl { template <> struct type_traits<QMediaPlayer> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaPlayer> &qtdecl_QMediaPlayer (); }
 
 class QMediaPlayerControl;
 
-namespace tl { template <> struct type_traits<QMediaPlayerControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaPlayerControl> &qtdecl_QMediaPlayerControl (); }
 
 class QMediaPlaylist;
-
-namespace tl { template <> struct type_traits<QMediaPlaylist> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaPlaylist> &qtdecl_QMediaPlaylist (); }
 
 class QMediaRecorder;
 
-namespace tl { template <> struct type_traits<QMediaRecorder> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaRecorder> &qtdecl_QMediaRecorder (); }
 
 class QMediaRecorderControl;
-
-namespace tl { template <> struct type_traits<QMediaRecorderControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaRecorderControl> &qtdecl_QMediaRecorderControl (); }
 
 class QMediaResource;
 
-namespace tl { template <> struct type_traits<QMediaResource> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaResource> &qtdecl_QMediaResource (); }
 
 class QMediaService;
-
-namespace tl { template <> struct type_traits<QMediaService> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaService> &qtdecl_QMediaService (); }
 
 struct QMediaServiceCameraInfoInterface;
 
-namespace tl { template <> struct type_traits<QMediaServiceCameraInfoInterface> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaServiceCameraInfoInterface> &qtdecl_QMediaServiceCameraInfoInterface (); }
 
 struct QMediaServiceDefaultDeviceInterface;
-
-namespace tl { template <> struct type_traits<QMediaServiceDefaultDeviceInterface> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaServiceDefaultDeviceInterface> &qtdecl_QMediaServiceDefaultDeviceInterface (); }
 
 struct QMediaServiceFeaturesInterface;
 
-namespace tl { template <> struct type_traits<QMediaServiceFeaturesInterface> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaServiceFeaturesInterface> &qtdecl_QMediaServiceFeaturesInterface (); }
 
 struct QMediaServiceProviderFactoryInterface;
-
-namespace tl { template <> struct type_traits<QMediaServiceProviderFactoryInterface> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaServiceProviderFactoryInterface> &qtdecl_QMediaServiceProviderFactoryInterface (); }
 
 class QMediaServiceProviderHint;
 
-namespace tl { template <> struct type_traits<QMediaServiceProviderHint> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaServiceProviderHint> &qtdecl_QMediaServiceProviderHint (); }
 
 class QMediaServiceProviderPlugin;
-
-namespace tl { template <> struct type_traits<QMediaServiceProviderPlugin> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaServiceProviderPlugin> &qtdecl_QMediaServiceProviderPlugin (); }
 
 struct QMediaServiceSupportedDevicesInterface;
 
-namespace tl { template <> struct type_traits<QMediaServiceSupportedDevicesInterface> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaServiceSupportedDevicesInterface> &qtdecl_QMediaServiceSupportedDevicesInterface (); }
 
 struct QMediaServiceSupportedFormatsInterface;
-
-namespace tl { template <> struct type_traits<QMediaServiceSupportedFormatsInterface> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaServiceSupportedFormatsInterface> &qtdecl_QMediaServiceSupportedFormatsInterface (); }
 
 class QMediaStreamsControl;
 
-namespace tl { template <> struct type_traits<QMediaStreamsControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaStreamsControl> &qtdecl_QMediaStreamsControl (); }
 
 class QMediaTimeInterval;
-
-namespace tl { template <> struct type_traits<QMediaTimeInterval> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaTimeInterval> &qtdecl_QMediaTimeInterval (); }
 
 class QMediaTimeRange;
 
-namespace tl { template <> struct type_traits<QMediaTimeRange> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaTimeRange> &qtdecl_QMediaTimeRange (); }
 
 class QMediaVideoProbeControl;
-
-namespace tl { template <> struct type_traits<QMediaVideoProbeControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMediaVideoProbeControl> &qtdecl_QMediaVideoProbeControl (); }
 
 class QMetaDataReaderControl;
 
-namespace tl { template <> struct type_traits<QMetaDataReaderControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMetaDataReaderControl> &qtdecl_QMetaDataReaderControl (); }
 
 class QMetaDataWriterControl;
-
-namespace tl { template <> struct type_traits<QMetaDataWriterControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QMetaDataWriterControl> &qtdecl_QMetaDataWriterControl (); }
 
 class QRadioData;
 
-namespace tl { template <> struct type_traits<QRadioData> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QRadioData> &qtdecl_QRadioData (); }
 
 class QRadioDataControl;
-
-namespace tl { template <> struct type_traits<QRadioDataControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QRadioDataControl> &qtdecl_QRadioDataControl (); }
 
 class QRadioTuner;
 
-namespace tl { template <> struct type_traits<QRadioTuner> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QRadioTuner> &qtdecl_QRadioTuner (); }
 
 class QRadioTunerControl;
-
-namespace tl { template <> struct type_traits<QRadioTunerControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QRadioTunerControl> &qtdecl_QRadioTunerControl (); }
 
 class QSound;
 
-namespace tl { template <> struct type_traits<QSound> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QSound> &qtdecl_QSound (); }
 
 class QSoundEffect;
-
-namespace tl { template <> struct type_traits<QSoundEffect> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QSoundEffect> &qtdecl_QSoundEffect (); }
 
 class QVideoDeviceSelectorControl;
 
-namespace tl { template <> struct type_traits<QVideoDeviceSelectorControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QVideoDeviceSelectorControl> &qtdecl_QVideoDeviceSelectorControl (); }
 
 class QVideoEncoderSettings;
-
-namespace tl { template <> struct type_traits<QVideoEncoderSettings> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QVideoEncoderSettings> &qtdecl_QVideoEncoderSettings (); }
 
 class QVideoEncoderSettingsControl;
 
-namespace tl { template <> struct type_traits<QVideoEncoderSettingsControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QVideoEncoderSettingsControl> &qtdecl_QVideoEncoderSettingsControl (); }
 
 class QVideoFilterRunnable;
-
-namespace tl { template <> struct type_traits<QVideoFilterRunnable> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QVideoFilterRunnable> &qtdecl_QVideoFilterRunnable (); }
 
 class QVideoFrame;
 
-namespace tl { template <> struct type_traits<QVideoFrame> : public type_traits<void> {
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QVideoFrame> &qtdecl_QVideoFrame (); }
 
 class QVideoProbe;
-
-namespace tl { template <> struct type_traits<QVideoProbe> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QVideoProbe> &qtdecl_QVideoProbe (); }
 
 class QVideoRendererControl;
 
-namespace tl { template <> struct type_traits<QVideoRendererControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QVideoRendererControl> &qtdecl_QVideoRendererControl (); }
 
 class QVideoSurfaceFormat;
-
-namespace tl { template <> struct type_traits<QVideoSurfaceFormat> : public type_traits<void> {
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QVideoSurfaceFormat> &qtdecl_QVideoSurfaceFormat (); }
 
 class QVideoWidget;
 
-namespace tl { template <> struct type_traits<QVideoWidget> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-}; }
-
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QVideoWidget> &qtdecl_QVideoWidget (); }
 
 class QVideoWindowControl;
-
-namespace tl { template <> struct type_traits<QVideoWindowControl> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-  typedef tl::false_tag has_default_constructor;
-}; }
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QVideoWindowControl> &qtdecl_QVideoWindowControl (); }
 

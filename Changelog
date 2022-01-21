@@ -1,4 +1,6 @@
 
+0.28            (2022-xx-xx):
+
 0.27.6          (2022-01-04):
 * Enhancement: %GITHUB%/issues/963 Display snapped position in main window
 * Bugfix: %GITHUB%/issues/960 Cap values range now shown in netlist browser

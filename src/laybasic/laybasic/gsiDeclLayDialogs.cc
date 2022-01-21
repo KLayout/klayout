@@ -92,29 +92,6 @@ public:
   gsi::Callback get_cb;
 };
 
-}
-
-namespace tl
-{
-
-//  type traits for BrowserDialog_Stub
-template <> 
-struct type_traits<gsi::BrowserDialog_Stub> : public type_traits<void> {
-  typedef tl::false_tag has_copy_constructor;
-};
-
-//  type traits for BrowserPanel
-template <> 
-struct type_traits<lay::BrowserPanel> : public type_traits<void> {
-  typedef tl::false_tag has_default_constructor;
-  typedef tl::false_tag has_copy_constructor;
-};
-
-}
-
-namespace gsi
-{
-
 // ---------------------------------------------------------------------------------
 //  Value classes with "not set" capabilities
 

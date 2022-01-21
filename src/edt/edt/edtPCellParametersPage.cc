@@ -166,8 +166,7 @@ PCellParametersPage::init ()
 
   QGridLayout *frame_layout = new QGridLayout (this);
   //  spacing and margin for tool windows
-  frame_layout->setMargin (0);
-  frame_layout->setVerticalSpacing (0);
+  frame_layout->setContentsMargins (0, 0, 0, 0);
   setLayout (frame_layout);
 
   mp_update_frame = new QFrame ();
@@ -216,7 +215,7 @@ PCellParametersPage::init ()
   mp_error_label = new QLabel (mp_update_frame);
   mp_error_label->setWordWrap (true);
   palette = mp_error_label->palette ();
-  palette.setColor (QPalette::Foreground, Qt::red);
+  palette.setColor (QPalette::WindowText, Qt::red);
   mp_error_label->setPalette (palette);
   font = mp_error_label->font ();
   font.setBold (true);
@@ -260,7 +259,7 @@ PCellParametersPage::setup (lay::LayoutView *view, int cv_index, const db::PCell
   QGridLayout *inner_grid = new QGridLayout (inner_frame);
   inner_frame->setLayout (inner_grid);
   if (m_dense) {
-    inner_grid->setMargin (4);
+    inner_grid->setContentsMargins (4, 4, 4, 4);
     inner_grid->setHorizontalSpacing (6);
     inner_grid->setVerticalSpacing (2);
   }
@@ -301,7 +300,7 @@ PCellParametersPage::setup (lay::LayoutView *view, int cv_index, const db::PCell
         
         inner_grid = new QGridLayout (gb);
         if (m_dense) {
-          inner_grid->setMargin (4);
+          inner_grid->setContentsMargins (4, 4, 4, 4);
           inner_grid->setHorizontalSpacing (6);
           inner_grid->setVerticalSpacing (2);
         }
@@ -342,7 +341,7 @@ PCellParametersPage::setup (lay::LayoutView *view, int cv_index, const db::PCell
         {
           QFrame *f = new QFrame (inner_frame);
           QHBoxLayout *hb = new QHBoxLayout (f);
-          hb->setMargin (0);
+          hb->setContentsMargins (0, 0, 0, 0);
           f->setLayout (hb);
           f->setFrameShape (QFrame::NoFrame);
 

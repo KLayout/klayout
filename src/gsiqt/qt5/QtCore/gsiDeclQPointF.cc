@@ -32,7 +32,6 @@
 #include <QMatrix4x4>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
-#include "gsiDeclQtCoreTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

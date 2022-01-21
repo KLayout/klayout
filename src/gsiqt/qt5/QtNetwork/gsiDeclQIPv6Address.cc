@@ -30,7 +30,6 @@
 #include <QIPv6Address>
 #include "gsiQt.h"
 #include "gsiQtNetworkCommon.h"
-#include "gsiDeclQtNetworkTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

@@ -35,7 +35,6 @@
 #include <QSqlResult>
 #include "gsiQt.h"
 #include "gsiQtSqlCommon.h"
-#include "gsiDeclQtSqlTypeTraits.h"
 #include <memory>
 
 // -----------------------------------------------------------------------

@@ -757,9 +757,9 @@ public:
   /**
    *  @brief String conversion
    */
-  std::string to_string () const
+  std::string to_string (double dbu = 0.0) const
   {
-    return std::string ("(") + tl::to_quoted_string (string ()) + "," + m_trans.to_string () + ")";
+    return std::string ("(") + tl::to_quoted_string (string ()) + "," + m_trans.to_string (dbu) + ")";
   }
 
   /**
@@ -1125,15 +1125,6 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
 
 namespace tl 
 {
-  template <class C>
-  struct type_traits <db::text<C> > : public type_traits<void> 
-  {
-    typedef true_tag supports_extractor;
-    typedef true_tag supports_to_string;
-    typedef true_tag has_less_operator;
-    typedef true_tag has_equal_operator;
-  };
-
   template<> void DB_PUBLIC extractor_impl (tl::Extractor &ex, db::Text &p);
   template<> void DB_PUBLIC extractor_impl (tl::Extractor &ex, db::DText &p);
 

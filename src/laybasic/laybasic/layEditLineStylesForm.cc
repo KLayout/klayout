@@ -157,7 +157,7 @@ EditLineStylesForm::update ()
       name = tl::sprintf ("#%d", std::distance (m_styles.begin (), i));
     }
     QListWidgetItem *item = new QListWidgetItem (icon_from_data (*i), tl::to_qstring (name), mp_ui->style_items);
-    item->setTextColor (cdis);
+    item->setForeground (cdis);
   }
   for (std::vector <lay::LineStyles::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
     if ((*i)->order_index () > 0) {

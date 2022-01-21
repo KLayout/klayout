@@ -159,7 +159,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
     : QMainWindow (0),
       tl::Object (),
       lay::DispatcherDelegate (),
-      m_dispatcher (this),
+      m_dispatcher (this, this),
       m_text_progress (this, 10 /*verbosity threshold*/),
       m_mode (std::numeric_limits<unsigned int>::max ()),
       mp_setup_form (0),
@@ -179,9 +179,6 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
       mp_app (app),
       m_manager (undo_enabled)
 {
-  //  install us as menu widget parent
-  m_dispatcher.set_menu_parent_widget (this);
-
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
@@ -220,7 +217,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   mp_main_stack_widget->setCurrentIndex (0);
 
   QVBoxLayout *vbl = new QVBoxLayout (mp_main_frame);
-  vbl->setMargin (0);
+  vbl->setContentsMargins (0, 0, 0, 0);
   vbl->setSpacing (0);
 
   mp_tab_bar = new QTabBar (mp_main_frame);
@@ -348,7 +345,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   mp_status_bar->addWidget (mp_cp_frame);
 
   QHBoxLayout *cp_frame_ly = new QHBoxLayout (mp_cp_frame);
-  cp_frame_ly->setMargin (0);
+  cp_frame_ly->setContentsMargins (0, 0, 0, 0);
   cp_frame_ly->setSpacing (0);
   mp_cpx_label = new QLabel (mp_cp_frame);
   mp_cpx_label->setObjectName (QString::fromUtf8 ("cpx_label"));
@@ -793,6 +790,15 @@ MainWindow::tech_message (const std::string &s)
   mp_tech_status_label->setText(tl::to_qstring (s));
 }
 
+static int fm_width (const QFontMetrics &fm, const QString &s)
+{
+#if QT_VERSION >= 0x60000
+  return fm.horizontalAdvance (s);
+#else
+  return fm.width (s);
+#endif
+}
+
 void
 MainWindow::format_message ()
 {
@@ -841,7 +847,7 @@ MainWindow::format_message ()
 
     ++ndrop;
 
-  } while (short_message.size () < prev_len && fm.width (QString::fromUtf8 (" ") + tl::to_qstring (short_message)) > mp_msg_label->width ());
+  } while (short_message.size () < prev_len && fm_width (fm, QString::fromUtf8 (" ") + tl::to_qstring (short_message)) > mp_msg_label->width ());
 
   mp_msg_label->setText (QString::fromUtf8 (" ") + tl::to_qstring (short_message));
   mp_msg_label->setToolTip (tl::to_qstring (full_message));
@@ -1579,7 +1585,11 @@ MainWindow::cm_print ()
       QFont header_font (QString::fromUtf8 ("Helvetica"), 8);
       int hh = QFontMetrics (header_font, mp_printer.get ()).height ();
 
-      QRect page_rect = mp_printer->pageRect ();
+#if QT_VERSION >= 0x60000
+      QRectF page_rect = mp_printer->pageRect (QPrinter::DevicePixel);
+#else
+      QRectF page_rect = mp_printer->pageRect ();
+#endif
       page_rect.moveTo (0, 0);
 
       int b = std::min (page_rect.width (), page_rect.height ()) / 50;
@@ -1588,7 +1598,7 @@ MainWindow::cm_print ()
       page_rect.setTop (page_rect.top () + b);
       page_rect.setBottom (page_rect.bottom () - b);
 
-      QRect text_rect = page_rect;
+      QRectF text_rect = page_rect;
       text_rect.setLeft (text_rect.left () + hh / 2);
       text_rect.setRight (text_rect.right () - hh / 2);
       text_rect.setBottom (text_rect.bottom () - hh / 2);

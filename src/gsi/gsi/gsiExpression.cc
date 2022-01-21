@@ -106,6 +106,10 @@ public:
   std::pair<bool, size_t> find (bool st, const std::string &name) const
   {
     std::map<std::pair<bool, std::string>, size_t>::const_iterator t = m_name_map.find (std::make_pair (st, name));
+    if (! st && t == m_name_map.end ()) {
+      //  can also use static methods for instances
+      t = m_name_map.find (std::make_pair (true, name));
+    }
     if (t != m_name_map.end ()) {
       return std::make_pair (true, t->second);
     } else {
@@ -1088,11 +1092,7 @@ initialize_expressions ()
       //  skip external classes
       continue;
     } else if ((*c)->declaration () != *c) {
-      //  we might encounter a child class which is a reference to a top-level class (e.g.
-      //  duplication of enums into child classes). In this case we should create a reference inside the
-      //  target class.
       tl_assert ((*c)->parent () != 0);  //  top-level classes should be merged
-      //  TODO: implement (see rba.cc:1544 for example)
       continue;
     }
 
@@ -1360,6 +1360,65 @@ special_method_impl (gsi::MethodBase::special_method_type smt, tl::Variant &self
   return tl::Variant ();
 }
 
+static std::pair<const ExpressionMethodTable *, size_t> find_method (const gsi::ClassBase *cls, bool as_static, const std::string &method)
+{
+  const ExpressionMethodTable *mt = 0;
+  size_t mid = 0;
+
+  while (cls) {
+
+    mt = ExpressionMethodTable::method_table_by_class (cls);
+    std::pair<bool, size_t> t = mt->find (as_static, method);
+    if (t.first) {
+      mid = t.second;
+      return std::make_pair (mt, mid);
+    }
+
+    //  try unnamed child classes as static
+    for (auto cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
+      if (cc->name ().empty ()) {
+        std::pair<const ExpressionMethodTable *, size_t> m = find_method (cc->declaration (), true, method);
+        if (m.first) {
+          return m;
+        }
+      }
+    }
+
+    cls = cls->base ();
+
+  }
+
+  return std::make_pair ((const ExpressionMethodTable *) 0, size_t (0));
+}
+
+static const gsi::ClassBase *find_class_scope (const gsi::ClassBase *cls, const std::string &name)
+{
+  while (cls) {
+
+    //  try named child classes
+    for (auto cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
+      if (cc->name () == name) {
+        return cc->declaration ();
+      }
+    }
+
+    //  try unnamed child classes as additional bases
+    for (auto cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
+      if (cc->name ().empty ()) {
+        const gsi::ClassBase *scope = find_class_scope (cc->declaration (), name);
+        if (scope) {
+          return scope;
+        }
+      }
+    }
+
+    cls = cls->base ();
+
+  }
+
+  return 0;
+}
+
 void
 VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context*/, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const
 {
@@ -1374,25 +1433,34 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
     }
   }
 
-  const ExpressionMethodTable *mt = 0;
-  size_t mid = 0;
-  
-  const gsi::ClassBase *cls = clsact;
-  while (cls) {
+  auto m = find_method (clsact, mp_object_cls != 0 /*static*/, method);
 
-    mt = ExpressionMethodTable::method_table_by_class (cls);
-    std::pair<bool, size_t> t = mt->find (mp_object_cls != 0 /*static*/, method);
-    if (t.first) {
-      mid = t.second;
-      break;
+  const ExpressionMethodTable *mt = m.first;
+  size_t mid = m.second;
+
+  if (! mt) {
+
+    //  try class scope
+    const gsi::ClassBase *scope = find_class_scope (clsact, method);
+    if (scope) {
+
+      if (! args.empty ()) {
+        throw tl::Exception (tl::to_string (tr ("'%s' is not a function and cannot have parameters")), method);
+      }
+
+      //  we found a class scope: return a reference to that
+      const tl::VariantUserClassBase *scope_var_cls = scope->var_cls_cls ();
+      if (scope_var_cls) {
+        out = tl::Variant ((void *) 0, scope_var_cls, false);
+      } else {
+        out = tl::Variant ();
+      }
+      return;
+
+    } else {
+      throw tl::Exception (tl::to_string (tr ("Unknown method '%s' of class '%s'")), method, clsact->name ());
     }
 
-    cls = cls->base ();
-
-  }
-
-  if (cls == 0) {
-    throw tl::Exception (tl::to_string (tr ("Unknown method")) + " '" + method + "' of class '" + clsact->name () + "'");
   }
 
   const gsi::MethodBase *meth = 0;

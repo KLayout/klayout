@@ -42,7 +42,7 @@ void
 RecentConfigurationPage::init ()
 {
   QVBoxLayout *ly = new QVBoxLayout (this);
-  ly->setMargin (0);
+  ly->setContentsMargins (0, 0, 0, 0);
 
   QLabel *label = new QLabel (this);
   label->setText (tr ("Click to select a recent configuration"));

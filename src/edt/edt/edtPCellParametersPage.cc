@@ -214,7 +214,7 @@ PCellParametersPage::init ()
 
   mp_error_label = new QLabel (mp_update_frame);
   mp_error_label->setWordWrap (true);
-  QPalette palette = mp_error_label->palette ();
+  palette = mp_error_label->palette ();
   palette.setColor (QPalette::WindowText, Qt::red);
   mp_error_label->setPalette (palette);
   font = mp_error_label->font ();

@@ -25,6 +25,8 @@
 
 #include "dbShapes.h"
 #include "dbLayout.h"
+#include "dbLibrary.h"
+#include "dbPCellDeclaration.h"
 
 #include <QLineEdit>
 
@@ -577,6 +579,86 @@ db::Instance ChangeTargetCellApplicator::do_apply_inst (db::Cell &cell, const db
   db::CellInstArray arr = instance.cell_inst ();
   arr.object ().cell_index (m_cell_index);
   return cell.replace (instance, arr);
+}
+
+// -------------------------------------------------------------------------
+//  ChangeTargetPCellApplicator implementation
+
+ChangeTargetPCellApplicator::ChangeTargetPCellApplicator (db::pcell_id_type pcell_id, bool apply_new_id, db::Library *new_lib, bool apply_new_lib, const std::map<std::string, tl::Variant> &modified_parameters)
+  : m_pcell_id (pcell_id), m_apply_new_id (apply_new_id), mp_new_lib (new_lib), m_apply_new_lib (apply_new_lib), m_modified_parameters (modified_parameters)
+{
+  //  .. nothing yet ..
+}
+
+db::Instance
+ChangeTargetPCellApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double /*dbu*/, bool /*relative*/) const
+{
+  tl_assert (cell.layout ());
+
+  db::Layout *layout = cell.layout ();
+
+  std::pair<bool, db::pcell_id_type> pci = layout->is_pcell_instance (instance.cell_index ());
+  std::pair<bool, db::cell_index_type> ci (false, 0);
+
+  db::Library *lib = layout->defining_library (instance.cell_index ()).first;
+
+  std::map<std::string, tl::Variant> named_parameters;
+  if (pci.first) {
+    named_parameters = layout->get_named_pcell_parameters (instance.cell_index ());
+  }
+  for (std::map<std::string, tl::Variant>::const_iterator p = m_modified_parameters.begin (); p != m_modified_parameters.end (); ++p) {
+    named_parameters [p->first] = p->second;
+  }
+
+  if ((m_apply_new_lib && lib != mp_new_lib) || (m_apply_new_id && (lib != mp_new_lib || ! pci.first || pci.second != m_pcell_id))) {
+
+    if (m_apply_new_id) {
+
+      lib = mp_new_lib;
+      pci.first = true;
+      pci.second = m_pcell_id;
+
+    } else if (m_apply_new_lib) {
+
+      if (! pci.first) {
+        std::string cell_name = (lib ? &lib->layout () : layout)->cell_name (instance.cell_index ());
+        ci = (mp_new_lib ? &mp_new_lib->layout () : layout)->cell_by_name (cell_name.c_str ());
+      } else {
+        std::string pcell_name = (lib ? &lib->layout () : layout)->pcell_declaration (pci.second)->name ();
+        pci = (mp_new_lib ? &mp_new_lib->layout () : layout)->pcell_by_name (pcell_name.c_str ());
+      }
+
+      lib = mp_new_lib;
+
+    }
+
+  }
+
+  db::CellInstArray arr = instance.cell_inst ();
+  db::cell_index_type inst_cell_index = arr.object ().cell_index ();
+
+  if (ci.first || pci.first) {
+
+    //  instantiates the PCell
+    if (pci.first) {
+      inst_cell_index = (lib ? &lib->layout () : layout)->get_pcell_variant_dict (pci.second, named_parameters);
+    } else {
+      inst_cell_index = ci.second;
+    }
+
+    //  references the library
+    if (lib) {
+      inst_cell_index = layout->get_lib_proxy (lib, inst_cell_index);
+    }
+
+  }
+
+  if (arr.object ().cell_index () != inst_cell_index) {
+    arr.object ().cell_index (inst_cell_index);
+    return cell.replace (instance, arr);
+  } else {
+    return instance;
+  }
 }
 
 // -------------------------------------------------------------------------

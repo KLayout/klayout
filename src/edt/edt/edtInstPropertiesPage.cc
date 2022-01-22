@@ -23,6 +23,8 @@
 
 #include "dbLibrary.h"
 #include "dbPCellHeader.h"
+#include "dbLibraryProxy.h"
+#include "dbPCellVariant.h"
 #include "edtInstPropertiesPage.h"
 #include "edtPropertiesPageUtils.h"
 #include "edtPCellParametersPage.h"
@@ -428,25 +430,77 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     std::pair<bool, db::pcell_id_type> pci = layout->pcell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
     tl_assert (ci.first || pci.first);
 
-    db::cell_index_type inst_cell_index = 0;
+    db::Layout *current_layout = &cv->layout ();
+    db::cell_index_type current_ci = pos->back ().inst_ptr.cell_index ();
 
-    //  instantiate the PCell
-    if (pci.first) {
-      tl_assert (mp_pcell_parameters != 0);
-      tl_assert (layout->pcell_declaration (pci.second) == mp_pcell_parameters->pcell_decl ());
-      inst_cell_index = layout->get_pcell_variant (pci.second, mp_pcell_parameters->get_parameters ());
-    } else {
-      inst_cell_index = ci.second;
+    std::pair<bool, db::pcell_id_type> current_pci = current_layout->is_pcell_instance (current_ci);
+    std::pair<db::Library *, db::cell_index_type> l = current_layout->defining_library (current_ci);
+
+    db::Library *current_lib = l.first;
+    if (current_lib) {
+      current_layout = &current_lib->layout ();
+      current_ci = l.second;
     }
 
-    //  reference the library
-    if (lib) {
-      layout = & cv->layout ();
-      inst_cell_index = layout->get_lib_proxy (lib, inst_cell_index);
+    std::map<std::string, tl::Variant> modified_param_by_name;
+
+    if (current_pci.first) {
+
+      tl_assert (mp_pcell_parameters);
+
+      std::vector<tl::Variant> param = mp_pcell_parameters->get_parameters (0);
+      const std::vector<tl::Variant> &initial_param = mp_pcell_parameters->initial_parameters ();
+
+      const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_parameters->pcell_decl ()->parameter_declarations ();
+      for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd) {
+        unsigned int index = pd - pcp.begin ();
+        if (index < param.size () && index < initial_param.size () && param [index] != initial_param [index]) {
+          modified_param_by_name.insert (std::make_pair (pd->get_name (), param [index]));
+        }
+      }
+
     }
 
-    if (inst_cell_index != pos->back ().inst_ptr.cell_index ()) {
+    if (pci.first != current_pci.first || (ci.first && std::string (layout->cell_name (ci.second)) != current_layout->cell_name (current_ci))) {
+
+      //  a cell has been changed into pcell or vice versa, or the cell name has changed -> we can generate a new proxy and exchange cell indexes
+
+      db::cell_index_type inst_cell_index = 0;
+
+      //  instantiates the PCell
+      if (pci.first) {
+        tl_assert (mp_pcell_parameters != 0);
+        tl_assert (layout->pcell_declaration (pci.second) == mp_pcell_parameters->pcell_decl ());
+        inst_cell_index = layout->get_pcell_variant (pci.second, mp_pcell_parameters->get_parameters ());
+      } else {
+        inst_cell_index = ci.second;
+      }
+
+      //  references the library
+      if (lib) {
+        inst_cell_index = cv->layout ().get_lib_proxy (lib, inst_cell_index);
+      }
+
       appl->add (new ChangeTargetCellApplicator (inst_cell_index));
+
+    } else if (pci.first) {
+
+      //  pcell name has changed -> apply parameter deltas to other selected cells or pcells
+      //  otherwise keep pcell or cell name, change library if possible and required and apply parameter deltas to other selected cells or pcells
+
+      bool adjust_pcell_id = layout->pcell_declaration (pci.second)->name () != current_layout->pcell_declaration (current_pci.second)->name ();
+
+      if (adjust_pcell_id || lib != current_lib || ! modified_param_by_name.empty ()) {
+        appl->add (new ChangeTargetPCellApplicator (pci.second, adjust_pcell_id, lib, lib != current_lib, modified_param_by_name));
+      }
+
+    } else if (lib != current_lib) {
+
+      //  only library name has changed -> try to apply library to all selected instances keeping the cell name
+
+      //  NOTE: changing the library only is a special case of the ChangeTargetPCellApplicator
+      appl->add (new ChangeTargetPCellApplicator (0, false, lib, true, std::map<std::string, tl::Variant> ()));
+
     }
 
   } catch (tl::Exception &) {

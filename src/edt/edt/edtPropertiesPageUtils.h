@@ -335,6 +335,26 @@ private:
 };
 
 /**
+ *  @brief An applicator changing the target pcell of an instance
+ */
+class ChangeTargetPCellApplicator
+  : public ChangeApplicator
+{
+public:
+  ChangeTargetPCellApplicator (db::pcell_id_type pcell_id, bool apply_new_id, db::Library *new_lib, bool apply_new_lib, const std::map<std::string, tl::Variant> &modified_parameters);
+
+  bool supports_relative_mode () const { return false; }
+  db::Instance do_apply_inst (db::Cell &cell, const db::Instance &instance, double dbu, bool relative) const;
+
+private:
+  db::pcell_id_type m_pcell_id;
+  bool m_apply_new_id;
+  db::Library *mp_new_lib;
+  bool m_apply_new_lib;
+  const std::map<std::string, tl::Variant> &m_modified_parameters;
+};
+
+/**
  *  @brief An applicator changing the transformation properties of an instance
  */
 class ChangeInstanceTransApplicator

@@ -66,6 +66,10 @@ public:
   { 
     return db::Instance ();
   }
+
+private:
+  ChangeApplicator (const ChangeApplicator &);
+  ChangeApplicator &operator= (const ChangeApplicator &);
 };
 
 /**
@@ -351,7 +355,7 @@ private:
   bool m_apply_new_id;
   db::Library *mp_new_lib;
   bool m_apply_new_lib;
-  const std::map<std::string, tl::Variant> &m_modified_parameters;
+  std::map<std::string, tl::Variant> m_modified_parameters;
 };
 
 /**

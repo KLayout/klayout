@@ -461,7 +461,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
     }
 
-    if (pci.first != current_pci.first || (ci.first && std::string (layout->cell_name (ci.second)) != current_layout->cell_name (current_ci))) {
+    if (pci.first != current_pci.first || (! pci.first && std::string (layout->cell_name (ci.second)) != current_layout->cell_name (current_ci))) {
 
       //  a cell has been changed into pcell or vice versa, or the cell name has changed -> we can generate a new proxy and exchange cell indexes
 

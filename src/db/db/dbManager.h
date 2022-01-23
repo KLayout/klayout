@@ -144,6 +144,16 @@ public:
   transaction_id_t last_transaction_id () const;
 
   /**
+   *  @brief Gets the id of the next transaction to undo
+   */
+  transaction_id_t transaction_id_for_undo () const;
+
+  /**
+   *  @brief Gets the id of the next transaction to redo
+   */
+  transaction_id_t transaction_id_for_redo () const;
+
+  /**
    *  @brief Close a transaction successfully.
    */
   void commit ();
@@ -332,6 +342,11 @@ public:
     if (! mp_manager->transacting ()) {
       mp_manager->transaction (m_description, m_transaction_id);
     }
+  }
+
+  bool is_empty () const
+  {
+    return ! mp_manager || mp_manager->last_queued (0) == 0;
   }
 
   db::Manager::transaction_id_t id () const

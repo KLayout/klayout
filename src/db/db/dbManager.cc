@@ -144,6 +144,28 @@ Manager::last_transaction_id () const
   return m_transactions.empty () ? 0 : reinterpret_cast<transaction_id_t> (& m_transactions.back ());
 }
 
+Manager::transaction_id_t
+Manager::transaction_id_for_undo () const
+{
+  transactions_t::iterator c = m_current;
+  if (c == m_transactions.begin ()) {
+    return 0;
+  } else {
+    --c;
+    return reinterpret_cast<transaction_id_t> (c.operator-> ());
+  }
+}
+
+Manager::transaction_id_t
+Manager::transaction_id_for_redo () const
+{
+  if (m_current == m_transactions.end ()) {
+    return 0;
+  } else {
+    return reinterpret_cast<transaction_id_t> (m_current.operator-> ());
+  }
+}
+
 void
 Manager::cancel ()
 {
@@ -289,7 +311,7 @@ Manager::last_queued (db::Object *object)
   tl_assert (m_opened);
   tl_assert (! m_replay);
 
-  if (m_current->first.empty () || m_current->first.back ().first != object->id ()) {
+  if (m_current == m_transactions.end () || m_current->first.empty () || (object && m_current->first.back ().first != object->id ())) {
     return 0;
   } else {
     return m_current->first.back ().second;

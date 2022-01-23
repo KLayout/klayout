@@ -137,6 +137,21 @@ BEGIN_PROTECTED
 END_PROTECTED
 }
 
+static void
+get_cell_or_pcell_ids_by_name (const db::Layout *layout, const std::string &name, std::pair<bool, db::cell_index_type> &ci, std::pair<bool, db::pcell_id_type> &pci)
+{
+  ci = layout->cell_by_name (name.c_str ());
+  pci = layout->pcell_by_name (name.c_str ());
+
+  if (pci.first) {
+    //  prefer PCell names
+    ci.first = false;
+  } else if (ci.first && layout->cell (ci.second).is_proxy ()) {
+    //  don't let us select proxy names (they are eventually virtual cells)
+    ci.first = false;
+  }
+}
+
 void
 InstPropertiesPage::browse_cell ()
 {
@@ -155,19 +170,18 @@ BEGIN_PROTECTED
     layout = &cv->layout ();
   }
 
-  lay::LibraryCellSelectionForm form (this, layout, "browse_lib_cell");
+  lay::LibraryCellSelectionForm form (this, layout, "browse_lib_cell", false, lib != 0 /*for libs show top cells only*/);
   if (lib) {
     form.setWindowTitle (tl::to_qstring (tl::to_string (QObject::tr ("Select Cell - Library: ")) + lib->get_description ()));
   }
 
-  std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
+  std::pair<bool, db::pcell_id_type> pc;
+  std::pair<bool, db::cell_index_type> c;
+  get_cell_or_pcell_ids_by_name (layout, tl::to_string (cell_name_le->text ()), pc, c);
   if (pc.first) {
     form.set_selected_pcell_id (pc.second);
-  } else {
-    std::pair<bool, db::cell_index_type> c = layout->cell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
-    if (c.first) {
-      form.set_selected_cell_index (c.second);
-    }
+  } else if (c.first) {
+    form.set_selected_cell_index (c.second);
   }
 
   if (form.exec ()) {
@@ -388,21 +402,6 @@ bool
 InstPropertiesPage::readonly ()
 {
   return ! mp_service->view ()->is_editable ();
-}
-
-static void
-get_cell_or_pcell_ids_by_name (const db::Layout *layout, const std::string &name, std::pair<bool, db::cell_index_type> &ci, std::pair<bool, db::pcell_id_type> &pci)
-{
-  ci = layout->cell_by_name (name.c_str ());
-  pci = layout->pcell_by_name (name.c_str ());
-
-  if (pci.first) {
-    //  prefer PCell names
-    ci.first = false;
-  } else if (ci.first && layout->cell (ci.second).is_proxy ()) {
-    //  don't let us select proxy names (they are eventually virtual cells)
-    ci.first = false;
-  }
 }
 
 ChangeApplicator *
@@ -851,8 +850,9 @@ InstPropertiesPage::update_pcell_parameters ()
 
   }
 
-  std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
-  std::pair<bool, db::cell_index_type> cc = layout->cell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
+  std::pair<bool, db::pcell_id_type> pc;
+  std::pair<bool, db::cell_index_type> cc;
+  get_cell_or_pcell_ids_by_name (layout, tl::to_string (cell_name_le->text ()), pc, cc);
 
   //  indicate an invalid cell name
   if (! pc.first && ! cc.first) {

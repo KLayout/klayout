@@ -390,6 +390,21 @@ InstPropertiesPage::readonly ()
   return ! mp_service->view ()->is_editable ();
 }
 
+static void
+get_cell_or_pcell_ids_by_name (const db::Layout *layout, const std::string &name, std::pair<bool, db::cell_index_type> &ci, std::pair<bool, db::pcell_id_type> &pci)
+{
+  ci = layout->cell_by_name (name.c_str ());
+  pci = layout->pcell_by_name (name.c_str ());
+
+  if (pci.first) {
+    //  prefer PCell names
+    ci.first = false;
+  } else if (ci.first && layout->cell (ci.second).is_proxy ()) {
+    //  don't let us select proxy names (they are eventually virtual cells)
+    ci.first = false;
+  }
+}
+
 ChangeApplicator *
 InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance & /*inst*/, double dbu)
 {
@@ -416,8 +431,9 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
   try {
 
-    std::pair<bool, db::cell_index_type> ci = layout->cell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
-    std::pair<bool, db::pcell_id_type> pci = layout->pcell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
+    std::pair<bool, db::cell_index_type> ci;
+    std::pair<bool, db::pcell_id_type> pci;
+    get_cell_or_pcell_ids_by_name (layout, tl::to_string (cell_name_le->text ()), ci, pci);
     if (! ci.first && ! pci.first) {
       throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cell or PCell name: %s")).c_str (), tl::to_string (cell_name_le->text ()).c_str ());
     }
@@ -431,8 +447,9 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
   try {
 
-    std::pair<bool, db::cell_index_type> ci = layout->cell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
-    std::pair<bool, db::pcell_id_type> pci = layout->pcell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
+    std::pair<bool, db::cell_index_type> ci;
+    std::pair<bool, db::pcell_id_type> pci;
+    get_cell_or_pcell_ids_by_name (layout, tl::to_string (cell_name_le->text ()), ci, pci);
 
     db::Layout *current_layout = &cv->layout ();
     db::cell_index_type current_ci = pos->back ().inst_ptr.cell_index ();

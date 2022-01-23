@@ -307,8 +307,13 @@ InstPropertiesPage::update ()
   bool du = dbu_cb->isChecked ();
 
   db::Box cell_bbox = def_cell.bbox ();
-  cw_le->setText (tl::to_qstring (coord_to_string (cell_bbox.width (), dbu, du)));
-  ch_le->setText (tl::to_qstring (coord_to_string (cell_bbox.height (), dbu, du)));
+  if (cell_bbox.empty ()) {
+    cw_le->setText (QString ());
+    ch_le->setText (QString ());
+  } else {
+    cw_le->setText (tl::to_qstring (coord_to_string (cell_bbox.width (), dbu, du)));
+    ch_le->setText (tl::to_qstring (coord_to_string (cell_bbox.height (), dbu, du)));
+  }
 
   db::Trans t (pos->back ().inst_ptr.front ());
 
@@ -428,7 +433,6 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
     std::pair<bool, db::cell_index_type> ci = layout->cell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
     std::pair<bool, db::pcell_id_type> pci = layout->pcell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
-    tl_assert (ci.first || pci.first);
 
     db::Layout *current_layout = &cv->layout ();
     db::cell_index_type current_ci = pos->back ().inst_ptr.cell_index ();
@@ -442,26 +446,11 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
       current_ci = l.second;
     }
 
-    std::map<std::string, tl::Variant> modified_param_by_name;
+    if (! ci.first && ! pci.first) {
 
-    if (current_pci.first) {
+      //  invalid cell name ...
 
-      tl_assert (mp_pcell_parameters);
-
-      std::vector<tl::Variant> param = mp_pcell_parameters->get_parameters (0);
-      const std::vector<tl::Variant> &initial_param = mp_pcell_parameters->initial_parameters ();
-
-      const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_parameters->pcell_decl ()->parameter_declarations ();
-      for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd) {
-        unsigned int index = pd - pcp.begin ();
-        if (index < param.size () && index < initial_param.size () && param [index] != initial_param [index]) {
-          modified_param_by_name.insert (std::make_pair (pd->get_name (), param [index]));
-        }
-      }
-
-    }
-
-    if (pci.first != current_pci.first || (! pci.first && std::string (layout->cell_name (ci.second)) != current_layout->cell_name (current_ci))) {
+    } else if (pci.first != current_pci.first || (! pci.first && std::string (layout->cell_name (ci.second)) != current_layout->cell_name (current_ci))) {
 
       //  a cell has been changed into pcell or vice versa, or the cell name has changed -> we can generate a new proxy and exchange cell indexes
 
@@ -489,6 +478,21 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
       //  otherwise keep pcell or cell name, change library if possible and required and apply parameter deltas to other selected cells or pcells
 
       bool adjust_pcell_id = layout->pcell_declaration (pci.second)->name () != current_layout->pcell_declaration (current_pci.second)->name ();
+
+      std::map<std::string, tl::Variant> modified_param_by_name;
+
+      tl_assert (mp_pcell_parameters);
+
+      std::vector<tl::Variant> param = mp_pcell_parameters->get_parameters (0);
+      const std::vector<tl::Variant> &initial_param = mp_pcell_parameters->initial_parameters ();
+
+      const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_parameters->pcell_decl ()->parameter_declarations ();
+      for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd) {
+        unsigned int index = pd - pcp.begin ();
+        if (index < param.size () && index < initial_param.size () && param [index] != initial_param [index]) {
+          modified_param_by_name.insert (std::make_pair (pd->get_name (), param [index]));
+        }
+      }
 
       if (adjust_pcell_id || lib != current_lib || ! modified_param_by_name.empty ()) {
         appl->add (new ChangeTargetPCellApplicator (pci.second, adjust_pcell_id, lib, lib != current_lib, modified_param_by_name));

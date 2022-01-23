@@ -176,7 +176,7 @@ PCellParametersPage::init ()
   QGridLayout *update_frame_layout = new QGridLayout (mp_update_frame);
   mp_update_frame->setLayout (update_frame_layout);
   if (m_dense) {
-    update_frame_layout->setMargin (4);
+    update_frame_layout->setContentsMargins (4, 4, 4, 4);
     update_frame_layout->setHorizontalSpacing (6);
     update_frame_layout->setVerticalSpacing (2);
   }
@@ -203,7 +203,7 @@ PCellParametersPage::init ()
   QGridLayout *error_frame_layout = new QGridLayout (mp_error_frame);
   mp_error_frame->setLayout (error_frame_layout);
   if (m_dense) {
-    error_frame_layout->setMargin (4);
+    error_frame_layout->setContentsMargins (4, 4, 4, 4);
     error_frame_layout->setHorizontalSpacing (6);
     error_frame_layout->setVerticalSpacing (2);
   }

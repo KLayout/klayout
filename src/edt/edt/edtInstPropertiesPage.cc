@@ -437,6 +437,15 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
       throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cell or PCell name: %s")).c_str (), tl::to_string (cell_name_le->text ()).c_str ());
     }
 
+    //  detect recursions in the hierarchy
+    if (lib == 0 && ci.first) {
+      std::set<db::cell_index_type> called;
+      layout->cell (ci.second).collect_called_cells (called);
+      if (ci.second == cv.cell_index () || called.find (cv.cell_index ()) != called.end ()) {
+        throw tl::Exception (tl::to_string (QObject::tr ("Trying to build a recursive hierarchy")).c_str ());
+      }
+    }
+
     lay::indicate_error (cell_name_le, (tl::Exception *) 0);
 
   } catch (tl::Exception &ex) {

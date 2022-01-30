@@ -177,7 +177,7 @@ BEGIN_PROTECTED
 
   std::pair<bool, db::pcell_id_type> pc;
   std::pair<bool, db::cell_index_type> c;
-  get_cell_or_pcell_ids_by_name (layout, tl::to_string (cell_name_le->text ()), pc, c);
+  get_cell_or_pcell_ids_by_name (layout, tl::to_string (cell_name_le->text ()), c, pc);
   if (pc.first) {
     form.set_selected_pcell_id (pc.second);
   } else if (c.first) {
@@ -861,7 +861,7 @@ InstPropertiesPage::update_pcell_parameters ()
 
   std::pair<bool, db::pcell_id_type> pc;
   std::pair<bool, db::cell_index_type> cc;
-  get_cell_or_pcell_ids_by_name (layout, tl::to_string (cell_name_le->text ()), pc, cc);
+  get_cell_or_pcell_ids_by_name (layout, tl::to_string (cell_name_le->text ()), cc, pc);
 
   //  indicate an invalid cell name
   if (! pc.first && ! cc.first) {

@@ -697,6 +697,7 @@ PCellParametersPage::get_parameters (bool *ok)
 void
 PCellParametersPage::set_parameters (const std::vector<tl::Variant> &parameters)
 {
+  m_parameters = parameters;
   set_parameters_internal (parameters, false);
 }
 

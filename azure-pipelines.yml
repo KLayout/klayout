@@ -6,7 +6,7 @@ trigger:
     - staging
   tags:
     include:
-      - '*'
+      - 'v*'
 
 jobs:
 - job: Build

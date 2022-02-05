@@ -583,7 +583,7 @@ if __name__ == '__main__':
           version=config.version(),
           license='GNU GPLv3',
           description='KLayout standalone Python package',
-          long_description='TODO',
+          long_description='This package is a standalone distribution of KLayout\'s Python API.\n\nFor more details see here: https://www.klayout.org/klayout-pypi',
           author='Matthias Koefferlein',
           author_email='matthias@klayout.de',
           classifiers=[

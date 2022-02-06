@@ -110,7 +110,7 @@ cp -pd $bininstdir/db_plugins/lib*so* makedeb-tmp/${libdir}/db_plugins
 cp -pd $bininstdir/lay_plugins/lib*so* makedeb-tmp/${libdir}/lay_plugins
 cp -pd $bininstdir/pymod/klayout/*so makedeb-tmp/${pylibdir}
 cp -pd $bininstdir/pymod/klayout/*py makedeb-tmp/${pylibdir}
-for d in db tl rdb; do
+for d in db tl rdb lib; do
   mkdir -p makedeb-tmp/${pylibdir}/$d
   cp -pd $bininstdir/pymod/klayout/$d/*py makedeb-tmp/${pylibdir}/$d
 done

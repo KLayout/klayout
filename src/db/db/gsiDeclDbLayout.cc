@@ -1104,7 +1104,18 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@param properties_id The properties ID to get the properties for\n"
     "@return The array of variants (see \\properties_id)\n"
   ) +
-  gsi::method_ext ("top_cell", &top_cell, 
+  gsi::method ("unique_cell_name", &db::Layout::uniquify_cell_name, gsi::arg ("name"),
+    "@brief Creates a new unique cell name from the given name\n"
+    "@return A unique name derived from the argument\n"
+    "\n"
+    "If a cell with the given name exists, a suffix will be added to make the name unique. "
+    "Otherwise, the argument will be returned unchanged.\n"
+    "\n"
+    "The returned name can be used to rename cells without risk of creating name clashes.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method_ext ("top_cell", &top_cell,
     "@brief Returns the top cell object\n"
     "@return The \\Cell object of the top cell\n"
     "If the layout has a single top cell, this method returns the top cell's \\Cell object.\n"
@@ -1194,7 +1205,10 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "is returns a \\Cell object (\\create_cell).\n"
   ) +
   gsi::method ("rename_cell", &db::Layout::rename_cell, gsi::arg ("index"), gsi::arg ("name"),
-    "@brief name\n"
+    "@brief Renames the cell with given index\n"
+    "The cell with the given index is renamed to the given name. NOTE: it is not ensured that the name is unique. "
+    "This method allows assigning identical names to different cells which usually breaks things.\n"
+    "Consider using \\unique_cell_name to generate truely unique names.\n"
   ) +
   gsi::method ("delete_cell", &db::Layout::delete_cell, gsi::arg ("cell_index"),
     "@brief Deletes a cell \n"

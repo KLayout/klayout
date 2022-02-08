@@ -380,7 +380,7 @@ public:
 }
 
 bool
-Salt::create_grain (const SaltGrain &templ, SaltGrain &target)
+Salt::create_grain (const SaltGrain &templ, SaltGrain &target, double timeout, tl::InputHttpStreamCallback *callback)
 {
   tl_assert (m_root.begin_collections () != m_root.end_collections ());
 
@@ -471,7 +471,7 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target)
 
       //  otherwise download from the URL
       tl::info << QObject::tr ("Downloading package from '%1' to '%2' ..").arg (tl::to_qstring (templ.url ())).arg (tl::to_qstring (target.path ()));
-      res = tl::WebDAVObject::download (templ.url (), target.path ());
+      res = tl::WebDAVObject::download (templ.url (), target.path (), timeout, callback);
 
     } else {
 

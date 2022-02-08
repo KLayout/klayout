@@ -309,6 +309,13 @@
               </spacer>
              </item>
              <item>
+              <widget class="QPushButton" name="abort_button">
+               <property name="text">
+                <string>Abort</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QPushButton" name="close_button">
                <property name="text">
                 <string>Close</string>

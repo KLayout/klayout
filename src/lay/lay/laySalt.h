@@ -183,7 +183,7 @@ public:
    *
    *  Returns true, if the package could be created successfully.
    */
-  bool create_grain (const SaltGrain &templ, SaltGrain &target);
+  bool create_grain (const SaltGrain &templ, SaltGrain &target, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
 
   /**
    *  @brief Removes redundant entries with same names

@@ -101,6 +101,16 @@ public:
   std::vector<tl::Variant> get_parameters (bool *ok = 0);
 
   /**
+   *  @brief Gets the initial parameters
+   *
+   *  The initial parameters are the ones present on "setup".
+   */
+  const std::vector<tl::Variant> &initial_parameters () const
+  {
+    return m_parameters;
+  }
+
+  /**
    *  @brief Get the PCell declaration pointer
    */
   const db::PCellDeclaration *pcell_decl () const

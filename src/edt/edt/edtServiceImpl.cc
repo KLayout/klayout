@@ -1410,7 +1410,6 @@ InstService::make_cell (const lay::CellView &cv)
   //  head transaction, hence releasing (thus: deleting) cells. To prevert interference, create
   //  the transaction at the beginning.
   db::Transaction tr (manager (), tl::to_string (QObject::tr ("Create reference cell")), m_reference_transaction_id);
-  m_reference_transaction_id = tr.id ();
 
   lay::LayerState layer_state = view ()->layer_snapshot ();
 
@@ -1477,6 +1476,10 @@ InstService::make_cell (const lay::CellView &cv)
 
   m_has_valid_cell = true;
   m_current_cell = inst_cell_index;
+
+  if (! tr.is_empty ()) {
+    m_reference_transaction_id = tr.id ();
+  }
 
   return std::pair<bool, db::cell_index_type> (true, inst_cell_index);
 }
@@ -1611,7 +1614,7 @@ void
 InstService::do_cancel_edit ()
 {
   //  Undo "create reference" transactions which basically unfinished "create instance" transactions
-  if (m_reference_transaction_id > 0 && manager ()->last_transaction_id () == m_reference_transaction_id) {
+  if (m_reference_transaction_id > 0 && manager ()->transaction_id_for_undo () == m_reference_transaction_id) {
     manager ()->undo ();
   }
 

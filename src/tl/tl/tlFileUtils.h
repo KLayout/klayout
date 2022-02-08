@@ -171,6 +171,11 @@ std::string TL_PUBLIC combine_path (const std::string &p1, const std::string &p2
 std::string TL_PUBLIC current_dir ();
 
 /**
+ *  @brief Change the current directory and returns true if the change was successful
+ */
+bool TL_PUBLIC chdir (const std::string &path);
+
+/**
  *  @brief This function splits the path into it's components
  *  On Windows, the first component may be the drive prefix ("C:") or
  *  UNC server name ("\\server").

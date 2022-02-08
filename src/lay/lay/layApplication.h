@@ -25,6 +25,7 @@
 #define HDR_layApplication
 
 #include "layCommon.h"
+#include "layBusy.h"
 
 #include <QApplication>
 #include <QEventLoop>
@@ -366,7 +367,7 @@ private:
  *  @brief The GUI-enabled application class
  */
 class LAY_PUBLIC GuiApplication
-  : public QApplication, public ApplicationBase
+  : public QApplication, public ApplicationBase, public lay::BusyMode
 {
 public:
   GuiApplication (int &argc, char **argv);
@@ -407,6 +408,19 @@ public:
   {
     return mp_mw;
   }
+
+  /**
+   *  @brief Enters busy mode (true) or leaves it (false)
+   *
+   *  Use lay::BusySection to declare a section in "busy" mode. In busy mode, some features are disabled to
+   *  prevent recursion in processing of events.
+   */
+  virtual void enter_busy_mode (bool bm);
+
+  /**
+   *  @brief Gets a value indicating whether busy mode is enabled
+   */
+  virtual bool is_busy () const;
 
   /**
    *  @brief Forces update of the application menu

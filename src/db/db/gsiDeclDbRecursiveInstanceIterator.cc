@@ -30,6 +30,31 @@
 namespace gsi
 {
 
+namespace {
+
+/**
+ *  @brief A wrapper that allows using "each" on the iterator
+ */
+class IteratorIterator
+{
+public:
+  typedef db::RecursiveInstanceIterator value_type;
+  typedef db::RecursiveInstanceIterator &reference;
+  typedef db::RecursiveInstanceIterator *pointer;
+  typedef std::forward_iterator_tag iterator_category;
+  typedef void difference_type;
+
+  IteratorIterator (db::RecursiveInstanceIterator *iter) : mp_iter (iter) { }
+  bool at_end () const { return mp_iter->at_end (); }
+  reference operator* () const { return *mp_iter; }
+  void operator++ () { ++*mp_iter; }
+
+private:
+  db::RecursiveInstanceIterator *mp_iter;
+};
+
+}
+
 // ---------------------------------------------------------------
 //  db::RecursiveInstanceIterator binding
 
@@ -46,6 +71,11 @@ static db::RecursiveInstanceIterator *new_si2 (const db::Layout &layout, const d
 static db::RecursiveInstanceIterator *new_si2a (const db::Layout &layout, const db::Cell &cell, const db::Region &region, bool overlapping)
 {
   return new db::RecursiveInstanceIterator (layout, cell, region, overlapping);
+}
+
+static IteratorIterator each (db::RecursiveInstanceIterator *r)
+{
+  return IteratorIterator (r);
 }
 
 static db::DCplxTrans si_dtrans (const db::RecursiveInstanceIterator *r)
@@ -183,6 +213,21 @@ Class<db::RecursiveInstanceIterator> decl_RecursiveInstanceIterator ("db", "Recu
     "bounding box is overlapping the search region are reported. If \"overlapping\" is false, instances whose "
     "bounding box touches the search region are reported. The bounding box of instances is measured taking all layers "
     "of the target cell into account.\n"
+  ) +
+  gsi::iterator_ext ("each", &each,
+    "@brief Native iteration\n"
+    "This method enables native iteration, e.g.\n"
+    "\n"
+    "@code\n"
+    "  iter = ... # RecursiveInstanceIterator\n"
+    "  iter.each do |i|\n"
+    "     ... i is the iterator itself\n"
+    "  end\n"
+    "@/code\n"
+    "\n"
+    "This is slightly more convenient than the 'at_end' .. 'next' loop.\n"
+    "\n"
+    "This feature has been introduced in version 0.28.\n"
   ) +
   gsi::method ("max_depth=", (void (db::RecursiveInstanceIterator::*) (int)) &db::RecursiveInstanceIterator::max_depth, gsi::arg ("depth"),
     "@brief Specifies the maximum hierarchy depth to look into\n"
@@ -465,6 +510,12 @@ Class<db::RecursiveInstanceIterator> decl_RecursiveInstanceIterator ("db", "Recu
   "while !iter.at_end?\n"
   "  puts \"Instance of #{iter.inst_cell.name} in #{cell.name}: \" + (iter.dtrans * iter.inst_dtrans).to_s\n"
   "  iter.next\n"
+  "end\n"
+  "@/code\n"
+  "\n"
+  "# or shorter:\n"
+  "cell.begin_instances_rec.each do |iter|\n"
+  "  puts \"Instance of #{iter.inst_cell.name} in #{cell.name}: \" + (iter.dtrans * iter.inst_dtrans).to_s\n"
   "end\n"
   "@/code\n"
   "\n"

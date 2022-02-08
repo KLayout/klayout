@@ -102,6 +102,7 @@ SOURCES = \
   layBrowserDialog.cc \
   layBrowserPanel.cc \
   layBrowseShapesForm.cc \
+  layBusy.cc \
   layCanvasPlane.cc \
   layCellSelectionForm.cc \
   layCellTreeModel.cc \
@@ -208,6 +209,7 @@ HEADERS = \
   layBrowser.h \
   layBrowserPanel.h \
   layBrowseShapesForm.h \
+  layBusy.h \
   layCanvasPlane.h \
   layCellSelectionForm.h \
   layCellTreeModel.h \

@@ -1318,6 +1318,20 @@ GuiApplication::notify (QObject *receiver, QEvent *e)
 }
 
 void
+GuiApplication::enter_busy_mode (bool bm)
+{
+  if (mp_mw) {
+    mp_mw->enter_busy_mode (bm);
+  }
+}
+
+bool
+GuiApplication::is_busy () const
+{
+  return mp_mw && mp_mw->is_busy ();
+}
+
+void
 GuiApplication::force_update_app_menu ()
 {
 #if defined(__APPLE__)
@@ -1484,18 +1498,19 @@ GuiApplication::setup ()
 void
 GuiApplication::process_events_impl (QEventLoop::ProcessEventsFlags flags, bool silent)
 {
+  //  prevent recursive process_events
+  if (is_busy ()) {
+    return;
+  }
+
   if (mp_mw) {
 
-    //  prevent recursive process_events
-    if (mp_mw->is_busy ()) {
-      return;
-    }
+    lay::BusySection busy;
 
     if (silent) {
       tl::DeferredMethodScheduler::enable (false);
     }
 
-    mp_mw->enter_busy_mode (true);
     try {
 #if QT_VERSION < 0x050000
       QApplication::syncX ();
@@ -1507,7 +1522,6 @@ GuiApplication::process_events_impl (QEventLoop::ProcessEventsFlags flags, bool 
     } catch (...) {
       //  ignore exceptions
     }
-    mp_mw->enter_busy_mode (false);
 
     if (silent) {
       tl::DeferredMethodScheduler::enable (true);

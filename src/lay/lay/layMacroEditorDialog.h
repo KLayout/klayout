@@ -301,7 +301,6 @@ private:
   lay::Dispatcher *mp_plugin_root;
   lym::MacroCollection *mp_root;
   bool m_first_show;
-  bool m_in_processing;
   bool m_debugging_on;
   lym::Macro *mp_run_macro;
   std::vector<lym::Macro *> m_macro_templates;

@@ -44,6 +44,7 @@
 #include "dbClipboardData.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
+#include "layBusy.h"
 #include "layLibrariesView.h"
 #include "layCellTreeModel.h"
 #include "layLayoutView.h"
@@ -135,6 +136,8 @@ LibraryTreeWidget::startDrag (Qt::DropActions supportedActions)
     if (!data) {
       return;
     }
+
+    lay::BusySection busy_section; // issue 984
 
     QDrag *drag = new QDrag (this);
     drag->setMimeData(data);

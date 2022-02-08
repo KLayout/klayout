@@ -42,6 +42,7 @@
 
 #include "dbClipboard.h"
 #include "dbClipboardData.h"
+#include "layBusy.h"
 #include "layHierarchyControlPanel.h"
 #include "layCellTreeModel.h"
 #include "layLayoutView.h"
@@ -145,6 +146,8 @@ HCPCellTreeWidget::startDrag (Qt::DropActions supportedActions)
     if (!data) {
       return;
     }
+
+    lay::BusySection busy_section; // issue 984
 
     QDrag *drag = new QDrag (this);
     drag->setMimeData(data);

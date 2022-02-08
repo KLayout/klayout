@@ -934,7 +934,7 @@ OutputFileBase::OutputFileBase (const std::string &path, int keep_backups)
       }
     }
     if (! m_backup_path.empty ()) {
-      if (! tl::rename_file (path, m_backup_path)) {
+      if (! tl::rename_file (path, tl::filename (m_backup_path))) {
         tl::warn << tl::sprintf (tl::to_string (tr ("Could not create backup file: unable to rename original file '%s' to backup file")), path, m_backup_path);
         m_backup_path = std::string ();
       }

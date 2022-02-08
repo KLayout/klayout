@@ -511,7 +511,6 @@ Class<db::RecursiveInstanceIterator> decl_RecursiveInstanceIterator ("db", "Recu
   "  puts \"Instance of #{iter.inst_cell.name} in #{cell.name}: \" + (iter.dtrans * iter.inst_dtrans).to_s\n"
   "  iter.next\n"
   "end\n"
-  "@/code\n"
   "\n"
   "# or shorter:\n"
   "cell.begin_instances_rec.each do |iter|\n"

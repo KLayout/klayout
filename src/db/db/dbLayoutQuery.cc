@@ -202,7 +202,9 @@ struct ShapeFilterPropertyIDs
   ShapeFilterPropertyIDs (LayoutQuery *q)
   {
     bbox               = q->register_property ("bbox", LQ_box);
+    dbbox              = q->register_property ("dbbox", LQ_dbox);
     shape_bbox         = q->register_property ("shape_bbox", LQ_box);
+    shape_dbbox        = q->register_property ("shape_dbbox", LQ_dbox);
     shape              = q->register_property ("shape", LQ_shape);
     layer_info         = q->register_property ("layer_info", LQ_layer);
     layer_index        = q->register_property ("layer_index", LQ_variant);
@@ -211,7 +213,9 @@ struct ShapeFilterPropertyIDs
   }
 
   unsigned int bbox;                // bbox                 -> The shape's bounding box
+  unsigned int dbbox;               // dbbox                -> The shape's bounding box in micrometer units
   unsigned int shape_bbox;          // shape_bbox           -> == box
+  unsigned int shape_dbbox;         // shape_dbbox          -> == dbox
   unsigned int shape;               // shape                -> The shape object
   unsigned int layer_info;          // layer_info           -> The layer (a LayerInfo object)
   unsigned int layer_index;         // layer_index          -> The layer index
@@ -307,6 +311,12 @@ public:
     if (id == m_pids.bbox || id == m_pids.shape_bbox) {
 
       v = tl::Variant::make_variant (m_shape->bbox ());
+      return true;
+
+    } else if (id == m_pids.dbbox || id == m_pids.shape_dbbox) {
+
+      tl_assert (mp_parent->layout ());
+      v = tl::Variant::make_variant (db::CplxTrans (mp_parent->layout ()->dbu ()) * m_shape->bbox ());
       return true;
 
     } else if (id == m_pids.shape) {
@@ -418,7 +428,9 @@ struct ChildCellFilterPropertyIDs
     parent_cell_name   = q->register_property ("parent_cell_name", LQ_variant);
     hier_levels        = q->register_property ("hier_levels", LQ_variant);
     bbox               = q->register_property ("bbox", LQ_box);
+    dbbox              = q->register_property ("dbbox", LQ_dbox);
     cell_bbox          = q->register_property ("cell_bbox", LQ_box);
+    cell_dbbox         = q->register_property ("cell_dbbox", LQ_dbox);
 
     //  with instance_mode == NoInstances:
     if (instance_mode == NoInstances) {
@@ -434,21 +446,31 @@ struct ChildCellFilterPropertyIDs
     //  with instance_mode != NoInstances:
     if (instance_mode != NoInstances) {
       path_trans       = q->register_property ("path_trans", LQ_trans);
+      path_dtrans      = q->register_property ("path_dtrans", LQ_dtrans);
       trans            = q->register_property ("trans", LQ_trans);
+      dtrans           = q->register_property ("dtrans", LQ_dtrans);
       inst_bbox        = q->register_property ("inst_bbox", LQ_box);
+      inst_dbbox       = q->register_property ("inst_dbbox", LQ_box);
       inst             = q->register_property ("inst", LQ_instance);
       array_a          = q->register_property ("array_a", LQ_point);
+      array_da         = q->register_property ("array_da", LQ_dpoint);
       array_na         = q->register_property ("array_na", LQ_variant);
       array_b          = q->register_property ("array_b", LQ_point);
+      array_db         = q->register_property ("array_db", LQ_dpoint);
       array_nb         = q->register_property ("array_nb", LQ_variant);
     } else {
       path_trans       = std::numeric_limits<unsigned int>::max ();
+      path_dtrans      = std::numeric_limits<unsigned int>::max ();
       trans            = std::numeric_limits<unsigned int>::max ();
+      dtrans           = std::numeric_limits<unsigned int>::max ();
       inst_bbox        = std::numeric_limits<unsigned int>::max ();
+      inst_dbbox       = std::numeric_limits<unsigned int>::max ();
       inst             = std::numeric_limits<unsigned int>::max ();
       array_a          = std::numeric_limits<unsigned int>::max ();
+      array_da         = std::numeric_limits<unsigned int>::max ();
       array_na         = std::numeric_limits<unsigned int>::max ();
       array_b          = std::numeric_limits<unsigned int>::max ();
+      array_db         = std::numeric_limits<unsigned int>::max ();
       array_nb         = std::numeric_limits<unsigned int>::max ();
     }
 
@@ -475,7 +497,9 @@ struct ChildCellFilterPropertyIDs
   unsigned int parent_cell_name;    // parent_cell_name     -> Name of parent cell (next in path) or nil
   unsigned int hier_levels;         // hier_levels          -> Number of hierarchy levels in path (length of path - 1)
   unsigned int bbox;                // bbox                 -> Cell bounding box
+  unsigned int dbbox;               // dbbox                -> Cell bounding box in micrometer units
   unsigned int cell_bbox;           // cell_bbox            -> == bbox
+  unsigned int cell_dbbox;          // cell_dbbox           -> == dbbox
 
   //  with instance_mode == NoInstances:
   unsigned int references;          // references           -> The number of instances (arefs count as 1) of this cell in the parent cell
@@ -484,17 +508,22 @@ struct ChildCellFilterPropertyIDs
 
   //  with instance_mode != NoInstances:
   unsigned int path_trans;          // path_trans           -> The transformation of that instance into the top cell
+  unsigned int path_dtrans;         // path_dtrans          -> The transformation of that instance into the top cell in micrometer units
   unsigned int trans;               // trans                -> The transformation of that instance (first instance if an array)
+  unsigned int dtrans;              // dtrans               -> The transformation of that instance (first instance if an array) in micrometer units
   unsigned int inst_bbox;           // inst_bbox            -> The instance bounding box in the top cell
+  unsigned int inst_dbbox;          // inst_dbbox           -> The instance bounding box in the top cell in micrometer units
   unsigned int inst;                // inst                 -> The instance object
   unsigned int array_a;             // array_a              -> The a vector for an array instance
+  unsigned int array_da;            // array_da             -> The a vector for an array instance in micrometer units
   unsigned int array_na;            // array_na             -> The a axis array dimension
   unsigned int array_b;             // array_b              -> The b vector for an array instance
+  unsigned int array_db;            // array_db             -> The b vector for an array instance in micrometer units
   unsigned int array_nb;            // array_nb             -> The b axis array dimension
 
   //  with instance_mode == ExplodedInstances:
   unsigned int array_ia;            // array_ia             -> The a index when an array is iterated
-  unsigned int array_ib;            // array_ib             -> The b index when an array is iterated
+  unsigned int array_ib;             // array_ib             -> The b index when an array is iterated
 };
 
 class DB_PUBLIC ChildCellFilterState
@@ -764,6 +793,15 @@ public:
       }
       return true;
 
+    } else if (id == m_pids.dbbox || id == m_pids.cell_dbbox) {
+
+      if (! layout ()->is_valid_cell_index (cell_index ())) {
+        v = tl::Variant ();
+      } else {
+        v = tl::Variant::make_variant (db::CplxTrans (layout ()->dbu ()) * layout ()->cell (cell_index ()).bbox ());
+      }
+      return true;
+
     } else if (id == m_pids.cell_name) {
 
       if (! layout ()->is_valid_cell_index (cell_index ())) {
@@ -983,6 +1021,35 @@ public:
         return false;
       }
 
+    } else if (id == m_pids.inst_dbbox) {
+
+      if (mp_parent) {
+
+        if (m_instance_mode == ExplodedInstances) {
+
+          db::ICplxTrans t = m_parent_trans;
+          t *= (*m_inst)->complex_trans (*m_array_iter);
+          db::DBox box (db::CplxTrans (layout ()->dbu ()) * t * layout ()->cell ((*m_inst)->object ().cell_index ()).bbox ());
+          v = tl::Variant::make_variant (box);
+          return true;
+
+        } else if (m_instance_mode == ArrayInstances) {
+
+          db::ICplxTrans t = m_parent_trans;
+          t *= (*m_inst)->complex_trans ();
+          db::box_convert <db::CellInst> bc (*layout ());
+          db::DBox box (db::CplxTrans (layout ()->dbu ()) * t * (*m_inst)->bbox (bc));
+          v = tl::Variant::make_variant (box);
+          return true;
+
+        } else {
+          return false;
+        }
+
+      } else {
+        return false;
+      }
+
     } else if (id == m_pids.path_trans) {
 
       if (mp_parent) {
@@ -1011,6 +1078,36 @@ public:
         return true;
       }
 
+    } else if (id == m_pids.path_dtrans) {
+
+      if (mp_parent) {
+
+        if (m_instance_mode == ExplodedInstances) {
+
+          db::ICplxTrans t = m_parent_trans;
+          t *= (*m_inst)->complex_trans (*m_array_iter);
+          db::CplxTrans tdbu (layout ()->dbu ());
+          v = tl::Variant::make_variant (tdbu * t * tdbu.inverted ());
+          return true;
+
+        } else if (m_instance_mode == ArrayInstances) {
+
+          db::ICplxTrans t = m_parent_trans;
+          t *= (*m_inst)->complex_trans ();
+          db::CplxTrans tdbu (layout ()->dbu ());
+          v = tl::Variant::make_variant (tdbu * t * tdbu.inverted ());
+          return true;
+
+        } else {
+          v = tl::Variant::make_variant (db::ICplxTrans ());
+          return true;
+        }
+
+      } else {
+        v = tl::Variant::make_variant (db::ICplxTrans ());
+        return true;
+      }
+
     } else if (id == m_pids.trans) {
 
       if (mp_parent) {
@@ -1023,6 +1120,30 @@ public:
         } else if (m_instance_mode == ArrayInstances) {
 
           v = tl::Variant::make_variant ((*m_inst)->complex_trans ());
+          return true;
+
+        } else {
+          return false;
+        }
+
+      } else {
+        return false;
+      }
+
+    } else if (id == m_pids.dtrans) {
+
+      if (mp_parent) {
+
+        if (m_instance_mode == ExplodedInstances) {
+
+          db::CplxTrans tdbu (layout ()->dbu ());
+          v = tl::Variant::make_variant (tdbu * (*m_inst)->complex_trans (*m_array_iter) * tdbu.inverted ());
+          return true;
+
+        } else if (m_instance_mode == ArrayInstances) {
+
+          db::CplxTrans tdbu (layout ()->dbu ());
+          v = tl::Variant::make_variant (tdbu * (*m_inst)->complex_trans () * tdbu.inverted ());
           return true;
 
         } else {
@@ -1064,7 +1185,7 @@ public:
         return true;
       }
 
-    } else if (id == m_pids.array_a || id == m_pids.array_b || id == m_pids.array_na || id == m_pids.array_nb) {
+    } else if (id == m_pids.array_a || id == m_pids.array_b || id == m_pids.array_da || id == m_pids.array_db || id == m_pids.array_na || id == m_pids.array_nb) {
 
       if (! mp_parent || m_instance_mode == NoInstances) {
         return false;
@@ -1074,8 +1195,12 @@ public:
         if ((*m_inst)->is_regular_array (a, b, na, nb)) {
           if (id == m_pids.array_a) {
             v = tl::Variant::make_variant (a);
+          } else if (id == m_pids.array_da) {
+            v = tl::Variant::make_variant (db::CplxTrans (layout ()->dbu ()) * a);
           } else if (id == m_pids.array_b) {
             v = tl::Variant::make_variant (b);
+          } else if (id == m_pids.array_db) {
+            v = tl::Variant::make_variant (db::CplxTrans (layout ()->dbu ()) * b);
           } else if (id == m_pids.array_na) {
             v = na;
           } else if (id == m_pids.array_nb) {
@@ -1178,8 +1303,11 @@ struct CellFilterPropertyIDs
     tot_weight         = q->register_property ("tot_weight", LQ_variant);
     instances          = q->register_property ("instances", LQ_variant);
     bbox               = q->register_property ("bbox", LQ_box);
+    dbbox              = q->register_property ("dbbox", LQ_dbox);
     cell_bbox          = q->register_property ("cell_bbox", LQ_box);
+    cell_dbbox         = q->register_property ("cell_dbbox", LQ_dbox);
     path_trans         = q->register_property ("path_trans", LQ_trans);
+    path_dtrans        = q->register_property ("path_dtrans", LQ_dtrans);
   }
 
   unsigned int path;                // path                 -> Variant array with the indexes of the cells in that path
@@ -1200,8 +1328,11 @@ struct CellFilterPropertyIDs
   unsigned int tot_weight;          // tot_weight           -> The number of instances of this cell in the initial cell along the given path
   unsigned int instances;           // instances            -> The number of instances of this cell in the previous cell (or over all if there is no previous cell)
   unsigned int bbox;                // bbox                 -> Cell bounding box
+  unsigned int dbbox;               // dbbox                -> Cell bounding box in micrometer units
   unsigned int cell_bbox;           // cell_bbox            -> == bbox
+  unsigned int cell_dbbox;          // cell_dbbox           -> == dbbox
   unsigned int path_trans;          // parent_trans         -> transformation to initial cell
+  unsigned int path_dtrans;         // parent_dtrans        -> transformation to initial cell in micrometer units
 };
 
 class DB_PUBLIC CellFilterState
@@ -1283,6 +1414,15 @@ public:
       }
       return true;
 
+    } else if (id == m_pids.dbbox || id == m_pids.cell_dbbox) {
+
+      if (! layout ()->is_valid_cell_index (*m_cell)) {
+        v = tl::Variant ();
+      } else {
+        v = tl::Variant::make_variant (db::CplxTrans (layout ()->dbu ()) * layout ()->cell (*m_cell).bbox ());
+      }
+      return true;
+
     } else if (id == m_pids.cell_name || id == m_pids.initial_cell_name) {
 
       if (! layout ()->is_valid_cell_index (*m_cell)) {
@@ -1361,6 +1501,11 @@ public:
     } else if (id == m_pids.path_trans) {
 
       v = tl::Variant::make_variant (db::ICplxTrans ());
+      return true;
+
+    } else if (id == m_pids.path_dtrans) {
+
+      v = tl::Variant::make_variant (db::DCplxTrans ());
       return true;
 
     } else {

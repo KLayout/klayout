@@ -872,20 +872,25 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     #                             |         +-- db_plugins/
     #                             |         +-- lay_plugins/
     #                             +-- Buddy/+
-    #                                       +-- 'strm2cif'
-    #                                       +-- 'strm2dxf'
-    #                                       :
-    #                                       +-- 'strmxor'
+    #                             |         +-- 'strm2cif'
+    #                             |         +-- 'strm2dxf'
+    #                             |         :
+    #                             |         +-- 'strmxor'
+    #                             +-- pymod/+
+    #                                       +-- klayout/
+    #                                       +-- pya/
     #-----------------------------------------------------------------
     targetDir0 = "%s/klayout.app/Contents" % AbsMacPkgDir
     targetDirR = targetDir0 + "/Resources"
     targetDirF = targetDir0 + "/Frameworks"
     targetDirM = targetDir0 + "/MacOS"
     targetDirB = targetDir0 + "/Buddy"
+    targetDirP = targetDir0 + "/pymod"
     os.makedirs(targetDirR)
     os.makedirs(targetDirF)
     os.makedirs(targetDirM)
     os.makedirs(targetDirB)
+    os.makedirs(targetDirP)
 
 
     print( " [4] Copying KLayout's dynamic link libraries to 'Frameworks' ..." )
@@ -1033,7 +1038,9 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     sourceDir1 = sourceDir0 + "/MacOS"
     sourceDir2 = "%s/macbuild/Resources" % ProjectDir
     sourceDir3 = "%s" % MacBinDir
+    sourceDir4 = "%s/pymod" % MacBinDir
 
+    # (A) the main components
     tmpfileM = ProjectDir + "/macbuild/Resources/Info.plist.template"
     keydicM  = { 'exe': 'klayout', 'icon': 'klayout.icns', 'bname': 'klayout', 'ver': Version }
     plistM   = GenerateInfoPlist( keydicM, tmpfileM )
@@ -1045,17 +1052,21 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     shutil.copy2( sourceDir1 + "/klayout",      targetDirM )
     shutil.copy2( sourceDir2 + "/klayout.icns", targetDirR )
 
-
     os.chmod( targetDir0 + "/PkgInfo",      0o0644 )
     os.chmod( targetDir0 + "/Info.plist",   0o0644 )
     os.chmod( targetDirM + "/klayout",      0o0755 )
     os.chmod( targetDirR + "/klayout.icns", 0o0644 )
 
+    # (B) the buddy command line tools
     buddies = glob.glob( sourceDir3 + "/strm*" )
     for item in buddies:
         shutil.copy2( item, targetDirB )
         buddy = os.path.basename(item)
         os.chmod( targetDirB + "/" + buddy, 0o0755 )
+
+    # (C) the pymod
+    shutil.copytree( sourceDir4 + "/klayout",  targetDirP + "/klayout" )
+    shutil.copytree( sourceDir4 + "/pya",      targetDirP + "/pya" )
 
 
     print( " [7] Setting and changing the identification names of KLayout's libraries in each executable ..." )

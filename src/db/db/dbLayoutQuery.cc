@@ -42,10 +42,69 @@ namespace db
 // --------------------------------------------------------------------------------
 //  Some utilities
 
-bool check_trailing_reserved_word (const tl::Extractor &ex0) 
+static const char *s_select = "select";
+static const char *s_delete = "delete";
+static const char *s_or = "or";
+static const char *s_of = "of";
+static const char *s_on = "on";
+static const char *s_do = "do";
+static const char *s_from = "from";
+static const char *s_layer = "layer";
+static const char *s_layers = "layers";
+static const char *s_cell = "cell";
+static const char *s_cells = "cells";
+static const char *s_where = "where";
+static const char *s_shapes = "shapes";
+static const char *s_polygons = "polygons";
+static const char *s_boxes = "boxes";
+static const char *s_edges = "edges";
+static const char *s_paths = "paths";
+static const char *s_texts = "texts";
+static const char *s_instances = "instances";
+static const char *s_arrays = "arrays";
+static const char *s_sorted = "sorted";
+static const char *s_unique = "unique";
+static const char *s_by = "by";
+static const char *s_with = "with";
+static const char *s_pass = "pass";
+
+const char *s_reserved_words[] = {
+  s_select,
+  s_delete,
+  s_or,
+  s_of,
+  s_on,
+  s_do,
+  s_from,
+  s_layer,
+  s_layers,
+  s_cell,
+  s_cells,
+  s_where,
+  s_shapes,
+  s_polygons,
+  s_boxes,
+  s_edges,
+  s_paths,
+  s_texts,
+  s_instances,
+  s_arrays,
+  s_sorted,
+  s_unique,
+  s_by,
+  s_with,
+  s_pass
+};
+
+bool check_trailing_reserved_word (const tl::Extractor &ex0)
 {
   tl::Extractor ex = ex0;
-  return (ex.test ("do") || ex.test ("sorted") || ex.test ("pass") || ex.test ("where"));
+  for (size_t i = 0; i < sizeof (s_reserved_words) / sizeof (s_reserved_words[0]); ++i) {
+    if (ex.test (s_reserved_words[i])) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // --------------------------------------------------------------------------------
@@ -2370,7 +2429,7 @@ parse_cell_name_filter_element (tl::Extractor &ex, LayoutQuery *q, ChildCellFilt
     std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     do {
       parse_cell_name_filter_seq (ex, q, b.get (), instance_mode, reading);
-    } while (ex.test (",") || ex.test ("or"));
+    } while (ex.test (",") || ex.test (s_or));
 
     //  TODO: do this in the optimization
     if (b->children ().size () == 1 && dynamic_cast<FilterBracket *> (b->children ()[0])) {
@@ -2507,21 +2566,21 @@ parse_cell_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bo
 
     std::unique_ptr<FilterBracket> b (new FilterBracket (q));
 
-    if (ex.test ("instances")) {
-      (ex.test ("of") || ex.test ("from")) && (ex.test ("cells") || ex.test ("cell"));
+    if (ex.test (s_instances)) {
+      (ex.test (s_of) || ex.test (s_from)) && (ex.test (s_cells) || ex.test (s_cell));
       //  Because an array member cannot be modified we use ArrayInstances in the modification case always
       parse_cell_name_filter_seq (ex, q, b.get (), reading ? ExplodedInstances : ArrayInstances, reading);
-    } else if (ex.test ("arrays")) {
-      (ex.test ("of") || ex.test ("from")) && (ex.test ("cells") || ex.test ("cell"));
+    } else if (ex.test (s_arrays)) {
+      (ex.test (s_of) || ex.test (s_from)) && (ex.test (s_cells) || ex.test (s_cell));
       parse_cell_name_filter_seq (ex, q, b.get (), ArrayInstances, reading);
     } else {
-      ex.test ("cells") || ex.test ("cell");
+      ex.test (s_cells) || ex.test (s_cell);
       parse_cell_name_filter_seq (ex, q, b.get (), NoInstances, reading);
     }
 
     FilterBase *fl = 0, *f = 0;
 
-    if (with_where_clause && ex.test ("where")) {
+    if (with_where_clause && ex.test (s_where)) {
 
       std::string expr = tl::Eval::parse_expr (ex, true);
 
@@ -2552,22 +2611,22 @@ parse_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool re
 {
   unsigned int sf = (unsigned int) db::ShapeIterator::Nothing;
   do {
-    if (ex.test ("shapes")) {
+    if (ex.test (s_shapes)) {
       sf |= (unsigned int) db::ShapeIterator::All;
-    } else if (ex.test ("polygons")) {
+    } else if (ex.test (s_polygons)) {
       sf |= (unsigned int) db::ShapeIterator::Polygons;
-    } else if (ex.test ("boxes")) {
+    } else if (ex.test (s_boxes)) {
       sf |= (unsigned int) db::ShapeIterator::Boxes;
-    } else if (ex.test ("edges")) {
+    } else if (ex.test (s_edges)) {
       sf |= (unsigned int) db::ShapeIterator::Edges;
-    } else if (ex.test ("paths")) {
+    } else if (ex.test (s_paths)) {
       sf |= (unsigned int) db::ShapeIterator::Paths;
-    } else if (ex.test ("texts")) {
+    } else if (ex.test (s_texts)) {
       sf |= (unsigned int) db::ShapeIterator::Texts;
     } else {
       break;
     }
-  } while (ex.test (",") || ex.test ("or"));
+  } while (ex.test (",") || ex.test (s_or));
 
   db::ShapeIterator::flags_type shapes = (db::ShapeIterator::flags_type) sf;
 
@@ -2575,12 +2634,12 @@ parse_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool re
 
     db::LayerMap lm;
 
-    if (ex.test ("on")) {
-      ex.test ("layer") || ex.test ("layers");
+    if (ex.test (s_on)) {
+      ex.test (s_layer) || ex.test (s_layers);
       lm.map_expr (ex, 0);
     }
 
-    ex.test ("of") || ex.test ("from");
+    ex.test (s_of) || ex.test (s_from);
 
     std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     parse_cell_filter (ex, q, b.get (), false, reading);
@@ -2596,7 +2655,7 @@ parse_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool re
     bracket->add_child (f);
     fl->connect (f);
 
-    if (ex.test ("where")) {
+    if (ex.test (s_where)) {
 
       std::string expr = tl::Eval::parse_expr (ex, true);
 
@@ -2617,7 +2676,7 @@ parse_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool re
 void
 parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool reading)
 {
-  if (ex.test ("select")) {
+  if (ex.test (s_select)) {
 
     std::vector<std::string> expressions;
 
@@ -2625,7 +2684,7 @@ parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool
       expressions.push_back (tl::Eval::parse_expr (ex, true));
     } while (ex.test (","));
 
-    ex.expect ("from");
+    ex.expect (s_from);
 
     std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     parse_filter (ex, q, b.get (), true);
@@ -2633,10 +2692,10 @@ parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool
     bool unique = false;
 
     std::string sort_expression;
-    if (ex.test ("sorted")) {
-      ex.test ("by");
+    if (ex.test (s_sorted)) {
+      ex.test (s_by);
       sort_expression = tl::Eval::parse_expr (ex, true);
-      unique = ex.test ("unique");
+      unique = ex.test (s_unique);
     }
 
     FilterBase *f = b.release ();
@@ -2649,16 +2708,16 @@ parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool
 
     bracket->connect_exit (ff);
 
-  } else if (! reading && ex.test ("with")) {
+  } else if (! reading && ex.test (s_with)) {
 
     std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     parse_filter (ex, q, b.get (), false);
 
-    ex.expect ("do");
+    ex.expect (s_do);
 
     std::string expression = tl::Eval::parse_expr (ex, true);
 
-    bool transparent = ex.test ("pass");
+    bool transparent = ex.test (s_pass);
 
     FilterBase *f = b.release ();
     bracket->add_child (f);
@@ -2670,12 +2729,12 @@ parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool
 
     bracket->connect_exit (ff);
 
-  } else if (! reading && ex.test ("delete")) {
+  } else if (! reading && ex.test (s_delete)) {
 
     std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     parse_filter (ex, q, b.get (), false);
 
-    bool transparent = ex.test ("pass");
+    bool transparent = ex.test (s_pass);
 
     FilterBase *f = b.release ();
     bracket->add_child (f);
@@ -2699,7 +2758,10 @@ LayoutQuery::LayoutQuery (const std::string &query)
 
   tl::Extractor ex (query.c_str ());
   parse_statement (ex, this, r.get (), false);
-  ex.expect_end ();
+
+  if (! ex.at_end ()) {
+    ex.error (tl::to_string (tr ("Unexpected text")));
+  }
 
   r->optimize ();
   mp_root = r.release ();

@@ -742,7 +742,7 @@ struct cplx_trans_defs
       "\n"
       "@return The inverted transformation\n"
     ) +
-    method ("ctrans", &C::ctrans, arg ("d"),
+    method ("ctrans|*", &C::ctrans, arg ("d"),
       "@brief Transforms a distance\n"
       "\n"
       "The \"ctrans\" method transforms the given distance.\n"

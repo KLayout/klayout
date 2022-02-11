@@ -29,6 +29,7 @@
 #include "dbLayout.h"
 #include "dbInstElement.h"
 #include "tlAssert.h"
+#include "tlObject.h"
 
 #include <map>
 #include <set>
@@ -306,7 +307,7 @@ public:
    */
   const layout_type *layout () const
   {
-    return mp_layout;
+    return mp_layout.get ();
   }
 
   /**
@@ -765,7 +766,7 @@ private:
   std::set<db::cell_index_type> m_start, m_stop;
   cplx_trans_type m_global_trans;
 
-  const layout_type *mp_layout;
+  tl::weak_ptr<layout_type> mp_layout;
   const cell_type *mp_top_cell;
   const shapes_type *mp_shapes;
 

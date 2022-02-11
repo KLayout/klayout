@@ -62,10 +62,10 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
   std::string tmp_file;
   db::SaveLayoutOptions options;
 
-  if (norm == WriteGDS2) {
+  if ((norm & db::NormFileMask) == WriteGDS2) {
     tmp_file = _this->tmp_file (tl::sprintf ("tmp_%x.gds", hash));
     options.set_format ("GDS2");
-  } else if (norm == WriteOAS) {
+  } else if ((norm & db::NormFileMask) == WriteOAS) {
     tmp_file = _this->tmp_file (tl::sprintf ("tmp_%x.oas", hash));
     options.set_format ("OASIS");
   } else {
@@ -74,13 +74,17 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
     options.set_format_from_filename (tmp_file);
   }
 
+  if ((norm & NoContext) != 0) {
+    options.set_write_context_info (false);
+  }
+
   {
     tl::OutputStream stream (tmp_file.c_str ());
     db::Writer writer (options);
     writer.write (const_cast<db::Layout &> (layout), stream);
   }
 
-  if (norm == WriteGDS2 || norm == WriteOAS) {
+  if ((norm & db::NormFileMask) == WriteGDS2 || (norm & db::NormFileMask) == WriteOAS) {
 
     //  read all layers from the original layout, so the layer table is the same
     for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
@@ -133,7 +137,7 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
 
       equal = db::compare_layouts (*subject, layout_au,
                                      (n > 0 ? db::layout_diff::f_silent : db::layout_diff::f_verbose)
-                                     | (norm == AsPolygons ? db::layout_diff::f_boxes_as_polygons + db::layout_diff::f_paths_as_polygons : 0)
+                                     | ((norm & AsPolygons) != 0 ? db::layout_diff::f_boxes_as_polygons + db::layout_diff::f_paths_as_polygons : 0)
                                      | db::layout_diff::f_flatten_array_insts
                                    /*| db::layout_diff::f_no_text_details | db::layout_diff::f_no_text_orientation*/
                                    , tolerance, 100 /*max diff lines*/);

@@ -233,6 +233,12 @@ LibraryClass decl_Library ("db", "Library",
   ) +
   gsi::method ("layout", (db::Layout &(db::Library::*)()) &db::Library::layout, 
     "@brief The layout object where the cells reside that this library defines\n"
+  ) +
+  gsi::method ("refresh", &db::Library::refresh,
+    "@brief Updates all layouts using this library.\n"
+    "This method will retire cells or update layouts in the attached clients.\n"
+    "\n"
+    "This method has been introduced in version 0.27.8."
   ),
   "@brief A Library \n"
   "\n"

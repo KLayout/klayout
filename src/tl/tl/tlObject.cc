@@ -244,6 +244,10 @@ void WeakOrSharedPtr::reset_object ()
 
 void WeakOrSharedPtr::reset (Object *t, bool is_shared, bool is_event)
 {
+  if (t == mp_t) {
+    return;
+  }
+
   Object *to_delete = 0;
 
   {

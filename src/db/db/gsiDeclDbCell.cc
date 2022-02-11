@@ -1510,11 +1510,22 @@ static db::Cell *dup_cell (const db::Cell *cell)
   return new_cell;
 }
 
+static const char *cell_name (const db::Cell *cell)
+{
+  if (cell->layout ()) {
+    return cell->layout ()->cell_name (cell->cell_index ());
+  } else {
+    return "<none>";
+  }
+}
+
 static db::Point default_origin;
 
 Class<db::Cell> decl_Cell ("db", "Cell",
-  gsi::method ("name", &db::Cell::get_basic_name,
+  gsi::method_ext ("name", &cell_name,
     "@brief Gets the cell's name\n"
+    "\n"
+    "This may be an internal name for proxy cells. See \\basic_name for the formal name (PCell name or library cell name).\n"
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +

@@ -1334,7 +1334,9 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
     tl::Clock start_time = tl::Clock::current ();
     while (n > m_connection->read_available () && ! m_connection->finished () && (m_timeout <= 0.0 || (tl::Clock::current() - start_time).seconds () < m_timeout) && ! tl::CurlNetworkManager::instance ()->has_reply ()) {
       mp_stream->tick ();
-      ++*m_progress;
+      if (m_progress.get ()) {  //  might have been reset by tick()
+        ++*m_progress;
+      }
     }
   }
 

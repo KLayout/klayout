@@ -205,6 +205,13 @@ public:
   bool is_retired (const cell_index_type library_cell_index) const;
 
   /**
+   *  @brief Refreshes the library on all clients
+   *
+   *  This will refresh PCells, retire cells (turn them into "cold proxies") and reload layouts.
+   */
+  void refresh ();
+
+  /**
    *  @brief Remap the library proxies to a different library
    *
    *  After remapping, "other" can replace "this".

@@ -51,10 +51,12 @@ class Texts;
  */
 enum NormalizationMode
 {
-  NoNormalization,        //  no normalization - take the test subject as it is
-  AsPolygons,             //  paths and boxes are treated as polygons
-  WriteGDS2,              //  normalize subject by writing to GDS2 and reading back
-  WriteOAS                //  normalize subject by writing to OASIS and reading back
+  NoNormalization = 0,    //  no normalization - take the test subject as it is
+  WriteGDS2 = 1,          //  normalize subject by writing to GDS2 and reading back
+  WriteOAS = 2,           //  normalize subject by writing to OASIS and reading back
+  NormFileMask = 7,       //  bits the extract for file mode
+  NoContext = 8,          //  write tmp file without context
+  AsPolygons = 16         //  paths and boxes are treated as polygons
 };
 
 /**

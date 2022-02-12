@@ -89,6 +89,8 @@ void
 LibraryProxy::remap (lib_id_type lib_id, cell_index_type lib_cell_index)
 {
   if (lib_id == m_lib_id && m_library_cell_index == lib_cell_index) {
+    //  we trigger an update in any case to implement the library's "refresh"
+    update ();
     return;
   }
 

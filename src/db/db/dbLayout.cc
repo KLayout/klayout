@@ -2295,7 +2295,7 @@ Layout::convert_cell_to_static (db::cell_index_type ci)
   tl_assert (is_valid_cell_index (ci));
   db::cell_index_type ret_ci = ci;
 
-  if (dynamic_cast<const LibraryProxy *> (m_cell_ptrs [ci]) || dynamic_cast<const PCellVariant *> (m_cell_ptrs [ci])) {
+  if (m_cell_ptrs [ci] && m_cell_ptrs [ci]->is_proxy ()) {
 
     invalidate_hier ();
 

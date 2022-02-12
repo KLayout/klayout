@@ -81,6 +81,11 @@ TEST(1_simple)
   run_test (_this, "ringo_simple", "ringo.gds");
 }
 
+TEST(1a_simple_double_compare)
+{
+  run_test (_this, "ringo_simple_compare2", "ringo.gds");
+}
+
 TEST(1b_simple_with_tolerance)
 {
   run_test (_this, "ringo_simple_with_tol", "ringo.gds");

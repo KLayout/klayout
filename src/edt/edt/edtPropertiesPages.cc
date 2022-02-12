@@ -958,8 +958,8 @@ PathPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::st
   }
 
   width_le->setText (tl::to_qstring (coord_to_string (t.ctrans (path.width ()), dbu, du)));
-  start_ext_le->setText (tl::to_qstring (coord_to_string (t.ctrans (path.extensions ().first), dbu, du)));
-  end_ext_le->setText (tl::to_qstring (coord_to_string (t.ctrans (path.extensions ().second), dbu, du)));
+  start_ext_le->setText (tl::to_qstring (coord_to_string (t.mag () * path.extensions ().first, dbu, du)));
+  end_ext_le->setText (tl::to_qstring (coord_to_string (t.mag () * path.extensions ().second, dbu, du)));
   round_cb->setChecked (path.round ());
 }
 
@@ -1061,8 +1061,8 @@ EditablePathPropertiesPage::do_update (const db::Shape &shape, double dbu, const
 
   width_le->setText (tl::to_qstring (coord_to_string (t.ctrans (w), dbu, du)));
 
-  start_ext_le->setText (tl::to_qstring (coord_to_string (t.ctrans (se), dbu, du)));
-  end_ext_le->setText (tl::to_qstring (coord_to_string (t.ctrans (ee), dbu, du)));
+  start_ext_le->setText (tl::to_qstring (coord_to_string (t.mag () * se, dbu, du)));
+  end_ext_le->setText (tl::to_qstring (coord_to_string (t.mag () * ee, dbu, du)));
 
   int type_choice = path_type_choice (path);
   if (type_cb->currentIndex () == 2) {

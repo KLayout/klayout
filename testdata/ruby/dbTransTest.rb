@@ -80,8 +80,8 @@ class DBTrans_TestClass < TestBase
     assert_equal( RBA::Trans::new(RBA::Trans::R180, RBA::DVector::new(5,-7)).to_s, "r180 5,-7" )
     assert_equal( RBA::Trans::new(RBA::Trans::R180).to_s, "r180 0,0" )
 
-    assert_equal( e.ctrans( 2.0 ).to_s, "2" )
-    assert_equal( (e * 2.0).to_s, "2" )
+    assert_equal( e.ctrans( 2.0 ), 2.0 )
+    assert_equal( e * 2.0, 2.0 )
     assert_equal( e.trans( RBA::Edge::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )
     assert_equal( ( e * RBA::Edge::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )
     assert_equal( e.trans( RBA::Box::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )

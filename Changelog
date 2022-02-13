@@ -1,3 +1,18 @@
+0.27.8          (2022-02-13):
+* Bugfix: %GITHUB%/issues/971 Double compare fails in LVS
+* Bugfix: %GITHUB%/issues/972 CIF writer generates unreadable file with invalid cell or layer names
+* Bugfix: %GITHUB%/issues/973 Enhanced timeout in package manager on large file download
+* Bugfix: %GITHUB%/issues/979 Backup file generation fails with relative paths
+* Bugfix: %GITHUB%/issues/982 Heal option for tiled XOR
+* Bugfix: %GITHUB%/issues/983 Bug changing PCell parameters of multiple cell instance
+* Bugfix: %GITHUB%/issues/984 Crash in debug mode when placing a "slow cell"
+* Bugfix: %GITHUB%/issues/994 Loss of selection when clicking at wrong position
+  To make this problem less annoying, the capture range was increased when
+  clicking at already selected items for "Move".
+* Bugfix: %GITHUB%/issues/995 New top cell appearing after load
+* Enhancement: %GITHUB%/issues/996 Refresh function to trigger update from within library
+* Bugfix: %GITHUB%/issues/997 Wrong display of negative extensions of paths
+* Bugfix: scale and grids were wrong in case of oversampling
 
 0.27.7          (2022-01-12):
 * Bugfix: %GITHUB%/issues/969 PCell error (infinite recursion)

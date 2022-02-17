@@ -25,6 +25,7 @@
 #include "dbCellVariants.h"
 #include "dbPolygonTools.h"
 #include "tlProgress.h"
+#include "tlTimer.h"
 
 namespace db
 {
@@ -436,9 +437,45 @@ ContextCache::find_layout_context (db::cell_index_type from, db::cell_index_type
 // ------------------------------------------------------------
 //  Scale and snap a layout
 
+static bool
+is_on_grid (const db::Vector &v, db::Coord g, db::Coord m, db::Coord d)
+{
+  int64_t dg = int64_t (g) * int64_t (d);
+  return (int64_t (v.x ()) * m) % dg == 0 && (int64_t (v.y ()) * m) % dg == 0;
+}
+
+static void
+scale_and_snap_cell_instance (db::CellInstArray &ci, const db::ICplxTrans &tr, const db::ICplxTrans &trinv, const db::Vector &delta, db::Coord g, db::Coord m, db::Coord d)
+{
+  db::Trans ti (ci.front ());
+
+  db::Vector ti_disp = ti.disp ();
+  ti_disp.transform (tr);
+  ti_disp = scaled_and_snapped_vector (ti_disp, g, m, d, delta.x (), g, m, d, delta.y ());
+  ti_disp.transform (trinv);
+
+  ci.move (ti_disp - ti.disp ());
+}
+
+static db::Edge
+scaled_and_snapped_edge (const db::Edge &e, db::Coord g, db::Coord m, db::Coord d, db::Coord ox, db::Coord oy)
+{
+  int64_t dg = int64_t (g) * int64_t (d);
+
+  int64_t x1 = snap_to_grid (int64_t (e.p1 ().x ()) * m + int64_t (ox), dg) / int64_t (d);
+  int64_t y1 = snap_to_grid (int64_t (e.p1 ().y ()) * m + int64_t (oy), dg) / int64_t (d);
+
+  int64_t x2 = snap_to_grid (int64_t (e.p2 ().x ()) * m + int64_t (ox), dg) / int64_t (d);
+  int64_t y2 = snap_to_grid (int64_t (e.p2 ().y ()) * m + int64_t (oy), dg) / int64_t (d);
+
+  return db::Edge (db::Point (x1, y1), db::Point (x2, y2));
+}
+
 void
 scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db::Coord d)
 {
+  tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("scale_and_snap")));
+
   if (g < 0) {
     throw tl::Exception (tl::to_string (tr ("Snapping requires a positive grid value")));
   }
@@ -453,8 +490,11 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
 
   db::cell_variants_collector<db::ScaleAndGridReducer> vars (db::ScaleAndGridReducer (g, m, d));
 
-  vars.collect (layout, cell);
-  vars.separate_variants (layout, cell);
+  {
+    tl::SelfTimer timer1 (tl::verbosity () >= 41, tl::to_string (tr ("scale_and_snap: variant formation")));
+    vars.collect (layout, cell);
+    vars.separate_variants (layout, cell);
+  }
 
   std::set<db::cell_index_type> called_cells;
   cell.collect_called_cells (called_cells);
@@ -463,9 +503,13 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
   db::LayoutLocker layout_locker (&layout);
   layout.update ();
 
-  std::vector<db::Point> heap;
+  tl::SelfTimer timer2 (tl::verbosity () >= 41, tl::to_string (tr ("scale_and_snap: snapping and scaling")));
 
-  unsigned int work_layer = layout.insert_layer ();
+  std::vector<db::Point> heap;
+  std::vector<db::Vector> iterated_array_vectors;
+  std::vector<db::CellInstArrayWithProperties> new_insts_with_props;
+  std::vector<db::CellInstArray> new_insts;
+  std::vector<db::Instance> instances_to_replace;
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
@@ -486,7 +530,8 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
     for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
 
       db::Shapes &s = c->shapes ((*l).first);
-      db::Shapes &out = c->shapes (work_layer);
+
+      //  TODO: properties, edges, edge pairs
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes); ! si.at_end (); ++si) {
 
@@ -495,7 +540,8 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         poly.transform (tr);
         poly = scaled_and_snapped_polygon (poly, g, m, d, tr_disp.x (), g, m, d, tr_disp.y (), heap);
         poly.transform (trinv);
-        out.insert (poly);
+
+        s.replace (*si, poly);
 
       }
 
@@ -506,12 +552,35 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         text.transform (tr);
         text.trans (db::Trans (text.trans ().rot (), scaled_and_snapped_vector (text.trans ().disp (), g, m, d, tr_disp.x (), g, m, d, tr_disp.y ())));
         text.transform (trinv);
-        out.insert (text);
+
+        s.replace (*si, text);
 
       }
 
-      s.swap (out);
-      out.clear ();
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
+
+        db::Edge edge;
+        si->edge (edge);
+        edge.transform (tr);
+        edge = scaled_and_snapped_edge (edge, g, m , d, tr_disp.x (), tr_disp.y ());
+        edge.transform (trinv);
+
+        s.replace (*si, edge);
+
+      }
+
+      for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::EdgePairs); ! si.at_end (); ++si) {
+
+        db::EdgePair edge_pair;
+        si->edge_pair (edge_pair);
+        edge_pair.transform (tr);
+        edge_pair = db::EdgePair (scaled_and_snapped_edge (edge_pair.first (), g, m , d, tr_disp.x (), tr_disp.y ()),
+                                  scaled_and_snapped_edge (edge_pair.second (), g, m , d, tr_disp.x (), tr_disp.y ()));
+        edge_pair.transform (trinv);
+
+        s.replace (*si, edge_pair);
+
+      }
 
     }
 
@@ -520,33 +589,115 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
     //  as a variant cell (an effect of ScaleAndGridReducer::want_variants(cell) == true where cells have children).
     //  Variant cells are not copied blindly back to the original layout.
 
-    std::list<db::CellInstArray> new_insts;
+    new_insts.clear ();
+    new_insts_with_props.clear ();
+    instances_to_replace.clear ();
 
     for (db::Cell::const_iterator inst = c->begin (); ! inst.at_end (); ++inst) {
 
       const db::CellInstArray &ia = inst->cell_inst ();
-      for (db::CellInstArray::iterator i = ia.begin (); ! i.at_end (); ++i) {
 
-        db::Trans ti (*i);
-        db::Vector ti_disp = ti.disp ();
-        ti_disp.transform (tr);
-        ti_disp = scaled_and_snapped_vector (ti_disp, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
-        ti_disp.transform (trinv);
-        ti.disp (ti_disp);
+      //  shortcut if we do not need to explode the array
 
-        if (ia.is_complex ()) {
-          new_insts.push_back (db::CellInstArray (ia.object (), ia.complex_trans (ti)));
-        } else {
-          new_insts.push_back (db::CellInstArray (ia.object (), ti));
+      iterated_array_vectors.clear ();
+      db::Vector a, b;
+      unsigned long na, nb;
+
+      bool need_explode = false;
+      db::CellInstArray new_array (ia);
+
+      if (tr.is_complex ()) {
+
+        need_explode = ia.size () > 1;
+
+      } else if (ia.is_iterated_array (&iterated_array_vectors)) {
+
+        for (std::vector<db::Vector>::const_iterator i = iterated_array_vectors.begin (); ! need_explode && i != iterated_array_vectors.end (); ++i) {
+          need_explode = ! is_on_grid (*i, g, m, d);
+        }
+
+        if (! need_explode) {
+
+          bool needs_update = false;
+          for (std::vector<db::Vector>::iterator i = iterated_array_vectors.begin (); ! need_explode && i != iterated_array_vectors.end (); ++i) {
+            db::Vector v = scaled_and_snapped_vector (*i, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
+            if (v != *i) {
+              needs_update = true;
+              *i = v;
+            }
+          }
+
+          if (needs_update) {
+            if (ia.is_complex ()) {
+              new_array = db::CellInstArray (ia.object (), ia.complex_trans (ia.front ()), iterated_array_vectors.begin (), iterated_array_vectors.end ());
+            } else {
+              new_array = db::CellInstArray (ia.object (), ia.front (), iterated_array_vectors.begin (), iterated_array_vectors.end ());
+            }
+          }
+
+        }
+
+      } else if (ia.is_regular_array (a, b, na, nb)) {
+
+        need_explode = (na > 1 && ! is_on_grid (a, g, m, d)) && (nb > 1 && ! is_on_grid (b, g, m, d));
+
+        if (! need_explode) {
+
+          a = scaled_and_snapped_vector (a, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
+          b = scaled_and_snapped_vector (b, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
+
+          if (ia.is_complex ()) {
+            new_array = db::CellInstArray (ia.object (), ia.complex_trans (ia.front ()), a, b, na, nb);
+          } else {
+            new_array = db::CellInstArray (ia.object (), ia.front (), a, b, na, nb);
+          }
+
+        }
+
+      }
+
+      if (! need_explode) {
+
+        scale_and_snap_cell_instance (new_array, tr, trinv, tr_disp, g, m, d);
+        c->replace (*inst, new_array);
+
+      } else {
+
+        instances_to_replace.push_back (*inst);
+
+        for (db::CellInstArray::iterator i = ia.begin (); ! i.at_end (); ++i) {
+
+          db::Trans ti (*i);
+          db::Vector ti_disp = ti.disp ();
+          ti_disp.transform (tr);
+          ti_disp = scaled_and_snapped_vector (ti_disp, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
+          ti_disp.transform (trinv);
+          ti.disp (ti_disp);
+
+          db::CellInstArray new_array;
+          if (ia.is_complex ()) {
+            new_array = db::CellInstArray (ia.object (), ia.complex_trans (ti));
+          } else {
+            new_array = db::CellInstArray (ia.object (), ti);
+          }
+
+          if (inst->prop_id () > 0) {
+            new_insts_with_props.push_back (db::CellInstArrayWithProperties (new_array, inst->prop_id ()));
+          } else {
+            new_insts.push_back (new_array);
+          }
+
         }
 
       }
 
     }
 
-    c->clear_insts ();
-
-    for (std::list<db::CellInstArray>::const_iterator i = new_insts.begin (); i != new_insts.end (); ++i) {
+    c->erase_insts (instances_to_replace);
+    for (std::vector<db::CellInstArray>::const_iterator i = new_insts.begin (); i != new_insts.end (); ++i) {
+      c->insert (*i);
+    }
+    for (std::vector<db::CellInstArrayWithProperties>::const_iterator i = new_insts_with_props.begin (); i != new_insts_with_props.end (); ++i) {
       c->insert (*i);
     }
 

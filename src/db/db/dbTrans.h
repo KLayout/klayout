@@ -78,6 +78,14 @@ struct default_trans
   }
 
   /**
+   *  @brief Test, whether this is a unit transformation for vectors - i.e. ignoring displacements
+   */
+  bool is_unity_for_vector () const
+  {
+    return true;
+  }
+
+  /**
    *  @brief Orthogonal predicate
    *
    *  This predicate tells if the transformation is orthogonal, i.e. does only provide rotations by 
@@ -406,6 +414,14 @@ public:
    *  @brief Returns true, if the transformation is unity
    */
   bool is_unity () const
+  {
+    return m_f == 0;
+  }
+
+  /**
+   *  @brief Test, whether this is a unit transformation for vectors - i.e. ignoring displacements
+   */
+  bool is_unity_for_vector () const
   {
     return m_f == 0;
   }
@@ -870,6 +886,14 @@ public:
   }
 
   /**
+   *  @brief Test, whether this is a unit transformation for vectors - i.e. ignoring displacements
+   */
+  bool is_unity_for_vector () const
+  {
+    return true;
+  }
+
+  /**
    *  @brief Inversion
    *
    *  Returns the inverted transformation
@@ -1309,6 +1333,14 @@ public:
   bool is_unity () const
   {
     return m_u.equal (displacement_type ()) && fixpoint_trans<C>::is_unity ();
+  }
+
+  /**
+   *  @brief Test, whether this is a unit transformation for vectors - i.e. ignoring displacements
+   */
+  bool is_unity_for_vector () const
+  {
+    return fixpoint_trans<C>::is_unity ();
   }
 
   /**
@@ -1874,9 +1906,9 @@ public:
   }
 
   /**
-   *  @brief Test, whether this is a unit transformation
+   *  @brief Test, whether this is a unit transformation for vectors - i.e. ignoring displacements
    */
-  bool is_unity () const
+  bool is_unity_for_vector () const
   {
     if (fabs (m_mag - 1.0) > eps_f ()) {
       return false;
@@ -1887,7 +1919,15 @@ public:
     if (fabs (m_cos - 1.0) > eps_f ()) {
       return false;
     }
-    return disp ().equal (displacement_type ());
+    return true;
+  }
+
+  /**
+   *  @brief Test, whether this is a unit transformation
+   */
+  bool is_unity () const
+  {
+    return is_unity_for_vector () && disp ().equal (displacement_type ());
   }
 
   /**

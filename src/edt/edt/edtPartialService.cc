@@ -261,13 +261,12 @@ insert_point_path (const db::Path &p, const std::set<EdgeWithIndex> &sel, db::Po
 }
 
 static void 
-assign_path_compressed (db::Path &p, std::vector <db::Point> &ctr)
+remove_redundant_points (std::vector <db::Point> &ctr)
 {
   //  compress contour (remove redundant points)
   //  and assign to path
 
   std::vector<db::Point>::iterator wp = ctr.begin ();
-  std::vector<db::Point>::iterator wp0 = wp;
   std::vector<db::Point>::const_iterator rp = ctr.begin ();
   db::Point pm1 = *rp;
   if (wp != ctr.end ()) {
@@ -275,20 +274,14 @@ assign_path_compressed (db::Path &p, std::vector <db::Point> &ctr)
     ++rp;
     while (rp != ctr.end ()) {
       db::Point p0 = *rp;
-      ++rp;
-      if (rp != ctr.end ()) {
-        db::Point pp1 = *rp;
-        if (! (db::vprod_sign (pp1 - p0, p0 - pm1) == 0 && db::sprod_sign (pp1 - p0, p0 - pm1) >= 0)) {
-          *wp++ = p0;
-          pm1 = p0;
-        }
-      } else {
+      if (p0 != pm1) {
         *wp++ = p0;
       }
+      ++rp;
     }
   }
 
-  p.assign (wp0, wp);
+  ctr.erase (wp, ctr.end ());
 }
 
 static db::Path
@@ -310,7 +303,8 @@ del_points_path (const db::Path &p, const std::set<EdgeWithIndex> &sel)
     }
   }
 
-  assign_path_compressed (new_path, ctr);
+  remove_redundant_points (ctr);
+  new_path.assign (ctr.begin (), ctr.end ());
 
   return new_path;
 }
@@ -362,10 +356,10 @@ modify_path (db::Path &p, const std::map <PointWithIndex, db::Point> &new_points
   }
 
   if (compress) {
-    assign_path_compressed (p, ctr);
-  } else {
-    p.assign (ctr.begin (), ctr.end ());
+    remove_redundant_points (ctr);
   }
+
+  p.assign (ctr.begin (), ctr.end ());
 }
 
 bool
@@ -402,6 +396,8 @@ insert_point_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel, db:
 
     if (found) {
 
+      remove_redundant_points (ctr);
+
       new_poly = p;
       if (c == 0) {
         new_poly.assign_hull (ctr.begin (), ctr.end (), false /*don't compress*/);
@@ -436,10 +432,12 @@ del_points_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel)
       }
     }
 
+    remove_redundant_points (ctr);
+
     if (c == 0) {
-      new_poly.assign_hull (ctr.begin (), ctr.end (), true /*compress*/);
+      new_poly.assign_hull (ctr.begin (), ctr.end (), false /*compress*/);
     } else {
-      new_poly.assign_hole (c - 1, ctr.begin (), ctr.end (), true /*compress*/);
+      new_poly.assign_hole (c - 1, ctr.begin (), ctr.end (), false /*compress*/);
     }
 
   }
@@ -495,10 +493,14 @@ modify_polygon (db::Polygon &p,
 
     }
 
+    if (compress) {
+      remove_redundant_points (ctr);
+    }
+
     if (c == 0) {
-      p.assign_hull (ctr.begin (), ctr.end (), compress);
+      p.assign_hull (ctr.begin (), ctr.end (), false /*compress*/);
     } else {
-      p.assign_hole (c - 1, ctr.begin (), ctr.end (), compress);
+      p.assign_hole (c - 1, ctr.begin (), ctr.end (), false /*compress*/);
     }
 
   }

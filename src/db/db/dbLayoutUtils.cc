@@ -437,13 +437,6 @@ ContextCache::find_layout_context (db::cell_index_type from, db::cell_index_type
 // ------------------------------------------------------------
 //  Scale and snap a layout
 
-static bool
-is_on_grid (const db::Vector &v, db::Coord g, db::Coord m, db::Coord d)
-{
-  int64_t dg = int64_t (g) * int64_t (d);
-  return (int64_t (v.x ()) * m) % dg == 0 && (int64_t (v.y ()) * m) % dg == 0;
-}
-
 static void
 scale_and_snap_cell_instance (db::CellInstArray &ci, const db::ICplxTrans &tr, const db::ICplxTrans &trinv, const db::Vector &delta, db::Coord g, db::Coord m, db::Coord d)
 {

@@ -2676,12 +2676,6 @@ private:
   template <class T>
   void transform_delegate (const T &tr, db::ArrayRepository *array_rep) 
   {
-    //  No need to do anything if there are no vector-transforming components as displacement
-    //  is entirely handled outside the delegate
-    if (tr.is_unity_for_vector ()) {
-      return;
-    }
-
     //  transform the delegate
     if (! array_rep && ! mp_base->in_repository) {
 

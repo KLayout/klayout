@@ -49,6 +49,11 @@ struct box_defs
     return c.release ();
   }
 
+  static C world ()
+  {
+    return C::world ();
+  }
+
   static C *new_v ()
   {
     return new C ();
@@ -131,6 +136,22 @@ struct box_defs
       "Two points are given to create a new box. If the coordinates "
       "are not provided in the correct order (i.e. right < left), these are "
       "swapped."
+    ) +
+    method ("world", &world,
+      "@brief Gets the 'world' box\n"
+      "The world box is the biggest box that can be represented. So it is basically 'all'. The "
+      "world box behaves neutral on intersections for example. In other operations such as displacement or transformations, "
+      "the world box may render unexpected results because of coordinate overflow.\n"
+      "\n"
+      "The world box can be used\n"
+      "@ul\n"
+      "  @li for comparison ('==', '!=', '<') @/li\n"
+      "  @li in union and intersection ('+' and '&') @/li\n"
+      "  @li in relations (\\contains?, \\overlaps?, \\touches?) @/li\n"
+      "  @li as 'all' argument in region queries @/li\n"
+      "@/ul\n"
+      "\n"
+      "This method has been introduced in version 0.28."
     ) +
     method ("p1", &C::p1,
       "@brief Gets the lower left point of the box\n"

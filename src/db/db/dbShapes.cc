@@ -839,27 +839,27 @@ Shapes::transform (const Shapes::shape_type &ref, const Trans &t)
   case shape_type::Polygon:
     {
       shape_type::polygon_type p (ref.polygon ());
-      p.transform (t);
+      p.transform (t, false /* don't compress */);
       return replace_member_with_props (shape_type::polygon_type::tag (), ref, p);
     }
   case shape_type::PolygonRef:
     {
       shape_type::polygon_type p;
       ref.polygon (p);
-      p.transform (t);
+      p.transform (t, false /* don't compress */);
       return replace_member_with_props (shape_type::polygon_ref_type::tag (), ref, p);
     }
   case shape_type::SimplePolygon:
     {
       shape_type::simple_polygon_type p (ref.simple_polygon ());
-      p.transform (t);
+      p.transform (t, false /* don't compress */);
       return replace_member_with_props (shape_type::simple_polygon_type::tag (), ref, p);
     }
   case shape_type::SimplePolygonRef:
     {
       shape_type::simple_polygon_type p;
       ref.simple_polygon (p);
-      p.transform (t);
+      p.transform (t, false /* don't compress */);
       return replace_member_with_props (shape_type::simple_polygon_ref_type::tag (), ref, p);
     }
   case shape_type::Edge:

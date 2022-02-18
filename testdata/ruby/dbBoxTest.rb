@@ -106,6 +106,13 @@ class DBBox_TestClass < TestBase
     a = RBA::DBox.new 
     assert_equal( a.empty?, true )
 
+    a = RBA::DBox::world
+    b = RBA::DBox::new(1, 2, 3, 4)
+    assert_equal( a.empty?, false )
+    assert_equal( a == RBA::DBox::world, true )
+    assert_equal( (a + b) == RBA::DBox::world, true )
+    assert_equal( (a & b) == b, true )
+
   end
 
   # DBox basics
@@ -302,6 +309,13 @@ class DBBox_TestClass < TestBase
 
     a = RBA::Box.new 
     assert_equal( a.empty?, true )
+
+    a = RBA::Box::world
+    b = RBA::Box::new(1, 2, 3, 4)
+    assert_equal( a.empty?, false )
+    assert_equal( a == RBA::Box::world, true )
+    assert_equal( (a + b) == RBA::Box::world, true )
+    assert_equal( (a & b) == b, true )
 
   end
 

@@ -119,6 +119,9 @@ public:
   virtual void begin_edge_differences () { }
   virtual void detailed_diff (const db::PropertiesRepository & /*pr*/, const std::vector <std::pair <db::Edge, db::properties_id_type> > & /*a*/, const std::vector <std::pair <db::Edge, db::properties_id_type> > & /*b*/) { }
   virtual void end_edge_differences () { }
+  virtual void begin_edge_pair_differences () { }
+  virtual void detailed_diff (const db::PropertiesRepository & /*pr*/, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > & /*a*/, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > & /*b*/) { }
+  virtual void end_edge_pair_differences () { }
   virtual void begin_text_differences () { }
   virtual void detailed_diff (const db::PropertiesRepository & /*pr*/, const std::vector <std::pair <db::Text, db::properties_id_type> > & /*a*/, const std::vector <std::pair <db::Text, db::properties_id_type> > & /*b*/) { }
   virtual void end_text_differences () { }

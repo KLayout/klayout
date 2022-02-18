@@ -507,9 +507,6 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
 
   std::vector<db::Point> heap;
   std::vector<db::Vector> iterated_array_vectors;
-  std::vector<db::CellInstArrayWithProperties> new_insts_with_props;
-  std::vector<db::CellInstArray> new_insts;
-  std::vector<db::Instance> instances_to_replace;
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
@@ -530,8 +527,7 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
     for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
 
       db::Shapes &s = c->shapes ((*l).first);
-
-      //  TODO: properties, edges, edge pairs
+      db::Shapes new_shapes;
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes); ! si.at_end (); ++si) {
 
@@ -541,7 +537,11 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         poly = scaled_and_snapped_polygon (poly, g, m, d, tr_disp.x (), g, m, d, tr_disp.y (), heap);
         poly.transform (trinv);
 
-        s.replace (*si, poly);
+        if (si->is_box () && poly.is_box ()) {
+          new_shapes.insert (db::BoxWithProperties (poly.box (), si->prop_id ()));
+        } else {
+          new_shapes.insert (db::PolygonWithProperties (poly, si->prop_id ()));
+        }
 
       }
 
@@ -553,7 +553,7 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         text.trans (db::Trans (text.trans ().rot (), scaled_and_snapped_vector (text.trans ().disp (), g, m, d, tr_disp.x (), g, m, d, tr_disp.y ())));
         text.transform (trinv);
 
-        s.replace (*si, text);
+        new_shapes.insert (db::TextWithProperties (text, si->prop_id ()));
 
       }
 
@@ -565,7 +565,7 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
         edge = scaled_and_snapped_edge (edge, g, m , d, tr_disp.x (), tr_disp.y ());
         edge.transform (trinv);
 
-        s.replace (*si, edge);
+        new_shapes.insert (db::EdgeWithProperties (edge, si->prop_id ()));
 
       }
 
@@ -578,127 +578,56 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
                                   scaled_and_snapped_edge (edge_pair.second (), g, m , d, tr_disp.x (), tr_disp.y ()));
         edge_pair.transform (trinv);
 
-        s.replace (*si, edge_pair);
+        new_shapes.insert (db::EdgePairWithProperties (edge_pair, si->prop_id ()));
 
       }
+
+      s.swap (new_shapes);
 
     }
 
     //  Snap instance placements to grid and magnify
     //  NOTE: we can modify the instances because the ScaleAndGridReducer marked every cell with children
     //  as a variant cell (an effect of ScaleAndGridReducer::want_variants(cell) == true where cells have children).
-    //  Variant cells are not copied blindly back to the original layout.
-
-    new_insts.clear ();
-    new_insts_with_props.clear ();
-    instances_to_replace.clear ();
+    //  The variant formation also made sure the iterated and regular arrays are exploded where required.
 
     for (db::Cell::const_iterator inst = c->begin (); ! inst.at_end (); ++inst) {
 
       const db::CellInstArray &ia = inst->cell_inst ();
 
-      //  shortcut if we do not need to explode the array
-
       iterated_array_vectors.clear ();
       db::Vector a, b;
       unsigned long na, nb;
 
-      bool need_explode = false;
       db::CellInstArray new_array (ia);
 
-      if (tr.is_complex ()) {
+      if (ia.is_iterated_array (&iterated_array_vectors)) {
 
-        need_explode = ia.size () > 1;
-
-      } else if (ia.is_iterated_array (&iterated_array_vectors)) {
-
-        for (std::vector<db::Vector>::const_iterator i = iterated_array_vectors.begin (); ! need_explode && i != iterated_array_vectors.end (); ++i) {
-          need_explode = ! is_on_grid (*i, g, m, d);
+        bool needs_update = false;
+        for (std::vector<db::Vector>::iterator i = iterated_array_vectors.begin (); i != iterated_array_vectors.end (); ++i) {
+          db::Vector v = scaled_and_snapped_vector (*i, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
+          if (v != *i) {
+            needs_update = true;
+            *i = v;
+          }
         }
 
-        if (! need_explode) {
-
-          bool needs_update = false;
-          for (std::vector<db::Vector>::iterator i = iterated_array_vectors.begin (); ! need_explode && i != iterated_array_vectors.end (); ++i) {
-            db::Vector v = scaled_and_snapped_vector (*i, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
-            if (v != *i) {
-              needs_update = true;
-              *i = v;
-            }
-          }
-
-          if (needs_update) {
-            if (ia.is_complex ()) {
-              new_array = db::CellInstArray (ia.object (), ia.complex_trans (ia.front ()), iterated_array_vectors.begin (), iterated_array_vectors.end ());
-            } else {
-              new_array = db::CellInstArray (ia.object (), ia.front (), iterated_array_vectors.begin (), iterated_array_vectors.end ());
-            }
-          }
-
+        if (needs_update) {
+          new_array = db::CellInstArray (ia.object (), ia.complex_trans (ia.front ()), iterated_array_vectors.begin (), iterated_array_vectors.end ());
         }
 
       } else if (ia.is_regular_array (a, b, na, nb)) {
 
-        need_explode = (na > 1 && ! is_on_grid (a, g, m, d)) && (nb > 1 && ! is_on_grid (b, g, m, d));
+        a = scaled_and_snapped_vector (a, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
+        b = scaled_and_snapped_vector (b, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
 
-        if (! need_explode) {
-
-          a = scaled_and_snapped_vector (a, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
-          b = scaled_and_snapped_vector (b, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
-
-          if (ia.is_complex ()) {
-            new_array = db::CellInstArray (ia.object (), ia.complex_trans (ia.front ()), a, b, na, nb);
-          } else {
-            new_array = db::CellInstArray (ia.object (), ia.front (), a, b, na, nb);
-          }
-
-        }
+        new_array = db::CellInstArray (ia.object (), ia.complex_trans (ia.front ()), a, b, na, nb);
 
       }
 
-      if (! need_explode) {
+      scale_and_snap_cell_instance (new_array, tr, trinv, tr_disp, g, m, d);
+      c->replace (*inst, new_array);
 
-        scale_and_snap_cell_instance (new_array, tr, trinv, tr_disp, g, m, d);
-        c->replace (*inst, new_array);
-
-      } else {
-
-        instances_to_replace.push_back (*inst);
-
-        for (db::CellInstArray::iterator i = ia.begin (); ! i.at_end (); ++i) {
-
-          db::Trans ti (*i);
-          db::Vector ti_disp = ti.disp ();
-          ti_disp.transform (tr);
-          ti_disp = scaled_and_snapped_vector (ti_disp, g, m, d, tr_disp.x (), g, m, d, tr_disp.y ());
-          ti_disp.transform (trinv);
-          ti.disp (ti_disp);
-
-          db::CellInstArray new_array;
-          if (ia.is_complex ()) {
-            new_array = db::CellInstArray (ia.object (), ia.complex_trans (ti));
-          } else {
-            new_array = db::CellInstArray (ia.object (), ti);
-          }
-
-          if (inst->prop_id () > 0) {
-            new_insts_with_props.push_back (db::CellInstArrayWithProperties (new_array, inst->prop_id ()));
-          } else {
-            new_insts.push_back (new_array);
-          }
-
-        }
-
-      }
-
-    }
-
-    c->erase_insts (instances_to_replace);
-    for (std::vector<db::CellInstArray>::const_iterator i = new_insts.begin (); i != new_insts.end (); ++i) {
-      c->insert (*i);
-    }
-    for (std::vector<db::CellInstArrayWithProperties>::const_iterator i = new_insts_with_props.begin (); i != new_insts_with_props.end (); ++i) {
-      c->insert (*i);
     }
 
   }

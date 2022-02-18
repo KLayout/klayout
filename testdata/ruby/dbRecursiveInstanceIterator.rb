@@ -27,13 +27,24 @@ class DBLayout_TestClass < TestBase
 
   def collect(s, l)
 
+    # check native iteration here too ..
+    res2 = []
+    s.each do |s|
+      r = "[#{s.inst_cell.name}]"
+      r += (s.trans * s.inst_trans).to_s
+      res2.push(r)
+    end
+
     res = []
+    s.reset
     while !s.at_end?
       r = "[#{s.inst_cell.name}]"
       r += (s.trans * s.inst_trans).to_s
       res.push(r)
       s.next
     end
+
+    assert_equal(res, res2)
 
     return res.join("/")
 

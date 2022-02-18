@@ -69,6 +69,12 @@ struct cell_inst_array_defs
   }
 
   static C *
+  new_cell_inst_vector (db::cell_index_type ci, const vector_type &v)
+  {
+    return new C (db::CellInst (ci), trans_type (v));
+  }
+
+  static C *
   new_cell_inst (db::cell_index_type ci, const trans_type &t)
   {
     return new C (db::CellInst (ci), t);
@@ -82,6 +88,13 @@ struct cell_inst_array_defs
     } else {
       return new C (db::CellInst (ci), trans_type (t));
     }
+  }
+
+  static C *
+  new_cell_inst_array_vector (db::cell_index_type ci, const vector_type &v,
+                       const vector_type &a, const vector_type &b, unsigned int na, unsigned int nb)
+  {
+    return new C (db::CellInst (ci), trans_type (v), a, b, na, nb);
   }
 
   static C *
@@ -397,6 +410,12 @@ struct cell_inst_array_defs
       "@param cell_index The cell to instantiate\n"
       "@param trans The transformation by which to instantiate the cell\n"
     ) +
+    gsi::constructor ("new", &new_cell_inst_vector, gsi::arg ("cell_index"), gsi::arg ("disp"),
+      "@brief Creates a single cell instance\n"
+      "@param cell_index The cell to instantiate\n"
+      "@param disp The displacement\n"
+      "This convenience initializer has been introduced in version 0.28."
+    ) +
     gsi::constructor ("new", &new_cell_inst_cplx, gsi::arg ("cell_index"), gsi::arg ("trans"),
       "@brief Creates a single cell instance with a complex transformation\n"
       "@param cell_index The cell to instantiate\n"
@@ -414,6 +433,17 @@ struct cell_inst_array_defs
         "\n"
         "Starting with version 0.25 the displacements are of vector type."
       )
+    ) +
+    gsi::constructor ("new", &new_cell_inst_array_vector, gsi::arg ("cell_index"), gsi::arg ("disp"), gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("na"), gsi::arg ("nb"),
+      "@brief Creates a single cell instance\n"
+      "@param cell_index The cell to instantiate\n"
+      "@param disp The basic displacement of the first instance\n"
+      "@param a The displacement vector of the array in the 'a' axis\n"
+      "@param b The displacement vector of the array in the 'b' axis\n"
+      "@param na The number of placements in the 'a' axis\n"
+      "@param nb The number of placements in the 'b' axis\n"
+      "\n"
+      "This convenience initializer has been introduced in version 0.28."
     ) +
     gsi::constructor ("new", &new_cell_inst_array_cplx, gsi::arg ("cell_index"), gsi::arg ("trans"), gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("na"), gsi::arg ("nb"),
       "@brief Creates a single cell instance with a complex transformation\n"

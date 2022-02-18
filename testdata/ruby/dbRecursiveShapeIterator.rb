@@ -27,7 +27,21 @@ class DBRecursiveShapeIterator_TestClass < TestBase
 
   def collect(s, l)
 
+    # check native iteration here too ..
+    res2 = []
+    s.each do |s|
+      r = "[#{l.cell_name(s.cell_index)}]"
+      if s.shape.is_box?
+        box = s.shape.box
+        r += box.transformed(s.trans).to_s
+      else 
+        r += "X";
+      end
+      res2.push(r)
+    end
+
     res = []
+    s.reset
     while !s.at_end?
       r = "[#{l.cell_name(s.cell_index)}]"
       if s.shape.is_box?
@@ -39,6 +53,8 @@ class DBRecursiveShapeIterator_TestClass < TestBase
       s.next
       res.push(r)
     end
+
+    assert_equal(res, res2)
 
     return res.join("/")
 

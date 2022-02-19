@@ -46,6 +46,8 @@
 
 #include <fstream>
 #include <memory>
+#include <string>
+#include <set>
 
 namespace lym
 {
@@ -1066,6 +1068,11 @@ MacroCollection::MacroCollection ()
 
 MacroCollection::~MacroCollection ()
 {
+  do_clear ();
+}
+
+void MacroCollection::do_clear ()
+{
   for (iterator m = begin (); m != end (); ++m) {
     delete m->second;
   }
@@ -1513,6 +1520,13 @@ void MacroCollection::scan (const std::string &path)
   }
 }
 
+void MacroCollection::clear ()
+{
+  begin_changes ();
+  do_clear ();
+  on_changed ();
+}
+
 void MacroCollection::erase (lym::Macro *mp)
 {
   for (iterator m = m_macros.begin (); m != m_macros.end (); ++m) {
@@ -1861,30 +1875,42 @@ bool MacroCollection::has_autorun_early () const
   return has_autorun_for (*this, true);
 }
 
-static void autorun_for (lym::MacroCollection &collection, bool early)
+static void autorun_for (lym::MacroCollection &collection, bool early, std::set<std::string> *executed_already)
 {
   for (lym::MacroCollection::child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
-    autorun_for (*c->second, early);
+    autorun_for (*c->second, early, executed_already);
   }
 
   for (lym::MacroCollection::iterator c = collection.begin (); c != collection.end (); ++c) {
+
     if (c->second->can_run () && ((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ()))) {
-      BEGIN_PROTECTED_SILENT
-        c->second->run ();
-        c->second->install_doc ();
-      END_PROTECTED_SILENT
+
+      if (!executed_already || executed_already->find (c->second->path ()) == executed_already->end ()) {
+
+        BEGIN_PROTECTED_SILENT
+          c->second->run ();
+          c->second->install_doc ();
+        END_PROTECTED_SILENT
+
+        if (executed_already) {
+          executed_already->insert (c->second->path ());
+        }
+
+      }
+
     }
+
   }
 }
 
-void MacroCollection::autorun ()
+void MacroCollection::autorun (std::set<std::string> *already_executed)
 {
-  autorun_for (*this, false);
+  autorun_for (*this, false, already_executed);
 }
 
-void MacroCollection::autorun_early ()
+void MacroCollection::autorun_early (std::set<std::string> *already_executed)
 {
-  autorun_for (*this, true);
+  autorun_for (*this, true, already_executed);
 }
 
 void MacroCollection::dump (int l)

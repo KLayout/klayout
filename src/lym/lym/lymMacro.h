@@ -846,6 +846,12 @@ public:
   void add_unspecific (lym::Macro *m);
 
   /**
+   *  @brief Empties the collection
+   *  Note: only the unspecific on_changed event is generated.
+   */
+  void clear ();
+
+  /**
    *  @brief Erases the given macro from the list
    *  
    *  This does not remove the file but just remove the macro object.
@@ -995,7 +1001,7 @@ public:
   /**
    *  @brief Runs all macros marked with auto-run
    */
-  void autorun ();
+  void autorun (std::set<std::string> *already_executed = 0);
 
   /**
    *  @brief Returns true, if the collection has an early autorun macro
@@ -1005,7 +1011,7 @@ public:
   /**
    *  @brief Runs all macros marked with early auto-run
    */
-  void autorun_early ();
+  void autorun_early (std::set<std::string> *already_executed = 0);
 
   /**
    *  @brief Redo the scan (will add new files or folders)
@@ -1128,6 +1134,8 @@ private:
   {
     m_readonly = f;
   }
+
+  void do_clear ();
 
   //  no copying
   MacroCollection (const MacroCollection &d);

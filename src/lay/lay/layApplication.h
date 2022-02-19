@@ -215,6 +215,13 @@ public:
   }
 
   /**
+   *  @brief Adds a new macro category
+   *
+   *  This method is only effective when called during the autorun_early stage
+   */
+  void add_macro_category (const std::string &name, const std::string &description, const std::vector<std::string> &folders);
+
+  /**
    *  @brief Return true, if undo buffering is enabled
    */
   bool is_undo_enabled () const

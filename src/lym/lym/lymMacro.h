@@ -431,6 +431,20 @@ public:
   void set_autorun_early (bool f);
 
   /**
+   *  @brief Gets the priority of the macro in autorun and autorun-early mode
+   *  0 is the first priority, -1 means "never execute".
+   */
+  int priority () const
+  {
+    return m_priority;
+  }
+
+  /**
+   *  @brief Sets the priority
+   */
+  void set_priority (int p);
+
+  /**
    *  @brief Gets a value indicating whether the macro shall be shown in the menu
    */
   bool show_in_menu () const
@@ -596,6 +610,7 @@ private:
   bool m_autorun;
   bool m_autorun_default;
   bool m_autorun_early;
+  int m_priority;
   bool m_show_in_menu;
   std::string m_group_name;
   std::string m_menu_path;

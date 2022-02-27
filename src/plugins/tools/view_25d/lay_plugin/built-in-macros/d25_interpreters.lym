@@ -161,7 +161,7 @@ module D25
 
   # Creates a new macro category
   if RBA::Application::instance 
-    RBA::Application::instance.add_macro_category("d25", "2.5d view", [ "d25" ])
+    RBA::Application::instance.add_macro_category("d25", "2.5d View", [ "d25" ])
   end
  
 end

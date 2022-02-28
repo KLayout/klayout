@@ -1998,10 +1998,10 @@ OASISWriter::write (const db::CellInstArray &inst, db::properties_id_type prop_i
 
     if (rep != db::Repetition ()) {
       for (db::RepetitionIterator r = rep.begin (); ! r.at_end (); ++r) {
-        write_inst_with_rep (inst, prop_id, *r, array_rep);
+        write_inst_with_rep (inst, prop_id, *r + po, array_rep);
       }
     } else {
-      write_inst_with_rep (inst, prop_id, db::Vector (), array_rep);
+      write_inst_with_rep (inst, prop_id, po, array_rep);
     }
 
   } else if (inst.is_regular_array (a, b, amax, bmax) && (amax > 1 || bmax > 1)) {

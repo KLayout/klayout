@@ -611,6 +611,7 @@ LEFDEFReaderOptions::format_name () const
 static void set_datatypes (db::LEFDEFReaderOptions *data, void (db::LEFDEFReaderOptions::*clear) (), void (db::LEFDEFReaderOptions::*set_datatype) (int datatype), void (db::LEFDEFReaderOptions::*set_datatype_per_mask) (unsigned int mask, int datatype), const std::string &s)
 {
   (data->*clear) ();
+  (data->*set_datatype) (-1);
 
   tl::Extractor ex (s.c_str ());
 
@@ -642,6 +643,7 @@ static void set_datatypes (db::LEFDEFReaderOptions *data, void (db::LEFDEFReader
 static void set_suffixes (db::LEFDEFReaderOptions *data, void (db::LEFDEFReaderOptions::*clear) (), void (db::LEFDEFReaderOptions::*set_suffix) (const std::string &suffix), void (db::LEFDEFReaderOptions::*set_suffix_per_mask) (unsigned int mask, const std::string &suffix), const std::string &s)
 {
   (data->*clear) ();
+  (data->*set_suffix) (std::string ());
 
   tl::Extractor ex (s.c_str ());
 

@@ -40,7 +40,7 @@ HTMLItemDelegate::HTMLItemDelegate (QObject *parent)
   m_icon_spacing = 6;
   m_text_margin = 4;
   m_text_height = -1;
-  m_text_width = 500;
+  m_text_width = -1;
   m_plain_text = false;
   m_anchors_clickable = false;
 }

@@ -164,8 +164,12 @@ NetlistBrowserTreeModel::data (const QModelIndex &index, int role) const
     return QVariant (icon_for_status (status (index)));
   } else if (role == Qt::DisplayRole) {
     return QVariant (text (index));
-  } else if (role == Qt::ToolTipRole && index.column () == m_status_column) {
-    return tooltip (index);
+  } else if (role == Qt::ToolTipRole) {
+    if (index.column () == m_status_column) {
+      return tooltip (index);
+    } else {
+      return QVariant (text (index));
+    }
   } else if (role == Qt::UserRole) {
     return QVariant (search_text (index));
   } else if (role == Qt::FontRole) {

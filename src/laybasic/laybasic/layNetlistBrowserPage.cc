@@ -168,16 +168,22 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   for (int i = 0; i < 4; ++i) {
     delegate = new lay::HTMLItemDelegate (this);
     delegate->set_text_margin (2);
+    delegate->set_plain_text (true);
+    /* currently, HTML is not used:
     delegate->set_anchors_clickable (true);
     connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
+    */
     directory_tree->setItemDelegateForColumn (i, delegate);
   }
 
   for (int i = 0; i < 2; ++i) {
     delegate = new lay::HTMLItemDelegate (this);
     delegate->set_text_margin (2);
+    delegate->set_plain_text (true);
+    /* currently, HTML is not used:
     delegate->set_anchors_clickable (true);
     connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
+    */
     hierarchy_tree->setItemDelegateForColumn (i, delegate);
   }
 

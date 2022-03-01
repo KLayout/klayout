@@ -113,6 +113,16 @@ public:
   db::FormatSpecificReaderOptions *clone () const;
   virtual const std::string &format_name () const;
 
+  bool paths_relative_to_cwd () const
+  {
+    return m_paths_relative_to_cwd;
+  }
+
+  void set_paths_relative_to_cwd (bool f)
+  {
+    m_paths_relative_to_cwd = f;
+  }
+
   bool read_all_layers () const
   {
     return m_read_all_layers;
@@ -1003,6 +1013,7 @@ private:
   std::vector<std::string> m_lef_files;
   tl::weak_collection<db::Layout> m_macro_layouts;
   std::vector<std::string> m_macro_layout_files;
+  bool m_paths_relative_to_cwd;
 };
 
 /**

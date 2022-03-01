@@ -510,8 +510,9 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_special_routing_datatype (0),
     m_separate_groups (false),
     m_map_file (),
-    m_macro_resolution_mode (false),
-    m_read_lef_with_def (true)
+    m_macro_resolution_mode (0),
+    m_read_lef_with_def (true),
+    m_paths_relative_to_cwd (false)
 {
   //  .. nothing yet ..
 }
@@ -590,6 +591,7 @@ LEFDEFReaderOptions &LEFDEFReaderOptions::operator= (const LEFDEFReaderOptions &
     m_lef_files = d.m_lef_files;
     m_macro_layout_files = d.m_macro_layout_files;
     m_read_lef_with_def = d.m_read_lef_with_def;
+    m_paths_relative_to_cwd = d.m_paths_relative_to_cwd;
     set_macro_layouts (d.macro_layouts ());
   }
   return *this;
@@ -1204,6 +1206,18 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
     }
 
     m_layers.insert (std::make_pair (std::make_pair (n, LayerDetailsKey (purpose, mask)), ll));
+
+    if (ll.empty ()) {
+      tl::warn << tl::to_string (tr ("No mapping for layer")) << " '" << n << "', purpose '" << purpose_to_name (purpose) << "'" << tl::noendl;
+      if (mask > 0) {
+        tl::warn << tl::to_string (tr (" Mask ")) << mask << tl::noendl;
+      }
+      if (via_size != db::DVector ()) {
+        tl::warn << tl::to_string (tr (" Via size ")) << via_size.to_string () << tl::noendl;
+      }
+      tl::warn << tl::to_string (tr (" - layer is ignored"));
+    }
+
     return ll;
 
   } else {

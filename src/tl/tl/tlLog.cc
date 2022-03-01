@@ -371,11 +371,13 @@ protected:
 
 private:
   bool m_colorized;
+  bool m_new_line;
 };
 
 WarningChannel::WarningChannel ()
 {
   m_colorized = can_colorize (stdout);
+  m_new_line = true;
 }
 
 WarningChannel::~WarningChannel ()
@@ -393,6 +395,7 @@ void
 WarningChannel::endl ()
 {
   fputs ("\n", stdout);
+  m_new_line = true;
 }
 
 void
@@ -410,7 +413,10 @@ WarningChannel::begin ()
   if (m_colorized) {
     fputs (ANSI_BLUE, stdout);
   }
-  fputs ("Warning: ", stdout);
+  if (m_new_line) {
+    fputs ("Warning: ", stdout);
+    m_new_line = false;
+  }
 }
 
 
@@ -436,11 +442,13 @@ protected:
 
 private:
   bool m_colorized;
+  bool m_new_line;
 };
 
 ErrorChannel::ErrorChannel ()
 {
   m_colorized = can_colorize (stderr);
+  m_new_line = true;
 }
 
 ErrorChannel::~ErrorChannel ()
@@ -458,6 +466,7 @@ void
 ErrorChannel::endl ()
 {
   fputs ("\n", stderr);
+  m_new_line = true;
 }
 
 void
@@ -475,7 +484,10 @@ ErrorChannel::begin ()
   if (m_colorized) {
     fputs (ANSI_RED, stderr);
   }
-  fputs ("ERROR: ", stderr);
+  if (m_new_line) {
+    fputs ("ERROR: ", stderr);
+    m_new_line = false;
+  }
 }
 
 // ------------------------------------------------

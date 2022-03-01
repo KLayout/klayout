@@ -1978,7 +1978,11 @@ MacroEditorDialog::replace_all_button_clicked ()
 void
 MacroEditorDialog::search_requested (const QString &s)
 {
-  searchEditBox->setText (s);
+  if (! s.isNull ()) {
+    searchEditBox->setText (s);
+  } else {
+    searchEditBox->selectAll ();
+  }
   searchEditBox->setFocus ();
   search_editing ();
 }

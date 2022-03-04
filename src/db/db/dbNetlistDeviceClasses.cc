@@ -22,6 +22,8 @@
 
 #include "dbNetlistDeviceClasses.h"
 #include "tlClassRegistry.h"
+#include "tlTimer.h"
+#include "tlLog.h"
 
 namespace db
 {
@@ -716,6 +718,9 @@ public:
   {
     net_iterator n = begin_nets (), nn = other.begin_nets ();
     for ( ; n != end_nets (); ++n, ++nn) {
+      if (tl::verbosity () >= 40) {
+        tl::log << "Joining nets: " << (*n)->expanded_name () << " and " << (*nn)->expanded_name ();
+      }
       circuit->join_nets (const_cast<db::Net *> (*n), const_cast<db::Net *> (*nn));
     }
   }
@@ -730,6 +735,8 @@ private:
 void
 DeviceClassMOS3Transistor::join_split_gates (db::Circuit *circuit) const
 {
+  tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("join split gates ")) + name () + " (" + circuit->name () + ")");
+
   std::set<const db::Net *> seen_nets;
 
   for (db::Circuit::net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
@@ -749,6 +756,8 @@ DeviceClassMOS3Transistor::join_split_gates (db::Circuit *circuit) const
     for (db::Net::const_terminal_iterator t = n->begin_terminals (); t != n->end_terminals (); ++t) {
 
       if (t->device_class () == this && is_source_terminal (t->terminal_id ())) {
+
+        //  form a new chain
 
         chain.clear ();
 
@@ -795,6 +804,8 @@ DeviceClassMOS3Transistor::join_split_gates (db::Circuit *circuit) const
       }
 
     }
+
+    //  identify compatible chains and join their S/D nodes
 
     for (std::map<const db::Net *, std::list<SplitGateDeviceChain> >::iterator cs = chains.begin (); cs != chains.end (); ++cs) {
 
@@ -847,7 +858,7 @@ DeviceClassMOS4Transistor::DeviceClassMOS4Transistor ()
 bool
 DeviceClassMOS4Transistor::has_bulk_pin () const
 {
-  return false;
+  return true;
 }
 
 // ------------------------------------------------------------------------------------

@@ -386,6 +386,55 @@ CODE
     end
 
     # %LVS%
+    # @name split_gates
+    # @brief Implements the "split gates" feature
+    # @synopsis split_gates(device_name)
+    # @synopsis split_gates(device_name, circuit_filter)
+    # Multi-fingered, multi-gate MOS transistors can be built without connecting
+    # the source/drain internal nets between the fingers. This will prevent 
+    # "combine_devices" from combining the single gate transistors of the
+    # different fingers into single ones.
+    #
+    # "split_gates" now marks the devices of the given class so that they will
+    # receive a special treatment which joins the internl source/drain nodes.
+    #
+    # By default, this method is applied to all circuits. You can specify
+    # a circuit pattern to apply it to certain circuits only.
+    #
+    # "device_name" must be a valid device name and denote a MOS3, MOS4, DMOS3
+    # or DMOS4 device.
+
+    def split_gates(device_name, circuit_pattern = "*")
+
+      device_name.is_a?(String) || raise("Device name argument of 'split_gates' must be a string")
+      circuit_pattern.is_a?(String) || raise("Circuit pattern argument of 'split_gates' must be a string")
+
+      if self._l2n_data
+        # already extracted
+        self._split_gates(self._l2n_data, device_name, circuit_pattern)
+      else
+        @post_extract_config << lambda { |l2n| self._split_gates(l2n, device_name, circuit_pattern) }
+      end
+
+    end
+
+    def _split_gates(l2n, device_name, circuit_pattern)
+
+      dc = l2n.netlist.device_class_by_name(device_name)
+      if ! dc
+        raise("'#{device_name}' is not a valid device name") 
+      end
+      if ! dc.respond_to?(:join_split_gates)
+        raise("Device '#{device_name}' is not a kind supporting 'split_gates'") 
+      end
+
+      l2n.netlist.circuits_by_name(circuit_pattern).each do |c|
+        dc.join_split_gates(c)
+      end
+
+    end
+
+    # %LVS%
     # @name blank_circuit
     # @brief Removes the content from the given circuits (blackboxing)
     # @synopsis blank_circuit(circuit_filter)

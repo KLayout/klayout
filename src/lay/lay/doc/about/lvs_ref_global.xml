@@ -226,6 +226,16 @@ See <a href="/about/lvs_ref_netter.xml#same_nets">Netter#same_nets</a>! for a de
 <p>
 See <a href="/about/lvs_ref_netter.xml#schematic">Netter#schematic</a> for a description of that function.
 </p>
+<a name="split_gates"/><h2>"split_gates" - Implements the "split gates" feature for the given device and circuits</h2>
+<keyword name="split_gates"/>
+<p>Usage:</p>
+<ul>
+<li><tt>split_gates(device_name)</tt></li>
+<li><tt>split_gates(device_name, circuit_filter)</tt></li>
+</ul>
+<p>
+See <a href="/about/lvs_ref_netter.xml#split_gates">Netter#split_gates</a> for a description of that function.
+</p>
 <a name="tolerance"/><h2>"tolerance" - Specifies compare tolerances for certain device parameters</h2>
 <keyword name="tolerance"/>
 <p>Usage:</p>

@@ -26,6 +26,9 @@ SOURCES = \
 FORMS = \
   D25View.ui \
 
+RESOURCES = \
+  layD25Resources.qrc \
+
 greaterThan(QT_MAJOR_VERSION, 5) {
   QT += openglwidgets
 }

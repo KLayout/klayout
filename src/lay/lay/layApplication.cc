@@ -686,6 +686,22 @@ ApplicationBase::init_app ()
 
   if (mc) {
 
+    //  create the basic macro categories
+
+    if (ruby_interpreter ().available ()) {
+      std::vector<std::string> folders;
+      folders.push_back ("macros");
+      folders.push_back ("ruby");
+      mc->add_macro_category ("macros", "Ruby", folders);
+    }
+
+    if (python_interpreter ().available ()) {
+      std::vector<std::string> folders;
+      folders.push_back ("pymacros");
+      folders.push_back ("python");
+      mc->add_macro_category ("pymacros", "Python", folders);
+    }
+
     mc->enable_implicit_macros (! m_no_macros);
 
     //  Add the global ruby modules as the first ones.
@@ -741,12 +757,28 @@ ApplicationBase::init_app ()
     }
   }
 
+  std::set<std::string> already_executed;
+
   //  run all early autorun macros
-  lym::MacroCollection::root ().autorun_early ();
+  lym::MacroCollection::root ().autorun_early (&already_executed);
+
+  //  autorun_early may have added macro categories, so we need to call finish() again
+  if (mc) {
+
+    mc->finish ();
+
+    //  as this regenerates the macro collection, autorun_early is required again
+    //  note: this does no re-execute macros that have been executed already
+    lym::MacroCollection::root ().autorun_early (&already_executed);
+
+  }
 
   //  rescan the folders because early autorun macros might have added 
   //  suffixes through the MacroInterpreter interface.
   lym::MacroCollection::root ().rescan ();
+
+  //  and yet another autorun_early pass ..
+  lym::MacroCollection::root ().autorun_early (&already_executed);
 
   //  creates the main window or plugin root as required
   setup ();
@@ -782,6 +814,15 @@ ApplicationBase::init_app ()
       tl::info << "  " << *c;
     }
 
+  }
+}
+
+void
+ApplicationBase::add_macro_category (const std::string &name, const std::string &description, const std::vector<std::string> &folders)
+{
+  lay::MacroController *mc = lay::MacroController::instance ();
+  if (mc) {
+    mc->add_macro_category (name, description, folders);
   }
 }
 

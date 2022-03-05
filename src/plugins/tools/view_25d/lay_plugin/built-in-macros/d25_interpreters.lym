@@ -15,15 +15,15 @@
  <interpreter>ruby</interpreter>
  <dsl-interpreter-name/>
  <text>
-module LVS
+module D25
 
-  class LVSExecutable &lt; RBA::Executable
+  class D25Executable &lt; RBA::Executable
 
-    def initialize(macro, generator, l2ndb_index = nil)
+    def initialize(macro, generator, rdb_index = nil)
 
-      @lvs = LVSEngine::new
-      @lvs._l2ndb_index = l2ndb_index
-      @lvs._generator = generator
+      @d25 = D25Engine::new
+      @d25._rdb_index = rdb_index
+      @d25._generator = generator
 
       @macro = macro
 
@@ -31,25 +31,25 @@ module LVS
 
     def execute
 
-      @lvs._start("LVS: " + @macro.path)
+      @d25._start("D25: " + @macro.path)
 
-      # Set a debugger scope so that our errors end up with the debugger set to the LVS's line
+      # Set a debugger scope so that our errors end up with the debugger set to the D25's line
       RBA::MacroExecutionContext::set_debugger_scope(@macro.path)
 
       begin
 
-        # No verbosity set in lvs engine - we cannot use the engine's logger 
+        # No verbosity set in d25 engine - we cannot use the engine's logger 
         RBA::Logger::verbosity &gt;= 10 &amp;&amp; RBA::Logger::info("Running #{@macro.path}")
-        @lvs.instance_eval(@macro.text, @macro.path)
+        @d25.instance_eval(@macro.text, @macro.path)
 
       rescue =&gt; ex
 
-        @lvs.error("In #{@macro.path}: #{ex.to_s}")
+        @d25.error("In #{@macro.path}: #{ex.to_s}")
         RBA::MacroExecutionContext::ignore_next_exception
         raise ex
 
       end
-      
+
       nil
 
     end
@@ -60,14 +60,14 @@ module LVS
       RBA::MacroExecutionContext::remove_debugger_scope
 
       # cleans up and creates layout and report views
-      @lvs._finish
+      @d25._finish
 
     end
 
   end
   
-  # A DSL implementation for a LVS language (XML format)
-  class LVSInterpreter &lt; RBA::MacroInterpreter
+  # A DSL implementation for a D25 language (XML format)
+  class D25Interpreter &lt; RBA::MacroInterpreter
   
     # Constructor
     def initialize(recipe)
@@ -76,34 +76,34 @@ module LVS
 
       # Make the DSL use ruby syntax highlighting
       self.syntax_scheme = "ruby"
-      self.suffix = "lylvs"
+      self.suffix = "lyd25"
       self.debugger_scheme = RBA::MacroInterpreter::RubyDebugger
       self.storage_scheme = RBA::MacroInterpreter::MacroFormat
-      self.description = "LVS"
+      self.description = "D25"
 
       # Registers the new interpreter
-      register("lvs-dsl-xml")
+      register("d25-dsl-xml")
 
       # create a template for the macro editor:
-      create_template(":/lvs-templates/lvs.lym")
+      create_template(":/d25-templates/d25.lym")
 
       # if available, create a menu branch
       if RBA::Application::instance &amp;&amp; RBA::Application::instance.main_window
         mw = RBA::Application::instance.main_window
-        mw.menu.insert_menu("tools_menu.verification_group+", "lvs", "LVS")
+        mw.menu.insert_menu("tools_menu.verification_group+", "d25", "2.5d View")
       end
 
     end
     
     # Implements the execute method
     def executable(macro)
-      LVSExecutable::new(macro, @recipe.generator("script" => macro.path))
+      D25Executable::new(macro, @recipe.generator("script" => macro.path))
     end
     
   end
   
-  # A DSL implementation for a LVS language (Plain text format)
-  class LVSPlainTextInterpreter &lt; RBA::MacroInterpreter
+  # A DSL implementation for a D25 language (Plain text format)
+  class D25PlainTextInterpreter &lt; RBA::MacroInterpreter
   
     # Constructor
     def initialize(recipe)
@@ -112,28 +112,28 @@ module LVS
 
       # Make the DSL use ruby syntax highlighting
       self.syntax_scheme = "ruby"
-      self.suffix = "lvs"
+      self.suffix = "d25"
       self.debugger_scheme = RBA::MacroInterpreter::RubyDebugger
       self.storage_scheme = RBA::MacroInterpreter::PlainTextWithHashAnnotationsFormat
-      self.description = "LVS (Text)"
+      self.description = "D25 (Text)"
 
       # Registers the new interpreter
-      register("lvs-dsl")
+      register("d25-dsl")
 
     end
     
     # Implements the execute method
     def executable(macro)
-      LVSExecutable::new(macro, @recipe.generator("script" => macro.path))
+      D25Executable::new(macro, @recipe.generator("script" => macro.path))
     end
     
   end
-
-  # A recipe implementation allowing the LVS run to be redone
-  class LVSRecipe &lt; RBA::Recipe
+  
+  # A recipe implementation allowing the D25 run to be redone
+  class D25Recipe &lt; RBA::Recipe
 
     def initialize
-      super("lvs", "LVS recipe")
+      super("d25", "D25 recipe")
     end
 
     def executable(params)
@@ -144,24 +144,24 @@ module LVS
       end
 
       macro = RBA::Macro::macro_by_path(script)
-      macro || raise("Can't find LVS script #{script} - unable to re-run")
+      macro || raise("Can't find D25 script #{script} - unable to re-run")
 
-      LVSExecutable::new(macro, self.generator("script" => script), params["l2ndb_index"])
+      D25Executable::new(macro, self.generator("script" => script), params["rdb_index"])
       
     end
 
   end
   
   # Register the recipe
-  lvs_recipe = LVSRecipe::new
+  d25_recipe = D25Recipe::new
  
   # Register the new interpreters
-  LVSInterpreter::new(lvs_recipe)
-  LVSPlainTextInterpreter::new(lvs_recipe)
+  D25Interpreter::new(d25_recipe)
+  D25PlainTextInterpreter::new(d25_recipe)
 
   # Creates a new macro category
   if RBA::Application::instance 
-    RBA::Application::instance.add_macro_category("lvs", "LVS", [ "lvs" ])
+    RBA::Application::instance.add_macro_category("d25", "2.5d View", [ "d25" ])
   end
  
 end

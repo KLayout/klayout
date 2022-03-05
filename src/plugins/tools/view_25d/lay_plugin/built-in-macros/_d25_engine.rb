@@ -163,7 +163,7 @@ module D25
                 raise("'color' must be a color value (an integer)")
               end
               display.fill = a[:color]
-              display.frame = a[:color]
+              display.frame = nil
             end
             if a[:frame]
               if !a[:frame].is_a?(0xffffff.class)
@@ -206,7 +206,7 @@ module D25
               
         end
 
-        yield
+        block && yield
 
       ensure
         @display = nil
@@ -232,7 +232,7 @@ module D25
 
         begin
 
-          view.clear
+          view.begin(self._generator)
 
           displays = {}
 

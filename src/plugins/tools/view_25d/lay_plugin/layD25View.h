@@ -64,6 +64,7 @@ public:
   static D25View *open (lay::LayoutView *view);
   void close ();
   void clear ();
+  void begin (const std::string &generator);
   void open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like);
   void close_display ();
   void entry (const db::Region &data, double dbu, double zstart, double zstop);
@@ -82,12 +83,16 @@ private slots:
   void vscale_slider_changed (int value);
   void vscale_value_edited ();
   void init_failed ();
+  void rerun_button_pressed ();
 
 private:
   Ui::D25View *mp_ui;
+  tl::DeferredMethod<D25View> dm_rerun_macro;
+  std::string m_generator;
 
   void cellviews_changed ();
   void layer_properties_changed (int);
+  void rerun_macro ();
 };
 
 }

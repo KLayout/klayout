@@ -142,6 +142,11 @@ public:
     return m_error;
   }
 
+  bool has_error () const
+  {
+    return m_has_error;
+  }
+
   void clear ();
   void open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like);
   void close_display ();
@@ -165,6 +170,7 @@ private:
   std::unique_ptr<D25InteractionMode> mp_mode;
   QOpenGLShaderProgram *m_shapes_program, *m_lines_program, *m_gridplane_program;
   std::string m_error;
+  bool m_has_error;
   double m_scale_factor;
   double m_vscale_factor;
   QVector3D m_displacement;

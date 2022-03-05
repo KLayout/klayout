@@ -20,6 +20,8 @@
 
 */
 
+#include "tlExceptions.h"
+#include "tlRecipe.h"
 
 #include "layD25View.h"
 #include "layLayoutView.h"
@@ -35,7 +37,8 @@ namespace lay
 const double initial_elevation = 15.0;
 
 D25View::D25View (lay::Dispatcher *root, lay::LayoutView *view)
-  : lay::Browser (root, view, "d25_view")
+  : lay::Browser (root, view, "d25_view"),
+    dm_rerun_macro (this, &D25View::rerun_macro)
 {
   mp_ui = new Ui::D25View ();
   mp_ui->setupUi (this);
@@ -56,10 +59,14 @@ D25View::D25View (lay::Dispatcher *root, lay::LayoutView *view)
   connect (mp_ui->d25_view, SIGNAL (scale_factor_changed(double)), this, SLOT (scale_factor_changed(double)));
   connect (mp_ui->d25_view, SIGNAL (vscale_factor_changed(double)), this, SLOT (vscale_factor_changed(double)));
   connect (mp_ui->d25_view, SIGNAL (init_failed()), this, SLOT (init_failed()));
+  connect (mp_ui->rerun_button, SIGNAL (clicked()), this, SLOT (rerun_button_pressed()));
 
-  mp_ui->gl_stack->setCurrentIndex (0);
+  mp_ui->rerun_button->setEnabled (false);
+
+  mp_ui->gl_stack->setCurrentIndex (2);
 
   lay::activate_help_links (mp_ui->doc_label);
+  lay::activate_help_links (mp_ui->empty_label);
 
   view->cellviews_changed_event.add (this, &D25View::cellviews_changed);
   view->layer_list_changed_event.add (this, &D25View::layer_properties_changed);
@@ -144,38 +151,67 @@ D25View::close ()
 void
 D25View::clear ()
 {
-  mp_ui->d25_view->clear ();
+  if (! mp_ui->d25_view->has_error ()) {
+    mp_ui->gl_stack->setCurrentIndex (2);
+    mp_ui->d25_view->clear ();
+  }
+
+  mp_ui->rerun_button->setEnabled (false);
+  m_generator.clear ();
+}
+
+void
+D25View::begin (const std::string &generator)
+{
+  clear ();
+
+  if (! mp_ui->d25_view->has_error ()) {
+    m_generator = generator;
+    mp_ui->rerun_button->setEnabled (true);
+  }
 }
 
 void
 D25View::open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like)
 {
-  mp_ui->d25_view->open_display (frame_color, fill_color, like);
+  if (! mp_ui->d25_view->has_error ()) {
+    mp_ui->d25_view->open_display (frame_color, fill_color, like);
+  }
 }
 
 void
 D25View::close_display ()
 {
-  mp_ui->d25_view->close_display ();
+  if (! mp_ui->d25_view->has_error ()) {
+    mp_ui->d25_view->close_display ();
+  }
 }
 
 void
 D25View::entry (const db::Region &data, double dbu, double zstart, double zstop)
 {
-  mp_ui->d25_view->entry (data, dbu, zstart, zstop);
+  if (! mp_ui->d25_view->has_error ()) {
+    mp_ui->d25_view->entry (data, dbu, zstart, zstop);
+  }
 }
 
 void
 D25View::finish ()
 {
-  mp_ui->d25_view->finish ();
+  if (! mp_ui->d25_view->has_error ()) {
 
-  // @@@ install layer properties widget
+    mp_ui->d25_view->finish ();
 
-  mp_ui->d25_view->reset ();
-  mp_ui->d25_view->set_cam_azimuth (0.0);
-  mp_ui->d25_view->set_cam_elevation (-initial_elevation);
-  mp_ui->d25_view->fit ();
+    // @@@ install layer properties widget
+
+    mp_ui->d25_view->reset ();
+    mp_ui->d25_view->set_cam_azimuth (0.0);
+    mp_ui->d25_view->set_cam_elevation (-initial_elevation);
+    mp_ui->d25_view->fit ();
+
+    mp_ui->gl_stack->setCurrentIndex (0);
+
+  }
 }
 
 static QString scale_factor_to_string (double f)
@@ -268,6 +304,26 @@ D25View::activated ()
   mp_ui->d25_view->set_cam_azimuth (0.0);
   mp_ui->d25_view->set_cam_elevation (-initial_elevation);
   mp_ui->d25_view->fit ();
+}
+
+void
+D25View::rerun_button_pressed ()
+{
+  //  NOTE: we use deferred execution, because otherwise the button won't get repainted properly
+  dm_rerun_macro ();
+}
+
+void
+D25View::rerun_macro ()
+{
+BEGIN_PROTECTED
+
+  if (! m_generator.empty ()) {
+    std::map<std::string, tl::Variant> add_pars;
+    tl::Recipe::make (m_generator, add_pars);
+  }
+
+END_PROTECTED
 }
 
 void

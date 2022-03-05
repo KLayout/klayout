@@ -205,6 +205,7 @@ D25ViewWidget::D25ViewWidget (QWidget *parent)
   m_zset = false;
   m_display_open = false;
   mp_view = 0;
+  m_has_error = false;
 
   reset_viewport ();
 }
@@ -616,7 +617,6 @@ D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double 
 
       //  sequential assignment
       lay::color_t color = mp_view->get_palette ().luminous_color_by_index (m_layers.size ());
-      color_to_gl (color, m_layers.back ().frame_color);
       color_to_gl (color, m_layers.back ().fill_color);
 
     }
@@ -638,190 +638,6 @@ D25ViewWidget::attach_view (LayoutView *view)
 {
   mp_view = view;
 }
-
-#if 0 // @@@
-namespace {
-
-  class ZDataCache
-  {
-  public:
-    ZDataCache () { }
-
-    std::vector<db::D25LayerInfo> operator() (lay::LayoutView *view, int cv_index, int layer_index)
-    {
-      std::map<int, std::map<int, std::vector<db::D25LayerInfo> > >::const_iterator c = m_cache.find (cv_index);
-      if (c != m_cache.end ()) {
-        std::map<int, std::vector<db::D25LayerInfo> >::const_iterator l = c->second.find (layer_index);
-        if (l != c->second.end ()) {
-          return l->second;
-        } else {
-          return std::vector<db::D25LayerInfo> ();
-        }
-      }
-
-      std::map<int, std::vector<db::D25LayerInfo> > &lcache = m_cache [cv_index];
-
-      const db::D25TechnologyComponent *comp = 0;
-
-      const lay::CellView &cv = view->cellview (cv_index);
-      if (cv.is_valid () && cv->technology ()) {
-        const db::Technology *tech = cv->technology ();
-        comp = dynamic_cast<const db::D25TechnologyComponent *> (tech->component_by_name ("d25"));
-      }
-
-      if (comp) {
-
-        std::multimap<db::LayerProperties, db::D25LayerInfo, db::LPLogicalLessFunc> zi_by_lp;
-
-        db::D25TechnologyComponent::layers_type layers = comp->compile_from_source ();
-        for (db::D25TechnologyComponent::layers_type::const_iterator i = layers.begin (); i != layers.end (); ++i) {
-          zi_by_lp.insert (std::make_pair (i->layer (), *i));
-        }
-
-        const db::Layout &ly = cv->layout ();
-        for (int l = 0; l < int (ly.layers ()); ++l) {
-          if (ly.is_valid_layer (l)) {
-            db::LayerProperties lp = ly.get_properties (l);
-            std::multimap<db::LayerProperties, db::D25LayerInfo, db::LPLogicalLessFunc>::const_iterator z = zi_by_lp.find (lp);
-            if ((z == zi_by_lp.end () || ! z->first.log_equal (lp)) && ! lp.name.empty ()) {
-              //  If possible, try by name only
-              lp = db::LayerProperties (lp.name);
-              z = zi_by_lp.find (lp);
-            }
-            while (z != zi_by_lp.end () && z->first.log_equal (lp)) {
-              lcache[l].push_back (z->second);
-              ++z;
-            }
-          }
-        }
-
-      }
-
-      std::map<int, std::vector<db::D25LayerInfo> >::const_iterator l = lcache.find (layer_index);
-      if (l != lcache.end ()) {
-        return l->second;
-      } else {
-        return std::vector<db::D25LayerInfo> ();
-      }
-    }
-
-  private:
-    std::map<int, std::map<int, std::vector<db::D25LayerInfo> > > m_cache;
-  };
-
-}
-
-bool
-D25ViewWidget::prepare_view ()
-{
-  m_layers.clear ();
-  m_layer_to_info.clear ();
-  m_vertex_chunks.clear ();
-  m_line_chunks.clear ();
-
-  bool zset = false;
-  m_zmin = m_zmax = 0.0;
-
-  if (! mp_view) {
-    m_bbox = db::DBox (-1.0, -1.0, 1.0, 1.0);
-    return false;
-  }
-
-  m_bbox = mp_view->viewport ().box ();
-
-  ZDataCache zdata;
-
-  //  collect and confine to cell bbox
-  db::DBox cell_bbox;
-  for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
-
-    std::vector<db::D25LayerInfo> zinfo;
-    if (! lp->has_children ()) {
-      zinfo = zdata (mp_view, lp->cellview_index (), lp->layer_index ());
-    }
-
-    for (std::vector<db::D25LayerInfo>::const_iterator zi = zinfo.begin (); zi != zinfo.end (); ++zi) {
-      const lay::CellView &cv = mp_view->cellview ((unsigned int) lp->cellview_index ());
-      cell_bbox += db::CplxTrans (cv->layout ().dbu ()) * cv.cell ()->bbox ((unsigned int) lp->layer_index ());
-    }
-
-  }
-
-  bool any = false;
-
-  tl::AbsoluteProgress progress (tl::to_string (tr ("Rendering ...")));
-
-  for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
-
-    std::vector<db::D25LayerInfo> zinfo;
-    if (! lp->has_children ()) {
-      zinfo = zdata (mp_view, lp->cellview_index (), lp->layer_index ());
-    }
-
-    for (std::vector<db::D25LayerInfo>::const_iterator zi = zinfo.begin (); zi != zinfo.end (); ++zi) {
-
-      any = true;
-
-      double z0 = zi->zstart ();
-      double z1 = zi->zstop ();
-
-      m_vertex_chunks.push_back (triangle_chunks_type ());
-      m_line_chunks.push_back (line_chunks_type ());
-
-      LayerInfo info;
-      lp_to_info (*lp, info);
-      info.vertex_chunk = &m_vertex_chunks.back ();
-      info.line_chunk = &m_line_chunks.back ();
-
-      m_layer_to_info.insert (std::make_pair (std::make_pair (lp->cellview_index (), lp->layer_index ()), m_layers.size ()));
-      m_layers.push_back (info);
-
-      const lay::CellView &cv = mp_view->cellview ((unsigned int) lp->cellview_index ());
-
-      render_layout (progress, m_vertex_chunks.back (), m_line_chunks.back (), cv->layout (), *cv.cell (), db::CplxTrans (cv->layout ().dbu ()).inverted () * m_bbox, (unsigned int) lp->layer_index (), z0, z1);
-
-      if (! zset) {
-        m_zmin = z0;
-        m_zmax = z1;
-        zset = true;
-      } else {
-        m_zmin = std::min (z0, m_zmin);
-        m_zmax = std::max (z1, m_zmax);
-      }
-
-    }
-
-  }
-
-  return any;
-}
-
-void
-D25ViewWidget::refresh_view ()
-{
-  if (! mp_view) {
-    return;
-  }
-
-  for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
-
-    std::pair<size_t, size_t> key = std::make_pair (lp->cellview_index (), lp->layer_index ());
-
-    std::multimap<std::pair<size_t, size_t>, size_t>::const_iterator l = m_layer_to_info.find (key);
-    while (l != m_layer_to_info.end () && l->first == key) {
-      if (l->second < m_layers.size ()) {
-        lp_to_info (*lp, m_layers [l->second]);
-      }
-      ++l;
-    }
-
-  }
-
-  refresh ();
-}
-
-// -----------------------
-#endif
 
 void
 D25ViewWidget::render_polygon (D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Polygon &poly, double dbu, double zstart, double zstop)
@@ -991,22 +807,22 @@ D25ViewWidget::initializeGL ()
   tl_assert (m_gridplane_program == 0);
   tl_assert (m_lines_program == 0);
 
-  bool error = false;
+  m_has_error = false;
 
   try {
     do_initialize_gl ();
   } catch (tl::Exception &ex) {
     m_error = ex.msg ();
-    error = true;
+    m_has_error = true;
   } catch (std::exception &ex) {
     m_error = ex.what ();
-    error = true;
+    m_has_error = true;
   } catch (...) {
     m_error = "(unspecific error)";
-    error = true;
+    m_has_error = true;
   }
 
-  if (error) {
+  if (m_has_error) {
 
     delete m_shapes_program;
     m_shapes_program = 0;

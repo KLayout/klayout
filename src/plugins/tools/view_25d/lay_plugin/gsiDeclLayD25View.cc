@@ -62,6 +62,9 @@ Class<lay::D25View> decl_D25View (QT_EXTERNAL_BASE (QDialog) "lay", "D25View",
   gsi::method ("clear", &lay::D25View::clear,
     "@brief Clears all display entries in the view"
   ) +
+  gsi::method ("begin", &lay::D25View::begin, gsi::arg ("generator"),
+    "@brief Initiates delivery of display groups"
+  ) +
   gsi::method ("open_display", &lay::D25View::open_display, gsi::arg ("frame_color"), gsi::arg ("fill_color"), gsi::arg ("like"),
     "@brief Creates a new display group"
   ) +
@@ -80,6 +83,8 @@ Class<lay::D25View> decl_D25View (QT_EXTERNAL_BASE (QDialog) "lay", "D25View",
   "@brief The 2.5d View Dialog\n"
   "\n"
   "This class is used internally to implement the 2.5d feature.\n"
+  "\n"
+  "This class has been introduced in version 0.28."
 );
 
 }

@@ -42,8 +42,8 @@
 #   Options are:
 #
 #     display(..., color: 0xff0000)       use bright red for the material color (RGB)
-#     display(..., frame: 0xff0000)       use bright red for the frame color (combine with "color" for the fill)
-#     display(..., hollow: true)          use hollow style (only frame is drawn)
+#     display(..., frame: 0xff0000)       use bright red for the frame color (combine with "fill" for the fill color)
+#     display(..., fill: 0x00ff00)        use bright green for the fill color along (combine with "frame" for the frame color)
 #     display(..., like: "7/0")           borrow style from layout view's style for layer "7/0"
 #
 

@@ -19,10 +19,9 @@ module D25
 
   class D25Executable &lt; RBA::Executable
 
-    def initialize(macro, generator, rdb_index = nil)
+    def initialize(macro, generator)
 
       @d25 = D25Engine::new
-      @d25._rdb_index = rdb_index
       @d25._generator = generator
 
       @macro = macro
@@ -148,7 +147,7 @@ module D25
       macro = RBA::Macro::macro_by_path(script)
       macro || raise("Can't find D25 script #{script} - unable to re-run")
 
-      D25Executable::new(macro, self.generator("script" => script), params["rdb_index"])
+      D25Executable::new(macro, self.generator("script" => script))
       
     end
 

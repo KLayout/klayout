@@ -27,6 +27,7 @@
 
 #include "layD25MemChunks.h"
 #include "layD25Camera.h"
+#include "layViewOp.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLVertexArrayObject>
@@ -41,8 +42,8 @@
 
 namespace db
 {
-  class Layout;
-  class Cell;
+  class Region;
+  struct LayerProperties;
 }
 
 namespace tl
@@ -78,6 +79,18 @@ class D25ViewWidget
 Q_OBJECT 
 
 public:
+  typedef lay::mem_chunks<GLfloat, 1024 * 18> triangle_chunks_type;
+  typedef lay::mem_chunks<GLfloat, 1024 * 6> line_chunks_type;
+
+  struct LayerInfo
+  {
+    triangle_chunks_type *vertex_chunk;
+    line_chunks_type *line_chunk;
+    GLfloat fill_color [4];
+    GLfloat frame_color [4];
+    bool visible;
+  };
+
   D25ViewWidget (QWidget *parent);
   ~D25ViewWidget ();
 
@@ -88,8 +101,8 @@ public:
   void mouseReleaseEvent (QMouseEvent *event);
   void mouseMoveEvent (QMouseEvent *event);
 
-  bool attach_view(lay::LayoutView *view);
-  void refresh_view ();
+  void attach_view(lay::LayoutView *view);
+  // @@@ void refresh_view ();
 
   QVector3D hit_point_with_scene(const QVector3D &line_dir);
   void refresh ();
@@ -129,6 +142,12 @@ public:
     return m_error;
   }
 
+  void clear ();
+  void open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like);
+  void close_display ();
+  void entry (const db::Region &data, double dbu, double zstart, double zstop);
+  void finish ();
+
 signals:
   void scale_factor_changed (double f);
   void vscale_factor_changed (double f);
@@ -143,9 +162,6 @@ public slots:
   void fit ();
 
 private:
-  typedef lay::mem_chunks<GLfloat, 1024 * 18> triangle_chunks_type;
-  typedef lay::mem_chunks<GLfloat, 1024 * 6> line_chunks_type;
-
   std::unique_ptr<D25InteractionMode> mp_mode;
   QOpenGLShaderProgram *m_shapes_program, *m_lines_program, *m_gridplane_program;
   std::string m_error;
@@ -155,32 +171,26 @@ private:
   lay::LayoutView *mp_view;
   db::DBox m_bbox;
   double m_zmin, m_zmax;
+  bool m_zset;
+  bool m_display_open;
 
   std::list<triangle_chunks_type> m_vertex_chunks;
   std::list<line_chunks_type> m_line_chunks;
 
-  struct LayerInfo {
-    const triangle_chunks_type *vertex_chunk;
-    const line_chunks_type *line_chunk;
-    GLfloat color [4];
-    GLfloat frame_color [4];
-    bool visible;
-  };
-
   std::vector<LayerInfo> m_layers;
-  std::multimap<std::pair<size_t, size_t>, size_t> m_layer_to_info;
+  std::multimap<std::pair<size_t, size_t>, size_t> m_layer_to_info; // @@@
 
   void initializeGL ();
   void paintGL ();
   void resizeGL (int w, int h);
 
   void do_initialize_gl ();
-  bool prepare_view();
-  void render_layout (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Layout &layout, const db::Cell &cell, const db::Box &clip_box, unsigned int layer, double zstart, double zstop);
+  // @@@ bool prepare_view();
+  // @@@  void render_layout (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Layout &layout, const db::Cell &cell, const db::Box &clip_box, unsigned int layer, double zstart, double zstop);
+  void render_region (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Region &region, double dbu, const db::Box &clip_box, double zstart, double zstop);
   void render_polygon (D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Polygon &poly, double dbu, double zstart, double zstop);
   void render_wall (D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Edge &poly, double dbu, double zstart, double zstop);
   void reset_viewport ();
-  static void lp_to_info (const lay::LayerPropertiesNode &lp, D25ViewWidget::LayerInfo &info);
 };
 
 }

@@ -50,6 +50,8 @@ module D25
 
       end
 
+      @d25._check
+
       nil
 
     end

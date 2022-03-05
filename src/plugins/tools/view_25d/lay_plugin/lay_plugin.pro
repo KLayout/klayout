@@ -16,6 +16,7 @@ HEADERS = \
     layD25Camera.h
 
 SOURCES = \
+  gsiDeclLayD25View.cc \
   layD25View.cc \
   layD25ViewWidget.cc \
   layD25Plugin.cc \

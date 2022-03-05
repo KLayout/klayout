@@ -31,6 +31,8 @@
 #include "dbPolygonGenerators.h"
 #include "dbPolygonTools.h"
 #include "dbClip.h"
+#include "dbRegion.h"
+#include "dbOriginalLayerRegion.h"
 
 #include "tlException.h"
 #include "tlProgress.h"
@@ -200,6 +202,8 @@ D25ViewWidget::D25ViewWidget (QWidget *parent)
   setFormat (format);
 
   m_zmin = m_zmax = 0.0;
+  m_zset = false;
+  m_display_open = false;
   mp_view = 0;
 
   reset_viewport ();
@@ -496,17 +500,146 @@ D25ViewWidget::aspect_ratio () const
   return double (width ()) / double (height ());
 }
 
-bool
+void
+D25ViewWidget::clear ()
+{
+  m_layers.clear ();
+  m_layer_to_info.clear ();
+  m_vertex_chunks.clear ();
+  m_line_chunks.clear ();
+
+  m_zset = false;
+  m_zmin = m_zmax = 0.0;
+  m_display_open = false;
+
+  if (! mp_view) {
+    m_bbox = db::DBox (-1.0, -1.0, 1.0, 1.0);
+  } else {
+    m_bbox = mp_view->viewport ().box ();
+  }
+}
+
+static void color_to_gl (color_t color, GLfloat (&gl_color) [4])
+{
+  gl_color[0] = ((color >> 16) & 0xff) / 255.0f;
+  gl_color[1] = ((color >> 8) & 0xff) / 255.0f;
+  gl_color[2] = (color & 0xff) / 255.0f;
+  gl_color[3] = 1.0f;
+}
+
+static void color_to_gl (const color_t *color, GLfloat (&gl_color) [4])
+{
+  if (! color) {
+    for (unsigned int i = 0; i < 4; ++i) {
+      gl_color [i] = 0.0;
+    }
+  } else {
+    color_to_gl (*color, gl_color);
+  }
+}
+
+static void lp_to_info (const lay::LayerPropertiesNode &lp, D25ViewWidget::LayerInfo &info)
+{
+  color_to_gl (lp.fill_color (true), info.fill_color);
+  if (lp.dither_pattern (true) == 1 /*hollow*/) {
+    info.fill_color [3] = 0.0f;
+  }
+
+  color_to_gl (lp.frame_color (true), info.frame_color);
+  if (lp.frame_color (true) == lp.fill_color (true) && info.fill_color [3] > 0.5) {
+    //  optimize: don't draw wire frame unless required
+    info.frame_color [3] = 0.0f;
+  }
+
+  info.visible = lp.visible (true);
+}
+
+void
+D25ViewWidget::open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like)
+{
+  m_vertex_chunks.push_back (triangle_chunks_type ());
+  m_line_chunks.push_back (line_chunks_type ());
+
+  LayerInfo info;
+
+  info.visible = true;
+  color_to_gl (frame_color, info.frame_color);
+  color_to_gl (fill_color, info.fill_color);
+  info.vertex_chunk = &m_vertex_chunks.back ();
+  info.line_chunk = &m_line_chunks.back ();
+
+  if (like && mp_view) {
+    for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
+      if (! lp->has_children () && lp->source (true).layer_props ().log_equal (*like)) {
+        lp_to_info (*lp, info);
+        break;
+      }
+    }
+  }
+
+  m_layers.push_back (info);
+  m_display_open = true;
+}
+
+void
+D25ViewWidget::close_display ()
+{
+  m_display_open = false;
+}
+
+void
+D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double zstop)
+{
+  tl_assert (m_display_open);
+
+  //  try to establish a default color from the region's origin if required
+  const db::OriginalLayerRegion *original_region = dynamic_cast<db::OriginalLayerRegion *> (data.delegate ());
+  if (mp_view && m_layers.back ().fill_color [3] == 0.0 && m_layers.back ().frame_color [3] == 0.0) {
+
+    if (original_region) {
+
+      const db::RecursiveShapeIterator *iter = original_region->iter ();
+      if (iter && iter->layout () && iter->layout ()->is_valid_layer (iter->layer ())) {
+
+        db::LayerProperties like = iter->layout ()->get_properties (iter->layer ());
+
+        for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
+          if (! lp->has_children () && lp->source (true).layer_props ().log_equal (like)) {
+            lp_to_info (*lp, m_layers.back ());
+            break;
+          }
+        }
+
+      }
+
+    } else {
+
+      //  sequential assignment
+      lay::color_t color = mp_view->get_palette ().luminous_color_by_index (m_layers.size ());
+      color_to_gl (color, m_layers.back ().frame_color);
+      color_to_gl (color, m_layers.back ().fill_color);
+
+    }
+
+  }
+
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Rendering ...")));
+  render_region (progress, *m_layers.back ().vertex_chunk, *m_layers.back ().line_chunk, data, dbu, db::CplxTrans (dbu).inverted () * m_bbox, zstart, zstop);
+}
+
+void
+D25ViewWidget::finish ()
+{
+  // @@@
+}
+
+void
 D25ViewWidget::attach_view (LayoutView *view)
 {
   mp_view = view;
-
-  bool any = prepare_view ();
-  reset ();
-
-  return any;
 }
 
+#if 0 // @@@
 namespace {
 
   class ZDataCache
@@ -576,31 +709,6 @@ namespace {
     std::map<int, std::map<int, std::vector<db::D25LayerInfo> > > m_cache;
   };
 
-}
-
-static void color_to_gl (color_t color, GLfloat (&gl_color) [4])
-{
-  gl_color[0] = ((color >> 16) & 0xff) / 255.0f;
-  gl_color[1] = ((color >> 8) & 0xff) / 255.0f;
-  gl_color[2] = (color & 0xff) / 255.0f;
-  gl_color[3] = 1.0f;
-}
-
-void
-D25ViewWidget::lp_to_info (const lay::LayerPropertiesNode &lp, LayerInfo &info)
-{
-  color_to_gl (lp.fill_color (true), info.color);
-  if (lp.dither_pattern (true) == 1 /*hollow*/) {
-    info.color [3] = 0.0f;
-  }
-
-  color_to_gl (lp.frame_color (true), info.frame_color);
-  if (lp.frame_color (true) == lp.fill_color (true) && info.color [3] > 0.5) {
-    //  optimize: don't draw wire frame unless required
-    info.frame_color [3] = 0.0f;
-  }
-
-  info.visible = lp.visible (true);
 }
 
 bool
@@ -712,6 +820,9 @@ D25ViewWidget::refresh_view ()
   refresh ();
 }
 
+// -----------------------
+#endif
+
 void
 D25ViewWidget::render_polygon (D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Polygon &poly, double dbu, double zstart, double zstop)
 {
@@ -792,6 +903,8 @@ D25ViewWidget::render_wall (D25ViewWidget::triangle_chunks_type &chunks, D25View
   line_chunks.add (edge.p1 ().x () * dbu, zstop, edge.p1 ().y () * dbu);
 }
 
+// @@@
+#if 0
 void
 D25ViewWidget::render_layout (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Layout &layout, const db::Cell &cell, const db::Box &clip_box, unsigned int layer, double zstart, double zstop)
 {
@@ -818,6 +931,32 @@ D25ViewWidget::render_layout (tl::AbsoluteProgress &progress, D25ViewWidget::tri
 
       for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
         render_wall (chunks, line_chunks, *e, layout.dbu (), zstart, zstop);
+      }
+
+    }
+
+  }
+}
+#endif
+
+void
+D25ViewWidget::render_region (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Region &region, double dbu, const db::Box &clip_box, double zstart, double zstop)
+{
+  std::vector<db::Polygon> poly_heap;
+
+  for (db::Region::const_iterator p = region.begin (); !p.at_end (); ++p) {
+
+    poly_heap.clear ();
+    db::clip_poly (*p, clip_box, poly_heap, false /*keep holes*/);
+
+    for (std::vector<db::Polygon>::const_iterator p = poly_heap.begin (); p != poly_heap.end (); ++p) {
+
+      ++progress;
+
+      render_polygon (chunks, line_chunks, *p, dbu, zstart, zstop);
+
+      for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
+        render_wall (chunks, line_chunks, *e, dbu, zstart, zstop);
       }
 
     }
@@ -1098,8 +1237,8 @@ D25ViewWidget::paintGL ()
   glEnableVertexAttribArray (positions);
 
   for (std::vector<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    if (l->visible && l->color [3] > 0.5) {
-      m_shapes_program->setUniformValue ("color", l->color [0], l->color [1], l->color [2], l->color [3]);
+    if (l->visible && l->fill_color [3] > 0.5) {
+      m_shapes_program->setUniformValue ("color", l->fill_color [0], l->fill_color [1], l->fill_color [2], l->fill_color [3]);
       l->vertex_chunk->draw_to (this, positions, GL_TRIANGLES);
     }
   }

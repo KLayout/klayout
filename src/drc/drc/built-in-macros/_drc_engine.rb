@@ -1627,6 +1627,54 @@ CODE
     end
 
     # %DRC%
+    # @name region_touch 
+    # @brief Specifies region selected input in "touch mode"
+    # @synopsis region_touch(args)
+    # See \Source#touching for a description of that function.
+    #
+    # The following code will select shapes touching a 500x600 micron rectangle (lower left corner at 0,0) 
+    # from the input layout. The shapes will not be clipped:
+    # 
+    # @code
+    # region_touch(0.mm, 0.mm, 0.5.mm, 0.6.mm)
+    # # shapes will now be the ones touching the rectangular region
+    # l1 = input(1, 0)
+    # @/code
+    # 
+    # To remove this condition, call "region_touch" without any arguments.
+ 
+    def region_touch(*args)
+      self._context("region_touch") do
+        @def_source = layout.touching(*args)
+      end
+      nil
+    end
+
+    # %DRC%
+    # @name region_overlap 
+    # @brief Specifies region selected input in "overlap mode"
+    # @synopsis region_overlap(args)
+    # See \Source#overlapping for a description of that function.
+    #
+    # The following code will select shapes overlapping a 500x600 micron rectangle (lower left corner at 0,0) 
+    # from the input layout. The shapes will not be clipped:
+    # 
+    # @code
+    # region_overlapping(0.mm, 0.mm, 0.5.mm, 0.6.mm)
+    # # shapes will now be the ones overlapping the rectangular region
+    # l1 = input(1, 0)
+    # @/code
+    # 
+    # To remove this condition, call "region_overlapping" without any arguments.
+ 
+    def region_overlap(*args)
+      self._context("region_overlap") do
+        @def_source = layout.overlapping(*args)
+      end
+      nil
+    end
+
+    # %DRC%
     # @name global_transform
     # @brief Gets or sets a global transformation
     # @synopsis global_transform

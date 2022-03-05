@@ -42,9 +42,11 @@ module D25
       @zstack = []
 
       # clip to layout view
-      if RBA::LayoutView::current
-        self.clip(RBA::LayoutView::current.box)
-      end
+      if ! RBA::LayoutView::current
+        raise "No layout loaded for running 2.5d view on"
+      end 
+
+      self.region_overlap(RBA::LayoutView::current.box)
 
     end
 
@@ -126,7 +128,7 @@ module D25
           raise("No layer specified")
         end
 
-        info = D25ZInfo::new(layer.data, zstart, zstop, @display || D25Display::new)
+        info = D25ZInfo::new(layer, zstart, zstop, @display || D25Display::new)
         @zstack << info
 
         return info
@@ -137,77 +139,90 @@ module D25
     
     def display(*args, &block)
 
-      display = D25Display::new
+      begin
 
-      args.each do |a|
+        display = D25Display::new
+        @display = display
 
-        if a.is_a?(D25ZInfo)
+        args.each do |a|
 
-          @zstack.each do |z|
-            if z == a
-              z.display = display
+          if a.is_a?(D25ZInfo)
+
+            @zstack.each do |z|
+              if z == a
+                z.display = display
+              end
             end
-          end
 
-        elsif a.is_a?(Hash)
+          elsif a.is_a?(Hash)
 
-          hollow_fill = 0xffffffff
+            hollow_fill = 0xffffffff
 
-          if a[:color]
-            if !a[:color].is_a?(0xffffff.class)
-              raise("'color' must be a color value (an integer)")
+            if a[:color]
+              if !a[:color].is_a?(0xffffff.class)
+                raise("'color' must be a color value (an integer)")
+              end
+              display.fill = a[:color]
+              display.frame = a[:color]
             end
-            display.fill = a[:color]
-            display.frame = a[:color]
-          end
-          if a[:frame]
-            if !a[:frame].is_a?(0xffffff.class)
-              raise("'frame' must be a color value (an integer)")
+            if a[:frame]
+              if !a[:frame].is_a?(0xffffff.class)
+                raise("'frame' must be a color value (an integer)")
+              end
+              display.frame = a[:frame]
             end
-            display.frame = a[:frame]
-          end
-          if a[:fill]
-            if !a[:fill].is_a?(0xffffff.class)
-              raise("'fill' must be a color value (an integer)")
+            if a[:fill]
+              if !a[:fill].is_a?(0xffffff.class)
+                raise("'fill' must be a color value (an integer)")
+              end
+              display.fill = a[:fill]
             end
-            display.fill = a[:fill]
-          end
-          if a[:hollow]
             if a[:hollow]
-              display.fill = hollow_fill
+              if a[:hollow]
+                display.fill = hollow_fill
+              end
             end
-          end
 
-          if a[:like]
-            li = nil
-            if a[:like].is_a?(String)
-              li = RBA::LayerInfo::from_string(a[:like])
-            elsif a[:like].is_a?(RBA::LayerInfo)
-              li = a[:like]
-            else
-              raise("'like' must be a string or LayerInfo object")
+            if a[:like]
+              li = nil
+              if a[:like].is_a?(String)
+                li = RBA::LayerInfo::from_string(a[:like])
+              elsif a[:like].is_a?(RBA::LayerInfo)
+                li = a[:like]
+              else
+                raise("'like' must be a string or LayerInfo object")
+              end
+              display.like = li
             end
-            display.like = li
-          end
 
-          invalid_keys = a.keys.select { |k| ![ :fill, :frame, :color, :hollow, :like ].member?(k) }
-          if invalid_keys.size > 0
-            raise("Keyword argument(s) not understood: #{invalid_keys.collect(&:to_s).join(',')}")
-          end
+            invalid_keys = a.keys.select { |k| ![ :fill, :frame, :color, :hollow, :like ].member?(k) }
+            if invalid_keys.size > 0
+              raise("Keyword argument(s) not understood: #{invalid_keys.collect(&:to_s).join(',')}")
+            end
 
-        else
-          raise("Argument not understood: #{a.inspect}")
+          else
+            raise("Argument not understood: #{a.inspect}")
+          end
+              
         end
-            
+
+        yield
+
+      ensure
+        @display = nil
+      end
+
+    end
+
+    def _check
+
+      if @zstack.empty?
+        raise("No z calls made in 2.5d script")
       end
 
     end
 
     def _finish(final = true)
-
-      if final && @zstack.empty?
-        raise("No z calls made in 2.5d script")
-      end
 
       super(final)
 
@@ -216,6 +231,8 @@ module D25
         view = RBA::LayoutView::current.open_d25_view
 
         begin
+
+          view.clear
 
           displays = {}
 
@@ -227,7 +244,7 @@ module D25
             display = zz[0].display
             view.open_display(display.frame, display.fill, display.like)
             zz.each do |z|
-              view.entry(z.layer, z.start, z.zstop)
+              view.entry(z.layer.data, self.dbu, z.zstart, z.zstop)
             end
             view.close_display
           end
@@ -235,6 +252,7 @@ module D25
           view.finish
 
         rescue => ex
+          view.clear
           view.close
           raise ex
         end

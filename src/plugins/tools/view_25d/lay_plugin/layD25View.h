@@ -27,6 +27,7 @@
 
 #include "tlObject.h"
 #include "layBrowser.h"
+#include "layViewOp.h"
 
 namespace Ui
 {
@@ -36,6 +37,12 @@ namespace Ui
 namespace lay
 {
   class LayoutView;
+}
+
+namespace db
+{
+  class Region;
+  struct LayerProperties;
 }
 
 namespace lay
@@ -53,6 +60,14 @@ public:
   virtual void menu_activated (const std::string &symbol);
   virtual void deactivated ();
   virtual void activated ();
+
+  static D25View *open (lay::LayoutView *view);
+  void close ();
+  void clear ();
+  void open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like);
+  void close_display ();
+  void entry (const db::Region &data, double dbu, double zstart, double zstop);
+  void finish ();
 
 protected:
   void accept ();

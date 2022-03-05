@@ -43,19 +43,19 @@ D25View::D25View (lay::Dispatcher *root, lay::LayoutView *view)
   mp_ui->d25_view->setFocusPolicy (Qt::StrongFocus);
   mp_ui->d25_view->setFocus ();
 
-  connect (mp_ui->fit_back, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
-  connect (mp_ui->fit_front, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
-  connect (mp_ui->fit_left, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
-  connect (mp_ui->fit_right, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
-  connect (mp_ui->fit_top, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
-  connect (mp_ui->fit_bottom, SIGNAL (clicked ()), this, SLOT (fit_button_clicked ()));
-  connect (mp_ui->zoom_slider, SIGNAL (valueChanged (int)), this, SLOT (scale_slider_changed (int)));
-  connect (mp_ui->vzoom_slider, SIGNAL (valueChanged (int)), this, SLOT (vscale_slider_changed (int)));
-  connect (mp_ui->zoom_factor, SIGNAL (editingFinished ()), this, SLOT (scale_value_edited ()));
-  connect (mp_ui->vzoom_factor, SIGNAL (editingFinished ()), this, SLOT (vscale_value_edited ()));
-  connect (mp_ui->d25_view, SIGNAL (scale_factor_changed (double)), this, SLOT (scale_factor_changed (double)));
-  connect (mp_ui->d25_view, SIGNAL (vscale_factor_changed (double)), this, SLOT (vscale_factor_changed (double)));
-  connect (mp_ui->d25_view, SIGNAL (init_failed ()), this, SLOT (init_failed ()));
+  connect (mp_ui->fit_back, SIGNAL (clicked()), this, SLOT (fit_button_clicked()));
+  connect (mp_ui->fit_front, SIGNAL (clicked()), this, SLOT (fit_button_clicked()));
+  connect (mp_ui->fit_left, SIGNAL (clicked()), this, SLOT (fit_button_clicked()));
+  connect (mp_ui->fit_right, SIGNAL (clicked()), this, SLOT (fit_button_clicked()));
+  connect (mp_ui->fit_top, SIGNAL (clicked()), this, SLOT (fit_button_clicked()));
+  connect (mp_ui->fit_bottom, SIGNAL (clicked()), this, SLOT (fit_button_clicked()));
+  connect (mp_ui->zoom_slider, SIGNAL (valueChanged(int)), this, SLOT (scale_slider_changed(int)));
+  connect (mp_ui->vzoom_slider, SIGNAL (valueChanged(int)), this, SLOT (vscale_slider_changed(int)));
+  connect (mp_ui->zoom_factor, SIGNAL (editingFinished()), this, SLOT (scale_value_edited()));
+  connect (mp_ui->vzoom_factor, SIGNAL (editingFinished()), this, SLOT (vscale_value_edited()));
+  connect (mp_ui->d25_view, SIGNAL (scale_factor_changed(double)), this, SLOT (scale_factor_changed(double)));
+  connect (mp_ui->d25_view, SIGNAL (vscale_factor_changed(double)), this, SLOT (vscale_factor_changed(double)));
+  connect (mp_ui->d25_view, SIGNAL (init_failed()), this, SLOT (init_failed()));
 
   mp_ui->gl_stack->setCurrentIndex (0);
 
@@ -84,7 +84,7 @@ D25View::cellviews_changed ()
 void
 D25View::layer_properties_changed (int)
 {
-  mp_ui->d25_view->refresh_view ();
+  // @@@ mp_ui->d25_view->refresh_view ();
 }
 
 void
@@ -111,6 +111,71 @@ D25View::menu_activated (const std::string &symbol)
   } else {
     lay::Browser::menu_activated (symbol);
   }
+}
+
+D25View *
+D25View::open (lay::LayoutView *view)
+{
+  D25View *d25_view = view->get_plugin<lay::D25View> ();
+  if (d25_view) {
+
+    d25_view->show ();
+    d25_view->activateWindow ();
+    d25_view->raise ();
+
+    try {
+      d25_view->activate ();
+    } catch (...) {
+      d25_view->deactivate ();
+      throw;
+    }
+
+  }
+
+  return d25_view;
+}
+
+void
+D25View::close ()
+{
+  hide ();
+}
+
+void
+D25View::clear ()
+{
+  mp_ui->d25_view->clear ();
+}
+
+void
+D25View::open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like)
+{
+  mp_ui->d25_view->open_display (frame_color, fill_color, like);
+}
+
+void
+D25View::close_display ()
+{
+  mp_ui->d25_view->close_display ();
+}
+
+void
+D25View::entry (const db::Region &data, double dbu, double zstart, double zstop)
+{
+  mp_ui->d25_view->entry (data, dbu, zstart, zstop);
+}
+
+void
+D25View::finish ()
+{
+  mp_ui->d25_view->finish ();
+
+  // @@@ install
+
+  mp_ui->d25_view->reset ();
+  mp_ui->d25_view->set_cam_azimuth (0.0);
+  mp_ui->d25_view->set_cam_elevation (-initial_elevation);
+  mp_ui->d25_view->fit ();
 }
 
 static QString scale_factor_to_string (double f)
@@ -198,12 +263,7 @@ D25View::deactivated ()
 void
 D25View::activated ()
 {
-  bool any = mp_ui->d25_view->attach_view (view ());
-  if (! any) {
-    mp_ui->d25_view->attach_view (0);
-    throw tl::Exception (tl::to_string (tr ("No z data configured for the layers in this view.\nUse \"Tools/Manage Technologies\" to set up a z stack or check if it applies to the layers here.")));
-  }
-
+  mp_ui->d25_view->attach_view (view ());
   mp_ui->d25_view->reset ();
   mp_ui->d25_view->set_cam_azimuth (0.0);
   mp_ui->d25_view->set_cam_elevation (-initial_elevation);

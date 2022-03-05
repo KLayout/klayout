@@ -108,6 +108,10 @@ static void set_pin_property_name (db::LEFDEFReaderOptions *config, const tl::Va
 
 static
 gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfiguration",
+  gsi::method ("paths_relative_to_cwd=", &db::LEFDEFReaderOptions::set_paths_relative_to_cwd, gsi::arg ("f"),
+    "@brief Sets a value indicating whether to use paths relative to cwd (true) or DEF file (false) for map or LEF files\n"
+    "This write-only attribute has been introduced in version 0.27.9."
+  ) +
   gsi::method ("layer_map", (db::LayerMap &(db::LEFDEFReaderOptions::*) ()) &db::LEFDEFReaderOptions::layer_map,
     "@brief Gets the layer map to be used for the LEF/DEF reader\n"
     "@return A reference to the layer map\n"

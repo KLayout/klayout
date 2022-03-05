@@ -173,3 +173,7 @@ TEST(20_private)
   run_test (_this, "test_20.lylvs", "test_20.cir.gz", "test_20.gds.gz", true, "test_20b.lvsdb");
 }
 
+TEST(21_private)
+{
+  run_test (_this, "test_21.lylvs", "test_21.cir.gz", "test_21.gds.gz", true, "test_21.lvsdb");
+}

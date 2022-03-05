@@ -31,6 +31,33 @@
 namespace bd
 {
 
+static std::string::size_type find_file_sep (const std::string &s, std::string::size_type from)
+{
+  std::string::size_type p1 = s.find ("+", from);
+  std::string::size_type p2 = s.find (",", from);
+
+  if (p1 == std::string::npos) {
+    return p2;
+  } else if (p2 == std::string::npos) {
+    return p1;
+  } else {
+    return p1 < p2 ? p1 : p2;
+  }
+}
+
+static std::vector<std::string> split_file_list (const std::string &infile)
+{
+  std::vector<std::string> files;
+
+  size_t p = 0;
+  for (size_t pp = 0; (pp = find_file_sep (infile, p)) != std::string::npos; p = pp + 1) {
+    files.push_back (std::string (infile, p, pp - p));
+  }
+  files.push_back (std::string (infile, p));
+
+  return files;
+}
+
 int converter_main (int argc, char *argv[], const std::string &format)
 {
   bd::GenericWriterOptions generic_writer_options;
@@ -42,7 +69,7 @@ int converter_main (int argc, char *argv[], const std::string &format)
   generic_reader_options.add_options (cmd);
 
   cmd << tl::arg ("input",  &infile,  "The input file (any format, may be gzip compressed)",
-                  "You can use '+' to supply multiple files which will be read after each other into the same layout. "
+                  "You can use '+' or ',' to supply multiple files which will be read after each other into the same layout. "
                   "This provides some cheap, but risky way of merging files. Beware of cell name conflicts.")
       << tl::arg ("output", &outfile, tl::sprintf ("The output file (%s format)", format))
     ;
@@ -57,7 +84,7 @@ int converter_main (int argc, char *argv[], const std::string &format)
     db::LoadLayoutOptions load_options;
     generic_reader_options.configure (load_options);
 
-    std::vector<std::string> files = tl::split (infile, "+");
+    std::vector<std::string> files = split_file_list (infile);
 
     for (std::vector<std::string>::const_iterator f = files.begin (); f != files.end (); ++f) {
       tl::InputStream stream (*f);

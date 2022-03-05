@@ -116,7 +116,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
     effective_options = *lefdef_options;
   }
 
-  db::LEFDEFReaderState state (&effective_options, layout, tl::dirname (m_stream.absolute_path ()));
+  db::LEFDEFReaderState state (&effective_options, layout, effective_options.paths_relative_to_cwd () ? std::string () : tl::dirname (m_stream.absolute_path ()));
 
   layout.dbu (effective_options.dbu ());
 

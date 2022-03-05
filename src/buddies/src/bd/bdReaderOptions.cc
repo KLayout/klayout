@@ -647,7 +647,7 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "\n"
                     "The following values are accepted for this option:\n"
                     "\n"
-                    "* 0: produce LEF geometry unless a FOREIGN cell is specified\n"
+                    "* 0: produce LEF geometry unless a FOREIGN cell is specified (the default)\n"
                     "* 1: produce LEF geometry always and ignore FOREIGN\n"
                     "* 2: Never produce LEF geometry and assume FOREIGN always\n"
                     "\n"
@@ -679,8 +679,6 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "Use a comma-separated list of file names here to specify which LEF files to read. "
                     "See also '--" + m_long_prefix + "lefdef-read-lef-with-def' for an option to implicitly read all LEF files in the same "
                     "place than the DEF file.\n"
-                    "\n"
-                    "Relative paths are resolved based on the location of the DEF file which is read."
                    )
       ;
 
@@ -807,6 +805,8 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
   load_options.set_option_by_name ("lefdef_config.separate_groups", m_lefdef_separate_groups);
   load_options.set_option_by_name ("lefdef_config.map_file", m_lefdef_map_file);
   load_options.set_option_by_name ("lefdef_config.macro_resolution_mode", m_lefdef_macro_resolution_mode);
+  load_options.set_option_by_name ("lefdef_config.macro_resolution_mode", m_lefdef_macro_resolution_mode);
+  load_options.set_option_by_name ("lefdef_config.paths_relative_to_cwd", true);
 
   m_lef_layouts.clear ();
   tl::Variant lef_layout_ptrs = tl::Variant::empty_list ();

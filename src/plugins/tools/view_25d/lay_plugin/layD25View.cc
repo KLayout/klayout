@@ -170,7 +170,7 @@ D25View::finish ()
 {
   mp_ui->d25_view->finish ();
 
-  // @@@ install
+  // @@@ install layer properties widget
 
   mp_ui->d25_view->reset ();
   mp_ui->d25_view->set_cam_azimuth (0.0);

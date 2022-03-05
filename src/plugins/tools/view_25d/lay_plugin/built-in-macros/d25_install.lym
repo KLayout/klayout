@@ -43,6 +43,18 @@ module D25
 
     mw.menu.insert_item("tools_menu.#{cat}.end", "edit_script", @edit_action)
 
+    @open_action = RBA::Action::new
+    @open_action.title = "Open Window"
+    @open_action.on_triggered do
+      if ! RBA::LayoutView::current
+        RBA::MessageBox::critical("Error", "No layout loaded for running 2.5d view on", RBA::MessageBox::Ok)
+      else 
+        RBA::LayoutView::current.open_d25_view
+      end
+    end
+
+    mw.menu.insert_item("tools_menu.#{cat}.end", "open_window", @open_action)
+
   end
 
 end

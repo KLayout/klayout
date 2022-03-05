@@ -52,10 +52,9 @@ public:
     return 0;
   }
 
-  virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
+  virtual void get_menu_entries (std::vector<lay::MenuEntry> & /*menu_entries*/) const
   {
-    lay::PluginDeclaration::get_menu_entries (menu_entries);
-    menu_entries.push_back (lay::menu_item ("lay::d25_view", "d25_view:edit", "tools_menu.post_verification_group", tl::to_string (QObject::tr ("2.5d View - experimental"))));
+    // .. nothing yet ..
   }
 
   virtual bool configure (const std::string & /*name*/, const std::string & /*value*/)

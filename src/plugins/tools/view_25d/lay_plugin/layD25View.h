@@ -24,6 +24,7 @@
 #define HDR_layD25View
 
 #include <QDialog>
+#include <QListWidgetItem>
 
 #include "tlObject.h"
 #include "layBrowser.h"
@@ -84,6 +85,11 @@ private slots:
   void vscale_value_edited ();
   void init_failed ();
   void rerun_button_pressed ();
+  void material_item_changed (QListWidgetItem *);
+  void hide_all_triggered ();
+  void hide_selected_triggered ();
+  void show_all_triggered ();
+  void show_selected_triggered ();
 
 private:
   Ui::D25View *mp_ui;

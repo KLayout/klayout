@@ -482,6 +482,15 @@ D25ViewWidget::refresh ()
 }
 
 void
+D25ViewWidget::set_material_visible (size_t index, bool visible)
+{
+  if (index < m_layers.size () && m_layers [index].visible != visible) {
+    m_layers [index].visible = visible;
+    update ();
+  }
+}
+
+void
 D25ViewWidget::showEvent (QShowEvent *)
 {
   //  NOTE: This should happen automatically, but apparently the OpenGL widget doesn't do an automatic refresh:
@@ -551,7 +560,7 @@ static void lp_to_info (const lay::LayerPropertiesNode &lp, D25ViewWidget::Layer
     info.frame_color [3] = 0.0f;
   }
 
-  info.visible = lp.visible (true);
+  info.visible = true;
 }
 
 void

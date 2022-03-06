@@ -424,7 +424,23 @@
               </sizepolicy>
              </property>
             </widget>
-            <widget class="QWidget" name="widget" native="true"/>
+            <widget class="QListWidget" name="material_list">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::ExtendedSelection</enum>
+             </property>
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="uniformItemSizes">
+              <bool>true</bool>
+             </property>
+            </widget>
            </widget>
           </item>
          </layout>
@@ -566,6 +582,36 @@
     </widget>
    </item>
   </layout>
+  <action name="select_all_action">
+   <property name="text">
+    <string>Select All</string>
+   </property>
+  </action>
+  <action name="unselect_all_action">
+   <property name="text">
+    <string>Unselect All</string>
+   </property>
+  </action>
+  <action name="show_all_action">
+   <property name="text">
+    <string>Show All</string>
+   </property>
+  </action>
+  <action name="hide_all_action">
+   <property name="text">
+    <string>Hide All</string>
+   </property>
+  </action>
+  <action name="show_selected_action">
+   <property name="text">
+    <string>Show Selected</string>
+   </property>
+  </action>
+  <action name="hide_selected_action">
+   <property name="text">
+    <string>Hide Selected</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -591,6 +637,38 @@
     <hint type="destinationlabel">
      <x>767</x>
      <y>659</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>select_all_action</sender>
+   <signal>triggered()</signal>
+   <receiver>material_list</receiver>
+   <slot>selectAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>716</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>unselect_all_action</sender>
+   <signal>triggered()</signal>
+   <receiver>material_list</receiver>
+   <slot>clearSelection()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>716</x>
+     <y>336</y>
     </hint>
    </hints>
   </connection>

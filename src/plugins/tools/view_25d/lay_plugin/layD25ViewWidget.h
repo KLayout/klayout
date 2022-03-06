@@ -149,6 +149,13 @@ public:
     return m_has_error;
   }
 
+  const std::vector<LayerInfo> &layers () const
+  {
+    return m_layers;
+  }
+
+  void set_material_visible (size_t index, bool visible);
+
   void clear ();
   void open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like, const std::string *name);
   void close_display ();

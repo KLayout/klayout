@@ -31,6 +31,8 @@
 
 #include <stdio.h>
 
+#include <QFontMetrics>
+
 namespace lay
 {
 
@@ -61,6 +63,10 @@ D25View::D25View (lay::Dispatcher *root, lay::LayoutView *view)
   connect (mp_ui->d25_view, SIGNAL (vscale_factor_changed(double)), this, SLOT (vscale_factor_changed(double)));
   connect (mp_ui->d25_view, SIGNAL (init_failed()), this, SLOT (init_failed()));
   connect (mp_ui->rerun_button, SIGNAL (clicked()), this, SLOT (rerun_button_pressed()));
+  connect (mp_ui->hide_all_action, SIGNAL (triggered()), this, SLOT (hide_all_triggered()));
+  connect (mp_ui->hide_selected_action, SIGNAL (triggered()), this, SLOT (hide_selected_triggered()));
+  connect (mp_ui->show_all_action, SIGNAL (triggered()), this, SLOT (show_all_triggered()));
+  connect (mp_ui->show_selected_action, SIGNAL (triggered()), this, SLOT (show_selected_triggered()));
 
   mp_ui->rerun_button->setEnabled (false);
 
@@ -71,6 +77,25 @@ D25View::D25View (lay::Dispatcher *root, lay::LayoutView *view)
 
   view->cellviews_changed_event.add (this, &D25View::cellviews_changed);
   view->layer_list_changed_event.add (this, &D25View::layer_properties_changed);
+
+  QPalette palette = mp_ui->material_list->palette ();
+  palette.setColor (QPalette::Base, Qt::black);
+  palette.setColor (QPalette::Text, Qt::white);
+  mp_ui->material_list->setPalette (palette);
+
+  QFont font = mp_ui->material_list->font ();
+  font.setWeight (QFont::Bold);
+  mp_ui->material_list->setFont (font);
+
+  mp_ui->material_list->addAction (mp_ui->select_all_action);
+  mp_ui->material_list->addAction (mp_ui->unselect_all_action);
+  mp_ui->material_list->addAction (mp_ui->show_all_action);
+  mp_ui->material_list->addAction (mp_ui->show_selected_action);
+  mp_ui->material_list->addAction (mp_ui->hide_all_action);
+  mp_ui->material_list->addAction (mp_ui->hide_selected_action);
+  mp_ui->material_list->setContextMenuPolicy (Qt::ActionsContextMenu);
+
+  connect (mp_ui->material_list, SIGNAL (itemChanged (QListWidgetItem *)), this, SLOT (material_item_changed (QListWidgetItem *)));
 }
 
 D25View::~D25View ()
@@ -92,7 +117,7 @@ D25View::cellviews_changed ()
 void
 D25View::layer_properties_changed (int)
 {
-  // @@@ mp_ui->d25_view->refresh_view ();
+  //  .. nothing yet ..
 }
 
 void
@@ -196,6 +221,35 @@ D25View::entry (const db::Region &data, double dbu, double zstart, double zstop)
   }
 }
 
+static void layer_info_to_item (const lay::D25ViewWidget::LayerInfo &info, QListWidgetItem *item, size_t index, QSize icon_size)
+{
+  if (info.has_name) {
+    item->setText (tl::to_qstring (info.name));
+  } else {
+    item->setText (tl::to_qstring ("#" + tl::to_string (index + 1)));
+  }
+
+  QImage img (icon_size, QImage::Format_ARGB32);
+  img.fill (QColor (floor (info.fill_color [0] * 255 + 0.5), floor (info.fill_color [1] * 255 + 0.5), floor (info.fill_color [2] * 255 + 0.5), floor (info.fill_color [3] * 255 + 0.5)));
+
+  QColor fc (floor (info.frame_color [0] * 255 + 0.5), floor (info.frame_color [1] * 255 + 0.5), floor (info.frame_color [2] * 255 + 0.5), floor (info.frame_color [3] * 255 + 0.5));
+  if (fc.alpha () > 0) {
+    QRgb fc_rgb = fc.rgba ();
+    for (int x = 0; x < icon_size.width (); ++x) {
+      img.setPixel (x, 0, fc_rgb);
+      img.setPixel (x, icon_size.height () - 1, fc_rgb);
+    }
+    for (int y = 0; y < icon_size.height (); ++y) {
+      img.setPixel (0, y, fc_rgb);
+      img.setPixel (icon_size.width () - 1, y, fc_rgb);
+    }
+  }
+
+  QIcon icon;
+  icon.addPixmap (QPixmap::fromImage (img));
+  item->setIcon (icon);
+}
+
 void
 D25View::finish ()
 {
@@ -203,7 +257,19 @@ D25View::finish ()
 
     mp_ui->d25_view->finish ();
 
-    // @@@ install layer properties widget
+    QFontMetrics fm (mp_ui->material_list->font ());
+    QSize icon_size = fm.size (Qt::TextSingleLine, "WW");
+    icon_size.setHeight (icon_size.height () - 2);
+    mp_ui->material_list->setIconSize (icon_size);
+
+    mp_ui->material_list->clear ();
+    const std::vector<lay::D25ViewWidget::LayerInfo> &layers = mp_ui->d25_view->layers ();
+    for (auto l = layers.begin (); l != layers.end (); ++l) {
+      QListWidgetItem *item = new QListWidgetItem (mp_ui->material_list);
+      item->setFlags (item->flags () | Qt::ItemIsUserCheckable);
+      item->setCheckState (Qt::Checked);
+      layer_info_to_item (*l, item, l - layers.begin (), icon_size);
+    }
 
     mp_ui->d25_view->reset ();
     mp_ui->d25_view->set_cam_azimuth (0.0);
@@ -299,6 +365,15 @@ D25View::vscale_factor_changed (double f)
 }
 
 void
+D25View::material_item_changed (QListWidgetItem *item)
+{
+  int index = mp_ui->material_list->row (item);
+  if (index >= 0) {
+    mp_ui->d25_view->set_material_visible (size_t (index), item->checkState () == Qt::Checked);
+  }
+}
+
+void
 D25View::deactivated ()
 {
   mp_ui->d25_view->attach_view (0);
@@ -364,6 +439,42 @@ D25View::fit_button_clicked ()
   mp_ui->d25_view->set_cam_elevation (elevation);
 
   mp_ui->d25_view->fit ();
+}
+
+void
+D25View::hide_all_triggered ()
+{
+  for (int i = 0; i < mp_ui->material_list->count (); ++i) {
+    mp_ui->material_list->item (i)->setCheckState (Qt::Unchecked);
+  }
+}
+
+void
+D25View::hide_selected_triggered ()
+{
+  for (int i = 0; i < mp_ui->material_list->count (); ++i) {
+    if (mp_ui->material_list->item (i)->isSelected ()) {
+      mp_ui->material_list->item (i)->setCheckState (Qt::Unchecked);
+    }
+  }
+}
+
+void
+D25View::show_all_triggered ()
+{
+  for (int i = 0; i < mp_ui->material_list->count (); ++i) {
+    mp_ui->material_list->item (i)->setCheckState (Qt::Checked);
+  }
+}
+
+void
+D25View::show_selected_triggered ()
+{
+  for (int i = 0; i < mp_ui->material_list->count (); ++i) {
+    if (mp_ui->material_list->item (i)->isSelected ()) {
+      mp_ui->material_list->item (i)->setCheckState (Qt::Checked);
+    }
+  }
 }
 
 void 

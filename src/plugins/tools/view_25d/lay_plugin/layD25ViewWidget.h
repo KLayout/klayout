@@ -89,6 +89,8 @@ public:
     GLfloat fill_color [4];
     GLfloat frame_color [4];
     bool visible;
+    std::string name;
+    bool has_name;
   };
 
   D25ViewWidget (QWidget *parent);
@@ -148,7 +150,7 @@ public:
   }
 
   void clear ();
-  void open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like);
+  void open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like, const std::string *name);
   void close_display ();
   void entry (const db::Region &data, double dbu, double zstart, double zstop);
   void finish ();

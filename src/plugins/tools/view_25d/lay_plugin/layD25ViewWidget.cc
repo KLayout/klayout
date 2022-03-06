@@ -555,7 +555,7 @@ static void lp_to_info (const lay::LayerPropertiesNode &lp, D25ViewWidget::Layer
 }
 
 void
-D25ViewWidget::open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like)
+D25ViewWidget::open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like, const std::string *name)
 {
   m_vertex_chunks.push_back (triangle_chunks_type ());
   m_line_chunks.push_back (line_chunks_type ());
@@ -565,6 +565,14 @@ D25ViewWidget::open_display (const color_t *frame_color, const color_t *fill_col
   info.visible = true;
   color_to_gl (frame_color, info.frame_color);
   color_to_gl (fill_color, info.fill_color);
+
+  info.has_name = (name != 0 || like != 0);
+  if (name) {
+    info.name = *name;
+  } else if (like) {
+    info.name = like->to_string ();
+  }
+
   info.vertex_chunk = &m_vertex_chunks.back ();
   info.line_chunk = &m_line_chunks.back ();
 
@@ -601,9 +609,11 @@ D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double 
     m_zmax = std::min (m_zmax, std::max (zstart, zstop));
   }
 
+  LayerInfo &info = m_layers.back ();
+
   //  try to establish a default color from the region's origin if required
   const db::OriginalLayerRegion *original_region = dynamic_cast<db::OriginalLayerRegion *> (data.delegate ());
-  if (mp_view && m_layers.back ().fill_color [3] == 0.0 && m_layers.back ().frame_color [3] == 0.0) {
+  if (mp_view && info.fill_color [3] == 0.0 && info.frame_color [3] == 0.0) {
 
     if (original_region) {
 
@@ -614,7 +624,11 @@ D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double 
 
         for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
           if (! lp->has_children () && lp->source (true).layer_props ().log_equal (like)) {
-            lp_to_info (*lp, m_layers.back ());
+            lp_to_info (*lp, info);
+            if (! info.has_name) {
+              info.name = like.to_string ();
+              info.has_name = true;
+            }
             break;
           }
         }
@@ -625,7 +639,7 @@ D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double 
 
       //  sequential assignment
       lay::color_t color = mp_view->get_palette ().luminous_color_by_index (m_layers.size ());
-      color_to_gl (color, m_layers.back ().fill_color);
+      color_to_gl (color, info.fill_color);
 
     }
 
@@ -638,7 +652,7 @@ D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double 
 void
 D25ViewWidget::finish ()
 {
-  // @@@
+  //  .. nothing yet ..
 }
 
 void

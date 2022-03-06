@@ -65,7 +65,7 @@ public:
   void close ();
   void clear ();
   void begin (const std::string &generator);
-  void open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like);
+  void open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like, const std::string *name);
   void close_display ();
   void entry (const db::Region &data, double dbu, double zstart, double zstop);
   void finish ();

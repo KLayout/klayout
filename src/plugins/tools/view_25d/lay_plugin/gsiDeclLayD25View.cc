@@ -65,7 +65,7 @@ Class<lay::D25View> decl_D25View (QT_EXTERNAL_BASE (QDialog) "lay", "D25View",
   gsi::method ("begin", &lay::D25View::begin, gsi::arg ("generator"),
     "@brief Initiates delivery of display groups"
   ) +
-  gsi::method ("open_display", &lay::D25View::open_display, gsi::arg ("frame_color"), gsi::arg ("fill_color"), gsi::arg ("like"),
+  gsi::method ("open_display", &lay::D25View::open_display, gsi::arg ("frame_color"), gsi::arg ("fill_color"), gsi::arg ("like"), gsi::arg ("name"),
     "@brief Creates a new display group"
   ) +
   gsi::method ("entry", &lay::D25View::entry, gsi::arg ("data"), gsi::arg ("dbu"), gsi::arg ("zstart"), gsi::arg ("zstop"),

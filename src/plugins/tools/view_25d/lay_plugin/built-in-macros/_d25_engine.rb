@@ -260,7 +260,7 @@ module D25
 
           displays.each do |k,zz|
             display = zz[0].display
-            view.open_display(display.frame, display.fill, display.like)
+            view.open_display(display.frame, display.fill, display.like, display.name)
             zz.each do |z|
               view.entry(z.layer.data, self.dbu, z.zstart, z.zstop)
             end

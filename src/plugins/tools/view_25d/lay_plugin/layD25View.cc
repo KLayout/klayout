@@ -38,7 +38,8 @@ const double initial_elevation = 15.0;
 
 D25View::D25View (lay::Dispatcher *root, lay::LayoutView *view)
   : lay::Browser (root, view, "d25_view"),
-    dm_rerun_macro (this, &D25View::rerun_macro)
+    dm_rerun_macro (this, &D25View::rerun_macro),
+    dm_fit (this, &D25View::fit)
 {
   mp_ui = new Ui::D25View ();
   mp_ui->setupUi (this);
@@ -207,11 +208,18 @@ D25View::finish ()
     mp_ui->d25_view->reset ();
     mp_ui->d25_view->set_cam_azimuth (0.0);
     mp_ui->d25_view->set_cam_elevation (-initial_elevation);
-    mp_ui->d25_view->fit ();
+    //  NOTE: needs to be delayed to allow the geometry to be updated before (initial call)
+    dm_fit ();
 
     mp_ui->gl_stack->setCurrentIndex (0);
 
   }
+}
+
+void
+D25View::fit ()
+{
+  mp_ui->d25_view->fit ();
 }
 
 static QString scale_factor_to_string (double f)

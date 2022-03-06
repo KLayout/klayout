@@ -592,6 +592,15 @@ D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double 
 {
   tl_assert (m_display_open);
 
+  if (! m_zset) {
+    m_zmin = std::min (zstart, zstop);
+    m_zmax = std::max (zstart, zstop);
+    m_zset = true;
+  } else {
+    m_zmin = std::min (m_zmin, std::min (zstart, zstop));
+    m_zmax = std::min (m_zmax, std::max (zstart, zstop));
+  }
+
   //  try to establish a default color from the region's origin if required
   const db::OriginalLayerRegion *original_region = dynamic_cast<db::OriginalLayerRegion *> (data.delegate ());
   if (mp_view && m_layers.back ().fill_color [3] == 0.0 && m_layers.back ().frame_color [3] == 0.0) {

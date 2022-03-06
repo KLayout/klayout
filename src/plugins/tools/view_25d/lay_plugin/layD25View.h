@@ -88,11 +88,13 @@ private slots:
 private:
   Ui::D25View *mp_ui;
   tl::DeferredMethod<D25View> dm_rerun_macro;
+  tl::DeferredMethod<D25View> dm_fit;
   std::string m_generator;
 
   void cellviews_changed ();
   void layer_properties_changed (int);
   void rerun_macro ();
+  void fit ();
 };
 
 }

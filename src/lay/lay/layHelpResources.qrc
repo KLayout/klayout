@@ -49,6 +49,7 @@
         <file alias="packages.xml">doc/about/packages.xml</file>
         <file alias="25d_view.xml">doc/about/25d_view.xml</file>
         <file alias="25d_screenshot.png">doc/about/25d_screenshot.png</file>
+        <file alias="25d_screenshot2.png">doc/about/25d_screenshot2.png</file>
     </qresource>
     <qresource prefix="/help/manual">
         <file alias="adjust_origin.xml">doc/manual/adjust_origin.xml</file>

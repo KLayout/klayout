@@ -108,6 +108,9 @@ module D25
               raise("Duplicate layer argument")
             end
             layer = a
+            if ! layer.data.is_a?(RBA::Region)
+              raise("Expected a polygon layer")
+            end
 
           elsif a.is_a?(1.class) || a.is_a?(1.0.class)
 

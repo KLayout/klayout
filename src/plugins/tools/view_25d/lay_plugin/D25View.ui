@@ -376,6 +376,9 @@
    </item>
    <item>
     <widget class="QStackedWidget" name="gl_stack">
+     <property name="currentIndex">
+      <number>2</number>
+     </property>
      <widget class="QWidget" name="page">
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="leftMargin">
@@ -510,7 +513,8 @@
        <item>
         <widget class="QLabel" name="empty_label">
          <property name="text">
-          <string>In order to use the 2.5d view you will need a script which generates the view.</string>
+          <string>In order to use the 2.5d view you will need a script which generates the view.&lt;br/&gt;
+See here for more information: &lt;a href=&quot;int:/about/25d_view.xml&quot;&gt;The 2.5d View&lt;/a&gt;.</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

@@ -20,12 +20,47 @@ module D25
 
   class D25Display
 
-    attr_accessor :fill, :frame, :like
+    attr_accessor :fill, :frame, :like, :name
 
     def initialize
       self.fill = nil
       self.frame = nil
       self.like = nil
+      self.name = nil
+    end
+
+    def set_fill(arg)
+      if !arg.is_a?(0xffffff.class)
+        raise("'fill' must be a color value (an integer)")
+      end
+      self.fill = arg
+    end
+
+    def set_frame(arg)
+      if !arg.is_a?(0xffffff.class)
+        raise("'frame' must be a color value (an integer)")
+      end
+      self.frame = arg
+    end
+
+    def set_color(arg)
+      if !arg.is_a?(0xffffff.class)
+        raise("'color' must be a color value (an integer)")
+      end
+      self.fill = arg
+      self.frame = nil
+    end
+
+    def set_like(arg)
+      li = nil
+      if arg.is_a?(String)
+        li = RBA::LayerInfo::from_string(arg)
+      elsif arg.is_a?(RBA::LayerInfo)
+        li = arg
+      else
+        raise("'like' must be a string or LayerInfo object")
+      end
+      self.like = li
     end
 
   end
@@ -58,6 +93,7 @@ module D25
         zstart = nil
         zstop = nil
         height = nil
+        display = D25Display::new
 
         args.each do |a|
 
@@ -88,19 +124,31 @@ module D25
               end
               height = a[:height]
             end
+
             if a[:zstart]
               if zstart
                 raise("Duplicate zstart specification")
               end
               zstart = a[:zstart]
             end
+
             if a[:zstop]
               if zstop
                 raise("Duplicate zstop specification")
               end
               zstop = a[:zstop]
             end  
-            invalid_keys = a.keys.select { |k| ![ :height, :zstart, :zstop ].member?(k) }
+
+            a[:color] && display.set_color(a[:color])
+            a[:frame] && display.set_frame(a[:frame])
+            a[:fill] && display.set_fill(a[:fill])
+            a[:like] && display.set_like(a[:like])
+
+            if a[:name]
+              display.name = a[:name].to_s
+            end
+
+            invalid_keys = a.keys.select { |k| ![ :height, :zstart, :zstop, :color, :frame, :fill, :like, :name ].member?(k) }
             if invalid_keys.size > 0
               raise("Keyword argument(s) not understood: #{invalid_keys.collect(&:to_s).join(',')}")
             end
@@ -128,7 +176,7 @@ module D25
           raise("No layer specified")
         end
 
-        info = D25ZInfo::new(layer, zstart, zstop, @display || D25Display::new)
+        info = D25ZInfo::new(layer, zstart, zstop, @display || display)
         @zstack << info
 
         return info
@@ -137,7 +185,7 @@ module D25
 
     end
     
-    def display(*args, &block)
+    def zz(*args, &block)
 
       begin
 
@@ -156,46 +204,16 @@ module D25
 
           elsif a.is_a?(Hash)
 
-            hollow_fill = 0xffffffff
+            a[:color] && display.set_color(a[:color])
+            a[:frame] && display.set_frame(a[:frame])
+            a[:fill] && display.set_fill(a[:fill])
+            a[:like] && display.set_like(a[:like])
 
-            if a[:color]
-              if !a[:color].is_a?(0xffffff.class)
-                raise("'color' must be a color value (an integer)")
-              end
-              display.fill = a[:color]
-              display.frame = nil
-            end
-            if a[:frame]
-              if !a[:frame].is_a?(0xffffff.class)
-                raise("'frame' must be a color value (an integer)")
-              end
-              display.frame = a[:frame]
-            end
-            if a[:fill]
-              if !a[:fill].is_a?(0xffffff.class)
-                raise("'fill' must be a color value (an integer)")
-              end
-              display.fill = a[:fill]
-            end
-            if a[:hollow]
-              if a[:hollow]
-                display.fill = hollow_fill
-              end
+            if a[:name]
+              display.name = a[:name].to_s
             end
 
-            if a[:like]
-              li = nil
-              if a[:like].is_a?(String)
-                li = RBA::LayerInfo::from_string(a[:like])
-              elsif a[:like].is_a?(RBA::LayerInfo)
-                li = a[:like]
-              else
-                raise("'like' must be a string or LayerInfo object")
-              end
-              display.like = li
-            end
-
-            invalid_keys = a.keys.select { |k| ![ :fill, :frame, :color, :hollow, :like ].member?(k) }
+            invalid_keys = a.keys.select { |k| ![ :fill, :frame, :color, :hollow, :like, :name ].member?(k) }
             if invalid_keys.size > 0
               raise("Keyword argument(s) not understood: #{invalid_keys.collect(&:to_s).join(',')}")
             end

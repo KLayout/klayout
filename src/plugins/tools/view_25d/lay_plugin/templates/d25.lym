@@ -22,34 +22,38 @@
 # z(layer, options ...):
 #
 #   This function generates a extruded view from the given layer.
-#   The "options" describe the z extension. Valid forms are:
+#   
+#   Some options control the z extrusion:
 #
 #     z(layer, 0.1 .. 0.2)                extrude layer to z = 0.1 to 0.2 um
 #     z(layer, zstart: 0.1, zstop: 0.2)   same as above
 #     z(layer, zstart: 0.1, height: 0.1)  same as above, but with height instead of zstop
 #     z(layer, height: 200.nm)            extrude layer from last z position with a height of 200nm
+#
+#   You can specify display options:
+#
+#     z(..., color: 0xff0000)             use bright red for the material color (RGB)
+#     z(..., frame: 0xff0000)             use bright red for the frame color (combine with "fill" for the fill color)
+#     z(..., fill: 0x00ff00)              use bright green for the fill color along (combine with "frame" for the frame color)
+#     z(..., like: "7/0")                 borrow style from layout view's style for layer "7/0"
+#     z(..., name: "M1")                  assigns a name to show for the material 
 #   
-#   If layer is an original layer, the display options (colors, hollow) are taken
+#   If no display options are given and layer is an original layer, the colors are taken
 #   from the original layer's display style. Otherwise KLayout decides about the 
-#   initial display options. Use "display(...)" to control the display options.
+#   colors itself using the application's palette. 
 #
-# display(options) { block }
-# display(z(...), z(...), ..., options):
+# zz(options) { block }
+# zz(z(...), z(...), ..., options):
 #
-#   Specify the display options to use for the layers generated inside the block
-#   (which must contains at least one "z" call) or the given z calls:
+#   Creates a display group. The display options are the same for all
+#   extrusion specs within the group. 
 #
-#   Options are:
-#
-#     display(..., color: 0xff0000)       use bright red for the material color (RGB)
-#     display(..., frame: 0xff0000)       use bright red for the frame color (combine with "fill" for the fill color)
-#     display(..., fill: 0x00ff00)        use bright green for the fill color along (combine with "frame" for the frame color)
-#     display(..., like: "7/0")           borrow style from layout view's style for layer "7/0"
-#
+#   The options of "zz" are "name", "color", "frame", "fill" and "like".
 
 z(input(1, 0), 0.1 .. 0.2)
+z(input(2, 0), height: 250.nm, color: 0xffbc80)
 
-display(like: 7/0) do
+zz(like: 7/0, name: "Metal") do
   z(input(7, 0), height: 100.nm)
   z(input(8, 0), height: 150.nm)
 end

@@ -26,7 +26,6 @@
 #include "layLayoutView.h"
 
 #include "dbRecursiveShapeIterator.h"
-#include "dbD25TechnologyComponent.h"
 #include "dbEdgeProcessor.h"
 #include "dbPolygonGenerators.h"
 #include "dbPolygonTools.h"

@@ -517,7 +517,6 @@ void
 D25ViewWidget::clear ()
 {
   m_layers.clear ();
-  m_layer_to_info.clear ();
   m_vertex_chunks.clear ();
   m_line_chunks.clear ();
 

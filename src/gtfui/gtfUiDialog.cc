@@ -264,7 +264,7 @@ static std::string
 log_event_to_text (const gtf::LogEventBase *e)
 {
   std::string t = e->name ();
-  /* @@@ too much:
+  /* too much:
   std::vector< std::pair<std::string, std::string> > attrs;
   e->attributes (attrs);
   for (std::vector< std::pair<std::string, std::string> >::const_iterator a = attrs.begin (); a != attrs.end (); ++a) {

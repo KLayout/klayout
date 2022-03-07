@@ -68,9 +68,8 @@ D25View::D25View (lay::Dispatcher *root, lay::LayoutView *view)
   connect (mp_ui->show_all_action, SIGNAL (triggered()), this, SLOT (show_all_triggered()));
   connect (mp_ui->show_selected_action, SIGNAL (triggered()), this, SLOT (show_selected_triggered()));
 
-  mp_ui->rerun_button->setEnabled (false);
-
   mp_ui->gl_stack->setCurrentIndex (2);
+  mp_ui->rerun_button->setEnabled (false);
 
   lay::activate_help_links (mp_ui->doc_label);
   lay::activate_help_links (mp_ui->empty_label);
@@ -193,7 +192,6 @@ D25View::begin (const std::string &generator)
 
   if (! mp_ui->d25_view->has_error ()) {
     m_generator = generator;
-    mp_ui->rerun_button->setEnabled (true);
   }
 }
 
@@ -293,6 +291,7 @@ D25View::finish ()
     //  NOTE: needs to be delayed to allow the geometry to be updated before (initial call)
     dm_fit ();
 
+    mp_ui->rerun_button->setEnabled (true);
     mp_ui->gl_stack->setCurrentIndex (0);
 
   }
@@ -314,6 +313,7 @@ D25View::init_failed ()
 {
   mp_ui->error_text->setPlainText (tl::to_qstring (mp_ui->d25_view->error ()));
   mp_ui->gl_stack->setCurrentIndex (1);
+  mp_ui->rerun_button->setEnabled (false);
 }
 
 void

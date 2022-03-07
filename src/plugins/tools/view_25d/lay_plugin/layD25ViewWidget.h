@@ -107,7 +107,6 @@ public:
   void mouseMoveEvent (QMouseEvent *event);
 
   void attach_view(lay::LayoutView *view);
-  // @@@ void refresh_view ();
 
   QVector3D hit_point_with_scene(const QVector3D &line_dir);
   void refresh ();
@@ -198,7 +197,6 @@ private:
   std::list<line_chunks_type> m_line_chunks;
 
   std::vector<LayerInfo> m_layers;
-  std::multimap<std::pair<size_t, size_t>, size_t> m_layer_to_info; // @@@
 
   void initializeGL ();
   void paintGL ();

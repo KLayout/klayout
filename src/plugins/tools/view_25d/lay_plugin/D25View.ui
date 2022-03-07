@@ -61,6 +61,9 @@
       </property>
       <item>
        <widget class="QToolButton" name="rerun_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="toolTip">
          <string>Execute script again</string>
         </property>

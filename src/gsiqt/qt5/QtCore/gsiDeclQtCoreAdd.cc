@@ -28,7 +28,6 @@
 #include <QPoint>
 #include <QColor>
 #include <QSize>
-#include <QAbstractMessageHandler>
 
 //  NOTE: this is required because HitTestAccuracy is defined here, but goes into Qt
 //  namespace which is in QtCore ... this introduces a dependency of QtCore GSI lib on QtGui.

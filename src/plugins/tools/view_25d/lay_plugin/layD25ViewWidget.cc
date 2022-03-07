@@ -31,7 +31,11 @@
 #include "dbPolygonTools.h"
 #include "dbClip.h"
 #include "dbRegion.h"
+#include "dbEdges.h"
+#include "dbEdgePairs.h"
 #include "dbOriginalLayerRegion.h"
+#include "dbOriginalLayerEdges.h"
+#include "dbOriginalLayerEdgePairs.h"
 
 #include "tlException.h"
 #include "tlProgress.h"
@@ -605,7 +609,7 @@ D25ViewWidget::close_display ()
 }
 
 void
-D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double zstop)
+D25ViewWidget::enter (const db::RecursiveShapeIterator *iter, double zstart, double zstop)
 {
   tl_assert (m_display_open);
 
@@ -621,12 +625,10 @@ D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double 
   LayerInfo &info = m_layers.back ();
 
   //  try to establish a default color from the region's origin if required
-  const db::OriginalLayerRegion *original_region = dynamic_cast<db::OriginalLayerRegion *> (data.delegate ());
   if (mp_view && info.fill_color [3] == 0.0 && info.frame_color [3] == 0.0) {
 
-    if (original_region) {
+    if (iter) {
 
-      const db::RecursiveShapeIterator *iter = original_region->iter ();
       if (iter && iter->layout () && iter->layout ()->is_valid_layer (iter->layer ())) {
 
         db::LayerProperties like = iter->layout ()->get_properties (iter->layer ());
@@ -653,9 +655,54 @@ D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double 
     }
 
   }
+}
+
+void
+D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double zstop)
+{
+  //  try to establish a default color from the region's origin if required
+  const db::RecursiveShapeIterator *iter = 0;
+  const db::OriginalLayerRegion *original = dynamic_cast<db::OriginalLayerRegion *> (data.delegate ());
+  if (original) {
+    iter = original->iter ();
+  }
+
+  enter (iter, zstart, zstop);
 
   tl::AbsoluteProgress progress (tl::to_string (tr ("Rendering ...")));
   render_region (progress, *m_layers.back ().vertex_chunk, *m_layers.back ().line_chunk, data, dbu, db::CplxTrans (dbu).inverted () * m_bbox, zstart, zstop);
+}
+
+void
+D25ViewWidget::entry (const db::Edges &data, double dbu, double zstart, double zstop)
+{
+  //  try to establish a default color from the region's origin if required
+  const db::RecursiveShapeIterator *iter = 0;
+  const db::OriginalLayerEdges *original = dynamic_cast<db::OriginalLayerEdges *> (data.delegate ());
+  if (original) {
+    iter = original->iter ();
+  }
+
+  enter (iter, zstart, zstop);
+
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Rendering ...")));
+  render_edges (progress, *m_layers.back ().vertex_chunk, *m_layers.back ().line_chunk, data, dbu, db::CplxTrans (dbu).inverted () * m_bbox, zstart, zstop);
+}
+
+void
+D25ViewWidget::entry (const db::EdgePairs &data, double dbu, double zstart, double zstop)
+{
+  //  try to establish a default color from the region's origin if required
+  const db::RecursiveShapeIterator *iter = 0;
+  const db::OriginalLayerEdgePairs *original = dynamic_cast<db::OriginalLayerEdgePairs *> (data.delegate ());
+  if (original) {
+    iter = original->iter ();
+  }
+
+  enter (iter, zstart, zstop);
+
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Rendering ...")));
+  render_edge_pairs (progress, *m_layers.back ().vertex_chunk, *m_layers.back ().line_chunk, data, dbu, db::CplxTrans (dbu).inverted () * m_bbox, zstart, zstop);
 }
 
 void
@@ -750,42 +797,6 @@ D25ViewWidget::render_wall (D25ViewWidget::triangle_chunks_type &chunks, D25View
   line_chunks.add (edge.p1 ().x () * dbu, zstop, edge.p1 ().y () * dbu);
 }
 
-// @@@
-#if 0
-void
-D25ViewWidget::render_layout (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Layout &layout, const db::Cell &cell, const db::Box &clip_box, unsigned int layer, double zstart, double zstop)
-{
-  std::vector<db::Polygon> poly_heap;
-
-  //  TODO: hidden cells, hierarchy depth ...
-
-  db::RecursiveShapeIterator s (layout, cell, layer, clip_box);
-  s.shape_flags (db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes);
-  for ( ; ! s.at_end (); ++s) {
-
-    db::Polygon polygon;
-    s->polygon (polygon);
-    polygon.transform (s.trans ());
-
-    poly_heap.clear ();
-    db::clip_poly (polygon, clip_box, poly_heap, false /*keep holes*/);
-
-    for (std::vector<db::Polygon>::const_iterator p = poly_heap.begin (); p != poly_heap.end (); ++p) {
-
-      ++progress;
-
-      render_polygon (chunks, line_chunks, *p, layout.dbu (), zstart, zstop);
-
-      for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
-        render_wall (chunks, line_chunks, *e, layout.dbu (), zstart, zstop);
-      }
-
-    }
-
-  }
-}
-#endif
-
 void
 D25ViewWidget::render_region (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Region &region, double dbu, const db::Box &clip_box, double zstart, double zstop)
 {
@@ -806,6 +817,43 @@ D25ViewWidget::render_region (tl::AbsoluteProgress &progress, D25ViewWidget::tri
         render_wall (chunks, line_chunks, *e, dbu, zstart, zstop);
       }
 
+    }
+
+  }
+}
+
+void
+D25ViewWidget::render_edges (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Edges &edges, double dbu, const db::Box &clip_box, double zstart, double zstop)
+{
+  for (db::Edges::const_iterator e = edges.begin (); !e.at_end (); ++e) {
+
+    ++progress;
+
+    std::pair<bool, db::Edge> ec = e->clipped (clip_box);
+    if (ec.first) {
+      render_wall (chunks, line_chunks, ec.second, dbu, zstart, zstop);
+    }
+
+  }
+}
+
+void
+D25ViewWidget::render_edge_pairs (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::EdgePairs &edge_pairs, double dbu, const db::Box &clip_box, double zstart, double zstop)
+{
+  for (db::EdgePairs::const_iterator e = edge_pairs.begin (); !e.at_end (); ++e) {
+
+    ++progress;
+
+    std::pair<bool, db::Edge> ec;
+
+    ec = e->first ().clipped (clip_box);
+    if (ec.first) {
+      render_wall (chunks, line_chunks, ec.second, dbu, zstart, zstop);
+    }
+
+    ec = e->second ().clipped (clip_box);
+    if (ec.first) {
+      render_wall (chunks, line_chunks, ec.second, dbu, zstart, zstop);
     }
 
   }

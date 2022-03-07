@@ -43,6 +43,9 @@
 namespace db
 {
   class Region;
+  class Edges;
+  class EdgePairs;
+  class RecursiveShapeIterator;
   struct LayerProperties;
 }
 
@@ -160,6 +163,8 @@ public:
   void open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like, const std::string *name);
   void close_display ();
   void entry (const db::Region &data, double dbu, double zstart, double zstop);
+  void entry (const db::Edges &data, double dbu, double zstart, double zstop);
+  void entry (const db::EdgePairs &data, double dbu, double zstart, double zstop);
   void finish ();
 
 signals:
@@ -200,12 +205,13 @@ private:
   void resizeGL (int w, int h);
 
   void do_initialize_gl ();
-  // @@@ bool prepare_view();
-  // @@@  void render_layout (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Layout &layout, const db::Cell &cell, const db::Box &clip_box, unsigned int layer, double zstart, double zstop);
   void render_region (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Region &region, double dbu, const db::Box &clip_box, double zstart, double zstop);
+  void render_edges (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Edges &region, double dbu, const db::Box &clip_box, double zstart, double zstop);
+  void render_edge_pairs (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::EdgePairs &region, double dbu, const db::Box &clip_box, double zstart, double zstop);
   void render_polygon (D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Polygon &poly, double dbu, double zstart, double zstop);
   void render_wall (D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Edge &poly, double dbu, double zstart, double zstop);
   void reset_viewport ();
+  void enter (const db::RecursiveShapeIterator *iter, double zstart, double zstop);
 };
 
 }

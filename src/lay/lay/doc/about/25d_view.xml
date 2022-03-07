@@ -82,7 +82,7 @@ z(input(2, 0), height: 300.nm)                  # adds layer 2/0 for the next 30
 
   <ul>
     <li><p><tt>z(</tt>layer [, options]<tt>)</tt></p>
-        <p>Extrudes the given layer. "layer" is a (polygon) DRC layer. "options" declare the z extrusion and display parameters.</p>
+        <p>Extrudes the given layer. "layer" is a DRC layer (polygon, edge or even edge pair). "options" declare the z extrusion and display parameters.</p>
     </li>
     <li><p><tt>zz(</tt> [options] <tt>) {</tt> block <tt>}</tt></p>
         <p>Declares a material group which combines multiple "z" statements under a single display group.

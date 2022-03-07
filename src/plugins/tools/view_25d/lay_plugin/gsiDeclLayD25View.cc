@@ -71,6 +71,12 @@ Class<lay::D25View> decl_D25View (QT_EXTERNAL_BASE (QDialog) "lay", "D25View",
   gsi::method ("entry", &lay::D25View::entry, gsi::arg ("data"), gsi::arg ("dbu"), gsi::arg ("zstart"), gsi::arg ("zstop"),
     "@brief Creates a new display entry in the group opened with \\open_display"
   ) +
+  gsi::method ("entry", &lay::D25View::entry_edge, gsi::arg ("data"), gsi::arg ("dbu"), gsi::arg ("zstart"), gsi::arg ("zstop"),
+    "@brief Creates a new display entry in the group opened with \\open_display"
+  ) +
+  gsi::method ("entry", &lay::D25View::entry_edge_pair, gsi::arg ("data"), gsi::arg ("dbu"), gsi::arg ("zstart"), gsi::arg ("zstop"),
+    "@brief Creates a new display entry in the group opened with \\open_display"
+  ) +
   gsi::method ("close_display", &lay::D25View::close_display,
     "@brief Finishes the display group"
   ) +

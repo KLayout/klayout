@@ -221,6 +221,22 @@ D25View::entry (const db::Region &data, double dbu, double zstart, double zstop)
   }
 }
 
+void
+D25View::entry_edge (const db::Edges &data, double dbu, double zstart, double zstop)
+{
+  if (! mp_ui->d25_view->has_error ()) {
+    mp_ui->d25_view->entry (data, dbu, zstart, zstop);
+  }
+}
+
+void
+D25View::entry_edge_pair (const db::EdgePairs &data, double dbu, double zstart, double zstop)
+{
+  if (! mp_ui->d25_view->has_error ()) {
+    mp_ui->d25_view->entry (data, dbu, zstart, zstop);
+  }
+}
+
 static void layer_info_to_item (const lay::D25ViewWidget::LayerInfo &info, QListWidgetItem *item, size_t index, QSize icon_size)
 {
   if (info.has_name) {

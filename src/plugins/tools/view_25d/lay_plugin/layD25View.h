@@ -43,6 +43,8 @@ namespace lay
 namespace db
 {
   class Region;
+  class Edges;
+  class EdgePairs;
   struct LayerProperties;
 }
 
@@ -69,6 +71,8 @@ public:
   void open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like, const std::string *name);
   void close_display ();
   void entry (const db::Region &data, double dbu, double zstart, double zstop);
+  void entry_edge (const db::Edges &data, double dbu, double zstart, double zstop);
+  void entry_edge_pair (const db::EdgePairs &data, double dbu, double zstart, double zstop);
   void finish ();
 
 protected:

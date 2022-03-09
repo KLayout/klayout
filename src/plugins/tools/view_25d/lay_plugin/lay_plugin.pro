@@ -6,7 +6,11 @@ include($$PWD/../../../lay_plugin.pri)
 
 INCLUDEPATH += $$RDB_INC $$ANT_INC $$QTBASIC_INC
 DEPENDPATH += $$RDB_INC $$ANT_INC $$QTBASIC_INC
-LIBS += -L$$DESTDIR/.. -lklayout_qtbasic -lklayout_rdb -lklayout_ant
+
+LIBS += -L$$DESTDIR/.. -lklayout_rdb -lklayout_ant
+equals(HAVE_QTBINDINGS, "1") {
+  LIBS += -lklayout_qtbasic -lklayout_QtGui -lklayout_QtCore
+}
 
 HEADERS = \
   layD25View.h \

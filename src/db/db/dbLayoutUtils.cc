@@ -520,7 +520,7 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
     for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
 
       db::Shapes &s = c->shapes ((*l).first);
-      db::Shapes new_shapes;
+      db::Shapes new_shapes (layout.is_editable ());
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes); ! si.at_end (); ++si) {
 

@@ -1063,11 +1063,6 @@ private:
   void
   collect_instance_interactions (const db::CellInstArray *inst1, const db::CellInstArray *inst2)
   {
-#if 0
-printf("@@@ check instance interactions %s (#%d, %s) <-> %s (#%d, %s)\n",
-    mp_subject_layout->cell_name (inst1->object ().cell_index ()), int (inst1->size ()), (inst1->bbox(db::box_convert<db::CellInst> (*mp_subject_layout)).to_string()).c_str(),
-    mp_intruder_layout->cell_name (inst2->object ().cell_index ()), int (inst2->size ()), (inst2->bbox(db::box_convert<db::CellInst> (*mp_intruder_layout)).to_string()).c_str()); // @@@
-#endif
     //  TODO: this algorithm is not in particular effective for identical arrays
 
     const db::Cell &cell1 = mp_subject_layout->cell (inst1->object ().cell_index ());
@@ -1076,9 +1071,6 @@ printf("@@@ check instance interactions %s (#%d, %s) <-> %s (#%d, %s)\n",
 
     std::unordered_map<db::ICplxTrans, std::list<std::pair<db::cell_index_type, db::ICplxTrans> > > interactions_cache;
 
-#if 0
-printf("@@@  -> #%d\n", int(inst1->size()));
-#endif
     for (db::CellInstArray::iterator n = inst1->begin (); ! n.at_end (); ++n) {
 
       db::ICplxTrans tn1 = inst1->complex_trans (*n);
@@ -1482,9 +1474,6 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
                                                     const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders,
                                                     db::Coord dist) const
 {
-#if 0 // @@@
-printf("@@@ --- compute_contexts (%s @ %s)\n", mp_subject_layout->cell_name (subject_cell->cell_index ()), subject_cell_inst.to_string().c_str()); fflush(stdout);
-#endif
   CRONOLOGY_COLLECTION_BRACKET(event_compute_contexts)
 
   if (tl::verbosity () >= m_base_verbosity + 20) {

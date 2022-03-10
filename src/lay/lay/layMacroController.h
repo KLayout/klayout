@@ -147,9 +147,15 @@ public:
 
   /**
    *  @brief Loads the macros from the predefined paths and establishes the search paths
-   *  This method will also establish the macro categories.
+   *  This method can be called multiple times.
    */
   void finish ();
+
+  /**
+   *  @brief Adds a new macro category
+   *  finish() needs to be called after adding a new category.
+   */
+  void add_macro_category (const std::string &name, const std::string &description, const std::vector<std::string> &folders);
 
   /**
    *  @brief Adds a temporary macro

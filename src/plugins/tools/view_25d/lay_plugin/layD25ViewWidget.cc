@@ -26,11 +26,16 @@
 #include "layLayoutView.h"
 
 #include "dbRecursiveShapeIterator.h"
-#include "dbD25TechnologyComponent.h"
 #include "dbEdgeProcessor.h"
 #include "dbPolygonGenerators.h"
 #include "dbPolygonTools.h"
 #include "dbClip.h"
+#include "dbRegion.h"
+#include "dbEdges.h"
+#include "dbEdgePairs.h"
+#include "dbOriginalLayerRegion.h"
+#include "dbOriginalLayerEdges.h"
+#include "dbOriginalLayerEdgePairs.h"
 
 #include "tlException.h"
 #include "tlProgress.h"
@@ -200,7 +205,10 @@ D25ViewWidget::D25ViewWidget (QWidget *parent)
   setFormat (format);
 
   m_zmin = m_zmax = 0.0;
+  m_zset = false;
+  m_display_open = false;
   mp_view = 0;
+  m_has_error = false;
 
   reset_viewport ();
 }
@@ -478,6 +486,15 @@ D25ViewWidget::refresh ()
 }
 
 void
+D25ViewWidget::set_material_visible (size_t index, bool visible)
+{
+  if (index < m_layers.size () && m_layers [index].visible != visible) {
+    m_layers [index].visible = visible;
+    update ();
+  }
+}
+
+void
 D25ViewWidget::showEvent (QShowEvent *)
 {
   //  NOTE: This should happen automatically, but apparently the OpenGL widget doesn't do an automatic refresh:
@@ -496,86 +513,22 @@ D25ViewWidget::aspect_ratio () const
   return double (width ()) / double (height ());
 }
 
-bool
-D25ViewWidget::attach_view (LayoutView *view)
+void
+D25ViewWidget::clear ()
 {
-  mp_view = view;
+  m_layers.clear ();
+  m_vertex_chunks.clear ();
+  m_line_chunks.clear ();
 
-  bool any = prepare_view ();
-  reset ();
+  m_zset = false;
+  m_zmin = m_zmax = 0.0;
+  m_display_open = false;
 
-  return any;
-}
-
-namespace {
-
-  class ZDataCache
-  {
-  public:
-    ZDataCache () { }
-
-    std::vector<db::D25LayerInfo> operator() (lay::LayoutView *view, int cv_index, int layer_index)
-    {
-      std::map<int, std::map<int, std::vector<db::D25LayerInfo> > >::const_iterator c = m_cache.find (cv_index);
-      if (c != m_cache.end ()) {
-        std::map<int, std::vector<db::D25LayerInfo> >::const_iterator l = c->second.find (layer_index);
-        if (l != c->second.end ()) {
-          return l->second;
-        } else {
-          return std::vector<db::D25LayerInfo> ();
-        }
-      }
-
-      std::map<int, std::vector<db::D25LayerInfo> > &lcache = m_cache [cv_index];
-
-      const db::D25TechnologyComponent *comp = 0;
-
-      const lay::CellView &cv = view->cellview (cv_index);
-      if (cv.is_valid () && cv->technology ()) {
-        const db::Technology *tech = cv->technology ();
-        comp = dynamic_cast<const db::D25TechnologyComponent *> (tech->component_by_name ("d25"));
-      }
-
-      if (comp) {
-
-        std::multimap<db::LayerProperties, db::D25LayerInfo, db::LPLogicalLessFunc> zi_by_lp;
-
-        db::D25TechnologyComponent::layers_type layers = comp->compile_from_source ();
-        for (db::D25TechnologyComponent::layers_type::const_iterator i = layers.begin (); i != layers.end (); ++i) {
-          zi_by_lp.insert (std::make_pair (i->layer (), *i));
-        }
-
-        const db::Layout &ly = cv->layout ();
-        for (int l = 0; l < int (ly.layers ()); ++l) {
-          if (ly.is_valid_layer (l)) {
-            db::LayerProperties lp = ly.get_properties (l);
-            std::multimap<db::LayerProperties, db::D25LayerInfo, db::LPLogicalLessFunc>::const_iterator z = zi_by_lp.find (lp);
-            if ((z == zi_by_lp.end () || ! z->first.log_equal (lp)) && ! lp.name.empty ()) {
-              //  If possible, try by name only
-              lp = db::LayerProperties (lp.name);
-              z = zi_by_lp.find (lp);
-            }
-            while (z != zi_by_lp.end () && z->first.log_equal (lp)) {
-              lcache[l].push_back (z->second);
-              ++z;
-            }
-          }
-        }
-
-      }
-
-      std::map<int, std::vector<db::D25LayerInfo> >::const_iterator l = lcache.find (layer_index);
-      if (l != lcache.end ()) {
-        return l->second;
-      } else {
-        return std::vector<db::D25LayerInfo> ();
-      }
-    }
-
-  private:
-    std::map<int, std::map<int, std::vector<db::D25LayerInfo> > > m_cache;
-  };
-
+  if (! mp_view) {
+    m_bbox = db::DBox (-1.0, -1.0, 1.0, 1.0);
+  } else {
+    m_bbox = mp_view->viewport ().box ();
+  }
 }
 
 static void color_to_gl (color_t color, GLfloat (&gl_color) [4])
@@ -586,130 +539,181 @@ static void color_to_gl (color_t color, GLfloat (&gl_color) [4])
   gl_color[3] = 1.0f;
 }
 
-void
-D25ViewWidget::lp_to_info (const lay::LayerPropertiesNode &lp, LayerInfo &info)
+static void color_to_gl (const color_t *color, GLfloat (&gl_color) [4])
 {
-  color_to_gl (lp.fill_color (true), info.color);
+  if (! color) {
+    for (unsigned int i = 0; i < 4; ++i) {
+      gl_color [i] = 0.0;
+    }
+  } else {
+    color_to_gl (*color, gl_color);
+  }
+}
+
+static void lp_to_info (const lay::LayerPropertiesNode &lp, D25ViewWidget::LayerInfo &info)
+{
+  color_to_gl (lp.fill_color (true), info.fill_color);
   if (lp.dither_pattern (true) == 1 /*hollow*/) {
-    info.color [3] = 0.0f;
+    info.fill_color [3] = 0.0f;
   }
 
   color_to_gl (lp.frame_color (true), info.frame_color);
-  if (lp.frame_color (true) == lp.fill_color (true) && info.color [3] > 0.5) {
+  if (lp.frame_color (true) == lp.fill_color (true) && info.fill_color [3] > 0.5) {
     //  optimize: don't draw wire frame unless required
     info.frame_color [3] = 0.0f;
   }
 
-  info.visible = lp.visible (true);
-}
-
-bool
-D25ViewWidget::prepare_view ()
-{
-  m_layers.clear ();
-  m_layer_to_info.clear ();
-  m_vertex_chunks.clear ();
-  m_line_chunks.clear ();
-
-  bool zset = false;
-  m_zmin = m_zmax = 0.0;
-
-  if (! mp_view) {
-    m_bbox = db::DBox (-1.0, -1.0, 1.0, 1.0);
-    return false;
-  }
-
-  m_bbox = mp_view->viewport ().box ();
-
-  ZDataCache zdata;
-
-  //  collect and confine to cell bbox
-  db::DBox cell_bbox;
-  for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
-
-    std::vector<db::D25LayerInfo> zinfo;
-    if (! lp->has_children ()) {
-      zinfo = zdata (mp_view, lp->cellview_index (), lp->layer_index ());
-    }
-
-    for (std::vector<db::D25LayerInfo>::const_iterator zi = zinfo.begin (); zi != zinfo.end (); ++zi) {
-      const lay::CellView &cv = mp_view->cellview ((unsigned int) lp->cellview_index ());
-      cell_bbox += db::CplxTrans (cv->layout ().dbu ()) * cv.cell ()->bbox ((unsigned int) lp->layer_index ());
-    }
-
-  }
-
-  bool any = false;
-
-  tl::AbsoluteProgress progress (tl::to_string (tr ("Rendering ...")));
-
-  for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
-
-    std::vector<db::D25LayerInfo> zinfo;
-    if (! lp->has_children ()) {
-      zinfo = zdata (mp_view, lp->cellview_index (), lp->layer_index ());
-    }
-
-    for (std::vector<db::D25LayerInfo>::const_iterator zi = zinfo.begin (); zi != zinfo.end (); ++zi) {
-
-      any = true;
-
-      double z0 = zi->zstart ();
-      double z1 = zi->zstop ();
-
-      m_vertex_chunks.push_back (triangle_chunks_type ());
-      m_line_chunks.push_back (line_chunks_type ());
-
-      LayerInfo info;
-      lp_to_info (*lp, info);
-      info.vertex_chunk = &m_vertex_chunks.back ();
-      info.line_chunk = &m_line_chunks.back ();
-
-      m_layer_to_info.insert (std::make_pair (std::make_pair (lp->cellview_index (), lp->layer_index ()), m_layers.size ()));
-      m_layers.push_back (info);
-
-      const lay::CellView &cv = mp_view->cellview ((unsigned int) lp->cellview_index ());
-
-      render_layout (progress, m_vertex_chunks.back (), m_line_chunks.back (), cv->layout (), *cv.cell (), db::CplxTrans (cv->layout ().dbu ()).inverted () * m_bbox, (unsigned int) lp->layer_index (), z0, z1);
-
-      if (! zset) {
-        m_zmin = z0;
-        m_zmax = z1;
-        zset = true;
-      } else {
-        m_zmin = std::min (z0, m_zmin);
-        m_zmax = std::max (z1, m_zmax);
-      }
-
-    }
-
-  }
-
-  return any;
+  info.visible = true;
 }
 
 void
-D25ViewWidget::refresh_view ()
+D25ViewWidget::open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like, const std::string *name)
 {
-  if (! mp_view) {
-    return;
+  m_vertex_chunks.push_back (triangle_chunks_type ());
+  m_line_chunks.push_back (line_chunks_type ());
+
+  LayerInfo info;
+
+  info.visible = true;
+  color_to_gl (frame_color, info.frame_color);
+  color_to_gl (fill_color, info.fill_color);
+
+  info.has_name = (name != 0 || like != 0);
+  if (name) {
+    info.name = *name;
+  } else if (like) {
+    info.name = like->to_string ();
   }
 
-  for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
+  info.vertex_chunk = &m_vertex_chunks.back ();
+  info.line_chunk = &m_line_chunks.back ();
 
-    std::pair<size_t, size_t> key = std::make_pair (lp->cellview_index (), lp->layer_index ());
-
-    std::multimap<std::pair<size_t, size_t>, size_t>::const_iterator l = m_layer_to_info.find (key);
-    while (l != m_layer_to_info.end () && l->first == key) {
-      if (l->second < m_layers.size ()) {
-        lp_to_info (*lp, m_layers [l->second]);
+  if (like && mp_view) {
+    for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
+      if (! lp->has_children () && lp->source (true).layer_props ().log_equal (*like)) {
+        lp_to_info (*lp, info);
+        break;
       }
-      ++l;
+    }
+  }
+
+  m_layers.push_back (info);
+  m_display_open = true;
+}
+
+void
+D25ViewWidget::close_display ()
+{
+  m_display_open = false;
+}
+
+void
+D25ViewWidget::enter (const db::RecursiveShapeIterator *iter, double zstart, double zstop)
+{
+  tl_assert (m_display_open);
+
+  if (! m_zset) {
+    m_zmin = std::min (zstart, zstop);
+    m_zmax = std::max (zstart, zstop);
+    m_zset = true;
+  } else {
+    m_zmin = std::min (m_zmin, std::min (zstart, zstop));
+    m_zmax = std::min (m_zmax, std::max (zstart, zstop));
+  }
+
+  LayerInfo &info = m_layers.back ();
+
+  //  try to establish a default color from the region's origin if required
+  if (mp_view && info.fill_color [3] == 0.0 && info.frame_color [3] == 0.0) {
+
+    if (iter) {
+
+      if (iter && iter->layout () && iter->layout ()->is_valid_layer (iter->layer ())) {
+
+        db::LayerProperties like = iter->layout ()->get_properties (iter->layer ());
+
+        for (lay::LayerPropertiesConstIterator lp = mp_view->begin_layers (); ! lp.at_end (); ++lp) {
+          if (! lp->has_children () && lp->source (true).layer_props ().log_equal (like)) {
+            lp_to_info (*lp, info);
+            if (! info.has_name) {
+              info.name = like.to_string ();
+              info.has_name = true;
+            }
+            break;
+          }
+        }
+
+      }
+
+    } else {
+
+      //  sequential assignment
+      lay::color_t color = mp_view->get_palette ().luminous_color_by_index (m_layers.size ());
+      color_to_gl (color, info.fill_color);
+
     }
 
   }
+}
 
-  refresh ();
+void
+D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double zstop)
+{
+  //  try to establish a default color from the region's origin if required
+  const db::RecursiveShapeIterator *iter = 0;
+  const db::OriginalLayerRegion *original = dynamic_cast<db::OriginalLayerRegion *> (data.delegate ());
+  if (original) {
+    iter = original->iter ();
+  }
+
+  enter (iter, zstart, zstop);
+
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Rendering ...")));
+  render_region (progress, *m_layers.back ().vertex_chunk, *m_layers.back ().line_chunk, data, dbu, db::CplxTrans (dbu).inverted () * m_bbox, zstart, zstop);
+}
+
+void
+D25ViewWidget::entry (const db::Edges &data, double dbu, double zstart, double zstop)
+{
+  //  try to establish a default color from the region's origin if required
+  const db::RecursiveShapeIterator *iter = 0;
+  const db::OriginalLayerEdges *original = dynamic_cast<db::OriginalLayerEdges *> (data.delegate ());
+  if (original) {
+    iter = original->iter ();
+  }
+
+  enter (iter, zstart, zstop);
+
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Rendering ...")));
+  render_edges (progress, *m_layers.back ().vertex_chunk, *m_layers.back ().line_chunk, data, dbu, db::CplxTrans (dbu).inverted () * m_bbox, zstart, zstop);
+}
+
+void
+D25ViewWidget::entry (const db::EdgePairs &data, double dbu, double zstart, double zstop)
+{
+  //  try to establish a default color from the region's origin if required
+  const db::RecursiveShapeIterator *iter = 0;
+  const db::OriginalLayerEdgePairs *original = dynamic_cast<db::OriginalLayerEdgePairs *> (data.delegate ());
+  if (original) {
+    iter = original->iter ();
+  }
+
+  enter (iter, zstart, zstop);
+
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Rendering ...")));
+  render_edge_pairs (progress, *m_layers.back ().vertex_chunk, *m_layers.back ().line_chunk, data, dbu, db::CplxTrans (dbu).inverted () * m_bbox, zstart, zstop);
+}
+
+void
+D25ViewWidget::finish ()
+{
+  //  .. nothing yet ..
+}
+
+void
+D25ViewWidget::attach_view (LayoutView *view)
+{
+  mp_view = view;
 }
 
 void
@@ -793,33 +797,62 @@ D25ViewWidget::render_wall (D25ViewWidget::triangle_chunks_type &chunks, D25View
 }
 
 void
-D25ViewWidget::render_layout (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Layout &layout, const db::Cell &cell, const db::Box &clip_box, unsigned int layer, double zstart, double zstop)
+D25ViewWidget::render_region (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Region &region, double dbu, const db::Box &clip_box, double zstart, double zstop)
 {
   std::vector<db::Polygon> poly_heap;
 
-  //  TODO: hidden cells, hierarchy depth ...
-
-  db::RecursiveShapeIterator s (layout, cell, layer, clip_box);
-  s.shape_flags (db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes);
-  for ( ; ! s.at_end (); ++s) {
-
-    db::Polygon polygon;
-    s->polygon (polygon);
-    polygon.transform (s.trans ());
+  for (db::Region::const_iterator p = region.begin (); !p.at_end (); ++p) {
 
     poly_heap.clear ();
-    db::clip_poly (polygon, clip_box, poly_heap, false /*keep holes*/);
+    db::clip_poly (*p, clip_box, poly_heap, false /*keep holes*/);
 
     for (std::vector<db::Polygon>::const_iterator p = poly_heap.begin (); p != poly_heap.end (); ++p) {
 
       ++progress;
 
-      render_polygon (chunks, line_chunks, *p, layout.dbu (), zstart, zstop);
+      render_polygon (chunks, line_chunks, *p, dbu, zstart, zstop);
 
       for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
-        render_wall (chunks, line_chunks, *e, layout.dbu (), zstart, zstop);
+        render_wall (chunks, line_chunks, *e, dbu, zstart, zstop);
       }
 
+    }
+
+  }
+}
+
+void
+D25ViewWidget::render_edges (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Edges &edges, double dbu, const db::Box &clip_box, double zstart, double zstop)
+{
+  for (db::Edges::const_iterator e = edges.begin (); !e.at_end (); ++e) {
+
+    ++progress;
+
+    std::pair<bool, db::Edge> ec = e->clipped (clip_box);
+    if (ec.first) {
+      render_wall (chunks, line_chunks, ec.second, dbu, zstart, zstop);
+    }
+
+  }
+}
+
+void
+D25ViewWidget::render_edge_pairs (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::EdgePairs &edge_pairs, double dbu, const db::Box &clip_box, double zstart, double zstop)
+{
+  for (db::EdgePairs::const_iterator e = edge_pairs.begin (); !e.at_end (); ++e) {
+
+    ++progress;
+
+    std::pair<bool, db::Edge> ec;
+
+    ec = e->first ().clipped (clip_box);
+    if (ec.first) {
+      render_wall (chunks, line_chunks, ec.second, dbu, zstart, zstop);
+    }
+
+    ec = e->second ().clipped (clip_box);
+    if (ec.first) {
+      render_wall (chunks, line_chunks, ec.second, dbu, zstart, zstop);
     }
 
   }
@@ -852,22 +885,22 @@ D25ViewWidget::initializeGL ()
   tl_assert (m_gridplane_program == 0);
   tl_assert (m_lines_program == 0);
 
-  bool error = false;
+  m_has_error = false;
 
   try {
     do_initialize_gl ();
   } catch (tl::Exception &ex) {
     m_error = ex.msg ();
-    error = true;
+    m_has_error = true;
   } catch (std::exception &ex) {
     m_error = ex.what ();
-    error = true;
+    m_has_error = true;
   } catch (...) {
     m_error = "(unspecific error)";
-    error = true;
+    m_has_error = true;
   }
 
-  if (error) {
+  if (m_has_error) {
 
     delete m_shapes_program;
     m_shapes_program = 0;
@@ -1098,8 +1131,8 @@ D25ViewWidget::paintGL ()
   glEnableVertexAttribArray (positions);
 
   for (std::vector<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    if (l->visible && l->color [3] > 0.5) {
-      m_shapes_program->setUniformValue ("color", l->color [0], l->color [1], l->color [2], l->color [3]);
+    if (l->visible && l->fill_color [3] > 0.5) {
+      m_shapes_program->setUniformValue ("color", l->fill_color [0], l->fill_color [1], l->fill_color [2], l->fill_color [3]);
       l->vertex_chunk->draw_to (this, positions, GL_TRIANGLES);
     }
   }

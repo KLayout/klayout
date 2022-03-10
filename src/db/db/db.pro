@@ -204,7 +204,6 @@ SOURCES = \
     gsiDeclDbNetlistCrossReference.cc \
     gsiDeclDbLayoutVsSchematic.cc \
     dbNetlistObject.cc \
-    dbD25TechnologyComponent.cc \
     gsiDeclDbTexts.cc \
     dbTexts.cc \
     dbDeepTexts.cc \
@@ -381,7 +380,6 @@ HEADERS = \
     dbLayoutVsSchematicFormatDefs.h \
     dbLayoutVsSchematic.h \
     dbNetlistObject.h \
-    dbD25TechnologyComponent.h \
     dbTexts.h \
     dbDeepTexts.h \
     dbAsIfFlatTexts.h \

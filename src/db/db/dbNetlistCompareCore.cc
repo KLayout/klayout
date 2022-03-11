@@ -268,6 +268,29 @@ public:
     }
   }
 
+  void clear ()
+  {
+    m_to_undo.clear ();
+    m_to_undo_to_unknown.clear ();
+    m_to_undo_devices.clear ();
+    m_to_undo_subcircuits.clear ();
+  }
+
+  void swap (TentativeNodeMapping &other)
+  {
+    m_to_undo.swap (other.m_to_undo);
+    m_to_undo_to_unknown.swap (other.m_to_undo_to_unknown);
+    m_to_undo_devices.swap (other.m_to_undo_devices);
+    m_to_undo_subcircuits.swap (other.m_to_undo_subcircuits);
+  }
+
+  std::vector<std::pair<NetGraph *, size_t> > nodes_tracked ()
+  {
+    std::vector<std::pair<NetGraph *, size_t> > res = m_to_undo;
+    res.insert (res.end (), m_to_undo_to_unknown.begin (), m_to_undo_to_unknown.end ());
+    return res;
+  }
+
 private:
   std::vector<std::pair<NetGraph *, size_t> > m_to_undo, m_to_undo_to_unknown;
   std::vector<std::pair<DeviceEquivalenceTracker *, std::pair<const db::Device *, const db::Device *> > > m_to_undo_devices;
@@ -804,6 +827,7 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
   //  sort the ambiguity group such that net names match best
 
   std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> > pairs;
+  std::list<TentativeNodeMapping> tn_for_pairs;
   tl::equivalence_clusters<const NetGraphNode *> equivalent_other_nodes;
 
   sort_node_range_by_best_match (nr);
@@ -940,7 +964,7 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
 
       }
 
-      if (to_remove != iters2.end ()) {
+      if (any) {
 
         //  Add the new pair to the temporary mapping (even in tentative mode)
         //  Reasoning: doing the mapping may render other nets incompatible, so to ensure "edges_are_compatible" works properly we
@@ -953,6 +977,21 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
         size_t other_ni = mp_other_graph->node_index_for_net (i2->node->net ());
 
         TentativeNodeMapping::map_pair (&tn_temp, mp_graph, ni, mp_other_graph, other_ni, dm, dm_other, *device_equivalence, scm, scm_other, *subcircuit_equivalence, depth);
+
+        if (! tentative) {
+
+          //  Re-run the mapping for the selected pair and stash that - this will lock this mapping when investigating other
+          //  branches of the ambiguity resolution tree
+
+          if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare || tl::verbosity () >= 40) {
+            tl::info << indent_s << "finalizing decision (rerun tracking): " << i1->node->net ()->expanded_name () << " vs. " << i2->node->net ()->expanded_name ();
+          }
+
+          tn_for_pairs.push_back (TentativeNodeMapping ());
+          size_t bt_count = derive_node_identities (ni, depth + 1, complexity * n_branch, &tn_for_pairs.back ());
+          tl_assert (bt_count != failed_match);
+
+        }
 
         //  now we can get rid of the node and reduce the "other" list of ambiguous nodes
         iters2.erase (to_remove);
@@ -1013,6 +1052,61 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
 
     }
 
+    //  Establish further mappings from the mappings stashed during tentative evaluation
+
+    std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin ();
+    for (std::list<TentativeNodeMapping>::iterator tn_of_pair = tn_for_pairs.begin (); tn_of_pair != tn_for_pairs.end (); ++tn_of_pair, ++p) {
+
+      //  Note: this would propagate ambiguities to all *derived* mappings. But this probably goes too far:
+      //    bool ambiguous = equivalent_other_nodes.has_attribute (p->second);
+      //  Instead we ignore propagated ambiguitied for now:
+      bool ambiguous = false;
+
+      if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare || tl::verbosity () >= 40) {
+        tl::info << indent_s << "propagating from deduced match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
+      }
+
+      std::vector<std::pair<NetGraph *, size_t> > nn = tn_of_pair->nodes_tracked ();
+
+      for (std::vector<std::pair<NetGraph *, size_t> >::const_iterator i = nn.begin (); i != nn.end (); ++i) {
+
+        if (i->first != mp_graph) {
+          continue;
+        }
+
+        NetGraphNode *n = & mp_graph->node (i->second);
+
+        size_t other_net_index = n->other_net_index ();
+        NetGraphNode *n_other = & mp_other_graph->node (other_net_index);
+
+        if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare || tl::verbosity () >= 40) {
+          if (ambiguous) {
+            tl::info << indent_s << "deduced ambiguous match: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+          } else {
+            tl::info << indent_s << "deduced match: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+          }
+        }
+
+        if (ambiguous) {
+          if (logger) {
+            logger->match_ambiguous_nets (n->net (), n_other->net ());
+          }
+          for (db::Net::const_pin_iterator i = n->net ()->begin_pins (); i != n->net ()->end_pins (); ++i) {
+            pa.push_back (i->pin ()->id ());
+          }
+          for (db::Net::const_pin_iterator i = n_other->net ()->begin_pins (); i != n_other->net ()->end_pins (); ++i) {
+            pb.push_back (i->pin ()->id ());
+          }
+        } else if (logger) {
+          logger->match_nets (n->net (), n_other->net ());
+        }
+
+      }
+
+      tn_of_pair->clear ();
+
+    }
+
     //  marks pins on ambiguous nets as swappable
 
     if (! pa.empty ()) {
@@ -1020,21 +1114,6 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
     }
     if (! pb.empty ()) {
       circuit_pin_mapper->map_pins (mp_other_graph->circuit (), pb);
-    }
-
-    //  And seek further from these pairs
-
-    if (depth_first) {
-
-      for (std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin (); p != pairs.end (); ++p) {
-
-        size_t ni = mp_graph->node_index_for_net (p->first->net ());
-
-        size_t bt_count = derive_node_identities (ni, depth + 1, complexity * n_branch, tentative);
-        tl_assert (bt_count != failed_match);
-
-      }
-
     }
 
   } else {

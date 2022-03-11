@@ -163,6 +163,13 @@ public:
 
 // --------------------------------------------------------------------------------------------------------------------
 
+class TentativeNodeMapping;
+
+/**
+ *  @brief A special TentativeNodeMapping pointer indicating "tentative-like" mode when repeating tentative evaluation
+ */
+static TentativeNodeMapping *shortcut = reinterpret_cast<TentativeNodeMapping *> (size_t (1));
+
 /**
  *  @brief An audit object which allows reverting tentative node assignments
  */
@@ -196,7 +203,7 @@ public:
     g1->identify (n1, n2, exact_match);
     g2->identify (n2, n1, exact_match);
 
-    if (nm) {
+    if (nm && nm != shortcut) {
       nm->keep (g1, n1);
       nm->keep (g2, n2);
     }
@@ -213,7 +220,7 @@ public:
     g1->identify (n1, n2);
     g2->identify (n2, n1);
 
-    if (nm) {
+    if (nm && nm != shortcut) {
       nm->keep_for_unknown (g1, n1);
       nm->keep_for_unknown (g2, n2);
     }
@@ -225,7 +232,7 @@ public:
   static void map_to_unknown (TentativeNodeMapping *nm, NetGraph *g1, size_t n1)
   {
     g1->identify (n1, unknown_id);
-    if (nm) {
+    if (nm && nm != shortcut) {
       nm->keep (g1, n1);
     }
   }
@@ -238,7 +245,7 @@ public:
 
     for (std::vector<std::pair<const db::Device *, const db::Device *> >::const_iterator dd = device_map.begin (); dd != device_map.end (); ++dd) {
       if (device_eq.map (dd->first, dd->second)) {
-        if (nm) {
+        if (nm && nm != shortcut) {
           nm->keep (&device_eq, dd->first, dd->second);
         } else {
           if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
@@ -257,7 +264,7 @@ public:
 
     for (std::vector<std::pair<const db::SubCircuit *, const db::SubCircuit *> >::const_iterator cc = subcircuit_map.begin (); cc != subcircuit_map.end (); ++cc) {
       if (subcircuit_eq.map (cc->first, cc->second)) {
-        if (nm) {
+        if (nm && nm != shortcut) {
           nm->keep (&subcircuit_eq, cc->first, cc->second);
         } else {
           if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
@@ -669,7 +676,7 @@ NetlistCompareCore::derive_node_identities (size_t net_index, size_t depth, size
   size_t new_nodes = 0;
 
   if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
-    if (! tentative) {
+    if (! tentative || tentative == shortcut) {
       tl::info << nl_compare_debug_indent(depth) << "deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
     } else {
       tl::info << nl_compare_debug_indent(depth) << "tentatively deducing from pair: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
@@ -715,7 +722,7 @@ NetlistCompareCore::derive_node_identities (size_t net_index, size_t depth, size
   }
 
   if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
-    if (! tentative && new_nodes > 0) {
+    if ((! tentative || tentative == shortcut) && new_nodes > 0) {
       tl::info << nl_compare_debug_indent(depth) << "=> finished pair deduction: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name () << " with " << new_nodes << " new pairs";
     }
   }
@@ -906,9 +913,6 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
 
           if (bt_count != failed_match) {
 
-            if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
-              tl::info << indent_s << "match found";
-            }
             //  we have a match ...
 
             if (any) {
@@ -916,10 +920,19 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
               //  there is already a known pair, so we can mark *i2 and the previous *i2 as equivalent
               //  (makes them ambiguous)
               equivalent_other_nodes.same (i2->node, pairs.back ().second);
+
+              if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
+                tl::info << indent_s << "=> establishing ambiguity of there nodes " << i2->node->net ()->expanded_name () << " and " << pairs.back ().second->net ()->expanded_name ();
+              }
+
               //  we know enough now ...
               break;
 
             } else {
+
+              if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
+                tl::info << indent_s << "match found";
+              }
 
               //  identified a new pair
               new_nodes += bt_count + 1;
@@ -971,7 +984,7 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
 
   }
 
-  if (! tentative) {
+  if (! tentative || tentative == shortcut) {
 
     //  issue the matching pairs
 
@@ -1024,13 +1037,18 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
 
     //  And seek further from these pairs
 
-    if (depth_first) {
+    if (depth_first && ! tentative) {
 
       for (std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin (); p != pairs.end (); ++p) {
 
         size_t ni = mp_graph->node_index_for_net (p->first->net ());
 
-        size_t bt_count = derive_node_identities (ni, depth + 1, complexity * n_branch, tentative);
+//@@@ Problem: while the previous node identity derivation is shortened, this one runs longer and this might generate
+//@@@ an conflict
+
+        size_t bt_count = derive_node_identities (ni, depth + 1, complexity * n_branch, shortcut);
+
+//@@@        size_t bt_count = derive_node_identities (ni, depth + 1, complexity * n_branch, tentative);
         tl_assert (bt_count != failed_match);
 
       }
@@ -1091,7 +1109,7 @@ NetlistCompareCore::derive_node_identities_from_singular_match (const NetGraphNo
 
     TentativeNodeMapping::map_pair (tentative, mp_graph, ni, mp_other_graph, other_ni, dm, dm_other, *device_equivalence, scm, scm_other, *subcircuit_equivalence, depth, exact_match);
 
-    if (! tentative) {
+    if (! tentative || tentative == shortcut) {
       ++*progress;
       if (logger) {
         if (! exact_match) {

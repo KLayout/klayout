@@ -907,21 +907,22 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
           continue;
         }
 
-        if (use_name && net_names_are_equal (i1->node->net (), i2->node->net ())) {
+        if (use_name) {
 
-          if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
-            tl::info << indent_s << "=> accepted for identical names";
-          }
+          if (net_names_are_equal (i1->node->net (), i2->node->net ())) {
 
-          //  utilize net names to propose a match
-          if (any) {
-            pairs.pop_back (); // @@@
+            if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
+              tl::info << indent_s << "=> accepted for identical names";
+            }
+
+            //  utilize net names to propose a match
+            pairs.push_back (std::make_pair (i1->node, i2->node));
+            to_remove = ii2;
+            node_count = 1;
+            any = true;
+            break;
+
           }
-          pairs.push_back (std::make_pair (i1->node, i2->node));
-          to_remove = ii2;
-          node_count = 1;
-          any = true;
-          break;
 
         } else {
 

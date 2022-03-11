@@ -885,6 +885,8 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
       }
 
       bool any = false;
+      bool need_rerun = false;
+      size_t node_count = 0;
       std::vector<std::vector<NodeEdgePair>::const_iterator>::iterator to_remove = iters2.end ();
 
       for (std::vector<std::vector<NodeEdgePair>::const_iterator>::iterator ii2 = iters2.begin (); ii2 != iters2.end (); ++ii2) {
@@ -912,9 +914,12 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
           }
 
           //  utilize net names to propose a match
-          new_nodes += 1;
+          if (any) {
+            pairs.pop_back (); // @@@
+          }
           pairs.push_back (std::make_pair (i1->node, i2->node));
           to_remove = ii2;
+          node_count = 1;
           any = true;
           break;
 
@@ -946,9 +951,10 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
             } else {
 
               //  identified a new pair
-              new_nodes += bt_count + 1;
+              node_count = bt_count + 1;
               pairs.push_back (std::make_pair (i1->node, i2->node));
               to_remove = ii2;
+              need_rerun = true;
               any = true;
 
               //  no ambiguity analysis in tentative mode - we can stop now
@@ -966,6 +972,8 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
 
       if (any) {
 
+        new_nodes += node_count;
+
         //  Add the new pair to the temporary mapping (even in tentative mode)
         //  Reasoning: doing the mapping may render other nets incompatible, so to ensure "edges_are_compatible" works properly we
         //  need to lock the current pairs resources such as devices by listing them in the mapping. This is doing by "derive_*_equivalence" inside
@@ -978,7 +986,7 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
 
         TentativeNodeMapping::map_pair (&tn_temp, mp_graph, ni, mp_other_graph, other_ni, dm, dm_other, *device_equivalence, scm, scm_other, *subcircuit_equivalence, depth);
 
-        if (! tentative) {
+        if (need_rerun && ! tentative) {
 
           //  Re-run the mapping for the selected pair and stash that - this will lock this mapping when investigating other
           //  branches of the ambiguity resolution tree

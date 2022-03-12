@@ -864,6 +864,7 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
       //  (Rationale for the latter: passive nets cannot be told apart topologically and are typical for blackbox models.
       //  So the net name is the only differentiator)
       bool use_name = ! dont_consider_net_names || i1->node->net ()->is_passive ();
+      bool use_topology = dont_consider_net_names || i1->node->net ()->is_passive ();
 
       //  in tentative mode, reject this choice if nets are named and all other nets in the ambiguity group differ -> this favors net matching by name
       if (use_name && tentative) {
@@ -907,24 +908,23 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
           continue;
         }
 
-        if (use_name) {
+        if (use_name && net_names_are_equal (i1->node->net (), i2->node->net ())) {
 
-          if (net_names_are_equal (i1->node->net (), i2->node->net ())) {
-
-            if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
-              tl::info << indent_s << "=> accepted for identical names";
-            }
-
-            //  utilize net names to propose a match
-            pairs.push_back (std::make_pair (i1->node, i2->node));
-            to_remove = ii2;
-            node_count = 1;
-            any = true;
-            break;
-
+          if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
+            tl::info << indent_s << "=> accepted for identical names";
           }
 
-        } else {
+          //  utilize net names to propose a match
+          if (any) {
+            pairs.pop_back ();
+          }
+          pairs.push_back (std::make_pair (i1->node, i2->node));
+          to_remove = ii2;
+          node_count = 1;
+          any = true;
+          break;
+
+        } else if (use_topology) {
 
           size_t ni = mp_graph->node_index_for_net (i1->node->net ());
           size_t other_ni = mp_other_graph->node_index_for_net (i2->node->net ());

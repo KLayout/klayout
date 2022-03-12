@@ -942,7 +942,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
   RedundantNodeCache redundant_nodes;
   redundant_nodes.fill (g1);
 
-  //  two passes: one without ambiguities, the second one with
+  //  Three passes: one without ambiguities, the second one with ambiguities and names (optional) and a third with ambiguities with topology
 
   for (int pass = 0; pass < 3 && ! good; ++pass) {
 

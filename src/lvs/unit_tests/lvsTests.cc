@@ -30,7 +30,7 @@
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
-void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string &au_netlist, const std::string &layout, bool priv = false, const std::string &au_lvsdb_name = std::string ())
+void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string &au_netlist, const std::string &layout, bool priv = false, const std::string &au_lvsdb_name = std::string (), const std::string &added = std::string ())
 {
   std::string testsrc = priv ? tl::testdata_private () : tl::testdata ();
   testsrc = tl::combine_path (testsrc, "lvs");
@@ -51,7 +51,8 @@ void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string
         "$lvs_test_target_lvsdb = '%s'\n"
         "$lvs_test_target_cir = '%s'\n"
         "$lvs_test_target_l2n = '%s'\n"
-      , ly, output_lvsdb, output_cir, output_l2n)
+        "%s"
+      , ly, output_lvsdb, output_cir, output_l2n, added)
     );
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
@@ -176,4 +177,22 @@ TEST(20_private)
 TEST(21_private)
 {
   run_test (_this, "test_21.lylvs", "test_21.cir.gz", "test_21.gds.gz", true, "test_21.lvsdb");
+}
+
+//  issue #1021
+TEST(22a_SP6TArray2X4)
+{
+  run_test (_this, "SP6TArray_2X4.lvs", "test_22a.cir", "SP6TArray_2X4.gds", false, "test_22a.lvsdb", "$test22_texts = false\n$test22_deep = false");
+}
+TEST(22b_SP6TArray2X4)
+{
+  run_test (_this, "SP6TArray_2X4.lvs", "test_22b.cir", "SP6TArray_2X4.gds", false, "test_22b.lvsdb", "$test22_texts = true\n$test22_deep = false");
+}
+TEST(22c_SP6TArray2X4)
+{
+  run_test (_this, "SP6TArray_2X4.lvs", "test_22c.cir", "SP6TArray_2X4.gds", false, "test_22c.lvsdb", "$test22_texts = false\n$test22_deep = true");
+}
+TEST(22d_SP6TArray2X4)
+{
+  run_test (_this, "SP6TArray_2X4.lvs", "test_22d.cir", "SP6TArray_2X4.gds", false, "test_22d.lvsdb", "$test22_texts = true\n$test22_deep = true");
 }

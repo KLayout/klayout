@@ -755,6 +755,18 @@ class QtBinding_TestClass < TestBase
 
   end
 
+  def test_54
+
+    # issue #1029 (Crash for QBrush passed to setData)
+
+    item = RBA::QTreeWidgetItem::new
+    item.setBackground(0, RBA::QBrush::new(RBA::QColor::new(0xFF, 0xFF, 0x00)))
+    assert_equal(item.background(0).color.red, 255)
+    assert_equal(item.background(0).color.green, 255)
+    assert_equal(item.background(0).color.blue, 0)
+
+  end
+
 end 
 
 load("test_epilogue.rb")

@@ -1,0 +1,18 @@
+source $drc_test_source
+target $drc_test_target
+
+deep
+
+layer = input(1)
+layer.output(1, 0)
+
+layer.width(0.5.micron).output(100,0)
+
+t = layer.texts("*", as_boxes)
+t.output(101, 0)
+
+layer2 = labels(1)
+layer2.output(102, 0)
+t = layer2.texts("*", as_boxes)
+t.output(103, 0)
+

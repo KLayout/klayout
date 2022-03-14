@@ -1312,3 +1312,9 @@ TEST(53_cellWiseExtentWithClip)
 {
   run_test (_this, "53", false);
 }
+
+TEST(54_issue1011)
+{
+  run_test (_this, "54", false);
+}
+

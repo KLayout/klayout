@@ -728,7 +728,7 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
   load_options.set_option_by_name ("gds2_allow_multi_xy_records", m_gds2_allow_multi_xy_records);
 
   load_options.set_option_by_name ("oasis_read_all_properties", m_oasis_read_all_properties);
-  load_options.set_option_by_name ("oasis_expect_strict_mode", m_oasis_expect_strict_mode ? 1 : 0);
+  load_options.set_option_by_name ("oasis_expect_strict_mode", m_oasis_expect_strict_mode ? 1 : -1);
 
   load_options.set_option_by_name ("cif_layer_map", tl::Variant::make_variant (m_layer_map));
   load_options.set_option_by_name ("cif_create_other_layers", m_create_other_layers);

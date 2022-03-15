@@ -152,7 +152,7 @@ TEST(16_private)
 TEST(17_private)
 {
   test_is_long_runner ();
-  run_test (_this, "test_17.lylvs", "test_17b.cir.gz", "test_17.gds.gz", true, "test_17b.lvsdb");
+  run_test (_this, "test_17.lylvs", "test_17b.cir.gz", "test_17.gds.gz", true, "test_17b_2.lvsdb");
 }
 
 TEST(18_private)
@@ -170,7 +170,7 @@ TEST(19_private)
 TEST(20_private)
 {
   // test_is_long_runner ();
-  run_test (_this, "test_20.lylvs", "test_20.cir.gz", "test_20.gds.gz", true, "test_20b.lvsdb");
+  run_test (_this, "test_20.lylvs", "test_20.cir.gz", "test_20.gds.gz", true, "test_20b_2.lvsdb");
 }
 
 TEST(21_private)

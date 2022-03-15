@@ -2682,7 +2682,7 @@ CODE
           # TODO: align with LayoutToNetlist by using a "master" L2N
           # object which keeps the DSS.
           @dss.text_property_name = "LABEL"
-          @dss.text_enlargement = 1
+          @dss.text_enlargement = 0
           @dss.reject_odd_polygons = @deep_reject_odd_polygons
           @dss.max_vertex_count = @max_vertex_count
           @dss.max_area_ratio = @max_area_ratio

@@ -47,10 +47,7 @@ BD_PUBLIC int strm2txt (int argc, char *argv[])
   {
     db::LoadLayoutOptions load_options;
     generic_reader_options.configure (load_options);
-
-    tl::InputStream stream (infile);
-    db::Reader reader (stream);
-    reader.read (layout, load_options);
+    bd::read_files (layout, infile, load_options);
   }
 
   {

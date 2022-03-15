@@ -71,10 +71,7 @@ void clip (ClipData &data)
   {
     db::LoadLayoutOptions load_options;
     data.reader_options.configure (load_options);
-
-    tl::InputStream stream (data.file_in);
-    db::Reader reader (stream);
-    reader.read (layout, load_options);
+    bd::read_files (layout, data.file_in, load_options);
   }
 
   //  create the layers in the target layout as well

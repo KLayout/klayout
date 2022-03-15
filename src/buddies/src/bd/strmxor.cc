@@ -408,10 +408,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
 
     db::LoadLayoutOptions load_options;
     generic_reader_options_a.configure (load_options);
-
-    tl::InputStream stream (infile_a);
-    db::Reader reader (stream);
-    reader.read (layout_a, load_options);
+    bd::read_files (layout_a, infile_a, load_options);
   }
 
   {
@@ -419,10 +416,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
 
     db::LoadLayoutOptions load_options;
     generic_reader_options_b.configure (load_options);
-
-    tl::InputStream stream (infile_b);
-    db::Reader reader (stream);
-    reader.read (layout_b, load_options);
+    bd::read_files (layout_b, infile_b, load_options);
   }
 
   if (top_a.empty ()) {

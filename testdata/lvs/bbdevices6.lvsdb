@@ -49,19 +49,19 @@ layout(
  circuit(BWBTEST
 
   # Circuit boundary
-  rect((554500 -276000) (403000 162001))
+  rect((554500 -276000) (403000 162000))
 
   # Nets with their geometries
   net(1 name(B)
    rect(l15 (832000 -242000) (93500 75500))
-   rect(l15 (-46751 -37751) (2 2))
+   rect(l15 (-46750 -37750) (0 0))
   )
   net(2 name(A)
    rect(l15 (576500 -249000) (105500 81500))
-   rect(l15 (-52751 -40751) (2 2))
+   rect(l15 (-52750 -40750) (0 0))
   )
   net(3 name(BWBTEST)
-   rect(l15 (754499 -114001) (2 2))
+   rect(l15 (754500 -114000) (0 0))
   )
 
   # Outgoing pins and their connections to nets
@@ -71,19 +71,19 @@ layout(
  circuit(FWBTEST
 
   # Circuit boundary
-  rect((536500 386500) (404000 179001))
+  rect((536500 386500) (404000 179000))
 
   # Nets with their geometries
   net(1 name(B)
    rect(l3 (793500 427000) (120500 82000))
-   rect(l3 (-60251 -41001) (2 2))
+   rect(l3 (-60250 -41000) (0 0))
   )
   net(2 name(A)
    rect(l3 (572500 432500) (74500 73500))
-   rect(l3 (-37251 -36751) (2 2))
+   rect(l3 (-37250 -36750) (0 0))
   )
   net(3 name(FWBTEST)
-   rect(l3 (797999 565499) (2 2))
+   rect(l3 (798000 565500) (0 0))
   )
 
   # Outgoing pins and their connections to nets
@@ -93,19 +93,19 @@ layout(
  circuit(FBGATEST
 
   # Circuit boundary
-  rect((-449500 412500) (390500 198001))
+  rect((-449500 412500) (390500 198000))
 
   # Nets with their geometries
   net(1 name(B)
    rect(l3 (-221000 412500) (162000 152500))
-   rect(l3 (-81001 -76251) (2 2))
+   rect(l3 (-81000 -76250) (0 0))
   )
   net(2 name(A)
    rect(l3 (-449500 422500) (146000 144500))
-   rect(l3 (-71001 -71251) (2 2))
+   rect(l3 (-71000 -71250) (0 0))
   )
   net(3 name(FBGATEST)
-   rect(l3 (-417001 610499) (2 2))
+   rect(l3 (-417000 610500) (0 0))
   )
 
   # Outgoing pins and their connections to nets
@@ -115,19 +115,19 @@ layout(
  circuit(BBGATEST
 
   # Circuit boundary
-  rect((-468000 -313001) (442500 226001))
+  rect((-468000 -313000) (442500 226000))
 
   # Nets with their geometries
   net(1 name(B)
    rect(l15 (-468000 -280000) (177000 189000))
-   rect(l15 (-88501 -94501) (2 2))
+   rect(l15 (-88500 -94500) (0 0))
   )
   net(2 name(A)
    rect(l15 (-218500 -290000) (193000 203000))
-   rect(l15 (-94001 -101501) (2 2))
+   rect(l15 (-94000 -101500) (0 0))
   )
   net(3 name(BBGATEST)
-   rect(l15 (-422001 -313001) (2 2))
+   rect(l15 (-422000 -313000) (0 0))
   )
 
   # Outgoing pins and their connections to nets
@@ -142,11 +142,11 @@ layout(
   # Nets with their geometries
   net(1 name(A)
    rect(l16 (317000 -232000) (92000 92000))
-   rect(l16 (-46001 -46001) (2 2))
+   rect(l16 (-46000 -46000) (0 0))
   )
   net(2 name(B)
    rect(l16 (95500 -231000) (116000 97000))
-   rect(l16 (-58001 -48501) (2 2))
+   rect(l16 (-58000 -48500) (0 0))
   )
 
   # Outgoing pins and their connections to nets
@@ -162,11 +162,11 @@ layout(
   # Nets with their geometries
   net(1 name(B)
    rect(l11 (323000 151500) (76000 83000))
-   rect(l11 (-38001 -41501) (2 2))
+   rect(l11 (-38000 -41500) (0 0))
   )
   net(2 name(A)
    rect(l11 (96500 159500) (90000 73000))
-   rect(l11 (-45001 -36501) (2 2))
+   rect(l11 (-45000 -36500) (0 0))
   )
 
   # Outgoing pins and their connections to nets
@@ -182,11 +182,11 @@ layout(
   # Nets with their geometries
   net(1 name(B)
    rect(l1 (327000 436500) (72000 93000))
-   rect(l1 (-36001 -46501) (2 2))
+   rect(l1 (-36000 -46500) (0 0))
   )
   net(2 name(A)
    rect(l1 (101500 443500) (82000 84000))
-   rect(l1 (-41001 -42001) (2 2))
+   rect(l1 (-41000 -42000) (0 0))
   )
 
   # Outgoing pins and their connections to nets

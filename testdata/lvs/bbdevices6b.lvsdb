@@ -49,7 +49,7 @@ layout(
  circuit(BWBTEST
 
   # Circuit boundary
-  rect((554500 -276000) (403000 162001))
+  rect((554500 -276000) (403000 162000))
 
   # Outgoing pins and their connections to nets
   pin(name(A))
@@ -58,7 +58,7 @@ layout(
  circuit(FWBTEST
 
   # Circuit boundary
-  rect((536500 386500) (404000 179001))
+  rect((536500 386500) (404000 179000))
 
   # Outgoing pins and their connections to nets
   pin(name(A))
@@ -67,7 +67,7 @@ layout(
  circuit(FBGATEST
 
   # Circuit boundary
-  rect((-449500 412500) (390500 198001))
+  rect((-449500 412500) (390500 198000))
 
   # Outgoing pins and their connections to nets
   pin(name(B))
@@ -76,7 +76,7 @@ layout(
  circuit(BBGATEST
 
   # Circuit boundary
-  rect((-468000 -313001) (442500 226001))
+  rect((-468000 -313000) (442500 226000))
 
   # Outgoing pins and their connections to nets
   pin(name(A))

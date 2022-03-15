@@ -1,0 +1,25 @@
+* SP6TArray_2X4
+* SP6TCell
+.subckt SP6TCell vdd vss wl bl bl_n
+Mpu1 vdd bit_n bit vdd sky130_fd_pr__pfet_01v8__model l=0.15um w=0.42um
+Mpu2 bit_n bit vdd vdd sky130_fd_pr__pfet_01v8__model l=0.15um w=0.42um
+Mpd1 vss bit_n bit vss sky130_fd_pr__nfet_01v8__model l=0.15um w=0.42um
+Mpd2 bit_n bit vss vss sky130_fd_pr__nfet_01v8__model l=0.15um w=0.42um
+Mpg1 bl wl bit vss sky130_fd_pr__nfet_01v8__model l=0.15um w=0.42um
+Mpg2 bl_n wl bit_n vss sky130_fd_pr__nfet_01v8__model l=0.15um w=0.42um
+.ends SP6TCell
+* SP6TArray_2X1
+.subckt SP6TArray_2X1 vss vdd wl[0] wl[1] bl[0] bl_n[0]
+Xinst0x0 vdd vss wl[0] bl[0] bl_n[0] SP6TCell
+Xinst1x0 vdd vss wl[1] bl[0] bl_n[0] SP6TCell
+.ends SP6TArray_2X1
+* SP6TArray_2X2
+.subckt SP6TArray_2X2 vss vdd wl[0] wl[1] bl[0] bl_n[0] bl[1] bl_n[1]
+Xinst0x0 vss vdd wl[0] wl[1] bl[0] bl_n[0] SP6TArray_2X1
+Xinst0x1 vss vdd wl[0] wl[1] bl[1] bl_n[1] SP6TArray_2X1
+.ends SP6TArray_2X2
+* SP6TArray_2X4
+.subckt SP6TArray_2X4 vss vdd wl[0] wl[1] bl[0] bl_n[0] bl[1] bl_n[1] bl[2] bl_n[2] bl[3] bl_n[3]
+Xinst0x0 vss vdd wl[0] wl[1] bl[0] bl_n[0] bl[1] bl_n[1] SP6TArray_2X2
+Xinst0x1 vss vdd wl[0] wl[1] bl[2] bl_n[2] bl[3] bl_n[3] SP6TArray_2X2
+.ends SP6TArray_2X4

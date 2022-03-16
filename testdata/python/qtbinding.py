@@ -640,6 +640,15 @@ class QtBindingTest(unittest.TestCase):
     else:
       self.assertEqual(str(jsonData), 'b\'{"test":"test"}\'')
 
+  def test_54(self):
+
+    # issue #1029 (Crash for QBrush passed to setData)
+    item = pya.QTreeWidgetItem()
+    item.setBackground(0, pya.QBrush(pya.QColor(0xFF, 0xFF, 0x00)))
+    self.assertEqual(item.background(0).color.red, 255)
+    self.assertEqual(item.background(0).color.green, 255)
+    self.assertEqual(item.background(0).color.blue, 0)
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(QtBindingTest)

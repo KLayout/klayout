@@ -3,6 +3,7 @@
 #define HDR_tlAlgorithm
 
 #include <iterator>
+#include <algorithm>
 
 /*
  *  This header is a copy of the gcc STL "stl_algo" and "stl_algobase"

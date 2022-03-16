@@ -21,6 +21,7 @@
 */
 
 #include "bdReaderOptions.h"
+#include "bdWriterOptions.h"
 #include "dbLayout.h"
 #include "dbTilingProcessor.h"
 #include "dbReader.h"
@@ -327,6 +328,9 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   generic_reader_options_a.add_options (cmd);
   generic_reader_options_b.add_options (cmd);
 
+  bd::GenericWriterOptions writer_options;
+  writer_options.add_options (cmd);
+
   cmd << tl::arg ("input_a",                   &infile_a,   "The first input file (any format, may be gzip compressed)")
       << tl::arg ("input_b",                   &infile_b,   "The second input file (any format, may be gzip compressed)")
       << tl::arg ("?output",                   &output,     "The output file to which the XOR differences are written",
@@ -408,10 +412,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
 
     db::LoadLayoutOptions load_options;
     generic_reader_options_a.configure (load_options);
-
-    tl::InputStream stream (infile_a);
-    db::Reader reader (stream);
-    reader.read (layout_a, load_options);
+    bd::read_files (layout_a, infile_a, load_options);
   }
 
   {
@@ -419,10 +420,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
 
     db::LoadLayoutOptions load_options;
     generic_reader_options_b.configure (load_options);
-
-    tl::InputStream stream (infile_b);
-    db::Reader reader (stream);
-    reader.read (layout_b, load_options);
+    bd::read_files (layout_b, infile_b, load_options);
   }
 
   if (top_a.empty ()) {
@@ -512,6 +510,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
 
     db::SaveLayoutOptions save_options;
     save_options.set_format_from_filename (output);
+    writer_options.configure (save_options, *output_layout);
 
     tl::OutputStream stream (output);
     db::Writer writer (save_options);

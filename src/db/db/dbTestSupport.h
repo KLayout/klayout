@@ -85,12 +85,12 @@ void DB_PUBLIC compare_layouts (tl::TestBase *_this, const db::Layout &layout, c
 /**
  *  @brief Compares a netlist against a string
  */
-void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const std::string &au_nl_string, bool exact_parameter_match = false);
+void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const std::string &au_nl_string, bool exact_parameter_match = false, bool with_names = false);
 
 /**
  *  @brief Compares a netlist against another netlist
  */
-void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const db::Netlist &netlist_au, bool exact_parameter_match = false);
+void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const db::Netlist &netlist_au, bool exact_parameter_match = false, bool with_names = false);
 
 /**
  *  @brief Convenient compare of region vs. string

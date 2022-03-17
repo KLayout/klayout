@@ -299,7 +299,7 @@ private:
   }
 };
 
-void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const std::string &au_nl_string, bool exact_parameter_match)
+void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const std::string &au_nl_string, bool exact_parameter_match, bool with_names)
 {
   db::Netlist au_nl;
   for (db::Netlist::const_device_class_iterator d = netlist.begin_device_classes (); d != netlist.end_device_classes (); ++d) {
@@ -308,12 +308,13 @@ void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist,
 
   au_nl.from_string (au_nl_string);
 
-  compare_netlist (_this, netlist, au_nl, exact_parameter_match);
+  compare_netlist (_this, netlist, au_nl, exact_parameter_match, with_names);
 }
 
-void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const db::Netlist &netlist_au, bool exact_parameter_match)
+void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const db::Netlist &netlist_au, bool exact_parameter_match, bool with_names)
 {
   db::NetlistComparer comp (0);
+  comp.set_dont_consider_net_names (! with_names);
 
   db::Netlist netlist_copy (netlist);
 
@@ -330,6 +331,7 @@ void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist,
     //  Compare once again - this time with logger
     CompareLogger logger;
     db::NetlistComparer comp (&logger);
+    comp.set_dont_consider_net_names (! with_names);
     comp.compare (&netlist_copy, &netlist_au);
   }
 }

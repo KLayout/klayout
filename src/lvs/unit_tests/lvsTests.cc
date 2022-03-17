@@ -76,19 +76,7 @@ void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string
     reader.read (stream, nl2);
   }
 
-  //  NOTE: it's kind of redundant to use the comparer for checking the LVS
-  //  output, but this will essentially verify the output netlist's consistency.
-  db::NetlistCrossReference xref;
-  db::NetlistComparer comparer (&xref);
-  comparer.set_max_branch_complexity (500);
-  comparer.set_max_depth (20);
-  bool res = comparer.compare (&nl1, &nl2);
-  if (! res) {
-    tl::info << "Netlist mismatch:";
-    tl::info << "  current: " << output_cir;
-    tl::info << "  golden: " << au_cir;
-  }
-  EXPECT_EQ (res, true);
+  db::compare_netlist (_this, nl1, nl2);
 
   if (! au_lvsdb_name.empty ()) {
     std::string au_lvsdb = tl::combine_path (testsrc, au_lvsdb_name);

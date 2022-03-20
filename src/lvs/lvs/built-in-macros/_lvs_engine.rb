@@ -101,6 +101,13 @@ module LVS
     # See \Netter#join_symmetric_nets for a description of that function.
  
     # %LVS%
+    # @name split_gates
+    # @brief Implements the "split gates" feature for the given device and circuits
+    # @synopsis split_gates(device_name)
+    # @synopsis split_gates(device_name, circuit_filter)
+    # See \Netter#split_gates for a description of that function.
+ 
+    # %LVS%
     # @name blank_circuit
     # @brief Removes the content from the given circuits (blackboxing)
     # @synopsis blank_circuit(circuit_filter)
@@ -207,7 +214,7 @@ module LVS
     # @synopsis lvs_data
     # See \Netter#lvs_data for a description of that function.
 
-    %w(schematic compare join_symmetric_nets tolerance ignore_parameter enable_parameter disable_parameter 
+    %w(schematic compare split_gates join_symmetric_nets tolerance ignore_parameter enable_parameter disable_parameter 
        blank_circuit align same_nets same_nets! same_circuits same_device_classes equivalent_pins 
        min_caps max_res max_depth max_branch_complexity consider_net_names lvs_data).each do |f|
       eval <<"CODE"

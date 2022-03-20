@@ -114,6 +114,7 @@ public:
 
   virtual tl::Variant var () const;
   virtual void set (const tl::Variant &v);
+  const PythonPtr &ptr () const { return m_var; }
 
 private:
   PythonPtr m_var;
@@ -641,7 +642,7 @@ struct reader<gsi::ByteArrayType>
 };
 
 static
-PyObject *object_from_variant (tl::Variant &var, PYAObjectBase *self, const gsi::ArgType &atype)
+PyObject *object_from_variant (tl::Variant &var, PYAObjectBase *self, const gsi::ArgType &atype, bool transfer = false)
 {
   if (var.is_user()) {
 
@@ -657,7 +658,7 @@ PyObject *object_from_variant (tl::Variant &var, PYAObjectBase *self, const gsi:
     void *obj = var.to_user ();
     const gsi::ClassBase *cls = var.user_cls ()->gsi_cls ();
 
-    if (pass_obj) {
+    if (pass_obj || transfer) {
 
       if (holder) {
 
@@ -711,12 +712,17 @@ struct reader<gsi::VariantType>
       *ret = PythonRef (Py_None, false /*borrowed*/);
     } else {
       gsi::VariantAdaptorImpl<tl::Variant> *aa = dynamic_cast<gsi::VariantAdaptorImpl<tl::Variant> *> (a.get ());
+      PythonBasedVariantAdaptor *pa = dynamic_cast<PythonBasedVariantAdaptor *> (a.get ());
       if (aa) {
         //  A small optimization that saves one variant copy
         *ret = object_from_variant (aa->var_ref_nc (), self, atype);
+      } else if (pa) {
+        //  Optimization for Python to Python transfer
+        *ret = pa->ptr ();
       } else {
         tl::Variant v = a->var ();
-        *ret = object_from_variant (v, self, atype);
+        //  NOTE: as v may hold the object, we need to transfer ownership
+        *ret = object_from_variant (v, self, atype, true);
       }
     }
   }

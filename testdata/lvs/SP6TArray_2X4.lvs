@@ -1,0 +1,206 @@
+
+source($lvs_test_source)
+report_lvs($lvs_test_target_lvsdb, true)
+target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
+
+schematic("SP6TArray_2X4.spi")
+
+consider_net_names($test22_texts)
+if $test22_deep
+  deep
+else
+  flat
+end
+
+# Define layers
+nwm = input(64, 20)
+nsdm = input(93, 44)
+psdm = input(94, 20)
+hvi = input(75, 20)
+difftap_pin = input(65, 16)
+difftap_block = input(100, 10)
+difftap = input(65, 20)
+poly_pin = input(66, 16)
+poly_block = input(100, 20)
+poly = input(66, 20)
+li_pin = input(67, 16)
+li_block = input(100, 40)
+li = input(67, 20)
+m1_pin = input(68, 16)
+m1_block = input(100, 60)
+m1 = input(68, 20)
+m2_pin = input(69, 16)
+m2_block = input(100, 80)
+m2 = input(69, 20)
+m3_pin = input(70, 16)
+m3_block = input(100, 100)
+m3 = input(70, 20)
+m4_pin = input(71, 16)
+m4_block = input(100, 120)
+m4 = input(71, 20)
+m5_pin = input(72, 16)
+m5_block = input(100, 140)
+m5 = input(72, 20)
+licon_block = input(100, 30)
+mcon_block = input(100, 50)
+via_block = input(100, 70)
+via2_block = input(100, 90)
+via3_block = input(100, 110)
+via4_block = input(100, 130)
+licon = input(66, 44)
+mcon = input(67, 44)
+via = input(68, 44)
+via2 = input(69, 44)
+via3 = input(70, 44)
+via4 = input(71, 44)
+hvtp = input(78, 44)
+lvtn = input(125, 44)
+pad = input(76, 20)
+areaid_diode = input(81, 23)
+polyres = input(66, 13)
+diffres = input(65, 13)
+prBoundary = input(235, 4)
+substrate__Sky130 = polygon_layer
+
+difftap__conn = (difftap-(poly+diffres))
+difftap__conn__nsdm = (difftap__conn&nsdm&nwm)
+difftap__conn__psdm = (difftap__conn&psdm-nwm)
+poly__conn = (poly-polyres)
+gate__hvmosgate = (difftap&poly__conn&hvi)
+gate__mosgate = (difftap&poly__conn-hvi)
+gate__mosfet__nfet_01v8 = (gate__mosgate&nsdm)
+gate__mosfet__nfet_01v8_lvt = (gate__mosgate&nsdm&lvtn)
+gate__mosfet__nfet_g5v0d10v5 = (gate__hvmosgate&nsdm)
+gate__mosfet__pfet_01v8 = (gate__mosgate&nwm&psdm)
+gate__mosfet__pfet_01v8_hvt = (gate__mosgate&nwm&psdm&hvtp)
+gate__mosfet__pfet_01v8_lvt = (gate__mosgate&nwm&psdm&lvtn)
+gate__mosfet__pfet_g5v0d10v5 = (gate__hvmosgate&nwm&psdm)
+resistor__active_res = (difftap&diffres)
+resistor__poly_res = (poly&polyres)
+diode__ndiode = (difftap&areaid_diode&nsdm)
+diode__pdiode = (difftap&areaid_diode&psdm)
+
+# Connectivity
+connect_global(substrate__Sky130, "vss")
+# connect(difftap,difftap.pin)
+connect(difftap__conn, difftap_pin)
+# connect(difftap__conn,difftap__conn:nsdm)
+connect(difftap__conn, difftap__conn__nsdm)
+# connect(difftap__conn:nsdm,nwm)
+connect(difftap__conn__nsdm, nwm)
+# connect(difftap__conn,difftap__conn:psdm)
+connect(difftap__conn, difftap__conn__psdm)
+# connect(difftap__conn:psdm,substrate:Sky130)
+connect_global(difftap__conn__psdm, "vss")
+# connect(poly,poly.pin)
+connect(poly, poly_pin)
+# connect(li,li.pin)
+connect(li, li_pin)
+# connect(m1,m1.pin)
+connect(m1, m1_pin)
+# connect(m2,m2.pin)
+connect(m2, m2_pin)
+# connect(m3,m3.pin)
+connect(m3, m3_pin)
+# connect(m4,m4.pin)
+connect(m4, m4_pin)
+# connect(m5,m5.pin)
+connect(m5, m5_pin)
+# connect((difftap__conn,poly__conn),licon)
+connect(difftap__conn, licon)
+connect(poly__conn, licon)
+# connect(licon,li)
+connect(licon, li)
+# connect(li,mcon)
+connect(li, mcon)
+# connect(mcon,m1)
+connect(mcon, m1)
+# connect(m1,via)
+connect(m1, via)
+# connect(via,m2)
+connect(via, m2)
+# connect(m2,via2)
+connect(m2, via2)
+# connect(via2,m3)
+connect(via2, m3)
+# connect(m3,via3)
+connect(m3, via3)
+# connect(via3,m4)
+connect(via3, m4)
+# connect(m4,via4)
+connect(m4, via4)
+# connect(via4,m5)
+connect(via4, m5)
+
+connect_implicit("vss*")
+connect_implicit("vcc*")
+connect_implicit("vdd*")
+connect_implicit("SP6TArray_2X1", "vdd")
+
+# Resistors
+# active_res
+extract_devices(resistor("active_res", 200.0), {
+    "R" => resistor__active_res, "C" => difftap__conn,
+})
+same_device_classes("active_res", "RES")
+# poly_res
+extract_devices(resistor("poly_res", 300.0), {
+    "R" => resistor__poly_res, "C" => poly__conn,
+})
+same_device_classes("poly_res", "RES")
+
+# Diodes
+# ndiode
+extract_devices(diode("sky130_fd_pr__diode_pw2nd_05v5"), {
+    "P" => substrate__Sky130, "N" => diode__ndiode, "tC" => difftap__conn
+})
+# pdiode
+extract_devices(diode("sky130_fd_pr__diode_pd2nw_05v5"), {
+    "P" => diode__pdiode, "N" => nwm, "tA" => difftap__conn
+})
+
+# Transistors
+# nfet_01v8
+cheat("SP6TCell") do
+extract_devices(mos4("sky130_fd_pr__nfet_01v8__model"), {
+    "SD" => difftap__conn, "G" => gate__mosfet__nfet_01v8, "tG" => poly__conn, "W" => substrate__Sky130,
+})
+end
+
+# nfet_01v8_lvt
+extract_devices(mos4("sky130_fd_pr__nfet_01v8_lvt__model"), {
+    "SD" => difftap__conn, "G" => gate__mosfet__nfet_01v8_lvt, "tG" => poly__conn, "W" => substrate__Sky130,
+})
+# nfet_g5v0d10v5
+extract_devices(mos4("sky130_fd_pr__nfet_g5v0d10v5__model"), {
+    "SD" => difftap__conn, "G" => gate__mosfet__nfet_g5v0d10v5, "tG" => poly__conn, "W" => substrate__Sky130,
+})
+# pfet_01v8
+cheat("SP6TCell") do
+extract_devices(mos4("sky130_fd_pr__pfet_01v8__model"), {
+    "SD" => difftap__conn, "G" => gate__mosfet__pfet_01v8, "tG" => poly__conn, "W" => nwm,
+})
+end
+
+# pfet_01v8_hvt
+extract_devices(mos4("sky130_fd_pr__pfet_01v8_hvt__model"), {
+    "SD" => difftap__conn, "G" => gate__mosfet__pfet_01v8_hvt, "tG" => poly__conn, "W" => nwm,
+})
+# pfet_01v8_lvt
+extract_devices(mos4("sky130_fd_pr__pfet_01v8_lvt__model"), {
+    "SD" => difftap__conn, "G" => gate__mosfet__pfet_01v8_lvt, "tG" => poly__conn, "W" => nwm,
+})
+# pfet_g5v0d10v5
+extract_devices(mos4("sky130_fd_pr__pfet_g5v0d10v5__model"), {
+    "SD" => difftap__conn, "G" => gate__mosfet__pfet_g5v0d10v5, "tG" => poly__conn, "W" => nwm,
+})
+
+netlist
+
+align
+ok = compare
+if ok then
+    print("LVS OK\n")
+else
+    abort "LVS Failed!"
+end

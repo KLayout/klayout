@@ -116,7 +116,12 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
     effective_options = *lefdef_options;
   }
 
-  db::LEFDEFReaderState state (&effective_options, layout, tl::dirname (m_stream.absolute_path ()));
+  std::string base_path;
+  if (! effective_options.paths_relative_to_cwd ()) {
+    base_path = tl::dirname (m_stream.absolute_path ());
+  }
+
+  db::LEFDEFReaderState state (&effective_options, layout, base_path);
 
   layout.dbu (effective_options.dbu ());
 
@@ -131,7 +136,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
 
-      std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
+      std::string lp = correct_path (*l, layout, base_path);
 
       tl::InputStream lef_stream (lp);
       tl::log << tl::to_string (tr ("Reading")) << " " << lp;
@@ -152,7 +157,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
 
-      std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
+      std::string lp = correct_path (*l, layout, base_path);
 
       tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
 
@@ -205,7 +210,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
     tl::shared_collection<db::Layout> macro_layout_object_holder;
     for (std::vector<std::string>::const_iterator l = effective_options.begin_macro_layout_files (); l != effective_options.end_macro_layout_files (); ++l) {
 
-      std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
+      std::string lp = correct_path (*l, layout, base_path);
 
       tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF macro layout file: ")) + lp);
 

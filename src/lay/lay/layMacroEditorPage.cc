@@ -1770,7 +1770,11 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
           QTextBlock e = mp_text->document ()->findBlock (c.selectionEnd ());
           if (e == s) {
             emit search_requested (c.selectedText ());
+          } else {
+            emit search_requested (QString ());
           }
+        } else {
+          emit search_requested (QString ());
         }
 
         return true;

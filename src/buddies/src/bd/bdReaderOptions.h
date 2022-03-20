@@ -195,6 +195,13 @@ private:
   tl::shared_collection<db::Layout> m_lef_layouts;
 };
 
+/**
+ *  @brief A function to load a sequence of files into the layout with the given options
+ *
+ *  "file_path" is a "+" or "," separated list of files read "into" a single layout.
+ */
+BD_PUBLIC void read_files (db::Layout &layout, const std::string &infile, const db::LoadLayoutOptions &options);
+
 }
 
 #endif

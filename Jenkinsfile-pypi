@@ -33,7 +33,7 @@ node("master") {
   stage("Publish and test") {
         
     //  publish for release tags
-    if (BRANCH_NAME.startsWith('pypi_v')) {
+    if (BRANCH_NAME.startsWith('pypi_')) {
       sh("twine upload --skip-existing wheelhouse/klayout-*manylinux2014*.whl wheelhouse/*.zip")
     }
 

@@ -105,7 +105,7 @@ void LayoutToNetlist::keep_dss ()
 
 void LayoutToNetlist::init ()
 {
-  dss ().set_text_enlargement (1);
+  dss ().set_text_enlargement (0);
   dss ().set_text_property_name (tl::Variant ("LABEL"));
 }
 

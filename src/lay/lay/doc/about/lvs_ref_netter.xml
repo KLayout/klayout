@@ -427,6 +427,28 @@ If no reader is provided, Spice format will be assumed. The reader object is a
 Alternatively, a <class_doc href="Netlist">Netlist</class_doc> object can be given which is obtained from any other
 source.
 </p>
+<a name="split_gates"/><h2>"split_gates" - Implements the "split gates" feature</h2>
+<keyword name="split_gates"/>
+<p>Usage:</p>
+<ul>
+<li><tt>split_gates(device_name)</tt></li>
+<li><tt>split_gates(device_name, circuit_filter)</tt></li>
+</ul>
+<p>
+Multi-fingered, multi-gate MOS transistors can be built without connecting
+the source/drain internal nets between the fingers. This will prevent 
+"combine_devices" from combining the single gate transistors of the
+different fingers into single ones.
+</p><p>
+"split_gates" now marks the devices of the given class so that they will
+receive a special treatment which joins the internl source/drain nodes.
+</p><p>
+By default, this method is applied to all circuits. You can specify
+a circuit pattern to apply it to certain circuits only.
+</p><p>
+"device_name" must be a valid device name and denote a MOS3, MOS4, DMOS3
+or DMOS4 device.
+</p>
 <a name="tolerance"/><h2>"tolerance" - Specifies compare tolerances for certain device parameters</h2>
 <keyword name="tolerance"/>
 <p>Usage:</p>

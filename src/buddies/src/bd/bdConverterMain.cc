@@ -42,7 +42,7 @@ int converter_main (int argc, char *argv[], const std::string &format)
   generic_reader_options.add_options (cmd);
 
   cmd << tl::arg ("input",  &infile,  "The input file (any format, may be gzip compressed)",
-                  "You can use '+' to supply multiple files which will be read after each other into the same layout. "
+                  "You can use '+' or ',' to supply multiple files which will be read after each other into the same layout. "
                   "This provides some cheap, but risky way of merging files. Beware of cell name conflicts.")
       << tl::arg ("output", &outfile, tl::sprintf ("The output file (%s format)", format))
     ;
@@ -56,14 +56,7 @@ int converter_main (int argc, char *argv[], const std::string &format)
   {
     db::LoadLayoutOptions load_options;
     generic_reader_options.configure (load_options);
-
-    std::vector<std::string> files = tl::split (infile, "+");
-
-    for (std::vector<std::string>::const_iterator f = files.begin (); f != files.end (); ++f) {
-      tl::InputStream stream (*f);
-      db::Reader reader (stream);
-      reader.read (layout, load_options);
-    }
+    read_files (layout, infile, load_options);
   }
 
   {

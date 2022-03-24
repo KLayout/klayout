@@ -1139,9 +1139,9 @@ end</pre>
 
   <p>A Shape object represents a box if it returns true on <class_doc href="Shape#is_box?"/>. 
   The only specific methods that are provided for box type shapes are the <class_doc href="Shape#box"/>
-  getter and <class_doc href="Shape#box="/> setter. <class_box href="Shape#box_center"/>, 
-  <class_box href="Shape#box_center="/>, <class_box href="Shape#box_p1"/>, <class_box href="Shape#box_p1="/>,
-  <class_box href="Shape#box_p2"/> and <class_box href="Shape#box_p2="/> get or modify individual aspects of the 
+  getter and <class_doc href="Shape#box="/> setter. <class_doc href="Shape#box_center"/>, 
+  <class_doc href="Shape#box_center="/>, <class_doc href="Shape#box_p1"/>, <class_doc href="Shape#box_p1="/>,
+  <class_doc href="Shape#box_p2"/> and <class_doc href="Shape#box_p2="/> get or modify individual aspects of the 
   box.
   </p>
 

@@ -643,7 +643,7 @@ GSIHelpProvider::produce_class_index (const char *module_name) const
   }
 
   if (! qt_class_names.empty ()) {
-    os << tl::to_string (QObject::tr ("Find Qt class documentation")) << " <a href=\"#qtclasses\">" << tl::to_string (QObject::tr ("here")) << "</a>" << std::endl;
+    os << "<p>" << tl::to_string (QObject::tr ("Find Qt class documentation")) << " <a href=\"#qtclasses\">" << tl::to_string (QObject::tr ("here")) << "</a></p>" << std::endl;
   }
 
   if (! class_names.empty ()) {
@@ -992,6 +992,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
      << std::endl;
 
   os << "<doc><title>" << tl::to_string (QObject::tr ("API reference - Class")) << " " << escape_xml (cls) << "</title>" << std::endl;
+  os << "<property name=\"module\" value=\"" << escape_xml (cls_obj->module ()) << "\"/>" << std::endl;
 
   os << "<keyword name=\"" << escape_xml (cls) << "\"/>" << std::endl;
 
@@ -1328,6 +1329,9 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
 
   os << "<table>";
 
+  int rowindex = -1;
+  int sigindex = -1;
+
   for (std::multimap <std::string, std::pair<const gsi::MethodBase *, size_t> >::const_iterator i = mm.begin (); i != mm.end (); ++i, ++n) {
 
     const gsi::MethodBase::MethodSynonym &syn = i->second.first->begin_synonyms () [i->second.second];
@@ -1335,13 +1339,23 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     DocumentationParser method_doc (i->second.first);
     std::string pydoc = pya::PythonInterpreter::python_doc (i->second.first);
 
-    os << "<tr>";
+    if (i->first != prev_title) {
+      rowindex += 1;
+    }
+    os << "<tr class=\"bigrow" << (rowindex % 2) << "\">";
+
     if (i->first != prev_title) {
       int rows = 0;
       for (std::multimap <std::string, std::pair<const gsi::MethodBase *, size_t> >::const_iterator j = i; j != mm.end () && j->first == i->first; ++j) {
         ++rows;
       }
-      os << "<td rowspan=\"" << rows << "\">";
+      if (rows > 1) {
+        os << "<td rowspan=\"" << rows << "\">";
+        sigindex = 0;
+      } else {
+        os << "<td>";
+        sigindex = -1;
+      }
       os << "<h3>" << escape_xml (i->first) << "</h3>" << std::endl;
       prev_title = i->first;
       os << "</td>";
@@ -1352,7 +1366,12 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
        << "<a name=\"m_" << escape_xml (i->first) << "\"/>"
        << "<keyword title=\"" << tl::to_string (QObject::tr ("API reference - Class")) << " " << escape_xml (cls) << ", " << tl::to_string (QObject::tr ("Method")) << " " << escape_xml (i->first) <<  "\" name=\"" << escape_xml (cls) << "#" << escape_xml (i->first) << "\"/>" << std::endl;
 
-    os << "<p><b>" << tl::to_string (QObject::tr ("Signature")) << "</b>: ";
+    os << "<p><b>";
+    if (sigindex >= 0) {
+      ++sigindex;
+      os << "(" << sigindex << ") ";
+    }
+    os << tl::to_string (QObject::tr ("Signature")) << "</b>: ";
     std::string attr = method_attributes (i->second.first, method_doc);
     if (! attr.empty ()) {
       os << "<i>[" << escape_xml (attr) << "] </i>";
@@ -1395,7 +1414,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
 
     if (! pydoc.empty ()) {
       os << "<p><b>";
-      os << tl::to_string (QObject::tr ("Python specific notes:"));
+      os << tl::to_string (QObject::tr ("Python specific notes: "));
       os << "</b><br/>" << escape_xml (pydoc) << "</p>" << std::endl;
     }
 

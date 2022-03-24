@@ -152,6 +152,11 @@ public:
    */
   static void create_index_file (const std::string &path);
 
+  /**
+   *  @brief Creates a help index computed from the loaded definitions
+   */
+  static lay::HelpSource *computed ();
+
 private:
   std::vector<IndexEntry> m_index;
   std::map<std::string, std::string> m_parent_of;

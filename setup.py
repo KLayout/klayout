@@ -273,8 +273,9 @@ class Config(object):
                         quote_path("-I" + os.path.join(bits, "curl", "include"))]
             else:
                 return []
-        elif platform.system() == "Darwin":
-            return []
+        # elif platform.system() == "Darwin":
+        #    return []
+        # https://github.com/KLayout/klayout/issues/1040#issuecomment-1078474759
         else:
             return ["-Wno-strict-aliasing",  # Avoids many "type-punned pointer" warnings
                     "-std=c++11",  # because we use unordered_map/unordered_set

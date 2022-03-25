@@ -273,8 +273,6 @@ class Config(object):
                         quote_path("-I" + os.path.join(bits, "curl", "include"))]
             else:
                 return []
-        elif platform.system() == "Darwin":
-            return []
         else:
             return ["-Wno-strict-aliasing",  # Avoids many "type-punned pointer" warnings
                     "-std=c++11",  # because we use unordered_map/unordered_set

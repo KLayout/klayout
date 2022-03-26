@@ -289,7 +289,7 @@ box = RBA::Box::new(dbox)
 
   <p>
   The spine points of a path can be iterated with <class_doc href="Path#each_point"/>. <class_doc href="Path#num_points"/> returns the number of points.
-  <class_doc href="Path#point"/> returns a specific point and <class_doc href="Path#points="/> allows replacing of the spine with the given array of Point objects.
+  <class_doc href="Path#points="/> allows replacing of the spine with the given array of Point objects.
   <class_doc href="Path#round="/> sets the "round ended" flag. <class_doc href="Path#bbox"/> and <class_doc href="Path#area"/> deliver the bounding box and the area, where the area
   is only approximate and is computed from the spine's length including the extensions times the width for efficiency. For
   certain acute-angle configurations that value may not be the exact area.
@@ -338,7 +338,7 @@ box = RBA::Box::new(dbox)
   <p>
   <class_doc href="Text#move"/>, <class_doc href="Text#moved"/> and <class_doc href="Text#transformed"/> basically work
   like for the other objects.
-  The class method <class_doc href="Text#from_dtext"/> creates a integer-coordinate type Text object from a floating-point coordinate type DText
+  The class method <class_doc href="Text#from_dtype"/> creates an integer-coordinate type Text object from a floating-point coordinate type DText
   object (see below). The floating-point coordinates are rounded to the nearest integer coordinates.
   </p>
 
@@ -740,8 +740,9 @@ ly.top_cell.shapes(ly.layer(100, 0)).insert(r11 &amp; r21)
   </p>
 
   <p>
-  Edge pairs can be "normalized" using <class_doc href="EdgePair#normalize"/>. Normalization
-  will bring the edge pairs in a form such that when connecting their start and end 
+  Edge pairs can be "normalized" using <class_doc href="EdgePair#normalizes"/>.
+  This method returns the normalized version of the edge pair.
+  Normalization will bring the edge pairs in a form such that when connecting their start and end
   points a closed loop without intersections is formed. Normalized edge pairs will produce
   nicer polygons later on.
   </p>

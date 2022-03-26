@@ -108,7 +108,7 @@ layout.write("my_layout.gds")</pre>
   For doing so, the Layout object keeps layers as a table of <class_doc href="LayerInfo"/> objects. The LayerInfo object
   carries information about the description of a layer, for example layer and datatype number and/or the layer name.
   A layer is basically 
-  just an index in that table. Layers can be created using the <class_doc href="LayerInfo#insert_layer"/> method. Each layer is present
+  just an index in that table. Layers can be created using the <class_doc href="Layout#insert_layer"/> method. Each layer is present
   in every cell and inside a cell, a shape storage for each layer is provided.
   </p>
 
@@ -508,10 +508,10 @@ shape.set_property(1, "NewValue")</pre>
   </p>
 
   <p>
-  The <class_doc href="Layout#layer"/> attribute allows read and write access to the layer number. <class_doc href="Layout#datatype"/> is the 
-  attribute for the datatype number. <class_doc href="Layout#name"/> gives access to the text name. <class_doc href="Layout#is_named?"/> returns
+  The <class_doc href="LayerInfo#layer"/> attribute allows read and write access to the layer number. <class_doc href="LayerInfo#datatype"/> is the
+  attribute for the datatype number. <class_doc href="LayerInfo#name"/> gives access to the text name. <class_doc href="LayerInfo#is_named?"/> returns
   true, if the LayerInfo object represents a named layer (no layer or datatype number are specified). 
-  <class_doc href="Layout#is_equivalent?"/> compares two LayerInfo objects and returns true, if both denote the same
+  <class_doc href="LayerInfo#is_equivalent?"/> compares two LayerInfo objects and returns true, if both denote the same
   layer. This is not exact equivalence but follows the logical precendence: two layers are equivalent
   if layer or datatype number match (in that case the text name is ignored) or, if no layer and datatype
   number are specified, the name matches exactly.
@@ -879,9 +879,9 @@ end</pre>
   <keyword name="Instance"/>
   <p>
   As stated earlier, the <class_doc href="Instance"/> object represents a cell instance
-  in the database and basically acts as a reference or pointer to a CellInstArray object inside the database.
+  in the database. Technically it acts as a proxy to some CellInstArray inside the database.
   In addition, it provides access to properties attached to the instance. Instance objects play an important
-  role in the Cell class to identify a certain instance, for example to delete an instance.
+  role in the Cell class to identify a certain instance, for example to delete it.
   </p>
 
   <p>
@@ -895,20 +895,25 @@ end</pre>
   </p>
 
   <p>
-  The cell the Instance object lives in can be obtained with <class_doc href="Instance#cell"/>. <class_doc href="Instance#parent_cell_index"/> basically
-  renders the same information, but in form of a cell index. The layout the instance lives in can be 
-  obtained with <class_doc href="Instance#layout"/>.
+  The cell the Instance object lives in can be obtained with <class_doc href="Instance#cell"/>. <class_doc href="Instance#cell_index"/> basically
+  renders the same information, but in form of a cell index. The cell can be assigned (<class_doc href="Instance#cell="/>) which changes is to
+  refer to a different cell.
+  </p>
+
+  <p>
+  The layout the instance lives in can be obtained with <class_doc href="Instance#layout"/>. The cell the instance lives in
+  is returned by <class_doc href="Instance#parent_cell"/>. The parent cell can be assigned (<class_doc href="Instance#parent_cell="/>), which effectively moves the instance to
+  a different cell.
   </p>
 
   <p>
   User properties can be accessed through the <class_doc href="Instance#prop_id"/> attribute or, more convenient, through the 
-  <class_doc href="Instance#get_property"/>, <class_doc href="Instance#delete_property"/> or <class_doc href="Instance#set_property"/> methods. Please note that changing the
+  <class_doc href="Instance#property"/>, <class_doc href="Instance#delete_property"/> or <class_doc href="Instance#set_property"/> methods. Please note that changing the
   property ID or the property values may invalidate iterators as well. 
   </p>
 
   <p>
-  An instance has an equality operator. That operator returns true, if the Instance objects point to
-  the same cell instance.
+  An instance has an equality operator. That operator returns true, if the Instances indentify the same object.
   </p>
   
   <h2>The Shapes class</h2>

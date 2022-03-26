@@ -338,7 +338,10 @@ box = RBA::Box::new(dbox)
   <p>
   <class_doc href="Text#move"/>, <class_doc href="Text#moved"/> and <class_doc href="Text#transformed"/> basically work
   like for the other objects.
-  The class method <class_doc href="Text#from_dtype"/> creates an integer-coordinate type Text object from a floating-point coordinate type DText
+  </p>
+
+  <p>
+  Passing a DText object to the Text constructor creates an integer-coordinate type Text object from a floating-point coordinate type DText
   object (see below). The floating-point coordinates are rounded to the nearest integer coordinates.
   </p>
 
@@ -740,7 +743,7 @@ ly.top_cell.shapes(ly.layer(100, 0)).insert(r11 &amp; r21)
   </p>
 
   <p>
-  Edge pairs can be "normalized" using <class_doc href="EdgePair#normalizes"/>.
+  Edge pairs can be "normalized" using <class_doc href="EdgePair#normalized"/>.
   This method returns the normalized version of the edge pair.
   Normalization will bring the edge pairs in a form such that when connecting their start and end
   points a closed loop without intersections is formed. Normalized edge pairs will produce

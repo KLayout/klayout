@@ -786,7 +786,7 @@ end</pre>
   a PCell. <class_doc href="Cell#pcell_id"/> returns the PCell declaration ID if the cell is a PCell variant. <class_doc href="Cell#pcell_declaration"/> will
   return the PCell declaration object. There is also a overload of "pcell_declaration" that determines the PCell declaration
   object for an Instance if it is a PCell instance. <class_doc href="Cell#pcell_parameters"/> delivers the PCell parameters for a cell (if it is
-  a PCell variant) or an instance (if it is a PCell instance). The PCell parameters are an array of <class_doc href="Variant"/> object 
+  a PCell variant) or an instance (if it is a PCell instance). The PCell parameters are an array of variable-type values
   and the interpretation is dependent on the PCell implementation. The <class_doc href="PCellDeclaration"/> object 
   which can be obtained through "pcell_declaration" gives the necessary information about the interpretation of the 
   parameters.

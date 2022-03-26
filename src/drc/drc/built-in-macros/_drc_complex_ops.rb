@@ -498,7 +498,7 @@ CODE
   # out = in.drc(primary.bbox_min > 200.nm)   # equivalent
   # @/code
   #
-  # The "bbox_min" method is available as a plain function or as a method on \DRC## expressions.
+  # The "bbox_min" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.bbox_min".
   
   def bbox_min
@@ -578,7 +578,7 @@ CODE
   # out = in.drc(primary.bbox_aspect_ratio > 3)   # equivalent
   # @/code
   #
-  # The "bbox_aspect_ratio" method is available as a plain function or as a method on \DRC## expressions.
+  # The "bbox_aspect_ratio" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.bbox_aspect_ratio".
   
   def bbox_aspect_ratio
@@ -609,7 +609,7 @@ CODE
   # out = in.drc(primary.relative_height > 3)   # equivalent
   # @/code
   #
-  # The "relative_height" method is available as a plain function or as a method on \DRC## expressions.
+  # The "relative_height" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.bbox_aspect_ratio".
   
   def relative_height
@@ -638,7 +638,7 @@ CODE
   # out = in.drc(primary.area_ratio > 3)   # equivalent
   # @/code
   #
-  # The "area_ratio" method is available as a plain function or as a method on \DRC## expressions.
+  # The "area_ratio" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.area_ratio".
   
   def area_ratio

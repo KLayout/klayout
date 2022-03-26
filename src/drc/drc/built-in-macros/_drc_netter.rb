@@ -192,7 +192,7 @@ module DRC
     # @/code
     #
     # The return value of this method will be the device class of the devices
-    # generated in the extraction step (see \DeviceClass).
+    # generated in the extraction step (see RBA::DeviceClass).
     
     def extract_devices(devex, layer_selection)
     

@@ -805,7 +805,6 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
-    "@return A \\IntValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
     "@return The value entered if \"Ok\" was pressed or nil if \"Cancel\" was pressed\n"
     "This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent."
   ) +

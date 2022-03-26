@@ -762,6 +762,10 @@ ApplicationBase::init_app ()
   //  run all early autorun macros
   lym::MacroCollection::root ().autorun_early (&already_executed);
 
+  //  redo gsi::initialize as the macros may have registered new external classes
+  //  through the "doc to external class" mechanism.
+  gsi::initialize ();
+
   //  autorun_early may have added macro categories, so we need to call finish() again
   if (mc) {
 

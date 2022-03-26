@@ -460,14 +460,19 @@ replace_references (const std::string &t, const gsi::ClassBase *cls_base)
 // --------------------------------------------------------------------------------------
 //  Implementation
 
+GSIHelpProvider::GSIHelpProvider ()
+{
+  //  .. nothing yet ..
+}
+
 std::string 
-GSIHelpProvider::folder () const
+GSIHelpProvider::folder (lay::HelpSource * /*src*/) const
 {
   return "code";
 }
 
 std::string 
-GSIHelpProvider::title () const
+GSIHelpProvider::title (lay::HelpSource * /*src*/) const
 {
   return tl::to_string (QObject::tr ("API Reference"));
 }
@@ -485,7 +490,7 @@ void produce_toc (const gsi::ClassBase *cls, std::vector <std::string> &toc)
 }
 
 void 
-GSIHelpProvider::toc (std::vector<std::string> &t)
+GSIHelpProvider::toc (lay::HelpSource * /*src*/, std::vector<std::string> &t)
 {
   std::set<std::string> mod_names;
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
@@ -499,7 +504,7 @@ GSIHelpProvider::toc (std::vector<std::string> &t)
 }
 
 QDomDocument
-GSIHelpProvider::get (const std::string &path) const
+GSIHelpProvider::get (lay::HelpSource *src, const std::string &path) const
 {
   QUrl url = QUrl::fromEncoded (path.c_str ());
   QString url_path = url.path ();
@@ -508,9 +513,9 @@ GSIHelpProvider::get (const std::string &path) const
 
   std::string text;
   if (url_path == QString::fromUtf8 ("/code/index.xml")) {
-    text = produce_class_index (0);
+    text = produce_class_index (src, 0);
   } else if (module_index_url.indexIn (url_path) == 0) {
-    text = produce_class_index (from_encoded_class_name (tl::to_string (module_index_url.cap (1))).c_str ());
+    text = produce_class_index (src, from_encoded_class_name (tl::to_string (module_index_url.cap (1))).c_str ());
   } else if (class_doc_url.indexIn (url_path) == 0) {
     text = produce_class_doc (from_encoded_class_name (tl::to_string (class_doc_url.cap (1))));
   } else {
@@ -539,23 +544,6 @@ GSIHelpProvider::get (const std::string &path) const
   return doc;
 }
 
-static 
-void produce_doc_index (const gsi::ClassBase *cls, std::ostringstream &os)
-{
-  DocumentationParser &doc = cls_documentation (cls);
-  std::string qname = make_qualified_name (cls);
-
-  //  Only list the name if the class is not hidden, it's a top-level class or the path is an expanded one
-  //  (the last criterion avoids generating classes such as A::B_C)
-  if (! doc.hidden) {
-    os << "<topic-ref href=\"" << escape_xml (class_doc_url (qname)) << "\"/>" << std::endl;
-  }
-
-  for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
-    produce_doc_index (cc.operator-> (), os);
-  }
-}
-
 static
 void collect_class_info (const gsi::ClassBase *cls, const std::string &module, std::vector <std::pair <std::string, std::pair<std::string, std::string> > > &class_names, std::vector <std::pair <std::string, std::pair<std::string, std::string> > > &qt_class_names)
 {
@@ -578,8 +566,9 @@ void collect_class_info (const gsi::ClassBase *cls, const std::string &module, s
 }
 
 std::string
-GSIHelpProvider::produce_class_index (const char *module_name) const
+GSIHelpProvider::produce_class_index (lay::HelpSource *src, const char *module_name) const
 {
+  bool skip_qt_classes = src->get_option ("skip-qt-classes").to_bool ();
   std::ostringstream os;
 
   os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl
@@ -605,10 +594,17 @@ GSIHelpProvider::produce_class_index (const char *module_name) const
     }
   }
 
+  if (skip_qt_classes) {
+    qt_class_names.clear ();
+  }
+
   if (! module_name) {
 
-    for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
-      produce_doc_index (c.operator-> (), os);
+    for (class_index_t::const_iterator i = class_names.begin (); i != class_names.end (); ++i) {
+      os << "<topic-ref href=\"" << escape_xml (class_doc_url (i->first)) << "\"/>" << std::endl;
+    }
+    for (class_index_t::const_iterator i = qt_class_names.begin (); i != qt_class_names.end (); ++i) {
+      os << "<topic-ref href=\"" << escape_xml (class_doc_url (i->first)) << "\"/>" << std::endl;
     }
 
     std::set<std::string> mod_names;
@@ -657,9 +653,9 @@ GSIHelpProvider::produce_class_index (const char *module_name) const
       os << "<tr class=\"row" << (n % 2)  << "\">" << std::endl;
       os << "<td><a href=\"" << escape_xml (class_doc_url (cc->first)) << "\">" << escape_xml (cc->first) << "</a></td>";
       if (! module_name) {
-        os << "<td>&nbsp;&nbsp;&nbsp;<nobr><a href=\"" << module_doc_url (cc->second.first) << "\">" << escape_xml (cc->second.first) << "</a></nobr></td>";
+        os << "<td><a href=\"" << module_doc_url (cc->second.first) << "\">" << escape_xml (cc->second.first) << "</a></td>";
       }
-      os << "<td>&nbsp;&nbsp;&nbsp;<nobr>" << escape_xml (cc->second.second) << "</nobr></td></tr>" << std::endl;
+      os << "<td>" << escape_xml (cc->second.second) << "</td></tr>" << std::endl;
     }
     os << "</table>" << std::endl;
 
@@ -676,9 +672,9 @@ GSIHelpProvider::produce_class_index (const char *module_name) const
       os << "<tr class=\"row" << (n % 2)  << "\">" << std::endl;
       os << "<td><a href=\"" << escape_xml (class_doc_url (cc->first)) << "\">" << escape_xml (cc->first) << "</a></td>";
       if (! module_name) {
-        os << "<td>&nbsp;&nbsp;&nbsp;<nobr><a href=\"" << module_doc_url (cc->second.first) << "\">" << escape_xml (cc->second.first) << "</a></nobr></td>";
+        os << "<td><a href=\"" << module_doc_url (cc->second.first) << "\">" << escape_xml (cc->second.first) << "</a></td>";
       }
-      os << "<td>&nbsp;&nbsp;&nbsp;<nobr>" << escape_xml (cc->second.second) << "</nobr></td></tr>" << std::endl;
+      os << "<td>" << escape_xml (cc->second.second) << "</td></tr>" << std::endl;
     }
     os << "</table>" << std::endl;
 

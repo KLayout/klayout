@@ -332,13 +332,8 @@ HelpSource::~HelpSource()
 void
 HelpSource::produce_index_file (const std::string &path)
 {
-  m_index.clear ();
-  m_titles.clear ();
-  m_title_map.clear ();
-  m_parent_of.clear ();
+  scan ();
 
-  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Initializing help index")), 1, false /*can't cancel*/);
-  scan (index_url, progress);
   try {
 
     tl::OutputStream os (path, tl::OutputStream::OM_Plain);
@@ -360,15 +355,16 @@ HelpSource::create_index_file (const std::string &path)
   source.produce_index_file (path);
 }
 
-lay::HelpSource *
-HelpSource::computed ()
+void
+HelpSource::scan ()
 {
-  std::unique_ptr<lay::HelpSource> hs (new lay::HelpSource (false));
+  m_index.clear ();
+  m_titles.clear ();
+  m_title_map.clear ();
+  m_parent_of.clear ();
 
   tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Initializing help index")), 1);
-  hs->scan (index_url, progress);
-
-  return hs.release ();
+  scan (index_url, progress);
 }
 
 std::string
@@ -482,11 +478,11 @@ HelpSource::get_dom (const std::string &u)
   QString path = url.path ();
 
   for (tl::Registrar<lay::HelpProvider>::iterator cls = tl::Registrar<lay::HelpProvider>::begin (); cls != tl::Registrar<lay::HelpProvider>::end (); ++cls) {
-    if (path.startsWith (tl::to_qstring ("/" + cls->folder () + "/"))) {
+    if (path.startsWith (tl::to_qstring ("/" + cls->folder (this) + "/"))) {
       if (tl::verbosity () >= 20) {
         tl::info << "Help provider: create content for " << u;
       }
-      return cls->get (u);
+      return cls->get (this, u);
     }
   }
 
@@ -644,7 +640,7 @@ HelpSource::produce_main_index ()
 
   os << "<topics>" << std::endl;
   for (tl::Registrar<lay::HelpProvider>::iterator cls = tl::Registrar<lay::HelpProvider>::begin (); cls != tl::Registrar<lay::HelpProvider>::end (); ++cls) {
-    os << "<topic href=\"" << cls->index () << "\"/>" << std::endl;
+    os << "<topic href=\"" << cls->index (this) << "\"/>" << std::endl;
   }
   os << "</topics>" << std::endl;
 
@@ -1087,6 +1083,24 @@ HelpSource::urls ()
     u.push_back (p->first);
   }
   return u;
+}
+
+void
+HelpSource::set_option (const std::string &key, const tl::Variant &value)
+{
+  s_global_options[key] = value;
+}
+
+const tl::Variant &
+HelpSource::get_option (const std::string &key) const
+{
+  auto i = s_global_options.find (key);
+  if (i != s_global_options.end ()) {
+    return i->second;
+  } else {
+    static tl::Variant nil;
+    return nil;
+  }
 }
 
 }

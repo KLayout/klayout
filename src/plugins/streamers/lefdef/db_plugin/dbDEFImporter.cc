@@ -1442,6 +1442,7 @@ DEFImporter::do_read (db::Layout &layout)
 
   double dbu_mic = 1000.0;
   double scale = 1.0 / (dbu_mic * layout.dbu ());
+  size_t top_id = 0;
 
   std::map<std::string, std::vector<db::Polygon> > regions;
   std::list<DEFImporterGroup> groups;
@@ -1450,7 +1451,7 @@ DEFImporter::do_read (db::Layout &layout)
   m_via_desc = m_lef_importer.vias ();
   m_styles.clear ();
 
-  db::Cell &design = layout.cell (layout.add_cell ("TOP"));
+  db::Cell &design = layout.cell (reader_state ()->make_cell (layout, top_id));
 
   while (! at_end ()) {
 
@@ -1465,7 +1466,7 @@ DEFImporter::do_read (db::Layout &layout)
     } else if (test ("DESIGN")) {
 
       std::string cn = get ();
-      layout.rename_cell (design.cell_index (), layout.uniquify_cell_name (cn.c_str ()).c_str ());
+      reader_state ()->rename_cell (layout, top_id, cn);
 
       expect (";");
 
@@ -1651,7 +1652,7 @@ DEFImporter::do_read (db::Layout &layout)
 
   if (! groups.empty () && options ().separate_groups ()) {
 
-    others_cell = &layout.cell (layout.add_cell ("NOGROUP"));
+    others_cell = &layout.cell (reader_state ()->make_cell (layout, "NOGROUP"));
     design.insert (db::CellInstArray (others_cell->cell_index (), db::Trans ()));
 
     //  Walk through the groups, create a group container cell and put all instances
@@ -1659,7 +1660,7 @@ DEFImporter::do_read (db::Layout &layout)
 
     for (std::list<DEFImporterGroup>::const_iterator g = groups.begin (); g != groups.end (); ++g) {
 
-      db::Cell *group_cell = &layout.cell (layout.add_cell (("GROUP_" + g->name).c_str ()));
+      db::Cell *group_cell = &layout.cell (reader_state ()->make_cell (layout, ("GROUP_" + g->name).c_str ()));
       design.insert (db::CellInstArray (group_cell->cell_index (), db::Trans ()));
 
       if (! g->region_name.empty ()) {

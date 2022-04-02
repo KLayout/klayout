@@ -123,6 +123,9 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
   db::LEFDEFReaderState state (&effective_options, layout, base_path);
 
+  db::CommonReaderOptions common_options = options.get_options<db::CommonReaderOptions> ();
+  state.set_conflict_resolution_mode (common_options.cell_conflict_resolution);
+
   layout.dbu (effective_options.dbu ());
 
   if (import_lef) {

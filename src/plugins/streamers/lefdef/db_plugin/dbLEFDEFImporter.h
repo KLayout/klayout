@@ -27,6 +27,7 @@
 #include "dbPluginCommon.h"
 #include "dbLayout.h"
 #include "dbReader.h"
+#include "dbCommonReader.h"
 #include "dbStreamLayers.h"
 #include "tlStream.h"
 #include "tlVariant.h"
@@ -44,6 +45,7 @@ namespace db
 {
 
 class LEFDEFReaderState;
+class LEFDEFImporter;
 struct MacroDesc;
 
 /**
@@ -1215,6 +1217,7 @@ private:
  *  This class will handle the creation and management of layers in the LEF/DEF reader context
  */
 class DB_PLUGIN_PUBLIC LEFDEFReaderState
+  : public db::CommonReaderBase
 {
 public:
   /**
@@ -1226,6 +1229,14 @@ public:
    *  @brief Destructor
    */
   ~LEFDEFReaderState ();
+
+  /**
+   *  @brief Attaches to or detaches from an importer
+   */
+  void attach_reader (LEFDEFImporter *importer)
+  {
+    mp_importer = importer;
+  }
 
   /**
    *  @brief Reads the given map file
@@ -1317,6 +1328,10 @@ public:
     return m_foreign_cells;
   }
 
+protected:
+  virtual void common_reader_error (const std::string &msg);
+  virtual void common_reader_warn (const std::string &msg);
+
 private:
   /**
    *  @brief A key for the via cache
@@ -1389,6 +1404,7 @@ private:
   LEFDEFReaderState (const LEFDEFReaderState &);
   LEFDEFReaderState &operator= (const LEFDEFReaderState &);
 
+  LEFDEFImporter *mp_importer;
   std::map <std::pair<std::string, LayerDetailsKey>, std::set<unsigned int> > m_layers;
   db::LayerMap m_layer_map;
   bool m_create_layers;
@@ -1453,6 +1469,8 @@ struct DB_PLUGIN_PUBLIC MacroDesc
 class DB_PLUGIN_PUBLIC LEFDEFImporter
 {
 public:
+  friend class LEFDEFReaderState;
+
   /**
    *  @brief Default constructor
    */

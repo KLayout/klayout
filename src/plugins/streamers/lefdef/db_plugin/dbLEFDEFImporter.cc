@@ -868,7 +868,7 @@ LEFDEFReaderOptions::special_routing_datatype_str () const
 //  LEFDEFLayerDelegate implementation
 
 LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout, const std::string &base_path)
-  : m_create_layers (true), m_has_explicit_layer_mapping (false), m_laynum (1), mp_tech_comp (tc)
+  : mp_importer (0), m_create_layers (true), m_has_explicit_layer_mapping (false), m_laynum (1), mp_tech_comp (tc)
 {
   if (! tc->map_file ().empty ()) {
 
@@ -897,6 +897,22 @@ LEFDEFReaderState::~LEFDEFReaderState ()
   }
 
   m_macro_generators.clear ();
+}
+
+void
+LEFDEFReaderState::common_reader_error (const std::string &msg)
+{
+  if (mp_importer) {
+    mp_importer->error (msg);
+  }
+}
+
+void
+LEFDEFReaderState::common_reader_warn (const std::string &msg)
+{
+  if (mp_importer) {
+    mp_importer->warn (msg);
+  }
 }
 
 void
@@ -1538,6 +1554,8 @@ std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout
 void
 LEFDEFReaderState::finish (db::Layout &layout)
 {
+  CommonReaderBase::finish (layout);
+
   int lnum = 0;
 
   std::set<int> used_numbers;
@@ -1650,7 +1668,7 @@ LEFDEFReaderState::via_cell (const std::string &vn, db::Layout &layout, unsigned
       }
 
       std::string cn = mp_tech_comp->via_cellname_prefix () + vn + mask_suffix;
-      cell = &layout.cell (layout.add_cell (cn.c_str ()));
+      cell = &layout.cell (make_cell (layout, cn.c_str ()));
 
       std::vector<unsigned int> masks;
       masks.reserve (3);
@@ -1705,7 +1723,7 @@ LEFDEFReaderState::foreign_cell (Layout &layout, const std::string &name)
   if (cc.first) {
     ci = cc.second;
   } else {
-    ci = layout.add_cell (name.c_str ());
+    ci = make_cell (layout, name.c_str ());
     layout.cell (ci).set_ghost_cell (true);
   }
 
@@ -1747,7 +1765,7 @@ LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std:
     if (macro_desc.foreign_name != mn) {
 
       //  create an indirection for renaming the cell
-      cell = &layout.cell (layout.add_cell (mn.c_str ()));
+      cell = &layout.cell (make_cell (layout, mn.c_str ()));
       cell->insert (db::CellInstArray (db::CellInst (foreign_cell->cell_index ()), db::Trans (db::Point () - macro_desc.origin) * macro_desc.foreign_trans));
 
     } else {
@@ -1779,7 +1797,7 @@ LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std:
 
     std::string cn = mn + mask_suffix;
 
-    cell = &layout.cell (layout.add_cell (cn.c_str ()));
+    cell = &layout.cell (make_cell (layout, cn.c_str ()));
 
     if (mg->is_fixedmask ()) {
       mg->create_cell (*this, layout, *cell, 0, std::vector<unsigned int> (), nm);
@@ -1827,6 +1845,7 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderS
   progress.set_unit (10000.0);
 
   mp_reader_state = &state;
+  mp_reader_state->attach_reader (this);
 
   if (state.tech_comp ()) {
     m_options = *state.tech_comp ();
@@ -1863,11 +1882,13 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderS
 
     do_read (layout); 
 
+    mp_reader_state->attach_reader (0);
     delete mp_stream;
     mp_stream = 0;
     mp_progress = 0;
 
   } catch (...) {
+    mp_reader_state->attach_reader (0);
     delete mp_stream;
     mp_stream = 0;
     mp_progress = 0;

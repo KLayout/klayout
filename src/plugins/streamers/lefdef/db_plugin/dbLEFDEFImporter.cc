@@ -1217,14 +1217,18 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
 
     std::set <unsigned int> ll;
 
-    if (n.empty () || ! m_has_explicit_layer_mapping) {
+    if (! m_has_explicit_layer_mapping) {
       ll = open_layer_uncached (layout, n, purpose, mask);
     }
 
     m_layers.insert (std::make_pair (std::make_pair (n, LayerDetailsKey (purpose, mask)), ll));
 
     if (ll.empty ()) {
-      tl::warn << tl::to_string (tr ("No mapping for layer")) << " '" << n << "', purpose '" << purpose_to_name (purpose) << "'" << tl::noendl;
+      if (n.empty ()) {
+        tl::warn << tl::to_string (tr ("No mapping for purpose")) << " '" << purpose_to_name (purpose) << "'" << tl::noendl;
+      } else {
+        tl::warn << tl::to_string (tr ("No mapping for layer")) << " '" << n << "', purpose '" << purpose_to_name (purpose) << "'" << tl::noendl;
+      }
       if (mask > 0) {
         tl::warn << tl::to_string (tr (" Mask ")) << mask << tl::noendl;
       }

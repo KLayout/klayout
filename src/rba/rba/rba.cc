@@ -1558,7 +1558,7 @@ public:
     if (as_static) {
 
       if (tl::verbosity () >= 20) {
-        tl::log << tl::to_string (tr ("Registering class as Ruby module:) ")) << cls->name ();
+        tl::log << tl::to_string (tr ("Registering class as Ruby module: ")) << cls->name ();
       }
 
       std::string mixin_name = cls->name () + "_Mixin";

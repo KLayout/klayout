@@ -22,10 +22,10 @@
   sequence of symbolic names separated by a dot. For example:
   </p>
   
-  <li>
-    <ul><tt>edit_menu.end</tt> is the end of the "Edit" menu </ul>
-    <ul><tt>edit_menu.undo</tt> is the "Undo" entry in the "Edit" menu</ul>
-  </li>
+  <ul>
+    <li><tt>edit_menu.end</tt> is the end of the "Edit" menu </li>
+    <li><tt>edit_menu.undo</tt> is the "Undo" entry in the "Edit" menu</li>
+  </ul>
   
   <p>To obtain
   a list of the paths available, have a look at the "Key Bindings" page in the "Application"

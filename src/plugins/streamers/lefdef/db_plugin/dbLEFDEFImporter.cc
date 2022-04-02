@@ -1124,7 +1124,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
           } else if (i->second == All) {
 
             for (std::map<std::string, LayerPurpose>::const_iterator p = purpose_translation.begin (); p != purpose_translation.end (); ++p) {
-              if (p->second != All) {
+              if (p->second != All && p->second != Blockage) {
                 translated_purposes.insert (LayerDetailsKey (p->second, mask, via_size));
               }
             }

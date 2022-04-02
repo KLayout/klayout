@@ -1,0 +1,3 @@
+DESIGN sub ;
+DIEAREA ( 0 0 ) ( 200 200 ) ;
+END DESIGN

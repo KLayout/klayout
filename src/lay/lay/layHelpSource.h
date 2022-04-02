@@ -75,6 +75,8 @@ class HelpSource
 {
 public:
   HelpSource ();
+  HelpSource (bool make_index);
+
   ~HelpSource();
 
   virtual std::string get (const std::string &url);
@@ -152,6 +154,22 @@ public:
    */
   static void create_index_file (const std::string &path);
 
+  /**
+   *  @brief Scans the help providers and produce the index
+   */
+  void scan ();
+
+  /**
+   *  @brief Sets a global options for tailoring the help output
+   */
+  void set_option (const std::string &key, const tl::Variant &value);
+
+  /**
+   *  @brief Sets a global options for tailoring the help output
+   *  A null variant is returned if the option is not present.
+   */
+  const tl::Variant &get_option (const std::string &key) const;
+
 private:
   std::vector<IndexEntry> m_index;
   std::map<std::string, std::string> m_parent_of;
@@ -159,8 +177,8 @@ private:
   std::map<std::string, std::string> m_title_map;
   std::string m_klayout_version;
   int m_kindex;
+  std::map<std::string, tl::Variant> s_global_options;
 
-  HelpSource (bool make_index);
   QDomDocument produce_search (const std::string &index);
   QDomDocument produce_main_index ();
   void produce_index_file (const std::string &path);

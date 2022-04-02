@@ -38,14 +38,16 @@ class GSIHelpProvider
   : public HelpProvider
 {
 public:
-  virtual std::string folder () const;
-  virtual std::string title () const;
-  virtual void toc (std::vector<std::string> &t);
-  virtual QDomDocument get (const std::string &u) const;
+  GSIHelpProvider ();
+
+  virtual std::string folder (lay::HelpSource *src) const;
+  virtual std::string title (lay::HelpSource *src) const;
+  virtual void toc (lay::HelpSource *src, std::vector<std::string> &t);
+  virtual QDomDocument get (lay::HelpSource *src, const std::string &u) const;
 
 private:
   std::string produce_class_doc (const std::string &cls) const;
-  std::string produce_class_index (const char *module_name) const;
+  std::string produce_class_index (HelpSource *src, const char *module_name) const;
 };
 
 }

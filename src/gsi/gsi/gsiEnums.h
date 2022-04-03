@@ -26,6 +26,7 @@
 
 #include "gsiDecl.h"
 #include "tlString.h"
+#include "tlVariant.h"
 
 #if defined(HAVE_QT)
 #  include <QFlags>
@@ -59,6 +60,16 @@ public:
 
   E &value () { return m_e; }
   const E &value () const { return m_e; }
+
+  int to_int () const { return int (m_e); }
+  tl::Variant to_variant () const { return tl::Variant (int (m_e)); }
+
+  std::string to_string () const
+  {
+    const Enum<E> *ecls = dynamic_cast<const Enum<E> *> (cls_decl<E> ());
+    tl_assert (ecls != 0);
+    return ecls->enum_to_string (m_e);
+  }
 
 private:
   E m_e;
@@ -209,7 +220,7 @@ public:
     return ecls->enum_to_string_inspect (*e);
   }
 
-  static int enum_to_i (const E *e) 
+  static int enum_to_int (const E *e)
   {
     return int (*e); 
   }
@@ -219,14 +230,29 @@ public:
     return *e == other;
   }
 
-  static bool enum_ne (const E *e, const E &other) 
+  static bool enum_eq_with_int (const E *e, int other)
+  {
+    return int (*e) == other;
+  }
+
+  static bool enum_ne (const E *e, const E &other)
   {
     return *e != other;
   }
 
-  static bool enum_lt (const E *e, const E &other) 
+  static bool enum_ne_with_int (const E *e, int other)
+  {
+    return int (*e) != other;
+  }
+
+  static bool enum_lt (const E *e, const E &other)
   {
     return *e < other;
+  }
+
+  static bool enum_lt_with_int (const E *e, int other)
+  {
+    return int (*e) < other;
   }
 
   static E *new_enum_from_int (int i)
@@ -248,10 +274,13 @@ public:
       gsi::constructor ("new", &new_enum_from_string, gsi::arg("s"), "@brief Creates an enum from a string value") +
       gsi::method_ext ("to_s", &enum_to_string_ext, "@brief Gets the symbolic string from an enum") +
       gsi::method_ext ("inspect", &enum_to_string_inspect_ext, "@brief Converts an enum to a visual string") +
-      gsi::method_ext ("to_i", &enum_to_i, "@brief Gets the integer value from the enum") +
+      gsi::method_ext ("to_i", &enum_to_int, "@brief Gets the integer value from the enum") +
       gsi::method_ext ("==", &enum_eq, gsi::arg("other"), "@brief Compares two enums") +
+      gsi::method_ext ("==", &enum_eq_with_int, gsi::arg("other"), "@brief Compares an enum with an integer value") +
       gsi::method_ext ("!=", &enum_ne, gsi::arg("other"), "@brief Compares two enums for inequality") +
-      gsi::method_ext ("<", &enum_lt, gsi::arg("other"), "@brief Returns true if the first enum is less (in the enum symbol order) than the second");
+      gsi::method_ext ("!=", &enum_ne_with_int, gsi::arg("other"), "@brief Compares an enum with an integer for inequality") +
+      gsi::method_ext ("<", &enum_lt, gsi::arg("other"), "@brief Returns true if the first enum is less (in the enum symbol order) than the second") +
+      gsi::method_ext ("<", &enum_lt_with_int, gsi::arg("other"), "@brief Returns true if the enum is less (in the enum symbol order) than the integer value");
 
     return m + defs ();
   }

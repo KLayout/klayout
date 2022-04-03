@@ -100,7 +100,7 @@
     </li>
     <li>
       Technology folders: each technology folder can carry a "macros" or "pymacros" subfolder where technology-specific
-      macros are kept. See <link href="/about/technology-manager.xml"/> for details about technologies.
+      macros are kept. See <link href="/about/technology_manager.xml"/> for details about technologies.
     </li>
     <li>
       Macros can be kept in packages and installed from a remote repository. See <link href="/about/packages.xml"/> for 

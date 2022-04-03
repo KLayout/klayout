@@ -18,6 +18,8 @@ def create_ref(mod, s)
     else
       "<a href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml\">#{$1}</a>"
     end
+  elsif s =~ /([A-Z].*)/
+    "<a href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml\">#{$1}</a>"
   else
     "<a href=\"#" + s + "\">#{s}</a>"
   end
@@ -34,6 +36,8 @@ def create_link(mod, s)
     else
       "<link href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml\"/>"
     end
+  elsif s =~ /([A-Z].*)/
+    "<link href=\"/" + $loc + "/" + mod.downcase + "_ref_" + $1.downcase + ".xml\"/>"
   else
     "<link href=\"#" + s + "\"/>"
   end

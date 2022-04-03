@@ -388,7 +388,7 @@ extract_devices(mos4("NMOS4"), { :SD =&gt; nsd, :G =&gt; gate, :P =&gt; poly, :W
 </pre>
 </p><p>
 The return value of this method will be the device class of the devices
-generated in the extraction step (see <a href="#DeviceClass">DeviceClass</a>).
+generated in the extraction step (see <class_doc href="DeviceClass">DeviceClass</class_doc>).
 </p>
 <a name="l2n_data"/><h2>"l2n_data" - Gets the internal <class_doc href="LayoutToNetlist">LayoutToNetlist</class_doc> object</h2>
 <keyword name="l2n_data"/>

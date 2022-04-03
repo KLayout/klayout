@@ -25,7 +25,7 @@ module DRC
     # 
     # Objects that can be inserted are RBA::Edge objects (into edge layers) or 
     # RBA::DPolygon, RBA::DSimplePolygon, RBA::Path, RBA::DBox (into polygon layers).
-    # Convenience methods exist to create such objects (\global#edge, \global#polygon, \global#box and \#global#path).
+    # Convenience methods exist to create such objects (\global#edge, \global#polygon, \global#box and \global#path).
     # However, RBA constructors can used as well.
     # 
     # The insert method is useful in combination with the \global#polygon_layer or \global#edge_layer functions: 

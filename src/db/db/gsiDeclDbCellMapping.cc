@@ -90,7 +90,7 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "\n"
     "The cell mapping is created for cells from cell_indexes_b to cell from cell_indexes_a in the respective layouts. "
     "This method clears the mapping and creates one for each cell pair from cell_indexes_b vs. cell_indexes_a. "
-    "If used for \\Layout#copy_tree or \\Layout#move_tree, this cell mapping will essentially "
+    "If used for \\Layout#copy_tree_shapes or \\Layout#move_tree_shapes, this cell mapping will essentially "
     "flatten the source cells in the target layout.\n"
     "\n"
     "This method is equivalent to \\clear, followed by \\map(cell_index_a, cell_index_b) for each cell pair.\n"

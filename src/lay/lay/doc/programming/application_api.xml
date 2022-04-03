@@ -116,8 +116,6 @@
       This object provides access to the main menu, the toolbar and various context menus. With this object it 
       is possible to manipulate the menu.</li>
     <li><class_doc href="MainWindow#message"/>: show a message in the status bar.</li>
-    <li><class_doc href="MainWindow#reader_options"/>: gets the current layout reader options and allows modification of the latter. 
-      The reader options configure the reading of layouts.</li>
     <li><class_doc href="MainWindow#save_session"/> and <class_doc href="MainWindow#restore_session"/>: save or restore a session. 
       Sessions contain a window settings and information about the layouts loaded. 
       Sessions allows storing and restoring of the state of the main window.</li>
@@ -268,7 +266,7 @@ Application::instance.main_window.views</pre>
     <li><class_doc href="LayoutView#add_stipple"/>, <class_doc href="LayoutView#clear_stipples"/> and <class_doc href="LayoutView#remove_stipple"/>: 
     manage custom stipples.
     </li>
-    <li><class_doc href="LayoutView#add_line_style"/>, <class_doc href="LayoutView#clear_line_styles"/> and <class_doc href="LayoutView#remove_line_styles"/>: 
+    <li><class_doc href="LayoutView#add_line_style"/>, <class_doc href="LayoutView#clear_line_styles"/> and <class_doc href="LayoutView#remove_line_style"/>:
     manage custom line styles.
     </li>
     <li><class_doc href="LayoutView#ascend"/> and <class_doc href="LayoutView#descend"/>: moves the context cell up or down in the 
@@ -369,7 +367,7 @@ Application::instance.main_window.views</pre>
     <li><class_doc href="LayoutView#reload_layout"/>: 
     reloads a given layout.
     </li>
-    <li><class_doc href="LayoutView#create_rdb"/>, <class_doc href="LayoutView#delete_rdb"/>, <class_doc href="LayoutView#rdb"/>
+    <li><class_doc href="LayoutView#create_rdb"/>, <class_doc href="LayoutView#remove_rdb"/>, <class_doc href="LayoutView#rdb"/>
       and <class_doc href="LayoutView#num_rdbs"/>: Create, delete and get report databases stored inside the LayoutView object.
     </li>
     <li><class_doc href="LayoutView#rename_cellview"/>: 
@@ -398,7 +396,7 @@ Application::instance.main_window.views</pre>
   </p>
 
   <p>
-  Transactions can be initiated with <link href="LayoutView#transaction"/> and committed with <link href="LayoutView#commit"/>.
+  Transactions can be initiated with <class_doc href="LayoutView#transaction"/> and committed with <class_doc href="LayoutView#commit"/>.
   To ensure, every initiation of a transaction is matched by a "commit", it is recommended to employ "ensure":
   </p>
 

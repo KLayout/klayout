@@ -164,7 +164,7 @@
   <h2>MOS transistor with bulk</h2>
 
   <p>
-  The API class of the three-terminal MOS transistor is <class_doc href="DeviceClassMOS3"/>.
+  The API class of the three-terminal MOS transistor is <class_doc href="DeviceClassMOS3Transistor"/>.
   </p>
 
   <p>
@@ -221,7 +221,7 @@
   <p>
   In SPICE, BJT3 devices are represented by the "Q" element with the
   device class name as the model name.
-  The API class is <class_doc href="DeviceClassBJT3"/>.
+  The API class is <class_doc href="DeviceClassBJT3Transistor"/>.
   </p>
 
   <h2>Bipolar transistor with substrate</h2>
@@ -243,7 +243,7 @@
   <p>
   In SPICE, BJT4 devices are represented by the "Q" element with four nodes and the
   device class name as the model name.
-  The API class is <class_doc href="DeviceClassBJT4"/>.
+  The API class is <class_doc href="DeviceClassBJT4Transistor"/>.
   </p>
 
 </doc>

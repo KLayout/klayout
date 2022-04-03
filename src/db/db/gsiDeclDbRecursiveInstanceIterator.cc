@@ -476,7 +476,7 @@ Class<db::RecursiveInstanceIterator> decl_RecursiveInstanceIterator ("db", "Recu
   "\\Cell offers three methods to get these iterators: begin_instances_rec, begin_instances_rec_touching and begin_instances_rec_overlapping.\n"
   "\\Cell#begin_instances_rec will deliver a standard recursive instance iterator which starts from the given cell and iterates "
   "over all child cells. \\Cell#begin_instances_rec_touching creates a RecursiveInstanceIterator which delivers the instances "
-  "whose bounding boxed touch the given search box. \\Layout#begin_instances_rec_overlapping gives an iterator which delivers all instances whose bounding box "
+  "whose bounding boxed touch the given search box. \\Cell#begin_instances_rec_overlapping gives an iterator which delivers all instances whose bounding box "
   "overlaps the search box.\n"
   "\n"
   "A RecursiveInstanceIterator object can also be created directly, like this:\n"

@@ -600,12 +600,12 @@ delete shapes on layer 6 of cell TOP
     </tr>
     <tr>
       <td>bbox</td>
-      <td><class_ref href="Box"/></td>
+      <td><class_doc href="Box"/></td>
       <td>The cell's bounding box.</td>
     </tr>
     <tr>
       <td>cell_bbox</td>
-      <td><class_ref href="Box"/></td>
+      <td><class_doc href="Box"/></td>
       <td>Same as "bbox" (disambiguator for shape and instance bounding boxes).</td>
     </tr>
   </table>

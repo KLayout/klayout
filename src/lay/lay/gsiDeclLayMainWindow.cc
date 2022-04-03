@@ -376,7 +376,7 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
   method_ext ("commit_config", &config_end,
     "@brief Commits the configuration settings\n"
     "This method is provided for using MainWindow without an Application object. "
-    "It's a convience method which is equivalent to 'dispatcher().config_end(...)'. See \\Dispatcher#config_end for details.\n"
+    "It's a convience method which is equivalent to 'dispatcher().commit_config(...)'. See \\Dispatcher#commit_config for details.\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +

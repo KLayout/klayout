@@ -714,7 +714,7 @@ DRC expressions are quite rich and powerful. They provide a more intuitive way o
 writing DRC expressions, are more efficient and open new opportunities. DRC
 development is likely to focus on this scheme in the future.
 </p><p>
-More formal details about the bits and pieces can be found in the "<a href="#DRC">DRC</a>" class documentation.
+More formal details about the bits and pieces can be found in the "<a href="/about/drc_ref_drc.xml">DRC</a>" class documentation.
 </p>
 <a name="dup"/><h2>"dup" - Duplicates a layer</h2>
 <keyword name="dup"/>
@@ -786,7 +786,7 @@ See <a href="#enclosing">enclosing</a> for a description of that method
 </ul>
 <p>
 <b>Note: </b>"enclosed" is available as operators for the "universal DRC" function <a href="#drc">drc</a> within
-the <a href="#DRC">DRC</a> framework. These variants have more options and are more intuitive to use. 
+the <a href="/about/drc_ref_drc.xml">DRC</a> framework. These variants have more options and are more intuitive to use. 
 See <a href="/about/drc_ref_global.xml#enclosed">enclosed</a> for more details.
 </p><p>
 This method checks whether layer is enclosed by (is inside of) other_layer by not less than the
@@ -824,7 +824,7 @@ The following images show the effect of two enclosed checks (red: input1, blue: 
 </ul>
 <p>
 <b>Note: </b>"enclosing" and "enc" are available as operators for the "universal DRC" function <a href="#drc">drc</a> within
-the <a href="#DRC">DRC</a> framework. These variants have more options and are more intuitive to use. 
+the <a href="/about/drc_ref_drc.xml">DRC</a> framework. These variants have more options and are more intuitive to use. 
 See <a href="/about/drc_ref_global.xml#enclosing">enclosing</a> for more details.
 </p><p>
 This method checks whether layer encloses (is bigger than) other_layer by not less than the
@@ -1330,7 +1330,7 @@ The following image shows the effect of the "in" method (input1: red, input2: bl
 <p>
 Objects that can be inserted are <class_doc href="Edge">Edge</class_doc> objects (into edge layers) or 
 <class_doc href="DPolygon">DPolygon</class_doc>, <class_doc href="DSimplePolygon">DSimplePolygon</class_doc>, <class_doc href="Path">Path</class_doc>, <class_doc href="DBox">DBox</class_doc> (into polygon layers).
-Convenience methods exist to create such objects (<a href="/about/drc_ref_global.xml#edge">edge</a>, <a href="/about/drc_ref_global.xml#polygon">polygon</a>, <a href="/about/drc_ref_global.xml#box">box</a> and <a href="/about/drc_ref_#global.xml#path">#global#path</a>).
+Convenience methods exist to create such objects (<a href="/about/drc_ref_global.xml#edge">edge</a>, <a href="/about/drc_ref_global.xml#polygon">polygon</a>, <a href="/about/drc_ref_global.xml#box">box</a> and <a href="/about/drc_ref_global.xml#path">path</a>).
 However, RBA constructors can used as well.
 </p><p>
 The insert method is useful in combination with the <a href="/about/drc_ref_global.xml#polygon_layer">polygon_layer</a> or <a href="/about/drc_ref_global.xml#edge_layer">edge_layer</a> functions: 
@@ -1516,7 +1516,7 @@ See <a href="#isolated">isolated</a> for a description of that method
 </ul>
 <p>
 <b>Note: </b>"isolated" and "iso" are available as operators for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
-the <a href="#DRC">DRC</a> framework. These variants have more options and are more intuitive to use. See <a href="/about/drc_ref_global.xml#isolated">isolated</a> for more details.
+the <a href="/about/drc_ref_drc.xml">DRC</a> framework. These variants have more options and are more intuitive to use. See <a href="/about/drc_ref_global.xml#isolated">isolated</a> for more details.
 </p><p>
 See <a href="#space">space</a> for a description of this method. "isolated" is the space check variant which checks different polygons only.
 In contrast to <a href="#space">space</a>, the "isolated"
@@ -1922,7 +1922,7 @@ is <a href="#select_not_overlapping">select_not_overlapping</a>.
 </ul>
 <p>
 <b>Note: </b>"notch" is available as an operator for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
-the <a href="#DRC">DRC</a> framework. This variant has more options and is more intuitive to use. See <a href="/about/drc_ref_global.xml#notch">notch</a> for more details.
+the <a href="/about/drc_ref_drc.xml">DRC</a> framework. This variant has more options and is more intuitive to use. See <a href="/about/drc_ref_global.xml#notch">notch</a> for more details.
 </p><p>
 See <a href="#space">space</a> for a description of this method. 
 "notch" is the space check variant which finds space violations within a single polygon, but not against other polygons.
@@ -2061,7 +2061,7 @@ This method is available for edge layers. The argument must be a polygon layer.
 </ul>
 <p>
 <b>Note: </b>"overlap" is available as an operator for the "universal DRC" function <a href="#drc">drc</a> within
-the <a href="#DRC">DRC</a> framework. This variant has more options and is more intuitive to use. 
+the <a href="/about/drc_ref_drc.xml">DRC</a> framework. This variant has more options and is more intuitive to use. 
 See <a href="/about/drc_ref_global.xml#overlap">overlap</a> for more details.
 </p><p>
 This method checks whether layer and other_layer overlap by at least the
@@ -2591,7 +2591,7 @@ See <a href="#separation">separation</a> for a description of that method
 </ul>
 <p>
 <b>Note: </b>"separation" and "sep" are available as operators for the "universal DRC" function <a href="#drc">drc</a> within
-the <a href="#DRC">DRC</a> framework. These variants have more options and are more intuitive to use. 
+the <a href="/about/drc_ref_drc.xml">DRC</a> framework. These variants have more options and are more intuitive to use. 
 See <a href="/about/drc_ref_global.xml#separation">separation</a> for more details.
 </p><p>
 This method performs a two-layer spacing check. Like <a href="#space">space</a>, this method
@@ -2810,7 +2810,7 @@ not modify the layer but returns a snapped copy.
 </ul>
 <p>
 <b>Note: </b>"space" is available as an operator for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
-the <a href="#DRC">DRC</a> framework. This variant has more options and is more intuitive to use. See <a href="/about/drc_ref_global.xml#space">space</a> for more details.
+the <a href="/about/drc_ref_drc.xml">DRC</a> framework. This variant has more options and is more intuitive to use. See <a href="/about/drc_ref_global.xml#space">space</a> for more details.
 </p><p>
 This method performs a space check and returns a collection of edge pairs.
 A space check can be performed on polygon and edge layers. On edge layers, all
@@ -3092,7 +3092,7 @@ The following image shows the effect of the "moved" method:
 </ul>
 <p>
 <b>Note: </b>"width" is available as an operator for the "universal DRC" function <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> within
-the <a href="#DRC">DRC</a> framework. This variant has more options and is more intuitive to use. See <a href="/about/drc_ref_global.xml#width">width</a> for more details.
+the <a href="/about/drc_ref_drc.xml">DRC</a> framework. This variant has more options and is more intuitive to use. See <a href="/about/drc_ref_global.xml#width">width</a> for more details.
 </p><p>
 This method performs a width check and returns a collection of edge pairs.
 A width check can be performed on polygon and edge layers. On edge layers, all

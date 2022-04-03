@@ -100,7 +100,7 @@ See <a href="/about/lvs_ref_netter.xml#ignore_parameter">Netter#ignore_parameter
 <p>
 See <a href="/about/lvs_ref_netter.xml#join_symmetric_nets">Netter#join_symmetric_nets</a> for a description of that function.
 </p>
-<a name="lvs_data"/><h2>"lvs_data" - Gets the <a href="#LayoutVsSchematic">LayoutVsSchematic</a> object after compare was used</h2>
+<a name="lvs_data"/><h2>"lvs_data" - Gets the <class_doc href="LayoutVsSchematic">LayoutVsSchematic</class_doc> object after compare was used</h2>
 <keyword name="lvs_data"/>
 <p>Usage:</p>
 <ul>

@@ -49,7 +49,7 @@ ResourceHelpProvider::ResourceHelpProvider (const char *folder, const std::strin
 }
 
 QDomDocument 
-ResourceHelpProvider::get (const std::string &path) const
+ResourceHelpProvider::get (lay::HelpSource * /*src*/, const std::string &path) const
 {
   QString qpath = tl::to_qstring (path);
   QResource res (resource_url (qpath));

@@ -324,7 +324,7 @@ module DRC
     # whether to use named nets (numbers if false) and whether to add 
     # information comments such as instance coordinates or pin names.
     #
-    # "writer_delegate" allows using a \NetlistSpiceWriterDelegate object to 
+    # "writer_delegate" allows using a RBA::NetlistSpiceWriterDelegate object to 
     # control the actual writing.
 
     def write_spice(*args)

@@ -744,6 +744,10 @@ ApplicationBase::init_app ()
   //  run all early autorun macros
   lym::MacroCollection::root ().autorun_early ();
 
+  //  redo gsi::initialize as the macros may have registered new external classes
+  //  through the "doc to external class" mechanism.
+  gsi::initialize ();
+
   //  rescan the folders because early autorun macros might have added 
   //  suffixes through the MacroInterpreter interface.
   lym::MacroCollection::root ().rescan ();

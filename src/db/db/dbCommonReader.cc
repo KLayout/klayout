@@ -470,7 +470,7 @@ CommonReaderBase::open_dl (db::Layout &layout, const LDPair &dl)
 std::pair <bool, unsigned int>
 CommonReaderBase::open_dl_uncached (db::Layout &layout, const LDPair &dl)
 {
-  const std::set<unsigned int> &li = m_layer_map.logical (dl, layout);
+  std::set<unsigned int> li = m_layer_map.logical (dl, layout);
   if (li.empty ()) {
 
     if (! m_create_layers) {

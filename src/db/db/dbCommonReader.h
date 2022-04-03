@@ -262,7 +262,7 @@ protected:
    */
   db::LayerMap &layer_map ()
   {
-    return m_layer_map_out;
+    return m_layer_map;
   }
 
   /**
@@ -274,7 +274,7 @@ protected:
   }
 
   /**
-   *  @brief Enters the a layer with a given layer/datatype
+   *  @brief Enters the layer with a given layer/datatype
    */
   std::pair <bool, unsigned int> open_dl (db::Layout &layout, const LDPair &dl);
 

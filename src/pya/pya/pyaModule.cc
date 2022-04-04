@@ -632,6 +632,14 @@ static std::string extract_python_name (const std::string &name)
 static void
 pya_object_deallocate (PyObject *self)
 {
+  //  This avoids an assertion in debug builds (Python, gcmodule.c - update_refs).
+  //  In short, the GC expects not to see objects with refcount 0 and asserts.
+  //  However, due to triggering of signals or similar, the destructor call below
+  //  may trigger a GC (https://github.com/KLayout/klayout/issues/1054).
+  //  According to the comments this may be turned into a release mode assertion, so
+  //  we better work around it.
+  ++self->ob_refcnt;
+
   PYAObjectBase *p = PYAObjectBase::from_pyobject (self);
   p->~PYAObjectBase ();
   Py_TYPE (self)->tp_free (self);

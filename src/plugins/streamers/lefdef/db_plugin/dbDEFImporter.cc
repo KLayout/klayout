@@ -139,8 +139,15 @@ DEFImporter::get_def_ext (const std::string &ln, const std::pair<db::Coord, db::
   //  This implementation assumes the "preferred width" is controlling the default extension and it is
   //  identical to the minimum effective width. This is true if "LEF58_MINWIDTH" with "WRONGDIRECTION" is
   //  used in the proposed way. Which is to specify a larger width for the "wrong" direction.
+#if 0
+  //  This implementation tries to use LEF wire extension if given
   db::Coord de = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, std::min (wxy.first, wxy.second) * 0.5 * dbu) / dbu);
   return std::make_pair (de, de);
+#else
+  //  This implementation follows the LEFDEF 5.8 spec saying the "default extension is half the wire width":
+  db::Coord de = std::min (wxy.first, wxy.second) / 2;
+  return std::make_pair (de, de);
+#endif
 }
 
 void
@@ -379,7 +386,11 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
         //  compute begin extension
         db::Coord be = 0;
         if (pt0 == pts.begin ()) {
-          be = ext.front ().first;
+          if (pt0->x () == pt0 [1].x ()) {
+            be = ext.front ().second;
+          } else {
+            be = ext.front ().first;
+          }
         } else if (was_path_before) {
           //  provides the overlap to the previous segment
           be = wxy_perp / 2;
@@ -388,7 +399,11 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
         //  compute end extension
         db::Coord ee = 0;
         if (pt + 1 == pts.end ()) {
-          ee = ext.back ().first;
+          if (pt [-1].x () == pt->x ()) {
+            ee = ext.back ().second;
+          } else {
+            ee = ext.back ().first;
+          }
         }
 
 #if 0

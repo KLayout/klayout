@@ -485,6 +485,12 @@ LEFImporter::read_viadef_by_rule (RuleBasedViaGenerator *vg, ViaDesc &via_desc, 
 
       test (";");
 
+    } else if (test ("PATTERNNAME")) {
+
+      get ();  //  ignore
+
+      test (";");
+
     } else if (test ("PATTERN")) {
 
       vg->set_pattern (get ());

@@ -974,7 +974,7 @@ See <a href="#enclosing">enclosing</a> for more details about the various ways t
 </tr>
 </table>
 </p>
-<a name="l2n_data"/><h2>"l2n_data" - Gets the internal <class_doc href="LayoutToNetlist">LayoutToNetlist</class_doc> object for the default <a href="#Netter">Netter</a></h2>
+<a name="l2n_data"/><h2>"l2n_data" - Gets the internal <class_doc href="LayoutToNetlist">LayoutToNetlist</class_doc> object for the default <a href="/about/drc_ref_netter.xml">Netter</a></h2>
 <keyword name="l2n_data"/>
 <p>Usage:</p>
 <ul>
@@ -1036,7 +1036,7 @@ l2 = layout("second_layout.gds")
 (input(1, 0) ^ l2.input(1, 0)).output(100, 0)
 </pre>
 </p><p>
-For further methods on the source object see <a href="#Source">Source</a>.
+For further methods on the source object see <a href="/about/drc_ref_source.xml">Source</a>.
 </p>
 <a name="length (in condition)"/><h2>"length (in condition)" - Computes the total edge length of an edge layer or in universal DRC context: selects edges based on a length condition</h2>
 <keyword name="length (in condition)"/>
@@ -1166,7 +1166,7 @@ four-terminal MOS transistor.
 See <class_doc href="DeviceExtractorMOS4Transistor">DeviceExtractorMOS4Transistor</class_doc> for more details
 about this extractor (non-strict mode applies for 'mos4').
 </p>
-<a name="netlist"/><h2>"netlist" - Obtains the extracted netlist from the default <a href="#Netter">Netter</a></h2>
+<a name="netlist"/><h2>"netlist" - Obtains the extracted netlist from the default <a href="/about/drc_ref_netter.xml">Netter</a></h2>
 <keyword name="netlist"/>
 <p>
 The netlist is a <class_doc href="Netlist">Netlist</class_doc> object. If no netlist is extracted 
@@ -1286,7 +1286,7 @@ rectangle error filtering.
 <h3>Classic mode </h3>
 </p><p>
 Like other checks, this function is available as a classic DRC function with a layer as the first
-argument and as an <a href="#DRC">DRC</a> expression operator for use with <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>.
+argument and as an <a href="/about/drc_ref_drc.xml">DRC</a> expression operator for use with <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>.
 </p><p>
 <pre>
 # classic "overlap" check for &lt; 0.2 um
@@ -1439,6 +1439,46 @@ is equivalent to "layer.rectilinear" (see <a href="/about/drc_ref_layer.xml#rect
 argument, "rectilinear" represents the rectilinear polygons filter for primary shapes in 
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#rectilinear">DRC#rectilinear</a> for more details).
 </p>
+<a name="region_overlap"/><h2>"region_overlap" - Specifies region selected input in "overlap mode"</h2>
+<keyword name="region_overlap"/>
+<p>Usage:</p>
+<ul>
+<li><tt>region_overlap(args)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_source.xml#overlapping">Source#overlapping</a> for a description of that function.
+</p><p>
+The following code will select shapes overlapping a 500x600 micron rectangle (lower left corner at 0,0) 
+from the input layout. The shapes will not be clipped:
+</p><p>
+<pre>
+region_overlapping(0.mm, 0.mm, 0.5.mm, 0.6.mm)
+# shapes will now be the ones overlapping the rectangular region
+l1 = input(1, 0)
+</pre>
+</p><p>
+To remove this condition, call "region_overlapping" without any arguments.
+</p>
+<a name="region_touch"/><h2>"region_touch" - Specifies region selected input in "touch mode"</h2>
+<keyword name="region_touch"/>
+<p>Usage:</p>
+<ul>
+<li><tt>region_touch(args)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_source.xml#touching">Source#touching</a> for a description of that function.
+</p><p>
+The following code will select shapes touching a 500x600 micron rectangle (lower left corner at 0,0) 
+from the input layout. The shapes will not be clipped:
+</p><p>
+<pre>
+region_touch(0.mm, 0.mm, 0.5.mm, 0.6.mm)
+# shapes will now be the ones touching the rectangular region
+l1 = input(1, 0)
+</pre>
+</p><p>
+To remove this condition, call "region_touch" without any arguments.
+</p>
 <a name="relative_height"/><h2>"relative_height" - Selects primary shapes based on the ratio of height and width of their bounding boxes</h2>
 <keyword name="relative_height"/>
 <p>Usage:</p>
@@ -1586,7 +1626,7 @@ rectangle error filtering.
 <h3>Classic mode </h3>
 </p><p>
 Like <a href="#enclosing">enclosing</a>, this function is available as a classic DRC function with a layer as the first
-argument and as an <a href="#DRC">DRC</a> expression operator for use with <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>.
+argument and as an <a href="/about/drc_ref_drc.xml">DRC</a> expression operator for use with <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>.
 </p><p>
 <pre>
 # classic "separation" check for distance &lt; 0.2 um
@@ -1705,7 +1745,7 @@ l2 = layout("second_layout.gds")
 (input(1, 0) ^ l2.input(1, 0)).output(100, 0)
 </pre>
 </p><p>
-For further methods on the source object see <a href="#Source">Source</a>.
+For further methods on the source object see <a href="/about/drc_ref_source.xml">Source</a>.
 </p>
 <a name="space"/><h2>"space" - Performs a space check</h2>
 <keyword name="space"/>
@@ -2024,7 +2064,7 @@ specify SPICE format.
 whether to use named nets (numbers if false) and whether to add 
 information comments such as instance coordinates or pin names.
 </p><p>
-"writer_delegate" allows using a <a href="#NetlistSpiceWriterDelegate">NetlistSpiceWriterDelegate</a> object to 
+"writer_delegate" allows using a <class_doc href="NetlistSpiceWriterDelegate">NetlistSpiceWriterDelegate</class_doc> object to 
 control the actual writing.
 </p>
 </doc>

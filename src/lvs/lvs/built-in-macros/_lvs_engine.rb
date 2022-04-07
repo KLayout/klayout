@@ -210,7 +210,7 @@ module LVS
 
     # %LVS%
     # @name lvs_data
-    # @brief Gets the \LayoutVsSchematic object after compare was used
+    # @brief Gets the RBA::LayoutVsSchematic object after compare was used
     # @synopsis lvs_data
     # See \Netter#lvs_data for a description of that function.
 

@@ -1197,6 +1197,7 @@ private:
   struct Via {
     Via () : bottom_mask (0), cut_mask (0), top_mask (0) { }
     std::string name;
+    std::string nondefaultrule;
     unsigned int bottom_mask, cut_mask, top_mask;
     db::Trans trans;
   };
@@ -1283,17 +1284,17 @@ public:
    *
    *  The generator is capable of creating a via for a specific mask configuration
    */
-  void register_via_cell (const std::string &vn, LEFDEFLayoutGenerator *generator);
+  void register_via_cell (const std::string &vn, const std::string &nondefaultrule, LEFDEFLayoutGenerator *generator);
 
   /**
    *  @brief Gets the via cell for the given via name or 0 if no such via is registered
    */
-  db::Cell *via_cell (const std::string &vn, Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm);
+  db::Cell *via_cell (const std::string &vn, const std::string &nondefaultrule, Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm);
 
   /**
    *  @brief Gets the via generator for a given via name or 0 if there is no such generator
    */
-  LEFDEFLayoutGenerator *via_generator (const std::string &vn);
+  LEFDEFLayoutGenerator *via_generator (const std::string &vn, const std::string &nondefaultrule);
 
   /**
    *  @brief Registers a macro generator for the macro with the given name
@@ -1338,19 +1339,22 @@ private:
    */
   struct ViaKey
   {
-    ViaKey (const std::string &n, unsigned int mb, unsigned int mc, unsigned int mt)
-      : name (n), mask_bottom (mb), mask_cut (mc), mask_top (mt)
+    ViaKey (const std::string &n, const std::string &ndr, unsigned int mb, unsigned int mc, unsigned int mt)
+      : name (n), nondefaultrule (ndr), mask_bottom (mb), mask_cut (mc), mask_top (mt)
     { }
 
     bool operator== (const ViaKey &other) const
     {
-      return name == other.name && mask_bottom == other.mask_bottom && mask_cut == other.mask_cut && mask_top == other.mask_top;
+      return name == other.name && nondefaultrule == other.nondefaultrule && mask_bottom == other.mask_bottom && mask_cut == other.mask_cut && mask_top == other.mask_top;
     }
 
     bool operator< (const ViaKey &other) const
     {
       if (name != other.name) {
         return name < other.name;
+      }
+      if (nondefaultrule != other.nondefaultrule) {
+        return nondefaultrule < other.nondefaultrule;
       }
       if (mask_bottom != other.mask_bottom) {
         return mask_bottom < other.mask_bottom;
@@ -1364,7 +1368,7 @@ private:
       return false;
     }
 
-    std::string name;
+    std::string name, nondefaultrule;
     unsigned int mask_bottom, mask_cut, mask_top;
   };
 
@@ -1413,7 +1417,7 @@ private:
   std::map<std::string, int> m_default_number;
   const LEFDEFReaderOptions *mp_tech_comp;
   std::map<ViaKey, db::Cell *> m_via_cells;
-  std::map<std::string, LEFDEFLayoutGenerator *> m_via_generators;
+  std::map<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *> m_via_generators;
   std::map<MacroKey, std::pair<db::Cell *, db::Trans> > m_macro_cells;
   std::map<std::string, LEFDEFLayoutGenerator *> m_macro_generators;
   std::map<std::string, db::cell_index_type> m_foreign_cells;

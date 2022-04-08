@@ -410,6 +410,13 @@ TEST(23)
   run_test (_this, "def14", "map:test.map+lef:tech.lef+lef:stdlib.lef+def:test.def", "au.oas.gz", opt);
 }
 
+TEST(24)
+{
+  db::LEFDEFReaderOptions opt = default_options ();
+  opt.set_macro_resolution_mode (1);
+  run_test (_this, "def15", "map:test.map+lef:tech.lef+def:test.def", "au.oas.gz", opt);
+}
+
 TEST(100)
 {
   run_test (_this, "issue-172", "lef:in.lef+def:in.def", "au.oas.gz", default_options (), false);

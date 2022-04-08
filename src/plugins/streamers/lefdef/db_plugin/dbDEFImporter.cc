@@ -695,7 +695,7 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
           unsigned int mask_cut = (mask / 10) % 10;
           unsigned int mask_bottom = mask % 10;
 
-          db::Cell *cell = reader_state ()->via_cell (vn, layout, mask_bottom, mask_cut, mask_top, &m_lef_importer);
+          db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, mask_bottom, mask_cut, mask_top, &m_lef_importer);
           if (cell) {
             if (nx <= 1 && ny <= 1) {
               design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), db::Vector (pts.back ()))));
@@ -874,7 +874,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
           std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
           if (vd != m_via_desc.end ()) {
             //  TODO: no mask specification here?
-            db::Cell *cell = reader_state ()->via_cell (vn, layout, 0, 0, 0, &m_lef_importer);
+            db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, 0, 0, 0, &m_lef_importer);
             if (cell) {
               design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), pt)));
             }
@@ -1105,9 +1105,9 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
     if (rule_based_vg.get () && geo_based_vg.get ()) {
       error (tl::to_string (tr ("A via can only be defined through a VIARULE or geometry, not both ways")));
     } else if (rule_based_vg.get ()) {
-      reader_state ()->register_via_cell (n, rule_based_vg.release ());
+      reader_state ()->register_via_cell (n, std::string (), rule_based_vg.release ());
     } else if (geo_based_vg.get ()) {
-      reader_state ()->register_via_cell (n, geo_based_vg.release ());
+      reader_state ()->register_via_cell (n, std::string (), geo_based_vg.release ());
     } else {
       error (tl::to_string (tr ("Too little information to generate a via")));
     }

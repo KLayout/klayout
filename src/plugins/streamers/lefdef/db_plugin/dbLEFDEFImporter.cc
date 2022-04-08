@@ -389,7 +389,7 @@ GeometryBasedLayoutGenerator::create_cell (LEFDEFReaderState &reader, Layout &la
 
   for (std::list<Via>::const_iterator v = m_vias.begin (); v != m_vias.end (); ++v) {
 
-    LEFDEFLayoutGenerator *g = reader.via_generator (v->name);
+    LEFDEFLayoutGenerator *g = reader.via_generator (v->name, v->nondefaultrule);
     if (! g) {
       continue;
     }
@@ -401,7 +401,7 @@ GeometryBasedLayoutGenerator::create_cell (LEFDEFReaderState &reader, Layout &la
     unsigned mshift_cut = get_maskshift (msl [1], ext_msl, masks);
     unsigned mshift_top = get_maskshift (msl [2], ext_msl, masks);
 
-    db::Cell *vc = reader.via_cell (v->name, layout,
+    db::Cell *vc = reader.via_cell (v->name, v->nondefaultrule, layout,
                                     combine_maskshifts (msl [0], v->bottom_mask, mshift_bottom, nm),
                                     combine_maskshifts (msl [1], v->cut_mask, mshift_cut, nm),
                                     combine_maskshifts (msl [2], v->top_mask, mshift_top, nm),
@@ -886,7 +886,7 @@ LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout 
 
 LEFDEFReaderState::~LEFDEFReaderState ()
 {
-  for (std::map<std::string, LEFDEFLayoutGenerator *>::const_iterator i = m_via_generators.begin (); i != m_via_generators.end (); ++i) {
+  for (std::map<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *>::const_iterator i = m_via_generators.begin (); i != m_via_generators.end (); ++i) {
     delete i->second;
   }
 
@@ -1628,18 +1628,22 @@ LEFDEFReaderState::finish (db::Layout &layout)
 }
 
 void
-LEFDEFReaderState::register_via_cell (const std::string &vn, LEFDEFLayoutGenerator *generator)
+LEFDEFReaderState::register_via_cell (const std::string &vn, const std::string &nondefaultrule, LEFDEFLayoutGenerator *generator)
 {
-  if (m_via_generators.find (vn) != m_via_generators.end ()) {
-    delete m_via_generators [vn];
+  if (m_via_generators.find (std::make_pair (vn, nondefaultrule)) != m_via_generators.end ()) {
+    delete m_via_generators [std::make_pair (vn, nondefaultrule)];
   }
-  m_via_generators [vn] = generator;
+  m_via_generators [std::make_pair (vn, nondefaultrule)] = generator;
 }
 
 LEFDEFLayoutGenerator *
-LEFDEFReaderState::via_generator (const std::string &vn)
+LEFDEFReaderState::via_generator (const std::string &vn, const std::string &nondefaultrule)
 {
-  std::map<std::string, LEFDEFLayoutGenerator *>::const_iterator g = m_via_generators.find (vn);
+  std::map<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *>::const_iterator g = m_via_generators.find (std::make_pair (vn, nondefaultrule));
+  if (g == m_via_generators.end () && ! nondefaultrule.empty ()) {
+    //  default rule is fallback
+    g = m_via_generators.find (std::make_pair (vn, std::string ()));
+  }
   if (g != m_via_generators.end ()) {
     return g->second;
   } else {
@@ -1648,15 +1652,19 @@ LEFDEFReaderState::via_generator (const std::string &vn)
 }
 
 db::Cell *
-LEFDEFReaderState::via_cell (const std::string &vn, db::Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm)
+LEFDEFReaderState::via_cell (const std::string &vn, const std::string &nondefaultrule, db::Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm)
 {
-  ViaKey vk (vn, mask_bottom, mask_cut, mask_top);
+  ViaKey vk (vn, nondefaultrule, mask_bottom, mask_cut, mask_top);
   std::map<ViaKey, db::Cell *>::const_iterator i = m_via_cells.find (vk);
   if (i == m_via_cells.end ()) {
 
     db::Cell *cell = 0;
 
-    std::map<std::string, LEFDEFLayoutGenerator *>::const_iterator g = m_via_generators.find (vn);
+    std::map<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *>::const_iterator g = m_via_generators.find (std::make_pair (vn, nondefaultrule));
+    if (g == m_via_generators.end () && ! nondefaultrule.empty ()) {
+      //  default rule is fallback
+      g = m_via_generators.find (std::make_pair (vn, std::string ()));
+    }
     if (g != m_via_generators.end ()) {
 
       LEFDEFLayoutGenerator *vg = g->second;

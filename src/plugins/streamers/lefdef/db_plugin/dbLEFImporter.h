@@ -147,7 +147,7 @@ private:
   std::vector <db::Trans> get_iteration (double dbu);
   void read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes = 0, properties_id_type prop_id = 0);
   void read_nondefaultrule (Layout &layout);
-  void read_viadef (Layout &layout);
+  void read_viadef (Layout &layout, const std::string &nondefaultrule);
   void read_viadef_by_rule (RuleBasedViaGenerator *vg, ViaDesc &desc, const std::string &n, double dbu);
   void read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc &desc, const std::string &n, double dbu);
   void read_layer (Layout &layout);

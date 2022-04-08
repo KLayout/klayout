@@ -1008,6 +1008,10 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
         rule_based_vg->set_rows (get_long ());
         rule_based_vg->set_columns (get_long ());
 
+      } else if (test ("PATTERNNAME")) {
+
+        get ();  //  ignore
+
       } else if (test ("PATTERN")) {
 
         if (! rule_based_vg.get ()) {

@@ -848,6 +848,11 @@ TEST(130_viasize)
   run_test (_this, "viasize", "map:test.map+lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
 }
 
+TEST(131_patternname)
+{
+  run_test (_this, "patternname", "map:v.map+lef:v.lef+def:v.def", "au.oas.gz", default_options (), false);
+}
+
 TEST(200_lefdef_plugin)
 {
   db::Layout ly;

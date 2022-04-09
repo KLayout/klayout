@@ -1702,6 +1702,13 @@ public:
   unsigned int waste_layer () const;
 
   /**
+   *  @brief Gets the error layer
+   *
+   *  The error layer is used to display error messages.
+   */
+  unsigned int error_layer () const;
+
+  /**
    *  @brief Set the properties for a specified layer
    */
   void set_properties (unsigned int i, const LayerProperties &props);
@@ -1883,6 +1890,7 @@ private:
   lib_proxy_map m_lib_proxy_map;
   int m_guiding_shape_layer;
   int m_waste_layer;
+  int m_error_layer;
   bool m_do_cleanup;
   bool m_editable;
   meta_info m_meta_info;

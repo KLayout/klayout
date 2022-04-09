@@ -160,6 +160,21 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
 
   }
 
+  {
+    //  render error layer
+
+    db::RecursiveShapeIterator shapes (layout, cell, layout.error_layer ());
+    while (! shapes.at_end ()) {
+
+      for (db::CellInstArray::iterator arr = inst.begin (); ! arr.at_end (); ++arr) {
+        r.draw (*shapes, tr * inst.complex_trans (*arr) * shapes.trans (), fill, contour, 0 /*use vertex for origin*/, text);
+      }
+
+      ++shapes;
+
+    }
+  }
+
   // render the origins
   if (render_origins && vertex) {
 

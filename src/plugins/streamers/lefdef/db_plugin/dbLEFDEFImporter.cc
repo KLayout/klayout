@@ -1669,17 +1669,23 @@ LEFDEFReaderState::via_cell (const std::string &vn, const std::string &nondefaul
 
       LEFDEFLayoutGenerator *vg = g->second;
 
-      std::string mask_suffix;
-      if (mask_bottom > 0 || mask_cut > 0 || mask_top > 0) {
-        mask_suffix += "_";
-        mask_suffix += tl::to_string (mask_bottom);
-        mask_suffix += "_";
-        mask_suffix += tl::to_string (mask_cut);
-        mask_suffix += "_";
-        mask_suffix += tl::to_string (mask_top);
+      std::string n = vn;
+
+      if (! nondefaultrule.empty ()) {
+        n += "_";
+        n += nondefaultrule;
       }
 
-      std::string cn = mp_tech_comp->via_cellname_prefix () + vn + mask_suffix;
+      if (mask_bottom > 0 || mask_cut > 0 || mask_top > 0) {
+        n += "_";
+        n += tl::to_string (mask_bottom);
+        n += "_";
+        n += tl::to_string (mask_cut);
+        n += "_";
+        n += tl::to_string (mask_top);
+      }
+
+      std::string cn = mp_tech_comp->via_cellname_prefix () + n;
       cell = &layout.cell (make_cell (layout, cn.c_str ()));
 
       std::vector<unsigned int> masks;

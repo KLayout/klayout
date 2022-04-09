@@ -2565,8 +2565,15 @@ Layout::restore_proxies (ImportLayerMapping *layer_mapping)
     }
   }
 
+  bool needs_cleanup = false;
   for (std::vector<db::ColdProxy *>::const_iterator p = cold_proxies.begin (); p != cold_proxies.end (); ++p) {
-    recover_proxy_as ((*p)->cell_index (), (*p)->context_info (), layer_mapping);
+    if (recover_proxy_as ((*p)->cell_index (), (*p)->context_info (), layer_mapping)) {
+      needs_cleanup = true;
+    }
+  }
+
+  if (needs_cleanup) {
+    cleanup ();
   }
 }
 

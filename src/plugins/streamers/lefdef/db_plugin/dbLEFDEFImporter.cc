@@ -1655,25 +1655,29 @@ db::Cell *
 LEFDEFReaderState::via_cell (const std::string &vn, const std::string &nondefaultrule, db::Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm)
 {
   ViaKey vk (vn, nondefaultrule, mask_bottom, mask_cut, mask_top);
+
+  std::map<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *>::const_iterator g = m_via_generators.find (std::make_pair (vn, nondefaultrule));
+
+  if (g == m_via_generators.end () && ! vk.nondefaultrule.empty ()) {
+    //  default rule is fallback
+    g = m_via_generators.find (std::make_pair (vn, std::string ()));
+    vk.nondefaultrule.clear ();
+  }
+
   std::map<ViaKey, db::Cell *>::const_iterator i = m_via_cells.find (vk);
   if (i == m_via_cells.end ()) {
 
     db::Cell *cell = 0;
 
-    std::map<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *>::const_iterator g = m_via_generators.find (std::make_pair (vn, nondefaultrule));
-    if (g == m_via_generators.end () && ! nondefaultrule.empty ()) {
-      //  default rule is fallback
-      g = m_via_generators.find (std::make_pair (vn, std::string ()));
-    }
     if (g != m_via_generators.end ()) {
 
       LEFDEFLayoutGenerator *vg = g->second;
 
       std::string n = vn;
 
-      if (! nondefaultrule.empty ()) {
+      if (! vk.nondefaultrule.empty ()) {
         n += "_";
-        n += nondefaultrule;
+        n += vk.nondefaultrule;
       }
 
       if (mask_bottom > 0 || mask_cut > 0 || mask_top > 0) {

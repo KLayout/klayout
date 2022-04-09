@@ -1561,6 +1561,14 @@ Layout::allocate_new_cell ()
 }
 
 void
+Layout::refresh ()
+{
+  for (iterator c = begin (); c != end (); ++c) {
+    c->update ();
+  }
+}
+
+void
 Layout::cleanup (const std::set<db::cell_index_type> &keep)
 {
   //  only managed layouts will receive cleanup requests. Never library container layouts - these

@@ -148,6 +148,7 @@ Library::is_retired (const db::cell_index_type library_cell_index) const
 void
 Library::refresh ()
 {
+  layout ().refresh ();
   remap_to (this);
 }
 

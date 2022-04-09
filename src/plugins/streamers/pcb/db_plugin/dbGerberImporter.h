@@ -445,7 +445,7 @@ protected:
    *  @brief Flush the stored data to the output
    *  This method is similar to collect(), but writes the data to the layout.
    */
-  void flush ();
+  void flush (const std::string &net_name = std::string ());
 
   /**
    *  @brief Collects the data taken so far into the given region

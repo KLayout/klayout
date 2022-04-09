@@ -50,7 +50,10 @@ public:
 
   bool equal_impl (void *, void *) const;
   bool less_impl (void *, void *) const;
+  tl::Variant to_variant_impl (void *) const;
   std::string to_string_impl (void *) const;
+  int to_int_impl (void *) const;
+  double to_double_impl (void *) const;
 
   virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const;
 

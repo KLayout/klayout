@@ -320,7 +320,7 @@ TEST(7)
 
 TEST(10)
 {
-  run_test (_this, "def1", "lef:in.lef+def:in.def", "au.oas.gz", default_options ());
+  run_test (_this, "def1", "lef:in.lef+def:in.def", "au2.oas.gz", default_options ());
 }
 
 TEST(11)
@@ -339,7 +339,7 @@ TEST(12)
 
 TEST(13)
 {
-  run_test (_this, "def4", "lef:in.lef+def:in.def", "au.oas.gz", default_options ());
+  run_test (_this, "def4", "lef:in.lef+def:in.def", "au2.oas.gz", default_options ());
 }
 
 TEST(14)
@@ -414,7 +414,7 @@ TEST(24)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_macro_resolution_mode (1);
-  run_test (_this, "def15", "map:test.map+lef:tech.lef+def:test.def", "au.oas.gz", opt);
+  run_test (_this, "def15", "map:test.map+lef:tech.lef+def:test.def", "au2.oas.gz", opt);
 }
 
 TEST(100)

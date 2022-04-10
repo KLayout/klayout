@@ -2891,10 +2891,14 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "This method has been introduced in version 0.22.\n"
   ) +
   gsi::method_ext ("refresh", &refresh,
-    "@brief Refreshes the cell\n"
+    "@brief Refreshes a proxy cell\n"
     "\n"
-    "If the cell is a PCell or a proxy to a PCell in a library, this method recomputes the PCell.\n"
+    "If the cell is a PCell variant, this method recomputes the PCell.\n"
     "If the cell is a library proxy, this method reloads the information from the library, but not the library itself.\n"
+    "Note that if the cell is an PCell variant for a PCell coming from a library, this method will not recompute the PCell. "
+    "Instead, you can use \\Library#refresh to recompute all PCells from that library.\n"
+    "\n"
+    "You can use \\Layout#refresh to refresh all cells from a layout.\n"
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +

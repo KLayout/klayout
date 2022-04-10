@@ -237,6 +237,7 @@ LibraryClass decl_Library ("db", "Library",
   gsi::method ("refresh", &db::Library::refresh,
     "@brief Updates all layouts using this library.\n"
     "This method will retire cells or update layouts in the attached clients.\n"
+    "It will also recompute the PCells inside the library. "
     "\n"
     "This method has been introduced in version 0.27.8."
   ),

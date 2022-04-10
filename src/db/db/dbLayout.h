@@ -1633,6 +1633,14 @@ public:
   void cleanup (const std::set<db::cell_index_type> &keep = std::set<db::cell_index_type> ());
 
   /**
+   *  @brief Calls "update" on all cells of the layout
+   *
+   *  This will update PCells stored inside this layout, but will *not* update
+   *  PCells which are imported from a library.
+   */
+  void refresh ();
+
+  /**
    *  @brief Implementation of the undo operations
    */
   virtual void undo (db::Op *op);

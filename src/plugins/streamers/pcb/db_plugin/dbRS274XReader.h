@@ -80,6 +80,7 @@ private:
   std::map<std::string, std::string> m_aperture_macros;
   enum { ab_xy, ab_yx } m_axis_mapping;
   RS274XApertureBase *m_current_aperture;
+  std::string m_net_name;
 
   void read_as_parameter (const std::string &block);
   void read_fs_parameter (const std::string &block);
@@ -103,6 +104,7 @@ private:
   void read_lp_parameter (const std::string &block);
   void read_sr_parameter (const std::string &block);
   void read_if_parameter (const std::string &block);
+  bool read_net_name (const std::string &block, std::string &net_name) const;
   void install_block_aperture (const std::string &dcode, const db::Region &region);
   void process_mcode (int mcode);
   const std::string &get_block ();

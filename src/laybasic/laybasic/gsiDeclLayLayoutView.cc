@@ -1984,6 +1984,9 @@ static std::string get_technology (const lay::CellViewRef *cv)
 
 static tl::Event &get_technology_changed_event (lay::CellViewRef *cv)
 {
+  if (! cv->is_valid ()) {
+    throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cellview")));
+  }
   return (*cv)->technology_changed_event;
 }
 

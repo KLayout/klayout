@@ -1820,6 +1820,10 @@ Variant::to_int128 () const
     __int128 l = 0;
     ex.read (l);
     return l;
+  } else if (m_type == t_user) {
+    return m_var.mp_user.cls->to_int (m_var.mp_user.object);
+  } else if (m_type == t_user_ref) {
+    return m_var.mp_user_ref.cls->to_int (m_var.mp_user_ref.cls->deref_proxy_const (reinterpret_cast <const tl::WeakOrSharedPtr *> (m_var.mp_user_ref.ptr)->get ()));
   } else {
     return 0;
   }
@@ -1875,6 +1879,10 @@ Variant::to_ulonglong () const
     unsigned long long l = 0;
     tl::from_string (to_string (), l);
     return l;
+  } else if (m_type == t_user) {
+    return (unsigned long long) m_var.mp_user.cls->to_int (m_var.mp_user.object);
+  } else if (m_type == t_user_ref) {
+    return (unsigned long long) m_var.mp_user_ref.cls->to_int (m_var.mp_user_ref.cls->deref_proxy_const (reinterpret_cast <const tl::WeakOrSharedPtr *> (m_var.mp_user_ref.ptr)->get ()));
   } else {
     return 0;
   }
@@ -1929,6 +1937,10 @@ Variant::to_longlong () const
     long long l = 0;
     tl::from_string (to_string (), l);
     return l;
+  } else if (m_type == t_user) {
+    return (long long) m_var.mp_user.cls->to_int (m_var.mp_user.object);
+  } else if (m_type == t_user_ref) {
+    return (long long) m_var.mp_user_ref.cls->to_int (m_var.mp_user_ref.cls->deref_proxy_const (reinterpret_cast <const tl::WeakOrSharedPtr *> (m_var.mp_user_ref.ptr)->get ()));
   } else {
     return 0;
   }
@@ -1983,6 +1995,10 @@ Variant::to_ulong () const
     unsigned long l = 0;
     tl::from_string (to_string (), l);
     return l;
+  } else if (m_type == t_user) {
+    return (unsigned long) m_var.mp_user.cls->to_int (m_var.mp_user.object);
+  } else if (m_type == t_user_ref) {
+    return (unsigned long) m_var.mp_user_ref.cls->to_int (m_var.mp_user_ref.cls->deref_proxy_const (reinterpret_cast <const tl::WeakOrSharedPtr *> (m_var.mp_user_ref.ptr)->get ()));
   } else {
     return 0;
   }
@@ -2037,6 +2053,10 @@ Variant::to_long () const
     long l = 0;
     tl::from_string (to_string (), l);
     return l;
+  } else if (m_type == t_user) {
+    return (long) m_var.mp_user.cls->to_int (m_var.mp_user.object);
+  } else if (m_type == t_user_ref) {
+    return (long) m_var.mp_user_ref.cls->to_int (m_var.mp_user_ref.cls->deref_proxy_const (reinterpret_cast <const tl::WeakOrSharedPtr *> (m_var.mp_user_ref.ptr)->get ()));
   } else {
     return 0;
   }
@@ -2143,6 +2163,10 @@ Variant::to_double () const
     double d = 0;
     tl::from_string (to_string (), d);
     return d;
+  } else if (m_type == t_user) {
+    return m_var.mp_user.cls->to_double (m_var.mp_user.object);
+  } else if (m_type == t_user_ref) {
+    return m_var.mp_user_ref.cls->to_double (m_var.mp_user_ref.cls->deref_proxy_const (reinterpret_cast <const tl::WeakOrSharedPtr *> (m_var.mp_user_ref.ptr)->get ()));
   } else {
     return 0;
   }
@@ -2513,7 +2537,9 @@ QVariant Variant::to_qvariant () const
       } else if (dynamic_cast<const tl::VariantUserClass<QVector4D> *> (cls)) {
         return QVariant (to_user<QVector4D> ());
       } else {
-        return QVariant ();
+        tl::Variant var;
+        cls->to_variant (to_user (), var);
+        return var.to_qvariant ();
       }
     }
   default:

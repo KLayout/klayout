@@ -30,6 +30,7 @@
 #include "tlTypeTraits.h"
 #include "tlHeap.h"
 #include "tlUtils.h"
+#include "tlVariant.h"
 
 #include <memory>
 
@@ -76,7 +77,7 @@ struct _var_user_less_impl<T, false>
 };
 
 /**
- *  @brief A helper function to implement equal as efficiently as possible
+ *  @brief A helper function to implement to_string as efficiently as possible
  */
 template<class T, bool> struct _var_user_to_string_impl;
 
@@ -90,6 +91,57 @@ template<class T>
 struct _var_user_to_string_impl<T, false>
 {
   static std::string call (const T *a, const VariantUserClassImpl *delegate) { return delegate->to_string_impl ((void *) a); }
+};
+
+/**
+ *  @brief A helper function to implement to_variant as efficiently as possible
+ */
+template<class T, bool> struct _var_user_to_variant_impl;
+
+template<class T>
+struct _var_user_to_variant_impl<T, true>
+{
+  static tl::Variant call (const T *a, const VariantUserClassImpl * /*delegate*/) { return a->to_variant (); }
+};
+
+template<class T>
+struct _var_user_to_variant_impl<T, false>
+{
+  static tl::Variant call (const T *a, const VariantUserClassImpl *delegate) { return delegate->to_variant_impl ((void *) a); }
+};
+
+/**
+ *  @brief A helper function to implement to_int as efficiently as possible
+ */
+template<class T, bool> struct _var_user_to_int_impl;
+
+template<class T>
+struct _var_user_to_int_impl<T, true>
+{
+  static int call (const T *a, const VariantUserClassImpl * /*delegate*/) { return a->to_int (); }
+};
+
+template<class T>
+struct _var_user_to_int_impl<T, false>
+{
+  static int call (const T *a, const VariantUserClassImpl *delegate) { return delegate->to_int_impl ((void *) a); }
+};
+
+/**
+ *  @brief A helper function to implement to_double as efficiently as possible
+ */
+template<class T, bool> struct _var_user_to_double_impl;
+
+template<class T>
+struct _var_user_to_double_impl<T, true>
+{
+  static double call (const T *a, const VariantUserClassImpl * /*delegate*/) { return a->to_double (); }
+};
+
+template<class T>
+struct _var_user_to_double_impl<T, false>
+{
+  static double call (const T *a, const VariantUserClassImpl *delegate) { return delegate->to_double_impl ((void *) a); }
 };
 
 /**
@@ -152,9 +204,24 @@ public:
     return gsi::_var_user_less_impl<T, tl::has_less_operator<T>::value>::call ((const T *) a, (const T *) b, this);
   }
 
+  virtual void to_variant (const void *a, tl::Variant &var) const
+  {
+    var = gsi::_var_user_to_variant_impl<T, tl::has_to_variant<T>::value>::call ((const T *) a, this);
+  }
+
   virtual std::string to_string (const void *a) const
   {
     return gsi::_var_user_to_string_impl<T, tl::has_to_string<T>::value>::call ((const T *) a, this);
+  }
+
+  virtual int to_int (const void *a) const
+  {
+    return gsi::_var_user_to_int_impl<T, tl::has_to_int<T>::value>::call ((const T *) a, this);
+  }
+
+  virtual double to_double (const void *a) const
+  {
+    return gsi::_var_user_to_double_impl<T, tl::has_to_double<T>::value>::call ((const T *) a, this);
   }
 
   void *clone (const void *obj) const

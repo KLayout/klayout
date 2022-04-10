@@ -183,7 +183,6 @@ LibraryManager::register_lib (Library *library)
     if (found) {
       //  substitute
       old_lib = m_libs [l->second];
-      m_libs [l->second] = 0;
       m_lib_by_name.erase (l);
     }
 
@@ -193,10 +192,19 @@ LibraryManager::register_lib (Library *library)
   }
 
   if (old_lib) {
+
     old_lib->remap_to (library);
+
+    {
+      //  reset the library pointer only after "remap_to" -> this function may need lib_by_id.
+      tl::MutexLocker locker (&m_lock);
+      m_libs [old_lib->get_id ()] = 0;
+    }
+
     old_lib->set_id (std::numeric_limits<lib_id_type>::max ());
     delete old_lib;
     old_lib = 0;
+
   }
 
   //  take care of cold referrers - these may not get valid

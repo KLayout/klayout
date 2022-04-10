@@ -159,6 +159,11 @@ LibraryProxy::get_layer_indices (db::Layout &layout, db::ImportLayerMapping *lay
         //  map guiding shape layer
         m_layer_indices.push_back ((int) layout.guiding_shape_layer ());
 
+      } else if (i == lib->layout ().error_layer ()) {
+
+        //  map guiding shape layer
+        m_layer_indices.push_back ((int) layout.error_layer ());
+
       } else if (! lib->layout ().is_valid_layer (i) || cell.bbox (i).empty ()) {
 
         m_layer_indices.push_back (-1);

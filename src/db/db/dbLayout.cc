@@ -355,6 +355,7 @@ Layout::Layout (db::Manager *manager)
     m_properties_repository (this),
     m_guiding_shape_layer (-1),
     m_waste_layer (-1),
+    m_error_layer (-1),
     m_do_cleanup (false),
     m_editable (db::default_editable_mode ())
 {
@@ -372,6 +373,7 @@ Layout::Layout (bool editable, db::Manager *manager)
     m_properties_repository (this),
     m_guiding_shape_layer (-1),
     m_waste_layer (-1),
+    m_error_layer (-1),
     m_do_cleanup (false),
     m_editable (editable)
 {
@@ -393,6 +395,7 @@ Layout::Layout (const db::Layout &layout)
     m_properties_repository (this),
     m_guiding_shape_layer (-1),
     m_waste_layer (-1),
+    m_error_layer (-1),
     m_do_cleanup (false),
     m_editable (layout.m_editable)
 {
@@ -458,6 +461,7 @@ Layout::clear ()
 
   m_guiding_shape_layer = -1;
   m_waste_layer = -1;
+  m_error_layer = -1;
 
   m_lib_proxy_map.clear ();
   m_meta_info.clear ();
@@ -474,6 +478,7 @@ Layout::operator= (const Layout &d)
 
     m_guiding_shape_layer = d.m_guiding_shape_layer;
     m_waste_layer = d.m_waste_layer;
+    m_error_layer = d.m_error_layer;
     m_editable = d.m_editable;
 
     m_pcell_ids = d.m_pcell_ids;
@@ -1947,6 +1952,19 @@ Layout::get_layer (const db::LayerProperties &lp)
 }
 
 unsigned int
+Layout::error_layer () const
+{
+  if (m_error_layer < 0) {
+    //  create the waste layer (since that layer is cached we can do
+    //  this in a "const" fashion.
+    db::Layout *self = const_cast<db::Layout *> (this);
+    self->m_error_layer = (int) self->insert_special_layer (db::LayerProperties ("WASTE"));
+  }
+
+  return (unsigned int) m_error_layer;
+}
+
+unsigned int
 Layout::waste_layer () const
 {
   if (m_waste_layer < 0) {
@@ -2555,8 +2573,15 @@ Layout::restore_proxies (ImportLayerMapping *layer_mapping)
     }
   }
 
+  bool needs_cleanup = false;
   for (std::vector<db::ColdProxy *>::const_iterator p = cold_proxies.begin (); p != cold_proxies.end (); ++p) {
-    recover_proxy_as ((*p)->cell_index (), (*p)->context_info (), layer_mapping);
+    if (recover_proxy_as ((*p)->cell_index (), (*p)->context_info (), layer_mapping)) {
+      needs_cleanup = true;
+    }
+  }
+
+  if (needs_cleanup) {
+    cleanup ();
   }
 }
 

@@ -607,7 +607,7 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
     if (m_cv_index >= 0 && view ()->cellview (m_cv_index).is_valid ()) {
       techname = view ()->cellview (m_cv_index)->tech_name ();
     }
-    mp_ui->lib_cbx->set_technology_filter (techname, ! techname.empty ());
+    mp_ui->lib_cbx->set_technology_filter (techname, true);
 
     //  cell name
     std::string s;

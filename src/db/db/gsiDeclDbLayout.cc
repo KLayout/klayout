@@ -1089,6 +1089,14 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@brief Gets the library this layout lives in or nil if the layout is not part of a library\n"
     "This attribute has been introduced in version 0.27.5."
   ) +
+  gsi::method ("refresh", &db::Layout::refresh,
+    "@brief Calls \\Cell#refresh on all cells inside this layout\n"
+    "This method is useful to recompute all PCells from a layout. Note that this does not "
+    "update PCells which are linked from a library. To recompute PCells from a library, you need "
+    "to use \\Library#refresh on the library object from which the PCells are imported.\n"
+    "\n"
+    "This method has been introduced in version 0.27.9."
+  ) +
   gsi::method ("add_meta_info", &db::Layout::add_meta_info, gsi::arg ("info"),
     "@brief Adds meta information to the layout\n"
     "See \\LayoutMetaInfo for details about layouts and meta information."

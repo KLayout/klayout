@@ -130,7 +130,6 @@ private:
   std::vector<lay::ViewObject *> m_mouse_cursor_markers;
   QColor m_cursor_color;
   bool m_cursor_enabled;
-  lay::LayoutView *mp_view;
   bool m_has_tracking_position;
   db::DPoint m_tracking_position;
 };

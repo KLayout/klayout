@@ -89,6 +89,7 @@ public:
   PolygonService (db::Manager *manager, lay::LayoutView *view);
   
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+  virtual void do_delete ();
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
   virtual void do_mouse_move_inactive (const db::DPoint &p);
@@ -181,6 +182,7 @@ public:
   virtual void do_mouse_move (const db::DPoint &p);
   virtual bool do_mouse_click (const db::DPoint &p);
   virtual void do_mouse_move_inactive (const db::DPoint &p);
+  virtual void do_delete ();
   virtual void do_finish_edit ();
   virtual void do_cancel_edit ();
   virtual bool do_activated ();

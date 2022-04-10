@@ -421,6 +421,16 @@ PolygonService::do_mouse_move_inactive (const db::DPoint &p)
 }
 
 void
+PolygonService::do_delete ()
+{
+  if (m_points.size () > 2) {
+    m_points.erase (m_points.end () - 2);
+    m_last = m_points.end()[-2];
+    update_marker ();
+  }
+}
+
+void
 PolygonService::do_mouse_move (const db::DPoint &p)
 {
   do_mouse_move_inactive (p);
@@ -1058,7 +1068,17 @@ PathService::do_mouse_click (const db::DPoint &p)
   return false;
 }
 
-void 
+void
+PathService::do_delete ()
+{
+  if (m_points.size () > 2) {
+    m_points.erase (m_points.end () - 2);
+    m_last = m_points.end()[-2];
+    update_marker ();
+  }
+}
+
+void
 PathService::do_finish_edit ()
 {
   //  one point is reserved for the "current one"

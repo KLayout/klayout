@@ -796,6 +796,17 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
   }
 }
 
+bool
+Service::key_event (unsigned int key, unsigned int buttons)
+{
+  if (view ()->is_editable () && m_editing && buttons == 0 && key == Qt::Key_Backspace) {
+    do_delete ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
 void
 Service::activated ()
 {

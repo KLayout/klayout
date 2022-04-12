@@ -1023,7 +1023,8 @@ private:
  */
 enum LayerPurpose 
 {
-  Routing = 0,        //  from DEF only
+  None = 0,
+  Routing,            //  from DEF only
   Pins,               //  from DEF
   Fills,              //  from DEF
   FillsOPC,           //  from DEF
@@ -1037,6 +1038,8 @@ enum LayerPurpose
   Blockage,           //  from DEF only
   PlacementBlockage,  //  from DEF only
   Regions,            //  from DEF only
+  RegionsFence,       //  from DEF only
+  RegionsGuide,       //  from DEF only
   All                 //  from DEF only
 };
 
@@ -1243,8 +1246,10 @@ public:
    *  @brief Reads the given map file
    *
    *  Usually this file is read by the constructor. This method is provided for test purposes.
+   *  The filename can be a list of files, separated by "+" or ",". They are loaded together into
+   *  the same map like they were concatenated.
    */
-  void read_map_file (const std::string &path, db::Layout &layout);
+  void read_map_file (const std::string &filename, db::Layout &layout, const std::string &base_path);
 
   /**
    *  @brief Gets the layer map
@@ -1424,6 +1429,7 @@ private:
 
   std::set<unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
   db::cell_index_type foreign_cell(Layout &layout, const std::string &name);
+  void read_single_map_file (const std::string &path, std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> > &layer_map);
 };
 
 /**

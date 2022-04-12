@@ -70,11 +70,10 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
 
     if (ex.test ("map:")) {
 
-      std::string fn = fn_path, f;
+      std::string f;
       ex.read_word_or_quoted (f);
-      fn += f;
 
-      ld.read_map_file (fn, layout);
+      ld.read_map_file (f, layout, fn_path);
 
     } else if (ex.test ("def:")) {
 
@@ -915,5 +914,12 @@ TEST(202_lefdef_blend_mode)
 
   lefdef_opt.set_macro_resolution_mode (2);
   run_test2 (_this, "blend_mode", "map:layers.map+lef:sub.lef+def:top.def", "map:layers.map+def:sub.def", "au3.oas.gz", lefdef_opt, false);
+}
+
+TEST(203_regionsAndMapfileConcat)
+{
+  db::LEFDEFReaderOptions lefdef_opt = default_options ();
+
+  run_test (_this, "map_regions", "map:'test.map,test.add.map'+lef:test.lef+def:test.def", "au.oas.gz", lefdef_opt, false);
 }
 

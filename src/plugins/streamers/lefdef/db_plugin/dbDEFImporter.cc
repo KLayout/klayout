@@ -212,22 +212,39 @@ DEFImporter::read_nondefaultrules (double scale)
 }
 
 void
-DEFImporter::read_regions (std::map<std::string, std::vector<db::Polygon> > &regions, double scale)
+DEFImporter::read_regions (std::map<std::string, std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > > > &regions, double scale)
 {
   while (test ("-")) {
 
     std::string n = get ();
-    std::vector<db::Polygon> &polygons = regions [n];
+
+    std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > > &rg = regions[n];
+    rg.push_back (std::pair<LayerPurpose, std::vector<db::Polygon> > (Regions, std::vector<db::Polygon> ()));
+    LayerPurpose &p = rg.back ().first;
+    std::vector<db::Polygon> &polygons = rg.back ().second;
 
     while (! peek (";")) {
 
       if (test ("+")) {
 
-        //  ignore other options for now
-        while (! peek (";")) {
-          take ();
+        if (test ("TYPE")) {
+
+          if (test ("GUIDE")) {
+            p = RegionsGuide;
+          } else if (test ("FENCE")) {
+            p = RegionsFence;
+          } else {
+            error (tl::to_string (tr ("REGION type needs to be GUIDE or FENCE")));
+          }
+
+        } else {
+
+          //  ignore other options for now (i.e. PROPERTY)
+          while (! peek (";") && ! peek ("+")) {
+            take ();
+          }
+
         }
-        break;
 
       } else {
 
@@ -1476,7 +1493,7 @@ DEFImporter::do_read (db::Layout &layout)
   double scale = 1.0 / (dbu_mic * layout.dbu ());
   size_t top_id = 0;
 
-  std::map<std::string, std::vector<db::Polygon> > regions;
+  std::map<std::string, std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > > > regions;
   std::list<DEFImporterGroup> groups;
   std::list<std::pair<std::string, db::CellInstArray> > instances;
 
@@ -1697,19 +1714,30 @@ DEFImporter::do_read (db::Layout &layout)
 
       if (! g->region_name.empty ()) {
 
-        std::map<std::string, std::vector<db::Polygon> >::iterator r = regions.find (g->region_name);
+        std::map<std::string, std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > > >::iterator r = regions.find (g->region_name);
         if (r == regions.end ()) {
 
           warn (tl::sprintf (tl::to_string (tr ("Not a valid region name or region is already used: %s in group %s")), g->region_name, g->name));
 
         } else {
 
-          std::set<unsigned int> dl = open_layer (layout, std::string (), Regions, 0);
-          for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
-            for (std::vector<db::Polygon>::const_iterator p = r->second.begin (); p != r->second.end (); ++p) {
-              group_cell->shapes (*l).insert (*p);
+          for (std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > >::const_iterator rr = r->second.begin (); rr != r->second.end (); ++rr) {
+
+            std::set<unsigned int> dl = open_layer (layout, std::string (), rr->first, 0);
+            for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
+              group_cell->shapes (*l).insert (rr->second.begin (), rr->second.end ());
             }
+
+            if (rr->first != Regions) {
+              //  try the "ALL" slot too for FENCE and GUIDE regions
+              dl = open_layer (layout, std::string (), Regions, 0);
+              for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
+                group_cell->shapes (*l).insert (rr->second.begin (), rr->second.end ());
+              }
+            }
+
           }
+
           regions.erase (r);
 
         }
@@ -1747,12 +1775,19 @@ DEFImporter::do_read (db::Layout &layout)
 
   if (! regions.empty ()) {
 
-    std::set<unsigned int> dl = open_layer (layout, std::string (), Regions, 0);
-    for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
+    LayerPurpose lps [] = { Regions, RegionsGuide, RegionsFence };
 
-      for (std::map<std::string, std::vector<db::Polygon> >::const_iterator r = regions.begin (); r != regions.end (); ++r) {
-        for (std::vector<db::Polygon>::const_iterator p = r->second.begin (); p != r->second.end (); ++p) {
-          others_cell->shapes (*l).insert (*p);
+    for (unsigned int i = 0; i < sizeof (lps) / sizeof (lps[0]); ++i) {
+
+      std::set<unsigned int> dl = open_layer (layout, std::string (), lps[i], 0);
+
+      for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
+        for (std::map<std::string, std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > > >::const_iterator r = regions.begin (); r != regions.end (); ++r) {
+          for (std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > >::const_iterator rr = r->second.begin (); rr != r->second.end (); ++rr) {
+            if (lps [i] == Regions || rr->first == lps [i]) {
+              others_cell->shapes (*l).insert (rr->second.begin (), rr->second.end ());
+            }
+          }
         }
       }
 

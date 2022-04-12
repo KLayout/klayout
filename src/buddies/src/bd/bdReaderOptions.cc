@@ -623,7 +623,10 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "layers need to specified individually for different layer/purpose combinations.\n"
                     "\n"
                     "The mapping file is one layer mapping entry per line. Each line is a layer name, followed by a list of purposes (VIA, PIN ...) "
-                    "and a layer and datatype number. In addition, 'DIEAREA' can be used to map the design outline to a layer. 'NAME' in place of the "
+                    "and a layer and datatype number. In addition, 'DIEAREA', 'REGIONS' and 'BLOCKAGE' can be used to map the design outline, regions and blockages to a layer. "
+                    "'REGIONS' can have a detailed specifier which is 'FENCE' or 'GUIDE' for fence or guide type regions (e.g. 'REGIONS FENCE 99/0').\n"
+                    "\n"
+                    "'NAME' in place of the "
                     "layer name and using layer/purpose in the purpose column allows mapping labels to specific layers.\n"
                     "\n"
                     "This is an example for a layer map file:\n"
@@ -639,7 +642,9 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "VIA1    LEFPIN,VIA,PIN,NET,SPNET  13       0\n"
                     "M2      LEFPIN,PIN,NET,SPNET,VIA  14       0\n"
                     "\n"
-                    "If a map file is used, only the layers present in the map file are generated. No other layers are produced."
+                    "If a map file is used, only the layers present in the map file are generated. No other layers are produced.\n"
+                    "\n"
+                    "Multiple map files can be given, separated by '+' or ','. In that case, these files are concatenated."
                    )
         << tl::arg (group +
                     "!--" + m_long_prefix + "lefdef-macro-resolution-mode", &m_lefdef_macro_resolution_mode, "Specify how to generate layout from LEF macros",

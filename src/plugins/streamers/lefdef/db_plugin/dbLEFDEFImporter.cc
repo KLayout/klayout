@@ -121,6 +121,8 @@ static std::string purpose_to_name (LayerPurpose purpose)
     return "REGIONGUIDE";
   case RegionsFence:
     return "REGIONFENCE";
+  case RegionsNone:
+    return "REGIONNONE";
   case PlacementBlockage:
     return "BLOCKAGE";
   case Routing:
@@ -217,7 +219,7 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
 
   dl = reader.open_layer (layout, m_top_layer, ViaGeometry, mask_top, via_box.enlarged (m_te));
   for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
-    cell.shapes (*l).insert (db::Polygon (via_box.enlarged (m_te).moved (m_bo)));
+    cell.shapes (*l).insert (db::Polygon (via_box.enlarged (m_te).moved (m_to)));
   }
 
   const char *p = m_pattern.c_str ();
@@ -1051,7 +1053,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
           }
         }
 
-      } else if (w1 == "REGIONS") {
+      } else if (w1 == "REGION") {
 
         std::string name = "REGIONS";
         LayerPurpose lp = Regions;
@@ -1061,6 +1063,9 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
         } else if (w2 == "GUIDE") {
           name = "REGIONS_GUIDE";
           lp = RegionsGuide;
+        } else if (w2 == "NONE") {
+          name = "REGIONS_NONE";
+          lp = RegionsNone;
         } else if (w2 != "ALL") {
           tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d - ignoring unknowns REGION purpose %s (use FENCE, GUIDE or ALL)")), path, ts.line_number (), w2);
         }
@@ -1263,7 +1268,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
  */
 static bool has_fallback (LayerPurpose p)
 {
-  return p == RegionsFence || p == RegionsGuide;
+  return p == RegionsFence || p == RegionsGuide || p == RegionsNone;
 }
 
 std::set <unsigned int>

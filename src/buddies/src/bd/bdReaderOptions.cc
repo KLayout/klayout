@@ -82,6 +82,8 @@ GenericReaderOptions::GenericReaderOptions ()
   m_lefdef_produce_pin_names = ! v.is_nil ();
   m_lefdef_pin_property_name = v .to_parsable_string ();
 
+  m_lefdef_via_cellname_prefix = std::string ();
+
   m_lefdef_produce_cell_outlines = load_options.get_option_by_name ("lefdef_config.produce_cell_outlines").to_bool ();
   m_lefdef_cell_outline_layer = load_options.get_option_by_name ("lefdef_config.cell_outline_layer").to_string ();
   m_lefdef_produce_placement_blockages = load_options.get_option_by_name ("lefdef_config.produce_placement_blockages").to_bool ();
@@ -91,7 +93,6 @@ GenericReaderOptions::GenericReaderOptions ()
   m_lefdef_produce_via_geometry = load_options.get_option_by_name ("lefdef_config.produce_via_geometry").to_bool ();
   m_lefdef_via_geometry_suffix = load_options.get_option_by_name ("lefdef_config.via_geometry_suffix_str").to_string ();
   m_lefdef_via_geometry_datatype = load_options.get_option_by_name ("lefdef_config.via_geometry_datatype_str").to_string ();
-  m_lefdef_via_cellname_prefix = load_options.get_option_by_name ("lefdef_config.via_cellname_prefix").to_string ();
   m_lefdef_produce_pins = load_options.get_option_by_name ("lefdef_config.produce_pins").to_bool ();
   m_lefdef_pins_suffix = load_options.get_option_by_name ("lefdef_config.pins_suffix_str").to_string ();
   m_lefdef_pins_datatype = load_options.get_option_by_name ("lefdef_config.pins_datatype_str").to_string ();
@@ -623,8 +624,8 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "layers need to specified individually for different layer/purpose combinations.\n"
                     "\n"
                     "The mapping file is one layer mapping entry per line. Each line is a layer name, followed by a list of purposes (VIA, PIN ...) "
-                    "and a layer and datatype number. In addition, 'DIEAREA', 'REGIONS' and 'BLOCKAGE' can be used to map the design outline, regions and blockages to a layer. "
-                    "'REGIONS' can have a detailed specifier which is 'FENCE' or 'GUIDE' for fence or guide type regions (e.g. 'REGIONS FENCE 99/0').\n"
+                    "and a layer and datatype number. In addition, 'DIEAREA', 'REGION' and 'BLOCKAGE' can be used to map the design outline, regions and blockages to a layer. "
+                    "'REGION' can have a detailed specifier which is 'FENCE', 'GUIDE' or 'NONE' for fence, guide or other type regions (e.g. 'REGION FENCE 99/0').\n"
                     "\n"
                     "'NAME' in place of the "
                     "layer name and using layer/purpose in the purpose column allows mapping labels to specific layers.\n"

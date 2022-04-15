@@ -219,7 +219,7 @@ DEFImporter::read_regions (std::map<std::string, std::vector<std::pair<LayerPurp
     std::string n = get ();
 
     std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > > &rg = regions[n];
-    rg.push_back (std::pair<LayerPurpose, std::vector<db::Polygon> > (Regions, std::vector<db::Polygon> ()));
+    rg.push_back (std::pair<LayerPurpose, std::vector<db::Polygon> > (RegionsNone, std::vector<db::Polygon> ()));
     LayerPurpose &p = rg.back ().first;
     std::vector<db::Polygon> &polygons = rg.back ().second;
 
@@ -1775,7 +1775,7 @@ DEFImporter::do_read (db::Layout &layout)
 
   if (! regions.empty ()) {
 
-    LayerPurpose lps [] = { Regions, RegionsGuide, RegionsFence };
+    LayerPurpose lps [] = { Regions, RegionsNone, RegionsGuide, RegionsFence };
 
     for (unsigned int i = 0; i < sizeof (lps) / sizeof (lps[0]); ++i) {
 

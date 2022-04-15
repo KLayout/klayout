@@ -1038,6 +1038,7 @@ enum LayerPurpose
   Blockage,           //  from DEF only
   PlacementBlockage,  //  from DEF only
   Regions,            //  from DEF only
+  RegionsNone,        //  from DEF only
   RegionsFence,       //  from DEF only
   RegionsGuide,       //  from DEF only
   All                 //  from DEF only

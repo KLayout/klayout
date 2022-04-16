@@ -68,19 +68,9 @@ GenericReaderOptions::GenericReaderOptions ()
     m_magic_lib_path.push_back (i->to_string ());
   }
 
-  tl::Variant v;
-
-  v = load_options.get_option_by_name ("lefdef_config.net_property_name");
-  m_lefdef_produce_net_names = ! v.is_nil ();
-  m_lefdef_net_property_name = v .to_parsable_string ();
-
-  v = load_options.get_option_by_name ("lefdef_config.instance_property_name");
-  m_lefdef_produce_inst_names = ! v.is_nil ();
-  m_lefdef_inst_property_name = v .to_parsable_string ();
-
-  v = load_options.get_option_by_name ("lefdef_config.pin_property_name");
-  m_lefdef_produce_pin_names = ! v.is_nil ();
-  m_lefdef_pin_property_name = v .to_parsable_string ();
+  m_lefdef_net_property_name = std::string ();
+  m_lefdef_inst_property_name = std::string ();
+  m_lefdef_pin_property_name = std::string ();
 
   m_lefdef_via_cellname_prefix = std::string ();
 
@@ -384,39 +374,27 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
     std::string group ("[" + m_group_prefix + " options - LEF/DEF specific]");
 
     cmd << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-net-names", &m_lefdef_produce_net_names, "Disables producing net names as shape properties",
-                    "If this option is present, net names will not be emitted as shape properties."
-                   )
-        << tl::arg (group +
                     "#--" + m_long_prefix + "lefdef-net-property-name=spec", &m_lefdef_net_property_name, "Specifies which property name to use for net names",
                     "This option gives the name of the shape property used to annotate net names. For 'spec' use:\n"
                     "\n"
                     "* \"#n\" for property number \"n\" (compatible with GDS2)\n"
                     "* A plain word for a named property (not compatible with GDS2)\n"
                     "\n"
-                    "Producing net name annotation properties can be turned off with '--" + m_long_prefix + "lefdef-dont-produce-net-names'."
-                   )
-        << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-instance-names", &m_lefdef_produce_inst_names, "Disables producing DEF macro instance names as instance properties",
-                    "If this option is present, DEF macro instance names will not be emitted as instance properties."
+                    "By default, net names are not produced."
                    )
         << tl::arg (group +
                     "#--" + m_long_prefix + "lefdef-instance-property-name=spec", &m_lefdef_inst_property_name, "Specifies which property name to use for DEF macro instance names",
                     "This option gives the name of the instance property used to annotate DEF macro instance names. "
                     "For the 'spec' format see '--" + m_long_prefix + "lefdef-net-property-name'."
                     "\n"
-                    "Producing instance name annotation properties can be turned off with '--" + m_long_prefix + "lefdef-dont-produce-instance-names'."
-                   )
-        << tl::arg (group +
-                    "#!--" + m_long_prefix + "lefdef-dont-produce-pin-names", &m_lefdef_produce_pin_names, "Disables producing pin names as shape or instance properties",
-                    "If this option is present, Pin names will not be emitted as shape or instance properties."
+                    "By default, instance names are not produced."
                    )
         << tl::arg (group +
                     "#--" + m_long_prefix + "lefdef-pin-property-name=spec", &m_lefdef_pin_property_name, "Specifies which property name to use for pin names",
                     "This option gives the name of the shape or instance property used to annotate pin names. "
                     "For the 'spec' format see '--" + m_long_prefix + "lefdef-net-property-name'."
                     "\n"
-                    "Producing pin name annotation properties can be turned off with '--" + m_long_prefix + "lefdef-dont-produce-pin-names'."
+                    "By default, pin names are not produced."
                    )
         << tl::arg (group +
                     "#!--" + m_long_prefix + "lefdef-dont-produce-cell-outlines", &m_lefdef_produce_cell_outlines, "Disables producing cell outlines",
@@ -766,9 +744,9 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
   load_options.set_option_by_name ("lefdef_config.layer_map", tl::Variant::make_variant (m_layer_map));
   load_options.set_option_by_name ("lefdef_config.create_other_layers", m_create_other_layers);
   load_options.set_option_by_name ("lefdef_config.dbu", m_dbu);
-  load_options.set_option_by_name ("lefdef_config.net_property_name", m_lefdef_produce_net_names ? tl::Variant (m_lefdef_net_property_name) : tl::Variant ());
-  load_options.set_option_by_name ("lefdef_config.instance_property_name", m_lefdef_produce_inst_names ? tl::Variant (m_lefdef_inst_property_name) : tl::Variant ());
-  load_options.set_option_by_name ("lefdef_config.pin_property_name", m_lefdef_produce_pin_names ? tl::Variant (m_lefdef_pin_property_name) : tl::Variant ());
+  load_options.set_option_by_name ("lefdef_config.net_property_name", !m_lefdef_net_property_name.empty () ? tl::Variant (m_lefdef_net_property_name) : tl::Variant ());
+  load_options.set_option_by_name ("lefdef_config.instance_property_name", !m_lefdef_inst_property_name.empty () ? tl::Variant (m_lefdef_inst_property_name) : tl::Variant ());
+  load_options.set_option_by_name ("lefdef_config.pin_property_name", !m_lefdef_pin_property_name.empty () ? tl::Variant (m_lefdef_pin_property_name) : tl::Variant ());
   load_options.set_option_by_name ("lefdef_config.produce_cell_outlines", m_lefdef_produce_cell_outlines);
   load_options.set_option_by_name ("lefdef_config.cell_outline_layer", m_lefdef_cell_outline_layer);
   load_options.set_option_by_name ("lefdef_config.produce_placement_blockages", m_lefdef_produce_placement_blockages);

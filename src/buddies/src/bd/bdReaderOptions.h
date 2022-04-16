@@ -142,11 +142,8 @@ private:
   void set_read_named_layers (bool f);
 
   //  LEFDEF
-  bool m_lefdef_produce_net_names;
   std::string m_lefdef_net_property_name;
-  bool m_lefdef_produce_inst_names;
   std::string m_lefdef_inst_property_name;
-  bool m_lefdef_produce_pin_names;
   std::string m_lefdef_pin_property_name;
   bool m_lefdef_produce_cell_outlines;
   std::string m_lefdef_cell_outline_layer;

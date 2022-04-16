@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -72,6 +72,18 @@ typedef char __yes_type [1];
 typedef char __no_type [2];
 
 /**
+ *  @brief Detects whether a class has a "to_variant" method with a matching signature
+ */
+template <typename T> static __yes_type &__test_to_variant_func (decltype (&T::to_variant));
+template <typename> static __no_type &__test_to_variant_func (...);
+
+template <typename T>
+struct has_to_variant
+{
+  static constexpr bool value = sizeof (__test_to_variant_func<T> (nullptr)) == sizeof (__yes_type);
+};
+
+/**
  *  @brief Detects whether a class has a "to_string" method with a matching signature
  */
 template <typename T> static __yes_type &__test_to_string_func (decltype (&T::to_string));
@@ -81,6 +93,30 @@ template <typename T>
 struct has_to_string
 {
   static constexpr bool value = sizeof (__test_to_string_func<T> (nullptr)) == sizeof (__yes_type);
+};
+
+/**
+ *  @brief Detects whether a class has a "to_int" method with a matching signature
+ */
+template <typename T> static __yes_type &__test_to_int_func (decltype (&T::to_int));
+template <typename> static __no_type &__test_to_int_func (...);
+
+template <typename T>
+struct has_to_int
+{
+  static constexpr bool value = sizeof (__test_to_int_func<T> (nullptr)) == sizeof (__yes_type);
+};
+
+/**
+ *  @brief Detects whether a class has a "to_double" method with a matching signature
+ */
+template <typename T> static __yes_type &__test_to_double_func (decltype (&T::to_double));
+template <typename> static __no_type &__test_to_double_func (...);
+
+template <typename T>
+struct has_to_double
+{
+  static constexpr bool value = sizeof (__test_to_double_func<T> (nullptr)) == sizeof (__yes_type);
 };
 
 /**

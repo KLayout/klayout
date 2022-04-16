@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -260,6 +260,48 @@ TEST(SafeOutput)
   }
 }
 
+TEST(SafeOutput2)
+{
+  std::string cd = tl::current_dir ();
+  tl_assert (tl::chdir (tmp_file (".")));
+
+  try {
+
+    std::string tmp_path = "x";
+    tl::rm_dir_recursive (tmp_path);
+    tl::mkpath (tmp_path);
+    std::string tp = tl::combine_path (tmp_path, "y");
+
+    {
+      tl::OutputStream os (tp);
+      os << "blabla\n";
+    }
+
+    EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
+    EXPECT_EQ (tl::file_exists (tp), true);
+
+    {
+      tl::OutputStream os (tp);
+      EXPECT_EQ (tl::file_exists (tp + ".~backup"), true);
+      EXPECT_EQ (tl::file_exists (tp), true);
+      os << "Hello, world!\n";
+    }
+
+    EXPECT_EQ (tl::file_exists (tp + ".~backup"), false);
+    EXPECT_EQ (tl::file_exists (tp), true);
+
+    {
+      tl::InputStream is (tp);
+      EXPECT_EQ (is.read_all (), "Hello, world!\n");
+    }
+
+    tl::chdir (cd);
+
+  } catch (...) {
+    tl::chdir (cd);
+    throw;
+  }
+}
 
 TEST(Backups)
 {

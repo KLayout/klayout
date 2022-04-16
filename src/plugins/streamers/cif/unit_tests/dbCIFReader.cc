@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -87,7 +87,6 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   }
 
   //  normalize the layout by writing to CIF and reading from ..
-
   {
     tl::OutputStream stream (tmp_cif_file);
 
@@ -130,6 +129,110 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   equal = db::compare_layouts (layout, layout2_cif, db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_verbose | db::layout_diff::f_flatten_array_insts, 1);
   if (! equal) {
     _this->raise (tl::sprintf ("Compare failed after writing - see %s vs %s\n", file, tmp_cif_file));
+  }
+}
+
+static void run_test2 (tl::TestBase *_this, const std::string &base, db::Layout &layout, const char *file_au, const char *file_au_cif, const char *map = 0, double dbu = 0.001, bool dummy_calls = false, bool blank_sep = false)
+{
+  db::CIFReaderOptions *opt = new db::CIFReaderOptions();
+  opt->dbu = dbu;
+
+  db::LayerMap lm;
+  if (map) {
+    unsigned int ln = 0;
+    tl::Extractor ex (map);
+    while (! ex.at_end ()) {
+      lm.add_expr (ex, ln++);
+      ex.test (",");
+    }
+    opt->layer_map = lm;
+    opt->create_other_layers = true;
+  }
+
+  db::LoadLayoutOptions options;
+  options.set_options (opt);
+
+  db::Manager m (false);
+  db::Layout layout2 (&m), layout2_cif (&m), layout_au (&m), layout_au_cif (&m);
+
+  //  generate a "unique" name ...
+  unsigned int hash = 0;
+  for (const char *cp = file_au; *cp; ++cp) {
+    hash = (hash << 4) ^ (hash >> 4) ^ ((unsigned int) *cp);
+  }
+
+  //  normalize the layout by writing to GDS and reading from ..
+
+  std::string tmp_gds_file = _this->tmp_file (tl::sprintf ("tmp_%x.gds", hash));
+  std::string tmp_cif_file = _this->tmp_file (tl::sprintf ("tmp_%x.cif", hash));
+
+  {
+    tl::OutputStream stream (tmp_gds_file);
+    db::SaveLayoutOptions options;
+    options.set_format ("GDS2");
+    db::Writer writer (options);
+    writer.write (layout, stream);
+  }
+
+  {
+    tl::InputStream stream (tmp_gds_file);
+    db::Reader reader (stream);
+    reader.read (layout2);
+  }
+
+  //  normalize the layout by writing to CIF and reading from ..
+
+  {
+    tl::OutputStream stream (tmp_cif_file);
+
+    db::CIFWriterOptions *opt = new db::CIFWriterOptions();
+    opt->dummy_calls = dummy_calls;
+    opt->blank_separator = blank_sep;
+
+    db::CIFWriter writer;
+    db::SaveLayoutOptions options;
+    options.set_options (opt);
+    writer.write (layout, stream, options);
+  }
+
+  {
+    tl::InputStream stream (tmp_cif_file);
+
+    db::CIFReaderOptions *opt = new db::CIFReaderOptions();
+    opt->dbu = dbu;
+    db::LoadLayoutOptions reread_options;
+    reread_options.set_options (opt);
+
+    db::Reader reader (stream);
+    reader.read (layout2_cif, reread_options);
+  }
+
+  {
+    std::string fn (base);
+    fn += "/cif/";
+    fn += file_au;
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (layout_au);
+  }
+
+  {
+    std::string fn (base);
+    fn += "/cif/";
+    fn += file_au_cif;
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (layout_au_cif);
+  }
+
+  bool equal = db::compare_layouts (layout2, layout_au, db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_verbose | db::layout_diff::f_flatten_array_insts, 1);
+  if (! equal) {
+    _this->raise (tl::sprintf ("Compare failed after reading - see %s vs %s\n", tmp_gds_file, file_au));
+  }
+
+  equal = db::compare_layouts (layout2_cif, layout_au_cif, db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_verbose | db::layout_diff::f_flatten_array_insts, 1);
+  if (! equal) {
+    _this->raise (tl::sprintf ("Compare failed after writing - see %s vs %s\n", tmp_cif_file, file_au_cif));
   }
 }
 
@@ -205,4 +308,27 @@ TEST(rot_instances)
 TEST(rot_instances2)
 {
   run_test (_this, tl::testdata (), "issue_578.cif", "issue_578_au.gds");
+}
+
+//  issue #972
+TEST(bad_names)
+{
+  db::Layout ly;
+
+  db::cell_index_type ci = ly.add_cell ("(bad_cell,a b/c)");
+  db::Cell &cell = ly.cell (ci);
+
+  unsigned int l1 = ly.insert_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.insert_layer (db::LayerProperties (1, 5));
+  unsigned int l3 = ly.insert_layer (db::LayerProperties ("a b c"));
+  unsigned int l4 = ly.insert_layer (db::LayerProperties ("(a b c)"));
+  unsigned int l5 = ly.insert_layer (db::LayerProperties ("a,b/c"));
+
+  cell.shapes (l1).insert (db::Box (0, 0, 10, 10));
+  cell.shapes (l2).insert (db::Box (0, 0, 20, 20));
+  cell.shapes (l3).insert (db::Box (0, 0, 30, 30));
+  cell.shapes (l4).insert (db::Box (0, 0, 40, 40));
+  cell.shapes (l5).insert (db::Box (0, 0, 50, 50));
+
+  run_test2 (_this, tl::testdata (), ly, "issue_972_au.gds", "issue_972_au.cif");
 }

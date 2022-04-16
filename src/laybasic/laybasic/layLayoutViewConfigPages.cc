@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -170,7 +170,7 @@ LayoutViewConfigPage1::commit (lay::Dispatcher *root)
   root->config_set (cfg_abstract_mode_enabled, mp_ui->abstract_mode_grp->isChecked ());
 
   double w = 10.0;
-  tl::from_string (tl::to_string (mp_ui->abstract_mode_width_le->text ()), w);
+  tl::from_string_ext (tl::to_string (mp_ui->abstract_mode_width_le->text ()), w);
   root->config_set (cfg_abstract_mode_width, w);
   if (w <= 0.0) {
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid abstract mode border with - must be larger than 0")));
@@ -254,7 +254,7 @@ LayoutViewConfigPage2a::commit (lay::Dispatcher *root)
 
   try {
     int n;
-    tl::from_string (tl::to_string (mp_ui->cell_min_size_for_label_edit->text ()), n);
+    tl::from_string_ext (tl::to_string (mp_ui->cell_min_size_for_label_edit->text ()), n);
     root->config_set (cfg_min_inst_label_size, n);
   } catch (...) { }
 }
@@ -319,7 +319,7 @@ LayoutViewConfigPage2b::commit (lay::Dispatcher *root)
 
   try {
     double s;
-    tl::from_string (tl::to_string (mp_ui->text_def_size_edit->text ()), s);
+    tl::from_string_ext (tl::to_string (mp_ui->text_def_size_edit->text ()), s);
     root->config_set (cfg_default_text_size, s);
   } catch (...) { }
 }
@@ -511,7 +511,7 @@ LayoutViewConfigPage3b::commit (lay::Dispatcher *root)
 
   double pd = 0.0;
   try {
-    tl::from_string (tl::to_string (mp_ui->pan_distance_le->text ()), pd);
+    tl::from_string_ext (tl::to_string (mp_ui->pan_distance_le->text ()), pd);
   } catch (...) { }
   if (pd <= 0.0) {
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid pan distance: must be larger than 0.0")));
@@ -619,7 +619,7 @@ LayoutViewConfigPage3f::commit (lay::Dispatcher *root)
 
   try {
     unsigned int s;
-    tl::from_string (tl::to_string (mp_ui->drop_small_cells_value_le->text ()), s);
+    tl::from_string_ext (tl::to_string (mp_ui->drop_small_cells_value_le->text ()), s);
     root->config_set (cfg_drop_small_cells_value, s);
   } catch (...) { }
 

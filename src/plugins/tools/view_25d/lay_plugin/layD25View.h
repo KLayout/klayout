@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -24,9 +24,11 @@
 #define HDR_layD25View
 
 #include <QDialog>
+#include <QListWidgetItem>
 
 #include "tlObject.h"
 #include "layBrowser.h"
+#include "layViewOp.h"
 
 namespace Ui
 {
@@ -36,6 +38,14 @@ namespace Ui
 namespace lay
 {
   class LayoutView;
+}
+
+namespace db
+{
+  class Region;
+  class Edges;
+  class EdgePairs;
+  struct LayerProperties;
 }
 
 namespace lay
@@ -54,6 +64,17 @@ public:
   virtual void deactivated ();
   virtual void activated ();
 
+  static D25View *open (lay::LayoutView *view);
+  void close ();
+  void clear ();
+  void begin (const std::string &generator);
+  void open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like, const std::string *name);
+  void close_display ();
+  void entry (const db::Region &data, double dbu, double zstart, double zstop);
+  void entry_edge (const db::Edges &data, double dbu, double zstart, double zstop);
+  void entry_edge_pair (const db::EdgePairs &data, double dbu, double zstart, double zstop);
+  void finish ();
+
 protected:
   void accept ();
   void reject ();
@@ -67,12 +88,23 @@ private slots:
   void vscale_slider_changed (int value);
   void vscale_value_edited ();
   void init_failed ();
+  void rerun_button_pressed ();
+  void material_item_changed (QListWidgetItem *);
+  void hide_all_triggered ();
+  void hide_selected_triggered ();
+  void show_all_triggered ();
+  void show_selected_triggered ();
 
 private:
   Ui::D25View *mp_ui;
+  tl::DeferredMethod<D25View> dm_rerun_macro;
+  tl::DeferredMethod<D25View> dm_fit;
+  std::string m_generator;
 
   void cellviews_changed ();
   void layer_properties_changed (int);
+  void rerun_macro ();
+  void fit ();
 };
 
 }

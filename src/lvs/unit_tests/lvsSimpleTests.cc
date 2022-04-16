@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -79,6 +79,11 @@ void run_test (tl::TestBase *_this, const std::string &suffix, const std::string
 TEST(1_simple)
 {
   run_test (_this, "ringo_simple", "ringo.gds");
+}
+
+TEST(1a_simple_double_compare)
+{
+  run_test (_this, "ringo_simple_compare2", "ringo.gds");
 }
 
 TEST(1b_simple_with_tolerance)

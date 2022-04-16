@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -418,6 +418,16 @@ PolygonService::do_mouse_move_inactive (const db::DPoint &p)
 {
   lay::PointSnapToObjectResult snap_details = snap2_details (p);
   mouse_cursor_from_snap_details (snap_details);
+}
+
+void
+PolygonService::do_delete ()
+{
+  if (m_points.size () > 2) {
+    m_points.erase (m_points.end () - 2);
+    m_last = m_points.end()[-2];
+    update_marker ();
+  }
 }
 
 void
@@ -1058,7 +1068,17 @@ PathService::do_mouse_click (const db::DPoint &p)
   return false;
 }
 
-void 
+void
+PathService::do_delete ()
+{
+  if (m_points.size () > 2) {
+    m_points.erase (m_points.end () - 2);
+    m_last = m_points.end()[-2];
+    update_marker ();
+  }
+}
+
+void
 PathService::do_finish_edit ()
 {
   //  one point is reserved for the "current one"
@@ -1410,7 +1430,6 @@ InstService::make_cell (const lay::CellView &cv)
   //  head transaction, hence releasing (thus: deleting) cells. To prevert interference, create
   //  the transaction at the beginning.
   db::Transaction tr (manager (), tl::to_string (QObject::tr ("Create reference cell")), m_reference_transaction_id);
-  m_reference_transaction_id = tr.id ();
 
   lay::LayerState layer_state = view ()->layer_snapshot ();
 
@@ -1477,6 +1496,10 @@ InstService::make_cell (const lay::CellView &cv)
 
   m_has_valid_cell = true;
   m_current_cell = inst_cell_index;
+
+  if (! tr.is_empty ()) {
+    m_reference_transaction_id = tr.id ();
+  }
 
   return std::pair<bool, db::cell_index_type> (true, inst_cell_index);
 }
@@ -1611,7 +1634,7 @@ void
 InstService::do_cancel_edit ()
 {
   //  Undo "create reference" transactions which basically unfinished "create instance" transactions
-  if (m_reference_transaction_id > 0 && manager ()->last_transaction_id () == m_reference_transaction_id) {
+  if (m_reference_transaction_id > 0 && manager ()->transaction_id_for_undo () == m_reference_transaction_id) {
     manager ()->undo ();
   }
 

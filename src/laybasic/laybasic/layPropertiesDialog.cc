@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -139,7 +139,9 @@ BEGIN_PROTECTED
   if (! mp_properties_pages [m_index]->readonly ()) {
     db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
     mp_properties_pages [m_index]->apply ();
-    m_transaction_id = t.id ();
+    if (! t.is_empty ()) {
+      m_transaction_id = t.id ();
+    }
   }
 
   //  advance the current entry
@@ -181,7 +183,9 @@ BEGIN_PROTECTED
   if (! mp_properties_pages [m_index]->readonly ()) {
     db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
     mp_properties_pages [m_index]->apply ();
-    m_transaction_id = t.id ();
+    if (! t.is_empty ()) {
+      m_transaction_id = t.id ();
+    }
   }
 
   if (mp_properties_pages [m_index]->at_begin ()) {
@@ -280,7 +284,10 @@ BEGIN_PROTECTED
     //  we assume the page somehow indicates the error and does not apply the values
   }
 
-  m_transaction_id = t.id ();
+  //  remember transaction ID for undo on "Cancel" unless nothing happened
+  if (! t.is_empty ()) {
+    m_transaction_id = t.id ();
+  }
 
 END_PROTECTED
 }
@@ -294,7 +301,9 @@ PropertiesDialog::cancel_pressed ()
     //  because undo does not maintain a valid selection we clear it
     mp_editables->clear_selection ();
 
-    mp_manager->undo ();
+    if (mp_manager->transaction_id_for_undo () == m_transaction_id) {
+      mp_manager->undo ();
+    }
     m_transaction_id = 0;
 
   }
@@ -317,7 +326,9 @@ BEGIN_PROTECTED
     mp_properties_pages [m_index]->apply ();
     mp_properties_pages [m_index]->update ();
 
-    m_transaction_id = t.id ();
+    if (! t.is_empty ()) {
+      m_transaction_id = t.id ();
+    }
 
   }
 

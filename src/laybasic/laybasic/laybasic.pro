@@ -74,8 +74,7 @@ FORMS = \
     NetInfoDialog.ui \
     NetExportDialog.ui \
     SelectCellViewForm.ui \
-    LayoutStatistics.ui \
-    D25TechnologyComponentEditor.ui
+    LayoutStatistics.ui
 
 RESOURCES = \
     laybasicResources.qrc \
@@ -102,6 +101,7 @@ SOURCES = \
   layBrowserDialog.cc \
   layBrowserPanel.cc \
   layBrowseShapesForm.cc \
+  layBusy.cc \
   layCanvasPlane.cc \
   layCellSelectionForm.cc \
   layCellTreeModel.cc \
@@ -191,7 +191,6 @@ SOURCES = \
     laySelectCellViewForm.cc \
     layLayoutStatisticsForm.cc \
     gsiDeclLayNetlistBrowserDialog.cc \
-    layD25TechnologyComponent.cc \
     layLayoutViewFunctions.cc
 
 HEADERS = \
@@ -208,6 +207,7 @@ HEADERS = \
   layBrowser.h \
   layBrowserPanel.h \
   layBrowseShapesForm.h \
+  layBusy.h \
   layCanvasPlane.h \
   layCellSelectionForm.h \
   layCellTreeModel.h \
@@ -298,7 +298,6 @@ HEADERS = \
     layDispatcher.h \
     laySelectCellViewForm.h \
     layLayoutStatisticsForm.h \
-    layD25TechnologyComponent.h \
     layLayoutViewFunctions.h 
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC

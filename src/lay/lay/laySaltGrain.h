@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,6 +30,11 @@
 
 #include <QTime>
 #include <QImage>
+
+namespace tl
+{
+  class InputHttpStreamCallback;
+}
 
 namespace lay
 {
@@ -462,7 +467,7 @@ public:
    *  The data is read from "URL/grain.xml". This method will throw an
    *  exception if an error occurs during reading.
    */
-  static SaltGrain from_url (const std::string &url);
+  static SaltGrain from_url (const std::string &url, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
 
   /**
    *  @brief Returns a stream prepared for downloading the grain
@@ -470,7 +475,7 @@ public:
    *  "url" is the download URL on input and gets modified to match the
    *  actual URL if it is a relative one.
    */
-  static tl::InputStream *stream_from_url (std::string &url);
+  static tl::InputStream *stream_from_url (std::string &url, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
 
   /**
    *  @brief Forms the spec file download URL from a given download URL

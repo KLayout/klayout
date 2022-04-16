@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -286,6 +286,8 @@ CommonReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
   init (options);
 
+  tl_assert (!layout.under_construction ());
+
   m_common_options.layer_map.prepare (layout);
 
   layout.start_changes ();
@@ -297,6 +299,11 @@ CommonReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
     layout.end_changes ();
     throw;
   }
+
+  //  A cleanup may be necessary because of the following scenario: if library proxies contain subcells
+  //  which are proxies itself, the proxy update may make them orphans (the proxies are regenerated).
+  //  The cleanup will removed these.
+  layout.cleanup ();
 
   return m_layer_map_out;
 }

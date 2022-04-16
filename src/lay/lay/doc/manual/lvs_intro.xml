@@ -425,7 +425,7 @@ M$2 2 1 4 6 NMOS L=0.25U W=0.9U AS=0.405P AD=0.405P PS=2.7U PD=2.7U
   </p>
 
   <p>
-  <img src="inv_with_diodes.png"/>
+  <img src="/manual/inv_with_diodes.png"/>
   </p>
 
   <p>
@@ -433,7 +433,7 @@ M$2 2 1 4 6 NMOS L=0.25U W=0.9U AS=0.405P AD=0.405P PS=2.7U PD=2.7U
   </p>
 
   <p>
-  <img src="inv_schematic2.png"/>
+  <img src="/manual/inv_schematic2.png"/>
   </p>
 
   <p>

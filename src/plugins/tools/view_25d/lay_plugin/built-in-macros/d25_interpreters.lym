@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category/>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>true</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>ruby</interpreter>
+ <dsl-interpreter-name/>
+ <text>
+module D25
+
+  class D25Executable &lt; RBA::Executable
+
+    def initialize(macro, generator)
+
+      @d25 = D25Engine::new
+      @d25._generator = generator
+
+      @macro = macro
+
+    end
+
+    def execute
+
+      @d25._start("D25: " + @macro.path)
+
+      # Set a debugger scope so that our errors end up with the debugger set to the D25's line
+      RBA::MacroExecutionContext::set_debugger_scope(@macro.path)
+
+      begin
+
+        # No verbosity set in d25 engine - we cannot use the engine's logger 
+        RBA::Logger::verbosity &gt;= 10 &amp;&amp; RBA::Logger::info("Running #{@macro.path}")
+        @d25.instance_eval(@macro.text, @macro.path)
+
+      rescue =&gt; ex
+
+        @d25.error("In #{@macro.path}: #{ex.to_s}")
+        RBA::MacroExecutionContext::ignore_next_exception
+        raise ex
+
+      end
+
+      @d25._check
+
+      nil
+
+    end
+
+    def cleanup
+
+      # Remove the debugger scope
+      RBA::MacroExecutionContext::remove_debugger_scope
+
+      # cleans up and creates layout and report views
+      @d25._finish
+
+    end
+
+  end
+  
+  # A DSL implementation for a D25 language (XML format)
+  class D25Interpreter &lt; RBA::MacroInterpreter
+  
+    # Constructor
+    def initialize(recipe)
+
+      @recipe = recipe
+
+      # Make the DSL use ruby syntax highlighting
+      self.syntax_scheme = "ruby"
+      self.suffix = "lyd25"
+      self.debugger_scheme = RBA::MacroInterpreter::RubyDebugger
+      self.storage_scheme = RBA::MacroInterpreter::MacroFormat
+      self.description = "D25"
+
+      # Registers the new interpreter
+      register("d25-dsl-xml")
+
+      # create a template for the macro editor:
+      create_template(":/d25-templates/d25.lym")
+
+      # if available, create a menu branch
+      if RBA::Application::instance &amp;&amp; RBA::Application::instance.main_window
+        mw = RBA::Application::instance.main_window
+        mw.menu.insert_menu("tools_menu.verification_group+", "d25", "2.5d View")
+      end
+
+    end
+    
+    # Implements the execute method
+    def executable(macro)
+      D25Executable::new(macro, @recipe.generator("script" => macro.path))
+    end
+    
+  end
+  
+  # A DSL implementation for a D25 language (Plain text format)
+  class D25PlainTextInterpreter &lt; RBA::MacroInterpreter
+  
+    # Constructor
+    def initialize(recipe)
+
+      @recipe = recipe
+
+      # Make the DSL use ruby syntax highlighting
+      self.syntax_scheme = "ruby"
+      self.suffix = "d25"
+      self.debugger_scheme = RBA::MacroInterpreter::RubyDebugger
+      self.storage_scheme = RBA::MacroInterpreter::PlainTextWithHashAnnotationsFormat
+      self.description = "D25 (Text)"
+
+      # Registers the new interpreter
+      register("d25-dsl")
+
+    end
+    
+    # Implements the execute method
+    def executable(macro)
+      D25Executable::new(macro, @recipe.generator("script" => macro.path))
+    end
+    
+  end
+  
+  # A recipe implementation allowing the D25 run to be redone
+  class D25Recipe &lt; RBA::Recipe
+
+    def initialize
+      super("d25", "D25 recipe")
+    end
+
+    def executable(params)
+
+      script = params["script"]
+      if ! script
+        return
+      end
+
+      macro = RBA::Macro::macro_by_path(script)
+      macro || raise("Can't find D25 script #{script} - unable to re-run")
+
+      D25Executable::new(macro, self.generator("script" => script))
+      
+    end
+
+  end
+  
+  # Register the recipe
+  d25_recipe = D25Recipe::new
+ 
+  # Register the new interpreters
+  D25Interpreter::new(d25_recipe)
+  D25PlainTextInterpreter::new(d25_recipe)
+
+  # Creates a new macro category
+  if RBA::Application::instance 
+    RBA::Application::instance.add_macro_category("d25", "2.5d View", [ "d25" ])
+  end
+ 
+end
+</text>
+</klayout-macro>
+

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,25 +25,31 @@
 #include "dbLibraryProxy.h"
 #include "dbPCellDeclaration.h"
 #include "dbPCellVariant.h"
+#include "dbLibraryManager.h"
+
+#include <limits>
 
 namespace db
 {
 
 Library::Library()
-  : m_id (0), m_layout (true)
+  : m_id (std::numeric_limits<lib_id_type>::max ()), m_layout (true)
 {
   m_layout.set_library (this);
 }
 
 Library::Library(const Library &d)
-  : gsi::ObjectBase (), tl::Object (), m_name (d.m_name), m_description (d.m_description), m_id (0), m_layout (d.m_layout)
+  : gsi::ObjectBase (), tl::Object (), m_name (d.m_name), m_description (d.m_description), m_id (std::numeric_limits<lib_id_type>::max ()), m_layout (d.m_layout)
 {
   m_layout.set_library (this);
 }
 
 Library::~Library ()
 {
-  // .. nothing yet ..
+  //  unregister if not done yet
+  if (db::LibraryManager::initialized ()) {
+    db::LibraryManager::instance ().unregister_lib (this);
+  }
 }
 
 bool
@@ -137,6 +143,13 @@ Library::is_retired (const db::cell_index_type library_cell_index) const
   std::map<db::cell_index_type, int>::const_iterator i = m_refcount.find (library_cell_index);
   std::map<db::cell_index_type, int>::const_iterator j = m_retired_count.find (library_cell_index);
   return (i != m_refcount.end () && j != m_retired_count.end () && i->second == j->second);
+}
+
+void
+Library::refresh ()
+{
+  layout ().refresh ();
+  remap_to (this);
 }
 
 void

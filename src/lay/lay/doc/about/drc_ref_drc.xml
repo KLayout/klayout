@@ -234,7 +234,7 @@ out = in.drc(area_ratio &gt; 3)
 out = in.drc(primary.area_ratio &gt; 3)   # equivalent
 </pre>
 </p><p>
-The "area_ratio" method is available as a plain function or as a method on <a href="/about/drc_ref_drc#.xml">DRC#</a> expressions.
+The "area_ratio" method is available as a plain function or as a method on <a href="/about/drc_ref_drc.xml">DRC</a> expressions.
 The plain function is equivalent to "primary.area_ratio".
 </p>
 <a name="area_sum"/><h2>"area_sum" - Selects the input polygons if the sum of all areas meets the condition</h2>
@@ -275,7 +275,7 @@ out = in.drc(bbox_aspect_ratio &gt; 3)
 out = in.drc(primary.bbox_aspect_ratio &gt; 3)   # equivalent
 </pre>
 </p><p>
-The "bbox_aspect_ratio" method is available as a plain function or as a method on <a href="/about/drc_ref_drc#.xml">DRC#</a> expressions.
+The "bbox_aspect_ratio" method is available as a plain function or as a method on <a href="/about/drc_ref_drc.xml">DRC</a> expressions.
 The plain function is equivalent to "primary.bbox_aspect_ratio".
 </p>
 <a name="bbox_height"/><h2>"bbox_height" - Selects the input polygon if its bounding box height is meeting the condition</h2>
@@ -328,7 +328,7 @@ out = in.drc(bbox_min &gt; 200.nm)
 out = in.drc(primary.bbox_min &gt; 200.nm)   # equivalent
 </pre>
 </p><p>
-The "bbox_min" method is available as a plain function or as a method on <a href="/about/drc_ref_drc#.xml">DRC#</a> expressions.
+The "bbox_min" method is available as a plain function or as a method on <a href="/about/drc_ref_drc.xml">DRC</a> expressions.
 The plain function is equivalent to "primary.bbox_min".
 </p>
 <a name="bbox_width"/><h2>"bbox_width" - Selects the input polygon if its bounding box width is meeting the condition</h2>
@@ -839,7 +839,7 @@ out = in.drc(relative_height &gt; 3)
 out = in.drc(primary.relative_height &gt; 3)   # equivalent
 </pre>
 </p><p>
-The "relative_height" method is available as a plain function or as a method on <a href="/about/drc_ref_drc#.xml">DRC#</a> expressions.
+The "relative_height" method is available as a plain function or as a method on <a href="/about/drc_ref_drc.xml">DRC</a> expressions.
 The plain function is equivalent to "primary.bbox_aspect_ratio".
 </p>
 <a name="rounded_corners"/><h2>"rounded_corners" - Applies corner rounding</h2>

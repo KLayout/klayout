@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ ConfigPage::commit (lay::Dispatcher *root)
   root->config_set (cfg_ruler_grid_snap, mp_ui->ruler_grid_snap_cbx->isChecked ());
 
   int sr = 0;
-  tl::from_string (tl::to_string (mp_ui->ruler_snap_range_edit->text ()), sr);
+  tl::from_string_ext (tl::to_string (mp_ui->ruler_snap_range_edit->text ()), sr);
   if (sr < 1 || sr > 1000) {
     throw tl::Exception (tl::to_string (QObject::tr ("Not a valid pixel value (must be non-zero positive and not too large): %s")), tl::to_string (mp_ui->ruler_snap_range_edit->text ()));
   }
@@ -127,7 +127,7 @@ ConfigPage2::commit (lay::Dispatcher *root)
 {
   int mr;
   try {
-    tl::from_string (tl::to_string (mp_ui->num_rulers_edit->text ()), mr);
+    tl::from_string_ext (tl::to_string (mp_ui->num_rulers_edit->text ()), mr);
   } catch (...) {
     mr = -1;
   }

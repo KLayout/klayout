@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1984,6 +1984,9 @@ static std::string get_technology (const lay::CellViewRef *cv)
 
 static tl::Event &get_technology_changed_event (lay::CellViewRef *cv)
 {
+  if (! cv->is_valid ()) {
+    throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cellview")));
+  }
   return (*cv)->technology_changed_event;
 }
 

@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2021 Matthias Koefferlein
+# Copyright (C) 2006-2022 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -48,6 +48,11 @@ class DBCellInst_TestClass < TestBase
     assert_equal(a.is_complex?, false)
     assert_equal(a.trans.to_s, "r90 0,0")
     assert_equal(a.cplx_trans.to_s, "r90 *1 0,0")
+
+    a = RBA::CellInstArray::new(0, RBA::Vector::new(42, -17))
+    assert_equal(a.is_complex?, false)
+    assert_equal(a.trans.to_s, "r0 42,-17")
+    assert_equal(a.cplx_trans.to_s, "r0 *1 42,-17")
 
     a = RBA::CellInstArray::new(0, RBA::ICplxTrans::new(1.5))
     assert_equal(a.is_complex?, true)
@@ -105,6 +110,12 @@ class DBCellInst_TestClass < TestBase
     assert_equal(a.trans.to_s, "r90 0,0")
     assert_equal(a.cplx_trans.to_s, "r90 *1 0,0")
     assert_equal(a.to_s, "#0 r90 0,0 [10,20*3;30,40*5]")
+
+    a = RBA::CellInstArray::new(0, RBA::Vector::new(42, -17), RBA::Vector::new(10, 20), RBA::Vector::new(30, 40), 3, 5)
+    assert_equal(a.is_complex?, false)
+    assert_equal(a.trans.to_s, "r0 42,-17")
+    assert_equal(a.cplx_trans.to_s, "r0 *1 42,-17")
+    assert_equal(a.to_s, "#0 r0 42,-17 [10,20*3;30,40*5]")
 
     a = RBA::CellInstArray::new(0, RBA::ICplxTrans::new(1.5), RBA::Vector::new(10, 20), RBA::Vector::new(30, 40), 3, 5)
     assert_equal(a.is_complex?, true)
@@ -178,6 +189,11 @@ class DBCellInst_TestClass < TestBase
     assert_equal(a.trans.to_s, "r90 0,0")
     assert_equal(a.cplx_trans.to_s, "r90 *1 0,0")
 
+    a = RBA::DCellInstArray::new(0, RBA::DVector::new(42, -17))
+    assert_equal(a.is_complex?, false)
+    assert_equal(a.trans.to_s, "r0 42,-17")
+    assert_equal(a.cplx_trans.to_s, "r0 *1 42,-17")
+
     a = RBA::DCellInstArray::new(0, RBA::DCplxTrans::new(1.5))
     assert_equal(a.is_complex?, true)
     assert_equal(a.trans.to_s, "r0 0,0")
@@ -234,6 +250,12 @@ class DBCellInst_TestClass < TestBase
     assert_equal(a.trans.to_s, "r90 0,0")
     assert_equal(a.cplx_trans.to_s, "r90 *1 0,0")
     assert_equal(a.to_s, "#0 r90 0,0 [10,20*3;30,40*5]")
+
+    a = RBA::DCellInstArray::new(0, RBA::DVector::new(42, -17), RBA::DVector::new(10, 20), RBA::DVector::new(30, 40), 3, 5)
+    assert_equal(a.is_complex?, false)
+    assert_equal(a.trans.to_s, "r0 42,-17")
+    assert_equal(a.cplx_trans.to_s, "r0 *1 42,-17")
+    assert_equal(a.to_s, "#0 r0 42,-17 [10,20*3;30,40*5]")
 
     a = RBA::DCellInstArray::new(0, RBA::DCplxTrans::new(1.5), RBA::DVector::new(10, 20), RBA::DVector::new(30, 40), 3, 5)
     assert_equal(a.is_complex?, true)

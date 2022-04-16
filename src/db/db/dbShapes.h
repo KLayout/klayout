@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -485,6 +485,7 @@ public:
   virtual bool is_bbox_dirty () const = 0;
   virtual size_t size () const = 0;
   virtual bool empty () const = 0;
+  virtual bool is_tree_dirty () const = 0;
   virtual void sort () = 0;
   virtual LayerBase *clone () const = 0;
   virtual bool is_same_type (const LayerBase *other) const = 0;
@@ -1177,27 +1178,19 @@ public:
   shape_type transform (const shape_type &ref, const Trans &t);
 
   /**
-   *  @brief updates the bbox and sorts if necessary
-   *
-   *  This is equivalent to calling sort () and update_bbox () in this order.
+   *  @brief Updates the quad trees (sort ()) and resets the dirty flag
    */
   void update ();
 
   /**
-   *  @brief updates the bbox 
-   *
-   *  Updating the bbox is required after insert operations
-   *  and is performed only as far as necessary.
-   */
-  void update_bbox ();
-
-  /**
-   *  @brief check if the bounding box needs update
-   *
-   *  Returns true if the bounding box of the shapes has changed and 
-   *  requires an update.
+   *  @brief Returns a value indicating whether the shape container is modified and needs update
    */
   bool is_bbox_dirty () const;
+
+  /**
+   *  @brief Resets the "dirty bbox" condition (see is_bbox_dirty)
+   */
+  void reset_bbox_dirty ();
 
   /**
    *  @brief Retrieve the bbox 

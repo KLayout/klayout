@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -942,13 +942,22 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
   RedundantNodeCache redundant_nodes;
   redundant_nodes.fill (g1);
 
-  //  two passes: one without ambiguities, the second one with
+  //  Three passes: one without ambiguities, the second one with ambiguities and names (optional) and a third with ambiguities with topology
 
-  for (int pass = 0; pass < 2 && ! good; ++pass) {
+  for (int pass = 0; pass < 3 && ! good; ++pass) {
+
+    if (pass == 1 && m_dont_consider_net_names) {
+      //  skip the named pass in "don't consider net names" mode
+      continue;
+    }
 
     if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
       if (pass > 0) {
-        tl::info << "including ambiguous nodes now.";
+        if (pass == 1) {
+          tl::info << "including ambiguous nodes now (with names)";
+        } else {
+          tl::info << "including ambiguous nodes now (ignoreing names)";
+        }
       }
     }
 
@@ -956,7 +965,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     compare.max_depth = m_max_depth;
     compare.max_n_branch = m_max_n_branch;
     compare.depth_first = m_depth_first;
-    compare.dont_consider_net_names = m_dont_consider_net_names;
+    compare.dont_consider_net_names = (pass > 1);
     compare.with_ambiguous = (pass > 0);
     compare.circuit_pin_mapper = &circuit_pin_mapper;
     compare.subcircuit_equivalence = &subcircuit_equivalence;

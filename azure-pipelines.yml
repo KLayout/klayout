@@ -6,19 +6,19 @@ trigger:
     - staging
   tags:
     include:
-      - '*'
+      - 'v*'
 
 jobs:
 - job: Build
   pool:
-    vmImage: 'vs2017-win2016' # other options: 'macOS-10.13', 'ubuntu-16.04'
+    vmImage: 'windows-2019' # other options: 'macOS-10.13', 'ubuntu-16.04'
   strategy:
     matrix:
       # Python27:
       #   python.version: '2.7'
-      cp35-cp35m-win_amd64.whl:
-        python.version: '3.5'
-        python.architecture: 'x64'
+      # cp35-cp35m-win_amd64.whl:
+      #  python.version: '3.5'
+      #        python.architecture: 'x64'
       cp36-cp36m-win_amd64.whl:
         python.version: '3.6'
         python.architecture: 'x64'
@@ -31,9 +31,12 @@ jobs:
       cp39-cp39-win_amd64.whl:
         python.version: '3.9'
         python.architecture: 'x64'
-      cp35-cp35m-win32.whl:
-        python.version: '3.5'
-        python.architecture: 'x86'
+      cp310-cp310-win_amd64.whl:
+        python.version: '3.10'
+        python.architecture: 'x64'
+      # cp35-cp35m-win32.whl:
+      #        python.version: '3.5'
+      #        python.architecture: 'x86'
       cp36-cp36m-win32.whl:
         python.version: '3.6'
         python.architecture: 'x86'
@@ -45,6 +48,9 @@ jobs:
         python.architecture: 'x86'
       cp39-cp39-win32.whl:
         python.version: '3.9'
+        python.architecture: 'x86'
+      cp310-cp310-win32.whl:
+        python.version: '3.10'
         python.architecture: 'x86'
     maxParallel: 6
 
@@ -126,9 +132,14 @@ jobs:
   displayName: 'Combine Windows wheels and deploy to PyPI'
   dependsOn: Build
   pool:
-    vmImage: 'vs2017-win2016' # other options: 'macOS-10.13', 'ubuntu-16.04'
+    vmImage: 'windows-2019' # other options: 'macOS-10.13', 'ubuntu-16.04'
   steps:
     - checkout: none #skip checking out the default repository resource
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts wheel-3.10.x64'
+      inputs:
+        artifactName: 'wheel-3.10.x64'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: DownloadBuildArtifacts@0
       displayName: 'Download Build Artifacts wheel-3.9.x64'
       inputs:
@@ -150,9 +161,9 @@ jobs:
         artifactName: 'wheel-3.6.x64'
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.5.x64'
+      displayName: 'Download Build Artifacts wheel-3.10.x86'
       inputs:
-        artifactName: 'wheel-3.5.x64'
+        artifactName: 'wheel-3.10.x86'
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: DownloadBuildArtifacts@0
       displayName: 'Download Build Artifacts wheel-3.9.x86'
@@ -173,11 +184,6 @@ jobs:
       displayName: 'Download Build Artifacts wheel-3.6.x86'
       inputs:
         artifactName: 'wheel-3.6.x86'
-        downloadPath: '$(System.DefaultWorkingDirectory)'
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts wheel-3.5.x86'
-      inputs:
-        artifactName: 'wheel-3.5.x86'
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: CopyFiles@2
       condition: always()

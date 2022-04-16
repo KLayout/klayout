@@ -191,10 +191,6 @@ equals(HAVE_QT, "0") {
 
     QT += widgets gui printsupport
 
-    lessThan(QT_MAJOR_VERSION, 6) {
-      QT += xmlpatterns
-    }
-
     equals(HAVE_QTBINDINGS, "1") {
       !equals(HAVE_QT_DESIGNER, "0") {
         # designer isn't needed by the base application
@@ -212,6 +208,12 @@ equals(HAVE_QT, "0") {
         # uitools isn't needed by the base application
         QT += uitools
       }
+      !equals(HAVE_QT_XML, "0") {
+        lessThan(QT_MAJOR_VERSION, 6) {
+          QT += xmlpatterns
+        }
+      }
+
     }
 
   } else {

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -206,7 +206,8 @@ EditorServiceBase::EditorServiceBase (lay::LayoutView *view)
   : lay::ViewService (view->view_object_widget ()),
     lay::Editable (view),
     lay::Plugin (view),
-    m_cursor_enabled (true)
+    m_cursor_enabled (true),
+    m_has_tracking_position (false)
 {
   //  .. nothing yet ..
 }
@@ -219,6 +220,8 @@ EditorServiceBase::~EditorServiceBase ()
 void
 EditorServiceBase::add_mouse_cursor (const db::DPoint &pt, bool emphasize)
 {
+  m_has_tracking_position = true;
+  m_tracking_position = pt;
   m_mouse_cursor_markers.push_back (new MouseCursorViewObject (this, widget (), pt, emphasize));
 }
 
@@ -231,6 +234,7 @@ EditorServiceBase::add_edge_marker (const db::DEdge &e, bool emphasize)
 void
 EditorServiceBase::clear_mouse_cursors ()
 {
+  m_has_tracking_position = false;
   for (std::vector<lay::ViewObject *>::iterator r = m_mouse_cursor_markers.begin (); r != m_mouse_cursor_markers.end (); ++r) {
     delete *r;
   }

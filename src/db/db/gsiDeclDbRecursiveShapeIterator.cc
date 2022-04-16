@@ -1,8 +1,8 @@
-
+#
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -27,11 +27,38 @@
 
 #include "tlGlobPattern.h"
 
+#include <iterator>
+
 namespace gsi
 {
 
 // ---------------------------------------------------------------
 //  db::RecursiveShapeIterator binding
+
+namespace {
+
+/**
+ *  @brief A wrapper that allows using "each" on the iterator
+ */
+class IteratorIterator
+{
+public:
+  typedef db::RecursiveShapeIterator value_type;
+  typedef db::RecursiveShapeIterator &reference;
+  typedef db::RecursiveShapeIterator *pointer;
+  typedef std::forward_iterator_tag iterator_category;
+  typedef void difference_type;
+
+  IteratorIterator (db::RecursiveShapeIterator *iter) : mp_iter (iter) { }
+  bool at_end () const { return mp_iter->at_end (); }
+  reference operator* () const { return *mp_iter; }
+  void operator++ () { ++*mp_iter; }
+
+private:
+  db::RecursiveShapeIterator *mp_iter;
+};
+
+}
 
 static db::RecursiveShapeIterator *new_si1 (const db::Layout &layout, const db::Cell &cell, unsigned int layer)
 {
@@ -61,6 +88,11 @@ static db::RecursiveShapeIterator *new_si4 (const db::Layout &layout, const db::
 static db::RecursiveShapeIterator *new_si4a (const db::Layout &layout, const db::Cell &cell, const std::vector<unsigned int> &layers, const db::Region &region, bool overlapping)
 {
   return new db::RecursiveShapeIterator (layout, cell, layers, region, overlapping);
+}
+
+static IteratorIterator each (db::RecursiveShapeIterator *r)
+{
+  return IteratorIterator (r);
 }
 
 static db::DCplxTrans si_dtrans (const db::RecursiveShapeIterator *r)
@@ -235,6 +267,21 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
     "bounding box touches the search region are reported.\n"
     "\n"
     "This constructor has been introduced in version 0.23. The 'overlapping' parameter has been made optional in version 0.27.\n"
+  ) +
+  gsi::iterator_ext ("each", &each,
+    "@brief Native iteration\n"
+    "This method enables native iteration, e.g.\n"
+    "\n"
+    "@code\n"
+    "  iter = ... # RecursiveShapeIterator\n"
+    "  iter.each do |i|\n"
+    "     ... i is the iterator itself\n"
+    "  end\n"
+    "@/code\n"
+    "\n"
+    "This is slightly more convenient than the 'at_end' .. 'next' loop.\n"
+    "\n"
+    "This feature has been introduced in version 0.28.\n"
   ) +
   gsi::method ("max_depth=", (void (db::RecursiveShapeIterator::*) (int)) &db::RecursiveShapeIterator::max_depth, gsi::arg ("depth"),
     "@brief Specifies the maximum hierarchy depth to look into\n"
@@ -559,6 +606,14 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
   "    puts \"In cell #{iter.cell.name}: \" + polygon.to_s\n"
   "  end\n"
   "  iter.next\n"
+  "end\n"
+  "\n"
+  "# or shorter:\n"
+  "cell.begin_shapes_rec(layer).each do |iter|\n"
+  "  if iter.shape.renders_polygon?\n"
+  "    polygon = iter.shape.polygon.transformed(iter.itrans)\n"
+  "    puts \"In cell #{iter.cell.name}: \" + polygon.to_s\n"
+  "  end\n"
   "end\n"
   "@/code\n"
   "\n"

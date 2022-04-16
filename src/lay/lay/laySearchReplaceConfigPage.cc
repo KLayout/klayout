@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -110,10 +110,10 @@ void
 SearchReplaceConfigPage::commit (lay::Dispatcher *root)
 {
   double dim = 1.0;
-  tl::from_string (tl::to_string (le_window->text ()), dim);
+  tl::from_string_ext (tl::to_string (le_window->text ()), dim);
 
   unsigned int max_item_count = 1000;
-  tl::from_string (tl::to_string (le_max_items->text ()), max_item_count);
+  tl::from_string_ext (tl::to_string (le_max_items->text ()), max_item_count);
 
   root->config_set (cfg_sr_window_mode, SearchReplaceDialog::window_type (cbx_window->currentIndex ()), SearchReplaceWindowModeConverter ());
   root->config_set (cfg_sr_window_dim, dim);

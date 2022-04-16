@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -537,7 +537,7 @@ CellSelectionForm::hide_cell ()
 
 // ------------------------------------------------------------
 
-LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, db::Layout *layout, const char *name, bool all_cells)
+LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, db::Layout *layout, const char *name, bool all_cells, bool top_cells_only)
   : QDialog (parent), Ui::LibraryCellSelectionForm (),
     mp_lib (0), mp_layout (layout),
     m_name_cb_enabled (true),
@@ -545,7 +545,8 @@ LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, db::Layout 
     m_cell_index (-1),
     m_pcell_id (-1),
     m_is_pcell (false),
-    m_all_cells (all_cells)
+    m_all_cells (all_cells),
+    m_top_cells_only (top_cells_only)
 {
   setObjectName (QString::fromUtf8 (name));
 
@@ -571,7 +572,7 @@ LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, db::Layout 
   update_cell_list ();  
 }
 
-LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, const char *name, bool all_cells)
+LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, const char *name, bool all_cells, bool top_cells_only)
   : QDialog (parent), Ui::LibraryCellSelectionForm (),
     mp_lib (0), mp_layout (0),
     m_name_cb_enabled (true),
@@ -579,7 +580,8 @@ LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, const char 
     m_cell_index (-1),
     m_pcell_id (-1),
     m_is_pcell (false),
-    m_all_cells (all_cells)
+    m_all_cells (all_cells),
+    m_top_cells_only (top_cells_only)
 {
   mp_lib = db::LibraryManager::instance ().lib_ptr_by_name ("Basic");
   mp_layout = &mp_lib->layout ();
@@ -680,8 +682,16 @@ LibraryCellSelectionForm::update_cell_list ()
 
   if (mp_layout) {
 
+    unsigned int flags = lay::CellTreeModel::Flat;
+    if (! m_all_cells) {
+      flags |= lay::CellTreeModel::BasicCells;
+      if (m_top_cells_only) {
+        flags |= lay::CellTreeModel::TopCells;
+      }
+    }
+
     //  TODO: get rid of that const_cast
-    lay::CellTreeModel *model = new lay::CellTreeModel (lv_cells, const_cast<db::Layout *> (mp_layout), lay::CellTreeModel::Flat | (m_all_cells ? 0 : (lay::CellTreeModel::TopCells | lay::CellTreeModel::BasicCells)));
+    lay::CellTreeModel *model = new lay::CellTreeModel (lv_cells, const_cast<db::Layout *> (mp_layout), flags);
     
     lv_cells->setModel (model);
     //  connect can only happen after setModel()

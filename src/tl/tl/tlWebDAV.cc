@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -148,11 +148,13 @@ static std::string item_name (const std::string &path1, const std::string &path2
 }
 
 void
-WebDAVObject::read (const std::string &url, int depth)
+WebDAVObject::read (const std::string &url, int depth, double timeout, tl::InputHttpStreamCallback *callback)
 {
   tl::URI base_uri (url);
 
   tl::InputHttpStream http (url);
+  http.set_timeout (timeout);
+  http.set_callback (callback);
   http.add_header ("User-Agent", "SVN");
   http.add_header ("Depth", tl::to_string (depth));
   http.set_request ("PROPFIND");
@@ -202,12 +204,12 @@ struct DownloadItem
 }
 
 static
-void fetch_download_items (const std::string &url, const std::string &target, std::list<DownloadItem> &items, tl::AbsoluteProgress &progress)
+void fetch_download_items (const std::string &url, const std::string &target, std::list<DownloadItem> &items, tl::AbsoluteProgress &progress, double timeout, tl::InputHttpStreamCallback *callback)
 {
   ++progress;
 
   WebDAVObject object;
-  object.read (url, 1);
+  object.read (url, 1, timeout, callback);
 
   if (object.is_collection ()) {
 
@@ -231,7 +233,7 @@ void fetch_download_items (const std::string &url, const std::string &target, st
           throw tl::Exception (tl::to_string (tr ("Download failed: unable to create subdirectory '%s' in '%s' - no write permissions")), i->name (), target);
         }
 
-        fetch_download_items (i->url (), item_path, items, progress);
+        fetch_download_items (i->url (), item_path, items, progress, timeout, callback);
 
       } else {
 
@@ -250,16 +252,18 @@ void fetch_download_items (const std::string &url, const std::string &target, st
 }
 
 tl::InputStream *
-WebDAVObject::download_item (const std::string &url)
+WebDAVObject::download_item (const std::string &url, double timeout, tl::InputHttpStreamCallback *callback)
 {
   tl::InputHttpStream *http = new tl::InputHttpStream (url);
+  http->set_timeout (timeout);
+  http->set_callback (callback);
   //  This trick allows accessing GitHub repos through their SVN API
   http->add_header ("User-Agent", "SVN");
   return new tl::InputStream (http);
 }
 
 bool
-WebDAVObject::download (const std::string &url, const std::string &target)
+WebDAVObject::download (const std::string &url, const std::string &target, double timeout, tl::InputHttpStreamCallback *callback)
 {
   std::list<DownloadItem> items;
 
@@ -267,7 +271,7 @@ WebDAVObject::download (const std::string &url, const std::string &target)
 
     tl::info << tr ("Fetching file structure from ") << url;
     tl::AbsoluteProgress progress (tl::sprintf (tl::to_string (tr ("Fetching directory structure from %s")), url));
-    fetch_download_items (url, target, items, progress);
+    fetch_download_items (url, target, items, progress, timeout, callback);
 
   } catch (tl::Exception &ex) {
     tl::error << tr ("Error downloading file structure from '") << url << "':" << tl::endl << ex.msg ();
@@ -288,15 +292,23 @@ WebDAVObject::download (const std::string &url, const std::string &target)
       try {
 
         tl::OutputStream os (i->path);
-        std::unique_ptr<tl::InputStream> is (download_item (i->url));
+        std::unique_ptr<tl::InputStream> is (download_item (i->url, timeout, callback));
         is->copy_to (os);
 
+        ++progress;
+
+      } catch (tl::BreakException &ex) {
+        tl::info << tr ("Download was cancelled") << tl::endl << ex.msg ();
+        has_errors = true;
+        break;
+      } catch (tl::CancelException &ex) {
+        tl::info << tr ("Download was cancelled") << tl::endl << ex.msg ();
+        has_errors = true;
+        break;
       } catch (tl::Exception &ex) {
         tl::error << tr ("Error downloading file from '") << i->url << "':" << tl::endl << ex.msg ();
         has_errors = true;
       }
-
-      ++progress;
 
     }
   }

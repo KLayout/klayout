@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2021 Matthias Koefferlein
+# Copyright (C) 2006-2022 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,13 +30,13 @@ class DBLibrary_TestClass < TestBase
     lib = RBA::Library::new
 
     assert_equal(lib.name, "")
-    assert_equal(lib.id, 0)
+    noid = lib.id;
 
     lib.register("RBA-unit-test")
 
     assert_equal(lib.name, "RBA-unit-test")
     lib_id = lib.id
-    assert_equal(lib_id != 0, true)
+    assert_equal(lib_id != noid, true)
 
     # the layout inside the library knows the library
     assert_equal(lib.layout.library.id == lib.id, true)

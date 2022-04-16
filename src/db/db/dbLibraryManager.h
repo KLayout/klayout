@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "dbTypes.h"
 #include "tlClassRegistry.h"
 #include "tlEvents.h"
+#include "tlThreads.h"
 
 #include <map>
 #include <vector>
@@ -186,6 +187,13 @@ public:
   lib_id_type register_lib (Library *library);
 
   /**
+   *  @brief Unregisters a library
+   *
+   *  This will release the library from the manager's control and lifetime management.
+   */
+  void unregister_lib (Library *library);
+
+  /**
    *  @brief Deletes a library 
    */
   void delete_lib (Library *library);
@@ -207,8 +215,10 @@ public:
 private:
   std::vector<Library *> m_libs;
   lib_name_map m_lib_by_name;
+  mutable tl::Mutex m_lock;
 
   LibraryManager ();
+  Library *lib_internal (lib_id_type id) const;
 };
 
 }

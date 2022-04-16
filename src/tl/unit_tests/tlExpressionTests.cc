@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -454,6 +454,9 @@ public:
   virtual void *clone (const void *) const { tl_assert (false); }
   virtual void assign (void *, const void *) const { tl_assert (false); }
   virtual std::string to_string (const void *) const { tl_assert (false); }
+  virtual int to_int (const void *) const { tl_assert (false); }
+  virtual double to_double (const void *) const { tl_assert (false); }
+  virtual void to_variant (const void *, tl::Variant &) const { tl_assert (false); }
   virtual void read (void *, tl::Extractor &) const { }
   virtual const char *name () const { return "Box"; }
   virtual unsigned int type_code () const { return 0; }
@@ -519,6 +522,9 @@ public:
   virtual void *clone (const void *) const { tl_assert (false); }
   virtual void assign (void *, const void *) const { tl_assert (false); }
   virtual std::string to_string (const void *) const { tl_assert (false); }
+  virtual int to_int (const void *) const { tl_assert (false); }
+  virtual double to_double (const void *) const { tl_assert (false); }
+  virtual void to_variant (const void *, tl::Variant &) const { tl_assert (false); }
   virtual void read (void *, tl::Extractor &) const { }
   virtual const char *name () const { return "Edge"; }
   virtual unsigned int type_code () const { return 0; }

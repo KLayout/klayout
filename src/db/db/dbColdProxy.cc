@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -81,9 +81,9 @@ std::string
 ColdProxy::get_basic_name () const
 {
   if (! mp_context_info->pcell_name.empty ()) {
-    return "<defunct>" + mp_context_info->pcell_name;
+    return mp_context_info->pcell_name;
   } else if (! mp_context_info->cell_name.empty ()) {
-    return "<defunct>" + mp_context_info->cell_name;
+    return mp_context_info->cell_name;
   } else {
     return Cell::get_basic_name ();
   }

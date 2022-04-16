@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -839,27 +839,27 @@ Shapes::transform (const Shapes::shape_type &ref, const Trans &t)
   case shape_type::Polygon:
     {
       shape_type::polygon_type p (ref.polygon ());
-      p.transform (t);
+      p.transform (t, false /* don't compress */);
       return replace_member_with_props (shape_type::polygon_type::tag (), ref, p);
     }
   case shape_type::PolygonRef:
     {
       shape_type::polygon_type p;
       ref.polygon (p);
-      p.transform (t);
+      p.transform (t, false /* don't compress */);
       return replace_member_with_props (shape_type::polygon_ref_type::tag (), ref, p);
     }
   case shape_type::SimplePolygon:
     {
       shape_type::simple_polygon_type p (ref.simple_polygon ());
-      p.transform (t);
+      p.transform (t, false /* don't compress */);
       return replace_member_with_props (shape_type::simple_polygon_type::tag (), ref, p);
     }
   case shape_type::SimplePolygonRef:
     {
       shape_type::simple_polygon_type p;
       ref.simple_polygon (p);
-      p.transform (t);
+      p.transform (t, false /* don't compress */);
       return replace_member_with_props (shape_type::simple_polygon_ref_type::tag (), ref, p);
     }
   case shape_type::Edge:
@@ -1016,15 +1016,12 @@ Shapes::clear ()
   }
 }
 
-void Shapes::update_bbox ()
+void Shapes::reset_bbox_dirty ()
 {
-  for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    (*l)->update_bbox ();
-  }
   set_dirty (false);
 }
 
-void Shapes::update () 
+void Shapes::update ()
 {
   for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
     (*l)->sort ();
@@ -1039,7 +1036,7 @@ bool Shapes::is_bbox_dirty () const
     return true;
   }
   for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    if ((*l)->is_bbox_dirty ()) {
+    if ((*l)->is_tree_dirty ()) {
       return true;
     }
   }
@@ -1050,6 +1047,9 @@ Shapes::box_type Shapes::bbox () const
 {
   box_type box;
   for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+    if ((*l)->is_bbox_dirty ()) {
+      (*l)->update_bbox ();
+    }
     box += (*l)->bbox ();
   }
   return box;

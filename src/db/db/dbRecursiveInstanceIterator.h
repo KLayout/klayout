@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "dbLayout.h"
 #include "dbInstElement.h"
 #include "tlAssert.h"
+#include "tlObject.h"
 
 #include <map>
 #include <set>
@@ -180,7 +181,7 @@ public:
    */
   const layout_type *layout () const
   {
-    return mp_layout;
+    return mp_layout.get ();
   }
 
   /**
@@ -544,7 +545,7 @@ private:
   std::set<db::cell_index_type> m_targets;
   bool m_all_targets;
 
-  const layout_type *mp_layout;
+  tl::weak_ptr<layout_type> mp_layout;
   const cell_type *mp_top_cell;
 
   box_type m_region;

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -544,7 +544,7 @@ TEST(5)
   cell = l.recover_proxy (info);
   EXPECT_EQ (dynamic_cast<db::ColdProxy *> (cell) != 0, true);
   EXPECT_EQ (cell->get_qualified_name (), "<defunct>LIB.LIBCELL");
-  EXPECT_EQ (cell->get_basic_name (), "<defunct>LIBCELL");
+  EXPECT_EQ (cell->get_basic_name (), "LIBCELL");
   EXPECT_EQ (cell->get_display_name (), "<defunct>LIB.LIBCELL");
 
   EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nend_cell\nend_lib\n");
@@ -562,7 +562,7 @@ TEST(5)
   cell = &l.cell (l.cell_by_name ("LIBCELL").second);
   EXPECT_EQ (dynamic_cast<db::ColdProxy *> (cell) != 0, true);
   EXPECT_EQ (cell->get_qualified_name (), "<defunct>LIB.LIBCELL");
-  EXPECT_EQ (cell->get_basic_name (), "<defunct>LIBCELL");
+  EXPECT_EQ (cell->get_basic_name (), "LIBCELL");
   EXPECT_EQ (cell->get_display_name (), "<defunct>LIB.LIBCELL");
 
   //  NOTE: the box on 1/0 retained
@@ -590,7 +590,7 @@ TEST(5)
     cell = &l.cell (l.cell_by_name ("LIBCELL").second);
     EXPECT_EQ (dynamic_cast<db::ColdProxy *> (cell) != 0, true);
     EXPECT_EQ (cell->get_qualified_name (), "<defunct>LIB.LIBCELL");
-    EXPECT_EQ (cell->get_basic_name (), "<defunct>LIBCELL");
+    EXPECT_EQ (cell->get_basic_name (), "LIBCELL");
     EXPECT_EQ (cell->get_display_name (), "<defunct>LIB.LIBCELL");
     EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {LIBCELL}\nbox 1 0 {0 0} {100 200}\nend_cell\nend_lib\n");
 

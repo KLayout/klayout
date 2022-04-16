@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1238,6 +1238,96 @@ VariantUserClassImpl::to_string_impl (void *obj) const
 
   } else {
     return std::string (); 
+  }
+}
+
+tl::Variant
+VariantUserClassImpl::to_variant_impl (void *obj) const
+{
+  if (obj) {
+
+    if (! has_method ("to_v")) {
+
+      //  no method to convert the object to a string
+      return tl::Variant ();
+
+    } else {
+
+      tl::ExpressionParserContext context;
+
+      tl::Variant out;
+
+      tl::Variant object (obj, mp_object_cls, false);
+      std::vector<tl::Variant> vv;
+
+      execute_gsi (context, out, object, "to_v", vv);
+
+      return out;
+
+    }
+
+  } else {
+    return tl::Variant ();
+  }
+}
+
+int
+VariantUserClassImpl::to_int_impl (void *obj) const
+{
+  if (obj) {
+
+    if (! has_method ("to_i")) {
+
+      //  no method to convert the object to an integer
+      return 0;
+
+    } else {
+
+      tl::ExpressionParserContext context;
+
+      tl::Variant out;
+
+      tl::Variant object (obj, mp_object_cls, false);
+      std::vector<tl::Variant> vv;
+
+      execute_gsi (context, out, object, "to_i", vv);
+
+      return out.to_int ();
+
+    }
+
+  } else {
+    return 0;
+  }
+}
+
+double
+VariantUserClassImpl::to_double_impl (void *obj) const
+{
+  if (obj) {
+
+    if (! has_method ("to_f")) {
+
+      //  no method to convert the object to a double value
+      return 0.0;
+
+    } else {
+
+      tl::ExpressionParserContext context;
+
+      tl::Variant out;
+
+      tl::Variant object (obj, mp_object_cls, false);
+      std::vector<tl::Variant> vv;
+
+      execute_gsi (context, out, object, "to_f", vv);
+
+      return out.to_double ();
+
+    }
+
+  } else {
+    return 0.0;
   }
 }
 

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -170,9 +170,9 @@ NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &ce
       technology = std::string ();
     }
 
-    tl::from_string (tl::to_string (mp_ui->window_le->text ()), size);
+    tl::from_string_ext (tl::to_string (mp_ui->window_le->text ()), size);
     if (! mp_ui->dbu_le->text ().isEmpty ()) {
-      tl::from_string (tl::to_string (mp_ui->dbu_le->text ()), dbu);
+      tl::from_string_ext (tl::to_string (mp_ui->dbu_le->text ()), dbu);
     } else {
       dbu = 0.0;
     }
@@ -207,9 +207,9 @@ NewLayoutPropertiesDialog::accept ()
 BEGIN_PROTECTED;
 
   double x = 0.0;
-  tl::from_string (tl::to_string (mp_ui->window_le->text ()), x);
+  tl::from_string_ext (tl::to_string (mp_ui->window_le->text ()), x);
   if (!mp_ui->dbu_le->text ().isEmpty ()) {
-    tl::from_string (tl::to_string (mp_ui->dbu_le->text ()), x);
+    tl::from_string_ext (tl::to_string (mp_ui->dbu_le->text ()), x);
   }
 
   if (mp_ui->topcell_le->text ().isEmpty ()) {
@@ -250,7 +250,7 @@ NewCellPropertiesDialog::exec_dialog (const db::Layout *layout, std::string &cel
 
   if (QDialog::exec ()) {
 
-    tl::from_string (tl::to_string (mp_ui->window_le->text ()), size);
+    tl::from_string_ext (tl::to_string (mp_ui->window_le->text ()), size);
     cell_name = tl::to_string (mp_ui->name_le->text ());
     return true;
 
@@ -265,7 +265,7 @@ NewCellPropertiesDialog::accept ()
 BEGIN_PROTECTED;
 
   double x = 0.0;
-  tl::from_string (tl::to_string (mp_ui->window_le->text ()), x);
+  tl::from_string_ext (tl::to_string (mp_ui->window_le->text ()), x);
 
   if (mp_layout->cell_by_name (tl::to_string (mp_ui->name_le->text ()).c_str ()).first) {
     throw tl::Exception (tl::to_string (QObject::tr ("A cell with that name already exists: %s")), tl::to_string (mp_ui->name_le->text ()));
@@ -335,14 +335,14 @@ NewLayerPropertiesDialog::get (db::LayerProperties &src)
 {
   if (! mp_ui->layer_le->text ().isEmpty ()) {
     int l = -1;
-    tl::from_string (tl::to_string (mp_ui->layer_le->text ()), l);
+    tl::from_string_ext (tl::to_string (mp_ui->layer_le->text ()), l);
     src.layer = l;
   } else {
     src.layer = -1;
   }
   if (! mp_ui->datatype_le->text ().isEmpty ()) {
     int d = -1;
-    tl::from_string (tl::to_string (mp_ui->datatype_le->text ()), d);
+    tl::from_string_ext (tl::to_string (mp_ui->datatype_le->text ()), d);
     src.datatype = d;
   } else {
     src.datatype = -1;
@@ -395,8 +395,8 @@ MoveOptionsDialog::exec_dialog (db::DVector &disp)
   if (QDialog::exec ()) {
 
     double x = 0.0, y = 0.0;
-    tl::from_string (tl::to_string (mp_ui->disp_x_le->text ()), x);
-    tl::from_string (tl::to_string (mp_ui->disp_y_le->text ()), y);
+    tl::from_string_ext (tl::to_string (mp_ui->disp_x_le->text ()), x);
+    tl::from_string_ext (tl::to_string (mp_ui->disp_y_le->text ()), y);
 
     disp = db::DVector (x, y);
 
@@ -412,8 +412,8 @@ MoveOptionsDialog::accept ()
 {
 BEGIN_PROTECTED;
   double x = 0.0;
-  tl::from_string (tl::to_string (mp_ui->disp_x_le->text ()), x);
-  tl::from_string (tl::to_string (mp_ui->disp_y_le->text ()), x);
+  tl::from_string_ext (tl::to_string (mp_ui->disp_x_le->text ()), x);
+  tl::from_string_ext (tl::to_string (mp_ui->disp_y_le->text ()), x);
   QDialog::accept ();
 END_PROTECTED;
 }
@@ -470,8 +470,8 @@ MoveToOptionsDialog::exec_dialog (int &mode_x, int &mode_y, db::DPoint &target)
     }
 
     double x = 0.0, y = 0.0;
-    tl::from_string (tl::to_string (mp_ui->x_le->text ()), x);
-    tl::from_string (tl::to_string (mp_ui->y_le->text ()), y);
+    tl::from_string_ext (tl::to_string (mp_ui->x_le->text ()), x);
+    tl::from_string_ext (tl::to_string (mp_ui->y_le->text ()), y);
 
     target = db::DPoint (x, y);
 
@@ -487,8 +487,8 @@ MoveToOptionsDialog::accept ()
 {
 BEGIN_PROTECTED;
   double x = 0.0;
-  tl::from_string (tl::to_string (mp_ui->x_le->text ()), x);
-  tl::from_string (tl::to_string (mp_ui->y_le->text ()), x);
+  tl::from_string_ext (tl::to_string (mp_ui->x_le->text ()), x);
+  tl::from_string_ext (tl::to_string (mp_ui->y_le->text ()), x);
   QDialog::accept ();
 END_PROTECTED;
 }
@@ -955,8 +955,8 @@ AlignCellOptionsDialog::exec_dialog (AlignCellOptions &data)
       }
     }
 
-    tl::from_string (tl::to_string (mp_ui->x_le->text ()), data.xpos);
-    tl::from_string (tl::to_string (mp_ui->y_le->text ()), data.ypos);
+    tl::from_string_ext (tl::to_string (mp_ui->x_le->text ()), data.xpos);
+    tl::from_string_ext (tl::to_string (mp_ui->y_le->text ()), data.ypos);
 
     return true;
 
@@ -971,8 +971,8 @@ AlignCellOptionsDialog::accept ()
 BEGIN_PROTECTED;
 
   double x = 0.0;
-  tl::from_string (tl::to_string (mp_ui->x_le->text ()), x);
-  tl::from_string (tl::to_string (mp_ui->y_le->text ()), x);
+  tl::from_string_ext (tl::to_string (mp_ui->x_le->text ()), x);
+  tl::from_string_ext (tl::to_string (mp_ui->y_le->text ()), x);
 
   QDialog::accept ();
 

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -136,10 +136,10 @@ void
 NetlistBrowserConfigPage::commit (lay::Dispatcher *root)
 {
   double dim = 1.0;
-  tl::from_string (tl::to_string (le_window->text ()), dim);
+  tl::from_string_ext (tl::to_string (le_window->text ()), dim);
 
   unsigned int max_shapes_highlighted = 10000;
-  tl::from_string (tl::to_string (le_max_markers->text ()), max_shapes_highlighted);
+  tl::from_string_ext (tl::to_string (le_max_markers->text ()), max_shapes_highlighted);
 
   root->config_set (cfg_l2ndb_window_mode, lay::NetlistBrowserConfig::net_window_type (cbx_window->currentIndex ()), NetlistBrowserWindowModeConverter ());
   root->config_set (cfg_l2ndb_window_dim, dim);
@@ -300,7 +300,7 @@ NetlistBrowserConfigPage2::commit (lay::Dispatcher *root)
   } else {
     try {
       int s;
-      tl::from_string (tl::to_string (lw_le->text ()), s);
+      tl::from_string_ext (tl::to_string (lw_le->text ()), s);
       root->config_set (cfg_l2ndb_marker_line_width, s);
     } catch (...) { }
   }
@@ -310,7 +310,7 @@ NetlistBrowserConfigPage2::commit (lay::Dispatcher *root)
   } else {
     try {
       int s;
-      tl::from_string (tl::to_string (vs_le->text ()), s);
+      tl::from_string_ext (tl::to_string (vs_le->text ()), s);
       root->config_set (cfg_l2ndb_marker_vertex_size, s);
     } catch (...) { }
   }

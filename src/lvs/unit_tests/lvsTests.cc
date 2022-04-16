@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
-void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string &au_netlist, const std::string &layout, bool priv = false, const std::string &au_lvsdb_name = std::string ())
+void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string &au_netlist, const std::string &layout, bool priv = false, const std::string &au_lvsdb_name = std::string (), const std::string &added = std::string ())
 {
   std::string testsrc = priv ? tl::testdata_private () : tl::testdata ();
   testsrc = tl::combine_path (testsrc, "lvs");
@@ -51,7 +51,8 @@ void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string
         "$lvs_test_target_lvsdb = '%s'\n"
         "$lvs_test_target_cir = '%s'\n"
         "$lvs_test_target_l2n = '%s'\n"
-      , ly, output_lvsdb, output_cir, output_l2n)
+        "%s"
+      , ly, output_lvsdb, output_cir, output_l2n, added)
     );
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
@@ -75,19 +76,7 @@ void run_test (tl::TestBase *_this, const std::string &lvs_rs, const std::string
     reader.read (stream, nl2);
   }
 
-  //  NOTE: it's kind of redundant to use the comparer for checking the LVS
-  //  output, but this will essentially verify the output netlist's consistency.
-  db::NetlistCrossReference xref;
-  db::NetlistComparer comparer (&xref);
-  comparer.set_max_branch_complexity (500);
-  comparer.set_max_depth (20);
-  bool res = comparer.compare (&nl1, &nl2);
-  if (! res) {
-    tl::info << "Netlist mismatch:";
-    tl::info << "  current: " << output_cir;
-    tl::info << "  golden: " << au_cir;
-  }
-  EXPECT_EQ (res, true);
+  db::compare_netlist (_this, nl1, nl2);
 
   if (! au_lvsdb_name.empty ()) {
     std::string au_lvsdb = tl::combine_path (testsrc, au_lvsdb_name);
@@ -152,7 +141,7 @@ TEST(16_private)
 TEST(17_private)
 {
   test_is_long_runner ();
-  run_test (_this, "test_17.lylvs", "test_17b.cir.gz", "test_17.gds.gz", true, "test_17b.lvsdb");
+  run_test (_this, "test_17.lylvs", "test_17b.cir.gz", "test_17.gds.gz", true, "test_17b_2.lvsdb");
 }
 
 TEST(18_private)
@@ -170,6 +159,28 @@ TEST(19_private)
 TEST(20_private)
 {
   // test_is_long_runner ();
-  run_test (_this, "test_20.lylvs", "test_20.cir.gz", "test_20.gds.gz", true, "test_20b.lvsdb");
+  run_test (_this, "test_20.lylvs", "test_20.cir.gz", "test_20.gds.gz", true, "test_20b_2.lvsdb");
 }
 
+TEST(21_private)
+{
+  run_test (_this, "test_21.lylvs", "test_21.cir.gz", "test_21.gds.gz", true, "test_21.lvsdb");
+}
+
+//  issue #1021
+TEST(22a_SP6TArray2X4)
+{
+  run_test (_this, "SP6TArray_2X4.lvs", "test_22a.cir", "SP6TArray_2X4.gds", false, "test_22a.lvsdb", "$test22_texts = false\n$test22_deep = false");
+}
+TEST(22b_SP6TArray2X4)
+{
+  run_test (_this, "SP6TArray_2X4.lvs", "test_22b.cir", "SP6TArray_2X4.gds", false, "test_22b.lvsdb", "$test22_texts = true\n$test22_deep = false");
+}
+TEST(22c_SP6TArray2X4)
+{
+  run_test (_this, "SP6TArray_2X4.lvs", "test_22c.cir", "SP6TArray_2X4.gds", false, "test_22c.lvsdb", "$test22_texts = false\n$test22_deep = true");
+}
+TEST(22d_SP6TArray2X4)
+{
+  run_test (_this, "SP6TArray_2X4.lvs", "test_22d.cir", "SP6TArray_2X4.gds", false, "test_22d.lvsdb", "$test22_texts = true\n$test22_deep = true");
+}

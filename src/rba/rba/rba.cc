@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1558,7 +1558,7 @@ public:
     if (as_static) {
 
       if (tl::verbosity () >= 20) {
-        tl::log << tl::to_string (tr ("Registering class as Ruby module:) ")) << cls->name ();
+        tl::log << tl::to_string (tr ("Registering class as Ruby module: ")) << cls->name ();
       }
 
       std::string mixin_name = cls->name () + "_Mixin";

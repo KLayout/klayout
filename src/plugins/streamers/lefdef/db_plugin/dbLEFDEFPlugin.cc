@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -116,7 +116,12 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
     effective_options = *lefdef_options;
   }
 
-  db::LEFDEFReaderState state (&effective_options, layout, tl::dirname (m_stream.absolute_path ()));
+  std::string base_path;
+  if (! effective_options.paths_relative_to_cwd ()) {
+    base_path = tl::dirname (m_stream.absolute_path ());
+  }
+
+  db::LEFDEFReaderState state (&effective_options, layout, base_path);
 
   layout.dbu (effective_options.dbu ());
 
@@ -131,7 +136,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
 
-      std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
+      std::string lp = correct_path (*l, layout, base_path);
 
       tl::InputStream lef_stream (lp);
       tl::log << tl::to_string (tr ("Reading")) << " " << lp;
@@ -152,7 +157,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
 
-      std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
+      std::string lp = correct_path (*l, layout, base_path);
 
       tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
 
@@ -205,7 +210,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
     tl::shared_collection<db::Layout> macro_layout_object_holder;
     for (std::vector<std::string>::const_iterator l = effective_options.begin_macro_layout_files (); l != effective_options.end_macro_layout_files (); ++l) {
 
-      std::string lp = correct_path (*l, layout, tl::dirname (m_stream.absolute_path ()));
+      std::string lp = correct_path (*l, layout, base_path);
 
       tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF macro layout file: ")) + lp);
 
@@ -331,59 +336,75 @@ class LEFDEFFormatDeclaration
       tl::make_member (&LEFDEFReaderOptions::inst_property_name, &LEFDEFReaderOptions::set_inst_property_name, "inst-property-name") +
       tl::make_member (&LEFDEFReaderOptions::produce_pin_names, &LEFDEFReaderOptions::set_produce_pin_names, "produce-pin-names") +
       tl::make_member (&LEFDEFReaderOptions::pin_property_name, &LEFDEFReaderOptions::set_pin_property_name, "pin-property-name") +
+
       tl::make_member (&LEFDEFReaderOptions::produce_cell_outlines, &LEFDEFReaderOptions::set_produce_cell_outlines, "produce-cell-outlines") +
       tl::make_member (&LEFDEFReaderOptions::cell_outline_layer, &LEFDEFReaderOptions::set_cell_outline_layer, "cell-outline-layer") +
+
       tl::make_member (&LEFDEFReaderOptions::produce_placement_blockages, &LEFDEFReaderOptions::set_produce_placement_blockages, "produce-placement-blockages") +
       tl::make_member (&LEFDEFReaderOptions::placement_blockage_layer, &LEFDEFReaderOptions::set_placement_blockage_layer, "placement-blockage-layer") +
+
       tl::make_member (&LEFDEFReaderOptions::produce_regions, &LEFDEFReaderOptions::set_produce_regions, "produce-regions") +
       tl::make_member (&LEFDEFReaderOptions::region_layer, &LEFDEFReaderOptions::set_region_layer, "region-layer") +
+
       tl::make_member (&LEFDEFReaderOptions::produce_via_geometry, &LEFDEFReaderOptions::set_produce_via_geometry, "produce-via-geometry") +
       //  for backward compatibility
       tl::make_member (&LEFDEFReaderOptions::set_via_geometry_suffix, "special-via_geometry-suffix") +
       tl::make_member (&LEFDEFReaderOptions::set_via_geometry_datatype, "special-via_geometry-datatype") +
+      tl::make_member (&LEFDEFReaderOptions::set_via_geometry_suffix_str, "special-via_geometry-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::set_via_geometry_datatype_str, "special-via_geometry-datatype-string") +
       //  new:
-      tl::make_member (&LEFDEFReaderOptions::via_geometry_suffix_str, &LEFDEFReaderOptions::set_via_geometry_suffix_str, "special-via_geometry-suffix-string") +
-      tl::make_member (&LEFDEFReaderOptions::via_geometry_datatype_str, &LEFDEFReaderOptions::set_via_geometry_datatype_str, "special-via_geometry-datatype-string") +
+      tl::make_member (&LEFDEFReaderOptions::via_geometry_suffix_str, &LEFDEFReaderOptions::set_via_geometry_suffix_str, "via_geometry-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::via_geometry_datatype_str, &LEFDEFReaderOptions::set_via_geometry_datatype_str, "via_geometry-datatype-string") +
+
       tl::make_member (&LEFDEFReaderOptions::produce_pins, &LEFDEFReaderOptions::set_produce_pins, "produce-pins") +
       //  for backward compatibility
       tl::make_member (&LEFDEFReaderOptions::set_pins_suffix, "special-pins-suffix") +
       tl::make_member (&LEFDEFReaderOptions::set_pins_datatype, "special-pins-datatype") +
+      tl::make_member (&LEFDEFReaderOptions::set_pins_suffix_str, "special-pins-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::set_pins_datatype_str, "special-pins-datatype-string") +
       //  new:
-      tl::make_member (&LEFDEFReaderOptions::pins_suffix_str, &LEFDEFReaderOptions::set_pins_suffix_str, "special-pins-suffix-string") +
-      tl::make_member (&LEFDEFReaderOptions::pins_datatype_str, &LEFDEFReaderOptions::set_pins_datatype_str, "special-pins-datatype-string") +
+      tl::make_member (&LEFDEFReaderOptions::pins_suffix_str, &LEFDEFReaderOptions::set_pins_suffix_str, "pins-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::pins_datatype_str, &LEFDEFReaderOptions::set_pins_datatype_str, "pins-datatype-string") +
+
       tl::make_member (&LEFDEFReaderOptions::produce_lef_pins, &LEFDEFReaderOptions::set_produce_lef_pins, "produce-lef-pins") +
       //  for backward compatibility
       tl::make_member (&LEFDEFReaderOptions::set_lef_pins_suffix, "special-lef_pins-suffix") +
       tl::make_member (&LEFDEFReaderOptions::set_lef_pins_datatype, "special-lef_pins-datatype") +
+      tl::make_member (&LEFDEFReaderOptions::set_lef_pins_suffix_str, "special-lef_pins-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::set_lef_pins_datatype_str, "special-lef_pins-datatype-string") +
       //  new:
-      tl::make_member (&LEFDEFReaderOptions::lef_pins_suffix_str, &LEFDEFReaderOptions::set_lef_pins_suffix_str, "special-lef_pins-suffix-string") +
-      tl::make_member (&LEFDEFReaderOptions::lef_pins_datatype_str, &LEFDEFReaderOptions::set_lef_pins_datatype_str, "special-lef_pins-datatype-string") +
+      tl::make_member (&LEFDEFReaderOptions::lef_pins_suffix_str, &LEFDEFReaderOptions::set_lef_pins_suffix_str, "lef_pins-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::lef_pins_datatype_str, &LEFDEFReaderOptions::set_lef_pins_datatype_str, "lef_pins-datatype-string") +
+
       tl::make_member (&LEFDEFReaderOptions::produce_fills, &LEFDEFReaderOptions::set_produce_fills, "produce-fills") +
       //  for backward compatibility
       tl::make_member (&LEFDEFReaderOptions::set_fills_suffix, "special-fills-suffix") +
       tl::make_member (&LEFDEFReaderOptions::set_fills_datatype, "special-fills-datatype") +
+      tl::make_member (&LEFDEFReaderOptions::set_fills_suffix_str, "special-fills-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::set_fills_datatype_str, "special-fills-datatype-string") +
       //  new:
-      tl::make_member (&LEFDEFReaderOptions::fills_suffix_str, &LEFDEFReaderOptions::set_fills_suffix_str, "special-fills-suffix-string") +
-      tl::make_member (&LEFDEFReaderOptions::fills_datatype_str, &LEFDEFReaderOptions::set_fills_datatype_str, "special-fills-datatype-string") +
+      tl::make_member (&LEFDEFReaderOptions::fills_suffix_str, &LEFDEFReaderOptions::set_fills_suffix_str, "fills-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::fills_datatype_str, &LEFDEFReaderOptions::set_fills_datatype_str, "fills-datatype-string") +
+
       tl::make_member (&LEFDEFReaderOptions::produce_obstructions, &LEFDEFReaderOptions::set_produce_obstructions, "produce-obstructions") +
       tl::make_member (&LEFDEFReaderOptions::obstructions_suffix, &LEFDEFReaderOptions::set_obstructions_suffix, "obstructions-suffix") +
       tl::make_member (&LEFDEFReaderOptions::obstructions_datatype, &LEFDEFReaderOptions::set_obstructions_datatype, "obstructions-datatype") +
+
       tl::make_member (&LEFDEFReaderOptions::produce_blockages, &LEFDEFReaderOptions::set_produce_blockages, "produce-blockages") +
       tl::make_member (&LEFDEFReaderOptions::blockages_suffix, &LEFDEFReaderOptions::set_blockages_suffix, "blockages-suffix") +
       tl::make_member (&LEFDEFReaderOptions::blockages_datatype, &LEFDEFReaderOptions::set_blockages_datatype, "blockages-datatype") +
+
       tl::make_member (&LEFDEFReaderOptions::produce_labels, &LEFDEFReaderOptions::set_produce_labels, "produce-labels") +
       tl::make_member (&LEFDEFReaderOptions::labels_suffix, &LEFDEFReaderOptions::set_labels_suffix, "labels-suffix") +
       tl::make_member (&LEFDEFReaderOptions::labels_datatype, &LEFDEFReaderOptions::set_labels_datatype, "labels-datatype") +
       tl::make_member (&LEFDEFReaderOptions::produce_lef_labels, &LEFDEFReaderOptions::set_produce_lef_labels, "produce-lef-labels") +
       tl::make_member (&LEFDEFReaderOptions::lef_labels_suffix, &LEFDEFReaderOptions::set_lef_labels_suffix, "lef-labels-suffix") +
       tl::make_member (&LEFDEFReaderOptions::lef_labels_datatype, &LEFDEFReaderOptions::set_lef_labels_datatype, "lef-labels-datatype") +
+
       tl::make_member (&LEFDEFReaderOptions::produce_routing, &LEFDEFReaderOptions::set_produce_routing, "produce-routing") +
-      //  for backward compatibility
-      tl::make_member (&LEFDEFReaderOptions::set_routing_suffix, "special-routing-suffix") +
-      tl::make_member (&LEFDEFReaderOptions::set_routing_datatype, "special-routing-datatype") +
-      //  new:
-      tl::make_member (&LEFDEFReaderOptions::routing_suffix_str, &LEFDEFReaderOptions::set_routing_suffix_str, "special-routing-suffix-string") +
-      tl::make_member (&LEFDEFReaderOptions::routing_datatype_str, &LEFDEFReaderOptions::set_routing_datatype_str, "special-routing-datatype-string") +
+      tl::make_member (&LEFDEFReaderOptions::routing_suffix_str, &LEFDEFReaderOptions::set_routing_suffix_str, "routing-suffix-string") +
+      tl::make_member (&LEFDEFReaderOptions::routing_datatype_str, &LEFDEFReaderOptions::set_routing_datatype_str, "routing-datatype-string") +
+
       tl::make_member (&LEFDEFReaderOptions::produce_special_routing, &LEFDEFReaderOptions::set_produce_special_routing, "produce-special-routing") +
       //  for backward compatibility
       tl::make_member (&LEFDEFReaderOptions::set_special_routing_suffix, "special-routing-suffix") +
@@ -391,6 +412,7 @@ class LEFDEFFormatDeclaration
       //  new:
       tl::make_member (&LEFDEFReaderOptions::special_routing_suffix_str, &LEFDEFReaderOptions::set_special_routing_suffix_str, "special-routing-suffix-string") +
       tl::make_member (&LEFDEFReaderOptions::special_routing_datatype_str, &LEFDEFReaderOptions::set_special_routing_datatype_str, "special-routing-datatype-string") +
+
       tl::make_member (&LEFDEFReaderOptions::via_cellname_prefix, &LEFDEFReaderOptions::set_via_cellname_prefix, "via-cellname-prefix") +
       tl::make_member (&LEFDEFReaderOptions::begin_lef_files, &LEFDEFReaderOptions::end_lef_files, &LEFDEFReaderOptions::push_lef_file, "lef-files") +
       tl::make_member (&LEFDEFReaderOptions::begin_macro_layout_files, &LEFDEFReaderOptions::end_macro_layout_files, &LEFDEFReaderOptions::push_macro_layout_file, "macro_layout-files") +

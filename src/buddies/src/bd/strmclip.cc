@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -71,10 +71,7 @@ void clip (ClipData &data)
   {
     db::LoadLayoutOptions load_options;
     data.reader_options.configure (load_options);
-
-    tl::InputStream stream (data.file_in);
-    db::Reader reader (stream);
-    reader.read (layout, load_options);
+    bd::read_files (layout, data.file_in, load_options);
   }
 
   //  create the layers in the target layout as well

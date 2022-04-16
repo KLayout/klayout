@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -232,6 +232,8 @@ TEST(1)
     EXPECT_EQ (s, "1,8");
     s = q2s_var (iq, "bbox");
     EXPECT_EQ (s, "(0,1;2,3),()");
+    s = q2s_var (iq, "dbbox");
+    EXPECT_EQ (s, "(0,0.001;0.002,0.003),()");
   }
 
   {
@@ -568,15 +570,25 @@ TEST(2)
     EXPECT_EQ (s, "c1,c1");
     s = q2s_var (iq, "trans");
     EXPECT_EQ (s, "r0 *1 10,-20,m45 *1 -10,20");
+    s = q2s_var (iq, "dtrans");
+    EXPECT_EQ (s, "r0 *1 0.01,-0.02,m45 *1 -0.01,0.02");
     s = q2s_var (iq, "path_trans");
     EXPECT_EQ (s, "r0 *1 10,-20,m45 *1 -10,20");
+    s = q2s_var (iq, "path_dtrans");
+    EXPECT_EQ (s, "r0 *1 0.01,-0.02,m45 *1 -0.01,0.02");
     s = q2s_var (iq, "inst_bbox");
     EXPECT_EQ (s, "(10,-10;20,10),(0,20;20,30)");
+    s = q2s_var (iq, "inst_dbbox");
+    EXPECT_EQ (s, "(0.01,-0.01;0.02,0.01),(0,0.02;0.02,0.03)");
     s = q2s_var (iq, "inst");
     EXPECT_EQ (s, "cell_index=0 r0 10,-20,cell_index=0 m45 -10,20");
     s = q2s_var (iq, "array_a");
     EXPECT_EQ (s, "nil,nil");
+    s = q2s_var (iq, "array_da");
+    EXPECT_EQ (s, "nil,nil");
     s = q2s_var (iq, "array_b");
+    EXPECT_EQ (s, "nil,nil");
+    s = q2s_var (iq, "array_db");
     EXPECT_EQ (s, "nil,nil");
     s = q2s_var (iq, "array_na");
     EXPECT_EQ (s, "nil,nil");
@@ -603,8 +615,12 @@ TEST(2)
     EXPECT_EQ (s, "cell_index=0 r0 10,-20,cell_index=0 m45 -10,20 array=(1,1,0,2 2x3),cell_index=0 m45 -10,20 array=(1,1,0,2 2x3),cell_index=0 m45 -10,20 array=(1,1,0,2 2x3),cell_index=0 m45 -10,20 array=(1,1,0,2 2x3),cell_index=0 m45 -10,20 array=(1,1,0,2 2x3),cell_index=0 m45 -10,20 array=(1,1,0,2 2x3)");
     s = q2s_var (iq, "array_a");
     EXPECT_EQ (s, "nil,1,1,1,1,1,1,1,1,1,1,1,1");
+    s = q2s_var (iq, "array_da");
+    EXPECT_EQ (s, "nil,0.001,0.001,0.001,0.001,0.001,0.001,0.001,0.001,0.001,0.001,0.001,0.001");
     s = q2s_var (iq, "array_b");
     EXPECT_EQ (s, "nil,0,2,0,2,0,2,0,2,0,2,0,2");
+    s = q2s_var (iq, "array_db");
+    EXPECT_EQ (s, "nil,0,0.002,0,0.002,0,0.002,0,0.002,0,0.002,0,0.002");
     s = q2s_var (iq, "array_na");
     EXPECT_EQ (s, "nil,2,2,2,2,2,2");
     s = q2s_var (iq, "array_nb");
@@ -788,6 +804,12 @@ TEST(3)
     EXPECT_EQ (s, "0,1,1,2");
     s = q2s_var (iq, "bbox");
     EXPECT_EQ (s, "(0,1;2,3),(0,1;2,3),(0,1;2,3),(10,11;10,11)");
+    s = q2s_var (iq, "dbbox");
+    EXPECT_EQ (s, "(0,0.001;0.002,0.003),(0,0.001;0.002,0.003),(0,0.001;0.002,0.003),(0.01,0.011;0.01,0.011)");
+    s = q2s_var (iq, "shape_bbox");
+    EXPECT_EQ (s, "(0,1;2,3),(0,1;2,3),(0,1;2,3),(10,11;10,11)");
+    s = q2s_var (iq, "shape_dbbox");
+    EXPECT_EQ (s, "(0,0.001;0.002,0.003),(0,0.001;0.002,0.003),(0,0.001;0.002,0.003),(0.01,0.011;0.01,0.011)");
   }
 
   {

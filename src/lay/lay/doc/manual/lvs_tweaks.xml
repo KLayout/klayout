@@ -26,6 +26,7 @@
   a model subcircuit called "NMOS", use this <class_doc href="Netlist#flatten_circuit"/>:
   </p>
 
+  <k name="flatten_circuit"/>
   <pre>schematic.flatten_circuit("NMOS")</pre>
 
   <h2>Top level pin generation</h2>
@@ -45,6 +46,7 @@
   circuit a pin will be created (<class_doc href="Netlist#make_top_level_pins"/>):
   </p>
 
+  <k name="make_top_level_pins"/>
   <pre>netlist.make_top_level_pins</pre>
 
   <h2>Device combination</h2>
@@ -81,6 +83,7 @@
   capacitors). To run device combination, use <class_doc href="Netlist#combine_devices"/>:
   </p>
 
+  <k name="combine_devices"/>
   <pre>netlist.combine_devices</pre>
 
   <p>
@@ -138,6 +141,7 @@
   layout cell:
   </p>
 
+  <k name="align"/>
   <pre>align</pre>
 
   <h2>Black boxing (circuit abstraction)</h2>
@@ -164,6 +168,7 @@
   To wipe out the innards of a circuit, use the <class_doc href="Netlist#blank_circuit"/> method:
   </p>
 
+  <k name="blank_circuit"/>
   <pre>netlist.blank_circuit("CIRCUIT_NAME")
 schematic.blank_circuit("CIRCUIT_NAME")</pre>
 
@@ -196,6 +201,23 @@ schematic.blank_circuit("CIRCUIT_NAME")</pre>
   </p>
 
   <p>
+  This feature can be used to solve the "split_gates" problem (see "split_gates" 
+  below). The internal source/drain nodes are symmetric in the configuration
+  shown there, so "join_symmetric_nets" can be used to solve make the 
+  required connections, e.g.:
+  </p>
+
+  <k name="join_symmetric_nodes"/>
+  <pre>join_symmetric_nets("NAND2")</pre>
+
+  <p>
+  However, there is a more specific feature available ("split_gates") which covers more cases, 
+  but is specialized on MOS devices.
+  </p>
+
+  <h2>Split gates</h2>
+
+  <p>
   The following picture describes such a situation known as "split gate configuration".
   In this case, the N1 and N2 are identical: swapping them will not change the circuit's
   topology. Hence, they will carry the same potential and the red connection is not required physically. 
@@ -204,32 +226,38 @@ schematic.blank_circuit("CIRCUIT_NAME")</pre>
   </p>
 
   <p>
-  <img src="lvs_symm_nodes.png"/>
+  <img src="/manual/lvs_symm_nodes.png"/>
   </p>
 
   <p>
-  KLayout provides a feature (<a href="/about/lvs_ref_netter.xml#join_symmetric_nets">join_symmetric_nets</a>) 
+  KLayout provides a feature (<a href="/about/lvs_ref_netter.xml#split_gates">split_gates</a>) 
   which will add such connections after extraction of the netlist:
   </p>
 
-  <pre>join_symmetric_nets("NAND2")</pre>
+  <k name="split_gates"/>
+  <pre>split_gates("NMOS")</pre>
 
   <p>
-  This function will analyze the circuit "NAND2" in the extracted netlist and connect all symmetric 
-  nodes within it. If this function is called before "combine_devices" (e.g. through
+  This function will analyze all circuits in the extracted netlist with respect to "NMOS" devices and connect all 
+  split gates relevant source/drain nodes inside. If this function is called before "combine_devices" (e.g. through
   "netlist.simplify"), this connection is already present then and parallel devices
   will be recognized and combined.
   </p>
 
   <p>
-  The argument to "join_symmetric_nets" is a glob-style pattern. "*" will analyze and
-  modify all circuits, but at the price of potentially introducing unwanted connections.
-  Hence the recommendation is to use this feature on circuits which are known to 
-  need it.
+  The device name must denote a MOS3, MOS4, DMOS3 or DMOS4 device.
+  The gate lengths of all involved devices must be identical. 
+  For MOS4 and DMOS4, all devices on one gate net must share the 
+  same bulk net.
+  </p>
+
+  <p>
+  In addition to the device name, a glob-style circuit pattern can be supplied. In this case, the analysis is restricted
+  to the circuits matching this pattern.
   </p>
 
   <p> 
-  "join_symmetric_nets" can be used anywhere in the LVS script.
+  "split_gates" can be used anywhere in the LVS script.
   </p>
 
   <h2>Purging (elimination of redundancy)</h2>
@@ -249,6 +277,7 @@ schematic.blank_circuit("CIRCUIT_NAME")</pre>
   Floating nets are nets which don't connect to any device or subcircuit.
   </p>
 
+  <k name="purge"/>
   <pre>netlist.purge
 netlist.purge_nets</pre>
 
@@ -259,6 +288,7 @@ netlist.purge_nets</pre>
   "purge", "combine_devices" and "purge_nets" in this recommended order:
   </p>
 
+  <k name="simplify"/>
   <pre>netlist.simplify</pre>
 
   <p>

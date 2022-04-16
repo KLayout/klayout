@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1244,7 +1244,7 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "object's dimensions to micron units by scaling by the database unit.\n"
     "\n"
     "This method will also produce a flat version of the shapes inside the region. "
-    "\\RdbCategory#scan_region is a similar method which also supports construction of "
+    "\\RdbCategory#scan_collection is a similar method which also supports construction of "
     "hierarchical databases from deep regions.\n"
     "\n"
     "This method has been introduced in version 0.23.\n"
@@ -1262,7 +1262,7 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "object's dimensions to micron units by scaling by the database unit.\n"
     "\n"
     "This method will also produce a flat version of the edges inside the edge collection. "
-    "\\RdbCategory#scan_edges is a similar method which also supports construction of "
+    "\\RdbCategory#scan_collection is a similar method which also supports construction of "
     "hierarchical databases from deep edge collections.\n"
     "\n"
     "This method has been introduced in version 0.23.\n"
@@ -1280,7 +1280,7 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "object's dimensions to micron units by scaling by the database unit.\n"
     "\n"
     "This method will also produce a flat version of the edge pairs inside the edge pair collection. "
-    "\\RdbCategory#scan_edge_pairs is a similar method which also supports construction of "
+    "\\RdbCategory#scan_collection is a similar method which also supports construction of "
     "hierarchical databases from deep edge pair collections.\n"
     "\n"
     "This method has been introduced in version 0.23.\n"

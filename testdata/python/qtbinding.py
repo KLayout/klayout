@@ -1,5 +1,5 @@
 # KLayout Layout Viewer
-# Copyright (C) 2006-2021 Matthias Koefferlein
+# Copyright (C) 2006-2022 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -639,6 +639,15 @@ class QtBindingTest(unittest.TestCase):
       self.assertEqual(str(jsonData), '{"test":"test"}')
     else:
       self.assertEqual(str(jsonData), 'b\'{"test":"test"}\'')
+
+  def test_54(self):
+
+    # issue #1029 (Crash for QBrush passed to setData)
+    item = pya.QTreeWidgetItem()
+    item.setBackground(0, pya.QBrush(pya.QColor(0xFF, 0xFF, 0x00)))
+    self.assertEqual(item.background(0).color.red, 255)
+    self.assertEqual(item.background(0).color.green, 255)
+    self.assertEqual(item.background(0).color.blue, 0)
 
 # run unit tests
 if __name__ == '__main__':

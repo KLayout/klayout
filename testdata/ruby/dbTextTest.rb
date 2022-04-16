@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2021 Matthias Koefferlein
+# Copyright (C) 2006-2022 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -69,11 +69,33 @@ class DBText_TestClass < TestBase
     a = RBA::DText::new( "hallo", a.trans, 22.0, 7 )
     assert_equal( a.string, "hallo" )
     assert_equal( a.trans.to_s, "m45 5,7" )
+    assert_equal( a.position.to_s, "5,7" )
+    assert_equal( a.bbox.to_s, "(5,7;5,7)" )
     assert_equal( a.font, 7 )
     assert_equal( a.size, 22.0 )
 
     a.font = 8
     assert_equal( a.font, 8 )
+
+    a.halign = 1
+    assert_equal( a.halign.to_i, 1 )
+    assert_equal( a.halign, RBA::DText::HAlignCenter )
+    assert_equal( a.halign.to_s, "HAlignCenter" )
+
+    a.halign = RBA::DText::HAlignRight
+    assert_equal( a.halign.to_i, 2 )
+    assert_equal( a.halign, RBA::DText::HAlignRight )
+    assert_equal( a.halign.to_s, "HAlignRight" )
+
+    a.valign = 1
+    assert_equal( a.valign.to_i, 1 )
+    assert_equal( a.valign, RBA::DText::VAlignCenter )
+    assert_equal( a.valign.to_s, "VAlignCenter" )
+
+    a.valign = RBA::DText::VAlignBottom
+    assert_equal( a.valign.to_i, 2 )
+    assert_equal( a.valign, RBA::DText::VAlignBottom )
+    assert_equal( a.valign.to_s, "VAlignBottom" )
 
     a.size = 23.0
     assert_equal( a.size, 23.0 )
@@ -141,11 +163,33 @@ class DBText_TestClass < TestBase
     a = RBA::Text::new( "hallo", a.trans, 22, 7 )
     assert_equal( a.string, "hallo" )
     assert_equal( a.trans.to_s, "m45 5,7" )
+    assert_equal( a.position.to_s, "5,7" )
+    assert_equal( a.bbox.to_s, "(5,7;5,7)" )
     assert_equal( a.font, 7 )
     assert_equal( a.size, 22.0 )
 
     a.font = 8
     assert_equal( a.font, 8 )
+
+    a.halign = 1
+    assert_equal( a.halign.to_i, 1 )
+    assert_equal( a.halign, RBA::Text::HAlignCenter )
+    assert_equal( a.halign.to_s, "HAlignCenter" )
+
+    a.halign = RBA::Text::HAlignLeft
+    assert_equal( a.halign.to_i, 0 )
+    assert_equal( a.halign, RBA::Text::HAlignLeft )
+    assert_equal( a.halign.to_s, "HAlignLeft" )
+
+    a.valign = 1
+    assert_equal( a.valign.to_i, 1 )
+    assert_equal( a.valign, RBA::Text::VAlignCenter )
+    assert_equal( a.valign.to_s, "VAlignCenter" )
+
+    a.valign = RBA::Text::VAlignTop
+    assert_equal( a.valign.to_i, 0 )
+    assert_equal( a.valign, RBA::Text::VAlignTop )
+    assert_equal( a.valign.to_s, "VAlignTop" )
 
     a.size = 23
     assert_equal( a.size, 23 )

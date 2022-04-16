@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1427,7 +1427,7 @@ NetTracerDialog::get_trace_depth()
   try {
     QString depth = depth_le->text ().trimmed ();
     if (! depth.isEmpty ()) {
-      tl::from_string (tl::to_string (depth), n);
+      tl::from_string_ext (tl::to_string (depth), n);
       if (n < 0 || n > double (std::numeric_limits<size_t>::max ())) {
         n = 0.0;
       }

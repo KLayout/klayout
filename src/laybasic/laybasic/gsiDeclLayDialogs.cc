@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -379,6 +379,11 @@ static BrowserSource_Stub *new_html (const std::string &html)
 }
 
 Class<lay::BrowserSource> decl_BrowserSource ("lay", "BrowserSource_Native",
+#if defined(HAVE_QTBINDINGS)
+  gsi::method ("get_image", &lay::BrowserSource::get_image, gsi::arg ("url")) +
+#endif
+  gsi::method ("next_topic", &lay::BrowserSource::next_topic, gsi::arg ("url")) +
+  gsi::method ("prev_topic", &lay::BrowserSource::prev_topic, gsi::arg ("url")) +
   gsi::method ("get", &lay::BrowserSource::get),
   "@hide\n@alias BrowserSource"
 );
@@ -391,12 +396,31 @@ Class<lay::BrowserSource> &laybasicdecl_BrowserSource ()
 
 Class<BrowserSource_Stub> decl_BrowserSourceStub ("lay", "BrowserSource",
   gsi::constructor ("new|#new_html", &new_html,
-    "@brief construct a BrowserSource object with a default HTML string\n"
+    "@brief Constructs a BrowserSource object with a default HTML string\n"
     "\n"
     "The default HTML string is sent when no specific implementation is provided.\n"
   ) +
+#if defined(HAVE_QTBINDINGS)
+  gsi::method ("get_image", &lay::BrowserSource::get_image, gsi::arg ("url"),
+    "@brief Gets the image object for a specific URL\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+#endif
+  gsi::method ("next_topic", &lay::BrowserSource::next_topic, gsi::arg ("url"),
+    "@brief Gets the next topic URL from a given URL\n"
+    "An empty string will be returned if no next topic is available.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("prev_topic", &lay::BrowserSource::prev_topic, gsi::arg ("url"),
+    "@brief Gets the previous topic URL from a given URL\n"
+    "An empty string will be returned if no previous topic is available.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
   gsi::callback ("get", &BrowserSource_Stub::get, &BrowserSource_Stub::get_cb, gsi::arg ("url"),
-    "@brief Get the HTML code for a given \"int\" URL.\n"
+    "@brief Gets the HTML code for a given \"int\" URL.\n"
     "\n"
     "If this method returns an empty string, the browser will not be set to \n"
     "a new location. This allows implementing any functionality behind such links.\n"
@@ -781,7 +805,6 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
-    "@return A \\IntValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
     "@return The value entered if \"Ok\" was pressed or nil if \"Cancel\" was pressed\n"
     "This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent."
   ) +

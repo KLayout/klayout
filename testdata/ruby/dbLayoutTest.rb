@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2021 Matthias Koefferlein
+# Copyright (C) 2006-2022 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,10 +23,10 @@ end
 
 load("test_prologue.rb")
 
-class DBLayout_TestClass < TestBase
+class DBLayoutTest_TestClass < TestBase
 
   # LayerInfo
-  def _test_1_Layout
+  def test_1_Layout
 
     lp = RBA::LayerInfo::new
 
@@ -62,7 +62,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Basics: cells and instances
-  def _test_2_Layout
+  def test_2_Layout
 
     ly = RBA::Layout::new
 
@@ -182,7 +182,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Instances and bboxes
-  def _test_5_Layout
+  def test_5_Layout
 
     ly = RBA::Layout::new
 
@@ -223,10 +223,13 @@ class DBLayout_TestClass < TestBase
     assert_equal( c1.bbox_per_layer( lindex ).to_s, "()" )
     assert_equal( c1.bbox_per_layer( ldummy ).to_s, "()" )
 
+    assert_equal( ly.unique_cell_name("c3"), "c3" )
+    assert_equal( ly.unique_cell_name("c1"), "c1$1" )
+
   end
 
   # Instances and bboxes
-  def _test_6_Layout
+  def test_6_Layout
 
     ly = RBA::Layout::new
 
@@ -398,7 +401,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Instances and editable mode
-  def _test_6_EditableLayout
+  def test_6_EditableLayout
 
     ly = RBA::Layout::new( true )
     assert_equal( ly.is_editable?, true )
@@ -470,7 +473,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Instances and bboxes
-  def _test_6_Layout_props
+  def test_6_Layout_props
 
     ly = RBA::Layout::new
     pid = ly.properties_id( { 17 => "a", "b" => [ 1, 5, 7 ] }.to_a )
@@ -648,7 +651,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Properties
-  def _test_6_Layout_props2
+  def test_6_Layout_props2
 
     ly = RBA::Layout::new(true)
     pid = ly.properties_id( { 17 => "a", "b" => [ 1, 5, 7 ] }.to_a )
@@ -697,7 +700,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Instances and bboxes (editable mode)
-  def _test_6_Layout_new
+  def test_6_Layout_new
 
     if( RBA::Application::instance.is_editable? )
 
@@ -805,7 +808,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Copy/move between cells
-  def _test_7_cells_copy_move
+  def test_7_cells_copy_move
 
     # because of set_property ...
     if !RBA::Application::instance.is_editable? 
@@ -879,7 +882,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # top cells
-  def _test_8
+  def test_8
 
     l = RBA::Layout.new
     tc = []
@@ -916,7 +919,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # under construction and update
-  def _test_9
+  def test_9
 
     ly = RBA::Layout::new
     l1 = ly.insert_layer(RBA::LayerInfo::new(1, 0))
@@ -946,7 +949,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Instance editing
-  def _test_10
+  def test_10
 
     ly = RBA::Layout::new
 
@@ -1025,7 +1028,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # User properties
-  def _test_11
+  def test_11
 
     ly = RBA::Layout::new
 
@@ -1049,7 +1052,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Meta information
-  def _test_12
+  def test_12
 
     mi = RBA::LayoutMetaInfo::new("myinfo", "a")
 

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -790,8 +790,8 @@ from_string (const std::string &s, const unsigned char * &result)
   result = (unsigned char *) s.c_str ();
 }
 
-void
-from_string (const std::string &s, double &v)
+static void
+from_string_numeric (const std::string &s, double &v, bool eval)
 {
   const char *cp = s.c_str ();
   while (safe_isspace (*cp)) {
@@ -806,18 +806,23 @@ from_string (const std::string &s, double &v)
     ++cp_end;
   }
   if (*cp_end) {
-    //  try using an expression
-    v = tl::Eval ().parse (s).execute ().to_double ();
+    if (eval) {
+      //  try using an expression (using a clean environment disables all global features and leaves
+      //  only some static functions)
+      v = tl::Eval (0, 0, false).parse (s).execute ().to_double ();
+    } else {
+      throw tl::Exception (tl::to_string (tr ("Unexpected text after numeric value: '...")) + cp_end + "'");
+    }
   }
 }
 
 template <class T>
-void
-convert_string_to_int (const std::string &s, T &v)
+static void
+convert_string_to_int (const std::string &s, T &v, bool eval)
 {
   double x;
   // HACK: this should be some real string-to-int conversion
-  tl::from_string (s, x);
+  tl::from_string_numeric (s, x, eval);
   if (x < std::numeric_limits <T>::min ()) {
     throw tl::Exception (tl::to_string (tr ("Range underflow: ")) + s);
   }
@@ -831,39 +836,87 @@ convert_string_to_int (const std::string &s, T &v)
 }
 
 void
+from_string (const std::string &s, double &v)
+{
+  return from_string_numeric (s, v, false);
+}
+
+void
 from_string (const std::string &s, int &v)
 {
-  convert_string_to_int (s, v);
+  convert_string_to_int (s, v, false);
 }
 
 void
 from_string (const std::string &s, long &v)
 {
-  convert_string_to_int (s, v);
+  convert_string_to_int (s, v, false);
 }
 
 void
 from_string (const std::string &s, long long &v)
 {
-  convert_string_to_int (s, v);
+  convert_string_to_int (s, v, false);
 }
 
 void
 from_string (const std::string &s, unsigned int &v)
 {
-  convert_string_to_int (s, v);
+  convert_string_to_int (s, v, false);
 }
 
 void
 from_string (const std::string &s, unsigned long &v)
 {
-  convert_string_to_int (s, v);
+  convert_string_to_int (s, v, false);
 }
 
 void
 from_string (const std::string &s, unsigned long long &v)
 {
-  convert_string_to_int (s, v);
+  convert_string_to_int (s, v, false);
+}
+
+void
+from_string_ext (const std::string &s, double &v)
+{
+  return from_string_numeric (s, v, true);
+}
+
+void
+from_string_ext (const std::string &s, int &v)
+{
+  convert_string_to_int (s, v, true);
+}
+
+void
+from_string_ext (const std::string &s, long &v)
+{
+  convert_string_to_int (s, v, true);
+}
+
+void
+from_string_ext (const std::string &s, long long &v)
+{
+  convert_string_to_int (s, v, true);
+}
+
+void
+from_string_ext (const std::string &s, unsigned int &v)
+{
+  convert_string_to_int (s, v, true);
+}
+
+void
+from_string_ext (const std::string &s, unsigned long &v)
+{
+  convert_string_to_int (s, v, true);
+}
+
+void
+from_string_ext (const std::string &s, unsigned long long &v)
+{
+  convert_string_to_int (s, v, true);
 }
 
 void

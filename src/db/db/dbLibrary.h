@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -203,6 +203,13 @@ public:
    *  @brief Gets a value indicating whether a proxy is entirely retired
    */
   bool is_retired (const cell_index_type library_cell_index) const;
+
+  /**
+   *  @brief Refreshes the library on all clients
+   *
+   *  This will refresh PCells, retire cells (turn them into "cold proxies") and reload layouts.
+   */
+  void refresh ();
 
   /**
    *  @brief Remap the library proxies to a different library

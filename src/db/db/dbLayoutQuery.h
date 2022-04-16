@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -51,11 +51,14 @@ enum LayoutQueryPropertyType
   LQ_variant,
   LQ_shape,
   LQ_trans,
+  LQ_dtrans,
   LQ_layer,
   LQ_instance,
   LQ_cell,
   LQ_point,
+  LQ_dpoint,
   LQ_box,
+  LQ_dbox,
   LQ_polygon,
   LQ_path,
   LQ_edge,

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -445,7 +445,7 @@ protected:
    *  @brief Flush the stored data to the output
    *  This method is similar to collect(), but writes the data to the layout.
    */
-  void flush ();
+  void flush (const std::string &net_name = std::string ());
 
   /**
    *  @brief Collects the data taken so far into the given region

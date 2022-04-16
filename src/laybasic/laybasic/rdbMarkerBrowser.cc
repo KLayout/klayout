@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -170,10 +170,10 @@ void
 MarkerBrowserConfigPage::commit (lay::Dispatcher *root)
 {
   double dim = 1.0;
-  tl::from_string (tl::to_string (le_window->text ()), dim);
+  tl::from_string_ext (tl::to_string (le_window->text ()), dim);
 
   unsigned int max_markers_count = 1000;
-  tl::from_string (tl::to_string (le_max_markers->text ()), max_markers_count);
+  tl::from_string_ext (tl::to_string (le_max_markers->text ()), max_markers_count);
 
   root->config_set (cfg_rdb_context_mode, rdb::context_mode_type (cbx_context->currentIndex ()), MarkerBrowserContextModeConverter ());
   root->config_set (cfg_rdb_window_mode, rdb::window_type (cbx_window->currentIndex ()), MarkerBrowserWindowModeConverter ());
@@ -238,7 +238,7 @@ MarkerBrowserConfigPage2::commit (lay::Dispatcher *root)
   } else {
     try {
       int s;
-      tl::from_string (tl::to_string (lw_le->text ()), s);
+      tl::from_string_ext (tl::to_string (lw_le->text ()), s);
       root->config_set (cfg_rdb_marker_line_width, s);
     } catch (...) { }
   }
@@ -248,7 +248,7 @@ MarkerBrowserConfigPage2::commit (lay::Dispatcher *root)
   } else {
     try {
       int s;
-      tl::from_string (tl::to_string (vs_le->text ()), s);
+      tl::from_string_ext (tl::to_string (vs_le->text ()), s);
       root->config_set (cfg_rdb_marker_vertex_size, s);
     } catch (...) { }
   }

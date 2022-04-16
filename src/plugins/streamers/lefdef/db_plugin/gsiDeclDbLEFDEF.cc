@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -108,6 +108,10 @@ static void set_pin_property_name (db::LEFDEFReaderOptions *config, const tl::Va
 
 static
 gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfiguration",
+  gsi::method ("paths_relative_to_cwd=", &db::LEFDEFReaderOptions::set_paths_relative_to_cwd, gsi::arg ("f"),
+    "@brief Sets a value indicating whether to use paths relative to cwd (true) or DEF file (false) for map or LEF files\n"
+    "This write-only attribute has been introduced in version 0.27.9."
+  ) +
   gsi::method ("layer_map", (db::LayerMap &(db::LEFDEFReaderOptions::*) ()) &db::LEFDEFReaderOptions::layer_map,
     "@brief Gets the layer map to be used for the LEF/DEF reader\n"
     "@return A reference to the layer map\n"
@@ -258,13 +262,13 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n"
     "For example: the via layer is 'V1', \\via_geometry_suffix is 'GEO' and \\via_geometry_datatype is 1. Then:\n"
     "\n"
-    "@li\n"
-    "@ul If there is a mapping for 'V1.GEO', the layer and datatype will be taken from there. @/ul\n"
-    "@ul If there is a mapping for 'V1', the layer will be taken from there and the datatype will be taken from \\via_geometry_datatype. "
-    "    The name of the produced layer will be 'V1.GEO'. @/ul\n"
-    "@ul If there is no mapping for both, the layer number will be a unique value, the datatype will be taken from \\via_geometry_datatype "
-    "    and the layer name will be 'V1.GEO'. @/ul"
-    "@/li\n"
+    "@ul\n"
+    "@li If there is a mapping for 'V1.GEO', the layer and datatype will be taken from there. @/li\n"
+    "@li If there is a mapping for 'V1', the layer will be taken from there and the datatype will be taken from \\via_geometry_datatype. "
+    "    The name of the produced layer will be 'V1.GEO'. @/li\n"
+    "@li If there is no mapping for both, the layer number will be a unique value, the datatype will be taken from \\via_geometry_datatype "
+    "    and the layer name will be 'V1.GEO'. @/li"
+    "@/ul\n"
   ) +
   gsi::method ("produce_via_geometry=", &db::LEFDEFReaderOptions::set_produce_via_geometry, gsi::arg ("produce"),
     "@brief Sets a value indicating whether via geometries shall be produced.\n"

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -367,7 +367,16 @@ public:
    *  @param parent The parent evaluation context
    *  @param sloppy True to enable sloppy evaluation for pure parsing
    */
-  Eval (Eval *parent = 0, bool sloppy = false);
+  explicit Eval (Eval *parent = 0, bool sloppy = false);
+
+  /**
+   *  @brief Create a new object for expression evaluation
+   *
+   *  @param global The global evaluation context
+   *  @param parent The parent evaluation context
+   *  @param sloppy True to enable sloppy evaluation for pure parsing
+   */
+  explicit Eval (Eval *global, Eval *parent, bool sloppy = false);
 
   /**
    *  @brief virtual dtor to enable dynamic_cast on derived classes.
@@ -513,7 +522,7 @@ public:
 private:
   friend class Expression;
 
-  Eval *mp_parent;
+  Eval *mp_parent, *mp_global;
   std::map <std::string, tl::Variant> m_local_vars;
   std::map <std::string, EvalFunction *> m_local_functions;
   bool m_sloppy;

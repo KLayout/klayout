@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1514,4 +1514,43 @@ TEST(10)
     "leave_cell($2)\n"
     "end\n"
   );
+}
+
+TEST(11_LayoutIsWeakPointer)
+{
+  std::unique_ptr<db::Layout> g (new db::Layout ());
+  g->insert_layer (0);
+  g->insert_layer (1);
+  db::Cell &c0 (g->cell (g->add_cell ()));
+  db::Cell &c1 (g->cell (g->add_cell ()));
+  db::Cell &c2 (g->cell (g->add_cell ()));
+  db::Cell &c3 (g->cell (g->add_cell ()));
+
+  db::Box b (0, 100, 1000, 1200);
+  c1.shapes (0).insert (b);
+  c2.shapes (0).insert (b);
+  c3.shapes (0).insert (b);
+
+  db::Box bb (1, 101, 1001, 1201);
+  c2.shapes (1).insert (bb);
+
+  db::Trans tt;
+  c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), tt));
+  c0.insert (db::CellInstArray (db::CellInst (c2.cell_index ()), db::Trans (db::Vector (100, -100))));
+  c0.insert (db::CellInstArray (db::CellInst (c3.cell_index ()), db::Trans (1)));
+  c2.insert (db::CellInstArray (db::CellInst (c3.cell_index ()), db::Trans (db::Vector (1100, 0))));
+
+  std::string x;
+
+  db::RecursiveShapeIterator i1 (*g, c0, 0, db::Box (0, 0, 100, 100));
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "[$2](0,100;1000,1200)/[$3](100,0;1100,1100)");
+
+  g.reset (new db::Layout ());
+
+  //  now the layout is gone and the iterator stays silent (weak pointer to layout)
+  //  NOTE: this only works on reset or re-initialization. Not during iteration.
+  i1.reset ();
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "");
 }

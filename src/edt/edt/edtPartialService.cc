@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -261,13 +261,12 @@ insert_point_path (const db::Path &p, const std::set<EdgeWithIndex> &sel, db::Po
 }
 
 static void 
-assign_path_compressed (db::Path &p, std::vector <db::Point> &ctr)
+remove_redundant_points (std::vector <db::Point> &ctr)
 {
   //  compress contour (remove redundant points)
   //  and assign to path
 
   std::vector<db::Point>::iterator wp = ctr.begin ();
-  std::vector<db::Point>::iterator wp0 = wp;
   std::vector<db::Point>::const_iterator rp = ctr.begin ();
   db::Point pm1 = *rp;
   if (wp != ctr.end ()) {
@@ -275,20 +274,14 @@ assign_path_compressed (db::Path &p, std::vector <db::Point> &ctr)
     ++rp;
     while (rp != ctr.end ()) {
       db::Point p0 = *rp;
-      ++rp;
-      if (rp != ctr.end ()) {
-        db::Point pp1 = *rp;
-        if (! (db::vprod_sign (pp1 - p0, p0 - pm1) == 0 && db::sprod_sign (pp1 - p0, p0 - pm1) >= 0)) {
-          *wp++ = p0;
-          pm1 = p0;
-        }
-      } else {
+      if (p0 != pm1) {
         *wp++ = p0;
       }
+      ++rp;
     }
   }
 
-  p.assign (wp0, wp);
+  ctr.erase (wp, ctr.end ());
 }
 
 static db::Path
@@ -310,7 +303,8 @@ del_points_path (const db::Path &p, const std::set<EdgeWithIndex> &sel)
     }
   }
 
-  assign_path_compressed (new_path, ctr);
+  remove_redundant_points (ctr);
+  new_path.assign (ctr.begin (), ctr.end ());
 
   return new_path;
 }
@@ -362,10 +356,10 @@ modify_path (db::Path &p, const std::map <PointWithIndex, db::Point> &new_points
   }
 
   if (compress) {
-    assign_path_compressed (p, ctr);
-  } else {
-    p.assign (ctr.begin (), ctr.end ());
+    remove_redundant_points (ctr);
   }
+
+  p.assign (ctr.begin (), ctr.end ());
 }
 
 bool
@@ -402,6 +396,8 @@ insert_point_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel, db:
 
     if (found) {
 
+      remove_redundant_points (ctr);
+
       new_poly = p;
       if (c == 0) {
         new_poly.assign_hull (ctr.begin (), ctr.end (), false /*don't compress*/);
@@ -436,10 +432,12 @@ del_points_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel)
       }
     }
 
+    remove_redundant_points (ctr);
+
     if (c == 0) {
-      new_poly.assign_hull (ctr.begin (), ctr.end (), true /*compress*/);
+      new_poly.assign_hull (ctr.begin (), ctr.end (), false /*compress*/);
     } else {
-      new_poly.assign_hole (c - 1, ctr.begin (), ctr.end (), true /*compress*/);
+      new_poly.assign_hole (c - 1, ctr.begin (), ctr.end (), false /*compress*/);
     }
 
   }
@@ -495,10 +493,14 @@ modify_polygon (db::Polygon &p,
 
     }
 
+    if (compress) {
+      remove_redundant_points (ctr);
+    }
+
     if (c == 0) {
-      p.assign_hull (ctr.begin (), ctr.end (), compress);
+      p.assign_hull (ctr.begin (), ctr.end (), false /*compress*/);
     } else {
-      p.assign_hole (c - 1, ctr.begin (), ctr.end (), compress);
+      p.assign_hole (c - 1, ctr.begin (), ctr.end (), false /*compress*/);
     }
 
   }
@@ -1545,11 +1547,12 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
       //  thus, we can bring the point on grid or to an object's edge or vertex
       snap_details = snap2 (p);
       m_current = snap_details.snapped_point;
+      mouse_cursor_from_snap_details (snap_details);
     } else {
       m_current = m_start + snap (p - m_start);
+      clear_mouse_cursors ();
     }
 
-    mouse_cursor_from_snap_details (snap_details);
     selection_to_view ();
 
     m_alt_ac = lay::AC_Global;
@@ -2412,127 +2415,131 @@ PartialService::selection_to_view ()
 
   }
 
-  //  build the transformation variants cache
-  TransformationVariants tv (view ());
-
   size_t n_marker = 0;
   size_t n_inst_marker = 0;
 
-  for (partial_objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
+  if (! m_selection.empty ()) {
 
-    const lay::CellView &cv = view ()->cellview (r->first.cv_index ());
+    //  build the transformation variants cache
+    TransformationVariants tv (view ());
 
-    if (! r->first.is_cell_inst ()) {
+    for (partial_objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
 
-      const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (r->first.cv_index (), r->first.layer ());
-      if (tv_list && !tv_list->empty ()) {
+      const lay::CellView &cv = view ()->cellview (r->first.cv_index ());
 
-        //  use only the first one of the explicit transformations 
-        //  TODO: clarify how this can be implemented in a more generic form or leave it thus.
-        db::ICplxTrans gt (cv.context_trans () * r->first.trans ());
-        db::CplxTrans tt = (*tv_list) [0] * db::CplxTrans (cv->layout ().dbu ()) * gt;
-        db::Vector move_vector (tt.inverted () * (move_trans * (tt * db::Point ())));
+      if (! r->first.is_cell_inst ()) {
 
-        //  create the shift sets describing how points and edges are being moved
-        
-        std::map <EdgeWithIndex, db::Edge> new_edges;
-        std::map <PointWithIndex, db::Point> new_points;
+        const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (r->first.cv_index (), r->first.layer ());
+        if (tv_list && !tv_list->empty ()) {
 
-        if (m_dragging) {
-          create_shift_sets (r->first.shape (), r->second, new_points, new_edges, move_vector);
-        }
+          //  use only the first one of the explicit transformations
+          //  TODO: clarify how this can be implemented in a more generic form or leave it thus.
+          db::ICplxTrans gt (cv.context_trans () * r->first.trans ());
+          db::CplxTrans tt = (*tv_list) [0] * db::CplxTrans (cv->layout ().dbu ()) * gt;
+          db::Vector move_vector (tt.inverted () * (move_trans * (tt * db::Point ())));
 
-        //  create the markers to represent vertices and edges
+          //  create the shift sets describing how points and edges are being moved
 
-        enter_vertices (n_marker, r, new_points, new_edges, gt, *tv_list, false);
+          std::map <EdgeWithIndex, db::Edge> new_edges;
+          std::map <PointWithIndex, db::Point> new_points;
 
-        if (r->first.shape ().is_polygon ()) {
+          if (m_dragging) {
+            create_shift_sets (r->first.shape (), r->second, new_points, new_edges, move_vector);
+          }
 
-          for (unsigned int c = 0; c < r->first.shape ().holes () + 1; ++c) {
+          //  create the markers to represent vertices and edges
 
+          enter_vertices (n_marker, r, new_points, new_edges, gt, *tv_list, false);
+
+          if (r->first.shape ().is_polygon ()) {
+
+            for (unsigned int c = 0; c < r->first.shape ().holes () + 1; ++c) {
+
+              unsigned int n = 0;
+              db::Shape::polygon_edge_iterator ee;
+              for (db::Shape::polygon_edge_iterator e = r->first.shape ().begin_edge (c); ! e.at_end (); e = ee, ++n) {
+                ee = e;
+                ++ee;
+                unsigned int nn = ee.at_end () ? 0 : n + 1;
+                enter_edge (EdgeWithIndex (*e, n, nn, c), n_marker, r, new_points, new_edges, gt, *tv_list, false);
+              }
+
+            }
+
+            db::Polygon poly;
+            r->first.shape ().polygon (poly);
+
+            //  warning: poly is modified:
+            enter_polygon (poly, n_marker, r, new_points, new_edges, gt, *tv_list, false);
+
+          } else if (r->first.shape ().is_path ()) {
+
+            if (r->first.shape ().begin_point () != r->first.shape ().end_point ()) {
+
+              db::Shape::point_iterator pt = r->first.shape ().begin_point ();
+              db::Point p1 = *pt;
+
+              unsigned int n = 0;
+              while (true) {
+
+                ++pt;
+                if (pt == r->first.shape ().end_point ()) {
+                  break;
+                }
+
+                enter_edge (EdgeWithIndex (db::Edge (p1, *pt), n, n + 1, 0), n_marker, r, new_points, new_edges, gt, *tv_list, false);
+
+                p1 = *pt;
+                ++n;
+
+              }
+
+              //  TODO: ... put this somewhere else:
+              db::Path path;
+              r->first.shape ().path (path);
+
+              //  warning: path is modified:
+              enter_path (path, n_marker, r, new_points, new_edges, gt, *tv_list, false);
+
+            }
+
+          } else if (r->first.shape ().is_box ()) {
+
+            //  convert to polygon and test those edges
+            db::Polygon poly (r->first.shape ().box ());
             unsigned int n = 0;
             db::Shape::polygon_edge_iterator ee;
-            for (db::Shape::polygon_edge_iterator e = r->first.shape ().begin_edge (c); ! e.at_end (); e = ee, ++n) {
+            for (db::Shape::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); e = ee, ++n) {
               ee = e;
               ++ee;
               unsigned int nn = ee.at_end () ? 0 : n + 1;
-              enter_edge (EdgeWithIndex (*e, n, nn, c), n_marker, r, new_points, new_edges, gt, *tv_list, false);
+              enter_edge (EdgeWithIndex (*e, n, nn, 0), n_marker, r, new_points, new_edges, gt, *tv_list, false);
             }
 
-          }
+            //  warning: poly is modified:
+            enter_polygon (poly, n_marker, r, new_points, new_edges, gt, *tv_list, false);
 
-          db::Polygon poly;
-          r->first.shape ().polygon (poly);
+          } else if (r->first.shape ().is_text ()) {
 
-          //  warning: poly is modified:
-          enter_polygon (poly, n_marker, r, new_points, new_edges, gt, *tv_list, false);
-
-        } else if (r->first.shape ().is_path ()) {
-
-          if (r->first.shape ().begin_point () != r->first.shape ().end_point ()) {
-
-            db::Shape::point_iterator pt = r->first.shape ().begin_point ();
-            db::Point p1 = *pt;
-
-            unsigned int n = 0;
-            while (true) {
-
-              ++pt;
-              if (pt == r->first.shape ().end_point ()) {
-                break;
-              }
-              
-              enter_edge (EdgeWithIndex (db::Edge (p1, *pt), n, n + 1, 0), n_marker, r, new_points, new_edges, gt, *tv_list, false);
-
-              p1 = *pt;
-              ++n;
-
-            }
-
-            //  TODO: ... put this somewhere else: 
-            db::Path path;
-            r->first.shape ().path (path);
-
-            //  warning: path is modified:
-            enter_path (path, n_marker, r, new_points, new_edges, gt, *tv_list, false);
+            db::Point tp (r->first.shape ().text_trans () * db::Point ());
+            enter_edge (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0), n_marker, r, new_points, new_edges, gt, *tv_list, false);
 
           }
-
-        } else if (r->first.shape ().is_box ()) {
-
-          //  convert to polygon and test those edges
-          db::Polygon poly (r->first.shape ().box ());
-          unsigned int n = 0;
-          db::Shape::polygon_edge_iterator ee;
-          for (db::Shape::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); e = ee, ++n) {
-            ee = e;
-            ++ee;
-            unsigned int nn = ee.at_end () ? 0 : n + 1;
-            enter_edge (EdgeWithIndex (*e, n, nn, 0), n_marker, r, new_points, new_edges, gt, *tv_list, false);
-          }
-
-          //  warning: poly is modified:
-          enter_polygon (poly, n_marker, r, new_points, new_edges, gt, *tv_list, false);
-
-        } else if (r->first.shape ().is_text ()) {
-
-          db::Point tp (r->first.shape ().text_trans () * db::Point ());
-          enter_edge (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0), n_marker, r, new_points, new_edges, gt, *tv_list, false);
 
         }
 
-      }
+      } else {
 
-    } else {
+        //  compute the global transformation including movement, context and explicit transformation
+        db::ICplxTrans gt = db::VCplxTrans (1.0 / cv->layout ().dbu ()) * db::DCplxTrans (move_trans) * db::CplxTrans (cv->layout ().dbu ());
+        gt *= (cv.context_trans () * r->first.trans ());
 
-      //  compute the global transformation including movement, context and explicit transformation
-      db::ICplxTrans gt = db::VCplxTrans (1.0 / cv->layout ().dbu ()) * db::DCplxTrans (move_trans) * db::CplxTrans (cv->layout ().dbu ());
-      gt *= (cv.context_trans () * r->first.trans ());
+        const std::vector<db::DCplxTrans> *tv_list = tv.per_cv (r->first.cv_index ());
+        if (tv_list  && ! tv_list->empty ()) {
+          lay::InstanceMarker *marker = new_inst_marker (n_inst_marker, r->first.cv_index (), false);
+          marker->set (r->first.back ().inst_ptr, gt, *tv_list);
+        }
 
-      const std::vector<db::DCplxTrans> *tv_list = tv.per_cv (r->first.cv_index ());
-      if (tv_list  && ! tv_list->empty ()) {
-        lay::InstanceMarker *marker = new_inst_marker (n_inst_marker, r->first.cv_index (), false);
-        marker->set (r->first.back ().inst_ptr, gt, *tv_list);
       }
 
     }

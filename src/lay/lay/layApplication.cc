@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -686,6 +686,22 @@ ApplicationBase::init_app ()
 
   if (mc) {
 
+    //  create the basic macro categories
+
+    if (ruby_interpreter ().available ()) {
+      std::vector<std::string> folders;
+      folders.push_back ("macros");
+      folders.push_back ("ruby");
+      mc->add_macro_category ("macros", "Ruby", folders);
+    }
+
+    if (python_interpreter ().available ()) {
+      std::vector<std::string> folders;
+      folders.push_back ("pymacros");
+      folders.push_back ("python");
+      mc->add_macro_category ("pymacros", "Python", folders);
+    }
+
     mc->enable_implicit_macros (! m_no_macros);
 
     //  Add the global ruby modules as the first ones.
@@ -741,12 +757,32 @@ ApplicationBase::init_app ()
     }
   }
 
+  std::set<std::string> already_executed;
+
   //  run all early autorun macros
-  lym::MacroCollection::root ().autorun_early ();
+  lym::MacroCollection::root ().autorun_early (&already_executed);
+
+  //  redo gsi::initialize as the macros may have registered new external classes
+  //  through the "doc to external class" mechanism.
+  gsi::initialize ();
+
+  //  autorun_early may have added macro categories, so we need to call finish() again
+  if (mc) {
+
+    mc->finish ();
+
+    //  as this regenerates the macro collection, autorun_early is required again
+    //  note: this does no re-execute macros that have been executed already
+    lym::MacroCollection::root ().autorun_early (&already_executed);
+
+  }
 
   //  rescan the folders because early autorun macros might have added 
   //  suffixes through the MacroInterpreter interface.
   lym::MacroCollection::root ().rescan ();
+
+  //  and yet another autorun_early pass ..
+  lym::MacroCollection::root ().autorun_early (&already_executed);
 
   //  creates the main window or plugin root as required
   setup ();
@@ -782,6 +818,15 @@ ApplicationBase::init_app ()
       tl::info << "  " << *c;
     }
 
+  }
+}
+
+void
+ApplicationBase::add_macro_category (const std::string &name, const std::string &description, const std::vector<std::string> &folders)
+{
+  lay::MacroController *mc = lay::MacroController::instance ();
+  if (mc) {
+    mc->add_macro_category (name, description, folders);
   }
 }
 
@@ -1318,6 +1363,20 @@ GuiApplication::notify (QObject *receiver, QEvent *e)
 }
 
 void
+GuiApplication::enter_busy_mode (bool bm)
+{
+  if (mp_mw) {
+    mp_mw->enter_busy_mode (bm);
+  }
+}
+
+bool
+GuiApplication::is_busy () const
+{
+  return mp_mw && mp_mw->is_busy ();
+}
+
+void
 GuiApplication::force_update_app_menu ()
 {
 #if defined(__APPLE__)
@@ -1484,18 +1543,19 @@ GuiApplication::setup ()
 void
 GuiApplication::process_events_impl (QEventLoop::ProcessEventsFlags flags, bool silent)
 {
+  //  prevent recursive process_events
+  if (is_busy ()) {
+    return;
+  }
+
   if (mp_mw) {
 
-    //  prevent recursive process_events
-    if (mp_mw->is_busy ()) {
-      return;
-    }
+    lay::BusySection busy;
 
     if (silent) {
       tl::DeferredMethodScheduler::enable (false);
     }
 
-    mp_mw->enter_busy_mode (true);
     try {
 #if QT_VERSION < 0x050000
       QApplication::syncX ();
@@ -1507,7 +1567,6 @@ GuiApplication::process_events_impl (QEventLoop::ProcessEventsFlags flags, bool 
     } catch (...) {
       //  ignore exceptions
     }
-    mp_mw->enter_busy_mode (false);
 
     if (silent) {
       tl::DeferredMethodScheduler::enable (true);

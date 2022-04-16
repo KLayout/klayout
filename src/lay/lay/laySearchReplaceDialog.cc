@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1696,6 +1696,55 @@ SearchReplaceDialog::result_selection_changed ()
           mp_markers.push_back (marker);
 
           dbox += marker->bbox ();
+
+        }
+
+      } else if (index < int (m_model.data ().size ())) {
+
+        db::DCplxTrans as_dbu = db::DCplxTrans (layout.dbu ()).inverted ();
+
+        const tl::Variant &dr = m_model.data () [index];
+        for (tl::Variant::const_iterator v = dr.begin (); v != dr.end (); ++v) {
+
+          lay::Marker *marker = new lay::Marker (view (), cv_index);
+
+          if (v->is_user<db::DBox> ()) {
+            marker->set (v->to_user<db::DBox> (), as_dbu, global_trans);
+          } else if (v->is_user<db::Box> ()) {
+            marker->set (v->to_user<db::Box> (), db::ICplxTrans (), global_trans);
+          } else if (v->is_user<db::DEdge> ()) {
+            marker->set (v->to_user<db::DEdge> (), as_dbu, global_trans);
+          } else if (v->is_user<db::Edge> ()) {
+            marker->set (v->to_user<db::Edge> (), db::ICplxTrans (), global_trans);
+          } else if (v->is_user<db::DPolygon> ()) {
+            marker->set (v->to_user<db::DPolygon> (), as_dbu, global_trans);
+          } else if (v->is_user<db::Polygon> ()) {
+            marker->set (v->to_user<db::Polygon> (), db::ICplxTrans (), global_trans);
+          } else if (v->is_user<db::DPath> ()) {
+            marker->set (v->to_user<db::DPath> (), as_dbu, global_trans);
+          } else if (v->is_user<db::Path> ()) {
+            marker->set (v->to_user<db::Path> (), db::ICplxTrans (), global_trans);
+          } else if (v->is_user<db::DPoint> ()) {
+            db::DPoint p = v->to_user<db::DPoint> ();
+            marker->set (db::DBox (p, p), as_dbu, global_trans);
+          } else if (v->is_user<db::Point> ()) {
+            db::Point p = v->to_user<db::Point> ();
+            marker->set (db::Box (p, p), db::ICplxTrans (), global_trans);
+          } else if (v->is_user<db::DVector> ()) {
+            db::DPoint p = db::DPoint () + v->to_user<db::DVector> ();
+            marker->set (db::DBox (p, p), as_dbu, global_trans);
+          } else if (v->is_user<db::Vector> ()) {
+            db::Point p = db::Point () + v->to_user<db::Vector> ();
+            marker->set (db::Box (p, p), db::ICplxTrans (), global_trans);
+          } else {
+            delete marker;
+            marker = 0;
+          }
+
+          if (marker) {
+            mp_markers.push_back (marker);
+            dbox += marker->bbox ();
+          }
 
         }
 

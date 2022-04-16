@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2021 Matthias Koefferlein
+# Copyright (C) 2006-2022 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -277,7 +277,18 @@ class DBPolygon_TestClass < TestBase
     a = RBA::Polygon::new( [ RBA::Point::new( 0, 1 ), RBA::Point::new( 1, 5 ), RBA::Point::new( 5, 5 ) ] )
     assert_equal( a.to_s, "(0,1;1,5;5,5)" )
     assert_equal( a.sized(2, 0, 2).to_s, "(-2,1;-1,5;7,5;2,1)" )
+    assert_equal( a.sized(RBA::Vector::new(2, 0), 2).to_s, "(-2,1;-1,5;7,5;2,1)" )
+    assert_equal( a.sized(RBA::Vector::new(2, 0)).to_s, "(-2,1;-1,5;7,5;2,1)" )
+    aa = a.dup
     a.size(2, 0, 2);
+    assert_equal( a.to_s, "(-2,1;-1,5;7,5;2,1)" )
+    a = aa
+    aa = a.dup
+    a.size(RBA::Vector::new(2, 0), 2);
+    assert_equal( a.to_s, "(-2,1;-1,5;7,5;2,1)" )
+    a = aa
+    aa = a.dup
+    a.size(RBA::Vector::new(2, 0));
     assert_equal( a.to_s, "(-2,1;-1,5;7,5;2,1)" )
 
     a = RBA::Polygon::new

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -647,7 +647,7 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "\n"
                     "The following values are accepted for this option:\n"
                     "\n"
-                    "* 0: produce LEF geometry unless a FOREIGN cell is specified\n"
+                    "* 0: produce LEF geometry unless a FOREIGN cell is specified (the default)\n"
                     "* 1: produce LEF geometry always and ignore FOREIGN\n"
                     "* 2: Never produce LEF geometry and assume FOREIGN always\n"
                     "\n"
@@ -679,8 +679,6 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "Use a comma-separated list of file names here to specify which LEF files to read. "
                     "See also '--" + m_long_prefix + "lefdef-read-lef-with-def' for an option to implicitly read all LEF files in the same "
                     "place than the DEF file.\n"
-                    "\n"
-                    "Relative paths are resolved based on the location of the DEF file which is read."
                    )
       ;
 
@@ -730,7 +728,7 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
   load_options.set_option_by_name ("gds2_allow_multi_xy_records", m_gds2_allow_multi_xy_records);
 
   load_options.set_option_by_name ("oasis_read_all_properties", m_oasis_read_all_properties);
-  load_options.set_option_by_name ("oasis_expect_strict_mode", m_oasis_expect_strict_mode ? 1 : 0);
+  load_options.set_option_by_name ("oasis_expect_strict_mode", m_oasis_expect_strict_mode ? 1 : -1);
 
   load_options.set_option_by_name ("cif_layer_map", tl::Variant::make_variant (m_layer_map));
   load_options.set_option_by_name ("cif_create_other_layers", m_create_other_layers);
@@ -807,6 +805,8 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
   load_options.set_option_by_name ("lefdef_config.separate_groups", m_lefdef_separate_groups);
   load_options.set_option_by_name ("lefdef_config.map_file", m_lefdef_map_file);
   load_options.set_option_by_name ("lefdef_config.macro_resolution_mode", m_lefdef_macro_resolution_mode);
+  load_options.set_option_by_name ("lefdef_config.macro_resolution_mode", m_lefdef_macro_resolution_mode);
+  load_options.set_option_by_name ("lefdef_config.paths_relative_to_cwd", true);
 
   m_lef_layouts.clear ();
   tl::Variant lef_layout_ptrs = tl::Variant::empty_list ();
@@ -831,6 +831,44 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
   }
 
   load_options.set_option_by_name ("lefdef_config.macro_layouts", lef_layout_ptrs);
+}
+
+static std::string::size_type find_file_sep (const std::string &s, std::string::size_type from)
+{
+  std::string::size_type p1 = s.find ("+", from);
+  std::string::size_type p2 = s.find (",", from);
+
+  if (p1 == std::string::npos) {
+    return p2;
+  } else if (p2 == std::string::npos) {
+    return p1;
+  } else {
+    return p1 < p2 ? p1 : p2;
+  }
+}
+
+static std::vector<std::string> split_file_list (const std::string &infile)
+{
+  std::vector<std::string> files;
+
+  size_t p = 0;
+  for (size_t pp = 0; (pp = find_file_sep (infile, p)) != std::string::npos; p = pp + 1) {
+    files.push_back (std::string (infile, p, pp - p));
+  }
+  files.push_back (std::string (infile, p));
+
+  return files;
+}
+
+void read_files (db::Layout &layout, const std::string &infile, const db::LoadLayoutOptions &options)
+{
+  std::vector<std::string> files = split_file_list (infile);
+
+  for (std::vector<std::string>::const_iterator f = files.begin (); f != files.end (); ++f) {
+    tl::InputStream stream (*f);
+    db::Reader reader (stream);
+    reader.read (layout, options);
+  }
 }
 
 }

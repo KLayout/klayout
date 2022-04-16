@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -323,6 +323,11 @@ public:
   virtual bool mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
 
   /**
+   *  @brief Implements the key handler
+   */
+  virtual bool key_event (unsigned int /*key*/, unsigned int /*buttons*/);
+
+  /**
    *  @brief Implement the mouse mode: deactivate mouse mode
    */
   virtual void deactivated ();
@@ -429,6 +434,13 @@ protected:
    *  This method is supposed to return true, if the editing should be finished.
    */
   virtual bool do_mouse_click (const db::DPoint & /*p*/) { return false; }
+
+  /**
+   *  @brief Reimplemented by the specific implementation of the shape editors
+   *
+   *  This method is called when the backspace button is pressed
+   */
+  virtual void do_delete () { }
 
   /**
    *  @brief Reimplemented by the specific implementation of the shape editors

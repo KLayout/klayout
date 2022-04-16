@@ -1,0 +1,15 @@
+(CIF file written 2022-02-12 00:19:54 by KLayout);
+DS 1 1 10;
+9 bad_cellabc;
+L L1D0;
+B 10 10 5,5;
+L L1D5;
+B 20 20 10,10;
+L ABC;
+B 30 30 15,15;
+L ABCN1;
+B 40 40 20,20;
+L ABCN2;
+B 50 50 25,25;
+DF;
+E

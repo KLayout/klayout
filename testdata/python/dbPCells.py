@@ -1,5 +1,5 @@
 # KLayout Layout Viewer
-# Copyright (C) 2006-2021 Matthias Koefferlein
+# Copyright (C) 2006-2022 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -99,6 +99,9 @@ if "PCellDeclarationHelper" in pya.__dict__:
       # provide a descriptive text for the cell
       return "Box2(L=" + str(self.layer) + ",W=" + ('%.3f' % self.width) + ",H=" + ('%.3f' % self.height) + ")"
     
+    def wants_lazy_evaluation(self):
+      return True
+
     def produce_impl(self):
     
       dbu = self.layout.dbu
@@ -197,6 +200,7 @@ class DBPCellTests(unittest.TestCase):
     self.assertEqual(pcell_var.is_pcell_variant(), True)
     self.assertEqual(pcell_var.display_title(), "PCellTestLib.Box(L=1/0,W=1.000,H=1.000)")
     self.assertEqual(pcell_var.basic_name(), "Box")
+    self.assertEqual(pcell_var.pcell_declaration().wants_lazy_evaluation(), False)
     self.assertEqual(c1.is_pcell_variant(), False)
     self.assertEqual(c1.is_pcell_variant(pcell_inst), True)
     self.assertEqual(pcell_var.pcell_id(), pcell_decl_id)
@@ -343,6 +347,7 @@ class DBPCellTests(unittest.TestCase):
     self.assertEqual(pcell_var.pcell_declaration().__repr__(), pcell_decl.__repr__())
     self.assertEqual(c1.pcell_declaration(pcell_inst).__repr__(), pcell_decl.__repr__())
     self.assertEqual(pcell_inst.pcell_declaration().__repr__(), pcell_decl.__repr__())
+    self.assertEqual(pcell_decl.wants_lazy_evaluation(), True)
 
     li1 = find_layer(ly, "1/0")
     self.assertEqual(li1 == None, False)
@@ -489,7 +494,6 @@ class DBPCellTests(unittest.TestCase):
     cell = ly.create_cell("BOXVAR", "PCellTestLib")
 
     self.assertEqual(cell.begin_shapes_rec(ly.layer(5, 0)).shape().__str__(), "box (-100,-300;100,300)")
-
 
 # run unit tests
 if __name__ == '__main__':

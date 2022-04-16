@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@
 #include "dbClipboardData.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
+#include "layBusy.h"
 #include "layLibrariesView.h"
 #include "layCellTreeModel.h"
 #include "layLayoutView.h"
@@ -135,6 +136,8 @@ LibraryTreeWidget::startDrag (Qt::DropActions supportedActions)
     if (!data) {
       return;
     }
+
+    lay::BusySection busy_section; // issue 984
 
     QDrag *drag = new QDrag (this);
     drag->setMimeData(data);

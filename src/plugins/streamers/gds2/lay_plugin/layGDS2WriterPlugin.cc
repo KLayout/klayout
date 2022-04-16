@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ GDS2WriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Tech
     options->write_file_properties = mp_ui->write_file_properties->isChecked ();
     options->no_zero_length_paths = mp_ui->no_zero_length_paths->isChecked ();
 
-    tl::from_string (tl::to_string (mp_ui->max_vertex_le->text ()), n);
+    tl::from_string_ext (tl::to_string (mp_ui->max_vertex_le->text ()), n);
     if (! options->multi_xy_records) {
       if (n > 8191) {
         throw tl::Exception (tl::to_string (QObject::tr ("Maximum number of vertices must not exceed 8191")));
@@ -95,7 +95,7 @@ GDS2WriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Tech
     options->max_vertex_count = n;
 
     n = 32000;
-    tl::from_string (tl::to_string (mp_ui->cell_name_length_le->text ()), n);
+    tl::from_string_ext (tl::to_string (mp_ui->cell_name_length_le->text ()), n);
     if (n > 32000) {
       throw tl::Exception (tl::to_string (QObject::tr ("Maximum cell name length must not exceed 32000")));
     }

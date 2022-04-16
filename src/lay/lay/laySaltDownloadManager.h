@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,6 +34,11 @@
 #include <string>
 #include <map>
 
+namespace tl
+{
+  class InputHttpStreamCallback;
+}
+
 namespace lay
 {
 
@@ -52,6 +57,7 @@ public:
 
   bool is_confirmed () const  { return m_confirmed; }
   bool is_cancelled () const  { return m_cancelled; }
+  bool is_aborted () const  { return m_aborted; }
 
   void start ();
   void separator ();
@@ -65,10 +71,11 @@ public:
 private slots:
   void confirm_pressed ()     { m_confirmed = true; }
   void cancel_pressed ()      { m_cancelled = true; }
+  void abort_pressed ()       { m_aborted = true; }
   void close_pressed ()       { hide (); }
 
 private:
-  bool m_confirmed, m_cancelled;
+  bool m_confirmed, m_cancelled, m_aborted;
   lay::LogFile m_file;
   std::map<std::string, QTreeWidgetItem *> m_items_by_name;
 

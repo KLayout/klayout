@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le
 {
   try {
     Value value = Value (0);
-    tl::from_string (tl::to_string (le->text ()), value);
+    tl::from_string_ext (tl::to_string (le->text ()), value);
     dispatcher->config_set (cfg_name, tl::to_string (value));
     lay::indicate_error (le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
@@ -249,7 +249,7 @@ EditorOptionsText::apply (lay::Dispatcher *root)
     root->config_set (cfg_edit_text_size, 0.0);
   } else {
     double sz = 0.0;
-    tl::from_string (tl::to_string (mp_ui->size_le->text ()), sz);
+    tl::from_string_ext (tl::to_string (mp_ui->size_le->text ()), sz);
     root->config_set (cfg_edit_text_size, sz);
   }
 }
@@ -607,7 +607,7 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
     if (m_cv_index >= 0 && view ()->cellview (m_cv_index).is_valid ()) {
       techname = view ()->cellview (m_cv_index)->tech_name ();
     }
-    mp_ui->lib_cbx->set_technology_filter (techname, ! techname.empty ());
+    mp_ui->lib_cbx->set_technology_filter (techname, true);
 
     //  cell name
     std::string s;

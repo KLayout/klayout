@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -120,6 +120,57 @@ struct _var_user_to_string_impl<T, false>
 };
 
 /**
+ *  @brief A helper function to implement equal as efficiently as possible
+ */
+template<class T, bool> struct _var_user_to_int_impl;
+
+template<class T>
+struct _var_user_to_int_impl<T, true>
+{
+  static int call (const T *a) { return a->to_int (); }
+};
+
+template<class T>
+struct _var_user_to_int_impl<T, false>
+{
+  static int call (const T *) { tl_assert (false); }
+};
+
+/**
+ *  @brief A helper function to implement equal as efficiently as possible
+ */
+template<class T, bool> struct _var_user_to_double_impl;
+
+template<class T>
+struct _var_user_to_double_impl<T, true>
+{
+  static double call (const T *a) { return a->to_double (); }
+};
+
+template<class T>
+struct _var_user_to_double_impl<T, false>
+{
+  static double call (const T *) { tl_assert (false); }
+};
+
+/**
+ *  @brief A helper function to implement equal as efficiently as possible
+ */
+template<class T, bool> struct _var_user_to_variant_impl;
+
+template<class T>
+struct _var_user_to_variant_impl<T, true>
+{
+  static tl::Variant call (const T *a) { return a->to_variant (); }
+};
+
+template<class T>
+struct _var_user_to_variant_impl<T, false>
+{
+  static tl::Variant call (const T *) { tl_assert (false); }
+};
+
+/**
  *  @brief A utility implementation of tl::VariantUserClass using type traits for the implementation
  */
 template <class T>
@@ -162,7 +213,22 @@ public:
     return _var_user_to_string_impl<T, tl::has_to_string<T>::value>::call ((const T *) a);
   }
 
-  virtual void read (void *a, tl::Extractor &ex) const 
+  virtual int to_int (const void *a) const
+  {
+    return _var_user_to_int_impl<T, tl::has_to_int<T>::value>::call ((const T *) a);
+  }
+
+  virtual double to_double (const void *a) const
+  {
+    return _var_user_to_double_impl<T, tl::has_to_double<T>::value>::call ((const T *) a);
+  }
+
+  virtual void to_variant (const void *a, tl::Variant &v) const
+  {
+    v = _var_user_to_variant_impl<T, tl::has_to_variant<T>::value>::call ((const T *) a);
+  }
+
+  virtual void read (void *a, tl::Extractor &ex) const
   { 
     ex.read (*(T *)a);
   }

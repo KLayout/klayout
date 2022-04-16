@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -512,7 +512,7 @@ SaltGrain::from_path (const std::string &path)
 }
 
 tl::InputStream *
-SaltGrain::stream_from_url (std::string &url)
+SaltGrain::stream_from_url (std::string &url, double timeout, tl::InputHttpStreamCallback *callback)
 {
   if (url.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No download link available")));
@@ -535,17 +535,17 @@ SaltGrain::stream_from_url (std::string &url)
 
   std::string spec_url = SaltGrain::spec_url (url);
   if (spec_url.find ("http:") == 0 || spec_url.find ("https:") == 0) {
-    return tl::WebDAVObject::download_item (spec_url);
+    return tl::WebDAVObject::download_item (spec_url, timeout, callback);
   } else {
     return new tl::InputStream (spec_url);
   }
 }
 
 SaltGrain
-SaltGrain::from_url (const std::string &url_in)
+SaltGrain::from_url (const std::string &url_in, double timeout, tl::InputHttpStreamCallback *callback)
 {
   std::string url = url_in;
-  std::unique_ptr<tl::InputStream> stream (stream_from_url (url));
+  std::unique_ptr<tl::InputStream> stream (stream_from_url (url, timeout, callback));
 
   SaltGrain g;
   g.load (*stream);

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 
 #include "dbLibrary.h"
 #include "dbPCellHeader.h"
+#include "dbLibraryProxy.h"
+#include "dbPCellVariant.h"
 #include "edtInstPropertiesPage.h"
 #include "edtPropertiesPageUtils.h"
 #include "edtPCellParametersPage.h"
@@ -135,6 +137,21 @@ BEGIN_PROTECTED
 END_PROTECTED
 }
 
+static void
+get_cell_or_pcell_ids_by_name (const db::Layout *layout, const std::string &name, std::pair<bool, db::cell_index_type> &ci, std::pair<bool, db::pcell_id_type> &pci)
+{
+  ci = layout->cell_by_name (name.c_str ());
+  pci = layout->pcell_by_name (name.c_str ());
+
+  if (pci.first) {
+    //  prefer PCell names
+    ci.first = false;
+  } else if (ci.first && layout->cell (ci.second).is_proxy ()) {
+    //  don't let us select proxy names (they are eventually virtual cells)
+    ci.first = false;
+  }
+}
+
 void
 InstPropertiesPage::browse_cell ()
 {
@@ -153,19 +170,18 @@ BEGIN_PROTECTED
     layout = &cv->layout ();
   }
 
-  lay::LibraryCellSelectionForm form (this, layout, "browse_lib_cell");
+  lay::LibraryCellSelectionForm form (this, layout, "browse_lib_cell", false, lib != 0 /*for libs show top cells only*/);
   if (lib) {
     form.setWindowTitle (tl::to_qstring (tl::to_string (QObject::tr ("Select Cell - Library: ")) + lib->get_description ()));
   }
 
-  std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
+  std::pair<bool, db::pcell_id_type> pc;
+  std::pair<bool, db::cell_index_type> c;
+  get_cell_or_pcell_ids_by_name (layout, tl::to_string (cell_name_le->text ()), c, pc);
   if (pc.first) {
     form.set_selected_pcell_id (pc.second);
-  } else {
-    std::pair<bool, db::cell_index_type> c = layout->cell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
-    if (c.first) {
-      form.set_selected_cell_index (c.second);
-    }
+  } else if (c.first) {
+    form.set_selected_cell_index (c.second);
   }
 
   if (form.exec ()) {
@@ -305,8 +321,13 @@ InstPropertiesPage::update ()
   bool du = dbu_cb->isChecked ();
 
   db::Box cell_bbox = def_cell.bbox ();
-  cw_le->setText (tl::to_qstring (coord_to_string (cell_bbox.width (), dbu, du)));
-  ch_le->setText (tl::to_qstring (coord_to_string (cell_bbox.height (), dbu, du)));
+  if (cell_bbox.empty ()) {
+    cw_le->setText (QString ());
+    ch_le->setText (QString ());
+  } else {
+    cw_le->setText (tl::to_qstring (coord_to_string (cell_bbox.width (), dbu, du)));
+    ch_le->setText (tl::to_qstring (coord_to_string (cell_bbox.height (), dbu, du)));
+  }
 
   db::Trans t (pos->back ().inst_ptr.front ());
 
@@ -409,10 +430,20 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
   try {
 
-    std::pair<bool, db::cell_index_type> ci = layout->cell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
-    std::pair<bool, db::pcell_id_type> pci = layout->pcell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
+    std::pair<bool, db::cell_index_type> ci;
+    std::pair<bool, db::pcell_id_type> pci;
+    get_cell_or_pcell_ids_by_name (layout, tl::to_string (cell_name_le->text ()), ci, pci);
     if (! ci.first && ! pci.first) {
       throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cell or PCell name: %s")).c_str (), tl::to_string (cell_name_le->text ()).c_str ());
+    }
+
+    //  detect recursions in the hierarchy
+    if (lib == 0 && ci.first) {
+      std::set<db::cell_index_type> called;
+      layout->cell (ci.second).collect_called_cells (called);
+      if (ci.second == cv.cell_index () || called.find (cv.cell_index ()) != called.end ()) {
+        throw tl::Exception (tl::to_string (QObject::tr ("Trying to build a recursive hierarchy")).c_str ());
+      }
     }
 
     lay::indicate_error (cell_name_le, (tl::Exception *) 0);
@@ -424,29 +455,81 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
   try {
 
-    std::pair<bool, db::cell_index_type> ci = layout->cell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
-    std::pair<bool, db::pcell_id_type> pci = layout->pcell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
-    tl_assert (ci.first || pci.first);
+    std::pair<bool, db::cell_index_type> ci;
+    std::pair<bool, db::pcell_id_type> pci;
+    get_cell_or_pcell_ids_by_name (layout, tl::to_string (cell_name_le->text ()), ci, pci);
 
-    db::cell_index_type inst_cell_index = 0;
+    db::Layout *current_layout = &cv->layout ();
+    db::cell_index_type current_ci = pos->back ().inst_ptr.cell_index ();
 
-    //  instantiate the PCell
-    if (pci.first) {
-      tl_assert (mp_pcell_parameters != 0);
-      tl_assert (layout->pcell_declaration (pci.second) == mp_pcell_parameters->pcell_decl ());
-      inst_cell_index = layout->get_pcell_variant (pci.second, mp_pcell_parameters->get_parameters ());
-    } else {
-      inst_cell_index = ci.second;
+    std::pair<bool, db::pcell_id_type> current_pci = current_layout->is_pcell_instance (current_ci);
+    std::pair<db::Library *, db::cell_index_type> l = current_layout->defining_library (current_ci);
+
+    db::Library *current_lib = l.first;
+    if (current_lib) {
+      current_layout = &current_lib->layout ();
+      current_ci = l.second;
     }
 
-    //  reference the library
-    if (lib) {
-      layout = & cv->layout ();
-      inst_cell_index = layout->get_lib_proxy (lib, inst_cell_index);
-    }
+    if (! ci.first && ! pci.first) {
 
-    if (inst_cell_index != pos->back ().inst_ptr.cell_index ()) {
+      //  invalid cell name ...
+
+    } else if (pci.first != current_pci.first || (! pci.first && std::string (layout->cell_name (ci.second)) != current_layout->cell_name (current_ci))) {
+
+      //  a cell has been changed into pcell or vice versa, or the cell name has changed -> we can generate a new proxy and exchange cell indexes
+
+      db::cell_index_type inst_cell_index = 0;
+
+      //  instantiates the PCell
+      if (pci.first) {
+        tl_assert (mp_pcell_parameters != 0);
+        tl_assert (layout->pcell_declaration (pci.second) == mp_pcell_parameters->pcell_decl ());
+        inst_cell_index = layout->get_pcell_variant (pci.second, mp_pcell_parameters->get_parameters ());
+      } else {
+        inst_cell_index = ci.second;
+      }
+
+      //  references the library
+      if (lib) {
+        inst_cell_index = cv->layout ().get_lib_proxy (lib, inst_cell_index);
+      }
+
       appl->add (new ChangeTargetCellApplicator (inst_cell_index));
+
+    } else if (pci.first) {
+
+      //  pcell name has changed -> apply parameter deltas to other selected cells or pcells
+      //  otherwise keep pcell or cell name, change library if possible and required and apply parameter deltas to other selected cells or pcells
+
+      bool adjust_pcell_id = layout->pcell_declaration (pci.second)->name () != current_layout->pcell_declaration (current_pci.second)->name ();
+
+      std::map<std::string, tl::Variant> modified_param_by_name;
+
+      tl_assert (mp_pcell_parameters);
+
+      std::vector<tl::Variant> param = mp_pcell_parameters->get_parameters (0);
+      const std::vector<tl::Variant> &initial_param = mp_pcell_parameters->initial_parameters ();
+
+      const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_parameters->pcell_decl ()->parameter_declarations ();
+      for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd) {
+        unsigned int index = pd - pcp.begin ();
+        if (index < param.size () && index < initial_param.size () && param [index] != initial_param [index]) {
+          modified_param_by_name.insert (std::make_pair (pd->get_name (), param [index]));
+        }
+      }
+
+      if (adjust_pcell_id || lib != current_lib || ! modified_param_by_name.empty ()) {
+        appl->add (new ChangeTargetPCellApplicator (pci.second, adjust_pcell_id, lib, lib != current_lib, modified_param_by_name));
+      }
+
+    } else if (lib != current_lib) {
+
+      //  only library name has changed -> try to apply library to all selected instances keeping the cell name
+
+      //  NOTE: changing the library only is a special case of the ChangeTargetPCellApplicator
+      appl->add (new ChangeTargetPCellApplicator (0, false, lib, true, std::map<std::string, tl::Variant> ()));
+
     }
 
   } catch (tl::Exception &) {
@@ -456,7 +539,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
   double x = 0.0, y = 0.0;
 
   try {
-    tl::from_string (tl::to_string (pos_x_le->text ()), x);
+    tl::from_string_ext (tl::to_string (pos_x_le->text ()), x);
     lay::indicate_error (pos_x_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (pos_x_le, &ex);
@@ -464,7 +547,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
   }
 
   try {
-    tl::from_string (tl::to_string (pos_y_le->text ()), y);
+    tl::from_string_ext (tl::to_string (pos_y_le->text ()), y);
     lay::indicate_error (pos_y_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (pos_y_le, &ex);
@@ -481,7 +564,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
   bool mirror = mirror_cbx->isChecked ();
   double angle = 0.0;
   try {
-    tl::from_string (tl::to_string (angle_le->text ()), angle);
+    tl::from_string_ext (tl::to_string (angle_le->text ()), angle);
     lay::indicate_error (angle_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (angle_le, &ex);
@@ -490,7 +573,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
   double mag = 0.0;
   try {
-    tl::from_string (tl::to_string (mag_le->text ()), mag);
+    tl::from_string_ext (tl::to_string (mag_le->text ()), mag);
     lay::indicate_error (mag_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (mag_le, &ex);
@@ -519,7 +602,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     unsigned long rows = 0, cols = 0;
 
     try {
-      tl::from_string (tl::to_string (column_x_le->text ()), cx);
+      tl::from_string_ext (tl::to_string (column_x_le->text ()), cx);
       lay::indicate_error (column_x_le, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (column_x_le, &ex);
@@ -527,7 +610,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     }
 
     try {
-      tl::from_string (tl::to_string (column_y_le->text ()), cy);
+      tl::from_string_ext (tl::to_string (column_y_le->text ()), cy);
       lay::indicate_error (column_y_le, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (column_y_le, &ex);
@@ -535,7 +618,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     }
 
     try {
-      tl::from_string (tl::to_string (row_x_le->text ()), rx);
+      tl::from_string_ext (tl::to_string (row_x_le->text ()), rx);
       lay::indicate_error (row_x_le, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (row_x_le, &ex);
@@ -543,7 +626,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     }
 
     try {
-      tl::from_string (tl::to_string (row_y_le->text ()), ry);
+      tl::from_string_ext (tl::to_string (row_y_le->text ()), ry);
       lay::indicate_error (row_y_le, (tl::Exception *) 0);
     } catch (tl::Exception &ex) {
       lay::indicate_error (row_y_le, &ex);
@@ -551,7 +634,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     }
 
     try {
-      tl::from_string (tl::to_string (rows_le->text ()), rows);
+      tl::from_string_ext (tl::to_string (rows_le->text ()), rows);
       if (rows < 1) {
         throw tl::Exception (tl::to_string (tr ("Rows count can't be zero")));
       }
@@ -562,7 +645,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
     }
 
     try {
-      tl::from_string (tl::to_string (columns_le->text ()), cols);
+      tl::from_string_ext (tl::to_string (columns_le->text ()), cols);
       if (cols < 1) {
         throw tl::Exception (tl::to_string (tr ("Columns count can't be zero")));
       }
@@ -776,8 +859,9 @@ InstPropertiesPage::update_pcell_parameters ()
 
   }
 
-  std::pair<bool, db::pcell_id_type> pc = layout->pcell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
-  std::pair<bool, db::cell_index_type> cc = layout->cell_by_name (tl::to_string (cell_name_le->text ()).c_str ());
+  std::pair<bool, db::pcell_id_type> pc;
+  std::pair<bool, db::cell_index_type> cc;
+  get_cell_or_pcell_ids_by_name (layout, tl::to_string (cell_name_le->text ()), cc, pc);
 
   //  indicate an invalid cell name
   if (! pc.first && ! cc.first) {

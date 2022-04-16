@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -132,7 +132,7 @@ PropertiesPage::get_points (db::DPoint &p1, db::DPoint &p2)
   bool has_error = false;
 
   try {
-    tl::from_string (tl::to_string (x1->text ()), dx1);
+    tl::from_string_ext (tl::to_string (x1->text ()), dx1);
     lay::indicate_error (x1, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (x1, &ex);
@@ -140,7 +140,7 @@ PropertiesPage::get_points (db::DPoint &p1, db::DPoint &p2)
   }
 
   try {
-    tl::from_string (tl::to_string (x2->text ()), dx2);
+    tl::from_string_ext (tl::to_string (x2->text ()), dx2);
     lay::indicate_error (x2, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (x2, &ex);
@@ -148,7 +148,7 @@ PropertiesPage::get_points (db::DPoint &p1, db::DPoint &p2)
   }
 
   try {
-    tl::from_string (tl::to_string (y1->text ()), dy1);
+    tl::from_string_ext (tl::to_string (y1->text ()), dy1);
     lay::indicate_error (y1, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (y1, &ex);
@@ -156,7 +156,7 @@ PropertiesPage::get_points (db::DPoint &p1, db::DPoint &p2)
   }
 
   try {
-    tl::from_string (tl::to_string (y2->text ()), dy2);
+    tl::from_string_ext (tl::to_string (y2->text ()), dy2);
     lay::indicate_error (y2, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (y2, &ex);

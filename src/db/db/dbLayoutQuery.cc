@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -42,10 +42,69 @@ namespace db
 // --------------------------------------------------------------------------------
 //  Some utilities
 
-bool check_trailing_reserved_word (const tl::Extractor &ex0) 
+static const char *s_select = "select";
+static const char *s_delete = "delete";
+static const char *s_or = "or";
+static const char *s_of = "of";
+static const char *s_on = "on";
+static const char *s_do = "do";
+static const char *s_from = "from";
+static const char *s_layer = "layer";
+static const char *s_layers = "layers";
+static const char *s_cell = "cell";
+static const char *s_cells = "cells";
+static const char *s_where = "where";
+static const char *s_shapes = "shapes";
+static const char *s_polygons = "polygons";
+static const char *s_boxes = "boxes";
+static const char *s_edges = "edges";
+static const char *s_paths = "paths";
+static const char *s_texts = "texts";
+static const char *s_instances = "instances";
+static const char *s_arrays = "arrays";
+static const char *s_sorted = "sorted";
+static const char *s_unique = "unique";
+static const char *s_by = "by";
+static const char *s_with = "with";
+static const char *s_pass = "pass";
+
+const char *s_reserved_words[] = {
+  s_select,
+  s_delete,
+  s_or,
+  s_of,
+  s_on,
+  s_do,
+  s_from,
+  s_layer,
+  s_layers,
+  s_cell,
+  s_cells,
+  s_where,
+  s_shapes,
+  s_polygons,
+  s_boxes,
+  s_edges,
+  s_paths,
+  s_texts,
+  s_instances,
+  s_arrays,
+  s_sorted,
+  s_unique,
+  s_by,
+  s_with,
+  s_pass
+};
+
+bool check_trailing_reserved_word (const tl::Extractor &ex0)
 {
   tl::Extractor ex = ex0;
-  return (ex.test ("do") || ex.test ("sorted") || ex.test ("pass") || ex.test ("where"));
+  for (size_t i = 0; i < sizeof (s_reserved_words) / sizeof (s_reserved_words[0]); ++i) {
+    if (ex.test (s_reserved_words[i])) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // --------------------------------------------------------------------------------
@@ -202,7 +261,9 @@ struct ShapeFilterPropertyIDs
   ShapeFilterPropertyIDs (LayoutQuery *q)
   {
     bbox               = q->register_property ("bbox", LQ_box);
+    dbbox              = q->register_property ("dbbox", LQ_dbox);
     shape_bbox         = q->register_property ("shape_bbox", LQ_box);
+    shape_dbbox        = q->register_property ("shape_dbbox", LQ_dbox);
     shape              = q->register_property ("shape", LQ_shape);
     layer_info         = q->register_property ("layer_info", LQ_layer);
     layer_index        = q->register_property ("layer_index", LQ_variant);
@@ -211,7 +272,9 @@ struct ShapeFilterPropertyIDs
   }
 
   unsigned int bbox;                // bbox                 -> The shape's bounding box
+  unsigned int dbbox;               // dbbox                -> The shape's bounding box in micrometer units
   unsigned int shape_bbox;          // shape_bbox           -> == box
+  unsigned int shape_dbbox;         // shape_dbbox          -> == dbox
   unsigned int shape;               // shape                -> The shape object
   unsigned int layer_info;          // layer_info           -> The layer (a LayerInfo object)
   unsigned int layer_index;         // layer_index          -> The layer index
@@ -307,6 +370,12 @@ public:
     if (id == m_pids.bbox || id == m_pids.shape_bbox) {
 
       v = tl::Variant::make_variant (m_shape->bbox ());
+      return true;
+
+    } else if (id == m_pids.dbbox || id == m_pids.shape_dbbox) {
+
+      tl_assert (mp_parent->layout ());
+      v = tl::Variant::make_variant (db::CplxTrans (mp_parent->layout ()->dbu ()) * m_shape->bbox ());
       return true;
 
     } else if (id == m_pids.shape) {
@@ -418,7 +487,9 @@ struct ChildCellFilterPropertyIDs
     parent_cell_name   = q->register_property ("parent_cell_name", LQ_variant);
     hier_levels        = q->register_property ("hier_levels", LQ_variant);
     bbox               = q->register_property ("bbox", LQ_box);
+    dbbox              = q->register_property ("dbbox", LQ_dbox);
     cell_bbox          = q->register_property ("cell_bbox", LQ_box);
+    cell_dbbox         = q->register_property ("cell_dbbox", LQ_dbox);
 
     //  with instance_mode == NoInstances:
     if (instance_mode == NoInstances) {
@@ -434,21 +505,31 @@ struct ChildCellFilterPropertyIDs
     //  with instance_mode != NoInstances:
     if (instance_mode != NoInstances) {
       path_trans       = q->register_property ("path_trans", LQ_trans);
+      path_dtrans      = q->register_property ("path_dtrans", LQ_dtrans);
       trans            = q->register_property ("trans", LQ_trans);
+      dtrans           = q->register_property ("dtrans", LQ_dtrans);
       inst_bbox        = q->register_property ("inst_bbox", LQ_box);
+      inst_dbbox       = q->register_property ("inst_dbbox", LQ_box);
       inst             = q->register_property ("inst", LQ_instance);
       array_a          = q->register_property ("array_a", LQ_point);
+      array_da         = q->register_property ("array_da", LQ_dpoint);
       array_na         = q->register_property ("array_na", LQ_variant);
       array_b          = q->register_property ("array_b", LQ_point);
+      array_db         = q->register_property ("array_db", LQ_dpoint);
       array_nb         = q->register_property ("array_nb", LQ_variant);
     } else {
       path_trans       = std::numeric_limits<unsigned int>::max ();
+      path_dtrans      = std::numeric_limits<unsigned int>::max ();
       trans            = std::numeric_limits<unsigned int>::max ();
+      dtrans           = std::numeric_limits<unsigned int>::max ();
       inst_bbox        = std::numeric_limits<unsigned int>::max ();
+      inst_dbbox       = std::numeric_limits<unsigned int>::max ();
       inst             = std::numeric_limits<unsigned int>::max ();
       array_a          = std::numeric_limits<unsigned int>::max ();
+      array_da         = std::numeric_limits<unsigned int>::max ();
       array_na         = std::numeric_limits<unsigned int>::max ();
       array_b          = std::numeric_limits<unsigned int>::max ();
+      array_db         = std::numeric_limits<unsigned int>::max ();
       array_nb         = std::numeric_limits<unsigned int>::max ();
     }
 
@@ -475,7 +556,9 @@ struct ChildCellFilterPropertyIDs
   unsigned int parent_cell_name;    // parent_cell_name     -> Name of parent cell (next in path) or nil
   unsigned int hier_levels;         // hier_levels          -> Number of hierarchy levels in path (length of path - 1)
   unsigned int bbox;                // bbox                 -> Cell bounding box
+  unsigned int dbbox;               // dbbox                -> Cell bounding box in micrometer units
   unsigned int cell_bbox;           // cell_bbox            -> == bbox
+  unsigned int cell_dbbox;          // cell_dbbox           -> == dbbox
 
   //  with instance_mode == NoInstances:
   unsigned int references;          // references           -> The number of instances (arefs count as 1) of this cell in the parent cell
@@ -484,17 +567,22 @@ struct ChildCellFilterPropertyIDs
 
   //  with instance_mode != NoInstances:
   unsigned int path_trans;          // path_trans           -> The transformation of that instance into the top cell
+  unsigned int path_dtrans;         // path_dtrans          -> The transformation of that instance into the top cell in micrometer units
   unsigned int trans;               // trans                -> The transformation of that instance (first instance if an array)
+  unsigned int dtrans;              // dtrans               -> The transformation of that instance (first instance if an array) in micrometer units
   unsigned int inst_bbox;           // inst_bbox            -> The instance bounding box in the top cell
+  unsigned int inst_dbbox;          // inst_dbbox           -> The instance bounding box in the top cell in micrometer units
   unsigned int inst;                // inst                 -> The instance object
   unsigned int array_a;             // array_a              -> The a vector for an array instance
+  unsigned int array_da;            // array_da             -> The a vector for an array instance in micrometer units
   unsigned int array_na;            // array_na             -> The a axis array dimension
   unsigned int array_b;             // array_b              -> The b vector for an array instance
+  unsigned int array_db;            // array_db             -> The b vector for an array instance in micrometer units
   unsigned int array_nb;            // array_nb             -> The b axis array dimension
 
   //  with instance_mode == ExplodedInstances:
   unsigned int array_ia;            // array_ia             -> The a index when an array is iterated
-  unsigned int array_ib;            // array_ib             -> The b index when an array is iterated
+  unsigned int array_ib;             // array_ib             -> The b index when an array is iterated
 };
 
 class DB_PUBLIC ChildCellFilterState
@@ -764,6 +852,15 @@ public:
       }
       return true;
 
+    } else if (id == m_pids.dbbox || id == m_pids.cell_dbbox) {
+
+      if (! layout ()->is_valid_cell_index (cell_index ())) {
+        v = tl::Variant ();
+      } else {
+        v = tl::Variant::make_variant (db::CplxTrans (layout ()->dbu ()) * layout ()->cell (cell_index ()).bbox ());
+      }
+      return true;
+
     } else if (id == m_pids.cell_name) {
 
       if (! layout ()->is_valid_cell_index (cell_index ())) {
@@ -983,6 +1080,35 @@ public:
         return false;
       }
 
+    } else if (id == m_pids.inst_dbbox) {
+
+      if (mp_parent) {
+
+        if (m_instance_mode == ExplodedInstances) {
+
+          db::ICplxTrans t = m_parent_trans;
+          t *= (*m_inst)->complex_trans (*m_array_iter);
+          db::DBox box (db::CplxTrans (layout ()->dbu ()) * t * layout ()->cell ((*m_inst)->object ().cell_index ()).bbox ());
+          v = tl::Variant::make_variant (box);
+          return true;
+
+        } else if (m_instance_mode == ArrayInstances) {
+
+          db::ICplxTrans t = m_parent_trans;
+          t *= (*m_inst)->complex_trans ();
+          db::box_convert <db::CellInst> bc (*layout ());
+          db::DBox box (db::CplxTrans (layout ()->dbu ()) * t * (*m_inst)->bbox (bc));
+          v = tl::Variant::make_variant (box);
+          return true;
+
+        } else {
+          return false;
+        }
+
+      } else {
+        return false;
+      }
+
     } else if (id == m_pids.path_trans) {
 
       if (mp_parent) {
@@ -1011,6 +1137,36 @@ public:
         return true;
       }
 
+    } else if (id == m_pids.path_dtrans) {
+
+      if (mp_parent) {
+
+        if (m_instance_mode == ExplodedInstances) {
+
+          db::ICplxTrans t = m_parent_trans;
+          t *= (*m_inst)->complex_trans (*m_array_iter);
+          db::CplxTrans tdbu (layout ()->dbu ());
+          v = tl::Variant::make_variant (tdbu * t * tdbu.inverted ());
+          return true;
+
+        } else if (m_instance_mode == ArrayInstances) {
+
+          db::ICplxTrans t = m_parent_trans;
+          t *= (*m_inst)->complex_trans ();
+          db::CplxTrans tdbu (layout ()->dbu ());
+          v = tl::Variant::make_variant (tdbu * t * tdbu.inverted ());
+          return true;
+
+        } else {
+          v = tl::Variant::make_variant (db::ICplxTrans ());
+          return true;
+        }
+
+      } else {
+        v = tl::Variant::make_variant (db::ICplxTrans ());
+        return true;
+      }
+
     } else if (id == m_pids.trans) {
 
       if (mp_parent) {
@@ -1023,6 +1179,30 @@ public:
         } else if (m_instance_mode == ArrayInstances) {
 
           v = tl::Variant::make_variant ((*m_inst)->complex_trans ());
+          return true;
+
+        } else {
+          return false;
+        }
+
+      } else {
+        return false;
+      }
+
+    } else if (id == m_pids.dtrans) {
+
+      if (mp_parent) {
+
+        if (m_instance_mode == ExplodedInstances) {
+
+          db::CplxTrans tdbu (layout ()->dbu ());
+          v = tl::Variant::make_variant (tdbu * (*m_inst)->complex_trans (*m_array_iter) * tdbu.inverted ());
+          return true;
+
+        } else if (m_instance_mode == ArrayInstances) {
+
+          db::CplxTrans tdbu (layout ()->dbu ());
+          v = tl::Variant::make_variant (tdbu * (*m_inst)->complex_trans () * tdbu.inverted ());
           return true;
 
         } else {
@@ -1064,7 +1244,7 @@ public:
         return true;
       }
 
-    } else if (id == m_pids.array_a || id == m_pids.array_b || id == m_pids.array_na || id == m_pids.array_nb) {
+    } else if (id == m_pids.array_a || id == m_pids.array_b || id == m_pids.array_da || id == m_pids.array_db || id == m_pids.array_na || id == m_pids.array_nb) {
 
       if (! mp_parent || m_instance_mode == NoInstances) {
         return false;
@@ -1074,8 +1254,12 @@ public:
         if ((*m_inst)->is_regular_array (a, b, na, nb)) {
           if (id == m_pids.array_a) {
             v = tl::Variant::make_variant (a);
+          } else if (id == m_pids.array_da) {
+            v = tl::Variant::make_variant (db::CplxTrans (layout ()->dbu ()) * a);
           } else if (id == m_pids.array_b) {
             v = tl::Variant::make_variant (b);
+          } else if (id == m_pids.array_db) {
+            v = tl::Variant::make_variant (db::CplxTrans (layout ()->dbu ()) * b);
           } else if (id == m_pids.array_na) {
             v = na;
           } else if (id == m_pids.array_nb) {
@@ -1178,8 +1362,11 @@ struct CellFilterPropertyIDs
     tot_weight         = q->register_property ("tot_weight", LQ_variant);
     instances          = q->register_property ("instances", LQ_variant);
     bbox               = q->register_property ("bbox", LQ_box);
+    dbbox              = q->register_property ("dbbox", LQ_dbox);
     cell_bbox          = q->register_property ("cell_bbox", LQ_box);
+    cell_dbbox         = q->register_property ("cell_dbbox", LQ_dbox);
     path_trans         = q->register_property ("path_trans", LQ_trans);
+    path_dtrans        = q->register_property ("path_dtrans", LQ_dtrans);
   }
 
   unsigned int path;                // path                 -> Variant array with the indexes of the cells in that path
@@ -1200,8 +1387,11 @@ struct CellFilterPropertyIDs
   unsigned int tot_weight;          // tot_weight           -> The number of instances of this cell in the initial cell along the given path
   unsigned int instances;           // instances            -> The number of instances of this cell in the previous cell (or over all if there is no previous cell)
   unsigned int bbox;                // bbox                 -> Cell bounding box
+  unsigned int dbbox;               // dbbox                -> Cell bounding box in micrometer units
   unsigned int cell_bbox;           // cell_bbox            -> == bbox
+  unsigned int cell_dbbox;          // cell_dbbox           -> == dbbox
   unsigned int path_trans;          // parent_trans         -> transformation to initial cell
+  unsigned int path_dtrans;         // parent_dtrans        -> transformation to initial cell in micrometer units
 };
 
 class DB_PUBLIC CellFilterState
@@ -1283,6 +1473,15 @@ public:
       }
       return true;
 
+    } else if (id == m_pids.dbbox || id == m_pids.cell_dbbox) {
+
+      if (! layout ()->is_valid_cell_index (*m_cell)) {
+        v = tl::Variant ();
+      } else {
+        v = tl::Variant::make_variant (db::CplxTrans (layout ()->dbu ()) * layout ()->cell (*m_cell).bbox ());
+      }
+      return true;
+
     } else if (id == m_pids.cell_name || id == m_pids.initial_cell_name) {
 
       if (! layout ()->is_valid_cell_index (*m_cell)) {
@@ -1361,6 +1560,11 @@ public:
     } else if (id == m_pids.path_trans) {
 
       v = tl::Variant::make_variant (db::ICplxTrans ());
+      return true;
+
+    } else if (id == m_pids.path_dtrans) {
+
+      v = tl::Variant::make_variant (db::DCplxTrans ());
       return true;
 
     } else {
@@ -2225,7 +2429,7 @@ parse_cell_name_filter_element (tl::Extractor &ex, LayoutQuery *q, ChildCellFilt
     std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     do {
       parse_cell_name_filter_seq (ex, q, b.get (), instance_mode, reading);
-    } while (ex.test (",") || ex.test ("or"));
+    } while (ex.test (",") || ex.test (s_or));
 
     //  TODO: do this in the optimization
     if (b->children ().size () == 1 && dynamic_cast<FilterBracket *> (b->children ()[0])) {
@@ -2362,21 +2566,21 @@ parse_cell_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bo
 
     std::unique_ptr<FilterBracket> b (new FilterBracket (q));
 
-    if (ex.test ("instances")) {
-      (ex.test ("of") || ex.test ("from")) && (ex.test ("cells") || ex.test ("cell"));
+    if (ex.test (s_instances)) {
+      (ex.test (s_of) || ex.test (s_from)) && (ex.test (s_cells) || ex.test (s_cell));
       //  Because an array member cannot be modified we use ArrayInstances in the modification case always
       parse_cell_name_filter_seq (ex, q, b.get (), reading ? ExplodedInstances : ArrayInstances, reading);
-    } else if (ex.test ("arrays")) {
-      (ex.test ("of") || ex.test ("from")) && (ex.test ("cells") || ex.test ("cell"));
+    } else if (ex.test (s_arrays)) {
+      (ex.test (s_of) || ex.test (s_from)) && (ex.test (s_cells) || ex.test (s_cell));
       parse_cell_name_filter_seq (ex, q, b.get (), ArrayInstances, reading);
     } else {
-      ex.test ("cells") || ex.test ("cell");
+      ex.test (s_cells) || ex.test (s_cell);
       parse_cell_name_filter_seq (ex, q, b.get (), NoInstances, reading);
     }
 
     FilterBase *fl = 0, *f = 0;
 
-    if (with_where_clause && ex.test ("where")) {
+    if (with_where_clause && ex.test (s_where)) {
 
       std::string expr = tl::Eval::parse_expr (ex, true);
 
@@ -2407,22 +2611,22 @@ parse_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool re
 {
   unsigned int sf = (unsigned int) db::ShapeIterator::Nothing;
   do {
-    if (ex.test ("shapes")) {
+    if (ex.test (s_shapes)) {
       sf |= (unsigned int) db::ShapeIterator::All;
-    } else if (ex.test ("polygons")) {
+    } else if (ex.test (s_polygons)) {
       sf |= (unsigned int) db::ShapeIterator::Polygons;
-    } else if (ex.test ("boxes")) {
+    } else if (ex.test (s_boxes)) {
       sf |= (unsigned int) db::ShapeIterator::Boxes;
-    } else if (ex.test ("edges")) {
+    } else if (ex.test (s_edges)) {
       sf |= (unsigned int) db::ShapeIterator::Edges;
-    } else if (ex.test ("paths")) {
+    } else if (ex.test (s_paths)) {
       sf |= (unsigned int) db::ShapeIterator::Paths;
-    } else if (ex.test ("texts")) {
+    } else if (ex.test (s_texts)) {
       sf |= (unsigned int) db::ShapeIterator::Texts;
     } else {
       break;
     }
-  } while (ex.test (",") || ex.test ("or"));
+  } while (ex.test (",") || ex.test (s_or));
 
   db::ShapeIterator::flags_type shapes = (db::ShapeIterator::flags_type) sf;
 
@@ -2430,12 +2634,12 @@ parse_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool re
 
     db::LayerMap lm;
 
-    if (ex.test ("on")) {
-      ex.test ("layer") || ex.test ("layers");
+    if (ex.test (s_on)) {
+      ex.test (s_layer) || ex.test (s_layers);
       lm.map_expr (ex, 0);
     }
 
-    ex.test ("of") || ex.test ("from");
+    ex.test (s_of) || ex.test (s_from);
 
     std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     parse_cell_filter (ex, q, b.get (), false, reading);
@@ -2451,7 +2655,7 @@ parse_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool re
     bracket->add_child (f);
     fl->connect (f);
 
-    if (ex.test ("where")) {
+    if (ex.test (s_where)) {
 
       std::string expr = tl::Eval::parse_expr (ex, true);
 
@@ -2472,7 +2676,7 @@ parse_filter (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool re
 void
 parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool reading)
 {
-  if (ex.test ("select")) {
+  if (ex.test (s_select)) {
 
     std::vector<std::string> expressions;
 
@@ -2480,7 +2684,7 @@ parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool
       expressions.push_back (tl::Eval::parse_expr (ex, true));
     } while (ex.test (","));
 
-    ex.expect ("from");
+    ex.expect (s_from);
 
     std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     parse_filter (ex, q, b.get (), true);
@@ -2488,10 +2692,10 @@ parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool
     bool unique = false;
 
     std::string sort_expression;
-    if (ex.test ("sorted")) {
-      ex.test ("by");
+    if (ex.test (s_sorted)) {
+      ex.test (s_by);
       sort_expression = tl::Eval::parse_expr (ex, true);
-      unique = ex.test ("unique");
+      unique = ex.test (s_unique);
     }
 
     FilterBase *f = b.release ();
@@ -2504,16 +2708,16 @@ parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool
 
     bracket->connect_exit (ff);
 
-  } else if (! reading && ex.test ("with")) {
+  } else if (! reading && ex.test (s_with)) {
 
     std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     parse_filter (ex, q, b.get (), false);
 
-    ex.expect ("do");
+    ex.expect (s_do);
 
     std::string expression = tl::Eval::parse_expr (ex, true);
 
-    bool transparent = ex.test ("pass");
+    bool transparent = ex.test (s_pass);
 
     FilterBase *f = b.release ();
     bracket->add_child (f);
@@ -2525,12 +2729,12 @@ parse_statement (tl::Extractor &ex, LayoutQuery *q, FilterBracket *bracket, bool
 
     bracket->connect_exit (ff);
 
-  } else if (! reading && ex.test ("delete")) {
+  } else if (! reading && ex.test (s_delete)) {
 
     std::unique_ptr<FilterBracket> b (new FilterBracket (q));
     parse_filter (ex, q, b.get (), false);
 
-    bool transparent = ex.test ("pass");
+    bool transparent = ex.test (s_pass);
 
     FilterBase *f = b.release ();
     bracket->add_child (f);
@@ -2554,7 +2758,10 @@ LayoutQuery::LayoutQuery (const std::string &query)
 
   tl::Extractor ex (query.c_str ());
   parse_statement (ex, this, r.get (), false);
-  ex.expect_end ();
+
+  if (! ex.at_end ()) {
+    ex.error (tl::to_string (tr ("Unexpected text")));
+  }
 
   r->optimize ();
   mp_root = r.release ();

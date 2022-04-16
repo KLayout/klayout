@@ -3,7 +3,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ void LayoutToNetlist::keep_dss ()
 
 void LayoutToNetlist::init ()
 {
-  dss ().set_text_enlargement (1);
+  dss ().set_text_enlargement (0);
   dss ().set_text_property_name (tl::Variant ("LABEL"));
 }
 

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -47,10 +47,7 @@ BD_PUBLIC int strm2txt (int argc, char *argv[])
   {
     db::LoadLayoutOptions load_options;
     generic_reader_options.configure (load_options);
-
-    tl::InputStream stream (infile);
-    db::Reader reader (stream);
-    reader.read (layout, load_options);
+    bd::read_files (layout, infile, load_options);
   }
 
   {

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -473,7 +473,7 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
 
     //  compute major grid and switch to secondary style if necessary
     int s = 0;
-    while (dgrid < fw * 4 / bmp_canvas->resolution ()) {
+    while (dgrid < fw * 4) {
       if (s == 0) {
         dgrid *= 2.0;
       } else if (s == 1) {
@@ -502,9 +502,9 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
 
     if (m_show_ruler && dgrid < vp.width () * 0.2) {
 
-      int rh = int (floor (0.5 + fw * 0.8 / bmp_canvas->resolution ()));
-      int xoffset = int (floor (0.5 + fw * 2.5 / bmp_canvas->resolution ()));
-      int yoffset = int (floor (0.5 + fw * 2.5 / bmp_canvas->resolution ()));
+      int rh = int (floor (0.5 + fw * 0.8));
+      int xoffset = int (floor (0.5 + fw * 2.5));
+      int yoffset = int (floor (0.5 + fw * 2.5));
 
       painter.fill_rect (QPoint (xoffset, vp.height () - yoffset - rh / 2),
                          QPoint (xoffset + int (floor (0.5 + dgrid)), vp.height () - yoffset + rh / 2), 

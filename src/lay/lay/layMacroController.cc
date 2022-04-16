@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -49,61 +49,26 @@ MacroController::MacroController ()
   //  .. nothing yet ..
 }
 
-static lay::MacroController::MacroCategory ruby_cat ()
+void
+MacroController::add_macro_category (const std::string &name, const std::string &description, const std::vector<std::string> &folders)
 {
   lay::MacroController::MacroCategory cat;
-  cat.name = "macros";
-  cat.description = tl::to_string (QObject::tr ("Ruby"));
-  cat.folders.push_back ("macros");
-  cat.folders.push_back ("ruby");
-  return cat;
-}
-
-static lay::MacroController::MacroCategory python_cat ()
-{
-  lay::MacroController::MacroCategory cat;
-  cat.name = "pymacros";
-  cat.description = tl::to_string (QObject::tr ("Python"));
-  cat.folders.push_back ("pymacros");
-  cat.folders.push_back ("python");
-  return cat;
-}
-
-static lay::MacroController::MacroCategory drc_cat ()
-{
-  lay::MacroController::MacroCategory cat;
-  cat.name = "drc";
-  cat.description = tl::to_string (QObject::tr ("DRC"));
-  cat.folders.push_back ("drc");
-  return cat;
-}
-
-static lay::MacroController::MacroCategory lvs_cat ()
-{
-  lay::MacroController::MacroCategory cat;
-  cat.name = "lvs";
-  cat.description = tl::to_string (QObject::tr ("LVS"));
-  cat.folders.push_back ("lvs");
-  return cat;
+  cat.name = name;
+  cat.description = description;
+  cat.folders = folders;
+  m_macro_categories.push_back (cat);
 }
 
 void
 MacroController::finish ()
 {
+  lym::MacroCollection::root ().clear ();
+
   //  Scan built-in macros
   //  These macros are always taken, even if there are no macros requested (they are required to
   //  fully form the API).
   lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-macros", "macros", true);
   lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
-
-  //  TODO: consider adding "drc" and "lvs" dynamically and allow more dynamic categories
-  //  We can do so if we first load the macros with the initial interpreters, then do autorun (which creates DSL interpreters) and then
-  //  register the remaining categories.
-
-  m_macro_categories.push_back (ruby_cat ());
-  m_macro_categories.push_back (python_cat ());
-  m_macro_categories.push_back (drc_cat ());
-  m_macro_categories.push_back (lvs_cat ());
 
   //  scans the macros from techs and packages (this will allow autorun-early on them)
   //  and updates m_external_paths

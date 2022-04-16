@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -594,8 +594,10 @@ CellTreeModel::build_top_level ()
     while (top != mp_layout->end_top_down ()) {
 
       if (m_flat) {
-        CellTreeItem *item = new CellTreeItem (mp_layout, false, *top, true, m_sorting);
-        m_toplevel.push_back (item);
+        if ((m_flags & BasicCells) == 0 || ! mp_layout->cell (*top).is_proxy ()) {
+          CellTreeItem *item = new CellTreeItem (mp_layout, false, *top, true, m_sorting);
+          m_toplevel.push_back (item);
+        }
       } else if (mp_layout->cell (*top).is_top ()) {
         if ((m_flags & BasicCells) == 0 || ! mp_layout->cell (*top).is_proxy ()) {
           CellTreeItem *item = new CellTreeItem (mp_layout, false, *top, (m_flags & TopCells) != 0, m_sorting);

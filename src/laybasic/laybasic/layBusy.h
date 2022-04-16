@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,37 +21,45 @@
 */
 
 
-#ifndef HDR_layD25TechnologyComponent
-#define HDR_layD25TechnologyComponent
+#ifndef HDR_layBusy
+#define HDR_layBusy
 
-#include "ui_D25TechnologyComponentEditor.h"
-#include "layTechnology.h"
-#include "layGenericSyntaxHighlighter.h"
+#include "laybasicCommon.h"
 
-#include <memory>
-
-namespace lay {
-
-class D25TechnologyComponentEditor
-  : public lay::TechnologyComponentEditor,
-    public Ui::D25TechnologyComponentEditor
+namespace lay
 {
-Q_OBJECT
 
+/**
+ *  @brief An interface providing the "busy" methods
+ *
+ *  There must be one provider implementing this interface.
+ */
+class LAYBASIC_PUBLIC BusyMode
+{
 public:
-  D25TechnologyComponentEditor (QWidget *parent);
+  BusyMode ();
+  virtual ~BusyMode ();
 
-  void commit ();
-  void setup ();
+  virtual bool is_busy () const = 0;
+  virtual void enter_busy_mode (bool bm) = 0;
+};
 
-private slots:
-  void cursor_position_changed ();
+/**
+ *  @brief A RAII implementation of the busy mode setter
+ */
+class LAYBASIC_PUBLIC BusySection
+{
+public:
+  BusySection ();
+  ~BusySection ();
+
+  static bool is_busy ();
 
 private:
-  std::unique_ptr<lay::GenericSyntaxHighlighterAttributes> mp_hl_attributes, mp_hl_basic_attributes;
+  bool m_previous_mode;
+  BusyMode *mp_busy_mode;
 };
 
 }
 
 #endif
-

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ namespace gsi
 namespace tl
 {
 
+class Variant;
 class Extractor;
 class EvalClass;
 template <class T> void extractor_impl (tl::Extractor &, T &);
@@ -76,6 +77,9 @@ public:
   virtual bool less (const void *, const void *) const = 0;
   virtual void *clone (const void *) const = 0;
   virtual std::string to_string (const void *) const = 0;
+  virtual int to_int (const void *) const = 0;
+  virtual double to_double (const void *) const = 0;
+  virtual void to_variant (const void *, tl::Variant &var) const = 0;
   virtual void read (void *, tl::Extractor &ex) const = 0;
   virtual const char *name () const = 0;
   virtual bool is_const () const = 0;

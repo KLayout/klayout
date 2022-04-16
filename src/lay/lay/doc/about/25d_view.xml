@@ -18,97 +18,187 @@
   </p>
 
   <p>
-  To open the view, use "Tools/2.5d View". Currently, the performance is limited, a rough number for a
+  Currently, the performance is limited, a rough number for a
   practical limit is around 100k polygons. The 2.5d view is only available, if KLayout was compiled with
   OpenGL support.
+  </p>
+
+  <p>
+  In order to use the tool, you will need a script generating the material stack.
+  Such a script is a variant of a DRC script (see <link href="/manual/drc.xml"/>). 
+  The DRC language is used to import or generate polygon layers which are then
+  extruded and placed on a certain z level.
+  </p>
+
+  <p>
+  To create a new script, use "Tools/2.5d View/New 2.5d Script". This will create a new script in the
+  macro editor. 
+  </p>
+
+  <p>
+  A simple script is this one. It takes two layers - 1/0 and 2/0 - and extrudes then in a 
+  stacked fashion, the first with 200nm thickness and the second one with 300nm:
+  </p>
+
+  <pre>
+z(input(1, 0), zstart: 0.1.um, height: 200.nm)  # extrudes layer 1/0 to a height of 200nm starting at z=100nm
+z(input(2, 0), height: 300.nm)                  # adds layer 2/0 for the next 300nm
+</pre>
+
+  <p>
+  To run the script, use the "Run" button from the macro IDE or pick the script
+  from the script list in the "Tools/2.5d View" menu. If your script is not shown in that 
+  menu, check if it is configured to be bound to a menu item.
+  </p>
+
+  <p>
+  After the script was executed, the 2.5d window is displayed. If you closed that window, you can 
+  re-open it with "Tools/2.5d View/Open Window". The window will show the layout section visible 
+  in the layout view. To refresh the scene - also after changing the script - either run the script
+  again from the macro IDE or use the green "re-run" button in the upper left corner of the 2.5d view
+  window.
   </p>
 
   <p>
   <img src="/about/25d_screenshot.png"/>
   </p>
 
-  <h2>Setup</h2>
+  <h2>2.5d Script Anatomy</h2>
 
   <p>
-  The 2.5d view needs a technology setup explaining the way the layers are transformed into planes.
-  The setup is provided within a technology. Open the technology manager (File/Manage Technologies) and
-  navigate to the "Z Stack (2.5d)" component. The setup is basically a list of entries listing the 
-  layer from which to take the shapes and the depth information.
-  </p>
-
-  <p>
-  Each entry is a single line. Empty lines are ignored. Everything after a '#' character is 
-  considered a comment.
-  </p>
-
-  <p>
-  Each specification line consists of a layer specification, a colon and arguments.
-  The arguments are named (like "x=...") or in serial. Parameters are separated by comma or blanks.
-  Named arguments are:
+  As mentioned, a 2.5d script is a variant of a DRC script. You can basically use all features
+  of DRC, specifically boolean operations. Some practical restrictions exist:
   </p>
 
   <ul>
-    <li> <b>zstart</b>:  The lower z position of the extruded layer in µm </li>
-    <li> <b>zstop</b>: The upper z position of the extruded layer in µm </li>
-    <li> <b>height</b>:  The height of the extruded layer in µm </li>
+    <li>You should not use external sources ("source" statement) as the 2.5d view is related to the loaded layout</li>
+    <li>Report generation or "output" statements are permitted, but do not make much sense in the context
+        of 2.5d view scripts.</li>
   </ul>
 
   <p>
-  'height', 'zstart' and 'zstop' can be used in any combination. If no value is given for 'zstart',
-  the upper level of the previous layer will be used.
+  2.5d scripts utilizes the DRC language with these two additional functions:
+  </p>
+
+  <ul>
+    <li><p><tt>z(</tt>layer [, options]<tt>)</tt></p>
+        <p>Extrudes the given layer. "layer" is a DRC layer (polygon, edge or even edge pair). "options" declare the z extrusion and display parameters.</p>
+    </li>
+    <li><p><tt>zz(</tt> [options] <tt>) {</tt> block <tt>}</tt></p>
+        <p>Declares a material group which combines multiple "z" statements under a single display group.
+           This allows generating 3d material geometries which are more than a single extruded plane.
+           The display parameters then are specified within "zz" for all "z" calls inside the block.</p>
+    </li>
+  </ul>
+
+  <h3>"z" Function (plane extrusion)</h3>
+  <keyword name="z"/>
+
+  <p>
+  The layer argument of the function is a DRC layer which is rendered as an extruded sheet.
+  Further arguments control the height, z location and colors.
+  When used inside the "zz" block, the color options of the "z" calls are ignored and 
+  taken from "zz" instead.
   </p>
 
   <p>
-  If a single unnamed parameter is given, it corresponds to 'height'. Two parameters correspond to
-  'zstart' and 'zstop'.
+  Options for this function are:
   </p>
+
+  <ul>
+    <li><b>zstart</b>: specifies the bottom coordinate of the extruded sheet. If this option is not given, the top coordinate of the previous "z" statement is used.</li>
+    <li><b>zstop</b>: specifies the top coordinate of the extruded sheet. Alternatively you can use "height".</li>
+    <li><b>height</b>: specifies the extrusion height. Alternatively you can use "zstop".</li>
+    <li><b>color</b>: specifies the color to use as a 24 bit hex RGB triplet (use "0xrrggbb" to specify the color similar to the HTML notation "#rrggbb").
+                        A color specification gives a single color with not differentiation of frame and wall colors.</li>
+    <li><b>frame</b>: specifies the frame color to use as a 24 bit hex RGB triplet. If only a frame color is specified, the geometry will be rendered as wire frame only.</li>
+    <li><b>fill</b>: specifies the fill (wall) color to use as a 24 bit hex RGB triplet. This allows specifying a different color for wall and frame when used with "frame".</li>
+    <li><b>like</b>: specifies to use the same colors than used for some layer in the layout view. 
+                        If the layer is an original layer (i.e. taken from "input"), "like" defaults to the 
+                        original layer's source. If given, "like" needs to be a string representation of the
+                        layer source (e.g. "7/0" for layer 7, datatype 0).</li>
+    <li><b>name</b>: gives the material a name for displaying in the material list.</li>
+  </ul>
 
   <p>
-  Here are some examples:
+  Examples for the extrusion options:
   </p>
 
-  <pre>1: 0.5 1.5                    # extrude layer 1/0 from 0.5 to 1.5 vertically\n"
-1/0: 0.5 1.5                  # same with explicit datatype\n"
-1: zstop=1.5, zstart=0.5      # same with named parameters\n"
-1: height=1.0, zstop=1.5      # same with z stop minus height\n"
-1: 1.0 zstop=1.5              # same with height as unnamed parameter\n"
-  </pre>
-
-  <h4>Variables</h4>
-
-  <p>
-  You can declare variables inside the setup files and use them in formulas for
-  computed values. Variables are defined and set with the "var" keyword on a single line.
-  The notation follows the "expression" syntax used in many other places inside KLayout
-  (<link href="/about/expressions.xml"/>).
-  </p>
-
-  <p>
-  Here is an example:
-  </p>
-
-  <pre>var hmetal = 0.48\n"
-7/0: 0.5 0.5+hmetal*2        # 2x thick metal\n"
+  <pre>
+z(layer, 0.1 .. 0.2)                extrude layer to z = 0.1 to 0.2 um
+z(layer, zstart: 0.1, zstop: 0.2)   same as above
+z(layer, zstart: 0.1, height: 0.1)  same as above, but with height instead of zstop
+z(layer, height: 200.nm)            extrude layer from last z position with a height of 200nm
 </pre>
 
-  <h4>Conditionals</h4>
-
   <p>
-  For more flexibility, but of little practical use for now, conditionals are provided.
-  "if", "else", "elsif" and "end" for as in other languages, e.g. Ruby:
+  Examples for display options:
   </p>
 
-  <pre>var thick_m1 = true
-if thickm1
-  1: 0.5 1.5
-else
-  1: 0.5 1.2
+  <pre>
+z(..., color: 0xff0000)             use bright red for the material color (RGB)
+z(..., frame: 0xff0000)             use bright red for the frame color (combine with "fill" for the fill color)
+z(..., fill: 0x00ff00)              use bright green for the fill color along (combine with "frame" for the frame color)
+z(..., like: "7/0")                 borrow style from layout view's style for layer "7/0"
+z(..., name: "M1")                  assigns a name to show for the material 
+</pre>
+
+  <h3>"zz" Function (material groups)</h3>
+  <keyword name="zz"/>
+
+  <p>
+  The "zz" function forms a display group which clusters multiple "z" calls. The basic usage is with a block
+  containing the "z" calls. As DRC scripts are Ruby, the notation for the block is either "do .. end" or 
+  curly brackets immediately after the "zz" call:
+  </p>
+
+  <pre>
+zz( display options ... ) do
+  z(layer1, extrusion options ... )
+  z(layer2, extrusion options ... )
+  ...
 end
 </pre>
 
+  <p>
+  The "z" calls do not need to have colors or other display options as they are
+  taken from "zz".
+  </p>
+
+  <p>
+  Material groups allow forming more complex, stacked geometries. Here is an example
+  forming a simple FinFET geometry using boolean and a sizing operation:
+  </p>
+
+  <pre>
+poly = input(2, 0)
+active = input(1, 0)
+
+z(poly, zstart: 0, height: 20.nm, name: "POLY")
+
+zz(name: "ACTIVE", like: "1/0") do
+  
+  poly_sized = poly.sized(10.nm)
+  active_over_poly_sized = poly_sized &amp; active
+  
+  z(active - poly, zstart: 0, height: 10.nm)       # bottom sheet
+  z(active_over_poly_sized - poly, height: 10.nm)  # center sheet
+  z(active_over_poly_sized, height: 10.nm)         # top sheet
+
+end
+</pre>
+
+  <p>
+  Which renders this result:
+  </p>
+
+  <p>
+  <img src="/about/25d_screenshot2.png"/>
+  </p>
+
   <h2>Navigating the 2.5d View</h2>
-  <keyword>navigation</keyword>
-  <keyword>2.5d navigation</keyword>
+  <keyword name="navigation"/>
+  <keyword name="2.5d view navigation"/>
 
   <p>
   The navigation is based on the movement of the camera while the scene is 
@@ -159,7 +249,7 @@ end
   made invisible in the 2.5d view.
   </p>
 
-  <h2>Other controls</h2>
+  <h2>Other Controls</h2>
 
   <p>
   The left zoom slider changes the overall scale factor. The right slider only changes the z (height) axis zoom factor.
@@ -174,6 +264,14 @@ end
   <p>
   The button bar at the top right side holds the view presets. Use them to reset the window to 
   front view, top view etc.
+  </p>
+
+  <h2>Material Visibility</h2>
+
+  <p>
+  Using the check boxes from the material view right of the scene view you can disable
+  materials, so they are no longer rendered. From the material list's context menu, 
+  you can hide or show all materials or just the selected ones.
   </p>
 
 </doc>

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -218,7 +218,7 @@ PropertiesPage::get_xmin_xmax (double &xmin, double &xmax, bool &has_error_out)
   bool has_error = false;
 
   try {
-    tl::from_string (tl::to_string (from_le->text ()), xmin);
+    tl::from_string_ext (tl::to_string (from_le->text ()), xmin);
     lay::indicate_error (from_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (from_le, &ex);
@@ -226,7 +226,7 @@ PropertiesPage::get_xmin_xmax (double &xmin, double &xmax, bool &has_error_out)
   }
 
   try {
-    tl::from_string (tl::to_string (to_le->text ()), xmax);
+    tl::from_string_ext (tl::to_string (to_le->text ()), xmax);
     lay::indicate_error (to_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (to_le, &ex);
@@ -335,7 +335,7 @@ PropertiesPage::value_changed ()
 
   double x = 0.0;
   try {
-    tl::from_string (tl::to_string (value_le->text ()), x);
+    tl::from_string_ext (tl::to_string (value_le->text ()), x);
     lay::indicate_error (value_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (value_le, &ex);
@@ -485,8 +485,8 @@ PropertiesPage::recompute_histogram ()
   try {
 
     double xmin, xmax;
-    tl::from_string (tl::to_string (from_le->text ()), xmin);
-    tl::from_string (tl::to_string (to_le->text ()), xmax);
+    tl::from_string_ext (tl::to_string (from_le->text ()), xmin);
+    tl::from_string_ext (tl::to_string (to_le->text ()), xmax);
     if (xmin >= xmax) {
       throw tl::Exception ("");
     }
@@ -801,7 +801,7 @@ PropertiesPage::apply ()
          a = matrix.angle (), sa = matrix.shear_angle (), tx = matrix.perspective_tilt_x (z), ty = matrix.perspective_tilt_y (z);
 
   try {
-    tl::from_string (tl::to_string (width_le->text ()), w);
+    tl::from_string_ext (tl::to_string (width_le->text ()), w);
     if (w <= 0.0 || h <= 0.0) {
       throw tl::Exception (tl::to_string (QObject::tr ("Pixel width or height must be positive, non-null values")));
     }
@@ -812,7 +812,7 @@ PropertiesPage::apply ()
   }
 
   try {
-    tl::from_string (tl::to_string (height_le->text ()), h);
+    tl::from_string_ext (tl::to_string (height_le->text ()), h);
     lay::indicate_error (height_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (height_le, &ex);
@@ -820,7 +820,7 @@ PropertiesPage::apply ()
   }
 
   try {
-    tl::from_string (tl::to_string (x_offset_le->text ()), x);
+    tl::from_string_ext (tl::to_string (x_offset_le->text ()), x);
     lay::indicate_error (x_offset_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (x_offset_le, &ex);
@@ -828,7 +828,7 @@ PropertiesPage::apply ()
   }
 
   try {
-    tl::from_string (tl::to_string (y_offset_le->text ()), y);
+    tl::from_string_ext (tl::to_string (y_offset_le->text ()), y);
     lay::indicate_error (y_offset_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (y_offset_le, &ex);
@@ -836,7 +836,7 @@ PropertiesPage::apply ()
   }
 
   try {
-    tl::from_string (tl::to_string (angle_le->text ()), a);
+    tl::from_string_ext (tl::to_string (angle_le->text ()), a);
     lay::indicate_error (angle_le, (tl::Exception *) 0);
   } catch (tl::Exception &ex) {
     lay::indicate_error (angle_le, &ex);
@@ -844,7 +844,7 @@ PropertiesPage::apply ()
   }
 
   try {
-    tl::from_string (tl::to_string (shear_le->text ()), sa);
+    tl::from_string_ext (tl::to_string (shear_le->text ()), sa);
     if (sa <= -45 || sa >= 45) {
       throw tl::Exception (tl::to_string (QObject::tr ("The shear angle must be larger than -45 and less than 45 degree")));
     }
@@ -855,7 +855,7 @@ PropertiesPage::apply ()
   }
 
   try {
-    tl::from_string (tl::to_string (persp_tx_le->text ()), tx);
+    tl::from_string_ext (tl::to_string (persp_tx_le->text ()), tx);
     if (tx <= -90 || tx >= 90) {
       throw tl::Exception (tl::to_string (QObject::tr ("The perspective tilt angles must be larger than -90 and less than 90 degree")));
     }
@@ -866,7 +866,7 @@ PropertiesPage::apply ()
   }
 
   try {
-    tl::from_string (tl::to_string (persp_ty_le->text ()), ty);
+    tl::from_string_ext (tl::to_string (persp_ty_le->text ()), ty);
     if (ty <= -90 || ty >= 90) {
       throw tl::Exception (tl::to_string (QObject::tr ("The perspective tilt angles must be larger than -90 and less than 90 degree")));
     }

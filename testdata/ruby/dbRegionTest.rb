@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2021 Matthias Koefferlein
+# Copyright (C) 2006-2022 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -314,6 +314,16 @@ class DBRegion_TestClass < TestBase
     assert_equal(rr.to_s, "(-20,-30;-20,170;0,170;0,210;110,210;110,10;90,10;90,-30)")
 
     assert_equal((r1 | r2).sized(10, 20, 2).to_s, "(-20,-40;-20,180;0,180;0,220;110,220;110,0;90,0;90,-40)")
+    rr = (r1 | r2).dup
+    rr.size(10, 20, 2)
+    assert_equal(rr.to_s, "(-20,-40;-20,180;0,180;0,220;110,220;110,0;90,0;90,-40)")
+
+    assert_equal((r1 | r2).sized(RBA::Vector::new(10, 20)).to_s, "(-20,-40;-20,180;0,180;0,220;110,220;110,0;90,0;90,-40)")
+    rr = (r1 | r2).dup
+    rr.size(10, 20, 2)
+    assert_equal(rr.to_s, "(-20,-40;-20,180;0,180;0,220;110,220;110,0;90,0;90,-40)")
+
+    assert_equal((r1 | r2).sized(RBA::Vector::new(10, 20), 2).to_s, "(-20,-40;-20,180;0,180;0,220;110,220;110,0;90,0;90,-40)")
     rr = (r1 | r2).dup
     rr.size(10, 20, 2)
     assert_equal(rr.to_s, "(-20,-40;-20,180;0,180;0,220;110,220;110,0;90,0;90,-40)")

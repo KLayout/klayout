@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,26 +34,21 @@ TEST(1)
   db::Shapes s (&m, 0, db::default_editable_mode ());
   db::Box b_empty;
 
-  s.update_bbox ();
   EXPECT_EQ (s.bbox (), b_empty);
 
   db::Box b (0, 100, 1000, 1200);
   s.insert (b);
-  s.update_bbox ();
   EXPECT_EQ (s.bbox (), b);
 
   db::Edge e (-100, -200, 0, 0);
   s.insert (e);
-  s.update_bbox ();
   EXPECT_EQ (s.bbox (), db::Box (-100, -200, 1000, 1200));
   
   db::Shapes s2 (s);
-  s2.update_bbox ();
   EXPECT_EQ (s2.bbox (), db::Box (-100, -200, 1000, 1200));
 
   if (db::default_editable_mode ()) {
     s2.erase (db::Box::tag (), db::stable_layer_tag (), s2.begin (db::Box::tag (), db::stable_layer_tag ()));
-    s2.update_bbox ();
     EXPECT_EQ (s2.bbox (), db::Box (-100, -200, 0, 0));
   }
 }
@@ -64,25 +59,20 @@ TEST(1a)
   db::Shapes s (&m, 0, true);
   db::Box b_empty;
 
-  s.update_bbox ();
   EXPECT_EQ (s.bbox (), b_empty);
 
   db::Box b (0, 100, 1000, 1200);
   s.insert (b);
-  s.update_bbox ();
   EXPECT_EQ (s.bbox (), b);
 
   db::Edge e (-100, -200, 0, 0);
   s.insert (e);
-  s.update_bbox ();
   EXPECT_EQ (s.bbox (), db::Box (-100, -200, 1000, 1200));
   
   db::Shapes s2 (s);
-  s2.update_bbox ();
   EXPECT_EQ (s2.bbox (), db::Box (-100, -200, 1000, 1200));
 
   s2.erase (db::Box::tag (), db::stable_layer_tag (), s2.begin (db::Box::tag (), db::stable_layer_tag ()));
-  s2.update_bbox ();
   EXPECT_EQ (s2.bbox (), db::Box (-100, -200, 0, 0));
 }
 
@@ -92,21 +82,17 @@ TEST(1b)
   db::Shapes s (&m, 0, false);
   db::Box b_empty;
 
-  s.update_bbox ();
   EXPECT_EQ (s.bbox (), b_empty);
 
   db::Box b (0, 100, 1000, 1200);
   s.insert (b);
-  s.update_bbox ();
   EXPECT_EQ (s.bbox (), b);
 
   db::Edge e (-100, -200, 0, 0);
   s.insert (e);
-  s.update_bbox ();
   EXPECT_EQ (s.bbox (), db::Box (-100, -200, 1000, 1200));
   
   db::Shapes s2 (s);
-  s2.update_bbox ();
   EXPECT_EQ (s2.bbox (), db::Box (-100, -200, 1000, 1200));
 }
 
@@ -3206,12 +3192,10 @@ TEST(23)
   db::Shapes s (&m, 0, db::default_editable_mode ());
   db::Box b_empty;
 
-  s.update_bbox ();
   EXPECT_EQ (s.bbox (), b_empty);
 
   db::EdgePair ep (db::Edge (-100, -200, 0, 0), db::Edge (0, -100, 100, 100));
   s.insert (ep);
-  s.update_bbox ();
   EXPECT_EQ (s.bbox (), db::Box (-100, -200, 100, 100));
 
   db::ShapeIterator si = s.begin (db::ShapeIterator::EdgePairs);

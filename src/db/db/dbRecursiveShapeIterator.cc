@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -93,7 +93,6 @@ RecursiveShapeIterator::RecursiveShapeIterator ()
   //  anything. Not necessary reasonable.
   m_layer = 0;
   m_has_layers = false;
-  mp_layout = 0;
   mp_shapes = 0;
   mp_top_cell = 0;
   mp_cell = 0;
@@ -113,7 +112,6 @@ RecursiveShapeIterator::RecursiveShapeIterator (const shapes_type &shapes)
 {
   m_layer = 0;
   m_has_layers = false;
-  mp_layout = 0;
   mp_shapes = &shapes;
   mp_top_cell = 0;
   m_overlapping = false;
@@ -125,7 +123,6 @@ RecursiveShapeIterator::RecursiveShapeIterator (const shapes_type &shapes, const
 {
   m_layer = 0;
   m_has_layers = false;
-  mp_layout = 0;
   mp_shapes = &shapes;
   mp_top_cell = 0;
   m_overlapping = overlapping;
@@ -137,7 +134,6 @@ RecursiveShapeIterator::RecursiveShapeIterator (const shapes_type &shapes, const
 {
   m_layer = 0;
   m_has_layers = false;
-  mp_layout = 0;
   mp_shapes = &shapes;
   mp_top_cell = 0;
   m_overlapping = overlapping;
@@ -150,7 +146,7 @@ RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const
 {
   m_layer = layer;
   m_has_layers = false;
-  mp_layout = &layout;
+  mp_layout.reset (const_cast<db::Layout *> (&layout));
   mp_shapes = 0;
   mp_top_cell = &cell;
   m_overlapping = overlapping;
@@ -163,7 +159,7 @@ RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const
 {
   m_layer = layer;
   m_has_layers = false;
-  mp_layout = &layout;
+  mp_layout.reset (const_cast<db::Layout *> (&layout));
   mp_shapes = 0;
   mp_top_cell = &cell;
   m_overlapping = overlapping;
@@ -176,7 +172,7 @@ RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const
 {
   m_layer = layer;
   m_has_layers = false;
-  mp_layout = &layout;
+  mp_layout.reset (const_cast<db::Layout *> (&layout));
   mp_shapes = 0;
   mp_top_cell = &cell;
   m_overlapping = false;
@@ -190,7 +186,7 @@ RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const
   m_layer = 0;
   m_layers = layers;
   m_has_layers = true;
-  mp_layout = &layout;
+  mp_layout.reset (const_cast<db::Layout *> (&layout));
   mp_shapes = 0;
   mp_top_cell = &cell;
   m_overlapping = overlapping;
@@ -204,7 +200,7 @@ RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const
   m_layer = 0;
   m_layers = layers;
   m_has_layers = true;
-  mp_layout = &layout;
+  mp_layout.reset (const_cast<db::Layout *> (&layout));
   mp_shapes = 0;
   mp_top_cell = &cell;
   m_overlapping = overlapping;
@@ -218,7 +214,7 @@ RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const
   m_layer = 0;
   m_layers = layers;
   m_has_layers = true;
-  mp_layout = &layout;
+  mp_layout.reset (const_cast<db::Layout *> (&layout));
   mp_shapes = 0;
   mp_top_cell = &cell;
   m_overlapping = false;
@@ -232,7 +228,7 @@ RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const
   m_layer = 0;
   m_layers.insert (m_layers.end (), layers.begin (), layers.end ());
   m_has_layers = true;
-  mp_layout = &layout;
+  mp_layout.reset (const_cast<db::Layout *> (&layout));
   mp_shapes = 0;
   mp_top_cell = &cell;
   m_overlapping = overlapping;
@@ -246,7 +242,7 @@ RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const
   m_layer = 0;
   m_layers.insert (m_layers.end (), layers.begin (), layers.end ());
   m_has_layers = true;
-  mp_layout = &layout;
+  mp_layout.reset (const_cast<db::Layout *> (&layout));
   mp_shapes = 0;
   mp_top_cell = &cell;
   m_overlapping = overlapping;
@@ -260,7 +256,7 @@ RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const
   m_layer = 0;
   m_layers.insert (m_layers.end (), layers.begin (), layers.end ());
   m_has_layers = true;
-  mp_layout = &layout;
+  mp_layout.reset (const_cast<db::Layout *> (&layout));
   mp_shapes = 0;
   mp_top_cell = &cell;
   m_overlapping = false;
@@ -691,6 +687,8 @@ RecursiveShapeIterator::next_shape (RecursiveShapeReceiver *receiver) const
       
       if (! m_inst.at_end () && int (m_inst_iterators.size ()) < m_max_depth) {
 
+        tl_assert (mp_layout);
+
         //  determine whether the cell is empty with respect to the layers specified
         bool is_empty = false;
         if (! m_has_layers) {
@@ -754,6 +752,8 @@ RecursiveShapeIterator::next_shape (RecursiveShapeReceiver *receiver) const
 void
 RecursiveShapeIterator::down (RecursiveShapeReceiver *receiver) const
 {
+  tl_assert (mp_layout);
+
   m_trans_stack.push_back (m_trans);
   m_cells.push_back (mp_cell);
 

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -166,7 +166,7 @@ TechBaseEditorPage::commit ()
   tech ()->set_explicit_base_path (tl::to_string (mp_ui->base_path_le->text ()));
 
   double d = 0.001;
-  tl::from_string (tl::to_string (mp_ui->dbu_le->text ()), d);
+  tl::from_string_ext (tl::to_string (mp_ui->dbu_le->text ()), d);
   tech ()->set_dbu (d);
 
   if (! mp_ui->lyp_grp->isChecked ()) {

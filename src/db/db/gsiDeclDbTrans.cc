@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -219,7 +219,7 @@ struct trans_defs
       "\n"
       "@return The inverted transformation\n"
     ) +
-    method ("ctrans", &C::ctrans, arg ("d"),
+    method ("ctrans|*", &C::ctrans, arg ("d"),
       "@brief Transforms a distance\n"
       "\n"
       "The \"ctrans\" method transforms the given distance.\n"
@@ -229,6 +229,8 @@ struct trans_defs
       "\n"
       "@param d The distance to transform\n"
       "@return The transformed distance\n"
+      "\n"
+      "The product '*' has been added as a synonym in version 0.28."
     ) +
     method ("trans|*", (point_type (C::*) (const point_type &) const) &C::trans, arg ("p"),
       "@brief Transforms a point\n"
@@ -742,7 +744,7 @@ struct cplx_trans_defs
       "\n"
       "@return The inverted transformation\n"
     ) +
-    method ("ctrans", &C::ctrans, arg ("d"),
+    method ("ctrans|*", &C::ctrans, arg ("d"),
       "@brief Transforms a distance\n"
       "\n"
       "The \"ctrans\" method transforms the given distance.\n"
@@ -752,6 +754,8 @@ struct cplx_trans_defs
       "\n"
       "@param d The distance to transform\n"
       "@return The transformed distance\n"
+      "\n"
+      "The product '*' has been added as a synonym in version 0.28."
     ) +
     method ("trans|*", (target_point_type (C::*) (const point_type &) const) &C::trans, arg ("p"),
       "@brief Transforms a point\n"

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -2200,5 +2200,592 @@ TEST(40_ParallelBJT4Transistors)
     "  device '' d1 (C=n1,B=n2,E=n3,S=n4) (AE=5,PE=25,AB=3,PB=13,AC=4,PC=14,NE=5);\n"
     "end;\n"
   );
+}
+
+TEST(50_SplitGatesSimple)
+{
+  db::DeviceClassMOS3Transistor *mos = new db::DeviceClassMOS3Transistor ();
+
+  db::Netlist nl;
+  nl.add_device_class (mos);
+
+  db::Device *m11 = new db::Device (mos, "m11");
+  m11->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  m11->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 6.0);
+  db::Device *m21 = new db::Device (mos, "m21");
+  m21->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  m21->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 10.0);
+  db::Device *m12 = new db::Device (mos, "m12");
+  m12->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  m12->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 6.0);
+  db::Device *m22 = new db::Device (mos, "m22");
+  m22->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  m22->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 10.0);
+
+  db::Circuit *circuit = new db::Circuit ();
+  nl.add_circuit (circuit);
+
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_g1 = circuit->add_pin ("G1");
+  db::Pin pin_g2 = circuit->add_pin ("G2");
+
+  circuit->add_device (m11);
+  circuit->add_device (m21);
+  circuit->add_device (m12);
+  circuit->add_device (m22);
+
+  db::Net *n1 = new db::Net ("n1");
+  circuit->add_net (n1);
+  circuit->connect_pin (pin_a.id (), n1);
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, n1);
+  m12->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, n1);
+
+  db::Net *sd1 = new db::Net ("sd1");
+  circuit->add_net (sd1);
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, sd1);
+  m21->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd1);
+
+  db::Net *sd2 = new db::Net ("sd2");
+  circuit->add_net (sd2);
+  m12->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, sd2);
+  m22->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd2);
+
+  db::Net *n2 = new db::Net ("n2");
+  circuit->add_net (n2);
+  circuit->connect_pin (pin_b.id (), n2);
+  m21->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, n2);
+  m22->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, n2);
+
+  db::Net *g1 = new db::Net ("g1");
+  circuit->add_net (g1);
+  circuit->connect_pin (pin_g1.id (), g1);
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1);
+  m12->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1);
+
+  db::Net *g2 = new db::Net ("g2");
+  circuit->add_net (g2);
+  circuit->connect_pin (pin_g2.id (), g2);
+  m21->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g2);
+  m22->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g2);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    "  device '' m11 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  std::unique_ptr<db::Netlist> nl2;
+  nl2.reset (new db::Netlist (nl));
+
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+
+  EXPECT_EQ (nl2->to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    "  device '' m11 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    //  sd2 -> sd1
+    "  device '' m12 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  //  can switch S/D for non-strict devices ...
+
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, n1);
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd1);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    "  device '' m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  nl2.reset (new db::Netlist (nl));
+
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+
+  EXPECT_EQ (nl2->to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    //  sd1 -> sd2
+    "  device '' m11 (S=sd2,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  //  different lengths disable split_gate ...
+
+  m11->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 7);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    "  device '' m11 (S=sd1,G=g1,D=n1) (L=7,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  nl2.reset (new db::Netlist (nl));
+
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+
+  EXPECT_EQ (nl2->to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    "  device '' m11 (S=sd1,G=g1,D=n1) (L=7,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  m11->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 6);
+
+  //  split_gates is not bothered by parallel chain
+
+  db::Device *mp1 = new db::Device (mos, "mp1");
+  circuit->add_device (mp1);
+  mp1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  mp1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 6.0);
+
+  db::Device *mp2 = new db::Device (mos, "mp2");
+  circuit->add_device (mp2);
+  mp2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  mp2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 10.0);
+
+  mp1->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, n1);
+  mp1->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1);
+  mp2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, n2);
+  mp2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1);  //  NOTE: not g2!
+
+  db::Net *sd3 = new db::Net ("sd3");
+  circuit->add_net (sd3);
+  mp1->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, sd3);
+  mp2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd3);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    "  device '' m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  nl2.reset (new db::Netlist (nl));
+
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+
+  EXPECT_EQ (nl2->to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    //  sd1 -> sd2
+    "  device '' m11 (S=sd2,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  //  different device class can't be split-gated
+
+  db::DeviceClassMOS3Transistor *mos2 = new db::DeviceClassMOS3Transistor ();
+  mos2->set_name ("X");
+  nl.add_device_class (mos2);
+  m11->set_device_class (mos2);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    "  device X m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  nl2.reset (new db::Netlist (nl));
+
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+
+  EXPECT_EQ (nl2->to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    "  device X m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+}
+
+TEST(51_SplitGatesStrict)
+{
+  db::DeviceClassMOS3Transistor *mos = new db::DeviceClassMOS3Transistor ();
+  mos->set_strict (true);
+
+  db::Netlist nl;
+  nl.add_device_class (mos);
+
+  db::Device *m11 = new db::Device (mos, "m11");
+  m11->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  m11->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 6.0);
+  db::Device *m21 = new db::Device (mos, "m21");
+  m21->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  m21->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 10.0);
+  db::Device *m12 = new db::Device (mos, "m12");
+  m12->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  m12->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 6.0);
+  db::Device *m22 = new db::Device (mos, "m22");
+  m22->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  m22->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 10.0);
+
+  db::Circuit *circuit = new db::Circuit ();
+  nl.add_circuit (circuit);
+
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_g1 = circuit->add_pin ("G1");
+  db::Pin pin_g2 = circuit->add_pin ("G2");
+
+  circuit->add_device (m11);
+  circuit->add_device (m21);
+  circuit->add_device (m12);
+  circuit->add_device (m22);
+
+  db::Net *n1 = new db::Net ("n1");
+  circuit->add_net (n1);
+  circuit->connect_pin (pin_a.id (), n1);
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, n1);
+  m12->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, n1);
+
+  db::Net *sd1 = new db::Net ("sd1");
+  circuit->add_net (sd1);
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, sd1);
+  m21->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd1);
+
+  db::Net *sd2 = new db::Net ("sd2");
+  circuit->add_net (sd2);
+  m12->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, sd2);
+  m22->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd2);
+
+  db::Net *n2 = new db::Net ("n2");
+  circuit->add_net (n2);
+  circuit->connect_pin (pin_b.id (), n2);
+  m21->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, n2);
+  m22->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, n2);
+
+  db::Net *g1 = new db::Net ("g1");
+  circuit->add_net (g1);
+  circuit->connect_pin (pin_g1.id (), g1);
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1);
+  m12->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1);
+
+  db::Net *g2 = new db::Net ("g2");
+  circuit->add_net (g2);
+  circuit->connect_pin (pin_g2.id (), g2);
+  m21->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g2);
+  m22->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g2);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    "  device '' m11 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  std::unique_ptr<db::Netlist> nl2;
+  nl2.reset (new db::Netlist (nl));
+
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+
+  EXPECT_EQ (nl2->to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    "  device '' m11 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    //  sd2 -> sd1
+    "  device '' m12 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  //  cannot switch S/D for non-strict devices ...
+
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, n1);
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd1);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    "  device '' m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  nl2.reset (new db::Netlist (nl));
+
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+
+  EXPECT_EQ (nl2->to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    //  no change!
+    "  device '' m11 (S=sd1,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, n1);
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, sd1);
+
+  //  different lengths disable split_gate ...
+
+  m11->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 7);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    "  device '' m11 (S=n1,G=g1,D=sd1) (L=7,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  nl2.reset (new db::Netlist (nl));
+
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+
+  EXPECT_EQ (nl2->to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    "  device '' m11 (S=n1,G=g1,D=sd1) (L=7,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  m11->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 6);
+
+  //  split_gates is not bothered by parallel chain
+
+  db::Device *mp1 = new db::Device (mos, "mp1");
+  circuit->add_device (mp1);
+  mp1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  mp1->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 6.0);
+
+  db::Device *mp2 = new db::Device (mos, "mp2");
+  circuit->add_device (mp2);
+  mp2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  mp2->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 10.0);
+
+  mp1->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, n1);
+  mp1->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1);
+  mp2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, n2);
+  mp2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1);  //  NOTE: not g2!
+
+  db::Net *sd3 = new db::Net ("sd3");
+  circuit->add_net (sd3);
+  mp1->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, sd3);
+  mp2->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd3);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    "  device '' m11 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  nl2.reset (new db::Netlist (nl));
+
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+
+  EXPECT_EQ (nl2->to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
+    //  sd1 -> sd2
+    "  device '' m11 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+}
+
+TEST(52_SplitGatesMOS4)
+{
+  db::DeviceClassMOS4Transistor *mos = new db::DeviceClassMOS4Transistor ();
+
+  db::Netlist nl;
+  nl.add_device_class (mos);
+
+  db::Device *m11 = new db::Device (mos, "m11");
+  m11->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  m11->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 6.0);
+  db::Device *m21 = new db::Device (mos, "m21");
+  m21->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  m21->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 10.0);
+  db::Device *m12 = new db::Device (mos, "m12");
+  m12->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  m12->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 6.0);
+  db::Device *m22 = new db::Device (mos, "m22");
+  m22->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, 1.0);
+  m22->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, 10.0);
+
+  db::Circuit *circuit = new db::Circuit ();
+  nl.add_circuit (circuit);
+
+  db::Pin pin_a = circuit->add_pin ("A");
+  db::Pin pin_b = circuit->add_pin ("B");
+  db::Pin pin_g1 = circuit->add_pin ("G1");
+  db::Pin pin_g2 = circuit->add_pin ("G2");
+  db::Pin pin_vss = circuit->add_pin ("VSS");
+
+  circuit->add_device (m11);
+  circuit->add_device (m21);
+  circuit->add_device (m12);
+  circuit->add_device (m22);
+
+  db::Net *vss = new db::Net ("vss");
+  circuit->add_net (vss);
+  circuit->connect_pin (pin_vss.id (), vss);
+  m11->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, vss);
+  m12->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, vss);
+  m21->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, vss);
+  m22->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, vss);
+
+  db::Net *n1 = new db::Net ("n1");
+  circuit->add_net (n1);
+  circuit->connect_pin (pin_a.id (), n1);
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, n1);
+  m12->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, n1);
+
+  db::Net *sd1 = new db::Net ("sd1");
+  circuit->add_net (sd1);
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, sd1);
+  m21->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd1);
+
+  db::Net *sd2 = new db::Net ("sd2");
+  circuit->add_net (sd2);
+  m12->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, sd2);
+  m22->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd2);
+
+  db::Net *n2 = new db::Net ("n2");
+  circuit->add_net (n2);
+  circuit->connect_pin (pin_b.id (), n2);
+  m21->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, n2);
+  m22->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, n2);
+
+  db::Net *g1 = new db::Net ("g1");
+  circuit->add_net (g1);
+  circuit->connect_pin (pin_g1.id (), g1);
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1);
+  m12->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g1);
+
+  db::Net *g2 = new db::Net ("g2");
+  circuit->add_net (g2);
+  circuit->connect_pin (pin_g2.id (), g2);
+  m21->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g2);
+  m22->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_G, g2);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
+    "  device '' m11 (S=n1,G=g1,D=sd1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  std::unique_ptr<db::Netlist> nl2;
+  nl2.reset (new db::Netlist (nl));
+
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+
+  EXPECT_EQ (nl2->to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
+    "  device '' m11 (S=n1,G=g1,D=sd1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    //  sd2 -> sd1
+    "  device '' m12 (S=n1,G=g1,D=sd1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  //  can switch S/D for non-strict devices ...
+
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_D, n1);
+  m11->connect_terminal (db::DeviceClassMOS3Transistor::terminal_id_S, sd1);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
+    "  device '' m11 (S=sd1,G=g1,D=n1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  nl2.reset (new db::Netlist (nl));
+
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+
+  EXPECT_EQ (nl2->to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
+    //  sd1 -> sd2
+    "  device '' m11 (S=sd2,G=g1,D=n1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  //  different bulk pins disable split_gates ...
+
+  m11->connect_terminal (db::DeviceClassMOS4Transistor::terminal_id_B, n1);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
+    "  device '' m11 (S=sd1,G=g1,D=n1,B=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
+  nl2.reset (new db::Netlist (nl));
+
+  (dynamic_cast<db::DeviceClassMOS3Transistor *> (nl2->begin_device_classes ().operator-> ()))->join_split_gates (nl2->begin_top_down ().operator-> ());
+
+  EXPECT_EQ (nl2->to_string (),
+    "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
+    "  device '' m11 (S=sd1,G=g1,D=n1,B=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D=sd2,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+
 }
 

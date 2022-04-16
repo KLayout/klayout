@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -203,7 +203,7 @@ std::vector<char> python2c_func<std::vector<char> >::operator() (PyObject *rval)
 #else
   if (PyBytes_Check (rval)) {
     char *cp = 0;
-    ssize_t sz = 0;
+    Py_ssize_t sz = 0;
     PyBytes_AsStringAndSize (rval, &cp, &sz);
     tl_assert (cp != 0);
     return std::vector<char> (cp, cp + sz);
@@ -215,13 +215,13 @@ std::vector<char> python2c_func<std::vector<char> >::operator() (PyObject *rval)
       check_error ();
     }
     char *cp = 0;
-    ssize_t sz = 0;
+    Py_ssize_t sz = 0;
     PyBytes_AsStringAndSize (ba.get (), &cp, &sz);
     tl_assert (cp != 0);
     return std::vector<char> (cp, cp + sz);
   } else if (PyByteArray_Check (rval)) {
     char *cp = PyByteArray_AsString (rval);
-    ssize_t sz = PyByteArray_Size (rval);
+    Py_ssize_t sz = PyByteArray_Size (rval);
     return std::vector<char> (cp, cp + sz);
   } else {
     throw tl::Exception (tl::to_string (tr ("Argument cannot be converted to a byte array")));

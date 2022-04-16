@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1788,7 +1788,11 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
           QTextBlock e = mp_text->document ()->findBlock (c.selectionEnd ());
           if (e == s) {
             emit search_requested (c.selectedText ());
+          } else {
+            emit search_requested (QString ());
           }
+        } else {
+          emit search_requested (QString ());
         }
 
         return true;

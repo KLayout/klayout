@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -84,10 +84,19 @@ Class<lay::HelpDialog> decl_HelpDialog (QT_EXTERNAL_BASE (QDialog) "lay", "HelpD
 
 LAYBASIC_PUBLIC Class<lay::BrowserSource> &laybasicdecl_BrowserSource ();
 
+static lay::HelpSource *plain_help_source ()
+{
+  return new lay::HelpSource (false);
+}
+
 Class<lay::HelpSource> decl_HelpSource (laybasicdecl_BrowserSource (), "lay", "HelpSource",
+  gsi::constructor ("plain", &plain_help_source, "@brief Reserved for internal use") +
+  gsi::method ("scan", static_cast<void (lay::HelpSource::*) ()> (&lay::HelpSource::scan), "@brief Reserved internal use") +
 #if defined(HAVE_QTBINDINGS) && defined(HAVE_QT_XML)
-  gsi::method ("get_dom", &lay::HelpSource::get_dom, "@brief For internal use") + 
+  gsi::method ("get_dom", &lay::HelpSource::get_dom, gsi::arg ("path"), "@brief Reserved for internal use") +
 #endif
+  gsi::method ("set_option", &lay::HelpSource::set_option, gsi::arg ("key"), gsi::arg ("value"), "@brief Reserved for internal use") +
+  gsi::method ("get_option", &lay::HelpSource::get_option, gsi::arg ("key"), "@brief Reserved for internal use") +
   gsi::method ("urls", &lay::HelpSource::urls, "@brief Reserved for internal use") +
   gsi::method ("title_for", &lay::HelpSource::title_for, gsi::arg ("path"), "@brief Reserved internal use") +
   gsi::method ("parent_of", &lay::HelpSource::parent_of, gsi::arg ("path"), "@brief Reserved internal use") +

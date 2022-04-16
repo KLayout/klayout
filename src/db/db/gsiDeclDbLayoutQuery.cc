@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -111,7 +111,9 @@ char shape_query_property_name[]              = "shape";
 char layer_index_query_property_name[]        = "layer_index";
 char inst_query_property_name[]               = "inst";
 char path_trans_query_property_name[]         = "path_trans";
+char path_dtrans_query_property_name[]        = "path_dtrans";
 char trans_query_property_name[]              = "trans";
+char dtrans_query_property_name[]             = "dtrans";
 char cell_index_query_property_name[]         = "cell_index";
 char cell_query_property_name[]               = "cell";
 char parent_cell_index_query_property_name[]  = "parent_cell_index";
@@ -138,7 +140,9 @@ Class<db::LayoutQueryIterator> decl_LayoutQueryIterator ("db", "LayoutQueryItera
   make_shortcut_method<layer_index_query_property_name>() +
   make_shortcut_method<inst_query_property_name>() +
   make_shortcut_method<path_trans_query_property_name>() +
+  make_shortcut_method<path_dtrans_query_property_name>() +
   make_shortcut_method<trans_query_property_name>() +
+  make_shortcut_method<dtrans_query_property_name>() +
   make_shortcut_method<cell_index_query_property_name>() +
   make_shortcut_method<cell_query_property_name>() +
   make_shortcut_method<parent_cell_index_query_property_name>() +

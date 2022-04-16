@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -125,10 +125,10 @@ BEGIN_PROTECTED
 
     double x1 = 0.0, y1 = 0.0;
     double x2 = 0.0, y2 = 0.0;
-    tl::from_string (tl::to_string (le_x1->text ()), x1);
-    tl::from_string (tl::to_string (le_x2->text ()), x2);
-    tl::from_string (tl::to_string (le_y1->text ()), y1);
-    tl::from_string (tl::to_string (le_y2->text ()), y2);
+    tl::from_string_ext (tl::to_string (le_x1->text ()), x1);
+    tl::from_string_ext (tl::to_string (le_x2->text ()), x2);
+    tl::from_string_ext (tl::to_string (le_y1->text ()), y1);
+    tl::from_string_ext (tl::to_string (le_y2->text ()), y2);
 
     clip_boxes.push_back (db::Box (db::DBox (db::DPoint (x1, y1), db::DPoint (x2, y2)) * (1.0 / cv->layout ().dbu ())));
 
@@ -141,10 +141,10 @@ BEGIN_PROTECTED
 
     double x = 0.0, y = 0.0;
     double w = 0.0, h = 0.0;
-    tl::from_string (tl::to_string (le_x->text ()), x);
-    tl::from_string (tl::to_string (le_y->text ()), y);
-    tl::from_string (tl::to_string (le_w->text ()), w);
-    tl::from_string (tl::to_string (le_h->text ()), h);
+    tl::from_string_ext (tl::to_string (le_x->text ()), x);
+    tl::from_string_ext (tl::to_string (le_y->text ()), y);
+    tl::from_string_ext (tl::to_string (le_w->text ()), w);
+    tl::from_string_ext (tl::to_string (le_h->text ()), h);
 
     clip_boxes.push_back (db::Box (db::DBox (db::DPoint (x - 0.5 * w, y - 0.5 * h), db::DPoint (x + 0.5 * w, y + 0.5 * h)) * (1.0 / cv->layout ().dbu ())));
 

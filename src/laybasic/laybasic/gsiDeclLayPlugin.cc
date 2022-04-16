@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -253,6 +253,24 @@ public:
     }
   }
 
+  virtual bool has_tracking_position () const
+  {
+    if (f_has_tracking_position.can_issue ()) {
+      return f_has_tracking_position.issue<lay::ViewService, bool> (&lay::ViewService::has_tracking_position);
+    } else {
+      return lay::ViewService::has_tracking_position ();
+    }
+  }
+
+  virtual db::DPoint tracking_position () const
+  {
+    if (f_tracking_position.can_issue ()) {
+      return f_tracking_position.issue<lay::ViewService, db::DPoint> (&lay::ViewService::tracking_position);
+    } else {
+      return lay::ViewService::tracking_position ();
+    }
+  }
+
   gsi::Callback f_menu_activated;
   gsi::Callback f_configure;
   gsi::Callback f_config_finalize;
@@ -269,6 +287,8 @@ public:
   gsi::Callback f_deactivated;
   gsi::Callback f_drag_cancel;
   gsi::Callback f_update;
+  gsi::Callback f_has_tracking_position;
+  gsi::Callback f_tracking_position;
 };
 
 class PluginFactoryBase
@@ -778,7 +798,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "If the plugin implements some press-and-drag or a click-and-drag operation, this callback should "
     "cancel this operation and return in some state waiting for a new mouse event."
   ) +
-  callback ("update", &gsi::PluginBase::update, &gsi::PluginBase::f_update, 
+  callback ("update", &gsi::PluginBase::update, &gsi::PluginBase::f_update,
     "@brief Gets called when the view has changed\n"
     "This method is called in particular if the view has changed the visible rectangle, i.e. after zooming in or out or panning. "
     "This callback can be used to update any internal states that depend on the view's state."
@@ -795,6 +815,20 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "in the mouse move handler unless a button is pressed or the cursor is explicitly set again in the mouse_move_event.\n"
     "\n"
     "The cursor type is one of the cursor constants in the \\Cursor class, i.e. 'CursorArrow' for the normal cursor."
+  ) +
+  callback ("has_tracking_position", &gsi::PluginBase::has_tracking_position, &gsi::PluginBase::f_has_tracking_position,
+    "@brief Gets a value indicating whether the plugin provides a tracking position\n"
+    "The tracking position is shown in the lower-left corner of the layout window to indicate the current position.\n"
+    "If this method returns true for the active service, the application will fetch the position by calling \\tracking_position "
+    "rather than displaying the original mouse position.\n"
+    "\n"
+    "This method has been added in version 0.27.6."
+  ) +
+  callback ("tracking_position", &gsi::PluginBase::tracking_position, &gsi::PluginBase::f_tracking_position,
+    "@brief Gets the tracking position\n"
+    "See \\has_tracking_position for details.\n"
+    "\n"
+    "This method has been added in version 0.27.6."
   ),
   "@brief The plugin object\n"
   "\n"

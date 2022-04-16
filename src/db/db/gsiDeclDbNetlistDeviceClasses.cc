@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -240,6 +240,10 @@ Class<db::DeviceClassMOS3Transistor> decl_dbDeviceClassMOS3Transistor (decl_dbDe
   ) +
   gsi::constant ("PARAM_PD", db::DeviceClassMOS3Transistor::param_id_PD,
     "@brief A constant giving the parameter ID for parameter PD"
+  ) +
+  gsi::method ("join_split_gates", &db::DeviceClassMOS3Transistor::join_split_gates, gsi::arg ("circuit"),
+    "@brief Joins source/drain nets from 'split gate' transistor strings on the given circuit\n"
+    "This method has been introduced in version 0.27.9\n"
   ),
   "@brief A device class for a 3-terminal MOS transistor.\n"
   "This class describes a MOS transistor without a bulk terminal. "

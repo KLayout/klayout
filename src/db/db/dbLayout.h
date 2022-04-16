@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1633,6 +1633,14 @@ public:
   void cleanup (const std::set<db::cell_index_type> &keep = std::set<db::cell_index_type> ());
 
   /**
+   *  @brief Calls "update" on all cells of the layout
+   *
+   *  This will update PCells stored inside this layout, but will *not* update
+   *  PCells which are imported from a library.
+   */
+  void refresh ();
+
+  /**
    *  @brief Implementation of the undo operations
    */
   virtual void undo (db::Op *op);
@@ -1700,6 +1708,13 @@ public:
    *  The waste layer is used to store shapes that should not be visible and can be cleared at any time.
    */
   unsigned int waste_layer () const;
+
+  /**
+   *  @brief Gets the error layer
+   *
+   *  The error layer is used to display error messages.
+   */
+  unsigned int error_layer () const;
 
   /**
    *  @brief Set the properties for a specified layer
@@ -1883,6 +1898,7 @@ private:
   lib_proxy_map m_lib_proxy_map;
   int m_guiding_shape_layer;
   int m_waste_layer;
+  int m_error_layer;
   bool m_do_cleanup;
   bool m_editable;
   meta_info m_meta_info;

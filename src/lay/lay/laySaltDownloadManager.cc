@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "tlProgress.h"
 #include "tlFileUtils.h"
 #include "tlWebDAV.h"
+#include "tlLog.h"
 
 #include <memory>
 #include <QTreeWidgetItem>
@@ -38,16 +39,18 @@ namespace lay
 // ----------------------------------------------------------------------------------
 
 ConfirmationDialog::ConfirmationDialog (QWidget *parent)
-  : QDialog (parent), m_confirmed (false), m_cancelled (false), m_file (50000, true)
+  : QDialog (parent), m_confirmed (false), m_cancelled (false), m_aborted (false), m_file (50000, true)
 {
   Ui::SaltManagerInstallConfirmationDialog::setupUi (this);
 
   connect (ok_button, SIGNAL (clicked ()), this, SLOT (confirm_pressed ()));
   connect (cancel_button, SIGNAL (clicked ()), this, SLOT (cancel_pressed ()));
   connect (close_button, SIGNAL (clicked ()), this, SLOT (close_pressed ()));
+  connect (abort_button, SIGNAL (clicked ()), this, SLOT (abort_pressed ()));
 
   log_panel->hide ();
   attn_frame->hide ();
+  abort_button->hide ();
   log_view->setModel (&m_file);
 
   connect (&m_file, SIGNAL (layoutChanged ()), log_view, SLOT (scrollToBottom ()));
@@ -147,13 +150,15 @@ ConfirmationDialog::start ()
 {
   confirm_panel->hide ();
   log_panel->show ();
-  close_button->setEnabled (false);
+  close_button->hide ();
+  abort_button->show ();
 }
 
 void
 ConfirmationDialog::finish ()
 {
-  close_button->setEnabled (true);
+  close_button->show ();
+  abort_button->hide ();
 }
 
 // ----------------------------------------------------------------------------------
@@ -400,16 +405,28 @@ SaltDownloadManager::make_confirmation_dialog (QWidget *parent, const lay::Salt 
 namespace
 {
   class DownloadProgressAdaptor
-    : public tl::ProgressAdaptor
+    : public tl::ProgressAdaptor, public tl::InputHttpStreamCallback
   {
   public:
     DownloadProgressAdaptor (lay::ConfirmationDialog *dialog, const std::string &name)
-      : mp_dialog (dialog), m_name (name)
+      : mp_dialog (dialog), m_name (name), m_is_aborted (false)
     {
       mp_dialog->mark_fetching (m_name);
     }
 
-    virtual void yield (tl::Progress * /*progress*/) { }
+    virtual void yield (tl::Progress * /*progress*/)
+    {
+      QCoreApplication::processEvents (QEventLoop::AllEvents | QEventLoop::WaitForMoreEvents, 100);
+      if (mp_dialog->is_aborted ()) {
+        m_is_aborted = true;
+        throw tl::CancelException ();
+      }
+    }
+
+    virtual void wait_for_input ()
+    {
+      yield (0);
+    }
 
     virtual void trigger (tl::Progress *progress)
     {
@@ -426,9 +443,15 @@ namespace
       mp_dialog->mark_success (m_name);
     }
 
+    bool is_aborted () const
+    {
+      return m_is_aborted;
+    }
+
   private:
     lay::ConfirmationDialog *mp_dialog;
     std::string m_name;
+    bool m_is_aborted;
   };
 }
 
@@ -473,15 +496,17 @@ SaltDownloadManager::execute (lay::SaltManagerDialog *parent, lay::Salt &salt)
 
       int status = 1;
 
-      {
-        DownloadProgressAdaptor pa (dialog.get (), p->name);
-        if (! salt.create_grain (p->grain, target)) {
-          pa.error ();
-          result = false;
-          status = 0;
-        } else {
-          pa.success ();
-        }
+      DownloadProgressAdaptor pa (dialog.get (), p->name);
+      if (! salt.create_grain (p->grain, target, 0.0 /*infinite timeout*/, &pa)) {
+        pa.error ();
+        result = false;
+        status = 0;
+      } else {
+        pa.success ();
+      }
+
+      if (pa.is_aborted ()) {
+        break;
       }
 
       try {
@@ -517,7 +542,7 @@ SaltDownloadManager::execute (lay::SaltManagerDialog *parent, lay::Salt &salt)
         target.set_path (g->path ());
       }
 
-      if (! salt.create_grain (p->grain, target)) {
+      if (! salt.create_grain (p->grain, target, 60.0 /*timeout for offline installation*/)) {
         tl::error << tl::to_string (QObject::tr ("Installation failed for package %1").arg (tl::to_qstring (target.name ())));
         result = false;
       } else {

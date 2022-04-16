@@ -63,7 +63,7 @@
   <p>
   LEF and DEF import can be configured in many ways. The configuration of the LEF/DEF import
   feature is attached to a technology, so there can be individual configurations per technology.
-  For a description of the technology feature, see <link href="about/technology_manager.xml"/>.
+  For a description of the technology feature, see <link href="/about/technology_manager.xml"/>.
   The import feature uses the current technology. The current technology can be selected from
   the main toolbar's technology selector if specific technology settings exist. Otherwise, the
   default technology will be used.
@@ -138,14 +138,14 @@
     <li><b>Produce net names:</b> Check this option to assign user properties with the
       net name to the net shapes in DEF files. The user property name used for that
       purpose can be specified in the edit box below the check box. Use KLayout's 
-      variant notation (see <link href="about/variant_notation.xml"/>) to specify
+      variant notation (see <link href="/about/variant_notation.xml"/>) to specify
       value and type of the property name.
     </li>
     <li><b>Produce inst names:</b> Check this option to assign user properties with the
       instance name to the component instances created by DEF import.
       The user property name used for the instance name
       can be specified in the edit box below the check box. Use KLayout's 
-      variant notation (see <link href="about/variant_notation.xml"/>) to specify
+      variant notation (see <link href="/about/variant_notation.xml"/>) to specify
       value and type of the property name.
     </li>
     <li><b>Produce cell outlines:</b> If this option is checked, outline shapes are

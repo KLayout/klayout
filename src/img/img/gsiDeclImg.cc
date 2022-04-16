@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -553,7 +553,7 @@ static std::vector<bool> get_mask_data (ImageRef *obj)
 }
 
 //  NOTE: img::Object is available as "BasicImage" to allow binding for other methods.
-gsi::Class<img::Object> decl_BasicImage ("lay", "BasicImage", gsi::Methods (), "@hide");
+gsi::Class<img::Object> decl_BasicImage ("lay", "BasicImage", gsi::Methods (), "@hide\n@alias Image");
 
 gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
   gsi::constructor ("from_s", &gsi::img_from_s, gsi::arg ("s"),

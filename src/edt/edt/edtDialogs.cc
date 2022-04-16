@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -380,10 +380,10 @@ DistributeOptionsDialog::exec_dialog (lay::LayoutView * /*view*/, bool &hdistrib
     }
 
     hspace = 0.0;
-    tl::from_string (tl::to_string (this->h_space->text ()), hspace);
+    tl::from_string_ext (tl::to_string (this->h_space->text ()), hspace);
 
     hpitch = 0.0;
-    tl::from_string (tl::to_string (this->h_pitch->text ()), hpitch);
+    tl::from_string_ext (tl::to_string (this->h_pitch->text ()), hpitch);
 
     vdistribute = this->v_distribute->isChecked ();
     vmode = -1;
@@ -394,10 +394,10 @@ DistributeOptionsDialog::exec_dialog (lay::LayoutView * /*view*/, bool &hdistrib
     }
 
     vspace = 0.0;
-    tl::from_string (tl::to_string (this->v_space->text ()), vspace);
+    tl::from_string_ext (tl::to_string (this->v_space->text ()), vspace);
 
     vpitch = 0.0;
-    tl::from_string (tl::to_string (this->v_pitch->text ()), vpitch);
+    tl::from_string_ext (tl::to_string (this->v_pitch->text ()), vpitch);
 
     visible_layers = false;
     for (int i = 0; i < 2; ++i) {
@@ -557,13 +557,13 @@ RoundCornerOptionsDialog::exec_dialog (const db::Layout &layout, double &router,
 
     undo_before_apply = m_has_extracted && amend_cb->isChecked ();
 
-    tl::from_string (tl::to_string (router_le->text ()), router);
+    tl::from_string_ext (tl::to_string (router_le->text ()), router);
     if (rinner_le->text ().isEmpty ()) {
       rinner = router;
     } else {
-      tl::from_string (tl::to_string (rinner_le->text ()), rinner);
+      tl::from_string_ext (tl::to_string (rinner_le->text ()), rinner);
     }
-    tl::from_string (tl::to_string (points_le->text ()), npoints);
+    tl::from_string_ext (tl::to_string (points_le->text ()), npoints);
 
     mp_layout = 0;
     return true;
@@ -582,13 +582,13 @@ BEGIN_PROTECTED;
   double rhull = 0.0, rholes = 0.0;
   unsigned int npoints = 0;
   
-  tl::from_string (tl::to_string (router_le->text ()), rhull);
+  tl::from_string_ext (tl::to_string (router_le->text ()), rhull);
   if (rinner_le->text ().isEmpty ()) {
     rholes = rhull;
   } else {
-    tl::from_string (tl::to_string (rinner_le->text ()), rholes);
+    tl::from_string_ext (tl::to_string (rinner_le->text ()), rholes);
   }
-  tl::from_string (tl::to_string (points_le->text ()), npoints);
+  tl::from_string_ext (tl::to_string (points_le->text ()), npoints);
 
   const unsigned int min_points = 16;
   const double seg_thr = 10.0; // in DBU
@@ -638,12 +638,12 @@ MakeArrayOptionsDialog::exec_dialog (db::DVector &a, unsigned int &na, db::DVect
     double bx = 0.0, by = 0.0;
     double ax = 0.0, ay = 0.0;
 
-    tl::from_string (tl::to_string (column_x_le->text ()), bx);
-    tl::from_string (tl::to_string (column_y_le->text ()), by);
-    tl::from_string (tl::to_string (columns_le->text ()), nb);
-    tl::from_string (tl::to_string (row_x_le->text ()), ax);
-    tl::from_string (tl::to_string (row_y_le->text ()), ay);
-    tl::from_string (tl::to_string (rows_le->text ()), na);
+    tl::from_string_ext (tl::to_string (column_x_le->text ()), bx);
+    tl::from_string_ext (tl::to_string (column_y_le->text ()), by);
+    tl::from_string_ext (tl::to_string (columns_le->text ()), nb);
+    tl::from_string_ext (tl::to_string (row_x_le->text ()), ax);
+    tl::from_string_ext (tl::to_string (row_y_le->text ()), ay);
+    tl::from_string_ext (tl::to_string (rows_le->text ()), na);
 
     a = db::DVector (ax, ay);
     b = db::DVector (bx, by);
@@ -665,12 +665,12 @@ BEGIN_PROTECTED;
   double ax = 0.0, ay = 0.0;
   int na, nb;
 
-  tl::from_string (tl::to_string (column_x_le->text ()), bx);
-  tl::from_string (tl::to_string (column_y_le->text ()), by);
-  tl::from_string (tl::to_string (columns_le->text ()), nb);
-  tl::from_string (tl::to_string (row_x_le->text ()), ax);
-  tl::from_string (tl::to_string (row_y_le->text ()), ay);
-  tl::from_string (tl::to_string (rows_le->text ()), na);
+  tl::from_string_ext (tl::to_string (column_x_le->text ()), bx);
+  tl::from_string_ext (tl::to_string (column_y_le->text ()), by);
+  tl::from_string_ext (tl::to_string (columns_le->text ()), nb);
+  tl::from_string_ext (tl::to_string (row_x_le->text ()), ax);
+  tl::from_string_ext (tl::to_string (row_y_le->text ()), ay);
+  tl::from_string_ext (tl::to_string (rows_le->text ()), na);
 
   if (na < 1 || nb < 1) {
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid row or column count (must be larger or equal one)")));

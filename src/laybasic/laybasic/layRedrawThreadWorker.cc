@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -359,7 +359,7 @@ RedrawThreadWorker::perform_task (tl::Task *task)
       }
     }
 
-    //  draw the guiding shapes
+    //  draw the guiding and error shapes
     for (std::set< std::pair<db::DCplxTrans, int> >::const_iterator b = m_box_variants.begin (); b != m_box_variants.end (); ++b) {
 
       const lay::CellView &cv = m_cellviews [b->second];
@@ -374,8 +374,6 @@ RedrawThreadWorker::perform_task (tl::Task *task)
         //  draw one level more to show the guiding shapes as part of the instance
         m_to_level += 1; //  TODO: modifying this basic setting is a hack!
 
-        m_layer = mp_layout->guiding_shape_layer ();
-       
         //  configure renderer ..
         mp_renderer->draw_texts (m_text_visible);
         mp_renderer->draw_properties (false);
@@ -384,13 +382,30 @@ RedrawThreadWorker::perform_task (tl::Task *task)
         mp_renderer->set_font (db::Font (m_text_font));
         mp_renderer->apply_text_trans (m_apply_text_trans);
 
+        bool f = m_text_lazy_rendering;
+
         try {
+
+          m_text_lazy_rendering = false;
+
+          m_layer = mp_layout->guiding_shape_layer ();
           iterate_variants (m_redraw_region, cv.cell_index (), trans, &RedrawThreadWorker::draw_layer);
           iterate_variants (text_redraw_regions, cv.cell_index (), trans, &RedrawThreadWorker::draw_text_layer);
+
+          m_layer = mp_layout->error_layer ();
+          iterate_variants (m_redraw_region, cv.cell_index (), trans, &RedrawThreadWorker::draw_layer);
+          iterate_variants (text_redraw_regions, cv.cell_index (), trans, &RedrawThreadWorker::draw_text_layer);
+
+          m_text_lazy_rendering = f;
           m_to_level -= 1;
+
         } catch (...) {
+
+          m_text_lazy_rendering = f;
           m_to_level -= 1;
+
           throw;
+
         }
 
       }

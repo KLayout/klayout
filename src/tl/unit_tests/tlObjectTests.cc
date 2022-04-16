@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -74,12 +74,29 @@ TEST(1)
     EXPECT_EQ (sp0.get () == o, true);
     EXPECT_EQ (sp0 ? 1 : 0, 1);
 
+    //  installing the same pointer does not change anything
+    sp0.reset (sp.get ());
+    EXPECT_EQ (MyClass::instances (), 1);
+    EXPECT_EQ (sp0.get () == o, true);
+    EXPECT_EQ (sp.get () == o, true);
+
     delete o;
     o = 0;
     EXPECT_EQ (sp.get () == 0, true);
     EXPECT_EQ (sp ? 1 : 0, 0);
     EXPECT_EQ (sp0.get () == 0, true);
     EXPECT_EQ (sp0 ? 1 : 0, 0);
+    EXPECT_EQ (MyClass::instances (), 0);
+
+    MyClass *oo = new MyClass ();
+    sp.reset (oo);
+    EXPECT_EQ (MyClass::instances (), 1);
+    EXPECT_EQ (sp.get () == oo, true);
+    //  resetting again does not change anything
+    sp.reset (oo);
+    EXPECT_EQ (MyClass::instances (), 1);
+    EXPECT_EQ (sp.get () == oo, true);
+
   }
 
   EXPECT_EQ (MyClass::instances (), 0);

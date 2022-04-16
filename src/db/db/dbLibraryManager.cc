@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "tlAssert.h"
 #include "tlStaticObjects.h"
 #include "tlClassRegistry.h"
+#include "tlThreads.h"
 
 #include <memory>
 
@@ -69,13 +70,15 @@ LibraryManager::~LibraryManager ()
 std::pair<bool, lib_id_type> 
 LibraryManager::lib_by_name (const std::string &name, const std::set<std::string> &for_technologies) const
 {
+  tl::MutexLocker locker (&m_lock);
+
   iterator l;
 
   if (! for_technologies.empty ()) {
 
     l = m_lib_by_name.find (name);
     while (l != m_lib_by_name.end () && l->first == name) {
-      const db::Library *lptr = lib (l->second);
+      const db::Library *lptr = lib_internal (l->second);
       bool found = lptr->for_technologies ();
       for (std::set<std::string>::const_iterator t = for_technologies.begin (); t != for_technologies.end () && found; ++t) {
         if (! lptr->is_for_technology (*t)) {
@@ -93,7 +96,7 @@ LibraryManager::lib_by_name (const std::string &name, const std::set<std::string
   //  fallback: technology-unspecific libs
   l = m_lib_by_name.find (name);
   while (l != m_lib_by_name.end () && l->first == name) {
-    if (! lib (l->second)->for_technologies ()) {
+    if (! lib_internal (l->second)->for_technologies ()) {
       return std::make_pair (true, l->second);
     }
     ++l;
@@ -103,67 +106,106 @@ LibraryManager::lib_by_name (const std::string &name, const std::set<std::string
 }
 
 void
-LibraryManager::delete_lib (Library *library)
+LibraryManager::unregister_lib (Library *library)
 {
-  if (!library) {
+  if (! library) {
     return;
   }
 
-  m_lib_by_name.erase (library->get_name ());
+  {
+    tl::MutexLocker locker (&m_lock);
 
-  for (lib_id_type id = 0; id < m_libs.size (); ++id) {
-    if (m_libs [id] == library) {
-      library->remap_to (0);
-      delete library;
-      m_libs [id] = 0;
-      break;
+    for (lib_id_type id = 0; id < m_libs.size (); ++id) {
+      if (m_libs [id] == library) {
+        m_lib_by_name.erase (library->get_name ());
+        m_libs [id] = 0;
+        break;
+      }
     }
+  }
+
+  library->remap_to (0);
+  library->set_id (std::numeric_limits<lib_id_type>::max ());
+}
+
+void
+LibraryManager::delete_lib (Library *library)
+{
+  if (library) {
+    unregister_lib (library);
+    delete library;
   }
 }
 
 lib_id_type 
 LibraryManager::register_lib (Library *library)
 {
-  library->keep (); //  marks the library owned by the C++ side of GSI
+  lib_id_type id = std::numeric_limits<size_t>::max ();
+  Library *old_lib = 0;
 
-  lib_id_type id;
-  for (id = 0; id < m_libs.size (); ++id) {
-    if (m_libs [id] == 0) {
-      break;
+  {
+    tl::MutexLocker locker (&m_lock);
+
+    if (library->get_id () < m_libs.size ()) {
+      //  ignore re-registration attempts (they crash)
+      tl_assert (m_libs [library->get_id ()] == library);
+      return library->get_id ();
     }
-  }
 
-  if (id == m_libs.size ()) {
-    m_libs.push_back (library);
-  } else {
-    m_libs [id] = library;
-  }
+    library->keep (); //  marks the library owned by the C++ side of GSI
 
-  library->set_id (id);
-
-  //  if the new library replaces the old one, remap existing library proxies before deleting the library
-  //  (replacement is done only when all technologies are substituted)
-  lib_name_map::iterator l = m_lib_by_name.find (library->get_name ());
-  bool found = false;
-  while (l != m_lib_by_name.end () && l->first == library->get_name ()) {
-    if (m_libs [l->second] && m_libs [l->second]->get_technologies () == library->get_technologies ()) {
-      found = true;
-      break;
+    for (id = 0; id < m_libs.size (); ++id) {
+      if (m_libs [id] == 0) {
+        break;
+      }
     }
-    ++l;
+
+    if (id == m_libs.size ()) {
+      m_libs.push_back (library);
+    } else {
+      m_libs [id] = library;
+    }
+
+    library->set_id (id);
+
+    //  if the new library replaces the old one, remap existing library proxies before deleting the library
+    //  (replacement is done only when all technologies are substituted)
+    lib_name_map::iterator l = m_lib_by_name.find (library->get_name ());
+    bool found = false;
+    while (l != m_lib_by_name.end () && l->first == library->get_name ()) {
+      if (m_libs [l->second] && m_libs [l->second]->get_technologies () == library->get_technologies ()) {
+        found = true;
+        break;
+      }
+      ++l;
+    }
+
+    if (found) {
+      //  substitute
+      old_lib = m_libs [l->second];
+      m_lib_by_name.erase (l);
+    }
+
+    //  insert new lib as first of this name
+    l = m_lib_by_name.find (library->get_name ());
+    m_lib_by_name.insert (l, std::make_pair (library->get_name (), id));
   }
 
-  if (found) {
-    //  substitute
-    m_libs [l->second]->remap_to (library);
-    delete m_libs [l->second];
-    m_libs [l->second] = 0;
-    m_lib_by_name.erase (l);
-  }
+  if (old_lib) {
 
-  //  insert new lib as first of this name
-  l = m_lib_by_name.find (library->get_name ());
-  m_lib_by_name.insert (l, std::make_pair (library->get_name (), id));
+    old_lib->remap_to (library);
+
+    {
+      //  reset the library pointer only after "remap_to" -> this function may need lib_by_id.
+      tl::MutexLocker locker (&m_lock);
+      m_libs [old_lib->get_id ()] = 0;
+    }
+
+    old_lib->set_id (std::numeric_limits<lib_id_type>::max ());
+    delete old_lib;
+    old_lib = 0;
+
+  }
 
   //  take care of cold referrers - these may not get valid
   //  NOTE: this will try to substitute the cold proxies we may have generated during "remap_to" above, but
@@ -188,6 +230,13 @@ LibraryManager::register_lib (Library *library)
 Library *
 LibraryManager::lib (lib_id_type id) const
 {
+  tl::MutexLocker locker (&m_lock);
+  return lib_internal (id);
+}
+
+Library *
+LibraryManager::lib_internal (lib_id_type id) const
+{
   if (id >= m_libs.size ()) {
     return 0;
   } else {
@@ -198,17 +247,24 @@ LibraryManager::lib (lib_id_type id) const
 void
 LibraryManager::clear ()
 {
-  if (m_libs.empty ()) {
-    return;
-  }
-
-  //  empty the library table before we delete them - this avoid accesses to invalid libraries while doing so.    
   std::vector<Library *> libs;
-  libs.swap (m_libs);
-  m_lib_by_name.clear ();
+
+  {
+    tl::MutexLocker locker (&m_lock);
+
+    if (m_libs.empty ()) {
+      return;
+    }
+
+    //  empty the library table before we delete them - this avoid accesses to invalid libraries while doing so.
+    libs.swap (m_libs);
+    m_lib_by_name.clear ();
+  }
 
   for (std::vector<Library *>::iterator l = libs.begin (); l != libs.end (); ++l) {
     if (*l) {
+      (*l)->remap_to (0);
+      (*l)->set_id (std::numeric_limits<lib_id_type>::max ());
       delete *l;
     }
   }

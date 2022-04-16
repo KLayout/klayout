@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1802,6 +1802,48 @@ TEST(119_WithAndWithoutContext)
 
     CHECKPOINT ();
     db::compare_layouts (_this, gg, tl::testdata () + "/oasis/dbOASISWriter119_au.gds", db::NoNormalization);
+  }
+
+}
+
+TEST(120_IrregularInstRepetitions)
+{
+  db::Manager m (false);
+  db::Layout g (&m);
+
+  db::cell_index_type top = g.add_cell ("TOP");
+  db::cell_index_type c1 = g.add_cell ("C1");
+
+  db::Vector pts[3] = { db::Vector (0, 10), db::Vector (0, 20), db::Vector (0, 30) };
+
+  unsigned int l1 = g.insert_layer (db::LayerProperties (1, 0));
+  g.cell (c1).shapes (l1).insert (db::Box (-5, -5, 5, 5));
+  db::iterated_array<db::Coord> *reps = new db::iterated_array<db::Coord> (pts + 0, pts + 3);
+  g.cell (top).shapes (l1).insert (db::array<db::Box, db::UnitTrans> (db::Box (-5, -5, 5, 5), db::UnitTrans (), reps));
+
+  db::iterated_array<db::Coord> *rep = new db::iterated_array<db::Coord> (pts + 0, pts + 3);
+  db::CellInstArray ci1 (db::CellInst (c1), db::Trans (db::Vector (10, 0)), rep);
+  g.cell (top).insert (ci1);
+
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter120.oas"));
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    options.set_format ("OASIS");
+    db::Writer writer (options);
+    writer.write (g, out);
+  }
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    db::Layout gg;
+    reader.set_warnings_as_errors (true);
+    reader.read (gg);
+
+    CHECKPOINT ();
+    db::compare_layouts (_this, gg, tl::testdata () + "/oasis/dbOASISWriter120_au.gds", db::NoNormalization);
   }
 
 }

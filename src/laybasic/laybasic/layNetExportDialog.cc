@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ int
 NetExportDialog::start_layer_number ()
 {
   int ln = 0;
-  tl::from_string (tl::to_string (ui->layernum->text ()), ln);
+  tl::from_string_ext (tl::to_string (ui->layernum->text ()), ln);
   return ln;
 }
 

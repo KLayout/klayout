@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ class LayerMapping;
  *  a set of child cell instances and auxiliary information such as
  *  the parent instance list.
  *  A cell is identified through an index given to the cell upon instantiation.
- *  The cell index is valid in the context of a cell graph object which
+ *  The cell index is valid in the context of a layout object which
  *  must issue the cell index.
  */
 
@@ -483,7 +483,7 @@ public:
   bool is_shape_bbox_dirty () const;
 
   /** 
-   *  @brief Update the bbox 
+   *  @brief Updates the bbox
    *
    *  This will update the bbox from the shapes and instances.
    *  This requires the bboxes of the child cells to be computed
@@ -496,8 +496,9 @@ public:
    *  @return true, if the bounding box has changed.
    */
   bool update_bbox (unsigned int layers);
+
   /**
-   *  @brief Sort the shapes lists 
+   *  @brief Sorts the shapes lists
    *
    *  This will sort the shapes lists for query of regions 
    *  on a per-shape basis. Since sorting of the shapes is
@@ -511,7 +512,7 @@ public:
    *
    *  Before the bounding box can be retrieved, it must have
    *  been computed using update_bbox. This is performed by 
-   *  requesting an update from the graph.
+   *  requesting an update from the layout.
    *
    *  @return The bounding box that was computed by update_bbox
    */
@@ -522,7 +523,7 @@ public:
    *
    *  Before the bounding box can be retrieved, it must have
    *  been computed using update_bbox. This is performed by 
-   *  requesting an update from the graph.
+   *  requesting an update from the layout.
    *
    *  @return The bounding box that was computed by update_bbox
    */
@@ -1026,10 +1027,10 @@ protected:
   /**
    *  @brief Standard constructor: create an empty cell object
    * 
-   *  Takes the manager object from the graph object.
+   *  Takes the manager object from the layout object.
    *
    *  @param ci The index of the cell
-   *  @param g A reference to the graph object that owns the cell
+   *  @param g A reference to the layout object that owns the cell
    */
   Cell (cell_index_type ci, db::Layout &g);
 
@@ -1065,7 +1066,7 @@ private:
   //  linked list, used by Layout
   Cell *mp_last, *mp_next;
 
-  //  clear the shapes without telling the graph
+  //  clear the shapes without telling the layout
   void clear_shapes_no_invalidate ();
 
   //  helper function for computing the number of hierarchy levels

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ namespace tl
 {
 
 class HttpCredentialProvider;
+class InputHttpStream;
 
 class AuthenticationHandler
   : public QObject
@@ -66,7 +67,7 @@ class InputHttpStreamPrivateData
 Q_OBJECT
 
 public:
-  InputHttpStreamPrivateData (const std::string &url);
+  InputHttpStreamPrivateData (InputHttpStream *stream, const std::string &url);
 
   virtual ~InputHttpStreamPrivateData ();
 
@@ -76,6 +77,8 @@ public:
   void set_data (const char *data);
   void set_data (const char *data, size_t n);
   void add_header (const std::string &name, const std::string &value);
+  void set_timeout (double to);
+  double timeout () const;
 
   tl::Event &ready ()
   {
@@ -118,6 +121,8 @@ private:
   tl::Event m_ready;
   QTimer *mp_resend_timer;
   std::string m_ssl_errors;
+  double m_timeout;
+  InputHttpStream *mp_stream;
 
   void issue_request (const QUrl &url);
 };

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -80,12 +80,12 @@ MAGReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Techn
   db::MAGReaderOptions *options = dynamic_cast<db::MAGReaderOptions *> (o);
   if (options) {
 
-    tl::from_string (tl::to_string (mp_ui->dbu_le->text ()), options->dbu);
+    tl::from_string_ext (tl::to_string (mp_ui->dbu_le->text ()), options->dbu);
     if (options->dbu > 1000.0 || options->dbu < 1e-9) {
       throw tl::Exception (tl::to_string (QObject::tr ("Invalid value for database unit")));
     }
 
-    tl::from_string (tl::to_string (mp_ui->lambda_le->text ()), options->lambda);
+    tl::from_string_ext (tl::to_string (mp_ui->lambda_le->text ()), options->lambda);
     if (options->lambda > 10000000.0 || options->lambda < 1e-9) {
       throw tl::Exception (tl::to_string (QObject::tr ("Invalid value for lambda")));
     }

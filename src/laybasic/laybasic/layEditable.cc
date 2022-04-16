@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -159,7 +159,10 @@ Editables::selection_catch_bbox ()
 {
   db::DBox sel_bbox;
   for (iterator e = begin (); e != end (); ++e) {
-    double l = e->catch_distance ();
+    //  we use a larger distance for the bbox because once there is a box it's
+    //  more likely we want to capture it and it's tedious to capture a single
+    //  text otherwise (issue-994).
+    double l = e->catch_distance () * 3.0;
     sel_bbox += e->selection_bbox ().enlarged (db::DVector (l, l));
   }
   return sel_bbox;

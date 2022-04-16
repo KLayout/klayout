@@ -159,6 +159,11 @@ module LVS
   LVSInterpreter::new(lvs_recipe)
   LVSPlainTextInterpreter::new(lvs_recipe)
 
+  # Creates a new macro category
+  if RBA::Application::instance 
+    RBA::Application::instance.add_macro_category("lvs", "LVS", [ "lvs" ])
+  end
+ 
 end
 </text>
 </klayout-macro>

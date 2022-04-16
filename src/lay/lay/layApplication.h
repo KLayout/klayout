@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #define HDR_layApplication
 
 #include "layCommon.h"
+#include "layBusy.h"
 
 #include <QApplication>
 #include <QEventLoop>
@@ -214,6 +215,13 @@ public:
   }
 
   /**
+   *  @brief Adds a new macro category
+   *
+   *  This method is only effective when called during the autorun_early stage
+   */
+  void add_macro_category (const std::string &name, const std::string &description, const std::vector<std::string> &folders);
+
+  /**
    *  @brief Return true, if undo buffering is enabled
    */
   bool is_undo_enabled () const
@@ -366,7 +374,7 @@ private:
  *  @brief The GUI-enabled application class
  */
 class LAY_PUBLIC GuiApplication
-  : public QApplication, public ApplicationBase
+  : public QApplication, public ApplicationBase, public lay::BusyMode
 {
 public:
   GuiApplication (int &argc, char **argv);
@@ -407,6 +415,19 @@ public:
   {
     return mp_mw;
   }
+
+  /**
+   *  @brief Enters busy mode (true) or leaves it (false)
+   *
+   *  Use lay::BusySection to declare a section in "busy" mode. In busy mode, some features are disabled to
+   *  prevent recursion in processing of events.
+   */
+  virtual void enter_busy_mode (bool bm);
+
+  /**
+   *  @brief Gets a value indicating whether busy mode is enabled
+   */
+  virtual bool is_busy () const;
 
   /**
    *  @brief Forces update of the application menu

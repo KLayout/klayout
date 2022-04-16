@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,7 +28,8 @@
 
 static std::string np (const std::string &s)
 {
-  return tl::replaced (s, "\\", "/");
+  std::string t = tl::replaced (s, "\\\\", "/");
+  return tl::replaced (t, "\\", "/");
 }
 
 TEST(1_simple)
@@ -106,5 +107,33 @@ TEST(4_multi_include_interpolate)
   EXPECT_EQ (ie.translate_to_original (5).second, 3);
   EXPECT_EQ (ie.translate_to_original (6).first, fn);
   EXPECT_EQ (ie.translate_to_original (6).second, 3);
+}
+
+TEST(5_issue946)
+{
+  std::string fn = tl::testdata () + "/tl/x_inc4.txt";
+
+  std::string et;
+  tl::IncludeExpander ie = tl::IncludeExpander::expand (fn, tl::InputStream (fn).read_all (), et);
+  EXPECT_EQ (et, "A line\nincluded.4\nAnother line\n");
+
+  EXPECT_EQ (np (ie.to_string ()), np ("@1*" + tl::testdata () + "/tl/x_inc4.txt*0;2*'" + tl::testdata () + "/tl/inc 4.txt'*-1;3*" + tl::testdata () + "/tl/x_inc4.txt*0;"));
+  EXPECT_EQ (tl::IncludeExpander::from_string (ie.to_string ()).to_string (), ie.to_string ());
+
+  EXPECT_EQ (ie.translate_to_original (1).first, fn);
+  EXPECT_EQ (ie.translate_to_original (1).second, 1);
+  EXPECT_EQ (np (ie.translate_to_original (2).first), np (tl::testdata () + "/tl/inc 4.txt"));
+  EXPECT_EQ (ie.translate_to_original (2).second, 1);
+  EXPECT_EQ (ie.translate_to_original (3).first, fn);
+  EXPECT_EQ (ie.translate_to_original (3).second, 3);
+
+  fn = tl::testdata () + "/tl/inc 4.txt";
+
+  et.clear ();
+  ie = tl::IncludeExpander::expand (fn, tl::InputStream (fn).read_all (), et);
+  EXPECT_EQ (et, "included.4\n");
+
+  //  no quotes here so this string can be used as the original file name if there is no include
+  EXPECT_EQ (np (ie.to_string ()), np (tl::testdata () + "/tl/inc 4.txt"));
 }
 

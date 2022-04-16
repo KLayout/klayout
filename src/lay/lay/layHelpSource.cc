@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -53,6 +53,9 @@
 
 namespace lay
 {
+
+static const std::string index_url ("/index.xml");
+static const std::string search_url ("/search.xml");
 
 // --------------------------------------------------------------------------------------
 //  Some utilities
@@ -285,7 +288,14 @@ HelpSource::initialize_index ()
         tl::XMLFileSource in (*c);
         help_index_structure.parse (in, *this);
         if (m_klayout_version == lay::ApplicationBase::version ()) {
+          if (tl::verbosity () >= 10) {
+            tl::info << tl::to_string (tr ("Help index initialized from ")) << *c;
+          }
           ok = true;
+        } else {
+          if (tl::verbosity () >= 10) {
+            tl::warn << tl::to_string (tr ("Help index ignored (wrong version) from ")) << *c;
+          }
         }
       } catch (tl::Exception &ex) {
         tl::warn << ex.msg ();
@@ -322,13 +332,8 @@ HelpSource::~HelpSource()
 void
 HelpSource::produce_index_file (const std::string &path)
 {
-  m_index.clear ();
-  m_titles.clear ();
-  m_title_map.clear ();
-  m_parent_of.clear ();
+  scan ();
 
-  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Initializing help index")), 1, false /*can't cancel*/);
-  scan ("/index.xml", progress);
   try {
 
     tl::OutputStream os (path, tl::OutputStream::OM_Plain);
@@ -348,6 +353,18 @@ HelpSource::create_index_file (const std::string &path)
 {
   HelpSource source (false);
   source.produce_index_file (path);
+}
+
+void
+HelpSource::scan ()
+{
+  m_index.clear ();
+  m_titles.clear ();
+  m_title_map.clear ();
+  m_parent_of.clear ();
+
+  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Initializing help index")), 1);
+  scan (index_url, progress);
 }
 
 std::string
@@ -461,21 +478,21 @@ HelpSource::get_dom (const std::string &u)
   QString path = url.path ();
 
   for (tl::Registrar<lay::HelpProvider>::iterator cls = tl::Registrar<lay::HelpProvider>::begin (); cls != tl::Registrar<lay::HelpProvider>::end (); ++cls) {
-    if (path.startsWith (tl::to_qstring ("/" + cls->folder () + "/"))) {
+    if (path.startsWith (tl::to_qstring ("/" + cls->folder (this) + "/"))) {
       if (tl::verbosity () >= 20) {
         tl::info << "Help provider: create content for " << u;
       }
-      return cls->get (u);
+      return cls->get (this, u);
     }
   }
 
-  if (path == QString::fromUtf8 ("/search.xml")) {
+  if (path == tl::to_qstring (search_url)) {
 #if QT_VERSION >= 0x050000
     return produce_search (tl::to_string (QUrlQuery (url.query ()).queryItemValue (QString::fromUtf8 ("string")).toLower ()));
 #else
     return produce_search (tl::to_string (url.queryItemValue (QString::fromUtf8 ("string")).toLower ()));
 #endif
-  } else if (path == QString::fromUtf8 ("/index.xml")) {
+  } else if (path == tl::to_qstring (index_url)) {
     if (tl::verbosity () >= 20) {
       tl::info << "Help provider: create content for " << u;
     }
@@ -581,9 +598,14 @@ std::string
 HelpSource::next_topic (const std::string &url)
 {
   std::string u = tl::to_string (QUrl::fromEncoded (url.c_str ()).path ());
-  for (size_t t = 0; t + 1 < m_titles.size (); ++t) {
+  for (size_t t = m_titles.size (); t > 0; ) {
+    --t;
     if (m_titles [t].first == u) {
-      return "int:" + m_titles [t + 1].first;
+      if (t + 1 >= m_titles.size ()) {
+        return std::string ();
+      } else {
+        return "int:" + m_titles [t + 1].first;
+      }
     }
   }
   return std::string ();
@@ -618,7 +640,7 @@ HelpSource::produce_main_index ()
 
   os << "<topics>" << std::endl;
   for (tl::Registrar<lay::HelpProvider>::iterator cls = tl::Registrar<lay::HelpProvider>::begin (); cls != tl::Registrar<lay::HelpProvider>::end (); ++cls) {
-    os << "<topic href=\"" << cls->index () << "\"/>" << std::endl;
+    os << "<topic href=\"" << cls->index (this) << "\"/>" << std::endl;
   }
   os << "</topics>" << std::endl;
 
@@ -1056,11 +1078,29 @@ std::vector<std::string>
 HelpSource::urls ()
 {
   std::vector<std::string> u;
-  u.push_back ("/index.xml");
+  u.push_back (index_url);
   for (std::map<std::string, std::string>::const_iterator p = m_parent_of.begin (); p != m_parent_of.end (); ++p) {
     u.push_back (p->first);
   }
   return u;
+}
+
+void
+HelpSource::set_option (const std::string &key, const tl::Variant &value)
+{
+  s_global_options[key] = value;
+}
+
+const tl::Variant &
+HelpSource::get_option (const std::string &key) const
+{
+  auto i = s_global_options.find (key);
+  if (i != s_global_options.end ()) {
+    return i->second;
+  } else {
+    static tl::Variant nil;
+    return nil;
+  }
 }
 
 }

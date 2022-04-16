@@ -54,6 +54,12 @@ class PCell(pya.PCellDeclarationHelper):
   # def transformation_from_shape_impl(self):
   #   TODO: return a RBA::Trans object for the initial transformation of
   #   the instance
+  # 
+  # optional:
+  # def wants_lazy_evaluation(self):
+  #   TODO: return "True" here if the PCell takes a long time to compute.
+  #   In lazy mode, the user has to acknowledge parameter changes before 
+  #   they are executed.
   
 # TODO: add more PCell classes ..
 

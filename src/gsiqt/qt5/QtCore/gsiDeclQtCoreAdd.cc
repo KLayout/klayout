@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@
 #include <QPoint>
 #include <QColor>
 #include <QSize>
-#include <QAbstractMessageHandler>
 
 //  NOTE: this is required because HitTestAccuracy is defined here, but goes into Qt
 //  namespace which is in QtCore ... this introduces a dependency of QtCore GSI lib on QtGui.

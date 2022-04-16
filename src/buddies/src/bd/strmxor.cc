@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 */
 
 #include "bdReaderOptions.h"
+#include "bdWriterOptions.h"
 #include "dbLayout.h"
 #include "dbTilingProcessor.h"
 #include "dbReader.h"
@@ -30,12 +31,34 @@
 #include "dbDeepShapeStore.h"
 #include "gsiExpression.h"
 #include "tlCommandLineParser.h"
+#include "tlThreads.h"
 
-class CountingInserter
+namespace {
+
+// ---------------------------------------------------------------------
+
+class HealingCountingReceiver
+  : public db::TileOutputReceiver
 {
 public:
-  CountingInserter ()
-    : m_count (0)
+  HealingCountingReceiver (size_t *count, bool healing);
+
+  virtual void put (size_t /*ix*/, size_t /*iy*/, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double /*dbu*/, const db::ICplxTrans & /*trans*/, bool clip);
+  virtual void finish (bool);
+
+  void keep_for_healing (const db::Polygon &poly);
+
+private:
+  size_t *mp_count;
+  db::Region m_for_healing;
+  bool m_healing;
+};
+
+class HealingCountingInserter
+{
+public:
+  HealingCountingInserter (const db::Box &tile, bool healing, HealingCountingReceiver *rec)
+    : m_count (0), mp_tile (&tile), m_healing (healing), mp_receiver (rec)
   {
     //  .. nothing yet ..
   }
@@ -46,6 +69,15 @@ public:
     m_count += 1;
   }
 
+  void operator() (const db::Polygon &poly)
+  {
+    if (m_healing && ! poly.box ().inside (mp_tile->enlarged (db::Vector (-1, -1)))) {
+      mp_receiver->keep_for_healing (poly);
+    } else {
+      m_count += 1;
+    }
+  }
+
   size_t count () const
   {
     return m_count;
@@ -53,28 +85,139 @@ public:
 
 private:
   size_t m_count;
+  const db::Box *mp_tile;
+  bool m_healing;
+  HealingCountingReceiver *mp_receiver;
 };
 
-class CountingReceiver
+HealingCountingReceiver::HealingCountingReceiver (size_t *count, bool healing)
+  : mp_count (count), m_healing (healing)
+{
+  //  .. nothing yet ..
+}
+
+void
+HealingCountingReceiver::put (size_t /*ix*/, size_t /*iy*/, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double /*dbu*/, const db::ICplxTrans & /*trans*/, bool clip)
+{
+  HealingCountingInserter inserter (tile, m_healing, this);
+  db::insert_var (inserter, obj, tile, clip);
+  *mp_count += inserter.count ();
+}
+
+void
+HealingCountingReceiver::keep_for_healing (const db::Polygon &poly)
+{
+  m_for_healing.insert (poly);
+}
+
+void
+HealingCountingReceiver::finish (bool)
+{
+  if (m_healing) {
+    *mp_count += m_for_healing.merged ().count ();
+  }
+}
+
+// ---------------------------------------------------------------------
+
+class HealingTileLayoutOutputReceiver
   : public db::TileOutputReceiver
 {
 public:
-  CountingReceiver (size_t *count)
-    : mp_count (count)
+  HealingTileLayoutOutputReceiver (db::Layout *layout, db::Cell *cell, unsigned int layer, bool healing);
+
+  void put (size_t /*ix*/, size_t /*iy*/, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double dbu, const db::ICplxTrans &trans, bool clip);
+
+  void begin (size_t /*nx*/, size_t /*ny*/, const db::DPoint & /*p0*/, double /*dx*/, double /*dy*/, const db::DBox & /*frame*/);
+  void finish (bool /*success*/);
+
+  void keep_for_healing (const db::Polygon &poly);
+  void output (const db::Polygon &poly);
+
+private:
+  db::Layout *mp_layout;
+  db::Cell *mp_cell;
+  unsigned int m_layer;
+  db::Region m_for_healing;
+  bool m_healing;
+  tl::Mutex m_mutex;
+};
+
+class HealingTileLayoutOutputInserter
+{
+public:
+  HealingTileLayoutOutputInserter (const db::Box &tile, bool healing, const db::ICplxTrans &trans, HealingTileLayoutOutputReceiver *rec)
+    : mp_tile (&tile), m_healing (healing), mp_trans (&trans), mp_receiver (rec)
   {
     //  .. nothing yet ..
   }
 
-  virtual void put (size_t /*ix*/, size_t /*iy*/, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double /*dbu*/, const db::ICplxTrans & /*trans*/, bool clip)
+  template <class T>
+  void operator() (const T & /*t*/)
   {
-    CountingInserter inserter;
-    db::insert_var (inserter, obj, tile, clip);
-    *mp_count += inserter.count ();
+    //  .. ignore other shapes
+  }
+
+  void operator() (const db::Polygon &poly)
+  {
+    if (m_healing && ! poly.box ().inside (mp_tile->enlarged (db::Vector (-1, -1)))) {
+      mp_receiver->keep_for_healing (*mp_trans * poly);
+    } else {
+      mp_receiver->output (*mp_trans * poly);
+    }
   }
 
 private:
-  size_t *mp_count;
+  const db::Box *mp_tile;
+  bool m_healing;
+  const db::ICplxTrans *mp_trans;
+  HealingTileLayoutOutputReceiver *mp_receiver;
 };
+
+HealingTileLayoutOutputReceiver::HealingTileLayoutOutputReceiver (db::Layout *layout, db::Cell *cell, unsigned int layer, bool healing)
+  : mp_layout (layout), mp_cell (cell), m_layer (layer), m_healing (healing)
+{
+  //  .. nothing yet ..
+}
+
+void
+HealingTileLayoutOutputReceiver::put (size_t /*ix*/, size_t /*iy*/, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double dbu, const db::ICplxTrans &trans, bool clip)
+{
+  db::ICplxTrans tr (db::ICplxTrans (dbu / mp_layout->dbu ()) * trans);
+  HealingTileLayoutOutputInserter inserter (tile, m_healing, tr, this);
+  db::insert_var (inserter, obj, tile, clip);
+}
+
+void
+HealingTileLayoutOutputReceiver::begin (size_t /*nx*/, size_t /*ny*/, const db::DPoint & /*p0*/, double /*dx*/, double /*dy*/, const db::DBox & /*frame*/)
+{
+  mp_layout->start_changes ();
+}
+
+void
+HealingTileLayoutOutputReceiver::finish (bool /*success*/)
+{
+  //  heal the polygons
+  m_for_healing.merge ();
+  m_for_healing.insert_into (mp_layout, mp_cell->cell_index (), m_layer);
+  m_for_healing.clear ();
+
+  mp_layout->end_changes ();
+}
+
+void
+HealingTileLayoutOutputReceiver::keep_for_healing (const db::Polygon &poly)
+{
+  m_for_healing.insert (poly);
+}
+
+void
+HealingTileLayoutOutputReceiver::output (const db::Polygon &poly)
+{
+  mp_cell->shapes (m_layer).insert (poly);
+}
+
+// ---------------------------------------------------------------------
 
 struct ResultDescriptor
 {
@@ -119,6 +262,8 @@ struct ResultDescriptor
   }
 };
 
+// ---------------------------------------------------------------------
+
 struct XORData
 {
   XORData ()
@@ -126,7 +271,8 @@ struct XORData
       tolerance_bump (0),
       dont_summarize_missing_layers (false), silent (false), no_summary (false),
       threads (0),
-      tile_size (0.0), output_layout (0), output_cell (0)
+      tile_size (0.0), heal_results (false),
+      output_layout (0), output_cell (0)
   { }
 
   db::Layout *layout_a, *layout_b;
@@ -138,11 +284,16 @@ struct XORData
   bool no_summary;
   int threads;
   double tile_size;
+  bool heal_results;
   db::Layout *output_layout;
   db::cell_index_type output_cell;
   std::map<db::LayerProperties, std::pair<int, int>, db::LPLogicalLessFunc> l2l_map;
   std::map<std::pair<int, db::LayerProperties>, ResultDescriptor> *results;
 };
+
+}
+
+// ---------------------------------------------------------------------
 
 static bool run_tiled_xor (const XORData &xor_data);
 static bool run_deep_xor (const XORData &xor_data);
@@ -171,10 +322,14 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   int tolerance_bump = 10000;
   int threads = 1;
   double tile_size = 0.0;
+  bool heal_results = false;
 
   tl::CommandLineOptions cmd;
   generic_reader_options_a.add_options (cmd);
   generic_reader_options_b.add_options (cmd);
+
+  bd::GenericWriterOptions writer_options;
+  writer_options.add_options (cmd);
 
   cmd << tl::arg ("input_a",                   &infile_a,   "The first input file (any format, may be gzip compressed)")
       << tl::arg ("input_b",                   &infile_b,   "The second input file (any format, may be gzip compressed)")
@@ -219,6 +374,10 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
                   "In tiling mode, the layout is divided into tiles of the given size. Each tile is computed "
                   "individually. Multiple tiles can be processed in parallel on multiple cores."
                  )
+      << tl::arg ("-m|--heal",                 &heal_results, "Heal results in tiling mode",
+                  "This options runs a post-XOR merge to remove cuts implied by the tile formation. The resulting "
+                  "feature count is closer to the real number of differences."
+                 )
       << tl::arg ("-b|--layer-bump=offset",    &tolerance_bump, "Specifies the layer number offset to add for every tolerance",
                   "This value is the number added to the original layer number to form a layer set for each tolerance "
                   "value. If this value is set to 1000, the first tolerance value will produce XOR results on the "
@@ -253,10 +412,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
 
     db::LoadLayoutOptions load_options;
     generic_reader_options_a.configure (load_options);
-
-    tl::InputStream stream (infile_a);
-    db::Reader reader (stream);
-    reader.read (layout_a, load_options);
+    bd::read_files (layout_a, infile_a, load_options);
   }
 
   {
@@ -264,10 +420,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
 
     db::LoadLayoutOptions load_options;
     generic_reader_options_b.configure (load_options);
-
-    tl::InputStream stream (infile_b);
-    db::Reader reader (stream);
-    reader.read (layout_b, load_options);
+    bd::read_files (layout_b, infile_b, load_options);
   }
 
   if (top_a.empty ()) {
@@ -335,6 +488,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   xor_data.no_summary = no_summary;
   xor_data.threads = threads;
   xor_data.tile_size = tile_size;
+  xor_data.heal_results = heal_results;
   xor_data.output_layout = output_layout.get ();
   xor_data.output_cell = output_top;
   xor_data.l2l_map = l2l_map;
@@ -356,6 +510,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
 
     db::SaveLayoutOptions save_options;
     save_options.set_format_from_filename (output);
+    writer_options.configure (save_options, *output_layout);
 
     tl::OutputStream stream (output);
     db::Writer writer (save_options);
@@ -413,7 +568,6 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   return result ? 0 : 1;
 }
 
-
 bool run_tiled_xor (const XORData &xor_data)
 {
   db::TilingProcessor proc;
@@ -422,6 +576,7 @@ bool run_tiled_xor (const XORData &xor_data)
   if (xor_data.tile_size > db::epsilon) {
     if (tl::verbosity () >= 20) {
       tl::log << "Tile size: " << xor_data.tile_size;
+      tl::log << "Healing: " << (xor_data.heal_results ? "on" : "off");
     }
     proc.tile_size (xor_data.tile_size, xor_data.tile_size);
   }
@@ -444,8 +599,6 @@ bool run_tiled_xor (const XORData &xor_data)
   bool result = true;
 
   int index = 1;
-
-  std::list<tl::shared_ptr<CountingReceiver> > counters;
 
   for (std::map<db::LayerProperties, std::pair<int, int> >::const_iterator ll = xor_data.l2l_map.begin (); ll != xor_data.l2l_map.end (); ++ll) {
 
@@ -509,10 +662,10 @@ bool run_tiled_xor (const XORData &xor_data)
 
         if (result.layout) {
           result.layer_output = result.layout->insert_layer (lp);
-          proc.output (out, *result.layout, result.top_cell, result.layer_output);
+          HealingTileLayoutOutputReceiver *receiver = new HealingTileLayoutOutputReceiver (result.layout, &result.layout->cell (result.top_cell), result.layer_output, xor_data.heal_results);
+          proc.output (out, 0, receiver, db::ICplxTrans ());
         } else {
-          CountingReceiver *counter = new CountingReceiver (&result.shape_count);
-          counters.push_back (tl::shared_ptr<CountingReceiver> (counter));
+          HealingCountingReceiver *counter = new HealingCountingReceiver (&result.shape_count, xor_data.heal_results);
           proc.output (out, 0, counter, db::ICplxTrans ());
         }
 

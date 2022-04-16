@@ -153,7 +153,7 @@ mkdir -p %{buildroot}%{pylib}/klayout
 cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/*.so %{buildroot}%{pylib}/klayout
 cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/*.py %{buildroot}%{pylib}/klayout
 chmod 644 %{buildroot}%{pylib}/klayout/*
-for d in tl db rdb; do
+for d in tl db rdb lib; do
   mkdir -p %{buildroot}%{pylib}/klayout/$d
   cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/$d/*.py %{buildroot}%{pylib}/klayout/$d
   chmod 644 %{buildroot}%{pylib}/klayout/$d/*

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -84,13 +84,16 @@ TEST(1a)
   from_string("-15.000E+1", d);
   EXPECT_EQ (to_string(d), "-150");
 
-  from_string("25400/25.4", d);
+  from_string_ext("-15.000E+1", d);
+  EXPECT_EQ (to_string(d), "-150");
+
+  from_string_ext("25400/25.4", d);
   EXPECT_EQ (to_string(d), "1000");
 
-  from_string("25400/(25+0.4)", d);
+  from_string_ext("25400/(25+0.4)", d);
   EXPECT_EQ (to_string(d), "1000");
 
-  from_string(" 25400   / (25  + 0.4 )   ", d);
+  from_string_ext(" 25400   / (25  + 0.4 )   ", d);
   EXPECT_EQ (to_string(d), "1000");
 
   from_string("1E+03", d);
@@ -136,6 +139,8 @@ TEST(2)
   
   from_string ("   12   ", ul);
   EXPECT_EQ (ul, (unsigned int) 12);
+  from_string_ext ("   12   ", ul);
+  EXPECT_EQ (ul, (unsigned int) 12);
   error = false;
   try { from_string ("a", ul); } catch (...) { error = true; }
   EXPECT_EQ (error, true);
@@ -145,11 +150,15 @@ TEST(2)
 
   from_string ("   12   ", l);
   EXPECT_EQ (l, 12);
+  from_string_ext ("   12   ", l);
+  EXPECT_EQ (l, 12);
   error = false;
   try { from_string ("a", l); } catch (...) { error = true; }
   EXPECT_EQ (error, true);
 
   from_string ("   12   ", ui);
+  EXPECT_EQ (ui, (unsigned int) 12);
+  from_string_ext ("   12   ", ui);
   EXPECT_EQ (ui, (unsigned int) 12);
   error = false;
   try { from_string ("a", ui); } catch (...) { error = true; }
@@ -159,6 +168,8 @@ TEST(2)
   EXPECT_EQ (error, true);
 
   from_string ("   12   ", i);
+  EXPECT_EQ (i, 12);
+  from_string_ext ("   12   ", i);
   EXPECT_EQ (i, 12);
   error = false;
   try { from_string ("a", i); } catch (...) { error = true; }

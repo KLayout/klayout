@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -63,6 +63,18 @@ public:
   static std::string format_error (const std::string &em, int ec, const std::string &url, const std::string &body);
 };
 
+/**
+ *  @brief A callback function during waiting for a response
+ */
+class TL_PUBLIC InputHttpStreamCallback
+{
+public:
+  InputHttpStreamCallback () { }
+  virtual ~InputHttpStreamCallback () { }
+
+  virtual void wait_for_input () { }
+};
+
 class InputHttpStreamPrivateData;
 
 /**
@@ -99,8 +111,31 @@ public:
   /**
    *  @brief Polling: call this function regularly to explicitly establish polling
    *  (in the Qt framework, this is done automatically within the event loop)
+   *  May throw a tl::CancelException to stop.
+   *  Returns true if a message has arrived.
    */
   void tick ();
+
+  /**
+   *  @brief Sets a timeout callback
+   *  The callback's wait_for_input method is called regularily while the stream
+   *  waits for HTTP responses.
+   *  The implementation may throw a tl::CancelException to stop the polling.
+   */
+  void set_callback (tl::InputHttpStreamCallback *callback)
+  {
+    mp_callback = callback;
+  }
+
+  /**
+   *  @brief Sets the timeout in seconds
+   */
+  void set_timeout (double to);
+
+  /**
+   *  @brief Gets the timeout in seconds or zero if no timeout is set.
+   */
+  double timeout () const;
 
   /**
    *  @brief Sends the request for data
@@ -171,6 +206,7 @@ public:
 
 private:
   InputHttpStreamPrivateData *mp_data;
+  InputHttpStreamCallback *mp_callback;
 };
 
 }

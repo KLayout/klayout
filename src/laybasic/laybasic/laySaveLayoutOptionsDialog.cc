@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -396,8 +396,8 @@ SaveLayoutAsOptionsDialog::ok_button_pressed ()
   }
 
   double x = 0.0;
-  tl::from_string (tl::to_string (dbu_le->text ()), x);
-  tl::from_string (tl::to_string (sf_le->text ()), x);
+  tl::from_string_ext (tl::to_string (dbu_le->text ()), x);
+  tl::from_string_ext (tl::to_string (sf_le->text ()), x);
 
   accept ();
 
@@ -475,10 +475,10 @@ SaveLayoutAsOptionsDialog::get_options (lay::LayoutView *view, unsigned int cv_i
     }
 
     double dbu = 0.0;
-    tl::from_string (tl::to_string (dbu_le->text ()), dbu);
+    tl::from_string_ext (tl::to_string (dbu_le->text ()), dbu);
 
     double sf = 1.0;
-    tl::from_string (tl::to_string (sf_le->text ()), sf);
+    tl::from_string_ext (tl::to_string (sf_le->text ()), sf);
 
     options.set_dbu (dbu);
     options.set_scale_factor (sf);

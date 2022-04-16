@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2021 Matthias Koefferlein
+# Copyright (C) 2006-2022 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ class DBLayoutQuery_TestClass < TestBase
   def test_3
 
     q = RBA::LayoutQuery::new("delete TOP")
-    assert_equal(q.property_names.sort.join(","), "bbox,cell,cell_bbox,cell_index,cell_name,hier_levels,initial_cell,initial_cell_index,initial_cell_name,inst,instances,path,path_names,path_trans,references,shape,tot_weight,weight")
+    assert_equal(q.property_names.sort.join(","), "bbox,cell,cell_bbox,cell_dbbox,cell_index,cell_name,dbbox,hier_levels,initial_cell,initial_cell_index,initial_cell_name,inst,instances,path,path_dtrans,path_names,path_trans,references,shape,tot_weight,weight")
 
   end
 

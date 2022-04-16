@@ -54,9 +54,9 @@
   </p>
 
   <table>
-    <tr valign="top"><td><p>Default:</p></td><td width="5%"/><td><img src="/manual/fill_default.png"/></td></tr>
-    <tr valign="top"><td><p>Enhanced:</p></td><td width="5%"/><td><img src="/manual/fill_enhanced.png"/></td></tr>
-    <tr valign="top"><td><p>Enhanced plus<br/>second order:</p></td><td width="5%"/><td><img src="/manual/fill_second_order.png"/></td></tr>
+    <tr valign="top"><td width="10%"><b>Default:</b></td><td width="5%"/><td><img src="/manual/fill_default.png"/></td></tr>
+    <tr valign="top"><td width="10%"><b>Enhanced:</b></td><td width="5%"/><td><img src="/manual/fill_enhanced.png"/></td></tr>
+    <tr valign="top"><td width="10%"><b>Enhanced plus<br/>second order:</b></td><td width="5%"/><td><img src="/manual/fill_second_order.png"/></td></tr>
   </table>
 
 </doc>

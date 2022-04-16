@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -288,6 +288,32 @@ private:
 };
 
 /**
+ *  @brief A fuzzy compare operator for edge pairs
+ *  Compares two edge pair objects applying a tolerance between them. The tolerance is the allowed deviation
+ *  of points in database units.
+ */
+struct EdgePairCompareOpWithTolerance
+{
+  EdgePairCompareOpWithTolerance (db::Coord tolerance)
+    : m_ec (tolerance)
+  { }
+
+  bool operator() (const db::EdgePair &a, const db::EdgePair &b) const
+  {
+    if (m_ec (a.first (), b.first ())) {
+      return true;
+    } else if (m_ec (b.first (), a.first ())) {
+      return false;
+    } else {
+      return m_ec (a.second (), b.second ());
+    }
+  }
+
+private:
+  EdgeCompareOpWithTolerance m_ec;
+};
+
+/**
  *  @brief A fuzzy compare operator for boxes
  *  Compares two box objects applying a tolerance between them. The tolerance is the allowed deviation
  *  of points in database units.
@@ -492,6 +518,12 @@ make_edge_compare_func (db::Coord tolerance)
   return pair_compare_func<db::Edge, db::properties_id_type, EdgeCompareOpWithTolerance, std_compare_func<db::properties_id_type> > (EdgeCompareOpWithTolerance (tolerance), std_compare_func<db::properties_id_type> ());
 }
 
+pair_compare_func<db::EdgePair, db::properties_id_type, EdgePairCompareOpWithTolerance, std_compare_func<db::properties_id_type> >
+make_edge_pair_compare_func (db::Coord tolerance)
+{
+  return pair_compare_func<db::EdgePair, db::properties_id_type, EdgePairCompareOpWithTolerance, std_compare_func<db::properties_id_type> > (EdgePairCompareOpWithTolerance (tolerance), std_compare_func<db::properties_id_type> ());
+}
+
 pair_compare_func<db::Box, db::properties_id_type, BoxCompareOpWithTolerance, std_compare_func<db::properties_id_type> >
 make_box_compare_func (db::Coord tolerance)
 {
@@ -537,6 +569,21 @@ collect_edges (const db::Layout & /*l*/, const db::Cell *c, unsigned int layer, 
     }
     shapes.push_back (std::make_pair (db::Edge (), prop_id));
     s->edge (shapes.back ().first);
+  }
+}
+
+static void
+collect_edge_pairs (const db::Layout & /*l*/, const db::Cell *c, unsigned int layer, unsigned int flags, std::vector< std::pair<db::EdgePair, db::properties_id_type> > &shapes, PropertyMapper &pn)
+{
+  shapes.clear ();
+
+  for (db::ShapeIterator s = c->shapes (layer).begin (db::ShapeIterator::EdgePairs); !s.at_end (); ++s) {
+    db::properties_id_type prop_id = 0;
+    if (! (flags & layout_diff::f_no_properties)) {
+      prop_id = pn (s->prop_id ());
+    }
+    shapes.push_back (std::make_pair (db::EdgePair (), prop_id));
+    s->edge_pair (shapes.back ().first);
   }
 }
 
@@ -828,6 +875,8 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
   std::vector <std::pair <db::Box, db::properties_id_type> > boxes_b;
   std::vector <std::pair <db::Edge, db::properties_id_type> > edges_a;
   std::vector <std::pair <db::Edge, db::properties_id_type> > edges_b;
+  std::vector <std::pair <db::EdgePair, db::properties_id_type> > edge_pairs_a;
+  std::vector <std::pair <db::EdgePair, db::properties_id_type> > edge_pairs_b;
 
   for (unsigned int cci = 0; cci < common_cells.size (); ++cci) {
 
@@ -1053,6 +1102,31 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
         r.end_edge_differences ();
       }
 
+      //  compare edge pairs
+
+      edge_pairs_a.clear();
+      edge_pairs_b.clear();
+      if (is_valid_a) {
+        collect_edge_pairs (a, cell_a, layer_a, flags, edge_pairs_a, prop_normalize_a);
+      }
+      if (is_valid_b) {
+        collect_edge_pairs (b, cell_b, layer_b, flags, edge_pairs_b, prop_normalize_b);
+      }
+
+      reduce (edge_pairs_a, edge_pairs_b, make_edge_pair_compare_func (tolerance), tolerance > 0);
+
+      if (!edge_pairs_a.empty () || !edge_pairs_b.empty ()) {
+        differs = true;
+        if (flags & layout_diff::f_silent) {
+          return false;
+        }
+        r.begin_edge_pair_differences ();
+        if (verbose) {
+          r.detailed_diff (n.properties_repository (), edge_pairs_a, edge_pairs_b);
+        }
+        r.end_edge_pair_differences ();
+      }
+
       r.end_layer ();
 
     }
@@ -1130,6 +1204,9 @@ public:
   void begin_edge_differences ();
   void detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::Edge, db::properties_id_type> > &a, const std::vector <std::pair <db::Edge, db::properties_id_type> > &b);
   void end_edge_differences ();
+  void begin_edge_pair_differences ();
+  void detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &a, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &b);
+  void end_edge_pair_differences ();
   void begin_text_differences ();
   void detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::Text, db::properties_id_type> > &a, const std::vector <std::pair <db::Text, db::properties_id_type> > &b);
   void end_text_differences ();
@@ -1522,6 +1599,34 @@ PrintingDifferenceReceiver::detailed_diff (const db::PropertiesRepository &pr, c
 
 void
 PrintingDifferenceReceiver::end_edge_differences ()
+{
+}
+
+void
+PrintingDifferenceReceiver::begin_edge_pair_differences ()
+{
+  try {
+    enough (tl::error) << "Edge pairs differ for layer " << m_layer.to_string () << " in cell " << m_cellname;
+  } catch (tl::CancelException &) {
+    //  ignore cancel exceptions
+  }
+}
+
+void
+PrintingDifferenceReceiver::detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &a, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &b)
+{
+  try {
+    enough (tl::info) << "Not in b but in a:";
+    print_diffs (pr, a, b);
+    enough (tl::info) << "Not in a but in b:";
+    print_diffs (pr, b, a);
+  } catch (tl::CancelException &) {
+    //  ignore cancel exceptions
+  }
+}
+
+void
+PrintingDifferenceReceiver::end_edge_pair_differences ()
 {
 }
 

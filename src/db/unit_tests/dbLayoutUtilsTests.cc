@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@
 #include "dbCellMapping.h"
 #include "dbTestSupport.h"
 #include "dbReader.h"
+#include "dbLayoutDiff.h"
+#include "dbPropertiesRepository.h"
 #include "tlString.h"
 #include "tlUnitTest.h"
 
@@ -653,3 +655,127 @@ TEST(18_scale_and_snap)
   CHECKPOINT();
   db::compare_layouts (_this, l1, tl::testdata () + "/algo/layout_utils_au_sns3.gds");
 }
+
+TEST(19_scale_and_snap_basic)
+{
+  db::Layout l1;
+  db::Layout l2;
+
+  db::PropertiesRepository::properties_set ps1;
+  ps1.insert (std::make_pair (l1.properties_repository ().prop_name_id (tl::Variant ("p")), tl::Variant (17)));
+  db::properties_id_type pid1 = l1.properties_repository ().properties_id (ps1);
+
+  db::PropertiesRepository::properties_set ps2;
+  ps2.insert (std::make_pair (l2.properties_repository ().prop_name_id (tl::Variant ("p")), tl::Variant (17)));
+  db::properties_id_type pid2 = l2.properties_repository ().properties_id (ps2);
+
+  db::Cell &top1 = l1.cell (l1.add_cell ("TOP"));
+  db::Cell &top2 = l2.cell (l2.add_cell ("TOP"));
+
+  db::Cell &a1 = l1.cell (l1.add_cell ("A"));
+  db::Cell &a2a = l2.cell (l2.add_cell ("A"));
+
+  unsigned int layer1 = l1.insert_layer (db::LayerProperties (1, 0));
+  unsigned int layer2 = l2.insert_layer (db::LayerProperties (1, 0));
+
+  a1.shapes (layer1).insert (db::Box (0, 0, 100, 100));
+  a2a.shapes (layer2).insert (db::Box (0, 0, 100, 100));
+
+  top1.shapes (layer1).insert (db::Box (11, 21, 31, 41));
+  top2.shapes (layer2).insert (db::Box (10, 20, 30, 40));
+
+  top1.shapes (layer1).insert (db::BoxWithProperties (db::Box (11, 21, 31, 41), pid1));
+  top2.shapes (layer2).insert (db::BoxWithProperties (db::Box (10, 20, 30, 40), pid2));
+
+  top1.shapes (layer1).insert (db::Edge (11, 21, 31, 41));
+  top2.shapes (layer2).insert (db::Edge (10, 20, 30, 40));
+
+  top1.shapes (layer1).insert (db::EdgeWithProperties (db::Edge (11, 21, 31, 41), pid1));
+  top2.shapes (layer2).insert (db::EdgeWithProperties (db::Edge (10, 20, 30, 40), pid2));
+
+  top1.shapes (layer1).insert (db::EdgePair (db::Edge (11, 21, 31, 41), db::Edge (111, 121, 131, 141)));
+  top2.shapes (layer2).insert (db::EdgePair (db::Edge (10, 20, 30, 40), db::Edge (110, 120, 130, 140)));
+
+  top1.shapes (layer1).insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (11, 21, 31, 41), db::Edge (111, 121, 131, 141)), pid1));
+  top2.shapes (layer2).insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (10, 20, 30, 40), db::Edge (110, 120, 130, 140)), pid2));
+
+  top1.shapes (layer1).insert (db::Polygon (db::Box (11, 21, 31, 41)));
+  top2.shapes (layer2).insert (db::Polygon (db::Box (10, 20, 30, 40)));
+
+  top1.shapes (layer1).insert (db::PolygonWithProperties (db::Polygon (db::Box (11, 21, 31, 41)), pid1));
+  top2.shapes (layer2).insert (db::PolygonWithProperties (db::Polygon (db::Box (10, 20, 30, 40)), pid2));
+
+  db::Point pts1[] = {
+    db::Point (1, 101),
+    db::Point (101, 101),
+    db::Point (101, 201)
+  };
+
+  db::Point pts2[] = {
+    db::Point (0, 100),
+    db::Point (100, 100),
+    db::Point (100, 200)
+  };
+
+  top1.shapes (layer1).insert (db::Path (&pts1 [0], &pts1 [sizeof (pts1) / sizeof(pts1 [0])], 20));
+  top2.shapes (layer2).insert (db::Path (&pts2 [0], &pts2 [sizeof (pts2) / sizeof(pts2 [0])], 20));
+
+  top1.shapes (layer1).insert (db::PathWithProperties (db::Path (&pts1 [0], &pts1 [sizeof (pts1) / sizeof(pts1 [0])], 20), pid1));
+  top2.shapes (layer2).insert (db::PathWithProperties (db::Path (&pts2 [0], &pts2 [sizeof (pts2) / sizeof(pts2 [0])], 20), pid2));
+
+  top1.shapes (layer1).insert (db::Text ("t1", db::Trans (db::Vector (11, 21))));
+  top2.shapes (layer2).insert (db::Text ("t1", db::Trans (db::Vector (10, 20))));
+
+  top1.shapes (layer1).insert (db::TextWithProperties (db::Text ("t1", db::Trans (db::Vector (11, 21))), pid1));
+  top2.shapes (layer2).insert (db::TextWithProperties (db::Text ("t1", db::Trans (db::Vector (10, 20))), pid2));
+
+  top1.insert (db::CellInstArray (db::CellInst (a1.cell_index ()), db::Trans (db::Vector (11, 21))));
+  top2.insert (db::CellInstArray (db::CellInst (a2a.cell_index ()), db::Trans (db::Vector (10, 20))));
+
+  top1.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (a1.cell_index ()), db::Trans (db::Vector (11, 21))), pid1));
+  top2.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (a2a.cell_index ()), db::Trans (db::Vector (10, 20))), pid2));
+
+  top1.insert (db::CellInstArray (db::CellInst (a1.cell_index ()), db::Trans (db::Vector (11, 21)), db::Vector (0, 10), db::Vector (10, 0), 2, 3));
+  top2.insert (db::CellInstArray (db::CellInst (a2a.cell_index ()), db::Trans (db::Vector (10, 20)), db::Vector (0, 10), db::Vector (10, 0), 2, 3));
+
+  top1.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (a1.cell_index ()), db::Trans (db::Vector (11, 21)), db::Vector (0, 10), db::Vector (10, 0), 2, 3), pid1));
+  top2.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (a2a.cell_index ()), db::Trans (db::Vector (10, 20)), db::Vector (0, 10), db::Vector (10, 0), 2, 3), pid2));
+
+  std::vector<db::Vector> ia;
+  ia.push_back (db::Vector (0, 0));
+  ia.push_back (db::Vector (10, 0));
+  ia.push_back (db::Vector (0, 10));
+
+  top1.insert (db::CellInstArray (db::CellInst (a1.cell_index ()), db::Trans (db::Vector (11, 21)), ia.begin (), ia.end ()));
+  top2.insert (db::CellInstArray (db::CellInst (a2a.cell_index ()), db::Trans (db::Vector (10, 20)), ia.begin (), ia.end ()));
+
+  top1.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (a1.cell_index ()), db::Trans (db::Vector (11, 21)), ia.begin (), ia.end ()), pid1));
+  top2.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (a2a.cell_index ()), db::Trans (db::Vector (10, 20)), ia.begin (), ia.end ()), pid2));
+
+  db::scale_and_snap (l1, top1, 10, 1, 1);
+
+  bool equal = db::compare_layouts (l1, l2,
+                                     db::layout_diff::f_verbose
+                                     | db::layout_diff::f_boxes_as_polygons
+                                     | db::layout_diff::f_paths_as_polygons
+                                   , 0, 100 /*max diff lines*/);
+  EXPECT_EQ (equal, true);
+}
+
+TEST(20_scale_and_snap)
+{
+  db::Layout l1;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/scale_and_snap4.oas";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (l1);
+  }
+
+  db::scale_and_snap (l1, l1.cell (*l1.begin_top_down ()), 10, 95, 100);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, l1, tl::testdata () + "/algo/layout_utils_au_sns4.oas", db::NormalizationMode (db::WriteOAS + db::WithArrays));
+}
+

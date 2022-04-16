@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -427,6 +427,17 @@ public:
   virtual db::Trans transformation_from_shape (const db::Layout & /*layout*/, const db::Shape & /*shape*/, unsigned int /*layer*/) const
   {
     return db::Trans ();
+  }
+
+  /**
+   *  @brief Returns a value indicating that the PCell wants lazy evaluation
+   *
+   *  In lazy evaluation mode, the PCell is not immediately updated when a parameter is changed in the UI, but only when it is requested
+   *  to be updated.
+   */
+  virtual bool wants_lazy_evaluation () const
+  {
+    return false;
   }
 
   /**

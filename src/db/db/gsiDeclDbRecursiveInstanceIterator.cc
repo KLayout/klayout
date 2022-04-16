@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,6 +30,31 @@
 namespace gsi
 {
 
+namespace {
+
+/**
+ *  @brief A wrapper that allows using "each" on the iterator
+ */
+class IteratorIterator
+{
+public:
+  typedef db::RecursiveInstanceIterator value_type;
+  typedef db::RecursiveInstanceIterator &reference;
+  typedef db::RecursiveInstanceIterator *pointer;
+  typedef std::forward_iterator_tag iterator_category;
+  typedef void difference_type;
+
+  IteratorIterator (db::RecursiveInstanceIterator *iter) : mp_iter (iter) { }
+  bool at_end () const { return mp_iter->at_end (); }
+  reference operator* () const { return *mp_iter; }
+  void operator++ () { ++*mp_iter; }
+
+private:
+  db::RecursiveInstanceIterator *mp_iter;
+};
+
+}
+
 // ---------------------------------------------------------------
 //  db::RecursiveInstanceIterator binding
 
@@ -46,6 +71,11 @@ static db::RecursiveInstanceIterator *new_si2 (const db::Layout &layout, const d
 static db::RecursiveInstanceIterator *new_si2a (const db::Layout &layout, const db::Cell &cell, const db::Region &region, bool overlapping)
 {
   return new db::RecursiveInstanceIterator (layout, cell, region, overlapping);
+}
+
+static IteratorIterator each (db::RecursiveInstanceIterator *r)
+{
+  return IteratorIterator (r);
 }
 
 static db::DCplxTrans si_dtrans (const db::RecursiveInstanceIterator *r)
@@ -183,6 +213,21 @@ Class<db::RecursiveInstanceIterator> decl_RecursiveInstanceIterator ("db", "Recu
     "bounding box is overlapping the search region are reported. If \"overlapping\" is false, instances whose "
     "bounding box touches the search region are reported. The bounding box of instances is measured taking all layers "
     "of the target cell into account.\n"
+  ) +
+  gsi::iterator_ext ("each", &each,
+    "@brief Native iteration\n"
+    "This method enables native iteration, e.g.\n"
+    "\n"
+    "@code\n"
+    "  iter = ... # RecursiveInstanceIterator\n"
+    "  iter.each do |i|\n"
+    "     ... i is the iterator itself\n"
+    "  end\n"
+    "@/code\n"
+    "\n"
+    "This is slightly more convenient than the 'at_end' .. 'next' loop.\n"
+    "\n"
+    "This feature has been introduced in version 0.28.\n"
   ) +
   gsi::method ("max_depth=", (void (db::RecursiveInstanceIterator::*) (int)) &db::RecursiveInstanceIterator::max_depth, gsi::arg ("depth"),
     "@brief Specifies the maximum hierarchy depth to look into\n"
@@ -466,6 +511,11 @@ Class<db::RecursiveInstanceIterator> decl_RecursiveInstanceIterator ("db", "Recu
   "  puts \"Instance of #{iter.inst_cell.name} in #{cell.name}: \" + (iter.dtrans * iter.inst_dtrans).to_s\n"
   "  iter.next\n"
   "end\n"
+  "\n"
+  "# or shorter:\n"
+  "cell.begin_instances_rec.each do |iter|\n"
+  "  puts \"Instance of #{iter.inst_cell.name} in #{cell.name}: \" + (iter.dtrans * iter.inst_dtrans).to_s\n"
+  "end\n"
   "@/code\n"
   "\n"
   "Here, a target cell is specified which confines the search to instances of this particular cell.\n"
@@ -476,7 +526,7 @@ Class<db::RecursiveInstanceIterator> decl_RecursiveInstanceIterator ("db", "Recu
   "\\Cell offers three methods to get these iterators: begin_instances_rec, begin_instances_rec_touching and begin_instances_rec_overlapping.\n"
   "\\Cell#begin_instances_rec will deliver a standard recursive instance iterator which starts from the given cell and iterates "
   "over all child cells. \\Cell#begin_instances_rec_touching creates a RecursiveInstanceIterator which delivers the instances "
-  "whose bounding boxed touch the given search box. \\Layout#begin_instances_rec_overlapping gives an iterator which delivers all instances whose bounding box "
+  "whose bounding boxed touch the given search box. \\Cell#begin_instances_rec_overlapping gives an iterator which delivers all instances whose bounding box "
   "overlaps the search box.\n"
   "\n"
   "A RecursiveInstanceIterator object can also be created directly, like this:\n"

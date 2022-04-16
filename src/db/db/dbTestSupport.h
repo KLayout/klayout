@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -51,10 +51,13 @@ class Texts;
  */
 enum NormalizationMode
 {
-  NoNormalization,        //  no normalization - take the test subject as it is
-  AsPolygons,             //  paths and boxes are treated as polygons
-  WriteGDS2,              //  normalize subject by writing to GDS2 and reading back
-  WriteOAS                //  normalize subject by writing to OASIS and reading back
+  NoNormalization = 0,    //  no normalization - take the test subject as it is
+  WriteGDS2 = 1,          //  normalize subject by writing to GDS2 and reading back
+  WriteOAS = 2,           //  normalize subject by writing to OASIS and reading back
+  NormFileMask = 7,       //  bits the extract for file mode
+  NoContext = 8,          //  write tmp file without context
+  AsPolygons = 16,        //  paths and boxes are treated as polygons
+  WithArrays = 32         //  do not flatten arrays
 };
 
 /**
@@ -82,12 +85,12 @@ void DB_PUBLIC compare_layouts (tl::TestBase *_this, const db::Layout &layout, c
 /**
  *  @brief Compares a netlist against a string
  */
-void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const std::string &au_nl_string, bool exact_parameter_match = false);
+void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const std::string &au_nl_string, bool exact_parameter_match = false, bool with_names = false);
 
 /**
  *  @brief Compares a netlist against another netlist
  */
-void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const db::Netlist &netlist_au, bool exact_parameter_match = false);
+void DB_PUBLIC compare_netlist (tl::TestBase *_this, const db::Netlist &netlist, const db::Netlist &netlist_au, bool exact_parameter_match = false, bool with_names = false);
 
 /**
  *  @brief Convenient compare of region vs. string

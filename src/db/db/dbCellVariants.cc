@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -511,19 +511,52 @@ VariantsCollectorBase::create_var_instances_non_tl_invariant (db::Cell &in_cell,
     std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> >::const_iterator f = var_table.find (i->object ().cell_index ());
     if (f == var_table.end ()) {
 
-       in_cell.insert (*i);
+      in_cell.insert (*i);
 
     } else {
 
       const std::map<db::ICplxTrans, db::cell_index_type> &vt = f->second;
 
-      for (db::CellInstArray::iterator ia = i->begin (); ! ia.at_end (); ++ia) {
+      bool need_explode = false;
+      bool first = true;
+      db::cell_index_type ci = 0;
+
+      for (db::CellInstArray::iterator ia = i->begin (); ! ia.at_end () && ! need_explode; ++ia) {
 
         db::ICplxTrans rt = mp_red->reduce (for_var * mp_red->reduce_trans (i->complex_trans (*ia)));
         std::map<db::ICplxTrans, db::cell_index_type>::const_iterator v = vt.find (rt);
         tl_assert (v != vt.end ());
 
-        in_cell.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (v->second), i->complex_trans (*ia)), i->properties_id ()));
+        if (first) {
+          ci = v->second;
+          first = false;
+        } else {
+          need_explode = (ci != v->second);
+        }
+
+      }
+
+      if (need_explode) {
+
+        for (db::CellInstArray::iterator ia = i->begin (); ! ia.at_end (); ++ia) {
+
+          db::ICplxTrans rt = mp_red->reduce (for_var * mp_red->reduce_trans (i->complex_trans (*ia)));
+          std::map<db::ICplxTrans, db::cell_index_type>::const_iterator v = vt.find (rt);
+          tl_assert (v != vt.end ());
+
+          in_cell.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (v->second), i->complex_trans (*ia)), i->properties_id ()));
+
+        }
+
+      } else if (ci != i->object ().cell_index ()) {
+
+        db::CellInstArray new_array = *i;
+        new_array.object () = db::CellInst (ci);
+        in_cell.insert (db::CellInstArrayWithProperties (new_array, i->properties_id ()));
+
+      } else {
+
+        in_cell.insert (*i);
 
       }
 

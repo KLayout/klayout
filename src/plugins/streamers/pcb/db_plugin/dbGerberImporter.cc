@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -415,7 +415,7 @@ GerberFileReader::collect (db::Region &region)
 }
 
 void
-GerberFileReader::flush ()
+GerberFileReader::flush (const std::string &net_name)
 {
   process_clear_polygons ();
 
@@ -425,14 +425,35 @@ GerberFileReader::flush ()
     m_polygons.swap (merged_polygons);
   }
 
+  std::string nn = net_name;
   for (std::vector <unsigned int>::const_iterator t = m_target_layers.begin (); t != m_target_layers.end (); ++t) {
+
     db::Shapes &shapes = mp_top_cell->shapes (*t);
+
     for (std::vector<db::Polygon>::const_iterator p = m_polygons.begin (); p != m_polygons.end (); ++p) {
+
       shapes.insert (*p);
+
+      if (! nn.empty () && p->hull ().begin () != p->hull ().end ()) {
+        db::Point pt = *p->hull ().begin ();
+        shapes.insert (db::Text (nn, db::Trans (pt - db::Point ())));
+        nn.clear ();
+      }
+
     }
+
     for (std::vector<db::Path>::const_iterator p = m_lines.begin (); p != m_lines.end (); ++p) {
+
       shapes.insert (*p);
+
+      if (! nn.empty () && p->begin () != p->end ()) {
+        db::Point pt = *p->begin ();
+        shapes.insert (db::Text (nn, db::Trans (pt - db::Point ())));
+        nn.clear ();
+      }
+
     }
+
   }
 
   m_polygons.clear ();

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -89,6 +89,8 @@ void
 LibraryProxy::remap (lib_id_type lib_id, cell_index_type lib_cell_index)
 {
   if (lib_id == m_lib_id && m_library_cell_index == lib_cell_index) {
+    //  we trigger an update in any case to implement the library's "refresh"
+    update ();
     return;
   }
 
@@ -156,6 +158,11 @@ LibraryProxy::get_layer_indices (db::Layout &layout, db::ImportLayerMapping *lay
 
         //  map guiding shape layer
         m_layer_indices.push_back ((int) layout.guiding_shape_layer ());
+
+      } else if (i == lib->layout ().error_layer ()) {
+
+        //  map guiding shape layer
+        m_layer_indices.push_back ((int) layout.error_layer ());
 
       } else if (! lib->layout ().is_valid_layer (i) || cell.bbox (i).empty ()) {
 

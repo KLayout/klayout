@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 
 
 #include "gsiDecl.h"
+#include "gsiEnums.h"
 #include "dbPoint.h"
 #include "dbText.h"
 #include "dbHash.h"
@@ -36,6 +37,7 @@ template <class C>
 struct text_defs 
 {
   typedef typename C::coord_type coord_type;
+  typedef typename C::box_type box_type;
   typedef typename C::point_type point_type;
   typedef typename C::vector_type vector_type;
   typedef db::simple_trans<coord_type> simple_trans_type;
@@ -101,22 +103,43 @@ struct text_defs
     return t->font ();
   }
 
-  static void set_halign (C *t, int f)
+  static point_type get_pos (C *t)
+  {
+    return t->trans () * point_type ();
+  }
+
+  static box_type get_bbox (C *t)
+  {
+    point_type p = get_pos (t);
+    return box_type (p, p);
+  }
+
+  static void set_halign (C *t, db::HAlign f)
+  {
+    t->halign (f);
+  }
+
+  static void set_halign_int (C *t, int f)
   {
     t->halign (db::HAlign (f));
   }
 
-  static int get_halign (C *t)
+  static db::HAlign get_halign (C *t)
   {
     return t->halign ();
   }
 
-  static void set_valign (C *t, int f)
+  static void set_valign (C *t, db::VAlign f)
+  {
+    t->valign (f);
+  }
+
+  static void set_valign_int (C *t, int f)
   {
     t->valign (db::VAlign (f));
   }
 
-  static int get_valign (C *t)
+  static db::VAlign get_valign (C *t)
   {
     return t->valign ();
   }
@@ -186,6 +209,18 @@ struct text_defs
     method ("string", (const char *(C::*) () const) &C::string,
       "@brief Get the text string\n"
     ) +
+    method_ext ("position", get_pos,
+      "@brief Gets the position of the text\n"
+      "\n"
+      "This convenience method has been added in version 0.28."
+    ) +
+    method_ext ("bbox", get_bbox,
+      "@brief Gets the bounding box of the text\n"
+      "The bounding box of the text is a single point - the location of the text. "
+      "Both points of the box are identical.\n"
+      "\n"
+      "This method has been added in version 0.28."
+    ) +
     method_ext ("x=", set_x, gsi::arg ("x"),
       "@brief Sets the x location of the text\n"
       "\n"
@@ -210,43 +245,54 @@ struct text_defs
       "@brief Assign a transformation (text position and orientation) to this object\n"
     ) +
     method ("trans", (const simple_trans_type & (C::*) () const) &C::trans,
-      "@brief Get the transformation\n"
+      "@brief Gets the transformation\n"
     ) +
     method ("size=", (void (C::*) (coord_type)) &C::size, gsi::arg ("s"),
-      "@brief Set the text height of this object\n"
+      "@brief Sets the text height of this object\n"
     ) +
     method ("size", (coord_type (C::*) () const) &C::size,
-      "@brief Get the text height\n"
+      "@brief Gets the text height\n"
     ) +
     method_ext ("font=", &set_font, gsi::arg ("f"),
-      "@brief Set the font number\n"
+      "@brief Sets the font number\n"
+      "The font number does not play a role for KLayout. This property is provided "
+      "for compatibility with other systems which allow using different fonts for the text objects."
     ) +
     method_ext ("font", &get_font,
-      "@brief Get the font number\n"
+      "@brief Gets the font number\n"
+      "See \\font= for a description of this property."
+    ) +
+    method_ext ("#halign=", &set_halign_int, gsi::arg ("a"),
+      "@brief Sets the horizontal alignment\n"
+      "\n"
+      "This is the version accepting integer values. It's provided for backward compatibility.\n"
     ) +
     method_ext ("halign=", &set_halign, gsi::arg ("a"),
-      "@brief Set the horizontal alignment\n"
+      "@brief Sets the horizontal alignment\n"
       "\n"
       "This property specifies how the text is aligned relative to the anchor point. "
-      "Allowed values for this property are 0 (left), 1 (center) and 2 (right)."
       "\n"
-      "This property has been introduced in version 0.22.\n"
+      "This property has been introduced in version 0.22 and extended to enums in 0.28.\n"
     ) +
     method_ext ("halign", &get_halign,
-      "@brief Get the horizontal alignment\n"
+      "@brief Gets the horizontal alignment\n"
       "\n"
       "See \\halign= for a description of this property.\n"
     ) +
+    method_ext ("#valign=", &set_valign_int, gsi::arg ("a"),
+      "@brief Sets the vertical alignment\n"
+      "\n"
+      "This is the version accepting integer values. It's provided for backward compatibility.\n"
+    ) +
     method_ext ("valign=", &set_valign, gsi::arg ("a"),
-      "@brief Set the vertical alignment\n"
+      "@brief Sets the vertical alignment\n"
       "\n"
       "This property specifies how the text is aligned relative to the anchor point. "
-      "Allowed values for this property are 0 (top), 1 (center) and 2 (bottom)."
       "\n"
-      "This property has been introduced in version 0.22.\n"
+      "This property has been introduced in version 0.22 and extended to enums in 0.28.\n"
     ) +
     method_ext ("valign", &get_valign,
-      "@brief Get the vertical alignment\n"
+      "@brief Gets the vertical alignment\n"
       "\n"
       "See \\valign= for a description of this property.\n"
     ) +
@@ -303,14 +349,14 @@ struct text_defs
       "This method was introduced in version 0.23."
     ) +
     method ("transformed", &C::template transformed<simple_trans_type>, gsi::arg ("t"),
-      "@brief Transform the text with the given simple transformation\n"
+      "@brief Transforms the text with the given simple transformation\n"
       "\n"
       "\n"
       "@param t The transformation to apply\n"
       "@return The transformed text\n"
     ) +
     method ("transformed", &C::template transformed<complex_trans_type>, gsi::arg ("t"),
-      "@brief Transform the text with the given complex transformation\n"
+      "@brief Transforms the text with the given complex transformation\n"
       "\n"
       "\n"
       "@param t The magnifying transformation to apply\n"
@@ -346,7 +392,7 @@ struct text_defs
       "This method has been added in version 0.23.\n"
     ) +
     method ("to_s", &C::to_string, gsi::arg ("dbu", 0.0),
-      "@brief Convert to a string.\n"
+      "@brief Converts the object to a string.\n"
       "If a DBU is given, the output units will be micrometers.\n"
       "\n"
       "The DBU argument has been added in version 0.27.6.\n"
@@ -450,5 +496,45 @@ Class<db::DText> decl_DText ("db", "DText",
   "See @<a href=\"/programming/database_api.xml\">The Database API@</a> for more details about the "
   "database objects."
 );
+
+gsi::Enum<db::HAlign> decl_HAlign ("db", "HAlign",
+  gsi::enum_const ("HAlignLeft", db::HAlignLeft,
+    "@brief Left horizontal alignment\n"
+  ) +
+  gsi::enum_const ("HAlignCenter", db::HAlignCenter,
+    "@brief Centered horizontal alignment\n"
+  ) +
+  gsi::enum_const ("HAlignRight", db::HAlignRight,
+    "@brief Right horizontal alignment\n"
+  ) +
+  gsi::enum_const ("NoHAlign", db::NoHAlign,
+    "@brief Undefined horizontal alignment\n"
+  ),
+  "@brief This class represents the horizontal alignment modes.\n"
+  "This enum has been introduced in version 0.28."
+);
+
+gsi::Enum<db::VAlign> decl_VAlign ("db", "VAlign",
+  gsi::enum_const ("VAlignBottom", db::VAlignBottom,
+    "@brief Bottom vertical alignment\n"
+  ) +
+  gsi::enum_const ("VAlignCenter", db::VAlignCenter,
+    "@brief Centered vertical alignment\n"
+  ) +
+  gsi::enum_const ("VAlignTop", db::VAlignTop,
+    "@brief Top vertical alignment\n"
+  ) +
+  gsi::enum_const ("NoVAlign", db::NoVAlign,
+    "@brief Undefined vertical alignment\n"
+  ),
+  "@brief This class represents the vertical alignment modes.\n"
+  "This enum has been introduced in version 0.28."
+);
+
+//  Inject the alignment enums
+gsi::ClassExt<db::Text> inject_Text_HAlign_in_parent (decl_HAlign.defs ());
+gsi::ClassExt<db::DText> inject_DText_HAlign_in_parent (decl_HAlign.defs ());
+gsi::ClassExt<db::Text> inject_Text_VAlign_in_parent (decl_VAlign.defs ());
+gsi::ClassExt<db::DText> inject_DText_VAlign_in_parent (decl_VAlign.defs ());
 
 }

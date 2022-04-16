@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -2916,6 +2916,7 @@ printf_f (const ExpressionParserContext &context, tl::Variant &, const std::vect
   }
 
   std::cout << tl::sprintf (vv[0].to_string (), vv, 1);
+  std::cout.flush ();
 }
 
 // ----------------------------------------------------------------------------
@@ -3125,10 +3126,16 @@ Expression::execute (EvalTarget &v) const
 // ----------------------------------------------------------------------------
 //  Implementation of Eval
 
-Eval Eval::m_global;
+Eval Eval::m_global (0, 0, false);
 
 Eval::Eval (Eval *parent, bool sloppy)
-  : mp_parent (parent), m_sloppy (sloppy), mp_ctx_handler (0)
+  : mp_parent (parent), mp_global (&Eval::m_global), m_sloppy (sloppy), mp_ctx_handler (0)
+{
+  // .. nothing yet ..
+}
+
+Eval::Eval (Eval *global, Eval *parent, bool sloppy)
+  : mp_parent (parent), mp_global (global), m_sloppy (sloppy), mp_ctx_handler (0)
 {
   // .. nothing yet ..
 }
@@ -3958,8 +3965,8 @@ Eval::resolve_name (const std::string &t, const EvalFunction *&function, const t
   if (! function && ! value && ! var) {
     if (mp_parent) {
       mp_parent->resolve_name (t, function, value, var);
-    } else if (this != &m_global) {
-      m_global.resolve_name (t, function, value, var);
+    } else if (mp_global) {
+      mp_global->resolve_name (t, function, value, var);
     }
   }
 }

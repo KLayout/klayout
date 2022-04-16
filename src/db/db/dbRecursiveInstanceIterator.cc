@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -83,7 +83,6 @@ RecursiveInstanceIterator &RecursiveInstanceIterator::operator= (const Recursive
 RecursiveInstanceIterator::RecursiveInstanceIterator ()
 {
   //  anything. Not necessary reasonable.
-  mp_layout = 0;
   mp_top_cell = 0;
   mp_cell = 0;
   m_overlapping = false;
@@ -97,7 +96,7 @@ RecursiveInstanceIterator::RecursiveInstanceIterator ()
 RecursiveInstanceIterator::RecursiveInstanceIterator (const layout_type &layout, const cell_type &cell, const box_type &region, bool overlapping)
   : m_box_convert (layout)
 {
-  mp_layout = &layout;
+  mp_layout = const_cast<db::Layout *> (&layout);
   mp_top_cell = &cell;
   m_overlapping = overlapping;
   init ();
@@ -107,7 +106,7 @@ RecursiveInstanceIterator::RecursiveInstanceIterator (const layout_type &layout,
 RecursiveInstanceIterator::RecursiveInstanceIterator (const layout_type &layout, const cell_type &cell, const region_type &region, bool overlapping)
   : m_box_convert (layout)
 {
-  mp_layout = &layout;
+  mp_layout = const_cast<db::Layout *> (&layout);
   mp_top_cell = &cell;
   m_overlapping = overlapping;
   init ();
@@ -117,7 +116,7 @@ RecursiveInstanceIterator::RecursiveInstanceIterator (const layout_type &layout,
 RecursiveInstanceIterator::RecursiveInstanceIterator (const layout_type &layout, const cell_type &cell)
   : m_box_convert (layout)
 {
-  mp_layout = &layout;
+  mp_layout = const_cast<db::Layout *> (&layout);
   mp_top_cell = &cell;
   m_overlapping = false;
   init ();
@@ -272,6 +271,7 @@ RecursiveInstanceIterator::validate (RecursiveInstanceReceiver *receiver) const
   m_inst_array_iterators.clear ();
   m_cells.clear ();
   m_trans = cplx_trans_type ();
+  m_target_tree.clear ();
 
   m_local_region_stack.clear ();
   m_local_region_stack.push_back (m_region);
@@ -300,10 +300,9 @@ RecursiveInstanceIterator::validate (RecursiveInstanceReceiver *receiver) const
 
   }
 
-  if (mp_top_cell) {
+  if (mp_top_cell && mp_layout) {
 
     if (! m_all_targets) {
-      m_target_tree.clear ();
       mp_top_cell->collect_called_cells (m_target_tree);
     }
 
@@ -501,6 +500,8 @@ RecursiveInstanceIterator::next_instance (RecursiveInstanceReceiver *receiver) c
 void
 RecursiveInstanceIterator::down (RecursiveInstanceReceiver *receiver) const
 {
+  tl_assert (mp_layout);
+
   m_trans_stack.push_back (m_trans);
   m_cells.push_back (mp_cell);
 

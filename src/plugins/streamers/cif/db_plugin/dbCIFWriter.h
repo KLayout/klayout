@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,6 +32,9 @@
 #include "dbSaveLayoutOptions.h"
 #include "tlProgress.h"
 
+#include <set>
+#include <map>
+
 namespace tl
 {
   class OutputStream;
@@ -42,6 +45,25 @@ namespace db
 
 class Layout;
 class SaveLayoutOptions;
+
+/**
+ *  @brief A class generating valid names
+ */
+template <class ID>
+class DB_PLUGIN_PUBLIC_TEMPLATE CIFValidNameGenerator
+{
+public:
+  CIFValidNameGenerator ();
+
+  template <class Validator> void insert (ID id, const std::string &name, Validator validator);
+  template <class Validator> const std::string &valid_name_for_id (ID id, Validator validator);
+  void clear ();
+
+public:
+  std::map<ID, std::string> m_valid_names;
+  std::map<ID, std::string> m_pending_names;
+  std::set<std::string> m_existing_names;
+};
 
 /**
  *  @brief A CIF writer abstraction
@@ -67,9 +89,11 @@ private:
   CIFWriterOptions m_options;
   tl::AbsoluteProgress m_progress;
   endl_tag m_endl;
-  db::LayerProperties m_layer;
+  unsigned int m_layer;
   bool m_needs_emit;
-  
+  CIFValidNameGenerator<unsigned int> m_layer_names;
+  CIFValidNameGenerator<db::cell_index_type> m_cell_names;
+
   CIFWriter &operator<<(const char *s);
   CIFWriter &operator<<(const std::string &s);
   CIFWriter &operator<<(endl_tag); 

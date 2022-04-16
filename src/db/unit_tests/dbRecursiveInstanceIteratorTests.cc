@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -619,3 +619,44 @@ TEST(4)
   EXPECT_EQ (db::compare_layouts (boxes2layout (selected_boxes), boxes2layout (selected_boxes2), db::layout_diff::f_verbose, 0, 100 /*max diff lines*/), true);
 }
 
+TEST(5)
+{
+  std::unique_ptr<db::Layout> g (new db::Layout ());
+  g->insert_layer (0);
+  g->insert_layer (1);
+  g->insert_layer (2);
+
+  db::Cell &c0 (g->cell (g->add_cell ()));
+  db::Cell &c1 (g->cell (g->add_cell ()));
+  db::Cell &c2 (g->cell (g->add_cell ()));
+  db::Cell &c3 (g->cell (g->add_cell ()));
+
+  db::Box b (0, 100, 1000, 1200);
+  c0.shapes (0).insert (b);
+  c1.shapes (0).insert (b);
+  c2.shapes (0).insert (b);
+  c3.shapes (0).insert (b);
+
+  c0.shapes (2).insert (b);
+  c0.shapes (2).insert (b.moved (db::Vector (50, 50)));
+
+  db::Trans tt;
+  c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), tt));
+  c0.insert (db::CellInstArray (db::CellInst (c2.cell_index ()), db::Trans (db::Vector (100, -100))));
+  c0.insert (db::CellInstArray (db::CellInst (c3.cell_index ()), db::Trans (1)));
+  c2.insert (db::CellInstArray (db::CellInst (c3.cell_index ()), db::Trans (db::Vector (1100, 0))));
+
+  std::string x;
+
+  db::RecursiveInstanceIterator i1 (*g, c0, db::Box (0, 0, 100, 100));
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "[$1]$2 r0 0,0/[$1]$3 r0 100,-100");
+
+  g.reset (new db::Layout ());
+
+  //  now the layout is gone and the iterator stays silent (weak pointer to layout)
+  //  NOTE: this only works on reset or re-initialization. Not during iteration.
+  i1.reset ();
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "");
+}

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -75,24 +75,24 @@ DXFReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Techn
 {
   db::DXFReaderOptions *options = dynamic_cast<db::DXFReaderOptions *> (o);
   if (options) {
-    tl::from_string (tl::to_string (mp_ui->dbu_le->text ()), options->dbu);
+    tl::from_string_ext (tl::to_string (mp_ui->dbu_le->text ()), options->dbu);
     if (options->dbu > 1000.0 || options->dbu < 1e-9) {
       throw tl::Exception (tl::to_string (QObject::tr ("Invalid value for database unit")));
     }
-    tl::from_string (tl::to_string (mp_ui->unit_le->text ()), options->unit);
+    tl::from_string_ext (tl::to_string (mp_ui->unit_le->text ()), options->unit);
     if (options->unit > 1e9 || options->unit < 1e-9) {
       throw tl::Exception (tl::to_string (QObject::tr ("Invalid value for the unit")));
     }
-    tl::from_string (tl::to_string (mp_ui->text_scaling_le->text ()), options->text_scaling);
+    tl::from_string_ext (tl::to_string (mp_ui->text_scaling_le->text ()), options->text_scaling);
     if (options->text_scaling > 10000 || options->text_scaling < 1) {
       throw tl::Exception (tl::to_string (QObject::tr ("Invalid value for the text scaling")));
     }
-    tl::from_string (tl::to_string(mp_ui->circle_points_le->text ()), options->circle_points);
+    tl::from_string_ext (tl::to_string(mp_ui->circle_points_le->text ()), options->circle_points);
     if (options->circle_points < 4 || options->circle_points > 1000000) {
       throw tl::Exception (tl::to_string (QObject::tr ("Invalid value for the number of points for arc interpolation")));
     }
-    tl::from_string (tl::to_string(mp_ui->circle_accuracy_le->text ()), options->circle_accuracy);
-    tl::from_string (tl::to_string(mp_ui->contour_accuracy_le->text ()), options->contour_accuracy);
+    tl::from_string_ext (tl::to_string(mp_ui->circle_accuracy_le->text ()), options->circle_accuracy);
+    tl::from_string_ext (tl::to_string(mp_ui->contour_accuracy_le->text ()), options->contour_accuracy);
     options->polyline_mode = mp_ui->polyline2poly_cbx->currentIndex ();
     options->render_texts_as_polygons = mp_ui->render_texts_as_polygons_cbx->isChecked ();
     options->keep_other_cells = mp_ui->keep_other_cells_cbx->isChecked ();

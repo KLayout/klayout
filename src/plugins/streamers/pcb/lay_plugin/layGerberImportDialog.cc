@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1024,8 +1024,8 @@ GerberImportDialog::commit_page ()
     mp_data->num_metal_layers = -1;
     mp_data->num_via_types = -1;
 
-    tl::from_string (tl::to_string (mp_ui->num_metal_le->text ()), mp_data->num_metal_layers);
-    tl::from_string (tl::to_string (mp_ui->num_via_le->text ()), mp_data->num_via_types);
+    tl::from_string_ext (tl::to_string (mp_ui->num_metal_le->text ()), mp_data->num_metal_layers);
+    tl::from_string_ext (tl::to_string (mp_ui->num_via_le->text ()), mp_data->num_via_types);
 
     if (mp_data->num_metal_layers < 0) {
       throw tl::Exception (tl::to_string (QObject::tr ("Invalid number of metal layers")));
@@ -1297,12 +1297,12 @@ GerberImportDialog::commit_page ()
 
     mp_data->merge_flag = mp_ui->merge_cb->isChecked ();
     mp_data->invert_negative_layers = mp_ui->invert_cb->isChecked ();
-    tl::from_string (tl::to_string (mp_ui->border_le->text ()), mp_data->border);
+    tl::from_string_ext (tl::to_string (mp_ui->border_le->text ()), mp_data->border);
 
     bool import_into = (mp_data->mode == db::GerberImportData::ModeIntoLayout);
     if (! import_into) {
 
-      tl::from_string (tl::to_string (mp_ui->dbu_le->text ()), mp_data->dbu);
+      tl::from_string_ext (tl::to_string (mp_ui->dbu_le->text ()), mp_data->dbu);
       if (mp_data->dbu < 1e-6) {
         throw tl::Exception (tl::to_string (QObject::tr ("Database unit must not be negative or zero")));
       }

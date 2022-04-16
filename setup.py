@@ -4,7 +4,7 @@
 KLayout standalone Python module setup script
 
 
-    Copyright (C) 2006-2021 Matthias Koefferlein
+    Copyright (C) 2006-2022 Matthias Koefferlein
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -273,8 +273,6 @@ class Config(object):
                         quote_path("-I" + os.path.join(bits, "curl", "include"))]
             else:
                 return []
-        elif platform.system() == "Darwin":
-            return []
         else:
             return ["-Wno-strict-aliasing",  # Avoids many "type-punned pointer" warnings
                     "-std=c++11",  # because we use unordered_map/unordered_set
@@ -534,6 +532,7 @@ tl = Extension(config.root + '.tlcore',
                include_dirs=[_tl_path, _gsi_path, _pya_path],
                extra_objects=[config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
                extra_link_args=config.link_args('tlcore'),
+               extra_compile_args=config.compile_args('tlcore'),
                sources=list(tl_sources))
 
 # ------------------------------------------------------------------
@@ -547,6 +546,7 @@ db = Extension(config.root + '.dbcore',
                include_dirs=[_db_path, _tl_path, _gsi_path, _pya_path],
                extra_objects=[config.path_of('_db', _db_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
                extra_link_args=config.link_args('dbcore'),
+               extra_compile_args=config.compile_args('dbcore'),
                sources=list(db_sources))
 
 # ------------------------------------------------------------------
@@ -560,6 +560,7 @@ lib = Extension(config.root + '.libcore',
                include_dirs=[_lib_path, _tl_path, _gsi_path, _pya_path],
                extra_objects=[config.path_of('_lib', _lib_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
                extra_link_args=config.link_args('libcore'),
+               extra_compile_args=config.compile_args('libcore'),
                sources=list(lib_sources))
 
 # ------------------------------------------------------------------
@@ -573,6 +574,7 @@ rdb = Extension(config.root + '.rdbcore',
                 include_dirs=[_rdb_path, _tl_path, _gsi_path, _pya_path],
                 extra_objects=[config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
                 extra_link_args=config.link_args('rdbcore'),
+                extra_compile_args=config.compile_args('rdbcore'),
                 sources=list(rdb_sources))
 
 # ------------------------------------------------------------------
@@ -583,7 +585,7 @@ if __name__ == '__main__':
           version=config.version(),
           license='GNU GPLv3',
           description='KLayout standalone Python package',
-          long_description='TODO',
+          long_description='This package is a standalone distribution of KLayout\'s Python API.\n\nFor more details see here: https://www.klayout.org/klayout-pypi',
           author='Matthias Koefferlein',
           author_email='matthias@klayout.de',
           classifiers=[

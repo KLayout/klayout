@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ CIFReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Techn
 {
   db::CIFReaderOptions *options = dynamic_cast<db::CIFReaderOptions *> (o);
   if (options) {
-    tl::from_string (tl::to_string (mp_ui->dbu_le->text ()), options->dbu);
+    tl::from_string_ext (tl::to_string (mp_ui->dbu_le->text ()), options->dbu);
     if (options->dbu > 1000.0 || options->dbu < 1e-9) {
       throw tl::Exception (tl::to_string (QObject::tr ("Invalid value for database unit")));
     }

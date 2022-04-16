@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -2265,7 +2265,10 @@ db::NetlistSpiceWriter *new_spice_writer2 (NetlistSpiceWriterDelegateImpl *deleg
 
 Class<db::NetlistWriter> db_NetlistWriter ("db", "NetlistWriter",
   gsi::Methods (),
-  "@hide\n"
+  "@brief Base class for netlist writers\n"
+  "This class is provided as a base class for netlist writers. It is not intended for reimplementation on script level, but used internally as an interface.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
 );
 
 Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "NetlistSpiceWriter",
@@ -2355,7 +2358,10 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
 
 Class<db::NetlistReader> db_NetlistReader ("db", "NetlistReader",
   gsi::Methods (),
-  "@hide\n"
+  "@brief Base class for netlist readers\n"
+  "This class is provided as a base class for netlist readers. It is not intended for reimplementation on script level, but used internally as an interface.\n"
+  "\n"
+  "This class has been introduced in version 0.26."
 );
 
 /**

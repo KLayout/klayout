@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -965,9 +965,9 @@ struct polygon_defs
     poly->size (d, d, mode);
   }
 
-  static void size_d (C *poly, coord_type d)
+  static void size_dvm (C *poly, const db::Vector &dv, unsigned int mode)
   {
-    poly->size (d, d, 2);
+    poly->size (dv.x (), dv.y (), mode);
   }
 
   static C sized_xy (const C *poly, coord_type dx, coord_type dy, unsigned int mode)
@@ -980,9 +980,9 @@ struct polygon_defs
     return poly->sized (d, d, mode);
   }
 
-  static C sized_d (const C *poly, coord_type d)
+  static C sized_dvm (const C *poly, const db::Vector &dv, unsigned int mode)
   {
-    return poly->sized (d, d, 2);
+    return poly->sized (dv.x (), dv.y (), mode);
   }
 
   static bool inside (const C *poly, point_type pt)
@@ -1272,7 +1272,19 @@ struct polygon_defs
       "result = ep.simple_merge_p2p([ poly ], false, false, 1)\n"
       "@/code\n"
     ) +
-    method_ext ("size", &size_dm, gsi::arg ("d"), gsi::arg ("mode"),
+    method_ext ("size", &size_dvm, gsi::arg ("dv"), gsi::arg ("mode", (unsigned int) 2),
+      "@brief Sizes the polygon (biasing)\n"
+      "\n"
+      "This method is equivalent to\n"
+      "@code\n"
+      "size(dv.x, dv.y, mode)\n"
+      "@/code\n"
+      "\n"
+      "See \\size for a detailed description.\n"
+      "\n"
+      "This version has been introduced in version 0.28.\n"
+    ) +
+    method_ext ("size", &size_dm, gsi::arg ("d"), gsi::arg ("mode", (unsigned int) 2),
       "@brief Sizes the polygon (biasing)\n"
       "\n"
       "Shifts the contour outwards (d>0) or inwards (d<0).\n"
@@ -1294,7 +1306,19 @@ struct polygon_defs
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method_ext ("sized", &sized_dm, gsi::arg ("d"), gsi::arg ("mode"),
+    method_ext ("sized", &sized_dvm, gsi::arg ("dv"), gsi::arg ("mode", (unsigned int) 2),
+      "@brief Sizes the polygon (biasing) without modifying self\n"
+      "\n"
+      "This method is equivalent to\n"
+      "@code\n"
+      "sized(dv.x, dv.y, mode)\n"
+      "@/code\n"
+      "\n"
+      "See \\size and \\sized for a detailed description.\n"
+      "\n"
+      "This version has been introduced in version 0.28.\n"
+    ) +
+    method_ext ("sized", &sized_dm, gsi::arg ("d"), gsi::arg ("mode", (unsigned int) 2),
       "@brief Sizes the polygon (biasing) without modifying self\n"
       "\n"
       "Shifts the contour outwards (d>0) or inwards (d<0).\n"
@@ -1304,28 +1328,6 @@ struct polygon_defs
       "@/code\n"
       "\n"
       "See \\size and \\sized for a detailed description.\n"
-    ) +
-    method_ext ("sized", &sized_d, gsi::arg ("d"),
-      "@brief Sizes the polygon (biasing)\n"
-      "\n"
-      "@brief Sizing (biasing) without modifying self\n"
-      "This method is equivalent to\n"
-      "@code\n"
-      "sized(d, d, 2)\n"
-      "@/code\n"
-      "\n"
-      "See \\size and \\sized for a detailed description.\n"
-    ) +
-    method_ext ("size", &size_d, gsi::arg ("d"),
-      "@brief Sizes the polygon (biasing)\n"
-      "\n"
-      "Shifts the contour outwards (d>0) or inwards (d<0).\n"
-      "This method is equivalent to\n"
-      "@code\n"
-      "size(d, d, 2)\n"
-      "@/code\n"
-      "\n"
-      "See \\size for a detailed description.\n"
     ) +
     method ("holes", &C::holes,
       "@brief Returns the number of holes"

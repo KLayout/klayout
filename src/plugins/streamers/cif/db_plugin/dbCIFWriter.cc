@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,12 +25,158 @@
 #include "dbPolygonGenerators.h"
 #include "tlStream.h"
 #include "tlUtils.h"
+#include "tlUniqueName.h"
 
 #include <time.h>
 #include <string.h>
+#include <ctype.h>
 
 namespace db
 {
+
+// ---------------------------------------------------------------------------------
+//  CIFWriter utilities
+
+namespace
+{
+
+struct CellNameValidator
+{
+  CellNameValidator () { }
+
+  bool is_valid (const std::string &name)
+  {
+    for (const char *c = name.c_str (); *c; ++c) {
+      if (! (isdigit (*c) || isupper (*c) || islower (*c) || *c == '$' || *c == '_' || *c == ':')) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  std::string create_valid (const std::string &name)
+  {
+    std::string res;
+    res.reserve (name.size ());
+    for (const char *c = name.c_str (); *c; ++c) {
+      if (isdigit (*c) || isupper (*c) || islower (*c) || *c == '$' || *c == '_' || *c == ':') {
+        res += *c;
+      }
+    }
+    if (res.empty ()) {
+      res = "C";
+    }
+    return res;
+  }
+
+  const char *separator ()
+  {
+    return "$";
+  }
+};
+
+struct LayerNameValidator
+{
+  LayerNameValidator () { }
+
+  bool is_valid (const std::string &name)
+  {
+    for (const char *c = name.c_str (); *c; ++c) {
+      if (! (isdigit (*c) || isupper (*c) || *c == '_')) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  std::string create_valid (const std::string &name)
+  {
+    std::string res;
+    res.reserve (name.size ());
+    for (const char *c = name.c_str (); *c; ++c) {
+      char cu = toupper (*c);
+      if (isdigit (cu) || isalpha (cu) || *c == '_') {
+        res += cu;
+      }
+    }
+    if (res.empty ()) {
+      res = "C";
+    }
+    return res;
+  }
+
+  const char *separator ()
+  {
+    return "N";
+  }
+};
+
+}
+
+/**
+ *  @brief Gets the CIF name for a given layer
+ */
+std::string cif_layer_name (const db::LayerProperties &lp)
+{
+  if (lp.is_named ()) {
+    return lp.name;
+  } else if (lp.is_null ()) {
+    return std::string ();
+  } else if (lp.datatype <= 0) {
+    return std::string ("L") + tl::to_string (lp.layer);
+  } else {
+    return std::string ("L") + tl::to_string (lp.layer) + "D" + tl::to_string (lp.datatype);
+  }
+}
+
+// ---------------------------------------------------------------------------------
+//  CIFValidNameGenerator implementation
+
+template <class ID>
+CIFValidNameGenerator<ID>::CIFValidNameGenerator () { }
+
+template <class ID>
+template <class Validator>
+void
+CIFValidNameGenerator<ID>::insert (ID id, const std::string &name, Validator validator)
+{
+  if (m_existing_names.find (name) == m_existing_names.end () && validator.is_valid (name)) {
+    m_valid_names.insert (std::make_pair (id, name));
+    m_existing_names.insert (name);
+  } else {
+    m_pending_names.insert (std::make_pair (id, name));
+  }
+}
+
+template <class ID>
+template <class Validator>
+const std::string &
+CIFValidNameGenerator<ID>::valid_name_for_id (ID id, Validator validator)
+{
+  typename std::map<ID, std::string>::const_iterator i = m_valid_names.find (id);
+  if (i != m_valid_names.end ()) {
+    return i->second;
+  }
+
+  typename std::map<ID, std::string>::iterator j = m_pending_names.find (id);
+  if (j != m_pending_names.end ()) {
+    std::string valid_name = tl::unique_name (validator.create_valid (j->second), m_existing_names, validator.separator ());
+    m_pending_names.erase (j);
+    m_valid_names.insert (std::make_pair (id, valid_name));
+    return *m_existing_names.insert (valid_name).first;
+  }
+
+  tl_assert (false);
+}
+
+template <class ID>
+void
+CIFValidNameGenerator<ID>::clear ()
+{
+  m_existing_names.clear ();
+  m_valid_names.clear ();
+  m_pending_names.clear ();
+}
 
 // ---------------------------------------------------------------------------------
 //  CIFWriter implementation
@@ -79,6 +225,9 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
   m_options = options.get_options<CIFWriterOptions> ();
   mp_stream = &stream;
 
+  m_layer_names.clear ();
+  m_cell_names.clear ();
+
   //  compute the scale factor to get to the 10 nm basic database unit of CIF
   double tl_scale = options.scale_factor () * layout.dbu () / 0.01;
 
@@ -121,6 +270,16 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
   std::map <db::cell_index_type, int> db_to_cif_index_map;
   std::set <db::cell_index_type> called_cells;
 
+  //  register layers for generating valid names
+  for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator layer = layers.begin (); layer != layers.end (); ++layer) {
+    m_layer_names.insert (layer->first, cif_layer_name (layer->second), LayerNameValidator ());
+  }
+
+  //  register cells for generating valid cell names
+  for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
+    m_cell_names.insert (*cell, layout.cell_name (*cell), CellNameValidator ());
+  }
+
   //  body
   for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
 
@@ -135,7 +294,7 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
     double sf = 1.0;
 
     *this << "DS " << cell_index << " " << tl_scale_denom << " " << tl_scale_divider << ";" << m_endl;
-    *this << "9 " << tl::to_word_or_quoted_string (layout.cell_name (*cell)) << ";" << m_endl;
+    *this << "9 " << m_cell_names.valid_name_for_id (*cell, CellNameValidator ()) << ";" << m_endl;
 
     //  instances
     for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
@@ -200,7 +359,7 @@ CIFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
     for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
 
       m_needs_emit = true;
-      m_layer = l->second;
+      m_layer = l->first;
 
       write_texts (layout, cref, l->first, sf);
       write_polygons (layout, cref, l->first, sf);
@@ -245,7 +404,7 @@ CIFWriter::emit_layer()
 {
   if (m_needs_emit) {
     m_needs_emit = false;
-    *this << "L " << tl::to_word_or_quoted_string (tl::to_upper_case (m_layer.name), "0123456789_.$") << ";" << m_endl;
+    *this << "L " << m_layer_names.valid_name_for_id (m_layer, LayerNameValidator ()) << ";" << m_endl;
   }
 }
 

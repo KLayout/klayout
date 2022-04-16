@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -234,7 +234,7 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
     lay::Plugin (pr, true),
     mp_plugin_root (pr),
     mp_root (root),
-    m_first_show (true), m_in_processing (false), m_debugging_on (true),
+    m_first_show (true), m_debugging_on (true),
     mp_run_macro (0),
     md_update_console_text (this, &MacroEditorDialog::update_console_text),
     md_search_edited (this, &MacroEditorDialog::do_search_edited),
@@ -1075,12 +1075,10 @@ void
 MacroEditorDialog::process_events (QEventLoop::ProcessEventsFlags flags)
 {
   if (lay::ApplicationBase::instance ()) {
-    //  disable execution of deferred methods to avoid undesired execution of 
+    //  NOTE: we disable execution of deferred methods to avoid undesired execution of
     //  code while we are inside a Ruby callback through the silent mode
-    bool last_processing = m_in_processing;
-    m_in_processing = true;
+    //  NOTE: process_events will set BusySection::is_busy
     lay::ApplicationBase::instance ()->process_events (flags, true /*silent*/);
-    m_in_processing = last_processing;
   }
 }
 
@@ -1430,7 +1428,7 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
     return false;
   }
 
-  if (m_in_processing && (m_in_breakpoint || m_in_exec) && (dynamic_cast <QInputEvent *> (event) != 0 || dynamic_cast <QPaintEvent *> (event) != 0)) {
+  if (lay::BusySection::is_busy () && (m_in_breakpoint || m_in_exec) && (dynamic_cast <QInputEvent *> (event) != 0 || dynamic_cast <QPaintEvent *> (event) != 0)) {
 
     //  In breakpoint or execution mode and while processing the events from the debugger, 
     //  ignore all input or paint events targeted to widgets which are not children of this or the assistant dialog.
@@ -1447,7 +1445,7 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
       return true;
     }
 
-  } else if (! m_in_processing && m_in_exec) {
+  } else if (! lay::BusySection::is_busy ()  && m_in_exec) {
 
     //  While no explicit event processing is in progress and we are executing, this is an indication that
     //  "real" events are processed. In that case, we can postpone excplit processing. This avoids interference
@@ -1980,7 +1978,11 @@ MacroEditorDialog::replace_all_button_clicked ()
 void
 MacroEditorDialog::search_requested (const QString &s)
 {
-  searchEditBox->setText (s);
+  if (! s.isNull ()) {
+    searchEditBox->setText (s);
+  } else {
+    searchEditBox->selectAll ();
+  }
   searchEditBox->setFocus ();
   search_editing ();
 }
@@ -3032,7 +3034,7 @@ MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_
   }
 
   //  avoid recursive breakpoints and exception catches from the console while in a breakpoint or exception stop
-  if (m_in_processing) {
+  if (lay::BusySection::is_busy ()) {
     return;
   }
 
@@ -3126,7 +3128,7 @@ MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int lin
   }
 
   //  avoid recursive breakpoints and exception catches from the console while in a breakpoint or exception stop
-  if (m_in_processing) {
+  if (lay::BusySection::is_busy ()) {
     return;
   }
 

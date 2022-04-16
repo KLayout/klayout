@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -306,7 +306,8 @@ Cell::update_bbox (unsigned int layers)
   //  update the bboxes of the shapes lists
   for (shapes_map::iterator s = m_shapes_map.begin (); s != m_shapes_map.end (); ++s) {
 
-    s->second.update_bbox ();
+    s->second.reset_bbox_dirty ();
+
     box_type sbox (s->second.bbox ());
 
     if (! sbox.empty ()) {

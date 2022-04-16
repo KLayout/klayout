@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -264,7 +264,7 @@ static std::string
 log_event_to_text (const gtf::LogEventBase *e)
 {
   std::string t = e->name ();
-  /* @@@ too much:
+  /* too much:
   std::vector< std::pair<std::string, std::string> > attrs;
   e->attributes (attrs);
   for (std::vector< std::pair<std::string, std::string> >::const_iterator a = attrs.begin (); a != attrs.end (); ++a) {

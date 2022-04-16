@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -85,6 +85,12 @@ template <class C>
 static std::string version (C *)
 {
   return C::version ();
+}
+
+template <class C>
+static void add_macro_category (C *c, const std::string &name, const std::string &description, const std::vector<std::string> &folders)
+{
+  c->add_macro_category (name, description, folders);
 }
 
 template <class C>
@@ -225,6 +231,12 @@ static gsi::Methods application_methods ()
     method_ext<C, std::string> ("arch", &arch<C>,
       "@brief Returns the architecture string\n"
       "This method has been introduced in version 0.25."
+    ) +
+    method_ext<C, const std::string &, const std::string &, const std::vector<std::string> &> ("add_macro_category", &add_macro_category<C>, gsi::arg ("name"), gsi::arg ("description"), gsi::arg ("folders"),
+      "@brief Creates a new macro category\n"
+      "Creating a new macro category is only possible during the autorun_early stage. "
+      "The new macro category must correspond to an interpreter registered at the same stage.\n"
+      "This method has been introduced in version 0.28."
     ) +
     method<C *> ("instance", &C::instance,
       "@brief Return the singleton instance of the application\n"

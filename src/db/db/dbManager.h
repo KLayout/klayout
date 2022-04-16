@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -142,6 +142,16 @@ public:
    *  This method can be used to identify the current transaction by id.
    */
   transaction_id_t last_transaction_id () const;
+
+  /**
+   *  @brief Gets the id of the next transaction to undo
+   */
+  transaction_id_t transaction_id_for_undo () const;
+
+  /**
+   *  @brief Gets the id of the next transaction to redo
+   */
+  transaction_id_t transaction_id_for_redo () const;
 
   /**
    *  @brief Close a transaction successfully.
@@ -332,6 +342,11 @@ public:
     if (! mp_manager->transacting ()) {
       mp_manager->transaction (m_description, m_transaction_id);
     }
+  }
+
+  bool is_empty () const
+  {
+    return ! mp_manager || mp_manager->last_queued (0) == 0;
   }
 
   db::Manager::transaction_id_t id () const

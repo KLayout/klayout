@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -127,7 +127,8 @@ AuthenticationHandler::proxyAuthenticationRequired (const QNetworkProxy &proxy, 
 
 InputHttpStream::InputHttpStream (const std::string &url)
 {
-  mp_data = new InputHttpStreamPrivateData (url);
+  mp_data = new InputHttpStreamPrivateData (this, url);
+  mp_callback = 0;
 }
 
 InputHttpStream::~InputHttpStream ()
@@ -229,7 +230,22 @@ InputHttpStream::is_available ()
 void
 InputHttpStream::tick ()
 {
+  if (mp_callback) {
+    mp_callback->wait_for_input ();
+  }
   QCoreApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
+}
+
+void
+InputHttpStream::set_timeout (double to)
+{
+  mp_data->set_timeout (to);
+}
+
+double
+InputHttpStream::timeout () const
+{
+  return mp_data->timeout ();
 }
 
 // ---------------------------------------------------------------
@@ -238,8 +254,8 @@ InputHttpStream::tick ()
 static QNetworkAccessManager *s_network_manager (0);
 static AuthenticationHandler *s_auth_handler (0);
 
-InputHttpStreamPrivateData::InputHttpStreamPrivateData (const std::string &url)
-  : m_url (url), mp_reply (0), m_request ("GET"), mp_buffer (0), mp_resend_timer (new QTimer (this))
+InputHttpStreamPrivateData::InputHttpStreamPrivateData (InputHttpStream *stream, const std::string &url)
+  : m_url (url), mp_reply (0), m_request ("GET"), mp_buffer (0), mp_resend_timer (new QTimer (this)), m_timeout (10.0), mp_stream (stream)
 {
   if (! s_network_manager) {
 
@@ -261,6 +277,18 @@ InputHttpStreamPrivateData::InputHttpStreamPrivateData (const std::string &url)
 InputHttpStreamPrivateData::~InputHttpStreamPrivateData ()
 {
   close ();
+}
+
+void
+InputHttpStreamPrivateData::set_timeout (double to)
+{
+  m_timeout = to;
+}
+
+double
+InputHttpStreamPrivateData::timeout () const
+{
+  return m_timeout;
 }
 
 void
@@ -417,11 +445,9 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
     issue_request (QUrl (tl::to_qstring (m_url)));
   }
 
-  //  TODO: progress
   tl::Clock start_time = tl::Clock::current ();
-  double timeout = 10;  //  TODO: make variable
-  while (mp_reply == 0 && (tl::Clock::current() - start_time).seconds () < timeout) {
-    QCoreApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
+  while (mp_reply == 0 && (m_timeout <= 0.0 || (tl::Clock::current() - start_time).seconds () < m_timeout)) {
+    mp_stream->tick ();
   }
 
   if (! mp_reply) {

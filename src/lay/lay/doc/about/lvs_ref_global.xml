@@ -100,6 +100,15 @@ See <a href="/about/lvs_ref_netter.xml#ignore_parameter">Netter#ignore_parameter
 <p>
 See <a href="/about/lvs_ref_netter.xml#join_symmetric_nets">Netter#join_symmetric_nets</a> for a description of that function.
 </p>
+<a name="lvs_data"/><h2>"lvs_data" - Gets the <class_doc href="LayoutVsSchematic">LayoutVsSchematic</class_doc> object after compare was used</h2>
+<keyword name="lvs_data"/>
+<p>Usage:</p>
+<ul>
+<li><tt>lvs_data</tt></li>
+</ul>
+<p>
+See <a href="/about/lvs_ref_netter.xml#lvs_data">Netter#lvs_data</a> for a description of that function.
+</p>
 <a name="max_branch_complexity"/><h2>"max_branch_complexity" - Configures the maximum branch complexity for ambiguous net matching</h2>
 <keyword name="max_branch_complexity"/>
 <p>Usage:</p>
@@ -216,6 +225,16 @@ See <a href="/about/lvs_ref_netter.xml#same_nets">Netter#same_nets</a>! for a de
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml#schematic">Netter#schematic</a> for a description of that function.
+</p>
+<a name="split_gates"/><h2>"split_gates" - Implements the "split gates" feature for the given device and circuits</h2>
+<keyword name="split_gates"/>
+<p>Usage:</p>
+<ul>
+<li><tt>split_gates(device_name)</tt></li>
+<li><tt>split_gates(device_name, circuit_filter)</tt></li>
+</ul>
+<p>
+See <a href="/about/lvs_ref_netter.xml#split_gates">Netter#split_gates</a> for a description of that function.
 </p>
 <a name="tolerance"/><h2>"tolerance" - Specifies compare tolerances for certain device parameters</h2>
 <keyword name="tolerance"/>

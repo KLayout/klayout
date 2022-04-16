@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -471,17 +471,6 @@ static void break_polygons (db::Region *r, size_t max_vertex_count, double max_a
   r->process (db::PolygonBreaker (max_vertex_count, max_area_ratio));
 }
 
-static db::Region &size_ext (db::Region *r, db::Coord d)
-{
-  r->size (d);
-  return *r;
-}
-
-static db::Region sized_ext (db::Region *r, db::Coord d)
-{
-  return r->sized (d);
-}
-
 static db::Region &merge_ext1 (db::Region *r, int min_wc)
 {
   r->merge (false, std::max (0, min_wc - 1));
@@ -738,6 +727,19 @@ fill_region_multi (const db::Region *fr, db::Cell *cell, db::cell_index_type fil
                    const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
 {
   db::fill_region_repeat (cell, *fr, fill_cell_index, fc_box, row_step, column_step, fill_margin, remaining_polygons, glue_box);
+}
+
+static db::Region
+sized_dvm (const db::Region *region, const db::Vector &dv, unsigned int mode)
+{
+  return region->sized (dv.x (), dv.y (), mode);
+}
+
+static db::Region &
+size_dvm (db::Region *region, const db::Vector &dv, unsigned int mode)
+{
+  region->size (dv.x (), dv.y (), mode);
+  return *region;
 }
 
 static db::Point default_origin;
@@ -1537,7 +1539,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "# r now is (50,-50;50,100;100,100;100,-50)\n"
     "@/code\n"
   ) + 
-  method ("size", (db::Region & (db::Region::*) (db::Coord, unsigned int)) &db::Region::size, gsi::arg ("d"), gsi::arg ("mode"),
+  method_ext ("size", &size_dvm, gsi::arg ("dv"), gsi::arg ("mode", (unsigned int) 2),
+    "@brief Anisotropic sizing (biasing)\n"
+    "\n"
+    "@return The region after the sizing has applied (self)\n"
+    "\n"
+    "This method is equivalent to \"size(dv.x, dv.y, mode)\".\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+    "\n"
+    "This variant has been introduced in version 0.28."
+  ) +
+  method ("size", (db::Region & (db::Region::*) (db::Coord, unsigned int)) &db::Region::size, gsi::arg ("d"), gsi::arg ("mode", (unsigned int) 2),
     "@brief Isotropic sizing (biasing)\n"
     "\n"
     "@return The region after the sizing has applied (self)\n"
@@ -1546,39 +1559,34 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
-  method_ext ("size", size_ext, gsi::arg ("d"),
-    "@brief Isotropic sizing (biasing)\n"
-    "\n"
-    "@return The region after the sizing has applied (self)\n"
-    "\n"
-    "This method is equivalent to \"size(d, d, 2)\".\n"
-    "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
   method ("sized", (db::Region (db::Region::*) (db::Coord, db::Coord, unsigned int) const) &db::Region::sized, gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("mode"),
     "@brief Returns the anisotropically sized region\n"
     "\n"
     "@return The sized region\n"
     "\n"
-    "This method is returns the sized region (see \\size), but does not modify self.\n"
+    "This method returns the sized region (see \\size), but does not modify self.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 
-  method ("sized", (db::Region (db::Region::*) (db::Coord, unsigned int) const) &db::Region::sized, gsi::arg ("d"), gsi::arg ("mode"),
+  method_ext ("sized", &sized_dvm, gsi::arg ("dv"), gsi::arg ("mode", (unsigned int) 2),
+    "@brief Returns the (an)isotropically sized region\n"
+    "\n"
+    "@return The sized region\n"
+    "\n"
+    "This method is equivalent to \"sized(dv.x, dv.y, mode)\".\n"
+    "This method returns the sized region (see \\size), but does not modify self.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+    "\n"
+    "This variant has been introduced in version 0.28."
+  ) +
+  method ("sized", (db::Region (db::Region::*) (db::Coord, unsigned int) const) &db::Region::sized, gsi::arg ("d"), gsi::arg ("mode", (unsigned int) 2),
     "@brief Returns the isotropically sized region\n"
     "\n"
     "@return The sized region\n"
     "\n"
-    "This method is returns the sized region (see \\size), but does not modify self.\n"
-    "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
-  method_ext ("sized", sized_ext, gsi::arg ("d"),
-    "@brief Isotropic sizing (biasing)\n"
-    "\n"
-    "@return The region after the sizing has applied (self)\n"
-    "\n"
-    "This method is equivalent to \"sized(d, d, 2)\".\n"
+    "This method is equivalent to \"sized(d, d, mode)\".\n"
+    "This method returns the sized region (see \\size), but does not modify self.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) + 

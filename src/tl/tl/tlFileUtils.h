@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -169,6 +169,11 @@ std::string TL_PUBLIC combine_path (const std::string &p1, const std::string &p2
  *  @brief Gets the current directory
  */
 std::string TL_PUBLIC current_dir ();
+
+/**
+ *  @brief Change the current directory and returns true if the change was successful
+ */
+bool TL_PUBLIC chdir (const std::string &path);
 
 /**
  *  @brief This function splits the path into it's components

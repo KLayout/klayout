@@ -388,7 +388,7 @@ shapes on layer METAL, POLY from cell TOP
   Any kind of cell query can be used inside the shape query. If a cell query renders multiple 
   cells, the shape query will be applied to each of the cells returned. If instances are selected
   by the cell query, the shapes will be reported for each instance. Since the cumulated transformation
-  of a specific instance into the top cell is available through the "path_trans" variable, 
+  of a specific instance into the top cell is available through the "path_trans" (database units) or "path_dtrans" (micrometer units) variable,
   it is possible to transform each shape into the top cell in the instance case. The following expression 
   combines a "with .. do" action with a shape query to flatten all shapes below "TOP": 
   </p>
@@ -600,13 +600,23 @@ delete shapes on layer 6 of cell TOP
     </tr>
     <tr>
       <td>bbox</td>
-      <td><class_ref href="Box"/></td>
+      <td><class_doc href="Box"/></td>
       <td>The cell's bounding box.</td>
     </tr>
     <tr>
+      <td>dbbox</td>
+      <td><class_doc href="DBox"/></td>
+      <td>The cell's bounding box in micrometer units.</td>
+    </tr>
+    <tr>
       <td>cell_bbox</td>
-      <td><class_ref href="Box"/></td>
-      <td>Same as "bbox" (disambiguator for shape and instance bounding boxes).</td>
+      <td><class_doc href="Box"/></td>
+      <td>Same as "bbox" (disambiguator from shape and instance bounding boxes).</td>
+    </tr>
+    <tr>
+      <td>cell_dbbox</td>
+      <td><class_doc href="DBox"/></td>
+      <td>Same as "dbbox" (disambiguator from shape and instance bounding boxes).</td>
     </tr>
   </table>
 
@@ -632,14 +642,30 @@ delete shapes on layer 6 of cell TOP
           For a plain cell that is a unit transformation.</td>
     </tr>
     <tr>
+      <td>path_dtrans</td>
+      <td><class_doc href="DCplxTrans"/></td>
+      <td>The transformation of that instance into the top cell in micrometer units.
+          For a plain cell that is a unit transformation.</td>
+    </tr>
+    <tr>
       <td>trans</td>
       <td><class_doc href="ICplxTrans"/></td>
       <td>The transformation of that instance (first instance if an array).</td>
     </tr>
     <tr>
+      <td>dtrans</td>
+      <td><class_doc href="DCplxTrans"/></td>
+      <td>The transformation of that instance (first instance if an array) in micrometer units.</td>
+    </tr>
+    <tr>
       <td>inst_bbox</td>
       <td><class_doc href="Box"/></td>
       <td>The instance bounding box in the initial cell.</td>
+    </tr>
+    <tr>
+      <td>inst_dbbox</td>
+      <td><class_doc href="DBox"/></td>
+      <td>The instance bounding box in the initial cell in micrometer units.</td>
     </tr>
     <tr>
       <td>inst</td>
@@ -648,8 +674,13 @@ delete shapes on layer 6 of cell TOP
     </tr>
     <tr>
       <td>array_a</td>
-      <td><class_doc href="Point"/></td>
+      <td><class_doc href="Vector"/></td>
       <td>The a vector for an array instance or nil if the instance is not an array.</td>
+    </tr>
+    <tr>
+      <td>array_da</td>
+      <td><class_doc href="DVector"/></td>
+      <td>The a vector for an array instance in micrometer units or nil if the instance is not an array.</td>
     </tr>
     <tr>
       <td>array_na</td>
@@ -658,8 +689,13 @@ delete shapes on layer 6 of cell TOP
     </tr>
     <tr>
       <td>array_b</td>
-      <td><class_doc href="Point"/></td>
+      <td><class_doc href="Vector"/></td>
       <td>The b vector for an array instance or nil if the instance is not an array.</td>
+    </tr>
+    <tr>
+      <td>array_db</td>
+      <td><class_doc href="DVector"/></td>
+      <td>The b vector for an array instance in micrometer units or nil if the instance is not an array.</td>
     </tr>
     <tr>
       <td>array_nb</td>
@@ -689,13 +725,23 @@ delete shapes on layer 6 of cell TOP
     <tr><th>Name</th><th>Value type</th><th>Description</th></tr>
     <tr>
       <td>bbox</td>
-      <td><class_doc href="Box"/></td>
+      <td><class_doc href="DBox"/></td>
       <td>The shape's bounding box</td>
+    </tr>
+    <tr>
+      <td>dbbox</td>
+      <td><class_doc href="DBox"/></td>
+      <td>The shape's bounding box in micrometer units</td>
     </tr>
     <tr>
       <td>shape_bbox</td>
       <td><class_doc href="Box"/></td>
       <td>Same as "bbox" (disambiguator for cell or instance bounding boxes)</td>
+    </tr>
+    <tr>
+      <td>shape_dbbox</td>
+      <td><class_doc href="DBox"/></td>
+      <td>Same as "dbbox" (disambiguator for cell or instance bounding boxes)</td>
     </tr>
     <tr>
       <td>shape</td>

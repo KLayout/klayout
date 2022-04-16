@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -113,16 +113,18 @@ public:
    *
    *  This version does not provide library selection. \get_current_library will
    *  always return 0.
-   *  If all_cells is true, all cells (not only top cells and basic cells) are shown.
+   *  If all_cells is true, all cells (not just top cells and basic cells) are shown.
+   *  If top_cells_only is false, child cells are shown as well.
    */
-  LibraryCellSelectionForm (QWidget *parent, db::Layout *layout, const char *name, bool all_cells = false);
+  LibraryCellSelectionForm (QWidget *parent, db::Layout *layout, const char *name, bool all_cells = false, bool top_cells_only = true);
 
   /**
    *  @brief Create a selection form for cells plus the library
    *
    *  If all_cells is true, all cells (not only top cells and basic cells) are shown.
+   *  If top_cells_only is false, child cells are shown as well.
    */
-  LibraryCellSelectionForm (QWidget *parent, const char *name, bool all_cells = false);
+  LibraryCellSelectionForm (QWidget *parent, const char *name, bool all_cells = false, bool top_cells_only = true);
 
   /**
    *  @brief Set the selected library
@@ -187,6 +189,7 @@ private:
   db::pcell_id_type m_pcell_id;
   bool m_is_pcell;
   bool m_all_cells;
+  bool m_top_cells_only;
 
   void select_entry (db::cell_index_type n);
   void select_pcell_entry (db::pcell_id_type n);

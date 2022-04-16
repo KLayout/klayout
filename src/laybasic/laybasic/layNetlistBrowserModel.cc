@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -326,7 +326,7 @@ std::string device_parameter_string (const db::Device *device)
   const std::vector<db::DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();
   for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
     double v = device->parameter_value (p->id ());
-    if (! tl::equal (v, p->default_value ())) {
+    if (v > 0.0) {
       if (first) {
         s += " [";
         first = false;
@@ -2566,8 +2566,12 @@ NetlistBrowserModel::data (const QModelIndex &index, int role) const
     return QVariant (icon_for_status (status (index)));
   } else if (role == Qt::DisplayRole) {
     return QVariant (text (index));
-  } else if (role == Qt::ToolTipRole && index.column () == m_status_column) {
-    return tooltip (index);
+  } else if (role == Qt::ToolTipRole) {
+    if (index.column () == m_status_column) {
+      return tooltip (index);
+    } else {
+      return QVariant (text (index));
+    }
   } else if (role == Qt::UserRole) {
     return QVariant (search_text (index));
   } else if (role == Qt::FontRole) {

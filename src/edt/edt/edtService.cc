@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -793,6 +793,17 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
     return true;
   } else {
     return mouse_press_event (p, buttons, prio);
+  }
+}
+
+bool
+Service::key_event (unsigned int key, unsigned int buttons)
+{
+  if (view ()->is_editable () && m_editing && buttons == 0 && key == Qt::Key_Backspace) {
+    do_delete ();
+    return true;
+  } else {
+    return false;
   }
 }
 

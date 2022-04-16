@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -99,6 +99,8 @@ static void set_value (const db::PCellParameterDeclaration &p, QWidget *widget, 
           db::LayerProperties lp;
           if (value.is_user<db::LayerProperties> ()) {
             lp = value.to_user<db::LayerProperties> ();
+          } else if (value.is_nil ()) {
+            //  empty LayerProperties
           } else {
             std::string s = value.to_string ();
             tl::Extractor ex (s.c_str ());
@@ -154,6 +156,9 @@ PCellParametersPage::PCellParametersPage (QWidget *parent, bool dense)
 void
 PCellParametersPage::init ()
 {
+  QPalette palette;
+  QFont font;
+
   mp_pcell_decl.reset (0);
   mp_view = 0;
   m_cv_index = 0;
@@ -164,22 +169,66 @@ PCellParametersPage::init ()
   frame_layout->setContentsMargins (0, 0, 0, 0);
   setLayout (frame_layout);
 
-  mp_error_icon = new QLabel (this);
-  mp_error_icon->setPixmap (QPixmap (":/warn.png"));
-  mp_error_icon->hide ();
-  frame_layout->addWidget (mp_error_icon, 1, 0, 1, 1);
+  mp_update_frame = new QFrame ();
+  mp_update_frame->setFrameShape (QFrame::NoFrame);
+  frame_layout->addWidget (mp_update_frame, 0, 0, 1, 1);
 
-  mp_error_label = new QLabel (this);
+  QGridLayout *update_frame_layout = new QGridLayout (mp_update_frame);
+  mp_update_frame->setLayout (update_frame_layout);
+  if (m_dense) {
+    update_frame_layout->setContentsMargins (4, 4, 4, 4);
+    update_frame_layout->setHorizontalSpacing (6);
+    update_frame_layout->setVerticalSpacing (2);
+  }
+
+  mp_changed_icon = new QLabel (mp_update_frame);
+  mp_changed_icon->setPixmap (QPixmap (":/warn.png"));
+  update_frame_layout->addWidget (mp_changed_icon, 0, 0, 1, 1);
+
+  mp_update_button = new QToolButton (mp_update_frame);
+  mp_update_button->setText (tr ("Update"));
+  connect (mp_update_button, SIGNAL (clicked()), this, SLOT (update_button_pressed ()));
+  update_frame_layout->addWidget (mp_update_button, 0, 1, 1, 1);
+
+  mp_changed_label = new QLabel (mp_update_frame);
+  mp_changed_label->setText (tr ("Update needed"));
+  update_frame_layout->addWidget (mp_changed_label, 0, 2, 1, 1);
+
+  update_frame_layout->setColumnStretch (2, 1);
+
+  mp_error_frame = new QFrame ();
+  mp_error_frame->setFrameShape (QFrame::NoFrame);
+  frame_layout->addWidget (mp_error_frame, 1, 0, 1, 1);
+
+  QGridLayout *error_frame_layout = new QGridLayout (mp_error_frame);
+  mp_error_frame->setLayout (error_frame_layout);
+  if (m_dense) {
+    error_frame_layout->setContentsMargins (4, 4, 4, 4);
+    error_frame_layout->setHorizontalSpacing (6);
+    error_frame_layout->setVerticalSpacing (2);
+  }
+
+  mp_error_icon = new QLabel (mp_update_frame);
+  mp_error_icon->setPixmap (QPixmap (":/warn.png"));
+  error_frame_layout->addWidget (mp_error_icon, 1, 0, 1, 1);
+
+  mp_error_label = new QLabel (mp_update_frame);
   mp_error_label->setWordWrap (true);
-  QPalette palette = mp_error_label->palette ();
+  palette = mp_error_label->palette ();
   palette.setColor (QPalette::WindowText, Qt::red);
   mp_error_label->setPalette (palette);
-  QFont font = mp_error_label->font ();
+  font = mp_error_label->font ();
   font.setBold (true);
   mp_error_label->setFont (font);
-  mp_error_label->hide ();
-  frame_layout->addWidget (mp_error_label, 1, 1, 1, 1);
-  frame_layout->setColumnStretch (1, 1);
+  error_frame_layout->addWidget (mp_error_label, 1, 1, 1, 2);
+
+  error_frame_layout->setColumnStretch (2, 1);
+}
+
+bool
+PCellParametersPage::lazy_evaluation ()
+{
+  return mp_pcell_decl.get () && mp_pcell_decl->wants_lazy_evaluation ();
 }
 
 void
@@ -199,8 +248,8 @@ PCellParametersPage::setup (lay::LayoutView *view, int cv_index, const db::PCell
   mp_parameters_area = new QScrollArea (this);
   mp_parameters_area->setFrameShape (QFrame::NoFrame);
   QGridLayout *frame_layout = dynamic_cast<QGridLayout *> (QFrame::layout ());
-  frame_layout->addWidget (mp_parameters_area, 0, 0, 1, 2);
-  frame_layout->setRowStretch (0, 1);
+  frame_layout->addWidget (mp_parameters_area, 2, 0, 1, 1);
+  frame_layout->setRowStretch (2, 1);
 
   QFrame *fi = new QFrame (mp_parameters_area);
   QWidget *inner_frame = fi;
@@ -396,9 +445,7 @@ PCellParametersPage::setup (lay::LayoutView *view, int cv_index, const db::PCell
   mp_parameters_area->setWidget (main_frame);
   main_frame->show ();
 
-  //  does a first coerce and update. Ignore errors for now.
-  bool ok = false;
-  get_parameters (&ok);
+  update_current_parameters ();
 }
 
 PCellParametersPage::State
@@ -446,10 +493,31 @@ PCellParametersPage::do_parameter_changed ()
 {
   //  does a coerce and update
   bool ok = false;
-  get_parameters (&ok);
-  if (ok) {
+  std::vector<tl::Variant> parameters = get_parameters (&ok);
+  if (ok && ! lazy_evaluation ()) {
     emit edited ();
   }
+}
+
+void
+PCellParametersPage::update_button_pressed ()
+{
+  if (update_current_parameters ()) {
+    emit edited ();
+  }
+}
+
+bool
+PCellParametersPage::update_current_parameters ()
+{
+  bool ok = false;
+  std::vector<tl::Variant> parameters = get_parameters (&ok);
+  if (ok) {
+    m_current_parameters = parameters;
+    mp_update_frame->hide ();
+  }
+
+  return ok;
 }
 
 std::vector<tl::Variant> 
@@ -493,7 +561,7 @@ PCellParametersPage::get_parameters (bool *ok)
                 try {
 
                   int v = 0;
-                  tl::from_string (tl::to_string (le->text ()), v);
+                  tl::from_string_ext (tl::to_string (le->text ()), v);
 
                   parameters.back () = tl::Variant (v);
                   lay::indicate_error (le, (tl::Exception *) 0);
@@ -517,7 +585,7 @@ PCellParametersPage::get_parameters (bool *ok)
                 try {
 
                   double v = 0;
-                  tl::from_string (tl::to_string (le->text ()), v);
+                  tl::from_string_ext (tl::to_string (le->text ()), v);
 
                   parameters.back () = tl::Variant (v);
                   lay::indicate_error (le, (tl::Exception *) 0);
@@ -594,10 +662,7 @@ PCellParametersPage::get_parameters (bool *ok)
     if (mp_view->cellview (m_cv_index).is_valid ()) {
       mp_pcell_decl->coerce_parameters (mp_view->cellview (m_cv_index)->layout (), parameters);
     }
-    set_parameters (parameters);
-
-    mp_error_label->hide ();
-    mp_error_icon->hide ();
+    set_parameters_internal (parameters, lazy_evaluation ());
 
     if (ok) {
       *ok = true;
@@ -608,8 +673,7 @@ PCellParametersPage::get_parameters (bool *ok)
     if (ok) {
       mp_error_label->setText (tl::to_qstring (ex.basic_msg ()));
       mp_error_label->setToolTip (tl::to_qstring (ex.msg ()));
-      mp_error_icon->show ();
-      mp_error_label->show ();
+      mp_error_frame->show ();
       *ok = false;
     } else {
       throw;
@@ -619,8 +683,7 @@ PCellParametersPage::get_parameters (bool *ok)
 
     if (ok) {
       mp_error_label->setText (tl::to_qstring (ex.msg ()));
-      mp_error_icon->show ();
-      mp_error_label->show ();
+      mp_error_frame->show ();
       *ok = false;
     } else {
       throw;
@@ -631,8 +694,15 @@ PCellParametersPage::get_parameters (bool *ok)
   return parameters;
 }
 
-void 
+void
 PCellParametersPage::set_parameters (const std::vector<tl::Variant> &parameters)
+{
+  m_parameters = parameters;
+  set_parameters_internal (parameters, false);
+}
+
+void
+PCellParametersPage::set_parameters_internal (const std::vector<tl::Variant> &parameters, bool tentatively)
 {
   if (! mp_pcell_decl) {
     return;
@@ -646,6 +716,18 @@ PCellParametersPage::set_parameters (const std::vector<tl::Variant> &parameters)
       set_value (*p, m_widgets [r], parameters [r]);
     }
   }
+
+  mp_error_frame->hide ();
+
+  bool update_needed = false;
+
+  if (! tentatively) {
+    m_current_parameters = parameters;
+  } else {
+    update_needed = (m_current_parameters != parameters);
+  }
+
+  mp_update_frame->setVisible (update_needed);
 }
 
 }

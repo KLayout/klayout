@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -387,65 +387,56 @@ DXFWriter::write_polygons (const db::Layout & /*layout*/, const db::Cell &cell, 
 void 
 DXFWriter::write_polygon (const db::Polygon &polygon, double sf)
 {
-  if (m_options.polygon_mode == 0) {
+  if (polygon.holes () > 0 && (m_options.polygon_mode == 0 || m_options.polygon_mode == 1 || m_options.polygon_mode == 2)) {
 
-    for (unsigned int c = 0; c < polygon.holes () + 1; ++c) {
+    //  resolve holes or merge polygon as a preparation step
+    std::vector<db::Polygon> polygons;
 
-      *this << 0 << endl << "POLYLINE" << endl;
-      *this << 8 << endl; emit_layer (m_layer);
-      *this << 70 << endl << 1 << endl;
-      *this << 40 << endl << 0.0 << endl;
-      *this << 41 << endl << 0.0 << endl;
-      *this << 66 << endl << 1 << endl;  //  required by TrueView
+    db::EdgeProcessor ep;
+    ep.insert_sequence (polygon.begin_edge ());
+    db::PolygonContainer pc (polygons);
+    db::PolygonGenerator out (pc, true /*resolve holes*/, false /*min coherence for splitting*/);
+    db::SimpleMerge op;
+    ep.process (out, op);
 
-      for (db::Polygon::polygon_contour_iterator p = polygon.contour (c).begin (); p != polygon.contour (c).end (); ++p) {
-        *this << 0 << endl << "VERTEX" << endl;
-        *this << 8 << endl; emit_layer (m_layer);  //  required by TrueView
-        *this << 10 << endl << (*p).x () * sf << endl;
-        *this << 20 << endl << (*p).y () * sf << endl;
-      }
-
-      *this << 0 << endl << "SEQEND" << endl;
-
+    for (std::vector<db::Polygon>::const_iterator p = polygons.begin (); p != polygons.end (); ++p) {
+      write_polygon (*p, sf);
     }
+
+  } else if (m_options.polygon_mode == 0) {
+
+    *this << 0 << endl << "POLYLINE" << endl;
+    *this << 8 << endl; emit_layer (m_layer);
+    *this << 70 << endl << 1 << endl;
+    *this << 40 << endl << 0.0 << endl;
+    *this << 41 << endl << 0.0 << endl;
+    *this << 66 << endl << 1 << endl;  //  required by TrueView
+
+    for (db::Polygon::polygon_contour_iterator p = polygon.begin_hull (); p != polygon.end_hull (); ++p) {
+      *this << 0 << endl << "VERTEX" << endl;
+      *this << 8 << endl; emit_layer (m_layer);  //  required by TrueView
+      *this << 10 << endl << (*p).x () * sf << endl;
+      *this << 20 << endl << (*p).y () * sf << endl;
+    }
+
+    *this << 0 << endl << "SEQEND" << endl;
 
   } else if (m_options.polygon_mode == 1) {
 
-    for (unsigned int c = 0; c < polygon.holes () + 1; ++c) {
+    *this << 0 << endl << "LWPOLYLINE" << endl;
+    *this << 8 << endl; emit_layer (m_layer);
+    *this << 90 << endl << polygon.contour (0).size () << endl;
+    *this << 70 << endl << 1 << endl;
+    *this << 43 << endl << 0.0 << endl;
 
-      *this << 0 << endl << "LWPOLYLINE" << endl;
-      *this << 8 << endl; emit_layer (m_layer);
-      *this << 90 << endl << polygon.contour (0).size () << endl;
-      *this << 70 << endl << 1 << endl;
-      *this << 43 << endl << 0.0 << endl;
-
-      for (db::Polygon::polygon_contour_iterator p = polygon.contour (c).begin (); p != polygon.contour (c).end (); ++p) {
-        *this << 10 << endl << (*p).x () * sf << endl;
-        *this << 20 << endl << (*p).y () * sf << endl;
-      }
-
+    for (db::Polygon::polygon_contour_iterator p = polygon.begin_hull (); p != polygon.end_hull (); ++p) {
+      *this << 10 << endl << (*p).x () * sf << endl;
+      *this << 20 << endl << (*p).y () * sf << endl;
     }
 
   } else if (m_options.polygon_mode == 2) {
 
-    if (polygon.holes () > 0) {
-
-      //  resolve holes or merge polygon as a preparation step for split_polygon which only works properly
-      //  on merged polygons ...
-      std::vector<db::Polygon> polygons;
-
-      db::EdgeProcessor ep;
-      ep.insert_sequence (polygon.begin_edge ());
-      db::PolygonContainer pc (polygons);
-      db::PolygonGenerator out (pc, true /*resolve holes*/, false /*min coherence for splitting*/);
-      db::SimpleMerge op;
-      ep.process (out, op);
-
-      for (std::vector<db::Polygon>::const_iterator p = polygons.begin (); p != polygons.end (); ++p) {
-        write_polygon (*p, sf);
-      }
-
-    } else if (polygon.vertices () > 4) {
+    if (polygon.vertices () > 4) {
 
       std::vector <db::Polygon> polygons;
       db::split_polygon (polygon, polygons);

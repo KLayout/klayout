@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -353,6 +353,33 @@ static db::cell_index_type clip (db::Layout *l, db::cell_index_type c, const db:
   return cc [0];
 }
 
+static db::cell_index_type clip_dbox (db::Layout *l, db::cell_index_type c, const db::DBox &box)
+{
+  std::vector <db::Box> boxes;
+  boxes.push_back (db::CplxTrans (l->dbu ()).inverted () * box);
+  std::vector <db::cell_index_type> cc = db::clip_layout(*l, *l, c, boxes, true);
+  tl_assert (! cc.empty ());
+  return cc [0];
+}
+
+static db::Cell *clip_cell_dbox (db::Layout *l, const db::Cell &c, const db::DBox &box)
+{
+  std::vector <db::Box> boxes;
+  boxes.push_back (db::CplxTrans (l->dbu ()).inverted () * box);
+  std::vector <db::cell_index_type> cc = db::clip_layout(*l, *l, c.cell_index (), boxes, true);
+  tl_assert (! cc.empty ());
+  return &l->cell (cc [0]);
+}
+
+static db::Cell *clip_cell (db::Layout *l, const db::Cell &c, const db::Box &box)
+{
+  std::vector <db::Box> boxes;
+  boxes.push_back (box);
+  std::vector <db::cell_index_type> cc = db::clip_layout(*l, *l, c.cell_index (), boxes, true);
+  tl_assert (! cc.empty ());
+  return &l->cell (cc [0]);
+}
+
 static db::cell_index_type clip_into (const db::Layout *l, db::cell_index_type c, db::Layout *t, const db::Box &box)
 {
   std::vector <db::Box> boxes;
@@ -362,14 +389,92 @@ static db::cell_index_type clip_into (const db::Layout *l, db::cell_index_type c
   return cc [0];
 }
 
+static db::cell_index_type clip_into_dbox (const db::Layout *l, db::cell_index_type c, db::Layout *t, const db::DBox &box)
+{
+  std::vector <db::Box> boxes;
+  boxes.push_back (db::CplxTrans (l->dbu ()).inverted () * box);
+  std::vector <db::cell_index_type> cc = db::clip_layout(*l, *t, c, boxes, true);
+  tl_assert (! cc.empty ());
+  return cc [0];
+}
+
+static db::Cell *clip_into_cell (const db::Layout *l, const db::Cell &c, db::Layout *t, const db::Box &box)
+{
+  std::vector <db::Box> boxes;
+  boxes.push_back (box);
+  std::vector <db::cell_index_type> cc = db::clip_layout(*l, *t, c.cell_index (), boxes, true);
+  tl_assert (! cc.empty ());
+  return &t->cell (cc [0]);
+}
+
+static db::Cell *clip_into_cell_dbox (const db::Layout *l, const db::Cell &c, db::Layout *t, const db::DBox &box)
+{
+  std::vector <db::Box> boxes;
+  boxes.push_back (db::CplxTrans (l->dbu ()).inverted () * box);
+  std::vector <db::cell_index_type> cc = db::clip_layout(*l, *t, c.cell_index (), boxes, true);
+  tl_assert (! cc.empty ());
+  return &t->cell (cc [0]);
+}
+
+static std::vector<db::Box> transform_boxes (const db::Layout *l, const std::vector<db::DBox> &boxes)
+{
+  std::vector<db::Box> result;
+  result.reserve (boxes.size ());
+  db::VCplxTrans t = db::CplxTrans (l->dbu ()).inverted ();
+  for (std::vector<db::DBox>::const_iterator i = boxes.begin (); i != boxes.end (); ++i) {
+    result.push_back (t * *i);
+  }
+  return result;
+}
+
+static std::vector<db::Cell *> to_cell_refs (db::Layout *l, const std::vector<db::cell_index_type> &cell_indexes)
+{
+  std::vector<db::Cell *> result;
+  result.reserve (cell_indexes.size ());
+  for (std::vector<db::cell_index_type>::const_iterator i = cell_indexes.begin (); i != cell_indexes.end (); ++i) {
+    result.push_back (&l->cell (*i));
+  }
+  return result;
+}
+
 static std::vector<db::cell_index_type> multi_clip (db::Layout *l, db::cell_index_type c, const std::vector<db::Box> &boxes)
 {
-  return db::clip_layout(*l, *l, c, boxes, true);
+  return db::clip_layout (*l, *l, c, boxes, true);
+}
+
+static std::vector<db::Cell *> multi_clip_cells (db::Layout *l, const db::Cell &c, const std::vector<db::Box> &boxes)
+{
+  return to_cell_refs (l, db::clip_layout (*l, *l, c.cell_index (), boxes, true));
+}
+
+static std::vector<db::cell_index_type> multi_clip_dboxes (db::Layout *l, db::cell_index_type c, const std::vector<db::DBox> &boxes)
+{
+  return db::clip_layout (*l, *l, c, transform_boxes (l, boxes), true);
+}
+
+static std::vector<db::Cell *> multi_clip_cells_dboxes (db::Layout *l, const db::Cell &c, const std::vector<db::DBox> &boxes)
+{
+  return to_cell_refs (l, db::clip_layout (*l, *l, c.cell_index (), transform_boxes (l, boxes), true));
 }
 
 static std::vector<db::cell_index_type> multi_clip_into (db::Layout *l, db::cell_index_type c, db::Layout *t, const std::vector<db::Box> &boxes)
 {
-  return db::clip_layout(*l, *t, c, boxes, true);
+  return db::clip_layout (*l, *t, c, boxes, true);
+}
+
+static std::vector<db::Cell *> multi_clip_into_cells (db::Layout *l, const db::Cell &c, db::Layout *t, const std::vector<db::Box> &boxes)
+{
+  return to_cell_refs (l, db::clip_layout (*l, *t, c.cell_index (), boxes, true));
+}
+
+static std::vector<db::cell_index_type> multi_clip_into_dboxes (db::Layout *l, db::cell_index_type c, db::Layout *t, const std::vector<db::DBox> &boxes)
+{
+  return db::clip_layout (*l, *t, c, transform_boxes (l, boxes), true);
+}
+
+static std::vector<db::Cell *> multi_clip_into_cells_dboxes (db::Layout *l, const db::Cell &c, db::Layout *t, const std::vector<db::DBox> &boxes)
+{
+  return to_cell_refs (l, db::clip_layout (*l, *t, c.cell_index (), transform_boxes (l, boxes), true));
 }
 
 static unsigned int get_layer0 (db::Layout *l)
@@ -922,7 +1027,7 @@ Class<db::MetaInfo> decl_LayoutMetaInfo ("db", "LayoutMetaInfo",
   "Layout readers may generate meta information and some writers will add layout information to "
   "the layout object. Some writers will also read meta information to determine certain attributes.\n"
   "\n"
-  "Multiple layout meta information objects can be attached to one layout using \\Layout#add_meta. "
+  "Multiple layout meta information objects can be attached to one layout using \\Layout#add_meta_info. "
   "Meta information is identified by a unique name and carries a string value plus an optional description string. "
   "The description string is for information only and is not evaluated by code.\n"
   "\n"
@@ -983,6 +1088,14 @@ Class<db::Layout> decl_Layout ("db", "Layout",
   gsi::method ("library", &db::Layout::library,
     "@brief Gets the library this layout lives in or nil if the layout is not part of a library\n"
     "This attribute has been introduced in version 0.27.5."
+  ) +
+  gsi::method ("refresh", &db::Layout::refresh,
+    "@brief Calls \\Cell#refresh on all cells inside this layout\n"
+    "This method is useful to recompute all PCells from a layout. Note that this does not "
+    "update PCells which are linked from a library. To recompute PCells from a library, you need "
+    "to use \\Library#refresh on the library object from which the PCells are imported.\n"
+    "\n"
+    "This method has been introduced in version 0.27.9."
   ) +
   gsi::method ("add_meta_info", &db::Layout::add_meta_info, gsi::arg ("info"),
     "@brief Adds meta information to the layout\n"
@@ -1104,7 +1217,18 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@param properties_id The properties ID to get the properties for\n"
     "@return The array of variants (see \\properties_id)\n"
   ) +
-  gsi::method_ext ("top_cell", &top_cell, 
+  gsi::method ("unique_cell_name", &db::Layout::uniquify_cell_name, gsi::arg ("name"),
+    "@brief Creates a new unique cell name from the given name\n"
+    "@return A unique name derived from the argument\n"
+    "\n"
+    "If a cell with the given name exists, a suffix will be added to make the name unique. "
+    "Otherwise, the argument will be returned unchanged.\n"
+    "\n"
+    "The returned name can be used to rename cells without risk of creating name clashes.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method_ext ("top_cell", &top_cell,
     "@brief Returns the top cell object\n"
     "@return The \\Cell object of the top cell\n"
     "If the layout has a single top cell, this method returns the top cell's \\Cell object.\n"
@@ -1146,14 +1270,21 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduce in version 0.23 and replaces \\add_cell.\n"
   ) +
-  gsi::method_ext ("create_cell", &create_cell2, gsi::arg ("name"), gsi::arg ("params"),
-    "@brief Creates a cell as a PCell variant with the given name\n"
-    "@param name The name of the PCell and the name of the cell to create\n"
+  gsi::method_ext ("create_cell", &create_cell2, gsi::arg ("pcell_name"), gsi::arg ("params"),
+    "@brief Creates a cell as a PCell variant for the PCell with the given name\n"
+    "@param pcell_name The name of the PCell and also the name of the cell to create\n"
     "@param params The PCell parameters (key/value dictionary)\n"
-    "@return The \\Cell object of the newly created cell.\n"
+    "@return The \\Cell object of the newly created cell or an existing cell if the PCell has already been used with these parameters.\n"
     "\n"
-    "This method will look up the PCell by the given name and create a new PCell variant "
-    "with the given parameters. The parameters are specified as a key/value dictionary with "
+    "PCells are instantiated by creating a PCell variant. A PCell variant is linked to the PCell and represents "
+    "this PCell with a particular parameter set.\n"
+    "\n"
+    "This method will look up the PCell by the PCell name and create a new PCell variant "
+    "for the given parameters. If the PCell has already been instantiated with the same parameters, the "
+    "original variant will be returned. Hence this method is not strictly creating a cell - only if the required variant has "
+    "not been created yet.\n"
+    "\n"
+    "The parameters are specified as a key/value dictionary with "
     "the names being the ones from the PCell declaration.\n"
     "\n"
     "If no PCell with the given name exists, nil is returned.\n"
@@ -1164,25 +1295,34 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@brief Creates a cell with the given name\n"
     "@param name The name of the library cell and the name of the cell to create\n"
     "@param lib_name The name of the library where to take the cell from\n"
-    "@return The \\Cell object of the newly created cell.\n"
+    "@return The \\Cell object of the newly created cell or an existing cell if the library cell has already been used in this layout.\n"
     "\n"
-    "This method will look up the cell by the given name in the specified library and create a new library proxy to this cell.\n"
+    "Library cells are imported by creating a 'library proxy'. This is a cell which represents "
+    "the library cell in the framework of the current layout. The library proxy is linked to the "
+    "library and will be updated if the library cell is changed.\n"
+    "\n"
+    "This method will look up the cell by the given name in the specified library and create a new library proxy for this cell.\n"
+    "If the same library cell has already been used, the original library proxy is returned. Hence, strictly speaking this "
+    "method does not always create a new cell but may return a reference to an existing cell.\n"
+    "\n"
     "If the library name is not valid, nil is returned.\n"
     "\n"
     "This method has been introduce in version 0.24.\n"
   ) +
-  gsi::method_ext ("create_cell", &create_cell4, gsi::arg ("name"), gsi::arg ("lib_name"), gsi::arg ("params"),
-    "@brief Creates a cell with the given name\n"
-    "@param name The name of the PCell and the name of the cell to create\n"
+  gsi::method_ext ("create_cell", &create_cell4, gsi::arg ("pcell_name"), gsi::arg ("lib_name"), gsi::arg ("params"),
+    "@brief Creates a cell for a PCell with the given PCell name from the given library\n"
+    "@param pcell_name The name of the PCell and also the name of the cell to create\n"
     "@param lib_name The name of the library where to take the PCell from\n"
     "@param params The PCell parameters (key/value dictionary)\n"
-    "@return The \\Cell object of the newly created cell.\n"
+    "@return The \\Cell object of the newly created cell or an existing cell if this PCell has already been used with the given parameters\n"
     "\n"
-    "This method will look up the PCell by the given name in the specified library and create a new PCell variant "
-    "with the given parameters. The parameters are specified as a key/value dictionary with "
+    "This method will look up the PCell by the PCell name in the specified library and create a new PCell variant "
+    "for the given parameters plus the library proxy. The parameters must be specified as a key/value dictionary with "
     "the names being the ones from the PCell declaration.\n"
     "\n"
-    "If no PCell with the given name exists or the library name is not valid, nil is returned.\n"
+    "If no PCell with the given name exists or the library name is not valid, nil is returned. Note that "
+    "this function - despite the name - may not always create a new cell, but return an existing cell if the "
+    "PCell from the library has already been used with the given parameters.\n"
     "\n"
     "This method has been introduce in version 0.24.\n"
   ) +
@@ -1194,7 +1334,10 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "is returns a \\Cell object (\\create_cell).\n"
   ) +
   gsi::method ("rename_cell", &db::Layout::rename_cell, gsi::arg ("index"), gsi::arg ("name"),
-    "@brief name\n"
+    "@brief Renames the cell with given index\n"
+    "The cell with the given index is renamed to the given name. NOTE: it is not ensured that the name is unique. "
+    "This method allows assigning identical names to different cells which usually breaks things.\n"
+    "Consider using \\unique_cell_name to generate truely unique names.\n"
   ) +
   gsi::method ("delete_cell", &db::Layout::delete_cell, gsi::arg ("cell_index"),
     "@brief Deletes a cell \n"
@@ -1635,7 +1778,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@param cell_mapping The cell mapping object that determines how cells are identified between source and target layout\n"
     "\n"
     "Provide a \\CellMapping object to specify pairs of cells which are mapped from the source layout to this "
-    "layout. When constructing such a cell mapping object for example with \\CellMapping#for_multi_cell_full, use self "
+    "layout. When constructing such a cell mapping object for example with \\CellMapping#for_multi_cells_full, use self "
     "as the target layout. During the cell mapping construction, the cell mapper will usually create a suitable target "
     "hierarchy already. After having completed the cell mapping, use \\copy_tree_shapes to copy over the shapes from "
     "the source to the target layout.\n"
@@ -1649,7 +1792,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@param layer_mapping Specifies which layers are copied from the source layout to the target layout\n"
     "\n"
     "Provide a \\CellMapping object to specify pairs of cells which are mapped from the source layout to this "
-    "layout. When constructing such a cell mapping object for example with \\CellMapping#for_multi_cell_full, use self "
+    "layout. When constructing such a cell mapping object for example with \\CellMapping#for_multi_cells_full, use self "
     "as the target layout. During the cell mapping construction, the cell mapper will usually create a suitable target "
     "hierarchy already. After having completed the cell mapping, use \\copy_tree_shapes to copy over the shapes from "
     "the source to the target layout.\n"
@@ -1916,6 +2059,30 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been added in version 0.21.\n"
   ) + 
+  gsi::method_ext ("clip", &clip_dbox, gsi::arg ("cell"), gsi::arg ("box"),
+    "@brief Clips the given cell by the given rectangle and produce a new cell with the clip\n"
+    "@param cell The cell index of the cell to clip\n"
+    "@param box The clip box in micrometer units\n"
+    "@return The index of the new cell\n"
+    "\n"
+    "This variant which takes a micrometer-unit box has been added in version 0.28."
+  ) +
+  gsi::method_ext ("clip", &clip_cell, gsi::arg ("cell"), gsi::arg ("box"),
+    "@brief Clips the given cell by the given rectangle and produce a new cell with the clip\n"
+    "@param cell The cell reference of the cell to clip\n"
+    "@param box The clip box in database units\n"
+    "@return The reference to the new cell\n"
+    "\n"
+    "This variant which takes cell references instead of cell indexes has been added in version 0.28."
+  ) +
+  gsi::method_ext ("clip", &clip_cell_dbox, gsi::arg ("cell"), gsi::arg ("box"),
+    "@brief Clips the given cell by the given rectangle and produce a new cell with the clip\n"
+    "@param cell The cell reference of the cell to clip\n"
+    "@param box The clip box in micrometer units\n"
+    "@return The reference to the new cell\n"
+    "\n"
+    "This variant which takes a micrometer-unit box and cell references has been added in version 0.28."
+  ) +
   gsi::method_ext ("clip_into", &clip_into, gsi::arg ("cell"), gsi::arg ("target"), gsi::arg ("box"),
     "@brief Clips the given cell by the given rectangle and produce a new cell with the clip\n"
     "@param cell The cell index of the cell to clip\n"
@@ -1935,8 +2102,35 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been added in version 0.21.\n"
   ) + 
+  gsi::method_ext ("clip_into", &clip_into_dbox, gsi::arg ("cell"), gsi::arg ("target"), gsi::arg ("box"),
+    "@brief Clips the given cell by the given rectangle and produce a new cell with the clip\n"
+    "@param cell The cell index of the cell to clip\n"
+    "@param box The clip box in micrometer units\n"
+    "@param target The target layout\n"
+    "@return The index of the new cell in the target layout\n"
+    "\n"
+    "This variant which takes a micrometer-unit box has been added in version 0.28."
+  ) +
+  gsi::method_ext ("clip_into", &clip_into_cell, gsi::arg ("cell"), gsi::arg ("target"), gsi::arg ("box"),
+    "@brief Clips the given cell by the given rectangle and produce a new cell with the clip\n"
+    "@param cell The reference to the cell to clip\n"
+    "@param box The clip box in database units\n"
+    "@param target The target layout\n"
+    "@return The reference to the new cell in the target layout\n"
+    "\n"
+    "This variant which takes cell references instead of cell indexes has been added in version 0.28."
+  ) +
+  gsi::method_ext ("clip_into", &clip_into_cell_dbox, gsi::arg ("cell"), gsi::arg ("target"), gsi::arg ("box"),
+    "@brief Clips the given cell by the given rectangle and produce a new cell with the clip\n"
+    "@param cell The reference to the cell to clip\n"
+    "@param box The clip box in micrometer units\n"
+    "@param target The target layout\n"
+    "@return The reference to the new cell in the target layout\n"
+    "\n"
+    "This variant which takes a micrometer-unit box and cell references has been added in version 0.28."
+  ) +
   gsi::method_ext ("multi_clip", &multi_clip, gsi::arg ("cell"), gsi::arg ("boxes"),
-    "@brief Clips the given cell by the given rectangles and produce new cells with the clips, one for each rectangle.\n"
+    "@brief Clips the given cell by the given rectangles and produces new cells with the clips, one for each rectangle.\n"
     "@param cell The cell index of the cell to clip\n"
     "@param boxes The clip boxes in database units\n"
     "@return The indexes of the new cells\n"
@@ -1949,8 +2143,32 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been added in version 0.21.\n"
   ) + 
+  gsi::method_ext ("multi_clip", &multi_clip_dboxes, gsi::arg ("cell"), gsi::arg ("boxes"),
+    "@brief Clips the given cell by the given rectangles and produces new cells with the clips, one for each rectangle.\n"
+    "@param cell The cell index of the cell to clip\n"
+    "@param boxes The clip boxes in micrometer units\n"
+    "@return The indexes of the new cells\n"
+    "\n"
+    "This variant which takes micrometer-unit boxes has been added in version 0.28."
+  ) +
+  gsi::method_ext ("multi_clip", &multi_clip_cells, gsi::arg ("cell"), gsi::arg ("boxes"),
+    "@brief Clips the given cell by the given rectangles and produces new cells with the clips, one for each rectangle.\n"
+    "@param cell The reference to the cell to clip\n"
+    "@param boxes The clip boxes in database units\n"
+    "@return The references to the new cells\n"
+    "\n"
+    "This variant which takes cell references has been added in version 0.28."
+  ) +
+  gsi::method_ext ("multi_clip", &multi_clip_cells_dboxes, gsi::arg ("cell"), gsi::arg ("boxes"),
+    "@brief Clips the given cell by the given rectangles and produces new cells with the clips, one for each rectangle.\n"
+    "@param cell The reference to the cell to clip\n"
+    "@param boxes The clip boxes in micrometer units\n"
+    "@return The references to the new cells\n"
+    "\n"
+    "This variant which takes cell references and micrometer-unit boxes has been added in version 0.28."
+  ) +
   gsi::method_ext ("multi_clip_into", &multi_clip_into, gsi::arg ("cell"), gsi::arg ("target"), gsi::arg ("boxes"),
-    "@brief Clips the given cell by the given rectangles and produce new cells with the clips, one for each rectangle.\n"
+    "@brief Clips the given cell by the given rectangles and produces new cells with the clips, one for each rectangle.\n"
     "@param cell The cell index of the cell to clip\n"
     "@param boxes The clip boxes in database units\n"
     "@param target The target layout\n"
@@ -1968,6 +2186,33 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "copy shapes to the same layers than they have been on the original layout.\n"
     "\n"
     "This method has been added in version 0.21.\n"
+  ) +
+  gsi::method_ext ("multi_clip_into", &multi_clip_into_dboxes, gsi::arg ("cell"), gsi::arg ("target"), gsi::arg ("boxes"),
+    "@brief Clips the given cell by the given rectangles and produces new cells with the clips, one for each rectangle.\n"
+    "@param cell The cell index of the cell to clip\n"
+    "@param boxes The clip boxes in database units\n"
+    "@param target The target layout\n"
+    "@return The indexes of the new cells\n"
+    "\n"
+    "This variant which takes micrometer-unit boxes has been added in version 0.28."
+  ) +
+  gsi::method_ext ("multi_clip_into", &multi_clip_into_cells, gsi::arg ("cell"), gsi::arg ("target"), gsi::arg ("boxes"),
+    "@brief Clips the given cell by the given rectangles and produces new cells with the clips, one for each rectangle.\n"
+    "@param cell The reference the cell to clip\n"
+    "@param boxes The clip boxes in database units\n"
+    "@param target The target layout\n"
+    "@return The references to the new cells\n"
+    "\n"
+    "This variant which takes cell references boxes has been added in version 0.28."
+  ) +
+  gsi::method_ext ("multi_clip_into", &multi_clip_into_cells_dboxes, gsi::arg ("cell"), gsi::arg ("target"), gsi::arg ("boxes"),
+    "@brief Clips the given cell by the given rectangles and produces new cells with the clips, one for each rectangle.\n"
+    "@param cell The reference the cell to clip\n"
+    "@param boxes The clip boxes in micrometer units\n"
+    "@param target The target layout\n"
+    "@return The references to the new cells\n"
+    "\n"
+    "This variant which takes cell references and micrometer-unit boxes has been added in version 0.28."
   ) +
   gsi::method ("convert_cell_to_static", &db::Layout::convert_cell_to_static, gsi::arg ("cell_index"),
     "@brief Converts a PCell or library cell to a usual (static) cell\n"

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ public:
   /**
    *  @brief Open a stream with the given URL
    */
-  InputHttpStreamPrivateData (const std::string &url);
+  InputHttpStreamPrivateData (InputHttpStream *stream, const std::string &url);
 
   /**
    *  @brief Close the file
@@ -135,6 +135,16 @@ public:
    */
   bool data_available ();
 
+  /**
+   *  @brief Sets the timeout in seconds
+   */
+  void set_timeout (double to);
+
+  /**
+   *  @brief Gets the timeout in seconds
+   */
+  double timeout () const;
+
   //  Basic interface
   virtual void reset ();
   virtual void close ();
@@ -143,12 +153,14 @@ public:
   virtual std::string filename () const;
 
 private:
-  std::auto_ptr<CurlConnection> m_connection;
+  std::unique_ptr<CurlConnection> m_connection;
   tl::Event m_ready_event;
   tl::Event m_data_ready_event;
   bool m_sent;
   bool m_ready;
-  std::auto_ptr<tl::AbsoluteProgress> m_progress;
+  std::unique_ptr<tl::AbsoluteProgress> m_progress;
+  double m_timeout;
+  InputHttpStream *mp_stream;
 
   void on_data_available ();
   void on_finished ();

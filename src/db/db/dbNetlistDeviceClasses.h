@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -191,8 +191,26 @@ public:
     return new DeviceClassMOS3Transistor (*this);
   }
 
+  /**
+   *  @brief Implements the "split_gates" feature
+   *  This feature will join internal source/drain nodes to form fingered multi-gate
+   *  transistors.
+   */
+  void join_split_gates (db::Circuit *circuit) const;
+
+  /**
+   * @brief Returns true if device lengths are compatible
+   */
+  static bool lengths_are_identical (const db::Device *a, const db::Device *b);
+
 protected:
   void combine_parameters (Device *a, Device *b) const;
+  virtual bool has_bulk_pin () const;
+
+private:
+  bool is_source_terminal (size_t tid) const;
+  bool is_drain_terminal (size_t tid) const;
+  bool net_is_source_drain_connection (const db::Net *net) const;
 };
 
 /**
@@ -212,6 +230,9 @@ public:
   {
     return new DeviceClassMOS4Transistor (*this);
   }
+
+protected:
+  virtual bool has_bulk_pin () const;
 };
 
 /**

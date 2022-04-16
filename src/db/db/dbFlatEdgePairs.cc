@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -91,7 +91,6 @@ size_t FlatEdgePairs::hier_count () const
 
 Box FlatEdgePairs::compute_bbox () const
 {
-  mp_edge_pairs->update_bbox ();
   return mp_edge_pairs->bbox ();
 }
 

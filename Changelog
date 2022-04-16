@@ -1,6 +1,27 @@
 
-0.27.6          (2021-xx-xx):
-TODO
+0.28            (2022-xx-xx):
+
+0.27.6          (2022-01-04):
+* Enhancement: %GITHUB%/issues/963 Display snapped position in main window
+* Bugfix: %GITHUB%/issues/960 Cap values range now shown in netlist browser
+* Bugfix: %GITHUB%/issues/954 Fixed a device extraction glitch
+* Bugfix: %GITHUB%/issues/951 Internal error fixed when deleting the cell you're sitting at
+  Side effect: copy & paste of cells is correctly disabled now in viewer mode
+* Bugfix: %GITHUB%/issues/942 Technology file routing suffix string typo
+* Bugfix: %GITHUB%/issues/946 Python: __file__ returns quoted path string
+* Bugfix: DRC check for equal width now returns more consistent results
+  Previously, a check like "layer.drc(width == something)" was not flagging
+  all candidates correctly.
+* Enhancement: A PCell can request "lazy evaluation" now
+  This means that a parameter change needs to be committed in the UI before
+  it is being taken. This way, slow PCell evaluation will not make the
+  application stall. To add this feature, reimplement "wants_lazy_evaluation"
+  in the PCell class to return "true".
+* Enhancement: "lvs_data" is a global function now in LVS scripts
+* Bugfix: less liberal evaluation of expressions in string to numeric conversion
+  This will fix a potential vulnerability which allows someone to sneak 
+  in expression code through malicious configuration, technology or layer properties
+  files.
 
 0.27.5          (2021-11-14):
 * Enhancements: Better support for execution (also cross-interpreter) of macro code from scripts

@@ -1,7 +1,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -134,7 +134,7 @@ bool NetShape::interacts_with (const db::NetShape &other) const
       //  Polygon vs. polygon
       db::PolygonRef pr_other = other.polygon_ref ();
       db::PolygonRef pr = polygon_ref ();
-      db::Polygon p = pr_other.obj ().transformed (pr.trans ().inverted () * pr_other.trans ());
+      db::Polygon p = pr_other.obj ().transformed (pr.trans ().inverted () * pr_other.trans (), false);
       return db::interact_pp (pr.obj (), p);
 
     } else {

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -75,6 +75,7 @@ MacroPropertiesDialog::update (const lym::Macro *macro)
   propertiesFrame->setEnabled (! macro->is_readonly ());
   description->setText (tl::to_qstring (macro->description ()));
   version->setText (tl::to_qstring (macro->version ()));
+  priority->setText (tl::to_qstring (tl::to_string (macro->priority ())));
   prolog->setText (tl::to_qstring (macro->prolog ()));
   epilog->setText (tl::to_qstring (macro->epilog ()));
   autorun->setChecked (macro->is_autorun ());
@@ -98,6 +99,10 @@ MacroPropertiesDialog::commit (lym::Macro *macro)
   macro->set_show_in_menu (showmenu->isChecked ());
   macro->set_group_name (tl::to_string (groupName->text ()));
   macro->set_menu_path (tl::to_string (menuPath->text ()));
+
+  int p = 0;
+  tl::from_string (tl::to_string (priority->text ()), p);
+  macro->set_priority (p);
 }
 
 }

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -160,10 +160,8 @@ PCellVariant::update (ImportLayerMapping *layer_mapping)
       m_display_name = header->declaration ()->get_display_name (m_parameters);
     } catch (tl::Exception &ex) {
       tl::error << ex.msg ();
-      if (! layer_ids.empty ()) {
-        //  put error messages into layout as text objects
-        shapes (layer_ids [0]).insert (db::Text (ex.msg (), db::Trans ()));
-      }
+      //  put error messages into layout as text objects on error layer
+      shapes (layout ()->error_layer ()).insert (db::Text (ex.msg (), db::Trans ()));
     }
 
     //  produce the shape parameters on the guiding shape layer so they can be edited

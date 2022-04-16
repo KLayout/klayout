@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2021 Matthias Koefferlein
+# Copyright (C) 2006-2022 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1043,9 +1043,30 @@ class DBLayout_TestClass < TestBase
     ci = l.clip(c0.cell_index, RBA::Box.new(0, 0, 200, 200))
     assert_equal(dump_layer_i(l, 0, ci), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
 
+    cic = l.clip(c0, RBA::Box.new(0, 0, 200, 200))
+    assert_equal(dump_layer_i(l, 0, cic.cell_index), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
+
+    cid = l.clip(c0.cell_index, RBA::DBox.new(0, 0, 0.2, 0.2))
+    assert_equal(dump_layer_i(l, 0, cid), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
+
+    cicd = l.clip(c0, RBA::DBox.new(0, 0, 0.2, 0.2))
+    assert_equal(dump_layer_i(l, 0, cicd.cell_index), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
+
     ci = l.multi_clip(c0.cell_index, [RBA::Box.new(0, 0, 200, 200),RBA::Box.new(1000, 0, 1300, 200)])
     assert_equal(dump_layer_i(l, 0, ci[0]), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
     assert_equal(dump_layer_i(l, 0, ci[1]), "(1000,0;1100,200); (1200,0;1300,200)")
+
+    cic = l.multi_clip(c0, [RBA::Box.new(0, 0, 200, 200),RBA::Box.new(1000, 0, 1300, 200)])
+    assert_equal(dump_layer_i(l, 0, cic[0].cell_index), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
+    assert_equal(dump_layer_i(l, 0, cic[1].cell_index), "(1000,0;1100,200); (1200,0;1300,200)")
+
+    cid = l.multi_clip(c0.cell_index, [RBA::DBox.new(0, 0, 0.2, 0.2),RBA::DBox.new(1.0, 0, 1.3, 0.2)])
+    assert_equal(dump_layer_i(l, 0, cid[0]), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
+    assert_equal(dump_layer_i(l, 0, cid[1]), "(1000,0;1100,200); (1200,0;1300,200)")
+
+    cidc = l.multi_clip(c0, [RBA::DBox.new(0, 0, 0.2, 0.2),RBA::DBox.new(1.0, 0, 1.3, 0.2)])
+    assert_equal(dump_layer_i(l, 0, cidc[0].cell_index), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
+    assert_equal(dump_layer_i(l, 0, cidc[1].cell_index), "(1000,0;1100,200); (1200,0;1300,200)")
 
     ll = RBA::Layout.new
     ll.dbu = l.dbu
@@ -1054,9 +1075,30 @@ class DBLayout_TestClass < TestBase
     ci = l.clip_into(c0.cell_index, ll, RBA::Box.new(0, 0, 200, 200))
     assert_equal(dump_layer_i(ll, 0, ci), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
 
+    cic = l.clip_into(c0, ll, RBA::Box.new(0, 0, 200, 200))
+    assert_equal(dump_layer_i(ll, 0, cic.cell_index), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
+
+    cid = l.clip_into(c0.cell_index, ll, RBA::DBox.new(0, 0, 0.2, 0.2))
+    assert_equal(dump_layer_i(ll, 0, cid), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
+
+    cicd = l.clip_into(c0, ll, RBA::DBox.new(0, 0, 0.2, 0.2))
+    assert_equal(dump_layer_i(ll, 0, cicd.cell_index), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
+
     ci = l.multi_clip_into(c0.cell_index, ll, [RBA::Box.new(0, 0, 200, 200),RBA::Box.new(1000, 0, 1300, 200)])
     assert_equal(dump_layer_i(ll, 0, ci[0]), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
     assert_equal(dump_layer_i(ll, 0, ci[1]), "(1000,0;1100,200); (1200,0;1300,200)")
+
+    cic = l.multi_clip_into(c0, ll, [RBA::Box.new(0, 0, 200, 200),RBA::Box.new(1000, 0, 1300, 200)])
+    assert_equal(dump_layer_i(ll, 0, cic[0]), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
+    assert_equal(dump_layer_i(ll, 0, cic[1]), "(1000,0;1100,200); (1200,0;1300,200)")
+
+    cid = l.multi_clip_into(c0.cell_index, ll, [RBA::DBox.new(0, 0, 0.2, 0.2),RBA::DBox.new(1.0, 0, 1.3, 0.2)])
+    assert_equal(dump_layer_i(ll, 0, cid[0]), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
+    assert_equal(dump_layer_i(ll, 0, cid[1]), "(1000,0;1100,200); (1200,0;1300,200)")
+
+    cicd = l.multi_clip_into(c0, ll, [RBA::DBox.new(0, 0, 0.2, 0.2),RBA::DBox.new(1.0, 0, 1.3, 0.2)])
+    assert_equal(dump_layer_i(ll, 0, cicd[0]), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
+    assert_equal(dump_layer_i(ll, 0, cicd[1]), "(1000,0;1100,200); (1200,0;1300,200)")
 
   end
 

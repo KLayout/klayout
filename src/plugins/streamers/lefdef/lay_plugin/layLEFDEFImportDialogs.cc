@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -360,6 +360,7 @@ LEFDEFReaderOptionsEditor::LEFDEFReaderOptionsEditor (QWidget *parent)
   connect (produce_routing, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_special_routing, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_labels, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
+  connect (produce_lef_labels, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (add_lef_file, SIGNAL (clicked ()), this, SLOT (add_lef_file_clicked ()));
   connect (del_lef_files, SIGNAL (clicked ()), this, SLOT (del_lef_files_clicked ()));
   connect (move_lef_files_up, SIGNAL (clicked ()), this, SLOT (move_lef_files_up_clicked ()));
@@ -391,7 +392,7 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_produce_pin_names (produce_pin_names->isChecked ());
 
   double dbu_value = 0.0;
-  tl::from_string (tl::to_string (dbu->text ()), dbu_value);
+  tl::from_string_ext (tl::to_string (dbu->text ()), dbu_value);
   if (dbu_value < 1e-7) {
     throw tl::Exception (tl::to_string (tr ("Invalid database unit value (must be non-null and positive)")));
   }
@@ -644,6 +645,7 @@ LEFDEFReaderOptionsEditor::checkbox_changed ()
   suffix_routing->setEnabled (produce_routing->isChecked ());
   suffix_special_routing->setEnabled (produce_special_routing->isChecked ());
   suffix_labels->setEnabled (produce_labels->isChecked ());
+  suffix_lef_labels->setEnabled (produce_lef_labels->isChecked ());
   datatype_via_geometry->setEnabled (produce_via_geometry->isChecked ());
   datatype_pins->setEnabled (produce_pins->isChecked ());
   datatype_lef_pins->setEnabled (produce_lef_pins->isChecked ());
@@ -653,6 +655,7 @@ LEFDEFReaderOptionsEditor::checkbox_changed ()
   datatype_routing->setEnabled (produce_routing->isChecked ());
   datatype_special_routing->setEnabled (produce_special_routing->isChecked ());
   datatype_labels->setEnabled (produce_labels->isChecked ());
+  datatype_lef_labels->setEnabled (produce_lef_labels->isChecked ());
 }
 
 void

@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/built-in-macros">
+        <file alias="_d25_engine.rb">built-in-macros/_d25_engine.rb</file>
+        <file alias="d25_interpreters.lym">built-in-macros/d25_interpreters.lym</file>
+        <file alias="d25_install.lym">built-in-macros/d25_install.lym</file>
+    </qresource>
+    <qresource prefix="/d25-templates">
+        <file alias="d25.lym">templates/d25.lym</file>
+    </qresource>
+</RCC>

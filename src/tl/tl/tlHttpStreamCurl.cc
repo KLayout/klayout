@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -524,7 +524,12 @@ public:
    *  @brief Must be called in regular intervals to update the status
    *  Returns the number of open connections.
    */
-  int tick ();
+  void tick ();
+
+  /**
+   *  @brief Returns true if a reply has arrived
+   */
+  bool has_reply () const;
 
   /**
    *  @brief The singleton instance
@@ -555,7 +560,8 @@ private:
 
 InputHttpStream::InputHttpStream (const std::string &url)
 {
-  mp_data = new InputHttpStreamPrivateData (url);
+  mp_data = new InputHttpStreamPrivateData (this, url);
+  mp_callback = 0;
 }
 
 InputHttpStream::~InputHttpStream ()
@@ -658,8 +664,24 @@ InputHttpStream::is_available ()
 void
 InputHttpStream::tick ()
 {
+  if (mp_callback) {
+    mp_callback->wait_for_input ();
+  }
   CurlNetworkManager::instance ()->tick ();
 }
+
+void
+InputHttpStream::set_timeout (double to)
+{
+  mp_data->set_timeout (to);
+}
+
+double
+InputHttpStream::timeout () const
+{
+  return mp_data->timeout ();
+}
+
 
 // ----------------------------------------------------------------------
 //  CurlConnection implementation
@@ -1081,7 +1103,8 @@ void CurlNetworkManager::release_connection (CurlConnection *connection)
 
 void CurlNetworkManager::on_tick ()
 {
-  if (tick ()) {
+  tick ();
+  if (! has_reply ()) {
     //  NOTE: don't reschedule if there is no DM scheduler. This will cause deep
     //  recursion.
     if (tl::DeferredMethodScheduler::instance ()) {
@@ -1090,13 +1113,18 @@ void CurlNetworkManager::on_tick ()
   }
 }
 
-int CurlNetworkManager::tick ()
+bool CurlNetworkManager::has_reply () const
+{
+  return m_still_running <= 0;
+}
+
+void CurlNetworkManager::tick ()
 {
 #if defined(DEBUG_CURL)
   std::cerr << "CurlNetworkManager::tick()" << std::endl;
 #endif
   if (m_still_running <= 0) {
-    return 0;
+    return;
   }
 
   struct timeval timeout;
@@ -1189,14 +1217,13 @@ int CurlNetworkManager::tick ()
     }
 
   }
-
-  return m_still_running;
 }
 
 // ---------------------------------------------------------------
 //  InputHttpStreamPrivateData implementation
 
-InputHttpStreamPrivateData::InputHttpStreamPrivateData (const std::string &url)
+InputHttpStreamPrivateData::InputHttpStreamPrivateData (InputHttpStream *stream, const std::string &url)
+  : m_timeout (10.0), mp_stream (stream)
 {
   m_sent = false;
   m_ready = false;
@@ -1210,6 +1237,18 @@ InputHttpStreamPrivateData::InputHttpStreamPrivateData (const std::string &url)
 InputHttpStreamPrivateData::~InputHttpStreamPrivateData ()
 {
   // .. nothing yet ..
+}
+
+void
+InputHttpStreamPrivateData::set_timeout (double to)
+{
+  m_timeout = to;
+}
+
+double
+InputHttpStreamPrivateData::timeout () const
+{
+  return m_timeout;
 }
 
 bool
@@ -1292,8 +1331,12 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
       m_progress.reset (new tl::AbsoluteProgress (tl::to_string (tr ("Downloading")) + " " + m_connection->url (), 1));
     }
 
-    while (n > m_connection->read_available () && ! m_connection->finished () && CurlNetworkManager::instance ()->tick ()) {
-      ++*m_progress;
+    tl::Clock start_time = tl::Clock::current ();
+    while (n > m_connection->read_available () && ! m_connection->finished () && (m_timeout <= 0.0 || (tl::Clock::current() - start_time).seconds () < m_timeout) && ! tl::CurlNetworkManager::instance ()->has_reply ()) {
+      mp_stream->tick ();
+      if (m_progress.get ()) {  //  might have been reset by tick()
+        ++*m_progress;
+      }
     }
   }
 

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2021 Matthias Koefferlein
+  Copyright (C) 2006-2022 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -46,6 +46,8 @@
 
 #include <fstream>
 #include <memory>
+#include <string>
+#include <set>
 
 namespace lym
 {
@@ -53,7 +55,7 @@ namespace lym
 // ----------------------------------------------------------------------
 
 Macro::Macro ()
-  : m_modified (true), m_readonly (false), m_autorun (false), m_autorun_default (false), m_autorun_early (false), m_show_in_menu (false), m_is_file (false), mp_parent (0), m_interpreter (None), m_format (Macro::NoFormat)
+  : m_modified (true), m_readonly (false), m_autorun (false), m_autorun_default (false), m_autorun_early (false), m_priority (0), m_show_in_menu (false), m_is_file (false), mp_parent (0), m_interpreter (None), m_format (Macro::NoFormat)
 {
   // .. nothing yet ..
 }
@@ -87,6 +89,7 @@ void Macro::assign (const lym::Macro &other)
   m_autorun = other.m_autorun;
   m_autorun_default = other.m_autorun_default;
   m_autorun_early = other.m_autorun_early;
+  m_priority = other.m_priority;
   m_show_in_menu = other.m_show_in_menu;
   m_shortcut = other.m_shortcut;
   m_format = other.m_format;
@@ -111,6 +114,7 @@ bool Macro::operator== (const Macro &other) const
     m_text == other.m_text &&
     m_autorun == other.m_autorun &&
     m_autorun_early == other.m_autorun_early &&
+    m_priority == other.m_priority &&
     m_show_in_menu == other.m_show_in_menu &&
     m_shortcut == other.m_shortcut &&
     m_interpreter == other.m_interpreter &&
@@ -182,6 +186,7 @@ static tl::XMLStruct<lym::Macro> xml_struct ("klayout-macro",
   tl::make_member (&Macro::doc, &Macro::set_doc, "doc") +
   tl::make_member (&Macro::is_autorun, &Macro::set_autorun, "autorun") +
   tl::make_member (&Macro::is_autorun_early, &Macro::set_autorun_early, "autorun-early") +
+  tl::make_member (&Macro::priority, &Macro::set_priority, "priority") +
   tl::make_member (&Macro::shortcut, &Macro::set_shortcut, "shortcut") +
   tl::make_member (&Macro::show_in_menu, &Macro::set_show_in_menu, "show-in-menu") +
   tl::make_member (&Macro::group_name, &Macro::set_group_name, "group-name") +
@@ -550,19 +555,22 @@ struct PropertyField
   void (lym::Macro::*string_setter) (const std::string &);
   bool (lym::Macro::*bool_getter) () const;
   void (lym::Macro::*bool_setter) (bool);
+  int (lym::Macro::*int_getter) () const;
+  void (lym::Macro::*int_setter) (int);
 };
 
 static PropertyField property_fields[] = {
-  { "description",    &lym::Macro::description, &lym::Macro::set_description,   0, 0 }, 
-  { "prolog",         &lym::Macro::prolog, &lym::Macro::set_prolog,             0, 0 }, 
-  { "epilog",         &lym::Macro::epilog, &lym::Macro::set_epilog,             0, 0 }, 
-  { "version",        &lym::Macro::version, &lym::Macro::set_version,           0, 0 }, 
-  { "autorun",        0, 0,                                                     &lym::Macro::is_autorun, &lym::Macro::set_autorun },
-  { "autorun-early",  0, 0,                                                     &lym::Macro::is_autorun_early, &lym::Macro::set_autorun_early},
-  { "show-in-menu",   0, 0,                                                     &lym::Macro::show_in_menu, &lym::Macro::set_show_in_menu },
-  { "group-name",     &lym::Macro::group_name, &lym::Macro::set_group_name,     0, 0 }, 
-  { "menu-path",      &lym::Macro::menu_path, &lym::Macro::set_menu_path,       0, 0 }, 
-  { "shortcut",       &lym::Macro::shortcut, &lym::Macro::set_shortcut,         0, 0 } 
+  { "description",    &lym::Macro::description, &lym::Macro::set_description,   0, 0,                                                            0, 0 },
+  { "prolog",         &lym::Macro::prolog, &lym::Macro::set_prolog,             0, 0,                                                            0, 0 },
+  { "epilog",         &lym::Macro::epilog, &lym::Macro::set_epilog,             0, 0,                                                            0, 0 },
+  { "version",        &lym::Macro::version, &lym::Macro::set_version,           0, 0,                                                            0, 0 },
+  { "autorun",        0, 0,                                                     &lym::Macro::is_autorun, &lym::Macro::set_autorun,               0, 0 },
+  { "autorun-early",  0, 0,                                                     &lym::Macro::is_autorun_early, &lym::Macro::set_autorun_early,   0, 0 },
+  { "show-in-menu",   0, 0,                                                     &lym::Macro::show_in_menu, &lym::Macro::set_show_in_menu,        0, 0 },
+  { "group-name",     &lym::Macro::group_name, &lym::Macro::set_group_name,     0, 0,                                                            0, 0 },
+  { "menu-path",      &lym::Macro::menu_path, &lym::Macro::set_menu_path,       0, 0,                                                            0, 0 },
+  { "shortcut",       &lym::Macro::shortcut, &lym::Macro::set_shortcut,         0, 0,                                                            0, 0 },
+  { "priority",       0, 0,                                                     0, 0,                                                            &lym::Macro::priority, &lym::Macro::set_priority }
 };
 
 static std::string escape_pta_string (const char *cp) 
@@ -623,6 +631,11 @@ void Macro::sync_text_with_properties ()
       if (v) {
         new_lines.push_back (std::string ("# $") + pf->name);
       }
+    } else if (pf->int_getter) {
+      int v = (this->*(pf->int_getter)) ();
+      if (v) {
+        new_lines.push_back (std::string ("# $") + pf->name + ": " + tl::to_string (v));
+      }
     }
   }
 
@@ -670,6 +683,8 @@ void Macro::sync_properties_with_text ()
       (this->*(pf->string_setter)) (std::string ());
     } else if (pf->bool_setter) {
       (this->*(pf->bool_setter)) (false);
+    } else if (pf->int_setter) {
+      (this->*(pf->int_setter)) (0);
     }
   }
 
@@ -694,6 +709,10 @@ void Macro::sync_properties_with_text ()
             (this->*(pf->string_setter)) (unescape_pta_string (pex.skip ()));
           } else if (pf->bool_setter) {
             (this->*(pf->bool_setter)) (true);
+          } else if (pf->int_setter) {
+            int v = 0;
+            tl::from_string (pex.skip (), v);
+            (this->*(pf->int_setter)) (v);
           }
 
           break;
@@ -761,6 +780,15 @@ void Macro::set_autorun (bool f)
   if (f != m_autorun) {
     m_modified = true;
     m_autorun = f;
+    on_changed ();
+  }
+}
+
+void Macro::set_priority (int p)
+{
+  if (p != m_priority) {
+    m_modified = true;
+    m_priority = p;
     on_changed ();
   }
 }
@@ -1065,6 +1093,11 @@ MacroCollection::MacroCollection ()
 }
 
 MacroCollection::~MacroCollection ()
+{
+  do_clear ();
+}
+
+void MacroCollection::do_clear ()
 {
   for (iterator m = begin (); m != end (); ++m) {
     delete m->second;
@@ -1513,6 +1546,13 @@ void MacroCollection::scan (const std::string &path)
   }
 }
 
+void MacroCollection::clear ()
+{
+  begin_changes ();
+  do_clear ();
+  on_changed ();
+}
+
 void MacroCollection::erase (lym::Macro *mp)
 {
   for (iterator m = m_macros.begin (); m != m_macros.end (); ++m) {
@@ -1861,30 +1901,78 @@ bool MacroCollection::has_autorun_early () const
   return has_autorun_for (*this, true);
 }
 
-static void autorun_for (lym::MacroCollection &collection, bool early)
+static int collect_priority (lym::MacroCollection &collection, bool early, int from_prio)
 {
+  int p = -1;
+
   for (lym::MacroCollection::child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
-    autorun_for (*c->second, early);
+    int pp = collect_priority (*c->second, early, from_prio);
+    if (pp >= from_prio && (p < 0 || pp < p)) {
+      p = pp;
+    }
   }
 
   for (lym::MacroCollection::iterator c = collection.begin (); c != collection.end (); ++c) {
     if (c->second->can_run () && ((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ()))) {
-      BEGIN_PROTECTED_SILENT
-        c->second->run ();
-        c->second->install_doc ();
-      END_PROTECTED_SILENT
+      int pp = c->second->priority ();
+      if (pp >= from_prio && (p < 0 || pp < p)) {
+        p = pp;
+      }
     }
+  }
+
+  return p;
+}
+
+static void autorun_for_prio (lym::MacroCollection &collection, bool early, std::set<std::string> *executed_already, int prio)
+{
+  for (lym::MacroCollection::child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
+    autorun_for_prio (*c->second, early, executed_already, prio);
+  }
+
+  for (lym::MacroCollection::iterator c = collection.begin (); c != collection.end (); ++c) {
+
+    if (c->second->priority () == prio && c->second->can_run () && ((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ()))) {
+
+      if (!executed_already || executed_already->find (c->second->path ()) == executed_already->end ()) {
+
+        BEGIN_PROTECTED_SILENT
+          c->second->run ();
+          c->second->install_doc ();
+        END_PROTECTED_SILENT
+
+        if (executed_already) {
+          executed_already->insert (c->second->path ());
+        }
+
+      }
+
+    }
+
   }
 }
 
-void MacroCollection::autorun ()
+static void autorun_for (lym::MacroCollection &collection, bool early, std::set<std::string> *executed_already)
 {
-  autorun_for (*this, false);
+  int prio = 0;
+  while (true) {
+    int p = collect_priority (collection, early, prio);
+    if (p < prio) {
+      break;
+    }
+    autorun_for_prio (collection, early, executed_already, p);
+    prio = p + 1;
+  }
 }
 
-void MacroCollection::autorun_early ()
+void MacroCollection::autorun (std::set<std::string> *already_executed)
 {
-  autorun_for (*this, true);
+  autorun_for (*this, false, already_executed);
+}
+
+void MacroCollection::autorun_early (std::set<std::string> *already_executed)
+{
+  autorun_for (*this, true, already_executed);
 }
 
 void MacroCollection::dump (int l)

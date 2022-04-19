@@ -962,6 +962,9 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
     std::set<std::string> seen_layers;
     std::vector<std::string> routing_layers;
 
+    bool has_cut_geometry = false;
+    bool has_patternname = false;
+
     while (test ("+")) {
 
       bool is_polygon = false;
@@ -1028,6 +1031,7 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
       } else if (test ("PATTERNNAME")) {
 
         get ();  //  ignore
+        has_patternname = true;
 
       } else if (test ("PATTERN")) {
 
@@ -1080,6 +1084,7 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
         } else if (m_lef_importer.is_cut_layer (ln)) {
 
           geo_based_vg->set_maskshift_layer (1, ln);
+          has_cut_geometry = true;
 
         }
 
@@ -1107,6 +1112,10 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
 
     }
 
+    if (has_patternname && ! has_cut_geometry) {
+      warn (tl::sprintf (tl::to_string (tr ("Via %s uses legacy PATTERNAME and no cut geometry - no via shapes are generated")), n));
+    }
+
     if (vd.m1.empty () && vd.m2.empty ()) {
 
       //  analyze the layers to find the metals
@@ -1114,7 +1123,7 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
         vd.m1 = routing_layers[0];
         vd.m2 = routing_layers[1];
       } else {
-        warn ("Can't determine routing layers for via: " + n);
+        warn (tl::to_string (tr ("Cannot determine routing layers for via: ")) + n);
       }
 
     }

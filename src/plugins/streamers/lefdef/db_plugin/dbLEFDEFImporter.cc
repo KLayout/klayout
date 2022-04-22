@@ -149,9 +149,9 @@ static std::string purpose_to_name (LayerPurpose purpose)
     return "BLK";
   case All:
     return "ALL";
+  default:
+    return std::string ();
   }
-
-  return std::string ();
 }
 
 static std::string

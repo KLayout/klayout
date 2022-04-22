@@ -1055,7 +1055,12 @@ struct LayerDetailsKey
 
   LayerDetailsKey (LayerPurpose _purpose, unsigned int _mask = 0, const db::DVector &_via_size = db::DVector ())
     : purpose (_purpose), mask (_mask), via_size (_via_size)
-  { }
+  {
+    //  normalize the via size such that x is smaller than y size (issue-1065)
+    if (via_size.y () < via_size.x ()) {
+      via_size = db::DVector (via_size.y (), via_size.x ());
+    }
+  }
 
   bool operator< (const LayerDetailsKey &other) const
   {

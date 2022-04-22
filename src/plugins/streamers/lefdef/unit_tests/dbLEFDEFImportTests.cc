@@ -854,6 +854,13 @@ TEST(130_viasize)
   run_test (_this, "viasize", "map:test.map+lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
 }
 
+//  issue-1065
+TEST(130_viasize2)
+{
+  run_test (_this, "viasize2", "map:test_ok.map+lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
+  run_test (_this, "viasize2", "map:test_fail.map+lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
+}
+
 TEST(131_patternname)
 {
   run_test (_this, "patternname", "map:v.map+lef:v.lef+def:v.def", "au.oas.gz", default_options (), false);

@@ -117,6 +117,12 @@ static std::string purpose_to_name (LayerPurpose purpose)
     return "OUTLINE";
   case Regions:
     return "REGION";
+  case RegionsGuide:
+    return "REGIONGUIDE";
+  case RegionsFence:
+    return "REGIONFENCE";
+  case RegionsNone:
+    return "REGIONNONE";
   case PlacementBlockage:
     return "BLOCKAGE";
   case Routing:
@@ -143,9 +149,9 @@ static std::string purpose_to_name (LayerPurpose purpose)
     return "BLK";
   case All:
     return "ALL";
+  default:
+    return std::string ();
   }
-
-  return std::string ();
 }
 
 static std::string
@@ -213,7 +219,7 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
 
   dl = reader.open_layer (layout, m_top_layer, ViaGeometry, mask_top, via_box.enlarged (m_te));
   for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
-    cell.shapes (*l).insert (db::Polygon (via_box.enlarged (m_te).moved (m_bo)));
+    cell.shapes (*l).insert (db::Polygon (via_box.enlarged (m_te).moved (m_to)));
   }
 
   const char *p = m_pattern.c_str ();
@@ -389,7 +395,7 @@ GeometryBasedLayoutGenerator::create_cell (LEFDEFReaderState &reader, Layout &la
 
   for (std::list<Via>::const_iterator v = m_vias.begin (); v != m_vias.end (); ++v) {
 
-    LEFDEFLayoutGenerator *g = reader.via_generator (v->name);
+    LEFDEFLayoutGenerator *g = reader.via_generator (v->name, v->nondefaultrule);
     if (! g) {
       continue;
     }
@@ -401,7 +407,7 @@ GeometryBasedLayoutGenerator::create_cell (LEFDEFReaderState &reader, Layout &la
     unsigned mshift_cut = get_maskshift (msl [1], ext_msl, masks);
     unsigned mshift_top = get_maskshift (msl [2], ext_msl, masks);
 
-    db::Cell *vc = reader.via_cell (v->name, layout,
+    db::Cell *vc = reader.via_cell (v->name, v->nondefaultrule, layout,
                                     combine_maskshifts (msl [0], v->bottom_mask, mshift_bottom, nm),
                                     combine_maskshifts (msl [1], v->cut_mask, mshift_cut, nm),
                                     combine_maskshifts (msl [2], v->top_mask, mshift_top, nm),
@@ -868,11 +874,11 @@ LEFDEFReaderOptions::special_routing_datatype_str () const
 //  LEFDEFLayerDelegate implementation
 
 LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout, const std::string &base_path)
-  : m_create_layers (true), m_has_explicit_layer_mapping (false), m_laynum (1), mp_tech_comp (tc)
+  : mp_importer (0), m_create_layers (true), m_has_explicit_layer_mapping (false), m_laynum (1), mp_tech_comp (tc)
 {
   if (! tc->map_file ().empty ()) {
 
-    read_map_file (correct_path (tc->map_file (), layout, base_path), layout);
+    read_map_file (tc->map_file (), layout, base_path);
 
   } else {
 
@@ -886,7 +892,7 @@ LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout 
 
 LEFDEFReaderState::~LEFDEFReaderState ()
 {
-  for (std::map<std::string, LEFDEFLayoutGenerator *>::const_iterator i = m_via_generators.begin (); i != m_via_generators.end (); ++i) {
+  for (std::map<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *>::const_iterator i = m_via_generators.begin (); i != m_via_generators.end (); ++i) {
     delete i->second;
   }
 
@@ -897,6 +903,22 @@ LEFDEFReaderState::~LEFDEFReaderState ()
   }
 
   m_macro_generators.clear ();
+}
+
+void
+LEFDEFReaderState::common_reader_error (const std::string &msg)
+{
+  if (mp_importer) {
+    mp_importer->error (msg);
+  }
+}
+
+void
+LEFDEFReaderState::common_reader_warn (const std::string &msg)
+{
+  if (mp_importer) {
+    mp_importer->warn (msg);
+  }
 }
 
 void
@@ -926,16 +948,70 @@ static bool try_read_layers (tl::Extractor &ex, std::vector<int> &layers)
   return true;
 }
 
+static std::string::size_type find_file_sep (const std::string &s, std::string::size_type from)
+{
+  std::string::size_type p1 = s.find ("+", from);
+  std::string::size_type p2 = s.find (",", from);
+
+  if (p1 == std::string::npos) {
+    return p2;
+  } else if (p2 == std::string::npos) {
+    return p1;
+  } else {
+    return p1 < p2 ? p1 : p2;
+  }
+}
+
+static std::vector<std::string> split_file_list (const std::string &infile)
+{
+  std::vector<std::string> files;
+
+  size_t p = 0;
+  for (size_t pp = 0; (pp = find_file_sep (infile, p)) != std::string::npos; p = pp + 1) {
+    files.push_back (std::string (infile, p, pp - p));
+  }
+  files.push_back (std::string (infile, p));
+
+  return files;
+}
+
 void
-LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
+LEFDEFReaderState::read_map_file (const std::string &filename, db::Layout &layout, const std::string &base_path)
 {
   m_has_explicit_layer_mapping = true;
 
-  tl::log << tl::to_string (tr ("Reading LEF/DEF map file")) << " " << path;
+  std::vector<std::string> paths = split_file_list (filename);
 
+  std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> > layer_map;
+
+  for (std::vector<std::string>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
+    read_single_map_file (correct_path (*p, layout, base_path), layer_map);
+  }
+
+  //  build an explicit layer mapping now.
+
+  tl_assert (m_has_explicit_layer_mapping);
+  m_layers.clear ();
+  m_layer_map.clear ();
+
+  db::DirectLayerMapping lm (&layout);
+  for (std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> >::const_iterator i = layer_map.begin (); i != layer_map.end (); ++i) {
+    for (std::vector<db::LayerProperties>::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
+      unsigned int layer = lm.map_layer (*j).second;
+      m_layers [i->first].insert (layer);
+      m_layer_map.mmap (*j, layer);
+    }
+  }
+}
+
+void
+LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> > &layer_map)
+{
   tl::InputFile file (path);
   tl::InputStream file_stream (file);
   tl::TextInputStream ts (file_stream);
+
+  tl::log << tl::to_string (tr ("Reading LEF/DEF map file")) << " " << file_stream.absolute_path ();
 
   std::map<std::string, LayerPurpose> purpose_translation;
   purpose_translation ["LEFPIN"] = LEFPins;
@@ -948,8 +1024,6 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
   purpose_translation ["VIA"] = ViaGeometry;
   purpose_translation ["BLOCKAGE"] = Blockage;
   purpose_translation ["ALL"] = All;
-
-  std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> > layer_map;
 
   while (! ts.at_end ()) {
 
@@ -979,11 +1053,26 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
           }
         }
 
-      } else if (w1 == "REGIONS") {
+      } else if (w1 == "REGION") {
+
+        std::string name = "REGIONS";
+        LayerPurpose lp = Regions;
+        if (w2 == "FENCE") {
+          name = "REGIONS_FENCE";
+          lp = RegionsFence;
+        } else if (w2 == "GUIDE") {
+          name = "REGIONS_GUIDE";
+          lp = RegionsGuide;
+        } else if (w2 == "NONE") {
+          name = "REGIONS_NONE";
+          lp = RegionsNone;
+        } else if (w2 != "ALL") {
+          tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d - ignoring unknowns REGION purpose %s (use FENCE, GUIDE or ALL)")), path, ts.line_number (), w2);
+        }
 
         for (std::vector<int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
           for (std::vector<int>::const_iterator d = datatypes.begin (); d != datatypes.end (); ++d) {
-            layer_map [std::make_pair (std::string (), LayerDetailsKey (Regions))].push_back (db::LayerProperties (*l, *d, "REGIONS"));
+            layer_map [std::make_pair (std::string (), LayerDetailsKey (lp))].push_back (db::LayerProperties (*l, *d, name));
           }
         }
 
@@ -1124,7 +1213,7 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
           } else if (i->second == All) {
 
             for (std::map<std::string, LayerPurpose>::const_iterator p = purpose_translation.begin (); p != purpose_translation.end (); ++p) {
-              if (p->second != All) {
+              if (p->second != All && p->second != Blockage) {
                 translated_purposes.insert (LayerDetailsKey (p->second, mask, via_size));
               }
             }
@@ -1172,21 +1261,14 @@ LEFDEFReaderState::read_map_file (const std::string &path, db::Layout &layout)
     }
 
   }
+}
 
-  //  build an explicit layer mapping now.
-
-  tl_assert (m_has_explicit_layer_mapping);
-  m_layers.clear ();
-  m_layer_map.clear ();
-
-  db::DirectLayerMapping lm (&layout);
-  for (std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> >::const_iterator i = layer_map.begin (); i != layer_map.end (); ++i) {
-    for (std::vector<db::LayerProperties>::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
-      unsigned int layer = lm.map_layer (*j).second;
-      m_layers [i->first].insert (layer);
-      m_layer_map.mmap (*j, layer);
-    }
-  }
+/**
+ *  @brief Returns true, if the layer purpose has a fallback
+ */
+static bool has_fallback (LayerPurpose p)
+{
+  return p == RegionsFence || p == RegionsGuide || p == RegionsNone;
 }
 
 std::set <unsigned int>
@@ -1201,14 +1283,18 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
 
     std::set <unsigned int> ll;
 
-    if (n.empty () || ! m_has_explicit_layer_mapping) {
+    if (! m_has_explicit_layer_mapping) {
       ll = open_layer_uncached (layout, n, purpose, mask);
     }
 
     m_layers.insert (std::make_pair (std::make_pair (n, LayerDetailsKey (purpose, mask)), ll));
 
-    if (ll.empty ()) {
-      tl::warn << tl::to_string (tr ("No mapping for layer")) << " '" << n << "', purpose '" << purpose_to_name (purpose) << "'" << tl::noendl;
+    if (ll.empty () && ! has_fallback (purpose)) {
+      if (n.empty ()) {
+        tl::warn << tl::to_string (tr ("No mapping for purpose")) << " '" << purpose_to_name (purpose) << "'" << tl::noendl;
+      } else {
+        tl::warn << tl::to_string (tr ("No mapping for layer")) << " '" << n << "', purpose '" << purpose_to_name (purpose) << "'" << tl::noendl;
+      }
       if (mask > 0) {
         tl::warn << tl::to_string (tr (" Mask ")) << mask << tl::noendl;
       }
@@ -1538,6 +1624,8 @@ std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout
 void
 LEFDEFReaderState::finish (db::Layout &layout)
 {
+  CommonReaderBase::finish (layout);
+
   int lnum = 0;
 
   std::set<int> used_numbers;
@@ -1606,18 +1694,22 @@ LEFDEFReaderState::finish (db::Layout &layout)
 }
 
 void
-LEFDEFReaderState::register_via_cell (const std::string &vn, LEFDEFLayoutGenerator *generator)
+LEFDEFReaderState::register_via_cell (const std::string &vn, const std::string &nondefaultrule, LEFDEFLayoutGenerator *generator)
 {
-  if (m_via_generators.find (vn) != m_via_generators.end ()) {
-    delete m_via_generators [vn];
+  if (m_via_generators.find (std::make_pair (vn, nondefaultrule)) != m_via_generators.end ()) {
+    delete m_via_generators [std::make_pair (vn, nondefaultrule)];
   }
-  m_via_generators [vn] = generator;
+  m_via_generators [std::make_pair (vn, nondefaultrule)] = generator;
 }
 
 LEFDEFLayoutGenerator *
-LEFDEFReaderState::via_generator (const std::string &vn)
+LEFDEFReaderState::via_generator (const std::string &vn, const std::string &nondefaultrule)
 {
-  std::map<std::string, LEFDEFLayoutGenerator *>::const_iterator g = m_via_generators.find (vn);
+  std::map<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *>::const_iterator g = m_via_generators.find (std::make_pair (vn, nondefaultrule));
+  if (g == m_via_generators.end () && ! nondefaultrule.empty ()) {
+    //  default rule is fallback
+    g = m_via_generators.find (std::make_pair (vn, std::string ()));
+  }
   if (g != m_via_generators.end ()) {
     return g->second;
   } else {
@@ -1626,31 +1718,45 @@ LEFDEFReaderState::via_generator (const std::string &vn)
 }
 
 db::Cell *
-LEFDEFReaderState::via_cell (const std::string &vn, db::Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm)
+LEFDEFReaderState::via_cell (const std::string &vn, const std::string &nondefaultrule, db::Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm)
 {
-  ViaKey vk (vn, mask_bottom, mask_cut, mask_top);
+  ViaKey vk (vn, nondefaultrule, mask_bottom, mask_cut, mask_top);
+
+  std::map<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *>::const_iterator g = m_via_generators.find (std::make_pair (vn, nondefaultrule));
+
+  if (g == m_via_generators.end () && ! vk.nondefaultrule.empty ()) {
+    //  default rule is fallback
+    g = m_via_generators.find (std::make_pair (vn, std::string ()));
+    vk.nondefaultrule.clear ();
+  }
+
   std::map<ViaKey, db::Cell *>::const_iterator i = m_via_cells.find (vk);
   if (i == m_via_cells.end ()) {
 
     db::Cell *cell = 0;
 
-    std::map<std::string, LEFDEFLayoutGenerator *>::const_iterator g = m_via_generators.find (vn);
     if (g != m_via_generators.end ()) {
 
       LEFDEFLayoutGenerator *vg = g->second;
 
-      std::string mask_suffix;
-      if (mask_bottom > 0 || mask_cut > 0 || mask_top > 0) {
-        mask_suffix += "_";
-        mask_suffix += tl::to_string (mask_bottom);
-        mask_suffix += "_";
-        mask_suffix += tl::to_string (mask_cut);
-        mask_suffix += "_";
-        mask_suffix += tl::to_string (mask_top);
+      std::string n = vn;
+
+      if (! vk.nondefaultrule.empty ()) {
+        n += "_";
+        n += vk.nondefaultrule;
       }
 
-      std::string cn = mp_tech_comp->via_cellname_prefix () + vn + mask_suffix;
-      cell = &layout.cell (layout.add_cell (cn.c_str ()));
+      if (mask_bottom > 0 || mask_cut > 0 || mask_top > 0) {
+        n += "_";
+        n += tl::to_string (mask_bottom);
+        n += "_";
+        n += tl::to_string (mask_cut);
+        n += "_";
+        n += tl::to_string (mask_top);
+      }
+
+      std::string cn = mp_tech_comp->via_cellname_prefix () + n;
+      cell = &layout.cell (make_cell (layout, cn.c_str ()));
 
       std::vector<unsigned int> masks;
       masks.reserve (3);
@@ -1705,7 +1811,7 @@ LEFDEFReaderState::foreign_cell (Layout &layout, const std::string &name)
   if (cc.first) {
     ci = cc.second;
   } else {
-    ci = layout.add_cell (name.c_str ());
+    ci = make_cell (layout, name.c_str ());
     layout.cell (ci).set_ghost_cell (true);
   }
 
@@ -1747,7 +1853,7 @@ LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std:
     if (macro_desc.foreign_name != mn) {
 
       //  create an indirection for renaming the cell
-      cell = &layout.cell (layout.add_cell (mn.c_str ()));
+      cell = &layout.cell (make_cell (layout, mn.c_str ()));
       cell->insert (db::CellInstArray (db::CellInst (foreign_cell->cell_index ()), db::Trans (db::Point () - macro_desc.origin) * macro_desc.foreign_trans));
 
     } else {
@@ -1779,7 +1885,7 @@ LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std:
 
     std::string cn = mn + mask_suffix;
 
-    cell = &layout.cell (layout.add_cell (cn.c_str ()));
+    cell = &layout.cell (make_cell (layout, cn.c_str ()));
 
     if (mg->is_fixedmask ()) {
       mg->create_cell (*this, layout, *cell, 0, std::vector<unsigned int> (), nm);
@@ -1819,6 +1925,8 @@ LEFDEFImporter::get_mask (long m)
 void 
 LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderState &state)
 {
+  tl::log << tl::to_string (tr ("Reading LEF/DEF file")) << " " << stream.absolute_path ();
+
   m_fn = stream.filename ();
 
   tl::AbsoluteProgress progress (tl::to_string (tr ("Reading ")) + m_fn, 1000);
@@ -1827,6 +1935,7 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderS
   progress.set_unit (10000.0);
 
   mp_reader_state = &state;
+  mp_reader_state->attach_reader (this);
 
   if (state.tech_comp ()) {
     m_options = *state.tech_comp ();
@@ -1863,11 +1972,13 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderS
 
     do_read (layout); 
 
+    mp_reader_state->attach_reader (0);
     delete mp_stream;
     mp_stream = 0;
     mp_progress = 0;
 
   } catch (...) {
+    mp_reader_state->attach_reader (0);
     delete mp_stream;
     mp_stream = 0;
     mp_progress = 0;

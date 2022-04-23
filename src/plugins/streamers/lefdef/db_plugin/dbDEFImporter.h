@@ -79,7 +79,7 @@ private:
   std::pair<db::Coord, db::Coord> get_def_ext (const std::string &ln, const std::pair<db::Coord, db::Coord> &wxy, double dbu);
   void read_diearea (db::Layout &layout, db::Cell &design, double scale);
   void read_nondefaultrules (double scale);
-  void read_regions (std::map<std::string, std::vector<db::Polygon> > &regions, double scale);
+  void read_regions (std::map<std::string, std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > > > &regions, double scale);
   void read_groups (std::list<DEFImporterGroup> &groups, double scale);
   void read_blockages (db::Layout &layout, db::Cell &design, double scale);
   void read_nets (db::Layout &layout, db::Cell &design, double scale, bool specialnets);

@@ -104,8 +104,9 @@ OASISReader::init (const db::LoadLayoutOptions &options)
 {
   CommonReader::init (options);
 
-  m_read_texts = common_options ().enable_text_objects;
-  m_read_properties = common_options ().enable_properties;
+  db::CommonReaderOptions common_options = options.get_options<db::CommonReaderOptions> ();
+  m_read_texts = common_options.enable_text_objects;
+  m_read_properties = common_options.enable_properties;
 
   db::OASISReaderOptions oasis_options = options.get_options<db::OASISReaderOptions> ();
   m_read_all_properties = oasis_options.read_all_properties;

@@ -30,18 +30,18 @@ namespace db
 {
 
 // ---------------------------------------------------------------
-//  Common reader implementation
+//  Common reader basic feature implementation
 
 static const size_t null_id = std::numeric_limits<size_t>::max ();
 
-CommonReader::CommonReader ()
+CommonReaderBase::CommonReaderBase ()
   : m_cc_resolution (AddToCell), m_create_layers (false)
 {
   //  .. nothing yet ..
 }
 
 db::cell_index_type
-CommonReader::make_cell (db::Layout &layout, const std::string &cn)
+CommonReaderBase::make_cell (db::Layout &layout, const std::string &cn)
 {
   tl_assert (! cn.empty ());
 
@@ -69,13 +69,13 @@ CommonReader::make_cell (db::Layout &layout, const std::string &cn)
 }
 
 bool
-CommonReader::has_cell (const std::string &cn) const
+CommonReaderBase::has_cell (const std::string &cn) const
 {
   return m_name_map.find (cn) != m_name_map.end ();
 }
 
 std::pair<bool, db::cell_index_type>
-CommonReader::cell_by_name (const std::string &cn) const
+CommonReaderBase::cell_by_name (const std::string &cn) const
 {
   std::map<std::string, std::pair<size_t, db::cell_index_type> >::const_iterator iname = m_name_map.find (cn);
   if (iname != m_name_map.end ()) {
@@ -86,7 +86,7 @@ CommonReader::cell_by_name (const std::string &cn) const
 }
 
 db::cell_index_type
-CommonReader::make_cell (db::Layout &layout, size_t id)
+CommonReaderBase::make_cell (db::Layout &layout, size_t id)
 {
   tl_assert (id != null_id);
 
@@ -114,13 +114,13 @@ CommonReader::make_cell (db::Layout &layout, size_t id)
 }
 
 bool
-CommonReader::has_cell (size_t id) const
+CommonReaderBase::has_cell (size_t id) const
 {
   return m_id_map.find (id) != m_id_map.end ();
 }
 
 std::pair<bool, db::cell_index_type>
-CommonReader::cell_by_id (size_t id) const
+CommonReaderBase::cell_by_id (size_t id) const
 {
   std::map<size_t, std::pair<std::string, db::cell_index_type> >::const_iterator iid = m_id_map.find (id);
   if (iid != m_id_map.end ()) {
@@ -131,7 +131,7 @@ CommonReader::cell_by_id (size_t id) const
 }
 
 const std::string &
-CommonReader::name_for_id (size_t id) const
+CommonReaderBase::name_for_id (size_t id) const
 {
   std::map<size_t, std::string>::const_iterator n = m_name_for_id.find (id);
   if (n != m_name_for_id.end ()) {
@@ -143,7 +143,7 @@ CommonReader::name_for_id (size_t id) const
 }
 
 void
-CommonReader::rename_cell (db::Layout &layout, size_t id, const std::string &cn)
+CommonReaderBase::rename_cell (db::Layout &layout, size_t id, const std::string &cn)
 {
   m_name_for_id.insert (std::make_pair (id, cn));
 
@@ -191,7 +191,7 @@ CommonReader::rename_cell (db::Layout &layout, size_t id, const std::string &cn)
 }
 
 db::cell_index_type
-CommonReader::cell_for_instance (db::Layout &layout, size_t id)
+CommonReaderBase::cell_for_instance (db::Layout &layout, size_t id)
 {
   tl_assert (id != null_id);
 
@@ -213,7 +213,7 @@ CommonReader::cell_for_instance (db::Layout &layout, size_t id)
 }
 
 db::cell_index_type
-CommonReader::cell_for_instance (db::Layout &layout, const std::string &cn)
+CommonReaderBase::cell_for_instance (db::Layout &layout, const std::string &cn)
 {
   tl_assert (! cn.empty ());
 
@@ -235,7 +235,7 @@ CommonReader::cell_for_instance (db::Layout &layout, const std::string &cn)
 }
 
 void
-CommonReader::merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index) const
+CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index) const
 {
   const db::Cell &src_cell = layout.cell (src_cell_index);
   db::Cell &target_cell = layout.cell (target_cell_index);
@@ -253,7 +253,7 @@ CommonReader::merge_cell (db::Layout &layout, db::cell_index_type target_cell_in
 }
 
 void
-CommonReader::merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index) const
+CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index) const
 {
   const db::Cell &src_cell = layout.cell (src_cell_index);
   db::Cell &target_cell = layout.cell (target_cell_index);
@@ -281,46 +281,9 @@ CommonReader::merge_cell_without_instances (db::Layout &layout, db::cell_index_t
   layout.delete_cell (src_cell.cell_index ());
 }
 
-const db::LayerMap &
-CommonReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
-{
-  init (options);
-
-  tl_assert (!layout.under_construction ());
-
-  m_common_options.layer_map.prepare (layout);
-
-  layout.start_changes ();
-  try {
-    do_read (layout);
-    finish (layout);
-    layout.end_changes ();
-  } catch (...) {
-    layout.end_changes ();
-    throw;
-  }
-
-  //  A cleanup may be necessary because of the following scenario: if library proxies contain subcells
-  //  which are proxies itself, the proxy update may make them orphans (the proxies are regenerated).
-  //  The cleanup will removed these.
-  layout.cleanup ();
-
-  return m_layer_map_out;
-}
-
-const db::LayerMap &
-CommonReader::read (db::Layout &layout)
-{
-  return read (layout, db::LoadLayoutOptions ());
-}
-
 void
-CommonReader::init (const LoadLayoutOptions &options)
+CommonReaderBase::init ()
 {
-  m_common_options = options.get_options<db::CommonReaderOptions> ();
-  m_cc_resolution = m_common_options.cell_conflict_resolution;
-  m_create_layers = m_common_options.create_other_layers;
-
   m_layer_map_out.clear ();
   m_multi_mapping_placeholders.clear ();
   m_layer_cache.clear ();
@@ -329,7 +292,7 @@ CommonReader::init (const LoadLayoutOptions &options)
 }
 
 void
-CommonReader::finish (db::Layout &layout)
+CommonReaderBase::finish (db::Layout &layout)
 {
   bool any_missing = false;
 
@@ -492,7 +455,7 @@ CommonReader::finish (db::Layout &layout)
 }
 
 std::pair <bool, unsigned int>
-CommonReader::open_dl (db::Layout &layout, const LDPair &dl)
+CommonReaderBase::open_dl (db::Layout &layout, const LDPair &dl)
 {
   std::map<db::LDPair, std::pair <bool, unsigned int> >::const_iterator lc = m_layer_cache.find (dl);
   if (lc != m_layer_cache.end ()) {
@@ -505,9 +468,9 @@ CommonReader::open_dl (db::Layout &layout, const LDPair &dl)
 }
 
 std::pair <bool, unsigned int>
-CommonReader::open_dl_uncached (db::Layout &layout, const LDPair &dl)
+CommonReaderBase::open_dl_uncached (db::Layout &layout, const LDPair &dl)
 {
-  const std::set<unsigned int> &li = common_options ().layer_map.logical (dl, layout);
+  std::set<unsigned int> li = m_layer_map.logical (dl, layout);
   if (li.empty ()) {
 
     if (! m_create_layers) {
@@ -556,6 +519,58 @@ CommonReader::open_dl_uncached (db::Layout &layout, const LDPair &dl)
     return std::make_pair (true, mmp->second);
 
   }
+}
+
+// ---------------------------------------------------------------
+//  Common reader implementation
+
+CommonReader::CommonReader ()
+{
+  //  .. nothing yet ..
+}
+
+const db::LayerMap &
+CommonReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
+{
+  init (options);
+
+  tl_assert (!layout.under_construction ());
+
+  layer_map ().prepare (layout);
+
+  layout.start_changes ();
+  try {
+    do_read (layout);
+    finish (layout);
+    layout.end_changes ();
+  } catch (...) {
+    layout.end_changes ();
+    throw;
+  }
+
+  //  A cleanup may be necessary because of the following scenario: if library proxies contain subcells
+  //  which are proxies itself, the proxy update may make them orphans (the proxies are regenerated).
+  //  The cleanup will removed these.
+  layout.cleanup ();
+
+  return layer_map_out ();
+}
+
+const db::LayerMap &
+CommonReader::read (db::Layout &layout)
+{
+  return read (layout, db::LoadLayoutOptions ());
+}
+
+void
+CommonReader::init (const LoadLayoutOptions &options)
+{
+  CommonReaderBase::init ();
+
+  db::CommonReaderOptions common_options = options.get_options<db::CommonReaderOptions> ();
+  set_conflict_resolution_mode (common_options.cell_conflict_resolution);
+  set_create_layers (common_options.create_other_layers);
+  set_layer_map (common_options.layer_map);
 }
 
 // ---------------------------------------------------------------

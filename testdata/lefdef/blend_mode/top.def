@@ -1,0 +1,6 @@
+DESIGN top ;
+DIEAREA ( 0 0 ) ( 1000 1000 ) ;
+COMPONENTS 1 ;
+- sub sub + PLACED ( 0 0 ) N ;
+END COMPONENTS
+END DESIGN

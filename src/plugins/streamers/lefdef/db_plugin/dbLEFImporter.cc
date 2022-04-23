@@ -380,7 +380,7 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
 }
 
 void
-LEFImporter::read_nondefaultrule (db::Layout & /*layout*/)
+LEFImporter::read_nondefaultrule (db::Layout &layout)
 {
   //  read NONDEFAULTRULE sections
   std::string n = get ();
@@ -408,11 +408,7 @@ LEFImporter::read_nondefaultrule (db::Layout & /*layout*/)
 
     } else if (test ("VIA")) {
 
-      //  ignore VIA statements
-      std::string v = get ();
-      while (! test ("END") || ! test (v)) {
-        take ();
-      }
+      read_viadef (layout, n);
 
     } else {
       while (! at_end () && ! test (";")) {
@@ -640,7 +636,7 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc 
 }
 
 void
-LEFImporter::read_viadef (Layout &layout)
+LEFImporter::read_viadef (Layout &layout, const std::string &nondefaultrule)
 {
   std::string n = get ();
 
@@ -653,11 +649,11 @@ LEFImporter::read_viadef (Layout &layout)
   if (test ("VIARULE")) {
     std::unique_ptr<RuleBasedViaGenerator> vg (new RuleBasedViaGenerator ());
     read_viadef_by_rule (vg.get (), via_desc, n, layout.dbu ());
-    reader_state ()->register_via_cell (n, vg.release ());
+    reader_state ()->register_via_cell (n, nondefaultrule, vg.release ());
   } else {
     std::unique_ptr<GeometryBasedLayoutGenerator> vg (new GeometryBasedLayoutGenerator ());
     read_viadef_by_geometry (vg.get (), via_desc, n, layout.dbu ());
-    reader_state ()->register_via_cell (n, vg.release ());
+    reader_state ()->register_via_cell (n, nondefaultrule, vg.release ());
   }
 
   test ("VIA");
@@ -1064,7 +1060,7 @@ LEFImporter::do_read (db::Layout &layout)
 
     } else if (test ("VIA")) {
 
-      read_viadef (layout);
+      read_viadef (layout, std::string ());
 
     } else if (test ("BEGINEXT")) {
 

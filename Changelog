@@ -1,3 +1,29 @@
+0.27.9          (2022-04-23):
+* Bugfix: %GITHUB%/issues/1008 Don't optimize away points on path edit
+* Bugfix: %GITHUB%/issues/1011 DRC in deep mode highlights erroneous width violation with text
+* Bugfix: %GITHUB%/issues/1012 Warning requested if LEF/DEF map file does not capture certain layers 
+* Bugfix: %GITHUB%/issues/1013 OASIS writer bug with certain irregular arrays
+* Bugfix: %GITHUB%/issues/1017 DXF export: better handling of PCB zone fills
+* Bugfix: %GITHUB%/issues/1021 LVS unexpectedly failing
+* Bugfix: %GITHUB%/issues/1029 Problem with Qt binding
+* Bugfix: %GITHUB%/issues/1040 pip install klayout doesn't seem to work on M1 MacBookPro
+* Bugfix: %GITHUB%/issues/1054 Qt binding: crash due to Python allocation-while-deallocating
+* Bugfix: Buddy tools + OASIS: invalid warning about unexpected strict mode
+* Bugfix: Ctrl+F will always enter search box in Macro IDE now
+* Bugfix: LEF/DEF reader options - could not clear suffix or set datatype to none
+* Bugfix: netlist/LVS result browser - do not clip texts, provide texts as tool tips as well for inspection
+* Bugfix: the library selected box listed technology-specific libraries even if no technology was selected
+* Bugfixes and enhancements for the LEF/DEF reader
+  Includes %GITHUB%/issues/1050, %GITHUB%/issues/1065 and %GITHUB%/issues/1047
+  plus a number of standard compatibility issues. Bugfixes and enhancements for the 
+  strm2xyz buddy tool's LEF/DEF reader implementations.
+* Enhancement: %GITHUB%/issues/1057 Include PCell update in Library#refresh
+* Enhancement: %GITHUB%/issues/1058 Backspace to delete last point from polygon or path
+* Enhancement: Split gates option for LVS (new keyword is "split_gates") - see documentation for details
+* Enhancement: generate labels for PCB X2 net names
+* Enhancement: PCell errors are now shown on a separate layer (formerly only if the PCell featured at least one layer-type parameter)
+  This layer is available with the same style and configuration than the guiding shape layer.
+
 0.27.8          (2022-02-13):
 * Bugfix: %GITHUB%/issues/971 Double compare fails in LVS
 * Bugfix: %GITHUB%/issues/972 CIF writer generates unreadable file with invalid cell or layer names

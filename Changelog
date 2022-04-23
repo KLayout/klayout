@@ -6,9 +6,9 @@
 * Bugfix: %GITHUB%/issues/1017 DXF export: better handling of PCB zone fills
 * Bugfix: %GITHUB%/issues/1021 LVS unexpectedly failing
 * Bugfix: %GITHUB%/issues/1029 Problem with Qt binding
+* Bugfix: %GITHUB%/issues/1031 Buddy tools + OASIS: invalid warning about unexpected strict mode
 * Bugfix: %GITHUB%/issues/1040 pip install klayout doesn't seem to work on M1 MacBookPro
 * Bugfix: %GITHUB%/issues/1054 Qt binding: crash due to Python allocation-while-deallocating
-* Bugfix: Buddy tools + OASIS: invalid warning about unexpected strict mode
 * Bugfix: Ctrl+F will always enter search box in Macro IDE now
 * Bugfix: LEF/DEF reader options - could not clear suffix or set datatype to none
 * Bugfix: netlist/LVS result browser - do not clip texts, provide texts as tool tips as well for inspection

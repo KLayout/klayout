@@ -27,6 +27,9 @@ ubuntu18)
 ubuntu20)
   depends="libqt5core5a (>= 5.12.8), libqt5designer5 (>= 5.12.8), libqt5gui5 (>= 5.12.8), libqt5multimedia5 (>= 5.12.8), libqt5multimediawidgets5 (>= 5.12.8), libqt5network5 (>= 5.12.8), libqt5opengl5 (>= 5.12.8), libqt5printsupport5 (>= 5.12.8), libqt5sql5 (>= 5.12.8), libqt5svg5 (>= 5.12.8), libqt5widgets5 (>= 5.12.8), libqt5xml5 (>= 5.12.8), libqt5xmlpatterns5 (>= 5.12.8), zlib1g (>= 1.2.11), libruby2.7 (>= 2.7.0), python3 (>= 3.8.2), libpython3.8 (>= 3.8.2), libstdc++6 (>=10), libc6 (>= 2.31)" 
   ;;
+ubuntu22)
+  depends="libqt5core5a (>= 5.15.3), libqt5designer5 (>= 5.15.3), libqt5gui5 (>= 5.15.3), libqt5multimedia5 (>= 5.15.3), libqt5multimediawidgets5 (>= 5.15.3), libqt5network5 (>= 5.15.3), libqt5opengl5 (>= 5.15.3), libqt5printsupport5 (>= 5.15.3), libqt5sql5 (>= 5.15.3), libqt5svg5 (>= 5.15.3), libqt5widgets5 (>= 5.15.3), libqt5xml5 (>= 5.15.3), libqt5xmlpatterns5 (>= 5.15.3), zlib1g (>= 1.2.11), libruby3.0 (>= 3.0.2), python3 (>= 3.10.4), libpython3.10 (>= 3.10.4), libstdc++6 (>=12), libc6 (>= 2.35)" 
+  ;;
 *)
   echo "Unknown target '$target' (given as first argument)"
   exit 1

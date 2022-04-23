@@ -139,8 +139,15 @@ DEFImporter::get_def_ext (const std::string &ln, const std::pair<db::Coord, db::
   //  This implementation assumes the "preferred width" is controlling the default extension and it is
   //  identical to the minimum effective width. This is true if "LEF58_MINWIDTH" with "WRONGDIRECTION" is
   //  used in the proposed way. Which is to specify a larger width for the "wrong" direction.
+#if 0
+  //  This implementation tries to use LEF wire extension if given
   db::Coord de = db::coord_traits<db::Coord>::rounded (m_lef_importer.layer_ext (ln, std::min (wxy.first, wxy.second) * 0.5 * dbu) / dbu);
   return std::make_pair (de, de);
+#else
+  //  This implementation follows the LEFDEF 5.8 spec saying the "default extension is half the wire width":
+  db::Coord de = std::min (wxy.first, wxy.second) / 2;
+  return std::make_pair (de, de);
+#endif
 }
 
 void
@@ -205,22 +212,39 @@ DEFImporter::read_nondefaultrules (double scale)
 }
 
 void
-DEFImporter::read_regions (std::map<std::string, std::vector<db::Polygon> > &regions, double scale)
+DEFImporter::read_regions (std::map<std::string, std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > > > &regions, double scale)
 {
   while (test ("-")) {
 
     std::string n = get ();
-    std::vector<db::Polygon> &polygons = regions [n];
+
+    std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > > &rg = regions[n];
+    rg.push_back (std::pair<LayerPurpose, std::vector<db::Polygon> > (RegionsNone, std::vector<db::Polygon> ()));
+    LayerPurpose &p = rg.back ().first;
+    std::vector<db::Polygon> &polygons = rg.back ().second;
 
     while (! peek (";")) {
 
       if (test ("+")) {
 
-        //  ignore other options for now
-        while (! peek (";")) {
-          take ();
+        if (test ("TYPE")) {
+
+          if (test ("GUIDE")) {
+            p = RegionsGuide;
+          } else if (test ("FENCE")) {
+            p = RegionsFence;
+          } else {
+            error (tl::to_string (tr ("REGION type needs to be GUIDE or FENCE")));
+          }
+
+        } else {
+
+          //  ignore other options for now (i.e. PROPERTY)
+          while (! peek (";") && ! peek ("+")) {
+            take ();
+          }
+
         }
-        break;
 
       } else {
 
@@ -379,7 +403,11 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
         //  compute begin extension
         db::Coord be = 0;
         if (pt0 == pts.begin ()) {
-          be = ext.front ().first;
+          if (pt0->x () == pt0 [1].x ()) {
+            be = ext.front ().second;
+          } else {
+            be = ext.front ().first;
+          }
         } else if (was_path_before) {
           //  provides the overlap to the previous segment
           be = wxy_perp / 2;
@@ -388,15 +416,32 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
         //  compute end extension
         db::Coord ee = 0;
         if (pt + 1 == pts.end ()) {
-          ee = ext.back ().first;
+          if (pt [-1].x () == pt->x ()) {
+            ee = ext.back ().second;
+          } else {
+            ee = ext.back ().first;
+          }
         }
 
+#if 0
+        //  single path
         db::Path p (pt0, pt + 1, wxy, be, ee, false);
         if (prop_id != 0) {
           design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
         } else {
           design.shapes (layer).insert (p);
         }
+#else
+        //  multipart paths
+        for (std::vector<db::Point>::const_iterator i = pt0; i != pt; ++i) {
+          db::Path p (i, i + 2, wxy, i == pt0 ? be : wxy / 2, i + 1 != pt ? wxy / 2 : ee, false);
+          if (prop_id != 0) {
+            design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
+          } else {
+            design.shapes (layer).insert (p);
+          }
+        }
+#endif
 
         was_path_before = true;
 
@@ -667,7 +712,7 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
           unsigned int mask_cut = (mask / 10) % 10;
           unsigned int mask_bottom = mask % 10;
 
-          db::Cell *cell = reader_state ()->via_cell (vn, layout, mask_bottom, mask_cut, mask_top, &m_lef_importer);
+          db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, mask_bottom, mask_cut, mask_top, &m_lef_importer);
           if (cell) {
             if (nx <= 1 && ny <= 1) {
               design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), db::Vector (pts.back ()))));
@@ -846,7 +891,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
           std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
           if (vd != m_via_desc.end ()) {
             //  TODO: no mask specification here?
-            db::Cell *cell = reader_state ()->via_cell (vn, layout, 0, 0, 0, &m_lef_importer);
+            db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, 0, 0, 0, &m_lef_importer);
             if (cell) {
               design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), pt)));
             }
@@ -917,6 +962,9 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
     std::set<std::string> seen_layers;
     std::vector<std::string> routing_layers;
 
+    bool has_cut_geometry = false;
+    bool has_patternname = false;
+
     while (test ("+")) {
 
       bool is_polygon = false;
@@ -980,6 +1028,11 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
         rule_based_vg->set_rows (get_long ());
         rule_based_vg->set_columns (get_long ());
 
+      } else if (test ("PATTERNNAME")) {
+
+        get ();  //  ignore
+        has_patternname = true;
+
       } else if (test ("PATTERN")) {
 
         if (! rule_based_vg.get ()) {
@@ -1031,6 +1084,7 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
         } else if (m_lef_importer.is_cut_layer (ln)) {
 
           geo_based_vg->set_maskshift_layer (1, ln);
+          has_cut_geometry = true;
 
         }
 
@@ -1058,6 +1112,10 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
 
     }
 
+    if (has_patternname && ! has_cut_geometry) {
+      warn (tl::sprintf (tl::to_string (tr ("Via %s uses legacy PATTERNAME and no cut geometry - no via shapes are generated")), n));
+    }
+
     if (vd.m1.empty () && vd.m2.empty ()) {
 
       //  analyze the layers to find the metals
@@ -1065,7 +1123,7 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
         vd.m1 = routing_layers[0];
         vd.m2 = routing_layers[1];
       } else {
-        warn ("Can't determine routing layers for via: " + n);
+        warn (tl::to_string (tr ("Cannot determine routing layers for via: ")) + n);
       }
 
     }
@@ -1073,9 +1131,9 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
     if (rule_based_vg.get () && geo_based_vg.get ()) {
       error (tl::to_string (tr ("A via can only be defined through a VIARULE or geometry, not both ways")));
     } else if (rule_based_vg.get ()) {
-      reader_state ()->register_via_cell (n, rule_based_vg.release ());
+      reader_state ()->register_via_cell (n, std::string (), rule_based_vg.release ());
     } else if (geo_based_vg.get ()) {
-      reader_state ()->register_via_cell (n, geo_based_vg.release ());
+      reader_state ()->register_via_cell (n, std::string (), geo_based_vg.release ());
     } else {
       error (tl::to_string (tr ("Too little information to generate a via")));
     }
@@ -1442,15 +1500,16 @@ DEFImporter::do_read (db::Layout &layout)
 
   double dbu_mic = 1000.0;
   double scale = 1.0 / (dbu_mic * layout.dbu ());
+  size_t top_id = 0;
 
-  std::map<std::string, std::vector<db::Polygon> > regions;
+  std::map<std::string, std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > > > regions;
   std::list<DEFImporterGroup> groups;
   std::list<std::pair<std::string, db::CellInstArray> > instances;
 
   m_via_desc = m_lef_importer.vias ();
   m_styles.clear ();
 
-  db::Cell &design = layout.cell (layout.add_cell ("TOP"));
+  db::Cell &design = layout.cell (reader_state ()->make_cell (layout, top_id));
 
   while (! at_end ()) {
 
@@ -1465,7 +1524,7 @@ DEFImporter::do_read (db::Layout &layout)
     } else if (test ("DESIGN")) {
 
       std::string cn = get ();
-      layout.rename_cell (design.cell_index (), layout.uniquify_cell_name (cn.c_str ()).c_str ());
+      reader_state ()->rename_cell (layout, top_id, cn);
 
       expect (";");
 
@@ -1651,7 +1710,7 @@ DEFImporter::do_read (db::Layout &layout)
 
   if (! groups.empty () && options ().separate_groups ()) {
 
-    others_cell = &layout.cell (layout.add_cell ("NOGROUP"));
+    others_cell = &layout.cell (reader_state ()->make_cell (layout, "NOGROUP"));
     design.insert (db::CellInstArray (others_cell->cell_index (), db::Trans ()));
 
     //  Walk through the groups, create a group container cell and put all instances
@@ -1659,24 +1718,35 @@ DEFImporter::do_read (db::Layout &layout)
 
     for (std::list<DEFImporterGroup>::const_iterator g = groups.begin (); g != groups.end (); ++g) {
 
-      db::Cell *group_cell = &layout.cell (layout.add_cell (("GROUP_" + g->name).c_str ()));
+      db::Cell *group_cell = &layout.cell (reader_state ()->make_cell (layout, ("GROUP_" + g->name).c_str ()));
       design.insert (db::CellInstArray (group_cell->cell_index (), db::Trans ()));
 
       if (! g->region_name.empty ()) {
 
-        std::map<std::string, std::vector<db::Polygon> >::iterator r = regions.find (g->region_name);
+        std::map<std::string, std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > > >::iterator r = regions.find (g->region_name);
         if (r == regions.end ()) {
 
           warn (tl::sprintf (tl::to_string (tr ("Not a valid region name or region is already used: %s in group %s")), g->region_name, g->name));
 
         } else {
 
-          std::set<unsigned int> dl = open_layer (layout, std::string (), Regions, 0);
-          for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
-            for (std::vector<db::Polygon>::const_iterator p = r->second.begin (); p != r->second.end (); ++p) {
-              group_cell->shapes (*l).insert (*p);
+          for (std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > >::const_iterator rr = r->second.begin (); rr != r->second.end (); ++rr) {
+
+            std::set<unsigned int> dl = open_layer (layout, std::string (), rr->first, 0);
+            for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
+              group_cell->shapes (*l).insert (rr->second.begin (), rr->second.end ());
             }
+
+            if (rr->first != Regions) {
+              //  try the "ALL" slot too for FENCE and GUIDE regions
+              dl = open_layer (layout, std::string (), Regions, 0);
+              for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
+                group_cell->shapes (*l).insert (rr->second.begin (), rr->second.end ());
+              }
+            }
+
           }
+
           regions.erase (r);
 
         }
@@ -1714,12 +1784,19 @@ DEFImporter::do_read (db::Layout &layout)
 
   if (! regions.empty ()) {
 
-    std::set<unsigned int> dl = open_layer (layout, std::string (), Regions, 0);
-    for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
+    LayerPurpose lps [] = { Regions, RegionsNone, RegionsGuide, RegionsFence };
 
-      for (std::map<std::string, std::vector<db::Polygon> >::const_iterator r = regions.begin (); r != regions.end (); ++r) {
-        for (std::vector<db::Polygon>::const_iterator p = r->second.begin (); p != r->second.end (); ++p) {
-          others_cell->shapes (*l).insert (*p);
+    for (unsigned int i = 0; i < sizeof (lps) / sizeof (lps[0]); ++i) {
+
+      std::set<unsigned int> dl = open_layer (layout, std::string (), lps[i], 0);
+
+      for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
+        for (std::map<std::string, std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > > >::const_iterator r = regions.begin (); r != regions.end (); ++r) {
+          for (std::vector<std::pair<LayerPurpose, std::vector<db::Polygon> > >::const_iterator rr = r->second.begin (); rr != r->second.end (); ++rr) {
+            if (lps [i] == Regions || rr->first == lps [i]) {
+              others_cell->shapes (*l).insert (rr->second.begin (), rr->second.end ());
+            }
+          }
         }
       }
 

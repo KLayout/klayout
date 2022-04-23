@@ -27,6 +27,7 @@
 #include "dbPluginCommon.h"
 #include "dbLayout.h"
 #include "dbReader.h"
+#include "dbCommonReader.h"
 #include "dbStreamLayers.h"
 #include "tlStream.h"
 #include "tlVariant.h"
@@ -44,6 +45,7 @@ namespace db
 {
 
 class LEFDEFReaderState;
+class LEFDEFImporter;
 struct MacroDesc;
 
 /**
@@ -1021,7 +1023,8 @@ private:
  */
 enum LayerPurpose 
 {
-  Routing = 0,        //  from DEF only
+  None = 0,
+  Routing,            //  from DEF only
   Pins,               //  from DEF
   Fills,              //  from DEF
   FillsOPC,           //  from DEF
@@ -1035,6 +1038,9 @@ enum LayerPurpose
   Blockage,           //  from DEF only
   PlacementBlockage,  //  from DEF only
   Regions,            //  from DEF only
+  RegionsNone,        //  from DEF only
+  RegionsFence,       //  from DEF only
+  RegionsGuide,       //  from DEF only
   All                 //  from DEF only
 };
 
@@ -1049,7 +1055,12 @@ struct LayerDetailsKey
 
   LayerDetailsKey (LayerPurpose _purpose, unsigned int _mask = 0, const db::DVector &_via_size = db::DVector ())
     : purpose (_purpose), mask (_mask), via_size (_via_size)
-  { }
+  {
+    //  normalize the via size such that x is smaller than y size (issue-1065)
+    if (via_size.y () < via_size.x ()) {
+      via_size = db::DVector (via_size.y (), via_size.x ());
+    }
+  }
 
   bool operator< (const LayerDetailsKey &other) const
   {
@@ -1195,6 +1206,7 @@ private:
   struct Via {
     Via () : bottom_mask (0), cut_mask (0), top_mask (0) { }
     std::string name;
+    std::string nondefaultrule;
     unsigned int bottom_mask, cut_mask, top_mask;
     db::Trans trans;
   };
@@ -1215,6 +1227,7 @@ private:
  *  This class will handle the creation and management of layers in the LEF/DEF reader context
  */
 class DB_PLUGIN_PUBLIC LEFDEFReaderState
+  : public db::CommonReaderBase
 {
 public:
   /**
@@ -1228,11 +1241,21 @@ public:
   ~LEFDEFReaderState ();
 
   /**
+   *  @brief Attaches to or detaches from an importer
+   */
+  void attach_reader (LEFDEFImporter *importer)
+  {
+    mp_importer = importer;
+  }
+
+  /**
    *  @brief Reads the given map file
    *
    *  Usually this file is read by the constructor. This method is provided for test purposes.
+   *  The filename can be a list of files, separated by "+" or ",". They are loaded together into
+   *  the same map like they were concatenated.
    */
-  void read_map_file (const std::string &path, db::Layout &layout);
+  void read_map_file (const std::string &filename, db::Layout &layout, const std::string &base_path);
 
   /**
    *  @brief Gets the layer map
@@ -1272,17 +1295,17 @@ public:
    *
    *  The generator is capable of creating a via for a specific mask configuration
    */
-  void register_via_cell (const std::string &vn, LEFDEFLayoutGenerator *generator);
+  void register_via_cell (const std::string &vn, const std::string &nondefaultrule, LEFDEFLayoutGenerator *generator);
 
   /**
    *  @brief Gets the via cell for the given via name or 0 if no such via is registered
    */
-  db::Cell *via_cell (const std::string &vn, Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm);
+  db::Cell *via_cell (const std::string &vn, const std::string &nondefaultrule, Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm);
 
   /**
    *  @brief Gets the via generator for a given via name or 0 if there is no such generator
    */
-  LEFDEFLayoutGenerator *via_generator (const std::string &vn);
+  LEFDEFLayoutGenerator *via_generator (const std::string &vn, const std::string &nondefaultrule);
 
   /**
    *  @brief Registers a macro generator for the macro with the given name
@@ -1317,25 +1340,32 @@ public:
     return m_foreign_cells;
   }
 
+protected:
+  virtual void common_reader_error (const std::string &msg);
+  virtual void common_reader_warn (const std::string &msg);
+
 private:
   /**
    *  @brief A key for the via cache
    */
   struct ViaKey
   {
-    ViaKey (const std::string &n, unsigned int mb, unsigned int mc, unsigned int mt)
-      : name (n), mask_bottom (mb), mask_cut (mc), mask_top (mt)
+    ViaKey (const std::string &n, const std::string &ndr, unsigned int mb, unsigned int mc, unsigned int mt)
+      : name (n), nondefaultrule (ndr), mask_bottom (mb), mask_cut (mc), mask_top (mt)
     { }
 
     bool operator== (const ViaKey &other) const
     {
-      return name == other.name && mask_bottom == other.mask_bottom && mask_cut == other.mask_cut && mask_top == other.mask_top;
+      return name == other.name && nondefaultrule == other.nondefaultrule && mask_bottom == other.mask_bottom && mask_cut == other.mask_cut && mask_top == other.mask_top;
     }
 
     bool operator< (const ViaKey &other) const
     {
       if (name != other.name) {
         return name < other.name;
+      }
+      if (nondefaultrule != other.nondefaultrule) {
+        return nondefaultrule < other.nondefaultrule;
       }
       if (mask_bottom != other.mask_bottom) {
         return mask_bottom < other.mask_bottom;
@@ -1349,7 +1379,7 @@ private:
       return false;
     }
 
-    std::string name;
+    std::string name, nondefaultrule;
     unsigned int mask_bottom, mask_cut, mask_top;
   };
 
@@ -1389,6 +1419,7 @@ private:
   LEFDEFReaderState (const LEFDEFReaderState &);
   LEFDEFReaderState &operator= (const LEFDEFReaderState &);
 
+  LEFDEFImporter *mp_importer;
   std::map <std::pair<std::string, LayerDetailsKey>, std::set<unsigned int> > m_layers;
   db::LayerMap m_layer_map;
   bool m_create_layers;
@@ -1397,13 +1428,14 @@ private:
   std::map<std::string, int> m_default_number;
   const LEFDEFReaderOptions *mp_tech_comp;
   std::map<ViaKey, db::Cell *> m_via_cells;
-  std::map<std::string, LEFDEFLayoutGenerator *> m_via_generators;
+  std::map<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *> m_via_generators;
   std::map<MacroKey, std::pair<db::Cell *, db::Trans> > m_macro_cells;
   std::map<std::string, LEFDEFLayoutGenerator *> m_macro_generators;
   std::map<std::string, db::cell_index_type> m_foreign_cells;
 
   std::set<unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
   db::cell_index_type foreign_cell(Layout &layout, const std::string &name);
+  void read_single_map_file (const std::string &path, std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> > &layer_map);
 };
 
 /**
@@ -1453,6 +1485,8 @@ struct DB_PLUGIN_PUBLIC MacroDesc
 class DB_PLUGIN_PUBLIC LEFDEFImporter
 {
 public:
+  friend class LEFDEFReaderState;
+
   /**
    *  @brief Default constructor
    */

@@ -132,8 +132,7 @@ public:
 /**
  *  @brief A common reader base for GDS2 and OASIS providing common services for both readers
  */
-class DB_PUBLIC CommonReader
-  : public ReaderBase
+class DB_PUBLIC CommonReaderBase
 {
 public:
   typedef tl::interval_map <db::ld_type, tl::interval_map <db::ld_type, std::string> > layer_name_map;
@@ -141,7 +140,7 @@ public:
   /**
    *  @brief Constructor
    */
-  CommonReader ();
+  CommonReaderBase ();
 
   /**
    *  @brief Make a cell from a name
@@ -205,17 +204,40 @@ public:
    */
   void finish (db::Layout &layout);
 
-  //  Reimplementation of the ReaderBase interace
-  virtual const db::LayerMap &read (db::Layout &layout, const db::LoadLayoutOptions &options);
-  virtual const db::LayerMap &read (db::Layout &layout);
+  /**
+   *  @brief Re-initialize: clears the tables and caches
+   */
+  void init ();
+
+  /**
+   *  @brief Sets a value indicating whether to create layers
+   */
+  void set_create_layers (bool f)
+  {
+    m_create_layers = f;
+  }
+
+  /**
+   *  @brief Sets the conflict resolution mode
+   */
+  void set_conflict_resolution_mode (CellConflictResolution cc_resolution)
+  {
+    m_cc_resolution = cc_resolution;
+  }
+
+  /**
+   *  @brief Sets the input layer map
+   */
+  void set_layer_map (const db::LayerMap &lm)
+  {
+    m_layer_map = lm;
+  }
 
 protected:
   friend class CommonReaderLayerMapping;
 
   virtual void common_reader_error (const std::string &msg) = 0;
   virtual void common_reader_warn (const std::string &msg) = 0;
-  virtual void do_read (db::Layout &layout) = 0;
-  virtual void init (const LoadLayoutOptions &options);
 
   /**
    * @brief Merge (and delete) the src_cell into target_cell
@@ -228,14 +250,6 @@ protected:
   void merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index) const;
 
   /**
-   *  @brief Gets the common options
-   */
-  db::CommonReaderOptions &common_options ()
-  {
-    return m_common_options;
-  }
-
-  /**
    *  @brief Gets the layer name map
    */
   layer_name_map &layer_names ()
@@ -244,7 +258,23 @@ protected:
   }
 
   /**
-   *  @brief Enters the a layer with a given layer/datatype
+   *  @brief Gets the input layer name
+   */
+  db::LayerMap &layer_map ()
+  {
+    return m_layer_map;
+  }
+
+  /**
+   *  @brief Gets the output layer name map
+   */
+  const db::LayerMap &layer_map_out () const
+  {
+    return m_layer_map_out;
+  }
+
+  /**
+   *  @brief Enters the layer with a given layer/datatype
    */
   std::pair <bool, unsigned int> open_dl (db::Layout &layout, const LDPair &dl);
 
@@ -255,7 +285,7 @@ private:
   std::map<size_t, std::string> m_name_for_id;
   CellConflictResolution m_cc_resolution;
   bool m_create_layers;
-  db::CommonReaderOptions m_common_options;
+  db::LayerMap m_layer_map;
   db::LayerMap m_layer_map_out;
   tl::interval_map <db::ld_type, tl::interval_map <db::ld_type, std::string> > m_layer_names;
   std::map<db::LDPair, std::pair <bool, unsigned int> > m_layer_cache;
@@ -263,6 +293,33 @@ private:
   std::set<unsigned int> m_layers_created;
 
   std::pair <bool, unsigned int> open_dl_uncached (db::Layout &layout, const LDPair &dl);
+};
+
+
+
+/**
+ *  @brief A common reader base for GDS2 and OASIS providing common services for both readers
+ */
+class DB_PUBLIC CommonReader
+  : public ReaderBase, public CommonReaderBase
+{
+public:
+  typedef tl::interval_map <db::ld_type, tl::interval_map <db::ld_type, std::string> > layer_name_map;
+
+  /**
+   *  @brief Constructor
+   */
+  CommonReader ();
+
+  //  Reimplementation of the ReaderBase interace
+  virtual const db::LayerMap &read (db::Layout &layout, const db::LoadLayoutOptions &options);
+  virtual const db::LayerMap &read (db::Layout &layout);
+
+protected:
+  friend class CommonReaderLayerMapping;
+
+  virtual void init (const LoadLayoutOptions &options);
+  virtual void do_read (db::Layout &layout) = 0;
 };
 
 /**

@@ -50,7 +50,7 @@ static db::LEFDEFReaderOptions default_options ()
   return tc;
 }
 
-static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *filename, const db::LEFDEFReaderOptions &options, bool priv = true)
+static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *filename, const db::LEFDEFReaderOptions &options, bool priv = true, db::CellConflictResolution cc_mode = db::RenameCell)
 {
   std::string fn_path (priv ? tl::testdata_private () : tl::testdata ());
   fn_path += "/lefdef/";
@@ -60,6 +60,7 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
   tl::Extractor ex (filename);
 
   db::LEFDEFReaderState ld (&options, layout, fn_path);
+  ld.set_conflict_resolution_mode (cc_mode);
 
   db::DEFImporter imp;
   bool any_def = false;
@@ -69,11 +70,10 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
 
     if (ex.test ("map:")) {
 
-      std::string fn = fn_path, f;
+      std::string f;
       ex.read_word_or_quoted (f);
-      fn += f;
 
-      ld.read_map_file (fn, layout);
+      ld.read_map_file (f, layout, fn_path);
 
     } else if (ex.test ("def:")) {
 
@@ -142,12 +142,12 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
   return ld.layer_map ();
 }
 
-static db::LayerMap run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au, const db::LEFDEFReaderOptions &options, bool priv = true)
+static db::LayerMap run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au, const db::LEFDEFReaderOptions &options, bool priv = true, db::CellConflictResolution cc_mode = db::RenameCell)
 {
   db::Manager m (false);
   db::Layout layout (&m), layout2 (&m), layout_au (&m);
 
-  db::LayerMap lm = read (layout, lef_dir, filename, options, priv);
+  db::LayerMap lm = read (layout, lef_dir, filename, options, priv, cc_mode);
 
   //  normalize the layout by writing to OASIS and reading from ..
 
@@ -210,6 +210,73 @@ static db::LayerMap run_test (tl::TestBase *_this, const char *lef_dir, const ch
   return lm;
 }
 
+static void run_test2 (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *filename2, const char *au, const db::LEFDEFReaderOptions &options, bool priv = true, db::CellConflictResolution cc_mode = db::RenameCell)
+{
+  db::Manager m (false);
+  db::Layout layout (&m), layout2 (&m), layout_au (&m);
+
+  read (layout, lef_dir, filename, options, priv, cc_mode);
+  read (layout, lef_dir, filename2, options, priv, cc_mode);
+
+  //  normalize the layout by writing to OASIS and reading from ..
+
+  //  generate a "unique" name ...
+  unsigned int hash = 0;
+  if (au) {
+    for (const char *cp = au; *cp; ++cp) {
+      hash = (hash << 4) ^ (hash >> 4) ^ ((unsigned int) *cp);
+    }
+  }
+
+  std::string tmp_file = _this->tmp_file (tl::sprintf ("tmp_%x.oas", hash));
+
+  {
+    tl::OutputStream stream (tmp_file);
+    db::SaveLayoutOptions options;
+    options.set_format ("OASIS");
+    options.set_option_by_name ("oasis_permissive", tl::Variant (true));
+    db::Writer writer (options);
+    writer.write (layout, stream);
+  }
+
+  {
+    tl::InputStream stream (tmp_file);
+    db::Reader reader (stream);
+    reader.read (layout2);
+  }
+
+  if (au) {
+
+    std::string fn (priv ? tl::testdata_private () : tl::testdata ());
+    fn += "/lefdef/";
+    fn += lef_dir;
+    fn += "/";
+    fn += au;
+
+    try {
+      tl::InputStream stream (fn);
+      db::Reader reader (stream);
+      reader.read (layout_au);
+    } catch (...) {
+      _this->raise (tl::sprintf ("Compare failed - see %s vs %s (not existing or not readable)\n", tmp_file, fn));
+      throw;
+    }
+
+    bool equal = db::compare_layouts (layout2, layout_au, db::layout_diff::f_verbose | db::layout_diff::f_flatten_array_insts, 0);
+    if (! equal) {
+      _this->raise (tl::sprintf ("Compare failed - see %s vs %s\n", tmp_file, fn));
+    }
+
+  } else {
+
+    bool equal = db::compare_layouts (layout2, layout_au, db::layout_diff::f_verbose | db::layout_diff::f_flatten_array_insts, 0);
+    if (! equal) {
+      _this->raise (tl::sprintf ("Compare failed - see %s vs empty file\n", tmp_file));
+    }
+
+  }
+}
+
 TEST(1)
 {
   run_test (_this, "lef1", "lef:in.lef", 0, default_options ());
@@ -252,7 +319,7 @@ TEST(7)
 
 TEST(10)
 {
-  run_test (_this, "def1", "lef:in.lef+def:in.def", "au.oas.gz", default_options ());
+  run_test (_this, "def1", "lef:in.lef+def:in.def", "au2.oas.gz", default_options ());
 }
 
 TEST(11)
@@ -271,7 +338,7 @@ TEST(12)
 
 TEST(13)
 {
-  run_test (_this, "def4", "lef:in.lef+def:in.def", "au.oas.gz", default_options ());
+  run_test (_this, "def4", "lef:in.lef+def:in.def", "au2.oas.gz", default_options ());
 }
 
 TEST(14)
@@ -340,6 +407,13 @@ TEST(23)
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_macro_resolution_mode (1);
   run_test (_this, "def14", "map:test.map+lef:tech.lef+lef:stdlib.lef+def:test.def", "au.oas.gz", opt);
+}
+
+TEST(24)
+{
+  db::LEFDEFReaderOptions opt = default_options ();
+  opt.set_macro_resolution_mode (1);
+  run_test (_this, "def15", "map:test.map+lef:tech.lef+def:test.def", "au2.oas.gz", opt);
 }
 
 TEST(100)
@@ -720,7 +794,7 @@ TEST(117_mapfile_all)
       "'+M1.LEFOBS;M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/SPNET/...\\' (1/5)';"
       "'+M1.NET;M1.SPNET : \\'M1.NET/SPNET\\' (16/0)';"
       "'+M1.NET : M1.NET (18/0)';"
-      "'+M1.BLK;M1.FILL;M1.FILLOPC;M1.LEFOBS;M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/FILL/...\\' (22/2)';"
+      "'+M1.FILL;M1.FILLOPC;M1.LEFOBS;M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/FILL/...\\' (22/2)';"
       "'+\\'M1.NET:1\\';\\'M1.PIN:1\\';\\'M1.SPNET:1\\';\\'M1.VIA:1\\' : \\'M1.NET:1/PIN:1/...\\' (6/0)';"
       "'+\\'M1.NET:1\\' : \\'M1.NET:1\\' (7/0)';"
       "'+M1.PIN : M1.PIN (3/0)';"
@@ -736,7 +810,7 @@ TEST(117_mapfile_all)
       "'M1.LABEL : M1.LABEL (26/0)';"
       // NAME M1/NET not supported: "'+M1.LABEL : M1.LABEL (27/0)';"
       // NAME M1/SPNET not supported: "'+M1.LABEL : M1.LABEL (28/1)';"
-      "'+M1.BLK : M1.BLK (13/0)';"
+      "'M1.BLK : M1.BLK (13/0)';"
       "'M1_TEXT.LABEL;M1_TEXT.LEFLABEL : \\'M1_TEXT.LABEL/M1_TEXT.LEFLABEL\\' (29/0)'"
     ")"
   )
@@ -778,6 +852,18 @@ TEST(121_fillwithmask)
 TEST(130_viasize)
 {
   run_test (_this, "viasize", "map:test.map+lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
+}
+
+//  issue-1065
+TEST(130_viasize2)
+{
+  run_test (_this, "viasize2", "map:test_ok.map+lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
+  run_test (_this, "viasize2", "map:test_fail.map+lef:test.lef+def:test.def", "au.oas.gz", default_options (), false);
+}
+
+TEST(131_patternname)
+{
+  run_test (_this, "patternname", "map:v.map+lef:v.lef+def:v.def", "au.oas.gz", default_options (), false);
 }
 
 TEST(200_lefdef_plugin)
@@ -824,5 +910,23 @@ TEST(201_lefdef_plugin_explicit_lef)
   }
 
   db::compare_layouts (_this, ly, fn_path + "au_plugin_alt_lef.oas.gz", db::WriteOAS);
+}
+
+TEST(202_lefdef_blend_mode)
+{
+  db::LEFDEFReaderOptions lefdef_opt = default_options ();
+
+  run_test2 (_this, "blend_mode", "map:layers.map+lef:sub.lef+def:top.def", "map:layers.map+def:sub.def", "au1.oas.gz", lefdef_opt, false);
+  run_test2 (_this, "blend_mode", "map:layers.map+lef:sub.lef+def:top.def", "map:layers.map+def:sub.def", "au2.oas.gz", lefdef_opt, false, db::AddToCell);
+
+  lefdef_opt.set_macro_resolution_mode (2);
+  run_test2 (_this, "blend_mode", "map:layers.map+lef:sub.lef+def:top.def", "map:layers.map+def:sub.def", "au3.oas.gz", lefdef_opt, false);
+}
+
+TEST(203_regionsAndMapfileConcat)
+{
+  db::LEFDEFReaderOptions lefdef_opt = default_options ();
+
+  run_test (_this, "map_regions", "map:'test.map,test.add.map'+lef:test.lef+def:test.def", "au.oas.gz", lefdef_opt, false);
 }
 

@@ -554,7 +554,7 @@ def Parse_CLI_Args(config):
     config['DeploymentP']   = DeploymentP
     config['PackagePrefix'] = PackagePrefix
     config['DeployVerbose'] = DeployVerbose
-    config['ModuleSet']     = ModuleSet         #
+    config['ModuleSet']     = ModuleSet
     return config
 
 #------------------------------------------------------------------------------

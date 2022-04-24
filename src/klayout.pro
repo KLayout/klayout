@@ -11,6 +11,8 @@ SUBDIRS = \
   lib \
   plugins \
   unit_tests \
+  buddies \
+  lym \
 
 !equals(HAVE_QT, "0") {
 
@@ -20,8 +22,6 @@ SUBDIRS = \
     laybasic \
     lay \
     ant \
-    buddies \
-    lym \
     img \
     edt \
     fontgen \
@@ -60,19 +60,20 @@ lib.depends += db
 
 plugins.depends += lib rdb db
 
-!equals(HAVE_QT, "0") {
+buddies.depends += plugins lym $$LANG_DEPENDS
+lym.depends += gsi $$LANG_DEPENDS
 
-  buddies.depends += plugins lym $$LANG_DEPENDS
+equals(HAVE_RUBY, "1") {
+  SUBDIRS += drc lvs
+  MAIN_DEPENDS += drc lvs
+  drc.depends += rdb lym
+  lvs.depends += drc
+}
+
+!equals(HAVE_QT, "0") {
 
   equals(HAVE_PYTHON, "1") {
     pymod.depends += lay
-  }
-
-  equals(HAVE_RUBY, "1") {
-    SUBDIRS += drc lvs
-    MAIN_DEPENDS += drc lvs
-    drc.depends += rdb lym
-    lvs.depends += drc
   }
 
   equals(HAVE_QTBINDINGS, "1") {
@@ -89,7 +90,6 @@ plugins.depends += lib rdb db
 
   plugins.depends += lay ant
 
-  lym.depends += gsi $$LANG_DEPENDS
   laybasic.depends += rdb lym
   ant.depends += laybasic
   img.depends += laybasic

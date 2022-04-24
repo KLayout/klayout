@@ -26,7 +26,7 @@
 
 #include "layCommon.h"
 #include "layPlugin.h"
-#include "lymMacro.h"
+#include "lymMacroCollection.h"
 #include "tlObject.h"
 #include "tlDeferredExecution.h"
 #include "tlFileSystemWatcher.h"

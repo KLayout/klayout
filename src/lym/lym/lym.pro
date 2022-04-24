@@ -9,12 +9,14 @@ DEFINES += MAKE_LYM_LIBRARY
 SOURCES = \
   gsiDeclLymMacro.cc \
   lymMacroInterpreter.cc \
+  lymMacroCollection.cc \
   lymMacro.cc \
 
 HEADERS = \
   lymCommon.h \
   lymInclude.h \
   lymMacroInterpreter.h \
+  lymMacroCollection.h \
   lymMacro.h \
 
 INCLUDEPATH += $$TL_INC $$GSI_INC

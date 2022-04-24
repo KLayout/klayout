@@ -2673,6 +2673,7 @@ public slots:
   void min_hier_changed (int i);
   void max_hier_changed (int i);
 
+private:
   //  event handlers used to connect to the layout object's events
   void signal_hier_changed ();
   void signal_bboxes_from_layer_changed (unsigned int cv_index, unsigned int layer_index);

@@ -23,7 +23,7 @@
 
 #include "layMacroEditorTree.h"
 #include "layMacroEditorDialog.h"
-#include "lymMacro.h"
+#include "lymMacroCollection.h"
 #include "tlExceptions.h"
 #include "tlInternational.h"
 #include "tlException.h"

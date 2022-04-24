@@ -408,7 +408,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   db::Layout layout_b;
 
   {
-    tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Loading file (A): ")) + infile_a);
+    tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Loading file (A): ")) + infile_a);
 
     db::LoadLayoutOptions load_options;
     generic_reader_options_a.configure (load_options);
@@ -416,7 +416,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   }
 
   {
-    tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Loading file (B): ")) + infile_b);
+    tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Loading file (B): ")) + infile_b);
 
     db::LoadLayoutOptions load_options;
     generic_reader_options_b.configure (load_options);

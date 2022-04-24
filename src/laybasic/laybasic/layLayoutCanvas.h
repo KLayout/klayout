@@ -171,8 +171,6 @@ public:
 
   void update_image ();
 
-  virtual void paintEvent (QPaintEvent *);
-
   /**
    *  @brief Specifies the global transformation which is always applied first
    */
@@ -386,6 +384,7 @@ private:
 
   QMutex m_mutex;
 
+  virtual void paintEvent (QPaintEvent *);
   virtual void resizeEvent (QResizeEvent *);
   virtual bool event (QEvent *e);
   virtual void key_event (unsigned int key, unsigned int buttons);

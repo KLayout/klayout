@@ -14,6 +14,10 @@ SUBDIRS = \
   buddies \
   lym \
 
+equals(HAVE_RUBY, "1") {
+  SUBDIRS += drc lvs
+}
+
 !equals(HAVE_QT, "0") {
 
   # TODO: make buddies able to build without Qt
@@ -64,10 +68,10 @@ buddies.depends += plugins lym $$LANG_DEPENDS
 lym.depends += gsi $$LANG_DEPENDS
 
 equals(HAVE_RUBY, "1") {
-  SUBDIRS += drc lvs
   MAIN_DEPENDS += drc lvs
   drc.depends += rdb lym
   lvs.depends += drc
+  buddies.depends += drc lvs
 }
 
 !equals(HAVE_QT, "0") {
@@ -102,8 +106,3 @@ equals(HAVE_RUBY, "1") {
 }
 
 unit_tests.depends += plugins $$MAIN_DEPENDS $$LANG_DEPENDS
-
-RESOURCES += \
-    plugins/tools/import/lay_plugin/layResources.qrc \
-    laybasic/laybasic/layResources.qrc
-

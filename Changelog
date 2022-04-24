@@ -1,6 +1,51 @@
 
 0.28            (2022-xx-xx):
 
+0.27.9          (2022-04-23):
+* Bugfix: %GITHUB%/issues/1008 Don't optimize away points on path edit
+* Bugfix: %GITHUB%/issues/1011 DRC in deep mode highlights erroneous width violation with text
+* Bugfix: %GITHUB%/issues/1012 Warning requested if LEF/DEF map file does not capture certain layers 
+* Bugfix: %GITHUB%/issues/1013 OASIS writer bug with certain irregular arrays
+* Bugfix: %GITHUB%/issues/1017 DXF export: better handling of PCB zone fills
+* Bugfix: %GITHUB%/issues/1021 LVS unexpectedly failing
+* Bugfix: %GITHUB%/issues/1029 Problem with Qt binding
+* Bugfix: %GITHUB%/issues/1031 Buddy tools + OASIS: invalid warning about unexpected strict mode
+* Bugfix: %GITHUB%/issues/1040 pip install klayout doesn't seem to work on M1 MacBookPro
+* Bugfix: %GITHUB%/issues/1054 Qt binding: crash due to Python allocation-while-deallocating
+* Bugfix: Ctrl+F will always enter search box in Macro IDE now
+* Bugfix: LEF/DEF reader options - could not clear suffix or set datatype to none
+* Bugfix: netlist/LVS result browser - do not clip texts, provide texts as tool tips as well for inspection
+* Bugfix: the library selected box listed technology-specific libraries even if no technology was selected
+* Bugfixes and enhancements for the LEF/DEF reader
+  Includes %GITHUB%/issues/1050, %GITHUB%/issues/1065 and %GITHUB%/issues/1047
+  plus a number of standard compatibility issues. Bugfixes and enhancements for the 
+  strm2xyz buddy tool's LEF/DEF reader implementations.
+* Enhancement: %GITHUB%/issues/1057 Include PCell update in Library#refresh
+* Enhancement: %GITHUB%/issues/1058 Backspace to delete last point from polygon or path
+* Enhancement: Split gates option for LVS (new keyword is "split_gates") - see documentation for details
+* Enhancement: generate labels for PCB X2 net names
+* Enhancement: PCell errors are now shown on a separate layer (formerly only if the PCell featured at least one layer-type parameter)
+  This layer is available with the same style and configuration than the guiding shape layer.
+
+0.27.8          (2022-02-13):
+* Bugfix: %GITHUB%/issues/971 Double compare fails in LVS
+* Bugfix: %GITHUB%/issues/972 CIF writer generates unreadable file with invalid cell or layer names
+* Bugfix: %GITHUB%/issues/973 Enhanced timeout in package manager on large file download
+* Bugfix: %GITHUB%/issues/979 Backup file generation fails with relative paths
+* Bugfix: %GITHUB%/issues/982 Heal option for tiled XOR
+* Bugfix: %GITHUB%/issues/983 Bug changing PCell parameters of multiple cell instance
+* Bugfix: %GITHUB%/issues/984 Crash in debug mode when placing a "slow cell"
+* Bugfix: %GITHUB%/issues/994 Loss of selection when clicking at wrong position
+  To make this problem less annoying, the capture range was increased when
+  clicking at already selected items for "Move".
+* Bugfix: %GITHUB%/issues/995 New top cell appearing after load
+* Enhancement: %GITHUB%/issues/996 Refresh function to trigger update from within library
+* Bugfix: %GITHUB%/issues/997 Wrong display of negative extensions of paths
+* Bugfix: scale and grids were wrong in case of oversampling
+
+0.27.7          (2022-01-12):
+* Bugfix: %GITHUB%/issues/969 PCell error (infinite recursion)
+  
 0.27.6          (2022-01-04):
 * Enhancement: %GITHUB%/issues/963 Display snapped position in main window
 * Bugfix: %GITHUB%/issues/960 Cap values range now shown in netlist browser

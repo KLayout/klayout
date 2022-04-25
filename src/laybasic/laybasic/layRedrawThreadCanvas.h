@@ -33,7 +33,6 @@
 #include <vector>
 
 #include <QMutex>
-#include <QColor>
 
 class QImage;
 

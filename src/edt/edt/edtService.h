@@ -41,7 +41,6 @@
 
 #include <set>
 #include <vector>
-#include <QColor>
 
 namespace lay {
   class LayerPropertiesConstIterator;

@@ -1609,7 +1609,7 @@ MarkerBrowserPage::set_dispatcher (lay::Dispatcher *pr)
 }
 
 void 
-MarkerBrowserPage::set_marker_style (QColor color, int line_width, int vertex_size, int halo, int dither_pattern)
+MarkerBrowserPage::set_marker_style (lay::Color color, int line_width, int vertex_size, int halo, int dither_pattern)
 {
   m_marker_color = color;
   m_marker_line_width = line_width;

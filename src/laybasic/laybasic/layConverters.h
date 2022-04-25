@@ -25,6 +25,7 @@
 #define HDR_layConverters
 
 #include "laybasicCommon.h"
+#include "layColor.h"
 
 #include <QColor>
 
@@ -37,7 +38,9 @@ namespace lay
 struct LAYBASIC_PUBLIC ColorConverter 
 {
   std::string to_string (const QColor &c) const;
+  std::string to_string (const lay::Color &c) const;
   void from_string (const std::string &s, QColor &c) const;
+  void from_string (const std::string &s, lay::Color &c) const;
 };
 
 }

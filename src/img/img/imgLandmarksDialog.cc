@@ -345,7 +345,7 @@ public:
     widget ()->ungrab_mouse (this);
   }
 
-  void set_colors (QColor /*background*/, QColor /*color*/)
+  void set_colors (lay::Color /*background*/, lay::Color /*color*/)
   {
     // ...
   }

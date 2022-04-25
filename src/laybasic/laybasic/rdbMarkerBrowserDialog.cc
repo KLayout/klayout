@@ -474,7 +474,7 @@ MarkerBrowserDialog::configure (const std::string &name, const std::string &valu
 
   } else if (name == cfg_rdb_marker_color) {
 
-    QColor color;
+    lay::Color color;
     if (! value.empty ()) {
       lay::ColorConverter ().from_string (value, color);
     }

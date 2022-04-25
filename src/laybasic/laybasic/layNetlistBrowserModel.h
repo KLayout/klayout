@@ -25,6 +25,7 @@
 #define HDR_layNetlistBrowserModel
 
 #include "layColorPalette.h"
+#include "layColor.h"
 #include "laybasicCommon.h"
 
 #include "dbLayoutToNetlist.h"
@@ -34,7 +35,6 @@
 #include "tlTypeTraits.h"
 
 #include <QAbstractItemModel>
-#include <QColor>
 
 #include <map>
 #include <memory>
@@ -57,15 +57,15 @@ Q_OBJECT
 public:
   NetColorizer ();
 
-  void configure (const QColor &marker_color, const lay::ColorPalette *auto_colors);
+  void configure (const lay::Color &marker_color, const lay::ColorPalette *auto_colors);
   bool has_color_for_net (const db::Net *net);
-  void set_color_of_net (const db::Net *net, const QColor &color);
+  void set_color_of_net (const db::Net *net, const Color &color);
   void reset_color_of_net (const db::Net *net);
   void clear ();
 
-  QColor color_of_net (const db::Net *net) const;
+  lay::Color color_of_net (const db::Net *net) const;
 
-  const QColor &marker_color () const
+  const lay::Color &marker_color () const
   {
     return m_marker_color;
   }
@@ -77,10 +77,10 @@ signals:
   void colors_changed ();
 
 private:
-  QColor m_marker_color;
+  lay::Color m_marker_color;
   lay::ColorPalette m_auto_colors;
   bool m_auto_colors_enabled;
-  std::map<const db::Net *, QColor> m_custom_color;
+  std::map<const db::Net *, lay::Color> m_custom_color;
   bool m_update_needed;
   bool m_signals_enabled;
   mutable std::map<const db::Net *, size_t> m_net_index_by_object;

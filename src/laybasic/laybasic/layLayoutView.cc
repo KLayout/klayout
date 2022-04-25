@@ -404,7 +404,7 @@ LayoutView::init (db::Manager *mgr, QWidget * /*parent*/)
   m_paste_display_mode = 2;
   m_guiding_shape_visible = true;
   m_guiding_shape_line_width = 1;
-  m_guiding_shape_color = QColor ();
+  m_guiding_shape_color = lay::Color ();
   m_guiding_shape_vertex_size = 5;
   m_to_level = 0;
   m_ctx_dimming = 50;
@@ -1151,7 +1151,7 @@ LayoutView::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_background_color) {
 
-    QColor color;
+    lay::Color color;
     ColorConverter ().from_string (value, color);
     background_color (color);
     //  do not take - let others receive the background color events as well
@@ -1196,7 +1196,7 @@ LayoutView::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_ctx_color) {
 
-    QColor color;
+    lay::Color color;
     ColorConverter ().from_string (value, color);
     ctx_color (color);
     return true;
@@ -1217,7 +1217,7 @@ LayoutView::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_child_ctx_color) {
 
-    QColor color;
+    lay::Color color;
     ColorConverter ().from_string (value, color);
     child_ctx_color (color);
     return true;
@@ -1301,14 +1301,14 @@ LayoutView::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_cell_box_color) {
 
-    QColor color;
+    lay::Color color;
     ColorConverter ().from_string (value, color);
     cell_box_color (color);
     return true;
 
   } else if (name == cfg_text_color) {
 
-    QColor color;
+    lay::Color color;
     ColorConverter ().from_string (value, color);
     text_color (color);
     return true;
@@ -1427,14 +1427,14 @@ LayoutView::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_guiding_shape_color) {
 
-    QColor color;
+    lay::Color color;
     ColorConverter ().from_string (value, color);
     guiding_shapes_color (color);
     return true;
 
   } else if (name == cfg_guiding_shape_color) {
 
-    QColor color;
+    lay::Color color;
     ColorConverter ().from_string (value, color);
     guiding_shapes_color (color);
     return true;
@@ -1589,7 +1589,7 @@ LayoutView::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_sel_color) {
 
-    QColor color;
+    lay::Color color;
     lay::ColorConverter ().from_string (value, color);
 
     //  Change the color
@@ -2991,7 +2991,7 @@ LayoutView::get_image (unsigned int width, unsigned int height)
 
 QImage 
 LayoutView::get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, 
-                                    QColor background, QColor foreground, QColor active, const db::DBox &target_box, bool monochrome)
+                                    lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
 
@@ -3034,7 +3034,7 @@ LayoutView::save_image (const std::string &fn, unsigned int width, unsigned int 
 void 
 LayoutView::save_image_with_options (const std::string &fn, 
                                      unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, 
-                                     QColor background, QColor foreground, QColor active, const db::DBox &target_box, bool monochrome)
+                                     lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
 
@@ -4128,11 +4128,11 @@ LayoutView::set_view_ops ()
   std::vector <lay::ViewOp> view_ops;
   view_ops.reserve (nlayers * planes_per_layer + special_planes_before + special_planes_after);
 
-  lay::color_t box_color;
-  if (! m_box_color.isValid ()) {
-    box_color = mp_canvas->foreground_color ().rgb ();
+  lay::Color box_color;
+  if (! m_box_color.is_valid ()) {
+    box_color = mp_canvas->foreground_color ();
   } else {
-    box_color = m_box_color.rgb ();
+    box_color = m_box_color;
   }
 
   //  cell boxes
@@ -4141,10 +4141,10 @@ LayoutView::set_view_ops ()
     lay::ViewOp vop;
 
     //  context level
-    if (m_ctx_color.isValid ()) {
+    if (m_ctx_color.is_valid ()) {
       vop = lay::ViewOp (m_ctx_color.rgb (), lay::ViewOp::Copy, 0, 0, 0);
     } else {
-      vop = lay::ViewOp (lay::LayerProperties::brighter (box_color, brightness_for_context), lay::ViewOp::Copy, 0, 0, 0);
+      vop = lay::ViewOp (lay::LayerProperties::brighter (box_color.rgb (), brightness_for_context), lay::ViewOp::Copy, 0, 0, 0);
     }
 
     //  fill, frame, text, vertex
@@ -4154,10 +4154,10 @@ LayoutView::set_view_ops ()
     view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
 
     //  child level
-    if (m_child_ctx_color.isValid ()) {
+    if (m_child_ctx_color.is_valid ()) {
       vop = lay::ViewOp (m_child_ctx_color.rgb (), lay::ViewOp::Copy, 0, 0, 0);
     } else {
-      vop = lay::ViewOp (lay::LayerProperties::brighter (box_color, brightness_for_context), lay::ViewOp::Copy, 0, 0, 0);
+      vop = lay::ViewOp (lay::LayerProperties::brighter (box_color.rgb (), brightness_for_context), lay::ViewOp::Copy, 0, 0, 0);
     }
 
     //  fill, frame, text, vertex
@@ -4167,7 +4167,7 @@ LayoutView::set_view_ops ()
     view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
 
     //  current level
-    vop = lay::ViewOp (box_color, lay::ViewOp::Copy, 0, 0, 0);
+    vop = lay::ViewOp (box_color.rgb (), lay::ViewOp::Copy, 0, 0, 0);
 
     //  fill, frame, text, vertex
     view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
@@ -4187,8 +4187,8 @@ LayoutView::set_view_ops ()
 
   //  produce the ViewOps for the guiding shapes
 
-  color_t gs_color = box_color;
-  if (m_guiding_shape_color.isValid ()) {
+  color_t gs_color = box_color.rgb ();
+  if (m_guiding_shape_color.is_valid ()) {
     gs_color = m_guiding_shape_color.rgb ();
   }
 
@@ -4202,7 +4202,7 @@ LayoutView::set_view_ops ()
     if (ctx == 0) {
 
       //  context planes
-      if (m_ctx_color.isValid ()) {
+      if (m_ctx_color.is_valid ()) {
         frame_color = text_color = fill_color = m_ctx_color.rgb ();
       } else {
         frame_color = text_color = fill_color = lay::LayerProperties::brighter (gs_color, brightness_for_context);
@@ -4215,7 +4215,7 @@ LayoutView::set_view_ops ()
     } else if (ctx == 1) {
 
       //  child level planes (if used)
-      if (m_child_ctx_color.isValid ()) {
+      if (m_child_ctx_color.is_valid ()) {
         frame_color = text_color = fill_color = m_child_ctx_color.rgb ();
       } else {
         frame_color = text_color = fill_color = lay::LayerProperties::brighter (gs_color, brightness_for_child_context);
@@ -4318,12 +4318,12 @@ LayoutView::set_view_ops ()
         if (ctx == 0) {
 
           //  context planes
-          if (m_ctx_color.isValid ()) {
+          if (m_ctx_color.is_valid ()) {
             frame_color = text_color = fill_color = m_ctx_color.rgb ();
           } else {
             fill_color = l->eff_fill_color_brighter (true /*real*/, brightness_for_context);
             frame_color = l->eff_frame_color_brighter (true /*real*/, brightness_for_context);
-            if (m_text_color.isValid ()) {
+            if (m_text_color.is_valid ()) {
               text_color = lay::LayerProperties::brighter (m_text_color.rgb (), brightness_for_context);
             } else {
               text_color = frame_color;
@@ -4337,12 +4337,12 @@ LayoutView::set_view_ops ()
         } else if (ctx == 1) {
 
           //  child level planes (if used)
-          if (m_child_ctx_color.isValid ()) {
+          if (m_child_ctx_color.is_valid ()) {
             frame_color = text_color = fill_color = m_child_ctx_color.rgb ();
           } else {
             fill_color = l->eff_fill_color_brighter (true /*real*/, brightness_for_child_context);
             frame_color = l->eff_frame_color_brighter (true /*real*/, brightness_for_child_context);
-            if (m_text_color.isValid ()) {
+            if (m_text_color.is_valid ()) {
               text_color = lay::LayerProperties::brighter (m_text_color.rgb (), brightness_for_child_context);
             } else {
               text_color = frame_color;
@@ -4358,7 +4358,7 @@ LayoutView::set_view_ops ()
           //  current level planes
           fill_color = l->eff_fill_color (true /*real*/);
           frame_color = l->eff_frame_color (true /*real*/);
-          if (m_text_color.isValid ()) {
+          if (m_text_color.is_valid ()) {
             text_color = m_text_color.rgb ();
           } else {
             text_color = frame_color;
@@ -4414,7 +4414,7 @@ LayoutView::guiding_shapes_visible (bool v)
 }
 
 void
-LayoutView::guiding_shapes_color (QColor c)
+LayoutView::guiding_shapes_color (lay::Color c)
 {
   if (c != m_guiding_shape_color) {
     m_guiding_shape_color = c;
@@ -4477,7 +4477,7 @@ LayoutView::drop_small_cells_cond (drop_small_cells_cond_type t)
 }
 
 void 
-LayoutView::cell_box_color (QColor c)
+LayoutView::cell_box_color (lay::Color c)
 {
   if (c != m_box_color) {
     m_box_color = c;
@@ -4627,7 +4627,7 @@ LayoutView::set_palette (const lay::LineStylePalette &p)
 }
 
 void
-LayoutView::ctx_color (QColor c)
+LayoutView::ctx_color (lay::Color c)
 {
   if (c != m_ctx_color) {
     m_ctx_color = c;
@@ -4654,7 +4654,7 @@ LayoutView::ctx_hollow (bool h)
 }
 
 void
-LayoutView::child_ctx_color (QColor c)
+LayoutView::child_ctx_color (lay::Color c)
 {
   if (c != m_child_ctx_color) {
     m_child_ctx_color = c;
@@ -4711,22 +4711,22 @@ LayoutView::abstract_mode_enabled (bool e)
 }
 
 void 
-LayoutView::background_color (QColor c)
+LayoutView::background_color (lay::Color c)
 {
   if (c == mp_canvas->background_color ()) {
     return;
   }
 
   //  replace by "real" background color if required
-  if (! c.isValid ()) {
-    c = palette ().color (QPalette::Normal, QPalette::Base);
+  if (! c.is_valid ()) {
+    c = lay::Color (palette ().color (QPalette::Normal, QPalette::Base).rgb ());
   }
 
-  QColor contrast;
+  lay::Color contrast;
   if (c.green () > 128) {
-    contrast = QColor (0, 0, 0);
+    contrast = lay::Color (0, 0, 0);
   } else {
-    contrast = QColor (255, 255, 255);
+    contrast = lay::Color (255, 255, 255);
   }
 
   if (mp_control_panel) {
@@ -5267,7 +5267,7 @@ LayoutView::show_markers (bool f)
 }
 
 void
-LayoutView::text_color (QColor c)
+LayoutView::text_color (lay::Color c)
 {
   if (m_text_color != c) {
     m_text_color = c;

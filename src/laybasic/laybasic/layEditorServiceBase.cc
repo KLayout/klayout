@@ -59,11 +59,11 @@ public:
 
   uint32_t cursor_color (lay::ViewObjectCanvas &canvas) const
   {
-    QColor color;
+    lay::Color color;
     if (mp_service) {
       color = mp_service->tracking_cursor_color ();
     }
-    if (! color.isValid ()) {
+    if (! color.is_valid ()) {
       color = canvas.foreground_color ();
     }
     return color.rgb ();
@@ -263,7 +263,7 @@ EditorServiceBase::configure (const std::string &name, const std::string &value)
 
   if (name == cfg_tracking_cursor_color) {
 
-    QColor color;
+    lay::Color color;
     lay::ColorConverter ().from_string (value, color);
 
     if (color != m_cursor_color) {

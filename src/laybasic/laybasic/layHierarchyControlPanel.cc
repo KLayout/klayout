@@ -655,23 +655,23 @@ HierarchyControlPanel::current_cell (int cv_index, HierarchyControlPanel::cell_p
 }
 
 void
-HierarchyControlPanel::set_background_color (QColor c)
+HierarchyControlPanel::set_background_color (lay::Color c)
 {
   m_background_color = c;
   for (std::vector <QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {
     QPalette pl ((*f)->palette ());
-    pl.setColor (QPalette::Base, c);
+    pl.setColor (QPalette::Base, QColor (c.rgb ()));
     (*f)->setPalette (pl);
   }
 }
 
 void
-HierarchyControlPanel::set_text_color (QColor c)
+HierarchyControlPanel::set_text_color (lay::Color c)
 {
   m_text_color = c;
   for (std::vector <QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {
     QPalette pl ((*f)->palette ());
-    pl.setColor (QPalette::Text, c);
+    pl.setColor (QPalette::Text, QColor (c.rgb ()));
     (*f)->setPalette (pl);
   }
 }
@@ -895,11 +895,11 @@ HierarchyControlPanel::do_update_content (int cv_index)
     cell_list->setUniformRowHeights (true);
 
     pl = cell_list->palette ();
-    if (m_text_color.isValid ()) {
-      pl.setColor (QPalette::Text, m_text_color);
+    if (m_text_color.is_valid ()) {
+      pl.setColor (QPalette::Text, QColor (m_text_color.rgb ()));
     }
-    if (m_background_color.isValid ()) {
-      pl.setColor (QPalette::Base, m_background_color);
+    if (m_background_color.is_valid ()) {
+      pl.setColor (QPalette::Base, QColor (m_background_color.rgb ()));
     }
     cell_list->setPalette (pl);
 

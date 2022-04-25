@@ -918,13 +918,13 @@ public:
    *  @param linewidth The width of a line in pixels (usually 1) or 0 for default
    *  @param oversampling The oversampling factor (1..3) or 0 for default
    *  @param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default
-   *  @param background The background color or QColor() for default
-   *  @param foreground The foreground color or QColor() for default
-   *  @param active The active color or QColor() for default
+   *  @param background The background color or lay::Color() for default
+   *  @param foreground The foreground color or lay::Color() for default
+   *  @param active The active color or lay::Color() for default
    *  @param target_box The box to draw or db::DBox() for default
    *  @param monochrome If true, monochrome images will be produced
    */
-  void save_image_with_options (const std::string &fn, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, QColor background, QColor foreground, QColor active_color, const db::DBox &target_box, bool monochrome);
+  void save_image_with_options (const std::string &fn, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, Color background, Color foreground, Color active_color, const db::DBox &target_box, bool monochrome);
 
   /**
    *  @brief Get the screen content as a QImage object with the given width and height
@@ -939,13 +939,13 @@ public:
    *  @param linewidth The width of a line in pixels (usually 1) or 0 for default
    *  @param oversampling The oversampling factor (1..3) or 0 for default
    *  @param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default
-   *  @param background The background color or QColor() for default
-   *  @param foreground The foreground color or QColor() for default
-   *  @param active The active color or QColor() for default
+   *  @param background The background color or lay::Color() for default
+   *  @param foreground The foreground color or lay::Color() for default
+   *  @param active The active color or lay::Color() for default
    *  @param target_box The box to draw or db::DBox() for default
    *  @param monochrome If true, monochrome images will be produced
    */
-  QImage get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, QColor background, QColor foreground, QColor active_color, const db::DBox &target_box, bool monochrome);
+  QImage get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, lay::Color background, lay::Color foreground, lay::Color active_color, const db::DBox &target_box, bool monochrome);
 
   /**
    *  @brief Hierarchy level selection setter
@@ -1002,12 +1002,12 @@ public:
   /**
    *  @brief Cell box/label color setter
    */
-  void cell_box_color (QColor c);
+  void cell_box_color (lay::Color c);
 
   /**
    *  @brief Cell box/label getter
    */
-  QColor cell_box_color () const
+  lay::Color cell_box_color () const
   {
     return m_box_color;
   }
@@ -1200,12 +1200,12 @@ public:
   /**
    *  @brief Text object color
    */
-  void text_color (QColor c);
+  void text_color (lay::Color c);
 
   /**
    *  @brief Text object color
    */
-  QColor text_color () const
+  lay::Color text_color () const
   {
     return m_text_color;
   }
@@ -1811,7 +1811,7 @@ public:
   /**
    *  @brief Background color property
    */
-  QColor background_color () const
+  lay::Color background_color () const
   {
     return mp_canvas->background_color ();
   }
@@ -1819,7 +1819,7 @@ public:
   /**
    *  @brief Foreground color property
    */
-  QColor foreground_color () const
+  lay::Color foreground_color () const
   {
     return mp_canvas->foreground_color ();
   }
@@ -1827,7 +1827,7 @@ public:
   /**
    *  @brief Active color property
    */
-  QColor active_color () const
+  lay::Color active_color () const
   {
     return mp_canvas->active_color ();
   }
@@ -1887,7 +1887,7 @@ public:
   /**
    *  @brief Gets the guiding shapes color
    */
-  QColor guiding_shapes_color () const
+  lay::Color guiding_shapes_color () const
   {
     return m_guiding_shape_color;
   }
@@ -1895,7 +1895,7 @@ public:
   /**
    *  @brief Sets the guiding shapes color
    */
-  void guiding_shapes_color (QColor c);
+  void guiding_shapes_color (lay::Color c);
 
   /**
    *  @brief Gets the guiding shapes line width
@@ -2231,7 +2231,7 @@ public:
   /**
    *  @brief Get the default color for markers
    */
-  QColor default_marker_color () const
+  lay::Color default_marker_color () const
   {
     return m_marker_color;
   }
@@ -2791,15 +2791,15 @@ private:
   int m_paste_display_mode;
   int m_wheel_mode;
   bool m_guiding_shape_visible;
-  QColor m_guiding_shape_color;
+  lay::Color m_guiding_shape_color;
   int m_guiding_shape_line_width;
   int m_guiding_shape_vertex_size;
 
-  QColor m_ctx_color;
+  lay::Color m_ctx_color;
   int m_ctx_dimming;
   bool m_ctx_hollow;
 
-  QColor m_child_ctx_color;
+  lay::Color m_child_ctx_color;
   int m_child_ctx_dimming;
   bool m_child_ctx_hollow;
   bool m_child_ctx_enabled;
@@ -2807,13 +2807,13 @@ private:
   double m_abstract_mode_width;
   bool m_abstract_mode_enabled;
 
-  QColor m_box_color;
+  lay::Color m_box_color;
   bool m_box_text_transform;
   unsigned int m_box_font;
   int m_min_size_for_label;
   bool m_cell_box_visible;
 
-  QColor m_marker_color;
+  lay::Color m_marker_color;
   int m_marker_line_width;
   int m_marker_vertex_size;
   int m_marker_dither_pattern;
@@ -2831,7 +2831,7 @@ private:
   bool m_text_lazy_rendering;
   bool m_bitmap_caching;
   bool m_show_properties;
-  QColor m_text_color;
+  lay::Color m_text_color;
   bool m_apply_text_trans;
   double m_default_text_size;
   unsigned int m_text_font;
@@ -2892,11 +2892,11 @@ private:
   void do_redraw (int layer);
   void do_redraw ();
 
-  void background_color (QColor c);
-  void ctx_color (QColor c);
+  void background_color (lay::Color c);
+  void ctx_color (lay::Color c);
   void ctx_dimming (int percent);
   void ctx_hollow (bool h);
-  void child_ctx_color (QColor c);
+  void child_ctx_color (lay::Color c);
   void child_ctx_dimming (int percent);
   void child_ctx_hollow (bool h);
   void child_ctx_enabled (bool e);

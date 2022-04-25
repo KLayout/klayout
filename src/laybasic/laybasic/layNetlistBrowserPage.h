@@ -141,7 +141,7 @@ public:
    *  @param halo The halo flag or -1 for default
    *  @param dither_pattern The dither pattern index of -1 to take the default
    */
-  void set_highlight_style (QColor color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, bool use_original_colors, const lay::ColorPalette *auto_colors);
+  void set_highlight_style (lay::Color color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, bool use_original_colors, const lay::ColorPalette *auto_colors);
 
   /**
    *  @brief Gets a value indicating whether all items in the netlist tree are shown (specifically for cross-reference DBs)
@@ -253,9 +253,9 @@ private:
   std::vector<const db::Device *> selected_devices ();
   std::vector<const db::SubCircuit *> selected_subcircuits ();
   std::vector<const db::Circuit *> selected_circuits ();
-  void set_color_for_selected_nets (const QColor &color);
+  void set_color_for_selected_nets (const lay::Color &color);
   void layer_list_changed (int);
-  QColor make_valid_color (const QColor &color);
+  lay::Color make_valid_color (const lay::Color &color);
   bool produce_highlights_for_net(const db::Net *net, size_t &n_markers, const std::map<db::LayerProperties, lay::LayerPropertiesConstIterator> &display_by_lp, const std::vector<db::DCplxTrans> &tv);
   bool produce_highlights_for_device (const db::Device *device, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
   bool produce_highlights_for_circuit (const db::Circuit *circuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);

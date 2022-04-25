@@ -330,13 +330,13 @@ static void save_as2 (lay::LayoutView *view, unsigned int index, const std::stri
 #if defined(HAVE_QTBINDINGS)
 static QImage get_image_with_options (lay::LayoutView *view, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box, bool monochrome)
 {
-  return view->get_image_with_options (width, height, linewidth, oversampling, resolution, QColor (), QColor (), QColor (), target_box, monochrome); 
+  return view->get_image_with_options (width, height, linewidth, oversampling, resolution, lay::Color (), lay::Color (), lay::Color (), target_box, monochrome);
 }
 #endif
 
 static void save_image_with_options (lay::LayoutView *view, const std::string &fn, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box, bool monochrome)
 {
-  view->save_image_with_options (fn, width, height, linewidth, oversampling, resolution, QColor (), QColor (), QColor (), target_box, monochrome); 
+  view->save_image_with_options (fn, width, height, linewidth, oversampling, resolution, lay::Color (), lay::Color (), lay::Color (), target_box, monochrome);
 }
 
 static std::vector<std::string> 

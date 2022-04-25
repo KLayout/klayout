@@ -41,7 +41,7 @@ public:
   ZoomService (lay::LayoutView *view);
   ~ZoomService ();
 
-  void set_colors (QColor background, QColor text);
+  void set_colors (lay::Color background, lay::Color text);
   void begin (const db::DPoint &pos);
   void begin_pan (const db::DPoint &pos);
 

@@ -134,18 +134,18 @@ BookmarksView::follow_selection (bool f)
 }
 
 void
-BookmarksView::set_background_color (QColor c)
+BookmarksView::set_background_color (lay::Color c)
 {
   QPalette pl (mp_bookmarks->palette ());
-  pl.setColor (QPalette::Base, c);
+  pl.setColor (QPalette::Base, QColor (c.rgb ()));
   mp_bookmarks->setPalette (pl);
 }
 
 void
-BookmarksView::set_text_color (QColor c)
+BookmarksView::set_text_color (lay::Color c)
 {
   QPalette pl (mp_bookmarks->palette ());
-  pl.setColor (QPalette::Text, c);
+  pl.setColor (QPalette::Text, QColor (c.rgb ()));
   mp_bookmarks->setPalette (pl);
 }
 

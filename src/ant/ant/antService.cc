@@ -759,9 +759,9 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 
   int basic_width = int(0.5 + 1.0 / canvas.resolution ());
 
-  QColor c (mp_rulers->color ());
-  if (! c.isValid ()) {
-    c = QColor (canvas.foreground_color ().rgb ());
+  lay::Color c (mp_rulers->color ());
+  if (! c.is_valid ()) {
+    c = canvas.foreground_color ();
   }
 
   //  obtain bitmap to render on
@@ -819,7 +819,7 @@ Service::configure (const std::string &name, const std::string &value)
 
   if (name == cfg_ruler_color) {
 
-    QColor color;
+    lay::Color color;
     lay::ColorConverter ().from_string (value, color);
 
     //  make the color available for the dynamic view objects too.
@@ -910,7 +910,7 @@ Service::annotations_changed ()
 }
 
 std::vector <lay::ViewOp>
-Service::get_view_ops (lay::RedrawThreadCanvas &canvas, QColor background, QColor foreground, QColor /*active*/) const
+Service::get_view_ops (lay::RedrawThreadCanvas &canvas, lay::Color background, lay::Color foreground, lay::Color /*active*/) const
 {
   int basic_width = int(0.5 + 1.0 / canvas.resolution ());
 
@@ -920,7 +920,7 @@ Service::get_view_ops (lay::RedrawThreadCanvas &canvas, QColor background, QColo
   if (m_halo) {
     view_ops.push_back (lay::ViewOp (background.rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, 3 * basic_width, 0));
   }
-  if (m_color.isValid ()) {
+  if (m_color.is_valid ()) {
     view_ops.push_back (lay::ViewOp (m_color.rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, basic_width, 0));
   } else {
     view_ops.push_back (lay::ViewOp (foreground.rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, basic_width, 0));

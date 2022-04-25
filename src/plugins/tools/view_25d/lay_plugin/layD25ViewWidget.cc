@@ -1089,7 +1089,7 @@ D25ViewWidget::paintGL ()
   const qreal retina_scale = devicePixelRatio ();
   glViewport (0, 0, width () * retina_scale, height () * retina_scale);
 
-  QColor c = mp_view->background_color ();
+  lay::Color c = mp_view->background_color ();
   float foreground_rgb = (c.green () > 128 ? 0.0f : 1.0f);
   float ambient = (c.green () > 128 ? 0.8f : 0.25f);
   float mist_factor = (c.green () > 128 ? 0.2f : 0.4f);

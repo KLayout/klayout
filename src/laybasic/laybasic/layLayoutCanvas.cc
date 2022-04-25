@@ -303,9 +303,9 @@ LayoutCanvas::LayoutCanvas (QWidget *parent, lay::LayoutView *view, const char *
   mp_redraw_thread = new lay::RedrawThread (this, view);
 
   setBackgroundRole (QPalette::NoRole);
-  set_colors (palette ().color (QPalette::Normal, QPalette::Window),
-              palette ().color (QPalette::Normal, QPalette::Text),
-              palette ().color (QPalette::Normal, QPalette::Mid));
+  set_colors (lay::Color (palette ().color (QPalette::Normal, QPalette::Window).rgb ()),
+              lay::Color (palette ().color (QPalette::Normal, QPalette::Text).rgb ()),
+              lay::Color (palette ().color (QPalette::Normal, QPalette::Mid).rgb ()));
   setAttribute (Qt::WA_NoSystemBackground);
 }
 
@@ -378,7 +378,7 @@ LayoutCanvas::set_oversampling (unsigned int os)
 }
 
 void 
-LayoutCanvas::set_colors (QColor background, QColor foreground, QColor active)
+LayoutCanvas::set_colors (lay::Color background, lay::Color foreground, lay::Color active)
 {
   m_background = background.rgb ();
   m_foreground = foreground.rgb ();
@@ -697,7 +697,7 @@ class DetachedViewObjectCanvas
   : public BitmapViewObjectCanvas
 {
 public:
-  DetachedViewObjectCanvas (QColor bg, QColor fg, QColor ac, unsigned int width_l, unsigned int height_l, double resolution, QImage *img)
+  DetachedViewObjectCanvas (lay::Color bg, lay::Color fg, lay::Color ac, unsigned int width_l, unsigned int height_l, double resolution, QImage *img)
     : BitmapViewObjectCanvas (width_l, height_l, resolution),
       m_bg (bg), m_fg (fg), m_ac (ac), mp_image (img)
   {
@@ -722,17 +722,17 @@ public:
     }
   }
 
-  QColor background_color () const
+  lay::Color background_color () const
   {
     return m_bg;
   }
 
-  QColor foreground_color () const
+  lay::Color foreground_color () const
   {
     return m_fg;
   }
 
-  QColor active_color () const
+  lay::Color active_color () const
   {
     return m_ac;
   }
@@ -764,7 +764,7 @@ public:
   }
 
 private:
-  QColor m_bg, m_fg, m_ac;
+  lay::Color m_bg, m_fg, m_ac;
   QImage *mp_image;
   QImage *mp_image_l;
   double m_gamma;
@@ -773,11 +773,11 @@ private:
 QImage 
 LayoutCanvas::image (unsigned int width, unsigned int height) 
 {
-  return image_with_options (width, height, -1, -1, -1.0, QColor (), QColor (), QColor (), db::DBox (), false); 
+  return image_with_options (width, height, -1, -1, -1.0, lay::Color (), lay::Color (), lay::Color (), db::DBox (), false);
 }
 
 QImage 
-LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, QColor background, QColor foreground, QColor active, const db::DBox &target_box, bool is_mono) 
+LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool is_mono)
 {
   if (oversampling <= 0) {
     oversampling = m_oversampling;
@@ -788,13 +788,13 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
   if (resolution <= 0.0) {
     resolution = 1.0 / oversampling;
   }
-  if (background == QColor ()) {
+  if (! background.is_valid ()) {
     background = background_color ();
   }
-  if (foreground == QColor ()) {
+  if (! foreground.is_valid ()) {
     foreground = foreground_color ();
   }
-  if (active == QColor ()) {
+  if (! active.is_valid ()) {
     active = active_color ();
   }
 

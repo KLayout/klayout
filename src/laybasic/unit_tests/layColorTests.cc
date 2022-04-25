@@ -81,6 +81,10 @@ TEST(4)
 TEST(5)
 {
   EXPECT_EQ (lay::Color ("#80102030").is_valid (), true);
+  EXPECT_EQ (lay::Color ("#80102030").alpha (), 128);
+  EXPECT_EQ (lay::Color ("#80102030").red (), 16);
+  EXPECT_EQ (lay::Color ("#80102030").green (), 32);
+  EXPECT_EQ (lay::Color ("#80102030").blue (), 48);
   EXPECT_EQ (lay::Color ("#80102030").to_string (), "#80102030");
   EXPECT_EQ (lay::Color ("#80102030").rgb (), 0x80102030);
 

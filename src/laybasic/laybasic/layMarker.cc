@@ -196,7 +196,7 @@ MarkerBase::MarkerBase (lay::LayoutView *view)
 }
 
 void 
-MarkerBase::set_frame_color (QColor color)
+MarkerBase::set_frame_color (lay::Color color)
 {
   if (color != m_frame_color) {
     m_frame_color = color;
@@ -205,7 +205,7 @@ MarkerBase::set_frame_color (QColor color)
 }
 
 void 
-MarkerBase::set_color (QColor color)
+MarkerBase::set_color (lay::Color color)
 {
   if (color != m_color) {
     m_color = color;
@@ -292,16 +292,16 @@ MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay:
   int basic_width = int(0.5 + 1.0 / resolution);
 
   //  obtain bitmaps
-  QColor color = m_color;
-  if (! color.isValid ()) {
+  lay::Color color = m_color;
+  if (! color.is_valid ()) {
     color = mp_view->default_marker_color ();
   }
-  if (! color.isValid ()) {
+  if (! color.is_valid ()) {
     color = canvas.foreground_color ();
   }
 
-  QColor frame_color = m_frame_color;
-  if (! frame_color.isValid ()) {
+  lay::Color frame_color = m_frame_color;
+  if (! frame_color.is_valid ()) {
     frame_color = color;
   }
 

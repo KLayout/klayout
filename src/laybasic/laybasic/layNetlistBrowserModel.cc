@@ -111,7 +111,7 @@ NetColorizer::NetColorizer ()
 }
 
 void
-NetColorizer::configure (const QColor &marker_color, const lay::ColorPalette *auto_colors)
+NetColorizer::configure (const lay::Color &marker_color, const lay::ColorPalette *auto_colors)
 {
   m_marker_color = marker_color;
   if (auto_colors) {
@@ -131,7 +131,7 @@ NetColorizer::has_color_for_net (const db::Net *net)
 }
 
 void
-NetColorizer::set_color_of_net (const db::Net *net, const QColor &color)
+NetColorizer::set_color_of_net (const db::Net *net, const lay::Color &color)
 {
   m_custom_color[net] = color;
   emit_colors_changed ();
@@ -183,14 +183,14 @@ NetColorizer::emit_colors_changed ()
   }
 }
 
-QColor
+lay::Color
 NetColorizer::color_of_net (const db::Net *net) const
 {
   if (! net) {
-    return QColor ();
+    return lay::Color ();
   }
 
-  std::map<const db::Net *, QColor>::const_iterator c = m_custom_color.find (net);
+  std::map<const db::Net *, lay::Color>::const_iterator c = m_custom_color.find (net);
   if (c != m_custom_color.end ()) {
     return c->second;
   }
@@ -219,7 +219,7 @@ NetColorizer::color_of_net (const db::Net *net) const
     return m_auto_colors.color_by_index ((unsigned int) index);
 
   } else {
-    return QColor ();
+    return lay::Color ();
   }
 }
 
@@ -823,9 +823,9 @@ static QIcon icon_for_subcircuit ()
   return icon;
 }
 
-static QIcon colored_icon (const QColor &color, const QIcon &original_icon)
+static QIcon colored_icon (const lay::Color &color, const QIcon &original_icon)
 {
-  if (! color.isValid ()) {
+  if (! color.is_valid ()) {
     return icon_for_net ();
   }
 
@@ -857,12 +857,12 @@ static QIcon colored_icon (const QColor &color, const QIcon &original_icon)
   return colored_icon;
 }
 
-static QIcon net_icon_with_color (const QColor &color)
+static QIcon net_icon_with_color (const lay::Color &color)
 {
   return colored_icon (color, light_icon_for_net ());
 }
 
-static QIcon connection_icon_with_color (const QColor &color)
+static QIcon connection_icon_with_color (const lay::Color &color)
 {
   return colored_icon (color, light_icon_for_connection ());
 }
@@ -2869,7 +2869,7 @@ NetlistBrowserModel::icon_for_nets (const std::pair<const db::Net *, const db::N
 
   if (mp_colorizer && mp_colorizer->has_color_for_net (net)) {
 
-    QColor color = mp_colorizer->color_of_net (net);
+    lay::Color color = mp_colorizer->color_of_net (net);
 
     lay::color_t rgb = lay::color_t (color.rgb ());
     std::map<lay::color_t, QIcon>::const_iterator c = m_net_icon_per_color.find (rgb);
@@ -2891,7 +2891,7 @@ NetlistBrowserModel::icon_for_connection (const std::pair<const db::Net *, const
 
   if (mp_colorizer && mp_colorizer->has_color_for_net (net)) {
 
-    QColor color = mp_colorizer->color_of_net (net);
+    lay::Color color = mp_colorizer->color_of_net (net);
 
     lay::color_t rgb = lay::color_t (color.rgb ());
     std::map<lay::color_t, QIcon>::const_iterator c = m_connection_icon_per_color.find (rgb);

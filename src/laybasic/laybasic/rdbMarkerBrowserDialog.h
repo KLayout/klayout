@@ -73,7 +73,7 @@ private:
   window_type m_window;
   double m_window_dim;
   unsigned int m_max_marker_count;
-  QColor m_marker_color;
+  lay::Color m_marker_color;
   int m_marker_line_width;
   int m_marker_vertex_size;
   int m_marker_halo;

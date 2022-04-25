@@ -49,7 +49,7 @@ public:
   SelectionService (lay::LayoutView *view);
   ~SelectionService ();
 
-  void set_colors (QColor background, QColor color);
+  void set_colors (lay::Color background, lay::Color color);
   void begin (const db::DPoint &pos);
 
   bool dragging () const { return mp_box != 0; }

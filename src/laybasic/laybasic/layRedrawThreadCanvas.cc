@@ -394,7 +394,7 @@ BitmapRedrawThreadCanvas::initialize_plane (lay::CanvasPlane *plane, unsigned in
 }
 
 void 
-BitmapRedrawThreadCanvas::to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, QColor background, QColor foreground, QColor active, const lay::Drawings *drawings, QImage &img, unsigned int width, unsigned int height)
+BitmapRedrawThreadCanvas::to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, lay::Color background, lay::Color foreground, lay::Color active, const lay::Drawings *drawings, QImage &img, unsigned int width, unsigned int height)
 {
   if (width > m_width) {
     width = m_width;

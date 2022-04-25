@@ -69,6 +69,30 @@ public:
   Color (const std::string &name);
 
   /**
+   *  @brief Comparison: equal
+   */
+  bool operator== (const Color &color) const
+  {
+    return m_color == color.m_color;
+  }
+
+  /**
+   *  @brief Comparison: not equal
+   */
+  bool operator!= (const Color &color) const
+  {
+    return m_color != color.m_color;
+  }
+
+  /**
+   *  @brief Comparison: less
+   */
+  bool operator< (const Color &color) const
+  {
+    return m_color < color.m_color;
+  }
+
+  /**
    *  @brief Gets the string value from a color
    */
   std::string to_string () const;
@@ -84,6 +108,38 @@ public:
   color_t rgb () const
   {
     return m_color;
+  }
+
+  /**
+   *  @brief Gets the alpha component
+   */
+  unsigned int alpha () const
+  {
+    return (m_color & 0xff000000) >> 24;
+  }
+
+  /**
+   *  @brief Gets the red component
+   */
+  unsigned int red () const
+  {
+    return (m_color & 0xff0000) >> 16;
+  }
+
+  /**
+   *  @brief Gets the green component
+   */
+  unsigned int green () const
+  {
+    return (m_color & 0xff00) >> 8;
+  }
+
+  /**
+   *  @brief Gets the blue component
+   */
+  unsigned int blue () const
+  {
+    return (m_color & 0xff);
   }
 
 private:

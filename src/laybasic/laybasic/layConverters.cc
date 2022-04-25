@@ -41,7 +41,17 @@ ColorConverter::to_string (const QColor &c) const
   }
 }
 
-void 
+std::string
+ColorConverter::to_string (const lay::Color &c) const
+{
+  if (! c.is_valid ()) {
+    return "auto";
+  } else {
+    return c.to_string ();
+  }
+}
+
+void
 ColorConverter::from_string (const std::string &s, QColor &c) const
 {
   std::string t (tl::trim (s));
@@ -50,6 +60,17 @@ ColorConverter::from_string (const std::string &s, QColor &c) const
   } else {
     c = QColor (t.c_str ());
   } 
+}
+
+void
+ColorConverter::from_string (const std::string &s, lay::Color &c) const
+{
+  std::string t (tl::trim (s));
+  if (t == "auto") {
+    c = lay::Color ();
+  } else {
+    c = lay::Color (t);
+  }
 }
 
 }

@@ -187,7 +187,7 @@ NetTracerDialog::mouse_click_event (const db::DPoint &p, unsigned int buttons, b
         //  do auto coloring
         if (m_auto_color_enabled) {
           if (m_auto_color_index < int (m_auto_colors.colors ())) {
-            mp_nets.back ()->set_color (QColor (m_auto_colors.color_by_index (m_auto_color_index)));
+            mp_nets.back ()->set_color (m_auto_colors.color_by_index (m_auto_color_index));
           }
           ++m_auto_color_index;
           if (m_auto_color_index >= int (m_auto_colors.colors ())) {
@@ -476,7 +476,7 @@ NetTracerDialog::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_nt_marker_color) {
 
-    QColor color;
+    lay::Color color;
     if (! value.empty ()) {
       lay::ColorConverter ().from_string (value, color);
     }
@@ -594,7 +594,7 @@ NetTracerDialog::net_color_changed (QColor color)
     int item_index = net_list->row (*item);
     if (item_index >= 0 && item_index < int (mp_nets.size ())) {
       if (color != mp_nets [item_index]->color ()) {
-        mp_nets [item_index]->set_color (color);
+        mp_nets [item_index]->set_color (color.rgb ());
         changed = true;
       }
     }
@@ -1092,7 +1092,7 @@ NetTracerDialog::update_list ()
 
     item->setData (Qt::DisplayRole, tl::to_qstring (mp_nets [i]->name ()));
 
-    if (mp_nets [i]->color ().isValid ()) {
+    if (lay::Color (mp_nets [i]->color ()).is_valid ()) {
 
       QPixmap pxmp (icon_size);
       QPainter pxpainter (&pxmp);
@@ -1595,7 +1595,7 @@ NetTracerDialog::update_highlights ()
 
       std::map <unsigned int, unsigned int> llmap;
 
-      QColor net_color = mp_nets [item_index]->color ();
+      lay::Color net_color = mp_nets [item_index]->color ();
 
       //  Create markers for the shapes 
       for (db::NetTracerNet::iterator net_shape = mp_nets [item_index]->begin (); net_shape != mp_nets [item_index]->end () && n_marker < m_max_marker_count; ++net_shape) {
@@ -1648,10 +1648,10 @@ NetTracerDialog::update_highlights ()
             }
           }
 
-          if (net_color.isValid ()) {
+          if (net_color.is_valid ()) {
             mp_markers.back ()->set_color (net_color);
             mp_markers.back ()->set_frame_color (net_color);
-          } else if (m_marker_color.isValid ()) {
+          } else if (m_marker_color.is_valid ()) {
             mp_markers.back ()->set_color (m_marker_color);
             mp_markers.back ()->set_frame_color (m_marker_color);
           }

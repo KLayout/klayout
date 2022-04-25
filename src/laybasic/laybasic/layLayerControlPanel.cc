@@ -1640,21 +1640,21 @@ LayerControlPanel::set_no_stipples (bool ns)
 }
 
 void
-LayerControlPanel::set_background_color (QColor c)
+LayerControlPanel::set_background_color (lay::Color c)
 {
   QPalette pl (mp_layer_list->palette ());
-  pl.setColor (QPalette::Base, c);
+  pl.setColor (QPalette::Base, QColor (c.rgb ()));
   mp_layer_list->setPalette (pl);
-  mp_model->set_background_color (c);
+  mp_model->set_background_color (QColor (c.rgb ()));
 }
 
 void
-LayerControlPanel::set_text_color (QColor c)
+LayerControlPanel::set_text_color (lay::Color c)
 {
   QPalette pl (mp_layer_list->palette ());
-  pl.setColor (QPalette::Text, c);
+  pl.setColor (QPalette::Text, QColor (c.rgb ()));
   mp_layer_list->setPalette (pl);
-  mp_model->set_text_color (c);
+  mp_model->set_text_color (QColor (c.rgb ()));
 }
 
 void

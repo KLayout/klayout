@@ -229,7 +229,7 @@ NetlistBrowserPage::set_dispatcher (lay::Dispatcher *pr)
 }
 
 void
-NetlistBrowserPage::set_highlight_style (QColor color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, bool use_original_colors, const lay::ColorPalette *auto_colors)
+NetlistBrowserPage::set_highlight_style (lay::Color color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, bool use_original_colors, const lay::ColorPalette *auto_colors)
 {
   m_colorizer.configure (color, auto_colors);
   m_marker_line_width = line_width;
@@ -492,13 +492,13 @@ NetlistBrowserPage::selection_changed ()
 }
 
 void
-NetlistBrowserPage::set_color_for_selected_nets (const QColor &color)
+NetlistBrowserPage::set_color_for_selected_nets (const lay::Color &color)
 {
   std::vector<const db::Net *> nets = selected_nets ();
 
   m_colorizer.begin_changes ();
   for (std::vector<const db::Net *>::const_iterator n = nets.begin (); n != nets.end (); ++n) {
-    if (color.isValid ()) {
+    if (color.is_valid ()) {
       m_colorizer.set_color_of_net (*n, color);
     } else {
       m_colorizer.reset_color_of_net (*n);
@@ -514,7 +514,7 @@ NetlistBrowserPage::browse_color_for_net ()
 {
   QColor c = QColorDialog::getColor (QColor (), this);
   if (c.isValid ()) {
-    set_color_for_selected_nets (c);
+    set_color_for_selected_nets (lay::Color (c.rgb ()));
   }
 }
 
@@ -523,7 +523,7 @@ NetlistBrowserPage::select_color_for_net ()
 {
   QAction *action = dynamic_cast<QAction *> (sender ());
   if (action) {
-    set_color_for_selected_nets (action->data ().value<QColor> ());
+    set_color_for_selected_nets (lay::Color (action->data ().value<QColor> ().rgb ()));
   }
 }
 
@@ -1095,11 +1095,11 @@ NetlistBrowserPage::adjust_view ()
   }
 }
 
-QColor
-NetlistBrowserPage::make_valid_color (const QColor &color)
+lay::Color
+NetlistBrowserPage::make_valid_color (const lay::Color &color)
 {
-  if (! color.isValid () && mp_view) {
-    return mp_view->background_color ().green () < 128 ? QColor (Qt::white) : QColor (Qt::black);
+  if (! color.is_valid () && mp_view) {
+    return mp_view->background_color ().green () < 128 ? lay::Color (255, 255, 255) : lay::Color (0, 0, 0);
   } else {
     return color;
   }
@@ -1110,7 +1110,7 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
 {
   const db::Layout *layout = mp_database->internal_layout ();
 
-  QColor color = make_valid_color (m_colorizer.marker_color ());
+  lay::Color color = make_valid_color (m_colorizer.marker_color ());
 
   db::Box device_bbox = bbox_for_device_abstract (layout, device->device_abstract (), device->trans ());
   if (! device_bbox.empty ()) {
@@ -1159,7 +1159,7 @@ NetlistBrowserPage::produce_highlights_for_circuit (const db::Circuit *circuit, 
 {
   const db::Layout *layout = mp_database->internal_layout ();
 
-  QColor color = make_valid_color (m_colorizer.marker_color ());
+  lay::Color color = make_valid_color (m_colorizer.marker_color ());
   db::Box circuit_bbox = bbox_for_circuit (layout, circuit);
   if (circuit_bbox.empty ()) {
     return false;
@@ -1188,8 +1188,8 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
   db::cell_index_type cell_index = net->circuit ()->cell_index ();
   size_t cluster_id = net->cluster_id ();
 
-  QColor net_color = m_colorizer.color_of_net (net);
-  QColor fallback_color = make_valid_color (m_colorizer.marker_color ());
+  lay::Color net_color = m_colorizer.color_of_net (net);
+  lay::Color fallback_color = make_valid_color (m_colorizer.marker_color ());
 
   const db::Connectivity &conn = mp_database->connectivity ();
   for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
@@ -1212,7 +1212,7 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
       mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
       mp_markers.back ()->set (shapes->polygon_ref (), shapes.trans (), tv);
 
-      if (net_color.isValid ()) {
+      if (net_color.is_valid ()) {
 
         mp_markers.back ()->set_color (net_color);
         mp_markers.back ()->set_frame_color (net_color);

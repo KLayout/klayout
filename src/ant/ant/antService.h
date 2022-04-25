@@ -387,7 +387,7 @@ public:
   /**
    *  @brief Color accessor
    */
-  QColor color () const
+  lay::Color color () const
   {
     return m_color;
   }
@@ -498,7 +498,7 @@ public:
 
 private:
   //  Ruler display and snapping configuration
-  QColor m_color;
+  lay::Color m_color;
   bool m_halo;
   lay::angle_constraint_type m_snap_mode;
   double m_grid;
@@ -599,7 +599,7 @@ private:
   /**
    *  @brief implementation of the "Drawing" interface: configuration
    */
-  std::vector <lay::ViewOp> get_view_ops (lay::RedrawThreadCanvas &canvas, QColor background, QColor foreground, QColor active) const;
+  std::vector <lay::ViewOp> get_view_ops (lay::RedrawThreadCanvas &canvas, lay::Color background, lay::Color foreground, lay::Color active) const;
 
   /**
    *  @brief Update m_rulers to reflect the selection

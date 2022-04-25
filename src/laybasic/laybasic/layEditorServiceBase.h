@@ -92,7 +92,7 @@ public:
   /**
    *  @brief Gets the tracking cursor color
    */
-  QColor tracking_cursor_color () const
+  lay::Color tracking_cursor_color () const
   {
     return m_cursor_color;
   }
@@ -128,7 +128,7 @@ protected:
 private:
   //  The marker representing the mouse cursor
   std::vector<lay::ViewObject *> m_mouse_cursor_markers;
-  QColor m_cursor_color;
+  lay::Color m_cursor_color;
   bool m_cursor_enabled;
   bool m_has_tracking_position;
   db::DPoint m_tracking_position;

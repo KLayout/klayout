@@ -144,7 +144,7 @@ public:
   LayoutCanvas (QWidget *parent, lay::LayoutView *view, const char *name = "canvas");
   ~LayoutCanvas ();
 
-  void set_colors (QColor background, QColor foreground, QColor active);
+  void set_colors (lay::Color background, lay::Color foreground, lay::Color active);
 
   /**
    *  @brief Set the view ops for the layers
@@ -167,7 +167,7 @@ public:
 
   QImage screenshot ();
   QImage image (unsigned int width, unsigned int height);
-  QImage image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, QColor background, QColor foreground, QColor active_color, const db::DBox &target_box, bool monochrome);
+  QImage image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, lay::Color background, lay::Color foreground, lay::Color active_color, const db::DBox &target_box, bool monochrome);
 
   void update_image ();
 
@@ -288,25 +288,25 @@ public:
   /**
    *  @brief Reimplementation of ViewObjectCanvas: Background color 
    */
-  QColor background_color () const
+  lay::Color background_color () const
   { 
-    return QColor (m_background); 
+    return lay::Color (m_background);
   }
 
   /**
    *  @brief Reimplementation of ViewObjectCanvas: Foreground color 
    */
-  QColor foreground_color () const
+  lay::Color foreground_color () const
   { 
-    return QColor (m_foreground); 
+    return lay::Color (m_foreground);
   }
 
   /**
    *  @brief Reimplementation of ViewObjectCanvas: Active color 
    */
-  QColor active_color () const
+  lay::Color active_color () const
   { 
-    return QColor (m_active); 
+    return lay::Color (m_active);
   }
 
   /**

@@ -555,7 +555,7 @@ NetlistBrowserDialog::configure (const std::string &name, const std::string &val
 
   } else if (name == cfg_l2ndb_marker_color) {
 
-    QColor color;
+    lay::Color color;
     if (! value.empty ()) {
       lay::ColorConverter ().from_string (value, color);
     }

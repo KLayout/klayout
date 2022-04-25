@@ -27,8 +27,10 @@
 
 #include "laybasicCommon.h"
 
-#include <QObject>
-#include <QBitmap>
+#if defined(HAVE_QT)
+#  include <QObject>
+#  include <QBitmap>
+#endif
 
 #include "dbObject.h"
 
@@ -126,6 +128,7 @@ public:
     m_order_index = oi;
   }
 
+#if defined(HAVE_QT)
   /**
    *  @brief Get a monochrome bitmap object for this pattern
    *
@@ -133,6 +136,7 @@ public:
    *  @param height The desired height (-1 for default)
    */
   QBitmap get_bitmap (int width = -1, int height = -1) const;
+#endif
 
   /**
    *  @brief Gets the the dither pattern
@@ -225,10 +229,15 @@ private:
  *  replaced with a new pattern, except for the first pattern which
  *  cannot be changed. 
  */
-class LAYBASIC_PUBLIC DitherPattern
-  : public QObject, public db::Object
+class LAYBASIC_PUBLIC DitherPattern :
+#if defined(HAVE_QT)
+    public QObject,
+#endif
+    public db::Object
 {
+#if defined(HAVE_QT)
 Q_OBJECT
+#endif
 
 public:
   typedef std::vector<DitherPatternInfo> pattern_vector;
@@ -272,8 +281,9 @@ public:
     return m_pattern != p.m_pattern;
   }
 
+#if defined(HAVE_QT)
   /**
-   *  @brief Get a monochrome bitmap object for this pattern
+   *  @brief Gets a monochrome bitmap object for this pattern
    *
    *  If the index is not valid, an empty bitmap is returned.
    *
@@ -282,6 +292,7 @@ public:
    *  @param height The desired height (-1 for default)
    */
   QBitmap get_bitmap (unsigned int i, int width = -1, int height = -1) const;
+#endif
 
   /**
    *  @brief Deliver the pattern with the given index
@@ -373,12 +384,14 @@ public:
    */
   static const DitherPattern &default_pattern ();
 
+#if defined(HAVE_QT)
 signals:
   /**
    *  @brief This signal is emitted if a pattern is changed 
    */
   void changed ();
-  
+#endif
+
 private:
   std::vector<DitherPatternInfo> m_pattern;
 };

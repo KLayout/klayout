@@ -27,8 +27,10 @@
 
 #include "laybasicCommon.h"
 
-#include <QObject>
-#include <QBitmap>
+#if defined(HAVE_QT)
+#  include <QObject>
+#  include <QBitmap>
+#endif
 
 #include "dbObject.h"
 
@@ -141,6 +143,7 @@ public:
     return m_pattern;
   }
 
+#if defined(HAVE_QT)
   /**
    *  @brief Get a monochrome bitmap object for this pattern
    *
@@ -148,6 +151,7 @@ public:
    *  @param height The desired height (-1 for default)
    */
   QBitmap get_bitmap (int width = -1, int height = -1) const;
+#endif
 
   /**
    *  @brief Replaces the pattern string
@@ -215,10 +219,15 @@ private:
  *  replaced with a new pattern, except for the first styles which
  *  cannot be changed. 
  */
-class LAYBASIC_PUBLIC LineStyles
-  : public QObject, public db::Object
+class LAYBASIC_PUBLIC LineStyles :
+#if defined(HAVE_QT)
+    public QObject,
+#endif
+    public db::Object
 {
+#if defined(HAVE_QT)
 Q_OBJECT
+#endif
 
 public:
   typedef std::vector<LineStyleInfo> pattern_vector;
@@ -352,12 +361,14 @@ public:
    */
   static const LineStyles &default_style ();
 
+#if defined(HAVE_QT)
 signals:
   /**
    *  @brief This signal is emitted if a style is changed 
    */
   void changed ();
-  
+#endif
+
 private:
   std::vector<LineStyleInfo> m_styles;
 };

@@ -31,6 +31,8 @@
 #include "tlXMLWriter.h"
 #include "dbLoadLayoutOptions.h"
 
+#include <QFrame>
+
 namespace db
 {
   class StreamFormatDeclaration;

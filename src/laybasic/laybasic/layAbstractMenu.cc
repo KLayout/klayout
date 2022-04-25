@@ -39,6 +39,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QHBoxLayout>
+#include <QFrame>
 
 #include <ctype.h>
 

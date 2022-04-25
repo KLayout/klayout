@@ -26,6 +26,7 @@
 #define HDR_antConfigPage
 
 #include "layPlugin.h"
+#include "layPluginConfigPage.h"
 #include "antTemplate.h"
 
 class QListWidgetItem;

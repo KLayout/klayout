@@ -25,6 +25,7 @@
 #define HDR_rdbMarkerBrowser
 
 #include "layPlugin.h"
+#include "layPluginConfigPage.h"
 #include "ui_MarkerBrowserConfigPage.h"
 #include "ui_MarkerBrowserConfigPage2.h"
 

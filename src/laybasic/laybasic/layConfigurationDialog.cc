@@ -28,6 +28,7 @@
 #include "ui_ConfigurationDialog.h"
 #include "layConfigurationDialog.h"
 #include "layPlugin.h"
+#include "layPluginConfigPage.h"
 #include "layDispatcher.h"
 
 #include "tlLog.h"

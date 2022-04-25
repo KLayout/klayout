@@ -26,13 +26,12 @@
 #define HDR_layViewOp
 
 #include "laybasicCommon.h"
+#include "layColor.h"
 
 #include <stdint.h>
 
 namespace lay
 {
-
-typedef unsigned int color_t; 
 
 const unsigned int wordlen  = 32;
 const unsigned int wordbits = 5;

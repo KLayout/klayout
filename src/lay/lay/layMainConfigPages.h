@@ -28,6 +28,7 @@
 #include <QObject>
 
 #include "layPlugin.h"
+#include "layPluginConfigPage.h"
 
 #include <map>
 

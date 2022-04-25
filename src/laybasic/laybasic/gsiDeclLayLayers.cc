@@ -22,6 +22,7 @@
 
 
 #include "gsiDecl.h"
+#include "layLayerProperties.h"
 #include "layLayoutView.h"
 
 namespace gsi

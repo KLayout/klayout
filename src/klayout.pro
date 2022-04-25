@@ -13,6 +13,7 @@ SUBDIRS = \
   unit_tests \
   buddies \
   lym \
+  laybasic \
 
 equals(HAVE_RUBY, "1") {
   SUBDIRS += drc lvs
@@ -23,7 +24,6 @@ equals(HAVE_RUBY, "1") {
   # TODO: make buddies able to build without Qt
   SUBDIRS += \
     klayout_main \
-    laybasic \
     lay \
     ant \
     img \
@@ -66,6 +66,7 @@ plugins.depends += lib rdb db
 
 buddies.depends += plugins lym $$LANG_DEPENDS
 lym.depends += gsi $$LANG_DEPENDS
+laybasic.depends += rdb lym
 
 equals(HAVE_RUBY, "1") {
   MAIN_DEPENDS += drc lvs
@@ -94,7 +95,6 @@ equals(HAVE_RUBY, "1") {
 
   plugins.depends += lay ant
 
-  laybasic.depends += rdb lym
   ant.depends += laybasic
   img.depends += laybasic
   edt.depends += laybasic

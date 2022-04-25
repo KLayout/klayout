@@ -34,8 +34,6 @@
 #include "layViewOp.h"
 #include "dbTrans.h"
 
-#include <QColor>
-
 namespace lay
 {
 

@@ -25,6 +25,7 @@
 #define HDR_layNetlistBrowser
 
 #include "layPlugin.h"
+#include "layPluginConfigPage.h"
 #include "layColorPalette.h"
 #include "ui_NetlistBrowserConfigPage.h"
 #include "ui_NetlistBrowserConfigPage2.h"

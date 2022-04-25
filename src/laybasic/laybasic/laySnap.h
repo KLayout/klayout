@@ -27,7 +27,9 @@
 
 #include "laybasicCommon.h"
 
+#if defined(HAVE_QT)
 #include <QPoint>
+#endif
 
 #include <utility>
 #include <vector>
@@ -244,6 +246,7 @@ namespace lay
    */
   LAYBASIC_PUBLIC int draw_round (double x);
 
+#if defined(HAVE_QT)
   /**
    *  @brief rounding (and height-transformation) of a double point 
    */
@@ -253,6 +256,7 @@ namespace lay
    *  @brief rounding (and height-transformation) of a two-point vector
    */
   LAYBASIC_PUBLIC std::pair<QPoint, QPoint> draw_round (const db::DPoint &p1, const db::DPoint &p2, int h);
+#endif
 
   /**
    *  @brief rounding (and height-transformation) of a two-point vector

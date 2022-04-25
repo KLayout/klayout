@@ -37,14 +37,18 @@
 #include <set>
 #include <limits>
 
+#if defined(HAVE_QT)
 class QWidget;
+#endif
 
 namespace lay
 {
 
 class Editables;
+#if defined(HAVE_QT)
 class PropertiesPage;
 class PropertiesDialog;
+#endif
 
 /**
  *  @brief The "editable" interface
@@ -353,6 +357,7 @@ public:
     return false;
   }
 
+#if defined(HAVE_QT)
   /**
    *  @brief Create a "properties page" object
    *
@@ -368,6 +373,7 @@ public:
   {
     return 0;
   }
+#endif
 
   /**
    *  @brief Destruction callback by the properties page
@@ -584,10 +590,12 @@ public:
     return m_editables.end ();
   }
 
+#if defined(HAVE_QT)
   /**
    *  @brief The "show properties" operation
    */
   void show_properties (QWidget *parent);
+#endif
 
   /**
    *  @brief An event triggered if the selection changed
@@ -643,7 +651,9 @@ private:
 
   tl::shared_collection<lay::Editable> m_editables;
   std::set<lay::Editable *> m_enabled;
+#if defined(HAVE_QT)
   lay::PropertiesDialog *mp_properties_dialog;
+#endif
   bool m_move_selection;
   bool m_any_move_operation;
   db::DBox m_last_selected_point;

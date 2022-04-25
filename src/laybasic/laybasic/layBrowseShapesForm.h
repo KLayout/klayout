@@ -28,6 +28,7 @@
 #include "ui_BrowseShapesConfigPage.h"
 
 #include "layLayoutView.h"
+#include "layPluginConfigPage.h"
 #include "layBrowser.h"
 #include "layMarker.h"
 

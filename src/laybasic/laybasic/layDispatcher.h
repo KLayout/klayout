@@ -34,6 +34,10 @@
 #include <string>
 #include <vector>
 
+#if defined(HAVE_QT)
+class QWidget;
+#endif
+
 namespace lay
 {
 
@@ -117,6 +121,7 @@ public:
    */
   Dispatcher (Plugin *parent = 0, bool standalone = false);
 
+#if defined(HAVE_QT)
   /**
    *  @brief The constructor
    *
@@ -125,6 +130,7 @@ public:
    *  @param standalone The standalone flag passed to the plugin constructor.
    */
   Dispatcher (QWidget *menu_parent_widget, Plugin *parent = 0, bool standalone = false);
+#endif
 
   /**
    *  @brief The root constructor
@@ -133,6 +139,7 @@ public:
    */
   Dispatcher (DispatcherDelegate *delegate, Plugin *parent = 0, bool standalone = false);
 
+#if defined(HAVE_QT)
   /**
    *  @brief The root constructor
    *
@@ -140,6 +147,7 @@ public:
    *  @param delegate The notification receiver for dispatcher events
    */
   Dispatcher (QWidget *menu_parent_widget, DispatcherDelegate *delegate, Plugin *parent = 0, bool standalone = false);
+#endif
 
   /**
    *  @brief Destructor
@@ -216,6 +224,7 @@ public:
     }
   }
 
+#if defined(HAVE_QT)
   /**
    *  @brief Gets the parent widget
    */
@@ -238,6 +247,14 @@ public:
   {
     return (dispatcher () == this) ? mp_menu.get () : dispatcher ()->menu ();
   }
+#else
+
+  /**
+   *  @brief Returns true, if the dispatcher supplies a user interface
+   */
+  bool has_ui () { return false; }
+
+#endif
 
 protected:
   //  capture the configuration events so we can change the value of the configuration actions
@@ -248,8 +265,10 @@ private:
   Dispatcher (const Dispatcher &);
   Dispatcher &operator= (const Dispatcher &);
 
+#if defined(HAVE_QT)
   std::unique_ptr<lay::AbstractMenu> mp_menu;
   QWidget *mp_menu_parent_widget;
+#endif
   DispatcherDelegate *mp_delegate;
 };
 

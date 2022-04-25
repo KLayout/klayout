@@ -30,8 +30,6 @@
 #include <vector>
 
 #include "tlObject.h"
-#include "tlFileSystemWatcher.h"
-#include "layTechnology.h"
 #include "dbLayout.h"
 #include "dbMetaInfo.h"
 #include "dbReader.h"
@@ -39,6 +37,11 @@
 #include "dbLoadLayoutOptions.h"
 #include "dbInstElement.h"
 #include "gsi.h"
+
+#if defined(HAVE_QT)
+#  include "layTechnology.h"
+#  include "tlFileSystemWatcher.h"
+#endif
 
 namespace lay 
 {
@@ -287,10 +290,12 @@ public:
    */
   void layout_changed ();
 
+#if defined(HAVE_QT)
   /**
    *  @brief Gets the file system watcher that delivers events when one of the layouts gets updated
    */
   static tl::FileSystemWatcher &file_watcher ();
+#endif
 
 private:
   db::Layout *mp_layout;
@@ -305,7 +310,9 @@ private:
   void on_technology_changed ();
 
   static std::map <std::string, LayoutHandle *> ms_dict;
+#if defined(HAVE_QT)
   static tl::FileSystemWatcher *mp_file_watcher;
+#endif
 };
 
 /**

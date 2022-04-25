@@ -25,6 +25,7 @@
 #define HDR_layLayoutViewConfigPages
 
 #include "layPlugin.h"
+#include "layPluginConfigPage.h"
 #include "layColorPalette.h"
 #include "layStipplePalette.h"
 #include "layLineStylePalette.h"

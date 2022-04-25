@@ -28,6 +28,7 @@
 #include "ui_NetTracerConfigPage.h"
 
 #include "layPlugin.h"
+#include "layPluginConfigPage.h"
 #include "layColorPalette.h"
 
 namespace lay

@@ -26,6 +26,7 @@
 
 #include "layViewObject.h"
 #include "layPlugin.h"
+#include "layPluginConfigPage.h"
 #include "dbTypes.h"
 #include "dbBox.h"
 

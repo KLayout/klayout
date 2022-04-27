@@ -45,12 +45,12 @@ static void clear_colormap (img::DataMapping *dm)
 
 static void add_colormap (img::DataMapping *dm, double value, lay::color_t color)
 {
-  dm->false_color_nodes.push_back (std::make_pair (value, std::make_pair (QColor (color), QColor (color))));
+  dm->false_color_nodes.push_back (std::make_pair (value, std::make_pair (lay::Color (color), lay::Color (color))));
 }
 
 static void add_colormap2 (img::DataMapping *dm, double value, lay::color_t lcolor, lay::color_t rcolor)
 {
-  dm->false_color_nodes.push_back (std::make_pair (value, std::make_pair (QColor (lcolor), QColor (rcolor))));
+  dm->false_color_nodes.push_back (std::make_pair (value, std::make_pair (lay::Color (lcolor), lay::Color (rcolor))));
 }
 
 static size_t num_colormap_entries (const img::DataMapping *dm)

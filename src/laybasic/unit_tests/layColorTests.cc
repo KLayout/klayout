@@ -116,3 +116,104 @@ TEST(7)
   EXPECT_EQ (QColor (16, 32, 48, 128).rgb (), 0xff102030);
 #endif
 }
+
+TEST(8)
+{
+  unsigned int h, s, v;
+  int ih, is, iv;
+  lay::Color c = lay::Color (16, 32, 48);
+  c.get_hsv (h, s, v);
+  EXPECT_EQ (h, 210);
+  EXPECT_EQ (s, 170);
+  EXPECT_EQ (v, 48);
+
+  EXPECT_EQ (lay::Color::from_hsv (h, s, v).to_string (), "#102030");
+
+#if defined(HAVE_QT)
+  QColor qc = QColor (16, 32, 48);
+  qc.getHsv (&ih, &is, &iv);
+  EXPECT_EQ (ih, 210);
+  EXPECT_EQ (is, 170);
+  EXPECT_EQ (iv, 48);
+#endif
+
+  c = lay::Color (32, 16, 48);
+  c.get_hsv (h, s, v);
+  EXPECT_EQ (h, 270);
+  EXPECT_EQ (s, 170);
+  EXPECT_EQ (v, 48);
+
+  EXPECT_EQ (lay::Color::from_hsv (h, s, v).to_string (), "#201030");
+
+#if defined(HAVE_QT)
+  qc = QColor (32, 16, 48);
+  qc.getHsv (&ih, &is, &iv);
+  EXPECT_EQ (ih, 270);
+  EXPECT_EQ (is, 170);
+  EXPECT_EQ (iv, 48);
+#endif
+
+  c = lay::Color (32, 48, 16);
+  c.get_hsv (h, s, v);
+  EXPECT_EQ (h, 90);
+  EXPECT_EQ (s, 170);
+  EXPECT_EQ (v, 48);
+
+  EXPECT_EQ (lay::Color::from_hsv (h, s, v).to_string (), "#203010");
+
+#if defined(HAVE_QT)
+  qc = QColor (32, 48, 16);
+  qc.getHsv (&ih, &is, &iv);
+  EXPECT_EQ (ih, 90);
+  EXPECT_EQ (is, 170);
+  EXPECT_EQ (iv, 48);
+#endif
+
+  c = lay::Color (48, 32, 16);
+  c.get_hsv (h, s, v);
+  EXPECT_EQ (h, 30);
+  EXPECT_EQ (s, 170);
+  EXPECT_EQ (v, 48);
+
+  EXPECT_EQ (lay::Color::from_hsv (h, s, v).to_string (), "#302010");
+
+#if defined(HAVE_QT)
+  qc = QColor (48, 32, 16);
+  qc.getHsv (&ih, &is, &iv);
+  EXPECT_EQ (ih, 30);
+  EXPECT_EQ (is, 170);
+  EXPECT_EQ (iv, 48);
+#endif
+
+  c = lay::Color (48, 16, 32);
+  c.get_hsv (h, s, v);
+  EXPECT_EQ (h, 330);
+  EXPECT_EQ (s, 170);
+  EXPECT_EQ (v, 48);
+
+  EXPECT_EQ (lay::Color::from_hsv (h, s, v).to_string (), "#301020");
+
+#if defined(HAVE_QT)
+  qc = QColor (48, 16, 32);
+  qc.getHsv (&ih, &is, &iv);
+  EXPECT_EQ (ih, 330);
+  EXPECT_EQ (is, 170);
+  EXPECT_EQ (iv, 48);
+#endif
+
+  c = lay::Color (16, 48, 32);
+  c.get_hsv (h, s, v);
+  EXPECT_EQ (h, 150);
+  EXPECT_EQ (s, 170);
+  EXPECT_EQ (v, 48);
+
+  EXPECT_EQ (lay::Color::from_hsv (h, s, v).to_string (), "#103020");
+
+#if defined(HAVE_QT)
+  qc = QColor (16, 48, 32);
+  qc.getHsv (&ih, &is, &iv);
+  EXPECT_EQ (ih, 150);
+  EXPECT_EQ (is, 170);
+  EXPECT_EQ (iv, 48);
+#endif
+}

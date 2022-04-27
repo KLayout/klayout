@@ -31,6 +31,7 @@
 #include "dbPolygonTools.h"
 #include "tlFileUtils.h"
 #include "tlUri.h"
+#include "tlThreads.h"
 
 #include <cmath>
 #include <cstring>
@@ -40,7 +41,6 @@
 #include <memory.h>
 
 #include <QImage>
-#include <QMutex>
 
 namespace img
 {
@@ -51,8 +51,8 @@ namespace img
 DataMapping::DataMapping ()
   : brightness (0.0), contrast (0.0), gamma (1.0), red_gain (1.0), green_gain (1.0), blue_gain (1.0)
 {
-  false_color_nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (0, 0, 0), QColor (0, 0, 0))));
-  false_color_nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (255, 255, 255), QColor (255, 255, 255))));
+  false_color_nodes.push_back (std::make_pair (0.0, std::make_pair (lay::Color (0, 0, 0), lay::Color (0, 0, 0))));
+  false_color_nodes.push_back (std::make_pair (1.0, std::make_pair (lay::Color (255, 255, 255), lay::Color (255, 255, 255))));
 }
 
 bool 
@@ -192,11 +192,11 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
 
     for (unsigned int i = 1; i < false_color_nodes.size (); ++i) {
 
-      int h1, s1, v1;
-      false_color_nodes [i - 1].second.second.getHsv (&h1, &s1, &v1);
+      unsigned int h1, s1, v1;
+      false_color_nodes [i - 1].second.second.get_hsv (h1, s1, v1);
 
-      int h2, s2, v2;
-      false_color_nodes [i].second.first.getHsv (&h2, &s2, &v2);
+      unsigned int h2, s2, v2;
+      false_color_nodes [i].second.first.get_hsv (h2, s2, v2);
 
       //  The number of steps is chosen such that the full HSV band divides into approximately 200 steps
       double nsteps = 0.5 * sqrt (double (h1 - h2) * double (h1 - h2) + double (s1 - s2) * double (s1 - s2) + double (v1 - v2) * double (v1 - v2));
@@ -206,7 +206,7 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
 
       for (int j = 0; j < n; ++j) {
 
-        QColor c = interpolated_color (false_color_nodes, x);
+        lay::Color c = interpolated_color (false_color_nodes, x);
 
         double y = 0.0;
         if (channel == 0) {
@@ -258,6 +258,57 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
   }
 
   return dm;
+}
+
+// --------------------------------------------------------------------------------------
+
+namespace
+{
+
+struct compare_first_of_node
+{
+  bool operator() (const std::pair <double, std::pair<lay::Color, lay::Color> > &a, const std::pair <double, std::pair<lay::Color, lay::Color> > &b) const
+  {
+    return a.first < b.first;
+  }
+};
+
+}
+
+lay::Color
+interpolated_color (const DataMapping::false_color_nodes_type &nodes, double x)
+{
+  if (nodes.size () < 1) {
+    return lay::Color ();
+  } else if (nodes.size () < 2) {
+    return x < nodes[0].first ? nodes[0].second.first : nodes[0].second.second;
+  } else {
+
+    std::vector<std::pair<double, std::pair<lay::Color, lay::Color> > >::const_iterator p = std::lower_bound (nodes.begin (), nodes.end (), std::make_pair (x, std::make_pair (lay::Color (), lay::Color ())), compare_first_of_node ());
+    if (p == nodes.end ()) {
+      return nodes.back ().second.second;
+    } else if (p == nodes.begin ()) {
+      return nodes.front ().second.first;
+    } else {
+
+      double x1 = p[-1].first;
+      double x2 = p->first;
+
+      unsigned int h1 = 0, s1 = 0, v1 = 0;
+      p[-1].second.second.get_hsv (h1, s1, v1);
+
+      unsigned int h2 = 0, s2 = 0, v2 = 0;
+      p->second.first.get_hsv (h2, s2, v2);
+
+      int h = int (0.5 + h1 + double(x - x1) * double (h2 - h1) / double(x2 - x1));
+      int s = int (0.5 + s1 + double(x - x1) * double (s2 - s1) / double(x2 - x1));
+      int v = int (0.5 + v1 + double(x - x1) * double (v2 - v1) / double(x2 - x1));
+
+      return lay::Color::from_hsv ((unsigned int) h, (unsigned int) s, (unsigned int) v);
+
+    }
+
+  }
 }
 
 // --------------------------------------------------------------------------------------
@@ -690,7 +741,7 @@ private:
 
 static size_t make_id ()
 {
-  static QMutex id_lock;
+  static tl::Mutex id_lock;
   static size_t s_id_counter = 1;
 
   //  Get a new Id for the object. Id == 0 is reserved.
@@ -1283,7 +1334,7 @@ Object::from_string (const char *str, const char *base_dir)
 
         double x = 0.0;
         lay::ColorConverter cc;
-        QColor cl, cr;
+        lay::Color cl, cr;
         std::string s;
 
         m_data_mapping.false_color_nodes.clear ();
@@ -1654,7 +1705,7 @@ Object::to_string () const
     for (unsigned int i = 0; i < data_mapping ().false_color_nodes.size (); ++i) {
       os << data_mapping ().false_color_nodes[i].first;
       os << ",";
-      const std::pair<QColor, QColor> &clr = data_mapping ().false_color_nodes[i].second;
+      const std::pair<lay::Color, lay::Color> &clr = data_mapping ().false_color_nodes[i].second;
       os << tl::to_word_or_quoted_string (cc.to_string (clr.first));
       if (clr.first != clr.second) {
         os << ",";

@@ -373,7 +373,7 @@ namespace {
 
   struct ColorMapConverter
   {
-    std::string to_string (const std::pair<double, std::pair<QColor, QColor> > &cm) const
+    std::string to_string (const std::pair<double, std::pair<lay::Color, lay::Color> > &cm) const
     {
       std::string s;
       s = tl::to_string (cm.first);
@@ -389,7 +389,7 @@ namespace {
       return s;
     }
 
-    void from_string (const std::string &s, std::pair<double, std::pair<QColor, QColor> > &cm) const
+    void from_string (const std::string &s, std::pair<double, std::pair<lay::Color, lay::Color> > &cm) const
     {
       tl::Extractor ex (s.c_str ());
 
@@ -427,7 +427,7 @@ tl::XMLStruct<ImageProxy> s_img_structure ("image-data",
   tl::make_member (&ImageProxy::max_value, &ImageProxy::set_max_value, "max-value") +
   tl::make_element (&ImageProxy::data_mapping, &ImageProxy::set_data_mapping, "data-mapping",
     tl::make_element (&img::DataMapping::false_color_nodes, "color-map",
-      tl::make_member<std::pair<double, std::pair<QColor, QColor> >, img::DataMapping::false_color_nodes_type::const_iterator, img::DataMapping::false_color_nodes_type, ColorMapConverter> (&img::DataMapping::false_color_nodes_type::begin, &img::DataMapping::false_color_nodes_type::end, &img::DataMapping::false_color_nodes_type::push_back, "color-map-entry", ColorMapConverter ())
+      tl::make_member<std::pair<double, std::pair<lay::Color, lay::Color> >, img::DataMapping::false_color_nodes_type::const_iterator, img::DataMapping::false_color_nodes_type, ColorMapConverter> (&img::DataMapping::false_color_nodes_type::begin, &img::DataMapping::false_color_nodes_type::end, &img::DataMapping::false_color_nodes_type::push_back, "color-map-entry", ColorMapConverter ())
     ) +
     tl::make_member (&img::DataMapping::brightness, "brightness") +
     tl::make_member (&img::DataMapping::contrast, "contrast") +

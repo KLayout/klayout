@@ -142,6 +142,19 @@ public:
     return (m_color & 0xff);
   }
 
+  /**
+   *  @brief Gets the HSV color components
+   *  hue: 0..359
+   *  saturation: 0..255
+   *  value: 0..255
+   */
+  void get_hsv (unsigned int &hue, unsigned int &saturation, unsigned int &value) const;
+
+  /**
+   *  @brief Creates the color from a HSV color
+   */
+  static lay::Color from_hsv (unsigned int hue, unsigned int saturation, unsigned int value);
+
 private:
   color_t m_color;
 };

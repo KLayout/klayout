@@ -24,6 +24,8 @@
 #define HDR_imgWidgets
 
 #include "layWidgets.h"
+#include "layColor.h"
+#include "imgObject.h"
 
 #include <QObject>
 #include <QWidget>
@@ -37,13 +39,6 @@ class QPaintEvent;
 
 namespace img
 {
-
-/**
- *  @brief A helper function to interpolate a color in the color bar at a given x
- *
- *  TODO: move this somewhere else.
- */
-QColor interpolated_color (const std::vector<std::pair <double, std::pair<QColor, QColor> > > &nodes, double x);
 
 /**
  *  @brief A two-color widget
@@ -114,9 +109,9 @@ public:
     return m_selected >= 0;
   }
 
-  void set_nodes (const std::vector <std::pair <double, std::pair<QColor, QColor> > > &nodes);
+  void set_nodes (const std::vector <std::pair <double, std::pair<lay::Color, lay::Color> > > &nodes);
 
-  const std::vector <std::pair <double, std::pair<QColor, QColor> > > &nodes () const
+  const std::vector <std::pair <double, std::pair<lay::Color, lay::Color> > > &nodes () const
   {
     return m_nodes;
   }
@@ -135,7 +130,7 @@ signals:
 private:
   bool m_dragging;
   int m_selected;
-  std::vector <std::pair <double, std::pair<QColor, QColor> > > m_nodes;
+  std::vector <std::pair <double, std::pair<lay::Color, lay::Color> > > m_nodes;
   std::vector <size_t> m_histogram;
 };
 

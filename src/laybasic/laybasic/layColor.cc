@@ -23,6 +23,7 @@
 
 #include "layColor.h"
 #include "tlString.h"
+#include "tlMath.h"
 
 #include <ctype.h>
 
@@ -114,6 +115,84 @@ bool
 Color::is_valid () const
 {
   return (m_color & 0xff000000) != 0;
+}
+
+void
+Color::get_hsv (unsigned int &hue, unsigned int &saturation, unsigned int &value) const
+{
+  double r = double (red ()) / 255.0;
+  double g = double (green ()) / 255.0;
+  double b = double (blue ()) / 255.0;
+
+  double max = std::max (r, std::max (g, b));
+  double min = std::min (r, std::min (g, b));
+  double delta = max - min;
+
+  value = (unsigned int) tl::round (255.0 * max, 1);
+  hue = 0;
+  saturation = 0;
+
+  if (! tl::equal (delta, 0.0)) {
+
+    saturation = (unsigned int) tl::round (255.0 * delta / max, 1);
+    double h = 0.0;
+    if (tl::equal (r, max)) {
+      h = (g - b) / delta;
+    } else if (tl::equal (g, max)) {
+      h = 2.0f + (b - r) / delta;
+    } else if (tl::equal (b, max)) {
+      h = 4.0f + (r - g) / delta;
+    }
+    h *= 60.0;
+    if (tl::less (h, 0.0)) {
+      h += 360.0;
+    }
+
+    hue = (unsigned int) tl::round (h, 1);
+
+  }
+}
+
+static lay::Color color_d (double r, double g, double b)
+{
+  return lay::Color (tl::round (r * 255.0, 1), tl::round (g * 255.0, 1), tl::round (b * 255.0, 1));
+}
+
+lay::Color
+Color::from_hsv (unsigned int hue, unsigned int saturation, unsigned int value)
+{
+  if (saturation == 0) {
+    return lay::Color (value, value, value);
+  }
+
+  hue = (hue + 360) % 360;
+
+  double h = double (hue) / 60.0;
+  double s = double (saturation) / 255.0;
+  double v = double (value) / 255.0;
+
+  int i = int (tl::round_down (h, 1));
+  double f = (i & 1) != 0 ? h - i : 1.0 - h + i;
+  double p = v * (1.0 - s);
+  double q = v * (1.0 - s * f);
+
+  switch (i) {
+  case 0:
+    return color_d (v, q, p);
+  case 1:
+    return color_d (q, v, p);
+  case 2:
+    return color_d (p, v, q);
+  case 3:
+    return color_d (p, q, v);
+  case 4:
+    return color_d (q, p, v);
+  case 5:
+    return color_d (v, p, q);
+  default:
+    return lay::Color ();
+  }
+
 }
 
 }

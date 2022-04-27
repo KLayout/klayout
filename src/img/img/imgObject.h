@@ -33,12 +33,10 @@
 #include "dbMatrix.h"
 #include "dbPolygon.h"
 #include "tlDataMapping.h"
-#include "layViewOp.h"
+#include "layColor.h"
 
 #include <string>
 #include <vector>
-
-#include <QColor>
 
 namespace img {
   
@@ -52,7 +50,7 @@ class DataHeader;
 struct IMG_PUBLIC DataMapping
 {
 public:
-  typedef std::vector< std::pair<double, std::pair<QColor, QColor> > > false_color_nodes_type;
+  typedef std::vector< std::pair<double, std::pair<lay::Color, lay::Color> > > false_color_nodes_type;
 
   /**
    *  @brief The constructor
@@ -138,6 +136,11 @@ public:
    */
   tl::DataMappingBase *create_data_mapping (bool monochrome, double xmin, double xmax, unsigned int channel) const;
 };
+
+/**
+ *  @brief A helper function to interpolate a color in the color bar at a given x
+ */
+lay::Color interpolated_color (const DataMapping::false_color_nodes_type &nodes, double x);
 
 /**
  *  @brief A image object

@@ -735,9 +735,9 @@ PropertiesPage::blue_spinbox_changed (double value)
 void  
 PropertiesPage::black_to_white ()
 {
-  std::vector <std::pair <double, std::pair<QColor, QColor> > > nodes;
-  nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (0, 0, 0), QColor (0, 0, 0))));
-  nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (255, 255, 255), QColor (255, 255, 255))));
+  std::vector <std::pair <double, std::pair<lay::Color, lay::Color> > > nodes;
+  nodes.push_back (std::make_pair (0.0, std::make_pair (lay::Color (0, 0, 0), lay::Color (0, 0, 0))));
+  nodes.push_back (std::make_pair (1.0, std::make_pair (lay::Color (255, 255, 255), lay::Color (255, 255, 255))));
   false_color_control->set_nodes (nodes);
   emit edited ();
 }
@@ -745,9 +745,9 @@ PropertiesPage::black_to_white ()
 void  
 PropertiesPage::white_to_black ()
 {
-  std::vector <std::pair <double, std::pair<QColor, QColor> > > nodes;
-  nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (255, 255, 255), QColor (255, 255, 255))));
-  nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (0, 0, 0), QColor (0, 0, 0))));
+  std::vector <std::pair <double, std::pair<lay::Color, lay::Color> > > nodes;
+  nodes.push_back (std::make_pair (0.0, std::make_pair (lay::Color (255, 255, 255), lay::Color (255, 255, 255))));
+  nodes.push_back (std::make_pair (1.0, std::make_pair (lay::Color (0, 0, 0), lay::Color (0, 0, 0))));
   false_color_control->set_nodes (nodes);
   emit edited ();
 }
@@ -755,9 +755,9 @@ PropertiesPage::white_to_black ()
 void  
 PropertiesPage::red_to_blue ()
 {
-  std::vector <std::pair <double, std::pair<QColor, QColor> > > nodes;
-  nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (255, 0, 0), QColor (255, 0, 0))));
-  nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (0, 0, 255), QColor (0, 0, 255))));
+  std::vector <std::pair <double, std::pair<lay::Color, lay::Color> > > nodes;
+  nodes.push_back (std::make_pair (0.0, std::make_pair (lay::Color (255, 0, 0), lay::Color (255, 0, 0))));
+  nodes.push_back (std::make_pair (1.0, std::make_pair (lay::Color (0, 0, 255), lay::Color (0, 0, 255))));
   false_color_control->set_nodes (nodes);
   emit edited ();
 }
@@ -765,9 +765,9 @@ PropertiesPage::red_to_blue ()
 void  
 PropertiesPage::blue_to_red ()
 {
-  std::vector <std::pair <double, std::pair<QColor, QColor> > > nodes;
-  nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (0, 0, 255), QColor (0, 0, 255))));
-  nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (255, 0, 0), QColor (255, 0, 0))));
+  std::vector <std::pair <double, std::pair<lay::Color, lay::Color> > > nodes;
+  nodes.push_back (std::make_pair (0.0, std::make_pair (lay::Color (0, 0, 255), lay::Color (0, 0, 255))));
+  nodes.push_back (std::make_pair (1.0, std::make_pair (lay::Color (255, 0, 0), lay::Color (255, 0, 0))));
   false_color_control->set_nodes (nodes);
   emit edited ();
 }
@@ -775,7 +775,7 @@ PropertiesPage::blue_to_red ()
 void  
 PropertiesPage::reverse_color_order ()
 {
-  std::vector <std::pair <double, std::pair<QColor, QColor> > > nodes (false_color_control->nodes ());
+  std::vector <std::pair <double, std::pair<lay::Color, lay::Color> > > nodes (false_color_control->nodes ());
   for (size_t i = 0; i < nodes.size () / 2; ++i) {
     std::swap (nodes [i].second.second, nodes [nodes.size () - 1 - i].second.first);
     std::swap (nodes [i].second.first, nodes [nodes.size () - 1 - i].second.second);

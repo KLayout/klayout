@@ -18,11 +18,6 @@ jobs:
         os: [ubuntu-latest]
 
     steps:
-      - name: Set up GCC
-        uses: egor-tensin/setup-gcc@v1
-        with:
-          version: latest
-          platform: x64
       - name: Cancel Workflow Action
         uses: styfle/cancel-workflow-action@0.9.1
       - uses: actions/checkout@v2
@@ -33,9 +28,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install setuptools wheel twine
-          set "KLAYOUT_BITS=%cd%\klayout-microbits\klayout-microbits-1.0\msvc2017\%PYTHON_ARCHITECTURE%"
-          echo KLAYOUT_BITS=%KLAYOUT_BITS%
           pip install -e . --no-index 
+          sudo apt install build-essential
       - name: Test with pytest
         run: |
           python testdata/pymod/import_db.py

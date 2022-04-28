@@ -18,6 +18,11 @@ jobs:
         os: [ubuntu-latest]
 
     steps:
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: latest
+          platform: x64
       - name: Cancel Workflow Action
         uses: styfle/cancel-workflow-action@0.9.1
       - uses: actions/checkout@v2

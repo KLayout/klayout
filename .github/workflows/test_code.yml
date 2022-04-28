@@ -1,0 +1,40 @@
+---
+name: Lint and Test
+# https://docs.github.com/en/free-pro-team@latest/actions/guides/building-and-testing-python
+
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: 0 2 * * * # run at 2 AM UTC
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 12
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+        os: [ubuntu-latest]
+
+    steps:
+      - name: Cancel Workflow Action
+        uses: styfle/cancel-workflow-action@0.9.1
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install setuptools wheel twine
+          set "KLAYOUT_BITS=%cd%\klayout-microbits\klayout-microbits-1.0\msvc2017\%PYTHON_ARCHITECTURE%"
+          echo KLAYOUT_BITS=%KLAYOUT_BITS%
+          pip install klayout --no-index -f dist
+      - name: Test with pytest
+        run: |
+          python testdata/pymod/import_db.py
+          python testdata/pymod/import_rdb.py
+          python testdata/pymod/import_tl.py
+          python testdata/pymod/import_lib.py
+          python testdata/pymod/pya_tests.py

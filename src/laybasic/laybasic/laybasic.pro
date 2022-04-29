@@ -273,6 +273,7 @@ SOURCES += \
     layStipplePalette.cc \
     layStream.cc \
     layCanvasPlane.cc \
+    layLayoutViewBase.cc \
     layLayerProperties.cc \
     layViewObject.cc \
     layViewOp.cc \
@@ -289,6 +290,7 @@ HEADERS += \
     layEditable.h \
     layFinder.h \
     layFixedFont.h \
+    layLayoutViewBase.h \
     layLineStylePalette.h \
     layLineStyles.h \
     layMarker.h \

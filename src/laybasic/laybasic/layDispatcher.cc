@@ -73,27 +73,24 @@ Dispatcher::Dispatcher (DispatcherDelegate *delegate, Plugin *parent, bool stand
   }
 }
 
-#if defined(HAVE_QT)
-Dispatcher::Dispatcher (QWidget *menu_parent_widget, DispatcherDelegate *delegate, Plugin *parent, bool standalone)
-  : Plugin (parent, standalone),
-    mp_menu_parent_widget (menu_parent_widget),
-    mp_delegate (delegate)
-{
-  if (mp_menu_parent_widget) {
-    mp_menu.reset (new lay::AbstractMenu (this));
-  }
-  if (! parent && ! ms_dispatcher_instance) {
-    ms_dispatcher_instance = this;
-  }
-}
-#endif
-
 Dispatcher::~Dispatcher ()
 {
   if (ms_dispatcher_instance == this) {
     ms_dispatcher_instance = 0;
   }
 }
+
+#if defined(HAVE_QT)
+void Dispatcher::set_menu_parent_widget (QWidget *menu_parent_widget)
+{
+  mp_menu_parent_widget = menu_parent_widget;
+  if (mp_menu_parent_widget) {
+    mp_menu.reset (new lay::AbstractMenu (this));
+  } else {
+    mp_menu.reset (0);
+  }
+}
+#endif
 
 bool
 Dispatcher::configure (const std::string &name, const std::string &value)

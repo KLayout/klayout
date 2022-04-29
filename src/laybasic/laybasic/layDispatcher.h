@@ -121,33 +121,12 @@ public:
    */
   Dispatcher (Plugin *parent = 0, bool standalone = false);
 
-#if defined(HAVE_QT)
-  /**
-   *  @brief The constructor
-   *
-   *  @param menu_parent_widget If not 0, indicates that this is a GUI mode dispatcher providing an abstract menu
-   *  @param parent Usually 0, but a dispatcher may have parents. In this case, the dispatcher is not the actual dispatcher, but the real plugin chain's root is.
-   *  @param standalone The standalone flag passed to the plugin constructor.
-   */
-  Dispatcher (QWidget *menu_parent_widget, Plugin *parent = 0, bool standalone = false);
-#endif
-
   /**
    *  @brief The root constructor
    *
    *  @param delegate The notification receiver for dispatcher events
    */
   Dispatcher (DispatcherDelegate *delegate, Plugin *parent = 0, bool standalone = false);
-
-#if defined(HAVE_QT)
-  /**
-   *  @brief The root constructor
-   *
-   *  @param menu_parent_widget If not 0, indicates that this is a GUI mode dispatcher providing an abstract menu
-   *  @param delegate The notification receiver for dispatcher events
-   */
-  Dispatcher (QWidget *menu_parent_widget, DispatcherDelegate *delegate, Plugin *parent = 0, bool standalone = false);
-#endif
 
   /**
    *  @brief Destructor
@@ -232,6 +211,11 @@ public:
   {
     return mp_menu_parent_widget;
   }
+
+  /**
+   *  @brief Sets the parent widget
+   */
+  void set_menu_parent_widget (QWidget *pw);
 
   /**
    *  @brief Returns true, if the dispatcher supplies a user interface

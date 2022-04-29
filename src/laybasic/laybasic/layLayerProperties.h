@@ -48,7 +48,7 @@ namespace tl {
 
 namespace lay {
 
-class LayoutView;
+class LayoutViewBase;
 class LayerPropertiesList;
 class LayerPropertiesNode;
 
@@ -700,7 +700,7 @@ public:
    *  If it is set to false, the view's always_show_source attribute with determine whether the source is 
    *  shown.
    */
-  std::string display_string (const lay::LayoutView *view, bool real, bool always_with_source = false) const;
+  std::string display_string (const lay::LayoutViewBase *view, bool real, bool always_with_source = false) const;
   
   /**
    *  @brief The source specification 
@@ -717,7 +717,7 @@ public:
    *
    *  This method may throw an exception if the specification
    *  is not valid. In order to make the layer usable, the properties
-   *  object must be "realized" with respect to a LayoutView object.
+   *  object must be "realized" with respect to a LayoutViewBase object.
    */
   void set_source (const std::string &s);
   
@@ -725,7 +725,7 @@ public:
    *  @brief Load the source specification 
    *
    *  In order to make the layer usable, the properties
-   *  object must be "realized" with respect to a LayoutView object.
+   *  object must be "realized" with respect to a LayoutViewBase object.
    */
   void set_source (const lay::ParsedLayerSource &s);
   
@@ -887,7 +887,7 @@ protected:
    *
    *  @param view The view the properties refer to or 0 if there is no view.
    */
-  void do_realize (const LayoutView *view) const;
+  void do_realize (const LayoutViewBase *view) const;
 
   /** 
    *  @brief Tell, if a realize of the visual properties is needed
@@ -1172,12 +1172,12 @@ public:
    *  compute the actual property selection set.
    *  This method is supposed to be 
    */
-  void attach_view (LayoutView *view, unsigned int list_index);
+  void attach_view (LayoutViewBase *view, unsigned int list_index);
 
   /**
    *  @brief Gets the layout view the node lives in
    */
-  LayoutView *view () const;
+  LayoutViewBase *view () const;
 
   /**
    *  @brief Gets the index of the layer properties list that node lives in
@@ -1214,7 +1214,7 @@ protected:
 
 private:
   //  A reference to the view 
-  tl::weak_ptr<lay::LayoutView> mp_view;
+  tl::weak_ptr<lay::LayoutViewBase> mp_view;
   unsigned int m_list_index;
   //  the parent node
   tl::weak_ptr<LayerPropertiesNode> mp_parent;
@@ -1912,12 +1912,12 @@ public:
    *  "load" automatically attaches the view.
    *  This method has the side effect of recomputing the layer source parameters.
    */
-  void attach_view (lay::LayoutView *view, unsigned int list_index);
+  void attach_view (lay::LayoutViewBase *view, unsigned int list_index);
 
   /**
    *  @brief Gets the layout view this list is attached to
    */
-  lay::LayoutView *view () const;
+  lay::LayoutViewBase *view () const;
 
   /**
    *  @brief Gets the layout list
@@ -1925,7 +1925,7 @@ public:
   unsigned int list_index () const;
 
 private:
-  tl::weak_ptr<lay::LayoutView> mp_view;
+  tl::weak_ptr<lay::LayoutViewBase> mp_view;
   unsigned int m_list_index;
   layer_list m_layer_properties;
   lay::DitherPattern m_dither_pattern;

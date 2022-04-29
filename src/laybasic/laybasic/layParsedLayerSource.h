@@ -43,7 +43,7 @@ namespace lay
 {
 
 class LayerProperties;
-class LayoutView;
+class LayoutViewBase;
 class PropertySelectorBase;
 
 /**
@@ -640,7 +640,7 @@ public:
    *  This method delivers a display version that may be abbreviated and is supposed
    *  to be used in the layer list display.
    */
-  std::string display_string (const lay::LayoutView *view) const;
+  std::string display_string (const lay::LayoutViewBase *view) const;
 
   /**
    *  @brief Comparison (equality)

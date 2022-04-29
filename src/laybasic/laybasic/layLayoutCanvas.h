@@ -47,7 +47,7 @@
 namespace lay
 {
 
-class LayoutView;
+class LayoutViewBase;
 class RedrawThread;
 
 /**
@@ -138,10 +138,16 @@ class LayoutCanvas
     public lay::BitmapRedrawThreadCanvas,
     public lay::Drawings
 {
+#if defined(HAVE_QT)
 Q_OBJECT
+#endif
 
 public:
-  LayoutCanvas (QWidget *parent, lay::LayoutView *view, const char *name = "canvas");
+#if defined(HAVE_QT)
+  LayoutCanvas (QWidget *parent, lay::LayoutViewBase *view, const char *name = "canvas");
+#else
+  LayoutCanvas (lay::LayoutViewBase *view, const char *name = "canvas");
+#endif
   ~LayoutCanvas ();
 
   void set_colors (lay::Color background, lay::Color foreground, lay::Color active);
@@ -341,18 +347,18 @@ public:
    */
   tl::Event viewport_changed_event;
 
-signals:
-  void left_arrow_key_pressed ();
-  void up_arrow_key_pressed ();
-  void right_arrow_key_pressed ();
-  void down_arrow_key_pressed ();
-  void left_arrow_key_pressed_with_shift ();
-  void up_arrow_key_pressed_with_shift ();
-  void right_arrow_key_pressed_with_shift ();
-  void down_arrow_key_pressed_with_shift ();
+  //  key events
+  tl::Event left_arrow_key_pressed;
+  tl::Event up_arrow_key_pressed;
+  tl::Event right_arrow_key_pressed;
+  tl::Event down_arrow_key_pressed;
+  tl::Event left_arrow_key_pressed_with_shift;
+  tl::Event up_arrow_key_pressed_with_shift;
+  tl::Event right_arrow_key_pressed_with_shift;
+  tl::Event down_arrow_key_pressed_with_shift;
 
 private:
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   QImage *mp_image;
   QImage *mp_image_bg;
   QPixmap *mp_pixmap;

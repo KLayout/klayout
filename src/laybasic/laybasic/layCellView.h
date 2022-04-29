@@ -46,7 +46,7 @@
 namespace lay 
 {
 
-class LayoutView;
+class LayoutViewBase;
 
 /**
  *  @brief A layout handle
@@ -581,7 +581,7 @@ public:
    *  @param cv The reference to the target cellview
    *  @param view The reference to the layout view
    */
-  CellViewRef (lay::CellView *cv, lay::LayoutView *view);
+  CellViewRef (lay::CellView *cv, lay::LayoutViewBase *view);
 
   /**
    *  @brief Gets the cellview index of this reference
@@ -590,9 +590,9 @@ public:
   int index () const;
 
   /**
-   *  @brief Gets the LayoutView the reference is pointing to
+   *  @brief Gets the LayoutViewBase the reference is pointing to
    */
-  lay::LayoutView *view ();
+  lay::LayoutViewBase *view ();
 
   /**
    *  @brief Equality: Gives true, if the cellviews are identical
@@ -749,7 +749,7 @@ public:
 
 private:
   tl::weak_ptr<lay::CellView> mp_cv;
-  tl::weak_ptr<lay::LayoutView> mp_view;
+  tl::weak_ptr<lay::LayoutViewBase> mp_view;
 };
 
 }

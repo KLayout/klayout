@@ -22,7 +22,7 @@
 
 
 #include "layParsedLayerSource.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "tlString.h"
 #include "tlGlobPattern.h"
 
@@ -1163,7 +1163,7 @@ ParsedLayerSource::to_string () const
 }
 
 std::string
-ParsedLayerSource::display_string (const lay::LayoutView *view) const
+ParsedLayerSource::display_string (const lay::LayoutViewBase *view) const
 {
   std::string r;
 

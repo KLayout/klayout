@@ -136,7 +136,7 @@ protected:
     return m_max_level;
   }
 
-  lay::LayoutView *view () const
+  lay::LayoutViewBase *view () const
   {
     return mp_view;
   }
@@ -153,7 +153,7 @@ protected:
    *  path of instantiations up to the top cell is maintained and accessible by
    *  the path() accessor.
    */
-  void start (lay::LayoutView *view, const lay::CellView &cv, unsigned int cv_index, const std::vector<db::ICplxTrans> &trans, const db::Box &region, int min_level, int max_level, const std::vector<int> &layers = std::vector<int> ());
+  void start (LayoutViewBase *view, const lay::CellView &cv, unsigned int cv_index, const std::vector<db::ICplxTrans> &trans, const db::Box &region, int min_level, int max_level, const std::vector<int> &layers = std::vector<int> ());
 
   /**
    *  @brief Provide a basic edge test facility
@@ -186,7 +186,7 @@ private:
   int m_min_level, m_max_level;
   std::vector<db::InstElement> m_path;
   const db::Layout *mp_layout;
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   unsigned int m_cv_index;
   db::Box m_region;
   std::vector<int> m_layers;
@@ -214,8 +214,8 @@ public:
 
   ShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator::flags_type flags, const std::set<lay::ObjectInstPath> *excludes = 0);
 
-  bool find (lay::LayoutView *view, const lay::LayerProperties &lprops, const db::DBox &region_mu);
-  bool find (lay::LayoutView *view, const db::DBox &region_mu);
+  bool find (LayoutViewBase *view, const lay::LayerProperties &lprops, const db::DBox &region_mu);
+  bool find (LayoutViewBase *view, const db::DBox &region_mu);
 
   iterator begin () const
   {
@@ -262,13 +262,13 @@ protected:
 
 private:
   virtual void visit_cell (const db::Cell &cell, const db::Box &search_box, const db::ICplxTrans &t, int /*level*/);
-  bool find_internal (lay::LayoutView *view, 
-                      unsigned int cv_index, 
-                      const std::set<db::properties_id_type> *prop_sel, 
-                      bool inv_prop_sel, 
+  bool find_internal (LayoutViewBase *view,
+                      unsigned int cv_index,
+                      const std::set<db::properties_id_type> *prop_sel,
+                      bool inv_prop_sel,
                       const lay::HierarchyLevelSelection &hier_sel,
                       const std::vector<db::DCplxTrans> &trans_mu,
-                      const std::vector<int> &layers, 
+                      const std::vector<int> &layers,
                       const db::DBox &region_mu);
 
   const std::set<lay::ObjectInstPath> *mp_excludes;
@@ -300,8 +300,8 @@ public:
 
   InstFinder (bool point_mode, bool top_level_sel, bool full_arrays, bool enclose_inst = true, const std::set<lay::ObjectInstPath> *excludes = 0, bool visible_layers = false);
 
-  bool find (lay::LayoutView *view, unsigned int cv_index, const db::DCplxTrans &trans, const db::DBox &region_mu);
-  bool find (lay::LayoutView *view, const db::DBox &region_mu);
+  bool find (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTrans &trans, const db::DBox &region_mu);
+  bool find (LayoutViewBase *view, const db::DBox &region_mu);
  
   iterator begin () const
   {
@@ -315,7 +315,7 @@ public:
 
 private:
   virtual void visit_cell (const db::Cell &cell, const db::Box &search_box, const db::ICplxTrans &t, int level);
-  bool find_internal (lay::LayoutView *view, unsigned int cv_index, const db::DCplxTrans &trans_mu, const db::DBox &region_mu);
+  bool find_internal (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTrans &trans_mu, const db::DBox &region_mu);
 
   unsigned int m_cv_index;
   db::cell_index_type m_topcell;
@@ -326,7 +326,7 @@ private:
   bool m_enclose_insts;
   bool m_visible_layers;
   std::vector<int> m_visible_layer_indexes;
-  lay::LayoutView *mp_view;
+  LayoutViewBase *mp_view;
   tl::AbsoluteProgress *mp_progress;
 };
 

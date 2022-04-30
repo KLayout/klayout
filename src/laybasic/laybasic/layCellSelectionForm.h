@@ -49,7 +49,7 @@ class LAYBASIC_PUBLIC CellSelectionForm
   Q_OBJECT 
 
 public:
-  CellSelectionForm (QWidget *parent, lay::LayoutView *view, const char *name, bool simple_mode = false);
+  CellSelectionForm (QWidget *parent, LayoutView *view, const char *name, bool simple_mode = false);
 
   /**
    *  @brief Obtain the selected cellview's index (with changes)

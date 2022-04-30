@@ -60,7 +60,7 @@ ac_from_buttons (unsigned int buttons)
 
 // -------------------------------------------------------------
 
-Service::Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator::flags_type flags)
+Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type flags)
   : lay::EditorServiceBase (view),
     db::Object (manager),
     mp_view (view),
@@ -80,7 +80,7 @@ Service::Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator
   //  .. nothing yet ..
 }
 
-Service::Service (db::Manager *manager, lay::LayoutView *view)
+Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
   : lay::EditorServiceBase (view),
     db::Object (manager),
     mp_view (view),
@@ -312,7 +312,7 @@ Service::copy ()
 void
 Service::copy_selected ()
 {
-  edt::CopyModeDialog mode_dialog (view ());
+  edt::CopyModeDialog mode_dialog (view ()->widget ());
 
   bool need_to_ask_for_copy_mode = false;
   unsigned int inst_mode = 0;

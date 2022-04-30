@@ -48,6 +48,7 @@ namespace lay
 {
 
 class LayoutView;
+class LayoutViewBase;
 class LayerPropertiesConstIterator;
 
 /**
@@ -108,7 +109,7 @@ public:
   /**
    *  @brief Provides an icon for a given layer style
    */
-  static QIcon icon_for_layer (const lay::LayerPropertiesConstIterator &iter, lay::LayoutView *view, unsigned int w, unsigned int h, unsigned int di_offset, bool no_state = false);
+  static QIcon icon_for_layer (const lay::LayerPropertiesConstIterator &iter, lay::LayoutViewBase *view, unsigned int w, unsigned int h, unsigned int di_offset, bool no_state = false);
 
   /**
    *  @brief Gets the preferred icon size

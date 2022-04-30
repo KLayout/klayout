@@ -299,8 +299,8 @@ gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
 
 class ImageRef;
 
-static void replace_image (lay::LayoutView *view, size_t id, ImageRef &new_obj);
-static void erase_image (lay::LayoutView *view, size_t id);
+static void replace_image_base (lay::LayoutViewBase *view, size_t id, ImageRef &new_obj);
+static void erase_image_base (lay::LayoutViewBase *view, size_t id);
 
 /**
  *  @brief An extension of the img::Object that provides "live" updates of the view
@@ -321,7 +321,7 @@ public:
     //  .. nothing yet ..
   }
 
-  ImageRef (const img::Object &other, lay::LayoutView *view)
+  ImageRef (const img::Object &other, lay::LayoutViewBase *view)
     : img::Object (other), mp_view (view), dm_update_view (this, &ImageRef::do_update_view)
   {
     //  .. nothing yet ..
@@ -365,7 +365,7 @@ public:
   void erase ()
   {
     if (mp_view) {
-      erase_image (mp_view.get (), id ());
+      erase_image_base (mp_view.get (), id ());
       detach ();
     }
   }
@@ -373,7 +373,7 @@ public:
   template <class T>
   ImageRef transformed (const T &t) const
   {
-    return ImageRef (img::Object::transformed<T> (t), const_cast<lay::LayoutView *> (mp_view.get ()));
+    return ImageRef (img::Object::transformed<T> (t), const_cast<lay::LayoutViewBase *> (mp_view.get ()));
   }
 
   void set_view (lay::LayoutView *view)
@@ -398,12 +398,12 @@ protected:
   void do_update_view ()
   {
     if (mp_view) {
-      replace_image (mp_view.get (), id (), *this);
+      replace_image_base (mp_view.get (), id (), *this);
     }
   }
 
 private:
-  tl::weak_ptr<lay::LayoutView> mp_view;
+  tl::weak_ptr<lay::LayoutViewBase> mp_view;
   tl::DeferredMethod<ImageRef> dm_update_view;
 };
 
@@ -1114,7 +1114,7 @@ static void show_image (lay::LayoutView *view, size_t id, bool visible)
   }
 }
 
-static void replace_image (lay::LayoutView *view, size_t id, ImageRef &new_obj)
+void replace_image_base (lay::LayoutViewBase *view, size_t id, ImageRef &new_obj)
 {
   img::Service *img_service = view->get_plugin <img::Service> ();
   if (img_service) {
@@ -1129,7 +1129,12 @@ static void replace_image (lay::LayoutView *view, size_t id, ImageRef &new_obj)
   }
 }
 
-static void erase_image (lay::LayoutView *view, size_t id)
+static void replace_image (lay::LayoutView *view, size_t id, ImageRef &new_obj)
+{
+  replace_image_base (view, id, new_obj);
+}
+
+void erase_image_base (lay::LayoutViewBase *view, size_t id)
 {
   img::Service *img_service = view->get_plugin <img::Service> ();
   if (img_service) {
@@ -1142,6 +1147,11 @@ static void erase_image (lay::LayoutView *view, size_t id)
     img_service->erase_image_by_id (id);
 
   }
+}
+
+static void erase_image (lay::LayoutView *view, size_t id)
+{
+  erase_image_base (view, id);
 }
 
 static void insert_image (lay::LayoutView *view, ImageRef &obj)

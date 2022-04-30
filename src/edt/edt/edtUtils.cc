@@ -77,7 +77,7 @@ std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::stri
 // -------------------------------------------------------------
 //  SelectionIterator implementation
 
-SelectionIterator::SelectionIterator (lay::LayoutView *view, bool including_transient)
+SelectionIterator::SelectionIterator (lay::LayoutViewBase *view, bool including_transient)
   : m_transient_mode (false)
 {
   mp_edt_services = view->get_plugins <edt::Service> ();
@@ -145,7 +145,7 @@ SelectionIterator::next ()
 //  TransformationsVariants implementation
 //  for a lay::LayoutView
 
-TransformationVariants::TransformationVariants (const lay::LayoutView *view, bool per_cv_and_layer, bool per_cv)
+TransformationVariants::TransformationVariants (const lay::LayoutViewBase *view, bool per_cv_and_layer, bool per_cv)
 {
   //  build the transformation variants cache
 

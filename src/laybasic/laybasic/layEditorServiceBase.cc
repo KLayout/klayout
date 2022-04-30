@@ -202,7 +202,7 @@ private:
 
 // --------------------------------------------------------------------------------------
 
-EditorServiceBase::EditorServiceBase (lay::LayoutView *view)
+EditorServiceBase::EditorServiceBase (LayoutViewBase *view)
   : lay::ViewService (view->view_object_widget ()),
     lay::Editable (view),
     lay::Plugin (view),

@@ -674,7 +674,7 @@ CellViewRef::CellViewRef ()
   // .. nothing yet ..
 }
 
-CellViewRef::CellViewRef (lay::CellView *cv, lay::LayoutView *view)
+CellViewRef::CellViewRef (lay::CellView *cv, lay::LayoutViewBase *view)
   : mp_cv (cv), mp_view (view)
 {
   // .. nothing yet ..
@@ -706,7 +706,7 @@ CellViewRef::index () const
   }
 }
 
-lay::LayoutView *
+lay::LayoutViewBase *
 CellViewRef::view ()
 {
   return mp_view.get ();

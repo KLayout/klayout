@@ -360,15 +360,21 @@ ShapePropertiesPage::update_shape ()
 void
 ShapePropertiesPage::show_inst ()
 {
+  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (mp_service->view ());
+  tl_assert (lv != 0);
+
   InstantiationForm inst_form (this);
-  inst_form.show (mp_service->view (), *m_selection_ptrs [m_index]);
+  inst_form.show (lv, *m_selection_ptrs [m_index]);
 }
 
 void
 ShapePropertiesPage::show_props ()
 {
+  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (mp_service->view ());
+  tl_assert (lv != 0);
+
   lay::UserPropertiesForm props_form (this);
-  if (props_form.show (mp_service->view (), m_selection_ptrs [m_index]->cv_index (), m_prop_id)) {
+  if (props_form.show (lv, m_selection_ptrs [m_index]->cv_index (), m_prop_id)) {
     emit edited ();
   }
 }

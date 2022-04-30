@@ -323,9 +323,19 @@ public:
   void remove_unused_layers ();
 
   /**
+   *  @brief Internal method: check, if the layer tree is and an consistent state.
+   *
+   *  This method is used by the layer tree model to check, if the tree has been brought into
+   *  a consistent state.
+   *  HINT: for the layout this is solved more consistently with the "under construction" attribute
+   *  of the layout. There is no equivalent object for the layer tree currently.
+   */
+  bool layer_model_updated ();
+
+  /**
    *  @brief Returns true, if the layer source shall be shown always in the layer properties tree
    */
-  bool always_show_source () const
+  virtual bool always_show_source () const
   {
     return m_always_show_source;
   }
@@ -333,7 +343,7 @@ public:
   /**
    *  @brief Returns true, if the layer/datatype shall be shown always in the layer properties tree
    */
-  bool always_show_ld () const
+  virtual bool always_show_ld () const
   {
     return m_always_show_ld;
   }
@@ -341,7 +351,7 @@ public:
   /**
    *  @brief Returns true, if the layout index shall be shown always in the layer properties tree
    */
-  bool always_show_layout_index () const
+  virtual bool always_show_layout_index () const
   {
     return m_always_show_layout_index;
   }
@@ -388,6 +398,11 @@ public:
    *  @brief Open the L2NDB browser for a given database and associated cv index
    */
   void open_l2ndb_browser (int l2ndb_index, int cv_index);
+
+  /**
+   *  @brief Gets the editor options pages
+   */
+  lay::EditorOptionsPages *editor_options_pages ();
 
   /**
    *  @brief Gets the container with the layer control panel
@@ -763,7 +778,6 @@ private:
 
   void init_ui ();
   void init_menu ();
-  lay::EditorOptionsPages *editor_options_pages ();
   void do_setup_editor_options_pages ();
 
 protected:

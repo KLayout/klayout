@@ -496,7 +496,7 @@ RedrawThreadWorker::finish ()
 }
 
 void
-RedrawThreadWorker::setup (LayoutView *view, RedrawThreadCanvas *canvas, const std::vector<db::Box> &redraw_region, const db::DCplxTrans &vp_trans)
+RedrawThreadWorker::setup (LayoutViewBase *view, RedrawThreadCanvas *canvas, const std::vector<db::Box> &redraw_region, const db::DCplxTrans &vp_trans)
 {
   m_redraw_region = redraw_region;
   m_vp_trans = vp_trans;

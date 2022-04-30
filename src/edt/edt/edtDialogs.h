@@ -125,7 +125,7 @@ public:
   AlignOptionsDialog (QWidget *parent);
   virtual ~AlignOptionsDialog ();
 
-  bool exec_dialog (lay::LayoutView *view, int &hmode, int &vmode, bool &visible_layers);
+  bool exec_dialog (int &hmode, int &vmode, bool &visible_layers);
 };
 
 /**
@@ -141,7 +141,7 @@ public:
   DistributeOptionsDialog (QWidget *parent);
   virtual ~DistributeOptionsDialog ();
 
-  bool exec_dialog (lay::LayoutView *view, bool &hdistribute, int &hmode, double &hpitch, double &hspace, bool &vdistribute, int &vmode, double &vpitch, double &vspace, bool &visible_layers);
+  bool exec_dialog (bool &hdistribute, int &hmode, double &hpitch, double &hspace, bool &vdistribute, int &vmode, double &vpitch, double &vspace, bool &visible_layers);
 };
 
 /**

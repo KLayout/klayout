@@ -45,7 +45,7 @@ class ShapeEditService
   : public edt::Service
 {
 public:
-  ShapeEditService (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator::flags_type shape_types);
+  ShapeEditService (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type shape_types);
   
 protected:
   void get_edit_layer ();
@@ -86,7 +86,7 @@ class PolygonService
   : public ShapeEditService
 {
 public:
-  PolygonService (db::Manager *manager, lay::LayoutView *view);
+  PolygonService (db::Manager *manager, lay::LayoutViewBase *view);
   
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
   virtual void do_delete ();
@@ -117,7 +117,7 @@ class BoxService
   : public ShapeEditService
 {
 public:
-  BoxService (db::Manager *manager, lay::LayoutView *view);
+  BoxService (db::Manager *manager, lay::LayoutViewBase *view);
   
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
   virtual void do_begin_edit (const db::DPoint &p);
@@ -142,7 +142,7 @@ class TextService
   : public ShapeEditService
 {
 public:
-  TextService (db::Manager *manager, lay::LayoutView *view);
+  TextService (db::Manager *manager, lay::LayoutViewBase *view);
   ~TextService ();
   
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
@@ -174,7 +174,7 @@ class PathService
   : public ShapeEditService
 {
 public:
-  PathService (db::Manager *manager, lay::LayoutView *view);
+  PathService (db::Manager *manager, lay::LayoutViewBase *view);
   ~PathService ();
   
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
@@ -211,7 +211,7 @@ class InstService
   : public edt::Service
 {
 public:
-  InstService (db::Manager *manager, lay::LayoutView *view);
+  InstService (db::Manager *manager, lay::LayoutViewBase *view);
   
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
   virtual void do_begin_edit (const db::DPoint &p);

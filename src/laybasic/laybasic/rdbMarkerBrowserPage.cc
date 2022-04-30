@@ -1620,7 +1620,7 @@ MarkerBrowserPage::set_marker_style (lay::Color color, int line_width, int verte
 }
 
 void 
-MarkerBrowserPage::set_view (lay::LayoutView *view, unsigned int cv_index)
+MarkerBrowserPage::set_view (lay::LayoutViewBase *view, unsigned int cv_index)
 {
   mp_view = view;
   m_cv_index = cv_index;

@@ -274,7 +274,7 @@ invert (unsigned char *data, unsigned int width, unsigned int height)
   }
 }
 
-LayoutCanvas::LayoutCanvas (QWidget *parent, lay::LayoutView *view, const char *name)
+LayoutCanvas::LayoutCanvas (QWidget *parent, lay::LayoutViewBase *view, const char *name)
   : lay::ViewObjectWidget (parent, name), 
     mp_view (view),
     mp_image (0), mp_image_bg (0), mp_pixmap (0), 

@@ -77,8 +77,8 @@ validate_cell_path (const db::Layout &layout, lay::LayoutView::cell_path_type &p
   return false;
 }
 
-LayoutViewFunctions::LayoutViewFunctions (db::Manager *manager, LayoutView *view)
-  : lay::Plugin (view), mp_view (view), mp_manager (manager)
+LayoutViewFunctions::LayoutViewFunctions (db::Manager *manager, LayoutViewBase *view)
+  : lay::Plugin (view), mp_view (dynamic_cast <lay::LayoutView *> (view)), mp_manager (manager)
 {
   m_del_cell_mode = 0;
   m_move_to_origin_mode_x = 0;
@@ -104,6 +104,10 @@ LayoutViewFunctions::~LayoutViewFunctions ()
 void
 LayoutViewFunctions::menu_activated (const std::string &symbol)
 {
+  if (! view ()) {
+    return;
+  }
+
   if (symbol == "cm_show_properties") {
 
     view ()->show_properties (view ());
@@ -2240,7 +2244,7 @@ public:
     }
   }
 
-  lay::Plugin *create_plugin (db::Manager *manager, Dispatcher *, LayoutView *view) const
+  lay::Plugin *create_plugin (db::Manager *manager, Dispatcher *, LayoutViewBase *view) const
   {
     return new LayoutViewFunctions (manager, view);
   }

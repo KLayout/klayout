@@ -149,7 +149,7 @@ public:
   /**
    *  @brief The constructor
    */
-  PartialService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root);
+  PartialService (db::Manager *manager, lay::LayoutViewBase *view, lay::Dispatcher *root);
 
   /**
    *  @brief The destructor
@@ -159,7 +159,7 @@ public:
   /**
    *  @brief Access to the view object
    */
-  lay::LayoutView *view () const
+  lay::LayoutViewBase *view () const
   {
     tl_assert (mp_view != 0);
     return mp_view;
@@ -298,7 +298,7 @@ protected:
 
 private:
   //  The layout view that this service is attached to
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   lay::Dispatcher *mp_root;
   bool m_dragging;
   bool m_keep_selection;

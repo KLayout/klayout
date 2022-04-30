@@ -47,7 +47,7 @@ EditorOptionsFrame::~EditorOptionsFrame ()
 }
 
 void
-EditorOptionsFrame::populate (LayoutView *view)
+EditorOptionsFrame::populate (LayoutViewBase *view)
 {
   std::vector<lay::EditorOptionsPage *> prop_dialog_pages;
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {

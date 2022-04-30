@@ -302,7 +302,7 @@ public:
     menu_entries.push_back (lay::menu_item ("marker_browser::scan_layers_flat", "scan_layers_flat", "tools_menu.shapes_to_markers.end", tl::to_string (QObject::tr ("Flat"))));
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
     return new rdb::MarkerBrowserDialog (root, view);
   }

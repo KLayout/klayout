@@ -41,7 +41,7 @@
 
 namespace ant {
 
-class LayoutView;
+class LayoutViewBase;
 class LayoutCanvas;
 class Service;
 
@@ -201,7 +201,7 @@ public:
    */
   enum MoveMode { MoveNone, MoveP1, MoveP2, MoveP12, MoveP21, MoveP1X, MoveP2X, MoveP1Y, MoveP2Y, MoveRuler, MoveSelected };
 
-  Service (db::Manager *manager, lay::LayoutView *view);
+  Service (db::Manager *manager, lay::LayoutViewBase *view);
 
   ~Service ();
 
@@ -427,7 +427,7 @@ public:
   /**
    *  @brief Access to the view object
    */
-  lay::LayoutView *view () const
+  lay::LayoutViewBase *view () const
   {
     return mp_view;
   }
@@ -510,7 +510,7 @@ private:
   int m_max_number_of_rulers;
 
   //  The layout view that the ruler service is attached to
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
 
   //  The ruler view objects representing the selection
   //  and the moved rules in move mode

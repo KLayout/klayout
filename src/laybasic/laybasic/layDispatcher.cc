@@ -46,21 +46,6 @@ Dispatcher::Dispatcher (Plugin *parent, bool standalone)
   }
 }
 
-#if defined(HAVE_QT)
-Dispatcher::Dispatcher (QWidget *menu_parent_widget, Plugin *parent, bool standalone)
-  : Plugin (parent, standalone),
-    mp_menu_parent_widget (menu_parent_widget),
-    mp_delegate (0)
-{
-  if (mp_menu_parent_widget) {
-    mp_menu.reset (new lay::AbstractMenu (this));
-  }
-  if (! parent && ! ms_dispatcher_instance) {
-    ms_dispatcher_instance = this;
-  }
-}
-#endif
-
 Dispatcher::Dispatcher (DispatcherDelegate *delegate, Plugin *parent, bool standalone)
   : Plugin (parent, standalone),
 #if defined(HAVE_QT)

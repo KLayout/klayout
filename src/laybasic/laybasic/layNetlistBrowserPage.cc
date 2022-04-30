@@ -242,7 +242,7 @@ NetlistBrowserPage::set_highlight_style (lay::Color color, int line_width, int v
 }
 
 void
-NetlistBrowserPage::set_view (lay::LayoutView *view, int cv_index)
+NetlistBrowserPage::set_view (lay::LayoutViewBase *view, int cv_index)
 {
   if (mp_view) {
     mp_view->layer_list_changed_event.remove (this, &NetlistBrowserPage::layer_list_changed);
@@ -1424,7 +1424,7 @@ NetlistBrowserPage::export_nets (const std::vector<const db::Net *> *nets)
   if (dialog->exec_dialog (mp_plugin_root)) {
 
     //  NOTE: mp_view and database might get reset to 0 in create_layout
-    lay::LayoutView *view = mp_view;
+    lay::LayoutViewBase *view = mp_view;
     db::LayoutToNetlist *database = mp_database.get ();
 
     unsigned int cv_index = view->create_layout (true);

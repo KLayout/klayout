@@ -34,7 +34,7 @@ class XORPlugin
   : public lay::Plugin
 {
 public:
-  XORPlugin (Plugin *parent, lay::LayoutView *view)
+  XORPlugin (Plugin *parent, lay::LayoutViewBase *view)
     : lay::Plugin (parent), mp_view (view)
   {
     mp_dialog = new lay::XORToolDialog (0);
@@ -110,7 +110,7 @@ public:
     // .. nothing yet ..
   }
 
-  lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
+  lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
     return new XORPlugin (root, view);
   }

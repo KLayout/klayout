@@ -72,8 +72,8 @@ static int align_up ()          { return int (ant::Object::AL_up); }
 
 static void clear_annotations (lay::LayoutView *view);
 static void insert_annotation (lay::LayoutView *view, AnnotationRef *obj);
-static void erase_annotation (lay::LayoutView *view, int id);
-static void replace_annotation (lay::LayoutView *view, int id, const AnnotationRef &obj);
+static void erase_annotation_base (lay::LayoutViewBase *view, int id);
+static void replace_annotation_base (lay::LayoutViewBase *view, int id, const AnnotationRef &obj);
 
 /**
  *  @brief An extension of the ant::Object that provides "live" updates of the view
@@ -88,7 +88,7 @@ public:
     //  .. nothing yet ..
   }
 
-  AnnotationRef (const ant::Object &other, lay::LayoutView *view)
+  AnnotationRef (const ant::Object &other, lay::LayoutViewBase *view)
     : ant::Object (other), mp_view (view)
   {
     //  .. nothing yet ..
@@ -132,7 +132,7 @@ public:
   void erase ()
   {
     if (mp_view && id () >= 0) {
-      erase_annotation (mp_view.get (), id ());
+      erase_annotation_base (mp_view.get (), id ());
       detach ();
     }
   }
@@ -140,10 +140,10 @@ public:
   template <class T>
   AnnotationRef transformed (const T &t) const
   {
-    return AnnotationRef (ant::Object::transformed<T> (t), const_cast<lay::LayoutView *> (mp_view.get ()));
+    return AnnotationRef (ant::Object::transformed<T> (t), const_cast<lay::LayoutViewBase *> (mp_view.get ()));
   }
 
-  void set_view (lay::LayoutView *view)
+  void set_view (lay::LayoutViewBase *view)
   {
     mp_view.reset (view);
   }
@@ -152,12 +152,12 @@ protected:
   void property_changed ()
   {
     if (mp_view && id () >= 0) {
-      replace_annotation (mp_view.get (), id (), *this);
+      replace_annotation_base (mp_view.get (), id (), *this);
     }
   }
 
 private:
-  tl::weak_ptr<lay::LayoutView> mp_view;
+  tl::weak_ptr<lay::LayoutViewBase> mp_view;
 };
 
 static void clear_annotations (lay::LayoutView *view)
@@ -182,7 +182,7 @@ static void insert_annotation (lay::LayoutView *view, AnnotationRef *obj)
   }
 }
 
-static void erase_annotation (lay::LayoutView *view, int id)
+static void erase_annotation_base (lay::LayoutViewBase *view, int id)
 {
   ant::Service *ant_service = view->get_plugin <ant::Service> ();
   if (ant_service) {
@@ -195,7 +195,12 @@ static void erase_annotation (lay::LayoutView *view, int id)
   }
 }
 
-static void replace_annotation (lay::LayoutView *view, int id, const AnnotationRef &obj)
+static void erase_annotation (lay::LayoutView *view, int id)
+{
+  erase_annotation_base (view, id);
+}
+
+static void replace_annotation_base (lay::LayoutViewBase *view, int id, const AnnotationRef &obj)
 {
   ant::Service *ant_service = view->get_plugin <ant::Service> ();
   if (ant_service) {
@@ -206,6 +211,11 @@ static void replace_annotation (lay::LayoutView *view, int id, const AnnotationR
       }
     }
   }
+}
+
+static void replace_annotation (lay::LayoutView *view, int id, const AnnotationRef &obj)
+{
+  replace_annotation_base (view, id, obj);
 }
 
 static AnnotationRef create_measure_ruler (lay::LayoutView *view, const db::DPoint &pt, int angle_constraint)

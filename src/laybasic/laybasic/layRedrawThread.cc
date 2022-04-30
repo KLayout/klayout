@@ -39,7 +39,7 @@ namespace lay
 // -------------------------------------------------------------
 //  RedrawThread implementation
 
-RedrawThread::RedrawThread (lay::RedrawThreadCanvas *canvas, lay::LayoutView *view)
+RedrawThread::RedrawThread (lay::RedrawThreadCanvas *canvas, LayoutViewBase *view)
   : tl::Object ()
 {
   m_initial_update = false;

@@ -47,7 +47,7 @@ namespace edt
 // -----------------------------------------------------------------------------
 //  ShapeEditService implementation
 
-ShapeEditService::ShapeEditService (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator::flags_type shape_types)
+ShapeEditService::ShapeEditService (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type shape_types)
   : edt::Service (manager, view, shape_types), 
     m_layer (0), m_cv_index (0), mp_cell (0), mp_layout (0), m_combine_mode (CM_Add)
 {
@@ -362,7 +362,7 @@ ShapeEditService::deliver_shape (const db::Box &box)
 // -----------------------------------------------------------------------------
 //  PolygonService implementation
 
-PolygonService::PolygonService (db::Manager *manager, lay::LayoutView *view)
+PolygonService::PolygonService (db::Manager *manager, lay::LayoutViewBase *view)
   : ShapeEditService (manager, view, db::ShapeIterator::Polygons),
     m_closure_set (false), m_closure ()
 {
@@ -692,7 +692,7 @@ PolygonService::update_marker ()
 // -----------------------------------------------------------------------------
 //  BoxService implementation
 
-BoxService::BoxService (db::Manager *manager, lay::LayoutView *view)
+BoxService::BoxService (db::Manager *manager, lay::LayoutViewBase *view)
   : ShapeEditService (manager, view, db::ShapeIterator::Boxes)
 { 
   //  .. nothing yet ..
@@ -784,7 +784,7 @@ BoxService::selection_applies (const lay::ObjectInstPath &sel) const
 // -----------------------------------------------------------------------------
 //  TextService implementation
 
-TextService::TextService (db::Manager *manager, lay::LayoutView *view)
+TextService::TextService (db::Manager *manager, lay::LayoutViewBase *view)
   : ShapeEditService (manager, view, db::ShapeIterator::Texts),
     m_rot (0)
 { 
@@ -972,7 +972,7 @@ TextService::configure (const std::string &name, const std::string &value)
 // -----------------------------------------------------------------------------
 //  PathService implementation
 
-PathService::PathService (db::Manager *manager, lay::LayoutView *view)
+PathService::PathService (db::Manager *manager, lay::LayoutViewBase *view)
   : ShapeEditService (manager, view, db::ShapeIterator::Paths), 
     m_width (0.1), m_bgnext (0.0), m_endext (0.0), m_type (Flush), m_needs_update (true)
 {
@@ -1211,7 +1211,7 @@ PathService::config_finalize ()
 // -----------------------------------------------------------------------------
 //  InstService implementation
 
-InstService::InstService (db::Manager *manager, lay::LayoutView *view)
+InstService::InstService (db::Manager *manager, lay::LayoutViewBase *view)
   : edt::Service (manager, view),
     m_angle (0.0), m_scale (1.0),
     m_mirror (false), m_is_pcell (false),

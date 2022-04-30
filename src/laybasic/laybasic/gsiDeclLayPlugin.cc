@@ -40,7 +40,7 @@ namespace gsi
 //  since PluginBase object are only allowed to be created inside the create_plugin method
 //  of the factory, this hack is a quick but dirty workaround.
 static bool s_in_create_plugin = false;
-static lay::LayoutView *sp_view = 0;
+static lay::LayoutViewBase *sp_view = 0;
 static lay::Dispatcher *sp_dispatcher = 0;
 
 class PluginBase
@@ -393,7 +393,7 @@ public:
     }
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   { 
     if (f_create_plugin.can_issue ()) {
       return create_plugin_gsi (manager, root, view);
@@ -402,7 +402,7 @@ public:
     }
   }
 
-  virtual gsi::PluginBase *create_plugin_gsi (db::Manager *manager, lay::Dispatcher *root, lay::LayoutView *view) const
+  virtual gsi::PluginBase *create_plugin_gsi (db::Manager *manager, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   { 
     //  TODO: this is a hack. See notes above at s_in_create_plugin
     s_in_create_plugin = true;
@@ -410,7 +410,7 @@ public:
     sp_dispatcher = root;
     gsi::PluginBase *ret = 0;
     try {
-      ret = f_create_plugin.issue<PluginFactoryBase, gsi::PluginBase *, db::Manager *, lay::Dispatcher *, lay::LayoutView *> (&PluginFactoryBase::create_plugin_gsi, manager, root, view);
+      ret = f_create_plugin.issue<PluginFactoryBase, gsi::PluginBase *, db::Manager *, lay::Dispatcher *, lay::LayoutViewBase *> (&PluginFactoryBase::create_plugin_gsi, manager, root, view);
       s_in_create_plugin = false;
       sp_view = 0;
       sp_dispatcher = 0;

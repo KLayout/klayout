@@ -45,7 +45,7 @@ class GridNetPluginDeclaration
 public:
   virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
   virtual lay::ConfigPage *config_page (QWidget *parent, std::string &title) const;
-  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *, lay::LayoutView *view) const;
+  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *, lay::LayoutViewBase *view) const;
 };
 
 class GridNetConfigPage 
@@ -83,7 +83,7 @@ public:
     CheckerBoard
   };
 
-  GridNet (lay::LayoutView *view);
+  GridNet (lay::LayoutViewBase *view);
 
 private:
   virtual void render_bg (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas);
@@ -91,7 +91,7 @@ private:
   //  implementation of the lay::Plugin interface
   virtual bool configure (const std::string &name, const std::string &value);
 
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   bool m_visible;
   bool m_show_ruler;
   double m_grid;

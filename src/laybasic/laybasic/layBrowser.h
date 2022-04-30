@@ -47,9 +47,9 @@ public:
    *  @brief Constructor 
    */
 #if QT_VERSION >= 0x050000
-  Browser (lay::Dispatcher *root, lay::LayoutView *view, const char *name = "", Qt::WindowFlags fl = Qt::Window /*adds minimize button for example*/);
+  Browser (lay::Dispatcher *root, lay::LayoutViewBase *view, const char *name = "", Qt::WindowFlags fl = Qt::Window /*adds minimize button for example*/);
 #else
-  Browser (lay::Dispatcher *root, lay::LayoutView *view, const char *name = "", Qt::WFlags fl = Qt::Window /*adds minimize button for example*/);
+  Browser (lay::Dispatcher *root, lay::LayoutViewBase *view, const char *name = "", Qt::WFlags fl = Qt::Window /*adds minimize button for example*/);
 #endif
 
   /**
@@ -93,7 +93,7 @@ public:
   /** 
    *  @brief Return the pointer to the layout view 
    */
-  lay::LayoutView *view () 
+  lay::LayoutViewBase *view ()
   {
     return mp_view;
   }
@@ -132,7 +132,7 @@ public:
 
 private:
   bool m_active;
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   lay::Dispatcher *mp_root;
 
   void closeEvent (QCloseEvent *);

@@ -61,7 +61,7 @@ public:
   XORToolDialog (QWidget *parent);
   ~XORToolDialog ();
 
-  int exec_dialog (lay::LayoutView *view);
+  int exec_dialog (lay::LayoutViewBase *view);
 
 protected:
   void accept ();

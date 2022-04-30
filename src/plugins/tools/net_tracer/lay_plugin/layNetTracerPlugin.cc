@@ -75,7 +75,7 @@ public:
     menu_entries.push_back (lay::menu_item ("lay::edit_layer_stack", "edit_layer_stack", "tools_menu.end", tl::to_string (QObject::tr ("Edit Layer Stack"))));
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
     return new NetTracerDialog (root, view);
   }

@@ -689,6 +689,7 @@ LayoutView::ensure_layer_selected ()
 void
 LayoutView::remove_unused_layers ()
 {
+  // @@@ should not be in control panel
   if (mp_control_panel) {
     mp_control_panel->cm_remove_unused ();
   }
@@ -699,6 +700,18 @@ LayoutView::begin_layer_updates ()
 {
   if (mp_control_panel) {
     mp_control_panel->begin_updates ();
+  }
+}
+
+bool
+LayoutView::layer_model_updated ()
+{
+  //  because check_updated is called in the initialization phase, we check if the pointers
+  //  to the widgets are non-null:
+  if (mp_control_panel) {
+    return mp_control_panel->model_updated ();
+  } else {
+    return false;
   }
 }
 

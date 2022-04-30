@@ -280,7 +280,7 @@ AlignOptionsDialog::~AlignOptionsDialog ()
 }
 
 bool 
-AlignOptionsDialog::exec_dialog (lay::LayoutView * /*view*/, int &hmode, int &vmode, bool &visible_layers)
+AlignOptionsDialog::exec_dialog (int &hmode, int &vmode, bool &visible_layers)
 {
   QRadioButton *hmode_buttons [] = { this->h_none_rb, this->h_left_rb, this->h_center_rb, this->h_right_rb };
   QRadioButton *vmode_buttons [] = { this->v_none_rb, this->v_top_rb, this->v_center_rb, this->v_bottom_rb };
@@ -343,7 +343,7 @@ DistributeOptionsDialog::~DistributeOptionsDialog ()
 }
 
 bool
-DistributeOptionsDialog::exec_dialog (lay::LayoutView * /*view*/, bool &hdistribute, int &hmode, double &hpitch, double &hspace, bool &vdistribute, int &vmode, double &vpitch, double &vspace, bool &visible_layers)
+DistributeOptionsDialog::exec_dialog (bool &hdistribute, int &hmode, double &hpitch, double &hspace, bool &vdistribute, int &vmode, double &vpitch, double &vspace, bool &visible_layers)
 {
   QRadioButton *hmode_buttons [] = { this->h_none_rb, this->h_left_rb, this->h_center_rb, this->h_right_rb };
   QRadioButton *vmode_buttons [] = { this->v_none_rb, this->v_top_rb, this->v_center_rb, this->v_bottom_rb };

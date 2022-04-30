@@ -79,7 +79,7 @@ public:
     menu_entries.push_back (lay::menu_item ("browse_instances::show", "browse_instances", "tools_menu.end", tl::to_string (QObject::tr ("Browse Instances"))));
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
     return new BrowseInstancesForm (root, view);
   }
@@ -289,7 +289,7 @@ private:
 
 // ------------------------------------------------------------
 
-BrowseInstancesForm::BrowseInstancesForm (lay::Dispatcher *root, lay::LayoutView *vw)
+BrowseInstancesForm::BrowseInstancesForm (lay::Dispatcher *root, LayoutViewBase *vw)
   : lay::Browser (root, vw), 
     Ui::BrowseInstancesForm (),
     m_cv_index (0),
@@ -349,9 +349,12 @@ void
 BrowseInstancesForm::choose_cell_pressed ()
 {
 BEGIN_PROTECTED
-  CellSelectionForm form (this, view (), "browse_cell", true /*simple mode*/);
-  if (form.exec ()) {
-    change_cell (form.selected_cellview ().cell_index (), form.selected_cellview_index ());
+  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view ());
+  if (lv) {
+    CellSelectionForm form (this, lv, "browse_cell", true /*simple mode*/);
+    if (form.exec ()) {
+      change_cell (form.selected_cellview ().cell_index (), form.selected_cellview_index ());
+    }
   }
 END_PROTECTED
 }
@@ -522,18 +525,21 @@ struct BrowseInstancesCellInfo
 void 
 BrowseInstancesForm::activated ()
 {
-  view ()->save_view (m_display_state);
+  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view ());
+  tl_assert (lv != 0);
+
+  lv->save_view (m_display_state);
 
   //  if no cellviews are available, don't do anything
-  if (! view ()->cellviews ()) {
+  if (! lv->cellviews ()) {
     return;
   }
 
   //  obtain active cellview index and cell index
-  int cv_index = view ()->active_cellview_index (); 
+  int cv_index = lv->active_cellview_index ();
 
   lay::LayoutView::cell_path_type path;
-  view ()->current_cell_path (path);
+  lv->current_cell_path (path);
 
   //  no cell to index
   if (path.empty ()) {

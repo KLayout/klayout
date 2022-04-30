@@ -80,7 +80,7 @@ public:
      menu_entries.push_back (lay::menu_item ("browse_shapes::show", "browse_shapes", "tools_menu.end", tl::to_string (QObject::tr ("Browse Shapes"))));
    }
  
-   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
+   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
    {
      return new BrowseShapesForm (root, view);
    }
@@ -392,7 +392,7 @@ private:
 
 // ------------------------------------------------------------
 
-BrowseShapesForm::BrowseShapesForm (lay::Dispatcher *root, lay::LayoutView *vw)
+BrowseShapesForm::BrowseShapesForm (lay::Dispatcher *root, LayoutViewBase *vw)
   : lay::Browser (root, vw), 
     Ui::BrowseShapesForm (),
     m_cv_index (-1),
@@ -660,9 +660,12 @@ BrowseShapesForm::cell_inst_changed (QTreeWidgetItem *, QTreeWidgetItem *)
 void 
 BrowseShapesForm::activated ()
 {
-  view ()->save_view (m_display_state);
+  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view ());
+  tl_assert (lv != 0);
 
-  std::vector <lay::LayerPropertiesConstIterator> sel_layers = view ()->selected_layers (); 
+  lv->save_view (m_display_state);
+
+  std::vector <lay::LayerPropertiesConstIterator> sel_layers = lv->selected_layers ();
 
   if (sel_layers.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No layer selected")));
@@ -688,7 +691,7 @@ BrowseShapesForm::activated ()
         }
       } else { 
         m_cv_index = cv_index;
-        m_cellview = view ()->cellview (m_cv_index);
+        m_cellview = lv->cellview (m_cv_index);
       }
 
     }

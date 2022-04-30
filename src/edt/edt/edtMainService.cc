@@ -55,7 +55,7 @@ namespace edt
 // -----------------------------------------------------------------------------
 //  Main Service implementation
 
-MainService::MainService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root)
+MainService::MainService (db::Manager *manager, lay::LayoutViewBase *view, lay::Dispatcher *root)
   : lay::Plugin (view),
     lay::Editable (view),
     db::Object (manager),
@@ -93,7 +93,7 @@ edt::RoundCornerOptionsDialog *
 MainService::round_corners_dialog ()
 {
   if (! mp_round_corners_dialog) {
-    mp_round_corners_dialog = new edt::RoundCornerOptionsDialog (view ());
+    mp_round_corners_dialog = new edt::RoundCornerOptionsDialog (view ()->widget ());
   }
   return mp_round_corners_dialog;
 }
@@ -102,7 +102,7 @@ edt::AlignOptionsDialog *
 MainService::align_options_dialog ()
 {
   if (! mp_align_options_dialog) {
-    mp_align_options_dialog = new edt::AlignOptionsDialog (view ());
+    mp_align_options_dialog = new edt::AlignOptionsDialog (view ()->widget ());
   }
   return mp_align_options_dialog;
 }
@@ -111,7 +111,7 @@ edt::DistributeOptionsDialog *
 MainService::distribute_options_dialog ()
 {
   if (! mp_distribute_options_dialog) {
-    mp_distribute_options_dialog = new edt::DistributeOptionsDialog (view ());
+    mp_distribute_options_dialog = new edt::DistributeOptionsDialog (view ()->widget ());
   }
   return mp_distribute_options_dialog;
 }
@@ -120,7 +120,7 @@ lay::FlattenInstOptionsDialog *
 MainService::flatten_inst_options_dialog ()
 {
   if (! mp_flatten_inst_options_dialog) {
-    mp_flatten_inst_options_dialog = new lay::FlattenInstOptionsDialog (view (), false /*don't allow pruning*/);
+    mp_flatten_inst_options_dialog = new lay::FlattenInstOptionsDialog (view ()->widget (), false /*don't allow pruning*/);
   }
   return mp_flatten_inst_options_dialog;
 }
@@ -129,7 +129,7 @@ edt::MakeCellOptionsDialog *
 MainService::make_cell_options_dialog ()
 {
   if (! mp_make_cell_options_dialog) {
-    mp_make_cell_options_dialog = new edt::MakeCellOptionsDialog (view ());
+    mp_make_cell_options_dialog = new edt::MakeCellOptionsDialog (view ()->widget ());
   }
   return mp_make_cell_options_dialog;
 }
@@ -138,7 +138,7 @@ edt::MakeArrayOptionsDialog *
 MainService::make_array_options_dialog ()
 {
   if (! mp_make_array_options_dialog) {
-    mp_make_array_options_dialog = new edt::MakeArrayOptionsDialog (view ());
+    mp_make_array_options_dialog = new edt::MakeArrayOptionsDialog (view ()->widget ());
   }
   return mp_make_array_options_dialog;
 }
@@ -1188,9 +1188,10 @@ MainService::cm_convert_to_pcell ()
   }
 
   bool ok = false;
-  QString item = QInputDialog::getItem (view (), QObject::tr ("Select Target PCell"),
-                                                 QObject::tr ("Select the PCell the shape should be converted into"),
-                                                 items, 0, false, &ok);
+  QString item = QInputDialog::getItem (view ()->widget (),
+                                        QObject::tr ("Select Target PCell"),
+                                        QObject::tr ("Select the PCell the shape should be converted into"),
+                                        items, 0, false, &ok);
   if (! ok) {
     return;
   }
@@ -1289,7 +1290,7 @@ MainService::cm_convert_to_pcell ()
     }
 
     if (any_non_converted) {
-      QMessageBox::warning (view (), QObject::tr ("Warning"), QObject::tr ("Some of the shapes could not be converted to the desired PCell"));
+      QMessageBox::warning (view ()->widget (), QObject::tr ("Warning"), QObject::tr ("Some of the shapes could not be converted to the desired PCell"));
     }
 
     manager ()->commit ();
@@ -1505,7 +1506,7 @@ MainService::cm_size ()
   }
 
   bool ok = false;
-  QString s = QInputDialog::getText (view (), 
+  QString s = QInputDialog::getText (view ()->widget (),
                                      QObject::tr ("Sizing"), 
                                      QObject::tr ("Sizing (in micron, positive or negative). Two values (dx, dy) for anisotropic sizing."), 
                                      QLineEdit::Normal, QString::fromUtf8 ("0.0"), 
@@ -1750,7 +1751,7 @@ db::DVector compute_alignment_vector (const db::DBox &prim_box, const db::DBox &
 }
 
 static db::DBox 
-inst_bbox (const db::CplxTrans &tr, lay::LayoutView *view, int cv_index, const db::InstElement &inst_element, bool visible_only)
+inst_bbox (const db::CplxTrans &tr, lay::LayoutViewBase *view, int cv_index, const db::InstElement &inst_element, bool visible_only)
 {
   db::DBox box;
 
@@ -1779,7 +1780,7 @@ MainService::cm_align ()
 
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
 
-  if (! align_options_dialog ()->exec_dialog (view (), m_align_hmode, m_align_vmode, m_align_visible_layers)) {
+  if (! align_options_dialog ()->exec_dialog (m_align_hmode, m_align_vmode, m_align_visible_layers)) {
     return;
   }
 
@@ -1865,9 +1866,9 @@ MainService::cm_distribute ()
 
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
 
-  if (! distribute_options_dialog ()->exec_dialog (view (), m_hdistribute, m_distribute_hmode, m_distribute_hpitch, m_distribute_hspace,
-                                                            m_vdistribute, m_distribute_vmode, m_distribute_vpitch, m_distribute_vspace,
-                                                            m_distribute_visible_layers)) {
+  if (! distribute_options_dialog ()->exec_dialog (m_hdistribute, m_distribute_hmode, m_distribute_hpitch, m_distribute_hspace,
+                                                   m_vdistribute, m_distribute_vmode, m_distribute_vpitch, m_distribute_vspace,
+                                                   m_distribute_visible_layers)) {
     return;
   }
 
@@ -2107,7 +2108,7 @@ MainService::cm_tap ()
 
   //  List the layers under the cursor as pop up a menu
 
-  std::unique_ptr<QMenu> menu (new QMenu (view ()));
+  std::unique_ptr<QMenu> menu (new QMenu (view ()->widget ()));
   menu->show ();
 
   int icon_size = menu->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
@@ -2294,7 +2295,7 @@ class NewObjectsSelection
  : public db::ClipboardDataInsertReceiver 
 {
 public:
-  NewObjectsSelection (int cv_index, db::cell_index_type topcell, lay::LayoutView *view)
+  NewObjectsSelection (int cv_index, db::cell_index_type topcell, lay::LayoutViewBase *view)
     : m_cv_index (cv_index), m_topcell (topcell)
   {
     mp_polygon_service = view->get_plugin <edt::PolygonService> ();

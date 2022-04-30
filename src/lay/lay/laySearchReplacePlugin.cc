@@ -63,7 +63,7 @@ public:
     menu_entries.push_back (lay::menu_item ("search_replace::show", "search_replace_viewer:edit:view_mode", "edit_menu.utils_group+", tl::to_string (QObject::tr ("Search"))));
   }
  
-  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
     return new SearchReplaceDialog (root, view);
   }

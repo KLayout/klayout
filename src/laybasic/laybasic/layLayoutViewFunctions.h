@@ -46,7 +46,7 @@ public:
   /**
    *  @brief Constructor
    */
-  LayoutViewFunctions (db::Manager *manager, lay::LayoutView *view);
+  LayoutViewFunctions (db::Manager *manager, lay::LayoutViewBase *view);
 
   /** 
    *  @brief Destructor

@@ -168,7 +168,7 @@ public:
   RedrawThreadWorker (RedrawThread *redraw_thread);
   virtual ~RedrawThreadWorker ();
 
-  void setup (LayoutView *view, RedrawThreadCanvas *canvas, const std::vector<db::Box> &redraw_region, const db::DCplxTrans &vp_trans);
+  void setup (LayoutViewBase *view, RedrawThreadCanvas *canvas, const std::vector<db::Box> &redraw_region, const db::DCplxTrans &vp_trans);
   void finish ();
 
 protected:

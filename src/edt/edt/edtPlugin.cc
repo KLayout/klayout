@@ -179,18 +179,21 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutView *view, lay::Dispatcher *root) const
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *root) const
   {
+    lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view);
+    tl_assert (lv != 0);
+
     if (mp_pages_f != 0) {
       size_t nstart = pages.size ();
-      (*mp_pages_f) (pages, view, root);
+      (*mp_pages_f) (pages, lv, root);
       while (nstart < pages.size ()) {
         pages [nstart++]->set_plugin_declaration (this);
       }
     }
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *, lay::LayoutViewBase *view) const
   {
     Svc *service = new Svc (manager, view);
     service->set_plugin_declaration (this);
@@ -312,7 +315,7 @@ public:
     return false;
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
     return new edt::MainService (manager, view, root);
   }
@@ -327,10 +330,13 @@ public:
     return false;
   }
 
-  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutView *view, lay::Dispatcher *dispatcher) const
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const
   {
+    lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view);
+    tl_assert (lv != 0);
+
     //  NOTE: we do not set plugin_declaration which makes the page unspecific
-    EditorOptionsGeneric *generic_opt = new EditorOptionsGeneric (view, dispatcher);
+    EditorOptionsGeneric *generic_opt = new EditorOptionsGeneric (lv, dispatcher);
     pages.push_back (generic_opt);
   }
 
@@ -413,9 +419,14 @@ private:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl_main (new edt::MainPluginDeclaration (tl::to_string (QObject::tr ("Instances and shapes"))), 4000, "edt::MainService");
 
 void
-commit_recent (lay::LayoutView *view)
+commit_recent (lay::LayoutViewBase *view)
 {
-  lay::EditorOptionsPages *eo_pages = view->editor_options_pages ();;
+  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view);
+  if (!lv) {
+    return;
+  }
+
+  lay::EditorOptionsPages *eo_pages = lv->editor_options_pages ();
   if (!eo_pages) {
     return;
   }
@@ -442,12 +453,12 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> & /*pages*/, lay::LayoutView * /*view*/, lay::Dispatcher * /*root*/) const
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> & /*pages*/, lay::LayoutViewBase * /*view*/, lay::Dispatcher * /*root*/) const
   {
     //  .. no specific ones ..
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
     return new edt::PartialService (manager, view, root);
   }

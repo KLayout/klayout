@@ -55,7 +55,7 @@ class RedrawThread
     public tl::JobBase
 {
 public:
-  RedrawThread (lay::RedrawThreadCanvas *canvas, lay::LayoutView *view);
+  RedrawThread (lay::RedrawThreadCanvas *canvas, lay::LayoutViewBase *view);
   virtual ~RedrawThread ();
 
   void commit (const std::vector <lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution);
@@ -116,7 +116,7 @@ private:
   db::DFTrans m_stored_fp;
 
   lay::RedrawThreadCanvas *mp_canvas;
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   bool m_start_recursion_sentinel;
 
   tl::Clock m_clock;

@@ -244,11 +244,31 @@ public:
   }
 
   /**
+   *  @brief Display a status message
+   */
+  void message (const std::string &s = "", int timeout = 10);
+
+  /**
    *  @brief The "dirty" flag indicates that one of the layout has been modified
    *
    *  A signal is provided on a change of this flag (dirty_changed).
    */
   bool is_dirty () const;
+
+  /**
+   *  @brief Returns true, if the layer source shall be shown always in the layer properties tree
+   */
+  virtual bool always_show_source () const;
+
+  /**
+   *  @brief Returns true, if the layer/datatype shall be shown always in the layer properties tree
+   */
+  virtual bool always_show_ld () const;
+
+  /**
+   *  @brief Returns true, if the layout index shall be shown always in the layer properties tree
+   */
+  virtual bool always_show_layout_index () const;
 
   /**
    *  @brief Fill the layer properties for a new layer
@@ -403,17 +423,17 @@ public:
   }
 
   /**
+   *  @brief Rename a layer properties list
+   */
+  void rename_properties (unsigned int index, const std::string &new_name);
+
+  /**
    *  @brief Replace the current layer properties list
    */
   void set_properties (const LayerPropertiesList &list)
   {
     set_properties (current_layer_list (), list);
   }
-
-  /**
-   *  @brief Rename a layer properties list
-   */
-  void rename_properties (unsigned int index, const std::string &new_name);
 
   /**
    *  @brief Replace the specified layer properties list
@@ -2314,6 +2334,12 @@ public:
   void redraw_cell_boxes ();
   void timer ();
 
+  virtual void deactivate_all_browsers ();
+
+#if defined(HAVE_QT)
+  virtual QWidget *widget () { return 0; }
+#endif
+
 private:
   //  event handlers used to connect to the layout object's events
   void signal_hier_changed ();
@@ -2505,7 +2531,6 @@ protected:
   virtual void do_set_current_layer (const lay::LayerPropertiesConstIterator &l);
   virtual void do_set_no_stipples (bool no_stipples);
   virtual void do_set_phase (int phase);
-  virtual void deactivate_all_browsers ();
   virtual bool is_activated () const;
   virtual void update_content_for_cv (int cv_index);
   virtual void set_active_cellview_index (int index);
@@ -2517,10 +2542,6 @@ protected:
   virtual void emit_title_changed () { }
   virtual void emit_dirty_changed () { }
   virtual void emit_layer_order_changed () { }
-
-#if defined(HAVE_QT)
-  virtual QWidget *widget () { return 0; }
-#endif
 };
 
 }

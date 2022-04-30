@@ -613,6 +613,12 @@ LayoutViewBase::set_synchronous (bool s)
   m_synchronous = s;
 }
 
+void
+LayoutViewBase::message (const std::string & /*s*/, int /*timeout*/)
+{
+  //  .. nothing yet ..
+}
+
 bool
 LayoutViewBase::is_dirty () const
 {
@@ -1399,6 +1405,24 @@ LayoutViewBase::merge_dither_pattern (lay::LayerPropertiesList &props)
       }
     }
   }
+}
+
+bool
+LayoutViewBase::always_show_source () const
+{
+  return false;
+}
+
+bool
+LayoutViewBase::always_show_ld () const
+{
+  return true;
+}
+
+bool
+LayoutViewBase::always_show_layout_index () const
+{
+  return false;
 }
 
 void 

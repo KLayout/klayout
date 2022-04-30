@@ -29,7 +29,7 @@ namespace gsi
 {
 
 static 
-lay::DMarker *create_marker (lay::LayoutView *view) 
+lay::DMarker *create_marker (lay::LayoutViewBase *view)
 {
   return new lay::DMarker (view);
 }

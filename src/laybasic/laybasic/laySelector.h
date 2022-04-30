@@ -88,7 +88,7 @@ private:
 
   db::DPoint m_p1, m_p2;
   db::DPoint m_current_position;
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   lay::RubberBox *mp_box;
   unsigned int m_color;
   unsigned int m_buttons;

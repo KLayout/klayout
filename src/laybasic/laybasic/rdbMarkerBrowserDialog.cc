@@ -54,7 +54,7 @@ extern std::string cfg_rdb_marker_vertex_size;
 extern std::string cfg_rdb_marker_halo;
 extern std::string cfg_rdb_marker_dither_pattern;
 
-MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutView *vw)
+MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutViewBase *vw)
   : lay::Browser (root, vw),
     Ui::MarkerBrowserDialog (),
     m_context (rdb::AnyCell),
@@ -635,19 +635,22 @@ MarkerBrowserDialog::cv_index_changed (int index)
 void 
 MarkerBrowserDialog::activated ()
 {
+  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view ());
+  tl_assert (lv != 0);
+
   std::string state;
-  view ()->config_get (cfg_rdb_window_state, state);
+  lv->config_get (cfg_rdb_window_state, state);
   lay::restore_dialog_state (this, state);
 
   //  Switch to the active cellview index when no valid one is set.
-  lay::CellView cv = view ()->cellview (m_cv_index);
+  lay::CellView cv = lv->cellview (m_cv_index);
   if (! cv.is_valid ()) {
-    m_cv_index = view ()->active_cellview_index ();
+    m_cv_index = lv->active_cellview_index ();
   }
 
-  if (m_rdb_index < 0 && view ()->get_rdb (0) != 0) {
+  if (m_rdb_index < 0 && lv->get_rdb (0) != 0) {
 
-    m_rdb_name = view ()->get_rdb (0)->name ();
+    m_rdb_name = lv->get_rdb (0)->name ();
     rdbs_changed ();
 
   } else {
@@ -714,7 +717,10 @@ MarkerBrowserDialog::deactivated ()
 void 
 MarkerBrowserDialog::scan_layer ()
 {
-  std::vector<lay::LayerPropertiesConstIterator> layers = view ()->selected_layers ();
+  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view ());
+  tl_assert (lv != 0);
+
+  std::vector<lay::LayerPropertiesConstIterator> layers = lv->selected_layers ();
   if (layers.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No layer selected to get shapes from")));
   }
@@ -806,13 +812,16 @@ MarkerBrowserDialog::scan_layer ()
   }
 
   unsigned int rdb_index = view ()->add_rdb (rdb.release ());
-  view ()->open_rdb_browser (rdb_index, cv_index);
+  lv->open_rdb_browser (rdb_index, cv_index);
 }
 
 void 
 MarkerBrowserDialog::scan_layer_flat ()
 {
-  std::vector<lay::LayerPropertiesConstIterator> layers = view ()->selected_layers ();
+  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view ());
+  tl_assert (lv != 0);
+
+  std::vector<lay::LayerPropertiesConstIterator> layers = lv->selected_layers ();
   if (layers.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No layer selected to get shapes from")));
   }
@@ -882,7 +891,7 @@ MarkerBrowserDialog::scan_layer_flat ()
   }
 
   unsigned int rdb_index = view ()->add_rdb (rdb.release ());
-  view ()->open_rdb_browser (rdb_index, cv_index);
+  lv->open_rdb_browser (rdb_index, cv_index);
 }
 
 void 

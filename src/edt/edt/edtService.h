@@ -82,12 +82,12 @@ public:
   /**
    *  @brief The constructor for an service selecting shapes
    */
-  Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator::flags_type shape_types);
+  Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type shape_types);
 
   /**
    *  @brief The constructor for an service selecting instances
    */
-  Service (db::Manager *manager, lay::LayoutView *view);
+  Service (db::Manager *manager, lay::LayoutViewBase *view);
 
   /**
    *  @brief The destructor
@@ -243,7 +243,7 @@ public:
   /**
    *  @brief Access to the view object
    */
-  lay::LayoutView *view () const
+  lay::LayoutViewBase *view () const
   {
     tl_assert (mp_view != 0);
     return mp_view;
@@ -559,7 +559,7 @@ protected:
 
 private:
   //  The layout view that the editor service is attached to
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
 
   //  The marker objects representing the selection
   std::vector<lay::ViewObject *> m_markers;

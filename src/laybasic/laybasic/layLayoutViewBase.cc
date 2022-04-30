@@ -70,6 +70,10 @@
 #include "gsi.h"
 #include "gtf.h"
 
+#if defined(HAVE_QT)
+#  include <QImageWriter>
+#endif
+
 #include <limits>
 
 namespace lay
@@ -366,9 +370,6 @@ LayoutViewBase::init (db::Manager *mgr)
   m_transient_selection_mode = true;
   m_sel_inside_pcells = false;
   m_add_other_layers = false;
-  m_always_show_source = false;
-  m_always_show_ld = true;
-  m_always_show_layout_index = false;
   m_search_range = 5;
   m_search_range_box = 0;
 
@@ -376,7 +377,11 @@ LayoutViewBase::init (db::Manager *mgr)
   m_layer_properties_lists.back ()->attach_view (this, (unsigned int) (m_layer_properties_lists.size () - 1));
   m_current_layer_list = 0;
 
-  mp_canvas = new lay::LayoutCanvas (this); // @@@ Widget parent???
+#if defined(HAVE_QT)
+  mp_canvas = new lay::LayoutCanvas (widget (), this);
+#else
+  mp_canvas = new lay::LayoutCanvas (this);
+#endif
 
   mp_canvas->left_arrow_key_pressed.add (this, &LayoutViewBase::pan_left);
   mp_canvas->up_arrow_key_pressed.add (this, &LayoutViewBase::pan_up);
@@ -523,6 +528,35 @@ void LayoutViewBase::clear_plugins ()
     delete *p;
   }
   mp_plugins.clear ();
+  mp_active_plugin = 0;
+}
+
+void LayoutViewBase::create_plugins (const lay::PluginDeclaration *except_this)
+{
+  clear_plugins ();
+
+  //  create the plugins
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+
+    if (&*cls != except_this) {
+
+      //  TODO: clean solution. The following is a HACK:
+      if (cls.current_name () == "ant::Plugin" || cls.current_name () == "img::Plugin") {
+        //  ant and img are created always
+        create_plugin (&*cls);
+      } else if ((options () & LV_NoPlugins) == 0) {
+        //  others: only create unless LV_NoPlugins is set
+        create_plugin (&*cls);
+      } else if ((options () & LV_NoGrid) == 0 && cls.current_name () == "GridNetPlugin") {
+        //  except grid net plugin which is created on request
+        create_plugin (&*cls);
+      }
+
+    }
+
+  }
+
+  mode (default_mode ());
 }
 
 lay::Plugin *LayoutViewBase::create_plugin (const lay::PluginDeclaration *cls)
@@ -603,29 +637,6 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
     tl::from_string (value, m_add_other_layers);
     return false; // not taken - let others set it too.
-
-  } else if (name == cfg_layers_always_show_source) {
-
-    bool a = false;
-    tl::from_string (value, a);
-    if (a != m_always_show_source) {
-      m_always_show_source = a;
-      layer_list_changed_event (4);
-    }
-
-    return true;
-
-  } else if (name == cfg_layers_always_show_ld) {
-
-    tl::from_string (value, m_always_show_ld);
-    update_content ();
-    return true;
-
-  } else if (name == cfg_layers_always_show_layout_index) {
-
-    tl::from_string (value, m_always_show_layout_index);
-    update_content ();
-    return true;
 
   } else if (name == cfg_background_color) {
 
@@ -1184,7 +1195,7 @@ LayoutViewBase::enable_edits (bool enable)
   }
 
   if (edits_enabled () != is_enabled) {
-    emit edits_enabled_changed ();
+    emit_edits_enabled_changed ();
   }
 }
 
@@ -1415,8 +1426,8 @@ LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesList &p
     manager ()->clear ();
   }
 
-  if (mp_control_panel && index == current_layer_list ()) {
-    mp_control_panel->begin_updates ();
+  if (index == current_layer_list ()) {
+    begin_layer_updates ();
   }
 
   *m_layer_properties_lists [index] = props;
@@ -1479,9 +1490,9 @@ LayoutViewBase::replace_layer_node (unsigned int index, const LayerPropertiesCon
       manager ()->clear ();
     }
 
-    if (mp_control_panel && index == current_layer_list ()) {
-      mp_control_panel->begin_updates ();
-    }
+  if (index == current_layer_list ()) {
+    begin_layer_updates ();
+  }
 
     LayerPropertiesIterator non_const_iter (get_properties (index), iter.uint ());
     *non_const_iter = node;
@@ -1554,8 +1565,8 @@ LayoutViewBase::insert_layer (unsigned int index, const LayerPropertiesConstIter
     manager ()->clear ();
   }
   
-  if (mp_control_panel && index == current_layer_list ()) {
-    mp_control_panel->begin_updates ();
+  if (index == current_layer_list ()) {
+    begin_layer_updates ();
   }
 
   const LayerPropertiesNode &ret = m_layer_properties_lists [index]->insert (LayerPropertiesIterator (*m_layer_properties_lists [index], before.uint ()), node);
@@ -1579,8 +1590,8 @@ LayoutViewBase::delete_layer (unsigned int index, LayerPropertiesConstIterator &
 
   lay::LayerPropertiesNode orig = *iter;
 
-  if (mp_control_panel && index == current_layer_list ()) {
-    mp_control_panel->begin_updates ();
+  if (index == current_layer_list ()) {
+    begin_layer_updates ();
   }
 
   //  delete the element
@@ -1601,16 +1612,6 @@ LayoutViewBase::delete_layer (unsigned int index, LayerPropertiesConstIterator &
 
   //  invalidate the iterator so it can be used to refer to the next element
   iter.invalidate ();
-}
-
-void
-LayoutViewBase::signal_selection_changed ()
-{
-  if (selection_size () > 1) {
-    message (tl::sprintf (tl::to_string (tr ("selected: %ld objects")), selection_size ()));
-  }
-
-  lay::Editables::signal_selection_changed ();
 }
 
 void 
@@ -1942,9 +1943,7 @@ LayoutViewBase::erase_cellview (unsigned int index)
     manager ()->clear ();
   }
 
-  if (mp_control_panel) {
-    mp_control_panel->begin_updates ();
-  }
+  begin_layer_updates ();
 
   m_cellviews.erase (cellview_iter (int (index)));
 
@@ -1985,7 +1984,7 @@ LayoutViewBase::erase_cellview (unsigned int index)
   update_content ();
 
   if (m_title.empty ()) {
-    emit title_changed ();
+    emit_title_changed ();
   }
 }
 
@@ -2014,7 +2013,7 @@ LayoutViewBase::clear_cellviews ()
   finish_cellviews_changed ();
 
   if (m_title.empty ()) {
-    emit title_changed ();
+    emit_title_changed ();
   }
 }
 
@@ -2081,12 +2080,10 @@ LayoutViewBase::set_layout (const lay::CellView &cv, unsigned int cvindex)
   //  since the hierarchy panel may hold cellviews, we explicitly request an initialization
   //  of the tree. This will release such references. This way, set_layout guarantees that
   //  the layouts are released as far as possible. This is important for reload () for example.
-  if (mp_hierarchy_panel) {
-    mp_hierarchy_panel->do_update_content (cvindex);
-  }
+  update_content_for_cv (cvindex);
 
   if (m_title.empty ()) {
-    emit title_changed ();
+    emit_title_changed ();
   }
 }
 
@@ -2291,7 +2288,7 @@ LayoutViewBase::add_new_layers (const std::vector <unsigned int> &layer_ids, int
     set_properties (new_props);
 
     if (was_empty) {
-      set_current_layer (new_props.begin_const_recursive ());
+      do_set_current_layer (new_props.begin_const_recursive ());
     }
 
   }
@@ -2618,7 +2615,7 @@ LayoutViewBase::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview,
 
   try {
 
-    m_active_cellview_changed_event_enabled = false;
+    enable_active_cellview_changed_event (false);
 
     stop_redraw ();
 
@@ -2698,15 +2695,8 @@ LayoutViewBase::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview,
     }
 
     //  select the first layer if nothing else is selected
-    if (cv_index == 0 && ! mp_control_panel->has_selection ()) {
-      const lay::LayerPropertiesList &lp = get_properties ();
-      lay::LayerPropertiesConstIterator li = lp.begin_const_recursive ();
-      while (! li.at_end () && li->has_children ()) {
-        ++li;
-      }
-      if (! li.at_end ()) {
-        mp_control_panel->set_current_layer (li);
-      }
+    if (cv_index == 0) {
+      ensure_layer_selected ();
     }
 
     //  signal to any observers
@@ -2727,19 +2717,16 @@ LayoutViewBase::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview,
       set_active_cellview_index (cv_index);
     }
 
-    m_active_cellview_changed_event_enabled = true;
+    enable_active_cellview_changed_event (true);
 
   } catch (...) {
 
     update_content ();
 
-    m_active_cellview_changed_event_enabled = true;
+    enable_active_cellview_changed_event (true, true);
     throw;
 
   }
-
-  //  this event may not be generated otherwise, hence force it now.
-  active_cellview_changed (cv_index);
 
   return cv_index;
 }
@@ -2824,7 +2811,7 @@ LayoutViewBase::load_layout (const std::string &filename, const db::LoadLayoutOp
 
   try {
 
-    m_active_cellview_changed_event_enabled = false;
+    enable_active_cellview_changed_event (false);
 
     //  select the cell with the largest area as the first top cell
     db::Layout::top_down_const_iterator top = cv->layout ().begin_top_down ();
@@ -2875,15 +2862,8 @@ LayoutViewBase::load_layout (const std::string &filename, const db::LoadLayoutOp
     create_initial_layer_props (cv_index, lyp_file, add_other_layers);
 
     //  select the first layer if nothing else is selected
-    if (cv_index == 0 && ! mp_control_panel->has_selection ()) {
-      const lay::LayerPropertiesList &lp = get_properties ();
-      lay::LayerPropertiesConstIterator li = lp.begin_const_recursive ();
-      while (! li.at_end () && li->has_children ()) {
-        ++li;
-      }
-      if (! li.at_end ()) {
-        mp_control_panel->set_current_layer (li);
-      }
+    if (cv_index == 0) {
+      ensure_layer_selected ();
     }
 
     //  signal to any observers
@@ -2896,19 +2876,16 @@ LayoutViewBase::load_layout (const std::string &filename, const db::LoadLayoutOp
     }
     update_content ();
 
-    m_active_cellview_changed_event_enabled = true;
+    enable_active_cellview_changed_event (true);
 
   } catch (...) {
 
     update_content ();
 
-    m_active_cellview_changed_event_enabled = true;
+    enable_active_cellview_changed_event (true, true /*silent*/);
     throw;
 
   }
-
-  //  this event may not be generated otherwise, hence force it now.
-  active_cellview_changed (cv_index);
 
   return cv_index;
 }
@@ -3092,7 +3069,7 @@ LayoutViewBase::timer ()
 
   if (dirty != m_dirty) {
     m_dirty = dirty;
-    emit dirty_changed ();
+    emit_dirty_changed ();
   }
 
   if (m_prop_changed) {
@@ -3105,9 +3082,7 @@ LayoutViewBase::timer ()
     m_last_checked = current_time;
     if (m_animated) {
       set_view_ops ();
-      if (mp_control_panel) {
-        mp_control_panel->set_phase (int (m_phase));
-      }
+      do_set_phase (int (m_phase));
       if (m_animated) {
         ++m_phase;
       }
@@ -3124,7 +3099,7 @@ LayoutViewBase::force_update_content ()
 void
 LayoutViewBase::update_content ()
 {
-  if (m_activated) {
+  if (is_activated ()) {
     set_view_ops ();
   }
 }
@@ -3836,20 +3811,6 @@ LayoutViewBase::set_hier_levels_basic (std::pair<int, int> l)
 {
   if (l != get_hier_levels ()) {
 
-    if (mp_min_hier_spbx) {
-      mp_min_hier_spbx->blockSignals (true);
-      mp_min_hier_spbx->setValue (l.first);
-      mp_min_hier_spbx->setMaximum (l.second);
-      mp_min_hier_spbx->blockSignals (false);
-    }
-
-    if (mp_max_hier_spbx) {
-      mp_max_hier_spbx->blockSignals (true);
-      mp_max_hier_spbx->setValue (l.second);
-      mp_max_hier_spbx->setMinimum (l.first);
-      mp_max_hier_spbx->blockSignals (false);
-    }
-
     m_from_level = l.first;
     m_to_level = l.second;
 
@@ -4122,15 +4083,19 @@ LayoutViewBase::select_cellviews_fit (const std::list <CellView> &cvs)
 void
 LayoutViewBase::cellview_changed (unsigned int index)
 {
-  if (mp_hierarchy_panel) {
-    mp_hierarchy_panel->do_update_content (index);
-  }
+  update_content_for_cv (index);
 
   cellview_changed_event (index);
 
   if (m_title.empty ()) {
-    emit title_changed ();
+    emit_title_changed ();
   }
+}
+
+void
+LayoutViewBase::set_current_cell_path (int /*cv_index*/, const cell_path_type & /*path*/)
+{
+  //  .. nothing yet ..
 }
 
 void 
@@ -4523,9 +4488,7 @@ LayoutViewBase::no_stipples (bool f)
 {
   if (m_no_stipples != f) {
     m_no_stipples = f;
-    if (mp_control_panel) {
-      mp_control_panel->set_no_stipples (m_no_stipples);
-    }
+    do_set_no_stipples (f);
     update_content ();
   }
 }
@@ -4613,43 +4576,24 @@ LayoutViewBase::paste_interactive ()
 void
 LayoutViewBase::copy ()
 {
-  if (mp_hierarchy_panel && mp_hierarchy_panel->has_focus ()) {
-    mp_hierarchy_panel->copy ();
-  } else if (mp_control_panel && mp_control_panel->has_focus ()) {
-    mp_control_panel->copy ();
-  } else {
-
-    if (! lay::Editables::has_selection ()) {
-      //  try to use the transient selection for the real one
-      lay::Editables::transient_to_selection ();
-    }
-
-    lay::Editables::copy ();
-
+  if (! lay::Editables::has_selection ()) {
+    //  try to use the transient selection for the real one
+    lay::Editables::transient_to_selection ();
   }
+
+  lay::Editables::copy ();
 }
 
 void
 LayoutViewBase::cut ()
 {
-  if (mp_hierarchy_panel && mp_hierarchy_panel->has_focus ()) {
-    //  TODO: currently the hierarchy panel's cut function does it's own transaction handling.
-    //  Otherwise the cut function is not working propertly.
-    mp_hierarchy_panel->cut ();
-  } else if (mp_control_panel && mp_control_panel->has_focus ()) {
-    db::Transaction trans (manager (), tl::to_string (QObject::tr ("Cut Layers")));
-    mp_control_panel->cut ();
-  } else {
-
-    if (! lay::Editables::has_selection ()) {
-      //  try to use the transient selection for the real one
-      lay::Editables::transient_to_selection ();
-    }
-
-    db::Transaction trans (manager (), tl::to_string (QObject::tr ("Cut")));
-    lay::Editables::cut ();
-
+  if (! lay::Editables::has_selection ()) {
+    //  try to use the transient selection for the real one
+    lay::Editables::transient_to_selection ();
   }
+
+  db::Transaction trans (manager (), tl::to_string (QObject::tr ("Cut")));
+  lay::Editables::cut ();
 }
 
 void 
@@ -4686,7 +4630,7 @@ LayoutViewBase::add_missing_layers ()
     }
   }
 
-  emit layer_order_changed ();
+  emit_layer_order_changed ();
 }
 
 LayerState 
@@ -4742,15 +4686,7 @@ LayoutViewBase::add_new_layers (const LayerState &state)
   }
 
   if (needs_update) {
-    emit layer_order_changed ();
-  }
-}
-
-void 
-LayoutViewBase::remove_unused_layers ()
-{
-  if (mp_control_panel) {
-    mp_control_panel->cm_remove_unused ();
+    emit_layer_order_changed ();
   }
 }
 
@@ -4810,7 +4746,61 @@ LayoutViewBase::stop ()
 }
 
 void
+LayoutViewBase::begin_layer_updates ()
+{
+  //  .. nothing yet ..
+}
+
+void
+LayoutViewBase::ensure_layer_selected ()
+{
+  //  .. nothing yet ..
+}
+
+void
+LayoutViewBase::do_set_current_layer (const lay::LayerPropertiesConstIterator & /*l*/)
+{
+  //  .. nothing yet ..
+}
+
+void
+LayoutViewBase::do_set_no_stipples (bool /*no_stipples*/)
+{
+  //  .. nothing yet ..
+}
+
+void
+LayoutViewBase::do_set_phase (int /*phase*/)
+{
+  //  .. nothing yet ..
+}
+
+void
+LayoutViewBase::deactivate_all_browsers ()
+{
+  //  .. nothing yet ..
+}
+
+bool
+LayoutViewBase::is_activated () const
+{
+  return true;
+}
+
+void
 LayoutViewBase::switch_mode (int /*m*/)
+{
+  //  .. nothing yet ..
+}
+
+void
+LayoutViewBase::set_active_cellview_index (int /*index*/)
+{
+  //  .. nothing yet ..
+}
+
+void
+LayoutViewBase::enable_active_cellview_changed_event (bool /*enable*/, bool /*silent*/)
 {
   //  .. nothing yet ..
 }
@@ -4821,13 +4811,13 @@ LayoutViewBase::mode (int m)
   if (m != m_mode) {
 
     m_mode = m;
-    lay::Plugin *active_plugin = 0;
+    mp_active_plugin = 0;
 
     if (m > 0) {
 
       for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
         if ((*p)->plugin_declaration ()->id () == m) {
-          active_plugin = *p;
+          mp_active_plugin = *p;
           mp_canvas->activate ((*p)->view_service_interface ());
           break;
         }
@@ -4837,22 +4827,6 @@ LayoutViewBase::mode (int m)
       mp_canvas->activate (mp_selection_service);
     } else if (m == -1 && mp_move_service) {
       mp_canvas->activate (mp_move_service);
-    }
-
-    lay::EditorOptionsPages *eo_pages = editor_options_pages ();
-    if (eo_pages) {
-
-      //  TODO: this is very inefficient as each "activate" will regenerate the tabs
-      for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
-        bool is_active = false;
-        if ((*op)->plugin_declaration () == 0) {
-          is_active = true;
-        } else if (active_plugin && active_plugin->plugin_declaration () == (*op)->plugin_declaration ()) {
-          is_active = true;
-        }
-        (*op)->activate (is_active);
-      }
-
     }
 
   }
@@ -4911,15 +4885,21 @@ LayoutViewBase::menu_activated (const std::string &symbol)
   }
 }
 
-void 
+void
+LayoutViewBase::update_content_for_cv (int /*cellview_index*/)
+{
+  //  .. nothing yet ..
+}
+
+void
 LayoutViewBase::rename_cellview (const std::string &name, int cellview_index)
 {
   if (cellview_index >= 0 && cellview_index < int (m_cellviews.size ())) {
     if ((*cellview_iter (cellview_index))->name () != name) {
       (*cellview_iter (cellview_index))->rename (name);
-      mp_hierarchy_panel->do_update_content (cellview_index);
+      update_content_for_cv (cellview_index);
       if (m_title.empty ()) {
-        emit title_changed ();
+        emit_title_changed ();
       }
     }
   }

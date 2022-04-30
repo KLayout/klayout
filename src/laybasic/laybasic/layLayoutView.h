@@ -161,6 +161,19 @@ public:
   void message (const std::string &s = "", int timeout = 10);
 
   /**
+   *  @brief Select a certain mode (by index)
+   */
+  virtual void mode (int m);
+
+  /**
+   *  @brief Gets the current mode
+   */
+  int mode () const
+  {
+    return LayoutViewBase::mode ();
+  }
+
+  /**
    *  @brief Switches the application's mode
    *
    *  Switches the mode on application level. Use this method to initiate
@@ -179,7 +192,7 @@ public:
    *
    *  If plugins already exist, they are deleted and created again
    */
-  void create_plugins (const lay::PluginDeclaration *except_this = 0);
+  virtual void create_plugins (const lay::PluginDeclaration *except_this = 0);
 
   /**
    *  @brief Sets the currently active layer by layer properties and cell view index
@@ -246,7 +259,7 @@ public:
   /**
    *  @brief Select a certain cellview for the active one
    */
-  void set_active_cellview_index (int index);
+  virtual void set_active_cellview_index (int index);
 
   /**
    *  @brief Cell paths of the selected cells
@@ -292,7 +305,7 @@ public:
    *  The current cell is the one highlighted in the browser with the focus rectangle. The
    *  cell given by the path is highlighted and scrolled into view.
    */
-  void set_current_cell_path (int cv_index, const cell_path_type &path);
+  virtual void set_current_cell_path (int cv_index, const cell_path_type &path);
 
   /**
    *  @brief Set the path to the current cell is the current cellview
@@ -302,6 +315,35 @@ public:
   void set_current_cell_path (const cell_path_type &path)
   {
     set_current_cell_path (active_cellview_index (), path);
+  }
+
+  /**
+   *  @brief Remove unused layers
+   */
+  void remove_unused_layers ();
+
+  /**
+   *  @brief Returns true, if the layer source shall be shown always in the layer properties tree
+   */
+  bool always_show_source () const
+  {
+    return m_always_show_source;
+  }
+
+  /**
+   *  @brief Returns true, if the layer/datatype shall be shown always in the layer properties tree
+   */
+  bool always_show_ld () const
+  {
+    return m_always_show_ld;
+  }
+
+  /**
+   *  @brief Returns true, if the layout index shall be shown always in the layer properties tree
+   */
+  bool always_show_layout_index () const
+  {
+    return m_always_show_layout_index;
   }
 
   /**
@@ -712,6 +754,10 @@ private:
   QSpinBox *mp_max_hier_spbx;
   BookmarkList m_bookmarks;
   bool m_active_cellview_changed_event_enabled;
+  std::set<int> m_active_cellview_changed_events;
+  bool m_always_show_source;
+  bool m_always_show_ld;
+  bool m_always_show_layout_index;
 
   tl::DeferredMethod<lay::LayoutView> dm_setup_editor_option_pages;
 
@@ -734,6 +780,25 @@ protected:
   virtual lay::Color default_background_color ();
   virtual void do_set_background_color (lay::Color color, lay::Color contrast);
   virtual void do_paste ();
+  virtual void begin_layer_updates ();
+  virtual void ensure_layer_selected ();
+  virtual void do_set_current_layer (const lay::LayerPropertiesConstIterator &l);
+  virtual void update_content_for_cv (int cv_index);
+  virtual void do_set_no_stipples (bool no_stipples);
+  virtual void do_set_phase (int phase);
+  virtual bool set_hier_levels_basic (std::pair<int, int> l);
+  virtual bool is_activated () const;
+  virtual void enable_active_cellview_changed_event (bool enable, bool silent = false);
+
+  //  overrides Editables method to display a message
+  void signal_selection_changed ();
+
+  virtual void emit_edits_enabled_changed ();
+  virtual void emit_title_changed ();
+  virtual void emit_dirty_changed ();
+  virtual void emit_layer_order_changed ();
+
+  virtual QWidget *widget () { return this; }
 };
 
 }

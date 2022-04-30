@@ -165,6 +165,9 @@ void
 LayoutView::init_ui ()
 {
   m_activated = true;
+  m_always_show_source = false;
+  m_always_show_ld = true;
+  m_always_show_layout_index = false;
 
   QVBoxLayout *vbl = new QVBoxLayout (this);
   vbl->setContentsMargins (0, 0, 0, 0);
@@ -282,10 +285,6 @@ LayoutView::init_ui ()
   mp_timer = new QTimer (this);
   connect (mp_timer, SIGNAL (timeout ()), this, SLOT (timer ()));
   mp_timer->start (timer_interval);
-
-  create_plugins ();
-
-  config_setup ();
 }
 
 LayoutView::~LayoutView ()
@@ -396,32 +395,8 @@ LayoutView *LayoutView::current ()
 
 void LayoutView::create_plugins (const lay::PluginDeclaration *except_this)
 {
-  clear_plugins ();
-
-  //  create the plugins
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-
-    if (&*cls != except_this) {
-
-      //  TODO: clean solution. The following is a HACK:
-      if (cls.current_name () == "ant::Plugin" || cls.current_name () == "img::Plugin") {
-        //  ant and img are created always
-        create_plugin (&*cls);
-      } else if ((options () & LV_NoPlugins) == 0) {
-        //  others: only create unless LV_NoPlugins is set
-        create_plugin (&*cls);
-      } else if ((options () & LV_NoGrid) == 0 && cls.current_name () == "GridNetPlugin") {
-        //  except grid net plugin which is created on request
-        create_plugin (&*cls);
-      }
-
-    }
-
-  }
-
+  LayoutViewBase::create_plugins (except_this);
   dm_setup_editor_option_pages ();
-
-  mode (default_mode ());
 }
 
 namespace {
@@ -559,6 +534,39 @@ LayoutView::configure (const std::string &name, const std::string &value)
     }
     return true;
 
+  } else if (name == cfg_layers_always_show_source) {
+
+    bool a = false;
+    tl::from_string (value, a);
+    if (a != m_always_show_source) {
+      m_always_show_source = a;
+      layer_list_changed_event (4);
+    }
+
+    return true;
+
+  } else if (name == cfg_layers_always_show_ld) {
+
+    bool a = false;
+    tl::from_string (value, a);
+    if (a != m_always_show_ld) {
+      m_always_show_ld = a;
+      layer_list_changed_event (4);
+    }
+
+    return true;
+
+  } else if (name == cfg_layers_always_show_layout_index) {
+
+    bool a = false;
+    tl::from_string (value, a);
+    if (a != m_always_show_layout_index) {
+      m_always_show_layout_index = a;
+      layer_list_changed_event (4);
+    }
+
+    return true;
+
   } else {
     return false;
   }
@@ -629,6 +637,12 @@ LayoutView::set_current_layer (const lay::LayerPropertiesConstIterator &l)
   }
 }
 
+void
+LayoutView::do_set_current_layer (const lay::LayerPropertiesConstIterator &l)
+{
+  set_current_layer (l);
+}
+
 lay::LayerPropertiesConstIterator 
 LayoutView::current_layer () const
 {
@@ -654,6 +668,37 @@ LayoutView::set_selected_layers (const std::vector<lay::LayerPropertiesConstIter
 {
   if (mp_control_panel) {
     mp_control_panel->set_selection (sel);
+  }
+}
+
+void
+LayoutView::ensure_layer_selected ()
+{
+  if (! mp_control_panel->has_selection ()) {
+    const lay::LayerPropertiesList &lp = get_properties ();
+    lay::LayerPropertiesConstIterator li = lp.begin_const_recursive ();
+    while (! li.at_end () && li->has_children ()) {
+      ++li;
+    }
+    if (! li.at_end ()) {
+      mp_control_panel->set_current_layer (li);
+    }
+  }
+}
+
+void
+LayoutView::remove_unused_layers ()
+{
+  if (mp_control_panel) {
+    mp_control_panel->cm_remove_unused ();
+  }
+}
+
+void
+LayoutView::begin_layer_updates ()
+{
+  if (mp_control_panel) {
+    mp_control_panel->begin_updates ();
   }
 }
 
@@ -765,6 +810,59 @@ LayoutView::do_set_background_color (lay::Color c, lay::Color contrast)
 }
 
 void
+LayoutView::do_set_no_stipples (bool no_stipples)
+{
+  if (mp_control_panel) {
+    mp_control_panel->set_no_stipples (no_stipples);
+  }
+}
+
+void
+LayoutView::do_set_phase (int phase)
+{
+  if (mp_control_panel) {
+    mp_control_panel->set_phase (phase);
+  }
+}
+
+void
+LayoutView::enable_active_cellview_changed_event (bool enable, bool silent)
+{
+  if (m_active_cellview_changed_event_enabled == enable) {
+    return;
+  }
+
+  m_active_cellview_changed_event_enabled = enable;
+  if (enable) {
+
+    if (!silent && ! m_active_cellview_changed_events.empty ()) {
+
+      //  deliver stored events
+
+      //  we need to cancel pending drawing or dragging operations to reflect the new cellview (different target, may have different technology etc.)
+      cancel_esc ();
+
+      //  we need to setup the editor option pages because the technology may have changed
+      dm_setup_editor_option_pages ();
+
+      active_cellview_changed_event ();
+      for (std::set<int>::const_iterator i = m_active_cellview_changed_events.begin (); i != m_active_cellview_changed_events.end (); ++i) {
+        active_cellview_changed_with_index_event (*i);
+      }
+
+      //  Because the title reflects the active one, emit a title changed event
+      if (title_string ().empty ()) {
+        emit title_changed ();
+      }
+
+    }
+
+  }
+
+  m_active_cellview_changed_events.clear ();
+}
+
+void
 LayoutView::active_cellview_changed (int index)
 {
   if (m_active_cellview_changed_event_enabled) {
@@ -783,6 +881,8 @@ LayoutView::active_cellview_changed (int index)
       emit title_changed ();
     }
 
+  } else {
+    m_active_cellview_changed_events.insert (index);
   }
 }
 
@@ -797,6 +897,32 @@ LayoutView::active_library_changed (int /*index*/)
   //  commit the new active library to the other views and persist this state
   //  TODO: could be passed through the LibraryController (like through some LibraryController::active_library)
   dispatcher ()->config_set (cfg_current_lib_view, lib_name);
+}
+
+bool
+LayoutView::set_hier_levels_basic (std::pair<int, int> l)
+{
+  if (l != get_hier_levels ()) {
+
+    if (mp_min_hier_spbx) {
+      mp_min_hier_spbx->blockSignals (true);
+      mp_min_hier_spbx->setValue (l.first);
+      mp_min_hier_spbx->setMaximum (l.second);
+      mp_min_hier_spbx->blockSignals (false);
+    }
+
+    if (mp_max_hier_spbx) {
+      mp_max_hier_spbx->blockSignals (true);
+      mp_max_hier_spbx->setValue (l.second);
+      mp_max_hier_spbx->setMinimum (l.first);
+      mp_max_hier_spbx->blockSignals (false);
+    }
+
+    return LayoutViewBase::set_hier_levels_basic (l);
+
+  } else {
+    return false;
+  }
 }
 
 bool
@@ -924,6 +1050,12 @@ LayoutView::deactivate ()
   m_activated = false;
 }
 
+bool
+LayoutView::is_activated () const
+{
+  return m_activated;
+}
+
 void
 LayoutView::deactivate_all_browsers ()
 {
@@ -931,6 +1063,14 @@ LayoutView::deactivate_all_browsers ()
     if ((*p)->browser_interface ()) {
       (*p)->browser_interface ()->deactivate ();
     }
+  }
+}
+
+void
+LayoutView::update_content_for_cv (int cellview_index)
+{
+  if (mp_hierarchy_panel) {
+    mp_hierarchy_panel->do_update_content (cellview_index);
   }
 }
 
@@ -953,9 +1093,69 @@ LayoutView::current_pos (double x, double y)
 }
 
 void
+LayoutView::emit_edits_enabled_changed ()
+{
+  emit edits_enabled_changed ();
+}
+
+void
+LayoutView::emit_title_changed ()
+{
+  emit title_changed ();
+}
+
+void
+LayoutView::emit_dirty_changed ()
+{
+  emit dirty_changed ();
+}
+
+void
+LayoutView::emit_layer_order_changed ()
+{
+  emit layer_order_changed ();
+}
+
+void
+LayoutView::signal_selection_changed ()
+{
+  if (selection_size () > 1) {
+    message (tl::sprintf (tl::to_string (tr ("selected: %ld objects")), selection_size ()));
+  }
+
+  lay::Editables::signal_selection_changed ();
+}
+
+void
 LayoutView::message (const std::string &s, int timeout)
 {
   emit show_message (s, timeout * 1000);
+}
+
+void
+LayoutView::mode (int m)
+{
+  if (mode () != m) {
+
+    LayoutViewBase::mode (m);
+
+    lay::EditorOptionsPages *eo_pages = editor_options_pages ();
+    if (eo_pages) {
+
+      //  TODO: this is very inefficient as each "activate" will regenerate the tabs
+      for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+        bool is_active = false;
+        if ((*op)->plugin_declaration () == 0) {
+          is_active = true;
+        } else if (active_plugin () && active_plugin ()->plugin_declaration () == (*op)->plugin_declaration ()) {
+          is_active = true;
+        }
+        (*op)->activate (is_active);
+      }
+
+    }
+
+  }
 }
 
 void

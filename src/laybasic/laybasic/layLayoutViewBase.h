@@ -53,6 +53,10 @@
 #include "tlTimer.h"
 #include "dbInstElement.h"
 
+#if defined(HAVE_QT)
+class QWidget;
+#endif
+
 namespace rdb {
   class Database;
 }
@@ -1392,7 +1396,7 @@ public:
   /**
    *  @brief Select a certain mode (by index)
    */
-  void mode (int m);
+  virtual void mode (int m);
   
   /**
    *  @brief Test, if the view is currently in move mode.
@@ -2023,35 +2027,6 @@ public:
   LayerState layer_snapshot () const;
 
   /**
-   *  @brief Remove unused layers
-   */
-  void remove_unused_layers ();
-
-  /**
-   *  @brief Returns true, if the layer source shall be shown always in the layer properties tree
-   */
-  bool always_show_source () const
-  {
-    return m_always_show_source;
-  }
-
-  /**
-   *  @brief Returns true, if the layer/datatype shall be shown always in the layer properties tree
-   */
-  bool always_show_ld () const
-  {
-    return m_always_show_ld;
-  }
-
-  /**
-   *  @brief Returns true, if the layout index shall be shown always in the layer properties tree
-   */
-  bool always_show_layout_index () const
-  {
-    return m_always_show_layout_index;
-  }
-
-  /**
    *  @brief Add a marker database
    *
    *  The layout view will become owner of the database.
@@ -2364,9 +2339,6 @@ private:
   tl::vector <db::LayoutToNetlist *> m_l2ndbs;
   std::string m_def_lyp_file;
   bool m_add_other_layers;
-  bool m_always_show_source;
-  bool m_always_show_ld;
-  bool m_always_show_layout_index;
   bool m_synchronous;
   int m_drawing_workers;
 
@@ -2461,6 +2433,8 @@ private:
 
   std::vector<lay::Plugin *> mp_plugins;
 
+  lay::Plugin *mp_active_plugin;
+
   bool m_visibility_changed;
 
   tl::Clock m_clock, m_last_checked;
@@ -2484,7 +2458,6 @@ private:
   void abstract_mode_enabled (bool e);
   bool has_max_hier () const;
   int max_hier_level () const;
-  bool set_hier_levels_basic (std::pair<int, int> l);
 
   void update_event_handlers ();
   void viewport_changed ();
@@ -2494,9 +2467,6 @@ private:
   void finish_cellviews_changed ();
   void init_layer_properties (LayerProperties &props, const LayerPropertiesList &lp_list) const;
   void merge_dither_pattern (lay::LayerPropertiesList &props);
-
-  //  overrides Editables method to display a message
-  void signal_selection_changed ();
 
 protected:
   unsigned int options () const
@@ -2509,6 +2479,11 @@ protected:
     return m_mode;
   }
 
+  lay::Plugin *active_plugin () const
+  {
+    return mp_active_plugin;
+  }
+
   bool configure (const std::string &name, const std::string &value);
   void config_finalize ();
 
@@ -2517,6 +2492,7 @@ protected:
 
   lay::Plugin *create_plugin (const lay::PluginDeclaration *cls);
   void clear_plugins ();
+  virtual void create_plugins (const lay::PluginDeclaration *except_this = 0);
 
   void free_resources ();
 
@@ -2524,6 +2500,27 @@ protected:
   virtual void do_set_background_color (lay::Color color, lay::Color contrast);
   virtual void do_paste ();
   virtual void switch_mode (int m);
+  virtual void begin_layer_updates ();
+  virtual void ensure_layer_selected ();
+  virtual void do_set_current_layer (const lay::LayerPropertiesConstIterator &l);
+  virtual void do_set_no_stipples (bool no_stipples);
+  virtual void do_set_phase (int phase);
+  virtual void deactivate_all_browsers ();
+  virtual bool is_activated () const;
+  virtual void update_content_for_cv (int cv_index);
+  virtual void set_active_cellview_index (int index);
+  virtual void enable_active_cellview_changed_event (bool enable, bool silent = false);
+  virtual bool set_hier_levels_basic (std::pair<int, int> l);
+  virtual void set_current_cell_path (int cv_index, const cell_path_type &path);
+
+  virtual void emit_edits_enabled_changed () { }
+  virtual void emit_title_changed () { }
+  virtual void emit_dirty_changed () { }
+  virtual void emit_layer_order_changed () { }
+
+#if defined(HAVE_QT)
+  virtual QWidget *widget () { return 0; }
+#endif
 };
 
 }

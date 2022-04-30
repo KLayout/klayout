@@ -47,7 +47,7 @@ def GenerateUsage(platform):
     usage  = "\n"
     usage += "---------------------------------------------------------------------------------------------------------\n"
     usage += "<< Usage of 'build4mac.py' >>\n"
-    usage += "       for building KLayout 0.27.4 or later on different Apple macOS / Mac OSX platforms.\n"
+    usage += "       for building KLayout 0.27.9 or later on different Apple macOS / Mac OSX platforms.\n"
     usage += "\n"
     usage += "$ [python] ./build4mac.py\n"
     usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value\n"
@@ -683,7 +683,8 @@ def Get_Build_Parameters(config):
     return parameters
 
 #------------------------------------------------------------------------------
-## To run the main Bash script "build.sh" with appropriate options
+## To run the "setup.py" script with appropriate options for building
+#  the klayout Python Module "pymod".
 #
 # @param[in] parameters     dictionary containing the build parameters
 #
@@ -1036,7 +1037,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
 
 
     print( " [3] Creating the standard directory structure for 'klayout.app' bundle ..." )
-    #-----------------------------------------------------------------
+    #--------------------------------------------------------------------------------------------------------------
     # [3] Create the directory skeleton for "klayout.app" bundle
     #     and command line buddy tools such as "strm2cif".
     #     They are stored in the directory structure below.
@@ -1062,9 +1063,12 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     #                             |         +-- 'strmxor'
     #                             |
     #                             +-- pymod-dist/+ (created only if *.whl and *.egg are available)
-    #                                            +-- klayout-0.27.8-cp38-cp38-macosx_10_9_x86_64.whl (example)
-    #                                            +-- klayout-0.27.8-py3.8-macosx-10.9-x86_64.egg (example)
-    #-----------------------------------------------------------------
+    #                                            +-- klayout-0.27.8-cp38-cp38-macosx_10_9_x86_64.whl (example)(1)
+    #                                            +-- klayout-0.27.8-py3.8-macosx-10.9-x86_64.egg (example)(2)
+    #
+    #                                            (1) *.whl is recommended to install with 'pip3'
+    #                                            (2) *.egg is for 'easy_install' users
+    #--------------------------------------------------------------------------------------------------------------
     targetDir0 = "%s/klayout.app/Contents" % AbsMacPkgDir
     targetDirR = targetDir0 + "/Resources"
     targetDirF = targetDir0 + "/Frameworks"
@@ -1080,7 +1084,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
 
 
     print( " [4] Copying KLayout's dynamic link libraries to 'Frameworks' ..." )
-    #-------------------------------------------------------------------------------
+    #---------------------------------------------------------------------------------------
     # [4] Copy KLayout's dynamic link libraries to "Frameworks/" and create
     #     the library dependency dictionary.
     #     <<< Do this job in "Frameworks/" >>>
@@ -1110,7 +1114,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     #     libklayout_gsi.0.dylib (compatibility version 0.26.0, current version 0.26.1)
     #     libklayout_db.0.dylib (compatibility version 0.26.0, current version 0.26.1)
     #       :
-    #-------------------------------------------------------------------------------
+    #---------------------------------------------------------------------------------------
     os.chdir( targetDirF )
     dynamicLinkLibs = glob.glob( os.path.join( AbsMacBinDir, "*.dylib" ) )
     depDicOrdinary  = {} # inter-library dependency dictionary

@@ -50,6 +50,7 @@
 #include "gsi.h"
 #include "tlException.h"
 #include "tlEvents.h"
+#include "tlTimer.h"
 #include "dbInstElement.h"
 
 namespace rdb {
@@ -196,7 +197,7 @@ public:
    *  This reimplementation of the lay::Editables interface additionally
    *  looks for content providers in the tree views for example.
    */
-  bool has_selection ();
+  virtual bool has_selection ();
 
   /**
    *  @brief Pastes from clipboard
@@ -217,7 +218,7 @@ public:
    *  This reimplementation of the lay::Editables interface additionally
    *  looks for copy providers in the tree views for example.
    */
-  void copy ();
+  virtual void copy ();
 
   /**
    *  @brief Cuts to clipboard
@@ -225,7 +226,7 @@ public:
    *  This reimplementation of the lay::Editables interface additionally
    *  looks for cut & copy providers in the tree views for example.
    */
-  void cut ();
+  virtual void cut ();
 
   /**
    *  @brief Gets the explicit title string of the view
@@ -637,19 +638,6 @@ public:
    *  @brief An event signalling that the visibility of some cells has changed
    */
   tl::Event cell_visibility_changed_event;
-
-  /**
-   *  @brief An event triggered if the active cellview changes
-   *  This event is triggered after the active cellview changed.
-   */
-  tl::Event active_cellview_changed_event;
-
-  /**
-   *  @brief An event triggered if the active cellview changes
-   *  This event is triggered after the active cellview changed. The integer parameter is the index of the
-   *  new cellview.
-   */
-  tl::event<int> active_cellview_changed_with_index_event;
 
   /**
    *  @brief Save the given cellview into the given file (with options)
@@ -1294,9 +1282,9 @@ public:
   unsigned int add_layout (lay::LayoutHandle *layout_handle, bool add_cellview, bool initialize_layers = true);
 
   /**
-   *  @brief Pass the current position from the mouse tracker to the status bar
+   *  @brief Indicates the current position
    */ 
-  void current_pos (double x, double y);
+  virtual void current_pos (double x, double y);
 
   /**
    *  @brief Obtain the number of cellviews
@@ -1390,11 +1378,6 @@ public:
   db::DBox box () const;
 
   /**
-   *  @brief Display a status message
-   */
-  void message (const std::string &s = "", int timeout = 10);
-
-  /**
    *  @brief Create a new cell with the given in the given cellview
    *
    *  @param cv_index The index of the cellview where to create the cell
@@ -1412,14 +1395,6 @@ public:
   void mode (int m);
   
   /**
-   *  @brief Switches the application's mode
-   *
-   *  Switches the mode on application level. Use this method to initiate
-   *  a mode switch from the view.
-   */
-  void switch_mode (int m);
-
-  /**
    *  @brief Test, if the view is currently in move mode.
    */
   bool is_move_mode () const;
@@ -1433,12 +1408,6 @@ public:
    *  @brief Query the intrinsic mouse modes available
    */
   static unsigned int intrinsic_mouse_modes (std::vector<std::string> *descriptions);
-
-  /**
-   *  @brief Updates the menu for the given view
-   *  If the view is 0, the menu shall be updated to reflect "no view active"
-   */
-  static void update_menu (lay::LayoutViewBase *view, lay::AbstractMenu &menu);
 
   /**
    *  @brief Query the default mode
@@ -1926,16 +1895,6 @@ public:
   void merge_layer_props (const std::vector<lay::LayerPropertiesList> &props);
 
   /**
-   *  @brief Internal method: check, if the layer tree is and an consistent state.
-   *  
-   *  This method is used by the layer tree model to check, if the tree has been brought into 
-   *  a consistent state.
-   *  HINT: for the layout this is solved more consistently with the "under construction" attribute
-   *  of the layout. There is no equivalent object for the layer tree currently.
-   */
-  bool layer_model_updated ();
-
-  /**
    *  @brief Get the "select inside PCells" selection mode
    *
    *  @return true, objects inside PCells can be selected
@@ -2279,13 +2238,6 @@ public:
   lay::MoveService *move_service () const { return mp_move_service; }
 
   /**
-   *  @brief Create all plugins
-   *
-   *  If plugins already exist, they are deleted and created again
-   */
-  void create_plugins (const lay::PluginDeclaration *except_this = 0);
-
-  /**
    *  @brief Gets the full field box
    *
    *  This is the box to which the view will zoom on zoom_fit().
@@ -2385,11 +2337,7 @@ public:
   void redraw_layer (unsigned int index);
   void redraw_deco_layer ();
   void redraw_cell_boxes ();
-  void layer_tab_changed ();
-  void layer_order_changed ();
   void timer ();
-  void min_hier_changed (int i);
-  void max_hier_changed (int i);
 
 private:
   //  event handlers used to connect to the layout object's events
@@ -2402,10 +2350,6 @@ private:
   void signal_annotations_changed ();
   void signal_plugin_enabled_changed ();
   void signal_apply_technology (lay::LayoutHandle *layout_handle);
-
-  void active_cellview_changed (int index);
-  void active_library_changed (int index);
-  void side_panel_destroyed ();
 
 private:
   bool m_editable;
@@ -2492,7 +2436,7 @@ private:
   bool m_absolute_coordinates;
 
   bool m_dirty;
-  bool m_activated;
+  bool m_prop_changed;
   bool m_animated;
   unsigned int m_phase;
 
@@ -2519,6 +2463,8 @@ private:
 
   bool m_visibility_changed;
 
+  tl::Clock m_clock, m_last_checked;
+
   void init (db::Manager *mgr);
 
   void do_prop_changed ();
@@ -2544,9 +2490,6 @@ private:
   void viewport_changed ();
   void cellview_changed (unsigned int index);
 
-  bool configure (const std::string &name, const std::string &value);
-  void config_finalize ();
-
   void do_load_layer_props (const std::string &fn, bool map_cv, int cv_index, bool add_default);
   void finish_cellviews_changed ();
   void init_layer_properties (LayerProperties &props, const LayerPropertiesList &lp_list) const;
@@ -2555,10 +2498,32 @@ private:
   //  overrides Editables method to display a message
   void signal_selection_changed ();
 
-  lay::Plugin *create_plugin (const lay::PluginDeclaration *cls);
+protected:
+  unsigned int options () const
+  {
+    return m_options;
+  }
+
+  int mode () const
+  {
+    return m_mode;
+  }
+
+  bool configure (const std::string &name, const std::string &value);
+  void config_finalize ();
 
   std::list<lay::CellView>::iterator cellview_iter (int cv_index);
   std::list<lay::CellView>::const_iterator cellview_iter (int cv_index) const;
+
+  lay::Plugin *create_plugin (const lay::PluginDeclaration *cls);
+  void clear_plugins ();
+
+  void free_resources ();
+
+  virtual lay::Color default_background_color ();
+  virtual void do_set_background_color (lay::Color color, lay::Color contrast);
+  virtual void do_paste ();
+  virtual void switch_mode (int m);
 };
 
 }

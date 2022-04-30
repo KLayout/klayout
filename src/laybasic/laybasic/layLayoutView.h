@@ -94,7 +94,8 @@ class EditorOptionsPages;
  *  It manages the layer display list, bookmark list etc.
  */
 class LAYBASIC_PUBLIC LayoutView
-  : public LayoutViewBase
+  : public QFrame,
+    public LayoutViewBase
 {
 Q_OBJECT
 
@@ -110,6 +111,11 @@ public:
   LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent = 0, const char *name = "view", unsigned int options = (unsigned int) LV_Normal);
 
   /**
+   *  @brief Destructor
+   */
+  ~LayoutView ();
+
+  /**
    *  @brief Makes this view the current one
    */
   void set_current ();
@@ -119,12 +125,20 @@ public:
    *
    *  The argument can be 0 which means there is no current view.
    */
-  static void set_current (LayoutViewBase *);
+  static void set_current (LayoutView *);
 
   /**
    *  @brief Gets the current view
    */
-  static LayoutViewBase *current ();
+  static LayoutView *current ();
+
+  /**
+   *  @brief Determine if there is something to copy
+   *
+   *  This reimplementation of the lay::Editables interface additionally
+   *  looks for content providers in the tree views for example.
+   */
+  virtual bool has_selection ();
 
   /**
    *  @brief Gets the window title of the view
@@ -140,6 +154,32 @@ public:
    *  @brief Resets the explicit title and enable the automatic naming
    */
   void reset_title ();
+
+  /**
+   *  @brief Display a status message
+   */
+  void message (const std::string &s = "", int timeout = 10);
+
+  /**
+   *  @brief Switches the application's mode
+   *
+   *  Switches the mode on application level. Use this method to initiate
+   *  a mode switch from the view.
+   */
+  void switch_mode (int m);
+
+  /**
+   *  @brief Updates the menu for the given view
+   *  If the view is 0, the menu shall be updated to reflect "no view active"
+   */
+  static void update_menu (lay::LayoutView *view, lay::AbstractMenu &menu);
+
+  /**
+   *  @brief Create all plugins
+   *
+   *  If plugins already exist, they are deleted and created again
+   */
+  void create_plugins (const lay::PluginDeclaration *except_this = 0);
 
   /**
    *  @brief Sets the currently active layer by layer properties and cell view index
@@ -265,6 +305,11 @@ public:
   }
 
   /**
+   *  @brief Indicates the current position
+   */
+  virtual void current_pos (double x, double y);
+
+  /**
    *  @brief Bookmark the current view under the given name
    */
   void bookmark_view (const std::string &name);
@@ -359,9 +404,25 @@ public:
   }
 
   /**
+   *  @brief Copies to clipboard
+   *
+   *  This reimplementation of the lay::Editables interface additionally
+   *  looks for copy providers in the tree views for example.
+   */
+  virtual void copy ();
+
+  /**
+   *  @brief Cuts to clipboard
+   *
+   *  This reimplementation of the lay::Editables interface additionally
+   *  looks for cut & copy providers in the tree views for example.
+   */
+  virtual void cut ();
+
+  /**
    *  @brief Deliver a size hint (reimplementation of QWidget)
    */
-  QSize sizeHint () const;
+  virtual QSize sizeHint () const;
 
   /**
    *  @brief An event signalling that the view is going to close
@@ -377,6 +438,19 @@ public:
    *  @brief An event signalling that the view is going to become invisible
    */
   tl::Event hide_event;
+
+  /**
+   *  @brief An event triggered if the active cellview changes
+   *  This event is triggered after the active cellview changed.
+   */
+  tl::Event active_cellview_changed_event;
+
+  /**
+   *  @brief An event triggered if the active cellview changes
+   *  This event is triggered after the active cellview changed. The integer parameter is the index of the
+   *  new cellview.
+   */
+  tl::event<int> active_cellview_changed_with_index_event;
 
 public slots:
   /**
@@ -560,56 +634,22 @@ public slots:
     LayoutViewBase::redraw_cell_boxes ();
   }
 
-  void layer_tab_changed ()
-  {
-    LayoutViewBase::layer_tab_changed ();
-  }
-
-  void layer_order_changed ()
-  {
-    LayoutViewBase::layer_order_changed ();
-  }
+  void layer_tab_changed ();
+  void layer_order_changed ();
 
   void timer ()
   {
     LayoutViewBase::timer ();
   }
 
-  void min_hier_changed (int i)
-  {
-    LayoutViewBase::min_hier_changed (i);
-  }
-
-  void max_hier_changed (int i)
-  {
-    LayoutViewBase::max_hier_changed (i);
-  }
+  void min_hier_changed (int i);
+  void max_hier_changed (int i);
 
   void deactivate_all_browsers ();
 
-private:
-  //  event handlers used to connect to the layout object's events
-  void signal_hier_changed ();
-  void signal_bboxes_from_layer_changed (unsigned int cv_index, unsigned int layer_index);
-  void signal_bboxes_changed ();
-  void signal_prop_ids_changed ();
-  void signal_layer_properties_changed ();
-  void signal_cell_name_changed ();
-  void signal_annotations_changed ();
-  void signal_plugin_enabled_changed ();
-  void signal_apply_technology (lay::LayoutHandle *layout_handle);
-
 private slots:
-  void active_cellview_changed (int index)
-  {
-    LayoutViewBase::active_cellview_changed (index);
-  }
-
-  void active_library_changed (int index)
-  {
-    LayoutViewBase::active_library_changed (index);
-  }
-
+  void active_cellview_changed (int index);
+  void active_library_changed (int index);
   void side_panel_destroyed ();
 
 signals:
@@ -660,6 +700,7 @@ signals:
 
 private:
   QTimer *mp_timer;
+  bool m_activated;
   QFrame *mp_left_frame;
   lay::LayerControlPanel *mp_control_panel;
   lay::HierarchyControlPanel *mp_hierarchy_panel;
@@ -672,18 +713,27 @@ private:
   BookmarkList m_bookmarks;
   bool m_active_cellview_changed_event_enabled;
 
-  tl::DeferredMethod<lay::LayoutView> dm_prop_changed;
   tl::DeferredMethod<lay::LayoutView> dm_setup_editor_option_pages;
 
-  void init (db::Manager *mgr, QWidget *parent);
+  void init_ui ();
   void init_menu ();
+  lay::EditorOptionsPages *editor_options_pages ();
   void do_setup_editor_options_pages ();
+
+protected:
   void activate ();
   void deactivate ();
 
-  bool eventFilter(QObject *obj, QEvent *ev);
-  void showEvent (QShowEvent *);
-  void hideEvent (QHideEvent *);
+  virtual bool eventFilter(QObject *obj, QEvent *ev);
+  virtual void showEvent (QShowEvent *);
+  virtual void hideEvent (QHideEvent *);
+
+  virtual bool configure (const std::string &name, const std::string &value);
+  virtual void config_finalize ();
+
+  virtual lay::Color default_background_color ();
+  virtual void do_set_background_color (lay::Color color, lay::Color contrast);
+  virtual void do_paste ();
 };
 
 }

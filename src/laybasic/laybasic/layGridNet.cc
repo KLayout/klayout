@@ -23,16 +23,14 @@
 
 #include "laybasicConfig.h"
 #include "layGridNet.h"
-#if defined(HAVE_QT) // @@@
-#  include "layWidgets.h"
-#endif
-#include "layLayoutView.h"
 #include "layConverters.h"
+#include "layLayoutView.h"
 #include "layFixedFont.h"
 #include "laySnap.h"
 #include "dbTrans.h"
-#if defined(HAVE_QT) // @@@
-#  include "ui_GridNetConfigPage.h"
+
+#if defined(HAVE_QT)
+#  include "layGridNetConfigPage.h"
 #endif
 
 namespace lay
@@ -56,32 +54,28 @@ static struct {
   { lay::GridNet::CheckerBoard,      "checkerboard"        }
 };
 
-class GridNetStyleConverter
+void
+GridNetStyleConverter::from_string (const std::string &value, lay::GridNet::GridStyle &style)
 {
-public:
-  void
-  from_string (const std::string &value, lay::GridNet::GridStyle &style)
-  {
-    for (unsigned int i = 0; i < sizeof (grid_styles) / sizeof (grid_styles [0]); ++i) {
-      if (value == grid_styles [i].string) {
-        style = grid_styles [i].style;
-        return;
-      }
+  for (unsigned int i = 0; i < sizeof (grid_styles) / sizeof (grid_styles [0]); ++i) {
+    if (value == grid_styles [i].string) {
+      style = grid_styles [i].style;
+      return;
     }
-    throw tl::Exception (tl::to_string (tr ("Invalid grid net style: ")) + value);
   }
+  throw tl::Exception (tl::to_string (tr ("Invalid grid net style: ")) + value);
+}
 
-  std::string 
-  to_string (lay::GridNet::GridStyle style)
-  {
-    for (unsigned int i = 0; i < sizeof (grid_styles) / sizeof (grid_styles [0]); ++i) {
-      if (style == grid_styles [i].style) {
-        return grid_styles [i].string;
-      }
+std::string
+GridNetStyleConverter::to_string (lay::GridNet::GridStyle style)
+{
+  for (unsigned int i = 0; i < sizeof (grid_styles) / sizeof (grid_styles [0]); ++i) {
+    if (style == grid_styles [i].style) {
+      return grid_styles [i].string;
     }
-    return "";
   }
-};
+  return "";
+}
 
 // ------------------------------------------------------------
 //  Implementation of the GridNetPluginDeclaration 
@@ -117,85 +111,6 @@ GridNetPluginDeclaration::create_plugin (db::Manager *, Dispatcher *, lay::Layou
 }
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new GridNetPluginDeclaration (), 2010, "GridNetPlugin");
-
-// ------------------------------------------------------------
-//  Implementation of the configuration page
-
-#if defined(HAVE_QT)
-GridNetConfigPage::GridNetConfigPage (QWidget *parent)
-  : lay::ConfigPage (parent)
-{
-  mp_ui = new Ui::GridNetConfigPage ();
-  mp_ui->setupUi (this);
-
-  mp_grid_color_cbtn = new lay::ColorButton (mp_ui->grid_net_color_pb);
-  mp_grid_grid_color_cbtn = new lay::ColorButton (mp_ui->grid_grid_color_pb);
-  mp_grid_axis_color_cbtn = new lay::ColorButton (mp_ui->grid_axis_color_pb);
-  mp_grid_ruler_color_cbtn = new lay::ColorButton (mp_ui->grid_ruler_color_pb);
-}
-
-GridNetConfigPage::~GridNetConfigPage ()
-{
-  delete mp_ui;
-  mp_ui = 0;
-}
-
-void 
-GridNetConfigPage::setup (lay::Dispatcher *root)
-{
-  std::string value;
-
-  //  Grid visibility
-  bool visible = false;
-  root->config_get (cfg_grid_visible, visible);
-  mp_ui->grid_group->setChecked (visible);
-
-  bool show_ruler = false;
-  root->config_get (cfg_grid_show_ruler, show_ruler);
-  mp_ui->show_ruler->setChecked (show_ruler);
-
-  QColor color;
-  root->config_get (cfg_grid_color, color, ColorConverter ());
-  mp_grid_color_cbtn->set_color (color);
-
-  root->config_get (cfg_grid_grid_color, color, ColorConverter ());
-  mp_grid_grid_color_cbtn->set_color (color);
-
-  root->config_get (cfg_grid_axis_color, color, ColorConverter ());
-  mp_grid_axis_color_cbtn->set_color (color);
-
-  root->config_get (cfg_grid_ruler_color, color, ColorConverter ());
-  mp_grid_ruler_color_cbtn->set_color (color);
-
-  lay::GridNet::GridStyle style;
-
-  style = lay::GridNet::Invisible;
-  root->config_get (cfg_grid_style0, style, GridNetStyleConverter ());
-  mp_ui->style0_cbx->setCurrentIndex (int (style));
-
-  style = lay::GridNet::Invisible;
-  root->config_get (cfg_grid_style1, style, GridNetStyleConverter ());
-  mp_ui->style1_cbx->setCurrentIndex (int (style));
-
-  style = lay::GridNet::Invisible;
-  root->config_get (cfg_grid_style2, style, GridNetStyleConverter ());
-  mp_ui->style2_cbx->setCurrentIndex (int (style));
-}
-
-void 
-GridNetConfigPage::commit (lay::Dispatcher *root)
-{
-  root->config_set (cfg_grid_visible, mp_ui->grid_group->isChecked ());
-  root->config_set (cfg_grid_show_ruler, mp_ui->show_ruler->isChecked ());
-  root->config_set (cfg_grid_color, mp_grid_color_cbtn->get_color (), lay::ColorConverter ());
-  root->config_set (cfg_grid_grid_color, mp_grid_grid_color_cbtn->get_color (), lay::ColorConverter ());
-  root->config_set (cfg_grid_axis_color, mp_grid_axis_color_cbtn->get_color (), lay::ColorConverter ());
-  root->config_set (cfg_grid_ruler_color, mp_grid_ruler_color_cbtn->get_color (), lay::ColorConverter ());
-  root->config_set (cfg_grid_style0, lay::GridNet::GridStyle (mp_ui->style0_cbx->currentIndex ()), GridNetStyleConverter ());
-  root->config_set (cfg_grid_style1, lay::GridNet::GridStyle (mp_ui->style1_cbx->currentIndex ()), GridNetStyleConverter ());
-  root->config_set (cfg_grid_style2, lay::GridNet::GridStyle (mp_ui->style2_cbx->currentIndex ()), GridNetStyleConverter ());
-}
-#endif
 
 // ------------------------------------------------------------
 //  Implementation of the GridNet object
@@ -302,14 +217,14 @@ public:
     // .. nothing yet ..
   }
 
-  void set (const QPoint &p, QColor c) 
+  void set (const db::Point &p, lay::Color c)
   {
     if (p.x () >= 0 && p.x () < m_width && p.y () >= 0 && p.y () < m_height) {
       ((unsigned int *) mp_img->scanLine (p.y ())) [p.x ()] = c.rgb ();
     }
   }
     
-  void draw_line (const QPoint &p1, const QPoint &p2, QColor c) 
+  void draw_line (const db::Point &p1, const db::Point &p2, lay::Color c)
   {
     if (p1.x () == p2.x ()) {
 
@@ -343,28 +258,28 @@ public:
     }
   }
     
-  void fill_rect (const QPoint &p1, const QPoint &p2, QColor c) 
+  void fill_rect (const db::Point &p1, const db::Point &p2, lay::Color c)
   {
     int y1 = std::min (p1.y (), p2.y ());
     int y2 = std::max (p1.y (), p2.y ());
     for (int y = y1; y <= y2; ++y) {
-      draw_line (QPoint (p1.x (), y), QPoint (p2.x (), y), c);
+      draw_line (db::Point (p1.x (), y), db::Point (p2.x (), y), c);
     }
   }
 
-  void draw_rect (const QPoint &p1, const QPoint &p2, QColor c) 
+  void draw_rect (const db::Point &p1, const db::Point &p2, lay::Color c)
   {
     int y1 = std::min (p1.y (), p2.y ());
     int y2 = std::max (p1.y (), p2.y ());
     int x1 = std::min (p1.x (), p2.x ());
     int x2 = std::max (p1.x (), p2.x ());
-    draw_line (QPoint (x1, y1), QPoint (x2, y1), c);
-    draw_line (QPoint (x1, y2), QPoint (x2, y2), c);
-    draw_line (QPoint (x1, y1), QPoint (x1, y2), c);
-    draw_line (QPoint (x2, y1), QPoint (x2, y2), c);
+    draw_line (db::Point (x1, y1), db::Point (x2, y1), c);
+    draw_line (db::Point (x1, y2), db::Point (x2, y2), c);
+    draw_line (db::Point (x1, y1), db::Point (x1, y2), c);
+    draw_line (db::Point (x2, y1), db::Point (x2, y2), c);
   }
 
-  void draw_text (const char *t, const QPoint &p, QColor c, int halign, int valign)
+  void draw_text (const char *t, const db::Point &p, lay::Color c, int halign, int valign)
   {
     const lay::FixedFont &ff = lay::FixedFont::get_font (m_resolution);
     int x = p.x (), y = p.y ();
@@ -516,16 +431,16 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
       int xoffset = int (floor (0.5 + fw * 2.5));
       int yoffset = int (floor (0.5 + fw * 2.5));
 
-      painter.fill_rect (QPoint (xoffset, vp.height () - yoffset - rh / 2),
-                         QPoint (xoffset + int (floor (0.5 + dgrid)), vp.height () - yoffset + rh / 2), 
+      painter.fill_rect (db::Point (xoffset, vp.height () - yoffset - rh / 2),
+                         db::Point (xoffset + int (floor (0.5 + dgrid)), vp.height () - yoffset + rh / 2),
                          ruler_color);
 
-      painter.draw_rect (QPoint (xoffset + int (floor (0.5 + dgrid)), vp.height () - yoffset - rh / 2),
-                         QPoint (xoffset + int (floor (0.5 + 2 * dgrid)), vp.height () - yoffset + rh / 2), 
+      painter.draw_rect (db::Point (xoffset + int (floor (0.5 + dgrid)), vp.height () - yoffset - rh / 2),
+                         db::Point (xoffset + int (floor (0.5 + 2 * dgrid)), vp.height () - yoffset + rh / 2),
                          ruler_color);
 
       painter.draw_text (tl::sprintf ("%g \265m", grid * 2).c_str (), 
-                         QPoint (xoffset + int (floor (0.5 + trans.ctrans (2 * grid))), vp.height () - yoffset - rh / 2 - 2), 
+                         db::Point (xoffset + int (floor (0.5 + trans.ctrans (2 * grid))), vp.height () - yoffset - rh / 2 - 2),
                          ruler_color, -1, 1);
 
       if (mp_view->global_trans ().fp_trans () != db::DFTrans ()) {
@@ -550,9 +465,9 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
         poly.transform (db::FTrans (mp_view->global_trans ().fp_trans ()));
 
         for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); !e.at_end (); ++e) {
-          QPoint p0 (xoffset + 2 * rh, vp.height () - yoffset - rh * 5);
-          QPoint p1 = p0 + QPoint (int (floor (0.5 + (*e).p1 ().x () * 0.1 * rh * 4)), -int (floor (0.5 + (*e).p1 ().y () * 0.1 * rh * 4)));
-          QPoint p2 = p0 + QPoint (int (floor (0.5 + (*e).p2 ().x () * 0.1 * rh * 4)), -int (floor (0.5 + (*e).p2 ().y () * 0.1 * rh * 4)));
+          db::Point p0 (xoffset + 2 * rh, vp.height () - yoffset - rh * 5);
+          db::Point p1 = p0 + db::Vector (int (floor (0.5 + (*e).p1 ().x () * 0.1 * rh * 4)), -int (floor (0.5 + (*e).p1 ().y () * 0.1 * rh * 4)));
+          db::Point p2 = p0 + db::Vector (int (floor (0.5 + (*e).p2 ().x () * 0.1 * rh * 4)), -int (floor (0.5 + (*e).p2 ().y () * 0.1 * rh * 4)));
           painter.draw_line (p1, p2, ruler_color);
         }
 
@@ -596,9 +511,9 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
 
       for (db::DCoord x = x1; x < x2 + grid * eps; x += grid) {
         for (db::DCoord y = y1; y < y2 + grid * eps; y += grid) {
-          QPoint p (draw_round (trans * db::DPoint (x, y), vp.height ()));
-          painter.draw_line (p - QPoint (2, 0), p + QPoint (2, 0), grid_color);
-          painter.draw_line (p - QPoint (0, 2), p + QPoint (0, 2), grid_color);
+          db::Point p (draw_round (trans * db::DPoint (x, y), vp.height ()));
+          painter.draw_line (p - db::Vector (2, 0), p + db::Vector (2, 0), grid_color);
+          painter.draw_line (p - db::Vector (0, 2), p + db::Vector (0, 2), grid_color);
         }
       }
 
@@ -609,15 +524,15 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
       //  the way we iterate here is safe against integer overflow ..
       n = nx;
       for (db::DCoord x = x1; n > 0; x += grid, --n) {
-        QPoint p1 (draw_round (trans * db::DPoint (x, y1), vp.height ()));
-        QPoint p2 (draw_round (trans * db::DPoint (x, y2), vp.height ()));
+        db::Point p1 (draw_round (trans * db::DPoint (x, y1), vp.height ()));
+        db::Point p2 (draw_round (trans * db::DPoint (x, y2), vp.height ()));
         painter.draw_line (p1, p2, grid_color);
       }
 
       n = ny;
       for (db::DCoord y = y1; n > 0; y += grid, --n) {
-        QPoint p1 (draw_round (trans * db::DPoint (x1, y), vp.height ()));
-        QPoint p2 (draw_round (trans * db::DPoint (x2, y), vp.height ()));
+        db::Point p1 (draw_round (trans * db::DPoint (x1, y), vp.height ()));
+        db::Point p2 (draw_round (trans * db::DPoint (x2, y), vp.height ()));
         painter.draw_line (p1, p2, grid_color);
       }
 
@@ -637,23 +552,23 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
       //  the way we iterate here is safe against integer overflow ..
       n = nx;
       for (db::DCoord x = x1; n > 0; x += grid, --n) {
-        QPoint p1 (draw_round (trans * db::DPoint (x, y1), vp.height ()));
-        QPoint p2 (draw_round (trans * db::DPoint (x, y2), vp.height ()));
+        db::Point p1 (draw_round (trans * db::DPoint (x, y1), vp.height ()));
+        db::Point p2 (draw_round (trans * db::DPoint (x, y2), vp.height ()));
         painter.draw_line (p1, p2, grid_color);
         for (db::DCoord y = y1; y < y2 + g * eps; y += g) {
-          QPoint p (draw_round (trans * db::DPoint (x, y), vp.height ()));
-          painter.draw_line (p - QPoint (2, 0), p + QPoint (2, 0), grid_color);
+          db::Point p (draw_round (trans * db::DPoint (x, y), vp.height ()));
+          painter.draw_line (p - db::Vector (2, 0), p + db::Vector (2, 0), grid_color);
         }
       }
 
       n = ny;
       for (db::DCoord y = y1; n > 0; y += grid, --n) {
-        QPoint p1 (draw_round (trans * db::DPoint (x1, y), vp.height ()));
-        QPoint p2 (draw_round (trans * db::DPoint (x2, y), vp.height ()));
+        db::Point p1 (draw_round (trans * db::DPoint (x1, y), vp.height ()));
+        db::Point p2 (draw_round (trans * db::DPoint (x2, y), vp.height ()));
         painter.draw_line (p1, p2, grid_color);
         for (db::DCoord x = x1; x < x2 + g * eps; x += g) {
-          QPoint p (draw_round (trans * db::DPoint (x, y), vp.height ()));
-          painter.draw_line (p - QPoint (0, 2), p + QPoint (0, 2), grid_color);
+          db::Point p (draw_round (trans * db::DPoint (x, y), vp.height ()));
+          painter.draw_line (p - db::Vector (0, 2), p + db::Vector (0, 2), grid_color);
         }
       }
 
@@ -663,9 +578,9 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
         for (db::DCoord y = y1; y < y2 + grid * eps; y += grid) {
           double idx = (x + y) / grid + eps;
           if (idx - 2.0 * floor (idx * 0.5) < 0.5) {
-            QPoint p1 (draw_round (trans * db::DPoint (x, y), vp.height ()));
-            QPoint p2 (draw_round (trans * db::DPoint (x + grid, y + grid), vp.height ()));
-            painter.fill_rect (p1, p2 + QPoint (-1, 1), grid_color);
+            db::Point p1 (draw_round (trans * db::DPoint (x, y), vp.height ()));
+            db::Point p2 (draw_round (trans * db::DPoint (x + grid, y + grid), vp.height ()));
+            painter.fill_rect (p1, p2 + db::Vector (-1, 1), grid_color);
           }
         }
       }
@@ -718,28 +633,28 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
       } else if (m_style0 == Crosses) {
 
         for (db::DCoord y = y1; y < y2 + grid * eps && draw_yaxis; y += grid) {
-          QPoint p (draw_round (trans * db::DPoint (0.0, y), vp.height ()));
-          painter.draw_line (p - QPoint (2, 0), p + QPoint (2, 0), axis_color);
-          painter.draw_line (p - QPoint (0, 2), p + QPoint (0, 2), axis_color);
+          db::Point p (draw_round (trans * db::DPoint (0.0, y), vp.height ()));
+          painter.draw_line (p - db::Vector (2, 0), p + db::Vector (2, 0), axis_color);
+          painter.draw_line (p - db::Vector (0, 2), p + db::Vector (0, 2), axis_color);
         }
         for (db::DCoord x = x1; x < x2 + grid * eps && draw_xaxis; x += grid) {
-          QPoint p (draw_round (trans * db::DPoint (x, 0.0), vp.height ()));
-          painter.draw_line (p - QPoint (2, 0), p + QPoint (2, 0), axis_color);
-          painter.draw_line (p - QPoint (0, 2), p + QPoint (0, 2), axis_color);
+          db::Point p (draw_round (trans * db::DPoint (x, 0.0), vp.height ()));
+          painter.draw_line (p - db::Vector (2, 0), p + db::Vector (2, 0), axis_color);
+          painter.draw_line (p - db::Vector (0, 2), p + db::Vector (0, 2), axis_color);
         }
 
       } else if (m_style0 == Lines) {
 
         //  the way we iterate here is safe against integer overflow ..
         if (draw_yaxis) {
-          QPoint p1 (draw_round (trans * db::DPoint (0.0, y1), vp.height ()));
-          QPoint p2 (draw_round (trans * db::DPoint (0.0, y2), vp.height ()));
+          db::Point p1 (draw_round (trans * db::DPoint (0.0, y1), vp.height ()));
+          db::Point p2 (draw_round (trans * db::DPoint (0.0, y2), vp.height ()));
           painter.draw_line (p1, p2, axis_color);
         }
 
         if (draw_xaxis) {
-          QPoint p1 (draw_round (trans * db::DPoint (x1, 0.0), vp.height ()));
-          QPoint p2 (draw_round (trans * db::DPoint (x2, 0.0), vp.height ()));
+          db::Point p1 (draw_round (trans * db::DPoint (x1, 0.0), vp.height ()));
+          db::Point p2 (draw_round (trans * db::DPoint (x2, 0.0), vp.height ()));
           painter.draw_line (p1, p2, axis_color);
         }
 
@@ -757,22 +672,22 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
 
         //  the way we iterate here is safe against integer overflow ..
         if (draw_yaxis) {
-          QPoint p1 (draw_round (trans * db::DPoint (0.0, y1), vp.height ()));
-          QPoint p2 (draw_round (trans * db::DPoint (0.0, y2), vp.height ()));
+          db::Point p1 (draw_round (trans * db::DPoint (0.0, y1), vp.height ()));
+          db::Point p2 (draw_round (trans * db::DPoint (0.0, y2), vp.height ()));
           painter.draw_line (p1, p2, axis_color);
           for (db::DCoord y = y1; y < y2 + g * eps; y += g) {
-            QPoint p (draw_round (trans * db::DPoint (0.0, y), vp.height ()));
-            painter.draw_line (p - QPoint (2, 0), p + QPoint (2, 0), axis_color);
+            db::Point p (draw_round (trans * db::DPoint (0.0, y), vp.height ()));
+            painter.draw_line (p - db::Vector (2, 0), p + db::Vector (2, 0), axis_color);
           }
         }
 
         if (draw_xaxis) {
-          QPoint p1 (draw_round (trans * db::DPoint (x1, 0.0), vp.height ()));
-          QPoint p2 (draw_round (trans * db::DPoint (x2, 0.0), vp.height ()));
+          db::Point p1 (draw_round (trans * db::DPoint (x1, 0.0), vp.height ()));
+          db::Point p2 (draw_round (trans * db::DPoint (x2, 0.0), vp.height ()));
           painter.draw_line (p1, p2, axis_color);
           for (db::DCoord x = x1; x < x2 + g * eps; x += g) {
-            QPoint p (draw_round (trans * db::DPoint (x, 0.0), vp.height ()));
-            painter.draw_line (p - QPoint (0, 2), p + QPoint (0, 2), axis_color);
+            db::Point p (draw_round (trans * db::DPoint (x, 0.0), vp.height ()));
+            painter.draw_line (p - db::Vector (0, 2), p + db::Vector (0, 2), axis_color);
           }
         }
 

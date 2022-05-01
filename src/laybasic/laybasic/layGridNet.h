@@ -53,28 +53,6 @@ public:
   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *, lay::LayoutViewBase *view) const;
 };
 
-#if defined(HAVE_QT) // @@@
-class GridNetConfigPage
-  : public lay::ConfigPage
-{
-Q_OBJECT
-
-public:
-  GridNetConfigPage (QWidget *parent);
-  ~GridNetConfigPage ();
-
-  virtual void setup (lay::Dispatcher *root);
-  virtual void commit (lay::Dispatcher *root);
-
-private:
-  Ui::GridNetConfigPage *mp_ui;
-  lay::ColorButton *mp_grid_color_cbtn;
-  lay::ColorButton *mp_grid_grid_color_cbtn;
-  lay::ColorButton *mp_grid_axis_color_cbtn;
-  lay::ColorButton *mp_grid_ruler_color_cbtn;
-};
-#endif
-
 class GridNet
   : public lay::BackgroundViewObject,
     public lay::Plugin
@@ -109,6 +87,13 @@ private:
   GridStyle m_style0;
   GridStyle m_style1;
   GridStyle m_style2;
+};
+
+class GridNetStyleConverter
+{
+public:
+  void from_string (const std::string &value, lay::GridNet::GridStyle &style);
+  std::string to_string (lay::GridNet::GridStyle style);
 };
 
 }

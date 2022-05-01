@@ -493,7 +493,7 @@ BEGIN_PROTECTED
   const DragDropDataBase *dd = get_drag_drop_data (event->mimeData ());
   if (dd) {
 
-    db::DPoint p = pixel_to_um (event->pos ());
+    db::DPoint p = pixel_to_um (db::Point (event->pos ().x (), event->pos ().y ()));
 
     bool done = drag_enter_event (p, dd);
     service_iterator svc = begin_services ();
@@ -538,7 +538,7 @@ BEGIN_PROTECTED
   const DragDropDataBase *dd = get_drag_drop_data (event->mimeData ());
   if (dd) {
 
-    db::DPoint p = pixel_to_um (event->pos ());
+    db::DPoint p = pixel_to_um (db::Point (event->pos ().x (), event->pos ().y ()));
 
     bool done = drag_move_event (p, dd);
     service_iterator svc = begin_services ();
@@ -562,7 +562,7 @@ BEGIN_PROTECTED
   const DragDropDataBase *dd = get_drag_drop_data (event->mimeData ());
   if (dd) {
 
-    db::DPoint p = pixel_to_um (event->pos ());
+    db::DPoint p = pixel_to_um (db::Point (event->pos ().x (), event->pos ().y ()));
 
     bool done = drop_event (p, dd);
     service_iterator svc = begin_services ();
@@ -583,7 +583,7 @@ ViewObjectWidget::mouseMoveEvent (QMouseEvent *e)
 {
 BEGIN_PROTECTED  
   ensure_entered ();
-  m_mouse_pos = e->pos ();
+  m_mouse_pos = db::Point (e->pos ().x (), e->pos ().y ());
   m_mouse_buttons = qt_to_buttons (e->buttons (), e->modifiers ());
   do_mouse_move ();
 END_PROTECTED
@@ -683,13 +683,13 @@ BEGIN_PROTECTED
 
   bool done = false; 
 
-  m_mouse_pos = e->pos ();
-  m_mouse_pressed = e->pos ();
+  m_mouse_pos = db::Point (e->pos ().x (), e->pos ().y ());
+  m_mouse_pressed = m_mouse_pos;
   m_mouse_pressed_state = false;
 
   unsigned int buttons = qt_to_buttons (e->buttons (), e->modifiers ());
 
-  db::DPoint p = pixel_to_um (e->pos ());
+  db::DPoint p = pixel_to_um (m_mouse_pos);
 
   for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
     std::list<ViewService *>::iterator gg = g;
@@ -805,7 +805,7 @@ BEGIN_PROTECTED
 
 #if QT_VERSION < 0x60000
   int delta = e->delta ();
-  db::DPoint p = pixel_to_um (e->pos ());
+  db::DPoint p = pixel_to_um (db::Point (e->pos ().x (), e->pos ().y ()));
   bool horizontal = (e->orientation () == Qt::Horizontal);
 #else
   int delta = e->angleDelta ().y ();
@@ -852,8 +852,8 @@ ViewObjectWidget::mousePressEvent (QMouseEvent *e)
   ensure_entered ();
   setFocus ();
 
-  m_mouse_pos = e->pos ();
-  m_mouse_pressed = e->pos ();
+  m_mouse_pos = db::Point (e->pos ().x (), e->pos ().y ());
+  m_mouse_pressed = m_mouse_pos;
 
   m_mouse_buttons = qt_to_buttons (e->buttons (), e->modifiers ());
   
@@ -869,8 +869,8 @@ BEGIN_PROTECTED
 
   bool done = false; 
 
-  m_mouse_pos = e->pos ();
-  db::DPoint p = pixel_to_um (e->pos ());
+  m_mouse_pos = db::Point (e->pos ().x (), e->pos ().y ());
+  db::DPoint p = pixel_to_um (m_mouse_pos);
 
   for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
     std::list<ViewService *>::iterator gg = g;

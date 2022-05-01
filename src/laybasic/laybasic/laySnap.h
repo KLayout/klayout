@@ -246,17 +246,15 @@ namespace lay
    */
   LAYBASIC_PUBLIC int draw_round (double x);
 
-#if defined(HAVE_QT)
   /**
    *  @brief rounding (and height-transformation) of a double point 
    */
-  LAYBASIC_PUBLIC QPoint draw_round (db::DPoint p, int h);
+  LAYBASIC_PUBLIC db::Point draw_round (db::DPoint p, int h);
 
   /**
    *  @brief rounding (and height-transformation) of a two-point vector
    */
-  LAYBASIC_PUBLIC std::pair<QPoint, QPoint> draw_round (const db::DPoint &p1, const db::DPoint &p2, int h);
-#endif
+  LAYBASIC_PUBLIC std::pair<db::Point, db::Point> draw_round (const db::DPoint &p1, const db::DPoint &p2, int h);
 
   /**
    *  @brief rounding (and height-transformation) of a two-point vector

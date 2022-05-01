@@ -221,7 +221,7 @@ struct LAYBASIC_PUBLIC NetlistObjectsPath
  *      - terminals and nets
  */
 class LAYBASIC_PUBLIC NetlistBrowserModel
-  : public QAbstractItemModel
+  : public QAbstractItemModel, public tl::Object
 {
 Q_OBJECT
 

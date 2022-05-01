@@ -2380,7 +2380,7 @@ NetlistBrowserModel::NetlistBrowserModel (QWidget *parent, db::LayoutToNetlist *
 {
   mp_root.reset (new RootItemData ());
   mp_indexer.reset (new SingleIndexedNetlistModel (l2ndb->netlist ()));
-  connect (mp_colorizer, SIGNAL (colors_changed ()), this, SLOT (colors_changed ()));
+  mp_colorizer->colors_changed.add (this, &NetlistBrowserModel::colors_changed);
 
   m_object_column = 0;
   m_status_column = -1;
@@ -2393,7 +2393,7 @@ NetlistBrowserModel::NetlistBrowserModel (QWidget *parent, db::LayoutVsSchematic
 {
   mp_root.reset (new RootItemData ());
   mp_indexer.reset (new NetlistCrossReferenceModel (lvsdb->cross_ref ()));
-  connect (mp_colorizer, SIGNAL (colors_changed ()), this, SLOT (colors_changed ()));
+  mp_colorizer->colors_changed.add (this, &NetlistBrowserModel::colors_changed);
 
   m_object_column = 0;
   m_status_column = 1;

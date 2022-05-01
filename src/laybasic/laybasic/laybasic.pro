@@ -120,6 +120,7 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layEditorServiceBase.cc \
     layFileDialog.cc \
     layGenericSyntaxHighlighter.cc \
+    layGridNetConfigPage.cc \
     layHierarchyControlPanel.cc \
     layIndexedNetlistModel.cc \
     layItemDelegates.cc \
@@ -193,6 +194,7 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layEditorServiceBase.h \
     layFileDialog.h \
     layGenericSyntaxHighlighter.h \
+    layGridNetConfigPage.h \
     layHierarchyControlPanel.h \
     layIndexedNetlistModel.h \
     layItemDelegates.h \

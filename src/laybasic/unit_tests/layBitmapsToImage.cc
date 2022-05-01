@@ -95,7 +95,7 @@ TEST(1)
   lay::DitherPattern dp;
   lay::LineStyles ls;
 
-  QMutex m;
+  tl::Mutex m;
   lay::bitmaps_to_image (view_ops, pbitmaps, dp, ls, &img, 32, 32, 0, &m);
 
   EXPECT_EQ (to_string (img, 0x800000),

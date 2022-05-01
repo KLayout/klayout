@@ -64,7 +64,7 @@ public:
   enum mode_type { ToCellView = 0, AnyTop, Local };
   enum window_type { DontChange = 0, FitCell, FitMarker, Center, CenterSize };
 
-  BrowseShapesForm (lay::Dispatcher *root, LayoutViewBase *view);
+  BrowseShapesForm (lay::Dispatcher *root, LayoutView *view);
   ~BrowseShapesForm ();
 
   bool eventFilter (QObject *watched, QEvent *event);

@@ -336,7 +336,9 @@ static QImage get_image_with_options (lay::LayoutView *view, unsigned int width,
 
 static void save_image_with_options (lay::LayoutView *view, const std::string &fn, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box, bool monochrome)
 {
+#if defined(HAVE_QT) // @@@
   view->save_image_with_options (fn, width, height, linewidth, oversampling, resolution, lay::Color (), lay::Color (), lay::Color (), target_box, monochrome);
+#endif
 }
 
 static std::vector<std::string> 
@@ -417,11 +419,19 @@ static lay::LayoutView *new_view (QWidget *parent, bool editable, db::Manager *m
 
 static lay::LayoutView *new_view2 (bool editable, db::Manager *manager, unsigned int options)
 {
+#if defined(HAVE_QT)
   return new lay::LayoutView (manager, editable, 0 /*plugin parent*/, 0 /*parent*/, "view", options);
+#else
+  return new lay::LayoutView (manager, editable, 0 /*plugin parent*/, options);
+#endif
 }
 
+#if defined(HAVE_QT)
 Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutView",
-#if defined(HAVE_QTBINDINGS)
+#else
+Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutView",
+#endif
+#if defined(HAVE_QTBINDINGS) && defined(HAVE_QT)
   gsi::constructor ("new", &new_view, gsi::arg ("parent"), gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),
     "@brief Creates a standalone view\n"
     "\n"
@@ -574,12 +584,14 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been introduced in version 0.27."
   ) +
+#if defined(HAVE_QT)
   gsi::method ("current", &lay::LayoutView::current,
     "@brief Returns the current view\n"
     "The current view is the one that is shown in the current tab. Returns nil if no layout is loaded.\n"
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
+#endif
   gsi::method ("stop_redraw", &lay::LayoutView::stop_redraw,
     "@brief Stops the redraw thread\n"
     "\n"
@@ -953,11 +965,13 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@brief Return the viewport height in pixels\n"
     "This method was introduced in version 0.18.\n"
   ) +
+#if defined(HAVE_QT)
   gsi::method ("bookmark_view", &lay::LayoutView::bookmark_view, gsi::arg ("name"),
     "@brief Bookmarks the current view under the given name\n"
     "\n"
     "@param name The name under which to bookmark the current state"
   ) +
+#endif
   gsi::method ("add_missing_layers", &lay::LayoutView::add_missing_layers,
     "@brief Adds new layers to layer list\n"
     "This method was introduced in version 0.19.\n"
@@ -1149,7 +1163,6 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been introduced in 0.23.10.\n"
   ) +
-#endif
   gsi::method ("save_screenshot", &lay::LayoutView::save_screenshot, gsi::arg ("filename"),
     "@brief Saves a screenshot to the given file\n"
     "\n"
@@ -1171,6 +1184,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "The image is written as a PNG file to the given file. "
     "The image is drawn synchronously with the given width and height. Drawing may take some time. "
   ) +
+#endif
   gsi::method_ext ("save_image_with_options", &save_image_with_options, gsi::arg ("filename"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth"), gsi::arg ("oversampling"), gsi::arg ("resolution"), gsi::arg ("target"), gsi::arg ("monochrome"),
     "@brief Saves the layout as an image to the given file (with options)\n"
     "\n"
@@ -1556,6 +1570,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
     "(add_file_open_observer/remove_file_open_observer) have been removed in 0.25.\n"
   ) +
+#if defined(HAVE_QT)
   gsi::event ("on_close", &lay::LayoutView::close_event,
     "@brief A event indicating that the view is about to close\n"
     "\n"
@@ -1573,6 +1588,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "It has been added in version 0.25."
   ) +
+#endif
   gsi::event ("on_viewport_changed", &lay::LayoutView::viewport_changed_event,
     "@brief An event indicating that the viewport (the visible rectangle) has changed\n"
     "\n"
@@ -1690,11 +1706,13 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "If a report database with the given name already exists, a unique name will be created.\n"
     "The name will be replaced by the file name when a file is loaded into the report database.\n"
   ) +
+#if defined(HAVE_QT)
   gsi::method ("show_rdb", &lay::LayoutView::open_rdb_browser, gsi::arg ("rdb_index"), gsi::arg ("cv_index"),
     "@brief Shows a report database in the marker browser on a certain layout\n"
     "The marker browser is opened showing the report database with the index given by \"rdb_index\".\n"
     "It will be attached (i.e. navigate to) the layout with the given cellview index in \"cv_index\".\n"
   ) +
+#endif
   gsi::event ("on_l2ndb_list_changed", &lay::LayoutView::l2ndb_list_changed_event,
     "@brief An event that is triggered the list of netlist databases is changed\n"
     "\n"
@@ -1749,6 +1767,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been added in version 0.26."
   ) +
+#if defined(HAVE_QT)
   gsi::method ("show_l2ndb", &lay::LayoutView::open_l2ndb_browser, gsi::arg ("l2ndb_index"), gsi::arg ("cv_index"),
     "@brief Shows a netlist database in the marker browser on a certain layout\n"
     "The netlist browser is opened showing the netlist database with the index given by \"l2ndb_index\".\n"
@@ -1756,6 +1775,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been added in version 0.26."
   ) +
+#endif
   gsi::method_ext ("lvsdb", &get_lvsdb, gsi::arg ("index"),
     "@brief Gets the netlist database with the given index\n"
     "@return The \\LayoutVsSchematic object or nil if the index is not valid"
@@ -1791,6 +1811,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been added in version 0.26."
   ) +
+#if defined(HAVE_QT)
   gsi::method ("show_lvsdb", &lay::LayoutView::open_l2ndb_browser, gsi::arg ("lvsdb_index"), gsi::arg ("cv_index"),
     "@brief Shows a netlist database in the marker browser on a certain layout\n"
     "The netlist browser is opened showing the netlist database with the index given by \"lvsdb_index\".\n"
@@ -1798,6 +1819,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been added in version 0.26."
   ) +
+#endif
   //  HINT: the cast is important to direct GSI to the LayoutView method rather than the
   //  Plugin method (in which case we get a segmentation violation ..)
   //  TODO: this method belongs to the Plugin interface and should be located there.
@@ -1985,11 +2007,12 @@ static std::string get_technology (const lay::CellViewRef *cv)
 static tl::Event &get_technology_changed_event (lay::CellViewRef *cv)
 {
   if (! cv->is_valid ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cellview")));
+    throw tl::Exception (tl::to_string (tr ("Not a valid cellview")));
   }
   return (*cv)->technology_changed_event;
 }
 
+#if defined(HAVE_QT)
 static lay::CellViewRef get_active_cellview_ref ()
 {
   lay::LayoutView *view = lay::LayoutView::current ();
@@ -2002,6 +2025,7 @@ static lay::CellViewRef get_active_cellview_ref ()
     return lay::CellViewRef ();
   }
 }
+#endif
 
 static void set_cell (lay::CellViewRef *cv, db::Cell *cell)
 {
@@ -2046,7 +2070,7 @@ static bool cv_is_cell_hidden (lay::CellViewRef *cv, const db::Cell *cell)
 {
   if (cv->is_valid () && cell) {
     if (cell->layout () != &(*cv)->layout ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("The cell is not a cell of the view's layout")));
+      throw tl::Exception (tl::to_string (tr ("The cell is not a cell of the view's layout")));
     }
     return cv->view ()->is_cell_hidden (cell->cell_index (), cv->index ());
   } else {
@@ -2058,7 +2082,7 @@ static void cv_hide_cell (lay::CellViewRef *cv, const db::Cell *cell)
 {
   if (cv->is_valid () && cell) {
     if (cell->layout () != &(*cv)->layout ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("The cell is not a cell of the view's layout")));
+      throw tl::Exception (tl::to_string (tr ("The cell is not a cell of the view's layout")));
     }
     cv->view ()->hide_cell (cell->cell_index (), cv->index ());
   }
@@ -2068,7 +2092,7 @@ static void cv_show_cell (lay::CellViewRef *cv, const db::Cell *cell)
 {
   if (cv->is_valid () && cell) {
     if (cell->layout () != &(*cv)->layout ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("The cell is not a cell of the view's layout")));
+      throw tl::Exception (tl::to_string (tr ("The cell is not a cell of the view's layout")));
     }
     cv->view ()->show_cell (cell->cell_index (), cv->index ());
   }
@@ -2079,6 +2103,11 @@ static void cv_show_all_cells (lay::CellViewRef *cv)
   if (cv->is_valid ()) {
     cv->view ()->show_all_cells (cv->index ());
   }
+}
+
+static lay::LayoutView *get_view (lay::CellViewRef *cv)
+{
+  return cv->view ()->ui ();
 }
 
 Class<lay::CellViewRef> decl_CellView ("lay", "CellView",
@@ -2092,11 +2121,12 @@ Class<lay::CellViewRef> decl_CellView ("lay", "CellView",
     "The index will be negative if the cellview is not a valid one.\n"
     "This method has been added in version 0.25.\n"
   ) +
-  method ("view", &lay::CellViewRef::view,
+  method_ext ("view", &get_view,
     "@brief Gets the view the cellview resides in\n"
     "This reference will be nil if the cellview is not a valid one.\n"
     "This method has been added in version 0.25.\n"
   ) +
+#if defined(HAVE_QT)
   method ("active", &get_active_cellview_ref,
     "@brief Gets the active CellView\n"
     "The active CellView is the one that is selected in the current layout view. This method is "
@@ -2108,6 +2138,7 @@ Class<lay::CellViewRef> decl_CellView ("lay", "CellView",
     "\n"
     "This method has been introduced in version 0.23."
   ) + 
+#endif
   method ("is_valid?", &lay::CellViewRef::is_valid,
     "@brief Returns true, if the cellview is valid\n"
     "A cellview may become invalid if the corresponding tab is closed for example."

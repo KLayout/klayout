@@ -711,7 +711,7 @@ D25ViewWidget::finish ()
 }
 
 void
-D25ViewWidget::attach_view (LayoutViewBase *view)
+D25ViewWidget::attach_view (LayoutView *view)
 {
   mp_view = view;
 }

@@ -23,7 +23,9 @@
 
 #include "layCellView.h"
 #include "layLayoutView.h"
-#include "layStream.h"
+#if defined(HAVE_QT) // @@@
+#  include "layStream.h"
+#endif
 #include "dbLayout.h"
 #include "dbWriter.h"
 #include "dbReader.h"
@@ -64,7 +66,7 @@ LayoutHandle::LayoutHandle (db::Layout *layout, const std::string &filename)
   //  layouts in the managed layouts space participate in spare proxy cleanup
   layout->do_cleanup (true);
 
-  file_watcher ().add_file (m_filename);
+  add_file_to_watcher (m_filename);
 
   if (! m_filename.empty ()) {
     rename (filename_for_caption (m_filename));
@@ -107,7 +109,23 @@ LayoutHandle::~LayoutHandle ()
     ms_dict.erase (m_name);
   }
 
-  file_watcher ().remove_file (filename ());
+  remove_file_from_watcher (filename ());
+}
+
+void
+LayoutHandle::remove_file_from_watcher (const std::string &path)
+{
+#if defined(HAVE_QT)
+  file_watcher ().remove_file (path);
+#endif
+}
+
+void
+LayoutHandle::add_file_to_watcher (const std::string &path)
+{
+#if defined(HAVE_QT)
+  file_watcher ().add_file (path);
+#endif
 }
 
 void
@@ -176,9 +194,9 @@ LayoutHandle::layout () const
 void
 LayoutHandle::set_filename (const std::string &fn) 
 {
-  file_watcher ().remove_file (m_filename);
+  remove_file_from_watcher (m_filename);
   m_filename = fn;
-  file_watcher ().add_file (m_filename);
+  add_file_to_watcher (m_filename);
 }
 
 const std::string &
@@ -274,6 +292,7 @@ LayoutHandle::set_save_options (const db::SaveLayoutOptions &options, bool valid
 void
 LayoutHandle::update_save_options (db::SaveLayoutOptions &options)
 {
+#if defined(HAVE_QT) // @@@
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
 
     const lay::StreamWriterPluginDeclaration *decl = dynamic_cast <const lay::StreamWriterPluginDeclaration *> (&*cls);
@@ -294,6 +313,7 @@ LayoutHandle::update_save_options (db::SaveLayoutOptions &options)
     }
 
   }
+#endif
 }
 
 void 
@@ -307,7 +327,7 @@ LayoutHandle::save_as (const std::string &fn, tl::OutputStream::OutputStreamMode
     //  reader options.
     m_load_options = db::LoadLayoutOptions ();
 
-    file_watcher ().remove_file (filename ());
+    remove_file_from_watcher (filename ());
 
     rename (filename_for_caption (fn));
 
@@ -331,14 +351,14 @@ LayoutHandle::save_as (const std::string &fn, tl::OutputStream::OutputStreamMode
     }
 
     if (update) {
-      file_watcher ().add_file (filename ());
+      add_file_to_watcher (filename ());
       m_dirty = false;
     }
 
   } catch (...) {
 
     if (update) {
-      file_watcher ().add_file (filename ());
+      add_file_to_watcher (filename ());
     }
 
     throw;
@@ -366,8 +386,8 @@ LayoutHandle::load (const db::LoadLayoutOptions &options, const std::string &tec
   }
 
   //  Update the file's data:
-  file_watcher ().remove_file (filename ());
-  file_watcher ().add_file (filename ());
+  remove_file_from_watcher (filename ());
+  add_file_to_watcher (filename ());
 
   m_dirty = false;
   return new_lmap;
@@ -391,13 +411,14 @@ LayoutHandle::load ()
   }
 
   //  Update the file's data:
-  file_watcher ().remove_file (filename ());
-  file_watcher ().add_file (filename ());
+  remove_file_from_watcher (filename ());
+  add_file_to_watcher (filename ());
 
   m_dirty = false;
   return new_lmap;
 }
 
+#if defined(HAVE_QT)
 tl::FileSystemWatcher &
 LayoutHandle::file_watcher ()
 {
@@ -408,8 +429,10 @@ LayoutHandle::file_watcher ()
   return *mp_file_watcher;
 }
 
-std::map <std::string, LayoutHandle *> LayoutHandle::ms_dict;
 tl::FileSystemWatcher *LayoutHandle::mp_file_watcher = 0;
+#endif
+
+std::map <std::string, LayoutHandle *> LayoutHandle::ms_dict;
 
 // -------------------------------------------------------------
 //  LayoutHandleRef implementation

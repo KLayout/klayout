@@ -42,7 +42,7 @@ class NetlistBrowserDialog
   Q_OBJECT
 
 public:
-  NetlistBrowserDialog (lay::Dispatcher *root, lay::LayoutViewBase *view);
+  NetlistBrowserDialog (lay::Dispatcher *root, lay::LayoutView *view);
   ~NetlistBrowserDialog ();
 
   void load (int lay_index, int cv_index);

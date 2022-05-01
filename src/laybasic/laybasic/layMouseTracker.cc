@@ -28,7 +28,7 @@
 namespace lay
 {
 
-MouseTracker::MouseTracker (lay::LayoutViewBase *view)
+MouseTracker::MouseTracker (lay::LayoutView *view)
   : lay::ViewService (view->view_object_widget ()), mp_view (view)
 {
   widget ()->grab_mouse (this, false);

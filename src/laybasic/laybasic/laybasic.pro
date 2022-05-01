@@ -84,11 +84,8 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
 
   SOURCES = \
     gsiDeclLayDialogs.cc \
-    gsiDeclLayLayoutView.cc \
-    gsiDeclLayMarker.cc \
     gsiDeclLayMenu.cc \
     gsiDeclLayNetlistBrowserDialog.cc \
-    gsiDeclLayPlugin.cc \
     gsiDeclLayStream.cc \
     gtf.cc \
     layAbstractMenu.cc \
@@ -105,7 +102,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layBusy.cc \
     layCellSelectionForm.cc \
     layCellTreeModel.cc \
-    layCellView.cc \
     layConfigurationDialog.cc \
     layConverters.cc \
     layCursor.cc \
@@ -178,7 +174,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layBusy.h \
     layCellSelectionForm.h \
     layCellTreeModel.h \
-    layCellView.h \
     layConfigurationDialog.h \
     layConverters.h \
     layColor.h \
@@ -240,9 +235,13 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
 
 SOURCES += \
     gsiDeclLayLayers.cc \
+    gsiDeclLayLayoutView.cc \
+    gsiDeclLayMarker.cc \
+    gsiDeclLayPlugin.cc \
     layAnnotationShapes.cc \
     layBitmap.cc \
     layBitmapRenderer.cc \
+    layCellView.cc \
     layColor.cc \
     layColorPalette.cc \
     layDispatcher.cc \
@@ -283,6 +282,7 @@ HEADERS += \
     layAnnotationShapes.h \
     layBitmap.h \
     layBitmapRenderer.h \
+    layCellView.h \
     layColorPalette.h \
     layDispatcher.h \
     layDisplayState.h \

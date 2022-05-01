@@ -23,7 +23,7 @@
 
 
 #include "laySnap.h"
-#include "layLayoutViewBase.h"
+#include "layLayoutView.h"
 
 #include "dbEdge.h"
 
@@ -282,7 +282,7 @@ public:
    *  This will run the finder on the given view.
    *  "search_range" is the search range in micron units.
    */
-  void find (lay::LayoutViewBase *view, double search_range)
+  void find (lay::LayoutView *view, double search_range)
   {
     if (! view) {
       return;
@@ -586,7 +586,7 @@ private:
   }
 
   void
-  do_find (lay::LayoutViewBase *view, int cv_index, const db::Cell &cell, unsigned int l, int min_level, int max_level, const db::CplxTrans &t)
+  do_find (lay::LayoutView *view, int cv_index, const db::Cell &cell, unsigned int l, int min_level, int max_level, const db::CplxTrans &t)
   {
     db::Box touch_box = t.inverted () * m_region;
 
@@ -727,7 +727,7 @@ private:
 };
 
 static PointSnapToObjectResult
-do_obj_snap (lay::LayoutViewBase *view, const db::DPoint &pt, const db::DVector &grid, double snap_range, const std::vector <db::DEdge> &cutlines)
+do_obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double snap_range, const std::vector <db::DEdge> &cutlines)
 {
   db::DPoint dp (pt);
 
@@ -792,7 +792,7 @@ do_obj_snap (lay::LayoutViewBase *view, const db::DPoint &pt, const db::DVector 
 }
 
 static TwoPointSnapToObjectResult
-do_obj_snap2 (lay::LayoutViewBase *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, double min_search_range, double max_search_range, const std::vector <db::DEdge> &cutlines)
+do_obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, double min_search_range, double max_search_range, const std::vector <db::DEdge> &cutlines)
 {
   db::DPoint dp1 (pt1);
   db::DPoint dp2 (pt2);
@@ -915,13 +915,13 @@ make_cutlines (lay::angle_constraint_type snap_mode, const db::DPoint &p1, std::
 }
 
 PointSnapToObjectResult
-obj_snap (lay::LayoutViewBase *view, const db::DPoint &pt, const db::DVector &grid, double snap_range)
+obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double snap_range)
 {
   return do_obj_snap (view, pt, grid, snap_range, std::vector<db::DEdge> ());
 }
 
 PointSnapToObjectResult
-obj_snap (lay::LayoutViewBase *view, const db::DPoint &p1, const db::DPoint &p2, const db::DVector &grid, lay::angle_constraint_type snap_mode, double snap_range)
+obj_snap (lay::LayoutView *view, const db::DPoint &p1, const db::DPoint &p2, const db::DVector &grid, lay::angle_constraint_type snap_mode, double snap_range)
 {
   std::vector <db::DEdge> cutlines;
   make_cutlines (snap_mode, p1, cutlines);
@@ -929,19 +929,19 @@ obj_snap (lay::LayoutViewBase *view, const db::DPoint &p1, const db::DPoint &p2,
 }
 
 TwoPointSnapToObjectResult
-obj_snap2 (lay::LayoutViewBase *view, const db::DPoint &pt, const db::DVector &grid, double min_search_range, double max_search_range)
+obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double min_search_range, double max_search_range)
 {
   return obj_snap2 (view, pt, pt, grid, min_search_range, max_search_range);
 }
 
 TwoPointSnapToObjectResult
-obj_snap2 (lay::LayoutViewBase *view, const db::DPoint &pt, const db::DVector &grid, lay::angle_constraint_type ac, double min_search_range, double max_search_range)
+obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, lay::angle_constraint_type ac, double min_search_range, double max_search_range)
 {
   return obj_snap2 (view, pt, pt, grid, ac, min_search_range, max_search_range);
 }
 
 TwoPointSnapToObjectResult
-obj_snap2 (lay::LayoutViewBase *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, double min_search_range, double max_search_range)
+obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, double min_search_range, double max_search_range)
 {
   db::DPoint dp1 = lay::snap_xy (pt1, grid);
   db::DPoint dp2 = lay::snap_xy (pt2, grid);
@@ -950,7 +950,7 @@ obj_snap2 (lay::LayoutViewBase *view, const db::DPoint &pt1, const db::DPoint &p
 }
 
 TwoPointSnapToObjectResult
-obj_snap2 (lay::LayoutViewBase *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, lay::angle_constraint_type snap_mode, double min_search_range, double max_search_range)
+obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, lay::angle_constraint_type snap_mode, double min_search_range, double max_search_range)
 {
   db::DPoint dp1 = lay::snap_xy (pt1, grid);
   db::DPoint dp2 = lay::snap_xy (pt2, grid);

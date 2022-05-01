@@ -1165,6 +1165,11 @@ static void clear_children (lay::LayerPropertiesNode *node)
   node->clear_children ();
 }
 
+static lay::LayoutView *get_view (lay::LayerPropertiesNode *node)
+{
+  return node->view ()->ui ();
+}
+
 Class<lay::LayerPropertiesNode> decl_LayerPropertiesNode (
   decl_LayerProperties, 
   "lay", "LayerPropertiesNode",
@@ -1222,7 +1227,7 @@ Class<lay::LayerPropertiesNode> decl_LayerPropertiesNode (
     "\n"
     "@return A bbox in micron units\n"
   ) +
-  method ("view", &lay::LayerPropertiesNode::view,
+  method_ext ("view", &get_view,
     "@brief Gets the view this node lives in\n"
     "\n"
     "This reference can be nil if the node is a orphan node that lives outside a view."

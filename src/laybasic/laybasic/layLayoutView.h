@@ -419,11 +419,6 @@ public:
   virtual QWidget *widget () { return this; }
 
   /**
-   *  @brief Gets the LayoutView interface
-   */
-  virtual LayoutView *ui () { return this; }
-
-  /**
    *  @brief Copies to clipboard
    *
    *  This reimplementation of the lay::Editables interface additionally
@@ -762,6 +757,15 @@ protected:
   virtual void emit_title_changed ();
   virtual void emit_dirty_changed ();
   virtual void emit_layer_order_changed ();
+
+protected:
+  /**
+   *  @brief Gets the LayoutView interface
+   */
+  virtual LayoutView *get_ui () { return this; }
+
+private:
+  using LayoutViewBase::ui;
 };
 
 }
@@ -792,6 +796,15 @@ public:
    *  @brief Constructor (clone from another view)
    */
   LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
+
+protected:
+  /**
+   *  @brief Gets the LayoutView interface
+   */
+  virtual LayoutView *get_ui () { return this; }
+
+private:
+  using LayoutViewBase::ui;
 };
 
 }

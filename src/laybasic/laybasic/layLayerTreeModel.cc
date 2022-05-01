@@ -631,7 +631,7 @@ LayerTreeModel::empty_within_view_predicate (const QModelIndex &index) const
 
 LAYBASIC_PUBLIC
 QIcon
-LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, lay::LayoutViewBase *view, unsigned int w, unsigned int h, unsigned int di_off, bool no_state)
+LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, lay::LayoutView *view, unsigned int w, unsigned int h, unsigned int di_off, bool no_state)
 {
   h = std::max ((unsigned int) 16, h);
   w = std::max ((unsigned int) 16, w);

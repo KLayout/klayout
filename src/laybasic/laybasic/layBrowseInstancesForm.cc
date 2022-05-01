@@ -79,7 +79,7 @@ public:
     menu_entries.push_back (lay::menu_item ("browse_instances::show", "browse_instances", "tools_menu.end", tl::to_string (QObject::tr ("Browse Instances"))));
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
   {
     return new BrowseInstancesForm (root, view);
   }
@@ -289,7 +289,7 @@ private:
 
 // ------------------------------------------------------------
 
-BrowseInstancesForm::BrowseInstancesForm (lay::Dispatcher *root, LayoutViewBase *vw)
+BrowseInstancesForm::BrowseInstancesForm (lay::Dispatcher *root, LayoutView *vw)
   : lay::Browser (root, vw), 
     Ui::BrowseInstancesForm (),
     m_cv_index (0),
@@ -349,7 +349,7 @@ void
 BrowseInstancesForm::choose_cell_pressed ()
 {
 BEGIN_PROTECTED
-  CellSelectionForm form (this, view ()->ui (), "browse_cell", true /*simple mode*/);
+  CellSelectionForm form (this, view (), "browse_cell", true /*simple mode*/);
   if (form.exec ()) {
     change_cell (form.selected_cellview ().cell_index (), form.selected_cellview_index ());
   }

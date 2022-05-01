@@ -303,7 +303,7 @@ CellTreeItem::by_area_equal_than (const CellTreeItem *b) const
 //  valid ("under construction"). In this case, the model will return defaults or void
 //  objects.
 
-CellTreeModel::CellTreeModel (QWidget *parent, lay::LayoutViewBase *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting)
+CellTreeModel::CellTreeModel (QWidget *parent, lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting)
   : QAbstractItemModel (parent), 
     m_flags (flags),
     m_sorting (sorting),
@@ -379,7 +379,7 @@ CellTreeModel::~CellTreeModel ()
 }
 
 void
-CellTreeModel::configure (lay::LayoutViewBase *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting)
+CellTreeModel::configure (lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting)
 {
   db::Layout *layout = & view->cellview (cv_index)->layout ();
   do_configure (layout, 0, view, cv_index, flags, base, sorting);
@@ -398,7 +398,7 @@ CellTreeModel::configure (db::Library *library, unsigned int flags, const db::Ce
 }
 
 void
-CellTreeModel::do_configure (db::Layout *layout, db::Library *library, lay::LayoutViewBase *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting)
+CellTreeModel::do_configure (db::Layout *layout, db::Library *library, lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting)
 {
   bool flat = ((flags & Flat) != 0) && ((flags & TopCells) == 0);
 

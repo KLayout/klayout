@@ -49,7 +49,7 @@ namespace edt
   /**
    *  @brief Commits the current configuration for the recently used configuration list
    */
-  void commit_recent (lay::LayoutViewBase *view);
+  void commit_recent (lay::LayoutView *view);
 }
 
 #endif

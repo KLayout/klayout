@@ -1170,7 +1170,6 @@ public:
    *  This method attaches the properties node and it's children to a view.
    *  This enables the node to realize itself against the view, i.e.
    *  compute the actual property selection set.
-   *  This method is supposed to be 
    */
   void attach_view (LayoutViewBase *view, unsigned int list_index);
 
@@ -1912,7 +1911,7 @@ public:
    *  "load" automatically attaches the view.
    *  This method has the side effect of recomputing the layer source parameters.
    */
-  void attach_view (lay::LayoutViewBase *view, unsigned int list_index);
+  void attach_view (LayoutViewBase *view, unsigned int list_index);
 
   /**
    *  @brief Gets the layout view this list is attached to

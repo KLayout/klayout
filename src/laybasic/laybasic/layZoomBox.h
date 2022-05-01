@@ -30,7 +30,7 @@
 namespace lay
 {
 
-class LayoutViewBase;
+class LayoutView;
 class LayoutCanvas;
 class RubberBox;
 
@@ -38,7 +38,7 @@ class LAYBASIC_PUBLIC ZoomService
   : public lay::ViewService
 {
 public: 
-  ZoomService (lay::LayoutViewBase *view);
+  ZoomService (lay::LayoutView *view);
   ~ZoomService ();
 
   void set_colors (lay::Color background, lay::Color text);
@@ -55,7 +55,7 @@ private:
 
   db::DPoint m_p1, m_p2;
   db::DBox m_vp;
-  lay::LayoutViewBase *mp_view;
+  lay::LayoutView *mp_view;
   lay::RubberBox *mp_box;
   unsigned int m_color;
 };

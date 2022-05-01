@@ -55,7 +55,7 @@ namespace edt
 // -----------------------------------------------------------------------------
 //  Main Service implementation
 
-MainService::MainService (db::Manager *manager, lay::LayoutViewBase *view, lay::Dispatcher *root)
+MainService::MainService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root)
   : lay::Plugin (view),
     lay::Editable (view),
     db::Object (manager),
@@ -1751,7 +1751,7 @@ db::DVector compute_alignment_vector (const db::DBox &prim_box, const db::DBox &
 }
 
 static db::DBox 
-inst_bbox (const db::CplxTrans &tr, lay::LayoutViewBase *view, int cv_index, const db::InstElement &inst_element, bool visible_only)
+inst_bbox (const db::CplxTrans &tr, lay::LayoutView *view, int cv_index, const db::InstElement &inst_element, bool visible_only)
 {
   db::DBox box;
 
@@ -2296,7 +2296,7 @@ class NewObjectsSelection
  : public db::ClipboardDataInsertReceiver 
 {
 public:
-  NewObjectsSelection (int cv_index, db::cell_index_type topcell, lay::LayoutViewBase *view)
+  NewObjectsSelection (int cv_index, db::cell_index_type topcell, lay::LayoutView *view)
     : m_cv_index (cv_index), m_topcell (topcell)
   {
     mp_polygon_service = view->get_plugin <edt::PolygonService> ();

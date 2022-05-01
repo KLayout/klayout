@@ -40,7 +40,7 @@ public:
 
   virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const;
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *, lay::LayoutViewBase *view) const;
+  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *, lay::LayoutView *view) const;
   virtual bool implements_editable (std::string &title) const;
   virtual bool implements_mouse_mode (std::string &title) const;
   virtual bool configure (const std::string &name, const std::string &value);

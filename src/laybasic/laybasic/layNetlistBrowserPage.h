@@ -86,7 +86,7 @@ public:
    *  If that pointer is non-null, the browser will attach itself to
    *  the view and provide highlights for the selected markers inside the given cellview.
    */
-  void set_view (LayoutViewBase *view, int cv_index);
+  void set_view (LayoutView *view, int cv_index);
 
   /**
    *  @brief Attaches the page to a L2N DB
@@ -224,7 +224,7 @@ private:
   int m_marker_dither_pattern;
   int m_marker_intensity;
   bool m_use_original_colors;
-  lay::LayoutViewBase *mp_view;
+  lay::LayoutView *mp_view;
   unsigned int m_cv_index;
   lay::Dispatcher *mp_plugin_root;
   tl::weak_ptr<db::LayoutToNetlist> mp_database;

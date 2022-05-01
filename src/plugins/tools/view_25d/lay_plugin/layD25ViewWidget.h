@@ -57,7 +57,7 @@ namespace tl
 namespace lay
 {
 
-class LayoutViewBase;
+class LayoutView;
 class LayerPropertiesNode;
 class D25ViewWidget;
 
@@ -106,7 +106,7 @@ public:
   void mouseReleaseEvent (QMouseEvent *event);
   void mouseMoveEvent (QMouseEvent *event);
 
-  void attach_view(lay::LayoutViewBase *view);
+  void attach_view(lay::LayoutView *view);
 
   QVector3D hit_point_with_scene(const QVector3D &line_dir);
   void refresh ();
@@ -187,7 +187,7 @@ private:
   double m_scale_factor;
   double m_vscale_factor;
   QVector3D m_displacement;
-  lay::LayoutViewBase *mp_view;
+  lay::LayoutView *mp_view;
   db::DBox m_bbox;
   double m_zmin, m_zmax;
   bool m_zset;

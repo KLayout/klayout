@@ -297,6 +297,16 @@ public:
   static tl::FileSystemWatcher &file_watcher ();
 #endif
 
+  /**
+   *  @brief Removes a file from the watcher
+   */
+  static void remove_file_from_watcher (const std::string &path);
+
+  /**
+   *  @brief Adds a file to the watcher
+   */
+  static void add_file_to_watcher (const std::string &path);
+
 private:
   db::Layout *mp_layout;
   int m_ref_count;

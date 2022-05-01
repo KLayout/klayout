@@ -376,7 +376,7 @@ public:
     menu_entries.push_back (lay::menu_item ("netlist_browser::show", "browse_netlists", "tools_menu.end", tl::to_string (QObject::tr ("Netlist Browser"))));
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
   {
     return new lay::NetlistBrowserDialog (root, view);
   }

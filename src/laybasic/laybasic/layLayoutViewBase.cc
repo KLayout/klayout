@@ -274,7 +274,7 @@ LayoutViewBase::LayoutViewBase (lay::LayoutViewBase *source, db::Manager *manage
     } else {
       *m_layer_properties_lists [i] = *source->m_layer_properties_lists [i];
     }
-    m_layer_properties_lists [i]->attach_view (this, (unsigned int) i);
+    m_layer_properties_lists [i]->attach_view (ui (), (unsigned int) i);
   }
 
   if (! m_layer_properties_lists.empty ()) {
@@ -367,7 +367,7 @@ LayoutViewBase::init (db::Manager *mgr)
   m_search_range_box = 0;
 
   m_layer_properties_lists.push_back (new LayerPropertiesList ());
-  m_layer_properties_lists.back ()->attach_view (this, (unsigned int) (m_layer_properties_lists.size () - 1));
+  m_layer_properties_lists.back ()->attach_view (ui (), (unsigned int) (m_layer_properties_lists.size () - 1));
   m_current_layer_list = 0;
 
 #if defined(HAVE_QT)
@@ -388,16 +388,16 @@ LayoutViewBase::init (db::Manager *mgr)
   //  occupy services and editables:
   //  these services get deleted by the canvas destructor automatically:
   if ((m_options & LV_NoTracker) == 0) {
-    mp_tracker = new lay::MouseTracker (this);
+    mp_tracker = new lay::MouseTracker (ui ());
   }
   if ((m_options & LV_NoZoom) == 0) {
-    mp_zoom_service = new lay::ZoomService (this);
+    mp_zoom_service = new lay::ZoomService (ui ());
   }
   if ((m_options & LV_NoSelection) == 0) {
-    mp_selection_service = new lay::SelectionService (this);
+    mp_selection_service = new lay::SelectionService (ui ());
   }
   if ((m_options & LV_NoMove) == 0) {
-    mp_move_service = new lay::MoveService (this);
+    mp_move_service = new lay::MoveService (ui ());
   }
 
   create_plugins ();
@@ -554,7 +554,7 @@ void LayoutViewBase::create_plugins (const lay::PluginDeclaration *except_this)
 
 lay::Plugin *LayoutViewBase::create_plugin (const lay::PluginDeclaration *cls)
 {
-  lay::Plugin *p = cls->create_plugin (manager (), dispatcher (), this);
+  lay::Plugin *p = cls->create_plugin (manager (), dispatcher (), ui ());
   if (p) {
 
     //  unhook the plugin from the script side if created there (prevent GC from destroying it)
@@ -1329,7 +1329,7 @@ LayoutViewBase::insert_layer_list (unsigned index, const LayerPropertiesList &pr
   clear_layer_selection ();
 
   m_layer_properties_lists.insert (m_layer_properties_lists.begin () + index, new LayerPropertiesList (props));
-  m_layer_properties_lists [index]->attach_view (this, index);
+  m_layer_properties_lists [index]->attach_view (ui (), index);
   merge_dither_pattern (*m_layer_properties_lists [index]);
 
   m_current_layer_list = index;
@@ -1538,7 +1538,7 @@ LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesList &p
       return;
     } else {
       m_layer_properties_lists.push_back (new LayerPropertiesList ());
-      m_layer_properties_lists.back ()->attach_view (this, (unsigned int) (m_layer_properties_lists.size () - 1));
+      m_layer_properties_lists.back ()->attach_view (ui (), (unsigned int) (m_layer_properties_lists.size () - 1));
     }
   }
 
@@ -1557,7 +1557,7 @@ LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesList &p
   }
 
   *m_layer_properties_lists [index] = props;
-  m_layer_properties_lists [index]->attach_view (this, index);
+  m_layer_properties_lists [index]->attach_view (ui (), index);
 
   merge_dither_pattern (*m_layer_properties_lists [index]);
 
@@ -1975,7 +1975,7 @@ LayoutViewBase::signal_layer_properties_changed ()
   //  recompute the source 
   //  TODO: this is a side effect of this method - provide a special method for this purpose
   for (unsigned int i = 0; i < layer_lists (); ++i) {
-    m_layer_properties_lists [i]->attach_view (this, i);
+    m_layer_properties_lists [i]->attach_view (ui (), i);
   }
 
   //  schedule a redraw request - since the layer views might not have changed, this is necessary
@@ -1991,7 +1991,7 @@ LayoutViewBase::signal_prop_ids_changed ()
   //  recompute the source 
   //  TODO: this is a side effect of this method - provide a special method for this purpose
   for (unsigned int i = 0; i < layer_lists (); ++i) {
-    m_layer_properties_lists [i]->attach_view (this, i);
+    m_layer_properties_lists [i]->attach_view (ui (), i);
   }
 }
 
@@ -2298,7 +2298,7 @@ LayoutViewBase::do_load_layer_props (const std::string &fn, bool map_cv, int cv_
     if (map_cv) {
       cv_map.insert (std::make_pair (-1, cv_index));
     }
-    p->attach_view (this, p - props.begin ());
+    p->attach_view (ui (), p - props.begin ());
     p->expand (cv_map, add_default);
   }
 
@@ -3089,7 +3089,7 @@ LayoutViewBase::create_initial_layer_props (int cv_index, const std::string &lyp
 
   //  expand the wildcards and map to the target cv.
   for (std::vector<lay::LayerPropertiesList>::iterator p = props.begin (); p != props.end (); ++p) {
-    p->attach_view (this, p - props.begin ());
+    p->attach_view (ui (), p - props.begin ());
     p->expand (cv_map, add_missing || !loaded);
   }
 
@@ -3203,7 +3203,7 @@ LayoutViewBase::widget ()
 #endif
 
 LayoutView *
-LayoutViewBase::ui ()
+LayoutViewBase::get_ui ()
 {
   tl_assert (false);
 }

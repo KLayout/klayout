@@ -80,7 +80,7 @@ public:
      menu_entries.push_back (lay::menu_item ("browse_shapes::show", "browse_shapes", "tools_menu.end", tl::to_string (QObject::tr ("Browse Shapes"))));
    }
  
-   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
+   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
    {
      return new BrowseShapesForm (root, view);
    }
@@ -392,7 +392,7 @@ private:
 
 // ------------------------------------------------------------
 
-BrowseShapesForm::BrowseShapesForm (lay::Dispatcher *root, LayoutViewBase *vw)
+BrowseShapesForm::BrowseShapesForm (lay::Dispatcher *root, LayoutView *vw)
   : lay::Browser (root, vw), 
     Ui::BrowseShapesForm (),
     m_cv_index (-1),

@@ -54,7 +54,7 @@ extern std::string cfg_rdb_marker_vertex_size;
 extern std::string cfg_rdb_marker_halo;
 extern std::string cfg_rdb_marker_dither_pattern;
 
-MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutViewBase *vw)
+MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutView *vw)
   : lay::Browser (root, vw),
     Ui::MarkerBrowserDialog (),
     m_context (rdb::AnyCell),
@@ -806,7 +806,7 @@ MarkerBrowserDialog::scan_layer ()
   }
 
   unsigned int rdb_index = view ()->add_rdb (rdb.release ());
-  view ()->ui ()->open_rdb_browser (rdb_index, cv_index);
+  view ()->open_rdb_browser (rdb_index, cv_index);
 }
 
 void 
@@ -882,7 +882,7 @@ MarkerBrowserDialog::scan_layer_flat ()
   }
 
   unsigned int rdb_index = view ()->add_rdb (rdb.release ());
-  view ()->ui ()->open_rdb_browser (rdb_index, cv_index);
+  view ()->open_rdb_browser (rdb_index, cv_index);
 }
 
 void 

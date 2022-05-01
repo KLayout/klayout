@@ -32,9 +32,9 @@ namespace lay
 {
 
 #if QT_VERSION >= 0x050000
-Browser::Browser (lay::Dispatcher *root, lay::LayoutViewBase *view, const char *name, Qt::WindowFlags fl)
+Browser::Browser (lay::Dispatcher *root, lay::LayoutView *view, const char *name, Qt::WindowFlags fl)
 #else
-Browser::Browser (lay::Dispatcher *root, lay::LayoutViewBase *view, const char *name, Qt::WFlags fl)
+Browser::Browser (lay::Dispatcher *root, lay::LayoutView *view, const char *name, Qt::WFlags fl)
 #endif
     //  TODO: clarify whether to keep the browsers as separate (potentially hidden) windows
   : QDialog (0 /*view*/, fl),

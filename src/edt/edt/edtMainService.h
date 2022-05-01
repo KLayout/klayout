@@ -64,7 +64,7 @@ public:
   /**
    *  @brief The constructor
    */
-  MainService (db::Manager *manager, lay::LayoutViewBase *view, lay::Dispatcher *root);
+  MainService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root);
 
   /**
    *  @brief The destructor
@@ -74,7 +74,7 @@ public:
   /**
    *  @brief Access to the view object
    */
-  lay::LayoutViewBase *view () const
+  lay::LayoutView *view () const
   {
     return mp_view;
   }
@@ -196,7 +196,7 @@ public:
 
 private:
   //  The layout view that this service is attached to
-  lay::LayoutViewBase *mp_view;
+  lay::LayoutView *mp_view;
   lay::Dispatcher *mp_root;
   bool m_needs_update;
 

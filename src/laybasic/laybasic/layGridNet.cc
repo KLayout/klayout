@@ -105,7 +105,7 @@ GridNetPluginDeclaration::config_page (QWidget *parent, std::string &title) cons
 #endif
 
 lay::Plugin *
-GridNetPluginDeclaration::create_plugin (db::Manager *, Dispatcher *, lay::LayoutViewBase *view) const
+GridNetPluginDeclaration::create_plugin (db::Manager *, Dispatcher *, lay::LayoutView *view) const
 {
   return new lay::GridNet (view);
 }
@@ -115,7 +115,7 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new GridNetPlugi
 // ------------------------------------------------------------
 //  Implementation of the GridNet object
 
-GridNet::GridNet (LayoutViewBase *view)
+GridNet::GridNet (LayoutView *view)
   : lay::BackgroundViewObject (view->view_object_widget ()), 
     lay::Plugin (view),
     mp_view (view),

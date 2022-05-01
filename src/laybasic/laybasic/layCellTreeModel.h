@@ -45,7 +45,7 @@ namespace db
 namespace lay
 {
 
-class LayoutViewBase;
+class LayoutView;
 class CellTreeItem;
 
 /**
@@ -85,7 +85,7 @@ public:
    *  If flags "Children" or "Parents" are given, "base" must be set to the cell of which
    *  the children or parents should be derived.
    */
-  CellTreeModel (QWidget *parent, lay::LayoutViewBase *view, int cv_index, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
+  CellTreeModel (QWidget *parent, lay::LayoutView *view, int cv_index, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
 
   /**
    *  @brief Constructor
@@ -120,7 +120,7 @@ public:
   /**
    *  @brief Reconfigures the model with a LayoutView
    */
-  void configure (LayoutViewBase *view, int cv_index, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
+  void configure (LayoutView *view, int cv_index, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
 
   /**
    *  @brief Reconfigures the model with a pure Layout
@@ -257,7 +257,7 @@ private:
   unsigned int m_flags;
   Sorting m_sorting;
   QWidget *mp_parent;
-  lay::LayoutViewBase *mp_view;
+  lay::LayoutView *mp_view;
   db::Layout *mp_layout;
   db::Library *mp_library;
   int m_cv_index;
@@ -271,7 +271,7 @@ private:
   void build_top_level ();
   void clear_top_level ();
   bool search_children (const tl::GlobPattern &pattern, CellTreeItem *item);
-  void do_configure (db::Layout *layout, db::Library *library, LayoutViewBase *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting);
+  void do_configure (db::Layout *layout, db::Library *library, LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting);
 };
 
 /**

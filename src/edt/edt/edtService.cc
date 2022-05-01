@@ -60,7 +60,7 @@ ac_from_buttons (unsigned int buttons)
 
 // -------------------------------------------------------------
 
-Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type flags)
+Service::Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator::flags_type flags)
   : lay::EditorServiceBase (view),
     db::Object (manager),
     mp_view (view),
@@ -80,7 +80,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
   //  .. nothing yet ..
 }
 
-Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
+Service::Service (db::Manager *manager, lay::LayoutView *view)
   : lay::EditorServiceBase (view),
     db::Object (manager),
     mp_view (view),

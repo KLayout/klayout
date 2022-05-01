@@ -37,7 +37,7 @@ namespace lay
 // -------------------------------------------------------------
 //  SelectionService implementation
 
-SelectionService::SelectionService (lay::LayoutViewBase *view)
+SelectionService::SelectionService (lay::LayoutView *view)
   : QObject (),
     lay::ViewService (view->view_object_widget ()), 
     mp_view (view),

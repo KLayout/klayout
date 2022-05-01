@@ -784,7 +784,7 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 // -------------------------------------------------------------
 //  ant::Service implementation
 
-Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
+Service::Service (db::Manager *manager, lay::LayoutView *view)
   : lay::EditorServiceBase (view),
     lay::Drawing (1/*number of planes*/, view->drawings ()),
     db::Object (manager),

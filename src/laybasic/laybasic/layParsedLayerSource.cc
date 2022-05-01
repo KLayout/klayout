@@ -22,7 +22,7 @@
 
 
 #include "layParsedLayerSource.h"
-#include "layLayoutViewBase.h"
+#include "layLayoutView.h"
 #include "tlString.h"
 #include "tlGlobPattern.h"
 

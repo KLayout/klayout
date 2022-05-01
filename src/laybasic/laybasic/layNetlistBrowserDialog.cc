@@ -56,7 +56,7 @@ extern const std::string cfg_l2ndb_max_shapes_highlighted;
 extern const std::string cfg_l2ndb_show_all;
 extern const std::string cfg_l2ndb_window_state;
 
-NetlistBrowserDialog::NetlistBrowserDialog (lay::Dispatcher *root, lay::LayoutViewBase *vw)
+NetlistBrowserDialog::NetlistBrowserDialog (lay::Dispatcher *root, lay::LayoutView *vw)
   : lay::Browser (root, vw),
     lay::ViewService (vw->view_object_widget ()),
     Ui::NetlistBrowserDialog (),

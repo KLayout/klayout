@@ -203,7 +203,7 @@ public:
   typedef lay::AnnotationShapes::iterator obj_iterator;
   enum MoveMode { move_none, move_selected, move_landmark, move_l, move_r, move_t, move_b, move_lr, move_tr, move_ll, move_tl, move_all };
 
-  Service (db::Manager *manager, lay::LayoutViewBase *view);
+  Service (db::Manager *manager, lay::LayoutView *view);
 
   ~Service ();
 
@@ -432,7 +432,7 @@ public:
   /**
    *  @brief Access to the view object
    */
-  lay::LayoutViewBase *view () const
+  lay::LayoutView *view () const
   {
     return mp_view;
   }
@@ -480,7 +480,7 @@ public:
 
 private:
   //  The layout view that the image service is attached to
-  lay::LayoutViewBase *mp_view;
+  lay::LayoutView *mp_view;
 
   //  The view objects representing the selection and the moved images in move mode
   std::vector<View *> m_selected_image_views;

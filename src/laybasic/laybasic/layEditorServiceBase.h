@@ -46,7 +46,7 @@ public:
   /**
    *  @brief Constructor
    */
-  EditorServiceBase (lay::LayoutViewBase *view);
+  EditorServiceBase (lay::LayoutView *view);
 
   /**
    *  @brief Destructor

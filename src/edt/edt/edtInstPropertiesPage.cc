@@ -207,7 +207,7 @@ void
 InstPropertiesPage::show_props ()
 {
   lay::UserPropertiesForm props_form (this);
-  if (props_form.show (mp_service->view ()->ui (), m_selection_ptrs [m_index]->cv_index (), m_prop_id)) {
+  if (props_form.show (mp_service->view (), m_selection_ptrs [m_index]->cv_index (), m_prop_id)) {
     emit edited ();
   }
 }
@@ -395,7 +395,7 @@ void
 InstPropertiesPage::show_inst ()
 {
   InstantiationForm inst_form (this);
-  inst_form.show (mp_service->view ()->ui (), *m_selection_ptrs [m_index]);
+  inst_form.show (mp_service->view (), *m_selection_ptrs [m_index]);
 }
 
 bool 
@@ -912,7 +912,7 @@ InstPropertiesPage::update_pcell_parameters ()
 
       mp_pcell_parameters = new PCellParametersPage (pcell_tab);
       connect (mp_pcell_parameters, SIGNAL (edited ()), this, SIGNAL (edited ()));
-      mp_pcell_parameters->setup (mp_service->view ()->ui (), pos->cv_index (), layout->pcell_declaration (pc.second), parameters);
+      mp_pcell_parameters->setup (mp_service->view (), pos->cv_index (), layout->pcell_declaration (pc.second), parameters);
       pcell_tab->layout ()->addWidget (mp_pcell_parameters);
 
     }

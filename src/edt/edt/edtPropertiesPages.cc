@@ -361,14 +361,14 @@ void
 ShapePropertiesPage::show_inst ()
 {
   InstantiationForm inst_form (this);
-  inst_form.show (mp_service->view ()->ui (), *m_selection_ptrs [m_index]);
+  inst_form.show (mp_service->view (), *m_selection_ptrs [m_index]);
 }
 
 void
 ShapePropertiesPage::show_props ()
 {
   lay::UserPropertiesForm props_form (this);
-  if (props_form.show (mp_service->view ()->ui (), m_selection_ptrs [m_index]->cv_index (), m_prop_id)) {
+  if (props_form.show (mp_service->view (), m_selection_ptrs [m_index]->cv_index (), m_prop_id)) {
     emit edited ();
   }
 }

@@ -30,7 +30,7 @@ namespace lay
 {
 
 class EditorOptionsPages;
-class LayoutViewBase;
+class LayoutView;
 
 class LAYBASIC_PUBLIC EditorOptionsFrame
   : public QFrame
@@ -39,7 +39,7 @@ public:
   EditorOptionsFrame (QWidget *parent);
   virtual ~EditorOptionsFrame ();
 
-  void populate (lay::LayoutViewBase *view);
+  void populate (lay::LayoutView *view);
 
   EditorOptionsPages *pages_widget () const
   {

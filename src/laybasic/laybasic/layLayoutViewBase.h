@@ -790,12 +790,12 @@ public:
    */
   void load_layer_props (const std::string &fn, int cv_index, bool add_default);
 
+#if defined(HAVE_QT) // @@@
   /**
    *  @brief Save the screen content to a file
    */
   void save_screenshot (const std::string &fn);
 
-#if defined(HAVE_QT)
   /**
    *  @brief Get the screen content as a QImage object
    */
@@ -2510,7 +2510,18 @@ public:
   /**
    *  @brief Gets the LayoutView interface
    */
-  virtual LayoutView *ui ();
+  LayoutView *ui ()
+  {
+    return get_ui ();
+  }
+
+  /**
+   *  @brief Gets the LayoutView interface (const version)
+   */
+  const LayoutView *ui () const
+  {
+    return const_cast<LayoutViewBase *> (this)->get_ui ();
+  }
 
 private:
   //  event handlers used to connect to the layout object's events
@@ -2685,6 +2696,8 @@ protected:
   {
     return mp_active_plugin;
   }
+
+  virtual LayoutView *get_ui ();
 
   bool configure (const std::string &name, const std::string &value);
   void config_finalize ();

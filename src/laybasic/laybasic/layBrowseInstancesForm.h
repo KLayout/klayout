@@ -65,7 +65,7 @@ public:
   enum mode_type { ToCellView = 0, AnyTop, Parent };
   enum window_type { DontChange = 0, FitCell, FitMarker, Center, CenterSize };
 
-  BrowseInstancesForm (lay::Dispatcher *root, lay::LayoutViewBase *view);
+  BrowseInstancesForm (lay::Dispatcher *root, lay::LayoutView *view);
   ~BrowseInstancesForm ();
 
   bool eventFilter (QObject *watched, QEvent *event);

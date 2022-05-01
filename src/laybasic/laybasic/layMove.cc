@@ -34,7 +34,7 @@ namespace lay
 // -------------------------------------------------------------
 //  MoveService implementation
 
-MoveService::MoveService (lay::LayoutViewBase *view)
+MoveService::MoveService (lay::LayoutView *view)
   : lay::ViewService (view->view_object_widget ()),
     m_dragging (false),
     m_dragging_transient (false),

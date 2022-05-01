@@ -103,9 +103,9 @@ public:
     // .. nothing yet ..
   }
 
-  lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
+  lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
   {
-    return new DiffPlugin (root, view->ui ());
+    return new DiffPlugin (root, view);
   }
 };
 

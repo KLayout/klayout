@@ -1336,6 +1336,8 @@ LayoutViewBase::insert_layer_list (unsigned index, const LayerPropertiesList &pr
     manager ()->clear ();
   }
 
+  clear_layer_selection ();
+
   m_layer_properties_lists.insert (m_layer_properties_lists.begin () + index, new LayerPropertiesList (props));
   m_layer_properties_lists [index]->attach_view (this, index);
   merge_dither_pattern (*m_layer_properties_lists [index]);
@@ -1362,6 +1364,8 @@ LayoutViewBase::delete_layer_list (unsigned index)
   } else if (manager () && ! replaying ()) {
     manager ()->clear ();
   }
+
+  clear_layer_selection ();
 
   delete m_layer_properties_lists [index];
   m_layer_properties_lists.erase (m_layer_properties_lists.begin () + index);
@@ -1426,17 +1430,41 @@ LayoutViewBase::set_current_layer (unsigned int cv_index, const db::LayerPropert
 }
 
 void
+LayoutViewBase::clear_layer_selection ()
+{
+  m_current_layer = lay::LayerPropertiesConstIterator ();
+  m_selected_layers.clear ();
+}
+
+void
 LayoutViewBase::set_current_layer (const lay::LayerPropertiesConstIterator &l)
 {
-  //  @@@ No checking happens
   m_current_layer = l;
+  m_selected_layers.clear ();
+  m_selected_layers.push_back (l);
 }
 
 lay::LayerPropertiesConstIterator
 LayoutViewBase::current_layer () const
 {
-  //  @@@ No checking happens
   return m_current_layer;
+}
+
+std::vector<lay::LayerPropertiesConstIterator>
+LayoutViewBase::selected_layers () const
+{
+  return m_selected_layers;
+}
+
+void
+LayoutViewBase::set_selected_layers (const std::vector<lay::LayerPropertiesConstIterator> &sel)
+{
+  m_selected_layers = sel;
+  if (sel.empty ()) {
+    m_current_layer = lay::LayerPropertiesConstIterator ();
+  } else {
+    m_current_layer = sel.front ();
+  }
 }
 
 void
@@ -1544,13 +1572,10 @@ LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesList &p
   merge_dither_pattern (*m_layer_properties_lists [index]);
 
   if (index == current_layer_list ()) {
-
+    end_layer_updates ();
     layer_list_changed_event (3);
-
     redraw ();
-
     m_prop_changed = true;
-
   }
 }
 
@@ -1607,14 +1632,11 @@ LayoutViewBase::replace_layer_node (unsigned int index, const LayerPropertiesCon
     non_const_iter->attach_view (this, index);
 
     if (index == current_layer_list ()) {
-
+      end_layer_updates ();
       layer_list_changed_event (2);
-
       //  TODO: check, if redraw is actually necessary (this is complex!)
       redraw ();
-
       m_prop_changed = true;
-
     }
   }
 }
@@ -1681,6 +1703,7 @@ LayoutViewBase::insert_layer (unsigned int index, const LayerPropertiesConstIter
 
   //  signal to the observers that something has changed
   if (index == current_layer_list ()) {
+    end_layer_updates ();
     layer_list_changed_event (2);
     redraw ();
     m_prop_changed = true;
@@ -1713,6 +1736,7 @@ LayoutViewBase::delete_layer (unsigned int index, LayerPropertiesConstIterator &
 
   //  signal to the observers that something has changed
   if (index == current_layer_list ()) {
+    end_layer_updates ();
     layer_list_changed_event (2);
     redraw ();
     m_prop_changed = true;
@@ -2087,6 +2111,8 @@ LayoutViewBase::erase_cellview (unsigned int index)
   //  clear the history
   m_display_states.clear ();
   m_display_state_ptr = 0;
+
+  end_layer_updates ();
 
   //  signal to the observers that something has changed
   layer_list_changed_event (3);
@@ -3176,6 +3202,20 @@ db::DBox
 LayoutViewBase::box () const
 {
   return mp_canvas->viewport ().box ();
+}
+
+#if defined(HAVE_QT)
+QWidget *
+LayoutViewBase::widget ()
+{
+  tl_assert (false);
+}
+#endif
+
+LayoutView *
+LayoutViewBase::ui ()
+{
+  tl_assert (false);
 }
 
 // @@@ needs to be called "as often as possible"
@@ -4836,6 +4876,34 @@ LayoutViewBase::cut ()
   lay::Editables::cut ();
 }
 
+void
+LayoutViewBase::remove_unused_layers ()
+{
+  bool any_deleted;
+  do {
+
+    std::vector <lay::LayerPropertiesConstIterator> sel;
+
+    lay::LayerPropertiesConstIterator l = begin_layers ();
+    while (! l.at_end ()) {
+      if (! l->has_children () && l->bbox ().empty ()) {
+        sel.push_back (l);
+      }
+      ++l;
+    }
+
+    std::sort (sel.begin (), sel.end (), CompareLayerIteratorBottomUp ());
+    any_deleted = false;
+    for (std::vector<lay::LayerPropertiesConstIterator>::iterator s = sel.begin (); s != sel.end (); ++s) {
+      delete_layer (*s);
+      any_deleted = true;
+    }
+
+  } while (any_deleted);
+
+  emit_layer_order_changed ();
+}
+
 void 
 LayoutViewBase::add_missing_layers ()
 {
@@ -4992,9 +5060,24 @@ LayoutViewBase::begin_layer_updates ()
 }
 
 void
-LayoutViewBase::ensure_layer_selected ()
+LayoutViewBase::end_layer_updates ()
 {
   //  .. nothing yet ..
+}
+
+void
+LayoutViewBase::ensure_layer_selected ()
+{
+  if (current_layer () == lay::LayerPropertiesConstIterator ()) {
+    const lay::LayerPropertiesList &lp = get_properties ();
+    lay::LayerPropertiesConstIterator li = lp.begin_const_recursive ();
+    while (! li.at_end () && li->has_children ()) {
+      ++li;
+    }
+    if (! li.at_end ()) {
+      set_current_layer (li);
+    }
+  }
 }
 
 void

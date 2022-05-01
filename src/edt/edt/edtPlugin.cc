@@ -181,12 +181,9 @@ public:
 
   virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *root) const
   {
-    lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view);
-    tl_assert (lv != 0);
-
     if (mp_pages_f != 0) {
       size_t nstart = pages.size ();
-      (*mp_pages_f) (pages, lv, root);
+      (*mp_pages_f) (pages, view->ui (), root);
       while (nstart < pages.size ()) {
         pages [nstart++]->set_plugin_declaration (this);
       }
@@ -332,11 +329,8 @@ public:
 
   virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const
   {
-    lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view);
-    tl_assert (lv != 0);
-
     //  NOTE: we do not set plugin_declaration which makes the page unspecific
-    EditorOptionsGeneric *generic_opt = new EditorOptionsGeneric (lv, dispatcher);
+    EditorOptionsGeneric *generic_opt = new EditorOptionsGeneric (view->ui (), dispatcher);
     pages.push_back (generic_opt);
   }
 
@@ -421,12 +415,7 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl_main (new edt::Ma
 void
 commit_recent (lay::LayoutViewBase *view)
 {
-  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view);
-  if (!lv) {
-    return;
-  }
-
-  lay::EditorOptionsPages *eo_pages = lv->editor_options_pages ();
+  lay::EditorOptionsPages *eo_pages = view->ui ()->editor_options_pages ();
   if (!eo_pages) {
     return;
   }

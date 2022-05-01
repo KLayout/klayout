@@ -105,9 +105,7 @@ public:
 
   lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
-    lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view);
-    tl_assert (lv != 0);
-    return new DiffPlugin (root, lv);
+    return new DiffPlugin (root, view->ui ());
   }
 };
 

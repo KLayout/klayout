@@ -78,7 +78,7 @@ validate_cell_path (const db::Layout &layout, lay::LayoutView::cell_path_type &p
 }
 
 LayoutViewFunctions::LayoutViewFunctions (db::Manager *manager, LayoutViewBase *view)
-  : lay::Plugin (view), mp_view (dynamic_cast <lay::LayoutView *> (view)), mp_manager (manager)
+  : lay::Plugin (view), mp_view (view->ui ()), mp_manager (manager)
 {
   m_del_cell_mode = 0;
   m_move_to_origin_mode_x = 0;

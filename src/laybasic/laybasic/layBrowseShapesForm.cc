@@ -660,12 +660,9 @@ BrowseShapesForm::cell_inst_changed (QTreeWidgetItem *, QTreeWidgetItem *)
 void 
 BrowseShapesForm::activated ()
 {
-  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view ());
-  tl_assert (lv != 0);
+  view ()->save_view (m_display_state);
 
-  lv->save_view (m_display_state);
-
-  std::vector <lay::LayerPropertiesConstIterator> sel_layers = lv->selected_layers ();
+  std::vector <lay::LayerPropertiesConstIterator> sel_layers = view ()->selected_layers ();
 
   if (sel_layers.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No layer selected")));
@@ -691,7 +688,7 @@ BrowseShapesForm::activated ()
         }
       } else { 
         m_cv_index = cv_index;
-        m_cellview = lv->cellview (m_cv_index);
+        m_cellview = view ()->cellview (m_cv_index);
       }
 
     }

@@ -316,12 +316,7 @@ FillDialog::get_fill_parameters ()
   } else if (layer_spec_cbx->currentIndex () == 2) {
 
     //  get selected layers
-    std::vector<lay::LayerPropertiesConstIterator> s;
-
-    lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (mp_view);
-    if (lv) {
-      s = lv->selected_layers (); // @@@ should be part of LayoutViewBase too
-    }
+    std::vector<lay::LayerPropertiesConstIterator> s = mp_view->selected_layers ();
 
     for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = s.begin (); l != s.end (); ++l) {
       if (! (*l)->has_children () && cv->layout ().is_valid_layer ((*l)->layer_index ())) {

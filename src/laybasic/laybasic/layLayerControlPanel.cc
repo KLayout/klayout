@@ -444,38 +444,11 @@ void
 LayerControlPanel::cm_remove_unused ()
 {
   BEGIN_PROTECTED_CLEANUP
-
   begin_updates ();
-
   transaction (tl::to_string (QObject::tr ("Clean up views")));
-
-  bool any_deleted;
-  do {
-
-    std::vector <lay::LayerPropertiesConstIterator> sel;
-
-    lay::LayerPropertiesConstIterator l = mp_view->begin_layers ();
-    while (! l.at_end ()) {
-      if (! l->has_children () && l->bbox ().empty ()) {
-        sel.push_back (l);
-      }
-      ++l;
-    }
-
-    std::sort (sel.begin (), sel.end (), CompareLayerIteratorBottomUp ());
-    any_deleted = false;
-    for (std::vector<lay::LayerPropertiesConstIterator>::iterator s = sel.begin (); s != sel.end (); ++s) {
-      mp_view->delete_layer (*s);
-      any_deleted = true;
-    }
-
-  } while (any_deleted);
-
+  mp_view->remove_unused_layers ();
   commit ();
-
   end_updates ();
-
-  emit order_changed ();
 
   END_PROTECTED_CLEANUP { recover (); }
 }

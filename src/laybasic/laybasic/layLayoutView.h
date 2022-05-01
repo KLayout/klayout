@@ -274,11 +274,6 @@ public:
   virtual void set_current_cell_path (int cv_index, const cell_path_type &path);
 
   /**
-   *  @brief Remove unused layers
-   */
-  void remove_unused_layers ();
-
-  /**
    *  @brief Internal method: check, if the layer tree is and an consistent state.
    *
    *  This method is used by the layer tree model to check, if the tree has been brought into
@@ -415,6 +410,16 @@ public:
   {
     return mp_editor_options_frame;
   }
+
+  /**
+   *  @brief Gets the QWidget interface
+   */
+  virtual QWidget *widget () { return this; }
+
+  /**
+   *  @brief Gets the LayoutView interface
+   */
+  virtual LayoutView *ui () { return this; }
 
   /**
    *  @brief Copies to clipboard
@@ -740,7 +745,7 @@ protected:
   virtual void do_set_background_color (lay::Color color, lay::Color contrast);
   virtual void do_paste ();
   virtual void begin_layer_updates ();
-  virtual void ensure_layer_selected ();
+  virtual void end_layer_updates ();
   virtual void update_content_for_cv (int cv_index);
   virtual void do_set_no_stipples (bool no_stipples);
   virtual void do_set_phase (int phase);
@@ -755,8 +760,6 @@ protected:
   virtual void emit_title_changed ();
   virtual void emit_dirty_changed ();
   virtual void emit_layer_order_changed ();
-
-  virtual QWidget *widget () { return this; }
 };
 
 }

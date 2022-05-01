@@ -729,22 +729,19 @@ NetlistBrowserDialog::cv_index_changed (int index)
 void
 NetlistBrowserDialog::activated ()
 {
-  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view ());
-  tl_assert (lv != 0);
-
   std::string state;
-  lv->config_get (cfg_l2ndb_window_state, state);
+  view ()->config_get (cfg_l2ndb_window_state, state);
   lay::restore_dialog_state (this, state, false /*don't adjust the section sizes*/);
 
   //  Switch to the active cellview index when no valid one is set.
-  lay::CellView cv = lv->cellview (m_cv_index);
+  lay::CellView cv = view ()->cellview (m_cv_index);
   if (! cv.is_valid ()) {
-    m_cv_index = lv->active_cellview_index ();
+    m_cv_index = view ()->active_cellview_index ();
   }
 
-  if (m_l2n_index < 0 && lv->get_l2ndb (0) != 0) {
+  if (m_l2n_index < 0 && view ()->get_l2ndb (0) != 0) {
 
-    m_l2ndb_name = lv->get_l2ndb (0)->name ();
+    m_l2ndb_name = view ()->get_l2ndb (0)->name ();
     l2ndbs_changed ();
 
   } else {

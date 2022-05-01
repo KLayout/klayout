@@ -70,6 +70,7 @@ namespace db {
 
 namespace lay {
 
+class LayoutView;
 class MouseTracker;
 class ZoomService;
 class SelectionService;
@@ -550,6 +551,18 @@ public:
    *  This method returns a null iterator, if no layer is active.
    */
   virtual lay::LayerPropertiesConstIterator current_layer () const;
+
+  /**
+   *  @brief Return the layers that are selected in the layer browser
+   *
+   *  Returns an empty list if no layer is selected.
+   */
+  virtual std::vector<lay::LayerPropertiesConstIterator> selected_layers () const;
+
+  /**
+   *  @brief Sets the layers that are selected in the layer browser
+   */
+  virtual void set_selected_layers (const std::vector<lay::LayerPropertiesConstIterator> &sel);
 
   /**
    *  @brief Set the custom dither pattern 
@@ -2169,6 +2182,11 @@ public:
   void add_missing_layers ();
 
   /**
+   *  @brief Remove unused layers
+   */
+  void remove_unused_layers ();
+
+  /**
    *  @brief Add layers which are not part of the LayerState
    */
   void add_new_layers (const LayerState &snapshot);
@@ -2484,8 +2502,16 @@ public:
   virtual void deactivate_all_browsers ();
 
 #if defined(HAVE_QT)
-  virtual QWidget *widget () { return 0; }
+  /**
+   *  @brief Gets the QWidget interface
+   */
+  virtual QWidget *widget ();
 #endif
+
+  /**
+   *  @brief Gets the LayoutView interface
+   */
+  virtual LayoutView *ui ();
 
 private:
   //  event handlers used to connect to the layout object's events
@@ -2613,6 +2639,7 @@ private:
   std::set<int> m_active_cellview_changed_events;
 
   lay::LayerPropertiesConstIterator m_current_layer;
+  std::vector<lay::LayerPropertiesConstIterator> m_selected_layers;
 
   std::vector<cell_path_type> m_current_cell_per_cellview;
 
@@ -2676,13 +2703,16 @@ protected:
   virtual void do_set_background_color (lay::Color color, lay::Color contrast);
   virtual void do_paste ();
   virtual void begin_layer_updates ();
-  virtual void ensure_layer_selected ();
+  virtual void end_layer_updates ();
+  virtual void clear_layer_selection ();
   virtual void do_set_no_stipples (bool no_stipples);
   virtual void do_set_phase (int phase);
   virtual bool is_activated () const;
   virtual void do_change_active_cellview ();
   virtual void update_content_for_cv (int cv_index);
   virtual bool set_hier_levels_basic (std::pair<int, int> l);
+
+  void ensure_layer_selected ();
 
   void enable_active_cellview_changed_event (bool enable, bool silent = false);
   void active_cellview_changed (int index);

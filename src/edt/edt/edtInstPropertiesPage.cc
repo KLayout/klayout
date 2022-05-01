@@ -206,11 +206,8 @@ END_PROTECTED
 void
 InstPropertiesPage::show_props ()
 {
-  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (mp_service->view ());
-  tl_assert (lv != 0);
-
   lay::UserPropertiesForm props_form (this);
-  if (props_form.show (lv, m_selection_ptrs [m_index]->cv_index (), m_prop_id)) {
+  if (props_form.show (mp_service->view ()->ui (), m_selection_ptrs [m_index]->cv_index (), m_prop_id)) {
     emit edited ();
   }
 }
@@ -384,27 +381,21 @@ InstPropertiesPage::update ()
 void 
 InstPropertiesPage::show_cell ()
 {
-  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (mp_service->view ());
-  tl_assert (lv != 0);
-
   edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
 
-  lay::CellView::unspecific_cell_path_type path (lv->cellview (pos->cv_index ()).combined_unspecific_path ());
+  lay::CellView::unspecific_cell_path_type path (mp_service->view ()->cellview (pos->cv_index ()).combined_unspecific_path ());
   for (lay::ObjectInstPath::iterator p = pos->begin (); p != pos->end (); ++p) {
     path.push_back (p->inst_ptr.cell_index ());
   }
 
-  lv->set_current_cell_path (pos->cv_index (), path);
+  mp_service->view ()->set_current_cell_path (pos->cv_index (), path);
 }
 
 void
 InstPropertiesPage::show_inst ()
 {
-  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (mp_service->view ());
-  tl_assert (lv != 0);
-
   InstantiationForm inst_form (this);
-  inst_form.show (lv, *m_selection_ptrs [m_index]);
+  inst_form.show (mp_service->view ()->ui (), *m_selection_ptrs [m_index]);
 }
 
 bool 
@@ -852,9 +843,6 @@ InstPropertiesPage::apply_to_all (bool relative)
 void
 InstPropertiesPage::update_pcell_parameters ()
 {
-  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (mp_service->view ());
-  tl_assert (lv != 0);
-
   db::Layout *layout;
 
   //  find the layout the cell has to be looked up: that is either the layout of the current instance or 
@@ -866,7 +854,7 @@ InstPropertiesPage::update_pcell_parameters ()
   } else {
 
     edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
-    const lay::CellView &cv = lv->cellview (pos->cv_index ());
+    const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
     layout = &cv->layout ();
 
   }
@@ -890,7 +878,7 @@ InstPropertiesPage::update_pcell_parameters ()
     std::vector<tl::Variant> parameters;
 
     edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
-    const lay::CellView &cv = lv->cellview (pos->cv_index ());
+    const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
     db::Cell &cell = cv->layout ().cell (pos->cell_index ());
     std::pair<bool, db::pcell_id_type> pci = cell.is_pcell_instance (pos->back ().inst_ptr);
     const db::Library *pci_lib = cv->layout ().defining_library (pos->back ().inst_ptr.cell_index ()).first;
@@ -924,7 +912,7 @@ InstPropertiesPage::update_pcell_parameters ()
 
       mp_pcell_parameters = new PCellParametersPage (pcell_tab);
       connect (mp_pcell_parameters, SIGNAL (edited ()), this, SIGNAL (edited ()));
-      mp_pcell_parameters->setup (lv, pos->cv_index (), layout->pcell_declaration (pc.second), parameters);
+      mp_pcell_parameters->setup (mp_service->view ()->ui (), pos->cv_index (), layout->pcell_declaration (pc.second), parameters);
       pcell_tab->layout ()->addWidget (mp_pcell_parameters);
 
     }

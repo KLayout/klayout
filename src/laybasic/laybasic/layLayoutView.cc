@@ -657,34 +657,18 @@ LayoutView::set_selected_layers (const std::vector<lay::LayerPropertiesConstIter
 }
 
 void
-LayoutView::ensure_layer_selected ()
-{
-  if (! mp_control_panel->has_selection ()) {
-    const lay::LayerPropertiesList &lp = get_properties ();
-    lay::LayerPropertiesConstIterator li = lp.begin_const_recursive ();
-    while (! li.at_end () && li->has_children ()) {
-      ++li;
-    }
-    if (! li.at_end ()) {
-      mp_control_panel->set_current_layer (li);
-    }
-  }
-}
-
-void
-LayoutView::remove_unused_layers ()
-{
-  // @@@ should not be in control panel
-  if (mp_control_panel) {
-    mp_control_panel->cm_remove_unused ();
-  }
-}
-
-void
 LayoutView::begin_layer_updates ()
 {
   if (mp_control_panel) {
     mp_control_panel->begin_updates ();
+  }
+}
+
+void
+LayoutView::end_layer_updates ()
+{
+  if (mp_control_panel) {
+    mp_control_panel->end_updates ();
   }
 }
 

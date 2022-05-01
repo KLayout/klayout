@@ -349,12 +349,9 @@ void
 BrowseInstancesForm::choose_cell_pressed ()
 {
 BEGIN_PROTECTED
-  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view ());
-  if (lv) {
-    CellSelectionForm form (this, lv, "browse_cell", true /*simple mode*/);
-    if (form.exec ()) {
-      change_cell (form.selected_cellview ().cell_index (), form.selected_cellview_index ());
-    }
+  CellSelectionForm form (this, view ()->ui (), "browse_cell", true /*simple mode*/);
+  if (form.exec ()) {
+    change_cell (form.selected_cellview ().cell_index (), form.selected_cellview_index ());
   }
 END_PROTECTED
 }
@@ -525,21 +522,18 @@ struct BrowseInstancesCellInfo
 void 
 BrowseInstancesForm::activated ()
 {
-  lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view ());
-  tl_assert (lv != 0);
-
-  lv->save_view (m_display_state);
+  view ()->save_view (m_display_state);
 
   //  if no cellviews are available, don't do anything
-  if (! lv->cellviews ()) {
+  if (! view ()->cellviews ()) {
     return;
   }
 
   //  obtain active cellview index and cell index
-  int cv_index = lv->active_cellview_index ();
+  int cv_index = view ()->active_cellview_index ();
 
   lay::LayoutView::cell_path_type path;
-  lv->current_cell_path (path);
+  view ()->current_cell_path (path);
 
   //  no cell to index
   if (path.empty ()) {

@@ -2,8 +2,12 @@
 name: Mac CI
 
 on:
-  pull_request:
+  release:
+    types: [created, published]
   push:
+    branches: [master]
+    tags: [v*]
+  workflow_dispatch:
 
 jobs:
   mac-build:

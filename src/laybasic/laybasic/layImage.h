@@ -163,7 +163,8 @@ public:
    *
    *  This feature produces a binary-alpha image of *this and other. The
    *  result can be patched into this image to render the same image than
-   *  "other".
+   *  "other". The difference image will contains the pixels from other which
+   *  are different from *this.
    *
    *  alpha values from this and other are ignored.
    */

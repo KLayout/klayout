@@ -25,7 +25,28 @@
 #include "tlUnitTest.h"
 
 #if defined(HAVE_QT)
-#include <QImage>
+
+#  include <QImage>
+
+static bool compare_images (const QImage &qimg, const std::string &au)
+{
+  QImage qimg2;
+  qimg2.load (tl::to_qstring (au));
+
+  if (qimg2.width () == (int) qimg.width () && qimg2.height () == (int) qimg.height ()) {
+    for (int i = 0; i < qimg.width (); ++i) {
+      for (int j = 0; j < qimg.height (); ++j) {
+        if (((const lay::color_t *) qimg.scanLine (j))[i] != ((const lay::color_t *) qimg2.scanLine (j))[i]) {
+          return false;
+        }
+      }
+    }
+    return true;
+  } else {
+    return false;
+  }
+}
+
 #endif
 
 TEST(1)
@@ -90,3 +111,51 @@ TEST(1)
   EXPECT_EQ (img4.height (), 16);
   EXPECT_EQ (img4.scan_line (5)[8], 0x102030);
 }
+
+#if defined(HAVE_QT)
+
+TEST(2)
+{
+  lay::Image img (227, 231);
+
+  for (unsigned int i = 0; i < img.width (); ++i) {
+    for (unsigned int j = 0; j < img.height (); ++j) {
+      img.scan_line (j) [i] = 0xff000000 | (i << 16) | j;
+    }
+  }
+
+  std::string tmp = tmp_file ("test.png");
+  QImage qimg = img.to_image ();
+  qimg.save (tl::to_qstring (tmp));
+  tl::info << "PNG file written to " << tmp;
+
+  std::string au = tl::testsrc () + "/testdata/lay/au.png";
+  tl::info << "PNG file read from " << au;
+
+  EXPECT_EQ (compare_images (qimg, au), true);
+
+  lay::Image img_saved (img);
+  img.scan_line (52) [42] = 0xff000000;
+
+  lay::Image diff = img.diff (img_saved);
+  EXPECT_EQ (compare_images (img.to_image (), au), false);
+  EXPECT_EQ (compare_images (img_saved.to_image (), au), true);
+
+  img.patch (diff);
+  EXPECT_EQ (compare_images (img.to_image (), au), true);
+
+  img.fill (0xff000000);
+  img.patch (diff);
+
+  tmp = tmp_file ("diff.png");
+  qimg = img.to_image ();
+  qimg.save (tl::to_qstring (tmp));
+  tl::info << "PNG file written to " << tmp;
+
+  au = tl::testsrc () + "/testdata/lay/au_diff.png";
+  tl::info << "PNG file read from " << au;
+
+  EXPECT_EQ (compare_images (qimg, au), true);
+}
+
+#endif

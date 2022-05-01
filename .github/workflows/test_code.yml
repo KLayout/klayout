@@ -27,7 +27,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          sudo apt install build-essential curl
+          sudo apt install -y build-essential curl zlib1g-dev libcurl4-openssl-dev libexpat1-dev
           pip install setuptools wheel twine
           pip install -e . --no-index 
       - name: Test with pytest

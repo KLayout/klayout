@@ -19,6 +19,7 @@ SOURCES = \
   tlFileSystemWatcherTests.cc \
   tlFileUtilsTests.cc \
   tlHttpStreamTests.cc \
+  tlImageTests.cc \
   tlIncludeTests.cc \
   tlInt128SupportTests.cc \
   tlIntervalMapTests.cc \
@@ -36,11 +37,10 @@ SOURCES = \
   tlUniqueIdTests.cc \
   tlListTests.cc \
   tlEquivalenceClustersTests.cc \
-    tlUniqueNameTests.cc \
-    tlGlobPatternTests.cc \
-    tlRecipeTests.cc \
-    tlUriTests.cc \
-  tlUtilsTests.cc \
+  tlUniqueNameTests.cc \
+  tlGlobPatternTests.cc \
+  tlRecipeTests.cc \
+  tlUriTests.cc \
   tlVariantTests.cc \
   tlWebDAVTests.cc \
   tlXMLParserTests.cc

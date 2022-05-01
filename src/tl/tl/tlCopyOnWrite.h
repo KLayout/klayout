@@ -144,6 +144,22 @@ public:
   }
 
   /**
+   *  @brief Swaps two pointers
+   */
+  void swap (copy_on_write_ptr<X, Dup> &other)
+  {
+    if (this == &other) {
+      return;
+    }
+
+    tl::MutexLocker locker1 (&ms_lock);
+    tl::MutexLocker locker2 (&other.ms_lock);
+
+    std::swap (mp_x, other.mp_x);
+    std::swap (mp_holder, other.mp_holder);
+  }
+
+  /**
    *  @brief Gets a writable object
    *  This is when we will create a new copy if the object is shared.
    */

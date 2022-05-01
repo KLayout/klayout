@@ -26,6 +26,7 @@
 #include "layDispatcher.h"
 
 #include "layPlugin.h"
+#include "layLayoutView.h"
 
 namespace lay
 {
@@ -34,7 +35,7 @@ class XORPlugin
   : public lay::Plugin
 {
 public:
-  XORPlugin (Plugin *parent, lay::LayoutViewBase *view)
+  XORPlugin (Plugin *parent, lay::LayoutView *view)
     : lay::Plugin (parent), mp_view (view)
   {
     mp_dialog = new lay::XORToolDialog (0);
@@ -112,7 +113,9 @@ public:
 
   lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
-    return new XORPlugin (root, view);
+    lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view);
+    tl_assert (lv != 0);
+    return new XORPlugin (root, lv);
   }
 };
 

@@ -49,7 +49,7 @@ static const std::string cfg_cell_selection_search_use_expressions ("cell-select
 
 // ------------------------------------------------------------
 
-CellSelectionForm::CellSelectionForm (QWidget *parent, LayoutView *view, const char *name, bool simple_mode)
+CellSelectionForm::CellSelectionForm (QWidget *parent, LayoutViewBase *view, const char *name, bool simple_mode)
   : QDialog (parent), Ui::CellSelectionForm (),
     mp_view (view),
     m_current_cv (-1),

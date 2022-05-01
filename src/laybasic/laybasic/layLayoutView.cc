@@ -321,6 +321,12 @@ LayoutView::~LayoutView ()
   mp_bookmarks_view = 0;
 }
 
+void
+LayoutView::do_change_active_cellview ()
+{
+  dm_setup_editor_option_pages ();
+}
+
 lay::EditorOptionsPages *LayoutView::editor_options_pages ()
 {
   if (! mp_editor_options_frame) {
@@ -614,21 +620,6 @@ LayoutView::set_or_request_current_layer (unsigned int cv_index, const db::Layer
   return false;
 }
 
-bool
-LayoutView::set_current_layer (unsigned int cv_index, const db::LayerProperties &lp) 
-{
-  //  rename the ones that got shifted.
-  lay::LayerPropertiesConstIterator l = begin_layers ();
-  while (! l.at_end ()) {
-    if (l->source (true).cv_index () == int (cv_index) && l->source (true).layer_props ().log_equal (lp)) {
-      set_current_layer (l);
-      return true;
-    }
-    ++l;
-  }
-  return false;
-}
-
 void
 LayoutView::set_current_layer (const lay::LayerPropertiesConstIterator &l) 
 {
@@ -637,13 +628,7 @@ LayoutView::set_current_layer (const lay::LayerPropertiesConstIterator &l)
   }
 }
 
-void
-LayoutView::do_set_current_layer (const lay::LayerPropertiesConstIterator &l)
-{
-  set_current_layer (l);
-}
-
-lay::LayerPropertiesConstIterator 
+lay::LayerPropertiesConstIterator
 LayoutView::current_layer () const
 {
   if (mp_control_panel) {
@@ -839,67 +824,6 @@ LayoutView::do_set_phase (int phase)
 }
 
 void
-LayoutView::enable_active_cellview_changed_event (bool enable, bool silent)
-{
-  if (m_active_cellview_changed_event_enabled == enable) {
-    return;
-  }
-
-  m_active_cellview_changed_event_enabled = enable;
-  if (enable) {
-
-    if (!silent && ! m_active_cellview_changed_events.empty ()) {
-
-      //  deliver stored events
-
-      //  we need to cancel pending drawing or dragging operations to reflect the new cellview (different target, may have different technology etc.)
-      cancel_esc ();
-
-      //  we need to setup the editor option pages because the technology may have changed
-      dm_setup_editor_option_pages ();
-
-      active_cellview_changed_event ();
-      for (std::set<int>::const_iterator i = m_active_cellview_changed_events.begin (); i != m_active_cellview_changed_events.end (); ++i) {
-        active_cellview_changed_with_index_event (*i);
-      }
-
-      //  Because the title reflects the active one, emit a title changed event
-      if (title_string ().empty ()) {
-        emit title_changed ();
-      }
-
-    }
-
-  }
-
-  m_active_cellview_changed_events.clear ();
-}
-
-void
-LayoutView::active_cellview_changed (int index)
-{
-  if (m_active_cellview_changed_event_enabled) {
-
-    //  we need to cancel pending drawing or dragging operations to reflect the new cellview (different target, may have different technology etc.)
-    cancel_esc ();
-
-    //  we need to setup the editor option pages because the technology may have changed
-    dm_setup_editor_option_pages ();
-
-    active_cellview_changed_event ();
-    active_cellview_changed_with_index_event (index);
-
-    //  Because the title reflects the active one, emit a title changed event
-    if (title_string ().empty ()) {
-      emit title_changed ();
-    }
-
-  } else {
-    m_active_cellview_changed_events.insert (index);
-  }
-}
-
-void
 LayoutView::active_library_changed (int /*index*/)
 {
   std::string lib_name;
@@ -987,18 +911,6 @@ LayoutView::cut ()
   } else {
     LayoutViewBase::cut ();
   }
-}
-
-const lay::CellView &
-LayoutView::active_cellview () const
-{
-  return cellview ((unsigned int) active_cellview_index ());
-}
-
-lay::CellViewRef
-LayoutView::active_cellview_ref ()
-{
-  return cellview_ref ((unsigned int) active_cellview_index ());
 }
 
 int

@@ -141,21 +141,6 @@ public:
   virtual bool has_selection ();
 
   /**
-   *  @brief Gets the window title of the view
-   */
-  std::string title () const;
-
-  /**
-   *  @brief Sets the window title to an explicit string
-   */
-  void set_title (const std::string &t);
-
-  /**
-   *  @brief Resets the explicit title and enable the automatic naming
-   */
-  void reset_title ();
-
-  /**
    *  @brief Display a status message
    */
   void message (const std::string &s = "", int timeout = 10);
@@ -179,7 +164,7 @@ public:
    *  Switches the mode on application level. Use this method to initiate
    *  a mode switch from the view.
    */
-  void switch_mode (int m);
+  virtual void switch_mode (int m);
 
   /**
    *  @brief Updates the menu for the given view
@@ -210,7 +195,10 @@ public:
    *
    *  Returns false if the layer is not a valid one.
    */
-  bool set_current_layer (unsigned int cv_index, const db::LayerProperties &properties);
+  bool set_current_layer (unsigned int cv_index, const db::LayerProperties &properties)
+  {
+    return LayoutViewBase::set_current_layer (cv_index, properties);
+  }
 
   /**
    *  @brief Sets the currently active layer
@@ -218,7 +206,7 @@ public:
    *  The active layer is the one that is active in the layer
    *  browser panel. This method will also select this layer.
    */
-  void set_current_layer (const lay::LayerPropertiesConstIterator &l);
+  virtual void set_current_layer (const lay::LayerPropertiesConstIterator &l);
 
   /**
    *  @brief Retrieve the index of the currently active layer
@@ -227,7 +215,7 @@ public:
    *  browser panel.
    *  This method returns a null iterator, if no layer is active.
    */
-  lay::LayerPropertiesConstIterator current_layer () const;
+  virtual lay::LayerPropertiesConstIterator current_layer () const;
 
   /**
    *  @brief Return the layers that are selected in the layer browser
@@ -245,16 +233,6 @@ public:
    *  @brief Get the index of the active cellview (shown in hierarchy browser)
    */
   int active_cellview_index () const;
-
-  /**
-   *  @brief Get the index of the active cellview (shown in hierarchy browser)
-   */
-  const lay::CellView &active_cellview () const;
-
-  /**
-   *  @brief Gets a cellview reference to the active cellview
-   */
-  lay::CellViewRef active_cellview_ref ();
 
   /**
    *  @brief Select a certain cellview for the active one
@@ -278,18 +256,6 @@ public:
   void current_cell_path (int cv_index, cell_path_type &path) const;
 
   /**
-   *  @brief Cell path of the current cell
-   *
-   *  This method version is provided for automation purposes mainly.
-   */
-  cell_path_type get_current_cell_path (int cv_index) const
-  {
-    cell_path_type r;
-    current_cell_path (cv_index, r);
-    return r;
-  }
-
-  /**
    *  @brief Cell path of the current cell in the active cellview
    *
    *  This is a convenience function returning the path for the active cellview.
@@ -306,16 +272,6 @@ public:
    *  cell given by the path is highlighted and scrolled into view.
    */
   virtual void set_current_cell_path (int cv_index, const cell_path_type &path);
-
-  /**
-   *  @brief Set the path to the current cell is the current cellview
-   *
-   *  This is a convenience function setting the path for the active cellview.
-   */
-  void set_current_cell_path (const cell_path_type &path)
-  {
-    set_current_cell_path (active_cellview_index (), path);
-  }
 
   /**
    *  @brief Remove unused layers
@@ -495,19 +451,6 @@ public:
    *  @brief An event signalling that the view is going to become invisible
    */
   tl::Event hide_event;
-
-  /**
-   *  @brief An event triggered if the active cellview changes
-   *  This event is triggered after the active cellview changed.
-   */
-  tl::Event active_cellview_changed_event;
-
-  /**
-   *  @brief An event triggered if the active cellview changes
-   *  This event is triggered after the active cellview changed. The integer parameter is the index of the
-   *  new cellview.
-   */
-  tl::event<int> active_cellview_changed_with_index_event;
 
 public slots:
   /**
@@ -705,7 +648,11 @@ public slots:
   void deactivate_all_browsers ();
 
 private slots:
-  void active_cellview_changed (int index);
+  void active_cellview_changed (int index)
+  {
+    LayoutViewBase::active_cellview_changed (index);
+  }
+
   void active_library_changed (int index);
   void side_panel_destroyed ();
 
@@ -768,8 +715,6 @@ private:
   QSpinBox *mp_min_hier_spbx;
   QSpinBox *mp_max_hier_spbx;
   BookmarkList m_bookmarks;
-  bool m_active_cellview_changed_event_enabled;
-  std::set<int> m_active_cellview_changed_events;
   bool m_always_show_source;
   bool m_always_show_ld;
   bool m_always_show_layout_index;
@@ -796,13 +741,12 @@ protected:
   virtual void do_paste ();
   virtual void begin_layer_updates ();
   virtual void ensure_layer_selected ();
-  virtual void do_set_current_layer (const lay::LayerPropertiesConstIterator &l);
   virtual void update_content_for_cv (int cv_index);
   virtual void do_set_no_stipples (bool no_stipples);
   virtual void do_set_phase (int phase);
   virtual bool set_hier_levels_basic (std::pair<int, int> l);
+  virtual void do_change_active_cellview ();
   virtual bool is_activated () const;
-  virtual void enable_active_cellview_changed_event (bool enable, bool silent = false);
 
   //  overrides Editables method to display a message
   void signal_selection_changed ();

@@ -24,6 +24,7 @@
 #include "layDispatcher.h"
 
 #include "layPlugin.h"
+#include "layLayoutView.h"
 
 namespace lay
 {
@@ -104,7 +105,9 @@ public:
 
   lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
-    return new DiffPlugin (root, view);
+    lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view);
+    tl_assert (lv != 0);
+    return new DiffPlugin (root, lv);
   }
 };
 

@@ -57,7 +57,7 @@ class D25View
 Q_OBJECT 
 
 public:
-  D25View (lay::Dispatcher *root, lay::LayoutView *view);
+  D25View (lay::Dispatcher *root, lay::LayoutViewBase *view);
   ~D25View ();
 
   virtual void menu_activated (const std::string &symbol);

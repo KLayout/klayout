@@ -196,6 +196,22 @@ public:
   ~LayoutViewBase ();
 
   /**
+   *  @brief Gets the current mode
+   */
+  int mode () const
+  {
+    return m_mode;
+  }
+
+  /**
+   *  @brief Switches the application's mode
+   *
+   *  Switches the mode on application level. Use this method to initiate
+   *  a mode switch from the view.
+   */
+  virtual void switch_mode (int m);
+
+  /**
    *  @brief Determine if there is something to copy
    *
    *  This reimplementation of the lay::Editables interface additionally
@@ -507,6 +523,33 @@ public:
   {
     insert_layer_list (index, LayerPropertiesList ());
   }
+
+  /**
+   *  @brief Sets the currently active layer by layer properties and cell view index
+   *
+   *  This method will look up that layer in the layer view tree and select that layer.
+   *  This method will also select this layer.
+   *
+   *  Returns false if the layer is not a valid one.
+   */
+  bool set_current_layer (unsigned int cv_index, const db::LayerProperties &properties);
+
+  /**
+   *  @brief Sets the currently active layer
+   *
+   *  The active layer is the one that is active in the layer
+   *  browser panel. This method will also select this layer.
+   */
+  virtual void set_current_layer (const lay::LayerPropertiesConstIterator &l);
+
+  /**
+   *  @brief Retrieve the index of the currently active layer
+   *
+   *  The active layer is the one that is active in the layer
+   *  browser panel.
+   *  This method returns a null iterator, if no layer is active.
+   */
+  virtual lay::LayerPropertiesConstIterator current_layer () const;
 
   /**
    *  @brief Set the custom dither pattern 
@@ -1837,7 +1880,96 @@ public:
    */
   db::InstElement ascend (int cellview_index);
 
-  /** 
+  /**
+   *  @brief Get the index of the active cellview (shown in hierarchy browser)
+   */
+  const lay::CellView &active_cellview () const;
+
+  /**
+   *  @brief Gets a cellview reference to the active cellview
+   */
+  lay::CellViewRef active_cellview_ref ();
+
+  /**
+   *  @brief Get the index of the active cellview (shown in hierarchy browser)
+   */
+  virtual int active_cellview_index () const;
+
+  /**
+   *  @brief Select a certain cellview for the active one
+   */
+  virtual void set_active_cellview_index (int index);
+
+  /**
+   *  @brief An event triggered if the active cellview changes
+   *  This event is triggered after the active cellview changed.
+   */
+  tl::Event active_cellview_changed_event;
+
+  /**
+   *  @brief An event triggered if the active cellview changes
+   *  This event is triggered after the active cellview changed. The integer parameter is the index of the
+   *  new cellview.
+   */
+  tl::event<int> active_cellview_changed_with_index_event;
+
+  /**
+   *  @brief Cell paths of the selected cells
+   *
+   *  The current cell is the one highlighted in the browser with the focus rectangle. The
+   *  current path is returned for the cellview given by cv_index.
+   */
+  virtual void selected_cells_paths (int cv_index, std::vector<cell_path_type> &paths) const;
+
+  /**
+   *  @brief Cell path of the current cell
+   *
+   *  The current cell is the one highlighted in the browser with the focus rectangle. The
+   *  current path is returned for the cellview given by cv_index.
+   */
+  virtual void current_cell_path (int cv_index, cell_path_type &path) const;
+
+  /**
+   *  @brief Cell path of the current cell
+   *
+   *  This method version is provided for automation purposes mainly.
+   */
+  cell_path_type get_current_cell_path (int cv_index) const
+  {
+    cell_path_type r;
+    current_cell_path (cv_index, r);
+    return r;
+  }
+
+  /**
+   *  @brief Cell path of the current cell in the active cellview
+   *
+   *  This is a convenience function returning the path for the active cellview.
+   */
+  void current_cell_path (cell_path_type &path) const
+  {
+    current_cell_path (active_cellview_index (), path);
+  }
+
+  /**
+   *  @brief Set the path to the current cell
+   *
+   *  The current cell is the one highlighted in the browser with the focus rectangle. The
+   *  cell given by the path is highlighted and scrolled into view.
+   */
+  virtual void set_current_cell_path (int cv_index, const cell_path_type &path);
+
+  /**
+   *  @brief Set the path to the current cell is the current cellview
+   *
+   *  This is a convenience function setting the path for the active cellview.
+   */
+  void set_current_cell_path (const cell_path_type &path)
+  {
+    set_current_cell_path (active_cellview_index (), path);
+  }
+
+  /**
    *  @brief Select a cell by path for a certain cell view and fit cell
    */
   void select_cell_fit (const cell_path_type &path, int cellview_index);
@@ -2187,6 +2319,21 @@ public:
   }
 
   /**
+   *  @brief Gets the window title of the view
+   */
+  std::string title () const;
+
+  /**
+   *  @brief Sets the window title to an explicit string
+   */
+  void set_title (const std::string &t);
+
+  /**
+   *  @brief Resets the explicit title and enable the automatic naming
+   */
+  void reset_title ();
+
+  /**
    *  @brief Removes the previous state from the stack
    */
   void pop_state ();
@@ -2461,6 +2608,14 @@ private:
 
   lay::Plugin *mp_active_plugin;
 
+  int m_active_cellview_index;
+  bool m_active_cellview_changed_event_enabled;
+  std::set<int> m_active_cellview_changed_events;
+
+  lay::LayerPropertiesConstIterator m_current_layer;
+
+  std::vector<cell_path_type> m_current_cell_per_cellview;
+
   bool m_visibility_changed;
 
   tl::Clock m_clock, m_last_checked;
@@ -2500,11 +2655,6 @@ protected:
     return m_options;
   }
 
-  int mode () const
-  {
-    return m_mode;
-  }
-
   lay::Plugin *active_plugin () const
   {
     return mp_active_plugin;
@@ -2525,18 +2675,17 @@ protected:
   virtual lay::Color default_background_color ();
   virtual void do_set_background_color (lay::Color color, lay::Color contrast);
   virtual void do_paste ();
-  virtual void switch_mode (int m);
   virtual void begin_layer_updates ();
   virtual void ensure_layer_selected ();
-  virtual void do_set_current_layer (const lay::LayerPropertiesConstIterator &l);
   virtual void do_set_no_stipples (bool no_stipples);
   virtual void do_set_phase (int phase);
   virtual bool is_activated () const;
+  virtual void do_change_active_cellview ();
   virtual void update_content_for_cv (int cv_index);
-  virtual void set_active_cellview_index (int index);
-  virtual void enable_active_cellview_changed_event (bool enable, bool silent = false);
   virtual bool set_hier_levels_basic (std::pair<int, int> l);
-  virtual void set_current_cell_path (int cv_index, const cell_path_type &path);
+
+  void enable_active_cellview_changed_event (bool enable, bool silent = false);
+  void active_cellview_changed (int index);
 
   virtual void emit_edits_enabled_changed () { }
   virtual void emit_title_changed () { }

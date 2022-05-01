@@ -68,7 +68,8 @@ NetTracerDialog::NetTracerDialog (lay::Dispatcher *root, lay::LayoutView *view)
     m_marker_intensity (0),
     m_auto_color_enabled (false),
     m_auto_color_index (0),
-    m_mouse_state (0)
+    m_mouse_state (0),
+    mp_view (view)
 {
   mp_export_file_dialog = new lay::FileDialog (this, tl::to_string (QObject::tr ("Export Net")), tl::to_string (QObject::tr ("KLayout net files (*.lyn);;All files (*)")));
 

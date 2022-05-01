@@ -28,6 +28,7 @@
 
 #include "layConverters.h"
 #include "layCellView.h"
+#include "layLayoutView.h"
 
 #include "gsiDecl.h"
 
@@ -77,7 +78,9 @@ public:
 
   virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
-    return new NetTracerDialog (root, view);
+    lay::LayoutView *lv = dynamic_cast<lay::LayoutView *> (view);
+    tl_assert (lv != 0);
+    return new NetTracerDialog (root, lv);
   }
 };
 

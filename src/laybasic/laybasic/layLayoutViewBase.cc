@@ -304,6 +304,9 @@ LayoutViewBase::init (db::Manager *mgr)
 {
   manager (mgr);
 
+  m_active_cellview_index = -1;
+  m_active_cellview_changed_event_enabled = true;
+
   m_annotation_shapes.manager (mgr);
 
   m_visibility_changed = false;
@@ -623,6 +626,58 @@ bool
 LayoutViewBase::is_dirty () const
 {
   return m_dirty;
+}
+
+std::string
+LayoutViewBase::title () const
+{
+  if (! m_title.empty ()) {
+    return m_title;
+  } else if (cellviews () == 0) {
+    return tl::to_string (QObject::tr ("<empty>"));
+  } else {
+
+    int cv_index = active_cellview_index ();
+    if (cv_index < 0 || cv_index >= int (cellviews ())) {
+      cv_index = 0;
+    }
+
+    const lay::CellView &cv0 = cellview (cv_index);
+
+    std::string t;
+
+    t += cv0->name ();
+    if (cv0->layout ().is_valid_cell_index (cv0.cell_index ())) {
+      t += " [";
+      t += cv0->layout ().cell_name (cv0.cell_index ());
+      t += "]";
+    }
+
+    if (cellviews () > 1) {
+      t += " ...";
+    }
+
+    return t;
+
+  }
+}
+
+void
+LayoutViewBase::set_title (const std::string &t)
+{
+  if (m_title != t) {
+    m_title = t;
+    emit_title_changed ();
+  }
+}
+
+void
+LayoutViewBase::reset_title ()
+{
+  if (! m_title.empty ()) {
+    m_title = "";
+    emit_title_changed ();
+  }
 }
 
 bool 
@@ -1355,6 +1410,35 @@ LayoutViewBase::rename_properties (unsigned int index, const std::string &new_na
   layer_list_changed_event (4);
 }
 
+bool
+LayoutViewBase::set_current_layer (unsigned int cv_index, const db::LayerProperties &lp)
+{
+  //  rename the ones that got shifted.
+  lay::LayerPropertiesConstIterator l = begin_layers ();
+  while (! l.at_end ()) {
+    if (l->source (true).cv_index () == int (cv_index) && l->source (true).layer_props ().log_equal (lp)) {
+      set_current_layer (l);
+      return true;
+    }
+    ++l;
+  }
+  return false;
+}
+
+void
+LayoutViewBase::set_current_layer (const lay::LayerPropertiesConstIterator &l)
+{
+  //  @@@ No checking happens
+  m_current_layer = l;
+}
+
+lay::LayerPropertiesConstIterator
+LayoutViewBase::current_layer () const
+{
+  //  @@@ No checking happens
+  return m_current_layer;
+}
+
 void
 LayoutViewBase::merge_dither_pattern (lay::LayerPropertiesList &props)
 {
@@ -1975,6 +2059,10 @@ LayoutViewBase::erase_cellview (unsigned int index)
     m_hidden_cells.erase (m_hidden_cells.begin () + index);
   }
 
+  if (m_current_cell_per_cellview.size () > index) {
+    m_current_cell_per_cellview.erase (m_current_cell_per_cellview.begin () + index);
+  }
+
   for (unsigned int lindex = 0; lindex < layer_lists (); ++lindex) {
 
     //  remove all references to the cellview
@@ -2029,6 +2117,9 @@ LayoutViewBase::clear_cellviews ()
   }
   set_properties (lay::LayerPropertiesList ());
   m_cellviews.clear ();
+
+  m_hidden_cells.clear ();
+  m_current_cell_per_cellview.clear ();
 
   //  clear the history, store path and zoom box
   m_display_states.clear ();
@@ -2312,7 +2403,7 @@ LayoutViewBase::add_new_layers (const std::vector <unsigned int> &layer_ids, int
     set_properties (new_props);
 
     if (was_empty) {
-      do_set_current_layer (new_props.begin_const_recursive ());
+      set_current_layer (new_props.begin_const_recursive ());
     }
 
   }
@@ -2599,6 +2690,11 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
         m_hidden_cells [cv_index].insert (cid.second);
       }
     }
+  }
+
+  //  clear the current cell (NOTE: this is for providing a cell target for some UI functions only)
+  if (m_current_cell_per_cellview.size () > cv_index) {
+    m_current_cell_per_cellview [cv_index] = cell_path_type ();
   }
 
   //  Determine which layers to create as new layers. New layer need to be created
@@ -4116,13 +4212,133 @@ LayoutViewBase::cellview_changed (unsigned int index)
   }
 }
 
+const lay::CellView &
+LayoutViewBase::active_cellview () const
+{
+  return cellview ((unsigned int) active_cellview_index ());
+}
+
+lay::CellViewRef
+LayoutViewBase::active_cellview_ref ()
+{
+  return cellview_ref ((unsigned int) active_cellview_index ());
+}
+
+int
+LayoutViewBase::active_cellview_index () const
+{
+  return m_active_cellview_index;
+}
+
 void
-LayoutViewBase::set_current_cell_path (int /*cv_index*/, const cell_path_type & /*path*/)
+LayoutViewBase::set_active_cellview_index (int index)
+{
+  if (index >= 0 && index < int (cellviews ())) {
+    if (m_active_cellview_index != index) {
+      m_active_cellview_index = index;
+      active_cellview_changed (index);
+    }
+  } else {
+    m_active_cellview_index = -1;
+  }
+}
+
+void
+LayoutViewBase::selected_cells_paths (int /*cv_index*/, std::vector<cell_path_type> & /*paths*/) const
+{
+  //  TODO: not implemented yet as there is no setter so far.
+  //  (but it is implemented in the UI version where it is bound to the hierarchy control panel)
+}
+
+void
+LayoutViewBase::current_cell_path (int cv_index, cell_path_type &path) const
+{
+  if (cv_index >= 0 && cv_index < int (m_current_cell_per_cellview.size ())) {
+    path = m_current_cell_per_cellview [cv_index];
+  } else {
+    path = cell_path_type ();
+  }
+}
+
+void
+LayoutViewBase::set_current_cell_path (int cv_index, const cell_path_type &path)
+{
+  if (cv_index >= 0) {
+    while (cv_index <= int (m_current_cell_per_cellview.size ())) {
+      m_current_cell_per_cellview.push_back (cell_path_type ());
+    }
+    m_current_cell_per_cellview [cv_index] = path;
+  }
+}
+
+void
+LayoutViewBase::do_change_active_cellview ()
 {
   //  .. nothing yet ..
 }
 
-void 
+void
+LayoutViewBase::enable_active_cellview_changed_event (bool enable, bool silent)
+{
+  if (m_active_cellview_changed_event_enabled == enable) {
+    return;
+  }
+
+  m_active_cellview_changed_event_enabled = enable;
+  if (enable) {
+
+    if (!silent && ! m_active_cellview_changed_events.empty ()) {
+
+      //  deliver stored events
+
+      //  we need to cancel pending drawing or dragging operations to reflect the new cellview (different target, may have different technology etc.)
+      cancel_esc ();
+
+      //  we need to setup the editor option pages because the technology may have changed
+      do_change_active_cellview ();
+
+      active_cellview_changed_event ();
+      for (std::set<int>::const_iterator i = m_active_cellview_changed_events.begin (); i != m_active_cellview_changed_events.end (); ++i) {
+        active_cellview_changed_with_index_event (*i);
+      }
+
+      //  Because the title reflects the active one, emit a title changed event
+      if (title_string ().empty ()) {
+        emit_title_changed ();
+      }
+
+    }
+
+  }
+
+  m_active_cellview_changed_events.clear ();
+}
+
+void
+LayoutViewBase::active_cellview_changed (int index)
+{
+  if (m_active_cellview_changed_event_enabled) {
+
+    //  we need to cancel pending drawing or dragging operations to reflect the new cellview (different target, may have different technology etc.)
+    cancel_esc ();
+
+    //  we need to setup the editor option pages because the technology may have changed
+    do_change_active_cellview ();
+
+    active_cellview_changed_event ();
+    active_cellview_changed_with_index_event (index);
+
+    //  Because the title reflects the active one, emit a title changed event
+    if (title_string ().empty ()) {
+      emit_title_changed ();
+    }
+
+  } else {
+    m_active_cellview_changed_events.insert (index);
+  }
+}
+
+void
 LayoutViewBase::select_cell_dispatch (const cell_path_type &path, int cellview_index)
 {
   bool set_max_hier = (m_full_hier_new_cell || has_max_hier ());
@@ -4782,12 +4998,6 @@ LayoutViewBase::ensure_layer_selected ()
 }
 
 void
-LayoutViewBase::do_set_current_layer (const lay::LayerPropertiesConstIterator & /*l*/)
-{
-  //  .. nothing yet ..
-}
-
-void
 LayoutViewBase::do_set_no_stipples (bool /*no_stipples*/)
 {
   //  .. nothing yet ..
@@ -4812,21 +5022,9 @@ LayoutViewBase::is_activated () const
 }
 
 void
-LayoutViewBase::switch_mode (int /*m*/)
+LayoutViewBase::switch_mode (int m)
 {
-  //  .. nothing yet ..
-}
-
-void
-LayoutViewBase::set_active_cellview_index (int /*index*/)
-{
-  //  .. nothing yet ..
-}
-
-void
-LayoutViewBase::enable_active_cellview_changed_event (bool /*enable*/, bool /*silent*/)
-{
-  //  .. nothing yet ..
+  mode (m);
 }
 
 void 

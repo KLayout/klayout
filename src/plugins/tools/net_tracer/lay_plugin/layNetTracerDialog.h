@@ -108,6 +108,8 @@ private:
   lay::FileDialog *mp_export_file_dialog;
   std::string m_export_file_name;
 
+  lay::LayoutView *mp_view;
+
   void commit ();
   size_t get_trace_depth ();
   void update_highlights ();
@@ -121,6 +123,11 @@ private:
   db::NetTracerNet *do_trace (const db::DBox &start_search_box, const db::DBox &stop_search_box, bool trace_path);
   bool get_net_tracer_setup (const lay::CellView &cv, db::NetTracerData &data);
   void trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView &cv, bool flat);
+
+  lay::LayoutView *view ()
+  {
+    return mp_view;
+  }
 };
 
 }

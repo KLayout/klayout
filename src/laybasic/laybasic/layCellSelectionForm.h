@@ -49,7 +49,7 @@ class LAYBASIC_PUBLIC CellSelectionForm
   Q_OBJECT 
 
 public:
-  CellSelectionForm (QWidget *parent, LayoutView *view, const char *name, bool simple_mode = false);
+  CellSelectionForm (QWidget *parent, LayoutViewBase *view, const char *name, bool simple_mode = false);
 
   /**
    *  @brief Obtain the selected cellview's index (with changes)
@@ -76,7 +76,7 @@ public slots:
   void find_prev_clicked();
 
 private:
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   std::vector <lay::CellView> m_cellviews;
   int m_current_cv;
   bool m_name_cb_enabled;

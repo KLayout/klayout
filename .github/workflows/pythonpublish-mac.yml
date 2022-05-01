@@ -1,0 +1,29 @@
+---
+name: Mac CI
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  mac-build:
+    name: Wrapper macOS Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["macos-11", "macos-10.15"]
+        pyversion: ["python@3.8", "python@3.9", "python@3.10"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Build the macOS wheels
+        run: |
+          pip3 install twine
+          pip3 install -e . --no-index
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          python3 setup.py sdist bdist_wheel
+          twine upload dist/*

@@ -1,0 +1,29 @@
+---
+name: Mac test code
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  mac-build:
+    name: Wrapper macOS Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["macos-11", "macos-10.15"]
+        pyversion: ["python@3.8", "python@3.9", "python@3.10"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Build the macOS wheels
+        run: |
+          pip3 install twine
+          pip3 install -e . --no-index
+      - name: Test code
+        run: |
+          python testdata/pymod/import_db.py
+          python testdata/pymod/import_rdb.py
+          python testdata/pymod/import_tl.py
+          python testdata/pymod/import_lib.py
+          python testdata/pymod/pya_tests.py

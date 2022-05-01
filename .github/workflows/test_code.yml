@@ -14,7 +14,7 @@ jobs:
     strategy:
       max-parallel: 12
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.7, 3.8, 3.9, 3.10]
         os: [ubuntu-latest]
 
     steps:
@@ -31,7 +31,7 @@ jobs:
           sudo apt install -y build-essential curl zlib1g-dev libcurl4-openssl-dev libexpat1-dev
           pip install setuptools wheel twine
           pip install -e . --no-index 
-      - name: Test with pytest
+      - name: Test code
         run: |
           python testdata/pymod/import_db.py
           python testdata/pymod/import_rdb.py

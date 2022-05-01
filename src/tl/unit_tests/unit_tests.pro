@@ -19,7 +19,6 @@ SOURCES = \
   tlFileSystemWatcherTests.cc \
   tlFileUtilsTests.cc \
   tlHttpStreamTests.cc \
-  tlImageTests.cc \
   tlIncludeTests.cc \
   tlInt128SupportTests.cc \
   tlIntervalMapTests.cc \

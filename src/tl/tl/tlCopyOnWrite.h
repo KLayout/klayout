@@ -152,9 +152,7 @@ public:
       return;
     }
 
-    tl::MutexLocker locker1 (&ms_lock);
-    tl::MutexLocker locker2 (&other.ms_lock);
-
+    tl::MutexLocker locker (&ms_lock);
     std::swap (mp_x, other.mp_x);
     std::swap (mp_holder, other.mp_holder);
   }

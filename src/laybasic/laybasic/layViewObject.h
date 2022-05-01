@@ -1030,7 +1030,7 @@ public:
   }
 
 protected:
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) // @@@
   /**
    *  @brief Qt focus event handler
    */
@@ -1101,7 +1101,7 @@ protected:
   void wheelEvent (QWheelEvent *e);
 #endif
 
-#if !defined(HAVE_QT)
+#if !defined(HAVE_QT) // @@@
   void update ();
 #endif
 

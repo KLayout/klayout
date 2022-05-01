@@ -32,10 +32,12 @@
 #include <vector>
 #include <map>
 
-#include <QPoint>
-#include <QByteArray>
-#include <QColor>
-#include <QWidget>
+#if defined(HAVE_QT)
+#  include <QPoint>
+#  include <QByteArray>
+#  include <QColor>
+#  include <QWidget>
+#endif
 
 #include "tlObjectCollection.h"
 #include "tlVariant.h"
@@ -45,6 +47,7 @@
 #include "layCursor.h"
 #include "layBitmapRenderer.h"
 
+#if defined(HAVE_QT)
 class QMouseEvent;
 class QImage;
 class QDragEnterEvent;
@@ -52,6 +55,7 @@ class QDragMoveEvent;
 class QDragLeaveEvent;
 class QDropEvent;
 class QMimeData;
+#endif
 
 namespace db
 {
@@ -89,6 +93,7 @@ public:
    */
   virtual ~DragDropDataBase () { } 
 
+#if defined(HAVE_QT) // @@@
   /**
    *  @brief Serializes itself to an QByteArray
    */
@@ -105,6 +110,7 @@ public:
    *  @brief Create a QMimeData object from the object
    */
   QMimeData *to_mime_data () const;
+#endif
 };
 
 /**
@@ -176,6 +182,7 @@ public:
     return m_is_pcell;
   }
 
+#if defined(HAVE_QT) // @@@
   /**
    *  @brief Serializes itself to an QByteArray
    */
@@ -187,6 +194,7 @@ public:
    *  Returns false, if deserialization failed.
    */
   bool deserialize (const QByteArray &ba);
+#endif
 
 private:
   const db::Layout *mp_layout;
@@ -644,8 +652,10 @@ enum ButtonState {
  *  painting.
  */
 
-class LAYBASIC_PUBLIC ViewObjectWidget 
-  : public QWidget,
+class LAYBASIC_PUBLIC ViewObjectWidget :
+#if defined(HAVE_QT)
+    public QWidget,
+#endif
     public tl::Object
 {
 public:
@@ -657,7 +667,11 @@ public:
   /**
    *  @brief ctor
    */
+#if defined(HAVE_QT)
   ViewObjectWidget (QWidget *view, const char *name);
+#else
+  ViewObjectWidget ();
+#endif
 
   /**
    *  @brief dtor
@@ -984,7 +998,7 @@ public:
   /**
    *  @brief Gets the current mouse position
    */
-  QPoint mouse_position () const
+  db::Point mouse_position () const
   {
     return m_mouse_pos;
   }
@@ -1000,12 +1014,12 @@ public:
   /**
    *  @brief Translates a screen coordinate in micrometer coordinates
    */
-  db::DPoint pixel_to_um (const QPoint &pt) const;
+  db::DPoint pixel_to_um (const db::Point &pt) const;
 
   /**
    *  @brief Translates a screen coordinate in micrometer coordinates
    */
-  db::DPoint pixel_to_um (const QPointF &pt) const;
+  db::DPoint pixel_to_um (const db::DPoint &pt) const;
 
   /**
    *  @brief Gets a flag indicating whether the mouse is inside the window
@@ -1016,6 +1030,7 @@ public:
   }
 
 protected:
+#if defined(HAVE_QT)
   /**
    *  @brief Qt focus event handler
    */
@@ -1084,6 +1099,11 @@ protected:
    *  @brief Qt mouse wheel event handler
    */
   void wheelEvent (QWheelEvent *e);
+#endif
+
+#if !defined(HAVE_QT)
+  void update ();
+#endif
 
   /**
    *  @brief Set the transformation for mouse events
@@ -1104,8 +1124,8 @@ private:
   bool m_needs_update_bg;
   lay::ViewService *mp_active_service;
   db::DCplxTrans m_trans;
-  QPoint m_mouse_pos;
-  QPoint m_mouse_pressed;
+  db::Point m_mouse_pos;
+  db::Point m_mouse_pressed;
   bool m_mouse_pressed_state;
   unsigned int m_mouse_buttons;
   bool m_in_mouse_move;
@@ -1117,6 +1137,8 @@ private:
   void begin_mouse_event (lay::Cursor::cursor_shape cursor = lay::Cursor::keep);
   void end_mouse_event ();
   void objects_changed ();
+  int widget_height () const;
+  int widget_width () const;
 
   /**
    *  @brief Register a service
@@ -1328,10 +1350,12 @@ public:
    */
   void clear_fg_bitmaps ();
 
+#if defined(HAVE_QT) // @@@
   /**
    *  @brief Return the background image
    */
   virtual QImage &bg_image () = 0;
+#endif
 
   /**
    *  @brief Set the width and height and resolution

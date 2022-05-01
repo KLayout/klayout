@@ -20,7 +20,7 @@
 
 */
 
-
+#if defined(HAVE_QT) // @@@
 #include "layBitmapsToImage.h"
 #include "layBitmap.h"
 #include "layDitherPattern.h"
@@ -940,3 +940,4 @@ TEST(1)
 
 }
 
+#endif

@@ -26,7 +26,10 @@
 
 #include "layViewObject.h"
 #include "layPlugin.h"
-#include "layPluginConfigPage.h"
+#if defined(HAVE_QT)
+#  include "layPluginConfigPage.h"
+#endif
+#include "layColor.h"
 #include "dbTypes.h"
 #include "dbBox.h"
 
@@ -44,11 +47,14 @@ class GridNetPluginDeclaration
 {
 public:
   virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const;
+#if defined(HAVE_QT)
   virtual lay::ConfigPage *config_page (QWidget *parent, std::string &title) const;
+#endif
   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *, lay::LayoutViewBase *view) const;
 };
 
-class GridNetConfigPage 
+#if defined(HAVE_QT) // @@@
+class GridNetConfigPage
   : public lay::ConfigPage
 {
 Q_OBJECT
@@ -67,6 +73,7 @@ private:
   lay::ColorButton *mp_grid_axis_color_cbtn;
   lay::ColorButton *mp_grid_ruler_color_cbtn;
 };
+#endif
 
 class GridNet
   : public lay::BackgroundViewObject,
@@ -95,10 +102,10 @@ private:
   bool m_visible;
   bool m_show_ruler;
   double m_grid;
-  QColor m_color;
-  QColor m_grid_color;
-  QColor m_axis_color;
-  QColor m_ruler_color;
+  lay::Color m_color;
+  lay::Color m_grid_color;
+  lay::Color m_axis_color;
+  lay::Color m_ruler_color;
   GridStyle m_style0;
   GridStyle m_style1;
   GridStyle m_style2;

@@ -89,6 +89,7 @@ bool
 MoveService::key_event (unsigned int key, unsigned int /*buttons*/)
 {
   double dx = 0.0, dy = 0.0;
+#if defined(HAVE_QT) // @@@
   if (int (key) == Qt::Key_Down) {
     dy = -1.0;
   } else if (int (key) == Qt::Key_Up) {
@@ -98,6 +99,7 @@ MoveService::key_event (unsigned int key, unsigned int /*buttons*/)
   } else if (int (key) == Qt::Key_Right) {
     dx = 1.0;
   }
+#endif
 
   if (! m_dragging && fabs (dx + dy) > 0.0 && mp_editables->has_selection ()) {
 

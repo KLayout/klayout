@@ -31,8 +31,6 @@
 #include <list>
 #include <utility>
 
-#include <QDialog>
-
 #include "dbInstElement.h"
 #include "dbClipboardData.h"
 #include "dbClipboard.h"

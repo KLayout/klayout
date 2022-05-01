@@ -29,8 +29,6 @@
 #include <set>
 #include <utility>
 
-#include <QMutex>
-
 #include "dbTrans.h"
 #include "dbBox.h"
 #include "layViewport.h"
@@ -43,6 +41,7 @@
 #include "layRedrawThreadCanvas.h"
 #include "layRedrawLayerInfo.h"
 #include "tlDeferredExecution.h"
+#include "tlThreads.h"
 
 namespace lay
 {
@@ -146,7 +145,7 @@ public:
 #if defined(HAVE_QT)
   LayoutCanvas (QWidget *parent, lay::LayoutViewBase *view, const char *name = "canvas");
 #else
-  LayoutCanvas (lay::LayoutViewBase *view, const char *name = "canvas");
+  LayoutCanvas (lay::LayoutViewBase *view);
 #endif
   ~LayoutCanvas ();
 
@@ -171,9 +170,11 @@ public:
     return m_view_ops; 
   }
 
+#if defined(HAVE_QT) // @@@
   QImage screenshot ();
   QImage image (unsigned int width, unsigned int height);
   QImage image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, lay::Color background, lay::Color foreground, lay::Color active_color, const db::DBox &target_box, bool monochrome);
+#endif
 
   void update_image ();
 
@@ -315,6 +316,7 @@ public:
     return lay::Color (m_active);
   }
 
+#if defined(HAVE_QT) // @@@
   /**
    *  @brief Reimplementation of ViewObjectCanvas: background image
    */
@@ -322,6 +324,7 @@ public:
   {
     return *mp_image;
   }
+#endif
 
   /** 
    *  @brief Reimplementation of RedrawThreadCanvas: signal end of drawing
@@ -359,9 +362,11 @@ public:
 
 private:
   lay::LayoutViewBase *mp_view;
+#if defined(HAVE_QT) // @@@
   QImage *mp_image;
   QImage *mp_image_bg;
   QPixmap *mp_pixmap;
+#endif
   db::DBox m_precious_box;
   lay::Viewport m_viewport, m_viewport_l;
   lay::color_t m_background;
@@ -388,11 +393,13 @@ private:
   std::vector<ImageCacheEntry> m_image_cache;
   size_t m_image_cache_size;
 
-  QMutex m_mutex;
+  tl::Mutex m_mutex;
 
+#if defined(HAVE_QT)
   virtual void paintEvent (QPaintEvent *);
   virtual void resizeEvent (QResizeEvent *);
   virtual bool event (QEvent *e);
+#endif
   virtual void key_event (unsigned int key, unsigned int buttons);
 
   //  implementation of the lay::Drawings interface

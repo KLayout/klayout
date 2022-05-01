@@ -386,7 +386,7 @@ render_scanline_cross (const uint32_t *dp, unsigned int ds, const lay::Bitmap *p
   }
 }
 
-static void create_precursor_bitmaps (const std::vector<lay::ViewOp> &view_ops_in, const std::vector <unsigned int> &vo_map, const std::vector<lay::Bitmap *> &pbitmaps_in, const std::vector<unsigned int> &bm_map, const lay::LineStyles &ls, unsigned int width, unsigned int height, std::map<unsigned int, lay::Bitmap> &precursors, QMutex *mutex)
+static void create_precursor_bitmaps (const std::vector<lay::ViewOp> &view_ops_in, const std::vector <unsigned int> &vo_map, const std::vector<lay::Bitmap *> &pbitmaps_in, const std::vector<unsigned int> &bm_map, const lay::LineStyles &ls, unsigned int width, unsigned int height, std::map<unsigned int, lay::Bitmap> &precursors, tl::Mutex *mutex)
 {
   tl_assert (bm_map.size () == vo_map.size ());
 
@@ -430,7 +430,7 @@ bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
                       QImage *pimage, unsigned int width, unsigned int height,
                       bool use_bitmap_index,
                       bool transparent,
-                      QMutex *mutex)
+                      tl::Mutex *mutex)
 {
   std::vector<unsigned int> bm_map;
   std::vector<unsigned int> vo_map;
@@ -668,7 +668,7 @@ bitmaps_to_image_mono (const std::vector<lay::ViewOp> &view_ops_in,
                        const lay::LineStyles &ls,
                        QImage *pimage, unsigned int width, unsigned int height,
                        bool use_bitmap_index,
-                       QMutex *mutex)
+                       tl::Mutex *mutex)
 {
   std::vector<unsigned int> bm_map;
   std::vector<unsigned int> vo_map;
@@ -873,7 +873,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
                   const lay::LineStyles &ls,
                   QImage *pimage, unsigned int width, unsigned int height,
                   bool use_bitmap_index,
-                  QMutex *mutex)
+                  tl::Mutex *mutex)
 {
   if (pimage->depth () <= 1) {
     bitmaps_to_image_mono (view_ops_in, pbitmaps_in, dp, ls, pimage, width, height, use_bitmap_index, mutex);

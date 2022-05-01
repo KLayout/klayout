@@ -30,6 +30,7 @@
 
 #include "dbLayoutToNetlist.h"
 #include "dbLayoutVsSchematic.h"
+#include "layNetColorizer.h"
 
 #include "tlList.h"
 #include "tlTypeTraits.h"
@@ -45,48 +46,6 @@ namespace lay
 {
 
 class IndexedNetlistModel;
-
-// ----------------------------------------------------------------------------------
-//  NetColorizer definition
-
-class LAYBASIC_PUBLIC NetColorizer
-  : public QObject
-{
-Q_OBJECT
-
-public:
-  NetColorizer ();
-
-  void configure (const lay::Color &marker_color, const lay::ColorPalette *auto_colors);
-  bool has_color_for_net (const db::Net *net);
-  void set_color_of_net (const db::Net *net, const Color &color);
-  void reset_color_of_net (const db::Net *net);
-  void clear ();
-
-  lay::Color color_of_net (const db::Net *net) const;
-
-  const lay::Color &marker_color () const
-  {
-    return m_marker_color;
-  }
-
-  void begin_changes ();
-  void end_changes ();
-
-signals:
-  void colors_changed ();
-
-private:
-  lay::Color m_marker_color;
-  lay::ColorPalette m_auto_colors;
-  bool m_auto_colors_enabled;
-  std::map<const db::Net *, lay::Color> m_custom_color;
-  bool m_update_needed;
-  bool m_signals_enabled;
-  mutable std::map<const db::Net *, size_t> m_net_index_by_object;
-
-  void emit_colors_changed ();
-};
 
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserModel definition

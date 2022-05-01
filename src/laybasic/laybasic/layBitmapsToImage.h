@@ -25,10 +25,10 @@
 #define HDR_layBitmapsToImage
 
 #include "layViewOp.h"
+#include "tlThreads.h"
 
 #include <vector>
 
-class QMutex;
 class QImage;
 
 namespace lay
@@ -46,7 +46,7 @@ class Bitmap;
  *  with the given width and height.
  *  The "view_ops" and "pbitmaps" vectors must have the same size.
  *  The QImage must be initialized to the given width and height.
- *  If the QMutex pointer is not 0, the mutex is locked between operations 
+ *  If the tl::Mutex pointer is not 0, the mutex is locked between operations
  *  if the bitmap is accessed. The set of dither pattern specifies any custom
  *  pattern that are used bz the view operands.
  *  The "use_bitmap_index" parameter specifies whether the bitmap_index
@@ -60,7 +60,7 @@ bitmaps_to_image (const std::vector <lay::ViewOp> &view_ops,
                   const lay::LineStyles &ls,
                   QImage *pimage, unsigned int width, unsigned int height,
                   bool use_bitmap_index,
-                  QMutex *mutex);
+                  tl::Mutex *mutex);
 
 /**
  *  @brief Convert a lay::Bitmap to a unsigned char * data field to be passed to QBitmap

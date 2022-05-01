@@ -205,16 +205,16 @@ StipplePalette::from_string (const std::string &s)
     }
 
     if (! x.at_end ()) {
-      throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("unexpected characters: %s")), x.skip ()));
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("unexpected characters: %s")), x.skip ()));
     }
 
     if (stipples () == 0 || standard_stipples () == 0) {
-      throw tl::Exception (tl::to_string (QObject::tr ("invalid palette - no stipples and/or standard stipples")));
+      throw tl::Exception (tl::to_string (tr ("invalid palette - no stipples and/or standard stipples")));
     }
 
   } catch (std::exception &ex) {
     //  reformat error message
-    throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Stipple palette string format error: %s")), ex.what ()));
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("Stipple palette string format error: %s")), ex.what ()));
   }
 }
 

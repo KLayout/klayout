@@ -37,7 +37,7 @@ namespace lay
 
 // ------------------------------------------------------------------------
 
-void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, const db::CplxTrans &tr, lay::Renderer &r,
+void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, const db::CplxTrans &trans, lay::Renderer &r,
                        unsigned int font, lay::CanvasPlane *fill, lay::CanvasPlane *contour, lay::CanvasPlane *vertex, lay::CanvasPlane *text,
                        bool cell_name_text_transform, int min_size_for_label, bool draw_outline, size_t max_shapes)
 {
@@ -83,29 +83,29 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
       db::Vector av(a), bv(b);
 
       //  fallback to simpler representation using a description text
-      db::CplxTrans tbox (tr * inst.complex_trans ());
+      db::CplxTrans tbox (trans * inst.complex_trans ());
 
       //  one representative instance
       r.draw (cell_box, tbox, fill, contour, 0, text);
-      r.draw (cell_box, db::CplxTrans (tr * (av * long (amax - 1))) * tbox, fill, contour, 0, text);
-      r.draw (cell_box, db::CplxTrans (tr * (bv * long (bmax - 1))) * tbox, fill, contour, 0, text);
-      r.draw (cell_box, db::CplxTrans (tr * (av * long (amax - 1) + bv * long (bmax - 1))) * tbox, fill, contour, 0, text);
+      r.draw (cell_box, db::CplxTrans (trans * (av * long (amax - 1))) * tbox, fill, contour, 0, text);
+      r.draw (cell_box, db::CplxTrans (trans * (bv * long (bmax - 1))) * tbox, fill, contour, 0, text);
+      r.draw (cell_box, db::CplxTrans (trans * (av * long (amax - 1) + bv * long (bmax - 1))) * tbox, fill, contour, 0, text);
 
       db::DBox cb (tbox * cell_box);
       db::DPolygon p;
       db::DPoint points[] = {
         db::DPoint (cb.lower_left ()), 
-        db::DPoint (cb.lower_left () + tr * (av * long (amax - 1))),
-        db::DPoint (cb.lower_left () + tr * (av * long (amax - 1) + bv * long (bmax - 1))),
-        db::DPoint (cb.lower_left () + tr * (bv * long (bmax - 1))),
+        db::DPoint (cb.lower_left () + trans * (av * long (amax - 1))),
+        db::DPoint (cb.lower_left () + trans * (av * long (amax - 1) + bv * long (bmax - 1))),
+        db::DPoint (cb.lower_left () + trans * (bv * long (bmax - 1))),
       };
       p.assign_hull (points, points + sizeof (points) / sizeof (points[0]));
       r.draw (p, fill, contour, 0, text);
 
       if (text) {
-        db::DBox arr_box (db::DPoint (), db::DPoint () + tr * (av * long (amax - 1) + bv * long (bmax - 1)));
+        db::DBox arr_box (db::DPoint (), db::DPoint () + trans * (av * long (amax - 1) + bv * long (bmax - 1)));
         arr_box *= cb;
-        r.draw (arr_box, tl::sprintf (tl::to_string (QObject::tr ("Array %ldx%ld")), amax, bmax), db::Font (font), db::HAlignCenter, db::VAlignCenter, db::DFTrans (db::DFTrans::r0), 0, 0, 0, text);
+        r.draw (arr_box, tl::sprintf (tl::to_string (tr ("Array %ldx%ld")), amax, bmax), db::Font (font), db::HAlignCenter, db::VAlignCenter, db::DFTrans (db::DFTrans::r0), 0, 0, 0, text);
       }
 
     } else {
@@ -113,7 +113,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
       for (db::CellInstArray::iterator arr = inst.begin (); ! arr.at_end (); ++arr) {
 
         //  fallback to simpler representation using a description text
-        db::CplxTrans tbox (tr * inst.complex_trans ());
+        db::CplxTrans tbox (trans * inst.complex_trans ());
 
         r.draw (cell_box, tbox, fill, contour, 0, 0);
 
@@ -149,7 +149,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
       while (! shapes.at_end ()) {
 
         for (db::CellInstArray::iterator arr = inst.begin (); ! arr.at_end (); ++arr) {
-          r.draw (*shapes, tr * inst.complex_trans (*arr) * shapes.trans (), fill, contour, 0 /*use vertex for origin*/, text);
+          r.draw (*shapes, trans * inst.complex_trans (*arr) * shapes.trans (), fill, contour, 0 /*use vertex for origin*/, text);
         }
 
         ++shapes;
@@ -167,7 +167,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
     while (! shapes.at_end ()) {
 
       for (db::CellInstArray::iterator arr = inst.begin (); ! arr.at_end (); ++arr) {
-        r.draw (*shapes, tr * inst.complex_trans (*arr) * shapes.trans (), fill, contour, 0 /*use vertex for origin*/, text);
+        r.draw (*shapes, trans * inst.complex_trans (*arr) * shapes.trans (), fill, contour, 0 /*use vertex for origin*/, text);
       }
 
       ++shapes;
@@ -179,7 +179,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
   if (render_origins && vertex) {
 
     for (db::CellInstArray::iterator arr = inst.begin (); ! arr.at_end (); ++arr) {
-      db::DPoint dp = db::DPoint () + (tr * inst.complex_trans (*arr)).disp ();
+      db::DPoint dp = db::DPoint () + (trans * inst.complex_trans (*arr)).disp ();
       r.draw (db::DEdge (dp, dp), 0, 0, vertex, 0);
     }
 

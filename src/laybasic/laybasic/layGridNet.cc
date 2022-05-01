@@ -23,13 +23,17 @@
 
 #include "laybasicConfig.h"
 #include "layGridNet.h"
-#include "layWidgets.h"
+#if defined(HAVE_QT) // @@@
+#  include "layWidgets.h"
+#endif
 #include "layLayoutView.h"
 #include "layConverters.h"
 #include "layFixedFont.h"
 #include "laySnap.h"
 #include "dbTrans.h"
-#include "ui_GridNetConfigPage.h"
+#if defined(HAVE_QT) // @@@
+#  include "ui_GridNetConfigPage.h"
+#endif
 
 namespace lay
 {
@@ -64,7 +68,7 @@ public:
         return;
       }
     }
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid grid net style: ")) + value);
+    throw tl::Exception (tl::to_string (tr ("Invalid grid net style: ")) + value);
   }
 
   std::string 
@@ -97,12 +101,14 @@ GridNetPluginDeclaration::get_options (std::vector < std::pair<std::string, std:
   //  grid-micron is not configured here since some other entity is supposed to do this.
 }
 
+#if defined(HAVE_QT)
 lay::ConfigPage *
 GridNetPluginDeclaration::config_page (QWidget *parent, std::string &title) const
 {
   title = tl::to_string (QObject::tr ("Display|Background"));
   return new GridNetConfigPage (parent); 
 }
+#endif
 
 lay::Plugin *
 GridNetPluginDeclaration::create_plugin (db::Manager *, Dispatcher *, lay::LayoutViewBase *view) const
@@ -115,6 +121,7 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new GridNetPlugi
 // ------------------------------------------------------------
 //  Implementation of the configuration page
 
+#if defined(HAVE_QT)
 GridNetConfigPage::GridNetConfigPage (QWidget *parent)
   : lay::ConfigPage (parent)
 {
@@ -188,6 +195,7 @@ GridNetConfigPage::commit (lay::Dispatcher *root)
   root->config_set (cfg_grid_style1, lay::GridNet::GridStyle (mp_ui->style1_cbx->currentIndex ()), GridNetStyleConverter ());
   root->config_set (cfg_grid_style2, lay::GridNet::GridStyle (mp_ui->style2_cbx->currentIndex ()), GridNetStyleConverter ());
 }
+#endif
 
 // ------------------------------------------------------------
 //  Implementation of the GridNet object
@@ -210,25 +218,25 @@ GridNet::configure (const std::string &name, const std::string &value)
 
   if (name == cfg_grid_color) {
 
-    QColor color;
+    lay::Color color;
     ColorConverter ().from_string (value, color);
     need_update = test_and_set (m_color, color);
 
   } else if (name == cfg_grid_grid_color) {
 
-    QColor color;
+    lay::Color color;
     ColorConverter ().from_string (value, color);
     need_update = test_and_set (m_grid_color, color);
 
   } else if (name == cfg_grid_axis_color) {
 
-    QColor color;
+    lay::Color color;
     ColorConverter ().from_string (value, color);
     need_update = test_and_set (m_axis_color, color);
 
   } else if (name == cfg_grid_ruler_color) {
 
-    QColor color;
+    lay::Color color;
     ColorConverter ().from_string (value, color);
     need_update = test_and_set (m_ruler_color, color);
 
@@ -283,7 +291,7 @@ GridNet::configure (const std::string &name, const std::string &value)
   return taken;
 }
 
-
+#if defined(HAVE_QT) // @@@
 class ImagePainter
 {
 public:
@@ -427,27 +435,28 @@ private:
   double m_resolution;
   int m_width, m_height;
 };
+#endif
 
 void 
 GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
 {
   if (m_visible) {
 
-    QColor color;
-    if (m_color.isValid ()) {
+    lay::Color color;
+    if (m_color.is_valid ()) {
       color = m_color;
     } else {
-      color = QColor (128, 128, 128); // TODO: this is not a "real" automatic color ..
+      color = lay::Color (128, 128, 128); // TODO: this is not a "real" automatic color ..
     }
 
-    QColor grid_color = color, axis_color = color, ruler_color = color;
-    if (m_grid_color.isValid ()) {
+    lay::Color grid_color = color, axis_color = color, ruler_color = color;
+    if (m_grid_color.is_valid ()) {
       grid_color = m_grid_color;
     }
-    if (m_axis_color.isValid ()) {
+    if (m_axis_color.is_valid ()) {
       axis_color = m_axis_color;
     }
-    if (m_ruler_color.isValid ()) {
+    if (m_ruler_color.is_valid ()) {
       ruler_color = m_ruler_color;
     }
 
@@ -457,6 +466,7 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
       return;
     }
 
+#if defined(HAVE_QT) // @@@
     ImagePainter painter (*bmp_canvas);
 
     db::DCplxTrans trans = vp.trans ();
@@ -769,11 +779,10 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
       }
 
     }
+#endif
 
   }
-
 }
  
-
 } // namespace lay
 

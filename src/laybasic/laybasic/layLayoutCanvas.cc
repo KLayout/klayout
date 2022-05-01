@@ -20,14 +20,15 @@
 
 */
 
-
-#include <QEvent>
-#include <QPixmap>
-#include <QBitmap>
-#include <QPainter>
-#include <QApplication>
-#include <QBuffer>
-#include <QWheelEvent>
+#if defined(HAVE_QT)
+#  include <QEvent>
+#  include <QPixmap>
+#  include <QBitmap>
+#  include <QPainter>
+#  include <QApplication>
+#  include <QBuffer>
+#  include <QWheelEvent>
+#endif
 
 #include "tlTimer.h"
 #include "tlLog.h"
@@ -36,9 +37,13 @@
 #include "layRedrawThread.h"
 #include "layLayoutView.h"
 #include "layMarker.h"
-#include "gtf.h"
+#if defined(HAVE_QT) // @@@
+#  include "gtf.h"
+#endif
 
+#if defined(HAVE_QT) // @@@
 #include "layBitmapsToImage.h"
+#endif
 
 #include <sstream>
 #include <algorithm>
@@ -131,6 +136,7 @@ std::string ImageCacheEntry::to_string () const
 
 // ----------------------------------------------------------------------------
 
+#if defined(HAVE_QT) // @@@
 static void 
 blowup (const QImage &src, QImage &dest, unsigned int os)
 {
@@ -273,7 +279,9 @@ invert (unsigned char *data, unsigned int width, unsigned int height)
     }
   }
 }
+#endif
 
+#if defined(HAVE_QT) // @@@
 LayoutCanvas::LayoutCanvas (QWidget *parent, lay::LayoutViewBase *view, const char *name)
   : lay::ViewObjectWidget (parent, name), 
     mp_view (view),
@@ -288,6 +296,22 @@ LayoutCanvas::LayoutCanvas (QWidget *parent, lay::LayoutViewBase *view, const ch
     m_do_update_image_dm (this, &LayoutCanvas::do_update_image),
     m_do_end_of_drawing_dm (this, &LayoutCanvas::do_end_of_drawing),
     m_image_cache_size (1)
+#else
+LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
+  : lay::ViewObjectWidget (),
+    mp_view (view),
+// @@@    mp_image (0), mp_image_bg (0), mp_pixmap (0),
+    m_background (0), m_foreground (0), m_active (0),
+    m_oversampling (1),
+    m_dpr (1),
+    m_need_redraw (false),
+    m_redraw_clearing (false),
+    m_redraw_force_update (true),
+    m_update_image (true),
+    m_do_update_image_dm (this, &LayoutCanvas::do_update_image),
+    m_do_end_of_drawing_dm (this, &LayoutCanvas::do_end_of_drawing),
+    m_image_cache_size (1)
+#endif
 {
 #if QT_VERSION > 0x050000
   m_dpr = devicePixelRatio ();
@@ -302,11 +326,13 @@ LayoutCanvas::LayoutCanvas (QWidget *parent, lay::LayoutViewBase *view, const ch
 
   mp_redraw_thread = new lay::RedrawThread (this, view);
 
+#if defined(HAVE_QT) // @@@
   setBackgroundRole (QPalette::NoRole);
   set_colors (lay::Color (palette ().color (QPalette::Normal, QPalette::Window).rgb ()),
               lay::Color (palette ().color (QPalette::Normal, QPalette::Text).rgb ()),
               lay::Color (palette ().color (QPalette::Normal, QPalette::Mid).rgb ()));
   setAttribute (Qt::WA_NoSystemBackground);
+#endif
 }
 
 LayoutCanvas::~LayoutCanvas ()
@@ -314,6 +340,7 @@ LayoutCanvas::~LayoutCanvas ()
   //  Detach all listeners so we don't trigger events in the destructor
   viewport_changed_event.clear ();
 
+#if defined(HAVE_QT) // @@@
   if (mp_image) {
     delete mp_image;
     mp_image = 0;
@@ -326,6 +353,7 @@ LayoutCanvas::~LayoutCanvas ()
     delete mp_pixmap;
     mp_pixmap = 0;
   }
+#endif
   if (mp_redraw_thread) {
     delete mp_redraw_thread;
     mp_redraw_thread = 0;
@@ -337,6 +365,7 @@ LayoutCanvas::~LayoutCanvas ()
 void
 LayoutCanvas::key_event (unsigned int key, unsigned int buttons)
 {
+#if defined(HAVE_QT) // @@@
   if (! (buttons & lay::ShiftButton)) {
     if (int (key) == Qt::Key_Down) {
       emit down_arrow_key_pressed ();
@@ -358,6 +387,7 @@ LayoutCanvas::key_event (unsigned int key, unsigned int buttons)
       emit right_arrow_key_pressed_with_shift ();
     }
   }
+#endif
 }
 
 void
@@ -385,10 +415,12 @@ LayoutCanvas::set_colors (lay::Color background, lay::Color foreground, lay::Col
   m_active = active.rgb ();
       
   //  force regeneration of background image ..
+#if defined(HAVE_QT) // @@@
   if (mp_image_bg) {
     delete mp_image_bg;
   }
   mp_image_bg = 0;
+#endif
 
   update_image ();
 }
@@ -427,6 +459,7 @@ LayoutCanvas::prepare_drawing ()
 
     BitmapViewObjectCanvas::set_size (m_viewport_l.width (), m_viewport_l.height (), 1.0 / double (m_oversampling * m_dpr));
 
+#if defined(HAVE_QT) // @@@
     if (! mp_image ||
         (unsigned int) mp_image->width () != m_viewport_l.width () || 
         (unsigned int) mp_image->height () != m_viewport_l.height ()) {
@@ -444,6 +477,7 @@ LayoutCanvas::prepare_drawing ()
     }
 
     mp_image->fill (m_background);
+#endif
 
     //  Cancel any pending "finish" event so there is no race between finish and restart (important for caching)
     m_do_end_of_drawing_dm.cancel (); 
@@ -546,12 +580,15 @@ LayoutCanvas::update_image ()
 void
 LayoutCanvas::free_resources ()
 {
+#if defined(HAVE_QT) // @@@
   if (mp_pixmap) {
     delete mp_pixmap;
     mp_pixmap = 0;
   }
+#endif
 }
 
+#if defined(HAVE_QT) // @@@
 void
 LayoutCanvas::paintEvent (QPaintEvent *)
 {
@@ -692,7 +729,9 @@ LayoutCanvas::paintEvent (QPaintEvent *)
   }
 
 }
+#endif
 
+#if defined(HAVE_QT) // @@@
 class DetachedViewObjectCanvas
   : public BitmapViewObjectCanvas
 {
@@ -769,14 +808,18 @@ private:
   QImage *mp_image_l;
   double m_gamma;
 };
+#endif
 
+#if defined(HAVE_QT) // @@@
 QImage 
 LayoutCanvas::image (unsigned int width, unsigned int height) 
 {
   return image_with_options (width, height, -1, -1, -1.0, lay::Color (), lay::Color (), lay::Color (), db::DBox (), false);
 }
+#endif
 
-QImage 
+#if defined(HAVE_QT) // @@@
+QImage
 LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool is_mono)
 {
   if (oversampling <= 0) {
@@ -866,8 +909,10 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
 
   return img;
 }
+#endif
 
-QImage 
+#if defined(HAVE_QT) // @@@
+QImage
 LayoutCanvas::screenshot () 
 {
   //  if required, start the redraw thread ..
@@ -896,7 +941,9 @@ LayoutCanvas::screenshot ()
 
   return img;
 }
+#endif
 
+#if defined(HAVE_QT)
 void 
 LayoutCanvas::resizeEvent (QResizeEvent *)
 {
@@ -910,6 +957,7 @@ LayoutCanvas::resizeEvent (QResizeEvent *)
   do_redraw_all (true);
   viewport_changed_event ();
 }
+#endif
 
 void 
 LayoutCanvas::update_viewport ()
@@ -979,6 +1027,7 @@ LayoutCanvas::do_update_image ()
   update_image ();
 }
 
+#if defined(HAVE_QT) // @@@
 bool
 LayoutCanvas::event (QEvent *e) 
 {
@@ -997,6 +1046,7 @@ LayoutCanvas::event (QEvent *e)
     return QWidget::event (e);
   }
 }
+#endif
 
 void
 LayoutCanvas::redraw_all ()

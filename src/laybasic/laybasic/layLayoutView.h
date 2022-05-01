@@ -26,6 +26,8 @@
 
 #include "laybasicCommon.h"
 
+#if defined(HAVE_QT)
+
 #include <vector>
 #include <map>
 #include <set>
@@ -763,5 +765,37 @@ protected:
 };
 
 }
+
+#else  //  defined(HAVE_QT)
+
+#include "layLayoutViewBase.h"
+
+namespace lay
+{
+
+/**
+ *  @brief The layout view object
+ *
+ *  The layout view is responsible for displaying one or a set of layouts.
+ *  It manages the layer display list and many other components.
+ */
+class LAYBASIC_PUBLIC LayoutView
+  : public LayoutViewBase
+{
+public:
+  /**
+   *  @brief Constructor
+   */
+  LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
+
+  /**
+   *  @brief Constructor (clone from another view)
+   */
+  LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
+};
+
+}
+
+#endif
 
 #endif

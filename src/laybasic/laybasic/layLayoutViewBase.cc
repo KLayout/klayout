@@ -25,6 +25,8 @@
 #include <fstream>
 #include <vector>
 
+#include "laybasicConfig.h"
+
 #include "tlInternational.h"
 #include "tlExpression.h"
 #include "tlTimer.h"
@@ -35,7 +37,6 @@
 #include "layLayoutViewBase.h"
 #include "layViewOp.h"
 #include "layViewObject.h"
-#include "laybasicConfig.h"
 #include "layConverters.h"
 #include "layGridNet.h"
 #include "layMove.h"
@@ -45,30 +46,19 @@
 #include "layFixedFont.h"
 #include "laySelector.h"
 #include "layLayoutCanvas.h"
-#include "layLayerControlPanel.h"
-#include "layHierarchyControlPanel.h"
-#include "layLibrariesView.h"
-#include "layBrowser.h"
 #include "layRedrawThread.h"
 #include "layRedrawThreadWorker.h"
 #include "layParsedLayerSource.h"
-#include "layBookmarkManagementForm.h"
-#include "layNetlistBrowserDialog.h"
-#include "layBookmarksView.h"
-#include "layEditorOptionsFrame.h"
-#include "layEditorOptionsPages.h"
 #include "dbClipboard.h"
 #include "dbLayout.h"
 #include "dbLayoutUtils.h"
 #include "dbManager.h"
 #include "dbLibrary.h"
 #include "rdb.h"
-#include "rdbMarkerBrowserDialog.h"
 #include "dbLayoutToNetlist.h"
 #include "dbTechnology.h"
 #include "tlXMLParser.h"
 #include "gsi.h"
-#include "gtf.h"
 
 #if defined(HAVE_QT)
 #  include <QImageWriter>
@@ -634,7 +624,7 @@ LayoutViewBase::title () const
   if (! m_title.empty ()) {
     return m_title;
   } else if (cellviews () == 0) {
-    return tl::to_string (QObject::tr ("<empty>"));
+    return tl::to_string (tr ("<empty>"));
   } else {
 
     int cv_index = active_cellview_index ();
@@ -4836,7 +4826,7 @@ LayoutViewBase::paste_interactive ()
 {
   clear_selection ();
 
-  std::unique_ptr<db::Transaction> trans (new db::Transaction (manager (), tl::to_string (QObject::tr ("Paste and move"))));
+  std::unique_ptr<db::Transaction> trans (new db::Transaction (manager (), tl::to_string (tr ("Paste and move"))));
 
   {
     //  let the receivers sort out who is pasting what ..
@@ -4872,7 +4862,7 @@ LayoutViewBase::cut ()
     lay::Editables::transient_to_selection ();
   }
 
-  db::Transaction trans (manager (), tl::to_string (QObject::tr ("Cut")));
+  db::Transaction trans (manager (), tl::to_string (tr ("Cut")));
   lay::Editables::cut ();
 }
 

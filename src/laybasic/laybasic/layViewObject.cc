@@ -20,12 +20,13 @@
 
 */
 
-
-#include <QMouseEvent>
-#include <QWheelEvent>
-#include <QKeyEvent>
-#include <QMimeData>
-#include <QCoreApplication>
+#if defined(HAVE_QT)
+#  include <QMouseEvent>
+#  include <QWheelEvent>
+#  include <QKeyEvent>
+#  include <QMimeData>
+#  include <QCoreApplication>
+#endif
 
 #include "layViewObject.h"
 #include "layCanvasPlane.h"
@@ -51,6 +52,7 @@ const char *drag_drop_mime_type ()
   return "application/klayout-ddd";
 }
 
+#if defined(HAVE_QT) // @@@
 QMimeData *
 DragDropDataBase::to_mime_data () const
 {
@@ -58,10 +60,12 @@ DragDropDataBase::to_mime_data () const
   mimeData->setData (QString::fromUtf8 (drag_drop_mime_type ()), serialized ());
   return mimeData;
 }
+#endif
 
 // ---------------------------------------------------------------
 //  Implementation of CellDragDropData
 
+#if defined(HAVE_QT) // @@@
 QByteArray
 CellDragDropData::serialized () const
 {
@@ -119,10 +123,12 @@ CellDragDropData::deserialize (const QByteArray &ba)
 
   }
 }
+#endif
 
 // ---------------------------------------------------------------
 //  A helper function to convert a Qt modifier/buttons to klayout buttons
 
+#if defined(HAVE_QT)
 static unsigned int 
 qt_to_buttons (Qt::MouseButtons b, Qt::KeyboardModifiers m)
 {
@@ -139,6 +145,7 @@ qt_to_buttons (Qt::MouseButtons b, Qt::KeyboardModifiers m)
          ((m & Qt::ControlModifier) != 0 ? ControlButton : 0) |
          ((m & Qt::AltModifier) != 0 ? AltButton : 0);
 }
+#endif
 
 // ---------------------------------------------------------------
 //  BackgroundViewObject implementation
@@ -225,7 +232,9 @@ ViewObject::redraw ()
     if (m_static) {
       widget ()->touch ();
     } else {
-      widget ()->update ();
+#if defined(HAVE_QT)
+      widget ()->update ();  // @@@
+#endif
     }
   }
 }
@@ -280,6 +289,7 @@ ViewService::set_cursor (lay::Cursor::cursor_shape cursor)
 // ---------------------------------------------------------------
 //  ViewObject implementation
 
+#if defined(HAVE_QT) // @@@
 ViewObjectWidget::ViewObjectWidget (QWidget *parent, const char *name)
   : QWidget (parent), 
     m_view_objects_dismissed (false),
@@ -299,6 +309,22 @@ ViewObjectWidget::ViewObjectWidget (QWidget *parent, const char *name)
 
   m_objects.changed ().add (this, &ViewObjectWidget::objects_changed);
 }
+#else
+ViewObjectWidget::ViewObjectWidget ()
+  : m_view_objects_dismissed (false),
+    m_needs_update_static (false),
+    m_needs_update_bg (false),
+    mp_active_service (0),
+    m_mouse_pressed_state (false),
+    m_mouse_buttons (0),
+    m_in_mouse_move (false),
+    m_mouse_inside (false),
+    m_cursor (lay::Cursor::none),
+    m_default_cursor (lay::Cursor::none)
+{
+  m_objects.changed ().add (this, &ViewObjectWidget::objects_changed);
+}
+#endif
 
 ViewObjectWidget::~ViewObjectWidget ()
 {
@@ -369,6 +395,7 @@ ViewObjectWidget::set_cursor (lay::Cursor::cursor_shape cursor)
 void
 ViewObjectWidget::set_default_cursor (lay::Cursor::cursor_shape cursor)
 {
+#if defined(HAVE_QT) // @@@
   if (cursor != m_default_cursor) {
     m_default_cursor = cursor;
     if (m_cursor == lay::Cursor::none) {
@@ -379,14 +406,17 @@ ViewObjectWidget::set_default_cursor (lay::Cursor::cursor_shape cursor)
       }
     }
   }
+#endif
 }
 
 void
 ViewObjectWidget::ensure_entered ()
 {
+#if defined(HAVE_QT) // @@@
   if (! m_mouse_inside) {
     enterEvent (0);
   }
+#endif
 }
 
 void 
@@ -398,6 +428,7 @@ ViewObjectWidget::begin_mouse_event (lay::Cursor::cursor_shape cursor)
 void 
 ViewObjectWidget::end_mouse_event ()
 {
+#if defined(HAVE_QT) // @@@
   if (m_cursor == lay::Cursor::none) {
     if (m_default_cursor == lay::Cursor::none) {
       unsetCursor ();
@@ -407,8 +438,10 @@ ViewObjectWidget::end_mouse_event ()
   } else if (m_cursor != lay::Cursor::keep) {
     setCursor (lay::Cursor::qcursor (m_cursor));
   }
+#endif
 }
 
+#if defined(HAVE_QT) // @@@
 bool
 ViewObjectWidget::focusNextPrevChild (bool /*next*/)
 {
@@ -555,6 +588,7 @@ BEGIN_PROTECTED
   do_mouse_move ();
 END_PROTECTED
 }
+#endif
 
 void
 ViewObjectWidget::do_mouse_move ()
@@ -637,7 +671,8 @@ ViewObjectWidget::do_mouse_move ()
   m_in_mouse_move = false;
 }
 
-void 
+#if defined(HAVE_QT) // @@@
+void
 ViewObjectWidget::mouseDoubleClickEvent (QMouseEvent *e)
 {
 BEGIN_PROTECTED  
@@ -883,17 +918,38 @@ END_PROTECTED
 
   m_mouse_pressed_state = false;
 }
+#endif
 
-db::DPoint
-ViewObjectWidget::pixel_to_um (const QPoint &pt) const
+int
+ViewObjectWidget::widget_height () const
 {
-  return m_trans.inverted () * db::DPoint (pt.x (), height () - 1 - pt.y ());
+#if defined(HAVE_QT)
+  return height ();
+#else
+  return 500; // @@@
+#endif
+}
+
+int
+ViewObjectWidget::widget_width () const
+{
+#if defined(HAVE_QT)
+  return width ();
+#else
+  return 800; // @@@
+#endif
 }
 
 db::DPoint
-ViewObjectWidget::pixel_to_um (const QPointF &pt) const
+ViewObjectWidget::pixel_to_um (const db::Point &pt) const
 {
-  return m_trans.inverted () * db::DPoint (pt.x (), height () - 1 - pt.y ());
+  return m_trans.inverted () * db::DPoint (pt.x (), widget_height () - 1 - pt.y ());
+}
+
+db::DPoint
+ViewObjectWidget::pixel_to_um (const db::DPoint &pt) const
+{
+  return m_trans.inverted () * db::DPoint (pt.x (), widget_height () - 1 - pt.y ());
 }
 
 void
@@ -1018,6 +1074,14 @@ ViewObjectWidget::thaw (ViewObject *obj)
   }
 }
 
+#if !defined(HAVE_QT)
+void
+ViewObjectWidget::update ()
+{
+  // @@@
+}
+#endif
+
 void
 ViewObjectWidget::touch ()
 {
@@ -1057,7 +1121,7 @@ db::DBox
 ViewObjectWidget::mouse_event_viewport () const
 {
   db::DPoint p1 = m_trans.inverted () * db::DPoint (0, 0);
-  db::DPoint p2 = m_trans.inverted () * db::DPoint (width (), height ());
+  db::DPoint p2 = m_trans.inverted () * db::DPoint (widget_width (), widget_height ());
   return db::DBox (p1, p2);
 }
 

@@ -27,6 +27,7 @@
 
 #include <ctype.h>
 #include <algorithm>
+#include <string.h>
 
 namespace lay
 {
@@ -162,6 +163,7 @@ LineStyleInfo::is_bit_set (unsigned int n) const
   return (pattern () [(n / 32) % pattern_stride ()] & (1 << (n % 32))) != 0;
 }
 
+#if defined(HAVE_QT) // @@@
 QBitmap
 LineStyleInfo::get_bitmap (int width, int height) const
 {
@@ -196,6 +198,7 @@ LineStyleInfo::get_bitmap (int width, int height) const
 
   return bitmap;
 }
+#endif
 
 void
 LineStyleInfo::set_pattern (uint32_t pt, unsigned int w) 
@@ -351,8 +354,11 @@ struct ReplaceLineStyleOp
   LineStyleInfo m_old, m_new;
 };
 
-LineStyles::LineStyles ()
-  : QObject (), db::Object (0)
+LineStyles::LineStyles () :
+#if defined(HAVE_QT)
+    QObject (),
+#endif
+    db::Object (0)
 {
   for (unsigned int d = 0; d < sizeof (style_strings) / sizeof (style_strings [0]); d += 2) {
     m_styles.push_back (LineStyleInfo ());
@@ -361,15 +367,18 @@ LineStyles::LineStyles ()
   }
 }
 
+LineStyles::LineStyles (const LineStyles &p) :
+#if defined(HAVE_QT)
+  QObject (),
+#endif
+  db::Object (0)
+{
+  m_styles = p.m_styles;
+}
+
 LineStyles::~LineStyles ()
 {
   //  .. nothing yet ..
-}
-
-LineStyles::LineStyles (const LineStyles &p)
-  : QObject (), db::Object (0)
-{
-  m_styles = p.m_styles;
 }
 
 LineStyles &
@@ -418,7 +427,9 @@ LineStyles::replace_style (unsigned int i, const LineStyleInfo &p)
 
   //  if something has changed emit the signal
   if (chg) {
+#if defined(HAVE_QT) // @@@
     emit changed ();
+#endif
   }
 }
 

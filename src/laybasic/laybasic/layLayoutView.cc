@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include <iostream>
 #include <fstream>
@@ -1107,3 +1108,26 @@ LayoutView::sizeHint () const
 }
 
 } // namespace lay
+
+#else  //  defined(HAVE_QT)
+
+#include "layLayoutView.h"
+
+namespace lay
+{
+
+LayoutView::LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+  : LayoutViewBase (mgr, editable, plugin_parent, options)
+{
+  //  .. nothing yet ..
+}
+
+LayoutView::LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+  : LayoutViewBase (source, mgr, editable, plugin_parent, options)
+{
+  //  .. nothing yet ..
+}
+
+} // namespace lay
+
+#endif

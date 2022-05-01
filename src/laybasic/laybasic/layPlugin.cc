@@ -33,12 +33,13 @@
 #include "tlExceptions.h"
 #include "tlClassRegistry.h"
 
+#if defined(HAVE_QT)
 #include "gtf.h"
+#endif
 
 #include <iostream>
 #include <fstream>
 #include <memory>
-#include <QObject>
 
 namespace lay
 {
@@ -93,6 +94,7 @@ PluginDeclaration::menu_symbols ()
   return symbols;
 }
 
+#if defined(HAVE_QT)
 namespace {
 
 class GenericMenuAction
@@ -142,10 +144,12 @@ private:
 };
 
 }
+#endif
 
 void
 PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
 {
+#if defined(HAVE_QT) // @@@
   lay::AbstractMenu &menu = *dispatcher->menu ();
 
   mp_editable_mode_action.reset ((Action *) 0);
@@ -255,11 +259,13 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
     menu.insert_item (m->second.first, name + ":mode_group", mp_mouse_mode_action.get ());
 
   }
+#endif
 }
 
 void
 PluginDeclaration::remove_menu_items (Dispatcher *dispatcher)
 {
+#if defined(HAVE_QT) // @@@
   lay::AbstractMenu *menu = dispatcher->menu ();
   menu->delete_items (mp_editable_mode_action.get ());
   menu->delete_items (mp_mouse_mode_action.get ());
@@ -274,6 +280,7 @@ PluginDeclaration::remove_menu_items (Dispatcher *dispatcher)
     menu->delete_items (*a);
   }
   m_menu_actions.clear ();
+#endif
 }
 
 void 
@@ -281,9 +288,11 @@ PluginDeclaration::set_editable_enabled (bool f)
 {
   if (f != m_editable_enabled) {
     m_editable_enabled = f;
+#if defined(HAVE_QT) // @@@
     if (mp_editable_mode_action.get ()) {
       mp_editable_mode_action->set_checked (f);
     }
+#endif
     editable_enabled_changed_event ();
   }
 }
@@ -358,7 +367,7 @@ Plugin::config_set (const std::string &name, const std::string &value)
           return;
         }
       } catch (tl::Exception &ex) {
-        tl::error << tl::to_string (QObject::tr ("Error on configure")) << " " << name << "='" << value << "': " << ex.msg ();
+        tl::error << tl::to_string (tr ("Error on configure")) << " " << name << "='" << value << "': " << ex.msg ();
       }
     }
   }
@@ -481,7 +490,7 @@ Plugin::do_config_set (const std::string &name, const std::string &value, bool f
       return true;
     }
   } catch (tl::Exception &ex) {
-    tl::error << tl::to_string (QObject::tr ("Error on configure")) << " " << name << "='" << value << "': " << ex.msg ();
+    tl::error << tl::to_string (tr ("Error on configure")) << " " << name << "='" << value << "': " << ex.msg ();
   }
 
   //  propagate to all children (not only the first that takes it!)

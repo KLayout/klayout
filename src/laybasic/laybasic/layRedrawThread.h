@@ -28,10 +28,6 @@
 #include <set>
 #include <memory>
 
-#include <QThread>
-#include <QMutex>
-#include <QWaitCondition>
-
 #include "dbBox.h"
 #include "dbTrans.h"
 #include "dbLayout.h"
@@ -41,6 +37,7 @@
 #include "layRedrawLayerInfo.h"
 #include "layCanvasPlane.h"
 #include "tlTimer.h"
+#include "tlThreads.h"
 #include "tlThreadedWorkers.h"
 
 namespace lay {
@@ -120,8 +117,8 @@ private:
   bool m_start_recursion_sentinel;
 
   tl::Clock m_clock;
-  QMutex m_initial_wait_lock;
-  QWaitCondition m_initial_wait_cond;
+  tl::Mutex m_initial_wait_lock;
+  tl::WaitCondition m_initial_wait_cond;
 
   std::unique_ptr<tl::SelfTimer> m_main_timer;
 };

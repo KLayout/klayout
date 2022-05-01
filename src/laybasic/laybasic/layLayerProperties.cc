@@ -439,7 +439,7 @@ public:
   void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv) const
   {
     if (vv.size () != 0) {
-      throw tl::EvalError (tl::to_string (QObject::tr ("Layer source function must not have arguments")), context);
+      throw tl::EvalError (tl::to_string (tr ("Layer source function must not have arguments")), context);
     }
 
     out = tl::Variant ();

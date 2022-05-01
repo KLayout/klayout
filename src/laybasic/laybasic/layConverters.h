@@ -27,7 +27,9 @@
 #include "laybasicCommon.h"
 #include "layColor.h"
 
-#include <QColor>
+#if defined(HAVE_QT)
+#  include <QColor>
+#endif
 
 namespace lay
 {
@@ -37,9 +39,11 @@ namespace lay
  */
 struct LAYBASIC_PUBLIC ColorConverter 
 {
+#if defined(HAVE_QT)
   std::string to_string (const QColor &c) const;
-  std::string to_string (const lay::Color &c) const;
   void from_string (const std::string &s, QColor &c) const;
+#endif
+  std::string to_string (const lay::Color &c) const;
   void from_string (const std::string &s, lay::Color &c) const;
 };
 

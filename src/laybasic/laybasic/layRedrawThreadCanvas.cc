@@ -23,11 +23,15 @@
 
 #include "layRedrawThreadCanvas.h"
 #include "layCanvasPlane.h"
+#if defined(HAVE_QT)
 #include "layBitmapsToImage.h"
+#endif
 #include "layDrawing.h"
 #include "layBitmap.h"
 
+#if defined(HAVE_QT) // @@@
 #include <QImage>
+#endif
 
 namespace lay
 {
@@ -393,6 +397,7 @@ BitmapRedrawThreadCanvas::initialize_plane (lay::CanvasPlane *plane, unsigned in
   unlock ();
 }
 
+#if defined(HAVE_QT) // @@@
 void 
 BitmapRedrawThreadCanvas::to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, lay::Color background, lay::Color foreground, lay::Color active, const lay::Drawings *drawings, QImage &img, unsigned int width, unsigned int height)
 {
@@ -412,6 +417,7 @@ BitmapRedrawThreadCanvas::to_image (const std::vector <lay::ViewOp> &view_ops, c
     bitmaps_to_image (d->get_view_ops (*this, background, foreground, active), *bt, dp, ls, &img, width, height, true, &mutex ());
   }
 }
+#endif
 
 }
 

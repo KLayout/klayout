@@ -455,8 +455,10 @@ public:
 
 #if defined(HAVE_QT)
 private slots:
-  void toggle_editable_enabled ();
+#else
+private:
 #endif
+  void toggle_editable_enabled ();
 
 private:
   int m_id;

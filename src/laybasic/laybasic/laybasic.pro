@@ -93,7 +93,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     gtf.cc \
     layAbstractMenu.cc \
     layBackgroundAwareTreeStyle.cc \
-    layBitmapRenderer.cc \
     layBitmapsToImage.cc \
     layBookmarkList.cc \
     layBookmarkManagementForm.cc \
@@ -121,7 +120,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layEditorServiceBase.cc \
     layFileDialog.cc \
     layGenericSyntaxHighlighter.cc \
-    layGridNet.cc \
     layHierarchyControlPanel.cc \
     layIndexedNetlistModel.cc \
     layItemDelegates.cc \
@@ -129,10 +127,8 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layLayerMappingWidget.cc \
     layLayerToolbox.cc \
     layLayerTreeModel.cc \
-    layLayoutCanvas.cc \
     layLayoutPropertiesForm.cc \
     layLayoutStatisticsForm.cc \
-    layLayoutView.cc \
     layLayoutViewConfigPages.cc \
     layLayoutViewFunctions.cc \
     layLibrariesView.cc \
@@ -154,6 +150,7 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     laySelectLineStyleForm.cc \
     laySelectStippleForm.cc \
     laySelector.cc \
+    layStream.cc \
     layTechnology.cc \
     layTipDialog.cc \
     layWidgets.cc \
@@ -168,7 +165,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layAbstractMenu.h \
     layBackgroundAwareTreeStyle.h \
     layBitmap.h \
-    layBitmapRenderer.h \
     layBitmapsToImage.h \
     layBookmarkList.h \
     layBookmarkManagementForm.h \
@@ -197,7 +193,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layEditorServiceBase.h \
     layFileDialog.h \
     layGenericSyntaxHighlighter.h \
-    layGridNet.h \
     layHierarchyControlPanel.h \
     layIndexedNetlistModel.h \
     layItemDelegates.h \
@@ -205,10 +200,8 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layLayerMappingWidget.h \
     layLayerToolbox.h \
     layLayerTreeModel.h \
-    layLayoutCanvas.h \
     layLayoutPropertiesForm.h \
     layLayoutStatisticsForm.h \
-    layLayoutView.h \
     layLayoutViewConfigPages.h \
     layLayoutViewFunctions.h \
     layLibrariesView.h \
@@ -230,6 +223,7 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     laySelectLineStyleForm.h \
     laySelectStippleForm.h \
     laySelector.h \
+    layStream.h \
     layTechnology.h \
     layTipDialog.h \
     layWidgets.h \
@@ -246,6 +240,7 @@ SOURCES += \
     gsiDeclLayLayers.cc \
     layAnnotationShapes.cc \
     layBitmap.cc \
+    layBitmapRenderer.cc \
     layColor.cc \
     layColorPalette.cc \
     layDispatcher.cc \
@@ -254,12 +249,16 @@ SOURCES += \
     layDrawing.cc \
     layEditable.cc \
     layFinder.cc \
+    layGridNet.cc \
     layFixedFont.cc \
+    layLayoutCanvas.cc \
+    layLayoutView.cc \
     layLineStylePalette.cc \
     layLineStyles.cc \
     layMarker.cc \
     layMouseTracker.cc \
     layMove.cc \
+    layNetColorizer.cc \
     layObjectInstPath.cc \
     layParsedLayerSource.cc \
     layPlugin.cc \
@@ -271,7 +270,6 @@ SOURCES += \
     layRubberBox.cc \
     laySnap.cc \
     layStipplePalette.cc \
-    layStream.cc \
     layCanvasPlane.cc \
     layLayoutViewBase.cc \
     layLayerProperties.cc \
@@ -282,20 +280,25 @@ SOURCES += \
 HEADERS += \
     layAnnotationShapes.h \
     layBitmap.h \
+    layBitmapRenderer.h \
     layColorPalette.h \
     layDispatcher.h \
     layDisplayState.h \
     layDitherPattern.h \
     layDrawing.h \
     layEditable.h \
+    layLayoutCanvas.h \
+    layLayoutView.h \
     layFinder.h \
     layFixedFont.h \
+    layGridNet.h \
     layLayoutViewBase.h \
     layLineStylePalette.h \
     layLineStyles.h \
     layMarker.h \
     layMouseTracker.h \
     layMove.h \
+    layNetColorizer.h \
     layObjectInstPath.h \
     layParsedLayerSource.h \
     layPlugin.h \
@@ -307,7 +310,6 @@ HEADERS += \
     layRubberBox.h \
     laySnap.h \
     layStipplePalette.h \
-    layStream.h \
     layLayerProperties.h \
     layCanvasPlane.h \
     layViewObject.h \

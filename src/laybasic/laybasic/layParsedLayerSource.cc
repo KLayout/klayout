@@ -415,7 +415,7 @@ extract_base (tl::Extractor &ex)
   } else if (ex.test ("!=")) {
     eq = false;
   } else {
-    ex.error (tl::to_string (QObject::tr ("'==' or '!=' operator expected")));
+    ex.error (tl::to_string (tr ("'==' or '!=' operator expected")));
   }
   ex.read (v);
   return new PropertySelectorEqual (n, v, eq);
@@ -1376,7 +1376,7 @@ ParsedLayerSource::parse_from_string (const char *cp)
       if (sp == "CellFrame" || sp == "cellframe" || sp == "CF" || sp == "cell-frame") {
         m_special_purpose = SP_CellFrame;
       } else {
-        throw tl::Exception (tl::to_string (QObject::tr ("Invalid special purpose '%s'")), sp);
+        throw tl::Exception (tl::to_string (tr ("Invalid special purpose '%s'")), sp);
       }
 
     } else if (x.test ("(")) {

@@ -129,6 +129,7 @@ int draw_round (double x)
   }
 }
 
+#if defined(HAVE_QT)
 QPoint draw_round (db::DPoint p, int h)
 {
   return QPoint (draw_round (p.x ()), h - 1 - draw_round (p.y ()));
@@ -140,6 +141,7 @@ draw_round (const db::DPoint &p1, const db::DPoint &p2, int h)
   std::pair<db::DPoint , db::DPoint> dp = draw_round_dbl (p1, p2, h);
   return std::make_pair (draw_round (dp.first, h), draw_round (dp.second, h));
 }
+#endif
 
 std::pair<db::DPoint, db::DPoint>
 draw_round_dbl (const db::DPoint &p1, const db::DPoint &p2, int /*h*/)

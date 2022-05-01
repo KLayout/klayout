@@ -29,12 +29,9 @@
 #include "dbTrans.h"
 #include "layViewOp.h"
 #include "layBitmapRenderer.h"
+#include "tlThreads.h"
 
 #include <vector>
-
-#include <QMutex>
-
-class QImage;
 
 namespace lay {
 
@@ -151,7 +148,7 @@ public:
   /**
    *  @brief Access to the mutex object
    */
-  QMutex &mutex () 
+  tl::Mutex &mutex ()
   {
     return m_mutex;
   }
@@ -186,7 +183,7 @@ public:
   virtual lay::Renderer *create_renderer () = 0;
 
 private:
-  QMutex m_mutex;
+  tl::Mutex m_mutex;
   double m_resolution;
   unsigned int m_width, m_height;
 };
@@ -318,10 +315,12 @@ public:
     return new lay::BitmapRenderer (m_width, m_height, resolution ()); 
   }
 
+#if defined(HAVE_QT) // @@@
   /**
    *  @brief Transfer the content to an QImage 
    */
   void to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, lay::Color background, lay::Color foreground, lay::Color active, const lay::Drawings *drawings, QImage &img, unsigned int width, unsigned int height);
+#endif
 
   /**
    *  @brief Gets the current bitmap data as a BitmapCanvasData object

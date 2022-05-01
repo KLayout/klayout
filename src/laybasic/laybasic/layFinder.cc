@@ -267,7 +267,7 @@ struct LPContextCompareOp
 bool
 ShapeFinder::find (LayoutViewBase *view, const db::DBox &region_mu)
 {
-  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Selecting ...")));
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Selecting ...")));
   progress.set_unit (1000);
   progress.set_format ("");
   mp_progress = &progress;
@@ -332,7 +332,7 @@ ShapeFinder::find (LayoutViewBase *view, const db::DBox &region_mu)
 bool 
 ShapeFinder::find (lay::LayoutViewBase *view, const lay::LayerProperties &lprops, const db::DBox &region_mu)
 {
-  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Selecting ...")));
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Selecting ...")));
   progress.set_unit (1000);
   progress.set_format ("");
   mp_progress = &progress;
@@ -626,7 +626,7 @@ InstFinder::InstFinder (bool point_mode, bool top_level_sel, bool full_arrays, b
 bool
 InstFinder::find (lay::LayoutViewBase *view, const db::DBox &region_mu)
 {
-  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Selecting ...")));
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Selecting ...")));
   progress.set_unit (1000);
   progress.set_format ("");
   mp_progress = &progress;
@@ -643,7 +643,7 @@ InstFinder::find (lay::LayoutViewBase *view, const db::DBox &region_mu)
 bool 
 InstFinder::find (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTrans &trans_mu, const db::DBox &region_mu)
 {
-  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Selecting ...")));
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Selecting ...")));
   progress.set_unit (1000);
   progress.set_format ("");
   mp_progress = &progress;

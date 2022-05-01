@@ -34,7 +34,6 @@
 #include <memory>
 
 #include "layLayerProperties.h"
-#include "layAbstractMenu.h"
 #include "layAnnotationShapes.h"
 #include "layDispatcher.h"
 #include "layLayoutCanvas.h"

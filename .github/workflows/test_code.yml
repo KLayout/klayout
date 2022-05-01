@@ -29,7 +29,7 @@ jobs:
         run: |
           pip install setuptools wheel twine
           pip install -e . --no-index 
-          sudo apt install build-essential
+          sudo apt install build-essential curl
       - name: Test with pytest
         run: |
           python testdata/pymod/import_db.py

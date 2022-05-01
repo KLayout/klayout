@@ -30,6 +30,7 @@ jobs:
           platform: x64
       - name: Install dependencies
         run: |
+          sudo apt update
           sudo apt install -y build-essential curl zlib1g-dev libcurl4-openssl-dev libexpat1-dev
           python -m pip install --upgrade pip
           pip install setuptools wheel twine

@@ -1,5 +1,5 @@
 ---
-name: Mac CI
+name: Mac publish package
 
 on:
   release:

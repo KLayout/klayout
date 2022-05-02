@@ -1,5 +1,5 @@
 ---
-name: build linux python package
+name: Build Python Package
 # https://docs.github.com/en/free-pro-team@latest/actions/guides/building-and-testing-python
 
 on:
@@ -7,13 +7,13 @@ on:
   push:
 
 jobs:
-  linux-build:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 12
       matrix:
+        os: [ubuntu-latest, "macos-11", "macos-10.15"]
         python-version: [3.7, 3.8, 3.9, '3.10']
-        os: [ubuntu-latest]
 
     steps:
       - name: Cancel Workflow Action
@@ -30,9 +30,10 @@ jobs:
       - name: Install dependencies
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-          sudo apt update
-          sudo apt install -y build-essential curl zlib1g-dev libcurl4-openssl-dev libexpat1-dev
-          pip install setuptools wheel twine
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt update
+            sudo apt install -y build-essential curl zlib1g-dev libcurl4-openssl-dev libexpat1-dev
+          fi
       - name: Build and Install package
         run: |
           pip install -e . --no-index
@@ -43,3 +44,11 @@ jobs:
           python testdata/pymod/import_tl.py
           python testdata/pymod/import_lib.py
           python testdata/pymod/pya_tests.py
+      - name: Build wheels  # check https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
+        uses: pypa/cibuildwheel@v2.5.0
+        # to supply options, put them in 'env', like:
+        # env:
+        #   CIBW_SOME_OPTION: value
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./wheelhouse/*.whl

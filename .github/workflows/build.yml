@@ -1,5 +1,5 @@
 ---
-name: Build Python Package
+name: Build Python Wheels
 # https://docs.github.com/en/free-pro-team@latest/actions/guides/building-and-testing-python
 
 on:
@@ -13,7 +13,6 @@ jobs:
       max-parallel: 12
       matrix:
         os: [ubuntu-latest, "macos-11", "macos-10.15"]
-        python-version: [3.7, 3.8, 3.9, '3.10']
 
     steps:
       - name: Cancel Workflow Action
@@ -22,34 +21,28 @@ jobs:
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ${{ matrix.python-version }}-${{ matrix.os }}  # Make cache specific to OS
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
+          key: ${{ github.job }}-${{ matrix.os }}  # Make cache specific to OS
+          max-size: "5G"
       - name: Install dependencies
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             sudo apt update
             sudo apt install -y build-essential curl zlib1g-dev libcurl4-openssl-dev libexpat1-dev
           fi
-      - name: Build and Install package
-        run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           echo "/usr/lib/ccache:/usr/local/opt/ccache/libexec" >> $GITHUB_PATH
-          pip install -e . --no-index
-      - name: Test code
-        run: |
-          python testdata/pymod/import_db.py
-          python testdata/pymod/import_rdb.py
-          python testdata/pymod/import_tl.py
-          python testdata/pymod/import_lib.py
-          python testdata/pymod/pya_tests.py
       - name: Build wheels  # check https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
         uses: pypa/cibuildwheel@v2.5.0
         # to supply options, put them in 'env', like:
         # env:
         #   CIBW_SOME_OPTION: value
+        env:
+          CIBW_TEST_COMMAND: >
+            python {package}/testdata/pymod/import_db.py &&
+            python {package}/testdata/pymod/import_rdb.py &&
+            python {package}/testdata/pymod/import_tl.py &&
+            python {package}/testdata/pymod/import_lib.py &&
+            python {package}/testdata/pymod/pya_tests.py
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl

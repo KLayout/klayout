@@ -30,6 +30,7 @@ Image::Image (unsigned int w, unsigned int h, lay::color_t *data)
 {
   m_width = w;
   m_height = h;
+  m_transparent = false;
   m_data.reset (new ImageData (data, w * h));
 }
 
@@ -37,6 +38,7 @@ Image::Image (unsigned int w, unsigned int h, const lay::color_t *data, unsigned
 {
   m_width = w;
   m_height = h;
+  m_transparent = false;
 
   lay::color_t *d = new color_t [w * h];
 
@@ -58,6 +60,7 @@ Image::Image ()
 {
   m_width = 0;
   m_height = 0;
+  m_transparent = false;
 }
 
 Image::Image (const Image &other)
@@ -82,6 +85,7 @@ Image::operator= (const Image &other)
     m_width = other.m_width;
     m_height = other.m_height;
     m_data = other.m_data;
+    m_transparent = other.m_transparent;
   }
   return *this;
 }
@@ -96,6 +100,12 @@ Image::operator= (Image &&other)
 }
 
 void
+Image::set_transparent (bool f)
+{
+  m_transparent = f;
+}
+
+void
 Image::swap (Image &other)
 {
   if (this == &other) {
@@ -104,6 +114,7 @@ Image::swap (Image &other)
 
   std::swap (m_width, other.m_width);
   std::swap (m_height, other.m_height);
+  std::swap (m_transparent, other.m_transparent);
   m_data.swap (other.m_data);
 }
 
@@ -148,7 +159,7 @@ Image::data () const
 QImage
 Image::to_image () const
 {
-  return QImage ((const uchar *) data (), m_width, m_height, QImage::Format_ARGB32);
+  return QImage ((const uchar *) data (), m_width, m_height, m_transparent ? QImage::Format_ARGB32 : QImage::Format_RGB32);
 }
 #endif
 
@@ -157,6 +168,7 @@ Image::patch (const Image &other)
 {
   tl_assert (width () == other.width ());
   tl_assert (height () == other.height ());
+  tl_assert (other.transparent ());
 
   const color_t *d = other.data ();
   color_t *dd = data ();
@@ -178,6 +190,7 @@ Image::diff (const Image &other) const
   tl_assert (height () == other.height ());
 
   Image res (m_width, m_height);
+  res.set_transparent (true);
 
   const color_t *d2 = other.data ();
   const color_t *d1 = data ();

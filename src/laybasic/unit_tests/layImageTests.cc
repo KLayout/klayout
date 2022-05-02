@@ -57,11 +57,17 @@ TEST(1)
   EXPECT_EQ (img.width (), 15);
   EXPECT_EQ (img.height (), 25);
 
+  EXPECT_EQ (img.transparent (), false);
+  img.set_transparent (true);
+  EXPECT_EQ (img.transparent (), true);
+
   img.fill (0x112233);
   EXPECT_EQ (img.scan_line (5)[10], 0x112233);
 
   lay::Image img2;
+  EXPECT_EQ (img2.transparent (), false);
   img2 = img;
+  EXPECT_EQ (img2.transparent (), true);
   EXPECT_EQ (img2.width (), 15);
   EXPECT_EQ (img2.height (), 25);
 
@@ -72,7 +78,9 @@ TEST(1)
   EXPECT_EQ (img.scan_line (5)[10], 0x112233);
   EXPECT_EQ (img2.scan_line (5)[10], 0x332211);
 
+  img.set_transparent (false);
   img2.swap (img);
+  EXPECT_EQ (img2.transparent (), false);
   EXPECT_EQ (img2.scan_line (5)[10], 0x112233);
   EXPECT_EQ (img.scan_line (5)[10], 0x332211);
 

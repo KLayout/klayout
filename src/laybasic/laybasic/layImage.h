@@ -98,6 +98,19 @@ public:
   Image &operator= (Image &&other);
 
   /**
+   *  @brief Sets a value indicating whether an alpha channel is present
+   */
+  void set_transparent (bool f);
+
+  /**
+   *  @brief Gets a value indicating whether an alpha channel is present
+   */
+  bool transparent () const
+  {
+    return m_transparent;
+  }
+
+  /**
    *  @brief Swaps this image with another one
    */
   void swap (Image &other);
@@ -206,12 +219,12 @@ private:
   private:
     lay::color_t *mp_data;
     size_t m_length;
-    size_t m_stride;
 
     ImageData &operator= (const ImageData &other);
   };
 
   unsigned int m_width, m_height;
+  bool m_transparent;
   tl::copy_on_write_ptr<ImageData> m_data;
 };
 

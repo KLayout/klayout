@@ -134,6 +134,9 @@ TEST(2)
     }
   }
 
+  EXPECT_EQ (img.transparent (), false);
+  EXPECT_EQ (img.to_image ().format () == QImage::Format_RGB32, true);
+
   std::string tmp = tmp_file ("test.png");
   QImage qimg = img.to_image ();
   qimg.save (tl::to_qstring (tmp));
@@ -148,6 +151,8 @@ TEST(2)
   img.scan_line (52) [42] = 0xff000000;
 
   lay::Image diff = img.diff (img_saved);
+  EXPECT_EQ (diff.transparent (), true);
+  EXPECT_EQ (diff.to_image ().format () == QImage::Format_ARGB32, true);
   EXPECT_EQ (compare_images (img.to_image (), au), false);
   EXPECT_EQ (compare_images (img_saved.to_image (), au), true);
 

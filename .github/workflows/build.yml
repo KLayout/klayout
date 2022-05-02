@@ -29,13 +29,14 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           if [ "$RUNNER_OS" == "Linux" ]; then
             sudo apt update
             sudo apt install -y build-essential curl zlib1g-dev libcurl4-openssl-dev libexpat1-dev
           fi
       - name: Build and Install package
         run: |
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          echo "/usr/lib/ccache:/usr/local/opt/ccache/libexec" >> $GITHUB_PATH
           pip install -e . --no-index
       - name: Test code
         run: |

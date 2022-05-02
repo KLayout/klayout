@@ -10,6 +10,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       max-parallel: 12
       matrix:
         os: [ubuntu-latest, "macos-11", "macos-10.15"]

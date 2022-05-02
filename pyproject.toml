@@ -11,3 +11,7 @@ test-command = [
 [tool.cibuildwheel.linux]
 before-build = "bash {project}/ci-scripts/docker/docker_prepare.sh"
 environment = { CCACHE_DIR="/host/home/runner/work/klayout/klayout/.ccache" }
+
+[tool.cibuildwheel.macos]
+# Don't repair macOS wheels
+repair-wheel-command = ""

@@ -23,10 +23,12 @@
 #include "layImage.h"
 
 #include "tlUnitTest.h"
+#include "tlTimer.h"
 
 #if defined(HAVE_QT)
 
 #  include <QImage>
+#  include <QPainter>
 
 static bool compare_images (const QImage &qimg, const std::string &au)
 {
@@ -159,3 +161,89 @@ TEST(2)
 }
 
 #endif
+
+TEST(3)
+{
+  {
+    tl::SelfTimer timer ("Run time - lay::Image copy, no write (should be very fast)");
+
+    lay::Image img (1000, 1000);
+    img.fill (0x112233);
+
+    for (unsigned int i = 0; i < 5000; ++i) {
+      lay::Image img2 (img);
+    }
+  }
+
+#if defined(HAVE_QT)
+  {
+    tl::SelfTimer timer ("Run time - QImage copy, no write (should be very fast)");
+
+    lay::Image img (1000, 1000);
+    img.fill (0x112233);
+    QImage qimg (img.to_image ());
+
+    for (unsigned int i = 0; i < 5000; ++i) {
+      QImage qimg2 (qimg);
+    }
+  }
+#endif
+
+  {
+    tl::SelfTimer timer ("Run time - lay::Image copy on write");
+
+    lay::Image img (1000, 1000);
+    img.fill (0x112233);
+
+    for (unsigned int i = 0; i < 5000; ++i) {
+      lay::Image img2 (img);
+      img2.scan_line (100) [7] = 0;
+    }
+  }
+
+#if defined(HAVE_QT)
+  {
+    tl::SelfTimer timer ("Run time - QImage copy on write (should not be much less than lay::Image copy on write)");
+
+    lay::Image img (1000, 1000);
+    img.fill (0x112233);
+    QImage qimg (img.to_image ());
+
+    for (unsigned int i = 0; i < 5000; ++i) {
+      QImage qimg2 (qimg);
+      qimg2.scanLine (100) [7] = 0;
+    }
+  }
+
+  {
+    tl::SelfTimer timer ("Run time - direct QImage paint");
+
+    lay::Image img (1000, 1000);
+    img.fill (0x112233);
+    QImage qimg (img.to_image ());
+    QImage qrec (img.to_image ());
+    qrec.fill (0);
+
+    QPainter painter (&qrec);
+    for (unsigned int i = 0; i < 1000; ++i) {
+      painter.drawImage (QPoint (0, 0), qimg);
+    }
+  }
+
+  {
+    tl::SelfTimer timer ("Run time - lay::Image paint (should not be much more than direct QImage paint)");
+
+    lay::Image img (1000, 1000);
+    img.fill (0x112233);
+    QImage qrec (img.to_image ());
+    qrec.fill (0);
+
+    QPainter painter (&qrec);
+    for (unsigned int i = 0; i < 1000; ++i) {
+      painter.drawImage (QPoint (0, 0), img.to_image ());
+    }
+  }
+
+#endif
+}
+

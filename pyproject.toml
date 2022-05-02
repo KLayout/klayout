@@ -10,4 +10,4 @@ test-command = [
 
 [tool.cibuildwheel.linux]
 before-build = "bash {project}/ci-scripts/docker/docker_prepare.sh"
-environment = { CCACHE_DIR="/host$(ccache -k cache_dir)" }
+environment = { CCACHE_DIR="/host/home/runner/work/klayout/klayout/.ccache" }

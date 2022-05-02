@@ -27,6 +27,7 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           echo "/usr/lib/ccache:/usr/local/opt/ccache/libexec" >> $GITHUB_PATH
+          export CCACHE_DIR="$(ccache -k cache_dir)"
       - name: Build wheels  # check https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
         uses: pypa/cibuildwheel@v2.5.0
         # to supply options, put them in 'env', like:

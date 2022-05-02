@@ -1,5 +1,5 @@
 ---
-name: Mac test code
+name: Mac test python package
 
 on:
   pull_request:
@@ -18,10 +18,17 @@ jobs:
         uses: styfle/cancel-workflow-action@0.9.1
       - name: Checkout
         uses: actions/checkout@master
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ github.job }}-${{ matrix.os }}  # Make cache specific to OS
       - name: Build the macOS wheels
         run: |
           pip3 install twine
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          ccache -s
           pip3 install -e . --no-index
+          ccache -s
       - name: Test code
         run: |
           python3 testdata/pymod/import_db.py

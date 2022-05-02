@@ -1,5 +1,5 @@
 ---
-name: Upload Python Package for linux
+name: Upload Linux Python Wheel to PyPI
 
 on:
   release:
@@ -23,6 +23,10 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.x
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ github.job }}-${{ matrix.os }}  # Make cache specific to OS
       - name: Set up GCC
         uses: egor-tensin/setup-gcc@v1
         with:
@@ -31,16 +35,19 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           sudo apt install -y build-essential curl zlib1g-dev libcurl4-openssl-dev libexpat1-dev
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
           set "KLAYOUT_BITS=%cd%\klayout-microbits\klayout-microbits-1.0\msvc2017\%PYTHON_ARCHITECTURE%"
           echo KLAYOUT_BITS=%KLAYOUT_BITS%
-          pip install klayout --no-index -f dist
+          # pip install klayout --no-index -f dist
       - name: Build and publish
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
+          ccache -s
           python setup.py sdist bdist_wheel
+          ccache -s
           twine upload dist/*

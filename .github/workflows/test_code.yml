@@ -1,5 +1,5 @@
 ---
-name: linux Test code
+name: linux test python package
 # https://docs.github.com/en/free-pro-team@latest/actions/guides/building-and-testing-python
 
 on:
@@ -21,6 +21,10 @@ jobs:
       - name: Cancel Workflow Action
         uses: styfle/cancel-workflow-action@0.9.1
       - uses: actions/checkout@v2
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ github.job }}-${{ matrix.os }}  # Make cache specific to OS
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -28,9 +32,14 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           sudo apt install -y build-essential curl zlib1g-dev libcurl4-openssl-dev libexpat1-dev
           pip install setuptools wheel twine
+      - name: Build and Install package
+        run: |
+          ccache -s
           pip install -e . --no-index 
+          ccache -s
       - name: Test code
         run: |
           python testdata/pymod/import_db.py

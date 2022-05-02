@@ -10,7 +10,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  linux-deploy:
+    needs: [mac-build, build]
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 12
@@ -18,15 +19,15 @@ jobs:
         python-version: [3.8, 3.9, '3.10']
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.x
+      - uses: actions/checkout@v3
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ${{ github.job }}-${{ matrix.os }}  # Make cache specific to OS
+          key: ${{ matrix.python-version }}-${{ matrix.os }}  # Make cache specific to OS
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: Set up GCC
         uses: egor-tensin/setup-gcc@v1
         with:
@@ -47,7 +48,5 @@ jobs:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
-          ccache -s
           python setup.py sdist bdist_wheel
-          ccache -s
           twine upload dist/*

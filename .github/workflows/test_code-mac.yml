@@ -1,5 +1,5 @@
 ---
-name: Mac test python package
+name: build Mac python package
 
 on:
   pull_request:
@@ -7,21 +7,24 @@ on:
 
 jobs:
   mac-build:
-    name: Wrapper macOS Build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: ["macos-11", "macos-10.15"]
-        pyversion: ["python@3.8", "python@3.9", "python@3.10"]
+        python-version: [3.7, 3.8, 3.9, '3.10']
     steps:
       - name: Cancel Workflow Action
         uses: styfle/cancel-workflow-action@0.9.1
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ${{ github.job }}-${{ matrix.os }}  # Make cache specific to OS
+          key: ${{ matrix.python-version }}-${{ matrix.os }}  # Make cache specific to OS
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: Build the macOS wheels
         run: |
           pip3 install twine

@@ -24,8 +24,8 @@ jobs:
           pip3 install -e . --no-index
       - name: Test code
         run: |
-          python testdata/pymod/import_db.py
-          python testdata/pymod/import_rdb.py
-          python testdata/pymod/import_tl.py
-          python testdata/pymod/import_lib.py
-          python testdata/pymod/pya_tests.py
+          python3 testdata/pymod/import_db.py
+          python3 testdata/pymod/import_rdb.py
+          python3 testdata/pymod/import_tl.py
+          python3 testdata/pymod/import_lib.py
+          python3 testdata/pymod/pya_tests.py

@@ -10,4 +10,4 @@ test-command = [
 
 [tool.cibuildwheel.linux]
 before-build = "bash {project}/ci-scripts/docker/docker_prepare.sh"
-environment = { CFLAGS="-std=c99 -fno-strict-aliasing", LDFLAGS="-Wl,--strip-debug", OPENBLAS64_="/usr/local", NPY_USE_BLAS_ILP64="1", RUNNER_OS="Linux" }
+environment = { CCACHE_DIR="/host$(ccache -k cache_dir)" }

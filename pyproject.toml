@@ -1,0 +1,13 @@
+[tool.cibuildwheel]
+build-verbosity = "3"
+test-command = [
+  "python {package}/testdata/pymod/import_db.py",
+  "python {package}/testdata/pymod/import_rdb.py",
+  "python {package}/testdata/pymod/import_tl.py",
+  "python {package}/testdata/pymod/import_lib.py",
+  "python {package}/testdata/pymod/pya_tests.py"
+]
+
+[tool.cibuildwheel.linux]
+before-build = "bash {project}/ci-scripts/docker/docker_prepare.sh"
+environment = { CFLAGS="-std=c99 -fno-strict-aliasing", LDFLAGS="-Wl,--strip-debug", OPENBLAS64_="/usr/local", NPY_USE_BLAS_ILP64="1", RUNNER_OS="Linux" }

@@ -25,10 +25,6 @@ jobs:
           max-size: "5G"
       - name: Install dependencies
         run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt update
-            sudo apt install -y build-essential curl zlib1g-dev libcurl4-openssl-dev libexpat1-dev
-          fi
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           echo "/usr/lib/ccache:/usr/local/opt/ccache/libexec" >> $GITHUB_PATH
       - name: Build wheels  # check https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
@@ -36,13 +32,6 @@ jobs:
         # to supply options, put them in 'env', like:
         # env:
         #   CIBW_SOME_OPTION: value
-        env:
-          CIBW_TEST_COMMAND: >
-            python {package}/testdata/pymod/import_db.py &&
-            python {package}/testdata/pymod/import_rdb.py &&
-            python {package}/testdata/pymod/import_tl.py &&
-            python {package}/testdata/pymod/import_lib.py &&
-            python {package}/testdata/pymod/pya_tests.py
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl

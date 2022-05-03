@@ -8,11 +8,11 @@ test-command = [
   "python {package}/testdata/pymod/pya_tests.py"
 ]
 # Disable building PyPy wheels on all platforms
-skip = "pp*"
+skip = "pp* *manylinux*"
 
 [tool.cibuildwheel.linux]
 before-all = "source {project}/ci-scripts/docker/docker_prepare.sh"
-environment = { CCACHE_DIR="/host/home/runner/work/klayout/klayout/.ccache" }
+# environment = { CCACHE_DIR="/host/home/runner/work/klayout/klayout/.ccache" }
 archs = ["auto64"]
 
 [tool.cibuildwheel.macos]

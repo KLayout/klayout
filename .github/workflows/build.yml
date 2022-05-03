@@ -13,8 +13,13 @@ jobs:
       fail-fast: false
       max-parallel: 12
       matrix:
-        os: [ubuntu-latest, "macos-latest"]
-
+        include:
+          - os: "macos-latest"
+            cibuild: "*macosx*"
+          - os: "ubuntu-latest"
+            cibuild: "*manylinux*"
+          - os: "ubuntu-latest"
+            cibuild: "*musllinux*"
     steps:
       - name: Cancel Workflow Action
         uses: styfle/cancel-workflow-action@0.9.1
@@ -22,18 +27,32 @@ jobs:
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ${{ github.job }}-${{ matrix.os }}  # Make cache specific to OS
+          key: ${{ github.job }}-${{ matrix.os }}-${{ matrix.cibuild }}  # Make cache specific to OS
           max-size: "5G"
       - name: Install dependencies
         run: |
+          env
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           echo "/usr/lib/ccache:/usr/local/opt/ccache/libexec" >> $GITHUB_PATH
-          export CCACHE_DIR="$(ccache -k cache_dir)"
+          HOST_CCACHE_DIR="$(ccache -k cache_dir)"
+          mkdir -p $HOST_CCACHE_DIR
       - name: Build wheels  # check https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
         uses: pypa/cibuildwheel@v2.5.0
         # to supply options, put them in 'env', like:
         # env:
         #   CIBW_SOME_OPTION: value
+        env:
+          CIBW_BUILD: ${{ matrix.cibuild }}
+      - name: Download Cache from Docker (linux only)
+        if: ${{ env.RUNNER_OS == 'Linux' }}
+        # hack until https://github.com/pypa/cibuildwheel/issues/1030 is fixed
+        run: |
+          env
+          ccache -s
+          HOST_CCACHE_DIR="$(ccache -k cache_dir)"
+          rm -rf $HOST_CCACHE_DIR
+          mv ./wheelhouse/.ccache $HOST_CCACHE_DIR
+          ccache -s
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl

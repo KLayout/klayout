@@ -31,7 +31,14 @@ elif [[ -f "/etc/alpine-release" ]]; then
     export PATH="/usr/lib/ccache/bin:$PATH"
 fi
 
-echo $PATH
+# hack until https://github.com/pypa/cibuildwheel/issues/1030 is fixed
+# Place ccache folder in /outputs
+HOST_CCACHE_DIR="/host${HOST_CCACHE_DIR:-/home/runner/work/klayout/klayout/.ccache}"
+if [ -d $HOST_CCACHE_DIR ]; then
+    cp -R $HOST_CCACHE_DIR /output/
+fi
+
+ccache -o cache_dir="/output/.ccache"
 # export CCACHE_DIR="/host/home/runner/work/klayout/klayout/.ccache"
 ccache -M 5 G  # set cache size to 5 G
 

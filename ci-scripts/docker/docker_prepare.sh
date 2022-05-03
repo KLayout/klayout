@@ -13,13 +13,13 @@ if [[ -d "/usr/lib64/ccache" ]]; then
     ln -s /usr/bin/ccache /usr/lib64/ccache/cc
     ln -s /usr/bin/ccache /usr/lib64/ccache/gcc
     ln -s /usr/bin/ccache /usr/lib64/ccache/g++
-    export PATH="/usr/lib64/ccache/:$PATH"
+    export PATH="/usr/lib64/ccache:$PATH"
 elif [[ -d "/usr/lib/ccache" ]]; then
     ln -s /usr/bin/ccache /usr/lib/ccache/c++
     ln -s /usr/bin/ccache /usr/lib/ccache/cc
     ln -s /usr/bin/ccache /usr/lib/ccache/gcc
     ln -s /usr/bin/ccache /usr/lib/ccache/g++
-    export PATH="/usr/lib/ccache/:$PATH"
+    export PATH="/usr/lib/ccache:$PATH"
 fi
 
 echo $PATH

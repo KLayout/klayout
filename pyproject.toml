@@ -13,6 +13,7 @@ skip = "pp*"
 [tool.cibuildwheel.linux]
 before-all = "source {project}/ci-scripts/docker/docker_prepare.sh"
 environment = { CCACHE_DIR="/host/home/runner/work/klayout/klayout/.ccache" }
+archs = ["auto64"]
 
 [tool.cibuildwheel.macos]
 # Don't repair macOS wheels

@@ -44,7 +44,7 @@ jobs:
         env:
           CIBW_BUILD: ${{ matrix.cibuild }}
       - name: Download Cache from Docker (linux only)
-        if: ${{ env.RUNNER_OS == 'Linux' }}
+        if: ${{ runner.os == 'Linux' }}
         # hack until https://github.com/pypa/cibuildwheel/issues/1030 is fixed
         run: |
           env

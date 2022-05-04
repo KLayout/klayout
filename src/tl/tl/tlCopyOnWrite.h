@@ -153,7 +153,6 @@ public:
     }
 
     tl::MutexLocker locker (&ms_lock);
-    std::swap (mp_x, other.mp_x);
     std::swap (mp_holder, other.mp_holder);
   }
 
@@ -250,7 +249,6 @@ public:
   }
 
 private:
-  X *mp_x;
   copy_on_write_holder<X> *mp_holder;
 
   void release ()

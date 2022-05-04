@@ -29,6 +29,7 @@
 #include "tlCopyOnWrite.h"
 
 #include <string.h>
+#include <cstdint>
 
 #if defined(HAVE_QT)
 #  include <QImage>
@@ -38,7 +39,7 @@ namespace lay
 {
 
 /**
- *  @brief An 32bit RGBA image class
+ *  @brief An 32bit RGB/RGBA image class
  *
  *  This class substitutes QImage in Qt-less applications.
  *  It provides 32bit RGBA pixels with the format used by lay::Color.
@@ -129,6 +130,14 @@ public:
   unsigned int height () const
   {
     return m_height;
+  }
+
+  /**
+   *  @brief Gets the image stride (number of bytes per row)
+   */
+  unsigned int stride () const
+  {
+    return sizeof (lay::color_t) * m_width;
   }
 
   /**
@@ -226,6 +235,171 @@ private:
   unsigned int m_width, m_height;
   bool m_transparent;
   tl::copy_on_write_ptr<ImageData> m_data;
+};
+
+/**
+ *  @brief An monochrome image class
+ *
+ *  This class substitutes QImage for monochrome images in Qt-less applications.
+ */
+
+class LAYBASIC_PUBLIC MonoImage
+{
+public:
+  /**
+   *  @brief Creates an image with the given height and width
+   *
+   *  If data is given, the image is initialized with the given data and will take ownership over the
+   *  data block.
+   *
+   *  Lines are byte-aligned.
+   */
+  MonoImage (unsigned int w, unsigned int h, uint8_t *data);
+
+  /**
+   *  @brief Creates an image with the given height and width
+   *
+   *  If data is given, the image is initialized with the given data. A copy of the data is created.
+   *
+   *  "stride" specifies the stride (distance in bytes between two rows of data).
+   *  The size of the data block needs to be stride*h elements or bytes(w)*h if stride is not given.
+   */
+  MonoImage (unsigned int w, unsigned int h, const uint8_t *data = 0, unsigned int stride = 0);
+
+  /**
+   *  @brief Default constructor
+   */
+  MonoImage ();
+
+  /**
+   *  @brief Copy constructor
+   */
+  MonoImage (const MonoImage &other);
+
+  /**
+   *  @brief Move constructor
+   */
+  MonoImage (MonoImage &&other);
+
+  /**
+   *  @brief Destructor
+   */
+  ~MonoImage ();
+
+  /**
+   *  @brief Assignment
+   */
+  MonoImage &operator= (const MonoImage &other);
+
+  /**
+   *  @brief Move constructor
+   */
+  MonoImage &operator= (MonoImage &&other);
+
+  /**
+   *  @brief Swaps this image with another one
+   */
+  void swap (MonoImage &other);
+
+  /**
+   *  @brief Gets the images width
+   */
+  unsigned int width () const
+  {
+    return m_width;
+  }
+
+  /**
+   *  @brief Gets the images width
+   */
+  unsigned int height () const
+  {
+    return m_height;
+  }
+
+  /**
+   *  @brief Gets the image stride (number of bytes per row)
+   */
+  unsigned int stride () const
+  {
+    return m_stride;
+  }
+
+  /**
+   *  @brief Fills the image with the given color
+   */
+  void fill (bool value);
+
+  /**
+   *  @brief Gets the scanline for row n
+   */
+  uint8_t *scan_line (unsigned int n);
+
+  /**
+   *  @brief Gets the scanline for row n (const version)
+   */
+  const uint8_t *scan_line (unsigned int n) const;
+
+  /**
+   *  @brief Gets the data pointer
+   */
+  uint8_t *data ();
+
+  /**
+   *  @brief Gets the data pointer (const version)
+   */
+  const uint8_t *data () const;
+
+#if defined(HAVE_QT)
+  /**
+   *  @brief Produces a QMonoImage object from the image
+   */
+  QImage to_image () const;
+#endif
+
+private:
+  class MonoImageData
+  {
+  public:
+    MonoImageData ()
+      : mp_data (0), m_length (0)
+    {
+      //  .. nothing yet ..
+    }
+
+    MonoImageData (uint8_t *data, size_t length)
+      : mp_data (data), m_length (length)
+    {
+      //  .. nothing yet ..
+    }
+
+    MonoImageData (const MonoImageData &other)
+    {
+      m_length = other.length ();
+      mp_data = new uint8_t [other.length ()];
+      memcpy (mp_data, other.data (), m_length * sizeof (uint8_t));
+    }
+
+    ~MonoImageData ()
+    {
+      delete[] mp_data;
+      mp_data = 0;
+    }
+
+    size_t length () const { return m_length; }
+    uint8_t *data () { return mp_data; }
+    const uint8_t *data () const { return mp_data; }
+
+  private:
+    uint8_t *mp_data;
+    size_t m_length;
+
+    MonoImageData &operator= (const MonoImageData &other);
+  };
+
+  unsigned int m_width, m_height;
+  unsigned int m_stride;
+  tl::copy_on_write_ptr<MonoImageData> m_data;
 };
 
 }

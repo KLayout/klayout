@@ -26,7 +26,11 @@
 namespace lay
 {
 
+// -----------------------------------------------------------------------------------------------------
+//  Image implementation
+
 Image::Image (unsigned int w, unsigned int h, lay::color_t *data)
+  : m_data ()
 {
   m_width = w;
   m_height = h;
@@ -35,16 +39,21 @@ Image::Image (unsigned int w, unsigned int h, lay::color_t *data)
 }
 
 Image::Image (unsigned int w, unsigned int h, const lay::color_t *data, unsigned int stride)
+  : m_data ()
 {
   m_width = w;
   m_height = h;
   m_transparent = false;
 
-  lay::color_t *d = new color_t [w * h];
+  tl_assert ((stride % sizeof (lay::color_t)) == 0);
+  stride /= sizeof (lay::color_t);
+
+  lay::color_t *d = new lay::color_t [w * h];
+  lay::color_t *new_data = d;
 
   if (data) {
     for (unsigned int i = 0; i < h; ++i) {
-      for (unsigned int i = 0; i < h; ++i) {
+      for (unsigned int j = 0; j < w; ++j) {
         *d++ = *data++;
       }
       if (stride > w) {
@@ -53,7 +62,7 @@ Image::Image (unsigned int w, unsigned int h, const lay::color_t *data, unsigned
     }
   }
 
-  m_data.reset (new ImageData (d, w * h));
+  m_data.reset (new ImageData (new_data, w * h));
 }
 
 Image::Image ()
@@ -210,5 +219,151 @@ Image::diff (const Image &other) const
 
   return res;
 }
+
+// -----------------------------------------------------------------------------------------------------
+//  MonoImage implementation
+
+static unsigned int
+stride_from_width (unsigned int w)
+{
+  //  Qt needs 32bit-aligned data
+  return 4 * ((w + 31) / 32);
+}
+
+MonoImage::MonoImage (unsigned int w, unsigned int h, uint8_t *data)
+{
+  m_width = w;
+  m_height = h;
+  m_stride = stride_from_width (w);
+  m_data.reset (new MonoImageData (data, m_stride * h));
+}
+
+MonoImage::MonoImage (unsigned int w, unsigned int h, const uint8_t *data, unsigned int stride)
+{
+  m_width = w;
+  m_height = h;
+  m_stride = stride_from_width (w);
+
+  uint8_t *d = new uint8_t [m_stride * h];
+  uint8_t *new_data = d;
+
+  if (data) {
+    for (unsigned int i = 0; i < h; ++i) {
+      memcpy (d, data, m_stride);
+      d += m_stride;
+      data += m_stride;
+      if (stride > m_stride) {
+        data += stride - m_stride;
+      }
+    }
+  }
+
+  m_data.reset (new MonoImageData (new_data, m_stride * h));
+}
+
+MonoImage::MonoImage ()
+{
+  m_width = 0;
+  m_height = 0;
+  m_stride = 0;
+}
+
+MonoImage::MonoImage (const MonoImage &other)
+{
+  operator= (other);
+}
+
+MonoImage::MonoImage (MonoImage &&other)
+{
+  swap (other);
+}
+
+MonoImage::~MonoImage ()
+{
+  //  .. nothing yet ..
+}
+
+MonoImage &
+MonoImage::operator= (const MonoImage &other)
+{
+  if (this != &other) {
+    m_width = other.m_width;
+    m_height = other.m_height;
+    m_stride = other.m_stride;
+    m_data = other.m_data;
+  }
+  return *this;
+}
+
+MonoImage &
+MonoImage::operator= (MonoImage &&other)
+{
+  if (this != &other) {
+    swap (other);
+  }
+  return *this;
+}
+
+void
+MonoImage::swap (MonoImage &other)
+{
+  if (this == &other) {
+    return;
+  }
+
+  std::swap (m_width, other.m_width);
+  std::swap (m_height, other.m_height);
+  std::swap (m_stride, other.m_stride);
+  m_data.swap (other.m_data);
+}
+
+void
+MonoImage::fill (bool value)
+{
+  uint8_t c = value ? 0xff : 0;
+  uint8_t *d = data ();
+  for (unsigned int i = 0; i < m_height; ++i) {
+    for (unsigned int j = 0; j < m_stride; ++j) {
+      *d++ = c;
+    }
+  }
+}
+
+uint8_t *
+MonoImage::scan_line (unsigned int n)
+{
+  tl_assert (n < m_height);
+  return m_data->data () + n * m_stride;
+}
+
+const uint8_t *
+MonoImage::scan_line (unsigned int n) const
+{
+  tl_assert (n < m_height);
+  return m_data->data () + n * m_stride;
+}
+
+uint8_t *
+MonoImage::data ()
+{
+  return m_data->data ();
+}
+
+const uint8_t *
+MonoImage::data () const
+{
+  return m_data->data ();
+}
+
+#if defined(HAVE_QT)
+QImage
+MonoImage::to_image () const
+{
+  QImage img = QImage ((const uchar *) data (), m_width, m_height, QImage::Format_MonoLSB);
+  img.setColor (0, 0xff000000);
+  img.setColor (1, 0xffffffff);
+  return img;
+}
+#endif
 
 }

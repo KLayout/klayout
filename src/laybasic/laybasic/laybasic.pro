@@ -118,7 +118,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layGenericSyntaxHighlighter.cc \
     layGridNetConfigPage.cc \
     layHierarchyControlPanel.cc \
-    layImage.cc \
     layIndexedNetlistModel.cc \
     layItemDelegates.cc \
     layLayerControlPanel.cc \
@@ -139,6 +138,7 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layNetlistBrowserPage.cc \
     layNetlistBrowserTreeModel.cc \
     layNetlistCrossReferenceModel.cc \
+  layPixelBuffer.cc \
     layPluginConfigPage.cc \
     layProperties.cc \
     layPropertiesDialog.cc \
@@ -192,7 +192,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layGenericSyntaxHighlighter.h \
     layGridNetConfigPage.h \
     layHierarchyControlPanel.h \
-    layImage.h \
     layIndexedNetlistModel.h \
     layItemDelegates.h \
     layLayerControlPanel.h \
@@ -213,6 +212,7 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layNetlistBrowserPage.h \
     layNetlistBrowserTreeModel.h \
     layNetlistCrossReferenceModel.h \
+  layPixelBuffer.h \
     layPluginConfigPage.h \
     layProperties.h \
     layPropertiesDialog.h \

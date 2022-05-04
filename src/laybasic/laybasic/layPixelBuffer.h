@@ -21,8 +21,8 @@
 */
 
 
-#ifndef HDR_layImage
-#define HDR_layImage
+#ifndef HDR_layPixelBuffer
+#define HDR_layPixelBuffer
 
 #include "laybasicCommon.h"
 #include "layColor.h"
@@ -45,7 +45,7 @@ namespace lay
  *  It provides 32bit RGBA pixels with the format used by lay::Color.
  */
 
-class LAYBASIC_PUBLIC Image
+class LAYBASIC_PUBLIC PixelBuffer
 {
 public:
   /**
@@ -56,7 +56,7 @@ public:
    *
    *  The size of the data block needs to be w*h elements.
    */
-  Image (unsigned int w, unsigned int h, lay::color_t *data);
+  PixelBuffer (unsigned int w, unsigned int h, lay::color_t *data);
 
   /**
    *  @brief Creates an image with the given height and width
@@ -66,37 +66,37 @@ public:
    *  "stride" specifies the stride (distance between two rows of data).
    *  The size of the data block needs to be stride*h elements or w*h if stride is not given.
    */
-  Image (unsigned int w, unsigned int h, const lay::color_t *data = 0, unsigned int stride = 0);
+  PixelBuffer (unsigned int w, unsigned int h, const lay::color_t *data = 0, unsigned int stride = 0);
 
   /**
    *  @brief Default constructor
    */
-  Image ();
+  PixelBuffer ();
 
   /**
    *  @brief Copy constructor
    */
-  Image (const Image &other);
+  PixelBuffer (const PixelBuffer &other);
 
   /**
    *  @brief Move constructor
    */
-  Image (Image &&other);
+  PixelBuffer (PixelBuffer &&other);
 
   /**
    *  @brief Destructor
    */
-  ~Image ();
+  ~PixelBuffer ();
 
   /**
    *  @brief Assignment
    */
-  Image &operator= (const Image &other);
+  PixelBuffer &operator= (const PixelBuffer &other);
 
   /**
    *  @brief Move constructor
    */
-  Image &operator= (Image &&other);
+  PixelBuffer &operator= (PixelBuffer &&other);
 
   /**
    *  @brief Sets a value indicating whether an alpha channel is present
@@ -114,7 +114,7 @@ public:
   /**
    *  @brief Swaps this image with another one
    */
-  void swap (Image &other);
+  void swap (PixelBuffer &other);
 
   /**
    *  @brief Gets the images width
@@ -178,7 +178,7 @@ public:
    *  This feature does not implement real alpha blending. Instead all
    *  pixels with an alpha value >= 128 from the other image are patched into this image.
    */
-  void patch (const Image &other);
+  void patch (const PixelBuffer &other);
 
   /**
    *  @brief Generates the image difference
@@ -190,7 +190,7 @@ public:
    *
    *  alpha values from this and other are ignored.
    */
-  Image diff (const Image &other) const;
+  PixelBuffer diff (const PixelBuffer &other) const;
 
 private:
   class ImageData
@@ -243,7 +243,7 @@ private:
  *  This class substitutes QImage for monochrome images in Qt-less applications.
  */
 
-class LAYBASIC_PUBLIC MonoImage
+class LAYBASIC_PUBLIC BitmapBuffer
 {
 public:
   /**
@@ -254,7 +254,7 @@ public:
    *
    *  Lines are byte-aligned.
    */
-  MonoImage (unsigned int w, unsigned int h, uint8_t *data);
+  BitmapBuffer (unsigned int w, unsigned int h, uint8_t *data);
 
   /**
    *  @brief Creates an image with the given height and width
@@ -264,42 +264,42 @@ public:
    *  "stride" specifies the stride (distance in bytes between two rows of data).
    *  The size of the data block needs to be stride*h elements or bytes(w)*h if stride is not given.
    */
-  MonoImage (unsigned int w, unsigned int h, const uint8_t *data = 0, unsigned int stride = 0);
+  BitmapBuffer (unsigned int w, unsigned int h, const uint8_t *data = 0, unsigned int stride = 0);
 
   /**
    *  @brief Default constructor
    */
-  MonoImage ();
+  BitmapBuffer ();
 
   /**
    *  @brief Copy constructor
    */
-  MonoImage (const MonoImage &other);
+  BitmapBuffer (const BitmapBuffer &other);
 
   /**
    *  @brief Move constructor
    */
-  MonoImage (MonoImage &&other);
+  BitmapBuffer (BitmapBuffer &&other);
 
   /**
    *  @brief Destructor
    */
-  ~MonoImage ();
+  ~BitmapBuffer ();
 
   /**
    *  @brief Assignment
    */
-  MonoImage &operator= (const MonoImage &other);
+  BitmapBuffer &operator= (const BitmapBuffer &other);
 
   /**
    *  @brief Move constructor
    */
-  MonoImage &operator= (MonoImage &&other);
+  BitmapBuffer &operator= (BitmapBuffer &&other);
 
   /**
    *  @brief Swaps this image with another one
    */
-  void swap (MonoImage &other);
+  void swap (BitmapBuffer &other);
 
   /**
    *  @brief Gets the images width

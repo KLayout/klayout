@@ -20,16 +20,16 @@
 
 */
 
-#include "layImage.h"
+#include "layPixelBuffer.h"
 #include "tlAssert.h"
 
 namespace lay
 {
 
 // -----------------------------------------------------------------------------------------------------
-//  Image implementation
+//  PixelBuffer implementation
 
-Image::Image (unsigned int w, unsigned int h, lay::color_t *data)
+PixelBuffer::PixelBuffer (unsigned int w, unsigned int h, lay::color_t *data)
   : m_data ()
 {
   m_width = w;
@@ -38,7 +38,7 @@ Image::Image (unsigned int w, unsigned int h, lay::color_t *data)
   m_data.reset (new ImageData (data, w * h));
 }
 
-Image::Image (unsigned int w, unsigned int h, const lay::color_t *data, unsigned int stride)
+PixelBuffer::PixelBuffer (unsigned int w, unsigned int h, const lay::color_t *data, unsigned int stride)
   : m_data ()
 {
   m_width = w;
@@ -65,30 +65,30 @@ Image::Image (unsigned int w, unsigned int h, const lay::color_t *data, unsigned
   m_data.reset (new ImageData (new_data, w * h));
 }
 
-Image::Image ()
+PixelBuffer::PixelBuffer ()
 {
   m_width = 0;
   m_height = 0;
   m_transparent = false;
 }
 
-Image::Image (const Image &other)
+PixelBuffer::PixelBuffer (const PixelBuffer &other)
 {
   operator= (other);
 }
 
-Image::Image (Image &&other)
+PixelBuffer::PixelBuffer (PixelBuffer &&other)
 {
   swap (other);
 }
 
-Image::~Image ()
+PixelBuffer::~PixelBuffer ()
 {
   //  .. nothing yet ..
 }
 
-Image &
-Image::operator= (const Image &other)
+PixelBuffer &
+PixelBuffer::operator= (const PixelBuffer &other)
 {
   if (this != &other) {
     m_width = other.m_width;
@@ -99,8 +99,8 @@ Image::operator= (const Image &other)
   return *this;
 }
 
-Image &
-Image::operator= (Image &&other)
+PixelBuffer &
+PixelBuffer::operator= (PixelBuffer &&other)
 {
   if (this != &other) {
     swap (other);
@@ -109,13 +109,13 @@ Image::operator= (Image &&other)
 }
 
 void
-Image::set_transparent (bool f)
+PixelBuffer::set_transparent (bool f)
 {
   m_transparent = f;
 }
 
 void
-Image::swap (Image &other)
+PixelBuffer::swap (PixelBuffer &other)
 {
   if (this == &other) {
     return;
@@ -128,7 +128,7 @@ Image::swap (Image &other)
 }
 
 void
-Image::fill (lay::color_t c)
+PixelBuffer::fill (lay::color_t c)
 {
   color_t *d = data ();
   for (unsigned int i = 0; i < m_height; ++i) {
@@ -139,41 +139,41 @@ Image::fill (lay::color_t c)
 }
 
 color_t *
-Image::scan_line (unsigned int n)
+PixelBuffer::scan_line (unsigned int n)
 {
   tl_assert (n < m_height);
   return m_data->data () + n * m_width;
 }
 
 const color_t *
-Image::scan_line (unsigned int n) const
+PixelBuffer::scan_line (unsigned int n) const
 {
   tl_assert (n < m_height);
   return m_data->data () + n * m_width;
 }
 
 color_t *
-Image::data ()
+PixelBuffer::data ()
 {
   return m_data->data ();
 }
 
 const color_t *
-Image::data () const
+PixelBuffer::data () const
 {
   return m_data->data ();
 }
 
 #if defined(HAVE_QT)
 QImage
-Image::to_image () const
+PixelBuffer::to_image () const
 {
   return QImage ((const uchar *) data (), m_width, m_height, m_transparent ? QImage::Format_ARGB32 : QImage::Format_RGB32);
 }
 #endif
 
 void
-Image::patch (const Image &other)
+PixelBuffer::patch (const PixelBuffer &other)
 {
   tl_assert (width () == other.width ());
   tl_assert (height () == other.height ());
@@ -192,13 +192,13 @@ Image::patch (const Image &other)
   }
 }
 
-Image
-Image::diff (const Image &other) const
+PixelBuffer
+PixelBuffer::diff (const PixelBuffer &other) const
 {
   tl_assert (width () == other.width ());
   tl_assert (height () == other.height ());
 
-  Image res (m_width, m_height);
+  PixelBuffer res (m_width, m_height);
   res.set_transparent (true);
 
   const color_t *d2 = other.data ();
@@ -221,7 +221,7 @@ Image::diff (const Image &other) const
 }
 
 // -----------------------------------------------------------------------------------------------------
-//  MonoImage implementation
+//  BitmapBuffer implementation
 
 static unsigned int
 stride_from_width (unsigned int w)
@@ -230,7 +230,7 @@ stride_from_width (unsigned int w)
   return 4 * ((w + 31) / 32);
 }
 
-MonoImage::MonoImage (unsigned int w, unsigned int h, uint8_t *data)
+BitmapBuffer::BitmapBuffer (unsigned int w, unsigned int h, uint8_t *data)
 {
   m_width = w;
   m_height = h;
@@ -238,7 +238,7 @@ MonoImage::MonoImage (unsigned int w, unsigned int h, uint8_t *data)
   m_data.reset (new MonoImageData (data, m_stride * h));
 }
 
-MonoImage::MonoImage (unsigned int w, unsigned int h, const uint8_t *data, unsigned int stride)
+BitmapBuffer::BitmapBuffer (unsigned int w, unsigned int h, const uint8_t *data, unsigned int stride)
 {
   m_width = w;
   m_height = h;
@@ -261,30 +261,30 @@ MonoImage::MonoImage (unsigned int w, unsigned int h, const uint8_t *data, unsig
   m_data.reset (new MonoImageData (new_data, m_stride * h));
 }
 
-MonoImage::MonoImage ()
+BitmapBuffer::BitmapBuffer ()
 {
   m_width = 0;
   m_height = 0;
   m_stride = 0;
 }
 
-MonoImage::MonoImage (const MonoImage &other)
+BitmapBuffer::BitmapBuffer (const BitmapBuffer &other)
 {
   operator= (other);
 }
 
-MonoImage::MonoImage (MonoImage &&other)
+BitmapBuffer::BitmapBuffer (BitmapBuffer &&other)
 {
   swap (other);
 }
 
-MonoImage::~MonoImage ()
+BitmapBuffer::~BitmapBuffer ()
 {
   //  .. nothing yet ..
 }
 
-MonoImage &
-MonoImage::operator= (const MonoImage &other)
+BitmapBuffer &
+BitmapBuffer::operator= (const BitmapBuffer &other)
 {
   if (this != &other) {
     m_width = other.m_width;
@@ -295,8 +295,8 @@ MonoImage::operator= (const MonoImage &other)
   return *this;
 }
 
-MonoImage &
-MonoImage::operator= (MonoImage &&other)
+BitmapBuffer &
+BitmapBuffer::operator= (BitmapBuffer &&other)
 {
   if (this != &other) {
     swap (other);
@@ -305,7 +305,7 @@ MonoImage::operator= (MonoImage &&other)
 }
 
 void
-MonoImage::swap (MonoImage &other)
+BitmapBuffer::swap (BitmapBuffer &other)
 {
   if (this == &other) {
     return;
@@ -318,7 +318,7 @@ MonoImage::swap (MonoImage &other)
 }
 
 void
-MonoImage::fill (bool value)
+BitmapBuffer::fill (bool value)
 {
   uint8_t c = value ? 0xff : 0;
   uint8_t *d = data ();
@@ -330,34 +330,34 @@ MonoImage::fill (bool value)
 }
 
 uint8_t *
-MonoImage::scan_line (unsigned int n)
+BitmapBuffer::scan_line (unsigned int n)
 {
   tl_assert (n < m_height);
   return m_data->data () + n * m_stride;
 }
 
 const uint8_t *
-MonoImage::scan_line (unsigned int n) const
+BitmapBuffer::scan_line (unsigned int n) const
 {
   tl_assert (n < m_height);
   return m_data->data () + n * m_stride;
 }
 
 uint8_t *
-MonoImage::data ()
+BitmapBuffer::data ()
 {
   return m_data->data ();
 }
 
 const uint8_t *
-MonoImage::data () const
+BitmapBuffer::data () const
 {
   return m_data->data ();
 }
 
 #if defined(HAVE_QT)
 QImage
-MonoImage::to_image () const
+BitmapBuffer::to_image () const
 {
   QImage img = QImage ((const uchar *) data (), m_width, m_height, QImage::Format_MonoLSB);
   img.setColor (0, 0xff000000);

@@ -20,7 +20,7 @@
 
 */
 
-#include "layImage.h"
+#include "layPixelBuffer.h"
 
 #include "tlUnitTest.h"
 #include "tlTimer.h"
@@ -69,7 +69,7 @@ static bool compare_images_mono (const QImage &qimg, const std::string &au)
   }
 }
 
-static bool compare_images (const lay::Image &img, const lay::Image &img2)
+static bool compare_images (const lay::PixelBuffer &img, const lay::PixelBuffer &img2)
 {
   if (img2.width () == img.width () && img2.height () == img.height ()) {
     for (unsigned int j = 0; j < img.height (); ++j) {
@@ -85,7 +85,7 @@ static bool compare_images (const lay::Image &img, const lay::Image &img2)
   }
 }
 
-static bool compare_images (const lay::MonoImage &img, const lay::MonoImage &img2)
+static bool compare_images (const lay::BitmapBuffer &img, const lay::BitmapBuffer &img2)
 {
   if (img2.width () == img.width () && img2.height () == img.height ()) {
     for (unsigned int j = 0; j < img.height (); ++j) {
@@ -105,7 +105,7 @@ static bool compare_images (const lay::MonoImage &img, const lay::MonoImage &img
 
 TEST(1)
 {
-  lay::Image img (15, 25);
+  lay::PixelBuffer img (15, 25);
   EXPECT_EQ (img.width (), 15);
   EXPECT_EQ (img.height (), 25);
   EXPECT_EQ (img.stride (), 15 * sizeof (lay::color_t));
@@ -117,7 +117,7 @@ TEST(1)
   img.fill (0x112233);
   EXPECT_EQ (img.scan_line (5)[10], 0x112233);
 
-  lay::Image img2;
+  lay::PixelBuffer img2;
   EXPECT_EQ (img2.transparent (), false);
   img2 = img;
   EXPECT_EQ (img2.transparent (), true);
@@ -142,7 +142,7 @@ TEST(1)
   EXPECT_EQ (img.scan_line (5)[10], 0x332211);
   EXPECT_EQ (img2.scan_line (5)[10], 0x332211);
 
-  img2 = lay::Image (10, 16);
+  img2 = lay::PixelBuffer (10, 16);
   EXPECT_EQ (img.width (), 15);
   EXPECT_EQ (img.height (), 25);
   EXPECT_EQ (img2.width (), 10);
@@ -159,7 +159,7 @@ TEST(1)
   EXPECT_EQ (img.height (), 16);
   EXPECT_EQ (img.scan_line (5)[8], 0x010203);
 
-  lay::Image img3 (img);
+  lay::PixelBuffer img3 (img);
   EXPECT_EQ (compare_images (img, img3), true);
   EXPECT_EQ (img3.width (), 10);
   EXPECT_EQ (img3.height (), 16);
@@ -174,25 +174,25 @@ TEST(1)
   EXPECT_EQ (img.height (), 16);
   EXPECT_EQ (img.scan_line (5)[8], 0x102030);
 
-  lay::Image img4 (std::move (img));
+  lay::PixelBuffer img4 (std::move (img));
   EXPECT_EQ (img4.width (), 10);
   EXPECT_EQ (img4.height (), 16);
   EXPECT_EQ (img4.scan_line (5)[8], 0x102030);
 
   //  other constructors
-  EXPECT_EQ (compare_images (lay::Image (img4.width (), img4.height (), (const lay::color_t *) img4.data ()), img4), true);
-  EXPECT_EQ (compare_images (lay::Image (img4.width (), img4.height (), (const lay::color_t *) img4.data (), img4.stride ()), img4), true);
+  EXPECT_EQ (compare_images (lay::PixelBuffer (img4.width (), img4.height (), (const lay::color_t *) img4.data ()), img4), true);
+  EXPECT_EQ (compare_images (lay::PixelBuffer (img4.width (), img4.height (), (const lay::color_t *) img4.data (), img4.stride ()), img4), true);
 
   lay::color_t *dnew = new lay::color_t [ img4.width () * img4.height () * sizeof (lay::color_t) ];
   memcpy (dnew, (const lay::color_t *) img4.data (), img4.width () * img4.height () * sizeof (lay::color_t));
-  EXPECT_EQ (compare_images (lay::Image (img4.width (), img4.height (), dnew), img4), true);
+  EXPECT_EQ (compare_images (lay::PixelBuffer (img4.width (), img4.height (), dnew), img4), true);
 }
 
 #if defined(HAVE_QT)
 
 TEST(2)
 {
-  lay::Image img (227, 231);
+  lay::PixelBuffer img (227, 231);
 
   for (unsigned int i = 0; i < img.width (); ++i) {
     for (unsigned int j = 0; j < img.height (); ++j) {
@@ -213,10 +213,10 @@ TEST(2)
 
   EXPECT_EQ (compare_images (qimg, au), true);
 
-  lay::Image img_saved (img);
+  lay::PixelBuffer img_saved (img);
   img.scan_line (52) [42] = 0xff000000;
 
-  lay::Image diff = img.diff (img_saved);
+  lay::PixelBuffer diff = img.diff (img_saved);
   EXPECT_EQ (diff.transparent (), true);
   EXPECT_EQ (diff.to_image ().format () == QImage::Format_ARGB32, true);
   EXPECT_EQ (compare_images (img.to_image (), au), false);
@@ -246,11 +246,11 @@ TEST(3)
   {
     tl::SelfTimer timer ("Run time - lay::Image copy, no write (should be very fast)");
 
-    lay::Image img (1000, 1000);
+    lay::PixelBuffer img (1000, 1000);
     img.fill (0x112233);
 
     for (unsigned int i = 0; i < 5000; ++i) {
-      lay::Image img2 (img);
+      lay::PixelBuffer img2 (img);
     }
   }
 
@@ -258,7 +258,7 @@ TEST(3)
   {
     tl::SelfTimer timer ("Run time - QImage copy, no write (should be very fast)");
 
-    lay::Image img (1000, 1000);
+    lay::PixelBuffer img (1000, 1000);
     img.fill (0x112233);
     QImage qimg (img.to_image ());
 
@@ -271,11 +271,11 @@ TEST(3)
   {
     tl::SelfTimer timer ("Run time - lay::Image copy on write");
 
-    lay::Image img (1000, 1000);
+    lay::PixelBuffer img (1000, 1000);
     img.fill (0x112233);
 
     for (unsigned int i = 0; i < 5000; ++i) {
-      lay::Image img2 (img);
+      lay::PixelBuffer img2 (img);
       img2.scan_line (100) [7] = 0;
     }
   }
@@ -284,7 +284,7 @@ TEST(3)
   {
     tl::SelfTimer timer ("Run time - QImage copy on write (should not be much less than lay::Image copy on write)");
 
-    lay::Image img (1000, 1000);
+    lay::PixelBuffer img (1000, 1000);
     img.fill (0x112233);
     QImage qimg (img.to_image ());
 
@@ -297,7 +297,7 @@ TEST(3)
   {
     tl::SelfTimer timer ("Run time - direct QImage paint");
 
-    lay::Image img (1000, 1000);
+    lay::PixelBuffer img (1000, 1000);
     img.fill (0x112233);
     QImage qimg (img.to_image ());
     QImage qrec (img.to_image ());
@@ -312,7 +312,7 @@ TEST(3)
   {
     tl::SelfTimer timer ("Run time - lay::Image paint (should not be much more than direct QImage paint)");
 
-    lay::Image img (1000, 1000);
+    lay::PixelBuffer img (1000, 1000);
     img.fill (0x112233);
     QImage qrec (img.to_image ());
     qrec.fill (0);
@@ -330,7 +330,7 @@ TEST(3)
 
 TEST(11)
 {
-  lay::MonoImage img (15, 25);
+  lay::BitmapBuffer img (15, 25);
   EXPECT_EQ (img.width (), 15);
   EXPECT_EQ (img.height (), 25);
   EXPECT_EQ (img.stride (), 4);
@@ -338,7 +338,7 @@ TEST(11)
   img.fill (true);
   EXPECT_EQ (img.scan_line (5)[1], 0xff);
 
-  lay::MonoImage img2;
+  lay::BitmapBuffer img2;
   img2 = img;
   EXPECT_EQ (img2.width (), 15);
   EXPECT_EQ (img2.height (), 25);
@@ -359,7 +359,7 @@ TEST(11)
   EXPECT_EQ (img.scan_line (5)[1], 0);
   EXPECT_EQ (img2.scan_line (5)[1], 0);
 
-  img2 = lay::MonoImage (10, 16);
+  img2 = lay::BitmapBuffer (10, 16);
   EXPECT_EQ (img.width (), 15);
   EXPECT_EQ (img.height (), 25);
   EXPECT_EQ (img2.width (), 10);
@@ -376,7 +376,7 @@ TEST(11)
   EXPECT_EQ (img.height (), 16);
   EXPECT_EQ (img.scan_line (5)[0], 0xff);
 
-  lay::MonoImage img3 (img);
+  lay::BitmapBuffer img3 (img);
   EXPECT_EQ (compare_images (img, img3), true);
   EXPECT_EQ (img3.width (), 10);
   EXPECT_EQ (img3.height (), 16);
@@ -391,25 +391,25 @@ TEST(11)
   EXPECT_EQ (img.height (), 16);
   EXPECT_EQ (img.scan_line (5)[1], 0);
 
-  lay::MonoImage img4 (std::move (img));
+  lay::BitmapBuffer img4 (std::move (img));
   EXPECT_EQ (img4.width (), 10);
   EXPECT_EQ (img4.height (), 16);
   EXPECT_EQ (img4.scan_line (5)[1], 0);
 
   //  other constructors
-  EXPECT_EQ (compare_images (lay::MonoImage (img4.width (), img4.height (), (const uint8_t *) img4.data ()), img4), true);
-  EXPECT_EQ (compare_images (lay::MonoImage (img4.width (), img4.height (), (const uint8_t *) img4.data (), img4.stride ()), img4), true);
+  EXPECT_EQ (compare_images (lay::BitmapBuffer (img4.width (), img4.height (), (const uint8_t *) img4.data ()), img4), true);
+  EXPECT_EQ (compare_images (lay::BitmapBuffer (img4.width (), img4.height (), (const uint8_t *) img4.data (), img4.stride ()), img4), true);
 
   uint8_t *dnew = new uint8_t [ img4.width () * img4.height () * sizeof (uint8_t) ];
   memcpy (dnew, (const uint8_t *) img4.data (), img4.stride () * img4.height ());
-  EXPECT_EQ (compare_images (lay::MonoImage (img4.width (), img4.height (), dnew), img4), true);
+  EXPECT_EQ (compare_images (lay::BitmapBuffer (img4.width (), img4.height (), dnew), img4), true);
 }
 
 #if defined(HAVE_QT)
 
 TEST(12)
 {
-  lay::MonoImage img (227, 231);
+  lay::BitmapBuffer img (227, 231);
 
   for (unsigned int i = 0; i < img.stride (); ++i) {
     for (unsigned int j = 0; j < img.height (); ++j) {

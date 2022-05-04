@@ -168,8 +168,19 @@ public:
 #if defined(HAVE_QT)
   /**
    *  @brief Produces a QImage object from the image
+   *
+   *  NOTE: this version creates a reference, i.e. the QImage is valid only
+   *  during the lifetime of the PixelBuffer.
    */
   QImage to_image () const;
+
+  /**
+   *  @brief Produces a QImage object from the image
+   *
+   *  NOTE: this version creates a copy and the QImage is independent of the
+   *  PixelBuffer.
+   */
+  QImage to_image_copy () const;
 #endif
 
   /**
@@ -352,9 +363,20 @@ public:
 
 #if defined(HAVE_QT)
   /**
-   *  @brief Produces a QMonoImage object from the image
+   *  @brief Produces a QImage object from the image
+   *
+   *  NOTE: this version creates a reference, i.e. the QImage is valid only
+   *  during the lifetime of the BitmapBuffer.
    */
   QImage to_image () const;
+
+  /**
+   *  @brief Produces a QImage object from the image
+   *
+   *  NOTE: this version creates a copy and the QImage is independent of the
+   *  BitmapBuffer.
+   */
+  QImage to_image_copy () const;
 #endif
 
 private:

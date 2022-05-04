@@ -170,6 +170,14 @@ PixelBuffer::to_image () const
 {
   return QImage ((const uchar *) data (), m_width, m_height, m_transparent ? QImage::Format_ARGB32 : QImage::Format_RGB32);
 }
+
+QImage
+PixelBuffer::to_image_copy () const
+{
+  QImage img (m_width, m_height, m_transparent ? QImage::Format_ARGB32 : QImage::Format_RGB32);
+  memcpy (img.bits (), data (), img.sizeInBytes ());
+  return img;
+}
 #endif
 
 void
@@ -362,6 +370,14 @@ BitmapBuffer::to_image () const
   QImage img = QImage ((const uchar *) data (), m_width, m_height, QImage::Format_MonoLSB);
   img.setColor (0, 0xff000000);
   img.setColor (1, 0xffffffff);
+  return img;
+}
+
+QImage
+BitmapBuffer::to_image_copy () const
+{
+  QImage img (m_width, m_height, QImage::Format_MonoLSB);
+  memcpy (img.bits (), data (), img.sizeInBytes ());
   return img;
 }
 #endif

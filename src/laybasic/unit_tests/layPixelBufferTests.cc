@@ -237,6 +237,15 @@ TEST(2)
   tl::info << "PNG file read from " << au;
 
   EXPECT_EQ (compare_images (qimg, au), true);
+
+  qimg = img.to_image_copy ();
+  img.fill (false);
+
+  tmp = tmp_file ("test2.png");
+  qimg.save (tl::to_qstring (tmp));
+  tl::info << "PNG file written to " << tmp;
+
+  EXPECT_EQ (compare_images (qimg, au), true);
 }
 
 #endif
@@ -426,6 +435,15 @@ TEST(12)
 
   std::string au = tl::testsrc () + "/testdata/lay/au_mono.png";
   tl::info << "PNG file read from " << au;
+
+  EXPECT_EQ (compare_images_mono (qimg.convertToFormat (QImage::Format_Mono), au), true);
+
+  qimg = img.to_image_copy ();
+  img.fill (false);
+
+  tmp = tmp_file ("test2.png");
+  qimg.save (tl::to_qstring (tmp));
+  tl::info << "PNG file written to " << tmp;
 
   EXPECT_EQ (compare_images_mono (qimg.convertToFormat (QImage::Format_Mono), au), true);
 }

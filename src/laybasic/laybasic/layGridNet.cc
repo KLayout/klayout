@@ -26,6 +26,7 @@
 #include "layConverters.h"
 #include "layLayoutView.h"
 #include "layFixedFont.h"
+#include "layPixelBufferPainter.h"
 #include "laySnap.h"
 #include "dbTrans.h"
 
@@ -206,153 +207,7 @@ GridNet::configure (const std::string &name, const std::string &value)
   return taken;
 }
 
-#if defined(HAVE_QT) // @@@
-class ImagePainter
-{
-public:
-  ImagePainter (lay::BitmapViewObjectCanvas &canvas)
-    : mp_img (&canvas.bg_image ()), 
-      m_resolution (canvas.resolution ()), m_width (canvas.canvas_width ()), m_height (canvas.canvas_height ())
-  {
-    // .. nothing yet ..
-  }
-
-  void set (const db::Point &p, lay::Color c)
-  {
-    if (p.x () >= 0 && p.x () < m_width && p.y () >= 0 && p.y () < m_height) {
-      ((unsigned int *) mp_img->scanLine (p.y ())) [p.x ()] = c.rgb ();
-    }
-  }
-    
-  void draw_line (const db::Point &p1, const db::Point &p2, lay::Color c)
-  {
-    if (p1.x () == p2.x ()) {
-
-      int x = p1.x ();
-      int y1 = std::min (p1.y (), p2.y ());
-      int y2 = std::max (p1.y (), p2.y ());
-      if ((y2 >= 0 || y1 < m_height) && x >= 0 && x < m_width) {
-        y1 = std::max (y1, 0);
-        y2 = std::min (y2, m_height - 1);
-        for (int y = y1; y <= y2; ++y) {
-          ((unsigned int *) mp_img->scanLine (y)) [x] = c.rgb ();
-        }
-      }
-
-    } else if (p1.y () == p2.y ()) {
-
-      int y = p1.y ();
-      int x1 = std::min (p1.x (), p2.x ());
-      int x2 = std::max (p1.x (), p2.x ());
-      if ((x2 >= 0 || x1 < m_width) && y >= 0 && y < m_height) {
-        x1 = std::max (x1, 0);
-        x2 = std::min (x2, m_width - 1);
-        unsigned int *sl = (unsigned int *) mp_img->scanLine (y) + x1;
-        for (int x = x1; x <= x2; ++x) {
-          *sl++ = c.rgb ();
-        }
-      }
-
-    } else {
-      // TODO: not implemented yet.
-    }
-  }
-    
-  void fill_rect (const db::Point &p1, const db::Point &p2, lay::Color c)
-  {
-    int y1 = std::min (p1.y (), p2.y ());
-    int y2 = std::max (p1.y (), p2.y ());
-    for (int y = y1; y <= y2; ++y) {
-      draw_line (db::Point (p1.x (), y), db::Point (p2.x (), y), c);
-    }
-  }
-
-  void draw_rect (const db::Point &p1, const db::Point &p2, lay::Color c)
-  {
-    int y1 = std::min (p1.y (), p2.y ());
-    int y2 = std::max (p1.y (), p2.y ());
-    int x1 = std::min (p1.x (), p2.x ());
-    int x2 = std::max (p1.x (), p2.x ());
-    draw_line (db::Point (x1, y1), db::Point (x2, y1), c);
-    draw_line (db::Point (x1, y2), db::Point (x2, y2), c);
-    draw_line (db::Point (x1, y1), db::Point (x1, y2), c);
-    draw_line (db::Point (x2, y1), db::Point (x2, y2), c);
-  }
-
-  void draw_text (const char *t, const db::Point &p, lay::Color c, int halign, int valign)
-  {
-    const lay::FixedFont &ff = lay::FixedFont::get_font (m_resolution);
-    int x = p.x (), y = p.y ();
-
-    if (halign < 0) {
-      x -= ff.width () * int (strlen (t));
-    } else if (halign == 0) {
-      x -= ff.width () * int (strlen (t)) / 2;
-    }
-
-    if (valign < 0) {
-      y += ff.height ();
-    } else if (valign == 0) {
-      y += ff.height () / 2;
-    }
-
-    //  TODO: simple implementation
-    for (; *t; ++t) {
-
-      unsigned char ch = *t;
-
-      if (x < -int (ff.width ()) || x >= int (mp_img->width ()) || y < 0 || y >= int (mp_img->height () + ff.height ())) {
-        continue;
-      }
-
-      if (ch < ff.first_char () || (ch - ff.first_char ()) >= ff.n_chars ()) {
-        continue;
-      }
-
-      const uint32_t *dc = ff.data () + size_t (ch - ff.first_char ()) * ff.height () * ff.stride ();
-      for (unsigned int i = 0; i < ff.height (); ++i, dc += ff.stride ()) {
-
-        int iy = y - ff.height () + i + 1;
-        if (iy >= 0 || iy < mp_img->height ()) {
-
-          uint32_t *d = (uint32_t *) mp_img->scanLine (y - ff.height () + i);
-          uint32_t m = 1; 
-          int ix = x;
-          const uint32_t *ds = dc;
-
-          for (unsigned int j = 0; j < ff.width (); ++j, ++ix) {
-
-            if ((*ds & m) && ix >= 0 && ix < mp_img->width ()) {
-              d[ix] = c.rgb ();
-            }
-
-            m <<= 1;
-            //  word wrap
-            if (m == 0) {
-              ++ds;
-              m = 1;
-            }
-
-          }
-
-        }
-
-      } 
-
-      x += ff.width ();
-
-    }
-
-  }
-
-private:
-  QImage *mp_img;
-  double m_resolution;
-  int m_width, m_height;
-};
-#endif
-
-void 
+void
 GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
 {
   if (m_visible) {
@@ -377,12 +232,11 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
 
     // TODO: currently, the grid net can only be rendered to a bitmap canvas ..
     BitmapViewObjectCanvas *bmp_canvas = dynamic_cast<BitmapViewObjectCanvas *> (&canvas);
-    if (! bmp_canvas) {
+    if (! bmp_canvas || ! bmp_canvas->bg_image ()) {
       return;
     }
 
-#if defined(HAVE_QT) // @@@
-    ImagePainter painter (*bmp_canvas);
+    PixelBufferPainter painter (*bmp_canvas->bg_image (), bmp_canvas->canvas_width (), bmp_canvas->canvas_height (), bmp_canvas->resolution ());
 
     db::DCplxTrans trans = vp.trans ();
     db::DCplxTrans::inverse_trans trans_inv (trans.inverted ());
@@ -694,7 +548,6 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
       }
 
     }
-#endif
 
   }
 }

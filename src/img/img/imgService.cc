@@ -83,7 +83,7 @@ private:
 // -------------------------------------------------------------
 
 static void
-draw_scanline (unsigned int level, const img::Object &image_object, QImage &qimage, int y, const db::Matrix3d &t, const db::Matrix3d &it, const db::DPoint &q1, const db::DPoint &q2)
+draw_scanline (unsigned int level, const img::Object &image_object, lay::PixelBuffer &pxbuffer, int y, const db::Matrix3d &t, const db::Matrix3d &it, const db::DPoint &q1, const db::DPoint &q2)
 {
   double source_width = image_object.width ();
   double source_height = image_object.height ();
@@ -95,8 +95,8 @@ draw_scanline (unsigned int level, const img::Object &image_object, QImage &qima
     std::swap (x1, x2);
   }
 
-  int xstart = int (std::max (0.0, std::min (floor (x1), double (qimage.width ()))));
-  int xstop = int (std::max (0.0, std::min (ceil (x2) + 1.0, double (qimage.width ()))));
+  int xstart = int (std::max (0.0, std::min (floor (x1), double (pxbuffer.width ()))));
+  int xstop = int (std::max (0.0, std::min (ceil (x2) + 1.0, double (pxbuffer.width ()))));
 
   db::DPoint p1 = it.trans (db::DPoint (xstart, y));
   db::DPoint p2 = it.trans (db::DPoint (xstop, y));
@@ -106,8 +106,8 @@ draw_scanline (unsigned int level, const img::Object &image_object, QImage &qima
 
   if (level < 7 && xstop > xstart + 1 && fabs (xm - (xstart + xstop) / 2) > 1.0 && xm > xstart + 1 && xm < xstop - 1) {
 
-    draw_scanline (level + 1, image_object, qimage, y, t, it, q1, qm);
-    draw_scanline (level + 1, image_object, qimage, y, t, it, qm, q2);
+    draw_scanline (level + 1, image_object, pxbuffer, y, t, it, q1, qm);
+    draw_scanline (level + 1, image_object, pxbuffer, y, t, it, qm, q2);
 
   } else {
 
@@ -115,8 +115,8 @@ draw_scanline (unsigned int level, const img::Object &image_object, QImage &qima
     double dpx = (p2.x () - p1.x ()) / double (xstop - xstart);
     double dpy = (p2.y () - p1.y ()) / double (xstop - xstart);
 
-    QRgb *scanline_data = (QRgb *) qimage.scanLine (qimage.height () - y - 1) + xstart;
-    QRgb *pixel_data = (QRgb *) image_object.pixel_data ();
+    lay::color_t *scanline_data = pxbuffer.scan_line (pxbuffer.height () - y - 1) + xstart;
+    lay::color_t *pixel_data = (lay::color_t *) image_object.pixel_data ();
     const unsigned char *mask_data = image_object.mask ();
 
     for (int x = xstart; x < xstop; ++x) {
@@ -144,15 +144,15 @@ draw_image (const img::Object &image_object, const lay::Viewport &vp, lay::ViewO
 { 
   // TODO: currently, the images can only be rendered to a bitmap canvas ..
   lay::BitmapViewObjectCanvas *bmp_canvas = dynamic_cast<lay::BitmapViewObjectCanvas *> (&canvas);
-  if (! bmp_canvas) {
+  if (! bmp_canvas || ! bmp_canvas->bg_image ()) {
     return;
   }
 
-  QImage &qimage = bmp_canvas->bg_image ();
+  lay::PixelBuffer &image = *bmp_canvas->bg_image ();
   db::DBox source_image_box (0.0, 0.0, image_object.width (), image_object.height ());
 
   //  safety measure to avoid division by zero.
-  if (qimage.width () < 1 || qimage.height () < 1) {
+  if (image.width () < 1 || image.height () < 1) {
     return;
   }
 
@@ -165,7 +165,7 @@ draw_image (const img::Object &image_object, const lay::Viewport &vp, lay::ViewO
   db::DBox image_box = source_image_box.transformed (t);
 
   int y1 = int (floor (std::max (0.0, image_box.bottom ())));
-  int y2 = int (floor (std::min (double (qimage.height ()) - 1, image_box.top ())));
+  int y2 = int (floor (std::min (double (image.height ()) - 1, image_box.top ())));
 
   for (int y = y1; y <= y2; ++y) {
 
@@ -175,7 +175,7 @@ draw_image (const img::Object &image_object, const lay::Viewport &vp, lay::ViewO
     //  clip the transformed scanline to the original image 
     std::pair<bool, db::DEdge> clipped = scanline.clipped_line (source_image_box);
     if (clipped.first) {
-      draw_scanline (0, image_object, qimage, y, t, it, clipped.second.p1 (), clipped.second.p2 ());
+      draw_scanline (0, image_object, image, y, t, it, clipped.second.p1 (), clipped.second.p2 ());
     }
 
   }

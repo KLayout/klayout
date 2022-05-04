@@ -138,7 +138,8 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layNetlistBrowserPage.cc \
     layNetlistBrowserTreeModel.cc \
     layNetlistCrossReferenceModel.cc \
-  layPixelBuffer.cc \
+    layPixelBuffer.cc \
+    layPixelBufferPainter.cc \
     layPluginConfigPage.cc \
     layProperties.cc \
     layPropertiesDialog.cc \
@@ -212,7 +213,8 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layNetlistBrowserPage.h \
     layNetlistBrowserTreeModel.h \
     layNetlistCrossReferenceModel.h \
-  layPixelBuffer.h \
+    layPixelBuffer.h \
+    layPixelBufferPainter.h \
     layPluginConfigPage.h \
     layProperties.h \
     layPropertiesDialog.h \

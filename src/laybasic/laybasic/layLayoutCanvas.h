@@ -170,11 +170,10 @@ public:
     return m_view_ops; 
   }
 
-#if defined(HAVE_QT) // @@@
-  QImage screenshot ();
-  QImage image (unsigned int width, unsigned int height);
-  QImage image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, lay::Color background, lay::Color foreground, lay::Color active_color, const db::DBox &target_box, bool monochrome);
-#endif
+  lay::PixelBuffer screenshot ();
+  lay::PixelBuffer image (unsigned int width, unsigned int height);
+  lay::PixelBuffer image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, lay::Color background, lay::Color foreground, lay::Color active_color, const db::DBox &target_box);
+  lay::BitmapBuffer image_with_options_mono (unsigned int width, unsigned int height, int linewidth, bool background, bool foreground, bool active_color, const db::DBox &target_box);
 
   void update_image ();
 
@@ -316,15 +315,13 @@ public:
     return lay::Color (m_active);
   }
 
-#if defined(HAVE_QT) // @@@
   /**
    *  @brief Reimplementation of ViewObjectCanvas: background image
    */
-  QImage &bg_image ()
+  lay::PixelBuffer *bg_image ()
   {
-    return *mp_image;
+    return mp_image;
   }
-#endif
 
   /** 
    *  @brief Reimplementation of RedrawThreadCanvas: signal end of drawing
@@ -362,9 +359,9 @@ public:
 
 private:
   lay::LayoutViewBase *mp_view;
+  lay::PixelBuffer *mp_image;
+  lay::PixelBuffer *mp_image_bg;
 #if defined(HAVE_QT) // @@@
-  QImage *mp_image;
-  QImage *mp_image_bg;
   QPixmap *mp_pixmap;
 #endif
   db::DBox m_precious_box;

@@ -29,6 +29,7 @@
 #include "dbTrans.h"
 #include "layViewOp.h"
 #include "layBitmapRenderer.h"
+#include "layPixelBuffer.h"
 #include "tlThreads.h"
 
 #include <vector>
@@ -315,12 +316,15 @@ public:
     return new lay::BitmapRenderer (m_width, m_height, resolution ()); 
   }
 
-#if defined(HAVE_QT) // @@@
   /**
-   *  @brief Transfer the content to an QImage 
+   *  @brief Transfer the content to a PixelBuffer
    */
-  void to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, lay::Color background, lay::Color foreground, lay::Color active, const lay::Drawings *drawings, QImage &img, unsigned int width, unsigned int height);
-#endif
+  void to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, lay::Color background, lay::Color foreground, lay::Color active, const lay::Drawings *drawings, PixelBuffer &img, unsigned int width, unsigned int height);
+
+  /**
+   *  @brief Transfer the content to a BitmapBuffer (monochrome)
+   */
+  void to_image_mono (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, bool background, bool foreground, bool active, const lay::Drawings *drawings, lay::BitmapBuffer &img, unsigned int width, unsigned int height);
 
   /**
    *  @brief Gets the current bitmap data as a BitmapCanvasData object

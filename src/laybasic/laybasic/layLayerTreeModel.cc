@@ -523,7 +523,7 @@ LayerTreeModel::parent (const QModelIndex &index) const
  */
 static void
 single_bitmap_to_image (const lay::ViewOp &view_op, lay::Bitmap &bitmap,
-                        QImage *pimage, const lay::DitherPattern &dither_pattern, const lay::LineStyles &line_styles,
+                        lay::PixelBuffer *pimage, const lay::DitherPattern &dither_pattern, const lay::LineStyles &line_styles,
                         unsigned int width, unsigned int height)
 {
   std::vector <lay::ViewOp> view_ops;
@@ -640,11 +640,12 @@ LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, l
   lay::color_t fill_color  = iter->has_fill_color (true)  ? iter->eff_fill_color (true)  : def_color;
   lay::color_t frame_color = iter->has_frame_color (true) ? iter->eff_frame_color (true) : def_color;
 
-  QImage image (w, h, QImage::Format_ARGB32);
+  lay::PixelBuffer image (w, h);
+  image.set_transparent (true);
   image.fill (view->background_color ().rgb ());
 
   //  upper scanline is a dummy one
-  uint32_t *sl0 = (uint32_t *) image.scanLine (0);
+  uint32_t *sl0 = (uint32_t *) image.scan_line (0);
   uint32_t transparent = QColor (Qt::transparent).rgba ();
   for (size_t i = 0; i < w; ++i) {
     *sl0++ = transparent;
@@ -773,7 +774,7 @@ LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, l
   //  create vertex
   single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Cross, iter->marked (true) ? 9/*mark size*/ : 0), vertex, &image, view->dither_pattern (), view->line_styles (),  w, h);
 
-  QPixmap pixmap = QPixmap::fromImage (image); // Qt 4.6.0 workaround
+  QPixmap pixmap = QPixmap::fromImage (image.to_image ()); // Qt 4.6.0 workaround
   return QIcon (pixmap);
 }
 

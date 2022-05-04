@@ -70,6 +70,8 @@ class ViewObjectWidget;
 class ViewObjectCanvas;
 class CanvasPlane;
 class Bitmap;
+class PixelBuffer;
+class BitmapBuffer;
 
 LAYBASIC_PUBLIC const char *drag_drop_mime_type ();
 
@@ -1350,13 +1352,6 @@ public:
    */
   void clear_fg_bitmaps ();
 
-#if defined(HAVE_QT) // @@@
-  /**
-   *  @brief Return the background image
-   */
-  virtual QImage &bg_image () = 0;
-#endif
-
   /**
    *  @brief Set the width and height and resolution
    */
@@ -1387,6 +1382,16 @@ public:
   {
     return m_height;
   }
+
+  /**
+   *  @brief Gets the pixel buffer that background objects render to
+   */
+  virtual lay::PixelBuffer *bg_image ();
+
+  /**
+   *  @brief Gets the monochrome pixel buffer that background objects render to
+   */
+  virtual lay::BitmapBuffer *bg_bitmap ();
 
 private:
   std::map <lay::ViewOp, unsigned int> m_fg_bitmap_table;

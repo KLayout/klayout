@@ -2452,7 +2452,7 @@ LayoutViewBase::init_layer_properties (LayerProperties &p, const LayerProperties
   p.set_marked (false);
 }
 
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) // @@@ add methods without QImage!!!!
 QImage 
 LayoutViewBase::get_screenshot ()
 {
@@ -2461,7 +2461,7 @@ LayoutViewBase::get_screenshot ()
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
   
-  return mp_canvas->screenshot ();
+  return mp_canvas->screenshot ().to_image_copy ();
 }
 
 void 
@@ -2491,7 +2491,7 @@ LayoutViewBase::save_screenshot (const std::string &fn)
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
   
-  if (! writer.write (mp_canvas->screenshot ())) {
+  if (! writer.write (mp_canvas->screenshot ().to_image ())) {
     throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
   }
 
@@ -2506,19 +2506,23 @@ LayoutViewBase::get_image (unsigned int width, unsigned int height)
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
   
-  return mp_canvas->image (width, height);
+  return mp_canvas->image (width, height).to_image_copy ();
 }
 
 QImage 
 LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
-                                    lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
+                                        lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
 
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
   
-  return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box, monochrome);
+  if (monochrome) {
+    return mp_canvas->image_with_options_mono (width, height, linewidth, background.green () >= 128, foreground.green () >= 128, active.green () >= 128, target_box).to_image_copy ();
+  } else {
+    return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box).to_image_copy ();
+  }
 }
 
 void 
@@ -2544,7 +2548,7 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
   
-  if (! writer.write (mp_canvas->image (width, height))) {
+  if (! writer.write (mp_canvas->image (width, height).to_image ())) {
     throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
   }
 
@@ -2575,9 +2579,15 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
   
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
-  
-  if (! writer.write (mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box, monochrome))) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
+
+  if (monochrome) {
+    if (! writer.write (mp_canvas->image_with_options_mono (width, height, linewidth, background.green () >= 128, foreground.green () >= 128, active.green () >= 128, target_box).to_image ())) {
+      throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
+    }
+  } else {
+    if (! writer.write (mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box).to_image ())) {
+      throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
+    }
   }
 
   tl::log << "Saved screen shot to " << fn;
@@ -2741,7 +2751,6 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
   set_properties (new_props);
 
   goto_view (state);
-  
 }
 
 unsigned int 

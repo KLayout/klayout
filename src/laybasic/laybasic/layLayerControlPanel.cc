@@ -301,8 +301,8 @@ LayerControlPanel::LayerControlPanel (lay::LayoutView *view, db::Manager *manage
   mp_model = new lay::LayerTreeModel (this, view);
   mp_layer_list = new LCPTreeWidget (this, mp_model, "layer_tree");
   mp_layer_list->setUniformRowHeights (true);
-  mp_model->set_font (mp_layer_list->font ());
   mp_layer_list->setIconSize (mp_model->icon_size ());
+  mp_model->set_font_no_signal (mp_layer_list->font ());
 
   l->addWidget (mp_layer_list);
   connect (mp_layer_list, SIGNAL (double_clicked (const QModelIndex &, Qt::KeyboardModifiers)), this, SLOT (double_clicked (const QModelIndex &, Qt::KeyboardModifiers)));

@@ -152,6 +152,11 @@ public:
   void set_font (const QFont &font);
 
   /**
+   *  @brief Set the font to use for text display (without emitting a signal)
+   */
+  void set_font_no_signal (const QFont &font);
+
+  /**
    *  @brief Set the text color to use for text display
    */
   void set_text_color (QColor color);

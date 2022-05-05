@@ -1,0 +1,96 @@
+---
+name: Build Python Wheels
+# https://docs.github.com/en/free-pro-team@latest/actions/guides/building-and-testing-python
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      max-parallel: 12
+      matrix:
+        include:
+          - os: "macos-latest"
+            cibuild: "*macosx*"
+          - os: "ubuntu-latest"
+            cibuild: "*manylinux*"
+          - os: "ubuntu-latest"
+            cibuild: "*musllinux*"
+    steps:
+      - name: Cancel Workflow Action
+        uses: styfle/cancel-workflow-action@0.9.1
+      - uses: actions/checkout@v3
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ github.job }}-${{ matrix.os }}-${{ matrix.cibuild }}  # Make cache specific to OS
+          max-size: "5G"
+      - name: Install dependencies
+        run: |
+          env
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          echo "/usr/lib/ccache:/usr/local/opt/ccache/libexec" >> $GITHUB_PATH
+          HOST_CCACHE_DIR="$(ccache -k cache_dir)"
+          mkdir -p $HOST_CCACHE_DIR
+      - name: Build wheels  # check https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
+        uses: pypa/cibuildwheel@v2.5.0
+        # to supply options, put them in 'env', like:
+        # env:
+        #   CIBW_SOME_OPTION: value
+        env:
+          CIBW_BUILD: ${{ matrix.cibuild }}
+      - name: Download Cache from Docker (linux only)
+        if: ${{ runner.os == 'Linux' }}
+        # hack until https://github.com/pypa/cibuildwheel/issues/1030 is fixed
+        run: |
+          env
+          ccache -s
+          HOST_CCACHE_DIR="$(ccache -k cache_dir)"
+          rm -rf $HOST_CCACHE_DIR
+          mv ./wheelhouse/.ccache $HOST_CCACHE_DIR
+          ls -la $HOST_CCACHE_DIR
+          ccache -s
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./wheelhouse/*.whl
+
+# The following was taken from https://cibuildwheel.readthedocs.io/en/stable/deliver-to-pypi/
+  make_sdist:
+    name: Make SDist
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Optional, use if you use setuptools_scm
+        submodules: true  # Optional, use if you have submodules
+
+    - name: Build SDist
+      run: pipx run build --sdist
+
+    - uses: actions/upload-artifact@v2
+      with:
+        path: dist/*.tar.gz
+
+  upload_all:
+    needs: [build, make_sdist]
+    runs-on: ubuntu-latest
+    # Uncomment for real PyPi
+    # if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: artifact
+        path: dist
+
+    - uses: pypa/gh-action-pypi-publish@v1.4.2
+      with:
+        user: __token__
+        # Test PyPI
+        password: ${{ secrets.test_pypi_password }}
+        repository_url: https://test.pypi.org/legacy/
+        # Uncomment for Real Pypi
+        # password: ${{ secrets.pypi_password }}

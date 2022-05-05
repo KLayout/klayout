@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #===============================================================================
@@ -47,7 +47,7 @@ def GenerateUsage(platform):
     usage  = "\n"
     usage += "---------------------------------------------------------------------------------------------------------\n"
     usage += "<< Usage of 'build4mac.py' >>\n"
-    usage += "       for building KLayout 0.27.5 or later on different Apple macOS / Mac OSX platforms.\n"
+    usage += "       for building KLayout 0.27.9 or later on different Apple macOS / Mac OSX platforms.\n"
     usage += "\n"
     usage += "$ [python] ./build4mac.py\n"
     usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value\n"
@@ -74,6 +74,7 @@ def GenerateUsage(platform):
     usage += "                        :   Ana3: use Python 3.8 from Anaconda3                          | \n"
     usage += "                        :   HB39: use Python 3.9 from Homebrew                           | \n"
     usage += "                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew  | \n"
+    usage += "   [-j|--jump2pymod]    : jump into <pymod> build (developer's use only)                 | disabled\n"
     usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled\n"
     usage += "   [-u|--noqtuitools]   : don't include uitools in Qt binding                            | disabled\n"
     usage += "   [-m|--make <option>] : option passed to 'make'                                        | '--jobs=4'\n"
@@ -180,6 +181,7 @@ def Get_Default_Config():
         ModuleRuby   = "nil"
         ModulePython = "nil"
 
+    Jump2Pymod    = False
     NonOSStdLang  = False
     NoQtBindings  = False
     NoQtUiTools   = False
@@ -200,6 +202,7 @@ def Get_Default_Config():
     config['ModuleQt']      = ModuleQt          # Qt module to be used
     config['ModuleRuby']    = ModuleRuby        # Ruby module to be used
     config['ModulePython']  = ModulePython      # Python module to be used
+    config['Jump2Pymod']    = Jump2Pymod        # True to jump into <pymod> build
     config['NonOSStdLang']  = NonOSStdLang      # True if non-OS-standard language is chosen
     config['NoQtBindings']  = NoQtBindings      # True if not creating Qt bindings for Ruby scripts
     config['NoQtUiTools']   = NoQtUiTools       # True if not to include QtUiTools in Qt binding
@@ -239,6 +242,7 @@ def Parse_CLI_Args(config):
     ModuleQt      = config['ModuleQt']
     ModuleRuby    = config['ModuleRuby']
     ModulePython  = config['ModulePython']
+    Jump2Pymod    = config['Jump2Pymod']
     NonOSStdLang  = config['NonOSStdLang']
     NoQtBindings  = config['NoQtBindings']
     NoQtUiTools   = config['NoQtUiTools']
@@ -266,6 +270,12 @@ def Parse_CLI_Args(config):
     p.add_option( '-p', '--python',
                     dest='type_python',
                     help="Python type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3', 'HB39', 'HBAuto']" )
+
+    p.add_option( '-j', '--jump2pymod',
+                    action='store_true',
+                    dest='jump_to_pymod',
+                    default=False,
+                    help="jump into <pymod> build (developer's use only)" )
 
     p.add_option( '-n', '--noqtbinding',
                     action='store_true',
@@ -321,6 +331,7 @@ def Parse_CLI_Args(config):
         p.set_defaults( type_qt        = "qt6brew",
                         type_ruby      = "hb27",
                         type_python    = "hb38",
+                        jump_to_pymod  = False,
                         no_qt_binding  = False,
                         no_qt_uitools  = False,
                         make_option    = "--jobs=4",
@@ -334,6 +345,7 @@ def Parse_CLI_Args(config):
         p.set_defaults( type_qt        = "qt6brew",
                         type_ruby      = "sys",
                         type_python    = "sys",
+                        jump_to_pymod  = False,
                         no_qt_binding  = False,
                         no_qt_uitools  = False,
                         make_option    = "--jobs=4",
@@ -487,6 +499,8 @@ def Parse_CLI_Args(config):
     # (D) Set of modules chosen
     ModuleSet = ( choiceQt65, choiceRuby, choicePython )
 
+    # (E) Set other parameters
+    Jump2Pymod   = opt.jump_to_pymod
     NoQtBindings = opt.no_qt_binding
     NoQtUiTools  = opt.no_qt_uitools
     MakeOptions  = opt.make_option
@@ -532,7 +546,7 @@ def Parse_CLI_Args(config):
         print( "" )
         print( message )
         print( "" )
-        if CheckComOnly:
+        if CheckComOnly and not Jump2Pymod:
             sys.exit(0)
 
     #-----------------------------------------------------
@@ -543,6 +557,7 @@ def Parse_CLI_Args(config):
     config['ModuleQt']      = ModuleQt
     config['ModuleRuby']    = ModuleRuby
     config['ModulePython']  = ModulePython
+    config['Jump2Pymod']    = Jump2Pymod
     config['NonOSStdLang']  = NonOSStdLang
     config['NoQtBindings']  = NoQtBindings
     config['NoQtUiTools']   = NoQtUiTools
@@ -553,7 +568,7 @@ def Parse_CLI_Args(config):
     config['DeploymentP']   = DeploymentP
     config['PackagePrefix'] = PackagePrefix
     config['DeployVerbose'] = DeployVerbose
-    config['ModuleSet']     = ModuleSet         #
+    config['ModuleSet']     = ModuleSet
     return config
 
 #------------------------------------------------------------------------------
@@ -573,6 +588,7 @@ def Get_Build_Parameters(config):
     ModuleQt      = config['ModuleQt']
     ModuleRuby    = config['ModuleRuby']
     ModulePython  = config['ModulePython']
+    Jump2Pymod    = config['Jump2Pymod']
     ModuleSet     = config['ModuleSet']
     NoQtBindings  = config['NoQtBindings']
     NoQtUiTools   = config['NoQtUiTools']
@@ -663,7 +679,161 @@ def Get_Build_Parameters(config):
 
     # (J) Extra parameters needed for deployment
     parameters['project_dir'] = ProjectDir
+
+    # (K) Extra parameters needed for <pymod>
+    #     <pymod> will be built for:
+    #       Platform     = [ 'Monterey', 'BigSur', 'Catalina' ]
+    #       ModuleRuby   = [ 'Ruby27MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]
+    #       ModulePython = [ 'Python38MacPorts', 'Python38Brew',
+    #                        'PythonAnaconda3',  'PythonAutoBrew' ]
+    parameters['Jump2Pymod']   = Jump2Pymod
+    parameters['Platform']     = Platform
+    parameters['ModuleRuby']   = ModuleRuby
+    parameters['ModulePython'] = ModulePython
+
+    PymodDistDir = dict()
+    if Platform in [ 'Monterey', 'BigSur', 'Catalina' ]:
+        if ModuleRuby in [ 'Ruby27MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]:
+            if ModulePython in ['Python38MacPorts']:
+                PymodDistDir[ModulePython] = 'dist-MP3'
+            elif ModulePython in [ 'Python38Brew', 'PythonAutoBrew' ]:
+                PymodDistDir[ModulePython] = 'dist-HB3'
+            elif ModulePython in [ 'PythonAnaconda3' ]:
+                PymodDistDir[ModulePython] = 'dist-ana3'
+    parameters['pymod_dist'] = PymodDistDir
     return parameters
+
+#------------------------------------------------------------------------------
+## To run the "setup.py" script with appropriate options for building
+#  the klayout Python Module "pymod".
+#
+# @param[in] parameters     dictionary containing the build parameters
+#
+# @return 0 on success; non-zero (1), otherwise
+#------------------------------------------------------------------------------
+def Build_pymod(parameters):
+    #---------------------------------------------------------------------------
+    # [1] <pymod> will be built for:
+    #       Platform     = [ 'Monterey', 'BigSur', 'Catalina' ]
+    #       ModuleRuby   = [ 'Ruby27MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]
+    #       ModulePython = [ 'Python38MacPorts', 'Python38Brew',
+    #                        'PythonAnaconda3',  'PythonAutoBrew' ]
+    #---------------------------------------------------------------------------
+    Platform     = parameters['Platform']
+    ModuleRuby   = parameters['ModuleRuby']
+    ModulePython = parameters['ModulePython']
+    if not Platform in [ 'Monterey', 'BigSur', 'Catalina' ]:
+        return 0
+    elif not ModuleRuby in [ 'Ruby27MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]:
+        return 0
+    elif not ModulePython in [ 'Python38MacPorts', 'Python38Brew', 'PythonAnaconda3', 'PythonAutoBrew' ]:
+        return 0
+
+    #--------------------------------------------------------------------
+    # [2] Get the new directory names (dictionary) for "dist"
+    #--------------------------------------------------------------------
+    PymodDistDir = parameters['pymod_dist']
+
+    #--------------------------------------------------------------------
+    # [3] Set different command line parameters for building <pymod>
+    #--------------------------------------------------------------------
+    cmd1_args = "   setup.py  build \\\n"
+    cmd2_args = "   setup.py  bdist_wheel \\\n"
+    cmd3_args = "   setup.py  bdist_egg \\\n"
+    cmd4_args = "   setup.py  clean --all \\\n"
+
+    #--------------------------------------------------------------------
+    # [4] Make the consolidated command lines
+    #--------------------------------------------------------------------
+    command1  = "time"
+    command1 += " \\\n   %s \\\n" % parameters['python']
+    command1 += cmd1_args
+    command1 += "   2>&1 | tee -a %s; \\\n" % parameters['logfile']
+    command1 += "   test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
+
+    command2  = "time"
+    command2 += " \\\n   %s \\\n" % parameters['python']
+    command2 += cmd2_args
+    command2 += "   2>&1 | tee -a %s; \\\n" % parameters['logfile']
+    command2 += "   test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
+
+    command3  = "time"
+    command3 += " \\\n   %s \\\n" % parameters['python']
+    command3 += cmd3_args
+    command3 += "   2>&1 | tee -a %s; \\\n" % parameters['logfile']
+    command3 += "   test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
+
+    command4  = "time"
+    command4 += " \\\n   %s \\\n" % parameters['python']
+    command4 += cmd4_args
+    command4 += "   2>&1 | tee -a %s; \\\n" % parameters['logfile']
+    command4 += "   test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
+
+    print( "" )
+    print( "### You are going to build <pymod> with the following four stages." )
+    print( "<Stage-1>")
+    print( "  ", command1 )
+    print( "" )
+
+    print( "<Stage-2>")
+    print( "  ", command2 )
+    print( "" )
+
+    print( "<Stage-3>")
+    print( "  ", command3 )
+    print( "" )
+
+    print( "<Stage-4>")
+    print( "  ", command4 )
+    print( "" )
+    if parameters['check_cmd_only']:
+        sys.exit(0)
+
+    #-----------------------------------------------------
+    # [5] Invoke the main Python scripts; takes time:-)
+    #-----------------------------------------------------
+    myscript = os.path.basename(__file__)
+    ret = subprocess.call( command1, shell=True )
+    if ret != 0:
+        print( "", file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "!!! <%s>: failed to build <pymod>" % myscript, file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "", file=sys.stderr )
+        return 1
+
+    ret = subprocess.call( command2, shell=True )
+    if ret != 0:
+        print( "", file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "!!! <%s>: failed to build <pymod-wheel>" % myscript, file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "", file=sys.stderr )
+        return 1
+
+    ret = subprocess.call( command3, shell=True )
+    if ret != 0:
+        print( "", file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "!!! <%s>: failed to build <pymod-egg>" % myscript, file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "", file=sys.stderr )
+        return 1
+
+    ret = subprocess.call( command4, shell=True )
+    if ret != 0:
+        print( "", file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "!!! <%s>: failed to clean <pymod>" % myscript, file=sys.stderr )
+        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "", file=sys.stderr )
+        return 1
+
+    #-----------------------------------------------------
+    # [6] Rename the "dist/" directory
+    #-----------------------------------------------------
+    os.rename( "dist", PymodDistDir[ModulePython] )
+    return 0
 
 #------------------------------------------------------------------------------
 ## To run the main Bash script "build.sh" with appropriate options
@@ -673,135 +843,141 @@ def Get_Build_Parameters(config):
 # @return 0 on success; non-zero (1), otherwise
 #------------------------------------------------------------------------------
 def Run_Build_Command(parameters):
-    #-----------------------------------------------------
-    # [1] Set parameters passed to the main Bash script
-    #-----------------------------------------------------
-    cmd_args = ""
+    jump2pymod = parameters['Jump2Pymod']
 
-    # (A) debug or release
-    if parameters["debug_mode"]:
-        mode      = "debug"
-        cmd_args += "  -debug"
-    else:
-        mode      = "release"
-        cmd_args += "  -release"
+    if not jump2pymod:
+        #-----------------------------------------------------
+        # [1] Set parameters passed to the main Bash script
+        #-----------------------------------------------------
+        cmd_args = ""
 
-    # (C) Target directories and files
-    MacBuildDirQAT = parameters['build'] + ".macQAT"
+        # (A) debug or release
+        if parameters["debug_mode"]:
+            mode      = "debug"
+            cmd_args += "  -debug"
+        else:
+            mode      = "release"
+            cmd_args += "  -release"
 
-    # (D) Qt[6|5]
-    # '-qt6' is not yet supported as of 2021-11-27
-    # Passing '-qt5' with the Qt6 environments looks conflict
-    #cmd_args += " \\\n  -qt5"
-    cmd_args += " \\\n  -qmake %s" % parameters['qmake']
-    cmd_args += " \\\n  -bin   %s" % parameters['bin']
-    cmd_args += " \\\n  -build %s" % parameters['build']
-    cmd_args += " \\\n  -rpath %s" % parameters['rpath']
+        # (C) Target directories and files
+        MacBuildDirQAT = parameters['build'] + ".macQAT"
 
-    # (E) want Qt bindings with Ruby scripts?
-    if parameters['no_qt_bindings']:
-        cmd_args += " \\\n  -without-qtbinding"
-    else:
-        cmd_args += " \\\n  -with-qtbinding"
+        # (D) Qt5
+        cmd_args += " \\\n  -qt5"
+        cmd_args += " \\\n  -qmake %s" % parameters['qmake']
+        cmd_args += " \\\n  -bin   %s" % parameters['bin']
+        cmd_args += " \\\n  -build %s" % parameters['build']
+        cmd_args += " \\\n  -rpath %s" % parameters['rpath']
 
-    # (F) want QtUiTools?
-    if parameters['no_qt_uitools']:
-        cmd_args += " \\\n  -without-qt-uitools"
+        # (E) want Qt bindings with Ruby scripts?
+        if parameters['no_qt_bindings']:
+            cmd_args += " \\\n  -without-qtbinding"
+        else:
+            cmd_args += " \\\n  -with-qtbinding"
 
-    # (G) options to `make` tool
-    if 'make_options' in parameters:
-        cmd_args += " \\\n  -option %s" % parameters['make_options']
+        # (F) want QtUiTools?
+        if parameters['no_qt_uitools']:
+            cmd_args += " \\\n  -without-qt-uitools"
 
-    # (H) about Ruby
-    if 'ruby' in parameters:
-        cmd_args += " \\\n  -ruby   %s" % parameters['ruby']
-        cmd_args += " \\\n  -rbinc  %s" % parameters['rbinc']
-        cmd_args += " \\\n  -rblib  %s" % parameters['rblib']
-        if 'rbinc2' in parameters:
-            cmd_args += " \\\n  -rbinc2  %s" % parameters['rbinc2']
-    else:
-        cmd_args += " \\\n  -noruby"
+        # (G) options to `make` tool
+        if 'make_options' in parameters:
+            cmd_args += " \\\n  -option %s" % parameters['make_options']
 
-    # (I) about Python
-    if 'python' in parameters:
-        cmd_args += " \\\n  -python %s" % parameters['python']
-        cmd_args += " \\\n  -pyinc  %s" % parameters['pyinc']
-        cmd_args += " \\\n  -pylib  %s" % parameters['pylib']
-    else:
-        cmd_args += " \\\n  -nopython"
+        # (H) about Ruby
+        if 'ruby' in parameters:
+            cmd_args += " \\\n  -ruby   %s" % parameters['ruby']
+            cmd_args += " \\\n  -rbinc  %s" % parameters['rbinc']
+            cmd_args += " \\\n  -rblib  %s" % parameters['rblib']
+            if 'rbinc2' in parameters:
+                cmd_args += " \\\n  -rbinc2  %s" % parameters['rbinc2']
+        else:
+            cmd_args += " \\\n  -noruby"
 
-    #-----------------------------------------------------
-    # [2] Make the consolidated command line
-    #-----------------------------------------------------
-    command  = "time"
-    command += " \\\n  %s" % parameters['build_cmd']
-    command += cmd_args
-    command += "  2>&1 | tee %s; \\\n" % parameters['logfile']
-    command += "test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
+        # (I) about Python
+        if 'python' in parameters:
+            cmd_args += " \\\n  -python %s" % parameters['python']
+            cmd_args += " \\\n  -pyinc  %s" % parameters['pyinc']
+            cmd_args += " \\\n  -pylib  %s" % parameters['pylib']
+        else:
+            cmd_args += " \\\n  -nopython"
 
-    if parameters['check_cmd_only']:
-        print(command)
-        sys.exit(0)
+        #-----------------------------------------------------
+        # [2] Make the consolidated command line
+        #-----------------------------------------------------
+        command  = "time"
+        command += " \\\n  %s" % parameters['build_cmd']
+        command += cmd_args
+        command += "  2>&1 | tee %s; \\\n" % parameters['logfile']
+        command += "test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
 
-    #-----------------------------------------------------
-    # [3] Invoke the main Bash script; takes time:-)
-    #-----------------------------------------------------
-    myscript = os.path.basename(__file__)
-    ret = subprocess.call( command, shell=True )
-    if ret != 0:
+        if parameters['check_cmd_only']:
+            print(command)
+            sys.exit(0)
+
+        #-----------------------------------------------------
+        # [3] Invoke the main Bash script; takes time:-)
+        #-----------------------------------------------------
+        myscript = os.path.basename(__file__)
+        ret = subprocess.call( command, shell=True )
+        if ret != 0:
+            print( "", file=sys.stderr )
+            print( "-------------------------------------------------------------", file=sys.stderr )
+            print( "!!! <%s>: failed to build KLayout" % myscript, file=sys.stderr )
+            print( "-------------------------------------------------------------", file=sys.stderr )
+            print( "", file=sys.stderr )
+            return 1
+
         print( "", file=sys.stderr )
-        print( "-------------------------------------------------------------", file=sys.stderr )
-        print( "!!! <%s>: failed to build KLayout" % myscript, file=sys.stderr )
-        print( "-------------------------------------------------------------", file=sys.stderr )
+        print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
+        print( "### <%s>: successfully built KLayout" % myscript, file=sys.stderr )
+        print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
         print( "", file=sys.stderr )
-        return 1
 
-    print( "", file=sys.stderr )
-    print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
-    print( "### <%s>: successfully built KLayout" % myscript, file=sys.stderr )
-    print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
-    print( "", file=sys.stderr )
+        #------------------------------------------------------------------------
+        # [4] Prepare "*.macQAT/" directory for the QATest.
+        #     Binaries under "*.macQAT/" such as *.dylib will be touched later.
+        #------------------------------------------------------------------------
+        print( "### Preparing <%s>" % MacBuildDirQAT )
+        if os.path.isdir( MacBuildDirQAT ):
+            shutil.rmtree( MacBuildDirQAT )
+
+        os.chdir( parameters['build'] )
+        tarFile = "../macQATest.tar"
+        tarCmdC = "tar cf %s ." % tarFile
+        if subprocess.call( tarCmdC, shell=True ) != 0:
+            print( "", file=sys.stderr )
+            print( "-------------------------------------------------------------", file=sys.stderr )
+            print( "!!! <%s>: failed to create <%s>" % (myscript, tarFile), file=sys.stderr )
+            print( "-------------------------------------------------------------", file=sys.stderr )
+            print( "", file=sys.stderr )
+            return 1
+
+        os.chdir( "../" )
+        os.mkdir( MacBuildDirQAT )
+        os.chdir( MacBuildDirQAT )
+        tarCmdX = "tar xf %s" % tarFile
+        if subprocess.call( tarCmdX, shell=True ) != 0:
+            print( "", file=sys.stderr )
+            print( "-------------------------------------------------------------", file=sys.stderr )
+            print( "!!! <%s>: failed to unpack <%s>" % (myscript, tarFile), file=sys.stderr )
+            print( "-------------------------------------------------------------", file=sys.stderr )
+            print( "", file=sys.stderr )
+            return 1
+
+        os.remove( tarFile )
+        os.chdir( "../" )
+        shutil.copy2( "macbuild/macQAT.sh", MacBuildDirQAT )
+        shutil.copy2( "macbuild/macQAT.py", MacBuildDirQAT )
+        print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
+        print( "### <%s>: prepared the initial *.macQAT/" % myscript, file=sys.stderr )
+        print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
+        print( "", file=sys.stderr )
 
     #------------------------------------------------------------------------
-    # [4] Prepare "*.macQAT/" directory for the QATest.
-    #     Binaries under "*.macQAT/" such as *.dylib will be touched later.
+    # [5] Build <pymod> for some predetermined environments
     #------------------------------------------------------------------------
-    print( "### Preparing <%s>" % MacBuildDirQAT )
-    if os.path.isdir( MacBuildDirQAT ):
-        shutil.rmtree( MacBuildDirQAT )
-
-    os.chdir( parameters['build'] )
-    tarFile = "../macQATest.tar"
-    tarCmdC = "tar cf %s ." % tarFile
-    if subprocess.call( tarCmdC, shell=True ) != 0:
-        print( "", file=sys.stderr )
-        print( "-------------------------------------------------------------", file=sys.stderr )
-        print( "!!! <%s>: failed to create <%s>" % (myscript, tarFile), file=sys.stderr )
-        print( "-------------------------------------------------------------", file=sys.stderr )
-        print( "", file=sys.stderr )
-        return 1
-
-    os.chdir( "../" )
-    os.mkdir( MacBuildDirQAT )
-    os.chdir( MacBuildDirQAT )
-    tarCmdX = "tar xf %s" % tarFile
-    if subprocess.call( tarCmdX, shell=True ) != 0:
-        print( "", file=sys.stderr )
-        print( "-------------------------------------------------------------", file=sys.stderr )
-        print( "!!! <%s>: failed to unpack <%s>" % (myscript, tarFile), file=sys.stderr )
-        print( "-------------------------------------------------------------", file=sys.stderr )
-        print( "", file=sys.stderr )
-        return 1
-
-    os.remove( tarFile )
-    os.chdir( "../" )
-    shutil.copy2( "macbuild/macQAT.sh", MacBuildDirQAT )
-    shutil.copy2( "macbuild/macQAT.py", MacBuildDirQAT )
-    print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
-    print( "### <%s>: prepared the initial *.macQAT/" % myscript, file=sys.stderr )
-    print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
-    print( "", file=sys.stderr )
-    return 0
+    ret = Build_pymod(parameters)
+    return ret
 
 #------------------------------------------------------------------------------
 ## For making a bundle (klayout.app), deploy built binaries and libraries
@@ -837,6 +1013,13 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     AbsMacBuildDir = "%s/%s" % (ProjectDir, MacBuildDir)
     AbsMacBuildLog = "%s/%s" % (ProjectDir, MacBuildLog)
 
+    try:
+        PymodDistDir = parameters['pymod_dist']
+        pymodDistDir = PymodDistDir[ModulePython]   # [ 'dist-MP3', 'dist-HB3', 'dist-ana3' ]
+    except KeyError:
+        pymodDistDir = ""
+    else:
+        pass
 
     print("")
     print( "##### Started deploying libraries and executables for <klayout.app> #####" )
@@ -875,7 +1058,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
 
 
     print( " [3] Creating the standard directory structure for 'klayout.app' bundle ..." )
-    #-----------------------------------------------------------------
+    #--------------------------------------------------------------------------------------------------------------
     # [3] Create the directory skeleton for "klayout.app" bundle
     #     and command line buddy tools such as "strm2cif".
     #     They are stored in the directory structure below.
@@ -895,24 +1078,34 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     #                             |         +-- db_plugins/
     #                             |         +-- lay_plugins/
     #                             +-- Buddy/+
-    #                                       +-- 'strm2cif'
-    #                                       +-- 'strm2dxf'
-    #                                       :
-    #                                       +-- 'strmxor'
-    #-----------------------------------------------------------------
+    #                             |         +-- 'strm2cif'
+    #                             |         +-- 'strm2dxf'
+    #                             |         :
+    #                             |         +-- 'strmxor'
+    #                             |
+    #                             +-- pymod-dist/+ (created only if *.whl and *.egg are available)
+    #                                            +-- klayout-0.27.8-cp38-cp38-macosx_10_9_x86_64.whl (example)(1)
+    #                                            +-- klayout-0.27.8-py3.8-macosx-10.9-x86_64.egg (example)(2)
+    #
+    #                                            (1) *.whl is recommended to install with 'pip3'
+    #                                            (2) *.egg is for 'easy_install' users
+    #--------------------------------------------------------------------------------------------------------------
     targetDir0 = "%s/klayout.app/Contents" % AbsMacPkgDir
     targetDirR = targetDir0 + "/Resources"
     targetDirF = targetDir0 + "/Frameworks"
     targetDirM = targetDir0 + "/MacOS"
     targetDirB = targetDir0 + "/Buddy"
+    targetDirP = targetDir0 + "/pymod-dist"
     os.makedirs(targetDirR)
     os.makedirs(targetDirF)
     os.makedirs(targetDirM)
     os.makedirs(targetDirB)
+    if not pymodDistDir == "":
+        os.makedirs(targetDirP)
 
 
     print( " [4] Copying KLayout's dynamic link libraries to 'Frameworks' ..." )
-    #-------------------------------------------------------------------------------
+    #---------------------------------------------------------------------------------------
     # [4] Copy KLayout's dynamic link libraries to "Frameworks/" and create
     #     the library dependency dictionary.
     #     <<< Do this job in "Frameworks/" >>>
@@ -942,7 +1135,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     #     libklayout_gsi.0.dylib (compatibility version 0.26.0, current version 0.26.1)
     #     libklayout_db.0.dylib (compatibility version 0.26.0, current version 0.26.1)
     #       :
-    #-------------------------------------------------------------------------------
+    #---------------------------------------------------------------------------------------
     os.chdir( targetDirF )
     dynamicLinkLibs = glob.glob( os.path.join( AbsMacBinDir, "*.dylib" ) )
     depDicOrdinary  = {} # inter-library dependency dictionary
@@ -1056,7 +1249,9 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     sourceDir1 = sourceDir0 + "/MacOS"
     sourceDir2 = "%s/macbuild/Resources" % ProjectDir
     sourceDir3 = "%s" % MacBinDir
+    sourceDir4 = "%s/pymod" % MacBinDir
 
+    # (A) the main components
     tmpfileM = ProjectDir + "/macbuild/Resources/Info.plist.template"
     keydicM  = { 'exe': 'klayout', 'icon': 'klayout.icns', 'bname': 'klayout', 'ver': Version }
     plistM   = GenerateInfoPlist( keydicM, tmpfileM )
@@ -1068,18 +1263,24 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     shutil.copy2( sourceDir1 + "/klayout",      targetDirM )
     shutil.copy2( sourceDir2 + "/klayout.icns", targetDirR )
 
-
     os.chmod( targetDir0 + "/PkgInfo",      0o0644 )
     os.chmod( targetDir0 + "/Info.plist",   0o0644 )
     os.chmod( targetDirM + "/klayout",      0o0755 )
     os.chmod( targetDirR + "/klayout.icns", 0o0644 )
 
+    # (B) the buddy command line tools
     buddies = glob.glob( sourceDir3 + "/strm*" )
     for item in buddies:
         shutil.copy2( item, targetDirB )
         buddy = os.path.basename(item)
         os.chmod( targetDirB + "/" + buddy, 0o0755 )
 
+    # (C) the pymod
+    if not pymodDistDir == "":
+        for item in glob.glob( pymodDistDir + "/*.whl" ):
+            shutil.copy2( item,  targetDirP )
+        for item in glob.glob( pymodDistDir + "/*.egg" ):
+            shutil.copy2( item,  targetDirP )
 
     print( " [7] Setting and changing the identification names of KLayout's libraries in each executable ..." )
     #-------------------------------------------------------------

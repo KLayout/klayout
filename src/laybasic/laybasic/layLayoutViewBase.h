@@ -183,12 +183,20 @@ public:
   /**
    *  @brief Constructor
    */
-  LayoutViewBase (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
+#if defined(HAVE_QT)
+  LayoutViewBase (QWidget *widget, lay::LayoutView *ui, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
+#else
+  LayoutViewBase (lay::LayoutView *ui, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
+#endif
 
   /**
    *  @brief Constructor (clone from another view)
    */
-  LayoutViewBase (lay::LayoutViewBase *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
+#if defined(HAVE_QT)
+  LayoutViewBase (QWidget *widget, lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
+#else
+  LayoutViewBase (lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
+#endif
 
   /** 
    *  @brief Destructor
@@ -2504,7 +2512,7 @@ public:
   /**
    *  @brief Gets the QWidget interface
    */
-  virtual QWidget *widget ();
+  QWidget *widget ();
 #endif
 
   /**
@@ -2536,6 +2544,10 @@ private:
   void signal_apply_technology (lay::LayoutHandle *layout_handle);
 
 private:
+#if defined(HAVE_QT)
+  QWidget *mp_widget;
+#endif
+  lay::LayoutView *mp_ui;
   bool m_editable;
   int m_disabled_edits;
   unsigned int m_options;

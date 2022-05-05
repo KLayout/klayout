@@ -327,7 +327,7 @@ static void save_as2 (lay::LayoutView *view, unsigned int index, const std::stri
   view->save_as (index, filename, tl::OutputStream::OM_Auto, options, true, 0);
 }
 
-#if defined(HAVE_QTBINDINGS)
+#if defined(HAVE_QTBINDINGS) // @@@
 static QImage get_image_with_options (lay::LayoutView *view, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box, bool monochrome)
 {
   return view->get_image_with_options (width, height, linewidth, oversampling, resolution, lay::Color (), lay::Color (), lay::Color (), target_box, monochrome);

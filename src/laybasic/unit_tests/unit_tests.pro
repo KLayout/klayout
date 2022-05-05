@@ -14,6 +14,7 @@ SOURCES = \
   layLayerProperties.cc \
   layParsedLayerSource.cc \
   layPixelBufferTests.cc \
+  layLayoutViewTests.cc \
   layRenderer.cc \
   layNetlistBrowserModelTests.cc \
   layNetlistBrowserTreeModelTests.cc \

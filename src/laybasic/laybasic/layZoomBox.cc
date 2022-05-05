@@ -31,7 +31,7 @@ namespace lay
 // -------------------------------------------------------------
 //  ZoomService implementation
 
-ZoomService::ZoomService (lay::LayoutView *view)
+ZoomService::ZoomService (lay::LayoutViewBase *view)
   : lay::ViewService (view->view_object_widget ()), 
     mp_view (view),
     mp_box (0),

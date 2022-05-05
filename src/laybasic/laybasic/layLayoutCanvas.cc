@@ -37,13 +37,11 @@
 #include "layRedrawThread.h"
 #include "layLayoutView.h"
 #include "layMarker.h"
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
 #  include "gtf.h"
 #endif
 
-#if defined(HAVE_QT) // @@@
 #include "layBitmapsToImage.h"
-#endif
 
 #include <sstream>
 #include <algorithm>

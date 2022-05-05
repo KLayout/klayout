@@ -31,13 +31,13 @@
 namespace lay {
 
 class Editables;
-class LayoutView;
+class LayoutViewBase;
 
 class MoveService :
     public lay::ViewService
 {
 public: 
-  MoveService (lay::LayoutView *view);
+  MoveService (lay::LayoutViewBase *view);
   ~MoveService ();
 
   virtual bool configure (const std::string &name, const std::string &value);
@@ -59,7 +59,7 @@ private:
   bool m_dragging;
   bool m_dragging_transient;
   lay::Editables *mp_editables;
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   double m_global_grid;
   db::DPoint m_shift;
   db::DPoint m_mouse_pos;

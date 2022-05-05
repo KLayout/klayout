@@ -232,8 +232,16 @@ struct OpDeleteLayerProps
 
 const double animation_interval = 0.5;
 
-LayoutViewBase::LayoutViewBase (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+#if defined(HAVE_QT)
+LayoutViewBase::LayoutViewBase (QWidget *widget, lay::LayoutView *ui, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+#else
+LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+#endif
   : lay::Dispatcher (plugin_parent, false /*not standalone*/),
+#if defined(HAVE_QT)
+    mp_widget (widget),
+#endif
+    mp_ui (ui),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager)
@@ -244,8 +252,16 @@ LayoutViewBase::LayoutViewBase (db::Manager *manager, bool editable, lay::Plugin
   init (manager);
 }
 
-LayoutViewBase::LayoutViewBase (lay::LayoutViewBase *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+#if defined(HAVE_QT)
+LayoutViewBase::LayoutViewBase (QWidget *widget, lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+#else
+LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+#endif
   : lay::Dispatcher (plugin_parent, false /*not standalone*/),
+#if defined(HAVE_QT)
+    mp_widget (widget),
+#endif
+    mp_ui (ui),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager)
@@ -274,7 +290,7 @@ LayoutViewBase::LayoutViewBase (lay::LayoutViewBase *source, db::Manager *manage
     } else {
       *m_layer_properties_lists [i] = *source->m_layer_properties_lists [i];
     }
-    m_layer_properties_lists [i]->attach_view (ui (), (unsigned int) i);
+    m_layer_properties_lists [i]->attach_view (this, (unsigned int) i);
   }
 
   if (! m_layer_properties_lists.empty ()) {
@@ -367,7 +383,7 @@ LayoutViewBase::init (db::Manager *mgr)
   m_search_range_box = 0;
 
   m_layer_properties_lists.push_back (new LayerPropertiesList ());
-  m_layer_properties_lists.back ()->attach_view (ui (), (unsigned int) (m_layer_properties_lists.size () - 1));
+  m_layer_properties_lists.back ()->attach_view (this, (unsigned int) (m_layer_properties_lists.size () - 1));
   m_current_layer_list = 0;
 
 #if defined(HAVE_QT)
@@ -388,16 +404,16 @@ LayoutViewBase::init (db::Manager *mgr)
   //  occupy services and editables:
   //  these services get deleted by the canvas destructor automatically:
   if ((m_options & LV_NoTracker) == 0) {
-    mp_tracker = new lay::MouseTracker (ui ());
+    mp_tracker = new lay::MouseTracker (this);
   }
   if ((m_options & LV_NoZoom) == 0) {
-    mp_zoom_service = new lay::ZoomService (ui ());
+    mp_zoom_service = new lay::ZoomService (this);
   }
   if ((m_options & LV_NoSelection) == 0) {
-    mp_selection_service = new lay::SelectionService (ui ());
+    mp_selection_service = new lay::SelectionService (this);
   }
   if ((m_options & LV_NoMove) == 0) {
-    mp_move_service = new lay::MoveService (ui ());
+    mp_move_service = new lay::MoveService (this);
   }
 
   create_plugins ();
@@ -3207,14 +3223,14 @@ LayoutViewBase::box () const
 QWidget *
 LayoutViewBase::widget ()
 {
-  tl_assert (false);
+  return mp_widget;
 }
 #endif
 
 LayoutView *
 LayoutViewBase::get_ui ()
 {
-  tl_assert (false);
+  return mp_ui;
 }
 
 // @@@ needs to be called "as often as possible"

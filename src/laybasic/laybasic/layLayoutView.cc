@@ -94,7 +94,7 @@ static LayoutView *ms_current = 0;
 
 LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
   : QFrame (parent),
-    LayoutViewBase (manager, editable, plugin_parent, options),
+    LayoutViewBase (this, this, manager, editable, plugin_parent, options),
     dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
 {
   //  ensures the deferred method scheduler is present
@@ -106,7 +106,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
   : QFrame (parent), 
-    LayoutViewBase (source, manager, editable, plugin_parent, options),
+    LayoutViewBase (this, this, source, manager, editable, plugin_parent, options),
     dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
 {
   //  ensures the deferred method scheduler is present
@@ -1117,13 +1117,13 @@ namespace lay
 {
 
 LayoutView::LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options)
-  : LayoutViewBase (mgr, editable, plugin_parent, options)
+  : LayoutViewBase (this, mgr, editable, plugin_parent, options)
 {
   //  .. nothing yet ..
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options)
-  : LayoutViewBase (source, mgr, editable, plugin_parent, options)
+  : LayoutViewBase (this, source, mgr, editable, plugin_parent, options)
 {
   //  .. nothing yet ..
 }

@@ -414,11 +414,6 @@ public:
   }
 
   /**
-   *  @brief Gets the QWidget interface
-   */
-  virtual QWidget *widget () { return this; }
-
-  /**
    *  @brief Copies to clipboard
    *
    *  This reimplementation of the lay::Editables interface additionally
@@ -757,12 +752,6 @@ protected:
   virtual void emit_title_changed ();
   virtual void emit_dirty_changed ();
   virtual void emit_layer_order_changed ();
-
-protected:
-  /**
-   *  @brief Gets the LayoutView interface
-   */
-  virtual LayoutView *get_ui () { return this; }
 
 private:
   using LayoutViewBase::ui;

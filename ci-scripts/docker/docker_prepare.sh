@@ -38,6 +38,8 @@ if [ -d $HOST_CCACHE_DIR ]; then
     cp -R $HOST_CCACHE_DIR /output/
 fi
 
+ls -la /output/
+
 ccache -o cache_dir="/output/.ccache"
 # export CCACHE_DIR="/host/home/runner/work/klayout/klayout/.ccache"
 ccache -M 5 G  # set cache size to 5 G

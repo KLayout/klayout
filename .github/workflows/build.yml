@@ -52,7 +52,45 @@ jobs:
           HOST_CCACHE_DIR="$(ccache -k cache_dir)"
           rm -rf $HOST_CCACHE_DIR
           mv ./wheelhouse/.ccache $HOST_CCACHE_DIR
+          ls -la $HOST_CCACHE_DIR
           ccache -s
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl
+
+# The following was taken from https://cibuildwheel.readthedocs.io/en/stable/deliver-to-pypi/
+  make_sdist:
+    name: Make SDist
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Optional, use if you use setuptools_scm
+        submodules: true  # Optional, use if you have submodules
+
+    - name: Build SDist
+      run: pipx run build --sdist
+
+    - uses: actions/upload-artifact@v2
+      with:
+        path: dist/*.tar.gz
+
+  upload_all:
+    needs: [build, make_sdist]
+    runs-on: ubuntu-latest
+    # Uncomment for real PyPi
+    # if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: artifact
+        path: dist
+
+    - uses: pypa/gh-action-pypi-publish@v1.4.2
+      with:
+        user: __token__
+        # Test PyPI
+        password: ${{ secrets.test_pypi_password }}
+        repository_url: https://test.pypi.org/legacy/
+        # Uncomment for Real Pypi
+        # password: ${{ secrets.pypi_password }}

@@ -35,7 +35,8 @@ fi
 # Place ccache folder in /outputs
 HOST_CCACHE_DIR="/host${HOST_CCACHE_DIR:-/home/runner/work/klayout/klayout/.ccache}"
 if [ -d $HOST_CCACHE_DIR ]; then
-    cp -R $HOST_CCACHE_DIR /output/
+    mkdir -p /output
+    cp -R $HOST_CCACHE_DIR /output/.ccache
 fi
 
 ls -la /output/

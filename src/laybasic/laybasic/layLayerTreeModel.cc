@@ -203,7 +203,13 @@ LayerTreeModel::set_font (const QFont &font)
   signal_data_changed ();
 }
 
-void 
+void
+LayerTreeModel::set_font_no_signal (const QFont &font)
+{
+  m_font = font;
+}
+
+void
 LayerTreeModel::set_text_color (QColor color)
 {
   m_text_color = color;

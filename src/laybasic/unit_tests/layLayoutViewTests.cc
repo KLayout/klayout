@@ -159,7 +159,7 @@ TEST(3)
   QImage qimg;
   qimg = lv.get_image_with_options (500, 500, 1, 1, 1.0, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox (), true);
 
-  EXPECT_EQ (qimg.format () == QImage::Format_RGB32, true);
+  EXPECT_EQ (qimg.format () == QImage::Format_MonoLSB, true);
 
   std::string tmp = tmp_file ("test.png");
   qimg.save (tl::to_qstring (tmp));
@@ -168,6 +168,6 @@ TEST(3)
   std::string au = tl::testsrc () + "/testdata/lay/au_lv3.png";
   tl::info << "PNG file read from " << au;
 
-  EXPECT_EQ (compare_images (qimg, au), true);
+  EXPECT_EQ (compare_images_mono (qimg.convertToFormat (QImage::Format_Mono), au), true);
 }
 #endif

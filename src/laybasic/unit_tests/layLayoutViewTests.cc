@@ -103,6 +103,7 @@ static bool compare_images (const lay::BitmapBuffer &img, const lay::BitmapBuffe
 
 #endif
 
+#if defined(HAVE_QT) // @@@
 TEST(1)
 {
   lay::LayoutView lv (0, false, 0);
@@ -169,3 +170,4 @@ TEST(3)
 
   EXPECT_EQ (compare_images (qimg, au), true);
 }
+#endif

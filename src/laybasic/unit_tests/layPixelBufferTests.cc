@@ -69,6 +69,8 @@ static bool compare_images_mono (const QImage &qimg, const std::string &au)
   }
 }
 
+#endif
+
 static bool compare_images (const lay::PixelBuffer &img, const lay::PixelBuffer &img2)
 {
   if (img2.width () == img.width () && img2.height () == img.height ()) {
@@ -100,8 +102,6 @@ static bool compare_images (const lay::BitmapBuffer &img, const lay::BitmapBuffe
     return false;
   }
 }
-
-#endif
 
 TEST(1)
 {

@@ -26,6 +26,7 @@
 
 #include "tlCommon.h"
 #include "tlThreads.h"
+#include <algorithm>
 
 namespace tl
 {

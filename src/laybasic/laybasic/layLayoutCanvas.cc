@@ -277,10 +277,18 @@ invert (unsigned char *data, unsigned int width, unsigned int height)
   }
 }
 
+#if defined(HAVE_QT)
 LayoutCanvas::LayoutCanvas (QWidget *parent, lay::LayoutViewBase *view, const char *name)
   : lay::ViewObjectWidget (parent, name), 
+#else
+LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
+  : lay::ViewObjectWidget (),
+#endif
     mp_view (view),
-    mp_image (0), mp_image_bg (0), mp_pixmap (0), 
+    mp_image (0), mp_image_bg (0),
+#if defined(HAVE_QT)
+    mp_pixmap (0),
+#endif
     m_background (0), m_foreground (0), m_active (0),
     m_oversampling (1),
     m_dpr (1),
@@ -447,10 +455,12 @@ LayoutCanvas::prepare_drawing ()
         delete mp_image;
       }
       mp_image = new lay::PixelBuffer (m_viewport_l.width (), m_viewport_l.height ());
+#if defined(HAVE_QT)
       if (mp_pixmap) {
         delete mp_pixmap;
         mp_pixmap = 0;
       }
+#endif
     }
 
     mp_image->fill (m_background);

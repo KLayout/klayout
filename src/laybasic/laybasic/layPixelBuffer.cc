@@ -22,9 +22,91 @@
 
 #include "layPixelBuffer.h"
 #include "tlAssert.h"
+#include "tlLog.h"
+
+#if defined(HAVE_PNG)
+#  include <png.h>
+#endif
 
 namespace lay
 {
+
+// -----------------------------------------------------------------------------------------------------
+//  Exceptions
+
+PixelBufferReadError::PixelBufferReadError (const char *msg)
+  : tl::Exception (tl::to_string (tr ("PNG read error: ")) + std::string (msg))
+{
+  //  .. nothing yet ..
+}
+
+PixelBufferReadError::PixelBufferReadError (const std::string &msg)
+  : tl::Exception (tl::to_string (tr ("PNG read error: ")) + msg)
+{
+  //  .. nothing yet ..
+}
+
+PixelBufferWriteError::PixelBufferWriteError (const char *msg)
+  : tl::Exception (tl::to_string (tr ("PNG write error: ")) + std::string (msg))
+{
+  //  .. nothing yet ..
+}
+
+PixelBufferWriteError::PixelBufferWriteError (const std::string &msg)
+  : tl::Exception (tl::to_string (tr ("PNG write error: ")) + msg)
+{
+  //  .. nothing yet ..
+}
+
+#if defined(HAVE_PNG)
+
+static void png_read_warn_f (png_structp /*png_ptr*/, png_const_charp error_message)
+{
+  tl::warn << tl::to_string (tr ("Warning reading PNG: ")) << error_message;
+}
+
+static void png_read_error_f (png_structp /*png_ptr*/, png_const_charp error_message)
+{
+  throw PixelBufferReadError (error_message);
+}
+
+static void png_write_warn_f (png_structp /*png_ptr*/, png_const_charp error_message)
+{
+  tl::warn << tl::to_string (tr ("Warning writing PNG: ")) << error_message;
+}
+
+static void png_write_error_f (png_structp /*png_ptr*/, png_const_charp error_message)
+{
+  throw PixelBufferReadError (error_message);
+}
+
+static void read_from_stream_f (png_structp png_ptr, png_bytep bytes, size_t length)
+{
+  tl::InputStream *stream = (tl::InputStream *) png_get_io_ptr (png_ptr);
+  try {
+    memcpy (bytes, stream->get (length), length);
+  } catch (tl::Exception &ex) {
+    png_error (png_ptr, ex.msg ().c_str ());
+  }
+}
+
+static void write_to_stream_f (png_structp png_ptr, png_bytep bytes, size_t length)
+{
+  tl::OutputStream *stream = (tl::OutputStream *) png_get_io_ptr (png_ptr);
+  try {
+    stream->put ((const char *) bytes, length);
+  } catch (tl::Exception &ex) {
+    png_error (png_ptr, ex.msg ().c_str ());
+  }
+}
+
+static void flush_stream_f (png_structp png_ptr)
+{
+  tl::OutputStream *stream = (tl::OutputStream *) png_get_io_ptr (png_ptr);
+  stream->flush ();
+}
+
+#endif
 
 // -----------------------------------------------------------------------------------------------------
 //  PixelBuffer implementation
@@ -228,6 +310,103 @@ PixelBuffer::diff (const PixelBuffer &other) const
   return res;
 }
 
+#if defined(HAVE_PNG)
+
+PixelBuffer
+PixelBuffer::read_png (tl::InputStream &input)
+{
+  png_structp png_ptr = NULL;
+  png_infop info_ptr = NULL;
+
+  png_ptr = png_create_read_struct (PNG_LIBPNG_VER_STRING, NULL, &png_read_error_f, &png_read_warn_f);
+  tl_assert (png_ptr != NULL);
+
+  info_ptr = png_create_info_struct (png_ptr);
+  tl_assert (info_ptr != NULL);
+
+  png_set_read_fn (png_ptr, (void *) &input, &read_from_stream_f);
+  png_set_bgr (png_ptr);    // compatible with lay::color_t
+
+  png_read_png (png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+
+  PixelBuffer res (png_get_image_width (png_ptr, info_ptr), png_get_image_height (png_ptr, info_ptr));
+
+  unsigned int fmt = png_get_color_type (png_ptr, info_ptr);
+  unsigned int bd = png_get_bit_depth (png_ptr, info_ptr);
+
+  if (fmt == PNG_COLOR_TYPE_RGBA && bd == 8) {
+
+    tl_assert (png_get_rowbytes (png_ptr, info_ptr) == res.width () * sizeof (lay::color_t));
+
+    png_bytepp row_pointers = png_get_rows (png_ptr, info_ptr);
+    for (unsigned int i = 0; i < res.height (); ++i) {
+      memcpy ((void *) res.scan_line (i), (void *) row_pointers [i], sizeof (lay::color_t) * res.width ());
+    }
+
+  } else if (fmt == PNG_COLOR_TYPE_RGB && bd == 8) {
+
+    //  RGB has 3 bytes per pixel which need to be transformed into RGB32
+
+    unsigned int rb = png_get_rowbytes (png_ptr, info_ptr);
+    tl_assert (rb == res.width () * 3);
+
+    png_bytepp row_pointers = png_get_rows (png_ptr, info_ptr);
+    for (unsigned int i = 0; i < res.height (); ++i) {
+      lay::color_t *c = res.scan_line (i);
+      const uint8_t *d = row_pointers [i];
+      const uint8_t *dd = d + rb;
+      while (d < dd) {
+        uint8_t b = *d++;
+        uint8_t g = *d++;
+        uint8_t r = *d++;
+        *c++ = 0xff000000 | ((r << 8 | g) << 8) | b;
+      }
+    }
+
+  } else {
+
+    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+    throw PixelBufferReadError (tl::sprintf (tl::to_string (tr ("PNG reader supports 32 bit RGB or RGBA only (file: %s, format is %d, bit depth is %d)")), input.filename (), fmt, bd));
+
+  }
+
+  png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+
+  return res;
+}
+
+void
+PixelBuffer::write_png (tl::OutputStream &output)
+{
+  png_structp png_ptr = NULL;
+  png_infop info_ptr = NULL;
+
+  png_ptr = png_create_write_struct (PNG_LIBPNG_VER_STRING, NULL, &png_write_error_f, &png_write_warn_f);
+  tl_assert (png_ptr != NULL);
+
+  info_ptr = png_create_info_struct (png_ptr);
+  tl_assert (info_ptr != NULL);
+
+  png_set_write_fn (png_ptr, (void *) &output, &write_to_stream_f, &flush_stream_f);
+  png_set_bgr (png_ptr);    // compatible with lay::color_t
+
+  unsigned int bd = 8;  // bit depth
+  unsigned int fmt = PNG_COLOR_TYPE_RGBA;
+
+  png_set_IHDR (png_ptr, info_ptr, width (), height (), bd, fmt, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+  png_write_info (png_ptr, info_ptr);
+
+  for (unsigned int i = 0; i < height (); ++i) {
+    png_write_row (png_ptr, png_const_bytep (scan_line (i)));
+  }
+
+  png_write_end (png_ptr, info_ptr);
+  png_destroy_write_struct(&png_ptr, &info_ptr);
+}
+
+#endif
+
 // -----------------------------------------------------------------------------------------------------
 //  BitmapBuffer implementation
 
@@ -381,5 +560,82 @@ BitmapBuffer::to_image_copy () const
   return img;
 }
 #endif
+
+#if defined(HAVE_PNG)
+
+BitmapBuffer
+BitmapBuffer::read_png (tl::InputStream &input)
+{
+  png_structp png_ptr = NULL;
+  png_infop info_ptr = NULL;
+
+  png_ptr = png_create_read_struct (PNG_LIBPNG_VER_STRING, NULL, &png_read_error_f, &png_read_warn_f);
+  tl_assert (png_ptr != NULL);
+
+  info_ptr = png_create_info_struct (png_ptr);
+  tl_assert (info_ptr != NULL);
+
+  png_set_read_fn (png_ptr, (void *) &input, &read_from_stream_f);
+
+  png_read_png (png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+
+  BitmapBuffer res (png_get_image_width (png_ptr, info_ptr), png_get_image_height (png_ptr, info_ptr));
+
+  unsigned int fmt = png_get_color_type (png_ptr, info_ptr);
+  unsigned int bd = png_get_bit_depth (png_ptr, info_ptr);
+
+  if (fmt == PNG_COLOR_TYPE_GRAY && bd == 1) {
+
+    size_t rb = png_get_rowbytes (png_ptr, info_ptr);
+    tl_assert (rb == (res.width () + 7) / 8);
+
+    png_bytepp row_pointers = png_get_rows (png_ptr, info_ptr);
+    for (unsigned int i = 0; i < res.height (); ++i) {
+      memcpy ((void *) res.scan_line (i), (void *) row_pointers [i], rb);
+    }
+
+  } else {
+
+    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+    throw PixelBufferReadError (tl::sprintf (tl::to_string (tr ("PNG bitmap reader supports monochrome files only (file: %s, format is %d, bit depth is %d)")), input.filename (), fmt, bd));
+
+  }
+
+  png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+
+  return res;
+}
+
+void
+BitmapBuffer::write_png (tl::OutputStream &output)
+{
+  png_structp png_ptr = NULL;
+  png_infop info_ptr = NULL;
+
+  png_ptr = png_create_write_struct (PNG_LIBPNG_VER_STRING, NULL, &png_write_error_f, &png_write_warn_f);
+  tl_assert (png_ptr != NULL);
+
+  info_ptr = png_create_info_struct (png_ptr);
+  tl_assert (info_ptr != NULL);
+
+  png_set_write_fn (png_ptr, (void *) &output, &write_to_stream_f, &flush_stream_f);
+
+  unsigned int bd = 1;  // bit depth
+  unsigned int fmt = PNG_COLOR_TYPE_GRAY;
+
+  png_set_IHDR (png_ptr, info_ptr, width (), height (), bd, fmt, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+  png_write_info (png_ptr, info_ptr);
+
+  for (unsigned int i = 0; i < height (); ++i) {
+    png_write_row (png_ptr, png_const_bytep (scan_line (i)));
+  }
+
+  png_write_end (png_ptr, info_ptr);
+  png_destroy_write_struct(&png_ptr, &info_ptr);
+}
+
+#endif
+
 
 }

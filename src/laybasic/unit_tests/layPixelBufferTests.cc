@@ -250,6 +250,95 @@ TEST(2)
 
 #endif
 
+#if defined(HAVE_PNG)
+
+//  libpng support
+TEST(2b)
+{
+  lay::PixelBuffer img;
+
+  std::string in = tl::testsrc () + "/testdata/lay/png1.png";  //  ARGB32
+  tl::info << "PNG file read (libpng) from " << in;
+
+  {
+    tl::InputStream stream (in);
+    img = lay::PixelBuffer::read_png (stream);
+  }
+
+  std::string tmp = tmp_file ("test.png");
+  {
+    tl::OutputStream stream (tmp);
+    img.write_png (stream);
+  }
+  tl::info << "PNG file written to " << tmp;
+
+  lay::PixelBuffer img2;
+
+  {
+    tl::InputStream stream (tmp);
+    img2 = lay::PixelBuffer::read_png (stream);
+  }
+
+  EXPECT_EQ (compare_images (img, img2), true);
+
+  std::string tmp2 = tmp_file ("test2.png");
+  {
+    tl::OutputStream stream (tmp2);
+    img2.write_png (stream);
+  }
+  tl::info << "PNG file written to " << tmp2;
+
+#if defined (HAVE_QT)
+  //  Qt cross-check
+  std::string au = tl::testsrc () + "/testdata/lay/au.png";
+  EXPECT_EQ (compare_images (img2.to_image (), au), true);
+#endif
+}
+
+TEST(2c)
+{
+  lay::PixelBuffer img;
+
+  std::string in = tl::testsrc () + "/testdata/lay/png2.png";  //  RGB32
+  tl::info << "PNG file read (libpng) from " << in;
+
+  {
+    tl::InputStream stream (in);
+    img = lay::PixelBuffer::read_png (stream);
+  }
+
+  std::string tmp = tmp_file ("test.png");
+  {
+    tl::OutputStream stream (tmp);
+    img.write_png (stream);
+  }
+  tl::info << "PNG file written to " << tmp;
+
+  lay::PixelBuffer img2;
+
+  {
+    tl::InputStream stream (tmp);
+    img2 = lay::PixelBuffer::read_png (stream);
+  }
+
+  EXPECT_EQ (compare_images (img, img2), true);
+
+  std::string tmp2 = tmp_file ("test2.png");
+  {
+    tl::OutputStream stream (tmp2);
+    img2.write_png (stream);
+  }
+  tl::info << "PNG file written to " << tmp2;
+
+#if defined (HAVE_QT)
+  //  Qt cross-check
+  std::string au = tl::testsrc () + "/testdata/lay/au.png";
+  EXPECT_EQ (compare_images (img2.to_image (), au), true);
+#endif
+}
+
+#endif
+
 TEST(3)
 {
   {
@@ -446,6 +535,53 @@ TEST(12)
   tl::info << "PNG file written to " << tmp;
 
   EXPECT_EQ (compare_images_mono (qimg.convertToFormat (QImage::Format_Mono), au), true);
+}
+
+#endif
+
+#if defined(HAVE_PNG)
+
+//  libpng support
+TEST(12b)
+{
+  lay::BitmapBuffer img;
+
+  std::string in = tl::testsrc () + "/testdata/lay/au_mono.png";
+  tl::info << "PNG file read (libpng) from " << in;
+
+  {
+    tl::InputStream stream (in);
+    img = lay::BitmapBuffer::read_png (stream);
+  }
+
+  std::string tmp = tmp_file ("test.png");
+  {
+    tl::OutputStream stream (tmp);
+    img.write_png (stream);
+  }
+  tl::info << "PNG file written to " << tmp;
+
+  lay::BitmapBuffer img2;
+
+  {
+    tl::InputStream stream (tmp);
+    img2 = lay::BitmapBuffer::read_png (stream);
+  }
+
+  EXPECT_EQ (compare_images (img, img2), true);
+
+  std::string tmp2 = tmp_file ("test2.png");
+  {
+    tl::OutputStream stream (tmp2);
+    img2.write_png (stream);
+  }
+  tl::info << "PNG file written to " << tmp2;
+
+#if defined (HAVE_QT)
+  //  Qt cross-check
+  std::string au = tl::testsrc () + "/testdata/lay/au_mono.png";
+  EXPECT_EQ (compare_images (img2.to_image ().convertToFormat (QImage::Format_Mono), au), true);
+#endif
 }
 
 #endif

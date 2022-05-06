@@ -72,6 +72,15 @@ equals(HAVE_CURL, "1") {
   DEFINES += HAVE_CURL
 }
 
+equals(HAVE_PNG, "1") {
+  !isEmpty(BITS_PATH) {
+    include($$BITS_PATH/png/png.pri)
+  } else {
+    LIBS += -lpng
+  }
+  DEFINES += HAVE_PNG
+}
+
 equals(HAVE_EXPAT, "1") {
   !isEmpty(BITS_PATH) {
     include($$BITS_PATH/expat/expat.pri)

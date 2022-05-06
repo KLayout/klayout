@@ -27,6 +27,8 @@
 #include "laybasicCommon.h"
 #include "layColor.h"
 #include "tlCopyOnWrite.h"
+#include "tlStream.h"
+#include "tlException.h"
 
 #include <string.h>
 #include <cstdint>
@@ -39,12 +41,33 @@ namespace lay
 {
 
 /**
+ *  @brief An exception thrown when a PNG read error occurs
+ */
+class LAYBASIC_PUBLIC PixelBufferReadError
+  : public tl::Exception
+{
+public:
+  PixelBufferReadError (const char *msg);
+  PixelBufferReadError (const std::string &msg);
+};
+
+/**
+ *  @brief An exception thrown when a PNG write error occurs
+ */
+class LAYBASIC_PUBLIC PixelBufferWriteError
+  : public tl::Exception
+{
+public:
+  PixelBufferWriteError (const char *msg);
+  PixelBufferWriteError (const std::string &msg);
+};
+
+/**
  *  @brief An 32bit RGB/RGBA image class
  *
  *  This class substitutes QImage in Qt-less applications.
  *  It provides 32bit RGBA pixels with the format used by lay::Color.
  */
-
 class LAYBASIC_PUBLIC PixelBuffer
 {
 public:
@@ -181,6 +204,20 @@ public:
    *  PixelBuffer.
    */
   QImage to_image_copy () const;
+#endif
+
+#if defined(HAVE_PNG)
+  /**
+   *  @brief Creates a PixelBuffer object from a PNG file
+   *  Throws a PixelBufferReadError if an error occurs.
+   */
+  static PixelBuffer read_png (tl::InputStream &input);
+
+  /**
+   *  @brief Writes the PixelBuffer object to a PNG file
+   *  Throws a PixelBufferWriteError if an error occurs.
+   */
+  void write_png (tl::OutputStream &output);
 #endif
 
   /**
@@ -377,6 +414,20 @@ public:
    *  BitmapBuffer.
    */
   QImage to_image_copy () const;
+#endif
+
+#if defined(HAVE_PNG)
+  /**
+   *  @brief Creates a PixelBuffer object from a PNG file
+   *  Throws a PixelBufferReadError if an error occurs.
+   */
+  static BitmapBuffer read_png (tl::InputStream &input);
+
+  /**
+   *  @brief Writes the PixelBuffer object to a PNG file
+   *  Throws a PixelBufferWriteError if an error occurs.
+   */
+  void write_png (tl::OutputStream &output);
 #endif
 
 private:

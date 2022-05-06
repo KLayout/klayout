@@ -90,7 +90,7 @@ jobs:
       with:
         user: __token__
         # Test PyPI
-        password: ${{ secrets.test_pypi_password }}
-        repository_url: https://test.pypi.org/legacy/
+        # password: ${{ secrets.test_pypi_password }}
+        # repository_url: https://test.pypi.org/legacy/
         # Uncomment for Real Pypi
-        # password: ${{ secrets.pypi_password }}
+        password: ${{ secrets.pypi_password }}

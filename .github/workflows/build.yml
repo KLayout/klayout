@@ -79,7 +79,7 @@ jobs:
     needs: [build, make_sdist]
     runs-on: ubuntu-latest
     # Uncomment for real PyPi
-    # if: github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'release' && github.event.action == 'published'
     steps:
     - uses: actions/download-artifact@v2
       with:

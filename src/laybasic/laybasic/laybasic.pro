@@ -242,6 +242,7 @@ SOURCES += \
     gsiDeclLayLayoutView.cc \
     gsiDeclLayMarker.cc \
     gsiDeclLayPlugin.cc \
+    gsiDeclLayPixelBuffer.cc \
     layAnnotationShapes.cc \
     layBitmap.cc \
     layBitmapRenderer.cc \

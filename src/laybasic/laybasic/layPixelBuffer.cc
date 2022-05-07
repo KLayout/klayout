@@ -212,6 +212,10 @@ PixelBuffer::swap (PixelBuffer &other)
 void
 PixelBuffer::fill (lay::color_t c)
 {
+  if (! transparent ()) {
+    c |= 0xff000000;  //  ensures that alpha is properly set
+  }
+
   color_t *d = data ();
   for (unsigned int i = 0; i < m_height; ++i) {
     for (unsigned int j = 0; j < m_width; ++j) {
@@ -259,6 +263,17 @@ PixelBuffer::to_image_copy () const
   QImage img (m_width, m_height, m_transparent ? QImage::Format_ARGB32 : QImage::Format_RGB32);
   memcpy (img.bits (), data (), img.sizeInBytes ());
   return img;
+}
+
+PixelBuffer
+PixelBuffer::from_image (const QImage &img)
+{
+  if (img.format () != QImage::Format_ARGB32 && img.format () != QImage::Format_RGB32) {
+    QImage img_argb32 = img.convertToFormat (QImage::Format_ARGB32);
+    return PixelBuffer (img_argb32.width (), img_argb32.height (), (const lay::color_t *) img_argb32.bits ());
+  } else {
+    return PixelBuffer (img.width (), img.height (), (const lay::color_t *) img.bits ());
+  }
 }
 #endif
 
@@ -376,7 +391,7 @@ PixelBuffer::read_png (tl::InputStream &input)
 }
 
 void
-PixelBuffer::write_png (tl::OutputStream &output)
+PixelBuffer::write_png (tl::OutputStream &output) const
 {
   png_structp png_ptr = NULL;
   png_infop info_ptr = NULL;
@@ -559,6 +574,17 @@ BitmapBuffer::to_image_copy () const
   memcpy (img.bits (), data (), img.sizeInBytes ());
   return img;
 }
+
+BitmapBuffer
+BitmapBuffer::from_image (const QImage &img)
+{
+  if (img.format () != QImage::Format_MonoLSB) {
+    QImage img_monolsb = img.convertToFormat (QImage::Format_MonoLSB);
+    return BitmapBuffer (img_monolsb.width (), img_monolsb.height (), (const uint8_t *) img_monolsb.bits ());
+  } else {
+    return BitmapBuffer (img.width (), img.height (), (const uint8_t *) img.bits ());
+  }
+}
 #endif
 
 #if defined(HAVE_PNG)
@@ -610,7 +636,7 @@ BitmapBuffer::read_png (tl::InputStream &input)
 }
 
 void
-BitmapBuffer::write_png (tl::OutputStream &output)
+BitmapBuffer::write_png (tl::OutputStream &output) const
 {
   png_structp png_ptr = NULL;
   png_infop info_ptr = NULL;

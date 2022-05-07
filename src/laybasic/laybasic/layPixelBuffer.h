@@ -204,6 +204,11 @@ public:
    *  PixelBuffer.
    */
   QImage to_image_copy () const;
+
+  /**
+   *  @brief Creates a pixel buffer from a QImage object
+   */
+  static PixelBuffer from_image (const QImage &img);
 #endif
 
 #if defined(HAVE_PNG)
@@ -217,7 +222,7 @@ public:
    *  @brief Writes the PixelBuffer object to a PNG file
    *  Throws a PixelBufferWriteError if an error occurs.
    */
-  void write_png (tl::OutputStream &output);
+  void write_png (tl::OutputStream &output) const;
 #endif
 
   /**
@@ -414,6 +419,11 @@ public:
    *  BitmapBuffer.
    */
   QImage to_image_copy () const;
+
+  /**
+   *  @brief Creates a pixel buffer from a QImage object
+   */
+  static BitmapBuffer from_image (const QImage &img);
 #endif
 
 #if defined(HAVE_PNG)
@@ -427,7 +437,7 @@ public:
    *  @brief Writes the PixelBuffer object to a PNG file
    *  Throws a PixelBufferWriteError if an error occurs.
    */
-  void write_png (tl::OutputStream &output);
+  void write_png (tl::OutputStream &output) const;
 #endif
 
 private:

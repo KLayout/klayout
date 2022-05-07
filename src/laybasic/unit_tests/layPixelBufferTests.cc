@@ -153,33 +153,33 @@ TEST(1)
   EXPECT_EQ (compare_images (img, img2), false);
 
   EXPECT_EQ (img.scan_line (5)[10], 0x332211);
-  EXPECT_EQ (img2.scan_line (5)[8], 0x010203);
+  EXPECT_EQ (img2.scan_line (5)[8], 0xff010203);
 
   img = std::move (img2);
   EXPECT_EQ (compare_images (img, img2), false);
   EXPECT_EQ (img.width (), 10);
   EXPECT_EQ (img.height (), 16);
-  EXPECT_EQ (img.scan_line (5)[8], 0x010203);
+  EXPECT_EQ (img.scan_line (5)[8], 0xff010203);
 
   lay::PixelBuffer img3 (img);
   EXPECT_EQ (compare_images (img, img3), true);
   EXPECT_EQ (img3.width (), 10);
   EXPECT_EQ (img3.height (), 16);
-  EXPECT_EQ (img3.scan_line (5)[8], 0x010203);
+  EXPECT_EQ (img3.scan_line (5)[8], 0xff010203);
 
   img.fill (0x102030);
   EXPECT_EQ (compare_images (img, img3), false);
   EXPECT_EQ (img3.width (), 10);
   EXPECT_EQ (img3.height (), 16);
-  EXPECT_EQ (img3.scan_line (5)[8], 0x010203);
+  EXPECT_EQ (img3.scan_line (5)[8], 0xff010203);
   EXPECT_EQ (img.width (), 10);
   EXPECT_EQ (img.height (), 16);
-  EXPECT_EQ (img.scan_line (5)[8], 0x102030);
+  EXPECT_EQ (img.scan_line (5)[8], 0xff102030);
 
   lay::PixelBuffer img4 (std::move (img));
   EXPECT_EQ (img4.width (), 10);
   EXPECT_EQ (img4.height (), 16);
-  EXPECT_EQ (img4.scan_line (5)[8], 0x102030);
+  EXPECT_EQ (img4.scan_line (5)[8], 0xff102030);
 
   //  other constructors
   EXPECT_EQ (compare_images (lay::PixelBuffer (img4.width (), img4.height (), (const lay::color_t *) img4.data ()), img4), true);
@@ -214,6 +214,9 @@ TEST(2)
   tl::info << "PNG file read from " << au;
 
   EXPECT_EQ (compare_images (qimg, au), true);
+
+  lay::PixelBuffer img_returned = lay::PixelBuffer::from_image (qimg);
+  EXPECT_EQ (compare_images (img, img_returned), true);
 
   lay::PixelBuffer img_saved (img);
   img.scan_line (52) [42] = 0xff000000;
@@ -528,6 +531,9 @@ TEST(12)
   tl::info << "PNG file read from " << au;
 
   EXPECT_EQ (compare_images_mono (qimg, au), true);
+
+  lay::BitmapBuffer img_returned = lay::BitmapBuffer::from_image (qimg);
+  EXPECT_EQ (compare_images (img, img_returned), true);
 
   qimg = img.to_image_copy ();
   img.fill (false);

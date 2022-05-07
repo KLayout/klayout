@@ -1153,7 +1153,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "The image contains the current scene (layout, annotations etc.).\n"
     "The image is drawn synchronously with the given width and height. Drawing may take some time. "
   ) +
-  gsi::method_ext ("get_image_with_options", &get_image_with_options, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth"), gsi::arg ("oversampling"), gsi::arg ("resolution"), gsi::arg ("target"), gsi::arg ("monochrome"),
+  gsi::method_ext ("get_image_with_options", &get_image_with_options, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth", 0), gsi::arg ("oversampling", 0), gsi::arg ("resolution", 0.0), gsi::arg ("target", db::DBox (), "current"), gsi::arg ("monochrome", false),
     "@brief Gets the layout image as a \\QImage (with options)\n"
     "\n"
     "@param width The width of the image to render in pixel.\n"
@@ -1191,7 +1191,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been introduced in 0.28.\n"
   ) +
-  gsi::method_ext ("get_pixels_with_options", &get_pixels_with_options, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth"), gsi::arg ("oversampling"), gsi::arg ("resolution"), gsi::arg ("target"),
+  gsi::method_ext ("get_pixels_with_options", &get_pixels_with_options, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth", 0), gsi::arg ("oversampling", 0), gsi::arg ("resolution", 0.0), gsi::arg ("target", db::DBox (), "current"),
     "@brief Gets the layout image as a \\PixelBuffer (with options)\n"
     "\n"
     "@param width The width of the image to render in pixel.\n"
@@ -1206,7 +1206,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been introduced in 0.28.\n"
   ) +
-  gsi::method_ext ("get_pixels_with_options_mono", &get_pixels_with_options_mono, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth"), gsi::arg ("target"),
+  gsi::method_ext ("get_pixels_with_options_mono", &get_pixels_with_options_mono, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth", 0), gsi::arg ("target", db::DBox (), "current"),
     "@brief Gets the layout image as a \\PixelBuffer (with options)\n"
     "\n"
     "@param width The width of the image to render in pixel.\n"
@@ -1241,7 +1241,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "The image is written as a PNG file to the given file. "
     "The image is drawn synchronously with the given width and height. Drawing may take some time. "
   ) +
-  gsi::method_ext ("save_image_with_options", &save_image_with_options, gsi::arg ("filename"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth"), gsi::arg ("oversampling"), gsi::arg ("resolution"), gsi::arg ("target"), gsi::arg ("monochrome"),
+  gsi::method_ext ("save_image_with_options", &save_image_with_options, gsi::arg ("filename"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth", 0), gsi::arg ("oversampling", 0), gsi::arg ("resolution", 0.0), gsi::arg ("target", db::DBox (), "current"), gsi::arg ("monochrome", false),
     "@brief Saves the layout as an image to the given file (with options)\n"
     "\n"
     "@param filename The file to which to write the screenshot to.\n"

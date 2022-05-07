@@ -425,8 +425,32 @@ class LAYLayoutView_TestClass < TestBase
 
   def test_4
 
-    # standalone view image generation
+    # standalone image generation (see C++ tests)
     lv = RBA::LayoutView::new
+    lv.set_config("inst-color", "#000000")
+    lv.set_config("background-color", "#ffffff")
+    lv.load_layout(File.join($ut_testsrc, "testdata/gds/t10.gds"), true)
+
+    img = lv.get_pixels_with_options(500, 500, 1, 1, 1.0, RBA::DBox::new)
+    au = RBA::PixelBuffer.read_png(File.join($ut_testsrc, "testdata/lay/au_lv1.png"))
+    if au
+      assert_equal(au == img, true)
+    end
+
+    lv.set_config("full-hierarchy-new-cell", "true")
+    lv.load_layout(File.join($ut_testsrc, "testdata/gds/t10.gds"), false)
+
+    img = lv.get_pixels_with_options(500, 500, 1, 1, 1.0, RBA::DBox::new)
+    au = RBA::PixelBuffer.read_png(File.join($ut_testsrc, "testdata/lay/au_lv2.png"))
+    if au
+      assert_equal(au == img, true)
+    end
+
+    img = lv.get_pixels_with_options_mono(500, 500, 1, RBA::DBox::new)
+    au = RBA::BitmapBuffer.read_png(File.join($ut_testsrc, "testdata/lay/au_lv3.png"))
+    if au
+      assert_equal(au == img, true)
+    end
 
   end
 

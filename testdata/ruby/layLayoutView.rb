@@ -423,6 +423,13 @@ class LAYLayoutView_TestClass < TestBase
 
   end
 
+  def test_4
+
+    # standalone view image generation
+    lv = RBA::LayoutView::new
+
+  end
+
 end
 
 load("test_epilogue.rb")

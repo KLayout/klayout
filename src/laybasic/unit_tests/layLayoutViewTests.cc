@@ -71,39 +71,17 @@ static bool compare_images_mono (const QImage &qimg, const std::string &au)
 
 static bool compare_images (const lay::PixelBuffer &img, const lay::PixelBuffer &img2)
 {
-  if (img2.width () == img.width () && img2.height () == img.height ()) {
-    for (unsigned int j = 0; j < img.height (); ++j) {
-      for (unsigned int i = 0; i < img.width (); ++i) {
-        if (((const lay::color_t *) img.scan_line (j))[i] != ((const lay::color_t *) img2.scan_line (j))[i]) {
-          return false;
-        }
-      }
-    }
-    return true;
-  } else {
-    return false;
-  }
+  return img == img2;
 }
 
 static bool compare_images (const lay::BitmapBuffer &img, const lay::BitmapBuffer &img2)
 {
-  if (img2.width () == img.width () && img2.height () == img.height ()) {
-    for (unsigned int j = 0; j < img.height (); ++j) {
-      for (unsigned int i = 0; i < img.stride (); ++i) {
-        if (((const uint8_t *) img.scan_line (j))[i] != ((const uint8_t *) img2.scan_line (j))[i]) {
-          return false;
-        }
-      }
-    }
-    return true;
-  } else {
-    return false;
-  }
+  return img == img2;
 }
 
 #endif
 
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
 TEST(1)
 {
   lay::LayoutView lv (0, false, 0);
@@ -169,5 +147,92 @@ TEST(3)
   tl::info << "PNG file read from " << au;
 
   EXPECT_EQ (compare_images_mono (qimg.convertToFormat (QImage::Format_Mono), au), true);
+}
+#endif
+
+#if defined(HAVE_PNG)
+TEST(11)
+{
+  lay::LayoutView lv (0, false, 0);
+  lv.cell_box_color (lay::Color (0, 0, 0));
+
+  lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
+
+  lay::PixelBuffer img;
+  img = lv.get_pixels_with_options (500, 500, 1, 1, 1.0, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox ());
+
+  std::string tmp = tmp_file ("test.png");
+  {
+    tl::OutputStream stream (tmp);
+    img.write_png (stream);
+  }
+  tl::info << "PNG file written to " << tmp;
+
+  std::string au = tl::testsrc () + "/testdata/lay/au_lv1.png";
+  lay::PixelBuffer au_img;
+  {
+    tl::InputStream stream (au);
+    au_img = lay::PixelBuffer::read_png (stream);
+  }
+  tl::info << "PNG file read from " << au;
+
+  EXPECT_EQ (compare_images (img, au_img), true);
+}
+
+TEST(12)
+{
+  lay::LayoutView lv (0, false, 0);
+  lv.full_hier_new_cell (true);
+
+  lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
+
+  lay::PixelBuffer img;
+  img = lv.get_pixels_with_options (500, 500, 1, 1, 1.0, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox ());
+
+  std::string tmp = tmp_file ("test.png");
+  {
+    tl::OutputStream stream (tmp);
+    img.write_png (stream);
+  }
+  tl::info << "PNG file written to " << tmp;
+
+  std::string au = tl::testsrc () + "/testdata/lay/au_lv2.png";
+  lay::PixelBuffer au_img;
+  {
+    tl::InputStream stream (au);
+    au_img = lay::PixelBuffer::read_png (stream);
+  }
+  tl::info << "PNG file read from " << au;
+
+  EXPECT_EQ (compare_images (img, au_img), true);
+}
+
+//  monochrome
+TEST(13)
+{
+  lay::LayoutView lv (0, false, 0);
+  lv.full_hier_new_cell (true);
+
+  lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
+
+  lay::BitmapBuffer img;
+  img = lv.get_pixels_with_options_mono (500, 500, 1, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox ());
+
+  std::string tmp = tmp_file ("test.png");
+  {
+    tl::OutputStream stream (tmp);
+    img.write_png (stream);
+  }
+  tl::info << "PNG file written to " << tmp;
+
+  std::string au = tl::testsrc () + "/testdata/lay/au_lv3.png";
+  lay::BitmapBuffer au_img;
+  {
+    tl::InputStream stream (au);
+    au_img = lay::BitmapBuffer::read_png (stream);
+  }
+  tl::info << "PNG file read from " << au;
+
+  EXPECT_EQ (compare_images (img, au_img), true);
 }
 #endif

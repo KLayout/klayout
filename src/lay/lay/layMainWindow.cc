@@ -2876,7 +2876,9 @@ MainWindow::close_view (int index)
 
       view_closed_event (int (index));
 
-      delete view (index);
+      //  delete the view later as it may still be needed by event handlers or similar
+      std::unique_ptr<lay::LayoutView> old_view (view (index));
+
       mp_views.erase (mp_views.begin () + index, mp_views.begin () + index + 1);
 
       if (index >= int (mp_views.size ())) {

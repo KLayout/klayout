@@ -220,15 +220,8 @@ private:
  *  cannot be changed. 
  */
 class LAYBASIC_PUBLIC LineStyles :
-#if defined(HAVE_QT)
-    public QObject,
-#endif
     public db::Object
 {
-#if defined(HAVE_QT)
-Q_OBJECT
-#endif
-
 public:
   typedef std::vector<LineStyleInfo> pattern_vector;
   typedef pattern_vector::const_iterator iterator;
@@ -360,14 +353,6 @@ public:
    *  @brief Accessor to the default style (solid)
    */
   static const LineStyles &default_style ();
-
-#if defined(HAVE_QT)
-signals:
-  /**
-   *  @brief This signal is emitted if a style is changed 
-   */
-  void changed ();
-#endif
 
 private:
   std::vector<LineStyleInfo> m_styles;

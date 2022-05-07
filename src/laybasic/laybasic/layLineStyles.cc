@@ -163,7 +163,7 @@ LineStyleInfo::is_bit_set (unsigned int n) const
   return (pattern () [(n / 32) % pattern_stride ()] & (1 << (n % 32))) != 0;
 }
 
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
 QBitmap
 LineStyleInfo::get_bitmap (int width, int height) const
 {
@@ -355,9 +355,6 @@ struct ReplaceLineStyleOp
 };
 
 LineStyles::LineStyles () :
-#if defined(HAVE_QT)
-    QObject (),
-#endif
     db::Object (0)
 {
   for (unsigned int d = 0; d < sizeof (style_strings) / sizeof (style_strings [0]); d += 2) {
@@ -368,9 +365,6 @@ LineStyles::LineStyles () :
 }
 
 LineStyles::LineStyles (const LineStyles &p) :
-#if defined(HAVE_QT)
-  QObject (),
-#endif
   db::Object (0)
 {
   m_styles = p.m_styles;
@@ -423,13 +417,6 @@ LineStyles::replace_style (unsigned int i, const LineStyleInfo &p)
     }
     m_styles [i] = p;
     chg = true;
-  }
-
-  //  if something has changed emit the signal
-  if (chg) {
-#if defined(HAVE_QT) // @@@
-    emit changed ();
-#endif
   }
 }
 

@@ -357,29 +357,27 @@ LayoutCanvas::~LayoutCanvas ()
 void
 LayoutCanvas::key_event (unsigned int key, unsigned int buttons)
 {
-#if defined(HAVE_QT) // @@@
   if (! (buttons & lay::ShiftButton)) {
     if (int (key) == lay::KeyDown) {
-      emit down_arrow_key_pressed ();
+      down_arrow_key_pressed ();
     } else if (int (key) == lay::KeyUp) {
-      emit up_arrow_key_pressed ();
+      up_arrow_key_pressed ();
     } else if (int (key) == lay::KeyLeft) {
-      emit left_arrow_key_pressed ();
+      left_arrow_key_pressed ();
     } else if (int (key) == lay::KeyRight) {
-      emit right_arrow_key_pressed ();
+      right_arrow_key_pressed ();
     }
   } else {
     if (int (key) == lay::KeyDown) {
-      emit down_arrow_key_pressed_with_shift ();
+      down_arrow_key_pressed_with_shift ();
     } else if (int (key) == lay::KeyUp) {
-      emit up_arrow_key_pressed_with_shift ();
+      up_arrow_key_pressed_with_shift ();
     } else if (int (key) == lay::KeyLeft) {
-      emit left_arrow_key_pressed_with_shift ();
+      left_arrow_key_pressed_with_shift ();
     } else if (int (key) == lay::KeyRight) {
-      emit right_arrow_key_pressed_with_shift ();
+      right_arrow_key_pressed_with_shift ();
     }
   }
-#endif
 }
 
 void

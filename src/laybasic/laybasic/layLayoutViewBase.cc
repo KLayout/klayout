@@ -64,6 +64,9 @@
 #  include <QImageWriter>
 #endif
 
+// Enable this if you have both Qt and libpng and want to use libpng for saving images:
+//  #define PREFER_LIBPNG_FOR_SAVE 1
+
 #include <limits>
 
 namespace lay
@@ -2512,7 +2515,7 @@ png_texts (const lay::LayoutViewBase *view, const db::DBox &box)
   return texts;
 }
 
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) && !defined(PREFER_LIBPNG_FOR_SAVE)
 void
 LayoutViewBase::save_screenshot (const std::string &fn)
 {
@@ -2544,9 +2547,9 @@ LayoutViewBase::save_screenshot (const std::string &fn)
   tl::DeferredMethodScheduler::execute ();
 
   tl::OutputStream stream (fn);
-  // @@@ TODO: add texts
-  // @@@ mp_canvas->screenshot ().write_png (stream, png_texts (this, box ()));
-  mp_canvas->screenshot ().write_png (stream);
+  lay::PixelBuffer img = mp_canvas->screenshot ();
+  img.set_texts (png_texts (this, box ()));
+  img.write_png (stream);
 
   tl::log << "Saved screen shot to " << fn;
 }
@@ -2596,7 +2599,7 @@ LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height,
 
 lay::PixelBuffer
 LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
-                                           lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box)
+                                         lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Get image")));
 
@@ -2608,7 +2611,7 @@ LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height
 
 lay::BitmapBuffer
 LayoutViewBase::get_pixels_with_options_mono (unsigned int width, unsigned int height, int linewidth,
-                                             lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box)
+                                              lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Get image")));
 
@@ -2618,7 +2621,7 @@ LayoutViewBase::get_pixels_with_options_mono (unsigned int width, unsigned int h
   return mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box);
 }
 
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) && !defined(PREFER_LIBPNG_FOR_SAVE)
 void
 LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned int height)
 {
@@ -2648,19 +2651,21 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
 
   lay::Viewport vp (width, height, mp_canvas->viewport ().target_box ());
-  std::vector<std::pair<std::string, std::string> > texts = png_texts (this, vp.box ());
 
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
 
   tl::OutputStream stream (fn);
-  mp_canvas->image (width, height).write_png (stream);
+  lay::PixelBuffer img = mp_canvas->image (width, height);
+  std::vector<std::pair<std::string, std::string> > texts = png_texts (this, vp.box ());
+  img.set_texts (texts);
+  img.write_png (stream);
 
   tl::log << "Saved image to " << fn;
 }
 #endif
 
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) && !defined(PREFER_LIBPNG_FOR_SAVE)
 void
 LayoutViewBase::save_image_with_options (const std::string &fn,
                                          unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
@@ -2680,7 +2685,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
   tl::DeferredMethodScheduler::execute ();
 
   if (monochrome) {
-    if (! writer.write (mp_canvas->image_with_options_mono (width, height, linewidth, background.to_mono (), foreground.to_mono (), active.to_mono (), target_box).to_image ())) {
+    if (! writer.write (mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box).to_image ())) {
       throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
     }
   } else {
@@ -2707,9 +2712,17 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
 
   tl::OutputStream stream (fn);
   if (monochrome) {
-    mp_canvas->image_with_options_mono (width, height, linewidth, background.to_mono (), foreground.to_mono (), active.to_mono (), target_box).write_png (stream);
+
+    lay::BitmapBuffer img = mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box);
+    img.set_texts (texts);
+    img.write_png (stream);
+
   } else {
-    mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box).write_png (stream);
+
+    lay::PixelBuffer img = mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box);
+    img.set_texts (texts);
+    img.write_png (stream);
+
   }
 
   tl::log << "Saved image to " << fn;

@@ -258,6 +258,26 @@ public:
    */
   PixelBuffer diff (const PixelBuffer &other) const;
 
+  /**
+   *  @brief Gets the texts
+   *
+   *  Texts are annotations which can be stored to PNG and back.
+   */
+  const std::vector<std::pair<std::string, std::string> > &texts () const
+  {
+    return m_texts;
+  }
+
+  /**
+   *  @brief Sets the texts
+   *
+   *  Texts are annotations which can be stored to PNG and back.
+   */
+  void set_texts (const std::vector<std::pair<std::string, std::string> > &texts)
+  {
+    m_texts = texts;
+  }
+
 private:
   class ImageData
   {
@@ -301,6 +321,7 @@ private:
   unsigned int m_width, m_height;
   bool m_transparent;
   tl::copy_on_write_ptr<ImageData> m_data;
+  std::vector<std::pair<std::string, std::string> > m_texts;
 };
 
 /**
@@ -466,6 +487,26 @@ public:
   void write_png (tl::OutputStream &output) const;
 #endif
 
+  /**
+   *  @brief Gets the texts
+   *
+   *  Texts are annotations which can be stored to PNG and back.
+   */
+  const std::vector<std::pair<std::string, std::string> > &texts () const
+  {
+    return m_texts;
+  }
+
+  /**
+   *  @brief Sets the texts
+   *
+   *  Texts are annotations which can be stored to PNG and back.
+   */
+  void set_texts (const std::vector<std::pair<std::string, std::string> > &texts)
+  {
+    m_texts = texts;
+  }
+
 private:
   class MonoImageData
   {
@@ -509,6 +550,7 @@ private:
   unsigned int m_width, m_height;
   unsigned int m_stride;
   tl::copy_on_write_ptr<MonoImageData> m_data;
+  std::vector<std::pair<std::string, std::string> > m_texts;
 };
 
 }

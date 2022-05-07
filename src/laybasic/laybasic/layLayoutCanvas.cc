@@ -566,7 +566,7 @@ LayoutCanvas::update_image ()
 void
 LayoutCanvas::free_resources ()
 {
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
   if (mp_pixmap) {
     delete mp_pixmap;
     mp_pixmap = 0;
@@ -574,7 +574,7 @@ LayoutCanvas::free_resources ()
 #endif
 }
 
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
 void
 LayoutCanvas::paintEvent (QPaintEvent *)
 {
@@ -1006,7 +1006,7 @@ LayoutCanvas::screenshot ()
   return img;
 }
 
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) // @@@
 void 
 LayoutCanvas::resizeEvent (QResizeEvent *)
 {
@@ -1090,7 +1090,7 @@ LayoutCanvas::do_update_image ()
   update_image ();
 }
 
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
 bool
 LayoutCanvas::event (QEvent *e) 
 {

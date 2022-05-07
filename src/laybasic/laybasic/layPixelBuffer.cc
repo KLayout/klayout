@@ -202,6 +202,7 @@ PixelBuffer::operator= (const PixelBuffer &other)
     m_height = other.m_height;
     m_data = other.m_data;
     m_transparent = other.m_transparent;
+    m_texts = other.m_texts;
   }
   return *this;
 }
@@ -232,6 +233,7 @@ PixelBuffer::swap (PixelBuffer &other)
   std::swap (m_height, other.m_height);
   std::swap (m_transparent, other.m_transparent);
   m_data.swap (other.m_data);
+  m_texts.swap (other.m_texts);
 }
 
 void
@@ -435,6 +437,15 @@ PixelBuffer::write_png (tl::OutputStream &output) const
 
   png_set_IHDR (png_ptr, info_ptr, width (), height (), bd, fmt, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
+  std::vector<png_text> tptrs;
+  for (auto i = m_texts.begin (); i != m_texts.end (); ++i) {
+    tptrs.push_back (png_text ());
+    tptrs.back ().compression = PNG_TEXT_COMPRESSION_NONE;
+    tptrs.back ().key = const_cast<char *> (i->first.c_str ());
+    tptrs.back ().text = const_cast<char *> (i->second.c_str ());
+  }
+  png_set_text (png_ptr, info_ptr, tptrs.begin ().operator-> (), m_texts.size ());
+
   png_write_info (png_ptr, info_ptr);
 
   for (unsigned int i = 0; i < height (); ++i) {
@@ -546,6 +557,7 @@ BitmapBuffer::operator= (const BitmapBuffer &other)
     m_height = other.m_height;
     m_stride = other.m_stride;
     m_data = other.m_data;
+    m_texts = other.m_texts;
   }
   return *this;
 }
@@ -570,6 +582,7 @@ BitmapBuffer::swap (BitmapBuffer &other)
   std::swap (m_height, other.m_height);
   std::swap (m_stride, other.m_stride);
   m_data.swap (other.m_data);
+  m_texts.swap (other.m_texts);
 }
 
 void
@@ -707,6 +720,15 @@ BitmapBuffer::write_png (tl::OutputStream &output) const
   unsigned int fmt = PNG_COLOR_TYPE_GRAY;
 
   png_set_IHDR (png_ptr, info_ptr, width (), height (), bd, fmt, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+  std::vector<png_text> tptrs;
+  for (auto i = m_texts.begin (); i != m_texts.end (); ++i) {
+    tptrs.push_back (png_text ());
+    tptrs.back ().compression = PNG_TEXT_COMPRESSION_NONE;
+    tptrs.back ().key = const_cast<char *> (i->first.c_str ());
+    tptrs.back ().text = const_cast<char *> (i->second.c_str ());
+  }
+  png_set_text (png_ptr, info_ptr, tptrs.begin ().operator-> (), m_texts.size ());
 
   png_write_info (png_ptr, info_ptr);
 

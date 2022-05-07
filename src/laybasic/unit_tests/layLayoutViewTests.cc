@@ -236,3 +236,90 @@ TEST(13)
   EXPECT_EQ (compare_images (img, au_img), true);
 }
 #endif
+
+#if defined(HAVE_PNG) || defined(HAVE_QT)
+TEST(21)
+{
+  lay::LayoutView lv (0, false, 0);
+  lv.cell_box_color (lay::Color (0, 0, 0));
+
+  lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
+
+  std::string tmp = tmp_file ("test.png");
+  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox (), false);
+
+  lay::PixelBuffer img;
+  {
+    tl::InputStream stream (tmp);
+    img = lay::PixelBuffer::read_png (stream);
+  }
+  tl::info << "PNG file read from " << tmp;
+
+  std::string au = tl::testsrc () + "/testdata/lay/au_lv1.png";
+  lay::PixelBuffer au_img;
+  {
+    tl::InputStream stream (au);
+    au_img = lay::PixelBuffer::read_png (stream);
+  }
+  tl::info << "PNG file read from " << au;
+
+  EXPECT_EQ (compare_images (img, au_img), true);
+}
+
+TEST(22)
+{
+  lay::LayoutView lv (0, false, 0);
+  lv.full_hier_new_cell (true);
+
+  lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
+
+  std::string tmp = tmp_file ("test.png");
+  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox (), false);
+
+  lay::PixelBuffer img;
+  {
+    tl::InputStream stream (tmp);
+    img = lay::PixelBuffer::read_png (stream);
+  }
+  tl::info << "PNG file read from " << tmp;
+
+  std::string au = tl::testsrc () + "/testdata/lay/au_lv2.png";
+  lay::PixelBuffer au_img;
+  {
+    tl::InputStream stream (au);
+    au_img = lay::PixelBuffer::read_png (stream);
+  }
+  tl::info << "PNG file read from " << au;
+
+  EXPECT_EQ (compare_images (img, au_img), true);
+}
+
+//  monochrome
+TEST(23)
+{
+  lay::LayoutView lv (0, false, 0);
+  lv.full_hier_new_cell (true);
+
+  lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
+
+  std::string tmp = tmp_file ("test.png");
+  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox (), true);
+
+  lay::BitmapBuffer img;
+  {
+    tl::InputStream stream (tmp);
+    img = lay::BitmapBuffer::read_png (stream);
+  }
+  tl::info << "PNG file read from " << tmp;
+
+  std::string au = tl::testsrc () + "/testdata/lay/au_lv3.png";
+  lay::BitmapBuffer au_img;
+  {
+    tl::InputStream stream (au);
+    au_img = lay::BitmapBuffer::read_png (stream);
+  }
+  tl::info << "PNG file read from " << au;
+
+  EXPECT_EQ (compare_images (img, au_img), true);
+}
+#endif

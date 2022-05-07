@@ -576,6 +576,7 @@ BitmapBuffer::read_png (tl::InputStream &input)
   tl_assert (info_ptr != NULL);
 
   png_set_read_fn (png_ptr, (void *) &input, &read_from_stream_f);
+  png_set_packswap (png_ptr); // compatible with BitmapBuffer
 
   png_read_png (png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
 
@@ -584,7 +585,9 @@ BitmapBuffer::read_png (tl::InputStream &input)
   unsigned int fmt = png_get_color_type (png_ptr, info_ptr);
   unsigned int bd = png_get_bit_depth (png_ptr, info_ptr);
 
-  if (fmt == PNG_COLOR_TYPE_GRAY && bd == 1) {
+  if ((fmt == PNG_COLOR_TYPE_GRAY || fmt == PNG_COLOR_TYPE_PALETTE) && bd == 1) {
+
+    //  TODO: evaluate palette?
 
     size_t rb = png_get_rowbytes (png_ptr, info_ptr);
     tl_assert (rb == (res.width () + 7) / 8);
@@ -619,6 +622,7 @@ BitmapBuffer::write_png (tl::OutputStream &output)
   tl_assert (info_ptr != NULL);
 
   png_set_write_fn (png_ptr, (void *) &output, &write_to_stream_f, &flush_stream_f);
+  png_set_packswap (png_ptr); // compatible with BitmapBuffer
 
   unsigned int bd = 1;  // bit depth
   unsigned int fmt = PNG_COLOR_TYPE_GRAY;

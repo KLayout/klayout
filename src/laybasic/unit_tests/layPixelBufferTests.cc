@@ -53,12 +53,13 @@ static bool compare_images_mono (const QImage &qimg, const std::string &au)
 {
   QImage qimg2;
   qimg2.load (tl::to_qstring (au));
+  qimg2 = qimg2.convertToFormat (QImage::Format_MonoLSB); // that's the format of BitmapBuffer ..
 
   if (qimg2.width () == (int) qimg.width () && qimg2.height () == (int) qimg.height ()) {
     //  NOTE: slooooow ...
     for (int j = 0; j < qimg.height (); ++j) {
       for (int i = 0; i < qimg.width (); ++i) {
-        if ((qimg.scanLine (j)[i / 8] & (0x80 >> (i % 8))) != (qimg2.scanLine (j)[i / 8] & (0x80 >> (i % 8)))) {
+        if ((qimg.scanLine (j)[i / 8] & (0x01 << (i % 8))) != (qimg2.scanLine (j)[i / 8] & (0x01 << (i % 8)))) {
           return false;
         }
       }
@@ -90,9 +91,10 @@ static bool compare_images (const lay::PixelBuffer &img, const lay::PixelBuffer 
 static bool compare_images (const lay::BitmapBuffer &img, const lay::BitmapBuffer &img2)
 {
   if (img2.width () == img.width () && img2.height () == img.height ()) {
+    //  NOTE: slooooow ...
     for (unsigned int j = 0; j < img.height (); ++j) {
-      for (unsigned int i = 0; i < img.stride (); ++i) {
-        if (((const uint8_t *) img.scan_line (j))[i] != ((const uint8_t *) img2.scan_line (j))[i]) {
+      for (unsigned int i = 0; i < img.width (); ++i) {
+        if ((img.scan_line (j)[i / 8] & (0x01 << (i % 8))) != (img2.scan_line (j)[i / 8] & (0x01 << (i % 8)))) {
           return false;
         }
       }
@@ -253,7 +255,7 @@ TEST(2)
 #if defined(HAVE_PNG)
 
 //  libpng support
-TEST(2b)
+TEST(3)
 {
   lay::PixelBuffer img;
 
@@ -279,14 +281,14 @@ TEST(2b)
     img2 = lay::PixelBuffer::read_png (stream);
   }
 
-  EXPECT_EQ (compare_images (img, img2), true);
-
   std::string tmp2 = tmp_file ("test2.png");
   {
     tl::OutputStream stream (tmp2);
     img2.write_png (stream);
   }
   tl::info << "PNG file written to " << tmp2;
+
+  EXPECT_EQ (compare_images (img, img2), true);
 
 #if defined (HAVE_QT)
   //  Qt cross-check
@@ -295,7 +297,7 @@ TEST(2b)
 #endif
 }
 
-TEST(2c)
+TEST(4)
 {
   lay::PixelBuffer img;
 
@@ -321,14 +323,14 @@ TEST(2c)
     img2 = lay::PixelBuffer::read_png (stream);
   }
 
-  EXPECT_EQ (compare_images (img, img2), true);
-
   std::string tmp2 = tmp_file ("test2.png");
   {
     tl::OutputStream stream (tmp2);
     img2.write_png (stream);
   }
   tl::info << "PNG file written to " << tmp2;
+
+  EXPECT_EQ (compare_images (img, img2), true);
 
 #if defined (HAVE_QT)
   //  Qt cross-check
@@ -339,7 +341,7 @@ TEST(2c)
 
 #endif
 
-TEST(3)
+TEST(5)
 {
   {
     tl::SelfTimer timer ("Run time - lay::Image copy, no write (should be very fast)");
@@ -525,7 +527,7 @@ TEST(12)
   std::string au = tl::testsrc () + "/testdata/lay/au_mono.png";
   tl::info << "PNG file read from " << au;
 
-  EXPECT_EQ (compare_images_mono (qimg.convertToFormat (QImage::Format_Mono), au), true);
+  EXPECT_EQ (compare_images_mono (qimg, au), true);
 
   qimg = img.to_image_copy ();
   img.fill (false);
@@ -534,7 +536,7 @@ TEST(12)
   qimg.save (tl::to_qstring (tmp));
   tl::info << "PNG file written to " << tmp;
 
-  EXPECT_EQ (compare_images_mono (qimg.convertToFormat (QImage::Format_Mono), au), true);
+  EXPECT_EQ (compare_images_mono (qimg, au), true);
 }
 
 #endif
@@ -542,7 +544,7 @@ TEST(12)
 #if defined(HAVE_PNG)
 
 //  libpng support
-TEST(12b)
+TEST(13)
 {
   lay::BitmapBuffer img;
 
@@ -568,8 +570,6 @@ TEST(12b)
     img2 = lay::BitmapBuffer::read_png (stream);
   }
 
-  EXPECT_EQ (compare_images (img, img2), true);
-
   std::string tmp2 = tmp_file ("test2.png");
   {
     tl::OutputStream stream (tmp2);
@@ -577,10 +577,12 @@ TEST(12b)
   }
   tl::info << "PNG file written to " << tmp2;
 
+  EXPECT_EQ (compare_images (img, img2), true);
+
 #if defined (HAVE_QT)
   //  Qt cross-check
   std::string au = tl::testsrc () + "/testdata/lay/au_mono.png";
-  EXPECT_EQ (compare_images (img2.to_image ().convertToFormat (QImage::Format_Mono), au), true);
+  EXPECT_EQ (compare_images_mono (img2.to_image (), au), true);
 #endif
 }
 

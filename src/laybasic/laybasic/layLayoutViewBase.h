@@ -798,16 +798,22 @@ public:
    */
   void load_layer_props (const std::string &fn, int cv_index, bool add_default);
 
-#if defined(HAVE_QT) // @@@
   /**
    *  @brief Save the screen content to a file
    */
   void save_screenshot (const std::string &fn);
 
+#if defined(HAVE_QT)
   /**
    *  @brief Get the screen content as a QImage object
    */
   QImage get_screenshot ();
+#endif
+
+  /**
+   *  @brief Gets the screen content as a lay::PixelBuffer object
+   */
+  lay::PixelBuffer get_screenshot_pb ();
 
   /**
    *  @brief Save an image file with the given width and height
@@ -831,11 +837,19 @@ public:
    */
   void save_image_with_options (const std::string &fn, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, Color background, Color foreground, Color active_color, const db::DBox &target_box, bool monochrome);
 
+#if defined(HAVE_QT)
   /**
    *  @brief Get the screen content as a QImage object with the given width and height
    */
   QImage get_image (unsigned int width, unsigned int height);
+#endif
 
+  /**
+   *  @brief Gets the screen content as a lay::PixelBuffer object
+   */
+  lay::PixelBuffer get_pixels (unsigned int width, unsigned int height);
+
+#if defined(HAVE_QT)
   /**
    *  @brief Get the screen content as a QImage object with the given width and height
    *
@@ -852,6 +866,38 @@ public:
    */
   QImage get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, lay::Color background, lay::Color foreground, lay::Color active_color, const db::DBox &target_box, bool monochrome);
 #endif
+
+  /**
+   *  @brief Get the screen content as a lay::PixelBuffer object with the given width and height
+   *
+   *  @param width The width of the image in pixels
+   *  @param height The height of the image
+   *  @param linewidth The width of a line in pixels (usually 1) or 0 for default
+   *  @param oversampling The oversampling factor (1..3) or 0 for default
+   *  @param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default
+   *  @param background The background color or lay::Color() for default
+   *  @param foreground The foreground color or lay::Color() for default
+   *  @param active The active color or lay::Color() for default
+   *  @param target_box The box to draw or db::DBox() for default
+   */
+  lay::PixelBuffer get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, lay::Color background, lay::Color foreground, lay::Color active_color, const db::DBox &target_box);
+
+  /**
+   *  @brief Get the screen content as a monochrome lay::BitmapBuffer object with the given options
+   *
+   *  @param width The width of the image in pixels
+   *  @param height The height of the image
+   *  @param linewidth The width of a line in pixels (usually 1) or 0 for default
+   *  @param oversampling The oversampling factor (1..3) or 0 for default
+   *  @param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default
+   *  @param background The background color or lay::Color() for default
+   *  @param foreground The foreground color or lay::Color() for default
+   *  @param active The active color or lay::Color() for default
+   *  @param target_box The box to draw or db::DBox() for default
+   *
+   *  The colors will are converted to "on" pixels with a green channel value >= 50%.
+   */
+  lay::BitmapBuffer get_pixels_with_options_mono (unsigned int width, unsigned int height, int linewidth, lay::Color background, lay::Color foreground, lay::Color active_color, const db::DBox &target_box);
 
   /**
    *  @brief Hierarchy level selection setter

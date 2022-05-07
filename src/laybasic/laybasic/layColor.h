@@ -143,6 +143,14 @@ public:
   }
 
   /**
+   *  @brief Converts the color into monochrome "on" value
+   */
+  bool to_mono () const
+  {
+    return (m_color & 0x8000) != 0;
+  }
+
+  /**
    *  @brief Gets the HSV color components
    *  hue: 0..359
    *  saturation: 0..255

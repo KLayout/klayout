@@ -173,7 +173,7 @@ public:
   lay::PixelBuffer screenshot ();
   lay::PixelBuffer image (unsigned int width, unsigned int height);
   lay::PixelBuffer image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, lay::Color background, lay::Color foreground, lay::Color active_color, const db::DBox &target_box);
-  lay::BitmapBuffer image_with_options_mono (unsigned int width, unsigned int height, int linewidth, bool background, bool foreground, bool active_color, const db::DBox &target_box);
+  lay::BitmapBuffer image_with_options_mono (unsigned int width, unsigned int height, int linewidth, lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box);
 
   void update_image ();
 

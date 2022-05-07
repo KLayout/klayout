@@ -1640,7 +1640,7 @@ NetTracerDialog::update_highlights ()
             mp_markers.back ()->set_line_width (original->width (true));
             mp_markers.back ()->set_vertex_size (1);
             mp_markers.back ()->set_dither_pattern (original->dither_pattern (true));
-            if (view ()->background_color ().green () < 128) {
+            if (! view ()->background_color ().to_mono ()) {
               mp_markers.back ()->set_color (original->eff_fill_color_brighter (true, (m_marker_intensity * 255) / 100));
               mp_markers.back ()->set_frame_color (original->eff_frame_color_brighter (true, (m_marker_intensity * 255) / 100));
             } else {

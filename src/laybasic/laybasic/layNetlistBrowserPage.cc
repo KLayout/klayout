@@ -1099,7 +1099,7 @@ lay::Color
 NetlistBrowserPage::make_valid_color (const lay::Color &color)
 {
   if (! color.is_valid () && mp_view) {
-    return mp_view->background_color ().green () < 128 ? lay::Color (255, 255, 255) : lay::Color (0, 0, 0);
+    return mp_view->background_color ().to_mono () ? lay::Color (0, 0, 0) : lay::Color (255, 255, 255);
   } else {
     return color;
   }

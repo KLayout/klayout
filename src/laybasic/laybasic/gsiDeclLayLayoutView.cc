@@ -327,18 +327,26 @@ static void save_as2 (lay::LayoutView *view, unsigned int index, const std::stri
   view->save_as (index, filename, tl::OutputStream::OM_Auto, options, true, 0);
 }
 
-#if defined(HAVE_QTBINDINGS) // @@@
+#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
 static QImage get_image_with_options (lay::LayoutView *view, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box, bool monochrome)
 {
   return view->get_image_with_options (width, height, linewidth, oversampling, resolution, lay::Color (), lay::Color (), lay::Color (), target_box, monochrome);
 }
 #endif
 
+static lay::PixelBuffer get_pixels_with_options (lay::LayoutView *view, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box)
+{
+  return view->get_pixels_with_options (width, height, linewidth, oversampling, resolution, lay::Color (), lay::Color (), lay::Color (), target_box);
+}
+
+static lay::BitmapBuffer get_pixels_with_options_mono (lay::LayoutView *view, unsigned int width, unsigned int height, int linewidth, const db::DBox &target_box)
+{
+  return view->get_pixels_with_options_mono (width, height, linewidth, lay::Color (), lay::Color (), lay::Color (), target_box);
+}
+
 static void save_image_with_options (lay::LayoutView *view, const std::string &fn, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box, bool monochrome)
 {
-#if defined(HAVE_QT) // @@@
   view->save_image_with_options (fn, width, height, linewidth, oversampling, resolution, lay::Color (), lay::Color (), lay::Color (), target_box, monochrome);
-#endif
 }
 
 static std::vector<std::string> 
@@ -1128,7 +1136,7 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "Show the layout in full depth down to the deepest level of hierarchy. "
     "This method may cause a redraw."
   ) +
-#if defined(HAVE_QTBINDINGS)
+#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
   gsi::method ("get_screenshot", &lay::LayoutView::get_screenshot,
     "@brief Gets a screenshot as a \\QImage\n"
     "\n"
@@ -1157,11 +1165,60 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@param monochrome If true, monochrome images will be produced.\n"
     "\n"
     "The image contains the current scene (layout, annotations etc.).\n"
-    "The image is written as a PNG file to the given file. "
     "The image is drawn synchronously with the given width and height. Drawing may take some time. "
     "Monochrome images don't have background or annotation objects currently.\n"
     "\n"
     "This method has been introduced in 0.23.10.\n"
+  ) +
+#endif
+  gsi::method ("get_screenshot_pixels", &lay::LayoutView::get_screenshot_pb,
+    "@brief Gets a screenshot as a \\PixelBuffer\n"
+    "\n"
+    "Getting the image requires the drawing to be complete. Ideally, synchronous mode is switched on "
+    "for the application to guarantee this condition. The image will have the size of the viewport "
+    "showing the current layout."
+    "\n"
+    "This method has been introduced in 0.28.\n"
+  ) +
+  gsi::method ("get_pixels", &lay::LayoutView::get_pixels, gsi::arg ("width"), gsi::arg ("height"),
+    "@brief Gets the layout image as a \\PixelBuffer\n"
+    "\n"
+    "@param width The width of the image to render in pixel.\n"
+    "@param height The height of the image to render in pixel.\n"
+    "\n"
+    "The image contains the current scene (layout, annotations etc.).\n"
+    "The image is drawn synchronously with the given width and height. Drawing may take some time. "
+    "\n"
+    "This method has been introduced in 0.28.\n"
+  ) +
+  gsi::method_ext ("get_pixels_with_options", &get_pixels_with_options, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth"), gsi::arg ("oversampling"), gsi::arg ("resolution"), gsi::arg ("target"),
+    "@brief Gets the layout image as a \\PixelBuffer (with options)\n"
+    "\n"
+    "@param width The width of the image to render in pixel.\n"
+    "@param height The height of the image to render in pixel.\n"
+    "@param linewidth The width of a line in pixels (usually 1) or 0 for default.\n"
+    "@param oversampling The oversampling factor (1..3) or 0 for default.\n"
+    "@param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default.\n"
+    "@param target_box The box to draw or an empty box for default.\n"
+    "\n"
+    "The image contains the current scene (layout, annotations etc.).\n"
+    "The image is drawn synchronously with the given width and height. Drawing may take some time. "
+    "\n"
+    "This method has been introduced in 0.28.\n"
+  ) +
+  gsi::method_ext ("get_pixels_with_options_mono", &get_pixels_with_options_mono, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth"), gsi::arg ("target"),
+    "@brief Gets the layout image as a \\PixelBuffer (with options)\n"
+    "\n"
+    "@param width The width of the image to render in pixel.\n"
+    "@param height The height of the image to render in pixel.\n"
+    "@param linewidth The width of a line in pixels (usually 1) or 0 for default.\n"
+    "@param target_box The box to draw or an empty box for default.\n"
+    "\n"
+    "The image contains the current scene (layout, annotations etc.).\n"
+    "The image is drawn synchronously with the given width and height. Drawing may take some time. "
+    "Monochrome images don't have background or annotation objects currently.\n"
+    "\n"
+    "This method has been introduced in 0.28.\n"
   ) +
   gsi::method ("save_screenshot", &lay::LayoutView::save_screenshot, gsi::arg ("filename"),
     "@brief Saves a screenshot to the given file\n"
@@ -1184,7 +1241,6 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "The image is written as a PNG file to the given file. "
     "The image is drawn synchronously with the given width and height. Drawing may take some time. "
   ) +
-#endif
   gsi::method_ext ("save_image_with_options", &save_image_with_options, gsi::arg ("filename"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth"), gsi::arg ("oversampling"), gsi::arg ("resolution"), gsi::arg ("target"), gsi::arg ("monochrome"),
     "@brief Saves the layout as an image to the given file (with options)\n"
     "\n"

@@ -23,7 +23,9 @@
 #include "gsiDecl.h"
 #include "layPixelBuffer.h"
 
-#include <QBuffer>
+#if defined(HAVE_QT)
+#  include <QBuffer>
+#endif
 
 namespace gsi
 {

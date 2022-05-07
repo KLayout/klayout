@@ -2468,7 +2468,7 @@ LayoutViewBase::init_layer_properties (LayerProperties &p, const LayerProperties
   p.set_marked (false);
 }
 
-#if defined(HAVE_QT) // @@@ add methods without QImage!!!!
+#if defined(HAVE_QT)
 QImage 
 LayoutViewBase::get_screenshot ()
 {
@@ -2479,30 +2479,51 @@ LayoutViewBase::get_screenshot ()
   
   return mp_canvas->screenshot ().to_image_copy ();
 }
+#endif
 
-void 
+lay::PixelBuffer
+LayoutViewBase::get_screenshot_pb ()
+{
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save screenshot")));
+
+  //  Execute all deferred methods - ensure there are no pending tasks
+  tl::DeferredMethodScheduler::execute ();
+
+  return mp_canvas->screenshot ();
+}
+
+static std::vector<std::pair<std::string, std::string> >
+png_texts (const lay::LayoutViewBase *view, const db::DBox &box)
+{
+  std::vector<std::pair<std::string, std::string> > texts;
+
+  //  Unfortunately the PNG writer does not allow writing of long strings.
+  //  We separate the description into a set of keys:
+
+  for (unsigned int i = 0; i < view->cellviews (); ++i) {
+    if (view->cellview (i).is_valid ()) {
+      std::string name = view->cellview (i)->layout ().cell_name (view->cellview (i).cell_index ());
+      texts.push_back (std::make_pair (std::string ("Cell") + tl::to_string (int (i) + 1), name));
+    }
+  }
+
+  texts.push_back (std::make_pair (std::string ("Rect"), box.to_string ()));
+
+  return texts;
+}
+
+#if defined(HAVE_QT)
+void
 LayoutViewBase::save_screenshot (const std::string &fn)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save screenshot")));
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
-  //  Unfortunately the PNG writer does not allow writing of long strings.
-  //  We separate the description into a set of keys:
-
-  for (unsigned int i = 0; i < cellviews (); ++i) {
-    if (cellview (i).is_valid ()) {
-      std::string name = cellview (i)->layout ().cell_name (cellview (i).cell_index ());
-      writer.setText (tl::to_qstring ("Cell" + tl::to_string (int (i) + 1)), tl::to_qstring (name));
-    }
+  std::vector<std::pair<std::string, std::string> > texts = png_texts (this, box ());
+  for (auto i = texts.begin (); i != texts.end (); ++i) {
+    writer.setText (tl::to_qstring (i->first), tl::to_qstring (i->second));
   }
-
-  db::DBox b (box ());
-  std::string desc;
-  desc += tl::micron_to_string (b.left ()) + "," + tl::micron_to_string (b.bottom ());
-  desc += "/";
-  desc += tl::micron_to_string (b.right ()) + "," + tl::micron_to_string (b.top ());
-  writer.setText (QString::fromUtf8 ("Rect"), tl::to_qstring (desc));
 
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
@@ -2513,54 +2534,104 @@ LayoutViewBase::save_screenshot (const std::string &fn)
 
   tl::log << "Saved screen shot to " << fn;
 }
+#else
+void
+LayoutViewBase::save_screenshot (const std::string &fn)
+{
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save screenshot")));
 
-QImage 
+  //  Execute all deferred methods - ensure there are no pending tasks
+  tl::DeferredMethodScheduler::execute ();
+
+  tl::OutputStream stream (fn);
+  // @@@ TODO: add texts
+  // @@@ mp_canvas->screenshot ().write_png (stream, png_texts (this, box ()));
+  mp_canvas->screenshot ().write_png (stream);
+
+  tl::log << "Saved screen shot to " << fn;
+}
+#endif
+
+#if defined(HAVE_QT)
+QImage
 LayoutViewBase::get_image (unsigned int width, unsigned int height)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Get image")));
 
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
   
   return mp_canvas->image (width, height).to_image_copy ();
 }
+#endif
 
-QImage 
+lay::PixelBuffer
+LayoutViewBase::get_pixels (unsigned int width, unsigned int height)
+{
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Get image")));
+
+  //  Execute all deferred methods - ensure there are no pending tasks
+  tl::DeferredMethodScheduler::execute ();
+
+  return mp_canvas->image (width, height);
+}
+
+#if defined(HAVE_QT)
+QImage
 LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
                                         lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Get image")));
 
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
   
   if (monochrome) {
-    return mp_canvas->image_with_options_mono (width, height, linewidth, background.green () >= 128, foreground.green () >= 128, active.green () >= 128, target_box).to_image_copy ();
+    return mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box).to_image_copy ();
   } else {
     return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box).to_image_copy ();
   }
 }
+#endif
 
-void 
+lay::PixelBuffer
+LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
+                                           lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box)
+{
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Get image")));
+
+  //  Execute all deferred methods - ensure there are no pending tasks
+  tl::DeferredMethodScheduler::execute ();
+
+  return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box);
+}
+
+lay::BitmapBuffer
+LayoutViewBase::get_pixels_with_options_mono (unsigned int width, unsigned int height, int linewidth,
+                                             lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box)
+{
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Get image")));
+
+  //  Execute all deferred methods - ensure there are no pending tasks
+  tl::DeferredMethodScheduler::execute ();
+
+  return mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box);
+}
+
+#if defined(HAVE_QT)
+void
 LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned int height)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
-  //  Unfortunately the PNG writer does not allow writing of long strings.
-  //  We separate the description into a set of keys:
-
-  for (unsigned int i = 0; i < cellviews (); ++i) {
-    if (cellview (i).is_valid ()) {
-      std::string name = cellview (i)->layout ().cell_name (cellview (i).cell_index ());
-      writer.setText (tl::to_qstring ("Cell" + tl::to_string (int (i) + 1)), tl::to_qstring (name));
-    }
+  lay::Viewport vp (width, height, mp_canvas->viewport ().target_box ());
+  std::vector<std::pair<std::string, std::string> > texts = png_texts (this, vp.box ());
+  for (auto i = texts.begin (); i != texts.end (); ++i) {
+    writer.setText (tl::to_qstring (i->first), tl::to_qstring (i->second));
   }
 
-  lay::Viewport vp (width, height, mp_canvas->viewport ().target_box ());
-  writer.setText (QString::fromUtf8 ("Rect"), tl::to_qstring (vp.box ().to_string ()));
-  
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
   
@@ -2568,36 +2639,48 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
     throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
   }
 
-  tl::log << "Saved screen shot to " << fn;
+  tl::log << "Saved image to " << fn;
 }
+#else
+void
+LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned int height)
+{
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
 
-void 
+  lay::Viewport vp (width, height, mp_canvas->viewport ().target_box ());
+  std::vector<std::pair<std::string, std::string> > texts = png_texts (this, vp.box ());
+
+  //  Execute all deferred methods - ensure there are no pending tasks
+  tl::DeferredMethodScheduler::execute ();
+
+  tl::OutputStream stream (fn);
+  mp_canvas->image (width, height).write_png (stream);
+
+  tl::log << "Saved image to " << fn;
+}
+#endif
+
+#if defined(HAVE_QT)
+void
 LayoutViewBase::save_image_with_options (const std::string &fn,
-                                     unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, 
-                                     lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
+                                         unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
+                                         lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
-  //  Unfortunately the PNG writer does not allow writing of long strings.
-  //  We separate the description into a set of keys:
-
-  for (unsigned int i = 0; i < cellviews (); ++i) {
-    if (cellview (i).is_valid ()) {
-      std::string name = cellview (i)->layout ().cell_name (cellview (i).cell_index ());
-      writer.setText (tl::to_qstring ("Cell" + tl::to_string (int (i) + 1)), tl::to_qstring (name));
-    }
+  lay::Viewport vp (width, height, mp_canvas->viewport ().target_box ());
+  std::vector<std::pair<std::string, std::string> > texts = png_texts (this, vp.box ());
+  for (auto i = texts.begin (); i != texts.end (); ++i) {
+    writer.setText (tl::to_qstring (i->first), tl::to_qstring (i->second));
   }
 
-  lay::Viewport vp (width, height, mp_canvas->viewport ().target_box ());
-  writer.setText (QString::fromUtf8 ("Rect"), tl::to_qstring (vp.box ().to_string ()));
-  
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
 
   if (monochrome) {
-    if (! writer.write (mp_canvas->image_with_options_mono (width, height, linewidth, background.green () >= 128, foreground.green () >= 128, active.green () >= 128, target_box).to_image ())) {
+    if (! writer.write (mp_canvas->image_with_options_mono (width, height, linewidth, background.to_mono (), foreground.to_mono (), active.to_mono (), target_box).to_image ())) {
       throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
     }
   } else {
@@ -2606,7 +2689,30 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
     }
   }
 
-  tl::log << "Saved screen shot to " << fn;
+  tl::log << "Saved image to " << fn;
+}
+#else
+void
+LayoutViewBase::save_image_with_options (const std::string &fn,
+                                         unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
+                                         lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
+{
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
+
+  lay::Viewport vp (width, height, mp_canvas->viewport ().target_box ());
+  std::vector<std::pair<std::string, std::string> > texts = png_texts (this, vp.box ());
+
+  //  Execute all deferred methods - ensure there are no pending tasks
+  tl::DeferredMethodScheduler::execute ();
+
+  tl::OutputStream stream (fn);
+  if (monochrome) {
+    mp_canvas->image_with_options_mono (width, height, linewidth, background.to_mono (), foreground.to_mono (), active.to_mono (), target_box).write_png (stream);
+  } else {
+    mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box).write_png (stream);
+  }
+
+  tl::log << "Saved image to " << fn;
 }
 #endif
 
@@ -3591,7 +3697,7 @@ LayoutViewBase::do_prop_changed ()
 void
 LayoutViewBase::set_view_ops ()
 {
-  bool bright_background = (mp_canvas->background_color ().green () > 128);
+  bool bright_background = (mp_canvas->background_color ().to_mono ());
   int brightness_for_context = ((bright_background ? m_ctx_dimming : -m_ctx_dimming) * 256) / 100;
   int brightness_for_child_context = ((bright_background ? m_child_ctx_dimming : -m_child_ctx_dimming) * 256) / 100;
 
@@ -4185,7 +4291,7 @@ LayoutViewBase::background_color (lay::Color c)
   }
 
   lay::Color contrast;
-  if (c.green () > 128) {
+  if (c.to_mono ()) {
     contrast = lay::Color (0, 0, 0);
   } else {
     contrast = lay::Color (255, 255, 255);

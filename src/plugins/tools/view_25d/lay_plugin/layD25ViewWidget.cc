@@ -1090,10 +1090,10 @@ D25ViewWidget::paintGL ()
   glViewport (0, 0, width () * retina_scale, height () * retina_scale);
 
   lay::Color c = mp_view->background_color ();
-  float foreground_rgb = (c.green () > 128 ? 0.0f : 1.0f);
-  float ambient = (c.green () > 128 ? 0.8f : 0.25f);
-  float mist_factor = (c.green () > 128 ? 0.2f : 0.4f);
-  float mist_add = (c.green () > 128 ? 0.8f : 0.2f);
+  float foreground_rgb = (c.to_mono () ? 0.0f : 1.0f);
+  float ambient = (c.to_mono () ? 0.8f : 0.25f);
+  float mist_factor = (c.to_mono () ? 0.2f : 0.4f);
+  float mist_add = (c.to_mono () ? 0.8f : 0.2f);
   glClearColor (float (c.red ()) / 255.0f, float (c.green ()) / 255.0f, float (c.blue ()) / 255.0f, 1.0);
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

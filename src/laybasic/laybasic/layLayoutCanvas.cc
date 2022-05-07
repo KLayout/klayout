@@ -933,11 +933,15 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
 }
 
 lay::BitmapBuffer
-LayoutCanvas::image_with_options_mono (unsigned int width, unsigned int height, int linewidth, bool background, bool foreground, bool active, const db::DBox &target_box)
+LayoutCanvas::image_with_options_mono (unsigned int width, unsigned int height, int linewidth, lay::Color background_c, lay::Color foreground_c, lay::Color active_c, const db::DBox &target_box)
 {
   if (linewidth <= 0) {
     linewidth = 1;
   }
+
+  bool background = background_c.is_valid () ? background_c.to_mono () : background_color ().to_mono ();
+  bool foreground = foreground_c.is_valid () ? foreground_c.to_mono () : foreground_color ().to_mono ();
+  bool active = active_c.is_valid () ? active_c.to_mono () : active_color ().to_mono ();
 
   //  provide canvas objects for the layout bitmaps and the foreground/background objects
   BitmapRedrawThreadCanvas rd_canvas;

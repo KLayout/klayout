@@ -80,7 +80,7 @@ public:
     }
 
     lay::Color contrast;
-    if (c.green () > 128) {
+    if (c.to_mono ()) {
       contrast = lay::Color (0, 0, 0);
     } else {
       contrast = lay::Color (255, 255, 255);

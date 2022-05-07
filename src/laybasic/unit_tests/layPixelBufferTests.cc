@@ -74,35 +74,12 @@ static bool compare_images_mono (const QImage &qimg, const std::string &au)
 
 static bool compare_images (const lay::PixelBuffer &img, const lay::PixelBuffer &img2)
 {
-  if (img2.width () == img.width () && img2.height () == img.height ()) {
-    for (unsigned int j = 0; j < img.height (); ++j) {
-      for (unsigned int i = 0; i < img.width (); ++i) {
-        if (((const lay::color_t *) img.scan_line (j))[i] != ((const lay::color_t *) img2.scan_line (j))[i]) {
-          return false;
-        }
-      }
-    }
-    return true;
-  } else {
-    return false;
-  }
+  return img == img2;
 }
 
 static bool compare_images (const lay::BitmapBuffer &img, const lay::BitmapBuffer &img2)
 {
-  if (img2.width () == img.width () && img2.height () == img.height ()) {
-    //  NOTE: slooooow ...
-    for (unsigned int j = 0; j < img.height (); ++j) {
-      for (unsigned int i = 0; i < img.width (); ++i) {
-        if ((img.scan_line (j)[i / 8] & (0x01 << (i % 8))) != (img2.scan_line (j)[i / 8] & (0x01 << (i % 8)))) {
-          return false;
-        }
-      }
-    }
-    return true;
-  } else {
-    return false;
-  }
+  return img == img2;
 }
 
 TEST(1)

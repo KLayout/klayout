@@ -143,6 +143,12 @@ Class<lay::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
     "\n"
     "The pixels are basically uninitialized. You will need to use \\fill to initialize them to a certain value."
   ) +
+  gsi::method ("==", &lay::PixelBuffer::operator==, gsi::arg ("other"),
+    "@brief Returns a value indicating whether self is identical to the other image\n"
+  ) +
+  gsi::method ("!=", &lay::PixelBuffer::operator!=, gsi::arg ("other"),
+    "@brief Returns a value indicating whether self is not identical to the other image\n"
+  ) +
   gsi::method ("transparent=", &lay::PixelBuffer::set_transparent, gsi::arg ("t"),
     "@brief Sets a flag indicating whether the pixel buffer supports an alpha channel\n"
     "\n"
@@ -224,7 +230,9 @@ Class<lay::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
   "transparency through an optional alpha channel. The color format for a pixel is "
   "\"0xAARRGGBB\" where 'AA' is the alpha value which is ignored in non-transparent mode.\n"
   "\n"
-  "This class supports basic operations such as initialization, single-pixel access and I/O to PNG."
+  "This class supports basic operations such as initialization, single-pixel access and I/O to PNG.\n"
+  "\n"
+  "This class has been introduced in version 0.28."
 );
 
 
@@ -335,6 +343,12 @@ Class<lay::BitmapBuffer> decl_BitmapBuffer ("lay", "BitmapBuffer",
     "\n"
     "The pixels are basically uninitialized. You will need to use \\fill to initialize them to a certain value."
   ) +
+  gsi::method ("==", &lay::BitmapBuffer::operator==, gsi::arg ("other"),
+    "@brief Returns a value indicating whether self is identical to the other image\n"
+  ) +
+  gsi::method ("!=", &lay::BitmapBuffer::operator!=, gsi::arg ("other"),
+    "@brief Returns a value indicating whether self is not identical to the other image\n"
+  ) +
   gsi::method ("fill", &lay::BitmapBuffer::fill, gsi::arg ("color"),
     "@brief Fills the pixel buffer with the given pixel value\n"
   ) +
@@ -391,7 +405,9 @@ Class<lay::BitmapBuffer> decl_BitmapBuffer ("lay", "BitmapBuffer",
   "This object is mainly provided for offline rendering of layouts in Qt-less environments.\n"
   "It supports a rectangular pixel space with color values encoded in single bits.\n"
   "\n"
-  "This class supports basic operations such as initialization, single-pixel access and I/O to PNG."
+  "This class supports basic operations such as initialization, single-pixel access and I/O to PNG.\n"
+  "\n"
+  "This class has been introduced in version 0.28."
 );
 
 }

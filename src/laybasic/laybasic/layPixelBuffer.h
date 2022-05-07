@@ -112,6 +112,19 @@ public:
   ~PixelBuffer ();
 
   /**
+   *  @brief Equality
+   */
+  bool operator== (const PixelBuffer &other) const;
+
+  /**
+   *  @brief Inequality
+   */
+  bool operator!= (const PixelBuffer &other) const
+  {
+    return !operator== (other);
+  }
+
+  /**
    *  @brief Assignment
    */
   PixelBuffer &operator= (const PixelBuffer &other);
@@ -333,6 +346,19 @@ public:
    *  @brief Move constructor
    */
   BitmapBuffer (BitmapBuffer &&other);
+
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const BitmapBuffer &other) const;
+
+  /**
+   *  @brief Inequality
+   */
+  bool operator!= (const BitmapBuffer &other) const
+  {
+    return !operator== (other);
+  }
 
   /**
    *  @brief Destructor

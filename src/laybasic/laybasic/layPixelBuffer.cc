@@ -169,6 +169,31 @@ PixelBuffer::~PixelBuffer ()
   //  .. nothing yet ..
 }
 
+bool
+PixelBuffer::operator== (const PixelBuffer &other) const
+{
+  if (width () != other.width () || height () != other.height ()) {
+    return false;
+  }
+  if (transparent () != other.transparent ()) {
+    return false;
+  }
+
+  lay::color_t m = transparent () ? 0xffffffff : 0xffffff;
+  for (unsigned int i = 0; i < other.height (); ++i) {
+    const lay::color_t *d = scan_line (i);
+    const lay::color_t *de = d + width ();
+    const lay::color_t *dd = other.scan_line (i);
+    while (d != de) {
+      if (((*d++ ^ *dd++) & m) != 0) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
 PixelBuffer &
 PixelBuffer::operator= (const PixelBuffer &other)
 {
@@ -483,6 +508,34 @@ BitmapBuffer::BitmapBuffer (BitmapBuffer &&other)
 BitmapBuffer::~BitmapBuffer ()
 {
   //  .. nothing yet ..
+}
+
+bool
+BitmapBuffer::operator== (const BitmapBuffer &other) const
+{
+  if (width () != other.width () || height () != other.height ()) {
+    return false;
+  }
+
+  for (unsigned int i = 0; i < other.height (); ++i) {
+    const uint8_t *d = scan_line (i);
+    const uint8_t *dd = other.scan_line (i);
+    unsigned int bits_left = width ();
+    while (bits_left >= 8) {
+      if (*d++ != *dd++) {
+        return false;
+      }
+      bits_left -= 8;
+    }
+    if (bits_left > 0) {
+      unsigned int m = (0x01 << bits_left) - 1;
+      if (((*d ^ *dd) & m) != 0) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 BitmapBuffer &

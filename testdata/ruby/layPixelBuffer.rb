@@ -41,17 +41,21 @@ class LAYPixelBuffer_TestClass < TestBase
 
   def test_1
 
-    pb = RBA::PixelBuffer::new
-    assert_equal(pb.width, 0)
-    assert_equal(pb.height, 0)
+    pb_null = RBA::PixelBuffer::new
+    assert_equal(pb_null.width, 0)
+    assert_equal(pb_null.height, 0)
 
     pb = RBA::PixelBuffer::new(10, 20)
+    assert_equal(compare(pb_null, pb), false)
+    assert_equal(pb_null == pb, false)
     assert_equal(pb.width, 10)
     assert_equal(pb.height, 20)
     assert_equal(pb.transparent, false)
 
+    pb_copy = pb.dup
     pb.transparent = true
     assert_equal(pb.transparent, true)
+    assert_equal(pb_copy == pb, false)
 
     pb.fill(0xf0010203)
     assert_equal(pb.pixel(0, 0), 0xf0010203)
@@ -66,12 +70,14 @@ class LAYPixelBuffer_TestClass < TestBase
 
     pb_copy = pb.dup
     assert_equal(compare(pb_copy, pb), true)
+    assert_equal(pb_copy == pb, true)
     pb.set_pixel(1, 2, 0x112233)
     assert_equal(pb.pixel(0, 0), 0xf0010203)
     assert_equal(pb.pixel(1, 2), 0xff112233)
     assert_equal(pb_copy.pixel(1, 2), 0xff102030)
 
     assert_equal(compare(pb_copy, pb), false)
+    assert_equal(pb_copy == pb, false)
 
     pb_copy.swap(pb)
     assert_equal(pb_copy.pixel(1, 2), 0xff112233)
@@ -88,14 +94,40 @@ class LAYPixelBuffer_TestClass < TestBase
     pb.set_pixel(1, 2, 0x112233)
 
     assert_equal(compare(pb1, pb), false)
+    assert_equal(pb1 == pb, false)
     
     diff = pb1.diff(pb)
     pb1.patch(diff)
     assert_equal(compare(pb1, pb), true)
+    assert_equal(pb1 == pb, true)
 
   end
 
   def test_3
+
+    pb = RBA::PixelBuffer::new(10, 20)
+    pb.fill(0xf0010203)
+
+    pb1 = pb.dup
+    pb.set_pixel(1, 2, 0x112233)
+
+    pb1 = pb.dup
+    pb.set_pixel(1, 2, 0xf0112233)
+    assert_equal(compare(pb1, pb), true)
+    assert_equal(pb1 == pb, true)  # not transparent -> alpha is ignored
+
+    pb1.transparent = true
+    pb.transparent = true
+    assert_equal(compare(pb1, pb), true)
+    assert_equal(pb1 == pb, true)
+
+    pb.set_pixel(1, 2, 0xf0112233)
+    assert_equal(compare(pb1, pb), false)
+    assert_equal(pb1 == pb, false)  # now, alpha matters
+
+  end
+
+  def test_4
     
     pb = RBA::PixelBuffer::new(10, 20)
     pb.transparent = true

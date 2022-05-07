@@ -69,6 +69,8 @@ static bool compare_images_mono (const QImage &qimg, const std::string &au)
   }
 }
 
+#endif
+
 static bool compare_images (const lay::PixelBuffer &img, const lay::PixelBuffer &img2)
 {
   return img == img2;
@@ -78,8 +80,6 @@ static bool compare_images (const lay::BitmapBuffer &img, const lay::BitmapBuffe
 {
   return img == img2;
 }
-
-#endif
 
 #if defined(HAVE_QT)
 TEST(1)

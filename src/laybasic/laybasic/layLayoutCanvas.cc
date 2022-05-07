@@ -1006,7 +1006,8 @@ LayoutCanvas::screenshot ()
   return img;
 }
 
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
+
 void 
 LayoutCanvas::resizeEvent (QResizeEvent *)
 {
@@ -1020,6 +1021,23 @@ LayoutCanvas::resizeEvent (QResizeEvent *)
   do_redraw_all (true);
   viewport_changed_event ();
 }
+
+#else
+
+void
+LayoutCanvas::resize (unsigned int width, unsigned int height)
+{
+  //  clear the image cache
+  m_image_cache.clear ();
+
+  //  set the viewport to the new size
+  m_viewport.set_size (width * m_dpr, height * m_dpr);
+  m_viewport_l.set_size (width * m_oversampling * m_dpr, height * m_oversampling * m_dpr);
+  mouse_event_trans (db::DCplxTrans (1.0 / double (m_dpr)) * m_viewport.trans ());
+  do_redraw_all (true);
+  viewport_changed_event ();
+}
+
 #endif
 
 void 

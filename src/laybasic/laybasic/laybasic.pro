@@ -90,7 +90,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     gtf.cc \
     layAbstractMenu.cc \
     layBackgroundAwareTreeStyle.cc \
-    layBitmapsToImage.cc \
     layBookmarkList.cc \
     layBookmarkManagementForm.cc \
     layBookmarksView.cc \
@@ -103,7 +102,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layCellSelectionForm.cc \
     layCellTreeModel.cc \
     layConfigurationDialog.cc \
-    layConverters.cc \
     layCursor.cc \
     layDialogs.cc \
     layEditLineStyleWidget.cc \
@@ -146,12 +144,10 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     laySelectCellViewForm.cc \
     laySelectLineStyleForm.cc \
     laySelectStippleForm.cc \
-    laySelector.cc \
     layStream.cc \
     layTechnology.cc \
     layTipDialog.cc \
     layWidgets.cc \
-    layZoomBox.cc \
     rdbInfoWidget.cc \
     rdbMarkerBrowser.cc \
     rdbMarkerBrowserDialog.cc \
@@ -162,7 +158,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layAbstractMenu.h \
     layBackgroundAwareTreeStyle.h \
     layBitmap.h \
-    layBitmapsToImage.h \
     layBookmarkList.h \
     layBookmarkManagementForm.h \
     layBookmarksView.h \
@@ -175,7 +170,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layCellSelectionForm.h \
     layCellTreeModel.h \
     layConfigurationDialog.h \
-    layConverters.h \
     layColor.h \
     layCursor.h \
     layDialogs.h \
@@ -219,12 +213,10 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     laySelectCellViewForm.h \
     laySelectLineStyleForm.h \
     laySelectStippleForm.h \
-    laySelector.h \
     layStream.h \
     layTechnology.h \
     layTipDialog.h \
     layWidgets.h \
-    layZoomBox.h \
     laybasicConfig.h \
     rdbInfoWidget.h \
     rdbMarkerBrowser.h \
@@ -242,9 +234,11 @@ SOURCES += \
     layAnnotationShapes.cc \
     layBitmap.cc \
     layBitmapRenderer.cc \
+    layBitmapsToImage.cc \
     layCellView.cc \
     layColor.cc \
     layColorPalette.cc \
+    layConverters.cc \
     layDispatcher.cc \
     layDisplayState.cc \
     layDitherPattern.cc \
@@ -272,6 +266,7 @@ SOURCES += \
     layRedrawThreadWorker.cc \
     layRenderer.cc \
     layRubberBox.cc \
+    laySelector.cc \
     laySnap.cc \
     layStipplePalette.cc \
     layCanvasPlane.cc \
@@ -280,13 +275,16 @@ SOURCES += \
     layViewObject.cc \
     layViewOp.cc \
     layViewport.cc \
+    layZoomBox.cc \
 
 HEADERS += \
     layAnnotationShapes.h \
     layBitmap.h \
     layBitmapRenderer.h \
+    layBitmapsToImage.h \
     layCellView.h \
     layColorPalette.h \
+    layConverters.h \
     layDispatcher.h \
     layDisplayState.h \
     layDitherPattern.h \
@@ -315,6 +313,7 @@ HEADERS += \
     layRedrawThreadWorker.h \
     layRenderer.h \
     layRubberBox.h \
+    laySelector.h \
     laySnap.h \
     layStipplePalette.h \
     layLayerProperties.h \
@@ -322,6 +321,7 @@ HEADERS += \
     layViewObject.h \
     layViewOp.h \
     layViewport.h \
+    layZoomBox.h \
     laybasicCommon.h \
 
 

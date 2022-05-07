@@ -31,6 +31,7 @@ namespace lay
 // ----------------------------------------------------------------
 //  ColorConverter implementation
 
+#if defined(HAVE_QT)
 std::string 
 ColorConverter::to_string (const QColor &c) const
 {
@@ -40,6 +41,7 @@ ColorConverter::to_string (const QColor &c) const
     return tl::to_string (c.name ());
   }
 }
+#endif
 
 std::string
 ColorConverter::to_string (const lay::Color &c) const
@@ -51,6 +53,7 @@ ColorConverter::to_string (const lay::Color &c) const
   }
 }
 
+#if defined(HAVE_QT)
 void
 ColorConverter::from_string (const std::string &s, QColor &c) const
 {
@@ -61,6 +64,7 @@ ColorConverter::from_string (const std::string &s, QColor &c) const
     c = QColor (t.c_str ());
   } 
 }
+#endif
 
 void
 ColorConverter::from_string (const std::string &s, lay::Color &c) const

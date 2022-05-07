@@ -28,8 +28,10 @@
 #include "tlLog.h"
 #include "tlException.h"
 
-#include <QMessageBox>
-#include <QApplication>
+#if defined(HAVE_QT)
+#  include <QMessageBox>
+#  include <QApplication>
+#endif
 
 namespace lay
 {
@@ -37,8 +39,10 @@ namespace lay
 // -------------------------------------------------------------
 //  SelectionService implementation
 
-SelectionService::SelectionService (lay::LayoutViewBase *view)
-  : QObject (),
+SelectionService::SelectionService (lay::LayoutViewBase *view) :
+#if defined(HAVE_QT)
+    QObject (),
+#endif
     lay::ViewService (view->view_object_widget ()), 
     mp_view (view),
     mp_box (0),
@@ -48,9 +52,11 @@ SelectionService::SelectionService (lay::LayoutViewBase *view)
     m_hover_wait (false),
     m_mouse_in_window (false)
 { 
+#if defined(HAVE_QT)
   m_timer.setInterval (100 /*hover time*/);
   m_timer.setSingleShot (true);
   connect (&m_timer, SIGNAL (timeout ()), this, SLOT (timeout ()));
+#endif
 }
 
 SelectionService::~SelectionService ()
@@ -81,7 +87,9 @@ void
 SelectionService::hover_reset ()
 {
   if (m_hover_wait) {
+#if defined(HAVE_QT)
     m_timer.stop ();
+#endif
     m_hover_wait = false;
   }
   if (m_hover) {
@@ -90,6 +98,7 @@ SelectionService::hover_reset ()
   }
 }
 
+#if defined(HAVE_QT)
 void 
 SelectionService::timeout ()
 {
@@ -98,6 +107,7 @@ SelectionService::timeout ()
   mp_view->clear_transient_selection ();
   mp_view->transient_select (m_hover_point);
 }
+#endif
 
 void
 SelectionService::reset_box ()
@@ -155,7 +165,9 @@ SelectionService::mouse_move_event (const db::DPoint &p, unsigned int buttons, b
       mp_box->set_points (m_p1, m_p2);
     } else if (m_mouse_in_window && mp_view->transient_selection_mode ()) {
       m_hover_wait = true;
+#if defined(HAVE_QT)
       m_timer.start ();
+#endif
       m_hover_point = p;
     }
 
@@ -173,10 +185,12 @@ SelectionService::mouse_double_click_event (const db::DPoint & /*p*/, unsigned i
     reset_box ();
   }
 
+#if defined(HAVE_QT)
   if (prio && (buttons & lay::LeftButton) != 0) {
     mp_view->show_properties (QApplication::activeWindow ());
     return true;
   }
+#endif
 
   return false;
 }
@@ -230,13 +244,17 @@ SelectionService::mouse_click_event (const db::DPoint &p, unsigned int buttons, 
       //  add a transient selection trigger to capture the "next" selection.
       if (mp_view->transient_selection_mode ()) {
         m_hover_wait = true;
+#if defined(HAVE_QT)
         m_timer.start ();
+#endif
         m_hover_point = p;
       }
 
     } catch (tl::Exception &ex) {
       tl::error << ex.msg ();
-      QMessageBox::critical (0, QObject::tr ("Error"), tl::to_qstring (ex.msg ()));
+#if defined(HAVE_QT)
+      QMessageBox::critical (0, tr ("Error"), tl::to_qstring (ex.msg ()));
+#endif
       //  clear selection
       mp_view->select (db::DBox (), lay::Editable::Reset);
     }
@@ -273,7 +291,9 @@ SelectionService::mouse_release_event (const db::DPoint & /*p*/, unsigned int /*
         mp_view->select (db::DBox (m_p1, m_p2), mode);
       } catch (tl::Exception &ex) {
         tl::error << ex.msg ();
-        QMessageBox::critical (0, QObject::tr ("Error"), tl::to_qstring (ex.msg ()));
+#if defined(HAVE_QT)
+        QMessageBox::critical (0, tr ("Error"), tl::to_qstring (ex.msg ()));
+#endif
         //  clear selection
         mp_view->select (db::DBox (), lay::Editable::Reset);
       }
@@ -301,4 +321,3 @@ SelectionService::begin (const db::DPoint &pos)
 }
 
 }
-

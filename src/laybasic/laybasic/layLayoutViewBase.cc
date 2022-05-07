@@ -354,7 +354,7 @@ LayoutViewBase::init (db::Manager *mgr)
   m_no_stipples = false;
   m_stipple_offset = true;
   m_fit_new_cell = true;
-  m_full_hier_new_cell = true;
+  m_full_hier_new_cell = false;
   m_clear_ruler_new_cell = false;
   m_dbu_coordinates = false;
   m_absolute_coordinates = false;
@@ -2475,7 +2475,7 @@ LayoutViewBase::init_layer_properties (LayerProperties &p, const LayerProperties
 QImage 
 LayoutViewBase::get_screenshot ()
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save screenshot")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save screenshot")));
 
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
@@ -2487,7 +2487,7 @@ LayoutViewBase::get_screenshot ()
 lay::PixelBuffer
 LayoutViewBase::get_screenshot_pb ()
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save screenshot")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save screenshot")));
 
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
@@ -2519,7 +2519,7 @@ png_texts (const lay::LayoutViewBase *view, const db::DBox &box)
 void
 LayoutViewBase::save_screenshot (const std::string &fn)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save screenshot")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save screenshot")));
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
@@ -2532,7 +2532,7 @@ LayoutViewBase::save_screenshot (const std::string &fn)
   tl::DeferredMethodScheduler::execute ();
   
   if (! writer.write (mp_canvas->screenshot ().to_image ())) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
+    throw tl::Exception (tl::to_string (tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
   }
 
   tl::log << "Saved screen shot to " << fn;
@@ -2541,7 +2541,7 @@ LayoutViewBase::save_screenshot (const std::string &fn)
 void
 LayoutViewBase::save_screenshot (const std::string &fn)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save screenshot")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save screenshot")));
 
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
@@ -2559,7 +2559,7 @@ LayoutViewBase::save_screenshot (const std::string &fn)
 QImage
 LayoutViewBase::get_image (unsigned int width, unsigned int height)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Get image")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
@@ -2571,7 +2571,7 @@ LayoutViewBase::get_image (unsigned int width, unsigned int height)
 lay::PixelBuffer
 LayoutViewBase::get_pixels (unsigned int width, unsigned int height)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Get image")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
@@ -2584,7 +2584,7 @@ QImage
 LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
                                         lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Get image")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
@@ -2601,7 +2601,7 @@ lay::PixelBuffer
 LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
                                          lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Get image")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
@@ -2613,7 +2613,7 @@ lay::BitmapBuffer
 LayoutViewBase::get_pixels_with_options_mono (unsigned int width, unsigned int height, int linewidth,
                                               lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Get image")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
   //  Execute all deferred methods - ensure there are no pending tasks
   tl::DeferredMethodScheduler::execute ();
@@ -2625,7 +2625,7 @@ LayoutViewBase::get_pixels_with_options_mono (unsigned int width, unsigned int h
 void
 LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned int height)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
@@ -2639,7 +2639,7 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
   tl::DeferredMethodScheduler::execute ();
   
   if (! writer.write (mp_canvas->image (width, height).to_image ())) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
+    throw tl::Exception (tl::to_string (tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
   }
 
   tl::log << "Saved image to " << fn;
@@ -2648,7 +2648,7 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
 void
 LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned int height)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
 
   lay::Viewport vp (width, height, mp_canvas->viewport ().target_box ());
 
@@ -2671,7 +2671,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
                                          unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
                                          lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
 
   QImageWriter writer (tl::to_qstring (fn), QByteArray ("PNG"));
 
@@ -2686,11 +2686,11 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
 
   if (monochrome) {
     if (! writer.write (mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box).to_image ())) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
+      throw tl::Exception (tl::to_string (tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
     }
   } else {
     if (! writer.write (mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box).to_image ())) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
+      throw tl::Exception (tl::to_string (tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
     }
   }
 
@@ -2702,7 +2702,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
                                          unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
                                          lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
 
   lay::Viewport vp (width, height, mp_canvas->viewport ().target_box ());
   std::vector<std::pair<std::string, std::string> > texts = png_texts (this, vp.box ());

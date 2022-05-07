@@ -396,7 +396,10 @@ private:
   virtual void paintEvent (QPaintEvent *);
   virtual void resizeEvent (QResizeEvent *);
   virtual bool event (QEvent *e);
+#else
+  void resize (unsigned int width, unsigned int height);
 #endif
+
   virtual void key_event (unsigned int key, unsigned int buttons);
 
   //  implementation of the lay::Drawings interface

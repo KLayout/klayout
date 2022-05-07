@@ -342,6 +342,11 @@ public:
   }
 
   /**
+   *  @brief Resizes the canvas object in the Qt-less case
+   */
+  void resize (unsigned int width, unsigned int height);
+
+  /**
    *  @brief An event indicating that the viewport was changed.
    *  If the viewport (the rectangle that is shown) changes, this event is fired.
    */
@@ -361,7 +366,7 @@ private:
   lay::LayoutViewBase *mp_view;
   lay::PixelBuffer *mp_image;
   lay::PixelBuffer *mp_image_bg;
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
   QPixmap *mp_pixmap;
 #endif
   db::DBox m_precious_box;
@@ -396,8 +401,6 @@ private:
   virtual void paintEvent (QPaintEvent *);
   virtual void resizeEvent (QResizeEvent *);
   virtual bool event (QEvent *e);
-#else
-  void resize (unsigned int width, unsigned int height);
 #endif
 
   virtual void key_event (unsigned int key, unsigned int buttons);
@@ -411,6 +414,7 @@ private:
   void do_update_image ();
   void do_end_of_drawing ();
   void do_redraw_all (bool force_redraw = true);
+  void do_resize (unsigned int width, unsigned int height);
 
   void prepare_drawing ();
 };

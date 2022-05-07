@@ -1136,6 +1136,11 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "Show the layout in full depth down to the deepest level of hierarchy. "
     "This method may cause a redraw."
   ) +
+  gsi::method ("resize", static_cast<void (lay::LayoutView::*) (unsigned int, unsigned int)> (&lay::LayoutView::resize),
+    "@brief Resizes the layout view to the given dimension\n"
+    "\n"
+    "This method has been made available in all builds in 0.28.\n"
+  ) +
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
   gsi::method ("get_screenshot", static_cast<QImage (lay::LayoutView::*) ()> (&lay::LayoutView::get_screenshot),
     "@brief Gets a screenshot as a \\QImage\n"

@@ -1007,38 +1007,47 @@ LayoutCanvas::screenshot ()
 }
 
 #if defined(HAVE_QT)
-
 void 
 LayoutCanvas::resizeEvent (QResizeEvent *)
 {
-  //  clear the image cache
-  m_image_cache.clear ();
-
-  //  set the viewport to the new size
-  m_viewport.set_size (width () * m_dpr, height () * m_dpr);
-  m_viewport_l.set_size (width () * m_oversampling * m_dpr, height () * m_oversampling * m_dpr);
-  mouse_event_trans (db::DCplxTrans (1.0 / double (m_dpr)) * m_viewport.trans ());
-  do_redraw_all (true);
-  viewport_changed_event ();
+  do_resize (width (), height ());
 }
-
-#else
+#endif
 
 void
 LayoutCanvas::resize (unsigned int width, unsigned int height)
 {
-  //  clear the image cache
-  m_image_cache.clear ();
+  //  don't wait until the layout system informs us - which may never take place when
+  //  the widget isn't shown.
+  do_resize (width, height);
 
-  //  set the viewport to the new size
-  m_viewport.set_size (width * m_dpr, height * m_dpr);
-  m_viewport_l.set_size (width * m_oversampling * m_dpr, height * m_oversampling * m_dpr);
-  mouse_event_trans (db::DCplxTrans (1.0 / double (m_dpr)) * m_viewport.trans ());
-  do_redraw_all (true);
-  viewport_changed_event ();
+#if defined(HAVE_QT)
+  QWidget::resize (width, height);
+#endif
 }
 
-#endif
+void
+LayoutCanvas::do_resize (unsigned int width, unsigned int height)
+{
+  unsigned int w = width * m_dpr, h = height * m_dpr;
+  unsigned int wl = width * m_oversampling * m_dpr, hl = height * m_oversampling * m_dpr;
+
+  if (m_viewport.width () != w || m_viewport.height () != h ||
+      m_viewport_l.width () != wl || m_viewport_l.height () != hl) {
+
+    //  clear the image cache
+    m_image_cache.clear ();
+
+    //  set the viewport to the new size
+    m_viewport.set_size (width * m_dpr, height * m_dpr);
+    m_viewport_l.set_size (width * m_oversampling * m_dpr, height * m_oversampling * m_dpr);
+
+    mouse_event_trans (db::DCplxTrans (1.0 / double (m_dpr)) * m_viewport.trans ());
+    do_redraw_all (true);
+    viewport_changed_event ();
+
+  }
+}
 
 void 
 LayoutCanvas::update_viewport ()

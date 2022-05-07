@@ -414,6 +414,14 @@ public:
   }
 
   /**
+   *  @brief Resizes the view to the given width and height in pixels
+   */
+  void resize (unsigned int width, unsigned int height)
+  {
+    LayoutViewBase::resize (width, height);
+  }
+
+  /**
    *  @brief Copies to clipboard
    *
    *  This reimplementation of the lay::Editables interface additionally

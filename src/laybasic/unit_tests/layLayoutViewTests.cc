@@ -24,6 +24,7 @@
 
 #include "tlUnitTest.h"
 #include "tlTimer.h"
+#include "tlSleep.h"
 
 #if defined(HAVE_QT)
 
@@ -149,6 +150,28 @@ TEST(3)
   EXPECT_EQ (compare_images_mono (qimg.convertToFormat (QImage::Format_Mono), au), true);
 }
 #endif
+
+TEST(4)
+{
+  lay::LayoutView lv (0, false, 0);
+  lv.set_drawing_workers (2);
+  lv.cell_box_color (lay::Color (0, 0, 0));
+
+  lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
+
+  lv.resize (42, 117);
+  tl::msleep (250);
+
+  lay::PixelBuffer img = lv.get_screenshot_pb ();
+  EXPECT_EQ (img.width (), 42);
+  EXPECT_EQ (img.height (), 117);
+
+  lv.resize (142, 217);
+
+  img = lv.get_screenshot_pb ();
+  EXPECT_EQ (img.width (), 142);
+  EXPECT_EQ (img.height (), 217);
+}
 
 #if defined(HAVE_PNG)
 TEST(11)

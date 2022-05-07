@@ -485,6 +485,11 @@ LayoutViewBase::~LayoutViewBase ()
   mp_canvas = 0;
 }
 
+void LayoutViewBase::resize (unsigned int width, unsigned int height)
+{
+  mp_canvas->resize (width, height);
+}
+
 void LayoutViewBase::update_event_handlers ()
 {
   tl::Object::detach_from_all_events ();

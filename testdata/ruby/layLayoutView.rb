@@ -454,6 +454,23 @@ class LAYLayoutView_TestClass < TestBase
 
   end
 
+  def test_5
+
+    lv = RBA::LayoutView::new
+    lv.load_layout(File.join($ut_testsrc, "testdata/gds/t10.gds"), true)
+
+    lv.resize(42, 117)
+    img = lv.get_screenshot_pixels
+    assert_equal(img.width, 42)
+    assert_equal(img.height, 117)
+
+    lv.resize(142, 217)
+    img = lv.get_screenshot_pixels
+    assert_equal(img.width, 142)
+    assert_equal(img.height, 217)
+
+  end
+
 end
 
 load("test_epilogue.rb")

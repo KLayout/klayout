@@ -1638,6 +1638,11 @@ public:
   }
 
   /**
+   *  @brief Resizes the view to the given width and height in pixels
+   */
+  void resize (unsigned int width, unsigned int height);
+
+  /**
    *  @brief Background color property
    */
   lay::Color background_color () const

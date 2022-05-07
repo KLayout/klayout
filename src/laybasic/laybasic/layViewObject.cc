@@ -232,9 +232,7 @@ ViewObject::redraw ()
     if (m_static) {
       widget ()->touch ();
     } else {
-#if defined(HAVE_QT)
-      widget ()->update ();  // @@@
-#endif
+      widget ()->update ();
     }
   }
 }
@@ -287,9 +285,9 @@ ViewService::set_cursor (lay::Cursor::cursor_shape cursor)
 }
 
 // ---------------------------------------------------------------
-//  ViewObject implementation
+//  ViewObjectWidget implementation
 
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
 ViewObjectWidget::ViewObjectWidget (QWidget *parent, const char *name)
   : QWidget (parent), 
     m_view_objects_dismissed (false),
@@ -301,7 +299,10 @@ ViewObjectWidget::ViewObjectWidget (QWidget *parent, const char *name)
     m_in_mouse_move (false),
     m_mouse_inside (false),
     m_cursor (lay::Cursor::none),
-    m_default_cursor (lay::Cursor::none)
+    m_default_cursor (lay::Cursor::none),
+    m_widget_width (0),
+    m_widget_height (0),
+    m_image_updated (false)
 {
   setMouseTracking (true); 
   setObjectName (QString::fromUtf8 (name));
@@ -320,7 +321,10 @@ ViewObjectWidget::ViewObjectWidget ()
     m_in_mouse_move (false),
     m_mouse_inside (false),
     m_cursor (lay::Cursor::none),
-    m_default_cursor (lay::Cursor::none)
+    m_default_cursor (lay::Cursor::none),
+    m_widget_width (500),
+    m_widget_height (500),
+    m_image_updated (false)
 {
   m_objects.changed ().add (this, &ViewObjectWidget::objects_changed);
 }
@@ -395,7 +399,7 @@ ViewObjectWidget::set_cursor (lay::Cursor::cursor_shape cursor)
 void
 ViewObjectWidget::set_default_cursor (lay::Cursor::cursor_shape cursor)
 {
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
   if (cursor != m_default_cursor) {
     m_default_cursor = cursor;
     if (m_cursor == lay::Cursor::none) {
@@ -920,13 +924,23 @@ END_PROTECTED
 }
 #endif
 
+void
+ViewObjectWidget::resize (unsigned int w, unsigned int h)
+{
+  m_widget_width = w;
+  m_widget_height = h;
+#if defined(HAVE_QT)
+  QWidget::resize (w, h);
+#endif
+}
+
 int
 ViewObjectWidget::widget_height () const
 {
 #if defined(HAVE_QT)
   return height ();
 #else
-  return 500; // @@@
+  return m_widget_height;
 #endif
 }
 
@@ -936,7 +950,7 @@ ViewObjectWidget::widget_width () const
 #if defined(HAVE_QT)
   return width ();
 #else
-  return 800; // @@@
+  return m_widget_width;
 #endif
 }
 
@@ -1078,7 +1092,16 @@ ViewObjectWidget::thaw (ViewObject *obj)
 void
 ViewObjectWidget::update ()
 {
-  // @@@
+  //  NOTE: this does not need to be thread-safe as we make sure (as in Qt) that update() is always called from the main thread.
+  m_image_updated = true;
+}
+
+bool
+ViewObjectWidget::image_updated ()
+{
+  bool f = m_image_updated;
+  m_image_updated = false;
+  return f;
 }
 #endif
 

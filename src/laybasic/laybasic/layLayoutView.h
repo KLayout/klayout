@@ -794,6 +794,21 @@ public:
    */
   LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
 
+  /**
+   *  @brief This event is triggered in the "timer" callback when the image ("screenshot") was updated.
+   */
+  tl::Event image_updated_event;
+
+  /**
+   *  @brief This event is triggered in the "timer" callback when the drawing thread has finished.
+   */
+  tl::Event drawing_finished_event;
+
+  /**
+   *  @brief A callback that needs to be called "frequently"
+   */
+  void timer ();
+
 protected:
   /**
    *  @brief Gets the LayoutView interface

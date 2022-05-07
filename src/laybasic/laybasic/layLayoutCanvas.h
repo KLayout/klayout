@@ -347,6 +347,11 @@ public:
   void resize (unsigned int width, unsigned int height);
 
   /**
+   *  @brief Gets (and resets) a flag indicating that drawing has finished
+   */
+  bool drawing_finished ();
+
+  /**
    *  @brief An event indicating that the viewport was changed.
    *  If the viewport (the rectangle that is shown) changes, this event is fired.
    */
@@ -385,6 +390,7 @@ private:
   bool m_redraw_clearing;
   bool m_redraw_force_update;
   bool m_update_image;
+  bool m_drawing_finished;
   std::vector<int> m_need_redraw_layer;
   std::vector<lay::RedrawLayerInfo> m_layers;
 

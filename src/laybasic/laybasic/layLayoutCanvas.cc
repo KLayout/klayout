@@ -296,6 +296,7 @@ LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
     m_redraw_clearing (false),
     m_redraw_force_update (true),
     m_update_image (true),
+    m_drawing_finished (false),
     m_do_update_image_dm (this, &LayoutCanvas::do_update_image),
     m_do_end_of_drawing_dm (this, &LayoutCanvas::do_end_of_drawing),
     m_image_cache_size (1)
@@ -358,23 +359,23 @@ LayoutCanvas::key_event (unsigned int key, unsigned int buttons)
 {
 #if defined(HAVE_QT) // @@@
   if (! (buttons & lay::ShiftButton)) {
-    if (int (key) == Qt::Key_Down) {
+    if (int (key) == lay::KeyDown) {
       emit down_arrow_key_pressed ();
-    } else if (int (key) == Qt::Key_Up) {
+    } else if (int (key) == lay::KeyUp) {
       emit up_arrow_key_pressed ();
-    } else if (int (key) == Qt::Key_Left) {
+    } else if (int (key) == lay::KeyLeft) {
       emit left_arrow_key_pressed ();
-    } else if (int (key) == Qt::Key_Right) {
+    } else if (int (key) == lay::KeyRight) {
       emit right_arrow_key_pressed ();
     }
   } else {
-    if (int (key) == Qt::Key_Down) {
+    if (int (key) == lay::KeyDown) {
       emit down_arrow_key_pressed_with_shift ();
-    } else if (int (key) == Qt::Key_Up) {
+    } else if (int (key) == lay::KeyUp) {
       emit up_arrow_key_pressed_with_shift ();
-    } else if (int (key) == Qt::Key_Left) {
+    } else if (int (key) == lay::KeyLeft) {
       emit left_arrow_key_pressed_with_shift ();
-    } else if (int (key) == Qt::Key_Right) {
+    } else if (int (key) == lay::KeyRight) {
       emit right_arrow_key_pressed_with_shift ();
     }
   }
@@ -1017,13 +1018,12 @@ LayoutCanvas::resizeEvent (QResizeEvent *)
 void
 LayoutCanvas::resize (unsigned int width, unsigned int height)
 {
+  //  pass down to the basic view object canvas
+  lay::ViewObjectWidget::resize (width, height);
+
   //  don't wait until the layout system informs us - which may never take place when
   //  the widget isn't shown.
   do_resize (width, height);
-
-#if defined(HAVE_QT)
-  QWidget::resize (width, height);
-#endif
 }
 
 void
@@ -1093,6 +1093,14 @@ LayoutCanvas::zoom_trans (const db::DCplxTrans &trans)
   update_viewport ();
 }
 
+bool
+LayoutCanvas::drawing_finished ()
+{
+  bool f = m_drawing_finished;
+  m_drawing_finished = false;
+  return f;
+}
+
 void 
 LayoutCanvas::do_end_of_drawing ()
 {
@@ -1109,6 +1117,8 @@ LayoutCanvas::do_end_of_drawing ()
   }
 
   set_default_cursor (lay::Cursor::none);
+
+  m_drawing_finished = true;
 }
 
 void

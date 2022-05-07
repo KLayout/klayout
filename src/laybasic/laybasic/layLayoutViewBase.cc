@@ -34,6 +34,7 @@
 #include "tlLog.h"
 #include "tlAssert.h"
 #include "tlExceptions.h"
+#include "tlDeferredExecution.h"
 #include "layLayoutViewBase.h"
 #include "layViewOp.h"
 #include "layViewObject.h"
@@ -3357,7 +3358,7 @@ LayoutViewBase::get_ui ()
   return mp_ui;
 }
 
-// @@@ needs to be called "as often as possible"
+//  NOTE: this methods needs to be called "frequently"
 void
 LayoutViewBase::timer ()
 {

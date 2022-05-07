@@ -638,12 +638,53 @@ private:
  *  @brief Describes the button state (supposed to be ored)
  */
 enum ButtonState {
-  ShiftButton = 1,
+  ShiftButton   = 1,
   ControlButton = 2,
-  AltButton = 4,
-  LeftButton = 8,
-  MidButton = 16,
-  RightButton = 32
+  AltButton     = 4,
+  LeftButton    = 8,
+  MidButton     = 16,
+  RightButton   = 32
+};
+
+/**
+ *  @brief Key codes for keys understood by the standard components
+ */
+enum KeyCodes {
+#if defined(HAVE_QT)
+  KeyEscape    = int(Qt::Key_Escape),
+  KeyTab       = int(Qt::Key_Tab),
+  KeyBacktab   = int(Qt::Key_Backtab),
+  KeyBackspace = int(Qt::Key_Backspace),
+  KeyReturn    = int(Qt::Key_Return),
+  KeyEnter     = int(Qt::Key_Enter),
+  KeyInsert    = int(Qt::Key_Insert),
+  KeyDelete    = int(Qt::Key_Delete),
+  KeyHome      = int(Qt::Key_Home),
+  KeyEnd       = int(Qt::Key_End),
+  KeyDown      = int(Qt::Key_Down),
+  KeyUp        = int(Qt::Key_Up),
+  KeyLeft      = int(Qt::Key_Left),
+  KeyRight     = int(Qt::Key_Right),
+  KeyPageUp    = int(Qt::Key_PageUp),
+  KeyPageDown  = int(Qt::Key_PageDown)
+#else
+  KeyEscape    = 0x01000000,
+  KeyTab       = 0x01000001,
+  KeyBacktab   = 0x01000002,
+  KeyBackspace = 0x01000003,
+  KeyReturn    = 0x01000004,
+  KeyEnter     = 0x01000005,
+  KeyInsert    = 0x01000006,
+  KeyDelete    = 0x01000007,
+  KeyHome      = 0x01000010,
+  KeyEnd       = 0x01000011,
+  KeyLeft      = 0x01000012,
+  KeyUp        = 0x01000013,
+  KeyRight     = 0x01000014,
+  KeyDown      = 0x01000015,
+  KeyPageUp    = 0x01000016,
+  KeyPageDown  = 0x01000017
+#endif
 };
 
 /**
@@ -1031,6 +1072,15 @@ public:
     return m_mouse_inside;
   }
 
+#if !defined(HAVE_QT)
+  /**
+   *  @brief Gets a value indicating that the image data has been updated
+   *
+   *  This method will return true once after "update" was called.
+   */
+  bool image_updated ();
+#endif
+
 protected:
 #if defined(HAVE_QT) // @@@
   /**
@@ -1103,7 +1153,13 @@ protected:
   void wheelEvent (QWheelEvent *e);
 #endif
 
-#if !defined(HAVE_QT) // @@@
+#if !defined(HAVE_QT)
+  /**
+   *  @brief Emulates the update() method in the non-Qt case
+   *
+   *  After calling this method, the next image_updated() call will return true while also resetting the
+   *  update needed flag.
+   */
   void update ();
 #endif
 
@@ -1111,6 +1167,11 @@ protected:
    *  @brief Set the transformation for mouse events
    */
   void mouse_event_trans (const db::DCplxTrans &trans);
+
+  /**
+   *  @brief Resizes the widget
+   */
+  void resize (unsigned int w, unsigned int h);
 
 private:
   friend class lay::ViewObject;
@@ -1133,6 +1194,8 @@ private:
   bool m_in_mouse_move;
   bool m_mouse_inside;
   lay::Cursor::cursor_shape m_cursor, m_default_cursor;
+  unsigned int m_widget_width, m_widget_height;
+  bool m_image_updated;
 
   void ensure_entered ();
   void do_mouse_move ();

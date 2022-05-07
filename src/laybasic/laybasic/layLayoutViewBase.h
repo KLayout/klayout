@@ -2762,6 +2762,11 @@ protected:
 
   virtual LayoutView *get_ui ();
 
+  lay::LayoutCanvas *canvas ()
+  {
+    return mp_canvas;
+  }
+
   bool configure (const std::string &name, const std::string &value);
   void config_finalize ();
 

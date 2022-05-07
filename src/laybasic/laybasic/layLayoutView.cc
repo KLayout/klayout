@@ -1128,6 +1128,26 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable
   //  .. nothing yet ..
 }
 
+//  NOTE: this methods needs to be called "frequently"
+void
+LayoutView::timer ()
+{
+  LayoutViewBase::timer ();
+
+  //  Without Qt, this is also the opportunity to execute deferred methods
+  tl::DeferredMethodScheduler::execute ();
+
+  //  We also issue the "image_updated" event if the image ("screenshot") has been updated
+  if (canvas ()->image_updated ()) {
+    image_updated_event ();
+  }
+
+  //  And also the drawing_finished event
+  if (canvas ()->drawing_finished ()) {
+    drawing_finished_event ();
+  }
+}
+
 } // namespace lay
 
 #endif

@@ -23,7 +23,7 @@
 
 #include "layCellView.h"
 #include "layLayoutView.h"
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
 #  include "layStream.h"
 #endif
 #include "dbLayout.h"
@@ -292,7 +292,7 @@ LayoutHandle::set_save_options (const db::SaveLayoutOptions &options, bool valid
 void
 LayoutHandle::update_save_options (db::SaveLayoutOptions &options)
 {
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
 
     const lay::StreamWriterPluginDeclaration *decl = dynamic_cast <const lay::StreamWriterPluginDeclaration *> (&*cls);

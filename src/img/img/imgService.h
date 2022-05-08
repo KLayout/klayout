@@ -369,10 +369,12 @@ public:
    */
   virtual void transform (const db::DCplxTrans &trans);
 
+#if defined(HAVE_QT)
   /**
    *  @brief Create the properties page
    */
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+#endif
 
   /**
    *  @brief Get the selection for the properties page

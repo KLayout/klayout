@@ -49,7 +49,7 @@ DEFINES += MAKE_EDT_LIBRARY
 
 }
 
-HEADERS = \
+HEADERS += \
   edtConfig.h \
   edtMainService.h \
   edtPartialService.h \
@@ -60,7 +60,7 @@ HEADERS = \
   edtCommon.h \
   edtDistribute.h \
 
-SOURCES = \
+SOURCES += \
   edtConfig.cc \
   edtMainService.cc \
   edtPartialService.cc \

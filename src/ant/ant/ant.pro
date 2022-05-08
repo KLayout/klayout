@@ -6,16 +6,7 @@ include($$PWD/../../lib.pri)
 
 DEFINES += MAKE_ANT_LIBRARY
 
-HEADERS = \
-  antConfig.h \
-  antConfigPage.h \
-  antObject.h \
-  antPlugin.h \
-  antPropertiesPage.h \
-  antService.h \
-  antTemplate.h \
-    antForceLink.h \
-    antCommon.h
+!equals(HAVE_QT, "0") {
 
 FORMS = \
   RulerConfigPage.ui \
@@ -24,16 +15,33 @@ FORMS = \
   RulerConfigPage4.ui \
   RulerPropertiesPage.ui \
 
+HEADERS = \
+  antConfigPage.h \
+  antPropertiesPage.h \
+
 SOURCES = \
-  antConfig.cc \
   antConfigPage.cc \
+  antPropertiesPage.cc \
+
+}
+
+HEADERS += \
+  antConfig.h \
+  antObject.h \
+  antPlugin.h \
+  antService.h \
+  antTemplate.h \
+  antForceLink.h \
+  antCommon.h
+
+SOURCES += \
+  antConfig.cc \
   antObject.cc \
   antPlugin.cc \
-  antPropertiesPage.cc \
   antService.cc \
   antTemplate.cc \
   gsiDeclAnt.cc \
-    antForceLink.cc
+  antForceLink.cc
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC

@@ -32,9 +32,13 @@
 #include "laybasicConfig.h"
 #include "layConverters.h"
 #include "layLayoutCanvas.h"
-#include "layProperties.h"
+#if defined(HAVE_QT)
+#  include "layProperties.h"
+#endif
 #include "antService.h"
-#include "antPropertiesPage.h"
+#if defined(HAVE_QT)
+#  include "antPropertiesPage.h"
+#endif
 #include "antConfig.h"
 
 namespace ant
@@ -1525,7 +1529,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
         //  begin the transaction
         tl_assert (! manager ()->transacting ());
-        manager ()->transaction (tl::to_string (QObject::tr ("Create ruler")));
+        manager ()->transaction (tl::to_string (tr ("Create ruler")));
 
         m_current = ant::Object (pt, pt, 0, tpl);
         show_message ();
@@ -1562,7 +1566,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
           //  begin the transaction
           tl_assert (! manager ()->transacting ());
-          manager ()->transaction (tl::to_string (QObject::tr ("Create ruler")));
+          manager ()->transaction (tl::to_string (tr ("Create ruler")));
 
           m_current = ant::Object (ee.first, ee.second, 0, tpl);
           show_message ();
@@ -1598,7 +1602,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
       //  begin the transaction
       tl_assert (! manager ()->transacting ());
-      manager ()->transaction (tl::to_string (QObject::tr ("Create ruler"))); 
+      manager ()->transaction (tl::to_string (tr ("Create ruler")));
 
       show_message ();
 
@@ -2160,19 +2164,21 @@ Service::display_status (bool transient)
 
     std::string msg;
     if (! transient) {
-      msg = tl::to_string (QObject::tr ("selected: "));
+      msg = tl::to_string (tr ("selected: "));
     }
-    msg += tl::sprintf (tl::to_string (QObject::tr ("annotation(d=%s x=%s y=%s)")), ruler->text (), ruler->text_x (), ruler->text_y ());
+    msg += tl::sprintf (tl::to_string (tr ("annotation(d=%s x=%s y=%s)")), ruler->text (), ruler->text_x (), ruler->text_y ());
     view ()->message (msg);
 
   }
 }
 
+#if defined(HAVE_QT)
 lay::PropertiesPage *
 Service::properties_page (db::Manager *manager, QWidget *parent)
 {
   return new PropertiesPage (this, manager, parent);
 }
+#endif
 
 void 
 Service::get_selection (std::vector <obj_iterator> &sel) const
@@ -2248,7 +2254,7 @@ Service::menu_activated (const std::string &symbol)
   if (symbol == "ant::clear_all_rulers_internal") {
     clear_rulers ();
   } else if (symbol == "ant::clear_all_rulers") {
-    manager ()->transaction (tl::to_string (QObject::tr ("Clear all rulers"))); 
+    manager ()->transaction (tl::to_string (tr ("Clear all rulers")));
     clear_rulers ();
     manager ()->commit ();
   } else {

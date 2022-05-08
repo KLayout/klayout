@@ -31,6 +31,8 @@
 namespace ant
 {
 
+class Template;
+
 class PluginDeclaration
   : public lay::PluginDeclaration
 {
@@ -44,7 +46,9 @@ public:
   virtual bool implements_editable (std::string &title) const;
   virtual bool implements_mouse_mode (std::string &title) const;
   virtual bool configure (const std::string &name, const std::string &value);
+#if defined(HAVE_QT)
   virtual std::vector<std::pair <std::string, lay::ConfigPage *> > config_pages (QWidget *parent) const;
+#endif
   virtual void config_finalize ();
   virtual void initialized (lay::Dispatcher *);
   virtual void uninitialize (lay::Dispatcher *);
@@ -60,7 +64,9 @@ private:
   
   std::vector<ant::Template> m_templates;
   int m_current_template;
+#if defined(HAVE_QT)
   tl::weak_collection<lay::ConfigureAction> m_actions;
+#endif
   bool m_current_template_updated;
   bool m_templates_updated;
 };

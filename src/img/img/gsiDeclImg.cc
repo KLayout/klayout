@@ -1103,7 +1103,7 @@ static void show_image (lay::LayoutView *view, size_t id, bool visible)
 
     const img::Object *img = img_service->object_by_id (id);
     if (img == 0) {
-      throw tl::Exception (tl::to_string (QObject::tr ("The image Id is not valid")));
+      throw tl::Exception (tl::to_string (tr ("The image Id is not valid")));
     }
 
     img::Object new_img (*img);
@@ -1121,7 +1121,7 @@ void replace_image_base (lay::LayoutView *view, size_t id, ImageRef &new_obj)
 
     const img::Object *img = img_service->object_by_id (id);
     if (img == 0) {
-      throw tl::Exception (tl::to_string (QObject::tr ("The image Id is not valid")));
+      throw tl::Exception (tl::to_string (tr ("The image Id is not valid")));
     }
 
     img_service->change_image_by_id (id, new_obj);
@@ -1141,7 +1141,7 @@ void erase_image_base (lay::LayoutView *view, size_t id)
 
     const img::Object *img = img_service->object_by_id (id);
     if (img == 0) {
-      throw tl::Exception (tl::to_string (QObject::tr ("The image Id is not valid")));
+      throw tl::Exception (tl::to_string (tr ("The image Id is not valid")));
     }
 
     img_service->erase_image_by_id (id);
@@ -1157,7 +1157,7 @@ static void erase_image (lay::LayoutView *view, size_t id)
 static void insert_image (lay::LayoutView *view, ImageRef &obj)
 {
   if (obj.is_valid ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("The object is already inserted into a view - detach the object first or create a different object.")));
+    throw tl::Exception (tl::to_string (tr ("The object is already inserted into a view - detach the object first or create a different object.")));
   }
 
   img::Service *img_service = view->get_plugin <img::Service> ();

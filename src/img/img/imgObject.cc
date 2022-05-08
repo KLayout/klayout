@@ -22,12 +22,12 @@
 
 
 #include "imgObject.h"
-#include "imgWidgets.h" // for interpolate_color()
 #include "imgStream.h"
 #include "tlLog.h"
 #include "tlTimer.h"
 #include "layPlugin.h"
 #include "layConverters.h"
+#include "layPixelBuffer.h"
 #include "dbPolygonTools.h"
 #include "tlFileUtils.h"
 #include "tlUri.h"
@@ -40,7 +40,9 @@
 #include <string>
 #include <memory.h>
 
-#include <QImage>
+#if defined(HAVE_QT)
+#  include <QImage>
+#endif
 
 namespace img
 {
@@ -1557,6 +1559,8 @@ Object::read_file ()
     //  continue with other formats ...
   }
 
+#if defined(HAVE_QT)
+
   QImage qimage (tl::to_qstring (m_filename));
 
   if (! qimage.isNull ()) {
@@ -1617,6 +1621,85 @@ Object::read_file ()
     }
 
   }
+
+#elif defined(HAVE_PNG)
+
+  lay::PixelBuffer img;
+
+  {
+    tl::InputStream stream (m_filename);
+    img = lay::PixelBuffer::read_png (stream);
+  }
+
+  bool is_color = false;
+  for (unsigned int i = 0; i < img.height () && ! is_color; ++i) {
+    const lay::color_t *d = img.scan_line (i);
+    const lay::color_t *dd = d + img.width ();
+    while (! is_color && d != dd) {
+      lay::color_t c = *d++;
+      is_color = (((c >> 8) ^ c) & 0xffff) != 0;
+    }
+  }
+
+  if (! m_min_value_set) {
+    m_min_value = 0.0;
+  }
+
+  if (! m_max_value_set) {
+    m_max_value = 255.0;
+  }
+
+  m_min_value_set = true;
+  m_max_value_set = true;
+
+  unsigned int w = img.width (), h = img.height ();
+
+  mp_data = new DataHeader (w, h, is_color, true);
+  mp_data->add_ref ();
+
+  if (is_color) {
+
+    unsigned char *red   = mp_data->byte_data (0);
+    unsigned char *green = mp_data->byte_data (1);
+    unsigned char *blue  = mp_data->byte_data (2);
+    unsigned char *msk   = img.transparent () ? mp_data->set_mask () : 0;
+
+    for (unsigned int y = 0; y < h; ++y) {
+      const lay::color_t *d = img.scan_line (h - y - 1);
+      const lay::color_t *dd = d + img.width ();
+      while (d != dd) {
+        lay::color_t rgb = *d++;
+        *red++ = lay::red (rgb);
+        *green++ = lay::green (rgb);
+        *blue++ = lay::blue (rgb);
+        if (msk) {
+          *msk++ = lay::alpha (rgb) > 128;
+        }
+      }
+    }
+
+  } else {
+
+    unsigned char *mono = mp_data->byte_data ();
+    unsigned char *msk = img.transparent () ? mp_data->set_mask () : 0;
+
+    for (unsigned int y = 0; y < h; ++y) {
+      const lay::color_t *d = img.scan_line (h - y - 1);
+      const lay::color_t *dd = d + img.width ();
+      while (d != dd) {
+        lay::color_t rgb = *d++;
+        *mono++ = lay::green (rgb);
+        if (msk) {
+          *msk++ = lay::alpha (rgb) > 128;
+        }
+      }
+    }
+
+  }
+
+#else
+  throw tl::Exception (tl::to_string ("No PNG support compiled in - cannot load PNG files"));
+#endif
 }
 
 void 

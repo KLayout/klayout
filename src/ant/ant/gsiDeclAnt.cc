@@ -171,7 +171,7 @@ static void clear_annotations (lay::LayoutView *view)
 static void insert_annotation (lay::LayoutView *view, AnnotationRef *obj)
 {
   if (obj->is_valid ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("The object is already inserted into a view - detach the object first or create a different object.")));
+    throw tl::Exception (tl::to_string (tr ("The object is already inserted into a view - detach the object first or create a different object.")));
   }
 
   ant::Service *ant_service = view->get_plugin <ant::Service> ();

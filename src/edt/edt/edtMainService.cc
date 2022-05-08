@@ -402,7 +402,7 @@ MainService::cm_flatten_insts ()
 
 #if defined(HAVE_QT)
   if (! (flatten_inst_options_dialog ()->exec_dialog (m_flatten_insts_levels, m_flatten_prune) && m_flatten_insts_levels != 0)) {
-    return
+    return;
   }
 #endif
 

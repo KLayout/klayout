@@ -32,22 +32,28 @@
 #include "laySnap.h"
 #include "layLayoutView.h"
 #include "laybasicConfig.h"
-#include "layLayoutCanvas.h"
-#include "layProperties.h"
-#include "layTipDialog.h"
+#if defined(HAVE_QT)
+#  include "layProperties.h"
+#  include "layTipDialog.h"
+#endif
 #include "tlExceptions.h"
 #include "imgService.h"
 #include "imgPlugin.h"
-#include "ui_AddNewImageDialog.h"
+#if defined(HAVE_QT)
+#  include "ui_AddNewImageDialog.h"
+#endif
 
-#include <QApplication>
+#if defined(HAVE_QT)
+#  include <QApplication>
+#endif
 
 namespace img
 {
 
 // -------------------------------------------------------------
 
-class AddNewImageDialog 
+#if defined(HAVE_QT)
+class AddNewImageDialog
   : public QDialog, 
     public Ui::AddNewImageDialog
 {
@@ -68,7 +74,7 @@ public:
     properties_frame->apply ();
 
     if (mp_image_object->is_empty ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("No data loaded for that image")));
+      throw tl::Exception (tl::to_string (tr ("No data loaded for that image")));
     }
 
     QDialog::accept ();
@@ -79,6 +85,7 @@ public:
 private:
   img::Object *mp_image_object;
 };
+#endif
 
 // -------------------------------------------------------------
 
@@ -1361,19 +1368,21 @@ Service::display_status (bool transient)
 
     std::string msg;
     if (! transient) {
-      msg = tl::to_string (QObject::tr ("selected: "));
+      msg = tl::to_string (tr ("selected: "));
     }
-    msg += tl::sprintf (tl::to_string (QObject::tr ("image(%dx%d)")), image->width (), image->height ());
+    msg += tl::sprintf (tl::to_string (tr ("image(%dx%d)")), image->width (), image->height ());
     view ()->message (msg);
 
   }
 }
 
+#if defined(HAVE_QT)
 lay::PropertiesPage *
 Service::properties_page (db::Manager *manager, QWidget *parent)
 {
   return new img::PropertiesPage (this, manager, parent);
 }
+#endif
 
 void 
 Service::get_selection (std::vector <obj_iterator> &sel) const
@@ -1463,15 +1472,16 @@ Service::menu_activated (const std::string &symbol)
 {
   if (symbol == "img::clear_all_images") {
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Clear all images"))); 
+    manager ()->transaction (tl::to_string (tr ("Clear all images")));
     clear_images ();
     manager ()->commit ();
 
   } else if (symbol == "img::add_image") {
 
+#if defined(HAVE_QT)
     if (! images_visible ()) {
       lay::TipDialog td (QApplication::activeWindow (),
-                    tl::to_string (QObject::tr ("Images are not visible. If you add an image you will not see it.\n\n"
+                    tl::to_string (tr ("Images are not visible. If you add an image you will not see it.\n\n"
                                                 "Choose 'View/Show Images' to make images visible.")),
                     "add-image-while-not-visible",
                     lay::TipDialog::okcancel_buttons);
@@ -1482,6 +1492,7 @@ Service::menu_activated (const std::string &symbol)
         return;
       }
     }
+#endif
 
     add_image ();
 
@@ -1573,6 +1584,7 @@ Service::top_z_position () const
 void 
 Service::add_image ()
 {
+#if defined(HAVE_QT)
   img::Object *new_image = new img::Object ();
 
   AddNewImageDialog dialog (QApplication::activeWindow (), new_image);
@@ -1580,7 +1592,7 @@ Service::add_image ()
 
     clear_selection ();
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Add image"))); 
+    manager ()->transaction (tl::to_string (tr ("Add image")));
     new_image->set_z_position (top_z_position ());
     mp_view->annotation_shapes ().insert (db::DUserObject (new_image));
     manager ()->commit ();
@@ -1588,6 +1600,7 @@ Service::add_image ()
   } else {
     delete new_image;
   }
+#endif
 }
 
 void

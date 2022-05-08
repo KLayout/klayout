@@ -31,7 +31,7 @@ namespace ant
 {
 
 Template::Template ()
-  : m_title (tl::to_string (QObject::tr ("Ruler"))),
+  : m_title (tl::to_string (tr ("Ruler"))),
     m_fmt_x ("$X"), m_fmt_y ("$Y"), m_fmt ("$D"),
     m_style (ant::Object::STY_ruler), m_outline (ant::Object::OL_diag),
     m_snap (true), m_angle_constraint (lay::AC_Global),

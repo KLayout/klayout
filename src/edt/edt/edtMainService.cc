@@ -1331,7 +1331,10 @@ MainService::cm_convert_to_pcell ()
     }
 
     if (any_non_converted) {
-      QMessageBox::warning (view ()->widget (), tr ("Warning"), tr ("Some of the shapes could not be converted to the desired PCell"));
+      tl::warn << tl::to_string (tr ("Some of the shapes could not be converted to the desired PCell"));
+#if defined(HAVE_QT)
+      QMessageBox::warning (view (), tr ("Warning"), tr ("Some of the shapes could not be converted to the desired PCell"));
+#endif
     }
 
     manager ()->commit ();

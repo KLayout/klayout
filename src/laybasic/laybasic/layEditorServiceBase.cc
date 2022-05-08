@@ -307,7 +307,7 @@ EditorServiceBase::show_error (tl::Exception &ex)
 {
   tl::error << ex.msg ();
 #if defined(HAVE_QT)
-  QMessageBox::critical (0, tr ("Error"), tl::to_qstring (ex.msg ()));
+  QMessageBox::critical (widget (), tr ("Error"), tl::to_qstring (ex.msg ()));
 #endif
 }
 

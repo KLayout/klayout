@@ -357,6 +357,54 @@ get_config_names (lay::LayoutView *view)
   return names;
 }
 
+static void
+send_key_press_event (lay::LayoutView *view, unsigned int key, unsigned int buttons)
+{
+  view->view_object_widget ()->send_key_press_event (key, buttons);
+}
+
+static void
+send_mouse_move_event (lay::LayoutView *view, const db::DPoint &pt, unsigned int buttons)
+{
+  view->view_object_widget ()->send_mouse_move_event (pt, buttons);
+}
+
+static void
+send_leave_event (lay::LayoutView *view)
+{
+  view->view_object_widget ()->send_leave_event ();
+}
+
+static void
+send_enter_event (lay::LayoutView *view)
+{
+  view->view_object_widget ()->send_enter_event ();
+}
+
+static void
+send_mouse_press_event (lay::LayoutView *view, const db::DPoint &pt, unsigned int buttons)
+{
+  view->view_object_widget ()->send_mouse_press_event (pt, buttons);
+}
+
+static void
+send_mouse_double_clicked_event (lay::LayoutView *view, const db::DPoint &pt, unsigned int buttons)
+{
+  view->view_object_widget ()->send_mouse_double_clicked_event (pt, buttons);
+}
+
+static void
+send_mouse_release_event (lay::LayoutView *view, const db::DPoint &pt, unsigned int buttons)
+{
+  view->view_object_widget ()->send_mouse_release_event (pt, buttons);
+}
+
+static void
+send_wheel_event (lay::LayoutView *view, int delta, bool horizontal, const db::DPoint &pt, unsigned int buttons)
+{
+  view->view_object_widget ()->send_wheel_event (delta, horizontal, pt, buttons);
+}
+
 namespace {
 
   /**
@@ -2007,6 +2055,68 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "invalid results."
     "\n"
     "This method was introduced in version 0.16."
+  ) +
+  gsi::method_ext ("send_key_press_event", &send_key_press_event, gsi::arg ("key"), gsi::arg ("buttons"),
+    "@brief Sends a key press event\n"
+    "\n"
+    "This method is intended to emulate the key press events sent by Qt normally in environments where Qt is not present. "
+    "The arguments follow the conventions used within \\Plugin#key_event for example.\n"
+    "\n"
+    "This method was introduced in version 0.28."
+  ) +
+  gsi::method_ext ("send_mouse_move_event", &send_mouse_move_event, gsi::arg ("pt"), gsi::arg ("buttons"),
+    "@brief Sends a mouse move event\n"
+    "\n"
+    "This method is intended to emulate the mouse move events sent by Qt normally in environments where Qt is not present. "
+    "The arguments follow the conventions used within \\Plugin#mouse_move_event for example.\n"
+    "\n"
+    "This method was introduced in version 0.28."
+  ) +
+  gsi::method_ext ("send_mouse_press_event", &send_mouse_press_event, gsi::arg ("pt"), gsi::arg ("buttons"),
+    "@brief Sends a mouse button press event\n"
+    "\n"
+    "This method is intended to emulate the mouse button press events sent by Qt normally in environments where Qt is not present. "
+    "The arguments follow the conventions used within \\Plugin#mouse_move_event for example.\n"
+    "\n"
+    "This method was introduced in version 0.28."
+  ) +
+  gsi::method_ext ("send_mouse_double_clicked_event", &send_mouse_double_clicked_event, gsi::arg ("pt"), gsi::arg ("buttons"),
+    "@brief Sends a mouse button double-click event\n"
+    "\n"
+    "This method is intended to emulate the mouse button double-click events sent by Qt normally in environments where Qt is not present. "
+    "The arguments follow the conventions used within \\Plugin#mouse_move_event for example.\n"
+    "\n"
+    "This method was introduced in version 0.28."
+  ) +
+  gsi::method_ext ("send_mouse_release_event", &send_mouse_release_event, gsi::arg ("pt"), gsi::arg ("buttons"),
+    "@brief Sends a mouse button release event\n"
+    "\n"
+    "This method is intended to emulate the mouse button release events sent by Qt normally in environments where Qt is not present. "
+    "The arguments follow the conventions used within \\Plugin#mouse_move_event for example.\n"
+    "\n"
+    "This method was introduced in version 0.28."
+  ) +
+  gsi::method_ext ("send_leave_event", &send_leave_event,
+    "@brief Sends a mouse window leave event\n"
+    "\n"
+    "This method is intended to emulate the mouse mouse window leave events sent by Qt normally in environments where Qt is not present. "
+    "\n"
+    "This method was introduced in version 0.28."
+  ) +
+  gsi::method_ext ("send_enter_event", &send_enter_event,
+    "@brief Sends a mouse window leave event\n"
+    "\n"
+    "This method is intended to emulate the mouse mouse window leave events sent by Qt normally in environments where Qt is not present. "
+    "\n"
+    "This method was introduced in version 0.28."
+  ) +
+  gsi::method_ext ("send_wheel_event", &send_wheel_event, gsi::arg ("delta"), gsi::arg ("horizontal"), gsi::arg ("pt"), gsi::arg ("buttons"),
+    "@brief Sends a mouse wheel event\n"
+    "\n"
+    "This method is intended to emulate the mouse wheel events sent by Qt normally in environments where Qt is not present. "
+    "The arguments follow the conventions used within \\Plugin#wheel_event for example.\n"
+    "\n"
+    "This method was introduced in version 0.28."
   ),
   "@brief The view object presenting one or more layout objects\n"
   "\n"

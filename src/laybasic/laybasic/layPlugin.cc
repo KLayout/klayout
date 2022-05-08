@@ -62,6 +62,7 @@ PluginDeclaration::~PluginDeclaration ()
   }
 }
 
+#if defined(HAVE_QT)
 void 
 PluginDeclaration::toggle_editable_enabled ()
 {
@@ -69,6 +70,7 @@ PluginDeclaration::toggle_editable_enabled ()
   set_editable_enabled (! editable_enabled ());
   END_PROTECTED
 }
+#endif
 
 std::vector<std::string>
 PluginDeclaration::menu_symbols ()
@@ -95,6 +97,7 @@ PluginDeclaration::menu_symbols ()
 }
 
 #if defined(HAVE_QT)
+
 namespace {
 
 class GenericMenuAction
@@ -144,12 +147,10 @@ private:
 };
 
 }
-#endif
 
 void
 PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
 {
-#if defined(HAVE_QT) // @@@
   lay::AbstractMenu &menu = *dispatcher->menu ();
 
   mp_editable_mode_action.reset ((Action *) 0);
@@ -259,13 +260,11 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
     menu.insert_item (m->second.first, name + ":mode_group", mp_mouse_mode_action.get ());
 
   }
-#endif
 }
 
 void
 PluginDeclaration::remove_menu_items (Dispatcher *dispatcher)
 {
-#if defined(HAVE_QT) // @@@
   lay::AbstractMenu *menu = dispatcher->menu ();
   menu->delete_items (mp_editable_mode_action.get ());
   menu->delete_items (mp_mouse_mode_action.get ());
@@ -280,15 +279,16 @@ PluginDeclaration::remove_menu_items (Dispatcher *dispatcher)
     menu->delete_items (*a);
   }
   m_menu_actions.clear ();
-#endif
 }
+
+#endif
 
 void 
 PluginDeclaration::set_editable_enabled (bool f)
 {
   if (f != m_editable_enabled) {
     m_editable_enabled = f;
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
     if (mp_editable_mode_action.get ()) {
       mp_editable_mode_action->set_checked (f);
     }

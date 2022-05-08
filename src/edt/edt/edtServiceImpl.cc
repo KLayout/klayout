@@ -37,6 +37,7 @@
 #include "layLayerProperties.h"
 #include "layLayoutView.h"
 #include "layTipDialog.h"
+#include "layDragDropData.h"
 
 #include <QInputDialog>
 #include <QApplication>

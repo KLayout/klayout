@@ -163,14 +163,14 @@ TEST(4)
   tl::msleep (250);
 
   lay::PixelBuffer img = lv.get_screenshot_pb ();
-  EXPECT_EQ (img.width (), 42);
-  EXPECT_EQ (img.height (), 117);
+  EXPECT_EQ ((int) img.width (), 42);
+  EXPECT_EQ ((int) img.height (), 117);
 
   lv.resize (142, 217);
 
   img = lv.get_screenshot_pb ();
-  EXPECT_EQ (img.width (), 142);
-  EXPECT_EQ (img.height (), 217);
+  EXPECT_EQ ((int) img.width (), 142);
+  EXPECT_EQ ((int) img.height (), 217);
 }
 
 #if defined(HAVE_PNG)

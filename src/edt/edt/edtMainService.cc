@@ -2113,7 +2113,7 @@ MainService::cm_tap ()
 
   int icon_size = menu->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
 
-  db::Point mp_local = view ()->view_object_widget ()->mouse_position ();
+  db::DPoint mp_local = view ()->view_object_widget ()->mouse_position ();
   QPoint mp = view ()->view_object_widget ()->mapToGlobal (QPoint (mp_local.x (), mp_local.y ()));
 
   for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = tapped_layers.begin (); l != tapped_layers.end (); ++l) {

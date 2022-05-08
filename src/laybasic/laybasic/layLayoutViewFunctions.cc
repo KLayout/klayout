@@ -433,7 +433,7 @@ LayoutViewFunctions::cm_cell_user_properties ()
     lay::UserPropertiesForm props_form (view ());
     if (props_form.show (view (), cv_index, prop_id)) {
 
-      view ()->transaction (tl::to_string (QObject::tr ("Edit cell's user properties")));
+      view ()->transaction (tl::to_string (tr ("Edit cell's user properties")));
       cell.prop_id (prop_id);
       view ()->commit ();
 
@@ -456,7 +456,7 @@ LayoutViewFunctions::cm_cell_replace ()
   if (cv_index >= 0 && paths.size () > 0) {
 
     if (paths.size () > 1) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Replace cell cannot be used when multiple cells are selected")));
+      throw tl::Exception (tl::to_string (tr ("Replace cell cannot be used when multiple cells are selected")));
     }
 
     db::Layout &layout = view ()->cellview (cv_index)->layout ();
@@ -487,7 +487,7 @@ LayoutViewFunctions::cm_cell_replace ()
 
         view ()->clear_selection ();
 
-        view ()->transaction (tl::to_string (QObject::tr ("Replace cells")));
+        view ()->transaction (tl::to_string (tr ("Replace cells")));
 
         //  replace instances of the target cell with the new cell 
 
@@ -555,7 +555,7 @@ LayoutViewFunctions::cm_lay_convert_to_static ()
 
     db::Layout &layout = view ()->cellview (cv_index)->layout ();
 
-    view ()->transaction (tl::to_string (QObject::tr ("Convert all cells to static")));
+    view ()->transaction (tl::to_string (tr ("Convert all cells to static")));
 
     std::vector<db::cell_index_type> cells;
     for (db::Layout::const_iterator c = layout.begin (); c != layout.end (); ++c) {
@@ -611,7 +611,7 @@ LayoutViewFunctions::cm_cell_convert_to_static ()
 
     view ()->clear_selection ();
 
-    view ()->transaction (tl::to_string (QObject::tr ("Convert cells to static")));
+    view ()->transaction (tl::to_string (tr ("Convert cells to static")));
 
     std::map<db::cell_index_type, db::cell_index_type> cell_map;
 
@@ -697,7 +697,7 @@ LayoutViewFunctions::cm_cell_delete ()
         }
       }
 
-      view ()->transaction (tl::to_string (QObject::tr ("Delete cells")));
+      view ()->transaction (tl::to_string (tr ("Delete cells")));
 
       if (mode == 0 || mode == 2) {
         layout.delete_cells (cells_to_delete);
@@ -730,7 +730,7 @@ void
 LayoutViewFunctions::cm_layer_cut ()
 {
   if (view ()->control_panel ()) {
-    db::Transaction trans (manager (), tl::to_string (QObject::tr ("Cut Layers")));
+    db::Transaction trans (manager (), tl::to_string (tr ("Cut Layers")));
     view ()->control_panel ()->cut ();
   }
 }
@@ -739,7 +739,7 @@ void
 LayoutViewFunctions::cm_layer_paste ()
 {
   if (view ()->control_panel ()) {
-    db::Transaction trans (manager (), tl::to_string (QObject::tr ("Paste Layers")));
+    db::Transaction trans (manager (), tl::to_string (tr ("Paste Layers")));
     view ()->control_panel ()->paste ();
   }
 }
@@ -758,7 +758,7 @@ void
 LayoutViewFunctions::cm_cell_paste ()
 {
   if (view ()->hierarchy_panel ()) {
-    db::Transaction trans (manager (), tl::to_string (QObject::tr ("Paste Cells")));
+    db::Transaction trans (manager (), tl::to_string (tr ("Paste Cells")));
     view ()->hierarchy_panel ()->paste ();
   }
 }
@@ -789,12 +789,12 @@ LayoutViewFunctions::cm_cell_flatten ()
       std::vector<HierarchyControlPanel::cell_path_type> paths;
       view ()->hierarchy_panel ()->selected_cells (cv_index, paths);
       if (paths.empty ()) {
-        throw tl::Exception (tl::to_string (QObject::tr ("No cells selected for flattening")));
+        throw tl::Exception (tl::to_string (tr ("No cells selected for flattening")));
       }
 
       for (std::vector<HierarchyControlPanel::cell_path_type>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
         if (p->size () > 0 && cv->layout ().cell (p->back ()).is_proxy ()) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Cannot use this function on a PCell or library cell")));
+          throw tl::Exception (tl::to_string (tr ("Cannot use this function on a PCell or library cell")));
         }
       }
 
@@ -809,7 +809,7 @@ LayoutViewFunctions::cm_cell_flatten ()
         if (manager () && manager ()->is_enabled ()) {
 
           lay::TipDialog td (QApplication::activeWindow (), 
-                             tl::to_string (QObject::tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")), 
+                             tl::to_string (tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")),
                              "flatten-undo-buffering",
                              lay::TipDialog::yesnocancel_buttons);
 
@@ -832,7 +832,7 @@ LayoutViewFunctions::cm_cell_flatten ()
           if (! supports_undo) {
             manager ()->clear ();
           } else {
-            manager ()->transaction (tl::to_string (QObject::tr ("Flatten cell")));
+            manager ()->transaction (tl::to_string (tr ("Flatten cell")));
           }
         }
 
@@ -890,7 +890,7 @@ LayoutViewFunctions::cm_cell_rename ()
     std::string name (layout.cell_name (path.back ()));
     if (name_dialog.exec_dialog (layout, name)) {
 
-      view ()->transaction (tl::to_string (QObject::tr ("Rename cell")));
+      view ()->transaction (tl::to_string (tr ("Rename cell")));
       layout.rename_cell (path.back (), name.c_str ());
       view ()->commit ();
 
@@ -921,7 +921,7 @@ LayoutViewFunctions::cm_cell_hide ()
     std::vector<HierarchyControlPanel::cell_path_type> paths;
     view ()->hierarchy_panel ()->selected_cells (view ()->active_cellview_index (), paths);
 
-    view ()->transaction (tl::to_string (QObject::tr ("Hide cell")));
+    view ()->transaction (tl::to_string (tr ("Hide cell")));
 
     for (std::vector<HierarchyControlPanel::cell_path_type>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
       if (! p->empty ()) {
@@ -942,7 +942,7 @@ LayoutViewFunctions::cm_cell_show ()
     std::vector<HierarchyControlPanel::cell_path_type> paths;
     view ()->hierarchy_panel ()->selected_cells (view ()->active_cellview_index (), paths);
 
-    view ()->transaction (tl::to_string (QObject::tr ("Show cell")));
+    view ()->transaction (tl::to_string (tr ("Show cell")));
 
     for (std::vector<HierarchyControlPanel::cell_path_type>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
       if (! p->empty ()) {
@@ -959,7 +959,7 @@ void
 LayoutViewFunctions::cm_cell_show_all ()
 {
   if (view ()->hierarchy_panel ()) {
-    view ()->transaction (tl::to_string (QObject::tr ("Show all cells")));
+    view ()->transaction (tl::to_string (tr ("Show all cells")));
     view ()->show_all_cells ();
     view ()->commit ();
   }
@@ -1270,7 +1270,7 @@ LayoutViewFunctions::cm_reload ()
 
   if (view ()->cellviews () > 1) {
 
-    lay::SelectCellViewForm form (0, view (), tl::to_string (QObject::tr ("Select Layouts To Reload")));
+    lay::SelectCellViewForm form (0, view (), tl::to_string (tr ("Select Layouts To Reload")));
     form.select_all ();
 
     if (form.exec () == QDialog::Accepted) {
@@ -1308,10 +1308,10 @@ LayoutViewFunctions::cm_reload ()
     if (dirty_layouts != 0) {
 
       QMessageBox mbox (view ());
-      mbox.setText (tl::to_qstring (tl::to_string (QObject::tr ("The following layouts need saving:\n\n")) + dirty_files + "\n\nPress 'Reload Without Saving' to reload anyhow and discard changes."));
-      mbox.setWindowTitle (QObject::tr ("Save Needed"));
+      mbox.setText (tl::to_qstring (tl::to_string (tr ("The following layouts need saving:\n\n")) + dirty_files + "\n\nPress 'Reload Without Saving' to reload anyhow and discard changes."));
+      mbox.setWindowTitle (tr ("Save Needed"));
       mbox.setIcon (QMessageBox::Warning);
-      QAbstractButton *yes_button = mbox.addButton (QObject::tr ("Reload Without Saving"), QMessageBox::YesRole);
+      QAbstractButton *yes_button = mbox.addButton (tr ("Reload Without Saving"), QMessageBox::YesRole);
       mbox.addButton (QMessageBox::Cancel);
 
       mbox.exec ();
@@ -1352,7 +1352,7 @@ LayoutViewFunctions::transform_layout (const db::DCplxTrans &tr_mic)
 
     db::Layout &layout = view ()->cellview (cv_index)->layout ();
 
-    db::ICplxTrans tr (db::DCplxTrans (1.0 / layout.dbu ()) * tr_mic * db::DCplxTrans (layout.dbu ()));
+    db::ICplxTrans trans (db::DCplxTrans (1.0 / layout.dbu ()) * tr_mic * db::DCplxTrans (layout.dbu ()));
 
     bool has_proxy = false;
     for (db::Layout::const_iterator c = layout.begin (); ! has_proxy && c != layout.end (); ++c) {
@@ -1361,19 +1361,19 @@ LayoutViewFunctions::transform_layout (const db::DCplxTrans &tr_mic)
 
     if (has_proxy && 
         QMessageBox::question (view (),
-                               QObject::tr ("Transforming PCells Or Library Cells"), 
-                               QObject::tr ("The layout contains PCells or library cells or both.\n"
-                                            "Any changes to such cells may be lost when their layout is refreshed later.\n"
-                                            "Consider using 'Convert all cells to static' before transforming the layout.\n"
-                                            "\n"
-                                            "Would you like to continue?\n"
-                                            "Choose 'Yes' to continue anyway. Choose 'No' to cancel."), 
+                               tr ("Transforming PCells Or Library Cells"),
+                               tr ("The layout contains PCells or library cells or both.\n"
+                                   "Any changes to such cells may be lost when their layout is refreshed later.\n"
+                                   "Consider using 'Convert all cells to static' before transforming the layout.\n"
+                                   "\n"
+                                   "Would you like to continue?\n"
+                                   "Choose 'Yes' to continue anyway. Choose 'No' to cancel."),
                                QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
       return;
     }
 
-    view ()->transaction (tl::to_string (QObject::tr ("Transform layout")));
-    layout.transform (tr);
+    view ()->transaction (tl::to_string (tr ("Transform layout")));
+    layout.transform (trans);
     view ()->commit ();
 
   }
@@ -1409,8 +1409,8 @@ LayoutViewFunctions::cm_lay_free_rot ()
 {
   bool ok = false;
   QString s = QInputDialog::getText (QApplication::activeWindow (), 
-                                     QObject::tr ("Free rotation"), 
-                                     QObject::tr ("Rotation angle in degree (counterclockwise)"), 
+                                     tr ("Free rotation"),
+                                     tr ("Rotation angle in degree (counterclockwise)"),
                                      QLineEdit::Normal, QString::fromUtf8 ("0.0"), 
                                      &ok);
 
@@ -1429,8 +1429,8 @@ LayoutViewFunctions::cm_lay_scale ()
 {
   bool ok = false;
   QString s = QInputDialog::getText (QApplication::activeWindow (), 
-                                     QObject::tr ("Scaling"), 
-                                     QObject::tr ("Scaling factor"), 
+                                     tr ("Scaling"),
+                                     tr ("Scaling factor"),
                                      QLineEdit::Normal, QString::fromUtf8 ("1.0"), 
                                      &ok);
 
@@ -1502,8 +1502,8 @@ LayoutViewFunctions::cm_sel_free_rot ()
 {
   bool ok = false;
   QString s = QInputDialog::getText (QApplication::activeWindow (), 
-                                     QObject::tr ("Free rotation"), 
-                                     QObject::tr ("Rotation angle in degree (counterclockwise)"), 
+                                     tr ("Free rotation"),
+                                     tr ("Rotation angle in degree (counterclockwise)"),
                                      QLineEdit::Normal, QString::fromUtf8 ("0.0"), 
                                      &ok);
 
@@ -1527,8 +1527,8 @@ LayoutViewFunctions::cm_sel_scale ()
 {
   bool ok = false;
   QString s = QInputDialog::getText (QApplication::activeWindow (), 
-                                     QObject::tr ("Scaling"), 
-                                     QObject::tr ("Scaling factor"), 
+                                     tr ("Scaling"),
+                                     tr ("Scaling factor"),
                                      QLineEdit::Normal, QString::fromUtf8 ("1.0"), 
                                      &ok);
 
@@ -1560,7 +1560,7 @@ LayoutViewFunctions::cm_sel_move_to ()
 {
   db::DBox sel_bbox (view ()->lay::Editables::selection_bbox ());
   if (sel_bbox.empty ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Nothing selected to move")));
+    throw tl::Exception (tl::to_string (tr ("Nothing selected to move")));
   }
 
   double x = sel_bbox.left () + (sel_bbox.width () * (1 + m_move_to_origin_mode_x) * 0.5);
@@ -1623,7 +1623,7 @@ LayoutViewFunctions::cm_copy_layer ()
     if (manager () && manager ()->is_enabled ()) {
 
       lay::TipDialog td (QApplication::activeWindow (), 
-                         tl::to_string (QObject::tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")), 
+                         tl::to_string (tr ("Undo buffering for the following operation can be memory and time consuming.\nChoose \"Yes\" to use undo buffering or \"No\" for no undo buffering. Warning: in the latter case, the undo history will be lost.\n\nChoose undo buffering?")),
                          "copy-layer-undo-buffering",
                          lay::TipDialog::yesnocancel_buttons);
 
@@ -1645,7 +1645,7 @@ LayoutViewFunctions::cm_copy_layer ()
       if (! supports_undo) {
         manager ()->clear ();
       } else {
-        manager ()->transaction (tl::to_string (QObject::tr ("Duplicate layer"))); 
+        manager ()->transaction (tl::to_string (tr ("Duplicate layer")));
       }
     }
 
@@ -1653,7 +1653,7 @@ LayoutViewFunctions::cm_copy_layer ()
 
       bool same_layout = (&view ()->cellview (m_copy_cvr)->layout () == &view ()->cellview (m_copy_cva)->layout ());
       if (same_layout && m_copy_layera == m_copy_layerr) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Source and target layer must not be identical for duplicate operation")));
+        throw tl::Exception (tl::to_string (tr ("Source and target layer must not be identical for duplicate operation")));
       }
 
       if (m_duplicate_hier_mode == 0) {
@@ -1780,11 +1780,11 @@ LayoutViewFunctions::cm_new_layer ()
 
       for (unsigned int l = 0; l < cv->layout ().layers (); ++l) {
         if (cv->layout ().is_valid_layer (l) && cv->layout ().get_properties (l).log_equal (m_new_layer_props)) {
-          throw tl::Exception (tl::to_string (QObject::tr ("A layer with that signature already exists: ")) + m_new_layer_props.to_string ());
+          throw tl::Exception (tl::to_string (tr ("A layer with that signature already exists: ")) + m_new_layer_props.to_string ());
         }
       }
 
-      view ()->transaction (tl::to_string (QObject::tr ("New layer")));
+      view ()->transaction (tl::to_string (tr ("New layer")));
 
       unsigned int l = cv->layout ().insert_layer (m_new_layer_props);
       std::vector <unsigned int> nl;
@@ -1810,7 +1810,7 @@ LayoutViewFunctions::cm_align_cell_origin ()
       return;
     }
     if (cell->is_proxy ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Cannot use this function on a PCell or library cell")));
+      throw tl::Exception (tl::to_string (tr ("Cannot use this function on a PCell or library cell")));
     }
 
     lay::AlignCellOptionsDialog dialog (view ());
@@ -1818,7 +1818,7 @@ LayoutViewFunctions::cm_align_cell_origin ()
 
       view ()->clear_selection ();
 
-      view ()->transaction (tl::to_string (QObject::tr ("Align cell origin")));
+      view ()->transaction (tl::to_string (tr ("Align cell origin")));
 
       db::Box bbox;
 
@@ -1900,12 +1900,12 @@ LayoutViewFunctions::cm_edit_layer ()
 {
   lay::LayerPropertiesConstIterator sel = view ()->current_layer ();
   if (sel.is_null ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("No layer selected for editing it's properties")));
+    throw tl::Exception (tl::to_string (tr ("No layer selected for editing it's properties")));
   }
 
   int index = sel->cellview_index ();
   if (sel->has_children () || index < 0 || int (view ()->cellviews ()) <= index || sel->layer_index () < 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("No valid layer selected for editing it's properties")));
+    throw tl::Exception (tl::to_string (tr ("No valid layer selected for editing it's properties")));
   }
 
   const lay::CellView &cv = view ()->cellview (index);
@@ -1917,11 +1917,11 @@ LayoutViewFunctions::cm_edit_layer ()
 
     for (unsigned int l = 0; l < cv->layout ().layers (); ++l) {
       if (cv->layout ().is_valid_layer (l) && int (l) != sel->layer_index () && cv->layout ().get_properties (l).log_equal (layer_props)) {
-        throw tl::Exception (tl::to_string (QObject::tr ("A layer with that signature already exists: ")) + layer_props.to_string ());
+        throw tl::Exception (tl::to_string (tr ("A layer with that signature already exists: ")) + layer_props.to_string ());
       }
     }
 
-    view ()->transaction (tl::to_string (QObject::tr ("Edit layer")));
+    view ()->transaction (tl::to_string (tr ("Edit layer")));
 
     cv->layout ().set_properties (sel->layer_index (), layer_props);
 
@@ -1963,13 +1963,13 @@ LayoutViewFunctions::cm_delete_layer ()
   }
 
   if (valid_sel.empty ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("No or no valid layer selected for deleting them")));
+    throw tl::Exception (tl::to_string (tr ("No or no valid layer selected for deleting them")));
   }
 
   view ()->cancel_edits ();
   view ()->clear_selection ();
 
-  view ()->transaction (tl::to_string (QObject::tr ("Delete layers")));
+  view ()->transaction (tl::to_string (tr ("Delete layers")));
 
   //  Hint: delete_layer must come before the layers are actually deleted in because
   //  for undo this must be the last thing to do (otherwise the layout is not propertly set up)
@@ -2002,7 +2002,7 @@ LayoutViewFunctions::cm_clear_layer ()
 {
   std::vector<lay::LayerPropertiesConstIterator> sel = view ()->selected_layers ();
   if (sel.empty ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("No layer selected for clearing")));
+    throw tl::Exception (tl::to_string (tr ("No layer selected for clearing")));
   }
 
   lay::ClearLayerModeDialog mode_dialog (view ());
@@ -2011,7 +2011,7 @@ LayoutViewFunctions::cm_clear_layer ()
     view ()->cancel_edits ();
     view ()->clear_selection ();
 
-    view ()->transaction (tl::to_string (QObject::tr ("Clear layer")));
+    view ()->transaction (tl::to_string (tr ("Clear layer")));
 
     for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator si = sel.begin (); si != sel.end (); ++si) {
 
@@ -2058,153 +2058,153 @@ public:
 
     //  secret menu entries
     at = "@secrets.end";
-    menu_entries.push_back (lay::menu_item ("cm_paste_interactive", "paste_interactive:edit", at, tl::to_string (QObject::tr ("Paste Interactive"))));
-    menu_entries.push_back (lay::menu_item ("cm_duplicate_interactive", "duplicate_interactive:edit", at, tl::to_string (QObject::tr ("Duplicate Interactive"))));
-    menu_entries.push_back (lay::menu_item ("cm_sel_move_interactive", "sel_move_interactive:edit", at, tl::to_string (QObject::tr ("Move Interactive"))));
-    menu_entries.push_back (lay::menu_item ("cm_select_next_item", "select_next_item:edit", at, tl::to_string (QObject::tr ("Select Next Item(Space)"))));
-    menu_entries.push_back (lay::menu_item ("cm_select_next_item_add", "select_next_item_add:edit", at, tl::to_string (QObject::tr ("Select Next Item too(Shift+Space)"))));
+    menu_entries.push_back (lay::menu_item ("cm_paste_interactive", "paste_interactive:edit", at, tl::to_string (tr ("Paste Interactive"))));
+    menu_entries.push_back (lay::menu_item ("cm_duplicate_interactive", "duplicate_interactive:edit", at, tl::to_string (tr ("Duplicate Interactive"))));
+    menu_entries.push_back (lay::menu_item ("cm_sel_move_interactive", "sel_move_interactive:edit", at, tl::to_string (tr ("Move Interactive"))));
+    menu_entries.push_back (lay::menu_item ("cm_select_next_item", "select_next_item:edit", at, tl::to_string (tr ("Select Next Item(Space)"))));
+    menu_entries.push_back (lay::menu_item ("cm_select_next_item_add", "select_next_item_add:edit", at, tl::to_string (tr ("Select Next Item too(Shift+Space)"))));
 
     at = "edit_menu.edit_options_group";
-    menu_entries.push_back (lay::menu_item ("cm_undo", "undo:edit", at, tl::to_string (QObject::tr ("Undo(Ctrl+Z)"))));
-    menu_entries.push_back (lay::menu_item ("cm_redo", "redo:edit", at, tl::to_string (QObject::tr ("Redo(Ctrl+Y)"))));
+    menu_entries.push_back (lay::menu_item ("cm_undo", "undo:edit", at, tl::to_string (tr ("Undo(Ctrl+Z)"))));
+    menu_entries.push_back (lay::menu_item ("cm_redo", "redo:edit", at, tl::to_string (tr ("Redo(Ctrl+Y)"))));
 
     menu_entries.push_back (lay::separator ("basic_group", at));
-    menu_entries.push_back (lay::submenu ("layout_menu:edit:edit_mode", at, tl::to_string (QObject::tr ("Layout"))));
+    menu_entries.push_back (lay::submenu ("layout_menu:edit:edit_mode", at, tl::to_string (tr ("Layout"))));
     {
       std::string at = "edit_menu.layout_menu.end";
-      menu_entries.push_back (lay::menu_item ("cm_lay_flip_x", "lay_flip_x:edit_mode", at, tl::to_string (QObject::tr ("Flip Horizontally"))));
-      menu_entries.push_back (lay::menu_item ("cm_lay_flip_y", "lay_flip_y:edit_mode", at, tl::to_string (QObject::tr ("Flip Vertically"))));
-      menu_entries.push_back (lay::menu_item ("cm_lay_rot_cw", "lay_rot_cw:edit_mode", at, tl::to_string (QObject::tr ("Rotate Clockwise"))));
-      menu_entries.push_back (lay::menu_item ("cm_lay_rot_ccw", "lay_rot_ccw:edit_mode", at, tl::to_string (QObject::tr ("Rotate Counterclockwise"))));
-      menu_entries.push_back (lay::menu_item ("cm_lay_free_rot", "lay_free_rot:edit_mode", at, tl::to_string (QObject::tr ("Rotation By Angle"))));
-      menu_entries.push_back (lay::menu_item ("cm_lay_scale", "lay_scale:edit_mode", at, tl::to_string (QObject::tr ("Scale"))));
-      menu_entries.push_back (lay::menu_item ("cm_lay_move", "lay_move:edit_mode", at, tl::to_string (QObject::tr ("Move By"))));
+      menu_entries.push_back (lay::menu_item ("cm_lay_flip_x", "lay_flip_x:edit_mode", at, tl::to_string (tr ("Flip Horizontally"))));
+      menu_entries.push_back (lay::menu_item ("cm_lay_flip_y", "lay_flip_y:edit_mode", at, tl::to_string (tr ("Flip Vertically"))));
+      menu_entries.push_back (lay::menu_item ("cm_lay_rot_cw", "lay_rot_cw:edit_mode", at, tl::to_string (tr ("Rotate Clockwise"))));
+      menu_entries.push_back (lay::menu_item ("cm_lay_rot_ccw", "lay_rot_ccw:edit_mode", at, tl::to_string (tr ("Rotate Counterclockwise"))));
+      menu_entries.push_back (lay::menu_item ("cm_lay_free_rot", "lay_free_rot:edit_mode", at, tl::to_string (tr ("Rotation By Angle"))));
+      menu_entries.push_back (lay::menu_item ("cm_lay_scale", "lay_scale:edit_mode", at, tl::to_string (tr ("Scale"))));
+      menu_entries.push_back (lay::menu_item ("cm_lay_move", "lay_move:edit_mode", at, tl::to_string (tr ("Move By"))));
       menu_entries.push_back (lay::separator ("cellop_group", at));
-      menu_entries.push_back (lay::menu_item ("cm_lay_convert_to_static", "lay_convert_to_static:edit_mode", at, tl::to_string (QObject::tr ("Convert All Cells To Static"))));
+      menu_entries.push_back (lay::menu_item ("cm_lay_convert_to_static", "lay_convert_to_static:edit_mode", at, tl::to_string (tr ("Convert All Cells To Static"))));
     }
 
-    menu_entries.push_back (lay::submenu ("cell_menu:edit:edit_mode", at, tl::to_string (QObject::tr ("Cell"))));
+    menu_entries.push_back (lay::submenu ("cell_menu:edit:edit_mode", at, tl::to_string (tr ("Cell"))));
     {
       std::string at = "edit_menu.cell_menu.end";
-      menu_entries.push_back (lay::menu_item ("cm_new_cell", "new_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("New Cell"))));
-      menu_entries.push_back (lay::menu_item ("cm_cell_delete", "delete_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Delete Cell"))));
-      menu_entries.push_back (lay::menu_item ("cm_cell_rename", "rename_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Rename Cell"))));
-      menu_entries.push_back (lay::menu_item ("cm_cell_replace", "replace_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Replace Cell"))));
-      menu_entries.push_back (lay::menu_item ("cm_cell_flatten", "flatten_cell:edit:edit_mode", at, tl::to_string (QObject::tr ("Flatten Cell"))));
+      menu_entries.push_back (lay::menu_item ("cm_new_cell", "new_cell:edit:edit_mode", at, tl::to_string (tr ("New Cell"))));
+      menu_entries.push_back (lay::menu_item ("cm_cell_delete", "delete_cell:edit:edit_mode", at, tl::to_string (tr ("Delete Cell"))));
+      menu_entries.push_back (lay::menu_item ("cm_cell_rename", "rename_cell:edit:edit_mode", at, tl::to_string (tr ("Rename Cell"))));
+      menu_entries.push_back (lay::menu_item ("cm_cell_replace", "replace_cell:edit:edit_mode", at, tl::to_string (tr ("Replace Cell"))));
+      menu_entries.push_back (lay::menu_item ("cm_cell_flatten", "flatten_cell:edit:edit_mode", at, tl::to_string (tr ("Flatten Cell"))));
       menu_entries.push_back (lay::separator ("ops_group", at));
-      menu_entries.push_back (lay::menu_item ("cm_adjust_origin", "adjust_cell_origin:edit:edit_mode", at, tl::to_string (QObject::tr ("Adjust Origin"))));
-      menu_entries.push_back (lay::menu_item ("cm_cell_convert_to_static", "convert_cell_to_static:edit_mode", at, tl::to_string (QObject::tr ("Convert Cell To Static"))));
+      menu_entries.push_back (lay::menu_item ("cm_adjust_origin", "adjust_cell_origin:edit:edit_mode", at, tl::to_string (tr ("Adjust Origin"))));
+      menu_entries.push_back (lay::menu_item ("cm_cell_convert_to_static", "convert_cell_to_static:edit_mode", at, tl::to_string (tr ("Convert Cell To Static"))));
       menu_entries.push_back (lay::separator ("props_group", at));
-      menu_entries.push_back (lay::menu_item ("cm_cell_user_properties", "user_properties", at, tl::to_string (QObject::tr ("User Properties"))));
+      menu_entries.push_back (lay::menu_item ("cm_cell_user_properties", "user_properties", at, tl::to_string (tr ("User Properties"))));
     }
 
-    menu_entries.push_back (lay::submenu ("layer_menu:edit:edit_mode", at, tl::to_string (QObject::tr ("Layer"))));
+    menu_entries.push_back (lay::submenu ("layer_menu:edit:edit_mode", at, tl::to_string (tr ("Layer"))));
     {
       std::string at = "edit_menu.layer_menu.end";
-      menu_entries.push_back (lay::menu_item ("cm_new_layer", "new_layer:edit:edit_mode", at, tl::to_string (QObject::tr ("New Layer"))));
-      menu_entries.push_back (lay::menu_item ("cm_clear_layer", "clear_layer:edit:edit_mode", at, tl::to_string (QObject::tr ("Clear Layer"))));
-      menu_entries.push_back (lay::menu_item ("cm_delete_layer", "delete_layer:edit:edit_mode", at, tl::to_string (QObject::tr ("Delete Layer"))));
-      menu_entries.push_back (lay::menu_item ("cm_copy_layer", "copy_layer:edit:edit_mode", at, tl::to_string (QObject::tr ("Copy Layer"))));
-      menu_entries.push_back (lay::menu_item ("cm_edit_layer", "edit_layer:edit:edit_mode", at, tl::to_string (QObject::tr ("Edit Layer Specification"))));
+      menu_entries.push_back (lay::menu_item ("cm_new_layer", "new_layer:edit:edit_mode", at, tl::to_string (tr ("New Layer"))));
+      menu_entries.push_back (lay::menu_item ("cm_clear_layer", "clear_layer:edit:edit_mode", at, tl::to_string (tr ("Clear Layer"))));
+      menu_entries.push_back (lay::menu_item ("cm_delete_layer", "delete_layer:edit:edit_mode", at, tl::to_string (tr ("Delete Layer"))));
+      menu_entries.push_back (lay::menu_item ("cm_copy_layer", "copy_layer:edit:edit_mode", at, tl::to_string (tr ("Copy Layer"))));
+      menu_entries.push_back (lay::menu_item ("cm_edit_layer", "edit_layer:edit:edit_mode", at, tl::to_string (tr ("Edit Layer Specification"))));
     }
 
-    menu_entries.push_back (lay::submenu ("selection_menu:edit", at, tl::to_string (QObject::tr ("Selection"))));
+    menu_entries.push_back (lay::submenu ("selection_menu:edit", at, tl::to_string (tr ("Selection"))));
     {
       std::string at = "edit_menu.selection_menu.end";
-      menu_entries.push_back (lay::menu_item ("cm_sel_flip_x", "sel_flip_x", at, tl::to_string (QObject::tr ("Flip Horizontally"))));
-      menu_entries.push_back (lay::menu_item ("cm_sel_flip_y", "sel_flip_y", at, tl::to_string (QObject::tr ("Flip Vertically"))));
-      menu_entries.push_back (lay::menu_item ("cm_sel_rot_cw", "sel_rot_cw", at, tl::to_string (QObject::tr ("Rotate Clockwise"))));
-      menu_entries.push_back (lay::menu_item ("cm_sel_rot_ccw", "sel_rot_ccw", at, tl::to_string (QObject::tr ("Rotate Counterclockwise"))));
-      menu_entries.push_back (lay::menu_item ("cm_sel_free_rot", "sel_free_rot", at, tl::to_string (QObject::tr ("Rotation By Angle"))));
-      menu_entries.push_back (lay::menu_item ("cm_sel_scale", "sel_scale", at, tl::to_string (QObject::tr ("Scale"))));
-      menu_entries.push_back (lay::menu_item ("cm_sel_move", "sel_move", at, tl::to_string (QObject::tr ("Move By"))));
-      menu_entries.push_back (lay::menu_item ("cm_sel_move_to", "sel_move_to", at, tl::to_string (QObject::tr ("Move To"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_flip_x", "sel_flip_x", at, tl::to_string (tr ("Flip Horizontally"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_flip_y", "sel_flip_y", at, tl::to_string (tr ("Flip Vertically"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_rot_cw", "sel_rot_cw", at, tl::to_string (tr ("Rotate Clockwise"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_rot_ccw", "sel_rot_ccw", at, tl::to_string (tr ("Rotate Counterclockwise"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_free_rot", "sel_free_rot", at, tl::to_string (tr ("Rotation By Angle"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_scale", "sel_scale", at, tl::to_string (tr ("Scale"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_move", "sel_move", at, tl::to_string (tr ("Move By"))));
+      menu_entries.push_back (lay::menu_item ("cm_sel_move_to", "sel_move_to", at, tl::to_string (tr ("Move To"))));
     }
 
     menu_entries.push_back (lay::separator ("utils_group", at));
-    menu_entries.push_back (lay::submenu ("utils_menu:edit:edit_mode", at, tl::to_string (QObject::tr ("Utilities"))));
+    menu_entries.push_back (lay::submenu ("utils_menu:edit:edit_mode", at, tl::to_string (tr ("Utilities"))));
 
     menu_entries.push_back (lay::separator ("misc_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_delete", "delete:edit", at, tl::to_string (QObject::tr ("Delete(Del)"))));
-    menu_entries.push_back (lay::menu_item ("cm_show_properties", "show_properties:edit", at, tl::to_string (QObject::tr ("Properties(Q)"))));
+    menu_entries.push_back (lay::menu_item ("cm_delete", "delete:edit", at, tl::to_string (tr ("Delete(Del)"))));
+    menu_entries.push_back (lay::menu_item ("cm_show_properties", "show_properties:edit", at, tl::to_string (tr ("Properties(Q)"))));
 
     menu_entries.push_back (lay::separator ("cpc_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_copy", "copy:edit", at, tl::to_string (QObject::tr ("Copy(Ctrl+C)"))));
-    menu_entries.push_back (lay::menu_item ("cm_cut", "cut:edit", at, tl::to_string (QObject::tr ("Cut(Ctrl+X)"))));
-    menu_entries.push_back (lay::menu_item ("cm_paste", "paste:edit", at, tl::to_string (QObject::tr ("Paste(Ctrl+V)"))));
-    menu_entries.push_back (lay::menu_item ("cm_duplicate", "duplicate:edit", at, tl::to_string (QObject::tr ("Duplicate(Ctrl+B)"))));
+    menu_entries.push_back (lay::menu_item ("cm_copy", "copy:edit", at, tl::to_string (tr ("Copy(Ctrl+C)"))));
+    menu_entries.push_back (lay::menu_item ("cm_cut", "cut:edit", at, tl::to_string (tr ("Cut(Ctrl+X)"))));
+    menu_entries.push_back (lay::menu_item ("cm_paste", "paste:edit", at, tl::to_string (tr ("Paste(Ctrl+V)"))));
+    menu_entries.push_back (lay::menu_item ("cm_duplicate", "duplicate:edit", at, tl::to_string (tr ("Duplicate(Ctrl+B)"))));
 
     menu_entries.push_back (lay::separator ("modes_group", at));
-    menu_entries.push_back (lay::submenu ("mode_menu", at, tl::to_string (QObject::tr ("Mode"))));
+    menu_entries.push_back (lay::submenu ("mode_menu", at, tl::to_string (tr ("Mode"))));
 
-    menu_entries.push_back (lay::submenu ("select_menu", at, tl::to_string (QObject::tr ("Select"))));
+    menu_entries.push_back (lay::submenu ("select_menu", at, tl::to_string (tr ("Select"))));
     {
       std::string at = "edit_menu.select_menu.end";
-      menu_entries.push_back (lay::menu_item ("cm_select_all", "select_all", at, tl::to_string (QObject::tr ("Select All"))));
-      menu_entries.push_back (lay::menu_item ("cm_unselect_all", "unselect_all", at, tl::to_string (QObject::tr ("Unselect All"))));
+      menu_entries.push_back (lay::menu_item ("cm_select_all", "select_all", at, tl::to_string (tr ("Select All"))));
+      menu_entries.push_back (lay::menu_item ("cm_unselect_all", "unselect_all", at, tl::to_string (tr ("Unselect All"))));
       menu_entries.push_back (lay::separator ("edit_select_basic_group", at));
-      menu_entries.push_back (lay::menu_item ("lv:enable_all", "enable_all", at, tl::to_string (QObject::tr ("Enable All"))));
-      menu_entries.push_back (lay::menu_item ("lv:disable_all", "disable_all", at, tl::to_string (QObject::tr ("Disable All"))));
+      menu_entries.push_back (lay::menu_item ("lv:enable_all", "enable_all", at, tl::to_string (tr ("Enable All"))));
+      menu_entries.push_back (lay::menu_item ("lv:disable_all", "disable_all", at, tl::to_string (tr ("Disable All"))));
       menu_entries.push_back (lay::separator ("edit_select_individual_group", at));
     };
 
     menu_entries.push_back (lay::separator ("cancel_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_cancel", "cancel", at, tl::to_string (QObject::tr ("Cancel(Esc)"))));
+    menu_entries.push_back (lay::menu_item ("cm_cancel", "cancel", at, tl::to_string (tr ("Cancel(Esc)"))));
 
     at = "bookmark_menu.end";
-    menu_entries.push_back (lay::submenu ("goto_bookmark_menu", at, tl::to_string (QObject::tr ("Goto Bookmark"))));
-    menu_entries.push_back (lay::menu_item ("cm_bookmark_view", "bookmark_view", at, tl::to_string (QObject::tr ("Bookmark This View"))));
+    menu_entries.push_back (lay::submenu ("goto_bookmark_menu", at, tl::to_string (tr ("Goto Bookmark"))));
+    menu_entries.push_back (lay::menu_item ("cm_bookmark_view", "bookmark_view", at, tl::to_string (tr ("Bookmark This View"))));
 
     menu_entries.push_back (lay::separator ("bookmark_mgm_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_manage_bookmarks", "manage_bookmarks", at, tl::to_string (QObject::tr ("Manage Bookmarks"))));
-    menu_entries.push_back (lay::menu_item ("cm_load_bookmarks", "load_bookmarks", at, tl::to_string (QObject::tr ("Load Bookmarks"))));
-    menu_entries.push_back (lay::menu_item ("cm_save_bookmarks", "save_bookmarks", at, tl::to_string (QObject::tr ("Save Bookmarks"))));
-    menu_entries.push_back (lay::submenu ("open_recent_menu_bookmarks", at, tl::to_string (QObject::tr ("Recent Bookmark Files"))));
+    menu_entries.push_back (lay::menu_item ("cm_manage_bookmarks", "manage_bookmarks", at, tl::to_string (tr ("Manage Bookmarks"))));
+    menu_entries.push_back (lay::menu_item ("cm_load_bookmarks", "load_bookmarks", at, tl::to_string (tr ("Load Bookmarks"))));
+    menu_entries.push_back (lay::menu_item ("cm_save_bookmarks", "save_bookmarks", at, tl::to_string (tr ("Save Bookmarks"))));
+    menu_entries.push_back (lay::submenu ("open_recent_menu_bookmarks", at, tl::to_string (tr ("Recent Bookmark Files"))));
 
     at = "zoom_menu.end";
-    menu_entries.push_back (lay::submenu ("global_trans", at, tl::to_string (QObject::tr ("Global Transformation"))));
+    menu_entries.push_back (lay::submenu ("global_trans", at, tl::to_string (tr ("Global Transformation"))));
     {
       std::string at = "zoom_menu.global_trans.end";
-      menu_entries.push_back (lay::config_menu_item ("r0", at, tl::to_string (QObject::tr ("\\(r0\\)<:/r0.png>")), cfg_global_trans, "?r0 *1 0,0"));
-      menu_entries.push_back (lay::config_menu_item ("r90", at, tl::to_string (QObject::tr ("\\(r90\\)<:/r90.png>")), cfg_global_trans, "?r90 *1 0,0"));
-      menu_entries.push_back (lay::config_menu_item ("r180", at, tl::to_string (QObject::tr ("\\(r180\\)<:/r180.png>")), cfg_global_trans, "?r180 *1 0,0"));
-      menu_entries.push_back (lay::config_menu_item ("r270", at, tl::to_string (QObject::tr ("\\(r270\\)<:/r270.png>")), cfg_global_trans, "?r270 *1 0,0"));
-      menu_entries.push_back (lay::config_menu_item ("m0", at, tl::to_string (QObject::tr ("\\(m0\\)<:/m0.png>")), cfg_global_trans, "?m0 *1 0,0"));
-      menu_entries.push_back (lay::config_menu_item ("m45", at, tl::to_string (QObject::tr ("\\(m45\\)<:/m45.png>")), cfg_global_trans, "?m45 *1 0,0"));
-      menu_entries.push_back (lay::config_menu_item ("m90", at, tl::to_string (QObject::tr ("\\(m90\\)<:/m90.png>")), cfg_global_trans, "?m90 *1 0,0"));
-      menu_entries.push_back (lay::config_menu_item ("m135", at, tl::to_string (QObject::tr ("\\(m135\\)<:/m135.png>")), cfg_global_trans, "?m135 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("r0", at, tl::to_string (tr ("\\(r0\\)<:/r0.png>")), cfg_global_trans, "?r0 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("r90", at, tl::to_string (tr ("\\(r90\\)<:/r90.png>")), cfg_global_trans, "?r90 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("r180", at, tl::to_string (tr ("\\(r180\\)<:/r180.png>")), cfg_global_trans, "?r180 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("r270", at, tl::to_string (tr ("\\(r270\\)<:/r270.png>")), cfg_global_trans, "?r270 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("m0", at, tl::to_string (tr ("\\(m0\\)<:/m0.png>")), cfg_global_trans, "?m0 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("m45", at, tl::to_string (tr ("\\(m45\\)<:/m45.png>")), cfg_global_trans, "?m45 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("m90", at, tl::to_string (tr ("\\(m90\\)<:/m90.png>")), cfg_global_trans, "?m90 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("m135", at, tl::to_string (tr ("\\(m135\\)<:/m135.png>")), cfg_global_trans, "?m135 *1 0,0"));
     }
 
     menu_entries.push_back (lay::separator ("hier_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_max_hier", "max_hier", at, tl::to_string (QObject::tr ("Full Hierarchy(*)"))));
-    menu_entries.push_back (lay::menu_item ("cm_max_hier_0", "max_hier_0", at, tl::to_string (QObject::tr ("Box Only(0)"))));
-    menu_entries.push_back (lay::menu_item ("cm_max_hier_1", "max_hier_1", at, tl::to_string (QObject::tr ("Top Level Only(1)"))));
-    menu_entries.push_back (lay::menu_item ("cm_inc_max_hier", "inc_max_hier", at, tl::to_string (QObject::tr ("Increment Hierarchy(+)"))));
-    menu_entries.push_back (lay::menu_item ("cm_dec_max_hier", "dec_max_hier", at, tl::to_string (QObject::tr ("Decrement Hierarchy(-)"))));
+    menu_entries.push_back (lay::menu_item ("cm_max_hier", "max_hier", at, tl::to_string (tr ("Full Hierarchy(*)"))));
+    menu_entries.push_back (lay::menu_item ("cm_max_hier_0", "max_hier_0", at, tl::to_string (tr ("Box Only(0)"))));
+    menu_entries.push_back (lay::menu_item ("cm_max_hier_1", "max_hier_1", at, tl::to_string (tr ("Top Level Only(1)"))));
+    menu_entries.push_back (lay::menu_item ("cm_inc_max_hier", "inc_max_hier", at, tl::to_string (tr ("Increment Hierarchy(+)"))));
+    menu_entries.push_back (lay::menu_item ("cm_dec_max_hier", "dec_max_hier", at, tl::to_string (tr ("Decrement Hierarchy(-)"))));
 
     menu_entries.push_back (lay::separator ("zoom_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_zoom_fit", "zoom_fit", at, tl::to_string (QObject::tr ("Zoom Fit(F2)"))));
-    menu_entries.push_back (lay::menu_item ("cm_zoom_fit_sel", "zoom_fit_sel", at, tl::to_string (QObject::tr ("Zoom Fit Selection(Shift+F2)"))));
-    menu_entries.push_back (lay::menu_item ("cm_zoom_in", "zoom_in", at, tl::to_string (QObject::tr ("Zoom In(Ctrl++)"))));
-    menu_entries.push_back (lay::menu_item ("cm_zoom_out", "zoom_out", at, tl::to_string (QObject::tr ("Zoom Out(Ctrl+-)"))));
+    menu_entries.push_back (lay::menu_item ("cm_zoom_fit", "zoom_fit", at, tl::to_string (tr ("Zoom Fit(F2)"))));
+    menu_entries.push_back (lay::menu_item ("cm_zoom_fit_sel", "zoom_fit_sel", at, tl::to_string (tr ("Zoom Fit Selection(Shift+F2)"))));
+    menu_entries.push_back (lay::menu_item ("cm_zoom_in", "zoom_in", at, tl::to_string (tr ("Zoom In(Ctrl++)"))));
+    menu_entries.push_back (lay::menu_item ("cm_zoom_out", "zoom_out", at, tl::to_string (tr ("Zoom Out(Ctrl+-)"))));
     /* disabled because that interferes with the use of the arrow keys for moving the selection
     MenuLayoutEntry::separator ("pan_group");
-    menu_entries.push_back (lay::menu_item ("cm_pan_up", "pan_up", at, tl::to_string (QObject::tr ("Pan Up(Up)"))));
-    menu_entries.push_back (lay::menu_item ("cm_pan_down", "pan_down", at, tl::to_string (QObject::tr ("Pan Down(Down)"))));
-    menu_entries.push_back (lay::menu_item ("cm_pan_left", "pan_left", at, tl::to_string (QObject::tr ("Pan Left(Left)"))));
-    menu_entries.push_back (lay::menu_item ("cm_pan_right", "pan_right", at, tl::to_string (QObject::tr ("Pan Right(Right)"))));
+    menu_entries.push_back (lay::menu_item ("cm_pan_up", "pan_up", at, tl::to_string (tr ("Pan Up(Up)"))));
+    menu_entries.push_back (lay::menu_item ("cm_pan_down", "pan_down", at, tl::to_string (tr ("Pan Down(Down)"))));
+    menu_entries.push_back (lay::menu_item ("cm_pan_left", "pan_left", at, tl::to_string (tr ("Pan Left(Left)"))));
+    menu_entries.push_back (lay::menu_item ("cm_pan_right", "pan_right", at, tl::to_string (tr ("Pan Right(Right)"))));
     */
 
     menu_entries.push_back (lay::separator ("redraw_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_redraw", "redraw", at, tl::to_string (QObject::tr ("Redraw"))));
+    menu_entries.push_back (lay::menu_item ("cm_redraw", "redraw", at, tl::to_string (tr ("Redraw"))));
     menu_entries.push_back (lay::separator ("state_group", at));
     menu_entries.push_back (lay::menu_item_copy ("cm_prev_display_state", "prev_display_state", at, "@toolbar.prev_display_state"));
     menu_entries.push_back (lay::menu_item_copy ("cm_next_display_state", "next_display_state", at, "@toolbar.next_display_state"));
 
     menu_entries.push_back (lay::separator ("select_group", at));
-    menu_entries.push_back (lay::menu_item ("cm_select_cell", "select_cell:edit", at, tl::to_string (QObject::tr ("Select Cell"))));
-    menu_entries.push_back (lay::menu_item ("cm_select_current_cell", "select_current_cell", at, tl::to_string (QObject::tr ("Show As New Top(Ctrl+S)"))));
-    menu_entries.push_back (lay::menu_item ("cm_goto_position", "goto_position", at, tl::to_string (QObject::tr ("Goto Position(Ctrl+G)"))));
+    menu_entries.push_back (lay::menu_item ("cm_select_cell", "select_cell:edit", at, tl::to_string (tr ("Select Cell"))));
+    menu_entries.push_back (lay::menu_item ("cm_select_current_cell", "select_current_cell", at, tl::to_string (tr ("Show As New Top(Ctrl+S)"))));
+    menu_entries.push_back (lay::menu_item ("cm_goto_position", "goto_position", at, tl::to_string (tr ("Goto Position(Ctrl+G)"))));
 
     //  Add a hook for inserting new items after the modes
     menu_entries.push_back (lay::separator ("end_modes", "@toolbar.end"));

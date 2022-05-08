@@ -73,138 +73,9 @@ class Bitmap;
 class PixelBuffer;
 class BitmapBuffer;
 
-LAYBASIC_PUBLIC const char *drag_drop_mime_type ();
-
-/**
- *  @brief A helper class required to store the drag/drop data
- *
- *  Drag/drop data is basically a collection of key/value pairs. 
- *  A category string is provided to identify the kind of data.
- */
-
-class LAYBASIC_PUBLIC DragDropDataBase
-{
-public:
-  /**
-   *  @brief Default constructor
-   */
-  DragDropDataBase () { }
-
-  /**
-   *  @brief Dtor
-   */
-  virtual ~DragDropDataBase () { } 
-
-#if defined(HAVE_QT) // @@@
-  /**
-   *  @brief Serializes itself to an QByteArray
-   */
-  virtual QByteArray serialized () const = 0;
-
-  /**
-   *  @brief Try deserialization from an QByteArray
-   *
-   *  Returns false, if deserialization failed.
-   */
-  virtual bool deserialize (const QByteArray &ba) = 0;
-
-  /**
-   *  @brief Create a QMimeData object from the object
-   */
-  QMimeData *to_mime_data () const;
+#if defined(HAVE_QT)
+class DragDropDataBase;
 #endif
-};
-
-/**
- *  @brief Drag/drop data for a cell
- */
-
-class LAYBASIC_PUBLIC CellDragDropData
-  : public DragDropDataBase
-{
-public:
-  /**
-   *  @brief Default ctor
-   */
-  CellDragDropData ()
-    : mp_layout (0), mp_library (0), m_cell_index (0), m_is_pcell (false)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Specifies drag & drop of a cell
-   *
-   *  @param layout the layout where the cell lives in 
-   *  @param cell_index The index of the cell
-   */
-  CellDragDropData (const db::Layout *layout, const db::Library *library, db::cell_index_type cell_or_pcell_index, bool is_pcell, const std::vector<tl::Variant> &pcell_params = std::vector<tl::Variant> ())
-    : mp_layout (layout), mp_library (library), m_cell_index (cell_or_pcell_index), m_is_pcell (is_pcell), m_pcell_params (pcell_params)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Gets the layout object where the cell lives in
-   */
-  const db::Layout *layout () const
-  {
-    return mp_layout;
-  }
-
-  /**
-   *  @brief Gets the layout object where the cell lives in
-   */
-  const db::Library *library () const
-  {
-    return mp_library;
-  }
-
-  /**
-   *  @brief PCell parameters
-   */
-  const std::vector<tl::Variant> &pcell_params () const
-  {
-    return m_pcell_params;
-  }
-
-  /**
-   *  @brief Gets the index of the cell
-   */
-  db::cell_index_type cell_index () const
-  {
-    return m_cell_index;
-  }
-
-  /**
-   *  @brief Gets a value indicating whether the cell is a pcell
-   */
-  bool is_pcell () const
-  {
-    return m_is_pcell;
-  }
-
-#if defined(HAVE_QT) // @@@
-  /**
-   *  @brief Serializes itself to an QByteArray
-   */
-  virtual QByteArray serialized () const;
-
-  /**
-   *  @brief Try deserialization from an QByteArray
-   *
-   *  Returns false, if deserialization failed.
-   */
-  bool deserialize (const QByteArray &ba);
-#endif
-
-private:
-  const db::Layout *mp_layout;
-  const db::Library *mp_library;
-  db::cell_index_type m_cell_index;
-  bool m_is_pcell;
-  std::vector<tl::Variant> m_pcell_params;
-};
 
 /**
  *  @brief A view service 
@@ -243,6 +114,7 @@ public:
    */
   virtual bool key_event (unsigned int /*key*/, unsigned int /*buttons*/) { return false; }
 
+#if defined(HAVE_QT)
   /**
    *  @brief The drag enter event
    *
@@ -267,6 +139,7 @@ public:
    *  @brief The drop event
    */
   virtual bool drop_event (const db::DPoint & /*p*/, const DragDropDataBase * /*data*/) { return false; }
+#endif
 
   /**
    *  @brief Mouse press event handler
@@ -914,6 +787,7 @@ public:
    */
   virtual void key_event (unsigned int /*key*/, unsigned int /*buttons*/) { }
 
+#if defined(HAVE_QT)
   /**
    *  @brief The drag enter event
    *
@@ -938,6 +812,7 @@ public:
    *  @brief The drop event
    */
   virtual bool drop_event (const db::DPoint & /*p*/, const DragDropDataBase * /*data*/) { return false; }
+#endif
 
   /** 
    *  @brief Remaining mouse double click event handler
@@ -1041,7 +916,7 @@ public:
   /**
    *  @brief Gets the current mouse position
    */
-  db::Point mouse_position () const
+  db::DPoint mouse_position () const
   {
     return m_mouse_pos;
   }
@@ -1081,8 +956,48 @@ public:
   bool image_updated ();
 #endif
 
+  /**
+   *  @brief External entry point for key press event generation
+   */
+  void send_key_press_event (unsigned int key, unsigned int buttons);
+
+  /**
+   *  @brief External entry point for mouse move event generation
+   */
+  void send_mouse_move_event (const db::DPoint &pt, unsigned int buttons);
+
+  /**
+   *  @brief External entry point for leave event generation
+   */
+  void send_leave_event ();
+
+  /**
+   *  @brief External entry point for enter event generation
+   */
+  void send_enter_event ();
+
+  /**
+   *  @brief External entry point for mouse button press event generation
+   */
+  void send_mouse_press_event (const db::DPoint &pt, unsigned int buttons);
+
+  /**
+   *  @brief External entry point for mouse button double-click event generation
+   */
+  void send_mouse_double_clicked_event (const db::DPoint &pt, unsigned int buttons);
+
+  /**
+   *  @brief External entry point for mouse button release event generation
+   */
+  void send_mouse_release_event (const db::DPoint &pt, unsigned int buttons);
+
+  /**
+   *  @brief External entry point for mouse wheel event generation
+   */
+  void send_wheel_event (int delta, bool horizontal, const db::DPoint &pt, unsigned int buttons);
+
 protected:
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
   /**
    *  @brief Qt focus event handler
    */
@@ -1187,8 +1102,8 @@ private:
   bool m_needs_update_bg;
   lay::ViewService *mp_active_service;
   db::DCplxTrans m_trans;
-  db::Point m_mouse_pos;
-  db::Point m_mouse_pressed;
+  db::DPoint m_mouse_pos;
+  db::DPoint m_mouse_pressed;
   bool m_mouse_pressed_state;
   unsigned int m_mouse_buttons;
   bool m_in_mouse_move;

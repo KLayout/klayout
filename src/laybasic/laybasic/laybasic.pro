@@ -104,6 +104,7 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layConfigurationDialog.cc \
     layCursor.cc \
     layDialogs.cc \
+    layDragDropData.cc \
     layEditLineStyleWidget.cc \
     layEditLineStylesForm.cc \
     layEditStippleWidget.cc \
@@ -173,6 +174,7 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layColor.h \
     layCursor.h \
     layDialogs.h \
+    layDragDropData.h \
     layEditLineStyleWidget.h \
     layEditLineStylesForm.h \
     layEditStippleWidget.h \

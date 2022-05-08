@@ -20,8 +20,6 @@
 
 */
 
-#if defined(HAVE_QT) // @@@
-
 #include "layNetlistBrowserTreeModel.h"
 #include "tlUnitTest.h"
 
@@ -106,4 +104,3 @@ TEST (2)
   EXPECT_EQ (model->parent (model->index (1, 0, inv2PairIndex)).internalId () == inv2PairIndex.internalId (), true);
 }
 
-#endif

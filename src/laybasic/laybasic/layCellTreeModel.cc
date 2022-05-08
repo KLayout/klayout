@@ -23,6 +23,7 @@
 
 #include "layCellTreeModel.h"
 #include "layLayoutView.h"
+#include "layDragDropData.h"
 #include "tlGlobPattern.h"
 #include "dbPCellHeader.h"
 #include "dbPCellVariant.h"

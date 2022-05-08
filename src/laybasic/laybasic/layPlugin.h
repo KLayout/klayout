@@ -387,6 +387,14 @@ public:
   }
 
   /**
+   *  @brief Gets the available menu symbols from all plugins
+   *
+   *  This does not mean all symbols will be available.
+   */
+  static std::vector<std::string> menu_symbols ();
+
+#if defined(HAVE_QT)
+  /**
    *  @brief Creates the menu resources for this plugin
    *
    *  This method will create the menu resources for the plugin and perform the 
@@ -396,16 +404,10 @@ public:
   void init_menu (lay::Dispatcher *dispatcher);
 
   /**
-   *  @brief Gets the available menu symbols from all plugins
-   *
-   *  This does not mean all symbols will be available.
-   */
-  static std::vector<std::string> menu_symbols ();
-
-  /**
    *  @brief Removes the menu resources associated with this plugin
    */
   void remove_menu_items (lay::Dispatcher *dispatcher);
+#endif
 
   /**
    *  @brief Enables this editable part of the plugin
@@ -455,10 +457,8 @@ public:
 
 #if defined(HAVE_QT)
 private slots:
-#else
-private:
-#endif
   void toggle_editable_enabled ();
+#endif
 
 private:
   int m_id;

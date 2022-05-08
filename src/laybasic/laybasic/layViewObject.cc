@@ -31,6 +31,9 @@
 #include "layViewObject.h"
 #include "layCanvasPlane.h"
 #include "layBitmap.h"
+#if defined(HAVE_QT)
+#  include "layDragDropData.h"
+#endif
 #include "tlException.h"
 #include "tlAlgorithm.h"
 #include "tlExceptions.h"
@@ -43,87 +46,6 @@ namespace lay
 //  The distance by which the mouse must move in order to create a press/move/release
 //  event rather than a single click event:
 const int click_tolerance = 5;
-
-// ---------------------------------------------------------------
-//  Implementation of DragDropDataBase 
-
-const char *drag_drop_mime_type ()
-{
-  return "application/klayout-ddd";
-}
-
-#if defined(HAVE_QT) // @@@
-QMimeData *
-DragDropDataBase::to_mime_data () const
-{
-  QMimeData *mimeData = new QMimeData();
-  mimeData->setData (QString::fromUtf8 (drag_drop_mime_type ()), serialized ());
-  return mimeData;
-}
-#endif
-
-// ---------------------------------------------------------------
-//  Implementation of CellDragDropData
-
-#if defined(HAVE_QT) // @@@
-QByteArray
-CellDragDropData::serialized () const
-{
-  QByteArray data;
-  QDataStream stream (&data, QIODevice::WriteOnly);
-
-  stream << QString::fromUtf8 ("CellDragDropData");
-  stream << (quintptr) mp_layout;
-  stream << (quintptr) mp_library;
-  stream << m_cell_index;
-  stream << m_is_pcell;
-  stream << int (m_pcell_params.size ());
-  for (std::vector<tl::Variant>::const_iterator i = m_pcell_params.begin (); i != m_pcell_params.end (); ++i) {
-    stream << tl::to_qstring (i->to_parsable_string ());
-  }
-
-  return data;
-}
-
-bool
-CellDragDropData::deserialize (const QByteArray &ba)
-{
-  QDataStream stream (const_cast<QByteArray *> (&ba), QIODevice::ReadOnly);
-
-  QString tag;
-  stream >> tag;
-
-  if (tag == QString::fromUtf8 ("CellDragDropData")) {
-
-    quintptr p = 0;
-    stream >> p;
-    mp_layout = reinterpret_cast <const db::Layout *> (p);
-    stream >> p;
-    mp_library = reinterpret_cast <const db::Library *> (p);
-    stream >> m_cell_index;
-    stream >> m_is_pcell;
-
-    m_pcell_params.clear ();
-    int n = 0;
-    stream >> n;
-    while (n-- > 0) {
-      QString s;
-      stream >> s;
-      std::string stl_s = tl::to_string (s);
-      tl::Extractor ex (stl_s.c_str ());
-      m_pcell_params.push_back (tl::Variant ());
-      ex.read (m_pcell_params.back ());
-    }
-
-    return true;
-
-  } else {
-
-    return false;
-
-  }
-}
-#endif
 
 // ---------------------------------------------------------------
 //  A helper function to convert a Qt modifier/buttons to klayout buttons
@@ -399,9 +321,9 @@ ViewObjectWidget::set_cursor (lay::Cursor::cursor_shape cursor)
 void
 ViewObjectWidget::set_default_cursor (lay::Cursor::cursor_shape cursor)
 {
-#if defined(HAVE_QT)
   if (cursor != m_default_cursor) {
     m_default_cursor = cursor;
+#if defined(HAVE_QT)
     if (m_cursor == lay::Cursor::none) {
       if (m_default_cursor == lay::Cursor::none) {
         unsetCursor ();
@@ -409,18 +331,16 @@ ViewObjectWidget::set_default_cursor (lay::Cursor::cursor_shape cursor)
         setCursor (lay::Cursor::qcursor (m_default_cursor));
       }
     }
-  }
 #endif
+  }
 }
 
 void
 ViewObjectWidget::ensure_entered ()
 {
-#if defined(HAVE_QT) // @@@
   if (! m_mouse_inside) {
-    enterEvent (0);
+    send_enter_event ();
   }
-#endif
 }
 
 void 
@@ -432,7 +352,7 @@ ViewObjectWidget::begin_mouse_event (lay::Cursor::cursor_shape cursor)
 void 
 ViewObjectWidget::end_mouse_event ()
 {
-#if defined(HAVE_QT) // @@@
+#if defined(HAVE_QT)
   if (m_cursor == lay::Cursor::none) {
     if (m_default_cursor == lay::Cursor::none) {
       unsetCursor ();
@@ -445,7 +365,347 @@ ViewObjectWidget::end_mouse_event ()
 #endif
 }
 
-#if defined(HAVE_QT) // @@@
+void
+ViewObjectWidget::send_key_press_event (unsigned int key, unsigned int buttons)
+{
+  bool done = false;
+  if (mp_active_service) {
+    done = (mp_active_service->enabled () && mp_active_service->key_event (key, buttons));
+  }
+
+  if (! done) {
+    key_event (key, buttons);
+  }
+}
+
+void
+ViewObjectWidget::do_mouse_move ()
+{
+  m_in_mouse_move = true;
+
+  if (m_mouse_pressed_state &&
+    (abs (m_mouse_pos.x () - m_mouse_pressed.x ()) > click_tolerance || abs (m_mouse_pos.y () - m_mouse_pressed.y ()) > click_tolerance)) {
+
+    begin_mouse_event (lay::Cursor::none);
+
+    m_mouse_pressed_state = false;
+
+    bool done = false;
+
+    db::DPoint p = pixel_to_um (m_mouse_pressed);
+
+    for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
+      std::list<ViewService *>::iterator gg = g;
+      ++gg;
+      done = ((*g)->enabled () && (*g)->mouse_press_event (p, m_mouse_buttons, true));
+      g = gg;
+    }
+
+    if (! done && mp_active_service) {
+      done = (mp_active_service->enabled () && mp_active_service->mouse_press_event (p, m_mouse_buttons, true));
+    }
+
+    service_iterator svc = begin_services ();
+    while (svc != end_services () && !done) {
+      service_iterator next = svc;
+      ++next;
+      done = ((*svc)->enabled () && (*svc)->mouse_press_event (p, m_mouse_buttons, false));
+      svc = next;
+    }
+
+    if (! done) {
+      mouse_press_event (p, m_mouse_buttons);
+    }
+
+    end_mouse_event ();
+
+  }
+
+  if (! m_mouse_pressed_state) {
+
+    begin_mouse_event (lay::Cursor::none);
+
+    bool done = false;
+
+    db::DPoint p = pixel_to_um (m_mouse_pos);
+
+    for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
+      std::list<ViewService *>::iterator gg = g;
+      ++gg;
+      done = ((*g)->enabled () && (*g)->mouse_move_event (p, m_mouse_buttons, true));
+      g = gg;
+    }
+
+    if (! done && mp_active_service) {
+      done = (mp_active_service->enabled () && mp_active_service->mouse_move_event (p, m_mouse_buttons, true));
+    }
+
+    service_iterator svc = begin_services ();
+    while (svc != end_services () && !done) {
+      service_iterator next = svc;
+      ++next;
+      done = ((*svc)->enabled () && (*svc)->mouse_move_event (p, m_mouse_buttons, false));
+      svc = next;
+    }
+
+    if (! done) {
+      mouse_move_event (p, m_mouse_buttons);
+    }
+
+    end_mouse_event ();
+
+  }
+
+  m_in_mouse_move = false;
+}
+
+void
+ViewObjectWidget::send_mouse_move_event (const db::DPoint &pt, unsigned int buttons)
+{
+  ensure_entered ();
+  m_mouse_pos = pt;
+  m_mouse_buttons = buttons;
+  do_mouse_move ();
+}
+
+void
+ViewObjectWidget::send_leave_event ()
+{
+  try {
+
+    bool done = false;
+
+    for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
+      std::list<ViewService *>::iterator gg = g;
+      ++gg;
+      done = ((*g)->enabled () && (*g)->leave_event (true));
+      g = gg;
+    }
+
+    if (! done && mp_active_service) {
+      done = (mp_active_service->enabled () && mp_active_service->leave_event (true));
+    }
+
+    service_iterator svc = begin_services ();
+    while (svc != end_services () && !done) {
+      service_iterator next = svc;
+      ++next;
+      done = ((*svc)->enabled () && (*svc)->leave_event (false));
+      svc = next;
+    }
+
+    if (! done) {
+      leave_event ();
+    }
+
+    end_mouse_event ();
+
+    m_mouse_inside = false;
+
+  } catch (...) {
+    m_mouse_inside = false;
+    throw;
+  }
+}
+
+void
+ViewObjectWidget::send_enter_event ()
+{
+  m_mouse_inside = true;
+
+  begin_mouse_event ();
+
+  bool done = false;
+
+  for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
+    std::list<ViewService *>::iterator gg = g;
+    ++gg;
+    done = ((*g)->enabled () && (*g)->enter_event (true));
+    g = gg;
+  }
+
+  if (! done && mp_active_service) {
+    done = (mp_active_service->enabled () && mp_active_service->enter_event (true));
+  }
+
+  service_iterator svc = begin_services ();
+  while (svc != end_services () && !done) {
+    service_iterator next = svc;
+    ++next;
+    done = ((*svc)->enabled () && (*svc)->enter_event (false));
+    svc = next;
+  }
+
+  if (! done) {
+    enter_event ();
+  }
+
+  end_mouse_event ();
+}
+
+void
+ViewObjectWidget::send_mouse_press_event (const db::DPoint &pt, unsigned int buttons)
+{
+  ensure_entered ();
+#if defined(HAVE_QT)
+  setFocus ();
+#endif
+
+  m_mouse_pos = pt;
+  m_mouse_pressed = m_mouse_pos;
+
+  m_mouse_buttons = buttons;
+
+  m_mouse_pressed_state = true;
+}
+
+void
+ViewObjectWidget::send_mouse_double_clicked_event (const db::DPoint &pt, unsigned int buttons)
+{
+  ensure_entered ();
+  begin_mouse_event (lay::Cursor::none);
+
+#if defined(HAVE_QT)
+  setFocus ();
+#endif
+
+  bool done = false;
+
+  m_mouse_pos = pt;
+  m_mouse_pressed = m_mouse_pos;
+  m_mouse_pressed_state = false;
+
+  db::DPoint p = pixel_to_um (m_mouse_pos);
+
+  for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
+    std::list<ViewService *>::iterator gg = g;
+    ++gg;
+    done = ((*g)->m_enabled && (*g)->mouse_double_click_event (p, buttons, true));
+    g = gg;
+  }
+
+  if (! done && mp_active_service) {
+    done = (mp_active_service->enabled () && mp_active_service->mouse_double_click_event (p, buttons, true));
+  }
+
+  service_iterator svc = begin_services ();
+  while (svc != end_services () && !done) {
+    service_iterator next = svc;
+    ++next;
+    done = ((*svc)->enabled () && (*svc)->mouse_double_click_event (p, buttons, false));
+    svc = next;
+  }
+
+  if (! done) {
+    mouse_double_click_event (p, buttons);
+  }
+
+  end_mouse_event ();
+}
+
+void
+ViewObjectWidget::send_mouse_release_event (const db::DPoint &pt, unsigned int /*buttons*/)
+{
+  try {
+
+    ensure_entered ();
+    begin_mouse_event ();
+
+    bool done = false;
+
+    m_mouse_pos = pt;
+    db::DPoint p = pixel_to_um (m_mouse_pos);
+
+    for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
+      std::list<ViewService *>::iterator gg = g;
+      ++gg;
+      if (m_mouse_pressed_state) {
+        done = (*g)->enabled () && (*g)->mouse_click_event (p, m_mouse_buttons, true);
+      } else {
+        done = (*g)->enabled () && (*g)->mouse_release_event (p, m_mouse_buttons, true);
+      }
+      g = gg;
+    }
+
+    if (! done && mp_active_service && mp_active_service->enabled ()) {
+      if (m_mouse_pressed_state) {
+        done = mp_active_service->mouse_click_event (p, m_mouse_buttons, true);
+      } else {
+        done = mp_active_service->mouse_release_event (p, m_mouse_buttons, true);
+      }
+    }
+
+    service_iterator svc = begin_services ();
+    while (svc != end_services () && !done) {
+      service_iterator next = svc;
+      ++next;
+      if ((*svc)->enabled ()) {
+        if (m_mouse_pressed_state) {
+          done = (*svc)->mouse_click_event (p, m_mouse_buttons, false);
+        } else {
+          done = (*svc)->mouse_release_event (p, m_mouse_buttons, false);
+        }
+      }
+      svc = next;
+    }
+
+    if (! done) {
+      if (m_mouse_pressed_state) {
+        mouse_click_event (p, m_mouse_buttons);
+      } else {
+        mouse_release_event (p, m_mouse_buttons);
+      }
+    }
+
+    end_mouse_event ();
+
+    m_mouse_pressed_state = false;
+
+  } catch (...) {
+    m_mouse_pressed_state = false;
+    throw;
+  }
+}
+
+void
+ViewObjectWidget::send_wheel_event (int delta, bool horizontal, const db::DPoint &pt, unsigned int buttons)
+{
+  ensure_entered ();
+  begin_mouse_event ();
+
+  db::DPoint p = pixel_to_um (pt);
+
+  bool done = false;
+
+  for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
+    std::list<ViewService *>::iterator gg = g;
+    ++gg;
+    done = ((*g)->enabled () && (*g)->wheel_event (delta, horizontal, p, buttons, true));
+    g = gg;
+  }
+
+  if (! done && mp_active_service) {
+    done = (mp_active_service->enabled () && mp_active_service->wheel_event (delta, horizontal, p, buttons, true));
+  }
+
+  service_iterator svc = begin_services ();
+  while (svc != end_services () && !done) {
+    service_iterator next = svc;
+    ++next;
+    done = ((*svc)->enabled () && (*svc)->wheel_event (delta, horizontal, p, buttons, false));
+    svc = next;
+  }
+
+  if (! done) {
+    wheel_event (delta, horizontal, p, buttons);
+  }
+
+  end_mouse_event ();
+}
+
+
+#if defined(HAVE_QT)
+
 bool
 ViewObjectWidget::focusNextPrevChild (bool /*next*/)
 {
@@ -456,18 +716,8 @@ void
 ViewObjectWidget::keyPressEvent (QKeyEvent *e)
 {
 BEGIN_PROTECTED  
-
   unsigned int buttons = qt_to_buttons (Qt::MouseButtons (), e->modifiers ());
-
-  bool done = false;
-  if (mp_active_service) {
-    done = (mp_active_service->enabled () && mp_active_service->key_event ((unsigned int) e->key(), buttons));
-  }
-
-  if (! done) {
-    key_event ((unsigned int) e->key (), buttons);
-  }
-
+  send_key_press_event ((unsigned int) e->key (), buttons);
 END_PROTECTED
 }
 
@@ -586,139 +836,33 @@ void
 ViewObjectWidget::mouseMoveEvent (QMouseEvent *e)
 {
 BEGIN_PROTECTED  
-  ensure_entered ();
-  m_mouse_pos = db::Point (e->pos ().x (), e->pos ().y ());
-  m_mouse_buttons = qt_to_buttons (e->buttons (), e->modifiers ());
-  do_mouse_move ();
-END_PROTECTED
-}
+
+  db::DPoint p;
+#if QT_VERSION < 0x60000
+  p = db::DPoint (e->pos ().x (), e->pos ().y ());
+#else
+  p = db::DPoint (e->position ().x (), e->position ().y ());
 #endif
 
-void
-ViewObjectWidget::do_mouse_move ()
-{
-  m_in_mouse_move = true;
+  send_mouse_move_event (p, qt_to_buttons (e->buttons (), e->modifiers ()));
 
-  if (m_mouse_pressed_state && 
-    (abs (m_mouse_pos.x () - m_mouse_pressed.x ()) > click_tolerance || abs (m_mouse_pos.y () - m_mouse_pressed.y ()) > click_tolerance)) {
-
-    begin_mouse_event (lay::Cursor::none);
-
-    m_mouse_pressed_state = false;
-
-    bool done = false; 
-    
-    db::DPoint p = pixel_to_um (m_mouse_pressed);
-
-    for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
-      std::list<ViewService *>::iterator gg = g;
-      ++gg;
-      done = ((*g)->enabled () && (*g)->mouse_press_event (p, m_mouse_buttons, true));
-      g = gg;
-    }
-
-    if (! done && mp_active_service) {
-      done = (mp_active_service->enabled () && mp_active_service->mouse_press_event (p, m_mouse_buttons, true));
-    }
-
-    service_iterator svc = begin_services ();
-    while (svc != end_services () && !done) {
-      service_iterator next = svc;
-      ++next;
-      done = ((*svc)->enabled () && (*svc)->mouse_press_event (p, m_mouse_buttons, false));
-      svc = next;
-    }
-
-    if (! done) {
-      mouse_press_event (p, m_mouse_buttons);
-    }
-
-    end_mouse_event ();
-
-  }
-
-  if (! m_mouse_pressed_state) {
-
-    begin_mouse_event (lay::Cursor::none);
-
-    bool done = false; 
-
-    db::DPoint p = pixel_to_um (m_mouse_pos);
-
-    for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
-      std::list<ViewService *>::iterator gg = g;
-      ++gg;
-      done = ((*g)->enabled () && (*g)->mouse_move_event (p, m_mouse_buttons, true));
-      g = gg;
-    }
-
-    if (! done && mp_active_service) {
-      done = (mp_active_service->enabled () && mp_active_service->mouse_move_event (p, m_mouse_buttons, true));
-    }
-
-    service_iterator svc = begin_services ();
-    while (svc != end_services () && !done) {
-      service_iterator next = svc;
-      ++next;
-      done = ((*svc)->enabled () && (*svc)->mouse_move_event (p, m_mouse_buttons, false));
-      svc = next;
-    }
-
-    if (! done) {
-      mouse_move_event (p, m_mouse_buttons);
-    }
-
-    end_mouse_event ();
-
-  }
-
-  m_in_mouse_move = false;
+END_PROTECTED
 }
 
-#if defined(HAVE_QT) // @@@
 void
 ViewObjectWidget::mouseDoubleClickEvent (QMouseEvent *e)
 {
 BEGIN_PROTECTED  
-  ensure_entered ();
-  begin_mouse_event (lay::Cursor::none);
 
-  setFocus ();
+  db::DPoint p;
+#if QT_VERSION < 0x60000
+  p = db::DPoint (e->pos ().x (), e->pos ().y ());
+#else
+  p = db::DPoint (e->position ().x (), e->position ().y ());
+#endif
 
-  bool done = false; 
+  send_mouse_double_clicked_event (p, qt_to_buttons (e->buttons (), e->modifiers ()));
 
-  m_mouse_pos = db::Point (e->pos ().x (), e->pos ().y ());
-  m_mouse_pressed = m_mouse_pos;
-  m_mouse_pressed_state = false;
-
-  unsigned int buttons = qt_to_buttons (e->buttons (), e->modifiers ());
-
-  db::DPoint p = pixel_to_um (m_mouse_pos);
-
-  for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
-    std::list<ViewService *>::iterator gg = g;
-    ++gg;
-    done = ((*g)->m_enabled && (*g)->mouse_double_click_event (p, buttons, true));
-    g = gg;
-  }
-
-  if (! done && mp_active_service) {
-    done = (mp_active_service->enabled () && mp_active_service->mouse_double_click_event (p, buttons, true));
-  }
-
-  service_iterator svc = begin_services ();
-  while (svc != end_services () && !done) {
-    service_iterator next = svc;
-    ++next;
-    done = ((*svc)->enabled () && (*svc)->mouse_double_click_event (p, buttons, false));
-    svc = next;
-  }
-
-  if (! done) {
-    mouse_double_click_event (p, buttons);
-  }
-
-  end_mouse_event ();
 END_PROTECTED
 }
 
@@ -730,198 +874,75 @@ ViewObjectWidget::enterEvent (QEvent * /*event*/)
 #endif
 {
 BEGIN_PROTECTED  
-  m_mouse_inside = true;
-
-  begin_mouse_event ();
-
-  bool done = false; 
-
-  for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
-    std::list<ViewService *>::iterator gg = g;
-    ++gg;
-    done = ((*g)->enabled () && (*g)->enter_event (true));
-    g = gg;
-  }
-
-  if (! done && mp_active_service) {
-    done = (mp_active_service->enabled () && mp_active_service->enter_event (true));
-  }
-
-  service_iterator svc = begin_services ();
-  while (svc != end_services () && !done) {
-    service_iterator next = svc;
-    ++next;
-    done = ((*svc)->enabled () && (*svc)->enter_event (false));
-    svc = next;
-  }
-
-  if (! done) {
-    enter_event ();
-  }
-
-  end_mouse_event ();
+  send_enter_event ();
 END_PROTECTED
 }
 
-void 
+void
 ViewObjectWidget::leaveEvent (QEvent * /*event*/)
 {
-BEGIN_PROTECTED  
+BEGIN_PROTECTED
   begin_mouse_event ();
-
-  bool done = false; 
-
-  for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
-    std::list<ViewService *>::iterator gg = g;
-    ++gg;
-    done = ((*g)->enabled () && (*g)->leave_event (true));
-    g = gg;
-  }
-
-  if (! done && mp_active_service) {
-    done = (mp_active_service->enabled () && mp_active_service->leave_event (true));
-  }
-
-  service_iterator svc = begin_services ();
-  while (svc != end_services () && !done) {
-    service_iterator next = svc;
-    ++next;
-    done = ((*svc)->enabled () && (*svc)->leave_event (false));
-    svc = next;
-  }
-
-  if (! done) {
-    leave_event ();
-  }
-
-  end_mouse_event ();
 END_PROTECTED
-
-  m_mouse_inside = false;
 }
 
 void 
 ViewObjectWidget::wheelEvent (QWheelEvent *e)
 {
-BEGIN_PROTECTED  
-  ensure_entered ();
-  begin_mouse_event ();
+BEGIN_PROTECTED
 
+  db::DPoint p;
 #if QT_VERSION < 0x60000
   int delta = e->delta ();
-  db::DPoint p = pixel_to_um (db::Point (e->pos ().x (), e->pos ().y ()));
+  p = db::DPoint (e->pos ().x (), e->pos ().y ());
   bool horizontal = (e->orientation () == Qt::Horizontal);
 #else
   int delta = e->angleDelta ().y ();
-  db::DPoint p = pixel_to_um (e->position ());
+  p = db::DPoint (e->position ().x (), e->position ().y ());
   bool horizontal = false;
 #endif
 
   e->ignore ();
 
-  bool done = false; 
+  send_wheel_event (delta, horizontal, p, qt_to_buttons (e->buttons (), e->modifiers ()));
 
-  unsigned int buttons = qt_to_buttons (e->buttons (), e->modifiers ());
-
-  for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
-    std::list<ViewService *>::iterator gg = g;
-    ++gg;
-    done = ((*g)->enabled () && (*g)->wheel_event (delta, horizontal, p, buttons, true));
-    g = gg;
-  }
-
-  if (! done && mp_active_service) {
-    done = (mp_active_service->enabled () && mp_active_service->wheel_event (delta, horizontal, p, buttons, true));
-  }
-
-  service_iterator svc = begin_services ();
-  while (svc != end_services () && !done) {
-    service_iterator next = svc;
-    ++next;
-    done = ((*svc)->enabled () && (*svc)->wheel_event (delta, horizontal, p, buttons, false));
-    svc = next;
-  }
-
-  if (! done) {
-    wheel_event (delta, horizontal, p, buttons);
-  }
-
-  end_mouse_event ();
 END_PROTECTED
 }
 
 void 
 ViewObjectWidget::mousePressEvent (QMouseEvent *e)
 {
-  ensure_entered ();
-  setFocus ();
+BEGIN_PROTECTED
 
-  m_mouse_pos = db::Point (e->pos ().x (), e->pos ().y ());
-  m_mouse_pressed = m_mouse_pos;
+  db::DPoint p;
+#if QT_VERSION < 0x60000
+  p = db::DPoint (e->pos ().x (), e->pos ().y ());
+#else
+  p = db::DPoint (e->position ().x (), e->position ().y ());
+#endif
 
-  m_mouse_buttons = qt_to_buttons (e->buttons (), e->modifiers ());
-  
-  m_mouse_pressed_state = true;
+  send_mouse_press_event (p, qt_to_buttons (e->buttons (), e->modifiers ()));
+
+END_PROTECTED
 }
 
 void 
 ViewObjectWidget::mouseReleaseEvent (QMouseEvent *e)
 {
 BEGIN_PROTECTED  
-  ensure_entered ();
-  begin_mouse_event ();
 
-  bool done = false; 
+  db::DPoint p;
+#if QT_VERSION < 0x60000
+  p = db::DPoint (e->pos ().x (), e->pos ().y ());
+#else
+  p = db::DPoint (e->position ().x (), e->position ().y ());
+#endif
 
-  m_mouse_pos = db::Point (e->pos ().x (), e->pos ().y ());
-  db::DPoint p = pixel_to_um (m_mouse_pos);
+  send_mouse_press_event (p, qt_to_buttons (e->buttons (), e->modifiers ()));
 
-  for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
-    std::list<ViewService *>::iterator gg = g;
-    ++gg;
-    if (m_mouse_pressed_state) {
-      done = (*g)->enabled () && (*g)->mouse_click_event (p, m_mouse_buttons, true);
-    } else {
-      done = (*g)->enabled () && (*g)->mouse_release_event (p, m_mouse_buttons, true);
-    }
-    g = gg;
-  }
-
-  if (! done && mp_active_service && mp_active_service->enabled ()) {
-    if (m_mouse_pressed_state) {
-      done = mp_active_service->mouse_click_event (p, m_mouse_buttons, true);
-    } else {
-      done = mp_active_service->mouse_release_event (p, m_mouse_buttons, true);
-    }
-  }
-
-  service_iterator svc = begin_services ();
-  while (svc != end_services () && !done) {
-    service_iterator next = svc;
-    ++next;
-    if ((*svc)->enabled ()) {
-      if (m_mouse_pressed_state) {
-        done = (*svc)->mouse_click_event (p, m_mouse_buttons, false);
-      } else {
-        done = (*svc)->mouse_release_event (p, m_mouse_buttons, false);
-      }
-    }
-    svc = next;
-  }
-
-  if (! done) {
-    if (m_mouse_pressed_state) {
-      mouse_click_event (p, m_mouse_buttons);
-    } else {
-      mouse_release_event (p, m_mouse_buttons);
-    }
-  }
-
-  end_mouse_event ();
 END_PROTECTED
-
-  m_mouse_pressed_state = false;
 }
+
 #endif
 
 void

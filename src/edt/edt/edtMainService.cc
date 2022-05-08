@@ -397,10 +397,15 @@ MainService::cm_ascend ()
 void  
 MainService::cm_flatten_insts ()
 {
+#if ! defined(HAVE_QT)
+  tl_assert (false); // see TODO
+#endif
+
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
 #if defined(HAVE_QT)
+  //  TODO: make parameters persistent so we can set them externally
   if (! (flatten_inst_options_dialog ()->exec_dialog (m_flatten_insts_levels, m_flatten_prune) && m_flatten_insts_levels != 0)) {
     return;
   }
@@ -973,6 +978,10 @@ MainService::cm_resolve_arefs ()
 void  
 MainService::cm_make_cell ()
 {
+#if ! defined(HAVE_QT)
+  tl_assert (false); // see TODO
+#endif
+
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
@@ -993,6 +1002,7 @@ MainService::cm_make_cell ()
     const lay::CellView &cv = view ()->cellview (cv_index);
 
 #if defined(HAVE_QT)
+    //  TODO: make parameters persistent so we can set them externally
     if (! make_cell_options_dialog ()->exec_dialog (cv->layout (), m_make_cell_name, m_origin_mode_x, m_origin_mode_y)) {
       return;
     }
@@ -1145,7 +1155,10 @@ MainService::cm_convert_to_cell ()
 void
 MainService::cm_convert_to_pcell ()
 {
-#if defined(HAVE_QT) // @@@
+#if ! defined(HAVE_QT)
+  tl_assert (false); // see TODO
+#endif
+
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
@@ -1163,7 +1176,7 @@ MainService::cm_convert_to_pcell ()
   }
 
   //  Collected items
-  QStringList items;
+  std::vector<std::string> pcell_items;
 
   //  Collect the libraries and PCells within these libraries that are candidates here
   std::vector<std::pair<db::Library *, db::pcell_id_type> > pcells;
@@ -1190,7 +1203,7 @@ MainService::cm_convert_to_pcell ()
         //  We have positive hit
         if (pc_decl) {
           pcells.push_back (std::make_pair (lib, pc->second));
-          items.push_back (tl::to_qstring (lib->get_name () + "." + pc_decl->name ()));
+          pcell_items.push_back (lib->get_name () + "." + pc_decl->name ());
         }
 
       } catch (...) {
@@ -1199,6 +1212,19 @@ MainService::cm_convert_to_pcell ()
 
     }
 
+  }
+
+  if (pcell_items.empty ()) {
+    throw tl::Exception (tl::to_string (tr ("No PCell found that accepts the selected shapes for conversion.")));
+  }
+
+  int index = 0;
+
+#if defined(HAVE_QT)
+  //  TODO: In Qt-less case keep selection persistent so we can set it externally
+  QStringList items;
+  for (auto i = pcell_items.begin (); i != pcell_items.end (); ++i) {
+    items.push_back (tl::to_qstring (*i));
   }
 
   bool ok = false;
@@ -1210,10 +1236,11 @@ MainService::cm_convert_to_pcell ()
     return;
   }
 
-  int index = items.indexOf (item);
+  index = items.indexOf (item);
   if (index < 0) {
     return;
   }
+#endif
 
   db::Library *lib = pcells [index].first;
   db::pcell_id_type pcid = pcells [index].second;
@@ -1313,7 +1340,6 @@ MainService::cm_convert_to_pcell ()
     manager ()->commit ();
     throw;
   }
-#endif
 }
 
 static bool extract_rad (std::vector <db::Polygon> &poly, double &rinner, double &router, unsigned int &n)
@@ -1359,6 +1385,10 @@ static bool extract_rad (std::vector <db::Polygon> &poly, double &rinner, double
 void
 MainService::cm_round_corners ()
 {
+#if ! defined(HAVE_QT)
+  tl_assert (false); // see TODO
+#endif
+
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
@@ -1419,6 +1449,7 @@ MainService::cm_round_corners ()
   router *= dbu;
 
 #if defined(HAVE_QT)
+  //  TODO: make parameters persistent so we can set them externally
   if (! round_corners_dialog ()->exec_dialog (cv->layout (), m_router, m_rinner, m_npoints, m_undo_before_apply, router, rinner, n, has_extracted)) {
     return;
   }
@@ -1483,7 +1514,10 @@ MainService::cm_round_corners ()
 void
 MainService::cm_size ()
 {
-#if defined(HAVE_QT) // @@@
+#if ! defined(HAVE_QT)
+  tl_assert (false); // see TODO
+#endif
+
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
@@ -1523,6 +1557,10 @@ MainService::cm_size ()
     throw tl::Exception (tl::to_string (tr ("Selection does not contain polygons")));
   }
 
+  std::string sl ("0.0");
+
+#if defined(HAVE_QT)
+  //  TODO: keep the value persistent so we can set it externally in the Qt-less case
   bool ok = false;
   QString s = QInputDialog::getText (view ()->widget (),
                                      tr ("Sizing"),
@@ -1534,8 +1572,10 @@ MainService::cm_size ()
     return;
   }
 
+  sl = tl::to_string (s);
+#endif
+
   double dx = 0.0, dy = 0.0;
-  std::string sl (tl::to_string (s));
   tl::Extractor ex (sl.c_str ());
   ex.read (dx);
   if (ex.test (",")) {
@@ -1595,7 +1635,6 @@ MainService::cm_size ()
   }
 
   manager ()->commit ();
-#endif
 }
 
 void
@@ -1794,12 +1833,17 @@ inst_bbox (const db::CplxTrans &tr, lay::LayoutView *view, int cv_index, const d
 void 
 MainService::cm_align ()
 {
+#if ! defined(HAVE_QT)
+  tl_assert (false); // see TODO
+#endif
+
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
 
 #if defined(HAVE_QT)
+  //  TODO: make parameters persistent so we can set them externally
   if (! align_options_dialog ()->exec_dialog (m_align_hmode, m_align_vmode, m_align_visible_layers)) {
     return;
   }
@@ -1882,12 +1926,17 @@ MainService::cm_align ()
 void
 MainService::cm_distribute ()
 {
+#if ! defined(HAVE_QT)
+  tl_assert (false); // see TODO
+#endif
+
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
 
 #if defined(HAVE_QT)
+  //  TODO: make parameters persistent so we can set them externally
   if (! distribute_options_dialog ()->exec_dialog (m_hdistribute, m_distribute_hmode, m_distribute_hpitch, m_distribute_hspace,
                                                    m_vdistribute, m_distribute_vmode, m_distribute_vpitch, m_distribute_vspace,
                                                    m_distribute_visible_layers)) {
@@ -1992,6 +2041,10 @@ MainService::cm_distribute ()
 void
 MainService::cm_make_array ()
 {
+#if ! defined(HAVE_QT)
+  tl_assert (false); // see TODO
+#endif
+
   size_t n = 0;
   check_no_guiding_shapes ();
 
@@ -2008,6 +2061,7 @@ MainService::cm_make_array ()
   }
 
 #if defined(HAVE_QT)
+  //  TODO: make parameters persistent so we can set them externally
   if (! make_array_options_dialog ()->exec_dialog (m_array_a, m_array_na, m_array_b, m_array_nb)) {
     return;
   }
@@ -2097,7 +2151,10 @@ MainService::cm_make_array ()
 void 
 MainService::cm_tap ()
 {
-#if defined(HAVE_QT) // @@@
+#if ! defined(HAVE_QT)
+  tl_assert (false); // see TODO
+#endif
+
   if (! view ()->view_object_widget ()->mouse_in_window ()) {
     return;
   }
@@ -2134,6 +2191,8 @@ MainService::cm_tap ()
 
   //  List the layers under the cursor as pop up a menu
 
+#if defined(HAVE_QT)
+  //  TODO: what to do here in Qt-less case? Store results in configuration so they can be retrieved externally?
   std::unique_ptr<QMenu> menu (new QMenu (view ()->widget ()));
   menu->show ();
 

@@ -371,9 +371,7 @@ private:
   lay::LayoutViewBase *mp_view;
   lay::PixelBuffer *mp_image;
   lay::PixelBuffer *mp_image_bg;
-#if defined(HAVE_QT)
-  QPixmap *mp_pixmap;
-#endif
+  lay::PixelBuffer *mp_image_fg;
   db::DBox m_precious_box;
   lay::Viewport m_viewport, m_viewport_l;
   lay::color_t m_background;

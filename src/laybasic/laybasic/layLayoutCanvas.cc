@@ -22,11 +22,8 @@
 
 #if defined(HAVE_QT)
 #  include <QEvent>
-#  include <QPixmap>
-#  include <QBitmap>
 #  include <QPainter>
 #  include <QApplication>
-#  include <QBuffer>
 #  include <QWheelEvent>
 #endif
 
@@ -286,9 +283,7 @@ LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
 #endif
     mp_view (view),
     mp_image (0), mp_image_bg (0),
-#if defined(HAVE_QT)
-    mp_pixmap (0),
-#endif
+    mp_image_fg (0),
     m_background (0), m_foreground (0), m_active (0),
     m_oversampling (1),
     m_dpr (1),
@@ -340,12 +335,10 @@ LayoutCanvas::~LayoutCanvas ()
     delete mp_image_bg;
     mp_image_bg = 0;
   }
-#if defined(HAVE_QT)
-  if (mp_pixmap) {
-    delete mp_pixmap;
-    mp_pixmap = 0;
+  if (mp_image_fg) {
+    delete mp_image_fg;
+    mp_image_fg = 0;
   }
-#endif
   if (mp_redraw_thread) {
     delete mp_redraw_thread;
     mp_redraw_thread = 0;
@@ -454,12 +447,10 @@ LayoutCanvas::prepare_drawing ()
         delete mp_image;
       }
       mp_image = new lay::PixelBuffer (m_viewport_l.width (), m_viewport_l.height ());
-#if defined(HAVE_QT)
-      if (mp_pixmap) {
-        delete mp_pixmap;
-        mp_pixmap = 0;
+      if (mp_image_fg) {
+        delete mp_image_fg;
+        mp_image_fg = 0;
       }
-#endif
     }
 
     mp_image->fill (m_background);
@@ -565,12 +556,10 @@ LayoutCanvas::update_image ()
 void
 LayoutCanvas::free_resources ()
 {
-#if defined(HAVE_QT)
-  if (mp_pixmap) {
-    delete mp_pixmap;
-    mp_pixmap = 0;
+  if (mp_image_fg) {
+    delete mp_image_fg;
+    mp_image_fg = 0;
   }
-#endif
 }
 
 #if defined(HAVE_QT)
@@ -608,9 +597,9 @@ LayoutCanvas::paintEvent (QPaintEvent *)
       //  render the main bitmaps
       to_image (m_view_ops, dither_pattern (), line_styles (), background_color (), foreground_color (), active_color (), this, *mp_image, m_viewport_l.width (), m_viewport_l.height ());
 
-      if (mp_pixmap) {
-        delete mp_pixmap;
-        mp_pixmap = 0;
+      if (mp_image_fg) {
+        delete mp_image_fg;
+        mp_image_fg = 0;
       }
 
       m_update_image = false;
@@ -620,18 +609,18 @@ LayoutCanvas::paintEvent (QPaintEvent *)
     //  create a base pixmap consisting of the layout with background
     //  and static foreground objects
 
-    if (! mp_pixmap || needs_update_static () || 
-        int (mp_image->width ()) != mp_pixmap->size ().width () * int (m_oversampling) ||
-        int (mp_image->height ()) != mp_pixmap->size ().height () * int (m_oversampling)) {
+    if (! mp_image_fg || needs_update_static () ||
+        int (mp_image->width ()) != (int) mp_image_fg->width () * int (m_oversampling) ||
+        int (mp_image->height ()) != (int) mp_image_fg->height () * int (m_oversampling)) {
 
-      if (mp_pixmap) {
-        delete mp_pixmap;
+      if (mp_image_fg) {
+        delete mp_image_fg;
       } 
 
       clear_fg_bitmaps ();
       do_render (m_viewport_l, *this, true);
 
-      mp_pixmap = new QPixmap ();
+      mp_image_fg = new lay::PixelBuffer ();
 
       if (fg_bitmaps () > 0) {
 
@@ -640,40 +629,24 @@ LayoutCanvas::paintEvent (QPaintEvent *)
 
         //  render the foreground parts ..
         if (m_oversampling == 1) {
-          QImage img = full_image.to_image_copy ();  // NOTE: seems like it's required to create a copy as QPixmap stores a reference to the image
-#if QT_VERSION > 0x050000
-          img.setDevicePixelRatio (double (m_dpr));
-#endif
-          *mp_pixmap = QPixmap::fromImage (img); // Qt 4.6.0 workaround
+          *mp_image_fg = full_image;
         } else {
           lay::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
           subsampled_image.set_transparent (mp_image->transparent ());
           subsample (full_image, subsampled_image, m_oversampling, m_gamma);
-          QImage img = subsampled_image.to_image_copy ();  // NOTE: seems like it's required to create a copy as QPixmap stores a reference to the image
-#if QT_VERSION > 0x050000
-          img.setDevicePixelRatio (double (m_dpr));
-#endif
-          *mp_pixmap = QPixmap::fromImage (img); // Qt 4.6.0 workaround
+          *mp_image_fg = subsampled_image;
         }
 
       } else if (m_oversampling == 1) {
 
-        QImage img = mp_image->to_image_copy ();  // NOTE: seems like it's required to create a copy as QPixmap stores a reference to the image
-#if QT_VERSION > 0x050000
-        img.setDevicePixelRatio (double (m_dpr));
-#endif
-        *mp_pixmap = QPixmap::fromImage (img);
+        *mp_image_fg = *mp_image;
 
       } else {
 
         lay::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
         subsampled_image.set_transparent (mp_image->transparent ());
         subsample (*mp_image, subsampled_image, m_oversampling, m_gamma);
-        QImage img = subsampled_image.to_image_copy ();  // NOTE: seems like it's required to create a copy as QPixmap stores a reference to the image
-#if QT_VERSION > 0x050000
-        img.setDevicePixelRatio (double (m_dpr));
-#endif
-        *mp_pixmap = QPixmap::fromImage (img);
+        *mp_image_fg = subsampled_image;
 
       }
 
@@ -687,7 +660,11 @@ LayoutCanvas::paintEvent (QPaintEvent *)
 
     //  produce the pixmap first and then overdraw with dynamic content.
     QPainter painter (this);
-    painter.drawPixmap (QPoint (0, 0), *mp_pixmap);
+    QImage img = mp_image_fg->to_image ();
+#if QT_VERSION > 0x050000
+    img.setDevicePixelRatio (double (m_dpr));
+#endif
+    painter.drawImage (QPoint (0, 0), img);
 
     if (fg_bitmaps () > 0) {
 
@@ -703,7 +680,7 @@ LayoutCanvas::paintEvent (QPaintEvent *)
 #if QT_VERSION > 0x050000
         img.setDevicePixelRatio (double (m_dpr));
 #endif
-        painter.drawPixmap (QPoint (0, 0), QPixmap::fromImage (img));
+        painter.drawImage (QPoint (0, 0), img);
       } else {
         lay::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
         subsampled_image.set_transparent (true);
@@ -712,7 +689,7 @@ LayoutCanvas::paintEvent (QPaintEvent *)
 #if QT_VERSION > 0x050000
         img.setDevicePixelRatio (double (m_dpr));
 #endif
-        painter.drawPixmap (QPoint (0, 0), QPixmap::fromImage (img));
+        painter.drawImage (QPoint (0, 0), img);
       }
 
     }

@@ -29,8 +29,6 @@
 #include <utility>
 #include <vector>
 
-#include <QDialog>
-
 #include "layObjectInstPath.h"
 
 #include "dbInstElement.h"

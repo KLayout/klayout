@@ -88,7 +88,9 @@ class PolygonService
 public:
   PolygonService (db::Manager *manager, lay::LayoutView *view);
   
+#if defined(HAVE_QT)
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+#endif
   virtual void do_delete ();
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
@@ -119,7 +121,9 @@ class BoxService
 public:
   BoxService (db::Manager *manager, lay::LayoutView *view);
   
+#if defined(HAVE_QT)
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+#endif
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
   virtual void do_mouse_move_inactive (const db::DPoint &p);
@@ -145,7 +149,9 @@ public:
   TextService (db::Manager *manager, lay::LayoutView *view);
   ~TextService ();
   
+#if defined(HAVE_QT)
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+#endif
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_transform (const db::DPoint &p, db::DFTrans trans);
   virtual void do_mouse_move (const db::DPoint &p);
@@ -177,7 +183,9 @@ public:
   PathService (db::Manager *manager, lay::LayoutView *view);
   ~PathService ();
   
+#if defined(HAVE_QT)
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+#endif
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
   virtual bool do_mouse_click (const db::DPoint &p);
@@ -213,7 +221,9 @@ class InstService
 public:
   InstService (db::Manager *manager, lay::LayoutView *view);
   
+#if defined(HAVE_QT)
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+#endif
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move_inactive (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
@@ -222,10 +232,12 @@ public:
   virtual void do_finish_edit ();
   virtual void do_cancel_edit ();
   virtual bool do_activated ();
+#if defined(HAVE_QT)
   virtual bool drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase *data);
   virtual bool drag_move_event (const db::DPoint &p, const lay::DragDropDataBase *data);
   virtual void drag_leave_event ();
   virtual bool drop_event (const db::DPoint &p, const lay::DragDropDataBase *data);
+#endif
   virtual bool selection_applies (const lay::ObjectInstPath &sel) const;
 
 protected:

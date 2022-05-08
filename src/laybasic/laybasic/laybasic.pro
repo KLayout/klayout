@@ -112,7 +112,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layEditorOptionsFrame.cc \
     layEditorOptionsPage.cc \
     layEditorOptionsPages.cc \
-    layEditorServiceBase.cc \
     layFileDialog.cc \
     layGenericSyntaxHighlighter.cc \
     layGridNetConfigPage.cc \
@@ -182,7 +181,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layEditorOptionsFrame.h \
     layEditorOptionsPage.h \
     layEditorOptionsPages.h \
-    layEditorServiceBase.h \
     layFileDialog.h \
     layGenericSyntaxHighlighter.h \
     layGridNetConfigPage.h \
@@ -246,6 +244,7 @@ SOURCES += \
     layDitherPattern.cc \
     layDrawing.cc \
     layEditable.cc \
+    layEditorServiceBase.cc \
     layFinder.cc \
     layGridNet.cc \
     layFixedFont.cc \
@@ -292,6 +291,7 @@ HEADERS += \
     layDitherPattern.h \
     layDrawing.h \
     layEditable.h \
+    layEditorServiceBase.h \
     layLayoutCanvas.h \
     layLayoutView.h \
     layFinder.h \

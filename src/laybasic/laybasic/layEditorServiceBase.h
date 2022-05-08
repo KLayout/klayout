@@ -121,6 +121,11 @@ public:
     return m_tracking_position;
   }
 
+  /**
+   *  @brief Shows an error where an exception is not applicable
+   */
+  void show_error (tl::Exception &ex);
+
 protected:
   virtual bool configure (const std::string &name, const std::string &value);
   virtual void deactivated ();

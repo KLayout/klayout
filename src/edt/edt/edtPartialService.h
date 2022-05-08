@@ -34,8 +34,10 @@
 #include "edtUtils.h"
 #include "edtConfig.h"
 
-#include <QObject>
-#include <QTimer>
+#if defined(HAVE_QT)
+#  include <QObject>
+#  include <QTimer>
+#endif
 
 namespace db {
   class Manager;
@@ -136,12 +138,16 @@ struct EdgeWithIndex
 /**
  *  @brief The partial selection and manipulation service
  */
-class PartialService
-  : public QObject,
+class PartialService :
+#if defined(HAVE_QT)
+    public QObject,
+#endif
     public lay::EditorServiceBase,
     public db::Object
 {
+#if defined(HAVE_QT)
 Q_OBJECT
+#endif
 
 public: 
   typedef std::map<lay::ObjectInstPath, std::set<EdgeWithIndex> > partial_objects;
@@ -289,8 +295,10 @@ public:
    */
   virtual void edit_cancel ();
 
+#if defined(HAVE_QT)
 public slots:
   void timeout ();
+#endif
 
 protected:
   lay::angle_constraint_type connect_ac () const;
@@ -324,7 +332,9 @@ private:
   std::vector<lay::InstanceMarker *> m_inst_markers;
   std::vector<lay::InstanceMarker *> m_transient_inst_markers;
 
+#if defined(HAVE_QT)
   QTimer m_timer;
+#endif
   bool m_hover;
   bool m_hover_wait;
   db::DPoint m_hover_point;

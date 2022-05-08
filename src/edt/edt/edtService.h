@@ -32,6 +32,7 @@
 #include "layMarker.h"
 #include "laySnap.h"
 #include "layObjectInstPath.h"
+#include "layColor.h"
 #include "dbLayout.h"
 #include "dbShape.h"
 #include "edtUtils.h"
@@ -219,7 +220,7 @@ public:
   /**
    *  @brief Color accessor
    */
-  QColor color () const
+  lay::Color color () const
   {
     return m_color;
   }
@@ -592,7 +593,7 @@ private:
   db::ShapeIterator::flags_type m_flags;
 
   //  The look of the markers
-  QColor m_color;
+  lay::Color m_color;
 
   //  The current transformation on movement
   db::DTrans m_move_trans;
@@ -644,6 +645,9 @@ private:
    *  @brief Display the status bar message for the given selection
    */
   void display_status (bool transient);
+
+private:
+  void copy_selected (unsigned int inst_mode);
 };
 
 }

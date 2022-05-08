@@ -21,33 +21,37 @@
 */
 
 
-#include <QInputDialog>
-
 #include "dbEdgeProcessor.h"
 #include "dbPolygonTools.h"
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
 #include "tlExceptions.h"
 #include "layLayoutView.h"
-#include "layDialogs.h"
 #include "laySelector.h"
-#include "layCellSelectionForm.h"
 #include "layFinder.h"
 #include "layLayerProperties.h"
-#include "layLayerTreeModel.h"
 #include "tlProgress.h"
 #include "edtPlugin.h"
 #include "edtMainService.h"
 #include "edtService.h"
 #include "edtServiceImpl.h"
 #include "edtConfig.h"
-#include "edtDialogs.h"
-#include "edtEditorOptionsPages.h"
 #include "edtDistribute.h"
 
-#include <QMessageBox>
-#include <QFontInfo>
-#include <QWidgetAction>
+#if defined(HAVE_QT)
+#  include "layDialogs.h"
+#  include "layLayerTreeModel.h"
+#  include "layCellSelectionForm.h"
+#  include "edtDialogs.h"
+#  include "edtEditorOptionsPages.h"
+#endif
+
+#if defined(HAVE_QT)
+#  include <QInputDialog>
+#  include <QMessageBox>
+#  include <QFontInfo>
+#  include <QWidgetAction>
+#endif
 
 namespace edt
 {
@@ -73,21 +77,24 @@ MainService::MainService (db::Manager *manager, lay::LayoutView *view, lay::Disp
     m_origin_mode_x (-1), m_origin_mode_y (-1), m_origin_visible_layers_for_bbox (false),
     m_array_a (0.0, 1.0), m_array_b (1.0, 0.0),
     m_array_na (1), m_array_nb (1),
-    m_router (0.0), m_rinner (0.0), m_npoints (64), m_undo_before_apply (true),
-    mp_round_corners_dialog (0),
-    mp_align_options_dialog (0),
-    mp_distribute_options_dialog (0),
-    mp_flatten_inst_options_dialog (0),
-    mp_make_cell_options_dialog (0),
-    mp_make_array_options_dialog (0)
+    m_router (0.0), m_rinner (0.0), m_npoints (64), m_undo_before_apply (true)
 {
-  //  .. nothing yet ..
+#if defined(HAVE_QT)
+  mp_round_corners_dialog = 0;
+  mp_align_options_dialog = 0;
+  mp_distribute_options_dialog = 0;
+  mp_flatten_inst_options_dialog = 0;
+  mp_make_cell_options_dialog = 0;
+  mp_make_array_options_dialog = 0;
+#endif
 }
 
 MainService::~MainService ()
 {
   //  .. nothing yet ..
 }
+
+#if defined(HAVE_QT)
 
 edt::RoundCornerOptionsDialog *
 MainService::round_corners_dialog ()
@@ -142,6 +149,8 @@ MainService::make_array_options_dialog ()
   }
   return mp_make_array_options_dialog;
 }
+
+#endif
 
 void
 MainService::menu_activated (const std::string &symbol)
@@ -298,10 +307,10 @@ MainService::cm_descend ()
   }
 
   if (! common_inst.anything ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Select an object to determine into which instance to descend")));
+    throw tl::Exception (tl::to_string (tr ("Select an object to determine into which instance to descend")));
   }
   if (! common_inst.valid () || common_inst.ambiguous ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Selection is ambiguous - cannot determine into which instance to descend")));
+    throw tl::Exception (tl::to_string (tr ("Selection is ambiguous - cannot determine into which instance to descend")));
   }
 
   //  remove the common path and create a new set of selections
@@ -391,38 +400,40 @@ MainService::cm_flatten_insts ()
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
-  if (flatten_inst_options_dialog ()->exec_dialog (m_flatten_insts_levels, m_flatten_prune) && m_flatten_insts_levels != 0) {
+#if defined(HAVE_QT)
+  if (! (flatten_inst_options_dialog ()->exec_dialog (m_flatten_insts_levels, m_flatten_prune) && m_flatten_insts_levels != 0)) {
+    return
+  }
+#endif
 
-    view ()->cancel_edits ();
+  view ()->cancel_edits ();
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Flatten instances")));
+  manager ()->transaction (tl::to_string (tr ("Flatten instances")));
 
-    std::set<db::Layout *> needs_cleanup;
+  std::set<db::Layout *> needs_cleanup;
 
-    std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
-    for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+  for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
-      for (edt::Service::objects::const_iterator r = (*es)->selection ().begin (); r != (*es)->selection ().end (); ++r) {
+    for (edt::Service::objects::const_iterator r = (*es)->selection ().begin (); r != (*es)->selection ().end (); ++r) {
 
-        const lay::CellView &cv = view ()->cellview (r->cv_index ());
-        if (cv.is_valid ()) {
+      const lay::CellView &cv = view ()->cellview (r->cv_index ());
+      if (cv.is_valid ()) {
 
-          db::Cell &target_cell = cv->layout ().cell (r->cell_index ());
-          if (r->is_cell_inst () && target_cell.is_valid (r->back ().inst_ptr)) {
+        db::Cell &target_cell = cv->layout ().cell (r->cell_index ());
+        if (r->is_cell_inst () && target_cell.is_valid (r->back ().inst_ptr)) {
 
-            //  because we select whole arrays in editable mode, we can iterator over them
-            db::CellInstArray cell_inst = r->back ().inst_ptr.cell_inst ();
-            for (db::CellInstArray::iterator a = cell_inst.begin (); ! a.at_end (); ++a) {
-              cv->layout ().flatten (cv->layout ().cell (r->cell_index_tot ()), target_cell, cell_inst.complex_trans (*a), m_flatten_insts_levels < 0 ? m_flatten_insts_levels : m_flatten_insts_levels - 1);
-            }
-
-            if (cv->layout ().cell (r->back ().inst_ptr.cell_index ()).is_proxy ()) {
-              needs_cleanup.insert (& cv->layout ());
-            }
-
-            target_cell.erase (r->back ().inst_ptr);
-
+          //  because we select whole arrays in editable mode, we can iterator over them
+          db::CellInstArray cell_inst = r->back ().inst_ptr.cell_inst ();
+          for (db::CellInstArray::iterator a = cell_inst.begin (); ! a.at_end (); ++a) {
+            cv->layout ().flatten (cv->layout ().cell (r->cell_index_tot ()), target_cell, cell_inst.complex_trans (*a), m_flatten_insts_levels < 0 ? m_flatten_insts_levels : m_flatten_insts_levels - 1);
           }
+
+          if (cv->layout ().cell (r->back ().inst_ptr.cell_index ()).is_proxy ()) {
+            needs_cleanup.insert (& cv->layout ());
+          }
+
+          target_cell.erase (r->back ().inst_ptr);
 
         }
 
@@ -430,17 +441,17 @@ MainService::cm_flatten_insts ()
 
     }
 
-    //  clean up the layouts that need to do so.
-    for (std::set<db::Layout *>::const_iterator l = needs_cleanup.begin (); l != needs_cleanup.end (); ++l) {
-      (*l)->cleanup ();
-    }
-
-    //  The selection is no longer valid
-    view ()->clear_selection ();
-
-    manager ()->commit ();
-
   }
+
+  //  clean up the layouts that need to do so.
+  for (std::set<db::Layout *>::const_iterator l = needs_cleanup.begin (); l != needs_cleanup.end (); ++l) {
+    (*l)->cleanup ();
+  }
+
+  //  The selection is no longer valid
+  view ()->clear_selection ();
+
+  manager ()->commit ();
 }
 
 void  
@@ -449,7 +460,7 @@ MainService::cm_move_hier_up ()
   view ()->cancel_edits ();
   check_no_guiding_shapes ();
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Move up in hierarchy")));
+  manager ()->transaction (tl::to_string (tr ("Move up in hierarchy")));
 
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -691,7 +702,7 @@ MainService::cm_make_cell_variants ()
       if (cv_index < 0) {
         cv_index = r->cv_index ();
       } else if (cv_index != int (r->cv_index ())) {
-        throw tl::Exception (tl::to_string (QObject::tr ("The selection must not contain objects from different layouts for 'make cell variants'")));
+        throw tl::Exception (tl::to_string (tr ("The selection must not contain objects from different layouts for 'make cell variants'")));
       }
     }
   }
@@ -705,7 +716,7 @@ MainService::cm_make_cell_variants ()
 
   view ()->cancel_edits ();
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Make cell variants for selection")));
+  manager ()->transaction (tl::to_string (tr ("Make cell variants for selection")));
 
   std::vector<lay::ObjectInstPath> new_selection;
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -716,7 +727,7 @@ MainService::cm_make_cell_variants ()
 
   //  TODO: the algorithm is basically O(2) in the number of selected items. A first 
   //  step to mitigate that problem is to provide a progress and hence a way to cancel it.
-  tl::RelativeProgress progress (tl::to_string (QObject::tr ("Make cell variants for selection")), num_sel, 1);
+  tl::RelativeProgress progress (tl::to_string (tr ("Make cell variants for selection")), num_sel, 1);
 
   for (size_t nsel = 0; nsel < num_sel; ++nsel) {
 
@@ -901,7 +912,7 @@ MainService::cm_resolve_arefs ()
         cv_index = r->cv_index ();
       } else if (cv_index != int (r->cv_index ())) {
         //  TODO: this limitation is not really necessary, but makes the code somewhat simpler
-        throw tl::Exception (tl::to_string (QObject::tr ("The selection must not contain objects from different layouts for 'resolve array references'")));
+        throw tl::Exception (tl::to_string (tr ("The selection must not contain objects from different layouts for 'resolve array references'")));
       }
       insts_to_resolve.push_back (*r);
     }
@@ -917,7 +928,7 @@ MainService::cm_resolve_arefs ()
 
   std::vector<lay::ObjectInstPath> new_selection;
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Resolve array references")));
+  manager ()->transaction (tl::to_string (tr ("Resolve array references")));
 
   for (std::vector<lay::ObjectInstPath>::const_iterator p = insts_to_resolve.begin (); p != insts_to_resolve.end (); ++p) {
 
@@ -972,7 +983,7 @@ MainService::cm_make_cell ()
       if (cv_index < 0) {
         cv_index = r->cv_index ();
       } else if (cv_index != int (r->cv_index ())) {
-        throw tl::Exception (tl::to_string (QObject::tr ("The selection must not contain objects from different layouts for 'make cell'")));
+        throw tl::Exception (tl::to_string (tr ("The selection must not contain objects from different layouts for 'make cell'")));
       }
     }
   }
@@ -981,79 +992,81 @@ MainService::cm_make_cell ()
 
     const lay::CellView &cv = view ()->cellview (cv_index);
 
-    if (make_cell_options_dialog ()->exec_dialog (cv->layout (), m_make_cell_name, m_origin_mode_x, m_origin_mode_y)) {
+#if defined(HAVE_QT)
+    if (! make_cell_options_dialog ()->exec_dialog (cv->layout (), m_make_cell_name, m_origin_mode_x, m_origin_mode_y)) {
+      return;
+    }
+ #endif
 
-      //  Compute the selection's bbox to establish a good origin for the new cell
-      db::Box selection_bbox; 
-      db::box_convert<db::CellInst> bc (cv->layout ());
-      for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-        for (edt::Service::objects::const_iterator r = (*es)->selection ().begin (); r != (*es)->selection ().end (); ++r) {
-          if (r->is_cell_inst ()) {
-            selection_bbox += db::ICplxTrans (r->trans ()) * r->back ().bbox (bc);
-          } else {
-            selection_bbox += db::ICplxTrans (r->trans ()) * r->shape ().bbox ();
-          }
+    //  Compute the selection's bbox to establish a good origin for the new cell
+    db::Box selection_bbox;
+    db::box_convert<db::CellInst> bc (cv->layout ());
+    for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+      for (edt::Service::objects::const_iterator r = (*es)->selection ().begin (); r != (*es)->selection ().end (); ++r) {
+        if (r->is_cell_inst ()) {
+          selection_bbox += db::ICplxTrans (r->trans ()) * r->back ().bbox (bc);
+        } else {
+          selection_bbox += db::ICplxTrans (r->trans ()) * r->shape ().bbox ();
         }
       }
+    }
 
-      if (selection_bbox.empty ()) {
-        throw tl::Exception (tl::to_string (QObject::tr ("The selection is empty. Cannot create a cell from an empty selection.")));
-      }
+    if (selection_bbox.empty ()) {
+      throw tl::Exception (tl::to_string (tr ("The selection is empty. Cannot create a cell from an empty selection.")));
+    }
 
-      view ()->cancel_edits ();
+    view ()->cancel_edits ();
 
-      manager ()->transaction (tl::to_string (QObject::tr ("Make cell from selection")));
+    manager ()->transaction (tl::to_string (tr ("Make cell from selection")));
 
-      db::cell_index_type target_ci = cv->layout ().add_cell (m_make_cell_name.c_str ());
-      //  create target cell
-      db::Cell &target_cell = cv->layout ().cell (target_ci);
+    db::cell_index_type target_ci = cv->layout ().add_cell (m_make_cell_name.c_str ());
+    //  create target cell
+    db::Cell &target_cell = cv->layout ().cell (target_ci);
 
-      //  create target cell instance
-      db::Vector ref;
-      if (m_origin_mode_x >= -1) {
-        ref = db::Vector (selection_bbox.left () + ((m_origin_mode_x + 1) * selection_bbox.width ()) / 2, selection_bbox.bottom () + ((m_origin_mode_y + 1) * selection_bbox.height ()) / 2);
-      }
+    //  create target cell instance
+    db::Vector ref;
+    if (m_origin_mode_x >= -1) {
+      ref = db::Vector (selection_bbox.left () + ((m_origin_mode_x + 1) * selection_bbox.width ()) / 2, selection_bbox.bottom () + ((m_origin_mode_y + 1) * selection_bbox.height ()) / 2);
+    }
 
-      db::Instance target_cell_inst = cv.cell ()->insert (db::CellInstArray (db::CellInst (target_ci), db::Trans (ref)));
-      db::ICplxTrans to = db::ICplxTrans (db::Trans (-ref));
+    db::Instance target_cell_inst = cv.cell ()->insert (db::CellInstArray (db::CellInst (target_ci), db::Trans (ref)));
+    db::ICplxTrans to = db::ICplxTrans (db::Trans (-ref));
 
-      for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+    for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
-        for (edt::Service::objects::const_iterator r = (*es)->selection ().begin (); r != (*es)->selection ().end (); ++r) {
+      for (edt::Service::objects::const_iterator r = (*es)->selection ().begin (); r != (*es)->selection ().end (); ++r) {
 
-          if (r->is_cell_inst ()) {
+        if (r->is_cell_inst ()) {
 
-            db::Instance new_inst = target_cell.insert (r->back ().inst_ptr);
-            target_cell.transform (new_inst, to * db::ICplxTrans (r->trans ()));
+          db::Instance new_inst = target_cell.insert (r->back ().inst_ptr);
+          target_cell.transform (new_inst, to * db::ICplxTrans (r->trans ()));
 
-          } else {
+        } else {
 
-            db::Shapes &target_shapes = target_cell.shapes (r->layer ());
-            db::Shape new_shape = target_shapes.insert (r->shape ());
-            target_shapes.transform (new_shape, to * db::ICplxTrans (r->trans ()));
-
-          }
+          db::Shapes &target_shapes = target_cell.shapes (r->layer ());
+          db::Shape new_shape = target_shapes.insert (r->shape ());
+          target_shapes.transform (new_shape, to * db::ICplxTrans (r->trans ()));
 
         }
 
-        //  delete all the objects currently selected and set the new selection
-        (*es)->del_selected ();
-
-        //  establish the new instance as selection for the instance service
-        std::vector<lay::ObjectInstPath> new_selection;
-        if ((*es)->flags () == db::ShapeIterator::Nothing) {
-          new_selection.push_back (lay::ObjectInstPath ());
-          new_selection.back ().set_topcell (cv.cell_index ());
-          new_selection.back ().set_cv_index (cv_index);
-          new_selection.back ().add_path (db::InstElement (target_cell_inst));
-        }
-        (*es)->set_selection (new_selection.begin (), new_selection.end ());
-
       }
 
-      manager ()->commit ();
+      //  delete all the objects currently selected and set the new selection
+      (*es)->del_selected ();
+
+      //  establish the new instance as selection for the instance service
+      std::vector<lay::ObjectInstPath> new_selection;
+      if ((*es)->flags () == db::ShapeIterator::Nothing) {
+        new_selection.push_back (lay::ObjectInstPath ());
+        new_selection.back ().set_topcell (cv.cell_index ());
+        new_selection.back ().set_cv_index (cv_index);
+        new_selection.back ().add_path (db::InstElement (target_cell_inst));
+      }
+      (*es)->set_selection (new_selection.begin (), new_selection.end ());
 
     }
+
+    manager ()->commit ();
 
   }
 
@@ -1069,7 +1082,7 @@ MainService::cm_convert_to_cell ()
 
   try {
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Convert to static cell")));
+    manager ()->transaction (tl::to_string (tr ("Convert to static cell")));
 
     std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
 
@@ -1110,7 +1123,7 @@ MainService::cm_convert_to_cell ()
     }
 
     if (needs_cleanup.empty ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("No instance of a PCell or library cell selected - nothing to convert")));
+      throw tl::Exception (tl::to_string (tr ("No instance of a PCell or library cell selected - nothing to convert")));
     }
 
     //  clean up the layouts that need to do so.
@@ -1132,6 +1145,7 @@ MainService::cm_convert_to_cell ()
 void
 MainService::cm_convert_to_pcell ()
 {
+#if defined(HAVE_QT) // @@@
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
@@ -1143,7 +1157,7 @@ MainService::cm_convert_to_pcell ()
     num_selected += (*es)->selection ().size ();
     for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
       if (s->is_cell_inst ()) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Selection contains instances - they cannot be converted to PCells.")));
+        throw tl::Exception (tl::to_string (tr ("Selection contains instances - they cannot be converted to PCells.")));
       }
     }
   }
@@ -1189,8 +1203,8 @@ MainService::cm_convert_to_pcell ()
 
   bool ok = false;
   QString item = QInputDialog::getItem (view ()->widget (),
-                                        QObject::tr ("Select Target PCell"),
-                                        QObject::tr ("Select the PCell the shape should be converted into"),
+                                        tr ("Select Target PCell"),
+                                        tr ("Select the PCell the shape should be converted into"),
                                         items, 0, false, &ok);
   if (! ok) {
     return;
@@ -1210,7 +1224,7 @@ MainService::cm_convert_to_pcell ()
 
   try {
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Convert to PCell")));
+    manager ()->transaction (tl::to_string (tr ("Convert to PCell")));
 
     std::vector<edt::Service::obj_iterator> to_delete;
     std::vector<lay::ObjectInstPath> new_selection;
@@ -1219,7 +1233,7 @@ MainService::cm_convert_to_pcell ()
     bool any_converted = false;
 
     {
-      tl::RelativeProgress progress (tl::to_string (QObject::tr ("Convert to PCell")), num_selected, 1000);
+      tl::RelativeProgress progress (tl::to_string (tr ("Convert to PCell")), num_selected, 1000);
 
       //  convert the shapes which can be converted
       for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -1267,7 +1281,7 @@ MainService::cm_convert_to_pcell ()
     }
 
     if (! any_converted) {
-      throw tl::Exception (tl::to_string (QObject::tr ("None of the shapes could be converted to the desired PCell")));
+      throw tl::Exception (tl::to_string (tr ("None of the shapes could be converted to the desired PCell")));
     }
 
     //  Delete the shapes which have been converted
@@ -1290,7 +1304,7 @@ MainService::cm_convert_to_pcell ()
     }
 
     if (any_non_converted) {
-      QMessageBox::warning (view ()->widget (), QObject::tr ("Warning"), QObject::tr ("Some of the shapes could not be converted to the desired PCell"));
+      QMessageBox::warning (view ()->widget (), tr ("Warning"), tr ("Some of the shapes could not be converted to the desired PCell"));
     }
 
     manager ()->commit ();
@@ -1299,6 +1313,7 @@ MainService::cm_convert_to_pcell ()
     manager ()->commit ();
     throw;
   }
+#endif
 }
 
 static bool extract_rad (std::vector <db::Polygon> &poly, double &rinner, double &router, unsigned int &n)
@@ -1361,12 +1376,12 @@ MainService::cm_round_corners ()
       if (! s->is_cell_inst () && (s->shape ().is_polygon () || s->shape ().is_path () || s->shape ().is_box ())) {
 
         if (cv_index >= 0 && cv_index != int (s->cv_index ())) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Selection originates from different layouts - cannot compute result in this case.")));
+          throw tl::Exception (tl::to_string (tr ("Selection originates from different layouts - cannot compute result in this case.")));
         }
         cv_index = int (s->cv_index ());
 
         if (layer_index >= 0 && layer_index != int (s->layer ())) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Selection originates from different layers - cannot compute result in this case.")));
+          throw tl::Exception (tl::to_string (tr ("Selection originates from different layers - cannot compute result in this case.")));
         }
         layer_index = int (s->layer ());
 
@@ -1380,7 +1395,7 @@ MainService::cm_round_corners ()
   }
 
   if (cv_index < 0 || layer_index < 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Selection does not contain polygons")));
+    throw tl::Exception (tl::to_string (tr ("Selection does not contain polygons")));
   }
 
   //  prepare: merge to remove cutlines and smooth to remove effects of cutlines
@@ -1403,9 +1418,11 @@ MainService::cm_round_corners ()
   rinner *= dbu;
   router *= dbu;
 
+#if defined(HAVE_QT)
   if (! round_corners_dialog ()->exec_dialog (cv->layout (), m_router, m_rinner, m_npoints, m_undo_before_apply, router, rinner, n, has_extracted)) {
     return;
   }
+#endif
 
   if (! m_undo_before_apply || ! has_extracted) {
     out.swap (in);
@@ -1420,7 +1437,7 @@ MainService::cm_round_corners ()
   ep.merge (out, primary, 0 /*min_wc*/, true /*resolve holes*/, true /*min coherence*/);
 
   view ()->cancel_edits ();
-  manager ()->transaction (tl::to_string (QObject::tr ("Corner rounding operation on selection")));
+  manager ()->transaction (tl::to_string (tr ("Corner rounding operation on selection")));
 
   //  Delete the current selection
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -1466,6 +1483,7 @@ MainService::cm_round_corners ()
 void
 MainService::cm_size ()
 {
+#if defined(HAVE_QT) // @@@
   tl_assert (view ()->is_editable ());
   check_no_guiding_shapes ();
 
@@ -1483,12 +1501,12 @@ MainService::cm_size ()
       if (! s->is_cell_inst () && (s->shape ().is_polygon () || s->shape ().is_path () || s->shape ().is_box ())) {
 
         if (cv_index >= 0 && cv_index != int (s->cv_index ())) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Selection originates from different layouts - cannot compute result in this case.")));
+          throw tl::Exception (tl::to_string (tr ("Selection originates from different layouts - cannot compute result in this case.")));
         }
         cv_index = int (s->cv_index ());
 
         if (layer_index >= 0 && layer_index != int (s->layer ())) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Selection originates from different layers - cannot compute result in this case.")));
+          throw tl::Exception (tl::to_string (tr ("Selection originates from different layers - cannot compute result in this case.")));
         }
         layer_index = int (s->layer ());
 
@@ -1502,13 +1520,13 @@ MainService::cm_size ()
   }
 
   if (cv_index < 0 || layer_index < 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Selection does not contain polygons")));
+    throw tl::Exception (tl::to_string (tr ("Selection does not contain polygons")));
   }
 
   bool ok = false;
   QString s = QInputDialog::getText (view ()->widget (),
-                                     QObject::tr ("Sizing"), 
-                                     QObject::tr ("Sizing (in micron, positive or negative). Two values (dx, dy) for anisotropic sizing."), 
+                                     tr ("Sizing"),
+                                     tr ("Sizing (in micron, positive or negative). Two values (dx, dy) for anisotropic sizing."),
                                      QLineEdit::Normal, QString::fromUtf8 ("0.0"), 
                                      &ok);
 
@@ -1536,7 +1554,7 @@ MainService::cm_size ()
   ep.size (primary, idx, idy, out, 2 /*mode, TODO: make variable*/, true /*resolve holes*/, true /*min coherence*/);
 
   view ()->cancel_edits ();
-  manager ()->transaction (tl::to_string (QObject::tr ("Sizing operation on selection")));
+  manager ()->transaction (tl::to_string (tr ("Sizing operation on selection")));
 
   //  Delete the current selection
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -1577,6 +1595,7 @@ MainService::cm_size ()
   }
 
   manager ()->commit ();
+#endif
 }
 
 void
@@ -1599,12 +1618,12 @@ MainService::boolean_op (int mode)
       if (s->seq () == 0 && ! s->is_cell_inst () && (s->shape ().is_polygon () || s->shape ().is_path () || s->shape ().is_box ())) {
 
         if (cv_index >= 0 && cv_index != int (s->cv_index ())) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Primary selection originates from different layouts - cannot compute result in this case.")));
+          throw tl::Exception (tl::to_string (tr ("Primary selection originates from different layouts - cannot compute result in this case.")));
         }
         cv_index = int (s->cv_index ());
 
         if (layer_index >= 0 && layer_index != int (s->layer ())) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Primary selection originates from different layers - cannot compute result in this case.")));
+          throw tl::Exception (tl::to_string (tr ("Primary selection originates from different layers - cannot compute result in this case.")));
         }
         layer_index = int (s->layer ());
 
@@ -1618,7 +1637,7 @@ MainService::boolean_op (int mode)
   }
 
   if (cv_index < 0 || layer_index < 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Primary selection does not contain polygons")));
+    throw tl::Exception (tl::to_string (tr ("Primary selection does not contain polygons")));
   }
 
   std::vector<db::Polygon> secondary;
@@ -1656,7 +1675,7 @@ MainService::boolean_op (int mode)
   }
 
   view ()->cancel_edits ();
-  manager ()->transaction (tl::to_string (QObject::tr ("Boolean operation on selection")));
+  manager ()->transaction (tl::to_string (tr ("Boolean operation on selection")));
 
   //  Delete the current selection
   //  NOTE: we delete only those shapes from the primary layer and keep shapes from other layers.
@@ -1780,9 +1799,11 @@ MainService::cm_align ()
 
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
 
+#if defined(HAVE_QT)
   if (! align_options_dialog ()->exec_dialog (m_align_hmode, m_align_vmode, m_align_visible_layers)) {
     return;
   }
+#endif
 
   db::DBox prim_box;
   bool has_secondary = false;
@@ -1812,7 +1833,7 @@ MainService::cm_align ()
   if (! prim_box.empty ()) {
 
     view ()->cancel_edits ();
-    manager ()->transaction (tl::to_string (QObject::tr ("Alignment")));
+    manager ()->transaction (tl::to_string (tr ("Alignment")));
 
     //  do the alignment
     for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -1866,11 +1887,13 @@ MainService::cm_distribute ()
 
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
 
+#if defined(HAVE_QT)
   if (! distribute_options_dialog ()->exec_dialog (m_hdistribute, m_distribute_hmode, m_distribute_hpitch, m_distribute_hspace,
                                                    m_vdistribute, m_distribute_vmode, m_distribute_vpitch, m_distribute_vspace,
                                                    m_distribute_visible_layers)) {
     return;
   }
+#endif
 
   if (! m_hdistribute && ! m_vdistribute) {
     return;
@@ -1946,7 +1969,7 @@ MainService::cm_distribute ()
 
   {
     view ()->cancel_edits ();
-    manager ()->transaction (tl::to_string (QObject::tr ("Distribution")));
+    manager ()->transaction (tl::to_string (tr ("Distribution")));
 
     //  do the distribution
     for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -1981,97 +2004,100 @@ MainService::cm_make_array ()
   }
 
   if (n == 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Nothing selected to make arrays of")));
+    throw tl::Exception (tl::to_string (tr ("Nothing selected to make arrays of")));
   }
 
-  if (make_array_options_dialog ()->exec_dialog (m_array_a, m_array_na, m_array_b, m_array_nb)) {
+#if defined(HAVE_QT)
+  if (! make_array_options_dialog ()->exec_dialog (m_array_a, m_array_na, m_array_b, m_array_nb)) {
+    return;
+  }
+#endif
 
-    view ()->cancel_edits ();
+  view ()->cancel_edits ();
 
-    //  undo support for small arrays only
-    bool has_undo = (m_array_na * m_array_nb < 1000);
+  //  undo support for small arrays only
+  bool has_undo = (m_array_na * m_array_nb < 1000);
 
-    //  No undo support currently - the undo buffering is pretty inefficient right now.
-    if (! has_undo) {
-      manager ()->clear ();
-    } else {
-      manager ()->transaction (tl::to_string (QObject::tr ("Make array")));
-    }
+  //  No undo support currently - the undo buffering is pretty inefficient right now.
+  if (! has_undo) {
+    manager ()->clear ();
+  } else {
+    manager ()->transaction (tl::to_string (tr ("Make array")));
+  }
 
-    tl::RelativeProgress progress (tl::to_string (QObject::tr ("Make array")), (size_t (m_array_na) * size_t (m_array_nb) - 1) * n, 1000);
+  tl::RelativeProgress progress (tl::to_string (tr ("Make array")), (size_t (m_array_na) * size_t (m_array_nb) - 1) * n, 1000);
 
-    for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+  for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
-      for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
 
-        const lay::CellView &cv = view ()->cellview (s->cv_index ());
-        if (! cv.is_valid ()) {
-          continue;
+      const lay::CellView &cv = view ()->cellview (s->cv_index ());
+      if (! cv.is_valid ()) {
+        continue;
+      }
+
+      db::Cell &target_cell = cv->layout ().cell (s->cell_index ());
+
+      if (s->is_cell_inst ()) {
+
+        for (unsigned int ia = 0; ia < m_array_na; ++ia) {
+          for (unsigned int ib = 0; ib < m_array_nb; ++ib) {
+
+            //  don't create a copy
+            if (ia == 0 && ib == 0) {
+              continue;
+            }
+
+            db::DCplxTrans dtrans (m_array_a * double (ia) + m_array_b * double (ib));
+            db::ICplxTrans itrans (db::DCplxTrans (s->trans ()).inverted () * db::DCplxTrans (1.0 / cv->layout ().dbu ()) * dtrans * db::DCplxTrans (cv->layout ().dbu ()) * db::DCplxTrans (s->trans ()));
+
+            db::Instance new_inst = target_cell.insert (s->back ().inst_ptr);
+            target_cell.transform (new_inst, itrans);
+
+            ++progress;
+
+          }
+
         }
 
-        db::Cell &target_cell = cv->layout ().cell (s->cell_index ());
+      } else {
 
-        if (s->is_cell_inst ()) {
+        db::Shapes &target_shapes = target_cell.shapes (s->layer ());
 
-          for (unsigned int ia = 0; ia < m_array_na; ++ia) {
-            for (unsigned int ib = 0; ib < m_array_nb; ++ib) {
+        for (unsigned int ia = 0; ia < m_array_na; ++ia) {
+          for (unsigned int ib = 0; ib < m_array_nb; ++ib) {
 
-              //  don't create a copy
-              if (ia == 0 && ib == 0) {
-                continue;
-              }
-
-              db::DCplxTrans dtrans (m_array_a * double (ia) + m_array_b * double (ib));
-              db::ICplxTrans itrans (db::DCplxTrans (s->trans ()).inverted () * db::DCplxTrans (1.0 / cv->layout ().dbu ()) * dtrans * db::DCplxTrans (cv->layout ().dbu ()) * db::DCplxTrans (s->trans ()));
-
-              db::Instance new_inst = target_cell.insert (s->back ().inst_ptr);
-              target_cell.transform (new_inst, itrans);
-
-              ++progress;
-
+            //  don't create a copy
+            if (ia == 0 && ib == 0) {
+              continue;
             }
 
+            db::DCplxTrans dtrans (m_array_a * double (ia) + m_array_b * double (ib));
+            db::ICplxTrans itrans (db::DCplxTrans (s->trans ()).inverted () * db::DCplxTrans (1.0 / cv->layout ().dbu ()) * dtrans * db::DCplxTrans (cv->layout ().dbu ()) * db::DCplxTrans (s->trans ()));
+
+            db::Shape new_shape = target_shapes.insert (s->shape ());
+            target_shapes.transform (new_shape, itrans);
+
+            ++progress;
+
           }
-
-        } else {
-
-          db::Shapes &target_shapes = target_cell.shapes (s->layer ());
-
-          for (unsigned int ia = 0; ia < m_array_na; ++ia) {
-            for (unsigned int ib = 0; ib < m_array_nb; ++ib) {
-
-              //  don't create a copy
-              if (ia == 0 && ib == 0) {
-                continue;
-              }
-
-              db::DCplxTrans dtrans (m_array_a * double (ia) + m_array_b * double (ib));
-              db::ICplxTrans itrans (db::DCplxTrans (s->trans ()).inverted () * db::DCplxTrans (1.0 / cv->layout ().dbu ()) * dtrans * db::DCplxTrans (cv->layout ().dbu ()) * db::DCplxTrans (s->trans ()));
-
-              db::Shape new_shape = target_shapes.insert (s->shape ());
-              target_shapes.transform (new_shape, itrans);
-
-              ++progress;
-
-            }
-          }
-
         }
 
       }
 
     }
 
-    if (has_undo) {
-      manager ()->commit ();
-    }
+  }
 
+  if (has_undo) {
+    manager ()->commit ();
   }
 }
 
 void 
 MainService::cm_tap ()
 {
+#if defined(HAVE_QT) // @@@
   if (! view ()->view_object_widget ()->mouse_in_window ()) {
     return;
   }
@@ -2134,6 +2160,7 @@ MainService::cm_tap ()
     }
 
   }
+#endif
 }
 
 void 
@@ -2147,7 +2174,7 @@ MainService::cm_change_layer ()
   //  get (common) cellview index of the selected shapes
   for (SelectionIterator s (view ()); ! s.at_end (); ++s) {
     if (cv_index >= 0 && cv_index != int (s->cv_index ())) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Selections originate from different layouts - cannot switch layer in this case.")));
+      throw tl::Exception (tl::to_string (tr ("Selections originate from different layouts - cannot switch layer in this case.")));
     }
     cv_index = int (s->cv_index ());
   }
@@ -2159,24 +2186,24 @@ MainService::cm_change_layer ()
 
     lay::LayerPropertiesConstIterator cl = view ()->current_layer ();
     if (cl.is_null ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Please select a layer first")).c_str ());
+      throw tl::Exception (tl::to_string (tr ("Please select a layer first")).c_str ());
     }
     
     if (cv_index != cl->cellview_index ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Shapes cannot be moved to a different layout")).c_str ());
+      throw tl::Exception (tl::to_string (tr ("Shapes cannot be moved to a different layout")).c_str ());
     }
 
     const lay::CellView &cv = view ()->cellview (cv_index);
     int layer = cl->layer_index ();
 
     if (! cv.is_valid ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Please select a cell first")).c_str ());
+      throw tl::Exception (tl::to_string (tr ("Please select a cell first")).c_str ());
     }
 
     if (layer < 0 || ! cv->layout ().is_valid_layer ((unsigned int) layer)) {
 
       if (cl->has_children ()) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Please select a valid drawing layer first")).c_str ());
+        throw tl::Exception (tl::to_string (tr ("Please select a valid drawing layer first")).c_str ());
       } else {
 
         //  create this layer now
@@ -2205,7 +2232,7 @@ MainService::cm_change_layer ()
 
     view ()->cancel_edits ();
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Change layer")));
+    manager ()->transaction (tl::to_string (tr ("Change layer")));
 
     db::Layout &layout = view ()->cellview (cv_index)->layout ();
 
@@ -2266,7 +2293,7 @@ MainService::cm_change_layer ()
     manager ()->commit ();
 
   } else {
-    throw tl::Exception (tl::to_string (QObject::tr ("Nothing selected to switch layers for")));
+    throw tl::Exception (tl::to_string (tr ("Nothing selected to switch layers for")));
   }
 
 }
@@ -2279,7 +2306,7 @@ MainService::check_no_guiding_shapes ()
     for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
       if (! s->is_cell_inst ()) {
         if (s->layer () == view ()->cellview (s->cv_index ())->layout ().guiding_shape_layer ()) {
-          throw tl::Exception (tl::to_string (QObject::tr ("This function cannot be applied to PCell guiding shapes")));
+          throw tl::Exception (tl::to_string (tr ("This function cannot be applied to PCell guiding shapes")));
         }
       }
     }
@@ -2376,7 +2403,7 @@ MainService::paste ()
       if (value) {
 
         if (! cv.is_valid ()) {
-          throw tl::Exception (tl::to_string (QObject::tr ("No cell selected to paste something into")));
+          throw tl::Exception (tl::to_string (tr ("No cell selected to paste something into")));
         }
 
         std::vector<unsigned int> nl = value->get ().insert (cv->layout (), cv.context_trans ().inverted (), &cv->layout ().cell (cv.cell_index ()), 0 /*new_tops*/, &insert_notification);

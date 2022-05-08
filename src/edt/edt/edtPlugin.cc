@@ -21,8 +21,11 @@
 */
 
 
-#include "layTipDialog.h"
-#include "layEditorOptionsPages.h"
+#if defined(HAVE_QT)
+#  include "layTipDialog.h"
+#  include "layEditorOptionsPages.h"
+#endif
+
 #include "layDispatcher.h"
 #include "layLayoutView.h"
 #include "edtPlugin.h"
@@ -31,26 +34,36 @@
 #include "edtServiceImpl.h"
 #include "edtMainService.h"
 #include "edtPartialService.h"
-#include "edtEditorOptionsPages.h"
-#include "edtRecentConfigurationPage.h"
+#if defined(HAVE_QT)
+#  include "edtEditorOptionsPages.h"
+#  include "edtRecentConfigurationPage.h"
+#endif
 
-#include <QApplication>
-#include <QLayout>
+#if defined(HAVE_QT)
+#  include <QApplication>
+#  include <QLayout>
+#endif
 
 namespace edt
 {
 
+#if defined(HAVE_QT)
 edt::RecentConfigurationPage::ConfigurationDescriptor shape_cfg_descriptors[] =
 {
   edt::RecentConfigurationPage::ConfigurationDescriptor ("", tl::to_string (tr ("Layer")), edt::RecentConfigurationPage::Layer),
 };
+#endif
 
+#if defined(HAVE_QT)
 static
 void get_shape_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
 {
   ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-shape-param",
                         &shape_cfg_descriptors[0], &shape_cfg_descriptors[sizeof (shape_cfg_descriptors) / sizeof (shape_cfg_descriptors[0])]));
 }
+#else
+static void get_shape_editor_options_pages () { }
+#endif
 
 static
 void get_text_options (std::vector < std::pair<std::string, std::string> > &options)
@@ -61,6 +74,7 @@ void get_text_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_text_valign, "bottom"));
 }
 
+#if defined(HAVE_QT)
 static
 void get_text_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
 {
@@ -77,6 +91,9 @@ void get_text_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, 
                         &text_cfg_descriptors[0], &text_cfg_descriptors[sizeof (text_cfg_descriptors) / sizeof (text_cfg_descriptors[0])]));
   ret.push_back (new edt::EditorOptionsText (view, dispatcher));
 }
+#else
+static void get_text_editor_options_pages () { }
+#endif
 
 static 
 void get_path_options (std::vector < std::pair<std::string, std::string> > &options)
@@ -87,6 +104,7 @@ void get_path_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_path_ext_var_end, "0.0"));
 }
 
+#if defined(HAVE_QT)
 static
 void get_path_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
 {
@@ -103,6 +121,9 @@ void get_path_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, 
                         &path_cfg_descriptors[0], &path_cfg_descriptors[sizeof (path_cfg_descriptors) / sizeof (path_cfg_descriptors[0])]));
   ret.push_back (new EditorOptionsPath (view, dispatcher));
 }
+#else
+static void get_path_editor_options_pages () { }
+#endif
 
 static 
 void get_inst_options (std::vector < std::pair<std::string, std::string> > &options)
@@ -123,6 +144,7 @@ void get_inst_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_show_shapes_of_instances, "true"));
 }
 
+#if defined(HAVE_QT)
 static
 void get_inst_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
 {
@@ -148,12 +170,16 @@ void get_inst_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, 
   ret.push_back (new EditorOptionsInstPCellParam (view, dispatcher));
   ret.push_back (new EditorOptionsInst (view, dispatcher));
 }
+#else
+static void get_inst_editor_options_pages () { }
+#endif
 
 template <class Svc>
 class PluginDeclaration
   : public PluginDeclarationBase
 {
 public:
+#if defined(HAVE_QT)
   PluginDeclaration (const std::string &title, const std::string &mouse_mode, 
                      void (*option_get_f) (std::vector < std::pair<std::string, std::string> > &) = 0,
                      void (*pages_f) (std::vector <lay::EditorOptionsPage *> &, lay::LayoutView *, lay::Dispatcher *) = 0)
@@ -161,6 +187,15 @@ public:
   {
     //  .. nothing yet ..
   }
+#else
+  PluginDeclaration (const std::string &title, const std::string &mouse_mode,
+                     void (*option_get_f) (std::vector < std::pair<std::string, std::string> > &) = 0,
+                     void (*pages_f) () = 0)
+    : m_title (title), m_mouse_mode (mouse_mode), mp_option_get_f (option_get_f), mp_pages_f (pages_f)
+  {
+    //  .. nothing yet ..
+  }
+#endif
 
   virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
   {
@@ -169,16 +204,19 @@ public:
     }
   }
 
+#if defined(HAVE_QT)
   virtual lay::ConfigPage *config_page (QWidget * /*parent*/, std::string & /*title*/) const
   {
     return 0;
   }
+#endif
 
   virtual void get_menu_entries (std::vector<lay::MenuEntry> & /*menu_entries*/) const
   {
     //  .. nothing yet ..
   }
 
+#if defined(HAVE_QT)
   virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutView *view, lay::Dispatcher *root) const
   {
     if (mp_pages_f != 0) {
@@ -189,6 +227,7 @@ public:
       }
     }
   }
+#endif
 
   virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *, lay::LayoutView *view) const
   {
@@ -214,31 +253,35 @@ private:
   std::string m_mouse_mode;
 
   void (*mp_option_get_f) (std::vector < std::pair<std::string, std::string> > &options);
+#if defined(HAVE_QT)
   void (*mp_pages_f) (std::vector <lay::EditorOptionsPage *> &, lay::LayoutView *, lay::Dispatcher *);
+#else
+  void (*mp_pages_f) ();
+#endif
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl1 (
-  new edt::PluginDeclaration<edt::PolygonService> (tl::to_string (QObject::tr ("Polygons")), "polygon:edit_mode\t" + tl::to_string (QObject::tr ("Polygon")) + "<:polygon.png>" + tl::to_string (QObject::tr ("{Create a polygon}")), 0, &get_shape_editor_options_pages),
+  new edt::PluginDeclaration<edt::PolygonService> (tl::to_string (tr ("Polygons")), "polygon:edit_mode\t" + tl::to_string (tr ("Polygon")) + "<:polygon.png>" + tl::to_string (tr ("{Create a polygon}")), 0, &get_shape_editor_options_pages),
   4010, 
   "edt::Service(Polygons)"
 );
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl2 (
-  new edt::PluginDeclaration<edt::BoxService> (tl::to_string (QObject::tr ("Boxes")), "box:edit_mode\t" + tl::to_string (QObject::tr ("Box")) + "\t<:box.png>" + tl::to_string (QObject::tr ("{Create a box}")), 0, &get_shape_editor_options_pages),
+  new edt::PluginDeclaration<edt::BoxService> (tl::to_string (tr ("Boxes")), "box:edit_mode\t" + tl::to_string (tr ("Box")) + "\t<:box.png>" + tl::to_string (tr ("{Create a box}")), 0, &get_shape_editor_options_pages),
   4011, 
   "edt::Service(Boxes)"
 );
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl3 (
-  new edt::PluginDeclaration<edt::TextService> (tl::to_string (QObject::tr ("Texts")), "text:edit_mode\t" + tl::to_string (QObject::tr ("Text")) + "\t<:text.png>" + tl::to_string (QObject::tr ("{Create a text object}")), &get_text_options, &get_text_editor_options_pages), 
+  new edt::PluginDeclaration<edt::TextService> (tl::to_string (tr ("Texts")), "text:edit_mode\t" + tl::to_string (tr ("Text")) + "\t<:text.png>" + tl::to_string (tr ("{Create a text object}")), &get_text_options, &get_text_editor_options_pages),
   4012, 
   "edt::Service(Texts)"
 );
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl4 (
-  new edt::PluginDeclaration<edt::PathService> (tl::to_string (QObject::tr ("Paths")), "path:edit_mode\t" + tl::to_string (QObject::tr ("Path")) + "\t<:path.png>" + tl::to_string (QObject::tr ("{Create a path}")), &get_path_options, &get_path_editor_options_pages), 
+  new edt::PluginDeclaration<edt::PathService> (tl::to_string (tr ("Paths")), "path:edit_mode\t" + tl::to_string (tr ("Path")) + "\t<:path.png>" + tl::to_string (tr ("{Create a path}")), &get_path_options, &get_path_editor_options_pages),
   4013, 
   "edt::Service(Paths)"
 );
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl5 (
-  new edt::PluginDeclaration<edt::InstService> (tl::to_string (QObject::tr ("Instances")), "instance:edit_mode\t" + tl::to_string (QObject::tr ("Instance")) + "\t<:instance.png>" + tl::to_string (QObject::tr ("{Create a cell instance}")), &get_inst_options, &get_inst_editor_options_pages), 
+  new edt::PluginDeclaration<edt::InstService> (tl::to_string (tr ("Instances")), "instance:edit_mode\t" + tl::to_string (tr ("Instance")) + "\t<:instance.png>" + tl::to_string (tr ("{Create a cell instance}")), &get_inst_options, &get_inst_editor_options_pages),
   4020, 
   "edt::Service(CellInstances)"
 );
@@ -264,41 +307,43 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_edit_combine_mode, "add"));
   }
 
+#if defined(HAVE_QT)
   virtual lay::ConfigPage *config_page (QWidget * /*parent*/, std::string & /*title*/) const
   {
     return 0;
   }
+#endif
 
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
 
     menu_entries.push_back (lay::separator ("edt::hier_group", "zoom_menu.end"));
-    menu_entries.push_back (lay::menu_item ("edt::descend", "descend", "zoom_menu.end", tl::to_string (QObject::tr ("Descend")) + "(Ctrl+D)"));
-    menu_entries.push_back (lay::menu_item ("edt::ascend", "ascend", "zoom_menu.end", tl::to_string (QObject::tr ("Ascend")) + "(Ctrl+A)"));
+    menu_entries.push_back (lay::menu_item ("edt::descend", "descend", "zoom_menu.end", tl::to_string (tr ("Descend")) + "(Ctrl+D)"));
+    menu_entries.push_back (lay::menu_item ("edt::ascend", "ascend", "zoom_menu.end", tl::to_string (tr ("Ascend")) + "(Ctrl+A)"));
 
-    menu_entries.push_back (lay::menu_item ("edt::sel_make_array", "make_array:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Make Array"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_make_array", "make_array:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Make Array"))));
     menu_entries.push_back (lay::separator ("selection_group:edit_mode", "edit_menu.selection_menu.end"));
-    menu_entries.push_back (lay::menu_item ("edt::sel_change_layer", "change_layer:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Change Layer"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_tap", "tap", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Tap")) + "(T)"));
-    menu_entries.push_back (lay::menu_item ("edt::sel_align", "align:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Align"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_distribute", "distribute:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Distribute"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_round_corners", "round_corners:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Round Corners"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_size", "size:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Size Shapes"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_union", "union:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Merge Shapes"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_intersection", "intersection:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Intersection - Others With First"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_difference", "difference:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Subtraction - Others From First"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_separate", "separate:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Separate - First into Inside/Outside Others"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_change_layer", "change_layer:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Change Layer"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_tap", "tap", "edit_menu.selection_menu.end", tl::to_string (tr ("Tap")) + "(T)"));
+    menu_entries.push_back (lay::menu_item ("edt::sel_align", "align:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Align"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_distribute", "distribute:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Distribute"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_round_corners", "round_corners:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Round Corners"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_size", "size:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Size Shapes"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_union", "union:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Merge Shapes"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_intersection", "intersection:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Intersection - Others With First"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_difference", "difference:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Subtraction - Others From First"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_separate", "separate:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Separate - First into Inside/Outside Others"))));
     menu_entries.push_back (lay::separator ("hier_group:edit_mode", "edit_menu.selection_menu.end"));
-    menu_entries.push_back (lay::menu_item ("edt::sel_flatten_insts", "flatten_insts:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Flatten Instances"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_resolve_arefs", "resolve_arefs:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Resolve Arrays"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_move_hier_up", "move_hier_up:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Move Up In Hierarchy"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_make_cell", "make_cell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Make Cell"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_make_cell_variants", "make_cell_variants:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Make Cell Variants"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_convert_to_pcell", "convert_to_pcell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Convert To PCell"))));
-    menu_entries.push_back (lay::menu_item ("edt::sel_convert_to_cell", "convert_to_cell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Convert To Static Cell"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_flatten_insts", "flatten_insts:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Flatten Instances"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_resolve_arefs", "resolve_arefs:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Resolve Arrays"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_move_hier_up", "move_hier_up:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Move Up In Hierarchy"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_make_cell", "make_cell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Make Cell"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_make_cell_variants", "make_cell_variants:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Make Cell Variants"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_convert_to_pcell", "convert_to_pcell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Convert To PCell"))));
+    menu_entries.push_back (lay::menu_item ("edt::sel_convert_to_cell", "convert_to_cell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Convert To Static Cell"))));
 
-    menu_entries.push_back (lay::menu_item ("edt::combine_mode", "combine_mode:edit_mode", "@toolbar.end_modes", tl::to_string (QObject::tr ("Combine{Select background combination mode}"))));
+    menu_entries.push_back (lay::menu_item ("edt::combine_mode", "combine_mode:edit_mode", "@toolbar.end_modes", tl::to_string (tr ("Combine{Select background combination mode}"))));
   }
 
   bool configure (const std::string &name, const std::string &value)
@@ -327,12 +372,14 @@ public:
     return false;
   }
 
+#if defined(HAVE_QT)
   virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages, lay::LayoutView *view, lay::Dispatcher *dispatcher) const
   {
     //  NOTE: we do not set plugin_declaration which makes the page unspecific
     EditorOptionsGeneric *generic_opt = new EditorOptionsGeneric (view, dispatcher);
     pages.push_back (generic_opt);
   }
+#endif
 
   virtual void initialize (lay::Dispatcher *root)
   {
@@ -343,18 +390,21 @@ public:
 
     mp_root = root;
 
+#if defined(HAVE_QT)
     //  add entries to the combine mode dialog
-    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_add",   new lay::ConfigureAction (tl::to_string (QObject::tr ("Add<:/cm_add.png>{Add shapes}")),   cfg_edit_combine_mode, CMConverter ().to_string (CM_Add)));
-    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_merge", new lay::ConfigureAction (tl::to_string (QObject::tr ("Merge<:/cm_merge.png>{Merge shapes with background}")), cfg_edit_combine_mode, CMConverter ().to_string (CM_Merge)));
-    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_erase", new lay::ConfigureAction (tl::to_string (QObject::tr ("Erase<:/cm_erase.png>{Erase shape from background}")), cfg_edit_combine_mode, CMConverter ().to_string (CM_Erase)));
-    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_mask",  new lay::ConfigureAction (tl::to_string (QObject::tr ("Mask<:/cm_mask.png>{Mask background with shape}")),  cfg_edit_combine_mode, CMConverter ().to_string (CM_Mask)));
-    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_diff",  new lay::ConfigureAction (tl::to_string (QObject::tr ("Diff<:/cm_diff.png>{Compute difference of shape with background}")),  cfg_edit_combine_mode, CMConverter ().to_string (CM_Diff)));
+    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_add",   new lay::ConfigureAction (tl::to_string (tr ("Add<:/cm_add.png>{Add shapes}")),   cfg_edit_combine_mode, CMConverter ().to_string (CM_Add)));
+    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_merge", new lay::ConfigureAction (tl::to_string (tr ("Merge<:/cm_merge.png>{Merge shapes with background}")), cfg_edit_combine_mode, CMConverter ().to_string (CM_Merge)));
+    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_erase", new lay::ConfigureAction (tl::to_string (tr ("Erase<:/cm_erase.png>{Erase shape from background}")), cfg_edit_combine_mode, CMConverter ().to_string (CM_Erase)));
+    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_mask",  new lay::ConfigureAction (tl::to_string (tr ("Mask<:/cm_mask.png>{Mask background with shape}")),  cfg_edit_combine_mode, CMConverter ().to_string (CM_Mask)));
+    mp->menu ()->insert_item ("@toolbar.combine_mode.end", "combine_mode_diff",  new lay::ConfigureAction (tl::to_string (tr ("Diff<:/cm_diff.png>{Compute difference of shape with background}")),  cfg_edit_combine_mode, CMConverter ().to_string (CM_Diff)));
 
     update_menu (CM_Add);
+#endif
   }
 
   void update_menu (combine_mode_type cm)
   {
+#if defined(HAVE_QT)
     lay::Dispatcher *mp = lay::Dispatcher::instance ();
     if (! mp || ! mp->has_ui ()) {
       return;
@@ -363,21 +413,22 @@ public:
     lay::Action *combine_menu = mp->menu ()->action ("@toolbar.combine_mode");
 
     if (cm == CM_Add) {
-      combine_menu->set_title (tl::to_string (QObject::tr ("Add")));
+      combine_menu->set_title (tl::to_string (tr ("Add")));
       combine_menu->set_icon (":/cm_add.png");
     } else if (cm == CM_Merge) {
-      combine_menu->set_title (tl::to_string (QObject::tr ("Merge")));
+      combine_menu->set_title (tl::to_string (tr ("Merge")));
       combine_menu->set_icon (":/cm_merge.png");
     } else if (cm == CM_Erase) {
-      combine_menu->set_title (tl::to_string (QObject::tr ("Erase")));
+      combine_menu->set_title (tl::to_string (tr ("Erase")));
       combine_menu->set_icon (":/cm_erase.png");
     } else if (cm == CM_Mask) {
-      combine_menu->set_title (tl::to_string (QObject::tr ("Mask")));
+      combine_menu->set_title (tl::to_string (tr ("Mask")));
       combine_menu->set_icon (":/cm_mask.png");
     } else if (cm == CM_Diff) {
-      combine_menu->set_title (tl::to_string (QObject::tr ("Diff")));
+      combine_menu->set_title (tl::to_string (tr ("Diff")));
       combine_menu->set_icon (":/cm_diff.png");
     }
+#endif
   }
 
   void initialized (lay::Dispatcher *root)
@@ -387,22 +438,27 @@ public:
       return;
     }
 
-    lay::Action *combine_menu = mp->menu ()->action ("@toolbar.combine_mode");
+#if defined(HAVE_QT)
 
-    //  Do some more initialization here.
+    //  generate a warning if the combine mode isn't "Add"
 
     combine_mode_type cm = CM_Add;
     root->config_get (cfg_edit_combine_mode, cm, CMConverter ());
+
+    lay::Action *combine_menu = mp->menu ()->action ("@toolbar.combine_mode");
+
     if (cm != CM_Add && combine_menu->is_visible ()) {
       lay::TipDialog td (QApplication::activeWindow (), 
-                    tl::to_string (QObject::tr ("The background combination mode of the shape editor is set to some other mode than 'Add'.\n"
-                                                "This can be confusing, because a shape may not be drawn as expected.\n\nTo switch back to normal mode, choose 'Add' for the background combination mode in the toolbar.")), 
+                    tl::to_string (tr ("The background combination mode of the shape editor is set to some other mode than 'Add'.\n"
+                                       "This can be confusing, because a shape may not be drawn as expected.\n\nTo switch back to normal mode, choose 'Add' for the background combination mode in the toolbar.")),
                     "has-non-add-edit-combine-mode");
       if (td.exec_dialog ()) {
         //  Don't bother the user with more dialogs.
         return;
       }
     }
+
+#endif
   }
 
 private:
@@ -410,11 +466,12 @@ private:
   std::string m_title;
 };
 
-static tl::RegisteredClass<lay::PluginDeclaration> config_decl_main (new edt::MainPluginDeclaration (tl::to_string (QObject::tr ("Instances and shapes"))), 4000, "edt::MainService");
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl_main (new edt::MainPluginDeclaration (tl::to_string (tr ("Instances and shapes"))), 4000, "edt::MainService");
 
 void
 commit_recent (lay::LayoutView *view)
 {
+#if defined(HAVE_QT)
   lay::EditorOptionsPages *eo_pages = view->editor_options_pages ();
   if (!eo_pages) {
     return;
@@ -425,6 +482,7 @@ commit_recent (lay::LayoutView *view)
       (*op)->commit_recent (view);
     }
   }
+#endif
 }
 
 class PartialPluginDeclaration
@@ -470,7 +528,7 @@ private:
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl30 (
-  new edt::PartialPluginDeclaration (tl::to_string (QObject::tr ("Partial shapes")), "partial:edit_mode\t" + tl::to_string (QObject::tr ("Partial{Edit points and edges of shapes}")) + "<:partial.png>"), 
+  new edt::PartialPluginDeclaration (tl::to_string (tr ("Partial shapes")), "partial:edit_mode\t" + tl::to_string (tr ("Partial{Edit points and edges of shapes}")) + "<:partial.png>"),
   4030, 
   "edt::PartialService"
 );

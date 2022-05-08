@@ -21,8 +21,6 @@
 */
 
 
-#include <QMessageBox>
-
 #include "dbVector.h"
 #include "layLayoutView.h"
 #include "laySnap.h"
@@ -31,9 +29,12 @@
 #include "edtPartialService.h"
 #include "edtService.h"
 #include "edtConfig.h"
-#include "edtDialogs.h"
 #include "edtPlugin.h"
-#include "edtEditorOptionsPages.h"
+
+#if defined(HAVE_QT)
+#  include "edtDialogs.h"
+#  include "edtEditorOptionsPages.h"
+#endif
 
 #include <cmath>
 
@@ -1010,8 +1011,10 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
 // -----------------------------------------------------------------------------
 //  Main Service implementation
 
-PartialService::PartialService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root)
-  : QObject (),
+PartialService::PartialService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root) :
+#if defined(HAVE_QT)
+    QObject (),
+#endif
     lay::EditorServiceBase (view),
     db::Object (manager),
     mp_view (view),
@@ -1027,9 +1030,11 @@ PartialService::PartialService (db::Manager *manager, lay::LayoutView *view, lay
     m_hover (false),
     m_hover_wait (false)
 { 
+#if defined(HAVE_QT)
   m_timer.setInterval (100 /*hover time*/);
   m_timer.setSingleShot (true);
   connect (&m_timer, SIGNAL (timeout ()), this, SLOT (timeout ()));
+#endif
 }
 
 PartialService::~PartialService ()
@@ -1077,7 +1082,9 @@ void
 PartialService::hover_reset ()
 {
   if (m_hover_wait) {
+#if defined(HAVE_QT)
     m_timer.stop ();
+#endif
     m_hover_wait = false;
   }
   if (m_hover) {
@@ -1086,7 +1093,9 @@ PartialService::hover_reset ()
   }
 }
 
-void 
+//  TODO: should receive timer calls from regular timer update
+#if defined(HAVE_QT)
+void
 PartialService::timeout ()
 {
   m_hover_wait = false;
@@ -1209,6 +1218,7 @@ PartialService::timeout ()
   resize_inst_markers (n_inst_marker, true);
 
 }
+#endif
 
 void
 PartialService::clear_partial_transient_selection ()
@@ -1571,7 +1581,9 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
     } else if (view ()->transient_selection_mode ()) {
 
       m_hover_wait = true;
+#if defined(HAVE_QT)
       m_timer.start ();
+#endif
       m_hover_point = p;
 
     }
@@ -1622,8 +1634,7 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
       try {
         partial_select (db::DBox (p, p), lay::Editable::Replace);
       } catch (tl::Exception &ex) {
-        tl::error << ex.msg ();
-        QMessageBox::critical (0, QObject::tr ("Error"), tl::to_qstring (ex.msg ()));
+        show_error (ex);
         //  clear selection
         partial_select (db::DBox (), lay::Editable::Reset);
       }
@@ -1703,7 +1714,7 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
       //  stop dragging
       widget ()->ungrab_mouse (this);
       
-      manager ()->transaction (tl::to_string (QObject::tr ("Partial move"))); 
+      manager ()->transaction (tl::to_string (tr ("Partial move")));
 
       //  heuristically, if there is just one edge selected: do not confine to the movement
       //  angle constraint - the edge usually is confined enough
@@ -1862,8 +1873,7 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
       selection_to_view ();
 
     } catch (tl::Exception &ex) {
-      tl::error << ex.msg ();
-      QMessageBox::critical (0, QObject::tr ("Error"), tl::to_qstring (ex.msg ()));
+      show_error (ex);
       //  clear selection
       partial_select (db::DBox (), lay::Editable::Reset);
     }
@@ -1901,7 +1911,7 @@ PartialService::mouse_double_click_event (const db::DPoint &p, unsigned int butt
       partial_objects::iterator r = m_selection.begin (); // we assert above that we have at least one selected element
       if (! r->first.is_cell_inst ()) {
 
-        manager ()->transaction (tl::to_string (QObject::tr ("Insert point"))); 
+        manager ()->transaction (tl::to_string (tr ("Insert point")));
 
         //  snap the point
         db::DPoint new_point_d = snap (p);
@@ -2018,8 +2028,7 @@ PartialService::mouse_release_event (const db::DPoint &p, unsigned int buttons, 
       try {
         partial_select (db::DBox (m_p1, m_p2), mode);
       } catch (tl::Exception &ex) {
-        tl::error << ex.msg ();
-        QMessageBox::critical (0, QObject::tr ("Error"), tl::to_qstring (ex.msg ()));
+        show_error (ex);
         //  clear selection
         partial_select (db::DBox (), lay::Editable::Reset);
       }

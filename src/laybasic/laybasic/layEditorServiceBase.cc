@@ -26,6 +26,10 @@
 #include "laybasicConfig.h"
 #include "layConverters.h"
 
+#if defined(HAVE_QT)
+#  include <QMessageBox>
+#endif
+
 namespace lay
 {
 
@@ -296,6 +300,15 @@ void
 EditorServiceBase::deactivated ()
 {
   clear_mouse_cursors ();
+}
+
+void
+EditorServiceBase::show_error (tl::Exception &ex)
+{
+  tl::error << ex.msg ();
+#if defined(HAVE_QT)
+  QMessageBox::critical (0, tr ("Error"), tl::to_qstring (ex.msg ()));
+#endif
 }
 
 }

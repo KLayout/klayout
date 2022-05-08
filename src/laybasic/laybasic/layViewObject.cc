@@ -882,7 +882,7 @@ void
 ViewObjectWidget::leaveEvent (QEvent * /*event*/)
 {
 BEGIN_PROTECTED
-  begin_mouse_event ();
+  send_leave_event ();
 END_PROTECTED
 }
 
@@ -938,7 +938,7 @@ BEGIN_PROTECTED
   p = db::DPoint (e->position ().x (), e->position ().y ());
 #endif
 
-  send_mouse_press_event (p, qt_to_buttons (e->buttons (), e->modifiers ()));
+  send_mouse_release_event (p, qt_to_buttons (e->buttons (), e->modifiers ()));
 
 END_PROTECTED
 }

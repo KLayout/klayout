@@ -173,6 +173,7 @@ LayoutView::init_ui ()
   QVBoxLayout *vbl = new QVBoxLayout (this);
   vbl->setContentsMargins (0, 0, 0, 0);
   vbl->setSpacing (0);
+  vbl->addWidget (view_object_widget ());
 
   if ((options () & LV_NoHierarchyPanel) == 0 && (options () & LV_Naked) == 0) {
 
@@ -283,6 +284,8 @@ LayoutView::init_ui ()
 
   }
   
+  config_setup ();
+
   mp_timer = new QTimer (this);
   connect (mp_timer, SIGNAL (timeout ()), this, SLOT (timer ()));
   mp_timer->start (timer_interval);
@@ -1119,13 +1122,13 @@ namespace lay
 LayoutView::LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options)
   : LayoutViewBase (this, mgr, editable, plugin_parent, options)
 {
-  //  .. nothing yet ..
+  config_setup ();
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options)
   : LayoutViewBase (this, source, mgr, editable, plugin_parent, options)
 {
-  //  .. nothing yet ..
+  config_setup ();
 }
 
 //  NOTE: this methods needs to be called "frequently"

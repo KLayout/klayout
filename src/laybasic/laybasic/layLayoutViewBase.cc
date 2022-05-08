@@ -421,8 +421,6 @@ LayoutViewBase::init (db::Manager *mgr)
   }
 
   create_plugins ();
-
-  config_setup ();
 }
 
 LayoutViewBase::~LayoutViewBase ()

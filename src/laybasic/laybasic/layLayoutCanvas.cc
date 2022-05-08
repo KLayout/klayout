@@ -640,7 +640,7 @@ LayoutCanvas::paintEvent (QPaintEvent *)
 
         //  render the foreground parts ..
         if (m_oversampling == 1) {
-          QImage img = full_image.to_image ();
+          QImage img = full_image.to_image_copy ();  // NOTE: seems like it's required to create a copy as QPixmap stores a reference to the image
 #if QT_VERSION > 0x050000
           img.setDevicePixelRatio (double (m_dpr));
 #endif
@@ -649,7 +649,7 @@ LayoutCanvas::paintEvent (QPaintEvent *)
           lay::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
           subsampled_image.set_transparent (mp_image->transparent ());
           subsample (full_image, subsampled_image, m_oversampling, m_gamma);
-          QImage img = subsampled_image.to_image ();
+          QImage img = subsampled_image.to_image_copy ();  // NOTE: seems like it's required to create a copy as QPixmap stores a reference to the image
 #if QT_VERSION > 0x050000
           img.setDevicePixelRatio (double (m_dpr));
 #endif
@@ -658,7 +658,7 @@ LayoutCanvas::paintEvent (QPaintEvent *)
 
       } else if (m_oversampling == 1) {
 
-        QImage img = mp_image->to_image ();
+        QImage img = mp_image->to_image_copy ();  // NOTE: seems like it's required to create a copy as QPixmap stores a reference to the image
 #if QT_VERSION > 0x050000
         img.setDevicePixelRatio (double (m_dpr));
 #endif
@@ -669,7 +669,7 @@ LayoutCanvas::paintEvent (QPaintEvent *)
         lay::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
         subsampled_image.set_transparent (mp_image->transparent ());
         subsample (*mp_image, subsampled_image, m_oversampling, m_gamma);
-        QImage img = subsampled_image.to_image ();
+        QImage img = subsampled_image.to_image_copy ();  // NOTE: seems like it's required to create a copy as QPixmap stores a reference to the image
 #if QT_VERSION > 0x050000
         img.setDevicePixelRatio (double (m_dpr));
 #endif

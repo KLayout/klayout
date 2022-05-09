@@ -28,6 +28,8 @@
 #  include <png.h>
 #endif
 
+#include <memory>
+
 namespace lay
 {
 
@@ -385,6 +387,8 @@ PixelBuffer::read_png (tl::InputStream &input)
       memcpy ((void *) res.scan_line (i), (void *) row_pointers [i], sizeof (lay::color_t) * res.width ());
     }
 
+    res.set_transparent (true);
+
   } else if (fmt == PNG_COLOR_TYPE_RGB && bd == 8) {
 
     //  RGB has 3 bytes per pixel which need to be transformed into RGB32
@@ -398,17 +402,56 @@ PixelBuffer::read_png (tl::InputStream &input)
       const uint8_t *d = row_pointers [i];
       const uint8_t *dd = d + rb;
       while (d < dd) {
-        uint8_t b = *d++;
-        uint8_t g = *d++;
-        uint8_t r = *d++;
+        lay::color_t b = *d++;
+        lay::color_t g = *d++;
+        lay::color_t r = *d++;
         *c++ = 0xff000000 | ((r << 8 | g) << 8) | b;
+      }
+    }
+
+  } else if (fmt == PNG_COLOR_TYPE_GRAY_ALPHA && bd == 8) {
+
+    //  GA format has 2 bytes per pixel (alpha, gray) which need to be transformed into ARGB
+
+    unsigned int rb = png_get_rowbytes (png_ptr, info_ptr);
+    tl_assert (rb == res.width () * 2);
+
+    png_bytepp row_pointers = png_get_rows (png_ptr, info_ptr);
+    for (unsigned int i = 0; i < res.height (); ++i) {
+      lay::color_t *c = res.scan_line (i);
+      const uint8_t *d = row_pointers [i];
+      const uint8_t *dd = d + rb;
+      while (d < dd) {
+        lay::color_t g = *d++;
+        lay::color_t a = *d++;
+        *c++ = (a << 24) | ((g << 8 | g) << 8) | g;
+      }
+    }
+
+    res.set_transparent (true);
+
+  } else if (fmt == PNG_COLOR_TYPE_GRAY && bd == 8) {
+
+    //  G format has 1 byte per pixel (gray) which need to be transformed into ARGB
+
+    unsigned int rb = png_get_rowbytes (png_ptr, info_ptr);
+    tl_assert (rb == res.width ());
+
+    png_bytepp row_pointers = png_get_rows (png_ptr, info_ptr);
+    for (unsigned int i = 0; i < res.height (); ++i) {
+      lay::color_t *c = res.scan_line (i);
+      const uint8_t *d = row_pointers [i];
+      const uint8_t *dd = d + rb;
+      while (d < dd) {
+        lay::color_t g = *d++;
+        *c++ = 0xff000000 | ((g << 8 | g) << 8) | g;
       }
     }
 
   } else {
 
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-    throw PixelBufferReadError (tl::sprintf (tl::to_string (tr ("PNG reader supports 32 bit RGB or RGBA only (file: %s, format is %d, bit depth is %d)")), input.filename (), fmt, bd));
+    throw PixelBufferReadError (tl::sprintf (tl::to_string (tr ("PNG reader supports 8 bit G, GA, RGB or RGBA files only (file: %s, format is %d, bit depth is %d)")), input.filename (), fmt, bd));
 
   }
 
@@ -433,7 +476,7 @@ PixelBuffer::write_png (tl::OutputStream &output) const
   png_set_bgr (png_ptr);    // compatible with lay::color_t
 
   unsigned int bd = 8;  // bit depth
-  unsigned int fmt = PNG_COLOR_TYPE_RGBA;
+  unsigned int fmt = transparent () ? PNG_COLOR_TYPE_RGBA : PNG_COLOR_TYPE_RGB;
 
   png_set_IHDR (png_ptr, info_ptr, width (), height (), bd, fmt, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
@@ -448,8 +491,31 @@ PixelBuffer::write_png (tl::OutputStream &output) const
 
   png_write_info (png_ptr, info_ptr);
 
-  for (unsigned int i = 0; i < height (); ++i) {
-    png_write_row (png_ptr, png_const_bytep (scan_line (i)));
+  if (transparent ()) {
+
+    for (unsigned int i = 0; i < height (); ++i) {
+      png_write_row (png_ptr, png_const_bytep (scan_line (i)));
+    }
+
+  } else {
+
+    std::unique_ptr<uint8_t []> buffer (new uint8_t [width () * 3]);
+
+    for (unsigned int i = 0; i < height (); ++i) {
+      uint8_t *d = buffer.get ();
+      const lay::color_t *s = scan_line (i);
+      const lay::color_t *se = s + width ();
+      while (s != se) {
+        lay::color_t c = *s++;
+        *d++ = c & 0xff;
+        c >>= 8;
+        *d++ = c & 0xff;
+        c >>= 8;
+        *d++ = c & 0xff;
+      }
+      png_write_row (png_ptr, png_const_bytep (buffer.get ()));
+    }
+
   }
 
   png_write_end (png_ptr, info_ptr);

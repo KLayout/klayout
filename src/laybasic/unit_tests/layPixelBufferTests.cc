@@ -319,9 +319,93 @@ TEST(4)
 #endif
 }
 
+TEST(5)
+{
+  lay::PixelBuffer img;
+
+  std::string in = tl::testsrc () + "/testdata/lay/png3.png";  //  GA
+  tl::info << "PNG file read (libpng) from " << in;
+
+  {
+    tl::InputStream stream (in);
+    img = lay::PixelBuffer::read_png (stream);
+  }
+
+  std::string tmp = tmp_file ("test.png");
+  {
+    tl::OutputStream stream (tmp);
+    img.write_png (stream);
+  }
+  tl::info << "PNG file written to " << tmp;
+
+  lay::PixelBuffer img2;
+
+  {
+    tl::InputStream stream (tmp);
+    img2 = lay::PixelBuffer::read_png (stream);
+  }
+
+  std::string tmp2 = tmp_file ("test2.png");
+  {
+    tl::OutputStream stream (tmp2);
+    img2.write_png (stream);
+  }
+  tl::info << "PNG file written to " << tmp2;
+
+  EXPECT_EQ (compare_images (img, img2), true);
+
+#if defined (HAVE_QT)
+  //  Qt cross-check
+  std::string au = tl::testsrc () + "/testdata/lay/au_gs.png";
+  EXPECT_EQ (compare_images (img2.to_image (), au), true);
+#endif
+}
+
+TEST(6)
+{
+  lay::PixelBuffer img;
+
+  std::string in = tl::testsrc () + "/testdata/lay/png4.png";  //  G
+  tl::info << "PNG file read (libpng) from " << in;
+
+  {
+    tl::InputStream stream (in);
+    img = lay::PixelBuffer::read_png (stream);
+  }
+
+  std::string tmp = tmp_file ("test.png");
+  {
+    tl::OutputStream stream (tmp);
+    img.write_png (stream);
+  }
+  tl::info << "PNG file written to " << tmp;
+
+  lay::PixelBuffer img2;
+
+  {
+    tl::InputStream stream (tmp);
+    img2 = lay::PixelBuffer::read_png (stream);
+  }
+
+  std::string tmp2 = tmp_file ("test2.png");
+  {
+    tl::OutputStream stream (tmp2);
+    img2.write_png (stream);
+  }
+  tl::info << "PNG file written to " << tmp2;
+
+  EXPECT_EQ (compare_images (img, img2), true);
+
+#if defined (HAVE_QT)
+  //  Qt cross-check
+  std::string au = tl::testsrc () + "/testdata/lay/au_gs.png";
+  EXPECT_EQ (compare_images (img2.to_image (), au), true);
+#endif
+}
+
 #endif
 
-TEST(5)
+TEST(7)
 {
   {
     tl::SelfTimer timer ("Run time - lay::Image copy, no write (should be very fast)");

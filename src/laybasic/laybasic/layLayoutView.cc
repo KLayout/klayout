@@ -309,6 +309,10 @@ LayoutView::~LayoutView ()
 {
   close_event ();
 
+  if (ms_current == this) {
+    ms_current = 0;
+  }
+
   if (mp_control_frame) {
     delete mp_control_frame;
   }

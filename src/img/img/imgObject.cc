@@ -200,8 +200,12 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
       unsigned int h2, s2, v2;
       false_color_nodes [i].second.first.get_hsv (h2, s2, v2);
 
+      int dh = int (h1) - int (h2);
+      int ds = int (s1) - int (s2);
+      int dv = int (v1) - int (v2);
+
       //  The number of steps is chosen such that the full HSV band divides into approximately 200 steps
-      double nsteps = 0.5 * sqrt (double (h1 - h2) * double (h1 - h2) + double (s1 - s2) * double (s1 - s2) + double (v1 - v2) * double (v1 - v2));
+      double nsteps = 0.5 * sqrt (double (dh * dh) + double (ds * ds) + double (dv * dv));
       int n = int (floor (nsteps + 1.0));
       double dx = (false_color_nodes [i].first - false_color_nodes [i - 1].first) / n;
       double x = false_color_nodes [i - 1].first;
@@ -302,9 +306,9 @@ interpolated_color (const DataMapping::false_color_nodes_type &nodes, double x)
       unsigned int h2 = 0, s2 = 0, v2 = 0;
       p->second.first.get_hsv (h2, s2, v2);
 
-      int h = int (0.5 + h1 + double(x - x1) * double (h2 - h1) / double(x2 - x1));
-      int s = int (0.5 + s1 + double(x - x1) * double (s2 - s1) / double(x2 - x1));
-      int v = int (0.5 + v1 + double(x - x1) * double (v2 - v1) / double(x2 - x1));
+      int h = int (0.5 + h1 + double(x - x1) * double (int (h2) - int (h1)) / double(x2 - x1));
+      int s = int (0.5 + s1 + double(x - x1) * double (int (s2) - int (s1)) / double(x2 - x1));
+      int v = int (0.5 + v1 + double(x - x1) * double (int (v2) - int (v1)) / double(x2 - x1));
 
       return lay::Color::from_hsv ((unsigned int) h, (unsigned int) s, (unsigned int) v);
 

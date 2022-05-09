@@ -777,9 +777,6 @@ struct ReplaceDitherPatternOp
 };
 
 DitherPattern::DitherPattern () :
-#if defined(HAVE_QT)
-    QObject (),
-#endif
     db::Object (0)
 {
   for (unsigned int d = 0; d < sizeof (dither_strings) / sizeof (dither_strings [0]); d += 2) {
@@ -795,9 +792,6 @@ DitherPattern::~DitherPattern ()
 }
 
 DitherPattern::DitherPattern (const DitherPattern &p) :
-#if defined(HAVE_QT)
-    QObject (),
-#endif
     db::Object (0)
 {
   m_pattern = p.m_pattern;
@@ -844,11 +838,8 @@ DitherPattern::pattern (unsigned int i) const
 void 
 DitherPattern::replace_pattern (unsigned int i, const DitherPatternInfo &p)
 {
-  bool chg = false;
-
   while (i >= count ()) {
     m_pattern.push_back (DitherPatternInfo ());
-    chg = true;
   }
 
   if (m_pattern [i] != p) {
@@ -856,14 +847,6 @@ DitherPattern::replace_pattern (unsigned int i, const DitherPatternInfo &p)
       manager ()->queue (this, new ReplaceDitherPatternOp (i, m_pattern [i], p));
     }
     m_pattern [i] = p;
-    chg = true;
-  }
-
-  //  if something has changed emit the signal
-  if (chg) {
-#if defined(HAVE_QT)
-    emit changed ();
-#endif
   }
 }
 

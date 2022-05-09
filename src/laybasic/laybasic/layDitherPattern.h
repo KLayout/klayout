@@ -230,15 +230,8 @@ private:
  *  cannot be changed. 
  */
 class LAYBASIC_PUBLIC DitherPattern :
-#if defined(HAVE_QT)
-    public QObject,
-#endif
     public db::Object
 {
-#if defined(HAVE_QT)
-Q_OBJECT
-#endif
-
 public:
   typedef std::vector<DitherPatternInfo> pattern_vector;
   typedef pattern_vector::const_iterator iterator;
@@ -383,14 +376,6 @@ public:
    *  @brief Accessor to the default dither pattern set
    */
   static const DitherPattern &default_pattern ();
-
-#if defined(HAVE_QT)
-signals:
-  /**
-   *  @brief This signal is emitted if a pattern is changed 
-   */
-  void changed ();
-#endif
 
 private:
   std::vector<DitherPatternInfo> m_pattern;

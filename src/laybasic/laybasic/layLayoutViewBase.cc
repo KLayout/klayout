@@ -396,15 +396,6 @@ LayoutViewBase::init (db::Manager *mgr)
   mp_canvas = new lay::LayoutCanvas (this);
 #endif
 
-  mp_canvas->left_arrow_key_pressed.add (this, &LayoutViewBase::pan_left);
-  mp_canvas->up_arrow_key_pressed.add (this, &LayoutViewBase::pan_up);
-  mp_canvas->right_arrow_key_pressed.add (this, &LayoutViewBase::pan_right);
-  mp_canvas->down_arrow_key_pressed.add (this, &LayoutViewBase::pan_down);
-  mp_canvas->left_arrow_key_pressed_with_shift.add (this, &LayoutViewBase::pan_left_fast);
-  mp_canvas->up_arrow_key_pressed_with_shift.add (this, &LayoutViewBase::pan_up_fast);
-  mp_canvas->right_arrow_key_pressed_with_shift.add (this, &LayoutViewBase::pan_right_fast);
-  mp_canvas->down_arrow_key_pressed_with_shift.add (this, &LayoutViewBase::pan_down_fast);
-
   //  occupy services and editables:
   //  these services get deleted by the canvas destructor automatically:
   if ((m_options & LV_NoTracker) == 0) {
@@ -511,6 +502,14 @@ void LayoutViewBase::update_event_handlers ()
   annotation_shapes ().bboxes_changed_any_event.add (this, &LayoutViewBase::signal_annotations_changed);
 
   mp_canvas->viewport_changed_event.add (this, &LayoutViewBase::viewport_changed);
+  mp_canvas->left_arrow_key_pressed.add (this, &LayoutViewBase::pan_left);
+  mp_canvas->up_arrow_key_pressed.add (this, &LayoutViewBase::pan_up);
+  mp_canvas->right_arrow_key_pressed.add (this, &LayoutViewBase::pan_right);
+  mp_canvas->down_arrow_key_pressed.add (this, &LayoutViewBase::pan_down);
+  mp_canvas->left_arrow_key_pressed_with_shift.add (this, &LayoutViewBase::pan_left_fast);
+  mp_canvas->up_arrow_key_pressed_with_shift.add (this, &LayoutViewBase::pan_up_fast);
+  mp_canvas->right_arrow_key_pressed_with_shift.add (this, &LayoutViewBase::pan_right_fast);
+  mp_canvas->down_arrow_key_pressed_with_shift.add (this, &LayoutViewBase::pan_down_fast);
 }
 
 void LayoutViewBase::viewport_changed ()

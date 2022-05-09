@@ -170,6 +170,20 @@ LayoutView::init_ui ()
   m_always_show_ld = true;
   m_always_show_layout_index = false;
 
+  mp_timer = 0;
+  mp_left_frame = 0;
+  mp_control_panel = 0;
+  mp_hierarchy_panel = 0;
+  mp_libraries_view = 0;
+  mp_bookmarks_view = 0;
+  mp_control_frame = 0;
+  mp_hierarchy_frame = 0;
+  mp_libraries_frame = 0;
+  mp_bookmarks_frame = 0;
+  mp_editor_options_frame = 0;
+  mp_min_hier_spbx = 0;
+  mp_max_hier_spbx = 0;
+
   QVBoxLayout *vbl = new QVBoxLayout (this);
   vbl->setContentsMargins (0, 0, 0, 0);
   vbl->setSpacing (0);

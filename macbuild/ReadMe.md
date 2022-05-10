@@ -1,6 +1,6 @@
 Relevant KLayout version: 0.27.9<br>
 Author: Kazzz-S<br>
-Last modified: 2022-04-30<br>
+Last modified: 2022-05-08<br>
 
 # 1. Introduction
 This directory **`macbuild`** contains different files required for building KLayout (http://www.klayout.de/) version 0.27.9 or later for different 64-bit macOS, including:
@@ -96,7 +96,7 @@ $ [python] ./build4mac.py
                         :   HB38: use Python 3.8 from Homebrew                           | 
                         :   Ana3: use Python 3.8 from Anaconda3                          | 
                         : HBAuto: use the latest Python 3.x auto-detected from Homebrew  | 
-   [-j|--jump2pymod]    : jump into <pymod> build (developer's use only)                 | disabled
+   [-P|--buildPymod]    : build and deploy Pymod (*.whl and *.egg) for LW-*.dmg          | disabled
    [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled
    [-u|--noqtuitools]   : don't include uitools in Qt binding                            | disabled
    [-m|--make <option>] : option passed to 'make'                                        | '--jobs=4'
@@ -144,7 +144,7 @@ $ [python] ./build4mac.py
                         :   HB38: use Python 3.8 from Homebrew                           | 
                         :   Ana3: use Python 3.8 from Anaconda3                          | 
                         : HBAuto: use the latest Python 3.x auto-detected from Homebrew  | 
-   [-j|--jump2pymod]    : jump into <pymod> build (developer's use only)                 | disabled
+   [-P|--buildPymod]    : build and deploy Pymod (*.whl and *.egg) for LW-*.dmg          | disabled
    [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled
    [-u|--noqtuitools]   : don't include uitools in Qt binding                            | disabled
    [-m|--make <option>] : option passed to 'make'                                        | '--jobs=4'
@@ -218,7 +218,7 @@ $ ./build4mac.py -q qt5macports -r mp27 -p mp38
 2. Confirm successful build (it will take about one hour depending on your machine spec).
 3. Run **`build4mac.py`** again with the same options used in 1. PLUS "-Y" to deploy executables and libraries under **`klayout.app`** bundle.<br>
    The buddy command-line tools (strm*) will also be deployed under **klayout.app/Contents/Buddy/** in this step.<br>
-   The KLayout Python Module (\*.whl, \*.egg) will be deployed under **klayout.app/Contents/pymod-dist/**.
+   If you use `--buildPymod` option in Step-1 and Step-3, the KLayout Python Module (\*.whl, \*.egg) will be built and deployed under **klayout.app/Contents/pymod-dist/**.
 
 ```
 $ ./build4mac.py -q qt5macports -r mp27 -p mp38 -Y
@@ -245,7 +245,7 @@ $ ./build4mac.py -q qt5brew -r hb27 -p hb38
 2. Confirm successful build (it will take about one hour depending on your machine spec).
 3. Run **`build4mac.py`** again with the same options used in 1. PLUS "-Y" to deploy executables and libraries under **`klayout.app`** bundle.<br>
    The buddy command-line tools (strm*) will also be deployed under **klayout.app/Contents/Buddy/** in this step.<br>
-   The KLayout Python Module (\*.whl, \*.egg) will be deployed under **klayout.app/Contents/pymod-dist/**.
+   If you use `--buildPymod` option in Step-1 and Step-3, the KLayout Python Module (\*.whl, \*.egg) will be built and deployed under **klayout.app/Contents/pymod-dist/**.
 
 ```
 $ ./build4mac.py -q qt5brew -r hb27 -p hb38 -Y
@@ -298,7 +298,7 @@ $ ./build4mac.py -q qt5ana3 -r ana3 -p ana3
 2. Confirm successful build (it will take about one hour depending on your machine spec).
 3. Run **`build4mac.py`** again with the same options used in 1. PLUS "-Y" to deploy executables and libraries under **`klayout.app`** bundle.<br>
    The buddy command-line tools (strm*) will also be deployed under **klayout.app/Contents/Buddy/** in this step.<br>
-   The KLayout Python Module (\*.whl, \*.egg) will be deployed under **klayout.app/Contents/pymod-dist/**.
+   If you use `--buildPymod` option in Step-1 and Step-3, the KLayout Python Module (\*.whl, \*.egg) will be built and deployed under **klayout.app/Contents/pymod-dist/**.
 
 ```
 $ ./build4mac.py -q qt5ana3 -r ana3 -p ana3 -Y

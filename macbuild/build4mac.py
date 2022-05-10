@@ -70,7 +70,7 @@ def GenerateUsage(platform):
     usage += "                        :   HB38: use Python 3.8 from Homebrew                           | \n"
     usage += "                        :   Ana3: use Python 3.8 from Anaconda3                          | \n"
     usage += "                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew  | \n"
-    usage += "   [-j|--jump2pymod]    : jump into <pymod> build (developer's use only)                 | disabled\n"
+    usage += "   [-P|--buildPymod]    : build and deploy Pymod (*.whl and *.egg) for LW-*.dmg          | disabled\n"
     usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled\n"
     usage += "   [-u|--noqtuitools]   : don't include uitools in Qt binding                            | disabled\n"
     usage += "   [-m|--make <option>] : option passed to 'make'                                        | '--jobs=4'\n"
@@ -177,7 +177,7 @@ def Get_Default_Config():
         ModuleRuby   = "nil"
         ModulePython = "nil"
 
-    Jump2Pymod    = False
+    BuildPymod    = False
     NonOSStdLang  = False
     NoQtBindings  = False
     NoQtUiTools   = False
@@ -198,7 +198,7 @@ def Get_Default_Config():
     config['ModuleQt']      = ModuleQt          # Qt module to be used
     config['ModuleRuby']    = ModuleRuby        # Ruby module to be used
     config['ModulePython']  = ModulePython      # Python module to be used
-    config['Jump2Pymod']    = Jump2Pymod        # True to jump into <pymod> build
+    config['BuildPymod']    = BuildPymod        # True to build and deploy "Pymod"
     config['NonOSStdLang']  = NonOSStdLang      # True if non-OS-standard language is chosen
     config['NoQtBindings']  = NoQtBindings      # True if not creating Qt bindings for Ruby scripts
     config['NoQtUiTools']   = NoQtUiTools       # True if not to include QtUiTools in Qt binding
@@ -238,7 +238,7 @@ def Parse_CLI_Args(config):
     ModuleQt      = config['ModuleQt']
     ModuleRuby    = config['ModuleRuby']
     ModulePython  = config['ModulePython']
-    Jump2Pymod    = config['Jump2Pymod']
+    BuildPymod    = config['BuildPymod']
     NonOSStdLang  = config['NonOSStdLang']
     NoQtBindings  = config['NoQtBindings']
     NoQtUiTools   = config['NoQtUiTools']
@@ -267,11 +267,11 @@ def Parse_CLI_Args(config):
                     dest='type_python',
                     help="Python type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3', 'HBAuto']" )
 
-    p.add_option( '-j', '--jump2pymod',
+    p.add_option( '-P', '--buildPymod',
                     action='store_true',
-                    dest='jump_to_pymod',
+                    dest='build_pymod',
                     default=False,
-                    help="jump into <pymod> build (developer's use only)" )
+                    help="build and deploy <Pymod> (disabled)" )
 
     p.add_option( '-n', '--noqtbinding',
                     action='store_true',
@@ -327,7 +327,7 @@ def Parse_CLI_Args(config):
         p.set_defaults( type_qt        = "qt5brew",
                         type_ruby      = "hb27",
                         type_python    = "hb38",
-                        jump_to_pymod  = False,
+                        build_pymod    = False,
                         no_qt_binding  = False,
                         no_qt_uitools  = False,
                         make_option    = "--jobs=4",
@@ -341,7 +341,7 @@ def Parse_CLI_Args(config):
         p.set_defaults( type_qt        = "qt5macports",
                         type_ruby      = "sys",
                         type_python    = "sys",
-                        jump_to_pymod  = False,
+                        build_pymod    = False,
                         no_qt_binding  = False,
                         no_qt_uitools  = False,
                         make_option    = "--jobs=4",
@@ -486,7 +486,7 @@ def Parse_CLI_Args(config):
     ModuleSet = ( choiceQt5, choiceRuby, choicePython )
 
     # (E) Set other parameters
-    Jump2Pymod   = opt.jump_to_pymod
+    BuildPymod   = opt.build_pymod
     NoQtBindings = opt.no_qt_binding
     NoQtUiTools  = opt.no_qt_uitools
     MakeOptions  = opt.make_option
@@ -511,14 +511,21 @@ def Parse_CLI_Args(config):
     if not DeploymentF and not DeploymentP:
         target  = "%s %s %s" % (Platform, Release, Machine)
         modules = "Qt=%s, Ruby=%s, Python=%s" % (ModuleQt, ModuleRuby, ModulePython)
-        message = "### You are going to build KLayout\n    for  <%s>\n    with <%s>...\n"
+        if BuildPymod:
+            pymodbuild = "enabled"
+        else:
+            pymodbuild = "disabled"
+        message = "### You are going to build KLayout\n    for  <%s>\n    with <%s>\n    with Pymod <%s>...\n"
         print("")
-        print( message % (target, modules) )
+        print( message % (target, modules, pymodbuild) )
     else:
         message = "### You are going to make "
         if DeploymentP:
             PackagePrefix = "LW-"
-            message      += "a lightweight (LW-) package excluding Qt5, Ruby, and Python..."
+            if not BuildPymod:
+                message += "a lightweight (LW-) package excluding Qt5, Ruby, and Python..."
+            else:
+                message += "a lightweight (LW-) package with Pymod excluding Qt5, Ruby, and Python..."
         elif DeploymentF:
             if (ModuleRuby in RubySys) and (ModulePython in PythonSys):
                 PackagePrefix = "ST-"
@@ -532,7 +539,7 @@ def Parse_CLI_Args(config):
         print( "" )
         print( message )
         print( "" )
-        if CheckComOnly and not Jump2Pymod:
+        if CheckComOnly:
             sys.exit(0)
 
     #-----------------------------------------------------
@@ -543,7 +550,7 @@ def Parse_CLI_Args(config):
     config['ModuleQt']      = ModuleQt
     config['ModuleRuby']    = ModuleRuby
     config['ModulePython']  = ModulePython
-    config['Jump2Pymod']    = Jump2Pymod
+    config['BuildPymod']    = BuildPymod
     config['NonOSStdLang']  = NonOSStdLang
     config['NoQtBindings']  = NoQtBindings
     config['NoQtUiTools']   = NoQtUiTools
@@ -555,7 +562,15 @@ def Parse_CLI_Args(config):
     config['PackagePrefix'] = PackagePrefix
     config['DeployVerbose'] = DeployVerbose
     config['ModuleSet']     = ModuleSet
-    return config
+
+    if CheckComOnly:
+        pp = pprint.PrettyPrinter( indent=4, width=140 )
+        parameters = Get_Build_Parameters(config)
+        Build_pymod(parameters)
+        pp.pprint(parameters)
+        sys.exit(0)
+    else:
+        return config
 
 #------------------------------------------------------------------------------
 ## To run the main Bash script "build.sh" with appropriate options
@@ -574,7 +589,7 @@ def Get_Build_Parameters(config):
     ModuleQt      = config['ModuleQt']
     ModuleRuby    = config['ModuleRuby']
     ModulePython  = config['ModulePython']
-    Jump2Pymod    = config['Jump2Pymod']
+    BuildPymod    = config['BuildPymod']
     ModuleSet     = config['ModuleSet']
     NoQtBindings  = config['NoQtBindings']
     NoQtUiTools   = config['NoQtUiTools']
@@ -635,6 +650,13 @@ def Get_Build_Parameters(config):
     # (G) options to `make` tool
     if not MakeOptions == "":
         parameters['make_options'] = MakeOptions
+        try:
+            jobopt, number = MakeOptions.split('=')  # like '--jobs=4' ?
+            pnum = int(number)
+        except Exception:
+            parameters['num_parallel'] = 4  # default
+        else:
+            parameters['num_parallel'] = pnum
 
     # (H) about Ruby
     if ModuleRuby != "nil":
@@ -660,12 +682,13 @@ def Get_Build_Parameters(config):
     parameters['project_dir'] = ProjectDir
 
     # (K) Extra parameters needed for <pymod>
-    #     <pymod> will be built for:
+    #     <pymod> will be built if:
+    #       BuildPymod   = True
     #       Platform     = [ 'Monterey', 'BigSur', 'Catalina' ]
     #       ModuleRuby   = [ 'Ruby27MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]
     #       ModulePython = [ 'Python38MacPorts', 'Python38Brew',
     #                        'PythonAnaconda3',  'PythonAutoBrew' ]
-    parameters['Jump2Pymod']   = Jump2Pymod
+    parameters['BuildPymod']   = BuildPymod
     parameters['Platform']     = Platform
     parameters['ModuleRuby']   = ModuleRuby
     parameters['ModulePython'] = ModulePython
@@ -692,15 +715,19 @@ def Get_Build_Parameters(config):
 #------------------------------------------------------------------------------
 def Build_pymod(parameters):
     #---------------------------------------------------------------------------
-    # [1] <pymod> will be built for:
+    # [1] <pymod> will be built if:
+    #       BuildPymod   = True
     #       Platform     = [ 'Monterey', 'BigSur', 'Catalina' ]
     #       ModuleRuby   = [ 'Ruby27MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]
     #       ModulePython = [ 'Python38MacPorts', 'Python38Brew',
     #                        'PythonAnaconda3',  'PythonAutoBrew' ]
     #---------------------------------------------------------------------------
+    BuildPymod   = parameters['BuildPymod']
     Platform     = parameters['Platform']
     ModuleRuby   = parameters['ModuleRuby']
     ModulePython = parameters['ModulePython']
+    if not BuildPymod:
+        return 0
     if not Platform in [ 'Monterey', 'BigSur', 'Catalina' ]:
         return 0
     elif not ModuleRuby in [ 'Ruby27MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]:
@@ -766,7 +793,7 @@ def Build_pymod(parameters):
     print( "  ", command4 )
     print( "" )
     if parameters['check_cmd_only']:
-        sys.exit(0)
+        return 0
 
     #-----------------------------------------------------
     # [5] Invoke the main Python scripts; takes time:-)
@@ -822,7 +849,7 @@ def Build_pymod(parameters):
 # @return 0 on success; non-zero (1), otherwise
 #------------------------------------------------------------------------------
 def Run_Build_Command(parameters):
-    jump2pymod = parameters['Jump2Pymod']
+    jump2pymod = False  # default=False; set True to jump into pymod-build for debugging
 
     if not jump2pymod:
         #-----------------------------------------------------
@@ -953,10 +980,14 @@ def Run_Build_Command(parameters):
         print( "", file=sys.stderr )
 
     #------------------------------------------------------------------------
-    # [5] Build <pymod> for some predetermined environments
+    # [5] Build <pymod> for some predetermined environments on demand
     #------------------------------------------------------------------------
-    ret = Build_pymod(parameters)
-    return ret
+    BuildPymod = parameters['BuildPymod']
+    if BuildPymod:
+        ret = Build_pymod(parameters)
+        return ret
+    else:
+        return 0
 
 #------------------------------------------------------------------------------
 ## For making a bundle (klayout.app), deploy built binaries and libraries
@@ -982,6 +1013,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     ModuleRuby     = config['ModuleRuby']
     ModulePython   = config['ModulePython']
 
+    BuildPymod     = parameters['BuildPymod']
     ProjectDir     = parameters['project_dir']
     MacBinDir      = parameters['bin']
     MacBuildDir    = parameters['build']
@@ -992,13 +1024,16 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     AbsMacBuildDir = "%s/%s" % (ProjectDir, MacBuildDir)
     AbsMacBuildLog = "%s/%s" % (ProjectDir, MacBuildLog)
 
-    try:
-        PymodDistDir = parameters['pymod_dist']
-        pymodDistDir = PymodDistDir[ModulePython]   # [ 'dist-MP3', 'dist-HB3', 'dist-ana3' ]
-    except KeyError:
-        pymodDistDir = ""
+    if BuildPymod:
+        try:
+            PymodDistDir = parameters['pymod_dist']
+            pymodDistDir = PymodDistDir[ModulePython]   # [ 'dist-MP3', 'dist-HB3', 'dist-ana3' ]
+        except KeyError:
+            pymodDistDir = ""
+        else:
+            pass
     else:
-        pass
+        pymodDistDir = ""
 
     print("")
     print( "##### Started deploying libraries and executables for <klayout.app> #####" )
@@ -1079,7 +1114,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     os.makedirs(targetDirF)
     os.makedirs(targetDirM)
     os.makedirs(targetDirB)
-    if not pymodDistDir == "":
+    if BuildPymod and not pymodDistDir == "":
         os.makedirs(targetDirP)
 
 
@@ -1254,8 +1289,8 @@ def Deploy_Binaries_For_Bundle(config, parameters):
         buddy = os.path.basename(item)
         os.chmod( targetDirB + "/" + buddy, 0o0755 )
 
-    # (C) the pymod
-    if not pymodDistDir == "":
+    # (C) the Pymod
+    if BuildPymod and not pymodDistDir == "":
         for item in glob.glob( pymodDistDir + "/*.whl" ):
             shutil.copy2( item,  targetDirP )
         for item in glob.glob( pymodDistDir + "/*.egg" ):

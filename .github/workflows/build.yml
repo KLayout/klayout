@@ -79,7 +79,7 @@ jobs:
     needs: [build, make_sdist]
     runs-on: ubuntu-latest
     # Uncomment for real PyPi
-    # if: github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'release' && github.event.action == 'published'
     steps:
     - uses: actions/download-artifact@v2
       with:
@@ -90,7 +90,7 @@ jobs:
       with:
         user: __token__
         # Test PyPI
-        password: ${{ secrets.test_pypi_password }}
-        repository_url: https://test.pypi.org/legacy/
+        # password: ${{ secrets.test_pypi_password }}
+        # repository_url: https://test.pypi.org/legacy/
         # Uncomment for Real Pypi
-        # password: ${{ secrets.pypi_password }}
+        password: ${{ secrets.pypi_password }}

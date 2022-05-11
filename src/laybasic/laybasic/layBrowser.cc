@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include <QDialog>
 
@@ -94,4 +95,6 @@ Browser::accept ()
 }
 
 }
+
+#endif
 

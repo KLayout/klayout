@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "laybasicConfig.h"
 #include "layMarker.h"
@@ -113,3 +114,4 @@ Navigator::background_color (QColor c)
 
 }
 
+#endif

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layQtTools.h"
 #include "tlString.h"
@@ -219,3 +220,4 @@ SignalBlocker::~SignalBlocker ()
 
 }
 
+#endif

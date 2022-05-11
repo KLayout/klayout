@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layProperties.h"
 
@@ -41,3 +42,4 @@ PropertiesPage::~PropertiesPage ()
 
 }
 
+#endif

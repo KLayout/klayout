@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_edtEditorOptionsPages
 #define HDR_edtEditorOptionsPages
@@ -195,3 +196,4 @@ private:
 
 #endif
 
+#endif

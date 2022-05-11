@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layEditStipplesForm
 #define HDR_layEditStipplesForm
@@ -111,3 +112,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

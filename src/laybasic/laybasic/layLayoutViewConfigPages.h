@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layLayoutViewConfigPages
 #define HDR_layLayoutViewConfigPages
@@ -358,3 +359,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

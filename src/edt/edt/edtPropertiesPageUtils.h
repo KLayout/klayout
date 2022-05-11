@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_edtPropertiesPageUtils
 #define HDR_edtPropertiesPageUtils
@@ -522,3 +523,4 @@ db::Coord coord_from_string (const char *txt, double dbu, bool du, const db::VCp
 
 #endif
 
+#endif

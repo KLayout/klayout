@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "layItemDelegates.h"
 
 #include <QApplication>
@@ -206,3 +208,5 @@ HTMLItemDelegate::editorEvent (QEvent *event, QAbstractItemModel * /*model*/, co
 }
 
 }
+
+#endif

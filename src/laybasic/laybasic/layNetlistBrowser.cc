@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "laybasicCommon.h"
 #include "layNetlistBrowserDialog.h"
@@ -386,3 +387,4 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new NetlistBrows
 
 }
 
+#endif

@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "edtRecentConfigurationPage.h"
 #include "edtUtils.h"
 #include "layDispatcher.h"
@@ -428,3 +430,5 @@ RecentConfigurationPage::commit_recent (lay::Dispatcher *root)
 }
 
 }
+
+#endif

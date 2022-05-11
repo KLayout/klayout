@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_laySaveLayoutOptionsDialog
 #define HDR_laySaveLayoutOptionsDialog
@@ -103,3 +104,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

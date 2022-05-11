@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "gsiDecl.h"
 #include "gsiSignals.h"
@@ -410,3 +411,5 @@ Class<ActionStub> decl_Action (decl_ActionBase, "lay", "Action",
 );
 
 }
+
+#endif

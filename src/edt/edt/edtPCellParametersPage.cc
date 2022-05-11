@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "edtPCellParametersPage.h"
 #include "edtPropertiesPageUtils.h"
@@ -732,4 +733,4 @@ PCellParametersPage::set_parameters_internal (const std::vector<tl::Variant> &pa
 
 }
 
-
+#endif

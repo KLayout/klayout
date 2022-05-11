@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_imgNavigator
 #define HDR_imgNavigator
@@ -70,3 +71,4 @@ private:
 
 #endif
 
+#endif

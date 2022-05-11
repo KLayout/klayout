@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "tlInternational.h"
 #include "layEditorOptionsPage.h"
@@ -88,3 +89,5 @@ EditorOptionsPage::activate (bool active)
 }
 
 }
+
+#endif

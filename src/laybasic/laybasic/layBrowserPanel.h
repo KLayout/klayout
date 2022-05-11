@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layBrowserPanel
 #define HDR_layBrowserPanel
@@ -487,3 +488,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

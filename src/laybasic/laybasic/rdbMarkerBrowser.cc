@@ -20,7 +20,7 @@
 
 */
 
-
+#if defined(HAVE_QT)
 
 #include "rdbMarkerBrowserDialog.h"
 
@@ -312,3 +312,4 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new MarkerBrowse
 
 }
 
+#endif

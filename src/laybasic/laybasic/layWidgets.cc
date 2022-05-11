@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include <QGridLayout>
 #include <QMenu>
@@ -1314,3 +1315,5 @@ InteractiveListWidget::refresh_flags ()
 }
 
 }
+
+#endif

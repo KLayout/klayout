@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layBookmarkManagementForm
 #define HDR_layBookmarkManagementForm
@@ -63,3 +64,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

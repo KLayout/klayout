@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layLayoutStatisticsForm.h"
 #include "layLayoutView.h"
@@ -848,5 +849,4 @@ LayoutStatisticsForm::layout_selected (int index)
 
 }
 
-
-
+#endif

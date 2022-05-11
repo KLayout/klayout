@@ -20,7 +20,6 @@
 
 */
 
-
 #ifndef HDR_layColor
 #define HDR_layColor
 

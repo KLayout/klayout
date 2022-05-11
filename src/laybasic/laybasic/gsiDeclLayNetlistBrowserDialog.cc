@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "gsiDecl.h"
 #include "gsiDeclBasic.h"
@@ -219,7 +220,7 @@ gsi::ClassExt<lay::LayoutView> decl_ext_layout_view (
   )
 );
 
-
-
 }
+
+#endif
 

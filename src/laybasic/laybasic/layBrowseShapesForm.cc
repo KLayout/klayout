@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include <vector>
 #include <string>
@@ -1178,4 +1179,6 @@ BrowseShapesForm::prev_inst ()
 }
 
 }
+
+#endif
 

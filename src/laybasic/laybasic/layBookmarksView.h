@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layBookmarksView
 #define HDR_layBookmarksView
@@ -75,3 +76,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

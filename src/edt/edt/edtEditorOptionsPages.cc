@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "tlInternational.h"
 #include "dbLibrary.h"
@@ -890,3 +891,4 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
 
 }
 
+#endif

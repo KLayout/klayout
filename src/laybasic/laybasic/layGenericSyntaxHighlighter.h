@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layGenericSyntaxHighlighter
 #define HDR_layGenericSyntaxHighlighter
@@ -735,3 +736,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT) 
+
 #include "gsiDecl.h"
 #include "gsiDeclBasic.h"
 #include "layBrowserDialog.h"
@@ -1186,3 +1188,5 @@ Class<MessageBox> decl_MessageBox (QT_EXTERNAL_BASE (QMainWindow) "lay", "Messag
 );
 
 }
+
+#endif

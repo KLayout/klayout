@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "dbBox.h"
 #include "dbLayout.h"
 
@@ -682,4 +684,6 @@ END_PROTECTED;
 }
 
 }
+
+#endif
 

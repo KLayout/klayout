@@ -20,7 +20,7 @@
 
 */
 
-
+#if defined(HAVE_QT)
 
 #include "layEditStipplesForm.h"
 #include "ui_EditStipplesForm.h"
@@ -623,3 +623,4 @@ EditStipplesForm::redo (db::Op *op)
 
 }
 
+#endif

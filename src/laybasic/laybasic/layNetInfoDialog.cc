@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "layNetInfoDialog.h"
 #include "tlXMLWriter.h"
 
@@ -486,3 +488,5 @@ void NetInfoDialog::update_info_text ()
 }
 
 }
+
+#endif

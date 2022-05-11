@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layBrowserPanel.h"
 #include "layBrowserDialog.h"
@@ -127,4 +128,6 @@ BrowserDialog::accept ()
 }
 
 }
+
+#endif
 

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layNetlistCrossReference
 #define HDR_layNetlistCrossReference
@@ -119,3 +120,5 @@ public:
 }
 
 #endif
+
+#endif  //  defined(HAVE_QT)

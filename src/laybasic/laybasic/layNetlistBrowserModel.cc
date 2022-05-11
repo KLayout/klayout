@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layNetlistBrowserModel.h"
 #include "layIndexedNetlistModel.h"
@@ -3020,3 +3021,4 @@ NetlistBrowserModel::set_item_visibility (QTreeView *view, bool show_all, bool w
 
 }
 
+#endif

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layBrowseInstancesForm
 #define HDR_layBrowseInstancesForm
@@ -132,3 +133,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

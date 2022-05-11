@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layCellTreeModel.h"
 #include "layLayoutView.h"
@@ -1296,3 +1297,6 @@ CellTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive,
 }
 
 } // namespace lay
+
+#endif
+

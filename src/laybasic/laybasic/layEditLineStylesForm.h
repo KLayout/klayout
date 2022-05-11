@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layEditLineStylesForm
 #define HDR_layEditLineStylesForm
@@ -107,3 +108,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

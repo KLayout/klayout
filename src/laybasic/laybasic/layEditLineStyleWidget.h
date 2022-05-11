@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layEditLineStyleWidget
 #define HDR_layEditLineStyleWidget
@@ -100,3 +101,5 @@ private:
 }
 
 #endif
+
+#endif  //  defined(HAVE_QT)

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layDialogs
 #define HDR_layDialogs
@@ -468,4 +469,4 @@ public:
 
 #endif
 
-
+#endif  //  defined(HAVE_QT)

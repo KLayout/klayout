@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "imgWidgets.h"
 
@@ -451,4 +452,6 @@ ColorBar::paintEvent (QPaintEvent *)
 }
 
 }
+
+#endif
 

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layNetlistBrowser
 #define HDR_layNetlistBrowser
@@ -90,3 +91,4 @@ public:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

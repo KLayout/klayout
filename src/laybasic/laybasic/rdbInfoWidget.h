@@ -20,7 +20,7 @@
 
 */
 
-
+#if defined(HAVE_QT)
 
 #ifndef HDR_rdbInfoWidget
 #define HDR_rdbInfoWidget
@@ -52,3 +52,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

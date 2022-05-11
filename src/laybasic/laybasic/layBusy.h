@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layBusy
 #define HDR_layBusy
@@ -63,3 +64,5 @@ private:
 }
 
 #endif
+
+#endif  //  defined(HAVE_QT)

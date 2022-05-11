@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_laySelectStippleForm
 #define HDR_laySelectStippleForm
@@ -72,3 +73,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

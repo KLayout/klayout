@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "laySelectCellViewForm.h"
 #include "layCellView.h"
@@ -134,3 +135,4 @@ SelectCellViewForm::select_all ()
 
 }
   
+#endif

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layBackgroundAwareTreeStyle
 #define HDR_layBackgroundAwareTreeStyle
@@ -50,3 +51,4 @@ public:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

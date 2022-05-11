@@ -35,6 +35,7 @@
 #include "layViewOp.h"
 #include "layViewObject.h"
 #include "layBitmap.h"
+#include "layColor.h"
 #include "layDrawing.h"
 #include "layDitherPattern.h"
 #include "layLineStyles.h"

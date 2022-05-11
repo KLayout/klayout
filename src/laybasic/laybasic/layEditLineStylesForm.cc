@@ -20,7 +20,7 @@
 
 */
 
-
+#if defined(HAVE_QT)
 
 #include "layEditLineStylesForm.h"
 #include "ui_EditLineStylesForm.h"
@@ -556,3 +556,4 @@ EditLineStylesForm::redo (db::Op *op)
 
 }
 
+#endif

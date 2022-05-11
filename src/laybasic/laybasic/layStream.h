@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layStream_h
 #define HDR_layStream_h
@@ -267,3 +268,4 @@ public:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

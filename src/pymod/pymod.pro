@@ -7,10 +7,13 @@ SUBDIRS = \
   tl \
   rdb \
   lib \
+  lay \
+  lym \
+  ant \
+  edt \
+  img \
 
 !equals(HAVE_QT, "0") {
-
-  SUBDIRS += lay
 
   equals(HAVE_QTBINDINGS, "1") {
 

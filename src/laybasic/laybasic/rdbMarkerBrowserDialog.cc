@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "rdbMarkerBrowserDialog.h"
 #include "rdb.h"
@@ -902,3 +903,4 @@ MarkerBrowserDialog::menu_activated (const std::string &symbol)
 
 }
 
+#endif

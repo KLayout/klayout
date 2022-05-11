@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layLayerToolbox.h"
 
@@ -1467,3 +1468,4 @@ LayerToolbox::set_palette (const lay::LineStylePalette &p)
 
 }
 
+#endif

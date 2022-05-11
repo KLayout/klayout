@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layTechnology
 #define HDR_layTechnology
@@ -137,3 +138,4 @@ public:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

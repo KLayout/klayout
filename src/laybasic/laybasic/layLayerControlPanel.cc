@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include <stdint.h>
 
@@ -2340,3 +2341,5 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new LayerControlPanelPluginDeclaration (), -9, "LayerControlPanelPlugin");
 
 } // namespace lay 
+
+#endif

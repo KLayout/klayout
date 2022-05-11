@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layIndexedNetlistModel
 #define HDR_layIndexedNetlistModel
@@ -205,3 +206,5 @@ private:
 }
 
 #endif
+
+#endif  //  defined(HAVE_QT)

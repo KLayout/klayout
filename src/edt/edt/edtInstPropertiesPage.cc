@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "dbLibrary.h"
 #include "dbPCellHeader.h"
@@ -940,3 +941,4 @@ InstPropertiesPage::update_pcell_parameters ()
 
 }
 
+#endif

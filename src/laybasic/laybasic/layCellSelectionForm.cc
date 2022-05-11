@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include <algorithm>
 #include <string>
@@ -876,4 +877,4 @@ LibraryCellSelectionForm::name_changed (const QString &s)
 
 }
 
-
+#endif

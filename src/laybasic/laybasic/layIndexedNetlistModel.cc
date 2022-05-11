@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layIndexedNetlistModel.h"
 #include "dbNetlist.h"
@@ -463,3 +464,5 @@ SingleIndexedNetlistModel::subcircuit_index (const subcircuit_pair &subcircuits)
 }
 
 }
+
+#endif

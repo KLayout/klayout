@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layEditLineStyleWidget.h"
 
@@ -422,3 +423,4 @@ EditLineStyleWidget::redo (db::Op *op)
 
 }
 
+#endif

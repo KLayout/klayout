@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layGenericSyntaxHighlighter.h"
 
@@ -1726,4 +1727,4 @@ GenericSyntaxHighlighter::highlightBlock(const QString &text)
 
 }
 
-
+#endif

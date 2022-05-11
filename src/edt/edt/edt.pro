@@ -8,15 +8,6 @@ DEFINES += MAKE_EDT_LIBRARY
 
 !equals(HAVE_QT, "0") {
 
-  HEADERS = \
-    edtDialogs.h \
-    edtEditorOptionsPages.h \
-    edtInstPropertiesPage.h \
-    edtPCellParametersPage.h \
-    edtPropertiesPages.h \
-    edtPropertiesPageUtils.h \
-    edtRecentConfigurationPage.h
-
   FORMS = \
     AlignOptionsDialog.ui \
     BoxPropertiesPage.ui \
@@ -38,7 +29,20 @@ DEFINES += MAKE_EDT_LIBRARY
     DistributeOptionsDialog.ui \
     EditorOptionsInstPCellParam.ui
 
-  SOURCES = \
+}
+
+# Disabled without Qt:
+
+HEADERS = \
+    edtDialogs.h \
+    edtEditorOptionsPages.h \
+    edtInstPropertiesPage.h \
+    edtPCellParametersPage.h \
+    edtPropertiesPages.h \
+    edtPropertiesPageUtils.h \
+    edtRecentConfigurationPage.h
+
+SOURCES = \
     edtDialogs.cc \
     edtEditorOptionsPages.cc \
     edtInstPropertiesPage.cc \
@@ -47,7 +51,7 @@ DEFINES += MAKE_EDT_LIBRARY
     edtPropertiesPageUtils.cc \
     edtRecentConfigurationPage.cc
 
-}
+# Enabled without Qt:
 
 HEADERS += \
   edtConfig.h \

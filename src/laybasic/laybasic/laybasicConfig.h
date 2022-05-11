@@ -20,7 +20,6 @@
 
 */
 
-
 #ifndef HDR_laybasicConfig
 #define HDR_laybasicConfig
 
@@ -147,4 +146,3 @@ static const std::string cfg_guiding_shape_vertex_size ("guiding-shape-vertex-si
 }
 
 #endif
-

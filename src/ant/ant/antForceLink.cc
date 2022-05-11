@@ -20,7 +20,6 @@
 
 */
 
-
 #include "antForceLink.h"
 
 namespace ant

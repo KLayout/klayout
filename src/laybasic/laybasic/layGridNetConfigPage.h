@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layGridNetConfigPage
 #define HDR_layGridNetConfigPage
@@ -58,3 +59,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

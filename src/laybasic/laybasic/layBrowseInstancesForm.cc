@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include <vector>
 #include <string>
@@ -911,4 +912,6 @@ BrowseInstancesForm::prev_inst ()
 }
 
 }
+
+#endif
 

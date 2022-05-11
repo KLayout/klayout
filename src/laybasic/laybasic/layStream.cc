@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layStream.h"
 #include "layPlugin.h"
@@ -84,3 +85,4 @@ const StreamWriterPluginDeclaration *StreamWriterPluginDeclaration::plugin_for_f
 
 }
 
+#endif

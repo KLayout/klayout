@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layCellSelectionForm
 #define HDR_layCellSelectionForm
@@ -201,3 +202,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

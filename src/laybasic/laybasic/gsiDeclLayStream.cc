@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "gsiDecl.h"
 #include "dbReader.h"
 #include "layTechnology.h"
@@ -46,4 +48,5 @@ gsi::ClassExt<db::LoadLayoutOptions> layout_reader_decl (
 
 }
 
+#endif
 

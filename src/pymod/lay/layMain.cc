@@ -22,10 +22,13 @@
 
 #include "../pymodHelper.h"
 
+#if defined(HAVE_QT)
 //  to force linking of the lay module
-#include "../../lay/lay/layForceLink.h"
+#  include "../../lay/lay/layForceLink.h"
+#else
+//  to force linking of the laybasic module
+//  NOTE: without Qt we can only utilize the core view classes from laybasic
+#  include "../../laybasic/laybasic/laybasicForceLink.h"
+#endif
 
-//  NOTE: img, ant, edt and rdb don't need to be force-linked
-//  as they are hard-linked by lay
-
-DEFINE_PYMOD(lay, "lay", "KLayout core module 'lay'")
+DEFINE_PYMOD(laycore, "lay", "KLayout core module 'lay'")

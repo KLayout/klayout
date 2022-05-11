@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layBookmarkList.h"
 #include "tlXMLParser.h"
@@ -117,4 +118,6 @@ BookmarkList::propose_new_bookmark_name () const
 }
 
 }
+
+#endif
 

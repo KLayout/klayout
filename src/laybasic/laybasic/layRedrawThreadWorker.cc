@@ -23,6 +23,7 @@
 
 #include "layRedrawThreadWorker.h"
 #include "layRedrawThread.h"
+#include "layBitmap.h"
 
 namespace lay
 {

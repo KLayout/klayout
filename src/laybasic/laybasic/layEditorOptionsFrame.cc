@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "layEditorOptionsFrame.h"
 #include "layEditorOptionsPage.h"
 #include "layEditorOptionsPages.h"
@@ -68,3 +70,5 @@ EditorOptionsFrame::populate (LayoutView *view)
 }
 
 }
+
+#endif

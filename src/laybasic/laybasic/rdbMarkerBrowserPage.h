@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_rdbMarkerBrowserPage
 #define HDR_rdbMarkerBrowserPage
@@ -225,3 +226,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

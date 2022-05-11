@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layHierarchyControlPanel
 #define HDR_layHierarchyControlPanel
@@ -340,3 +341,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

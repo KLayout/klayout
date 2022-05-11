@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include <string>
 
@@ -847,3 +848,5 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new LibraryViewPluginDeclaration (), -7, "LibraryViewPlugin");
 
 } // namespace lay
+
+#endif

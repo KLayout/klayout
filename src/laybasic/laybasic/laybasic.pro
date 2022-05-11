@@ -82,7 +82,11 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     laybasicResources.qrc \
     layLayoutStatistics.qrc \
 
-  SOURCES = \
+}
+
+# Disabled without Qt:
+
+SOURCES = \
     gsiDeclLayDialogs.cc \
     gsiDeclLayMenu.cc \
     gsiDeclLayNetlistBrowserDialog.cc \
@@ -153,7 +157,9 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     rdbMarkerBrowserDialog.cc \
     rdbMarkerBrowserPage.cc \
 
-  HEADERS = \
+# Disabled without Qt:
+
+HEADERS = \
     gtf.h \
     layAbstractMenu.h \
     layBackgroundAwareTreeStyle.h \
@@ -223,7 +229,7 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     rdbMarkerBrowserDialog.h \
     rdbMarkerBrowserPage.h \
 
-}
+# Enabled without Qt:
 
 SOURCES += \
     gsiDeclLayLayers.cc \
@@ -231,6 +237,7 @@ SOURCES += \
     gsiDeclLayMarker.cc \
     gsiDeclLayPlugin.cc \
     gsiDeclLayPixelBuffer.cc \
+    laybasicForceLink.cc \
     layAnnotationShapes.cc \
     layBitmap.cc \
     layBitmapRenderer.cc \
@@ -278,7 +285,10 @@ SOURCES += \
     layViewport.cc \
     layZoomBox.cc \
 
+# Enabled without Qt:
+
 HEADERS += \
+    laybasicForceLink.h \
     layAnnotationShapes.h \
     layBitmap.h \
     layBitmapRenderer.h \

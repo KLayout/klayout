@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layNetlistCrossReferenceModel.h"
 
@@ -800,3 +801,5 @@ std::string NetlistCrossReferenceModel::subcircuit_status_hint (const circuit_pa
 }
 
 }
+
+#endif

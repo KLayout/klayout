@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layBrowserPanel.h"
 #include "layDispatcher.h"
@@ -831,4 +832,5 @@ BrowserSource::attach (lay::BrowserPanel *d)
 
 }
 
+#endif
 

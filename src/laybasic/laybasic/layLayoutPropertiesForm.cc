@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layLayoutPropertiesForm.h"
 #include "layLayoutView.h"
@@ -206,5 +207,4 @@ END_PROTECTED
 
 }
 
-
-
+#endif

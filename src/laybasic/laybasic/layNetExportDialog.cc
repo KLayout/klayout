@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "layNetExportDialog.h"
 #include "layPlugin.h"
 #include "layDispatcher.h"
@@ -213,3 +215,5 @@ NetExportDialog::exec_dialog (lay::Dispatcher *plugin_root)
 }
 
 }
+
+#endif

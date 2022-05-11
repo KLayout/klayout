@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include <QDialog>
 #include <QVBoxLayout>
@@ -144,3 +145,4 @@ ConfigurationDialog::ok_clicked ()
 
 }
 
+#endif

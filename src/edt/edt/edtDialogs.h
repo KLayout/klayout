@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 
 #ifndef HDR_edtDialogs
@@ -205,6 +206,8 @@ private:
 };
 
 } // namespace edt
+
+#endif
 
 #endif
 

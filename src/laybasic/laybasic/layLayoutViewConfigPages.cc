@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layLayoutViewConfigPages.h"
 #include "laybasicConfig.h"
@@ -1631,3 +1632,4 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new LayoutViewCo
 
 }
 
+#endif

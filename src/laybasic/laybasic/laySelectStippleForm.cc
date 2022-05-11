@@ -20,7 +20,7 @@
 
 */
 
-
+#if defined(HAVE_QT)
 
 #include "laySelectStippleForm.h"
 #include "ui_SelectStippleForm.h"
@@ -133,3 +133,4 @@ SelectStippleForm::sel_changed (QListWidgetItem *citem, QListWidgetItem *)
 
 }
 
+#endif

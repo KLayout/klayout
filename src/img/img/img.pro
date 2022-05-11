@@ -13,6 +13,10 @@ FORMS = \
   ImageLandmarksDialog.ui \
   ImagePropertiesPage.ui \
 
+}
+
+# Disabled without Qt:
+
 HEADERS = \
   imgLandmarksDialog.h \
   imgNavigator.h \
@@ -25,7 +29,7 @@ SOURCES = \
   imgPropertiesPage.cc \
   imgWidgets.cc \
 
-}
+# Enabled without Qt:
 
 HEADERS += \
   imgObject.h \

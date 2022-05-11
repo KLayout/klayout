@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_edtPCellParametersPage
 #define HDR_edtPCellParametersPage
@@ -155,5 +156,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif

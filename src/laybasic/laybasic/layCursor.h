@@ -20,13 +20,14 @@
 
 */
 
-
 #ifndef HDR_layCursor
 #define HDR_layCursor
 
 #include "laybasicCommon.h"
 
+#if defined(HAVE_QT)
 class QCursor;
+#endif
 
 namespace lay
 {
@@ -64,13 +65,15 @@ struct LAYBASIC_PUBLIC Cursor
     closed_hand = 18
   };
 
+#if defined(HAVE_QT)
   /**
    *  @brief Get the QCursor from the lay::cursor_shape enum
    */
   static QCursor qcursor (cursor_shape cursor);
+#endif
+
 };
 
 }
 
 #endif
-

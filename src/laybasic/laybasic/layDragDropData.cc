@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "layDragDropData.h"
 
 #include <QDataStream>
@@ -106,3 +108,5 @@ CellDragDropData::deserialize (const QByteArray &ba)
 }
 
 }
+
+#endif

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include <QFileDialog>
 #include <QApplication>
@@ -303,3 +304,4 @@ FileDialog::get_save (std::string &fp, const std::string &title)
 
 } // namespace lay
 
+#endif

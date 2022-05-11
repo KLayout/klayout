@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "rdbMarkerBrowserPage.h"
 #include "rdb.h"
@@ -3163,3 +3164,4 @@ MarkerBrowserPage::eventFilter (QObject *watched, QEvent *event)
 
 }
 
+#endif

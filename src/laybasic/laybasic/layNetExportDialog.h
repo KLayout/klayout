@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layNetExportDialog
 #define HDR_layNetExportDialog
@@ -87,3 +88,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #ifndef HDR_layItemDelegates
 #define HDR_layItemDelegates
 
@@ -103,3 +105,5 @@ private:
 }
 
 #endif
+
+#endif  //  defined(HAVE_QT)

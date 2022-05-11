@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layDialogs.h"
 
@@ -1411,3 +1412,4 @@ END_PROTECTED
 
 }
 
+#endif

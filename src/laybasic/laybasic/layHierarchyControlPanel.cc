@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include <string>
 
@@ -1243,3 +1244,5 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new HierarchyControlPanelPluginDeclaration (), -8, "HierarchyControlPanelPlugin");
 
 } // namespace lay 
+
+#endif

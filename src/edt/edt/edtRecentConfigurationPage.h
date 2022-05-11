@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_edtRecentConfigurationPage
 #define HDR_edtRecentConfigurationPage
@@ -112,3 +113,4 @@ private:
 
 #endif
 
+#endif

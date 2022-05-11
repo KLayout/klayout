@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layNetlistBrowserPage.h"
 #include "layNetlistBrowserModel.h"
@@ -1458,3 +1459,4 @@ NetlistBrowserPage::export_nets (const std::vector<const db::Net *> *nets)
 
 }
 
+#endif

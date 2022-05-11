@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layBrowseShapesForm
 #define HDR_layBrowseShapesForm
@@ -134,3 +135,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

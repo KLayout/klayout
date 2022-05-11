@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layWidgets
 #define HDR_layWidgets
@@ -524,3 +525,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

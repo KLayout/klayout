@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layProperties
 #define HDR_layProperties
@@ -237,3 +238,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

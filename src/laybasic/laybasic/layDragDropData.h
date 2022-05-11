@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layDragDropData
 #define HDR_layDragDropData
@@ -169,3 +170,5 @@ private:
 }
 
 #endif
+
+#endif  //  defined(HAVE_QT)

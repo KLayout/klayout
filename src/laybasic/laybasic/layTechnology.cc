@@ -20,7 +20,10 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layTechnology.h"
 
 //  .. nothing yet ..
+
+#endif

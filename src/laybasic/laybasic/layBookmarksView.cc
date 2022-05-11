@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layBookmarksView.h"
 #include "layLayoutView.h"
@@ -210,4 +211,6 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new BookmarksViewPluginDeclaration (), -7, "BookmarksViewPlugin");
 
 }
+
+#endif
 

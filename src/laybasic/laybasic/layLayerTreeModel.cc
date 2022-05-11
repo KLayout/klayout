@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layLayerTreeModel.h"
 #include "layLayoutView.h"
@@ -931,3 +932,5 @@ LayerTreeModel::index (lay::LayerPropertiesConstIterator iter, int column) const
 }
 
 } // namespace lay
+
+#endif

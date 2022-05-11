@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layBookmarkManagementForm.h"
 #include "dbCellInst.h"
@@ -109,5 +110,5 @@ BookmarkManagementForm::accept ()
 
 }
 
-
+#endif
 

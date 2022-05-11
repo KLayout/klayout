@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layQtTools
 #define HDR_layQtTools
@@ -114,3 +115,4 @@ typedef QSignalBlocker SignalBlocker;
 
 #endif
 
+#endif  //  defined(HAVE_QT)

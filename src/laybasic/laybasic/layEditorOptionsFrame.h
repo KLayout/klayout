@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #ifndef HDR_layEditorOptionsFrame
 #define HDR_layEditorOptionsFrame
 
@@ -53,3 +55,5 @@ public:
 }
 
 #endif
+
+#endif  //  defined(HAVE_QT)

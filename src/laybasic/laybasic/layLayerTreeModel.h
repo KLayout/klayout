@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layLayerTreeModel
 #define HDR_layLayerTreeModel
@@ -282,3 +283,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #ifndef HDR_imgWidgets
 #define HDR_imgWidgets
 
@@ -138,3 +140,4 @@ private:
 
 #endif
 
+#endif

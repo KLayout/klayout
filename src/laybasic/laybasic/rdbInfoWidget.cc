@@ -21,6 +21,8 @@
 */
 
 
+#if defined(HAVE_QT)
+
 #include "rdbInfoWidget.h"
 
 #include <stdio.h>
@@ -63,3 +65,4 @@ InfoWidget::loadResource (int type, const QUrl &name)
 
 }
 
+#endif

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layLayerControlPanel
 #define HDR_layLayerControlPanel
@@ -379,3 +380,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

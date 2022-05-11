@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "layBackgroundAwareTreeStyle.h"
 
 #include <QPainter>
@@ -108,3 +110,6 @@ BackgroundAwareTreeStyle::drawPrimitive (QStyle::PrimitiveElement pe, const QSty
 }
 
 }
+
+#endif
+

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layEditStippleWidget.h"
 
@@ -529,3 +530,4 @@ EditStippleWidget::redo (db::Op *op)
 
 }
 
+#endif

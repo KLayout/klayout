@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "laybasicConfig.h"
 #include "layGridNetConfigPage.h"
@@ -111,3 +112,4 @@ GridNetConfigPage::commit (lay::Dispatcher *root)
 
 } // namespace lay
 
+#endif

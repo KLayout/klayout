@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layLayerMappingWidget.h"
 #include "tlExceptions.h"
@@ -259,3 +260,4 @@ LayerMappingWidget::current_tab_changed (int index)
 
 }
 
+#endif

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "imgPropertiesPage.h"
 #include "imgLandmarksDialog.h"
@@ -1003,3 +1004,4 @@ PropertiesPage::define_landmarks_pressed ()
 
 }
 
+#endif

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layLayoutStatisticsForm
 #define HDR_layLayoutStatisticsForm
@@ -56,3 +57,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

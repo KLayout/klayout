@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layAbstractMenu.h"
 #include "layDispatcher.h"
@@ -1702,3 +1703,5 @@ AbstractMenu::get_shortcuts (const std::string &root, std::map<std::string, std:
 }
 
 }
+
+#endif

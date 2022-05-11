@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "antPropertiesPage.h"
 #include "layLayoutView.h"
@@ -365,3 +366,4 @@ PropertiesPage::apply ()
 
 }
 
+#endif

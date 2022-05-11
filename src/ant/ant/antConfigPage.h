@@ -20,7 +20,7 @@
 
 */
 
-
+#if defined(HAVE_QT)
 
 #ifndef HDR_antConfigPage
 #define HDR_antConfigPage
@@ -131,6 +131,8 @@ private:
 };
 
 } // namespace ant
+
+#endif
 
 #endif
 

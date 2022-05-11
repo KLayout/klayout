@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "tlInternational.h"
 #include "layEditorOptionsPages.h"
@@ -214,3 +215,4 @@ static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le
 
 }
 
+#endif

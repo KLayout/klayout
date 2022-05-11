@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layNetlistBrowserTreeModel.h"
 #include "layIndexedNetlistModel.h"
@@ -447,3 +448,5 @@ NetlistBrowserTreeModel::rowCount (const QModelIndex &parent) const
 }
 
 }
+
+#endif

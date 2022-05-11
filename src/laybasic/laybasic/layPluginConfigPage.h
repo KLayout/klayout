@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layPluginConfigPage
 #define HDR_layPluginConfigPage
@@ -80,3 +81,4 @@ public:
 #endif
 
 
+#endif  //  defined(HAVE_QT)

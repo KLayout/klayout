@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_SelectCellViewForm
 #define HDR_SelectCellViewForm
@@ -90,3 +91,4 @@ public slots:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

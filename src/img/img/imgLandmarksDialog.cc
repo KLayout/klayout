@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "imgLandmarksDialog.h"
 #include "imgService.h"
@@ -499,3 +500,4 @@ LandmarksDialog::landmarks_updated ()
 
 }
 
+#endif

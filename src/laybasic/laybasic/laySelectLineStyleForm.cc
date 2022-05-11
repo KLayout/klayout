@@ -20,7 +20,7 @@
 
 */
 
-
+#if defined(HAVE_QT)
 
 #include "laySelectLineStyleForm.h"
 #include "ui_SelectLineStyleForm.h"
@@ -133,3 +133,4 @@ SelectLineStyleForm::sel_changed (QListWidgetItem *citem, QListWidgetItem *)
 
 }
 
+#endif

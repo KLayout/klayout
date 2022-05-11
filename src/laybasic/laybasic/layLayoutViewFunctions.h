@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layLayoutViewFunctions
 #define HDR_layLayoutViewFunctions
@@ -169,3 +170,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

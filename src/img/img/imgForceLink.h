@@ -10,7 +10,7 @@
   (at your option) any later version.
 
   This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  but WITHOUT ANY WARRANTY; without even the implied warrimgy of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 
@@ -33,7 +33,7 @@
 namespace img
 {
   IMG_PUBLIC int _force_link_f ();
-  int _force_link_target = _force_link_f ();
+  static int _force_link_target = _force_link_f ();
 }
 
 #endif

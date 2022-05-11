@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layTipDialog.h"
 #include "laybasicConfig.h"
@@ -217,3 +218,4 @@ TipDialog::~TipDialog ()
 
 }
 
+#endif

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "edtPropertiesPages.h"
 #include "edtPropertiesPageUtils.h"
@@ -1183,3 +1184,4 @@ EditablePathPropertiesPage::type_selected (int t)
 
 }
 
+#endif

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "laybasicCommon.h"
 
@@ -31,3 +32,5 @@ namespace lay
 //  .. nothing yet ..
 
 }
+
+#endif

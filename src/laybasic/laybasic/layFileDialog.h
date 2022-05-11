@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layFileDialog
 #define HDR_layFileDialog
@@ -98,3 +99,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

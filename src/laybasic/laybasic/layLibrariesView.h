@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layLibrariesView
 #define HDR_layLibrariesView
@@ -274,3 +275,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

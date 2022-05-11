@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layNetlistBrowserDialog.h"
 #include "tlProgress.h"
@@ -838,3 +839,4 @@ NetlistBrowserDialog::menu_activated (const std::string &symbol)
 
 }
 
+#endif

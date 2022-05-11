@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layLayoutView.h"
 #include "laySaveLayoutOptionsDialog.h"
@@ -553,3 +554,4 @@ SaveLayoutAsOptionsDialog::fmt_cbx_changed (int index)
 
 }
 
+#endif

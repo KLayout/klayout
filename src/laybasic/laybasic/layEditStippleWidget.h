@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layEditStippleWidget
 #define HDR_layEditStippleWidget
@@ -109,3 +110,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

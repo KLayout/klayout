@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include "layLayoutViewFunctions.h"
 #include "layLayoutView.h"
 #include "layCellSelectionForm.h"
@@ -2253,3 +2255,5 @@ public:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new LayoutViewPluginDeclaration (), -10, "LayoutViewPlugin");
 
 } // namespace lay
+
+#endif

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layNetInfoDialog
 #define HDR_layNetInfoDialog
@@ -73,3 +74,4 @@ private:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

@@ -102,7 +102,7 @@ static gsi::Interpreter *ruby_interpreter ()
   return interpreter_by_name ("rba");
 }
 
-Class<Interpreter> decl_Macro ("tl", "Interpreter",
+Class<Interpreter> decl_Interpreter ("tl", "Interpreter",
   gsi::method ("load_file", &Interpreter::load_file, gsi::arg ("path"),
     "@brief Loads the given file into the interpreter\n"
     "This will execute the code inside the file.\n"

@@ -524,6 +524,23 @@ _rdb = Library(config.root + '._rdb',
 config.add_extension(_rdb)
 
 # ------------------------------------------------------------------
+# _lay dependency library
+
+_lay_path = os.path.join("src", "laybasic", "laybasic")
+_lay_sources = set(glob.glob(os.path.join(_lay_path, "*.cc")))
+
+_lay = Library(config.root + '._lay',
+               define_macros=config.macros() + [('MAKE_LAYBASIC_LIBRARY', 1)],
+               include_dirs=[_rdb_path, _db_path, _tl_path, _gsi_path],
+               extra_objects=[config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
+               language='c++',
+               libraries=config.libraries('_lay'),
+               extra_link_args=config.link_args('_lay'),
+               extra_compile_args=config.compile_args('_lay'),
+               sources=list(_lay_sources))
+config.add_extension(_lay)
+
+# ------------------------------------------------------------------
 # _lym dependency library
 
 _lym_path = os.path.join("src", "lym", "lym")
@@ -539,23 +556,6 @@ _lym = Library(config.root + '._lym',
                extra_compile_args=config.compile_args('_lym'),
                sources=list(_lym_sources))
 config.add_extension(_lym)
-
-# ------------------------------------------------------------------
-# _lay dependency library
-
-_lay_path = os.path.join("src", "laybasic", "laybasic")
-_lay_sources = set(glob.glob(os.path.join(_lay_path, "*.cc")))
-
-_lay = Library(config.root + '._lay',
-               define_macros=config.macros() + [('MAKE_LAYBASIC_LIBRARY', 1)],
-               include_dirs=[_lym_path, _rdb_path, _db_path, _tl_path, _gsi_path],
-               extra_objects=[config.path_of('_lym', _lym_path), config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
-               language='c++',
-               libraries=config.libraries('_lay'),
-               extra_link_args=config.link_args('_lay'),
-               extra_compile_args=config.compile_args('_lay'),
-               sources=list(_lay_sources))
-config.add_extension(_lay)
 
 # ------------------------------------------------------------------
 # _ant dependency library
@@ -699,8 +699,8 @@ lay_sources = set(glob.glob(os.path.join(lay_path, "*.cc")))
 
 lay = Extension(config.root + '.laycore',
                 define_macros=config.macros(),
-                include_dirs=[_lay_path, _tl_path, _gsi_path, _pya_path],
-                extra_objects=[config.path_of('_lay', _lay_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
+                include_dirs=[_lay_path, _img_path, _ant_path, _edt_path, _lym_path, _tl_path, _gsi_path, _pya_path],
+                extra_objects=[config.path_of('_lay', _lay_path), config.path_of('_img', _img_path), config.path_of('_ant', _ant_path), config.path_of('_edt', _edt_path), config.path_of('_lym', _lym_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
                 extra_link_args=config.link_args('laycore'),
                 extra_compile_args=config.compile_args('laycore'),
                 sources=list(lay_sources))

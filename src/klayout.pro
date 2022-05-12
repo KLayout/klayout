@@ -64,7 +64,8 @@ lib.depends += db
 
 buddies.depends += plugins lym $$LANG_DEPENDS
 lym.depends += gsi $$LANG_DEPENDS
-laybasic.depends += rdb lym
+
+laybasic.depends += rdb 
 
 ant.depends += laybasic
 img.depends += laybasic

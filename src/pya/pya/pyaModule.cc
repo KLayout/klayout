@@ -2403,6 +2403,11 @@ public:
 
   PyTypeObject *make_class (const gsi::ClassBase *cls, bool as_static)
   {
+    //  drop non-standard names
+    if (tl::verbosity () >= 40) {
+      tl::info << tl::sprintf (tl::to_string (tr ("Creating class %s.%s")), PyModule_GetName (mp_module->module ()), cls->name ());
+    }
+
     //  NOTE: with as_static = true, this method produces a mixin. This is a class entirely consisting
     //  of static constants and child classes only. It can be mixed into an existing class for emulation
     //  additional base classes.

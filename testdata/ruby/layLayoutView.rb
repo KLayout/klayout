@@ -425,6 +425,16 @@ class LAYLayoutView_TestClass < TestBase
 
   def test_4
 
+    # check if PNG support is compiled in
+    # TODO: remove this once PNG support is available on all platforms
+    begin
+      RBA::PixelBuffer.read_png(File.join($ut_testsrc, "testdata/lay/au_lv1.png"))
+    rescue => ex
+      # PNG support missing
+      puts "WARNING: PNG support not compiled in - skipping test"
+      return
+    end
+
     # standalone image generation (see C++ tests)
     lv = RBA::LayoutView::new
     lv.set_config("inst-color", "#000000")

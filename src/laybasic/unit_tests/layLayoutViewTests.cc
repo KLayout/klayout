@@ -260,7 +260,7 @@ TEST(13)
 }
 #endif
 
-#if defined(HAVE_PNG) || defined(HAVE_QT)
+#if defined(HAVE_PNG) && defined(HAVE_QT)
 TEST(21)
 {
   lay::LayoutView lv (0, false, 0);

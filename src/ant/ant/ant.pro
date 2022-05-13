@@ -30,7 +30,6 @@ SOURCES = \
 # Enabled without Qt:
 
 HEADERS += \
-  antForceLink.h \
   antConfig.h \
   antObject.h \
   antPlugin.h \
@@ -40,7 +39,6 @@ HEADERS += \
   antCommon.h
 
 SOURCES += \
-  antForceLink.cc \
   antConfig.cc \
   antObject.cc \
   antPlugin.cc \

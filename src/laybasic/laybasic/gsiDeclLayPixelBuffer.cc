@@ -160,7 +160,7 @@ Class<lay::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
   gsi::method ("fill", &lay::PixelBuffer::fill, gsi::arg ("color"),
     "@brief Fills the pixel buffer with the given pixel value\n"
   ) +
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
   gsi::method_ext ("fill", &fill_with_qcolor, gsi::arg ("color"),
     "@brief Fills the pixel buffer with the given QColor\n"
   ) +
@@ -352,7 +352,7 @@ Class<lay::BitmapBuffer> decl_BitmapBuffer ("lay", "BitmapBuffer",
   gsi::method ("fill", &lay::BitmapBuffer::fill, gsi::arg ("color"),
     "@brief Fills the pixel buffer with the given pixel value\n"
   ) +
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
   gsi::method_ext ("fill", &fill_with_qcolor, gsi::arg ("color"),
     "@brief Fills the pixel buffer with the given QColor\n"
   ) +

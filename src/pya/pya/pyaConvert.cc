@@ -455,7 +455,9 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
     //  of the exposed property. Hence copying is safer.
 
     PyTypeObject *type = PythonModule::type_for_cls (clsact);
-    tl_assert (type != NULL);
+    if (!type) {
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Requested type %s.%s is not bound to a Python class (did you load the '%s' module?)")), clsact->module (), clsact->name (), clsact->module ()));
+    }
 
     //  create a instance and copy the value
     PyObject *new_pyobject = type->tp_alloc (type, 0);
@@ -477,7 +479,9 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
   } else {
 
     PyTypeObject *type = PythonModule::type_for_cls (clsact);
-    tl_assert (type != NULL);
+    if (!type) {
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Requested type %s.%s is not bound to a Python class (did you load the '%s' module?)")), clsact->module (), clsact->name (), clsact->module ()));
+    }
 
     //  create a instance and copy the value
     PyObject *new_pyobject = type->tp_alloc (type, 0);

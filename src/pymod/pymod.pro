@@ -8,10 +8,6 @@ SUBDIRS = \
   rdb \
   lib \
   lay \
-  lym \
-  ant \
-  edt \
-  img \
 
 !equals(HAVE_QT, "0") {
 

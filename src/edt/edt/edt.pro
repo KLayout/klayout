@@ -54,6 +54,7 @@ SOURCES = \
 # Enabled without Qt:
 
 HEADERS += \
+  edtForceLink.h \
   edtConfig.h \
   edtMainService.h \
   edtPartialService.h \
@@ -65,6 +66,7 @@ HEADERS += \
   edtDistribute.h \
 
 SOURCES += \
+  edtForceLink.cc \
   edtConfig.cc \
   edtMainService.cc \
   edtPartialService.cc \

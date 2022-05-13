@@ -8,12 +8,14 @@ DEFINES += MAKE_LYM_LIBRARY
 
 SOURCES = \
   gsiDeclLymMacro.cc \
+  lymForceLink.cc \
   lymMacroInterpreter.cc \
   lymMacroCollection.cc \
   lymMacro.cc \
 
 HEADERS = \
   lymCommon.h \
+  lymForceLink.h \
   lymInclude.h \
   lymMacroInterpreter.h \
   lymMacroCollection.h \

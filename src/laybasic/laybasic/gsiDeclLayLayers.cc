@@ -1165,11 +1165,6 @@ static void clear_children (lay::LayerPropertiesNode *node)
   node->clear_children ();
 }
 
-static lay::LayoutView *get_view (lay::LayerPropertiesNode *node)
-{
-  return node->view ()->ui ();
-}
-
 Class<lay::LayerPropertiesNode> decl_LayerPropertiesNode (
   decl_LayerProperties, 
   "lay", "LayerPropertiesNode",

@@ -35,6 +35,7 @@
 #include <QKeyEvent>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QMessageBox>
 
 #include "tlInternational.h"
 #include "tlExpression.h"

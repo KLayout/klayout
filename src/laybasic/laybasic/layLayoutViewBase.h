@@ -79,6 +79,7 @@ class MoveService;
 #if defined(HAVE_QT)
 class LayerControlPanel;
 class HierarchyControlPanel;
+class EditorOptionsPages;
 #endif
 
 /**
@@ -1668,6 +1669,14 @@ public:
    *  @brief Gets the hierarchy panel
    */
   virtual lay::HierarchyControlPanel *hierarchy_panel ()
+  {
+    return 0;
+  }
+
+  /**
+   *  @brief Gets the hierarchy panel
+   */
+  virtual lay::EditorOptionsPages *editor_options_pages ()
   {
     return 0;
   }

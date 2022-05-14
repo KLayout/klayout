@@ -327,7 +327,7 @@ public:
   /**
    *  @brief Gets the editor options pages
    */
-  lay::EditorOptionsPages *editor_options_pages ();
+  virtual lay::EditorOptionsPages *editor_options_pages ();
 
   /**
    *  @brief Gets the container with the layer control panel

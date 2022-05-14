@@ -28,6 +28,9 @@
 #include "layConverters.h"
 #include "layDispatcher.h"
 
+#include "ui_MarkerBrowserConfigPage.h"
+#include "ui_MarkerBrowserConfigPage2.h"
+
 #include <set>
 
 namespace rdb
@@ -128,9 +131,10 @@ MarkerBrowserWindowModeConverter::to_string (rdb::window_type mode)
 MarkerBrowserConfigPage::MarkerBrowserConfigPage (QWidget *parent)
   : lay::ConfigPage (parent)
 {
-  Ui::MarkerBrowserConfigPage::setupUi (this);
+  mp_ui = new Ui::MarkerBrowserConfigPage ();
+  mp_ui->setupUi (this);
 
-  connect (cbx_window, SIGNAL (currentIndexChanged (int)), this, SLOT (window_changed (int)));
+  connect (mp_ui->cbx_window, SIGNAL (currentIndexChanged (int)), this, SLOT (window_changed (int)));
 }
 
 void 
@@ -139,22 +143,22 @@ MarkerBrowserConfigPage::setup (lay::Dispatcher *root)
   //  context mode
   rdb::context_mode_type cmode = rdb::DatabaseTop;
   root->config_get (cfg_rdb_context_mode, cmode, MarkerBrowserContextModeConverter ());
-  cbx_context->setCurrentIndex (int (cmode));
+  mp_ui->cbx_context->setCurrentIndex (int (cmode));
 
   //  window mode
   rdb::window_type wmode = rdb::FitMarker;
   root->config_get (cfg_rdb_window_mode, wmode, MarkerBrowserWindowModeConverter ());
-  cbx_window->setCurrentIndex (int (wmode));
+  mp_ui->cbx_window->setCurrentIndex (int (wmode));
 
   //  window dimension
   double wdim = 1.0;
   root->config_get (cfg_rdb_window_dim, wdim);
-  le_window->setText (tl::to_qstring (tl::to_string (wdim)));
+  mp_ui->le_window->setText (tl::to_qstring (tl::to_string (wdim)));
     
   //  max. marker count
   unsigned int max_marker_count = 1000;
   root->config_get (cfg_rdb_max_marker_count, max_marker_count);
-  le_max_markers->setText (tl::to_qstring (tl::to_string (max_marker_count)));
+  mp_ui->le_max_markers->setText (tl::to_qstring (tl::to_string (max_marker_count)));
 
   //  enable controls
   window_changed (int (wmode));
@@ -163,20 +167,20 @@ MarkerBrowserConfigPage::setup (lay::Dispatcher *root)
 void
 MarkerBrowserConfigPage::window_changed (int m)
 {
-  le_window->setEnabled (m == int (rdb::FitMarker) || m == int (rdb::CenterSize));
+  mp_ui->le_window->setEnabled (m == int (rdb::FitMarker) || m == int (rdb::CenterSize));
 }
 
 void 
 MarkerBrowserConfigPage::commit (lay::Dispatcher *root)
 {
   double dim = 1.0;
-  tl::from_string_ext (tl::to_string (le_window->text ()), dim);
+  tl::from_string_ext (tl::to_string (mp_ui->le_window->text ()), dim);
 
   unsigned int max_markers_count = 1000;
-  tl::from_string_ext (tl::to_string (le_max_markers->text ()), max_markers_count);
+  tl::from_string_ext (tl::to_string (mp_ui->le_max_markers->text ()), max_markers_count);
 
-  root->config_set (cfg_rdb_context_mode, rdb::context_mode_type (cbx_context->currentIndex ()), MarkerBrowserContextModeConverter ());
-  root->config_set (cfg_rdb_window_mode, rdb::window_type (cbx_window->currentIndex ()), MarkerBrowserWindowModeConverter ());
+  root->config_set (cfg_rdb_context_mode, rdb::context_mode_type (mp_ui->cbx_context->currentIndex ()), MarkerBrowserContextModeConverter ());
+  root->config_set (cfg_rdb_window_mode, rdb::window_type (mp_ui->cbx_window->currentIndex ()), MarkerBrowserWindowModeConverter ());
   root->config_set (cfg_rdb_window_dim, dim);
   root->config_set (cfg_rdb_max_marker_count, max_markers_count);
 }
@@ -187,7 +191,8 @@ MarkerBrowserConfigPage::commit (lay::Dispatcher *root)
 MarkerBrowserConfigPage2::MarkerBrowserConfigPage2 (QWidget *parent)
   : lay::ConfigPage (parent)
 {
-  Ui::MarkerBrowserConfigPage2::setupUi (this);
+  mp_ui = new Ui::MarkerBrowserConfigPage2 ();
+  mp_ui->setupUi (this);
 }
 
 void 
@@ -196,70 +201,70 @@ MarkerBrowserConfigPage2::setup (lay::Dispatcher *root)
   //  marker color
   QColor color;
   root->config_get (cfg_rdb_marker_color, color, lay::ColorConverter ());
-  color_pb->set_color (color);
+  mp_ui->color_pb->set_color (color);
 
   //  marker line width
   int lw = 0;
   root->config_get (cfg_rdb_marker_line_width, lw);
   if (lw < 0) {
-    lw_le->setText (QString ());
+    mp_ui->lw_le->setText (QString ());
   } else {
-    lw_le->setText (tl::to_qstring (tl::to_string (lw)));
+    mp_ui->lw_le->setText (tl::to_qstring (tl::to_string (lw)));
   }
 
   //  marker vertex size
   int vs = 0;
   root->config_get (cfg_rdb_marker_vertex_size, vs);
   if (vs < 0) {
-    vs_le->setText (QString ());
+    mp_ui->vs_le->setText (QString ());
   } else {
-    vs_le->setText (tl::to_qstring (tl::to_string (vs)));
+    mp_ui->vs_le->setText (tl::to_qstring (tl::to_string (vs)));
   }
 
   //  stipple pattern
   int dp = 0;
   root->config_get (cfg_rdb_marker_dither_pattern, dp);
-  stipple_pb->set_dither_pattern (dp);
+  mp_ui->stipple_pb->set_dither_pattern (dp);
 
   //  halo
   int halo = 0;
   root->config_get (cfg_rdb_marker_halo, halo);
-  halo_cb->setCheckState (halo < 0 ? Qt::PartiallyChecked : (halo ? Qt::Checked : Qt::Unchecked));
+  mp_ui->halo_cb->setCheckState (halo < 0 ? Qt::PartiallyChecked : (halo ? Qt::Checked : Qt::Unchecked));
 }
 
 void 
 MarkerBrowserConfigPage2::commit (lay::Dispatcher *root)
 {
-  QColor color (color_pb->get_color ());
+  QColor color (mp_ui->color_pb->get_color ());
   root->config_set (cfg_rdb_marker_color, color, lay::ColorConverter ());
 
-  if (lw_le->text ().isEmpty ()) {
+  if (mp_ui->lw_le->text ().isEmpty ()) {
     root->config_set (cfg_rdb_marker_line_width, -1);
   } else {
     try {
       int s;
-      tl::from_string_ext (tl::to_string (lw_le->text ()), s);
+      tl::from_string_ext (tl::to_string (mp_ui->lw_le->text ()), s);
       root->config_set (cfg_rdb_marker_line_width, s);
     } catch (...) { }
   }
 
-  if (vs_le->text ().isEmpty ()) {
+  if (mp_ui->vs_le->text ().isEmpty ()) {
     root->config_set (cfg_rdb_marker_vertex_size, -1);
   } else {
     try {
       int s;
-      tl::from_string_ext (tl::to_string (vs_le->text ()), s);
+      tl::from_string_ext (tl::to_string (mp_ui->vs_le->text ()), s);
       root->config_set (cfg_rdb_marker_vertex_size, s);
     } catch (...) { }
   }
 
-  root->config_set (cfg_rdb_marker_dither_pattern, stipple_pb->dither_pattern ());
+  root->config_set (cfg_rdb_marker_dither_pattern, mp_ui->stipple_pb->dither_pattern ());
 
-  if (halo_cb->checkState () == Qt::PartiallyChecked) {
+  if (mp_ui->halo_cb->checkState () == Qt::PartiallyChecked) {
     root->config_set (cfg_rdb_marker_halo, -1);
-  } else if (halo_cb->checkState () == Qt::Unchecked) {
+  } else if (mp_ui->halo_cb->checkState () == Qt::Unchecked) {
     root->config_set (cfg_rdb_marker_halo, 0);
-  } else if (halo_cb->checkState () == Qt::Checked) {
+  } else if (mp_ui->halo_cb->checkState () == Qt::Checked) {
     root->config_set (cfg_rdb_marker_halo, 1);
   }
 }

@@ -27,12 +27,16 @@
 
 #include "layPlugin.h"
 #include "layPluginConfigPage.h"
-#include "ui_MarkerBrowserConfigPage.h"
-#include "ui_MarkerBrowserConfigPage2.h"
 
 #include "dbTrans.h"
 
 #include <algorithm>
+
+namespace Ui
+{
+  class MarkerBrowserConfigPage;
+  class MarkerBrowserConfigPage2;
+}
 
 namespace rdb
 {
@@ -41,8 +45,7 @@ enum context_mode_type { AnyCell = 0 , DatabaseTop, Current, CurrentOrAny, Local
 enum window_type { DontChange = 0, FitCell, FitMarker, Center, CenterSize };
 
 class MarkerBrowserConfigPage
-  : public lay::ConfigPage,
-    private Ui::MarkerBrowserConfigPage
+  : public lay::ConfigPage
 {
   Q_OBJECT 
 
@@ -54,11 +57,13 @@ public:
 
 public slots:
   void window_changed (int);
+
+private:
+  Ui::MarkerBrowserConfigPage *mp_ui;
 };
 
 class MarkerBrowserConfigPage2
-  : public lay::ConfigPage,
-    private Ui::MarkerBrowserConfigPage2
+  : public lay::ConfigPage
 {
   Q_OBJECT 
 
@@ -67,6 +72,9 @@ public:
 
   virtual void setup (lay::Dispatcher *root);
   virtual void commit (lay::Dispatcher *root);
+
+private:
+  Ui::MarkerBrowserConfigPage2 *mp_ui;
 };
 
 class MarkerBrowserContextModeConverter

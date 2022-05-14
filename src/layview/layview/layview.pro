@@ -1,10 +1,10 @@
 
 DESTDIR = $$OUT_PWD/../..
-TARGET = klayout_ui
+TARGET = klayout_layview
 
 include($$PWD/../../lib.pri)
 
-DEFINES += MAKE_UI_LIBRARY
+DEFINES += MAKE_LAYVIEW_LIBRARY
 
 FORMS = \
 

@@ -34,6 +34,8 @@
 #include <QInputDialog>
 #include <QKeyEvent>
 #include <QMessageBox>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 #include "tlInternational.h"
 #include "tlExpression.h"

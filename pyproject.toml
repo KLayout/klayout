@@ -1,0 +1,27 @@
+[tool.cibuildwheel]
+build-verbosity = "3"
+test-command = [
+  "python {package}/testdata/pymod/import_db.py",
+  "python {package}/testdata/pymod/import_rdb.py",
+  "python {package}/testdata/pymod/import_tl.py",
+  "python {package}/testdata/pymod/import_lib.py",
+  "python {package}/testdata/pymod/pya_tests.py"
+]
+# Disable building PyPy wheels on all platforms
+skip = "pp*"
+
+[tool.cibuildwheel.linux]
+# beware: the before-all script does not persist environment variables!
+# No point in defining $PATH or $CCACHE_DIR
+before-all = "source {project}/ci-scripts/docker/docker_prepare.sh"
+archs = ["auto64"]
+# Append a directory to the PATH variable (this is expanded in the build environment)
+environment = { PATH="/usr/lib/ccache:/usr/lib64/ccache:/usr/lib/ccache/bin:$PATH" }
+before-build = "ccache -s"
+# Export a variable to docker
+# CCACHE_DIR="/home/runner/work/klayout/klayout/.ccache"
+environment-pass = ["HOST_CCACHE_DIR"]
+
+[tool.cibuildwheel.macos]
+# Don't repair macOS wheels
+repair-wheel-command = ""

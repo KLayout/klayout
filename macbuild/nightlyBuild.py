@@ -88,6 +88,11 @@ def Get_Build_Options( targetDic ):
             buildOp["brewA"]   = [ '-q', 'Qt5Brew',     '-r', 'HB27', '-p', 'HBAuto' ]
         elif target == "brewAHW":
             buildOp["brewAHW"] = [ '-q', 'Qt5Brew',     '-r', 'sys',  '-p', 'HBAuto' ]
+
+    if WithPymod:
+        buildOp["ports"] = buildOp["ports"] + ['--buildPymod']
+        buildOp["brew"]  = buildOp["brew"]  + ['--buildPymod']
+        buildOp["ana3"]  = buildOp["ana3"]  + ['--buildPymod']
     return buildOp
 
 #------------------------------------------------------------------------------
@@ -167,6 +172,7 @@ def Parse_CommandLine_Arguments():
     global Usage     # usage
     global Target    # target list
     global Build     # operation flag
+    global WithPymod # operation flag
     global QATest    # operation flag
     global QACheck   # operation flag
     global MakeDMG   # operation flag
@@ -194,6 +200,7 @@ def Parse_CommandLine_Arguments():
     Usage += "   [--target <list>] : 0='std', 1='ports', 2='brew', 3='brewHW', 4='ana3', | '%s'\n" % targetopt
     Usage += "                       5='brewA', 6='brewAHW'                              | \n"
     Usage += "   [--build] : build and deploy                                            | disabled\n"
+    Usage += "   [--pymod] : build and deploy Pymod, too                                 | disabled\n"
     Usage += "   [--test]  : run the QA Test                                             | disabled\n"
     Usage += "   [--check] : check the QA Test results                                   | disabled\n"
     Usage += "   [--makedmg|--cleandmg <srlno>] : make or clean DMGs                     | disabled\n"
@@ -204,12 +211,12 @@ def Parse_CommandLine_Arguments():
     Usage += "          $ ln -s ./macbuild/nightlyBuild.py .                             | \n"
     Usage += "                                                                           | \n"
     Usage += "      Regular sequence for using this script:                              | \n"
-    Usage += "          (1) $ ./nightlyBuild.py  --build                                 | \n"
+    Usage += "          (1) $ ./nightlyBuild.py  --build  --pymod                        | \n"
     Usage += "          (2)   (confirm the build results)                                | \n"
     Usage += "          (3) $ ./nightlyBuild.py  --test                                  | \n"
     Usage += "          (4) $ ./nightlyBuild.py  --check (confirm the QA Test results)   | \n"
     Usage += "          (5) $ ./nightlyBuild.py  --makedmg  1                            | \n"
-    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.27.4'                      | \n"
+    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.27.9'                      | \n"
     Usage += "          (7) $ ./nightlyBuild.py  --cleandmg 1                            | \n"
     Usage += "---------------------------------------------------------------------------+----------------------\n"
 
@@ -223,6 +230,12 @@ def Parse_CommandLine_Arguments():
                     dest='build',
                     default=False,
                     help='build and deploy' )
+
+    p.add_option( '--pymod',
+                    action='store_true',
+                    dest='with_pymod',
+                    default=False,
+                    help='build and deploy Pymod, too ' )
 
     p.add_option( '--test',
                     action='store_true',
@@ -256,6 +269,7 @@ def Parse_CommandLine_Arguments():
 
     p.set_defaults( targets    = "%s" % targetopt,
                     build      = False,
+                    with_pymod = False,
                     qa_test    = False,
                     qa_check   = False,
                     makedmg    = "",
@@ -280,12 +294,13 @@ def Parse_CommandLine_Arguments():
         if idx in range(0, 7):
             Target.append( targetDic[idx] )
 
-    Build    = opt.build
-    QATest   = opt.qa_test
-    QACheck  = opt.qa_check
-    MakeDMG  = False
-    CleanDMG = False
-    Upload   = False
+    Build     = opt.build
+    WithPymod = opt.with_pymod
+    QATest    = opt.qa_test
+    QACheck   = opt.qa_check
+    MakeDMG   = False
+    CleanDMG  = False
+    Upload    = False
 
     if not opt.makedmg == "":
         MakeDMG = True

@@ -182,14 +182,6 @@ public:
   /**
    *  @brief Sets the currently active layer by layer properties and cell view index
    *
-   *  If the layer does not exist, the user will be asked whether to create the layer.
-   *  Returns false if the layer is not a valid one and the user defined to create the layer.
-   */
-  bool set_or_request_current_layer (unsigned int cv_index, const db::LayerProperties &properties);
-
-  /**
-   *  @brief Sets the currently active layer by layer properties and cell view index
-   *
    *  This method will look up that layer in the layer view tree and select that layer.
    *  This method will also select this layer.
    *

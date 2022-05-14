@@ -33,7 +33,6 @@
 #include <QImageWriter>
 #include <QInputDialog>
 #include <QKeyEvent>
-#include <QMessageBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
@@ -606,40 +605,6 @@ LayoutView::config_finalize ()
   //  It's important that the editor option pages are updated last - because the
   //  configuration change may trigger other configuration changes
   dm_setup_editor_option_pages ();
-}
-
-bool
-LayoutView::set_or_request_current_layer (unsigned int cv_index, const db::LayerProperties &lp)
-{
-  bool ok = set_current_layer (cv_index, lp);
-  if (ok) {
-    return true;
-  }
-
-  if (! mp_control_panel) {
-    return false;
-  }
-
-  const lay::CellView &cv = cellview (cv_index);
-  if (! cv.is_valid ()) {
-    return false;
-  }
-
-  if (QMessageBox::question (this, tr ("Create Layer"), tr ("Layer %1 does not exist yet. Create it now?").arg (tl::to_qstring (lp.to_string ()))) == QMessageBox::Yes) {
-
-    lay::LayerPropertiesNode lpn;
-    lpn.set_source (lay::ParsedLayerSource (lp, cv_index));
-    init_layer_properties (lpn);
-
-    transaction (tl::to_string (QObject::tr ("Create new layer")));
-    set_current_layer (lay::LayerPropertiesConstIterator (& insert_layer (end_layers (), lpn)));
-    commit ();
-
-    return true;
-
-  }
-
-  return false;
 }
 
 void

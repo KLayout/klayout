@@ -25,7 +25,7 @@
 #include "edtRecentConfigurationPage.h"
 #include "edtUtils.h"
 #include "layDispatcher.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "layLayerTreeModel.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
@@ -133,7 +133,7 @@ RecentConfigurationPage::set_stored_values (const std::list<std::vector<std::str
 }
 
 static lay::LayerPropertiesConstIterator
-lp_iter_from_string (lay::LayoutView *view, const std::string &s)
+lp_iter_from_string (lay::LayoutViewBase *view, const std::string &s)
 {
   //  parse the layer spec (<layer-props>[@<cv-index>])
   db::LayerProperties lp;
@@ -181,7 +181,7 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
 
   case RecentConfigurationPage::Layer:
     {
-      int icon_size = view ()->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
+      int icon_size = view ()->widget ()->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
       lay::LayerPropertiesConstIterator l;
       try {
         l = lp_iter_from_string (view (), values [column]);

@@ -80,10 +80,14 @@ SOURCES += \
 INCLUDEPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
 
-# Note: this accounts for UI-generated headers placed into the output folders in
-# shadow builds:
-INCLUDEPATH += $$DESTDIR/laybasic/laybasic
-DEPENDPATH += $$DESTDIR/laybasic/laybasic
-
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_db
+
+!equals(HAVE_QT, "0") {
+
+  INCLUDEPATH += $$LAYUI_INC
+  DEPENDPATH += $$LAYUI_INC
+
+  LIBS += -lklayout_layui
+
+}
 

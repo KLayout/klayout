@@ -26,7 +26,7 @@
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
 #include "tlExceptions.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "laySelector.h"
 #include "layFinder.h"
 #include "layLayerProperties.h"
@@ -59,7 +59,7 @@ namespace edt
 // -----------------------------------------------------------------------------
 //  Main Service implementation
 
-MainService::MainService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root)
+MainService::MainService (db::Manager *manager, lay::LayoutViewBase *view, lay::Dispatcher *root)
   : lay::Plugin (view),
     lay::Editable (view),
     db::Object (manager),

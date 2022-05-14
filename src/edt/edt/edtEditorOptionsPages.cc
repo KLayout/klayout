@@ -33,7 +33,7 @@
 #include "edtPropertiesPageUtils.h"
 #include "tlExceptions.h"
 #include "layPlugin.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "layCellSelectionForm.h"
 #include "layQtTools.h"
 #include "ui_EditorOptionsGeneric.h"

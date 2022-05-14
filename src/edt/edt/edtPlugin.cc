@@ -27,7 +27,7 @@
 #endif
 
 #include "layDispatcher.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "edtPlugin.h"
 #include "edtConfig.h"
 #include "edtService.h"
@@ -56,7 +56,7 @@ edt::RecentConfigurationPage::ConfigurationDescriptor shape_cfg_descriptors[] =
 
 #if defined(HAVE_QT)
 static
-void get_shape_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+void get_shape_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
 {
   ret.push_back (new RecentConfigurationPage (view, dispatcher, "edit-recent-shape-param",
                         &shape_cfg_descriptors[0], &shape_cfg_descriptors[sizeof (shape_cfg_descriptors) / sizeof (shape_cfg_descriptors[0])]));
@@ -76,7 +76,7 @@ void get_text_options (std::vector < std::pair<std::string, std::string> > &opti
 
 #if defined(HAVE_QT)
 static
-void get_text_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+void get_text_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
 {
   static edt::RecentConfigurationPage::ConfigurationDescriptor text_cfg_descriptors[] =
   {
@@ -106,7 +106,7 @@ void get_path_options (std::vector < std::pair<std::string, std::string> > &opti
 
 #if defined(HAVE_QT)
 static
-void get_path_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+void get_path_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
 {
   static edt::RecentConfigurationPage::ConfigurationDescriptor path_cfg_descriptors[] =
   {
@@ -146,7 +146,7 @@ void get_inst_options (std::vector < std::pair<std::string, std::string> > &opti
 
 #if defined(HAVE_QT)
 static
-void get_inst_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutView *view, lay::Dispatcher *dispatcher)
+void get_inst_editor_options_pages (std::vector<lay::EditorOptionsPage *> &ret, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
 {
   static edt::RecentConfigurationPage::ConfigurationDescriptor inst_cfg_descriptors[] =
   {
@@ -182,7 +182,7 @@ public:
 #if defined(HAVE_QT)
   PluginDeclaration (const std::string &title, const std::string &mouse_mode, 
                      void (*option_get_f) (std::vector < std::pair<std::string, std::string> > &) = 0,
-                     void (*pages_f) (std::vector <lay::EditorOptionsPage *> &, lay::LayoutView *, lay::Dispatcher *) = 0)
+                     void (*pages_f) (std::vector <lay::EditorOptionsPage *> &, lay::LayoutViewBase *, lay::Dispatcher *) = 0)
     : m_title (title), m_mouse_mode (mouse_mode), mp_option_get_f (option_get_f), mp_pages_f (pages_f)
   {
     //  .. nothing yet ..
@@ -254,7 +254,7 @@ private:
 
   void (*mp_option_get_f) (std::vector < std::pair<std::string, std::string> > &options);
 #if defined(HAVE_QT)
-  void (*mp_pages_f) (std::vector <lay::EditorOptionsPage *> &, lay::LayoutView *, lay::Dispatcher *);
+  void (*mp_pages_f) (std::vector <lay::EditorOptionsPage *> &, lay::LayoutViewBase *, lay::Dispatcher *);
 #else
   void (*mp_pages_f) ();
 #endif
@@ -469,7 +469,7 @@ private:
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl_main (new edt::MainPluginDeclaration (tl::to_string (tr ("Instances and shapes"))), 4000, "edt::MainService");
 
 void
-commit_recent (lay::LayoutView *view)
+commit_recent (lay::LayoutViewBase *view)
 {
 #if defined(HAVE_QT)
   lay::EditorOptionsPages *eo_pages = view->editor_options_pages ();

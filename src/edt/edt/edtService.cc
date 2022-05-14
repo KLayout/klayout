@@ -31,7 +31,7 @@
 #  include "edtDialogs.h"
 #endif
 #include "layFinder.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "laySnap.h"
 #include "tlProgress.h"
 #include "tlTimer.h"
@@ -62,7 +62,7 @@ ac_from_buttons (unsigned int buttons)
 
 // -------------------------------------------------------------
 
-Service::Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator::flags_type flags)
+Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type flags)
   : lay::EditorServiceBase (view),
     db::Object (manager),
     mp_view (view),
@@ -82,7 +82,7 @@ Service::Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator
   //  .. nothing yet ..
 }
 
-Service::Service (db::Manager *manager, lay::LayoutView *view)
+Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
   : lay::EditorServiceBase (view),
     db::Object (manager),
     mp_view (view),

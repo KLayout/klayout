@@ -28,7 +28,7 @@
 #include "edtPropertiesPageUtils.h"
 #include "layDialogs.h"
 #include "layObjectInstPath.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "layQtTools.h"
 #include "tlExceptions.h"
 #include "tlString.h"

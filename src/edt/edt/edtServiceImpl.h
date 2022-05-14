@@ -32,6 +32,7 @@
 namespace lay
 {
   class CellView;
+  class LayoutViewBase;
   class LayerPropertiesConstIterator;
 }
 
@@ -45,7 +46,7 @@ class ShapeEditService
   : public edt::Service
 {
 public:
-  ShapeEditService (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator::flags_type shape_types);
+  ShapeEditService (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type shape_types);
   
 protected:
   void get_edit_layer ();
@@ -86,7 +87,7 @@ class PolygonService
   : public ShapeEditService
 {
 public:
-  PolygonService (db::Manager *manager, lay::LayoutView *view);
+  PolygonService (db::Manager *manager, lay::LayoutViewBase *view);
   
 #if defined(HAVE_QT)
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
@@ -119,7 +120,7 @@ class BoxService
   : public ShapeEditService
 {
 public:
-  BoxService (db::Manager *manager, lay::LayoutView *view);
+  BoxService (db::Manager *manager, lay::LayoutViewBase *view);
   
 #if defined(HAVE_QT)
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
@@ -146,7 +147,7 @@ class TextService
   : public ShapeEditService
 {
 public:
-  TextService (db::Manager *manager, lay::LayoutView *view);
+  TextService (db::Manager *manager, lay::LayoutViewBase *view);
   ~TextService ();
   
 #if defined(HAVE_QT)
@@ -180,7 +181,7 @@ class PathService
   : public ShapeEditService
 {
 public:
-  PathService (db::Manager *manager, lay::LayoutView *view);
+  PathService (db::Manager *manager, lay::LayoutViewBase *view);
   ~PathService ();
   
 #if defined(HAVE_QT)
@@ -219,7 +220,7 @@ class InstService
   : public edt::Service
 {
 public:
-  InstService (db::Manager *manager, lay::LayoutView *view);
+  InstService (db::Manager *manager, lay::LayoutViewBase *view);
   
 #if defined(HAVE_QT)
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);

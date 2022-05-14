@@ -32,7 +32,7 @@ namespace lay
 {
   class Dispatcher;
   class EditorOptionsPage;
-  class LayoutView;
+  class LayoutViewBase;
 }
 
 namespace edt
@@ -49,7 +49,7 @@ namespace edt
   /**
    *  @brief Commits the current configuration for the recently used configuration list
    */
-  void commit_recent (lay::LayoutView *view);
+  void commit_recent (lay::LayoutViewBase *view);
 }
 
 #endif

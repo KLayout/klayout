@@ -35,7 +35,7 @@
 
 namespace lay
 {
-  class LayoutView;
+  class LayoutViewBase;
 }
 
 namespace edt
@@ -80,7 +80,7 @@ public:
    *  @param pcell_decl The PCell declaration
    *  @param parameters The parameter values to show (if empty, the default values are used)
    */
-  void setup (lay::LayoutView *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters);
+  void setup (lay::LayoutViewBase *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters);
 
   /**
    *  @brief Gets the pages current state
@@ -141,7 +141,7 @@ private:
   QFrame *mp_error_frame, *mp_update_frame;
   tl::weak_ptr<db::PCellDeclaration> mp_pcell_decl;
   std::vector<QWidget *> m_widgets;
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   int m_cv_index;
   db::pcell_parameters_type m_parameters;
   bool m_dense;

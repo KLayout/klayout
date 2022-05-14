@@ -22,7 +22,7 @@
 
 
 #include "dbVector.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "laySnap.h"
 #include "layFinder.h"
 #include "tlProgress.h"
@@ -1011,7 +1011,7 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
 // -----------------------------------------------------------------------------
 //  Main Service implementation
 
-PartialService::PartialService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root) :
+PartialService::PartialService (db::Manager *manager, lay::LayoutViewBase *view, lay::Dispatcher *root) :
 #if defined(HAVE_QT)
     QObject (),
 #endif

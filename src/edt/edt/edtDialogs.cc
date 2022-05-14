@@ -28,7 +28,7 @@
 #include "edtDialogs.h"
 #include "layObjectInstPath.h"
 #include "layCellView.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "layMarker.h"
 #include "tlException.h"
 #include "tlExceptions.h"
@@ -105,7 +105,7 @@ InstantiationForm::double_clicked (QListWidgetItem *item)
 }
 
 void 
-InstantiationForm::show (lay::LayoutView *view, const lay::ObjectInstPath &path)
+InstantiationForm::show (lay::LayoutViewBase *view, const lay::ObjectInstPath &path)
 {
   mp_view = view;
   mp_path = &path;
@@ -233,7 +233,7 @@ ChangeLayerOptionsDialog::~ChangeLayerOptionsDialog ()
 }
 
 bool 
-ChangeLayerOptionsDialog::exec_dialog (lay::LayoutView *view, int cv_index, unsigned int &new_layer)
+ChangeLayerOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int cv_index, unsigned int &new_layer)
 {
   std::vector <std::pair <db::LayerProperties, unsigned int> > ll;
 

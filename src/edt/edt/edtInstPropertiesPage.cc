@@ -32,7 +32,7 @@
 #include "edtDialogs.h"
 #include "layDialogs.h"
 #include "layObjectInstPath.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "layCellSelectionForm.h"
 #include "layQtTools.h"
 #include "tlExceptions.h"

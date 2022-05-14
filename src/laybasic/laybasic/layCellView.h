@@ -36,10 +36,10 @@
 #include "dbSaveLayoutOptions.h"
 #include "dbLoadLayoutOptions.h"
 #include "dbInstElement.h"
+#include "dbTechnology.h"
 #include "gsi.h"
 
 #if defined(HAVE_QT)
-#  include "layTechnology.h"
 #  include "tlFileSystemWatcher.h"
 #endif
 

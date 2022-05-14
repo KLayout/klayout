@@ -48,7 +48,7 @@ namespace lay
 
 class Plugin;
 class Dispatcher;
-class LayoutView;
+class LayoutViewBase;
 class ViewService;
 class Editable;
 class Drawing;
@@ -302,7 +302,7 @@ public:
    *  This method may return 0 for "dummy" plugins that just register menu entries
    *  or configuration options.
    */
-  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher * /*dispatcher*/, lay::LayoutView * /*view*/) const
+  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher * /*dispatcher*/, lay::LayoutViewBase * /*view*/) const
   {
     return 0;
   }
@@ -329,7 +329,7 @@ public:
    *
    *  The new pages are returned in the "pages" vector. The layout view will take ownership of these pages.
    */
-  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> & /*pages*/, lay::LayoutView * /*view*/, lay::Dispatcher * /*dispatcher*/) const
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> & /*pages*/, lay::LayoutViewBase * /*view*/, lay::Dispatcher * /*dispatcher*/) const
   {
     //  .. no pages in the default implementation ..
   }

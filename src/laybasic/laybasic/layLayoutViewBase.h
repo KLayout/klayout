@@ -35,6 +35,7 @@
 
 #include "layLayerProperties.h"
 #include "layAnnotationShapes.h"
+#include "layBookmarkList.h"
 #include "layDispatcher.h"
 #include "layLayoutCanvas.h"
 #include "layColorPalette.h"
@@ -74,8 +75,11 @@ class MouseTracker;
 class ZoomService;
 class SelectionService;
 class MoveService;
-class ColorButton;
-class ConfigureAction;
+
+#if defined(HAVE_QT)
+class LayerControlPanel;
+class HierarchyControlPanel;
+#endif
 
 /**
  *  @brief Stores a layer reference to create layers which have been added by some action
@@ -156,7 +160,6 @@ class LAYBASIC_PUBLIC LayoutViewBase :
 public:
   typedef lay::CellView::unspecific_cell_path_type cell_path_type;
   typedef lay::CellView::cell_index_type cell_index_type;
-  typedef std::pair<std::string, DisplayState> bookmark_type;
 
   /**
    *  @brief Define some options for the view
@@ -179,6 +182,11 @@ public:
   };
 
   enum drop_small_cells_cond_type { DSC_Max = 0, DSC_Min = 1, DSC_Sum = 2 };
+
+  /**
+   *  @brief Stand-alone Constructor
+   */
+  LayoutViewBase (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
 
   /**
    *  @brief Constructor
@@ -797,6 +805,24 @@ public:
    *  in the .lyp file will be overridden.
    */
   void load_layer_props (const std::string &fn, int cv_index, bool add_default);
+
+  /**
+   *  @brief Bookmark the current view under the given name
+   */
+  void bookmark_view (const std::string &name);
+
+  /**
+   *  @brief Obtain the bookmarks list
+   */
+  const BookmarkList &bookmarks () const
+  {
+    return m_bookmarks;
+  }
+
+  /**
+   *  @brief Set the bookmarks list
+   */
+  void bookmarks (const BookmarkList &b);
 
   /**
    *  @brief Save the screen content to a file
@@ -1629,6 +1655,24 @@ public:
     return mp_canvas;
   }
 
+#if defined(HAVE_QT)
+  /**
+   *  @brief Gets the layer control panel
+   */
+  virtual lay::LayerControlPanel *control_panel ()
+  {
+    return 0;
+  }
+
+  /**
+   *  @brief Gets the hierarchy panel
+   */
+  virtual lay::HierarchyControlPanel *hierarchy_panel ()
+  {
+    return 0;
+  }
+#endif
+
   /**
    *  @brief Get the current viewport 
    */
@@ -1838,6 +1882,15 @@ public:
    *  @brief Gets called when a file or URL is dropped on the view
    */
   virtual void drop_url (const std::string &path_or_url);
+
+  /**
+   *  @brief Returns true if the layer control panels model got updated
+   *  Internally used by CellTreeModel to synchronize
+   */
+  virtual bool layer_model_updated ()
+  {
+    return false;
+  }
 
   /**
    *  @brief Gets a list of all plugins
@@ -2309,6 +2362,11 @@ public:
   }
 
   /**
+   *  @brief Open the RDB browser for a given database and associated cv index
+   */
+  virtual void open_rdb_browser (int /*rdb_index*/, int /*cv_index*/) { }
+
+  /**
    *  @brief An event signalling a change in the marker database list
    *  
    *  If marker databases are added or removed, this event is triggered.
@@ -2368,6 +2426,11 @@ public:
   {
     return (unsigned int) m_l2ndbs.size ();
   }
+
+  /**
+   *  @brief Open the L2NDB browser for a given database and associated cv index
+   */
+  virtual void open_l2ndb_browser (int /*l2ndb_index*/, int /*cv_index*/) { }
 
   /**
    *  @brief An event signalling a change in the netlist database list
@@ -2691,6 +2754,8 @@ private:
   std::vector <DisplayState> m_display_states;
   unsigned int m_display_state_ptr;
 
+  BookmarkList m_bookmarks;
+
   std::vector<lay::LayerPropertiesList *> m_layer_properties_lists;
   unsigned int m_current_layer_list;
 
@@ -2791,6 +2856,8 @@ protected:
   virtual void do_change_active_cellview ();
   virtual void update_content_for_cv (int cv_index);
   virtual bool set_hier_levels_basic (std::pair<int, int> l);
+
+  virtual void bookmarks_changed () { }
 
   void ensure_layer_selected ();
 

@@ -24,7 +24,7 @@
 
 #include "laySelector.h"
 #include "layRubberBox.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "tlLog.h"
 #include "tlException.h"
 

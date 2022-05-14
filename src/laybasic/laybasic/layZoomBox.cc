@@ -23,7 +23,7 @@
 
 #include "layZoomBox.h"
 #include "layRubberBox.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 
 namespace lay
 {

@@ -14,6 +14,7 @@ SUBDIRS = \
   buddies \
   lym \
   laybasic \
+  layview \
   ant \
   img \
   edt \
@@ -28,6 +29,7 @@ equals(HAVE_RUBY, "1") {
   SUBDIRS += \
     klayout_main \
     lay \
+    layui \
     fontgen \
 
 }
@@ -66,10 +68,11 @@ buddies.depends += plugins lym $$LANG_DEPENDS
 lym.depends += gsi $$LANG_DEPENDS
 
 laybasic.depends += rdb 
+layview.depends += laybasic
 
-ant.depends += laybasic
-img.depends += laybasic
-edt.depends += laybasic
+ant.depends += layview
+img.depends += layview
+edt.depends += layview
 
 plugins.depends += lib rdb db ant
 
@@ -98,9 +101,11 @@ equals(HAVE_RUBY, "1") {
 
   }
 
-  plugins.depends += lay
+  layui.depends += rdb 
+  layview.depends += layui
+  lay.depends += laybasic ant img edt layui
 
-  lay.depends += laybasic ant img edt
+  plugins.depends += lay
 
   klayout_main.depends += plugins $$MAIN_DEPENDS
 

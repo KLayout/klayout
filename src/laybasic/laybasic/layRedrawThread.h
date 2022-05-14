@@ -32,7 +32,7 @@
 #include "dbTrans.h"
 #include "dbLayout.h"
 #include "layRenderer.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "layRedrawThreadCanvas.h"
 #include "layRedrawLayerInfo.h"
 #include "layCanvasPlane.h"

@@ -24,7 +24,7 @@
 
 #include "layMove.h"
 #include "layEditable.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "laySelector.h"
 #include "laybasicConfig.h"
 

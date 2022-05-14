@@ -25,7 +25,6 @@
 #include "layStream.h"
 #include "layPlugin.h"
 #include "laybasicConfig.h"
-#include "layTechnology.h"
 #include "dbStream.h"
 #include "dbLoadLayoutOptions.h"
 #include "dbSaveLayoutOptions.h"

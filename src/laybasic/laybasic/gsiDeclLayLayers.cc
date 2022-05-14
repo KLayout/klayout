@@ -23,7 +23,7 @@
 
 #include "gsiDecl.h"
 #include "layLayerProperties.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 
 namespace gsi
 {
@@ -1226,11 +1226,6 @@ Class<lay::LayerPropertiesNode> decl_LayerPropertiesNode (
     "operation possible.\n"
     "\n"
     "@return A bbox in micron units\n"
-  ) +
-  method_ext ("view", &get_view,
-    "@brief Gets the view this node lives in\n"
-    "\n"
-    "This reference can be nil if the node is a orphan node that lives outside a view."
   ) +
   method ("list_index", &lay::LayerPropertiesNode::list_index,
     "@brief Gets the index of the layer properties list that the node lives in\n"

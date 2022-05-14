@@ -39,7 +39,6 @@
 #include "layViewOp.h"
 #include "layViewObject.h"
 #include "layConverters.h"
-#include "layGridNet.h"
 #include "layMove.h"
 #include "layZoomBox.h"
 #include "layMouseTracker.h"
@@ -235,6 +234,22 @@ struct OpDeleteLayerProps
 // -------------------------------------------------------------
 
 const double animation_interval = 0.5;
+
+LayoutViewBase::LayoutViewBase (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+  : lay::Dispatcher (plugin_parent, false /*not standalone*/),
+#if defined(HAVE_QT)
+    mp_widget (0),
+#endif
+    mp_ui (0),
+    m_editable (editable),
+    m_options (options),
+    m_annotation_shapes (manager)
+{
+  //  either it's us or the parent has a dispatcher
+  tl_assert (dispatcher () != 0);
+
+  init (manager);
+}
 
 #if defined(HAVE_QT)
 LayoutViewBase::LayoutViewBase (QWidget *widget, lay::LayoutView *ui, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
@@ -576,7 +591,7 @@ void LayoutViewBase::create_plugins (const lay::PluginDeclaration *except_this)
 
 lay::Plugin *LayoutViewBase::create_plugin (const lay::PluginDeclaration *cls)
 {
-  lay::Plugin *p = cls->create_plugin (manager (), dispatcher (), ui ());
+  lay::Plugin *p = cls->create_plugin (manager (), dispatcher (), this);
   if (p) {
 
     //  unhook the plugin from the script side if created there (prevent GC from destroying it)
@@ -1351,7 +1366,7 @@ LayoutViewBase::insert_layer_list (unsigned index, const LayerPropertiesList &pr
   clear_layer_selection ();
 
   m_layer_properties_lists.insert (m_layer_properties_lists.begin () + index, new LayerPropertiesList (props));
-  m_layer_properties_lists [index]->attach_view (ui (), index);
+  m_layer_properties_lists [index]->attach_view (this, index);
   merge_dither_pattern (*m_layer_properties_lists [index]);
 
   m_current_layer_list = index;
@@ -1560,7 +1575,7 @@ LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesList &p
       return;
     } else {
       m_layer_properties_lists.push_back (new LayerPropertiesList ());
-      m_layer_properties_lists.back ()->attach_view (ui (), (unsigned int) (m_layer_properties_lists.size () - 1));
+      m_layer_properties_lists.back ()->attach_view (this, (unsigned int) (m_layer_properties_lists.size () - 1));
     }
   }
 
@@ -1579,7 +1594,7 @@ LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesList &p
   }
 
   *m_layer_properties_lists [index] = props;
-  m_layer_properties_lists [index]->attach_view (ui (), index);
+  m_layer_properties_lists [index]->attach_view (this, index);
 
   merge_dither_pattern (*m_layer_properties_lists [index]);
 
@@ -1997,7 +2012,7 @@ LayoutViewBase::signal_layer_properties_changed ()
   //  recompute the source 
   //  TODO: this is a side effect of this method - provide a special method for this purpose
   for (unsigned int i = 0; i < layer_lists (); ++i) {
-    m_layer_properties_lists [i]->attach_view (ui (), i);
+    m_layer_properties_lists [i]->attach_view (this, i);
   }
 
   //  schedule a redraw request - since the layer views might not have changed, this is necessary
@@ -2013,7 +2028,7 @@ LayoutViewBase::signal_prop_ids_changed ()
   //  recompute the source 
   //  TODO: this is a side effect of this method - provide a special method for this purpose
   for (unsigned int i = 0; i < layer_lists (); ++i) {
-    m_layer_properties_lists [i]->attach_view (ui (), i);
+    m_layer_properties_lists [i]->attach_view (this, i);
   }
 }
 
@@ -2278,6 +2293,21 @@ LayoutViewBase::signal_apply_technology (lay::LayoutHandle *layout_handle)
   }
 }
 
+void
+LayoutViewBase::bookmarks (const BookmarkList &b)
+{
+  m_bookmarks = b;
+  bookmarks_changed ();
+}
+
+void
+LayoutViewBase::bookmark_view (const std::string &name)
+{
+  DisplayState state (box (), get_min_hier_levels (), get_max_hier_levels (), cellview_list ());
+  m_bookmarks.add (name, state);
+  bookmarks_changed ();
+}
+
 void 
 LayoutViewBase::load_layer_props (const std::string &fn)
 {
@@ -2320,7 +2350,7 @@ LayoutViewBase::do_load_layer_props (const std::string &fn, bool map_cv, int cv_
     if (map_cv) {
       cv_map.insert (std::make_pair (-1, cv_index));
     }
-    p->attach_view (ui (), p - props.begin ());
+    p->attach_view (this, p - props.begin ());
     p->expand (cv_map, add_default);
   }
 
@@ -3236,7 +3266,7 @@ LayoutViewBase::create_initial_layer_props (int cv_index, const std::string &lyp
 
   //  expand the wildcards and map to the target cv.
   for (std::vector<lay::LayerPropertiesList>::iterator p = props.begin (); p != props.end (); ++p) {
-    p->attach_view (ui (), p - props.begin ());
+    p->attach_view (this, p - props.begin ());
     p->expand (cv_map, add_missing || !loaded);
   }
 

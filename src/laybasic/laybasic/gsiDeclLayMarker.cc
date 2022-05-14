@@ -23,13 +23,13 @@
 
 #include "gsiDecl.h"
 #include "layMarker.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 
 namespace gsi
 {
 
 static 
-lay::DMarker *create_marker (lay::LayoutView *view)
+lay::DMarker *create_marker (lay::LayoutViewBase *view)
 {
   return new lay::DMarker (view);
 }

@@ -22,7 +22,7 @@
 
 
 #include "layCellView.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #if defined(HAVE_QT)
 #  include "layStream.h"
 #endif

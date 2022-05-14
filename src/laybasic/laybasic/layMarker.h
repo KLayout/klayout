@@ -44,7 +44,7 @@
 namespace lay
 {
 
-class LayoutView;
+class LayoutViewBase;
 
 /**
  *  @brief The marker base class
@@ -59,7 +59,7 @@ public:
   /** 
    *  @brief The constructor 
    */ 
-  MarkerBase (lay::LayoutView *view);
+  MarkerBase (lay::LayoutViewBase *view);
 
   /**
    *  @brief Get the color by which the marker is drawn
@@ -232,7 +232,7 @@ protected:
   bool m_text_enabled;
   lay::ViewOp::Shape m_vertex_shape;
   int m_line_style, m_dither_pattern, m_frame_pattern;
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
 };
 
 /**
@@ -252,7 +252,7 @@ public:
   /** 
    *  @brief The constructor 
    */ 
-  GenericMarkerBase (lay::LayoutView *view, unsigned int cv_index);
+  GenericMarkerBase (lay::LayoutViewBase *view, unsigned int cv_index);
 
   /**
    *  @brief The destructor
@@ -321,7 +321,7 @@ public:
   /**
    *  @brief Gets the view object
    */
-  lay::LayoutView *view () const
+  lay::LayoutViewBase *view () const
   {
     return mp_view;
   }
@@ -344,7 +344,7 @@ public:
 private:
   db::CplxTrans m_trans;
   std::vector<db::DCplxTrans> *mp_trans_vector;
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   unsigned int m_cv_index;
 
   /**
@@ -367,7 +367,7 @@ public:
   /** 
    *  @brief The constructor 
    */ 
-  ShapeMarker (lay::LayoutView *view, unsigned int cv_index);
+  ShapeMarker (lay::LayoutViewBase *view, unsigned int cv_index);
 
   /**
    *  @brief The destructor
@@ -418,7 +418,7 @@ public:
    *  @param draw_outline True to have instances drawing their outline
    *  @param max_shapes The maximum number of shapes to draw for instances (just a box is drawn if more shapes are present)
    */ 
-  InstanceMarker (lay::LayoutView *view, unsigned int cv_index, bool draw_outline = true, size_t max_shapes = 0);
+  InstanceMarker (lay::LayoutViewBase *view, unsigned int cv_index, bool draw_outline = true, size_t max_shapes = 0);
 
   /**
    *  @brief The destructor
@@ -508,7 +508,7 @@ public:
    *  @param draw_outline True to have instances drawing their outline
    *  @param max_shapes The maximum number of shapes to draw for instances (just a box is drawn if more shapes are present)
    */ 
-  Marker (lay::LayoutView *view, unsigned int cv_index, bool draw_outline = true, size_t max_shapes = 0);
+  Marker (lay::LayoutViewBase *view, unsigned int cv_index, bool draw_outline = true, size_t max_shapes = 0);
 
   /**
    *  @brief The destructor
@@ -743,7 +743,7 @@ public:
   /** 
    *  @brief The constructor 
    */ 
-  DMarker (lay::LayoutView *view);
+  DMarker (lay::LayoutViewBase *view);
 
   /**
    *  @brief The destructor
@@ -806,7 +806,7 @@ private:
     void *any;
   } m_object;
 
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
 };
 
 }

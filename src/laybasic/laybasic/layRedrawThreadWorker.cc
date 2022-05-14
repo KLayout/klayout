@@ -70,7 +70,7 @@ RedrawThreadWorker::RedrawThreadWorker (RedrawThread *redraw_thread)
   m_default_text_size = 0.0;
   m_drop_small_cells = false;
   m_drop_small_cells_value = 0;
-  m_drop_small_cells_cond = lay::LayoutView::DSC_Min;
+  m_drop_small_cells_cond = lay::LayoutViewBase::DSC_Min;
   m_draw_array_border_instances = false;
   m_abstract_mode_width = 0;
   m_child_context_enabled = false;
@@ -2097,9 +2097,9 @@ RedrawThreadWorker::drop_cell (const db::Cell &cell, const db::CplxTrans &trans)
   db::DBox bbox = trans * cell.bbox ();
 
   double value = 0;
-  if (m_drop_small_cells_cond == lay::LayoutView::DSC_Min) {
+  if (m_drop_small_cells_cond == lay::LayoutViewBase::DSC_Min) {
     value = std::min (bbox.width (), bbox.height ());
-  } else if (m_drop_small_cells_cond == lay::LayoutView::DSC_Max) {
+  } else if (m_drop_small_cells_cond == lay::LayoutViewBase::DSC_Max) {
     value = std::max (bbox.width (), bbox.height ());
   } else {
     value = bbox.width () + bbox.height ();

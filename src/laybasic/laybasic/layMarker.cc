@@ -29,7 +29,7 @@
 #include "layCanvasPlane.h"
 #include "layViewOp.h"
 #include "layRenderer.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "tlAssert.h"
 
 namespace lay
@@ -188,7 +188,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
 
 // ------------------------------------------------------------------------
 
-MarkerBase::MarkerBase (lay::LayoutView *view)
+MarkerBase::MarkerBase (lay::LayoutViewBase *view)
   : lay::ViewObject (view->view_object_widget ()),
     m_line_width (-1), m_vertex_size (-1), m_halo (-1), m_text_enabled (true), m_vertex_shape (lay::ViewOp::Rect), m_line_style (-1), m_dither_pattern (-1), m_frame_pattern (0), mp_view (view)
 { 
@@ -372,7 +372,7 @@ MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay:
 
 // ------------------------------------------------------------------------
 
-GenericMarkerBase::GenericMarkerBase (lay::LayoutView *view, unsigned int cv_index)
+GenericMarkerBase::GenericMarkerBase (lay::LayoutViewBase *view, unsigned int cv_index)
   : MarkerBase (view), mp_trans_vector (0), mp_view (view), m_cv_index (cv_index)
 { 
   // .. nothing yet ..
@@ -496,7 +496,7 @@ GenericMarkerBase::dbu () const
 
 // ------------------------------------------------------------------------
 
-InstanceMarker::InstanceMarker (LayoutView *view, unsigned int cv_index, bool draw_outline, size_t max_shapes)
+InstanceMarker::InstanceMarker (LayoutViewBase *view, unsigned int cv_index, bool draw_outline, size_t max_shapes)
   : GenericMarkerBase (view, cv_index), m_draw_outline (draw_outline), m_max_shapes (max_shapes), m_inst ()
 { 
   // .. nothing yet ..
@@ -576,7 +576,7 @@ InstanceMarker::item_bbox () const
 
 // ------------------------------------------------------------------------
 
-ShapeMarker::ShapeMarker (LayoutView *view, unsigned int cv_index)
+ShapeMarker::ShapeMarker (LayoutViewBase *view, unsigned int cv_index)
   : GenericMarkerBase (view, cv_index), m_shape ()
 { 
   // .. nothing yet ..
@@ -643,7 +643,7 @@ ShapeMarker::item_bbox () const
 
 // ------------------------------------------------------------------------
 
-Marker::Marker (lay::LayoutView *view, unsigned int cv_index, bool draw_outline, size_t max_shapes)
+Marker::Marker (lay::LayoutViewBase *view, unsigned int cv_index, bool draw_outline, size_t max_shapes)
   : GenericMarkerBase (view, cv_index), m_draw_outline (draw_outline), m_max_shapes (max_shapes) 
 { 
   m_type = None;
@@ -1135,7 +1135,7 @@ Marker::render (const Viewport &vp, ViewObjectCanvas &canvas)
 
 // ------------------------------------------------------------------------
 
-DMarker::DMarker (LayoutView *view)
+DMarker::DMarker (LayoutViewBase *view)
   : MarkerBase (view), mp_view (view)
 { 
   m_type = None;

@@ -86,7 +86,7 @@ Finder::closer (double d)
 }
 
 void 
-Finder::start (lay::LayoutView *view, const lay::CellView &cv, unsigned int cv_index, const std::vector<db::ICplxTrans> &trans, const db::Box &region, int min_level, int max_level, const std::vector<int> &layers)
+Finder::start (lay::LayoutViewBase *view, const lay::CellView &cv, unsigned int cv_index, const std::vector<db::ICplxTrans> &trans, const db::Box &region, int min_level, int max_level, const std::vector<int> &layers)
 {
   m_layers = layers;
   m_region = region; 
@@ -265,7 +265,7 @@ struct LPContextCompareOp
 };
 
 bool
-ShapeFinder::find (LayoutView *view, const db::DBox &region_mu)
+ShapeFinder::find (LayoutViewBase *view, const db::DBox &region_mu)
 {
   tl::AbsoluteProgress progress (tl::to_string (tr ("Selecting ...")));
   progress.set_unit (1000);
@@ -330,7 +330,7 @@ ShapeFinder::find (LayoutView *view, const db::DBox &region_mu)
 }
 
 bool 
-ShapeFinder::find (lay::LayoutView *view, const lay::LayerProperties &lprops, const db::DBox &region_mu)
+ShapeFinder::find (lay::LayoutViewBase *view, const lay::LayerProperties &lprops, const db::DBox &region_mu)
 {
   tl::AbsoluteProgress progress (tl::to_string (tr ("Selecting ...")));
   progress.set_unit (1000);
@@ -349,7 +349,7 @@ ShapeFinder::find (lay::LayoutView *view, const lay::LayerProperties &lprops, co
 }
 
 bool 
-ShapeFinder::find_internal (lay::LayoutView *view, unsigned int cv_index, const std::set<db::properties_id_type> *prop_sel, bool inv_prop_sel, const lay::HierarchyLevelSelection &hier_sel, const std::vector<db::DCplxTrans> &trans_mu, const std::vector<int> &layers, const db::DBox &region_mu)
+ShapeFinder::find_internal (lay::LayoutViewBase *view, unsigned int cv_index, const std::set<db::properties_id_type> *prop_sel, bool inv_prop_sel, const lay::HierarchyLevelSelection &hier_sel, const std::vector<db::DCplxTrans> &trans_mu, const std::vector<int> &layers, const db::DBox &region_mu)
 {
   m_cv_index = cv_index;
 
@@ -624,7 +624,7 @@ InstFinder::InstFinder (bool point_mode, bool top_level_sel, bool full_arrays, b
 }
 
 bool
-InstFinder::find (lay::LayoutView *view, const db::DBox &region_mu)
+InstFinder::find (lay::LayoutViewBase *view, const db::DBox &region_mu)
 {
   tl::AbsoluteProgress progress (tl::to_string (tr ("Selecting ...")));
   progress.set_unit (1000);
@@ -641,7 +641,7 @@ InstFinder::find (lay::LayoutView *view, const db::DBox &region_mu)
 }
 
 bool 
-InstFinder::find (LayoutView *view, unsigned int cv_index, const db::DCplxTrans &trans_mu, const db::DBox &region_mu)
+InstFinder::find (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTrans &trans_mu, const db::DBox &region_mu)
 {
   tl::AbsoluteProgress progress (tl::to_string (tr ("Selecting ...")));
   progress.set_unit (1000);
@@ -655,7 +655,7 @@ InstFinder::find (LayoutView *view, unsigned int cv_index, const db::DCplxTrans 
 }
 
 bool 
-InstFinder::find_internal (LayoutView *view, unsigned int cv_index, const db::DCplxTrans &trans_mu, const db::DBox &region_mu)
+InstFinder::find_internal (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTrans &trans_mu, const db::DBox &region_mu)
 {
   const lay::CellView &cv = view->cellview (cv_index);
   if (! cv.is_valid ()) {

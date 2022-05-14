@@ -23,7 +23,6 @@
 
 #include "layLayerProperties.h"
 #include "layLayoutViewBase.h"
-#include "layLayoutView.h"
 #include "layConverters.h"
 #include "tlXMLParser.h"
 #include "tlException.h"
@@ -405,7 +404,7 @@ class LayerSourceEval
   : public tl::Eval
 {
 public:
-  LayerSourceEval (const lay::LayerProperties &lp, const lay::LayoutView *view, bool real)
+  LayerSourceEval (const lay::LayerProperties &lp, const lay::LayoutViewBase *view, bool real)
     : m_lp (lp), mp_view (view), m_real (real)
   { 
     // .. nothing yet ..
@@ -416,14 +415,14 @@ public:
     return m_lp.source (m_real);
   }
 
-  const lay::LayoutView *view () const
+  const lay::LayoutViewBase *view () const
   {
     return mp_view;
   }
 
 private:
   const lay::LayerProperties &m_lp;
-  const lay::LayoutView *mp_view;
+  const lay::LayoutViewBase *mp_view;
   bool m_real;
 };
 
@@ -499,7 +498,7 @@ LayerProperties::display_string (const lay::LayoutViewBase *view, bool real, boo
           realize_source ();
         }
 
-        LayerSourceEval eval (*this, view->ui (), real);
+        LayerSourceEval eval (*this, view, real);
         eval.define_function ("N", new LayerSourceEvalFunction ('N', &eval)); // layer name
         eval.define_function ("L", new LayerSourceEvalFunction ('L', &eval)); // layer number
         eval.define_function ("D", new LayerSourceEvalFunction ('D', &eval)); // datatype
@@ -1373,7 +1372,7 @@ expand_wildcard_layers (const LayerPropertiesNode &lp, const LayerPropertiesList
 
         //  NOTE: initialization through LayerProperties creates a new ID
         lay::LayerPropertiesNode node ((const LayerProperties &) lp);
-        node.attach_view (view->ui (), list_index);
+        node.attach_view (view, list_index);
 
         //  Build a new ParsedLayerSource combining the transformation, hierarchy levels and 
         //  property selections from the wildcard one and the requested layer source

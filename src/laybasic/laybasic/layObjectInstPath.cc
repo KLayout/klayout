@@ -26,7 +26,6 @@
 
 #include "layObjectInstPath.h"
 #include "layCellView.h"
-#include "layLayoutView.h"
 #include "tlException.h"
 
 namespace lay {

@@ -25,7 +25,7 @@
 #define HDR_layRedrawThreadWorker
 
 #include "dbLayout.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "tlThreadedWorkers.h"
 #include "tlTimer.h"
 
@@ -221,7 +221,7 @@ private:
   double m_default_text_size;
   bool m_drop_small_cells;
   unsigned int m_drop_small_cells_value;
-  lay::LayoutView::drop_small_cells_cond_type m_drop_small_cells_cond;
+  lay::LayoutViewBase::drop_small_cells_cond_type m_drop_small_cells_cond;
   bool m_draw_array_border_instances;
   double m_abstract_mode_width;
   bool m_child_context_enabled;
@@ -231,7 +231,7 @@ private:
   std::set <std::pair <db::CplxTrans, db::cell_index_type>, lay::CellVariantCacheCompare> *mp_cell_var_cache;
   unsigned int m_cache_hits, m_cache_misses;
   std::set <std::pair <db::DCplxTrans, int> > m_box_variants;
-  std::vector <std::set <lay::LayoutView::cell_index_type> > m_hidden_cells;
+  std::vector <std::set <lay::LayoutViewBase::cell_index_type> > m_hidden_cells;
   std::vector <lay::CellView> m_cellviews;
   const db::Layout *mp_layout;
   int m_cv_index;

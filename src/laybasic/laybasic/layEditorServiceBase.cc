@@ -22,7 +22,7 @@
 
 #include "layEditorServiceBase.h"
 #include "layViewport.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "laybasicConfig.h"
 #include "layConverters.h"
 
@@ -206,7 +206,7 @@ private:
 
 // --------------------------------------------------------------------------------------
 
-EditorServiceBase::EditorServiceBase (LayoutView *view)
+EditorServiceBase::EditorServiceBase (LayoutViewBase *view)
   : lay::ViewService (view->view_object_widget ()),
     lay::Editable (view),
     lay::Plugin (view),

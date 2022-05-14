@@ -33,7 +33,6 @@ namespace lay
 {
 
 class Dispatcher;
-class EditorOptionsPage;
 
 /**
  *  @brief The base class for configuration pages

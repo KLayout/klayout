@@ -14,18 +14,9 @@ SOURCES = \
   layLayerProperties.cc \
   layParsedLayerSource.cc \
   layPixelBufferTests.cc \
-  layLayoutViewTests.cc \
   layRenderer.cc \
   layAbstractMenuTests.cc \
   laySnapTests.cc
-
-!equals(HAVE_QT, "0") {
-
-  SOURCES += \
-    layNetlistBrowserModelTests.cc \
-    layNetlistBrowserTreeModelTests.cc \
-
-}
 
 INCLUDEPATH += $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC $$OUT_PWD/../laybasic
 DEPENDPATH += $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC $$OUT_PWD/../laybasic

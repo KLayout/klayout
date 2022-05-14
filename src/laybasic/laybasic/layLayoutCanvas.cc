@@ -32,7 +32,7 @@
 #include "tlAssert.h"
 #include "layLayoutCanvas.h"
 #include "layRedrawThread.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "layMarker.h"
 #if defined(HAVE_QT)
 #  include "gtf.h"

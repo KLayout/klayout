@@ -23,7 +23,7 @@
 
 #include "layMouseTracker.h"
 #include "layLayoutCanvas.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 
 namespace lay
 {

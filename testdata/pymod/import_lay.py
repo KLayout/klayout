@@ -21,17 +21,37 @@ import klayout.lay as lay
 import unittest
 import sys
 
+def can_create_layoutview():
+  if not "MainWindow" in lay.__dict__:
+    return True  # Qt-less
+  elif not "Application" in lay.__dict__:
+    return False  # cannot instantiate Application
+  elif lay.__dict__["Application"].instance() is None:
+    return False  # Application is not present
+  else:
+    return True
+
 # Tests the basic abilities of the module
 
 class BasicTest(unittest.TestCase):
 
   def test_1(self):
 
+    if not can_create_layoutview():
+      print("Skipped test as LayoutView cannot be instantiated")
+      return
+
     lv = lay.LayoutView()
     lv.resize(800, 600)
     lv.zoom_box(db.DBox(-42, -17, 142, 117))
     bx = lv.box()
     self.assertEqual(str(bx), "(-42.09,-19.09;141.91,118.91)")
+
+  def test_2(self):
+
+    p = lay.LayerPropertiesNode()
+    p.name = "u"
+    self.assertEqual(p.name, "u")
 
 # run unit tests
 if __name__ == '__main__':

@@ -87,12 +87,7 @@ PYMODTEST (bridge, "bridge.py")
 PYMODTEST (import_tl, "import_tl.py")
 PYMODTEST (import_db, "import_db.py")
 PYMODTEST (import_rdb, "import_rdb.py")
-
-#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
 PYMODTEST (import_lay, "import_lay.py")
-#else
-PYMODTEST (import_lay, "import_lay_noqt.py")
-#endif
 
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
 

@@ -179,7 +179,7 @@ class DBNetlistCrossReferenceTests(unittest.TestCase):
 
 # run unit tests
 if __name__ == '__main__':
-  suite = unittest.TestLoader().loadTestsFromTestCase(DBLayoutToNetlistTests)
+  suite = unittest.TestLoader().loadTestsFromTestCase(DBNetlistCrossReferenceTests)
 
   if not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
     sys.exit(1)

@@ -21,6 +21,16 @@ import unittest
 import os
 import sys
 
+def can_create_layoutview():
+  if not "MainWindow" in pya.__dict__:
+    return True  # Qt-less
+  elif not "Application" in pya.__dict__:
+    return False  # cannot instantiate Application
+  elif pya.__dict__["Application"].instance() is None:
+    return False  # Application is not present
+  else:
+    return True
+
 def astr(a):
   astr = []
   for i in a:
@@ -56,6 +66,10 @@ class LAYLayersTests(unittest.TestCase):
     return "\n".join(res)
 
   def test_1(self):
+
+    if not can_create_layoutview():
+      print("Skipped test as LayoutView cannot be created.")
+      return
 
     cv = pya.LayoutView()
     cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", True) 
@@ -201,6 +215,10 @@ class LAYLayersTests(unittest.TestCase):
     cv._destroy()
 
   def test_1a(self):
+
+    if not can_create_layoutview():
+      print("Skipped test as LayoutView cannot be created.")
+      return
 
     mgr = pya.Manager()
 
@@ -647,6 +665,10 @@ class LAYLayersTests(unittest.TestCase):
   # direct replacement of objects and attributes
   def test_3(self):
 
+    if not can_create_layoutview():
+      print("Skipped test as LayoutView cannot be created.")
+      return
+
     cv = pya.LayoutView()
     cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", pya.LoadLayoutOptions(), "", True) 
     cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t10.gds", pya.LoadLayoutOptions(), "", True) 
@@ -765,6 +787,10 @@ class LAYLayersTests(unittest.TestCase):
   # propagation of "real" attributes through the hierarchy
   def test_4(self):
 
+    if not can_create_layoutview():
+      print("Skipped test as LayoutView cannot be created.")
+      return
+
     cv = pya.LayoutView()
     cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", True) 
     cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t10.gds", True) 
@@ -794,6 +820,10 @@ class LAYLayersTests(unittest.TestCase):
 
   # delete method of iterator
   def test_5(self):
+
+    if not can_create_layoutview():
+      print("Skipped test as LayoutView cannot be created.")
+      return
 
     cv = pya.LayoutView()
     cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", True) 
@@ -883,6 +913,10 @@ class LAYLayersTests(unittest.TestCase):
   # custom stipples and line styles
   def test_6(self):
 
+    if not can_create_layoutview():
+      print("Skipped test as LayoutView cannot be created.")
+      return
+
     cv = pya.LayoutView()
     cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", True) 
 
@@ -926,7 +960,7 @@ if __name__ == '__main__':
   suite = unittest.TestSuite()
   # NOTE: Use this instead of loadTestsfromTestCase to select a specific test:
   #   suite.addTest(BasicTest("test_26"))
-  suite = unittest.TestLoader().loadTestsFromTestCase(LAYLayersTest)
+  suite = unittest.TestLoader().loadTestsFromTestCase(LAYLayersTests)
 
   # Only runs with Application available
   if "Application" in pya.__all__ and not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():

@@ -23,7 +23,11 @@
 #include "../pymodHelper.h"
 
 //  to force linking of the layview module
+#if defined(HAVE_QT)
+#  include "../../lay/lay/layForceLink.h"
+#else
 #  include "../../layview/layview/layviewForceLink.h"
+#endif
 
 //  Force-include other dependencies
 //  NOTE: these libraries contribute to the "lay" module space. Hence we have to include them.
@@ -33,4 +37,3 @@
 #include "../../lym/lym/lymForceLink.h"
 
 DEFINE_PYMOD(laycore, "lay", "KLayout core module 'lay'")
-

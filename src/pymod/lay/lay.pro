@@ -9,12 +9,13 @@ SOURCES = \
 
 HEADERS += \
 
-equals(HAVE_QT, "0") {
-  LIBS += -lklayout_laybasic
-} else {
+LIBS += -lklayout_layview
+
+!equals(HAVE_QT, "0") {
+  LIBS += -lklayout_layui
   LIBS += -lklayout_lay
 }
 
 # hard linked as they contribute GSI classes to "lay" module:
-LIBS += -lklayout_img -lklayout_edt -lklayout_ant -lklayout_lym
+LIBS += -lklayout_laybasic -lklayout_img -lklayout_edt -lklayout_ant -lklayout_lym
 

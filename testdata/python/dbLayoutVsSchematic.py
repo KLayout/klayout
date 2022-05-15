@@ -23,7 +23,7 @@ import unittest
 import sys
 import os
 
-class DBLayoutToNetlistTests(unittest.TestCase):
+class DBLayoutVsSchematicTests(unittest.TestCase):
 
   def test_1_Basic(self):
 

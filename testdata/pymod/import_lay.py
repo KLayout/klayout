@@ -16,10 +16,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import testprep
-import klayout.QtCore
-import klayout.QtGui
-if not "QApplication" in klayout.QtGui.__all__:
-  import klayout.QtWidgets  # Qt5
+import klayout.db as db
 import klayout.lay as lay
 import unittest
 import sys
@@ -29,15 +26,12 @@ import sys
 class BasicTest(unittest.TestCase):
 
   def test_1(self):
-    self.assertEqual("Annotation" in lay.__all__, True)
 
-  def test_2(self):
-    # Some smoke test
-    ant = lay.Annotation()
-    ant.style = lay.Annotation.StyleRuler
-    self.assertEqual(str(ant.style), str(lay.Annotation.StyleRuler))
-    ant.fmt_x = "abc"
-    self.assertEqual(ant.fmt_x, "abc")
+    lv = lay.LayoutView()
+    lv.resize(800, 600)
+    lv.zoom_box(db.DBox(-42, -17, 142, 117))
+    bx = lv.box()
+    self.assertEqual(str(bx), "(-42.09,-19.09;141.91,118.91)")
 
 # run unit tests
 if __name__ == '__main__':

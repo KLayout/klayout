@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layLayoutViewQt
 #define HDR_layLayoutViewQt
@@ -736,5 +737,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif

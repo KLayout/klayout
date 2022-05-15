@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "gsiDecl.h"
 #include "gsiSignals.h"
@@ -221,3 +222,5 @@ static ClassExt<lay::LayerPropertiesNode> extdecl_LayerPropertiesNode (
 );
 
 }
+
+#endif

@@ -23,7 +23,6 @@ FORMS = \
   DuplicateLayerDialog.ui \
   EditStipplesForm.ui \
   FlattenInstOptionsDialog.ui \
-  GridNetConfigPage.ui \
   LayerMappingWidget.ui \
   LayerSourceDialog.ui \
   LayoutProperties.ui \
@@ -105,8 +104,6 @@ SOURCES = \
     layEditorOptionsPage.cc \
     layEditorOptionsPages.cc \
     layFileDialog.cc \
-    layGridNetConfigPage.cc \
-    layGridNet.cc \
     layGenericSyntaxHighlighter.cc \
     layHierarchyControlPanel.cc \
     layIndexedNetlistModel.cc \
@@ -165,8 +162,6 @@ HEADERS = \
     layEditorOptionsPages.h \
     layFileDialog.h \
     layGenericSyntaxHighlighter.h \
-    layGridNetConfigPage.h \
-    layGridNet.h \
     layHierarchyControlPanel.h \
     layIndexedNetlistModel.h \
     layItemDelegates.h \
@@ -196,7 +191,6 @@ HEADERS = \
     layTechnology.h \
     layTipDialog.h \
     layWidgets.h \
-    laybasicConfig.h \
     rdbInfoWidget.h \
     rdbMarkerBrowser.h \
     rdbMarkerBrowserDialog.h \

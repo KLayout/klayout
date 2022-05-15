@@ -20,6 +20,8 @@
 
 */
 
+#if defined(HAVE_QT)
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -1083,3 +1085,6 @@ LayoutView::sizeHint () const
 }
 
 } // namespace lay
+
+#endif
+

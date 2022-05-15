@@ -20,6 +20,7 @@
 
 */
 
+#if !defined(HAVE_QT)
 
 #ifndef HDR_layLayoutViewNoQt
 #define HDR_layLayoutViewNoQt
@@ -76,5 +77,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif

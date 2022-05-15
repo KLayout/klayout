@@ -20,7 +20,10 @@
 
 */
 
+#if !defined(HAVE_QT)
+
 #include "gsiDecl.h"
+#include "gsiSignals.h"
 #include "layLayoutView.h"
 
 namespace gsi
@@ -46,6 +49,32 @@ Class<lay::LayoutView> decl_LayoutView (decl_LayoutViewBase, "lay", "LayoutView"
     "\n"
     "This constructor has been introduced in version 0.25.\n"
     "It has been enhanced with the arguments in version 0.27.\n"
+  ) +
+  gsi::event ("on_image_updated_event", static_cast<tl::Event (lay::LayoutView::*)> (&lay::LayoutView::image_updated_event),
+    "@brief An event indicating that the image (\"screenshot\") was updated\n"
+    "\n"
+    "This event is triggered when calling \\timer."
+    "\n"
+    "This event has been introduced in version 0.28."
+  ) +
+  gsi::event ("on_drawing_finished_event", static_cast<tl::Event (lay::LayoutView::*)> (&lay::LayoutView::drawing_finished_event),
+    "@brief An event indicating that the image is fully drawn\n"
+    "\n"
+    "This event is triggered when calling \\timer. "
+    "Before this event is issue, a final \\on_image_updated_event may be issued.\n"
+    "\n"
+    "This event has been introduced in version 0.28."
+  ) +
+  gsi::method ("timer", static_cast<void (lay::LayoutView::*) ()> (&lay::LayoutView::timer),
+    "@brief A callback required to be called regularily in the non-Qt case.\n"
+    "\n"
+    "This callback eventually implements the event loop in the non-Qt case. The main task "
+    "is to indicate new versions of the layout image while it is drawn. "
+    "When a new image has arrived, this method will issue an \\on_image_updated_event. "
+    "In the implementation of the latter, \"screenshot\" may be called to retrieve the current image.\n"
+    "When drawing has finished, the \\on_drawing_finished_event will be triggered.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
   ),
   "@brief The view object presenting one or more layout objects\n"
   "\n"
@@ -81,4 +110,6 @@ static ClassExt<lay::LayerPropertiesNode> extdecl_LayerPropertiesNode (
 );
 
 }
+
+#endif
 

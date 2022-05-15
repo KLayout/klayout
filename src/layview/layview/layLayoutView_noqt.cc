@@ -20,6 +20,8 @@
 
 */
 
+#if !defined(HAVE_QT)
+
 #include "layLayoutView.h"
 
 namespace lay
@@ -58,3 +60,5 @@ LayoutView::timer ()
 }
 
 } // namespace lay
+
+#endif

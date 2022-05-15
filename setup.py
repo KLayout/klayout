@@ -524,21 +524,38 @@ _rdb = Library(config.root + '._rdb',
 config.add_extension(_rdb)
 
 # ------------------------------------------------------------------
-# _lay dependency library
+# _laybasic dependency library
 
-_lay_path = os.path.join("src", "laybasic", "laybasic")
-_lay_sources = set(glob.glob(os.path.join(_lay_path, "*.cc")))
+_laybasic_path = os.path.join("src", "laybasic", "laybasic")
+_laybasic_sources = set(glob.glob(os.path.join(_laybasic_path, "*.cc")))
 
-_lay = Library(config.root + '._lay',
+_laybasic = Library(config.root + '._laybasic',
                define_macros=config.macros() + [('MAKE_LAYBASIC_LIBRARY', 1)],
                include_dirs=[_rdb_path, _db_path, _tl_path, _gsi_path],
                extra_objects=[config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
                language='c++',
-               libraries=config.libraries('_lay'),
-               extra_link_args=config.link_args('_lay'),
-               extra_compile_args=config.compile_args('_lay'),
-               sources=list(_lay_sources))
-config.add_extension(_lay)
+               libraries=config.libraries('_laybasic'),
+               extra_link_args=config.link_args('_laybasic'),
+               extra_compile_args=config.compile_args('_laybasic'),
+               sources=list(_laybasic_sources))
+config.add_extension(_laybasic)
+
+# ------------------------------------------------------------------
+# _layview dependency library
+
+_layview_path = os.path.join("src", "layview", "layview")
+_layview_sources = set(glob.glob(os.path.join(_layview_path, "*.cc")))
+
+_layview = Library(config.root + '._layview',
+               define_macros=config.macros() + [('MAKE_LAYVIEW_LIBRARY', 1)],
+               include_dirs=[_laybasic_path, _rdb_path, _db_path, _tl_path, _gsi_path],
+               extra_objects=[config.path_of('_laybasic', _laybasic_path), config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
+               language='c++',
+               libraries=config.libraries('_layview'),
+               extra_link_args=config.link_args('_layview'),
+               extra_compile_args=config.compile_args('_layview'),
+               sources=list(_layview_sources))
+config.add_extension(_layview)
 
 # ------------------------------------------------------------------
 # _lym dependency library
@@ -565,8 +582,8 @@ _ant_sources = set(glob.glob(os.path.join(_ant_path, "*.cc")))
 
 _ant = Library(config.root + '._ant',
                define_macros=config.macros() + [('MAKE_ANT_LIBRARY', 1)],
-               include_dirs=[_lay_path, _rdb_path, _db_path, _tl_path, _gsi_path],
-               extra_objects=[config.path_of('_lay', _lay_path), config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
+               include_dirs=[_laybasic_path, _layview_path, _rdb_path, _db_path, _tl_path, _gsi_path],
+               extra_objects=[config.path_of('_laybasic', _laybasic_path), config.path_of('_layview', _layview_path), config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
                language='c++',
                libraries=config.libraries('_ant'),
                extra_link_args=config.link_args('_ant'),
@@ -582,8 +599,8 @@ _img_sources = set(glob.glob(os.path.join(_img_path, "*.cc")))
 
 _img = Library(config.root + '._img',
                define_macros=config.macros() + [('MAKE_ANT_LIBRARY', 1)],
-               include_dirs=[_lay_path, _rdb_path, _db_path, _tl_path, _gsi_path],
-               extra_objects=[config.path_of('_lay', _lay_path), config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
+               include_dirs=[_laybasic_path, _layview_path, _rdb_path, _db_path, _tl_path, _gsi_path],
+               extra_objects=[config.path_of('_laybasic', _laybasic_path), config.path_of('_layview', _layview_path), config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
                language='c++',
                libraries=config.libraries('_img'),
                extra_link_args=config.link_args('_img'),
@@ -599,8 +616,8 @@ _edt_sources = set(glob.glob(os.path.join(_edt_path, "*.cc")))
 
 _edt = Library(config.root + '._edt',
                define_macros=config.macros() + [('MAKE_ANT_LIBRARY', 1)],
-               include_dirs=[_lay_path, _rdb_path, _db_path, _tl_path, _gsi_path],
-               extra_objects=[config.path_of('_lay', _lay_path), config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
+               include_dirs=[_laybasic_path, _layview_path, _rdb_path, _db_path, _tl_path, _gsi_path],
+               extra_objects=[config.path_of('_laybasic', _laybasic_path), config.path_of('_layview', _layview_path), config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
                language='c++',
                libraries=config.libraries('_edt'),
                extra_link_args=config.link_args('_edt'),
@@ -699,67 +716,27 @@ lay_sources = set(glob.glob(os.path.join(lay_path, "*.cc")))
 
 lay = Extension(config.root + '.laycore',
                 define_macros=config.macros(),
-                include_dirs=[_lay_path, _img_path, _ant_path, _edt_path, _lym_path, _tl_path, _gsi_path, _pya_path],
-                extra_objects=[config.path_of('_lay', _lay_path), config.path_of('_img', _img_path), config.path_of('_ant', _ant_path), config.path_of('_edt', _edt_path), config.path_of('_lym', _lym_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
+                include_dirs=[_laybasic_path, 
+                              _layview_path, 
+                              _img_path, 
+                              _ant_path, 
+                              _edt_path, 
+                              _lym_path, 
+                              _tl_path, 
+                              _gsi_path, 
+                              _pya_path],
+                extra_objects=[config.path_of('_laybasic', _laybasic_path), 
+                               config.path_of('_layview', _layview_path), 
+                               config.path_of('_img', _img_path), 
+                               config.path_of('_ant', _ant_path), 
+                               config.path_of('_edt', _edt_path), 
+                               config.path_of('_lym', _lym_path), 
+                               config.path_of('_tl', _tl_path), 
+                               config.path_of('_gsi', _gsi_path), 
+                               config.path_of('_pya', _pya_path)],
                 extra_link_args=config.link_args('laycore'),
                 extra_compile_args=config.compile_args('laycore'),
                 sources=list(lay_sources))
-
-# ------------------------------------------------------------------
-# ant extension library
-
-ant_path = os.path.join("src", "pymod", "ant")
-ant_sources = set(glob.glob(os.path.join(ant_path, "*.cc")))
-
-ant = Extension(config.root + '.antcore',
-                define_macros=config.macros(),
-                include_dirs=[_ant_path, _tl_path, _gsi_path, _pya_path],
-                extra_objects=[config.path_of('_ant', _ant_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
-                extra_link_args=config.link_args('antcore'),
-                extra_compile_args=config.compile_args('antcore'),
-                sources=list(ant_sources))
-
-# ------------------------------------------------------------------
-# edt extension library
-
-edt_path = os.path.join("src", "pymod", "edt")
-edt_sources = set(glob.glob(os.path.join(edt_path, "*.cc")))
-
-edt = Extension(config.root + '.edtcore',
-                define_macros=config.macros(),
-                include_dirs=[_edt_path, _tl_path, _gsi_path, _pya_path],
-                extra_objects=[config.path_of('_edt', _edt_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
-                extra_link_args=config.link_args('edtcore'),
-                extra_compile_args=config.compile_args('edtcore'),
-                sources=list(edt_sources))
-
-# ------------------------------------------------------------------
-# img extension library
-
-img_path = os.path.join("src", "pymod", "img")
-img_sources = set(glob.glob(os.path.join(img_path, "*.cc")))
-
-img = Extension(config.root + '.imgcore',
-                define_macros=config.macros(),
-                include_dirs=[_img_path, _tl_path, _gsi_path, _pya_path],
-                extra_objects=[config.path_of('_img', _img_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
-                extra_link_args=config.link_args('imgcore'),
-                extra_compile_args=config.compile_args('imgcore'),
-                sources=list(img_sources))
-
-# ------------------------------------------------------------------
-# lym extension library
-
-lym_path = os.path.join("src", "pymod", "lym")
-lym_sources = set(glob.glob(os.path.join(lym_path, "*.cc")))
-
-lym = Extension(config.root + '.lymcore',
-                define_macros=config.macros(),
-                include_dirs=[_lym_path, _tl_path, _gsi_path, _pya_path],
-                extra_objects=[config.path_of('_lym', _lym_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
-                extra_link_args=config.link_args('lymcore'),
-                extra_compile_args=config.compile_args('lymcore'),
-                sources=list(lym_sources))
 
 # ------------------------------------------------------------------
 # Core setup function
@@ -786,4 +763,4 @@ if __name__ == '__main__':
           url='https://github.com/klayout/klayout',
           packages=find_packages('src/pymod/distutils_src'),
           package_dir={'': 'src/pymod/distutils_src'},  # https://github.com/pypa/setuptools/issues/230
-          ext_modules=[_tl, _gsi, _pya, _rba, _db, _lib, _rdb, _lym, _lay, _ant, _edt, _img] + db_plugins + [tl, db, lib, rdb, lay, ant, edt, img, lym])
+          ext_modules=[_tl, _gsi, _pya, _rba, _db, _lib, _rdb, _lym, _laybasic, _layview, _ant, _edt, _img] + db_plugins + [tl, db, lib, rdb, lay])

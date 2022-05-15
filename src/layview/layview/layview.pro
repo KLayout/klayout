@@ -6,22 +6,27 @@ include($$PWD/../../lib.pri)
 
 DEFINES += MAKE_LAYVIEW_LIBRARY
 
-FORMS = \
-
 RESOURCES = \
 
 SOURCES = \
+  layGridNet.cc \
 
 HEADERS = \
-  layLayoutView.h
+  layGridNet.h \
+  layLayoutView.h \
 
 !equals(HAVE_QT, "0") {
 
+  FORMS = \
+    GridNetConfigPage.ui \
+
   SOURCES += \
+    layGridNetConfigPage.cc \
     layLayoutView_qt.cc \
     gsiDeclLayLayoutView_qt.cc \
 
   HEADERS += \
+    layGridNetConfigPage.h \
     layLayoutView_qt.h \
 
 } else {

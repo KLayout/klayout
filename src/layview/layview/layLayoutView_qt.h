@@ -54,7 +54,6 @@
 #include <string>
 #include <memory>
 
-#include <QFrame>
 #include <QImage>
 
 class QSpinBox;
@@ -94,8 +93,7 @@ class EditorOptionsPages;
  *  It manages the layer display list, bookmark list etc.
  */
 class LAYVIEW_PUBLIC LayoutView
-  : public QFrame,
-    public LayoutViewBase
+  : public LayoutViewBase
 {
 Q_OBJECT
 

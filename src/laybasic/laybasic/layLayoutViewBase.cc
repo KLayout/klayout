@@ -235,11 +235,11 @@ struct OpDeleteLayerProps
 
 const double animation_interval = 0.5;
 
-LayoutViewBase::LayoutViewBase (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
-  : lay::Dispatcher (plugin_parent, false /*not standalone*/),
+LayoutViewBase::LayoutViewBase (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options) :
 #if defined(HAVE_QT)
-    mp_widget (0),
+    QFrame (0),
 #endif
+    lay::Dispatcher (plugin_parent, false /*not standalone*/),
     mp_ui (0),
     m_editable (editable),
     m_options (options),
@@ -252,14 +252,14 @@ LayoutViewBase::LayoutViewBase (db::Manager *manager, bool editable, lay::Plugin
 }
 
 #if defined(HAVE_QT)
-LayoutViewBase::LayoutViewBase (QWidget *widget, lay::LayoutView *ui, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+LayoutViewBase::LayoutViewBase (QWidget *parent, lay::LayoutView *ui, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options) :
 #else
-LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options) :
 #endif
-  : lay::Dispatcher (plugin_parent, false /*not standalone*/),
 #if defined(HAVE_QT)
-    mp_widget (widget),
+    QFrame (parent),
 #endif
+    lay::Dispatcher (plugin_parent, false /*not standalone*/),
     mp_ui (ui),
     m_editable (editable),
     m_options (options),
@@ -272,14 +272,14 @@ LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, db::Manager *manager, bool 
 }
 
 #if defined(HAVE_QT)
-LayoutViewBase::LayoutViewBase (QWidget *widget, lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+LayoutViewBase::LayoutViewBase (QWidget *parent, lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options) :
 #else
-LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options) :
 #endif
-  : lay::Dispatcher (plugin_parent, false /*not standalone*/),
 #if defined(HAVE_QT)
-    mp_widget (widget),
+    QFrame (parent),
 #endif
+    lay::Dispatcher (plugin_parent, false /*not standalone*/),
     mp_ui (ui),
     m_editable (editable),
     m_options (options),
@@ -3375,7 +3375,7 @@ LayoutViewBase::box () const
 QWidget *
 LayoutViewBase::widget ()
 {
-  return mp_widget;
+  return this;
 }
 #endif
 

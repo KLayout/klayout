@@ -54,7 +54,7 @@
 #include "dbInstElement.h"
 
 #if defined(HAVE_QT)
-class QWidget;
+#  include <QFrame>
 #endif
 
 namespace rdb {
@@ -155,6 +155,9 @@ struct LAYBASIC_PUBLIC LayerDisplayProperties
  *  It manages the layer display list, bookmark list etc.
  */
 class LAYBASIC_PUBLIC LayoutViewBase :
+#if defined(HAVE_QT)
+    public QFrame,
+#endif
     public lay::Editables,
     public lay::Dispatcher
 {
@@ -193,7 +196,7 @@ public:
    *  @brief Constructor
    */
 #if defined(HAVE_QT)
-  LayoutViewBase (QWidget *widget, lay::LayoutView *ui, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
+  LayoutViewBase (QWidget *parent, lay::LayoutView *ui, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
 #else
   LayoutViewBase (lay::LayoutView *ui, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
 #endif
@@ -2667,9 +2670,6 @@ private:
   void signal_apply_technology (lay::LayoutHandle *layout_handle);
 
 private:
-#if defined(HAVE_QT)
-  QWidget *mp_widget;
-#endif
   lay::LayoutView *mp_ui;
   bool m_editable;
   int m_disabled_edits;

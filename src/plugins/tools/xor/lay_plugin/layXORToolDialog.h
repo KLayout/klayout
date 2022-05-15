@@ -34,7 +34,7 @@ namespace Ui
 
 namespace lay
 {
-  class LayoutView;
+  class LayoutViewBase;
 }
 
 namespace lay
@@ -61,7 +61,7 @@ public:
   XORToolDialog (QWidget *parent);
   ~XORToolDialog ();
 
-  int exec_dialog (lay::LayoutView *view);
+  int exec_dialog (lay::LayoutViewBase *view);
 
 protected:
   void accept ();
@@ -74,7 +74,7 @@ protected slots:
 
 private:
   Ui::XORToolDialog *mp_ui;
-  tl::weak_ptr<lay::LayoutView> mp_view;
+  tl::weak_ptr<lay::LayoutViewBase> mp_view;
 };
 
 }

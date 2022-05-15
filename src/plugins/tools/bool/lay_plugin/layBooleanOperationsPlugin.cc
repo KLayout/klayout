@@ -26,7 +26,7 @@
 
 #include "layPlugin.h"
 #include "layTipDialog.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 
 #include "dbShapeProcessor.h"
 
@@ -39,7 +39,7 @@ class BooleanOperationsPlugin
   : public lay::Plugin
 {
 public:
-  BooleanOperationsPlugin (Plugin *parent, lay::LayoutView *view)
+  BooleanOperationsPlugin (Plugin *parent, lay::LayoutViewBase *view)
     : lay::Plugin (parent), mp_view (view)
   {
     m_boolean_cva = -1;
@@ -100,7 +100,7 @@ public:
 
     }
 
-    lay::BooleanOptionsDialog dialog (mp_view);
+    lay::BooleanOptionsDialog dialog (mp_view->widget ());
     if (dialog.exec_dialog (mp_view, m_boolean_cva, m_boolean_layera, m_boolean_cvb, m_boolean_layerb, m_boolean_cvr, m_boolean_layerr, m_boolean_mode, m_boolean_hier_mode, m_boolean_mincoh)) {
 
       mp_view->cancel ();
@@ -237,7 +237,7 @@ public:
 
     }
 
-    lay::MergeOptionsDialog dialog (mp_view);
+    lay::MergeOptionsDialog dialog (mp_view->widget ());
     if (dialog.exec_dialog (mp_view, m_boolean_cva, m_boolean_layera, m_boolean_cvr, m_boolean_layerr, m_boolean_minwc, m_boolean_hier_mode, m_boolean_mincoh)) {
 
       mp_view->cancel ();
@@ -352,7 +352,7 @@ public:
 
     }
 
-    lay::SizingOptionsDialog dialog (mp_view);
+    lay::SizingOptionsDialog dialog (mp_view->widget ());
     if (dialog.exec_dialog (mp_view, m_boolean_cva, m_boolean_layera, m_boolean_cvr, m_boolean_layerr, m_boolean_sizex, m_boolean_sizey, m_boolean_size_mode, m_boolean_hier_mode, m_boolean_mincoh)) {
 
       mp_view->cancel ();
@@ -445,7 +445,7 @@ public:
   }
 
 private:
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   int m_boolean_cva, m_boolean_cvb, m_boolean_cvr;
   int m_boolean_layera, m_boolean_layerb, m_boolean_layerr;
   int m_boolean_hier_mode, m_boolean_mode;

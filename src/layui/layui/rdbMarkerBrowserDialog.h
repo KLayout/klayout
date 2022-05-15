@@ -25,6 +25,7 @@
 #ifndef HDR_rdbMarkerBrowserDialog
 #define HDR_rdbMarkerBrowserDialog
 
+#include "layuiCommon.h"
 #include "layBrowser.h"
 #include "layColor.h"
 #include "rdbMarkerBrowser.h"
@@ -37,7 +38,7 @@ namespace Ui
 namespace rdb
 {
 
-class MarkerBrowserDialog
+class LAYUI_PUBLIC MarkerBrowserDialog
   : public lay::Browser
 {
   Q_OBJECT

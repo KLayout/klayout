@@ -70,7 +70,7 @@ static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le
 // ------------------------------------------------------------------
 //  EditorOptionsGeneric implementation
 
-EditorOptionsGeneric::EditorOptionsGeneric (lay::LayoutView *view, lay::Dispatcher *dispatcher)
+EditorOptionsGeneric::EditorOptionsGeneric (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
   : EditorOptionsPage (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsGeneric ();
@@ -207,7 +207,7 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
 // ------------------------------------------------------------------
 //  EditorOptionsText implementation
 
-EditorOptionsText::EditorOptionsText (lay::LayoutView *view, lay::Dispatcher *dispatcher)
+EditorOptionsText::EditorOptionsText (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
   : lay::EditorOptionsPage (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsText ();
@@ -285,7 +285,7 @@ EditorOptionsText::setup (lay::Dispatcher *root)
 // ------------------------------------------------------------------
 //  EditorOptionsPath implementation
 
-EditorOptionsPath::EditorOptionsPath (lay::LayoutView *view, lay::Dispatcher *dispatcher)
+EditorOptionsPath::EditorOptionsPath (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
   : lay::EditorOptionsPage (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsPath ();
@@ -386,7 +386,7 @@ EditorOptionsPath::setup (lay::Dispatcher *root)
 // ------------------------------------------------------------------
 //  EditorOptionsInst implementation
 
-EditorOptionsInst::EditorOptionsInst (lay::LayoutView *view, lay::Dispatcher *dispatcher)
+EditorOptionsInst::EditorOptionsInst (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
   : lay::EditorOptionsPage (view, dispatcher)
 {
   mp_ui = new Ui::EditorOptionsInst ();
@@ -679,7 +679,7 @@ EditorOptionsInst::setup (lay::Dispatcher *root)
 // ------------------------------------------------------------------
 //  EditorOptionsInstPCellParam implementation
 
-EditorOptionsInstPCellParam::EditorOptionsInstPCellParam (lay::LayoutView *view, lay::Dispatcher *dispatcher)
+EditorOptionsInstPCellParam::EditorOptionsInstPCellParam (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
   : lay::EditorOptionsPage (view, dispatcher), mp_pcell_parameters (0), mp_placeholder_label (0)
 {
   mp_ui = new Ui::EditorOptionsInstPCellParam ();

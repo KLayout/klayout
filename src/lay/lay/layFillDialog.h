@@ -76,7 +76,7 @@ class LAY_PUBLIC FillDialog
 Q_OBJECT 
 
 public:
-  FillDialog (lay::Dispatcher *root, lay::LayoutView *view);
+  FillDialog (lay::Dispatcher *root, lay::LayoutViewBase *view);
   ~FillDialog ();
 
 public slots:
@@ -95,7 +95,7 @@ private:
   void generate_fill (const FillParameters &fp);
   FillParameters get_fill_parameters ();
 
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
 };
 
 }

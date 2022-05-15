@@ -186,7 +186,7 @@ XORToolDialog::~XORToolDialog ()
 }
 
 int 
-XORToolDialog::exec_dialog (lay::LayoutView *view)
+XORToolDialog::exec_dialog (lay::LayoutViewBase *view)
 {
   mp_view = view;
 

@@ -30,7 +30,7 @@
 #include "layPlugin.h"
 #include "layRenderer.h"
 #include "laySnap.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "laybasicConfig.h"
 #if defined(HAVE_QT)
 #  include "layProperties.h"
@@ -409,7 +409,7 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 // -------------------------------------------------------------
 //  img::Service implementation
 
-Service::Service (db::Manager *manager, lay::LayoutView *view)
+Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
   : lay::BackgroundViewObject (view->view_object_widget ()),
     lay::Editable (view),
     lay::Plugin (view),

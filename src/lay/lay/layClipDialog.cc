@@ -66,7 +66,7 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new ClipDialogPl
 
 // ------------------------------------------------------------
 
-ClipDialog::ClipDialog (lay::Dispatcher *root, LayoutView *vw)
+ClipDialog::ClipDialog (lay::Dispatcher *root, LayoutViewBase *vw)
   : lay::Browser (root, vw), 
     Ui::ClipDialog ()
 {

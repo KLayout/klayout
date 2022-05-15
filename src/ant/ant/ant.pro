@@ -47,7 +47,16 @@ SOURCES += \
   gsiDeclAnt.cc \
   antForceLink.cc
 
-INCLUDEPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
-DEPENDPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
-LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_db
+INCLUDEPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$LAYVIEW_INC $$DB_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$LAYVIEW_INC $$DB_INC
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_layview -lklayout_db
+
+!equals(HAVE_QT, "0") {
+
+  INCLUDEPATH += $$LAYUI_INC
+  DEPENDPATH += $$LAYUI_INC
+
+  LIBS += -lklayout_layui
+
+}
 

@@ -25,7 +25,7 @@
 #include "antObject.h"
 #include "antService.h"
 #include "antPlugin.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 
 namespace gsi
 {
@@ -70,10 +70,10 @@ static int align_right ()       { return int (ant::Object::AL_right); }
 static int align_top ()         { return int (ant::Object::AL_top); }
 static int align_up ()          { return int (ant::Object::AL_up); }
 
-static void clear_annotations (lay::LayoutView *view);
-static void insert_annotation (lay::LayoutView *view, AnnotationRef *obj);
-static void erase_annotation_base (lay::LayoutView *view, int id);
-static void replace_annotation_base (lay::LayoutView *view, int id, const AnnotationRef &obj);
+static void clear_annotations (lay::LayoutViewBase *view);
+static void insert_annotation (lay::LayoutViewBase *view, AnnotationRef *obj);
+static void erase_annotation_base (lay::LayoutViewBase *view, int id);
+static void replace_annotation_base (lay::LayoutViewBase *view, int id, const AnnotationRef &obj);
 
 /**
  *  @brief An extension of the ant::Object that provides "live" updates of the view
@@ -88,7 +88,7 @@ public:
     //  .. nothing yet ..
   }
 
-  AnnotationRef (const ant::Object &other, lay::LayoutView *view)
+  AnnotationRef (const ant::Object &other, lay::LayoutViewBase *view)
     : ant::Object (other), mp_view (view)
   {
     //  .. nothing yet ..
@@ -140,10 +140,10 @@ public:
   template <class T>
   AnnotationRef transformed (const T &t) const
   {
-    return AnnotationRef (ant::Object::transformed<T> (t), const_cast<lay::LayoutView *> (mp_view.get ()));
+    return AnnotationRef (ant::Object::transformed<T> (t), const_cast<lay::LayoutViewBase *> (mp_view.get ()));
   }
 
-  void set_view (lay::LayoutView *view)
+  void set_view (lay::LayoutViewBase *view)
   {
     mp_view.reset (view);
   }
@@ -157,10 +157,10 @@ protected:
   }
 
 private:
-  tl::weak_ptr<lay::LayoutView> mp_view;
+  tl::weak_ptr<lay::LayoutViewBase> mp_view;
 };
 
-static void clear_annotations (lay::LayoutView *view)
+static void clear_annotations (lay::LayoutViewBase *view)
 {
   ant::Service *ant_service = view->get_plugin <ant::Service> ();
   if (ant_service) {
@@ -168,7 +168,7 @@ static void clear_annotations (lay::LayoutView *view)
   }
 }
 
-static void insert_annotation (lay::LayoutView *view, AnnotationRef *obj)
+static void insert_annotation (lay::LayoutViewBase *view, AnnotationRef *obj)
 {
   if (obj->is_valid ()) {
     throw tl::Exception (tl::to_string (tr ("The object is already inserted into a view - detach the object first or create a different object.")));
@@ -182,7 +182,7 @@ static void insert_annotation (lay::LayoutView *view, AnnotationRef *obj)
   }
 }
 
-static void erase_annotation_base (lay::LayoutView *view, int id)
+static void erase_annotation_base (lay::LayoutViewBase *view, int id)
 {
   ant::Service *ant_service = view->get_plugin <ant::Service> ();
   if (ant_service) {
@@ -195,12 +195,12 @@ static void erase_annotation_base (lay::LayoutView *view, int id)
   }
 }
 
-static void erase_annotation (lay::LayoutView *view, int id)
+static void erase_annotation (lay::LayoutViewBase *view, int id)
 {
   erase_annotation_base (view, id);
 }
 
-static void replace_annotation_base (lay::LayoutView *view, int id, const AnnotationRef &obj)
+static void replace_annotation_base (lay::LayoutViewBase *view, int id, const AnnotationRef &obj)
 {
   ant::Service *ant_service = view->get_plugin <ant::Service> ();
   if (ant_service) {
@@ -213,12 +213,12 @@ static void replace_annotation_base (lay::LayoutView *view, int id, const Annota
   }
 }
 
-static void replace_annotation (lay::LayoutView *view, int id, const AnnotationRef &obj)
+static void replace_annotation (lay::LayoutViewBase *view, int id, const AnnotationRef &obj)
 {
   replace_annotation_base (view, id, obj);
 }
 
-static AnnotationRef create_measure_ruler (lay::LayoutView *view, const db::DPoint &pt, int angle_constraint)
+static AnnotationRef create_measure_ruler (lay::LayoutViewBase *view, const db::DPoint &pt, int angle_constraint)
 {
   std::vector<ant::Service *> ant_services = view->get_plugins <ant::Service> ();
   if (! ant_services.empty ()) {
@@ -351,7 +351,7 @@ public:
     //  .. nothing yet ..
   }
 
-  AnnotationRefIterator (const ant::AnnotationIterator &iter, lay::LayoutView *view)
+  AnnotationRefIterator (const ant::AnnotationIterator &iter, lay::LayoutViewBase *view)
     : ant::AnnotationIterator (iter), mp_view (view)
   {
     //  .. nothing yet ..
@@ -359,14 +359,14 @@ public:
 
   reference operator* () const
   {
-    return reference (ant::AnnotationIterator::operator* (), const_cast<lay::LayoutView * >(mp_view.get ()));
+    return reference (ant::AnnotationIterator::operator* (), const_cast<lay::LayoutViewBase * >(mp_view.get ()));
   }
 
 private:
-  tl::weak_ptr<lay::LayoutView> mp_view;
+  tl::weak_ptr<lay::LayoutViewBase> mp_view;
 };
 
-static AnnotationRefIterator begin_annotations (lay::LayoutView *view)
+static AnnotationRefIterator begin_annotations (lay::LayoutViewBase *view)
 {
   ant::Service *ant_service = view->get_plugin <ant::Service> ();
   if (ant_service) {
@@ -376,7 +376,7 @@ static AnnotationRefIterator begin_annotations (lay::LayoutView *view)
   }
 }
 
-static AnnotationRef get_annotation (lay::LayoutView *view, int id)
+static AnnotationRef get_annotation (lay::LayoutViewBase *view, int id)
 {
   ant::Service *ant_service = view->get_plugin <ant::Service> ();
   if (ant_service) {
@@ -389,21 +389,21 @@ static AnnotationRef get_annotation (lay::LayoutView *view, int id)
   return AnnotationRef ();
 }
 
-static tl::Event &get_annotations_changed_event (lay::LayoutView *view)
+static tl::Event &get_annotations_changed_event (lay::LayoutViewBase *view)
 {
   ant::Service *ant_service = view->get_plugin <ant::Service> ();
   tl_assert (ant_service != 0);
   return ant_service->annotations_changed_event;
 }
 
-static tl::Event &get_annotation_selection_changed_event (lay::LayoutView *view)
+static tl::Event &get_annotation_selection_changed_event (lay::LayoutViewBase *view)
 {
   ant::Service *ant_service = view->get_plugin <ant::Service> ();
   tl_assert (ant_service != 0);
   return ant_service->annotation_selection_changed_event;
 }
 
-static tl::event<int> &get_annotation_changed_event (lay::LayoutView *view)
+static tl::event<int> &get_annotation_changed_event (lay::LayoutViewBase *view)
 {
   ant::Service *ant_service = view->get_plugin <ant::Service> ();
   tl_assert (ant_service != 0);
@@ -989,7 +989,7 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
 );
 
 static
-gsi::ClassExt<lay::LayoutView> layout_view_decl (
+gsi::ClassExt<lay::LayoutViewBase> layout_view_decl (
   gsi::method_ext ("clear_annotations", &gsi::clear_annotations, 
     "@brief Clears all annotations on this view"
   ) +
@@ -1123,7 +1123,7 @@ private:
 
 //  extend the layout view by "edtService" specific methods 
 
-static bool has_annotation_selection (const lay::LayoutView *view)
+static bool has_annotation_selection (const lay::LayoutViewBase *view)
 {
   std::vector<ant::Service *> ant_services = view->get_plugins <ant::Service> ();
   for (std::vector<ant::Service *>::const_iterator s = ant_services.begin (); s != ant_services.end (); ++s) {
@@ -1134,13 +1134,13 @@ static bool has_annotation_selection (const lay::LayoutView *view)
   return false;
 }
 
-static AnnotationSelectionIterator begin_annotations_selected (const lay::LayoutView *view)
+static AnnotationSelectionIterator begin_annotations_selected (const lay::LayoutViewBase *view)
 {
   return AnnotationSelectionIterator (view->get_plugins <ant::Service> ());
 }
 
 static
-gsi::ClassExt<lay::LayoutView> layout_view_decl2 (
+gsi::ClassExt<lay::LayoutViewBase> layout_view_decl2 (
   gsi::method_ext ("has_annotation_selection?", &has_annotation_selection, 
     "@brief Returns true, if annotations (rulers) are selected in this view"
     "\n"

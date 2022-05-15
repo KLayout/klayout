@@ -1333,7 +1333,7 @@ MainService::cm_convert_to_pcell ()
     if (any_non_converted) {
       tl::warn << tl::to_string (tr ("Some of the shapes could not be converted to the desired PCell"));
 #if defined(HAVE_QT)
-      QMessageBox::warning (view (), tr ("Warning"), tr ("Some of the shapes could not be converted to the desired PCell"));
+      QMessageBox::warning (view ()->widget (), tr ("Warning"), tr ("Some of the shapes could not be converted to the desired PCell"));
 #endif
     }
 
@@ -1812,7 +1812,7 @@ db::DVector compute_alignment_vector (const db::DBox &prim_box, const db::DBox &
 }
 
 static db::DBox 
-inst_bbox (const db::CplxTrans &tr, lay::LayoutView *view, int cv_index, const db::InstElement &inst_element, bool visible_only)
+inst_bbox (const db::CplxTrans &tr, lay::LayoutViewBase *view, int cv_index, const db::InstElement &inst_element, bool visible_only)
 {
   db::DBox box;
 
@@ -2385,7 +2385,7 @@ class NewObjectsSelection
  : public db::ClipboardDataInsertReceiver 
 {
 public:
-  NewObjectsSelection (int cv_index, db::cell_index_type topcell, lay::LayoutView *view)
+  NewObjectsSelection (int cv_index, db::cell_index_type topcell, lay::LayoutViewBase *view)
     : m_cv_index (cv_index), m_topcell (topcell)
   {
     mp_polygon_service = view->get_plugin <edt::PolygonService> ();

@@ -37,7 +37,7 @@ namespace Ui
 
 namespace lay
 {
-  class LayoutView;
+  class LayoutViewBase;
 }
 
 namespace db
@@ -57,14 +57,14 @@ class D25View
 Q_OBJECT 
 
 public:
-  D25View (lay::Dispatcher *root, lay::LayoutView *view);
+  D25View (lay::Dispatcher *root, lay::LayoutViewBase *view);
   ~D25View ();
 
   virtual void menu_activated (const std::string &symbol);
   virtual void deactivated ();
   virtual void activated ();
 
-  static D25View *open (lay::LayoutView *view);
+  static D25View *open (lay::LayoutViewBase *view);
   void close ();
   void clear ();
   void begin (const std::string &generator);

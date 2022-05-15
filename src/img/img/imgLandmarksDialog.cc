@@ -145,7 +145,7 @@ class LandmarkEditorService
   : public lay::ViewService
 {
 public:
-  LandmarkEditorService (lay::LayoutView *view, img::Object *img)
+  LandmarkEditorService (lay::LayoutViewBase *view, img::Object *img)
     : lay::ViewService (view->view_object_widget ()), 
       mp_image (img), m_selected (-1), m_dragging (false),
       m_mode (LandmarksDialog::None)

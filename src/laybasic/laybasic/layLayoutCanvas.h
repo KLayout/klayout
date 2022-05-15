@@ -24,11 +24,7 @@
 #ifndef HDR_layLayoutCanvas
 #define HDR_layLayoutCanvas
 
-#include <vector>
-#include <map>
-#include <set>
-#include <utility>
-
+#include "laybasicCommon.h"
 #include "dbTrans.h"
 #include "dbBox.h"
 #include "layViewport.h"
@@ -43,6 +39,11 @@
 #include "layRedrawLayerInfo.h"
 #include "tlDeferredExecution.h"
 #include "tlThreads.h"
+
+#include <vector>
+#include <map>
+#include <set>
+#include <utility>
 
 namespace lay
 {
@@ -132,7 +133,7 @@ private:
  *  and to manage the auxiliary objects like rulers etc.
  */
 
-class LayoutCanvas 
+class LAYBASIC_PUBLIC LayoutCanvas
   : public lay::ViewObjectWidget,
     public lay::BitmapViewObjectCanvas,
     public lay::BitmapRedrawThreadCanvas,

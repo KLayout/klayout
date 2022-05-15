@@ -86,12 +86,12 @@ public:
 /**
  *  @brief Fill the given stack widget with pairs of items plus properties widget
  */
-void fill_find_pages (QStackedWidget *sw, lay::LayoutView *view, int cv_index);
+void fill_find_pages (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_index);
 
 /**
  *  @brief Fill the given stack widget with pairs of items plus properties widget
  */
-void fill_replace_pages (QStackedWidget *sw, lay::LayoutView *view, int cv_index);
+void fill_replace_pages (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_index);
 
 /**
  *  @brief Get an object id from a page index

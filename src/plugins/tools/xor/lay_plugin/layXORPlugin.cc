@@ -35,7 +35,7 @@ class XORPlugin
   : public lay::Plugin
 {
 public:
-  XORPlugin (Plugin *parent, lay::LayoutView *view)
+  XORPlugin (Plugin *parent, lay::LayoutViewBase *view)
     : lay::Plugin (parent), mp_view (view)
   {
     mp_dialog = new lay::XORToolDialog (0);
@@ -61,7 +61,7 @@ public:
   }
 
 private:
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   lay::XORToolDialog *mp_dialog;
 };
 

@@ -61,6 +61,7 @@ SOURCES += \
   layMarker.cc \
   layMouseTracker.cc \
   layMove.cc \
+  layNativePlugin.cc \
   layNetColorizer.cc \
   layObjectInstPath.cc \
   layParsedLayerSource.cc \
@@ -112,6 +113,7 @@ HEADERS += \
   layMarker.h \
   layMouseTracker.h \
   layMove.h \
+  layNativePlugin.h \
   layNetColorizer.h \
   layObjectInstPath.h \
   layParsedLayerSource.h \

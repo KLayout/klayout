@@ -699,7 +699,7 @@ fill_ctx_cbx (QComboBox *cbx)
   cbx->addItem (QObject::tr ("All cells"));
 }
 
-SearchReplaceDialog::SearchReplaceDialog (lay::Dispatcher *root, lay::LayoutView *view)
+SearchReplaceDialog::SearchReplaceDialog (lay::Dispatcher *root, LayoutViewBase *view)
   : lay::Browser (root, view),
     Ui::SearchReplaceDialog (),
     mp_view (view),

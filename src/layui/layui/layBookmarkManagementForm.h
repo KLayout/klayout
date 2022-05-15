@@ -27,6 +27,7 @@
 
 #include <QDialog>
 
+#include "layuiCommon.h"
 #include "layLayoutViewBase.h"
 
 #include <set>
@@ -39,7 +40,7 @@ namespace Ui
 namespace lay
 {
 
-class BookmarkManagementForm
+class LAYUI_PUBLIC BookmarkManagementForm
   : public QDialog
 {
   Q_OBJECT 

@@ -28,7 +28,7 @@
 #include "imgService.h"
 #include "imgStream.h"
 #include "dbTilingProcessor.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 
 namespace gsi
 {
@@ -299,8 +299,8 @@ gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
 
 class ImageRef;
 
-static void replace_image_base (lay::LayoutView *view, size_t id, ImageRef &new_obj);
-static void erase_image_base (lay::LayoutView *view, size_t id);
+static void replace_image_base (lay::LayoutViewBase *view, size_t id, ImageRef &new_obj);
+static void erase_image_base (lay::LayoutViewBase *view, size_t id);
 
 /**
  *  @brief An extension of the img::Object that provides "live" updates of the view
@@ -321,7 +321,7 @@ public:
     //  .. nothing yet ..
   }
 
-  ImageRef (const img::Object &other, lay::LayoutView *view)
+  ImageRef (const img::Object &other, lay::LayoutViewBase *view)
     : img::Object (other), mp_view (view), dm_update_view (this, &ImageRef::do_update_view)
   {
     //  .. nothing yet ..
@@ -373,10 +373,10 @@ public:
   template <class T>
   ImageRef transformed (const T &t) const
   {
-    return ImageRef (img::Object::transformed<T> (t), const_cast<lay::LayoutView *> (mp_view.get ()));
+    return ImageRef (img::Object::transformed<T> (t), const_cast<lay::LayoutViewBase *> (mp_view.get ()));
   }
 
-  void set_view (lay::LayoutView *view)
+  void set_view (lay::LayoutViewBase *view)
   {
     mp_view.reset (view);
   }
@@ -403,7 +403,7 @@ protected:
   }
 
 private:
-  tl::weak_ptr<lay::LayoutView> mp_view;
+  tl::weak_ptr<lay::LayoutViewBase> mp_view;
   tl::DeferredMethod<ImageRef> dm_update_view;
 };
 
@@ -1073,7 +1073,7 @@ public:
     //  .. nothing yet ..
   }
 
-  ImageRefIterator (const img::ImageIterator &iter, lay::LayoutView *view)
+  ImageRefIterator (const img::ImageIterator &iter, lay::LayoutViewBase *view)
     : img::ImageIterator (iter), mp_view (view)
   {
     //  .. nothing yet ..
@@ -1081,14 +1081,14 @@ public:
 
   reference operator* () const
   {
-    return reference (img::ImageIterator::operator* (), const_cast<lay::LayoutView * >(mp_view.get ()));
+    return reference (img::ImageIterator::operator* (), const_cast<lay::LayoutViewBase * >(mp_view.get ()));
   }
 
 private:
-  tl::weak_ptr<lay::LayoutView> mp_view;
+  tl::weak_ptr<lay::LayoutViewBase> mp_view;
 };
 
-static void clear_images (lay::LayoutView *view)
+static void clear_images (lay::LayoutViewBase *view)
 {
   img::Service *img_service = view->get_plugin <img::Service> ();
   if (img_service) {
@@ -1096,7 +1096,7 @@ static void clear_images (lay::LayoutView *view)
   }
 }
 
-static void show_image (lay::LayoutView *view, size_t id, bool visible)
+static void show_image (lay::LayoutViewBase *view, size_t id, bool visible)
 {
   img::Service *img_service = view->get_plugin <img::Service> ();
   if (img_service) {
@@ -1114,7 +1114,7 @@ static void show_image (lay::LayoutView *view, size_t id, bool visible)
   }
 }
 
-void replace_image_base (lay::LayoutView *view, size_t id, ImageRef &new_obj)
+void replace_image_base (lay::LayoutViewBase *view, size_t id, ImageRef &new_obj)
 {
   img::Service *img_service = view->get_plugin <img::Service> ();
   if (img_service) {
@@ -1129,12 +1129,12 @@ void replace_image_base (lay::LayoutView *view, size_t id, ImageRef &new_obj)
   }
 }
 
-static void replace_image (lay::LayoutView *view, size_t id, ImageRef &new_obj)
+static void replace_image (lay::LayoutViewBase *view, size_t id, ImageRef &new_obj)
 {
   replace_image_base (view, id, new_obj);
 }
 
-void erase_image_base (lay::LayoutView *view, size_t id)
+void erase_image_base (lay::LayoutViewBase *view, size_t id)
 {
   img::Service *img_service = view->get_plugin <img::Service> ();
   if (img_service) {
@@ -1149,12 +1149,12 @@ void erase_image_base (lay::LayoutView *view, size_t id)
   }
 }
 
-static void erase_image (lay::LayoutView *view, size_t id)
+static void erase_image (lay::LayoutViewBase *view, size_t id)
 {
   erase_image_base (view, id);
 }
 
-static void insert_image (lay::LayoutView *view, ImageRef &obj)
+static void insert_image (lay::LayoutViewBase *view, ImageRef &obj)
 {
   if (obj.is_valid ()) {
     throw tl::Exception (tl::to_string (tr ("The object is already inserted into a view - detach the object first or create a different object.")));
@@ -1168,7 +1168,7 @@ static void insert_image (lay::LayoutView *view, ImageRef &obj)
   }
 }
 
-static ImageRef get_image (lay::LayoutView *view, size_t id)
+static ImageRef get_image (lay::LayoutViewBase *view, size_t id)
 {
   img::Service *img_service = view->get_plugin <img::Service> ();
   if (img_service) {
@@ -1181,28 +1181,28 @@ static ImageRef get_image (lay::LayoutView *view, size_t id)
   return ImageRef ();
 }
 
-static tl::Event &get_images_changed_event (lay::LayoutView *view)
+static tl::Event &get_images_changed_event (lay::LayoutViewBase *view)
 {
   img::Service *img_service = view->get_plugin <img::Service> ();
   tl_assert (img_service != 0);
   return img_service->images_changed_event;
 }
 
-static tl::Event &get_image_selection_changed_event (lay::LayoutView *view)
+static tl::Event &get_image_selection_changed_event (lay::LayoutViewBase *view)
 {
   img::Service *img_service = view->get_plugin <img::Service> ();
   tl_assert (img_service != 0);
   return img_service->image_selection_changed_event;
 }
 
-static tl::event<int> &get_image_changed_event (lay::LayoutView *view)
+static tl::event<int> &get_image_changed_event (lay::LayoutViewBase *view)
 {
   img::Service *img_service = view->get_plugin <img::Service> ();
   tl_assert (img_service != 0);
   return img_service->image_changed_event;
 }
 
-static ImageRefIterator begin_images (lay::LayoutView *view)
+static ImageRefIterator begin_images (lay::LayoutViewBase *view)
 {
   img::Service *img_service = view->get_plugin <img::Service> ();
   if (img_service) {
@@ -1213,7 +1213,7 @@ static ImageRefIterator begin_images (lay::LayoutView *view)
 }
 
 static
-gsi::ClassExt<lay::LayoutView> layout_view_decl (
+gsi::ClassExt<lay::LayoutViewBase> layout_view_decl (
   gsi::method_ext ("clear_images", &gsi::clear_images, 
     "@brief Clear all images on this view"
   ) +
@@ -1342,7 +1342,7 @@ private:
 
 //  extend the layout view by "edtService" specific methods 
 
-static bool has_image_selection (const lay::LayoutView *view)
+static bool has_image_selection (const lay::LayoutViewBase *view)
 {
   std::vector<img::Service *> img = view->get_plugins <img::Service> ();
   for (std::vector<img::Service *>::const_iterator s = img.begin (); s != img.end (); ++s) {
@@ -1353,14 +1353,14 @@ static bool has_image_selection (const lay::LayoutView *view)
   return false;
 }
 
-static SelectionIterator begin_images_selected (const lay::LayoutView *view)
+static SelectionIterator begin_images_selected (const lay::LayoutViewBase *view)
 {
   return SelectionIterator (view->get_plugins <img::Service> ());
 }
 
 
 static
-gsi::ClassExt<lay::LayoutView> layout_view_decl2 (
+gsi::ClassExt<lay::LayoutViewBase> layout_view_decl2 (
   gsi::method_ext ("has_image_selection?", &has_image_selection, 
     "@brief Returns true, if images are selected in this view"
     "\n"

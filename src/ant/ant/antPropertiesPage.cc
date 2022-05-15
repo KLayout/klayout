@@ -23,7 +23,7 @@
 #if defined(HAVE_QT)
 
 #include "antPropertiesPage.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "layQtTools.h"
 
 namespace ant

@@ -40,6 +40,9 @@
 #include "layLayoutViewBase.h"
 #include "tlExceptions.h"
 
+#include "ui_CellSelectionForm.h"
+#include "ui_LibraryCellSelectionForm.h"
+
 #include <QHeaderView>
 
 namespace lay
@@ -51,7 +54,7 @@ static const std::string cfg_cell_selection_search_use_expressions ("cell-select
 // ------------------------------------------------------------
 
 CellSelectionForm::CellSelectionForm (QWidget *parent, LayoutViewBase *view, const char *name, bool simple_mode)
-  : QDialog (parent), Ui::CellSelectionForm (),
+  : QDialog (parent),
     mp_view (view),
     m_current_cv (-1),
     m_name_cb_enabled (true),
@@ -61,11 +64,12 @@ CellSelectionForm::CellSelectionForm (QWidget *parent, LayoutViewBase *view, con
     m_update_all_dm (this, &CellSelectionForm::update_all),
     m_simple_mode (simple_mode)
 {
+  mp_ui = new Ui::CellSelectionForm ();
   setObjectName (QString::fromUtf8 (name));
 
-  Ui::CellSelectionForm::setupUi (this);
+  mp_ui->setupUi (this);
 
-  le_cell_name->set_tab_signal_enabled (true);
+  mp_ui->le_cell_name->set_tab_signal_enabled (true);
 
   mp_use_regular_expressions = new QAction (this);
   mp_use_regular_expressions->setCheckable (true);
@@ -86,33 +90,33 @@ CellSelectionForm::CellSelectionForm (QWidget *parent, LayoutViewBase *view, con
     mp_use_regular_expressions->setChecked (ue);
   }
 
-  QMenu *m = new QMenu (le_cell_name);
+  QMenu *m = new QMenu (mp_ui->le_cell_name);
   m->addAction (mp_use_regular_expressions);
   m->addAction (mp_case_sensitive);
   connect (mp_use_regular_expressions, SIGNAL (triggered ()), this, SLOT (name_changed ()));
   connect (mp_case_sensitive, SIGNAL (triggered ()), this, SLOT (name_changed ()));
 
-  le_cell_name->set_clear_button_enabled (true);
-  le_cell_name->set_options_button_enabled (true);
-  le_cell_name->set_options_menu (m);
+  mp_ui->le_cell_name->set_clear_button_enabled (true);
+  mp_ui->le_cell_name->set_options_button_enabled (true);
+  mp_ui->le_cell_name->set_options_menu (m);
 
 
   // signals and slots connections
-  connect (cancel_button, SIGNAL(clicked()), this, SLOT(reject()));
-  connect (cb_views, SIGNAL(activated(int)), this, SLOT(view_changed(int)));
-  connect (tb_set_parent, SIGNAL(clicked()), this, SLOT(set_parent()));
-  connect (tb_set_child, SIGNAL(clicked()), this, SLOT(set_child()));
-  connect (pb_hide, SIGNAL(clicked()), this, SLOT(hide_cell()));
-  connect (pb_show, SIGNAL(clicked()), this, SLOT(show_cell()));
-  connect (le_cell_name, SIGNAL(textChanged(const QString&)), this, SLOT(name_changed()));
-  connect (ok_button, SIGNAL(clicked()), this, SLOT(accept()));
-  connect (apply_button, SIGNAL(clicked()), this, SLOT(apply_clicked()));
-  connect (find_next, SIGNAL(clicked()), this, SLOT(find_next_clicked()));
-  connect (le_cell_name, SIGNAL(tab_pressed()), this, SLOT(find_next_clicked()));
-  connect (le_cell_name, SIGNAL(backtab_pressed()), this, SLOT(find_prev_clicked()));
+  connect (mp_ui->cancel_button, SIGNAL(clicked()), this, SLOT(reject()));
+  connect (mp_ui->cb_views, SIGNAL(activated(int)), this, SLOT(view_changed(int)));
+  connect (mp_ui->tb_set_parent, SIGNAL(clicked()), this, SLOT(set_parent()));
+  connect (mp_ui->tb_set_child, SIGNAL(clicked()), this, SLOT(set_child()));
+  connect (mp_ui->pb_hide, SIGNAL(clicked()), this, SLOT(hide_cell()));
+  connect (mp_ui->pb_show, SIGNAL(clicked()), this, SLOT(show_cell()));
+  connect (mp_ui->le_cell_name, SIGNAL(textChanged(const QString&)), this, SLOT(name_changed()));
+  connect (mp_ui->ok_button, SIGNAL(clicked()), this, SLOT(accept()));
+  connect (mp_ui->apply_button, SIGNAL(clicked()), this, SLOT(apply_clicked()));
+  connect (mp_ui->find_next, SIGNAL(clicked()), this, SLOT(find_next_clicked()));
+  connect (mp_ui->le_cell_name, SIGNAL(tab_pressed()), this, SLOT(find_next_clicked()));
+  connect (mp_ui->le_cell_name, SIGNAL(backtab_pressed()), this, SLOT(find_prev_clicked()));
 
-  connect (lv_parents, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(parent_changed(const QModelIndex &)));
-  connect (lv_children, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(child_changed(const QModelIndex &)));
+  connect (mp_ui->lv_parents, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(parent_changed(const QModelIndex &)));
+  connect (mp_ui->lv_children, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(child_changed(const QModelIndex &)));
 
 
   m_cellviews.reserve (mp_view->cellviews ());
@@ -121,11 +125,11 @@ CellSelectionForm::CellSelectionForm (QWidget *parent, LayoutViewBase *view, con
   }
 
   if (simple_mode) {
-    apply_button->hide ();
-    tools_frame->hide ();
+    mp_ui->apply_button->hide ();
+    mp_ui->tools_frame->hide ();
   } else {
-    apply_button->show ();
-    tools_frame->show ();
+    mp_ui->apply_button->show ();
+    mp_ui->tools_frame->show ();
   }
 
   if (! m_cellviews.empty ()) {
@@ -134,26 +138,26 @@ CellSelectionForm::CellSelectionForm (QWidget *parent, LayoutViewBase *view, con
 
     int cvi = 0;
     for (std::vector<lay::CellView>::const_iterator cv = m_cellviews.begin (); cv != m_cellviews.end (); ++cv, ++cvi) {
-      cb_views->addItem (tl::to_qstring ((*cv)->name () + " (@" + tl::to_string (cvi + 1) + ")"));
+      mp_ui->cb_views->addItem (tl::to_qstring ((*cv)->name () + " (@" + tl::to_string (cvi + 1) + ")"));
     }
-    cb_views->setCurrentIndex (m_current_cv);
+    mp_ui->cb_views->setCurrentIndex (m_current_cv);
 
     if (m_cellviews.size () == 1) {
-      cb_views->hide ();
-      layout_lbl->hide ();
+      mp_ui->cb_views->hide ();
+      mp_ui->layout_lbl->hide ();
     } else {
-      cb_views->show ();
-      layout_lbl->show ();
+      mp_ui->cb_views->show ();
+      mp_ui->layout_lbl->show ();
     }
 
-    lv_cells->header ()->hide ();
-    lv_cells->setRootIsDecorated (false);
+    mp_ui->lv_cells->header ()->hide ();
+    mp_ui->lv_cells->setRootIsDecorated (false);
 
-    lv_children->header ()->hide ();
-    lv_children->setRootIsDecorated (false);
+    mp_ui->lv_children->header ()->hide ();
+    mp_ui->lv_children->setRootIsDecorated (false);
 
-    lv_parents->header ()->hide ();
-    lv_parents->setRootIsDecorated (false);
+    mp_ui->lv_parents->header ()->hide ();
+    mp_ui->lv_parents->setRootIsDecorated (false);
       
     update_cell_list ();  
 
@@ -168,15 +172,15 @@ CellSelectionForm::update_cell_list ()
     return;
   }
 
-  if (lv_cells->model ()) {
-    delete lv_cells->model ();
+  if (mp_ui->lv_cells->model ()) {
+    delete mp_ui->lv_cells->model ();
   }
 
-  lay::CellTreeModel *model = new lay::CellTreeModel (lv_cells, mp_view, m_current_cv, lay::CellTreeModel::Flat);
+  lay::CellTreeModel *model = new lay::CellTreeModel (mp_ui->lv_cells, mp_view, m_current_cv, lay::CellTreeModel::Flat);
   
-  lv_cells->setModel (model);
+  mp_ui->lv_cells->setModel (model);
   //  connect can only happen after setModel()
-  connect (lv_cells->selectionModel (), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(cell_changed(const QModelIndex &, const QModelIndex &)));
+  connect (mp_ui->lv_cells->selectionModel (), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(cell_changed(const QModelIndex &, const QModelIndex &)));
 
   lay::CellView::unspecific_cell_path_type path (m_cellviews [m_current_cv].combined_unspecific_path ());
   if (! path.empty ()) {
@@ -191,13 +195,13 @@ CellSelectionForm::update_parents_list ()
 
   if (m_current_cv >= 0 && m_current_cv < int (m_cellviews.size ())) {
 
-    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
     if (model) {
 
-      if (lv_parents->model ()) {
-        delete lv_parents->model ();
+      if (mp_ui->lv_parents->model ()) {
+        delete mp_ui->lv_parents->model ();
       }
-      lv_parents->setModel (new lay::CellTreeModel (lv_parents, mp_view, m_current_cv, lay::CellTreeModel::Flat | lay::CellTreeModel::Parents, model->cell (lv_cells->selectionModel ()->currentIndex ())));
+      mp_ui->lv_parents->setModel (new lay::CellTreeModel (mp_ui->lv_parents, mp_view, m_current_cv, lay::CellTreeModel::Flat | lay::CellTreeModel::Parents, model->cell (mp_ui->lv_cells->selectionModel ()->currentIndex ())));
 
     }
 
@@ -213,13 +217,13 @@ CellSelectionForm::update_children_list ()
   
   if (m_current_cv >= 0 && m_current_cv < int (m_cellviews.size ())) {
 
-    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
     if (model) {
 
-      if (lv_children->model ()) {
-        delete lv_children->model ();
+      if (mp_ui->lv_children->model ()) {
+        delete mp_ui->lv_children->model ();
       }
-      lv_children->setModel (new lay::CellTreeModel (lv_children, mp_view, m_current_cv, lay::CellTreeModel::Flat | lay::CellTreeModel::Children, model->cell (lv_cells->selectionModel ()->currentIndex ())));
+      mp_ui->lv_children->setModel (new lay::CellTreeModel (mp_ui->lv_children, mp_view, m_current_cv, lay::CellTreeModel::Flat | lay::CellTreeModel::Children, model->cell (mp_ui->lv_cells->selectionModel ()->currentIndex ())));
 
     }
 
@@ -247,12 +251,12 @@ CellSelectionForm::commit_cv ()
   //  update the cell view 
   if (m_current_cv >= 0 && m_current_cv < int (m_cellviews.size ())) {
 
-    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
     if (! model) {
       return;
     }
 
-    const db::Cell *cell = model->cell (lv_cells->selectionModel ()->currentIndex ());
+    const db::Cell *cell = model->cell (mp_ui->lv_cells->selectionModel ()->currentIndex ());
     if (cell) {
       m_cellviews [m_current_cv].set_cell (cell->cell_index ());
     }
@@ -298,12 +302,12 @@ CellSelectionForm::apply_clicked()
   //  select the current cell but don't make it the new top.
   if (m_current_cv >= 0 && m_current_cv < int (m_cellviews.size ())) {
 
-    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
     if (! model) {
       return;
     }
 
-    const db::Cell *cell = model->cell (lv_cells->selectionModel ()->currentIndex ());
+    const db::Cell *cell = model->cell (mp_ui->lv_cells->selectionModel ()->currentIndex ());
 
     lay::CellView cv (m_cellviews [m_current_cv]);
     cv.set_cell (cell->cell_index ());
@@ -319,9 +323,9 @@ CellSelectionForm::cell_changed (const QModelIndex &current, const QModelIndex &
 
     m_name_cb_enabled = false;
 
-    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
     if (model) {
-      le_cell_name->setText (tl::to_qstring (model->cell_name (current)));
+      mp_ui->le_cell_name->setText (tl::to_qstring (model->cell_name (current)));
       model->clear_locate ();
     }
 
@@ -336,7 +340,7 @@ CellSelectionForm::cell_changed (const QModelIndex &current, const QModelIndex &
 void
 CellSelectionForm::set_child ()
 {
-  child_changed (lv_children->selectionModel ()->currentIndex ());
+  child_changed (mp_ui->lv_children->selectionModel ()->currentIndex ());
 }
 
 void 
@@ -344,9 +348,9 @@ CellSelectionForm::child_changed(const QModelIndex &current)
 {
   if (m_children_cb_enabled && current.isValid ()) {
     if (m_current_cv >= 0 && m_current_cv < int (m_cellviews.size ())) {
-      lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_children->model ());
+      lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_children->model ());
       if (model) {
-        select_entry (model->cell_index (lv_children->selectionModel ()->currentIndex ()));
+        select_entry (model->cell_index (mp_ui->lv_children->selectionModel ()->currentIndex ()));
       }
     }
   }
@@ -355,7 +359,7 @@ CellSelectionForm::child_changed(const QModelIndex &current)
 void
 CellSelectionForm::set_parent ()
 {
-  parent_changed (lv_parents->selectionModel ()->currentIndex ());
+  parent_changed (mp_ui->lv_parents->selectionModel ()->currentIndex ());
 }
 
 void 
@@ -363,9 +367,9 @@ CellSelectionForm::parent_changed(const QModelIndex &current)
 {
   if (m_parents_cb_enabled && current.isValid ()) {
     if (m_current_cv >= 0 && m_current_cv < int (m_cellviews.size ())) {
-      lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_parents->model ());
+      lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_parents->model ());
       if (model) {
-        select_entry (model->cell_index (lv_parents->selectionModel ()->currentIndex ()));
+        select_entry (model->cell_index (mp_ui->lv_parents->selectionModel ()->currentIndex ()));
       }
     }
   }
@@ -376,7 +380,7 @@ CellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
 {
   m_cells_cb_enabled = false;
 
-  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
   if (! model) {
     return;
   }
@@ -394,12 +398,12 @@ CellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
   if (mi.isValid ()) {
 
     m_cells_cb_enabled = false;
-    lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
-    lv_cells->scrollTo (mi);
+    mp_ui->lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
+    mp_ui->lv_cells->scrollTo (mi);
     m_cells_cb_enabled = true;
 
     m_name_cb_enabled = false;
-    le_cell_name->setText (tl::to_qstring (model->cell_name (mi)));
+    mp_ui->le_cell_name->setText (tl::to_qstring (model->cell_name (mi)));
     model->clear_locate ();
     m_name_cb_enabled = true;
 
@@ -422,7 +426,7 @@ CellSelectionForm::update_all ()
 void 
 CellSelectionForm::find_next_clicked ()
 {
-  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
   if (! model) {
     return;
   }
@@ -431,8 +435,8 @@ CellSelectionForm::find_next_clicked ()
   if (mi.isValid ()) {
 
     m_cells_cb_enabled = false;
-    lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
-    lv_cells->scrollTo (mi);
+    mp_ui->lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
+    mp_ui->lv_cells->scrollTo (mi);
     update_children_list ();
     update_parents_list ();
     m_cells_cb_enabled = true;
@@ -443,7 +447,7 @@ CellSelectionForm::find_next_clicked ()
 void
 CellSelectionForm::find_prev_clicked ()
 {
-  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
   if (! model) {
     return;
   }
@@ -452,8 +456,8 @@ CellSelectionForm::find_prev_clicked ()
   if (mi.isValid ()) {
 
     m_cells_cb_enabled = false;
-    lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
-    lv_cells->scrollTo (mi);
+    mp_ui->lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
+    mp_ui->lv_cells->scrollTo (mi);
     update_children_list ();
     update_parents_list ();
     m_cells_cb_enabled = true;
@@ -466,9 +470,9 @@ CellSelectionForm::name_changed ()
 {
   if (m_name_cb_enabled) {
 
-    QString s = le_cell_name->text ();
+    QString s = mp_ui->le_cell_name->text ();
 
-    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
     if (! model) {
       return;
     }
@@ -481,9 +485,9 @@ CellSelectionForm::name_changed ()
     }
 
     m_cells_cb_enabled = false;
-    lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
+    mp_ui->lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
     if (mi.isValid ()) {
-      lv_cells->scrollTo (mi);
+      mp_ui->lv_cells->scrollTo (mi);
     }
     update_children_list ();
     update_parents_list ();
@@ -495,7 +499,7 @@ CellSelectionForm::name_changed ()
 void
 CellSelectionForm::show_cell ()
 {
-  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
   if (! model) {
     return;
   }
@@ -503,7 +507,7 @@ CellSelectionForm::show_cell ()
     return;
   }
 
-  QModelIndexList sel = lv_cells->selectionModel ()->selectedIndexes ();
+  QModelIndexList sel = mp_ui->lv_cells->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator s = sel.begin (); s != sel.end (); ++s) {
     db::cell_index_type ci = model->cell (*s)->cell_index ();
     mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Show cells")));
@@ -517,7 +521,7 @@ CellSelectionForm::show_cell ()
 void
 CellSelectionForm::hide_cell ()
 {
-  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
   if (! model) {
     return;
   }
@@ -525,7 +529,7 @@ CellSelectionForm::hide_cell ()
     return;
   }
 
-  QModelIndexList sel = lv_cells->selectionModel ()->selectedIndexes ();
+  QModelIndexList sel = mp_ui->lv_cells->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator s = sel.begin (); s != sel.end (); ++s) {
     db::cell_index_type ci = model->cell (*s)->cell_index ();
     mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Hide cells")));
@@ -539,7 +543,7 @@ CellSelectionForm::hide_cell ()
 // ------------------------------------------------------------
 
 LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, db::Layout *layout, const char *name, bool all_cells, bool top_cells_only)
-  : QDialog (parent), Ui::LibraryCellSelectionForm (),
+  : QDialog (parent),
     mp_lib (0), mp_layout (layout),
     m_name_cb_enabled (true),
     m_cells_cb_enabled (true),
@@ -549,32 +553,33 @@ LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, db::Layout 
     m_all_cells (all_cells),
     m_top_cells_only (top_cells_only)
 {
+  mp_ui = new Ui::LibraryCellSelectionForm ();
   setObjectName (QString::fromUtf8 (name));
 
-  Ui::LibraryCellSelectionForm::setupUi (this);
+  mp_ui->setupUi (this);
 
   //  no library selection
-  lib_label->hide ();
-  lib_cb->hide ();
+  mp_ui->lib_label->hide ();
+  mp_ui->lib_cb->hide ();
 
   //  signals and slots connections
-  connect (cancel_button, SIGNAL(clicked()), this, SLOT(reject()));
-  connect (ok_button, SIGNAL(clicked()), this, SLOT(accept()));
-  connect (le_cell_name, SIGNAL(textChanged(const QString&)), this, SLOT(name_changed(const QString&)));
-  connect (find_next, SIGNAL(clicked()), this, SLOT(find_next_clicked()));
-  connect (cb_show_all_cells, SIGNAL(clicked()), this, SLOT(show_all_changed()));
+  connect (mp_ui->cancel_button, SIGNAL(clicked()), this, SLOT(reject()));
+  connect (mp_ui->ok_button, SIGNAL(clicked()), this, SLOT(accept()));
+  connect (mp_ui->le_cell_name, SIGNAL(textChanged(const QString&)), this, SLOT(name_changed(const QString&)));
+  connect (mp_ui->find_next, SIGNAL(clicked()), this, SLOT(find_next_clicked()));
+  connect (mp_ui->cb_show_all_cells, SIGNAL(clicked()), this, SLOT(show_all_changed()));
 
-  lv_cells->header ()->hide ();
-  lv_cells->setRootIsDecorated (false);
+  mp_ui->lv_cells->header ()->hide ();
+  mp_ui->lv_cells->setRootIsDecorated (false);
 
-  ok_button->setText (QObject::tr ("Ok"));
-  cancel_button->setText (QObject::tr ("Cancel"));
+  mp_ui->ok_button->setText (QObject::tr ("Ok"));
+  mp_ui->cancel_button->setText (QObject::tr ("Cancel"));
 
   update_cell_list ();  
 }
 
 LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, const char *name, bool all_cells, bool top_cells_only)
-  : QDialog (parent), Ui::LibraryCellSelectionForm (),
+  : QDialog (parent),
     mp_lib (0), mp_layout (0),
     m_name_cb_enabled (true),
     m_cells_cb_enabled (true),
@@ -584,28 +589,30 @@ LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, const char 
     m_all_cells (all_cells),
     m_top_cells_only (top_cells_only)
 {
+  mp_ui = new Ui::LibraryCellSelectionForm ();
+
   mp_lib = db::LibraryManager::instance ().lib_ptr_by_name ("Basic");
   mp_layout = &mp_lib->layout ();
 
   setObjectName (QString::fromUtf8 (name));
 
-  Ui::LibraryCellSelectionForm::setupUi (this);
+  mp_ui->setupUi (this);
 
-  lib_cb->set_current_library (mp_lib);
+  mp_ui->lib_cb->set_current_library (mp_lib);
 
   // signals and slots connections
-  connect (cancel_button, SIGNAL(clicked()), this, SLOT(reject()));
-  connect (ok_button, SIGNAL(clicked()), this, SLOT(accept()));
-  connect (le_cell_name, SIGNAL(textChanged(const QString&)), this, SLOT(name_changed(const QString&)));
-  connect (find_next, SIGNAL(clicked()), this, SLOT(find_next_clicked()));
-  connect (lib_cb, SIGNAL(currentIndexChanged(int)), this, SLOT(lib_changed()));
-  connect (cb_show_all_cells, SIGNAL(clicked()), this, SLOT(show_all_changed()));
+  connect (mp_ui->cancel_button, SIGNAL(clicked()), this, SLOT(reject()));
+  connect (mp_ui->ok_button, SIGNAL(clicked()), this, SLOT(accept()));
+  connect (mp_ui->le_cell_name, SIGNAL(textChanged(const QString&)), this, SLOT(name_changed(const QString&)));
+  connect (mp_ui->find_next, SIGNAL(clicked()), this, SLOT(find_next_clicked()));
+  connect (mp_ui->lib_cb, SIGNAL(currentIndexChanged(int)), this, SLOT(lib_changed()));
+  connect (mp_ui->cb_show_all_cells, SIGNAL(clicked()), this, SLOT(show_all_changed()));
 
-  lv_cells->header ()->hide ();
-  lv_cells->setRootIsDecorated (false);
+  mp_ui->lv_cells->header ()->hide ();
+  mp_ui->lv_cells->setRootIsDecorated (false);
 
-  ok_button->setText (QObject::tr ("Ok"));
-  cancel_button->setText (QObject::tr ("Cancel"));
+  mp_ui->ok_button->setText (QObject::tr ("Ok"));
+  mp_ui->cancel_button->setText (QObject::tr ("Cancel"));
 
   update_cell_list ();  
 }
@@ -613,14 +620,14 @@ LibraryCellSelectionForm::LibraryCellSelectionForm (QWidget *parent, const char 
 void
 LibraryCellSelectionForm::show_all_changed ()
 {
-  m_all_cells = cb_show_all_cells->isChecked ();
+  m_all_cells = mp_ui->cb_show_all_cells->isChecked ();
   update_cell_list ();
 }
 
 void
 LibraryCellSelectionForm::lib_changed ()
 {
-  mp_lib = lib_cb->current_library ();
+  mp_lib = mp_ui->lib_cb->current_library ();
   mp_layout = mp_lib ? &mp_lib->layout () : 0;
   update_cell_list ();  
 }
@@ -675,11 +682,11 @@ END_PROTECTED
 void 
 LibraryCellSelectionForm::update_cell_list () 
 {
-  if (lv_cells->model ()) {
-    delete lv_cells->model ();
+  if (mp_ui->lv_cells->model ()) {
+    delete mp_ui->lv_cells->model ();
   }
 
-  cb_show_all_cells->setChecked (m_all_cells);
+  mp_ui->cb_show_all_cells->setChecked (m_all_cells);
 
   if (mp_layout) {
 
@@ -692,11 +699,11 @@ LibraryCellSelectionForm::update_cell_list ()
     }
 
     //  TODO: get rid of that const_cast
-    lay::CellTreeModel *model = new lay::CellTreeModel (lv_cells, const_cast<db::Layout *> (mp_layout), flags);
+    lay::CellTreeModel *model = new lay::CellTreeModel (mp_ui->lv_cells, const_cast<db::Layout *> (mp_layout), flags);
     
-    lv_cells->setModel (model);
+    mp_ui->lv_cells->setModel (model);
     //  connect can only happen after setModel()
-    connect (lv_cells->selectionModel (), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(cell_changed(const QModelIndex &, const QModelIndex &)));
+    connect (mp_ui->lv_cells->selectionModel (), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(cell_changed(const QModelIndex &, const QModelIndex &)));
 
     select_entry (std::numeric_limits<db::cell_index_type>::max ());
 
@@ -710,7 +717,7 @@ LibraryCellSelectionForm::cell_changed (const QModelIndex &current, const QModel
 
     m_name_cb_enabled = false;
 
-    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
     if (model) {
       m_is_pcell = model->is_pcell (current);
       if (m_is_pcell) {
@@ -718,7 +725,7 @@ LibraryCellSelectionForm::cell_changed (const QModelIndex &current, const QModel
       } else {
         m_cell_index = model->cell_index (current);
       }
-      le_cell_name->setText (tl::to_qstring (model->cell_name (current)));
+      mp_ui->le_cell_name->setText (tl::to_qstring (model->cell_name (current)));
       model->clear_locate ();
     } else {
       m_cell_index = -1;
@@ -738,7 +745,7 @@ LibraryCellSelectionForm::select_pcell_entry (db::pcell_id_type pci)
   m_pcell_id = pci;
   m_is_pcell = true;
 
-  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
   if (! model) {
     return;
   }
@@ -756,12 +763,12 @@ LibraryCellSelectionForm::select_pcell_entry (db::pcell_id_type pci)
   if (mi.isValid ()) {
 
     m_cells_cb_enabled = false;
-    lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
-    lv_cells->scrollTo (mi);
+    mp_ui->lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
+    mp_ui->lv_cells->scrollTo (mi);
     m_cells_cb_enabled = true;
 
     m_name_cb_enabled = false;
-    le_cell_name->setText (tl::to_qstring (model->cell_name (mi)));
+    mp_ui->le_cell_name->setText (tl::to_qstring (model->cell_name (mi)));
     model->clear_locate ();
     m_name_cb_enabled = true;
 
@@ -777,7 +784,7 @@ LibraryCellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
   m_cell_index = ci;
   m_is_pcell = false;
 
-  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
   if (! model) {
     return;
   }
@@ -795,12 +802,12 @@ LibraryCellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
   if (mi.isValid ()) {
 
     m_cells_cb_enabled = false;
-    lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
-    lv_cells->scrollTo (mi);
+    mp_ui->lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
+    mp_ui->lv_cells->scrollTo (mi);
     m_cells_cb_enabled = true;
 
     m_name_cb_enabled = false;
-    le_cell_name->setText (tl::to_qstring (model->cell_name (mi)));
+    mp_ui->le_cell_name->setText (tl::to_qstring (model->cell_name (mi)));
     model->clear_locate ();
     m_name_cb_enabled = true;
 
@@ -812,7 +819,7 @@ LibraryCellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
 void 
 LibraryCellSelectionForm::find_next_clicked ()
 {
-  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
   if (! model) {
     return;
   }
@@ -821,8 +828,8 @@ LibraryCellSelectionForm::find_next_clicked ()
   if (mi.isValid ()) {
 
     m_cells_cb_enabled = false;
-    lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
-    lv_cells->scrollTo (mi);
+    mp_ui->lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
+    mp_ui->lv_cells->scrollTo (mi);
 
     m_is_pcell = model->is_pcell (mi);
     if (m_is_pcell) {
@@ -845,7 +852,7 @@ LibraryCellSelectionForm::name_changed (const QString &s)
 {
   if (m_name_cb_enabled) {
 
-    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (mp_ui->lv_cells->model ());
     if (! model) {
       return;
     }
@@ -854,8 +861,8 @@ LibraryCellSelectionForm::name_changed (const QString &s)
     if (mi.isValid ()) {
 
       m_cells_cb_enabled = false;
-      lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
-      lv_cells->scrollTo (mi);
+      mp_ui->lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
+      mp_ui->lv_cells->scrollTo (mi);
 
       m_is_pcell = model->is_pcell (mi);
       if (m_is_pcell) {

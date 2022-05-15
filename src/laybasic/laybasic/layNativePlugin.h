@@ -23,7 +23,7 @@
 #ifndef HDR_layNativePlugin
 #define HDR_layNativePlugin
 
-#include "layCommon.h"
+#include "laybasicCommon.h"
 
 /**
  *  @brief A struct to hold the data of the plugin
@@ -84,12 +84,12 @@ struct klp_method_t { };
  *  @brief The gsi API functions wrapped for the native API
  */
 extern "C" {
-  LAY_PUBLIC const klp_class_t *klp_class_by_name (const char *name);
-  LAY_PUBLIC void *klp_create (const klp_class_t *cls);
-  LAY_PUBLIC void klp_destroy (const klp_class_t *cls, void *obj);
-  LAY_PUBLIC void *klp_clone (const klp_class_t *cls, const void *source);
-  LAY_PUBLIC void klp_assign (const klp_class_t *cls, void *target, const void *source);
-  LAY_PUBLIC void klp_require_api_version (const char *version);
+  LAYBASIC_PUBLIC const klp_class_t *klp_class_by_name (const char *name);
+  LAYBASIC_PUBLIC void *klp_create (const klp_class_t *cls);
+  LAYBASIC_PUBLIC void klp_destroy (const klp_class_t *cls, void *obj);
+  LAYBASIC_PUBLIC void *klp_clone (const klp_class_t *cls, const void *source);
+  LAYBASIC_PUBLIC void klp_assign (const klp_class_t *cls, void *target, const void *source);
+  LAYBASIC_PUBLIC void klp_require_api_version (const char *version);
 }
 
 

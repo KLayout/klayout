@@ -37,7 +37,7 @@ namespace lay
 {
 
 class CellView;
-class LayoutView;
+class LayoutViewBase;
 
 /**
  *  @brief The boolean operation options
@@ -52,7 +52,7 @@ public:
   BooleanOptionsDialog (QWidget *parent);
   virtual ~BooleanOptionsDialog ();
 
-  bool exec_dialog (lay::LayoutView *view, int &cv_a, int &layer_a, int &cv_b, int &layer_b, int &cv_res, int &layer_res, int &mode, int &hier_mode, bool &min_coherence);
+  bool exec_dialog (lay::LayoutViewBase *view, int &cv_a, int &layer_a, int &cv_b, int &layer_b, int &cv_res, int &layer_res, int &mode, int &hier_mode, bool &min_coherence);
 
 public slots:
   void cv_changed (int);
@@ -60,7 +60,7 @@ public slots:
 private:
   virtual void accept ();
 
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
 };
 
 /**
@@ -76,7 +76,7 @@ public:
   SizingOptionsDialog (QWidget *parent);
   virtual ~SizingOptionsDialog ();
 
-  bool exec_dialog (lay::LayoutView *view, int &cv, int &layer, int &cv_res, int &layer_res, double &dx, double &dy, unsigned int &size_mode, int &hier_mode, bool &min_coherence);
+  bool exec_dialog (lay::LayoutViewBase *view, int &cv, int &layer, int &cv_res, int &layer_res, double &dx, double &dy, unsigned int &size_mode, int &hier_mode, bool &min_coherence);
 
 public slots:
   void cv_changed (int);
@@ -84,7 +84,7 @@ public slots:
 private:
   virtual void accept ();
 
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
 };
 
 /**
@@ -100,7 +100,7 @@ public:
   MergeOptionsDialog (QWidget *parent);
   virtual ~MergeOptionsDialog ();
 
-  bool exec_dialog (lay::LayoutView *view, int &cv, int &layer, int &cv_res, int &layer_res, unsigned int &min_wc, int &hier_mode, bool &min_coherence);
+  bool exec_dialog (lay::LayoutViewBase *view, int &cv, int &layer, int &cv_res, int &layer_res, unsigned int &min_wc, int &hier_mode, bool &min_coherence);
 
 public slots:
   void cv_changed (int);
@@ -108,7 +108,7 @@ public slots:
 private:
   virtual void accept ();
 
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
 };
 
 }

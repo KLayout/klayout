@@ -73,7 +73,7 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new FillDialogPl
 
 // ------------------------------------------------------------
 
-FillDialog::FillDialog (lay::Dispatcher *main, LayoutView *view)
+FillDialog::FillDialog (lay::Dispatcher *main, LayoutViewBase *view)
   : QDialog (view->widget ()),
     lay::Plugin (main),
     Ui::FillDialog (),

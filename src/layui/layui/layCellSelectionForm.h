@@ -27,13 +27,20 @@
 
 #include <QAction>
 
-#include "ui_CellSelectionForm.h"
-#include "ui_LibraryCellSelectionForm.h"
+#include "layuiCommon.h"
 #include "layCellView.h"
 #include "tlDeferredExecution.h"
 
 #include <vector>
 #include <string>
+
+#include <QDialog>
+
+namespace Ui
+{
+  class CellSelectionForm;
+  class LibraryCellSelectionForm;
+}
 
 namespace lay
 {
@@ -45,7 +52,7 @@ class LayoutView;
  *  @brief A form to select a cell and a cell view index
  */
 class LAYUI_PUBLIC CellSelectionForm
-  : public QDialog, private Ui::CellSelectionForm
+  : public QDialog
 {
   Q_OBJECT 
 
@@ -77,6 +84,7 @@ public slots:
   void find_prev_clicked();
 
 private:
+  Ui::CellSelectionForm *mp_ui;
   lay::LayoutViewBase *mp_view;
   std::vector <lay::CellView> m_cellviews;
   int m_current_cv;
@@ -104,7 +112,7 @@ private:
  *  @brief A form to select a cell from a library
  */
 class LAYUI_PUBLIC LibraryCellSelectionForm
-  : public QDialog, private Ui::LibraryCellSelectionForm
+  : public QDialog
 {
   Q_OBJECT 
 
@@ -182,6 +190,7 @@ public slots:
   void show_all_changed ();
 
 private:
+  Ui::LibraryCellSelectionForm *mp_ui;
   db::Library *mp_lib;
   const db::Layout *mp_layout;
   bool m_name_cb_enabled;

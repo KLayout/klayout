@@ -32,6 +32,7 @@
 #include <QFrame>
 #include <QTreeView>
 
+#include "layuiCommon.h"
 #include "dbLayout.h"
 #include "layCanvasPlane.h"
 #include "layViewOp.h"
@@ -96,7 +97,7 @@ protected:
  *  The class communicates with a Layout interface for
  *  retrieval of the cell hierarchy
  */
-class HierarchyControlPanel
+class LAYUI_PUBLIC HierarchyControlPanel
   : public QFrame,
     public tl::Object
 {

@@ -53,7 +53,7 @@ namespace lay
 // -----------------------------------------------------------------------------------
 //  NetTracerDialog implementation
 
-NetTracerDialog::NetTracerDialog (lay::Dispatcher *root, lay::LayoutView *view)
+NetTracerDialog::NetTracerDialog (lay::Dispatcher *root, LayoutViewBase *view)
   : lay::Browser (root, view, "net_tracer_dialog"),
     lay::ViewService (view->view_object_widget ()), 
     m_cv_index (0), 

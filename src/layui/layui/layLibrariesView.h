@@ -25,13 +25,7 @@
 #ifndef HDR_layLibrariesView
 #define HDR_layLibrariesView
 
-#include <vector>
-#include <string>
-#include <algorithm>
-
-#include <QFrame>
-#include <QTreeView>
-
+#include "layuiCommon.h"
 #include "dbLayout.h"
 #include "layCanvasPlane.h"
 #include "layViewOp.h"
@@ -39,6 +33,13 @@
 #include "layCellTreeModel.h"
 #include "layWidgets.h"
 #include "tlDeferredExecution.h"
+
+#include <vector>
+#include <string>
+#include <algorithm>
+
+#include <QFrame>
+#include <QTreeView>
 
 class QModelIndex;
 class QComboBox;
@@ -95,7 +96,7 @@ protected:
  *  The class communicates with a Layout interface for
  *  retrieval of the cell hierarchy
  */
-class LibrariesView
+class LAYUI_PUBLIC LibrariesView
   : public QFrame,
     public tl::Object
 {

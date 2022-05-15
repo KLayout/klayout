@@ -462,9 +462,9 @@ static LayerPropertiesConstIteratorWrapper each_layer2 (lay::LayoutViewBase *vie
 }
 
 #if defined(HAVE_QT)
-Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutViewBase",
+LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutViewBase",
 #else
-Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutViewBase",
+LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutViewBase",
 #endif
   gsi::constant ("LV_NoLayers", (unsigned int) lay::LayoutViewBase::LV_NoLayers,
     "@brief With this option, no layers view will be provided (see \\layer_control_frame)\n"

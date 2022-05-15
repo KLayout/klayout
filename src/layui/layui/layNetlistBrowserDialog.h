@@ -25,6 +25,7 @@
 #ifndef HDR_layNetlistBrowserDialog
 #define HDR_layNetlistBrowserDialog
 
+#include "layuiCommon.h"
 #include "layBrowser.h"
 #include "layNetlistBrowser.h"
 #include "layViewObject.h"
@@ -47,7 +48,7 @@ namespace lay
 class NetlistObjectPath;
 class NetlistObjectsPath;
 
-class NetlistBrowserDialog
+class LAYUI_PUBLIC NetlistBrowserDialog
   : public lay::Browser,
     public lay::ViewService
 {

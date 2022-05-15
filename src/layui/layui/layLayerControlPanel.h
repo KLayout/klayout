@@ -26,17 +26,7 @@
 #define HDR_layLayerControlPanel
 
 
-#include <vector>
-#include <string>
-#include <set>
-#include <algorithm>
-
-#include <QFrame>
-#include <QLabel>
-#include <QPainter>
-#include <QPaintEvent>
-#include <QTreeView>
-
+#include "layuiCommon.h"
 #include "layCanvasPlane.h"
 #include "layViewOp.h"
 #include "layLayoutViewBase.h"
@@ -48,6 +38,17 @@
 #include "layWidgets.h"
 #include "dbObject.h"
 #include "tlDeferredExecution.h"
+
+#include <vector>
+#include <string>
+#include <set>
+#include <algorithm>
+
+#include <QFrame>
+#include <QLabel>
+#include <QPainter>
+#include <QPaintEvent>
+#include <QTreeView>
 
 class QTreeView;
 class QModelIndex;
@@ -108,7 +109,7 @@ private:
  *  The class communicates with a Layout interface for
  *  retrieval and changing of layer properties.
  */
-class LayerControlPanel
+class LAYUI_PUBLIC LayerControlPanel
   : public QFrame, 
     public db::Object,
     public tl::Object

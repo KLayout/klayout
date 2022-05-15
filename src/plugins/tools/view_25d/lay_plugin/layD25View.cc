@@ -38,7 +38,7 @@ namespace lay
 
 const double initial_elevation = 15.0;
 
-D25View::D25View (lay::Dispatcher *root, LayoutView *view)
+D25View::D25View (lay::Dispatcher *root, LayoutViewBase *view)
   : lay::Browser (root, view, "d25_view"),
     dm_rerun_macro (this, &D25View::rerun_macro),
     dm_fit (this, &D25View::fit)
@@ -146,7 +146,7 @@ D25View::menu_activated (const std::string &symbol)
 }
 
 D25View *
-D25View::open (lay::LayoutView *view)
+D25View::open (lay::LayoutViewBase *view)
 {
   D25View *d25_view = view->get_plugin<lay::D25View> ();
   if (d25_view) {

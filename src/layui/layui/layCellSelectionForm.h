@@ -25,8 +25,6 @@
 #ifndef HDR_layCellSelectionForm
 #define HDR_layCellSelectionForm
 
-#include <QAction>
-
 #include "layuiCommon.h"
 #include "layCellView.h"
 #include "tlDeferredExecution.h"
@@ -34,7 +32,9 @@
 #include <vector>
 #include <string>
 
+#include <QAction>
 #include <QDialog>
+#include <QModelIndex>
 
 namespace Ui
 {

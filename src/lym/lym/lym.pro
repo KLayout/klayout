@@ -16,7 +16,6 @@ SOURCES = \
 HEADERS = \
   lymCommon.h \
   lymForceLink.h \
-  lymInclude.h \
   lymMacroInterpreter.h \
   lymMacroCollection.h \
   lymMacro.h \

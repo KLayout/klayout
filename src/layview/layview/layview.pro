@@ -10,10 +10,12 @@ RESOURCES = \
 
 SOURCES = \
   layGridNet.cc \
+  layviewForceLink.cc \
 
 HEADERS = \
   layGridNet.h \
   layLayoutView.h \
+  layviewForceLink.h \
 
 !equals(HAVE_QT, "0") {
 

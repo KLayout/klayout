@@ -21,18 +21,18 @@
 */
 
 
-#ifndef HDR_laybasicForceLink
-#define HDR_laybasicForceLink
+#ifndef HDR_layuiForceLink
+#define HDR_layuiForceLink
 
-#include "laybasicCommon.h"
+#include "layuiCommon.h"
 
 /**
- *  @file Include this function to force linking of the laybasic module
+ *  @file Include this function to force linking of the layui module
  */
 
-namespace laybasic
+namespace layui
 {
-  LAYBASIC_PUBLIC int _force_link_f ();
+  LAYUI_PUBLIC int _force_link_f ();
   static int _force_link_target = _force_link_f ();
 }
 

@@ -22,14 +22,8 @@
 
 #include "../pymodHelper.h"
 
-#if defined(HAVE_QT)
-//  to force linking of the lay module
-#  include "../../lay/lay/layForceLink.h"
-#else
-//  to force linking of the laybasic module
-//  NOTE: without Qt we can only utilize the core view classes from laybasic
-#  include "../../laybasic/laybasic/laybasicForceLink.h"
-#endif
+//  to force linking of the layview module
+#  include "../../layview/layview/layviewForceLink.h"
 
 //  Force-include other dependencies
 //  NOTE: these libraries contribute to the "lay" module space. Hence we have to include them.

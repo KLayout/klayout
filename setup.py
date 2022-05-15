@@ -287,12 +287,12 @@ class Config(object):
         if platform.system() == "Windows":
             if mod == "_tl":
                 return [ "libcurl", "expat", "pthreadVCE2", "zlib", "wsock32" ]
-            elif mod == "_lay":
+            elif mod == "_laybasic":
                 return [ "libpng" ]
         else:
             if mod == "_tl":
                 return ['curl', 'expat']
-            elif mod == "_lay":
+            elif mod == "_laybasic":
                 return [ 'png' ]
         return []
 

@@ -25,6 +25,7 @@
 
 #if defined(HAVE_QT)
 #  include <QBuffer>
+#  include <QColor>
 #endif
 
 namespace gsi

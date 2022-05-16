@@ -88,7 +88,7 @@ TEST(5)
   EXPECT_EQ (lay::Color ("#80102030").to_string (), "#80102030");
   EXPECT_EQ (lay::Color ("#80102030").rgb (), 0x80102030);
 
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) && QT_VERSION >= 0x50000
   //  no alpha support in Qt
   EXPECT_EQ (QColor (tl::to_qstring ("#80102030")).isValid (), true);
   EXPECT_EQ (tl::to_string (QColor (tl::to_qstring ("#80102030")).name ()), "#102030");

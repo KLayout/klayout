@@ -272,6 +272,7 @@ module RBA
       param_index = @param_decls.length
       self.instance_eval("def #{name.to_s}; @param_values[#{param_index}]; end")
       self.instance_eval("def set_#{name.to_s}(v); @param_values[#{param_index}] = v; end")
+      self.instance_eval("def #{name.to_s}=(v); @param_values[#{param_index}] = v; end")
       if type == TypeLayer
         self.instance_eval("def #{name.to_s}_layer; @layers[#{@layer_param_index.length}]; end")
         @layer_param_index.push(param_index)

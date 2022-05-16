@@ -598,7 +598,7 @@ _img_path = os.path.join("src", "img", "img")
 _img_sources = set(glob.glob(os.path.join(_img_path, "*.cc")))
 
 _img = Library(config.root + '._img',
-               define_macros=config.macros() + [('MAKE_ANT_LIBRARY', 1)],
+               define_macros=config.macros() + [('MAKE_IMG_LIBRARY', 1)],
                include_dirs=[_laybasic_path, _layview_path, _rdb_path, _db_path, _tl_path, _gsi_path],
                extra_objects=[config.path_of('_laybasic', _laybasic_path), config.path_of('_layview', _layview_path), config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
                language='c++',
@@ -615,7 +615,7 @@ _edt_path = os.path.join("src", "edt", "edt")
 _edt_sources = set(glob.glob(os.path.join(_edt_path, "*.cc")))
 
 _edt = Library(config.root + '._edt',
-               define_macros=config.macros() + [('MAKE_ANT_LIBRARY', 1)],
+               define_macros=config.macros() + [('MAKE_EDT_LIBRARY', 1)],
                include_dirs=[_laybasic_path, _layview_path, _rdb_path, _db_path, _tl_path, _gsi_path],
                extra_objects=[config.path_of('_laybasic', _laybasic_path), config.path_of('_layview', _layview_path), config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
                language='c++',

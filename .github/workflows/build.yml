@@ -77,11 +77,25 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         path: dist/*.tar.gz
-
-  upload_all:
+     
+  upload_to_test_pypy:
     needs: [build, make_sdist]
     runs-on: ubuntu-latest
-    # Uncomment for real PyPi
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: artifact
+        path: dist
+
+    - uses: pypa/gh-action-pypi-publish@v1.4.2
+      with:
+        user: __token__
+        password: ${{ secrets.test_pypi_password }}
+        repository_url: https://test.pypi.org/legacy/
+
+  upload_to_pypi:
+    needs: [build, make_sdist]
+    runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:
     - uses: actions/download-artifact@v2
@@ -92,8 +106,4 @@ jobs:
     - uses: pypa/gh-action-pypi-publish@v1.4.2
       with:
         user: __token__
-        # Test PyPI
-        # password: ${{ secrets.test_pypi_password }}
-        # repository_url: https://test.pypi.org/legacy/
-        # Uncomment for Real Pypi
         password: ${{ secrets.pypi_password }}

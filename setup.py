@@ -288,7 +288,7 @@ class Config(object):
             if mod == "_tl":
                 return [ "libcurl", "expat", "pthreadVCE2", "zlib", "wsock32" ]
             elif mod == "_laybasic":
-                return [ "libpng" ]
+                return [ "libpng16" ]
         else:
             if mod == "_tl":
                 return ['curl', 'expat']

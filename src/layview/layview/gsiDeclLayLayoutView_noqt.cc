@@ -25,6 +25,7 @@
 #include "gsiDecl.h"
 #include "gsiSignals.h"
 #include "layLayoutView.h"
+#include "laybasicCommon.h"
 
 namespace gsi
 {
@@ -34,7 +35,7 @@ static lay::LayoutView *new_view2 (bool editable, db::Manager *manager, unsigned
   return new lay::LayoutView (manager, editable, 0 /*plugin parent*/, options);
 }
 
-extern Class<lay::LayoutView> decl_LayoutViewBase;
+LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase;
 
 Class<lay::LayoutView> decl_LayoutView (decl_LayoutViewBase, "lay", "LayoutView",
   gsi::constructor ("new", &new_view2, gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),

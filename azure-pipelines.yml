@@ -62,9 +62,9 @@ jobs:
       #arguments: # Optional
       script: | # Required when targetType == Inline
         pwd
-        Invoke-WebRequest -Uri "https://www.klayout.org/downloads/klayout-microbits-1.0.zip" -OutFile klayout-microbits-1.0.zip
+        Invoke-WebRequest -Uri "https://www.klayout.org/downloads/klayout-microbits-4.0.zip" -OutFile klayout-microbits-4.0.zip
         dir
-        Expand-Archive klayout-microbits-1.0.zip -DestinationPath klayout-microbits
+        Expand-Archive klayout-microbits-4.0.zip -DestinationPath klayout-microbits
         dir klayout-microbits
       #errorActionPreference: 'stop' # Optional. Options: stop, continue, silentlyContinue
       #failOnStderr: false # Optional
@@ -79,13 +79,13 @@ jobs:
 
   - script: |
       python -V
-      set "KLAYOUT_BITS=%cd%\klayout-microbits\klayout-microbits-1.0\msvc2017\%PYTHON_ARCHITECTURE%"
+      set "KLAYOUT_BITS=%cd%\klayout-microbits\klayout-microbits-4.0\msvc2017\%PYTHON_ARCHITECTURE%"
       echo KLAYOUT_BITS=%KLAYOUT_BITS%
       python setup.py bdist_wheel
     displayName: 'Build KLayout'
 
   - bash: |
-      bash `pwd`/ci-scripts/windows/fix_wheel.sh `pwd`/dist/*.whl "`pwd`/klayout-microbits/klayout-microbits-1.0/msvc2017/$PYTHON_ARCHITECTURE"
+      bash `pwd`/ci-scripts/windows/fix_wheel.sh `pwd`/dist/*.whl "`pwd`/klayout-microbits/klayout-microbits-4.0/msvc2017/$PYTHON_ARCHITECTURE"
     displayName: 'Copy klayout bits dlls into wheel'
 
   - script: |

@@ -35,7 +35,7 @@ static lay::LayoutView *new_view2 (bool editable, db::Manager *manager, unsigned
   return new lay::LayoutView (manager, editable, 0 /*plugin parent*/, options);
 }
 
-LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase;
+extern LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase;
 
 Class<lay::LayoutView> decl_LayoutView (decl_LayoutViewBase, "lay", "LayoutView",
   gsi::constructor ("new", &new_view2, gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),

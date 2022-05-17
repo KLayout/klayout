@@ -74,11 +74,11 @@ ant.depends += layview
 img.depends += layview
 edt.depends += layview
 
+plugins.depends += lib rdb db ant
+
 equals(HAVE_PYTHON, "1") {
   pymod.depends += layview ant img edt lym
 }
-
-plugins.depends += lib rdb db ant
 
 equals(HAVE_RUBY, "1") {
   MAIN_DEPENDS += drc lvs

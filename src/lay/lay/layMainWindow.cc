@@ -2036,6 +2036,10 @@ MainWindow::cm_load_layer_props ()
 void
 MainWindow::load_layer_props_from_file (const std::string &fn)
 {
+  if (! current_view ()) {
+    throw tl::Exception (tl::to_string (QObject::tr ("No view open to load the layer properties for")));
+  }
+
   int target_cv_index = -2;
 
   if (current_view ()->cellviews () > 1 && is_single_cv_layer_properties_file (fn)) {

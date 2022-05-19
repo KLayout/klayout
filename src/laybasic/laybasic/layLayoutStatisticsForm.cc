@@ -682,8 +682,13 @@ StatisticsSource::get (const std::string &url)
        <<     "<table>" << std::endl
        <<       "<tr>"
        <<         "<td>" << tl::to_string (QObject::tr ("Path")) << ":&nbsp;</td><td>" << m_h->filename () << "</td>"
-       <<       "</tr>" << std::endl
-       <<       "<tr>" 
+       <<       "</tr>" << std::endl;
+    if (! m_h->save_options ().format ().empty ()) {
+      os <<       "<tr>"
+         <<         "<td>" << tl::to_string (QObject::tr ("Format")) << ":&nbsp;</td><td>" << m_h->save_options ().format () << "</td>"
+         <<       "</tr>" << std::endl;
+    }
+    os <<       "<tr>"
        <<         "<td>" << tl::to_string (QObject::tr ("Technology")) << ":&nbsp;</td><td>" << m_h->technology ()->description () << format_tech_name (m_h->tech_name ()) << "</td>"
        <<       "</tr>" << std::endl
        <<       "<tr>"

@@ -51,6 +51,7 @@ tl::XMLElementList load_options_xml_element_list ()
 tl::XMLElementList save_options_xml_element_list ()
 {
   tl::XMLElementList elements;
+  elements.append (tl::make_member (&db::SaveLayoutOptions::format, &db::SaveLayoutOptions::set_format, "format"));
 
   for (tl::Registrar<db::StreamFormatDeclaration>::iterator cls = tl::Registrar<db::StreamFormatDeclaration>::begin (); cls != tl::Registrar<db::StreamFormatDeclaration>::end (); ++cls) {
     const StreamFormatDeclaration *decl = dynamic_cast <const StreamFormatDeclaration *> (&*cls);

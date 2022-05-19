@@ -277,7 +277,7 @@ LayoutHandle::update_save_options (db::SaveLayoutOptions &options)
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
 
     const lay::StreamWriterPluginDeclaration *decl = dynamic_cast <const lay::StreamWriterPluginDeclaration *> (&*cls);
-    if (! decl) {
+    if (! decl || decl->options_alias ()) {
       continue;
     }
 

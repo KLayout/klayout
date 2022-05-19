@@ -103,14 +103,6 @@ if RBA.constants.member?(:PCellDeclarationHelper)
 
   class BoxPCell2 < RBA::PCellDeclarationHelper
 
-    def self.coerce_called
-      return @@coerce_called
-    end
-
-    def self.reset_coerce_called
-      @@coerce_called = 0
-    end
-
     def initialize
 
       super()
@@ -140,8 +132,6 @@ if RBA.constants.member?(:PCellDeclarationHelper)
     end
       
     def coerce_parameters_impl
-      @@coerce_called ||= 0
-      @@coerce_called += 1
       self.secret = [0, self.secret].max
     end
 
@@ -368,11 +358,8 @@ class DBPCell_TestClass < TestBase
     assert_equal(lib != nil, true)
     pcell_decl = lib.layout().pcell_declaration("Box2")
 
-    BoxPCell2.reset_coerce_called
-
     param = [ RBA::LayerInfo::new(1, 0) ]  # rest is filled with defaults
     pcell_var_id = ly.add_pcell_variant(lib, pcell_decl.id(), param)
-    assert_equal(BoxPCell2.coerce_called, 1)
     pcell_var = ly.cell(pcell_var_id)
     pcell_inst = c1.insert(RBA::CellInstArray::new(pcell_var_id, RBA::Trans::new))
     assert_equal(pcell_var.basic_name, "Box2")
@@ -381,6 +368,7 @@ class DBPCell_TestClass < TestBase
     assert_equal(norm_hash(pcell_var.pcell_parameters_by_name()), "{\"height\"=>1.0, \"layer\"=><1/0>, \"secret\"=>0, \"width\"=>1.0}")
     assert_equal(pcell_var.pcell_parameter("height").inspect(), "1.0")
     assert_equal(c1.pcell_parameters(pcell_inst).inspect(), "[<1/0>, 1.0, 1.0, 0]")
+    assert_equal(c1.pcell_parameter(pcell_inst, "secret"), 0)
     assert_equal(norm_hash(c1.pcell_parameters_by_name(pcell_inst)), "{\"height\"=>1.0, \"layer\"=><1/0>, \"secret\"=>0, \"width\"=>1.0}")
     assert_equal(c1.pcell_parameter(pcell_inst, "height").inspect(), "1.0")
     assert_equal(norm_hash(pcell_inst.pcell_parameters_by_name()), "{\"height\"=>1.0, \"layer\"=><1/0>, \"secret\"=>0, \"width\"=>1.0}")
@@ -411,17 +399,30 @@ class DBPCell_TestClass < TestBase
     assert_equal(pcell_decl.parameters_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10).inspect, "[<10/0>, 1.0, 2.0, 0]")
     assert_equal(pcell_decl.transformation_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10).to_s, "r0 50,110")
 
-    BoxPCell2.reset_coerce_called
+    param2 = c1.pcell_parameters(pcell_inst)
+    param2[3] = -2  # "secret"
+    pcell_var_id2 = ly.add_pcell_variant(lib, pcell_decl.id(), param2)
+    pcell_var2 = ly.cell(pcell_var_id2)
+    pcell_inst2 = c1.insert(RBA::CellInstArray::new(pcell_var_id2, RBA::Trans::new))
+
+    assert_equal(c1.pcell_parameter(pcell_inst2, "secret"), -2)  # coerce_parameters NOT called!
+    assert_not_equal(pcell_inst.cell.library_cell_index, pcell_inst2.cell.library_cell_index)
+
     param = { "secret" => -1 }
     c1.change_pcell_parameters(pcell_inst, param)
-    assert_equal(c1.pcell_parameter("secret"), 0)
-    assert_equal(BoxPCell2.coerce_called, 1)
+    assert_equal(c1.pcell_parameter(pcell_inst, "secret"), -1)  # coerce_parameters NOT called!
 
-    BoxPCell2.reset_coerce_called
+    tl.refresh
+    assert_equal(c1.pcell_parameter(pcell_inst2, "secret"), 0)  # coerce_parameters was called
+    assert_equal(c1.pcell_parameter(pcell_inst, "secret"), 0)  # coerce_parameters was called
+
+    # same variant now
+    assert_equal(pcell_inst.cell.library_cell_index, pcell_inst2.cell.library_cell_index)
+
     param = { "secret" => 42 }
     c1.change_pcell_parameters(pcell_inst, param)
-    assert_equal(c1.pcell_parameter("secret"), 42)
-    assert_equal(BoxPCell2.coerce_called, 1)
+    assert_equal(c1.pcell_parameter(pcell_inst, "secret"), 42)
+    assert_not_equal(pcell_inst.cell.library_cell_index, pcell_inst2.cell.library_cell_index)
 
     ly._destroy
     tl._destroy

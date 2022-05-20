@@ -22,6 +22,7 @@
 
 
 #include "libBasicCircle.h"
+#include "tlMath.h"
 
 #include <cmath>
 
@@ -96,19 +97,26 @@ BasicCircle::coerce_parameters (const db::Layout & /*layout*/, db::pcell_paramet
     rs = parameters [p_handle].to_user <db::DPoint> ().distance ();
   } 
 
-  if (fabs (ru - r) > 1e-6) {
-    //  the explicit radius has changed: use it
-    ru = r;
-    parameters [p_handle] = db::DPoint (-r, 0);
-  } else {
-    //  the handle has changed: use this
-    ru = rs;
-    r = rs;
-    parameters [p_radius] = r;
-  }
 
-  //  set the hidden used radius parameter
-  parameters [p_actual_radius] = ru;
+  if (! tl::equal (r, ru)) {
+
+    if (tl::equal (r, rs)) {
+      //  the hidden value has changed (programmatically): set radius and handle accordingly
+      parameters [p_radius] = ru;
+      parameters [p_handle] = db::DPoint (-ru, 0);
+    } else {
+      //  the explicit radius has changed
+      parameters [p_handle] = db::DPoint (-r, 0);
+      parameters [p_actual_radius] = r;
+    }
+
+  } else if (! tl::equal (rs, ru)) {
+
+    //  the handle has changed: set radius and hidden actual radius accordingly
+    parameters [p_radius] = rs;
+    parameters [p_actual_radius] = rs;
+
+  }
 }
 
 void 
@@ -164,14 +172,14 @@ BasicCircle::get_parameter_declarations () const
   parameters.push_back (db::PCellParameterDeclaration ("radius"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
   parameters.back ().set_description (tl::to_string (tr ("Radius")));
-  parameters.back ().set_default (0.1);
+  parameters.back ().set_default (0.0);
   parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
   //  parameter #2: handle 
   tl_assert (parameters.size () == p_handle);
   parameters.push_back (db::PCellParameterDeclaration ("handle"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
-  parameters.back ().set_default (db::DPoint (-0.1, 0));
+  parameters.back ().set_default (db::DPoint (0, 0));
   parameters.back ().set_description (tl::to_string (tr ("R")));
 
   //  parameter #3: number of points 
@@ -185,7 +193,7 @@ BasicCircle::get_parameter_declarations () const
   tl_assert (parameters.size () == p_actual_radius);
   parameters.push_back (db::PCellParameterDeclaration ("actual_radius"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_default (0.0);
+  parameters.back ().set_default (1.0);
   parameters.back ().set_hidden (true);
 
   return parameters;

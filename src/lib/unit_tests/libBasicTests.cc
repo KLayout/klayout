@@ -25,6 +25,8 @@
 
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
+#include "dbReader.h"
+#include "dbTestSupport.h"
 
 #include "libBasicCircle.h"
 
@@ -100,6 +102,16 @@ TEST(1_Circle)
   EXPECT_EQ (circle->get_display_name (), "Basic.CIRCLE(l=1/0,r=8,n=64)");
   EXPECT_EQ (ly.get_pcell_parameters (circle->cell_index ()) [p_radius].to_double (), 8.0);
   EXPECT_EQ (ly.get_pcell_parameters (circle->cell_index ()) [p_actual_radius].to_double (), 8.0);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Shapes shapes;
+  db::Shape s = shapes.insert (db::Box (1000, 2000, 4000, 5000));
+  EXPECT_EQ (lib_basic->layout ().pcell_declaration (pc.second)->can_create_from_shape (ly, s, l1), true);
+  EXPECT_EQ (lib_basic->layout ().pcell_declaration (pc.second)->transformation_from_shape (ly, s, l1).to_string (), "r0 2500,3500");
+  plist = lib_basic->layout ().pcell_declaration (pc.second)->parameters_from_shape (ly, s, l1);
+  EXPECT_EQ (plist [p_layer].to_string (), "1/0");
+  EXPECT_EQ (plist [p_actual_radius].to_string (), "1.5");
 }
 
 TEST(2_Pie)
@@ -606,6 +618,17 @@ TEST(4_Donut)
   EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_actual_radius1].to_double (), 5);
   EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_radius2].to_double (), 9);
   EXPECT_EQ (ly.get_pcell_parameters (donut->cell_index ()) [p_actual_radius2].to_double (), 9);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Shapes shapes;
+  db::Shape s = shapes.insert (db::Box (1000, 2000, 3000, 5000));
+  EXPECT_EQ (lib_basic->layout ().pcell_declaration (pc.second)->can_create_from_shape (ly, s, l1), true);
+  EXPECT_EQ (lib_basic->layout ().pcell_declaration (pc.second)->transformation_from_shape (ly, s, l1).to_string (), "r0 2000,3500");
+  plist = lib_basic->layout ().pcell_declaration (pc.second)->parameters_from_shape (ly, s, l1);
+  EXPECT_EQ (plist [p_layer].to_string (), "1/0");
+  EXPECT_EQ (plist [p_actual_radius1].to_string (), "1");
+  EXPECT_EQ (plist [p_actual_radius2].to_string (), "0.5");
 }
 
 TEST(5_Ellipse)
@@ -728,4 +751,36 @@ TEST(5_Ellipse)
   EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_actual_radius_x].to_double (), 5);
   EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_radius_y].to_double (), 9);
   EXPECT_EQ (ly.get_pcell_parameters (ellipse->cell_index ()) [p_actual_radius_y].to_double (), 9);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Shapes shapes;
+  db::Shape s = shapes.insert (db::Box (1000, 2000, 3000, 5000));
+  EXPECT_EQ (lib_basic->layout ().pcell_declaration (pc.second)->can_create_from_shape (ly, s, l1), true);
+  EXPECT_EQ (lib_basic->layout ().pcell_declaration (pc.second)->transformation_from_shape (ly, s, l1).to_string (), "r0 2000,3500");
+  plist = lib_basic->layout ().pcell_declaration (pc.second)->parameters_from_shape (ly, s, l1);
+  EXPECT_EQ (plist [p_layer].to_string (), "1/0");
+  EXPECT_EQ (plist [p_actual_radius_x].to_string (), "1");
+  EXPECT_EQ (plist [p_actual_radius_y].to_string (), "1.5");
+}
+
+//  regeneration of PCells after reading
+TEST(10)
+{
+  db::Layout ly;
+
+  {
+    std::string fn (tl::testdata ());
+    fn += "/gds/basic_instances.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::Library *lib_basic = db::LibraryManager::instance ().lib_ptr_by_name ("Basic");
+  tl_assert (lib_basic);
+  lib_basic->refresh ();
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testdata () + "/gds/basic_instances_au.gds");
 }

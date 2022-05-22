@@ -67,8 +67,8 @@ BasicEllipse::parameters_from_shape (const db::Layout &layout, const db::Shape &
   //  use map_parameters to create defaults for the other parameters
   std::map<size_t, tl::Variant> nm;
   nm.insert (std::make_pair (p_layer, tl::Variant (layout.get_properties (layer))));
-  nm.insert (std::make_pair (p_radius_x, tl::Variant (0.5 * dbox.width ())));
-  nm.insert (std::make_pair (p_radius_y, tl::Variant (0.5 * dbox.height ())));
+  nm.insert (std::make_pair (p_actual_radius_x, tl::Variant (0.5 * dbox.width ())));
+  nm.insert (std::make_pair (p_actual_radius_y, tl::Variant (0.5 * dbox.height ())));
   return map_parameters (nm);
 }
 
@@ -92,8 +92,8 @@ BasicEllipse::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parame
     return;
   }
 
-  double ru_x = parameters [p_actual_radius_x].to_double ();
-  double r_x = parameters [p_radius_x].to_double ();
+  double ru_x = parameters [p_radius_x].to_double ();
+  double r_x = parameters [p_actual_radius_x].to_double ();
 
   double rs_x = ru_x;
   if (parameters [p_handle_x].is_user <db::DPoint> ()) {
@@ -108,16 +108,16 @@ BasicEllipse::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parame
     //  the handle has changed: use this
     ru_x = rs_x;
     r_x = rs_x;
-    parameters [p_radius_x] = r_x;
+    parameters [p_actual_radius_x] = r_x;
     parameters [p_handle_x] = db::DPoint (-r_x, 0);
   }
 
   //  set the hidden used radius parameter
-  parameters [p_actual_radius_x] = ru_x;
+  parameters [p_radius_x] = ru_x;
 
   //  do the same for the y radius
-  double ru_y = parameters [p_actual_radius_y].to_double ();
-  double r_y = parameters [p_radius_y].to_double ();
+  double ru_y = parameters [p_radius_y].to_double ();
+  double r_y = parameters [p_actual_radius_y].to_double ();
 
   double rs_y = ru_y;
   if (parameters [p_handle_y].is_user <db::DPoint> ()) {
@@ -132,12 +132,12 @@ BasicEllipse::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parame
     //  the handle has changed: use this
     ru_y = rs_y;
     r_y = rs_y;
-    parameters [p_radius_y] = r_y;
+    parameters [p_actual_radius_y] = r_y;
     parameters [p_handle_y] = db::DPoint (0, r_y);
   }
 
   //  set the hidden used radius parameter
-  parameters [p_actual_radius_y] = ru_y;
+  parameters [p_radius_y] = ru_y;
 }
 
 void 
@@ -147,8 +147,8 @@ BasicEllipse::produce (const db::Layout &layout, const std::vector<unsigned int>
     return;
   }
 
-  double r_x = parameters [p_actual_radius_x].to_double () / layout.dbu ();
-  double r_y = parameters [p_actual_radius_y].to_double () / layout.dbu ();
+  double r_x = parameters [p_radius_x].to_double () / layout.dbu ();
+  double r_y = parameters [p_radius_y].to_double () / layout.dbu ();
   int n = std::max (3, parameters [p_npoints].to_int ());
 
   std::vector <db::Point> points;
@@ -174,8 +174,8 @@ std::string
 BasicEllipse::get_display_name (const db::pcell_parameters_type &parameters) const
 {
   return "ELLIPSE(l=" + std::string (parameters [p_layer].to_string ()) +
-               ",rx=" + tl::to_string (parameters [p_actual_radius_x].to_double ()) +
-               ",ry=" + tl::to_string (parameters [p_actual_radius_y].to_double ()) +
+               ",rx=" + tl::to_string (parameters [p_radius_x].to_double ()) +
+               ",ry=" + tl::to_string (parameters [p_radius_y].to_double ()) +
                 ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
                   ")";
 }
@@ -195,30 +195,28 @@ BasicEllipse::get_parameter_declarations () const
   tl_assert (parameters.size () == p_radius_x);
   parameters.push_back (db::PCellParameterDeclaration ("radius_x"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (tr ("Radius (x)")));
-  parameters.back ().set_default (0.1);
-  parameters.back ().set_unit (tl::to_string (tr ("micron")));
+  parameters.back ().set_hidden (true);
 
   //  parameter #2: y radius 
+  //  This is a shadow parameter to receive the used y radius
   tl_assert (parameters.size () == p_radius_y);
   parameters.push_back (db::PCellParameterDeclaration ("radius_y"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (tr ("Radius (y)")));
-  parameters.back ().set_default (0.1);
-  parameters.back ().set_unit (tl::to_string (tr ("micron")));
+  parameters.back ().set_hidden (true);
 
   //  parameter #3: x handle 
+  //  This is a shadow parameter to receive the used x radius
   tl_assert (parameters.size () == p_handle_x);
   parameters.push_back (db::PCellParameterDeclaration ("handle_x"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
-  parameters.back ().set_default (db::DPoint (-0.2, 0));
+  parameters.back ().set_default (db::DPoint (-1.0, 0));
   parameters.back ().set_description (tl::to_string (tr ("Rx")));
 
   //  parameter #4: x handle 
   tl_assert (parameters.size () == p_handle_y);
   parameters.push_back (db::PCellParameterDeclaration ("handle_y"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
-  parameters.back ().set_default (db::DPoint (-0.1, 0));
+  parameters.back ().set_default (db::DPoint (0, 0.5));
   parameters.back ().set_description (tl::to_string (tr ("Ry")));
 
   //  parameter #5: number of points 
@@ -232,15 +230,17 @@ BasicEllipse::get_parameter_declarations () const
   tl_assert (parameters.size () == p_actual_radius_x);
   parameters.push_back (db::PCellParameterDeclaration ("actual_radius_x"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_default (0.0);
-  parameters.back ().set_hidden (true);
+  parameters.back ().set_description (tl::to_string (tr ("Radius (x)")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
+  parameters.back ().set_default (1.0);
 
   //  parameter #6: used y radius
   tl_assert (parameters.size () == p_actual_radius_y);
   parameters.push_back (db::PCellParameterDeclaration ("actual_radius_y"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_default (0.0);
-  parameters.back ().set_hidden (true);
+  parameters.back ().set_description (tl::to_string (tr ("Radius (y)")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
+  parameters.back ().set_default (0.5);
 
   return parameters;
 }

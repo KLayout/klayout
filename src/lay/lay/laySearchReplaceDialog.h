@@ -164,7 +164,7 @@ public:
     std::string text;
   };
 
-  SearchReplaceDialog (lay::Dispatcher *root, lay::LayoutView *view);
+  SearchReplaceDialog (lay::Dispatcher *root, lay::LayoutViewBase *view);
   ~SearchReplaceDialog ();
 
 private:
@@ -174,7 +174,7 @@ private:
   //  implementation of the lay::Plugin interface
   void menu_activated (const std::string &symbol);
 
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   std::vector<std::string> m_mru;
   std::vector<SavedQuery> m_saved;
   int m_current_mode;

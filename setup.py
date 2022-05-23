@@ -28,6 +28,7 @@ The standalone libraries are basically extension modules.
 Build requirements are:
  * curl library
  * expat library
+ * png library
 
 The main challenge is to map KLayout's shared object architecture.
 The structure consists of the Python extension libraries and a bunch
@@ -269,6 +270,7 @@ class Config(object):
             if bits:
                 return [quote_path("-I" + os.path.join(bits, "zlib", "include")),
                         quote_path("-I" + os.path.join(bits, "ptw", "include")),
+                        quote_path("-I" + os.path.join(bits, "png", "include")),
                         quote_path("-I" + os.path.join(bits, "expat", "include")),
                         quote_path("-I" + os.path.join(bits, "curl", "include"))]
             else:
@@ -285,9 +287,13 @@ class Config(object):
         if platform.system() == "Windows":
             if mod == "_tl":
                 return [ "libcurl", "expat", "pthreadVCE2", "zlib", "wsock32" ]
+            elif mod == "_laybasic":
+                return [ "libpng16" ]
         else:
             if mod == "_tl":
                 return ['curl', 'expat']
+            elif mod == "_laybasic":
+                return [ 'png' ]
         return []
 
     def link_args(self, mod):
@@ -298,8 +304,9 @@ class Config(object):
             args = ["/DLL"]
             bits = os.getenv("KLAYOUT_BITS")
             if bits:
-                args += [quote_path("/LIBPATH:" + os.path.join(bits, "zlib", "libraries")),
+                args += [quote_path("/LIBPATH:" + os.path.join(bits, "zlib", "lib")),
                          quote_path("/LIBPATH:" + os.path.join(bits, "ptw", "libraries")),
+                         quote_path("/LIBPATH:" + os.path.join(bits, "png", "libraries")),
                          quote_path("/LIBPATH:" + os.path.join(bits, "expat", "libraries")),
                          quote_path("/LIBPATH:" + os.path.join(bits, "curl", "libraries"))]
             return args
@@ -334,7 +341,7 @@ class Config(object):
         """
         Returns the macros to use for building
         """
-        return [('HAVE_CURL', 1), ('HAVE_EXPAT', 1), ('KLAYOUT_MAJOR_VERSION', self.major_version()), ('KLAYOUT_MINOR_VERSION', self.minor_version())]
+        return [('HAVE_PNG', 1), ('HAVE_CURL', 1), ('HAVE_EXPAT', 1), ('KLAYOUT_MAJOR_VERSION', self.major_version()), ('KLAYOUT_MINOR_VERSION', self.minor_version())]
 
     def minor_version(self):
         """
@@ -425,6 +432,7 @@ _gsi = Library(config.root + '._gsi',
                include_dirs=[_tl_path],
                extra_objects=[config.path_of('_tl', _tl_path)],
                language='c++',
+               libraries=config.libraries('_gsi'),
                extra_link_args=config.link_args('_gsi'),
                extra_compile_args=config.compile_args('_gsi'),
                sources=list(_gsi_sources))
@@ -441,10 +449,28 @@ _pya = Library(config.root + '._pya',
                include_dirs=[_tl_path, _gsi_path],
                extra_objects=[config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path)],
                language='c++',
+               libraries=config.libraries('_pya'),
                extra_link_args=config.link_args('_pya'),
                extra_compile_args=config.compile_args('_pya'),
                sources=list(_pya_sources))
 config.add_extension(_pya)
+
+# ------------------------------------------------------------------
+# _rba dependency library (dummy)
+
+_rba_path = os.path.join("src", "rbastub")
+_rba_sources = set(glob.glob(os.path.join(_rba_path, "*.cc")))
+
+_rba = Library(config.root + '._rba',
+               define_macros=config.macros() + [('MAKE_RBA_LIBRARY', 1)],
+               include_dirs=[_tl_path, _gsi_path],
+               extra_objects=[config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path)],
+               language='c++',
+               libraries=config.libraries('_rba'),
+               extra_link_args=config.link_args('_rba'),
+               extra_compile_args=config.compile_args('_rba'),
+               sources=list(_rba_sources))
+config.add_extension(_rba)
 
 # ------------------------------------------------------------------
 # _db dependency library
@@ -457,6 +483,7 @@ _db = Library(config.root + '._db',
               include_dirs=[_tl_path, _gsi_path, _db_path],
               extra_objects=[config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path)],
               language='c++',
+              libraries=config.libraries('_db'),
               extra_link_args=config.link_args('_db'),
               extra_compile_args=config.compile_args('_db'),
               sources=list(_db_sources))
@@ -473,6 +500,7 @@ _lib = Library(config.root + '._lib',
               include_dirs=[_tl_path, _gsi_path, _db_path, _lib_path],
               extra_objects=[config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
               language='c++',
+              libraries=config.libraries('_lib'),
               extra_link_args=config.link_args('_lib'),
               extra_compile_args=config.compile_args('_lib'),
               sources=list(_lib_sources))
@@ -489,10 +517,113 @@ _rdb = Library(config.root + '._rdb',
                include_dirs=[_db_path, _tl_path, _gsi_path],
                extra_objects=[config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
                language='c++',
+               libraries=config.libraries('_rdb'),
                extra_link_args=config.link_args('_rdb'),
                extra_compile_args=config.compile_args('_rdb'),
                sources=list(_rdb_sources))
 config.add_extension(_rdb)
+
+# ------------------------------------------------------------------
+# _laybasic dependency library
+
+_laybasic_path = os.path.join("src", "laybasic", "laybasic")
+_laybasic_sources = set(glob.glob(os.path.join(_laybasic_path, "*.cc")))
+
+_laybasic = Library(config.root + '._laybasic',
+               define_macros=config.macros() + [('MAKE_LAYBASIC_LIBRARY', 1)],
+               include_dirs=[_rdb_path, _db_path, _tl_path, _gsi_path],
+               extra_objects=[config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
+               language='c++',
+               libraries=config.libraries('_laybasic'),
+               extra_link_args=config.link_args('_laybasic'),
+               extra_compile_args=config.compile_args('_laybasic'),
+               sources=list(_laybasic_sources))
+config.add_extension(_laybasic)
+
+# ------------------------------------------------------------------
+# _layview dependency library
+
+_layview_path = os.path.join("src", "layview", "layview")
+_layview_sources = set(glob.glob(os.path.join(_layview_path, "*.cc")))
+
+_layview = Library(config.root + '._layview',
+               define_macros=config.macros() + [('MAKE_LAYVIEW_LIBRARY', 1)],
+               include_dirs=[_laybasic_path, _rdb_path, _db_path, _tl_path, _gsi_path],
+               extra_objects=[config.path_of('_laybasic', _laybasic_path), config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
+               language='c++',
+               libraries=config.libraries('_layview'),
+               extra_link_args=config.link_args('_layview'),
+               extra_compile_args=config.compile_args('_layview'),
+               sources=list(_layview_sources))
+config.add_extension(_layview)
+
+# ------------------------------------------------------------------
+# _lym dependency library
+
+_lym_path = os.path.join("src", "lym", "lym")
+_lym_sources = set(glob.glob(os.path.join(_lym_path, "*.cc")))
+
+_lym = Library(config.root + '._lym',
+               define_macros=config.macros() + [('MAKE_LYM_LIBRARY', 1)],
+               include_dirs=[_pya_path, _rba_path, _tl_path, _gsi_path],
+               extra_objects=[config.path_of('_rba', _rba_path), config.path_of('_pya', _pya_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path)],
+               language='c++',
+               libraries=config.libraries('_lym'),
+               extra_link_args=config.link_args('_lym'),
+               extra_compile_args=config.compile_args('_lym'),
+               sources=list(_lym_sources))
+config.add_extension(_lym)
+
+# ------------------------------------------------------------------
+# _ant dependency library
+
+_ant_path = os.path.join("src", "ant", "ant")
+_ant_sources = set(glob.glob(os.path.join(_ant_path, "*.cc")))
+
+_ant = Library(config.root + '._ant',
+               define_macros=config.macros() + [('MAKE_ANT_LIBRARY', 1)],
+               include_dirs=[_laybasic_path, _layview_path, _rdb_path, _db_path, _tl_path, _gsi_path],
+               extra_objects=[config.path_of('_laybasic', _laybasic_path), config.path_of('_layview', _layview_path), config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
+               language='c++',
+               libraries=config.libraries('_ant'),
+               extra_link_args=config.link_args('_ant'),
+               extra_compile_args=config.compile_args('_ant'),
+               sources=list(_ant_sources))
+config.add_extension(_ant)
+
+# ------------------------------------------------------------------
+# _img dependency library
+
+_img_path = os.path.join("src", "img", "img")
+_img_sources = set(glob.glob(os.path.join(_img_path, "*.cc")))
+
+_img = Library(config.root + '._img',
+               define_macros=config.macros() + [('MAKE_IMG_LIBRARY', 1)],
+               include_dirs=[_laybasic_path, _layview_path, _rdb_path, _db_path, _tl_path, _gsi_path],
+               extra_objects=[config.path_of('_laybasic', _laybasic_path), config.path_of('_layview', _layview_path), config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
+               language='c++',
+               libraries=config.libraries('_img'),
+               extra_link_args=config.link_args('_img'),
+               extra_compile_args=config.compile_args('_img'),
+               sources=list(_img_sources))
+config.add_extension(_img)
+
+# ------------------------------------------------------------------
+# _edt dependency library
+
+_edt_path = os.path.join("src", "edt", "edt")
+_edt_sources = set(glob.glob(os.path.join(_edt_path, "*.cc")))
+
+_edt = Library(config.root + '._edt',
+               define_macros=config.macros() + [('MAKE_EDT_LIBRARY', 1)],
+               include_dirs=[_laybasic_path, _layview_path, _rdb_path, _db_path, _tl_path, _gsi_path],
+               extra_objects=[config.path_of('_laybasic', _laybasic_path), config.path_of('_layview', _layview_path), config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_db', _db_path)],
+               language='c++',
+               libraries=config.libraries('_edt'),
+               extra_link_args=config.link_args('_edt'),
+               extra_compile_args=config.compile_args('_edt'),
+               sources=list(_edt_sources))
+config.add_extension(_edt)
 
 # ------------------------------------------------------------------
 # dependency libraries from db_plugins
@@ -578,6 +709,36 @@ rdb = Extension(config.root + '.rdbcore',
                 sources=list(rdb_sources))
 
 # ------------------------------------------------------------------
+# lay extension library
+
+lay_path = os.path.join("src", "pymod", "lay")
+lay_sources = set(glob.glob(os.path.join(lay_path, "*.cc")))
+
+lay = Extension(config.root + '.laycore',
+                define_macros=config.macros(),
+                include_dirs=[_laybasic_path, 
+                              _layview_path, 
+                              _img_path, 
+                              _ant_path, 
+                              _edt_path, 
+                              _lym_path, 
+                              _tl_path, 
+                              _gsi_path, 
+                              _pya_path],
+                extra_objects=[config.path_of('_laybasic', _laybasic_path), 
+                               config.path_of('_layview', _layview_path), 
+                               config.path_of('_img', _img_path), 
+                               config.path_of('_ant', _ant_path), 
+                               config.path_of('_edt', _edt_path), 
+                               config.path_of('_lym', _lym_path), 
+                               config.path_of('_tl', _tl_path), 
+                               config.path_of('_gsi', _gsi_path), 
+                               config.path_of('_pya', _pya_path)],
+                extra_link_args=config.link_args('laycore'),
+                extra_compile_args=config.compile_args('laycore'),
+                sources=list(lay_sources))
+
+# ------------------------------------------------------------------
 # Core setup function
 
 if __name__ == '__main__':
@@ -602,4 +763,4 @@ if __name__ == '__main__':
           url='https://github.com/klayout/klayout',
           packages=find_packages('src/pymod/distutils_src'),
           package_dir={'': 'src/pymod/distutils_src'},  # https://github.com/pypa/setuptools/issues/230
-          ext_modules=[_tl, _gsi, _pya, _db, _lib, _rdb] + db_plugins + [tl, db, lib, rdb])
+          ext_modules=[_tl, _gsi, _pya, _rba, _db, _lib, _rdb, _lym, _laybasic, _layview, _ant, _edt, _img] + db_plugins + [tl, db, lib, rdb, lay])

@@ -10,12 +10,12 @@ SOURCES = \
   layAnnotationShapes.cc \
   layBitmap.cc \
   layBitmapsToImage.cc \
+  layColorTests.cc \
   layLayerProperties.cc \
   layParsedLayerSource.cc \
+  layPixelBufferTests.cc \
   layRenderer.cc \
-  layNetlistBrowserModelTests.cc \
-    layNetlistBrowserTreeModelTests.cc \
-    layAbstractMenuTests.cc \
+  layAbstractMenuTests.cc \
   laySnapTests.cc
 
 INCLUDEPATH += $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC $$OUT_PWD/../laybasic

@@ -14,11 +14,6 @@ jobs:
     vmImage: 'windows-2019' # other options: 'macOS-10.13', 'ubuntu-16.04'
   strategy:
     matrix:
-      # Python27:
-      #   python.version: '2.7'
-      # cp35-cp35m-win_amd64.whl:
-      #  python.version: '3.5'
-      #        python.architecture: 'x64'
       cp36-cp36m-win_amd64.whl:
         python.version: '3.6'
         python.architecture: 'x64'
@@ -34,9 +29,6 @@ jobs:
       cp310-cp310-win_amd64.whl:
         python.version: '3.10'
         python.architecture: 'x64'
-      # cp35-cp35m-win32.whl:
-      #        python.version: '3.5'
-      #        python.architecture: 'x86'
       cp36-cp36m-win32.whl:
         python.version: '3.6'
         python.architecture: 'x86'
@@ -70,9 +62,9 @@ jobs:
       #arguments: # Optional
       script: | # Required when targetType == Inline
         pwd
-        Invoke-WebRequest -Uri "https://www.klayout.org/downloads/klayout-microbits-1.0.zip" -OutFile klayout-microbits-1.0.zip
+        Invoke-WebRequest -Uri "https://www.klayout.org/downloads/klayout-microbits-4.0.zip" -OutFile klayout-microbits-4.0.zip
         dir
-        Expand-Archive klayout-microbits-1.0.zip -DestinationPath klayout-microbits
+        Expand-Archive klayout-microbits-4.0.zip -DestinationPath klayout-microbits
         dir klayout-microbits
       #errorActionPreference: 'stop' # Optional. Options: stop, continue, silentlyContinue
       #failOnStderr: false # Optional
@@ -81,37 +73,30 @@ jobs:
       #workingDirectory: # Optional
     displayName: 'Download and Extract KLayout bits'
 
-  # - script: |
-  #     curl https://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi -o VCForPython27.msi
-  #     msiexec /i VCForPython27.msi /quiet
-  #     set "VS90COMNTOOLS=C:\Users\VssAdministrator\AppData\Local\Programs\Common\Microsoft\Visual C++ for Python\9.0\VC"
-  #     curl https://raw.githubusercontent.com/mattn/gntp-send/master/include/msinttypes/stdint.h -o "%VS90COMNTOOLS%\Include\stdint.h"
-  #     dir "%VS90COMNTOOLS%\Include"
-  #   condition: eq(variables['python.version'], '2.7')
-  #   displayName: 'Install Microsoft Visual C++ Compiler for Python 2.7'
-
   - script: |
       python -m pip install --upgrade pip setuptools wheel
     displayName: 'Update pip, setuptools and wheel'
 
   - script: |
       python -V
-      set "KLAYOUT_BITS=%cd%\klayout-microbits\klayout-microbits-1.0\msvc2017\%PYTHON_ARCHITECTURE%"
+      set "KLAYOUT_BITS=%cd%\klayout-microbits\klayout-microbits-4.0\msvc2017\%PYTHON_ARCHITECTURE%"
       echo KLAYOUT_BITS=%KLAYOUT_BITS%
       python setup.py bdist_wheel
     displayName: 'Build KLayout'
 
   - bash: |
-      bash `pwd`/ci-scripts/windows/fix_wheel.sh `pwd`/dist/*.whl "`pwd`/klayout-microbits/klayout-microbits-1.0/msvc2017/$PYTHON_ARCHITECTURE"
+      bash `pwd`/ci-scripts/windows/fix_wheel.sh `pwd`/dist/*.whl "`pwd`/klayout-microbits/klayout-microbits-4.0/msvc2017/$PYTHON_ARCHITECTURE"
     displayName: 'Copy klayout bits dlls into wheel'
 
   - script: |
       echo PATH=%PATH%
+      set TESTSRC=.
       pip install klayout --no-index -f dist
       python testdata/pymod/import_db.py
       python testdata/pymod/import_rdb.py
       python testdata/pymod/import_tl.py
       python testdata/pymod/import_lib.py
+      python testdata/pymod/import_lay.py
       python testdata/pymod/pya_tests.py
     displayName: 'Test KLayout pymod'
 

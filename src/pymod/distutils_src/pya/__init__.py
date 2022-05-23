@@ -6,3 +6,4 @@ from klayout.db import *  # noqa
 from klayout.lib import *  # noqa
 from klayout.tl import *  # noqa
 from klayout.rdb import *  # noqa
+from klayout.lay import *  # noqa

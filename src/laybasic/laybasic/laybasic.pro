@@ -6,303 +6,142 @@ include($$PWD/../../lib.pri)
 
 DEFINES += MAKE_LAYBASIC_LIBRARY
 
-FORMS = \
-  AlignCellOptionsDialog.ui \
-  BookmarkManagementForm.ui \
-  BrowseInstancesConfigPage.ui \
-  BrowseInstancesForm.ui \
-  BrowserDialog.ui \
-  BrowserPanel.ui \
-  BrowseShapesConfigPage.ui \
-  BrowseShapesForm.ui \
-  CellSelectionForm.ui \
-  ClearLayerModeDialog.ui \
-  ConfigurationDialog.ui \
-  CopyCellModeDialog.ui \
-  DeleteCellModeDialog.ui \
-  DuplicateLayerDialog.ui \
-  EditStipplesForm.ui \
-  FlattenInstOptionsDialog.ui \
-  GridNetConfigPage.ui \
-  LayerMappingWidget.ui \
-  LayerSourceDialog.ui \
-  LayoutProperties.ui \
-  LayoutViewConfigPage1.ui \
-  LayoutViewConfigPage2a.ui \
-  LayoutViewConfigPage2b.ui \
-  LayoutViewConfigPage2c.ui \
-  LayoutViewConfigPage2d.ui \
-  LayoutViewConfigPage3a.ui \
-  LayoutViewConfigPage3b.ui \
-  LayoutViewConfigPage3c.ui \
-  LayoutViewConfigPage3f.ui \
-  LayoutViewConfigPage4.ui \
-  LayoutViewConfigPage5.ui \
-  LayoutViewConfigPage6.ui \
-  LayoutViewConfigPage7.ui \
-  LayoutViewConfigPage.ui \
-  LibraryCellSelectionForm.ui \
-  LoadLayoutOptionsDialog.ui \
-  MarkerBrowserConfigPage2.ui \
-  MarkerBrowserConfigPage.ui \
-  MarkerBrowserDialog.ui \
-  MarkerBrowserPage.ui \
-  MarkerBrowserSnapshotView.ui \
-  MoveOptionsDialog.ui \
-  MoveToOptionsDialog.ui \
-  NewCellPropertiesDialog.ui \
-  NewLayerPropertiesDialog.ui \
-  NewLayoutPropertiesDialog.ui \
-  OpenLayoutModeDialog.ui \
-  PropertiesDialog.ui \
-  RenameCellDialog.ui \
-  ReplaceCellOptionsDialog.ui \
-  SaveLayoutOptionsDialog.ui \
-  SaveLayoutAsOptionsDialog.ui \
-  SelectStippleForm.ui \
-  TipDialog.ui \
-  UserPropertiesForm.ui \
-  UserPropertiesEditForm.ui \
-  SpecificLoadLayoutOptionsDialog.ui \
-  SelectLineStyleForm.ui \
-  LayoutViewConfigPage6a.ui \
-  EditLineStylesForm.ui \
-    NetlistBrowserPage.ui \
-    NetlistBrowserConfigPage.ui \
-    NetlistBrowserConfigPage2.ui \
-    NetlistBrowserDialog.ui \
-    NetInfoDialog.ui \
-    NetExportDialog.ui \
-    SelectCellViewForm.ui \
-    LayoutStatistics.ui
+!equals(HAVE_QT, 0) {
 
-RESOURCES = \
-    laybasicResources.qrc \
-    layLayoutStatistics.qrc
+  FORMS = \
+    PropertiesDialog.ui \
 
-SOURCES = \
-  gtf.cc \
-  gsiDeclLayDialogs.cc \
+  SOURCES = \
+    gtf.cc \
+    layPluginConfigPage.cc \
+    layPropertiesDialog.cc \
+    layProperties.cc \
+    layAbstractMenu.cc \
+    layDragDropData.cc \
+    layCursor.cc \
+
+  HEADERS = \
+    gtf.h \
+    layPluginConfigPage.h \
+    layPropertiesDialog.h \
+    layProperties.h \
+    layAbstractMenu.h \
+    layDragDropData.h \
+    layCursor.h \
+
+}
+
+SOURCES += \
   gsiDeclLayLayers.cc \
-  gsiDeclLayLayoutView.cc \
+  gsiDeclLayLayoutViewBase.cc \
   gsiDeclLayMarker.cc \
-  gsiDeclLayMenu.cc \
   gsiDeclLayPlugin.cc \
-  gsiDeclLayStream.cc \
-  layAbstractMenu.cc \
+  gsiDeclLayPixelBuffer.cc \
+  laybasicForceLink.cc \
   layAnnotationShapes.cc \
   layBitmap.cc \
   layBitmapRenderer.cc \
   layBitmapsToImage.cc \
   layBookmarkList.cc \
-  layBookmarkManagementForm.cc \
-  layBrowseInstancesForm.cc \
-  layBrowser.cc \
-  layBrowserDialog.cc \
-  layBrowserPanel.cc \
-  layBrowseShapesForm.cc \
-  layBusy.cc \
-  layCanvasPlane.cc \
-  layCellSelectionForm.cc \
-  layCellTreeModel.cc \
   layCellView.cc \
+  layColor.cc \
   layColorPalette.cc \
-  layConfigurationDialog.cc \
   layConverters.cc \
-  layCursor.cc \
-  layDialogs.cc \
+  layDispatcher.cc \
   layDisplayState.cc \
   layDitherPattern.cc \
   layDrawing.cc \
   layEditable.cc \
-  layEditStipplesForm.cc \
-  layEditStippleWidget.cc \
-  layEditorOptionsFrame.cc \
-  layEditorOptionsPage.cc \
-  layEditorOptionsPages.cc \
   layEditorServiceBase.cc \
-  layFileDialog.cc \
   layFinder.cc \
   layFixedFont.cc \
-  layGridNet.cc \
-  layHierarchyControlPanel.cc \
-  layLayerControlPanel.cc \
-  layLayerMappingWidget.cc \
-  layLayerProperties.cc \
-  layLayerToolbox.cc \
-  layLayerTreeModel.cc \
   layLayoutCanvas.cc \
-  layLayoutPropertiesForm.cc \
-  layLayoutView.cc \
-  layLayoutViewConfigPages.cc \
-  layLoadLayoutOptionsDialog.cc \
+  layLineStylePalette.cc \
+  layLineStyles.cc \
   layMarker.cc \
   layMouseTracker.cc \
   layMove.cc \
+  layNativePlugin.cc \
+  layNetColorizer.cc \
   layObjectInstPath.cc \
   layParsedLayerSource.cc \
+  layPixelBuffer.cc \
+  layPixelBufferPainter.cc \
   layPlugin.cc \
-  layProperties.cc \
-  layPropertiesDialog.cc \
-  layQtTools.cc \
   layRedrawLayerInfo.cc \
-  layRedrawThreadCanvas.cc \
   layRedrawThread.cc \
+  layRedrawThreadCanvas.cc \
   layRedrawThreadWorker.cc \
   layRenderer.cc \
   layRubberBox.cc \
-  laySaveLayoutOptionsDialog.cc \
   laySelector.cc \
-  laySelectStippleForm.cc \
   laySnap.cc \
-  layStipplePalette.cc \
   layStream.cc \
-  layTechnology.cc \
-  layTipDialog.cc \
+  layStipplePalette.cc \
+  layCanvasPlane.cc \
+  layLayoutViewBase.cc \
+  layLayerProperties.cc \
   layViewObject.cc \
   layViewOp.cc \
   layViewport.cc \
-  layWidgets.cc \
   layZoomBox.cc \
-  rdbInfoWidget.cc \
-  rdbMarkerBrowser.cc \
-  rdbMarkerBrowserDialog.cc \
-  rdbMarkerBrowserPage.cc \
-  layLineStyles.cc \
-  laySelectLineStyleForm.cc \
-  layLineStylePalette.cc \
-  layEditLineStylesForm.cc \
-  layEditLineStyleWidget.cc \
-  layBackgroundAwareTreeStyle.cc \
-    layNetlistBrowser.cc \
-    layNetlistBrowserDialog.cc \
-    layNetlistBrowserPage.cc \
-    layItemDelegates.cc \
-    layNetInfoDialog.cc \
-    layNetExportDialog.cc \
-    layNetlistBrowserModel.cc \
-    layIndexedNetlistModel.cc \
-    layNetlistCrossReferenceModel.cc \
-    layNetlistBrowserTreeModel.cc \
-    layLibrariesView.cc \
-    layBookmarksView.cc \
-    layGenericSyntaxHighlighter.cc \
-    layDispatcher.cc \
-    laySelectCellViewForm.cc \
-    layLayoutStatisticsForm.cc \
-    gsiDeclLayNetlistBrowserDialog.cc \
-    layLayoutViewFunctions.cc
 
-HEADERS = \
-  gtf.h \
-  layAbstractMenu.h \
+HEADERS += \
+  laybasicConfig.h \
+  laybasicForceLink.h \
   layAnnotationShapes.h \
   layBitmap.h \
   layBitmapRenderer.h \
   layBitmapsToImage.h \
   layBookmarkList.h \
-  layBookmarkManagementForm.h \
-  layBrowseInstancesForm.h \
-  layBrowserDialog.h \
-  layBrowser.h \
-  layBrowserPanel.h \
-  layBrowseShapesForm.h \
-  layBusy.h \
-  layCanvasPlane.h \
-  layCellSelectionForm.h \
-  layCellTreeModel.h \
   layCellView.h \
   layColorPalette.h \
-  layConfigurationDialog.h \
+  layColor.h \
   layConverters.h \
-  layCursor.h \
-  layDialogs.h \
+  layDispatcher.h \
   layDisplayState.h \
   layDitherPattern.h \
   layDrawing.h \
   layEditable.h \
-  layEditStipplesForm.h \
-  layEditStippleWidget.h \
-  layEditorOptionsFrame.h \
-  layEditorOptionsPage.h \
-  layEditorOptionsPages.h \
   layEditorServiceBase.h \
-  layFileDialog.h \
+  layLayoutCanvas.h \
   layFinder.h \
   layFixedFont.h \
-  layGridNet.h \
-  layHierarchyControlPanel.h \
-  layLayerControlPanel.h \
-  layLayerMappingWidget.h \
-  layLayerProperties.h \
-  layLayerToolbox.h \
-  layLayerTreeModel.h \
-  layLayoutCanvas.h \
-  layLayoutPropertiesForm.h \
-  layLayoutViewConfigPages.h \
-  layLayoutView.h \
-  layLoadLayoutOptionsDialog.h \
+  layLayoutViewBase.h \
+  layLineStylePalette.h \
+  layLineStyles.h \
   layMarker.h \
   layMouseTracker.h \
   layMove.h \
+  layNativePlugin.h \
+  layNetColorizer.h \
   layObjectInstPath.h \
   layParsedLayerSource.h \
+  layPixelBuffer.h \
+  layPixelBufferPainter.h \
   layPlugin.h \
-  layPropertiesDialog.h \
-  layProperties.h \
-  layQtTools.h \
   layRedrawLayerInfo.h \
-  layRedrawThreadCanvas.h \
   layRedrawThread.h \
+  layRedrawThreadCanvas.h \
   layRedrawThreadWorker.h \
   layRenderer.h \
   layRubberBox.h \
-  laySaveLayoutOptionsDialog.h \
   laySelector.h \
-  laySelectStippleForm.h \
   laySnap.h \
-  layStipplePalette.h \
   layStream.h \
-  layTechnology.h \
-  layTipDialog.h \
+  layStipplePalette.h \
+  layLayerProperties.h \
+  layCanvasPlane.h \
   layViewObject.h \
   layViewOp.h \
   layViewport.h \
-  layWidgets.h \
   layZoomBox.h \
-  rdbInfoWidget.h \
-  rdbMarkerBrowserDialog.h \
-  rdbMarkerBrowser.h \
-  rdbMarkerBrowserPage.h \
-  layLineStyles.h \
-  laySelectLineStyleForm.h \
-  layLineStylePalette.h \
-  layEditLineStylesForm.h \
-  layEditLineStyleWidget.h \
   laybasicCommon.h \
-  laybasicConfig.h \
-  layBackgroundAwareTreeStyle.h \
-    layNetlistBrowser.h \
-    layNetlistBrowserDialog.h \
-    layNetlistBrowserPage.h \
-    layItemDelegates.h \
-    layNetInfoDialog.h \
-    layNetExportDialog.h \
-    layNetlistBrowserModel.h \
-    layIndexedNetlistModel.h \
-    layNetlistCrossReferenceModel.h \
-    layNetlistBrowserTreeModel.h \
-    layLibrariesView.h \
-    layBookmarksView.h \
-    layGenericSyntaxHighlighter.h \
-    layDispatcher.h \
-    laySelectCellViewForm.h \
-    layLayoutStatisticsForm.h \
-    layLayoutViewFunctions.h 
 
-INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC
-DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC
-LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb -lklayout_lym
+
+INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb 
 
 INCLUDEPATH += $$QTBASIC_INC
 DEPENDPATH += $$QTBASIC_INC

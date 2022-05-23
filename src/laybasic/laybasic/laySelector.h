@@ -30,26 +30,32 @@
 #include "layViewObject.h"
 #include "layEditable.h"
 
-#include <QTimer>
-#include <QObject>
+#if defined (HAVE_QT)
+#  include <QTimer>
+#  include <QObject>
+#endif
 
 namespace lay {
 
 class RubberBox;
-class LayoutView;
+class LayoutViewBase;
 class LayoutCanvas;
 
-class LAYBASIC_PUBLIC SelectionService
-  : public QObject,
+class LAYBASIC_PUBLIC SelectionService :
+#if defined (HAVE_QT)
+    public QObject,
+#endif
     public lay::ViewService
 {
+#if defined (HAVE_QT)
 Q_OBJECT
+#endif
 
 public: 
-  SelectionService (lay::LayoutView *view);
+  SelectionService (lay::LayoutViewBase *view);
   ~SelectionService ();
 
-  void set_colors (QColor background, QColor color);
+  void set_colors (lay::Color background, lay::Color color);
   void begin (const db::DPoint &pos);
 
   bool dragging () const { return mp_box != 0; }
@@ -72,23 +78,27 @@ public:
    */
   void hover_reset ();
 
+#if defined (HAVE_QT)
 public slots:
   void timeout ();
+#endif
 
 private:
   virtual void deactivated ();
 
   db::DPoint m_p1, m_p2;
   db::DPoint m_current_position;
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   lay::RubberBox *mp_box;
   unsigned int m_color;
   unsigned int m_buttons;
-  QTimer m_timer;
   bool m_hover;
   bool m_hover_wait;
   db::DPoint m_hover_point;
   bool m_mouse_in_window;
+#if defined (HAVE_QT)
+  QTimer m_timer;
+#endif
 
   void reset_box ();
 };

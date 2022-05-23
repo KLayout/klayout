@@ -27,8 +27,6 @@
 #include "layDrawing.h"
 #include "layBitmap.h"
 
-#include <QImage>
-
 namespace lay
 {
 
@@ -393,8 +391,8 @@ BitmapRedrawThreadCanvas::initialize_plane (lay::CanvasPlane *plane, unsigned in
   unlock ();
 }
 
-void 
-BitmapRedrawThreadCanvas::to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, QColor background, QColor foreground, QColor active, const lay::Drawings *drawings, QImage &img, unsigned int width, unsigned int height)
+void
+BitmapRedrawThreadCanvas::to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, lay::Color background, lay::Color foreground, lay::Color active, const lay::Drawings *drawings, lay::PixelBuffer &img, unsigned int width, unsigned int height)
 {
   if (width > m_width) {
     width = m_width;
@@ -413,5 +411,26 @@ BitmapRedrawThreadCanvas::to_image (const std::vector <lay::ViewOp> &view_ops, c
   }
 }
 
+void
+BitmapRedrawThreadCanvas::to_image_mono (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, bool background, bool foreground, bool active, const lay::Drawings *drawings, lay::BitmapBuffer &img, unsigned int width, unsigned int height)
+{
+  if (width > m_width) {
+    width = m_width;
+  }
+  if (height > m_height) {
+    height = m_height;
+  }
+
+  unsigned int all_one = 0xffffffff;
+
+  //  convert the plane data to image data
+  bitmaps_to_image (view_ops, mp_plane_buffers, dp, ls, &img, width, height, true, &mutex ());
+
+  //  convert the planes of the "drawing" objects too:
+  std::vector <std::vector <lay::Bitmap *> >::const_iterator bt = mp_drawing_plane_buffers.begin ();
+  for (lay::Drawings::const_iterator d = drawings->begin (); d != drawings->end () && bt != mp_drawing_plane_buffers.end (); ++d, ++bt) {
+    bitmaps_to_image (d->get_view_ops (*this, background ? all_one : 0, foreground ? all_one : 0, active ? all_one : 0), *bt, dp, ls, &img, width, height, true, &mutex ());
+  }
 }
 
+}

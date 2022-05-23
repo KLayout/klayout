@@ -20,23 +20,19 @@
 
 */
 
-
 #include "layBitmapsToImage.h"
 #include "layBitmap.h"
 #include "layDitherPattern.h"
 #include "layLineStyles.h"
+#include "layPixelBuffer.h"
 #include "tlUnitTest.h"
 
-#include <QImage>
-#include <QColor>
-#include <QMutex>
-
 std::string
-to_string (const QImage &img, unsigned int mask)
+to_string (const lay::PixelBuffer &img, unsigned int mask)
 {
   std::string s;
   for (unsigned int i = 0; i < 32; ++i) {
-    const unsigned int *data = (const unsigned int *)img.scanLine (i);
+    const unsigned int *data = (const unsigned int *)img.scan_line (i);
     for (unsigned int j = 0; j < 32; ++j) {
       s += (data[j] & mask) ? "x" : ".";
     }
@@ -89,13 +85,13 @@ TEST(1)
   view_ops.push_back (lay::ViewOp (0x000080, lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, 1));
   view_ops.push_back (lay::ViewOp (0x0000c0, lay::ViewOp::Or, 0, 0, 0, lay::ViewOp::Rect, 3));
 
-  QImage img (QSize (32, 32), QImage::Format_RGB32);
+  lay::PixelBuffer img (32, 32);
   img.fill (0);
 
   lay::DitherPattern dp;
   lay::LineStyles ls;
 
-  QMutex m;
+  tl::Mutex m;
   lay::bitmaps_to_image (view_ops, pbitmaps, dp, ls, &img, 32, 32, 0, &m);
 
   EXPECT_EQ (to_string (img, 0x800000),
@@ -939,4 +935,3 @@ TEST(1)
   );
 
 }
-

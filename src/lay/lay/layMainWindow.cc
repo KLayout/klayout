@@ -159,7 +159,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
     : QMainWindow (0),
       tl::Object (),
       lay::DispatcherDelegate (),
-      m_dispatcher (this, this),
+      m_dispatcher (this),
       m_text_progress (this, 10 /*verbosity threshold*/),
       m_mode (std::numeric_limits<unsigned int>::max ()),
       mp_setup_form (0),
@@ -179,6 +179,8 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
       mp_app (app),
       m_manager (undo_enabled)
 {
+  m_dispatcher.set_menu_parent_widget (this);
+
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
@@ -2882,7 +2884,9 @@ MainWindow::close_view (int index)
 
       view_closed_event (int (index));
 
-      delete view (index);
+      //  delete the view later as it may still be needed by event handlers or similar
+      std::unique_ptr<lay::LayoutView> old_view (view (index));
+
       mp_views.erase (mp_views.begin () + index, mp_views.begin () + index + 1);
 
       if (index >= int (mp_views.size ())) {

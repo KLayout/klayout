@@ -30,7 +30,7 @@
 #include "tlTimer.h"
 #include "tlProgress.h"
 #include "layCellView.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "tlExceptions.h"
 
 #include "ui_DiffToolDialog.h"
@@ -608,7 +608,7 @@ DiffToolDialog::~DiffToolDialog ()
 }
 
 int 
-DiffToolDialog::exec_dialog (lay::LayoutView *view)
+DiffToolDialog::exec_dialog (lay::LayoutViewBase *view)
 {
   mp_view = view;
 

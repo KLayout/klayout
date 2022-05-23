@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_edtRecentConfigurationPage
 #define HDR_edtRecentConfigurationPage
@@ -32,7 +33,7 @@
 
 namespace lay
 {
-  class LayoutView;
+  class LayoutViewBase;
 }
 
 namespace edt
@@ -77,7 +78,7 @@ public:
   };
 
   template <class Iter>
-  RecentConfigurationPage (lay::LayoutView *view, lay::Dispatcher *dispatcher, const std::string &recent_cfg_name, Iter begin_cfg, Iter end_cfg)
+  RecentConfigurationPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher, const std::string &recent_cfg_name, Iter begin_cfg, Iter end_cfg)
     : EditorOptionsPage (view, dispatcher), m_recent_cfg_name (recent_cfg_name), m_cfg (begin_cfg, end_cfg)
   {
     init ();
@@ -112,3 +113,4 @@ private:
 
 #endif
 
+#endif

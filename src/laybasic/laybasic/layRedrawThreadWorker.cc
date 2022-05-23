@@ -23,6 +23,7 @@
 
 #include "layRedrawThreadWorker.h"
 #include "layRedrawThread.h"
+#include "layBitmap.h"
 
 namespace lay
 {
@@ -69,7 +70,7 @@ RedrawThreadWorker::RedrawThreadWorker (RedrawThread *redraw_thread)
   m_default_text_size = 0.0;
   m_drop_small_cells = false;
   m_drop_small_cells_value = 0;
-  m_drop_small_cells_cond = lay::LayoutView::DSC_Min;
+  m_drop_small_cells_cond = lay::LayoutViewBase::DSC_Min;
   m_draw_array_border_instances = false;
   m_abstract_mode_width = 0;
   m_child_context_enabled = false;
@@ -194,9 +195,9 @@ RedrawThreadWorker::perform_task (tl::Task *task)
           m_layer = li.layer_index;
        
           if (tl::verbosity () >= 40) {
-            tl::info << tl::to_string (QObject::tr ("Drawing layer: ")) << mp_layout->get_properties (m_layer).name;
+            tl::info << tl::to_string (tr ("Drawing layer: ")) << mp_layout->get_properties (m_layer).name;
           }
-          tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (QObject::tr ("Drawing layer")));
+          tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Drawing layer")));
 
           //  configure renderer ..
           mp_renderer->set_xfill (m_xfill);
@@ -220,9 +221,9 @@ RedrawThreadWorker::perform_task (tl::Task *task)
 
           //  if no specific layer is assigned, draw cell boxes with the style given
           if (tl::verbosity () >= 40) {
-            tl::info << tl::to_string (QObject::tr ("Drawing custom frames"));
+            tl::info << tl::to_string (tr ("Drawing custom frames"));
           }
-          tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (QObject::tr ("Drawing frames")));
+          tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Drawing frames")));
 
           for (std::set< std::pair<db::DCplxTrans, int> >::const_iterator b = m_box_variants.begin (); b != m_box_variants.end (); ++b) {
             if (b->second == li.cellview_index) {
@@ -245,9 +246,9 @@ RedrawThreadWorker::perform_task (tl::Task *task)
 
     //  draw the bounding boxes
     if (tl::verbosity () >= 40) {
-      tl::info << tl::to_string (QObject::tr ("Drawing frames and guiding shapes"));
+      tl::info << tl::to_string (tr ("Drawing frames and guiding shapes"));
     }
-    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (QObject::tr ("Drawing frames and guiding shapes")));
+    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Drawing frames and guiding shapes")));
 
     //  No xfill for cell boxes
     mp_renderer->set_xfill (false);
@@ -416,9 +417,9 @@ RedrawThreadWorker::perform_task (tl::Task *task)
 
     //  draw the decorations
     if (tl::verbosity () >= 40) {
-      tl::info << tl::to_string (QObject::tr ("Drawing decorations"));
+      tl::info << tl::to_string (tr ("Drawing decorations"));
     }
-    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (QObject::tr ("Drawing decorations")));
+    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Drawing decorations")));
 
     m_buffers.clear ();
     mp_canvas->initialize_plane (m_planes[0], m_nlayers * planes_per_layer + special_planes_before); 
@@ -496,7 +497,7 @@ RedrawThreadWorker::finish ()
 }
 
 void
-RedrawThreadWorker::setup (LayoutView *view, RedrawThreadCanvas *canvas, const std::vector<db::Box> &redraw_region, const db::DCplxTrans &vp_trans)
+RedrawThreadWorker::setup (LayoutViewBase *view, RedrawThreadCanvas *canvas, const std::vector<db::Box> &redraw_region, const db::DCplxTrans &vp_trans)
 {
   m_redraw_region = redraw_region;
   m_vp_trans = vp_trans;
@@ -2096,9 +2097,9 @@ RedrawThreadWorker::drop_cell (const db::Cell &cell, const db::CplxTrans &trans)
   db::DBox bbox = trans * cell.bbox ();
 
   double value = 0;
-  if (m_drop_small_cells_cond == lay::LayoutView::DSC_Min) {
+  if (m_drop_small_cells_cond == lay::LayoutViewBase::DSC_Min) {
     value = std::min (bbox.width (), bbox.height ());
-  } else if (m_drop_small_cells_cond == lay::LayoutView::DSC_Max) {
+  } else if (m_drop_small_cells_cond == lay::LayoutViewBase::DSC_Max) {
     value = std::max (bbox.width (), bbox.height ());
   } else {
     value = bbox.width () + bbox.height ();
@@ -2172,7 +2173,7 @@ RedrawThreadWorker::iterate_variants (const std::vector <db::Box> &redraw_region
     m_from_level = fl;
 
     if (tl::verbosity () >= 40) {
-      tl::info << tl::to_string (QObject::tr ("Cell variant cache hits/misses: ")) << m_cache_hits << "/" << m_cache_misses;
+      tl::info << tl::to_string (tr ("Cell variant cache hits/misses: ")) << m_cache_hits << "/" << m_cache_misses;
     }
 
   } else {

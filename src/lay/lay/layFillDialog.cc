@@ -62,7 +62,7 @@ public:
     menu_entries.push_back (lay::menu_item ("fill_tool::show", "fill_tool:edit_mode", "edit_menu.utils_menu.end", tl::to_string (QObject::tr ("Fill Tool"))));
   }
  
-   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
+   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
    {
      return new FillDialog (root, view);
    }
@@ -73,8 +73,8 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new FillDialogPl
 
 // ------------------------------------------------------------
 
-FillDialog::FillDialog (lay::Dispatcher *main, lay::LayoutView *view)
-  : QDialog (view),
+FillDialog::FillDialog (lay::Dispatcher *main, LayoutViewBase *view)
+  : QDialog (view->widget ()),
     lay::Plugin (main),
     Ui::FillDialog (),
     mp_view (view)
@@ -315,8 +315,9 @@ FillDialog::get_fill_parameters ()
 
   } else if (layer_spec_cbx->currentIndex () == 2) {
 
-    //  selected layers
+    //  get selected layers
     std::vector<lay::LayerPropertiesConstIterator> s = mp_view->selected_layers ();
+
     for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = s.begin (); l != s.end (); ++l) {
       if (! (*l)->has_children () && cv->layout ().is_valid_layer ((*l)->layer_index ())) {
         fp.exclude_layers.push_back (cv->layout ().get_properties ((*l)->layer_index ()));

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "gtf.h"
 
@@ -35,4 +36,5 @@ void Recorder::errlog_puts (const char *s) { }
 
 }
 
+#endif
 

@@ -32,6 +32,7 @@
 #include "layMarker.h"
 #include "laySnap.h"
 #include "layObjectInstPath.h"
+#include "layColor.h"
 #include "dbLayout.h"
 #include "dbShape.h"
 #include "edtUtils.h"
@@ -41,7 +42,6 @@
 
 #include <set>
 #include <vector>
-#include <QColor>
 
 namespace lay {
   class LayerPropertiesConstIterator;
@@ -83,12 +83,12 @@ public:
   /**
    *  @brief The constructor for an service selecting shapes
    */
-  Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator::flags_type shape_types);
+  Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type shape_types);
 
   /**
    *  @brief The constructor for an service selecting instances
    */
-  Service (db::Manager *manager, lay::LayoutView *view);
+  Service (db::Manager *manager, lay::LayoutViewBase *view);
 
   /**
    *  @brief The destructor
@@ -220,7 +220,7 @@ public:
   /**
    *  @brief Color accessor
    */
-  QColor color () const
+  lay::Color color () const
   {
     return m_color;
   }
@@ -244,7 +244,7 @@ public:
   /**
    *  @brief Access to the view object
    */
-  lay::LayoutView *view () const
+  lay::LayoutViewBase *view () const
   {
     tl_assert (mp_view != 0);
     return mp_view;
@@ -560,7 +560,7 @@ protected:
 
 private:
   //  The layout view that the editor service is attached to
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
 
   //  The marker objects representing the selection
   std::vector<lay::ViewObject *> m_markers;
@@ -593,7 +593,7 @@ private:
   db::ShapeIterator::flags_type m_flags;
 
   //  The look of the markers
-  QColor m_color;
+  lay::Color m_color;
 
   //  The current transformation on movement
   db::DTrans m_move_trans;
@@ -645,6 +645,9 @@ private:
    *  @brief Display the status bar message for the given selection
    */
   void display_status (bool transient);
+
+private:
+  void copy_selected (unsigned int inst_mode);
 };
 
 }

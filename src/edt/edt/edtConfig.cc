@@ -289,7 +289,7 @@ EditGridConverter::from_string_picky (const std::string &s, db::DVector &eg)
       y = x;
     }
     if (x < 1e-6 || y < 1e-6) {
-      throw tl::Exception (tl::to_string (QObject::tr ("The grid must be larger than zero")));
+      throw tl::Exception (tl::to_string (tr ("The grid must be larger than zero")));
     }
     eg = db::DVector (x, y);  
   }

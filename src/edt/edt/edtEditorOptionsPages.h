@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_edtEditorOptionsPages
 #define HDR_edtEditorOptionsPages
@@ -51,7 +52,7 @@ namespace lay
 {
   class PluginDeclaration;
   class Dispatcher;
-  class LayoutView;
+  class LayoutViewBase;
   class Plugin;
 }
 
@@ -69,7 +70,7 @@ class EditorOptionsGeneric
 Q_OBJECT
 
 public:
-  EditorOptionsGeneric (lay::LayoutView *view, lay::Dispatcher *dispatcher);
+  EditorOptionsGeneric (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
   ~EditorOptionsGeneric ();
 
   virtual std::string title () const;
@@ -92,7 +93,7 @@ class EditorOptionsText
   : public lay::EditorOptionsPage
 {
 public:
-  EditorOptionsText (lay::LayoutView *view, lay::Dispatcher *dispatcher);
+  EditorOptionsText (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
   ~EditorOptionsText ();
 
   virtual std::string title () const;
@@ -113,7 +114,7 @@ class EditorOptionsPath
 Q_OBJECT 
 
 public:
-  EditorOptionsPath (lay::LayoutView *view, lay::Dispatcher *dispatcher);
+  EditorOptionsPath (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
   ~EditorOptionsPath ();
 
   virtual std::string title () const;
@@ -137,7 +138,7 @@ class EditorOptionsInst
 Q_OBJECT 
 
 public:
-  EditorOptionsInst (lay::LayoutView *view, lay::Dispatcher *root);
+  EditorOptionsInst (lay::LayoutViewBase *view, lay::Dispatcher *root);
   ~EditorOptionsInst ();
 
   virtual std::string title () const;
@@ -169,7 +170,7 @@ class EditorOptionsInstPCellParam
 Q_OBJECT
 
 public:
-  EditorOptionsInstPCellParam (lay::LayoutView *view, lay::Dispatcher *root);
+  EditorOptionsInstPCellParam (lay::LayoutViewBase *view, lay::Dispatcher *root);
   ~EditorOptionsInstPCellParam ();
 
   virtual std::string title () const;
@@ -195,3 +196,4 @@ private:
 
 #endif
 
+#endif

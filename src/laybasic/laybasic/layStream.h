@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layStream_h
 #define HDR_layStream_h
@@ -30,6 +31,8 @@
 #include "tlXMLParser.h"
 #include "tlXMLWriter.h"
 #include "dbLoadLayoutOptions.h"
+
+#include <QFrame>
 
 namespace db
 {
@@ -273,3 +276,4 @@ public:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

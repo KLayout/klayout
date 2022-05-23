@@ -34,8 +34,6 @@
 #include "layViewOp.h"
 #include "dbTrans.h"
 
-#include <QColor>
-
 namespace lay
 {
 
@@ -123,7 +121,7 @@ public:
   /**
    *  @brief Get the current appearance
    */
-  virtual std::vector <lay::ViewOp> get_view_ops (lay::RedrawThreadCanvas &canvas, QColor background, QColor foreground, QColor active) const = 0;
+  virtual std::vector <lay::ViewOp> get_view_ops (lay::RedrawThreadCanvas &canvas, lay::Color background, lay::Color foreground, lay::Color active) const = 0;
 
 private:
   unsigned int m_num_planes;

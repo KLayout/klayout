@@ -56,7 +56,6 @@ HEADERS = \
     laySignalHandler.h \
     layLibraryController.h \
     layFontController.h \
-    layNativePlugin.h \
     laySystemPaths.h \
     layMacroEditorSetupPage.h \
     layPasswordDialog.h \
@@ -164,7 +163,6 @@ SOURCES = \
     laySignalHandler.cc \
     layLibraryController.cc \
     layFontController.cc \
-    layNativePlugin.cc \
     laySystemPaths.cc \
     layMacroEditorSetupPage.cc \
     layPasswordDialog.cc \
@@ -179,9 +177,9 @@ RESOURCES = layBuildInMacros.qrc \
     laySaltTemplates.qrc \
     layDRCLVSHelpResources.qrc
 
-INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LAYBASIC_INC $$ANT_INC $$IMG_INC $$EDT_INC $$LYM_INC
-DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LAYBASIC_INC $$ANT_INC $$IMG_INC $$EDT_INC $$LYM_INC
-LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb -lklayout_lym -lklayout_laybasic -lklayout_ant -lklayout_img -lklayout_edt
+INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LAYBASIC_INC $$LAYUI_INC $$LAYVIEW_INC $$ANT_INC $$IMG_INC $$EDT_INC $$LYM_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LAYBASIC_INC $$LAYUI_INC $$LAYVIEW_INC $$ANT_INC $$IMG_INC $$EDT_INC $$LYM_INC
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb -lklayout_lym -lklayout_laybasic -lklayout_layview -lklayout_layui -lklayout_ant -lklayout_img -lklayout_edt
 
 win32 {
   # for stack trace support:

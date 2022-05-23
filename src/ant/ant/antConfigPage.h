@@ -20,12 +20,13 @@
 
 */
 
-
+#if defined(HAVE_QT)
 
 #ifndef HDR_antConfigPage
 #define HDR_antConfigPage
 
 #include "layPlugin.h"
+#include "layPluginConfigPage.h"
 #include "antTemplate.h"
 
 class QListWidgetItem;
@@ -130,6 +131,8 @@ private:
 };
 
 } // namespace ant
+
+#endif
 
 #endif
 

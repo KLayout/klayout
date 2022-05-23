@@ -29,7 +29,7 @@
 #include "layCanvasPlane.h"
 #include "layViewOp.h"
 #include "layRenderer.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "tlAssert.h"
 
 namespace lay
@@ -37,7 +37,7 @@ namespace lay
 
 // ------------------------------------------------------------------------
 
-void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, const db::CplxTrans &tr, lay::Renderer &r,
+void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, const db::CplxTrans &trans, lay::Renderer &r,
                        unsigned int font, lay::CanvasPlane *fill, lay::CanvasPlane *contour, lay::CanvasPlane *vertex, lay::CanvasPlane *text,
                        bool cell_name_text_transform, int min_size_for_label, bool draw_outline, size_t max_shapes)
 {
@@ -83,29 +83,29 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
       db::Vector av(a), bv(b);
 
       //  fallback to simpler representation using a description text
-      db::CplxTrans tbox (tr * inst.complex_trans ());
+      db::CplxTrans tbox (trans * inst.complex_trans ());
 
       //  one representative instance
       r.draw (cell_box, tbox, fill, contour, 0, text);
-      r.draw (cell_box, db::CplxTrans (tr * (av * long (amax - 1))) * tbox, fill, contour, 0, text);
-      r.draw (cell_box, db::CplxTrans (tr * (bv * long (bmax - 1))) * tbox, fill, contour, 0, text);
-      r.draw (cell_box, db::CplxTrans (tr * (av * long (amax - 1) + bv * long (bmax - 1))) * tbox, fill, contour, 0, text);
+      r.draw (cell_box, db::CplxTrans (trans * (av * long (amax - 1))) * tbox, fill, contour, 0, text);
+      r.draw (cell_box, db::CplxTrans (trans * (bv * long (bmax - 1))) * tbox, fill, contour, 0, text);
+      r.draw (cell_box, db::CplxTrans (trans * (av * long (amax - 1) + bv * long (bmax - 1))) * tbox, fill, contour, 0, text);
 
       db::DBox cb (tbox * cell_box);
       db::DPolygon p;
       db::DPoint points[] = {
         db::DPoint (cb.lower_left ()), 
-        db::DPoint (cb.lower_left () + tr * (av * long (amax - 1))),
-        db::DPoint (cb.lower_left () + tr * (av * long (amax - 1) + bv * long (bmax - 1))),
-        db::DPoint (cb.lower_left () + tr * (bv * long (bmax - 1))),
+        db::DPoint (cb.lower_left () + trans * (av * long (amax - 1))),
+        db::DPoint (cb.lower_left () + trans * (av * long (amax - 1) + bv * long (bmax - 1))),
+        db::DPoint (cb.lower_left () + trans * (bv * long (bmax - 1))),
       };
       p.assign_hull (points, points + sizeof (points) / sizeof (points[0]));
       r.draw (p, fill, contour, 0, text);
 
       if (text) {
-        db::DBox arr_box (db::DPoint (), db::DPoint () + tr * (av * long (amax - 1) + bv * long (bmax - 1)));
+        db::DBox arr_box (db::DPoint (), db::DPoint () + trans * (av * long (amax - 1) + bv * long (bmax - 1)));
         arr_box *= cb;
-        r.draw (arr_box, tl::sprintf (tl::to_string (QObject::tr ("Array %ldx%ld")), amax, bmax), db::Font (font), db::HAlignCenter, db::VAlignCenter, db::DFTrans (db::DFTrans::r0), 0, 0, 0, text);
+        r.draw (arr_box, tl::sprintf (tl::to_string (tr ("Array %ldx%ld")), amax, bmax), db::Font (font), db::HAlignCenter, db::VAlignCenter, db::DFTrans (db::DFTrans::r0), 0, 0, 0, text);
       }
 
     } else {
@@ -113,7 +113,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
       for (db::CellInstArray::iterator arr = inst.begin (); ! arr.at_end (); ++arr) {
 
         //  fallback to simpler representation using a description text
-        db::CplxTrans tbox (tr * inst.complex_trans ());
+        db::CplxTrans tbox (trans * inst.complex_trans ());
 
         r.draw (cell_box, tbox, fill, contour, 0, 0);
 
@@ -149,7 +149,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
       while (! shapes.at_end ()) {
 
         for (db::CellInstArray::iterator arr = inst.begin (); ! arr.at_end (); ++arr) {
-          r.draw (*shapes, tr * inst.complex_trans (*arr) * shapes.trans (), fill, contour, 0 /*use vertex for origin*/, text);
+          r.draw (*shapes, trans * inst.complex_trans (*arr) * shapes.trans (), fill, contour, 0 /*use vertex for origin*/, text);
         }
 
         ++shapes;
@@ -167,7 +167,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
     while (! shapes.at_end ()) {
 
       for (db::CellInstArray::iterator arr = inst.begin (); ! arr.at_end (); ++arr) {
-        r.draw (*shapes, tr * inst.complex_trans (*arr) * shapes.trans (), fill, contour, 0 /*use vertex for origin*/, text);
+        r.draw (*shapes, trans * inst.complex_trans (*arr) * shapes.trans (), fill, contour, 0 /*use vertex for origin*/, text);
       }
 
       ++shapes;
@@ -179,7 +179,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
   if (render_origins && vertex) {
 
     for (db::CellInstArray::iterator arr = inst.begin (); ! arr.at_end (); ++arr) {
-      db::DPoint dp = db::DPoint () + (tr * inst.complex_trans (*arr)).disp ();
+      db::DPoint dp = db::DPoint () + (trans * inst.complex_trans (*arr)).disp ();
       r.draw (db::DEdge (dp, dp), 0, 0, vertex, 0);
     }
 
@@ -188,7 +188,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
 
 // ------------------------------------------------------------------------
 
-MarkerBase::MarkerBase (lay::LayoutView *view)
+MarkerBase::MarkerBase (lay::LayoutViewBase *view)
   : lay::ViewObject (view->view_object_widget ()),
     m_line_width (-1), m_vertex_size (-1), m_halo (-1), m_text_enabled (true), m_vertex_shape (lay::ViewOp::Rect), m_line_style (-1), m_dither_pattern (-1), m_frame_pattern (0), mp_view (view)
 { 
@@ -196,7 +196,7 @@ MarkerBase::MarkerBase (lay::LayoutView *view)
 }
 
 void 
-MarkerBase::set_frame_color (QColor color)
+MarkerBase::set_frame_color (lay::Color color)
 {
   if (color != m_frame_color) {
     m_frame_color = color;
@@ -205,7 +205,7 @@ MarkerBase::set_frame_color (QColor color)
 }
 
 void 
-MarkerBase::set_color (QColor color)
+MarkerBase::set_color (lay::Color color)
 {
   if (color != m_color) {
     m_color = color;
@@ -292,16 +292,16 @@ MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay:
   int basic_width = int(0.5 + 1.0 / resolution);
 
   //  obtain bitmaps
-  QColor color = m_color;
-  if (! color.isValid ()) {
+  lay::Color color = m_color;
+  if (! color.is_valid ()) {
     color = mp_view->default_marker_color ();
   }
-  if (! color.isValid ()) {
+  if (! color.is_valid ()) {
     color = canvas.foreground_color ();
   }
 
-  QColor frame_color = m_frame_color;
-  if (! frame_color.isValid ()) {
+  lay::Color frame_color = m_frame_color;
+  if (! frame_color.is_valid ()) {
     frame_color = color;
   }
 
@@ -372,7 +372,7 @@ MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay:
 
 // ------------------------------------------------------------------------
 
-GenericMarkerBase::GenericMarkerBase (lay::LayoutView *view, unsigned int cv_index)
+GenericMarkerBase::GenericMarkerBase (lay::LayoutViewBase *view, unsigned int cv_index)
   : MarkerBase (view), mp_trans_vector (0), mp_view (view), m_cv_index (cv_index)
 { 
   // .. nothing yet ..
@@ -496,7 +496,7 @@ GenericMarkerBase::dbu () const
 
 // ------------------------------------------------------------------------
 
-InstanceMarker::InstanceMarker (lay::LayoutView *view, unsigned int cv_index, bool draw_outline, size_t max_shapes)
+InstanceMarker::InstanceMarker (LayoutViewBase *view, unsigned int cv_index, bool draw_outline, size_t max_shapes)
   : GenericMarkerBase (view, cv_index), m_draw_outline (draw_outline), m_max_shapes (max_shapes), m_inst ()
 { 
   // .. nothing yet ..
@@ -576,7 +576,7 @@ InstanceMarker::item_bbox () const
 
 // ------------------------------------------------------------------------
 
-ShapeMarker::ShapeMarker (lay::LayoutView *view, unsigned int cv_index)
+ShapeMarker::ShapeMarker (LayoutViewBase *view, unsigned int cv_index)
   : GenericMarkerBase (view, cv_index), m_shape ()
 { 
   // .. nothing yet ..
@@ -643,7 +643,7 @@ ShapeMarker::item_bbox () const
 
 // ------------------------------------------------------------------------
 
-Marker::Marker (lay::LayoutView *view, unsigned int cv_index, bool draw_outline, size_t max_shapes)
+Marker::Marker (lay::LayoutViewBase *view, unsigned int cv_index, bool draw_outline, size_t max_shapes)
   : GenericMarkerBase (view, cv_index), m_draw_outline (draw_outline), m_max_shapes (max_shapes) 
 { 
   m_type = None;
@@ -1135,7 +1135,7 @@ Marker::render (const Viewport &vp, ViewObjectCanvas &canvas)
 
 // ------------------------------------------------------------------------
 
-DMarker::DMarker (lay::LayoutView *view)
+DMarker::DMarker (LayoutViewBase *view)
   : MarkerBase (view), mp_view (view)
 { 
   m_type = None;

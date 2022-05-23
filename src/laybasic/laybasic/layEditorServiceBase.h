@@ -46,7 +46,7 @@ public:
   /**
    *  @brief Constructor
    */
-  EditorServiceBase (lay::LayoutView *view);
+  EditorServiceBase (lay::LayoutViewBase *view);
 
   /**
    *  @brief Destructor
@@ -92,7 +92,7 @@ public:
   /**
    *  @brief Gets the tracking cursor color
    */
-  QColor tracking_cursor_color () const
+  lay::Color tracking_cursor_color () const
   {
     return m_cursor_color;
   }
@@ -121,6 +121,11 @@ public:
     return m_tracking_position;
   }
 
+  /**
+   *  @brief Shows an error where an exception is not applicable
+   */
+  void show_error (tl::Exception &ex);
+
 protected:
   virtual bool configure (const std::string &name, const std::string &value);
   virtual void deactivated ();
@@ -128,7 +133,7 @@ protected:
 private:
   //  The marker representing the mouse cursor
   std::vector<lay::ViewObject *> m_mouse_cursor_markers;
-  QColor m_cursor_color;
+  lay::Color m_cursor_color;
   bool m_cursor_enabled;
   bool m_has_tracking_position;
   db::DPoint m_tracking_position;

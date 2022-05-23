@@ -232,16 +232,16 @@ ColorPalette::from_string (const std::string &s, bool simple)
     }
 
     if (! x.at_end ()) {
-      throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("unexpected characters: %s")), x.skip ()));
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("unexpected characters: %s")), x.skip ()));
     }
 
     if (! simple && (colors () == 0 || luminous_colors () == 0)) {
-      throw tl::Exception (tl::to_string (QObject::tr ("invalid palette - no colors and/or default colors")));
+      throw tl::Exception (tl::to_string (tr ("invalid palette - no colors and/or default colors")));
     }
 
   } catch (std::exception &ex) {
     //  reformat error message
-    throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Color palette string format error: %s")), ex.what ()));
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("Color palette string format error: %s")), ex.what ()));
   }
 }
 

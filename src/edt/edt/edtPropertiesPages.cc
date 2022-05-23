@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "edtPropertiesPages.h"
 #include "edtPropertiesPageUtils.h"
@@ -27,7 +28,7 @@
 #include "edtPropertiesPageUtils.h"
 #include "layDialogs.h"
 #include "layObjectInstPath.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "layQtTools.h"
 #include "tlExceptions.h"
 #include "tlString.h"
@@ -1183,3 +1184,4 @@ EditablePathPropertiesPage::type_selected (int t)
 
 }
 
+#endif

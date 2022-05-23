@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layPropertiesDialog
 #define HDR_layPropertiesDialog
@@ -103,3 +104,4 @@ protected:
 
 #endif
 
+#endif  //  defined(HAVE_QT)

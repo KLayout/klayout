@@ -5,7 +5,8 @@ test-command = [
   "python {package}/testdata/pymod/import_rdb.py",
   "python {package}/testdata/pymod/import_tl.py",
   "python {package}/testdata/pymod/import_lib.py",
-  "python {package}/testdata/pymod/pya_tests.py"
+  "python {package}/testdata/pymod/import_lay.py",
+  "TESTSRC={package} python {package}/testdata/pymod/pya_tests.py"
 ]
 # Disable building PyPy wheels on all platforms
 skip = "pp*"

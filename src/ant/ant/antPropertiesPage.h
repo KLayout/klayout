@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_antPropertiesPage
 #define HDR_antPropertiesPage
@@ -68,5 +69,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif

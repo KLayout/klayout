@@ -6,70 +6,88 @@ include($$PWD/../../lib.pri)
 
 DEFINES += MAKE_EDT_LIBRARY
 
-HEADERS = \
-  edtConfig.h \
-  edtDialogs.h \
-  edtEditorOptionsPages.h \
-  edtInstPropertiesPage.h \
-  edtMainService.h \
-  edtPartialService.h \
-  edtPCellParametersPage.h \
-  edtPlugin.h \
-  edtPropertiesPages.h \
-  edtPropertiesPageUtils.h \
-  edtService.h \
-  edtServiceImpl.h \
-  edtUtils.h \
-    edtCommon.h \
-    edtDistribute.h \
-    edtRecentConfigurationPage.h
+!equals(HAVE_QT, "0") {
 
-FORMS = \
-  AlignOptionsDialog.ui \
-  BoxPropertiesPage.ui \
-  CopyModeDialog.ui \
-  ChangeLayerOptionsDialog.ui \
-  EditablePathPropertiesPage.ui \
-  EditorOptionsGeneric.ui \
-  EditorOptionsInst.ui \
-  EditorOptionsPath.ui \
-  EditorOptionsText.ui \
-  InstantiationForm.ui \
-  InstPropertiesPage.ui \
-  MakeArrayOptionsDialog.ui \
-  MakeCellOptionsDialog.ui \
-  PathPropertiesPage.ui \
-  PolygonPropertiesPage.ui \
-  RoundCornerOptionsDialog.ui \
-  TextPropertiesPage.ui \
+  FORMS = \
+    AlignOptionsDialog.ui \
+    BoxPropertiesPage.ui \
+    CopyModeDialog.ui \
+    ChangeLayerOptionsDialog.ui \
+    EditablePathPropertiesPage.ui \
+    EditorOptionsGeneric.ui \
+    EditorOptionsInst.ui \
+    EditorOptionsPath.ui \
+    EditorOptionsText.ui \
+    InstantiationForm.ui \
+    InstPropertiesPage.ui \
+    MakeArrayOptionsDialog.ui \
+    MakeCellOptionsDialog.ui \
+    PathPropertiesPage.ui \
+    PolygonPropertiesPage.ui \
+    RoundCornerOptionsDialog.ui \
+    TextPropertiesPage.ui \
     DistributeOptionsDialog.ui \
     EditorOptionsInstPCellParam.ui
 
+}
+
+# Disabled without Qt:
+
+HEADERS = \
+    edtDialogs.h \
+    edtEditorOptionsPages.h \
+    edtInstPropertiesPage.h \
+    edtPCellParametersPage.h \
+    edtPropertiesPages.h \
+    edtPropertiesPageUtils.h \
+    edtRecentConfigurationPage.h
+
 SOURCES = \
+    edtDialogs.cc \
+    edtEditorOptionsPages.cc \
+    edtInstPropertiesPage.cc \
+    edtPCellParametersPage.cc \
+    edtPropertiesPages.cc \
+    edtPropertiesPageUtils.cc \
+    edtRecentConfigurationPage.cc
+
+# Enabled without Qt:
+
+HEADERS += \
+  edtForceLink.h \
+  edtConfig.h \
+  edtMainService.h \
+  edtPartialService.h \
+  edtPlugin.h \
+  edtService.h \
+  edtServiceImpl.h \
+  edtUtils.h \
+  edtCommon.h \
+  edtDistribute.h \
+
+SOURCES += \
+  edtForceLink.cc \
   edtConfig.cc \
-  edtDialogs.cc \
-  edtEditorOptionsPages.cc \
-  edtInstPropertiesPage.cc \
   edtMainService.cc \
   edtPartialService.cc \
-  edtPCellParametersPage.cc \
   edtPlugin.cc \
-  edtPropertiesPages.cc \
-  edtPropertiesPageUtils.cc \
   edtService.cc \
   edtServiceImpl.cc \
   edtUtils.cc \
   gsiDeclEdt.cc \
-    edtDistribute.cc \
-    edtRecentConfigurationPage.cc
+  edtDistribute.cc \
 
-INCLUDEPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
-DEPENDPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
+INCLUDEPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$LAYVIEW_INC $$DB_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$LAYVIEW_INC $$DB_INC
 
-# Note: this accounts for UI-generated headers placed into the output folders in
-# shadow builds:
-INCLUDEPATH += $$DESTDIR/laybasic/laybasic
-DEPENDPATH += $$DESTDIR/laybasic/laybasic
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_layview -lklayout_db
 
-LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_db
+!equals(HAVE_QT, "0") {
+
+  INCLUDEPATH += $$LAYUI_INC
+  DEPENDPATH += $$LAYUI_INC
+
+  LIBS += -lklayout_layui
+
+}
 

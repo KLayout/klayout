@@ -339,13 +339,13 @@ NetTracerSymbolInfo::parse (tl::Extractor &ex)
 //  Net implementation
 
 NetTracerNet::NetTracerNet ()
-  : m_dbu (0.001), m_incomplete (true), m_trace_path (false)
+  : m_dbu (0.001), m_incomplete (true), m_color (0), m_trace_path (false)
 {
   //  .. nothing yet ..
 }
 
 NetTracerNet::NetTracerNet (const NetTracer &tracer, const db::ICplxTrans &trans, const db::Layout &layout, db::cell_index_type cell_index, const std::string &layout_filename, const std::string &layout_name, const NetTracerData &data)
-  : m_name (tracer.name ()), m_incomplete (tracer.incomplete ()), m_trace_path (false)
+  : m_name (tracer.name ()), m_incomplete (tracer.incomplete ()), m_color (0), m_trace_path (false)
 {
   m_dbu = layout.dbu ();
   m_top_cell_name = layout.cell_name (cell_index);

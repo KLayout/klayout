@@ -11,19 +11,25 @@ SUBDIRS = \
   lib \
   plugins \
   unit_tests \
+  buddies \
+  lym \
+  laybasic \
+  layview \
+  ant \
+  img \
+  edt \
+
+equals(HAVE_RUBY, "1") {
+  SUBDIRS += drc lvs
+}
 
 !equals(HAVE_QT, "0") {
 
   # TODO: make buddies able to build without Qt
   SUBDIRS += \
     klayout_main \
-    laybasic \
     lay \
-    ant \
-    buddies \
-    lym \
-    img \
-    edt \
+    layui \
     fontgen \
 
 }
@@ -58,21 +64,33 @@ db.depends += gsi
 rdb.depends += db
 lib.depends += db
 
-plugins.depends += lib rdb db
+buddies.depends += plugins lym $$LANG_DEPENDS
+lym.depends += gsi $$LANG_DEPENDS
+
+laybasic.depends += rdb 
+layview.depends += laybasic
+
+ant.depends += layview
+img.depends += layview
+edt.depends += layview
+
+plugins.depends += lib rdb db ant
+
+equals(HAVE_PYTHON, "1") {
+  pymod.depends += layview ant img edt lym
+}
+
+equals(HAVE_RUBY, "1") {
+  MAIN_DEPENDS += drc lvs
+  drc.depends += rdb lym
+  lvs.depends += drc
+  buddies.depends += drc lvs
+}
 
 !equals(HAVE_QT, "0") {
 
-  buddies.depends += plugins lym $$LANG_DEPENDS
-
   equals(HAVE_PYTHON, "1") {
     pymod.depends += lay
-  }
-
-  equals(HAVE_RUBY, "1") {
-    SUBDIRS += drc lvs
-    MAIN_DEPENDS += drc lvs
-    drc.depends += rdb lym
-    lvs.depends += drc
   }
 
   equals(HAVE_QTBINDINGS, "1") {
@@ -87,23 +105,14 @@ plugins.depends += lib rdb db
 
   }
 
-  plugins.depends += lay ant
+  layui.depends += laybasic
+  layview.depends += layui
+  lay.depends += ant img edt layui
 
-  lym.depends += gsi $$LANG_DEPENDS
-  laybasic.depends += rdb lym
-  ant.depends += laybasic
-  img.depends += laybasic
-  edt.depends += laybasic
-
-  lay.depends += laybasic ant img edt
+  plugins.depends += lay
 
   klayout_main.depends += plugins $$MAIN_DEPENDS
 
 }
 
 unit_tests.depends += plugins $$MAIN_DEPENDS $$LANG_DEPENDS
-
-RESOURCES += \
-    plugins/tools/import/lay_plugin/layResources.qrc \
-    laybasic/laybasic/layResources.qrc
-

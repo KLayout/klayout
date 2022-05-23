@@ -64,7 +64,7 @@ public:
   /**
    *  @brief The constructor
    */
-  MainService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root);
+  MainService (db::Manager *manager, lay::LayoutViewBase *view, lay::Dispatcher *root);
 
   /**
    *  @brief The destructor
@@ -74,7 +74,7 @@ public:
   /**
    *  @brief Access to the view object
    */
-  lay::LayoutView *view () const
+  lay::LayoutViewBase *view () const
   {
     return mp_view;
   }
@@ -196,7 +196,7 @@ public:
 
 private:
   //  The layout view that this service is attached to
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   lay::Dispatcher *mp_root;
   bool m_needs_update;
 
@@ -221,21 +221,25 @@ private:
   double m_router, m_rinner;
   unsigned int m_npoints;
   bool m_undo_before_apply;
+#if defined(HAVE_QT)
   edt::RoundCornerOptionsDialog *mp_round_corners_dialog;
   edt::AlignOptionsDialog *mp_align_options_dialog;
   edt::DistributeOptionsDialog *mp_distribute_options_dialog;
   lay::FlattenInstOptionsDialog *mp_flatten_inst_options_dialog;
   edt::MakeCellOptionsDialog *mp_make_cell_options_dialog;
   edt::MakeArrayOptionsDialog *mp_make_array_options_dialog;
+#endif
 
   void boolean_op (int mode);
   void check_no_guiding_shapes ();
+#if defined(HAVE_QT)
   edt::RoundCornerOptionsDialog *round_corners_dialog ();
   edt::AlignOptionsDialog *align_options_dialog ();
   edt::DistributeOptionsDialog *distribute_options_dialog ();
   lay::FlattenInstOptionsDialog *flatten_inst_options_dialog ();
   edt::MakeCellOptionsDialog *make_cell_options_dialog ();
   edt::MakeArrayOptionsDialog *make_array_options_dialog ();
+#endif
 };
 
 }

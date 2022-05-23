@@ -29,8 +29,6 @@
 #include <utility>
 #include <vector>
 
-#include <QDialog>
-
 #include "layObjectInstPath.h"
 
 #include "dbInstElement.h"
@@ -40,7 +38,7 @@
 
 namespace lay
 {
-  class LayoutView;
+  class LayoutViewBase;
 }
 
 namespace edt {
@@ -84,7 +82,7 @@ public:
 class TransformationVariants
 {
 public:
-  TransformationVariants (const lay::LayoutView *view, bool per_cv_and_layer = true, bool per_cv = true);
+  TransformationVariants (const lay::LayoutViewBase *view, bool per_cv_and_layer = true, bool per_cv = true);
 
   const std::vector<db::DCplxTrans> *per_cv_and_layer (unsigned int cv, unsigned int layer) const;
   const std::vector<db::DCplxTrans> *per_cv (unsigned int cv) const;
@@ -109,7 +107,7 @@ public:
    *
    *  If "including_transient" is true, the transient selection will be used as fallback.
    */
-  SelectionIterator (lay::LayoutView *view, bool including_transient = true);
+  SelectionIterator (lay::LayoutViewBase *view, bool including_transient = true);
 
   /**
    *  @brief Returns a value indicating whether the transient selection is taken

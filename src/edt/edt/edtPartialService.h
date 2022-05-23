@@ -34,8 +34,10 @@
 #include "edtUtils.h"
 #include "edtConfig.h"
 
-#include <QObject>
-#include <QTimer>
+#if defined(HAVE_QT)
+#  include <QObject>
+#  include <QTimer>
+#endif
 
 namespace db {
   class Manager;
@@ -136,12 +138,16 @@ struct EdgeWithIndex
 /**
  *  @brief The partial selection and manipulation service
  */
-class PartialService
-  : public QObject,
+class PartialService :
+#if defined(HAVE_QT)
+    public QObject,
+#endif
     public lay::EditorServiceBase,
     public db::Object
 {
+#if defined(HAVE_QT)
 Q_OBJECT
+#endif
 
 public: 
   typedef std::map<lay::ObjectInstPath, std::set<EdgeWithIndex> > partial_objects;
@@ -149,7 +155,7 @@ public:
   /**
    *  @brief The constructor
    */
-  PartialService (db::Manager *manager, lay::LayoutView *view, lay::Dispatcher *root);
+  PartialService (db::Manager *manager, lay::LayoutViewBase *view, lay::Dispatcher *root);
 
   /**
    *  @brief The destructor
@@ -159,7 +165,7 @@ public:
   /**
    *  @brief Access to the view object
    */
-  lay::LayoutView *view () const
+  lay::LayoutViewBase *view () const
   {
     tl_assert (mp_view != 0);
     return mp_view;
@@ -282,15 +288,17 @@ public:
   /**
    *  @brief Reimplementation of the ViewService interface: set the colors
    */
-  virtual void set_colors (QColor background, QColor text);
+  virtual void set_colors (lay::Color background, lay::Color text);
 
   /**
    *  @brief Cancel any edit operations (in this case, unselect all & cancel any drag operation)
    */
   virtual void edit_cancel ();
 
+#if defined(HAVE_QT)
 public slots:
   void timeout ();
+#endif
 
 protected:
   lay::angle_constraint_type connect_ac () const;
@@ -298,7 +306,7 @@ protected:
 
 private:
   //  The layout view that this service is attached to
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   lay::Dispatcher *mp_root;
   bool m_dragging;
   bool m_keep_selection;
@@ -324,7 +332,9 @@ private:
   std::vector<lay::InstanceMarker *> m_inst_markers;
   std::vector<lay::InstanceMarker *> m_transient_inst_markers;
 
+#if defined(HAVE_QT)
   QTimer m_timer;
+#endif
   bool m_hover;
   bool m_hover_wait;
   db::DPoint m_hover_point;

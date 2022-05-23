@@ -149,16 +149,16 @@ LineStylePalette::from_string (const std::string &s)
     }
 
     if (! x.at_end ()) {
-      throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("unexpected characters: %s")), x.skip ()));
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("unexpected characters: %s")), x.skip ()));
     }
 
     if (styles () == 0) {
-      throw tl::Exception (tl::to_string (QObject::tr ("invalid line style palette - no styles")));
+      throw tl::Exception (tl::to_string (tr ("invalid line style palette - no styles")));
     }
 
   } catch (std::exception &ex) {
     //  reformat error message
-    throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Line style palette string format error: %s")), ex.what ()));
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("Line style palette string format error: %s")), ex.what ()));
   }
 }
 

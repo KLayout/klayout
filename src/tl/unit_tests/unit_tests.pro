@@ -36,11 +36,10 @@ SOURCES = \
   tlUniqueIdTests.cc \
   tlListTests.cc \
   tlEquivalenceClustersTests.cc \
-    tlUniqueNameTests.cc \
-    tlGlobPatternTests.cc \
-    tlRecipeTests.cc \
-    tlUriTests.cc \
-  tlUtilsTests.cc \
+  tlUniqueNameTests.cc \
+  tlGlobPatternTests.cc \
+  tlRecipeTests.cc \
+  tlUriTests.cc \
   tlVariantTests.cc \
   tlWebDAVTests.cc \
   tlXMLParserTests.cc

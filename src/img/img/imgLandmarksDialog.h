@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_imgLandmarksDialog
 #define HDR_imgLandmarksDialog
@@ -63,5 +64,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif

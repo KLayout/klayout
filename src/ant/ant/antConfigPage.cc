@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "antConfigPage.h"
 #include "ui_RulerConfigPage.h"
@@ -417,3 +418,5 @@ ConfigPage4::commit ()
 }
 
 } // namespace ant
+
+#endif

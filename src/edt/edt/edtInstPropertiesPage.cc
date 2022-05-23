@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "dbLibrary.h"
 #include "dbPCellHeader.h"
@@ -31,7 +32,7 @@
 #include "edtDialogs.h"
 #include "layDialogs.h"
 #include "layObjectInstPath.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "layCellSelectionForm.h"
 #include "layQtTools.h"
 #include "tlExceptions.h"
@@ -940,3 +941,4 @@ InstPropertiesPage::update_pcell_parameters ()
 
 }
 
+#endif

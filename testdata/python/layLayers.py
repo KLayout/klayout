@@ -21,13 +21,23 @@ import unittest
 import os
 import sys
 
+def can_create_layoutview():
+  if not "MainWindow" in pya.__dict__:
+    return True  # Qt-less
+  elif not "Application" in pya.__dict__:
+    return False  # cannot instantiate Application
+  elif pya.__dict__["Application"].instance() is None:
+    return False  # Application is not present
+  else:
+    return True
+
 def astr(a):
   astr = []
   for i in a:
     astr.append(str(i))
   return "[" + ", ".join(astr) + "]"
 
-class LAYLayersTest(unittest.TestCase):
+class LAYLayersTests(unittest.TestCase):
 
   def lnode_str(self, space, l):
     return space + l.current().source_(True) + "\n";
@@ -57,14 +67,13 @@ class LAYLayersTest(unittest.TestCase):
 
   def test_1(self):
 
-    app = pya.Application.instance()
-    mw = app.main_window()
-    mw.close_all()
+    if not can_create_layoutview():
+      print("Skipped test as LayoutView cannot be created.")
+      return
 
-    mw.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", 1) 
-    mw.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t10.gds", 2) 
-
-    cv = mw.current_view()
+    cv = pya.LayoutView()
+    cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", True) 
+    cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t10.gds", True) 
 
     cv.clear_layers()
 
@@ -203,18 +212,19 @@ class LAYLayersTest(unittest.TestCase):
 
     self.assertEqual(self.lnodes_str("", cv.begin_layers()), "*/*@*\n  1/0@1\n  1/0@2\n%5@2\n  %5@2\n")
 
-    mw.close_all()
+    cv._destroy()
 
   def test_1a(self):
 
-    app = pya.Application.instance()
-    mw = app.main_window()
-    mw.close_all()
+    if not can_create_layoutview():
+      print("Skipped test as LayoutView cannot be created.")
+      return
 
-    mw.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", 1) 
-    mw.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t10.gds", 2) 
+    mgr = pya.Manager()
 
-    cv = mw.current_view()
+    cv = pya.LayoutView(False, mgr)
+    cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", True) 
+    cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t10.gds", True) 
 
     cv.clear_layers()
 
@@ -396,7 +406,7 @@ class LAYLayersTest(unittest.TestCase):
     cv.delete_layers(0, a)
     self.assertEqual(cv.begin_layers(0).at_end(), True)
     cv.commit()
-    mw.cm_undo()
+    mgr.undo()
     self.assertEqual(cv.begin_layers(0).at_end(), False)
 
     cv.transaction("Delete")
@@ -407,10 +417,10 @@ class LAYLayersTest(unittest.TestCase):
     self.assertEqual(i, 2)
     self.assertEqual(cv.begin_layers(0).at_end(), True)
     cv.commit()
-    mw.cm_undo()
+    mgr.undo()
     self.assertEqual(cv.begin_layers(0).at_end(), False)
 
-    mw.close_all()
+    cv._destroy()
 
   def test_2(self):
 
@@ -655,14 +665,14 @@ class LAYLayersTest(unittest.TestCase):
   # direct replacement of objects and attributes
   def test_3(self):
 
-    app = pya.Application.instance()
-    mw = app.main_window()
-    mw.close_all()
+    if not can_create_layoutview():
+      print("Skipped test as LayoutView cannot be created.")
+      return
 
-    mw.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", pya.LoadLayoutOptions(), "", 1) 
-    mw.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t10.gds", pya.LoadLayoutOptions(), "", 2) 
+    cv = pya.LayoutView()
+    cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", pya.LoadLayoutOptions(), "", True) 
+    cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t10.gds", pya.LoadLayoutOptions(), "", True) 
 
-    cv = mw.current_view()
     self.assertEqual(self.lnodes_str("", cv.begin_layers()), "1/0@1\n2/0@1\n1/0@2\n2/0@2\n3/0@2\n3/1@2\n4/0@2\n5/0@2\n6/0@2\n6/1@2\n7/0@2\n8/0@2\n8/1@2\n")
 
     cv.clear_layers()
@@ -772,19 +782,18 @@ class LAYLayersTest(unittest.TestCase):
     self.assertEqual(self.lnodes_str("", cv.begin_layers()), "TOP@1\n  nn1@1\n    nn1@1\n")
     self.assertEqual(self.lnodes_str2(cv), "TOP@1\nnn1@1\nnn1@1")
 
-    mw.close_all()
+    cv._destroy()
 
   # propagation of "real" attributes through the hierarchy
   def test_4(self):
 
-    app = pya.Application.instance()
-    mw = app.main_window()
-    mw.close_all()
+    if not can_create_layoutview():
+      print("Skipped test as LayoutView cannot be created.")
+      return
 
-    mw.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", 1) 
-    mw.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t10.gds", 2) 
-
-    cv = mw.current_view()
+    cv = pya.LayoutView()
+    cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", True) 
+    cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t10.gds", True) 
 
     cv.clear_layers()
 
@@ -807,18 +816,18 @@ class LAYLayersTest(unittest.TestCase):
     self.assertEqual(pos.first_child().current().visible_(True), False)
     self.assertEqual(pos.first_child().current().visible_(False), True)
 
-    mw.close_all()
+    cv._destroy()
 
   # delete method of iterator
   def test_5(self):
 
-    app = pya.Application.instance()
-    mw = app.main_window()
-    mw.close_all()
+    if not can_create_layoutview():
+      print("Skipped test as LayoutView cannot be created.")
+      return
 
-    mw.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", 1) 
+    cv = pya.LayoutView()
+    cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", True) 
 
-    cv = mw.current_view()
     cv.clear_layers()
 
     new_p = pya.LayerProperties()
@@ -899,18 +908,17 @@ class LAYLayersTest(unittest.TestCase):
     self.assertEqual(pc.at_end(), True)
     self.assertEqual(pc.current().is_valid(), False)
 
-    mw.close_all()
+    cv._destroy()
 
   # custom stipples and line styles
   def test_6(self):
 
-    app = pya.Application.instance()
-    mw = app.main_window()
-    mw.close_all()
+    if not can_create_layoutview():
+      print("Skipped test as LayoutView cannot be created.")
+      return
 
-    mw.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", 1) 
-
-    cv = mw.current_view()
+    cv = pya.LayoutView()
+    cv.load_layout(os.getenv("TESTSRC") + "/testdata/gds/t11.gds", True) 
 
     cv.clear_stipples()
 
@@ -944,7 +952,7 @@ class LAYLayersTest(unittest.TestCase):
     cv.clear_line_styles()
     self.assertEqual(cv.get_line_style(index), "")
 
-    mw.close_all()
+    cv._destroy()
 
 
 # run unit tests
@@ -952,7 +960,7 @@ if __name__ == '__main__':
   suite = unittest.TestSuite()
   # NOTE: Use this instead of loadTestsfromTestCase to select a specific test:
   #   suite.addTest(BasicTest("test_26"))
-  suite = unittest.TestLoader().loadTestsFromTestCase(LAYLayersTest)
+  suite = unittest.TestLoader().loadTestsFromTestCase(LAYLayersTests)
 
   # Only runs with Application available
   if "Application" in pya.__all__ and not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():

@@ -25,6 +25,7 @@
 #define HDR_layMacroEditorSetupPage
 
 #include "layPlugin.h"
+#include "layPluginConfigPage.h"
 #include "ui_MacroEditorSetupPage.h"
 
 namespace lay

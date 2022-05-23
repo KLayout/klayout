@@ -41,7 +41,7 @@
 
 namespace ant {
 
-class LayoutView;
+class LayoutViewBase;
 class LayoutCanvas;
 class Service;
 
@@ -201,7 +201,7 @@ public:
    */
   enum MoveMode { MoveNone, MoveP1, MoveP2, MoveP12, MoveP21, MoveP1X, MoveP2X, MoveP1Y, MoveP2Y, MoveRuler, MoveSelected };
 
-  Service (db::Manager *manager, lay::LayoutView *view);
+  Service (db::Manager *manager, lay::LayoutViewBase *view);
 
   ~Service ();
 
@@ -346,10 +346,12 @@ public:
    */
   virtual void transform (const db::DCplxTrans &trans);
 
+#if defined(HAVE_QT)
   /**
    *  @brief Create the properties page
    */
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+#endif
 
   /**
    *  @brief Get the selection for the properties page
@@ -387,7 +389,7 @@ public:
   /**
    *  @brief Color accessor
    */
-  QColor color () const
+  lay::Color color () const
   {
     return m_color;
   }
@@ -427,7 +429,7 @@ public:
   /**
    *  @brief Access to the view object
    */
-  lay::LayoutView *view () const
+  lay::LayoutViewBase *view () const
   {
     return mp_view;
   }
@@ -498,7 +500,7 @@ public:
 
 private:
   //  Ruler display and snapping configuration
-  QColor m_color;
+  lay::Color m_color;
   bool m_halo;
   lay::angle_constraint_type m_snap_mode;
   double m_grid;
@@ -510,7 +512,7 @@ private:
   int m_max_number_of_rulers;
 
   //  The layout view that the ruler service is attached to
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
 
   //  The ruler view objects representing the selection
   //  and the moved rules in move mode
@@ -599,7 +601,7 @@ private:
   /**
    *  @brief implementation of the "Drawing" interface: configuration
    */
-  std::vector <lay::ViewOp> get_view_ops (lay::RedrawThreadCanvas &canvas, QColor background, QColor foreground, QColor active) const;
+  std::vector <lay::ViewOp> get_view_ops (lay::RedrawThreadCanvas &canvas, lay::Color background, lay::Color foreground, lay::Color active) const;
 
   /**
    *  @brief Update m_rulers to reflect the selection

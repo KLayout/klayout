@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 
 #ifndef HDR_edtInstPropertiesPage
@@ -88,3 +89,4 @@ protected slots:
 
 #endif
 
+#endif

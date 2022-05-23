@@ -21,9 +21,6 @@
 */
 
 
-#include <QEvent>
-#include <QApplication>
-
 #include "layRedrawThread.h"
 #include "layRedrawThreadWorker.h"
 #include "tlLog.h"
@@ -39,7 +36,7 @@ namespace lay
 // -------------------------------------------------------------
 //  RedrawThread implementation
 
-RedrawThread::RedrawThread (lay::RedrawThreadCanvas *canvas, lay::LayoutView *view)
+RedrawThread::RedrawThread (lay::RedrawThreadCanvas *canvas, LayoutViewBase *view)
   : tl::Object ()
 {
   m_initial_update = false;
@@ -63,7 +60,7 @@ RedrawThread::~RedrawThread ()
 void RedrawThread::layout_changed ()
 {
   if (is_running () && tl::verbosity () >= 30) {
-    tl::info << tl::to_string (QObject::tr ("Layout changed: redraw thread stopped"));
+    tl::info << tl::to_string (tr ("Layout changed: redraw thread stopped"));
   }
 
   //  if something changed on the layouts we observe, stop the redraw thread
@@ -228,9 +225,9 @@ RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::v
 
   {
     if (tl::verbosity () >= 40) {
-      tl::info << tl::to_string (QObject::tr ("Preparing to draw"));
+      tl::info << tl::to_string (tr ("Preparing to draw"));
     }
-    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (QObject::tr ("Preparing to draw")));
+    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Preparing to draw")));
 
     //  detach from all layout objects 
     tl::Object::detach_from_all_events ();

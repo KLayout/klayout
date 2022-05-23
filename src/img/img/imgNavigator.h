@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_imgNavigator
 #define HDR_imgNavigator
@@ -54,7 +55,7 @@ public:
   void background_color (QColor c);
   img::Object *setup (lay::Dispatcher *root, img::Object *img);
 
-  lay::LayoutView *view () 
+  lay::LayoutView *view ()
   {
     return mp_view;
   }
@@ -62,7 +63,7 @@ public:
   void activate_service (lay::ViewService *service);
 
 private:
-  lay::LayoutView *mp_view;  
+  lay::LayoutView *mp_view;
   lay::ZoomService *mp_zoom_service;
 };
 
@@ -70,3 +71,4 @@ private:
 
 #endif
 
+#endif

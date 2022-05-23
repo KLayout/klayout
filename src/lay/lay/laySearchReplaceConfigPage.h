@@ -25,6 +25,7 @@
 #define HDR_laySearchReplaceConfigPage
 
 #include "layPlugin.h"
+#include "layPluginConfigPage.h"
 #include "laySearchReplaceDialog.h"
 
 #include "ui_SearchReplaceConfigPage.h"

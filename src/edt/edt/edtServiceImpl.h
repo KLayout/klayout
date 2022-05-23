@@ -32,6 +32,7 @@
 namespace lay
 {
   class CellView;
+  class LayoutViewBase;
   class LayerPropertiesConstIterator;
 }
 
@@ -45,7 +46,7 @@ class ShapeEditService
   : public edt::Service
 {
 public:
-  ShapeEditService (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator::flags_type shape_types);
+  ShapeEditService (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type shape_types);
   
 protected:
   void get_edit_layer ();
@@ -86,9 +87,11 @@ class PolygonService
   : public ShapeEditService
 {
 public:
-  PolygonService (db::Manager *manager, lay::LayoutView *view);
+  PolygonService (db::Manager *manager, lay::LayoutViewBase *view);
   
+#if defined(HAVE_QT)
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+#endif
   virtual void do_delete ();
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
@@ -117,9 +120,11 @@ class BoxService
   : public ShapeEditService
 {
 public:
-  BoxService (db::Manager *manager, lay::LayoutView *view);
+  BoxService (db::Manager *manager, lay::LayoutViewBase *view);
   
+#if defined(HAVE_QT)
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+#endif
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
   virtual void do_mouse_move_inactive (const db::DPoint &p);
@@ -142,10 +147,12 @@ class TextService
   : public ShapeEditService
 {
 public:
-  TextService (db::Manager *manager, lay::LayoutView *view);
+  TextService (db::Manager *manager, lay::LayoutViewBase *view);
   ~TextService ();
   
+#if defined(HAVE_QT)
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+#endif
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_transform (const db::DPoint &p, db::DFTrans trans);
   virtual void do_mouse_move (const db::DPoint &p);
@@ -174,10 +181,12 @@ class PathService
   : public ShapeEditService
 {
 public:
-  PathService (db::Manager *manager, lay::LayoutView *view);
+  PathService (db::Manager *manager, lay::LayoutViewBase *view);
   ~PathService ();
   
+#if defined(HAVE_QT)
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+#endif
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
   virtual bool do_mouse_click (const db::DPoint &p);
@@ -211,9 +220,11 @@ class InstService
   : public edt::Service
 {
 public:
-  InstService (db::Manager *manager, lay::LayoutView *view);
+  InstService (db::Manager *manager, lay::LayoutViewBase *view);
   
+#if defined(HAVE_QT)
   virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+#endif
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move_inactive (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
@@ -222,10 +233,12 @@ public:
   virtual void do_finish_edit ();
   virtual void do_cancel_edit ();
   virtual bool do_activated ();
+#if defined(HAVE_QT)
   virtual bool drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase *data);
   virtual bool drag_move_event (const db::DPoint &p, const lay::DragDropDataBase *data);
   virtual void drag_leave_event ();
   virtual bool drop_event (const db::DPoint &p, const lay::DragDropDataBase *data);
+#endif
   virtual bool selection_applies (const lay::ObjectInstPath &sel) const;
 
 protected:

@@ -87,10 +87,9 @@ PYMODTEST (bridge, "bridge.py")
 PYMODTEST (import_tl, "import_tl.py")
 PYMODTEST (import_db, "import_db.py")
 PYMODTEST (import_rdb, "import_rdb.py")
+PYMODTEST (import_lay, "import_lay.py")
 
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
-
-PYMODTEST (import_lay, "import_lay.py")
 
 PYMODTEST (import_QtCore, "import_QtCore.py")
 #if QT_VERSION >= 0x60000
@@ -145,9 +144,5 @@ PYMODTEST (import_QtCore5Compat, "import_QtCore5Compat.py")
 #endif
 
 PYMODTEST (import_pya, "pya_tests.py")
-
-#elif defined(HAVE_QT)
-
-PYMODTEST (import_lay, "import_lay_noqt.py")
 
 #endif

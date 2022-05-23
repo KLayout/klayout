@@ -338,16 +338,47 @@ SaveLayoutAsOptionsDialog::SaveLayoutAsOptionsDialog (QWidget *parent, const std
 
       fmt_cbx->addItem (tl::to_qstring (fmt->format_title ()));
 
-      StreamWriterOptionsPage *page = 0;
-
       //  obtain the config page from the plugin which we identify by format name
       const StreamWriterPluginDeclaration *decl = plugin_for_format (fmt->format_name ());
-      if (decl) {
-        page = decl->format_specific_options_page (options_stack);
-      }
 
-      m_pages.push_back (std::make_pair (page, fmt->format_name ()));
-      m_tab_positions.push_back (page ? options_stack->addWidget (page) : empty_widget_index);
+      if (decl) {
+
+        const char *alias = decl->options_alias ();
+        if (alias) {
+
+          //  alias needs to come before
+          int index = -1;
+          int n = 0;
+          for (tl::Registrar<db::StreamFormatDeclaration>::iterator i = tl::Registrar<db::StreamFormatDeclaration>::begin (); i != tl::Registrar<db::StreamFormatDeclaration>::end (); ++i) {
+            if (i->format_name () == alias) {
+              index = n;
+            }
+            ++n;
+          }
+
+          if (index >= 0 && index < int (m_tab_positions.size ())) {
+            m_pages.push_back (std::make_pair (m_pages [index].first, fmt->format_name ()));
+            m_tab_positions.push_back (m_tab_positions[index]);
+          } else {
+            m_pages.push_back (std::make_pair ((StreamWriterOptionsPage *) 0, fmt->format_name ()));
+            m_tab_positions.push_back (empty_widget_index);
+          }
+
+        } else {
+
+          StreamWriterOptionsPage *page = decl->format_specific_options_page (options_stack);
+
+          m_pages.push_back (std::make_pair (page, fmt->format_name ()));
+          m_tab_positions.push_back (page ? options_stack->addWidget (page) : empty_widget_index);
+
+        }
+
+      } else {
+
+        m_pages.push_back (std::make_pair ((StreamWriterOptionsPage *) 0, fmt->format_name ()));
+        m_tab_positions.push_back (empty_widget_index);
+
+      }
 
     }
 
@@ -440,7 +471,7 @@ SaveLayoutAsOptionsDialog::get_options (lay::LayoutView *view, unsigned int cv_i
   for (std::vector< std::pair<StreamWriterOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
 
     const StreamWriterPluginDeclaration *decl = plugin_for_format (page->second);
-    if (decl) {
+    if (decl && ! decl->options_alias ()) {
 
       std::unique_ptr<db::FormatSpecificWriterOptions> specific_options;
       if (options.get_options (page->second)) {

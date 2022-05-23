@@ -889,8 +889,8 @@ def Run_Build_Command(parameters):
         # (C) Target directories and files
         MacBuildDirQAT = parameters['build'] + ".macQAT"
 
-        # (D) Qt5
-        cmd_args += " \\\n  -qt5"
+        # (D) Qt5 | Qt6 (Homebrew)
+        #cmd_args += " \\\n  -qt5" # make 'build.sh' detect the Qt type automatically
         cmd_args += " \\\n  -qmake %s" % parameters['qmake']
         cmd_args += " \\\n  -bin   %s" % parameters['bin']
         cmd_args += " \\\n  -build %s" % parameters['build']

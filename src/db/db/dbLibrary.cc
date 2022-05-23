@@ -222,9 +222,19 @@ Library::remap_to (db::Library *other)
 
         } else {
 
-          //  map pcell parameters by name
-          std::map<std::string, tl::Variant> param_by_name = lib_pcell->parameters_by_name ();
-          lp->first->remap (other->get_id (), other->layout ().get_pcell_variant (pn.second, new_pcell_decl->map_parameters (param_by_name)));
+          db::pcell_parameters_type new_parameters = new_pcell_decl->map_parameters (lib_pcell->parameters_by_name ());
+
+          //  coerce the new parameters if requested
+          try {
+            db::pcell_parameters_type plist = new_parameters;
+            new_pcell_decl->coerce_parameters (other->layout (), plist);
+            plist.swap (new_parameters);
+          } catch (tl::Exception &ex) {
+            //  ignore exception - we will do that again on update() to establish an error message
+            tl::error << ex.msg ();
+          }
+
+          lp->first->remap (other->get_id (), other->layout ().get_pcell_variant (pn.second, new_parameters));
 
         }
 

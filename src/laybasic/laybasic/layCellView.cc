@@ -296,7 +296,7 @@ LayoutHandle::update_save_options (db::SaveLayoutOptions &options)
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
 
     const lay::StreamWriterPluginDeclaration *decl = dynamic_cast <const lay::StreamWriterPluginDeclaration *> (&*cls);
-    if (! decl) {
+    if (! decl || decl->options_alias ()) {
       continue;
     }
 
@@ -370,6 +370,8 @@ db::LayerMap
 LayoutHandle::load (const db::LoadLayoutOptions &options, const std::string &technology)
 {
   m_load_options = options;
+  m_save_options = db::SaveLayoutOptions ();
+  m_save_options_valid = false;
 
   set_tech_name (technology);
 
@@ -389,6 +391,7 @@ LayoutHandle::load (const db::LoadLayoutOptions &options, const std::string &tec
   remove_file_from_watcher (filename ());
   add_file_to_watcher (filename ());
 
+  m_save_options.set_format (reader.format ());
   m_dirty = false;
   return new_lmap;
 }
@@ -397,6 +400,8 @@ db::LayerMap
 LayoutHandle::load ()
 {
   m_load_options = db::LoadLayoutOptions ();
+  m_save_options = db::SaveLayoutOptions ();
+  m_save_options_valid = false;
 
   set_tech_name (std::string ());
 
@@ -414,6 +419,7 @@ LayoutHandle::load ()
   remove_file_from_watcher (filename ());
   add_file_to_watcher (filename ());
 
+  m_save_options.set_format (reader.format ());
   m_dirty = false;
   return new_lmap;
 }

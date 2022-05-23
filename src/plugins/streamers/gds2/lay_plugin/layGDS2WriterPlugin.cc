@@ -118,12 +118,14 @@ GDS2WriterOptionPage::multi_xy_clicked ()
 // ---------------------------------------------------------------
 //  GDS2WriterPluginDeclaration definition and implementation
 
-class GDS2WriterPluginDeclaration
+namespace {
+
+class GDS2WriterPluginDeclarationBase
   : public StreamWriterPluginDeclaration
 {
 public:
-  GDS2WriterPluginDeclaration ()
-    : StreamWriterPluginDeclaration (db::GDS2WriterOptions ().format_name ())
+  GDS2WriterPluginDeclarationBase (const std::string &name)
+    : StreamWriterPluginDeclaration (name)
   {
     // .. nothing yet ..
   }
@@ -152,20 +154,46 @@ public:
   }
 };
 
+}
+
 /**
- *  @brief A dummy plugin for GDS2Text
+ *  @brief A plugin for GDS2
+ */
+class GDS2WriterPluginDeclaration
+  : public GDS2WriterPluginDeclarationBase
+{
+public:
+  GDS2WriterPluginDeclaration ()
+    : GDS2WriterPluginDeclarationBase (db::GDS2WriterOptions ().format_name ())
+  {
+    // .. nothing yet ..
+  }
+};
+
+/**
+ *  @brief A plugin for GDS2Text
  *
  *  GDS2Text shares the options with GDS2, although some limitations do not exist.
  *  There is not specific option set for GDS2Text. The writer will take the options from GDS2.
  */
 class GDS2TextWriterPluginDeclaration
-  : public StreamWriterPluginDeclaration
+  : public GDS2WriterPluginDeclarationBase
 {
 public:
   GDS2TextWriterPluginDeclaration ()
-    : StreamWriterPluginDeclaration ("GDS2Text")
+    : GDS2WriterPluginDeclarationBase ("GDS2Text")
   {
     // .. nothing yet ..
+  }
+
+  virtual const char *options_alias () const
+  {
+    return db::GDS2WriterOptions ().format_name ().c_str ();
+  }
+
+  StreamWriterOptionsPage *format_specific_options_page (QWidget *) const
+  {
+    return 0;
   }
 };
 

@@ -2048,6 +2048,10 @@ MainWindow::cm_load_layer_props ()
 void
 MainWindow::load_layer_props_from_file (const std::string &fn)
 {
+  if (! current_view ()) {
+    throw tl::Exception (tl::to_string (QObject::tr ("No view open to load the layer properties for")));
+  }
+
   int target_cv_index = -2;
 
   if (current_view ()->cellviews () > 1 && is_single_cv_layer_properties_file (fn)) {
@@ -2296,12 +2300,14 @@ MainWindow::do_save (bool as)
           db::SaveLayoutOptions options = cv->save_options ();
           if (!cv->save_options_valid () && cv->technology ()) {
             options = cv->technology ()->save_layout_options ();
+            options.set_format (cv->save_options ().format ());
           }
 
           options.set_dbu (cv->layout ().dbu ());
-          options.set_format_from_filename (fn);
 
-          cv->update_save_options (options);
+          if (as || options.format ().empty ()) {
+            options.set_format_from_filename (fn);
+          }
 
           tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;
 
@@ -2338,7 +2344,9 @@ MainWindow::cm_save_all ()
         db::SaveLayoutOptions options (cv->save_options ());
         options.set_dbu (cv->layout ().dbu ());
 
-        options.set_format_from_filename (fn);
+        if (options.format ().empty ()) {
+          options.set_format_from_filename (fn);
+        }
 
         tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;
 

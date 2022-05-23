@@ -205,6 +205,12 @@ while [ "$*" != "" ]; do
   -libexpat)
     HAVE_EXPAT=1
     ;;
+  -qt5)
+    echo "*** WARNING: -qt5 option is ignored - Qt version is auto-detected now."
+    ;;
+  -qt4)
+    echo "*** WARNING: -qt4 option is ignored - Qt version is auto-detected now."
+    ;;
   -option)
     MAKE_OPT="$MAKE_OPT $1"
     shift
@@ -242,8 +248,6 @@ while [ "$*" != "" ]; do
     echo "  -dry-run              Don't build, just run qmake"
     echo ""
     echo "Special options (usually auto-selected from ruby/python/Qt installation):"
-    echo ""
-    echo "  -qt4|-qt5             Use Qt4 or Qt5 API [default: auto detect]"
     echo ""
     echo "  -rblib <file>         Location of the .so/.dll to link for Ruby support"
     echo "  -rbinc <dir>          Location of the Ruby headers (in particular 'ruby.h')"

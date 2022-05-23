@@ -2288,12 +2288,14 @@ MainWindow::do_save (bool as)
           db::SaveLayoutOptions options = cv->save_options ();
           if (!cv->save_options_valid () && cv->technology ()) {
             options = cv->technology ()->save_layout_options ();
+            options.set_format (cv->save_options ().format ());
           }
 
           options.set_dbu (cv->layout ().dbu ());
-          options.set_format_from_filename (fn);
 
-          cv->update_save_options (options);
+          if (as || options.format ().empty ()) {
+            options.set_format_from_filename (fn);
+          }
 
           tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;
 
@@ -2330,7 +2332,9 @@ MainWindow::cm_save_all ()
         db::SaveLayoutOptions options (cv->save_options ());
         options.set_dbu (cv->layout ().dbu ());
 
-        options.set_format_from_filename (fn);
+        if (options.format ().empty ()) {
+          options.set_format_from_filename (fn);
+        }
 
         tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;
 

@@ -64,7 +64,7 @@ BasicCircle::parameters_from_shape (const db::Layout &layout, const db::Shape &s
   //  use map_parameters to create defaults for the other parameters
   std::map<size_t, tl::Variant> nm;
   nm.insert (std::make_pair (p_layer, tl::Variant (layout.get_properties (layer))));
-  nm.insert (std::make_pair (p_radius, tl::Variant (0.5 * std::min (dbox.width (), dbox.height ()))));
+  nm.insert (std::make_pair (p_actual_radius, tl::Variant (0.5 * std::min (dbox.width (), dbox.height ()))));
   return map_parameters (nm);
 }
 
@@ -88,8 +88,8 @@ BasicCircle::coerce_parameters (const db::Layout & /*layout*/, db::pcell_paramet
     return;
   }
 
-  double ru = parameters [p_actual_radius].to_double ();
-  double r = parameters [p_radius].to_double ();
+  double ru = parameters [p_radius].to_double ();
+  double r = parameters [p_actual_radius].to_double ();
 
   double rs = ru;
   if (parameters [p_handle].is_user <db::DPoint> ()) {
@@ -104,11 +104,11 @@ BasicCircle::coerce_parameters (const db::Layout & /*layout*/, db::pcell_paramet
     //  the handle has changed: use this
     ru = rs;
     r = rs;
-    parameters [p_radius] = r;
+    parameters [p_actual_radius] = r;
   }
 
   //  set the hidden used radius parameter
-  parameters [p_actual_radius] = ru;
+  parameters [p_radius] = ru;
 }
 
 void 
@@ -118,7 +118,7 @@ BasicCircle::produce (const db::Layout &layout, const std::vector<unsigned int> 
     return;
   }
 
-  double r = parameters [p_actual_radius].to_double () / layout.dbu ();
+  double r = parameters [p_radius].to_double () / layout.dbu ();
   int n = std::max (3, parameters [p_npoints].to_int ());
 
   std::vector <db::Point> points;
@@ -143,7 +143,7 @@ std::string
 BasicCircle::get_display_name (const db::pcell_parameters_type &parameters) const
 {
   return "CIRCLE(l=" + std::string (parameters [p_layer].to_string ()) +
-               ",r=" + tl::to_string (parameters [p_actual_radius].to_double ()) +
+               ",r=" + tl::to_string (parameters [p_radius].to_double ()) +
                ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
                  ")";
 }
@@ -159,19 +159,19 @@ BasicCircle::get_parameter_declarations () const
   parameters.back ().set_type (db::PCellParameterDeclaration::t_layer);
   parameters.back ().set_description (tl::to_string (tr ("Layer")));
 
-  //  parameter #1: radius 
+  //  parameter #1: radius (shadow, hidden)
+  //  This parameter is updated by "coerce_parameters" from "actual_radius" or "handle",
+  //  whichever changed.
   tl_assert (parameters.size () == p_radius);
   parameters.push_back (db::PCellParameterDeclaration ("radius"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (tr ("Radius")));
-  parameters.back ().set_default (0.1);
-  parameters.back ().set_unit (tl::to_string (tr ("micron")));
+  parameters.back ().set_hidden (true);
 
   //  parameter #2: handle 
   tl_assert (parameters.size () == p_handle);
   parameters.push_back (db::PCellParameterDeclaration ("handle"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
-  parameters.back ().set_default (db::DPoint (-0.1, 0));
+  parameters.back ().set_default (db::DPoint (-1.0, 0));
   parameters.back ().set_description (tl::to_string (tr ("R")));
 
   //  parameter #3: number of points 
@@ -181,12 +181,13 @@ BasicCircle::get_parameter_declarations () const
   parameters.back ().set_description (tl::to_string (tr ("Number of points")));
   parameters.back ().set_default (64);
 
-  //  parameter #4: used radius
+  //  parameter #4: radius (entry field)
   tl_assert (parameters.size () == p_actual_radius);
   parameters.push_back (db::PCellParameterDeclaration ("actual_radius"));
+  parameters.back ().set_description (tl::to_string (tr ("Radius")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_default (0.0);
-  parameters.back ().set_hidden (true);
+  parameters.back ().set_default (1.0);
 
   return parameters;
 }

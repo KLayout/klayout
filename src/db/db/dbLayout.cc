@@ -2423,8 +2423,7 @@ Layout::get_pcell_parameter (cell_index_type cell_index, const std::string &name
   if (pcell_variant) {
     return pcell_variant->parameter_by_name (name);
   } else {
-    static std::map<std::string, tl::Variant> empty;
-    return empty;
+    return tl::Variant ();
   }
 }
 
@@ -2444,8 +2443,7 @@ Layout::get_named_pcell_parameters (cell_index_type cell_index) const
   if (pcell_variant) {
     return pcell_variant->parameters_by_name ();
   } else {
-    static std::map<std::string, tl::Variant> empty;
-    return empty;
+    return std::map<std::string, tl::Variant> ();
   }
 }
 

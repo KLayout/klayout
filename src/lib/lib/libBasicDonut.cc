@@ -67,8 +67,8 @@ BasicDonut::parameters_from_shape (const db::Layout &layout, const db::Shape &sh
   //  use map_parameters to create defaults for the other parameters
   std::map<size_t, tl::Variant> nm;
   nm.insert (std::make_pair (p_layer, tl::Variant (layout.get_properties (layer))));
-  nm.insert (std::make_pair (p_radius1, tl::Variant (0.5 * std::min (dbox.width (), dbox.height ()))));
-  nm.insert (std::make_pair (p_radius2, tl::Variant (0.25 * std::min (dbox.width (), dbox.height ()))));
+  nm.insert (std::make_pair (p_actual_radius1, tl::Variant (0.5 * std::min (dbox.width (), dbox.height ()))));
+  nm.insert (std::make_pair (p_actual_radius2, tl::Variant (0.25 * std::min (dbox.width (), dbox.height ()))));
   return map_parameters (nm);
 }
 
@@ -92,15 +92,15 @@ BasicDonut::coerce_parameters (const db::Layout & /*layout*/, db::pcell_paramete
     return;
   }
 
-  double ru1 = parameters [p_actual_radius1].to_double ();
-  double r1 = parameters [p_radius1].to_double ();
+  double ru1 = parameters [p_radius1].to_double ();
+  double r1 = parameters [p_actual_radius1].to_double ();
   double rs1 = ru1;
   if (parameters [p_handle1].is_user <db::DPoint> ()) {
     rs1 = parameters [p_handle1].to_user <db::DPoint> ().distance ();
   } 
 
-  double ru2 = parameters [p_actual_radius2].to_double ();
-  double r2 = parameters [p_radius2].to_double ();
+  double ru2 = parameters [p_radius2].to_double ();
+  double r2 = parameters [p_actual_radius2].to_double ();
   double rs2 = ru2;
   if (parameters [p_handle2].is_user <db::DPoint> ()) {
     rs2 = parameters [p_handle2].to_user <db::DPoint> ().distance ();
@@ -118,13 +118,13 @@ BasicDonut::coerce_parameters (const db::Layout & /*layout*/, db::pcell_paramete
     r1 = rs1;
     ru2 = rs2;
     r2 = rs2;
-    parameters [p_radius1] = r1;
-    parameters [p_radius2] = r2;
+    parameters [p_actual_radius1] = r1;
+    parameters [p_actual_radius2] = r2;
   }
 
   //  set the hidden used radius parameter
-  parameters [p_actual_radius1] = ru1;
-  parameters [p_actual_radius2] = ru2;
+  parameters [p_radius1] = ru1;
+  parameters [p_radius2] = ru2;
 }
 
 void 
@@ -134,8 +134,8 @@ BasicDonut::produce (const db::Layout &layout, const std::vector<unsigned int> &
     return;
   }
 
-  double r1 = parameters [p_actual_radius1].to_double () / layout.dbu ();
-  double r2 = parameters [p_actual_radius2].to_double () / layout.dbu ();
+  double r1 = parameters [p_radius1].to_double () / layout.dbu ();
+  double r2 = parameters [p_radius2].to_double () / layout.dbu ();
   int n = std::max (3, parameters [p_npoints].to_int ());
 
   std::vector <db::Point> points;
@@ -170,8 +170,8 @@ std::string
 BasicDonut::get_display_name (const db::pcell_parameters_type &parameters) const
 {
   return "DONUT(l=" + std::string (parameters [p_layer].to_string ()) +
-              ",r=" + tl::to_string (parameters [p_actual_radius1].to_double ()) +
-               ".." + tl::to_string (parameters [p_actual_radius2].to_double ()) +
+              ",r=" + tl::to_string (parameters [p_radius1].to_double ()) +
+               ".." + tl::to_string (parameters [p_radius2].to_double ()) +
               ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
                 ")";
 }
@@ -188,33 +188,29 @@ BasicDonut::get_parameter_declarations () const
   parameters.back ().set_description (tl::to_string (tr ("Layer")));
 
   //  parameter #1: radius1 
+  //  This is a shadow parameter to receive the used first radius
   tl_assert (parameters.size () == p_radius1);
   parameters.push_back (db::PCellParameterDeclaration ("radius1"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (tr ("Radius 1")));
-  parameters.back ().set_default (0.1);
-  parameters.back ().set_unit (tl::to_string (tr ("micron")));
+  parameters.back ().set_hidden (true);
 
   //  parameter #2: radius2 
+  //  This is a shadow parameter to receive the used second radius
   tl_assert (parameters.size () == p_radius2);
   parameters.push_back (db::PCellParameterDeclaration ("radius2"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (tr ("Radius 2")));
-  parameters.back ().set_default (0.2);
-  parameters.back ().set_unit (tl::to_string (tr ("micron")));
+  parameters.back ().set_hidden (true);
 
   //  parameter #3: handle 1
   tl_assert (parameters.size () == p_handle1);
   parameters.push_back (db::PCellParameterDeclaration ("handle1"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
-  parameters.back ().set_default (db::DPoint (-0.1, 0));
   parameters.back ().set_description (tl::to_string (tr ("R1")));
 
   //  parameter #4: handle 2
   tl_assert (parameters.size () == p_handle2);
   parameters.push_back (db::PCellParameterDeclaration ("handle2"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
-  parameters.back ().set_default (db::DPoint (-0.2, 0));
   parameters.back ().set_description (tl::to_string (tr ("R2")));
 
   //  parameter #5: number of points 
@@ -228,15 +224,17 @@ BasicDonut::get_parameter_declarations () const
   tl_assert (parameters.size () == p_actual_radius1);
   parameters.push_back (db::PCellParameterDeclaration ("actual_radius1"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_default (0.0);
-  parameters.back ().set_hidden (true);
+  parameters.back ().set_description (tl::to_string (tr ("Radius 1")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
+  parameters.back ().set_default (0.5);
 
   //  parameter #7: used radius 2
   tl_assert (parameters.size () == p_actual_radius2);
   parameters.push_back (db::PCellParameterDeclaration ("actual_radius2"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_default (0.0);
-  parameters.back ().set_hidden (true);
+  parameters.back ().set_description (tl::to_string (tr ("Radius 2")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
+  parameters.back ().set_default (1.0);
 
   return parameters;
 }

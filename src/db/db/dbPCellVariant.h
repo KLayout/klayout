@@ -62,7 +62,12 @@ public:
   virtual Cell *clone (Layout &layout) const;
 
   /**
-   *  @brief Get the parameter name map for this variant
+   *  @brief Gets the parameter name map for a parameter list
+   */
+  std::map<std::string, tl::Variant> parameters_by_name_from_list (const pcell_parameters_type &list) const;
+
+  /**
+   *  @brief Gets the parameter name map for this variant
    */
   std::map<std::string, tl::Variant> parameters_by_name () const;
 

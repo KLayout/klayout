@@ -24,6 +24,7 @@
 #include "layDispatcher.h"
 
 #include "layPlugin.h"
+#include "layLayoutViewBase.h"
 
 namespace lay
 {
@@ -32,7 +33,7 @@ class DiffPlugin
   : public lay::Plugin
 {
 public:
-  DiffPlugin (Plugin *parent, lay::LayoutView *view)
+  DiffPlugin (Plugin *parent, lay::LayoutViewBase *view)
     : lay::Plugin (parent), mp_view (view)
   {
     mp_dialog = new lay::DiffToolDialog (0);
@@ -58,7 +59,7 @@ public:
   }
 
 private:
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   lay::DiffToolDialog *mp_dialog;
 };
 
@@ -102,7 +103,7 @@ public:
     // .. nothing yet ..
   }
 
-  lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutView *view) const
+  lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
     return new DiffPlugin (root, view);
   }

@@ -29,13 +29,15 @@
 #include "tlClassRegistry.h"
 #include "tlInclude.h"
 
+#include <cstring>
+
 namespace lym
 {
 
 tl::Executable *
 MacroInterpreter::executable (const lym::Macro *) const
 {
-  throw tl::Exception (tl::to_string (QObject::tr ("executable() implementation missing for DSL interpreter")));
+  throw tl::Exception (tl::to_string (tr ("executable() implementation missing for DSL interpreter")));
 }
 
 bool 
@@ -131,7 +133,7 @@ MacroInterpreter::execute_macro (const lym::Macro *macro)
     }
   }
 
-  throw tl::Exception (tl::to_string (QObject::tr ("No interpreter registered for DSL type '")) + macro->dsl_interpreter () + "'");
+  throw tl::Exception (tl::to_string (tr ("No interpreter registered for DSL type '")) + macro->dsl_interpreter () + "'");
 }
 
 std::string 

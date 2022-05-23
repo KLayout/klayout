@@ -24,7 +24,7 @@
 
 #include "layMove.h"
 #include "layEditable.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "laySelector.h"
 #include "laybasicConfig.h"
 
@@ -34,9 +34,8 @@ namespace lay
 // -------------------------------------------------------------
 //  MoveService implementation
 
-MoveService::MoveService (lay::LayoutView *view)
-  : QObject (),
-    lay::ViewService (view->view_object_widget ()), 
+MoveService::MoveService (lay::LayoutViewBase *view)
+  : lay::ViewService (view->view_object_widget ()),
     m_dragging (false),
     m_dragging_transient (false),
     mp_editables (view),
@@ -90,13 +89,13 @@ bool
 MoveService::key_event (unsigned int key, unsigned int /*buttons*/)
 {
   double dx = 0.0, dy = 0.0;
-  if (int (key) == Qt::Key_Down) {
+  if (int (key) == lay::KeyDown) {
     dy = -1.0;
-  } else if (int (key) == Qt::Key_Up) {
+  } else if (int (key) == lay::KeyUp) {
     dy = 1.0;
-  } else if (int (key) == Qt::Key_Left) {
+  } else if (int (key) == lay::KeyLeft) {
     dx = -1.0;
-  } else if (int (key) == Qt::Key_Right) {
+  } else if (int (key) == lay::KeyRight) {
     dx = 1.0;
   }
 

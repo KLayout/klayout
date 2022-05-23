@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layPropertiesDialog.h"
 
@@ -349,3 +350,4 @@ PropertiesDialog::reject ()
 
 }
 
+#endif

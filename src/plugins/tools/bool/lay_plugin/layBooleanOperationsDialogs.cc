@@ -62,7 +62,7 @@ BooleanOptionsDialog::cv_changed (int)
 }
 
 bool 
-BooleanOptionsDialog::exec_dialog (lay::LayoutView *view, int &cv_a, int &layer_a, int &cv_b, int &layer_b, int &cv_r, int &layer_r, int &mode, int &hier_mode, bool &min_coherence)
+BooleanOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int &cv_a, int &layer_a, int &cv_b, int &layer_b, int &cv_r, int &layer_r, int &mode, int &hier_mode, bool &min_coherence)
 {
   mp_view = view;
 
@@ -183,7 +183,7 @@ SizingOptionsDialog::cv_changed (int)
 }
 
 bool 
-SizingOptionsDialog::exec_dialog (lay::LayoutView *view, int &cv, int &layer, int &cv_r, int &layer_r, double &dx, double &dy, unsigned int &size_mode, int &hier_mode, bool &min_coherence)
+SizingOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int &cv, int &layer, int &cv_r, int &layer_r, double &dx, double &dy, unsigned int &size_mode, int &hier_mode, bool &min_coherence)
 {
   mp_view = view;
 
@@ -309,7 +309,7 @@ MergeOptionsDialog::cv_changed (int)
 }
 
 bool 
-MergeOptionsDialog::exec_dialog (lay::LayoutView *view, int &cv, int &layer, int &cv_r, int &layer_r, unsigned int &min_wc, int &hier_mode, bool &min_coherence)
+MergeOptionsDialog::exec_dialog (lay::LayoutViewBase *view, int &cv, int &layer, int &cv_r, int &layer_r, unsigned int &min_wc, int &hier_mode, bool &min_coherence)
 {
   mp_view = view;
 

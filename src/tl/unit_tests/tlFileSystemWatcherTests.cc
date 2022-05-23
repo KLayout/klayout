@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "tlFileSystemWatcher.h"
 #include "tlString.h"
@@ -218,3 +219,4 @@ TEST(3)
   EXPECT_EQ (changed_spy.count (), 0);
 }
 
+#endif

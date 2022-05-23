@@ -57,7 +57,7 @@ class NetTracerDialog
 Q_OBJECT
 
 public:
-  NetTracerDialog (lay::Dispatcher *root, lay::LayoutView *view);
+  NetTracerDialog (lay::Dispatcher *root, lay::LayoutViewBase *view);
   virtual ~NetTracerDialog ();
 
   virtual bool mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio);
@@ -92,7 +92,7 @@ private:
   nt_window_type m_window;
   double m_window_dim;
   unsigned int m_max_marker_count;
-  QColor m_marker_color;
+  lay::Color m_marker_color;
   int m_marker_line_width;
   int m_marker_vertex_size;
   int m_marker_halo;
@@ -108,6 +108,8 @@ private:
   lay::FileDialog *mp_export_file_dialog;
   std::string m_export_file_name;
 
+  lay::LayoutViewBase *mp_view;
+
   void commit ();
   size_t get_trace_depth ();
   void update_highlights ();
@@ -121,6 +123,11 @@ private:
   db::NetTracerNet *do_trace (const db::DBox &start_search_box, const db::DBox &stop_search_box, bool trace_path);
   bool get_net_tracer_setup (const lay::CellView &cv, db::NetTracerData &data);
   void trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView &cv, bool flat);
+
+  lay::LayoutViewBase *view ()
+  {
+    return mp_view;
+  }
 };
 
 }

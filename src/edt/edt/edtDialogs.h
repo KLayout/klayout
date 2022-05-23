@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 
 #ifndef HDR_edtDialogs
@@ -45,7 +46,7 @@
 
 namespace lay
 {
-  class LayoutView;
+  class LayoutViewBase;
   class Marker;
   class ObjectInstPath;
 }
@@ -81,7 +82,7 @@ public:
   InstantiationForm (QWidget *parent);
   virtual ~InstantiationForm ();
 
-  void show (lay::LayoutView *view, const lay::ObjectInstPath &path);
+  void show (lay::LayoutViewBase *view, const lay::ObjectInstPath &path);
 
 public slots:
   void display_mode_changed (bool);
@@ -90,7 +91,7 @@ public slots:
 private:
   void update ();
 
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
   const lay::ObjectInstPath *mp_path;
   lay::Marker *mp_marker;
   bool m_enable_cb_callbacks;
@@ -109,7 +110,7 @@ public:
   ChangeLayerOptionsDialog (QWidget *parent);
   virtual ~ChangeLayerOptionsDialog ();
 
-  bool exec_dialog (lay::LayoutView *view, int cv_index, unsigned int &new_layer);
+  bool exec_dialog (lay::LayoutViewBase *view, int cv_index, unsigned int &new_layer);
 };
 
 /**
@@ -125,7 +126,7 @@ public:
   AlignOptionsDialog (QWidget *parent);
   virtual ~AlignOptionsDialog ();
 
-  bool exec_dialog (lay::LayoutView *view, int &hmode, int &vmode, bool &visible_layers);
+  bool exec_dialog (int &hmode, int &vmode, bool &visible_layers);
 };
 
 /**
@@ -141,7 +142,7 @@ public:
   DistributeOptionsDialog (QWidget *parent);
   virtual ~DistributeOptionsDialog ();
 
-  bool exec_dialog (lay::LayoutView *view, bool &hdistribute, int &hmode, double &hpitch, double &hspace, bool &vdistribute, int &vmode, double &vpitch, double &vspace, bool &visible_layers);
+  bool exec_dialog (bool &hdistribute, int &hmode, double &hpitch, double &hspace, bool &vdistribute, int &vmode, double &vpitch, double &vspace, bool &visible_layers);
 };
 
 /**
@@ -205,6 +206,8 @@ private:
 };
 
 } // namespace edt
+
+#endif
 
 #endif
 

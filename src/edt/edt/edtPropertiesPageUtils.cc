@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "edtPropertiesPageUtils.h"
 
@@ -870,3 +871,4 @@ coords_to_string (const db::DPoint &dp, double dbu, bool du, const char *sep)
 
 }
 
+#endif

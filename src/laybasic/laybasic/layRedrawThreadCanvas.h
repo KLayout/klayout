@@ -29,13 +29,10 @@
 #include "dbTrans.h"
 #include "layViewOp.h"
 #include "layBitmapRenderer.h"
+#include "layPixelBuffer.h"
+#include "tlThreads.h"
 
 #include <vector>
-
-#include <QMutex>
-#include <QColor>
-
-class QImage;
 
 namespace lay {
 
@@ -152,7 +149,7 @@ public:
   /**
    *  @brief Access to the mutex object
    */
-  QMutex &mutex () 
+  tl::Mutex &mutex ()
   {
     return m_mutex;
   }
@@ -187,7 +184,7 @@ public:
   virtual lay::Renderer *create_renderer () = 0;
 
 private:
-  QMutex m_mutex;
+  tl::Mutex m_mutex;
   double m_resolution;
   unsigned int m_width, m_height;
 };
@@ -320,9 +317,14 @@ public:
   }
 
   /**
-   *  @brief Transfer the content to an QImage 
+   *  @brief Transfer the content to a PixelBuffer
    */
-  void to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, QColor background, QColor foreground, QColor active, const lay::Drawings *drawings, QImage &img, unsigned int width, unsigned int height);
+  void to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, lay::Color background, lay::Color foreground, lay::Color active, const lay::Drawings *drawings, PixelBuffer &img, unsigned int width, unsigned int height);
+
+  /**
+   *  @brief Transfer the content to a BitmapBuffer (monochrome)
+   */
+  void to_image_mono (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, bool background, bool foreground, bool active, const lay::Drawings *drawings, lay::BitmapBuffer &img, unsigned int width, unsigned int height);
 
   /**
    *  @brief Gets the current bitmap data as a BitmapCanvasData object

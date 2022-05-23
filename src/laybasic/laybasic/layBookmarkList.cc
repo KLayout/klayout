@@ -20,7 +20,6 @@
 
 */
 
-
 #include "layBookmarkList.h"
 #include "tlXMLParser.h"
 
@@ -117,4 +116,3 @@ BookmarkList::propose_new_bookmark_name () const
 }
 
 }
-

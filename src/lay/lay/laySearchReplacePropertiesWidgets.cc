@@ -320,7 +320,7 @@ class SearchInstanceProperties
     private Ui::SearchPropertiesInstance
 {
 public:
-  SearchInstanceProperties (QStackedWidget *sw, lay::LayoutView * /*view*/, int /*cv_index*/)
+  SearchInstanceProperties (QStackedWidget *sw, lay::LayoutViewBase * /*view*/, int /*cv_index*/)
     : SearchPropertiesWidget (sw)
   {
     setupUi (this);
@@ -377,7 +377,7 @@ class SearchShapeProperties
     protected Ui::SearchPropertiesShape
 {
 public:
-  SearchShapeProperties (QStackedWidget *sw, lay::LayoutView *view, int cv_index)
+  SearchShapeProperties (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_index)
     : SearchPropertiesWidget (sw)
   {
     setupUi (this);
@@ -449,7 +449,7 @@ class SearchPolygonProperties
   : public SearchShapeProperties
 {
 public:
-  SearchPolygonProperties (QStackedWidget *sw, lay::LayoutView *view, int cv_index)
+  SearchPolygonProperties (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_index)
     : SearchShapeProperties (sw, view, cv_index)
   {
     //  .. nothing yet ..
@@ -518,7 +518,7 @@ class SearchBoxProperties
     private Ui::SearchPropertiesBox
 {
 public:
-  SearchBoxProperties (QStackedWidget *sw, lay::LayoutView *view, int cv_index)
+  SearchBoxProperties (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_index)
     : SearchPropertiesWidget (sw)
   {
     setupUi (this);
@@ -593,7 +593,7 @@ class SearchPathProperties
     private Ui::SearchPropertiesPath
 {
 public:
-  SearchPathProperties (QStackedWidget *sw, lay::LayoutView *view, int cv_index)
+  SearchPathProperties (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_index)
     : SearchPropertiesWidget (sw)
   {
     setupUi (this);
@@ -666,7 +666,7 @@ class SearchTextProperties
     private Ui::SearchPropertiesText
 {
 public:
-  SearchTextProperties (QStackedWidget *sw, lay::LayoutView *view, int cv_index)
+  SearchTextProperties (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_index)
     : SearchPropertiesWidget (sw)
   {
     setupUi (this);
@@ -748,7 +748,7 @@ class ReplaceInstanceProperties
     private Ui::ReplacePropertiesInstance
 {
 public:
-  ReplaceInstanceProperties (QStackedWidget *sw, lay::LayoutView * /*view*/, int /*cv_index*/)
+  ReplaceInstanceProperties (QStackedWidget *sw, lay::LayoutViewBase * /*view*/, int /*cv_index*/)
     : ReplacePropertiesWidget (sw)
   {
     setupUi (this);
@@ -787,7 +787,7 @@ class ReplaceShapeProperties
     protected Ui::ReplacePropertiesShape
 {
 public:
-  ReplaceShapeProperties (QStackedWidget *sw, lay::LayoutView *view, int cv_index)
+  ReplaceShapeProperties (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_index)
     : ReplacePropertiesWidget (sw)
   {
     setupUi (this);
@@ -828,7 +828,7 @@ class ReplacePolygonProperties
   : public ReplaceShapeProperties
 {
 public:
-  ReplacePolygonProperties (QStackedWidget *sw, lay::LayoutView *view, int cv_index)
+  ReplacePolygonProperties (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_index)
     : ReplaceShapeProperties (sw, view, cv_index)
   {
     //  .. nothing yet ..
@@ -867,7 +867,7 @@ class ReplaceBoxProperties
     private Ui::ReplacePropertiesBox
 {
 public:
-  ReplaceBoxProperties (QStackedWidget *sw, lay::LayoutView *view, int cv_index)
+  ReplaceBoxProperties (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_index)
     : ReplacePropertiesWidget (sw)
   {
     setupUi (this);
@@ -919,7 +919,7 @@ class ReplacePathProperties
     private Ui::ReplacePropertiesPath
 {
 public:
-  ReplacePathProperties (QStackedWidget *sw, lay::LayoutView *view, int cv_index)
+  ReplacePathProperties (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_index)
     : ReplacePropertiesWidget (sw)
   {
     setupUi (this);
@@ -966,7 +966,7 @@ class ReplaceTextProperties
     private Ui::ReplacePropertiesText
 {
 public:
-  ReplaceTextProperties (QStackedWidget *sw, lay::LayoutView *view, int cv_index)
+  ReplaceTextProperties (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_index)
     : ReplacePropertiesWidget (sw)
   {
     setupUi (this);
@@ -1018,7 +1018,7 @@ public:
 
 // ----------------------------------------------------------------------------
 
-void fill_find_pages (QStackedWidget *sw, lay::LayoutView *view, int cv_index)
+void fill_find_pages (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_index)
 {
   while (sw->count () > 0) {
     sw->removeWidget (sw->widget (0));
@@ -1031,7 +1031,7 @@ void fill_find_pages (QStackedWidget *sw, lay::LayoutView *view, int cv_index)
   sw->addWidget (new SearchTextProperties (sw, view, cv_index));
 }
 
-void fill_replace_pages (QStackedWidget *sw, lay::LayoutView *view, int cv_index)
+void fill_replace_pages (QStackedWidget *sw, lay::LayoutViewBase *view, int cv_index)
 {
   while (sw->count () > 0) {
     sw->removeWidget (sw->widget (0));

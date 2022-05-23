@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_layAbstractMenu
 #define HDR_layAbstractMenu
@@ -824,4 +825,4 @@ private:
 
 #endif
 
-
+#endif  //  defined(HAVE_QT)

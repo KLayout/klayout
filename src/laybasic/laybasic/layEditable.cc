@@ -25,7 +25,9 @@
 #include "dbClipboard.h"
 #include "tlAssert.h"
 
-#include "layPropertiesDialog.h"
+#if defined(HAVE_QT)
+#  include "layPropertiesDialog.h"
+#endif
 
 #include <algorithm>
 #include <memory>
@@ -72,25 +74,29 @@ Editable::~Editable ()
 //  Editables implementation
 
 Editables::Editables (db::Manager *manager)
-  : db::Object (manager), mp_properties_dialog (0), m_move_selection (false), m_any_move_operation (false)
+  : db::Object (manager), m_move_selection (false), m_any_move_operation (false)
 {
-  //  .. nothing yet ..
+#if defined(HAVE_QT)
+  mp_properties_dialog = 0;
+#endif
 }
 
 Editables::~Editables ()
 {
   cancel_edits ();
 
+#if defined(HAVE_QT)
   if (mp_properties_dialog) {
     delete mp_properties_dialog;
     mp_properties_dialog = 0;
   }
+#endif
 }
 
 void 
 Editables::del (db::Transaction *transaction)
 {
-  std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (QObject::tr ("Delete"))));
+  std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (tr ("Delete"))));
 
   if (has_selection ()) {
 
@@ -169,9 +175,9 @@ Editables::selection_catch_bbox ()
 }
 
 void
-Editables::transform (const db::DCplxTrans &tr, db::Transaction *transaction)
+Editables::transform (const db::DCplxTrans &t, db::Transaction *transaction)
 {
-  std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (QObject::tr ("Transform"))));
+  std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (tr ("Transform"))));
 
   if (has_selection ()) {
 
@@ -183,7 +189,7 @@ Editables::transform (const db::DCplxTrans &tr, db::Transaction *transaction)
       manager ()->queue (this, new db::Op ());
 
       for (iterator e = begin (); e != end (); ++e) {
-        e->transform (tr);
+        e->transform (t);
       }
 
     } catch (...) {
@@ -597,7 +603,7 @@ Editables::move_transform (const db::DPoint &p, db::DFTrans t, lay::angle_constr
 void 
 Editables::end_move (const db::DPoint &p, lay::angle_constraint_type ac, db::Transaction *transaction)
 {
-  std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (QObject::tr ("Move"))));
+  std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (tr ("Move"))));
 
   if (m_any_move_operation) {
 
@@ -660,10 +666,12 @@ Editables::edit_cancel ()
 void
 Editables::cancel_edits ()
 {
+#if defined(HAVE_QT)
   //  close the property dialog
   if (mp_properties_dialog) {
     mp_properties_dialog->hide ();
   }
+#endif
 
   //  cancel any edit operations
   for (iterator e = begin (); e != end (); ++e) {
@@ -671,6 +679,7 @@ Editables::cancel_edits ()
   }
 }
 
+#if defined(HAVE_QT)
 void
 Editables::show_properties (QWidget *parent)
 {
@@ -686,6 +695,7 @@ Editables::show_properties (QWidget *parent)
   mp_properties_dialog = new lay::PropertiesDialog (parent, manager (), this);
   mp_properties_dialog->show ();
 }
+#endif
 
 }
 

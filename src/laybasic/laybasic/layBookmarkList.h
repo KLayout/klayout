@@ -20,7 +20,6 @@
 
 */
 
-
 #ifndef HDR_layBookmarkList
 #define HDR_layBookmarkList
 
@@ -207,4 +206,3 @@ private:
 } // namespace lay
 
 #endif
-

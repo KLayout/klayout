@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layCursor.h"
 
@@ -77,3 +78,4 @@ Cursor::qcursor (cursor_shape cursor)
 
 }
 
+#endif

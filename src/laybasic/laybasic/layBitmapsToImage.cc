@@ -25,11 +25,10 @@
 #include "layBitmap.h"
 #include "layDitherPattern.h"
 #include "layLineStyles.h"
+#include "layPixelBuffer.h"
 #include "tlTimer.h"
 #include "tlAssert.h"
-
-#include <QMutex>
-#include <QImage>
+#include "tlThreads.h"
 
 namespace lay
 {
@@ -386,7 +385,7 @@ render_scanline_cross (const uint32_t *dp, unsigned int ds, const lay::Bitmap *p
   }
 }
 
-static void create_precursor_bitmaps (const std::vector<lay::ViewOp> &view_ops_in, const std::vector <unsigned int> &vo_map, const std::vector<lay::Bitmap *> &pbitmaps_in, const std::vector<unsigned int> &bm_map, const lay::LineStyles &ls, unsigned int width, unsigned int height, std::map<unsigned int, lay::Bitmap> &precursors, QMutex *mutex)
+static void create_precursor_bitmaps (const std::vector<lay::ViewOp> &view_ops_in, const std::vector <unsigned int> &vo_map, const std::vector<lay::Bitmap *> &pbitmaps_in, const std::vector<unsigned int> &bm_map, const lay::LineStyles &ls, unsigned int width, unsigned int height, std::map<unsigned int, lay::Bitmap> &precursors, tl::Mutex *mutex)
 {
   tl_assert (bm_map.size () == vo_map.size ());
 
@@ -422,16 +421,17 @@ static void create_precursor_bitmaps (const std::vector<lay::ViewOp> &view_ops_i
   }
 }
 
-static void 
-bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
-                      const std::vector<lay::Bitmap *> &pbitmaps_in,
-                      const lay::DitherPattern &dp,
-                      const lay::LineStyles &ls,
-                      QImage *pimage, unsigned int width, unsigned int height,
-                      bool use_bitmap_index,
-                      bool transparent,
-                      QMutex *mutex)
+void
+bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
+                  const std::vector<lay::Bitmap *> &pbitmaps_in,
+                  const lay::DitherPattern &dp,
+                  const lay::LineStyles &ls,
+                  PixelBuffer *pimage, unsigned int width, unsigned int height,
+                  bool use_bitmap_index,
+                  tl::Mutex *mutex)
 {
+  bool transparent = pimage->transparent ();
+
   std::vector<unsigned int> bm_map;
   std::vector<unsigned int> vo_map;
 
@@ -588,7 +588,7 @@ bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
 
     if (masks.size () > 0) {
 
-      lay::color_t *pt = (lay::color_t *) pimage->scanLine (height - 1 - y);
+      lay::color_t *pt = (lay::color_t *) pimage->scan_line (height - 1 - y);
       uint32_t *dptr_end = dptr; 
 
       unsigned int i = 0;
@@ -661,14 +661,14 @@ bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
   delete [] buffer;
 }
 
-static void 
-bitmaps_to_image_mono (const std::vector<lay::ViewOp> &view_ops_in, 
-                       const std::vector<lay::Bitmap *> &pbitmaps_in,
-                       const lay::DitherPattern &dp, 
-                       const lay::LineStyles &ls,
-                       QImage *pimage, unsigned int width, unsigned int height,
-                       bool use_bitmap_index,
-                       QMutex *mutex)
+void
+bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
+                  const std::vector<lay::Bitmap *> &pbitmaps_in,
+                  const lay::DitherPattern &dp,
+                  const lay::LineStyles &ls,
+                  lay::BitmapBuffer *pimage, unsigned int width, unsigned int height,
+                  bool use_bitmap_index,
+                  tl::Mutex *mutex)
 {
   std::vector<unsigned int> bm_map;
   std::vector<unsigned int> vo_map;
@@ -825,7 +825,7 @@ bitmaps_to_image_mono (const std::vector<lay::ViewOp> &view_ops_in,
 
     if (masks.size () > 0) {
 
-      lay::color_t *pt = (lay::color_t *) pimage->scanLine (height - 1 - y);
+      lay::color_t *pt = (lay::color_t *) pimage->scan_line (height - 1 - y);
       uint32_t *dptr_end = dptr; 
 
       unsigned int i = 0;
@@ -864,23 +864,6 @@ bitmaps_to_image_mono (const std::vector<lay::ViewOp> &view_ops_in,
 
   //  free the pixel buffer
   delete [] buffer;
-}
-
-void 
-bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in, 
-                  const std::vector<lay::Bitmap *> &pbitmaps_in,
-                  const lay::DitherPattern &dp, 
-                  const lay::LineStyles &ls,
-                  QImage *pimage, unsigned int width, unsigned int height,
-                  bool use_bitmap_index,
-                  QMutex *mutex)
-{
-  if (pimage->depth () <= 1) {
-    bitmaps_to_image_mono (view_ops_in, pbitmaps_in, dp, ls, pimage, width, height, use_bitmap_index, mutex);
-  } else {
-    bool transparent = (pimage->format () == QImage::Format_ARGB32);
-    bitmaps_to_image_rgb (view_ops_in, pbitmaps_in, dp, ls, pimage, width, height, use_bitmap_index, transparent, mutex);
-  }
 }
 
 void

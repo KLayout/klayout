@@ -23,8 +23,10 @@
 
 #include "edtMainService.h"
 #include "edtServiceImpl.h"
-#include "edtPropertiesPages.h"
-#include "edtInstPropertiesPage.h"
+#if defined(HAVE_QT)
+#  include "edtPropertiesPages.h"
+#  include "edtInstPropertiesPage.h"
+#endif
 #include "edtService.h"
 #include "edtPlugin.h"
 #include "dbEdge.h"
@@ -35,11 +37,16 @@
 #include "dbEdgeProcessor.h"
 #include "layMarker.h"
 #include "layLayerProperties.h"
-#include "layLayoutView.h"
-#include "layTipDialog.h"
+#include "layLayoutViewBase.h"
 
-#include <QInputDialog>
-#include <QApplication>
+#if defined(HAVE_QT)
+#  include "layTipDialog.h"
+#  include "layDragDropData.h"
+#endif
+
+#if defined(HAVE_QT)
+#  include <QApplication>
+#endif
 
 namespace edt
 {
@@ -47,7 +54,7 @@ namespace edt
 // -----------------------------------------------------------------------------
 //  ShapeEditService implementation
 
-ShapeEditService::ShapeEditService (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator::flags_type shape_types)
+ShapeEditService::ShapeEditService (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type shape_types)
   : edt::Service (manager, view, shape_types), 
     m_layer (0), m_cv_index (0), mp_cell (0), mp_layout (0), m_combine_mode (CM_Add)
 {
@@ -71,7 +78,7 @@ ShapeEditService::get_edit_layer ()
   lay::LayerPropertiesConstIterator cl = view ()->current_layer ();
 
   if (cl.is_null ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Please select a layer first")));
+    throw tl::Exception (tl::to_string (tr ("Please select a layer first")));
   }
 
   int cv_index = cl->cellview_index ();
@@ -79,20 +86,22 @@ ShapeEditService::get_edit_layer ()
   int layer = cl->layer_index ();
 
   if (cv_index < 0 || ! cv.is_valid ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Please select a cell first")));
+    throw tl::Exception (tl::to_string (tr ("Please select a cell first")));
   }
 
+#if defined(HAVE_QT)
   if (! cl->visible (true)) {
     lay::TipDialog td (QApplication::activeWindow (),
-                       tl::to_string (QObject::tr ("You are about to draw on a hidden layer. The result won't be visible.")),
+                       tl::to_string (tr ("You are about to draw on a hidden layer. The result won't be visible.")),
                        "drawing-on-invisible-layer");
     td.exec_dialog ();
   }
+#endif
 
   if (layer < 0 || ! cv->layout ().is_valid_layer ((unsigned int) layer)) {
 
     if (cl->has_children ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Please select a valid drawing layer first")));
+      throw tl::Exception (tl::to_string (tr ("Please select a valid drawing layer first")));
     } else {
 
       //  create this layer now
@@ -125,7 +134,7 @@ ShapeEditService::get_edit_layer ()
   mp_cell = &(mp_layout->cell (cv.cell_index ()));
 
   if (mp_cell->is_proxy ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot put a shape into a PCell or library cell")));
+    throw tl::Exception (tl::to_string (tr ("Cannot put a shape into a PCell or library cell")));
   }
 }
 
@@ -152,12 +161,14 @@ ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl
     return;
   }
 
+#if defined(HAVE_QT)
   if (! cl->visible (true)) {
     lay::TipDialog td (QApplication::activeWindow (),
-                       tl::to_string (QObject::tr ("You are now drawing on a hidden layer. The result won't be visible.")),
+                       tl::to_string (tr ("You are now drawing on a hidden layer. The result won't be visible.")),
                        "drawing-on-invisible-layer");
     td.exec_dialog ();
   }
+#endif
 
   if (layer < 0 || ! cv->layout ().is_valid_layer ((unsigned int) layer)) {
 
@@ -255,7 +266,7 @@ ShapeEditService::deliver_shape (const db::Polygon &poly)
 {
   if (m_combine_mode == CM_Add) {
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Create polygon"))); 
+    manager ()->transaction (tl::to_string (tr ("Create polygon")));
     cell ().shapes (layer ()).insert (poly);
     manager ()->commit ();
 
@@ -315,7 +326,7 @@ ShapeEditService::deliver_shape (const db::Polygon &poly)
       result = input;
     }
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Combine shape with background"))); 
+    manager ()->transaction (tl::to_string (tr ("Combine shape with background")));
 
     //  Erase existing shapes
     for (std::vector<db::Shape>::const_iterator s = shapes.begin (); s != shapes.end (); ++s) {
@@ -339,7 +350,7 @@ void
 ShapeEditService::deliver_shape (const db::Path &path)
 {
   if (m_combine_mode == CM_Add) {
-    manager ()->transaction (tl::to_string (QObject::tr ("Create path"))); 
+    manager ()->transaction (tl::to_string (tr ("Create path")));
     cell ().shapes (layer ()).insert (path);
     manager ()->commit ();
   } else {
@@ -351,7 +362,7 @@ void
 ShapeEditService::deliver_shape (const db::Box &box)
 {
   if (m_combine_mode == CM_Add) {
-    manager ()->transaction (tl::to_string (QObject::tr ("Create box"))); 
+    manager ()->transaction (tl::to_string (tr ("Create box")));
     cell ().shapes (layer ()).insert (box);
     manager ()->commit ();
   } else {
@@ -362,18 +373,20 @@ ShapeEditService::deliver_shape (const db::Box &box)
 // -----------------------------------------------------------------------------
 //  PolygonService implementation
 
-PolygonService::PolygonService (db::Manager *manager, lay::LayoutView *view)
+PolygonService::PolygonService (db::Manager *manager, lay::LayoutViewBase *view)
   : ShapeEditService (manager, view, db::ShapeIterator::Polygons),
     m_closure_set (false), m_closure ()
 {
   //  .. nothing yet ..
 }
 
+#if defined(HAVE_QT)
 lay::PropertiesPage *
 PolygonService::properties_page (db::Manager *manager, QWidget *parent)
 {
   return new edt::PolygonPropertiesPage (this, manager, parent);
 }
+#endif
 
 void 
 PolygonService::do_begin_edit (const db::DPoint &p)
@@ -468,7 +481,7 @@ PolygonService::get_polygon () const
   db::Polygon poly;
 
   if (m_points.size () < 4) {
-    throw tl::Exception (tl::to_string (QObject::tr ("A polygon must have at least 3 points")));
+    throw tl::Exception (tl::to_string (tr ("A polygon must have at least 3 points")));
   }
 
   std::vector<db::Point> points_dbu;
@@ -485,7 +498,7 @@ PolygonService::get_polygon () const
   poly.assign_hull (points_dbu.begin (), points_dbu.end (), true, true /*remove reflected*/);
 
   if (poly.hull ().size () < 3) {
-    throw tl::Exception (tl::to_string (QObject::tr ("A polygon must have at least 3 effective points")));
+    throw tl::Exception (tl::to_string (tr ("A polygon must have at least 3 effective points")));
   }
 
   return poly;
@@ -692,17 +705,19 @@ PolygonService::update_marker ()
 // -----------------------------------------------------------------------------
 //  BoxService implementation
 
-BoxService::BoxService (db::Manager *manager, lay::LayoutView *view)
+BoxService::BoxService (db::Manager *manager, lay::LayoutViewBase *view)
   : ShapeEditService (manager, view, db::ShapeIterator::Boxes)
 { 
   //  .. nothing yet ..
 }
   
+#if defined(HAVE_QT)
 lay::PropertiesPage *
 BoxService::properties_page (db::Manager *manager, QWidget *parent)
 {
   return new edt::BoxPropertiesPage (this, manager, parent);
 }
+#endif
 
 void 
 BoxService::do_begin_edit (const db::DPoint &p)
@@ -784,7 +799,7 @@ BoxService::selection_applies (const lay::ObjectInstPath &sel) const
 // -----------------------------------------------------------------------------
 //  TextService implementation
 
-TextService::TextService (db::Manager *manager, lay::LayoutView *view)
+TextService::TextService (db::Manager *manager, lay::LayoutViewBase *view)
   : ShapeEditService (manager, view, db::ShapeIterator::Texts),
     m_rot (0)
 { 
@@ -796,11 +811,13 @@ TextService::~TextService ()
   //  .. nothing yet ..
 }
 
+#if defined(HAVE_QT)
 lay::PropertiesPage *
 TextService::properties_page (db::Manager *manager, QWidget *parent)
 {
   return new edt::TextPropertiesPage (this, manager, parent);
 }
+#endif
 
 void 
 TextService::do_begin_edit (const db::DPoint &p)
@@ -889,16 +906,17 @@ TextService::do_finish_edit ()
 {
   get_edit_layer ();
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Create text"))); 
+  manager ()->transaction (tl::to_string (tr ("Create text")));
   cell ().shapes (layer ()).insert (get_text ());
   manager ()->commit ();
 
   commit_recent (view ());
 
+#if defined(HAVE_QT)
   if (! view ()->text_visible ()) {
 
     lay::TipDialog td (QApplication::activeWindow (),
-                       tl::to_string (QObject::tr ("A text object is created but texts are disabled for drawing and are not visible. Do you want to enable drawing of texts?\n\nChoose \"Yes\" to enable text drawing now.")), 
+                       tl::to_string (tr ("A text object is created but texts are disabled for drawing and are not visible. Do you want to enable drawing of texts?\n\nChoose \"Yes\" to enable text drawing now.")),
                        "text-created-but-not-visible",
                        lay::TipDialog::yesno_buttons);
 
@@ -909,6 +927,7 @@ TextService::do_finish_edit ()
     }
 
   }
+#endif
 }
 
 void 
@@ -972,7 +991,7 @@ TextService::configure (const std::string &name, const std::string &value)
 // -----------------------------------------------------------------------------
 //  PathService implementation
 
-PathService::PathService (db::Manager *manager, lay::LayoutView *view)
+PathService::PathService (db::Manager *manager, lay::LayoutViewBase *view)
   : ShapeEditService (manager, view, db::ShapeIterator::Paths), 
     m_width (0.1), m_bgnext (0.0), m_endext (0.0), m_type (Flush), m_needs_update (true)
 {
@@ -984,6 +1003,7 @@ PathService::~PathService ()
   //  .. nothing yet ..
 }
 
+#if defined(HAVE_QT)
 lay::PropertiesPage *
 PathService::properties_page (db::Manager *manager, QWidget *parent)
 {
@@ -993,6 +1013,7 @@ PathService::properties_page (db::Manager *manager, QWidget *parent)
     return new edt::PathPropertiesPage (this, manager, parent);
   }
 }
+#endif
 
 void 
 PathService::do_begin_edit (const db::DPoint &p)
@@ -1083,7 +1104,7 @@ PathService::do_finish_edit ()
 {
   //  one point is reserved for the "current one"
   if (m_points.size () < 3) {
-    throw tl::Exception (tl::to_string (QObject::tr ("A path must have at least 2 points")));
+    throw tl::Exception (tl::to_string (tr ("A path must have at least 2 points")));
   }
   m_points.pop_back ();
 
@@ -1211,7 +1232,7 @@ PathService::config_finalize ()
 // -----------------------------------------------------------------------------
 //  InstService implementation
 
-InstService::InstService (db::Manager *manager, lay::LayoutView *view)
+InstService::InstService (db::Manager *manager, lay::LayoutViewBase *view)
   : edt::Service (manager, view),
     m_angle (0.0), m_scale (1.0),
     m_mirror (false), m_is_pcell (false),
@@ -1224,11 +1245,13 @@ InstService::InstService (db::Manager *manager, lay::LayoutView *view)
   //  .. nothing yet ..
 }
 
+#if defined(HAVE_QT)
 lay::PropertiesPage *
 InstService::properties_page (db::Manager *manager, QWidget *parent)
 {
   return new edt::InstPropertiesPage (this, manager, parent);
 }
+#endif
 
 bool
 InstService::do_activated ()
@@ -1253,6 +1276,7 @@ InstService::get_default_layer_for_pcell ()
   return tl::Variant ();
 }
 
+#if defined(HAVE_QT)
 bool
 InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase *data)
 {
@@ -1323,7 +1347,7 @@ InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase 
   return false;
 }
 
-bool 
+bool
 InstService::drag_move_event (const db::DPoint &p, const lay::DragDropDataBase * /*data*/)
 { 
   if (m_in_drag_drop) {
@@ -1344,16 +1368,17 @@ InstService::drag_leave_event ()
 }
 
 bool
+InstService::drop_event (const db::DPoint & /*p*/, const lay::DragDropDataBase * /*data*/)
+{
+  m_in_drag_drop = false;
+  return false;
+}
+#endif
+
+bool
 InstService::selection_applies (const lay::ObjectInstPath &sel) const
 {
   return sel.is_cell_inst ();
-}
-
-bool  
-InstService::drop_event (const db::DPoint & /*p*/, const lay::DragDropDataBase * /*data*/) 
-{ 
-  m_in_drag_drop = false;
-  return false;
 }
 
 void
@@ -1383,7 +1408,7 @@ InstService::do_begin_edit (const db::DPoint &p)
   }
 
   if (cv.cell ()->is_proxy ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot put an instance into a PCell or library cell")));
+    throw tl::Exception (tl::to_string (tr ("Cannot put an instance into a PCell or library cell")));
   }
 
   m_trans = cv.context_trans ();
@@ -1429,7 +1454,7 @@ InstService::make_cell (const lay::CellView &cv)
   //  NOTE: do this at the beginning: creating a transaction might delete transactions behind the
   //  head transaction, hence releasing (thus: deleting) cells. To prevert interference, create
   //  the transaction at the beginning.
-  db::Transaction tr (manager (), tl::to_string (QObject::tr ("Create reference cell")), m_reference_transaction_id);
+  db::Transaction transaction (manager (), tl::to_string (tr ("Create reference cell")), m_reference_transaction_id);
 
   lay::LayerState layer_state = view ()->layer_snapshot ();
 
@@ -1497,8 +1522,8 @@ InstService::make_cell (const lay::CellView &cv)
   m_has_valid_cell = true;
   m_current_cell = inst_cell_index;
 
-  if (! tr.is_empty ()) {
-    m_reference_transaction_id = tr.id ();
+  if (! transaction.is_empty ()) {
+    m_reference_transaction_id = transaction.id ();
   }
 
   return std::pair<bool, db::cell_index_type> (true, inst_cell_index);
@@ -1596,10 +1621,10 @@ InstService::do_finish_edit ()
       std::vector <db::cell_index_type> intersection;
       std::set_intersection (called.begin (), called.end (), callers.begin (), callers.end (), std::back_inserter (intersection));
       if (! intersection.empty ()) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Inserting this instance would create a recursive hierarchy")));
+        throw tl::Exception (tl::to_string (tr ("Inserting this instance would create a recursive hierarchy")));
       }
 
-      manager ()->transaction (tl::to_string (QObject::tr ("Create instance")), m_reference_transaction_id); 
+      manager ()->transaction (tl::to_string (tr ("Create instance")), m_reference_transaction_id);
       m_reference_transaction_id = 0;
       db::Instance i = cv->layout ().cell (cv.cell_index ()).insert (inst);
       cv->layout ().cleanup ();

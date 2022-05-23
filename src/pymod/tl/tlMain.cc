@@ -23,4 +23,3 @@
 #include "../pymodHelper.h"
 
 DEFINE_PYMOD(tlcore, "tl", "KLayout core module 'tl'")
-

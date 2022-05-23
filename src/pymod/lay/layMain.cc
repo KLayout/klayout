@@ -22,10 +22,18 @@
 
 #include "../pymodHelper.h"
 
-//  to force linking of the lay module
-#include "../../lay/lay/layForceLink.h"
+//  to force linking of the layview module
+#if defined(HAVE_QT)
+#  include "../../lay/lay/layForceLink.h"
+#else
+#  include "../../layview/layview/layviewForceLink.h"
+#endif
 
-//  NOTE: img, ant, edt and rdb don't need to be force-linked
-//  as they are hard-linked by lay
+//  Force-include other dependencies
+//  NOTE: these libraries contribute to the "lay" module space. Hence we have to include them.
+#include "../../ant/ant/antForceLink.h"
+#include "../../img/img/imgForceLink.h"
+#include "../../edt/edt/edtForceLink.h"
+#include "../../lym/lym/lymForceLink.h"
 
-DEFINE_PYMOD(lay, "lay", "KLayout core module 'lay'")
+DEFINE_PYMOD(laycore, "lay", "KLayout core module 'lay'")

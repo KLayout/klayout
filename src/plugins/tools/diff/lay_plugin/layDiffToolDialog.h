@@ -36,7 +36,7 @@ namespace Ui
 
 namespace lay
 {
-  class LayoutView;
+  class LayoutViewBase;
 }
 
 namespace lay
@@ -57,7 +57,7 @@ public:
   DiffToolDialog (QWidget *parent);
   ~DiffToolDialog ();
 
-  int exec_dialog (lay::LayoutView *view);
+  int exec_dialog (lay::LayoutViewBase *view);
 
 protected slots:
   void xor_changed () { update (); }
@@ -69,7 +69,7 @@ protected:
 
 private:
   Ui::DiffToolDialog *mp_ui;
-  lay::LayoutView *mp_view;
+  lay::LayoutViewBase *mp_view;
 };
 
 }

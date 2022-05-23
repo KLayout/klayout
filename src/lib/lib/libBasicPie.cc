@@ -70,38 +70,38 @@ BasicPie::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parameters
     return;
   }
 
-  double ru = parameters [p_actual_radius].to_double ();
-  double r = parameters [p_radius].to_double ();
+  double ru = parameters [p_radius].to_double ();
+  double r = parameters [p_actual_radius].to_double ();
   double rs = ru;
-  if (parameters [p_handle1].is_user <db::DPoint> ()) {
-    rs = parameters [p_handle1].to_user <db::DPoint> ().distance ();
-    if (parameters [p_handle2].is_user <db::DPoint> ()) {
-      rs = std::max (rs, parameters [p_handle2].to_user <db::DPoint> ().distance ());
+  if (parameters [p_actual_handle1].is_user <db::DPoint> ()) {
+    rs = parameters [p_actual_handle1].to_user <db::DPoint> ().distance ();
+    if (parameters [p_actual_handle2].is_user <db::DPoint> ()) {
+      rs = std::max (rs, parameters [p_actual_handle2].to_user <db::DPoint> ().distance ());
     }
-  } else if (parameters [p_handle2].is_user <db::DPoint> ()) {
-    rs = parameters [p_handle2].to_user <db::DPoint> ().distance ();
+  } else if (parameters [p_actual_handle2].is_user <db::DPoint> ()) {
+    rs = parameters [p_actual_handle2].to_user <db::DPoint> ().distance ();
   } 
 
-  double a1u = parameters [p_actual_start_angle].to_double ();
-  double a1 = parameters [p_start_angle].to_double ();
+  double a1u = parameters [p_start_angle].to_double ();
+  double a1 = parameters [p_actual_start_angle].to_double ();
   db::DPoint h1u;
-  if (parameters [p_actual_handle1].is_user<db::DPoint> ()) {
-    h1u = parameters [p_actual_handle1].to_user<db::DPoint> ();
+  if (parameters [p_handle1].is_user<db::DPoint> ()) {
+    h1u = parameters [p_handle1].to_user<db::DPoint> ();
   }
   db::DPoint h1;
-  if (parameters [p_handle1].is_user<db::DPoint> ()) {
-    h1 = parameters [p_handle1].to_user<db::DPoint> ();
+  if (parameters [p_actual_handle1].is_user<db::DPoint> ()) {
+    h1 = parameters [p_actual_handle1].to_user<db::DPoint> ();
   }
 
-  double a2u = parameters [p_actual_end_angle].to_double ();
-  double a2 = parameters [p_end_angle].to_double ();
+  double a2u = parameters [p_end_angle].to_double ();
+  double a2 = parameters [p_actual_end_angle].to_double ();
   db::DPoint h2u;
-  if (parameters [p_actual_handle2].is_user<db::DPoint> ()) {
-    h2u = parameters [p_actual_handle2].to_user<db::DPoint> ();
+  if (parameters [p_handle2].is_user<db::DPoint> ()) {
+    h2u = parameters [p_handle2].to_user<db::DPoint> ();
   }
   db::DPoint h2;
-  if (parameters [p_handle2].is_user<db::DPoint> ()) {
-    h2 = parameters [p_handle2].to_user<db::DPoint> ();
+  if (parameters [p_actual_handle2].is_user<db::DPoint> ()) {
+    h2 = parameters [p_actual_handle2].to_user<db::DPoint> ();
   }
 
   if (fabs (ru - r) > 1e-6 || fabs (a1u - a1) > 1e-6 || fabs (a2u - a2) > 1e-6) {
@@ -113,8 +113,8 @@ BasicPie::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parameters
     h1u = db::DPoint (r * cos (a1 / 180.0 * M_PI), r * sin (a1 / 180.0 * M_PI));
     h2u = db::DPoint (r * cos (a2 / 180.0 * M_PI), r * sin (a2 / 180.0 * M_PI));
 
-    parameters [p_handle1] = h1u;
-    parameters [p_handle2] = h2u;
+    parameters [p_actual_handle1] = h1u;
+    parameters [p_actual_handle2] = h2u;
 
   } else if (h1u.distance (h1) > 1e-6 || h2u.distance (h2) > 1e-6) {
 
@@ -129,18 +129,18 @@ BasicPie::coerce_parameters (const db::Layout & /*layout*/, db::pcell_parameters
     h1u = h1;
     h2u = h2;
 
-    parameters [p_radius] = ru;
-    parameters [p_start_angle] = a1u;
-    parameters [p_end_angle] = a2u;
+    parameters [p_actual_radius] = ru;
+    parameters [p_actual_start_angle] = a1u;
+    parameters [p_actual_end_angle] = a2u;
 
   }
 
   //  set the hidden used radius parameter
-  parameters [p_actual_radius] = ru;
-  parameters [p_actual_start_angle] = a1u;
-  parameters [p_actual_end_angle] = a2u;
-  parameters [p_actual_handle1] = h1u;
-  parameters [p_actual_handle2] = h2u;
+  parameters [p_radius] = ru;
+  parameters [p_start_angle] = a1u;
+  parameters [p_end_angle] = a2u;
+  parameters [p_handle1] = h1u;
+  parameters [p_handle2] = h2u;
 }
 
 void 
@@ -150,9 +150,9 @@ BasicPie::produce (const db::Layout &layout, const std::vector<unsigned int> &la
     return;
   }
 
-  double r = parameters [p_actual_radius].to_double () / layout.dbu ();
-  double a1 = parameters [p_actual_start_angle].to_double ();
-  double a2 = parameters [p_actual_end_angle].to_double ();
+  double r = parameters [p_radius].to_double () / layout.dbu ();
+  double a1 = parameters [p_start_angle].to_double ();
+  double a2 = parameters [p_end_angle].to_double ();
   if (a2 < a1 - 1e-6) {
     a2 += 360 * ceil ((a1 - a2) / 360.0 + 1e-6);
   }
@@ -187,7 +187,7 @@ std::string
 BasicPie::get_display_name (const db::pcell_parameters_type &parameters) const
 {
   return "PIE(l=" + std::string (parameters [p_layer].to_string ()) +
-            ",r=" + tl::to_string (parameters [p_actual_radius].to_double ()) +
+            ",r=" + tl::to_string (parameters [p_radius].to_double ()) +
             ",a=" + tl::to_string (parameters [p_start_angle].to_double (), 6) +
              ".." + tl::to_string (parameters [p_end_angle].to_double (), 6) +
             ",n=" + tl::to_string (parameters [p_npoints].to_int ()) +
@@ -206,42 +206,42 @@ BasicPie::get_parameter_declarations () const
   parameters.back ().set_description (tl::to_string (tr ("Layer")));
 
   //  parameter #1: radius 
+  //  This parameter is updated by "coerce_parameters" from "actual_radius" or the handles,
+  //  whichever changed.
   tl_assert (parameters.size () == p_radius);
   parameters.push_back (db::PCellParameterDeclaration ("radius"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (tr ("Radius")));
-  parameters.back ().set_default (0.1);
-  parameters.back ().set_unit (tl::to_string (tr ("micron")));
+  parameters.back ().set_hidden (true);
 
   //  parameter #2: start angle 
+  //  This is a shadow parameter to keep the final start angle
   tl_assert (parameters.size () == p_start_angle);
   parameters.push_back (db::PCellParameterDeclaration ("a1"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (tr ("Start angle")));
-  parameters.back ().set_default (0);
-  parameters.back ().set_unit (tl::to_string (tr ("degree")));
+  parameters.back ().set_hidden (true);
 
   //  parameter #3: end angle 
+  //  This is a shadow parameter to keep the final end angle
   tl_assert (parameters.size () == p_end_angle);
   parameters.push_back (db::PCellParameterDeclaration ("a2"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (tr ("End angle")));
-  parameters.back ().set_default (90);
-  parameters.back ().set_unit (tl::to_string (tr ("degree")));
+  parameters.back ().set_hidden (true);
 
   //  parameter #4: handle 1
   tl_assert (parameters.size () == p_handle1);
+  //  This is a shadow parameter to keep the current handle position and to determine
+  //  whether the handle changed
   parameters.push_back (db::PCellParameterDeclaration ("handle1"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
-  parameters.back ().set_default (db::DPoint (0.1, 0));
-  parameters.back ().set_description (tl::to_string (tr ("S")));
+  parameters.back ().set_hidden (true);
 
   //  parameter #5: handle 1
+  //  This is a shadow parameter to keep the current handle position and to determine
+  //  whether the handle changed
   tl_assert (parameters.size () == p_handle2);
   parameters.push_back (db::PCellParameterDeclaration ("handle2"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
-  parameters.back ().set_default (db::DPoint (0, 0.1));
-  parameters.back ().set_description (tl::to_string (tr ("E")));
+  parameters.back ().set_hidden (true);
 
   //  parameter #6: number of points 
   tl_assert (parameters.size () == p_npoints);
@@ -254,34 +254,39 @@ BasicPie::get_parameter_declarations () const
   tl_assert (parameters.size () == p_actual_radius);
   parameters.push_back (db::PCellParameterDeclaration ("actual_radius"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_default (0.0);
-  parameters.back ().set_hidden (true);
+  parameters.back ().set_description (tl::to_string (tr ("Radius")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
+  parameters.back ().set_default (1.0);
 
   //  parameter #8: used start angle
   tl_assert (parameters.size () == p_actual_start_angle);
   parameters.push_back (db::PCellParameterDeclaration ("actual_start_angle"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
+  parameters.back ().set_description (tl::to_string (tr ("Start angle")));
+  parameters.back ().set_unit (tl::to_string (tr ("degree")));
   parameters.back ().set_default (0.0);
-  parameters.back ().set_hidden (true);
 
   //  parameter #9: used end angle
   tl_assert (parameters.size () == p_actual_end_angle);
   parameters.push_back (db::PCellParameterDeclaration ("actual_end_angle"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_default (0.0);
-  parameters.back ().set_hidden (true);
+  parameters.back ().set_description (tl::to_string (tr ("End angle")));
+  parameters.back ().set_unit (tl::to_string (tr ("degree")));
+  parameters.back ().set_default (90.0);
 
   //  parameter #10: used handle 1
   tl_assert (parameters.size () == p_actual_handle1);
   parameters.push_back (db::PCellParameterDeclaration ("actual_handle1"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
-  parameters.back ().set_hidden (true);
+  parameters.back ().set_description (tl::to_string (tr ("S")));
+  parameters.back ().set_default (db::DPoint (-1.0, 0.0));
 
   //  parameter #11: used handle 2
   tl_assert (parameters.size () == p_actual_handle2);
   parameters.push_back (db::PCellParameterDeclaration ("actual_handle2"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
-  parameters.back ().set_hidden (true);
+  parameters.back ().set_description (tl::to_string (tr ("E")));
+  parameters.back ().set_default (db::DPoint (0.0, 1.0));
 
   tl_assert (parameters.size () == p_total);
   return parameters;

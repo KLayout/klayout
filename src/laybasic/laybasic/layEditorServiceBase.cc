@@ -22,9 +22,13 @@
 
 #include "layEditorServiceBase.h"
 #include "layViewport.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "laybasicConfig.h"
 #include "layConverters.h"
+
+#if defined(HAVE_QT)
+#  include <QMessageBox>
+#endif
 
 namespace lay
 {
@@ -59,11 +63,11 @@ public:
 
   uint32_t cursor_color (lay::ViewObjectCanvas &canvas) const
   {
-    QColor color;
+    lay::Color color;
     if (mp_service) {
       color = mp_service->tracking_cursor_color ();
     }
-    if (! color.isValid ()) {
+    if (! color.is_valid ()) {
       color = canvas.foreground_color ();
     }
     return color.rgb ();
@@ -202,7 +206,7 @@ private:
 
 // --------------------------------------------------------------------------------------
 
-EditorServiceBase::EditorServiceBase (lay::LayoutView *view)
+EditorServiceBase::EditorServiceBase (LayoutViewBase *view)
   : lay::ViewService (view->view_object_widget ()),
     lay::Editable (view),
     lay::Plugin (view),
@@ -263,7 +267,7 @@ EditorServiceBase::configure (const std::string &name, const std::string &value)
 
   if (name == cfg_tracking_cursor_color) {
 
-    QColor color;
+    lay::Color color;
     lay::ColorConverter ().from_string (value, color);
 
     if (color != m_cursor_color) {
@@ -296,6 +300,15 @@ void
 EditorServiceBase::deactivated ()
 {
   clear_mouse_cursors ();
+}
+
+void
+EditorServiceBase::show_error (tl::Exception &ex)
+{
+  tl::error << ex.msg ();
+#if defined(HAVE_QT)
+  QMessageBox::critical (widget (), tr ("Error"), tl::to_qstring (ex.msg ()));
+#endif
 }
 
 }

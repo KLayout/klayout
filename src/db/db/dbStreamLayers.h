@@ -201,6 +201,8 @@ public:
 
   /**
    *  @brief Returns the first logical layer for a given layer specification
+   *  The first value of the pair indicates whether there is a valid mapping.
+   *  The second value will give the layer to map to.
    */
   template <class L>
   std::pair<bool, unsigned int> first_logical (const L &p) const
@@ -215,6 +217,8 @@ public:
 
   /**
    *  @brief Returns the first logical layer for a given layer specification
+   *  The first value of the pair indicates whether there is a valid mapping.
+   *  The second value will give the layer to map to.
    */
   template <class L>
   std::pair<bool, unsigned int> first_logical (const L &p, db::Layout &layout) const
@@ -230,24 +234,21 @@ public:
   /**
    *  @brief Query a layer mapping
    *
-   *  @return A pair telling if the layer is mapped (first=true) and
-   *  the logical layer mapped (second) if this is the case.
+   *  @return A set of layers which are designated targets.
    */
   std::set<unsigned int> logical (const LDPair &p) const;
 
   /** 
    *  @brief Query a layer mapping from a name
    *
-   *  @return A pair telling if the layer is mapped (first=true) and
-   *  the logical layer mapped (second) if this is the case.
+   *  @return A set of layers which are designated targets.
    */
   std::set<unsigned int> logical (const std::string &name) const;
 
   /** 
    *  @brief Query a layer mapping from a name or LDPair
    *
-   *  @return A pair telling if the layer is mapped (first=true) and
-   *  the logical layer mapped (second) if this is the case.
+   *  @return A set of layers which are designated targets.
    *
    *  @param p The layer that is looked for
    */
@@ -256,8 +257,7 @@ public:
   /**
    *  @brief Query or install a layer mapping from a name or LDPair
    *
-   *  @return A pair telling if the layer is mapped (first=true) and
-   *  the logical layer mapped (second) if this is the case.
+   *  @return A set of layers which are designated targets.
    *
    *  @param p The layer that is looked for
    *

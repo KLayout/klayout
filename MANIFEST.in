@@ -1,10 +1,16 @@
-recursive-include src/tl/tl *.cc *.h
+recursive-include src/ant/ant *.cc *.h
 recursive-include src/db/db *.cc *.cc_gen *.h
+recursive-include src/edt/edt *.cc *.h
 recursive-include src/gsi/gsi *.cc *.h
-recursive-include src/rdb/rdb *.cc *.h
-recursive-include src/pya/pya *.cc *.h
+recursive-include src/img/img *.cc *.h
+recursive-include src/laybasic/laybasic *.cc *.h
 recursive-include src/lib/lib *.cc *.h
+recursive-include src/lym/lym *.cc *.h
+recursive-include src/pya/pya *.cc *.h
 recursive-include src/pymod *.cc *.h
+recursive-include src/rbastub *.cc *.h
+recursive-include src/rdb/rdb *.cc *.h
+recursive-include src/tl/tl *.cc *.h
 include src/plugins/*/db_plugin/*.cc
 include src/plugins/*/*/db_plugin/*.cc
 include src/plugins/*/db_plugin/*.h

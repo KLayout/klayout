@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "gtf.h"
 #include "tlException.h"
@@ -1928,4 +1929,5 @@ GtfXmlHandler::warning (const QXmlParseException &ex)
 
 }
 
+#endif
 

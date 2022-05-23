@@ -28,13 +28,17 @@
 #include "layPlugin.h"
 #include "layRenderer.h"
 #include "laySnap.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "laybasicConfig.h"
 #include "layConverters.h"
 #include "layLayoutCanvas.h"
-#include "layProperties.h"
+#if defined(HAVE_QT)
+#  include "layProperties.h"
+#endif
 #include "antService.h"
-#include "antPropertiesPage.h"
+#if defined(HAVE_QT)
+#  include "antPropertiesPage.h"
+#endif
 #include "antConfig.h"
 
 namespace ant
@@ -759,9 +763,9 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 
   int basic_width = int(0.5 + 1.0 / canvas.resolution ());
 
-  QColor c (mp_rulers->color ());
-  if (! c.isValid ()) {
-    c = QColor (canvas.foreground_color ().rgb ());
+  lay::Color c (mp_rulers->color ());
+  if (! c.is_valid ()) {
+    c = canvas.foreground_color ();
   }
 
   //  obtain bitmap to render on
@@ -784,7 +788,7 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 // -------------------------------------------------------------
 //  ant::Service implementation
 
-Service::Service (db::Manager *manager, lay::LayoutView *view)
+Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
   : lay::EditorServiceBase (view),
     lay::Drawing (1/*number of planes*/, view->drawings ()),
     db::Object (manager),
@@ -819,7 +823,7 @@ Service::configure (const std::string &name, const std::string &value)
 
   if (name == cfg_ruler_color) {
 
-    QColor color;
+    lay::Color color;
     lay::ColorConverter ().from_string (value, color);
 
     //  make the color available for the dynamic view objects too.
@@ -910,7 +914,7 @@ Service::annotations_changed ()
 }
 
 std::vector <lay::ViewOp>
-Service::get_view_ops (lay::RedrawThreadCanvas &canvas, QColor background, QColor foreground, QColor /*active*/) const
+Service::get_view_ops (lay::RedrawThreadCanvas &canvas, lay::Color background, lay::Color foreground, lay::Color /*active*/) const
 {
   int basic_width = int(0.5 + 1.0 / canvas.resolution ());
 
@@ -920,7 +924,7 @@ Service::get_view_ops (lay::RedrawThreadCanvas &canvas, QColor background, QColo
   if (m_halo) {
     view_ops.push_back (lay::ViewOp (background.rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, 3 * basic_width, 0));
   }
-  if (m_color.isValid ()) {
+  if (m_color.is_valid ()) {
     view_ops.push_back (lay::ViewOp (m_color.rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, basic_width, 0));
   } else {
     view_ops.push_back (lay::ViewOp (foreground.rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, basic_width, 0));
@@ -1525,7 +1529,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
         //  begin the transaction
         tl_assert (! manager ()->transacting ());
-        manager ()->transaction (tl::to_string (QObject::tr ("Create ruler")));
+        manager ()->transaction (tl::to_string (tr ("Create ruler")));
 
         m_current = ant::Object (pt, pt, 0, tpl);
         show_message ();
@@ -1562,7 +1566,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
           //  begin the transaction
           tl_assert (! manager ()->transacting ());
-          manager ()->transaction (tl::to_string (QObject::tr ("Create ruler")));
+          manager ()->transaction (tl::to_string (tr ("Create ruler")));
 
           m_current = ant::Object (ee.first, ee.second, 0, tpl);
           show_message ();
@@ -1598,7 +1602,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
       //  begin the transaction
       tl_assert (! manager ()->transacting ());
-      manager ()->transaction (tl::to_string (QObject::tr ("Create ruler"))); 
+      manager ()->transaction (tl::to_string (tr ("Create ruler")));
 
       show_message ();
 
@@ -2160,19 +2164,21 @@ Service::display_status (bool transient)
 
     std::string msg;
     if (! transient) {
-      msg = tl::to_string (QObject::tr ("selected: "));
+      msg = tl::to_string (tr ("selected: "));
     }
-    msg += tl::sprintf (tl::to_string (QObject::tr ("annotation(d=%s x=%s y=%s)")), ruler->text (), ruler->text_x (), ruler->text_y ());
+    msg += tl::sprintf (tl::to_string (tr ("annotation(d=%s x=%s y=%s)")), ruler->text (), ruler->text_x (), ruler->text_y ());
     view ()->message (msg);
 
   }
 }
 
+#if defined(HAVE_QT)
 lay::PropertiesPage *
 Service::properties_page (db::Manager *manager, QWidget *parent)
 {
   return new PropertiesPage (this, manager, parent);
 }
+#endif
 
 void 
 Service::get_selection (std::vector <obj_iterator> &sel) const
@@ -2248,7 +2254,7 @@ Service::menu_activated (const std::string &symbol)
   if (symbol == "ant::clear_all_rulers_internal") {
     clear_rulers ();
   } else if (symbol == "ant::clear_all_rulers") {
-    manager ()->transaction (tl::to_string (QObject::tr ("Clear all rulers"))); 
+    manager ()->transaction (tl::to_string (tr ("Clear all rulers")));
     clear_rulers ();
     manager ()->commit ();
   } else {

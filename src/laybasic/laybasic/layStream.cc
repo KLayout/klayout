@@ -20,11 +20,11 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layStream.h"
 #include "layPlugin.h"
 #include "laybasicConfig.h"
-#include "layTechnology.h"
 #include "dbStream.h"
 #include "dbLoadLayoutOptions.h"
 #include "dbSaveLayoutOptions.h"
@@ -84,3 +84,4 @@ const StreamWriterPluginDeclaration *StreamWriterPluginDeclaration::plugin_for_f
 
 }
 
+#endif

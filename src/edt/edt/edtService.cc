@@ -26,10 +26,12 @@
 #include "dbLibrary.h"
 #include "edtPlugin.h"
 #include "edtService.h"
-#include "edtEditorOptionsPages.h"
-#include "edtDialogs.h"
+#if defined(HAVE_QT)
+#  include "edtEditorOptionsPages.h"
+#  include "edtDialogs.h"
+#endif
 #include "layFinder.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "laySnap.h"
 #include "tlProgress.h"
 #include "tlTimer.h"
@@ -60,7 +62,7 @@ ac_from_buttons (unsigned int buttons)
 
 // -------------------------------------------------------------
 
-Service::Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator::flags_type flags)
+Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type flags)
   : lay::EditorServiceBase (view),
     db::Object (manager),
     mp_view (view),
@@ -80,7 +82,7 @@ Service::Service (db::Manager *manager, lay::LayoutView *view, db::ShapeIterator
   //  .. nothing yet ..
 }
 
-Service::Service (db::Manager *manager, lay::LayoutView *view)
+Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
   : lay::EditorServiceBase (view),
     db::Object (manager),
     mp_view (view),
@@ -312,7 +314,8 @@ Service::copy ()
 void
 Service::copy_selected ()
 {
-  edt::CopyModeDialog mode_dialog (view ());
+#if defined(HAVE_QT)
+  edt::CopyModeDialog mode_dialog (view ()->widget ());
 
   bool need_to_ask_for_copy_mode = false;
   unsigned int inst_mode = 0;
@@ -340,32 +343,48 @@ Service::copy_selected ()
       dispatcher ()->config_end ();
     }
 
-    //  create one ClipboardData object per cv_index because, this one assumes that there is 
-    //  only one source layout object.
-    std::set <unsigned int> cv_indices;
+    copy_selected (inst_mode);
+
+  }
+#else
+
+  unsigned int inst_mode = 0;
+  if (m_hier_copy_mode >= 0) {
+    inst_mode = int (m_hier_copy_mode);
+  }
+
+  copy_selected (inst_mode);
+
+#endif
+}
+
+void
+Service::copy_selected (unsigned int inst_mode)
+{
+  //  create one ClipboardData object per cv_index because, this one assumes that there is
+  //  only one source layout object.
+  std::set <unsigned int> cv_indices;
+  for (objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
+    cv_indices.insert (r->cv_index ());
+  }
+
+  for (std::set <unsigned int>::const_iterator cvi = cv_indices.begin (); cvi != cv_indices.end (); ++cvi) {
+
+    db::ClipboardValue<edt::ClipboardData> *cd = new db::ClipboardValue<edt::ClipboardData> ();
+
+    //  add the selected objects to the clipboard data objects.
+    const lay::CellView &cv = view ()->cellview (*cvi);
     for (objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
-      cv_indices.insert (r->cv_index ());
-    }
-
-    for (std::set <unsigned int>::const_iterator cvi = cv_indices.begin (); cvi != cv_indices.end (); ++cvi) {
-
-      db::ClipboardValue<edt::ClipboardData> *cd = new db::ClipboardValue<edt::ClipboardData> ();
-
-      //  add the selected objects to the clipboard data objects.
-      const lay::CellView &cv = view ()->cellview (*cvi);
-      for (objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
-        if (r->cv_index () == *cvi) {
-          if (! r->is_cell_inst ()) {
-            cd->get ().add (cv->layout (), r->layer (), r->shape (), cv.context_trans () * r->trans ());
-          } else {
-            cd->get ().add (cv->layout (), r->back ().inst_ptr, inst_mode, cv.context_trans () * r->trans ());
-          }
+      if (r->cv_index () == *cvi) {
+        if (! r->is_cell_inst ()) {
+          cd->get ().add (cv->layout (), r->layer (), r->shape (), cv.context_trans () * r->trans ());
+        } else {
+          cd->get ().add (cv->layout (), r->back ().inst_ptr, inst_mode, cv.context_trans () * r->trans ());
         }
       }
-
-      db::Clipboard::instance () += cd;
-
     }
+
+    db::Clipboard::instance () += cd;
 
   }
 }
@@ -799,7 +818,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 bool
 Service::key_event (unsigned int key, unsigned int buttons)
 {
-  if (view ()->is_editable () && m_editing && buttons == 0 && key == Qt::Key_Backspace) {
+  if (view ()->is_editable () && m_editing && buttons == 0 && key == lay::KeyBackspace) {
     do_delete ();
     return true;
   } else {
@@ -1141,7 +1160,7 @@ Service::display_status (bool transient)
 
       std::string msg;
       if (! transient) {
-        msg = tl::to_string (QObject::tr ("selected: "));
+        msg = tl::to_string (tr ("selected: "));
       }
 
       db::Instance inst = r->back ().inst_ptr;
@@ -1149,12 +1168,12 @@ Service::display_status (bool transient)
       db::Vector a, b;
       unsigned long amax = 0, bmax = 0;
       if (! inst.is_regular_array (a, b, amax, bmax)) {
-        msg += tl::sprintf (tl::to_string (QObject::tr ("instance(\"%s\" %s)")), layout.display_name (inst.cell_index ()), inst.complex_trans ().to_string ());
+        msg += tl::sprintf (tl::to_string (tr ("instance(\"%s\" %s)")), layout.display_name (inst.cell_index ()), inst.complex_trans ().to_string ());
       } else {
-        msg += tl::sprintf (tl::to_string (QObject::tr ("instance(\"%s\" %s %ldx%ld)")), layout.display_name (inst.cell_index ()), inst.complex_trans ().to_string (), amax, bmax);
+        msg += tl::sprintf (tl::to_string (tr ("instance(\"%s\" %s %ldx%ld)")), layout.display_name (inst.cell_index ()), inst.complex_trans ().to_string (), amax, bmax);
       }
 
-      msg += tl::to_string (QObject::tr (" in "));
+      msg += tl::to_string (tr (" in "));
       msg += path_to_string (layout, *r);
 
       view ()->message (msg, transient ? 10 : 10000);
@@ -1163,31 +1182,31 @@ Service::display_status (bool transient)
 
       std::string msg;
       if (! transient) {
-        msg = tl::to_string (QObject::tr ("selected: "));
+        msg = tl::to_string (tr ("selected: "));
       }
 
       if (r->shape ().is_box ()) {
         db::Box b (r->shape ().bbox ());
-        msg += tl::sprintf (tl::to_string (QObject::tr ("box(%d,%d %d,%d)")), int (b.left ()), int (b.bottom ()), int (b.right ()), int (b.top ()));
+        msg += tl::sprintf (tl::to_string (tr ("box(%d,%d %d,%d)")), int (b.left ()), int (b.bottom ()), int (b.right ()), int (b.top ()));
       } else if (r->shape ().is_text ()) {
-        msg += tl::sprintf (tl::to_string (QObject::tr ("text(\"%s\" %s)")), tl::escape_string (r->shape ().text_string ()), r->shape ().text_trans ().to_string ());
+        msg += tl::sprintf (tl::to_string (tr ("text(\"%s\" %s)")), tl::escape_string (r->shape ().text_string ()), r->shape ().text_trans ().to_string ());
       } else if (r->shape ().is_polygon ()) {
         size_t npoints = 0;
         for (db::Shape::polygon_edge_iterator e = r->shape ().begin_edge (); ! e.at_end (); ++e) {
           ++npoints;
         }
-        msg += tl::sprintf (tl::to_string (QObject::tr ("polygon(#points=%lu)")), npoints);
+        msg += tl::sprintf (tl::to_string (tr ("polygon(#points=%lu)")), npoints);
       } else if (r->shape ().is_path ()) {
         size_t npoints = 0;
         for (db::Shape::point_iterator p = r->shape ().begin_point (); p != r->shape ().end_point (); ++p) {
           ++npoints;
         }
-        msg += tl::sprintf (tl::to_string (QObject::tr ("path(w=%d #points=%lu)")), int (r->shape ().path_width ()), npoints);
+        msg += tl::sprintf (tl::to_string (tr ("path(w=%d #points=%lu)")), int (r->shape ().path_width ()), npoints);
       }
 
       if (! msg.empty ()) {
 
-        msg += tl::to_string (QObject::tr (" on "));
+        msg += tl::to_string (tr (" on "));
 
         std::string ln = layout.get_properties (r->layer ()).to_string ();
         for (lay::LayerPropertiesConstIterator lp = view ()->begin_layers (); ! lp.at_end (); ++lp) {
@@ -1198,7 +1217,7 @@ Service::display_status (bool transient)
         }
         msg += ln;
 
-        msg += tl::to_string (QObject::tr (" in "));
+        msg += tl::to_string (tr (" in "));
         msg += path_to_string (layout, *r);
 
         view ()->message (msg, transient ? 10 : 10000);

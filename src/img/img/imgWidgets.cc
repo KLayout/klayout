@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "imgWidgets.h"
 
@@ -43,52 +44,6 @@ const int min_bar_height = 4;
 
 const double min_value_interval = 1e-3;
 const double epsilon = 1e-6;
-
-struct compare_first_of_node
-{
-  bool operator() (const std::pair <double, std::pair<QColor, QColor> > &a, const std::pair <double, std::pair<QColor, QColor> > &b) const
-  {
-    return a.first < b.first;
-  }
-};
-
-QColor
-interpolated_color (const std::vector<std::pair <double, std::pair<QColor, QColor> > > &nodes, double x)
-{
-  if (nodes.size () < 1) {
-    return QColor ();
-  } else if (nodes.size () < 2) {
-    return x < nodes[0].first ? nodes[0].second.first : nodes[0].second.second;
-  } else {
-
-    std::vector<std::pair<double, std::pair<QColor, QColor> > >::const_iterator p = std::lower_bound (nodes.begin (), nodes.end (), std::make_pair (x, std::make_pair (QColor (), QColor ())), compare_first_of_node ());
-    if (p == nodes.end ()) {
-      return nodes.back ().second.second;
-    } else if (p == nodes.begin ()) {
-      return nodes.front ().second.first;
-    } else {
-
-      double x1 = p[-1].first;
-      double x2 = p->first;
-
-      int h1 = 0, s1 = 0, v1 = 0;
-      p[-1].second.second.getHsv (&h1, &s1, &v1);
-
-      int h2 = 0, s2 = 0, v2 = 0;
-      p->second.first.getHsv (&h2, &s2, &v2);
-
-      int h = int (0.5 + h1 + double(x - x1) * double (h2 - h1) / double(x2 - x1));
-      int s = int (0.5 + s1 + double(x - x1) * double (s2 - s1) / double(x2 - x1));
-      int v = int (0.5 + v1 + double(x - x1) * double (v2 - v1) / double(x2 - x1));
-
-      QColor r;
-      r.setHsv (h, s, v);
-      return r;
-
-    }
-
-  }
-}
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -173,8 +128,8 @@ TwoColorWidget::lock_changed (bool checked)
 ColorBar::ColorBar (QWidget *parent)
   : QWidget (parent), m_dragging (false), m_selected (-1)
 {
-  m_nodes.push_back (std::make_pair (0.0, std::make_pair (QColor (0, 0, 0), QColor (0, 0, 0))));
-  m_nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (255, 255, 255), QColor (255, 255, 255))));
+  m_nodes.push_back (std::make_pair (0.0, std::make_pair (lay::Color (0, 0, 0), lay::Color (0, 0, 0))));
+  m_nodes.push_back (std::make_pair (1.0, std::make_pair (lay::Color (255, 255, 255), lay::Color (255, 255, 255))));
 }
 
 ColorBar::~ColorBar ()
@@ -206,7 +161,7 @@ void
 ColorBar::set_current_color (std::pair<QColor, QColor> c)
 {
   if (has_selection ()) {
-    m_nodes [m_selected].second = c;
+    m_nodes [m_selected].second = std::make_pair (lay::Color (c.first.rgb ()), lay::Color (c.second.rgb ()));
     emit color_mapping_changed ();
     update ();
   }
@@ -260,22 +215,35 @@ ColorBar::keyPressEvent (QKeyEvent *event)
   }
 }
 
+namespace
+{
+
+struct compare_first_of_node
+{
+  bool operator() (const std::pair <double, std::pair<lay::Color, lay::Color> > &a, const std::pair <double, std::pair<lay::Color, lay::Color> > &b) const
+  {
+    return a.first < b.first;
+  }
+};
+
+}
+
 void 
-ColorBar::set_nodes (const std::vector<std::pair<double, std::pair<QColor, QColor> > > &nodes)
+ColorBar::set_nodes (const std::vector<std::pair<double, std::pair<lay::Color, lay::Color> > > &nodes)
 {
   m_nodes = nodes;
 
   std::sort (m_nodes.begin (), m_nodes.end (), compare_first_of_node ());
 
   if (m_nodes.size () == 0 || fabs (m_nodes[0].first) > epsilon) {
-    m_nodes.insert (m_nodes.begin (), std::make_pair (0.0, std::make_pair (QColor (0, 0, 0), QColor (0, 0, 0))));
+    m_nodes.insert (m_nodes.begin (), std::make_pair (0.0, std::make_pair (lay::Color (0, 0, 0), lay::Color (0, 0, 0))));
   } else {
     m_nodes[0].first = 0.0;
   }
 
-  std::vector <std::pair <double, std::pair<QColor, QColor> > >::iterator w = m_nodes.begin ();
-  std::vector <std::pair <double, std::pair<QColor, QColor> > >::const_iterator nn = m_nodes.begin ();
-  for (std::vector <std::pair <double, std::pair<QColor, QColor> > >::const_iterator n = m_nodes.begin () + 1; n != m_nodes.end (); ++n) {
+  std::vector <std::pair <double, std::pair<lay::Color, lay::Color> > >::iterator w = m_nodes.begin ();
+  std::vector <std::pair <double, std::pair<lay::Color, lay::Color> > >::const_iterator nn = m_nodes.begin ();
+  for (std::vector <std::pair <double, std::pair<lay::Color, lay::Color> > >::const_iterator n = m_nodes.begin () + 1; n != m_nodes.end (); ++n) {
     if (fabs (nn->first - n->first) > min_value_interval) {
       *w++ = *nn;
       nn = n;
@@ -288,7 +256,7 @@ ColorBar::set_nodes (const std::vector<std::pair<double, std::pair<QColor, QColo
   if (m_nodes.back ().first > 1.0 - min_value_interval) {
     m_nodes.back ().first = 1.0;
   } else {
-    m_nodes.push_back (std::make_pair (1.0, std::make_pair (QColor (255, 255, 255), QColor (255, 255, 255))));
+    m_nodes.push_back (std::make_pair (1.0, std::make_pair (lay::Color (255, 255, 255), lay::Color (255, 255, 255))));
   }
 
   m_selected = -1;
@@ -313,8 +281,8 @@ ColorBar::mousePressEvent (QMouseEvent *event)
     double xx = double (event->x () - xl) / double (xr - xl);
 
     double dmin = 100.0;
-    std::vector<std::pair<double, std::pair<QColor, QColor> > >::const_iterator pmin = m_nodes.end ();
-    for (std::vector<std::pair<double, std::pair<QColor, QColor> > >::const_iterator p = m_nodes.begin (); p != m_nodes.end (); ++p) {
+    std::vector<std::pair<double, std::pair<lay::Color, lay::Color> > >::const_iterator pmin = m_nodes.end ();
+    for (std::vector<std::pair<double, std::pair<lay::Color, lay::Color> > >::const_iterator p = m_nodes.begin (); p != m_nodes.end (); ++p) {
       double d = fabs (p->first - xx);
       if (d < 0.05 && d < dmin) {
         dmin = d;
@@ -323,9 +291,10 @@ ColorBar::mousePressEvent (QMouseEvent *event)
     }
 
     if (pmin != m_nodes.end ()) {
-      m_selected = int (std::distance (std::vector<std::pair<double, std::pair<QColor, QColor> > >::const_iterator (m_nodes.begin ()), pmin));
+      m_selected = int (std::distance (std::vector<std::pair<double, std::pair<lay::Color, lay::Color> > >::const_iterator (m_nodes.begin ()), pmin));
       emit selection_changed ();
-      emit selection_changed (m_nodes [m_selected].second);
+      std::pair<lay::Color, lay::Color> cp = m_nodes [m_selected].second;
+      emit selection_changed (std::make_pair (QColor (cp.first.rgb ()), QColor (cp.second.rgb ())));
       m_dragging = true;
       update ();
     } else {
@@ -359,13 +328,14 @@ ColorBar::mouseDoubleClickEvent (QMouseEvent *event)
 
     double xx = double (event->x () - xl) / double (xr - xl);
 
-    std::vector<std::pair<double, std::pair<QColor, QColor> > >::iterator p = std::lower_bound (m_nodes.begin (), m_nodes.end (), std::make_pair (xx, std::make_pair (QColor (), QColor ())), compare_first_of_node ());
+    std::vector<std::pair<double, std::pair<lay::Color, lay::Color> > >::iterator p = std::lower_bound (m_nodes.begin (), m_nodes.end (), std::make_pair (xx, std::make_pair (lay::Color (), lay::Color ())), compare_first_of_node ());
     if (p != m_nodes.begin () && p != m_nodes.end ()) {
       m_selected = int (std::distance (m_nodes.begin (), p));
-      QColor ci = interpolated_color (m_nodes, xx);
+      lay::Color ci = interpolated_color (m_nodes, xx);
       m_nodes.insert (p, std::make_pair (xx, std::make_pair (ci, ci)));
       emit selection_changed ();
-      emit selection_changed (m_nodes [m_selected].second);
+      std::pair<lay::Color, lay::Color> cp = m_nodes [m_selected].second;
+      emit selection_changed (std::make_pair (QColor (cp.first.rgb ()), QColor (cp.second.rgb ())));
       emit color_mapping_changed ();
       update ();
     }
@@ -440,9 +410,9 @@ ColorBar::paintEvent (QPaintEvent *)
     if (xr != xl) {
       xx = double (x - xl) / double (xr - xl);
     }
-    QColor c = interpolated_color (m_nodes, xx);
+    lay::Color c = interpolated_color (m_nodes, xx);
 
-    painter.fillRect (x, yb - hbar, 1, hbar + 1, QBrush (c));
+    painter.fillRect (x, yb - hbar, 1, hbar + 1, QBrush (QColor (c.rgb ())));
 
   }
 
@@ -482,4 +452,6 @@ ColorBar::paintEvent (QPaintEvent *)
 }
 
 }
+
+#endif
 

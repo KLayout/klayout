@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_gtf
 #define HDR_gtf
@@ -569,5 +570,4 @@ LAYBASIC_PUBLIC tl::Variant image_to_variant (const QImage &image);
 
 #endif
 
-
-
+#endif  //  defined(HAVE_QT)

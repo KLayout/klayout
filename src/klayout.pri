@@ -11,8 +11,10 @@ RDB_INC = $$PWD/rdb/rdb
 IMG_INC = $$PWD/img/img
 LYM_INC = $$PWD/lym/lym
 LIB_INC = $$PWD/lib/lib
-LAY_INC = $$PWD/lay/lay
 LAYBASIC_INC = $$PWD/laybasic/laybasic
+LAYVIEW_INC = $$PWD/layview/layview
+LAYUI_INC = $$PWD/layui/layui
+LAY_INC = $$PWD/lay/lay
 
 QTBASIC_INC = $$PWD/gsiqt/qtbasic
 
@@ -70,6 +72,15 @@ equals(HAVE_CURL, "1") {
     }
   }
   DEFINES += HAVE_CURL
+}
+
+equals(HAVE_PNG, "1") {
+  !isEmpty(BITS_PATH) {
+    include($$BITS_PATH/png/png.pri)
+  } else {
+    LIBS += -lpng
+  }
+  DEFINES += HAVE_PNG
 }
 
 equals(HAVE_EXPAT, "1") {

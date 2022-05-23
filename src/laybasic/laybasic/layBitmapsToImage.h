@@ -25,11 +25,9 @@
 #define HDR_layBitmapsToImage
 
 #include "layViewOp.h"
+#include "tlThreads.h"
 
 #include <vector>
-
-class QMutex;
-class QImage;
 
 namespace lay
 {
@@ -37,16 +35,18 @@ namespace lay
 class DitherPattern;
 class LineStyles;
 class Bitmap;
+class PixelBuffer;
+class BitmapBuffer;
 
 /**
- *  @brief This function converts the given set of bitmaps to a QImage
+ *  @brief This function converts the given set of bitmaps to a PixelBuffer
  *
  *  This function uses the set of bitmaps in "pbitmaps" with the given set
  *  of view operands in "view_ops" and converts these into the QImage 
  *  with the given width and height.
  *  The "view_ops" and "pbitmaps" vectors must have the same size.
  *  The QImage must be initialized to the given width and height.
- *  If the QMutex pointer is not 0, the mutex is locked between operations 
+ *  If the tl::Mutex pointer is not 0, the mutex is locked between operations
  *  if the bitmap is accessed. The set of dither pattern specifies any custom
  *  pattern that are used bz the view operands.
  *  The "use_bitmap_index" parameter specifies whether the bitmap_index
@@ -58,12 +58,26 @@ bitmaps_to_image (const std::vector <lay::ViewOp> &view_ops,
                   const std::vector <lay::Bitmap *> &pbitmaps,
                   const lay::DitherPattern &dp, 
                   const lay::LineStyles &ls,
-                  QImage *pimage, unsigned int width, unsigned int height,
+                  lay::PixelBuffer *pimage, unsigned int width, unsigned int height,
                   bool use_bitmap_index,
-                  QMutex *mutex);
+                  tl::Mutex *mutex);
 
 /**
- *  @brief Convert a lay::Bitmap to a unsigned char * data field to be passed to QBitmap
+ *  @brief This function converts the given set of bitmaps to a BitmapBuffer
+ *
+ *  This is the monochrome version of the previous bitmaps_to_image function.
+ */
+LAYBASIC_PUBLIC void
+bitmaps_to_image (const std::vector <lay::ViewOp> &view_ops,
+                  const std::vector <lay::Bitmap *> &pbitmaps,
+                  const lay::DitherPattern &dp,
+                  const lay::LineStyles &ls,
+                  lay::BitmapBuffer *pimage, unsigned int width, unsigned int height,
+                  bool use_bitmap_index,
+                  tl::Mutex *mutex);
+
+/**
+ *  @brief Convert a lay::Bitmap to a unsigned char * data field to be passed to lay::BitmapBuffer
  *
  *  This function converts the bitmap given the view_op into a raw byte data
  *  field that can be passed to a QBitmap constructor. The data field is not 

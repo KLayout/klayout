@@ -22,7 +22,7 @@
 
 
 #include "layLayerProperties.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "layConverters.h"
 #include "tlXMLParser.h"
 #include "tlException.h"
@@ -404,7 +404,7 @@ class LayerSourceEval
   : public tl::Eval
 {
 public:
-  LayerSourceEval (const lay::LayerProperties &lp, const lay::LayoutView *view, bool real)
+  LayerSourceEval (const lay::LayerProperties &lp, const lay::LayoutViewBase *view, bool real)
     : m_lp (lp), mp_view (view), m_real (real)
   { 
     // .. nothing yet ..
@@ -415,14 +415,14 @@ public:
     return m_lp.source (m_real);
   }
 
-  const lay::LayoutView *view () const
+  const lay::LayoutViewBase *view () const
   {
     return mp_view;
   }
 
 private:
   const lay::LayerProperties &m_lp;
-  const lay::LayoutView *mp_view;
+  const lay::LayoutViewBase *mp_view;
   bool m_real;
 };
 
@@ -439,7 +439,7 @@ public:
   void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv) const
   {
     if (vv.size () != 0) {
-      throw tl::EvalError (tl::to_string (QObject::tr ("Layer source function must not have arguments")), context);
+      throw tl::EvalError (tl::to_string (tr ("Layer source function must not have arguments")), context);
     }
 
     out = tl::Variant ();
@@ -480,7 +480,7 @@ private:
 };
 
 std::string
-LayerProperties::display_string (const lay::LayoutView *view, bool real, bool always_show_source) const
+LayerProperties::display_string (const lay::LayoutViewBase *view, bool real, bool always_show_source) const
 {
   refresh ();
 
@@ -592,7 +592,7 @@ LayerProperties::need_realize (unsigned int flags, bool /*force*/)
 }
 
 void 
-LayerProperties::do_realize (const LayoutView *view) const
+LayerProperties::do_realize (const LayoutViewBase *view) const
 {
   m_layer_index = -1;
   m_cellview_index = -1;
@@ -712,10 +712,9 @@ LayerPropertiesNode::operator== (const LayerPropertiesNode &d) const
   return m_children == d.m_children;
 }
 
-LayoutView *
-LayerPropertiesNode::view () const
+LayoutViewBase *LayerPropertiesNode::view() const
 {
-  return const_cast<lay::LayoutView *> (mp_view.get ());
+  return const_cast<lay::LayoutViewBase *> (mp_view.get ());
 }
 
 unsigned int
@@ -804,7 +803,7 @@ LayerPropertiesNode::bbox () const
 }
 
 void 
-LayerPropertiesNode::attach_view (LayoutView *view, unsigned int list_index)
+LayerPropertiesNode::attach_view (LayoutViewBase *view, unsigned int list_index)
 {
   mp_view.reset (view);
   m_list_index = list_index;
@@ -1335,7 +1334,7 @@ static LayerPropertiesNode expand_wildcard_layout (const LayerPropertiesNode &so
 }
 
 static std::vector<LayerPropertiesNode> 
-expand_wildcard_layers (const LayerPropertiesNode &lp, const LayerPropertiesList &current_props, lay::LayoutView *view, unsigned int list_index)
+expand_wildcard_layers (const LayerPropertiesNode &lp, const LayerPropertiesList &current_props, lay::LayoutViewBase *view, unsigned int list_index)
 {
   std::vector<LayerPropertiesNode> new_props;
 
@@ -1651,7 +1650,7 @@ struct UIntColorConverter
     if (c == 0) {
       return "";
     } else {
-      return ColorConverter::to_string (QColor (c & 0xffffff));
+      return ColorConverter::to_string (lay::Color (c | 0xff000000));
     }
   }
 
@@ -1660,7 +1659,7 @@ struct UIntColorConverter
     if (s.empty ()) {
       c = 0;
     } else {
-      QColor qc;
+      lay::Color qc;
       ColorConverter::from_string (s, qc);
       c = qc.rgb () | 0xff000000;
     }
@@ -1858,7 +1857,7 @@ LayerPropertiesList::save (tl::OutputStream &os, const std::vector <lay::LayerPr
 }
   
 void 
-LayerPropertiesList::attach_view (lay::LayoutView *view, unsigned int list_index)
+LayerPropertiesList::attach_view (lay::LayoutViewBase *view, unsigned int list_index)
 {
   mp_view.reset (view);
   m_list_index = list_index;
@@ -1870,10 +1869,10 @@ LayerPropertiesList::attach_view (lay::LayoutView *view, unsigned int list_index
   }
 }
 
-lay::LayoutView *
+lay::LayoutViewBase *
 LayerPropertiesList::view () const
 {
-  return const_cast<lay::LayoutView *> (mp_view.get ());
+  return const_cast<lay::LayoutViewBase *> (mp_view.get ());
 }
 
 unsigned int

@@ -7,10 +7,9 @@ SUBDIRS = \
   tl \
   rdb \
   lib \
+  lay \
 
 !equals(HAVE_QT, "0") {
-
-  SUBDIRS += lay
 
   equals(HAVE_QTBINDINGS, "1") {
 

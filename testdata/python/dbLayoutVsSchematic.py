@@ -23,7 +23,7 @@ import unittest
 import sys
 import os
 
-class DBLayoutToNetlistTests(unittest.TestCase):
+class DBLayoutVsSchematicTests(unittest.TestCase):
 
   def test_1_Basic(self):
 
@@ -177,7 +177,7 @@ class DBLayoutToNetlistTests(unittest.TestCase):
 
 # run unit tests
 if __name__ == '__main__':
-  suite = unittest.TestLoader().loadTestsFromTestCase(DBLayoutToNetlistTests)
+  suite = unittest.TestLoader().loadTestsFromTestCase(DBLayoutVsSchematicTests)
 
   if not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
     sys.exit(1)

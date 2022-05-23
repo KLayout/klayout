@@ -28,6 +28,7 @@
 #include "layPlugin.h"
 #include "layMainWindow.h"
 #include "layFileDialog.h"
+#include "dbTechnology.h"
 #include "tlLog.h"
 #include "tlTimer.h"
 #include "tlXMLParser.h"

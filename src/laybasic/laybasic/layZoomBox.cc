@@ -23,7 +23,7 @@
 
 #include "layZoomBox.h"
 #include "layRubberBox.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 
 namespace lay
 {
@@ -31,7 +31,7 @@ namespace lay
 // -------------------------------------------------------------
 //  ZoomService implementation
 
-ZoomService::ZoomService (lay::LayoutView *view)
+ZoomService::ZoomService (lay::LayoutViewBase *view)
   : lay::ViewService (view->view_object_widget ()), 
     mp_view (view),
     mp_box (0),
@@ -54,7 +54,7 @@ ZoomService::drag_cancel ()
 }
 
 void 
-ZoomService::set_colors (QColor /*background*/, QColor color)
+ZoomService::set_colors (lay::Color /*background*/, lay::Color color)
 {
   m_color = color.rgb ();
   if (mp_box) {

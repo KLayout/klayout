@@ -25,7 +25,7 @@
 #include "edtService.h"
 #include "dbRecursiveShapeIterator.h"
 #include "layObjectInstPath.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 
 namespace gsi
 {
@@ -489,7 +489,7 @@ private:
 
 //  extend the layout view by "edtService" specific methods 
 
-static std::vector<edt::Service::objects::value_type> object_selection (const lay::LayoutView *view)
+static std::vector<edt::Service::objects::value_type> object_selection (const lay::LayoutViewBase *view)
 {
   std::vector<edt::Service::objects::value_type> result;
   std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
@@ -501,7 +501,7 @@ static std::vector<edt::Service::objects::value_type> object_selection (const la
   return result;
 }
 
-static void set_object_selection (const lay::LayoutView *view, const std::vector<edt::Service::objects::value_type> &all_selected)
+static void set_object_selection (const lay::LayoutViewBase *view, const std::vector<edt::Service::objects::value_type> &all_selected)
 {
   std::vector<edt::Service::objects::value_type> sel;
 
@@ -521,7 +521,7 @@ static void set_object_selection (const lay::LayoutView *view, const std::vector
   }
 }
 
-static bool has_object_selection (const lay::LayoutView *view)
+static bool has_object_selection (const lay::LayoutViewBase *view)
 {
   std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
@@ -532,7 +532,7 @@ static bool has_object_selection (const lay::LayoutView *view)
   return false;
 }
 
-static void clear_object_selection (const lay::LayoutView *view)
+static void clear_object_selection (const lay::LayoutViewBase *view)
 {
   std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
@@ -540,7 +540,7 @@ static void clear_object_selection (const lay::LayoutView *view)
   }
 }
 
-static void select_object (const lay::LayoutView *view, const edt::Service::objects::value_type &object)
+static void select_object (const lay::LayoutViewBase *view, const edt::Service::objects::value_type &object)
 {
   std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
@@ -551,7 +551,7 @@ static void select_object (const lay::LayoutView *view, const edt::Service::obje
   }
 }
 
-static void unselect_object (const lay::LayoutView *view, const edt::Service::objects::value_type &object)
+static void unselect_object (const lay::LayoutViewBase *view, const edt::Service::objects::value_type &object)
 {
   std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
@@ -562,7 +562,7 @@ static void unselect_object (const lay::LayoutView *view, const edt::Service::ob
   }
 }
 
-static bool has_transient_object_selection (const lay::LayoutView *view)
+static bool has_transient_object_selection (const lay::LayoutViewBase *view)
 {
   std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
@@ -573,18 +573,18 @@ static bool has_transient_object_selection (const lay::LayoutView *view)
   return false;
 }
 
-static EditableSelectionIterator begin_objects_selected (const lay::LayoutView *view)
+static EditableSelectionIterator begin_objects_selected (const lay::LayoutViewBase *view)
 {
   return EditableSelectionIterator (view->get_plugins <edt::Service> (), false);
 }
 
-static EditableSelectionIterator begin_objects_selected_transient (const lay::LayoutView *view)
+static EditableSelectionIterator begin_objects_selected_transient (const lay::LayoutViewBase *view)
 {
   return EditableSelectionIterator (view->get_plugins <edt::Service> (), true);
 }
 
 static
-gsi::ClassExt<lay::LayoutView> layout_view_decl (
+gsi::ClassExt<lay::LayoutViewBase> layout_view_decl (
   gsi::method_ext ("has_object_selection?", &has_object_selection, 
     "@brief Returns true, if geometrical objects (shapes or cell instances) are selected in this view"
   ) +

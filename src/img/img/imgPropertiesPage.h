@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #ifndef HDR_imgPropertiesPage
 #define HDR_imgPropertiesPage
@@ -103,5 +104,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif

@@ -22,7 +22,7 @@
 
 
 #include "layParsedLayerSource.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "tlString.h"
 #include "tlGlobPattern.h"
 
@@ -415,7 +415,7 @@ extract_base (tl::Extractor &ex)
   } else if (ex.test ("!=")) {
     eq = false;
   } else {
-    ex.error (tl::to_string (QObject::tr ("'==' or '!=' operator expected")));
+    ex.error (tl::to_string (tr ("'==' or '!=' operator expected")));
   }
   ex.read (v);
   return new PropertySelectorEqual (n, v, eq);
@@ -1163,7 +1163,7 @@ ParsedLayerSource::to_string () const
 }
 
 std::string
-ParsedLayerSource::display_string (const lay::LayoutView *view) const
+ParsedLayerSource::display_string (const lay::LayoutViewBase *view) const
 {
   std::string r;
 
@@ -1376,7 +1376,7 @@ ParsedLayerSource::parse_from_string (const char *cp)
       if (sp == "CellFrame" || sp == "cellframe" || sp == "CF" || sp == "cell-frame") {
         m_special_purpose = SP_CellFrame;
       } else {
-        throw tl::Exception (tl::to_string (QObject::tr ("Invalid special purpose '%s'")), sp);
+        throw tl::Exception (tl::to_string (tr ("Invalid special purpose '%s'")), sp);
       }
 
     } else if (x.test ("(")) {

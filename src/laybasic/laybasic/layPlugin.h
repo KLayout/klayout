@@ -26,13 +26,13 @@
 
 #include "laybasicCommon.h"
 
-#include <QFrame>
-
 #include "tlString.h"
 #include "tlClassRegistry.h"
 #include "tlDeferredExecution.h"
 #include "gsiObject.h"
-#include "layAbstractMenu.h"
+#if defined(HAVE_QT)
+#  include "layAbstractMenu.h"
+#endif
 
 #include <map>
 #include <vector>
@@ -48,54 +48,16 @@ namespace lay
 
 class Plugin;
 class Dispatcher;
-class LayoutView;
-class Browser;
+class LayoutViewBase;
 class ViewService;
 class Editable;
 class Drawing;
 class TechnologyComponentProvider;
+#if defined(HAVE_QT)
+class Browser;
 class EditorOptionsPage;
-
-/**
- *  @brief The base class for configuration pages
- *
- *  This interface defines some services the configuration page
- *  must provide (i.e. setup, commit)
- */
-class LAYBASIC_PUBLIC ConfigPage 
-  : public QFrame
-{
-public:
-  ConfigPage (QWidget *parent) 
-    : QFrame (parent)
-  {
-    // .. nothing else ..
-  }
-
-  /**
-   *  @brief Load the page
-   *
-   *  The implementation is supposed to fetch the configuration from the
-   *  Plugin object provided and load the widgets accordingly.
-   */
-  virtual void setup (Dispatcher * /*root*/)
-  {
-    //  the default implementation does nothing.
-  }
-
-  /**
-   *  @brief Commit the page
-   *
-   *  The implementation is supposed to read the configuration (and 
-   *  throw exceptions if the configuration something is invalid)
-   *  and commit the changes through 
-   */
-  virtual void commit (Dispatcher * /*root*/)
-  {
-    //  the default implementation does nothing.
-  }
-
-};
+class ConfigPage;
+#endif
 
 /**
  *  @brief A menu entry declaration
@@ -184,11 +146,15 @@ LAYBASIC_PUBLIC MenuEntry config_menu_item (const std::string &menu_name, const 
  *  mechanism (instantiate a tl::Registrar<tl::Plugin>::Class<Y>
  *  object).
  */
-class LAYBASIC_PUBLIC PluginDeclaration
-  : public QObject, 
+class LAYBASIC_PUBLIC PluginDeclaration :
+#if defined(HAVE_QT)
+    public QObject,
+#endif
     public gsi::ObjectBase
 {
-Q_OBJECT 
+#if defined(HAVE_QT)
+Q_OBJECT
+#endif
 
 public:
   /** 
@@ -211,6 +177,7 @@ public:
     //  the default implementation does not add any options
   }
 
+#if defined(HAVE_QT)
   /**
    *  @brief Fetch the configuration page for the configuration dialog
    *
@@ -222,7 +189,7 @@ public:
   {
     return 0;
   }
-  
+
   /**
    *  @brief Fetch the configuration pages for the configuration dialog
    *
@@ -235,6 +202,7 @@ public:
   {
     return std::vector<std::pair <std::string, ConfigPage *> > ();
   }
+#endif
 
   /**
    *  @brief The global configuration 
@@ -334,7 +302,7 @@ public:
    *  This method may return 0 for "dummy" plugins that just register menu entries
    *  or configuration options.
    */
-  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher * /*dispatcher*/, lay::LayoutView * /*view*/) const
+  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher * /*dispatcher*/, lay::LayoutViewBase * /*view*/) const
   {
     return 0;
   }
@@ -352,6 +320,7 @@ public:
     return false;
   }
 
+#if defined(HAVE_QT)
   /**
    *  @brief Gets the editor options pages
    *
@@ -360,10 +329,11 @@ public:
    *
    *  The new pages are returned in the "pages" vector. The layout view will take ownership of these pages.
    */
-  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> & /*pages*/, lay::LayoutView * /*view*/, lay::Dispatcher * /*dispatcher*/) const
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> & /*pages*/, lay::LayoutViewBase * /*view*/, lay::Dispatcher * /*dispatcher*/) const
   {
     //  .. no pages in the default implementation ..
   }
+#endif
 
   /**
    *  @brief Tells if the plugin implements a "lay::ViewService" active mouse mode
@@ -381,8 +351,8 @@ public:
   /**
    *  @brief Specifies the primary mouse modes
    *
-   *  These are built-in modes from the LayoutView. This method is intended for
-   *  the LayoutView's standard modes only.
+   *  These are built-in modes from the LayoutViewBase. This method is intended for
+   *  the LayoutViewBase's standard modes only.
    */
   virtual void implements_primary_mouse_modes (std::vector<std::pair<std::string, std::pair<std::string, int> > > & /*modes*/)
   {
@@ -417,6 +387,14 @@ public:
   }
 
   /**
+   *  @brief Gets the available menu symbols from all plugins
+   *
+   *  This does not mean all symbols will be available.
+   */
+  static std::vector<std::string> menu_symbols ();
+
+#if defined(HAVE_QT)
+  /**
    *  @brief Creates the menu resources for this plugin
    *
    *  This method will create the menu resources for the plugin and perform the 
@@ -426,16 +404,10 @@ public:
   void init_menu (lay::Dispatcher *dispatcher);
 
   /**
-   *  @brief Gets the available menu symbols from all plugins
-   *
-   *  This does not mean all symbols will be available.
-   */
-  static std::vector<std::string> menu_symbols ();
-
-  /**
    *  @brief Removes the menu resources associated with this plugin
    */
   void remove_menu_items (lay::Dispatcher *dispatcher);
+#endif
 
   /**
    *  @brief Enables this editable part of the plugin
@@ -483,14 +455,18 @@ public:
    */
   tl::Event editable_enabled_changed_event;
 
+#if defined(HAVE_QT)
 private slots:
   void toggle_editable_enabled ();
+#endif
 
 private:
   int m_id;
+#if defined(HAVE_QT)
   tl::weak_ptr<lay::Action> mp_editable_mode_action;
   tl::weak_ptr<lay::Action> mp_mouse_mode_action;
   tl::weak_collection<lay::Action> m_menu_actions;
+#endif
   bool m_editable_enabled;
 };
 
@@ -730,6 +706,7 @@ public:
     // .. this implementation does nothing ..
   }
 
+#if defined(HAVE_QT)
   /**
    *  @brief Return the lay::Browser interface if this object has one
    *
@@ -740,6 +717,7 @@ public:
   {
     return 0;
   }
+#endif
 
   /**
    *  @brief Return the lay::ViewService interface if this object has one

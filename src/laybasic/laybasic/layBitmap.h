@@ -20,8 +20,6 @@
 
 */
 
-
-
 #ifndef HDR_layBitmap
 #define HDR_layBitmap
 
@@ -396,4 +394,3 @@ Bitmap::scanline (unsigned n) const
 } // namespace lay
 
 #endif
-

@@ -159,7 +159,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
     : QMainWindow (0),
       tl::Object (),
       lay::DispatcherDelegate (),
-      m_dispatcher (this, this),
+      m_dispatcher (this),
       m_text_progress (this, 10 /*verbosity threshold*/),
       m_mode (std::numeric_limits<unsigned int>::max ()),
       mp_setup_form (0),
@@ -179,6 +179,8 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
       mp_app (app),
       m_manager (undo_enabled)
 {
+  m_dispatcher.set_menu_parent_widget (this);
+
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
@@ -2298,12 +2300,14 @@ MainWindow::do_save (bool as)
           db::SaveLayoutOptions options = cv->save_options ();
           if (!cv->save_options_valid () && cv->technology ()) {
             options = cv->technology ()->save_layout_options ();
+            options.set_format (cv->save_options ().format ());
           }
 
           options.set_dbu (cv->layout ().dbu ());
-          options.set_format_from_filename (fn);
 
-          cv->update_save_options (options);
+          if (as || options.format ().empty ()) {
+            options.set_format_from_filename (fn);
+          }
 
           tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;
 
@@ -2340,7 +2344,9 @@ MainWindow::cm_save_all ()
         db::SaveLayoutOptions options (cv->save_options ());
         options.set_dbu (cv->layout ().dbu ());
 
-        options.set_format_from_filename (fn);
+        if (options.format ().empty ()) {
+          options.set_format_from_filename (fn);
+        }
 
         tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;
 
@@ -2878,7 +2884,9 @@ MainWindow::close_view (int index)
 
       view_closed_event (int (index));
 
-      delete view (index);
+      //  delete the view later as it may still be needed by event handlers or similar
+      std::unique_ptr<lay::LayoutView> old_view (view (index));
+
       mp_views.erase (mp_views.begin () + index, mp_views.begin () + index + 1);
 
       if (index >= int (mp_views.size ())) {

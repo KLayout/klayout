@@ -23,12 +23,12 @@
 
 #include "layMouseTracker.h"
 #include "layLayoutCanvas.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 
 namespace lay
 {
 
-MouseTracker::MouseTracker (lay::LayoutView *view)
+MouseTracker::MouseTracker (lay::LayoutViewBase *view)
   : lay::ViewService (view->view_object_widget ()), mp_view (view)
 {
   widget ()->grab_mouse (this, false);

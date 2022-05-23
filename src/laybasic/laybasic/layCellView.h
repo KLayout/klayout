@@ -30,20 +30,23 @@
 #include <vector>
 
 #include "tlObject.h"
-#include "tlFileSystemWatcher.h"
-#include "layTechnology.h"
 #include "dbLayout.h"
 #include "dbMetaInfo.h"
 #include "dbReader.h"
 #include "dbSaveLayoutOptions.h"
 #include "dbLoadLayoutOptions.h"
 #include "dbInstElement.h"
+#include "dbTechnology.h"
 #include "gsi.h"
+
+#if defined(HAVE_QT)
+#  include "tlFileSystemWatcher.h"
+#endif
 
 namespace lay 
 {
 
-class LayoutView;
+class LayoutViewBase;
 
 /**
  *  @brief A layout handle
@@ -287,10 +290,22 @@ public:
    */
   void layout_changed ();
 
+#if defined(HAVE_QT)
   /**
    *  @brief Gets the file system watcher that delivers events when one of the layouts gets updated
    */
   static tl::FileSystemWatcher &file_watcher ();
+#endif
+
+  /**
+   *  @brief Removes a file from the watcher
+   */
+  static void remove_file_from_watcher (const std::string &path);
+
+  /**
+   *  @brief Adds a file to the watcher
+   */
+  static void add_file_to_watcher (const std::string &path);
 
 private:
   db::Layout *mp_layout;
@@ -305,7 +320,9 @@ private:
   void on_technology_changed ();
 
   static std::map <std::string, LayoutHandle *> ms_dict;
+#if defined(HAVE_QT)
   static tl::FileSystemWatcher *mp_file_watcher;
+#endif
 };
 
 /**
@@ -574,7 +591,7 @@ public:
    *  @param cv The reference to the target cellview
    *  @param view The reference to the layout view
    */
-  CellViewRef (lay::CellView *cv, lay::LayoutView *view);
+  CellViewRef (lay::CellView *cv, lay::LayoutViewBase *view);
 
   /**
    *  @brief Gets the cellview index of this reference
@@ -583,9 +600,9 @@ public:
   int index () const;
 
   /**
-   *  @brief Gets the LayoutView the reference is pointing to
+   *  @brief Gets the LayoutViewBase the reference is pointing to
    */
-  lay::LayoutView *view ();
+  lay::LayoutViewBase *view ();
 
   /**
    *  @brief Equality: Gives true, if the cellviews are identical
@@ -742,7 +759,7 @@ public:
 
 private:
   tl::weak_ptr<lay::CellView> mp_cv;
-  tl::weak_ptr<lay::LayoutView> mp_view;
+  tl::weak_ptr<lay::LayoutViewBase> mp_view;
 };
 
 }

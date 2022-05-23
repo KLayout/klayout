@@ -27,7 +27,9 @@
 
 #include "laybasicCommon.h"
 
+#if defined(HAVE_QT)
 #include <QPoint>
+#endif
 
 #include <utility>
 #include <vector>
@@ -39,7 +41,7 @@
 
 namespace lay
 {
-  class LayoutView;
+  class LayoutViewBase;
 
   /**
    *  @brief An angle constraint type
@@ -152,7 +154,7 @@ namespace lay
    *  @param grid Either (0,0) to disable grid snapping or a (gx,gy) value for the (potentially anisotropic grid)
    *  @param snap_range The search range for objects 
    */
-  LAYBASIC_PUBLIC PointSnapToObjectResult obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double snap_range);
+  LAYBASIC_PUBLIC PointSnapToObjectResult obj_snap (lay::LayoutViewBase *view, const db::DPoint &pt, const db::DVector &grid, double snap_range);
 
   /**
    *  @brief combined grid-, projection- and object snapping provided to implementing "magnetic features"
@@ -160,7 +162,7 @@ namespace lay
    *  This is a convenience method that creates the projection axes from a reference point and an angle mode.
    *  "pr" is the reference point, "pt" is the point to snap.
    */
-  LAYBASIC_PUBLIC PointSnapToObjectResult obj_snap (lay::LayoutView *view, const db::DPoint &pr, const db::DPoint &pt, const db::DVector &grid, lay::angle_constraint_type ac, double snap_range);
+  LAYBASIC_PUBLIC PointSnapToObjectResult obj_snap (lay::LayoutViewBase *view, const db::DPoint &pr, const db::DPoint &pt, const db::DVector &grid, lay::angle_constraint_type ac, double snap_range);
 
   /**
    *  @brief A structure describing the snap result for a two-sided object snap (distance measurement)
@@ -206,7 +208,7 @@ namespace lay
    *  This method basically implements "auto measure". The first value of the returned pair
    *  is true if such an edge could be found. Otherwise it's false.
    */
-  LAYBASIC_PUBLIC TwoPointSnapToObjectResult obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double min_search_range, double max_search_range);
+  LAYBASIC_PUBLIC TwoPointSnapToObjectResult obj_snap2 (LayoutViewBase *view, const db::DPoint &pt, const db::DVector &grid, double min_search_range, double max_search_range);
 
   /**
    *  @brief Same than obj_snap, but delivers two points on two opposite sides of the initial points
@@ -216,14 +218,14 @@ namespace lay
    *
    *  This version accepts two points defining different search regions for first and second edge.
    */
-  LAYBASIC_PUBLIC TwoPointSnapToObjectResult obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, double min_search_range, double max_search_range);
+  LAYBASIC_PUBLIC TwoPointSnapToObjectResult obj_snap2 (lay::LayoutViewBase *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, double min_search_range, double max_search_range);
 
   /**
    *  @brief Same than the previous obj_snap2, but allows specification of an angle constraint
    *
    *  Measurements will be confined to the direction specified.
    */
-  LAYBASIC_PUBLIC TwoPointSnapToObjectResult obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, lay::angle_constraint_type ac, double min_search_range, double max_search_range);
+  LAYBASIC_PUBLIC TwoPointSnapToObjectResult obj_snap2 (lay::LayoutViewBase *view, const db::DPoint &pt, const db::DVector &grid, lay::angle_constraint_type ac, double min_search_range, double max_search_range);
 
   /**
    *  @brief Same than the previous obj_snap2, but allows specification of an angle constraint
@@ -232,7 +234,7 @@ namespace lay
    *
    *  This version accepts two points defining different search regions for first and second edge.
    */
-  LAYBASIC_PUBLIC TwoPointSnapToObjectResult obj_snap2 (lay::LayoutView *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, lay::angle_constraint_type ac, double min_search_range, double max_search_range);
+  LAYBASIC_PUBLIC TwoPointSnapToObjectResult obj_snap2 (lay::LayoutViewBase *view, const db::DPoint &pt1, const db::DPoint &pt2, const db::DVector &grid, lay::angle_constraint_type ac, double min_search_range, double max_search_range);
 
   /**
    *  @brief Reduce a given vector according to the angle constraint
@@ -247,12 +249,12 @@ namespace lay
   /**
    *  @brief rounding (and height-transformation) of a double point 
    */
-  LAYBASIC_PUBLIC QPoint draw_round (db::DPoint p, int h);
+  LAYBASIC_PUBLIC db::Point draw_round (db::DPoint p, int h);
 
   /**
    *  @brief rounding (and height-transformation) of a two-point vector
    */
-  LAYBASIC_PUBLIC std::pair<QPoint, QPoint> draw_round (const db::DPoint &p1, const db::DPoint &p2, int h);
+  LAYBASIC_PUBLIC std::pair<db::Point, db::Point> draw_round (const db::DPoint &p1, const db::DPoint &p2, int h);
 
   /**
    *  @brief rounding (and height-transformation) of a two-point vector

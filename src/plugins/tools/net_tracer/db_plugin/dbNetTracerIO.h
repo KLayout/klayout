@@ -196,11 +196,10 @@ public:
     return m_net_shapes.size ();
   }
 
-#if defined(HAVE_QT)
   /**
    *  @brief Gets the color in which the net is drawn
    */
-  QColor color () const
+  uint32_t color () const
   {
     return m_color;
   }
@@ -208,11 +207,10 @@ public:
   /**
    *  @brief Sets the color in which the net is drawn
    */
-  void set_color (QColor c)
+  void set_color (uint32_t c)
   {
     m_color = c;
   }
-#endif
 
   /**
    *  @brief Get a name for the net
@@ -355,9 +353,7 @@ private:
   db::Shapes m_shapes;
   std::map <unsigned int, std::pair <db::LayerProperties, db::LayerProperties> > m_layers;
   std::map <unsigned int, std::string> m_cell_names;
-#if defined(HAVE_QT)
-  QColor m_color;
-#endif
+  uint32_t m_color;
   db::DBox m_start_search_box, m_stop_search_box;
   bool m_trace_path;
 

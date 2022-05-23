@@ -26,6 +26,7 @@
 #include "tlAssert.h"
 
 #include <ctype.h>
+#include <string.h>
 #include <algorithm>
 
 namespace lay
@@ -555,6 +556,8 @@ DitherPatternInfo::operator< (const DitherPatternInfo &d) const
   return m_order_index < d.m_order_index;
 }
 
+#if defined(HAVE_QT)
+
 // TODO including a scaling algorithm in this formula, or give more resolution to the dither
 QBitmap
 DitherPatternInfo::get_bitmap (int width, int height) const
@@ -592,6 +595,8 @@ DitherPatternInfo::get_bitmap (int width, int height) const
 
   return bitmap;
 }
+
+#endif
 
 void 
 DitherPatternInfo::set_pattern (const uint32_t *pt, unsigned int w, unsigned int h) 
@@ -771,8 +776,8 @@ struct ReplaceDitherPatternOp
   DitherPatternInfo m_old, m_new;
 };
 
-DitherPattern::DitherPattern ()
-  : QObject (), db::Object (0)
+DitherPattern::DitherPattern () :
+    db::Object (0)
 {
   for (unsigned int d = 0; d < sizeof (dither_strings) / sizeof (dither_strings [0]); d += 2) {
     m_pattern.push_back (DitherPatternInfo ());
@@ -786,8 +791,8 @@ DitherPattern::~DitherPattern ()
   //  .. nothing yet ..
 }
 
-DitherPattern::DitherPattern (const DitherPattern &p)
-  : QObject (), db::Object (0)
+DitherPattern::DitherPattern (const DitherPattern &p) :
+    db::Object (0)
 {
   m_pattern = p.m_pattern;
 }
@@ -807,6 +812,7 @@ DitherPattern::operator= (const DitherPattern &p)
   return *this;
 }
 
+#if defined(HAVE_QT)
 QBitmap
 DitherPattern::get_bitmap (unsigned int i, int width, int height) const
 {
@@ -816,6 +822,7 @@ DitherPattern::get_bitmap (unsigned int i, int width, int height) const
     return m_pattern [1].get_bitmap (width, height);
   }
 }
+#endif
 
 const DitherPatternInfo &
 DitherPattern::pattern (unsigned int i) const
@@ -831,11 +838,8 @@ DitherPattern::pattern (unsigned int i) const
 void 
 DitherPattern::replace_pattern (unsigned int i, const DitherPatternInfo &p)
 {
-  bool chg = false;
-
   while (i >= count ()) {
     m_pattern.push_back (DitherPatternInfo ());
-    chg = true;
   }
 
   if (m_pattern [i] != p) {
@@ -843,12 +847,6 @@ DitherPattern::replace_pattern (unsigned int i, const DitherPatternInfo &p)
       manager ()->queue (this, new ReplaceDitherPatternOp (i, m_pattern [i], p));
     }
     m_pattern [i] = p;
-    chg = true;
-  }
-
-  //  if something has changed emit the signal
-  if (chg) {
-    emit changed ();
   }
 }
 

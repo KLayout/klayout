@@ -36,22 +36,11 @@ static Dispatcher *ms_dispatcher_instance = 0;
 
 Dispatcher::Dispatcher (Plugin *parent, bool standalone)
   : Plugin (parent, standalone),
+#if defined(HAVE_QT)
     mp_menu_parent_widget (0),
+#endif
     mp_delegate (0)
 {
-  if (! parent && ! ms_dispatcher_instance) {
-    ms_dispatcher_instance = this;
-  }
-}
-
-Dispatcher::Dispatcher (QWidget *menu_parent_widget, Plugin *parent, bool standalone)
-  : Plugin (parent, standalone),
-    mp_menu_parent_widget (menu_parent_widget),
-    mp_delegate (0)
-{
-  if (mp_menu_parent_widget) {
-    mp_menu.reset (new lay::AbstractMenu (this));
-  }
   if (! parent && ! ms_dispatcher_instance) {
     ms_dispatcher_instance = this;
   }
@@ -59,22 +48,11 @@ Dispatcher::Dispatcher (QWidget *menu_parent_widget, Plugin *parent, bool standa
 
 Dispatcher::Dispatcher (DispatcherDelegate *delegate, Plugin *parent, bool standalone)
   : Plugin (parent, standalone),
+#if defined(HAVE_QT)
     mp_menu_parent_widget (0),
+#endif
     mp_delegate (delegate)
 {
-  if (! parent && ! ms_dispatcher_instance) {
-    ms_dispatcher_instance = this;
-  }
-}
-
-Dispatcher::Dispatcher (QWidget *menu_parent_widget, DispatcherDelegate *delegate, Plugin *parent, bool standalone)
-  : Plugin (parent, standalone),
-    mp_menu_parent_widget (menu_parent_widget),
-    mp_delegate (delegate)
-{
-  if (mp_menu_parent_widget) {
-    mp_menu.reset (new lay::AbstractMenu (this));
-  }
   if (! parent && ! ms_dispatcher_instance) {
     ms_dispatcher_instance = this;
   }
@@ -87,15 +65,29 @@ Dispatcher::~Dispatcher ()
   }
 }
 
+#if defined(HAVE_QT)
+void Dispatcher::set_menu_parent_widget (QWidget *menu_parent_widget)
+{
+  mp_menu_parent_widget = menu_parent_widget;
+  if (mp_menu_parent_widget) {
+    mp_menu.reset (new lay::AbstractMenu (this));
+  } else {
+    mp_menu.reset (0);
+  }
+}
+#endif
+
 bool
 Dispatcher::configure (const std::string &name, const std::string &value)
 {
+#if defined(HAVE_QT)
   if (mp_menu) {
     std::vector<lay::ConfigureAction *> ca = mp_menu->configure_actions (name);
     for (std::vector<lay::ConfigureAction *>::const_iterator a = ca.begin (); a != ca.end (); ++a) {
       (*a)->configure (value);
     }
   }
+#endif
 
   if (mp_delegate) {
     return mp_delegate->configure (name, value);
@@ -264,7 +256,7 @@ Dispatcher::read_config (const std::string &config_file)
   try {
     config_structure (this).parse (*file, *this);
   } catch (tl::Exception &ex) {
-    std::string msg = tl::to_string (QObject::tr ("Problem reading config file ")) + config_file + ": " + ex.msg ();
+    std::string msg = tl::to_string (tr ("Problem reading config file ")) + config_file + ": " + ex.msg ();
     throw tl::Exception (msg);
   }
 

@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 
 #ifndef HDR_edtPropertiesPages
@@ -205,5 +206,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif

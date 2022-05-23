@@ -20,12 +20,13 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "edtPCellParametersPage.h"
 #include "edtPropertiesPageUtils.h"
 #include "layWidgets.h"
 #include "layQtTools.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "tlScriptError.h"
 
 #include <QFrame>
@@ -232,7 +233,7 @@ PCellParametersPage::lazy_evaluation ()
 }
 
 void
-PCellParametersPage::setup (lay::LayoutView *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters)
+PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters)
 {
   mp_pcell_decl.reset (const_cast<db::PCellDeclaration *> (pcell_decl));  //  no const weak_ptr ...
   mp_view = view;
@@ -732,4 +733,4 @@ PCellParametersPage::set_parameters_internal (const std::vector<tl::Variant> &pa
 
 }
 
-
+#endif

@@ -21,14 +21,14 @@
 */
 
 #include "laySnap.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 
 #include "tlUnitTest.h"
 
 TEST(1)
 {
   db::Manager mgr (true);
-  lay::LayoutView view (&mgr, is_editable (), 0);
+  lay::LayoutViewBase view (&mgr, is_editable (), 0);
 
   int cv1 = view.create_layout ("", true, false);
   db::Layout &ly1 = view.cellview (cv1)->layout ();

@@ -23,7 +23,7 @@
 
 
 #include "layLayerProperties.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "tlXMLParser.h"
 #include "tlUnitTest.h"
 #include "dbLayout.h"
@@ -1304,7 +1304,7 @@ TEST (16)
   lay::LayerPropertiesList list;
 
   db::Manager mgr (true);
-  lay::LayoutView view (&mgr, is_editable (), 0);
+  lay::LayoutViewBase view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
   int cv1 = view.create_layout ("", true, false);
@@ -1356,7 +1356,7 @@ TEST (17)
   lay::LayerPropertiesList list;
 
   db::Manager mgr (true);
-  lay::LayoutView view (&mgr, is_editable (), 0);
+  lay::LayoutViewBase view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
   int cv1 = view.create_layout ("", true, false);
@@ -1423,7 +1423,7 @@ TEST (18)
   lay::LayerPropertiesList list;
 
   db::Manager mgr (true);
-  lay::LayoutView view (&mgr, is_editable (), 0);
+  lay::LayoutViewBase view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
   int cv1 = view.create_layout ("", true, false);
@@ -1491,7 +1491,7 @@ TEST (19)
   lay::LayerPropertiesList list;
 
   db::Manager mgr (true);
-  lay::LayoutView view (&mgr, is_editable (), 0);
+  lay::LayoutViewBase view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
   int cv1 = view.create_layout ("", true, false);
@@ -1560,7 +1560,7 @@ TEST (20)
   lay::LayerPropertiesList list;
 
   db::Manager mgr (true);
-  lay::LayoutView view (&mgr, is_editable (), 0);
+  lay::LayoutViewBase view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
   int cv1 = view.create_layout ("", true, false);
@@ -1632,7 +1632,7 @@ TEST (21)
   lay::LayerPropertiesList list;
 
   db::Manager mgr (true);
-  lay::LayoutView view (&mgr, is_editable (), 0);
+  lay::LayoutViewBase view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
   int cv1 = view.create_layout ("", true, false);

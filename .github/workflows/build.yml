@@ -88,6 +88,7 @@ jobs:
         path: dist
 
     - uses: pypa/gh-action-pypi-publish@v1.4.2
+      continue-on-error: true   # might fail if we don't bump the version
       with:
         user: __token__
         password: ${{ secrets.test_pypi_password }}

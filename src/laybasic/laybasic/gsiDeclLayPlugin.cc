@@ -25,7 +25,7 @@
 #include "gsiDeclBasic.h"
 #include "layPlugin.h"
 #include "layViewObject.h"
-#include "layLayoutView.h"
+#include "layLayoutViewBase.h"
 #include "layCursor.h"
 
 namespace gsi
@@ -40,7 +40,7 @@ namespace gsi
 //  since PluginBase object are only allowed to be created inside the create_plugin method
 //  of the factory, this hack is a quick but dirty workaround.
 static bool s_in_create_plugin = false;
-static lay::LayoutView *sp_view = 0;
+static lay::LayoutViewBase *sp_view = 0;
 static lay::Dispatcher *sp_dispatcher = 0;
 
 class PluginBase
@@ -51,7 +51,7 @@ public:
     : lay::Plugin (sp_dispatcher), lay::ViewService (sp_view ? sp_view->view_object_widget () : 0)
   {
     if (! s_in_create_plugin) {
-      throw tl::Exception (tl::to_string (QObject::tr ("A PluginBase object can only be created in the PluginFactory's create_plugin method")));
+      throw tl::Exception (tl::to_string (tr ("A PluginBase object can only be created in the PluginFactory's create_plugin method")));
     }
   }
 
@@ -393,7 +393,7 @@ public:
     }
   }
 
-  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutView *view) const
+  virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   { 
     if (f_create_plugin.can_issue ()) {
       return create_plugin_gsi (manager, root, view);
@@ -402,7 +402,7 @@ public:
     }
   }
 
-  virtual gsi::PluginBase *create_plugin_gsi (db::Manager *manager, lay::Dispatcher *root, lay::LayoutView *view) const
+  virtual gsi::PluginBase *create_plugin_gsi (db::Manager *manager, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   { 
     //  TODO: this is a hack. See notes above at s_in_create_plugin
     s_in_create_plugin = true;
@@ -410,7 +410,7 @@ public:
     sp_dispatcher = root;
     gsi::PluginBase *ret = 0;
     try {
-      ret = f_create_plugin.issue<PluginFactoryBase, gsi::PluginBase *, db::Manager *, lay::Dispatcher *, lay::LayoutView *> (&PluginFactoryBase::create_plugin_gsi, manager, root, view);
+      ret = f_create_plugin.issue<PluginFactoryBase, gsi::PluginBase *, db::Manager *, lay::Dispatcher *, lay::LayoutViewBase *> (&PluginFactoryBase::create_plugin_gsi, manager, root, view);
       s_in_create_plugin = false;
       sp_view = 0;
       sp_dispatcher = 0;
@@ -912,7 +912,51 @@ Class<gsi::ButtonStateNamespace> decl_ButtonState ("lay", "ButtonState",
   "This class has been introduced in version 0.22.\n"
 );
 
-static std::vector<std::string> 
+class KeyCodesNamespace { };
+
+static int const_KeyEscape()        { return (int) lay::KeyEscape; }
+static int const_KeyTab()           { return (int) lay::KeyTab; }
+static int const_KeyBacktab()       { return (int) lay::KeyBacktab; }
+static int const_KeyBackspace()     { return (int) lay::KeyBackspace; }
+static int const_KeyReturn()        { return (int) lay::KeyReturn; }
+static int const_KeyEnter()         { return (int) lay::KeyEnter; }
+static int const_KeyInsert()        { return (int) lay::KeyInsert; }
+static int const_KeyDelete()        { return (int) lay::KeyDelete; }
+static int const_KeyHome()          { return (int) lay::KeyHome; }
+static int const_KeyEnd()           { return (int) lay::KeyEnd; }
+static int const_KeyDown()          { return (int) lay::KeyDown; }
+static int const_KeyUp()            { return (int) lay::KeyUp; }
+static int const_KeyLeft()          { return (int) lay::KeyLeft; }
+static int const_KeyRight()         { return (int) lay::KeyRight; }
+static int const_KeyPageUp()        { return (int) lay::KeyPageUp; }
+static int const_KeyPageDown()      { return (int) lay::KeyPageDown; }
+
+Class<gsi::KeyCodesNamespace> decl_KeyCode ("lay", "KeyCode",
+  method ("Escape", &const_KeyEscape, "@brief Indicates the Escape key") +
+  method ("Tab", &const_KeyTab, "@brief Indicates the Tab key") +
+  method ("Backtab", &const_KeyBacktab, "@brief Indicates the Backtab key") +
+  method ("Backspace", &const_KeyBackspace, "@brief Indicates the Backspace key") +
+  method ("Return", &const_KeyReturn, "@brief Indicates the Return key") +
+  method ("Enter", &const_KeyEnter, "@brief Indicates the Enter key") +
+  method ("Insert", &const_KeyInsert, "@brief Indicates the Insert key") +
+  method ("Delete", &const_KeyDelete, "@brief Indicates the Delete key") +
+  method ("Home", &const_KeyHome, "@brief Indicates the Home key") +
+  method ("End", &const_KeyEnd, "@brief Indicates the End key") +
+  method ("Down", &const_KeyDown, "@brief Indicates the Down key") +
+  method ("Up", &const_KeyUp, "@brief Indicates the Up key") +
+  method ("Left", &const_KeyLeft, "@brief Indicates the Left key") +
+  method ("Right", &const_KeyRight, "@brief Indicates the Right key") +
+  method ("PageUp", &const_KeyPageUp, "@brief Indicates the PageUp key") +
+  method ("PageDown", &const_KeyPageDown, "@brief Indicates the PageDown key"),
+  "@brief The namespace for the some key codes.\n"
+  "This namespace defines some key codes understood by built-in \\LayoutView components. "
+  "When compiling with Qt, these codes are compatible with Qt's key codes.\n"
+  "The key codes are intended to be used when directly interfacing with \\LayoutView in non-Qt-based environments.\n"
+  "\n"
+  "This class has been introduced in version 0.28.\n"
+);
+
+static std::vector<std::string>
 get_config_names (lay::Dispatcher *dispatcher)
 {
   std::vector<std::string> names;

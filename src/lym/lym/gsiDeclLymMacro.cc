@@ -27,6 +27,7 @@
 #include "gsiEnums.h"
 #include "lymMacroInterpreter.h"
 #include "lymMacro.h"
+#include "lymMacroCollection.h"
 #include "rba.h"
 
 #include "tlClassRegistry.h"
@@ -204,7 +205,7 @@ public:
   lym::Macro *create_template (const std::string &url)
   {
     if (! mp_registration) {
-      throw std::runtime_error (tl::to_string (QObject::tr ("MacroInterpreter::create_template must be called after register")));
+      throw std::runtime_error (tl::to_string (tr ("MacroInterpreter::create_template must be called after register")));
     }
 
     lym::Macro *m = new lym::Macro ();
@@ -472,7 +473,11 @@ gsi::ClassExt<MacroInterpreterImpl> inject_Format_in_parent (decl_FormatEnum.def
 
 static lym::Macro *macro_by_path (const std::string &path)
 {
+#if defined(HAVE_QT)
   return lym::MacroCollection::root ().find_macro (path);
+#else
+  return 0;
+#endif
 }
 
 static std::string real_path (const std::string &path, int line)

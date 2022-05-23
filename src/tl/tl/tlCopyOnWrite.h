@@ -26,6 +26,7 @@
 
 #include "tlCommon.h"
 #include "tlThreads.h"
+#include <algorithm>
 
 namespace tl
 {
@@ -144,6 +145,19 @@ public:
   }
 
   /**
+   *  @brief Swaps two pointers
+   */
+  void swap (copy_on_write_ptr<X, Dup> &other)
+  {
+    if (this == &other) {
+      return;
+    }
+
+    tl::MutexLocker locker (&ms_lock);
+    std::swap (mp_holder, other.mp_holder);
+  }
+
+  /**
    *  @brief Gets a writable object
    *  This is when we will create a new copy if the object is shared.
    */
@@ -236,7 +250,6 @@ public:
   }
 
 private:
-  X *mp_x;
   copy_on_write_holder<X> *mp_holder;
 
   void release ()

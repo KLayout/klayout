@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_QT)
 
 #include "layAbstractMenu.h"
 #include "layDispatcher.h"
@@ -39,6 +40,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QHBoxLayout>
+#include <QFrame>
 
 #include <ctype.h>
 
@@ -1701,3 +1703,5 @@ AbstractMenu::get_shortcuts (const std::string &root, std::map<std::string, std:
 }
 
 }
+
+#endif

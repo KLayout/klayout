@@ -31,6 +31,7 @@
 
 #include "layMainWindow.h"
 #include "layApplication.h"
+#include "layPluginConfigPage.h"
 #include "tlExceptions.h"
 #include "tlLog.h"
 #include "dbHershey.h"

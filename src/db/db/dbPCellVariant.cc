@@ -123,12 +123,18 @@ PCellVariant::parameter_by_name (const std::string &name) const
 std::map<std::string, tl::Variant>
 PCellVariant::parameters_by_name () const
 {
+  return parameters_by_name_from_list (parameters ());
+}
+
+std::map<std::string, tl::Variant>
+PCellVariant::parameters_by_name_from_list (const db::pcell_parameters_type &list) const
+{
   std::map<std::string, tl::Variant> param_by_name;
 
   const PCellHeader *header = pcell_header ();
   if (header && header->declaration ()) {
 
-    db::pcell_parameters_type::const_iterator pp = parameters ().begin ();
+    db::pcell_parameters_type::const_iterator pp = list.begin ();
     const std::vector<db::PCellParameterDeclaration> &pcp = header->declaration ()->parameter_declarations ();
     for (std::vector<PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end () && pp != parameters ().end (); ++pd, ++pp) {
       param_by_name.insert (std::make_pair (pd->get_name (), *pp));
@@ -155,13 +161,25 @@ PCellVariant::update (ImportLayerMapping *layer_mapping)
 
     std::vector<unsigned int> layer_ids;
     try {
+
       layer_ids = header->get_layer_indices (*layout (), m_parameters, layer_mapping);
-      header->declaration ()->produce (*layout (), layer_ids, m_parameters, *this);
-      m_display_name = header->declaration ()->get_display_name (m_parameters);
+
+      //  call coerce prior to produce to make sure we have a validated parameter set
+      //  (note that we cannot persist parameters from here)
+      db::pcell_parameters_type plist = m_parameters;
+      header->declaration ()->coerce_parameters (*layout (), plist);
+
+      header->declaration ()->produce (*layout (), layer_ids, plist, *this);
+
+      m_display_name = header->declaration ()->get_display_name (plist);
+
     } catch (tl::Exception &ex) {
+
       tl::error << ex.msg ();
+
       //  put error messages into layout as text objects on error layer
       shapes (layout ()->error_layer ()).insert (db::Text (ex.msg (), db::Trans ()));
+
     }
 
     //  produce the shape parameters on the guiding shape layer so they can be edited

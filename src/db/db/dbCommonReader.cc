@@ -266,16 +266,7 @@ CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_ind
   }
 
   //  replace all instances of the new cell with the original one
-  std::vector<std::pair<db::cell_index_type, db::Instance> > parents;
-  for (db::Cell::parent_inst_iterator pi = src_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
-    parents.push_back (std::make_pair (pi->parent_cell_index (), pi->child_inst ()));
-  }
-
-  for (std::vector<std::pair<db::cell_index_type, db::Instance> >::const_iterator p = parents.begin (); p != parents.end (); ++p) {
-    db::CellInstArray ia = p->second.cell_inst ();
-    ia.object ().cell_index (target_cell.cell_index ());
-    layout.cell (p->first).replace (p->second, ia);
-  }
+  layout.replace_instances_of (src_cell.cell_index (), target_cell.cell_index ());
 
   //  finally delete the new cell
   layout.delete_cell (src_cell.cell_index ());

@@ -26,6 +26,7 @@
 #include "tlMath.h"
 
 #include <ctype.h>
+#include <algorithm>
 
 namespace lay
 {

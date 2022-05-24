@@ -707,7 +707,7 @@ QImage
 BitmapBuffer::to_image_copy () const
 {
   QImage img (m_width, m_height, QImage::Format_MonoLSB);
-#if QT_VERSION < 0x050000
+#if QT_VERSION < 0x051000
   memcpy (img.bits (), data (), img.byteCount ());
 #else
   memcpy (img.bits (), data (), img.sizeInBytes ());

@@ -32,7 +32,7 @@ namespace lay
 //  ZoomService implementation
 
 ZoomService::ZoomService (lay::LayoutViewBase *view)
-  : lay::ViewService (view->view_object_widget ()), 
+  : lay::ViewService (view->canvas ()), 
     mp_view (view),
     mp_box (0),
     m_color (0)
@@ -50,7 +50,7 @@ ZoomService::drag_cancel ()
     delete mp_box;
     mp_box = 0;
   }
-  widget ()->ungrab_mouse (this);
+  ui ()->ungrab_mouse (this);
 }
 
 void 
@@ -118,7 +118,7 @@ bool
 ZoomService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio) 
 { 
   if (! prio && (buttons & lay::RightButton) != 0) {
-    db::DBox vp = widget ()->mouse_event_viewport ();
+    db::DBox vp = ui ()->mouse_event_viewport ();
     if (mp_view && vp.contains (p)) {
       db::DVector d = (vp.p2 () - vp.p1 ()) * 0.5;
       mp_view->zoom_box (db::DBox (p - d, p + d));
@@ -132,21 +132,21 @@ ZoomService::mouse_release_event (const db::DPoint & /*p*/, unsigned int /*butto
 { 
   if (prio) {
 
-    widget ()->ungrab_mouse (this);
+    ui ()->ungrab_mouse (this);
 
     if (mp_box) {
 
       delete mp_box;
       mp_box = 0;
 
-      db::DBox vp = widget ()->mouse_event_viewport ();
+      db::DBox vp = ui ()->mouse_event_viewport ();
       db::DVector d = (vp.p2 () - vp.p1 ()) * 0.5;
 
       if (mp_view) {
 
         //  we need to use the original screen coordinate to find the move direction
-        db::DPoint p1s = widget ()->mouse_event_trans ().trans (m_p1);
-        db::DPoint p2s = widget ()->mouse_event_trans ().trans (m_p2);
+        db::DPoint p1s = ui ()->mouse_event_trans ().trans (m_p1);
+        db::DPoint p2s = ui ()->mouse_event_trans ().trans (m_p2);
 
         if (p2s.x () > p1s.x () && p1s.y () < p2s.y ()) {
 
@@ -185,7 +185,7 @@ ZoomService::wheel_event (int delta, bool /*horizontal*/, const db::DPoint &p, u
   //  Only act without the mouse being grabbed.
   if (! prio) {
 
-    db::DBox vp = widget ()->mouse_event_viewport ();
+    db::DBox vp = ui ()->mouse_event_viewport ();
     if (mp_view && vp.contains (p) && vp.width () > 0 && vp.height () > 0) {
 
       enum { horizontal, vertical, zoom } direction = zoom;
@@ -260,12 +260,12 @@ ZoomService::begin_pan (const db::DPoint &pos)
   mp_box = 0;
 
   m_p1 = pos;
-  m_vp = widget ()->mouse_event_viewport ();
+  m_vp = ui ()->mouse_event_viewport ();
 
   //  store one state which we are going to update
   mp_view->zoom_box (m_vp);
 
-  widget ()->grab_mouse (this, true);
+  ui ()->grab_mouse (this, true);
 }
 
 void 
@@ -277,9 +277,9 @@ ZoomService::begin (const db::DPoint &pos)
 
   m_p1 = pos;
   m_p2 = pos;
-  mp_box = new lay::RubberBox (widget (), m_color, pos, pos);
+  mp_box = new lay::RubberBox (ui (), m_color, pos, pos);
 
-  widget ()->grab_mouse (this, true);
+  ui ()->grab_mouse (this, true);
 }
 
 }

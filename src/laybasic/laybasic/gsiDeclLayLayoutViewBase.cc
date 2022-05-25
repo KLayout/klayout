@@ -360,49 +360,49 @@ get_config_names (lay::LayoutViewBase *view)
 static void
 send_key_press_event (lay::LayoutViewBase *view, unsigned int key, unsigned int buttons)
 {
-  view->view_object_widget ()->send_key_press_event (key, buttons);
+  view->canvas ()->send_key_press_event (key, buttons);
 }
 
 static void
 send_mouse_move_event (lay::LayoutViewBase *view, const db::DPoint &pt, unsigned int buttons)
 {
-  view->view_object_widget ()->send_mouse_move_event (pt, buttons);
+  view->canvas ()->send_mouse_move_event (pt, buttons);
 }
 
 static void
 send_leave_event (lay::LayoutViewBase *view)
 {
-  view->view_object_widget ()->send_leave_event ();
+  view->canvas ()->send_leave_event ();
 }
 
 static void
 send_enter_event (lay::LayoutViewBase *view)
 {
-  view->view_object_widget ()->send_enter_event ();
+  view->canvas ()->send_enter_event ();
 }
 
 static void
 send_mouse_press_event (lay::LayoutViewBase *view, const db::DPoint &pt, unsigned int buttons)
 {
-  view->view_object_widget ()->send_mouse_press_event (pt, buttons);
+  view->canvas ()->send_mouse_press_event (pt, buttons);
 }
 
 static void
 send_mouse_double_clicked_event (lay::LayoutViewBase *view, const db::DPoint &pt, unsigned int buttons)
 {
-  view->view_object_widget ()->send_mouse_double_clicked_event (pt, buttons);
+  view->canvas ()->send_mouse_double_clicked_event (pt, buttons);
 }
 
 static void
 send_mouse_release_event (lay::LayoutViewBase *view, const db::DPoint &pt, unsigned int buttons)
 {
-  view->view_object_widget ()->send_mouse_release_event (pt, buttons);
+  view->canvas ()->send_mouse_release_event (pt, buttons);
 }
 
 static void
 send_wheel_event (lay::LayoutViewBase *view, int delta, bool horizontal, const db::DPoint &pt, unsigned int buttons)
 {
-  view->view_object_widget ()->send_wheel_event (delta, horizontal, pt, buttons);
+  view->canvas ()->send_wheel_event (delta, horizontal, pt, buttons);
 }
 
 namespace {

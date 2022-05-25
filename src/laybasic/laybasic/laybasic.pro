@@ -85,6 +85,7 @@ SOURCES += \
   layViewOp.cc \
   layViewport.cc \
   layZoomBox.cc \
+  layUtils.cc \
 
 HEADERS += \
   laybasicConfig.h \
@@ -136,6 +137,7 @@ HEADERS += \
   layViewOp.h \
   layViewport.h \
   layZoomBox.h \
+  layUtils.h \
   laybasicCommon.h \
 
 

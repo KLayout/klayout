@@ -28,6 +28,7 @@
 #include "tlException.h"
 #include "tlString.h"
 #include "tlExceptions.h"
+#include "layUtils.h"
 
 namespace lay
 {
@@ -55,10 +56,14 @@ public:
     menu_entries.push_back (lay::menu_item ("clip_tool::show", "clip_tool:edit_mode", "edit_menu.utils_menu.end", tl::to_string (QObject::tr ("Clip Tool"))));
   }
  
-   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
-   {
-     return new ClipDialog (root, view);
-   }
+  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
+  {
+    if (lay::has_gui ()) {
+      return new ClipDialog (root, view);
+    } else {
+      return 0;
+    }
+  }
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new ClipDialogPluginDeclaration (), 20000, "ClipDialogPlugin");

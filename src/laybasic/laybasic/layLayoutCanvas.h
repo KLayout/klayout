@@ -134,15 +134,11 @@ private:
  */
 
 class LAYBASIC_PUBLIC LayoutCanvas
-  : public lay::ViewObjectWidget,
+  : public lay::ViewObjectUI,
     public lay::BitmapViewObjectCanvas,
     public lay::BitmapRedrawThreadCanvas,
     public lay::Drawings
 {
-#if defined(HAVE_QT)
-Q_OBJECT
-#endif
-
 public:
   LayoutCanvas (lay::LayoutViewBase *view);
   ~LayoutCanvas ();
@@ -340,11 +336,6 @@ public:
   }
 
   /**
-   *  @brief Resizes the canvas object in the Qt-less case
-   */
-  void resize (unsigned int width, unsigned int height);
-
-  /**
    *  @brief Gets (and resets) a flag indicating that drawing has finished
    */
   bool drawing_finished ();
@@ -399,13 +390,12 @@ private:
 
   tl::Mutex m_mutex;
 
-#if defined(HAVE_QT)
-  virtual void paintEvent (QPaintEvent *);
-  virtual void resizeEvent (QResizeEvent *);
-  virtual bool event (QEvent *e);
-#endif
-
   virtual void key_event (unsigned int key, unsigned int buttons);
+  virtual void resize_event (unsigned int width, unsigned int height);
+#if defined(HAVE_QT)
+  virtual void gtf_probe ();
+  virtual void paint_event ();
+#endif
 
   //  implementation of the lay::Drawings interface
   void update_drawings ();
@@ -416,7 +406,6 @@ private:
   void do_update_image ();
   void do_end_of_drawing ();
   void do_redraw_all (bool force_redraw = true);
-  void do_resize (unsigned int width, unsigned int height);
 
   void prepare_drawing ();
 };

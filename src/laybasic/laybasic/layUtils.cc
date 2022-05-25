@@ -20,36 +20,26 @@
 
 */
 
+#include "layUtils.h"
 
-
-#ifndef HDR_layRubberBox
-#define HDR_layRubberBox
-
-#include "layViewObject.h"
-
-namespace lay
-{
-
-class LAYBASIC_PUBLIC RubberBox
-  : public lay::ViewObject
-{
-public: 
-  RubberBox (lay::ViewObjectUI *canvas, unsigned int color, const db::DPoint &p1, const db::DPoint &p2);
-
-  void set_color (unsigned int color);
-  void set_stipple (unsigned int s);
-  void set_points (const db::DPoint &begin, const db::DPoint &end);
-
-private:
-  virtual void render (const Viewport &vp, ViewObjectCanvas &canvas);
-
-  db::DPoint m_p1, m_p2;
-  unsigned int m_color;
-  unsigned int m_stipple;
-};
-
-}
-
+#if defined(HAVE_QT)
+#  include <QApplication>
 #endif
 
+namespace lay {
 
+bool
+has_gui ()
+{
+#if defined(HAVE_QT)
+#if QT_VERSION < 0x50000
+  return (QApplication::type () != Qt::Tty);
+#else
+  return (dynamic_cast<QGuiApplication *> (QCoreApplication::instance ()) != 0);
+#endif
+#else
+  return false;
+#endif
+}
+
+}

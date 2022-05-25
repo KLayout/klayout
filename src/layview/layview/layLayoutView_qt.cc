@@ -72,6 +72,7 @@
 #include "layBookmarksView.h"
 #include "layEditorOptionsFrame.h"
 #include "layEditorOptionsPages.h"
+#include "layUtils.h"
 #include "dbClipboard.h"
 #include "dbLayout.h"
 #include "dbLayoutUtils.h"
@@ -263,12 +264,6 @@ LayoutView::init_menu ()
 void
 LayoutView::init_ui (QWidget *parent, const char *name)
 {
-#if QT_VERSION < 0x50000
-  bool has_gui = (QApplication::type () != Qt::Tty);
-#else
-  bool has_gui = (qGuiApp != 0);
-#endif
-
   m_activated = true;
   m_always_show_source = false;
   m_always_show_ld = true;
@@ -290,18 +285,18 @@ LayoutView::init_ui (QWidget *parent, const char *name)
   mp_min_hier_spbx = 0;
   mp_max_hier_spbx = 0;
 
-  if (has_gui) {
+  if (lay::has_gui ()) {
 
     mp_widget = new LayoutViewFrame (parent, this);
     mp_widget->setObjectName (QString::fromUtf8 (name));
-    view_object_widget ()->setParent (mp_widget);
+    canvas ()->widget ()->setParent (mp_widget);
 
     mp_connector = new LayoutViewSignalConnector (mp_widget, this);
 
     QVBoxLayout *vbl = new QVBoxLayout (mp_widget);
     vbl->setContentsMargins (0, 0, 0, 0);
     vbl->setSpacing (0);
-    vbl->addWidget (view_object_widget ());
+    vbl->addWidget (canvas ()->widget ());
 
     if ((options () & LV_NoHierarchyPanel) == 0 && (options () & LV_Naked) == 0) {
 
@@ -997,33 +992,53 @@ LayoutView::cut ()
 int
 LayoutView::active_cellview_index () const
 {
-  return mp_hierarchy_panel->active ();
+  if (mp_hierarchy_panel) {
+    return mp_hierarchy_panel->active ();
+  } else {
+    return LayoutViewBase::active_cellview_index ();
+  }
 }
 
 void 
 LayoutView::set_active_cellview_index (int index) 
 {
   if (index >= 0 && index < int (cellviews ())) {
-    mp_hierarchy_panel->select_active (index);
+    if (mp_hierarchy_panel) {
+      mp_hierarchy_panel->select_active (index);
+    } else {
+      LayoutViewBase::set_active_cellview_index (index);
+    }
   }
 }
 
 void 
 LayoutView::selected_cells_paths (int cv_index, std::vector<cell_path_type> &paths) const
 {
-  mp_hierarchy_panel->selected_cells (cv_index, paths);
+  if (mp_hierarchy_panel) {
+    mp_hierarchy_panel->selected_cells (cv_index, paths);
+  } else {
+    LayoutViewBase::selected_cells_paths (cv_index, paths);
+  }
 }
 
 void
 LayoutView::current_cell_path (int cv_index, cell_path_type &path) const
 {
-  mp_hierarchy_panel->current_cell (cv_index, path);
+  if (mp_hierarchy_panel) {
+    mp_hierarchy_panel->current_cell (cv_index, path);
+  } else {
+    LayoutViewBase::current_cell_path (cv_index, path);
+  }
 }
 
 void
 LayoutView::set_current_cell_path (int cv_index, const cell_path_type &path) 
 {
-  mp_hierarchy_panel->set_current_cell (cv_index, path);
+  if (mp_hierarchy_panel) {
+    mp_hierarchy_panel->set_current_cell (cv_index, path);
+  } else {
+    LayoutViewBase::set_current_cell_path (cv_index, path);
+  }
 }
 
 void

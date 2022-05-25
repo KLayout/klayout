@@ -40,7 +40,7 @@ public:
    *  @brief Constructor attaching to a certain object
    */
   LandmarkMarker (lay::ViewService *service, const db::DPoint &pos, bool selected)
-    : lay::ViewObject (service->widget ()),
+    : lay::ViewObject (service->ui ()),
       mp_service (service), m_pos (pos), m_selected (selected), m_position_set (true)
   {
     //  .. nothing yet ..
@@ -50,7 +50,7 @@ public:
    *  @brief Constructor attaching to a certain object
    */
   LandmarkMarker (lay::ViewService *service, bool selected)
-    : lay::ViewObject (service->widget ()),
+    : lay::ViewObject (service->ui ()),
       mp_service (service), m_pos (), m_selected (selected), m_position_set (false)
   {
     //  .. nothing yet ..
@@ -146,7 +146,7 @@ class LandmarkEditorService
 {
 public:
   LandmarkEditorService (lay::LayoutViewBase *view, img::Object *img)
-    : lay::ViewService (view->view_object_widget ()), 
+    : lay::ViewService (view->canvas ()), 
       mp_image (img), m_selected (-1), m_dragging (false),
       m_mode (LandmarksDialog::None)
   {
@@ -182,7 +182,7 @@ public:
 
         update ();
         
-        widget ()->grab_mouse (this, false);
+        ui ()->grab_mouse (this, false);
         m_dragging = true;
 
       } else if (m_mode == LandmarksDialog::Delete) {
@@ -227,7 +227,7 @@ public:
 
           update ();
 
-          widget ()->grab_mouse (this, false);
+          ui ()->grab_mouse (this, false);
           m_dragging = false;
 
         }
@@ -235,7 +235,7 @@ public:
       } else {
 
         int search_range = 5; // TODO: make_variable?
-        double l = double (search_range) / widget ()->mouse_event_trans ().mag ();
+        double l = double (search_range) / ui ()->mouse_event_trans ().mag ();
         db::DBox search_box = db::DBox (p, p).enlarged (db::DVector (l, l));
 
         int li = 0;
@@ -307,7 +307,7 @@ public:
       } else if (! m_dragging) {
 
         int search_range = 5; // TODO: make_variable?
-        double l = double (search_range) / widget ()->mouse_event_trans ().mag ();
+        double l = double (search_range) / ui ()->mouse_event_trans ().mag ();
         db::DBox search_box = db::DBox (p, p).enlarged (db::DVector (l, l));
 
         int li = 0;
@@ -343,7 +343,7 @@ public:
       m_dragging = false;
     }
 
-    widget ()->ungrab_mouse (this);
+    ui ()->ungrab_mouse (this);
   }
 
   void set_colors (lay::Color /*background*/, lay::Color /*color*/)

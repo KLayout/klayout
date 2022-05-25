@@ -43,7 +43,7 @@ SelectionService::SelectionService (lay::LayoutViewBase *view) :
 #if defined(HAVE_QT)
     QObject (),
 #endif
-    lay::ViewService (view->view_object_widget ()), 
+    lay::ViewService (view->canvas ()), 
     mp_view (view),
     mp_box (0),
     m_color (0),
@@ -114,7 +114,7 @@ SelectionService::reset_box ()
 {
   if (mp_box) {
 
-    widget ()->ungrab_mouse (this);
+    ui ()->ungrab_mouse (this);
 
     delete mp_box;
     mp_box = 0;
@@ -223,7 +223,7 @@ SelectionService::mouse_click_event (const db::DPoint &p, unsigned int buttons, 
     reset_box ();
   }
 
-  if (prio && mp_view && widget ()->mouse_event_viewport ().contains (p) && (buttons & lay::LeftButton) != 0) {
+  if (prio && mp_view && ui ()->mouse_event_viewport ().contains (p) && (buttons & lay::LeftButton) != 0) {
 
     lay::Editable::SelectionMode mode = lay::Editable::Replace;
     bool shift = ((buttons & lay::ShiftButton) != 0);
@@ -314,10 +314,10 @@ SelectionService::begin (const db::DPoint &pos)
 
   m_p1 = pos;
   m_p2 = pos;
-  mp_box = new lay::RubberBox (widget (), m_color, pos, pos);
+  mp_box = new lay::RubberBox (ui (), m_color, pos, pos);
   mp_box->set_stipple (6); // coarse hatched
 
-  widget ()->grab_mouse (this, true);
+  ui ()->grab_mouse (this, true);
 }
 
 }

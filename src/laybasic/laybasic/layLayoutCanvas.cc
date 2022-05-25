@@ -275,7 +275,7 @@ invert (unsigned char *data, unsigned int width, unsigned int height)
 }
 
 LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
-  : lay::ViewObjectWidget (),
+  : lay::ViewObjectUI (),
     mp_view (view),
     mp_image (0), mp_image_bg (0),
     mp_image_fg (0),
@@ -291,11 +291,25 @@ LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
     m_do_end_of_drawing_dm (this, &LayoutCanvas::do_end_of_drawing),
     m_image_cache_size (1)
 {
+  lay::Color bg (0xffffffff), fg (0xff000000), active (0xffc0c0c0);
+
 #if defined(HAVE_QT)
+  if (widget ()) {
+
 #if QT_VERSION > 0x050000
-  m_dpr = devicePixelRatio ();
+    m_dpr = widget ()->devicePixelRatio ();
 #endif
-  setObjectName (QString::fromUtf8 ("canvas"));
+
+    widget ()->setObjectName (QString::fromUtf8 ("canvas"));
+    widget ()->setBackgroundRole (QPalette::NoRole);
+
+    bg = lay::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Window).rgb ());
+    fg = lay::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Text).rgb ());
+    active = lay::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Mid).rgb ());
+
+    widget ()->setAttribute (Qt::WA_NoSystemBackground);
+
+  }
 #endif
 
   //  The gamma value used for subsampling: something between 1.8 and 2.2.
@@ -307,15 +321,7 @@ LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
 
   mp_redraw_thread = new lay::RedrawThread (this, view);
 
-#if defined(HAVE_QT)
-  setBackgroundRole (QPalette::NoRole);
-  set_colors (lay::Color (palette ().color (QPalette::Normal, QPalette::Window).rgb ()),
-              lay::Color (palette ().color (QPalette::Normal, QPalette::Text).rgb ()),
-              lay::Color (palette ().color (QPalette::Normal, QPalette::Mid).rgb ()));
-  setAttribute (Qt::WA_NoSystemBackground);
-#else
-  set_colors (0xffffffff, 0xff000000, 0xffc0c0c0);
-#endif
+  set_colors (bg, fg, active);
 }
 
 LayoutCanvas::~LayoutCanvas ()
@@ -560,7 +566,7 @@ LayoutCanvas::free_resources ()
 
 #if defined(HAVE_QT)
 void
-LayoutCanvas::paintEvent (QPaintEvent *)
+LayoutCanvas::paint_event ()
 {
   //  this is the update image request
   tl::SelfTimer timer_info (tl::verbosity () >= 41, tl::to_string (QObject::tr ("PaintEvent")));
@@ -655,7 +661,7 @@ LayoutCanvas::paintEvent (QPaintEvent *)
     do_render (m_viewport_l, *this, false);
 
     //  produce the pixmap first and then overdraw with dynamic content.
-    QPainter painter (this);
+    QPainter painter (widget ());
     QImage img = mp_image_fg->to_image ();
 #if QT_VERSION > 0x050000
     img.setDevicePixelRatio (double (m_dpr));
@@ -978,27 +984,8 @@ LayoutCanvas::screenshot ()
   return img;
 }
 
-#if defined(HAVE_QT)
-void 
-LayoutCanvas::resizeEvent (QResizeEvent *)
-{
-  do_resize (width (), height ());
-}
-#endif
-
 void
-LayoutCanvas::resize (unsigned int width, unsigned int height)
-{
-  //  pass down to the basic view object canvas
-  lay::ViewObjectWidget::resize (width, height);
-
-  //  don't wait until the layout system informs us - which may never take place when
-  //  the widget isn't shown.
-  do_resize (width, height);
-}
-
-void
-LayoutCanvas::do_resize (unsigned int width, unsigned int height)
+LayoutCanvas::resize_event (unsigned int width, unsigned int height)
 {
   unsigned int w = width * m_dpr, h = height * m_dpr;
   unsigned int wl = width * m_oversampling * m_dpr, hl = height * m_oversampling * m_dpr;
@@ -1099,22 +1086,11 @@ LayoutCanvas::do_update_image ()
 }
 
 #if defined(HAVE_QT)
-bool
-LayoutCanvas::event (QEvent *e) 
+void
+LayoutCanvas::gtf_probe ()
 {
-  if (e->type () == QEvent::MaxUser) {
-
-    //  GTF probe event
-    //  record the contents (the screenshot) as ASCII text
-    if (gtf::Recorder::instance () && gtf::Recorder::instance ()->recording ()) {
-      gtf::Recorder::instance ()->probe (this, gtf::image_to_variant (screenshot ().to_image_copy ()));
-    }
-
-    e->accept ();
-    return true;
-
-  } else {
-    return QWidget::event (e);
+  if (gtf::Recorder::instance () && gtf::Recorder::instance ()->recording ()) {
+    gtf::Recorder::instance ()->probe (widget (), gtf::image_to_variant (screenshot ().to_image_copy ()));
   }
 }
 #endif

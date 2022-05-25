@@ -57,7 +57,7 @@ class TrackingCursorBase
   : public lay::ViewObject
 {
 public:
-  TrackingCursorBase (lay::EditorServiceBase *service, lay::ViewObjectWidget *widget)
+  TrackingCursorBase (lay::EditorServiceBase *service, lay::ViewObjectUI *widget)
     : lay::ViewObject (widget, false), mp_service (service)
   { }
 
@@ -91,7 +91,7 @@ class MouseCursorViewObject
   : public TrackingCursorBase
 {
 public:
-  MouseCursorViewObject (lay::EditorServiceBase *service, lay::ViewObjectWidget *widget, const db::DPoint &pt, bool solid)
+  MouseCursorViewObject (lay::EditorServiceBase *service, lay::ViewObjectUI *widget, const db::DPoint &pt, bool solid)
     : TrackingCursorBase (service, widget), m_pt (pt), m_solid (solid)
   { }
 
@@ -139,7 +139,7 @@ class EdgeMarkerViewObject
   : public TrackingCursorBase
 {
 public:
-  EdgeMarkerViewObject (lay::EditorServiceBase *service, lay::ViewObjectWidget *widget, const db::DEdge &edge, bool solid)
+  EdgeMarkerViewObject (lay::EditorServiceBase *service, lay::ViewObjectUI *widget, const db::DEdge &edge, bool solid)
     : TrackingCursorBase (service, widget), m_edge (edge), m_solid (solid)
   { }
 
@@ -207,7 +207,7 @@ private:
 // --------------------------------------------------------------------------------------
 
 EditorServiceBase::EditorServiceBase (LayoutViewBase *view)
-  : lay::ViewService (view->view_object_widget ()),
+  : lay::ViewService (view->canvas ()),
     lay::Editable (view),
     lay::Plugin (view),
     m_cursor_enabled (true),
@@ -226,13 +226,13 @@ EditorServiceBase::add_mouse_cursor (const db::DPoint &pt, bool emphasize)
 {
   m_has_tracking_position = true;
   m_tracking_position = pt;
-  m_mouse_cursor_markers.push_back (new MouseCursorViewObject (this, widget (), pt, emphasize));
+  m_mouse_cursor_markers.push_back (new MouseCursorViewObject (this, ui (), pt, emphasize));
 }
 
 void
 EditorServiceBase::add_edge_marker (const db::DEdge &e, bool emphasize)
 {
-  m_mouse_cursor_markers.push_back (new EdgeMarkerViewObject (this, widget (), e, emphasize));
+  m_mouse_cursor_markers.push_back (new EdgeMarkerViewObject (this, ui (), e, emphasize));
 }
 
 void
@@ -307,7 +307,7 @@ EditorServiceBase::show_error (tl::Exception &ex)
 {
   tl::error << ex.msg ();
 #if defined(HAVE_QT)
-  QMessageBox::critical (widget (), tr ("Error"), tl::to_qstring (ex.msg ()));
+  QMessageBox::critical (ui ()->widget (), tr ("Error"), tl::to_qstring (ex.msg ()));
 #endif
 }
 

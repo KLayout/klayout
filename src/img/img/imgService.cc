@@ -410,7 +410,7 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 //  img::Service implementation
 
 Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
-  : lay::BackgroundViewObject (view->view_object_widget ()),
+  : lay::BackgroundViewObject (view->canvas ()),
     lay::Editable (view),
     lay::Plugin (view),
     db::Object (manager),

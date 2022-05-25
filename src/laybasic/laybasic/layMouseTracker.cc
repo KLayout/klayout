@@ -29,9 +29,9 @@ namespace lay
 {
 
 MouseTracker::MouseTracker (lay::LayoutViewBase *view)
-  : lay::ViewService (view->view_object_widget ()), mp_view (view)
+  : lay::ViewService (view->canvas ()), mp_view (view)
 {
-  widget ()->grab_mouse (this, false);
+  ui ()->grab_mouse (this, false);
 }
 
 bool 
@@ -42,7 +42,7 @@ MouseTracker::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, b
     //  NOTE: because the tracker grabs first and grabbers are registered first gets served last, the
     //  tracker will receive the event after all other mouse grabbers have been served and had their
     //  chance to set the tracking position.
-    lay::ViewService *vs = mp_view->view_object_widget ()->active_service ();
+    lay::ViewService *vs = mp_view->canvas ()->active_service ();
     db::DPoint tp = p;
     if (vs && vs->enabled () && vs->has_tracking_position ()) {
       tp = vs->tracking_position ();

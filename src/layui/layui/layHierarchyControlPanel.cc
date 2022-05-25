@@ -890,7 +890,7 @@ HierarchyControlPanel::do_update_content (int cv_index)
     header->setVisible (split_mode);
     cl_ly->addWidget (header);
 
-    HCPCellTreeWidget *cell_list = new HCPCellTreeWidget (cl_frame, "tree", mp_view->view_object_widget ());
+    HCPCellTreeWidget *cell_list = new HCPCellTreeWidget (cl_frame, "tree", mp_view->canvas ()->widget ());
     cl_ly->addWidget (cell_list);
     cell_list->setModel (new CellTreeModel (cell_list, mp_view, cv_index, m_flat ? CellTreeModel::Flat : 0, 0, m_sorting));
     cell_list->setUniformRowHeights (true);

@@ -26,6 +26,7 @@
 
 #include "layMainWindow.h"
 #include "layApplication.h"
+#include "layUtils.h"
 
 namespace lay
 {
@@ -65,7 +66,11 @@ public:
  
   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
-    return new SearchReplaceDialog (root, view);
+    if (lay::has_gui ()) {
+      return new SearchReplaceDialog (root, view);
+    } else {
+      return 0;
+    }
   }
 };
 

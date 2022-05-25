@@ -1637,13 +1637,13 @@ public:
   void absolute_coordinates (bool f);
 
   /**
-   *  @brief Get the view object widget (the canvas where the layout is drawn and view objects are placed)
+   *  @brief Gets the canvas object (where the layout is drawn and view objects are placed)
    *  
    *  This method intentionally delivers the ViewObjectWidget, not the 
    *  LayoutCanvas to emphasize that the LayoutCanvas object shall not
    *  be modified.
    */
-  lay::ViewObjectWidget *view_object_widget () 
+  lay::LayoutCanvas *canvas ()
   {
     return mp_canvas;
   }
@@ -2824,11 +2824,6 @@ protected:
   }
 
   virtual LayoutView *get_ui ();
-
-  lay::LayoutCanvas *canvas ()
-  {
-    return mp_canvas;
-  }
 
   bool configure (const std::string &name, const std::string &value);
   void config_finalize ();

@@ -32,7 +32,7 @@ namespace lay
 // -------------------------------------------------------------
 //  RubberBox implementation
 
-RubberBox::RubberBox (lay::ViewObjectWidget *widget, unsigned int color, const db::DPoint &p1, const db::DPoint &p2)
+RubberBox::RubberBox (lay::ViewObjectUI *widget, unsigned int color, const db::DPoint &p1, const db::DPoint &p2)
   : lay::ViewObject (widget, false /*not static*/), 
     m_p1 (p1), m_p2 (p2), m_color (color), m_stipple (0)
 { }

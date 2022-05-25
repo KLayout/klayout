@@ -37,6 +37,7 @@
 #include "tlAlgorithm.h"
 #include "layQtTools.h"
 #include "layMarker.h"
+#include "layUtils.h"
 
 
 namespace lay
@@ -74,17 +75,21 @@ public:
     return new BrowseShapesConfigPage (parent); 
   }
 
-   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
-   {
-     lay::PluginDeclaration::get_menu_entries (menu_entries);
-     menu_entries.push_back (lay::separator ("browser_group", "tools_menu.end"));
-     menu_entries.push_back (lay::menu_item ("browse_shapes::show", "browse_shapes", "tools_menu.end", tl::to_string (QObject::tr ("Browse Shapes"))));
-   }
+  virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
+  {
+    lay::PluginDeclaration::get_menu_entries (menu_entries);
+    menu_entries.push_back (lay::separator ("browser_group", "tools_menu.end"));
+    menu_entries.push_back (lay::menu_item ("browse_shapes::show", "browse_shapes", "tools_menu.end", tl::to_string (QObject::tr ("Browse Shapes"))));
+  }
  
-   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
-   {
-     return new BrowseShapesForm (root, view);
-   }
+  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
+  {
+    if (lay::has_gui ()) {
+      return new BrowseShapesForm (root, view);
+    } else {
+      return 0;
+    }
+  }
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new BrowseShapesPluginDeclaration (), 10000, "BrowseShapesPlugin");

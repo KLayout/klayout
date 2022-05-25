@@ -50,7 +50,7 @@ public:
   };
 
   NavigatorService (LayoutView *view)
-    : ViewService (view->view_object_widget ()), 
+    : ViewService (view->canvas ()), 
       mp_view (view), mp_source_view (0),
       mp_viewport_marker (0),
       m_drag_mode (DM_none),
@@ -101,7 +101,7 @@ public:
       delete mp_box;
       mp_box = 0;
 
-      widget ()->ungrab_mouse (this);
+      ui ()->ungrab_mouse (this);
 
       if (mp_source_view) {
         mp_source_view->zoom_box (db::DBox (m_p1, m_p2));
@@ -112,7 +112,7 @@ public:
     } else if (m_dragging) {
 
       m_dragging = false;
-      widget ()->ungrab_mouse (this);
+      ui ()->ungrab_mouse (this);
       return true;
 
     } else {
@@ -123,7 +123,7 @@ public:
   bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio) 
   { 
     if (! prio && (buttons & lay::RightButton) != 0) {
-      db::DBox vp = widget ()->mouse_event_viewport ();
+      db::DBox vp = ui ()->mouse_event_viewport ();
       if (mp_source_view && vp.contains (p)) {
         db::DVector d = (vp.p2 () - vp.p1 ()) * 0.5;
         mp_source_view->zoom_box (db::DBox (p - d, p + d));
@@ -156,7 +156,7 @@ public:
       m_dragging = true;
       m_p0 = p;
       m_b0 = m_box;
-      widget ()->grab_mouse (this, true);
+      ui ()->grab_mouse (this, true);
       return true;
 
     } else {
@@ -389,7 +389,7 @@ public:
       delete mp_box;
       mp_box = 0;
     }
-    widget ()->ungrab_mouse (this);
+    ui ()->ungrab_mouse (this);
   }
 
   void set_colors (lay::Color /*background*/, lay::Color color)
@@ -426,9 +426,9 @@ private:
     mp_box = 0;
 
     m_p1 = pos;
-    m_vp = widget ()->mouse_event_viewport ();
+    m_vp = ui ()->mouse_event_viewport ();
 
-    widget ()->grab_mouse (this, true);
+    ui ()->grab_mouse (this, true);
   }
 
   void begin (const db::DPoint &pos)
@@ -439,9 +439,9 @@ private:
 
     m_p1 = pos;
     m_p2 = pos;
-    mp_box = new lay::RubberBox (widget (), m_color, pos, pos);
+    mp_box = new lay::RubberBox (ui (), m_color, pos, pos);
 
-    widget ()->grab_mouse (this, true);
+    ui ()->grab_mouse (this, true);
   }
 };
 
@@ -664,7 +664,7 @@ Navigator::attach_view (LayoutView *view)
       mp_view->widget ()->show ();
 
       mp_service = new NavigatorService (mp_view);
-      mp_view->view_object_widget ()->activate (mp_service);
+      mp_view->canvas ()->activate (mp_service);
 
       mp_source_view->cellviews_changed_event.add (this, &Navigator::content_changed);
       mp_source_view->cellview_changed_event.add (this, &Navigator::content_changed_with_int);

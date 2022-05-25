@@ -29,6 +29,7 @@
 #include "layConverters.h"
 #include "layCellView.h"
 #include "layLayoutView.h"
+#include "layUtils.h"
 
 #include "gsiDecl.h"
 
@@ -78,7 +79,11 @@ public:
 
   virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
-    return new NetTracerDialog (root, view);
+    if (lay::has_gui ()) {
+      return new NetTracerDialog (root, view);
+    } else {
+      return 0;
+    }
   }
 };
 

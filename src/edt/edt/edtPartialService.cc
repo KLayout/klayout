@@ -1308,7 +1308,7 @@ const int sr_pixels = 8; //  TODO: make variable
 lay::PointSnapToObjectResult
 PartialService::snap2 (const db::DPoint &p) const
 {
-  double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
+  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
   return lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range);
 }
 
@@ -1526,7 +1526,7 @@ PartialService::edit_cancel ()
     mp_box = 0;
   }
 
-  widget ()->ungrab_mouse (this);
+  ui ()->ungrab_mouse (this);
 
   selection_to_view ();
 }
@@ -1654,10 +1654,10 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
 
       m_p1 = p;
       m_p2 = p;
-      mp_box = new lay::RubberBox (widget (), m_color, p, p);
+      mp_box = new lay::RubberBox (ui (), m_color, p, p);
       mp_box->set_stipple (6); // coarse hatched
 
-      widget ()->grab_mouse (this, true);
+      ui ()->grab_mouse (this, true);
 
     } else {
 
@@ -1673,7 +1673,7 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
         m_current = m_start = p;
       }
 
-      widget ()->grab_mouse (this, true);
+      ui ()->grab_mouse (this, true);
 
     }
 
@@ -1712,7 +1712,7 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
     if (m_current != m_start) {
 
       //  stop dragging
-      widget ()->ungrab_mouse (this);
+      ui ()->ungrab_mouse (this);
       
       manager ()->transaction (tl::to_string (tr ("Partial move")));
 
@@ -1743,7 +1743,7 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
 
     return true;
 
-  } else if (widget ()->mouse_event_viewport ().contains (p)) { 
+  } else if (ui ()->mouse_event_viewport ().contains (p)) { 
 
     //  clear other selection when this mode gets active
     //  (save the selection so our own selection does not get cleared)
@@ -1901,7 +1901,7 @@ PartialService::mouse_double_click_event (const db::DPoint &p, unsigned int butt
     m_alt_ac = ac_from_buttons (buttons);
 
     //  stop dragging
-    widget ()->ungrab_mouse (this);
+    ui ()->ungrab_mouse (this);
     m_dragging = false;
       
     partial_select (db::DBox (p, p), lay::Editable::Replace);
@@ -2006,12 +2006,12 @@ PartialService::mouse_release_event (const db::DPoint &p, unsigned int buttons, 
 
     m_alt_ac = ac_from_buttons (buttons);
 
-    widget ()->ungrab_mouse (this);
+    ui ()->ungrab_mouse (this);
 
     delete mp_box;
     mp_box = 0;
 
-    if (widget ()->mouse_event_viewport ().contains (p)) { 
+    if (ui ()->mouse_event_viewport ().contains (p)) { 
 
       lay::Editable::SelectionMode mode = lay::Editable::Replace;
       bool shift = ((m_buttons & lay::ShiftButton) != 0);
@@ -2067,7 +2067,7 @@ void
 PartialService::del ()
 {
   //  stop dragging
-  widget ()->ungrab_mouse (this);
+  ui ()->ungrab_mouse (this);
   
   std::map <std::pair <db::cell_index_type, std::pair <unsigned int, unsigned int> >, std::vector <partial_objects::const_iterator> > shapes_to_delete_by_cell;
 
@@ -2358,13 +2358,13 @@ PartialService::enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_obj
 double
 PartialService::catch_distance ()
 {
-  return double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+  return double (view ()->search_range ()) / ui ()->mouse_event_trans ().mag ();
 }
 
 double
 PartialService::catch_distance_box ()
 {
-  return double (view ()->search_range_box ()) / widget ()->mouse_event_trans ().mag ();
+  return double (view ()->search_range_box ()) / ui ()->mouse_event_trans ().mag ();
 }
 
 db::DPoint

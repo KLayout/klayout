@@ -2158,7 +2158,7 @@ MainService::cm_tap ()
   tl_assert (false); // see TODO
 #endif
 
-  if (! view ()->view_object_widget ()->mouse_in_window ()) {
+  if (! view ()->canvas ()->widget () || view ()->canvas ()->mouse_in_window ()) {
     return;
   }
 
@@ -2168,7 +2168,7 @@ MainService::cm_tap ()
   finder.set_catch_all (true);
 
   //  go through all visible layers of all cellviews
-  db::DPoint pt = view ()->view_object_widget ()->mouse_position_um ();
+  db::DPoint pt = view ()->canvas ()->mouse_position_um ();
   finder.find (view (), db::DBox (pt, pt));
 
   std::set<std::pair<unsigned int, unsigned int> > layers_in_selection;
@@ -2201,8 +2201,8 @@ MainService::cm_tap ()
 
   int icon_size = menu->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
 
-  db::DPoint mp_local = view ()->view_object_widget ()->mouse_position ();
-  QPoint mp = view ()->view_object_widget ()->mapToGlobal (QPoint (mp_local.x (), mp_local.y ()));
+  db::DPoint mp_local = view ()->canvas ()->mouse_position ();
+  QPoint mp = view ()->canvas ()->widget ()->mapToGlobal (QPoint (mp_local.x (), mp_local.y ()));
 
   for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = tapped_layers.begin (); l != tapped_layers.end (); ++l) {
     QAction *a = menu->addAction (lay::LayerTreeModel::icon_for_layer (*l, view (), icon_size, icon_size, 0, true), tl::to_qstring ((*l)->display_string (view (), true, true /*with source*/)));
@@ -2216,7 +2216,7 @@ MainService::cm_tap ()
     lay::LayerPropertiesConstIterator iter = tapped_layers [index];
     view ()->set_current_layer (iter);
 
-    edt::Service *es = dynamic_cast<edt::Service *> (view ()->view_object_widget ()->active_service ());
+    edt::Service *es = dynamic_cast<edt::Service *> (view ()->canvas ()->active_service ());
     if (es) {
       es->tap (pt);
     }

@@ -632,7 +632,7 @@ LibrariesView::do_update_content (int lib_index)
     header->setVisible (split_mode);
     cl_ly->addWidget (header);
 
-    LibraryTreeWidget *cell_list = new LibraryTreeWidget (cl_frame, "tree", mp_view->view_object_widget ());
+    LibraryTreeWidget *cell_list = new LibraryTreeWidget (cl_frame, "tree", mp_view->canvas ()->widget ());
     cl_ly->addWidget (cell_list);
     cell_list->setModel (new CellTreeModel (cell_list, m_libraries [i].get (), CellTreeModel::Flat | CellTreeModel::TopCells | CellTreeModel::BasicCells | CellTreeModel::WithVariants | CellTreeModel::WithIcons, 0));
     cell_list->setUniformRowHeights (true);

@@ -118,7 +118,7 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new GridNetPlugi
 //  Implementation of the GridNet object
 
 GridNet::GridNet (LayoutViewBase *view)
-  : lay::BackgroundViewObject (view->view_object_widget ()), 
+  : lay::BackgroundViewObject (view->canvas ()), 
     lay::Plugin (view),
     mp_view (view),
     m_visible (false), m_show_ruler (true), m_grid (1.0),

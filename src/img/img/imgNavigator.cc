@@ -94,7 +94,7 @@ Navigator::~Navigator ()
 void 
 Navigator::activate_service (lay::ViewService *service)
 {
-  mp_view->view_object_widget ()->activate (service);
+  mp_view->canvas ()->activate (service);
 }
 
 void

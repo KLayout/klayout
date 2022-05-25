@@ -55,7 +55,7 @@ namespace lay
 
 NetTracerDialog::NetTracerDialog (lay::Dispatcher *root, LayoutViewBase *view)
   : lay::Browser (root, view, "net_tracer_dialog"),
-    lay::ViewService (view->view_object_widget ()), 
+    lay::ViewService (view->canvas ()), 
     m_cv_index (0), 
     m_net_index (1),
     m_window (lay::NTFitNet),
@@ -170,7 +170,7 @@ NetTracerDialog::mouse_click_event (const db::DPoint &p, unsigned int buttons, b
       //  prepare for the net tracing 
       clear_markers ();
 
-      double l = double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+      double l = double (view ()->search_range ()) / ui ()->mouse_event_trans ().mag ();
 
       db::DBox start_search_box = db::DBox (p, p).enlarged (db::DVector (l, l));
 
@@ -1125,7 +1125,7 @@ BEGIN_PROTECTED
   net_list->setCurrentItem (0);
   m_mouse_state = 2;
   view ()->message (tl::to_string (QObject::tr ("Click on the first point in the net")));
-  widget ()->grab_mouse (this, false);
+  ui ()->grab_mouse (this, false);
 END_PROTECTED
 }
 
@@ -1137,7 +1137,7 @@ BEGIN_PROTECTED
   net_list->setCurrentItem (0);
   m_mouse_state = 1;
   view ()->message (tl::to_string (QObject::tr ("Click on a point in the net")));
-  widget ()->grab_mouse (this, false);
+  ui ()->grab_mouse (this, false);
 END_PROTECTED
 }
 
@@ -1160,7 +1160,7 @@ NetTracerDialog::release_mouse ()
   add2_pb->setChecked (false);
   m_mouse_state = 0;
   view ()->message ();
-  widget ()->ungrab_mouse (this);
+  ui ()->ungrab_mouse (this);
 }
 
 void

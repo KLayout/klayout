@@ -76,7 +76,11 @@ public:
 
     //  replace by "real" background color if required
     if (! c.is_valid ()) {
-      c = lay::Color (mp_view->palette ().color (QPalette::Normal, QPalette::Base).rgb ());
+      if (mp_view->widget ()) {
+        c = lay::Color (mp_view->widget ()->palette ().color (QPalette::Normal, QPalette::Base).rgb ());
+      } else {
+        c = lay::Color (0xffffff);  //  white
+      }
     }
 
     lay::Color contrast;
@@ -626,8 +630,8 @@ Navigator::view_closed (int index)
 void
 Navigator::resizeEvent (QResizeEvent *)
 {
-  if (mp_view) {
-    mp_view->setGeometry (mp_placeholder_label->geometry ());
+  if (mp_view && mp_view->widget ()) {
+    mp_view->widget ()->setGeometry (mp_placeholder_label->geometry ());
   }
 }
 
@@ -652,11 +656,12 @@ Navigator::attach_view (LayoutView *view)
     if (mp_source_view) {
 
       mp_view = new LayoutView (0, false, mp_source_view, this, "navigator", LayoutView::LV_Naked + LayoutView::LV_NoZoom + LayoutView::LV_NoServices + LayoutView::LV_NoGrid);
-      mp_view->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
-      mp_view->setMinimumWidth (100);
-      mp_view->setMinimumHeight (100);
-      mp_view->setGeometry (mp_placeholder_label->geometry ());
-      mp_view->show ();
+      tl_assert (mp_view->widget ());
+      mp_view->widget ()->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
+      mp_view->widget ()->setMinimumWidth (100);
+      mp_view->widget ()->setMinimumHeight (100);
+      mp_view->widget ()->setGeometry (mp_placeholder_label->geometry ());
+      mp_view->widget ()->show ();
 
       mp_service = new NavigatorService (mp_view);
       mp_view->view_object_widget ()->activate (mp_service);

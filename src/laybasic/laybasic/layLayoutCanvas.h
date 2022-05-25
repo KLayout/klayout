@@ -144,11 +144,7 @@ Q_OBJECT
 #endif
 
 public:
-#if defined(HAVE_QT)
-  LayoutCanvas (QWidget *parent, lay::LayoutViewBase *view, const char *name = "canvas");
-#else
   LayoutCanvas (lay::LayoutViewBase *view);
-#endif
   ~LayoutCanvas ();
 
   void set_colors (lay::Color background, lay::Color foreground, lay::Color active);

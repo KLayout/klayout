@@ -3368,21 +3368,23 @@ MainWindow::create_layout (const std::string &technology, int mode)
 void
 MainWindow::add_view (lay::LayoutView *view)
 {
-  connect (view, SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
-  connect (view, SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
-  connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
-  connect (view, SIGNAL (menu_needs_update ()), this, SLOT (menu_needs_update ()));
-  connect (view, SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
-  connect (view, SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
-  connect (view, SIGNAL (clear_current_pos ()), this, SLOT (clear_current_pos ()));
-  connect (view, SIGNAL (mode_change (int)), this, SLOT (select_mode (int)));
+  tl_assert (view->widget ());
+
+  connect (view->widget (), SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
+  connect (view->widget (), SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
+  connect (view->widget (), SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
+  connect (view->widget (), SIGNAL (menu_needs_update ()), this, SLOT (menu_needs_update ()));
+  connect (view->widget (), SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
+  connect (view->widget (), SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
+  connect (view->widget (), SIGNAL (clear_current_pos ()), this, SLOT (clear_current_pos ()));
+  connect (view->widget (), SIGNAL (mode_change (int)), this, SLOT (select_mode (int)));
 
   mp_views.push_back (view);
 
   //  we must resize the widget here to set the geometry properly.
   //  This is required to make zoom_fit work.
-  view->setGeometry (0, 0, mp_view_stack->width (), mp_view_stack->height ());
-  view->show ();
+  view->widget ()->setGeometry (0, 0, mp_view_stack->width (), mp_view_stack->height ());
+  view->widget ()->show ();
 }
 
 int
@@ -3563,7 +3565,7 @@ MainWindow::view_title_changed ()
     update_tab_title (i);
   }
 
-  if (sender () == current_view ()) {
+  if (current_view () && sender () == current_view ()->widget ()) {
     update_window_title ();
   }
 }

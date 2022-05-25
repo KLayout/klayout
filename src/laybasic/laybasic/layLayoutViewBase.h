@@ -155,9 +155,6 @@ struct LAYBASIC_PUBLIC LayerDisplayProperties
  *  It manages the layer display list, bookmark list etc.
  */
 class LAYBASIC_PUBLIC LayoutViewBase :
-#if defined(HAVE_QT)
-    public QFrame,
-#endif
     public lay::Editables,
     public lay::Dispatcher
 {
@@ -195,20 +192,12 @@ public:
   /**
    *  @brief Constructor
    */
-#if defined(HAVE_QT)
-  LayoutViewBase (QWidget *parent, lay::LayoutView *ui, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
-#else
   LayoutViewBase (lay::LayoutView *ui, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
-#endif
 
   /**
    *  @brief Constructor (clone from another view)
    */
-#if defined(HAVE_QT)
-  LayoutViewBase (QWidget *widget, lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
-#else
   LayoutViewBase (lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
-#endif
 
   /** 
    *  @brief Destructor
@@ -1648,7 +1637,7 @@ public:
   void absolute_coordinates (bool f);
 
   /**
-   *  @brief Get the view object widget 
+   *  @brief Get the view object widget (the canvas where the layout is drawn and view objects are placed)
    *  
    *  This method intentionally delivers the ViewObjectWidget, not the 
    *  LayoutCanvas to emphasize that the LayoutCanvas object shall not
@@ -2638,7 +2627,7 @@ public:
   /**
    *  @brief Gets the QWidget interface
    */
-  QWidget *widget ();
+  virtual QWidget *widget ();
 #endif
 
   /**

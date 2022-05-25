@@ -583,11 +583,7 @@ public:
   /**
    *  @brief ctor
    */
-#if defined(HAVE_QT)
-  ViewObjectWidget (QWidget *view, const char *name);
-#else
   ViewObjectWidget ();
-#endif
 
   /**
    *  @brief dtor

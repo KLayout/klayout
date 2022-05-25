@@ -209,9 +209,10 @@ ViewService::set_cursor (lay::Cursor::cursor_shape cursor)
 // ---------------------------------------------------------------
 //  ViewObjectWidget implementation
 
+ViewObjectWidget::ViewObjectWidget ()
 #if defined(HAVE_QT)
-ViewObjectWidget::ViewObjectWidget (QWidget *parent, const char *name)
-  : QWidget (parent), 
+  : QWidget (),
+#endif
     m_view_objects_dismissed (false),
     m_needs_update_static (false),
     m_needs_update_bg (false),
@@ -226,31 +227,13 @@ ViewObjectWidget::ViewObjectWidget (QWidget *parent, const char *name)
     m_widget_height (0),
     m_image_updated (false)
 {
-  setMouseTracking (true); 
-  setObjectName (QString::fromUtf8 (name));
+#if defined(HAVE_QT)
+  setMouseTracking (true);
   setAcceptDrops (true);
+#endif
 
   m_objects.changed ().add (this, &ViewObjectWidget::objects_changed);
 }
-#else
-ViewObjectWidget::ViewObjectWidget ()
-  : m_view_objects_dismissed (false),
-    m_needs_update_static (false),
-    m_needs_update_bg (false),
-    mp_active_service (0),
-    m_mouse_pressed_state (false),
-    m_mouse_buttons (0),
-    m_in_mouse_move (false),
-    m_mouse_inside (false),
-    m_cursor (lay::Cursor::none),
-    m_default_cursor (lay::Cursor::none),
-    m_widget_width (500),
-    m_widget_height (500),
-    m_image_updated (false)
-{
-  m_objects.changed ().add (this, &ViewObjectWidget::objects_changed);
-}
-#endif
 
 ViewObjectWidget::~ViewObjectWidget ()
 {

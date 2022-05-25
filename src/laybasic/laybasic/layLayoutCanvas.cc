@@ -274,13 +274,8 @@ invert (unsigned char *data, unsigned int width, unsigned int height)
   }
 }
 
-#if defined(HAVE_QT)
-LayoutCanvas::LayoutCanvas (QWidget *parent, lay::LayoutViewBase *view, const char *name)
-  : lay::ViewObjectWidget (parent, name), 
-#else
 LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
   : lay::ViewObjectWidget (),
-#endif
     mp_view (view),
     mp_image (0), mp_image_bg (0),
     mp_image_fg (0),
@@ -300,6 +295,7 @@ LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
 #if QT_VERSION > 0x050000
   m_dpr = devicePixelRatio ();
 #endif
+  setObjectName (QString::fromUtf8 ("canvas"));
 #endif
 
   //  The gamma value used for subsampling: something between 1.8 and 2.2.

@@ -771,7 +771,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "If a layout is shared between multiple cellviews (which may happen due to a clone of the layout view\n"
     "for example), all cellviews are renamed.\n"
   ) +
-  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const db::LoadLayoutOptions &, const std::string &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("technology"), gsi::arg ("add_cellview"),
+  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const db::LoadLayoutOptions &, const std::string &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("technology"), gsi::arg ("add_cellview", true),
     "@brief Loads a (new) file into the layout view with the given technology\n"
     "\n"
     "Loads the file given by the \"filename\" parameter and associates it with the given technology.\n"
@@ -781,9 +781,9 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "\n"
     "@return The index of the cellview loaded.\n"
     "\n"
-    "This version has been introduced in version 0.22.\n"
+    "This version has been introduced in version 0.22. The 'add_cellview' argument has been made optional in version 0.28.\n"
   ) +
-  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const db::LoadLayoutOptions &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("add_cellview"),
+  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const db::LoadLayoutOptions &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("add_cellview", true),
     "@brief Loads a (new) file into the layout view\n"
     "\n"
     "Loads the file given by the \"filename\" parameter.\n"
@@ -793,9 +793,9 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "\n"
     "@return The index of the cellview loaded.\n"
     "\n"
-    "This method has been introduced in version 0.18.\n"
+    "This method has been introduced in version 0.18. The 'add_cellview' argument has been made optional in version 0.28.\n"
   ) +
-  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const std::string &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("technology"), gsi::arg ("add_cellview"),
+  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const std::string &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("technology"), gsi::arg ("add_cellview", true),
     "@brief Loads a (new) file into the layout view with the given technology\n"
     "\n"
     "Loads the file given by the \"filename\" parameter and associates it with the given technology.\n"
@@ -804,16 +804,16 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "\n"
     "@return The index of the cellview loaded.\n"
     "\n"
-    "This version has been introduced in version 0.22.\n"
+    "This version has been introduced in version 0.22. The 'add_cellview' argument has been made optional in version 0.28.\n"
   ) +
-  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &filename, bool add_cellview)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("add_cellview"),
+  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &filename, bool add_cellview)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("add_cellview", true),
     "@brief Loads a (new) file into the layout view\n"
     "\n"
     "Loads the file given by the \"filename\" parameter.\n"
     "The add_cellview param controls whether to create a new cellview (true)\n"
     "or clear all cellviews before (false).\n"
     "\n"
-    "@return The index of the cellview loaded.\n"
+    "@return The index of the cellview loaded. The 'add_cellview' argument has been made optional in version 0.28.\n"
   ) +
   gsi::method ("active_cellview", static_cast<lay::CellViewRef (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::active_cellview_ref),
     "@brief Gets the active cellview (shown in hierarchy browser)\n"

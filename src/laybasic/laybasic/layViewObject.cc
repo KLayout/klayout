@@ -1146,14 +1146,14 @@ ViewObjectUI::thaw (ViewObject *obj)
 
 #if !defined(HAVE_QT)
 void
-ViewObjectWidget::update ()
+ViewObjectUI::update ()
 {
   //  NOTE: this does not need to be thread-safe as we make sure (as in Qt) that update() is always called from the main thread.
   m_image_updated = true;
 }
 
 bool
-ViewObjectWidget::image_updated ()
+ViewObjectUI::image_updated ()
 {
   bool f = m_image_updated;
   m_image_updated = false;

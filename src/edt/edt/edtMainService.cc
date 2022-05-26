@@ -2158,7 +2158,13 @@ MainService::cm_tap ()
   tl_assert (false); // see TODO
 #endif
 
-  if (! view ()->canvas ()->widget () || view ()->canvas ()->mouse_in_window ()) {
+#if defined(HAVE_QT)
+  if (! view ()->canvas ()->widget ()) {
+    return;
+  }
+#endif
+
+  if (! view ()->canvas ()->mouse_in_window ()) {
     return;
   }
 

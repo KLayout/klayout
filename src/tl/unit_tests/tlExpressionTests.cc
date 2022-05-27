@@ -920,7 +920,7 @@ TEST(8)
   try {
     v = e.parse ("1==1?log('a'):log(2)").execute ();
     EXPECT_EQ (v.to_string (), std::string ("abc"));
-  } catch (tl::EvalError) {
+  } catch (tl::EvalError &) {
     t = true;
   }
   EXPECT_EQ (t, true);
@@ -928,7 +928,7 @@ TEST(8)
   try {
     v = e.parse ("1==2||log('a')").execute ();
     EXPECT_EQ (v.to_string (), std::string ("1"));
-  } catch (tl::EvalError) {
+  } catch (tl::EvalError &) {
     t = true;
   }
   EXPECT_EQ (t, true);
@@ -940,7 +940,7 @@ TEST(8)
   try {
     v = e.parse ("1==1&&log('a')").execute ();
     EXPECT_EQ (v.to_string (), std::string ("false"));
-  } catch (tl::EvalError) {
+  } catch (tl::EvalError &) {
     t = true;
   }
   EXPECT_EQ (t, true);

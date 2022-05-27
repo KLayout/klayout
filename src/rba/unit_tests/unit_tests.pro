@@ -14,4 +14,7 @@ DEPENDPATH += $$RBA_INC $$TL_INC $$DB_INC $$GSI_INC
 
 LIBS += -L$$DESTDIR_UT -lklayout_rba -lklayout_tl -lklayout_db -lklayout_gsi
 
-RESOURCES = unit_tests.qrc \
+!equals(HAVE_QT, "0") {
+  RESOURCES = \
+    unit_tests.qrc
+}

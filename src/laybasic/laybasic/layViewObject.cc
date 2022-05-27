@@ -978,16 +978,16 @@ ViewObjectUI::resize (unsigned int w, unsigned int h)
 {
   m_widget_width = w;
   m_widget_height = h;
-#if defined(HAVE_QT)
 
+#if defined(HAVE_QT)
   if (mp_widget) {
     mp_widget->resize (w, h);
   }
+#endif
 
   //  don't wait until the layout system informs us - which may never take place when
-  //  the widget isn't shown.
+  //  the widget isn't shown. In the non-Qt case we need it anyway here.
   resize_event (w, h);
-#endif
 }
 
 int

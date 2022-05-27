@@ -23,7 +23,9 @@
 #include "tlDeferredExecution.h"
 #include "tlUnitTest.h"
 
-#include <QCoreApplication>
+#if defined(HAVE_QT)
+#  include <QCoreApplication>
+#endif
 
 int g_na = 0;
 int g_nb = 0;

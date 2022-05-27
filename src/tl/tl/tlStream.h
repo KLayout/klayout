@@ -453,7 +453,7 @@ public:
    *  @brief Copies the content of the stream to the output stream
    *  Throws an exception on error.
    */
-  void copy_to(tl::OutputStream &os);
+  void copy_to (tl::OutputStream &os);
 
   /**
    *  @brief Enable uncompression of the following DEFLATE-compressed block
@@ -539,6 +539,11 @@ public:
   {
     return mp_delegate;
   }
+
+  /**
+   *  @brief Swaps two streams
+   */
+  void swap (InputStream &other);
     
 protected:
   void reset_pos ()

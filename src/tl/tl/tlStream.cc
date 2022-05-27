@@ -42,6 +42,7 @@
 #include "tlAssert.h"
 #include "tlFileUtils.h"
 #include "tlLog.h"
+#include "tlResources.h"
 
 #include "tlException.h"
 #include "tlString.h"
@@ -195,7 +196,15 @@ InputStream::InputStream (const std::string &abstract_path)
     }
 
 #else
-    throw tl::Exception (tl::to_string (tr ("Qt not enabled - resource paths are not available")));
+
+    tl::InputStream *stream = tl::get_resource (ex.get ());
+    if (! stream) {
+      throw tl::Exception (tl::to_string (tr ("Resource not found: ")) + abstract_path);
+    }
+
+    swap (*stream);
+    delete stream;
+
 #endif
 
   } else if (ex.test ("pipe:")) {
@@ -229,6 +238,22 @@ InputStream::InputStream (const std::string &abstract_path)
   m_owns_delegate = true;
 }
 
+InputStream::~InputStream ()
+{
+  if (mp_delegate && m_owns_delegate) {
+    delete mp_delegate;
+    mp_delegate = 0;
+  }
+  if (mp_inflate) {
+    delete mp_inflate;
+    mp_inflate = 0;
+  }
+  if (mp_buffer) {
+    delete[] mp_buffer;
+    mp_buffer = 0;
+  }
+}
+
 std::string InputStream::absolute_path (const std::string &abstract_path)
 {
   //  TODO: align this implementation with InputStream ctor
@@ -254,20 +279,17 @@ std::string InputStream::absolute_path (const std::string &abstract_path)
   }
 }
 
-InputStream::~InputStream ()
+void
+InputStream::swap (InputStream &other)
 {
-  if (mp_delegate && m_owns_delegate) {
-    delete mp_delegate;
-    mp_delegate = 0;
-  }
-  if (mp_inflate) {
-    delete mp_inflate;
-    mp_inflate = 0;
-  } 
-  if (mp_buffer) {
-    delete[] mp_buffer;
-    mp_buffer = 0;
-  }
+  std::swap (m_pos, other.m_pos);
+  std::swap (mp_buffer, other.mp_buffer);
+  std::swap (m_bcap, other.m_bcap);
+  std::swap (m_blen, other.m_blen);
+  std::swap (mp_bptr, other.mp_bptr);
+  std::swap (mp_delegate, other.mp_delegate);
+  std::swap (m_owns_delegate, other.m_owns_delegate);
+  std::swap (mp_inflate, other.mp_inflate);
 }
 
 const char * 

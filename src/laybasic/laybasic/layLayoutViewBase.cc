@@ -2549,7 +2549,7 @@ LayoutViewBase::save_screenshot (const std::string &fn)
 
   tl::log << "Saved screen shot to " << fn;
 }
-#else
+#elif defined(HAVE_PNG)
 void
 LayoutViewBase::save_screenshot (const std::string &fn)
 {
@@ -2564,6 +2564,12 @@ LayoutViewBase::save_screenshot (const std::string &fn)
   img.write_png (stream);
 
   tl::log << "Saved screen shot to " << fn;
+}
+#else
+void
+LayoutViewBase::save_screenshot (const std::string &)
+{
+  throw tl::Exception (tl::to_string (tr ("Unable to write screenshot - PNG library not compiled in")));
 }
 #endif
 
@@ -2656,7 +2662,7 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
 
   tl::log << "Saved image to " << fn;
 }
-#else
+#elif defined(HAVE_PNG)
 void
 LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned int height)
 {
@@ -2674,6 +2680,12 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
   img.write_png (stream);
 
   tl::log << "Saved image to " << fn;
+}
+#else
+void
+LayoutViewBase::save_image (const std::string &, unsigned int, unsigned int)
+{
+  throw tl::Exception (tl::to_string (tr ("Unable to save image - PNG library not compiled in")));
 }
 #endif
 
@@ -2708,7 +2720,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
 
   tl::log << "Saved image to " << fn;
 }
-#else
+#elif defined(HAVE_PNG)
 void
 LayoutViewBase::save_image_with_options (const std::string &fn,
                                          unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
@@ -2738,6 +2750,14 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
   }
 
   tl::log << "Saved image to " << fn;
+}
+#else
+void
+LayoutViewBase::save_image_with_options (const std::string &,
+                                         unsigned int, unsigned int, int, int, double,
+                                         lay::Color, lay::Color, lay::Color, const db::DBox &, bool)
+{
+  throw tl::Exception (tl::to_string (tr ("Unable to save image - PNG library not compiled in")));
 }
 #endif
 

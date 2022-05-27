@@ -192,11 +192,6 @@ win32 {
   LIBS += -lexecinfo
 }
 
-# Note: this accounts for UI-generated headers placed into the output folders in
-# shadow builds:
-INCLUDEPATH += $$DESTDIR/laybasic/laybasic
-DEPENDPATH += $$DESTDIR/laybasic/laybasic
-
 INCLUDEPATH += $$QTBASIC_INC
 DEPENDPATH += $$QTBASIC_INC
 

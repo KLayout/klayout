@@ -285,7 +285,7 @@ InputStream::get (size_t n, bool bypass_inflate)
       delete mp_inflate;
       mp_inflate = 0;
     }
-  } 
+  }
 
   if (m_blen < n) {
 
@@ -341,16 +341,36 @@ std::string
 InputStream::read_all (size_t max_count) 
 {
   std::string str;
-  while (max_count > 0) {
-    size_t n = std::min (max_count, std::max (size_t (1), m_blen));
-    const char *b = get (n);
-    if (b) {
-      str += std::string (b, n);
-      max_count -= n;
-    } else {
-      break;
+
+  if (mp_inflate) {
+
+    //  Inflate is special - it does not have a guaranteed byte delivery, so we have to go the
+    //  hard way and pick the file byte by byte
+    while (max_count > 0) {
+      const char *b = get (1);
+      if (b) {
+        str += *b;
+        --max_count;
+      } else {
+        break;
+      }
     }
-  } 
+
+  } else {
+
+    while (max_count > 0) {
+      size_t n = std::min (max_count, std::max (size_t (1), m_blen));
+      const char *b = get (n);
+      if (b) {
+        str += std::string (b, n);
+        max_count -= n;
+      } else {
+        break;
+      }
+    }
+
+  }
+
   return str;
 }
 
@@ -358,15 +378,34 @@ std::string
 InputStream::read_all () 
 {
   std::string str;
-  while (true) {
-    size_t n = std::max (size_t (1), m_blen);
-    const char *b = get (n);
-    if (b) {
-      str += std::string (b, n);
-    } else {
-      break;
+
+  if (mp_inflate) {
+
+    //  Inflate is special - it does not have a guaranteed byte delivery, so we have to go the
+    //  hard way and pick the file byte by byte
+    while (true) {
+      const char *b = get (1);
+      if (b) {
+        str += *b;
+      } else {
+        break;
+      }
     }
-  } 
+
+  } else {
+
+    while (true) {
+      size_t n = std::max (size_t (1), m_blen);
+      const char *b = get (n);
+      if (b) {
+        str += std::string (b, n);
+      } else {
+        break;
+      }
+    }
+
+  }
+
   return str;
 }
 

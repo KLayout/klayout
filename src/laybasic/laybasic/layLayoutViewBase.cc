@@ -3390,7 +3390,7 @@ LayoutViewBase::timer ()
 {
   bool dirty = false;
   for (std::list<lay::CellView>::const_iterator i = m_cellviews.begin (); i != m_cellviews.end () && ! dirty; ++i) {
-    dirty = (*i)->layout ().is_editable () && (*i)->is_dirty ();
+    dirty = (*i).is_valid () && (*i)->layout ().is_editable () && (*i)->is_dirty ();
   }
 
   if (dirty != m_dirty) {

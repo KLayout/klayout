@@ -19,7 +19,7 @@ module LVS
 
   # Installs the home menu entries (needs to be done on autorun, not autorun-early)
 
-  if RBA::Application::instance &amp;&amp; RBA::Application::instance.main_window
+  if RBA.constants.member?(:Application) &amp;&amp; RBA::Application::instance &amp;&amp; RBA::Application::instance.main_window
 
     cat = "lvs"
 

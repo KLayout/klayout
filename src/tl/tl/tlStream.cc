@@ -166,6 +166,8 @@ InputStream::InputStream (const std::string &abstract_path)
   m_blen = 0;
   mp_buffer = 0;
 
+  bool needs_inflate = false;
+
   tl::Extractor ex (abstract_path.c_str ());
 
   if (ex.test (":")) {
@@ -197,13 +199,13 @@ InputStream::InputStream (const std::string &abstract_path)
 
 #else
 
-    tl::InputStream *stream = tl::get_resource (ex.get ());
-    if (! stream) {
+    std::pair<tl::InputStreamBase *, bool> rr = tl::get_resource_reader (ex.get ());
+    if (! rr.first) {
       throw tl::Exception (tl::to_string (tr ("Resource not found: ")) + abstract_path);
     }
 
-    swap (*stream);
-    delete stream;
+    mp_delegate = rr.first;
+    needs_inflate = rr.second;
 
 #endif
 
@@ -236,6 +238,10 @@ InputStream::InputStream (const std::string &abstract_path)
   }
 
   m_owns_delegate = true;
+
+  if (needs_inflate) {
+    inflate ();
+  }
 }
 
 InputStream::~InputStream ()
@@ -277,19 +283,6 @@ std::string InputStream::absolute_path (const std::string &abstract_path)
   } else {
     return tl::absolute_file_path (abstract_path);
   }
-}
-
-void
-InputStream::swap (InputStream &other)
-{
-  std::swap (m_pos, other.m_pos);
-  std::swap (mp_buffer, other.mp_buffer);
-  std::swap (m_bcap, other.m_bcap);
-  std::swap (m_blen, other.m_blen);
-  std::swap (mp_bptr, other.mp_bptr);
-  std::swap (mp_delegate, other.mp_delegate);
-  std::swap (m_owns_delegate, other.m_owns_delegate);
-  std::swap (mp_inflate, other.mp_inflate);
 }
 
 const char * 

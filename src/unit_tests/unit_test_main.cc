@@ -30,6 +30,7 @@
 #include "tlCommandLineParser.h"
 #include "tlFileUtils.h"
 #include "tlGlobPattern.h"
+#include "lymMacroCollection.h"
 #include "rba.h"
 #include "pya.h"
 #include "gsiDecl.h"
@@ -66,9 +67,9 @@
 //  (some in non-Qt case)
 #include "libForceLink.h"
 #include "rdbForceLink.h"
-#if defined(HAVE_RUBY) && defined(HAVE_QT)
-#include "drcForceLink.h"
-#include "lvsForceLink.h"
+#if defined(HAVE_RUBY)
+#  include "drcForceLink.h"
+#  include "lvsForceLink.h"
 #endif
 
 static int main_cont (int &argc, char **argv);
@@ -529,6 +530,13 @@ main_cont (int &argc, char **argv)
 
     python_interpreter.reset (new pya::PythonInterpreter ());
     python_interpreter->push_console (&console);
+
+    lym::MacroCollection &lym_root = lym::MacroCollection::root ();
+    lym_root.add_folder (tl::to_string (tr ("Built-In")), ":/built-in-macros", "macros", true);
+    lym_root.add_folder (tl::to_string (tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
+
+    lym_root.autorun_early ();
+    lym_root.autorun ();
 
 #endif
 

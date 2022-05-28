@@ -540,11 +540,6 @@ public:
     return mp_delegate;
   }
 
-  /**
-   *  @brief Swaps two streams
-   */
-  void swap (InputStream &other);
-    
 protected:
   void reset_pos ()
   {

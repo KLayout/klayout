@@ -59,6 +59,18 @@ LayoutView::timer ()
   }
 }
 
+static tl::weak_ptr<lay::LayoutView> s_current_view;
+
+LayoutView *LayoutView::current ()
+{
+  return s_current_view.get ();
+}
+
+void LayoutView::set_current (LayoutView *view)
+{
+  s_current_view.reset (view);
+}
+
 } // namespace lay
 
 #endif

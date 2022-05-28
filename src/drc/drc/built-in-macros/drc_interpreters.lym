@@ -88,7 +88,7 @@ module DRC
       create_template(":/drc-templates/drc.lym")
 
       # if available, create a menu branch
-      if RBA::Application::instance &amp;&amp; RBA::Application::instance.main_window
+      if RBA.constants.member?(:Application) &amp;&amp; RBA::Application::instance &amp;&amp; RBA::Application::instance.main_window
         mw = RBA::Application::instance.main_window
         mw.menu.insert_menu("tools_menu.verification_group+", "drc", "DRC")
       end
@@ -160,7 +160,7 @@ module DRC
   DRCPlainTextInterpreter::new(drc_recipe)
 
   # Creates a new macro category
-  if RBA::Application::instance 
+  if RBA.constants.member?(:Application) &amp;&amp; RBA::Application::instance 
     RBA::Application::instance.add_macro_category("drc", "DRC", [ "drc" ])
   end
  

@@ -66,6 +66,16 @@ public:
    */
   void timer ();
 
+  /**
+   *  @brief Gets the current view
+   */
+  static LayoutView *current ();
+
+  /**
+   *  @brief Sets the current view
+   */
+  static void set_current (LayoutView *view);
+
 protected:
   /**
    *  @brief Gets the LayoutView interface

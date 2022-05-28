@@ -68,6 +68,24 @@ TL_PUBLIC void unregister_resource (size_t id);
  */
 TL_PUBLIC tl::InputStream *get_resource (const char *name);
 
+/**
+ *  @brief Gets the resource data as a stream reader delegate plus compressed flag
+ *
+ *  @param name The resource name
+ *  @return A pair of reader delegate and a flag indicating whether the stream is compressed.
+ *  If the resource is not found, the reade delegate is 0.
+ *  It is the responsibility of the called to delete the reader delegate.
+ */
+TL_PUBLIC std::pair<tl::InputStreamBase *, bool> get_resource_reader (const char *name);
+
+/**
+ *  @brief Get resource names matching a glob pattern
+ *
+ *  For example, find_resources("/group/*") will find resources below "group".
+ *  "*" also matches "/", so resources from subgroups will be listed too.
+ */
+TL_PUBLIC std::vector<std::string> find_resources (const std::string &pattern);
+
 }
 
 #endif

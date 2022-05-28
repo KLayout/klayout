@@ -66,6 +66,18 @@ Class<lay::LayoutView> decl_LayoutView (decl_LayoutViewBase, "lay", "LayoutView"
     "\n"
     "This event has been introduced in version 0.28."
   ) +
+  gsi::method ("current", &lay::LayoutView::current,
+    "@brief Returns the current view\n"
+    "The current view is the one that is made current by using \\current=.\n"
+    "\n"
+    "This variation has been introduced for the non-Qt case in version 0.28."
+  ) +
+  gsi::method ("current=", &lay::LayoutView::set_current, gsi::arg ("view"),
+    "@brief Sets the current view\n"
+    "See \\current for details.\n"
+    "\n"
+    "This method has been introduced for the non-Qt case in version 0.28."
+  ) +
   gsi::method ("timer", static_cast<void (lay::LayoutView::*) ()> (&lay::LayoutView::timer),
     "@brief A callback required to be called regularily in the non-Qt case.\n"
     "\n"
@@ -84,12 +96,36 @@ Class<lay::LayoutView> decl_LayoutView (decl_LayoutViewBase, "lay", "LayoutView"
   "This object controls these aspects of the view and controls the appearance of the data. "
 );
 
+static lay::CellViewRef get_active_cellview_ref ()
+{
+  lay::LayoutView *view = 0; // @@@ lay::LayoutView::current ();
+  if (! view) {
+    return lay::CellViewRef ();
+  }
+  if (view->active_cellview_index () >= 0) {
+    return view->active_cellview_ref ();
+  } else {
+    return lay::CellViewRef ();
+  }
+}
+
 static lay::LayoutView *get_view (lay::CellViewRef *cv)
 {
   return cv->view ()->ui ();
 }
 
 static ClassExt<lay::CellViewRef> extdecl_CellView (
+  method ("active", &get_active_cellview_ref,
+    "@brief Gets the active CellView\n"
+    "The active CellView is the one that is selected in the current layout view. This method is "
+    "equivalent to\n"
+    "@code\n"
+    "RBA::LayoutView::current.active_cellview\n"
+    "@/code\n"
+    "If no CellView is active, this method returns nil.\n"
+    "\n"
+    "This method has been introduced in version 0.23."
+  ) +
   method_ext ("view", &get_view,
     "@brief Gets the view the cellview resides in\n"
     "This reference will be nil if the cellview is not a valid one.\n"

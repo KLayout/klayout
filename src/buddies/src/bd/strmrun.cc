@@ -83,6 +83,8 @@ BD_PUBLIC int strmrun (int argc, char *argv[])
     python.define_variable (v->first, v->second);
   }
 
+  // @@@ ... add Python and Ruby built-in macro collections, autorun-early and autorun ...
+
   std::string script = tl::absolute_file_path (data.script);
 
   lym::Macro macro;

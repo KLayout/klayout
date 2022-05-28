@@ -11,6 +11,7 @@ RESOURCES = \
 SOURCES = \
   layGridNet.cc \
   layviewForceLink.cc \
+  gsiDeclLayAdditional.cc \
 
 HEADERS = \
   layGridNet.h \

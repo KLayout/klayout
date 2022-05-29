@@ -185,6 +185,7 @@ ApplicationBase::ApplicationBase (bool non_ui_mode)
   : gsi::ObjectBase (),
     m_lyp_map_all_cvs (true), 
     m_lyp_add_default (false),
+    m_run_macro_and_exit (true),
     m_packages_with_dep (false),
     m_write_config_file (false),
     m_gtf_replay_rate (0),
@@ -353,7 +354,18 @@ ApplicationBase::parse_cmd (int &argc, char **argv)
 
     } else if (a == "-r" && (i + 1) < argc) {
 
+      if (! m_run_macro.empty ()) {
+        throw tl::Exception (tl::to_string (QObject::tr ("Option -r or -rr can only be used once")));
+      }
       m_run_macro = args [++i];
+
+    } else if (a == "-rr" && (i + 1) < argc) {
+
+      if (! m_run_macro.empty ()) {
+        throw tl::Exception (tl::to_string (QObject::tr ("Option -r or -rr can only be used once")));
+      }
+      m_run_macro = args [++i];
+      m_run_macro_and_exit = false;
 
     } else if (a == "-rx") {
 
@@ -998,7 +1010,8 @@ ApplicationBase::usage ()
   r += tl::to_string (QObject::tr ("  -nn <tech file>     Technology file (.lyt) to use for next layout(s) on command line")) + "\n";
   r += tl::to_string (QObject::tr ("  -p <plugin>         Load the plugin (can be used multiple times)")) + "\n";
   r += tl::to_string (QObject::tr ("  -r <script>         Execute main script on startup (after having loaded files etc.)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -rm <script>        Execute module on startup (can be used multiple times)")) + "\n";
+  r += tl::to_string (QObject::tr ("  -rr <script>        Like -r, but does not exit after executing the script")) + "\n";
+  r += tl::to_string (QObject::tr ("  -rm <script>        Execute script on startup before loading files (can be used multiple times)")) + "\n";
   r += tl::to_string (QObject::tr ("  -rd <name>=<value>  Specify script variable")) + "\n";
   r += tl::to_string (QObject::tr ("  -rx                 Ignore all implicit macros (*.rbm, rbainit, *.lym)")) + "\n";
   r += tl::to_string (QObject::tr ("  -s                  Load files into same view")) + "\n";
@@ -1247,6 +1260,10 @@ ApplicationBase::run ()
     macro.load_from (m_run_macro);
     macro.set_file_path (m_run_macro);
     result = macro.run ();
+
+    if (result == 0 && ! m_run_macro_and_exit) {
+      result = exec ();
+    }
 
   } else {
     result = exec ();

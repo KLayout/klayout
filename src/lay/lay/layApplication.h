@@ -346,6 +346,7 @@ private:
   bool m_lyp_map_all_cvs, m_lyp_add_default;
   std::string m_session_file;
   std::string m_run_macro;
+  bool m_run_macro_and_exit;
   std::vector<std::pair<std::string, std::string> > m_custom_macro_paths;
   std::vector<std::string> m_load_macros;
   std::vector <std::string> m_package_inst;

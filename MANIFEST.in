@@ -4,6 +4,7 @@ recursive-include src/edt/edt *.cc *.h
 recursive-include src/gsi/gsi *.cc *.h
 recursive-include src/img/img *.cc *.h
 recursive-include src/laybasic/laybasic *.cc *.h
+recursive-include src/layview/layview *.cc *.h
 recursive-include src/lib/lib *.cc *.h
 recursive-include src/lym/lym *.cc *.h
 recursive-include src/pya/pya *.cc *.h

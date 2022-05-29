@@ -106,7 +106,7 @@ equals(HAVE_RUBY, "1") {
 
   layui.depends += laybasic
   layview.depends += layui
-  lay.depends += ant img edt layui
+  lay.depends += ant img edt layui lym
 
   plugins.depends += lay
 

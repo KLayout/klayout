@@ -71,6 +71,11 @@ void LayoutView::set_current (LayoutView *view)
   s_current_view.reset (view);
 }
 
+void LayoutView::set_current ()
+{
+  s_current_view.reset (this);
+}
+
 } // namespace lay
 
 #endif

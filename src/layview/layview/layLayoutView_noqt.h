@@ -67,6 +67,11 @@ public:
   void timer ();
 
   /**
+   *  @brief Makes this view the current one
+   */
+  void set_current ();
+
+  /**
    *  @brief Gets the current view
    */
   static LayoutView *current ();

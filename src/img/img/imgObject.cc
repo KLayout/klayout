@@ -1702,7 +1702,7 @@ Object::read_file ()
   }
 
 #else
-  throw tl::Exception (tl::to_string ("No PNG support compiled in - cannot load PNG files"));
+  throw tl::Exception ("No PNG support compiled in - cannot load PNG files");
 #endif
 }
 

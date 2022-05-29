@@ -54,6 +54,11 @@ namespace lym
   class MacroCollection;
 }
 
+namespace db
+{
+  class Manager;
+}
+
 namespace lay
 {
 
@@ -61,6 +66,7 @@ class MainWindow;
 class Dispatcher;
 class ProgressReporter;
 class ProgressBar;
+class LayoutView;
 
 /**
  *  @brief The application base class
@@ -324,6 +330,7 @@ protected:
 
 private:
   std::vector<std::string> scan_global_modules ();
+  lay::LayoutView *create_view (db::Manager &manager);
 
   enum file_type {
     layout_file,

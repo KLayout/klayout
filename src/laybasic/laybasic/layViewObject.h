@@ -589,6 +589,13 @@ public:
    */
   ~ViewObjectUI ();
 
+#if defined(HAVE_QT)
+  /**
+   *  @brief Initializes the UI components
+   */
+  void init_ui (QWidget *parent);
+#endif
+
   /**
    *  @brief Cancel all drag operations
    */

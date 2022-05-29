@@ -488,7 +488,8 @@ private:
 //  ViewObjectWidget implementation
 
 ViewObjectUI::ViewObjectUI ()
-  : m_view_objects_dismissed (false),
+  : mp_widget (0),
+    m_view_objects_dismissed (false),
     m_needs_update_static (false),
     m_needs_update_bg (false),
     mp_active_service (0),
@@ -502,16 +503,6 @@ ViewObjectUI::ViewObjectUI ()
     m_widget_height (0),
     m_image_updated (false)
 {
-#if defined(HAVE_QT)
-  if (lay::has_gui ()) {
-    mp_widget = new ViewObjectQWidget (this);
-    mp_widget->setMouseTracking (true);
-    mp_widget->setAcceptDrops (true);
-  } else {
-    mp_widget = 0;
-  }
-#endif
-
   m_objects.changed ().add (this, &ViewObjectUI::objects_changed);
 }
 
@@ -526,6 +517,20 @@ ViewObjectUI::~ViewObjectUI ()
     delete m_services.front ();
   }
 }
+
+#if defined(HAVE_QT)
+void
+ViewObjectUI::init_ui (QWidget *parent)
+{
+  //  we rely on the parent to delete the UI widget
+  tl_assert (parent != 0);
+  tl_assert (mp_widget == 0);
+
+  mp_widget = new ViewObjectQWidget (this);
+  mp_widget->setMouseTracking (true);
+  mp_widget->setAcceptDrops (true);
+}
+#endif
 
 void
 ViewObjectUI::register_service (lay::ViewService *svc)

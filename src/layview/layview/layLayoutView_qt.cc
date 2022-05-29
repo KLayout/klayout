@@ -289,7 +289,8 @@ LayoutView::init_ui (QWidget *parent, const char *name)
 
     mp_widget = new LayoutViewFrame (parent, this);
     mp_widget->setObjectName (QString::fromUtf8 (name));
-    canvas ()->widget ()->setParent (mp_widget);
+
+    canvas ()->init_ui (mp_widget);
 
     mp_connector = new LayoutViewSignalConnector (mp_widget, this);
 
@@ -415,6 +416,9 @@ LayoutView::~LayoutView ()
     ms_current = 0;
   }
 
+  //  release all components and plugins before we delete the user interface
+  shutdown ();
+
   if (mp_control_frame) {
     delete mp_control_frame;
   }
@@ -443,6 +447,11 @@ LayoutView::~LayoutView ()
   }
   mp_bookmarks_frame = 0;
   mp_bookmarks_view = 0;
+
+  if (mp_widget) {
+    delete mp_widget;
+    mp_widget = 0;
+  }
 }
 
 void

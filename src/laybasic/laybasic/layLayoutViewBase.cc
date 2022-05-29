@@ -408,7 +408,8 @@ LayoutViewBase::init (db::Manager *mgr)
   create_plugins ();
 }
 
-LayoutViewBase::~LayoutViewBase ()
+void
+LayoutViewBase::shutdown ()
 {
   //  detach all observers
   //  This is to prevent signals to partially destroyed observers that own a LayoutViewBase
@@ -457,10 +458,15 @@ LayoutViewBase::~LayoutViewBase ()
     delete *p;
   }
 
-  //  detach from the manager, so we can safely delete the manager 
+  //  detach from the manager, so we can safely delete the manager
   manager (0);
 
   stop ();
+}
+
+LayoutViewBase::~LayoutViewBase ()
+{
+  shutdown ();
 
   //  because LayoutViewBase and LayoutCanvas both control lifetimes of
   //  ruler objects for example, it is safer to explicitly delete the
@@ -2285,6 +2291,38 @@ LayoutViewBase::bookmark_view (const std::string &name)
   DisplayState state (box (), get_min_hier_levels (), get_max_hier_levels (), cellview_list ());
   m_bookmarks.add (name, state);
   bookmarks_changed ();
+}
+
+bool
+LayoutViewBase::is_single_cv_layer_properties_file (const std::string &fn)
+{
+  //  If the file contains information for a single layout but we have multiple ones,
+  //  show the dialog to determine what layout to apply the information to.
+  std::vector<lay::LayerPropertiesList> props;
+  try {
+    tl::XMLFileSource in (fn);
+    props.push_back (lay::LayerPropertiesList ());
+    props.back ().load (in);
+  } catch (...) {
+    props.clear ();
+    tl::XMLFileSource in (fn);
+    lay::LayerPropertiesList::load (in, props);
+  }
+
+  //  Collect all cv indices in the layer properties
+  std::set <int> cv;
+  for (std::vector<lay::LayerPropertiesList>::const_iterator p = props.begin (); p != props.end (); ++p) {
+    for (lay::LayerPropertiesConstIterator lp = p->begin_const_recursive (); ! lp.at_end (); ++lp) {
+      if (! lp->has_children ()) {
+        cv.insert (lp->source (true).cv_index ());
+        if (cv.size () >= 2) {
+          break;
+        }
+      }
+    }
+  }
+
+  return (cv.size () == 1);
 }
 
 void 

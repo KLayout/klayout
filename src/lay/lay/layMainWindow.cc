@@ -1985,38 +1985,6 @@ MainWindow::load_layer_properties (const std::string &fn, int cv_index, bool all
   }
 }
 
-bool
-MainWindow::is_single_cv_layer_properties_file (const std::string &fn)
-{
-  //  If the file contains information for a single layout but we have multiple ones,
-  //  show the dialog to determine what layout to apply the information to.
-  std::vector<lay::LayerPropertiesList> props;
-  try {
-    tl::XMLFileSource in (fn);
-    props.push_back (lay::LayerPropertiesList ());
-    props.back ().load (in);
-  } catch (...) {
-    props.clear ();
-    tl::XMLFileSource in (fn);
-    lay::LayerPropertiesList::load (in, props);
-  }
-
-  //  Collect all cv indices in the layer properties
-  std::set <int> cv;
-  for (std::vector<lay::LayerPropertiesList>::const_iterator p = props.begin (); p != props.end (); ++p) {
-    for (lay::LayerPropertiesConstIterator lp = p->begin_const_recursive (); ! lp.at_end (); ++lp) {
-      if (! lp->has_children ()) {
-        cv.insert (lp->source (true).cv_index ());
-        if (cv.size () >= 2) {
-          break;
-        }
-      }
-    }
-  }
-
-  return (cv.size () == 1);
-}
-
 void
 MainWindow::cm_save_layer_props ()
 {
@@ -2054,7 +2022,7 @@ MainWindow::load_layer_props_from_file (const std::string &fn)
 
   int target_cv_index = -2;
 
-  if (current_view ()->cellviews () > 1 && is_single_cv_layer_properties_file (fn)) {
+  if (current_view ()->cellviews () > 1 && lay::LayoutView::is_single_cv_layer_properties_file (fn)) {
 
     QStringList items;
     items << QString (QObject::tr ("Take it as it is"));

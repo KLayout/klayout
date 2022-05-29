@@ -800,6 +800,13 @@ public:
   void load_layer_props (const std::string &fn, int cv_index, bool add_default);
 
   /**
+   *  @brief Determine whether a given layer properties file is a single-layout file
+   *
+   *  @return True, if the file contains definitions of a single layout only.
+   */
+  static bool is_single_cv_layer_properties_file (const std::string &fn);
+
+  /**
    *  @brief Bookmark the current view under the given name
    */
   void bookmark_view (const std::string &name);
@@ -2836,6 +2843,7 @@ protected:
   virtual void create_plugins (const lay::PluginDeclaration *except_this = 0);
 
   void free_resources ();
+  void shutdown ();
 
   virtual lay::Color default_background_color ();
   virtual void do_set_background_color (lay::Color color, lay::Color contrast);

@@ -607,6 +607,14 @@ main_cont (int &argc, char **argv)
     tl::set_continue_flag (continue_flag);
     tl::set_debug_mode (debug_mode);
 
+    //  set some global variables
+    if (rba::RubyInterpreter::instance ()) {
+      rba::RubyInterpreter::instance ()->define_variable ("ut_inst_path", tl::get_inst_path ());
+    }
+    if (pya::PythonInterpreter::instance ()) {
+      pya::PythonInterpreter::instance ()->define_variable ("ut_inst_path", tl::get_inst_path ());
+    }
+
     FILE *output_file = 0;
 
     try {

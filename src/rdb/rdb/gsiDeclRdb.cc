@@ -808,16 +808,19 @@ Class<rdb::Item> decl_RdbItem ("rdb", "RdbItem",
     "@brief Sets the tags from a string\n"
     "@param tags A comma-separated list of tags\n"
   ) +
-#if defined(HAVE_QT)
-  gsi::method ("image_str", &rdb::Item::image_str, 
+  gsi::method ("has_image?", &rdb::Item::has_image,
+    "@brief Gets a value indicating that the item has an image attached\n"
+    "See \\image_str how to obtain the image.\n\n"
+    "This method has been introduced in version 0.28.\n"
+  ) +
+  gsi::method ("image_str", &rdb::Item::image_str,
     "@brief Gets the image associated with this item as a string\n"
-    "@return A base64-encoded image file (usually in PNG format)\n"
+    "@return A base64-encoded image file (in PNG format)\n"
   ) +
   gsi::method ("image_str=", &rdb::Item::set_image_str, gsi::arg ("image"),
     "@brief Sets the image from a string\n"
     "@param image A base64-encoded image file (preferably in PNG format)\n"
   ) +
-#endif
   /* Not supported yet:
   gsi::method ("multiplicity", &rdb::Item::multiplicity, 
     "@brief Gets the item's multiplicity\n"

@@ -81,8 +81,8 @@ TL_PUBLIC std::pair<tl::InputStreamBase *, bool> get_resource_reader (const char
 /**
  *  @brief Get resource names matching a glob pattern
  *
- *  For example, find_resources("/group/*") will find resources below "group".
- *  "*" also matches "/", so resources from subgroups will be listed too.
+ *  For example, find_resources("/group*") will find resources whose name start with "group".
+ *  "*" also matches "/"!
  */
 TL_PUBLIC std::vector<std::string> find_resources (const std::string &pattern);
 

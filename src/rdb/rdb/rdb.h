@@ -941,35 +941,37 @@ public:
 
 #if defined(HAVE_QT)
   /**
-   *  @brief Get the image object attached to this item 
+   *  @brief Gets the image object attached to this item
    *
-   *  @return The image object or 0 if no object is attached
+   *  @return The image object or an empty image if no image is attached
    */
-  const QImage *image () const
-  {
-    return mp_image.get ();
-  }
+  const QImage image () const;
 
   /**
-   *  @brief Set an image for this item
-   *
-   *  The image object will become owned by the item
+   *  @brief Set the image for this item
    */
-  void set_image (QImage *image);
+  void set_image (const QImage &image);
+#endif
 
   /**
-   *  @brief Get an image as a string (base64 coded)
+   *  @brief Gets a value indicating whether the item has an image
+   */
+  bool has_image () const;
+
+  /**
+   *  @brief Gets the image as a string (PNG, base64 coded)
+   *
+   *  Note: if neither PNG support for Qt are compiled in, this string will be empty
    */
   std::string image_str () const;
 
   /**
-   *  @brief Get an image from a string (base64 coded)
+   *  @brief Gets the image from a string (PNG, base64 coded)
    *
    *  If the image string is empty, the image will be cleared.
    *  If the image string is not valid, the image will also be cleared.
    */
   void set_image_str (const std::string &s);
-#endif
 
   /**
    *  @brief Get the database reference
@@ -998,9 +1000,7 @@ private:
   bool m_visited;
   std::vector <bool> m_tag_ids;
   Database *mp_database;
-#if defined(HAVE_QT)
-  std::unique_ptr<QImage> mp_image;
-#endif
+  std::string m_image_str;
 
   Item ();
 
@@ -2226,8 +2226,13 @@ public:
   /**
    *  @brief Set the image of an item
    */
-  void set_item_image (const Item *item, QImage *image);
+  void set_item_image (const Item *item, const QImage &image);
 #endif
+
+  /**
+   *  @brief Set the image string of an item
+   */
+  void set_item_image_str (const Item *item, const std::string &image_str);
 
   /**
    *  @brief Set the multiplicity of an item

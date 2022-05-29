@@ -106,9 +106,7 @@ make_rdb_structure (rdb::Database *rdb)
         tl::make_member<std::string, rdb::Item> (&rdb::Item::cell_qname, &rdb::Item::set_cell_qname, "cell") +
         tl::make_member<bool, rdb::Item> (&rdb::Item::visited, &rdb::Item::set_visited, "visited") +
         tl::make_member<size_t, rdb::Item> (&rdb::Item::multiplicity, &rdb::Item::set_multiplicity, "multiplicity") +
-#if defined(HAVE_QT)
         tl::make_member<std::string, rdb::Item> (&rdb::Item::image_str, &rdb::Item::set_image_str, "image") +
-#endif
         tl::make_element<rdb::Values, rdb::Item> (&rdb::Item::values, &rdb::Item::set_values, "values", 
           tl::make_member<rdb::ValueWrapper, rdb::Values::const_iterator, rdb::Values> (&rdb::Values::begin, &rdb::Values::end, &rdb::Values::add, "value", ValueConverter (rdb)) 
         )

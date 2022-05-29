@@ -143,8 +143,39 @@ public:
 // ---------------------------------------------------------------
 //  InputStream implementation
 
+namespace {
+
+/**
+ *  @brief A dummy delegate to provide for the case of raw data stashed inside the stream itself
+ */
+class RawDataDelegate
+  : public InputStreamBase
+{
+public:
+  RawDataDelegate (const std::string &source)
+    : m_source (source)
+  { }
+
+  virtual size_t read (char *, size_t)
+  {
+    return 0;
+  }
+
+  virtual void reset () { }
+  virtual void close () { }
+
+  virtual std::string source () const { return m_source; }
+  virtual std::string absolute_path () const { return m_source; }
+  virtual std::string filename () const { return m_source; }
+
+public:
+  std::string m_source;
+};
+
+}
+
 InputStream::InputStream (InputStreamBase &delegate)
-  : m_pos (0), mp_bptr (0), mp_delegate (&delegate), m_owns_delegate (false), mp_inflate (0)
+  : m_pos (0), mp_bptr (0), mp_delegate (&delegate), m_owns_delegate (false), mp_inflate (0), m_inflate_always (false)
 { 
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
@@ -152,7 +183,7 @@ InputStream::InputStream (InputStreamBase &delegate)
 }
 
 InputStream::InputStream (InputStreamBase *delegate)
-  : m_pos (0), mp_bptr (0), mp_delegate (delegate), m_owns_delegate (true), mp_inflate (0)
+  : m_pos (0), mp_bptr (0), mp_delegate (delegate), m_owns_delegate (true), mp_inflate (0), m_inflate_always (false)
 {
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
@@ -160,7 +191,7 @@ InputStream::InputStream (InputStreamBase *delegate)
 }
 
 InputStream::InputStream (const std::string &abstract_path)
-  : m_pos (0), mp_bptr (0), mp_delegate (0), m_owns_delegate (false), mp_inflate (0)
+  : m_pos (0), mp_bptr (0), mp_delegate (0), m_owns_delegate (false), mp_inflate (0), m_inflate_always (false)
 { 
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
@@ -175,27 +206,29 @@ InputStream::InputStream (const std::string &abstract_path)
 #if defined(HAVE_QT)
 
     QResource res (tl::to_qstring (abstract_path));
-    if (res.size () > 0) {
-
-      QByteArray data;
-#if QT_VERSION >= 0x60000
-        if (res.compressionAlgorithm () == QResource::ZlibCompression) {
-#else
-        if (res.isCompressed ()) {
-#endif
-        data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
-      } else {
-        data = QByteArray ((const char *)res.data (), (int)res.size ());
-      }
-
-      mp_buffer = new char[data.size ()];
-      memcpy (mp_buffer, data.constData (), data.size ());
-
-      mp_bptr = mp_buffer;
-      m_bcap = data.size ();
-      m_blen = m_bcap;
-
+    if (res.size () == 0) {
+      throw tl::Exception (tl::to_string (tr ("Resource not found: ")) + abstract_path);
     }
+
+    QByteArray data;
+#if QT_VERSION >= 0x60000
+      if (res.compressionAlgorithm () == QResource::ZlibCompression) {
+#else
+      if (res.isCompressed ()) {
+#endif
+      data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
+    } else {
+      data = QByteArray ((const char *)res.data (), (int)res.size ());
+    }
+
+    mp_buffer = new char[data.size ()];
+    memcpy (mp_buffer, data.constData (), data.size ());
+
+    mp_bptr = mp_buffer;
+    m_bcap = data.size ();
+    m_blen = m_bcap;
+
+    mp_delegate = new RawDataDelegate (abstract_path);
 
 #else
 
@@ -240,7 +273,7 @@ InputStream::InputStream (const std::string &abstract_path)
   m_owns_delegate = true;
 
   if (needs_inflate) {
-    inflate ();
+    inflate_always ();
   }
 }
 
@@ -442,6 +475,13 @@ InputStream::inflate ()
 }
 
 void
+InputStream::inflate_always ()
+{
+  m_inflate_always = true;
+  reset ();
+}
+
+void
 InputStream::close ()
 {
   if (mp_delegate) {
@@ -468,6 +508,8 @@ InputStream::reset ()
 
   } else {
 
+    tl_assert (mp_delegate != 0);
+
     mp_delegate->reset ();
     m_pos = 0;
 
@@ -480,6 +522,10 @@ InputStream::reset ()
     m_blen = 0;
     mp_buffer = new char [m_bcap];
 
+  }
+
+  if (m_inflate_always) {
+    inflate ();
   }
 }
 

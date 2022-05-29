@@ -467,6 +467,15 @@ public:
   void inflate ();
 
   /**
+   *  @brief Enables "inflate" right from the beginning
+   *
+   *  Contrary to "inflate" (which is temporary), this version enables
+   *  decompression right from the beginning of the file. It does a "reset"
+   *  implicitly.
+   */
+  void inflate_always ();
+
+  /**
    *  @brief Obtain the current file position
    */
   size_t pos () const 
@@ -557,6 +566,7 @@ private:
 
   //  inflate support 
   InflateFilter *mp_inflate;
+  bool m_inflate_always;
 
   //  No copying currently
   InputStream (const InputStream &);

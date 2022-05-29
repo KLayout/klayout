@@ -821,15 +821,7 @@ Item &Item::operator= (const Item &d)
     m_visited = d.m_visited;
     m_multiplicity = d.m_multiplicity;
     m_tag_ids = d.m_tag_ids;
-
-#if defined(HAVE_QT)
-    if (mp_image.get ()) {
-      mp_image.reset (0);
-    }
-    if (d.mp_image.get ()) {
-      mp_image.reset (new QImage (*d.mp_image));
-    }
-#endif
+    m_image_str = d.m_image_str;
   }
 
   return *this;
@@ -952,47 +944,59 @@ Item::set_tag_str (const std::string &tags)
 
 #if defined(HAVE_QT)
 void 
-Item::set_image (QImage *image)
+Item::set_image (const QImage &image)
 {
-  mp_image.reset (image);
-}
+  if (image.isNull ()) {
 
-std::string 
-Item::image_str () const
-{
-  if (! mp_image.get ()) {
-    return std::string ();
+    m_image_str.clear ();
+
   } else {
 
     QByteArray img_data;
     QBuffer img_io_device (&img_data);
-    mp_image->save (&img_io_device, "PNG");
+    image.save (&img_io_device, "PNG");
 
-    return std::string (img_data.toBase64 ().constData ());
+    m_image_str = std::string (img_data.toBase64 ().constData ());
 
   }
 }
 
-void 
-Item::set_image_str (const std::string &s)
+const QImage
+Item::image () const
 {
-  if (s.empty ()) {
-    set_image (0);
+  if (m_image_str.empty ()) {
+
+    return QImage ();
+
   } else {
 
-    QByteArray img_data (QByteArray::fromBase64 (QByteArray::fromRawData (s.c_str (), int (s.size ()))));
+    QByteArray img_data (QByteArray::fromBase64 (QByteArray::fromRawData (m_image_str.c_str (), int (m_image_str.size ()))));
 
-    QImage *image = new QImage ();
-    if (image->loadFromData (img_data)) {
-      set_image (image);
-    } else {
-      delete image;
-      set_image (0);
-    }
+    QImage image;
+    image.loadFromData (img_data);
+    return image;
 
   }
 }
 #endif
+
+bool
+Item::has_image () const
+{
+  return !m_image_str.empty ();
+}
+
+std::string
+Item::image_str () const
+{
+  return m_image_str;
+}
+
+void
+Item::set_image_str (const std::string &s)
+{
+  m_image_str = s;
+}
 
 // ------------------------------------------------------------------------------------------
 //  Database implementation
@@ -1324,12 +1328,19 @@ Database::remove_item_tag (const Item *item, id_type tag)
 
 #if defined(HAVE_QT)
 void 
-Database::set_item_image (const Item *item, QImage *image)
+Database::set_item_image (const Item *item, const QImage &image)
 {
   set_modified ();
   const_cast <Item *> (item)->set_image (image);
 }
 #endif
+
+void
+Database::set_item_image_str (const Item *item, const std::string &image_str)
+{
+  set_modified ();
+  const_cast <Item *> (item)->set_image_str (image_str);
+}
 
 void 
 Database::set_item_multiplicity (const Item *item, size_t n)

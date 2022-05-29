@@ -146,7 +146,7 @@ tl::InputStream *get_resource (const char *name)
   } else {
     auto stream = new tl::InputStream (rr.first);
     if (rr.second) {
-      stream->inflate ();
+      stream->inflate_always ();
     }
     return stream;
   }

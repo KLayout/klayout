@@ -488,8 +488,7 @@ private:
 //  ViewObjectWidget implementation
 
 ViewObjectUI::ViewObjectUI ()
-  : mp_widget (0),
-    m_view_objects_dismissed (false),
+  : m_view_objects_dismissed (false),
     m_needs_update_static (false),
     m_needs_update_bg (false),
     mp_active_service (0),
@@ -504,6 +503,10 @@ ViewObjectUI::ViewObjectUI ()
     m_image_updated (false)
 {
   m_objects.changed ().add (this, &ViewObjectUI::objects_changed);
+
+#if defined(HAVE_QT)
+  mp_widget = 0;
+#endif
 }
 
 ViewObjectUI::~ViewObjectUI ()

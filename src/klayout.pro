@@ -34,7 +34,7 @@ equals(HAVE_RUBY, "1") {
 
 }
 
-LANG_DEPENDS =
+LANG_DEPENDS = 
 MAIN_DEPENDS =
 
 equals(HAVE_RUBY, "1") {
@@ -64,7 +64,6 @@ db.depends += gsi
 rdb.depends += db
 lib.depends += db
 
-buddies.depends += plugins lym $$LANG_DEPENDS
 lym.depends += gsi $$LANG_DEPENDS
 
 laybasic.depends += rdb 
@@ -74,10 +73,10 @@ ant.depends += layview
 img.depends += layview
 edt.depends += layview
 
-plugins.depends += lib rdb db ant
+plugins.depends += lib
 
 equals(HAVE_PYTHON, "1") {
-  pymod.depends += layview ant img edt lym
+  pymod.depends += layview lib ant img edt lym
 }
 
 equals(HAVE_RUBY, "1") {
@@ -107,12 +106,17 @@ equals(HAVE_RUBY, "1") {
 
   layui.depends += laybasic
   layview.depends += layui
-  lay.depends += ant img edt layui
+  lay.depends += ant img edt layui lym
 
   plugins.depends += lay
 
   klayout_main.depends += plugins $$MAIN_DEPENDS
 
+} else {
+
+  plugins.depends += layview ant img edt 
+
 }
 
-unit_tests.depends += plugins $$MAIN_DEPENDS $$LANG_DEPENDS
+buddies.depends += plugins lym $$LANG_DEPENDS
+unit_tests.depends += plugins lym $$MAIN_DEPENDS $$LANG_DEPENDS

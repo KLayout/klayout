@@ -417,7 +417,7 @@ void MacroCollection::scan ()
 
     std::vector<std::string> files = tl::dir_entries (p, true /*with_files*/, false /*with_dirs*/, true /*without_dotfiles*/);
     for (auto f = files.begin (); f != files.end (); ++f) {
-      if (suffixes.find (tl::extension (*f)) != suffixes.end ()) {
+      if (suffixes.find (tl::extension_last (*f)) != suffixes.end ()) {
         create_entry (tl::combine_path (p, *f));
       }
     }

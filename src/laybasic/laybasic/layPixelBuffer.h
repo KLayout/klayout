@@ -20,7 +20,6 @@
 
 */
 
-
 #ifndef HDR_layPixelBuffer
 #define HDR_layPixelBuffer
 

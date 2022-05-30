@@ -32,7 +32,10 @@
 
 #include <QDialog>
 
-#include "ui_SelectCellViewForm.h"
+namespace Ui
+{
+  class SelectCellViewForm;
+}
 
 namespace lay
 {
@@ -41,7 +44,7 @@ class CellView;
 class LayoutViewBase;
 
 class LAYUI_PUBLIC SelectCellViewForm
-  : public QDialog, private Ui::SelectCellViewForm
+  : public QDialog
 {
   Q_OBJECT 
 
@@ -85,6 +88,9 @@ public:
 
 public slots:
   virtual void select_all ();
+
+private:
+  Ui::SelectCellViewForm *mp_ui;
 };
 
 }

@@ -26,16 +26,16 @@
 #define HDR_laySaveLayoutOptionsDialog
 
 #include "layuiCommon.h"
-#include "ui_SaveLayoutOptionsDialog.h"
-#include "ui_SaveLayoutAsOptionsDialog.h"
 #include "dbStream.h"
 #include "dbSaveLayoutOptions.h"
 #include "layStream.h"
 #include "tlStream.h"
 
 #include <string>
+#include <QDialog>
 
 class QScrollArea;
+class QAbstractButton;
 class QWidget;
 
 namespace db
@@ -44,13 +44,19 @@ namespace db
   class Technologies;
 }
 
+namespace Ui
+{
+  class SaveLayoutAsOptionsDialog;
+  class SaveLayoutOptionsDialog;
+};
+
 namespace lay
 {
 
 class LayoutViewBase;
 
 class LAYUI_PUBLIC SaveLayoutAsOptionsDialog
-  : public QDialog, private Ui::SaveLayoutAsOptionsDialog
+  : public QDialog
 {
   Q_OBJECT 
 
@@ -65,6 +71,7 @@ public slots:
   void fmt_cbx_changed (int);
 
 private:
+  Ui::SaveLayoutAsOptionsDialog *mp_ui;
   std::vector< std::pair<StreamWriterOptionsPage *, std::string> > m_pages;
   std::vector<int> m_tab_positions;
   std::string m_filename;
@@ -73,7 +80,7 @@ private:
 };
 
 class LAYUI_PUBLIC SaveLayoutOptionsDialog
-  : public QDialog, private Ui::SaveLayoutOptionsDialog
+  : public QDialog
 {
   Q_OBJECT 
 
@@ -91,6 +98,7 @@ public slots:
   void current_tech_changed (int index);
 
 private:
+  Ui::SaveLayoutOptionsDialog *mp_ui;
   std::vector< std::pair<StreamWriterOptionsPage *, std::string> > m_pages;
   int m_technology_index;
   std::vector<db::SaveLayoutOptions> m_opt_array;

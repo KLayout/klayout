@@ -282,7 +282,7 @@ public:
   /**
    *  @brief Display a status message
    */
-  void message (const std::string &s = "", int timeout = 10);
+  virtual void message (const std::string &s = "", int timeout = 10);
 
   /**
    *  @brief The "dirty" flag indicates that one of the layout has been modified

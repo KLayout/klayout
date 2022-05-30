@@ -2133,6 +2133,22 @@ Layout::replace_cell (cell_index_type target_cell_index, db::Cell *new_cell, boo
   }
 }
 
+void
+Layout::replace_instances_of (cell_index_type src_cell_index, cell_index_type target_cell_index)
+{
+  //  replace all instances of the new cell with the original one
+  std::vector<std::pair<db::cell_index_type, db::Instance> > parents;
+  for (db::Cell::parent_inst_iterator pi = cell (src_cell_index).begin_parent_insts (); ! pi.at_end (); ++pi) {
+    parents.push_back (std::make_pair (pi->parent_cell_index (), pi->child_inst ()));
+  }
+
+  for (std::vector<std::pair<db::cell_index_type, db::Instance> >::const_iterator p = parents.begin (); p != parents.end (); ++p) {
+    db::CellInstArray ia = p->second.cell_inst ();
+    ia.object ().cell_index (target_cell_index);
+    cell (p->first).replace (p->second, ia);
+  }
+}
+
 void 
 Layout::get_pcell_variant_as (pcell_id_type pcell_id, const std::vector<tl::Variant> &p, cell_index_type target_cell_index, ImportLayerMapping *layer_mapping, bool retain_layout)
 {

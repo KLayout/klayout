@@ -35,6 +35,7 @@
 #include "dbClipboard.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbLayoutUtils.h"
+#include "dbPCellDeclaration.h"
 
 #include <QMessageBox>
 #include <QInputDialog>
@@ -487,18 +488,8 @@ LayoutViewFunctions::cm_cell_replace ()
 
         //  replace instances of the target cell with the new cell 
 
-        db::Cell &target_cell = layout.cell (paths.front ().back ());
-
-        std::vector<std::pair<db::cell_index_type, db::Instance> > parents;
-        for (db::Cell::parent_inst_iterator pi = target_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
-          parents.push_back (std::make_pair (pi->parent_cell_index (), pi->child_inst ()));
-        }
-
-        for (std::vector<std::pair<db::cell_index_type, db::Instance> >::const_iterator p = parents.begin (); p != parents.end (); ++p) {
-          db::CellInstArray ia = p->second.cell_inst ();
-          ia.object ().cell_index (with_cell);
-          layout.cell (p->first).replace (p->second, ia);
-        }
+        db::cell_index_type target_cell_index = paths.front ().back ();
+        layout.replace_instances_of (target_cell_index, with_cell);
 
         std::set<db::cell_index_type> cells_to_delete;
         for (std::vector<lay::LayoutView::cell_path_type>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
@@ -1905,21 +1896,73 @@ LayoutViewFunctions::cm_edit_layer ()
   }
 
   const lay::CellView &cv = view ()->cellview (index);
+  db::Layout &layout = cv->layout ();
 
-  db::LayerProperties layer_props = cv->layout ().get_properties ((unsigned int) sel->layer_index ());
+  db::LayerProperties layer_props = layout.get_properties ((unsigned int) sel->layer_index ());
+  db::LayerProperties old_props = layer_props;
 
   lay::NewLayerPropertiesDialog prop_dia (view ());
   if (prop_dia.exec_dialog (cv, layer_props)) {
 
-    for (unsigned int l = 0; l < cv->layout ().layers (); ++l) {
-      if (cv->layout ().is_valid_layer (l) && int (l) != sel->layer_index () && cv->layout ().get_properties (l).log_equal (layer_props)) {
-        throw tl::Exception (tl::to_string (QObject::tr ("A layer with that signature already exists: ")) + layer_props.to_string ());
+    for (unsigned int l = 0; l < layout.layers (); ++l) {
+      if (cv->layout ().is_valid_layer (l) && int (l) != sel->layer_index () && layout.get_properties (l).log_equal (layer_props)) {
+        throw tl::Exception (tl::to_string (tr ("A layer with that signature already exists: ")) + layer_props.to_string ());
       }
     }
 
     view ()->transaction (tl::to_string (QObject::tr ("Edit layer")));
 
     cv->layout ().set_properties (sel->layer_index (), layer_props);
+
+    //  Update all layer parameters for PCells inside the layout
+
+    //  collect PCell variants first
+    std::vector<std::pair<db::cell_index_type, const db::PCellDeclaration *> > pcell_variants;
+    for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+      const db::PCellDeclaration *pcell_decl = layout.pcell_declaration_for_pcell_variant (c->cell_index ());
+      if (pcell_decl) {
+        pcell_variants.push_back (std::make_pair (c->cell_index (), pcell_decl));
+      }
+    }
+
+    //  translate parameters if required
+    std::map<db::cell_index_type, db::cell_index_type> cell_map;
+
+    for (auto c = pcell_variants.begin (); c != pcell_variants.end (); ++c) {
+
+      const std::vector<tl::Variant> &old_param = layout.get_pcell_parameters (c->first);
+      std::vector<tl::Variant> new_param;
+      const std::vector<db::PCellParameterDeclaration> &pd = c->second->parameter_declarations ();
+      auto v = old_param.begin ();
+      auto p = pd.begin ();
+      while (v != old_param.end () && p != pd.end ()) {
+        if (p->get_type () == db::PCellParameterDeclaration::t_layer && v->to_user<db::LayerProperties> ().log_equal (old_props)) {
+          if (new_param.empty ()) {
+            new_param = old_param;
+          }
+          new_param [v - old_param.begin ()] = tl::Variant (layer_props);
+        }
+        ++v, ++p;
+      }
+
+      if (! new_param.empty ()) {
+        db::cell_index_type new_cell = layout.get_pcell_variant_cell (c->first, new_param);
+        cell_map[c->first] = new_cell;
+      }
+
+    }
+
+    //  change instances
+    {
+      db::LayoutLocker locker (&layout);
+      for (auto c = cell_map.begin (); c != cell_map.end (); ++c) {
+        layout.replace_instances_of (c->first, c->second);
+      }
+    }
+
+    layout.cleanup ();
+
+    //  Adjust view
 
     lay::LayerProperties lp (*sel);
     lay::ParsedLayerSource s = lp.source (false);

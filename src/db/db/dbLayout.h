@@ -1132,6 +1132,11 @@ public:
   void replace_cell (cell_index_type target_cell_index, db::Cell *new_cell, bool retain_layout);
 
   /**
+   *  @brief Replaces all instances of src_cell_index by target_cell_index
+   */
+  void replace_instances_of (cell_index_type src_cell_index, cell_index_type target_cell_index);
+
+  /**
    *  @brief Delete a cell plus the subcells not used otherwise
    *
    *  All subcells referenced directly or indirectly but not used otherwise

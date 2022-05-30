@@ -1925,7 +1925,7 @@ RedrawThreadWorker::draw_layer (int from_level, int to_level, db::cell_index_typ
     if ((dbbox.width () < 2.5 && dbbox.height () < 1.5) || 
         (dbbox.width () < 1.5 && dbbox.height () < 2.5)) {
 
-      if (bbox.overlaps (vp)) {
+      if (bbox.touches (vp)) {
 
         bool anything = true;
         if (level == 0) {

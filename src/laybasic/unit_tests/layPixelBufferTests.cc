@@ -38,7 +38,7 @@ static bool compare_images (const QImage &qimg, const std::string &au)
   if (qimg2.width () == (int) qimg.width () && qimg2.height () == (int) qimg.height ()) {
     for (int j = 0; j < qimg.height (); ++j) {
       for (int i = 0; i < qimg.width (); ++i) {
-        if (((const lay::color_t *) qimg.scanLine (j))[i] != ((const lay::color_t *) qimg2.scanLine (j))[i]) {
+        if (((const tl::color_t *) qimg.scanLine (j))[i] != ((const tl::color_t *) qimg2.scanLine (j))[i]) {
           return false;
         }
       }
@@ -87,7 +87,7 @@ TEST(1)
   lay::PixelBuffer img (15, 25);
   EXPECT_EQ (img.width (), 15);
   EXPECT_EQ (img.height (), 25);
-  EXPECT_EQ (img.stride (), 15 * sizeof (lay::color_t));
+  EXPECT_EQ (img.stride (), 15 * sizeof (tl::color_t));
 
   EXPECT_EQ (img.transparent (), false);
   img.set_transparent (true);
@@ -159,11 +159,11 @@ TEST(1)
   EXPECT_EQ (img4.scan_line (5)[8], 0xff102030);
 
   //  other constructors
-  EXPECT_EQ (compare_images (lay::PixelBuffer (img4.width (), img4.height (), (const lay::color_t *) img4.data ()), img4), true);
-  EXPECT_EQ (compare_images (lay::PixelBuffer (img4.width (), img4.height (), (const lay::color_t *) img4.data (), img4.stride ()), img4), true);
+  EXPECT_EQ (compare_images (lay::PixelBuffer (img4.width (), img4.height (), (const tl::color_t *) img4.data ()), img4), true);
+  EXPECT_EQ (compare_images (lay::PixelBuffer (img4.width (), img4.height (), (const tl::color_t *) img4.data (), img4.stride ()), img4), true);
 
-  lay::color_t *dnew = new lay::color_t [ img4.width () * img4.height () * sizeof (lay::color_t) ];
-  memcpy (dnew, (const lay::color_t *) img4.data (), img4.width () * img4.height () * sizeof (lay::color_t));
+  tl::color_t *dnew = new tl::color_t [ img4.width () * img4.height () * sizeof (tl::color_t) ];
+  memcpy (dnew, (const tl::color_t *) img4.data (), img4.width () * img4.height () * sizeof (tl::color_t));
   EXPECT_EQ (compare_images (lay::PixelBuffer (img4.width (), img4.height (), dnew), img4), true);
 }
 

@@ -24,7 +24,7 @@
 #define HDR_layPixelBuffer
 
 #include "laybasicCommon.h"
-#include "layColor.h"
+#include "tlColor.h"
 #include "tlCopyOnWrite.h"
 #include "tlStream.h"
 #include "tlException.h"
@@ -65,7 +65,7 @@ public:
  *  @brief An 32bit RGB/RGBA image class
  *
  *  This class substitutes QImage in Qt-less applications.
- *  It provides 32bit RGBA pixels with the format used by lay::Color.
+ *  It provides 32bit RGBA pixels with the format used by tl::Color.
  */
 class LAYBASIC_PUBLIC PixelBuffer
 {
@@ -78,7 +78,7 @@ public:
    *
    *  The size of the data block needs to be w*h elements.
    */
-  PixelBuffer (unsigned int w, unsigned int h, lay::color_t *data);
+  PixelBuffer (unsigned int w, unsigned int h, tl::color_t *data);
 
   /**
    *  @brief Creates an image with the given height and width
@@ -88,7 +88,7 @@ public:
    *  "stride" specifies the stride (distance between two rows of data).
    *  The size of the data block needs to be stride*h elements or w*h if stride is not given.
    */
-  PixelBuffer (unsigned int w, unsigned int h, const lay::color_t *data = 0, unsigned int stride = 0);
+  PixelBuffer (unsigned int w, unsigned int h, const tl::color_t *data = 0, unsigned int stride = 0);
 
   /**
    *  @brief Default constructor
@@ -172,33 +172,33 @@ public:
    */
   unsigned int stride () const
   {
-    return sizeof (lay::color_t) * m_width;
+    return sizeof (tl::color_t) * m_width;
   }
 
   /**
    *  @brief Fills the image with the given color
    */
-  void fill (lay::color_t);
+  void fill (tl::color_t);
 
   /**
    *  @brief Gets the scanline for row n
    */
-  color_t *scan_line (unsigned int n);
+  tl::color_t *scan_line (unsigned int n);
 
   /**
    *  @brief Gets the scanline for row n (const version)
    */
-  const color_t *scan_line (unsigned int n) const;
+  const tl::color_t *scan_line (unsigned int n) const;
 
   /**
    *  @brief Gets the data pointer
    */
-  color_t *data ();
+  tl::color_t *data ();
 
   /**
    *  @brief Gets the data pointer (const version)
    */
-  const color_t *data () const;
+  const tl::color_t *data () const;
 
 #if defined(HAVE_QT)
   /**
@@ -287,7 +287,7 @@ private:
       //  .. nothing yet ..
     }
 
-    ImageData (lay::color_t *data, size_t length)
+    ImageData (tl::color_t *data, size_t length)
       : mp_data (data), m_length (length)
     {
       //  .. nothing yet ..
@@ -296,8 +296,8 @@ private:
     ImageData (const ImageData &other)
     {
       m_length = other.length ();
-      mp_data = new lay::color_t [other.length ()];
-      memcpy (mp_data, other.data (), m_length * sizeof (lay::color_t));
+      mp_data = new tl::color_t [other.length ()];
+      memcpy (mp_data, other.data (), m_length * sizeof (tl::color_t));
     }
 
     ~ImageData ()
@@ -307,11 +307,11 @@ private:
     }
 
     size_t length () const { return m_length; }
-    lay::color_t *data () { return mp_data; }
-    const lay::color_t *data () const { return mp_data; }
+    tl::color_t *data () { return mp_data; }
+    const tl::color_t *data () const { return mp_data; }
 
   private:
-    lay::color_t *mp_data;
+    tl::color_t *mp_data;
     size_t m_length;
 
     ImageData &operator= (const ImageData &other);

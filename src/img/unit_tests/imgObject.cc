@@ -101,8 +101,8 @@ TEST(1)
   dm.red_gain = 1.25;
   dm.green_gain = 0.75;
   dm.blue_gain = 2.5;
-  lay::Color c (128, 255, 64);
-  lay::Color c2 (64, 32, 192);
+  tl::Color c (128, 255, 64);
+  tl::Color c2 (64, 32, 192);
   dm.false_color_nodes.insert (dm.false_color_nodes.begin () + 1, std::make_pair (0.5, std::make_pair (c, c)));
   image.set_data_mapping (dm);
   EXPECT_EQ (copy1.equals (&image), false);
@@ -226,7 +226,7 @@ TEST(2)
     dm.red_gain = 1.25;
     dm.green_gain = 0.75;
     dm.blue_gain = 2.5;
-    lay::Color c (128, 255, 64);
+    tl::Color c (128, 255, 64);
     dm.false_color_nodes.insert (dm.false_color_nodes.begin () + 1, std::make_pair (0.5, std::make_pair (c, c)));
     image.set_data_mapping (dm);
     EXPECT_EQ (copy1.equals (&image), false);

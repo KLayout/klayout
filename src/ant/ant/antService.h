@@ -389,7 +389,7 @@ public:
   /**
    *  @brief Color accessor
    */
-  lay::Color color () const
+  tl::Color color () const
   {
     return m_color;
   }
@@ -500,7 +500,7 @@ public:
 
 private:
   //  Ruler display and snapping configuration
-  lay::Color m_color;
+  tl::Color m_color;
   bool m_halo;
   lay::angle_constraint_type m_snap_mode;
   double m_grid;
@@ -601,7 +601,7 @@ private:
   /**
    *  @brief implementation of the "Drawing" interface: configuration
    */
-  std::vector <lay::ViewOp> get_view_ops (lay::RedrawThreadCanvas &canvas, lay::Color background, lay::Color foreground, lay::Color active) const;
+  std::vector <lay::ViewOp> get_view_ops (lay::RedrawThreadCanvas &canvas, tl::Color background, tl::Color foreground, tl::Color active) const;
 
   /**
    *  @brief Update m_rulers to reflect the selection

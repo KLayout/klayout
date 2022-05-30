@@ -24,7 +24,7 @@
 #include "layPlugin.h"
 #include "layConverters.h"
 #include "layDispatcher.h"
-#include "layColor.h"
+#include "tlColor.h"
 #if defined(HAVE_QT)
 #  include "layConfigurationDialog.h"
 #  include "layAbstractMenu.h"
@@ -67,7 +67,7 @@ PluginDeclaration::get_options (std::vector < std::pair<std::string, std::string
 {
   options.push_back (std::pair<std::string, std::string> (cfg_max_number_of_rulers, "-1"));
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_snap_range, "8"));
-  options.push_back (std::pair<std::string, std::string> (cfg_ruler_color, lay::ColorConverter ().to_string (lay::Color ())));
+  options.push_back (std::pair<std::string, std::string> (cfg_ruler_color, lay::ColorConverter ().to_string (tl::Color ())));
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_halo, "true"));
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_snap_mode, ACConverter ().to_string (lay::AC_Any)));
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_obj_snap, tl::to_string (true)));

@@ -643,9 +643,9 @@ LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, l
   h = std::max ((unsigned int) 16, h);
   w = std::max ((unsigned int) 16, w);
 
-  lay::color_t def_color   = 0x808080;
-  lay::color_t fill_color  = iter->has_fill_color (true)  ? iter->eff_fill_color (true)  : def_color;
-  lay::color_t frame_color = iter->has_frame_color (true) ? iter->eff_frame_color (true) : def_color;
+  tl::color_t def_color   = 0x808080;
+  tl::color_t fill_color  = iter->has_fill_color (true)  ? iter->eff_fill_color (true)  : def_color;
+  tl::color_t frame_color = iter->has_frame_color (true) ? iter->eff_frame_color (true) : def_color;
 
   lay::PixelBuffer image (w, h);
   image.set_transparent (true);

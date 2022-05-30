@@ -291,7 +291,7 @@ LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
     m_do_end_of_drawing_dm (this, &LayoutCanvas::do_end_of_drawing),
     m_image_cache_size (1)
 {
-  lay::Color bg (0xffffffff), fg (0xff000000), active (0xffc0c0c0);
+  tl::Color bg (0xffffffff), fg (0xff000000), active (0xffc0c0c0);
 
 #if defined(HAVE_QT)
   if (widget ()) {
@@ -303,9 +303,9 @@ LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
     widget ()->setObjectName (QString::fromUtf8 ("canvas"));
     widget ()->setBackgroundRole (QPalette::NoRole);
 
-    bg = lay::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Window).rgb ());
-    fg = lay::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Text).rgb ());
-    active = lay::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Mid).rgb ());
+    bg = tl::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Window).rgb ());
+    fg = tl::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Text).rgb ());
+    active = tl::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Mid).rgb ());
 
     widget ()->setAttribute (Qt::WA_NoSystemBackground);
 
@@ -393,7 +393,7 @@ LayoutCanvas::set_oversampling (unsigned int os)
 }
 
 void 
-LayoutCanvas::set_colors (lay::Color background, lay::Color foreground, lay::Color active)
+LayoutCanvas::set_colors (tl::Color background, tl::Color foreground, tl::Color active)
 {
   m_background = background.rgb ();
   m_foreground = foreground.rgb ();
@@ -712,7 +712,7 @@ class DetachedViewObjectCanvas
   : public BitmapViewObjectCanvas
 {
 public:
-  DetachedViewObjectCanvas (lay::Color bg, lay::Color fg, lay::Color ac, unsigned int width_l, unsigned int height_l, double resolution, lay::PixelBuffer *img)
+  DetachedViewObjectCanvas (tl::Color bg, tl::Color fg, tl::Color ac, unsigned int width_l, unsigned int height_l, double resolution, lay::PixelBuffer *img)
     : BitmapViewObjectCanvas (width_l, height_l, resolution),
       m_bg (bg), m_fg (fg), m_ac (ac), mp_image (img)
   {
@@ -738,17 +738,17 @@ public:
     }
   }
 
-  lay::Color background_color () const
+  tl::Color background_color () const
   {
     return m_bg;
   }
 
-  lay::Color foreground_color () const
+  tl::Color foreground_color () const
   {
     return m_fg;
   }
 
-  lay::Color active_color () const
+  tl::Color active_color () const
   {
     return m_ac;
   }
@@ -780,7 +780,7 @@ public:
   }
 
 private:
-  lay::Color m_bg, m_fg, m_ac;
+  tl::Color m_bg, m_fg, m_ac;
   lay::PixelBuffer *mp_image;
   lay::PixelBuffer *mp_image_l;
   double m_gamma;
@@ -809,17 +809,17 @@ public:
     clear_fg_bitmaps ();
   }
 
-  lay::Color background_color () const
+  tl::Color background_color () const
   {
     return m_bg ? 0xffffffff : 0;
   }
 
-  lay::Color foreground_color () const
+  tl::Color foreground_color () const
   {
     return m_fg ? 0xffffffff : 0;
   }
 
-  lay::Color active_color () const
+  tl::Color active_color () const
   {
     return m_ac ? 0xffffffff : 0;
   }
@@ -831,11 +831,11 @@ private:
 lay::PixelBuffer
 LayoutCanvas::image (unsigned int width, unsigned int height) 
 {
-  return image_with_options (width, height, -1, -1, -1.0, lay::Color (), lay::Color (), lay::Color (), db::DBox ());
+  return image_with_options (width, height, -1, -1, -1.0, tl::Color (), tl::Color (), tl::Color (), db::DBox ());
 }
 
 lay::PixelBuffer
-LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box)
+LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box)
 {
   if (oversampling <= 0) {
     oversampling = m_oversampling;
@@ -911,7 +911,7 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
 }
 
 lay::BitmapBuffer
-LayoutCanvas::image_with_options_mono (unsigned int width, unsigned int height, int linewidth, lay::Color background_c, lay::Color foreground_c, lay::Color active_c, const db::DBox &target_box)
+LayoutCanvas::image_with_options_mono (unsigned int width, unsigned int height, int linewidth, tl::Color background_c, tl::Color foreground_c, tl::Color active_c, const db::DBox &target_box)
 {
   if (linewidth <= 0) {
     linewidth = 1;

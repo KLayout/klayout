@@ -10,7 +10,6 @@ SOURCES = \
   layAnnotationShapes.cc \
   layBitmap.cc \
   layBitmapsToImage.cc \
-  layColorTests.cc \
   layLayerProperties.cc \
   layParsedLayerSource.cc \
   layPixelBufferTests.cc \

@@ -1230,7 +1230,7 @@ PartialService::clear_partial_transient_selection ()
 }
 
 void 
-PartialService::set_colors (lay::Color /*background*/, lay::Color color)
+PartialService::set_colors (tl::Color /*background*/, tl::Color color)
 {
   m_color = color.rgb ();
   if (mp_box) {

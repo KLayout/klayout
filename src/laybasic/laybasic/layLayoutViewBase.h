@@ -123,7 +123,7 @@ struct LAYBASIC_PUBLIC LayerDisplayProperties
    *  The effective frame color is computed from the frame color brightness and the
    *  frame color.
    */
-  color_t eff_frame_color () const;
+  tl::color_t eff_frame_color () const;
 
   /**
    *  @brief render the effective frame color
@@ -131,11 +131,11 @@ struct LAYBASIC_PUBLIC LayerDisplayProperties
    *  The effective frame color is computed from the frame color brightness and the
    *  frame color.
    */
-  color_t eff_fill_color () const;
+  tl::color_t eff_fill_color () const;
 
   //  display styles
-  color_t frame_color;
-  color_t fill_color;
+  tl::color_t frame_color;
+  tl::color_t fill_color;
   int frame_brightness;
   int fill_brightness;
   unsigned int dither_pattern;
@@ -855,13 +855,13 @@ public:
    *  @param linewidth The width of a line in pixels (usually 1) or 0 for default
    *  @param oversampling The oversampling factor (1..3) or 0 for default
    *  @param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default
-   *  @param background The background color or lay::Color() for default
-   *  @param foreground The foreground color or lay::Color() for default
-   *  @param active The active color or lay::Color() for default
+   *  @param background The background color or tl::Color() for default
+   *  @param foreground The foreground color or tl::Color() for default
+   *  @param active The active color or tl::Color() for default
    *  @param target_box The box to draw or db::DBox() for default
    *  @param monochrome If true, monochrome images will be produced
    */
-  void save_image_with_options (const std::string &fn, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, Color background, Color foreground, Color active_color, const db::DBox &target_box, bool monochrome);
+  void save_image_with_options (const std::string &fn, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box, bool monochrome);
 
 #if defined(HAVE_QT)
   /**
@@ -884,13 +884,13 @@ public:
    *  @param linewidth The width of a line in pixels (usually 1) or 0 for default
    *  @param oversampling The oversampling factor (1..3) or 0 for default
    *  @param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default
-   *  @param background The background color or lay::Color() for default
-   *  @param foreground The foreground color or lay::Color() for default
-   *  @param active The active color or lay::Color() for default
+   *  @param background The background color or tl::Color() for default
+   *  @param foreground The foreground color or tl::Color() for default
+   *  @param active The active color or tl::Color() for default
    *  @param target_box The box to draw or db::DBox() for default
    *  @param monochrome If true, monochrome images will be produced
    */
-  QImage get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, lay::Color background, lay::Color foreground, lay::Color active_color, const db::DBox &target_box, bool monochrome);
+  QImage get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box, bool monochrome);
 #endif
 
   /**
@@ -901,12 +901,12 @@ public:
    *  @param linewidth The width of a line in pixels (usually 1) or 0 for default
    *  @param oversampling The oversampling factor (1..3) or 0 for default
    *  @param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default
-   *  @param background The background color or lay::Color() for default
-   *  @param foreground The foreground color or lay::Color() for default
-   *  @param active The active color or lay::Color() for default
+   *  @param background The background color or tl::Color() for default
+   *  @param foreground The foreground color or tl::Color() for default
+   *  @param active The active color or tl::Color() for default
    *  @param target_box The box to draw or db::DBox() for default
    */
-  lay::PixelBuffer get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, lay::Color background, lay::Color foreground, lay::Color active_color, const db::DBox &target_box);
+  lay::PixelBuffer get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
 
   /**
    *  @brief Get the screen content as a monochrome lay::BitmapBuffer object with the given options
@@ -916,14 +916,14 @@ public:
    *  @param linewidth The width of a line in pixels (usually 1) or 0 for default
    *  @param oversampling The oversampling factor (1..3) or 0 for default
    *  @param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default
-   *  @param background The background color or lay::Color() for default
-   *  @param foreground The foreground color or lay::Color() for default
-   *  @param active The active color or lay::Color() for default
+   *  @param background The background color or tl::Color() for default
+   *  @param foreground The foreground color or tl::Color() for default
+   *  @param active The active color or tl::Color() for default
    *  @param target_box The box to draw or db::DBox() for default
    *
    *  The colors will are converted to "on" pixels with a green channel value >= 50%.
    */
-  lay::BitmapBuffer get_pixels_with_options_mono (unsigned int width, unsigned int height, int linewidth, lay::Color background, lay::Color foreground, lay::Color active_color, const db::DBox &target_box);
+  lay::BitmapBuffer get_pixels_with_options_mono (unsigned int width, unsigned int height, int linewidth, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
 
   /**
    *  @brief Hierarchy level selection setter
@@ -980,12 +980,12 @@ public:
   /**
    *  @brief Cell box/label color setter
    */
-  void cell_box_color (lay::Color c);
+  void cell_box_color (tl::Color c);
 
   /**
    *  @brief Cell box/label getter
    */
-  lay::Color cell_box_color () const
+  tl::Color cell_box_color () const
   {
     return m_box_color;
   }
@@ -1178,12 +1178,12 @@ public:
   /**
    *  @brief Text object color
    */
-  void text_color (lay::Color c);
+  void text_color (tl::Color c);
 
   /**
    *  @brief Text object color
    */
-  lay::Color text_color () const
+  tl::Color text_color () const
   {
     return m_text_color;
   }
@@ -1697,7 +1697,7 @@ public:
   /**
    *  @brief Background color property
    */
-  lay::Color background_color () const
+  tl::Color background_color () const
   {
     return mp_canvas->background_color ();
   }
@@ -1705,7 +1705,7 @@ public:
   /**
    *  @brief Foreground color property
    */
-  lay::Color foreground_color () const
+  tl::Color foreground_color () const
   {
     return mp_canvas->foreground_color ();
   }
@@ -1713,7 +1713,7 @@ public:
   /**
    *  @brief Active color property
    */
-  lay::Color active_color () const
+  tl::Color active_color () const
   {
     return mp_canvas->active_color ();
   }
@@ -1773,7 +1773,7 @@ public:
   /**
    *  @brief Gets the guiding shapes color
    */
-  lay::Color guiding_shapes_color () const
+  tl::Color guiding_shapes_color () const
   {
     return m_guiding_shape_color;
   }
@@ -1781,7 +1781,7 @@ public:
   /**
    *  @brief Sets the guiding shapes color
    */
-  void guiding_shapes_color (lay::Color c);
+  void guiding_shapes_color (tl::Color c);
 
   /**
    *  @brief Gets the guiding shapes line width
@@ -2205,7 +2205,7 @@ public:
   /**
    *  @brief Get the default color for markers
    */
-  lay::Color default_marker_color () const
+  tl::Color default_marker_color () const
   {
     return m_marker_color;
   }
@@ -2687,15 +2687,15 @@ private:
   int m_paste_display_mode;
   int m_wheel_mode;
   bool m_guiding_shape_visible;
-  lay::Color m_guiding_shape_color;
+  tl::Color m_guiding_shape_color;
   int m_guiding_shape_line_width;
   int m_guiding_shape_vertex_size;
 
-  lay::Color m_ctx_color;
+  tl::Color m_ctx_color;
   int m_ctx_dimming;
   bool m_ctx_hollow;
 
-  lay::Color m_child_ctx_color;
+  tl::Color m_child_ctx_color;
   int m_child_ctx_dimming;
   bool m_child_ctx_hollow;
   bool m_child_ctx_enabled;
@@ -2703,13 +2703,13 @@ private:
   double m_abstract_mode_width;
   bool m_abstract_mode_enabled;
 
-  lay::Color m_box_color;
+  tl::Color m_box_color;
   bool m_box_text_transform;
   unsigned int m_box_font;
   int m_min_size_for_label;
   bool m_cell_box_visible;
 
-  lay::Color m_marker_color;
+  tl::Color m_marker_color;
   int m_marker_line_width;
   int m_marker_vertex_size;
   int m_marker_dither_pattern;
@@ -2727,7 +2727,7 @@ private:
   bool m_text_lazy_rendering;
   bool m_bitmap_caching;
   bool m_show_properties;
-  lay::Color m_text_color;
+  tl::Color m_text_color;
   bool m_apply_text_trans;
   double m_default_text_size;
   unsigned int m_text_font;
@@ -2797,11 +2797,11 @@ private:
   void do_redraw ();
 
   void set_view_ops ();
-  void background_color (lay::Color c);
-  void ctx_color (lay::Color c);
+  void background_color (tl::Color c);
+  void ctx_color (tl::Color c);
   void ctx_dimming (int percent);
   void ctx_hollow (bool h);
-  void child_ctx_color (lay::Color c);
+  void child_ctx_color (tl::Color c);
   void child_ctx_dimming (int percent);
   void child_ctx_hollow (bool h);
   void child_ctx_enabled (bool e);
@@ -2845,8 +2845,8 @@ protected:
   void free_resources ();
   void shutdown ();
 
-  virtual lay::Color default_background_color ();
-  virtual void do_set_background_color (lay::Color color, lay::Color contrast);
+  virtual tl::Color default_background_color ();
+  virtual void do_set_background_color (tl::Color color, tl::Color contrast);
   virtual void do_paste ();
   virtual void begin_layer_updates ();
   virtual void end_layer_updates ();

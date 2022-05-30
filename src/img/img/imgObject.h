@@ -33,7 +33,7 @@
 #include "dbMatrix.h"
 #include "dbPolygon.h"
 #include "tlDataMapping.h"
-#include "layColor.h"
+#include "tlColor.h"
 
 #include <string>
 #include <vector>
@@ -50,7 +50,7 @@ class DataHeader;
 struct IMG_PUBLIC DataMapping
 {
 public:
-  typedef std::vector< std::pair<double, std::pair<lay::Color, lay::Color> > > false_color_nodes_type;
+  typedef std::vector< std::pair<double, std::pair<tl::Color, tl::Color> > > false_color_nodes_type;
 
   /**
    *  @brief The constructor
@@ -140,7 +140,7 @@ public:
 /**
  *  @brief A helper function to interpolate a color in the color bar at a given x
  */
-lay::Color interpolated_color (const DataMapping::false_color_nodes_type &nodes, double x);
+tl::Color interpolated_color (const DataMapping::false_color_nodes_type &nodes, double x);
 
 /**
  *  @brief A image object
@@ -883,7 +883,7 @@ public:
   /**
    *  @brief Get the RGB pixel data sets obtained by applying the LUT's
    */
-  const lay::color_t *pixel_data () const
+  const tl::color_t *pixel_data () const
   {
     validate_pixel_data ();
     return mp_pixel_data;
@@ -974,7 +974,7 @@ private:
   bool m_min_value_set, m_max_value_set;
   DataMapping m_data_mapping;
   bool m_visible;
-  mutable const lay::color_t *mp_pixel_data;
+  mutable const tl::color_t *mp_pixel_data;
   std::vector <db::DPoint> m_landmarks;
   int m_z_position;
   bool m_updates_enabled;

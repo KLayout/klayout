@@ -54,7 +54,7 @@ ZoomService::drag_cancel ()
 }
 
 void 
-ZoomService::set_colors (lay::Color /*background*/, lay::Color color)
+ZoomService::set_colors (tl::Color /*background*/, tl::Color color)
 {
   m_color = color.rgb ();
   if (mp_box) {

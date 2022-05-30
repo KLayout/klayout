@@ -31,7 +31,7 @@
 #include "layViewOp.h"
 #include "layViewObject.h"
 #include "layBitmap.h"
-#include "layColor.h"
+#include "tlColor.h"
 #include "layDrawing.h"
 #include "layDitherPattern.h"
 #include "layLineStyles.h"
@@ -143,7 +143,7 @@ public:
   LayoutCanvas (lay::LayoutViewBase *view);
   ~LayoutCanvas ();
 
-  void set_colors (lay::Color background, lay::Color foreground, lay::Color active);
+  void set_colors (tl::Color background, tl::Color foreground, tl::Color active);
 
   /**
    *  @brief Set the view ops for the layers
@@ -166,8 +166,8 @@ public:
 
   lay::PixelBuffer screenshot ();
   lay::PixelBuffer image (unsigned int width, unsigned int height);
-  lay::PixelBuffer image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, lay::Color background, lay::Color foreground, lay::Color active_color, const db::DBox &target_box);
-  lay::BitmapBuffer image_with_options_mono (unsigned int width, unsigned int height, int linewidth, lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box);
+  lay::PixelBuffer image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
+  lay::BitmapBuffer image_with_options_mono (unsigned int width, unsigned int height, int linewidth, tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box);
 
   void update_image ();
 
@@ -288,25 +288,25 @@ public:
   /**
    *  @brief Reimplementation of ViewObjectCanvas: Background color 
    */
-  lay::Color background_color () const
+  tl::Color background_color () const
   { 
-    return lay::Color (m_background);
+    return tl::Color (m_background);
   }
 
   /**
    *  @brief Reimplementation of ViewObjectCanvas: Foreground color 
    */
-  lay::Color foreground_color () const
+  tl::Color foreground_color () const
   { 
-    return lay::Color (m_foreground);
+    return tl::Color (m_foreground);
   }
 
   /**
    *  @brief Reimplementation of ViewObjectCanvas: Active color 
    */
-  lay::Color active_color () const
+  tl::Color active_color () const
   { 
-    return lay::Color (m_active);
+    return tl::Color (m_active);
   }
 
   /**
@@ -363,9 +363,9 @@ private:
   lay::PixelBuffer *mp_image_fg;
   db::DBox m_precious_box;
   lay::Viewport m_viewport, m_viewport_l;
-  lay::color_t m_background;
-  lay::color_t m_foreground;
-  lay::color_t m_active;
+  tl::color_t m_background;
+  tl::color_t m_foreground;
+  tl::color_t m_active;
   std::vector <lay::ViewOp> m_view_ops;
   lay::DitherPattern m_dither_pattern;
   lay::LineStyles m_line_styles;

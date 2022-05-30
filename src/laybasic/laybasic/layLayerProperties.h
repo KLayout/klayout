@@ -137,7 +137,7 @@ public:
   /**
    *  @brief Utility: compute the effective color from a color with brightness correction
    */
-  static color_t brighter (color_t in, int b);
+  static tl::color_t brighter (tl::color_t in, int b);
 
   /**
    *  @brief render the effective frame color 
@@ -145,7 +145,7 @@ public:
    *  The effective frame color is computed from the frame color brightness and the
    *  frame color.
    */
-  color_t eff_frame_color (bool real) const;
+  tl::color_t eff_frame_color (bool real) const;
 
   /**
    *  @brief render the effective fill color
@@ -153,7 +153,7 @@ public:
    *  The effective fill color is computed from the frame color brightness and the
    *  frame color.
    */
-  color_t eff_fill_color (bool real) const;
+  tl::color_t eff_fill_color (bool real) const;
 
   /**
    *  @brief render the effective frame color plus an additional brightness adjustment
@@ -161,7 +161,7 @@ public:
    *  This method returns the effective frame color with an additional brightness adjustment 
    *  applied.
    */
-  color_t eff_frame_color_brighter (bool real, int plus_brightness) const;
+  tl::color_t eff_frame_color_brighter (bool real, int plus_brightness) const;
 
   /**
    *  @brief render the effective frame color plus an additional brightness adjustment
@@ -169,14 +169,14 @@ public:
    *  This method returns the effective fill color with an additional brightness adjustment 
    *  applied.
    */
-  color_t eff_fill_color_brighter (bool real, int plus_brightness) const;
+  tl::color_t eff_fill_color_brighter (bool real, int plus_brightness) const;
 
   /**
    *  @brief Get the frame color
    *
    *  This method may return an invalid color if the color is not set.
    */
-  color_t frame_color (bool real) const
+  tl::color_t frame_color (bool real) const
   {
     if (real) {
       ensure_visual_realized ();
@@ -193,7 +193,7 @@ public:
    *  To clear the frame color, pass 0 to this method. Valid colors have the
    *  upper 8 bits set.
    */
-  void set_frame_color_code (color_t c)
+  void set_frame_color_code (tl::color_t c)
   {
     refresh ();
     if (m_frame_color != c) {
@@ -205,7 +205,7 @@ public:
   /**
    *  @brief Set the frame color to the given value
    */
-  void set_frame_color (color_t c)
+  void set_frame_color (tl::color_t c)
   {
     set_frame_color_code (c | 0xff000000);
   }
@@ -231,7 +231,7 @@ public:
    *
    *  This method may return an invalid color if the color is not set.
    */
-  color_t fill_color (bool real) const
+  tl::color_t fill_color (bool real) const
   {
     if (real) {
       ensure_visual_realized ();
@@ -248,7 +248,7 @@ public:
    *  To clear the fill color, pass 0 to this method. Valid colors have the
    *  upper 8 bits set.
    */
-  void set_fill_color_code (color_t c)
+  void set_fill_color_code (tl::color_t c)
   {
     refresh ();
     if (m_fill_color != c) {
@@ -260,7 +260,7 @@ public:
   /**
    *  @brief Set the fill color to the given value
    */
-  void set_fill_color (color_t c)
+  void set_fill_color (tl::color_t c)
   {
     set_fill_color_code (c | 0xff000000);
   }
@@ -844,8 +844,8 @@ public:
   /**
    *  @brief Adaptors required for the XML reader
    */
-  color_t frame_color_loc () const            { return frame_color (false);      }
-  color_t fill_color_loc () const             { return fill_color (false);       }
+  tl::color_t frame_color_loc () const        { return frame_color (false);      }
+  tl::color_t fill_color_loc () const         { return fill_color (false);       }
   int frame_brightness_loc () const           { return frame_brightness (false); }
   int fill_brightness_loc () const            { return fill_brightness (false);  }
   int dither_pattern_loc () const             { return dither_pattern (false);   }
@@ -928,10 +928,10 @@ private:
   //  the generation number
   size_t m_gen_id;
   //  display styles
-  color_t m_frame_color;
-  mutable color_t m_frame_color_real;
-  color_t m_fill_color;
-  mutable color_t m_fill_color_real;
+  tl::color_t m_frame_color;
+  mutable tl::color_t m_frame_color_real;
+  tl::color_t m_fill_color;
+  mutable tl::color_t m_fill_color_real;
   int m_frame_brightness;
   mutable int m_frame_brightness_real;
   int m_fill_brightness;

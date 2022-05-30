@@ -87,7 +87,7 @@ ColorPalette::ColorPalette ()
   // .. nothing yet ..
 }
 
-ColorPalette::ColorPalette (const std::vector<lay::color_t> &colors, const std::vector<unsigned int> &luminous_colors)
+ColorPalette::ColorPalette (const std::vector<tl::color_t> &colors, const std::vector<unsigned int> &luminous_colors)
   : m_colors (colors), m_luminous_color_indices (luminous_colors)
 {
   // .. nothing yet ..
@@ -115,7 +115,7 @@ ColorPalette::operator== (const ColorPalette &d) const
   return m_colors == d.m_colors && m_luminous_color_indices == d.m_luminous_color_indices;
 }
 
-lay::color_t 
+tl::color_t 
 ColorPalette::color_by_index (unsigned int n) const
 {
   return m_colors [n % colors ()];
@@ -140,7 +140,7 @@ ColorPalette::luminous_colors () const
 }
 
 void 
-ColorPalette::set_color (unsigned int n, lay::color_t c)
+ColorPalette::set_color (unsigned int n, tl::color_t c)
 {
   while (m_colors.size () <= n) {
     m_colors.push_back (0);
@@ -180,7 +180,7 @@ ColorPalette::to_string () const
       res += " ";
     }
 
-    lay::color_t c = m_colors [i];
+    tl::color_t c = m_colors [i];
     res += tl::sprintf ("%d,%d,%d", (c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff);
 
     for (unsigned int j = 0; j < m_luminous_color_indices.size (); ++j) {
@@ -217,7 +217,7 @@ ColorPalette::from_string (const std::string &s, bool simple)
       }
       x.expect (",").read (g).expect (",").read (b);
 
-      m_colors.push_back (0xff000000 | (lay::color_t (r & 0xff) << 16) | (lay::color_t (g & 0xff) << 8) | lay::color_t (b & 0xff));
+      m_colors.push_back (0xff000000 | (tl::color_t (r & 0xff) << 16) | (tl::color_t (g & 0xff) << 8) | tl::color_t (b & 0xff));
 
       if (x.test ("[")) {
         x.read (lc).expect ("]");

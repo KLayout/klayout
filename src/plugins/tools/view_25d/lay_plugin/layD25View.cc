@@ -196,7 +196,7 @@ D25View::begin (const std::string &generator)
 }
 
 void
-D25View::open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like, const std::string *name)
+D25View::open_display (const tl::color_t *frame_color, const tl::color_t *fill_color, const db::LayerProperties *like, const std::string *name)
 {
   if (! mp_ui->d25_view->has_error ()) {
     mp_ui->d25_view->open_display (frame_color, fill_color, like, name);

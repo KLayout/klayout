@@ -751,8 +751,8 @@ protected:
   virtual bool configure (const std::string &name, const std::string &value);
   virtual void config_finalize ();
 
-  virtual lay::Color default_background_color ();
-  virtual void do_set_background_color (lay::Color color, lay::Color contrast);
+  virtual tl::Color default_background_color ();
+  virtual void do_set_background_color (tl::Color color, tl::Color contrast);
   virtual void do_paste ();
   virtual void begin_layer_updates ();
   virtual void end_layer_updates ();

@@ -327,7 +327,7 @@ LayoutViewBase::init (db::Manager *mgr)
   m_paste_display_mode = 2;
   m_guiding_shape_visible = true;
   m_guiding_shape_line_width = 1;
-  m_guiding_shape_color = lay::Color ();
+  m_guiding_shape_color = tl::Color ();
   m_guiding_shape_vertex_size = 5;
   m_to_level = 0;
   m_ctx_dimming = 50;
@@ -713,7 +713,7 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_background_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     background_color (color);
     //  do not take - let others receive the background color events as well
@@ -758,7 +758,7 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_ctx_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     ctx_color (color);
     return true;
@@ -779,7 +779,7 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_child_ctx_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     child_ctx_color (color);
     return true;
@@ -863,14 +863,14 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_cell_box_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     cell_box_color (color);
     return true;
 
   } else if (name == cfg_text_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     text_color (color);
     return true;
@@ -989,14 +989,14 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_guiding_shape_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     guiding_shapes_color (color);
     return true;
 
   } else if (name == cfg_guiding_shape_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     guiding_shapes_color (color);
     return true;
@@ -1151,7 +1151,7 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_sel_color) {
 
-    lay::Color color;
+    tl::Color color;
     lay::ColorConverter ().from_string (value, color);
 
     //  Change the color
@@ -2503,7 +2503,7 @@ LayoutViewBase::init_layer_properties (LayerProperties &p) const
 void 
 LayoutViewBase::init_layer_properties (LayerProperties &p, const LayerPropertiesList &lp_list) const
 {
-  lay::color_t c = 0;
+  tl::color_t c = 0;
   if (m_palette.luminous_colors () > 0) {
     c = m_palette.luminous_color_by_index (p.source (true /*real*/).color_index ());
   }
@@ -2638,7 +2638,7 @@ LayoutViewBase::get_pixels (unsigned int width, unsigned int height)
 #if defined(HAVE_QT)
 QImage
 LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
-                                        lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
+                                        tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
@@ -2655,7 +2655,7 @@ LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height,
 
 lay::PixelBuffer
 LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
-                                         lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box)
+                                         tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
@@ -2667,7 +2667,7 @@ LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height
 
 lay::BitmapBuffer
 LayoutViewBase::get_pixels_with_options_mono (unsigned int width, unsigned int height, int linewidth,
-                                              lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box)
+                                              tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
@@ -2731,7 +2731,7 @@ LayoutViewBase::save_image (const std::string &, unsigned int, unsigned int)
 void
 LayoutViewBase::save_image_with_options (const std::string &fn,
                                          unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
-                                         lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
+                                         tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
 
@@ -2762,7 +2762,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
 void
 LayoutViewBase::save_image_with_options (const std::string &fn,
                                          unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
-                                         lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
+                                         tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
 
@@ -2793,7 +2793,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
 void
 LayoutViewBase::save_image_with_options (const std::string &,
                                          unsigned int, unsigned int, int, int, double,
-                                         lay::Color, lay::Color, lay::Color, const db::DBox &, bool)
+                                         tl::Color, tl::Color, tl::Color, const db::DBox &, bool)
 {
   throw tl::Exception (tl::to_string (tr ("Unable to save image - PNG library not compiled in")));
 }
@@ -3795,7 +3795,7 @@ LayoutViewBase::set_view_ops ()
   std::vector <lay::ViewOp> view_ops;
   view_ops.reserve (nlayers * planes_per_layer + special_planes_before + special_planes_after);
 
-  lay::Color box_color;
+  tl::Color box_color;
   if (! m_box_color.is_valid ()) {
     box_color = mp_canvas->foreground_color ();
   } else {
@@ -3854,7 +3854,7 @@ LayoutViewBase::set_view_ops ()
 
   //  produce the ViewOps for the guiding shapes
 
-  color_t gs_color = box_color.rgb ();
+  tl::color_t gs_color = box_color.rgb ();
   if (m_guiding_shape_color.is_valid ()) {
     gs_color = m_guiding_shape_color.rgb ();
   }
@@ -3863,7 +3863,7 @@ LayoutViewBase::set_view_ops ()
 
     lay::ViewOp::Mode mode = lay::ViewOp::Copy;
 
-    color_t fill_color, frame_color, text_color;
+    tl::color_t fill_color, frame_color, text_color;
     int dp = 1; // no stipples for guiding shapes 
 
     if (ctx == 0) {
@@ -3978,7 +3978,7 @@ LayoutViewBase::set_view_ops ()
           }
         }
 
-        color_t fill_color, frame_color, text_color;
+        tl::color_t fill_color, frame_color, text_color;
         int dp = m_no_stipples ? 1 : l->dither_pattern (true /*real*/);
         int ls = l->line_style (true /*real*/);
 
@@ -4081,7 +4081,7 @@ LayoutViewBase::guiding_shapes_visible (bool v)
 }
 
 void
-LayoutViewBase::guiding_shapes_color (lay::Color c)
+LayoutViewBase::guiding_shapes_color (tl::Color c)
 {
   if (c != m_guiding_shape_color) {
     m_guiding_shape_color = c;
@@ -4144,7 +4144,7 @@ LayoutViewBase::drop_small_cells_cond (drop_small_cells_cond_type t)
 }
 
 void 
-LayoutViewBase::cell_box_color (lay::Color c)
+LayoutViewBase::cell_box_color (tl::Color c)
 {
   if (c != m_box_color) {
     m_box_color = c;
@@ -4266,7 +4266,7 @@ LayoutViewBase::set_palette (const lay::LineStylePalette &p)
 }
 
 void
-LayoutViewBase::ctx_color (lay::Color c)
+LayoutViewBase::ctx_color (tl::Color c)
 {
   if (c != m_ctx_color) {
     m_ctx_color = c;
@@ -4293,7 +4293,7 @@ LayoutViewBase::ctx_hollow (bool h)
 }
 
 void
-LayoutViewBase::child_ctx_color (lay::Color c)
+LayoutViewBase::child_ctx_color (tl::Color c)
 {
   if (c != m_child_ctx_color) {
     m_child_ctx_color = c;
@@ -4349,20 +4349,20 @@ LayoutViewBase::abstract_mode_enabled (bool e)
   }
 }
 
-lay::Color
+tl::Color
 LayoutViewBase::default_background_color ()
 {
-  return lay::Color (0, 0, 0);  // black.
+  return tl::Color (0, 0, 0);  // black.
 }
 
 void
-LayoutViewBase::do_set_background_color (lay::Color /*color*/, lay::Color /*contrast*/)
+LayoutViewBase::do_set_background_color (tl::Color /*color*/, tl::Color /*contrast*/)
 {
   //  .. nothing yet ..
 }
 
 void 
-LayoutViewBase::background_color (lay::Color c)
+LayoutViewBase::background_color (tl::Color c)
 {
   if (c == mp_canvas->background_color ()) {
     return;
@@ -4373,11 +4373,11 @@ LayoutViewBase::background_color (lay::Color c)
     c = default_background_color ();
   }
 
-  lay::Color contrast;
+  tl::Color contrast;
   if (c.to_mono ()) {
-    contrast = lay::Color (0, 0, 0);
+    contrast = tl::Color (0, 0, 0);
   } else {
-    contrast = lay::Color (255, 255, 255);
+    contrast = tl::Color (255, 255, 255);
   }
 
   do_set_background_color (c, contrast);
@@ -4987,7 +4987,7 @@ LayoutViewBase::show_markers (bool f)
 }
 
 void
-LayoutViewBase::text_color (lay::Color c)
+LayoutViewBase::text_color (tl::Color c)
 {
   if (m_text_color != c) {
     m_text_color = c;

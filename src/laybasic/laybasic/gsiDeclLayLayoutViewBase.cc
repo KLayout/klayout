@@ -329,23 +329,23 @@ static void save_as2 (lay::LayoutViewBase *view, unsigned int index, const std::
 
 static lay::PixelBuffer get_pixels_with_options (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box)
 {
-  return view->get_pixels_with_options (width, height, linewidth, oversampling, resolution, lay::Color (), lay::Color (), lay::Color (), target_box);
+  return view->get_pixels_with_options (width, height, linewidth, oversampling, resolution, tl::Color (), tl::Color (), tl::Color (), target_box);
 }
 
 static lay::BitmapBuffer get_pixels_with_options_mono (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, const db::DBox &target_box)
 {
-  return view->get_pixels_with_options_mono (width, height, linewidth, lay::Color (), lay::Color (), lay::Color (), target_box);
+  return view->get_pixels_with_options_mono (width, height, linewidth, tl::Color (), tl::Color (), tl::Color (), target_box);
 }
 
 static void save_image_with_options (lay::LayoutViewBase *view, const std::string &fn, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box, bool monochrome)
 {
-  view->save_image_with_options (fn, width, height, linewidth, oversampling, resolution, lay::Color (), lay::Color (), lay::Color (), target_box, monochrome);
+  view->save_image_with_options (fn, width, height, linewidth, oversampling, resolution, tl::Color (), tl::Color (), tl::Color (), target_box, monochrome);
 }
 
 #if defined(HAVE_QTBINDINGS)
 static QImage get_image_with_options (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box, bool monochrome)
 {
-  return view->get_image_with_options (width, height, linewidth, oversampling, resolution, lay::Color (), lay::Color (), lay::Color (), target_box, monochrome);
+  return view->get_image_with_options (width, height, linewidth, oversampling, resolution, tl::Color (), tl::Color (), tl::Color (), target_box, monochrome);
 }
 #endif
 

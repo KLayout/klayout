@@ -20,7 +20,7 @@
 
 */
 
-#include "layColor.h"
+#include "tlColor.h"
 
 #include "tlUnitTest.h"
 
@@ -30,9 +30,9 @@
 
 TEST(1)
 {
-  EXPECT_EQ (lay::Color ().is_valid (), false);
-  EXPECT_EQ (lay::Color ().to_string (), "");
-  EXPECT_EQ (lay::Color ().rgb (), 0x00000000);
+  EXPECT_EQ (tl::Color ().is_valid (), false);
+  EXPECT_EQ (tl::Color ().to_string (), "");
+  EXPECT_EQ (tl::Color ().rgb (), 0x00000000);
 
 #if defined(HAVE_QT)
   EXPECT_EQ (QColor ().isValid (), false);
@@ -43,9 +43,9 @@ TEST(1)
 
 TEST(2)
 {
-  EXPECT_EQ (lay::Color (0x102030).is_valid (), true);
-  EXPECT_EQ (lay::Color (0x102030).to_string (), "#102030");
-  EXPECT_EQ (lay::Color (0x102030).rgb (), 0xff102030);
+  EXPECT_EQ (tl::Color (0x102030).is_valid (), true);
+  EXPECT_EQ (tl::Color (0x102030).to_string (), "#102030");
+  EXPECT_EQ (tl::Color (0x102030).rgb (), 0xff102030);
 
 #if defined(HAVE_QT)
   EXPECT_EQ (QColor (0x102030).isValid (), true);
@@ -56,13 +56,13 @@ TEST(2)
 
 TEST(3)
 {
-  EXPECT_EQ (lay::Color (std::string ()).is_valid (), false);
-  EXPECT_EQ (lay::Color ("#102030").is_valid (), true);
-  EXPECT_EQ (lay::Color ("#102030").to_string (), "#102030");
-  EXPECT_EQ (lay::Color ("#102030").rgb (), 0xff102030);
-  EXPECT_EQ (lay::Color ("102030").is_valid (), true);
-  EXPECT_EQ (lay::Color ("102030").to_string (), "#102030");
-  EXPECT_EQ (lay::Color ("102030").rgb (), 0xff102030);
+  EXPECT_EQ (tl::Color (std::string ()).is_valid (), false);
+  EXPECT_EQ (tl::Color ("#102030").is_valid (), true);
+  EXPECT_EQ (tl::Color ("#102030").to_string (), "#102030");
+  EXPECT_EQ (tl::Color ("#102030").rgb (), 0xff102030);
+  EXPECT_EQ (tl::Color ("102030").is_valid (), true);
+  EXPECT_EQ (tl::Color ("102030").to_string (), "#102030");
+  EXPECT_EQ (tl::Color ("102030").rgb (), 0xff102030);
 
 #if defined(HAVE_QT)
   EXPECT_EQ (QColor (tl::to_qstring ("#102030")).isValid (), true);
@@ -73,20 +73,20 @@ TEST(3)
 
 TEST(4)
 {
-  EXPECT_EQ (lay::Color ("#123").is_valid (), true);
-  EXPECT_EQ (lay::Color ("#123").to_string (), "#112233");
-  EXPECT_EQ (lay::Color ("#123").rgb (), 0xff112233);
+  EXPECT_EQ (tl::Color ("#123").is_valid (), true);
+  EXPECT_EQ (tl::Color ("#123").to_string (), "#112233");
+  EXPECT_EQ (tl::Color ("#123").rgb (), 0xff112233);
 }
 
 TEST(5)
 {
-  EXPECT_EQ (lay::Color ("#80102030").is_valid (), true);
-  EXPECT_EQ (lay::Color ("#80102030").alpha (), 128);
-  EXPECT_EQ (lay::Color ("#80102030").red (), 16);
-  EXPECT_EQ (lay::Color ("#80102030").green (), 32);
-  EXPECT_EQ (lay::Color ("#80102030").blue (), 48);
-  EXPECT_EQ (lay::Color ("#80102030").to_string (), "#80102030");
-  EXPECT_EQ (lay::Color ("#80102030").rgb (), 0x80102030);
+  EXPECT_EQ (tl::Color ("#80102030").is_valid (), true);
+  EXPECT_EQ (tl::Color ("#80102030").alpha (), 128);
+  EXPECT_EQ (tl::Color ("#80102030").red (), 16);
+  EXPECT_EQ (tl::Color ("#80102030").green (), 32);
+  EXPECT_EQ (tl::Color ("#80102030").blue (), 48);
+  EXPECT_EQ (tl::Color ("#80102030").to_string (), "#80102030");
+  EXPECT_EQ (tl::Color ("#80102030").rgb (), 0x80102030);
 
 #if defined(HAVE_QT) && QT_VERSION >= 0x50000
   //  no alpha support in Qt
@@ -98,16 +98,16 @@ TEST(5)
 
 TEST(6)
 {
-  EXPECT_EQ (lay::Color ("#8123").is_valid (), true);
-  EXPECT_EQ (lay::Color ("#8123").to_string (), "#88112233");
-  EXPECT_EQ (lay::Color ("#8123").rgb (), 0x88112233);
+  EXPECT_EQ (tl::Color ("#8123").is_valid (), true);
+  EXPECT_EQ (tl::Color ("#8123").to_string (), "#88112233");
+  EXPECT_EQ (tl::Color ("#8123").rgb (), 0x88112233);
 }
 
 TEST(7)
 {
-  EXPECT_EQ (lay::Color (16, 32, 48, 128).is_valid (), true);
-  EXPECT_EQ (lay::Color (16, 32, 48, 128).to_string (), "#80102030");
-  EXPECT_EQ (lay::Color (16, 32, 48, 128).rgb (), 0x80102030);
+  EXPECT_EQ (tl::Color (16, 32, 48, 128).is_valid (), true);
+  EXPECT_EQ (tl::Color (16, 32, 48, 128).to_string (), "#80102030");
+  EXPECT_EQ (tl::Color (16, 32, 48, 128).rgb (), 0x80102030);
 
 #if defined(HAVE_QT)
   //  no alpha support in Qt
@@ -121,13 +121,13 @@ TEST(8)
 {
   unsigned int h, s, v;
   int ih, is, iv;
-  lay::Color c = lay::Color (16, 32, 48);
+  tl::Color c = tl::Color (16, 32, 48);
   c.get_hsv (h, s, v);
   EXPECT_EQ (h, 210);
   EXPECT_EQ (s, 170);
   EXPECT_EQ (v, 48);
 
-  EXPECT_EQ (lay::Color::from_hsv (h, s, v).to_string (), "#102030");
+  EXPECT_EQ (tl::Color::from_hsv (h, s, v).to_string (), "#102030");
 
 #if defined(HAVE_QT)
   QColor qc = QColor (16, 32, 48);
@@ -137,13 +137,13 @@ TEST(8)
   EXPECT_EQ (iv, 48);
 #endif
 
-  c = lay::Color (32, 16, 48);
+  c = tl::Color (32, 16, 48);
   c.get_hsv (h, s, v);
   EXPECT_EQ (h, 270);
   EXPECT_EQ (s, 170);
   EXPECT_EQ (v, 48);
 
-  EXPECT_EQ (lay::Color::from_hsv (h, s, v).to_string (), "#201030");
+  EXPECT_EQ (tl::Color::from_hsv (h, s, v).to_string (), "#201030");
 
 #if defined(HAVE_QT)
   qc = QColor (32, 16, 48);
@@ -153,13 +153,13 @@ TEST(8)
   EXPECT_EQ (iv, 48);
 #endif
 
-  c = lay::Color (32, 48, 16);
+  c = tl::Color (32, 48, 16);
   c.get_hsv (h, s, v);
   EXPECT_EQ (h, 90);
   EXPECT_EQ (s, 170);
   EXPECT_EQ (v, 48);
 
-  EXPECT_EQ (lay::Color::from_hsv (h, s, v).to_string (), "#203010");
+  EXPECT_EQ (tl::Color::from_hsv (h, s, v).to_string (), "#203010");
 
 #if defined(HAVE_QT)
   qc = QColor (32, 48, 16);
@@ -169,13 +169,13 @@ TEST(8)
   EXPECT_EQ (iv, 48);
 #endif
 
-  c = lay::Color (48, 32, 16);
+  c = tl::Color (48, 32, 16);
   c.get_hsv (h, s, v);
   EXPECT_EQ (h, 30);
   EXPECT_EQ (s, 170);
   EXPECT_EQ (v, 48);
 
-  EXPECT_EQ (lay::Color::from_hsv (h, s, v).to_string (), "#302010");
+  EXPECT_EQ (tl::Color::from_hsv (h, s, v).to_string (), "#302010");
 
 #if defined(HAVE_QT)
   qc = QColor (48, 32, 16);
@@ -185,13 +185,13 @@ TEST(8)
   EXPECT_EQ (iv, 48);
 #endif
 
-  c = lay::Color (48, 16, 32);
+  c = tl::Color (48, 16, 32);
   c.get_hsv (h, s, v);
   EXPECT_EQ (h, 330);
   EXPECT_EQ (s, 170);
   EXPECT_EQ (v, 48);
 
-  EXPECT_EQ (lay::Color::from_hsv (h, s, v).to_string (), "#301020");
+  EXPECT_EQ (tl::Color::from_hsv (h, s, v).to_string (), "#301020");
 
 #if defined(HAVE_QT)
   qc = QColor (48, 16, 32);
@@ -201,13 +201,13 @@ TEST(8)
   EXPECT_EQ (iv, 48);
 #endif
 
-  c = lay::Color (16, 48, 32);
+  c = tl::Color (16, 48, 32);
   c.get_hsv (h, s, v);
   EXPECT_EQ (h, 150);
   EXPECT_EQ (s, 170);
   EXPECT_EQ (v, 48);
 
-  EXPECT_EQ (lay::Color::from_hsv (h, s, v).to_string (), "#103020");
+  EXPECT_EQ (tl::Color::from_hsv (h, s, v).to_string (), "#103020");
 
 #if defined(HAVE_QT)
   qc = QColor (16, 48, 32);

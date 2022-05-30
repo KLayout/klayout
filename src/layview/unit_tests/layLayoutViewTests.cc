@@ -39,7 +39,7 @@ static bool compare_images (const QImage &qimg, const std::string &au)
   if (qimg2.width () == (int) qimg.width () && qimg2.height () == (int) qimg.height ()) {
     for (int j = 0; j < qimg.height (); ++j) {
       for (int i = 0; i < qimg.width (); ++i) {
-        if (((const lay::color_t *) qimg.scanLine (j))[i] != ((const lay::color_t *) qimg2.scanLine (j))[i]) {
+        if (((const tl::color_t *) qimg.scanLine (j))[i] != ((const tl::color_t *) qimg2.scanLine (j))[i]) {
           return false;
         }
       }
@@ -86,12 +86,12 @@ static bool compare_images (const lay::BitmapBuffer &img, const lay::BitmapBuffe
 TEST(1)
 {
   lay::LayoutView lv (0, false, 0);
-  lv.cell_box_color (lay::Color (0, 0, 0));
+  lv.cell_box_color (tl::Color (0, 0, 0));
 
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   QImage qimg;
-  qimg = lv.get_image_with_options (500, 500, 1, 1, 1.0, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox (), false);
+  qimg = lv.get_image_with_options (500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), false);
 
   EXPECT_EQ (qimg.format () == QImage::Format_RGB32, true);
 
@@ -113,7 +113,7 @@ TEST(2)
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   QImage qimg;
-  qimg = lv.get_image_with_options (500, 500, 1, 1, 1.0, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox (), false);
+  qimg = lv.get_image_with_options (500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), false);
 
   EXPECT_EQ (qimg.format () == QImage::Format_RGB32, true);
 
@@ -136,7 +136,7 @@ TEST(3)
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   QImage qimg;
-  qimg = lv.get_image_with_options (500, 500, 1, 1, 1.0, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox (), true);
+  qimg = lv.get_image_with_options (500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), true);
 
   EXPECT_EQ (qimg.format () == QImage::Format_MonoLSB, true);
 
@@ -155,7 +155,7 @@ TEST(4)
 {
   lay::LayoutView lv (0, false, 0);
   lv.set_drawing_workers (2);
-  lv.cell_box_color (lay::Color (0, 0, 0));
+  lv.cell_box_color (tl::Color (0, 0, 0));
 
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
@@ -177,12 +177,12 @@ TEST(4)
 TEST(11)
 {
   lay::LayoutView lv (0, false, 0);
-  lv.cell_box_color (lay::Color (0, 0, 0));
+  lv.cell_box_color (tl::Color (0, 0, 0));
 
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   lay::PixelBuffer img;
-  img = lv.get_pixels_with_options (500, 500, 1, 1, 1.0, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox ());
+  img = lv.get_pixels_with_options (500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox ());
 
   std::string tmp = tmp_file ("test.png");
   {
@@ -210,7 +210,7 @@ TEST(12)
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   lay::PixelBuffer img;
-  img = lv.get_pixels_with_options (500, 500, 1, 1, 1.0, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox ());
+  img = lv.get_pixels_with_options (500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox ());
 
   std::string tmp = tmp_file ("test.png");
   {
@@ -239,7 +239,7 @@ TEST(13)
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   lay::BitmapBuffer img;
-  img = lv.get_pixels_with_options_mono (500, 500, 1, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox ());
+  img = lv.get_pixels_with_options_mono (500, 500, 1, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox ());
 
   std::string tmp = tmp_file ("test.png");
   {
@@ -264,12 +264,12 @@ TEST(13)
 TEST(21)
 {
   lay::LayoutView lv (0, false, 0);
-  lv.cell_box_color (lay::Color (0, 0, 0));
+  lv.cell_box_color (tl::Color (0, 0, 0));
 
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   std::string tmp = tmp_file ("test.png");
-  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox (), false);
+  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), false);
 
   lay::PixelBuffer img;
   {
@@ -297,7 +297,7 @@ TEST(22)
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   std::string tmp = tmp_file ("test.png");
-  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox (), false);
+  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), false);
 
   lay::PixelBuffer img;
   {
@@ -326,7 +326,7 @@ TEST(23)
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   std::string tmp = tmp_file ("test.png");
-  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, lay::Color (255, 255, 255), lay::Color (0, 0, 0), lay::Color (128, 128, 128), db::DBox (), true);
+  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), true);
 
   lay::BitmapBuffer img;
   {

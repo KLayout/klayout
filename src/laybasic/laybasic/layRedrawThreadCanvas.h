@@ -319,7 +319,7 @@ public:
   /**
    *  @brief Transfer the content to a PixelBuffer
    */
-  void to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, lay::Color background, lay::Color foreground, lay::Color active, const lay::Drawings *drawings, PixelBuffer &img, unsigned int width, unsigned int height);
+  void to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, tl::Color background, tl::Color foreground, tl::Color active, const lay::Drawings *drawings, PixelBuffer &img, unsigned int width, unsigned int height);
 
   /**
    *  @brief Transfer the content to a BitmapBuffer (monochrome)

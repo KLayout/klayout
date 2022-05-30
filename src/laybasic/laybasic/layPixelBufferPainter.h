@@ -25,7 +25,7 @@
 
 #include "laybasicCommon.h"
 
-#include "layColor.h"
+#include "tlColor.h"
 #include "dbPoint.h"
 
 namespace lay {
@@ -43,11 +43,11 @@ class LAYBASIC_PUBLIC PixelBufferPainter
 public:
   PixelBufferPainter (lay::PixelBuffer &img, unsigned int width, unsigned int height, double resolution);
 
-  void set (const db::Point &p, lay::Color c);
-  void draw_line (const db::Point &p1, const db::Point &p2, lay::Color c);
-  void fill_rect (const db::Point &p1, const db::Point &p2, lay::Color c);
-  void draw_rect (const db::Point &p1, const db::Point &p2, lay::Color c);
-  void draw_text (const char *t, const db::Point &p, lay::Color c, int halign, int valign);
+  void set (const db::Point &p, tl::Color c);
+  void draw_line (const db::Point &p1, const db::Point &p2, tl::Color c);
+  void fill_rect (const db::Point &p1, const db::Point &p2, tl::Color c);
+  void draw_rect (const db::Point &p1, const db::Point &p2, tl::Color c);
+  void draw_text (const char *t, const db::Point &p, tl::Color c, int halign, int valign);
 
 private:
   lay::PixelBuffer *mp_img;

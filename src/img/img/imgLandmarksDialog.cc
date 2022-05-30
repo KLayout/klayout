@@ -346,7 +346,7 @@ public:
     ui ()->ungrab_mouse (this);
   }
 
-  void set_colors (lay::Color /*background*/, lay::Color /*color*/)
+  void set_colors (tl::Color /*background*/, tl::Color /*color*/)
   {
     // ...
   }

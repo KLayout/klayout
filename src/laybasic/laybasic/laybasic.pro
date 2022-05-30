@@ -44,7 +44,6 @@ SOURCES += \
   layBitmapsToImage.cc \
   layBookmarkList.cc \
   layCellView.cc \
-  layColor.cc \
   layColorPalette.cc \
   layConverters.cc \
   layDispatcher.cc \
@@ -97,7 +96,6 @@ HEADERS += \
   layBookmarkList.h \
   layCellView.h \
   layColorPalette.h \
-  layColor.h \
   layConverters.h \
   layDispatcher.h \
   layDisplayState.h \

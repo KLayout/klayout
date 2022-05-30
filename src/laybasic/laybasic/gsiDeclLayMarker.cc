@@ -37,13 +37,13 @@ lay::DMarker *create_marker (lay::LayoutViewBase *view)
 static 
 void reset_frame_color (lay::DMarker *marker)
 {
-  marker->set_frame_color (lay::Color ());
+  marker->set_frame_color (tl::Color ());
 }
 
 static 
 void set_frame_color (lay::DMarker *marker, unsigned int color) 
 {
-  marker->set_frame_color (lay::Color (color));
+  marker->set_frame_color (tl::Color (color));
 }
 
 static 
@@ -61,13 +61,13 @@ bool has_frame_color (const lay::DMarker *marker)
 static 
 void reset_color (lay::DMarker *marker)
 {
-  marker->set_color (lay::Color ());
+  marker->set_color (tl::Color ());
 }
 
 static 
 void set_color (lay::DMarker *marker, unsigned int color) 
 {
-  marker->set_color (lay::Color (color));
+  marker->set_color (tl::Color (color));
 }
 
 static 

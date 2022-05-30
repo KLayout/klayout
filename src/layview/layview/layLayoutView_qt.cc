@@ -858,18 +858,18 @@ LayoutView::max_hier_changed (int i)
   set_hier_levels (std::make_pair (get_hier_levels ().first, i));
 }
 
-lay::Color
+tl::Color
 LayoutView::default_background_color ()
 {
   if (! mp_widget) {
     return LayoutViewBase::default_background_color ();
   } else {
-    return lay::Color (mp_widget->palette ().color (QPalette::Normal, QPalette::Base).rgb ());
+    return tl::Color (mp_widget->palette ().color (QPalette::Normal, QPalette::Base).rgb ());
   }
 }
 
 void 
-LayoutView::do_set_background_color (lay::Color c, lay::Color contrast)
+LayoutView::do_set_background_color (tl::Color c, tl::Color contrast)
 {
   if (mp_control_panel) {
     mp_control_panel->set_background_color (c);

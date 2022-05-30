@@ -122,8 +122,8 @@ draw_scanline (unsigned int level, const img::Object &image_object, lay::PixelBu
     double dpx = (p2.x () - p1.x ()) / double (xstop - xstart);
     double dpy = (p2.y () - p1.y ()) / double (xstop - xstart);
 
-    lay::color_t *scanline_data = pxbuffer.scan_line (pxbuffer.height () - y - 1) + xstart;
-    lay::color_t *pixel_data = (lay::color_t *) image_object.pixel_data ();
+    tl::color_t *scanline_data = pxbuffer.scan_line (pxbuffer.height () - y - 1) + xstart;
+    tl::color_t *pixel_data = (tl::color_t *) image_object.pixel_data ();
     const unsigned char *mask_data = image_object.mask ();
 
     for (int x = xstart; x < xstop; ++x) {

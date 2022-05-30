@@ -38,7 +38,7 @@ NetColorizer::NetColorizer ()
 }
 
 void
-NetColorizer::configure (const lay::Color &marker_color, const lay::ColorPalette *auto_colors)
+NetColorizer::configure (const tl::Color &marker_color, const lay::ColorPalette *auto_colors)
 {
   m_marker_color = marker_color;
   if (auto_colors) {
@@ -58,7 +58,7 @@ NetColorizer::has_color_for_net (const db::Net *net)
 }
 
 void
-NetColorizer::set_color_of_net (const db::Net *net, const lay::Color &color)
+NetColorizer::set_color_of_net (const db::Net *net, const tl::Color &color)
 {
   m_custom_color[net] = color;
   emit_colors_changed ();
@@ -110,14 +110,14 @@ NetColorizer::emit_colors_changed ()
   }
 }
 
-lay::Color
+tl::Color
 NetColorizer::color_of_net (const db::Net *net) const
 {
   if (! net) {
-    return lay::Color ();
+    return tl::Color ();
   }
 
-  std::map<const db::Net *, lay::Color>::const_iterator c = m_custom_color.find (net);
+  std::map<const db::Net *, tl::Color>::const_iterator c = m_custom_color.find (net);
   if (c != m_custom_color.end ()) {
     return c->second;
   }
@@ -146,7 +146,7 @@ NetColorizer::color_of_net (const db::Net *net) const
     return m_auto_colors.color_by_index ((unsigned int) index);
 
   } else {
-    return lay::Color ();
+    return tl::Color ();
   }
 }
 

@@ -258,7 +258,7 @@ public:
   /**
    *  @brief This method is called to set the background and text (foreground) color
    */
-  virtual void set_colors (lay::Color /*background*/, lay::Color /*text*/) { }
+  virtual void set_colors (tl::Color /*background*/, tl::Color /*text*/) { }
 
   /**
    *  @brief This method is called when a drag operation should be cancelled
@@ -1113,17 +1113,17 @@ public:
   /**
    *  @brief Background color property: background color of the canvas
    */
-  virtual lay::Color background_color () const = 0;
+  virtual tl::Color background_color () const = 0;
 
   /**
    *  @brief Foreground color property: foreground color of the canvas (some "contrast" color to background)
    */
-  virtual lay::Color foreground_color () const = 0;
+  virtual tl::Color foreground_color () const = 0;
 
   /**
    *  @brief Active color property: color of active elements on the canvas (some "contrast" color to background and different from foreground)
    */
-  virtual lay::Color active_color () const = 0;
+  virtual tl::Color active_color () const = 0;
 
   /**
    *  @brief Get the resolution

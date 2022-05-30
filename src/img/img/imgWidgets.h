@@ -26,7 +26,7 @@
 #define HDR_imgWidgets
 
 #include "layWidgets.h"
-#include "layColor.h"
+#include "tlColor.h"
 #include "imgObject.h"
 
 #include <QObject>
@@ -111,9 +111,9 @@ public:
     return m_selected >= 0;
   }
 
-  void set_nodes (const std::vector <std::pair <double, std::pair<lay::Color, lay::Color> > > &nodes);
+  void set_nodes (const std::vector <std::pair <double, std::pair<tl::Color, tl::Color> > > &nodes);
 
-  const std::vector <std::pair <double, std::pair<lay::Color, lay::Color> > > &nodes () const
+  const std::vector <std::pair <double, std::pair<tl::Color, tl::Color> > > &nodes () const
   {
     return m_nodes;
   }
@@ -132,7 +132,7 @@ signals:
 private:
   bool m_dragging;
   int m_selected;
-  std::vector <std::pair <double, std::pair<lay::Color, lay::Color> > > m_nodes;
+  std::vector <std::pair <double, std::pair<tl::Color, tl::Color> > > m_nodes;
   std::vector <size_t> m_histogram;
 };
 

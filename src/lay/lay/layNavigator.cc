@@ -72,22 +72,22 @@ public:
 
   void background_color_changed ()
   {
-    lay::Color c = mp_view->background_color ();
+    tl::Color c = mp_view->background_color ();
 
     //  replace by "real" background color if required
     if (! c.is_valid ()) {
       if (mp_view->widget ()) {
-        c = lay::Color (mp_view->widget ()->palette ().color (QPalette::Normal, QPalette::Base).rgb ());
+        c = tl::Color (mp_view->widget ()->palette ().color (QPalette::Normal, QPalette::Base).rgb ());
       } else {
-        c = lay::Color (0xffffff);  //  white
+        c = tl::Color (0xffffff);  //  white
       }
     }
 
-    lay::Color contrast;
+    tl::Color contrast;
     if (c.to_mono ()) {
-      contrast = lay::Color (0, 0, 0);
+      contrast = tl::Color (0, 0, 0);
     } else {
-      contrast = lay::Color (255, 255, 255);
+      contrast = tl::Color (255, 255, 255);
     }
 
     set_colors (c, contrast);
@@ -392,7 +392,7 @@ public:
     ui ()->ungrab_mouse (this);
   }
 
-  void set_colors (lay::Color /*background*/, lay::Color color)
+  void set_colors (tl::Color /*background*/, tl::Color color)
   {
     //  set zoom box color
     m_color = color.rgb ();

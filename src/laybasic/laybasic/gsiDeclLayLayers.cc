@@ -299,22 +299,22 @@ static void clear_lower_hier_level (lay::LayerProperties *n)
   n->set_source (s);
 }
 
-static lay::color_t get_eff_frame_color_1 (const lay::LayerProperties *n)
+static tl::color_t get_eff_frame_color_1 (const lay::LayerProperties *n)
 {
   return n->eff_frame_color (true);
 }
 
-static lay::color_t get_eff_fill_color_1 (const lay::LayerProperties *n)
+static tl::color_t get_eff_fill_color_1 (const lay::LayerProperties *n)
 {
   return n->eff_fill_color (true);
 }
 
-static lay::color_t get_frame_color_1 (const lay::LayerProperties *n)
+static tl::color_t get_frame_color_1 (const lay::LayerProperties *n)
 {
   return n->frame_color (true);
 }
 
-static lay::color_t get_fill_color_1 (const lay::LayerProperties *n)
+static tl::color_t get_fill_color_1 (const lay::LayerProperties *n)
 {
   return n->fill_color (true);
 }

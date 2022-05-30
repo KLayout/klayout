@@ -490,7 +490,7 @@ LibrariesView::double_clicked (const QModelIndex & /*index*/)
 }
 
 void
-LibrariesView::set_background_color (lay::Color c)
+LibrariesView::set_background_color (tl::Color c)
 {
   m_background_color = c;
   for (std::vector <QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {
@@ -501,7 +501,7 @@ LibrariesView::set_background_color (lay::Color c)
 }
 
 void
-LibrariesView::set_text_color (lay::Color c)
+LibrariesView::set_text_color (tl::Color c)
 {
   m_text_color = c;
   for (std::vector <QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {

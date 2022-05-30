@@ -46,16 +46,16 @@ static void fill_with_qcolor (lay::PixelBuffer *pb, QColor c)
 }
 #endif
 
-lay::color_t get_pixel_from_pixel_buffer (const lay::PixelBuffer *pb, unsigned int x, unsigned int y)
+tl::color_t get_pixel_from_pixel_buffer (const lay::PixelBuffer *pb, unsigned int x, unsigned int y)
 {
   if (x < pb->width () && y < pb->height ()) {
     return pb->scan_line (y)[x];
   } else {
-    return lay::color_t (0);
+    return tl::color_t (0);
   }
 }
 
-void set_pixel_in_pixel_buffer (lay::PixelBuffer *pb, unsigned int x, unsigned int y, lay::color_t c)
+void set_pixel_in_pixel_buffer (lay::PixelBuffer *pb, unsigned int x, unsigned int y, tl::color_t c)
 {
   if (! pb->transparent ()) {
     c |= 0xff000000;  //  ensures that alpha is set properly even if not required

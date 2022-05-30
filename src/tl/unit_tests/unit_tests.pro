@@ -11,6 +11,7 @@ SOURCES = \
   tlBase64Tests.cc \
   tlClassRegistryTests.cc \
   tlCommandLineParserTests.cc \
+  tlColorTests.cc \
   tlCopyOnWriteTests.cc \
   tlDataMappingTests.cc \
   tlDeferredExecutionTests.cc \

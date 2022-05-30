@@ -656,7 +656,7 @@ HierarchyControlPanel::current_cell (int cv_index, HierarchyControlPanel::cell_p
 }
 
 void
-HierarchyControlPanel::set_background_color (lay::Color c)
+HierarchyControlPanel::set_background_color (tl::Color c)
 {
   m_background_color = c;
   for (std::vector <QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {
@@ -667,7 +667,7 @@ HierarchyControlPanel::set_background_color (lay::Color c)
 }
 
 void
-HierarchyControlPanel::set_text_color (lay::Color c)
+HierarchyControlPanel::set_text_color (tl::Color c)
 {
   m_text_color = c;
   for (std::vector <QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {

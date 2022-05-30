@@ -763,7 +763,7 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 
   int basic_width = int(0.5 + 1.0 / canvas.resolution ());
 
-  lay::Color c (mp_rulers->color ());
+  tl::Color c (mp_rulers->color ());
   if (! c.is_valid ()) {
     c = canvas.foreground_color ();
   }
@@ -823,7 +823,7 @@ Service::configure (const std::string &name, const std::string &value)
 
   if (name == cfg_ruler_color) {
 
-    lay::Color color;
+    tl::Color color;
     lay::ColorConverter ().from_string (value, color);
 
     //  make the color available for the dynamic view objects too.
@@ -914,7 +914,7 @@ Service::annotations_changed ()
 }
 
 std::vector <lay::ViewOp>
-Service::get_view_ops (lay::RedrawThreadCanvas &canvas, lay::Color background, lay::Color foreground, lay::Color /*active*/) const
+Service::get_view_ops (lay::RedrawThreadCanvas &canvas, tl::Color background, tl::Color foreground, tl::Color /*active*/) const
 {
   int basic_width = int(0.5 + 1.0 / canvas.resolution ());
 

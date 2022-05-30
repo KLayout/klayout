@@ -21,7 +21,7 @@
 */
 
 #include "gsiDecl.h"
-#include "layPixelBuffer.h"
+#include "tlPixelBuffer.h"
 
 #if defined(HAVE_QT)
 #  include <QBuffer>
@@ -32,21 +32,21 @@ namespace gsi
 {
 
 // -------------------------------------------------------------------------------------
-//  lay::BitmapBuffer
+//  tl::BitmapBuffer
 
-static lay::PixelBuffer *create_pixel_buffer (unsigned int w, unsigned int h)
+static tl::PixelBuffer *create_pixel_buffer (unsigned int w, unsigned int h)
 {
-  return new lay::PixelBuffer (w, h);
+  return new tl::PixelBuffer (w, h);
 }
 
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
-static void fill_with_qcolor (lay::PixelBuffer *pb, QColor c)
+static void fill_with_qcolor (tl::PixelBuffer *pb, QColor c)
 {
   pb->fill (c.rgb ());
 }
 #endif
 
-tl::color_t get_pixel_from_pixel_buffer (const lay::PixelBuffer *pb, unsigned int x, unsigned int y)
+tl::color_t get_pixel_from_pixel_buffer (const tl::PixelBuffer *pb, unsigned int x, unsigned int y)
 {
   if (x < pb->width () && y < pb->height ()) {
     return pb->scan_line (y)[x];
@@ -55,7 +55,7 @@ tl::color_t get_pixel_from_pixel_buffer (const lay::PixelBuffer *pb, unsigned in
   }
 }
 
-void set_pixel_in_pixel_buffer (lay::PixelBuffer *pb, unsigned int x, unsigned int y, tl::color_t c)
+void set_pixel_in_pixel_buffer (tl::PixelBuffer *pb, unsigned int x, unsigned int y, tl::color_t c)
 {
   if (! pb->transparent ()) {
     c |= 0xff000000;  //  ensures that alpha is set properly even if not required
@@ -65,41 +65,41 @@ void set_pixel_in_pixel_buffer (lay::PixelBuffer *pb, unsigned int x, unsigned i
   }
 }
 
-static lay::PixelBuffer read_pixel_buffer (const std::string &file)
+static tl::PixelBuffer read_pixel_buffer (const std::string &file)
 {
 #if defined(HAVE_PNG)
   tl::InputStream stream (file);
-  return lay::PixelBuffer::read_png (stream);
+  return tl::PixelBuffer::read_png (stream);
 #elif defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
   //  QImage is fallback
   QImage img;
   img.load (tl::to_qstring (file), "PNG");
-  return lay::PixelBuffer::from_image (img);
+  return tl::PixelBuffer::from_image (img);
 #else
   throw tl::Exception (tl::to_string (tr ("No PNG support compiled in for PixelBuffer")));
-  return lay::PixelBuffer ();
+  return tl::PixelBuffer ();
 #endif
 }
 
 //  TODO: there should be some more efficient version of byte strings which avoid copies
-static lay::PixelBuffer pixel_buffer_from_png (const std::vector<char> &data)
+static tl::PixelBuffer pixel_buffer_from_png (const std::vector<char> &data)
 {
 #if defined(HAVE_PNG)
   tl::InputMemoryStream data_stream (data.begin ().operator-> (), data.size ());
   tl::InputStream stream (data_stream);
-  return lay::PixelBuffer::read_png (stream);
+  return tl::PixelBuffer::read_png (stream);
 #elif defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
   //  QImage is fallback
   tl_assert (data.size () < std::numeric_limits<int>::max ());
   QImage img = QImage::fromData ((const uchar *) data.begin ().operator-> (), int (data.size ()));
-  return lay::PixelBuffer::from_image (img);
+  return tl::PixelBuffer::from_image (img);
 #else
   throw tl::Exception (tl::to_string (tr ("No PNG support compiled in for PixelBuffer")));
-  return lay::PixelBuffer ();
+  return tl::PixelBuffer ();
 #endif
 }
 
-static void write_pixel_buffer (const lay::PixelBuffer *pb, const std::string &file)
+static void write_pixel_buffer (const tl::PixelBuffer *pb, const std::string &file)
 {
 #if defined(HAVE_PNG)
   tl::OutputStream stream (file);
@@ -114,7 +114,7 @@ static void write_pixel_buffer (const lay::PixelBuffer *pb, const std::string &f
 }
 
 //  TODO: there should be some more efficient version of byte strings which avoid copies
-static std::vector<char> pixel_buffer_to_png (const lay::PixelBuffer *pb)
+static std::vector<char> pixel_buffer_to_png (const tl::PixelBuffer *pb)
 {
 #if defined(HAVE_PNG)
   tl::OutputMemoryStream data_stream;
@@ -135,7 +135,7 @@ static std::vector<char> pixel_buffer_to_png (const lay::PixelBuffer *pb)
 }
 
 
-Class<lay::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
+Class<tl::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
   gsi::constructor ("new", &create_pixel_buffer, gsi::arg ("width"), gsi::arg ("height"),
     "@brief Creates a pixel buffer object\n"
     "\n"
@@ -144,21 +144,21 @@ Class<lay::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
     "\n"
     "The pixels are basically uninitialized. You will need to use \\fill to initialize them to a certain value."
   ) +
-  gsi::method ("==", &lay::PixelBuffer::operator==, gsi::arg ("other"),
+  gsi::method ("==", &tl::PixelBuffer::operator==, gsi::arg ("other"),
     "@brief Returns a value indicating whether self is identical to the other image\n"
   ) +
-  gsi::method ("!=", &lay::PixelBuffer::operator!=, gsi::arg ("other"),
+  gsi::method ("!=", &tl::PixelBuffer::operator!=, gsi::arg ("other"),
     "@brief Returns a value indicating whether self is not identical to the other image\n"
   ) +
-  gsi::method ("transparent=", &lay::PixelBuffer::set_transparent, gsi::arg ("t"),
+  gsi::method ("transparent=", &tl::PixelBuffer::set_transparent, gsi::arg ("t"),
     "@brief Sets a flag indicating whether the pixel buffer supports an alpha channel\n"
     "\n"
     "By default, the pixel buffer does not support an alpha channel.\n"
   ) +
-  gsi::method ("transparent", &lay::PixelBuffer::transparent,
+  gsi::method ("transparent", &tl::PixelBuffer::transparent,
     "@brief Gets a flag indicating whether the pixel buffer supports an alpha channel\n"
   ) +
-  gsi::method ("fill", &lay::PixelBuffer::fill, gsi::arg ("color"),
+  gsi::method ("fill", &tl::PixelBuffer::fill, gsi::arg ("color"),
     "@brief Fills the pixel buffer with the given pixel value\n"
   ) +
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
@@ -166,13 +166,13 @@ Class<lay::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
     "@brief Fills the pixel buffer with the given QColor\n"
   ) +
 #endif
-  gsi::method ("swap", &lay::PixelBuffer::swap, gsi::arg ("other"),
+  gsi::method ("swap", &tl::PixelBuffer::swap, gsi::arg ("other"),
     "@brief Swaps data with another PixelBuffer object\n"
   ) +
-  gsi::method ("width", &lay::PixelBuffer::width,
+  gsi::method ("width", &tl::PixelBuffer::width,
     "@brief Gets the width of the pixel buffer in pixels\n"
   ) +
-  gsi::method ("height", &lay::PixelBuffer::height,
+  gsi::method ("height", &tl::PixelBuffer::height,
     "@brief Gets the height of the pixel buffer in pixels\n"
   ) +
   gsi::method_ext ("set_pixel", &set_pixel_in_pixel_buffer, gsi::arg ("x"), gsi::arg ("y"), gsi::arg ("c"),
@@ -182,10 +182,10 @@ Class<lay::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
     "@brief Gets the value of the pixel at position x, y\n"
   ) +
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
-  gsi::method ("to_qimage", &lay::PixelBuffer::to_image_copy,
+  gsi::method ("to_qimage", &tl::PixelBuffer::to_image_copy,
     "@brief Converts the pixel buffer to a \\QImage object"
   ) +
-  gsi::method ("from_qimage", &lay::PixelBuffer::from_image, gsi::arg ("qimage"),
+  gsi::method ("from_qimage", &tl::PixelBuffer::from_image, gsi::arg ("qimage"),
     "@brief Creates a pixel buffer object from a QImage object\n"
   ) +
 #endif
@@ -209,14 +209,14 @@ Class<lay::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
     "\n"
     "This method may not be available if PNG support is not compiled into KLayout."
   ) +
-  gsi::method ("patch", &lay::PixelBuffer::patch, gsi::arg ("other"),
+  gsi::method ("patch", &tl::PixelBuffer::patch, gsi::arg ("other"),
     "@brief Patches another pixel buffer into this one\n"
     "\n"
     "This method is the inverse of \\diff - it will patch the difference image created by diff into this "
     "pixel buffer. Note that this method will not do true alpha blending and requires the other pixel buffer "
     "to have the same format than self. Self will be modified by this operation."
   ) +
-  gsi::method ("diff", &lay::PixelBuffer::diff, gsi::arg ("other"),
+  gsi::method ("diff", &tl::PixelBuffer::diff, gsi::arg ("other"),
     "@brief Creates a difference image\n"
     "\n"
     "This method is provided to support transfer of image differences - i.e. small updates instead of full images. "
@@ -238,14 +238,14 @@ Class<lay::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
 
 
 // -------------------------------------------------------------------------------------
-//  lay::BitmapBuffer
+//  tl::BitmapBuffer
 
-static lay::BitmapBuffer *create_bitmap_buffer (unsigned int w, unsigned int h)
+static tl::BitmapBuffer *create_bitmap_buffer (unsigned int w, unsigned int h)
 {
-  return new lay::BitmapBuffer (w, h);
+  return new tl::BitmapBuffer (w, h);
 }
 
-bool get_pixel_from_bitmap_buffer (const lay::BitmapBuffer *pb, unsigned int x, unsigned int y)
+bool get_pixel_from_bitmap_buffer (const tl::BitmapBuffer *pb, unsigned int x, unsigned int y)
 {
   if (x < pb->width () && y < pb->height ()) {
     return (pb->scan_line (y)[x / 8] & (0x01 << (x % 8))) != 0;
@@ -254,7 +254,7 @@ bool get_pixel_from_bitmap_buffer (const lay::BitmapBuffer *pb, unsigned int x, 
   }
 }
 
-void set_pixel_in_bitmap_buffer (lay::BitmapBuffer *pb, unsigned int x, unsigned int y, bool c)
+void set_pixel_in_bitmap_buffer (tl::BitmapBuffer *pb, unsigned int x, unsigned int y, bool c)
 {
   if (x < pb->width () && y < pb->height ()) {
     if (c) {
@@ -265,41 +265,41 @@ void set_pixel_in_bitmap_buffer (lay::BitmapBuffer *pb, unsigned int x, unsigned
   }
 }
 
-static lay::BitmapBuffer read_bitmap_buffer (const std::string &file)
+static tl::BitmapBuffer read_bitmap_buffer (const std::string &file)
 {
 #if defined(HAVE_PNG)
   tl::InputStream stream (file);
-  return lay::BitmapBuffer::read_png (stream);
+  return tl::BitmapBuffer::read_png (stream);
 #elif defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
   //  QImage is fallback
   QImage img;
   img.load (tl::to_qstring (file), "PNG");
-  return lay::BitmapBuffer::from_image (img);
+  return tl::BitmapBuffer::from_image (img);
 #else
   throw tl::Exception (tl::to_string (tr ("No PNG support compiled in for BitmapBuffer")));
-  return lay::BitmapBuffer ();
+  return tl::BitmapBuffer ();
 #endif
 }
 
 //  TODO: there should be some more efficient version of byte strings which avoid copies
-static lay::BitmapBuffer bitmap_buffer_from_png (const std::vector<char> &data)
+static tl::BitmapBuffer bitmap_buffer_from_png (const std::vector<char> &data)
 {
 #if defined(HAVE_PNG)
   tl::InputMemoryStream data_stream (data.begin ().operator-> (), data.size ());
   tl::InputStream stream (data_stream);
-  return lay::BitmapBuffer::read_png (stream);
+  return tl::BitmapBuffer::read_png (stream);
 #elif defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
   //  QImage is fallback
   tl_assert (data.size () < std::numeric_limits<int>::max ());
   QImage img = QImage::fromData ((const uchar *) data.begin ().operator-> (), int (data.size ()));
-  return lay::BitmapBuffer::from_image (img);
+  return tl::BitmapBuffer::from_image (img);
 #else
   throw tl::Exception (tl::to_string (tr ("No PNG support compiled in for BitmapBuffer")));
-  return lay::BitmapBuffer ();
+  return tl::BitmapBuffer ();
 #endif
 }
 
-static void write_bitmap_buffer (const lay::BitmapBuffer *pb, const std::string &file)
+static void write_bitmap_buffer (const tl::BitmapBuffer *pb, const std::string &file)
 {
 #if defined(HAVE_PNG)
   tl::OutputStream stream (file);
@@ -314,7 +314,7 @@ static void write_bitmap_buffer (const lay::BitmapBuffer *pb, const std::string 
 }
 
 //  TODO: there should be some more efficient version of byte strings which avoid copies
-static std::vector<char> bitmap_buffer_to_png (const lay::BitmapBuffer *pb)
+static std::vector<char> bitmap_buffer_to_png (const tl::BitmapBuffer *pb)
 {
 #if defined(HAVE_PNG)
   tl::OutputMemoryStream data_stream;
@@ -335,7 +335,7 @@ static std::vector<char> bitmap_buffer_to_png (const lay::BitmapBuffer *pb)
 }
 
 
-Class<lay::BitmapBuffer> decl_BitmapBuffer ("lay", "BitmapBuffer",
+Class<tl::BitmapBuffer> decl_BitmapBuffer ("lay", "BitmapBuffer",
   gsi::constructor ("new", &create_bitmap_buffer, gsi::arg ("width"), gsi::arg ("height"),
     "@brief Creates a pixel buffer object\n"
     "\n"
@@ -344,13 +344,13 @@ Class<lay::BitmapBuffer> decl_BitmapBuffer ("lay", "BitmapBuffer",
     "\n"
     "The pixels are basically uninitialized. You will need to use \\fill to initialize them to a certain value."
   ) +
-  gsi::method ("==", &lay::BitmapBuffer::operator==, gsi::arg ("other"),
+  gsi::method ("==", &tl::BitmapBuffer::operator==, gsi::arg ("other"),
     "@brief Returns a value indicating whether self is identical to the other image\n"
   ) +
-  gsi::method ("!=", &lay::BitmapBuffer::operator!=, gsi::arg ("other"),
+  gsi::method ("!=", &tl::BitmapBuffer::operator!=, gsi::arg ("other"),
     "@brief Returns a value indicating whether self is not identical to the other image\n"
   ) +
-  gsi::method ("fill", &lay::BitmapBuffer::fill, gsi::arg ("color"),
+  gsi::method ("fill", &tl::BitmapBuffer::fill, gsi::arg ("color"),
     "@brief Fills the pixel buffer with the given pixel value\n"
   ) +
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
@@ -358,13 +358,13 @@ Class<lay::BitmapBuffer> decl_BitmapBuffer ("lay", "BitmapBuffer",
     "@brief Fills the pixel buffer with the given QColor\n"
   ) +
 #endif
-  gsi::method ("swap", &lay::BitmapBuffer::swap, gsi::arg ("other"),
+  gsi::method ("swap", &tl::BitmapBuffer::swap, gsi::arg ("other"),
     "@brief Swaps data with another BitmapBuffer object\n"
   ) +
-  gsi::method ("width", &lay::BitmapBuffer::width,
+  gsi::method ("width", &tl::BitmapBuffer::width,
     "@brief Gets the width of the pixel buffer in pixels\n"
   ) +
-  gsi::method ("height", &lay::BitmapBuffer::height,
+  gsi::method ("height", &tl::BitmapBuffer::height,
     "@brief Gets the height of the pixel buffer in pixels\n"
   ) +
   gsi::method_ext ("set_pixel", &set_pixel_in_bitmap_buffer, gsi::arg ("x"), gsi::arg ("y"), gsi::arg ("c"),
@@ -374,10 +374,10 @@ Class<lay::BitmapBuffer> decl_BitmapBuffer ("lay", "BitmapBuffer",
     "@brief Gets the value of the pixel at position x, y\n"
   ) +
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
-  gsi::method ("to_qimage", &lay::BitmapBuffer::to_image_copy,
+  gsi::method ("to_qimage", &tl::BitmapBuffer::to_image_copy,
     "@brief Converts the pixel buffer to a \\QImage object"
   ) +
-  gsi::method ("from_qimage", &lay::BitmapBuffer::from_image, gsi::arg ("qimage"),
+  gsi::method ("from_qimage", &tl::BitmapBuffer::from_image, gsi::arg ("qimage"),
     "@brief Creates a pixel buffer object from a QImage object\n"
   ) +
 #endif

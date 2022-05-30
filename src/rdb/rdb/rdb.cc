@@ -27,6 +27,7 @@
 #include "tlAssert.h"
 #include "tlStream.h"
 #include "tlLog.h"
+#include "tlBase64.h"
 #include "dbPolygon.h"
 #include "dbBox.h"
 #include "dbEdge.h"
@@ -961,7 +962,7 @@ Item::set_image (const QImage &image)
   }
 }
 
-const QImage
+QImage
 Item::image () const
 {
   if (m_image_str.empty ()) {
@@ -978,6 +979,29 @@ Item::image () const
 
   }
 }
+#endif
+
+#if defined(HAVE_PNG)
+
+tl::PixelBuffer
+Item::image_pixels () const
+{
+  std::vector<unsigned char> data = tl::from_base64 (m_image_str.c_str ());
+  tl::InputStream stream (new tl::InputMemoryStream ((const char *) data.begin ().operator-> (), data.size ()));
+  return tl::PixelBuffer::read_png (stream);
+}
+
+void
+Item::set_image (const tl::PixelBuffer &image)
+{
+  tl::OutputMemoryStream mem;
+  {
+    tl::OutputStream stream (mem);
+    image.write_png (stream);
+  }
+  m_image_str = tl::to_base64 ((const unsigned char *) mem.data (), mem.size ());
+}
+
 #endif
 
 bool

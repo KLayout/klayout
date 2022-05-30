@@ -25,7 +25,7 @@
 #include "layBitmap.h"
 #include "layDitherPattern.h"
 #include "layLineStyles.h"
-#include "layPixelBuffer.h"
+#include "tlPixelBuffer.h"
 #include "tlTimer.h"
 #include "tlAssert.h"
 #include "tlThreads.h"
@@ -426,7 +426,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
                   const std::vector<lay::Bitmap *> &pbitmaps_in,
                   const lay::DitherPattern &dp,
                   const lay::LineStyles &ls,
-                  PixelBuffer *pimage, unsigned int width, unsigned int height,
+                  tl::PixelBuffer *pimage, unsigned int width, unsigned int height,
                   bool use_bitmap_index,
                   tl::Mutex *mutex)
 {
@@ -666,7 +666,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
                   const std::vector<lay::Bitmap *> &pbitmaps_in,
                   const lay::DitherPattern &dp,
                   const lay::LineStyles &ls,
-                  lay::BitmapBuffer *pimage, unsigned int width, unsigned int height,
+                  tl::BitmapBuffer *pimage, unsigned int width, unsigned int height,
                   bool use_bitmap_index,
                   tl::Mutex *mutex)
 {

@@ -551,4 +551,50 @@ TEST(6)
   EXPECT_EQ (db.variants ("c2")[5], c2e->id ());
 }
 
+TEST(7)
+{
+  rdb::Database db;
+  rdb::Category *cath = db.create_category ("cath_name");
+  rdb::Cell *c1 = db.create_cell ("c1");
+  rdb::Item *i1 = db.create_item (c1->id (), cath->id ());
 
+#if defined(HAVE_QT)
+
+  {
+    QImage img (16, 26, QImage::Format_RGB32);
+    for (int i = 0; i < img.height (); ++i) {
+      for (int j = 0; j < img.height (); ++j) {
+        img.scanLine (j) [i] = (i << 16) + j;
+      }
+    }
+    i1->set_image (img);
+
+    QImage img2 = i1->image ();
+
+    EXPECT_EQ (img.width (), img2.width ());
+    EXPECT_EQ (img.height (), img2.height ());
+    EXPECT_EQ (tl::PixelBuffer::from_image (img) == tl::PixelBuffer::from_image (img2), true);
+  }
+
+#endif
+
+#if defined(HAVE_PNG)
+
+  {
+    tl::PixelBuffer img (16, 26);
+    for (unsigned int i = 0; i < img.width (); ++i) {
+      for (unsigned int j = 0; j < img.height (); ++j) {
+        img.scan_line (j) [i] = (i << 16) + j;
+      }
+    }
+    i1->set_image (img);
+
+    tl::PixelBuffer img2 = i1->image_pixels ();
+
+    EXPECT_EQ (img.width (), img2.width ());
+    EXPECT_EQ (img.height (), img2.height ());
+    EXPECT_EQ (img == img2, true);
+  }
+
+#endif
+}

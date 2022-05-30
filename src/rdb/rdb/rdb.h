@@ -30,6 +30,7 @@
 #include "gsi.h"
 #include "tlObject.h"
 #include "tlObjectCollection.h"
+#include "tlPixelBuffer.h"
 
 #include <string>
 #include <list>
@@ -945,12 +946,24 @@ public:
    *
    *  @return The image object or an empty image if no image is attached
    */
-  const QImage image () const;
+  QImage image () const;
 
   /**
    *  @brief Set the image for this item
    */
   void set_image (const QImage &image);
+#endif
+
+#if defined(HAVE_PNG)
+  /**
+   *  @brief Gets the image as a tl::PixelBuffer object
+   */
+  tl::PixelBuffer image_pixels () const;
+
+  /**
+   *  @brief Sets the image from a tl::PixelBuffer object
+   */
+  void set_image (const tl::PixelBuffer &image);
 #endif
 
   /**

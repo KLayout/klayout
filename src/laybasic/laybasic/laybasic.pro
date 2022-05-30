@@ -36,7 +36,6 @@ SOURCES += \
   gsiDeclLayLayoutViewBase.cc \
   gsiDeclLayMarker.cc \
   gsiDeclLayPlugin.cc \
-  gsiDeclLayPixelBuffer.cc \
   laybasicForceLink.cc \
   layAnnotationShapes.cc \
   layBitmap.cc \
@@ -64,7 +63,6 @@ SOURCES += \
   layNetColorizer.cc \
   layObjectInstPath.cc \
   layParsedLayerSource.cc \
-  layPixelBuffer.cc \
   layPixelBufferPainter.cc \
   layPlugin.cc \
   layRedrawLayerInfo.cc \
@@ -116,7 +114,7 @@ HEADERS += \
   layNetColorizer.h \
   layObjectInstPath.h \
   layParsedLayerSource.h \
-  layPixelBuffer.h \
+  tlPixelBuffer.h \
   layPixelBufferPainter.h \
   layPlugin.h \
   layRedrawLayerInfo.h \

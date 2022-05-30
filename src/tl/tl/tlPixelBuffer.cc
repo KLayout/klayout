@@ -20,7 +20,7 @@
 
 */
 
-#include "layPixelBuffer.h"
+#include "tlPixelBuffer.h"
 #include "tlAssert.h"
 #include "tlLog.h"
 
@@ -30,7 +30,7 @@
 
 #include <memory>
 
-namespace lay
+namespace tl
 {
 
 // -----------------------------------------------------------------------------------------------------

@@ -837,9 +837,9 @@ public:
 #endif
 
   /**
-   *  @brief Gets the screen content as a lay::PixelBuffer object
+   *  @brief Gets the screen content as a tl::PixelBuffer object
    */
-  lay::PixelBuffer get_screenshot_pb ();
+  tl::PixelBuffer get_screenshot_pb ();
 
   /**
    *  @brief Save an image file with the given width and height
@@ -871,9 +871,9 @@ public:
 #endif
 
   /**
-   *  @brief Gets the screen content as a lay::PixelBuffer object
+   *  @brief Gets the screen content as a tl::PixelBuffer object
    */
-  lay::PixelBuffer get_pixels (unsigned int width, unsigned int height);
+  tl::PixelBuffer get_pixels (unsigned int width, unsigned int height);
 
 #if defined(HAVE_QT)
   /**
@@ -894,7 +894,7 @@ public:
 #endif
 
   /**
-   *  @brief Get the screen content as a lay::PixelBuffer object with the given width and height
+   *  @brief Get the screen content as a tl::PixelBuffer object with the given width and height
    *
    *  @param width The width of the image in pixels
    *  @param height The height of the image
@@ -906,10 +906,10 @@ public:
    *  @param active The active color or tl::Color() for default
    *  @param target_box The box to draw or db::DBox() for default
    */
-  lay::PixelBuffer get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
+  tl::PixelBuffer get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
 
   /**
-   *  @brief Get the screen content as a monochrome lay::BitmapBuffer object with the given options
+   *  @brief Get the screen content as a monochrome tl::BitmapBuffer object with the given options
    *
    *  @param width The width of the image in pixels
    *  @param height The height of the image
@@ -923,7 +923,7 @@ public:
    *
    *  The colors will are converted to "on" pixels with a green channel value >= 50%.
    */
-  lay::BitmapBuffer get_pixels_with_options_mono (unsigned int width, unsigned int height, int linewidth, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
+  tl::BitmapBuffer get_pixels_with_options_mono (unsigned int width, unsigned int height, int linewidth, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
 
   /**
    *  @brief Hierarchy level selection setter

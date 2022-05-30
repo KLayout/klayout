@@ -20,7 +20,7 @@
 
 */
 
-#include "layPixelBuffer.h"
+#include "tlPixelBuffer.h"
 
 #include "tlUnitTest.h"
 #include "tlTimer.h"
@@ -72,19 +72,19 @@ static bool compare_images_mono (const QImage &qimg, const std::string &au)
 
 #endif
 
-static bool compare_images (const lay::PixelBuffer &img, const lay::PixelBuffer &img2)
+static bool compare_images (const tl::PixelBuffer &img, const tl::PixelBuffer &img2)
 {
   return img == img2;
 }
 
-static bool compare_images (const lay::BitmapBuffer &img, const lay::BitmapBuffer &img2)
+static bool compare_images (const tl::BitmapBuffer &img, const tl::BitmapBuffer &img2)
 {
   return img == img2;
 }
 
 TEST(1)
 {
-  lay::PixelBuffer img (15, 25);
+  tl::PixelBuffer img (15, 25);
   EXPECT_EQ (img.width (), 15);
   EXPECT_EQ (img.height (), 25);
   EXPECT_EQ (img.stride (), 15 * sizeof (tl::color_t));
@@ -96,7 +96,7 @@ TEST(1)
   img.fill (0x112233);
   EXPECT_EQ (img.scan_line (5)[10], 0x112233);
 
-  lay::PixelBuffer img2;
+  tl::PixelBuffer img2;
   EXPECT_EQ (img2.transparent (), false);
   img2 = img;
   EXPECT_EQ (img2.transparent (), true);
@@ -121,7 +121,7 @@ TEST(1)
   EXPECT_EQ (img.scan_line (5)[10], 0x332211);
   EXPECT_EQ (img2.scan_line (5)[10], 0x332211);
 
-  img2 = lay::PixelBuffer (10, 16);
+  img2 = tl::PixelBuffer (10, 16);
   EXPECT_EQ (img.width (), 15);
   EXPECT_EQ (img.height (), 25);
   EXPECT_EQ (img2.width (), 10);
@@ -138,7 +138,7 @@ TEST(1)
   EXPECT_EQ (img.height (), 16);
   EXPECT_EQ (img.scan_line (5)[8], 0xff010203);
 
-  lay::PixelBuffer img3 (img);
+  tl::PixelBuffer img3 (img);
   EXPECT_EQ (compare_images (img, img3), true);
   EXPECT_EQ (img3.width (), 10);
   EXPECT_EQ (img3.height (), 16);
@@ -153,25 +153,25 @@ TEST(1)
   EXPECT_EQ (img.height (), 16);
   EXPECT_EQ (img.scan_line (5)[8], 0xff102030);
 
-  lay::PixelBuffer img4 (std::move (img));
+  tl::PixelBuffer img4 (std::move (img));
   EXPECT_EQ (img4.width (), 10);
   EXPECT_EQ (img4.height (), 16);
   EXPECT_EQ (img4.scan_line (5)[8], 0xff102030);
 
   //  other constructors
-  EXPECT_EQ (compare_images (lay::PixelBuffer (img4.width (), img4.height (), (const tl::color_t *) img4.data ()), img4), true);
-  EXPECT_EQ (compare_images (lay::PixelBuffer (img4.width (), img4.height (), (const tl::color_t *) img4.data (), img4.stride ()), img4), true);
+  EXPECT_EQ (compare_images (tl::PixelBuffer (img4.width (), img4.height (), (const tl::color_t *) img4.data ()), img4), true);
+  EXPECT_EQ (compare_images (tl::PixelBuffer (img4.width (), img4.height (), (const tl::color_t *) img4.data (), img4.stride ()), img4), true);
 
   tl::color_t *dnew = new tl::color_t [ img4.width () * img4.height () * sizeof (tl::color_t) ];
   memcpy (dnew, (const tl::color_t *) img4.data (), img4.width () * img4.height () * sizeof (tl::color_t));
-  EXPECT_EQ (compare_images (lay::PixelBuffer (img4.width (), img4.height (), dnew), img4), true);
+  EXPECT_EQ (compare_images (tl::PixelBuffer (img4.width (), img4.height (), dnew), img4), true);
 }
 
 #if defined(HAVE_QT)
 
 TEST(2)
 {
-  lay::PixelBuffer img (227, 231);
+  tl::PixelBuffer img (227, 231);
 
   for (unsigned int i = 0; i < img.width (); ++i) {
     for (unsigned int j = 0; j < img.height (); ++j) {
@@ -192,13 +192,13 @@ TEST(2)
 
   EXPECT_EQ (compare_images (qimg, au), true);
 
-  lay::PixelBuffer img_returned = lay::PixelBuffer::from_image (qimg);
+  tl::PixelBuffer img_returned = tl::PixelBuffer::from_image (qimg);
   EXPECT_EQ (compare_images (img, img_returned), true);
 
-  lay::PixelBuffer img_saved (img);
+  tl::PixelBuffer img_saved (img);
   img.scan_line (52) [42] = 0xff000000;
 
-  lay::PixelBuffer diff = img.diff (img_saved);
+  tl::PixelBuffer diff = img.diff (img_saved);
   EXPECT_EQ (diff.transparent (), true);
   EXPECT_EQ (diff.to_image ().format () == QImage::Format_ARGB32, true);
   EXPECT_EQ (compare_images (img.to_image (), au), false);
@@ -237,14 +237,14 @@ TEST(2)
 //  libpng support
 TEST(3)
 {
-  lay::PixelBuffer img;
+  tl::PixelBuffer img;
 
   std::string in = tl::testsrc () + "/testdata/lay/png1.png";  //  ARGB32
   tl::info << "PNG file read (libpng) from " << in;
 
   {
     tl::InputStream stream (in);
-    img = lay::PixelBuffer::read_png (stream);
+    img = tl::PixelBuffer::read_png (stream);
   }
 
   std::string tmp = tmp_file ("test.png");
@@ -254,11 +254,11 @@ TEST(3)
   }
   tl::info << "PNG file written to " << tmp;
 
-  lay::PixelBuffer img2;
+  tl::PixelBuffer img2;
 
   {
     tl::InputStream stream (tmp);
-    img2 = lay::PixelBuffer::read_png (stream);
+    img2 = tl::PixelBuffer::read_png (stream);
   }
 
   std::string tmp2 = tmp_file ("test2.png");
@@ -279,14 +279,14 @@ TEST(3)
 
 TEST(4)
 {
-  lay::PixelBuffer img;
+  tl::PixelBuffer img;
 
   std::string in = tl::testsrc () + "/testdata/lay/png2.png";  //  RGB32
   tl::info << "PNG file read (libpng) from " << in;
 
   {
     tl::InputStream stream (in);
-    img = lay::PixelBuffer::read_png (stream);
+    img = tl::PixelBuffer::read_png (stream);
   }
 
   std::string tmp = tmp_file ("test.png");
@@ -296,11 +296,11 @@ TEST(4)
   }
   tl::info << "PNG file written to " << tmp;
 
-  lay::PixelBuffer img2;
+  tl::PixelBuffer img2;
 
   {
     tl::InputStream stream (tmp);
-    img2 = lay::PixelBuffer::read_png (stream);
+    img2 = tl::PixelBuffer::read_png (stream);
   }
 
   std::string tmp2 = tmp_file ("test2.png");
@@ -321,14 +321,14 @@ TEST(4)
 
 TEST(5)
 {
-  lay::PixelBuffer img;
+  tl::PixelBuffer img;
 
   std::string in = tl::testsrc () + "/testdata/lay/png3.png";  //  GA
   tl::info << "PNG file read (libpng) from " << in;
 
   {
     tl::InputStream stream (in);
-    img = lay::PixelBuffer::read_png (stream);
+    img = tl::PixelBuffer::read_png (stream);
   }
 
   std::string tmp = tmp_file ("test.png");
@@ -338,11 +338,11 @@ TEST(5)
   }
   tl::info << "PNG file written to " << tmp;
 
-  lay::PixelBuffer img2;
+  tl::PixelBuffer img2;
 
   {
     tl::InputStream stream (tmp);
-    img2 = lay::PixelBuffer::read_png (stream);
+    img2 = tl::PixelBuffer::read_png (stream);
   }
 
   std::string tmp2 = tmp_file ("test2.png");
@@ -363,14 +363,14 @@ TEST(5)
 
 TEST(6)
 {
-  lay::PixelBuffer img;
+  tl::PixelBuffer img;
 
   std::string in = tl::testsrc () + "/testdata/lay/png4.png";  //  G
   tl::info << "PNG file read (libpng) from " << in;
 
   {
     tl::InputStream stream (in);
-    img = lay::PixelBuffer::read_png (stream);
+    img = tl::PixelBuffer::read_png (stream);
   }
 
   std::string tmp = tmp_file ("test.png");
@@ -380,11 +380,11 @@ TEST(6)
   }
   tl::info << "PNG file written to " << tmp;
 
-  lay::PixelBuffer img2;
+  tl::PixelBuffer img2;
 
   {
     tl::InputStream stream (tmp);
-    img2 = lay::PixelBuffer::read_png (stream);
+    img2 = tl::PixelBuffer::read_png (stream);
   }
 
   std::string tmp2 = tmp_file ("test2.png");
@@ -408,13 +408,13 @@ TEST(6)
 TEST(7)
 {
   {
-    tl::SelfTimer timer ("Run time - lay::Image copy, no write (should be very fast)");
+    tl::SelfTimer timer ("Run time - tl::Image copy, no write (should be very fast)");
 
-    lay::PixelBuffer img (1000, 1000);
+    tl::PixelBuffer img (1000, 1000);
     img.fill (0x112233);
 
     for (unsigned int i = 0; i < 5000; ++i) {
-      lay::PixelBuffer img2 (img);
+      tl::PixelBuffer img2 (img);
     }
   }
 
@@ -422,7 +422,7 @@ TEST(7)
   {
     tl::SelfTimer timer ("Run time - QImage copy, no write (should be very fast)");
 
-    lay::PixelBuffer img (1000, 1000);
+    tl::PixelBuffer img (1000, 1000);
     img.fill (0x112233);
     QImage qimg (img.to_image ());
 
@@ -433,22 +433,22 @@ TEST(7)
 #endif
 
   {
-    tl::SelfTimer timer ("Run time - lay::Image copy on write");
+    tl::SelfTimer timer ("Run time - tl::Image copy on write");
 
-    lay::PixelBuffer img (1000, 1000);
+    tl::PixelBuffer img (1000, 1000);
     img.fill (0x112233);
 
     for (unsigned int i = 0; i < 5000; ++i) {
-      lay::PixelBuffer img2 (img);
+      tl::PixelBuffer img2 (img);
       img2.scan_line (100) [7] = 0;
     }
   }
 
 #if defined(HAVE_QT)
   {
-    tl::SelfTimer timer ("Run time - QImage copy on write (should not be much less than lay::Image copy on write)");
+    tl::SelfTimer timer ("Run time - QImage copy on write (should not be much less than tl::Image copy on write)");
 
-    lay::PixelBuffer img (1000, 1000);
+    tl::PixelBuffer img (1000, 1000);
     img.fill (0x112233);
     QImage qimg (img.to_image ());
 
@@ -461,7 +461,7 @@ TEST(7)
   {
     tl::SelfTimer timer ("Run time - direct QImage paint");
 
-    lay::PixelBuffer img (1000, 1000);
+    tl::PixelBuffer img (1000, 1000);
     img.fill (0x112233);
     QImage qimg (img.to_image ());
     QImage qrec (img.to_image ());
@@ -474,9 +474,9 @@ TEST(7)
   }
 
   {
-    tl::SelfTimer timer ("Run time - lay::Image paint (should not be much more than direct QImage paint)");
+    tl::SelfTimer timer ("Run time - tl::Image paint (should not be much more than direct QImage paint)");
 
-    lay::PixelBuffer img (1000, 1000);
+    tl::PixelBuffer img (1000, 1000);
     img.fill (0x112233);
     QImage qrec (img.to_image ());
     qrec.fill (0);
@@ -494,7 +494,7 @@ TEST(7)
 
 TEST(11)
 {
-  lay::BitmapBuffer img (15, 25);
+  tl::BitmapBuffer img (15, 25);
   EXPECT_EQ (img.width (), 15);
   EXPECT_EQ (img.height (), 25);
   EXPECT_EQ (img.stride (), 4);
@@ -502,7 +502,7 @@ TEST(11)
   img.fill (true);
   EXPECT_EQ (img.scan_line (5)[1], 0xff);
 
-  lay::BitmapBuffer img2;
+  tl::BitmapBuffer img2;
   img2 = img;
   EXPECT_EQ (img2.width (), 15);
   EXPECT_EQ (img2.height (), 25);
@@ -523,7 +523,7 @@ TEST(11)
   EXPECT_EQ (img.scan_line (5)[1], 0);
   EXPECT_EQ (img2.scan_line (5)[1], 0);
 
-  img2 = lay::BitmapBuffer (10, 16);
+  img2 = tl::BitmapBuffer (10, 16);
   EXPECT_EQ (img.width (), 15);
   EXPECT_EQ (img.height (), 25);
   EXPECT_EQ (img2.width (), 10);
@@ -540,7 +540,7 @@ TEST(11)
   EXPECT_EQ (img.height (), 16);
   EXPECT_EQ (img.scan_line (5)[0], 0xff);
 
-  lay::BitmapBuffer img3 (img);
+  tl::BitmapBuffer img3 (img);
   EXPECT_EQ (compare_images (img, img3), true);
   EXPECT_EQ (img3.width (), 10);
   EXPECT_EQ (img3.height (), 16);
@@ -555,25 +555,25 @@ TEST(11)
   EXPECT_EQ (img.height (), 16);
   EXPECT_EQ (img.scan_line (5)[1], 0);
 
-  lay::BitmapBuffer img4 (std::move (img));
+  tl::BitmapBuffer img4 (std::move (img));
   EXPECT_EQ (img4.width (), 10);
   EXPECT_EQ (img4.height (), 16);
   EXPECT_EQ (img4.scan_line (5)[1], 0);
 
   //  other constructors
-  EXPECT_EQ (compare_images (lay::BitmapBuffer (img4.width (), img4.height (), (const uint8_t *) img4.data ()), img4), true);
-  EXPECT_EQ (compare_images (lay::BitmapBuffer (img4.width (), img4.height (), (const uint8_t *) img4.data (), img4.stride ()), img4), true);
+  EXPECT_EQ (compare_images (tl::BitmapBuffer (img4.width (), img4.height (), (const uint8_t *) img4.data ()), img4), true);
+  EXPECT_EQ (compare_images (tl::BitmapBuffer (img4.width (), img4.height (), (const uint8_t *) img4.data (), img4.stride ()), img4), true);
 
   uint8_t *dnew = new uint8_t [ img4.width () * img4.height () * sizeof (uint8_t) ];
   memcpy (dnew, (const uint8_t *) img4.data (), img4.stride () * img4.height ());
-  EXPECT_EQ (compare_images (lay::BitmapBuffer (img4.width (), img4.height (), dnew), img4), true);
+  EXPECT_EQ (compare_images (tl::BitmapBuffer (img4.width (), img4.height (), dnew), img4), true);
 }
 
 #if defined(HAVE_QT)
 
 TEST(12)
 {
-  lay::BitmapBuffer img (227, 231);
+  tl::BitmapBuffer img (227, 231);
 
   for (unsigned int i = 0; i < img.stride (); ++i) {
     for (unsigned int j = 0; j < img.height (); ++j) {
@@ -593,7 +593,7 @@ TEST(12)
 
   EXPECT_EQ (compare_images_mono (qimg, au), true);
 
-  lay::BitmapBuffer img_returned = lay::BitmapBuffer::from_image (qimg);
+  tl::BitmapBuffer img_returned = tl::BitmapBuffer::from_image (qimg);
   EXPECT_EQ (compare_images (img, img_returned), true);
 
   qimg = img.to_image_copy ();
@@ -613,14 +613,14 @@ TEST(12)
 //  libpng support
 TEST(13)
 {
-  lay::BitmapBuffer img;
+  tl::BitmapBuffer img;
 
   std::string in = tl::testsrc () + "/testdata/lay/au_mono.png";
   tl::info << "PNG file read (libpng) from " << in;
 
   {
     tl::InputStream stream (in);
-    img = lay::BitmapBuffer::read_png (stream);
+    img = tl::BitmapBuffer::read_png (stream);
   }
 
   std::string tmp = tmp_file ("test.png");
@@ -630,11 +630,11 @@ TEST(13)
   }
   tl::info << "PNG file written to " << tmp;
 
-  lay::BitmapBuffer img2;
+  tl::BitmapBuffer img2;
 
   {
     tl::InputStream stream (tmp);
-    img2 = lay::BitmapBuffer::read_png (stream);
+    img2 = tl::BitmapBuffer::read_png (stream);
   }
 
   std::string tmp2 = tmp_file ("test2.png");

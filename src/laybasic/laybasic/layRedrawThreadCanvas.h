@@ -29,7 +29,7 @@
 #include "dbTrans.h"
 #include "layViewOp.h"
 #include "layBitmapRenderer.h"
-#include "layPixelBuffer.h"
+#include "tlPixelBuffer.h"
 #include "tlThreads.h"
 
 #include <vector>
@@ -319,12 +319,12 @@ public:
   /**
    *  @brief Transfer the content to a PixelBuffer
    */
-  void to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, tl::Color background, tl::Color foreground, tl::Color active, const lay::Drawings *drawings, PixelBuffer &img, unsigned int width, unsigned int height);
+  void to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, tl::Color background, tl::Color foreground, tl::Color active, const lay::Drawings *drawings, tl::PixelBuffer &img, unsigned int width, unsigned int height);
 
   /**
    *  @brief Transfer the content to a BitmapBuffer (monochrome)
    */
-  void to_image_mono (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, bool background, bool foreground, bool active, const lay::Drawings *drawings, lay::BitmapBuffer &img, unsigned int width, unsigned int height);
+  void to_image_mono (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, bool background, bool foreground, bool active, const lay::Drawings *drawings, tl::BitmapBuffer &img, unsigned int width, unsigned int height);
 
   /**
    *  @brief Gets the current bitmap data as a BitmapCanvasData object

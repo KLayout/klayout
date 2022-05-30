@@ -430,6 +430,25 @@ class RDB_TestClass < TestBase
     item.image_str=is
     assert_equal(item.image_str, is)
     assert_equal(item.has_image?, true)
+
+    if item.respond_to?(:image_pixels)
+      px=item.image_pixels
+      assert_equal(px.width, 42)
+      assert_equal(px.height, 52)
+      item.image = px
+      px2=item.image_pixels
+      assert_equal(px == px2, true)
+    end
+    
+    if item.respond_to?(:image)
+      px=item.image
+      assert_equal(px.width, 42)
+      assert_equal(px.height, 52)
+      item.image = px
+      px2=item.image
+      assert_equal(px2.width, 42)
+      assert_equal(px2.height, 52)
+    end
     
     vs = RBA::RdbItemValue.new("a string")
     vs2 = RBA::RdbItemValue.new("a string (ii)")

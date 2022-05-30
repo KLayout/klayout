@@ -1357,13 +1357,13 @@ BitmapViewObjectCanvas::set_size (double resolution)
   m_resolution = resolution;
 }
 
-lay::PixelBuffer *
+tl::PixelBuffer *
 BitmapViewObjectCanvas::bg_image ()
 {
   return 0;
 }
 
-lay::BitmapBuffer *
+tl::BitmapBuffer *
 BitmapViewObjectCanvas::bg_bitmap ()
 {
   return 0;

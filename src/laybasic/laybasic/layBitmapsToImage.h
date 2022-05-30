@@ -29,14 +29,18 @@
 
 #include <vector>
 
+namespace tl
+{
+  class PixelBuffer;
+  class BitmapBuffer;
+}
+
 namespace lay
 {
 
 class DitherPattern;
 class LineStyles;
 class Bitmap;
-class PixelBuffer;
-class BitmapBuffer;
 
 /**
  *  @brief This function converts the given set of bitmaps to a PixelBuffer
@@ -58,7 +62,7 @@ bitmaps_to_image (const std::vector <lay::ViewOp> &view_ops,
                   const std::vector <lay::Bitmap *> &pbitmaps,
                   const lay::DitherPattern &dp, 
                   const lay::LineStyles &ls,
-                  lay::PixelBuffer *pimage, unsigned int width, unsigned int height,
+                  tl::PixelBuffer *pimage, unsigned int width, unsigned int height,
                   bool use_bitmap_index,
                   tl::Mutex *mutex);
 
@@ -72,12 +76,12 @@ bitmaps_to_image (const std::vector <lay::ViewOp> &view_ops,
                   const std::vector <lay::Bitmap *> &pbitmaps,
                   const lay::DitherPattern &dp,
                   const lay::LineStyles &ls,
-                  lay::BitmapBuffer *pimage, unsigned int width, unsigned int height,
+                  tl::BitmapBuffer *pimage, unsigned int width, unsigned int height,
                   bool use_bitmap_index,
                   tl::Mutex *mutex);
 
 /**
- *  @brief Convert a lay::Bitmap to a unsigned char * data field to be passed to lay::BitmapBuffer
+ *  @brief Convert a lay::Bitmap to a unsigned char * data field to be passed to tl::BitmapBuffer
  *
  *  This function converts the bitmap given the view_op into a raw byte data
  *  field that can be passed to a QBitmap constructor. The data field is not 

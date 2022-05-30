@@ -23,12 +23,12 @@
 #include "layPixelBufferPainter.h"
 
 #include "layFixedFont.h"
-#include "layPixelBuffer.h"
+#include "tlPixelBuffer.h"
 
 namespace lay
 {
 
-PixelBufferPainter::PixelBufferPainter (lay::PixelBuffer &img, unsigned int width, unsigned int height, double resolution)
+PixelBufferPainter::PixelBufferPainter (tl::PixelBuffer &img, unsigned int width, unsigned int height, double resolution)
   : mp_img (&img),
     m_resolution (resolution), m_width (width), m_height (height)
 {

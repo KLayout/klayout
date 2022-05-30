@@ -2534,7 +2534,7 @@ LayoutViewBase::get_screenshot ()
 }
 #endif
 
-lay::PixelBuffer
+tl::PixelBuffer
 LayoutViewBase::get_screenshot_pb ()
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save screenshot")));
@@ -2597,7 +2597,7 @@ LayoutViewBase::save_screenshot (const std::string &fn)
   tl::DeferredMethodScheduler::execute ();
 
   tl::OutputStream stream (fn);
-  lay::PixelBuffer img = mp_canvas->screenshot ();
+  tl::PixelBuffer img = mp_canvas->screenshot ();
   img.set_texts (png_texts (this, box ()));
   img.write_png (stream);
 
@@ -2624,7 +2624,7 @@ LayoutViewBase::get_image (unsigned int width, unsigned int height)
 }
 #endif
 
-lay::PixelBuffer
+tl::PixelBuffer
 LayoutViewBase::get_pixels (unsigned int width, unsigned int height)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
@@ -2653,7 +2653,7 @@ LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height,
 }
 #endif
 
-lay::PixelBuffer
+tl::PixelBuffer
 LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
                                          tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box)
 {
@@ -2665,7 +2665,7 @@ LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height
   return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box);
 }
 
-lay::BitmapBuffer
+tl::BitmapBuffer
 LayoutViewBase::get_pixels_with_options_mono (unsigned int width, unsigned int height, int linewidth,
                                               tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box)
 {
@@ -2712,7 +2712,7 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
   tl::DeferredMethodScheduler::execute ();
 
   tl::OutputStream stream (fn);
-  lay::PixelBuffer img = mp_canvas->image (width, height);
+  tl::PixelBuffer img = mp_canvas->image (width, height);
   std::vector<std::pair<std::string, std::string> > texts = png_texts (this, vp.box ());
   img.set_texts (texts);
   img.write_png (stream);
@@ -2775,13 +2775,13 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
   tl::OutputStream stream (fn);
   if (monochrome) {
 
-    lay::BitmapBuffer img = mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box);
+    tl::BitmapBuffer img = mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box);
     img.set_texts (texts);
     img.write_png (stream);
 
   } else {
 
-    lay::PixelBuffer img = mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box);
+    tl::PixelBuffer img = mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box);
     img.set_texts (texts);
     img.write_png (stream);
 

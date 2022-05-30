@@ -132,7 +132,7 @@ std::string ImageCacheEntry::to_string () const
 // ----------------------------------------------------------------------------
 
 static void 
-blowup (const lay::PixelBuffer &src, lay::PixelBuffer &dest, unsigned int os)
+blowup (const tl::PixelBuffer &src, tl::PixelBuffer &dest, unsigned int os)
 {
   unsigned int ymax = src.height ();
   unsigned int xmax = src.width ();
@@ -152,7 +152,7 @@ blowup (const lay::PixelBuffer &src, lay::PixelBuffer &dest, unsigned int os)
 }
 
 static void 
-subsample (const lay::PixelBuffer &src, lay::PixelBuffer &dest, unsigned int os, double g)
+subsample (const tl::PixelBuffer &src, tl::PixelBuffer &dest, unsigned int os, double g)
 {
   //  TODO: this is probably not compatible with the endianess of SPARC ..
   
@@ -448,7 +448,7 @@ LayoutCanvas::prepare_drawing ()
       if (mp_image) {
         delete mp_image;
       }
-      mp_image = new lay::PixelBuffer (m_viewport_l.width (), m_viewport_l.height ());
+      mp_image = new tl::PixelBuffer (m_viewport_l.width (), m_viewport_l.height ());
       if (mp_image_fg) {
         delete mp_image_fg;
         mp_image_fg = 0;
@@ -589,7 +589,7 @@ LayoutCanvas::paint_event ()
         if (mp_image_bg) {
           delete mp_image_bg;
         }
-        mp_image_bg = new lay::PixelBuffer (*mp_image);
+        mp_image_bg = new tl::PixelBuffer (*mp_image);
 
       } else {
         //  else reuse the saved image
@@ -622,18 +622,18 @@ LayoutCanvas::paint_event ()
       clear_fg_bitmaps ();
       do_render (m_viewport_l, *this, true);
 
-      mp_image_fg = new lay::PixelBuffer ();
+      mp_image_fg = new tl::PixelBuffer ();
 
       if (fg_bitmaps () > 0) {
 
-        lay::PixelBuffer full_image (*mp_image);
+        tl::PixelBuffer full_image (*mp_image);
         bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dither_pattern (), line_styles (), &full_image, m_viewport_l.width (), m_viewport_l.height (), false, &m_mutex);
 
         //  render the foreground parts ..
         if (m_oversampling == 1) {
           *mp_image_fg = full_image;
         } else {
-          lay::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
+          tl::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
           subsampled_image.set_transparent (mp_image->transparent ());
           subsample (full_image, subsampled_image, m_oversampling, m_gamma);
           *mp_image_fg = subsampled_image;
@@ -645,7 +645,7 @@ LayoutCanvas::paint_event ()
 
       } else {
 
-        lay::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
+        tl::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
         subsampled_image.set_transparent (mp_image->transparent ());
         subsample (*mp_image, subsampled_image, m_oversampling, m_gamma);
         *mp_image_fg = subsampled_image;
@@ -670,7 +670,7 @@ LayoutCanvas::paint_event ()
 
     if (fg_bitmaps () > 0) {
 
-      lay::PixelBuffer full_image (mp_image->width (), mp_image->height ());
+      tl::PixelBuffer full_image (mp_image->width (), mp_image->height ());
       full_image.set_transparent (true);
       full_image.fill (0);
 
@@ -684,7 +684,7 @@ LayoutCanvas::paint_event ()
 #endif
         painter.drawImage (QPoint (0, 0), img);
       } else {
-        lay::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
+        tl::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
         subsampled_image.set_transparent (true);
         subsample (full_image, subsampled_image, m_oversampling, m_gamma);
         QImage img = subsampled_image.to_image ();
@@ -712,7 +712,7 @@ class DetachedViewObjectCanvas
   : public BitmapViewObjectCanvas
 {
 public:
-  DetachedViewObjectCanvas (tl::Color bg, tl::Color fg, tl::Color ac, unsigned int width_l, unsigned int height_l, double resolution, lay::PixelBuffer *img)
+  DetachedViewObjectCanvas (tl::Color bg, tl::Color fg, tl::Color ac, unsigned int width_l, unsigned int height_l, double resolution, tl::PixelBuffer *img)
     : BitmapViewObjectCanvas (width_l, height_l, resolution),
       m_bg (bg), m_fg (fg), m_ac (ac), mp_image (img)
   {
@@ -720,7 +720,7 @@ public:
     m_gamma = 2.0;
 
     if (img->width () != width_l || img->height () != height_l) {
-      mp_image_l = new lay::PixelBuffer (width_l, height_l);
+      mp_image_l = new tl::PixelBuffer (width_l, height_l);
       mp_image_l->set_transparent (img->transparent ());
       mp_image_l->fill (bg.rgb ());
     } else {
@@ -753,7 +753,7 @@ public:
     return m_ac;
   }
 
-  virtual lay::PixelBuffer *bg_image ()
+  virtual tl::PixelBuffer *bg_image ()
   {
     return mp_image_l ? mp_image_l : mp_image;
   }
@@ -781,8 +781,8 @@ public:
 
 private:
   tl::Color m_bg, m_fg, m_ac;
-  lay::PixelBuffer *mp_image;
-  lay::PixelBuffer *mp_image_l;
+  tl::PixelBuffer *mp_image;
+  tl::PixelBuffer *mp_image_l;
   double m_gamma;
 };
 
@@ -828,13 +828,13 @@ private:
   bool m_bg, m_fg, m_ac;
 };
 
-lay::PixelBuffer
+tl::PixelBuffer
 LayoutCanvas::image (unsigned int width, unsigned int height) 
 {
   return image_with_options (width, height, -1, -1, -1.0, tl::Color (), tl::Color (), tl::Color (), db::DBox ());
 }
 
-lay::PixelBuffer
+tl::PixelBuffer
 LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box)
 {
   if (oversampling <= 0) {
@@ -857,7 +857,7 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
   }
 
   //  TODO: for other architectures MonoLSB may not be the right format
-  lay::PixelBuffer img (width, height);
+  tl::PixelBuffer img (width, height);
 
   //  this may happen for BIG images:
   if (img.width () != width || img.height () != height) {
@@ -910,7 +910,7 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
   return img;
 }
 
-lay::BitmapBuffer
+tl::BitmapBuffer
 LayoutCanvas::image_with_options_mono (unsigned int width, unsigned int height, int linewidth, tl::Color background_c, tl::Color foreground_c, tl::Color active_c, const db::DBox &target_box)
 {
   if (linewidth <= 0) {
@@ -946,7 +946,7 @@ LayoutCanvas::image_with_options_mono (unsigned int width, unsigned int height, 
   redraw_thread.start (0 /*synchronous*/, m_layers, vp, 1.0, true);
   redraw_thread.stop (); // safety
 
-  lay::BitmapBuffer img (width, height);
+  tl::BitmapBuffer img (width, height);
   img.fill (background);
 
   rd_canvas.to_image_mono (view_ops, dither_pattern (), line_styles (), background, foreground, active, this, img, vp.width (), vp.height ());
@@ -954,13 +954,13 @@ LayoutCanvas::image_with_options_mono (unsigned int width, unsigned int height, 
   return img;
 }
 
-lay::PixelBuffer
+tl::PixelBuffer
 LayoutCanvas::screenshot () 
 {
   //  if required, start the redraw thread ..
   prepare_drawing ();
 
-  lay::PixelBuffer img (m_viewport.width (), m_viewport.height ());
+  tl::PixelBuffer img (m_viewport.width (), m_viewport.height ());
   img.fill (m_background);
 
   DetachedViewObjectCanvas vo_canvas (background_color (), foreground_color (), active_color (), m_viewport_l.width (), m_viewport_l.height (), 1.0 / double (m_oversampling * m_dpr), &img);

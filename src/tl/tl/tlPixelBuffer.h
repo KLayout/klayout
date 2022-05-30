@@ -20,10 +20,10 @@
 
 */
 
-#ifndef HDR_layPixelBuffer
-#define HDR_layPixelBuffer
+#ifndef HDR_tlPixelBuffer
+#define HDR_tlPixelBuffer
 
-#include "laybasicCommon.h"
+#include "tlCommon.h"
 #include "tlColor.h"
 #include "tlCopyOnWrite.h"
 #include "tlStream.h"
@@ -36,13 +36,13 @@
 #  include <QImage>
 #endif
 
-namespace lay
+namespace tl
 {
 
 /**
  *  @brief An exception thrown when a PNG read error occurs
  */
-class LAYBASIC_PUBLIC PixelBufferReadError
+class TL_PUBLIC PixelBufferReadError
   : public tl::Exception
 {
 public:
@@ -53,7 +53,7 @@ public:
 /**
  *  @brief An exception thrown when a PNG write error occurs
  */
-class LAYBASIC_PUBLIC PixelBufferWriteError
+class TL_PUBLIC PixelBufferWriteError
   : public tl::Exception
 {
 public:
@@ -67,7 +67,7 @@ public:
  *  This class substitutes QImage in Qt-less applications.
  *  It provides 32bit RGBA pixels with the format used by tl::Color.
  */
-class LAYBASIC_PUBLIC PixelBuffer
+class TL_PUBLIC PixelBuffer
 {
 public:
   /**
@@ -329,7 +329,7 @@ private:
  *  This class substitutes QImage for monochrome images in Qt-less applications.
  */
 
-class LAYBASIC_PUBLIC BitmapBuffer
+class TL_PUBLIC BitmapBuffer
 {
 public:
   /**

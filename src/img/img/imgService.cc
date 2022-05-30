@@ -90,7 +90,7 @@ private:
 // -------------------------------------------------------------
 
 static void
-draw_scanline (unsigned int level, const img::Object &image_object, lay::PixelBuffer &pxbuffer, int y, const db::Matrix3d &t, const db::Matrix3d &it, const db::DPoint &q1, const db::DPoint &q2)
+draw_scanline (unsigned int level, const img::Object &image_object, tl::PixelBuffer &pxbuffer, int y, const db::Matrix3d &t, const db::Matrix3d &it, const db::DPoint &q1, const db::DPoint &q2)
 {
   double source_width = image_object.width ();
   double source_height = image_object.height ();
@@ -155,7 +155,7 @@ draw_image (const img::Object &image_object, const lay::Viewport &vp, lay::ViewO
     return;
   }
 
-  lay::PixelBuffer &image = *bmp_canvas->bg_image ();
+  tl::PixelBuffer &image = *bmp_canvas->bg_image ();
   db::DBox source_image_box (0.0, 0.0, image_object.width (), image_object.height ());
 
   //  safety measure to avoid division by zero.

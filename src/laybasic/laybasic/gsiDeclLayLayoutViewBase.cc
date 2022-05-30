@@ -327,12 +327,12 @@ static void save_as2 (lay::LayoutViewBase *view, unsigned int index, const std::
   view->save_as (index, filename, tl::OutputStream::OM_Auto, options, true, 0);
 }
 
-static lay::PixelBuffer get_pixels_with_options (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box)
+static tl::PixelBuffer get_pixels_with_options (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box)
 {
   return view->get_pixels_with_options (width, height, linewidth, oversampling, resolution, tl::Color (), tl::Color (), tl::Color (), target_box);
 }
 
-static lay::BitmapBuffer get_pixels_with_options_mono (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, const db::DBox &target_box)
+static tl::BitmapBuffer get_pixels_with_options_mono (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, const db::DBox &target_box)
 {
   return view->get_pixels_with_options_mono (width, height, linewidth, tl::Color (), tl::Color (), tl::Color (), target_box);
 }
@@ -1129,7 +1129,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "This method has been introduced in 0.23.10.\n"
   ) +
 #endif
-  gsi::method ("get_screenshot_pixels", static_cast<lay::PixelBuffer (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::get_screenshot_pb),
+  gsi::method ("get_screenshot_pixels", static_cast<tl::PixelBuffer (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::get_screenshot_pb),
     "@brief Gets a screenshot as a \\PixelBuffer\n"
     "\n"
     "Getting the image requires the drawing to be complete. Ideally, synchronous mode is switched on "
@@ -1138,7 +1138,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "\n"
     "This method has been introduced in 0.28.\n"
   ) +
-  gsi::method ("get_pixels", static_cast<lay::PixelBuffer (lay::LayoutViewBase::*) (unsigned int, unsigned int)> (&lay::LayoutViewBase::get_pixels), gsi::arg ("width"), gsi::arg ("height"),
+  gsi::method ("get_pixels", static_cast<tl::PixelBuffer (lay::LayoutViewBase::*) (unsigned int, unsigned int)> (&lay::LayoutViewBase::get_pixels), gsi::arg ("width"), gsi::arg ("height"),
     "@brief Gets the layout image as a \\PixelBuffer\n"
     "\n"
     "@param width The width of the image to render in pixel.\n"

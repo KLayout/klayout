@@ -12,7 +12,6 @@ SOURCES = \
   layBitmapsToImage.cc \
   layLayerProperties.cc \
   layParsedLayerSource.cc \
-  layPixelBufferTests.cc \
   layRenderer.cc \
   layAbstractMenuTests.cc \
   laySnapTests.cc

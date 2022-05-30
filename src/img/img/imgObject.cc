@@ -27,7 +27,7 @@
 #include "tlTimer.h"
 #include "layPlugin.h"
 #include "layConverters.h"
-#include "layPixelBuffer.h"
+#include "tlPixelBuffer.h"
 #include "dbPolygonTools.h"
 #include "tlFileUtils.h"
 #include "tlUri.h"
@@ -1628,11 +1628,11 @@ Object::read_file ()
 
 #elif defined(HAVE_PNG)
 
-  lay::PixelBuffer img;
+  tl::PixelBuffer img;
 
   {
     tl::InputStream stream (m_filename);
-    img = lay::PixelBuffer::read_png (stream);
+    img = tl::PixelBuffer::read_png (stream);
   }
 
   bool is_color = false;

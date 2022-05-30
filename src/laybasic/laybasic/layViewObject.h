@@ -63,6 +63,12 @@ namespace db
   class Layout;
 }
 
+namespace tl
+{
+  class PixelBuffer;
+  class BitmapBuffer;
+}
+
 namespace lay {
 
 class Viewport;
@@ -70,8 +76,6 @@ class ViewObjectUI;
 class ViewObjectCanvas;
 class CanvasPlane;
 class Bitmap;
-class PixelBuffer;
-class BitmapBuffer;
 
 #if defined(HAVE_QT)
 class DragDropDataBase;
@@ -1323,12 +1327,12 @@ public:
   /**
    *  @brief Gets the pixel buffer that background objects render to
    */
-  virtual lay::PixelBuffer *bg_image ();
+  virtual tl::PixelBuffer *bg_image ();
 
   /**
    *  @brief Gets the monochrome pixel buffer that background objects render to
    */
-  virtual lay::BitmapBuffer *bg_bitmap ();
+  virtual tl::BitmapBuffer *bg_bitmap ();
 
 private:
   std::map <lay::ViewOp, unsigned int> m_fg_bitmap_table;

@@ -164,10 +164,10 @@ public:
     return m_view_ops; 
   }
 
-  lay::PixelBuffer screenshot ();
-  lay::PixelBuffer image (unsigned int width, unsigned int height);
-  lay::PixelBuffer image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
-  lay::BitmapBuffer image_with_options_mono (unsigned int width, unsigned int height, int linewidth, tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box);
+  tl::PixelBuffer screenshot ();
+  tl::PixelBuffer image (unsigned int width, unsigned int height);
+  tl::PixelBuffer image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
+  tl::BitmapBuffer image_with_options_mono (unsigned int width, unsigned int height, int linewidth, tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box);
 
   void update_image ();
 
@@ -312,7 +312,7 @@ public:
   /**
    *  @brief Reimplementation of ViewObjectCanvas: background image
    */
-  lay::PixelBuffer *bg_image ()
+  tl::PixelBuffer *bg_image ()
   {
     return mp_image;
   }
@@ -358,9 +358,9 @@ public:
 
 private:
   lay::LayoutViewBase *mp_view;
-  lay::PixelBuffer *mp_image;
-  lay::PixelBuffer *mp_image_bg;
-  lay::PixelBuffer *mp_image_fg;
+  tl::PixelBuffer *mp_image;
+  tl::PixelBuffer *mp_image_bg;
+  tl::PixelBuffer *mp_image_fg;
   db::DBox m_precious_box;
   lay::Viewport m_viewport, m_viewport_l;
   tl::color_t m_background;

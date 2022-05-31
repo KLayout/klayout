@@ -1673,11 +1673,11 @@ Object::read_file ()
       const tl::color_t *dd = d + img.width ();
       while (d != dd) {
         tl::color_t rgb = *d++;
-        *red++ = lay::red (rgb);
-        *green++ = lay::green (rgb);
-        *blue++ = lay::blue (rgb);
+        *red++ = tl::red (rgb);
+        *green++ = tl::green (rgb);
+        *blue++ = tl::blue (rgb);
         if (msk) {
-          *msk++ = lay::alpha (rgb) > 128;
+          *msk++ = tl::alpha (rgb) > 128;
         }
       }
     }
@@ -1692,9 +1692,9 @@ Object::read_file ()
       const tl::color_t *dd = d + img.width ();
       while (d != dd) {
         tl::color_t rgb = *d++;
-        *mono++ = lay::green (rgb);
+        *mono++ = tl::green (rgb);
         if (msk) {
-          *msk++ = lay::alpha (rgb) > 128;
+          *msk++ = tl::alpha (rgb) > 128;
         }
       }
     }

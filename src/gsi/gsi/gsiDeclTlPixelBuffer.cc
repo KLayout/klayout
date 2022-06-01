@@ -25,7 +25,6 @@
 
 #if defined(HAVE_QT)
 #  include <QBuffer>
-#  include <QColor>
 #endif
 
 namespace gsi
@@ -38,13 +37,6 @@ static tl::PixelBuffer *create_pixel_buffer (unsigned int w, unsigned int h)
 {
   return new tl::PixelBuffer (w, h);
 }
-
-#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
-static void fill_with_qcolor (tl::PixelBuffer *pb, QColor c)
-{
-  pb->fill (c.rgb ());
-}
-#endif
 
 tl::color_t get_pixel_from_pixel_buffer (const tl::PixelBuffer *pb, unsigned int x, unsigned int y)
 {
@@ -161,11 +153,6 @@ Class<tl::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
   gsi::method ("fill", &tl::PixelBuffer::fill, gsi::arg ("color"),
     "@brief Fills the pixel buffer with the given pixel value\n"
   ) +
-#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
-  gsi::method_ext ("fill", &fill_with_qcolor, gsi::arg ("color"),
-    "@brief Fills the pixel buffer with the given QColor\n"
-  ) +
-#endif
   gsi::method ("swap", &tl::PixelBuffer::swap, gsi::arg ("other"),
     "@brief Swaps data with another PixelBuffer object\n"
   ) +
@@ -181,14 +168,6 @@ Class<tl::PixelBuffer> decl_PixelBuffer ("lay", "PixelBuffer",
   gsi::method_ext ("pixel", &get_pixel_from_pixel_buffer, gsi::arg ("x"), gsi::arg ("y"),
     "@brief Gets the value of the pixel at position x, y\n"
   ) +
-#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
-  gsi::method ("to_qimage", &tl::PixelBuffer::to_image_copy,
-    "@brief Converts the pixel buffer to a \\QImage object"
-  ) +
-  gsi::method ("from_qimage", &tl::PixelBuffer::from_image, gsi::arg ("qimage"),
-    "@brief Creates a pixel buffer object from a QImage object\n"
-  ) +
-#endif
   gsi::method ("read_png", &read_pixel_buffer, gsi::arg ("file"),
     "@brief Reads the pixel buffer from a PNG file"
     "\n"
@@ -353,11 +332,6 @@ Class<tl::BitmapBuffer> decl_BitmapBuffer ("lay", "BitmapBuffer",
   gsi::method ("fill", &tl::BitmapBuffer::fill, gsi::arg ("color"),
     "@brief Fills the pixel buffer with the given pixel value\n"
   ) +
-#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
-  gsi::method_ext ("fill", &fill_with_qcolor, gsi::arg ("color"),
-    "@brief Fills the pixel buffer with the given QColor\n"
-  ) +
-#endif
   gsi::method ("swap", &tl::BitmapBuffer::swap, gsi::arg ("other"),
     "@brief Swaps data with another BitmapBuffer object\n"
   ) +
@@ -373,14 +347,6 @@ Class<tl::BitmapBuffer> decl_BitmapBuffer ("lay", "BitmapBuffer",
   gsi::method_ext ("pixel", &get_pixel_from_bitmap_buffer, gsi::arg ("x"), gsi::arg ("y"),
     "@brief Gets the value of the pixel at position x, y\n"
   ) +
-#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
-  gsi::method ("to_qimage", &tl::BitmapBuffer::to_image_copy,
-    "@brief Converts the pixel buffer to a \\QImage object"
-  ) +
-  gsi::method ("from_qimage", &tl::BitmapBuffer::from_image, gsi::arg ("qimage"),
-    "@brief Creates a pixel buffer object from a QImage object\n"
-  ) +
-#endif
   gsi::method ("read_png", &read_bitmap_buffer, gsi::arg ("file"),
     "@brief Reads the pixel buffer from a PNG file"
     "\n"

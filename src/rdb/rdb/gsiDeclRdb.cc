@@ -821,18 +821,6 @@ Class<rdb::Item> decl_RdbItem ("rdb", "RdbItem",
     "@brief Sets the image from a string\n"
     "@param image A base64-encoded image file (preferably in PNG format)\n"
   ) +
-#if defined(HAVE_QTBINDINGS)
-  gsi::method ("image", &rdb::Item::image,
-    "@brief Gets the attached image as a QImage object\n"
-    "\n"
-    "This method has been added in version 0.28."
-  ) +
-  gsi::method ("image=", static_cast<void (rdb::Item::*) (const QImage &)> (&rdb::Item::set_image),
-    "@brief Sets the attached image from a QImage object\n"
-    "\n"
-    "This method has been added in version 0.28."
-  ) +
-#endif
 #if defined(HAVE_PNG)
   gsi::method ("image_pixels", &rdb::Item::image_pixels,
     "@brief Gets the attached image as a PixelBuffer object\n"

@@ -38,6 +38,7 @@ SOURCES += \
   gsiDeclLayPlugin.cc \
   gsiDeclLayTlAdded.cc \
   gsiDeclLayRdbAdded.cc \
+  layLayoutViewConfig.cc \
   laybasicForceLink.cc \
   layAnnotationShapes.cc \
   layBitmap.cc \

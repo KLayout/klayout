@@ -1,3 +1,11 @@
+0.27.10          (2022-06-04):
+* Bugfix: %GITHUB%/issues/1081 Using a layer properties file from recent list without layout loaded crashes KLayout
+* Enhancement: %GITHUB%/issues/1079 PCell update: Library#refresh should call coerce_parameters_impl  
+* Bugfix: %GITHUB%/issues/1075 Edit layer specification doesn't work well with PCells
+* Bugfix: %GITHUB%/issues/1071 Issues with GDS text format and "Save As"
+* Bugfix: %GITHUB%/issues/1068 Circle handle not shown sometimes
+* Bugfixes: two potential segfaults fixed due to early delete of LayoutView and access to non-initialized memory
+
 0.27.9          (2022-04-23):
 * Bugfix: %GITHUB%/issues/1008 Don't optimize away points on path edit
 * Bugfix: %GITHUB%/issues/1011 DRC in deep mode highlights erroneous width violation with text

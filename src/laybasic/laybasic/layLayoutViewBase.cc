@@ -5369,6 +5369,110 @@ LayoutViewBase::default_mode ()
   return 0; // TODO: any generic scheme? is select, should be ruler..
 }
 
+static std::string
+name_from_title (const std::string &title)
+{
+  std::string s = title;
+  std::string::size_type tab = s.find ('\t');
+  if (tab != std::string::npos) {
+    s = std::string (s, 0, tab);
+  }
+  std::string::size_type colon = s.find (':');
+  if (colon != std::string::npos) {
+    s = std::string (s, 0, colon);
+  }
+  return s;
+}
+
+static bool
+edit_mode_from_title (const std::string &title)
+{
+  std::string s = title;
+  std::string::size_type tab = s.find ('\t');
+  if (tab != std::string::npos) {
+    s = std::string (s, 0, tab);
+  }
+  std::vector<std::string> parts = tl::split (s, ":");
+  for (auto i = parts.begin (); i != parts.end (); ++i) {
+    if (*i == "edit_mode") {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::vector<std::string>
+LayoutViewBase::mode_names () const
+{
+  std::vector<std::string> names;
+
+  std::vector<std::string> intrinsic_modes;
+  intrinsic_mouse_modes (&intrinsic_modes);
+  for (auto i = intrinsic_modes.begin (); i != intrinsic_modes.end (); ++i) {
+    names.push_back (name_from_title (*i));
+  }
+
+  for (auto i = mp_plugins.begin (); i != mp_plugins.end (); ++i) {
+    std::string title;
+    if ((*i) && (*i)->plugin_declaration () && (*i)->plugin_declaration ()->implements_mouse_mode (title)) {
+      if (is_editable () || !edit_mode_from_title (title)) {
+        names.push_back (name_from_title (title));
+      }
+    }
+  }
+
+  return names;
+}
+
+std::string
+LayoutViewBase::mode_name () const
+{
+  if (m_mode <= 0) {
+
+    std::vector<std::string> intrinsic_modes;
+    intrinsic_mouse_modes (&intrinsic_modes);
+
+    if (int (intrinsic_modes.size ()) > -m_mode) {
+      return name_from_title (intrinsic_modes [-m_mode]);
+    }
+
+  } else {
+
+    for (auto i = mp_plugins.begin (); i != mp_plugins.end (); ++i) {
+      std::string title;
+      if ((*i) && (*i)->plugin_declaration () && (*i)->plugin_declaration ()->id () == m_mode && (*i)->plugin_declaration ()->implements_mouse_mode (title)) {
+        return name_from_title (title);
+      }
+    }
+
+  }
+
+  return std::string ();
+}
+
+void
+LayoutViewBase::switch_mode (const std::string &name)
+{
+  std::vector<std::string> intrinsic_modes;
+  intrinsic_mouse_modes (&intrinsic_modes);
+  for (auto i = intrinsic_modes.begin (); i != intrinsic_modes.end (); ++i) {
+    if (name_from_title (*i) == name) {
+      switch_mode (int (0 - int (i - intrinsic_modes.begin ())));
+      return;
+    }
+  }
+
+  for (auto i = mp_plugins.begin (); i != mp_plugins.end (); ++i) {
+    std::string title;
+    if ((*i) && (*i)->plugin_declaration () && (*i)->plugin_declaration ()->implements_mouse_mode (title)) {
+      if (name_from_title (title) == name) {
+        switch_mode ((*i)->plugin_declaration ()->id ());
+        return;
+      }
+    }
+  }
+}
+
 std::vector<std::string>
 LayoutViewBase::menu_symbols ()
 {

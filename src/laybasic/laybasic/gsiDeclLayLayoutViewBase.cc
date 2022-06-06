@@ -952,6 +952,42 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "\n"
     "@param props The layer properties object to initialize."
   ) +
+  gsi::method ("switch_mode", static_cast<void (lay::LayoutViewBase::*) (const std::string &)> (&lay::LayoutViewBase::switch_mode),
+    "@brief Switches the mode.\n"
+    "\n"
+    "See \\mode_name about a method to get the name of the current mode and \\mode_names for a method "
+    "to retrieve all available mode names.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("mode_name", &lay::LayoutViewBase::mode_name,
+    "@brief Gets the name of the current mode.\n"
+    "\n"
+    "See \\switch_mode about a method to change the mode and \\mode_names for a method "
+    "to retrieve all available mode names.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("mode_names", &lay::LayoutViewBase::mode_names,
+    "@brief Gets the names of the available modes.\n"
+    "\n"
+    "This method allows asking the view for the available mode names for \\switch_mode and "
+    "for the value returned by \\mode.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("call_menu", &lay::LayoutViewBase::menu_activated, gsi::arg ("symbol"),
+    "@brief Calls the menu item with the provided symbol.\n"
+    "To obtain all symbols, use \\menu_symbols.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("menu_symbols", &lay::LayoutViewBase::menu_symbols,
+    "@brief Gets all available menu symbols.\n"
+    "NOTE: currently this method delivers a superset of all available symbols. Depending on the context, no all symbols may trigger actual functionality.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
   gsi::method ("cancel", &lay::LayoutViewBase::cancel,
     "@brief Cancels all edit operations\n"
     "\n"

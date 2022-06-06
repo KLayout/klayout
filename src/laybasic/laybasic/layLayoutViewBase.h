@@ -221,6 +221,23 @@ public:
   virtual void switch_mode (int m);
 
   /**
+   *  @brief Gets the name of the active mode
+   */
+  std::string mode_name () const;
+
+  /**
+   *  @brief Switches the mode according to the given name
+   *
+   *  The name must be one of the names provided by "mode_names".
+   */
+  void switch_mode (const std::string &name);
+
+  /**
+   *  @brief Gets the names of the available modes
+   */
+  std::vector<std::string> mode_names () const;
+
+  /**
    *  @brief Determine if there is something to copy
    *
    *  This reimplementation of the lay::Editables interface additionally

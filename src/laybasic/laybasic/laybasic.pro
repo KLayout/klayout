@@ -16,7 +16,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layPluginConfigPage.cc \
     layPropertiesDialog.cc \
     layProperties.cc \
-    layAbstractMenu.cc \
     layDragDropData.cc \
     layCursor.cc \
 
@@ -25,7 +24,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layPluginConfigPage.h \
     layPropertiesDialog.h \
     layProperties.h \
-    layAbstractMenu.h \
     layDragDropData.h \
     layCursor.h \
 
@@ -35,9 +33,11 @@ SOURCES += \
   gsiDeclLayLayers.cc \
   gsiDeclLayLayoutViewBase.cc \
   gsiDeclLayMarker.cc \
+  gsiDeclLayMenu.cc \
   gsiDeclLayPlugin.cc \
   gsiDeclLayTlAdded.cc \
   gsiDeclLayRdbAdded.cc \
+  layAbstractMenu.cc \
   layLayoutViewConfig.cc \
   laybasicForceLink.cc \
   layAnnotationShapes.cc \
@@ -90,6 +90,7 @@ SOURCES += \
 HEADERS += \
   laybasicConfig.h \
   laybasicForceLink.h \
+  layAbstractMenu.h \
   layAnnotationShapes.h \
   layBitmap.h \
   layBitmapRenderer.h \

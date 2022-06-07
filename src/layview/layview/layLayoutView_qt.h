@@ -741,7 +741,6 @@ private:
   QSize size_hint () const;
 
   void init_ui (QWidget *parent, const char *name);
-  void init_menu ();
   void do_setup_editor_options_pages ();
 
 protected:

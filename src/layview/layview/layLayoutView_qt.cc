@@ -242,26 +242,6 @@ LayoutView::event_filter (QObject *obj, QEvent *event, bool &taken)
 }
 
 void
-LayoutView::init_menu ()
-{
-  //  make the plugins create their menu items
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    //  TODO: get rid of the const_cast hack
-    const_cast <lay::PluginDeclaration *> (&*cls)->init_menu (dispatcher ());
-  }
-
-  //  if not in editable mode, hide all entries from "edit_mode" group and show all from the "view_mode" group and vice versa
-  std::vector<std::string> edit_mode_grp = menu ()->group ("edit_mode");
-  for (std::vector<std::string>::const_iterator g = edit_mode_grp.begin (); g != edit_mode_grp.end (); ++g) {
-    menu ()->action (*g)->set_visible (is_editable ());
-  }
-  std::vector<std::string> view_mode_grp = menu ()->group ("view_mode");
-  for (std::vector<std::string>::const_iterator g = view_mode_grp.begin (); g != view_mode_grp.end (); ++g) {
-    menu ()->action (*g)->set_visible (! is_editable ());
-  }
-}
-
-void
 LayoutView::init_ui (QWidget *parent, const char *name)
 {
   m_activated = true;
@@ -406,6 +386,7 @@ LayoutView::init_ui (QWidget *parent, const char *name)
   }
   
   config_setup ();
+  finish ();
 }
 
 LayoutView::~LayoutView ()

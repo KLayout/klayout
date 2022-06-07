@@ -2861,6 +2861,8 @@ protected:
 
   void free_resources ();
   void shutdown ();
+  void finish ();
+  void init_menu ();
 
   virtual tl::Color default_background_color ();
   virtual void do_set_background_color (tl::Color color, tl::Color contrast);

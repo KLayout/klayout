@@ -64,9 +64,7 @@ private:
   
   std::vector<ant::Template> m_templates;
   int m_current_template;
-#if defined(HAVE_QT)
   tl::weak_collection<lay::ConfigureAction> m_actions;
-#endif
   bool m_current_template_updated;
   bool m_templates_updated;
 };

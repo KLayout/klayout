@@ -96,8 +96,6 @@ PluginDeclaration::menu_symbols ()
   return symbols;
 }
 
-#if defined(HAVE_QT)
-
 namespace {
 
 class GenericMenuAction
@@ -173,7 +171,9 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
     } 
 
     mp_editable_mode_action.reset (new Action (title));
+#if defined(HAVE_QT)
     gtf::action_connect (mp_editable_mode_action->qaction (), SIGNAL (triggered ()), this, SLOT (toggle_editable_enabled ()));
+#endif
     mp_editable_mode_action->set_checkable (true);
     mp_editable_mode_action->set_checked (m_editable_enabled);
 
@@ -281,18 +281,14 @@ PluginDeclaration::remove_menu_items (Dispatcher *dispatcher)
   m_menu_actions.clear ();
 }
 
-#endif
-
 void 
 PluginDeclaration::set_editable_enabled (bool f)
 {
   if (f != m_editable_enabled) {
     m_editable_enabled = f;
-#if defined(HAVE_QT)
     if (mp_editable_mode_action.get ()) {
       mp_editable_mode_action->set_checked (f);
     }
-#endif
     editable_enabled_changed_event ();
   }
 }
@@ -434,17 +430,6 @@ Plugin::get_config_names (std::vector<std::string> &names) const
 
 Dispatcher *
 Plugin::dispatcher ()
-{
-  Plugin *p = this;
-  while (p->mp_parent) {
-    p = p->mp_parent;
-  }
-
-  return dynamic_cast<Dispatcher *> (p);
-}
-
-Dispatcher *
-Plugin::dispatcher_maybe_null ()
 {
   Plugin *p = this;
   while (p->mp_parent) {

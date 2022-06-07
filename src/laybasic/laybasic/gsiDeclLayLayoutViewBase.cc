@@ -461,6 +461,11 @@ static LayerPropertiesConstIteratorWrapper each_layer2 (lay::LayoutViewBase *vie
   return LayerPropertiesConstIteratorWrapper (view->begin_layers (list_index));
 }
 
+static lay::AbstractMenu *menu (lay::LayoutViewBase *view)
+{
+  return view->menu ();
+}
+
 #if defined(HAVE_QT)
 LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutViewBase",
 #else
@@ -973,6 +978,14 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "\n"
     "This method allows asking the view for the available mode names for \\switch_mode and "
     "for the value returned by \\mode.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method_ext ("menu", &menu,
+    "@brief Gets the \\AbstractMenu associated with this view.\n"
+    "\n"
+    "In normal UI application mode this is the main window's view. For a detached view or in non-UI "
+    "applications this is the view's private menu.\n"
     "\n"
     "This method has been introduced in version 0.28."
   ) +

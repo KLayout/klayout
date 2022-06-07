@@ -24,10 +24,10 @@
 #include "layPlugin.h"
 #include "layConverters.h"
 #include "layDispatcher.h"
+#include "layAbstractMenu.h"
 #include "tlColor.h"
 #if defined(HAVE_QT)
 #  include "layConfigurationDialog.h"
-#  include "layAbstractMenu.h"
 #endif
 #include "antConfig.h"
 #if defined(HAVE_QT)
@@ -214,15 +214,12 @@ PluginDeclaration::initialized (lay::Dispatcher *root)
 void 
 PluginDeclaration::uninitialize (lay::Dispatcher *)
 {
-#if defined(HAVE_QT)
   m_actions.clear ();
-#endif
 }
 
 void 
 PluginDeclaration::update_current_template ()
 {
-#if defined(HAVE_QT)
   lay::Dispatcher *mp = lay::Dispatcher::instance ();
   if (! mp || ! mp->has_ui ()) {
     return;
@@ -248,13 +245,11 @@ PluginDeclaration::update_current_template ()
     }
 
   }
-#endif
 }
 
 void 
 PluginDeclaration::update_menu ()
 {
-#if defined(HAVE_QT)
   lay::Dispatcher *mp = lay::Dispatcher::instance ();
   if (! mp || ! mp->has_ui ()) {
     return;
@@ -294,7 +289,6 @@ PluginDeclaration::update_menu ()
       }
     }
   }
-#endif
 }
 
 void

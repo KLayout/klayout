@@ -31,12 +31,14 @@ LayoutView::LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_par
   : LayoutViewBase (this, mgr, editable, plugin_parent, options)
 {
   config_setup ();
+  finish ();
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options)
   : LayoutViewBase (this, source, mgr, editable, plugin_parent, options)
 {
   config_setup ();
+  finish ();
 }
 
 //  NOTE: this methods needs to be called "frequently"

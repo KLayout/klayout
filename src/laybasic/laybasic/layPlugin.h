@@ -30,9 +30,7 @@
 #include "tlClassRegistry.h"
 #include "tlDeferredExecution.h"
 #include "gsiObject.h"
-#if defined(HAVE_QT)
-#  include "layAbstractMenu.h"
-#endif
+#include "layAbstractMenu.h"
 
 #include <map>
 #include <vector>
@@ -393,7 +391,6 @@ public:
    */
   static std::vector<std::string> menu_symbols ();
 
-#if defined(HAVE_QT)
   /**
    *  @brief Creates the menu resources for this plugin
    *
@@ -407,7 +404,6 @@ public:
    *  @brief Removes the menu resources associated with this plugin
    */
   void remove_menu_items (lay::Dispatcher *dispatcher);
-#endif
 
   /**
    *  @brief Enables this editable part of the plugin
@@ -462,11 +458,9 @@ private slots:
 
 private:
   int m_id;
-#if defined(HAVE_QT)
   tl::weak_ptr<lay::Action> mp_editable_mode_action;
   tl::weak_ptr<lay::Action> mp_mouse_mode_action;
   tl::weak_collection<lay::Action> m_menu_actions;
-#endif
   bool m_editable_enabled;
 };
 
@@ -686,13 +680,6 @@ public:
    *  The returned pointer is guaranteed to be non-zero.
    */
   Dispatcher *dispatcher ();
-
-  /**
-   *  @brief Gets the dispatcher (the top level end of the plugin chain)
-   *  This version may return null, if the plugin is instantiated without a
-   *  root.
-   */
-  Dispatcher *dispatcher_maybe_null ();
 
   /**
    *  @brief Menu command handler

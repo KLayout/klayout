@@ -20,16 +20,16 @@
 
 */
 
-#if defined(HAVE_QT)
-
 #ifndef HDR_layAbstractMenu
 #define HDR_layAbstractMenu
 
-#include <QKeySequence>
-#include <QShortcut>
-#include <QAction>
-#include <QMenu>
-#include <QObject>
+#if defined(HAVE_QT)
+#  include <QKeySequence>
+#  include <QShortcut>
+#  include <QAction>
+#  include <QMenu>
+#  include <QObject>
+#endif
 
 #include <string>
 #include <set>
@@ -43,10 +43,12 @@
 #include "tlObject.h"
 #include "laybasicCommon.h"
 
+#if defined(HAVE_QT)
 class QFrame;
 class QMenuBar;
 class QToolBar;
 class QMenu;
+#endif
 
 namespace lay
 {
@@ -85,12 +87,16 @@ LAYBASIC_PUBLIC std::string pack_menu_items_hidden (const std::vector<std::pair<
  *
  *  This object is typically owned by the AbstractMenu and cannot be copied or assigned.
  */
-class LAYBASIC_PUBLIC Action
-  : public QObject,
+class LAYBASIC_PUBLIC Action :
+#if defined(HAVE_QT)
+    public QObject,
+#endif
     public tl::Object,
     public gsi::ObjectBase
 {
+#if defined(HAVE_QT)
 Q_OBJECT
+#endif
 
 public:
   /**
@@ -98,6 +104,7 @@ public:
    */
   Action ();
 
+#if defined(HAVE_QT)
   /**
    *  @brief Creates an action from the given QAction
    *  If "owned" is true, the QAction will become owned by the Action object.
@@ -109,6 +116,7 @@ public:
    *  If "owned" is true, the QAction will become owned by the Action object.
    */
   Action (QMenu *menu, bool owned = true);
+#endif
 
   /**
    *  @brief Creates an action with the given title (icon, keyboard shortcut)
@@ -310,6 +318,7 @@ public:
     return false;
   }
 
+#if defined(HAVE_QT)
   /**
    *  @brief Get the underlying QAction object
    *
@@ -321,6 +330,7 @@ public:
    *  @brief Gets the QMenu object if the action is a menu action
    */
   QMenu *menu () const;
+#endif
 
   /**
    *  @brief Gets the dispatcher object this action is connected to
@@ -330,29 +340,48 @@ public:
     return mp_dispatcher;
   }
 
+#if defined(HAVE_QT)
 protected slots:
   void destroyed (QObject *obj);
   void qaction_triggered ();
+#endif
 
 private:
   friend struct AbstractMenuItem;
 
+#if defined(HAVE_QT)
   QMenu *mp_menu;
   QAction *mp_action;
+#else
+  std::string m_title;
+  std::string m_icon;
+  std::string m_icontext;
+  std::string m_tooltip;
+  bool m_checked;
+  bool m_checkable;
+  bool m_enabled;
+  bool m_separator;
+#endif
   lay::Dispatcher *mp_dispatcher;
   bool m_owned;
   bool m_visible;
   bool m_hidden;
   std::string m_default_shortcut;
-  QKeySequence m_default_key_sequence;
   std::string m_shortcut;
   std::string m_symbol;
+#if defined(HAVE_QT)
+  QKeySequence m_default_key_sequence;
   QKeySequence m_key_sequence;
+#endif
   bool m_no_key_sequence;
 
   void set_dispatcher (Dispatcher *dispatcher);
+#if defined(HAVE_QT)
   QKeySequence get_key_sequence () const;
   QKeySequence get_key_sequence_for (const std::string &sc) const;
+#endif
+
+  void configure_from_title (const std::string &s);
 
   //  no copying
   Action (const Action &);
@@ -501,10 +530,12 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
     return mp_action.get ();
   }
 
+#if defined(HAVE_QT)
   QMenu *menu ()
   {
     return mp_action->menu ();
   }
+#endif
 
   void set_has_submenu ();
 
@@ -575,11 +606,15 @@ private:
  *  QMenu's created so far (except the detached menus), clear the QMenuBar, recreate the QMenu objects (note, that the 
  *  addresses will change this way!) and refill the QToolBar and QMenuBar.
  */
-class LAYBASIC_PUBLIC AbstractMenu
-  : public QObject,
+class LAYBASIC_PUBLIC AbstractMenu :
+#if defined(HAVE_QT)
+    public QObject,
+#endif
     public gsi::ObjectBase
 {
+#if defined(HAVE_QT)
 Q_OBJECT
+#endif
 
 public:
   /**
@@ -592,6 +627,7 @@ public:
    */
   ~AbstractMenu ();
 
+#if defined(HAVE_QT)
   /**
    *  @brief Rebuild the QMenu's and refill the QMenuBar object
    */
@@ -615,6 +651,29 @@ public:
    *  @return A reference to a QMenu object or 0 if the path is not valid or does not refer to a submenu
    */
   QMenu *menu (const std::string &path);
+
+  /**
+   *  @brief Get the detached menu
+   *
+   *  This will return a QMenu pointer to a detached menu that is created
+   *  with a "@.." top level entry. In any case, a valid QMenu object is returned
+   *  which never changes, even if the menu hierarchy is rebuilt. The QMenu returned
+   *  may be empty.
+   *
+   *  @param name The name of the detached menu, without the "@"
+   *  @return a valid QMenu object
+   */
+  QMenu *detached_menu (const std::string &name);
+
+  /**
+   *  @brief Creates a new exclusive action group
+   *
+   *  If a group with that name already exists, this method does nothing.
+   *
+   *  @return The QActionGroup object of that group
+   */
+  QActionGroup *make_exclusive_group (const std::string &name);
+#endif
 
   /**
    *  @brief Get the Action object for a given item
@@ -753,28 +812,6 @@ public:
   std::vector<lay::ConfigureAction *> configure_actions (const std::string &name);
 
   /**
-   *  @brief Get the detached menu
-   *
-   *  This will return a QMenu pointer to a detached menu that is created
-   *  with a "@.." top level entry. In any case, a valid QMenu object is returned
-   *  which never changes, even if the menu hierarchy is rebuilt. The QMenu returned
-   *  may be empty.
-   *
-   *  @param name The name of the detached menu, without the "@"
-   *  @return a valid QMenu object
-   */
-  QMenu *detached_menu (const std::string &name);
-
-  /**
-   *  @brief Creates a new exclusive action group
-   *
-   *  If a group with that name already exists, this method does nothing.
-   *
-   *  @return The QActionGroup object of that group
-   */
-  QActionGroup *make_exclusive_group (const std::string &name);
-
-  /**
    *  @brief Gets the keyboard shortcuts
    *  @param with_defaults Returns the default shortcuts if true. Otherwise returns the effective shortcut.
    *  @return a hash with menu paths for keys and key binding for values
@@ -794,11 +831,13 @@ public:
     return m_root;
   }
 
+#if defined(HAVE_QT)
 signals:
   /**
    *  @brief this signal is emitted whenever something changes on the menu
    */
   void changed ();
+#endif
 
 private:
   friend class Action;
@@ -806,8 +845,10 @@ private:
   std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator> > find_item (tl::Extractor &extr);
   const AbstractMenuItem *find_item_exact (const std::string &path) const;
   AbstractMenuItem *find_item_exact (const std::string &path);
+#if defined(HAVE_QT)
   void build (QMenu *menu, std::list<AbstractMenuItem> &items);
   void build (QToolBar *tbar, std::list<AbstractMenuItem> &items);
+#endif
   void collect_group (std::vector<std::string> &grp, const std::string &name, const AbstractMenuItem &item) const;
   void collect_configure_actions (std::vector<ConfigureAction *> &ca, AbstractMenuItem &item);
   void emit_changed ();
@@ -815,8 +856,10 @@ private:
 
   Dispatcher *mp_dispatcher;
   AbstractMenuItem m_root;
+#if defined(HAVE_QT)
   tl::stable_vector<QMenu> m_helper_menu_items;
   std::map<std::string, QActionGroup *> m_action_groups;
+#endif
   std::map<std::string, std::vector<ConfigureAction *> > m_config_action_by_name;
   bool m_config_actions_valid;
 };
@@ -824,5 +867,3 @@ private:
 }
 
 #endif
-
-#endif  //  defined(HAVE_QT)

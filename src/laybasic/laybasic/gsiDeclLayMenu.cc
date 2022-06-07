@@ -20,8 +20,6 @@
 
 */
 
-#if defined(HAVE_QT)
-
 #include "gsiDecl.h"
 #include "gsiSignals.h"
 #include "layAbstractMenu.h"
@@ -411,5 +409,3 @@ Class<ActionStub> decl_Action (decl_ActionBase, "lay", "Action",
 );
 
 }
-
-#endif

@@ -20,8 +20,6 @@
 
 */
 
-#if defined(HAVE_QT)
-
 #include "layAbstractMenu.h"
 #include "layDispatcher.h"
 #include "layPlugin.h"
@@ -30,17 +28,19 @@
 #include "gtf.h"
 #include "gsi.h"
 
-#include <QAction>
-#include <QActionGroup>
-#include <QMenu>
-#include <QMenuBar>
-#include <QShortcutEvent>
-#include <QToolBar>
-#include <QToolButton>
-#include <QApplication>
-#include <QMessageBox>
-#include <QHBoxLayout>
-#include <QFrame>
+#if defined(HAVE_QT)
+#  include <QAction>
+#  include <QActionGroup>
+#  include <QMenu>
+#  include <QMenuBar>
+#  include <QShortcutEvent>
+#  include <QToolBar>
+#  include <QToolButton>
+#  include <QApplication>
+#  include <QMessageBox>
+#  include <QHBoxLayout>
+#  include <QFrame>
+#endif
 
 #include <ctype.h>
 
@@ -245,12 +245,14 @@ AbstractMenuItem::set_action (Action *a, bool copy_properties)
 
   a->keep ();
 
+#if defined(HAVE_QT)
   if (copy_properties && mp_action->qaction () && a->qaction ()) {
     a->qaction ()->setIcon (mp_action->qaction ()->icon ());
     a->qaction ()->setToolTip (mp_action->qaction ()->toolTip ());
     a->qaction ()->setShortcut (mp_action->qaction ()->shortcut ());
     a->qaction ()->setIconText (mp_action->qaction ()->iconText ());
   }
+#endif
 
   bool enabled = mp_action.get () ? mp_action->is_enabled () : true;
   bool visible = mp_action.get () ? mp_action->is_visible () : true;
@@ -261,9 +263,11 @@ AbstractMenuItem::set_action (Action *a, bool copy_properties)
   mp_action->set_dispatcher (mp_dispatcher);
   mp_action->set_object_name (m_basename);
 
+#if defined(HAVE_QT)
   if (mp_action->menu ()) {
     mp_action->menu ()->setObjectName (tl::to_qstring (m_basename));
   }
+#endif
 }
 
 void
@@ -289,30 +293,8 @@ AbstractMenuItem::set_remove_on_empty ()
 
 static std::set<Action *> *sp_actionHandles = 0;
 
-static void
-configure_action_from_title (Action *ah, const std::string &s)
-{
-  std::string title;
-  std::string shortcut;
-  std::string res;
-  std::string tool_tip;
-
-  parse_menu_title (s, title, shortcut, res, tool_tip);
-
-  ah->qaction ()->setText (tl::to_qstring (title));
-
-  if (! tool_tip.empty ()) {
-    ah->qaction ()->setToolTip (tl::to_qstring (tool_tip));
-  }
-
-  if (! res.empty ()) {
-    ah->qaction ()->setIcon (QIcon (tl::to_qstring (res)));
-  }
-
-  if (! shortcut.empty ()) {
-    ah->set_default_shortcut (shortcut);
-  }
-}
+#if defined(HAVE_QT)
+namespace {
 
 /**
  *  @brief A specialization that provides a way to catch ambiguous key shortcuts
@@ -370,6 +352,8 @@ private:
   size_t m_id;
 };
 
+}
+
 static size_t
 id_from_action (QAction *action)
 {
@@ -377,9 +361,13 @@ id_from_action (QAction *action)
   return ao ? ao->id () : 0;
 }
 
-Action::Action ()
-  : mp_menu (0),
+#endif
+
+Action::Action () :
+#if defined(HAVE_QT)
+    mp_menu (0),
     mp_action (new ActionObject (0)),
+#endif
     mp_dispatcher (0),
     m_owned (true),
     m_visible (true),
@@ -391,11 +379,14 @@ Action::Action ()
   }
   sp_actionHandles->insert (this);
 
+#if defined(HAVE_QT)
   //  catch the destroyed signal to tell if the QAction object is deleted.
   connect (mp_action, SIGNAL (destroyed (QObject *)), this, SLOT (destroyed (QObject *)));
   connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
+#endif
 }
 
+#if defined(HAVE_QT)
 Action::Action (QAction *action, bool owned)
   : mp_menu (0),
     mp_action (action),
@@ -433,10 +424,13 @@ Action::Action (QMenu *menu, bool owned)
   connect (mp_menu, SIGNAL (destroyed (QObject *)), this, SLOT (destroyed (QObject *)));
   connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
 }
+#endif
 
-Action::Action (const std::string &title)
-  : mp_menu (0),
+Action::Action (const std::string &title) :
+#if defined(HAVE_QT)
+    mp_menu (0),
     mp_action (new QAction (0)),
+#endif
     mp_dispatcher (0),
     m_owned (true),
     m_visible (true),
@@ -448,11 +442,20 @@ Action::Action (const std::string &title)
   }
   sp_actionHandles->insert (this);
 
-  configure_action_from_title (this, title);
+#if !defined(HAVE_QT)
+  m_checked = false;
+  m_checkable = false;
+  m_enabled = true;
+  m_separator = false;
+#endif
 
+  configure_from_title (title);
+
+#if defined(HAVE_QT)
   //  catch the destroyed signal to tell if the QAction object is deleted.
   connect (mp_action, SIGNAL (destroyed (QObject *)), this, SLOT (destroyed (QObject *)));
   connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
+#endif
 }
 
 Action::~Action ()
@@ -465,6 +468,7 @@ Action::~Action ()
     }
   }
 
+#if defined(HAVE_QT)
   if (mp_menu) {
     if (m_owned) {
       delete mp_menu;
@@ -479,19 +483,55 @@ Action::~Action ()
     }
     mp_action = 0;
   }
+#endif
 }
 
 void
 Action::set_dispatcher (Dispatcher *dispatcher)
 {
   if (mp_dispatcher != dispatcher) {
+#if defined(HAVE_QT)
     if (mp_action && m_owned) {
       mp_action->setParent (dispatcher ? dispatcher->menu_parent_widget () : 0);
     }
+#endif
     mp_dispatcher = dispatcher;
   }
 }
 
+void
+Action::configure_from_title (const std::string &s)
+{
+  std::string title;
+  std::string shortcut;
+  std::string res;
+  std::string tool_tip;
+
+  parse_menu_title (s, title, shortcut, res, tool_tip);
+
+#if defined(HAVE_QT)
+  qaction ()->setText (tl::to_qstring (title));
+
+  if (! tool_tip.empty ()) {
+    qaction ()->setToolTip (tl::to_qstring (tool_tip));
+  }
+
+  if (! res.empty ()) {
+    qaction ()->setIcon (QIcon (tl::to_qstring (res)));
+  }
+
+  if (! shortcut.empty ()) {
+    set_default_shortcut (shortcut);
+  }
+#else
+  m_title = title;
+  m_default_shortcut = shortcut;
+  m_tooltip = tool_tip;
+  m_icon = res;
+#endif
+}
+
+#if defined(HAVE_QT)
 void
 Action::qaction_triggered ()
 {
@@ -499,13 +539,18 @@ Action::qaction_triggered ()
   triggered ();
   END_PROTECTED
 }
+#endif
 
 void
 Action::trigger ()
 {
+#if defined(HAVE_QT)
   if (qaction ()) {
     qaction ()->trigger ();
   }
+#else
+  triggered ();
+#endif
 }
 
 void
@@ -514,6 +559,7 @@ Action::triggered ()
   //  .. no action yet, the reimplementation must provide some ..
 }
 
+#if defined(HAVE_QT)
 QAction *
 Action::qaction () const
 {
@@ -538,16 +584,19 @@ Action::destroyed (QObject *obj)
   }
   m_owned = false;
 }
+#endif
 
 void
 Action::set_visible (bool v)
 {
   if (m_visible != v) {
     m_visible = v;
+#if defined(HAVE_QT)
     if (mp_action) {
       mp_action->setVisible (is_effective_visible ());
       mp_action->setShortcut (get_key_sequence ());
     }
+#endif
   }
 }
 
@@ -556,10 +605,12 @@ Action::set_hidden (bool h)
 {
   if (m_hidden != h) {
     m_hidden = h;
+#if defined(HAVE_QT)
     if (mp_action) {
       mp_action->setVisible (is_effective_visible ());
       mp_action->setShortcut (get_key_sequence ());
     }
+#endif
   }
 }
 
@@ -586,10 +637,12 @@ Action::set_default_shortcut (const std::string &sc)
 {
   if (m_default_shortcut != sc) {
     m_default_shortcut = sc;
+#if defined(HAVE_QT)
     m_default_key_sequence = QKeySequence (tl::to_qstring (sc));
     if (mp_action) {
       mp_action->setShortcut (get_key_sequence ());
     }
+#endif
   }
 }
 
@@ -599,25 +652,36 @@ Action::set_shortcut (const std::string &sc)
   if (m_shortcut != sc) {
     m_shortcut = sc;
     m_no_key_sequence = (sc == Action::no_shortcut ());
+#if defined(HAVE_QT)
     m_key_sequence = m_no_key_sequence ? QKeySequence () : QKeySequence (tl::to_qstring (m_shortcut));
     if (mp_action) {
       mp_action->setShortcut (get_key_sequence ());
     }
+#endif
   }
 }
 
 std::string
 Action::get_default_shortcut () const
 {
+#if defined(HAVE_QT)
   return tl::to_string (m_default_key_sequence.toString ());
+#else
+  return m_default_shortcut;
+#endif
 }
 
 std::string
 Action::get_shortcut () const
 {
+#if defined(HAVE_QT)
   return m_no_key_sequence ? Action::no_shortcut () : tl::to_string (m_key_sequence.toString ());
+#else
+  return m_no_key_sequence ? Action::no_shortcut () : m_shortcut;
+#endif
 }
 
+#if defined(HAVE_QT)
 QKeySequence
 Action::get_key_sequence () const
 {
@@ -647,6 +711,7 @@ Action::get_key_sequence_for (const std::string &sc) const
     return QKeySequence::fromString (tl::to_qstring (sc));
   }
 }
+#endif
 
 const std::string &
 Action::no_shortcut ()
@@ -658,100 +723,168 @@ Action::no_shortcut ()
 void
 Action::set_title (const std::string &t)
 {
+#if defined(HAVE_QT)
   if (qaction ()) {
     qaction ()->setText (tl::to_qstring (t));
   }
+#else
+  m_title = t;
+#endif
 }
 
 std::string
 Action::get_title () const
 {
+#if defined(HAVE_QT)
   if (qaction ()) {
     return tl::to_string (qaction ()->text ());
   } else {
     return std::string ();
   }
+#else
+  return m_title;
+#endif
 }
 
 std::string
 Action::get_effective_shortcut () const
 {
+#if defined(HAVE_QT)
   return tl::to_string (get_key_sequence ().toString ());
+#else
+  if (m_hidden || m_no_key_sequence) {
+    //  A hidden menu item does not have a key sequence too.
+    return std::string ();
+  } else if (m_shortcut.empty ()) {
+    return m_default_shortcut;
+  } else {
+    return m_shortcut;
+  }
+#endif
 }
 
 std::string
 Action::get_effective_shortcut_for (const std::string &sc) const
 {
+#if defined(HAVE_QT)
   return tl::to_string (get_key_sequence_for (sc).toString ());
+#else
+  if (m_hidden) {
+    //  A hidden menu item does not have a key sequence too.
+    return std::string ();
+  } else if (sc.empty ()) {
+    return m_default_shortcut;
+  } else if (sc == Action::no_shortcut ()) {
+    return std::string ();
+  } else {
+    return sc;
+  }
+#endif
 }
 
 void
 Action::add_to_exclusive_group (lay::AbstractMenu *menu, const std::string &group_name)
 {
+//  NOTE: this feature does not work without Qt
+#if defined(HAVE_QT)
   if (qaction ()) {
     menu->make_exclusive_group (group_name)->addAction (qaction ());
   }
+#endif
 }
 
 bool
 Action::is_checkable () const
 {
+#if defined(HAVE_QT)
   return qaction () && qaction ()->isCheckable ();
+#else
+  return m_checkable;
+#endif
 }
 
 bool
 Action::is_checked () const
 {
+#if defined(HAVE_QT)
   return qaction () && qaction ()->isChecked ();
+#else
+  return m_checked;
+#endif
 }
 
 bool
 Action::is_enabled () const
 {
+#if defined(HAVE_QT)
   return qaction () && qaction ()->isEnabled ();
+#else
+  return m_enabled;
+#endif
 }
 
 bool
 Action::is_separator () const
 {
+#if defined(HAVE_QT)
   return qaction () && qaction ()->isSeparator ();
+#else
+  return m_separator;
+#endif
 }
 
 void
 Action::set_enabled (bool b)
 {
+#if defined(HAVE_QT)
   if (qaction ()) {
     qaction ()->setEnabled (b);
   }
+#else
+  m_enabled = b;
+#endif
 }
 
 void
 Action::set_checked (bool c)
 {
+#if defined(HAVE_QT)
   if (qaction ()) {
     qaction ()->setChecked (c);
   }
+#else
+  m_checked = c;
+#endif
 }
 
 void
 Action::set_checkable (bool c)
 {
+#if defined(HAVE_QT)
   if (qaction ()) {
     qaction ()->setCheckable (c);
   }
+#else
+  m_checkable = c;
+#endif
 }
 
 void
 Action::set_separator (bool s)
 {
+#if defined(HAVE_QT)
   if (qaction ()) {
     qaction ()->setSeparator (s);
   }
+#else
+  m_separator = s;
+#endif
 }
 
 void
 Action::set_icon (const std::string &filename)
 {
+#if defined(HAVE_QT)
   if (qaction ()) {
     if (filename.empty ()) {
       qaction ()->setIcon (QIcon ());
@@ -759,21 +892,29 @@ Action::set_icon (const std::string &filename)
       qaction ()->setIcon (QIcon (tl::to_qstring (filename)));
     }
   }
+#else
+  m_icon = filename;
+#endif
 }
 
 std::string
 Action::get_tool_tip () const
 {
+#if defined(HAVE_QT)
   if (qaction ()) {
     return tl::to_string (qaction ()->toolTip ());
   } else {
     return std::string ();
   }
+#else
+  return m_tooltip;
+#endif
 }
 
 void
 Action::set_tool_tip (const std::string &text)
 {
+#if defined(HAVE_QT)
   if (qaction ()) {
     if (text.empty ()) {
       qaction ()->setToolTip (QString ());
@@ -781,21 +922,29 @@ Action::set_tool_tip (const std::string &text)
       qaction ()->setToolTip (tl::to_qstring (text));
     }
   }
+#else
+  m_tooltip = text;
+#endif
 }
 
 std::string
 Action::get_icon_text () const
 {
+#if defined(HAVE_QT)
   if (qaction ()) {
     return tl::to_string (qaction ()->iconText ());
   } else {
     return std::string ();
   }
+#else
+  return m_icontext;
+#endif
 }
 
 void
 Action::set_icon_text (const std::string &icon_text)
 {
+#if defined(HAVE_QT)
   if (qaction ()) {
     if (icon_text.empty ()) {
       qaction ()->setIconText (QString ());
@@ -803,14 +952,19 @@ Action::set_icon_text (const std::string &icon_text)
       qaction ()->setIconText (tl::to_qstring (icon_text));
     }
   }
+#else
+  m_icontext = icon_text;
+#endif
 }
 
 void
 Action::set_object_name (const std::string &name)
 {
+#if defined(HAVE_QT)
   if (qaction ()) {
     qaction ()->setObjectName (tl::to_qstring (name));
   }
+#endif
 }
 
 // ---------------------------------------------------------------
@@ -895,6 +1049,7 @@ AbstractMenu::~AbstractMenu ()
   //  .. nothing yet ..
 }
 
+#if defined(HAVE_QT)
 QActionGroup *
 AbstractMenu::make_exclusive_group (const std::string &name)
 {
@@ -1195,6 +1350,7 @@ AbstractMenu::menu (const std::string &path)
     return 0;
   }
 }
+#endif
 
 bool
 AbstractMenu::is_valid (const std::string &path) const
@@ -1645,7 +1801,9 @@ void
 AbstractMenu::emit_changed ()
 {
   m_config_actions_valid = false;
+#if defined(HAVE_QT)
   emit changed ();
+#endif
 }
 
 std::vector<ConfigureAction *> AbstractMenu::configure_actions (const std::string &name)
@@ -1703,5 +1861,3 @@ AbstractMenu::get_shortcuts (const std::string &root, std::map<std::string, std:
 }
 
 }
-
-#endif

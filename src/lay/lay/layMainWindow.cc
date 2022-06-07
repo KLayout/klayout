@@ -180,6 +180,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
       m_manager (undo_enabled)
 {
   m_dispatcher.set_menu_parent_widget (this);
+  m_dispatcher.make_menu ();
 
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();

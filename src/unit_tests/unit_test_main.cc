@@ -41,14 +41,14 @@
 //  This hard-links the GSI test classes
 #include "../gsi_test/gsiTestForceLink.h"
 
+#include "version.h"
+
 #if defined(HAVE_QT)
 
 #  include "layApplication.h"
 #  include "layMainWindow.h"
 #  include "laySystemPaths.h"
 #  include "layVersion.h"
-
-#  include "version.h"
 
 #  include <QDir>
 #  include <QFileInfo>
@@ -64,9 +64,13 @@
 #endif
 
 //  required to force linking of the "rdb", "lib" and "drc" module 
-//  (some in non-Qt case)
+//  and the plugins/auxiliary modules (some in non-Qt case)
 #include "libForceLink.h"
 #include "rdbForceLink.h"
+#include "antForceLink.h"
+#include "imgForceLink.h"
+#include "edtForceLink.h"
+#include "lymForceLink.h"
 #if defined(HAVE_RUBY)
 #  include "drcForceLink.h"
 #  include "lvsForceLink.h"

@@ -482,6 +482,14 @@ public:
   ant::Object create_measure_ruler(const db::DPoint &pt, lay::angle_constraint_type ac);
 
   /**
+   *  @brief Gets the annotation templates
+   */
+  const std::vector<ant::Template> &ruler_templates () const
+  {
+    return m_ruler_templates;
+  }
+
+  /**
    *  @brief An event triggered when the annotations changed
    *  When an annotation is added or removed, this event is triggered.
    */

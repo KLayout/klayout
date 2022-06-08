@@ -62,6 +62,25 @@ PluginDeclaration::instance ()
   return sp_instance;
 }
 
+static std::vector<ant::Template> make_standard_templates ()
+{
+  std::vector<ant::Template> templates;
+
+  templates.push_back (ant::Template (tl::to_string (tr ("Ruler")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_ruler"));
+
+  templates.push_back (ant::Template (tl::to_string (tr ("Cross")), "", "", "$U,$V", ant::Object::STY_cross_both, ant::Object::OL_diag, true, lay::AC_Global, "_cross"));
+  templates.back ().set_mode (ant::Template::RulerSingleClick);
+
+  templates.push_back (ant::Template (tl::to_string (tr ("Measure")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_measure"));
+  templates.back ().set_mode (ant::Template::RulerAutoMetric);
+
+  templates.push_back (ant::Template (tl::to_string (tr ("Ellipse")), "W=$(abs(X))", "H=$(abs(Y))", "", ant::Object::STY_line, ant::Object::OL_ellipse, true, lay::AC_Global, std::string ()));
+
+  templates.push_back (ant::Template (tl::to_string (tr ("Box")), "W=$(abs(X))", "H=$(abs(Y))", "", ant::Object::STY_line, ant::Object::OL_box, true, lay::AC_Global, std::string ()));
+
+  return templates;
+}
+
 void 
 PluginDeclaration::get_options (std::vector < std::pair<std::string, std::string> > &options) const
 {
@@ -72,7 +91,7 @@ PluginDeclaration::get_options (std::vector < std::pair<std::string, std::string
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_snap_mode, ACConverter ().to_string (lay::AC_Any)));
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_obj_snap, tl::to_string (true)));
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_grid_snap, tl::to_string (false)));
-  options.push_back (std::pair<std::string, std::string> (cfg_ruler_templates, ""));
+  options.push_back (std::pair<std::string, std::string> (cfg_ruler_templates, ant::TemplatesConverter ().to_string (make_standard_templates ())));
   options.push_back (std::pair<std::string, std::string> (cfg_current_ruler_template, "0"));
   //  grid-micron is not configured here since some other entity is supposed to do this.
 }
@@ -189,21 +208,7 @@ PluginDeclaration::initialized (lay::Dispatcher *root)
     //  This is the migration path from <= 0.24 to 0.25: clear all templates unless we
     //  have categorized ones there. Those can't be deleted, so we know we have a 0.25
     //  setup if there are some
-    m_templates.clear ();
-
-    //  Set up the templates we want to see (plus some non-categorized templates)
-
-    m_templates.push_back (ant::Template (tl::to_string (tr ("Ruler")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_ruler"));
-
-    m_templates.push_back (ant::Template (tl::to_string (tr ("Cross")), "", "", "$U,$V", ant::Object::STY_cross_both, ant::Object::OL_diag, true, lay::AC_Global, "_cross"));
-    m_templates.back ().set_mode (ant::Template::RulerSingleClick);
-
-    m_templates.push_back (ant::Template (tl::to_string (tr ("Measure")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_measure"));
-    m_templates.back ().set_mode (ant::Template::RulerAutoMetric);
-
-    m_templates.push_back (ant::Template (tl::to_string (tr ("Ellipse")), "W=$(abs(X))", "H=$(abs(Y))", "", ant::Object::STY_line, ant::Object::OL_ellipse, true, lay::AC_Global, std::string ()));
-
-    m_templates.push_back (ant::Template (tl::to_string (tr ("Box")), "W=$(abs(X))", "H=$(abs(Y))", "", ant::Object::STY_line, ant::Object::OL_box, true, lay::AC_Global, std::string ()));
+    m_templates = make_standard_templates ();
 
     root->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (m_templates));
     root->config_end ();
@@ -292,7 +297,7 @@ PluginDeclaration::update_menu ()
 }
 
 void
-PluginDeclaration::register_annotation_template (const ant::Template &t)
+PluginDeclaration::register_annotation_template (const ant::Template &t, lay::Plugin *plugin)
 {
   if (t.category ().empty ()) {
     return;
@@ -305,8 +310,38 @@ PluginDeclaration::register_annotation_template (const ant::Template &t)
   }
 
   m_templates.push_back (t);
-  lay::Dispatcher::instance ()->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (m_templates));
-  lay::Dispatcher::instance ()->config_end ();
+
+  if (! plugin) {
+    plugin = lay::Dispatcher::instance ();
+  }
+  if (plugin) {
+    plugin->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (m_templates));
+    plugin->config_end ();
+  }
+}
+
+void
+PluginDeclaration::unregister_annotation_template (const std::string &category, lay::Plugin *plugin)
+{
+  std::vector<ant::Template> tpl;
+
+  if (! category.empty ()) {
+    for (auto i = m_templates.begin (); i != m_templates.end (); ++i) {
+      if (i->category () != category) {
+        tpl.push_back (*i);
+      }
+    }
+  }
+
+  m_templates.swap (tpl);
+
+  if (! plugin) {
+    plugin = lay::Dispatcher::instance ();
+  }
+  if (plugin) {
+    plugin->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (m_templates));
+    plugin->config_end ();
+  }
 }
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new ant::PluginDeclaration (), 3000, "ant::Plugin");

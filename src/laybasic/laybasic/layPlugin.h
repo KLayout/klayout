@@ -467,13 +467,27 @@ private:
 /**
  *  @brief The plugin interface
  *
- *  Each configurable object must be derived from this interface.
- *  An configurable object can have a parent. This way, a hierarchy
- *  of configurable objects is created. The root object not having a
- *  parent acts as the main entry point: it will try to dispatch 
+ *  This is a basic interface providing several services in a
+ *  hierarchically organized fashion. It also provides a configuration
+ *  space (key/value pairs).
+ *
+ *  Each object participating in the plugin scheme must be derived from this interface.
+ *  An plugin can have a parent. This way, a hierarchy of plugin objects is created.
+ *  The root object not having a parent acts as the main entry point: it will try to dispatch
  *  configuration requests to the children.
- *  A node may have a local configuration - it will override any
- *  parent configurations.
+ *
+ *  Each node has a local configuration space which overrides the configuration changes
+ *  made to be parent.
+ *
+ *  Each plugin also has a static or global configuration space inside the
+ *  "plugin declaration". Configuration changes made to top level nodes are
+ *  reflected in the static space too.
+ *
+ *  A "standalone" node is one without a parent, but which does not communicate
+ *  with the static configuration space.
+ *
+ *  The "Dispatcher" adds the concept of a (singleton) root plugin to this hierarchical
+ *  configuration tree.
  */
 
 class LAYBASIC_PUBLIC Plugin

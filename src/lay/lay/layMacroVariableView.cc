@@ -25,6 +25,7 @@
 
 #include "tlException.h"
 #include "tlScriptError.h"
+#include "tlString.h"
 #include "gsiInspector.h"
 
 #include <cstdio>
@@ -71,18 +72,17 @@ pretty_print (const tl::Variant &v)
 
   } else if (v.is_double ()) {
 
-    QString res (QString::fromUtf8 ("%.12g").arg (v.to_double ()));
-    return res;
+    return tl::to_qstring (tl::sprintf ("%.12g", v.to_double ()));
 
   } else if (v.is_char ()) {
 
-    QString details (QString::fromUtf8 ("#%d (0x%x)").arg (v.to_int ()).arg (v.to_uint ()));
-    return tl::to_qstring (std::string ("'") + v.to_string () + "' ") + details;
+    std::string details = tl::sprintf ("#%d (0x%x)", v.to_int (), v.to_uint ());
+    return tl::to_qstring (std::string ("'") + v.to_string () + "' " + details);
 
   } else if (v.is_ulong () || v.is_long () || v.is_ulonglong () || v.is_longlong ()) {
 
-    QString details (QString::fromUtf8 ("(0x%llx)").arg (v.to_ulonglong ()));
-    return tl::to_qstring (v.to_string ()) + details;
+    std::string details = tl::sprintf (" (0x%llx)", v.to_ulonglong ());
+    return tl::to_qstring (v.to_string () + details);
 
   } else {
     return tl::to_qstring (v.to_parsable_string ());

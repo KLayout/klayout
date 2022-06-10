@@ -352,7 +352,7 @@ private:
 #if defined(HAVE_QT)
   QMenu *mp_menu;
   QAction *mp_action;
-#else
+#endif
   std::string m_title;
   std::string m_icon;
   std::string m_icontext;
@@ -361,7 +361,6 @@ private:
   bool m_checkable;
   bool m_enabled;
   bool m_separator;
-#endif
   lay::Dispatcher *mp_dispatcher;
   bool m_owned;
   bool m_visible;

@@ -416,7 +416,9 @@ LayoutViewBase::finish ()
 #if defined(HAVE_QT)
     set_menu_parent_widget (widget ());
     init_menu ();
-    menu ()->build (0, 0);
+    if (widget ()) {
+      menu ()->build (0, 0);
+    }
 #else
     init_menu ();
 #endif

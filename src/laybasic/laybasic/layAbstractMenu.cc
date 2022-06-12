@@ -783,7 +783,7 @@ bool
 Action::is_checked () const
 {
 #if defined(HAVE_QT)
-  return qaction () && qaction ()->isChecked ();
+  return qaction () ? qaction ()->isChecked () : m_checked;
 #else
   return m_checked;
 #endif
@@ -792,7 +792,11 @@ Action::is_checked () const
 bool
 Action::is_enabled () const
 {
+#if defined(HAVE_QT)
+  return qaction () ? qaction ()->isEnabled () : m_enabled;
+#else
   return m_enabled;
+#endif
 }
 
 bool

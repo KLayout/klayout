@@ -218,7 +218,7 @@ RESULT
     assert_equal( menu.is_separator?( "file_menu.sep" ), true )
 
     assert_equal( menu.action( "file_menu.#0" ).title, "New title" )
-    assert_equal( menu.action( "file_menu.#0" ).shortcut, "Ctrl+Shift+F7" )
+    assert_equal( menu.action( "file_menu.#0" ).shortcut, "Shift+Ctrl+F7" )
     assert_equal( menu.action( "file_menu.#3" ).icon_text, "X" )
     assert_equal( menu.action( "my_menu.new_item" ).is_visible?, true )
     assert_equal( menu.action( "file_menu.#3" ).is_checked?, false )

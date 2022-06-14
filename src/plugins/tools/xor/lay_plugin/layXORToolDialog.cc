@@ -802,8 +802,8 @@ XORWorker::do_perform_deep (const XORTask *xor_task)
 
       if (*t > 0) {
         tl::SelfTimer timer (tl::verbosity () >= 21, "Sizing part");
-        rr.size (-((*t + 1) / 2), (unsigned int)2, false);
-        rr.size (((*t + 1) / 2), (unsigned int)2, false);
+        rr.size (-((*t + 1) / 2), (unsigned int)2);
+        rr.size (((*t + 1) / 2), (unsigned int)2);
       }
 
       //  TODO: no clipping for hierarchical mode yet

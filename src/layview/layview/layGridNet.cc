@@ -28,7 +28,7 @@
 #include "layFixedFont.h"
 #include "layPixelBufferPainter.h"
 #include "laySnap.h"
-#include "layColor.h"
+#include "tlColor.h"
 #include "dbTrans.h"
 
 #if defined(HAVE_QT)
@@ -118,7 +118,7 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new GridNetPlugi
 //  Implementation of the GridNet object
 
 GridNet::GridNet (LayoutViewBase *view)
-  : lay::BackgroundViewObject (view->view_object_widget ()), 
+  : lay::BackgroundViewObject (view->canvas ()), 
     lay::Plugin (view),
     mp_view (view),
     m_visible (false), m_show_ruler (true), m_grid (1.0),
@@ -135,25 +135,25 @@ GridNet::configure (const std::string &name, const std::string &value)
 
   if (name == cfg_grid_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     need_update = test_and_set (m_color, color);
 
   } else if (name == cfg_grid_grid_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     need_update = test_and_set (m_grid_color, color);
 
   } else if (name == cfg_grid_axis_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     need_update = test_and_set (m_axis_color, color);
 
   } else if (name == cfg_grid_ruler_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     need_update = test_and_set (m_ruler_color, color);
 
@@ -213,14 +213,14 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
 {
   if (m_visible) {
 
-    lay::Color color;
+    tl::Color color;
     if (m_color.is_valid ()) {
       color = m_color;
     } else {
-      color = lay::Color (128, 128, 128); // TODO: this is not a "real" automatic color ..
+      color = tl::Color (128, 128, 128); // TODO: this is not a "real" automatic color ..
     }
 
-    lay::Color grid_color = color, axis_color = color, ruler_color = color;
+    tl::Color grid_color = color, axis_color = color, ruler_color = color;
     if (m_grid_color.is_valid ()) {
       grid_color = m_grid_color;
     }

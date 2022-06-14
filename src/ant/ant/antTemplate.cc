@@ -30,6 +30,32 @@
 namespace ant
 {
 
+ant::Template
+Template::from_object (const ant::Object &a, const std::string &title, int mode)
+{
+  ant::Template t;
+
+  t.angle_constraint (a.angle_constraint ());
+  t.category (a.category ());
+  t.fmt (a.fmt ());
+  t.fmt_x (a.fmt_x ());
+  t.fmt_y (a.fmt_y ());
+  t.set_main_position (a.main_position ());
+  t.set_main_xalign (a.main_xalign ());
+  t.set_main_yalign (a.main_yalign ());
+  t.set_xlabel_xalign (a.xlabel_xalign ());
+  t.set_xlabel_yalign (a.xlabel_yalign ());
+  t.set_ylabel_xalign (a.ylabel_xalign ());
+  t.set_ylabel_yalign (a.ylabel_yalign ());
+  t.outline (a.outline ());
+  t.style (a.style ());
+  t.title (title);
+
+  t.set_mode (ant::Template::ruler_mode_type (mode));
+
+  return t;
+}
+
 Template::Template ()
   : m_title (tl::to_string (tr ("Ruler"))),
     m_fmt_x ("$X"), m_fmt_y ("$Y"), m_fmt ("$D"),

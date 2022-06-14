@@ -327,25 +327,25 @@ static void save_as2 (lay::LayoutViewBase *view, unsigned int index, const std::
   view->save_as (index, filename, tl::OutputStream::OM_Auto, options, true, 0);
 }
 
-static lay::PixelBuffer get_pixels_with_options (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box)
+static tl::PixelBuffer get_pixels_with_options (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box)
 {
-  return view->get_pixels_with_options (width, height, linewidth, oversampling, resolution, lay::Color (), lay::Color (), lay::Color (), target_box);
+  return view->get_pixels_with_options (width, height, linewidth, oversampling, resolution, tl::Color (), tl::Color (), tl::Color (), target_box);
 }
 
-static lay::BitmapBuffer get_pixels_with_options_mono (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, const db::DBox &target_box)
+static tl::BitmapBuffer get_pixels_with_options_mono (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, const db::DBox &target_box)
 {
-  return view->get_pixels_with_options_mono (width, height, linewidth, lay::Color (), lay::Color (), lay::Color (), target_box);
+  return view->get_pixels_with_options_mono (width, height, linewidth, tl::Color (), tl::Color (), tl::Color (), target_box);
 }
 
 static void save_image_with_options (lay::LayoutViewBase *view, const std::string &fn, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box, bool monochrome)
 {
-  view->save_image_with_options (fn, width, height, linewidth, oversampling, resolution, lay::Color (), lay::Color (), lay::Color (), target_box, monochrome);
+  view->save_image_with_options (fn, width, height, linewidth, oversampling, resolution, tl::Color (), tl::Color (), tl::Color (), target_box, monochrome);
 }
 
 #if defined(HAVE_QTBINDINGS)
 static QImage get_image_with_options (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box, bool monochrome)
 {
-  return view->get_image_with_options (width, height, linewidth, oversampling, resolution, lay::Color (), lay::Color (), lay::Color (), target_box, monochrome);
+  return view->get_image_with_options (width, height, linewidth, oversampling, resolution, tl::Color (), tl::Color (), tl::Color (), target_box, monochrome);
 }
 #endif
 
@@ -360,49 +360,49 @@ get_config_names (lay::LayoutViewBase *view)
 static void
 send_key_press_event (lay::LayoutViewBase *view, unsigned int key, unsigned int buttons)
 {
-  view->view_object_widget ()->send_key_press_event (key, buttons);
+  view->canvas ()->send_key_press_event (key, buttons);
 }
 
 static void
 send_mouse_move_event (lay::LayoutViewBase *view, const db::DPoint &pt, unsigned int buttons)
 {
-  view->view_object_widget ()->send_mouse_move_event (pt, buttons);
+  view->canvas ()->send_mouse_move_event (pt, buttons);
 }
 
 static void
 send_leave_event (lay::LayoutViewBase *view)
 {
-  view->view_object_widget ()->send_leave_event ();
+  view->canvas ()->send_leave_event ();
 }
 
 static void
 send_enter_event (lay::LayoutViewBase *view)
 {
-  view->view_object_widget ()->send_enter_event ();
+  view->canvas ()->send_enter_event ();
 }
 
 static void
 send_mouse_press_event (lay::LayoutViewBase *view, const db::DPoint &pt, unsigned int buttons)
 {
-  view->view_object_widget ()->send_mouse_press_event (pt, buttons);
+  view->canvas ()->send_mouse_press_event (pt, buttons);
 }
 
 static void
 send_mouse_double_clicked_event (lay::LayoutViewBase *view, const db::DPoint &pt, unsigned int buttons)
 {
-  view->view_object_widget ()->send_mouse_double_clicked_event (pt, buttons);
+  view->canvas ()->send_mouse_double_clicked_event (pt, buttons);
 }
 
 static void
 send_mouse_release_event (lay::LayoutViewBase *view, const db::DPoint &pt, unsigned int buttons)
 {
-  view->view_object_widget ()->send_mouse_release_event (pt, buttons);
+  view->canvas ()->send_mouse_release_event (pt, buttons);
 }
 
 static void
 send_wheel_event (lay::LayoutViewBase *view, int delta, bool horizontal, const db::DPoint &pt, unsigned int buttons)
 {
-  view->view_object_widget ()->send_wheel_event (delta, horizontal, pt, buttons);
+  view->canvas ()->send_wheel_event (delta, horizontal, pt, buttons);
 }
 
 namespace {
@@ -459,6 +459,11 @@ static LayerPropertiesConstIteratorWrapper each_layer (lay::LayoutViewBase *view
 static LayerPropertiesConstIteratorWrapper each_layer2 (lay::LayoutViewBase *view, unsigned int list_index)
 {
   return LayerPropertiesConstIteratorWrapper (view->begin_layers (list_index));
+}
+
+static lay::AbstractMenu *menu (lay::LayoutViewBase *view)
+{
+  return view->menu ();
 }
 
 #if defined(HAVE_QT)
@@ -771,7 +776,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "If a layout is shared between multiple cellviews (which may happen due to a clone of the layout view\n"
     "for example), all cellviews are renamed.\n"
   ) +
-  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const db::LoadLayoutOptions &, const std::string &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("technology"), gsi::arg ("add_cellview"),
+  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const db::LoadLayoutOptions &, const std::string &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("technology"), gsi::arg ("add_cellview", true),
     "@brief Loads a (new) file into the layout view with the given technology\n"
     "\n"
     "Loads the file given by the \"filename\" parameter and associates it with the given technology.\n"
@@ -781,9 +786,9 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "\n"
     "@return The index of the cellview loaded.\n"
     "\n"
-    "This version has been introduced in version 0.22.\n"
+    "This version has been introduced in version 0.22. The 'add_cellview' argument has been made optional in version 0.28.\n"
   ) +
-  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const db::LoadLayoutOptions &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("add_cellview"),
+  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const db::LoadLayoutOptions &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("add_cellview", true),
     "@brief Loads a (new) file into the layout view\n"
     "\n"
     "Loads the file given by the \"filename\" parameter.\n"
@@ -793,9 +798,9 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "\n"
     "@return The index of the cellview loaded.\n"
     "\n"
-    "This method has been introduced in version 0.18.\n"
+    "This method has been introduced in version 0.18. The 'add_cellview' argument has been made optional in version 0.28.\n"
   ) +
-  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const std::string &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("technology"), gsi::arg ("add_cellview"),
+  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &, const std::string &, bool)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("technology"), gsi::arg ("add_cellview", true),
     "@brief Loads a (new) file into the layout view with the given technology\n"
     "\n"
     "Loads the file given by the \"filename\" parameter and associates it with the given technology.\n"
@@ -804,16 +809,16 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "\n"
     "@return The index of the cellview loaded.\n"
     "\n"
-    "This version has been introduced in version 0.22.\n"
+    "This version has been introduced in version 0.22. The 'add_cellview' argument has been made optional in version 0.28.\n"
   ) +
-  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &filename, bool add_cellview)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("add_cellview"),
+  gsi::method ("load_layout", static_cast<unsigned int (lay::LayoutViewBase::*) (const std::string &filename, bool add_cellview)> (&lay::LayoutViewBase::load_layout), gsi::arg ("filename"), gsi::arg ("add_cellview", true),
     "@brief Loads a (new) file into the layout view\n"
     "\n"
     "Loads the file given by the \"filename\" parameter.\n"
     "The add_cellview param controls whether to create a new cellview (true)\n"
     "or clear all cellviews before (false).\n"
     "\n"
-    "@return The index of the cellview loaded.\n"
+    "@return The index of the cellview loaded. The 'add_cellview' argument has been made optional in version 0.28.\n"
   ) +
   gsi::method ("active_cellview", static_cast<lay::CellViewRef (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::active_cellview_ref),
     "@brief Gets the active cellview (shown in hierarchy browser)\n"
@@ -951,6 +956,50 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "This method was introduced in version 0.19.\n"
     "\n"
     "@param props The layer properties object to initialize."
+  ) +
+  gsi::method ("switch_mode", static_cast<void (lay::LayoutViewBase::*) (const std::string &)> (&lay::LayoutViewBase::switch_mode),
+    "@brief Switches the mode.\n"
+    "\n"
+    "See \\mode_name about a method to get the name of the current mode and \\mode_names for a method "
+    "to retrieve all available mode names.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("mode_name", &lay::LayoutViewBase::mode_name,
+    "@brief Gets the name of the current mode.\n"
+    "\n"
+    "See \\switch_mode about a method to change the mode and \\mode_names for a method "
+    "to retrieve all available mode names.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("mode_names", &lay::LayoutViewBase::mode_names,
+    "@brief Gets the names of the available modes.\n"
+    "\n"
+    "This method allows asking the view for the available mode names for \\switch_mode and "
+    "for the value returned by \\mode.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method_ext ("menu", &menu,
+    "@brief Gets the \\AbstractMenu associated with this view.\n"
+    "\n"
+    "In normal UI application mode this is the main window's view. For a detached view or in non-UI "
+    "applications this is the view's private menu.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("call_menu", &lay::LayoutViewBase::menu_activated, gsi::arg ("symbol"),
+    "@brief Calls the menu item with the provided symbol.\n"
+    "To obtain all symbols, use \\menu_symbols.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("menu_symbols", &lay::LayoutViewBase::menu_symbols,
+    "@brief Gets all available menu symbols.\n"
+    "NOTE: currently this method delivers a superset of all available symbols. Depending on the context, no all symbols may trigger actual functionality.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
   ) +
   gsi::method ("cancel", &lay::LayoutViewBase::cancel,
     "@brief Cancels all edit operations\n"
@@ -1129,7 +1178,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "This method has been introduced in 0.23.10.\n"
   ) +
 #endif
-  gsi::method ("get_screenshot_pixels", static_cast<lay::PixelBuffer (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::get_screenshot_pb),
+  gsi::method ("get_screenshot_pixels", static_cast<tl::PixelBuffer (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::get_screenshot_pb),
     "@brief Gets a screenshot as a \\PixelBuffer\n"
     "\n"
     "Getting the image requires the drawing to be complete. Ideally, synchronous mode is switched on "
@@ -1138,7 +1187,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "\n"
     "This method has been introduced in 0.28.\n"
   ) +
-  gsi::method ("get_pixels", static_cast<lay::PixelBuffer (lay::LayoutViewBase::*) (unsigned int, unsigned int)> (&lay::LayoutViewBase::get_pixels), gsi::arg ("width"), gsi::arg ("height"),
+  gsi::method ("get_pixels", static_cast<tl::PixelBuffer (lay::LayoutViewBase::*) (unsigned int, unsigned int)> (&lay::LayoutViewBase::get_pixels), gsi::arg ("width"), gsi::arg ("height"),
     "@brief Gets the layout image as a \\PixelBuffer\n"
     "\n"
     "@param width The width of the image to render in pixel.\n"

@@ -47,7 +47,9 @@ HEADERS = \
 
 # Note: unlike other modules, the tl declarations have to go here
 # since gsi is dependent on tl
-SOURCES += gsiDeclTl.cc 
+SOURCES += \
+  gsiDeclTl.cc \
+  gsiDeclTlPixelBuffer.cc 
 
 INCLUDEPATH += $$TL_INC
 DEPENDPATH += $$TL_INC

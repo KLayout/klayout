@@ -168,12 +168,12 @@ public:
   /**
    *  @brief Changing of the background color
    */
-  void set_background_color (lay::Color c);
+  void set_background_color (tl::Color c);
 
   /**
    *  @brief Changing of the text color
    */
-  void set_text_color (lay::Color c);
+  void set_text_color (tl::Color c);
 
   /**
    *  @brief Set the "hide empty layers" flag

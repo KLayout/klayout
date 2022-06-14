@@ -20,8 +20,6 @@
 
 */
 
-#if defined(HAVE_QT)
-
 #include "layAbstractMenu.h"
 
 #include "tlUnitTest.h"
@@ -185,5 +183,3 @@ TEST(3_ActionReferences)
   //  the action is deleted because it's owned by the menu
   EXPECT_EQ (action.get () == 0, true);
 }
-
-#endif

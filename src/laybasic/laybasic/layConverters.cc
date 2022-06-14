@@ -44,7 +44,7 @@ ColorConverter::to_string (const QColor &c) const
 #endif
 
 std::string
-ColorConverter::to_string (const lay::Color &c) const
+ColorConverter::to_string (const tl::Color &c) const
 {
   if (! c.is_valid ()) {
     return "auto";
@@ -67,13 +67,13 @@ ColorConverter::from_string (const std::string &s, QColor &c) const
 #endif
 
 void
-ColorConverter::from_string (const std::string &s, lay::Color &c) const
+ColorConverter::from_string (const std::string &s, tl::Color &c) const
 {
   std::string t (tl::trim (s));
   if (t == "auto") {
-    c = lay::Color ();
+    c = tl::Color ();
   } else {
-    c = lay::Color (t);
+    c = tl::Color (t);
   }
 }
 

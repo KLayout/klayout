@@ -20,7 +20,7 @@
 
 */
 
-#include "layPixelBuffer.h"
+#include "tlPixelBuffer.h"
 #include "tlAssert.h"
 #include "tlLog.h"
 
@@ -30,7 +30,7 @@
 
 #include <memory>
 
-namespace lay
+namespace tl
 {
 
 // -----------------------------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ static void flush_stream_f (png_structp png_ptr)
 // -----------------------------------------------------------------------------------------------------
 //  PixelBuffer implementation
 
-PixelBuffer::PixelBuffer (unsigned int w, unsigned int h, lay::color_t *data)
+PixelBuffer::PixelBuffer (unsigned int w, unsigned int h, tl::color_t *data)
   : m_data ()
 {
   m_width = w;
@@ -122,18 +122,18 @@ PixelBuffer::PixelBuffer (unsigned int w, unsigned int h, lay::color_t *data)
   m_data.reset (new ImageData (data, w * h));
 }
 
-PixelBuffer::PixelBuffer (unsigned int w, unsigned int h, const lay::color_t *data, unsigned int stride)
+PixelBuffer::PixelBuffer (unsigned int w, unsigned int h, const tl::color_t *data, unsigned int stride)
   : m_data ()
 {
   m_width = w;
   m_height = h;
   m_transparent = false;
 
-  tl_assert ((stride % sizeof (lay::color_t)) == 0);
-  stride /= sizeof (lay::color_t);
+  tl_assert ((stride % sizeof (tl::color_t)) == 0);
+  stride /= sizeof (tl::color_t);
 
-  lay::color_t *d = new lay::color_t [w * h];
-  lay::color_t *new_data = d;
+  tl::color_t *d = new tl::color_t [w * h];
+  tl::color_t *new_data = d;
 
   if (data) {
     for (unsigned int i = 0; i < h; ++i) {
@@ -181,11 +181,11 @@ PixelBuffer::operator== (const PixelBuffer &other) const
     return false;
   }
 
-  lay::color_t m = transparent () ? 0xffffffff : 0xffffff;
+  tl::color_t m = transparent () ? 0xffffffff : 0xffffff;
   for (unsigned int i = 0; i < other.height (); ++i) {
-    const lay::color_t *d = scan_line (i);
-    const lay::color_t *de = d + width ();
-    const lay::color_t *dd = other.scan_line (i);
+    const tl::color_t *d = scan_line (i);
+    const tl::color_t *de = d + width ();
+    const tl::color_t *dd = other.scan_line (i);
     while (d != de) {
       if (((*d++ ^ *dd++) & m) != 0) {
         return false;
@@ -239,13 +239,13 @@ PixelBuffer::swap (PixelBuffer &other)
 }
 
 void
-PixelBuffer::fill (lay::color_t c)
+PixelBuffer::fill (tl::color_t c)
 {
   if (! transparent ()) {
     c |= 0xff000000;  //  ensures that alpha is properly set
   }
 
-  color_t *d = data ();
+  tl::color_t *d = data ();
   for (unsigned int i = 0; i < m_height; ++i) {
     for (unsigned int j = 0; j < m_width; ++j) {
       *d++ = c;
@@ -253,27 +253,27 @@ PixelBuffer::fill (lay::color_t c)
   }
 }
 
-color_t *
+tl::color_t *
 PixelBuffer::scan_line (unsigned int n)
 {
   tl_assert (n < m_height);
   return m_data->data () + n * m_width;
 }
 
-const color_t *
+const tl::color_t *
 PixelBuffer::scan_line (unsigned int n) const
 {
   tl_assert (n < m_height);
   return m_data->data () + n * m_width;
 }
 
-color_t *
+tl::color_t *
 PixelBuffer::data ()
 {
   return m_data->data ();
 }
 
-const color_t *
+const tl::color_t *
 PixelBuffer::data () const
 {
   return m_data->data ();
@@ -303,9 +303,9 @@ PixelBuffer::from_image (const QImage &img)
 {
   if (img.format () != QImage::Format_ARGB32 && img.format () != QImage::Format_RGB32) {
     QImage img_argb32 = img.convertToFormat (QImage::Format_ARGB32);
-    return PixelBuffer (img_argb32.width (), img_argb32.height (), (const lay::color_t *) img_argb32.bits ());
+    return PixelBuffer (img_argb32.width (), img_argb32.height (), (const tl::color_t *) img_argb32.bits ());
   } else {
-    return PixelBuffer (img.width (), img.height (), (const lay::color_t *) img.bits ());
+    return PixelBuffer (img.width (), img.height (), (const tl::color_t *) img.bits ());
   }
 }
 #endif
@@ -317,11 +317,11 @@ PixelBuffer::patch (const PixelBuffer &other)
   tl_assert (height () == other.height ());
   tl_assert (other.transparent ());
 
-  const color_t *d = other.data ();
-  color_t *dd = data ();
+  const tl::color_t *d = other.data ();
+  tl::color_t *dd = data ();
   for (unsigned int i = 0; i < m_height; ++i) {
     for (unsigned int j = 0; j < m_width; ++j) {
-      color_t c = *d++;
+      tl::color_t c = *d++;
       if ((c & 0x80000000) != 0) {
         *dd = c;
       }
@@ -339,9 +339,9 @@ PixelBuffer::diff (const PixelBuffer &other) const
   PixelBuffer res (m_width, m_height);
   res.set_transparent (true);
 
-  const color_t *d2 = other.data ();
-  const color_t *d1 = data ();
-  color_t *dd = res.data ();
+  const tl::color_t *d2 = other.data ();
+  const tl::color_t *d1 = data ();
+  tl::color_t *dd = res.data ();
 
   for (unsigned int i = 0; i < m_height; ++i) {
     for (unsigned int j = 0; j < m_width; ++j) {
@@ -373,7 +373,7 @@ PixelBuffer::read_png (tl::InputStream &input)
   tl_assert (info_ptr != NULL);
 
   png_set_read_fn (png_ptr, (void *) &input, &read_from_stream_f);
-  png_set_bgr (png_ptr);    // compatible with lay::color_t
+  png_set_bgr (png_ptr);    // compatible with tl::color_t
 
   png_read_png (png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
 
@@ -384,11 +384,11 @@ PixelBuffer::read_png (tl::InputStream &input)
 
   if (fmt == PNG_COLOR_TYPE_RGBA && bd == 8) {
 
-    tl_assert (png_get_rowbytes (png_ptr, info_ptr) == res.width () * sizeof (lay::color_t));
+    tl_assert (png_get_rowbytes (png_ptr, info_ptr) == res.width () * sizeof (tl::color_t));
 
     png_bytepp row_pointers = png_get_rows (png_ptr, info_ptr);
     for (unsigned int i = 0; i < res.height (); ++i) {
-      memcpy ((void *) res.scan_line (i), (void *) row_pointers [i], sizeof (lay::color_t) * res.width ());
+      memcpy ((void *) res.scan_line (i), (void *) row_pointers [i], sizeof (tl::color_t) * res.width ());
     }
 
     res.set_transparent (true);
@@ -402,13 +402,13 @@ PixelBuffer::read_png (tl::InputStream &input)
 
     png_bytepp row_pointers = png_get_rows (png_ptr, info_ptr);
     for (unsigned int i = 0; i < res.height (); ++i) {
-      lay::color_t *c = res.scan_line (i);
+      tl::color_t *c = res.scan_line (i);
       const uint8_t *d = row_pointers [i];
       const uint8_t *dd = d + rb;
       while (d < dd) {
-        lay::color_t b = *d++;
-        lay::color_t g = *d++;
-        lay::color_t r = *d++;
+        tl::color_t b = *d++;
+        tl::color_t g = *d++;
+        tl::color_t r = *d++;
         *c++ = 0xff000000 | ((r << 8 | g) << 8) | b;
       }
     }
@@ -422,12 +422,12 @@ PixelBuffer::read_png (tl::InputStream &input)
 
     png_bytepp row_pointers = png_get_rows (png_ptr, info_ptr);
     for (unsigned int i = 0; i < res.height (); ++i) {
-      lay::color_t *c = res.scan_line (i);
+      tl::color_t *c = res.scan_line (i);
       const uint8_t *d = row_pointers [i];
       const uint8_t *dd = d + rb;
       while (d < dd) {
-        lay::color_t g = *d++;
-        lay::color_t a = *d++;
+        tl::color_t g = *d++;
+        tl::color_t a = *d++;
         *c++ = (a << 24) | ((g << 8 | g) << 8) | g;
       }
     }
@@ -443,11 +443,11 @@ PixelBuffer::read_png (tl::InputStream &input)
 
     png_bytepp row_pointers = png_get_rows (png_ptr, info_ptr);
     for (unsigned int i = 0; i < res.height (); ++i) {
-      lay::color_t *c = res.scan_line (i);
+      tl::color_t *c = res.scan_line (i);
       const uint8_t *d = row_pointers [i];
       const uint8_t *dd = d + rb;
       while (d < dd) {
-        lay::color_t g = *d++;
+        tl::color_t g = *d++;
         *c++ = 0xff000000 | ((g << 8 | g) << 8) | g;
       }
     }
@@ -477,7 +477,7 @@ PixelBuffer::write_png (tl::OutputStream &output) const
   tl_assert (info_ptr != NULL);
 
   png_set_write_fn (png_ptr, (void *) &output, &write_to_stream_f, &flush_stream_f);
-  png_set_bgr (png_ptr);    // compatible with lay::color_t
+  png_set_bgr (png_ptr);    // compatible with tl::color_t
 
   unsigned int bd = 8;  // bit depth
   unsigned int fmt = transparent () ? PNG_COLOR_TYPE_RGBA : PNG_COLOR_TYPE_RGB;
@@ -507,10 +507,10 @@ PixelBuffer::write_png (tl::OutputStream &output) const
 
     for (unsigned int i = 0; i < height (); ++i) {
       uint8_t *d = buffer.get ();
-      const lay::color_t *s = scan_line (i);
-      const lay::color_t *se = s + width ();
+      const tl::color_t *s = scan_line (i);
+      const tl::color_t *se = s + width ();
       while (s != se) {
-        lay::color_t c = *s++;
+        tl::color_t c = *s++;
         *d++ = c & 0xff;
         c >>= 8;
         *d++ = c & 0xff;

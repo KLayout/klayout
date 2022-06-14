@@ -185,6 +185,7 @@ ApplicationBase::ApplicationBase (bool non_ui_mode)
   : gsi::ObjectBase (),
     m_lyp_map_all_cvs (true), 
     m_lyp_add_default (false),
+    m_run_macro_and_exit (true),
     m_packages_with_dep (false),
     m_write_config_file (false),
     m_gtf_replay_rate (0),
@@ -353,7 +354,18 @@ ApplicationBase::parse_cmd (int &argc, char **argv)
 
     } else if (a == "-r" && (i + 1) < argc) {
 
+      if (! m_run_macro.empty ()) {
+        throw tl::Exception (tl::to_string (QObject::tr ("Option -r or -rr can only be used once")));
+      }
       m_run_macro = args [++i];
+
+    } else if (a == "-rr" && (i + 1) < argc) {
+
+      if (! m_run_macro.empty ()) {
+        throw tl::Exception (tl::to_string (QObject::tr ("Option -r or -rr can only be used once")));
+      }
+      m_run_macro = args [++i];
+      m_run_macro_and_exit = false;
 
     } else if (a == "-rx") {
 
@@ -998,7 +1010,8 @@ ApplicationBase::usage ()
   r += tl::to_string (QObject::tr ("  -nn <tech file>     Technology file (.lyt) to use for next layout(s) on command line")) + "\n";
   r += tl::to_string (QObject::tr ("  -p <plugin>         Load the plugin (can be used multiple times)")) + "\n";
   r += tl::to_string (QObject::tr ("  -r <script>         Execute main script on startup (after having loaded files etc.)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -rm <script>        Execute module on startup (can be used multiple times)")) + "\n";
+  r += tl::to_string (QObject::tr ("  -rr <script>        Like -r, but does not exit after executing the script")) + "\n";
+  r += tl::to_string (QObject::tr ("  -rm <script>        Execute script on startup before loading files (can be used multiple times)")) + "\n";
   r += tl::to_string (QObject::tr ("  -rd <name>=<value>  Specify script variable")) + "\n";
   r += tl::to_string (QObject::tr ("  -rx                 Ignore all implicit macros (*.rbm, rbainit, *.lym)")) + "\n";
   r += tl::to_string (QObject::tr ("  -s                  Load files into same view")) + "\n";
@@ -1091,6 +1104,10 @@ ApplicationBase::run ()
   //  Run plugin and macro specific initializations
   autorun ();
 
+  //  Some objects we need during batch mode view generation
+  db::Manager batch_mode_manager;
+  tl::shared_ptr<LayoutView> batch_mode_view;
+
   if (mw) {
 
     for (std::vector <std::pair<file_type, std::pair<std::string, std::string> > >::const_iterator f = m_files.begin (); f != m_files.end (); ++f) {
@@ -1141,11 +1158,7 @@ ApplicationBase::run ()
 
     if (! m_layer_props_file.empty ()) {
 
-      if (m_lyp_map_all_cvs && mw->is_single_cv_layer_properties_file (m_layer_props_file)) {
-        mw->load_layer_properties (m_layer_props_file, -1, true /*all views*/, m_lyp_add_default);
-      } else {
-        mw->load_layer_properties (m_layer_props_file, true /*all views*/, m_lyp_add_default);
-      }
+      mw->load_layer_properties (m_layer_props_file, true /*all views*/, m_lyp_add_default);
 
       tl::log << "Layer properties loaded '" << m_layer_props_file << "'";
 
@@ -1165,25 +1178,79 @@ ApplicationBase::run ()
       player.replay (m_gtf_replay_rate, m_gtf_replay_stop);
     }
 
-    //  Give the plugins a change to do some last-minute initialisation and checks
+  } else {
+
+    //  in batch mode create at least one
+
+    for (std::vector <std::pair<file_type, std::pair<std::string, std::string> > >::const_iterator f = m_files.begin (); f != m_files.end (); ++f) {
+
+      if (f->first == layout_file || f->first == layout_file_with_tech) {
+
+        std::string filename = f->second.first;
+
+        if (batch_mode_view.get () != 0 && ! m_same_view) {
+          tl::warn << tl::sprintf (tl::to_string (tr ("Ignoring additional views in batch mode (file %s)")), filename);
+          continue;
+        }
+
+        if (! batch_mode_view) {
+          batch_mode_view.reset (create_view (batch_mode_manager));
+        }
+
+        if (f->first != layout_file_with_tech) {
+          batch_mode_view->load_layout (f->second.first, true);
+        } else {
+          batch_mode_view->load_layout (f->second.first, f->second.second, true);
+        }
+
+        //  Make the first one loaded the active one.
+        batch_mode_view->set_active_cellview_index (0);
+
+      } else if (f->first == rdb_file) {
+
+        if (! batch_mode_view) {
+          batch_mode_view.reset (create_view (batch_mode_manager));
+        }
+
+        std::unique_ptr <rdb::Database> db (new rdb::Database ());
+        db->load (f->second.first);
+        batch_mode_view->add_rdb (db.release ());
+
+      } else if (f->first == l2ndb_file) {
+
+        if (! batch_mode_view) {
+          batch_mode_view.reset (create_view (batch_mode_manager));
+        }
+
+        batch_mode_view->add_l2ndb (db::LayoutToNetlist::create_from_file (f->second.first));
+
+      }
+    }
+
+    if (! m_layer_props_file.empty () && batch_mode_view.get ()) {
+
+      batch_mode_view->load_layer_props (m_layer_props_file, m_lyp_add_default);
+
+      tl::log << "Layer properties loaded '" << m_layer_props_file << "'";
+
+      //  because the layer may carry transformations, we need to refit the cellviews.
+      batch_mode_view->zoom_fit ();
+
+    }
+
+  }
+
+  //  Give the plugins a change to do some last-minute initialisation and checks
+  if (dispatcher ()) {
     for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
       lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
       pd->initialized (dispatcher ());
     }
+  }
 
-    if (! m_no_gui && m_gtf_replay.empty () && m_gtf_record.empty ()) {
-      //  Show initial tip window if required
-      mw->about_to_exec ();
-    }
-
-  } else if (dispatcher ()) {
-
-    //  Give the plugins a change to do some last-minute initialisation and checks
-    for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-      lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
-      pd->initialized (dispatcher ());
-    }
-
+  if (mw && ! m_no_gui && m_gtf_replay.empty () && m_gtf_record.empty ()) {
+    //  Show initial tip window if required
+    mw->about_to_exec ();
   }
 
   if (! m_run_macro.empty ()) {
@@ -1194,13 +1261,37 @@ ApplicationBase::run ()
     macro.set_file_path (m_run_macro);
     result = macro.run ();
 
+    if (result == 0 && ! m_run_macro_and_exit) {
+      result = exec ();
+    }
+
   } else {
     result = exec ();
   }
 
   finish ();
 
+  batch_mode_view.reset (0);
+
   return result;
+}
+
+lay::LayoutView *
+ApplicationBase::create_view (db::Manager &manager)
+{
+  //  create a new view
+  lay::LayoutView *view = new lay::LayoutView (&manager, lay::ApplicationBase::instance ()->is_editable (), dispatcher (), 0 /*parent*/);
+
+  //  set initial attributes
+  view->set_synchronous (m_sync_mode);
+
+  int tl = 0;
+  dispatcher ()->config_get (cfg_initial_hier_depth, tl);
+  view->set_hier_levels (std::make_pair (0, tl));
+
+  view->set_current ();
+
+  return view;
 }
 
 void
@@ -1250,7 +1341,8 @@ dump_children (QObject *obj, int level = 0)
 void
 ApplicationBase::process_events_impl (QEventLoop::ProcessEventsFlags /*flags*/, bool /*silent*/)
 {
-  //  The base class implementation does nothing ..
+  //  in the non-UI case there are no events, but we can at least schedule deferred method calls.
+  tl::DeferredMethodScheduler::execute ();
 }
 
 bool 

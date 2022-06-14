@@ -29,13 +29,11 @@ equals(HAVE_PYTHON, "1") {
   LIBS += -lklayout_pyastub
 }
 
-!equals(HAVE_QT, "0") {
-  equals(HAVE_RUBY, "1") {
-    # DRC is only available with Ruby
-    INCLUDEPATH += $$DRC_INC $$LVS_INC
-    DEPENDPATH += $$DRC_INC $$LVS_INC
-    LIBS += -lklayout_drc -lklayout_lvs
-  }
+equals(HAVE_RUBY, "1") {
+  # DRC is only available with Ruby
+  INCLUDEPATH += $$DRC_INC $$LVS_INC
+  DEPENDPATH += $$DRC_INC $$LVS_INC
+  LIBS += -lklayout_drc -lklayout_lvs
 }
 
 msvc {

@@ -8,8 +8,10 @@ include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
   tlAlgorithmTests.cc \
+  tlBase64Tests.cc \
   tlClassRegistryTests.cc \
   tlCommandLineParserTests.cc \
+  tlColorTests.cc \
   tlCopyOnWriteTests.cc \
   tlDataMappingTests.cc \
   tlDeferredExecutionTests.cc \
@@ -27,6 +29,8 @@ SOURCES = \
   tlLongIntTests.cc \
   tlMathTests.cc \
   tlObjectTests.cc \
+  tlPixelBufferTests.cc \
+  tlResourcesTests.cc \
   tlReuseVectorTests.cc \
   tlStableVectorTests.cc \
   tlStreamTests.cc \

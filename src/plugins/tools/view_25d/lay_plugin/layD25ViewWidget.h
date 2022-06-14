@@ -159,7 +159,7 @@ public:
   void set_material_visible (size_t index, bool visible);
 
   void clear ();
-  void open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like, const std::string *name);
+  void open_display (const tl::color_t *frame_color, const tl::color_t *fill_color, const db::LayerProperties *like, const std::string *name);
   void close_display ();
   void entry (const db::Region &data, double dbu, double zstart, double zstop);
   void entry (const db::Edges &data, double dbu, double zstart, double zstop);

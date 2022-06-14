@@ -36,7 +36,6 @@
 #  include <QPoint>
 #  include <QByteArray>
 #  include <QColor>
-#  include <QWidget>
 #endif
 
 #include "tlObjectCollection.h"
@@ -48,6 +47,7 @@
 #include "layBitmapRenderer.h"
 
 #if defined(HAVE_QT)
+class QWidget;
 class QMouseEvent;
 class QImage;
 class QDragEnterEvent;
@@ -63,19 +63,25 @@ namespace db
   class Layout;
 }
 
+namespace tl
+{
+  class PixelBuffer;
+  class BitmapBuffer;
+}
+
 namespace lay {
 
 class Viewport;
-class ViewObjectWidget;
+class ViewObjectUI;
 class ViewObjectCanvas;
 class CanvasPlane;
 class Bitmap;
-class PixelBuffer;
-class BitmapBuffer;
 
 #if defined(HAVE_QT)
 class DragDropDataBase;
 #endif
+
+class ViewObjectQWidget;
 
 /**
  *  @brief A view service 
@@ -96,7 +102,7 @@ public:
   /**
    *  @brief Constructor
    */
-  ViewService (ViewObjectWidget *widget = 0);
+  ViewService (ViewObjectUI *widget = 0);
 
   /**
    *  @brief Destructor
@@ -238,7 +244,7 @@ public:
   /**
    *  @brief Accessor to the widget pointer
    */
-  ViewObjectWidget *widget () const 
+  ViewObjectUI *ui () const
   {  
     return mp_widget;
   }
@@ -256,7 +262,7 @@ public:
   /**
    *  @brief This method is called to set the background and text (foreground) color
    */
-  virtual void set_colors (lay::Color /*background*/, lay::Color /*text*/) { }
+  virtual void set_colors (tl::Color /*background*/, tl::Color /*text*/) { }
 
   /**
    *  @brief This method is called when a drag operation should be cancelled
@@ -289,9 +295,9 @@ public:
   }
 
 private:
-  friend class ViewObjectWidget;
+  friend class ViewObjectUI;
 
-  ViewObjectWidget *mp_widget;
+  ViewObjectUI *mp_widget;
   bool m_abs_grab;
   bool m_enabled;
 };
@@ -315,7 +321,7 @@ public:
    *  @param widget The widget object that the object is shown on.
    *  @param _static True, if the object is in frozen mode initially
    */
-  BackgroundViewObject (ViewObjectWidget *widget = 0);
+  BackgroundViewObject (ViewObjectUI *widget = 0);
 
   /**
    *  @brief The destructor
@@ -333,9 +339,9 @@ public:
   /**
    *  @brief Accessor to the widget object pointer
    */
-  ViewObjectWidget *widget () const 
+  ViewObjectUI *widget () const
   {  
-    return const_cast<ViewObjectWidget *> (mp_widget.get());
+    return const_cast<ViewObjectUI *> (mp_widget.get());
   }
 
   /**
@@ -381,12 +387,12 @@ public:
   void z_order (int z);
 
 private:
-  friend class ViewObjectWidget;
+  friend class ViewObjectUI;
 
   BackgroundViewObject (const BackgroundViewObject &d);
   BackgroundViewObject &operator= (const BackgroundViewObject &d);
 
-  tl::weak_ptr<ViewObjectWidget> mp_widget;
+  tl::weak_ptr<ViewObjectUI> mp_widget;
   bool m_visible;
   int m_z_order;
 };
@@ -415,7 +421,7 @@ public:
    *  @param widget The widget object that the object is shown on.
    *  @param _static True, if the object is in frozen mode initially
    */
-  ViewObject (ViewObjectWidget *widget = 0, bool _static = true);
+  ViewObject (ViewObjectUI *widget = 0, bool _static = true);
 
   /**
    *  @brief The destructor
@@ -434,9 +440,9 @@ public:
   /**
    *  @brief Accessor to the widget object pointer
    */
-  ViewObjectWidget *widget () const 
+  ViewObjectUI *widget () const
   {  
-    return const_cast<ViewObjectWidget *> (mp_widget.get());
+    return const_cast<ViewObjectUI *> (mp_widget.get());
   }
 
   /**
@@ -496,12 +502,12 @@ public:
   void freeze ();
 
 private:
-  friend class ViewObjectWidget;
+  friend class ViewObjectUI;
 
   ViewObject (const ViewObject &d);
   ViewObject &operator= (const ViewObject &d);
 
-  tl::weak_ptr<ViewObjectWidget> mp_widget;
+  tl::weak_ptr<ViewObjectUI> mp_widget;
   bool m_static;
   bool m_visible;
   bool m_dismissable;
@@ -568,10 +574,7 @@ enum KeyCodes {
  *  painting.
  */
 
-class LAYBASIC_PUBLIC ViewObjectWidget :
-#if defined(HAVE_QT)
-    public QWidget,
-#endif
+class LAYBASIC_PUBLIC ViewObjectUI :
     public tl::Object
 {
 public:
@@ -583,16 +586,19 @@ public:
   /**
    *  @brief ctor
    */
-#if defined(HAVE_QT)
-  ViewObjectWidget (QWidget *view, const char *name);
-#else
-  ViewObjectWidget ();
-#endif
+  ViewObjectUI ();
 
   /**
    *  @brief dtor
    */
-  ~ViewObjectWidget ();
+  ~ViewObjectUI ();
+
+#if defined(HAVE_QT)
+  /**
+   *  @brief Initializes the UI components
+   */
+  void init_ui (QWidget *parent);
+#endif
 
   /**
    *  @brief Cancel all drag operations
@@ -956,6 +962,16 @@ public:
   bool image_updated ();
 #endif
 
+#if defined(HAVE_QT)
+  /**
+   *  @brief Gets the QWidget representing this canvas visually in Qt
+   */
+  QWidget *widget ()
+  {
+    return mp_widget;
+  }
+#endif
+
   /**
    *  @brief External entry point for key press event generation
    */
@@ -996,79 +1012,14 @@ public:
    */
   void send_wheel_event (int delta, bool horizontal, const db::DPoint &pt, unsigned int buttons);
 
+  /**
+   *  @brief Resizes the widget
+   */
+  void resize (unsigned int w, unsigned int h);
+
 protected:
-#if defined(HAVE_QT)
-  /**
-   *  @brief Qt focus event handler
-   */
-  bool focusNextPrevChild (bool next);
+  friend class ViewObjectQWidget;
 
-  /**
-   *  @brief Qt keyboard event handler
-   */
-  void keyPressEvent (QKeyEvent *e);
-
-  /**
-   *  @brief Qt mouse move event handler
-   */
-  void mouseMoveEvent (QMouseEvent *e);
-
-  /**
-   *  @brief Qt mouse leave event handler
-   */
-  void leaveEvent (QEvent *e);
-
-  /**
-   *  @brief Qt mouse enter event handler
-   */
-#if QT_VERSION >= 0x60000
-  void enterEvent (QEnterEvent *e);
-#else
-  void enterEvent (QEvent *e);
-#endif
-
-  /**
-   *  @brief Qt mouse button press event handler
-   */
-  void mousePressEvent (QMouseEvent *e);
-
-  /**
-   *  @brief Qt mouse button double-click event handler
-   */
-  void mouseDoubleClickEvent (QMouseEvent *e);
-
-  /**
-   *  @brief Qt mouse button release event handler
-   */
-  void mouseReleaseEvent (QMouseEvent *e);
-
-  /**
-   *  @brief Qt drag enter event handler
-   */
-  void dragEnterEvent (QDragEnterEvent *event);
-
-  /**
-   *  @brief Qt drag leave event handler
-   */
-  void dragLeaveEvent (QDragLeaveEvent *event);
-
-  /**
-   *  @brief Qt drag enter event handler
-   */
-  void dragMoveEvent (QDragMoveEvent *event);
-
-  /**
-   *  @brief Qt drop event handler
-   */
-  void dropEvent (QDropEvent *event);
-
-  /**
-   *  @brief Qt mouse wheel event handler
-   */
-  void wheelEvent (QWheelEvent *e);
-#endif
-
-#if !defined(HAVE_QT)
   /**
    *  @brief Emulates the update() method in the non-Qt case
    *
@@ -1076,7 +1027,6 @@ protected:
    *  update needed flag.
    */
   void update ();
-#endif
 
   /**
    *  @brief Set the transformation for mouse events
@@ -1084,15 +1034,28 @@ protected:
   void mouse_event_trans (const db::DCplxTrans &trans);
 
   /**
-   *  @brief Resizes the widget
+   *  @brief Gets called when the view is resized
    */
-  void resize (unsigned int w, unsigned int h);
+  virtual void resize_event (unsigned int w, unsigned int h);
+
+  /**
+   *  @brief Receives the paint event from Qt
+   */
+  virtual void paint_event ();
+
+  /**
+   *  @brief GTF probe event
+   */
+  virtual void gtf_probe ();
 
 private:
   friend class lay::ViewObject;
   friend class lay::ViewService;
   friend class lay::BackgroundViewObject;
 
+#if defined(HAVE_QT)
+  QWidget *mp_widget;
+#endif
   tl::weak_collection<lay::ViewObject> m_objects;
   tl::weak_collection<lay::BackgroundViewObject> m_background_objects;
   std::list<lay::ViewService *> m_services;
@@ -1154,17 +1117,17 @@ public:
   /**
    *  @brief Background color property: background color of the canvas
    */
-  virtual lay::Color background_color () const = 0;
+  virtual tl::Color background_color () const = 0;
 
   /**
    *  @brief Foreground color property: foreground color of the canvas (some "contrast" color to background)
    */
-  virtual lay::Color foreground_color () const = 0;
+  virtual tl::Color foreground_color () const = 0;
 
   /**
    *  @brief Active color property: color of active elements on the canvas (some "contrast" color to background and different from foreground)
    */
-  virtual lay::Color active_color () const = 0;
+  virtual tl::Color active_color () const = 0;
 
   /**
    *  @brief Get the resolution
@@ -1364,12 +1327,12 @@ public:
   /**
    *  @brief Gets the pixel buffer that background objects render to
    */
-  virtual lay::PixelBuffer *bg_image ();
+  virtual tl::PixelBuffer *bg_image ();
 
   /**
    *  @brief Gets the monochrome pixel buffer that background objects render to
    */
-  virtual lay::BitmapBuffer *bg_bitmap ();
+  virtual tl::BitmapBuffer *bg_bitmap ();
 
 private:
   std::map <lay::ViewOp, unsigned int> m_fg_bitmap_table;

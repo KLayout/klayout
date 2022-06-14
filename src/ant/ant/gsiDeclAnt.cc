@@ -427,28 +427,33 @@ static int ruler_mode_auto_metric ()
 
 static void register_annotation_template (const ant::Object &a, const std::string &title, int mode)
 {
-  ant::Template t;
-
-  t.angle_constraint (a.angle_constraint ());
-  t.category (a.category ());
-  t.fmt (a.fmt ());
-  t.fmt_x (a.fmt_x ());
-  t.fmt_y (a.fmt_y ());
-  t.set_main_position (a.main_position ());
-  t.set_main_xalign (a.main_xalign ());
-  t.set_main_yalign (a.main_yalign ());
-  t.set_xlabel_xalign (a.xlabel_xalign ());
-  t.set_xlabel_yalign (a.xlabel_yalign ());
-  t.set_ylabel_xalign (a.ylabel_xalign ());
-  t.set_ylabel_yalign (a.ylabel_yalign ());
-  t.outline (a.outline ());
-  t.style (a.style ());
-  t.title (title);
-
-  t.set_mode (ant::Template::ruler_mode_type (mode));
+  ant::Template t = ant::Template::from_object (a, title, mode);
 
   if (ant::PluginDeclaration::instance ()) {
     ant::PluginDeclaration::instance ()->register_annotation_template (t);
+  }
+}
+
+static void register_annotation_template2 (lay::LayoutViewBase *view, const ant::Object &a, const std::string &title, int mode)
+{
+  ant::Template t = ant::Template::from_object (a, title, mode);
+
+  if (ant::PluginDeclaration::instance ()) {
+    ant::PluginDeclaration::instance ()->register_annotation_template (t, view);
+  }
+}
+
+static void unregister_annotation_template (const std::string &category)
+{
+  if (ant::PluginDeclaration::instance ()) {
+    ant::PluginDeclaration::instance ()->unregister_annotation_template (category);
+  }
+}
+
+static void unregister_annotation_template2 (lay::LayoutViewBase *view, const std::string &category)
+{
+  if (ant::PluginDeclaration::instance ()) {
+    ant::PluginDeclaration::instance ()->unregister_annotation_template (category, view);
   }
 }
 
@@ -458,15 +463,31 @@ gsi::Class<ant::Object> decl_BasicAnnotation ("lay", "BasicAnnotation", gsi::Met
 gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotation",
   gsi::method ("register_template", &gsi::register_annotation_template,
     gsi::arg ("annotation"), gsi::arg ("title"), gsi::arg ("mode", ruler_mode_normal (), "\\RulerModeNormal"),
-    "@brief Registers the given annotation as a template\n"
+    "@brief Registers the given annotation as a template globally\n"
+    "@annotation The annotation to use for the template (positions are ignored)\n"
     "@param title The title to use for the ruler template\n"
     "@param mode The mode the ruler will be created in (see Ruler... constants)\n"
     "\n"
-    "In order to register a system template, the category string of the annotation should be "
+    "In order to register a system template, the category string of the annotation has to be "
     "a unique and non-empty string. The annotation is added to the list of annotation templates "
     "and becomes available as a new template in the ruler drop-down menu.\n"
     "\n"
+    "The new annotation template is registered on all views.\n"
+    "\n"
+    "NOTE: this setting is persisted and the the application configuration is updated.\n"
+    "\n"
     "This method has been added in version 0.25."
+  ) +
+  gsi::method ("unregister_templates", &gsi::unregister_annotation_template,
+    gsi::arg ("category"),
+    "@brief Unregisters the template or templates with the given category string globally\n"
+    "\n"
+    "This method will remove all templates with the given category string. If the category string is empty, "
+    "all templates are removed.\n"
+    "\n"
+    "NOTE: this setting is persisted and the the application configuration is updated.\n"
+    "\n"
+    "This method has been added in version 0.28."
   ) +
   gsi::method ("RulerModeNormal", &gsi::ruler_mode_normal,
     "@brief Specifies normal ruler mode for the \\register_template method\n"
@@ -988,6 +1009,25 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
   "@/code\n"
 );
 
+static std::vector<std::vector<tl::Variant> > get_annotation_templates (lay::LayoutViewBase *view)
+{
+  ant::Service *ant_service = view->get_plugin <ant::Service> ();
+  tl_assert (ant_service != 0);
+
+  std::vector<std::vector<tl::Variant> > ant_objects;
+  const std::vector<ant::Template> &ruler_templates = ant_service->ruler_templates ();
+
+  ant_objects.reserve (ruler_templates.size ());
+  for (auto i = ruler_templates.begin (); i != ruler_templates.end (); ++i) {
+    ant_objects.push_back (std::vector<tl::Variant> ());
+    ant_objects.back ().push_back (tl::Variant (gsi::AnnotationRef (ant::Object (db::DPoint (), db::DPoint (), 0, *i), 0)));
+    ant_objects.back ().push_back (tl::Variant (i->title ()));
+    ant_objects.back ().push_back (tl::Variant (int (i->mode ())));
+  }
+
+  return ant_objects;
+}
+
 static
 gsi::ClassExt<lay::LayoutViewBase> layout_view_decl (
   gsi::method_ext ("clear_annotations", &gsi::clear_annotations, 
@@ -1063,6 +1103,42 @@ gsi::ClassExt<lay::LayoutViewBase> layout_view_decl (
     "@return The new ruler object\n"
     "\n"
     "This method was introduced in version 0.26."
+  ) +
+  gsi::method_ext ("register_annotation_template", &gsi::register_annotation_template2,
+    gsi::arg ("annotation"), gsi::arg ("title"), gsi::arg ("mode", ruler_mode_normal (), "\\RulerModeNormal"),
+    "@brief Registers the given annotation as a template for this particular view\n"
+    "@annotation The annotation to use for the template (positions are ignored)\n"
+    "@param title The title to use for the ruler template\n"
+    "@param mode The mode the ruler will be created in (see Ruler... constants)\n"
+    "\n"
+    "See \\Annotation#register_template for a method doing the same on application level. "
+    "This method is hardly useful normally, but can be used when customizing layout views as "
+    "individual widgets.\n"
+    "\n"
+    "This method has been added in version 0.28."
+  ) +
+  gsi::method_ext ("unregister_annotation_templates", &gsi::unregister_annotation_template2,
+    gsi::arg ("category"),
+    "@brief Unregisters the template or templates with the given category string on this particular view\n"
+    "\n"
+    "See \\Annotation#unregister_template for a method doing the same on application level."
+    "This method is hardly useful normally, but can be used when customizing layout views as "
+    "individual widgets.\n"
+    "\n"
+    "This method has been added in version 0.28."
+  ) +
+  gsi::method_ext ("annotation_templates", &get_annotation_templates,
+    "@brief Gets a list of \\Annotation objects representing the annotation templates.\n"
+    "\n"
+    "Annotation templates are the rulers available in the ruler drop-down (preset ruler types). "
+    "This method will fetch the templates available. This method returns triplets '(annotation, title, mode)'. "
+    "The first member of the triplet is the annotation object representing the template. The second "
+    "member is the title string displayed in the menu for this templates. The third member is the mode "
+    "value (one of the RulerMode... constants - e.g \\RulerModeNormal).\n"
+    "\n"
+    "The positions of the returned annotation objects are undefined.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
   ),
   ""
 );

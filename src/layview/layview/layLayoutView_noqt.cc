@@ -31,12 +31,14 @@ LayoutView::LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_par
   : LayoutViewBase (this, mgr, editable, plugin_parent, options)
 {
   config_setup ();
+  finish ();
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options)
   : LayoutViewBase (this, source, mgr, editable, plugin_parent, options)
 {
   config_setup ();
+  finish ();
 }
 
 //  NOTE: this methods needs to be called "frequently"
@@ -57,6 +59,23 @@ LayoutView::timer ()
   if (canvas ()->drawing_finished ()) {
     drawing_finished_event ();
   }
+}
+
+static tl::weak_ptr<lay::LayoutView> s_current_view;
+
+LayoutView *LayoutView::current ()
+{
+  return s_current_view.get ();
+}
+
+void LayoutView::set_current (LayoutView *view)
+{
+  s_current_view.reset (view);
+}
+
+void LayoutView::set_current ()
+{
+  s_current_view.reset (this);
 }
 
 } // namespace lay

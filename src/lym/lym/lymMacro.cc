@@ -309,7 +309,7 @@ void Macro::load ()
 bool 
 Macro::format_from_suffix (const std::string &fn, Macro::Interpreter &interpreter, std::string &dsl_name, bool &autorun_pref, Macro::Format &format)
 {
-  return format_from_suffix_string (tl::extension (fn), interpreter, dsl_name, autorun_pref, format);
+  return format_from_suffix_string (tl::extension_last (fn), interpreter, dsl_name, autorun_pref, format);
 }
 
 std::pair<bool, std::string>

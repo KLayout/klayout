@@ -30,9 +30,7 @@
 #include "tlClassRegistry.h"
 #include "tlDeferredExecution.h"
 #include "gsiObject.h"
-#if defined(HAVE_QT)
-#  include "layAbstractMenu.h"
-#endif
+#include "layAbstractMenu.h"
 
 #include <map>
 #include <vector>
@@ -393,7 +391,6 @@ public:
    */
   static std::vector<std::string> menu_symbols ();
 
-#if defined(HAVE_QT)
   /**
    *  @brief Creates the menu resources for this plugin
    *
@@ -407,7 +404,6 @@ public:
    *  @brief Removes the menu resources associated with this plugin
    */
   void remove_menu_items (lay::Dispatcher *dispatcher);
-#endif
 
   /**
    *  @brief Enables this editable part of the plugin
@@ -462,24 +458,36 @@ private slots:
 
 private:
   int m_id;
-#if defined(HAVE_QT)
   tl::weak_ptr<lay::Action> mp_editable_mode_action;
   tl::weak_ptr<lay::Action> mp_mouse_mode_action;
   tl::weak_collection<lay::Action> m_menu_actions;
-#endif
   bool m_editable_enabled;
 };
 
 /**
  *  @brief The plugin interface
  *
- *  Each configurable object must be derived from this interface.
- *  An configurable object can have a parent. This way, a hierarchy
- *  of configurable objects is created. The root object not having a
- *  parent acts as the main entry point: it will try to dispatch 
+ *  This is a basic interface providing several services in a
+ *  hierarchically organized fashion. It also provides a configuration
+ *  space (key/value pairs).
+ *
+ *  Each object participating in the plugin scheme must be derived from this interface.
+ *  An plugin can have a parent. This way, a hierarchy of plugin objects is created.
+ *  The root object not having a parent acts as the main entry point: it will try to dispatch
  *  configuration requests to the children.
- *  A node may have a local configuration - it will override any
- *  parent configurations.
+ *
+ *  Each node has a local configuration space which overrides the configuration changes
+ *  made to be parent.
+ *
+ *  Each plugin also has a static or global configuration space inside the
+ *  "plugin declaration". Configuration changes made to top level nodes are
+ *  reflected in the static space too.
+ *
+ *  A "standalone" node is one without a parent, but which does not communicate
+ *  with the static configuration space.
+ *
+ *  The "Dispatcher" adds the concept of a (singleton) root plugin to this hierarchical
+ *  configuration tree.
  */
 
 class LAYBASIC_PUBLIC Plugin
@@ -686,13 +694,6 @@ public:
    *  The returned pointer is guaranteed to be non-zero.
    */
   Dispatcher *dispatcher ();
-
-  /**
-   *  @brief Gets the dispatcher (the top level end of the plugin chain)
-   *  This version may return null, if the plugin is instantiated without a
-   *  root.
-   */
-  Dispatcher *dispatcher_maybe_null ();
 
   /**
    *  @brief Menu command handler

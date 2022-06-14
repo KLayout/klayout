@@ -179,7 +179,7 @@ const int sr_pixels = 8; // TODO: make variable
 lay::PointSnapToObjectResult
 Service::snap2_details (const db::DPoint &p) const
 {
-  double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
+  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
   return lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range);
 }
 
@@ -192,7 +192,7 @@ Service::snap2 (const db::DPoint &p) const
 db::DPoint 
 Service::snap2 (const db::DPoint &p, const db::DPoint &plast, bool connect) const
 {
-  double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
+  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
   return lay::obj_snap (m_snap_to_objects ? view () : 0, plast, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, connect ? connect_ac () : move_ac (), snap_range).snapped_point;
 }
 
@@ -922,13 +922,13 @@ Service::has_transient_selection ()
 double
 Service::catch_distance ()
 {
-  return double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+  return double (view ()->search_range ()) / ui ()->mouse_event_trans ().mag ();
 }
 
 double
 Service::catch_distance_box ()
 {
-  return double (view ()->search_range_box ()) / widget ()->mouse_event_trans ().mag ();
+  return double (view ()->search_range_box ()) / ui ()->mouse_event_trans ().mag ();
 }
 
 double

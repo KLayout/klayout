@@ -87,6 +87,118 @@ class ConfigureAction;
 class EditorOptionsPages;
 
 /**
+ *  @brief A custom QFrame that acts as the central widget for the LayoutView
+ */
+class LayoutViewFrame
+  : public QFrame
+{
+Q_OBJECT
+
+public:
+  LayoutViewFrame (QWidget *parent, lay::LayoutView *view);
+
+  virtual QSize sizeHint () const;
+  virtual bool eventFilter(QObject *obj, QEvent *event);
+  virtual void showEvent (QShowEvent *);
+  virtual void hideEvent (QHideEvent *);
+
+  void emit_title_changed () { emit title_changed (); }
+  void emit_dirty_changed () { emit dirty_changed (); }
+  void emit_show_message (const std::string &s, int ms) { emit show_message (s, ms); }
+  void emit_current_pos_changed (double x, double y, bool dbu_units) { emit current_pos_changed (x, y, dbu_units); }
+  void emit_clear_current_pos () { emit clear_current_pos (); }
+  void emit_edits_enabled_changed () { emit edits_enabled_changed (); }
+  void emit_mode_change (int m) { emit mode_change (m); }
+  void emit_current_layer_changed (const lay::LayerPropertiesConstIterator &l) { emit current_layer_changed (l); }
+  void emit_menu_needs_update () { emit menu_needs_update (); }
+  void emit_layer_order_changed () { emit layer_order_changed (); }
+
+signals:
+  /**
+   *  @brief This signal is emitted when the title changes
+   */
+  void title_changed ();
+
+  /**
+   *  @brief This signal is emitted when the "dirty" flag changes
+   */
+  void dirty_changed ();
+
+  /**
+   *  @brief This signal is emitted when the view wants to show a message for the given time (of infinitely for ms == 0)
+   */
+  void show_message (const std::string &s, int ms);
+
+  /**
+   *  @brief This signal is emitted when the view wants to indicate a mouse position change
+   */
+  void current_pos_changed (double x, double y, bool dbu_units);
+
+  /**
+   *  @brief This signal is emitted when the view wants to clear the mouse position
+   */
+  void clear_current_pos ();
+
+  /**
+   *  @brief This signal is sent when the "edits_enabled" state has changed
+   */
+  void edits_enabled_changed ();
+
+  /**
+   *  @brief This signal is sent when the view wants to update the menu
+   */
+  void menu_needs_update ();
+
+  /**
+   *  @brief The view initiated a mode change
+   */
+  void mode_change (int m);
+
+  /**
+   *  @brief The current layer changed
+   */
+  void current_layer_changed (const lay::LayerPropertiesConstIterator &l);
+
+  /**
+   *  @brief The layer order has changed
+   */
+  void layer_order_changed ();
+
+private:
+  LayoutView *mp_view;
+};
+
+/**
+ *  @brief An object connecting child widget signals with methods from LayoutView
+ */
+class LayoutViewSignalConnector
+  : public QObject
+{
+Q_OBJECT
+
+public:
+  LayoutViewSignalConnector (QObject *parent, lay::LayoutView *view);
+
+  typedef lay::LayoutViewBase::cell_path_type cell_path_type;
+
+private slots:
+  void active_cellview_changed (int index);
+  void active_library_changed (int index);
+  void side_panel_destroyed ();
+  void current_layer_changed_slot (const lay::LayerPropertiesConstIterator &iter);
+  void layer_tab_changed ();
+  void layer_order_changed ();
+  void select_cell_dispatch (const cell_path_type &path, int cellview_index);
+  void min_hier_changed (int i);
+  void max_hier_changed (int i);
+
+  void timer ();
+
+private:
+  LayoutView *mp_view;
+};
+
+/**
  *  @brief The layout view object
  *
  *  The layout view is responsible for displaying one or a set of layouts.
@@ -96,8 +208,6 @@ class EditorOptionsPages;
 class LAYVIEW_PUBLIC LayoutView
   : public LayoutViewBase
 {
-Q_OBJECT
-
 public:
   /**
    *  @brief Constructor
@@ -409,9 +519,14 @@ public:
   virtual void cut ();
 
   /**
-   *  @brief Deliver a size hint (reimplementation of QWidget)
+   *  @brief Gets the widget object
+   *
+   *  This pointer may be 0 if the layout view is created in a headless environment.
    */
-  virtual QSize sizeHint () const;
+  virtual QWidget *widget ()
+  {
+    return mp_widget;
+  }
 
   /**
    *  @brief An event signalling that the view is going to close
@@ -428,7 +543,6 @@ public:
    */
   tl::Event hide_event;
 
-public slots:
   /**
    *  @brief Store the current state on the "previous states" stack
    */
@@ -507,25 +621,6 @@ public slots:
   void ensure_selection_visible ()
   {
     LayoutViewBase::ensure_selection_visible ();
-  }
-
-  /** 
-   *  @brief Select a cell by index for a certain cell view
-   *
-   *  This will be forwarded to select_cell or select_cell_fit depending
-   *  on the m_fit_new_cell flag.
-   */
-  void select_cell_dispatch (const cell_path_type &path, int cellview_index)
-  {
-    LayoutViewBase::select_cell_dispatch (path, cellview_index);
-  }
-
-  /**
-   *  @brief Called when the current layer changed
-   */
-  void current_layer_changed_slot (const lay::LayerPropertiesConstIterator &iter)
-  {
-    LayoutViewBase::current_layer_changed_slot (iter);
   }
 
   //  zoom slots
@@ -610,76 +705,15 @@ public slots:
     LayoutViewBase::redraw_cell_boxes ();
   }
 
-  void layer_tab_changed ();
-  void layer_order_changed ();
-
-  void timer ()
-  {
-    LayoutViewBase::timer ();
-  }
-
-  void min_hier_changed (int i);
-  void max_hier_changed (int i);
-
   void deactivate_all_browsers ();
 
-private slots:
-  void active_cellview_changed (int index)
-  {
-    LayoutViewBase::active_cellview_changed (index);
-  }
-
-  void active_library_changed (int index);
-  void side_panel_destroyed ();
-
-signals:
-  /**
-   *  @brief This signal is emitted when the title changes
-   */
-  void title_changed ();
-
-  /**
-   *  @brief This signal is emitted when the "dirty" flag changes
-   */
-  void dirty_changed ();
-
-  /**
-   *  @brief This signal is emitted when the view wants to show a message for the given time (of infinitely for ms == 0)
-   */
-  void show_message (const std::string &s, int ms);
-
-  /**
-   *  @brief This signal is emitted when the view wants to indicate a mouse position change
-   */
-  void current_pos_changed (double x, double y, bool dbu_units);
-
-  /**
-   *  @brief This signal is emitted when the view wants to clear the mouse position
-   */
-  void clear_current_pos ();
-
-  /**
-   *  @brief This signal is sent when the "edits_enabled" state has changed
-   */
-  void edits_enabled_changed ();
-
-  /**
-   *  @brief This signal is sent when the view wants to update the menu
-   */
-  void menu_needs_update ();
-
-  /**
-   *  @brief The view initiated a mode change
-   */
-  void mode_change (int m);
-
-  /**
-   *  @brief The current layer changed
-   */
-  void current_layer_changed (const lay::LayerPropertiesConstIterator &l);
-
 private:
+  friend class LayoutViewSignalConnector;
+  friend class LayoutViewFrame;
+
   QTimer *mp_timer;
+  LayoutViewFrame *mp_widget;
+  LayoutViewSignalConnector *mp_connector;
   bool m_activated;
   QFrame *mp_left_frame;
   lay::LayerControlPanel *mp_control_panel;
@@ -696,23 +730,28 @@ private:
 
   tl::DeferredMethod<lay::LayoutView> dm_setup_editor_option_pages;
 
-  void init_ui ();
-  void init_menu ();
+  void active_library_changed (int index);
+  void side_panel_destroyed (QObject *sender);
+  void layer_tab_changed ();
+  void layer_order_changed ();
+  void min_hier_changed (int i);
+  void max_hier_changed (int i);
+
+  bool event_filter (QObject *obj, QEvent *ev, bool &taken);
+  QSize size_hint () const;
+
+  void init_ui (QWidget *parent, const char *name);
   void do_setup_editor_options_pages ();
 
 protected:
   void activate ();
   void deactivate ();
 
-  virtual bool eventFilter(QObject *obj, QEvent *ev);
-  virtual void showEvent (QShowEvent *);
-  virtual void hideEvent (QHideEvent *);
-
   virtual bool configure (const std::string &name, const std::string &value);
   virtual void config_finalize ();
 
-  virtual lay::Color default_background_color ();
-  virtual void do_set_background_color (lay::Color color, lay::Color contrast);
+  virtual tl::Color default_background_color ();
+  virtual void do_set_background_color (tl::Color color, tl::Color contrast);
   virtual void do_paste ();
   virtual void begin_layer_updates ();
   virtual void end_layer_updates ();

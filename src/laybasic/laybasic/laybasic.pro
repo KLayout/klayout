@@ -16,7 +16,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layPluginConfigPage.cc \
     layPropertiesDialog.cc \
     layProperties.cc \
-    layAbstractMenu.cc \
     layDragDropData.cc \
     layCursor.cc \
 
@@ -25,7 +24,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
     layPluginConfigPage.h \
     layPropertiesDialog.h \
     layProperties.h \
-    layAbstractMenu.h \
     layDragDropData.h \
     layCursor.h \
 
@@ -35,8 +33,12 @@ SOURCES += \
   gsiDeclLayLayers.cc \
   gsiDeclLayLayoutViewBase.cc \
   gsiDeclLayMarker.cc \
+  gsiDeclLayMenu.cc \
   gsiDeclLayPlugin.cc \
-  gsiDeclLayPixelBuffer.cc \
+  gsiDeclLayTlAdded.cc \
+  gsiDeclLayRdbAdded.cc \
+  layAbstractMenu.cc \
+  layLayoutViewConfig.cc \
   laybasicForceLink.cc \
   layAnnotationShapes.cc \
   layBitmap.cc \
@@ -44,7 +46,6 @@ SOURCES += \
   layBitmapsToImage.cc \
   layBookmarkList.cc \
   layCellView.cc \
-  layColor.cc \
   layColorPalette.cc \
   layConverters.cc \
   layDispatcher.cc \
@@ -65,7 +66,6 @@ SOURCES += \
   layNetColorizer.cc \
   layObjectInstPath.cc \
   layParsedLayerSource.cc \
-  layPixelBuffer.cc \
   layPixelBufferPainter.cc \
   layPlugin.cc \
   layRedrawLayerInfo.cc \
@@ -85,10 +85,12 @@ SOURCES += \
   layViewOp.cc \
   layViewport.cc \
   layZoomBox.cc \
+  layUtils.cc \
 
 HEADERS += \
   laybasicConfig.h \
   laybasicForceLink.h \
+  layAbstractMenu.h \
   layAnnotationShapes.h \
   layBitmap.h \
   layBitmapRenderer.h \
@@ -96,7 +98,6 @@ HEADERS += \
   layBookmarkList.h \
   layCellView.h \
   layColorPalette.h \
-  layColor.h \
   layConverters.h \
   layDispatcher.h \
   layDisplayState.h \
@@ -117,7 +118,7 @@ HEADERS += \
   layNetColorizer.h \
   layObjectInstPath.h \
   layParsedLayerSource.h \
-  layPixelBuffer.h \
+  tlPixelBuffer.h \
   layPixelBufferPainter.h \
   layPlugin.h \
   layRedrawLayerInfo.h \
@@ -136,6 +137,7 @@ HEADERS += \
   layViewOp.h \
   layViewport.h \
   layZoomBox.h \
+  layUtils.h \
   laybasicCommon.h \
 
 

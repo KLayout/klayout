@@ -20,15 +20,15 @@
 
 */
 
-#ifndef HDR_layColor
-#define HDR_layColor
+#ifndef HDR_tlColor
+#define HDR_tlColor
 
-#include "laybasicCommon.h"
+#include "tlCommon.h"
 
 #include <stdint.h>
 #include <string>
 
-namespace lay
+namespace tl
 {
 
 /**
@@ -50,7 +50,7 @@ inline unsigned int blue (color_t c)  { return c & 0xff; }
  *  This class is a replacement for QColor. It offers invalid color values and
  *  string conversion.
  */
-class LAYBASIC_PUBLIC Color
+class TL_PUBLIC Color
 {
 public:
   /**
@@ -168,7 +168,7 @@ public:
   /**
    *  @brief Creates the color from a HSV color
    */
-  static lay::Color from_hsv (unsigned int hue, unsigned int saturation, unsigned int value);
+  static tl::Color from_hsv (unsigned int hue, unsigned int saturation, unsigned int value);
 
 private:
   color_t m_color;

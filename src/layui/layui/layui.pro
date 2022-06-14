@@ -80,7 +80,6 @@ RESOURCES = \
 
 SOURCES = \
   gsiDeclLayDialogs.cc \
-  gsiDeclLayMenu.cc \
   gsiDeclLayNetlistBrowserDialog.cc \
   gsiDeclLayStream.cc \
   layuiForceLink.cc \

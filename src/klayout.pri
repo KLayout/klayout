@@ -182,6 +182,17 @@ equals(HAVE_QT, "0") {
 
   QT =
 
+  # fake qrc made with python
+  !equals(HAVE_PYTHON, "0") {
+    new_qrc.output  = qrc_${QMAKE_FILE_BASE}.cc
+    new_qrc.commands = $$PYTHON $$PWD/../scripts/pyqrc.py ${QMAKE_FILE_NAME} -o ${QMAKE_FILE_OUT}
+    new_qrc.depend_command = $$PYTHON $$PWD/../scripts/pyqrc.py ${QMAKE_FILE_NAME}
+    new_qrc.input = RESOURCES
+    new_qrc.variable_out = SOURCES
+    new_qrc.CONFIG += dep_lines
+    QMAKE_EXTRA_COMPILERS += new_qrc
+  }
+
 } else {
 
   DEFINES += HAVE_QT
@@ -290,3 +301,4 @@ DEFINES += \
   KLAYOUT_TINY_VERSION=$$KLAYOUT_TINY_VERSION \
 
 VERSION = $$KLAYOUT_VERSION
+

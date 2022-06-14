@@ -28,7 +28,7 @@
 #include "layuiCommon.h"
 
 #include "layBookmarkList.h"
-#include "layColor.h"
+#include "tlColor.h"
 
 #include <QFrame>
 #include <QListView>
@@ -53,8 +53,8 @@ public:
   BookmarksView (lay::LayoutViewBase *view, QWidget *parent, const char *name);
   ~BookmarksView ();
 
-  void set_background_color (lay::Color c);
-  void set_text_color (lay::Color c);
+  void set_background_color (tl::Color c);
+  void set_text_color (tl::Color c);
   void follow_selection (bool f);
 
   std::set<size_t> selected_bookmarks ();

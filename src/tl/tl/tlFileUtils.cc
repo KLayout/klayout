@@ -314,6 +314,17 @@ std::string basename (const std::string &s)
   }
 }
 
+std::string complete_basename (const std::string &s)
+{
+  std::vector<std::string> fnp = split_filename (filename (s));
+  if (fnp.size () > 0) {
+    fnp.pop_back ();
+    return tl::join (fnp, ".");
+  } else {
+    return std::string ();
+  }
+}
+
 std::string extension (const std::string &s)
 {
   std::vector<std::string> fnp = split_filename (filename (s));

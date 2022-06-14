@@ -66,7 +66,7 @@ public:
    *
    *  If the color is invalid, the marker is drawn with the canvases foreground color.
    */
-  lay::Color get_color () const
+  tl::Color get_color () const
   {
     return m_color;
   }
@@ -76,14 +76,14 @@ public:
    *
    *  If the color is invalid, the marker is drawn with the canvases foreground color.
    */
-  void set_color (lay::Color color);
+  void set_color (tl::Color color);
 
   /**
    *  @brief Get the color by which the marker's frame is drawn
    *
    *  If the color is invalid, the marker's frame is drawn with the fill color.
    */
-  lay::Color get_frame_color () const
+  tl::Color get_frame_color () const
   {
     return m_frame_color;
   }
@@ -93,7 +93,7 @@ public:
    *
    *  If the color is invalid, the marker's frame is drawn with the fill color.
    */
-  void set_frame_color (lay::Color color);
+  void set_frame_color (tl::Color color);
 
   /**
    *  @brief Get the line width with which the marker is drawn
@@ -226,8 +226,8 @@ public:
 protected:
   void get_bitmaps (const Viewport &vp, ViewObjectCanvas &canvas, lay::CanvasPlane *&fill, lay::CanvasPlane *&frame, lay::CanvasPlane *&vertex, lay::CanvasPlane *&text);
 
-  lay::Color m_color;
-  lay::Color m_frame_color;
+  tl::Color m_color;
+  tl::Color m_frame_color;
   char m_line_width, m_vertex_size, m_halo;
   bool m_text_enabled;
   lay::ViewOp::Shape m_vertex_shape;

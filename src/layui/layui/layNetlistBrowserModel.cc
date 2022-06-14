@@ -701,7 +701,7 @@ static QIcon icon_for_subcircuit ()
   return icon;
 }
 
-static QIcon colored_icon (const lay::Color &color, const QIcon &original_icon)
+static QIcon colored_icon (const tl::Color &color, const QIcon &original_icon)
 {
   if (! color.is_valid ()) {
     return icon_for_net ();
@@ -735,12 +735,12 @@ static QIcon colored_icon (const lay::Color &color, const QIcon &original_icon)
   return colored_icon;
 }
 
-static QIcon net_icon_with_color (const lay::Color &color)
+static QIcon net_icon_with_color (const tl::Color &color)
 {
   return colored_icon (color, light_icon_for_net ());
 }
 
-static QIcon connection_icon_with_color (const lay::Color &color)
+static QIcon connection_icon_with_color (const tl::Color &color)
 {
   return colored_icon (color, light_icon_for_connection ());
 }
@@ -2747,10 +2747,10 @@ NetlistBrowserModel::icon_for_nets (const std::pair<const db::Net *, const db::N
 
   if (mp_colorizer && mp_colorizer->has_color_for_net (net)) {
 
-    lay::Color color = mp_colorizer->color_of_net (net);
+    tl::Color color = mp_colorizer->color_of_net (net);
 
-    lay::color_t rgb = lay::color_t (color.rgb ());
-    std::map<lay::color_t, QIcon>::const_iterator c = m_net_icon_per_color.find (rgb);
+    tl::color_t rgb = tl::color_t (color.rgb ());
+    std::map<tl::color_t, QIcon>::const_iterator c = m_net_icon_per_color.find (rgb);
     if (c == m_net_icon_per_color.end ()) {
       c = m_net_icon_per_color.insert (std::make_pair (rgb, net_icon_with_color (color))).first;
     }
@@ -2769,10 +2769,10 @@ NetlistBrowserModel::icon_for_connection (const std::pair<const db::Net *, const
 
   if (mp_colorizer && mp_colorizer->has_color_for_net (net)) {
 
-    lay::Color color = mp_colorizer->color_of_net (net);
+    tl::Color color = mp_colorizer->color_of_net (net);
 
-    lay::color_t rgb = lay::color_t (color.rgb ());
-    std::map<lay::color_t, QIcon>::const_iterator c = m_connection_icon_per_color.find (rgb);
+    tl::color_t rgb = tl::color_t (color.rgb ());
+    std::map<tl::color_t, QIcon>::const_iterator c = m_connection_icon_per_color.find (rgb);
     if (c == m_connection_icon_per_color.end ()) {
       c = m_connection_icon_per_color.insert (std::make_pair (rgb, connection_icon_with_color (color))).first;
     }

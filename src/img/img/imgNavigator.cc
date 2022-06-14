@@ -52,13 +52,14 @@ img::Object *
 Navigator::setup (lay::Dispatcher *root, img::Object *img)
 {
   mp_view = new lay::LayoutView (0, false, root, this, "img_navigator_view", lay::LayoutView::LV_Naked + lay::LayoutView::LV_NoZoom + lay::LayoutView::LV_NoServices + lay::LayoutView::LV_NoGrid);
-  mp_view->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
-  mp_view->setMinimumWidth (100);
-  mp_view->setMinimumHeight (100);
+  tl_assert (mp_view->widget ());
+  mp_view->widget ()->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
+  mp_view->widget ()->setMinimumWidth (100);
+  mp_view->widget ()->setMinimumHeight (100);
 
   QVBoxLayout *layout = new QVBoxLayout (this);
-  layout->addWidget (mp_view);
-  layout->setStretchFactor (mp_view, 1);
+  layout->addWidget (mp_view->widget ());
+  layout->setStretchFactor (mp_view->widget (), 1);
   layout->setContentsMargins (0, 0, 0, 0);
   layout->setSpacing (0);
   setLayout (layout);
@@ -93,7 +94,7 @@ Navigator::~Navigator ()
 void 
 Navigator::activate_service (lay::ViewService *service)
 {
-  mp_view->view_object_widget ()->activate (service);
+  mp_view->canvas ()->activate (service);
 }
 
 void

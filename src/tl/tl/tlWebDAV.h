@@ -30,6 +30,10 @@
 #include <string>
 #include <vector>
 
+#if !defined(HAVE_CURL) && !defined(HAVE_QT)
+#  error "tlWebDAV.h can only be used with either curl or Qt enabled"
+#endif
+
 namespace tl
 {
 

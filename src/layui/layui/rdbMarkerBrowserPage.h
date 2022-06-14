@@ -28,7 +28,7 @@
 #include "ui_MarkerBrowserPage.h"
 #include "rdbMarkerBrowser.h"
 #include "tlDeferredExecution.h"
-#include "layColor.h"
+#include "tlColor.h"
 #include "dbBox.h"
 
 #include <QFrame>
@@ -138,7 +138,7 @@ public:
    *  @param halo The halo flag or -1 for default 
    *  @param dither_pattern The dither pattern index of -1 to take the default
    */
-  void set_marker_style (lay::Color color, int line_width, int vertex_size, int halo, int dither_pattern);
+  void set_marker_style (tl::Color color, int line_width, int vertex_size, int halo, int dither_pattern);
 
   /**
    *  @brief Enable or disable updates
@@ -197,7 +197,7 @@ private:
   rdb::window_type m_window;
   double m_window_dim;
   size_t m_max_marker_count;
-  lay::Color m_marker_color;
+  tl::Color m_marker_color;
   int m_marker_line_width;
   int m_marker_vertex_size;
   int m_marker_halo;

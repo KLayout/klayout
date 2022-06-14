@@ -147,20 +147,11 @@ TextGenerator::text_as_region (const std::string &t, double target_dbu, double m
   return region;
 }
 
-#if defined(HAVE_QT)
 void
 TextGenerator::load_from_resource (const std::string &name)
 {
-  QResource res (tl::to_qstring (name));
-  if (res.size () == 0) {
-    throw tl::Exception (tl::to_string (tr ("Unable to load font resource from ")) + name);
-  }
-
-  QByteArray data = qUncompress (QByteArray ((const char *) res.data (), int (res.size ())));
-
-  load_from_data (data.constData (), data.size (), tl::to_string (QFileInfo (tl::to_qstring (name)).baseName ()), name);
+  load_from_file (name);
 }
-#endif
 
 void
 TextGenerator::load_from_data (const char *data, size_t ndata, const std::string &name, const std::string &description)

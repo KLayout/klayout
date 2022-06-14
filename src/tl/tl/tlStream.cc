@@ -42,6 +42,7 @@
 #include "tlAssert.h"
 #include "tlFileUtils.h"
 #include "tlLog.h"
+#include "tlResources.h"
 
 #include "tlException.h"
 #include "tlString.h"
@@ -142,8 +143,39 @@ public:
 // ---------------------------------------------------------------
 //  InputStream implementation
 
+namespace {
+
+/**
+ *  @brief A dummy delegate to provide for the case of raw data stashed inside the stream itself
+ */
+class RawDataDelegate
+  : public InputStreamBase
+{
+public:
+  RawDataDelegate (const std::string &source)
+    : m_source (source)
+  { }
+
+  virtual size_t read (char *, size_t)
+  {
+    return 0;
+  }
+
+  virtual void reset () { }
+  virtual void close () { }
+
+  virtual std::string source () const { return m_source; }
+  virtual std::string absolute_path () const { return m_source; }
+  virtual std::string filename () const { return m_source; }
+
+public:
+  std::string m_source;
+};
+
+}
+
 InputStream::InputStream (InputStreamBase &delegate)
-  : m_pos (0), mp_bptr (0), mp_delegate (&delegate), m_owns_delegate (false), mp_inflate (0)
+  : m_pos (0), mp_bptr (0), mp_delegate (&delegate), m_owns_delegate (false), mp_inflate (0), m_inflate_always (false)
 { 
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
@@ -151,7 +183,7 @@ InputStream::InputStream (InputStreamBase &delegate)
 }
 
 InputStream::InputStream (InputStreamBase *delegate)
-  : m_pos (0), mp_bptr (0), mp_delegate (delegate), m_owns_delegate (true), mp_inflate (0)
+  : m_pos (0), mp_bptr (0), mp_delegate (delegate), m_owns_delegate (true), mp_inflate (0), m_inflate_always (false)
 {
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
@@ -159,11 +191,13 @@ InputStream::InputStream (InputStreamBase *delegate)
 }
 
 InputStream::InputStream (const std::string &abstract_path)
-  : m_pos (0), mp_bptr (0), mp_delegate (0), m_owns_delegate (false), mp_inflate (0)
+  : m_pos (0), mp_bptr (0), mp_delegate (0), m_owns_delegate (false), mp_inflate (0), m_inflate_always (false)
 { 
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
   mp_buffer = 0;
+
+  bool needs_inflate = false;
 
   tl::Extractor ex (abstract_path.c_str ());
 
@@ -172,30 +206,40 @@ InputStream::InputStream (const std::string &abstract_path)
 #if defined(HAVE_QT)
 
     QResource res (tl::to_qstring (abstract_path));
-    if (res.size () > 0) {
-
-      QByteArray data;
-#if QT_VERSION >= 0x60000
-        if (res.compressionAlgorithm () == QResource::ZlibCompression) {
-#else
-        if (res.isCompressed ()) {
-#endif
-        data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
-      } else {
-        data = QByteArray ((const char *)res.data (), (int)res.size ());
-      }
-
-      mp_buffer = new char[data.size ()];
-      memcpy (mp_buffer, data.constData (), data.size ());
-
-      mp_bptr = mp_buffer;
-      m_bcap = data.size ();
-      m_blen = m_bcap;
-
+    if (res.size () == 0) {
+      throw tl::Exception (tl::to_string (tr ("Resource not found: ")) + abstract_path);
     }
 
+    QByteArray data;
+#if QT_VERSION >= 0x60000
+      if (res.compressionAlgorithm () == QResource::ZlibCompression) {
 #else
-    throw tl::Exception (tl::to_string (tr ("Qt not enabled - resource paths are not available")));
+      if (res.isCompressed ()) {
+#endif
+      data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
+    } else {
+      data = QByteArray ((const char *)res.data (), (int)res.size ());
+    }
+
+    mp_buffer = new char[data.size ()];
+    memcpy (mp_buffer, data.constData (), data.size ());
+
+    mp_bptr = mp_buffer;
+    m_bcap = data.size ();
+    m_blen = m_bcap;
+
+    mp_delegate = new RawDataDelegate (abstract_path);
+
+#else
+
+    std::pair<tl::InputStreamBase *, bool> rr = tl::get_resource_reader (ex.get ());
+    if (! rr.first) {
+      throw tl::Exception (tl::to_string (tr ("Resource not found: ")) + abstract_path);
+    }
+
+    mp_delegate = rr.first;
+    needs_inflate = rr.second;
+
 #endif
 
   } else if (ex.test ("pipe:")) {
@@ -227,6 +271,26 @@ InputStream::InputStream (const std::string &abstract_path)
   }
 
   m_owns_delegate = true;
+
+  if (needs_inflate) {
+    inflate_always ();
+  }
+}
+
+InputStream::~InputStream ()
+{
+  if (mp_delegate && m_owns_delegate) {
+    delete mp_delegate;
+    mp_delegate = 0;
+  }
+  if (mp_inflate) {
+    delete mp_inflate;
+    mp_inflate = 0;
+  }
+  if (mp_buffer) {
+    delete[] mp_buffer;
+    mp_buffer = 0;
+  }
 }
 
 std::string InputStream::absolute_path (const std::string &abstract_path)
@@ -254,22 +318,6 @@ std::string InputStream::absolute_path (const std::string &abstract_path)
   }
 }
 
-InputStream::~InputStream ()
-{
-  if (mp_delegate && m_owns_delegate) {
-    delete mp_delegate;
-    mp_delegate = 0;
-  }
-  if (mp_inflate) {
-    delete mp_inflate;
-    mp_inflate = 0;
-  } 
-  if (mp_buffer) {
-    delete[] mp_buffer;
-    mp_buffer = 0;
-  }
-}
-
 const char * 
 InputStream::get (size_t n, bool bypass_inflate)
 {
@@ -285,7 +333,7 @@ InputStream::get (size_t n, bool bypass_inflate)
       delete mp_inflate;
       mp_inflate = 0;
     }
-  } 
+  }
 
   if (m_blen < n) {
 
@@ -341,16 +389,36 @@ std::string
 InputStream::read_all (size_t max_count) 
 {
   std::string str;
-  while (max_count > 0) {
-    size_t n = std::min (max_count, std::max (size_t (1), m_blen));
-    const char *b = get (n);
-    if (b) {
-      str += std::string (b, n);
-      max_count -= n;
-    } else {
-      break;
+
+  if (mp_inflate) {
+
+    //  Inflate is special - it does not have a guaranteed byte delivery, so we have to go the
+    //  hard way and pick the file byte by byte
+    while (max_count > 0) {
+      const char *b = get (1);
+      if (b) {
+        str += *b;
+        --max_count;
+      } else {
+        break;
+      }
     }
-  } 
+
+  } else {
+
+    while (max_count > 0) {
+      size_t n = std::min (max_count, std::max (size_t (1), m_blen));
+      const char *b = get (n);
+      if (b) {
+        str += std::string (b, n);
+        max_count -= n;
+      } else {
+        break;
+      }
+    }
+
+  }
+
   return str;
 }
 
@@ -358,15 +426,34 @@ std::string
 InputStream::read_all () 
 {
   std::string str;
-  while (true) {
-    size_t n = std::max (size_t (1), m_blen);
-    const char *b = get (n);
-    if (b) {
-      str += std::string (b, n);
-    } else {
-      break;
+
+  if (mp_inflate) {
+
+    //  Inflate is special - it does not have a guaranteed byte delivery, so we have to go the
+    //  hard way and pick the file byte by byte
+    while (true) {
+      const char *b = get (1);
+      if (b) {
+        str += *b;
+      } else {
+        break;
+      }
     }
-  } 
+
+  } else {
+
+    while (true) {
+      size_t n = std::max (size_t (1), m_blen);
+      const char *b = get (n);
+      if (b) {
+        str += std::string (b, n);
+      } else {
+        break;
+      }
+    }
+
+  }
+
   return str;
 }
 
@@ -385,6 +472,13 @@ InputStream::inflate ()
 {
   tl_assert (mp_inflate == 0);
   mp_inflate = new tl::InflateFilter (*this);
+}
+
+void
+InputStream::inflate_always ()
+{
+  m_inflate_always = true;
+  reset ();
 }
 
 void
@@ -414,6 +508,8 @@ InputStream::reset ()
 
   } else {
 
+    tl_assert (mp_delegate != 0);
+
     mp_delegate->reset ();
     m_pos = 0;
 
@@ -426,6 +522,10 @@ InputStream::reset ()
     m_blen = 0;
     mp_buffer = new char [m_bcap];
 
+  }
+
+  if (m_inflate_always) {
+    inflate ();
   }
 }
 

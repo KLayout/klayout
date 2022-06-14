@@ -124,12 +124,12 @@ public:
   /**
    *  @brief Changing of the background color
    */
-  void set_background_color (lay::Color c);
+  void set_background_color (tl::Color c);
 
   /**
    *  @brief Changing of the text color
    */
-  void set_text_color (lay::Color c);
+  void set_text_color (tl::Color c);
 
   /**
    *  @brief Sets the active library by name
@@ -249,8 +249,8 @@ private:
   QFrame *mp_search_frame;
   QCheckBox *mp_search_close_cb;
   QSplitter *mp_splitter;
-  lay::Color m_background_color;
-  lay::Color m_text_color;
+  tl::Color m_background_color;
+  tl::Color m_text_color;
   tl::DeferredMethod<LibrariesView> m_do_update_content_dm;
   tl::DeferredMethod<LibrariesView> m_do_full_update_content_dm;
   std::unique_ptr<QStyle> mp_tree_style;

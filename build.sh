@@ -36,6 +36,7 @@ HAVE_QT_DESIGNER=1
 HAVE_QT_XML=1
 HAVE_64BIT_COORD=0
 HAVE_QT=1
+HAVE_PNG=0
 HAVE_CURL=0
 HAVE_EXPAT=0
 
@@ -199,6 +200,9 @@ while [ "$*" != "" ]; do
   -dry-run)
     RUN_MAKE=0
     ;;
+  -libpng)
+    HAVE_PNG=1
+    ;;
   -libcurl)
     HAVE_CURL=1
     ;;
@@ -260,6 +264,7 @@ while [ "$*" != "" ]; do
     echo ""
     echo "  -libcurl              Use libcurl instead of QtNetwork (for Qt<4.7)"
     echo "  -libexpat             Use libexpat instead of QtXml"
+    echo "  -libpng               Use libpng instead of Qt for PNG generation"
     echo ""
     echo "Environment Variables:"
     echo ""
@@ -487,6 +492,9 @@ fi
 if [ $HAVE_CURL != 0 ]; then
   echo "    Uses libcurl for network access"
 fi
+if [ $HAVE_PNG != 0 ]; then
+  echo "    Uses libpng for PNG generation"
+fi
 if [ "$RPATH" = "" ]; then
   RPATH="$BIN"
 fi
@@ -622,6 +630,7 @@ qmake_options=(
   HAVE_QT="$HAVE_QT"
   HAVE_CURL="$HAVE_CURL"
   HAVE_EXPAT="$HAVE_EXPAT"
+  HAVE_PNG="$HAVE_PNG"
   PREFIX="$BIN"
   RPATH="$RPATH"
   KLAYOUT_VERSION="$KLAYOUT_VERSION"

@@ -230,7 +230,7 @@ NetlistBrowserPage::set_dispatcher (lay::Dispatcher *pr)
 }
 
 void
-NetlistBrowserPage::set_highlight_style (lay::Color color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, bool use_original_colors, const lay::ColorPalette *auto_colors)
+NetlistBrowserPage::set_highlight_style (tl::Color color, int line_width, int vertex_size, int halo, int dither_pattern, int marker_intensity, bool use_original_colors, const lay::ColorPalette *auto_colors)
 {
   m_colorizer.configure (color, auto_colors);
   m_marker_line_width = line_width;
@@ -493,7 +493,7 @@ NetlistBrowserPage::selection_changed ()
 }
 
 void
-NetlistBrowserPage::set_color_for_selected_nets (const lay::Color &color)
+NetlistBrowserPage::set_color_for_selected_nets (const tl::Color &color)
 {
   std::vector<const db::Net *> nets = selected_nets ();
 
@@ -515,7 +515,7 @@ NetlistBrowserPage::browse_color_for_net ()
 {
   QColor c = QColorDialog::getColor (QColor (), this);
   if (c.isValid ()) {
-    set_color_for_selected_nets (lay::Color (c.rgb ()));
+    set_color_for_selected_nets (tl::Color (c.rgb ()));
   }
 }
 
@@ -524,7 +524,7 @@ NetlistBrowserPage::select_color_for_net ()
 {
   QAction *action = dynamic_cast<QAction *> (sender ());
   if (action) {
-    set_color_for_selected_nets (lay::Color (action->data ().value<QColor> ().rgb ()));
+    set_color_for_selected_nets (tl::Color (action->data ().value<QColor> ().rgb ()));
   }
 }
 
@@ -1096,11 +1096,11 @@ NetlistBrowserPage::adjust_view ()
   }
 }
 
-lay::Color
-NetlistBrowserPage::make_valid_color (const lay::Color &color)
+tl::Color
+NetlistBrowserPage::make_valid_color (const tl::Color &color)
 {
   if (! color.is_valid () && mp_view) {
-    return mp_view->background_color ().to_mono () ? lay::Color (0, 0, 0) : lay::Color (255, 255, 255);
+    return mp_view->background_color ().to_mono () ? tl::Color (0, 0, 0) : tl::Color (255, 255, 255);
   } else {
     return color;
   }
@@ -1111,7 +1111,7 @@ NetlistBrowserPage::produce_highlights_for_device (const db::Device *device, siz
 {
   const db::Layout *layout = mp_database->internal_layout ();
 
-  lay::Color color = make_valid_color (m_colorizer.marker_color ());
+  tl::Color color = make_valid_color (m_colorizer.marker_color ());
 
   db::Box device_bbox = bbox_for_device_abstract (layout, device->device_abstract (), device->trans ());
   if (! device_bbox.empty ()) {
@@ -1160,7 +1160,7 @@ NetlistBrowserPage::produce_highlights_for_circuit (const db::Circuit *circuit, 
 {
   const db::Layout *layout = mp_database->internal_layout ();
 
-  lay::Color color = make_valid_color (m_colorizer.marker_color ());
+  tl::Color color = make_valid_color (m_colorizer.marker_color ());
   db::Box circuit_bbox = bbox_for_circuit (layout, circuit);
   if (circuit_bbox.empty ()) {
     return false;
@@ -1189,8 +1189,8 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
   db::cell_index_type cell_index = net->circuit ()->cell_index ();
   size_t cluster_id = net->cluster_id ();
 
-  lay::Color net_color = m_colorizer.color_of_net (net);
-  lay::Color fallback_color = make_valid_color (m_colorizer.marker_color ());
+  tl::Color net_color = m_colorizer.color_of_net (net);
+  tl::Color fallback_color = make_valid_color (m_colorizer.marker_color ());
 
   const db::Connectivity &conn = mp_database->connectivity ();
   for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {

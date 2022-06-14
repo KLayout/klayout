@@ -180,6 +180,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
       m_manager (undo_enabled)
 {
   m_dispatcher.set_menu_parent_widget (this);
+  m_dispatcher.make_menu ();
 
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
@@ -1985,38 +1986,6 @@ MainWindow::load_layer_properties (const std::string &fn, int cv_index, bool all
   }
 }
 
-bool
-MainWindow::is_single_cv_layer_properties_file (const std::string &fn)
-{
-  //  If the file contains information for a single layout but we have multiple ones,
-  //  show the dialog to determine what layout to apply the information to.
-  std::vector<lay::LayerPropertiesList> props;
-  try {
-    tl::XMLFileSource in (fn);
-    props.push_back (lay::LayerPropertiesList ());
-    props.back ().load (in);
-  } catch (...) {
-    props.clear ();
-    tl::XMLFileSource in (fn);
-    lay::LayerPropertiesList::load (in, props);
-  }
-
-  //  Collect all cv indices in the layer properties
-  std::set <int> cv;
-  for (std::vector<lay::LayerPropertiesList>::const_iterator p = props.begin (); p != props.end (); ++p) {
-    for (lay::LayerPropertiesConstIterator lp = p->begin_const_recursive (); ! lp.at_end (); ++lp) {
-      if (! lp->has_children ()) {
-        cv.insert (lp->source (true).cv_index ());
-        if (cv.size () >= 2) {
-          break;
-        }
-      }
-    }
-  }
-
-  return (cv.size () == 1);
-}
-
 void
 MainWindow::cm_save_layer_props ()
 {
@@ -2054,7 +2023,7 @@ MainWindow::load_layer_props_from_file (const std::string &fn)
 
   int target_cv_index = -2;
 
-  if (current_view ()->cellviews () > 1 && is_single_cv_layer_properties_file (fn)) {
+  if (current_view ()->cellviews () > 1 && lay::LayoutView::is_single_cv_layer_properties_file (fn)) {
 
     QStringList items;
     items << QString (QObject::tr ("Take it as it is"));
@@ -3368,21 +3337,23 @@ MainWindow::create_layout (const std::string &technology, int mode)
 void
 MainWindow::add_view (lay::LayoutView *view)
 {
-  connect (view, SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
-  connect (view, SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
-  connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
-  connect (view, SIGNAL (menu_needs_update ()), this, SLOT (menu_needs_update ()));
-  connect (view, SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
-  connect (view, SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
-  connect (view, SIGNAL (clear_current_pos ()), this, SLOT (clear_current_pos ()));
-  connect (view, SIGNAL (mode_change (int)), this, SLOT (select_mode (int)));
+  tl_assert (view->widget ());
+
+  connect (view->widget (), SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
+  connect (view->widget (), SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
+  connect (view->widget (), SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
+  connect (view->widget (), SIGNAL (menu_needs_update ()), this, SLOT (menu_needs_update ()));
+  connect (view->widget (), SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
+  connect (view->widget (), SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
+  connect (view->widget (), SIGNAL (clear_current_pos ()), this, SLOT (clear_current_pos ()));
+  connect (view->widget (), SIGNAL (mode_change (int)), this, SLOT (select_mode (int)));
 
   mp_views.push_back (view);
 
   //  we must resize the widget here to set the geometry properly.
   //  This is required to make zoom_fit work.
-  view->setGeometry (0, 0, mp_view_stack->width (), mp_view_stack->height ());
-  view->show ();
+  view->widget ()->setGeometry (0, 0, mp_view_stack->width (), mp_view_stack->height ());
+  view->widget ()->show ();
 }
 
 int
@@ -3563,7 +3534,7 @@ MainWindow::view_title_changed ()
     update_tab_title (i);
   }
 
-  if (sender () == current_view ()) {
+  if (current_view () && sender () == current_view ()->widget ()) {
     update_window_title ();
   }
 }

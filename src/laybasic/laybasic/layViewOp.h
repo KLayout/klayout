@@ -26,7 +26,7 @@
 #define HDR_layViewOp
 
 #include "laybasicCommon.h"
-#include "layColor.h"
+#include "tlColor.h"
 
 #include <stdint.h>
 
@@ -80,12 +80,12 @@ public:
   /**
    *  @brief The constructor given all the parameters to describe the operator
    */
-  ViewOp (color_t color, Mode mode, unsigned int line_style_index, unsigned int dither_index, unsigned int dither_offset, Shape shape = Rect, int width = 1, int bitmap_index = -1);
+  ViewOp (tl::color_t color, Mode mode, unsigned int line_style_index, unsigned int dither_index, unsigned int dither_offset, Shape shape = Rect, int width = 1, int bitmap_index = -1);
   
   /**
    *  @brief Internal: provide the mask for the "or" part of the operation
    */
-  color_t ormask () const
+  tl::color_t ormask () const
   { 
     return m_or; 
   }
@@ -93,7 +93,7 @@ public:
   /**
    *  @brief Internal: provide the mask for the "and" part of the operation
    */
-  color_t andmask () const
+  tl::color_t andmask () const
   { 
     return m_and; 
   }
@@ -101,7 +101,7 @@ public:
   /**
    *  @brief Internal: provide the mask for the "xor" part of the operation
    */
-  color_t xormask () const
+  tl::color_t xormask () const
   { 
     return m_xor; 
   }
@@ -237,16 +237,16 @@ public:
   }
 
 private:
-  color_t m_or;
-  color_t m_and;
-  color_t m_xor;
+  tl::color_t m_or;
+  tl::color_t m_and;
+  tl::color_t m_xor;
   unsigned int m_line_style_index;
   unsigned int m_dither_index, m_dither_offset;
   Shape m_shape;
   int m_width;
   int m_bitmap_index;
 
-  void init (color_t color, Mode mode);
+  void init (tl::color_t color, Mode mode);
 };
 
 } // namespace lay

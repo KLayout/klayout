@@ -26,7 +26,7 @@
 
 #include "laybasicCommon.h"
 #include "layColorPalette.h"
-#include "layColor.h"
+#include "tlColor.h"
 #include "tlEvents.h"
 
 #include <map>
@@ -49,15 +49,15 @@ class LAYBASIC_PUBLIC NetColorizer
 public:
   NetColorizer ();
 
-  void configure (const lay::Color &marker_color, const lay::ColorPalette *auto_colors);
+  void configure (const tl::Color &marker_color, const lay::ColorPalette *auto_colors);
   bool has_color_for_net (const db::Net *net);
-  void set_color_of_net (const db::Net *net, const lay::Color &color);
+  void set_color_of_net (const db::Net *net, const tl::Color &color);
   void reset_color_of_net (const db::Net *net);
   void clear ();
 
-  lay::Color color_of_net (const db::Net *net) const;
+  tl::Color color_of_net (const db::Net *net) const;
 
-  const lay::Color &marker_color () const
+  const tl::Color &marker_color () const
   {
     return m_marker_color;
   }
@@ -68,10 +68,10 @@ public:
   tl::Event colors_changed;
 
 private:
-  lay::Color m_marker_color;
+  tl::Color m_marker_color;
   lay::ColorPalette m_auto_colors;
   bool m_auto_colors_enabled;
-  std::map<const db::Net *, lay::Color> m_custom_color;
+  std::map<const db::Net *, tl::Color> m_custom_color;
   bool m_update_needed;
   bool m_signals_enabled;
   mutable std::map<const db::Net *, size_t> m_net_index_by_object;

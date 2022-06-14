@@ -27,7 +27,7 @@
 #include "tlTimer.h"
 #include "layPlugin.h"
 #include "layConverters.h"
-#include "layPixelBuffer.h"
+#include "tlPixelBuffer.h"
 #include "dbPolygonTools.h"
 #include "tlFileUtils.h"
 #include "tlUri.h"
@@ -53,8 +53,8 @@ namespace img
 DataMapping::DataMapping ()
   : brightness (0.0), contrast (0.0), gamma (1.0), red_gain (1.0), green_gain (1.0), blue_gain (1.0)
 {
-  false_color_nodes.push_back (std::make_pair (0.0, std::make_pair (lay::Color (0, 0, 0), lay::Color (0, 0, 0))));
-  false_color_nodes.push_back (std::make_pair (1.0, std::make_pair (lay::Color (255, 255, 255), lay::Color (255, 255, 255))));
+  false_color_nodes.push_back (std::make_pair (0.0, std::make_pair (tl::Color (0, 0, 0), tl::Color (0, 0, 0))));
+  false_color_nodes.push_back (std::make_pair (1.0, std::make_pair (tl::Color (255, 255, 255), tl::Color (255, 255, 255))));
 }
 
 bool 
@@ -212,7 +212,7 @@ DataMapping::create_data_mapping (bool monochrome, double xmin, double xmax, uns
 
       for (int j = 0; j < n; ++j) {
 
-        lay::Color c = interpolated_color (false_color_nodes, x);
+        tl::Color c = interpolated_color (false_color_nodes, x);
 
         double y = 0.0;
         if (channel == 0) {
@@ -273,7 +273,7 @@ namespace
 
 struct compare_first_of_node
 {
-  bool operator() (const std::pair <double, std::pair<lay::Color, lay::Color> > &a, const std::pair <double, std::pair<lay::Color, lay::Color> > &b) const
+  bool operator() (const std::pair <double, std::pair<tl::Color, tl::Color> > &a, const std::pair <double, std::pair<tl::Color, tl::Color> > &b) const
   {
     return a.first < b.first;
   }
@@ -281,16 +281,16 @@ struct compare_first_of_node
 
 }
 
-lay::Color
+tl::Color
 interpolated_color (const DataMapping::false_color_nodes_type &nodes, double x)
 {
   if (nodes.size () < 1) {
-    return lay::Color ();
+    return tl::Color ();
   } else if (nodes.size () < 2) {
     return x < nodes[0].first ? nodes[0].second.first : nodes[0].second.second;
   } else {
 
-    std::vector<std::pair<double, std::pair<lay::Color, lay::Color> > >::const_iterator p = std::lower_bound (nodes.begin (), nodes.end (), std::make_pair (x, std::make_pair (lay::Color (), lay::Color ())), compare_first_of_node ());
+    std::vector<std::pair<double, std::pair<tl::Color, tl::Color> > >::const_iterator p = std::lower_bound (nodes.begin (), nodes.end (), std::make_pair (x, std::make_pair (tl::Color (), tl::Color ())), compare_first_of_node ());
     if (p == nodes.end ()) {
       return nodes.back ().second.second;
     } else if (p == nodes.begin ()) {
@@ -310,7 +310,7 @@ interpolated_color (const DataMapping::false_color_nodes_type &nodes, double x)
       int s = int (0.5 + s1 + double(x - x1) * double (int (s2) - int (s1)) / double(x2 - x1));
       int v = int (0.5 + v1 + double(x - x1) * double (int (v2) - int (v1)) / double(x2 - x1));
 
-      return lay::Color::from_hsv ((unsigned int) h, (unsigned int) s, (unsigned int) v);
+      return tl::Color::from_hsv ((unsigned int) h, (unsigned int) s, (unsigned int) v);
 
     }
 
@@ -1340,7 +1340,7 @@ Object::from_string (const char *str, const char *base_dir)
 
         double x = 0.0;
         lay::ColorConverter cc;
-        lay::Color cl, cr;
+        tl::Color cl, cr;
         std::string s;
 
         m_data_mapping.false_color_nodes.clear ();
@@ -1628,19 +1628,19 @@ Object::read_file ()
 
 #elif defined(HAVE_PNG)
 
-  lay::PixelBuffer img;
+  tl::PixelBuffer img;
 
   {
     tl::InputStream stream (m_filename);
-    img = lay::PixelBuffer::read_png (stream);
+    img = tl::PixelBuffer::read_png (stream);
   }
 
   bool is_color = false;
   for (unsigned int i = 0; i < img.height () && ! is_color; ++i) {
-    const lay::color_t *d = img.scan_line (i);
-    const lay::color_t *dd = d + img.width ();
+    const tl::color_t *d = img.scan_line (i);
+    const tl::color_t *dd = d + img.width ();
     while (! is_color && d != dd) {
-      lay::color_t c = *d++;
+      tl::color_t c = *d++;
       is_color = (((c >> 8) ^ c) & 0xffff) != 0;
     }
   }
@@ -1669,15 +1669,15 @@ Object::read_file ()
     unsigned char *msk   = img.transparent () ? mp_data->set_mask () : 0;
 
     for (unsigned int y = 0; y < h; ++y) {
-      const lay::color_t *d = img.scan_line (h - y - 1);
-      const lay::color_t *dd = d + img.width ();
+      const tl::color_t *d = img.scan_line (h - y - 1);
+      const tl::color_t *dd = d + img.width ();
       while (d != dd) {
-        lay::color_t rgb = *d++;
-        *red++ = lay::red (rgb);
-        *green++ = lay::green (rgb);
-        *blue++ = lay::blue (rgb);
+        tl::color_t rgb = *d++;
+        *red++ = tl::red (rgb);
+        *green++ = tl::green (rgb);
+        *blue++ = tl::blue (rgb);
         if (msk) {
-          *msk++ = lay::alpha (rgb) > 128;
+          *msk++ = tl::alpha (rgb) > 128;
         }
       }
     }
@@ -1688,13 +1688,13 @@ Object::read_file ()
     unsigned char *msk = img.transparent () ? mp_data->set_mask () : 0;
 
     for (unsigned int y = 0; y < h; ++y) {
-      const lay::color_t *d = img.scan_line (h - y - 1);
-      const lay::color_t *dd = d + img.width ();
+      const tl::color_t *d = img.scan_line (h - y - 1);
+      const tl::color_t *dd = d + img.width ();
       while (d != dd) {
-        lay::color_t rgb = *d++;
-        *mono++ = lay::green (rgb);
+        tl::color_t rgb = *d++;
+        *mono++ = tl::green (rgb);
         if (msk) {
-          *msk++ = lay::alpha (rgb) > 128;
+          *msk++ = tl::alpha (rgb) > 128;
         }
       }
     }
@@ -1702,7 +1702,7 @@ Object::read_file ()
   }
 
 #else
-  throw tl::Exception (tl::to_string ("No PNG support compiled in - cannot load PNG files"));
+  throw tl::Exception ("No PNG support compiled in - cannot load PNG files");
 #endif
 }
 
@@ -1792,7 +1792,7 @@ Object::to_string () const
     for (unsigned int i = 0; i < data_mapping ().false_color_nodes.size (); ++i) {
       os << data_mapping ().false_color_nodes[i].first;
       os << ",";
-      const std::pair<lay::Color, lay::Color> &clr = data_mapping ().false_color_nodes[i].second;
+      const std::pair<tl::Color, tl::Color> &clr = data_mapping ().false_color_nodes[i].second;
       os << tl::to_word_or_quoted_string (cc.to_string (clr.first));
       if (clr.first != clr.second) {
         os << ",";
@@ -2223,7 +2223,7 @@ Object::validate_pixel_data () const
 
     size_t n = data_length ();
 
-    lay::color_t *nc_pixel_data = new lay::color_t [n];
+    tl::color_t *nc_pixel_data = new tl::color_t [n];
     mp_pixel_data = nc_pixel_data;
 
     double min = 0.0, max = 255.0;
@@ -2248,7 +2248,7 @@ Object::validate_pixel_data () const
 
       if (mp_data->is_color ()) {
 
-        lay::color_t *pixel_data = nc_pixel_data;
+        tl::color_t *pixel_data = nc_pixel_data;
         const unsigned char *f = mp_data->byte_data (0);
         const tl::DataMappingLookupTable *l = &lut[0];
         for (size_t j = 0; j < n; ++j) {
@@ -2271,7 +2271,7 @@ Object::validate_pixel_data () const
 
       } else {
 
-        lay::color_t *pixel_data = nc_pixel_data;
+        tl::color_t *pixel_data = nc_pixel_data;
         const unsigned char *f = mp_data->byte_data ();
         const tl::DataMappingLookupTable *l = &lut[0];
         for (size_t j = 0; j < n; ++j) {
@@ -2298,7 +2298,7 @@ Object::validate_pixel_data () const
 
       if (mp_data->is_color ()) {
 
-        lay::color_t *pixel_data = nc_pixel_data;
+        tl::color_t *pixel_data = nc_pixel_data;
         const float *f = mp_data->float_data (0);
         const tl::DataMappingLookupTable *l = &lut[0];
         for (size_t j = 0; j < n; ++j) {
@@ -2321,7 +2321,7 @@ Object::validate_pixel_data () const
 
       } else {
 
-        lay::color_t *pixel_data = nc_pixel_data;
+        tl::color_t *pixel_data = nc_pixel_data;
         const float *f = mp_data->float_data ();
         const tl::DataMappingLookupTable *l = &lut[0];
         for (size_t j = 0; j < n; ++j) {

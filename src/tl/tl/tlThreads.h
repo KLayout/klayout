@@ -228,7 +228,6 @@ protected:
   }
 };
 
-//  TODO: this is the non-threaded dummy implementation
 template <class T>
 class ThreadStorage
   : public ThreadStorageBase
@@ -253,7 +252,11 @@ public:
 
   void setLocalData (const T &data)
   {
-    add (new ThreadStorageHolder<T> (new T (data)));
+    if (hasLocalData ()) {
+      localData () = data;
+    } else {
+      add (new ThreadStorageHolder<T> (new T (data)));
+    }
   }
 };
 

@@ -133,7 +133,7 @@ private:
   lay::NetlistBrowserConfig::net_window_type m_window;
   double m_window_dim;
   unsigned int m_max_shape_count;
-  lay::Color m_marker_color;
+  tl::Color m_marker_color;
   lay::ColorPalette m_auto_colors;
   bool m_auto_color_enabled;
   int m_marker_line_width;

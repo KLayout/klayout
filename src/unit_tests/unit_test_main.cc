@@ -30,6 +30,7 @@
 #include "tlCommandLineParser.h"
 #include "tlFileUtils.h"
 #include "tlGlobPattern.h"
+#include "lymMacroCollection.h"
 #include "rba.h"
 #include "pya.h"
 #include "gsiDecl.h"
@@ -40,14 +41,14 @@
 //  This hard-links the GSI test classes
 #include "../gsi_test/gsiTestForceLink.h"
 
+#include "version.h"
+
 #if defined(HAVE_QT)
 
 #  include "layApplication.h"
 #  include "layMainWindow.h"
 #  include "laySystemPaths.h"
 #  include "layVersion.h"
-
-#  include "version.h"
 
 #  include <QDir>
 #  include <QFileInfo>
@@ -63,12 +64,16 @@
 #endif
 
 //  required to force linking of the "rdb", "lib" and "drc" module 
-//  (some in non-Qt case)
+//  and the plugins/auxiliary modules (some in non-Qt case)
 #include "libForceLink.h"
 #include "rdbForceLink.h"
-#if defined(HAVE_RUBY) && defined(HAVE_QT)
-#include "drcForceLink.h"
-#include "lvsForceLink.h"
+#include "antForceLink.h"
+#include "imgForceLink.h"
+#include "edtForceLink.h"
+#include "lymForceLink.h"
+#if defined(HAVE_RUBY)
+#  include "drcForceLink.h"
+#  include "lvsForceLink.h"
 #endif
 
 static int main_cont (int &argc, char **argv);
@@ -530,6 +535,13 @@ main_cont (int &argc, char **argv)
     python_interpreter.reset (new pya::PythonInterpreter ());
     python_interpreter->push_console (&console);
 
+    lym::MacroCollection &lym_root = lym::MacroCollection::root ();
+    lym_root.add_folder (tl::to_string (tr ("Built-In")), ":/built-in-macros", "macros", true);
+    lym_root.add_folder (tl::to_string (tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
+
+    lym_root.autorun_early ();
+    lym_root.autorun ();
+
 #endif
 
     bool editable = false, non_editable = false;
@@ -598,6 +610,14 @@ main_cont (int &argc, char **argv)
     tl::set_xml_format (xml_format);
     tl::set_continue_flag (continue_flag);
     tl::set_debug_mode (debug_mode);
+
+    //  set some global variables
+    if (rba::RubyInterpreter::instance ()) {
+      rba::RubyInterpreter::instance ()->define_variable ("ut_inst_path", tl::get_inst_path ());
+    }
+    if (pya::PythonInterpreter::instance ()) {
+      pya::PythonInterpreter::instance ()->define_variable ("ut_inst_path", tl::get_inst_path ());
+    }
 
     FILE *output_file = 0;
 

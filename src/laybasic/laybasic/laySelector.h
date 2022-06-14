@@ -55,7 +55,7 @@ public:
   SelectionService (lay::LayoutViewBase *view);
   ~SelectionService ();
 
-  void set_colors (lay::Color background, lay::Color color);
+  void set_colors (tl::Color background, tl::Color color);
   void begin (const db::DPoint &pos);
 
   bool dragging () const { return mp_box != 0; }

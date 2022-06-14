@@ -61,7 +61,7 @@ extern const std::string cfg_l2ndb_window_state;
 
 NetlistBrowserDialog::NetlistBrowserDialog (lay::Dispatcher *root, LayoutViewBase *vw)
   : lay::Browser (root, vw),
-    lay::ViewService (vw->view_object_widget ()),
+    lay::ViewService (vw->canvas ()),
     m_window (lay::NetlistBrowserConfig::FitNet),
     m_window_dim (0.0),
     m_max_shape_count (0),
@@ -225,7 +225,7 @@ void
 NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
 {
   //  prepare for the net tracing
-  double l = double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+  double l = double (view ()->search_range ()) / ui ()->mouse_event_trans ().mag ();
 
   db::DBox start_search_box = db::DBox (p, p).enlarged (db::DVector (l, l));
 
@@ -348,7 +348,7 @@ NetlistBrowserDialog::release_mouse ()
 {
   m_mouse_state = 0;
   view ()->message ();
-  widget ()->ungrab_mouse (this);
+  ui ()->ungrab_mouse (this);
 }
 
 lay::ViewService *
@@ -365,7 +365,7 @@ BEGIN_PROTECTED
   m_mouse_state = 1;
 
   view ()->message (tl::to_string (QObject::tr ("Click on a point in the net")));
-  widget ()->grab_mouse (this, false);
+  ui ()->grab_mouse (this, false);
 
 END_PROTECTED
 }
@@ -558,7 +558,7 @@ NetlistBrowserDialog::configure (const std::string &name, const std::string &val
 
   } else if (name == cfg_l2ndb_marker_color) {
 
-    lay::Color color;
+    tl::Color color;
     if (! value.empty ()) {
       lay::ColorConverter ().from_string (value, color);
     }

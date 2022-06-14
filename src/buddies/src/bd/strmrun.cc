@@ -35,6 +35,7 @@
 #include "libForceLink.h"
 #include "rdbForceLink.h"
 #include "lymMacro.h"
+#include "lymMacroCollection.h"
 
 struct RunnerData
 {
@@ -82,6 +83,14 @@ BD_PUBLIC int strmrun (int argc, char *argv[])
     ruby.define_variable (v->first, v->second);
     python.define_variable (v->first, v->second);
   }
+
+  //  install the built-in macros so we can run DRC and LVS scripts
+  lym::MacroCollection &lym_root = lym::MacroCollection::root ();
+  lym_root.add_folder (tl::to_string (tr ("Built-In")), ":/built-in-macros", "macros", true);
+  lym_root.add_folder (tl::to_string (tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
+
+  lym_root.autorun_early ();
+  lym_root.autorun ();
 
   std::string script = tl::absolute_file_path (data.script);
 

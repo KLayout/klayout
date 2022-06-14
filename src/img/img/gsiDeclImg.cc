@@ -43,14 +43,14 @@ static void clear_colormap (img::DataMapping *dm)
   dm->false_color_nodes.clear ();
 }
 
-static void add_colormap (img::DataMapping *dm, double value, lay::color_t color)
+static void add_colormap (img::DataMapping *dm, double value, tl::color_t color)
 {
-  dm->false_color_nodes.push_back (std::make_pair (value, std::make_pair (lay::Color (color), lay::Color (color))));
+  dm->false_color_nodes.push_back (std::make_pair (value, std::make_pair (tl::Color (color), tl::Color (color))));
 }
 
-static void add_colormap2 (img::DataMapping *dm, double value, lay::color_t lcolor, lay::color_t rcolor)
+static void add_colormap2 (img::DataMapping *dm, double value, tl::color_t lcolor, tl::color_t rcolor)
 {
-  dm->false_color_nodes.push_back (std::make_pair (value, std::make_pair (lay::Color (lcolor), lay::Color (rcolor))));
+  dm->false_color_nodes.push_back (std::make_pair (value, std::make_pair (tl::Color (lcolor), tl::Color (rcolor))));
 }
 
 static size_t num_colormap_entries (const img::DataMapping *dm)
@@ -58,7 +58,7 @@ static size_t num_colormap_entries (const img::DataMapping *dm)
   return dm->false_color_nodes.size ();
 }
 
-static lay::color_t colormap_color (const img::DataMapping *dm, size_t i)
+static tl::color_t colormap_color (const img::DataMapping *dm, size_t i)
 {
   if (i < dm->false_color_nodes.size ()) {
     return dm->false_color_nodes [i].second.first.rgb ();
@@ -67,7 +67,7 @@ static lay::color_t colormap_color (const img::DataMapping *dm, size_t i)
   }
 }
 
-static lay::color_t colormap_lcolor (const img::DataMapping *dm, size_t i)
+static tl::color_t colormap_lcolor (const img::DataMapping *dm, size_t i)
 {
   if (i < dm->false_color_nodes.size ()) {
     return dm->false_color_nodes [i].second.first.rgb ();
@@ -76,7 +76,7 @@ static lay::color_t colormap_lcolor (const img::DataMapping *dm, size_t i)
   }
 }
 
-static lay::color_t colormap_rcolor (const img::DataMapping *dm, size_t i)
+static tl::color_t colormap_rcolor (const img::DataMapping *dm, size_t i)
 {
   if (i < dm->false_color_nodes.size ()) {
     return dm->false_color_nodes [i].second.second.rgb ();

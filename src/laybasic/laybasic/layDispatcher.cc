@@ -22,6 +22,7 @@
 
 
 #include "layDispatcher.h"
+#include "layAbstractMenu.h"
 
 #include "tlXMLParser.h"
 #include "tlXMLWriter.h"
@@ -69,25 +70,23 @@ Dispatcher::~Dispatcher ()
 void Dispatcher::set_menu_parent_widget (QWidget *menu_parent_widget)
 {
   mp_menu_parent_widget = menu_parent_widget;
-  if (mp_menu_parent_widget) {
-    mp_menu.reset (new lay::AbstractMenu (this));
-  } else {
-    mp_menu.reset (0);
-  }
 }
 #endif
+
+void Dispatcher::make_menu ()
+{
+  mp_menu.reset (new lay::AbstractMenu (this));
+}
 
 bool
 Dispatcher::configure (const std::string &name, const std::string &value)
 {
-#if defined(HAVE_QT)
   if (mp_menu) {
     std::vector<lay::ConfigureAction *> ca = mp_menu->configure_actions (name);
     for (std::vector<lay::ConfigureAction *>::const_iterator a = ca.begin (); a != ca.end (); ++a) {
       (*a)->configure (value);
     }
   }
-#endif
 
   if (mp_delegate) {
     return mp_delegate->configure (name, value);

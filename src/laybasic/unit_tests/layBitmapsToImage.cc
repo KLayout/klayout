@@ -24,11 +24,11 @@
 #include "layBitmap.h"
 #include "layDitherPattern.h"
 #include "layLineStyles.h"
-#include "layPixelBuffer.h"
+#include "tlPixelBuffer.h"
 #include "tlUnitTest.h"
 
 std::string
-to_string (const lay::PixelBuffer &img, unsigned int mask)
+to_string (const tl::PixelBuffer &img, unsigned int mask)
 {
   std::string s;
   for (unsigned int i = 0; i < 32; ++i) {
@@ -85,7 +85,7 @@ TEST(1)
   view_ops.push_back (lay::ViewOp (0x000080, lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, 1));
   view_ops.push_back (lay::ViewOp (0x0000c0, lay::ViewOp::Or, 0, 0, 0, lay::ViewOp::Rect, 3));
 
-  lay::PixelBuffer img (32, 32);
+  tl::PixelBuffer img (32, 32);
   img.fill (0);
 
   lay::DitherPattern dp;

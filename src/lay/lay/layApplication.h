@@ -54,6 +54,11 @@ namespace lym
   class MacroCollection;
 }
 
+namespace db
+{
+  class Manager;
+}
+
 namespace lay
 {
 
@@ -61,6 +66,7 @@ class MainWindow;
 class Dispatcher;
 class ProgressReporter;
 class ProgressBar;
+class LayoutView;
 
 /**
  *  @brief The application base class
@@ -324,6 +330,7 @@ protected:
 
 private:
   std::vector<std::string> scan_global_modules ();
+  lay::LayoutView *create_view (db::Manager &manager);
 
   enum file_type {
     layout_file,
@@ -339,6 +346,7 @@ private:
   bool m_lyp_map_all_cvs, m_lyp_add_default;
   std::string m_session_file;
   std::string m_run_macro;
+  bool m_run_macro_and_exit;
   std::vector<std::pair<std::string, std::string> > m_custom_macro_paths;
   std::vector<std::string> m_load_macros;
   std::vector <std::string> m_package_inst;

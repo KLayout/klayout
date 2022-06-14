@@ -25,6 +25,7 @@
 
 #include "layPlugin.h"
 #include "layLayoutViewBase.h"
+#include "layUtils.h"
 
 namespace lay
 {
@@ -36,7 +37,11 @@ public:
   DiffPlugin (Plugin *parent, lay::LayoutViewBase *view)
     : lay::Plugin (parent), mp_view (view)
   {
-    mp_dialog = new lay::DiffToolDialog (0);
+    if (lay::has_gui ()) {
+      mp_dialog = new lay::DiffToolDialog (0);
+    } else {
+      mp_dialog = 0;
+    }
   }
 
   ~DiffPlugin ()
@@ -49,7 +54,7 @@ public:
   {
     if (symbol == "lay::diff_tool") {
 
-      if (mp_dialog->exec_dialog (mp_view)) {
+      if (mp_dialog && mp_dialog->exec_dialog (mp_view)) {
 
         // ... implementation is in layDiffToolDialog.cc ...
 

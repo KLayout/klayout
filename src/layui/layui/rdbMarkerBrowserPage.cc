@@ -1610,7 +1610,7 @@ MarkerBrowserPage::set_dispatcher (lay::Dispatcher *pr)
 }
 
 void 
-MarkerBrowserPage::set_marker_style (lay::Color color, int line_width, int vertex_size, int halo, int dither_pattern)
+MarkerBrowserPage::set_marker_style (tl::Color color, int line_width, int vertex_size, int halo, int dither_pattern)
 {
   m_marker_color = color;
   m_marker_line_width = line_width;
@@ -2001,9 +2001,10 @@ MarkerBrowserPage::update_info_text ()
 
       info += "</pre>";
 
-      if (item->image () != 0) {
+      QImage image = item->image ();
+      if (! image.isNull ()) {
         info += "<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style=\"border-color:blue; border-style:solid\"><tr><td><p>Snapshot image<br/>(click to enlarge)</p><p><a href=\"show-snapshot\"><img src=\"item.overview-image\"/></a></p></td></tr></table>";
-        info_text->set_image (*item->image ());
+        info_text->set_image (image);
       }
 
     }
@@ -2802,7 +2803,7 @@ MarkerBrowserPage::remove_snapshot_button_clicked ()
       if (selected_item->column () == 0) {
         const rdb::Item *i = list_model->item (selected_item->row ());
         if (i) {
-          mp_database->set_item_image (i, 0);
+          mp_database->set_item_image (i, QImage ());
         }
       }
     }
@@ -2830,7 +2831,7 @@ MarkerBrowserPage::snapshot_button_clicked ()
     const rdb::Item *i = list_model->item (selected_item->row ());
     if (i) {
 
-      mp_database->set_item_image (i, new QImage (mp_view->get_screenshot ()));
+      mp_database->set_item_image (i, QImage (mp_view->get_screenshot ()));
       markers_list->selectionModel ()->setCurrentIndex (*selected_item, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
       update_info_text ();
 
@@ -3125,8 +3126,8 @@ MarkerBrowserPage::info_anchor_clicked (const QUrl &link)
 
     QModelIndex current = markers_list->selectionModel ()->currentIndex ();
     const rdb::Item *i = list_model->item (current.row ());
-    if (i && i->image () != 0) {
-      MarkerBrowserSnapshotView *snapshot_view = new MarkerBrowserSnapshotView (this, *i->image ());
+    if (i && i->has_image ()) {
+      MarkerBrowserSnapshotView *snapshot_view = new MarkerBrowserSnapshotView (this, i->image ());
       snapshot_view->exec ();
       delete snapshot_view;
 #if QT_VERSION < 0x040300

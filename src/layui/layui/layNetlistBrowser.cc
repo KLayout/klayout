@@ -26,6 +26,7 @@
 #include "layNetlistBrowserDialog.h"
 #include "layConverters.h"
 #include "layDispatcher.h"
+#include "layUtils.h"
 
 #include "ui_NetlistBrowserConfigPage.h"
 #include "ui_NetlistBrowserConfigPage2.h"
@@ -384,7 +385,11 @@ public:
 
   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
-    return new lay::NetlistBrowserDialog (root, view);
+    if (has_gui ()) {
+      return new lay::NetlistBrowserDialog (root, view);
+    } else {
+      return 0;
+    }
   }
 };
 

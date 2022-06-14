@@ -38,6 +38,7 @@
 #include "tlAlgorithm.h"
 #include "layMarker.h"
 #include "layQtTools.h"
+#include "layUtils.h"
 #include "tlExceptions.h"
 
 namespace lay
@@ -82,7 +83,11 @@ public:
 
   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
-    return new BrowseInstancesForm (root, view);
+    if (lay::has_gui ()) {
+      return new BrowseInstancesForm (root, view);
+    } else {
+      return 0;
+    }
   }
 };
 

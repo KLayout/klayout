@@ -218,7 +218,7 @@ RESULT
     assert_equal( menu.is_separator?( "file_menu.sep" ), true )
 
     assert_equal( menu.action( "file_menu.#0" ).title, "New title" )
-    assert_equal( menu.action( "file_menu.#0" ).shortcut, "Ctrl+Shift+F7" )
+    assert_equal( menu.action( "file_menu.#0" ).shortcut, "Shift+Ctrl+F7" )
     assert_equal( menu.action( "file_menu.#3" ).icon_text, "X" )
     assert_equal( menu.action( "my_menu.new_item" ).is_visible?, true )
     assert_equal( menu.action( "file_menu.#3" ).is_checked?, false )
@@ -313,6 +313,10 @@ RESULT
 
   def test_3
 
+    if !RBA.constants.member?(:AbstractMenu)
+      return
+    end
+
     map = RBA::AbstractMenu::unpack_key_binding("'path.a':X;'path.b':''")
     assert_equal(map["path.a"], "X")
     assert_equal(map["path.b"], "")
@@ -332,6 +336,10 @@ RESULT
   end
 
   def test_4
+
+    if !RBA.constants.member?(:Action)
+      return
+    end
 
     action = RBA::Action::new
     action.title = "title:n1"
@@ -359,6 +367,10 @@ RESULT
 
   def test_5
 
+    if !RBA.constants.member?(:Action)
+      return
+    end
+
     action = RBA::Action::new
     action.title = "title:n1"
 
@@ -385,6 +397,10 @@ RESULT
   end
 
   def test_6
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
 
     app = RBA::Application.instance
     mw = app.main_window

@@ -422,11 +422,32 @@ class RDB_TestClass < TestBase
     assert_equal(item.has_tag?(db.tag_id("x1")), false)
     assert_equal(item.tags_str, "")
     
-    if item.respond_to?(:image_str)
-      is="iVBORw0KGgoAAAANSUhEUgAAACoAAAA0CAIAAABzfT3nAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA0SAAANOgHo3ZneAAAA3UlEQVRYhe2WwQ3DIAxFoco8XaGZIaeO43FyYgZYgYXcQ6SWuDGgBhWq/qccIvGCEd9SbAwAAPSGaW2lFR2rfWDpXrPpSe2SP10fvnn/PZHZH9IwbKFVZZ/Z6wMtZcjW02Bn2FVpZYdWdkr2nvh23S2FyDNJuVITpwmRjTGbNr0v20U5byNtJuuJt/fO2f93+UlbEJl5UjVPr3Y71EQ/PoPPlU+lDJtWlCt3GwCMG33BuJGAcWMEMG6c1jBudCyf/nzV8nbZPRohclFLHdGbZ8eNSjN1fmf0AACA1jwA4hKxu4C6P7EAAAAASUVORK5CYII="
-      item.image_str=is
-      # Only the first 30 bytes count ... the remaining part is too different for different versions of Qt
-      assert_equal(item.image_str[0..30], is[0..30])
+    assert_equal(item.image_str, "")
+    assert_equal(item.has_image?, false)
+
+    # can actually by any string, but only base64-encoded PNG images make sense
+    is="iVBORw0KGgoAAAANSUhEUgAAACoAAAA0CAIAAABzfT3nAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA0SAAANOgHo3ZneAAAA3UlEQVRYhe2WwQ3DIAxFoco8XaGZIaeO43FyYgZYgYXcQ6SWuDGgBhWq/qccIvGCEd9SbAwAAPSGaW2lFR2rfWDpXrPpSe2SP10fvnn/PZHZH9IwbKFVZZ/Z6wMtZcjW02Bn2FVpZYdWdkr2nvh23S2FyDNJuVITpwmRjTGbNr0v20U5byNtJuuJt/fO2f93+UlbEJl5UjVPr3Y71EQ/PoPPlU+lDJtWlCt3GwCMG33BuJGAcWMEMG6c1jBudCyf/nzV8nbZPRohclFLHdGbZ8eNSjN1fmf0AACA1jwA4hKxu4C6P7EAAAAASUVORK5CYII="
+    item.image_str=is
+    assert_equal(item.image_str, is)
+    assert_equal(item.has_image?, true)
+
+    if item.respond_to?(:image_pixels)
+      px=item.image_pixels
+      assert_equal(px.width, 42)
+      assert_equal(px.height, 52)
+      item.image = px
+      px2=item.image_pixels
+      assert_equal(px == px2, true)
+    end
+    
+    if item.respond_to?(:image)
+      px=item.image
+      assert_equal(px.width, 42)
+      assert_equal(px.height, 52)
+      item.image = px
+      px2=item.image
+      assert_equal(px2.width, 42)
+      assert_equal(px2.height, 52)
     end
     
     vs = RBA::RdbItemValue.new("a string")

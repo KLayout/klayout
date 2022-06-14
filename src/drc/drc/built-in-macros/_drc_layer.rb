@@ -3266,6 +3266,15 @@ CODE
     end
     
     # %DRC%
+    # @name texts?
+    # @brief Returns true, if the layer is a text collection
+    # @synopsis layer.texts?
+    
+    def texts?
+      self.data.is_a?(RBA::Texts)
+    end
+    
+    # %DRC%
     # @name is_deep?
     # @brief Returns true, if the layer is a deep (hierarchical) layer
     # @synopsis layer.is_deep?

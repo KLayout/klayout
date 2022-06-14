@@ -240,13 +240,6 @@ public:
   void clone_current_view ();
 
   /**
-   *  @brief Determine whether a given layer properties file is a single-layout file
-   *
-   *  @return True, if the file contains definitions of a single layout only.
-   */
-  bool is_single_cv_layer_properties_file (const std::string &fn);
-
-  /**
    *  @brief Load a layer definition file
    *
    *  This version will load the layer properties file "as it is". No mapping of cellview index

@@ -34,6 +34,21 @@ namespace tl
 
 static DeferredMethodScheduler *s_inst = 0;
 
+// -----------------------------------------------------------------------------------
+
+/**
+ *  @brief A default scheduler which is used for example in non-Qt environments
+ */
+class DefaultDeferredMethodScheduler
+  : public DeferredMethodScheduler
+{
+public:
+  DefaultDeferredMethodScheduler () : DeferredMethodScheduler () { }
+  void queue_event() {}
+};
+
+// -----------------------------------------------------------------------------------
+
 DeferredMethodScheduler::DeferredMethodScheduler ()
   : m_disabled (0), m_scheduled (false)
 {
@@ -55,7 +70,33 @@ DeferredMethodScheduler::instance ()
     new DeferredMethodSchedulerQt ();
   }
 #endif
+  if (! s_inst) {
+    new DefaultDeferredMethodScheduler ();
+  }
   return s_inst;
+}
+
+void
+DeferredMethodScheduler::enable (bool en)
+{
+  if (instance ()) {
+    instance ()->do_enable (en);
+  }
+}
+
+void
+DeferredMethodScheduler::execute ()
+{
+  if (instance ()) {
+    while (instance ()->do_execute ())
+      ;
+  }
+}
+
+bool
+DeferredMethodScheduler::is_disabled () const
+{
+  return m_disabled;
 }
 
 void 
@@ -105,10 +146,18 @@ DeferredMethodScheduler::do_enable (bool en)
   }
 }
 
-void
+bool
 DeferredMethodScheduler::do_execute ()
 {
   m_lock.lock ();
+
+  if (m_disabled) {
+    m_lock.unlock ();
+    return false;
+  }
+
+  bool any_pending = false;
+
   m_executing.clear ();
   m_unqueued.clear ();
   m_executing.swap (m_methods);
@@ -143,7 +192,10 @@ DeferredMethodScheduler::do_execute ()
   m_lock.lock ();
   m_unqueued.clear ();
   m_executing.clear ();
+  any_pending = !m_methods.empty ();
   m_lock.unlock ();
+
+  return any_pending;
 }
 
 }

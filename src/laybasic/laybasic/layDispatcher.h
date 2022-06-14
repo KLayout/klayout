@@ -222,6 +222,20 @@ public:
    */
   bool has_ui () { return menu_parent_widget () != 0; }
 
+#else
+  /**
+   *  @brief Returns true, if the dispatcher supplies a user interface
+   */
+  bool has_ui () { return false; }
+#endif
+
+  /**
+   *  @brief Creates the menu object
+   *
+   *  This method will only have an effect on the root dispatcher.
+   */
+  void make_menu ();
+
   /**
    *  @brief Gets the AbstractMenu object
    *
@@ -231,14 +245,6 @@ public:
   {
     return (dispatcher () == this) ? mp_menu.get () : dispatcher ()->menu ();
   }
-#else
-
-  /**
-   *  @brief Returns true, if the dispatcher supplies a user interface
-   */
-  bool has_ui () { return false; }
-
-#endif
 
 protected:
   //  capture the configuration events so we can change the value of the configuration actions
@@ -249,8 +255,8 @@ private:
   Dispatcher (const Dispatcher &);
   Dispatcher &operator= (const Dispatcher &);
 
-#if defined(HAVE_QT)
   std::unique_ptr<lay::AbstractMenu> mp_menu;
+#if defined(HAVE_QT)
   QWidget *mp_menu_parent_widget;
 #endif
   DispatcherDelegate *mp_delegate;

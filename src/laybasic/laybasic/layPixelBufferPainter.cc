@@ -23,12 +23,12 @@
 #include "layPixelBufferPainter.h"
 
 #include "layFixedFont.h"
-#include "layPixelBuffer.h"
+#include "tlPixelBuffer.h"
 
 namespace lay
 {
 
-PixelBufferPainter::PixelBufferPainter (lay::PixelBuffer &img, unsigned int width, unsigned int height, double resolution)
+PixelBufferPainter::PixelBufferPainter (tl::PixelBuffer &img, unsigned int width, unsigned int height, double resolution)
   : mp_img (&img),
     m_resolution (resolution), m_width (width), m_height (height)
 {
@@ -36,7 +36,7 @@ PixelBufferPainter::PixelBufferPainter (lay::PixelBuffer &img, unsigned int widt
 }
 
 void
-PixelBufferPainter::set (const db::Point &p, lay::Color c)
+PixelBufferPainter::set (const db::Point &p, tl::Color c)
 {
   if (p.x () >= 0 && p.x () < m_width && p.y () >= 0 && p.y () < m_height) {
     ((unsigned int *) mp_img->scan_line (p.y ())) [p.x ()] = c.rgb ();
@@ -44,7 +44,7 @@ PixelBufferPainter::set (const db::Point &p, lay::Color c)
 }
 
 void
-PixelBufferPainter::draw_line (const db::Point &p1, const db::Point &p2, lay::Color c)
+PixelBufferPainter::draw_line (const db::Point &p1, const db::Point &p2, tl::Color c)
 {
   if (p1.x () == p2.x ()) {
 
@@ -79,7 +79,7 @@ PixelBufferPainter::draw_line (const db::Point &p1, const db::Point &p2, lay::Co
 }
 
 void
-PixelBufferPainter::fill_rect (const db::Point &p1, const db::Point &p2, lay::Color c)
+PixelBufferPainter::fill_rect (const db::Point &p1, const db::Point &p2, tl::Color c)
 {
   int y1 = std::min (p1.y (), p2.y ());
   int y2 = std::max (p1.y (), p2.y ());
@@ -89,7 +89,7 @@ PixelBufferPainter::fill_rect (const db::Point &p1, const db::Point &p2, lay::Co
 }
 
 void
-PixelBufferPainter::draw_rect (const db::Point &p1, const db::Point &p2, lay::Color c)
+PixelBufferPainter::draw_rect (const db::Point &p1, const db::Point &p2, tl::Color c)
 {
   int y1 = std::min (p1.y (), p2.y ());
   int y2 = std::max (p1.y (), p2.y ());
@@ -102,7 +102,7 @@ PixelBufferPainter::draw_rect (const db::Point &p1, const db::Point &p2, lay::Co
 }
 
 void
-PixelBufferPainter::draw_text (const char *t, const db::Point &p, lay::Color c, int halign, int valign)
+PixelBufferPainter::draw_text (const char *t, const db::Point &p, tl::Color c, int halign, int valign)
 {
   const lay::FixedFont &ff = lay::FixedFont::get_font (m_resolution);
   int x = p.x (), y = p.y ();

@@ -189,14 +189,14 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
 // ------------------------------------------------------------------------
 
 MarkerBase::MarkerBase (lay::LayoutViewBase *view)
-  : lay::ViewObject (view->view_object_widget ()),
+  : lay::ViewObject (view->canvas ()),
     m_line_width (-1), m_vertex_size (-1), m_halo (-1), m_text_enabled (true), m_vertex_shape (lay::ViewOp::Rect), m_line_style (-1), m_dither_pattern (-1), m_frame_pattern (0), mp_view (view)
 { 
   // .. nothing yet ..
 }
 
 void 
-MarkerBase::set_frame_color (lay::Color color)
+MarkerBase::set_frame_color (tl::Color color)
 {
   if (color != m_frame_color) {
     m_frame_color = color;
@@ -205,7 +205,7 @@ MarkerBase::set_frame_color (lay::Color color)
 }
 
 void 
-MarkerBase::set_color (lay::Color color)
+MarkerBase::set_color (tl::Color color)
 {
   if (color != m_color) {
     m_color = color;
@@ -292,7 +292,7 @@ MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay:
   int basic_width = int(0.5 + 1.0 / resolution);
 
   //  obtain bitmaps
-  lay::Color color = m_color;
+  tl::Color color = m_color;
   if (! color.is_valid ()) {
     color = mp_view->default_marker_color ();
   }
@@ -300,7 +300,7 @@ MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay:
     color = canvas.foreground_color ();
   }
 
-  lay::Color frame_color = m_frame_color;
+  tl::Color frame_color = m_frame_color;
   if (! frame_color.is_valid ()) {
     frame_color = color;
   }

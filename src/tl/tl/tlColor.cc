@@ -21,14 +21,14 @@
 */
 
 
-#include "layColor.h"
+#include "tlColor.h"
 #include "tlString.h"
 #include "tlMath.h"
 
 #include <ctype.h>
 #include <algorithm>
 
-namespace lay
+namespace tl
 {
 
 Color::Color ()
@@ -154,16 +154,16 @@ Color::get_hsv (unsigned int &hue, unsigned int &saturation, unsigned int &value
   }
 }
 
-static lay::Color color_d (double r, double g, double b)
+static tl::Color color_d (double r, double g, double b)
 {
-  return lay::Color (tl::round (r * 255.0, 1), tl::round (g * 255.0, 1), tl::round (b * 255.0, 1));
+  return tl::Color (tl::round (r * 255.0, 1), tl::round (g * 255.0, 1), tl::round (b * 255.0, 1));
 }
 
-lay::Color
+tl::Color
 Color::from_hsv (unsigned int hue, unsigned int saturation, unsigned int value)
 {
   if (saturation == 0) {
-    return lay::Color (value, value, value);
+    return tl::Color (value, value, value);
   }
 
   hue = (hue + 360) % 360;
@@ -191,7 +191,7 @@ Color::from_hsv (unsigned int hue, unsigned int saturation, unsigned int value)
   case 5:
     return color_d (v, p, q);
   default:
-    return lay::Color ();
+    return tl::Color ();
   }
 
 }

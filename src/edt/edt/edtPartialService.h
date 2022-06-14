@@ -288,7 +288,7 @@ public:
   /**
    *  @brief Reimplementation of the ViewService interface: set the colors
    */
-  virtual void set_colors (lay::Color background, lay::Color text);
+  virtual void set_colors (tl::Color background, tl::Color text);
 
   /**
    *  @brief Cancel any edit operations (in this case, unselect all & cancel any drag operation)

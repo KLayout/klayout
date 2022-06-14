@@ -90,32 +90,19 @@ public:
    *  Enabling is cumulative: multiple enable(true) calls must be matched to
    *  the same number of enable(false) calls.
    */
-  static void enable (bool en)
-  {
-    if (instance ()) {
-      instance ()->do_enable (en);
-    }
-  }
+  static void enable (bool en);
 
   /**
    *  @brief Execute all queued methods
    *
    *  This method can be called to force execution of all queued methods.
    */
-  static void execute ()
-  {
-    if (instance ()) {
-      instance ()->do_execute ();
-    }
-  }
+  static void execute ();
 
   /**
    *  @brief Gets a value indicating whether the scheduler is disabled
    */
-  bool is_disabled () const
-  {
-    return m_disabled;
-  }
+  bool is_disabled () const;
 
 protected:
   /**
@@ -126,8 +113,9 @@ protected:
 
   /**
    *  @brief Executes the pending methods
+   *  Returns true if more calls are required because handlers have issued more calls
    */
-  void do_execute ();
+  bool do_execute ();
 
   /**
    *  @brief Constructor

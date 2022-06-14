@@ -38,6 +38,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QMessageBox>
+#include <QApplication>
 
 #include "tlInternational.h"
 #include "tlExpression.h"
@@ -71,6 +72,7 @@
 #include "layBookmarksView.h"
 #include "layEditorOptionsFrame.h"
 #include "layEditorOptionsPages.h"
+#include "layUtils.h"
 #include "dbClipboard.h"
 #include "dbLayout.h"
 #include "dbLayoutUtils.h"
@@ -84,9 +86,106 @@
 #include "gtf.h"
 
 #include <limits>
+#include <QFrame>
 
 namespace lay
 {
+
+// -------------------------------------------------------------
+//  LayoutViewFrame implementation
+
+LayoutViewFrame::LayoutViewFrame (QWidget *parent, lay::LayoutView *view)
+  : QFrame (parent), mp_view (view)
+{
+  //  .. nothing yet ..
+}
+
+QSize
+LayoutViewFrame::sizeHint () const
+{
+  return mp_view->size_hint ();
+}
+
+bool
+LayoutViewFrame::eventFilter(QObject *obj, QEvent *event)
+{
+  bool taken = false;
+  bool res = mp_view->event_filter (obj, event, taken);
+  if (taken) {
+    return res;
+  } else {
+    return QFrame::eventFilter (obj, event);
+  }
+}
+
+void LayoutViewFrame::showEvent (QShowEvent *)
+{
+  mp_view->show_event ();
+}
+
+void LayoutViewFrame::hideEvent (QHideEvent *)
+{
+  mp_view->hide_event ();
+}
+
+// -------------------------------------------------------------
+//  LayoutViewConnector implementation
+
+LayoutViewSignalConnector::LayoutViewSignalConnector (QObject *parent, lay::LayoutView *view)
+  : QObject (parent), mp_view (view)
+{
+  //  .. nothing yet ..
+}
+
+void LayoutViewSignalConnector::active_cellview_changed (int index)
+{
+  mp_view->active_cellview_changed (index);
+}
+
+void LayoutViewSignalConnector::active_library_changed (int index)
+{
+  mp_view->active_cellview_changed (index);
+}
+
+void LayoutViewSignalConnector::side_panel_destroyed ()
+{
+  mp_view->side_panel_destroyed (sender ());
+}
+
+void LayoutViewSignalConnector::select_cell_dispatch (const lay::LayoutViewBase::cell_path_type &path, int cellview_index)
+{
+  mp_view->select_cell_dispatch (path, cellview_index);
+}
+
+void LayoutViewSignalConnector::current_layer_changed_slot (const lay::LayerPropertiesConstIterator &iter)
+{
+  mp_view->current_layer_changed_slot (iter);
+}
+
+void LayoutViewSignalConnector::timer ()
+{
+  mp_view->timer ();
+}
+
+void LayoutViewSignalConnector::layer_tab_changed ()
+{
+  mp_view->layer_tab_changed ();
+}
+
+void LayoutViewSignalConnector::layer_order_changed ()
+{
+  mp_view->layer_order_changed ();
+}
+
+void LayoutViewSignalConnector::min_hier_changed (int i)
+{
+  mp_view->min_hier_changed (i);
+}
+
+void LayoutViewSignalConnector::max_hier_changed (int i)
+{
+  mp_view->max_hier_changed (i);
+}
 
 // -------------------------------------------------------------
 
@@ -95,34 +194,36 @@ const int timer_interval = 10;
 static LayoutView *ms_current = 0;
 
 LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
-  : LayoutViewBase (parent, this, manager, editable, plugin_parent, options),
+  : LayoutViewBase (this, manager, editable, plugin_parent, options),
+    mp_widget (0),
     dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
 {
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  setObjectName (QString::fromUtf8(name));
-  init_ui ();
+  init_ui (parent, name);
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
-  : LayoutViewBase (parent, this, source, manager, editable, plugin_parent, options),
+  : LayoutViewBase (this, source, manager, editable, plugin_parent, options),
+    mp_widget (0),
     dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
 {
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  setObjectName (QString::fromUtf8 (name));
-  init_ui ();
+  init_ui (parent, name);
 
   bookmarks (source->bookmarks ());
   set_active_cellview_index (source->active_cellview_index ());
 }
 
 bool 
-LayoutView::eventFilter(QObject *obj, QEvent *event)
+LayoutView::event_filter (QObject *obj, QEvent *event, bool &taken)
 {
   if (obj == mp_min_hier_spbx || obj == mp_max_hier_spbx) {
+
+    taken = true;
 
     //  Makes the min/max spin boxes accept only numeric and some control keys ..
     QKeyEvent *keyEvent = dynamic_cast<QKeyEvent*>(event);
@@ -133,43 +234,23 @@ LayoutView::eventFilter(QObject *obj, QEvent *event)
         keyEvent->key () != Qt::Key_Backspace &&
         (keyEvent->key () < Qt::Key_0 || keyEvent->key () > Qt::Key_9)) {
       return true;
-    } else {
-      return false;
     }
 
-  } else {
-    return QFrame::eventFilter (obj, event);
   }
+
+  return false;
 }
 
 void
-LayoutView::init_menu ()
-{
-  //  make the plugins create their menu items
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    //  TODO: get rid of the const_cast hack
-    const_cast <lay::PluginDeclaration *> (&*cls)->init_menu (dispatcher ());
-  }
-
-  //  if not in editable mode, hide all entries from "edit_mode" group and show all from the "view_mode" group and vice versa
-  std::vector<std::string> edit_mode_grp = menu ()->group ("edit_mode");
-  for (std::vector<std::string>::const_iterator g = edit_mode_grp.begin (); g != edit_mode_grp.end (); ++g) {
-    menu ()->action (*g)->set_visible (is_editable ());
-  }
-  std::vector<std::string> view_mode_grp = menu ()->group ("view_mode");
-  for (std::vector<std::string>::const_iterator g = view_mode_grp.begin (); g != view_mode_grp.end (); ++g) {
-    menu ()->action (*g)->set_visible (! is_editable ());
-  }
-}
-
-void
-LayoutView::init_ui ()
+LayoutView::init_ui (QWidget *parent, const char *name)
 {
   m_activated = true;
   m_always_show_source = false;
   m_always_show_ld = true;
   m_always_show_layout_index = false;
 
+  mp_widget = 0;
+  mp_connector = 0;
   mp_timer = 0;
   mp_left_frame = 0;
   mp_control_panel = 0;
@@ -184,125 +265,128 @@ LayoutView::init_ui ()
   mp_min_hier_spbx = 0;
   mp_max_hier_spbx = 0;
 
-  QVBoxLayout *vbl = new QVBoxLayout (this);
-  vbl->setContentsMargins (0, 0, 0, 0);
-  vbl->setSpacing (0);
-  vbl->addWidget (view_object_widget ());
+  if (lay::has_gui ()) {
 
-  if ((options () & LV_NoHierarchyPanel) == 0 && (options () & LV_Naked) == 0) {
+    mp_widget = new LayoutViewFrame (parent, this);
+    mp_widget->setObjectName (QString::fromUtf8 (name));
 
-    QFrame *hierarchy_frame = new QFrame (0);
-    hierarchy_frame->setObjectName (QString::fromUtf8 ("left"));
-    mp_hierarchy_frame = hierarchy_frame;
-    QVBoxLayout *left_frame_ly = new QVBoxLayout (hierarchy_frame);
-    left_frame_ly->setContentsMargins (0, 0, 0, 0);
-    left_frame_ly->setSpacing (0);
+    canvas ()->init_ui (mp_widget);
 
-    mp_hierarchy_panel = new lay::HierarchyControlPanel (this, hierarchy_frame, "hcp");
-    left_frame_ly->addWidget (mp_hierarchy_panel, 1 /*stretch*/);
+    mp_connector = new LayoutViewSignalConnector (mp_widget, this);
 
-    connect (mp_hierarchy_panel, SIGNAL (cell_selected (cell_path_type, int)), this, SLOT (select_cell_dispatch (cell_path_type, int)));
-    connect (mp_hierarchy_panel, SIGNAL (active_cellview_changed (int)), this, SLOT (active_cellview_changed (int)));
-    connect (mp_hierarchy_frame, SIGNAL (destroyed ()), this, SLOT (side_panel_destroyed ()));
+    QVBoxLayout *vbl = new QVBoxLayout (mp_widget);
+    vbl->setContentsMargins (0, 0, 0, 0);
+    vbl->setSpacing (0);
+    vbl->addWidget (canvas ()->widget ());
 
-    QFrame *levels_frame = new QFrame (hierarchy_frame);
-    levels_frame->setObjectName (QString::fromUtf8 ("lvl_frame"));
-    left_frame_ly->addWidget (levels_frame);
-    QHBoxLayout *levels_frame_ly = new QHBoxLayout (levels_frame);
-    levels_frame_ly->setContentsMargins (1, 1, 1, 1);
-    QLabel *level_l1 = new QLabel (tl::to_qstring (" " + tl::to_string (QObject::tr ("Levels"))), levels_frame);
-    levels_frame_ly->addWidget (level_l1);
-    mp_min_hier_spbx = new QSpinBox (levels_frame);
-    mp_min_hier_spbx->setObjectName (QString::fromUtf8 ("min_lvl"));
-    levels_frame_ly->addWidget (mp_min_hier_spbx);
-    QLabel *level_l2 = new QLabel (QString::fromUtf8 (".."), levels_frame);
-    levels_frame_ly->addWidget (level_l2);
-    mp_max_hier_spbx = new QSpinBox (levels_frame);
-    mp_max_hier_spbx->setObjectName (QString::fromUtf8 ("max_lvl"));
-    levels_frame_ly->addWidget (mp_max_hier_spbx);
+    if ((options () & LV_NoHierarchyPanel) == 0 && (options () & LV_Naked) == 0) {
 
-    mp_min_hier_spbx->installEventFilter (this);
-    mp_max_hier_spbx->installEventFilter (this);
+      QFrame *hierarchy_frame = new QFrame (0);
+      hierarchy_frame->setObjectName (QString::fromUtf8 ("left"));
+      mp_hierarchy_frame = hierarchy_frame;
+      QVBoxLayout *left_frame_ly = new QVBoxLayout (hierarchy_frame);
+      left_frame_ly->setContentsMargins (0, 0, 0, 0);
+      left_frame_ly->setSpacing (0);
 
-    mp_min_hier_spbx->setMaximum (0);
-    mp_min_hier_spbx->setMinimum (-1000);
-    mp_min_hier_spbx->setValue (0);
-    mp_max_hier_spbx->setMaximum (999);
-    mp_max_hier_spbx->setValue (0);
-    mp_max_hier_spbx->setMinimum (-1000);
+      mp_hierarchy_panel = new lay::HierarchyControlPanel (this, hierarchy_frame, "hcp");
+      left_frame_ly->addWidget (mp_hierarchy_panel, 1 /*stretch*/);
 
-    connect (mp_min_hier_spbx, SIGNAL (valueChanged (int)), this, SLOT (min_hier_changed (int)));
-    connect (mp_max_hier_spbx, SIGNAL (valueChanged (int)), this, SLOT (max_hier_changed (int)));
+      QObject::connect (mp_hierarchy_panel, SIGNAL (cell_selected (cell_path_type, int)), mp_connector, SLOT (select_cell_dispatch (cell_path_type, int)));
+      QObject::connect (mp_hierarchy_panel, SIGNAL (active_cellview_changed (int)), mp_connector, SLOT (active_cellview_changed (int)));
+      QObject::connect (mp_hierarchy_frame, SIGNAL (destroyed ()), mp_connector, SLOT (side_panel_destroyed ()));
 
-  }
+      QFrame *levels_frame = new QFrame (hierarchy_frame);
+      levels_frame->setObjectName (QString::fromUtf8 ("lvl_frame"));
+      left_frame_ly->addWidget (levels_frame);
+      QHBoxLayout *levels_frame_ly = new QHBoxLayout (levels_frame);
+      levels_frame_ly->setContentsMargins (1, 1, 1, 1);
+      QLabel *level_l1 = new QLabel (tl::to_qstring (" " + tl::to_string (QObject::tr ("Levels"))), levels_frame);
+      levels_frame_ly->addWidget (level_l1);
+      mp_min_hier_spbx = new QSpinBox (levels_frame);
+      mp_min_hier_spbx->setObjectName (QString::fromUtf8 ("min_lvl"));
+      levels_frame_ly->addWidget (mp_min_hier_spbx);
+      QLabel *level_l2 = new QLabel (QString::fromUtf8 (".."), levels_frame);
+      levels_frame_ly->addWidget (level_l2);
+      mp_max_hier_spbx = new QSpinBox (levels_frame);
+      mp_max_hier_spbx->setObjectName (QString::fromUtf8 ("max_lvl"));
+      levels_frame_ly->addWidget (mp_max_hier_spbx);
 
-  if ((options () & LV_NoBookmarksView) == 0 && (options () & LV_Naked) == 0) {
+      mp_min_hier_spbx->installEventFilter (mp_widget);
+      mp_max_hier_spbx->installEventFilter (mp_widget);
 
-    QFrame *bookmarks_frame = new QFrame (0);
-    bookmarks_frame->setObjectName (QString::fromUtf8 ("bookmarks_frame"));
-    mp_bookmarks_frame = bookmarks_frame;
-    QVBoxLayout *left_frame_ly = new QVBoxLayout (bookmarks_frame);
-    left_frame_ly->setContentsMargins (0, 0, 0, 0);
-    left_frame_ly->setSpacing (0);
+      mp_min_hier_spbx->setMaximum (0);
+      mp_min_hier_spbx->setMinimum (-1000);
+      mp_min_hier_spbx->setValue (0);
+      mp_max_hier_spbx->setMaximum (999);
+      mp_max_hier_spbx->setValue (0);
+      mp_max_hier_spbx->setMinimum (-1000);
 
-    mp_bookmarks_view = new lay::BookmarksView (this, bookmarks_frame, "bookmarks");
-    left_frame_ly->addWidget (mp_bookmarks_view, 1 /*stretch*/);
+      QObject::connect (mp_min_hier_spbx, SIGNAL (valueChanged (int)), mp_connector, SLOT (min_hier_changed (int)));
+      QObject::connect (mp_max_hier_spbx, SIGNAL (valueChanged (int)), mp_connector, SLOT (max_hier_changed (int)));
 
-    connect (mp_bookmarks_frame, SIGNAL (destroyed ()), this, SLOT (side_panel_destroyed ()));
+    }
 
-  }
+    if ((options () & LV_NoBookmarksView) == 0 && (options () & LV_Naked) == 0) {
 
-  if ((options () & LV_NoLibrariesView) == 0 && (options () & LV_Naked) == 0) {
+      QFrame *bookmarks_frame = new QFrame (0);
+      bookmarks_frame->setObjectName (QString::fromUtf8 ("bookmarks_frame"));
+      mp_bookmarks_frame = bookmarks_frame;
+      QVBoxLayout *left_frame_ly = new QVBoxLayout (bookmarks_frame);
+      left_frame_ly->setContentsMargins (0, 0, 0, 0);
+      left_frame_ly->setSpacing (0);
 
-    mp_libraries_frame = new QFrame (0);
-    mp_libraries_frame->setObjectName (QString::fromUtf8 ("libs_frame"));
-    QVBoxLayout *left_frame_ly = new QVBoxLayout (mp_libraries_frame);
-    left_frame_ly->setContentsMargins (0, 0, 0, 0);
-    left_frame_ly->setSpacing (0);
+      mp_bookmarks_view = new lay::BookmarksView (this, bookmarks_frame, "bookmarks");
+      left_frame_ly->addWidget (mp_bookmarks_view, 1 /*stretch*/);
 
-    mp_libraries_view = new lay::LibrariesView (this, mp_libraries_frame, "libs");
-    left_frame_ly->addWidget (mp_libraries_view, 1 /*stretch*/);
+      QObject::connect (mp_bookmarks_frame, SIGNAL (destroyed ()), mp_connector, SLOT (side_panel_destroyed ()));
 
-    connect (mp_libraries_view, SIGNAL (active_library_changed (int)), this, SLOT (active_library_changed (int)));
-    connect (mp_libraries_frame, SIGNAL (destroyed ()), this, SLOT (side_panel_destroyed ()));
+    }
 
-  }
+    if ((options () & LV_NoLibrariesView) == 0 && (options () & LV_Naked) == 0) {
 
-  if ((options () & LV_NoEditorOptionsPanel) == 0 && (options () & LV_Naked) == 0) {
+      mp_libraries_frame = new QFrame (0);
+      mp_libraries_frame->setObjectName (QString::fromUtf8 ("libs_frame"));
+      QVBoxLayout *left_frame_ly = new QVBoxLayout (mp_libraries_frame);
+      left_frame_ly->setContentsMargins (0, 0, 0, 0);
+      left_frame_ly->setSpacing (0);
 
-    mp_editor_options_frame = new lay::EditorOptionsFrame (0);
-    mp_editor_options_frame->populate (this);
+      mp_libraries_view = new lay::LibrariesView (this, mp_libraries_frame, "libs");
+      left_frame_ly->addWidget (mp_libraries_view, 1 /*stretch*/);
 
-    connect (mp_editor_options_frame, SIGNAL (destroyed ()), this, SLOT (side_panel_destroyed ()));
+      QObject::connect (mp_libraries_view, SIGNAL (active_library_changed (int)), mp_connector, SLOT (active_library_changed (int)));
+      QObject::connect (mp_libraries_frame, SIGNAL (destroyed ()), mp_connector, SLOT (side_panel_destroyed ()));
 
-  }
+    }
 
-  if ((options () & LV_NoLayers) == 0 && (options () & LV_Naked) == 0) {
+    if ((options () & LV_NoEditorOptionsPanel) == 0 && (options () & LV_Naked) == 0) {
 
-    mp_control_panel = new lay::LayerControlPanel (this, manager (), 0, "lcp");
-    mp_control_frame = mp_control_panel;
+      mp_editor_options_frame = new lay::EditorOptionsFrame (0);
+      mp_editor_options_frame->populate (this);
 
-    connect (mp_control_frame, SIGNAL (destroyed ()), this, SLOT (side_panel_destroyed ()));
-    connect (mp_control_panel, SIGNAL (tab_changed ()), this, SLOT (layer_tab_changed ()));
-    connect (mp_control_panel, SIGNAL (order_changed ()), this, SLOT (layer_order_changed ()));
-    connect (mp_control_panel, SIGNAL (current_layer_changed (const lay::LayerPropertiesConstIterator &)), this, SLOT (current_layer_changed_slot (const lay::LayerPropertiesConstIterator &)));
-    /*
-    connect (mp_control_panel, SIGNAL (marked_changed ()), this, SLOT (prop_changed ()));
-    connect (mp_control_panel, SIGNAL (width_changed ()), this, SLOT (prop_changed ()));
-    connect (mp_control_panel, SIGNAL (animation_changed ()), this, SLOT (prop_changed ()));
-    connect (mp_control_panel, SIGNAL (visibility_changed ()), this, SLOT (visibility_changed ()));
-    connect (mp_control_panel, SIGNAL (transparency_changed ()), this, SLOT (prop_changed ()));
-    connect (mp_control_panel, SIGNAL (stipple_changed ()), this, SLOT (prop_changed ()));
-    connect (mp_control_panel, SIGNAL (color_changed ()), this, SLOT (prop_changed ()));
-    */
+      QObject::connect (mp_editor_options_frame, SIGNAL (destroyed ()), mp_connector, SLOT (side_panel_destroyed ()));
+
+    }
+
+    if ((options () & LV_NoLayers) == 0 && (options () & LV_Naked) == 0) {
+
+      mp_control_panel = new lay::LayerControlPanel (this, manager (), 0, "lcp");
+      mp_control_frame = mp_control_panel;
+
+      QObject::connect (mp_control_frame, SIGNAL (destroyed ()), mp_connector, SLOT (side_panel_destroyed ()));
+      QObject::connect (mp_control_panel, SIGNAL (tab_changed ()), mp_connector, SLOT (layer_tab_changed ()));
+      QObject::connect (mp_control_panel, SIGNAL (order_changed ()), mp_connector, SLOT (layer_order_changed ()));
+      QObject::connect (mp_control_panel, SIGNAL (current_layer_changed (const lay::LayerPropertiesConstIterator &)), mp_connector, SLOT (current_layer_changed_slot (const lay::LayerPropertiesConstIterator &)));
+
+    }
+
+    mp_timer = new QTimer (mp_widget);
+    QObject::connect (mp_timer, SIGNAL (timeout ()), mp_connector, SLOT (timer ()));
+    mp_timer->start (timer_interval);
 
   }
   
   config_setup ();
-
-  mp_timer = new QTimer (this);
-  connect (mp_timer, SIGNAL (timeout ()), this, SLOT (timer ()));
-  mp_timer->start (timer_interval);
+  finish ();
 }
 
 LayoutView::~LayoutView ()
@@ -312,6 +396,9 @@ LayoutView::~LayoutView ()
   if (ms_current == this) {
     ms_current = 0;
   }
+
+  //  release all components and plugins before we delete the user interface
+  shutdown ();
 
   if (mp_control_frame) {
     delete mp_control_frame;
@@ -341,6 +428,11 @@ LayoutView::~LayoutView ()
   }
   mp_bookmarks_frame = 0;
   mp_bookmarks_view = 0;
+
+  if (mp_widget) {
+    delete mp_widget;
+    mp_widget = 0;
+  }
 }
 
 void
@@ -369,33 +461,23 @@ void LayoutView::do_setup_editor_options_pages ()
   }
 }
 
-void LayoutView::side_panel_destroyed ()
+void LayoutView::side_panel_destroyed (QObject *sender)
 {
-  if (sender () == mp_control_frame) {
+  if (sender == mp_control_frame) {
     mp_control_frame = 0;
     mp_control_panel = 0;
-  } else if (sender () == mp_hierarchy_frame) {
+  } else if (sender == mp_hierarchy_frame) {
     mp_hierarchy_frame = 0;
     mp_hierarchy_panel = 0;
-  } else if (sender () == mp_libraries_frame) {
+  } else if (sender == mp_libraries_frame) {
     mp_libraries_frame = 0;
     mp_libraries_view = 0;
-  } else if (sender () == mp_editor_options_frame) {
+  } else if (sender == mp_editor_options_frame) {
     mp_editor_options_frame = 0;
-  } else if (sender () == mp_bookmarks_frame) {
+  } else if (sender == mp_bookmarks_frame) {
     mp_bookmarks_frame = 0;
     mp_bookmarks_view = 0;
   }
-}
-
-void LayoutView::hideEvent (QHideEvent *)
-{
-  hide_event ();
-}
-
-void LayoutView::showEvent (QShowEvent *)
-{
-  show_event ();
 }
 
 void LayoutView::set_current ()
@@ -613,6 +695,8 @@ LayoutView::set_current_layer (const lay::LayerPropertiesConstIterator &l)
 {
   if (mp_control_panel) {
     mp_control_panel->set_current_layer (l);
+  } else {
+    return LayoutViewBase::set_current_layer (l);
   }
 }
 
@@ -622,7 +706,7 @@ LayoutView::current_layer () const
   if (mp_control_panel) {
     return mp_control_panel->current_layer ();
   } else {
-    return lay::LayerPropertiesConstIterator ();
+    return LayoutViewBase::current_layer ();
   }
 }
 
@@ -632,7 +716,7 @@ LayoutView::selected_layers () const
   if (mp_control_panel) {
     return mp_control_panel->selected_layers ();
   } else {
-    return std::vector<lay::LayerPropertiesConstIterator> ();
+    return LayoutViewBase::selected_layers ();
   }
 }
 
@@ -641,6 +725,8 @@ LayoutView::set_selected_layers (const std::vector<lay::LayerPropertiesConstIter
 {
   if (mp_control_panel) {
     mp_control_panel->set_selection (sel);
+  } else {
+    LayoutViewBase::set_selected_layers (sel);
   }
 }
 
@@ -649,6 +735,8 @@ LayoutView::begin_layer_updates ()
 {
   if (mp_control_panel) {
     mp_control_panel->begin_updates ();
+  } else {
+    LayoutViewBase::begin_layer_updates ();
   }
 }
 
@@ -657,6 +745,8 @@ LayoutView::end_layer_updates ()
 {
   if (mp_control_panel) {
     mp_control_panel->end_updates ();
+  } else {
+    LayoutViewBase::end_layer_updates ();
   }
 }
 
@@ -668,23 +758,27 @@ LayoutView::layer_model_updated ()
   if (mp_control_panel) {
     return mp_control_panel->model_updated ();
   } else {
-    return false;
+    return LayoutViewBase::layer_model_updated ();
   }
 }
 
 void
 LayoutView::bookmark_current_view ()
 {
+  if (! mp_widget) {
+    return;
+  }
+
   QString proposed_name = tl::to_qstring (bookmarks ().propose_new_bookmark_name ());
 
   while (true) {
     bool ok = false;
-    QString text = QInputDialog::getText (this, QObject::tr ("Enter Bookmark Name"), QObject::tr ("Bookmark name"),
+    QString text = QInputDialog::getText (mp_widget, QObject::tr ("Enter Bookmark Name"), QObject::tr ("Bookmark name"),
                                           QLineEdit::Normal, proposed_name, &ok);
     if (! ok) {
       break;
     } else if (text.isEmpty ()) {
-      QMessageBox::critical (this, QObject::tr ("Error"), QObject::tr ("Enter a name for the bookmark"));
+      QMessageBox::critical (mp_widget, QObject::tr ("Error"), QObject::tr ("Enter a name for the bookmark"));
     } else {
       bookmark_view (tl::to_string (text));
       break;
@@ -695,12 +789,16 @@ LayoutView::bookmark_current_view ()
 void
 LayoutView::manage_bookmarks ()
 {
+  if (! mp_widget) {
+    return;
+  }
+
   std::set<size_t> selected_bm;
   if (mp_bookmarks_frame->isVisible ()) {
     selected_bm = mp_bookmarks_view->selected_bookmarks ();
   }
 
-  BookmarkManagementForm dialog (this, "bookmark_form", bookmarks (), selected_bm);
+  BookmarkManagementForm dialog (mp_widget, "bookmark_form", bookmarks (), selected_bm);
   if (dialog.exec ()) {
     bookmarks (dialog.bookmarks ());
   }
@@ -710,7 +808,9 @@ void
 LayoutView::bookmarks_changed ()
 {
   mp_bookmarks_view->refresh ();
-  emit menu_needs_update ();
+  if (mp_widget) {
+    mp_widget->emit_menu_needs_update ();
+  }
 }
 
 void
@@ -739,14 +839,18 @@ LayoutView::max_hier_changed (int i)
   set_hier_levels (std::make_pair (get_hier_levels ().first, i));
 }
 
-lay::Color
+tl::Color
 LayoutView::default_background_color ()
 {
-  return lay::Color (palette ().color (QPalette::Normal, QPalette::Base).rgb ());
+  if (! mp_widget) {
+    return LayoutViewBase::default_background_color ();
+  } else {
+    return tl::Color (mp_widget->palette ().color (QPalette::Normal, QPalette::Base).rgb ());
+  }
 }
 
 void 
-LayoutView::do_set_background_color (lay::Color c, lay::Color contrast)
+LayoutView::do_set_background_color (tl::Color c, tl::Color contrast)
 {
   if (mp_control_panel) {
     mp_control_panel->set_background_color (c);
@@ -878,33 +982,53 @@ LayoutView::cut ()
 int
 LayoutView::active_cellview_index () const
 {
-  return mp_hierarchy_panel->active ();
+  if (mp_hierarchy_panel) {
+    return mp_hierarchy_panel->active ();
+  } else {
+    return LayoutViewBase::active_cellview_index ();
+  }
 }
 
 void 
 LayoutView::set_active_cellview_index (int index) 
 {
   if (index >= 0 && index < int (cellviews ())) {
-    mp_hierarchy_panel->select_active (index);
+    if (mp_hierarchy_panel) {
+      mp_hierarchy_panel->select_active (index);
+    } else {
+      LayoutViewBase::set_active_cellview_index (index);
+    }
   }
 }
 
 void 
 LayoutView::selected_cells_paths (int cv_index, std::vector<cell_path_type> &paths) const
 {
-  mp_hierarchy_panel->selected_cells (cv_index, paths);
+  if (mp_hierarchy_panel) {
+    mp_hierarchy_panel->selected_cells (cv_index, paths);
+  } else {
+    LayoutViewBase::selected_cells_paths (cv_index, paths);
+  }
 }
 
 void
 LayoutView::current_cell_path (int cv_index, cell_path_type &path) const
 {
-  mp_hierarchy_panel->current_cell (cv_index, path);
+  if (mp_hierarchy_panel) {
+    mp_hierarchy_panel->current_cell (cv_index, path);
+  } else {
+    LayoutViewBase::current_cell_path (cv_index, path);
+  }
 }
 
 void
 LayoutView::set_current_cell_path (int cv_index, const cell_path_type &path) 
 {
-  mp_hierarchy_panel->set_current_cell (cv_index, path);
+  if (mp_hierarchy_panel) {
+    mp_hierarchy_panel->set_current_cell (cv_index, path);
+  } else {
+    LayoutViewBase::set_current_cell_path (cv_index, path);
+  }
 }
 
 void
@@ -931,7 +1055,10 @@ LayoutView::deactivate ()
     }
   }
 
-  emit clear_current_pos ();
+  if (mp_widget) {
+    mp_widget->emit_clear_current_pos ();
+  }
+
   free_resources ();
   mp_timer->stop ();
   m_activated = false;
@@ -964,6 +1091,10 @@ LayoutView::update_content_for_cv (int cellview_index)
 void
 LayoutView::current_pos (double x, double y)
 {
+  if (! mp_widget) {
+    return;
+  }
+
   if (m_activated) {
     if (dbu_coordinates ()) {
       double dx = 0.0, dy = 0.0;
@@ -972,9 +1103,9 @@ LayoutView::current_pos (double x, double y)
         dx = x / dbu;
         dy = y / dbu;
       }
-      emit current_pos_changed (dx, dy, true);
+      mp_widget->emit_current_pos_changed (dx, dy, true);
     } else {
-      emit current_pos_changed (x, y, false);
+      mp_widget->emit_current_pos_changed (x, y, false);
     }
   }
 }
@@ -982,25 +1113,33 @@ LayoutView::current_pos (double x, double y)
 void
 LayoutView::emit_edits_enabled_changed ()
 {
-  emit edits_enabled_changed ();
+  if (mp_widget) {
+    mp_widget->emit_edits_enabled_changed ();
+  }
 }
 
 void
 LayoutView::emit_title_changed ()
 {
-  emit title_changed ();
+  if (mp_widget) {
+    mp_widget->emit_title_changed ();
+  }
 }
 
 void
 LayoutView::emit_dirty_changed ()
 {
-  emit dirty_changed ();
+  if (mp_widget) {
+    mp_widget->emit_dirty_changed ();
+  }
 }
 
 void
 LayoutView::emit_layer_order_changed ()
 {
-  emit layer_order_changed ();
+  if (mp_widget) {
+    mp_widget->emit_layer_order_changed ();
+  }
 }
 
 void
@@ -1016,7 +1155,9 @@ LayoutView::signal_selection_changed ()
 void
 LayoutView::message (const std::string &s, int timeout)
 {
-  emit show_message (s, timeout * 1000);
+  if (mp_widget) {
+    mp_widget->emit_show_message (s, timeout * 1000);
+  }
 }
 
 void
@@ -1050,7 +1191,9 @@ LayoutView::switch_mode (int m)
 {
   if (mode () != m) {
     mode (m);
-    emit mode_change (m);
+    if (mp_widget) {
+      mp_widget->emit_mode_change (m);
+    }
   }
 }
 
@@ -1073,7 +1216,7 @@ LayoutView::open_rdb_browser (int rdb_index, int cv_index)
 }
 
 QSize
-LayoutView::sizeHint () const
+LayoutView::size_hint () const
 {
   if ((options () & LV_Naked) != 0) {
     return QSize (200, 200);

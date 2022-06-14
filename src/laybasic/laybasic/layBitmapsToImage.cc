@@ -25,7 +25,7 @@
 #include "layBitmap.h"
 #include "layDitherPattern.h"
 #include "layLineStyles.h"
-#include "layPixelBuffer.h"
+#include "tlPixelBuffer.h"
 #include "tlTimer.h"
 #include "tlAssert.h"
 #include "tlThreads.h"
@@ -426,7 +426,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
                   const std::vector<lay::Bitmap *> &pbitmaps_in,
                   const lay::DitherPattern &dp,
                   const lay::LineStyles &ls,
-                  PixelBuffer *pimage, unsigned int width, unsigned int height,
+                  tl::PixelBuffer *pimage, unsigned int width, unsigned int height,
                   bool use_bitmap_index,
                   tl::Mutex *mutex)
 {
@@ -462,7 +462,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
 
   std::vector<lay::ViewOp> view_ops;
   std::vector<const lay::Bitmap *> pbitmaps;
-  std::vector<std::pair <lay::color_t, lay::color_t> > masks;
+  std::vector<std::pair <tl::color_t, tl::color_t> > masks;
   std::vector<uint32_t> non_empty_sls;
 
   view_ops.reserve (n_in);
@@ -588,13 +588,13 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
 
     if (masks.size () > 0) {
 
-      lay::color_t *pt = (lay::color_t *) pimage->scan_line (height - 1 - y);
+      tl::color_t *pt = (tl::color_t *) pimage->scan_line (height - 1 - y);
       uint32_t *dptr_end = dptr; 
 
       unsigned int i = 0;
       for (unsigned int x = 0; x < width; x += 32, ++i) {
 
-        lay::color_t y[32];
+        tl::color_t y[32];
         if (transparent) {
           for (int i = 0; i < 32; ++i) {
             y[i] = 0;
@@ -605,7 +605,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
           }
         };
 
-        lay::color_t z[32] = { 
+        tl::color_t z[32] = { 
           lay::wordones, lay::wordones, lay::wordones, lay::wordones, 
           lay::wordones, lay::wordones, lay::wordones, lay::wordones, 
           lay::wordones, lay::wordones, lay::wordones, lay::wordones, 
@@ -666,7 +666,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
                   const std::vector<lay::Bitmap *> &pbitmaps_in,
                   const lay::DitherPattern &dp,
                   const lay::LineStyles &ls,
-                  lay::BitmapBuffer *pimage, unsigned int width, unsigned int height,
+                  tl::BitmapBuffer *pimage, unsigned int width, unsigned int height,
                   bool use_bitmap_index,
                   tl::Mutex *mutex)
 {
@@ -700,7 +700,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
 
   std::vector<lay::ViewOp> view_ops;
   std::vector<const lay::Bitmap *> pbitmaps;
-  std::vector<std::pair <lay::color_t, lay::color_t> > masks;
+  std::vector<std::pair <tl::color_t, tl::color_t> > masks;
   std::vector<uint32_t> non_empty_sls;
 
   view_ops.reserve (n_in);
@@ -825,7 +825,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
 
     if (masks.size () > 0) {
 
-      lay::color_t *pt = (lay::color_t *) pimage->scan_line (height - 1 - y);
+      tl::color_t *pt = (tl::color_t *) pimage->scan_line (height - 1 - y);
       uint32_t *dptr_end = dptr; 
 
       unsigned int i = 0;

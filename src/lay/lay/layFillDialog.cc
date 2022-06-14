@@ -34,6 +34,7 @@
 #include "tlExceptions.h"
 #include "layMainWindow.h"
 #include "layCellSelectionForm.h"
+#include "layUtils.h"
 #include "edtService.h"
 
 namespace lay
@@ -64,7 +65,11 @@ public:
  
    virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
    {
-     return new FillDialog (root, view);
+     if (lay::has_gui ()) {
+       return new FillDialog (root, view);
+     } else {
+       return 0;
+     }
    }
 };
 

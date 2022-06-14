@@ -531,7 +531,7 @@ D25ViewWidget::clear ()
   }
 }
 
-static void color_to_gl (color_t color, GLfloat (&gl_color) [4])
+static void color_to_gl (tl::color_t color, GLfloat (&gl_color) [4])
 {
   gl_color[0] = ((color >> 16) & 0xff) / 255.0f;
   gl_color[1] = ((color >> 8) & 0xff) / 255.0f;
@@ -539,7 +539,7 @@ static void color_to_gl (color_t color, GLfloat (&gl_color) [4])
   gl_color[3] = 1.0f;
 }
 
-static void color_to_gl (const color_t *color, GLfloat (&gl_color) [4])
+static void color_to_gl (const tl::color_t *color, GLfloat (&gl_color) [4])
 {
   if (! color) {
     for (unsigned int i = 0; i < 4; ++i) {
@@ -567,7 +567,7 @@ static void lp_to_info (const lay::LayerPropertiesNode &lp, D25ViewWidget::Layer
 }
 
 void
-D25ViewWidget::open_display (const color_t *frame_color, const color_t *fill_color, const db::LayerProperties *like, const std::string *name)
+D25ViewWidget::open_display (const tl::color_t *frame_color, const tl::color_t *fill_color, const db::LayerProperties *like, const std::string *name)
 {
   m_vertex_chunks.push_back (triangle_chunks_type ());
   m_line_chunks.push_back (line_chunks_type ());
@@ -648,7 +648,7 @@ D25ViewWidget::enter (const db::RecursiveShapeIterator *iter, double zstart, dou
     } else {
 
       //  sequential assignment
-      lay::color_t color = mp_view->get_palette ().luminous_color_by_index (m_layers.size ());
+      tl::color_t color = mp_view->get_palette ().luminous_color_by_index (m_layers.size ());
       color_to_gl (color, info.fill_color);
 
     }
@@ -1089,7 +1089,7 @@ D25ViewWidget::paintGL ()
   const qreal retina_scale = devicePixelRatio ();
   glViewport (0, 0, width () * retina_scale, height () * retina_scale);
 
-  lay::Color c = mp_view->background_color ();
+  tl::Color c = mp_view->background_color ();
   float foreground_rgb = (c.to_mono () ? 0.0f : 1.0f);
   float ambient = (c.to_mono () ? 0.8f : 0.25f);
   float mist_factor = (c.to_mono () ? 0.2f : 0.4f);

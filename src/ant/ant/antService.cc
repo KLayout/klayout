@@ -727,7 +727,7 @@ is_selected (const ant::Object &ruler, const db::DBox &box, double /*enl*/)
 // -------------------------------------------------------------
 
 View::View (ant::Service *rulers, const ant::Object *ruler, bool selected)
-  : lay::ViewObject (rulers->widget ()), 
+  : lay::ViewObject (rulers->ui ()), 
     mp_rulers (rulers), m_selected (selected), mp_ruler (ruler)
 {
   //  .. nothing else ..
@@ -763,7 +763,7 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 
   int basic_width = int(0.5 + 1.0 / canvas.resolution ());
 
-  lay::Color c (mp_rulers->color ());
+  tl::Color c (mp_rulers->color ());
   if (! c.is_valid ()) {
     c = canvas.foreground_color ();
   }
@@ -823,12 +823,12 @@ Service::configure (const std::string &name, const std::string &value)
 
   if (name == cfg_ruler_color) {
 
-    lay::Color color;
+    tl::Color color;
     lay::ColorConverter ().from_string (value, color);
 
     //  make the color available for the dynamic view objects too.
     if (lay::test_and_set (m_color, color)) {
-      widget ()->touch ();
+      ui ()->touch ();
     }
 
   } else if (name == cfg_ruler_halo) {
@@ -838,7 +838,7 @@ Service::configure (const std::string &name, const std::string &value)
 
     //  make the color available for the dynamic view objects too.
     if (lay::test_and_set (m_halo, halo)) {
-      widget ()->touch ();
+      ui ()->touch ();
     }
 
   } else if (name == cfg_ruler_grid_micron) {
@@ -914,7 +914,7 @@ Service::annotations_changed ()
 }
 
 std::vector <lay::ViewOp>
-Service::get_view_ops (lay::RedrawThreadCanvas &canvas, lay::Color background, lay::Color foreground, lay::Color /*active*/) const
+Service::get_view_ops (lay::RedrawThreadCanvas &canvas, tl::Color background, tl::Color foreground, tl::Color /*active*/) const
 {
   int basic_width = int(0.5 + 1.0 / canvas.resolution ());
 
@@ -967,20 +967,20 @@ Service::clear_rulers ()
 double
 Service::catch_distance ()
 {
-  return double (view ()->search_range ()) / widget ()->mouse_event_trans ().mag ();
+  return double (view ()->search_range ()) / ui ()->mouse_event_trans ().mag ();
 }
 
 double
 Service::catch_distance_box ()
 {
-  return double (view ()->search_range_box ()) / widget ()->mouse_event_trans ().mag ();
+  return double (view ()->search_range_box ()) / ui ()->mouse_event_trans ().mag ();
 }
 
 void
 Service::drag_cancel () 
 {
   if (m_drawing) {
-    widget ()->ungrab_mouse (this);
+    ui ()->ungrab_mouse (this);
     m_drawing = false;
   }
 
@@ -1110,7 +1110,7 @@ bool
 Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::angle_constraint_type /*ac*/)
 {
   //  cancel any pending move or drag operations, reset mp_active_ruler
-  widget ()->drag_cancel (); // KLUDGE: every service does this to the same service manager
+  ui ()->drag_cancel (); // KLUDGE: every service does this to the same service manager
 
   clear_transient_selection ();
 
@@ -1558,7 +1558,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
           g = db::DVector (m_grid, m_grid);
         }
 
-        double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
+        double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
         snap_range *= 0.5;
 
         lay::TwoPointSnapToObjectResult ee = lay::obj_snap2 (mp_view, p, g, ac, snap_range, snap_range * 1000.0);
@@ -1592,7 +1592,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
         mp_active_ruler->thaw ();
         m_drawing = true;
 
-        widget ()->grab_mouse (this, false);
+        ui ()->grab_mouse (this, false);
 
       }
 
@@ -1627,7 +1627,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 ant::Object
 Service::create_measure_ruler (const db::DPoint &pt, lay::angle_constraint_type ac)
 {
-  double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
+  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
   snap_range *= 0.5;
 
   ant::Template tpl;
@@ -1687,7 +1687,7 @@ Service::snap1_details (const db::DPoint &p, bool obj_snap)
     g = db::DVector (m_grid, m_grid);
   }
 
-  double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
+  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
   return lay::obj_snap (obj_snap ? mp_view : 0, p, g, snap_range);
 }
 
@@ -1707,7 +1707,7 @@ Service::snap2_details (const db::DPoint &p1, const db::DPoint &p2, const ant::O
     g = db::DVector (m_grid, m_grid);
   }
 
-  double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
+  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
   lay::angle_constraint_type snap_mode = ac == lay::AC_Global ? (obj->angle_constraint () == lay::AC_Global ? m_snap_mode : obj->angle_constraint ()) : ac;
 
   return lay::obj_snap (m_obj_snap && obj->snap () ? mp_view : 0, p1, p2, g, snap_mode, snap_range);

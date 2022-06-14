@@ -90,7 +90,7 @@ private:
 // -------------------------------------------------------------
 
 static void
-draw_scanline (unsigned int level, const img::Object &image_object, lay::PixelBuffer &pxbuffer, int y, const db::Matrix3d &t, const db::Matrix3d &it, const db::DPoint &q1, const db::DPoint &q2)
+draw_scanline (unsigned int level, const img::Object &image_object, tl::PixelBuffer &pxbuffer, int y, const db::Matrix3d &t, const db::Matrix3d &it, const db::DPoint &q1, const db::DPoint &q2)
 {
   double source_width = image_object.width ();
   double source_height = image_object.height ();
@@ -122,8 +122,8 @@ draw_scanline (unsigned int level, const img::Object &image_object, lay::PixelBu
     double dpx = (p2.x () - p1.x ()) / double (xstop - xstart);
     double dpy = (p2.y () - p1.y ()) / double (xstop - xstart);
 
-    lay::color_t *scanline_data = pxbuffer.scan_line (pxbuffer.height () - y - 1) + xstart;
-    lay::color_t *pixel_data = (lay::color_t *) image_object.pixel_data ();
+    tl::color_t *scanline_data = pxbuffer.scan_line (pxbuffer.height () - y - 1) + xstart;
+    tl::color_t *pixel_data = (tl::color_t *) image_object.pixel_data ();
     const unsigned char *mask_data = image_object.mask ();
 
     for (int x = xstart; x < xstop; ++x) {
@@ -155,7 +155,7 @@ draw_image (const img::Object &image_object, const lay::Viewport &vp, lay::ViewO
     return;
   }
 
-  lay::PixelBuffer &image = *bmp_canvas->bg_image ();
+  tl::PixelBuffer &image = *bmp_canvas->bg_image ();
   db::DBox source_image_box (0.0, 0.0, image_object.width (), image_object.height ());
 
   //  safety measure to avoid division by zero.
@@ -410,7 +410,7 @@ View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
 //  img::Service implementation
 
 Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
-  : lay::BackgroundViewObject (view->view_object_widget ()),
+  : lay::BackgroundViewObject (view->canvas ()),
     lay::Editable (view),
     lay::Plugin (view),
     db::Object (manager),

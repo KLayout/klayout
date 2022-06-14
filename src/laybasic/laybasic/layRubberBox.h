@@ -34,7 +34,7 @@ class LAYBASIC_PUBLIC RubberBox
   : public lay::ViewObject
 {
 public: 
-  RubberBox (lay::ViewObjectWidget *canvas, unsigned int color, const db::DPoint &p1, const db::DPoint &p2);
+  RubberBox (lay::ViewObjectUI *canvas, unsigned int color, const db::DPoint &p1, const db::DPoint &p2);
 
   void set_color (unsigned int color);
   void set_stipple (unsigned int s);

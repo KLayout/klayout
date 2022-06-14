@@ -235,11 +235,8 @@ struct OpDeleteLayerProps
 
 const double animation_interval = 0.5;
 
-LayoutViewBase::LayoutViewBase (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options) :
-#if defined(HAVE_QT)
-    QFrame (0),
-#endif
-    lay::Dispatcher (plugin_parent, false /*not standalone*/),
+LayoutViewBase::LayoutViewBase (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+  : lay::Dispatcher (plugin_parent, false /*not standalone*/),
     mp_ui (0),
     m_editable (editable),
     m_options (options),
@@ -251,15 +248,8 @@ LayoutViewBase::LayoutViewBase (db::Manager *manager, bool editable, lay::Plugin
   init (manager);
 }
 
-#if defined(HAVE_QT)
-LayoutViewBase::LayoutViewBase (QWidget *parent, lay::LayoutView *ui, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options) :
-#else
-LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options) :
-#endif
-#if defined(HAVE_QT)
-    QFrame (parent),
-#endif
-    lay::Dispatcher (plugin_parent, false /*not standalone*/),
+LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+  : lay::Dispatcher (plugin_parent, false /*not standalone*/),
     mp_ui (ui),
     m_editable (editable),
     m_options (options),
@@ -271,15 +261,8 @@ LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, db::Manager *manager, bool 
   init (manager);
 }
 
-#if defined(HAVE_QT)
-LayoutViewBase::LayoutViewBase (QWidget *parent, lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options) :
-#else
-LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options) :
-#endif
-#if defined(HAVE_QT)
-    QFrame (parent),
-#endif
-    lay::Dispatcher (plugin_parent, false /*not standalone*/),
+LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+  : lay::Dispatcher (plugin_parent, false /*not standalone*/),
     mp_ui (ui),
     m_editable (editable),
     m_options (options),
@@ -344,7 +327,7 @@ LayoutViewBase::init (db::Manager *mgr)
   m_paste_display_mode = 2;
   m_guiding_shape_visible = true;
   m_guiding_shape_line_width = 1;
-  m_guiding_shape_color = lay::Color ();
+  m_guiding_shape_color = tl::Color ();
   m_guiding_shape_vertex_size = 5;
   m_to_level = 0;
   m_ctx_dimming = 50;
@@ -405,11 +388,7 @@ LayoutViewBase::init (db::Manager *mgr)
   m_layer_properties_lists.back ()->attach_view (this, (unsigned int) (m_layer_properties_lists.size () - 1));
   m_current_layer_list = 0;
 
-#if defined(HAVE_QT)
-  mp_canvas = new lay::LayoutCanvas (widget (), this);
-#else
   mp_canvas = new lay::LayoutCanvas (this);
-#endif
 
   //  occupy services and editables:
   //  these services get deleted by the canvas destructor automatically:
@@ -429,7 +408,47 @@ LayoutViewBase::init (db::Manager *mgr)
   create_plugins ();
 }
 
-LayoutViewBase::~LayoutViewBase ()
+void
+LayoutViewBase::finish ()
+{
+  //  if we're the root dispatcher initialize the menu and build the context menus. No other menus are built so far.
+  if (dispatcher () == this) {
+#if defined(HAVE_QT)
+    set_menu_parent_widget (widget ());
+    init_menu ();
+    if (widget ()) {
+      menu ()->build (0, 0);
+    }
+#else
+    init_menu ();
+#endif
+  }
+}
+
+void
+LayoutViewBase::init_menu ()
+{
+  make_menu ();
+
+  //  make the plugins create their menu items
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+    //  TODO: get rid of the const_cast hack
+    const_cast <lay::PluginDeclaration *> (&*cls)->init_menu (dispatcher ());
+  }
+
+  //  if not in editable mode, hide all entries from "edit_mode" group and show all from the "view_mode" group and vice versa
+  std::vector<std::string> edit_mode_grp = menu ()->group ("edit_mode");
+  for (std::vector<std::string>::const_iterator g = edit_mode_grp.begin (); g != edit_mode_grp.end (); ++g) {
+    menu ()->action (*g)->set_visible (is_editable ());
+  }
+  std::vector<std::string> view_mode_grp = menu ()->group ("view_mode");
+  for (std::vector<std::string>::const_iterator g = view_mode_grp.begin (); g != view_mode_grp.end (); ++g) {
+    menu ()->action (*g)->set_visible (! is_editable ());
+  }
+}
+
+void
+LayoutViewBase::shutdown ()
 {
   //  detach all observers
   //  This is to prevent signals to partially destroyed observers that own a LayoutViewBase
@@ -478,10 +497,15 @@ LayoutViewBase::~LayoutViewBase ()
     delete *p;
   }
 
-  //  detach from the manager, so we can safely delete the manager 
+  //  detach from the manager, so we can safely delete the manager
   manager (0);
 
   stop ();
+}
+
+LayoutViewBase::~LayoutViewBase ()
+{
+  shutdown ();
 
   //  because LayoutViewBase and LayoutCanvas both control lifetimes of
   //  ruler objects for example, it is safer to explicitly delete the
@@ -728,7 +752,7 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_background_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     background_color (color);
     //  do not take - let others receive the background color events as well
@@ -773,7 +797,7 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_ctx_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     ctx_color (color);
     return true;
@@ -794,7 +818,7 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_child_ctx_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     child_ctx_color (color);
     return true;
@@ -878,14 +902,14 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_cell_box_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     cell_box_color (color);
     return true;
 
   } else if (name == cfg_text_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     text_color (color);
     return true;
@@ -1004,14 +1028,14 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_guiding_shape_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     guiding_shapes_color (color);
     return true;
 
   } else if (name == cfg_guiding_shape_color) {
 
-    lay::Color color;
+    tl::Color color;
     ColorConverter ().from_string (value, color);
     guiding_shapes_color (color);
     return true;
@@ -1166,7 +1190,7 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_sel_color) {
 
-    lay::Color color;
+    tl::Color color;
     lay::ColorConverter ().from_string (value, color);
 
     //  Change the color
@@ -2308,6 +2332,38 @@ LayoutViewBase::bookmark_view (const std::string &name)
   bookmarks_changed ();
 }
 
+bool
+LayoutViewBase::is_single_cv_layer_properties_file (const std::string &fn)
+{
+  //  If the file contains information for a single layout but we have multiple ones,
+  //  show the dialog to determine what layout to apply the information to.
+  std::vector<lay::LayerPropertiesList> props;
+  try {
+    tl::XMLFileSource in (fn);
+    props.push_back (lay::LayerPropertiesList ());
+    props.back ().load (in);
+  } catch (...) {
+    props.clear ();
+    tl::XMLFileSource in (fn);
+    lay::LayerPropertiesList::load (in, props);
+  }
+
+  //  Collect all cv indices in the layer properties
+  std::set <int> cv;
+  for (std::vector<lay::LayerPropertiesList>::const_iterator p = props.begin (); p != props.end (); ++p) {
+    for (lay::LayerPropertiesConstIterator lp = p->begin_const_recursive (); ! lp.at_end (); ++lp) {
+      if (! lp->has_children ()) {
+        cv.insert (lp->source (true).cv_index ());
+        if (cv.size () >= 2) {
+          break;
+        }
+      }
+    }
+  }
+
+  return (cv.size () == 1);
+}
+
 void 
 LayoutViewBase::load_layer_props (const std::string &fn)
 {
@@ -2486,7 +2542,7 @@ LayoutViewBase::init_layer_properties (LayerProperties &p) const
 void 
 LayoutViewBase::init_layer_properties (LayerProperties &p, const LayerPropertiesList &lp_list) const
 {
-  lay::color_t c = 0;
+  tl::color_t c = 0;
   if (m_palette.luminous_colors () > 0) {
     c = m_palette.luminous_color_by_index (p.source (true /*real*/).color_index ());
   }
@@ -2517,7 +2573,7 @@ LayoutViewBase::get_screenshot ()
 }
 #endif
 
-lay::PixelBuffer
+tl::PixelBuffer
 LayoutViewBase::get_screenshot_pb ()
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save screenshot")));
@@ -2570,7 +2626,7 @@ LayoutViewBase::save_screenshot (const std::string &fn)
 
   tl::log << "Saved screen shot to " << fn;
 }
-#else
+#elif defined(HAVE_PNG)
 void
 LayoutViewBase::save_screenshot (const std::string &fn)
 {
@@ -2580,11 +2636,17 @@ LayoutViewBase::save_screenshot (const std::string &fn)
   tl::DeferredMethodScheduler::execute ();
 
   tl::OutputStream stream (fn);
-  lay::PixelBuffer img = mp_canvas->screenshot ();
+  tl::PixelBuffer img = mp_canvas->screenshot ();
   img.set_texts (png_texts (this, box ()));
   img.write_png (stream);
 
   tl::log << "Saved screen shot to " << fn;
+}
+#else
+void
+LayoutViewBase::save_screenshot (const std::string &)
+{
+  throw tl::Exception (tl::to_string (tr ("Unable to write screenshot - PNG library not compiled in")));
 }
 #endif
 
@@ -2601,7 +2663,7 @@ LayoutViewBase::get_image (unsigned int width, unsigned int height)
 }
 #endif
 
-lay::PixelBuffer
+tl::PixelBuffer
 LayoutViewBase::get_pixels (unsigned int width, unsigned int height)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
@@ -2615,7 +2677,7 @@ LayoutViewBase::get_pixels (unsigned int width, unsigned int height)
 #if defined(HAVE_QT)
 QImage
 LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
-                                        lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
+                                        tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
@@ -2630,9 +2692,9 @@ LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height,
 }
 #endif
 
-lay::PixelBuffer
+tl::PixelBuffer
 LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
-                                         lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box)
+                                         tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
@@ -2642,9 +2704,9 @@ LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height
   return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box);
 }
 
-lay::BitmapBuffer
+tl::BitmapBuffer
 LayoutViewBase::get_pixels_with_options_mono (unsigned int width, unsigned int height, int linewidth,
-                                              lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box)
+                                              tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
@@ -2677,7 +2739,7 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
 
   tl::log << "Saved image to " << fn;
 }
-#else
+#elif defined(HAVE_PNG)
 void
 LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned int height)
 {
@@ -2689,12 +2751,18 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
   tl::DeferredMethodScheduler::execute ();
 
   tl::OutputStream stream (fn);
-  lay::PixelBuffer img = mp_canvas->image (width, height);
+  tl::PixelBuffer img = mp_canvas->image (width, height);
   std::vector<std::pair<std::string, std::string> > texts = png_texts (this, vp.box ());
   img.set_texts (texts);
   img.write_png (stream);
 
   tl::log << "Saved image to " << fn;
+}
+#else
+void
+LayoutViewBase::save_image (const std::string &, unsigned int, unsigned int)
+{
+  throw tl::Exception (tl::to_string (tr ("Unable to save image - PNG library not compiled in")));
 }
 #endif
 
@@ -2702,7 +2770,7 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
 void
 LayoutViewBase::save_image_with_options (const std::string &fn,
                                          unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
-                                         lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
+                                         tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
 
@@ -2729,11 +2797,11 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
 
   tl::log << "Saved image to " << fn;
 }
-#else
+#elif defined(HAVE_PNG)
 void
 LayoutViewBase::save_image_with_options (const std::string &fn,
                                          unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
-                                         lay::Color background, lay::Color foreground, lay::Color active, const db::DBox &target_box, bool monochrome)
+                                         tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
 
@@ -2746,19 +2814,27 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
   tl::OutputStream stream (fn);
   if (monochrome) {
 
-    lay::BitmapBuffer img = mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box);
+    tl::BitmapBuffer img = mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box);
     img.set_texts (texts);
     img.write_png (stream);
 
   } else {
 
-    lay::PixelBuffer img = mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box);
+    tl::PixelBuffer img = mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box);
     img.set_texts (texts);
     img.write_png (stream);
 
   }
 
   tl::log << "Saved image to " << fn;
+}
+#else
+void
+LayoutViewBase::save_image_with_options (const std::string &,
+                                         unsigned int, unsigned int, int, int, double,
+                                         tl::Color, tl::Color, tl::Color, const db::DBox &, bool)
+{
+  throw tl::Exception (tl::to_string (tr ("Unable to save image - PNG library not compiled in")));
 }
 #endif
 
@@ -3375,7 +3451,7 @@ LayoutViewBase::box () const
 QWidget *
 LayoutViewBase::widget ()
 {
-  return this;
+  return 0;
 }
 #endif
 
@@ -3391,7 +3467,7 @@ LayoutViewBase::timer ()
 {
   bool dirty = false;
   for (std::list<lay::CellView>::const_iterator i = m_cellviews.begin (); i != m_cellviews.end () && ! dirty; ++i) {
-    dirty = (*i)->layout ().is_editable () && (*i)->is_dirty ();
+    dirty = (*i).is_valid () && (*i)->layout ().is_editable () && (*i)->is_dirty ();
   }
 
   if (dirty != m_dirty) {
@@ -3758,7 +3834,7 @@ LayoutViewBase::set_view_ops ()
   std::vector <lay::ViewOp> view_ops;
   view_ops.reserve (nlayers * planes_per_layer + special_planes_before + special_planes_after);
 
-  lay::Color box_color;
+  tl::Color box_color;
   if (! m_box_color.is_valid ()) {
     box_color = mp_canvas->foreground_color ();
   } else {
@@ -3817,7 +3893,7 @@ LayoutViewBase::set_view_ops ()
 
   //  produce the ViewOps for the guiding shapes
 
-  color_t gs_color = box_color.rgb ();
+  tl::color_t gs_color = box_color.rgb ();
   if (m_guiding_shape_color.is_valid ()) {
     gs_color = m_guiding_shape_color.rgb ();
   }
@@ -3826,7 +3902,7 @@ LayoutViewBase::set_view_ops ()
 
     lay::ViewOp::Mode mode = lay::ViewOp::Copy;
 
-    color_t fill_color, frame_color, text_color;
+    tl::color_t fill_color, frame_color, text_color;
     int dp = 1; // no stipples for guiding shapes 
 
     if (ctx == 0) {
@@ -3941,7 +4017,7 @@ LayoutViewBase::set_view_ops ()
           }
         }
 
-        color_t fill_color, frame_color, text_color;
+        tl::color_t fill_color, frame_color, text_color;
         int dp = m_no_stipples ? 1 : l->dither_pattern (true /*real*/);
         int ls = l->line_style (true /*real*/);
 
@@ -4044,7 +4120,7 @@ LayoutViewBase::guiding_shapes_visible (bool v)
 }
 
 void
-LayoutViewBase::guiding_shapes_color (lay::Color c)
+LayoutViewBase::guiding_shapes_color (tl::Color c)
 {
   if (c != m_guiding_shape_color) {
     m_guiding_shape_color = c;
@@ -4107,7 +4183,7 @@ LayoutViewBase::drop_small_cells_cond (drop_small_cells_cond_type t)
 }
 
 void 
-LayoutViewBase::cell_box_color (lay::Color c)
+LayoutViewBase::cell_box_color (tl::Color c)
 {
   if (c != m_box_color) {
     m_box_color = c;
@@ -4229,7 +4305,7 @@ LayoutViewBase::set_palette (const lay::LineStylePalette &p)
 }
 
 void
-LayoutViewBase::ctx_color (lay::Color c)
+LayoutViewBase::ctx_color (tl::Color c)
 {
   if (c != m_ctx_color) {
     m_ctx_color = c;
@@ -4256,7 +4332,7 @@ LayoutViewBase::ctx_hollow (bool h)
 }
 
 void
-LayoutViewBase::child_ctx_color (lay::Color c)
+LayoutViewBase::child_ctx_color (tl::Color c)
 {
   if (c != m_child_ctx_color) {
     m_child_ctx_color = c;
@@ -4312,20 +4388,20 @@ LayoutViewBase::abstract_mode_enabled (bool e)
   }
 }
 
-lay::Color
+tl::Color
 LayoutViewBase::default_background_color ()
 {
-  return lay::Color (0, 0, 0);  // black.
+  return tl::Color (0, 0, 0);  // black.
 }
 
 void
-LayoutViewBase::do_set_background_color (lay::Color /*color*/, lay::Color /*contrast*/)
+LayoutViewBase::do_set_background_color (tl::Color /*color*/, tl::Color /*contrast*/)
 {
   //  .. nothing yet ..
 }
 
 void 
-LayoutViewBase::background_color (lay::Color c)
+LayoutViewBase::background_color (tl::Color c)
 {
   if (c == mp_canvas->background_color ()) {
     return;
@@ -4336,11 +4412,11 @@ LayoutViewBase::background_color (lay::Color c)
     c = default_background_color ();
   }
 
-  lay::Color contrast;
+  tl::Color contrast;
   if (c.to_mono ()) {
-    contrast = lay::Color (0, 0, 0);
+    contrast = tl::Color (0, 0, 0);
   } else {
-    contrast = lay::Color (255, 255, 255);
+    contrast = tl::Color (255, 255, 255);
   }
 
   do_set_background_color (c, contrast);
@@ -4950,7 +5026,7 @@ LayoutViewBase::show_markers (bool f)
 }
 
 void
-LayoutViewBase::text_color (lay::Color c)
+LayoutViewBase::text_color (tl::Color c)
 {
   if (m_text_color != c) {
     m_text_color = c;
@@ -5330,6 +5406,110 @@ int
 LayoutViewBase::default_mode ()
 {
   return 0; // TODO: any generic scheme? is select, should be ruler..
+}
+
+static std::string
+name_from_title (const std::string &title)
+{
+  std::string s = title;
+  std::string::size_type tab = s.find ('\t');
+  if (tab != std::string::npos) {
+    s = std::string (s, 0, tab);
+  }
+  std::string::size_type colon = s.find (':');
+  if (colon != std::string::npos) {
+    s = std::string (s, 0, colon);
+  }
+  return s;
+}
+
+static bool
+edit_mode_from_title (const std::string &title)
+{
+  std::string s = title;
+  std::string::size_type tab = s.find ('\t');
+  if (tab != std::string::npos) {
+    s = std::string (s, 0, tab);
+  }
+  std::vector<std::string> parts = tl::split (s, ":");
+  for (auto i = parts.begin (); i != parts.end (); ++i) {
+    if (*i == "edit_mode") {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::vector<std::string>
+LayoutViewBase::mode_names () const
+{
+  std::vector<std::string> names;
+
+  std::vector<std::string> intrinsic_modes;
+  intrinsic_mouse_modes (&intrinsic_modes);
+  for (auto i = intrinsic_modes.begin (); i != intrinsic_modes.end (); ++i) {
+    names.push_back (name_from_title (*i));
+  }
+
+  for (auto i = mp_plugins.begin (); i != mp_plugins.end (); ++i) {
+    std::string title;
+    if ((*i) && (*i)->plugin_declaration () && (*i)->plugin_declaration ()->implements_mouse_mode (title)) {
+      if (is_editable () || !edit_mode_from_title (title)) {
+        names.push_back (name_from_title (title));
+      }
+    }
+  }
+
+  return names;
+}
+
+std::string
+LayoutViewBase::mode_name () const
+{
+  if (m_mode <= 0) {
+
+    std::vector<std::string> intrinsic_modes;
+    intrinsic_mouse_modes (&intrinsic_modes);
+
+    if (int (intrinsic_modes.size ()) > -m_mode) {
+      return name_from_title (intrinsic_modes [-m_mode]);
+    }
+
+  } else {
+
+    for (auto i = mp_plugins.begin (); i != mp_plugins.end (); ++i) {
+      std::string title;
+      if ((*i) && (*i)->plugin_declaration () && (*i)->plugin_declaration ()->id () == m_mode && (*i)->plugin_declaration ()->implements_mouse_mode (title)) {
+        return name_from_title (title);
+      }
+    }
+
+  }
+
+  return std::string ();
+}
+
+void
+LayoutViewBase::switch_mode (const std::string &name)
+{
+  std::vector<std::string> intrinsic_modes;
+  intrinsic_mouse_modes (&intrinsic_modes);
+  for (auto i = intrinsic_modes.begin (); i != intrinsic_modes.end (); ++i) {
+    if (name_from_title (*i) == name) {
+      switch_mode (int (0 - int (i - intrinsic_modes.begin ())));
+      return;
+    }
+  }
+
+  for (auto i = mp_plugins.begin (); i != mp_plugins.end (); ++i) {
+    std::string title;
+    if ((*i) && (*i)->plugin_declaration () && (*i)->plugin_declaration ()->implements_mouse_mode (title)) {
+      if (name_from_title (title) == name) {
+        switch_mode ((*i)->plugin_declaration ()->id ());
+        return;
+      }
+    }
+  }
 }
 
 std::vector<std::string>

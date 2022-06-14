@@ -27,7 +27,7 @@
 
 #include "layuiCommon.h"
 #include "layBrowser.h"
-#include "layColor.h"
+#include "tlColor.h"
 #include "rdbMarkerBrowser.h"
 
 namespace Ui
@@ -80,7 +80,7 @@ private:
   window_type m_window;
   double m_window_dim;
   unsigned int m_max_marker_count;
-  lay::Color m_marker_color;
+  tl::Color m_marker_color;
   int m_marker_line_width;
   int m_marker_vertex_size;
   int m_marker_halo;

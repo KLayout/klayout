@@ -32,7 +32,7 @@
 #include "layMarker.h"
 #include "laySnap.h"
 #include "layObjectInstPath.h"
-#include "layColor.h"
+#include "tlColor.h"
 #include "dbLayout.h"
 #include "dbShape.h"
 #include "edtUtils.h"
@@ -220,7 +220,7 @@ public:
   /**
    *  @brief Color accessor
    */
-  lay::Color color () const
+  tl::Color color () const
   {
     return m_color;
   }
@@ -593,7 +593,7 @@ private:
   db::ShapeIterator::flags_type m_flags;
 
   //  The look of the markers
-  lay::Color m_color;
+  tl::Color m_color;
 
   //  The current transformation on movement
   db::DTrans m_move_trans;

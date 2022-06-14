@@ -547,7 +547,7 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "This version was introduced in version 0.22.\n"
     "Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview.\n"
   ) +
-  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, int)) &lay::MainWindow::load_layout, gsi::arg ("filename"), gsi::arg ("mode"),
+  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, int)) &lay::MainWindow::load_layout, gsi::arg ("filename"), gsi::arg ("mode", 1),
     "@brief Loads a new layout\n"
     "\n"
     "@param filename The name of the file to load\n"
@@ -561,9 +561,9 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "This version will use the initial technology and the default reader options. "
     "Others versions are provided which allow specification of technology and reader options explicitly.\n"
     "\n"
-    "Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview.\n"
+    "Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview. The 'mode' argument has been made optional in version 0.28.\n"
   ) +
-  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, const std::string &, int)) &lay::MainWindow::load_layout, gsi::arg ("filename"), gsi::arg ("tech"), gsi::arg ("mode"),
+  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, const std::string &, int)) &lay::MainWindow::load_layout, gsi::arg ("filename"), gsi::arg ("tech"), gsi::arg ("mode", 1),
     "@brief Loads a new layout and associate it with the given technology\n"
     "\n"
     "@param filename The name of the file to load\n"
@@ -575,12 +575,12 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "into a new view (mode 1) or adding the layout to the current view (mode 2).\n"
     "In mode 1, the new view is made the current one.\n"
     "\n"
-    "If the technology name is not a valid technology name, the default technology will be used.\n"
+    "If the technology name is not a valid technology name, the default technology will be used. The 'mode' argument has been made optional in version 0.28.\n"
     "\n"
     "This version was introduced in version 0.22.\n"
     "Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview.\n"
   ) +
-  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, const db::LoadLayoutOptions &, int)) &lay::MainWindow::load_layout, gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("mode"),
+  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, const db::LoadLayoutOptions &, int)) &lay::MainWindow::load_layout, gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("mode", 1),
     "@brief Loads a new layout with the given options\n"
     "\n"
     "@param filename The name of the file to load\n"
@@ -593,9 +593,9 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "In mode 1, the new view is made the current one.\n"
     "\n"
     "This version was introduced in version 0.22.\n"
-    "Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview.\n"
+    "Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview. The 'mode' argument has been made optional in version 0.28.\n"
   ) +
-  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, const db::LoadLayoutOptions &, const std::string &, int)) &lay::MainWindow::load_layout, gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("tech"), gsi::arg ("mode"),
+  gsi::method ("load_layout", (lay::CellViewRef (lay::MainWindow::*) (const std::string &, const db::LoadLayoutOptions &, const std::string &, int)) &lay::MainWindow::load_layout, gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("tech"), gsi::arg ("mode", 1),
     "@brief Loads a new layout with the given options and associate it with the given technology\n"
     "\n"
     "@param filename The name of the file to load\n"
@@ -611,7 +611,7 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "If the technology name is not a valid technology name, the default technology will be used.\n"
     "\n"
     "This version was introduced in version 0.22.\n"
-    "Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview.\n"
+    "Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview. The 'mode' argument has been made optional in version 0.28.\n"
   ) +
   gsi::method ("clone_current_view", &lay::MainWindow::clone_current_view,
     "@brief Clones the current view and make it current\n"

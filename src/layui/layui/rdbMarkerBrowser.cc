@@ -27,6 +27,7 @@
 #include "dbLayout.h"
 #include "layConverters.h"
 #include "layDispatcher.h"
+#include "layUtils.h"
 
 #include "ui_MarkerBrowserConfigPage.h"
 #include "ui_MarkerBrowserConfigPage2.h"
@@ -309,7 +310,11 @@ public:
 
   virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   {
-    return new rdb::MarkerBrowserDialog (root, view);
+    if (lay::has_gui ()) {
+      return new rdb::MarkerBrowserDialog (root, view);
+    } else {
+      return 0;
+    }
   }
 };
 

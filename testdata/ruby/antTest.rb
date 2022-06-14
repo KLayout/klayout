@@ -564,6 +564,42 @@ class Ant_TestClass < TestBase
 
   end
 
+  # annotation template registration
+  def test_5
+
+    lv = RBA::LayoutView::new
+    tpl = lv.annotation_templates
+    assert_equal(tpl.size > 0, true) # at least one default template
+
+    lv.unregister_annotation_templates("")
+
+    tpl = lv.annotation_templates
+    assert_equal(tpl.size, 0)
+
+    a = RBA::Annotation::new
+    a.fmt = "U"
+    a.category = "42"
+    lv.register_annotation_template(a, "X", RBA::Annotation::RulerModeSingleClick)
+
+    tpl = lv.annotation_templates
+    assert_equal(tpl.size, 1)
+    assert_equal(tpl[0].size, 3)
+    (a, title, mode) = tpl[0]
+    assert_equal(a.fmt, "U")
+    assert_equal(a.category, "42")
+    assert_equal(title, "X")
+    assert_equal(mode, RBA::Annotation::RulerModeSingleClick)
+
+    lv.unregister_annotation_templates("X")
+    tpl = lv.annotation_templates
+    assert_equal(tpl.size, 1)
+
+    lv.unregister_annotation_templates("42")
+    tpl = lv.annotation_templates
+    assert_equal(tpl.size, 0)
+
+  end
+
 end
 
 load("test_epilogue.rb")

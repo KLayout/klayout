@@ -466,18 +466,35 @@ class LAYLayoutView_TestClass < TestBase
 
   def test_5
 
-    lv = RBA::LayoutView::new
-    lv.load_layout(File.join($ut_testsrc, "testdata/gds/t10.gds"), true)
+    [true, false].each do |editable|
 
-    lv.resize(42, 117)
-    img = lv.get_screenshot_pixels
-    assert_equal(img.width, 42)
-    assert_equal(img.height, 117)
+      lv = RBA::LayoutView::new(editable)
+      lv.load_layout(File.join($ut_testsrc, "testdata/gds/t10.gds"), true)
 
-    lv.resize(142, 217)
-    img = lv.get_screenshot_pixels
-    assert_equal(img.width, 142)
-    assert_equal(img.height, 217)
+      lv.resize(42, 117)
+      img = lv.get_screenshot_pixels
+      assert_equal(img.width, 42)
+      assert_equal(img.height, 117)
+
+      lv.resize(142, 217)
+      img = lv.get_screenshot_pixels
+      assert_equal(img.width, 142)
+      assert_equal(img.height, 217)
+
+      if editable
+        assert_equal(lv.mode_names, ["select", "move", "ruler", "polygon", "box", "text", "path", "instance", "partial"])
+      else
+        assert_equal(lv.mode_names, ["select", "move", "ruler"])
+      end
+      assert_equal(lv.mode_name, "select")
+      lv.switch_mode("ruler")
+      assert_equal(lv.mode_name, "ruler")
+      lv.switch_mode("move")
+      assert_equal(lv.mode_name, "move")
+      lv.switch_mode("select")
+      assert_equal(lv.mode_name, "select")
+
+    end
 
   end
 

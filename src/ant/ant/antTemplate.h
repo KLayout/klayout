@@ -66,6 +66,14 @@ public:
   };
 
   /**
+   *  @brief Creates a template from a ruler object
+   *
+   *  This will ignore the positions of the ruler but use the properties to
+   *  initialize the template.
+   */
+  static ant::Template from_object (const ant::Object &object, const std::string &title, int mode);
+
+  /**
    *  @brief Default constructor
    * 
    *  Creates a template with the default settings

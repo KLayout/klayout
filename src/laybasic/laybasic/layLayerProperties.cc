@@ -48,8 +48,8 @@ namespace lay
  *  All channels are scaled the same way in order not to change the
  *  color but the brightness alone.
  */
-color_t 
-LayerProperties::brighter (color_t in, int x)
+tl::color_t
+LayerProperties::brighter (tl::color_t in, int x)
 {
   //  shortcut for no correction
   if (x == 0) {
@@ -248,25 +248,25 @@ LayerProperties::is_visual () const
   return valid (true) && visible (true) && (layer_index () >= 0 || is_cell_box_layer ());
 }
 
-color_t 
+tl::color_t
 LayerProperties::eff_frame_color (bool real) const
 {
   return brighter (frame_color (real) & 0xffffff, frame_brightness (real));
 }
 
-color_t 
+tl::color_t
 LayerProperties::eff_fill_color (bool real) const
 {
   return brighter (fill_color (real) & 0xffffff, fill_brightness (real));
 }
 
-color_t 
+tl::color_t
 LayerProperties::eff_frame_color_brighter (bool real, int plus_brightness) const
 {
   return brighter (frame_color (real) & 0xffffff, frame_brightness (real) + plus_brightness);
 }
 
-color_t 
+tl::color_t
 LayerProperties::eff_fill_color_brighter (bool real, int plus_brightness) const
 {
   return brighter (fill_color (real) & 0xffffff, fill_brightness (real) + plus_brightness);
@@ -1645,21 +1645,21 @@ LayerPropertiesList::back () const
 struct UIntColorConverter 
   : private ColorConverter
 {
-  std::string to_string (const color_t &c) const
+  std::string to_string (const tl::color_t &c) const
   {
     if (c == 0) {
       return "";
     } else {
-      return ColorConverter::to_string (lay::Color (c | 0xff000000));
+      return ColorConverter::to_string (tl::Color (c | 0xff000000));
     }
   }
 
-  void from_string (const std::string &s, color_t &c) const
+  void from_string (const std::string &s, tl::color_t &c) const
   {
     if (s.empty ()) {
       c = 0;
     } else {
-      lay::Color qc;
+      tl::Color qc;
       ColorConverter::from_string (s, qc);
       c = qc.rgb () | 0xff000000;
     }
@@ -1767,8 +1767,8 @@ struct LineStyleIndexConverter
 static const tl::XMLElementList layer_element = tl::XMLElementList (
   //  HINT: these make_member calls want to be qualified: otherwise an internal error
   //  was observed ..
-  tl::make_member<lay::color_t, LayerPropertiesNode> (&LayerPropertiesNode::frame_color_loc,      &LayerPropertiesNode::set_frame_color_code, "frame-color",        UIntColorConverter ()) + 
-  tl::make_member<lay::color_t, LayerPropertiesNode> (&LayerPropertiesNode::fill_color_loc,       &LayerPropertiesNode::set_fill_color_code,  "fill-color",         UIntColorConverter ()) + 
+  tl::make_member<tl::color_t, LayerPropertiesNode> (&LayerPropertiesNode::frame_color_loc,      &LayerPropertiesNode::set_frame_color_code, "frame-color",        UIntColorConverter ()) + 
+  tl::make_member<tl::color_t, LayerPropertiesNode> (&LayerPropertiesNode::fill_color_loc,       &LayerPropertiesNode::set_fill_color_code,  "fill-color",         UIntColorConverter ()) + 
   tl::make_member<int, LayerPropertiesNode>          (&LayerPropertiesNode::frame_brightness_loc, &LayerPropertiesNode::set_frame_brightness, "frame-brightness") + 
   tl::make_member<int, LayerPropertiesNode>          (&LayerPropertiesNode::fill_brightness_loc,  &LayerPropertiesNode::set_fill_brightness,  "fill-brightness") + 
   tl::make_member<int, LayerPropertiesNode>          (&LayerPropertiesNode::dither_pattern_loc,   &LayerPropertiesNode::set_dither_pattern,   "dither-pattern",     DitherPatternIndexConverter ()) + 

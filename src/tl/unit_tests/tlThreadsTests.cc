@@ -229,7 +229,7 @@ TEST(3)
   MyThread3 my_thread;
   my_thread.start ();
   //  While we start the loop inside the thread we run it outside. Since
-  //  the counter is TLS, both loops will to the same but with different data.
+  //  the counter is TLS, both loops will do the same but with different data.
   //  A mutex is not involved.
   EXPECT_EQ (my_thread.do_run (9999999), 9999999);
   my_thread.wait ();

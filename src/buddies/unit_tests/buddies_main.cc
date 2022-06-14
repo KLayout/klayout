@@ -28,9 +28,8 @@
 #include "rba.h"
 #include "gsiDecl.h"
 
-// On Windows, ruby.h is not compatible with windows.h which is included by utHead - at least not if
-// windows.h is included before ruby.h ...
 #include "tlUnitTest.h"
+#include "tlFileUtils.h"
 
 void run_rubytest (tl::TestBase * /*_this*/, const std::string &fn)
 {

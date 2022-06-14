@@ -205,7 +205,7 @@ PropertiesPage::snap_to_layout_clicked ()
 
     bool snap_p1 = sender () == p1_to_layout;
 
-    double snap_range = service->widget ()->mouse_event_trans ().inverted ().ctrans (service->snap_range ());
+    double snap_range = service->ui ()->mouse_event_trans ().inverted ().ctrans (service->snap_range ());
     double max_range = 1000 * snap_range;
 
     while (snap_range < max_range) {
@@ -237,7 +237,7 @@ PropertiesPage::snap_to_layout_clicked ()
 
   } else {
 
-    double snap_range = service->widget ()->mouse_event_trans ().inverted ().ctrans (service->snap_range ());
+    double snap_range = service->ui ()->mouse_event_trans ().inverted ().ctrans (service->snap_range ());
     snap_range *= 0.5;
 
     lay::TwoPointSnapToObjectResult ee = lay::obj_snap2 (service->view (), p1, p2, g, ac, snap_range, snap_range * 1000.0);

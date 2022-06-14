@@ -1614,7 +1614,7 @@ LayerControlPanel::set_no_stipples (bool ns)
 }
 
 void
-LayerControlPanel::set_background_color (lay::Color c)
+LayerControlPanel::set_background_color (tl::Color c)
 {
   QPalette pl (mp_layer_list->palette ());
   pl.setColor (QPalette::Base, QColor (c.rgb ()));
@@ -1623,7 +1623,7 @@ LayerControlPanel::set_background_color (lay::Color c)
 }
 
 void
-LayerControlPanel::set_text_color (lay::Color c)
+LayerControlPanel::set_text_color (tl::Color c)
 {
   QPalette pl (mp_layer_list->palette ());
   pl.setColor (QPalette::Text, QColor (c.rgb ()));

@@ -10,6 +10,8 @@ FORMS =
 
 SOURCES = \
     tlAssert.cc \
+    tlBase64.cc \
+    tlColor.cc \
     tlClassRegistry.cc \
     tlCopyOnWrite.cc \
     tlDataMapping.cc \
@@ -26,6 +28,8 @@ SOURCES = \
     tlLog.cc \
     tlObject.cc \
     tlProgress.cc \
+    tlPixelBuffer.cc \
+    tlResources.cc \
     tlScriptError.cc \
     tlSleep.cc \
     tlStaticObjects.cc \
@@ -55,6 +59,8 @@ SOURCES = \
 HEADERS = \
     tlAlgorithm.h \
     tlAssert.h \
+    tlBase64.h \
+    tlColor.h \
     tlClassRegistry.h \
     tlCopyOnWrite.h \
     tlDataMapping.h \
@@ -76,6 +82,8 @@ HEADERS = \
     tlObject.h \
     tlObjectCollection.h \
     tlProgress.h \
+    tlPixelBuffer.h \
+    tlResources.h \
     tlReuseVector.h \
     tlScriptError.h \
     tlSleep.h \

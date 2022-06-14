@@ -154,14 +154,16 @@ main(int a_argc, const char **a_argv)
 #endif
 
 #if QT_VERSION >= 0x050000
-void myMessageOutput(QtMsgType type, const QMessageLogContext & /*ctx*/, const QString &msg)
+void custom_message_handler(QtMsgType type, const QMessageLogContext & /*ctx*/, const QString &msg)
 {
   switch (type) {
   case QtDebugMsg:
     fprintf(stderr, "Debug: %s\n", msg.toLocal8Bit ().constData ());
     break;
   case QtWarningMsg:
-    fprintf(stderr, "Warning: %s\n", msg.toLocal8Bit ().constData ());
+    if (tl::verbosity () > 0) {
+      fprintf(stderr, "Warning: %s\n", msg.toLocal8Bit ().constData ());
+    }
     break;
   case QtCriticalMsg:
     fprintf(stderr, "Critical: %s\n", msg.toLocal8Bit ().constData ());
@@ -175,14 +177,16 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext & /*ctx*/, const Q
   }
 }
 #else
-void myMessageOutput(QtMsgType type, const char *msg)
+void custom_message_handler(QtMsgType type, const char *msg)
 {
   switch (type) {
   case QtDebugMsg:
     fprintf(stderr, "Debug: %s\n", msg);
     break;
   case QtWarningMsg:
-    fprintf(stderr, "Warning: %s\n", msg);
+    if (tl::verbosity () > 0) {
+      fprintf(stderr, "Warning: %s\n", msg);
+    }
     break;
   case QtCriticalMsg:
     fprintf(stderr, "Critical: %s\n", msg);
@@ -223,7 +227,9 @@ klayout_main (int &argc, char **argv)
   about_text += prg_about_text;
   lay::Version::set_about_text (about_text.c_str ());
 
-  //  Capture the shortcut command line arguments
+  //  Capture the shortcut command line arguments and the verbosity settings
+  //  for early errors and warnings
+
   for (int i = 1; i < argc; ++i) {
 
     if (argv [i] == std::string ("-v")) {
@@ -235,6 +241,15 @@ klayout_main (int &argc, char **argv)
 
       tl::info << lay::ApplicationBase::usage () << tl::noendl;
       return 0;
+
+    } else if (argv [i] == std::string ("-d") && (i + 1) < argc) {
+
+      int v = 0;
+      tl::from_string (argv [++i], v);
+      if (v < 0) {
+        v = 0;
+      }
+      tl::verbosity (v);
 
     }
 
@@ -255,9 +270,9 @@ int
 klayout_main_cont (int &argc, char **argv)
 {
 #if QT_VERSION >= 0x050000
-  qInstallMessageHandler (myMessageOutput);
+  qInstallMessageHandler (custom_message_handler);
 #else
-  qInstallMsgHandler (myMessageOutput);
+  qInstallMsgHandler (custom_message_handler);
 #endif
 
   int result = 0;

@@ -26,7 +26,7 @@
 #define HDR_layNetlistBrowserModel
 
 #include "layColorPalette.h"
-#include "layColor.h"
+#include "tlColor.h"
 #include "layuiCommon.h"
 
 #include "dbLayoutToNetlist.h"
@@ -331,8 +331,8 @@ private:
   db::LayoutVsSchematic *mp_lvsdb;
   NetColorizer *mp_colorizer;
   std::unique_ptr<IndexedNetlistModel> mp_indexer;
-  mutable std::map<lay::color_t, QIcon> m_net_icon_per_color;
-  mutable std::map<lay::color_t, QIcon> m_connection_icon_per_color;
+  mutable std::map<tl::color_t, QIcon> m_net_icon_per_color;
+  mutable std::map<tl::color_t, QIcon> m_connection_icon_per_color;
   int m_object_column;
   int m_status_column;
   int m_first_column;

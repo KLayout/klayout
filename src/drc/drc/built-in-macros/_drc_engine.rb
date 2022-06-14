@@ -2685,7 +2685,7 @@ CODE
     end
 
     def _process_events
-      if RBA::Application.instance
+      if RBA.constants.member?(:Application) && RBA::Application.instance
         RBA::Application.instance.process_events
       end
     end

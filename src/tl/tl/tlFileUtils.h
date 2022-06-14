@@ -86,6 +86,12 @@ std::string TL_PUBLIC filename (const std::string &s);
 std::string TL_PUBLIC basename (const std::string &s);
 
 /**
+ *  @brief Gets the basename for a given file path (file name without the last extensions)
+ *  This will strip all extensions (i.e. "archive.tar.gz" will become "archive.tar").
+ */
+std::string TL_PUBLIC complete_basename (const std::string &s);
+
+/**
  *  @brief Gets the complete extension for a given file path
  */
 std::string TL_PUBLIC extension (const std::string &s);

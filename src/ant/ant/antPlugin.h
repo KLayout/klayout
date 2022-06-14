@@ -54,7 +54,8 @@ public:
   virtual void uninitialize (lay::Dispatcher *);
   virtual bool menu_activated (const std::string &symbol) const;
 
-  void register_annotation_template (const ant::Template &t);
+  void register_annotation_template (const ant::Template &t, lay::Plugin *plugin = 0);
+  void unregister_annotation_template (const std::string &category, lay::Plugin *plugin = 0);
 
   static PluginDeclaration *instance ();
 
@@ -64,9 +65,7 @@ private:
   
   std::vector<ant::Template> m_templates;
   int m_current_template;
-#if defined(HAVE_QT)
   tl::weak_collection<lay::ConfigureAction> m_actions;
-#endif
   bool m_current_template_updated;
   bool m_templates_updated;
 };

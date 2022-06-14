@@ -50,7 +50,7 @@ public:
   };
 
   NavigatorService (LayoutView *view)
-    : ViewService (view->view_object_widget ()), 
+    : ViewService (view->canvas ()), 
       mp_view (view), mp_source_view (0),
       mp_viewport_marker (0),
       m_drag_mode (DM_none),
@@ -72,18 +72,22 @@ public:
 
   void background_color_changed ()
   {
-    lay::Color c = mp_view->background_color ();
+    tl::Color c = mp_view->background_color ();
 
     //  replace by "real" background color if required
     if (! c.is_valid ()) {
-      c = lay::Color (mp_view->palette ().color (QPalette::Normal, QPalette::Base).rgb ());
+      if (mp_view->widget ()) {
+        c = tl::Color (mp_view->widget ()->palette ().color (QPalette::Normal, QPalette::Base).rgb ());
+      } else {
+        c = tl::Color (0xffffff);  //  white
+      }
     }
 
-    lay::Color contrast;
+    tl::Color contrast;
     if (c.to_mono ()) {
-      contrast = lay::Color (0, 0, 0);
+      contrast = tl::Color (0, 0, 0);
     } else {
-      contrast = lay::Color (255, 255, 255);
+      contrast = tl::Color (255, 255, 255);
     }
 
     set_colors (c, contrast);
@@ -97,7 +101,7 @@ public:
       delete mp_box;
       mp_box = 0;
 
-      widget ()->ungrab_mouse (this);
+      ui ()->ungrab_mouse (this);
 
       if (mp_source_view) {
         mp_source_view->zoom_box (db::DBox (m_p1, m_p2));
@@ -108,7 +112,7 @@ public:
     } else if (m_dragging) {
 
       m_dragging = false;
-      widget ()->ungrab_mouse (this);
+      ui ()->ungrab_mouse (this);
       return true;
 
     } else {
@@ -119,7 +123,7 @@ public:
   bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio) 
   { 
     if (! prio && (buttons & lay::RightButton) != 0) {
-      db::DBox vp = widget ()->mouse_event_viewport ();
+      db::DBox vp = ui ()->mouse_event_viewport ();
       if (mp_source_view && vp.contains (p)) {
         db::DVector d = (vp.p2 () - vp.p1 ()) * 0.5;
         mp_source_view->zoom_box (db::DBox (p - d, p + d));
@@ -152,7 +156,7 @@ public:
       m_dragging = true;
       m_p0 = p;
       m_b0 = m_box;
-      widget ()->grab_mouse (this, true);
+      ui ()->grab_mouse (this, true);
       return true;
 
     } else {
@@ -385,10 +389,10 @@ public:
       delete mp_box;
       mp_box = 0;
     }
-    widget ()->ungrab_mouse (this);
+    ui ()->ungrab_mouse (this);
   }
 
-  void set_colors (lay::Color /*background*/, lay::Color color)
+  void set_colors (tl::Color /*background*/, tl::Color color)
   {
     //  set zoom box color
     m_color = color.rgb ();
@@ -422,9 +426,9 @@ private:
     mp_box = 0;
 
     m_p1 = pos;
-    m_vp = widget ()->mouse_event_viewport ();
+    m_vp = ui ()->mouse_event_viewport ();
 
-    widget ()->grab_mouse (this, true);
+    ui ()->grab_mouse (this, true);
   }
 
   void begin (const db::DPoint &pos)
@@ -435,9 +439,9 @@ private:
 
     m_p1 = pos;
     m_p2 = pos;
-    mp_box = new lay::RubberBox (widget (), m_color, pos, pos);
+    mp_box = new lay::RubberBox (ui (), m_color, pos, pos);
 
-    widget ()->grab_mouse (this, true);
+    ui ()->grab_mouse (this, true);
   }
 };
 
@@ -626,8 +630,8 @@ Navigator::view_closed (int index)
 void
 Navigator::resizeEvent (QResizeEvent *)
 {
-  if (mp_view) {
-    mp_view->setGeometry (mp_placeholder_label->geometry ());
+  if (mp_view && mp_view->widget ()) {
+    mp_view->widget ()->setGeometry (mp_placeholder_label->geometry ());
   }
 }
 
@@ -652,14 +656,15 @@ Navigator::attach_view (LayoutView *view)
     if (mp_source_view) {
 
       mp_view = new LayoutView (0, false, mp_source_view, this, "navigator", LayoutView::LV_Naked + LayoutView::LV_NoZoom + LayoutView::LV_NoServices + LayoutView::LV_NoGrid);
-      mp_view->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
-      mp_view->setMinimumWidth (100);
-      mp_view->setMinimumHeight (100);
-      mp_view->setGeometry (mp_placeholder_label->geometry ());
-      mp_view->show ();
+      tl_assert (mp_view->widget ());
+      mp_view->widget ()->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
+      mp_view->widget ()->setMinimumWidth (100);
+      mp_view->widget ()->setMinimumHeight (100);
+      mp_view->widget ()->setGeometry (mp_placeholder_label->geometry ());
+      mp_view->widget ()->show ();
 
       mp_service = new NavigatorService (mp_view);
-      mp_view->view_object_widget ()->activate (mp_service);
+      mp_view->canvas ()->activate (mp_service);
 
       mp_source_view->cellviews_changed_event.add (this, &Navigator::content_changed);
       mp_source_view->cellview_changed_event.add (this, &Navigator::content_changed_with_int);

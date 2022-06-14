@@ -27,6 +27,7 @@
 
 #include "layPlugin.h"
 #include "layLayoutView.h"
+#include "layUtils.h"
 
 namespace lay
 {
@@ -38,7 +39,11 @@ public:
   XORPlugin (Plugin *parent, lay::LayoutViewBase *view)
     : lay::Plugin (parent), mp_view (view)
   {
-    mp_dialog = new lay::XORToolDialog (0);
+    if (lay::has_gui ()) {
+      mp_dialog = new lay::XORToolDialog (0);
+    } else {
+      mp_dialog = 0;
+    }
   }
 
   ~XORPlugin ()
@@ -51,7 +56,7 @@ public:
   {
     if (symbol == "lay::xor_tool") {
 
-      if (mp_dialog->exec_dialog (mp_view)) {
+      if (mp_dialog && mp_dialog->exec_dialog (mp_view)) {
 
         // ... implementation is in layXORToolDialog.cc ...
 

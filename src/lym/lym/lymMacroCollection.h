@@ -27,13 +27,13 @@
 #include "lymCommon.h"
 #include "lymMacro.h"
 
-#if defined(HAVE_QT)
-
 #include <string>
 #include <map>
 #include <set>
 
-#include <QObject>
+#if defined(HAVE_QT)
+#  include <QObject>
+#endif
 
 namespace lym
 {
@@ -45,9 +45,13 @@ namespace lym
  *  a folder containing *.lym, *.rb or other script files.
  */
 class LYM_PUBLIC MacroCollection
+#if defined(HAVE_QT)
   : public QObject
+#endif
 {
+#if defined(HAVE_QT)
 Q_OBJECT
+#endif
 
 public:
   typedef std::multimap <std::string, Macro *>::iterator iterator;
@@ -334,6 +338,11 @@ public:
 
   /**
    *  @brief Gets the begin iterator of the folders
+   *
+   *  The iterator will deliver a pair of a string and a MacroCollection object.
+   *  The string is the absolute path of the child folder. Child folders do not
+   *  necessarily live inside the directory of the parent folder. Specifically for
+   *  the root folder, children with any kind of paths may be present.
    */
   child_iterator begin_children ()
   {
@@ -382,6 +391,7 @@ public:
    *  @brief Gets a folder by name
    *
    *  If no folder with that name exists, this method will return 0.
+   *  The name is either relative to the folders path or it is an absolute path.
    */
   MacroCollection *folder_by_name (const std::string &name);
 
@@ -389,6 +399,7 @@ public:
    *  @brief Gets a folder by name
    *
    *  If no folder with that name exists, this method will return 0.
+   *  The name is either relative to the folders path or it is an absolute path.
    */
   const MacroCollection *folder_by_name (const std::string &name) const;
 
@@ -445,6 +456,7 @@ public:
    */
   void dump (int l = 0);
 
+#if defined(HAVE_QT)
 signals:
   /**
    *  @brief This signal is sent when the collection changes
@@ -496,6 +508,7 @@ signals:
    *  @brief This signal is emitted from the collection root if the menu needs to be updated
    */
   void menu_needs_update ();
+#endif
 
 private:
   friend class Macro;
@@ -518,10 +531,8 @@ private:
   void on_changed ();
   void on_menu_needs_update ();
 
-  /**
-   *  @brief Scans a folder creating the macro collection
-   */
-  void scan (const std::string &path);
+  void scan ();
+  void create_entry (const std::string &path);
 
   void rename_macro (Macro *macro, const std::string &new_name);
 
@@ -550,45 +561,6 @@ private:
 };
 
 }
-
-#else //  without QT:
-
-#include <string>
-
-namespace lym
-{
-
-/**
- *  @brief Dummy implementation for Qt-less builds.
- *
- *  This dummy implementation does not provide any services but acts as a dummy anchor
- *  for lym::Macro.
- *
- *  Without Qt, the MacroCollection does not make much sense as there is no
- *  application specific file system without an Application object.
- */
-class LYM_PUBLIC MacroCollection
-{
-public:
-  MacroCollection ()
-  {
-    //  .. nothing yet ..
-  }
-
-  std::string path () const
-  {
-    return std::string ();
-  }
-
-  void rename_macro (lym::Macro *, const std::string &)
-  {
-    //  .. nothing yet ..
-  }
-};
-
-}
-
-#endif
 
 #endif
 

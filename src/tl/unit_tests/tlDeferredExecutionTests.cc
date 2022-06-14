@@ -23,7 +23,9 @@
 #include "tlDeferredExecution.h"
 #include "tlUnitTest.h"
 
-#include <QCoreApplication>
+#if defined(HAVE_QT)
+#  include <QCoreApplication>
+#endif
 
 int g_na = 0;
 int g_nb = 0;
@@ -40,11 +42,24 @@ public:
   int na, nb;
 };
 
+void trigger_execution ()
+{
+#if defined(HAVE_QT)
+  if (QCoreApplication::instance ()) {
+    QCoreApplication::instance ()->processEvents ();
+    return;
+  }
+#endif
+
+  //  explicit execute if timer does not do it
+  tl::DeferredMethodScheduler::execute ();
+}
+
 TEST(1) 
 {
   g_na = g_nb = 0;
 
-  QCoreApplication::instance ()->processEvents ();
+  trigger_execution ();
 
   X *x = new X ();
 
@@ -53,7 +68,7 @@ TEST(1)
   EXPECT_EQ (g_na, 0);
   EXPECT_EQ (g_nb, 0);
 
-  QCoreApplication::instance ()->processEvents ();
+  trigger_execution ();
 
   EXPECT_EQ (x->na, 0);
   EXPECT_EQ (x->nb, 0);
@@ -71,7 +86,7 @@ TEST(1)
   tl::DeferredMethodScheduler::enable (false);
   tl::DeferredMethodScheduler::enable (false);
 
-  QCoreApplication::instance ()->processEvents ();
+  trigger_execution ();
 
   EXPECT_EQ (x->na, 0);
   EXPECT_EQ (x->nb, 0);
@@ -83,7 +98,7 @@ TEST(1)
   x->db ();
   x->db ();
 
-  QCoreApplication::instance ()->processEvents ();
+  trigger_execution ();
 
   EXPECT_EQ (x->na, 0);
   EXPECT_EQ (x->nb, 0);
@@ -92,14 +107,14 @@ TEST(1)
 
   tl::DeferredMethodScheduler::enable (true);
 
-  QCoreApplication::instance ()->processEvents ();
+  trigger_execution ();
 
   EXPECT_EQ (x->na, 1);
   EXPECT_EQ (x->nb, 2);
   EXPECT_EQ (g_na, 1);
   EXPECT_EQ (g_nb, 2);
   
-  QCoreApplication::instance ()->processEvents ();
+  trigger_execution ();
 
   EXPECT_EQ (x->na, 1);
   EXPECT_EQ (x->nb, 2);
@@ -116,14 +131,14 @@ TEST(1)
   EXPECT_EQ (g_na, 1);
   EXPECT_EQ (g_nb, 2);
   
-  QCoreApplication::instance ()->processEvents ();
+  trigger_execution ();
 
   EXPECT_EQ (x->na, 2);
   EXPECT_EQ (x->nb, 4);
   EXPECT_EQ (g_na, 2);
   EXPECT_EQ (g_nb, 4);
 
-  QCoreApplication::instance ()->processEvents ();
+  trigger_execution ();
 
   EXPECT_EQ (x->na, 2);
   EXPECT_EQ (x->nb, 4);
@@ -132,7 +147,7 @@ TEST(1)
   
   delete x;
 
-  QCoreApplication::instance ()->processEvents ();
+  trigger_execution ();
 
   x = new X ();
 
@@ -141,7 +156,7 @@ TEST(1)
   EXPECT_EQ (g_na, 2);
   EXPECT_EQ (g_nb, 4);
 
-  QCoreApplication::instance ()->processEvents ();
+  trigger_execution ();
 
   EXPECT_EQ (x->na, 0);
   EXPECT_EQ (x->nb, 0);
@@ -158,14 +173,14 @@ TEST(1)
   EXPECT_EQ (g_na, 2);
   EXPECT_EQ (g_nb, 4);
 
-  QCoreApplication::instance ()->processEvents ();
+  trigger_execution ();
 
   EXPECT_EQ (x->na, 1);
   EXPECT_EQ (x->nb, 2);
   EXPECT_EQ (g_na, 3);
   EXPECT_EQ (g_nb, 6);
   
-  QCoreApplication::instance ()->processEvents ();
+  trigger_execution ();
 
   EXPECT_EQ (x->na, 1);
   EXPECT_EQ (x->nb, 2);
@@ -179,7 +194,7 @@ TEST(1)
 
   delete x;
 
-  QCoreApplication::instance ()->processEvents ();
+  trigger_execution ();
 
   EXPECT_EQ (g_na, 3);
   EXPECT_EQ (g_nb, 6);
@@ -208,7 +223,7 @@ TEST(2)
   y->da ();
   y->db ();
 
-  QCoreApplication::instance ()->processEvents ();
+  trigger_execution ();
 
   EXPECT_EQ (y_inst, 0);
 }

@@ -530,7 +530,7 @@ LayerTreeModel::parent (const QModelIndex &index) const
  */
 static void
 single_bitmap_to_image (const lay::ViewOp &view_op, lay::Bitmap &bitmap,
-                        lay::PixelBuffer *pimage, const lay::DitherPattern &dither_pattern, const lay::LineStyles &line_styles,
+                        tl::PixelBuffer *pimage, const lay::DitherPattern &dither_pattern, const lay::LineStyles &line_styles,
                         unsigned int width, unsigned int height)
 {
   std::vector <lay::ViewOp> view_ops;
@@ -643,11 +643,11 @@ LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, l
   h = std::max ((unsigned int) 16, h);
   w = std::max ((unsigned int) 16, w);
 
-  lay::color_t def_color   = 0x808080;
-  lay::color_t fill_color  = iter->has_fill_color (true)  ? iter->eff_fill_color (true)  : def_color;
-  lay::color_t frame_color = iter->has_frame_color (true) ? iter->eff_frame_color (true) : def_color;
+  tl::color_t def_color   = 0x808080;
+  tl::color_t fill_color  = iter->has_fill_color (true)  ? iter->eff_fill_color (true)  : def_color;
+  tl::color_t frame_color = iter->has_frame_color (true) ? iter->eff_frame_color (true) : def_color;
 
-  lay::PixelBuffer image (w, h);
+  tl::PixelBuffer image (w, h);
   image.set_transparent (true);
   image.fill (view->background_color ().rgb ());
 

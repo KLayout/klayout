@@ -66,6 +66,18 @@ Class<lay::LayoutView> decl_LayoutView (decl_LayoutViewBase, "lay", "LayoutView"
     "\n"
     "This event has been introduced in version 0.28."
   ) +
+  gsi::method ("current", &lay::LayoutView::current,
+    "@brief Returns the current view\n"
+    "The current view is the one that is made current by using \\current=.\n"
+    "\n"
+    "This variation has been introduced for the non-Qt case in version 0.28."
+  ) +
+  gsi::method ("current=", &lay::LayoutView::set_current, gsi::arg ("view"),
+    "@brief Sets the current view\n"
+    "See \\current for details.\n"
+    "\n"
+    "This method has been introduced for the non-Qt case in version 0.28."
+  ) +
   gsi::method ("timer", static_cast<void (lay::LayoutView::*) ()> (&lay::LayoutView::timer),
     "@brief A callback required to be called regularily in the non-Qt case.\n"
     "\n"
@@ -82,32 +94,6 @@ Class<lay::LayoutView> decl_LayoutView (decl_LayoutViewBase, "lay", "LayoutView"
   "The visual part of the view is the tab panel in the main window. The non-visual part "
   "are the redraw thread, the layout handles, cell lists, layer view lists etc. "
   "This object controls these aspects of the view and controls the appearance of the data. "
-);
-
-static lay::LayoutView *get_view (lay::CellViewRef *cv)
-{
-  return cv->view ()->ui ();
-}
-
-static ClassExt<lay::CellViewRef> extdecl_CellView (
-  method_ext ("view", &get_view,
-    "@brief Gets the view the cellview resides in\n"
-    "This reference will be nil if the cellview is not a valid one.\n"
-    "This method has been added in version 0.25.\n"
-  )
-);
-
-static lay::LayoutView *get_view_from_lp (lay::LayerPropertiesNode *node)
-{
-  return node->view ()->ui ();
-}
-
-static ClassExt<lay::LayerPropertiesNode> extdecl_LayerPropertiesNode (
-  method_ext ("view", &get_view_from_lp,
-    "@brief Gets the view this node lives in\n"
-    "\n"
-    "This reference can be nil if the node is a orphan node that lives outside a view."
-  )
 );
 
 }

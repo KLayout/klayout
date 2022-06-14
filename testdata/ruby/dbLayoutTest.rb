@@ -310,12 +310,8 @@ class DBLayoutTest_TestClass < TestBase
     assert_equal( inst.nb, 20 )
     assert_equal( inst.cell_index, c1.cell_index )
 
-    if( RBA::Application::instance.is_editable? ) 
-      c2.each_inst { |inst| c2.erase( inst ) }
-      assert_equal( c2.bbox.to_s, "()" )
-    else
-      c2.clear_insts 
-    end
+    c2.each_inst { |inst| c2.erase( inst ) }
+    assert_equal( c2.bbox.to_s, "()" )
 
     tr = RBA::CplxTrans::new( 1.5, 90.0, true, RBA::DPoint::new( 100, -50 ) ) 
     inst = RBA::CellInstArray::new( c1.cell_index, tr, RBA::Point::new( 100, 0 ), RBA::Point::new( 0, 100 ), 10, 20 )
@@ -555,12 +551,7 @@ class DBLayoutTest_TestClass < TestBase
     assert_equal( inst.nb, 20 )
     assert_equal( inst.cell_index, c1.cell_index )
 
-    if( RBA::Application::instance.is_editable? ) 
-      c2.each_inst { |inst| c2.erase( inst ) }
-      assert_equal( c2.bbox.to_s, "()" )
-    else
-      c2.clear_insts 
-    end
+    c2.each_inst { |inst| c2.erase( inst ) }
     assert_equal( c2.bbox.to_s, "()" )
 
     tr = RBA::CplxTrans::new( 1.5, 90.0, true, RBA::DPoint::new( 100, -50 ) ) 
@@ -702,89 +693,85 @@ class DBLayoutTest_TestClass < TestBase
   # Instances and bboxes (editable mode)
   def test_6_Layout_new
 
-    if( RBA::Application::instance.is_editable? )
+    ly = RBA::Layout::new
+    pid1 = ly.properties_id( { 17 => "a", "b" => [ 1, 5, 7 ] }.to_a )
+    pid2 = ly.properties_id( { 100 => "x" }.to_a )
 
-      ly = RBA::Layout::new
-      pid1 = ly.properties_id( { 17 => "a", "b" => [ 1, 5, 7 ] }.to_a )
-      pid2 = ly.properties_id( { 100 => "x" }.to_a )
+    ci1 = ly.add_cell( "c1" )
+    ci2 = ly.add_cell( "c2" )
+    ci3 = ly.add_cell( "c3" )
+    c1 = ly.cell( ci1 )
+    c2 = ly.cell( ci2 )
+    c3 = ly.cell( ci3 )
 
-      ci1 = ly.add_cell( "c1" )
-      ci2 = ly.add_cell( "c2" )
-      ci3 = ly.add_cell( "c3" )
-      c1 = ly.cell( ci1 )
-      c2 = ly.cell( ci2 )
-      c3 = ly.cell( ci3 )
+    tr = RBA::Trans::new( RBA::Trans::R90, RBA::Point::new( 100, -50 ) ) 
+    inst_1 = RBA::CellInstArray::new( c1.cell_index, tr )
+    new_inst_1 = c2.insert( inst_1, pid1 )
+    new_inst_2 = c2.insert( inst_1, pid2 )
+    inst_2 = RBA::CellInstArray::new( c3.cell_index, tr*tr )
+    new_inst_3 = c1.insert( inst_2 )
 
-      tr = RBA::Trans::new( RBA::Trans::R90, RBA::Point::new( 100, -50 ) ) 
-      inst_1 = RBA::CellInstArray::new( c1.cell_index, tr )
-      new_inst_1 = c2.insert( inst_1, pid1 )
-      new_inst_2 = c2.insert( inst_1, pid2 )
-      inst_2 = RBA::CellInstArray::new( c3.cell_index, tr*tr )
-      new_inst_3 = c1.insert( inst_2 )
+    assert_equal( new_inst_1.cell_index, c1.cell_index )
+    assert_equal( new_inst_1.trans.to_s, tr.to_s )
+    assert_equal( new_inst_1.prop_id, pid1 )
+    assert_equal( new_inst_2.cell_index, c1.cell_index )
+    assert_equal( new_inst_2.trans.to_s, tr.to_s )
+    assert_equal( new_inst_2.prop_id, pid2 )
+    assert_equal( new_inst_3.cell_index, c3.cell_index )
+    assert_equal( new_inst_3.prop_id, 0 )
+    assert_equal( new_inst_3.trans.to_s, (tr*tr).to_s )
 
-      assert_equal( new_inst_1.cell_index, c1.cell_index )
-      assert_equal( new_inst_1.trans.to_s, tr.to_s )
-      assert_equal( new_inst_1.prop_id, pid1 )
-      assert_equal( new_inst_2.cell_index, c1.cell_index )
-      assert_equal( new_inst_2.trans.to_s, tr.to_s )
-      assert_equal( new_inst_2.prop_id, pid2 )
-      assert_equal( new_inst_3.cell_index, c3.cell_index )
-      assert_equal( new_inst_3.prop_id, 0 )
-      assert_equal( new_inst_3.trans.to_s, (tr*tr).to_s )
+    new_inst_3 = c1.replace_prop_id( new_inst_3, pid2 )
+  
+    assert_equal( new_inst_1.cell_index, c1.cell_index )
+    assert_equal( new_inst_1.trans.to_s, tr.to_s )
+    assert_equal( new_inst_1.prop_id, pid1 )
+    assert_equal( new_inst_2.cell_index, c1.cell_index )
+    assert_equal( new_inst_2.trans.to_s, tr.to_s )
+    assert_equal( new_inst_2.prop_id, pid2 )
+    assert_equal( new_inst_3.cell_index, c3.cell_index )
+    assert_equal( new_inst_3.prop_id, pid2 )
+    assert_equal( new_inst_3.trans.to_s, (tr*tr).to_s )
 
-      new_inst_3 = c1.replace_prop_id( new_inst_3, pid2 )
-    
-      assert_equal( new_inst_1.cell_index, c1.cell_index )
-      assert_equal( new_inst_1.trans.to_s, tr.to_s )
-      assert_equal( new_inst_1.prop_id, pid1 )
-      assert_equal( new_inst_2.cell_index, c1.cell_index )
-      assert_equal( new_inst_2.trans.to_s, tr.to_s )
-      assert_equal( new_inst_2.prop_id, pid2 )
-      assert_equal( new_inst_3.cell_index, c3.cell_index )
-      assert_equal( new_inst_3.prop_id, pid2 )
-      assert_equal( new_inst_3.trans.to_s, (tr*tr).to_s )
-
-      begin
-        new_inst_1 = c1.replace( new_inst_1, inst_2 )
-        assert_equal( true, false )
-      rescue
-        # OK: gives an error since we are trying to erase an object from a list that is does not belong to
-      end
-
-      new_inst_1 = c2.replace( new_inst_1, inst_2 )
-    
-      assert_equal( new_inst_1.cell_index, c3.cell_index )
-      assert_equal( new_inst_1.trans.to_s, (tr*tr).to_s )
-      assert_equal( new_inst_1.prop_id, pid1 )
-      assert_equal( new_inst_2.cell_index, c1.cell_index )
-      assert_equal( new_inst_2.trans.to_s, tr.to_s )
-      assert_equal( new_inst_2.prop_id, pid2 )
-      assert_equal( new_inst_3.cell_index, c3.cell_index )
-      assert_equal( new_inst_3.prop_id, pid2 )
-      assert_equal( new_inst_3.trans.to_s, (tr*tr).to_s )
-
-      new_inst_1 = c2.replace( new_inst_1, inst_2, pid1 )
-    
-      assert_equal( new_inst_1.cell_index, c3.cell_index )
-      assert_equal( new_inst_1.trans.to_s, (tr*tr).to_s )
-      assert_equal( new_inst_1.prop_id, pid1 )
-      assert_equal( new_inst_2.cell_index, c1.cell_index )
-      assert_equal( new_inst_2.trans.to_s, tr.to_s )
-      assert_equal( new_inst_2.prop_id, pid2 )
-      assert_equal( new_inst_3.cell_index, c3.cell_index )
-      assert_equal( new_inst_3.prop_id, pid2 )
-      assert_equal( new_inst_3.trans.to_s, (tr*tr).to_s )
-
-      assert_equal( new_inst_1.is_null?, false )
-      assert_equal( RBA::Instance.new.is_null?, true )
-
-      assert_equal( c2.is_leaf?, false )
-      c2.erase( new_inst_1 )
-      c2.erase( new_inst_2 )
-      assert_equal( c2.is_leaf?, true )
-      assert_equal( c2.child_instances, 0 )
-
+    begin
+      new_inst_1 = c1.replace( new_inst_1, inst_2 )
+      assert_equal( true, false )
+    rescue
+      # OK: gives an error since we are trying to erase an object from a list that is does not belong to
     end
+
+    new_inst_1 = c2.replace( new_inst_1, inst_2 )
+  
+    assert_equal( new_inst_1.cell_index, c3.cell_index )
+    assert_equal( new_inst_1.trans.to_s, (tr*tr).to_s )
+    assert_equal( new_inst_1.prop_id, pid1 )
+    assert_equal( new_inst_2.cell_index, c1.cell_index )
+    assert_equal( new_inst_2.trans.to_s, tr.to_s )
+    assert_equal( new_inst_2.prop_id, pid2 )
+    assert_equal( new_inst_3.cell_index, c3.cell_index )
+    assert_equal( new_inst_3.prop_id, pid2 )
+    assert_equal( new_inst_3.trans.to_s, (tr*tr).to_s )
+
+    new_inst_1 = c2.replace( new_inst_1, inst_2, pid1 )
+  
+    assert_equal( new_inst_1.cell_index, c3.cell_index )
+    assert_equal( new_inst_1.trans.to_s, (tr*tr).to_s )
+    assert_equal( new_inst_1.prop_id, pid1 )
+    assert_equal( new_inst_2.cell_index, c1.cell_index )
+    assert_equal( new_inst_2.trans.to_s, tr.to_s )
+    assert_equal( new_inst_2.prop_id, pid2 )
+    assert_equal( new_inst_3.cell_index, c3.cell_index )
+    assert_equal( new_inst_3.prop_id, pid2 )
+    assert_equal( new_inst_3.trans.to_s, (tr*tr).to_s )
+
+    assert_equal( new_inst_1.is_null?, false )
+    assert_equal( RBA::Instance.new.is_null?, true )
+
+    assert_equal( c2.is_leaf?, false )
+    c2.erase( new_inst_1 )
+    c2.erase( new_inst_2 )
+    assert_equal( c2.is_leaf?, true )
+    assert_equal( c2.child_instances, 0 )
 
   end
 
@@ -809,11 +796,6 @@ class DBLayoutTest_TestClass < TestBase
 
   # Copy/move between cells
   def test_7_cells_copy_move
-
-    # because of set_property ...
-    if !RBA::Application::instance.is_editable? 
-      return
-    end
 
     ly1 = RBA::Layout::new
     la1 = ly1.insert_layer(RBA::LayerInfo::new(1, 0))
@@ -976,54 +958,50 @@ class DBLayoutTest_TestClass < TestBase
     c3.each_inst { |i| str << i.to_s(true) }
     assert_equal(str.join(";"), "")
 
-    if RBA::Application::instance.is_editable? 
+    i1.cell_index = ci3
 
-      i1.cell_index = ci3
+    str = []
+    c1.each_inst { |i| str << i.to_s(true) }
+    assert_equal(str.join(";"), "c3 r90 100,-50")
 
-      str = []
-      c1.each_inst { |i| str << i.to_s(true) }
-      assert_equal(str.join(";"), "c3 r90 100,-50")
+    str = []
+    c2.each_inst { |i| str << i.to_s(true) }
+    assert_equal(str.join(";"), "")
 
-      str = []
-      c2.each_inst { |i| str << i.to_s(true) }
-      assert_equal(str.join(";"), "")
+    str = []
+    c3.each_inst { |i| str << i.to_s(true) }
+    assert_equal(str.join(";"), "")
 
-      str = []
-      c3.each_inst { |i| str << i.to_s(true) }
-      assert_equal(str.join(";"), "")
+    i1.cell = c2
 
-      i1.cell = c2
+    str = []
+    c1.each_inst { |i| str << i.to_s(true) }
+    assert_equal(str.join(";"), "c2 r90 100,-50")
 
-      str = []
-      c1.each_inst { |i| str << i.to_s(true) }
-      assert_equal(str.join(";"), "c2 r90 100,-50")
+    str = []
+    c2.each_inst { |i| str << i.to_s(true) }
+    assert_equal(str.join(";"), "")
 
-      str = []
-      c2.each_inst { |i| str << i.to_s(true) }
-      assert_equal(str.join(";"), "")
+    str = []
+    c3.each_inst { |i| str << i.to_s(true) }
+    assert_equal(str.join(";"), "")
 
-      str = []
-      c3.each_inst { |i| str << i.to_s(true) }
-      assert_equal(str.join(";"), "")
+    assert_equal(i1.parent_cell.name, "c1")
 
-      assert_equal(i1.parent_cell.name, "c1")
+    i1.cell = c1
+    i1.parent_cell = c2
 
-      i1.cell = c1
-      i1.parent_cell = c2
+    str = []
+    c1.each_inst { |i| str << i.to_s(true) }
+    assert_equal(str.join(";"), "")
 
-      str = []
-      c1.each_inst { |i| str << i.to_s(true) }
-      assert_equal(str.join(";"), "")
+    str = []
+    c2.each_inst { |i| str << i.to_s(true) }
+    assert_equal(str.join(";"), "c1 r90 100,-50")
 
-      str = []
-      c2.each_inst { |i| str << i.to_s(true) }
-      assert_equal(str.join(";"), "c1 r90 100,-50")
-
-      str = []
-      c3.each_inst { |i| str << i.to_s(true) }
-      assert_equal(str.join(";"), "")
-
-    end
+    str = []
+    c3.each_inst { |i| str << i.to_s(true) }
+    assert_equal(str.join(";"), "")
 
   end
 

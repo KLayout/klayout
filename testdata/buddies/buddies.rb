@@ -32,7 +32,7 @@ load("test_prologue.rb")
 class Buddies_TestClass < TestBase
 
   def buddy_bin(name)
-    file = File.join(RBA::Application::instance.inst_path, name)
+    file = File.join($ut_inst_path, name)
     return file
   end
 

@@ -34,7 +34,7 @@ ViewOp::ViewOp ()
   init (0, Copy);
 }
 
-ViewOp::ViewOp (color_t color, Mode mode, unsigned int line_style_index, unsigned int dither_index, unsigned int dither_offset, Shape shape, int width, int bitmap_index)
+ViewOp::ViewOp (tl::color_t color, Mode mode, unsigned int line_style_index, unsigned int dither_index, unsigned int dither_offset, Shape shape, int width, int bitmap_index)
   : m_line_style_index (line_style_index),
     m_dither_index (dither_index), m_dither_offset (dither_offset),
     m_shape (shape),
@@ -45,7 +45,7 @@ ViewOp::ViewOp (color_t color, Mode mode, unsigned int line_style_index, unsigne
 }
 
 void
-ViewOp::init (color_t color, Mode mode)
+ViewOp::init (tl::color_t color, Mode mode)
 {
   m_or  = (mode == Copy || mode == Or)  ? color : 0;
   m_and = (mode == Copy || mode == And) ? color : wordones;

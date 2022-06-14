@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_CURL) || defined(HAVE_QT)
 
 #include "tlWebDAV.h"
 #include "tlHttpStream.h"
@@ -149,3 +150,6 @@ TEST(5)
   EXPECT_EQ (ba21, "A text II.I.\n");
   text21.close ();
 }
+
+#endif
+

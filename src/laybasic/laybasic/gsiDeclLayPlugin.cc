@@ -48,7 +48,7 @@ class PluginBase
 {
 public:
   PluginBase ()
-    : lay::Plugin (sp_dispatcher), lay::ViewService (sp_view ? sp_view->view_object_widget () : 0)
+    : lay::Plugin (sp_dispatcher), lay::ViewService (sp_view ? sp_view->canvas () : 0)
   {
     if (! s_in_create_plugin) {
       throw tl::Exception (tl::to_string (tr ("A PluginBase object can only be created in the PluginFactory's create_plugin method")));
@@ -57,21 +57,21 @@ public:
 
   void grab_mouse ()
   {
-    if (widget ()) {
-      widget ()->grab_mouse (this, false);
+    if (ui ()) {
+      ui ()->grab_mouse (this, false);
     }
   }
 
   void ungrab_mouse ()
   {
-    if (widget ()) {
-      widget ()->ungrab_mouse (this);
+    if (ui ()) {
+      ui ()->ungrab_mouse (this);
     }
   }
 
   void set_cursor (int c)
   {
-    if (widget ()) {
+    if (ui ()) {
       lay::ViewService::set_cursor ((enum lay::Cursor::cursor_shape) c);
     }
   }

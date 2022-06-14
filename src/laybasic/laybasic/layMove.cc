@@ -35,7 +35,7 @@ namespace lay
 //  MoveService implementation
 
 MoveService::MoveService (lay::LayoutViewBase *view)
-  : lay::ViewService (view->view_object_widget ()),
+  : lay::ViewService (view->canvas ()),
     m_dragging (false),
     m_dragging_transient (false),
     mp_editables (view),
@@ -102,7 +102,7 @@ MoveService::key_event (unsigned int key, unsigned int /*buttons*/)
   if (! m_dragging && fabs (dx + dy) > 0.0 && mp_editables->has_selection ()) {
 
     //  determine a shift distance which is 2, 5 or 10 times the grid and is more than 5 pixels
-    double dmin = double (5 /*pixels min shift*/) / widget ()->mouse_event_trans ().mag ();
+    double dmin = double (5 /*pixels min shift*/) / ui ()->mouse_event_trans ().mag ();
     double d = m_global_grid;
     while (d < dmin) {
       d *= 2.0;
@@ -302,7 +302,7 @@ MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_
 
       m_dragging = true;
       m_dragging_transient = drag_transient;
-      widget ()->grab_mouse (this, false);
+      ui ()->grab_mouse (this, false);
 
       m_shift = db::DPoint ();
 
@@ -314,7 +314,7 @@ MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_
 
     m_dragging = false;
 
-    widget ()->ungrab_mouse (this);
+    ui ()->ungrab_mouse (this);
     mp_editables->end_move (p, ac_from_buttons (buttons), mp_transaction.release ());
 
     if (m_dragging_transient) {
@@ -334,7 +334,7 @@ MoveService::drag_cancel ()
   if (m_dragging) {
 
     mp_editables->edit_cancel ();
-    widget ()->ungrab_mouse (this);
+    ui ()->ungrab_mouse (this);
 
     m_dragging = false;
 

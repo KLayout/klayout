@@ -29,7 +29,7 @@
 #if defined(HAVE_QT)
 #  include "layPluginConfigPage.h"
 #endif
-#include "layColor.h"
+#include "tlColor.h"
 #include "dbTypes.h"
 #include "dbBox.h"
 
@@ -80,10 +80,10 @@ private:
   bool m_visible;
   bool m_show_ruler;
   double m_grid;
-  lay::Color m_color;
-  lay::Color m_grid_color;
-  lay::Color m_axis_color;
-  lay::Color m_ruler_color;
+  tl::Color m_color;
+  tl::Color m_grid_color;
+  tl::Color m_axis_color;
+  tl::Color m_ruler_color;
   GridStyle m_style0;
   GridStyle m_style1;
   GridStyle m_style2;

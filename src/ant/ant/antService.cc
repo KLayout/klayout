@@ -1333,7 +1333,7 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
   } else if (m_move_mode == MoveRuler) {
 
     //  try two ways of snapping
-    db::DVector dp = p - m_p1;
+    db::DVector dp = lay::snap_angle (p - m_p1, ac == lay::AC_Global ? m_snap_mode : ac);
 
     db::DPoint p1 = m_original.p1 () + dp;
     db::DPoint p2 = m_original.p2 () + dp;
@@ -1356,13 +1356,15 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
 
   } else if (m_move_mode == MoveSelected) {
 
-    db::DVector dp = p - m_trans (m_p1);
+    db::DVector dp = p - m_p1;
     //  round the drag distance to grid if required: this is the least we can do in this case
     if (m_grid_snap) {
       dp = db::DVector (lay::snap (dp.x (), m_grid), lay::snap (dp.y (), m_grid));
     } 
 
-    m_trans = db::DTrans (dp) * m_trans;
+    dp = lay::snap_angle (dp, ac == lay::AC_Global ? m_snap_mode : ac);
+
+    m_trans = db::DTrans (dp + (m_p1 - db::DPoint ()) - m_trans.disp ()) * m_trans * db::DTrans (db::DPoint () - m_p1);
 
     for (std::vector<ant::View *>::iterator r = m_rulers.begin (); r != m_rulers.end (); ++r) {
       (*r)->transform_by (db::DCplxTrans (m_trans));

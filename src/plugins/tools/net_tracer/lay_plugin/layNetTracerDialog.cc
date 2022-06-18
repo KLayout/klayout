@@ -586,16 +586,17 @@ NetTracerDialog::menu_activated (const std::string &symbol)
 }
 
 void 
-NetTracerDialog::net_color_changed (QColor color)
+NetTracerDialog::net_color_changed (QColor qc)
 {
   bool changed = false;
+  tl::Color color (qc);
 
   QList<QListWidgetItem *> selected_items = net_list->selectedItems ();
   for (QList<QListWidgetItem *>::const_iterator item = selected_items.begin (); item != selected_items.end (); ++item) {
     int item_index = net_list->row (*item);
     if (item_index >= 0 && item_index < int (mp_nets.size ())) {
       if (color != mp_nets [item_index]->color ()) {
-        mp_nets [item_index]->set_color (color.rgb ());
+        mp_nets [item_index]->set_color (color);
         changed = true;
       }
     }
@@ -1052,15 +1053,17 @@ NetTracerDialog::update_info ()
   //  determine and set the common net color
 
   if (selected_items.size () != 1) {
+
     net_color->set_color (QColor ());
     net_color->setEnabled (false);
+
   } else {
 
     QColor nc;
 
     int item_index = net_list->row (*selected_items.begin ());
     if (item_index >= 0 && item_index < int (mp_nets.size ())) {
-      nc = mp_nets [item_index]->color ();
+      nc = mp_nets [item_index]->color ().to_qc ();
     }
 
     net_color->set_color (nc);
@@ -1093,12 +1096,12 @@ NetTracerDialog::update_list ()
 
     item->setData (Qt::DisplayRole, tl::to_qstring (mp_nets [i]->name ()));
 
-    if (tl::Color (mp_nets [i]->color ()).is_valid ()) {
+    if (mp_nets [i]->color ().is_valid ()) {
 
       QPixmap pxmp (icon_size);
       QPainter pxpainter (&pxmp);
       pxpainter.setPen (QPen (text_color));
-      pxpainter.setBrush (QBrush (mp_nets [i]->color ()));
+      pxpainter.setBrush (QBrush (mp_nets [i]->color ().to_qc ()));
       QRect r (0, 0, pxmp.width () - 1, pxmp.height () - 1);
       pxpainter.drawRect (r);
 

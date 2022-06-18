@@ -28,6 +28,10 @@
 #include <stdint.h>
 #include <string>
 
+#if defined(HAVE_QT)
+#  include <QColor>
+#endif
+
 namespace tl
 {
 
@@ -60,8 +64,17 @@ public:
 
   /**
    *  @brief Creates a color from a RGB triplet
+   *
+   *  Note: this will set the alpha value to 255.
    */
   Color (color_t color);
+
+#if defined(HAVE_QT)
+  /**
+   *  @brief Creates a color from a QColor
+   */
+  Color (const QColor &qc);
+#endif
 
   /**
    *  @brief Creates a color from a RGB triplet and alpha value
@@ -74,6 +87,11 @@ public:
    *  @brief Creates a color value from a string
    */
   Color (const std::string &name);
+
+  /**
+   *  @brief Creates a color value from a string
+   */
+  Color (const char *name);
 
   /**
    *  @brief Comparison: equal
@@ -103,6 +121,13 @@ public:
    *  @brief Gets the string value from a color
    */
   std::string to_string () const;
+
+#if defined(HAVE_QT)
+  /**
+   *  @brief Gets the QColor from the color
+   */
+  QColor to_qc () const;
+#endif
 
   /**
    *  @brief Gets a value indicating whether the color is valid
@@ -172,7 +197,29 @@ public:
 
 private:
   color_t m_color;
+
+  void init_from_string (const char *s);
 };
+
+#if defined(HAVE_QT)
+
+/**
+ *  @brief Provides conversion of a color_t to QColor
+ */
+inline QColor c2qc (color_t c)
+{
+  return Color (c).to_qc ();
+}
+
+/**
+ *  @brief Provides conversion of a QColor to color_t
+ */
+inline color_t qc2c (const QColor &qc)
+{
+  return Color (qc).rgb ();
+}
+
+#endif
 
 }
 

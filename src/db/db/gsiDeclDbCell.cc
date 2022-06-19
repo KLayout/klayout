@@ -90,25 +90,51 @@ struct cell_inst_array_defs
     }
   }
 
+  static void normalize_array_arguments (const vector_type &a, const vector_type &b, unsigned long &na, unsigned long &nb)
+  {
+    if (na < 1 || a == vector_type ()) {
+      na = 1;
+    }
+    if (nb < 1 || b == vector_type ()) {
+      nb = 1;
+    }
+  }
+
   static C *
   new_cell_inst_array_vector (db::cell_index_type ci, const vector_type &v,
-                       const vector_type &a, const vector_type &b, unsigned int na, unsigned int nb)
+                       const vector_type &a, const vector_type &b, unsigned long na, unsigned long nb)
   {
-    return new C (db::CellInst (ci), trans_type (v), a, b, na, nb);
+    normalize_array_arguments (a, b, na, nb);
+    if (na == 1 && nb == 1) {
+      //  single instance
+      return new_cell_inst_vector (ci, v);
+    } else {
+      return new C (db::CellInst (ci), trans_type (v), a, b, na, nb);
+    }
   }
 
   static C *
   new_cell_inst_array (db::cell_index_type ci, const trans_type &t,
-                       const vector_type &a, const vector_type &b, unsigned int na, unsigned int nb)
+                       const vector_type &a, const vector_type &b, unsigned long na, unsigned long nb)
   {
-    return new C (db::CellInst (ci), t, a, b, na, nb);
+    normalize_array_arguments (a, b, na, nb);
+    if (na == 1 && nb == 1) {
+      //  single instance
+      return new_cell_inst (ci, t);
+    } else {
+      return new C (db::CellInst (ci), t, a, b, na, nb);
+    }
   }
 
   static C *
   new_cell_inst_array_cplx (db::cell_index_type ci, const complex_trans_type &t,
-                            const vector_type &a, const vector_type &b, unsigned int na, unsigned int nb)
+                            const vector_type &a, const vector_type &b, unsigned long na, unsigned long nb)
   {
-    if (t.is_mag () || ! t.is_ortho ()) {
+    normalize_array_arguments (a, b, na, nb);
+    if (na == 1 && nb == 1) {
+      //  single instance
+      return new_cell_inst_cplx (ci, t);
+    } else if (t.is_mag () || ! t.is_ortho ()) {
       return new C (db::CellInst (ci), t, a, b, na, nb);
     } else {
       return new C (db::CellInst (ci), trans_type (t), a, b, na, nb);
@@ -160,6 +186,23 @@ struct cell_inst_array_defs
     return a;
   }
 
+  static void reset_array_reg (C *arr, const vector_type &a, const vector_type &b, unsigned long na, unsigned long nb)
+  {
+    if (na > 0 && nb > 0) {
+      if (arr->is_complex ()) {
+        *arr = C (arr->object (), arr->complex_trans (), a, b, na, nb);
+      } else {
+        *arr = C (arr->object (), arr->front (), a, b, na, nb);
+      }
+    } else {
+      if (arr->is_complex ()) {
+        *arr = C (arr->object (), arr->complex_trans ());
+      } else {
+        *arr = C (arr->object (), arr->front ());
+      }
+    }
+  }
+
   static void set_array_a (C *arr, const vector_type &a_in)
   {
     vector_type a, b;
@@ -168,11 +211,7 @@ struct cell_inst_array_defs
 
     a = a_in;
 
-    if (arr->is_complex ()) {
-      *arr = C (arr->object (), arr->complex_trans (), a, b, na, nb);
-    } else {
-      *arr = C (arr->object (), arr->front (), a, b, na, nb);
-    }
+    reset_array_reg (arr, a, b, na, nb);
   }
 
   static vector_type array_b (const C *arr)
@@ -191,11 +230,7 @@ struct cell_inst_array_defs
 
     b = b_in;
 
-    if (arr->is_complex ()) {
-      *arr = C (arr->object (), arr->complex_trans (), a, b, na, nb);
-    } else {
-      *arr = C (arr->object (), arr->front (), a, b, na, nb);
-    }
+    reset_array_reg (arr, a, b, na, nb);
   }
 
   static unsigned long array_na (const C *arr)
@@ -214,19 +249,7 @@ struct cell_inst_array_defs
 
     na = na_in;
 
-    if (na > 0 && nb > 0) {
-      if (arr->is_complex ()) {
-        *arr = C (arr->object (), arr->complex_trans (), a, b, na, nb);
-      } else {
-        *arr = C (arr->object (), arr->front (), a, b, na, nb);
-      }
-    } else {
-      if (arr->is_complex ()) {
-        *arr = C (arr->object (), arr->complex_trans ());
-      } else {
-        *arr = C (arr->object (), arr->front ());
-      }
-    }
+    reset_array_reg (arr, a, b, na, nb);
   }
 
   static unsigned long array_nb (const C *arr)
@@ -245,19 +268,7 @@ struct cell_inst_array_defs
 
     nb = nb_in;
 
-    if (na > 0 && nb > 0) {
-      if (arr->is_complex ()) {
-        *arr = C (arr->object (), arr->complex_trans (), a, b, na, nb);
-      } else {
-        *arr = C (arr->object (), arr->front (), a, b, na, nb);
-      }
-    } else {
-      if (arr->is_complex ()) {
-        *arr = C (arr->object (), arr->complex_trans ());
-      } else {
-        *arr = C (arr->object (), arr->front ());
-      }
-    }
+    reset_array_reg (arr, a, b, na, nb);
   }
 
   static void set_trans (C *arr, const trans_type &t)

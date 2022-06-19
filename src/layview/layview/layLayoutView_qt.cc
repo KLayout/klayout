@@ -1122,7 +1122,7 @@ void
 LayoutView::emit_title_changed ()
 {
   if (mp_widget) {
-    mp_widget->emit_title_changed ();
+    mp_widget->emit_title_changed (this);
   }
 }
 
@@ -1130,7 +1130,7 @@ void
 LayoutView::emit_dirty_changed ()
 {
   if (mp_widget) {
-    mp_widget->emit_dirty_changed ();
+    mp_widget->emit_dirty_changed (this);
   }
 }
 

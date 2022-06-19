@@ -27,10 +27,7 @@
 #include "dbNetTracer.h"
 #include "dbLayerProperties.h"
 #include "dbTechnology.h"
-
-#if defined(HAVE_QT)
-#  include <QColor>
-#endif
+#include "tlColor.h"
 
 namespace db
 {
@@ -199,7 +196,7 @@ public:
   /**
    *  @brief Gets the color in which the net is drawn
    */
-  uint32_t color () const
+  const tl::Color &color () const
   {
     return m_color;
   }
@@ -207,7 +204,7 @@ public:
   /**
    *  @brief Sets the color in which the net is drawn
    */
-  void set_color (uint32_t c)
+  void set_color (const tl::Color &c)
   {
     m_color = c;
   }
@@ -353,7 +350,7 @@ private:
   db::Shapes m_shapes;
   std::map <unsigned int, std::pair <db::LayerProperties, db::LayerProperties> > m_layers;
   std::map <unsigned int, std::string> m_cell_names;
-  uint32_t m_color;
+  tl::Color m_color;
   db::DBox m_start_search_box, m_stop_search_box;
   bool m_trace_path;
 

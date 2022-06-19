@@ -3339,8 +3339,8 @@ MainWindow::add_view (lay::LayoutView *view)
 {
   tl_assert (view->widget ());
 
-  connect (view->widget (), SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
-  connect (view->widget (), SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
+  connect (view->widget (), SIGNAL (title_changed (lay::LayoutView *)), this, SLOT (view_title_changed (lay::LayoutView *)));
+  connect (view->widget (), SIGNAL (dirty_changed (lay::LayoutView *)), this, SLOT (view_title_changed (lay::LayoutView *)));
   connect (view->widget (), SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
   connect (view->widget (), SIGNAL (menu_needs_update ()), this, SLOT (menu_needs_update ()));
   connect (view->widget (), SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
@@ -3527,14 +3527,14 @@ MainWindow::update_tab_title (int i)
 }
 
 void
-MainWindow::view_title_changed ()
+MainWindow::view_title_changed (lay::LayoutView *view)
 {
-  int i = index_of (dynamic_cast<const lay::LayoutView *> (sender ()));
+  int i = index_of (view);
   if (i >= 0) {
     update_tab_title (i);
   }
 
-  if (current_view () && sender () == current_view ()->widget ()) {
+  if (view == current_view ()) {
     update_window_title ();
   }
 }

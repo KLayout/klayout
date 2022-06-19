@@ -35,6 +35,10 @@ TEST(1)
   EXPECT_EQ (tl::Color ().rgb (), 0x00000000);
 
 #if defined(HAVE_QT)
+  EXPECT_EQ (tl::Color (QColor ()).is_valid (), false);
+  EXPECT_EQ (tl::Color (QColor ()).to_string (), "");
+  EXPECT_EQ (tl::Color (QColor ()).rgb (), 0x00000000);
+  EXPECT_EQ (tl::Color (QColor ()).to_qc ().isValid (), false);
   EXPECT_EQ (QColor ().isValid (), false);
   EXPECT_EQ (tl::to_string (QColor ().name ()), "#000000");  // why?
   EXPECT_EQ (QColor ().rgb (), 0xff000000);
@@ -48,6 +52,11 @@ TEST(2)
   EXPECT_EQ (tl::Color (0x102030).rgb (), 0xff102030);
 
 #if defined(HAVE_QT)
+  EXPECT_EQ (tl::Color (QColor (0x102030)).is_valid (), true);
+  EXPECT_EQ (tl::Color (QColor (0x102030)).to_string (), "#102030");
+  EXPECT_EQ (tl::Color (QColor (0x102030)).rgb (), 0xff102030);
+  EXPECT_EQ (tl::Color (QColor (0x102030)).to_qc ().isValid (), true);
+  EXPECT_EQ (tl::to_string (tl::Color (QColor (0x102030)).to_qc ().name ()), "#102030");
   EXPECT_EQ (QColor (0x102030).isValid (), true);
   EXPECT_EQ (tl::to_string (QColor (0x102030).name ()), "#102030");
   EXPECT_EQ (QColor (0x102030).rgb (), 0xff102030);

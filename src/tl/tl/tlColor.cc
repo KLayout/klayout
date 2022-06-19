@@ -43,6 +43,16 @@ Color::Color (color_t color)
   //  .. nothing yet ..
 }
 
+#if defined(HAVE_QT)
+Color::Color (const QColor &qc)
+  : m_color (0)
+{
+  if (qc.isValid ()) {
+    m_color = qc.rgba ();
+  }
+}
+#endif
+
 Color::Color (unsigned int r, unsigned int g, unsigned int b, unsigned int alpha)
   : m_color ((b & 0xff) | ((g & 0xff) << 8) | ((r & 0xff) << 16) | ((alpha & 0xff) << 24))
 {
@@ -52,8 +62,19 @@ Color::Color (unsigned int r, unsigned int g, unsigned int b, unsigned int alpha
 Color::Color (const std::string &name)
 {
   m_color = 0;
+  init_from_string (name.c_str ());
+}
 
-  tl::Extractor ex (name.c_str ());
+Color::Color (const char *name)
+{
+  m_color = 0;
+  init_from_string (name);
+}
+
+void
+Color::init_from_string (const char *s)
+{
+  tl::Extractor ex (s);
 
   unsigned int n = 0;
 
@@ -111,6 +132,14 @@ Color::to_string () const
 
   }
 }
+
+#if defined(HAVE_QT)
+QColor
+Color::to_qc () const
+{
+  return is_valid () ? QColor (rgb ()) : QColor ();
+}
+#endif
 
 bool
 Color::is_valid () const

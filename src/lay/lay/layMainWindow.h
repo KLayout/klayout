@@ -638,7 +638,7 @@ public slots:
   void open_recent_layer_properties (size_t n);
   void open_recent_bookmarks (size_t n);
   void view_selected (int index);
-  void view_title_changed ();
+  void view_title_changed (lay::LayoutView *view);
 
   /**
    *  @brief shows the given URL as a non-modal help window

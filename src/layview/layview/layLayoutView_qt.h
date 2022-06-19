@@ -102,8 +102,8 @@ public:
   virtual void showEvent (QShowEvent *);
   virtual void hideEvent (QHideEvent *);
 
-  void emit_title_changed () { emit title_changed (); }
-  void emit_dirty_changed () { emit dirty_changed (); }
+  void emit_title_changed (lay::LayoutView *view) { emit title_changed (view); }
+  void emit_dirty_changed (lay::LayoutView *view) { emit dirty_changed (view); }
   void emit_show_message (const std::string &s, int ms) { emit show_message (s, ms); }
   void emit_current_pos_changed (double x, double y, bool dbu_units) { emit current_pos_changed (x, y, dbu_units); }
   void emit_clear_current_pos () { emit clear_current_pos (); }
@@ -117,12 +117,12 @@ signals:
   /**
    *  @brief This signal is emitted when the title changes
    */
-  void title_changed ();
+  void title_changed (lay::LayoutView *view);
 
   /**
    *  @brief This signal is emitted when the "dirty" flag changes
    */
-  void dirty_changed ();
+  void dirty_changed (lay::LayoutView *view);
 
   /**
    *  @brief This signal is emitted when the view wants to show a message for the given time (of infinitely for ms == 0)

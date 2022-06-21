@@ -365,25 +365,25 @@ class DBCellInst_TestClass < TestBase
     ii.na = 0
     assert_equal(ii.to_s, "#8 r270 0,0")
 
-    i = RBA::CellInstArray.new(0, RBA::Vector::new(1, 2), RBA::Vector::new(10, 20), RBA::Vector::new, 2, 2)
+    i = RBA::CellInstArray.new(0, RBA::Trans::new(RBA::Vector::new(1, 2)), RBA::Vector::new(10, 20), RBA::Vector::new, 2, 2)
     assert_equal(i.to_s, "#0 r0 1,2 [10,20*2;0,0*1]")
 
-    i = RBA::CellInstArray.new(0, RBA::Vector::new(1, 2), RBA::Vector::new(10, 20), RBA::Vector::new(11, 21), 2, 2)
+    i = RBA::CellInstArray.new(0, RBA::Trans::new(RBA::Vector::new(1, 2)), RBA::Vector::new(10, 20), RBA::Vector::new(11, 21), 2, 2)
     assert_equal(i.to_s, "#0 r0 1,2 [10,20*2;11,21*2]")
 
-    i = RBA::CellInstArray.new(0, RBA::Vector::new(1, 2), RBA::Vector::new, RBA::Vector::new(11, 21), 2, 2)
+    i = RBA::CellInstArray.new(0, RBA::Trans::new(RBA::Vector::new(1, 2)), RBA::Vector::new, RBA::Vector::new(11, 21), 2, 2)
     assert_equal(i.to_s, "#0 r0 1,2 [0,0*1;11,21*2]")
 
-    i = RBA::CellInstArray.new(0, RBA::Vector::new(1, 2), RBA::Vector::new, RBA::Vector::new, 2, 2)
+    i = RBA::CellInstArray.new(0, RBA::Trans::new(RBA::Vector::new(1, 2)), RBA::Vector::new, RBA::Vector::new, 2, 2)
     assert_equal(i.to_s, "#0 r0 1,2")
 
-    i = RBA::CellInstArray.new(0, RBA::Vector::new(1, 2), RBA::Vector::new(10, 20), RBA::Vector::new(11, 21), 0, 2)
+    i = RBA::CellInstArray.new(0, RBA::Trans::new(RBA::Vector::new(1, 2)), RBA::Vector::new(10, 20), RBA::Vector::new(11, 21), 0, 2)
     assert_equal(i.to_s, "#0 r0 1,2 [10,20*1;11,21*2]")
 
-    i = RBA::CellInstArray.new(0, RBA::Vector::new(1, 2), RBA::Vector::new(10, 20), RBA::Vector::new(11, 21), 2, 0)
+    i = RBA::CellInstArray.new(0, RBA::Trans::new(RBA::Vector::new(1, 2)), RBA::Vector::new(10, 20), RBA::Vector::new(11, 21), 2, 0)
     assert_equal(i.to_s, "#0 r0 1,2 [10,20*2;11,21*1]")
 
-    i = RBA::CellInstArray.new(0, RBA::Vector::new(1, 2), RBA::Vector::new(10, 20), RBA::Vector::new(11, 21), 0, 0)
+    i = RBA::CellInstArray.new(0, RBA::Trans::new(RBA::Vector::new(1, 2)), RBA::Vector::new(10, 20), RBA::Vector::new(11, 21), 0, 0)
     assert_equal(i.to_s, "#0 r0 1,2")
 
   end
@@ -458,25 +458,25 @@ class DBCellInst_TestClass < TestBase
     ii.na = 0
     assert_equal(ii.to_s, "#8 r270 0,0")
 
-    i = RBA::DCellInstArray.new(0, RBA::DVector::new(1, 2), RBA::DVector::new(10, 20), RBA::DVector::new, 2, 2)
+    i = RBA::DCellInstArray.new(0, RBA::DTrans::new(RBA::DVector::new(1, 2)), RBA::DVector::new(10, 20), RBA::DVector::new, 2, 2)
     assert_equal(i.to_s, "#0 r0 1,2 [10,20*2;0,0*1]")
 
-    i = RBA::DCellInstArray.new(0, RBA::DVector::new(1, 2), RBA::DVector::new(10, 20), RBA::DVector::new(11, 21), 2, 2)
+    i = RBA::DCellInstArray.new(0, RBA::DTrans::new(RBA::DVector::new(1, 2)), RBA::DVector::new(10, 20), RBA::DVector::new(11, 21), 2, 2)
     assert_equal(i.to_s, "#0 r0 1,2 [10,20*2;11,21*2]")
 
-    i = RBA::DCellInstArray.new(0, RBA::DVector::new(1, 2), RBA::DVector::new, RBA::DVector::new(11, 21), 2, 2)
+    i = RBA::DCellInstArray.new(0, RBA::DTrans::new(RBA::DVector::new(1, 2)), RBA::DVector::new, RBA::DVector::new(11, 21), 2, 2)
     assert_equal(i.to_s, "#0 r0 1,2 [0,0*1;11,21*2]")
 
-    i = RBA::DCellInstArray.new(0, RBA::DVector::new(1, 2), RBA::DVector::new, RBA::DVector::new, 2, 2)
+    i = RBA::DCellInstArray.new(0, RBA::DTrans::new(RBA::DVector::new(1, 2)), RBA::DVector::new, RBA::DVector::new, 2, 2)
     assert_equal(i.to_s, "#0 r0 1,2")
 
-    i = RBA::DCellInstArray.new(0, RBA::DVector::new(1, 2), RBA::DVector::new(10, 20), RBA::DVector::new(11, 21), 0, 2)
+    i = RBA::DCellInstArray.new(0, RBA::DTrans::new(RBA::DVector::new(1, 2)), RBA::DVector::new(10, 20), RBA::DVector::new(11, 21), 0, 2)
     assert_equal(i.to_s, "#0 r0 1,2 [10,20*1;11,21*2]")
 
-    i = RBA::DCellInstArray.new(0, RBA::DVector::new(1, 2), RBA::DVector::new(10, 20), RBA::DVector::new(11, 21), 2, 0)
+    i = RBA::DCellInstArray.new(0, RBA::DTrans::new(RBA::DVector::new(1, 2)), RBA::DVector::new(10, 20), RBA::DVector::new(11, 21), 2, 0)
     assert_equal(i.to_s, "#0 r0 1,2 [10,20*2;11,21*1]")
 
-    i = RBA::DCellInstArray.new(0, RBA::DVector::new(1, 2), RBA::DVector::new(10, 20), RBA::DVector::new(11, 21), 0, 0)
+    i = RBA::DCellInstArray.new(0, RBA::DTrans::new(RBA::DVector::new(1, 2)), RBA::DVector::new(10, 20), RBA::DVector::new(11, 21), 0, 0)
     assert_equal(i.to_s, "#0 r0 1,2")
 
   end

@@ -57,7 +57,7 @@
       <item row="0" column="0" colspan="2">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>If this option is enabled, the program will detect changes in layout files and ask whether to reload them</string>
+         <string>If this option is enabled, the program will detect changes in layout files and ask whether to reload them.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -109,7 +109,45 @@
       <item row="1" column="2">
        <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>(0 for &quot;no backups)</string>
+         <string>(0 for no backups)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Disable Save Needed Dialog</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <item row="1" column="0" colspan="2">
+       <widget class="QCheckBox" name="always_exit_without_saving">
+        <property name="text">
+         <string>Always exit without saving</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>If this option is enabled, the program will not ask to save changes before exiting.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>false</bool>
         </property>
        </widget>
       </item>

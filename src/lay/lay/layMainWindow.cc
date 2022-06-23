@@ -1477,7 +1477,7 @@ MainWindow::can_close ()
   std::string df_list;
   int dirty_layouts = dirty_files (df_list);
 
-  if (dirty_layouts == 0) {
+  if ( (dirty_layouts == 0) || cfg_always_exit_without_saving ) {
     return true;
   } else {
 

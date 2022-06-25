@@ -514,13 +514,13 @@ namespace std
   template <class Shape, class Trans>
   size_t hfunc (const db::shape_ref<Shape, Trans> &o, size_t h)
   {
-    return hfunc (*o.ptr (), hfunc (o.trans (), h));
+    return hfunc ((size_t) o.ptr (), hfunc (o.trans (), h));
   }
 
   template <class Shape, class Trans>
   size_t hfunc (const db::shape_ref<Shape, Trans> &o)
   {
-    return hfunc (*o.ptr (), hfunc (o.trans ()));
+    return hfunc ((size_t) o.ptr (), hfunc (o.trans ()));
   }
 
   template <class Shape, class Trans>
@@ -539,13 +539,13 @@ namespace std
   template <class Shape, class Trans>
   size_t hfunc (const db::polygon_ref<Shape, Trans> &o, size_t h)
   {
-    return hfunc (*o.ptr (), hfunc (o.trans (), h));
+    return hfunc ((size_t) o.ptr (), hfunc (o.trans (), h));
   }
 
   template <class Shape, class Trans>
   size_t hfunc (const db::polygon_ref<Shape, Trans> &o)
   {
-    return hfunc (*o.ptr (), hfunc (o.trans ()));
+    return hfunc ((size_t) o.ptr (), hfunc (o.trans ()));
   }
 
   template <class Shape, class Trans>
@@ -564,13 +564,13 @@ namespace std
   template <class Shape, class Trans>
   size_t hfunc (const db::path_ref<Shape, Trans> &o, size_t h)
   {
-    return hfunc (*o.ptr (), hfunc (o.trans (), h));
+    return hfunc ((size_t) o.ptr (), hfunc (o.trans (), h));
   }
 
   template <class Shape, class Trans>
   size_t hfunc (const db::path_ref<Shape, Trans> &o)
   {
-    return hfunc (*o.ptr (), hfunc (o.trans ()));
+    return hfunc ((size_t) o.ptr (), hfunc (o.trans ()));
   }
 
   template <class Shape, class Trans>
@@ -589,13 +589,13 @@ namespace std
   template <class Shape, class Trans>
   size_t hfunc (const db::text_ref<Shape, Trans> &o, size_t h)
   {
-    return hfunc (*o.ptr (), hfunc (o.trans (), h));
+    return hfunc ((size_t) o.ptr (), hfunc (o.trans (), h));
   }
 
   template <class Shape, class Trans>
   size_t hfunc (const db::text_ref<Shape, Trans> &o)
   {
-    return hfunc (*o.ptr (), hfunc (o.trans ()));
+    return hfunc ((size_t) o.ptr (), hfunc (o.trans ()));
   }
 
   template <class Shape, class Trans>

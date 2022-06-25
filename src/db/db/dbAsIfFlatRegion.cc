@@ -1038,6 +1038,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
 #if defined(USE_LOCAL_PROCESSOR)
 
   bool needs_merged_primary = different_polygons || options.needs_merged ();
+needs_merged_primary = true; // @@@
 
   db::RegionIterator polygons (needs_merged_primary ? begin_merged () : begin ());
   bool primary_is_merged = ! merged_semantics () || needs_merged_primary || is_merged ();

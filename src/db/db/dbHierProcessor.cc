@@ -342,11 +342,11 @@ template <class TS, class TI, class TR>
 local_processor_cell_context<TS, TI, TR> &
 local_processor_cell_context<TS, TI, TR>::operator= (const local_processor_cell_context &other)
 {
-    if (this != &other) {
-        m_propagated = other.m_propagated;
-        m_drops = other.m_drops;
-    }
-    return *this;
+  if (this != &other) {
+    m_propagated = other.m_propagated;
+    m_drops = other.m_drops;
+  }
+  return *this;
 }
 
 template <class TS, class TI, class TR>
@@ -1221,6 +1221,7 @@ private:
     db::box_convert <db::CellInst, true> inst_bc (*mp_subject_layout, m_subject_layer);
     db::Box rbox = db::box_convert<TI> () (ref);
 
+// @@@ make member of receiver?
     db::shape_reference_translator_with_trans<TI, db::ICplxTrans> rt (mp_subject_layout);
 
     for (db::CellInstArray::iterator n = inst->begin_touching (safe_box_enlarged (rbox, dist - 1, dist - 1), inst_bc); ! n.at_end (); ++n) {

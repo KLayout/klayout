@@ -1648,6 +1648,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
   bool other_is_merged = true;
 
   bool needs_merged_primary = different_polygons || options.needs_merged ();
+needs_merged_primary = true; // @@@
   bool primary_is_merged = ! merged_semantics () || needs_merged_primary || is_merged ();
 
   if (other == subject_regionptr ()) {

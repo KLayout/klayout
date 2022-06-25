@@ -250,7 +250,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
 
     size_t n = 0;
 
-    if (m_is_merged) {
+    if (m_is_merged || (interactions.size () == 1 && interactions.subject_shape (interactions.begin ()->first).is_box ())) {
 
       for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
         const TS &subject = interactions.subject_shape (i->first);
@@ -355,7 +355,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
 
     size_t n = 0;
 
-    if (m_is_merged) {
+    if (m_is_merged || (interactions.size () == 1 && ids.empty () && interactions.subject_shape (interactions.begin ()->first).is_box ())) {
 
       for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
         //  we can't directly insert because TS may be != TI

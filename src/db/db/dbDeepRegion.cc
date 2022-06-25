@@ -1647,16 +1647,23 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
   unsigned int other_layer = 0;
   bool other_is_merged = true;
 
+  bool needs_merged_primary = different_polygons || options.needs_merged ();
+  bool primary_is_merged = ! merged_semantics () || needs_merged_primary || is_merged ();
+
   if (other == subject_regionptr ()) {
     other_layer = subject_idlayer ();
+    other_is_merged = primary_is_merged;
   } else if (other == foreign_regionptr ()) {
     other_layer = foreign_idlayer ();
+    other_is_merged = primary_is_merged;
   } else {
     other_deep = dynamic_cast<const db::DeepRegion *> (other->delegate ());
     if (! other_deep) {
       return db::AsIfFlatRegion::run_check (rel, different_polygons, other, d, options);
     }
-    if (options.whole_edges) {
+    if (! other->merged_semantics ()) {
+      other_is_merged = true;
+    } else if (options.whole_edges) {
       //  NOTE: whole edges needs both inputs merged
       other_layer = other_deep->merged_deep_layer ().layer ();
       other_is_merged = true;
@@ -1666,7 +1673,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
     }
   }
 
-  const db::DeepLayer &polygons = merged_deep_layer ();
+  const db::DeepLayer &polygons = needs_merged_primary ? merged_deep_layer () : deep_layer ();
 
   EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
@@ -1677,7 +1684,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
   std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
 
-  db::CheckLocalOperation op (check, different_polygons, other_deep != 0, other_is_merged, options);
+  db::CheckLocalOperation op (check, different_polygons, primary_is_merged, other_deep != 0, other_is_merged, options);
 
   db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (const_cast<db::Layout *> (&polygons.layout ()),
                                                                           const_cast<db::Cell *> (&polygons.initial_cell ()),

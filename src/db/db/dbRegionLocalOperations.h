@@ -197,6 +197,19 @@ struct DB_PUBLIC RegionCheckOptions
    *  @brief Specifies whether to produce negative output
    */
   bool negative;
+
+  /**
+   *  @brief Gets a value indicating whether merged primary input is required
+   */
+  bool needs_merged () const
+  {
+    return negative
+             || rect_filter != NoRectFilter
+             || opposite_filter != NoOppositeFilter
+             || max_projection != std::numeric_limits<distance_type>::max ()
+             || min_projection != 0
+             || whole_edges;
+  }
 };
 
 template <class TS, class TI>
@@ -204,7 +217,7 @@ class check_local_operation
   : public local_operation<TS, TI, db::EdgePair>
 {
 public:
-  check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options);
+  check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options);
 
   virtual db::Coord dist () const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
@@ -216,6 +229,7 @@ public:
 private:
   EdgeRelationFilter m_check;
   bool m_different_polygons;
+  bool m_is_merged;
   bool m_has_other;
   bool m_other_is_merged;
   db::RegionCheckOptions m_options;

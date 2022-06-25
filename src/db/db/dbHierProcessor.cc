@@ -204,7 +204,7 @@ public:
 
   Ref operator() (const Ref &ref) const
   {
-    typename std::unordered_map<const shape_type *, std::pair<const shape_type *, ref_trans_type> >::const_iterator m = m_cache.find (ref.ptr ());
+    auto m = m_cache.find (std::make_pair (ref.ptr (), m_bare_trans));
     if (m != m_cache.end ()) {
 
       return Ref (m->second.first, ref_trans_type (m_trans * Trans (ref.trans ())) * m->second.second);
@@ -221,7 +221,7 @@ public:
         ptr = mp_layout->shape_repository ().repository (typename shape_type::tag ()).insert (sh);
       }
 
-      m_cache[ref.ptr ()] = std::make_pair (ptr, red_trans);
+      m_cache[std::make_pair (ref.ptr (), m_bare_trans)] = std::make_pair (ptr, red_trans);
 
       return Ref (ptr, ref_trans_type (m_trans * Trans (ref.trans ())) * red_trans);
 
@@ -233,7 +233,7 @@ private:
   Trans m_trans;
   ref_trans_type m_ref_trans;
   Trans m_bare_trans;
-  mutable std::unordered_map<const shape_type *, std::pair<const shape_type *, ref_trans_type> > m_cache;
+  mutable std::unordered_map<std::pair<const shape_type *, Trans>, std::pair<const shape_type *, ref_trans_type> > m_cache;
 };
 
 template <class Trans>
@@ -1198,7 +1198,7 @@ public:
   typedef std::unordered_map<std::pair<db::cell_index_type, db::ICplxTrans>, interactions_value_type> interactions_type;
 
   interaction_registration_inst2shape (db::Layout *subject_layout, unsigned int subject_layer, db::Coord dist, interactions_type *result)
-    : mp_subject_layout (subject_layout), m_subject_layer (subject_layer), m_dist (dist), mp_result (result)
+    : mp_subject_layout (subject_layout), m_subject_layer (subject_layer), m_dist (dist), mp_result (result), m_rt (subject_layout)
   {
     //  nothing yet ..
   }
@@ -1213,6 +1213,7 @@ private:
   unsigned int m_subject_layer;
   db::Coord m_dist;
   interactions_type *mp_result;
+  db::shape_reference_translator_with_trans<TI, db::ICplxTrans> m_rt;
 
   void
   collect_instance_shape_interactions (const db::CellInstArray *inst, unsigned int layer, const TI &ref, db::Coord dist)
@@ -1220,9 +1221,6 @@ private:
     const db::Cell &cell = mp_subject_layout->cell (inst->object ().cell_index ());
     db::box_convert <db::CellInst, true> inst_bc (*mp_subject_layout, m_subject_layer);
     db::Box rbox = db::box_convert<TI> () (ref);
-
-// @@@ make member of receiver?
-    db::shape_reference_translator_with_trans<TI, db::ICplxTrans> rt (mp_subject_layout);
 
     for (db::CellInstArray::iterator n = inst->begin_touching (safe_box_enlarged (rbox, dist - 1, dist - 1), inst_bc); ! n.at_end (); ++n) {
 
@@ -1232,7 +1230,7 @@ private:
       if (! cbox.empty ()) {
 
         db::ICplxTrans tni = tn.inverted ();
-        rt.set_trans (tni);
+        m_rt.set_trans (tni);
 
         std::set<TI> *shapes = 0;
 
@@ -1244,7 +1242,7 @@ private:
           if (! shapes) {
             shapes = & (*mp_result) [std::make_pair (cell.cell_index (), tn)].second [layer];
           }
-          shapes->insert (rt (ref));
+          shapes->insert (m_rt (ref));
         }
       }
 

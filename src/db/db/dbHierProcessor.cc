@@ -189,10 +189,17 @@ public:
   typedef typename Ref::shape_type shape_type;
   typedef typename Ref::trans_type ref_trans_type;
 
-  shape_reference_translator_with_trans_from_shape_ref (db::Layout *target_layout, const Trans &trans)
-    : mp_layout (target_layout), m_trans (trans), m_ref_trans (trans), m_bare_trans (Trans (m_ref_trans.inverted ()) * trans)
+  shape_reference_translator_with_trans_from_shape_ref (db::Layout *target_layout)
+    : mp_layout (target_layout)
   {
     //  .. nothing yet ..
+  }
+
+  void set_trans (const Trans &trans)
+  {
+    m_trans = trans;
+    m_ref_trans = ref_trans_type (trans);
+    m_bare_trans = Trans (m_ref_trans.inverted ()) * trans;
   }
 
   Ref operator() (const Ref &ref) const
@@ -234,8 +241,8 @@ class shape_reference_translator_with_trans<db::PolygonRef, Trans>
   : public shape_reference_translator_with_trans_from_shape_ref<db::PolygonRef, Trans>
 {
 public:
-  shape_reference_translator_with_trans (db::Layout *target_layout, const Trans &trans)
-    : shape_reference_translator_with_trans_from_shape_ref<db::PolygonRef, Trans> (target_layout, trans)
+  shape_reference_translator_with_trans (db::Layout *target_layout)
+    : shape_reference_translator_with_trans_from_shape_ref<db::PolygonRef, Trans> (target_layout)
   {
     //  .. nothing yet ..
   }
@@ -247,10 +254,14 @@ class shape_reference_translator_with_trans
 public:
   typedef Sh shape_type;
 
-  shape_reference_translator_with_trans (db::Layout * /*target_layout*/, const Trans &trans)
-    : m_trans (trans)
+  shape_reference_translator_with_trans (db::Layout * /*target_layout*/)
   {
     //  .. nothing yet ..
+  }
+
+  void set_trans (const Trans &trans)
+  {
+    m_trans = trans;
   }
 
   shape_type operator() (const shape_type &s) const
@@ -353,13 +364,20 @@ local_processor_cell_context<TS, TI, TR>::propagate (unsigned int output_layer, 
     return;
   }
 
+  db::Layout *subject_layout = 0;
+  shape_reference_translator_with_trans<TR, db::ICplxTrans> rt (subject_layout);
+
   for (typename std::vector<local_processor_cell_drop<TS, TI, TR> >::const_iterator d = m_drops.begin (); d != m_drops.end (); ++d) {
 
     tl_assert (d->parent_context != 0);
     tl_assert (d->parent != 0);
 
-    db::Layout *subject_layout = d->parent->layout ();
-    shape_reference_translator_with_trans<TR, db::ICplxTrans> rt (subject_layout, d->cell_inst);
+    if (subject_layout != d->parent->layout ()) {
+      subject_layout = d->parent->layout ();
+      rt = shape_reference_translator_with_trans<TR, db::ICplxTrans> (subject_layout);
+    }
+
+    rt.set_trans (d->cell_inst);
     std::vector<TR> new_refs;
     new_refs.reserve (res.size ());
     for (typename std::unordered_set<TR>::const_iterator r = res.begin (); r != res.end (); ++r) {
@@ -1203,6 +1221,8 @@ private:
     db::box_convert <db::CellInst, true> inst_bc (*mp_subject_layout, m_subject_layer);
     db::Box rbox = db::box_convert<TI> () (ref);
 
+    db::shape_reference_translator_with_trans<TI, db::ICplxTrans> rt (mp_subject_layout);
+
     for (db::CellInstArray::iterator n = inst->begin_touching (safe_box_enlarged (rbox, dist - 1, dist - 1), inst_bc); ! n.at_end (); ++n) {
 
       db::ICplxTrans tn = inst->complex_trans (*n);
@@ -1211,7 +1231,7 @@ private:
       if (! cbox.empty ()) {
 
         db::ICplxTrans tni = tn.inverted ();
-        db::shape_reference_translator_with_trans<TI, db::ICplxTrans> rt (mp_subject_layout, tni);
+        rt.set_trans (tni);
 
         std::set<TI> *shapes = 0;
 

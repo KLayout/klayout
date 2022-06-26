@@ -208,16 +208,16 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
   edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check (m_check, result, intra_polygon_result, m_options.negative, m_different_polygons, m_has_other, m_options.shielded, symmetric_edge_pairs);
   poly2poly_check<TS> poly_check (edge_check);
 
-  std::list<TS> heap;
   std::unordered_set<TI> polygons;
   std::unordered_set<TS> spolygons;
+  std::unordered_set<TI> subjects;
 
   db::EdgeProcessor ep;
   ep.set_base_verbosity (50);
 
   std::set<unsigned int> ids;
-  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-    for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+    for (auto j = i->second.begin (); j != i->second.end (); ++j) {
       ids.insert (*j);
     }
   }
@@ -230,13 +230,13 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
     db::Vector e (edge_check.distance (), edge_check.distance ());
 
     db::Box subject_box;
-    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (auto i = interactions.begin (); i != interactions.end (); ++i) {
       subject_box += db::box_convert<TS> () (interactions.subject_shape (i->first));
     }
 
     if (edge_check.requires_different_layers ()) {
       db::Box intruder_box;
-      for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
+      for (auto id = ids.begin (); id != ids.end (); ++id) {
         intruder_box += db::box_convert<TI> () (interactions.intruder_shape (*id).second);
       }
       common_box = subject_box.enlarged (e) & intruder_box.enlarged (e);
@@ -252,7 +252,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
 
     if (m_is_merged || (interactions.size () == 1 && interactions.subject_shape (interactions.begin ()->first).is_box ())) {
 
-      for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
         const TS &subject = interactions.subject_shape (i->first);
         if (! take_all) {
           poly_check.enter (subject, n, common_box);
@@ -269,7 +269,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       ep.clear ();
       size_t nn = 0;
 
-      for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
         const TS &is = interactions.subject_shape (i->first);
         for (typename TS::polygon_edge_iterator e = is.begin_edge (); ! e.at_end (); ++e) {
           ep.insert (*e, nn);
@@ -284,7 +284,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       db::SimpleMerge op (1 /*wc>0*/);
       ep.process (pg, op);
 
-      for (typename std::unordered_set<TS>::const_iterator o = spolygons.begin (); o != spolygons.end (); ++o) {
+      for (auto o = spolygons.begin (); o != spolygons.end (); ++o) {
         if (! take_all) {
           poly_check.enter (*o, n, common_box);
         } else {
@@ -310,9 +310,9 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       ep.clear ();
       size_t nn = 0;
 
-      for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
+      for (auto id = ids.begin (); id != ids.end (); ++id) {
         const TI &is = interactions.intruder_shape (*id).second;
-        for (typename TI::polygon_edge_iterator e = is.begin_edge (); ! e.at_end (); ++e) {
+        for (auto e = is.begin_edge (); ! e.at_end (); ++e) {
           ep.insert (*e, nn);
         }
         ++nn;
@@ -326,7 +326,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       ep.process (pg, op);
 
       n = 1;
-      for (typename std::unordered_set<TI>::const_iterator o = polygons.begin (); o != polygons.end (); ++o) {
+      for (auto o = polygons.begin (); o != polygons.end (); ++o) {
         if (! take_all) {
           poly_check.enter (*o, n, common_box);
         } else {
@@ -338,7 +338,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
     } else {
 
       n = 1;
-      for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
+      for (auto id = ids.begin (); id != ids.end (); ++id) {
         if (! take_all) {
           poly_check.enter (interactions.intruder_shape (*id).second, n, common_box);
         } else {
@@ -353,32 +353,22 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
 
     //  NOTE: we need to eliminate identical shapes from intruders and subjects because those will shield
 
+    //  subject handling
+
     size_t n = 0;
 
-    if (m_is_merged || (interactions.size () == 1 && ids.empty () && interactions.subject_shape (interactions.begin ()->first).is_box ())) {
+    if (m_is_merged || (interactions.size () == 1 && interactions.subject_shape (interactions.begin ()->first).is_box ())) {
 
-      for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
         //  we can't directly insert because TS may be != TI
         const TS &ts = interactions.subject_shape (i->first);
-        insert_into_hash (polygons, ts);
+        insert_into_hash (subjects, ts);
         if (! take_all) {
           poly_check.enter (ts, n, common_box);
         } else {
           poly_check.enter (ts, n);
         }
-        ++n;
-      }
-
-      for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
-        const TI &ti = interactions.intruder_shape (*id).second;
-        if (polygons.find (ti) == polygons.end ()) {
-          if (! take_all) {
-            poly_check.enter (ti, n, common_box);
-          } else {
-            poly_check.enter (ti, n);
-          }
-          ++n;
-        }
+        n += 2;
       }
 
     } else {
@@ -388,17 +378,9 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       ep.clear ();
       size_t nn = 0;
 
-      for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
         const TS &ts = interactions.subject_shape (i->first);
-        for (typename TS::polygon_edge_iterator e = ts.begin_edge (); ! e.at_end (); ++e) {
-          ep.insert (*e, nn);
-        }
-        ++nn;
-      }
-
-      for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
-        const TI &ti = interactions.intruder_shape (*id).second;
-        for (typename TI::polygon_edge_iterator e = ti.begin_edge (); ! e.at_end (); ++e) {
+        for (auto e = ts.begin_edge (); ! e.at_end (); ++e) {
           ep.insert (*e, nn);
         }
         ++nn;
@@ -411,13 +393,82 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       db::SimpleMerge op (1 /*wc>0*/);
       ep.process (pg, op);
 
-      for (typename std::unordered_set<TS>::const_iterator o = spolygons.begin (); o != spolygons.end (); ++o) {
+      for (auto o = spolygons.begin (); o != spolygons.end (); ++o) {
+        insert_into_hash (subjects, *o);
         if (! take_all) {
           poly_check.enter (*o, n, common_box);
         } else {
           poly_check.enter (*o, n);
         }
-        ++n;
+        n += 2;
+      }
+
+    }
+
+    //  intruder handling
+
+    n = 1;
+
+    if (ids.empty ()) {
+
+      //  nothing to supply
+
+    } else if (! m_is_merged) {
+
+      //  merge needed for intruders - we do a boolean NOT with the subject shape to
+      //  avoid shielding
+
+      ep.clear ();
+      size_t nn = 0;
+
+      for (auto id = ids.begin (); id != ids.end (); ++id) {
+        const TI &ti = interactions.intruder_shape (*id).second;
+        if (subjects.find (ti) == subjects.end ()) {
+          for (auto e = ti.begin_edge (); ! e.at_end (); ++e) {
+            ep.insert (*e, nn);
+          }
+          nn += 2;
+        }
+      }
+
+      if (nn > 0) {
+
+        nn = 1;
+        for (auto i = subjects.begin (); i != subjects.end (); ++i) {
+          for (auto e = i->begin_edge (); ! e.at_end (); ++e) {
+            ep.insert (*e, nn);
+          }
+          nn += 2;
+        }
+
+        polygons.clear ();
+
+        db::polygon_ref_generator<TI> ps (layout, polygons);
+        db::PolygonGenerator pg (ps, false /*don't resolve holes*/, false);
+        db::BooleanOp op (db::BooleanOp::ANotB);
+        ep.process (pg, op);
+
+        for (auto o = polygons.begin (); o != polygons.end (); ++o) {
+          if (! take_all) {
+            poly_check.enter (*o, n, common_box);
+          } else {
+            poly_check.enter (*o, n);
+          }
+        }
+
+      }
+
+    } else {
+
+      for (auto id = ids.begin (); id != ids.end (); ++id) {
+        const TI &ti = interactions.intruder_shape (*id).second;
+        if (subjects.find (ti) == subjects.end ()) {
+          if (! take_all) {
+            poly_check.enter (ti, n, common_box);
+          } else {
+            poly_check.enter (ti, n);
+          }
+        }
       }
 
     }

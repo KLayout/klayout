@@ -62,7 +62,11 @@ void check_error ()
     if (exc_traceback) {
       PyTracebackObject *traceback = (PyTracebackObject*) exc_traceback.get ();
       for (PyTracebackObject *t = traceback; t; t = t->tb_next) {
+#if PY_VERSION_HEX >= 0x030B0000
+        backtrace.push_back (tl::BacktraceElement (python2c<std::string> (PyFrame_GetCode(t->tb_frame)->co_filename), t->tb_lineno));
+#else
         backtrace.push_back (tl::BacktraceElement (python2c<std::string> (t->tb_frame->f_code->co_filename), t->tb_lineno));
+#endif
       }
       std::reverse (backtrace.begin (), backtrace.end ());
     }

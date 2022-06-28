@@ -92,14 +92,27 @@ public:
   {
     while (frame != NULL) {
 
+#if PY_VERSION_HEX >= 0x030B0000
+      int line = PyFrame_GetLineNumber(frame);
+#else
       int line = frame->f_lineno;
+#endif
       std::string fn;
+#if PY_VERSION_HEX >= 0x030B0000
+      if (test_type<std::string> (PyFrame_GetCode(frame)->co_filename, true)) {
+        fn = normalize_path (python2c<std::string> (PyFrame_GetCode(frame)->co_filename));
+#else
       if (test_type<std::string> (frame->f_code->co_filename, true)) {
         fn = normalize_path (python2c<std::string> (frame->f_code->co_filename));
+#endif
       }
       m_stack_trace.push_back (tl::BacktraceElement (fn, line));
 
+#if PY_VERSION_HEX >= 0x030B0000
+      frame = PyFrame_GetBack(frame);
+#else
       frame = frame->f_back;
+#endif
 
     }
   }
@@ -444,7 +457,11 @@ PythonInterpreter::get_context (int context, PythonRef &globals, PythonRef &loca
 
   PyFrameObject *f = mp_current_frame;
   while (f && context > 0) {
+#if PY_VERSION_HEX >= 0x030B0000
+    f = PyFrame_GetBack(f);
+#else
     f = f->f_back;
+#endif
     --context;
   }
 
@@ -454,8 +471,13 @@ PythonInterpreter::get_context (int context, PythonRef &globals, PythonRef &loca
     //  (see PyFrame_GetLocals implementation)
     PyFrame_FastToLocals (f);
 
+#if PY_VERSION_HEX >= 0x030B0000
+    globals = PythonRef (PyObject_GetAttrString((PyObject*)f, "f_globals"));
+    locals = PythonRef (PyObject_GetAttrString((PyObject*)f, "f_locals"), false);
+#else
     globals = PythonRef (f->f_globals, false);
     locals = PythonRef (f->f_locals, false);
+#endif
 
   } else {
 
@@ -634,8 +656,13 @@ PythonInterpreter::trace_func (PyFrameObject *frame, int event, PyObject *arg)
       //  see below for a description of m_block_exceptions
       m_block_exceptions = false;
 
+#if PY_VERSION_HEX >= 0x030B0000
+      int line = PyFrame_GetLineNumber(frame);
+      size_t file_id = prepare_trace (PyFrame_GetCode(frame)->co_filename);
+#else
       int line = frame->f_lineno;
       size_t file_id = prepare_trace (frame->f_code->co_filename);
+#endif
 
       PythonStackTraceProvider st_provider (frame, m_debugger_scope);
       mp_current_exec_handler->trace (this, file_id, line, &st_provider);
@@ -666,8 +693,13 @@ PythonInterpreter::trace_func (PyFrameObject *frame, int event, PyObject *arg)
 
         } else {
 
+#if PY_VERSION_HEX >= 0x030B0000
+          int line = PyFrame_GetLineNumber(frame);
+          size_t file_id = prepare_trace (PyFrame_GetCode(frame)->co_filename);
+#else
           int line = frame->f_lineno;
           size_t file_id = prepare_trace (frame->f_code->co_filename);
+#endif
 
           std::string emsg = "<unknown>";
           if (exc_value) {

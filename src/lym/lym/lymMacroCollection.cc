@@ -423,7 +423,7 @@ void MacroCollection::scan ()
     }
 
     std::vector<std::string> dirs = tl::dir_entries (p, false /*with_files*/, true /*with_dirs*/, true /*without_dotfiles*/);
-    for (auto f = files.begin (); f != files.end (); ++f) {
+    for (auto f = dirs.begin (); f != dirs.end (); ++f) {
 
       std::string fp = tl::combine_path (p, *f);
       if (! tl::is_dir (fp)) {
@@ -439,8 +439,8 @@ void MacroCollection::scan ()
           mc->set_virtual_mode (NotVirtual);
           bool ro = (m_readonly || ! tl::is_writable (fp));
           mc->set_readonly (ro);
-          mc->scan ();
           mc->set_parent (this);
+          mc->scan ();
         }
 
       } catch (tl::Exception &ex) {

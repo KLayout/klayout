@@ -674,16 +674,24 @@ BrowserPanel::loadResource (int type, const QUrl &url)
 {
   if (type == QTextDocument::ImageResource) {
 
-    BEGIN_PROTECTED
-    return QVariant (mp_source->get_image (tl::to_string (url.toString ())));
-    END_PROTECTED
+    try {
+      return QVariant (mp_source->get_image (tl::to_string (url.toString ())));
+    } catch (tl::Exception &ex) {
+      tl::error << ex.msg ();
+    } catch (...) {
+    }
+
     return QVariant ();
 
   } else if (type == QTextDocument::StyleSheetResource) {
 
-    BEGIN_PROTECTED
-    return QVariant (tl::to_qstring (mp_source->get_css (tl::to_string (url.toString ()))));
-    END_PROTECTED
+    try {
+      return QVariant (tl::to_qstring (mp_source->get_css (tl::to_string (url.toString ()))));
+    } catch (tl::Exception &ex) {
+      tl::error << ex.msg ();
+    } catch (...) {
+    }
+
     return QVariant ();
 
   } else if (type != QTextDocument::HtmlResource) {
@@ -707,7 +715,7 @@ BrowserPanel::loadResource (int type, const QUrl &url)
     //  (normal) override cursor.
     QApplication::setOverrideCursor (QCursor (Qt::ArrowCursor));
 
-    BEGIN_PROTECTED
+    try {
 
       std::string u = tl::to_string (url.toString ());
       std::string s;
@@ -756,7 +764,10 @@ BrowserPanel::loadResource (int type, const QUrl &url)
       //  push the outline
       set_outline (ol);
 
-    END_PROTECTED
+    } catch (tl::Exception &ex) {
+      tl::error << ex.msg ();
+    } catch (...) {
+    }
 
     QApplication::restoreOverrideCursor ();
 

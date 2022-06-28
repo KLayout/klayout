@@ -84,6 +84,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_dbu_digits, "2"));
     options.push_back (std::pair<std::string, std::string> (cfg_reader_options_show_always, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_assistant_bookmarks, ""));
+    options.push_back (std::pair<std::string, std::string> (cfg_always_exit_without_saving, "false"));
   }
 
   virtual std::vector<std::pair <std::string, ConfigPage *> > config_pages (QWidget *parent) const 
@@ -198,6 +199,10 @@ MainConfigPage7::setup (lay::Dispatcher *root)
   int kb = 0;
   root->config_get (cfg_keep_backups, kb);
   mp_ui->keep_backups->setValue (kb);
+  
+  bool ex = false;
+  root->config_get (cfg_always_exit_without_saving, ex);
+  mp_ui->always_exit_without_saving->setChecked (ex);
 }
 
 void
@@ -206,6 +211,7 @@ MainConfigPage7::commit (lay::Dispatcher *root)
   try {
     root->config_set (cfg_layout_file_watcher_enabled, mp_ui->check_for_updates->isChecked ());
     root->config_set (cfg_keep_backups, mp_ui->keep_backups->value ());
+    root->config_set (cfg_always_exit_without_saving, mp_ui->always_exit_without_saving->isChecked ());
   } catch (...) { }
 }
 

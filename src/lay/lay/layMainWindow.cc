@@ -201,6 +201,8 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   init_menu ();
 
   mp_assistant = 0;
+      
+  m_always_exit_without_saving = false;
 
   mp_pr = new lay::ProgressReporter ();
   mp_pr->set_progress_bar (&m_text_progress);
@@ -1256,6 +1258,11 @@ MainWindow::configure (const std::string &name, const std::string &value)
     m_initial_technology = value;
     return true;
 
+  } else if (name == cfg_always_exit_without_saving) {
+
+    tl::from_string (cfg_always_exit_without_saving, m_always_exit_without_saving);
+    return true;
+
   } else {
     return false;
   }
@@ -1468,7 +1475,7 @@ MainWindow::can_close ()
   std::string df_list;
   int dirty_layouts = dirty_files (df_list);
 
-  if (dirty_layouts == 0) {
+  if ( m_always_exit_without_saving || (dirty_layouts == 0) ) {
     return true;
   } else {
 

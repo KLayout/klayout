@@ -691,7 +691,7 @@ private:
   lay::Navigator *mp_navigator;
   QDockWidget *mp_hp_dock_widget, *mp_lp_dock_widget, *mp_libs_dock_widget, *mp_eo_dock_widget, *mp_bm_dock_widget;
   ControlWidgetStack *mp_hp_stack, *mp_lp_stack, *mp_libs_stack, *mp_eo_stack, *mp_bm_stack;
-  bool m_hp_visible, m_lp_visible, m_libs_visible, m_eo_visible, m_bm_visible, m_navigator_visible, m_layer_toolbox_visible;
+  bool m_hp_visible, m_lp_visible, m_libs_visible, m_eo_visible, m_bm_visible, m_navigator_visible, m_layer_toolbox_visible, m_always_exit_without_saving;
   QDockWidget *mp_layer_toolbox_dock_widget;
   lay::LayerToolbox *mp_layer_toolbox;
   ViewWidgetStack *mp_view_stack;

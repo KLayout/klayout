@@ -1269,7 +1269,7 @@ MainWindow::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_always_exit_without_saving) {
 
-    tl::from_string (cfg_always_exit_without_saving, m_always_exit_without_saving);
+    tl::from_string (value, m_always_exit_without_saving);
     return true;
 
   } else {

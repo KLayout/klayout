@@ -348,7 +348,7 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
    "the device layers. The actual geometries are later available to \\extract_devices\n"
    "in the order the layers are defined.\n"
   ) +
-  gsi::method ("define_opt_layer", (const db::NetlistDeviceExtractorLayerDefinition &(GenericDeviceExtractor::*) (const std::string &name, const std::string &)) &GenericDeviceExtractor::define_layer, gsi::arg ("name"), gsi::arg ("description"),
+  gsi::method ("define_opt_layer", (const db::NetlistDeviceExtractorLayerDefinition &(GenericDeviceExtractor::*) (const std::string &name, size_t fallback, const std::string &)) &GenericDeviceExtractor::define_layer, gsi::arg ("name"), gsi::arg ("fallback"), gsi::arg ("description"),
    "@brief Defines a layer with a fallback layer.\n"
    "@return The layer descriptor object created for this layer (use 'index' to get the layer's index)\n"
    "As \\define_layer, this method allows specification of device extraction layer. In addition to \\define_layout, it features "

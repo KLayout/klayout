@@ -27,6 +27,7 @@ class ResistorExtractor < RBA::GenericDeviceExtractor
   def setup
     define_layer("C", "Conductor")
     define_layer("R", "Resistor")
+    define_opt_layer("tR", 1, "Resistor")
     register_device_class(RBA::DeviceClassResistor::new)
   end
 
@@ -80,7 +81,7 @@ enable_parameter("RPP1", "W")
 disable_parameter("RPP1", "R")
 
 extract_devices(ResistorExtractor::new("RPP1", 0.5), # intentionally wrong: 1565.15/5
-  { "C" => p1trm, "R" => rpp1 })
+  { "C" => p1trm, "R" => rpp1, "tR" => rpp1 })
 
 connect(met1_dg,      cont)
 connect(p1trm,        cont)

@@ -798,7 +798,7 @@ static db::DeviceParameterDefinition *new_parameter_definition (const std::strin
 
 Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "DeviceParameterDefinition",
   gsi::constructor ("new", &gsi::new_parameter_definition, gsi::arg ("name"), gsi::arg ("description", std::string ()), gsi::arg ("default_value", 0.0), gsi::arg ("is_primary", true), gsi::arg ("si_scaling", 1.0),
-    "@brief Creates a new parameter definition."
+    "@brief Creates a new parameter definition.\n"
     "@param name The name of the parameter\n"
     "@param description The human-readable description\n"
     "@param default_value The initial value\n"

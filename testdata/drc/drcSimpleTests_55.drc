@@ -1,0 +1,20 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+licon = input(66, 44)
+
+licon.output(66, 44)
+
+licon_cluster = licon.sized(0.2).sized(-0.2)
+
+single = licon_cluster.drc(secondary(licon).count == 1)
+single.sized(0.1).output(100, 0)
+
+single = licon_cluster.drc(if_any(secondary(licon).count == 1))
+single.sized(0.1).output(101, 0)
+

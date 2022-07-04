@@ -2832,7 +2832,7 @@ Class<db::NetlistSpiceReader> db_NetlistSpiceReader (db_NetlistReader, "db", "Ne
   "Use the SPICE reader like this:\n"
   "\n"
   "@code\n"
-  "writer = RBA::NetlistSpiceReader::new\n"
+  "reader = RBA::NetlistSpiceReader::new\n"
   "netlist = RBA::Netlist::new\n"
   "netlist.read(path, reader)\n"
   "@/code\n"

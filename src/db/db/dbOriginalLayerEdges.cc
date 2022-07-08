@@ -270,7 +270,7 @@ OriginalLayerEdges::less (const Edges &other) const
 void
 OriginalLayerEdges::init ()
 {
-  m_is_merged = true;
+  m_is_merged = false;
   m_merged_edges_valid = false;
 }
 

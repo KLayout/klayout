@@ -1530,8 +1530,10 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
         db::DPoint pt = snap1 (p, m_obj_snap && tpl.snap ()).second;
 
         //  begin the transaction
-        tl_assert (! manager ()->transacting ());
-        manager ()->transaction (tl::to_string (tr ("Create ruler")));
+        if (manager ()) {
+          tl_assert (! manager ()->transacting ());
+          manager ()->transaction (tl::to_string (tr ("Create ruler")));
+        }
 
         m_current = ant::Object (pt, pt, 0, tpl);
         show_message ();
@@ -1539,7 +1541,9 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
         insert_ruler (m_current, true);
 
         //  end the transaction
-        manager ()->commit ();
+        if (manager ()) {
+          manager ()->commit ();
+        }
 
       } else if (tpl.mode () == ant::Template::RulerAutoMetric) {
 
@@ -1567,8 +1571,10 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
         if (ee.any) {
 
           //  begin the transaction
-          tl_assert (! manager ()->transacting ());
-          manager ()->transaction (tl::to_string (tr ("Create ruler")));
+          if (manager ()) {
+            tl_assert (! manager ()->transacting ());
+            manager ()->transaction (tl::to_string (tr ("Create ruler")));
+          }
 
           m_current = ant::Object (ee.first, ee.second, 0, tpl);
           show_message ();
@@ -1576,7 +1582,9 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
           insert_ruler (m_current, true);
 
           //  end the transaction
-          manager ()->commit ();
+          if (manager ()) {
+            manager ()->commit ();
+          }
 
         }
 
@@ -1603,8 +1611,10 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
       //  create the ruler object
 
       //  begin the transaction
-      tl_assert (! manager ()->transacting ());
-      manager ()->transaction (tl::to_string (tr ("Create ruler")));
+      if (manager ()) {
+        tl_assert (! manager ()->transacting ());
+        manager ()->transaction (tl::to_string (tr ("Create ruler")));
+      }
 
       show_message ();
 
@@ -1615,7 +1625,9 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
       clear_transient_selection ();
 
       //  end the transaction
-      manager ()->commit ();
+      if (manager ()) {
+        manager ()->commit ();
+      }
       
     }
 
@@ -2256,9 +2268,13 @@ Service::menu_activated (const std::string &symbol)
   if (symbol == "ant::clear_all_rulers_internal") {
     clear_rulers ();
   } else if (symbol == "ant::clear_all_rulers") {
-    manager ()->transaction (tl::to_string (tr ("Clear all rulers")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Clear all rulers")));
+    }
     clear_rulers ();
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
   } else {
     lay::Plugin::menu_activated (symbol);
   }

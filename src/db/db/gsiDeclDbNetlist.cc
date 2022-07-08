@@ -260,7 +260,7 @@ static const db::Net *net_for_terminal_by_name_const (const db::Device *device, 
   }
 }
 
-static const db::Net *net_for_terminal_by_name (db::Device *device, const std::string &name)
+static db::Net *net_for_terminal_by_name (db::Device *device, const std::string &name)
 {
   if (! device->device_class () || ! device->device_class ()->has_terminal_with_name (name)) {
     return 0;
@@ -2832,7 +2832,7 @@ Class<db::NetlistSpiceReader> db_NetlistSpiceReader (db_NetlistReader, "db", "Ne
   "Use the SPICE reader like this:\n"
   "\n"
   "@code\n"
-  "writer = RBA::NetlistSpiceReader::new\n"
+  "reader = RBA::NetlistSpiceReader::new\n"
   "netlist = RBA::Netlist::new\n"
   "netlist.read(path, reader)\n"
   "@/code\n"

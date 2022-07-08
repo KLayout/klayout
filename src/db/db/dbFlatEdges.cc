@@ -82,7 +82,7 @@ void FlatEdges::invalidate_cache ()
 
 void FlatEdges::init ()
 {
-  m_is_merged = true;
+  m_is_merged = false;
   m_merged_edges_valid = false;
 }
 
@@ -321,9 +321,7 @@ const db::RecursiveShapeIterator *FlatEdges::iter () const
 void
 FlatEdges::do_insert (const db::Edge &edge)
 {
-  if (! empty ()) {
-    m_is_merged = false;
-  }
+  m_is_merged = empty ();
 
   mp_edges->insert (edge);
   invalidate_cache ();

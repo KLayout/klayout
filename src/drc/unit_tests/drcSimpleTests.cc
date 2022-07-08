@@ -1318,3 +1318,13 @@ TEST(54_issue1011)
   run_test (_this, "54", false);
 }
 
+TEST(55_drccount)
+{
+  run_test (_this, "55", false);
+}
+
+TEST(55d_drccount)
+{
+  run_test (_this, "55", true);
+}
+

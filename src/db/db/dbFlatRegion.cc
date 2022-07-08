@@ -82,7 +82,7 @@ void FlatRegion::invalidate_cache ()
 
 void FlatRegion::init ()
 {
-  m_is_merged = true;
+  m_is_merged = false;
   m_merged_polygons_valid = false;
 }
 

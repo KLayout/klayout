@@ -382,7 +382,7 @@ OriginalLayerRegion::less (const Region &other) const
 void
 OriginalLayerRegion::init ()
 {
-  m_is_merged = true;
+  m_is_merged = false;
   m_merged_polygons_valid = false;
 }
 

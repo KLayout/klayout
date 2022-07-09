@@ -107,7 +107,9 @@ Editables::del (db::Transaction *transaction)
       cancel_edits ();
 
       //  this dummy operation will update the screen:
-      manager ()->queue (this, new db::Op ());
+      if (manager ()) {
+        manager ()->queue (this, new db::Op ());
+      }
 
       for (iterator e = begin (); e != end (); ++e) {
         e->del ();
@@ -129,7 +131,9 @@ Editables::cut ()
     cancel_edits ();
 
     //  this dummy operation will update the screen:
-    manager ()->queue (this, new db::Op ());
+    if (manager ()) {
+      manager ()->queue (this, new db::Op ());
+    }
 
     db::Clipboard::instance ().clear ();
     for (iterator e = begin (); e != end (); ++e) {
@@ -186,7 +190,9 @@ Editables::transform (const db::DCplxTrans &t, db::Transaction *transaction)
       trans_holder->open ();
 
       //  this dummy operation will update the screen:
-      manager ()->queue (this, new db::Op ());
+      if (manager ()) {
+        manager ()->queue (this, new db::Op ());
+      }
 
       for (iterator e = begin (); e != end (); ++e) {
         e->transform (t);
@@ -208,7 +214,7 @@ Editables::paste ()
     cancel_edits ();
 
     //  this dummy operation will update the screen:
-    if (manager ()->transacting ()) {
+    if (manager () && manager ()->transacting ()) {
       manager ()->queue (this, new db::Op ());
     }
 
@@ -610,7 +616,9 @@ Editables::end_move (const db::DPoint &p, lay::angle_constraint_type ac, db::Tra
     trans_holder->open ();
 
     //  this dummy operation will update the screen:
-    manager ()->queue (this, new db::Op ());
+    if (manager ()) {
+      manager ()->queue (this, new db::Op ());
+    }
 
     for (iterator e = begin (); e != end (); ++e) {
       e->end_move (p, ac);

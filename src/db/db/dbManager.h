@@ -339,7 +339,7 @@ public:
 
   void open ()
   {
-    if (! mp_manager->transacting ()) {
+    if (mp_manager && ! mp_manager->transacting ()) {
       mp_manager->transaction (m_description, m_transaction_id);
     }
   }

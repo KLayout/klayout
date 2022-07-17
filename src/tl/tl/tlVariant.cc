@@ -254,42 +254,47 @@ void VariantUserClassBase::register_instance (const tl::VariantUserClassBase *in
 void VariantUserClassBase::unregister_instance (const tl::VariantUserClassBase *inst, const std::type_info &type, bool is_const)
 {
   if (sp_class_table) {
-
     auto c = sp_class_table->find (VariantUserClassTableKey (type, is_const));
     if (c != sp_class_table->end ()) {
       sp_class_table->erase (c);
-      sp_classes->operator[] (c->second) = 0;
-      while (!sp_classes->empty () && sp_classes->back () == 0) {
-        sp_classes->pop_back ();
+      if (sp_classes) {
+        sp_classes->operator[] (c->second) = 0;
+        while (!sp_classes->empty () && sp_classes->back () == 0) {
+          sp_classes->pop_back ();
+        }
       }
     }
+  }
 
+  if (sp_class_index_by_name) {
     auto cn = sp_class_index_by_name->find (std::make_pair (std::string (type.name ()), is_const));
     if (cn != sp_class_index_by_name->end ()) {
       sp_class_index_by_name->erase (cn);
     }
+  }
 
+  if (sp_class_to_index) {
     sp_class_to_index->erase (inst);
+  }
 
-    if (sp_class_table->empty ()) {
-      delete sp_class_table;
-      sp_class_table = 0;
-    }
+  if (sp_class_table && sp_class_table->empty ()) {
+    delete sp_class_table;
+    sp_class_table = 0;
+  }
 
-    if (sp_classes->empty ()) {
-      delete sp_classes;
-      sp_classes = 0;
-    }
+  if (sp_classes && sp_classes->empty ()) {
+    delete sp_classes;
+    sp_classes = 0;
+  }
 
-    if (sp_class_index_by_name->empty ()) {
-      delete sp_class_index_by_name;
-      sp_class_index_by_name = 0;
-    }
+  if (sp_class_index_by_name && sp_class_index_by_name->empty ()) {
+    delete sp_class_index_by_name;
+    sp_class_index_by_name = 0;
+  }
 
-    if (sp_class_to_index->empty ()) {
-      delete sp_class_to_index;
-      sp_class_to_index = 0;
-    }
+  if (sp_class_to_index && sp_class_to_index->empty ()) {
+    delete sp_class_to_index;
+    sp_class_to_index = 0;
   }
 }
 

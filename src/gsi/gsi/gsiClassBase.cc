@@ -49,9 +49,11 @@ namespace {
 
 //  TODO: thread-safe? Unlikely that multiple threads access this member -
 //  we do a initial scan and after this no more write access here.
-typedef std::map<const std::type_info *, const ClassBase *, type_info_compare> ti_to_class_map_t;
-static ti_to_class_map_t *sp_ti_to_class = 0;
-//  NOTE: MacOS/clang seems to have some issue with RTTI across shared objects. This map provides a name-based fallback
+static std::vector<const ClassBase *> *sp_classes = 0;
+typedef std::map<const ClassBase *, size_t> class_to_index_map_t;
+static class_to_index_map_t *sp_class_to_index = 0;
+typedef std::map<const std::type_info *, size_t> ti_to_class_map_t;
+static ti_to_class_map_t *sp_ti_to_class_index = 0;
 typedef std::map<std::string, const ClassBase *> tname_to_class_map_t;
 static tname_to_class_map_t *sp_tname_to_class = 0;
 
@@ -67,9 +69,17 @@ ClassBase::ClassBase (const std::string &doc, const Methods &mm, bool do_registe
     mp_new_class_collection->push_back (this);
 
     //  invalidate the "typeinfo to class" map
-    if (sp_ti_to_class) {
-      delete sp_ti_to_class;
-      sp_ti_to_class = 0;
+    if (sp_classes) {
+      delete sp_classes;
+      sp_classes = 0;
+    }
+    if (sp_class_to_index) {
+      delete sp_class_to_index;
+      sp_class_to_index = 0;
+    }
+    if (sp_ti_to_class_index) {
+      delete sp_ti_to_class_index;
+      sp_ti_to_class_index = 0;
     }
     if (sp_tname_to_class) {
       delete sp_tname_to_class;
@@ -826,14 +836,25 @@ static void add_class_to_map (const gsi::ClassBase *c)
     ti = &c->type ();
   }
 
-  if (! sp_ti_to_class) {
-    sp_ti_to_class = new ti_to_class_map_t ();
+  if (! sp_classes) {
+    sp_classes = new std::vector<const ClassBase *> ();
+  }
+  if (! sp_class_to_index) {
+    sp_class_to_index = new class_to_index_map_t ();
+  }
+  if (! sp_ti_to_class_index) {
+    sp_ti_to_class_index = new ti_to_class_map_t ();
   }
   if (! sp_tname_to_class) {
     sp_tname_to_class = new tname_to_class_map_t ();
   }
 
-  if (!sp_ti_to_class->insert (std::make_pair (ti, c)).second) {
+  auto c2i = sp_class_to_index->insert (std::make_pair (c, sp_classes->size ())).first;
+  if (c2i->second >= sp_classes->size ()) {
+    sp_classes->push_back (c);
+  }
+
+  if (!sp_ti_to_class_index->insert (std::make_pair (ti, c2i->second)).second) {
     //  Duplicate registration of this class
     tl::error << "Duplicate registration of class " << c->name () << " (type " << ti->name () << ")";
     tl_assert (false);
@@ -844,27 +865,27 @@ static void add_class_to_map (const gsi::ClassBase *c)
 
 const ClassBase *class_by_typeinfo_no_assert (const std::type_info &ti)
 {
-  if (! sp_ti_to_class || sp_ti_to_class->empty ()) {
-    for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
+  if (! sp_ti_to_class_index || sp_ti_to_class_index->empty ()) {
+    for (auto c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
       add_class_to_map (c.operator-> ());
     }
-    for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_new_classes (); c != gsi::ClassBase::end_new_classes (); ++c) {
+    for (auto c = gsi::ClassBase::begin_new_classes (); c != gsi::ClassBase::end_new_classes (); ++c) {
       add_class_to_map (c.operator-> ());
     }
   }
 
-  if (! sp_ti_to_class) {
+  if (! sp_ti_to_class_index) {
     return 0;
   } else {
-    ti_to_class_map_t::const_iterator c = sp_ti_to_class->find (&ti);
-    if (c != sp_ti_to_class->end ()) {
-      return c->second;
+    auto c = sp_ti_to_class_index->find (&ti);
+    if (c != sp_ti_to_class_index->end ()) {
+      return sp_classes->operator[] (c->second);
     } else {
       //  try name lookup
-      tname_to_class_map_t::const_iterator cn = sp_tname_to_class->find (std::string (ti.name ()));
+      auto cn = sp_tname_to_class->find (std::string (ti.name ()));
       if (cn != sp_tname_to_class->end ()) {
         //  we can use this typeinfo as alias
-        sp_ti_to_class->insert (std::make_pair (&ti, cn->second));
+        sp_ti_to_class_index->insert (std::make_pair (&ti, sp_class_to_index->operator[] (cn->second)));
         return cn->second;
       } else {
         return 0;

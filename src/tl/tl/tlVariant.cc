@@ -144,22 +144,25 @@ struct VariantUserClassTableKey
     if (is_const != k.is_const) {
       return is_const < k.is_const;
     }
-    if (*type != *k.type) {
-      return type->before (*k.type);
+    if (type != k.type) {
+      return type < k.type;
     }
     return false;
   }
 
   bool operator== (const VariantUserClassTableKey &k) const
   {
-    return is_const == k.is_const && *type == *k.type;
+    return is_const == k.is_const && type == k.type;
   }
 
   const std::type_info *type;
   bool is_const;
 };
 
-static std::map<VariantUserClassTableKey, const tl::VariantUserClassBase *> *sp_class_table = 0;
+static std::vector<const VariantUserClassBase *> *sp_classes = 0;
+static std::map<const VariantUserClassBase *, size_t> *sp_class_to_index = 0; 
+static std::map<std::pair<std::string, bool>, size_t> *sp_class_index_by_name = 0;
+static std::map<VariantUserClassTableKey, size_t> *sp_class_table = 0;
 static std::map <std::string, const VariantUserClassBase *> s_user_type_by_name;
 
 void
@@ -191,7 +194,7 @@ VariantUserClassBase::find_cls_by_name (const std::string &name)
 {
   tl_assert (! s_user_type_by_name.empty ());
 
-  std::map <std::string, const VariantUserClassBase *>::const_iterator s = s_user_type_by_name.find (tl::to_lower_case (name));
+  auto s = s_user_type_by_name.find (tl::to_lower_case (name));
   if (s == s_user_type_by_name.end ()) {
     return 0;
   }
@@ -199,33 +202,99 @@ VariantUserClassBase::find_cls_by_name (const std::string &name)
   return s->second;
 }
 
+//  type-info based interface
+
 const tl::VariantUserClassBase *VariantUserClassBase::instance (const std::type_info &type, bool is_const)
 {
   tl_assert (sp_class_table != 0);
-  std::map<VariantUserClassTableKey, const tl::VariantUserClassBase *>::const_iterator c = sp_class_table->find (VariantUserClassTableKey (type, is_const));
-  tl_assert (c != sp_class_table->end ());
-  return c->second;
+
+  const tl::VariantUserClassBase *inst = 0;
+
+  auto c = sp_class_table->find (VariantUserClassTableKey (type, is_const));
+  if (c == sp_class_table->end ()) {
+
+    //  fallback: lookup by name and update if required - sometimes, there may be two different type info objects for the same thing
+    auto c2i = sp_class_index_by_name->find (std::make_pair (std::string (type.name ()), is_const));
+    tl_assert (c2i != sp_class_index_by_name->end ());
+    sp_class_table->insert (std::make_pair (VariantUserClassTableKey (type, is_const), c2i->second));
+    inst = sp_classes->operator[] (c2i->second);
+
+  } else {
+    inst = sp_classes->operator[] (c->second);
+  }
+
+  tl_assert (inst != 0);
+  return inst;
 }
 
 void VariantUserClassBase::register_instance (const tl::VariantUserClassBase *inst, const std::type_info &type, bool is_const)
 {
   if (! sp_class_table) {
-    sp_class_table = new std::map<VariantUserClassTableKey, const tl::VariantUserClassBase *> ();
+    sp_class_table = new std::map<VariantUserClassTableKey, size_t> ();
   }
-  (*sp_class_table)[VariantUserClassTableKey (type, is_const)] = inst;
+  if (! sp_classes) {
+    sp_classes = new std::vector<const tl::VariantUserClassBase *> ();
+  }
+  if (! sp_class_index_by_name) {
+    sp_class_index_by_name = new std::map<std::pair<std::string, bool>, size_t> ();
+  }
+  if (! sp_class_to_index) {
+    sp_class_to_index = new std::map<const VariantUserClassBase *, size_t> ();
+  }
+
+  size_t index = sp_class_to_index->insert (std::make_pair (inst, sp_classes->size ())).first->second;
+  if (index == sp_classes->size ()) {
+    sp_classes->push_back (inst);
+  }
+  
+  (*sp_class_table)[VariantUserClassTableKey (type, is_const)] = index;
+  (*sp_class_index_by_name) [std::make_pair (std::string (type.name ()), is_const)] = index;
 }
 
 void VariantUserClassBase::unregister_instance (const tl::VariantUserClassBase *inst, const std::type_info &type, bool is_const)
 {
   if (sp_class_table) {
-    std::map<VariantUserClassTableKey, const tl::VariantUserClassBase *>::iterator c = sp_class_table->find (VariantUserClassTableKey (type, is_const));
-    if (c != sp_class_table->end () && c->second == inst) {
+    auto c = sp_class_table->find (VariantUserClassTableKey (type, is_const));
+    if (c != sp_class_table->end ()) {
       sp_class_table->erase (c);
+      if (sp_classes) {
+        sp_classes->operator[] (c->second) = 0;
+        while (!sp_classes->empty () && sp_classes->back () == 0) {
+          sp_classes->pop_back ();
+        }
+      }
     }
-    if (sp_class_table->empty ()) {
-      delete sp_class_table;
-      sp_class_table = 0;
+  }
+
+  if (sp_class_index_by_name) {
+    auto cn = sp_class_index_by_name->find (std::make_pair (std::string (type.name ()), is_const));
+    if (cn != sp_class_index_by_name->end ()) {
+      sp_class_index_by_name->erase (cn);
     }
+  }
+
+  if (sp_class_to_index) {
+    sp_class_to_index->erase (inst);
+  }
+
+  if (sp_class_table && sp_class_table->empty ()) {
+    delete sp_class_table;
+    sp_class_table = 0;
+  }
+
+  if (sp_classes && sp_classes->empty ()) {
+    delete sp_classes;
+    sp_classes = 0;
+  }
+
+  if (sp_class_index_by_name && sp_class_index_by_name->empty ()) {
+    delete sp_class_index_by_name;
+    sp_class_index_by_name = 0;
+  }
+
+  if (sp_class_to_index && sp_class_to_index->empty ()) {
+    delete sp_class_to_index;
+    sp_class_to_index = 0;
   }
 }
 

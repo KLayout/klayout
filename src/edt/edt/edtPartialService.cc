@@ -1466,9 +1466,6 @@ PartialService::transform_selection (const db::DTrans &move_trans)
 
   //  then move all instances.
   
-  //  TODO: DTrans should have a ctor that takes a vector
-  db::DTrans move_trans_inst = db::DTrans (db::DVector () + lay::snap_angle (m_current - m_start, move_ac ()));
-
   //  sort the selected objects (the instances) by the cell they are in
   //  The key is a pair: cell_index, cv_index
   std::map <std::pair <db::cell_index_type, unsigned int>, std::vector <partial_objects::const_iterator> > insts_by_cell;
@@ -1494,7 +1491,7 @@ PartialService::transform_selection (const db::DTrans &move_trans)
       if (tv_list && ! tv_list->empty ()) {
 
         db::CplxTrans tt = (*tv_list) [0] * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ();
-        db::ICplxTrans move_trans_dbu (tt.inverted () * db::DCplxTrans (move_trans_inst) * tt);
+        db::ICplxTrans move_trans_dbu (tt.inverted () * db::DCplxTrans (move_trans) * tt);
 
         std::sort (insts_to_transform.begin (), insts_to_transform.end ());
         std::vector <std::pair <db::Instance, db::ICplxTrans> >::const_iterator unique_end = std::unique (insts_to_transform.begin (), insts_to_transform.end ());

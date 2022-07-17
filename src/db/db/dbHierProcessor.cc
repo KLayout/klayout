@@ -1261,13 +1261,20 @@ template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, d
 template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::TextRef, db::TextRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::TextRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::TextRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::TextRef, db::PolygonRef, db::TextRef>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::Edge>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::EdgePair>;
 template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Polygon, db::EdgePair>;
 template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Polygon, db::Edge>;
 template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::PolygonRef, db::Edge>;
 template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::PolygonRef, db::PolygonRef>;
 
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessorResultComputationTask implementation

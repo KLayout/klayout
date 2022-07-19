@@ -256,13 +256,13 @@ void VariantUserClassBase::unregister_instance (const tl::VariantUserClassBase *
   if (sp_class_table) {
     auto c = sp_class_table->find (VariantUserClassTableKey (type, is_const));
     if (c != sp_class_table->end ()) {
-      sp_class_table->erase (c);
-      if (sp_classes) {
+      if (sp_classes && c->second < sp_classes->size ()) {
         sp_classes->operator[] (c->second) = 0;
         while (!sp_classes->empty () && sp_classes->back () == 0) {
           sp_classes->pop_back ();
         }
       }
+      sp_class_table->erase (c);
     }
   }
 

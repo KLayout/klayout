@@ -25,14 +25,14 @@
 #include "dbClip.h"
 #include "dbRegion.h"
 #include "dbPolygonTools.h"
+#include "tlIteratorUtils.h"
 
 namespace db
 {
 
 static HierarchyBuilderShapeInserter def_inserter;
 
-static HierarchyBuilder::cell_map_type null_map;
-static HierarchyBuilder::cell_map_type::const_iterator null_iterator = null_map.end ();
+static HierarchyBuilder::cell_map_type::const_iterator null_iterator = HierarchyBuilder::cell_map_type::const_iterator ();
 
 // -------------------------------------------------------------------------------------------
 
@@ -286,7 +286,7 @@ HierarchyBuilder::end (const RecursiveShapeIterator *iter)
 void
 HierarchyBuilder::enter_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
 {
-  tl_assert (m_cm_entry != m_cell_map.end () && m_cm_entry != null_iterator);
+  tl_assert (! tl::is_equal_iterator_unchecked (m_cm_entry, null_iterator) && m_cm_entry != m_cell_map.end ());
 
   m_cells_seen.insert (m_cm_entry->first);
 

@@ -1720,8 +1720,12 @@ private:
             std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
             consider_instance_pair (common12, i1, t1, ii1, *jj2, tt2, db::CellInstArray::iterator (), ii_interactions);
 
-            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
-              propagate_cluster_inst (i->second, i2.cell_index (), i2t, i2.prop_id ());
+            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ) {
+              std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator ii = i;
+              ++i;
+              if (! propagate_cluster_inst (ii->second, i2.cell_index (), i2t, i2.prop_id ())) {
+                ii_interactions.erase (ii);
+              }
             }
 
             ii_interactions.unique ();
@@ -1736,8 +1740,12 @@ private:
             std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
             consider_instance_pair (common12, *jj1, tt1, db::CellInstArray::iterator (), i2, t2, ii2, ii_interactions);
 
-            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
-              propagate_cluster_inst (i->first, i1.cell_index (), i1t, i1.prop_id ());
+            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ) {
+              std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator ii = i;
+              ++i;
+              if (! propagate_cluster_inst (ii->first, i1.cell_index (), i1t, i1.prop_id ())) {
+                ii_interactions.erase (ii);
+              }
             }
 
             ii_interactions.unique ();
@@ -1900,9 +1908,14 @@ private:
             std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
             consider_instance_pair (common, i, t, ii, *jj2, tt2, db::CellInstArray::iterator (), ii_interactions);
 
-            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator ii = ii_interactions.begin (); ii != ii_interactions.end (); ++ii) {
-              propagate_cluster_inst (ii->second, i.cell_index (), tt2, i.prop_id ());
+            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator ii = ii_interactions.begin (); ii != ii_interactions.end (); ) {
+              std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator iii = ii;
+              ++ii;
+              if (! propagate_cluster_inst (iii->second, i.cell_index (), tt2, i.prop_id ())) {
+                ii_interactions.erase (iii);
+              }
             }
+
             interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
 
           }
@@ -1971,9 +1984,14 @@ private:
           std::list<ClusterInstanceInteraction> ci_interactions;
           consider_cluster_instance_pair (c1, *jj2, tt2, ci_interactions);
 
-          for (typename std::list<ClusterInstanceInteraction>::iterator ii = ci_interactions.begin (); ii != ci_interactions.end (); ++ii) {
-            propagate_cluster_inst (ii->other_ci, i2.cell_index (), i2t, i2.prop_id ());
+          for (typename std::list<ClusterInstanceInteraction>::iterator ii = ci_interactions.begin (); ii != ci_interactions.end (); ) {
+            typename std::list<ClusterInstanceInteraction>::iterator iii = ii;
+            ++ii;
+            if (! propagate_cluster_inst (iii->other_ci, i2.cell_index (), i2t, i2.prop_id ())) {
+              ci_interactions.erase (iii);
+            }
           }
+
           interactions_out.splice (interactions_out.end (), ci_interactions, ci_interactions.begin (), ci_interactions.end ());
 
         }
@@ -2088,12 +2106,20 @@ private:
    *
    *  After calling this method, the cluster instance in ci is guaranteed to have connections from all
    *  parent cells. One of these connections represents the instance ci.
+   *
+   *  Returns false if the connection was already there in the same place (indicating duplicate instances).
+   *  In this case, the cluster instance should be skipped. In the other case, the cluster instance is
+   *  updated to reflect the connected cluster.
    */
-  void propagate_cluster_inst (ClusterInstance &ci, db::cell_index_type pci, const db::ICplxTrans &trans, db::properties_id_type prop_id) const
+  bool propagate_cluster_inst (ClusterInstance &ci, db::cell_index_type pci, const db::ICplxTrans &trans, db::properties_id_type prop_id) const
   {
     size_t id_new = mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, ci, pci, true);
-    tl_assert (id_new != 0);
-    ci = db::ClusterInstance (id_new, pci, trans, prop_id);
+    if (id_new == 0) {
+      return false;
+    } else {
+      ci = db::ClusterInstance (id_new, pci, trans, prop_id);
+      return true;
+    }
   }
 
   /**
@@ -2178,7 +2204,7 @@ hier_clusters<T>::propagate_cluster_inst (const db::Layout &layout, const db::Ce
 
   if (parent_cluster > 0) {
 
-    //  taken parent
+    //  take parent
     id_new = parent_cluster;
 
   } else {

@@ -1582,8 +1582,7 @@ private:
    *  @param interacting_clusters_out Receives the cluster interaction descriptors
    *
    *  "interacting_clusters_out" will be cluster interactions in the parent instance space of i1 and i2 respectively.
-   *  Cluster ID will be valid in the parent cells containing i1 and i2 and the cluster instances property ID will be set to p1 and p2
-   *  respectively.
+   *  Cluster ID will be valid in the parent cells containing i1 and i2.
    */
   void consider_instance_pair (const box_type &common,
                                const db::Instance &i1, const db::ICplxTrans &t1, const db::CellInstArray::iterator &i1element,
@@ -1614,6 +1613,7 @@ private:
     InstanceToInstanceInteraction ii_key;
     db::ICplxTrans i1t, i2t;
     bool fill_cache = false;
+    db::ICplxTrans c2t;
 
     size_t n1 = i1element.at_end () ? i1.size () : 1;
     size_t n2 = i2element.at_end () ? i2.size () : 1;
@@ -1629,6 +1629,8 @@ private:
       db::ICplxTrans tt2 = t2 * i2t;
 
       db::ICplxTrans cache_norm = tt1.inverted ();
+      c2t = i2t * (tt2.inverted () * tt1);
+
       ii_key = InstanceToInstanceInteraction ((! i1element.at_end () || i1.size () == 1) ? 0 : i1.cell_inst ().delegate (),
                                               (! i2element.at_end () || i2.size () == 1) ? 0 : i2.cell_inst ().delegate (),
                                               cache_norm, cache_norm * tt2);
@@ -1643,7 +1645,7 @@ private:
           i->first.set_inst_prop_id (i1.prop_id ());
           i->first.transform (i1t);
           i->second.set_inst_prop_id (i2.prop_id ());
-          i->second.transform (i2t);
+          i->second.transform (c2t);
         }
 
         return;
@@ -1695,10 +1697,19 @@ private:
 
         db::ICplxTrans i2t = i2.complex_trans (*ii2);
         db::ICplxTrans tt2 = t2 * i2t;
+
+//  NOTE: identical instances are possible and should not be ignored
+//  Otherwise, these will contain disconnected nets
+#if 0
         if (i1.cell_index () == i2.cell_index () && tt1 == tt2) {
           //  skip interactions between identical instances (duplicate instance removal)
-          continue;
+          if (! i2element.at_end ()) {
+            break;
+          } else {
+            continue;
+          }
         }
+#endif
 
         box_type ib2 = bb2.transformed (tt2);
 
@@ -1720,12 +1731,8 @@ private:
             std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
             consider_instance_pair (common12, i1, t1, ii1, *jj2, tt2, db::CellInstArray::iterator (), ii_interactions);
 
-            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ) {
-              std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator ii = i;
-              ++i;
-              if (! propagate_cluster_inst (ii->second, i2.cell_index (), i2t, i2.prop_id ())) {
-                ii_interactions.erase (ii);
-              }
+            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
+              propagate_cluster_inst (i->second, i2.cell_index (), i2t, i2.prop_id ());
             }
 
             ii_interactions.unique ();
@@ -1740,12 +1747,8 @@ private:
             std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
             consider_instance_pair (common12, *jj1, tt1, db::CellInstArray::iterator (), i2, t2, ii2, ii_interactions);
 
-            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ) {
-              std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator ii = i;
-              ++i;
-              if (! propagate_cluster_inst (ii->first, i1.cell_index (), i1t, i1.prop_id ())) {
-                ii_interactions.erase (ii);
-              }
+            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator i = ii_interactions.begin (); i != ii_interactions.end (); ++i) {
+              propagate_cluster_inst (i->first, i1.cell_index (), i1t, i1.prop_id ());
             }
 
             ii_interactions.unique ();
@@ -1783,10 +1786,10 @@ private:
     if (fill_cache && sorted_interactions.size () < instance_to_instance_cache_set_size_threshold) {
 
       //  normalize transformations for cache
-      db::ICplxTrans i1ti = i1t.inverted (), i2ti = i2t.inverted ();
+      db::ICplxTrans i1ti = i1t.inverted (), c2ti = c2t.inverted ();
       for (std::vector<std::pair<ClusterInstance, ClusterInstance> >::iterator i = sorted_interactions.begin (); i != sorted_interactions.end (); ++i) {
         i->first.transform (i1ti);
-        i->second.transform (i2ti);
+        i->second.transform (c2ti);
       }
 
       cluster_instance_pair_list_type &cached = mp_instance_interaction_cache->insert (i1.cell_index (), i2.cell_index (), ii_key);
@@ -1908,12 +1911,8 @@ private:
             std::list<std::pair<ClusterInstance, ClusterInstance> > ii_interactions;
             consider_instance_pair (common, i, t, ii, *jj2, tt2, db::CellInstArray::iterator (), ii_interactions);
 
-            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator ii = ii_interactions.begin (); ii != ii_interactions.end (); ) {
-              std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator iii = ii;
-              ++ii;
-              if (! propagate_cluster_inst (iii->second, i.cell_index (), tt2, i.prop_id ())) {
-                ii_interactions.erase (iii);
-              }
+            for (std::list<std::pair<ClusterInstance, ClusterInstance> >::iterator ii = ii_interactions.begin (); ii != ii_interactions.end (); ++ii) {
+              propagate_cluster_inst (ii->second, i.cell_index (), tt2, i.prop_id ());
             }
 
             interacting_clusters.splice (interacting_clusters.end (), ii_interactions, ii_interactions.begin (), ii_interactions.end ());
@@ -1984,12 +1983,8 @@ private:
           std::list<ClusterInstanceInteraction> ci_interactions;
           consider_cluster_instance_pair (c1, *jj2, tt2, ci_interactions);
 
-          for (typename std::list<ClusterInstanceInteraction>::iterator ii = ci_interactions.begin (); ii != ci_interactions.end (); ) {
-            typename std::list<ClusterInstanceInteraction>::iterator iii = ii;
-            ++ii;
-            if (! propagate_cluster_inst (iii->other_ci, i2.cell_index (), i2t, i2.prop_id ())) {
-              ci_interactions.erase (iii);
-            }
+          for (typename std::list<ClusterInstanceInteraction>::iterator ii = ci_interactions.begin (); ii != ci_interactions.end (); ++ii) {
+            propagate_cluster_inst (ii->other_ci, i2.cell_index (), i2t, i2.prop_id ());
           }
 
           interactions_out.splice (interactions_out.end (), ci_interactions, ci_interactions.begin (), ci_interactions.end ());
@@ -2111,15 +2106,11 @@ private:
    *  In this case, the cluster instance should be skipped. In the other case, the cluster instance is
    *  updated to reflect the connected cluster.
    */
-  bool propagate_cluster_inst (ClusterInstance &ci, db::cell_index_type pci, const db::ICplxTrans &trans, db::properties_id_type prop_id) const
+  void propagate_cluster_inst (ClusterInstance &ci, db::cell_index_type pci, const db::ICplxTrans &trans, db::properties_id_type prop_id) const
   {
     size_t id_new = mp_tree->propagate_cluster_inst (*mp_layout, *mp_cell, ci, pci, true);
-    if (id_new == 0) {
-      return false;
-    } else {
-      ci = db::ClusterInstance (id_new, pci, trans, prop_id);
-      return true;
-    }
+    tl_assert (id_new != 0);
+    ci = db::ClusterInstance (id_new, pci, trans, prop_id);
   }
 
   /**

@@ -1613,7 +1613,6 @@ private:
     InstanceToInstanceInteraction ii_key;
     db::ICplxTrans i1t, i2t;
     bool fill_cache = false;
-    db::ICplxTrans c2t;
 
     size_t n1 = i1element.at_end () ? i1.size () : 1;
     size_t n2 = i2element.at_end () ? i2.size () : 1;
@@ -1629,7 +1628,6 @@ private:
       db::ICplxTrans tt2 = t2 * i2t;
 
       db::ICplxTrans cache_norm = tt1.inverted ();
-      c2t = i2t * (tt2.inverted () * tt1);
 
       ii_key = InstanceToInstanceInteraction ((! i1element.at_end () || i1.size () == 1) ? 0 : i1.cell_inst ().delegate (),
                                               (! i2element.at_end () || i2.size () == 1) ? 0 : i2.cell_inst ().delegate (),
@@ -1645,7 +1643,7 @@ private:
           i->first.set_inst_prop_id (i1.prop_id ());
           i->first.transform (i1t);
           i->second.set_inst_prop_id (i2.prop_id ());
-          i->second.transform (c2t);
+          i->second.transform (i2t);
         }
 
         return;
@@ -1786,10 +1784,10 @@ private:
     if (fill_cache && sorted_interactions.size () < instance_to_instance_cache_set_size_threshold) {
 
       //  normalize transformations for cache
-      db::ICplxTrans i1ti = i1t.inverted (), c2ti = c2t.inverted ();
+      db::ICplxTrans i1ti = i1t.inverted (), i2ti = i2t.inverted ();
       for (std::vector<std::pair<ClusterInstance, ClusterInstance> >::iterator i = sorted_interactions.begin (); i != sorted_interactions.end (); ++i) {
         i->first.transform (i1ti);
-        i->second.transform (c2ti);
+        i->second.transform (i2ti);
       }
 
       cluster_instance_pair_list_type &cached = mp_instance_interaction_cache->insert (i1.cell_index (), i2.cell_index (), ii_key);

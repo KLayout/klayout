@@ -1696,9 +1696,6 @@ private:
         db::ICplxTrans i2t = i2.complex_trans (*ii2);
         db::ICplxTrans tt2 = t2 * i2t;
 
-//  NOTE: identical instances are possible and should not be ignored
-//  Otherwise, these will contain disconnected nets
-#if 0
         if (i1.cell_index () == i2.cell_index () && tt1 == tt2) {
           //  skip interactions between identical instances (duplicate instance removal)
           if (! i2element.at_end ()) {
@@ -1707,7 +1704,6 @@ private:
             continue;
           }
         }
-#endif
 
         box_type ib2 = bb2.transformed (tt2);
 

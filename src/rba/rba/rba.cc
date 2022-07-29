@@ -914,6 +914,51 @@ static gsi::ArgType create_void_type ()
 
 static gsi::ArgType s_void_type = create_void_type ();
 
+static void
+push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, int argc, tl::Heap &heap)
+{
+  int i = 0;
+
+  try {
+
+    VALUE *av = argv;
+    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && av < argv + argc; ++a, ++av, ++i) {
+      push_arg (*a, arglist, *av, heap);
+    }
+
+  } catch (tl::Exception &ex) {
+
+    //  In case of an error upon write, pop the arguments to clean them up.
+    //  Without this, there is a risk to keep dead objects on the stack.
+    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
+      pop_arg (*a, 0, arglist, heap);
+    }
+
+    const gsi::ArgSpecBase *arg_spec = meth->begin_arguments () [i].spec ();
+
+    std::string msg;
+    if (arg_spec && ! arg_spec->name ().empty ()) {
+      msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d ('%s')")), ex.basic_msg (), i + 1, arg_spec->name ());
+    } else {
+      msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d")), ex.basic_msg (), i + 1);
+    }
+
+    ex.set_basic_msg (msg);
+    throw ex;
+
+  } catch (...) {
+
+    //  In case of an error upon write, pop the arguments to clean them up.
+    //  Without this, there is a risk to keep dead objects on the stack.
+    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
+      pop_arg (*a, 0, arglist, heap);
+    }
+
+    throw;
+
+  }
+}
+
 VALUE
 method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 {
@@ -991,28 +1036,8 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
       {
         gsi::SerialArgs arglist (meth->argsize ());
-
-        try {
-
-          VALUE *av = argv;
-          for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && av < argv + argc; ++a, ++av) {
-            push_arg (*a, arglist, *av, heap);
-          }
-
-        } catch (...) {
-
-          //  In case of an error upon write, pop the arguments to clean them up.
-          //  Without this, there is a risk to keep dead objects on the stack.
-          for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-            pop_arg (*a, 0, arglist, heap);
-          }
-
-          throw;
-
-        }
-
+        push_args (arglist, meth, argv, argc, heap);
         meth->call (0, arglist, retlist);
-
       }
 
       void *obj = retlist.read<void *> (heap);
@@ -1065,28 +1090,8 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
       {
         gsi::SerialArgs arglist (meth->argsize ());
-
-        try {
-
-          VALUE *av = argv;
-          for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && av < argv + argc; ++a, ++av) {
-            push_arg (*a, arglist, *av, heap);
-          }
-
-        } catch (...) {
-
-          //  In case of an error upon write, pop the arguments to clean them up.
-          //  Without this, there is a risk to keep dead objects on the stack.
-          for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-            pop_arg (*a, 0, arglist, heap);
-          }
-
-          throw;
-
-        }
-
+        push_args (arglist, meth, argv, argc, heap);
         meth->call (obj, arglist, retlist);
-
       }
 
       if (meth->ret_type ().is_iter ()) {

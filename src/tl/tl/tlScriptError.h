@@ -128,8 +128,6 @@ public:
 
   virtual std::string msg () const;
 
-  std::string basic_msg () const;
-
 private:
   std::string m_sourcefile;
   int m_line;

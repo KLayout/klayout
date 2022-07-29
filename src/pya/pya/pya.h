@@ -82,21 +82,6 @@ public:
   PythonError (const PythonError &d);
 };
 
-/**
- *  @brief A class encapsulating an argument error
- */
-class PYA_PUBLIC PythonArgumentError
-  : public tl::Exception
-{
-public:
-  PythonArgumentError (const tl::Exception &ex, int index, const std::string &name);
-  virtual std::string msg () const;
-
-private:
-  int m_index;
-  std::string m_name;
-};
-
 class PythonModule;
 
 /**

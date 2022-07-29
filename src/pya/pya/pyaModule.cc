@@ -1195,8 +1195,17 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args
       pop_arg (*a, arglist, 0, heap);
     }
 
+    std::string msg;
     const gsi::ArgSpecBase *arg_spec = meth->begin_arguments () [i].spec ();
-    throw PythonArgumentError (ex, i, arg_spec ? arg_spec->name () : std::string ());
+
+    if (arg_spec && ! arg_spec->name ().empty ()) {
+      msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d ('%s')")), ex.basic_msg (), i + 1, arg_spec->name ());
+    } else {
+      msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d")), ex.basic_msg (), i + 1);
+    }
+
+    ex.set_basic_msg (msg);
+    throw ex;
 
   } catch (...) {
 

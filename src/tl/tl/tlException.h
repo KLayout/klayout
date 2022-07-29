@@ -126,7 +126,27 @@ public:
 
   virtual ~Exception () { }
 
+  /**
+   *  @brief Gets the full message text
+   *  Derived classes may dynamically build error messages.
+   *  "basic_msg" is the core message. Derived classes may
+   *  ignore the core message or modify the latter to build
+   *  the full message.
+   */
   virtual std::string msg () const { return m_msg; }
+
+  /**
+   *  @brief Gets the basic message
+   *  The basic message is the actual error text. Derived classes
+   *  may decide to deliver a more elaborate version of the message
+   *  through "msg".
+   */
+  std::string basic_msg () const { return m_msg; }
+
+  /**
+   *  @brief Exchanges the basic message
+   */
+  void set_basic_msg (const std::string &msg) { m_msg = msg; }
 
 private:
   std::string m_msg;

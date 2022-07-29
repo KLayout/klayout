@@ -68,23 +68,6 @@ PythonError::PythonError (const PythonError &d)
 { }
 
 // --------------------------------------------------------------------------
-//  PythonArgumentError implementation
-
-PythonArgumentError::PythonArgumentError (const tl::Exception &ex, int index, const std::string &name)
-  : tl::Exception (ex.msg ()), m_index (index), m_name (name)
-{ }
-
-std::string
-PythonArgumentError::msg () const
-{
-  if (! m_name.empty ()) {
-    return tl::sprintf (tl::to_string (tr ("%s for argument #%d ('%s')")),  tl::Exception::msg (), m_index + 1, m_name);
-  } else {
-    return tl::sprintf (tl::to_string (tr ("%s for argument #%d")),  tl::Exception::msg (), m_index + 1);
-  }
-}
-
-// --------------------------------------------------------------------------
 
 /**
  *  @brief The python interpreter instance

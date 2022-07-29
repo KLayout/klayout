@@ -2839,20 +2839,13 @@ TEST(11_DuplicateInstances)
 
   std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
-#if 0
-  //  suppressing duplicate cells:
   au = tl::combine_path (au, "device_extract_au1_dup_inst_with_rec_nets.gds");
-#else
-  //  with all cells
-  au = tl::combine_path (au, "device_extract_au1_dup_inst_with_rec_nets_all_cells.gds");
-#endif
 
   db::compare_layouts (_this, ly, au);
 
   //  compare netlist as string
   CHECKPOINT ();
   db::compare_netlist (_this, *l2n.netlist (),
-#if 0
     //  suppressing duplicate cells:
     "circuit RINGO ();\n"
     "  subcircuit INV2 $1 (IN=$I12,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
@@ -2882,73 +2875,6 @@ TEST(11_DuplicateInstances)
     "  subcircuit INV2 $4 (IN=$I1,$2=$I19,OUT=$I2,$4=$I10,$5=$I14);\n"
     "  subcircuit INV2 $5 (IN=$I5,$2=$I18,OUT=$I9,$4=$I10,$5=$I14);\n"
     "end;\n"
-#else
-    //  with all cells
-    "circuit RINGO ();\n"
-    "  device PMOS $1 (S=FB,G=$I11,D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $2 (S=VDD,G=FB,D=OSC) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $3 (S=$I34,G=$I10,D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $4 (S=VDD,G=$I34,D=$I4) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $5 (S=$I33,G=$I2,D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $6 (S=VDD,G=$I33,D=$I3) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $7 (S=$I32,G=$I1,D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $8 (S=VDD,G=$I32,D=$I2) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $9 (S=$I31,G=$I6,D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $10 (S=VDD,G=$I31,D=$I1) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $11 (S=$I36,G=FB,D=VDD) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $12 (S=VDD,G=$I36,D=$I6) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $13 (S=$I36,G=FB,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $14 (S=VSS,G=$I36,D=$I6) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $15 (S=FB,G=$I11,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $16 (S=VSS,G=FB,D=OSC) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $17 (S=$I34,G=$I10,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $18 (S=VSS,G=$I34,D=$I4) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $19 (S=$I33,G=$I2,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $20 (S=VSS,G=$I33,D=$I3) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $21 (S=$I32,G=$I1,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $22 (S=VSS,G=$I32,D=$I2) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $23 (S=$I31,G=$I6,D=VSS) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $24 (S=VSS,G=$I31,D=$I1) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  subcircuit INV2 $1 (IN=$I11,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 $2 (IN=FB,$2=$I36,OUT=$I6,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 $3 (IN=$I6,$2=$I31,OUT=$I1,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 $4 (IN=$I1,$2=$I32,OUT=$I2,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 $5 (IN=$I2,$2=$I33,OUT=$I3,$4=VSS,$5=VDD);\n"
-    "  subcircuit BLOCK $6 ($1=$I34,$2=VDD,$3=VSS,$4=$I10,$5=$I3,$6=$I4,$7=$I11);\n"
-    "  subcircuit INV2 $7 (IN=$I10,$2=$I34,OUT=$I4,$4=VSS,$5=VDD);\n"
-    "end;\n"
-    "circuit INV2 (IN=IN,$2=$2,OUT=OUT,$4=$4,$5=$5);\n"
-    "  subcircuit TRANS $1 ($1=$2,$2=$4,$3=IN);\n"
-    "  subcircuit TRANS $2 ($1=$2,$2=$5,$3=IN);\n"
-    "  subcircuit TRANS $3 ($1=$5,$2=OUT,$3=$2);\n"
-    "  subcircuit TRANS $4 ($1=$4,$2=OUT,$3=$2);\n"
-    "end;\n"
-    "circuit TRANS ($1=$1,$2=$2,$3=$3);\n"
-    "end;\n"
-    "circuit BLOCK ($1=$I24,$2=$I17,$3=$I13,$4=$I9,$5=$I8,$6=$I5,$7=$I3);\n"
-    "  device PMOS $1 (S=$I21,G=$I5,D=$I17) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $2 (S=$I17,G=$I21,D=$I1) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $3 (S=$I23,G=$I2,D=$I17) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $4 (S=$I17,G=$I23,D=$I3) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $5 (S=$I22,G=$I1,D=$I17) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $6 (S=$I17,G=$I22,D=$I2) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device PMOS $7 (S=$I28,G=$I8,D=$I17) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device PMOS $8 (S=$I17,G=$I28,D=$I9) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $9 (S=$I21,G=$I5,D=$I13) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $10 (S=$I13,G=$I21,D=$I1) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $11 (S=$I23,G=$I2,D=$I13) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $12 (S=$I13,G=$I23,D=$I3) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $13 (S=$I22,G=$I1,D=$I13) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $14 (S=$I13,G=$I22,D=$I2) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  device NMOS $15 (S=$I28,G=$I8,D=$I13) (L=0.25,W=0.95,AS=0.49875,AD=0.26125,PS=2.95,PD=1.5);\n"
-    "  device NMOS $16 (S=$I13,G=$I28,D=$I9) (L=0.25,W=0.95,AS=0.26125,AD=0.49875,PS=1.5,PD=2.95);\n"
-    "  subcircuit INV2 $1 (IN=$I8,$2=$I28,OUT=$I9,$4=$I13,$5=$I17);\n"
-    "  subcircuit INV2 $2 (IN=$I9,$2=$I24,OUT=$I5,$4=$I13,$5=$I17);\n"
-    "  subcircuit INV2 $3 (IN=$I2,$2=$I23,OUT=$I3,$4=$I13,$5=$I17);\n"
-    "  subcircuit INV2 $4 (IN=$I1,$2=$I22,OUT=$I2,$4=$I13,$5=$I17);\n"
-    "  subcircuit INV2 $5 (IN=$I5,$2=$I21,OUT=$I1,$4=$I13,$5=$I17);\n"
-    "end;\n"
-#endif
   );
 }
 

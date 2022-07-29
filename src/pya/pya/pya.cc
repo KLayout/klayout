@@ -38,6 +38,7 @@
 #include "tlTimer.h"
 #include "tlFileUtils.h"
 #include "tlString.h"
+#include "tlInternational.h"
 
 #if defined(HAVE_QT)
 #  include <QCoreApplication>
@@ -50,6 +51,38 @@
 
 namespace pya
 {
+
+// --------------------------------------------------------------------------
+//  PythonError implementation
+
+PythonError::PythonError (const char *msg, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
+  : tl::ScriptError (msg, cls, backtrace)
+{ }
+
+PythonError::PythonError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
+  : tl::ScriptError (msg, sourcefile, line, cls, backtrace)
+{ }
+
+PythonError::PythonError (const PythonError &d)
+  : tl::ScriptError (d)
+{ }
+
+// --------------------------------------------------------------------------
+//  PythonArgumentError implementation
+
+PythonArgumentError::PythonArgumentError (const tl::Exception &ex, int index, const std::string &name)
+  : tl::Exception (ex.msg ()), m_index (index), m_name (name)
+{ }
+
+std::string
+PythonArgumentError::msg () const
+{
+  if (! m_name.empty ()) {
+    return tl::sprintf (tl::to_string (tr ("%s for argument #%d ('%s')")),  tl::Exception::msg (), m_index + 1, m_name);
+  } else {
+    return tl::sprintf (tl::to_string (tr ("%s for argument #%d")),  tl::Exception::msg (), m_index + 1);
+  }
+}
 
 // --------------------------------------------------------------------------
 

@@ -1,3 +1,15 @@
+0.27.11          (2022-08-10):
+* Bugfix: %GITHUB%/issues/1098 Normalize zero dimension when generating regular array instance
+* Enhancement: %GITHUB%/issues/1103 Add setting to disable Save Needed dialog box
+* Bugfix: %GITHUB%/issues/1106 "move by" does not move instances from partial selection
+* Bugfix: %GITHUB%/issues/1111 GenericDeviceExtractor#define_opt_layer not working
+* Bugfix: %GITHUB%/issues/1114 MSYS2 compatibility with latest revision (based on gcc 12.1)
+* Bugfix: %GITHUB%/issues/1126 Internal error on DRC operation
+* Bugfix: %GITHUB%/issues/1135 LVS mismatch on parallel devices and issue on ambiguity resolution
+* Enhancement: Support for Python 3.11
+* Enhancement: L2N and LVSDB readers made compatible with potential future extensions
+* Bugfixes: Fixed a number of potential segfaults due to memory corruption found during master branch refactoring
+
 0.27.10          (2022-06-04):
 * Bugfix: %GITHUB%/issues/1081 Using a layer properties file from recent list without layout loaded crashes KLayout
 * Enhancement: %GITHUB%/issues/1079 PCell update: Library#refresh should call coerce_parameters_impl  

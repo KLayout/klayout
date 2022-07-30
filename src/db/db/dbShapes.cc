@@ -998,6 +998,8 @@ Shapes::clear ()
 {
   if (!m_layers.empty ()) {
 
+    invalidate_state ();  //  HINT: must come before the change is done!
+
     for (tl::vector<LayerBase *>::const_iterator l = m_layers.end (); l != m_layers.begin (); ) {
       //  because the undo stack will do a push, we need to remove layers from the back (this is the last undo
       //  element to be executed)
@@ -1010,7 +1012,6 @@ Shapes::clear ()
       }
     }
 
-    invalidate_state ();  //  HINT: must come before the change is done!
     m_layers.clear ();
 
   }

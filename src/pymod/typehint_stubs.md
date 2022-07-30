@@ -15,10 +15,10 @@ https://github.com/python/mypy/issues/11965
 I patched the stubgen program temporarily to fit our needs. See branch: https://github.com/thomaslima/mypy/tree/issue-klayout
 
 Run stubgen as such:
-`$ stubgen -m klayout.dbcore -o src/pymod/distutils_src/klayout/`
-`$ stubgen -m klayout.tlcore -o src/pymod/distutils_src/klayout/`
-`$ stubgen -m klayout.rdbcore -o src/pymod/distutils_src/klayout/`
-`$ stubgen -m klayout.libcore -o src/pymod/distutils_src/klayout/`
+`$ stubgen -m klayout.dbcore -o src/pymod/distutils_src/`
+`$ stubgen -m klayout.tlcore -o src/pymod/distutils_src/`
+`$ stubgen -m klayout.rdbcore -o src/pymod/distutils_src/`
+`$ stubgen -m klayout.libcore -o src/pymod/distutils_src/`
 
 TODO:
 - [x] 1. Complete signature generation for all methods in pyaModule.cc. A line containing func(arg1, arg2) should suffice. Multiple lines automatically generate overloading.

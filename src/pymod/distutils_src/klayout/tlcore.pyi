@@ -342,8 +342,13 @@ class ArgType:
     def inner(self) -> ArgType:
         """
         inner() -> ArgType
-        @brief Returns the inner ArgType object (i.e. value of a vector)
+        @brief Returns the inner ArgType object (i.e. value of a vector/map)
         Starting with version 0.22, this method replaces the is_vector method.
+        """
+    def inner_k(self) -> ArgType:
+        """
+        inner_k() -> ArgType
+        @brief Returns the inner ArgType object (i.e. key of a map)
         """
     def is_const_object(self) -> bool:
         """

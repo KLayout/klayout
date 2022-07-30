@@ -69,7 +69,7 @@ static int t_object () { return T_object; }
 static int t_vector () { return T_vector; }
 static int t_map () { return T_map; }
 
-static int type (const ArgType *t) 
+static int type (const ArgType *t)
 {
   return t->type ();
 }
@@ -120,8 +120,12 @@ Class<ArgType> decl_ArgType ("tl", "ArgType",
     "@brief Return the basic type (see t_.. constants)\n"
   ) +
   gsi::method ("inner", &ArgType::inner,
-    "@brief Returns the inner ArgType object (i.e. value of a vector)\n"
+    "@brief Returns the inner ArgType object (i.e. value of a vector/map)\n"
     "Starting with version 0.22, this method replaces the is_vector method.\n"
+  ) +
+  gsi::method ("inner_k", &ArgType::inner_k,
+    "@brief Returns the inner ArgType object (i.e. key of a map)\n"
+    "This method has been introduced in version 0.27."
   ) +
   gsi::method ("pass_obj?", &ArgType::pass_obj,
     "@brief True, if the ownership over an object represented by this type is passed to the receiver\n"
@@ -324,5 +328,3 @@ Class<ClassBase> decl_Class ("tl", "Class",
 );
 
 }
-
-

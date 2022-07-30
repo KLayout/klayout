@@ -116,6 +116,11 @@ Class<lay::LayoutView> decl_LayoutView (decl_LayoutViewBase, "lay", "LayoutView"
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
+  gsi::method ("widget", &lay::LayoutView::widget,
+    "@brief Gets the QWidget object for the layout view\n"
+    "\n"
+    "This method has been introduced in version 0.28 where LayoutView is no longer derived from QWidget directly.\n"
+  ) +
 #endif
   gsi::method ("current", &lay::LayoutView::current,
     "@brief Returns the current view\n"

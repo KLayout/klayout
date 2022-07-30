@@ -10,6 +10,7 @@
 from __future__ import print_function  # to use print() of Python 3 in Python >= 2.7
 import sys
 import os
+import codecs
 import shutil
 import glob
 import platform
@@ -219,6 +220,123 @@ def Get_Default_Config():
     config['Machine']       = Machine           # - do -
     config['Processor']     = Processor         # - do -
     return config
+
+#------------------------------------------------------------------------------
+## To apply a workaround patch to "./src/klayout.pri" to work with Ruby 3.x.
+#
+# @param[in] config     dictionary containing the default configuration
+#
+# @return void
+#------------------------------------------------------------------------------
+def ApplyPatch2KLayoutQtPri4Ruby3(config):
+    #----------------------------------------------------------------
+    # [1] Check if the previous patch exists
+    #----------------------------------------------------------------
+    priMaster   = "./src/klayout.pri"
+    priOriginal = "./src/klayout.pri.org"
+    if os.path.exists(priOriginal):
+        shutil.copy2( priOriginal, priMaster )
+        os.remove( priOriginal )
+
+    #----------------------------------------------------------------
+    # [2] Not using Ruby?
+    #----------------------------------------------------------------
+    ModuleRuby = config['ModuleRuby']
+    if ModuleRuby == 'nil':
+        return;
+
+    #----------------------------------------------------------------
+    # [3] Get the Ruby version code as done in "build.sh"
+    #----------------------------------------------------------------
+    rubyExe  = RubyDictionary[ModuleRuby]['exe']
+    oneline  = "puts (RbConfig::CONFIG['MAJOR'] || 0).to_i*10000+(RbConfig::CONFIG['MINOR'] || 0).to_i*100+(RbConfig::CONFIG['TEENY'] || 0).to_i"
+    command  = [ '%s' % rubyExe, '-rrbconfig', '-e', '%s' % oneline ]
+    verCode  = subprocess.check_output( command, encoding='utf-8' ).strip() # like 3.1.2 => "30102"
+    verInt   = int(verCode)
+    verMajor = verInt // 10000
+    verMinor = (verInt - verMajor * 10000) // 100
+    verTeeny = (verInt - verMajor * 10000) - (verMinor * 100)
+    # print( verMajor, verMinor, verTeeny )
+    # quit()
+    if verMajor < 3:
+        return;
+
+    #-----------------------------------------------------------------------------------------------
+    # [4] The two buggy Apple compilers below flag errors like:
+    #
+    #     /Applications/anaconda3/include/ruby-3.1.0/ruby/internal/intern/vm.h:383:1: error: \
+    #     '__declspec' attributes are not enabled; use '-fdeclspec' or '-fms-extensions' to \
+    #     enable support for __declspec attributes RBIMPL_ATTR_NORETURN()
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #   Problematic in <Catalina> with
+    #     Apple clang version 12.0.0 (clang-1200.0.32.29)
+    #     Target: x86_64-apple-darwin19.6.0
+    #     Thread model: posix
+    #
+    #   Problematic in <Big Sur> with
+    #     Apple clang version 13.0.0 (clang-1300.0.29.30)
+    #     Target: x86_64-apple-darwin20.6.0
+    #     Thread model: posix
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #   Non-problematic in <Monterey> with
+    #     Apple clang version 13.1.6 (clang-1316.0.21.2.5)
+    #     Target: x86_64-apple-darwin21.6.0
+    #     Thread model: posix
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #   Refer to https://github.com/nginx/unit/issues/653
+    #            https://github.com/nginx/unit/issues/653#issuecomment-1062129080
+    #
+    #   Pass "-fdeclspec" option to the QMAKE_CXXFLAGS macro via the "./src/klayout.pri" file like:
+    """
+    # <build4mac.py> applied this patch for Mac to work with Ruby 3.x
+    mac {
+        QMAKE_CXXFLAGS += -fdeclspec
+    }
+    # <build4mac.py> applied this patch for Mac to work with Ruby 3.x
+    """
+    #-----------------------------------------------------------------------------------------------
+    #----------------------------------------------------------------
+    # (A) Check Platform
+    #----------------------------------------------------------------
+    Platform = config['Platform']
+    if Platform in [ "Monterey" ]:
+        return
+    elif Platform in [ "BigSur", "Catalina" ]: # take care
+        pass
+    else:
+        return # the results are not tested and unknown
+
+    #----------------------------------------------------------------
+    # (B) Check ./src/klayout.pri and apply the patch if necessary
+    #----------------------------------------------------------------
+    keystring = "<build4mac.py> applied this patch for Mac to work with Ruby 3.x"
+    patPatch  = r"(^#)([ ]*)(%s)([ ]*$)" % keystring
+    regPatch  = re.compile(patPatch)
+    foundKey1 = False
+    foundKey2 = False
+
+    with codecs.open( priMaster, "r", "utf-8" ) as file:
+        allLines = file.readlines()
+        file.close()
+        for line in allLines:
+            if regPatch.match( line.strip() ):
+                if not foundKey1:
+                    foundKey1 = True
+                    continue
+                elif not foundKey2:
+                    foundKey2 = True
+                    break
+    if foundKey1 and foundKey2:
+        return
+
+    shutil.copy2( priMaster, priOriginal )
+    with codecs.open( priMaster, "a", "utf-8" ) as file:
+        file.write( "# %s\n" % keystring )
+        file.write( "mac {\n" )
+        file.write( "    QMAKE_CXXFLAGS += -fdeclspec\n" )
+        file.write( "}\n" )
+        file.write( "# %s\n" % keystring )
+    return
 
 #------------------------------------------------------------------------------
 ## To parse the command line parameters
@@ -660,6 +778,7 @@ def Get_Build_Parameters(config):
 
     # (H) about Ruby
     if ModuleRuby != "nil":
+        ApplyPatch2KLayoutQtPri4Ruby3( config )
         parameters['ruby']  = RubyDictionary[ModuleRuby]['exe']
         parameters['rbinc'] = RubyDictionary[ModuleRuby]['inc']
         parameters['rblib'] = RubyDictionary[ModuleRuby]['lib']

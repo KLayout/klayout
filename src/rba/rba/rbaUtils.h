@@ -224,6 +224,9 @@ VALUE rba_f_eval_checked (int argc, VALUE *argv, VALUE self);
 void rba_yield_checked (VALUE value);
 VALUE rba_eval_string_in_context (const char *expr, const char *file, int line, int context);
 
+bool exceptions_blocked ();
+void block_exceptions (bool f);
+
 /**
  *  @brief A struct encapsulating the call parameters for a function
  */
@@ -261,7 +264,12 @@ R rba_safe_func (R (*f) (A), A arg)
   int error = 0;
 
   RUBY_BEGIN_EXEC
+    //  NOTE: we do not want exceptions to be seen in the debugger here - later they are rethrown after
+    //  being annotated. This is when we want to see them.
+    bool eb = exceptions_blocked ();
+    block_exceptions (true);
     rb_protect (&rba_safe_func_caller<R, A>, (VALUE) &cp, &error);
+    block_exceptions (eb);
   RUBY_END_EXEC
 
   if (error) {

@@ -148,8 +148,19 @@ class TL_PUBLIC ExitException
   : public tl::Exception
 {
 public:
-  ExitException () : tl::Exception ("exit"), m_status (1) { }
-  ExitException (int status) : tl::Exception ("exit"), m_status (status) { }
+  ExitException ()
+    : tl::Exception ("exit"), m_status (1)
+  {
+    //  do not catch in debugger
+    set_first_chance (false);
+  }
+
+  ExitException (int status)
+    : tl::Exception ("exit"), m_status (status)
+  {
+    //  do not catch in debugger
+    set_first_chance (false);
+  }
 
   int status() const { return m_status; }
 

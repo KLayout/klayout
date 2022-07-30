@@ -46,7 +46,7 @@ class TL_PUBLIC Exception
 {
 public:
   Exception (const std::string &msg)
-    : m_msg (msg)
+    : m_msg (msg), m_first_chance (true)
   { }
 
   Exception (const std::string &fmt, const std::vector<tl::Variant> &a)
@@ -148,8 +148,24 @@ public:
    */
   void set_basic_msg (const std::string &msg) { m_msg = msg; }
 
+  /**
+   *  @brief Sets a flag indicating whether this exception is a first-chance one
+   *
+   *  "first chance" means it has not been seen in the debugger.
+   *  Set this flag to false to indicate that it already got seen.
+   *  By default the flag is true, indicating it has not been handled
+   *  by the debugger.
+   */
+  void set_first_chance (bool f) { m_first_chance = f; }
+
+  /**
+   *  @brief Gets a flag indicating that is this a first-chance exception
+   */
+  bool first_chance () const { return m_first_chance; }
+
 private:
   std::string m_msg;
+  bool m_first_chance;
   void init (const std::string &fmt, const std::vector<tl::Variant> &a);
 };
 

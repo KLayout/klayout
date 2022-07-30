@@ -179,6 +179,16 @@ public:
   void end_exec ();
 
   /**
+   *  @brief Gets a flag indicating whether exceptions are blocked from being seen in the debugger
+   */
+  bool exceptions_blocked ();
+
+  /**
+   *  @brief Sets a flag indicating whether exceptions are blocked from being seen in the debugger
+   */
+  void block_exceptions (bool f);
+
+  /**
    *  @brief Fetch the version string
    *
    *  Returns an empty string when no Ruby interpreter is installed.

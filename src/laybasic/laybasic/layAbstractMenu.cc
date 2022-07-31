@@ -387,7 +387,7 @@ Action::Action () :
 #if defined(HAVE_QT)
   //  catch the destroyed signal to tell if the QAction object is deleted.
   if (mp_action) {
-    connect (mp_action, SIGNAL (destroyed (QObject *)), this, SLOT (destroyed (QObject *)));
+    connect (mp_action, SIGNAL (destroyed (QObject *)), this, SLOT (was_destroyed (QObject *)));
     connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
   }
 #endif
@@ -413,7 +413,7 @@ Action::Action (QAction *action, bool owned)
   sp_actionHandles->insert (this);
 
   //  catch the destroyed signal to tell if the QAction object is deleted.
-  connect (mp_action, SIGNAL (destroyed (QObject *)), this, SLOT (destroyed (QObject *)));
+  connect (mp_action, SIGNAL (destroyed (QObject *)), this, SLOT (was_destroyed (QObject *)));
   connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
 }
 
@@ -436,7 +436,8 @@ Action::Action (QMenu *menu, bool owned)
   sp_actionHandles->insert (this);
 
   //  catch the destroyed signal to tell if the QAction object is deleted.
-  connect (mp_menu, SIGNAL (destroyed (QObject *)), this, SLOT (destroyed (QObject *)));
+  connect (mp_menu, SIGNAL (destroyed (QObject *)), this, SLOT (was_destroyed (QObject *)));
+  connect (mp_menu, SIGNAL (aboutToShow ()), this, SLOT (menu_about_to_show ()));
   connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
 }
 #endif
@@ -466,7 +467,7 @@ Action::Action (const std::string &title) :
 #if defined(HAVE_QT)
   //  catch the destroyed signal to tell if the QAction object is deleted.
   if (mp_action) {
-    connect (mp_action, SIGNAL (destroyed (QObject *)), this, SLOT (destroyed (QObject *)));
+    connect (mp_action, SIGNAL (destroyed (QObject *)), this, SLOT (was_destroyed (QObject *)));
     connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
   }
 #endif
@@ -538,6 +539,30 @@ Action::configure_from_title (const std::string &s)
 
 #if defined(HAVE_QT)
 void
+Action::menu_about_to_show ()
+{
+  BEGIN_PROTECTED
+
+  if (! mp_dispatcher || ! mp_dispatcher->menu ()) {
+    return;
+  }
+  AbstractMenuItem *item = mp_dispatcher->menu ()->find_item_for_action (this);
+  if (! item ) {
+    return;
+  }
+
+  for (auto i = item->children.begin (); i != item->children.end (); ++i) {
+    if (i->action ()) {
+      i->action ()->sync_qaction ();
+    }
+  }
+
+  END_PROTECTED
+}
+#endif
+
+#if defined(HAVE_QT)
+void
 Action::qaction_triggered ()
 {
   BEGIN_PROTECTED
@@ -578,7 +603,7 @@ Action::menu () const
 }
 
 void
-Action::destroyed (QObject *obj)
+Action::was_destroyed (QObject *obj)
 {
   if (obj == mp_action) {
     mp_action = 0;
@@ -592,16 +617,23 @@ Action::destroyed (QObject *obj)
 #endif
 
 void
+Action::sync_qaction ()
+{
+#if defined(HAVE_QT)
+  if (mp_action) {
+    mp_action->setVisible (is_effective_visible ());
+    mp_action->setShortcut (get_key_sequence ());
+    mp_action->setEnabled (is_effective_enabled ());
+  }
+#endif
+}
+
+void
 Action::set_visible (bool v)
 {
   if (m_visible != v) {
     m_visible = v;
-#if defined(HAVE_QT)
-    if (mp_action) {
-      mp_action->setVisible (is_effective_visible ());
-      mp_action->setShortcut (get_key_sequence ());
-    }
-#endif
+    sync_qaction ();
   }
 }
 
@@ -610,12 +642,7 @@ Action::set_hidden (bool h)
 {
   if (m_hidden != h) {
     m_hidden = h;
-#if defined(HAVE_QT)
-    if (mp_action) {
-      mp_action->setVisible (is_effective_visible ());
-      mp_action->setShortcut (get_key_sequence ());
-    }
-#endif
+    sync_qaction ();
   }
 }
 
@@ -634,7 +661,7 @@ Action::is_hidden () const
 bool
 Action::is_effective_visible () const
 {
-  return m_visible && !m_hidden;
+  return m_visible && !m_hidden && wants_visible ();
 }
 
 void
@@ -792,11 +819,7 @@ Action::is_checked () const
 bool
 Action::is_enabled () const
 {
-#if defined(HAVE_QT)
-  return qaction () ? qaction ()->isEnabled () : m_enabled;
-#else
   return m_enabled;
-#endif
 }
 
 bool
@@ -808,12 +831,16 @@ Action::is_separator () const
 void
 Action::set_enabled (bool b)
 {
-#if defined(HAVE_QT)
-  if (qaction ()) {
-    qaction ()->setEnabled (b);
+  if (m_enabled != b) {
+    m_enabled = b;
+    sync_qaction ();
   }
-#endif
-  m_enabled = b;
+}
+
+bool
+Action::is_effective_enabled () const
+{
+  return m_enabled && wants_enabled ();
 }
 
 void
@@ -1506,6 +1533,33 @@ AbstractMenu::delete_items (Action *action)
     do_delete_items (m_root, action);
     emit_changed ();
   }
+}
+
+const AbstractMenuItem *
+AbstractMenu::find_item_for_action (const Action *action, const AbstractMenuItem *from) const
+{
+  return (const_cast<AbstractMenu *> (this))->find_item_for_action (action, const_cast<AbstractMenuItem *> (from));
+}
+
+AbstractMenuItem *
+AbstractMenu::find_item_for_action (const Action *action, AbstractMenuItem *from)
+{
+  if (! from) {
+    from = const_cast<AbstractMenuItem *> (&root ());
+  }
+
+  if (from->action () == action) {
+    return from;
+  }
+
+  for (auto i = from->children.begin (); i != from->children.end (); ++i) {
+    AbstractMenuItem *item = find_item_for_action (action, i.operator-> ());
+    if (item) {
+      return item;
+    }
+  }
+
+  return 0;
 }
 
 const AbstractMenuItem *

@@ -52,6 +52,7 @@
 #include "tlExceptions.h"
 #include "tlExpression.h"
 #include "tlFileUtils.h"
+#include "tlUri.h"
 #include "dbMemStatistics.h"
 #include "dbManager.h"
 #include "dbStream.h"
@@ -3202,10 +3203,23 @@ MainWindow::open_recent (size_t n)
   END_PROTECTED
 }
 
+static bool
+is_file_available (const std::string &fn)
+{
+  tl::URI uri (fn);
+  if (uri.scheme ().empty ()) {
+    return tl::is_readable (fn);
+  } else if (uri.scheme () == "file") {
+    return tl::is_readable (uri.path ());
+  } else {
+    return true;
+  }
+}
+
 bool
 MainWindow::is_available_recent (size_t n)
 {
-  return (n < m_mru.size () && tl::is_readable (m_mru [n].first));
+  return (n < m_mru.size () && is_file_available (m_mru [n].first));
 }
 
 void
@@ -3225,7 +3239,7 @@ MainWindow::open_recent_session (size_t n)
 bool
 MainWindow::is_available_recent_session (size_t n)
 {
-  return (n < m_mru_sessions.size () && tl::is_readable (m_mru_sessions [n]));
+  return (n < m_mru_sessions.size () && is_file_available (m_mru_sessions [n]));
 }
 
 void
@@ -3245,7 +3259,7 @@ MainWindow::open_recent_layer_properties (size_t n)
 bool
 MainWindow::is_available_recent_layer_properties (size_t n)
 {
-  return (n < m_mru_layer_properties.size () && tl::is_readable (m_mru_layer_properties [n]));
+  return (n < m_mru_layer_properties.size () && is_file_available (m_mru_layer_properties [n]));
 }
 
 void
@@ -3269,7 +3283,7 @@ MainWindow::open_recent_bookmarks (size_t n)
 bool
 MainWindow::is_available_recent_bookmarks (size_t n)
 {
-  return (n < m_mru_bookmarks.size () && tl::is_readable (m_mru_bookmarks [n]));
+  return (n < m_mru_bookmarks.size () && is_file_available (m_mru_bookmarks [n]));
 }
 
 void

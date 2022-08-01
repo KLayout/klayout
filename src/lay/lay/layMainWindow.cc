@@ -3019,7 +3019,7 @@ public:
 
   void triggered ()
   {
-    mp_mw->configure (m_cfg, std::string ());
+    dispatcher ()->config_set (m_cfg, std::string ());
   }
 
 private:

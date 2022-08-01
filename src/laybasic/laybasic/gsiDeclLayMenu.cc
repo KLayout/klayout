@@ -39,7 +39,27 @@ public:
     on_triggered_event ();
   }
 
+  virtual bool wants_visible () const
+  {
+    if (wants_visible_cb.can_issue ()) {
+      return wants_visible_cb.issue<lay::Action, bool> (&lay::Action::wants_visible);
+    } else {
+      return true;
+    }
+  }
+
+  virtual bool wants_enabled () const
+  {
+    if (wants_enabled_cb.can_issue ()) {
+      return wants_enabled_cb.issue<lay::Action, bool> (&lay::Action::wants_enabled);
+    } else {
+      return true;
+    }
+  }
+
   gsi::Callback triggered_cb;
+  gsi::Callback wants_visible_cb;
+  gsi::Callback wants_enabled_cb;
   tl::Event on_triggered_event;
 };
 
@@ -291,9 +311,15 @@ Class<lay::Action> decl_ActionBase ("lay", "ActionBase",
   ) +
   method ("is_effective_visible?", &lay::Action::is_effective_visible,
     "@brief Gets a value indicating whether the item is really visible\n"
-    "This is the combined visibility from \\is_visible? and \\is_hidden?."
+    "This is the combined visibility from \\is_visible? and \\is_hidden? and dynamic visibility (\\wants_visible)."
     "\n"
     "This attribute has been introduced in version 0.25.\n"
+  ) +
+  method ("is_effective_enabled?", &lay::Action::is_effective_enabled,
+    "@brief Gets a value indicating whether the item is really enabled\n"
+    "This is the combined value from \\is_enabled? and dynamic value (\\wants_enabled)."
+    "\n"
+    "This attribute has been introduced in version 0.28.\n"
   ) +
   method ("separator=", &lay::Action::set_separator, gsi::arg ("separator"),
     "@brief Makes an item a separator or not\n"
@@ -367,6 +393,24 @@ Class<lay::Action> decl_ActionBase ("lay", "ActionBase",
 Class<ActionStub> decl_Action (decl_ActionBase, "lay", "Action",
   gsi::callback ("triggered", &ActionStub::triggered, &ActionStub::triggered_cb,
     "@brief This method is called if the menu item is selected"
+  ) +
+  gsi::callback ("wants_visible", &ActionStub::wants_visible, &ActionStub::wants_visible_cb,
+    "@brief Returns a value whether the action wants to become visible\n"
+    "This is a dynamic query for visibility which the system uses to dynamically show or hide "
+    "menu items, for example in the MRU lists. This visibility information is evaluated in addition "
+    "to \\is_visible? and \\is_hidden? and contributes to the effective visibility status from "
+    "\\is_effective_visible?.\n"
+    "\n"
+    "This feature has been introduced in version 0.28.\n"
+  ) +
+  gsi::callback ("wants_enabled", &ActionStub::wants_enabled, &ActionStub::wants_enabled_cb,
+    "@brief Returns a value whether the action wants to become enabled\n"
+    "This is a dynamic query for enabled state which the system uses to dynamically show or hide "
+    "menu items. This information is evaluated in addition "
+    "to \\is_enabled? and contributes to the effective enabled status from "
+    "\\is_effective_enabled?.\n"
+    "\n"
+    "This feature has been introduced in version 0.28.\n"
   ) +
   gsi::event ("on_triggered", &ActionStub::on_triggered_event,
     "@brief This event is called if the menu item is selected\n"

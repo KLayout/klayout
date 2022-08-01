@@ -1036,11 +1036,12 @@ public:
     return m_s_utf8.constData ();
   }
 
-  virtual void set (const char *c_str, size_t s, tl::Heap &)
+  virtual void set (const char *c_str, size_t s, tl::Heap &heap)
   {
     if (! m_is_const) {
-      m_latin1_holder = QString::fromUtf8 (c_str, int (s)).toLatin1 ();
-      *mp_s = QLatin1String (m_latin1_holder.constData (), m_latin1_holder.size ());
+      QByteArray *latin1_holder = new QByteArray (QString::fromUtf8 (c_str, int (s)).toLatin1 ());
+      heap.push (latin1_holder);
+      *mp_s = QLatin1String (latin1_holder->constData (), latin1_holder->size ());
     }
   }
 
@@ -1048,7 +1049,6 @@ private:
   QLatin1String *mp_s;
   bool m_is_const;
   QLatin1String m_s;
-  QByteArray m_latin1_holder;
   mutable QByteArray m_s_utf8;
 };
 

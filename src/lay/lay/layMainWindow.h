@@ -637,6 +637,10 @@ public slots:
   void open_recent_session (size_t n);
   void open_recent_layer_properties (size_t n);
   void open_recent_bookmarks (size_t n);
+  bool is_available_recent(size_t n);
+  bool is_available_recent_session (size_t n);
+  bool is_available_recent_layer_properties (size_t n);
+  bool is_available_recent_bookmarks (size_t n);
   void view_selected (int index);
   void view_title_changed (lay::LayoutView *view);
 

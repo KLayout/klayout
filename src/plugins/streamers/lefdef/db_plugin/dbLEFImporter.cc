@@ -135,6 +135,26 @@ static db::Shape insert_shape (db::Cell &cell, unsigned int layer_id, const Shap
   }
 }
 
+static db::Box box_for_label (const db::Polygon &p)
+{
+  if (p.is_box ()) {
+    return p.box ();
+  } else if (p.begin_hull () != p.end_hull ()) {
+    return db::Box (*p.begin_hull (), *p.begin_hull ());
+  } else {
+    return db::Box ();
+  }
+}
+
+static db::Box box_for_label (const db::Path &p)
+{
+  if (p.begin () != p.end ()) {
+    return db::Box (*p.begin (), *p.begin ());
+  } else {
+    return db::Box ();
+  }
+}
+
 void
 LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, LayerPurpose purpose, std::map<std::string, db::Box> *collect_boxes_for_labels, db::properties_id_type prop_id)
 {
@@ -201,7 +221,7 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
             db::Path pt = p.transformed (*t);
             lg->add_path (layer_name, purpose, pt, mask, prop_id);
             if (collect_boxes_for_labels) {
-              collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = pt.box ();
+              collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = box_for_label (pt);
             }
           }
 
@@ -209,7 +229,7 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
 
           lg->add_path (layer_name, purpose, p, mask, prop_id);
           if (collect_boxes_for_labels) {
-            collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = p.box ();
+            collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = box_for_label (p);
           }
 
         }
@@ -249,7 +269,7 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
             db::Polygon pt = p.transformed (*t);
             lg->add_polygon (layer_name, purpose, pt, mask, prop_id);
             if (collect_boxes_for_labels) {
-              collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = pt.box ();
+              collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = box_for_label (pt);
             }
           }
 
@@ -257,7 +277,7 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
 
           lg->add_polygon (layer_name, purpose, p, mask, prop_id);
           if (collect_boxes_for_labels) {
-            collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = p.box ();
+            collect_boxes_for_labels->insert (std::make_pair (layer_name, db::Box ())).first->second = box_for_label (p);
           }
 
         }
@@ -883,7 +903,9 @@ LEFImporter::read_macro (Layout &layout)
             read_geometries (mg, layout.dbu (), LEFPins, &boxes_for_labels, prop_id);
 
             for (std::map <std::string, db::Box>::const_iterator b = boxes_for_labels.begin (); b != boxes_for_labels.end (); ++b) {
-              mg->add_text (b->first, LEFLabel, db::Text (label.c_str (), db::Trans (b->second.center () - db::Point ())), 0, 0);
+              if (! b->second.empty ()) {
+                mg->add_text (b->first, LEFLabel, db::Text (label.c_str (), db::Trans (b->second.center () - db::Point ())), 0, 0);
+              }
             }
 
           } else {

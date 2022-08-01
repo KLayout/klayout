@@ -227,20 +227,20 @@ RESULT
     $a1.visible = false
     assert_equal( menu.action( "my_menu.new_item" ).is_visible?, false )
     assert_equal( menu.action( "my_menu.new_item" ).is_checked?, false )
-    assert_equal( menu.action( "my_menu.new_item" ).is_enabled?, false )
+    assert_equal( menu.action( "my_menu.new_item" ).is_enabled?, true )
 
     $a1.checked = true
     assert_equal( menu.action( "file_menu.#3" ).is_visible?, false )
     assert_equal( menu.action( "file_menu.#3" ).is_checked?, false )
     assert_equal( menu.action( "file_menu.#3" ).is_checkable?, false )
-    assert_equal( menu.action( "file_menu.#3" ).is_enabled?, false )
+    assert_equal( menu.action( "file_menu.#3" ).is_enabled?, true )
 
     $a1.checked = false
     $a1.checkable = true;
     assert_equal( menu.action( "my_menu.new_item" ).is_visible?, false )
     assert_equal( menu.action( "my_menu.new_item" ).is_checked?, false )
     assert_equal( menu.action( "my_menu.new_item" ).is_checkable?, true )
-    assert_equal( menu.action( "my_menu.new_item" ).is_enabled?, false )
+    assert_equal( menu.action( "my_menu.new_item" ).is_enabled?, true )
     $a1.checked = true
     assert_equal( menu.action( "file_menu.#0" ).is_checked?, true )
 
@@ -437,6 +437,50 @@ RESULT
     # reset for the next pass
     mw.set_menu_items_hidden(mw.get_default_menu_items_hidden)
     mw.set_key_bindings(mw.get_default_key_bindings)
+
+  end
+
+  class MyAction < RBA::Action
+    attr_accessor :dyn_visible, :dyn_enabled
+    def initialize
+      self.dyn_visible = true
+      self.dyn_enabled = true
+    end
+    def wants_visible
+      self.dyn_visible
+    end
+    def wants_enabled
+      self.dyn_enabled
+    end
+  end
+
+  def test_7
+
+    a = MyAction::new
+
+    assert_equal(a.is_effective_visible?, true)
+    a.hidden = true
+    assert_equal(a.is_effective_visible?, false)
+    a.hidden = false
+    assert_equal(a.is_effective_visible?, true)
+    a.visible = false
+    assert_equal(a.is_effective_visible?, false)
+    a.visible = true
+    assert_equal(a.is_effective_visible?, true)
+    a.dyn_visible = false
+    assert_equal(a.is_effective_visible?, false)
+    a.dyn_visible = true
+    assert_equal(a.is_effective_visible?, true)
+
+    assert_equal(a.is_effective_enabled?, true)
+    a.enabled = false
+    assert_equal(a.is_effective_enabled?, false)
+    a.enabled = true
+    assert_equal(a.is_effective_enabled?, true)
+    a.dyn_enabled = false
+    assert_equal(a.is_effective_enabled?, false)
+    a.dyn_enabled = true
+    assert_equal(a.is_effective_enabled?, true)
 
   end
 

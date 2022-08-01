@@ -318,6 +318,34 @@ public:
     return false;
   }
 
+  /**
+   *  @brief Gets a value indicating the action is visible (dynamic calls)
+   *  In addition to static visibility (visible/hidden), an Action object can request to
+   *  become invisible dynamically based on conditions. This will work for menu-items
+   *  for which the system will query the status before the menu is shown.
+   */
+  virtual bool wants_visible () const
+  {
+    return true;
+  }
+
+  /**
+   *  @brief Gets a value indicating the action is enabled (dynamic calls)
+   *  In addition to static visibility (visible/hidden), an Action object can request to
+   *  become invisible dynamically based on conditions. This will work for menu-items
+   *  for which the system will query the status before the menu is shown.
+   */
+  virtual bool wants_enabled () const
+  {
+    return true;
+  }
+
+  /**
+   *  @brief Gets the effective enabled state
+   *  This is the combined value from is_enabled and wants_enabled.
+   */
+  bool is_effective_enabled () const;
+
 #if defined(HAVE_QT)
   /**
    *  @brief Get the underlying QAction object
@@ -342,8 +370,9 @@ public:
 
 #if defined(HAVE_QT)
 protected slots:
-  void destroyed (QObject *obj);
+  void was_destroyed (QObject *obj);
   void qaction_triggered ();
+  void menu_about_to_show ();
 #endif
 
 private:
@@ -381,6 +410,7 @@ private:
 #endif
 
   void configure_from_title (const std::string &s);
+  void sync_qaction ();
 
   //  no copying
   Action (const Action &);
@@ -801,7 +831,7 @@ public:
    *  @param group The group name
    *  @param A vector of all members (as actions) of the group
    */
-  std::vector<Action *> group_actions(const std::string &name);
+  std::vector<Action *> group_actions (const std::string &name);
 
   /**
    *  @brief Get the configure actions for a given configuration name
@@ -844,6 +874,8 @@ private:
   std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator> > find_item (tl::Extractor &extr);
   const AbstractMenuItem *find_item_exact (const std::string &path) const;
   AbstractMenuItem *find_item_exact (const std::string &path);
+  const AbstractMenuItem *find_item_for_action (const Action *action, const AbstractMenuItem *from = 0) const;
+  AbstractMenuItem *find_item_for_action (const Action *action, AbstractMenuItem *from = 0);
 #if defined(HAVE_QT)
   void build (QMenu *menu, std::list<AbstractMenuItem> &items);
   void build (QToolBar *tbar, std::list<AbstractMenuItem> &items);

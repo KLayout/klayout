@@ -1353,3 +1353,48 @@ TEST(200_issue609)
     EXPECT_EQ (root_nets (hc.clusters_per_cell (*td)), size_t (0));
   }
 }
+
+//  issue #1126
+TEST(201_issue1126)
+{
+  {
+    db::Layout ly;
+    unsigned int l1 = 0;
+
+    {
+      db::LayerProperties p;
+      db::LayerMap lmap;
+
+      p.layer = 1;
+      p.datatype = 0;
+      lmap.map (db::LDPair (p.layer, p.datatype), l1 = ly.insert_layer ());
+      ly.set_properties (l1, p);
+
+      db::LoadLayoutOptions options;
+      options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+      options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+      std::string fn (tl::testdata ());
+      fn += "/algo/issue-1126.gds.gz";
+      tl::InputStream stream (fn);
+      db::Reader reader (stream);
+      reader.read (ly, options);
+    }
+
+    std::vector<std::string> strings;
+    normalize_layer (ly, strings, l1);
+
+    //  connect 1 to 1
+    db::Connectivity conn;
+    conn.connect (l1, l1);
+
+    db::hier_clusters<db::PolygonRef> hc;
+    hc.build (ly, ly.cell (*ly.begin_top_down ()), conn);
+
+    // should not assert until here
+  }
+
+  //  detailed test:
+  run_hc_test (_this, "issue-1126.gds.gz", "issue-1126_au.gds");
+}
+

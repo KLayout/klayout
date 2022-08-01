@@ -94,7 +94,11 @@ public:
   virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
   {
     const generic_shape_iterator_delegate2<Iter> *o = dynamic_cast<const generic_shape_iterator_delegate2<Iter> *> (other);
+#if defined(_MSC_VER) && defined(_ITERATOR_DEBUG_LEVEL) && _ITERATOR_DEBUG_LEVEL >= 2
+    return o && o->m_iter._Unwrapped () == m_iter._Unwrapped ();
+#else
     return o && o->m_iter == m_iter;
+#endif
   }
 
 private:

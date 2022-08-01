@@ -145,9 +145,10 @@ msvc {
 
   QMAKE_CXXFLAGS_WARN_ON += \
 
-  # as we're using default-constructed iterators as "null" we can't have
-  # checked iterators with MSVC
-  DEFINES += _ITERATOR_DEBUG_LEVEL=0
+  # for stack trace support:
+  # lpsapi for GetModuleFileName and others
+  # dbghelp for SymFromAddr and other
+  LIBS += -lpsapi -ldbghelp
 
 } else {
 
@@ -171,9 +172,25 @@ msvc {
   QMAKE_CXXFLAGS += -std=c++11
 
   win32 {
+
     QMAKE_LFLAGS += -Wl,--exclude-all-symbols
+
+    # for stack trace support:
+    # lpsapi for GetModuleFileName and others
+    # dbghelp for SymFromAddr and other
+    LIBS += -lpsapi -ldbghelp
+
+    QMAKE_CXXFLAGS += -Wa,-mbig-obj
+
   } else {
+
     QMAKE_CXXFLAGS += -fvisibility=hidden
+
+  }
+
+  *bsd* {
+    # stack trace support
+    LIBS += -lexecinfo
   }
 
 }

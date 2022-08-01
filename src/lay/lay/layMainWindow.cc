@@ -51,6 +51,8 @@
 #include "tlStream.h"
 #include "tlExceptions.h"
 #include "tlExpression.h"
+#include "tlFileUtils.h"
+#include "tlUri.h"
 #include "dbMemStatistics.h"
 #include "dbManager.h"
 #include "dbStream.h"
@@ -2902,29 +2904,28 @@ MainWindow::add_mru (const std::string &fn_rel)
   add_mru (fn_rel, m_initial_technology);
 }
 
-const size_t max_mru = 16;
+const size_t max_mru = 16; //  TODO: make configurable?
 
 void
 MainWindow::add_mru (const std::string &fn_rel, const std::string &tech)
 {
-  std::vector <std::pair<std::string, std::string> > new_mru (m_mru);
+  std::vector <std::pair<std::string, std::string> > new_mru;
   std::string fn (tl::InputStream::absolute_path (fn_rel));
 
-  for (std::vector<std::pair<std::string, std::string> >::iterator mru = new_mru.begin (); mru != new_mru.end (); ++mru) {
-    if (mru->first == fn) {
-      new_mru.erase (mru);
-      break;
+  for (auto mru = m_mru.begin (); mru != m_mru.end (); ++mru) {
+    if (mru->first != fn /* delete non-existing files: && tl::is_readable (mru->first) */) {
+      new_mru.push_back (*mru);
     }
   }
 
   new_mru.push_back (std::make_pair (fn, tech));
 
   if (new_mru.size () > max_mru) {
-    new_mru.erase (new_mru.begin ());
+    new_mru.erase (new_mru.begin (), new_mru.end () - max_mru);
   }
 
   std::string config_str;
-  for (std::vector<std::pair<std::string, std::string> >::const_iterator mru = new_mru.begin (); mru != new_mru.end (); ++mru) {
+  for (auto mru = new_mru.begin (); mru != new_mru.end (); ++mru) {
     if (! config_str.empty ()) {
       config_str += " ";
     }
@@ -2952,20 +2953,19 @@ MainWindow::add_to_other_mru (const std::string &fn_rel, const std::string &cfg)
     tl_assert (false);
   }
 
-  std::vector <std::string> new_mru = *mru_ptr;
+  std::vector <std::string> new_mru;
   std::string fn (tl::InputStream::absolute_path (fn_rel));
 
-  for (std::vector<std::string>::iterator mru = new_mru.begin (); mru != new_mru.end (); ++mru) {
-    if (*mru == fn) {
-      new_mru.erase (mru);
-      break;
+  for (auto mru = mru_ptr->begin (); mru != mru_ptr->end (); ++mru) {
+    if (*mru != fn /* delete non-existing files: && tl::is_readable (*mru) */) {
+      new_mru.push_back (*mru);
     }
   }
 
   new_mru.push_back (fn);
 
   if (new_mru.size () > max_mru) {
-    new_mru.erase (new_mru.begin ());
+    new_mru.erase (new_mru.begin (), new_mru.end () - max_mru);
   }
 
   std::string config_str;
@@ -2986,72 +2986,45 @@ class OpenRecentAction
   : public lay::Action
 {
 public:
-  OpenRecentAction (lay::MainWindow *mw, size_t n)
-    : lay::Action (), mp_mw (mw), m_n (n)
+  OpenRecentAction (lay::MainWindow *mw, size_t n, void (lay::MainWindow::*open_meth) (size_t), bool (lay::MainWindow::*avail_meth) (size_t))
+    : lay::Action (), mp_mw (mw), m_n (n), m_open_meth (open_meth), m_avail_meth (avail_meth)
   { }
 
   void triggered ()
   {
-    mp_mw->open_recent (m_n);
+    (mp_mw->*m_open_meth) (m_n);
+  }
+
+  bool wants_enabled () const
+  {
+    return (mp_mw->*m_avail_meth) (m_n);
   }
 
 private:
   lay::MainWindow *mp_mw;
   size_t m_n;
+  void (lay::MainWindow::*m_open_meth) (size_t);
+  bool (lay::MainWindow::*m_avail_meth) (size_t);
 };
 
-class OpenRecentSessionAction
+class ClearRecentAction
   : public lay::Action
 {
 public:
-  OpenRecentSessionAction (lay::MainWindow *mw, size_t n)
-    : lay::Action (), mp_mw (mw), m_n (n)
-  { }
+  ClearRecentAction (lay::MainWindow *mw, const std::string &cfg)
+    : lay::Action (), mp_mw (mw), m_cfg (cfg)
+  {
+    set_title (tl::to_string (tr ("Clear List")));
+  }
 
   void triggered ()
   {
-    mp_mw->open_recent_session (m_n);
+    mp_mw->configure (m_cfg, std::string ());
   }
 
 private:
   lay::MainWindow *mp_mw;
-  size_t m_n;
-};
-
-class OpenRecentLayerPropertiesAction
-  : public lay::Action
-{
-public:
-  OpenRecentLayerPropertiesAction (lay::MainWindow *mw, size_t n)
-    : lay::Action (), mp_mw (mw), m_n (n)
-  { }
-
-  void triggered ()
-  {
-    mp_mw->open_recent_layer_properties (m_n);
-  }
-
-private:
-  lay::MainWindow *mp_mw;
-  size_t m_n;
-};
-
-class OpenRecentBookmarksAction
-  : public lay::Action
-{
-public:
-  OpenRecentBookmarksAction (lay::MainWindow *mw, size_t n)
-    : lay::Action (), mp_mw (mw), m_n (n)
-  { }
-
-  void triggered ()
-  {
-    mp_mw->open_recent_bookmarks (m_n);
-  }
-
-private:
-  lay::MainWindow *mp_mw;
-  size_t m_n;
+  std::string m_cfg;
 };
 
 }
@@ -3074,10 +3047,13 @@ MainWindow::do_update_mru_menus ()
       for (std::vector<std::pair<std::string, std::string> >::iterator mru = m_mru.end (); mru != m_mru.begin (); ) {
         --mru;
         size_t i = std::distance (m_mru.begin (), mru);
-        Action *action = new OpenRecentAction (this, i);
+        Action *action = new OpenRecentAction (this, i, &lay::MainWindow::open_recent, &lay::MainWindow::is_available_recent);
         action->set_title (mru->first);
         menu ()->insert_item (mru_menu + ".end", tl::sprintf ("open_recent_%d", i + 1), action);
       }
+
+      menu ()->insert_separator (mru_menu + ".end", "clear_sep");
+      menu ()->insert_item (mru_menu + ".end", "clear_recent", new ClearRecentAction (this, cfg_mru));
 
     } else {
       open_recent_action->set_enabled (false);
@@ -3100,10 +3076,13 @@ MainWindow::do_update_mru_menus ()
       for (std::vector<std::string>::iterator mru = m_mru_sessions.end (); mru != m_mru_sessions.begin (); ) {
         --mru;
         size_t i = std::distance (m_mru_sessions.begin (), mru);
-        Action *action = new OpenRecentSessionAction (this, i);
+        Action *action = new OpenRecentAction (this, i, &lay::MainWindow::open_recent_session, &lay::MainWindow::is_available_recent_session);
         action->set_title (*mru);
         menu ()->insert_item (mru_menu + ".end", tl::sprintf ("open_recent_%d", i + 1), action);
       }
+
+      menu ()->insert_separator (mru_menu + ".end", "clear_sep");
+      menu ()->insert_item (mru_menu + ".end", "clear_recent", new ClearRecentAction (this, cfg_mru_sessions));
 
     } else {
       open_recent_action->set_enabled (false);
@@ -3126,10 +3105,13 @@ MainWindow::do_update_mru_menus ()
       for (std::vector<std::string>::iterator mru = m_mru_layer_properties.end (); mru != m_mru_layer_properties.begin (); ) {
         --mru;
         size_t i = std::distance (m_mru_layer_properties.begin (), mru);
-        Action *action = new OpenRecentLayerPropertiesAction (this, i);
+        Action *action = new OpenRecentAction (this, i, &lay::MainWindow::open_recent_layer_properties, &lay::MainWindow::is_available_recent_layer_properties);
         action->set_title (*mru);
         menu ()->insert_item (mru_menu + ".end", tl::sprintf ("open_recent_%d", i + 1), action);
       }
+
+      menu ()->insert_separator (mru_menu + ".end", "clear_sep");
+      menu ()->insert_item (mru_menu + ".end", "clear_recent", new ClearRecentAction (this, cfg_mru_layer_properties));
 
     } else {
       open_recent_action->set_enabled (false);
@@ -3152,10 +3134,13 @@ MainWindow::do_update_mru_menus ()
       for (std::vector<std::string>::iterator mru = m_mru_bookmarks.end (); mru != m_mru_bookmarks.begin (); ) {
         --mru;
         size_t i = std::distance (m_mru_bookmarks.begin (), mru);
-        Action *action = new OpenRecentBookmarksAction (this, i);
+        Action *action = new OpenRecentAction (this, i, &lay::MainWindow::open_recent_bookmarks, &lay::MainWindow::is_available_recent_bookmarks);
         action->set_title (*mru);
         menu ()->insert_item (mru_menu + ".end", tl::sprintf ("open_recent_%d", i + 1), action);
       }
+
+      menu ()->insert_separator (mru_menu + ".end", "clear_sep");
+      menu ()->insert_item (mru_menu + ".end", "clear_recent", new ClearRecentAction (this, cfg_mru_bookmarks));
 
     } else {
       open_recent_action->set_enabled (false);
@@ -3218,6 +3203,25 @@ MainWindow::open_recent (size_t n)
   END_PROTECTED
 }
 
+static bool
+is_file_available (const std::string &fn)
+{
+  tl::URI uri (fn);
+  if (uri.scheme ().empty ()) {
+    return tl::is_readable (fn);
+  } else if (uri.scheme () == "file") {
+    return tl::is_readable (uri.path ());
+  } else {
+    return true;
+  }
+}
+
+bool
+MainWindow::is_available_recent (size_t n)
+{
+  return (n < m_mru.size () && is_file_available (m_mru [n].first));
+}
+
 void
 MainWindow::open_recent_session (size_t n)
 {
@@ -3232,6 +3236,12 @@ MainWindow::open_recent_session (size_t n)
   END_PROTECTED
 }
 
+bool
+MainWindow::is_available_recent_session (size_t n)
+{
+  return (n < m_mru_sessions.size () && is_file_available (m_mru_sessions [n]));
+}
+
 void
 MainWindow::open_recent_layer_properties (size_t n)
 {
@@ -3244,6 +3254,12 @@ MainWindow::open_recent_layer_properties (size_t n)
   }
 
   END_PROTECTED
+}
+
+bool
+MainWindow::is_available_recent_layer_properties (size_t n)
+{
+  return (n < m_mru_layer_properties.size () && is_file_available (m_mru_layer_properties [n]));
 }
 
 void
@@ -3262,6 +3278,12 @@ MainWindow::open_recent_bookmarks (size_t n)
   }
 
   END_PROTECTED
+}
+
+bool
+MainWindow::is_available_recent_bookmarks (size_t n)
+{
+  return (n < m_mru_bookmarks.size () && is_file_available (m_mru_bookmarks [n]));
 }
 
 void

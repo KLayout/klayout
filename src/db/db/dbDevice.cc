@@ -23,6 +23,7 @@
 #include "dbDevice.h"
 #include "dbCircuit.h"
 #include "dbDeviceClass.h"
+#include "tlIteratorUtils.h"
 
 namespace db
 {
@@ -39,7 +40,7 @@ Device::Device ()
 Device::~Device ()
 {
   for (std::vector<Net::terminal_iterator>::const_iterator t = m_terminal_refs.begin (); t != m_terminal_refs.end (); ++t) {
-    if (*t != Net::terminal_iterator () && (*t)->net ()) {
+    if (! tl::is_null_iterator (*t) && (*t)->net ()) {
       (*t)->net ()->erase_terminal (*t);
     }
   }
@@ -125,7 +126,7 @@ const Net *Device::net_for_terminal (size_t terminal_id) const
 {
   if (terminal_id < m_terminal_refs.size ()) {
     Net::terminal_iterator p = m_terminal_refs [terminal_id];
-    if (p != Net::terminal_iterator ()) {
+    if (! tl::is_null_iterator (p)) {
       return p->net ();
     }
   }
@@ -140,7 +141,7 @@ void Device::connect_terminal (size_t terminal_id, Net *net)
 
   if (terminal_id < m_terminal_refs.size ()) {
     Net::terminal_iterator p = m_terminal_refs [terminal_id];
-    if (p != Net::terminal_iterator () && p->net ()) {
+    if (! tl::is_null_iterator (p) && p->net ()) {
       p->net ()->erase_terminal (p);
     }
     m_terminal_refs [terminal_id] = Net::terminal_iterator ();

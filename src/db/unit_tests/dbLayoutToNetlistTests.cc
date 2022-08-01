@@ -2846,6 +2846,7 @@ TEST(11_DuplicateInstances)
   //  compare netlist as string
   CHECKPOINT ();
   db::compare_netlist (_this, *l2n.netlist (),
+    //  suppressing duplicate cells:
     "circuit RINGO ();\n"
     "  subcircuit INV2 $1 (IN=$I12,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
     "  subcircuit INV2 $2 (IN=FB,$2=$I25,OUT=$I1,$4=VSS,$5=VDD);\n"

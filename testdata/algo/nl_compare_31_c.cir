@@ -1,0 +1,14 @@
+
+* cell lvs_test
+* pin VDDO
+* pin VP
+.SUBCKT lvs_test 1 2
+* net 1 VDDO
+* net 2 VP
+* device instance $150 r0 *1 1.308,124.128 PCH_18_MAC
+M$150 1 2 1 1 PCH_18_MAC L=0.225U W=10653U AS=29.399936P AD=29.399936P
++ PS=562.496U PD=562.496U
+* device instance $1 r0 *1 24.014,63.84 PCH_18_MAC
+M$1 1 2 1 1 PCH_18_MAC L=0.135U W=1809U AS=5.790774P AD=5.619278P PS=115.96U
++ PD=115.184U
+.ENDS lvs_test

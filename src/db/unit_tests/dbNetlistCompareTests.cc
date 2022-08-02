@@ -4882,3 +4882,60 @@ TEST(30_ComparePrimaryAndOtherParameters)
 
   EXPECT_EQ (good, true);
 }
+
+TEST(31_ParallelMOSFets)
+{
+  db::Netlist a, b, c;
+
+  tl::InputStream fa (tl::testdata () + "/algo/nl_compare_31_a.cir");
+  tl::InputStream fb (tl::testdata () + "/algo/nl_compare_31_b.cir");
+  tl::InputStream fc (tl::testdata () + "/algo/nl_compare_31_c.cir");
+
+  db::NetlistSpiceReader reader;
+  reader.read (fa, a);
+  reader.read (fb, b);
+  reader.read (fc, c);
+
+  NetlistCompareTestLogger logger;
+  std::string txt;
+  bool good;
+  db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
+
+  good = comp.compare (&a, &b);
+
+  txt = logger.text ();
+
+  EXPECT_EQ (good, true);
+
+  EXPECT_EQ (txt,
+    "begin_circuit LVS_TEST LVS_TEST\n"
+    "match_nets 2 2\n"
+    "match_nets 1 1\n"
+    "match_pins 1 1\n"
+    "match_pins 2 2\n"
+    "match_devices 1I39A $1\n"
+    "match_devices 1I38 $150\n"
+    "end_circuit LVS_TEST LVS_TEST MATCH"
+  );
+
+  logger.clear ();
+
+  good = comp.compare (&a, &b);
+
+  txt = logger.text ();
+
+  EXPECT_EQ (good, true);
+
+  EXPECT_EQ (txt,
+    "begin_circuit LVS_TEST LVS_TEST\n"
+    "match_nets 2 2\n"
+    "match_nets 1 1\n"
+    "match_pins 1 1\n"
+    "match_pins 2 2\n"
+    "match_devices 1I39A $1\n"
+    "match_devices 1I38 $150\n"
+    "end_circuit LVS_TEST LVS_TEST MATCH"
+  );
+}
+

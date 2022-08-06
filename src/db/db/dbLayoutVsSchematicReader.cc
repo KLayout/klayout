@@ -81,14 +81,14 @@ void LayoutVsSchematicStandardReader::read_netlist (db::LayoutVsSchematic *lvs)
     } else if (test (skeys::layout_key) || test (lkeys::layout_key)) {
 
       Brace br (this);
-      LayoutToNetlistStandardReader::read_netlist (0, lvs, true /*nested*/, &m_map_per_circuit_a);
+      LayoutToNetlistStandardReader::read_netlist (0, lvs, &br, &m_map_per_circuit_a);
       br.done ();
 
     } else if (test (skeys::reference_key) || test (lkeys::reference_key)) {
 
       Brace br (this);
       std::unique_ptr<db::Netlist> netlist (new db::Netlist ());
-      LayoutToNetlistStandardReader::read_netlist (netlist.get (), 0, true /*nested*/, &m_map_per_circuit_b);
+      LayoutToNetlistStandardReader::read_netlist (netlist.get (), 0, &br, &m_map_per_circuit_b);
       lvs->set_reference_netlist (netlist.release ());
       br.done ();
 
@@ -106,9 +106,13 @@ void LayoutVsSchematicStandardReader::read_netlist (db::LayoutVsSchematic *lvs)
     } else if (at_end ()) {
       throw tl::Exception (tl::to_string (tr ("Unexpected end of file")));
     } else {
-      throw tl::Exception (tl::to_string (tr ("Invalid keyword")));
+      skip_element ();
     }
 
+  }
+
+  if (version > 1) {
+    throw tl::Exception (tl::to_string (tr ("This program version only supports version 1 of the LVS DB format. File version is: ")) + tl::to_string (version));
   }
 }
 
@@ -162,7 +166,7 @@ void LayoutVsSchematicStandardReader::read_xrefs_for_circuits (db::NetlistCrossR
     } else if (at_end ()) {
       throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside circuit definition (net, pin, device or circuit expected)")));
     } else {
-      throw tl::Exception (tl::to_string (tr ("Invalid keyword inside circuit definition (net, pin, device or circuit expected)")));
+      skip_element ();
     }
 
   }
@@ -214,7 +218,7 @@ void LayoutVsSchematicStandardReader::read_xref (db::NetlistCrossReference *xref
         } else if (at_end ()) {
           throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside circuit definition (status keyword of xrefs expected)")));
         } else {
-          throw tl::Exception (tl::to_string (tr ("Invalid keyword inside circuit definition (status keyword of xrefs expected)")));
+          skip_element ();
         }
 
       }
@@ -223,6 +227,8 @@ void LayoutVsSchematicStandardReader::read_xref (db::NetlistCrossReference *xref
 
       br.done ();
 
+    } else {
+      skip_element ();
     }
 
   }
@@ -344,6 +350,10 @@ void LayoutVsSchematicStandardReader::read_net_pair (db::NetlistCrossReference *
   read_status (status);
   read_message (msg);
 
+  while (br) {
+    skip_element ();
+  }
+
   br.done ();
 
   xref->gen_nets (net_by_numerical_id (circuit_a, ion_a, m_map_per_circuit_a), net_by_numerical_id (circuit_b, ion_b, m_map_per_circuit_b), status, msg);
@@ -361,6 +371,10 @@ void LayoutVsSchematicStandardReader::read_pin_pair (db::NetlistCrossReference *
   std::string msg;
   read_status (status);
   read_message (msg);
+
+  while (br) {
+    skip_element ();
+  }
 
   br.done ();
 
@@ -380,6 +394,10 @@ void LayoutVsSchematicStandardReader::read_device_pair (db::NetlistCrossReferenc
   read_status (status);
   read_message (msg);
 
+  while (br) {
+    skip_element ();
+  }
+
   br.done ();
 
   xref->gen_devices (device_by_numerical_id (circuit_a, ion_a, m_map_per_circuit_a), device_by_numerical_id (circuit_b, ion_b, m_map_per_circuit_b), status, msg);
@@ -397,6 +415,10 @@ void LayoutVsSchematicStandardReader::read_subcircuit_pair (db::NetlistCrossRefe
   std::string msg;
   read_status (status);
   read_message (msg);
+
+  while (br) {
+    skip_element ();
+  }
 
   br.done ();
 

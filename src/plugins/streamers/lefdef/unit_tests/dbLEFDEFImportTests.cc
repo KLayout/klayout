@@ -930,3 +930,15 @@ TEST(203_regionsAndMapfileConcat)
   run_test (_this, "map_regions", "map:'test.map,test.add.map'+lef:test.lef+def:test.def", "au.oas.gz", lefdef_opt, false);
 }
 
+//  issue 1132
+TEST(204_concave_pins)
+{
+  db::LEFDEFReaderOptions lefdef_opt = default_options ();
+  lefdef_opt.set_lef_pins_datatype (12);
+  lefdef_opt.set_lef_pins_suffix (".LEFPIN");
+  lefdef_opt.set_lef_labels_datatype (11);
+  lefdef_opt.set_lef_labels_suffix (".LEFLABEL");
+
+  run_test (_this, "issue-1132", "read:test.lef", "au.oas.gz", lefdef_opt, false);
+}
+

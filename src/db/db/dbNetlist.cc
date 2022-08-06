@@ -505,6 +505,8 @@ void Netlist::flatten_circuit (Circuit *circuit)
 
 void Netlist::flatten ()
 {
+  db::NetlistLocker locker (this);
+
   std::set<db::Circuit *> top_circuits;
   size_t ntop = top_circuit_count ();
   for (db::Netlist::top_down_circuit_iterator tc = begin_top_down (); tc != end_top_down () && ntop > 0; ++tc) {

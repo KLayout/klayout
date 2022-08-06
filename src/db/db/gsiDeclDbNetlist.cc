@@ -197,10 +197,10 @@ static bool is_combined_device (const db::Device *device)
   return ! device->reconnected_terminals ().empty ();
 }
 
+static std::vector<db::DeviceReconnectedTerminal> empty;
+
 static std::vector<db::DeviceReconnectedTerminal>::const_iterator begin_reconnected_terminals_for (const db::Device *device, size_t terminal_id)
 {
-  static std::vector<db::DeviceReconnectedTerminal> empty;
-
   const std::vector<db::DeviceReconnectedTerminal> *ti = device->reconnected_terminals_for ((unsigned int) terminal_id);
   if (! ti) {
     return empty.begin ();
@@ -211,8 +211,6 @@ static std::vector<db::DeviceReconnectedTerminal>::const_iterator begin_reconnec
 
 static std::vector<db::DeviceReconnectedTerminal>::const_iterator end_reconnected_terminals_for (const db::Device *device, size_t terminal_id)
 {
-  static std::vector<db::DeviceReconnectedTerminal> empty;
-
   const std::vector<db::DeviceReconnectedTerminal> *ti = device->reconnected_terminals_for ((unsigned int) terminal_id);
   if (! ti) {
     return empty.end ();

@@ -443,3 +443,19 @@ TEST(2_FlowWithErrors)
   compare_lvsdbs (_this, path2, au_path2);
 }
 
+TEST(3_ReaderFuture)
+{
+  db::LayoutVsSchematic lvs;
+
+  std::string in_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "lvs_test3.lvsdb");
+  lvs.load (in_path);
+
+  //  verify against the input
+
+  std::string path = tmp_file ("tmp.txt");
+  lvs.save (path, false);
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "lvs_test3_au.lvsdb");
+
+  compare_text_files (path, au_path);
+}

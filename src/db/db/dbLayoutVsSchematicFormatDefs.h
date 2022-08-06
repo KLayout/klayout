@@ -47,80 +47,81 @@ namespace db
  *  The file follows the declaration-before-use principle
  *  (circuits before subcircuits, nets before use ...)
  *
- *  Global statements:
- *
+ *  Main body:
  *    #%lvsdb-klayout                  - header line identifies format
+ *    [version|description|layout-netlist|reference-netlist|xrefs|any]*
+ *
+ *  [version]:
  *    version(<number>)                - file format version [short key: V]
+ *
+ *  [description]:
  *    description(<text>)              - an arbitrary description text [short key: B]
- *    layout([layout])                 - layout part [short key: J]
- *    reference([reference-def]*)      - reference netlist part [short key: H]
- *    xref([xref-def]*)                - cross-reference part [short key: Z]
  *
- *  [layout]:
+ *  [layout-netlist]:
+ *    layout(...)                      - layout netlist part [short key: J]
+ *                                       Content is the LayoutToNetlist dump without version and description
  *
- *      ...                            - the LayoutToNetlist dump without version and description
+ *  [reference-netlist]:
+ *    reference(...)
+ *                                     - reference netlist part [short key: H]
+ *                                       Content is the Netlist dump (reduced version of LayoutToNetlist)
  *
- *  [reference-def]:
+ *  [xrefs]:
+ *    xref([xref|any]*)                - cross-reference part [short key: Z]
  *
- *    circuit(<name> [netlist-circuit-def]*)
- *                                     - circuit [short key: X]
- *  [netlist-circuit-def]:
- *
- *    net(<id> [net-name]?)            - a net declaration [short key: N]
- *    pin(<name> <net-id>)             - outgoing pin connection [short key: P]
- *    device(<name> [device-def]*)     - device with connections [short key: D]
- *    circuit(<name> [subcircuit-def]*)
- *                                     - subcircuit with connections [short key: X]
- *
- *  [net-name]:
- *
- *    name(<net-name>)                 - specify net name [short key: I]
- *
- *  [device-def]:
- *
- *    terminal(<terminal-name> <net-id>)
- *                                     - specifies connection of the terminal with
- *                                       a net [short key: T]
- *
- *  [subcircuit-def]:
- *
- *    pin(<pin-name> <net-id>)         - specifies connection of the pin with a net [short key: P]
- *
- *  [xref-def]:
- *
- *    circuit([non] [non] [status]? [message]? [circuit-xrefs])
+ *  [xref]:
+ *    circuit([non] [non] [status|message|log|circuit-xrefs|any]*)
  *                                     - circuit pair [short key: X]
  *
- *  [circuit-xrefs]:
- *
- *    xref([pair]*)                    - circuit cross-reference part [short key: Z]
- *
- *  [pair]
- *
- *    pin([ion] [ion] [status]? [message]?)       - a pin pair [short key: P]
- *    device([ion] [ion] [status]? [message]?)    - a device pair [short key: D]
- *    circuit([ion] [ion] [status]? [message]?)   - a subcircuit pair [short key: X]
- *    net([ion] [ion] [status]? [message]?)       - a net pair [short key: N]
- *
  *  [non]
- *
  *    <name> | ()
  *
- *  [ion]
+ *  [log]:
+ *    log([log-entry]*)                - log entries [short key: L]
  *
+ *  [log-entry]:
+ *    entry([level] <name> [any]*)     - log entry [short key: M]
+ *
+ *  [level]:
+ *    info |                           - [short key: I]
+ *    warning |                        - [short key: W]
+ *    error                            - [short key: E]
+ *
+ *  [circuit-xrefs]:
+ *    xref([xref-pin|xref-device|xref-circuit|xref-net|any]*)
+ *                                     - circuit cross-reference part [short key: Z]
+ *
+ *  [xref-pin]:
+ *    pin([ion] [ion] [status]? [message]? [any]*)       - a pin pair [short key: P]
+ *
+ *  [xref-device]:
+ *    device([ion] [ion] [status]? [message]? [any]*)    - a device pair [short key: D]
+ *
+ *  [xref-circuit]:
+ *    circuit([ion] [ion] [status]? [message]? [any]*)   - a subcircuit pair [short key: X]
+ *
+ *  [xref-net]:
+ *    net([ion] [ion] [status]? [message]? [any]*)       - a net pair [short key: N]
+ *
+ *  [ion]:
  *    <id> | ()
  *
- *  [message]
- *
+ *  [message]:
  *    description(<name>)              - error description [short key: B]
  *
- *  [status]
- *
+ *  [status]:
  *    mismatch |                       - [short key: 0]
  *    match |                          - [short key: 1]
  *    nomatch |                        - [short key: X]
  *    warning |                        - [short key: W]
  *    skipped                          - [short key: S]
+ *
+ *  [any]:
+ *    * |
+ *    <token> |
+ *    <token> ( [any]* ) |
+ *    <float> |
+ *    <quoted-string>
  */
 
 namespace lvs_std_format
@@ -132,12 +133,18 @@ namespace lvs_std_format
     static std::string reference_key;
     static std::string layout_key;
     static std::string xref_key;
+    static std::string log_key;
+    static std::string log_entry_key;
 
     static std::string mismatch_key;
     static std::string match_key;
     static std::string nomatch_key;
     static std::string warning_key;
     static std::string skipped_key;
+
+    static std::string info_level_key;
+    static std::string warning_level_key;
+    static std::string error_level_key;
   };
 
   struct DB_PUBLIC LongKeys
@@ -147,12 +154,18 @@ namespace lvs_std_format
     static std::string reference_key;
     static std::string layout_key;
     static std::string xref_key;
+    static std::string log_key;
+    static std::string log_entry_key;
 
     static std::string mismatch_key;
     static std::string match_key;
     static std::string nomatch_key;
     static std::string warning_key;
     static std::string skipped_key;
+
+    static std::string info_level_key;
+    static std::string warning_level_key;
+    static std::string error_level_key;
   };
 
   template <bool Short> struct DB_PUBLIC keys;

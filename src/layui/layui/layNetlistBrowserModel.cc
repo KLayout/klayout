@@ -457,6 +457,7 @@ static std::vector<std::pair<const db::DeviceTerminalDefinition *, const db::Dev
             result.push_back (std::make_pair (i->first, j->first));
             nn2.erase (j);
             found = true;
+            break;
           }
         }
 

@@ -23,6 +23,7 @@
 #include "dbCircuit.h"
 #include "dbNetlist.h"
 #include "dbLayout.h"
+#include "tlIteratorUtils.h"
 
 #include <set>
 
@@ -169,7 +170,7 @@ const Pin *Circuit::pin_by_id (size_t id) const
     return 0;
   } else {
     pin_list::iterator pi = m_pin_by_id [id];
-    if (pi == pin_list::iterator ()) {
+    if (tl::is_null_iterator (pi)) {
       return 0;
     } else {
       return pi.operator-> ();
@@ -179,7 +180,7 @@ const Pin *Circuit::pin_by_id (size_t id) const
 
 void Circuit::rename_pin (size_t id, const std::string &name)
 {
-  if (id < m_pin_by_id.size () && m_pin_by_id [id] != pin_list::iterator ()) {
+  if (id < m_pin_by_id.size () && ! tl::is_null_iterator (m_pin_by_id [id])) {
     m_pin_by_id [id]->set_name (name);
   }
 }
@@ -327,7 +328,7 @@ Pin &Circuit::add_pin (const std::string &name)
 
 void Circuit::remove_pin (size_t id)
 {
-  if (id < m_pin_by_id.size () && m_pin_by_id [id] != pin_list::iterator ()) {
+  if (id < m_pin_by_id.size () && ! tl::is_null_iterator (m_pin_by_id [id])) {
     m_pins.erase (m_pin_by_id [id]);
     m_pin_by_id [id] = pin_list::iterator ();
   }
@@ -653,7 +654,7 @@ const Net *Circuit::net_for_pin (size_t pin_id) const
 {
   if (pin_id < m_pin_refs.size ()) {
     Net::pin_iterator p = m_pin_refs [pin_id];
-    if (p != Net::pin_iterator ()) {
+    if (! tl::is_null_iterator (p)) {
       return p->net ();
     }
   }
@@ -668,7 +669,7 @@ void Circuit::connect_pin (size_t pin_id, Net *net)
 
   if (pin_id < m_pin_refs.size ()) {
     Net::pin_iterator p = m_pin_refs [pin_id];
-    if (p != Net::pin_iterator () && p->net ()) {
+    if (! tl::is_null_iterator (p) && p->net ()) {
       p->net ()->erase_pin (p);
     }
     m_pin_refs [pin_id] = Net::pin_iterator ();

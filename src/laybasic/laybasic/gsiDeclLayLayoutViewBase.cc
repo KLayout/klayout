@@ -542,18 +542,6 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "\n"
     "This constant has been introduced in version 0.27.\n"
   ) +
-  gsi::method ("call_menu", static_cast<void (lay::LayoutViewBase::*) (const std::string &)> (&lay::LayoutViewBase::menu_activated),
-    "@brief Calls the menu item with the provided symbol.\n"
-    "To obtain all symbols, use get_menu_symbols.\n"
-    "\n"
-    "This method has been introduced in version 0.27."
-  ) +
-  gsi::method ("menu_symbols", &lay::LayoutViewBase::menu_symbols,
-    "@brief Gets all available menu symbols (see \\call_menu).\n"
-    "NOTE: currently this method delivers a superset of all available symbols. Depending on the context, no all symbols may trigger actual functionality.\n"
-    "\n"
-    "This method has been introduced in version 0.27."
-  ) +
   gsi::method ("stop_redraw", static_cast<void (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::stop_redraw),
     "@brief Stops the redraw thread\n"
     "\n"
@@ -982,13 +970,13 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "@brief Calls the menu item with the provided symbol.\n"
     "To obtain all symbols, use \\menu_symbols.\n"
     "\n"
-    "This method has been introduced in version 0.28."
+    "This method has been introduced in version 0.27."
   ) +
   gsi::method ("menu_symbols", &lay::LayoutViewBase::menu_symbols,
-    "@brief Gets all available menu symbols.\n"
+    "@brief Gets all available menu symbols (see \\call_menu).\n"
     "NOTE: currently this method delivers a superset of all available symbols. Depending on the context, no all symbols may trigger actual functionality.\n"
     "\n"
-    "This method has been introduced in version 0.28."
+    "This method has been introduced in version 0.27."
   ) +
   gsi::method ("cancel", &lay::LayoutViewBase::cancel,
     "@brief Cancels all edit operations\n"

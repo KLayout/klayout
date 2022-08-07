@@ -202,9 +202,15 @@ private slots:
   void anchor_clicked (const QString &url);
   void navigate_back ();
   void navigate_forward ();
-  void current_index_changed (const QModelIndex &index);
-  void current_tree_index_changed (const QModelIndex &index);
-  void selection_changed ();
+  void nl_current_index_changed (const QModelIndex &index);
+  void sch_current_index_changed (const QModelIndex &index);
+  void xref_current_index_changed (const QModelIndex &index);
+  void nl_current_tree_index_changed (const QModelIndex &index);
+  void sch_current_tree_index_changed (const QModelIndex &index);
+  void xref_current_tree_index_changed (const QModelIndex &index);
+  void nl_selection_changed ();
+  void sch_selection_changed ();
+  void xref_selection_changed ();
   void browse_color_for_net ();
   void select_color_for_net ();
   void mode_changed ();
@@ -262,6 +268,11 @@ private:
   bool produce_highlights_for_circuit (const db::Circuit *circuit, size_t &n_markers, const std::vector<db::DCplxTrans> &tv);
   void configure_marker (lay::Marker *marker, bool with_fill);
   void rerun_macro ();
+  void selection_changed (QTreeView *hierarchy_tree, QTreeView *directory_tree);
+  void current_tree_index_changed (QTreeView *hierarchy_tree, QTreeView *directory_tree, const QModelIndex &index);
+  void current_index_changed (QTreeView *hierarchy_tree, QTreeView *directory_tree, const QModelIndex &index);
+  QTreeView *current_hierarchy_tree ();
+  QTreeView *current_directory_tree ();
 
   void export_nets (const std::vector<const db::Net *> *nets);
 };

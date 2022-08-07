@@ -138,48 +138,64 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   m_show_all_action->setCheckable (true);
   m_show_all_action->setChecked (m_show_all);
 
-  QAction *color_action = new QAction (QObject::tr ("Colorize Nets"), directory_tree);
-  QMenu *menu = new QMenu (directory_tree);
-  lay::ColorButton::build_color_menu (menu, this, SLOT (browse_color_for_net ()), SLOT (select_color_for_net ()));
-  color_action->setMenu (menu);
+  QTreeView *dt[] = { nl_directory_tree, sch_directory_tree, xref_directory_tree };
 
-  QAction *sep;
-  directory_tree->addAction (m_show_all_action);
-  directory_tree->addAction (actionCollapseAll);
-  //  TODO: this gives a too big tree - confine to single branches?
-  //  directory_tree->addAction (actionExpandAll);
-  sep = new QAction (directory_tree);
-  sep->setSeparator (true);
-  directory_tree->addAction (sep);
-  directory_tree->addAction (actionUnselectAll);
-  sep = new QAction (directory_tree);
-  sep->setSeparator (true);
-  directory_tree->addAction (sep);
-  directory_tree->addAction (color_action);
-  sep = new QAction (directory_tree);
-  sep->setSeparator (true);
-  directory_tree->addAction (sep);
-  directory_tree->addAction (actionExportSelected);
-  directory_tree->addAction (actionExportAll);
+  for (int m = 0; m < sizeof (dt) / sizeof (dt[0]); ++m) {
 
-  directory_tree->header ()->setDefaultSectionSize (150);
+    QTreeView *directory_tree = dt[m];
 
-  lay::HTMLItemDelegate *delegate;
+    QAction *color_action = new QAction (QObject::tr ("Colorize Nets"), directory_tree);
+    QMenu *menu = new QMenu (directory_tree);
+    lay::ColorButton::build_color_menu (menu, this, SLOT (browse_color_for_net ()), SLOT (select_color_for_net ()));
+    color_action->setMenu (menu);
 
-  for (int i = 0; i < 4; ++i) {
-    delegate = new lay::HTMLItemDelegate (this);
-    delegate->set_text_margin (2);
-    delegate->set_anchors_clickable (true);
-    connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
-    directory_tree->setItemDelegateForColumn (i, delegate);
+    QAction *sep;
+    directory_tree->addAction (m_show_all_action);
+    directory_tree->addAction (actionCollapseAll);
+    //  TODO: this gives a too big tree - confine to single branches?
+    //  directory_tree->addAction (actionExpandAll);
+    sep = new QAction (directory_tree);
+    sep->setSeparator (true);
+    directory_tree->addAction (sep);
+    directory_tree->addAction (actionUnselectAll);
+    sep = new QAction (directory_tree);
+    sep->setSeparator (true);
+    directory_tree->addAction (sep);
+    directory_tree->addAction (color_action);
+    sep = new QAction (directory_tree);
+    sep->setSeparator (true);
+    directory_tree->addAction (sep);
+    directory_tree->addAction (actionExportSelected);
+    directory_tree->addAction (actionExportAll);
+
+    directory_tree->header ()->setDefaultSectionSize (150);
+
+    for (int i = 0; i < 4; ++i) {
+      lay::HTMLItemDelegate *delegate = new lay::HTMLItemDelegate (this);
+      delegate->set_text_margin (2);
+      delegate->set_anchors_clickable (true);
+      connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
+      directory_tree->setItemDelegateForColumn (i, delegate);
+    }
+
+    directory_tree->installEventFilter (this);
+
   }
 
-  for (int i = 0; i < 2; ++i) {
-    delegate = new lay::HTMLItemDelegate (this);
-    delegate->set_text_margin (2);
-    delegate->set_anchors_clickable (true);
-    connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
-    hierarchy_tree->setItemDelegateForColumn (i, delegate);
+  QTreeView *ht[] = { nl_hierarchy_tree, sch_hierarchy_tree, xref_hierarchy_tree };
+
+  for (int m = 0; m < sizeof (ht) / sizeof (ht[0]); ++m) {
+
+    QTreeView *hierarchy_tree = ht[m];
+
+    for (int i = 0; i < 2; ++i) {
+      lay::HTMLItemDelegate *delegate = new lay::HTMLItemDelegate (this);
+      delegate->set_text_margin (2);
+      delegate->set_anchors_clickable (true);
+      connect (delegate, SIGNAL (anchor_clicked (const QString &)), this, SLOT (anchor_clicked (const QString &)));
+      hierarchy_tree->setItemDelegateForColumn (i, delegate);
+    }
+
   }
 
   QMenu *find_edit_menu = new QMenu (find_text);
@@ -200,16 +216,14 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   connect (forward, SIGNAL (clicked ()), this, SLOT (navigate_forward ()));
   connect (backward, SIGNAL (clicked ()), this, SLOT (navigate_back ()));
 
-  connect (show_netlist, SIGNAL (clicked ()), this, SLOT (mode_changed ()));
-  connect (show_xref, SIGNAL (clicked ()), this, SLOT (mode_changed ()));
+// @@@  connect (show_netlist, SIGNAL (clicked ()), this, SLOT (mode_changed ()));
+// @@@  connect (show_xref, SIGNAL (clicked ()), this, SLOT (mode_changed ()));
 
   connect (actionExportAll, SIGNAL (triggered ()), this, SLOT (export_all ()));
   connect (actionExportSelected, SIGNAL (triggered ()), this, SLOT (export_selected ()));
 
   forward->setEnabled (false);
   backward->setEnabled (false);
-
-  directory_tree->installEventFilter (this);
 }
 
 NetlistBrowserPage::~NetlistBrowserPage ()
@@ -220,7 +234,7 @@ NetlistBrowserPage::~NetlistBrowserPage ()
 bool
 NetlistBrowserPage::is_netlist_mode ()
 {
-  return show_netlist->isChecked ();
+  return mode_tab->currentIndex () == 0; // @@@
 }
 
 void
@@ -285,7 +299,8 @@ NetlistBrowserPage::set_max_shape_count (size_t max_shape_count)
 bool
 NetlistBrowserPage::eventFilter (QObject *watched, QEvent *event)
 {
-  if (watched != directory_tree) {
+  QTreeView *tree = dynamic_cast<QTreeView *> (watched);
+  if (tree != nl_directory_tree && tree != sch_directory_tree && tree != xref_directory_tree) {
     return false;
   }
 
@@ -295,7 +310,7 @@ NetlistBrowserPage::eventFilter (QObject *watched, QEvent *event)
   }
 
   if (ke->key () == Qt::Key_Escape) {
-    directory_tree->clearSelection ();
+    tree->clearSelection ();
     return true;
   } else {
     return false;
@@ -308,17 +323,69 @@ NetlistBrowserPage::layer_list_changed (int)
   dm_update_highlights ();
 }
 
+QTreeView *
+NetlistBrowserPage::current_hierarchy_tree ()
+{
+  switch (mode_tab->currentIndex ()) {
+  case 0:
+    return nl_hierarchy_tree;
+  case 1:
+    return sch_hierarchy_tree;
+  case 2:
+    return xref_hierarchy_tree;
+  default:
+    return 0;
+  }
+}
+
+QTreeView *
+NetlistBrowserPage::current_directory_tree ()
+{
+  switch (mode_tab->currentIndex ()) {
+  case 0:
+    return nl_directory_tree;
+  case 1:
+    return sch_directory_tree;
+  case 2:
+    return xref_directory_tree;
+  default:
+    return 0;
+  }
+}
+
 void
 NetlistBrowserPage::anchor_clicked (const QString &a)
 {
-  NetlistBrowserModel *netlist_model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+  QTreeView *directory_tree = current_directory_tree ();
+  NetlistBrowserModel *netlist_model = 0;
+  if (directory_tree) {
+    netlist_model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+  }
   if (netlist_model) {
     navigate_to (netlist_model->index_from_url (a), true);
   }
 }
 
 void
-NetlistBrowserPage::current_tree_index_changed (const QModelIndex &index)
+NetlistBrowserPage::nl_current_tree_index_changed (const QModelIndex &index)
+{
+  current_tree_index_changed (nl_hierarchy_tree, nl_directory_tree, index);
+}
+
+void
+NetlistBrowserPage::sch_current_tree_index_changed (const QModelIndex &index)
+{
+  current_tree_index_changed (sch_hierarchy_tree, sch_directory_tree, index);
+}
+
+void
+NetlistBrowserPage::xref_current_tree_index_changed (const QModelIndex &index)
+{
+  current_tree_index_changed (xref_hierarchy_tree, xref_directory_tree, index);
+}
+
+void
+NetlistBrowserPage::current_tree_index_changed (QTreeView *hierarchy_tree, QTreeView *directory_tree, const QModelIndex &index)
 {
   if (index.isValid () && m_signals_enabled) {
 
@@ -340,7 +407,25 @@ NetlistBrowserPage::current_tree_index_changed (const QModelIndex &index)
 }
 
 void
-NetlistBrowserPage::current_index_changed (const QModelIndex &index)
+NetlistBrowserPage::nl_current_index_changed (const QModelIndex &index)
+{
+  current_index_changed (nl_hierarchy_tree, nl_directory_tree, index);
+}
+
+void
+NetlistBrowserPage::sch_current_index_changed (const QModelIndex &index)
+{
+  current_index_changed (sch_hierarchy_tree, sch_directory_tree, index);
+}
+
+void
+NetlistBrowserPage::xref_current_index_changed (const QModelIndex &index)
+{
+  current_index_changed (xref_hierarchy_tree, xref_directory_tree, index);
+}
+
+void
+NetlistBrowserPage::current_index_changed (QTreeView *hierarchy_tree, QTreeView *directory_tree, const QModelIndex &index)
 {
   if (index.isValid () && m_signals_enabled) {
 
@@ -366,11 +451,27 @@ void
 NetlistBrowserPage::select_net (const db::Net *net)
 {
   if (! net || ! net->circuit ()) {
-    directory_tree->clearSelection ();
+
+    nl_directory_tree->clearSelection ();
+    sch_directory_tree->clearSelection ();
+    xref_directory_tree->clearSelection ();
+
   } else {
-    NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+
+    NetlistBrowserModel *model;
+
+    model = dynamic_cast<NetlistBrowserModel *> (nl_directory_tree->model ());
     tl_assert (model != 0);
-    directory_tree->setCurrentIndex (model->index_from_net (net));
+    nl_directory_tree->setCurrentIndex (model->index_from_net (net));
+
+    model = dynamic_cast<NetlistBrowserModel *> (sch_directory_tree->model ());
+    tl_assert (model != 0);
+    sch_directory_tree->setCurrentIndex (model->index_from_net (net));
+
+    model = dynamic_cast<NetlistBrowserModel *> (xref_directory_tree->model ());
+    tl_assert (model != 0);
+    xref_directory_tree->setCurrentIndex (model->index_from_net (net));
+
   }
 }
 
@@ -378,21 +479,42 @@ void
 NetlistBrowserPage::select_path (const lay::NetlistObjectsPath &path)
 {
   if (path.is_null ()) {
-    directory_tree->clearSelection ();
+
+    nl_directory_tree->clearSelection ();
+    sch_directory_tree->clearSelection ();
+    xref_directory_tree->clearSelection ();
+
   } else {
-    NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+
+    NetlistBrowserModel *model;
+
+    model = dynamic_cast<NetlistBrowserModel *> (nl_directory_tree->model ());
     tl_assert (model != 0);
-    directory_tree->setCurrentIndex (model->index_from_path (path));
+    nl_directory_tree->setCurrentIndex (model->index_from_path (path));
+
+    model = dynamic_cast<NetlistBrowserModel *> (sch_directory_tree->model ());
+    tl_assert (model != 0);
+    sch_directory_tree->setCurrentIndex (model->index_from_path (path));
+
+    model = dynamic_cast<NetlistBrowserModel *> (xref_directory_tree->model ());
+    tl_assert (model != 0);
+    xref_directory_tree->setCurrentIndex (model->index_from_path (path));
+
   }
 }
 
 std::vector<const db::Net *>
 NetlistBrowserPage::selected_nets ()
 {
+  std::vector<const db::Net *> nets;
+
+  QTreeView *directory_tree = current_directory_tree ();
+  if (! directory_tree) {
+    return nets;
+  }
+
   NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
   tl_assert (model != 0);
-
-  std::vector<const db::Net *> nets;
 
   QModelIndexList selection = directory_tree->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator i = selection.begin (); i != selection.end (); ++i) {
@@ -410,10 +532,15 @@ NetlistBrowserPage::selected_nets ()
 std::vector<const db::Circuit *>
 NetlistBrowserPage::selected_circuits ()
 {
+  std::vector<const db::Circuit *> circuits;
+
+  QTreeView *directory_tree = current_directory_tree ();
+  if (! directory_tree) {
+    return circuits;
+  }
+
   NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
   tl_assert (model != 0);
-
-  std::vector<const db::Circuit *> circuits;
 
   QModelIndexList selection = directory_tree->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator i = selection.begin (); i != selection.end (); ++i) {
@@ -431,10 +558,15 @@ NetlistBrowserPage::selected_circuits ()
 std::vector<const db::SubCircuit *>
 NetlistBrowserPage::selected_subcircuits ()
 {
+  std::vector<const db::SubCircuit *> subcircuits;
+
+  QTreeView *directory_tree = current_directory_tree ();
+  if (! directory_tree) {
+    return subcircuits;
+  }
+
   NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
   tl_assert (model != 0);
-
-  std::vector<const db::SubCircuit *> subcircuits;
 
   QModelIndexList selection = directory_tree->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator i = selection.begin (); i != selection.end (); ++i) {
@@ -452,10 +584,15 @@ NetlistBrowserPage::selected_subcircuits ()
 std::vector<const db::Device *>
 NetlistBrowserPage::selected_devices ()
 {
+  std::vector<const db::Device *> devices;
+
+  QTreeView *directory_tree = current_directory_tree ();
+  if (! directory_tree) {
+    return devices;
+  }
+
   NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
   tl_assert (model != 0);
-
-  std::vector<const db::Device *> devices;
 
   QModelIndexList selection = directory_tree->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator i = selection.begin (); i != selection.end (); ++i) {
@@ -471,7 +608,25 @@ NetlistBrowserPage::selected_devices ()
 }
 
 void
-NetlistBrowserPage::selection_changed ()
+NetlistBrowserPage::nl_selection_changed ()
+{
+  selection_changed (nl_hierarchy_tree, nl_directory_tree);
+}
+
+void
+NetlistBrowserPage::sch_selection_changed ()
+{
+  selection_changed (sch_hierarchy_tree, sch_directory_tree);
+}
+
+void
+NetlistBrowserPage::xref_selection_changed ()
+{
+  selection_changed (xref_hierarchy_tree, xref_directory_tree);
+}
+
+void
+NetlistBrowserPage::selection_changed (QTreeView * /*hierarchy_tree*/, QTreeView *directory_tree)
 {
   NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
   tl_assert (model != 0);
@@ -531,11 +686,37 @@ NetlistBrowserPage::select_color_for_net ()
 void
 NetlistBrowserPage::navigate_to (const QModelIndex &index, bool fwd)
 {
-  if (! index.isValid ()) {
+  if (! index.isValid () || ! index.model ()) {
+    return;
+  }
+
+  QTreeView *directory_tree = 0;
+  QTreeView *hierarchy_tree = 0;
+
+  if (index.model () == nl_directory_tree->model ()) {
+
+    directory_tree = nl_directory_tree;
+    hierarchy_tree = nl_hierarchy_tree;
+    mode_tab->setCurrentIndex (0);
+
+  } else if (index.model () == sch_directory_tree->model ()) {
+
+    directory_tree = sch_directory_tree;
+    hierarchy_tree = sch_hierarchy_tree;
+    mode_tab->setCurrentIndex (1);
+
+  } else if (index.model () == xref_directory_tree->model ()) {
+
+    directory_tree = xref_directory_tree;
+    hierarchy_tree = xref_hierarchy_tree;
+    mode_tab->setCurrentIndex (2);
+
+  } else {
     return;
   }
 
   m_signals_enabled = false;
+
   try {
 
     directory_tree->setCurrentIndex (index);
@@ -557,7 +738,7 @@ NetlistBrowserPage::navigate_to (const QModelIndex &index, bool fwd)
 
   add_to_history (index, fwd);
 
-  selection_changed ();
+  selection_changed (directory_tree, hierarchy_tree);
 }
 
 void
@@ -643,7 +824,7 @@ NetlistBrowserPage::info_button_pressed ()
 void
 NetlistBrowserPage::mode_changed ()
 {
-  setup_trees ();
+ // @@@ setup_trees ();
 }
 
 static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const QRegExp &to_find, const QModelIndex &from)
@@ -739,6 +920,11 @@ NetlistBrowserPage::find_button_pressed ()
               actionCaseSensitive->isChecked () ? Qt::CaseSensitive : Qt::CaseInsensitive,
               actionUseRegularExpressions->isChecked () ? QRegExp::RegExp : QRegExp::FixedString);
 
+  QTreeView *directory_tree = current_directory_tree ();
+  if (! directory_tree) {
+    return;
+  }
+
   QModelIndex next = find_next (directory_tree, directory_tree->model (), re, directory_tree->currentIndex ());
   if (next.isValid ()) {
     navigate_to (next);
@@ -761,9 +947,9 @@ NetlistBrowserPage::show_all (bool f)
     m_show_all = f;
     m_show_all_action->setChecked (f);
 
-    NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+    NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (xref_directory_tree->model ());
     if (model) {
-      model->set_item_visibility (directory_tree, m_show_all, false /*show warnings only with 'show all'*/);
+      model->set_item_visibility (xref_directory_tree, m_show_all, false /*show warnings only with 'show all'*/);
     }
 
   }
@@ -799,14 +985,11 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
     rerun_button->setToolTip (QString ());
   }
 
-  show_netlist->setVisible (lvsdb != 0);
-  show_xref->setVisible (lvsdb != 0);
-
-  bool se = m_signals_enabled;
-  m_signals_enabled = false;
-  show_netlist->setChecked (lvsdb == 0);
-  show_xref->setChecked (lvsdb != 0);
-  m_signals_enabled = se;
+  bool is_lvsdb = (lvsdb != 0);
+  mode_tab->widget (0)->setVisible (true);
+  mode_tab->widget (1)->setVisible (is_lvsdb);
+  mode_tab->widget (2)->setVisible (is_lvsdb);
+  mode_tab->widget (3)->setVisible (is_lvsdb);
 
   clear_highlights ();
 
@@ -819,84 +1002,157 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
   return true;
 }
 
+static void
+set_abstract_tree_model (QTreeView *view, QAbstractItemModel *new_model)
+{
+  int columns = view->model () ? view->model ()->columnCount (QModelIndex ()) : 0;
+  int new_columns = new_model->columnCount (QModelIndex ());
+
+  delete view->model ();
+  view->setModel (new_model);
+
+  view->header ()->show ();
+  view->header ()->setStretchLastSection (true);
+  view->header ()->setMinimumSectionSize (25);
+
+  if (columns < new_columns) {
+    //  makes sure new columns are properly size-adjusted
+    for (int i = std::max (0, columns - 1); i < new_columns; ++i) {
+      view->header ()->resizeSection (i, i == 1 ? view->header ()->minimumSectionSize () : view->header ()->defaultSectionSize ());
+    }
+  }
+}
+
+static void
+set_tree_model (QTreeView *view, NetlistBrowserModel *new_model)
+{
+  set_abstract_tree_model (view, new_model);
+
+  //  hide the status column if not needed
+  view->header ()->setSectionHidden (1, new_model->status_column () < 0);
+}
+
+static void
+set_tree_model (QTreeView *view, NetlistBrowserTreeModel *new_model)
+{
+  set_abstract_tree_model (view, new_model);
+
+  //  hide the status column if not needed
+  view->header ()->setSectionHidden (1, new_model->status_column () < 0);
+}
+
 void
 NetlistBrowserPage::setup_trees ()
 {
   if (! mp_database.get ()) {
-    delete directory_tree->model ();
-    directory_tree->setModel (0);
-    delete hierarchy_tree->model ();
-    hierarchy_tree->setModel (0);
+    delete nl_directory_tree->model ();
+    nl_directory_tree->setModel (0);
+    delete sch_directory_tree->model ();
+    sch_directory_tree->setModel (0);
+    delete xref_directory_tree->model ();
+    xref_directory_tree->setModel (0);
+    delete nl_hierarchy_tree->model ();
+    nl_hierarchy_tree->setModel (0);
+    delete sch_hierarchy_tree->model ();
+    sch_hierarchy_tree->setModel (0);
+    delete xref_hierarchy_tree->model ();
+    xref_hierarchy_tree->setModel (0);
     return;
   }
 
   db::LayoutToNetlist *l2ndb = mp_database.get ();
-  db::LayoutVsSchematic *lvsdb = show_netlist->isChecked () ? 0 : dynamic_cast<db::LayoutVsSchematic *> (l2ndb);
+  db::LayoutVsSchematic *lvsdb = dynamic_cast<db::LayoutVsSchematic *> (l2ndb);
 
   {
     //  NOTE: with the tree as the parent, the tree will take over ownership of the model
-    NetlistBrowserModel *new_model = 0;
-    if (lvsdb) {
-      new_model = new NetlistBrowserModel (directory_tree, lvsdb, &m_colorizer);
-    } else {
-      new_model = new NetlistBrowserModel (directory_tree, l2ndb, &m_colorizer);
-    }
+    NetlistBrowserModel *new_model = new NetlistBrowserModel (nl_directory_tree, l2ndb, &m_colorizer);
 
-    int columns = directory_tree->model () ? directory_tree->model ()->columnCount (QModelIndex ()) : 0;
-    int new_columns = new_model->columnCount (QModelIndex ());
+    set_tree_model (nl_directory_tree, new_model);
 
-    delete directory_tree->model ();
-    directory_tree->setModel (new_model);
-    connect (directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
-    connect (directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (selection_changed ()));
-
-    directory_tree->header ()->show ();
-    directory_tree->header ()->setStretchLastSection (true);
-    directory_tree->header ()->setMinimumSectionSize (25);
-
-    if (columns < new_columns) {
-      //  makes sure new columns are properly size-adjusted
-      for (int i = std::max (0, columns - 1); i < new_columns; ++i) {
-        directory_tree->header ()->resizeSection (i, i == 1 ? directory_tree->header ()->minimumSectionSize () : directory_tree->header ()->defaultSectionSize ());
-      }
-    }
-
-    //  hide the status column if not needed
-    directory_tree->header ()->setSectionHidden (1, new_model->status_column () < 0);
+    connect (nl_directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (nl_current_index_changed (const QModelIndex &)));
+    connect (nl_directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (nl_selection_changed ()));
 
     //  establish visibility according to "show all"
-    new_model->set_item_visibility (directory_tree, m_show_all, false /*show warnings only with 'show all'*/);
+    new_model->set_item_visibility (nl_directory_tree, m_show_all, false /*show warnings only with 'show all'*/);
+  }
+
+  if (lvsdb) {
+
+    //  NOTE: with the tree as the parent, the tree will take over ownership of the model
+    // @@@ should be schematic
+    NetlistBrowserModel *new_model = new NetlistBrowserModel (sch_directory_tree, l2ndb, &m_colorizer);
+
+    set_tree_model (nl_directory_tree, new_model);
+
+    connect (sch_directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (sch_current_index_changed (const QModelIndex &)));
+    connect (sch_directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (sch_selection_changed ()));
+
+    //  establish visibility according to "show all"
+    new_model->set_item_visibility (sch_directory_tree, m_show_all, false /*show warnings only with 'show all'*/);
+
+  } else {
+
+    delete sch_directory_tree->model ();
+    sch_directory_tree->setModel (0);
+
+  }
+
+  if (lvsdb) {
+
+    //  NOTE: with the tree as the parent, the tree will take over ownership of the model
+    NetlistBrowserModel *new_model = new NetlistBrowserModel (xref_directory_tree, lvsdb, &m_colorizer);
+
+    set_tree_model (nl_directory_tree, new_model);
+
+    connect (xref_directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (xref_current_index_changed (const QModelIndex &)));
+    connect (xref_directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (xref_selection_changed ()));
+
+    //  establish visibility according to "show all"
+    new_model->set_item_visibility (xref_directory_tree, m_show_all, false /*show warnings only with 'show all'*/);
+
+  } else {
+
+    delete xref_directory_tree->model ();
+    xref_directory_tree->setModel (0);
+
   }
 
   {
     //  NOTE: with the tree as the parent, the tree will take over ownership of the model
-    NetlistBrowserTreeModel *new_hierarchy_model = 0;
-    if (lvsdb) {
-      new_hierarchy_model = new NetlistBrowserTreeModel (hierarchy_tree, lvsdb);
-    } else {
-      new_hierarchy_model = new NetlistBrowserTreeModel (hierarchy_tree, l2ndb);
-    }
+    NetlistBrowserTreeModel *new_hierarchy_model = new NetlistBrowserTreeModel (nl_hierarchy_tree, l2ndb);
+    set_tree_model (nl_directory_tree, new_hierarchy_model);
 
-    int columns = hierarchy_tree->model () ? hierarchy_tree->model ()->columnCount (QModelIndex ()) : 0;
-    int new_columns = new_hierarchy_model->columnCount (QModelIndex ());
+    connect (nl_hierarchy_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (nl_current_tree_index_changed (const QModelIndex &)));
+  }
 
-    delete hierarchy_tree->model ();
-    hierarchy_tree->setModel (new_hierarchy_model);
-    connect (hierarchy_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_tree_index_changed (const QModelIndex &)));
+  if (lvsdb) {
 
-    hierarchy_tree->header ()->show ();
-    hierarchy_tree->header ()->setStretchLastSection (true);
-    hierarchy_tree->header ()->setMinimumSectionSize (25);
+    //  NOTE: with the tree as the parent, the tree will take over ownership of the model
+    NetlistBrowserTreeModel *new_hierarchy_model = new NetlistBrowserTreeModel (sch_hierarchy_tree, l2ndb);
+    set_tree_model (sch_directory_tree, new_hierarchy_model);
 
-    if (columns < new_columns) {
-      //  makes sure new columns are properly size-adjusted
-      for (int i = std::max (0, columns - 1); i < new_columns; ++i) {
-        hierarchy_tree->header ()->resizeSection (i, i == 1 ? hierarchy_tree->header ()->minimumSectionSize () : hierarchy_tree->header ()->defaultSectionSize ());
-      }
-    }
+    connect (sch_hierarchy_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (sch_current_tree_index_changed (const QModelIndex &)));
 
-    //  hide the status column if not needed
-    hierarchy_tree->header ()->setSectionHidden (1, new_hierarchy_model->status_column () < 0);
+  } else {
+
+    delete sch_hierarchy_tree->model ();
+    sch_hierarchy_tree->setModel (0);
+
+  }
+
+  if (lvsdb) {
+
+    //  NOTE: with the tree as the parent, the tree will take over ownership of the model
+    NetlistBrowserTreeModel *new_hierarchy_model = new NetlistBrowserTreeModel (xref_hierarchy_tree, lvsdb);
+    set_tree_model (xref_directory_tree, new_hierarchy_model);
+
+    connect (xref_hierarchy_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (xref_current_tree_index_changed (const QModelIndex &)));
+
+  } else {
+
+    delete xref_hierarchy_tree->model ();
+    xref_hierarchy_tree->setModel (0);
+
   }
 
   find_text->setText (QString ());

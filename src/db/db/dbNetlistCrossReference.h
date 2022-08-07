@@ -105,6 +105,15 @@ public:
     std::string msg;
   };
 
+  struct LogEntryData
+  {
+    LogEntryData (Severity s, const std::string &m) : severity (s), msg (m) { }
+    LogEntryData () : severity (NoSeverity) { }
+
+    Severity severity;
+    std::string msg;
+  };
+
   struct PerCircuitData
   {
     PerCircuitData () : status (None) { }
@@ -117,6 +126,8 @@ public:
     typedef pin_pairs_type::const_iterator pin_pairs_const_iterator;
     typedef std::vector<SubCircuitPairData> subcircuit_pairs_type;
     typedef subcircuit_pairs_type::const_iterator subcircuit_pairs_const_iterator;
+    typedef std::vector<LogEntryData> log_entries_type;
+    typedef log_entries_type::const_iterator log_entries_const_iterator;
 
     Status status;
     std::string msg;
@@ -124,6 +135,7 @@ public:
     device_pairs_type devices;
     pin_pairs_type pins;
     subcircuit_pairs_type subcircuits;
+    log_entries_type log_entries;
   };
 
   struct PerNetData
@@ -145,6 +157,7 @@ public:
   void gen_end_netlist (const db::Netlist *a, const db::Netlist *b);
   void gen_begin_circuit (const db::Circuit *a, const db::Circuit *b);
   void gen_end_circuit (const db::Circuit *a, const db::Circuit *b, Status status, const std::string &msg);
+  void gen_log_entry (Severity severity, const std::string &msg);
   void gen_nets (const db::Net *a, const db::Net *b, Status status, const std::string &msg);
   void gen_devices (const db::Device *a, const db::Device *b, Status status, const std::string &msg);
   void gen_pins (const db::Pin *a, const db::Pin *b, Status status, const std::string &msg);
@@ -183,6 +196,11 @@ public:
   {
     gen_begin_circuit (a, b);
     gen_end_circuit (a, b, Mismatch, msg);
+  }
+
+  virtual void log_entry (Severity severity, const std::string &msg)
+  {
+    gen_log_entry (severity, msg);
   }
 
   virtual void match_nets (const db::Net *a, const db::Net *b)

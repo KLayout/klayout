@@ -51,6 +51,16 @@ public:
   virtual ~NetlistCompareLogger () { }
 
   /**
+   *  @brief An enum describing the severity for the log_entry function
+   */
+  enum Severity {
+    NoSeverity = 0,   //  unspecific
+    Info = 1,         //  information only
+    Warning = 2,      //  a warning
+    Error = 3         //  an error
+  };
+
+  /**
    *  @brief Begin logging for netlist a and b
    */
   virtual void begin_netlist (const db::Netlist * /*a*/, const db::Netlist * /*b*/) { }
@@ -87,6 +97,19 @@ public:
    *  "a" is null if there is no match for b and vice versa.
    */
   virtual void circuit_mismatch (const db::Circuit * /*a*/, const db::Circuit * /*b*/, const std::string & /*msg*/ = std::string ()) { }
+
+  /**
+   *  @brief Receives log entries for the current circuit pair
+   *  These events are only generated when the "wants_log_entry" hint returns true.
+   */
+  virtual void log_entry (Severity /*level*/, const std::string & /*msg*/) { }
+
+  /**
+   *  @brief Returns a value indicating whether log entries need to be generated
+   *  Log entries may include hints which are expensive to compute. This method tells the
+   *  matching algorithm whether to create such entries or not.
+   */
+  virtual bool wants_log_entries () const { return false; }
 
   /**
    *  @brief Nets a and b match exactly

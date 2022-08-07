@@ -21,6 +21,7 @@
 */
 
 #include "gsiDecl.h"
+#include "gsiEnums.h"
 #include "dbNetlistCompare.h"
 
 namespace {
@@ -33,7 +34,7 @@ class GenericNetlistCompareLogger
 {
 public:
   GenericNetlistCompareLogger ()
-    : db::NetlistCompareLogger ()
+    : db::NetlistCompareLogger (), m_wants_log (false)
   {
     //  .. nothing yet ..
   }
@@ -127,13 +128,42 @@ public:
     if (cb_circuit_mismatch.can_issue ()) {
       cb_circuit_mismatch.issue<GenericNetlistCompareLogger, const db::Circuit *, const db::Circuit *, const std::string &> (&GenericNetlistCompareLogger::circuit_mismatch_fb, a, b, msg);
     } else {
-      db::NetlistCompareLogger::circuit_mismatch (a, b);
+      db::NetlistCompareLogger::circuit_mismatch (a, b, msg);
     }
   }
 
   void circuit_mismatch_fb (const db::Circuit *a, const db::Circuit *b, const std::string &msg)
   {
     db::NetlistCompareLogger::circuit_mismatch (a, b, msg);
+  }
+
+  virtual void log_entry (db::NetlistCompareLogger::Severity severity, const std::string &msg)
+  {
+    if (cb_log_entry.can_issue ()) {
+      cb_log_entry.issue<GenericNetlistCompareLogger, db::NetlistCompareLogger::Severity, const std::string &> (&GenericNetlistCompareLogger::log_entry, severity, msg);
+    } else {
+      db::NetlistCompareLogger::log_entry (severity, msg);
+    }
+  }
+
+  void log_entry_fb (db::NetlistCompareLogger::Severity severity, const std::string &msg)
+  {
+    db::NetlistCompareLogger::log_entry (severity, msg);
+  }
+
+  virtual bool wants_log () const
+  {
+    return m_wants_log;
+  }
+
+  bool get_wants_log () const
+  {
+    return m_wants_log;
+  }
+
+  void set_wants_log (bool f)
+  {
+    m_wants_log = f;
   }
 
   virtual void match_nets (const db::Net *a, const db::Net *b)
@@ -297,8 +327,10 @@ public:
   gsi::Callback cb_end_circuit;
   gsi::Callback cb_circuit_skipped;
   gsi::Callback cb_match_nets;
-  gsi::Callback cb_net_mismatch;
   gsi::Callback cb_circuit_mismatch;
+  gsi::Callback cb_log_entry;
+  gsi::Callback cb_wants_log;
+  gsi::Callback cb_net_mismatch;
   gsi::Callback cb_match_ambiguous_nets;
   gsi::Callback cb_match_devices;
   gsi::Callback cb_match_devices_with_different_parameters;
@@ -312,6 +344,8 @@ public:
 private:
   GenericNetlistCompareLogger (const GenericNetlistCompareLogger &d);
   GenericNetlistCompareLogger &operator= (const GenericNetlistCompareLogger &d);
+
+  bool m_wants_log;
 };
 
 }
@@ -367,6 +401,26 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger (decl_dbNetl
     "this method is called with the one circuit and nil for the other circuit.\n"
     "\n"
     "This method is called instead of \\begin_circuit and \\end_circuit."
+  ) +
+  gsi::callback ("log_entry", &GenericNetlistCompareLogger::log_entry, &GenericNetlistCompareLogger::cb_log_entry, gsi::arg ("level"), gsi::arg ("msg"),
+    "@brief Issues an entry for the compare log.\n"
+    "This method delivers a log message generated during the compare of two circuits.\n"
+    "It is called between of \\begin_circuit and \\end_circuit and only if \\wants_log returns true.\n"
+    "\n"
+    "This method has been added in version 0.28."
+  ) +
+  gsi::method ("wants_log=", &GenericNetlistCompareLogger::set_wants_log, gsi::arg ("value"),
+    "@brief Sets a value indicating whether the receiver wants log messages.\n"
+    "Log messages may include compare hints which are expensive to compute. Hence, by default, log generation is turned off. "
+    "Set this attribute to true in order to receive log messages.\n"
+    "\n"
+    "This method has been added in version 0.28."
+  ) +
+  gsi::method ("wants_log", &GenericNetlistCompareLogger::get_wants_log,
+    "@brief Gets a value indicating whether the receiver wants log messages.\n"
+    "See \\wants_log= for details about this flag.\n"
+    "\n"
+    "This method has been added in version 0.28."
   ) +
   gsi::callback ("match_nets", &GenericNetlistCompareLogger::match_nets, &GenericNetlistCompareLogger::cb_match_nets, gsi::arg ("a"), gsi::arg ("b"),
     "@brief This function is called when two nets are identified.\n"
@@ -619,6 +673,23 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
   "achieve net matching. Swappable pins belong to an 'equivalence group' and can be defined with \\equivalent_pins.\n"
   "\n"
   "This class has been introduced in version 0.26."
+);
+
+gsi::EnumIn<GenericNetlistCompareLogger, db::NetlistCompareLogger::Severity> decl_CompareLoggerSeverity ("db", "Severity",
+  gsi::enum_const ("NoSeverity", db::NetlistCompareLogger::NoSeverity,
+    "@brief Unspecific severity\n"
+  ) +
+  gsi::enum_const ("Info", db::NetlistCompareLogger::Info,
+    "@brief Information only\n"
+  ) +
+  gsi::enum_const ("Warning", db::NetlistCompareLogger::Warning,
+    "@brief A warning\n"
+  ) +
+  gsi::enum_const ("Error", db::NetlistCompareLogger::Error,
+    "@brief An error\n"
+  ),
+  "@brief This class represents the log severity level for \\GenericNetlistCompareLogger#log_entry.\n"
+  "This enum has been introduced in version 0.28."
 );
 
 }

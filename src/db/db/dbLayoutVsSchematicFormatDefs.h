@@ -80,9 +80,9 @@ namespace db
  *    log([log-entry]*)                - log entries [short key: L]
  *
  *  [log-entry]:
- *    entry([level] <name> [any]*)     - log entry [short key: M]
+ *    entry([severity] [message|any]*) - log entry [short key: M]
  *
- *  [level]:
+ *  [severity]:
  *    info |                           - [short key: I]
  *    warning |                        - [short key: W]
  *    error                            - [short key: E]
@@ -92,16 +92,20 @@ namespace db
  *                                     - circuit cross-reference part [short key: Z]
  *
  *  [xref-pin]:
- *    pin([ion] [ion] [status]? [message]? [any]*)       - a pin pair [short key: P]
+ *    pin([ion] [ion] [status]? [message]? [any]*)
+ *                                     - a pin pair [short key: P]
  *
  *  [xref-device]:
- *    device([ion] [ion] [status]? [message]? [any]*)    - a device pair [short key: D]
+ *    device([ion] [ion] [status]? [message]? [any]*)
+ *                                     - a device pair [short key: D]
  *
  *  [xref-circuit]:
- *    circuit([ion] [ion] [status]? [message]? [any]*)   - a subcircuit pair [short key: X]
+ *    circuit([ion] [ion] [status]? [message]? [any]*)
+ *                                     - a subcircuit pair [short key: X]
  *
  *  [xref-net]:
- *    net([ion] [ion] [status]? [message]? [any]*)       - a net pair [short key: N]
+ *    net([ion] [ion] [status]? [message]? [any]*)
+ *                                     - a net pair [short key: N]
  *
  *  [ion]:
  *    <id> | ()
@@ -142,9 +146,9 @@ namespace lvs_std_format
     static std::string warning_key;
     static std::string skipped_key;
 
-    static std::string info_level_key;
-    static std::string warning_level_key;
-    static std::string error_level_key;
+    static std::string info_severity_key;
+    static std::string warning_severity_key;
+    static std::string error_severity_key;
   };
 
   struct DB_PUBLIC LongKeys
@@ -163,9 +167,9 @@ namespace lvs_std_format
     static std::string warning_key;
     static std::string skipped_key;
 
-    static std::string info_level_key;
-    static std::string warning_level_key;
-    static std::string error_level_key;
+    static std::string info_severity_key;
+    static std::string warning_severity_key;
+    static std::string error_severity_key;
   };
 
   template <bool Short> struct DB_PUBLIC keys;

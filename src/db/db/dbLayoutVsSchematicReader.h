@@ -79,6 +79,9 @@ private:
 
   bool read_status (db::NetlistCrossReference::Status &status);
   bool read_message (std::string &msg);
+  void read_log_entry (db::NetlistCrossReference *xref);
+  void read_logs_for_circuits (db::NetlistCrossReference *xref);
+  bool read_severity (db::NetlistCrossReference::Severity &severity);
   void read_xref (db::NetlistCrossReference *xref);
   void read_xrefs_for_circuits (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b);
   void read_net_pair (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b);

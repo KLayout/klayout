@@ -150,6 +150,59 @@ bool LayoutVsSchematicStandardReader::read_status (db::NetlistCrossReference::St
   }
 }
 
+bool LayoutVsSchematicStandardReader::read_severity (db::NetlistCrossReference::Severity &severity)
+{
+  if (test (skeys::info_severity_key) || test (lkeys::info_severity_key)) {
+    severity = db::NetlistCrossReference::Info;
+    return true;
+  } else if (test (skeys::warning_severity_key) || test (lkeys::warning_severity_key)) {
+    severity = db::NetlistCrossReference::Warning;
+    return true;
+  } else if (test (skeys::error_severity_key) || test (lkeys::error_severity_key)) {
+    severity = db::NetlistCrossReference::Error;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void LayoutVsSchematicStandardReader::read_log_entry (db::NetlistCrossReference *xref)
+{
+  db::NetlistCrossReference::Severity severity = db::NetlistCrossReference::NoSeverity;
+  std::string msg;
+
+  Brace br (this);
+  while (br) {
+    if (read_severity (severity)) {
+      //  continue
+    } else if (read_message (msg)) {
+      //  continue
+    } else {
+      skip_element ();
+    }
+  }
+  br.done ();
+
+  xref->log_entry (severity, msg);
+}
+
+void LayoutVsSchematicStandardReader::read_logs_for_circuits (db::NetlistCrossReference *xref)
+{
+  Brace br (this);
+  while (br) {
+
+    if (test (skeys::log_entry_key) || test (lkeys::log_entry_key)) {
+      read_log_entry (xref);
+    } else if (at_end ()) {
+      throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside circuit definition (net, pin, device or circuit expected)")));
+    } else {
+      skip_element ();
+    }
+
+  }
+  br.done ();
+}
+
 void LayoutVsSchematicStandardReader::read_xrefs_for_circuits (db::NetlistCrossReference *xref, const db::Circuit *circuit_a, const db::Circuit *circuit_b)
 {
   Brace br (this);
@@ -215,6 +268,8 @@ void LayoutVsSchematicStandardReader::read_xref (db::NetlistCrossReference *xref
           //  continue
         } else if (test (skeys::xref_key) || test (lkeys::xref_key)) {
           read_xrefs_for_circuits (xref, circuit_a, circuit_b);
+        } else if (test (skeys::log_key) || test (lkeys::log_key)) {
+          read_logs_for_circuits (xref);
         } else if (at_end ()) {
           throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside circuit definition (status keyword of xrefs expected)")));
         } else {

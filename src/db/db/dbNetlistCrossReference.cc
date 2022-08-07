@@ -417,6 +417,12 @@ NetlistCrossReference::gen_end_circuit (const db::Circuit *, const db::Circuit *
 }
 
 void
+NetlistCrossReference::gen_log_entry (Severity severity, const std::string &msg)
+{
+  mp_per_circuit_data->log_entries.push_back (LogEntryData (severity, msg));
+}
+
+void
 NetlistCrossReference::gen_nets (const db::Net *a, const db::Net *b, Status status, const std::string &msg)
 {
   establish_pair (a, b, status, msg);

@@ -839,6 +839,7 @@ static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const 
     return index;
   }
 
+  int max_depth = 4;
   QModelIndex current = index;
 
   std::vector<QModelIndex> parent_stack;
@@ -856,6 +857,13 @@ static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const 
   std::reverse (parent_stack.begin (), parent_stack.end ());
   std::reverse (rows_stack.begin (), rows_stack.end ());
 
+  while (int (rows_stack.size ()) > max_depth) {
+    rows_stack.pop_back ();
+    parent_stack.pop_back ();
+  }
+
+  std::vector<std::pair<int, int> > initial_rows_stack = rows_stack;
+
   tl::AbsoluteProgress progress (tl::to_string (tr ("Searching ...")));
 
   do {
@@ -864,7 +872,7 @@ static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const 
 
     bool has_next = false;
 
-    if (model->hasChildren (current) && rows_stack.size () < 2) {
+    if (model->hasChildren (current) && rows_stack.size () < max_depth - 1) {
 
       int row_count = model->rowCount (current);
       if (row_count > 0) {
@@ -908,7 +916,7 @@ static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const 
 
     }
 
-  } while (current.internalPointer () != from.internalPointer () || current.row () != from.row ());
+  } while (rows_stack != initial_rows_stack);
 
   return QModelIndex ();
 }

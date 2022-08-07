@@ -925,7 +925,7 @@ class Basic_TestClass < TestBase
       assert_equal( b.b4( Y.new ), "b4_result: -6" )
       assert_equal( false, true )  # this must never hit
     rescue
-      assert_equal( $!.to_s(), "Unexpected object type (expected argument of class A, got Basic_TestClass::Y) in B::b4" );
+      assert_equal( $!.to_s(), "Unexpected object type (expected argument of class A, got Basic_TestClass::Y) for argument #1 in B::b4" );
     end
   
     # Test, if this throws an error (object of class X passed to A argument):
@@ -935,7 +935,7 @@ class Basic_TestClass < TestBase
       assert_equal( b.b4( bb ), "b4_result: -6" )
       assert_equal( false, true )  # this must never hit
     rescue
-      assert_equal( $!.to_s(), "Unexpected object type (expected argument of class A, got RBA::B) in B::b4" );
+      assert_equal( $!.to_s(), "Unexpected object type (expected argument of class A, got RBA::B) for argument #1 in B::b4" );
     end
   
   end

@@ -122,6 +122,15 @@ static std::string search_string_from_names (const std::pair<const Obj *, const 
 }
 
 
+NetlistBrowserTreeModel::NetlistBrowserTreeModel (QWidget *parent, db::Netlist *netlist)
+  : QAbstractItemModel (parent), mp_l2ndb (0), mp_lvsdb (0)
+{
+  mp_indexer.reset (new SingleIndexedNetlistModel (netlist));
+
+  m_object_column = 0;
+  m_status_column = -1;
+}
+
 NetlistBrowserTreeModel::NetlistBrowserTreeModel (QWidget *parent, db::LayoutToNetlist *l2ndb)
   : QAbstractItemModel (parent), mp_l2ndb (l2ndb), mp_lvsdb (0)
 {

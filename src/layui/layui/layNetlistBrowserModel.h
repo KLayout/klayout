@@ -229,6 +229,7 @@ class LAYUI_PUBLIC NetlistBrowserModel
 Q_OBJECT
 
 public:
+  NetlistBrowserModel (QWidget *parent, db::Netlist *netlist, NetColorizer *colorizer);
   NetlistBrowserModel (QWidget *parent, db::LayoutToNetlist *l2ndb, NetColorizer *colorizer);
   NetlistBrowserModel (QWidget *parent, db::LayoutVsSchematic *lvsdb, NetColorizer *colorizer);
   ~NetlistBrowserModel ();

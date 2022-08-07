@@ -213,7 +213,6 @@ private slots:
   void xref_selection_changed ();
   void browse_color_for_net ();
   void select_color_for_net ();
-  void mode_changed ();
 
 protected:
   bool eventFilter (QObject *watched, QEvent *event);

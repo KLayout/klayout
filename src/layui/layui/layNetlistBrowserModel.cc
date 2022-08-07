@@ -2377,6 +2377,19 @@ CircuitDeviceTerminalItemData::search_text ()
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserModel implementation
 
+NetlistBrowserModel::NetlistBrowserModel (QWidget *parent, db::Netlist *netlist, NetColorizer *colorizer)
+  : QAbstractItemModel (parent), mp_l2ndb (0), mp_lvsdb (0), mp_colorizer (colorizer)
+{
+  mp_root.reset (new RootItemData ());
+  mp_indexer.reset (new SingleIndexedNetlistModel (netlist));
+  mp_colorizer->colors_changed.add (this, &NetlistBrowserModel::colors_changed);
+
+  m_object_column = 0;
+  m_status_column = -1;
+  m_first_column = 2;
+  m_second_column = -1;
+}
+
 NetlistBrowserModel::NetlistBrowserModel (QWidget *parent, db::LayoutToNetlist *l2ndb, NetColorizer *colorizer)
   : QAbstractItemModel (parent), mp_l2ndb (l2ndb), mp_lvsdb (0), mp_colorizer (colorizer)
 {

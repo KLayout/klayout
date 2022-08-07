@@ -216,9 +216,6 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   connect (forward, SIGNAL (clicked ()), this, SLOT (navigate_forward ()));
   connect (backward, SIGNAL (clicked ()), this, SLOT (navigate_back ()));
 
-// @@@  connect (show_netlist, SIGNAL (clicked ()), this, SLOT (mode_changed ()));
-// @@@  connect (show_xref, SIGNAL (clicked ()), this, SLOT (mode_changed ()));
-
   connect (actionExportAll, SIGNAL (triggered ()), this, SLOT (export_all ()));
   connect (actionExportSelected, SIGNAL (triggered ()), this, SLOT (export_selected ()));
 
@@ -489,16 +486,25 @@ NetlistBrowserPage::select_path (const lay::NetlistObjectsPath &path)
     NetlistBrowserModel *model;
 
     model = dynamic_cast<NetlistBrowserModel *> (nl_directory_tree->model ());
-    tl_assert (model != 0);
-    nl_directory_tree->setCurrentIndex (model->index_from_path (path));
+    if (model) {
+      nl_directory_tree->setCurrentIndex (model->index_from_path (path));
+    }
+
+/*
+    TODO: to support path selection in schematic, we had to translate the netlist circuits
+    into reference circuits first using the xref translation (if available)
+    This does not work:
 
     model = dynamic_cast<NetlistBrowserModel *> (sch_directory_tree->model ());
-    tl_assert (model != 0);
-    sch_directory_tree->setCurrentIndex (model->index_from_path (path));
+    if (model) {
+      sch_directory_tree->setCurrentIndex (model->index_from_path (path));
+    }
+*/
 
     model = dynamic_cast<NetlistBrowserModel *> (xref_directory_tree->model ());
-    tl_assert (model != 0);
-    xref_directory_tree->setCurrentIndex (model->index_from_path (path));
+    if (model) {
+      xref_directory_tree->setCurrentIndex (model->index_from_path (path));
+    }
 
   }
 }
@@ -821,12 +827,6 @@ NetlistBrowserPage::info_button_pressed ()
   mp_info_dialog->show ();
 }
 
-void
-NetlistBrowserPage::mode_changed ()
-{
- // @@@ setup_trees ();
-}
-
 static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const QRegExp &to_find, const QModelIndex &from)
 {
   QModelIndex index = from;
@@ -1094,8 +1094,7 @@ NetlistBrowserPage::setup_trees ()
   if (lvsdb) {
 
     //  NOTE: with the tree as the parent, the tree will take over ownership of the model
-    // @@@ should be schematic
-    NetlistBrowserModel *new_model = new NetlistBrowserModel (sch_directory_tree, l2ndb, &m_colorizer);
+    NetlistBrowserModel *new_model = new NetlistBrowserModel (sch_directory_tree, lvsdb->reference_netlist (), &m_colorizer);
 
     set_tree_model (sch_directory_tree, new_model);
 

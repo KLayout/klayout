@@ -738,7 +738,7 @@ NetlistBrowserPage::navigate_to (const QModelIndex &index, bool fwd)
 
   add_to_history (index, fwd);
 
-  selection_changed (directory_tree, hierarchy_tree);
+  selection_changed (hierarchy_tree, directory_tree);
 }
 
 void
@@ -985,11 +985,18 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
     rerun_button->setToolTip (QString ());
   }
 
+  //  @@@ how to hide?
   bool is_lvsdb = (lvsdb != 0);
-  mode_tab->widget (0)->setVisible (true);
-  mode_tab->widget (1)->setVisible (is_lvsdb);
-  mode_tab->widget (2)->setVisible (is_lvsdb);
-  mode_tab->widget (3)->setVisible (is_lvsdb);
+  mode_tab->setTabEnabled (0, true);
+  mode_tab->setTabEnabled (1, is_lvsdb);
+  mode_tab->setTabEnabled (2, is_lvsdb);
+  mode_tab->setTabEnabled (3, is_lvsdb);
+
+  if (is_lvsdb) {
+    mode_tab->setCurrentIndex (2);
+  } else {
+    mode_tab->setCurrentIndex (0);
+  }
 
   clear_highlights ();
 
@@ -1082,7 +1089,7 @@ NetlistBrowserPage::setup_trees ()
     // @@@ should be schematic
     NetlistBrowserModel *new_model = new NetlistBrowserModel (sch_directory_tree, l2ndb, &m_colorizer);
 
-    set_tree_model (nl_directory_tree, new_model);
+    set_tree_model (sch_directory_tree, new_model);
 
     connect (sch_directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (sch_current_index_changed (const QModelIndex &)));
     connect (sch_directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (sch_selection_changed ()));
@@ -1102,7 +1109,7 @@ NetlistBrowserPage::setup_trees ()
     //  NOTE: with the tree as the parent, the tree will take over ownership of the model
     NetlistBrowserModel *new_model = new NetlistBrowserModel (xref_directory_tree, lvsdb, &m_colorizer);
 
-    set_tree_model (nl_directory_tree, new_model);
+    set_tree_model (xref_directory_tree, new_model);
 
     connect (xref_directory_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (xref_current_index_changed (const QModelIndex &)));
     connect (xref_directory_tree->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (xref_selection_changed ()));
@@ -1120,7 +1127,7 @@ NetlistBrowserPage::setup_trees ()
   {
     //  NOTE: with the tree as the parent, the tree will take over ownership of the model
     NetlistBrowserTreeModel *new_hierarchy_model = new NetlistBrowserTreeModel (nl_hierarchy_tree, l2ndb);
-    set_tree_model (nl_directory_tree, new_hierarchy_model);
+    set_tree_model (nl_hierarchy_tree, new_hierarchy_model);
 
     connect (nl_hierarchy_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (nl_current_tree_index_changed (const QModelIndex &)));
   }
@@ -1129,7 +1136,7 @@ NetlistBrowserPage::setup_trees ()
 
     //  NOTE: with the tree as the parent, the tree will take over ownership of the model
     NetlistBrowserTreeModel *new_hierarchy_model = new NetlistBrowserTreeModel (sch_hierarchy_tree, l2ndb);
-    set_tree_model (sch_directory_tree, new_hierarchy_model);
+    set_tree_model (sch_hierarchy_tree, new_hierarchy_model);
 
     connect (sch_hierarchy_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (sch_current_tree_index_changed (const QModelIndex &)));
 
@@ -1144,7 +1151,7 @@ NetlistBrowserPage::setup_trees ()
 
     //  NOTE: with the tree as the parent, the tree will take over ownership of the model
     NetlistBrowserTreeModel *new_hierarchy_model = new NetlistBrowserTreeModel (xref_hierarchy_tree, lvsdb);
-    set_tree_model (xref_directory_tree, new_hierarchy_model);
+    set_tree_model (xref_hierarchy_tree, new_hierarchy_model);
 
     connect (xref_hierarchy_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (xref_current_tree_index_changed (const QModelIndex &)));
 

@@ -1142,7 +1142,7 @@ NetlistBrowserPage::setup_trees ()
   if (lvsdb) {
 
     //  NOTE: with the tree as the parent, the tree will take over ownership of the model
-    NetlistBrowserTreeModel *new_hierarchy_model = new NetlistBrowserTreeModel (sch_hierarchy_tree, l2ndb);
+    NetlistBrowserTreeModel *new_hierarchy_model = new NetlistBrowserTreeModel (sch_hierarchy_tree, lvsdb->reference_netlist ());
     set_tree_model (sch_hierarchy_tree, new_hierarchy_model);
 
     connect (sch_hierarchy_tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (sch_current_tree_index_changed (const QModelIndex &)));

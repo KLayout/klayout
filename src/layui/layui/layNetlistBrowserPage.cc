@@ -484,22 +484,24 @@ NetlistBrowserPage::select_path (const lay::NetlistObjectsPath &path)
   } else {
 
     NetlistBrowserModel *model;
+    db::LayoutToNetlist *l2ndb = mp_database.get ();
+    db::LayoutVsSchematic *lvsdb = dynamic_cast<db::LayoutVsSchematic *> (l2ndb);
 
     model = dynamic_cast<NetlistBrowserModel *> (nl_directory_tree->model ());
     if (model) {
       nl_directory_tree->setCurrentIndex (model->index_from_path (path));
     }
 
-/*
-    TODO: to support path selection in schematic, we had to translate the netlist circuits
-    into reference circuits first using the xref translation (if available)
-    This does not work:
-
     model = dynamic_cast<NetlistBrowserModel *> (sch_directory_tree->model ());
-    if (model) {
-      sch_directory_tree->setCurrentIndex (model->index_from_path (path));
+    if (model && lvsdb && lvsdb->cross_ref ()) {
+      lay::NetlistObjectsPath sch_path = path;
+      //  Note: translation helps generating a schematic-netlist index to
+      //  naviate to the schematic netlist in case of probing for example (only
+      //  works if all path components can be translated)
+      if (lay::NetlistObjectsPath::translate (sch_path, *lvsdb->cross_ref ())) {
+        sch_directory_tree->setCurrentIndex (model->index_from_path (sch_path));
+      }
     }
-*/
 
     model = dynamic_cast<NetlistBrowserModel *> (xref_directory_tree->model ());
     if (model) {
@@ -622,7 +624,35 @@ NetlistBrowserPage::nl_selection_changed ()
 void
 NetlistBrowserPage::sch_selection_changed ()
 {
-  selection_changed (sch_hierarchy_tree, sch_directory_tree);
+  QTreeView *directory_tree = sch_directory_tree;
+
+  NetlistBrowserModel *model = dynamic_cast<NetlistBrowserModel *> (directory_tree->model ());
+  tl_assert (model != 0);
+
+  db::LayoutToNetlist *l2ndb = mp_database.get ();
+  db::LayoutVsSchematic *lvsdb = dynamic_cast<db::LayoutVsSchematic *> (l2ndb);
+  if (! lvsdb || ! lvsdb->cross_ref ()) {
+    return;
+  }
+
+  QModelIndexList selected = directory_tree->selectionModel ()->selectedIndexes ();
+
+  std::vector<lay::NetlistObjectsPath> selected_paths;
+  selected_paths.reserve (selected.size ());
+  for (QModelIndexList::const_iterator i = selected.begin (); i != selected.end (); ++i) {
+    if (i->column () == 0) {
+      selected_paths.push_back (model->path_from_index (*i));
+      //  translate the schematic paths to layout paths (if available)
+      if (! lay::NetlistObjectsPath::translate (selected_paths.back (), *lvsdb->cross_ref ())) {
+        selected_paths.pop_back ();
+      }
+    }
+  }
+
+  QModelIndex current = directory_tree->selectionModel ()->currentIndex ();
+  highlight (model->path_from_index (current), selected_paths);
+
+  selection_changed_event ();
 }
 
 void

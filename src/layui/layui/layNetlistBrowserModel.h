@@ -183,8 +183,9 @@ public:
     return ! root.first && ! root.second;
   }
 
-  static NetlistObjectsPath from_first(const NetlistObjectPath &p);
+  static NetlistObjectsPath from_first (const NetlistObjectPath &p);
   static NetlistObjectsPath from_second (const NetlistObjectPath &p);
+  static bool translate (NetlistObjectsPath &p, const db::NetlistCrossReference &xref);
 
   NetlistObjectPath first () const;
   NetlistObjectPath second () const;

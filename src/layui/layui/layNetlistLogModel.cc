@@ -27,6 +27,7 @@
 #include <QIcon>
 #include <QFont>
 #include <QColor>
+#include <QWidget>
 
 namespace lay
 {
@@ -70,7 +71,8 @@ namespace {
 
 const std::string var_sep (" \u21D4 ");
 
-NetlistLogModel::NetlistLogModel (const db::NetlistCrossReference *cross_ref)
+NetlistLogModel::NetlistLogModel (QWidget *parent, const db::NetlistCrossReference *cross_ref)
+  : QAbstractItemModel (parent)
 {
   tl_assert (cross_ref->netlist_a () != 0);
   tl_assert (cross_ref->netlist_b () != 0);
@@ -88,7 +90,11 @@ NetlistLogModel::NetlistLogModel (const db::NetlistCrossReference *cross_ref)
 bool
 NetlistLogModel::hasChildren (const QModelIndex &parent) const
 {
-  return (parent.isValid () || ! m_circuits.empty ());
+  if (! parent.isValid ()) {
+    return ! m_circuits.empty ();
+  } else {
+    return ! parent.parent ().isValid ();
+  }
 }
 
 QModelIndex
@@ -97,7 +103,18 @@ NetlistLogModel::index (int row, int column, const QModelIndex &parent) const
   if (! parent.isValid ()) {
     return createIndex (row, column, quintptr (0));
   } else {
-    return createIndex (row, column, quintptr (& m_circuits [parent.row ()].second->log_entries [row]));
+    return createIndex (row, column, quintptr (& m_circuits [parent.row ()]));
+  }
+}
+
+QModelIndex
+NetlistLogModel::parent (const QModelIndex &child) const
+{
+  if (child.internalPointer () == (void *) 0) {
+    return QModelIndex ();
+  } else {
+    const circuit_entry *ce = (const circuit_entry *) child.internalPointer ();
+    return createIndex (int (ce - & m_circuits.front ()), child.column (), quintptr (0));
   }
 }
 
@@ -106,6 +123,8 @@ NetlistLogModel::rowCount (const QModelIndex &parent) const
 {
   if (! parent.isValid ()) {
     return int (m_circuits.size ());
+  } else if (parent.parent ().isValid ()) {
+    return 0;
   } else if (parent.row () >= 0 && parent.row () < int (m_circuits.size ())) {
     return int (m_circuits [parent.row ()].second->log_entries.size ());
   } else {
@@ -116,49 +135,50 @@ NetlistLogModel::rowCount (const QModelIndex &parent) const
 int
 NetlistLogModel::columnCount (const QModelIndex & /*parent*/) const
 {
-  return 2;
+  return 1;
 }
 
 QVariant
 NetlistLogModel::data (const QModelIndex &index, int role) const
 {
+  const db::NetlistCrossReference::LogEntryData *le = 0;
+  if (index.parent ().isValid ()) {
+    const circuit_entry *ce = (const circuit_entry *) index.internalPointer ();
+    if (ce) {
+      le = &ce->second->log_entries [index.row ()];
+    }
+  }
+
   if (role == Qt::DecorationRole) {
 
-    if (index.parent ().isValid ()) {
-      auto *le = (const db::NetlistCrossReference::LogEntryData *) index.internalPointer ();
-      if (! le) {
-        //  ignore
-      } else if (le->severity == db::NetlistCrossReference::Error) {
-        return QIcon (QString::fromUtf8 (":/error_16.png"));
-      } else if (le->severity == db::NetlistCrossReference::Warning) {
-        return QIcon (QString::fromUtf8 (":/warn_16.png"));
-      } else if (le->severity == db::NetlistCrossReference::Info) {
-        return QIcon (QString::fromUtf8 (":/info_16.png"));
-      } else {
-        return QIcon (QString::fromUtf8 (":/empty_16.png"));
-      }
+    if (! le) {
+      //  ignore
+    } else if (le->severity == db::NetlistCrossReference::Error) {
+      return QIcon (QString::fromUtf8 (":/error_16.png"));
+    } else if (le->severity == db::NetlistCrossReference::Warning) {
+      return QIcon (QString::fromUtf8 (":/warn_16.png"));
+    } else if (le->severity == db::NetlistCrossReference::Info) {
+      return QIcon (QString::fromUtf8 (":/info_16.png"));
     }
 
   } else if (role == Qt::DisplayRole) {
 
     if (index.parent ().isValid ()) {
-      auto *le = (const db::NetlistCrossReference::LogEntryData *) index.internalPointer ();
       if (le) {
         return QVariant (tl::to_qstring (le->msg));
       }
     } else if (index.row () >= 0 && index.row () < int (m_circuits.size ())) {
       const std::pair<const db::Circuit *, const db::Circuit *> &cp = m_circuits [index.row ()].first;
       if (cp.first->name () != cp.second->name ()) {
-        return QVariant (tl::to_qstring (cp.first->name () + var_sep + cp.second->name ()));
+        return QVariant (tr ("Circuit ") + tl::to_qstring (cp.first->name () + var_sep + cp.second->name ()));
       } else {
-        return QVariant (tl::to_qstring (cp.first->name ()));
+        return QVariant (tr ("Circuit ") + tl::to_qstring (cp.first->name ()));
       }
     }
 
   } else if (role == Qt::FontRole) {
 
     if (index.parent ().isValid ()) {
-      auto *le = (const db::NetlistCrossReference::LogEntryData *) index.internalPointer ();
       if (le && le->severity == db::NetlistCrossReference::Error) {
         QFont f;
         f.setBold (true);
@@ -169,7 +189,6 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
   } else if (role == Qt::ForegroundRole) {
 
     if (index.parent ().isValid ()) {
-      auto *le = (const db::NetlistCrossReference::LogEntryData *) index.internalPointer ();
       if (!le) {
         //  ignore
       } else if (le->severity == db::NetlistCrossReference::Error) {
@@ -187,7 +206,7 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
 QVariant
 NetlistLogModel::headerData (int section, Qt::Orientation /*orientation*/, int role) const
 {
-  if (role == Qt::DisplayRole && section == 1) {
+  if (role == Qt::DisplayRole && section == 0) {
     return QVariant (tr ("Message"));
   } else {
     return QVariant ();

@@ -40,17 +40,19 @@ class LAYUI_PUBLIC NetlistLogModel
   : public QAbstractItemModel
 {
 public:
-  NetlistLogModel (const db::NetlistCrossReference *cross_ref);
+  NetlistLogModel (QWidget *parent, const db::NetlistCrossReference *cross_ref);
 
   virtual bool hasChildren (const QModelIndex &parent) const;
   virtual QModelIndex index (int row, int column, const QModelIndex &parent) const;
+  virtual QModelIndex parent (const QModelIndex &child) const;
   virtual int rowCount (const QModelIndex &parent) const;
   virtual int columnCount (const QModelIndex &parent) const;
   virtual QVariant data (const QModelIndex &index, int role) const;
   virtual QVariant headerData (int section, Qt::Orientation orientation, int role) const;
 
 private:
-  std::vector<std::pair<std::pair<const db::Circuit *, const db::Circuit *>, const db::NetlistCrossReference::PerCircuitData *> > m_circuits;
+  typedef std::pair<std::pair<const db::Circuit *, const db::Circuit *>, const db::NetlistCrossReference::PerCircuitData *> circuit_entry;
+  std::vector<circuit_entry> m_circuits;
 };
 
 }

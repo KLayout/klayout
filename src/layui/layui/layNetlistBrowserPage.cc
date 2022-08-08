@@ -25,6 +25,7 @@
 #include "layNetlistBrowserPage.h"
 #include "layNetlistBrowserModel.h"
 #include "layNetlistBrowserTreeModel.h"
+#include "layNetlistLogModel.h"
 #include "layItemDelegates.h"
 #include "layCellView.h"
 #include "layLayoutViewBase.h"
@@ -1090,6 +1091,7 @@ void
 NetlistBrowserPage::setup_trees ()
 {
   if (! mp_database.get ()) {
+
     delete nl_directory_tree->model ();
     nl_directory_tree->setModel (0);
     delete sch_directory_tree->model ();
@@ -1102,11 +1104,28 @@ NetlistBrowserPage::setup_trees ()
     sch_hierarchy_tree->setModel (0);
     delete xref_hierarchy_tree->model ();
     xref_hierarchy_tree->setModel (0);
+    delete log_view->model ();
+    log_view->setModel (0);
+
     return;
+
   }
 
   db::LayoutToNetlist *l2ndb = mp_database.get ();
   db::LayoutVsSchematic *lvsdb = dynamic_cast<db::LayoutVsSchematic *> (l2ndb);
+
+  if (lvsdb && lvsdb->cross_ref ()) {
+
+    NetlistLogModel *new_model = new NetlistLogModel (log_view, lvsdb->cross_ref ());
+    delete log_view->model ();
+    log_view->setModel (new_model);
+
+  } else {
+
+    delete log_view->model ();
+    log_view->setModel (0);
+
+  }
 
   {
     //  NOTE: with the tree as the parent, the tree will take over ownership of the model

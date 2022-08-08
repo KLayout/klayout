@@ -38,10 +38,10 @@ LayoutVsSchematicStandardReader::LayoutVsSchematicStandardReader (tl::InputStrea
   //  .. nothing yet ..
 }
 
-void LayoutVsSchematicStandardReader::do_read_lvs (db::LayoutVsSchematic *l2n)
+void LayoutVsSchematicStandardReader::do_read_lvs (db::LayoutVsSchematic *lvs)
 {
   try {
-    read_netlist (l2n);
+    read_netlist (lvs);
   } catch (tl::Exception &ex) {
     throw tl::Exception (tl::sprintf (tl::to_string (tr ("%s in line: %d of %s")), ex.msg (), stream ().line_number (), path ()));
   }

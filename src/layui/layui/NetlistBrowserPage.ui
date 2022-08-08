@@ -572,7 +572,14 @@
            <number>4</number>
           </property>
           <item>
-           <widget class="QTreeView" name="log_view"/>
+           <widget class="QTreeView" name="log_view">
+            <property name="headerHidden">
+             <bool>true</bool>
+            </property>
+            <attribute name="headerVisible">
+             <bool>false</bool>
+            </attribute>
+           </widget>
           </item>
          </layout>
         </widget>

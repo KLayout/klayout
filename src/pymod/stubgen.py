@@ -154,7 +154,7 @@ def translate_methodname(name: str) -> str:
 
     return new_name
 
-def translate_type(arg_type: ktl.ArgType, module: str) -> str:
+def translate_type(arg_type: ktl.ArgType, within_class: ktl.Class) -> str:
     """ Translates klayout's C-type to a type in Python.
 
     This function is equivalent to the `type_to_s` in `pyaModule.cc`.
@@ -185,16 +185,19 @@ def translate_type(arg_type: ktl.ArgType, module: str) -> str:
 
     py_str:str = ""
     if arg_type.type() == ktl.ArgType.TypeObject:
-        if module and arg_type.cls().module() != module:
+        if within_class.module() and arg_type.cls().module() != within_class.module():
             py_str = arg_type.cls().module() + "." + arg_type.cls().name()
         else:
             py_str = arg_type.cls().name()
+            if py_str == within_class.name():
+                # Forward definition of the Class within the class.
+                py_str = f"'{py_str}'"
     elif arg_type.type() == ktl.ArgType.TypeMap:
-        inner_key = translate_type(arg_type.inner_k(), module)
-        inner_val = translate_type(arg_type.inner(), module)
+        inner_key = translate_type(arg_type.inner_k(), within_class)
+        inner_val = translate_type(arg_type.inner(), within_class)
         py_str = f"Dict[{inner_key}, {inner_val}]"
     elif arg_type.type() == ktl.ArgType.TypeVector:
-        py_str = f"Iterable[{translate_type(arg_type.inner(), module)}]"
+        py_str = f"Iterable[{translate_type(arg_type.inner(), within_class)}]"
     else:
         py_str = _type_dict[arg_type.type()]
 
@@ -343,7 +346,7 @@ def get_py_methods(c: ktl.Class) -> Tuple[List[Stub],Dict[str, ktl.Class]]:
                 argname += "_"
             elif not argname:
                 argname = f"arg{i}"
-            args.append(f"{argname}: {translate_type(a, c.module())}")
+            args.append(f"{argname}: {translate_type(a, c)}")
         return ", ".join(args)
 
     # Extract all properties (methods that have getters and/or setters)
@@ -352,7 +355,7 @@ def get_py_methods(c: ktl.Class) -> Tuple[List[Stub],Dict[str, ktl.Class]]:
         if m.is_getter:
             m_setter = find_setter(c_methods, m.name)
             process_argtype(m.m.ret_type())
-            ret_type = translate_type(m.m.ret_type(), c.module())
+            ret_type = translate_type(m.m.ret_type(), c)
             if m_setter is not None:  # full property
                 doc = m.doc + m_setter.doc
                 properties.append(
@@ -395,7 +398,7 @@ def get_py_methods(c: ktl.Class) -> Tuple[List[Stub],Dict[str, ktl.Class]]:
             if is_duplicate:
                 decorator = "@overload\n" + decorator
             process_argtype(m.m.ret_type())
-            ret_type = translate_type(m.m.ret_type(), c.module())
+            ret_type = translate_type(m.m.ret_type(), c)
             classmethods.append(
                 MethodStub(
                     decorator=decorator,
@@ -413,7 +416,7 @@ def get_py_methods(c: ktl.Class) -> Tuple[List[Stub],Dict[str, ktl.Class]]:
         if is_duplicate:
             decorator = "@overload\n" + decorator
         process_argtype(m.m.ret_type())
-        ret_type = translate_type(m.m.ret_type(), c.module())
+        ret_type = translate_type(m.m.ret_type(), c)
         boundmethods.append(
             MethodStub(
                 decorator=decorator,
@@ -440,8 +443,8 @@ def get_class_stub(c: ktl.Class, ignore: List[ktl.Class] = None, module: str = "
     for ignore_c in ignore + [c]:
         child_classes.pop(ignore_c.name(), None)
     for child_c in child_classes.values():
-        if child_c.module():
-        # if child class has a module, no need to include it.
+        if child_c.module() and child_c.module() != module:
+            # if child class has a foreign module, it is not a child
             continue
         _cstub.child_stubs.append(get_class_stub(child_c, ignore=ignore, module=c.module()))
     for stub in child_attributes:
@@ -471,15 +474,11 @@ def print_db():
         print(stub.format_stub(include_docstring=False) + "\n")
 
 def test_v1():
-    for c in ktl.Class.each_class():
-        base = ""
-        if c.base():
-            base = f"({c.base().name()})"
+    db_classes = get_db_classes()
+    for c in db_classes:
         if c.name() != 'Region':
             continue
-        print(c.module() + "." + c.name() + base + ":")
-        for stub in get_py_methods(c):
-            print(stub.format_stub(include_docstring=False) + "\n")
+        print(get_class_stub(c, ignore=db_classes, module="db").format_stub(include_docstring=False))
 
 def test_v2():
     db_classes = get_db_classes()
@@ -496,4 +495,4 @@ def test_v3():
 
 if __name__ == "__main__":
     print_db()
-    # test_v3()
+    # test_v2()

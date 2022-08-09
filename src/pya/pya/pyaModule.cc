@@ -541,6 +541,8 @@ static std::string extract_python_name (const std::string &name)
     return "__ixor__";
   } else if (name == "[]") {
     return "__getitem__";
+  } else if (name == "[]=") {
+    return "__setitem__";
   } else {
 
     const char *c = name.c_str ();

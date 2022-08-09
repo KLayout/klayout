@@ -26,3 +26,10 @@ TODO:
 - [x] 3. Generate stubs for klayout.*core.
 - [ ] 4. Manually check and backannotate types in klayout.*core.pyi.
 - [ ] 5. How to update the stubs if klayout code changes? Manually for now.
+
+NEW APPROACH:
+- [x] 1. Use klayout.tl to inspect all classes and methods in pya.
+- [ ] 2. Figure out last few bugs.
+    - DPoint has a method with "=" when it should have been "*=". There must be an issue with the gsiDeclInternal algorithms.
+    - Some inner classes, e.g. LogicalOp inside CompoundRegionOperationNode are not returning
+- [ ] 3. Manually check and compare to mypy's output.

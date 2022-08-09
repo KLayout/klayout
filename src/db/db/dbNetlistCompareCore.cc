@@ -31,6 +31,7 @@
 
 #include "tlAssert.h"
 #include "tlLog.h"
+#include "tlInternational.h"
 
 namespace db
 {
@@ -1045,6 +1046,10 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
 
       if (ambiguous) {
         if (logger) {
+          if (logger->wants_log_entries ()) {
+            logger->log_entry (db::NetlistCompareLogger::Warning,
+                               tl::sprintf (tl::to_string (tr ("Matching nets %s from an ambiguous group of nets")), nets2string (p->first->net (), p->second->net ())));
+          }
           logger->match_ambiguous_nets (p->first->net (), p->second->net ());
         }
         for (db::Net::const_pin_iterator i = p->first->net ()->begin_pins (); i != p->first->net ()->end_pins (); ++i) {
@@ -1066,8 +1071,10 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
     std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin ();
     for (std::list<TentativeNodeMapping>::iterator tn_of_pair = tn_for_pairs.begin (); tn_of_pair != tn_for_pairs.end (); ++tn_of_pair, ++p) {
 
+      bool was_ambiguous = equivalent_other_nodes.has_attribute (p->second);
+
       //  Note: this would propagate ambiguities to all *derived* mappings. But this probably goes too far:
-      //    bool ambiguous = equivalent_other_nodes.has_attribute (p->second);
+      //    bool ambiguous = was_ambiguous;
       //  Instead we ignore propagated ambiguitied for now:
       bool ambiguous = false;
 
@@ -1089,11 +1096,16 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
         NetGraphNode *n_other = & mp_other_graph->node (other_net_index);
 
         if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare || tl::verbosity () >= 40) {
-          if (ambiguous) {
-            tl::info << indent_s << "deduced ambiguous match: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+          if (was_ambiguous) {
+            tl::info << indent_s << "deduced from ambiguous match: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
           } else {
             tl::info << indent_s << "deduced match: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
           }
+        }
+
+        if (logger && logger->wants_log_entries () && was_ambiguous) {
+          logger->log_entry (db::NetlistCompareLogger::Info,
+                             tl::sprintf (tl::to_string (tr ("Matching nets %s following an ambiguous match")), nets2string (n->net (), n_other->net ())));
         }
 
         if (ambiguous) {
@@ -1231,6 +1243,50 @@ NetlistCompareCore::derive_node_identities_from_singular_match (const NetGraphNo
     //  mismatch of assignment state
     return failed_match;
 
+  }
+}
+
+void
+NetlistCompareCore::analyze_failed_matches (std::vector<NodeEdgePair> &nodes, std::vector<NodeEdgePair> &other_nodes) const
+{
+  //  Determine the range of nodes with same identity
+
+  std::vector<NodeEdgePair>::const_iterator n1 = nodes.begin ();
+  std::vector<NodeEdgePair>::const_iterator n2 = other_nodes.begin ();
+
+  std::vector<std::vector<NodeEdgePair>::const_iterator> singular1, singular2;
+
+  while (n1 != nodes.end () && n2 != other_nodes.end ()) {
+
+    if (n1->node->has_other ()) {
+      ++n1;
+      continue;
+    } else if (n2->node->has_other ()) {
+      ++n2;
+      continue;
+    }
+
+    if (*n1->node < *n2->node) {
+      singular1.push_back (n1);
+      ++n1;
+      continue;
+    } else if (*n2->node < *n1->node) {
+      singular2.push_back (n2);
+      ++n2;
+      continue;
+    }
+
+    ++n1;
+    ++n2;
+
+  }
+
+  for (auto i = singular1.begin (); i != singular1.end (); ++i) {
+    logger->log_entry (db::NetlistCompareLogger::Error, tl::sprintf (tl::to_string (tr ("Net %s from primary netlist does not match topologically to any net from reference netlist")), (*i)->node->net ()->expanded_name ()));
+  }
+
+  for (auto i = singular2.begin (); i != singular2.end (); ++i) {
+    logger->log_entry (db::NetlistCompareLogger::Error, tl::sprintf (tl::to_string (tr ("Net %s from reference netlist does not match topologically to any net from primary netlist")), (*i)->node->net ()->expanded_name ()));
   }
 }
 

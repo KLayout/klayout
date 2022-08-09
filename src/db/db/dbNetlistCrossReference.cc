@@ -27,6 +27,7 @@ namespace db
 {
 
 NetlistCrossReference::NetlistCrossReference ()
+  : m_wants_log_entries (true)
 {
   //  .. nothing yet ..
 }
@@ -419,7 +420,11 @@ NetlistCrossReference::gen_end_circuit (const db::Circuit *, const db::Circuit *
 void
 NetlistCrossReference::gen_log_entry (Severity severity, const std::string &msg)
 {
-  mp_per_circuit_data->log_entries.push_back (LogEntryData (severity, msg));
+  if (mp_per_circuit_data) {
+    mp_per_circuit_data->log_entries.push_back (LogEntryData (severity, msg));
+  } else {
+    m_other_log_entries.push_back (LogEntryData (severity, msg));
+  }
 }
 
 void

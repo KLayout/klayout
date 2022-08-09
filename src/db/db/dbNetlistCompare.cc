@@ -379,8 +379,16 @@ NetlistComparer::compare_impl (const db::Netlist *a, const db::Netlist *b) const
     } else {
 
       if (mp_logger) {
-        mp_logger->circuit_skipped (ca, cb, generate_subcircuits_not_verified_warning (ca, verified_circuits_a, cb, verified_circuits_b));
+
+        std::string msg = generate_subcircuits_not_verified_warning (ca, verified_circuits_a, cb, verified_circuits_b);
+
+        if (mp_logger->wants_log_entries ()) {
+          mp_logger->log_entry (db::NetlistCompareLogger::Error, msg);
+        }
+
+        mp_logger->circuit_skipped (ca, cb, msg);
         good = false;
+
       }
 
     }
@@ -442,7 +450,6 @@ NetlistComparer::all_subcircuits_verified (const db::Circuit *c, const std::set<
       return false;
     }
   }
-
   return true;
 }
 
@@ -889,6 +896,10 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       //  in must_match mode, check if the nets are identical
       if (mp_logger) {
         if (p->second && ! exact_match) {
+          if (mp_logger->wants_log_entries ()) {
+            mp_logger->log_entry (db::NetlistCompareLogger::Error,
+                                  tl::sprintf (tl::to_string (tr ("Nets %s are paired explicitly, but are not identical topologically")), nets2string (p->first)));
+          }
           mp_logger->net_mismatch (p->first.first, p->first.second);
         } else {
           mp_logger->match_nets (p->first.first, p->first.second);
@@ -944,7 +955,8 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
   //  Three passes: one without ambiguities, the second one with ambiguities and names (optional) and a third with ambiguities with topology
 
-  for (int pass = 0; pass < 3 && ! good; ++pass) {
+  int num_passes = 3;
+  for (int pass = 0; pass < num_passes && ! good; ++pass) {
 
     if (pass == 1 && m_dont_consider_net_names) {
       //  skip the named pass in "don't consider net names" mode
@@ -972,6 +984,8 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     compare.device_equivalence = &device_equivalence;
     compare.logger = mp_logger;
     compare.progress = &progress;
+
+    std::vector<NodeEdgePair> nodes, other_nodes;
 
     good = true;
     while (true) {
@@ -1015,7 +1029,8 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
       //  derive new identities through topology: first collect all nets with the same topological signature
 
-      std::vector<NodeEdgePair> nodes, other_nodes;
+      nodes.clear ();
+      other_nodes.clear ();
 
       std::vector<NetGraphNode::edge_type> no_edges;
       no_edges.push_back (NetGraphNode::edge_type ());
@@ -1070,6 +1085,10 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
     }
 
+    if (pass + 1 == num_passes && ! good && mp_logger && mp_logger->wants_log_entries ()) {
+      compare.analyze_failed_matches (nodes, other_nodes);
+    }
+
   }
 
   //  Report missing net assignment
@@ -1119,6 +1138,33 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
   return good;
 }
 
+static void
+analyze_pin_mismatch (const db::Pin *pin1, const db::Circuit *c1, const db::Pin *pin2, const db::Circuit * /*c2*/, db::NetlistCompareLogger *logger)
+{
+  if (! pin1) {
+    logger->log_entry (db::NetlistCompareLogger::Error, tl::sprintf (tl::to_string (tr ("No equivalent pin %s from reference netlist found in netlist.\nThis is an indication that a physical connection is not made to the subcircuit.")), pin2->expanded_name ()));
+  }
+
+  if (! pin2) {
+
+    logger->log_entry (db::NetlistCompareLogger::Error, tl::sprintf (tl::to_string (tr ("No equivalent pin %s from netlist found in reference netlist.\nThis is an indication that additional physical connections are made to the subcircuit cell.")), pin1->expanded_name ()));
+
+    //  attempt to identify pins which are creating invalid connections
+    for (auto p = c1->begin_parents (); p != c1->end_parents (); ++p) {
+      for (auto c = p->begin_subcircuits (); c != p->end_subcircuits (); ++c) {
+        const db::SubCircuit &sc = *c;
+        if (sc.circuit_ref () == c1) {
+          const db::Net *net = sc.net_for_pin (pin1->id ());
+          if (net && (net->subcircuit_pin_count () > 1 || net->terminal_count () > 0 || net->pin_count () > 0)) {
+            logger->log_entry (db::NetlistCompareLogger::Info, tl::sprintf (tl::to_string (tr ("Potential invalid connection in circuit %s, subcircuit cell reference at %s")), p->name (), sc.trans ().to_string ()));
+          }
+        }
+      }
+    }
+
+  }
+}
+
 bool
 NetlistComparer::handle_pin_mismatch (const db::NetGraph &g1, const db::Circuit *c1, const db::Pin *pin1, const db::NetGraph &g2, const db::Circuit *c2, const db::Pin *pin2) const
 {
@@ -1163,7 +1209,11 @@ NetlistComparer::handle_pin_mismatch (const db::NetGraph &g1, const db::Circuit 
     }
     return true;
   } else {
+
     if (mp_logger) {
+      if (mp_logger->wants_log_entries ()) {
+        analyze_pin_mismatch (pin1, c1, pin2, c2, mp_logger);
+      }
       mp_logger->pin_mismatch (pin1, pin2);
     }
     return false;

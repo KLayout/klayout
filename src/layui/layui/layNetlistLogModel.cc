@@ -39,7 +39,14 @@ namespace {
   {
     inline bool operator() (const Obj *a, const Obj *b) const
     {
-      return a->name () < b->name ();
+      if ((a != 0) != (b != 0)) {
+        return (a != 0) < (b != 0);
+      }
+      if (! a) {
+        return false;
+      } else {
+        return a->name () < b->name ();
+      }
     }
   };
 
@@ -60,8 +67,8 @@ namespace {
 
   struct CircuitsCompareByName
   {
-    bool operator() (const std::pair<std::pair<const db::Circuit *, const db::Circuit *>, const db::NetlistCrossReference::PerCircuitData *> &a,
-                     const std::pair<std::pair<const db::Circuit *, const db::Circuit *>, const db::NetlistCrossReference::PerCircuitData *> &b) const
+    bool operator() (const std::pair<std::pair<const db::Circuit *, const db::Circuit *>, const db::NetlistCrossReference::PerCircuitData::log_entries_type *> &a,
+                     const std::pair<std::pair<const db::Circuit *, const db::Circuit *>, const db::NetlistCrossReference::PerCircuitData::log_entries_type *> &b) const
     {
       return sort_pair<db::Circuit, sort_single_by_name<db::Circuit> > () (a.first, b.first);
     }
@@ -77,10 +84,14 @@ NetlistLogModel::NetlistLogModel (QWidget *parent, const db::NetlistCrossReferen
   tl_assert (cross_ref->netlist_a () != 0);
   tl_assert (cross_ref->netlist_b () != 0);
 
+  if (! cross_ref->other_log_entries ().empty ()) {
+    m_circuits.push_back (std::make_pair (std::make_pair ((const db::Circuit *)0, (const db::Circuit *)0), &cross_ref->other_log_entries ()));
+  }
+
   for (auto i = cross_ref->begin_circuits (); i != cross_ref->end_circuits (); ++i) {
     const db::NetlistCrossReference::PerCircuitData *pcd = cross_ref->per_circuit_data_for (*i);
     if (pcd && i->first && i->second && ! pcd->log_entries.empty ()) {
-      m_circuits.push_back (std::make_pair (*i, pcd));
+      m_circuits.push_back (std::make_pair (*i, &pcd->log_entries));
     }
   }
 
@@ -126,7 +137,7 @@ NetlistLogModel::rowCount (const QModelIndex &parent) const
   } else if (parent.parent ().isValid ()) {
     return 0;
   } else if (parent.row () >= 0 && parent.row () < int (m_circuits.size ())) {
-    return int (m_circuits [parent.row ()].second->log_entries.size ());
+    return int (m_circuits [parent.row ()].second->size ());
   } else {
     return 0;
   }
@@ -145,7 +156,7 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
   if (index.parent ().isValid ()) {
     const circuit_entry *ce = (const circuit_entry *) index.internalPointer ();
     if (ce) {
-      le = &ce->second->log_entries [index.row ()];
+      le = &(*ce->second) [index.row ()];
     }
   }
 
@@ -169,7 +180,9 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
       }
     } else if (index.row () >= 0 && index.row () < int (m_circuits.size ())) {
       const std::pair<const db::Circuit *, const db::Circuit *> &cp = m_circuits [index.row ()].first;
-      if (cp.first->name () != cp.second->name ()) {
+      if (! cp.first || ! cp.second) {
+        return QVariant (tr ("General"));
+      } else if (cp.first->name () != cp.second->name ()) {
         return QVariant (tr ("Circuit ") + tl::to_qstring (cp.first->name () + var_sep + cp.second->name ()));
       } else {
         return QVariant (tr ("Circuit ") + tl::to_qstring (cp.first->name ()));
@@ -184,6 +197,10 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
         f.setBold (true);
         return QVariant (f);
       }
+    } else {
+      QFont f;
+      f.setBold (true);
+      return QVariant (f);
     }
 
   } else if (role == Qt::ForegroundRole) {

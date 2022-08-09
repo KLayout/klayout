@@ -61,7 +61,8 @@ NetlistCompareGlobalOptions::options ()
 // --------------------------------------------------------------------------------------------------------------------
 //   Some utilities
 
-std::string nl_compare_debug_indent (size_t depth)
+std::string
+nl_compare_debug_indent (size_t depth)
 {
   std::string s;
   for (size_t d = 0; d < depth; ++d) {
@@ -69,6 +70,26 @@ std::string nl_compare_debug_indent (size_t depth)
   }
   return s;
 }
+
+const std::string var_sep (" \u21D4 ");
+
+std::string
+nets2string (const db::Net *a, const db::Net *b)
+{
+  if (a->expanded_name () != b->expanded_name ()) {
+    return a->expanded_name () + var_sep + b->expanded_name ();
+  } else {
+    return a->expanded_name ();
+  }
+}
+
+std::string
+nets2string (const std::pair<const db::Net *, const db::Net *> &np)
+{
+  return nets2string (np.first, np.second);
+}
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 //   Some functions

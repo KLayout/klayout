@@ -258,6 +258,16 @@ public:
     gen_subcircuits (a, b, Mismatch, msg);
   }
 
+  virtual bool wants_log_entries () const
+  {
+    return m_wants_log_entries;
+  }
+
+  void set_wants_log_entries (bool f)
+  {
+    m_wants_log_entries = f;
+  }
+
   void clear ();
 
   size_t circuit_count () const
@@ -277,6 +287,11 @@ public:
   circuits_iterator end_circuits () const
   {
     return m_circuits.end ();
+  }
+
+  const PerCircuitData::log_entries_type &other_log_entries () const
+  {
+    return m_other_log_entries;
   }
 
   const db::Pin *other_pin_for (const db::Pin *pin) const;
@@ -313,6 +328,8 @@ private:
   std::map<const db::SubCircuit *, const db::SubCircuit *> m_other_subcircuit;
   std::pair<const db::Circuit *, const db::Circuit *> m_current_circuits;
   PerCircuitData *mp_per_circuit_data;
+  PerCircuitData::log_entries_type m_other_log_entries;
+  bool m_wants_log_entries;
 
   void establish_pair (const db::Circuit *a, const db::Circuit *b);
   void establish_pair (const db::Net *a, const db::Net *b, Status status, const std::string &msg);

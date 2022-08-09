@@ -51,7 +51,7 @@ public:
   virtual QVariant headerData (int section, Qt::Orientation orientation, int role) const;
 
 private:
-  typedef std::pair<std::pair<const db::Circuit *, const db::Circuit *>, const db::NetlistCrossReference::PerCircuitData *> circuit_entry;
+  typedef std::pair<std::pair<const db::Circuit *, const db::Circuit *>, const db::NetlistCrossReference::PerCircuitData::log_entries_type *> circuit_entry;
   std::vector<circuit_entry> m_circuits;
 };
 

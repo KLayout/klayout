@@ -573,6 +573,9 @@
           </property>
           <item>
            <widget class="QTreeView" name="log_view">
+            <property name="contextMenuPolicy">
+             <enum>Qt::ActionsContextMenu</enum>
+            </property>
             <property name="headerHidden">
              <bool>true</bool>
             </property>
@@ -620,16 +623,6 @@
     </widget>
    </item>
   </layout>
-  <action name="actionCollapseAll">
-   <property name="text">
-    <string>Collapse All</string>
-   </property>
-  </action>
-  <action name="actionExpandAll">
-   <property name="text">
-    <string>Expand All</string>
-   </property>
-  </action>
   <action name="actionUseRegularExpressions">
    <property name="checkable">
     <bool>true</bool>

@@ -85,6 +85,11 @@ public:
    */
   size_t derive_node_identities_from_node_set (std::vector<NodeEdgePair> &nodes, std::vector<NodeEdgePair> &other_nodes) const;
 
+  /**
+   *  @brief Analyzes the non-matched remaining nodes and produces log output
+   */
+  void analyze_failed_matches (std::vector<NodeEdgePair> &nodes, std::vector<NodeEdgePair> &other_nodes) const;
+
   size_t max_depth;
   size_t max_n_branch;
   bool depth_first;

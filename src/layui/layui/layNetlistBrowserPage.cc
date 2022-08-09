@@ -139,9 +139,19 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   m_show_all_action->setCheckable (true);
   m_show_all_action->setChecked (m_show_all);
 
+  {
+    QAction *collapse_all = new QAction (QObject::tr ("Collapse All"), log_view);
+    connect (collapse_all, SIGNAL (triggered ()), log_view, SLOT (collapseAll ()));
+    log_view->addAction (collapse_all);
+
+    QAction *expand_all = new QAction (QObject::tr ("Expand All"), log_view);
+    connect (expand_all, SIGNAL (triggered ()), log_view, SLOT (expandAll ()));
+    log_view->addAction (expand_all);
+  }
+
   QTreeView *dt[] = { nl_directory_tree, sch_directory_tree, xref_directory_tree };
 
-  for (int m = 0; m < sizeof (dt) / sizeof (dt[0]); ++m) {
+  for (int m = 0; m < int (sizeof (dt) / sizeof (dt[0])); ++m) {
 
     QTreeView *directory_tree = dt[m];
 
@@ -152,8 +162,12 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
 
     QAction *sep;
     directory_tree->addAction (m_show_all_action);
-    directory_tree->addAction (actionCollapseAll);
+    QAction *collapse_all = new QAction (QObject::tr ("Collapse All"), directory_tree);
+    connect (collapse_all, SIGNAL (triggered ()), directory_tree, SLOT (collapseAll ()));
+    directory_tree->addAction (collapse_all);
     //  TODO: this gives a too big tree - confine to single branches?
+    //  QAction *expand_all = new QAction (QObject::tr ("Expand All"), directory_tree);
+    //  connect (expand_all, SIGNAL (triggered ()), directory_tree, SLOT (expandAll ()));
     //  directory_tree->addAction (actionExpandAll);
     sep = new QAction (directory_tree);
     sep->setSeparator (true);
@@ -185,7 +199,7 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
 
   QTreeView *ht[] = { nl_hierarchy_tree, sch_hierarchy_tree, xref_hierarchy_tree };
 
-  for (int m = 0; m < sizeof (ht) / sizeof (ht[0]); ++m) {
+  for (int m = 0; m < int (sizeof (ht) / sizeof (ht[0])); ++m) {
 
     QTreeView *hierarchy_tree = ht[m];
 
@@ -903,7 +917,7 @@ static QModelIndex find_next (QTreeView *view, QAbstractItemModel *model, const 
 
     bool has_next = false;
 
-    if (model->hasChildren (current) && rows_stack.size () < max_depth - 1) {
+    if (model->hasChildren (current) && int (rows_stack.size ()) < max_depth - 1) {
 
       int row_count = model->rowCount (current);
       if (row_count > 0) {

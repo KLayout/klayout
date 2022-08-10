@@ -351,7 +351,7 @@ module DRC
     # %DRC%
     # @brief Performs an antenna check
     # @name antenna_check
-    # @synopsis antenna_check(gate, metal, ratio, [ diode_specs ... ])
+    # @synopsis antenna_check(gate, metal, ratio, [ diode_specs ... ] [, texts ])
     #
     # The antenna check is used to avoid plasma induced damage. Physically, 
     # the damage happes if during the manufacturing of a metal layer with
@@ -486,8 +486,13 @@ module DRC
     # The error shapes produced by the antenna check are copies
     # of the metal shapes on the metal layers of each network 
     # violating the antenna rule.
+    # 
+    # You can specify a text layer (use "labels" to create one). It will receive
+    # error labels describing the measured values and computation parameters for debugging
+    # the layout. This option has been introduced in version 0.27.11.
+    # 
 
-    def antenna_check(agate, ametal, ratio, *diodes)
+    def antenna_check(agate, ametal, ratio, *args)
 
       @engine._context("antenna_check") do
 
@@ -529,18 +534,31 @@ module DRC
           raise("Ratio argument is not a number")
         end
 
-        dl = diodes.collect do |d|
-          if d.is_a?(Array)
-            d.size == 2 || raise("Diode specification pair expects two elements")
-            d[0].requires_region
-            [ d[0].data, d[1].to_f ]
-          else 
-            d.requires_region
-            [ d.data, 0.0 ]
+        dl = []
+        texts = nil
+        n = 3
+        args.each do |a|
+          if a.is_a?(Array)
+            a.size == 2 || raise("Diode specification pair expects two elements for argument #{n + 1}")
+            if ! a[0].is_a?(DRC::DRCLayer)
+              raise("Diode specification pair needs a layer for the first argument of argument #{n + 1}")
+            end
+            a[0].requires_region
+            dl << [ a[0].data, a[1].to_f ]
+          elsif ! a.is_a?(DRC::DRCLayer)
+            raise("Argument #{n + 1} has to be a layer")
+          else
+            a.requires_texts_or_region
+            if a.data.is_a?(RBA::Region)
+              dl << [ a.data, 0.0 ]
+            else
+              texts = a.data
+            end
           end
+          n += 1
         end
 
-        DRC::DRCLayer::new(@engine, @engine._cmd(l2n_data, :antenna_check, gate.data, gate_area_factor, gate_perimeter_factor, metal.data, metal_area_factor, metal_perimeter_factor, ratio, dl))
+        DRC::DRCLayer::new(@engine, @engine._cmd(l2n_data, :antenna_check, gate.data, gate_area_factor, gate_perimeter_factor, metal.data, metal_area_factor, metal_perimeter_factor, ratio, dl, texts))
 
       end
 

@@ -58,6 +58,7 @@ same but without clipping is <a href="#touching">touching</a> or <a href="#overl
 <keyword name="edge_pairs"/>
 <p>Usage:</p>
 <ul>
+<li><tt>source.edge_pairs</tt></li>
 <li><tt>source.edge_pairs(layer)</tt></li>
 <li><tt>source.edge_pairs(layer, datatype)</tt></li>
 <li><tt>source.edge_pairs(layer_into)</tt></li>
@@ -73,12 +74,15 @@ This method is identical to <a href="#input">input</a> with respect to the optio
 </p><p>
 Use the global version of "edge_pairs" without a source object to address the default source.
 </p><p>
+"edge_pairs" without any arguments will create a new, empty original layer.
+</p><p>
 This method has been introduced in version 0.27.
 </p>
 <a name="edges"/><h2>"edges" - Gets the edge shapes (or shapes that can be converted edges) from an input layer</h2>
 <keyword name="edges"/>
 <p>Usage:</p>
 <ul>
+<li><tt>source.edges</tt></li>
 <li><tt>source.edges(layer)</tt></li>
 <li><tt>source.edges(layer, datatype)</tt></li>
 <li><tt>source.edges(layer_into)</tt></li>
@@ -93,6 +97,8 @@ as native objects.
 This method is identical to <a href="#input">input</a> with respect to the options supported.
 </p><p>
 Use the global version of "edges" without a source object to address the default source.
+</p><p>
+"edges" without any arguments will create a new, empty original layer.
 </p><p>
 This method has been introduced in version 0.27.
 </p>
@@ -160,6 +166,7 @@ source.global_transform(shift(0, 100.um), rotate(90.0))
 <keyword name="input"/>
 <p>Usage:</p>
 <ul>
+<li><tt>source.input</tt></li>
 <li><tt>source.input(layer)</tt></li>
 <li><tt>source.input(layer, datatype)</tt></li>
 <li><tt>source.input(layer_into)</tt></li>
@@ -200,12 +207,15 @@ operations is available for these objects, such as boolean "and" and "not" with 
 True text layers should be preferred over mixed polygon/text layers if text object processing
 is required.
 </p><p>
+"input" without any arguments will create a new, empty original layer.
+</p><p>
 Use the global version of "input" without a source object to address the default source.
 </p>
 <a name="labels"/><h2>"labels" - Gets the labels (texts) from an input layer</h2>
 <keyword name="labels"/>
 <p>Usage:</p>
 <ul>
+<li><tt>source.labels</tt></li>
 <li><tt>source.labels(layer)</tt></li>
 <li><tt>source.labels(layer, datatype)</tt></li>
 <li><tt>source.labels(layer_into)</tt></li>
@@ -218,6 +228,8 @@ This method is identical to <a href="#input">input</a>, but takes only texts fro
 layer. Starting with version 0.27, the result is no longer a polygon layer that tries
 to provide text support but a layer type which is provided for carrying text objects
 explicitly.
+</p><p>
+"labels" without any arguments will create a new, empty original layer.
 </p><p>
 Use the global version of "labels" without a source object to address the default source.
 </p>
@@ -258,7 +270,8 @@ layers.each { |l| (input(l) &amp; clip_box).output(l) }
 <li><tt>make_layer</tt></li>
 </ul>
 <p>
-This method delivers a new empty original layer.
+This method delivers a new empty original layer. It is provided to keep old code working.
+Use "input" without arguments instead.
 </p>
 <a name="overlapping"/><h2>"overlapping" - Specifies input selected from a region in overlapping mode</h2>
 <keyword name="overlapping"/>
@@ -286,6 +299,7 @@ the search region with their bounding box (without the requirement to overlap)
 <keyword name="polygons"/>
 <p>Usage:</p>
 <ul>
+<li><tt>source.polygons</tt></li>
 <li><tt>source.polygons(layer)</tt></li>
 <li><tt>source.polygons(layer, datatype)</tt></li>
 <li><tt>source.polygons(layer_into)</tt></li>
@@ -297,6 +311,8 @@ With "polygon shapes" we mean all kind of shapes that can be converted to polygo
 Those are boxes, paths and real polygons.
 </p><p>
 This method is identical to <a href="#input">input</a> with respect to the options supported.
+</p><p>
+"polygons" without any arguments will create a new, empty original layer.
 </p><p>
 Use the global version of "polygons" without a source object to address the default source.
 </p>

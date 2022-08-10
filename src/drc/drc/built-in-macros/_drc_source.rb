@@ -367,6 +367,7 @@ CODE
     # %DRC%
     # @name input
     # @brief Specifies input from a source
+    # @synopsis source.input
     # @synopsis source.input(layer)
     # @synopsis source.input(layer, datatype)
     # @synopsis source.input(layer_into)
@@ -405,6 +406,8 @@ CODE
     # True text layers should be preferred over mixed polygon/text layers if text object processing
     # is required.
     #
+    # "input" without any arguments will create a new, empty original layer.
+    #
     # Use the global version of "input" without a source object to address the default source.
     
     def input(*args)
@@ -417,6 +420,7 @@ CODE
     # %DRC%
     # @name labels
     # @brief Gets the labels (texts) from an input layer
+    # @synopsis source.labels
     # @synopsis source.labels(layer)
     # @synopsis source.labels(layer, datatype)
     # @synopsis source.labels(layer_into)
@@ -428,6 +432,8 @@ CODE
     # layer. Starting with version 0.27, the result is no longer a polygon layer that tries
     # to provide text support but a layer type which is provided for carrying text objects
     # explicitly.
+    #
+    # "labels" without any arguments will create a new, empty original layer.
     #
     # Use the global version of "labels" without a source object to address the default source.
     
@@ -441,6 +447,7 @@ CODE
     # %DRC%
     # @name polygons
     # @brief Gets the polygon shapes (or shapes that can be converted polygons) from an input layer
+    # @synopsis source.polygons
     # @synopsis source.polygons(layer)
     # @synopsis source.polygons(layer, datatype)
     # @synopsis source.polygons(layer_into)
@@ -451,6 +458,8 @@ CODE
     # Those are boxes, paths and real polygons.
     # 
     # This method is identical to \input with respect to the options supported.
+    #
+    # "polygons" without any arguments will create a new, empty original layer.
     #
     # Use the global version of "polygons" without a source object to address the default source.
     
@@ -464,6 +473,7 @@ CODE
     # %DRC%
     # @name edges
     # @brief Gets the edge shapes (or shapes that can be converted edges) from an input layer
+    # @synopsis source.edges
     # @synopsis source.edges(layer)
     # @synopsis source.edges(layer, datatype)
     # @synopsis source.edges(layer_into)
@@ -478,6 +488,8 @@ CODE
     #
     # Use the global version of "edges" without a source object to address the default source.
     # 
+    # "edges" without any arguments will create a new, empty original layer.
+    #
     # This method has been introduced in version 0.27.
     
     def edges(*args)
@@ -490,6 +502,7 @@ CODE
     # %DRC%
     # @name edge_pairs
     # @brief Gets the edge pairs from an input layer
+    # @synopsis source.edge_pairs
     # @synopsis source.edge_pairs(layer)
     # @synopsis source.edge_pairs(layer, datatype)
     # @synopsis source.edge_pairs(layer_into)
@@ -504,6 +517,8 @@ CODE
     #
     # Use the global version of "edge_pairs" without a source object to address the default source.
     # 
+    # "edge_pairs" without any arguments will create a new, empty original layer.
+    #
     # This method has been introduced in version 0.27.
     
     def edge_pairs(*args)
@@ -517,7 +532,8 @@ CODE
     # @name make_layer
     # @brief Creates an empty polygon layer based on the hierarchy of the layout
     # @synopsis make_layer
-    # This method delivers a new empty original layer.
+    # This method delivers a new empty original layer. It is provided to keep old code working.
+    # Use "input" without arguments instead.
 
     def make_layer
       layers = []

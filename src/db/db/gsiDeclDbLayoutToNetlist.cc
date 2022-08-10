@@ -98,7 +98,7 @@ static std::vector<std::string> l2n_layer_names (const db::LayoutToNetlist *l2n)
   return ln;
 }
 
-static db::Region antenna_check3 (db::LayoutToNetlist *l2n, const db::Region &poly, double poly_area_factor, double poly_perimeter_factor, const db::Region &metal, double metal_area_factor, double metal_perimeter_factor, double ratio, const std::vector<tl::Variant> &diodes)
+static db::Region antenna_check3 (db::LayoutToNetlist *l2n, const db::Region &poly, double poly_area_factor, double poly_perimeter_factor, const db::Region &metal, double metal_area_factor, double metal_perimeter_factor, double ratio, const std::vector<tl::Variant> &diodes, db::Texts *texts)
 {
   std::vector<std::pair<const db::Region *, double> > diode_pairs;
 
@@ -127,17 +127,17 @@ static db::Region antenna_check3 (db::LayoutToNetlist *l2n, const db::Region &po
 
   }
 
-  return l2n->antenna_check (poly, poly_area_factor, poly_perimeter_factor, metal, metal_area_factor, metal_perimeter_factor, ratio, diode_pairs);
+  return l2n->antenna_check (poly, poly_area_factor, poly_perimeter_factor, metal, metal_area_factor, metal_perimeter_factor, ratio, diode_pairs, texts);
 }
 
-static db::Region antenna_check2 (db::LayoutToNetlist *l2n, const db::Region &poly, double poly_perimeter_factor, const db::Region &metal, double metal_perimeter_factor, double ratio, const std::vector<tl::Variant> &diodes)
+static db::Region antenna_check2 (db::LayoutToNetlist *l2n, const db::Region &poly, double poly_perimeter_factor, const db::Region &metal, double metal_perimeter_factor, double ratio, const std::vector<tl::Variant> &diodes, db::Texts *texts)
 {
-  return antenna_check3 (l2n, poly, 1, poly_perimeter_factor, metal, 1, metal_perimeter_factor, ratio, diodes);
+  return antenna_check3 (l2n, poly, 1, poly_perimeter_factor, metal, 1, metal_perimeter_factor, ratio, diodes, texts);
 }
 
-static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &poly, const db::Region &metal, double ratio, const std::vector<tl::Variant> &diodes)
+static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &poly, const db::Region &metal, double ratio, const std::vector<tl::Variant> &diodes, db::Texts *texts)
 {
-  return antenna_check3 (l2n, poly, 1, 0, metal, 1, 0, ratio, diodes);
+  return antenna_check3 (l2n, poly, 1, 0, metal, 1, 0, ratio, diodes, texts);
 }
 
 static void join_net_names (db::LayoutToNetlist *l2n, const std::string &s)
@@ -701,7 +701,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@brief Reads the extracted netlist from the file.\n"
     "This method employs the native format of KLayout.\n"
   ) +
-  gsi::method_ext ("antenna_check", &antenna_check, gsi::arg ("gate"), gsi::arg ("metal"), gsi::arg ("ratio"), gsi::arg ("diodes", std::vector<tl::Variant> (), "[]"),
+  gsi::method_ext ("antenna_check", &antenna_check, gsi::arg ("gate"), gsi::arg ("metal"), gsi::arg ("ratio"), gsi::arg ("diodes", std::vector<tl::Variant> (), "[]"), gsi::arg ("texts", (db::Texts *) 0, "nil"),
    "@brief Runs an antenna check on the extracted clusters\n"
    "\n"
    "The antenna check will traverse all clusters and run an antenna check\n"
@@ -741,8 +741,13 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
    "# diode_layer1 increases the ratio by 50 per square micrometer area:\n"
    "errors = l2n.antenna(poly, metal, 10.0 [ [ diode_layer, 50.0 ] ])\n"
    "@/code\n"
+   "\n"
+   "If 'texts' is non-nil, this text collection will receive labels explaining the error in "
+   "terms of area values and relevant ratio.\n"
+   "\n"
+   "The 'texts' parameter has been added in version 0.27.11."
   ) +
-  gsi::method_ext ("antenna_check", &antenna_check2, gsi::arg ("gate"), gsi::arg ("gate_perimeter_factor"), gsi::arg ("metal"), gsi::arg ("metal_perimeter_factor"), gsi::arg ("ratio"), gsi::arg ("diodes", std::vector<tl::Variant> (), "[]"),
+  gsi::method_ext ("antenna_check", &antenna_check2, gsi::arg ("gate"), gsi::arg ("gate_perimeter_factor"), gsi::arg ("metal"), gsi::arg ("metal_perimeter_factor"), gsi::arg ("ratio"), gsi::arg ("diodes", std::vector<tl::Variant> (), "[]"), gsi::arg ("texts", (db::Texts *) 0, "nil"),
    "@brief Runs an antenna check on the extracted clusters taking the perimeter into account\n"
    "\n"
    "This version of the \\antenna_check method allows taking the perimeter of gate or metal into account. "
@@ -759,7 +764,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
    "\n"
    "This variant has been introduced in version 0.26.6.\n"
   ) +
-  gsi::method_ext ("antenna_check", &antenna_check3, gsi::arg ("gate"), gsi::arg ("gate_area_factor"), gsi::arg ("gate_perimeter_factor"), gsi::arg ("metal"), gsi::arg ("metal_area_factor"), gsi::arg ("metal_perimeter_factor"), gsi::arg ("ratio"), gsi::arg ("diodes", std::vector<tl::Variant> (), "[]"),
+  gsi::method_ext ("antenna_check", &antenna_check3, gsi::arg ("gate"), gsi::arg ("gate_area_factor"), gsi::arg ("gate_perimeter_factor"), gsi::arg ("metal"), gsi::arg ("metal_area_factor"), gsi::arg ("metal_perimeter_factor"), gsi::arg ("ratio"), gsi::arg ("diodes", std::vector<tl::Variant> (), "[]"), gsi::arg ("texts", (db::Texts *) 0, "nil"),
    "@brief Runs an antenna check on the extracted clusters taking the perimeter into account and providing an area factor\n"
    "\n"
    "This (most generic) version of the \\antenna_check method allows taking the perimeter of gate or metal into account and also "

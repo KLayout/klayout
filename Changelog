@@ -8,6 +8,8 @@
 * Bugfix: %GITHUB%/issues/1135 LVS mismatch on parallel devices and issue on ambiguity resolution
 * Enhancement: Support for Python 3.11
 * Enhancement: L2N and LVSDB readers made compatible with potential future extensions
+* Enhancement: DRC Antenna check now can be given a text layer which receives output describing the measured and computed values
+* Bugfix: *= method (e.g. Point, DPoint) properly listed in help and reflection API
 * Bugfixes: Fixed a number of potential segfaults due to memory corruption found during master branch refactoring
 
 0.27.10          (2022-06-04):

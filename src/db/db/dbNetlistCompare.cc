@@ -1469,7 +1469,7 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
       bool mapped = true;
       std::vector<std::pair<size_t, size_t> > k = compute_device_key_for_other (*d, g2, device_categorizer.is_strict_device_category (device_cat), mapped);
 
-      std::multimap<std::vector<std::pair<size_t, size_t> >, std::pair<const db::Device *, size_t> >::iterator dm = device_map.find (k);
+      auto dm = device_map.find (k);
 
       if (! mapped || dm == device_map.end () || dm->first != k) {
 
@@ -1479,6 +1479,30 @@ NetlistComparer::do_device_assignment (const db::Circuit *c1, const db::NetGraph
         good = false;
 
       } else {
+
+        auto dmm = dm;
+        ++dmm;
+        size_t n = 1;
+        while (dmm != device_map.end () && dmm->first == k) {
+          ++dmm;
+          ++n;
+        }
+
+        if (n > 1) {
+
+          //  device ambiguities may arise from different devices being connected in parallel:
+          //  try to identify the device which matches
+
+          db::DeviceCompare dc;
+
+          for (auto i = dm; i != dmm; ++i) {
+            if (dc.equals (std::make_pair (i->second.first, i->second.second), std::make_pair (d.operator-> (), device_cat))) {
+              dm = i;
+              break;
+            }
+          }
+
+        }
 
         c1_device = dm->second.first;
         c1_device_cat = dm->second.second;

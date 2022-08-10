@@ -1566,15 +1566,21 @@ TEST(8_DiodesDontMatchOnSwappedPins)
 
   EXPECT_EQ (logger.text (),
     "begin_circuit TRIANGLE TRIANGLE\n"
-    "match_nets P3 P3\n"
-    "net_mismatch P1 P1\n"
-    "net_mismatch P2 P2\n"
-    "match_pins $0 $0\n"
-    "match_pins $1 $1\n"
-    "match_pins $2 $2\n"
-    "match_devices $3 $1\n"
-    "match_devices $2 $3\n"
-    "device_mismatch $1 $2\n"
+    "net_mismatch P1 (null)\n"
+    "net_mismatch P2 (null)\n"
+    "net_mismatch P3 (null)\n"
+    "net_mismatch (null) P1\n"
+    "net_mismatch (null) P2\n"
+    "net_mismatch (null) P3\n"
+    "match_pins $0 (null)\n"
+    "match_pins $1 (null)\n"
+    "match_pins $2 (null)\n"
+    "match_pins (null) $0\n"
+    "match_pins (null) $1\n"
+    "match_pins (null) $2\n"
+    "device_mismatch $1 $1\n"
+    "device_mismatch $2 $2\n"
+    "device_mismatch $3 $3\n"
     "end_circuit TRIANGLE TRIANGLE NOMATCH"
   );
   EXPECT_EQ (good, false);
@@ -4882,3 +4888,145 @@ TEST(30_ComparePrimaryAndOtherParameters)
 
   EXPECT_EQ (good, true);
 }
+
+TEST(31_ParallelMOSFets)
+{
+  db::Netlist a, b, c;
+
+  tl::InputStream fa (tl::testdata () + "/algo/nl_compare_31_a.cir");
+  tl::InputStream fb (tl::testdata () + "/algo/nl_compare_31_b.cir");
+  tl::InputStream fc (tl::testdata () + "/algo/nl_compare_31_c.cir");
+
+  db::NetlistSpiceReader reader;
+  reader.read (fa, a);
+  reader.read (fb, b);
+  reader.read (fc, c);
+
+  NetlistCompareTestLogger logger;
+  std::string txt;
+  bool good;
+  db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
+
+  good = comp.compare (&a, &b);
+
+  txt = logger.text ();
+
+  EXPECT_EQ (good, true);
+
+  EXPECT_EQ (txt,
+    "begin_circuit LVS_TEST LVS_TEST\n"
+    "match_nets 2 2\n"
+    "match_nets 1 1\n"
+    "match_pins 1 1\n"
+    "match_pins 2 2\n"
+    "match_devices 1I39A $1\n"
+    "match_devices 1I38 $150\n"
+    "end_circuit LVS_TEST LVS_TEST MATCH"
+  );
+
+  logger.clear ();
+
+  good = comp.compare (&a, &b);
+
+  txt = logger.text ();
+
+  EXPECT_EQ (good, true);
+
+  EXPECT_EQ (txt,
+    "begin_circuit LVS_TEST LVS_TEST\n"
+    "match_nets 2 2\n"
+    "match_nets 1 1\n"
+    "match_pins 1 1\n"
+    "match_pins 2 2\n"
+    "match_devices 1I39A $1\n"
+    "match_devices 1I38 $150\n"
+    "end_circuit LVS_TEST LVS_TEST MATCH"
+  );
+}
+
+TEST(32_InverterChain)
+{
+  db::Netlist a, b, c;
+
+  tl::InputStream fa (tl::testdata () + "/algo/nl_compare_32a.cir");
+  tl::InputStream fb (tl::testdata () + "/algo/nl_compare_32b.cir");
+
+  db::NetlistSpiceReader reader;
+  reader.read (fa, a);
+  reader.read (fb, b);
+
+  NetlistCompareTestLogger logger;
+  std::string txt;
+  bool good;
+  db::NetlistComparer comp (&logger);
+  comp.set_dont_consider_net_names (true);
+
+  good = comp.compare (&a, &b);
+
+  txt = logger.text ();
+
+  EXPECT_EQ (good, true);
+
+  EXPECT_EQ (txt,
+
+    "begin_circuit INV_CHAIN INV_CHAIN\n"
+    "match_nets 20 2\n"
+    "match_nets 21 1\n"
+    "match_ambiguous_nets 10 11\n"
+    "match_nets 11 12\n"
+    "match_nets 12 13\n"
+    "match_ambiguous_nets 16 5\n"
+    "match_nets 17 6\n"
+    "match_nets 18 7\n"
+    "match_nets 4 18\n"
+    "match_nets 5 19\n"
+    "match_nets 6 20\n"
+    "match_nets 15 4\n"
+    "match_nets 2 16\n"
+    "match_nets 3 17\n"
+    "match_nets 9 10\n"
+    "match_nets 8 9\n"
+    "match_nets 13 14\n"
+    "match_nets 14 3\n"
+    "match_nets 19 8\n"
+    "match_nets 1 15\n"
+    "match_nets 7 21\n"
+    "match_pins 20 2\n"
+    "match_pins 21 1\n"
+    "match_devices $12 2_1.N1\n"
+    "match_devices $28 2_1.P1\n"
+    "match_devices $13 2_2.N1\n"
+    "match_devices $29 2_2.P1\n"
+    "match_devices $14 2_3.N1\n"
+    "match_devices $30 2_3.P1\n"
+    "match_devices $15 2_4.N1\n"
+    "match_devices $31 2_4.P1\n"
+    "match_devices $16 2_5.N1\n"
+    "match_devices $32 2_5.P1\n"
+    "match_devices $7 _1.N1\n"
+    "match_devices $23 _1.P1\n"
+    "match_devices $8 _2.N1\n"
+    "match_devices $24 _2.P1\n"
+    "match_devices $9 _3.N1\n"
+    "match_devices $25 _3.P1\n"
+    "match_devices $10 _4.N1\n"
+    "match_devices $26 _4.P1\n"
+    "match_devices $11 _5.N1\n"
+    "match_devices $27 _5.P1\n"
+    "match_devices $1 0_1.N1\n"
+    "match_devices $17 0_1.P1\n"
+    "match_devices $2 0_2.N1\n"
+    "match_devices $18 0_2.P1\n"
+    "match_devices $3 0_3.N1\n"
+    "match_devices $19 0_3.P1\n"
+    "match_devices $4 0_4.N1\n"
+    "match_devices $20 0_4.P1\n"
+    "match_devices $5 0_5.N1\n"
+    "match_devices $21 0_5.P1\n"
+    "match_devices $6 0_6.N1\n"
+    "match_devices $22 0_6.P1\n"
+    "end_circuit INV_CHAIN INV_CHAIN MATCH"
+  );
+}
+

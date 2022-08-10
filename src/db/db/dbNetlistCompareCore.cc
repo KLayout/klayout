@@ -1026,6 +1026,7 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
 
     //  ambiguous pins
     std::vector<size_t> pa, pb;
+    std::set<const db::Net *> seen;
 
     for (std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin (); p != pairs.end (); ++p) {
 
@@ -1043,6 +1044,9 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
           tl::info << indent_s << "deduced match: " << p->first->net ()->expanded_name () << " vs. " << p->second->net ()->expanded_name ();
         }
       }
+
+      tl_assert (seen.find (p->first->net ()) == seen.end ());
+      seen.insert (p->first->net ());
 
       if (ambiguous) {
         if (logger) {
@@ -1091,6 +1095,13 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
         }
 
         NetGraphNode *n = & mp_graph->node (i->second);
+
+        //  tentative evaluation paths may render equivalences which are included in the initial node set,
+        //  hence we filter those out here
+        if (seen.find (n->net ()) != seen.end ()) {
+          continue;
+        }
+        seen.insert (n->net ());
 
         size_t other_net_index = n->other_net_index ();
         NetGraphNode *n_other = & mp_other_graph->node (other_net_index);
@@ -1169,7 +1180,7 @@ NetlistCompareCore::derive_node_identities_from_singular_match (const NetGraphNo
     }
     return tentative ? failed_match : 0;
 
-  } else if (! n->has_any_other () && ! n_other->has_any_other ()) {
+  } else if ((! n->has_any_other () && ! n_other->has_any_other ()) || (n->has_unknown_other () && n_other->has_unknown_other ())) { // @@@
 
     //  in tentative mode, reject this choice if both nets are named and
     //  their names differ -> this favors net matching by name
@@ -1189,7 +1200,11 @@ NetlistCompareCore::derive_node_identities_from_singular_match (const NetGraphNo
 
     bool exact_match = (mp_graph->node (ni) == mp_other_graph->node (other_ni));
 
-    TentativeNodeMapping::map_pair (tentative, mp_graph, ni, mp_other_graph, other_ni, dm, dm_other, *device_equivalence, scm, scm_other, *subcircuit_equivalence, depth, exact_match);
+    if (n->has_unknown_other ()) {
+      TentativeNodeMapping::map_pair_from_unknown (tentative, mp_graph, ni, mp_other_graph, other_ni, dm, dm_other, *device_equivalence, scm, scm_other, *subcircuit_equivalence, depth);
+    } else {
+      TentativeNodeMapping::map_pair (tentative, mp_graph, ni, mp_other_graph, other_ni, dm, dm_other, *device_equivalence, scm, scm_other, *subcircuit_equivalence, depth, exact_match);
+    }
 
     if (! tentative) {
       ++*progress;
@@ -1223,11 +1238,6 @@ NetlistCompareCore::derive_node_identities_from_singular_match (const NetGraphNo
     }
 
     return new_nodes;
-
-  } else if (n->has_unknown_other ()) {
-
-    //  accept any other net
-    return 0;
 
   } else if (n->has_other ()) {
 

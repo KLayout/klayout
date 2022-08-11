@@ -67,7 +67,7 @@ Qt5Ana3 = { 'qmake' : '/Applications/anaconda3/bin/qmake',
 RubyNil  = [ 'nil' ]
 RubySys  = [ 'RubyElCapitan', 'RubySierra', 'RubyHighSierra', 'RubyMojave' ]
 RubySys += [ 'RubyCatalina', 'RubyBigSur', 'RubyMonterey' ]
-RubyExt  = [ 'Ruby27MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]
+RubyExt  = [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3' ]
 Rubies   = RubyNil + RubySys + RubyExt
 
 #-----------------------------------------------------
@@ -156,30 +156,30 @@ RubyMonterey    = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions/
                     'lib':  '%s/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.tbd' % MontereySDK
                   }
 
-# Ruby 2.7 from MacPorts (https://www.macports.org/) *+*+*+ EXPERIMENTAL *+*+*+
-#  install with 'sudo port install ruby27'
-# [Key Type Name] = 'MP27'
-Ruby27MacPorts  = { 'exe': '/opt/local/bin/ruby2.7',
-                    'inc': '/opt/local/include/ruby-2.7.0',
-                    'lib': '/opt/local/lib/libruby.2.7.dylib'
+# Ruby 3.1 from MacPorts (https://www.macports.org/) *+*+*+ EXPERIMENTAL *+*+*+
+#  install with 'sudo port install ruby31'
+# [Key Type Name] = 'MP31'
+Ruby31MacPorts  = { 'exe': '/opt/local/bin/ruby3.1',
+                    'inc': '/opt/local/include/ruby-3.1.2',
+                    'lib': '/opt/local/lib/libruby.3.1.dylib'
                   }
 
-# Ruby 2.7 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
-#   install with 'brew install ruby'
-# [Key Type Name] = 'HB27'
-HBRuby27Path    = '%s/opt/ruby@2.7' % DefaultHomebrewRoot
-Ruby27Brew      = { 'exe': '%s/bin/ruby' % HBRuby27Path,
-                    'inc': '%s/include/ruby-2.7.0' % HBRuby27Path,
-                    'lib': '%s/lib/libruby.2.7.dylib' % HBRuby27Path
+# Ruby 3.1 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
+#   install with 'brew install ruby@3.1'
+# [Key Type Name] = 'HB31'
+HBRuby31Path    = '%s/opt/ruby@3.1' % DefaultHomebrewRoot
+Ruby31Brew      = { 'exe': '%s/bin/ruby' % HBRuby31Path,
+                    'inc': '%s/include/ruby-3.1.0' % HBRuby31Path,
+                    'lib': '%s/lib/libruby.3.1.dylib' % HBRuby31Path
                   }
 
-# Ruby 2.5 bundled with anaconda3 installed under /Applications/anaconda3/ *+*+*+ EXPERIMENTAL *+*+*+
+# Ruby 3.1 bundled with anaconda3 installed under /Applications/anaconda3/ *+*+*+ EXPERIMENTAL *+*+*+
 # The standard installation deploys the tool under $HOME/opt/anaconda3/.
 # If so, you need to make a symbolic link: /Applications/anaconda3 ---> $HOME/opt/anaconda3/
 # [Key Type Name] = 'Ana3'
 RubyAnaconda3   = { 'exe': '/Applications/anaconda3/bin/ruby',
-                    'inc': '/Applications/anaconda3/include/ruby-2.5.0',
-                    'lib': '/Applications/anaconda3/lib/libruby.2.5.1.dylib'
+                    'inc': '/Applications/anaconda3/include/ruby-3.1.0',
+                    'lib': '/Applications/anaconda3/lib/libruby.3.1.dylib'
                   }
 
 # Consolidated dictionary kit for Ruby
@@ -192,8 +192,8 @@ RubyDictionary  = { 'nil'           : None,
                     'RubyCatalina'  : RubyCatalina,
                     'RubyBigSur'    : RubyBigSur,
                     'RubyMonterey'  : RubyMonterey,
-                    'Ruby27MacPorts': Ruby27MacPorts,
-                    'Ruby27Brew'    : Ruby27Brew,
+                    'Ruby31MacPorts': Ruby31MacPorts,
+                    'Ruby31Brew'    : Ruby31Brew,
                     'RubyAnaconda3' : RubyAnaconda3
                   }
 

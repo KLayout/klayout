@@ -10,6 +10,7 @@
 from __future__ import print_function  # to use print() of Python 3 in Python >= 2.7
 import sys
 import os
+import codecs
 import shutil
 import glob
 import platform
@@ -35,9 +36,9 @@ from build4mac_util import *
 def GenerateUsage(platform):
     if platform.upper() in [ "MONTEREY", "BIGSUR" ]: # with Xcode [13.1 .. ]
         myQt5     = "qt5brew"
-        myRuby    = "hb27"
+        myRuby    = "hb31"
         myPython  = "hb38"
-        moduleset = ('qt5Brew', 'HB27', 'HB38')
+        moduleset = ('qt5Brew', 'HB31', 'HB38')
     else: # with Xcode [ .. 12.4]
         myQt5     = "qt5macports"
         myRuby    = "sys"
@@ -47,7 +48,7 @@ def GenerateUsage(platform):
     usage  = "\n"
     usage += "---------------------------------------------------------------------------------------------------------\n"
     usage += "<< Usage of 'build4mac.py' >>\n"
-    usage += "       for building KLayout 0.27.9 or later on different Apple macOS / Mac OSX platforms.\n"
+    usage += "       for building KLayout 0.27.10 or later on different Apple macOS / Mac OSX platforms.\n"
     usage += "\n"
     usage += "$ [python] ./build4mac.py\n"
     usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value\n"
@@ -56,12 +57,12 @@ def GenerateUsage(platform):
     usage += "                        :   Qt5MacPorts: use Qt5 from MacPorts                           | \n"
     usage += "                        :       Qt5Brew: use Qt5 from Homebrew                           | \n"
     usage += "                        :       Qt5Ana3: use Qt5 from Anaconda3                          | \n"
-    usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP27', 'HB27', 'Ana3']   | %s \n" % myRuby
+    usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP31', 'HB31', 'Ana3']   | %s \n" % myRuby
     usage += "                        :    nil: don't bind Ruby                                        | \n"
     usage += "                        :    Sys: use OS-bundled Ruby [2.0 - 2.6] depending on OS        | \n"
-    usage += "                        :   MP27: use Ruby 2.7 from MacPorts                             | \n"
-    usage += "                        :   HB27: use Ruby 2.7 from Homebrew                             | \n"
-    usage += "                        :   Ana3: use Ruby 2.5 from Anaconda3                            | \n"
+    usage += "                        :   MP31: use Ruby 3.1 from MacPorts                             | \n"
+    usage += "                        :   HB31: use Ruby 3.1 from Homebrew                             | \n"
+    usage += "                        :   Ana3: use Ruby 3.1 from Anaconda3                            | \n"
     usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3',   | %s \n" % myPython
     usage += "                        :                        'HBAuto']                               | \n"
     usage += "                        :    nil: don't bind Python                                      | \n"
@@ -221,6 +222,123 @@ def Get_Default_Config():
     return config
 
 #------------------------------------------------------------------------------
+## To apply a workaround patch to "./src/klayout.pri" to work with Ruby 3.x.
+#
+# @param[in] config     dictionary containing the default configuration
+#
+# @return void
+#------------------------------------------------------------------------------
+def ApplyPatch2KLayoutQtPri4Ruby3(config):
+    #----------------------------------------------------------------
+    # [1] Check if the previous patch exists
+    #----------------------------------------------------------------
+    priMaster   = "./src/klayout.pri"
+    priOriginal = "./src/klayout.pri.org"
+    if os.path.exists(priOriginal):
+        shutil.copy2( priOriginal, priMaster )
+        os.remove( priOriginal )
+
+    #----------------------------------------------------------------
+    # [2] Not using Ruby?
+    #----------------------------------------------------------------
+    ModuleRuby = config['ModuleRuby']
+    if ModuleRuby == 'nil':
+        return;
+
+    #----------------------------------------------------------------
+    # [3] Get the Ruby version code as done in "build.sh"
+    #----------------------------------------------------------------
+    rubyExe  = RubyDictionary[ModuleRuby]['exe']
+    oneline  = "puts (RbConfig::CONFIG['MAJOR'] || 0).to_i*10000+(RbConfig::CONFIG['MINOR'] || 0).to_i*100+(RbConfig::CONFIG['TEENY'] || 0).to_i"
+    command  = [ '%s' % rubyExe, '-rrbconfig', '-e', '%s' % oneline ]
+    verCode  = subprocess.check_output( command, encoding='utf-8' ).strip() # like 3.1.2 => "30102"
+    verInt   = int(verCode)
+    verMajor = verInt // 10000
+    verMinor = (verInt - verMajor * 10000) // 100
+    verTeeny = (verInt - verMajor * 10000) - (verMinor * 100)
+    # print( verMajor, verMinor, verTeeny )
+    # quit()
+    if verMajor < 3:
+        return;
+
+    #-----------------------------------------------------------------------------------------------
+    # [4] The two buggy Apple compilers below flag errors like:
+    #
+    #     /Applications/anaconda3/include/ruby-3.1.0/ruby/internal/intern/vm.h:383:1: error: \
+    #     '__declspec' attributes are not enabled; use '-fdeclspec' or '-fms-extensions' to \
+    #     enable support for __declspec attributes RBIMPL_ATTR_NORETURN()
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #   Problematic in <Catalina> with
+    #     Apple clang version 12.0.0 (clang-1200.0.32.29)
+    #     Target: x86_64-apple-darwin19.6.0
+    #     Thread model: posix
+    #
+    #   Problematic in <Big Sur> with
+    #     Apple clang version 13.0.0 (clang-1300.0.29.30)
+    #     Target: x86_64-apple-darwin20.6.0
+    #     Thread model: posix
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #   Non-problematic in <Monterey> with
+    #     Apple clang version 13.1.6 (clang-1316.0.21.2.5)
+    #     Target: x86_64-apple-darwin21.6.0
+    #     Thread model: posix
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #   Refer to https://github.com/nginx/unit/issues/653
+    #            https://github.com/nginx/unit/issues/653#issuecomment-1062129080
+    #
+    #   Pass "-fdeclspec" option to the QMAKE_CXXFLAGS macro via the "./src/klayout.pri" file like:
+    """
+    # <build4mac.py> applied this patch for Mac to work with Ruby 3.x
+    mac {
+        QMAKE_CXXFLAGS += -fdeclspec
+    }
+    # <build4mac.py> applied this patch for Mac to work with Ruby 3.x
+    """
+    #-----------------------------------------------------------------------------------------------
+    #----------------------------------------------------------------
+    # (A) Check Platform
+    #----------------------------------------------------------------
+    Platform = config['Platform']
+    if Platform in [ "Monterey" ]:
+        return
+    elif Platform in [ "BigSur", "Catalina" ]: # take care
+        pass
+    else:
+        return # the results are not tested and unknown
+
+    #----------------------------------------------------------------
+    # (B) Check ./src/klayout.pri and apply the patch if necessary
+    #----------------------------------------------------------------
+    keystring = "<build4mac.py> applied this patch for Mac to work with Ruby 3.x"
+    patPatch  = r"(^#)([ ]*)(%s)([ ]*$)" % keystring
+    regPatch  = re.compile(patPatch)
+    foundKey1 = False
+    foundKey2 = False
+
+    with codecs.open( priMaster, "r", "utf-8" ) as file:
+        allLines = file.readlines()
+        file.close()
+        for line in allLines:
+            if regPatch.match( line.strip() ):
+                if not foundKey1:
+                    foundKey1 = True
+                    continue
+                elif not foundKey2:
+                    foundKey2 = True
+                    break
+    if foundKey1 and foundKey2:
+        return
+
+    shutil.copy2( priMaster, priOriginal )
+    with codecs.open( priMaster, "a", "utf-8" ) as file:
+        file.write( "# %s\n" % keystring )
+        file.write( "mac {\n" )
+        file.write( "    QMAKE_CXXFLAGS += -fdeclspec\n" )
+        file.write( "}\n" )
+        file.write( "# %s\n" % keystring )
+    return
+
+#------------------------------------------------------------------------------
 ## To parse the command line parameters
 #
 # @param[in] config     dictionary containing the default configuration
@@ -261,7 +379,7 @@ def Parse_CLI_Args(config):
 
     p.add_option( '-r', '--ruby',
                     dest='type_ruby',
-                    help="Ruby type=['nil', 'Sys', 'MP27', 'HB27', 'Ana3']" )
+                    help="Ruby type=['nil', 'Sys', 'MP31', 'HB31', 'Ana3']" )
 
     p.add_option( '-p', '--python',
                     dest='type_python',
@@ -325,7 +443,7 @@ def Parse_CLI_Args(config):
 
     if Platform.upper() in [ "MONTEREY", "BIGSUR" ]: # with Xcode [13.1 .. ]
         p.set_defaults( type_qt        = "qt5brew",
-                        type_ruby      = "hb27",
+                        type_ruby      = "hb31",
                         type_python    = "hb38",
                         build_pymod    = False,
                         no_qt_binding  = False,
@@ -387,8 +505,8 @@ def Parse_CLI_Args(config):
     candidates         = dict()
     candidates['NIL']  = 'nil'
     candidates['SYS']  = 'Sys'
-    candidates['MP27'] = 'MP27'
-    candidates['HB27'] = 'HB27'
+    candidates['MP31'] = 'MP31'
+    candidates['HB31'] = 'HB31'
     candidates['ANA3'] = 'Ana3'
     try:
         choiceRuby = candidates[ opt.type_ruby.upper() ]
@@ -415,11 +533,11 @@ def Parse_CLI_Args(config):
                 ModuleRuby = 'RubySierra'
             elif Platform == "ElCapitan":
                 ModuleRuby = 'RubyElCapitan'
-        elif choiceRuby == "MP27":
-            ModuleRuby   = 'Ruby27MacPorts'
+        elif choiceRuby == "MP31":
+            ModuleRuby   = 'Ruby31MacPorts'
             NonOSStdLang = True
-        elif choiceRuby == "HB27":
-            ModuleRuby   = 'Ruby27Brew'
+        elif choiceRuby == "HB31":
+            ModuleRuby   = 'Ruby31Brew'
             NonOSStdLang = True
         elif choiceRuby == "Ana3":
             ModuleRuby   = 'RubyAnaconda3'
@@ -660,6 +778,7 @@ def Get_Build_Parameters(config):
 
     # (H) about Ruby
     if ModuleRuby != "nil":
+        ApplyPatch2KLayoutQtPri4Ruby3( config )
         parameters['ruby']  = RubyDictionary[ModuleRuby]['exe']
         parameters['rbinc'] = RubyDictionary[ModuleRuby]['inc']
         parameters['rblib'] = RubyDictionary[ModuleRuby]['lib']
@@ -685,7 +804,7 @@ def Get_Build_Parameters(config):
     #     <pymod> will be built if:
     #       BuildPymod   = True
     #       Platform     = [ 'Monterey', 'BigSur', 'Catalina' ]
-    #       ModuleRuby   = [ 'Ruby27MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]
+    #       ModuleRuby   = [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3' ]
     #       ModulePython = [ 'Python38MacPorts', 'Python38Brew',
     #                        'PythonAnaconda3',  'PythonAutoBrew' ]
     parameters['BuildPymod']   = BuildPymod
@@ -695,7 +814,7 @@ def Get_Build_Parameters(config):
 
     PymodDistDir = dict()
     if Platform in [ 'Monterey', 'BigSur', 'Catalina' ]:
-        if ModuleRuby in [ 'Ruby27MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]:
+        if ModuleRuby in [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3' ]:
             if ModulePython in ['Python38MacPorts']:
                 PymodDistDir[ModulePython] = 'dist-MP3'
             elif ModulePython in [ 'Python38Brew', 'PythonAutoBrew' ]:
@@ -718,7 +837,7 @@ def Build_pymod(parameters):
     # [1] <pymod> will be built if:
     #       BuildPymod   = True
     #       Platform     = [ 'Monterey', 'BigSur', 'Catalina' ]
-    #       ModuleRuby   = [ 'Ruby27MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]
+    #       ModuleRuby   = [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3' ]
     #       ModulePython = [ 'Python38MacPorts', 'Python38Brew',
     #                        'PythonAnaconda3',  'PythonAutoBrew' ]
     #---------------------------------------------------------------------------
@@ -730,7 +849,7 @@ def Build_pymod(parameters):
         return 0
     if not Platform in [ 'Monterey', 'BigSur', 'Catalina' ]:
         return 0
-    elif not ModuleRuby in [ 'Ruby27MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]:
+    elif not ModuleRuby in [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3' ]:
         return 0
     elif not ModulePython in [ 'Python38MacPorts', 'Python38Brew', 'PythonAnaconda3', 'PythonAutoBrew' ]:
         return 0
@@ -1503,13 +1622,13 @@ def Deploy_Binaries_For_Bundle(config, parameters):
                     file.write(line)
 
         #-------------------------------------------------------------
-        # [10] Special deployment of Ruby2.7 from Homebrew?
+        # [10] Special deployment of Ruby3.1 from Homebrew?
         #-------------------------------------------------------------
-        deploymentRuby27HB = (ModuleRuby == 'Ruby27Brew')
-        if deploymentRuby27HB and NonOSStdLang:
+        deploymentRuby31HB = (ModuleRuby == 'Ruby31Brew')
+        if deploymentRuby31HB and NonOSStdLang:
 
             print( "" )
-            print( " [10] You have reached optional deployment of Ruby from %s ..." % HBRuby27Path )
+            print( " [10] You have reached optional deployment of Ruby from %s ..." % HBRuby31Path )
             print( "   [!!!] Sorry, the deployed package will not work properly since deployment of" )
             print( "         Ruby2.7 from Homebrew is not yet supported." )
             print( "         Since you have Homebrew development environment, there two options:" )

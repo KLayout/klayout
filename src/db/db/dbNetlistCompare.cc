@@ -1086,7 +1086,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     }
 
     if (pass + 1 == num_passes && ! good && mp_logger && mp_logger->wants_log_entries ()) {
-      compare.analyze_failed_matches (nodes, other_nodes);
+      compare.analyze_failed_matches ();
     }
 
   }

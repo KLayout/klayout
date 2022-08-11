@@ -88,7 +88,7 @@ public:
   /**
    *  @brief Analyzes the non-matched remaining nodes and produces log output
    */
-  void analyze_failed_matches (std::vector<NodeEdgePair> &nodes, std::vector<NodeEdgePair> &other_nodes) const;
+  void analyze_failed_matches () const;
 
   size_t max_depth;
   size_t max_n_branch;

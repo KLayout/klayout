@@ -1492,11 +1492,7 @@ NetlistCompareCore::analyze_failed_matches () const
   }
 
   for (auto i = singular1.begin (); i != singular1.end (); ++i) {
-    logger->log_entry (db::NetlistCompareLogger::Error, tl::sprintf (tl::to_string (tr ("Net %s from primary netlist is not matching any net from reference netlist")), (*i)->net ()->expanded_name ()));
-  }
-
-  for (auto i = singular2.begin (); i != singular2.end (); ++i) {
-    logger->log_entry (db::NetlistCompareLogger::Error, tl::sprintf (tl::to_string (tr ("Net %s from reference netlist is not matching any net from primary netlist")), (*i)->net ()->expanded_name ()));
+    logger->log_entry (db::NetlistCompareLogger::Error, tl::sprintf (tl::to_string (tr ("Net %s is not matching any net from reference netlist")), (*i)->net ()->expanded_name ()));
   }
 
   //  attempt some analysis for close matches (including shorts / opens)
@@ -1554,6 +1550,9 @@ NetlistCompareCore::derive_node_identities_from_node_set (std::vector<NodeEdgePa
   }
 
   if (max_depth != std::numeric_limits<size_t>::max() && depth > max_depth) {
+    if (logger->wants_log_entries ()) {
+      logger->log_entry (db::NetlistCompareLogger::Warning, tl::sprintf (tl::to_string (tr ("Maximum depth exhausted (max depth is %d)")), int (max_depth)));
+    }
     if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
       tl::info << indent_s << "max. depth exhausted (" << depth << ">" << max_depth << ")";
     }
@@ -1669,6 +1668,9 @@ NetlistCompareCore::derive_node_identities_from_node_set (std::vector<NodeEdgePa
 
     } else if (max_n_branch != std::numeric_limits<size_t>::max () && double (std::max (nr->num1, nr->num2)) * double (n_branch) > double (max_n_branch)) {
 
+      if (logger->wants_log_entries ()) {
+        logger->log_entry (db::NetlistCompareLogger::Warning, tl::sprintf (tl::to_string (tr ("Maximum complexity exhausted (max complexity is %s, needs at least %s)")), tl::to_string (max_n_branch), tl::to_string (std::max (nr->num1, nr->num2) * n_branch)));
+      }
       if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
         tl::info << indent_s << "max. complexity exhausted (" << std::max (nr->num1, nr->num2) << "*" << n_branch << ">" << max_n_branch << ") - mismatch.";
       }

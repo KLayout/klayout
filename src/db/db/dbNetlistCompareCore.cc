@@ -1276,11 +1276,11 @@ static size_t distance (const NetGraphNode &a, const NetGraphNode &b)
       continue;
     }
 
-    if (*i < *j) {
+    if (i->first < j->first) {
       ++fuzz;
       ++i;
       continue;
-    } else if (*j < *i) {
+    } else if (j->first < i->first) {
       ++fuzz;
       ++j;
       continue;
@@ -1294,8 +1294,22 @@ static size_t distance (const NetGraphNode &a, const NetGraphNode &b)
   return fuzz;
 }
 
-static size_t distance3 (const NetGraphNode &a, const NetGraphNode &b1, const NetGraphNode &b2)
+static size_t distance3 (const NetGraphNode &a, const NetGraphNode &b1, const NetGraphNode &b2, const NetGraph &gb)
 {
+  bool needs_join = false;
+
+  for (auto e = b1.begin (); e != b1.end () && ! needs_join; ++e) {
+    needs_join = (e->second.second == b1.net () || e->second.second == b2.net ());
+  }
+
+  for (auto e = b2.begin (); e != b2.end () && ! needs_join; ++e) {
+    needs_join = (e->second.second == b1.net () || e->second.second == b2.net ());
+  }
+
+  if (needs_join) {
+    return distance (a, gb.joined (b1, b2));
+  }
+
   auto i = a.begin ();
   auto j1 = b1.begin ();
   auto j2 = b2.begin ();
@@ -1319,11 +1333,11 @@ static size_t distance3 (const NetGraphNode &a, const NetGraphNode &b1, const Ne
       continue;
     }
 
-    if (*i < *j) {
+    if (i->first < j->first) {
       ++fuzz;
       ++i;
       continue;
-    } else if (*j < *i) {
+    } else if (j->first < i->first) {
       ++fuzz;
       ++j;
       continue;
@@ -1338,12 +1352,13 @@ static size_t distance3 (const NetGraphNode &a, const NetGraphNode &b1, const Ne
 }
 
 static void
-analyze_nodes_for_close_matches (const std::multimap<size_t, const NetGraphNode *> &nodes_by_edges1, const std::multimap<size_t, const NetGraphNode *> &nodes_by_edges2, bool layout2ref, db::NetlistCompareLogger *logger)
+analyze_nodes_for_close_matches (const std::multimap<size_t, const NetGraphNode *> &nodes_by_edges1, const std::multimap<size_t, const NetGraphNode *> &nodes_by_edges2, bool layout2ref, db::NetlistCompareLogger *logger, const db::NetGraph &g2)
 {
   size_t max_search = 100;
-  double max_fuzz_factor = 0.1;
+  double max_fuzz_factor = 0.25;
   size_t max_fuzz_count = 3;
-  size_t min_edges = 6;
+  size_t max_edges_split = 3;  //  by how many edges joining will reduce the edge count at max
+  size_t min_edges = 2;
 
   std::string msg;
   if (layout2ref) {
@@ -1358,7 +1373,11 @@ analyze_nodes_for_close_matches (const std::multimap<size_t, const NetGraphNode 
       continue;
     }
 
+    std::set<const db::NetGraphNode *> seen;
+
     for (auto j = nodes_by_edges2.begin (); j != nodes_by_edges2.end (); ++j) {
+
+      seen.insert (j->second);
 
       if (j->first > i->first + max_fuzz_count - 1) {
         break;
@@ -1388,14 +1407,14 @@ analyze_nodes_for_close_matches (const std::multimap<size_t, const NetGraphNode 
       auto k = nodes_by_edges2.lower_bound (ne);
 
       size_t tries = max_search;
-      while (k != nodes_by_edges2.end () && j->first + k->first < i->first + max_fuzz_count && tries > 0) {
+      for ( ; k != nodes_by_edges2.end () && j->first + k->first < i->first + max_fuzz_count + max_edges_split && tries > 0; ++k) {
 
-        if (k == j) {
+        if (seen.find (k->second) != seen.end ()) {
           continue;
         }
 
-        size_t fuzz = distance3 (*i->second, *j->second, *k->second);
-        double fuzz_factor = double (fuzz) / ne;
+        size_t fuzz = distance3 (*i->second, *j->second, *k->second, g2);
+        double fuzz_factor = double (fuzz) / i->first;
         if (fuzz_factor < max_fuzz_factor) {
           logger->log_entry (db::NetlistCompareLogger::Info, tl::sprintf (msg,
                                   (layout2ref ? i : j)->second->net ()->expanded_name (),
@@ -1405,7 +1424,6 @@ analyze_nodes_for_close_matches (const std::multimap<size_t, const NetGraphNode 
         }
 
         --tries;
-        ++k;
 
       }
 
@@ -1495,8 +1513,8 @@ NetlistCompareCore::analyze_failed_matches () const
     nodes_by_edges2.insert (std::make_pair (n->end () - n->begin (), n));
   }
 
-  analyze_nodes_for_close_matches (nodes_by_edges1, nodes_by_edges2, true, logger);
-  analyze_nodes_for_close_matches (nodes_by_edges2, nodes_by_edges1, false, logger);
+  analyze_nodes_for_close_matches (nodes_by_edges1, nodes_by_edges2, true, logger, *mp_other_graph);
+  analyze_nodes_for_close_matches (nodes_by_edges2, nodes_by_edges1, false, logger, *mp_graph);
 }
 
 size_t

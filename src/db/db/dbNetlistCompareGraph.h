@@ -272,6 +272,11 @@ public:
     }
   }
 
+  std::vector<edge_type> &edges ()
+  {
+    return m_edges;
+  }
+
 private:
   const db::Net *mp_net;
   size_t m_other_net_index;
@@ -413,6 +418,11 @@ public:
   {
     return const_cast<db::NetGraphNode &> (((const NetGraph *) this)->virtual_node (sc));
   }
+
+  /**
+   * @brief Creates a new node representing two joined nodes
+   */
+  NetGraphNode joined (const NetGraphNode &a, const NetGraphNode &b) const;
 
   /**
    *  @brief Gets the net for a given node index

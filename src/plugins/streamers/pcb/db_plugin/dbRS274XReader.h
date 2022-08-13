@@ -48,7 +48,7 @@ class RS274XReader
   : public GerberFileReader
 {
 public:
-  RS274XReader ();
+  RS274XReader (int warn_level);
   ~RS274XReader ();
 
   double um (double u)

@@ -489,8 +489,12 @@ OASISReader::error (const std::string &msg)
 }
 
 void 
-OASISReader::warn (const std::string &msg) 
+OASISReader::warn (const std::string &msg, int wl)
 {
+  if (warn_level () < wl) {
+    return;
+  }
+
   if (warnings_as_errors ()) {
     error (msg);
   } else {

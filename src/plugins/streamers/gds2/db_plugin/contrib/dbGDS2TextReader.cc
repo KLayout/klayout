@@ -302,8 +302,12 @@ GDS2ReaderText::error (const std::string &msg)
 }
 
 void 
-GDS2ReaderText::warn (const std::string &msg) 
+GDS2ReaderText::warn (const std::string &msg, int wl)
 {
+  if (warn_level () < wl) {
+    return;
+  }
+
   // TODO: compress
   tl::warn << msg 
            << tl::to_string (tr (", line number=")) << sStream.line_number()

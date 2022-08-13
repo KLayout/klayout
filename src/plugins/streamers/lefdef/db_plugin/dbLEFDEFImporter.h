@@ -1342,7 +1342,7 @@ public:
 
 protected:
   virtual void common_reader_error (const std::string &msg);
-  virtual void common_reader_warn (const std::string &msg);
+  virtual void common_reader_warn (const std::string &msg, int warn_level = 1);
 
 private:
   /**
@@ -1490,7 +1490,7 @@ public:
   /**
    *  @brief Default constructor
    */
-  LEFDEFImporter ();
+  LEFDEFImporter (int warn_level);
 
   /**
    *  @brief Destructor
@@ -1520,7 +1520,7 @@ protected:
   /**
    *  @brief Issue a warning at the current location
    */
-  void warn (const std::string &msg);
+  void warn (const std::string &msg, int wl = 1);
 
   /**
    *  @brief Returns true if the reader is at the end of the file
@@ -1705,6 +1705,7 @@ private:
   bool m_produce_pin_props;
   db::property_names_id_type m_pin_prop_name_id;
   db::LEFDEFReaderOptions m_options;
+  int m_warn_level;
 
   const std::string &next ();
 };

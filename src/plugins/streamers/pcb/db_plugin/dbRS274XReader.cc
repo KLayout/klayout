@@ -30,8 +30,8 @@ namespace db
 // ---------------------------------------------------------------------------------
 //  RS274XReader implementation
 
-RS274XReader::RS274XReader ()
-  : GerberFileReader ()
+RS274XReader::RS274XReader (int warn_level)
+  : GerberFileReader (warn_level)
 {
   init ();
 }

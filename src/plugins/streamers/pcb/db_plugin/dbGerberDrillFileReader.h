@@ -57,7 +57,7 @@ class GerberDrillFileReader
   : public GerberFileReader
 {
 public:
-  GerberDrillFileReader ();
+  GerberDrillFileReader (int warn_level);
   ~GerberDrillFileReader ();
 
   double um (double u)

@@ -316,6 +316,8 @@ DXFReader::determine_polyline_mode ()
 const LayerMap &
 DXFReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
+  init (options);
+
   const db::DXFReaderOptions &specific_options = options.get_options<db::DXFReaderOptions> ();
 
   m_dbu = specific_options.dbu;
@@ -372,8 +374,12 @@ DXFReader::error (const std::string &msg)
 }
 
 void 
-DXFReader::warn (const std::string &msg) 
+DXFReader::warn (const std::string &msg, int wl)
 {
+  if (warn_level () < wl) {
+    return;
+  }
+
   // TODO: compress
   if (m_ascii) {
     tl::warn << msg 
@@ -2794,7 +2800,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
       }
 
     } else {
-      warn ("Entity " + entity_code + " not supported - ignored.");
+      warn ("Entity " + entity_code + " not supported - ignored.", 2);
       while ((g = read_group_code()) != 0) {
         skip_value (g);
       }
@@ -2978,7 +2984,7 @@ DXFReader::skip_value (int g)
     read_int32 ();
   } else {
     if (m_ascii) {
-      warn ("Unexpected group code: " + tl::to_string (g));
+      warn ("Unexpected group code: " + tl::to_string (g), 2);
     } else {
       error ("Unexpected group code: " + tl::to_string (g));
     }
@@ -2998,7 +3004,7 @@ DXFReader::read_group_code ()
       tl::Extractor ex (m_line.c_str ()); 
       int x = 0;
       if (! ex.try_read (x) || ! ex.at_end ()) {
-        warn ("Expected an ASCII integer value - line ignored");
+        warn ("Expected an ASCII integer value - line ignored", 2);
       } else {
         return x;
       }

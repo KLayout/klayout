@@ -61,7 +61,7 @@ join_layer_names (std::string &s, const std::string &n)
 //  ReaderBase implementation
 
 ReaderBase::ReaderBase () 
-  : m_warnings_as_errors (false)
+  : m_warnings_as_errors (false), m_warn_level (1)
 { 
 }
 
@@ -73,6 +73,12 @@ void
 ReaderBase::set_warnings_as_errors (bool f)
 {
   m_warnings_as_errors = f;
+}
+
+void
+ReaderBase::init (const db::LoadLayoutOptions &options)
+{
+  m_warn_level = options.warn_level ();
 }
 
 // ---------------------------------------------------------------

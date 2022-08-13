@@ -384,7 +384,20 @@ namespace gsi
 
   //  NOTE: the contribution comes from format specific extensions.
   Class<db::LoadLayoutOptions> decl_LoadLayoutOptions ("db", "LoadLayoutOptions",
-    gsi::Methods (),
+    gsi::method ("warn_level=", &db::LoadLayoutOptions::set_warn_level, gsi::arg ("level"),
+      "@brief Sets the warning level.\n"
+      "The warning level is a reader-specific setting which enables or disables warnings\n"
+      "on specific levels. Level 0 is always \"warnings off\". The default level is 1\n"
+      "which means \"reasonable warnings emitted\".\n"
+      "\n"
+      "This attribute has been added in version 0.28."
+    ) +
+    gsi::method ("warn_level", &db::LoadLayoutOptions::warn_level,
+      "@brief Sets the warning level.\n"
+      "See \\warn_level= for details about this attribute.\n"
+      "\n"
+      "This attribute has been added in version 0.28."
+    ),
     "@brief Layout reader options\n"
     "\n"
     "This object describes various layer reader options used for loading layouts.\n"

@@ -72,6 +72,8 @@ MAGReader::read (db::Layout &layout)
 const LayerMap &
 MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
+  init (options);
+
   prepare_layers (layout);
 
   mp_klayout_tech = layout.technology ();
@@ -135,8 +137,12 @@ MAGReader::error (const std::string &msg)
 }
 
 void 
-MAGReader::warn (const std::string &msg)
+MAGReader::warn (const std::string &msg, int wl)
 {
+  if (warn_level () < wl) {
+    return;
+  }
+
   // TODO: compress
   tl::warn << msg 
            << tl::to_string (tr (" (line=")) << mp_current_stream->line_number ()

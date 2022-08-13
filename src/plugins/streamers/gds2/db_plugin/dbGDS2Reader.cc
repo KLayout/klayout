@@ -272,8 +272,12 @@ GDS2Reader::error (const std::string &msg)
 }
 
 void 
-GDS2Reader::warn (const std::string &msg) 
+GDS2Reader::warn (const std::string &msg, int wl)
 {
+  if (warn_level () < wl) {
+    return;
+  }
+
   // TODO: compress
   tl::warn << msg 
            << tl::to_string (tr (" (position=")) << m_stream.pos ()

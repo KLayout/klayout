@@ -30,6 +30,7 @@
 namespace db
 {
   LoadLayoutOptions::LoadLayoutOptions ()
+    : m_warn_level (1)
   {
     // .. nothing yet ..
   }
@@ -43,6 +44,8 @@ namespace db
   LoadLayoutOptions::operator= (const LoadLayoutOptions &d)
   {
     if (&d != this) {
+
+      m_warn_level = d.m_warn_level;
 
       release ();
       for (std::map <std::string, FormatSpecificReaderOptions *>::const_iterator o = d.m_options.begin (); o != d.m_options.end (); ++o) {

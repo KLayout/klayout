@@ -129,7 +129,7 @@ public:
    *
    *  Reimplements CIFDiagnostics
    */
-  virtual void warn (const std::string &txt);
+  virtual void warn (const std::string &txt, int warn_level = 1);
 
 private:
   tl::TextInputStream m_stream;

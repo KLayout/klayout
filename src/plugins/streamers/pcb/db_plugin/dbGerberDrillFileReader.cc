@@ -29,8 +29,8 @@ namespace db
 // ---------------------------------------------------------------------------------
 //  GerberDrillFileReader implementation
 
-GerberDrillFileReader::GerberDrillFileReader ()
-  : GerberFileReader ()
+GerberDrillFileReader::GerberDrillFileReader (int warn_level)
+  : GerberFileReader (warn_level)
 {
   init ();
 }

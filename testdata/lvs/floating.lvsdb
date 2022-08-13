@@ -377,6 +377,12 @@ reference(
 # Cross reference
 xref(
  circuit(DINV DINV match
+  log(
+   entry(warning description('Matching nets B<1> from an ambiguous group of nets'))
+   entry(warning description('Matching nets B<2> from an ambiguous group of nets'))
+   entry(info description('Matching nets A<1> following an ambiguous match'))
+   entry(info description('Matching nets A<2> following an ambiguous match'))
+  )
   xref(
    net(1 1 match)
    net(2 2 match)

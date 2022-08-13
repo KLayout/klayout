@@ -93,4 +93,5 @@ schematic.simplify
 # Netlist vs. netlist
 align
 netlist.simplify
+no_lvs_hints
 compare

@@ -71,15 +71,27 @@ nl_compare_debug_indent (size_t depth)
   return s;
 }
 
-const std::string var_sep (" \u21D4 ");
+const std::string var_sep = tl::to_string (tr (" vs. "));
+
+static std::string
+expanded_name (const db::Net *a)
+{
+  if (a == 0) {
+    return tl::to_string (tr ("(not connected)"));
+  } else {
+    return a->expanded_name ();
+  }
+}
 
 std::string
 nets2string (const db::Net *a, const db::Net *b)
 {
-  if (a->expanded_name () != b->expanded_name ()) {
-    return a->expanded_name () + var_sep + b->expanded_name ();
+  std::string na = expanded_name (a);
+  std::string nb = expanded_name (b);
+  if (na != nb) {
+    return na + var_sep + nb;
   } else {
-    return a->expanded_name ();
+    return nb;
   }
 }
 

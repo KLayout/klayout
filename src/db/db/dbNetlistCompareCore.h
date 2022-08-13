@@ -96,6 +96,7 @@ public:
   bool dont_consider_net_names;
   bool with_ambiguous;
   NetlistCompareLogger *logger;
+  bool with_log;
   CircuitPinCategorizer *circuit_pin_mapper;
   SubCircuitEquivalenceTracker *subcircuit_equivalence;
   DeviceEquivalenceTracker *device_equivalence;

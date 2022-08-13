@@ -446,6 +446,9 @@ xref(
   )
  )
  circuit(testall TESTALL nomatch
+  log(
+   entry(error description('Net $2 is not matching any net from reference netlist'))
+  )
   xref(
    net(() 6 mismatch)
    net(3 2 match)

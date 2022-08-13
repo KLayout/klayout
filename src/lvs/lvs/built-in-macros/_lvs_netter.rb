@@ -499,6 +499,7 @@ CODE
     def _comparer_mini
 
       comparer = RBA::NetlistComparer::new
+      comparer.with_log = false
 
       # execute the configuration commands
       @comparer_miniconfig.each do |cc|
@@ -518,6 +519,17 @@ CODE
 
     end
       
+    # %LVS%
+    # @name no_lvs_hints
+    # @brief Disables LVS hints
+    # @synopsis no_lvs_hints
+    # LVS hints may be expensive to compute. Use this function to disable
+    # generation of LVS hints
+
+    def no_lvs_hints
+      @comparer_config << lambda { |comparer| comparer.with_log = false }
+    end
+
     # %LVS%
     # @name same_nets
     # @brief Establishes an equivalence between the nets

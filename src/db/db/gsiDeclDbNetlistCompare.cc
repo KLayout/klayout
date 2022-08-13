@@ -34,7 +34,7 @@ class GenericNetlistCompareLogger
 {
 public:
   GenericNetlistCompareLogger ()
-    : db::NetlistCompareLogger (), m_wants_log (false)
+    : db::NetlistCompareLogger ()
   {
     //  .. nothing yet ..
   }
@@ -149,21 +149,6 @@ public:
   void log_entry_fb (db::NetlistCompareLogger::Severity severity, const std::string &msg)
   {
     db::NetlistCompareLogger::log_entry (severity, msg);
-  }
-
-  virtual bool wants_log () const
-  {
-    return m_wants_log;
-  }
-
-  bool get_wants_log () const
-  {
-    return m_wants_log;
-  }
-
-  void set_wants_log (bool f)
-  {
-    m_wants_log = f;
   }
 
   virtual void match_nets (const db::Net *a, const db::Net *b)
@@ -329,7 +314,6 @@ public:
   gsi::Callback cb_match_nets;
   gsi::Callback cb_circuit_mismatch;
   gsi::Callback cb_log_entry;
-  gsi::Callback cb_wants_log;
   gsi::Callback cb_net_mismatch;
   gsi::Callback cb_match_ambiguous_nets;
   gsi::Callback cb_match_devices;
@@ -344,8 +328,6 @@ public:
 private:
   GenericNetlistCompareLogger (const GenericNetlistCompareLogger &d);
   GenericNetlistCompareLogger &operator= (const GenericNetlistCompareLogger &d);
-
-  bool m_wants_log;
 };
 
 }
@@ -405,20 +387,7 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger (decl_dbNetl
   gsi::callback ("log_entry", &GenericNetlistCompareLogger::log_entry, &GenericNetlistCompareLogger::cb_log_entry, gsi::arg ("level"), gsi::arg ("msg"),
     "@brief Issues an entry for the compare log.\n"
     "This method delivers a log message generated during the compare of two circuits.\n"
-    "It is called between of \\begin_circuit and \\end_circuit and only if \\wants_log returns true.\n"
-    "\n"
-    "This method has been added in version 0.28."
-  ) +
-  gsi::method ("wants_log=", &GenericNetlistCompareLogger::set_wants_log, gsi::arg ("value"),
-    "@brief Sets a value indicating whether the receiver wants log messages.\n"
-    "Log messages may include compare hints which are expensive to compute. Hence, by default, log generation is turned off. "
-    "Set this attribute to true in order to receive log messages.\n"
-    "\n"
-    "This method has been added in version 0.28."
-  ) +
-  gsi::method ("wants_log", &GenericNetlistCompareLogger::get_wants_log,
-    "@brief Gets a value indicating whether the receiver wants log messages.\n"
-    "See \\wants_log= for details about this flag.\n"
+    "It is called between of \\begin_circuit and \\end_circuit.\n"
     "\n"
     "This method has been added in version 0.28."
   ) +
@@ -524,6 +493,19 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
     "@brief Creates a new comparer object.\n"
     "The logger is a delegate or event receiver which the comparer will send compare events to. "
     "See the class description for more details."
+  ) +
+  gsi::method ("with_log=", &db::NetlistComparer::set_with_log, gsi::arg ("flag"),
+    "@brief Sets a value indicating that log messages are generated.\n"
+    "Log messages may be expensive to compute, hence they can be turned off.\n"
+    "By default, log messages are generated.\n"
+    "\n"
+    "This attribute have been introduced in version 0.28.\n"
+  ) +
+  gsi::method ("with_log", &db::NetlistComparer::with_log,
+    "@brief Gets a value indicating that log messages are generated.\n"
+    "See \\with_log= for details about this flag.\n"
+    "\n"
+    "This attribute have been introduced in version 0.28.\n"
   ) +
   gsi::method ("same_nets", (void (db::NetlistComparer::*) (const db::Net *, const db::Net *, bool)) &db::NetlistComparer::same_nets, gsi::arg ("net_a"), gsi::arg ("net_b"), gsi::arg ("must_match", false),
     "@brief Marks two nets as identical.\n"

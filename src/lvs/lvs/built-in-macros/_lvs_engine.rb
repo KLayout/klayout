@@ -90,10 +90,16 @@ module LVS
  
     # %LVS%
     # @name compare
-    # @brief Compares the extracted netlist vs. the schematic
+    # @brief Compares the extracted netlist vs. the schematic netlist
     # @synopsis compare
     # See \Netter#compare for a description of that function.
  
+    # %LVS%
+    # @name no_lvs_hints
+    # @brief Disables LVS hints
+    # @synopsis no_lvs_hints
+    # See \Netter#no_lvs_hints for a description of that feature.
+
     # %LVS%
     # @name join_symmetric_nets
     # @brief Joins symmetric nets of selected circuits on the extracted netlist
@@ -216,7 +222,7 @@ module LVS
 
     %w(schematic compare split_gates join_symmetric_nets tolerance ignore_parameter enable_parameter disable_parameter 
        blank_circuit align same_nets same_nets! same_circuits same_device_classes equivalent_pins 
-       min_caps max_res max_depth max_branch_complexity consider_net_names lvs_data).each do |f|
+       min_caps max_res max_depth max_branch_complexity consider_net_names lvs_data no_lvs_hints).each do |f|
       eval <<"CODE"
         def #{f}(*args)
           _netter.#{f}(*args)

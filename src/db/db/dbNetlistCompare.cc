@@ -62,6 +62,8 @@ NetlistComparer::NetlistComparer (NetlistCompareLogger *logger)
 
   m_dont_consider_net_names = false;
   m_case_sensitive = false;
+
+  m_with_log = true;
 }
 
 NetlistComparer::~NetlistComparer ()
@@ -382,7 +384,7 @@ NetlistComparer::compare_impl (const db::Netlist *a, const db::Netlist *b) const
 
         std::string msg = generate_subcircuits_not_verified_warning (ca, verified_circuits_a, cb, verified_circuits_b);
 
-        if (mp_logger->wants_log_entries ()) {
+        if (m_with_log) {
           mp_logger->log_entry (db::NetlistCompareLogger::Error, msg);
         }
 
@@ -896,7 +898,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       //  in must_match mode, check if the nets are identical
       if (mp_logger) {
         if (p->second && ! exact_match) {
-          if (mp_logger->wants_log_entries ()) {
+          if (m_with_log) {
             mp_logger->log_entry (db::NetlistCompareLogger::Error,
                                   tl::sprintf (tl::to_string (tr ("Nets %s are paired explicitly, but are not identical topologically")), nets2string (p->first)));
           }
@@ -983,6 +985,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     compare.subcircuit_equivalence = &subcircuit_equivalence;
     compare.device_equivalence = &device_equivalence;
     compare.logger = mp_logger;
+    compare.with_log = m_with_log;
     compare.progress = &progress;
 
     std::vector<NodeEdgePair> nodes, other_nodes;
@@ -1085,7 +1088,7 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
 
     }
 
-    if (pass + 1 == num_passes && ! good && mp_logger && mp_logger->wants_log_entries ()) {
+    if (pass + 1 == num_passes && ! good && mp_logger && m_with_log) {
       compare.analyze_failed_matches ();
     }
 
@@ -1211,7 +1214,7 @@ NetlistComparer::handle_pin_mismatch (const db::NetGraph &g1, const db::Circuit 
   } else {
 
     if (mp_logger) {
-      if (mp_logger->wants_log_entries ()) {
+      if (m_with_log) {
         analyze_pin_mismatch (pin1, c1, pin2, c2, mp_logger);
       }
       mp_logger->pin_mismatch (pin1, pin2);

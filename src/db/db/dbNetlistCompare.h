@@ -100,16 +100,8 @@ public:
 
   /**
    *  @brief Receives log entries for the current circuit pair
-   *  These events are only generated when the "wants_log_entry" hint returns true.
    */
   virtual void log_entry (Severity /*level*/, const std::string & /*msg*/) { }
-
-  /**
-   *  @brief Returns a value indicating whether log entries need to be generated
-   *  Log entries may include hints which are expensive to compute. This method tells the
-   *  matching algorithm whether to create such entries or not.
-   */
-  virtual bool wants_log_entries () const { return false; }
 
   /**
    *  @brief Nets a and b match exactly
@@ -281,6 +273,24 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating that log messages are generated
+   *  Log messages may be expensive to compute, hence they can be turned off.
+   *  By default, log messages are generated.
+   */
+  void set_with_log (bool f)
+  {
+    m_with_log = f;
+  }
+
+  /**
+   *  @brief Gets a value indicating that log messages are generated
+   */
+  bool with_log () const
+  {
+    return m_with_log;
+  }
+
+  /**
    *  @brief Sets a value indicating whether not to consider net names
    *  This feature is mainly intended for testing.
    */
@@ -388,6 +398,7 @@ protected:
   bool handle_pin_mismatch (const NetGraph &g1, const db::Circuit *c1, const db::Pin *pin1, const NetGraph &g2, const db::Circuit *c2, const db::Pin *p2) const;
 
   mutable NetlistCompareLogger *mp_logger;
+  bool m_with_log;
   std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > > m_same_nets;
   std::unique_ptr<CircuitPinCategorizer> mp_circuit_pin_categorizer;
   std::unique_ptr<DeviceCategorizer> mp_device_categorizer;

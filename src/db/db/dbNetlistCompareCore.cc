@@ -403,6 +403,7 @@ NetlistCompareCore::NetlistCompareCore (NetGraph *graph, NetGraph *other_graph)
     dont_consider_net_names (false),
     with_ambiguous (false),
     logger (0),
+    with_log (true),
     circuit_pin_mapper (0),
     subcircuit_equivalence (0),
     device_equivalence (0),
@@ -1050,7 +1051,7 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
 
       if (ambiguous) {
         if (logger) {
-          if (logger->wants_log_entries ()) {
+          if (with_log) {
             logger->log_entry (db::NetlistCompareLogger::Warning,
                                tl::sprintf (tl::to_string (tr ("Matching nets %s from an ambiguous group of nets")), nets2string (p->first->net (), p->second->net ())));
           }
@@ -1114,7 +1115,7 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
           }
         }
 
-        if (logger && logger->wants_log_entries () && was_ambiguous) {
+        if (logger && with_log && was_ambiguous) {
           logger->log_entry (db::NetlistCompareLogger::Info,
                              tl::sprintf (tl::to_string (tr ("Matching nets %s following an ambiguous match")), nets2string (n->net (), n_other->net ())));
         }
@@ -1550,7 +1551,7 @@ NetlistCompareCore::derive_node_identities_from_node_set (std::vector<NodeEdgePa
   }
 
   if (max_depth != std::numeric_limits<size_t>::max() && depth > max_depth) {
-    if (logger->wants_log_entries ()) {
+    if (with_log) {
       logger->log_entry (db::NetlistCompareLogger::Warning, tl::sprintf (tl::to_string (tr ("Maximum depth exhausted (max depth is %d)")), int (max_depth)));
     }
     if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
@@ -1668,7 +1669,7 @@ NetlistCompareCore::derive_node_identities_from_node_set (std::vector<NodeEdgePa
 
     } else if (max_n_branch != std::numeric_limits<size_t>::max () && double (std::max (nr->num1, nr->num2)) * double (n_branch) > double (max_n_branch)) {
 
-      if (logger->wants_log_entries ()) {
+      if (with_log) {
         logger->log_entry (db::NetlistCompareLogger::Warning, tl::sprintf (tl::to_string (tr ("Maximum complexity exhausted (max complexity is %s, needs at least %s)")), tl::to_string (max_n_branch), tl::to_string (std::max (nr->num1, nr->num2) * n_branch)));
       }
       if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {

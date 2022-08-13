@@ -239,6 +239,7 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::NetlistCro
 
       for (db::NetlistCrossReference::PerCircuitData::log_entries_const_iterator l = pcd->log_entries.begin (); l != pcd->log_entries.end (); ++l) {
         TokenizedOutput (o, Keys::log_entry_key, true) << severity_to_s (l->severity) << message_to_s (l->msg);
+        o << endl;
       }
 
     }

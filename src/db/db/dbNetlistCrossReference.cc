@@ -27,7 +27,6 @@ namespace db
 {
 
 NetlistCrossReference::NetlistCrossReference ()
-  : m_wants_log_entries (true)
 {
   //  .. nothing yet ..
 }

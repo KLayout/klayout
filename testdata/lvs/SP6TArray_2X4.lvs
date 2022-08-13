@@ -198,6 +198,7 @@ extract_devices(mos4("sky130_fd_pr__pfet_g5v0d10v5__model"), {
 netlist
 
 align
+no_lvs_hints
 ok = compare
 if ok then
     print("LVS OK\n")

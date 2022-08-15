@@ -541,7 +541,13 @@ Action::configure_from_title (const std::string &s)
 void
 Action::menu_about_to_show ()
 {
+  //  keeps a reference to self in case the action handler code removes actions
+  tl::shared_ptr<Action> self_holder (this);
+
   BEGIN_PROTECTED
+
+  on_menu_opening_event ();
+  menu_opening ();
 
   if (! mp_dispatcher || ! mp_dispatcher->menu ()) {
     return;
@@ -565,7 +571,11 @@ Action::menu_about_to_show ()
 void
 Action::qaction_triggered ()
 {
+  //  keeps a reference to self in case the action handler code removes actions
+  tl::shared_ptr<Action> self_holder (this);
+
   BEGIN_PROTECTED
+  on_triggered_event ();
   triggered ();
   END_PROTECTED
 }
@@ -574,17 +584,27 @@ Action::qaction_triggered ()
 void
 Action::trigger ()
 {
+  //  keeps a reference to self in case the action handler code removes actions
+  tl::shared_ptr<Action> self_holder (this);
+
 #if defined(HAVE_QT)
   if (qaction ()) {
     qaction ()->trigger ();
   }
 #else
+  on_triggered_event ();
   triggered ();
 #endif
 }
 
 void
 Action::triggered ()
+{
+  //  .. no action yet, the reimplementation must provide some ..
+}
+
+void
+Action::menu_opening ()
 {
   //  .. no action yet, the reimplementation must provide some ..
 }
@@ -600,6 +620,76 @@ QMenu *
 Action::menu () const
 {
   return mp_menu;
+}
+
+static void
+configure_action (QAction *target, QAction *src)
+{
+  target->setShortcut (src->shortcut ());
+  target->setToolTip (src->toolTip ());
+  target->setCheckable (src->isCheckable ());
+  target->setChecked (src->isChecked ());
+  target->setEnabled (src->isEnabled ());
+  target->setIcon (src->icon ());
+  target->setIconText (src->iconText ());
+  target->setSeparator (src->isSeparator ());
+  target->setText (src->text ());
+  target->setVisible (src->isVisible ());
+}
+
+void
+Action::set_menu (QMenu *menu, bool owned)
+{
+  if (mp_menu == menu || ! lay::has_gui () || ! mp_action) {
+    return;
+  }
+
+  if (mp_menu && ! menu) {
+
+    QAction *new_action = new ActionObject (0);
+    configure_action (new_action, mp_action);
+
+    if (m_owned) {
+      delete mp_menu;
+    }
+    mp_menu = 0;
+
+    mp_action = new_action;
+    m_owned = true;
+
+  } else if (mp_menu && menu) {
+
+    configure_action (menu->menuAction (), mp_action);
+
+    if (m_owned) {
+      delete mp_menu;
+    }
+
+    mp_menu = menu;
+    m_owned = owned;
+    mp_action = menu->menuAction ();
+
+  } else if (! mp_menu && menu) {
+
+    configure_action (menu->menuAction (), mp_action);
+
+    if (m_owned) {
+      delete mp_action;
+    }
+
+    mp_menu = menu;
+    m_owned = owned;
+    mp_action = menu->menuAction ();
+
+  }
+
+  if (mp_menu) {
+    connect (mp_menu, SIGNAL (destroyed (QObject *)), this, SLOT (was_destroyed (QObject *)));
+    connect (mp_menu, SIGNAL (aboutToShow ()), this, SLOT (menu_about_to_show ()));
+  } else {
+    connect (mp_action, SIGNAL (destroyed (QObject *)), this, SLOT (was_destroyed (QObject *)));
+  }
+  connect (mp_action, SIGNAL (triggered ()), this, SLOT (qaction_triggered ()));
 }
 
 void
@@ -891,6 +981,17 @@ Action::set_icon (const std::string &filename)
   m_icon = filename;
 }
 
+#if defined(HAVE_QT)
+void
+Action::set_qicon (const QIcon &icon)
+{
+  if (qaction ()) {
+    qaction ()->setIcon (icon);
+  }
+  m_icon.clear ();
+}
+#endif
+
 std::string
 Action::get_tool_tip () const
 {
@@ -1072,13 +1173,10 @@ AbstractMenu::build_detached (const std::string &name, QFrame *mbar)
       menu_button->setText (tl::to_qstring (c->action ()->get_title ()));
 
       if (c->menu () == 0) {
-        QMenu *menu = new QMenu (mp_dispatcher->menu_parent_widget ());
-        menu_button->setMenu (menu);
-        c->set_action (new Action (menu), true);
-      } else {
-        menu_button->setMenu (c->menu ());
+        c->set_menu (new QMenu (mp_dispatcher->menu_parent_widget ()), true);
       }
 
+      menu_button->setMenu (c->menu ());
       build (c->menu (), c->children);
 
     } else {
@@ -1120,7 +1218,6 @@ static QAction *insert_action_after (QWidget *widget, QAction *after, QAction *a
 void
 AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 {
-  m_helper_menu_items.clear ();
   if (tbar) {
     tbar->clear ();
   }
@@ -1153,14 +1250,15 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 
         if (c->menu () == 0) {
           QMenu *menu = new QMenu (tl::to_qstring (c->action ()->get_title ()), mp_dispatcher->menu_parent_widget ());
-          // HINT: it is necessary to add the menu action to a widget below the main window.
-          // Otherwise, the keyboard shortcuts do not work for menu items inside such a
-          // popup menu. It seems not to have a negative effect to add the menu to the
-          // main widget.
-          if (mp_dispatcher->menu_parent_widget ()) {
-            mp_dispatcher->menu_parent_widget ()->addAction (menu->menuAction ());
-          }
-          c->set_action (new Action (menu), true);
+          c->action ()->set_menu (menu, true);
+        }
+
+        // HINT: it is necessary to add the menu action to a widget below the main window.
+        // Otherwise, the keyboard shortcuts do not work for menu items inside such a
+        // popup menu. It seems not to have a negative effect to add the menu to the
+        // main widget.
+        if (mp_dispatcher->menu_parent_widget ()) {
+          mp_dispatcher->menu_parent_widget ()->addAction (c->menu ()->menuAction ());
         }
 
         //  prepare a detached menu which can be used as context menus
@@ -1235,13 +1333,14 @@ AbstractMenu::build (QMenu *m, std::list<AbstractMenuItem> &items)
     if (c->has_submenu ()) {
 
       if (! c->menu ()) {
-        //  HINT: the action acts as a container for the title. Unfortunately, we cannot create a
-        //  menu with a given action. The action is provided by addMenu instead.
+
         QMenu *menu = new QMenu (mp_dispatcher->menu_parent_widget ());
         menu->setTitle (tl::to_qstring (c->action ()->get_title ()));
-        c->set_action (new Action (menu), true);
+        c->set_menu (menu, true);
         prev_action = insert_action_after (m, prev_action, menu->menuAction ());
+
       } else {
+
         //  Move the action to the end if present in the menu already
         std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.find (std::make_pair (id_from_action (c->menu ()->menuAction ()), c->menu ()->menuAction ()));
         if (a != present_actions.end ()) {
@@ -1254,6 +1353,7 @@ AbstractMenu::build (QMenu *m, std::list<AbstractMenuItem> &items)
         } else {
           prev_action = insert_action_after (m, prev_action, c->menu ()->menuAction ());
         }
+
       }
 
       build (c->menu (), c->children);
@@ -1288,22 +1388,15 @@ AbstractMenu::build (QToolBar *t, std::list<AbstractMenuItem> &items)
   for (std::list<AbstractMenuItem>::iterator c = items.begin (); c != items.end (); ++c) {
 
     if (! c->children.empty ()) {
-
       //  To support tool buttons with menu we have to attach a helper menu
       //  item to the QAction object.
-      //  TODO: this hurts if we use this QAction otherwise. In this case, this
-      //  QAction would get a menu too. However, hopefully this usage is constrained
-      //  to special toolbar buttons only.
-      //  In order to be able to manage the QMenu ourselves, we must not give it a parent.
-      QMenu *menu = new QMenu (0);
-      m_helper_menu_items.push_back (menu); // will be owned by the stable vector
-      c->action ()->qaction ()->setMenu (menu);
-      t->addAction (c->action ()->qaction ());
-      build (menu, c->children);
-
-    } else {
-      t->addAction (c->action ()->qaction ());
+      if (! c->menu ()) {
+        c->set_menu (new QMenu (0), true);
+      }
+      build (c->menu (), c->children);
     }
+
+    t->addAction (c->action ()->qaction ());
 
   }
 }
@@ -1437,6 +1530,10 @@ AbstractMenu::insert_separator (const std::string &p, const std::string &name)
 void
 AbstractMenu::insert_menu (const std::string &p, const std::string &name, Action *action)
 {
+  if (! action->menu ()) {
+    action->set_menu (new QMenu (), true);
+  }
+
   typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
   tl::Extractor extr (p.c_str ());
   path_type path = find_item (extr);

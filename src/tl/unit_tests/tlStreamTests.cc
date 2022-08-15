@@ -163,6 +163,23 @@ TEST(TextInputStream)
   }
 }
 
+TEST(DataInputStream)
+{
+  tl::InputStream is ("data:SGVsbG8sIHdvcmxkIQpXaXRoIGFub3RoZXIgbGluZQoNDQpzZXBhcmF0ZWQgYnkgYSBMRkNSIGFuZCBDUkxGLg==");
+  tl::TextInputStream tis (is);
+  EXPECT_EQ (tis.get_line (), "Hello, world!");
+  EXPECT_EQ (tis.line_number (), size_t (1));
+  EXPECT_EQ (tis.get_line (), "With another line");
+  EXPECT_EQ (tis.line_number (), size_t (2));
+  EXPECT_EQ (tis.peek_char (), '\n');
+  EXPECT_EQ (tis.get_line (), "");
+  EXPECT_EQ (tis.line_number (), size_t (3));
+  EXPECT_EQ (tis.peek_char (), 's');
+  EXPECT_EQ (tis.get_line (), "separated by a LFCR and CRLF.");
+  EXPECT_EQ (tis.line_number (), size_t (4));
+  EXPECT_EQ (tis.at_end (), true);
+}
+
 namespace
 {
 

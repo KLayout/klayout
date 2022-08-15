@@ -122,11 +122,20 @@ public:
    *
    *  @param data The memory block where to read from
    *  @param length The length of the block
+   *  @param owns_data If true, the memory becomes owned by the stream
    */
-  InputMemoryStream (const char *data, size_t length)
-    : mp_data (data), m_length (length), m_pos (0)
+  InputMemoryStream (const char *data, size_t length, bool owns_data = false)
+    : mp_data (data), m_length (length), m_owns_data (owns_data), m_pos (0)
   {
     //  .. nothing yet ..
+  }
+
+  ~InputMemoryStream ()
+  {
+    if (m_owns_data) {
+      delete [] const_cast<char *> (mp_data);
+    }
+    mp_data = 0;
   }
 
   virtual size_t read (char *b, size_t n)
@@ -170,7 +179,9 @@ private:
   InputMemoryStream &operator= (const InputMemoryStream &);
 
   const char *mp_data;
-  size_t m_length, m_pos;
+  size_t m_length;
+  bool m_owns_data;
+  size_t m_pos;
 };
 
 /**

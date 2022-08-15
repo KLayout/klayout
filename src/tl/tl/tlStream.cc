@@ -43,7 +43,7 @@
 #include "tlFileUtils.h"
 #include "tlLog.h"
 #include "tlResources.h"
-
+#include "tlBase64.h"
 #include "tlException.h"
 #include "tlString.h"
 #include "tlUri.h"
@@ -241,6 +241,14 @@ InputStream::InputStream (const std::string &abstract_path)
     needs_inflate = rr.second;
 
 #endif
+
+  } else if (ex.test ("data:")) {
+
+    std::vector<unsigned char> data = tl::from_base64 (ex.get ());
+
+    char *data_ptr = new char [data.size ()];
+    memcpy (data_ptr, data.begin ().operator-> (), data.size ());
+    mp_delegate = new InputMemoryStream (data_ptr, data.size (), true);
 
   } else if (ex.test ("pipe:")) {
 

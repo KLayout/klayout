@@ -89,6 +89,7 @@ TEST(TextOutputStream)
     tl::file_utils_force_linux ();
 
     {
+      tl::rm_file (fn);  //  avoids trouble with wrong path delimeters and backup files
       tl::OutputStream os (fn, tl::OutputStream::OM_Auto, true);
       os << "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.";
     }
@@ -109,6 +110,7 @@ TEST(TextOutputStream)
     tl::file_utils_force_windows ();
 
     {
+      tl::rm_file (fn);  //  avoids trouble with wrong path delimeters and backup files
       tl::OutputStream os (fn, tl::OutputStream::OM_Auto, true);
       os << "Hello, world!\nWith another line\n\r\r\nseparated by a LFCR and CRLF.";
     }

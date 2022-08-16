@@ -31,6 +31,7 @@
 #include "layVersion.h"
 #include "laySignalHandler.h"
 #include "layRuntimeErrorForm.h"
+#include "layReaderErrorForm.h"
 #include "layProgress.h"
 #include "layTextProgress.h"
 #include "layBackgroundAwareTreeStyle.h"
@@ -106,6 +107,7 @@ static void ui_exception_handler_tl (const tl::Exception &ex, QWidget *parent)
   const tl::ExitException *gsi_exit = dynamic_cast <const tl::ExitException *> (&ex);
   const tl::BreakException *gsi_break = dynamic_cast <const tl::BreakException *> (&ex);
   const tl::ScriptError *gsi_excpt = dynamic_cast <const tl::ScriptError *> (&ex);
+  const db::ReaderUnknownFormatException *reader_excpt = dynamic_cast <const db::ReaderUnknownFormatException *> (&ex);
 
   if (gsi_exit || gsi_break) {
     //  exit and break exceptions are not shown - they are issued when a script is aborted or
@@ -131,11 +133,19 @@ static void ui_exception_handler_tl (const tl::Exception &ex, QWidget *parent)
     error_dialog.exec ();
 
   } else {
+
     tl::error << ex.msg (); 
     if (! parent) {
       parent = QApplication::activeWindow () ? QApplication::activeWindow () : lay::MainWindow::instance ();
     }
-    QMessageBox::critical (parent, QObject::tr ("Error"), tl::to_qstring (ex.msg ())); 
+
+    if (reader_excpt) {
+      lay::ReaderErrorForm error_dialog (parent, "reader_error_form", reader_excpt);
+      error_dialog.exec ();
+    } else {
+      QMessageBox::critical (parent, QObject::tr ("Error"), tl::to_qstring (ex.msg ()));
+    }
+
   }
 }
 

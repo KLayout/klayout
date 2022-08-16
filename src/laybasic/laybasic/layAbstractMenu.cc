@@ -622,21 +622,6 @@ Action::menu () const
   return mp_menu;
 }
 
-static void
-configure_action (QAction *target, QAction *src)
-{
-  target->setShortcut (src->shortcut ());
-  target->setToolTip (src->toolTip ());
-  target->setCheckable (src->isCheckable ());
-  target->setChecked (src->isChecked ());
-  target->setEnabled (src->isEnabled ());
-  target->setIcon (src->icon ());
-  target->setIconText (src->iconText ());
-  target->setSeparator (src->isSeparator ());
-  target->setText (src->text ());
-  target->setVisible (src->isVisible ());
-}
-
 void
 Action::set_menu (QMenu *menu, bool owned)
 {
@@ -647,7 +632,7 @@ Action::set_menu (QMenu *menu, bool owned)
   if (mp_menu && ! menu) {
 
     QAction *new_action = new ActionObject (0);
-    configure_action (new_action, mp_action);
+    configure_action (new_action);
 
     if (m_owned) {
       delete mp_menu;
@@ -659,7 +644,7 @@ Action::set_menu (QMenu *menu, bool owned)
 
   } else if (mp_menu && menu) {
 
-    configure_action (menu->menuAction (), mp_action);
+    configure_action (menu->menuAction ());
 
     if (m_owned) {
       delete mp_menu;
@@ -671,7 +656,7 @@ Action::set_menu (QMenu *menu, bool owned)
 
   } else if (! mp_menu && menu) {
 
-    configure_action (menu->menuAction (), mp_action);
+    configure_action (menu->menuAction ());
 
     if (m_owned) {
       delete mp_action;
@@ -717,6 +702,31 @@ Action::sync_qaction ()
   }
 #endif
 }
+
+#if defined(HAVE_QT)
+void
+Action::configure_action (QAction *target) const
+{
+  target->setVisible (is_effective_visible ());
+  target->setShortcut (get_key_sequence ());
+  target->setEnabled (is_effective_enabled ());
+  target->setToolTip (tl::to_qstring (get_tool_tip ()));
+  target->setCheckable (is_checkable ());
+  target->setChecked (is_checked ());
+  target->setIconText (tl::to_qstring (get_icon_text ()));
+  target->setSeparator (is_separator ());
+  target->setText (tl::to_qstring (get_title ()));
+
+  if (qaction ()) {
+    target->setIcon (qaction ()->icon ());
+    target->setObjectName (qaction ()->objectName ());
+  } else if (m_icon.empty ()) {
+    target->setIcon (QIcon ());
+  } else {
+    target->setIcon (QIcon (tl::to_qstring (m_icon)));
+  }
+}
+#endif
 
 void
 Action::set_visible (bool v)

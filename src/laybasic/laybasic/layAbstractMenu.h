@@ -437,6 +437,7 @@ private:
 #if defined(HAVE_QT)
   QKeySequence get_key_sequence () const;
   QKeySequence get_key_sequence_for (const std::string &sc) const;
+  void configure_action (QAction *target) const;
 #endif
 
   void configure_from_title (const std::string &s);

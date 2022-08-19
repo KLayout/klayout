@@ -34,6 +34,8 @@ namespace lvs_std_format
   DB_PUBLIC std::string LongKeys::reference_key ("reference");
   DB_PUBLIC std::string LongKeys::layout_key ("layout");
   DB_PUBLIC std::string LongKeys::xref_key ("xref");
+  DB_PUBLIC std::string LongKeys::log_key ("log");
+  DB_PUBLIC std::string LongKeys::log_entry_key ("entry");
 
   DB_PUBLIC std::string LongKeys::mismatch_key ("mismatch");
   DB_PUBLIC std::string LongKeys::match_key ("match");
@@ -41,15 +43,27 @@ namespace lvs_std_format
   DB_PUBLIC std::string LongKeys::warning_key ("warning");
   DB_PUBLIC std::string LongKeys::skipped_key ("skipped");
 
+  DB_PUBLIC std::string LongKeys::info_level_key ("info");
+  DB_PUBLIC std::string LongKeys::warning_level_key ("warning");
+  DB_PUBLIC std::string LongKeys::error_level_key ("error");
+
+  //  E, H, I, J, L, M, S, W, X, Z, 0, 1
+
   DB_PUBLIC std::string ShortKeys::reference_key ("H");
   DB_PUBLIC std::string ShortKeys::layout_key ("J");
   DB_PUBLIC std::string ShortKeys::xref_key ("Z");
+  DB_PUBLIC std::string ShortKeys::log_key ("L");
+  DB_PUBLIC std::string ShortKeys::log_entry_key ("M");
 
   DB_PUBLIC std::string ShortKeys::mismatch_key ("0");
   DB_PUBLIC std::string ShortKeys::match_key ("1");
   DB_PUBLIC std::string ShortKeys::nomatch_key ("X");
   DB_PUBLIC std::string ShortKeys::warning_key ("W");
   DB_PUBLIC std::string ShortKeys::skipped_key ("S");
+
+  DB_PUBLIC std::string ShortKeys::info_level_key ("I");
+  DB_PUBLIC std::string ShortKeys::warning_level_key ("W");
+  DB_PUBLIC std::string ShortKeys::error_level_key ("E");
 }
 
 }

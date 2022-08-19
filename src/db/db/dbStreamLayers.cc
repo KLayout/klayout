@@ -787,7 +787,7 @@ LayerMap::unmap (const LDPair &p1, const LDPair &p2)
   if (db::is_static_ld (p1.layer) && db::is_static_ld (p2.layer)) {
     m_ld_map.add (p1.layer, p2.layer + 1, LayerMap::datatype_map (), op);
   } else {
-    m_ld_map.add (m_ld_map.begin ()->first.first, m_ld_map.end ()->first.second, LayerMap::datatype_map (), op);
+    m_ld_map.add (m_ld_map.begin ()->first.first, (--m_ld_map.end ())->first.second, LayerMap::datatype_map (), op);
   }
 }
 

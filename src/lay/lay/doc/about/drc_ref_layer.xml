@@ -3037,6 +3037,12 @@ The effect of the operation is shown in these examples:
 </tr>
 </table>
 </p>
+<a name="texts?"/><h2>"texts?" - Returns true, if the layer is a text collection</h2>
+<keyword name="texts?"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.texts?</tt></li>
+</ul>
 <a name="texts_not"/><h2>"texts_not" - Selects texts from an original layer not matching a specific selection</h2>
 <keyword name="texts_not"/>
 <p>Usage:</p>

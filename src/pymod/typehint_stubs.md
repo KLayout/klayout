@@ -27,9 +27,20 @@ TODO:
 - [ ] 4. Manually check and backannotate types in klayout.*core.pyi.
 - [ ] 5. How to update the stubs if klayout code changes? Manually for now.
 
+New stubgen:
+`$  python ./src/pymod/stubgen.py db >! src/pymod/distutils_src/klayout/dbcore.pyi`
+`$  python ./src/pymod/stubgen.py rdb >! src/pymod/distutils_src/klayout/rdbcore.pyi`
+`$  python ./src/pymod/stubgen.py tl >! src/pymod/distutils_src/klayout/tlcore.pyi`
+
+To verify with mypi:
+Navigate to `./src/pymod/distutils_src`.
+Run, for example:
+`$ stubtest klayout.tlcore`
+
 NEW APPROACH:
 - [x] 1. Use klayout.tl to inspect all classes and methods in pya.
-- [ ] 2. Figure out last few bugs.
+- [x] 2. Figure out last few bugs.
     - DPoint has a method with "=" when it should have been "*=". There must be an issue with the gsiDeclInternal algorithms.
     - Some inner classes, e.g. LogicalOp inside CompoundRegionOperationNode are not returning
-- [ ] 3. Manually check and compare to mypy's output.
+- [x] 3. Manually check and compare to mypy's output.
+    - Looks good, but there are a few discrepancies between actual python module and stubs. Namely, deprecated methods were not included in the stub. The opposite is sometimes true as well, though for newer, experimental classes e.g. `klayout.dbcore.GenericDeviceCombiner.combine_devices`.

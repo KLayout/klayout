@@ -310,7 +310,7 @@ Class<db::NetlistDeviceExtractor> decl_dbNetlistDeviceExtractor ("db", "DeviceEx
 );
 
 Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceExtractor, "db", "GenericDeviceExtractor",
-  gsi::method ("name=", &GenericDeviceExtractor::set_name,
+  gsi::method ("set_name", &GenericDeviceExtractor::set_name,
     "@brief Sets the name of the device extractor and the device class."
   ) +
   gsi::callback ("setup", &GenericDeviceExtractor::setup, &GenericDeviceExtractor::cb_setup,

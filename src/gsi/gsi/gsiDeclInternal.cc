@@ -302,6 +302,12 @@ Class<ClassBase> decl_Class ("tl", "Class",
   gsi::iterator ("each_method", &ClassBase::begin_methods, &ClassBase::end_methods,
     "@brief Iterate over all methods of this class\n"
   ) +
+  gsi::iterator ("each_child_class", &ClassBase::begin_child_classes, &ClassBase::end_child_classes,
+    "@brief Iterate over all child classes within this class\n"
+  ) +
+  gsi::method ("parent", &ClassBase::parent,
+    "@brief The parent of the class\n"
+  ) +
   gsi::method ("name", &ClassBase::name,
     "@brief The name of the class\n"
   ) +

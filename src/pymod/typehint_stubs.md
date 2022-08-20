@@ -1,6 +1,20 @@
 Author: Thomas Ferreira de Lima
 email: thomas@tlima.me
 
+## Notes
+To use the stubgen script for the three main modules, run the following from the root folder of the repository:
+`$  python ./src/pymod/stubgen.py db >! src/pymod/distutils_src/klayout/dbcore.pyi`
+`$  python ./src/pymod/stubgen.py rdb >! src/pymod/distutils_src/klayout/rdbcore.pyi`
+`$  python ./src/pymod/stubgen.py tl >! src/pymod/distutils_src/klayout/tlcore.pyi`
+
+To compare the generated stubs with a python self-inspection of the klayout module, try the following:
+Navigate to `./src/pymod/distutils_src`.
+Run, for example:
+`$ stubtest klayout.tlcore`
+
+TODO:
+- [ ] Integrate above scripts with CI
+## Old notes
 This is a temporary file containing some development notes regarding generating py stubs (https://mypy.readthedocs.io/en/stable/stubgen.html) for klayout python's C-extension. This enables syntax highlighting and type checking from compatible IDEs like VS Code.
 
 It is possible to annotate C-extension docstrings to include function signatures, which helps with argument inspection.

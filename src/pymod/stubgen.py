@@ -12,7 +12,7 @@ from functools import wraps
 import functools
 from sys import argv
 from textwrap import indent
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 from klayout.tlcore import ArgType, Method
 import pya  # initialize all modules
 import klayout.tl as ktl
@@ -214,6 +214,8 @@ def _translate_type(arg_type: ktl.ArgType, within_class: ktl.Class) -> str:
     else:
         py_str = _type_dict[arg_type.type()]
 
+    if arg_type.is_iter():
+        py_str = f"Iterable[{py_str}]"
     if arg_type.has_default():
         py_str = f"Optional[{py_str}] = ..."
     return py_str
@@ -368,7 +370,7 @@ def get_py_child_classes(c: ktl.Class):
 
 def get_py_methods(
     c: ktl.Class,
-) -> Tuple[List[Stub], Dict[str, Tuple[str, ktl.Class]]]:
+) -> List[Stub]:
     c_methods = get_c_methods(c)
 
     # extract properties
@@ -413,7 +415,7 @@ def get_py_methods(
 
     def format_args(m: ktl.Method, self_str: str = "self") -> str:
         arg_list = _get_arglist(m, self_str=self_str)
-        new_arglist = []
+        new_arglist: List[Tuple[str, Optional[str]]] = []
         for argname, a in arg_list:
             if a:
                 new_arglist.append((argname, translate_type(a)))
@@ -422,7 +424,7 @@ def get_py_methods(
         return _format_args(new_arglist)
 
     # Extract all properties (methods that have getters and/or setters)
-    properties = list()
+    properties: List[Stub] = list()
     for m in copy(_c_methods):
         ret_type = translate_type(m.m.ret_type())
         if m.is_getter:
@@ -482,7 +484,7 @@ def get_py_methods(
         return names
 
     # Extract all classmethods
-    classmethods = list()
+    classmethods: List[Stub] = list()
     for m in copy(_c_methods):
         if m.is_classmethod:
             # Exception: if it is an __init__ constructor, ignore.
@@ -561,7 +563,7 @@ def get_py_methods(
     classmethods = sorted(classmethods)
     add_overload_decorator(classmethods)
 
-    return_list = properties + classmethods + boundmethods
+    return_list: List[Stub] = properties + classmethods + boundmethods
 
     return return_list
 

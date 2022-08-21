@@ -539,11 +539,11 @@ class Method:
         r"""
         @brief The documentation string for this method
         """
-    def each_argument(self) -> ArgType:
+    def each_argument(self) -> Iterable[ArgType]:
         r"""
         @brief Iterate over all arguments of this method
         """
-    def each_overload(self) -> MethodOverload:
+    def each_overload(self) -> Iterable[MethodOverload]:
         r"""
         @brief This iterator delivers the synonyms (overloads).
 
@@ -608,7 +608,7 @@ class Class:
     r"""
     @hide
     """
-    each_class: ClassVar[Class]
+    each_class: ClassVar[Iterable[Class]]
     r"""
     @brief Iterate over all classes
     """
@@ -673,11 +673,11 @@ class Class:
         r"""
         @brief The documentation string for this class
         """
-    def each_child_class(self) -> Class:
+    def each_child_class(self) -> Iterable[Class]:
         r"""
         @brief Iterate over all child classes within this class
         """
-    def each_method(self) -> Method:
+    def each_method(self) -> Iterable[Method]:
         r"""
         @brief Iterate over all methods of this class
         """

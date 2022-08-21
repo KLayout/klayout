@@ -136,13 +136,13 @@ class RdbCell:
 
         This method has been introduced in version 0.23.
         """
-    def each_item(self) -> RdbItem:
+    def each_item(self) -> Iterable[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with this cell
 
         This method has been introduced in version 0.23.
         """
-    def each_reference(self) -> RdbReference:
+    def each_reference(self) -> Iterable[RdbReference]:
         r"""
         @brief Iterates over all references
         """
@@ -236,13 +236,13 @@ class RdbCategory:
 
         This method has been introduced in version 0.23.
         """
-    def each_item(self) -> RdbItem:
+    def each_item(self) -> Iterable[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with this category
 
         This method has been introduced in version 0.23.
         """
-    def each_sub_category(self) -> RdbCategory:
+    def each_sub_category(self) -> Iterable[RdbCategory]:
         r"""
         @brief Iterates over all sub-categories
         """
@@ -696,7 +696,7 @@ class RdbItem:
 
         This method has been introduced in version 0.23.
         """
-    def each_value(self) -> RdbItemValue:
+    def each_value(self) -> Iterable[RdbItemValue]:
         r"""
         @brief Iterates over all values
         """
@@ -995,29 +995,29 @@ class ReportDatabase:
         @param shapes The shape container from which to take the items
         @param trans The transformation to apply
         """
-    def each_category(self) -> RdbCategory:
+    def each_category(self) -> Iterable[RdbCategory]:
         r"""
         @brief Iterates over all top-level categories
         """
-    def each_cell(self) -> RdbCell:
+    def each_cell(self) -> Iterable[RdbCell]:
         r"""
         @brief Iterates over all cells
         """
-    def each_item(self) -> RdbItem:
+    def each_item(self) -> Iterable[RdbItem]:
         r"""
         @brief Iterates over all items inside the database
         """
-    def each_item_per_category(self, category_id: int) -> RdbItem:
+    def each_item_per_category(self, category_id: int) -> Iterable[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with the given category
         @param category_id The ID of the category for which all associated items should be retrieved
         """
-    def each_item_per_cell(self, cell_id: int) -> RdbItem:
+    def each_item_per_cell(self, cell_id: int) -> Iterable[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with the given cell
         @param cell_id The ID of the cell for which all associated items should be retrieved
         """
-    def each_item_per_cell_and_category(self, cell_id: int, category_id: int) -> RdbItem:
+    def each_item_per_cell_and_category(self, cell_id: int, category_id: int) -> Iterable[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with the given cell and category
         @param cell_id The ID of the cell for which all associated items should be retrieved

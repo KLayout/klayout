@@ -1456,20 +1456,20 @@ class Cell:
 
         This method has been introduced in version 0.27.
         """
-    def each_child_cell(self) -> int:
+    def each_child_cell(self) -> Iterable[int]:
         r"""
         @brief Iterates over all child cells
 
         This iterator will report the child cell indices, not every instance.
         """
-    def each_inst(self) -> Instance:
+    def each_inst(self) -> Iterable[Instance]:
         r"""
         @brief Iterates over all child instances (which may actually be instance arrays)
 
         Starting with version 0.15, this iterator delivers \Instance objects rather than \CellInstArray objects.
         """
     @overload
-    def each_overlapping_inst(self, b: Box) -> Instance:
+    def each_overlapping_inst(self, b: Box) -> Iterable[Instance]:
         r"""
         @brief Gets the instances overlapping the given rectangle
 
@@ -1481,7 +1481,7 @@ class Cell:
         Starting with version 0.15, this iterator delivers \Instance objects rather than \CellInstArray objects.
         """
     @overload
-    def each_overlapping_inst(self, b: DBox) -> Instance:
+    def each_overlapping_inst(self, b: DBox) -> Iterable[Instance]:
         r"""
         @brief Gets the instances overlapping the given rectangle, with the rectangle in micrometer units
 
@@ -1493,7 +1493,7 @@ class Cell:
         This variant has been introduced in version 0.25.
         """
     @overload
-    def each_overlapping_shape(self, layer_index: int, box: Box) -> Shape:
+    def each_overlapping_shape(self, layer_index: int, box: Box) -> Iterable[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that overlap the given box
 
@@ -1504,7 +1504,7 @@ class Cell:
         This convenience method has been introduced in version 0.16.
         """
     @overload
-    def each_overlapping_shape(self, layer_index: int, box: DBox) -> Shape:
+    def each_overlapping_shape(self, layer_index: int, box: DBox) -> Iterable[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that overlap the given box, with the box given in micrometer units
 
@@ -1515,7 +1515,7 @@ class Cell:
         This convenience method has been introduced in version 0.16.
         """
     @overload
-    def each_overlapping_shape(self, layer_index: int, box: Box, flags: int) -> Shape:
+    def each_overlapping_shape(self, layer_index: int, box: Box, flags: int) -> Iterable[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that overlap the given box
 
@@ -1524,7 +1524,7 @@ class Cell:
         @param layer_index The layer on which to run the query
         """
     @overload
-    def each_overlapping_shape(self, layer_index: int, box: DBox, flags: int) -> Shape:
+    def each_overlapping_shape(self, layer_index: int, box: DBox, flags: int) -> Iterable[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that overlap the given box, with the box given in micrometer units
 
@@ -1532,21 +1532,21 @@ class Cell:
         @param box The box by which to query the shapes as a \DBox object in micrometer units
         @param layer_index The layer on which to run the query
         """
-    def each_parent_cell(self) -> int:
+    def each_parent_cell(self) -> Iterable[int]:
         r"""
         @brief Iterates over all parent cells
 
         This iterator will iterate over the parent cells, just returning their
         cell index.
         """
-    def each_parent_inst(self) -> ParentInstArray:
+    def each_parent_inst(self) -> Iterable[ParentInstArray]:
         r"""
         @brief Iterates over the parent instance list (which may actually be instance arrays)
 
         The parent instances are basically inversions of the instances. Using parent instances it is possible to determine how a specific cell is called from where.
         """
     @overload
-    def each_shape(self, layer_index: int) -> Shape:
+    def each_shape(self, layer_index: int) -> Iterable[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer
 
@@ -1556,7 +1556,7 @@ class Cell:
         This convenience method has been introduced in version 0.16.
         """
     @overload
-    def each_shape(self, layer_index: int, flags: int) -> Shape:
+    def each_shape(self, layer_index: int, flags: int) -> Iterable[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer
 
@@ -1566,7 +1566,7 @@ class Cell:
         This iterator is equivalent to 'shapes(layer).each'.
         """
     @overload
-    def each_touching_inst(self, b: Box) -> Instance:
+    def each_touching_inst(self, b: Box) -> Iterable[Instance]:
         r"""
         @brief Gets the instances touching the given rectangle
 
@@ -1578,7 +1578,7 @@ class Cell:
         Starting with version 0.15, this iterator delivers \Instance objects rather than \CellInstArray objects.
         """
     @overload
-    def each_touching_inst(self, b: DBox) -> Instance:
+    def each_touching_inst(self, b: DBox) -> Iterable[Instance]:
         r"""
         @brief Gets the instances touching the given rectangle, with the rectangle in micrometer units
 
@@ -1590,7 +1590,7 @@ class Cell:
         This variant has been introduced in version 0.25.
         """
     @overload
-    def each_touching_shape(self, layer_index: int, box: Box) -> Shape:
+    def each_touching_shape(self, layer_index: int, box: Box) -> Iterable[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that touch the given box
 
@@ -1601,7 +1601,7 @@ class Cell:
         This convenience method has been introduced in version 0.16.
         """
     @overload
-    def each_touching_shape(self, layer_index: int, box: DBox) -> Shape:
+    def each_touching_shape(self, layer_index: int, box: DBox) -> Iterable[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that touch the given box, with the box given in micrometer units
 
@@ -1612,7 +1612,7 @@ class Cell:
         This convenience method has been introduced in version 0.16.
         """
     @overload
-    def each_touching_shape(self, layer_index: int, box: Box, flags: int) -> Shape:
+    def each_touching_shape(self, layer_index: int, box: Box, flags: int) -> Iterable[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that touch the given box
 
@@ -1621,7 +1621,7 @@ class Cell:
         @param layer_index The layer on which to run the query
         """
     @overload
-    def each_touching_shape(self, layer_index: int, box: DBox, flags: int) -> Shape:
+    def each_touching_shape(self, layer_index: int, box: DBox, flags: int) -> Iterable[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that touch the given box, with the box given in micrometer units
 
@@ -3253,7 +3253,7 @@ class CellInstArray:
         r"""
         @brief Creates a copy of self
         """
-    def each_cplx_trans(self) -> ICplxTrans:
+    def each_cplx_trans(self) -> Iterable[ICplxTrans]:
         r"""
         @brief Gets the complex transformations represented by this instance
         For a single instance, this iterator will deliver the single, complex transformation. For array instances, the iterator will deliver each complex transformation of the expanded array.
@@ -3261,7 +3261,7 @@ class CellInstArray:
 
         This method has been introduced in version 0.25.
         """
-    def each_trans(self) -> Trans:
+    def each_trans(self) -> Iterable[Trans]:
         r"""
         @brief Gets the simple transformations represented by this instance
         For a single instance, this iterator will deliver the single, simple transformation. For array instances, the iterator will deliver each simple transformation of the expanded array.
@@ -3500,13 +3500,13 @@ class DCellInstArray:
         r"""
         @brief Creates a copy of self
         """
-    def each_cplx_trans(self) -> DCplxTrans:
+    def each_cplx_trans(self) -> Iterable[DCplxTrans]:
         r"""
         @brief Gets the complex transformations represented by this instance
         For a single instance, this iterator will deliver the single, complex transformation. For array instances, the iterator will deliver each complex transformation of the expanded array.
         This iterator is a generalization of \each_trans for general complex transformations.
         """
-    def each_trans(self) -> DTrans:
+    def each_trans(self) -> Iterable[DTrans]:
         r"""
         @brief Gets the simple transformations represented by this instance
         For a single instance, this iterator will deliver the single, simple transformation. For array instances, the iterator will deliver each simple transformation of the expanded array.
@@ -6794,7 +6794,7 @@ class EdgePairs(ShapeCollection):
         r"""
         @brief Creates a copy of self
         """
-    def each(self) -> EdgePair:
+    def each(self) -> Iterable[EdgePair]:
         r"""
         @brief Returns each edge pair of the edge pair collection
         """
@@ -8209,11 +8209,11 @@ class Edges(ShapeCollection):
         r"""
         @brief Creates a copy of self
         """
-    def each(self) -> Edge:
+    def each(self) -> Iterable[Edge]:
         r"""
         @brief Returns each edge of the region
         """
-    def each_merged(self) -> Edge:
+    def each_merged(self) -> Iterable[Edge]:
         r"""
         @brief Returns each edge of the region
 
@@ -10499,11 +10499,11 @@ class Layout:
         r"""
         @brief Creates a copy of self
         """
-    def each_cell(self) -> Cell:
+    def each_cell(self) -> Iterable[Cell]:
         r"""
         @brief Iterates the unsorted cell list
         """
-    def each_cell_bottom_up(self) -> int:
+    def each_cell_bottom_up(self) -> Iterable[int]:
         r"""
         @brief Iterates the bottom-up sorted cell list
 
@@ -10512,7 +10512,7 @@ class Layout:
         The bottom-up iterator does not deliver cells but cell
         indices actually.
         """
-    def each_cell_top_down(self) -> int:
+    def each_cell_top_down(self) -> Iterable[int]:
         r"""
         @brief Iterates the top-down sorted cell list
 
@@ -10523,14 +10523,14 @@ class Layout:
         indices actually.
         @brief begin iterator of the top-down sorted cell list
         """
-    def each_meta_info(self) -> LayoutMetaInfo:
+    def each_meta_info(self) -> Iterable[LayoutMetaInfo]:
         r"""
         @brief Iterates over the meta information of the layout
         See \LayoutMetaInfo for details about layouts and meta information.
 
         This method has been introduced in version 0.25.
         """
-    def each_top_cell(self) -> int:
+    def each_top_cell(self) -> Iterable[int]:
         r"""
         @brief Iterates the top cells
         A layout may have an arbitrary number of top cells. The usual case however is that there is one top cell.
@@ -12211,7 +12211,7 @@ class LayoutQuery:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
-    def each(self, layout: Layout, context: Optional[tl.ExpressionContext] = ...) -> LayoutQueryIterator:
+    def each(self, layout: Layout, context: Optional[tl.ExpressionContext] = ...) -> Iterable[LayoutQueryIterator]:
         r"""
         @brief Executes the query and delivered the results iteratively.
         The argument to the block is a \LayoutQueryIterator object which can be asked for specific results.
@@ -15377,12 +15377,12 @@ class Device(NetlistObject):
         @brief Disconnects the given terminal from any net.
         This version accepts a terminal name. If the name is not a valid terminal name, an exception is raised.
         """
-    def each_combined_abstract(self) -> DeviceAbstractRef:
+    def each_combined_abstract(self) -> Iterable[DeviceAbstractRef]:
         r"""
         @brief Iterates over the combined device specifications.
         This feature applies to combined devices. This iterator will deliver all device abstracts present in addition to the default device abstract.
         """
-    def each_reconnected_terminal_for(self, terminal_id: int) -> DeviceReconnectedTerminal:
+    def each_reconnected_terminal_for(self, terminal_id: int) -> Iterable[DeviceReconnectedTerminal]:
         r"""
         @brief Iterates over the reconnected terminal specifications for a given outer terminal.
         This feature applies to combined devices. This iterator will deliver all device-to-abstract terminal reroutings.
@@ -15943,17 +15943,17 @@ class Net(NetlistObject):
         r"""
         @brief Clears the net.
         """
-    def each_pin(self) -> NetPinRef:
+    def each_pin(self) -> Iterable[NetPinRef]:
         r"""
         @brief Iterates over all outgoing pins the net connects.
         Pin connections are described by \NetPinRef objects. Pin connections are connections to outgoing pins of the circuit the net lives in.
         """
-    def each_subcircuit_pin(self) -> NetSubcircuitPinRef:
+    def each_subcircuit_pin(self) -> Iterable[NetSubcircuitPinRef]:
         r"""
         @brief Iterates over all subcircuit pins the net connects.
         Subcircuit pin connections are described by \NetSubcircuitPinRef objects. These are connections to specific pins of subcircuits.
         """
-    def each_terminal(self) -> NetTerminalRef:
+    def each_terminal(self) -> Iterable[NetTerminalRef]:
         r"""
         @brief Iterates over all terminals the net connects.
         Terminals connect devices. Terminal connections are described by \NetTerminalRef objects.
@@ -16782,33 +16782,33 @@ class Circuit(NetlistObject):
         r"""
         @brief Disconnects the given pin from any net.
         """
-    def each_child(self) -> Circuit:
+    def each_child(self) -> Iterable[Circuit]:
         r"""
         @brief Iterates over the child circuits of this circuit
         Child circuits are the ones that are referenced from this circuit via subcircuits.
         """
-    def each_device(self) -> Device:
+    def each_device(self) -> Iterable[Device]:
         r"""
         @brief Iterates over the devices of the circuit
         """
-    def each_net(self) -> Net:
+    def each_net(self) -> Iterable[Net]:
         r"""
         @brief Iterates over the nets of the circuit
         """
-    def each_parent(self) -> Circuit:
+    def each_parent(self) -> Iterable[Circuit]:
         r"""
         @brief Iterates over the parent circuits of this circuit
         Child circuits are the ones that are referencing this circuit via subcircuits.
         """
-    def each_pin(self) -> Pin:
+    def each_pin(self) -> Iterable[Pin]:
         r"""
         @brief Iterates over the pins of the circuit
         """
-    def each_ref(self) -> SubCircuit:
+    def each_ref(self) -> Iterable[SubCircuit]:
         r"""
         @brief Iterates over the subcircuit objects referencing this circuit
         """
-    def each_subcircuit(self) -> SubCircuit:
+    def each_subcircuit(self) -> Iterable[SubCircuit]:
         r"""
         @brief Iterates over the subcircuits of the circuit
         """
@@ -17043,21 +17043,21 @@ class Netlist:
         r"""
         @brief Creates a copy of self
         """
-    def each_circuit(self) -> Circuit:
+    def each_circuit(self) -> Iterable[Circuit]:
         r"""
         @brief Iterates over the circuits of the netlist
         """
-    def each_circuit_bottom_up(self) -> Circuit:
+    def each_circuit_bottom_up(self) -> Iterable[Circuit]:
         r"""
         @brief Iterates over the circuits bottom-up
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
         """
-    def each_circuit_top_down(self) -> Circuit:
+    def each_circuit_top_down(self) -> Iterable[Circuit]:
         r"""
         @brief Iterates over the circuits top-down
         Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
         """
-    def each_device_class(self) -> DeviceClass:
+    def each_device_class(self) -> Iterable[DeviceClass]:
         r"""
         @brief Iterates over the device classes of the netlist
         """
@@ -18657,42 +18657,42 @@ class NetlistCrossReference(NetlistCompareLogger):
         r"""
         @hide
         """
-    def each_circuit_pair(self) -> NetlistCrossReference.CircuitPairData:
+    def each_circuit_pair(self) -> Iterable[NetlistCrossReference.CircuitPairData]:
         r"""
         @brief Delivers the circuit pairs and their status.
         See the class description for details.
         """
-    def each_device_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> NetlistCrossReference.DevicePairData:
+    def each_device_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> Iterable[NetlistCrossReference.DevicePairData]:
         r"""
         @brief Delivers the device pairs and their status for the given circuit pair.
         See the class description for details.
         """
-    def each_net_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> NetlistCrossReference.NetPairData:
+    def each_net_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> Iterable[NetlistCrossReference.NetPairData]:
         r"""
         @brief Delivers the net pairs and their status for the given circuit pair.
         See the class description for details.
         """
-    def each_net_pin_pair(self, net_pair: NetlistCrossReference.NetPairData) -> NetlistCrossReference.NetPinRefPair:
+    def each_net_pin_pair(self, net_pair: NetlistCrossReference.NetPairData) -> Iterable[NetlistCrossReference.NetPinRefPair]:
         r"""
         @brief Delivers the pin pairs for the given net pair.
         For the net pair, lists the pin pairs identified on this net.
         """
-    def each_net_subcircuit_pin_pair(self, net_pair: NetlistCrossReference.NetPairData) -> NetlistCrossReference.NetSubcircuitPinRefPair:
+    def each_net_subcircuit_pin_pair(self, net_pair: NetlistCrossReference.NetPairData) -> Iterable[NetlistCrossReference.NetSubcircuitPinRefPair]:
         r"""
         @brief Delivers the subcircuit pin pairs for the given net pair.
         For the net pair, lists the subcircuit pin pairs identified on this net.
         """
-    def each_net_terminal_pair(self, net_pair: NetlistCrossReference.NetPairData) -> NetlistCrossReference.NetTerminalRefPair:
+    def each_net_terminal_pair(self, net_pair: NetlistCrossReference.NetPairData) -> Iterable[NetlistCrossReference.NetTerminalRefPair]:
         r"""
         @brief Delivers the device terminal pairs for the given net pair.
         For the net pair, lists the device terminal pairs identified on this net.
         """
-    def each_pin_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> NetlistCrossReference.PinPairData:
+    def each_pin_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> Iterable[NetlistCrossReference.PinPairData]:
         r"""
         @brief Delivers the pin pairs and their status for the given circuit pair.
         See the class description for details.
         """
-    def each_subcircuit_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> NetlistCrossReference.SubCircuitPairData:
+    def each_subcircuit_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> Iterable[NetlistCrossReference.SubCircuitPairData]:
         r"""
         @brief Delivers the subcircuit pairs and their status for the given circuit pair.
         See the class description for details.
@@ -19776,11 +19776,11 @@ class DeviceExtractorBase:
 
         This method has been added in version 0.27.3.
         """
-    def each_error(self) -> NetlistDeviceExtractorError:
+    def each_error(self) -> Iterable[NetlistDeviceExtractorError]:
         r"""
         @brief Iterates over all errors collected in the device extractor.
         """
-    def each_layer_definition(self) -> NetlistDeviceExtractorLayerDefinition:
+    def each_layer_definition(self) -> Iterable[NetlistDeviceExtractorLayerDefinition]:
         r"""
         @brief Iterates over all layer definitions.
         """
@@ -20867,7 +20867,7 @@ class Path:
         r"""
         @brief Creates a copy of self
         """
-    def each_point(self) -> Point:
+    def each_point(self) -> Iterable[Point]:
         r"""
         @brief Get the points that make up the path's spine
         """
@@ -21194,7 +21194,7 @@ class DPath:
         r"""
         @brief Creates a copy of self
         """
-    def each_point(self) -> DPoint:
+    def each_point(self) -> Iterable[DPoint]:
         r"""
         @brief Get the points that make up the path's spine
         """
@@ -21982,11 +21982,11 @@ class SimplePolygon:
         r"""
         @brief Creates a copy of self
         """
-    def each_edge(self) -> Edge:
+    def each_edge(self) -> Iterable[Edge]:
         r"""
         @brief Iterates over the edges that make up the simple polygon
         """
-    def each_point(self) -> Point:
+    def each_point(self) -> Iterable[Point]:
         r"""
         @brief Iterates over the points that make up the simple polygon
         """
@@ -22486,11 +22486,11 @@ class DSimplePolygon:
         r"""
         @brief Creates a copy of self
         """
-    def each_edge(self) -> DEdge:
+    def each_edge(self) -> Iterable[DEdge]:
         r"""
         @brief Iterates over the edges that make up the simple polygon
         """
-    def each_point(self) -> DPoint:
+    def each_point(self) -> Iterable[DPoint]:
         r"""
         @brief Iterates over the points that make up the simple polygon
         """
@@ -23067,14 +23067,14 @@ class Polygon:
         @brief Creates a copy of self
         """
     @overload
-    def each_edge(self) -> Edge:
+    def each_edge(self) -> Iterable[Edge]:
         r"""
         @brief Iterates over the edges that make up the polygon
 
         This iterator will deliver all edges, including those of the holes. Hole edges are oriented counterclockwise while hull edges are oriented clockwise.
         """
     @overload
-    def each_edge(self, contour: int) -> Edge:
+    def each_edge(self, contour: int) -> Iterable[Edge]:
         r"""
         @brief Iterates over the edges of one contour of the polygon
 
@@ -23085,12 +23085,12 @@ class Polygon:
 
         This method was introduced in version 0.24.
         """
-    def each_point_hole(self, n: int) -> Point:
+    def each_point_hole(self, n: int) -> Iterable[Point]:
         r"""
         @brief Iterates over the points that make up the nth hole
         The hole number must be less than the number of holes (see \holes)
         """
-    def each_point_hull(self) -> Point:
+    def each_point_hull(self) -> Iterable[Point]:
         r"""
         @brief Iterates over the points that make up the hull
         """
@@ -23824,14 +23824,14 @@ class DPolygon:
         @brief Creates a copy of self
         """
     @overload
-    def each_edge(self) -> DEdge:
+    def each_edge(self) -> Iterable[DEdge]:
         r"""
         @brief Iterates over the edges that make up the polygon
 
         This iterator will deliver all edges, including those of the holes. Hole edges are oriented counterclockwise while hull edges are oriented clockwise.
         """
     @overload
-    def each_edge(self, contour: int) -> DEdge:
+    def each_edge(self, contour: int) -> Iterable[DEdge]:
         r"""
         @brief Iterates over the edges of one contour of the polygon
 
@@ -23842,12 +23842,12 @@ class DPolygon:
 
         This method was introduced in version 0.24.
         """
-    def each_point_hole(self, n: int) -> DPoint:
+    def each_point_hole(self, n: int) -> Iterable[DPoint]:
         r"""
         @brief Iterates over the points that make up the nth hole
         The hole number must be less than the number of holes (see \holes)
         """
-    def each_point_hull(self) -> DPoint:
+    def each_point_hull(self) -> Iterable[DPoint]:
         r"""
         @brief Iterates over the points that make up the hull
         """
@@ -26853,13 +26853,13 @@ class Region(ShapeCollection):
         r"""
         @brief Creates a copy of self
         """
-    def each(self) -> Polygon:
+    def each(self) -> Iterable[Polygon]:
         r"""
         @brief Returns each polygon of the region
 
         This returns the raw polygons (not merged polygons if merged semantics is enabled).
         """
-    def each_merged(self) -> Polygon:
+    def each_merged(self) -> Iterable[Polygon]:
         r"""
         @brief Returns each merged polygon of the region
 
@@ -29275,7 +29275,7 @@ class Shape:
         @brief Creates a copy of self
         """
     @overload
-    def each_dedge(self) -> DEdge:
+    def each_dedge(self) -> Iterable[DEdge]:
         r"""
         @brief Iterates over the edges of the object and returns edges in micrometer units
 
@@ -29284,7 +29284,7 @@ class Shape:
         This method has been introduced in version 0.25.
         """
     @overload
-    def each_dedge(self, contour: int) -> DEdge:
+    def each_dedge(self, contour: int) -> Iterable[DEdge]:
         r"""
         @brief Iterates over the edges of a single contour of the object and returns edges in micrometer units
 
@@ -29292,7 +29292,7 @@ class Shape:
 
         This method has been introduced in version 0.25.
         """
-    def each_dpoint(self) -> DPoint:
+    def each_dpoint(self) -> Iterable[DPoint]:
         r"""
         @brief Iterates over all points of the object and returns points in micrometer units
 
@@ -29300,7 +29300,7 @@ class Shape:
 
         This method has been introduced in version 0.25.
         """
-    def each_dpoint_hole(self, hole_index: int) -> DPoint:
+    def each_dpoint_hole(self, hole_index: int) -> Iterable[DPoint]:
         r"""
         @brief Iterates over a hole contour of the object and returns points in micrometer units
 
@@ -29308,7 +29308,7 @@ class Shape:
 
         This method has been introduced in version 0.25.
         """
-    def each_dpoint_hull(self) -> DPoint:
+    def each_dpoint_hull(self) -> Iterable[DPoint]:
         r"""
         @brief Iterates over the hull contour of the object and returns points in micrometer units
 
@@ -29317,7 +29317,7 @@ class Shape:
         This method has been introduced in version 0.25.
         """
     @overload
-    def each_edge(self) -> Edge:
+    def each_edge(self) -> Iterable[Edge]:
         r"""
         @brief Iterates over the edges of the object
 
@@ -29326,7 +29326,7 @@ class Shape:
         It will throw an exception if the object is not a polygon.
         """
     @overload
-    def each_edge(self, contour: int) -> Edge:
+    def each_edge(self, contour: int) -> Iterable[Edge]:
         r"""
         @brief Iterates over the edges of a single contour of the object
         @param contour The contour number (0 for hull, 1 for first hole ...)
@@ -29338,14 +29338,14 @@ class Shape:
 
         This method was introduced in version 0.24.
         """
-    def each_point(self) -> Point:
+    def each_point(self) -> Iterable[Point]:
         r"""
         @brief Iterates over all points of the object
 
         This method applies to paths and delivers all points of the path's center line.
         It will throw an exception for other objects.
         """
-    def each_point_hole(self, hole_index: int) -> Point:
+    def each_point_hole(self, hole_index: int) -> Iterable[Point]:
         r"""
         @brief Iterates over the points of a hole contour
 
@@ -29355,7 +29355,7 @@ class Shape:
 
         @param hole The hole index (see holes () method)
         """
-    def each_point_hull(self) -> Point:
+    def each_point_hull(self) -> Iterable[Point]:
         r"""
         @brief Iterates over the hull contour of the object
 
@@ -30058,21 +30058,21 @@ class Shapes:
         @brief Creates a copy of self
         """
     @overload
-    def each(self) -> Shape:
+    def each(self) -> Iterable[Shape]:
         r"""
         @brief Gets all shapes
 
         This call is equivalent to each(SAll). This convenience method has been introduced in version 0.16
         """
     @overload
-    def each(self, flags: int) -> Shape:
+    def each(self, flags: int) -> Iterable[Shape]:
         r"""
         @brief Gets all shapes
 
         @param flags An "or"-ed combination of the S... constants
         """
     @overload
-    def each_overlapping(self, region: Box) -> Shape:
+    def each_overlapping(self, region: Box) -> Iterable[Shape]:
         r"""
         @brief Gets all shapes that overlap the search box (region)
         @param region The rectangular search region
@@ -30080,7 +30080,7 @@ class Shapes:
         This call is equivalent to each_overlapping(SAll,region). This convenience method has been introduced in version 0.16
         """
     @overload
-    def each_overlapping(self, region: DBox) -> Shape:
+    def each_overlapping(self, region: DBox) -> Iterable[Shape]:
         r"""
         @brief Gets all shapes that overlap the search box (region) where the search box is given in micrometer units
         @param region The rectangular search region as a \DBox object in micrometer units
@@ -30089,7 +30089,7 @@ class Shapes:
         This method was introduced in version 0.25
         """
     @overload
-    def each_overlapping(self, flags: int, region: Box) -> Shape:
+    def each_overlapping(self, flags: int, region: Box) -> Iterable[Shape]:
         r"""
         @brief Gets all shapes that overlap the search box (region)
         This method was introduced in version 0.16
@@ -30098,7 +30098,7 @@ class Shapes:
         @param region The rectangular search region
         """
     @overload
-    def each_overlapping(self, flags: int, region: DBox) -> Shape:
+    def each_overlapping(self, flags: int, region: DBox) -> Iterable[Shape]:
         r"""
         @brief Gets all shapes that overlap the search box (region) where the search box is given in micrometer units
         @param flags An "or"-ed combination of the S... constants
@@ -30107,7 +30107,7 @@ class Shapes:
         This method was introduced in version 0.25
         """
     @overload
-    def each_touching(self, region: Box) -> Shape:
+    def each_touching(self, region: Box) -> Iterable[Shape]:
         r"""
         @brief Gets all shapes that touch the search box (region)
         @param region The rectangular search region
@@ -30115,7 +30115,7 @@ class Shapes:
         This call is equivalent to each_touching(SAll,region). This convenience method has been introduced in version 0.16
         """
     @overload
-    def each_touching(self, region: DBox) -> Shape:
+    def each_touching(self, region: DBox) -> Iterable[Shape]:
         r"""
         @brief Gets all shapes that touch the search box (region) where the search box is given in micrometer units
         @param region The rectangular search region as a \DBox object in micrometer units
@@ -30124,7 +30124,7 @@ class Shapes:
         This method was introduced in version 0.25
         """
     @overload
-    def each_touching(self, flags: int, region: Box) -> Shape:
+    def each_touching(self, flags: int, region: Box) -> Iterable[Shape]:
         r"""
         @brief Gets all shapes that touch the search box (region)
         This method was introduced in version 0.16
@@ -30133,7 +30133,7 @@ class Shapes:
         @param region The rectangular search region
         """
     @overload
-    def each_touching(self, flags: int, region: DBox) -> Shape:
+    def each_touching(self, flags: int, region: DBox) -> Iterable[Shape]:
         r"""
         @brief Gets all shapes that touch the search box (region) where the search box is given in micrometer units
         @param flags An "or"-ed combination of the S... constants
@@ -32074,7 +32074,7 @@ class Texts(ShapeCollection):
         r"""
         @brief Creates a copy of self
         """
-    def each(self) -> Text:
+    def each(self) -> Iterable[Text]:
         r"""
         @brief Returns each text of the text collection
         """
@@ -37392,7 +37392,7 @@ class NetTracer:
         r"""
         @brief Creates a copy of self
         """
-    def each_element(self) -> NetElement:
+    def each_element(self) -> Iterable[NetElement]:
         r"""
         @brief Iterates over the elements found during extraction
         The elements are available only after the extraction has been performed.

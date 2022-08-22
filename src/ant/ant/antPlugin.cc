@@ -91,7 +91,7 @@ PluginDeclaration::get_options (std::vector < std::pair<std::string, std::string
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_snap_mode, ACConverter ().to_string (lay::AC_Any)));
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_obj_snap, tl::to_string (true)));
   options.push_back (std::pair<std::string, std::string> (cfg_ruler_grid_snap, tl::to_string (false)));
-  options.push_back (std::pair<std::string, std::string> (cfg_ruler_templates, ant::TemplatesConverter ().to_string (make_standard_templates ())));
+  options.push_back (std::pair<std::string, std::string> (cfg_ruler_templates, std::string ()));
   options.push_back (std::pair<std::string, std::string> (cfg_current_ruler_template, "0"));
   //  grid-micron is not configured here since some other entity is supposed to do this.
 }
@@ -183,13 +183,10 @@ PluginDeclaration::config_finalize ()
   if (m_templates_updated) {
 
     update_menu ();
-    m_templates_updated = false;
-    m_current_template_updated = false;
 
   } else if (m_current_template_updated) {
 
     update_current_template ();
-    m_current_template_updated = false;
 
   }
 }
@@ -198,21 +195,16 @@ void
 PluginDeclaration::initialized (lay::Dispatcher *root)
 {
   //  Check if we already have templates (initial setup)
+  //  NOTE: this is not done by using a default value for the configuration item but dynamically.
+  //  This provides a migration path from earlier versions (not having templates) to recent ones.
   bool any_templates = false;
   for (std::vector<ant::Template>::iterator i = m_templates.begin (); ! any_templates && i != m_templates.end (); ++i) {
     any_templates = ! i->category ().empty ();
   }
 
   if (! any_templates) {
-
-    //  This is the migration path from <= 0.24 to 0.25: clear all templates unless we
-    //  have categorized ones there. Those can't be deleted, so we know we have a 0.25
-    //  setup if there are some
-    m_templates = make_standard_templates ();
-
-    root->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (m_templates));
+    root->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (make_standard_templates ()));
     root->config_end ();
-
   }
 }
 
@@ -250,6 +242,8 @@ PluginDeclaration::update_current_template ()
     }
 
   }
+
+  m_current_template_updated = false;
 }
 
 void 
@@ -294,6 +288,9 @@ PluginDeclaration::update_menu ()
       }
     }
   }
+
+  m_templates_updated = false;
+  m_current_template_updated = false;
 }
 
 void

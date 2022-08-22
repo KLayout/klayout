@@ -12,8 +12,7 @@ from functools import wraps
 import functools
 from sys import argv
 from textwrap import indent
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
-from klayout.tlcore import ArgType, Method
+from typing import Any, List, Optional, Tuple, Union
 import pya  # initialize all modules
 import klayout.tl as ktl
 

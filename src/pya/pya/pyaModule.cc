@@ -2364,206 +2364,6 @@ PythonModule::check (const char *mod_name)
   }
 }
 
-static std::string make_qualified_name (const gsi::ClassBase *cls)
-{
-  std::string qname;
-
-  const gsi::ClassBase *p = cls;
-  while (p) {
-
-    std::string n = p->name ();
-
-    if (qname.empty ()) {
-      qname = n;
-    } else {
-      qname = n + "." + qname;
-    }
-
-    p = p->parent ();
-
-  }
-
-  return qname;
-}
-
-static std::string
-type_to_s (const gsi::ArgType &a, bool for_return)
-{
-  std::string s;
-  switch (a.type ()) {
-  case gsi::T_void_ptr:
-    s += "None"; break;
-  case gsi::T_void:
-    s += "None"; break;
-  case gsi::T_bool:
-    s += "bool"; break;
-  case gsi::T_char:
-    s += "str"; break;
-  case gsi::T_schar:
-    s += "str"; break;
-  case gsi::T_uchar:
-    s += "str"; break;
-  case gsi::T_short:
-    s += "int"; break;
-  case gsi::T_ushort:
-    s += "int"; break;
-  case gsi::T_int:
-    s += "int"; break;
-#if defined(HAVE_64BIT_COORD)
-  case gsi::T_int128:
-    s += "int"; break;
-#endif
-  case gsi::T_uint:
-    s += "int"; break;
-  case gsi::T_long:
-    s += "int"; break;
-  case gsi::T_ulong:
-    s += "int"; break;
-  case gsi::T_longlong:
-    s += "int"; break;
-  case gsi::T_ulonglong:
-    s += "int"; break;
-  case gsi::T_double:
-    s += "float"; break;
-  case gsi::T_float:
-    s += "float"; break;
-  case gsi::T_string:
-    s += "str"; break;
-  case gsi::T_byte_array:
-    s += "bytes"; break;
-  case gsi::T_var:
-    s += "Any"; break;
-  case gsi::T_object:
-    if (a.is_cptr () || (! for_return && a.is_cref ())) {
-      // s = "const ";
-      s = "";
-    }
-    if (a.pass_obj ()) {
-      // s += "new ";
-      s += "";
-    }
-    s += make_qualified_name (a.cls ());
-    // s += a.cls ()->name ();
-    break;
-  case gsi::T_vector:
-    if (a.inner ()) {
-      s += "Iterable[";
-      s += type_to_s (*a.inner (), false);
-      s += "]";
-    }
-    break;
-  case gsi::T_map:
-    s += "Dict[";
-    if (a.inner_k ()) {
-      s += type_to_s (*a.inner_k (), false);
-    }
-    s += ", ";
-    if (a.inner ()) {
-      s += type_to_s (*a.inner (), false);
-    }
-    s += "]";
-    break;
-  }
-  if (a.is_cptr () || a.is_ptr ()) {
-    // s += " ptr";
-    s += "";
-  }
-  return s;
-}
-
-/**
- * Returns a return type from 'method' in a Python stub format.
- * Copied from layGSIHelpProvider.cc.
- */
-static std::string
-method_return (const gsi::MethodBase *method)
-{
-  return type_to_s (method->ret_type (), true);
-}
-
-/**
- * Returns an argument signature from 'method' in a Python stub format.
- * Copied from layGSIHelpProvider.cc.
- */
-static std::string
-method_arguments (const gsi::MethodBase *method)
-{
-  std::string r;
-  const char sep[] = " ";
-
-  if (method->begin_arguments () == method->end_arguments ()) {
-
-    r = "()";
-
-    return r;
-
-  } else {
-
-    r += "(";
-
-    int n = 0;
-    for (gsi::MethodBase::argument_iterator a = method->begin_arguments (); a != method->end_arguments (); ++a, ++n) {
-      if (n > 0) {
-        r += ",";
-        r += sep;
-      }
-
-      if (a->spec () && !a->spec ()->name ().empty()) {
-        r += a->spec ()->name ();
-        if (is_reserved_word(a->spec ()->name ()))
-        {
-          r += "_";
-        }
-        if (a->spec ()->has_default ()) {
-          r += ": Optional[" + type_to_s (*a, false);
-          r += "]";
-          r += " = ";
-          if (! a->spec ()->init_doc ().empty ()) {
-            // r += a->spec ()->init_doc ();
-            r += "None";
-          } else {
-            // try {
-            //   r += "(";
-            //   r += a->spec ()->default_value ().to_string ();
-            //   r += ")";
-            // } catch (tl::Exception &ex) {
-            //   r += "?";
-            // }
-            r += "None";
-          }
-        } else {
-          r += ": " + type_to_s (*a, false);
-        }
-      } else {
-        r += "arg" + tl::to_string (n + 1);
-        r += ": " + type_to_s (*a, false);
-      }
-    }
-
-    r += ")";
-
-  }
-
-  return r;
-}
-
-static std::string
-get_method_doc (const std::string py_name, const MethodTable *mt, const size_t mid)
-{
-  //  create documentation
-  std::string doc;
-  for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
-    if (! doc.empty ()) {
-      doc += "\n------\n";
-    }
-    std::string args_signature = method_arguments(*m);
-    std::string ret_signature = method_return(*m);
-    doc += tl::sprintf ("%s%s -> %s\n", py_name, args_signature, ret_signature);
-    doc += (*m)->doc ();
-  }
-  return doc;
-}
-
 void
 PythonModule::make_classes (const char *mod_name)
 {
@@ -2765,22 +2565,16 @@ PythonModule::make_classes (const char *mod_name)
 
       for (MethodTableEntry::method_iterator m = begin_getters; m != end_getters; ++m) {
         if (! doc.empty ()) {
-          doc += "\n------\n";
+          doc += "\n\n";
         }
-        std::string args_signature = method_arguments(*m);
-        std::string ret_signature = method_return(*m);
-        doc += tl::sprintf ("%s%s -> %s\n", name, args_signature, ret_signature);
         doc += (*m)->doc ();
         m_python_doc [*m] += tl::sprintf (tl::to_string (tr ("The object exposes a readable attribute '%s'. This is the getter.\n\n")), name);
       }
 
       for (MethodTableEntry::method_iterator m = begin_setters; m != end_setters; ++m) {
         if (! doc.empty ()) {
-          doc += "\n------\n";
+          doc += "\n\n";
         }
-        std::string args_signature = method_arguments(*m);
-        std::string ret_signature = method_return(*m);
-        doc += tl::sprintf ("%s%s -> %s\n", name, args_signature, ret_signature);
         doc += (*m)->doc ();
         m_python_doc [*m] += tl::sprintf (tl::to_string (tr ("The object exposes a writable attribute '%s'. This is the setter.\n\n")), name);
       }
@@ -2877,7 +2671,14 @@ PythonModule::make_classes (const char *mod_name)
           add_python_doc (**c, mt, int (mid), tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), name));
         }
 
-        // std::string doc = get_method_doc(name, mt, mid);
+        //  create documentation
+        std::string doc;
+        for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
+          if (! doc.empty ()) {
+            doc = "\n\n";
+          }
+          doc += (*m)->doc ();
+        }
 
         const gsi::MethodBase *m_first = *mt->begin (mid);
 
@@ -2941,7 +2742,7 @@ PythonModule::make_classes (const char *mod_name)
             PyMethodDef *method = make_method_def ();
             method->ml_name = make_string (*an);
             method->ml_meth = (PyCFunction) method_adaptors[mid];
-            method->ml_doc = make_string (get_method_doc (*an, mt, mid));
+            method->ml_doc = make_string (doc);
             method->ml_flags = METH_VARARGS;
 
             PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
@@ -2952,7 +2753,7 @@ PythonModule::make_classes (const char *mod_name)
           PyMethodDef *method = make_method_def ();
           method->ml_name = make_string (name);
           method->ml_meth = (PyCFunction) method_adaptors[mid];
-          method->ml_doc = make_string (get_method_doc (name, mt, mid));
+          method->ml_doc = make_string (doc);
           method->ml_flags = METH_VARARGS;
 
           PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
@@ -2985,7 +2786,7 @@ PythonModule::make_classes (const char *mod_name)
             PyMethodDef *method = make_method_def ();
             method->ml_name = "__init__";
             method->ml_meth = (PyCFunction) method_init_adaptors[mid];
-            method->ml_doc = make_string (get_method_doc (method->ml_name, mt, mid));
+            method->ml_doc = make_string (doc);
             method->ml_flags = METH_VARARGS;
 
             PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
@@ -2996,7 +2797,7 @@ PythonModule::make_classes (const char *mod_name)
           PyMethodDef *method = make_method_def ();
           method->ml_name = make_string (name);
           method->ml_meth = (PyCFunction) method_adaptors[mid];
-          method->ml_doc = make_string (get_method_doc (name, mt, mid));
+          method->ml_doc = make_string (doc);
           method->ml_flags = METH_VARARGS | METH_CLASS;
 
           PythonRef attr = PythonRef (PyDescr_NewClassMethod (type, method));

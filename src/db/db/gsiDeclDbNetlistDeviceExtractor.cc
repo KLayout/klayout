@@ -283,6 +283,9 @@ Class<db::NetlistDeviceExtractor> decl_dbNetlistDeviceExtractor ("db", "DeviceEx
   gsi::method ("name", &db::NetlistDeviceExtractor::name,
     "@brief Gets the name of the device extractor and the device class."
   ) +
+  gsi::method ("name=", &db::NetlistDeviceExtractor::set_name, gsi::arg ("name"),
+    "@brief Sets the name of the device extractor and the device class."
+  ) +
   gsi::method ("device_class", &db::NetlistDeviceExtractor::device_class,
     "@brief Gets the device class used during extraction\n"
     "The attribute will hold the actual device class used in the device extraction. It "
@@ -310,9 +313,6 @@ Class<db::NetlistDeviceExtractor> decl_dbNetlistDeviceExtractor ("db", "DeviceEx
 );
 
 Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceExtractor, "db", "GenericDeviceExtractor",
-  gsi::method ("set_name", &GenericDeviceExtractor::set_name,
-    "@brief Sets the name of the device extractor and the device class."
-  ) +
   gsi::callback ("setup", &GenericDeviceExtractor::setup, &GenericDeviceExtractor::cb_setup,
     "@brief Sets up the extractor.\n"
     "This method is supposed to set up the device extractor. This involves three basic steps:\n"

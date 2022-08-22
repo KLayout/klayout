@@ -675,7 +675,7 @@ class Class:
         """
     def each_child_class(self) -> Iterable[Class]:
         r"""
-        @brief Iterate over all child classes within this class
+        @brief Iterate over all child classes defined within this class
         """
     def each_method(self) -> Iterable[Method]:
         r"""

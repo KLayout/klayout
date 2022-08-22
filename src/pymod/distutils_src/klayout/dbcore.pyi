@@ -19728,6 +19728,10 @@ class DeviceExtractorBase:
 
     This class has been introduced in version 0.26.
     """
+    name: str
+    r"""
+    @brief Gets the name of the device extractor and the device class.@brief Sets the name of the device extractor and the device class.
+    """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -19783,10 +19787,6 @@ class DeviceExtractorBase:
     def each_layer_definition(self) -> Iterable[NetlistDeviceExtractorLayerDefinition]:
         r"""
         @brief Iterates over all layer definitions.
-        """
-    def name(self) -> str:
-        r"""
-        @brief Gets the name of the device extractor and the device class.
         """
     def test_initialize(self, netlist: Netlist) -> None:
         r"""
@@ -19981,10 +19981,6 @@ class GenericDeviceExtractor(DeviceExtractorBase):
         @brief Gets the scaled database unit
         Use this unit to compute device properties. It is the database unit multiplied with the
         device scaling factor.
-        """
-    def set_name(self, arg0: str) -> None:
-        r"""
-        @brief Sets the name of the device extractor and the device class.
         """
     def setup(self) -> None:
         r"""

@@ -245,8 +245,8 @@ public:
  *  @brief An intersection detector
  *
  *  This edge evaluator will not produce output edges but rather record the 
- *  property pairs of polygons intersecting. Only intersections (overlaps)
- *  are recorded. Touching contacts are not recorded.
+ *  property pairs of polygons intersecting or interacting in the specified
+ *  way.
  *
  *  It will build a set of property pairs, where the lower property value
  *  is the first one of the pairs. 

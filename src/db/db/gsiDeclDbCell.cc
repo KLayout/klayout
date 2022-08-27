@@ -2718,9 +2718,9 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@return The bounding box of the cell\n"
     "\n"
     "The bounding box is computed over all layers. To compute the bounding box over single layers, "
-    "use \\bbox_per_layer.\n"
+    "use \\bbox with a layer index argument.\n"
   ) +
-  gsi::method ("bbox_per_layer", (const db::Cell::box_type &(db::Cell::*) (unsigned int) const) &db::Cell::bbox, gsi::arg ("layer_index"),
+  gsi::method ("bbox|#bbox_per_layer", (const db::Cell::box_type &(db::Cell::*) (unsigned int) const) &db::Cell::bbox, gsi::arg ("layer_index"),
     "@brief Gets the per-layer bounding box of the cell\n"
     "\n"
     "@return The bounding box of the cell considering only the given layer\n"
@@ -2733,11 +2733,11 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@return The bounding box of the cell\n"
     "\n"
     "The bounding box is computed over all layers. To compute the bounding box over single layers, "
-    "use \\dbbox_per_layer.\n"
+    "use \\dbbox with a layer index argument.\n"
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("dbbox_per_layer", &cell_dbbox_per_layer, gsi::arg ("layer_index"),
+  gsi::method_ext ("dbbox|#dbbox_per_layer", &cell_dbbox_per_layer, gsi::arg ("layer_index"),
     "@brief Gets the per-layer bounding box of the cell in micrometer units\n"
     "\n"
     "@return The bounding box of the cell considering only the given layer\n"
@@ -3913,7 +3913,7 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("bbox_per_layer", &inst_bbox_per_layer, gsi::arg ("layer_index"),
+  gsi::method_ext ("bbox|#bbox_per_layer", &inst_bbox_per_layer, gsi::arg ("layer_index"),
     "@brief Gets the bounding box of the instance for a given layer\n"
     "@param layer_index The index of the layer the bounding box will be computed for.\n"
     "The bounding box incorporates all instances that the array represents. "
@@ -3922,11 +3922,11 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("dbbox_per_layer", &inst_dbbox_per_layer, gsi::arg ("layer_index"),
+  gsi::method_ext ("dbbox|#dbbox_per_layer", &inst_dbbox_per_layer, gsi::arg ("layer_index"),
     "@brief Gets the bounding box of the instance in micron units\n"
     "@param layer_index The index of the layer the bounding box will be computed for.\n"
-    "Gets the bounding box (see \\bbox_per_layer) of the instance, but will compute the micrometer unit box by "
-    "multiplying \\bbox_per_layer with the database unit.\n"
+    "Gets the bounding box (see \\bbox) of the instance, but will compute the micrometer unit box by "
+    "multiplying \\bbox with the database unit.\n"
     "\n"
     "This method has been introduced in version 0.25."
   ) +
@@ -4412,7 +4412,7 @@ static db::CellInstArray::box_type cell_inst_array_bbox_per_layer (const db::Cel
 
 Class<db::CellInstArray> decl_CellInstArray ("db", "CellInstArray",
   cell_inst_array_defs<db::CellInstArray>::methods (false /*old version*/) +
-  gsi::method_ext ("bbox_per_layer", &cell_inst_array_bbox_per_layer, gsi::arg ("layout"), gsi::arg ("layer_index"),
+  gsi::method_ext ("bbox|#bbox_per_layer", &cell_inst_array_bbox_per_layer, gsi::arg ("layout"), gsi::arg ("layer_index"),
     "@brief Gets the bounding box of the array with respect to one layer\n"
     "The bounding box incorporates all instances that the array represents. It needs the layout object to access the "
     "actual cell from the cell index."
@@ -4474,7 +4474,7 @@ static db::DBox cell_dinst_array_bbox_per_layer (const db::DCellInstArray *a, co
 
 Class<db::DCellInstArray> decl_DCellInstArray ("db", "DCellInstArray",
   cell_inst_array_defs<db::DCellInstArray>::methods (true /*new version*/) +
-  gsi::method_ext ("bbox_per_layer", &cell_dinst_array_bbox_per_layer, gsi::arg ("layout"), gsi::arg ("layer_index"),
+  gsi::method_ext ("bbox|#bbox_per_layer", &cell_dinst_array_bbox_per_layer, gsi::arg ("layout"), gsi::arg ("layer_index"),
     "@brief Gets the bounding box of the array with respect to one layer\n"
     "The bounding box incorporates all instances that the array represents. It needs the layout object to access the "
     "actual cell from the cell index."

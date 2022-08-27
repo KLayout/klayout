@@ -83,9 +83,13 @@ namespace gsi
   }
 
   static void
-  lm_map_string (db::LayerMap *layer_map, std::string &s, unsigned int l)
+  lm_map_string (db::LayerMap *layer_map, std::string &s, int l)
   {
-    layer_map->map_expr (s, l);
+    if (l < 0) {
+      layer_map->map_expr (s, layer_map->next_index ());
+    } else {
+      layer_map->map_expr (s, (unsigned int) l);
+    }
   }
 
   static void
@@ -113,9 +117,13 @@ namespace gsi
   }
 
   static void
-  lm_mmap_string (db::LayerMap *layer_map, std::string &s, unsigned int l)
+  lm_mmap_string (db::LayerMap *layer_map, std::string &s, int l)
   {
-    layer_map->mmap_expr (s, l);
+    if (l < 0) {
+      layer_map->mmap_expr (s, layer_map->next_index ());
+    } else {
+      layer_map->mmap_expr (s, (unsigned int) l);
+    }
   }
 
   static void
@@ -215,7 +223,7 @@ namespace gsi
       "\n"
       "This method has been added in version 0.20.\n"
     ) +
-    gsi::method_ext ("map", &lm_map_string, gsi::arg ("map_expr"), gsi::arg ("log_layer"),
+    gsi::method_ext ("map", &lm_map_string, gsi::arg ("map_expr"), gsi::arg ("log_layer", -1),
       "@brief Maps a physical layer given by a string to a logical one\n"
       "@param map_expr The string describing the physical layer to map.\n"
       "@param log_layer The logical layer to which the physical layers are mapped.\n"
@@ -242,7 +250,9 @@ namespace gsi
       "For example, \"1-10/0: *+1/0\" will add 1 to the original layer number.\n"
       "\"1-10/0-50: * / *\" will use the original layers.\n"
       "\n"
-      "Target mapping has been added in version 0.20.\n"
+      "If the logical layer is negative or omitted, the method will select the next available one.\n"
+      "\n"
+      "Target mapping has been added in version 0.20. The logical layer is optional since version 0.28.\n"
     ) +
     gsi::method_ext ("mmap", &lm_mmap, gsi::arg ("phys_layer"), gsi::arg ("log_layer"),
       "@brief Maps a physical layer to a logical one and adds to existing mappings\n"
@@ -280,14 +290,16 @@ namespace gsi
       "\n"
       "Multi-mapping has been added in version 0.27.\n"
     ) +
-    gsi::method_ext ("mmap", &lm_mmap_string, gsi::arg ("map_expr"), gsi::arg ("log_layer"),
+    gsi::method_ext ("mmap", &lm_mmap_string, gsi::arg ("map_expr"), gsi::arg ("log_layer", -1),
       "@brief Maps a physical layer given by an expression to a logical one and adds to existing mappings\n"
       "\n"
       "This method acts like the corresponding 'map' method, but adds the logical layer to the receivers of the "
       "given physical one. Hence this method implements 1:n mapping capabilities.\n"
       "For backward compatibility, 'map' still substitutes mapping.\n"
       "\n"
-      "Multi-mapping has been added in version 0.27.\n"
+      "If the logical layer is negative or omitted, the method will select the next available one.\n"
+      "\n"
+      "Multi-mapping has been added in version 0.27. The logical layer is optional since version 0.28.\n"
     ) +
     gsi::method_ext ("unmap", &lm_unmap, gsi::arg ("phys_layer"),
       "@brief Unmaps the given layer\n"
@@ -347,9 +359,9 @@ namespace gsi
     "\n"
     "@code"
     "lm = RBA::LayerMap::new\n"
-    "lm.map(\"1/0-255 : ONE (1/0)\", 0)\n"
-    "lm.map(\"2/0-255 : TWO (2/0)\", 1)\n"
-    "lm.map(\"3/0-255 : THREE (3/0)\", 2)\n"
+    "lm.map(\"1/0-255 : ONE (1/0)\")\n"
+    "lm.map(\"2/0-255 : TWO (2/0)\")\n"
+    "lm.map(\"3/0-255 : THREE (3/0)\")\n"
     "\n"
     "# read the layout using the layer map\n"
     "lo = RBA::LoadLayoutOptions::new\n"

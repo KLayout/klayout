@@ -25,6 +25,8 @@
 
 #include "layD25View.h"
 #include "layLayoutView.h"
+#include "layConverters.h"
+#include "laybasicConfig.h"
 #include "layQtTools.h"
 
 #include "ui_D25View.h"
@@ -77,11 +79,6 @@ D25View::D25View (lay::Dispatcher *root, LayoutViewBase *view)
   view->cellviews_changed_event.add (this, &D25View::cellviews_changed);
   view->layer_list_changed_event.add (this, &D25View::layer_properties_changed);
 
-  QPalette palette = mp_ui->material_list->palette ();
-  palette.setColor (QPalette::Base, Qt::black);
-  palette.setColor (QPalette::Text, Qt::white);
-  mp_ui->material_list->setPalette (palette);
-
   QFont font = mp_ui->material_list->font ();
   font.setWeight (QFont::Bold);
   mp_ui->material_list->setFont (font);
@@ -117,6 +114,27 @@ void
 D25View::layer_properties_changed (int)
 {
   //  .. nothing yet ..
+}
+
+bool D25View::configure(const std::string &name, const std::string &value)
+{
+  if (name == lay::cfg_background_color) {
+
+    lay::ColorConverter lc;
+
+    tl::Color bg;
+    lc.from_string (value, bg);
+
+    QPalette palette = mp_ui->material_list->palette ();
+    palette.setColor (QPalette::Base, bg.to_qc ());
+    palette.setColor (QPalette::Text, bg.to_mono () ? Qt::black : Qt::white);
+    mp_ui->material_list->setPalette (palette);
+
+    mp_ui->d25_view->update ();
+
+  }
+
+  return lay::Browser::configure (name, value);
 }
 
 void

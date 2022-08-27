@@ -53,7 +53,7 @@
 z(input(1, 0), 0.1 .. 0.2)
 z(input(2, 0), height: 250.nm, color: 0xffbc80)
 
-zz(like: 7/0, name: "Metal") do
+zz(like: "7/0", name: "Metal") do
   z(input(7, 0), height: 100.nm)
   z(input(8, 0), height: 150.nm)
 end

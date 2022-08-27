@@ -27,6 +27,7 @@
 #include "tlCommon.h"
 
 #include <string>
+#include <sstream>
 #include <typeinfo>
 #include <stdexcept>
 #include <stdint.h>
@@ -930,7 +931,34 @@ inline std::string sprintf (const std::string &fmt, const tl::Variant &a1, const
 
 TL_PUBLIC std::string trim (const std::string &s);
 TL_PUBLIC std::vector<std::string> split (const std::string &s, const std::string &sep);
-TL_PUBLIC std::string join (const std::vector<std::string> &strings, const std::string &sep);
+
+/**
+ *  @brief Joins a generic iterated list into a single string using the given separator
+ */
+template <class Iter>
+TL_PUBLIC_TEMPLATE std::string join (Iter from, Iter to, const std::string &sep)
+{
+  std::ostringstream r;
+
+  bool first = true;
+  for (Iter i = from; i != to; ++i) {
+    if (!first) {
+      r << sep;
+    }
+    first = false;
+    r << tl::to_string (*i);
+  }
+
+  return r.str ();
+}
+
+/**
+ *  @brief Joins a vector of strings into a single string using the given separator
+ */
+inline std::string join (const std::vector<std::string> &strings, const std::string &sep)
+{
+  return join (strings.begin (), strings.end (), sep);
+}
 
 /**
  *  @brief Returns the lower-case character for a wchar_t

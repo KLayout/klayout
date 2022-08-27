@@ -5,6 +5,7 @@ recursive-include src/rdb/rdb *.cc *.h
 recursive-include src/pya/pya *.cc *.h
 recursive-include src/lib/lib *.cc *.h
 recursive-include src/pymod *.cc *.h
+recursive-include src/pymod *.pyi
 include src/plugins/*/db_plugin/*.cc
 include src/plugins/*/*/db_plugin/*.cc
 include src/plugins/*/db_plugin/*.h

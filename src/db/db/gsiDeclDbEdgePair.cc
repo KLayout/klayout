@@ -49,7 +49,7 @@ struct edge_pair_defs
     return c.release ();
   }
 
-  static C *new_v () 
+  static C *new_v ()
   {
     return new C ();
   }
@@ -67,29 +67,29 @@ struct edge_pair_defs
   static gsi::Methods methods ()
   {
     return
-    constructor ("new", &new_v, 
+    constructor ("new", &new_v,
       "@brief Default constructor\n"
       "\n"
       "This constructor creates an default edge pair.\n"
-    ) + 
+    ) +
     constructor ("new", &new_ee, gsi::arg ("first"), gsi::arg ("second"), gsi::arg ("symmetric", false),
       "@brief Constructor from two edges\n"
       "\n"
       "This constructor creates an edge pair from the two edges given.\n"
       "See \\symmetric? for a description of this attribute."
-    ) + 
-    method ("first", (const edge_type &(C::*) () const) &C::first, 
+    ) +
+    method ("first", (const edge_type &(C::*) () const) &C::first,
       "@brief Gets the first edge\n"
-    ) + 
+    ) +
     method ("first=", &C::set_first, gsi::arg ("edge"),
       "@brief Sets the first edge\n"
-    ) + 
-    method ("second", (const edge_type &(C::*) () const) &C::second, 
+    ) +
+    method ("second", (const edge_type &(C::*) () const) &C::second,
       "@brief Gets the second edge\n"
-    ) + 
+    ) +
     method ("second=", &C::set_second, gsi::arg ("edge"),
       "@brief Sets the second edge\n"
-    ) + 
+    ) +
     method ("symmetric?", &C::is_symmetric,
       "@brief Returns a value indicating whether the edge pair is symmetric\n"
       "For symmetric edge pairs, the edges are commutable. Specifically, a symmetric edge pair with (e1,e2) is identical to (e2,e1). "
@@ -125,8 +125,8 @@ struct edge_pair_defs
       "Normalization is a first step recommended before converting an edge pair to a polygon, "
       "because that way the polygons won't be self-overlapping and the enlargement parameter "
       "is applied properly."
-    ) + 
-    method ("polygon", &C::to_polygon, gsi::arg ("e The enlargement (set to zero for exact representation)"),
+    ) +
+    method ("polygon", &C::to_polygon, gsi::arg ("e"),
       "@brief Convert an edge pair to a polygon\n"
       "The polygon is formed by connecting the end and start points of the edges. It is recommended to "
       "use \\normalized before converting the edge pair to a polygon.\n"
@@ -137,8 +137,10 @@ struct edge_pair_defs
       "edge pairs consisting of two point-like edges.\n"
       "\n"
       "Another version for converting edge pairs to simple polygons is \\simple_polygon which renders a \\SimplePolygon object."
-    ) + 
-    method ("simple_polygon", &C::to_simple_polygon, gsi::arg ("e The enlargement (set to zero for exact representation)"),
+      "\n"
+      "@param e The enlargement (set to zero for exact representation)"
+    ) +
+    method ("simple_polygon", &C::to_simple_polygon, gsi::arg ("e"),
       "@brief Convert an edge pair to a simple polygon\n"
       "The polygon is formed by connecting the end and start points of the edges. It is recommended to "
       "use \\normalized before converting the edge pair to a polygon.\n"
@@ -149,17 +151,19 @@ struct edge_pair_defs
       "edge pairs consisting of two point-like edges.\n"
       "\n"
       "Another version for converting edge pairs to polygons is \\polygon which renders a \\Polygon object."
-    ) + 
+      "\n"
+      "@param e The enlargement (set to zero for exact representation)"
+    ) +
     constructor ("from_s", &from_string, gsi::arg ("s"),
       "@brief Creates an object from a string\n"
       "Creates the object from a string representation (as returned by \\to_s)\n"
       "\n"
       "This method has been added in version 0.23.\n"
     ) +
-    method ("to_s", (std::string (C::*) () const) &C::to_string, 
+    method ("to_s", (std::string (C::*) () const) &C::to_string,
       "@brief Returns a string representing the edge pair\n"
     ) +
-    method ("bbox", &C::bbox, 
+    method ("bbox", &C::bbox,
       "@brief Gets the bounding box of the edge pair\n"
     ) +
     method ("<", &C::less, gsi::arg ("box"),

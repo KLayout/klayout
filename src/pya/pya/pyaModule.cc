@@ -589,6 +589,8 @@ static std::string extract_python_name (const std::string &name)
     return "__ixor__";
   } else if (name == "[]") {
     return "__getitem__";
+  } else if (name == "[]=") {
+    return "__setitem__";
   } else {
 
     const char *c = name.c_str ();
@@ -2684,7 +2686,7 @@ public:
         const gsi::MethodBase *m_first = *mt->begin (mid);
 
         tl_assert (mid < sizeof (method_adaptors) / sizeof (method_adaptors[0]));
-        if (! mt->is_static (mid)) {
+        if (! mt->is_static (mid)) {  //  Bound methods
 
           if (! as_static) {
 
@@ -2781,7 +2783,7 @@ public:
             mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This attribute is not available for Python")));
           }
 
-        } else if (! as_static) {
+        } else if (! as_static) {  //  Class methods
 
           if (m_first->ret_type ().type () == gsi::T_object && m_first->ret_type ().pass_obj () && name == "new") {
 

@@ -2726,6 +2726,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@return The bounding box of the cell considering only the given layer\n"
     "\n"
     "The bounding box is the box enclosing all shapes on the given layer.\n"
+    "\n"
+    "'bbox' is the preferred synonym since version 0.28.\n"
   ) +
   gsi::method_ext ("dbbox", &cell_dbbox,
     "@brief Gets the bounding box of the cell in micrometer units\n"
@@ -2744,7 +2746,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "The bounding box is the box enclosing all shapes on the given layer.\n"
     "\n"
-    "This method has been introduced in version 0.25."
+    "This method has been introduced in version 0.25. "
+    "'dbbox' is the preferred synonym since version 0.28.\n"
   ) +
   gsi::iterator_ext ("each_overlapping_inst", &begin_overlapping_inst, gsi::arg ("b"),
     "@brief Gets the instances overlapping the given rectangle\n"
@@ -3920,7 +3923,7 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "It gives the overall extension of the child cell as seen in the calling cell (or all array members if the instance forms an array) "
     "for the given layer. If the layer is empty in this cell and all it's children', an empty bounding box will be returned. "
     "\n"
-    "This method has been introduced in version 0.25."
+    "This method has been introduced in version 0.25. 'bbox' is the preferred synonym for it since version 0.28."
   ) +
   gsi::method_ext ("dbbox|#dbbox_per_layer", &inst_dbbox_per_layer, gsi::arg ("layer_index"),
     "@brief Gets the bounding box of the instance in micron units\n"
@@ -3928,7 +3931,7 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "Gets the bounding box (see \\bbox) of the instance, but will compute the micrometer unit box by "
     "multiplying \\bbox with the database unit.\n"
     "\n"
-    "This method has been introduced in version 0.25."
+    "This method has been introduced in version 0.25. 'dbbox' is the preferred synonym for it since version 0.28."
   ) +
   gsi::method_ext ("parent_cell", &parent_cell_ptr,
     "@brief Gets the cell this instance is contained in\n"
@@ -4415,7 +4418,9 @@ Class<db::CellInstArray> decl_CellInstArray ("db", "CellInstArray",
   gsi::method_ext ("bbox|#bbox_per_layer", &cell_inst_array_bbox_per_layer, gsi::arg ("layout"), gsi::arg ("layer_index"),
     "@brief Gets the bounding box of the array with respect to one layer\n"
     "The bounding box incorporates all instances that the array represents. It needs the layout object to access the "
-    "actual cell from the cell index."
+    "actual cell from the cell index.\n"
+    "\n"
+    "'bbox' is the preferred synonym since version 0.28.\n"
   ) +
   gsi::method_ext ("bbox", &cell_inst_array_bbox, gsi::arg ("layout"),
     "@brief Gets the bounding box of the array\n"
@@ -4477,7 +4482,9 @@ Class<db::DCellInstArray> decl_DCellInstArray ("db", "DCellInstArray",
   gsi::method_ext ("bbox|#bbox_per_layer", &cell_dinst_array_bbox_per_layer, gsi::arg ("layout"), gsi::arg ("layer_index"),
     "@brief Gets the bounding box of the array with respect to one layer\n"
     "The bounding box incorporates all instances that the array represents. It needs the layout object to access the "
-    "actual cell from the cell index."
+    "actual cell from the cell index.\n"
+    "\n"
+    "'bbox' is the preferred synonym since version 0.28.\n"
   ) +
   gsi::method_ext ("bbox", &cell_dinst_array_bbox, gsi::arg ("layout"),
     "@brief Gets the bounding box of the array\n"

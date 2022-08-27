@@ -33,6 +33,11 @@ class DBShapes_TestClass < TestBase
   # Shapes
   def test_7_Layout
 
+    shapes = RBA::Shapes::new
+
+    assert_equal(shapes.cell == nil, true)
+    assert_equal(shapes.layout == nil, true)
+
     ly = RBA::Layout::new
 
     ci1 = ly.add_cell( "c1" )
@@ -56,6 +61,9 @@ class DBShapes_TestClass < TestBase
     c1.shapes( lindex ).insert( RBA::Box::new( 200, -10, 250, 40 ) )
 
     shapes = c1.shapes( lindex )
+
+    assert_equal(shapes.cell == c1, true)
+    assert_equal(shapes.layout == ly, true)
 
     arr = []
     shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.box.to_s ) } 

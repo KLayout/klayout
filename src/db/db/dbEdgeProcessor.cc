@@ -560,8 +560,8 @@ private:
 // -------------------------------------------------------------------------------
 //  EdgePolygonOp implementation
 
-EdgePolygonOp::EdgePolygonOp (bool outside, bool include_touching, int polygon_mode) 
-  : m_outside (outside), m_include_touching (include_touching),
+EdgePolygonOp::EdgePolygonOp (EdgePolygonOp::mode_t mode, bool include_touching, int polygon_mode)
+  : m_mode (mode), m_include_touching (include_touching),
     m_function (polygon_mode),
     m_wcp_n (0), m_wcp_s (0)
 {
@@ -572,27 +572,30 @@ void EdgePolygonOp::reset ()
   m_wcp_n = m_wcp_s = 0;
 }
 
-bool EdgePolygonOp::select_edge (bool horizontal, property_type p) 
+int EdgePolygonOp::select_edge (bool horizontal, property_type p)
 {
   if (p == 0) {
+    return 0;
+  }
 
-    return false;
+  bool inside;
 
-  } else if (horizontal) {
-
-    bool res;
+  if (horizontal) {
     if (m_include_touching) {
-      res = (m_function (m_wcp_n) || m_function (m_wcp_s));
+      inside = (m_function (m_wcp_n) || m_function (m_wcp_s));
     } else {
-      res = (m_function (m_wcp_n) && m_function (m_wcp_s));
+      inside = (m_function (m_wcp_n) && m_function (m_wcp_s));
     }
-
-    return m_outside ? !res : res;
-
   } else {
+    inside = m_function (m_wcp_n);
+  }
 
-    return m_outside ? !m_function (m_wcp_n) : m_function (m_wcp_n);
-
+  if (m_mode == Inside) {
+    return inside ? 1 : 0;
+  } else if (m_mode == Outside) {
+    return inside ? 0 : 1;
+  } else {
+    return inside ? 1 : 2;
   }
 }
 
@@ -1705,10 +1708,11 @@ public:
 
   void select_edge (const WorkEdge &e)
   {
-    if (mp_op->select_edge (e.dy () == 0, e.prop)) {
-      mp_es->put (e);
+    int tag = mp_op->select_edge (e.dy () == 0, e.prop);
+    if (tag > 0) {
+      mp_es->put (e, (unsigned int) tag);
 #ifdef DEBUG_EDGE_PROCESSOR
-      printf ("put(%s)\n", e.to_string().c_str());
+      printf ("put(%s, %d)\n", e.to_string().c_str(), tag);
 #endif
     }
   }

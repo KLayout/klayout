@@ -34,6 +34,11 @@
 
 namespace db {
 
+/**
+ *  @brief The operation mode for the interaction filters
+ */
+enum EdgeInteractionMode { EdgesInteract, EdgesInside, EdgesOutside };
+
 class PolygonSink;
 
 /**
@@ -249,8 +254,8 @@ class edge_interaction_filter
   : public db::box_scanner_receiver<db::Edge, size_t>
 {
 public:
-  edge_interaction_filter (OutputContainer &output)
-    : mp_output (&output)
+  edge_interaction_filter (OutputContainer &output, EdgeInteractionMode mode)
+    : mp_output (&output), m_mode (mode)
   {
     //  .. nothing yet ..
   }
@@ -261,6 +266,7 @@ public:
     if (p1 != p2) {
       const db::Edge *o = p1 > p2 ? o2 : o1;
       const db::Edge *oo = p1 > p2 ? o1 : o2;
+      // @@@
       if (o->intersect (*oo)) {
         if (m_seen.insert (o).second) {
           mp_output->insert (*o);
@@ -272,6 +278,7 @@ public:
 private:
   OutputContainer *mp_output;
   std::set<const db::Edge *> m_seen;
+  EdgeInteractionMode m_mode;
 };
 
 /**
@@ -288,8 +295,8 @@ class edge_to_region_interaction_filter
   : public db::box_scanner_receiver2<db::Edge, size_t, db::Polygon, size_t>
 {
 public:
-  edge_to_region_interaction_filter (OutputContainer &output)
-    : mp_output (&output)
+  edge_to_region_interaction_filter (OutputContainer *output, EdgeInteractionMode mode)
+    : mp_output (output), m_mode (mode)
   {
     //  .. nothing yet ..
   }
@@ -300,6 +307,7 @@ public:
     tl::select (ep, e, p);
 
     if (m_seen.find (ep) == m_seen.end ()) {
+      // @@@
       if (db::interact (*p, *e)) {
         m_seen.insert (ep);
         mp_output->insert (*ep);
@@ -310,6 +318,7 @@ public:
 private:
   OutputContainer *mp_output;
   std::set<const OutputType *> m_seen;
+  EdgeInteractionMode m_mode;
 };
 
 /**
@@ -407,7 +416,7 @@ class DB_PUBLIC EdgeSegmentSelector
   : public EdgeProcessorBase
 {
 public:
-  EdgeSegmentSelector (int mode, db::Edges::length_type length, double fraction);
+  EdgeSegmentSelector (int mode, Edge::distance_type length, double fraction);
   ~EdgeSegmentSelector ();
 
   virtual void process (const db::Edge &edge, std::vector<db::Edge> &res) const;
@@ -420,7 +429,7 @@ public:
 
 private:
   int m_mode;
-  db::Edges::length_type m_length;
+  db::Edge::distance_type m_length;
   double m_fraction;
   db::MagnificationReducer m_vars;
 };

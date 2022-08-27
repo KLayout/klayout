@@ -88,6 +88,15 @@ public:
   virtual void put (const db::Edge &) { }
 
   /**
+   *  @brief Deliver a tagged edge
+   *
+   *  This method delivers an edge that ends or starts at the current scanline.
+   *  This version includes a tag which is generated when using "select_edge".
+   *  A tag is a value > 0 returned by "select_edge".
+   */
+  virtual void put (const db::Edge &, int /*tag*/) { }
+
+  /**
    *  @brief Deliver an edge that crosses the scanline
    *
    *  This method is called to deliver an edge that is not starting or ending at the
@@ -130,15 +139,15 @@ public:
   /**
    *  @brief Constructor connecting this receiver to an external edge vector
    */
-  EdgeContainer (std::vector<db::Edge> &edges, bool clear = false) 
-    : EdgeSink (), mp_edges (&edges), m_clear (clear) 
+  EdgeContainer (std::vector<db::Edge> &edges, bool clear = false, int tag = 0, EdgeContainer *chained = 0)
+    : EdgeSink (), mp_edges (&edges), m_clear (clear), m_tag (tag), mp_chained (chained)
   { }
 
   /**
    *  @brief Constructor using an internal edge vector
    */
-  EdgeContainer ()
-    : EdgeSink (), mp_edges (&m_edges), m_clear (false)
+  EdgeContainer (int tag = 0, EdgeContainer *chained = 0)
+    : EdgeSink (), mp_edges (&m_edges), m_clear (false), m_tag (tag), mp_chained (chained)
   { }
 
   /**
@@ -167,6 +176,9 @@ public:
       //  The single-shot scheme is a easy way to overcome problems with multiple start/flush brackets (i.e. on size filter)
       m_clear = false;
     }
+    if (mp_chained) {
+      mp_chained->start ();
+    }
   }
 
   /**
@@ -175,12 +187,30 @@ public:
   virtual void put (const db::Edge &e) 
   {
     mp_edges->push_back (e);
+    if (mp_chained) {
+      mp_chained->put (e);
+    }
+  }
+
+  /**
+   *  @brief Implementation of the EdgeSink interface
+   */
+  virtual void put (const db::Edge &e, int tag)
+  {
+    if (m_tag == 0 || tag == m_tag) {
+      mp_edges->push_back (e);
+    }
+    if (mp_chained) {
+      mp_chained->put (e, tag);
+    }
   }
 
 private:
   std::vector<db::Edge> m_edges;
   std::vector<db::Edge> *mp_edges;
   bool m_clear;
+  int m_tag;
+  EdgeContainer *mp_chained;
 };
 
 /**
@@ -204,7 +234,7 @@ public:
   virtual void reset () { }
   virtual void reserve (size_t /*n*/) { }
   virtual int edge (bool /*north*/, bool /*enter*/, property_type /*p*/) { return 0; }
-  virtual bool select_edge (bool /*horizontal*/, property_type /*p*/) { return false; }
+  virtual int select_edge (bool /*horizontal*/, property_type /*p*/) { return 0; }
   virtual int compare_ns () const { return 0; }
   virtual bool is_reset () const { return false; }
   virtual bool prefer_touch () const { return false; }
@@ -492,23 +522,33 @@ class DB_PUBLIC EdgePolygonOp
 {
 public:
   /**
+   * @brief The operation mode
+   */
+  enum mode_t {
+    Inside = 0,    //  Selects inside edges
+    Outside = 1,   //  Selects outside edges
+    Both = 2       //  Selects both (inside -> tag #1, outside -> tag #2)
+  };
+
+  /**
    *  @brief Constructor
    *
    *  @param outside If true, the operator will deliver edges outside the polygon
    *  @param include_touching If true, edges on the polygon's border will be considered "inside" of polygons
    *  @param polygon_mode Determines how the polygon edges on property 0 are interpreted (see merge operators)
    */
-  EdgePolygonOp (bool outside = false, bool include_touching = true, int polygon_mode = -1);
+  EdgePolygonOp (mode_t mode = Inside, bool include_touching = true, int polygon_mode = -1);
 
   virtual void reset ();
-  virtual bool select_edge (bool horizontal, property_type p);
+  virtual int select_edge (bool horizontal, property_type p);
   virtual int edge (bool north, bool enter, property_type p);
   virtual bool is_reset () const;
   virtual bool prefer_touch () const;
   virtual bool selects_edges () const;
 
 private:
-  bool m_outside, m_include_touching;
+  mode_t m_mode;
+  bool m_include_touching;
   db::ParametrizedInsideFunc m_function;
   int m_wcp_n, m_wcp_s;
 };

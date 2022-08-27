@@ -1038,6 +1038,242 @@ public:
   }
 
   /**
+   *  @brief Selects all edges of this edge collection which are completely outside polygons from the region
+   *
+   *  Merged semantics applies.
+   */
+  Edges &select_outside (const Region &other)
+  {
+    set_delegate (mp_delegate->selected_outside (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Selects all edges of this edge collection which are not completely outside polygons from the region
+   *
+   *  Merged semantics applies.
+   */
+  Edges &select_not_outside (const Region &other)
+  {
+    set_delegate (mp_delegate->selected_not_outside (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all edges of this edge collection which are completely outside polygons from the region
+   *
+   *  This method is an out-of-place version of select_outside.
+   *
+   *  Merged semantics applies.
+   */
+  Edges selected_outside (const Region &other) const
+  {
+    return Edges (mp_delegate->selected_outside (other));
+  }
+
+  /**
+   *  @brief Returns all edges of this edge collection which are not completely outside polygons from the region
+   *
+   *  This method is an out-of-place version of select_not_outside.
+   *
+   *  Merged semantics applies.
+   */
+  Edges selected_not_outside (const Region &other) const
+  {
+    return Edges (mp_delegate->selected_not_outside (other));
+  }
+
+  /**
+   *  @brief Returns all edges of this which are completely outside polygons from the region and the opposite ones at the same time
+   *
+   *  This method is equivalent to calling selected_outside and selected_not_outside, but faster.
+   *
+   *  Merged semantics applies.
+   */
+  std::pair<Edges, Edges> selected_outside_differential (const Region &other) const
+  {
+    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->selected_outside_pair (other);
+    return std::pair<Edges, Edges> (Edges (p.first), Edges (p.second));
+  }
+
+  /**
+   *  @brief Selects all edges of this edge collection which are completely inside polygons from the region
+   *
+   *  Merged semantics applies.
+   */
+  Edges &select_inside (const Region &other)
+  {
+    set_delegate (mp_delegate->selected_inside (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Selects all edges of this edge collection which are not completely inside polygons from the region
+   *
+   *  Merged semantics applies.
+   */
+  Edges &select_not_inside (const Region &other)
+  {
+    set_delegate (mp_delegate->selected_not_inside (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all edges of this which are completely inside polygons from the region
+   *
+   *  This method is an out-of-place version of select_inside.
+   *
+   *  Merged semantics applies.
+   */
+  Edges selected_inside (const Region &other) const
+  {
+    return Edges (mp_delegate->selected_inside (other));
+  }
+
+  /**
+   *  @brief Returns all edges of this which are not completely inside polygons from the region
+   *
+   *  This method is an out-of-place version of select_not_inside.
+   *
+   *  Merged semantics applies.
+   */
+  Edges selected_not_inside (const Region &other) const
+  {
+    return Edges (mp_delegate->selected_not_inside (other));
+  }
+
+  /**
+   *  @brief Returns all edges of this which are completely inside polygons from the region and the opposite ones at the same time
+   *
+   *  This method is equivalent to calling selected_inside and selected_not_inside, but faster.
+   *
+   *  Merged semantics applies.
+   */
+  std::pair<Edges, Edges> selected_inside_differential (const Region &other) const
+  {
+    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->selected_inside_pair (other);
+    return std::pair<Edges, Edges> (Edges (p.first), Edges (p.second));
+  }
+
+  /**
+   *  @brief Selects all edges of this edge collection which are completely outside edges from the other edge collection
+   *
+   *  Merged semantics applies.
+   */
+  Edges &select_outside (const Edges &other)
+  {
+    set_delegate (mp_delegate->selected_outside (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Selects all edges of this edge collection which are not completely outside edges from the other edge collection
+   *
+   *  Merged semantics applies.
+   */
+  Edges &select_not_outside (const Edges &other)
+  {
+    set_delegate (mp_delegate->selected_not_outside (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all edges of this edge collection which are completely outside edges from the other edge collection
+   *
+   *  This method is an out-of-place version of select_outside.
+   *
+   *  Merged semantics applies.
+   */
+  Edges selected_outside (const Edges &other) const
+  {
+    return Edges (mp_delegate->selected_outside (other));
+  }
+
+  /**
+   *  @brief Returns all edges of this edge collection which are not completely outside edges from the other edge collection
+   *
+   *  This method is an out-of-place version of select_not_outside.
+   *
+   *  Merged semantics applies.
+   */
+  Edges selected_not_outside (const Edges &other) const
+  {
+    return Edges (mp_delegate->selected_not_outside (other));
+  }
+
+  /**
+   *  @brief Returns all edges of this which are completely outside edges from the other edge collection and the opposite ones at the same time
+   *
+   *  This method is equivalent to calling selected_outside and selected_not_outside, but faster.
+   *
+   *  Merged semantics applies.
+   */
+  std::pair<Edges, Edges> selected_outside_differential (const Edges &other) const
+  {
+    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->selected_outside_pair (other);
+    return std::pair<Edges, Edges> (Edges (p.first), Edges (p.second));
+  }
+
+  /**
+   *  @brief Selects all edges of this edge collection which are completely inside edges from the other edge collection
+   *
+   *  Merged semantics applies.
+   */
+  Edges &select_inside (const Edges &other)
+  {
+    set_delegate (mp_delegate->selected_inside (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Selects all edges of this edge collection which are not completely inside edges from the other edge collection
+   *
+   *  Merged semantics applies.
+   */
+  Edges &select_not_inside (const Edges &other)
+  {
+    set_delegate (mp_delegate->selected_not_inside (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all edges of this which are completely inside edgess from the other edge collection
+   *
+   *  This method is an out-of-place version of select_inside.
+   *
+   *  Merged semantics applies.
+   */
+  Edges selected_inside (const Edges &other) const
+  {
+    return Edges (mp_delegate->selected_inside (other));
+  }
+
+  /**
+   *  @brief Returns all edges of this which are not completely inside edges from the other edge collection
+   *
+   *  This method is an out-of-place version of select_not_inside.
+   *
+   *  Merged semantics applies.
+   */
+  Edges selected_not_inside (const Edges &other) const
+  {
+    return Edges (mp_delegate->selected_not_inside (other));
+  }
+
+  /**
+   *  @brief Returns all edges of this which are completely inside edges from the other edge collection and the opposite ones at the same time
+   *
+   *  This method is equivalent to calling selected_inside and selected_not_inside, but faster.
+   *
+   *  Merged semantics applies.
+   */
+  std::pair<Edges, Edges> selected_inside_differential (const Edges &other) const
+  {
+    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->selected_inside_pair (other);
+    return std::pair<Edges, Edges> (Edges (p.first), Edges (p.second));
+  }
+
+  /**
    *  @brief Selects all edges of this edge set which overlap or touch with edges from the other edge set
    *
    *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be 

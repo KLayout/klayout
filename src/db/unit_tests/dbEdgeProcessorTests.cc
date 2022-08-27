@@ -2051,7 +2051,7 @@ TEST(32)
 
   std::vector<db::Edge> out;
   db::EdgeContainer ec (out);
-  db::EdgePolygonOp op (false, false /*not including touch*/);
+  db::EdgePolygonOp op (db::EdgePolygonOp::Inside, false /*not including touch*/);
 
   ep.process (ec, op);
 
@@ -2114,7 +2114,7 @@ TEST(33)
 
   std::vector<db::Edge> out;
   db::EdgeContainer ec (out);
-  db::EdgePolygonOp op (true, true /*including touch*/);
+  db::EdgePolygonOp op (db::EdgePolygonOp::Outside, true /*including touch*/);
 
   ep.process (ec, op);
 

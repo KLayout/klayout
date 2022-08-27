@@ -930,6 +930,20 @@ EdgesDelegate *DeepEdges::not_with (const Region &other) const
   }
 }
 
+std::pair<EdgesDelegate *, EdgesDelegate *>
+DeepEdges::andnot_with (const Edges &) const
+{
+  // @@@
+  return std::pair<EdgesDelegate *, EdgesDelegate *>();
+}
+
+std::pair<EdgesDelegate *, EdgesDelegate *>
+DeepEdges::andnot_with (const Region &) const
+{
+  // @@@
+  return std::pair<EdgesDelegate *, EdgesDelegate *>();
+}
+
 EdgesDelegate *DeepEdges::xor_with (const Edges &other) const
 {
   const DeepEdges *other_deep = dynamic_cast <const DeepEdges *> (other.delegate ());
@@ -1057,6 +1071,12 @@ EdgesDelegate *DeepEdges::outside_part (const Region &other) const
   }
 }
 
+std::pair<EdgesDelegate *, EdgesDelegate *> DeepEdges::inside_outside_part_pair (const Region &) const
+{
+  // @@@
+  return std::pair<EdgesDelegate *, EdgesDelegate *>();
+}
+
 RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const
 {
   const db::DeepLayer &edges = merged_deep_layer ();
@@ -1157,8 +1177,8 @@ class Edge2EdgeInteractingLocalOperation
   : public local_operation<db::Edge, db::Edge, db::Edge>
 {
 public:
-  Edge2EdgeInteractingLocalOperation (bool inverse)
-    : m_inverse (inverse)
+  Edge2EdgeInteractingLocalOperation (EdgeInteractionMode mode, bool inverse)
+    : m_mode (mode), m_inverse (inverse)
   {
     //  .. nothing yet ..
   }
@@ -1195,7 +1215,7 @@ public:
     if (m_inverse) {
 
       std::unordered_set<db::Edge> interacting;
-      edge_interaction_filter<std::unordered_set<db::Edge> > filter (interacting);
+      edge_interaction_filter<std::unordered_set<db::Edge> > filter (interacting, m_mode);
       scanner.process (filter, 1, db::box_convert<db::Edge> ());
 
       for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -1207,7 +1227,7 @@ public:
 
     } else {
 
-      edge_interaction_filter<std::unordered_set<db::Edge> > filter (result);
+      edge_interaction_filter<std::unordered_set<db::Edge> > filter (result, m_mode);
       scanner.process (filter, 1, db::box_convert<db::Edge> ());
 
     }
@@ -1229,6 +1249,7 @@ public:
   }
 
 private:
+  EdgeInteractionMode m_mode;
   bool m_inverse;
 };
 
@@ -1270,7 +1291,7 @@ public:
       scanner.insert (o.operator-> (), 0);
     }
 
-    edge_interaction_filter<std::unordered_set<db::Edge> > filter (result);
+    edge_interaction_filter<std::unordered_set<db::Edge> > filter (result, EdgesInteract);
     scanner.process (filter, 1, db::box_convert<db::Edge> ());
 
   }
@@ -1290,8 +1311,8 @@ class Edge2PolygonInteractingLocalOperation
   : public local_operation<db::Edge, db::PolygonRef, db::Edge>
 {
 public:
-  Edge2PolygonInteractingLocalOperation (bool inverse)
-    : m_inverse (inverse)
+  Edge2PolygonInteractingLocalOperation (EdgeInteractionMode mode, bool inverse)
+    : m_mode (mode), m_inverse (inverse)
   {
     //  .. nothing yet ..
   }
@@ -1330,7 +1351,7 @@ public:
     if (m_inverse) {
 
       std::unordered_set<db::Edge> interacting;
-      edge_to_region_interaction_filter<std::unordered_set<db::Edge> > filter (interacting);
+      edge_to_region_interaction_filter<std::unordered_set<db::Edge> > filter (&interacting, m_mode);
       scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
 
       for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -1342,7 +1363,7 @@ public:
 
     } else {
 
-      edge_to_region_interaction_filter<std::unordered_set<db::Edge> > filter (result);
+      edge_to_region_interaction_filter<std::unordered_set<db::Edge> > filter (&result, m_mode);
       scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
 
     }
@@ -1363,6 +1384,7 @@ public:
   }
 
 private:
+  EdgeInteractionMode m_mode;
   bool m_inverse;
 };
 
@@ -1427,7 +1449,7 @@ public:
     }
 
     ResultInserter inserter (layout, result);
-    edge_to_region_interaction_filter<ResultInserter> filter (inserter);
+    edge_to_region_interaction_filter<ResultInserter> filter (&inserter, EdgesInteract);
     scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
   }
 
@@ -1445,7 +1467,7 @@ public:
 }
 
 EdgesDelegate *
-DeepEdges::selected_interacting_generic (const Region &other, bool inverse) const
+DeepEdges::selected_interacting_generic (const Region &other, EdgeInteractionMode mode, bool inverse) const
 {
   std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
@@ -1459,7 +1481,7 @@ DeepEdges::selected_interacting_generic (const Region &other, bool inverse) cons
 
   DeepLayer dl_out (edges.derived ());
 
-  db::Edge2PolygonInteractingLocalOperation op (inverse);
+  db::Edge2PolygonInteractingLocalOperation op (mode, inverse);
 
   db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
   proc.set_base_verbosity (base_verbosity ());
@@ -1471,7 +1493,7 @@ DeepEdges::selected_interacting_generic (const Region &other, bool inverse) cons
 }
 
 EdgesDelegate *
-DeepEdges::selected_interacting_generic (const Edges &other, bool inverse) const
+DeepEdges::selected_interacting_generic (const Edges &other, EdgeInteractionMode mode, bool inverse) const
 {
   std::unique_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
@@ -1485,7 +1507,7 @@ DeepEdges::selected_interacting_generic (const Edges &other, bool inverse) const
 
   DeepLayer dl_out (edges.derived ());
 
-  db::Edge2EdgeInteractingLocalOperation op (inverse);
+  db::Edge2EdgeInteractingLocalOperation op (mode, inverse);
 
   db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
   proc.set_base_verbosity (base_verbosity ());
@@ -1494,6 +1516,20 @@ DeepEdges::selected_interacting_generic (const Edges &other, bool inverse) const
   proc.run (&op, edges.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
 
   return new db::DeepEdges (dl_out);
+}
+
+std::pair<EdgesDelegate *, EdgesDelegate *>
+DeepEdges::selected_interacting_pair_generic (const Edges &edges, EdgeInteractionMode mode) const
+{
+  // @@@
+  return std::pair<EdgesDelegate *, EdgesDelegate *>();
+}
+
+std::pair<EdgesDelegate *, EdgesDelegate *>
+DeepEdges::selected_interacting_pair_generic (const Region &region, EdgeInteractionMode mode) const
+{
+  // @@@
+  return std::pair<EdgesDelegate *, EdgesDelegate *>();
 }
 
 RegionDelegate *DeepEdges::pull_generic (const Region &other) const

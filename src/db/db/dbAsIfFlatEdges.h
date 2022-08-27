@@ -28,6 +28,8 @@
 #include "dbBoxScanner.h"
 #include "dbEdgesDelegate.h"
 #include "dbEdgeBoolean.h"
+#include "dbEdgeProcessor.h"
+#include "dbEdgesUtils.h"
 #include "dbBoxScanner.h"
 #include "dbPolygonTools.h"
 
@@ -115,19 +117,29 @@ public:
     return boolean (&other, EdgeAnd);
   }
 
-  virtual EdgesDelegate *and_with (const Region &other) const
-  {
-    return edge_region_op (other, false /*inside*/, true /*include borders*/);
-  }
-
   virtual EdgesDelegate *not_with (const Edges &other) const
   {
     return boolean (&other, EdgeNot);
   }
 
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> andnot_with (const Edges &other) const
+  {
+    return boolean_andnot (&other);
+  }
+
+  virtual EdgesDelegate *and_with (const Region &other) const
+  {
+    return edge_region_op (other, db::EdgePolygonOp::Inside, true /*include borders*/).first;
+  }
+
   virtual EdgesDelegate *not_with (const Region &other) const
   {
-    return edge_region_op (other, true /*outside*/, true /*include borders*/);
+    return edge_region_op (other, db::EdgePolygonOp::Outside, true /*include borders*/).first;
+  }
+
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> andnot_with (const Region &other) const
+  {
+    return edge_region_op (other, db::EdgePolygonOp::Both, true /*include borders*/);
   }
 
   virtual EdgesDelegate *xor_with (const Edges &other) const
@@ -154,12 +166,17 @@ public:
 
   virtual EdgesDelegate *inside_part (const Region &other) const
   {
-    return edge_region_op (other, false /*inside*/, false /*don't include borders*/);
+    return edge_region_op (other, db::EdgePolygonOp::Inside, false /*don't include borders*/).first;
   }
 
   virtual EdgesDelegate *outside_part (const Region &other) const
   {
-    return edge_region_op (other, true /*outside*/, false /*don't include borders*/);
+    return edge_region_op (other, db::EdgePolygonOp::Outside, false /*don't include borders*/).first;
+  }
+
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> inside_outside_part_pair (const Region &other) const
+  {
+    return edge_region_op (other, db::EdgePolygonOp::Both, false /*don't include borders*/);
   }
 
   virtual RegionDelegate *extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const;
@@ -170,6 +187,21 @@ public:
   virtual EdgesDelegate *selected_not_interacting (const Edges &) const;
   virtual EdgesDelegate *selected_interacting (const Region &) const;
   virtual EdgesDelegate *selected_not_interacting (const Region &) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair (const Region &other) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair (const Edges &other) const;
+
+  virtual EdgesDelegate *selected_outside (const Edges &other) const;
+  virtual EdgesDelegate *selected_not_outside (const Edges &other) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_outside_pair (const Edges &other) const;
+  virtual EdgesDelegate *selected_inside (const Edges &other) const;
+  virtual EdgesDelegate *selected_not_inside (const Edges &other) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_inside_pair (const Edges &other) const;
+  virtual EdgesDelegate *selected_outside (const Region &other) const;
+  virtual EdgesDelegate *selected_not_outside (const Region &other) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_outside_pair (const Region &other) const;
+  virtual EdgesDelegate *selected_inside (const Region &other) const;
+  virtual EdgesDelegate *selected_not_inside (const Region &other) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_inside_pair (const Region &other) const;
 
   virtual EdgesDelegate *in (const Edges &, bool) const;
 
@@ -184,8 +216,10 @@ protected:
   EdgePairsDelegate *run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, const EdgesCheckOptions &options) const;
   virtual EdgesDelegate *pull_generic (const Edges &edges) const;
   virtual RegionDelegate *pull_generic (const Region &region) const;
-  virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, bool inverse) const;
-  virtual EdgesDelegate *selected_interacting_generic (const Region &region, bool inverse) const;
+  virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, EdgeInteractionMode mode, bool inverse) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic (const Edges &edges, EdgeInteractionMode mode) const;
+  virtual EdgesDelegate *selected_interacting_generic (const Region &region, EdgeInteractionMode mode, bool inverse) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic (const Region &region, EdgeInteractionMode mode) const;
   AsIfFlatEdges &operator= (const AsIfFlatEdges &other);
   AsIfFlatEdges (const AsIfFlatEdges &other);
 
@@ -195,7 +229,8 @@ private:
 
   virtual db::Box compute_bbox () const;
   EdgesDelegate *boolean (const Edges *other, EdgeBoolOp op) const;
-  EdgesDelegate *edge_region_op (const Region &other, bool outside, bool include_borders) const;
+  std::pair<EdgesDelegate *, EdgesDelegate *> boolean_andnot (const Edges *other) const;
+  std::pair<EdgesDelegate *, EdgesDelegate *> edge_region_op(const Region &other, db::EdgePolygonOp::mode_t mode, bool include_borders) const;
 };
 
 }

@@ -475,7 +475,7 @@ EdgeToPolygonLocalOperation::do_compute_local (db::Layout * /*layout*/, const sh
     }
 
     db::EdgeToEdgeSetGenerator cc (result);
-    db::EdgePolygonOp op (m_outside, m_include_borders);
+    db::EdgePolygonOp op (m_outside ? db::EdgePolygonOp::Outside : db::EdgePolygonOp::Inside, m_include_borders);
     ep.process (cc, op);
 
   }

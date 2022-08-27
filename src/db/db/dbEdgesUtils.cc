@@ -177,7 +177,7 @@ extended_edge (const db::Edge &edge, db::Coord ext_b, db::Coord ext_e, db::Coord
 // -------------------------------------------------------------------------------------------------------------
 //  EdgeSegmentSelector processor
 
-EdgeSegmentSelector::EdgeSegmentSelector (int mode, db::Edges::length_type length, double fraction)
+EdgeSegmentSelector::EdgeSegmentSelector (int mode, Edge::distance_type length, double fraction)
   : m_mode (mode), m_length (length), m_fraction (fraction)
 { }
 

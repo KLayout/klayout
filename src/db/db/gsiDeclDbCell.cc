@@ -38,9 +38,11 @@
 #include "dbCellMapping.h"
 #include "dbPCellDeclaration.h"
 #include "dbSaveLayoutOptions.h"
+#include "dbLoadLayoutOptions.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbRecursiveInstanceIterator.h"
 #include "dbWriter.h"
+#include "dbReader.h"
 #include "dbHash.h"
 #include "tlStream.h"
 
@@ -1683,6 +1685,39 @@ static const char *cell_name (const db::Cell *cell)
   }
 }
 
+static std::vector<db::cell_index_type>
+read_options (db::Cell *cell, const std::string &path, const db::LoadLayoutOptions &options)
+{
+  if (! cell->layout ()) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout - cannot read such cells")));
+  }
+
+  db::Layout tmp (cell->layout ()->dbu ());
+
+  {
+    tl::InputStream stream (path);
+    db::Reader reader (stream);
+    reader.read (tmp, options);
+  }
+
+  if (tmp.end_top_cells () - tmp.begin_top_down () != 1) {
+    throw tl::Exception (tl::to_string (tr ("Imported layout does not have a single top cell - cannot read such layouts into a cell")));
+  }
+
+  db::CellMapping cm;
+  std::vector<db::cell_index_type> new_cells = cm.create_single_mapping_full (*cell->layout (), cell->cell_index (), tmp, *tmp.begin_top_down ());
+  cell->move_tree_shapes (tmp.cell (*tmp.begin_top_down ()), cm);
+
+  return new_cells;
+}
+
+static std::vector<db::cell_index_type>
+read_simple (db::Cell *cell, const std::string &path)
+{
+  return read_options (cell, path, db::LoadLayoutOptions ());
+}
+
+
 static db::Point default_origin;
 
 Class<db::Cell> decl_Cell ("db", "Cell",
@@ -1760,6 +1795,40 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "scaling etc.\n"
     "\n"
     "This method has been introduced in version 0.23.\n"
+  ) +
+  gsi::method_ext ("read", &read_options, gsi::arg ("file_name"), gsi::arg ("options"),
+    "@brief Reads a layout file into this cell\n"
+    "\n"
+    "@param file_name The path of the file to read\n"
+    "@param options The reader options to use\n"
+    "@return The indexes of the cells created during the reading (new child cells)\n"
+    "\n"
+    "The format of the file will be determined from the file name. "
+    "The layout will be read into the cell, potentially creating new layers and "
+    "a subhierarchy of cells below this cell.\n"
+    "\n"
+    "This feature is equivalent to the following code:\n"
+    "\n"
+    "@code\n"
+    "def Cell.read(file_name, options)\n"
+    "  layout = RBA::Layout::new\n"
+    "  layout.read(file_name, options)\n"
+    "  cm = RBA::CellMapping::new\n"
+    "  cm.for_single_cell_full(self, layout.top_cell)\n"
+    "  self.move_tree_shapes(layout.top_cell)\n"
+    "end\n"
+    "@/code\n"
+    "\n"
+    "See \\move_tree_shapes and \\CellMapping for more details and how to "
+    "implement more elaborate schemes.\n"
+    "\n"
+    "This method has been introduced in version 0.28.\n"
+  ) +
+  gsi::method_ext ("read", &read_simple, gsi::arg ("file_name"),
+    "@brief Reads a layout file into this cell\n"
+    "This version uses the default options for reading the file.\n"
+    "\n"
+    "This method has been introduced in version 0.28.\n"
   ) +
   gsi::method_ext ("dup", &dup_cell,
     "@brief Creates a copy of the cell\n"

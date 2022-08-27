@@ -23,7 +23,7 @@ end
 
 load("test_prologue.rb")
 
-class DBLayout_TestClass < TestBase
+class DBLayoutTests1_TestClass < TestBase
 
   def test_1
 

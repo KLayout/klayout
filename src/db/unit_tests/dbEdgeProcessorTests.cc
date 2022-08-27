@@ -1992,13 +1992,7 @@ TEST(31)
 
   ep.process (ec, op);
 
-  std::string s;
-  for (size_t i = 0; i < out.size (); ++i) {
-    if (i > 0) {
-      s += ";";
-    }
-    s += out[i].to_string ();
-  }
+  std::string s = tl::join (out.begin (), out.end (), ";");
   EXPECT_EQ (s, "(0,0;0,400);(0,0;500,0);(500,0;500,300);(0,400;0,417);(400,400;0,400);(394,406;0,417);(0,417;0,500)");
 
   ep.clear ();
@@ -2015,14 +2009,7 @@ TEST(31)
 
   ep.process (ec, op);
 
-  s.clear ();
-  for (size_t i = 0; i < out.size (); ++i) {
-    if (i > 0) {
-      s += ";";
-    }
-    s += out[i].to_string ();
-  }
-
+  s = tl::join (out.begin (), out.end (), ";");
   EXPECT_EQ (s, "(400,0;400,400);(0,500;300,500)");
 }
 
@@ -2055,13 +2042,7 @@ TEST(32)
 
   ep.process (ec, op);
 
-  std::string s;
-  for (size_t i = 0; i < out.size (); ++i) {
-    if (i > 0) {
-      s += ";";
-    }
-    s += out[i].to_string ();
-  }
+  std::string s = tl::join (out.begin (), out.end (), ";");
   EXPECT_EQ (s, "(400,400;0,400);(394,406;0,417)");
 
   ep.clear ();
@@ -2078,14 +2059,7 @@ TEST(32)
 
   ep.process (ec, op);
 
-  s.clear ();
-  for (size_t i = 0; i < out.size (); ++i) {
-    if (i > 0) {
-      s += ";";
-    }
-    s += out[i].to_string ();
-  }
-
+  s = tl::join (out.begin (), out.end (), ";");
   EXPECT_EQ (s, "(400,0;400,400)");
 }
 
@@ -2118,13 +2092,7 @@ TEST(33)
 
   ep.process (ec, op);
 
-  std::string s;
-  for (size_t i = 0; i < out.size (); ++i) {
-    if (i > 0) {
-      s += ";";
-    }
-    s += out[i].to_string ();
-  }
+  std::string s = tl::join (out.begin (), out.end (), ";");
   EXPECT_EQ (s, "(0,-100;0,0);(500,-100;500,0);(-100,0;0,0);(500,0;600,0);(500,300;500,400);"
                 "(0,400;-100,400);(500,400;400,400);(500,400;500,403);(600,400;500,400);"
                 "(600,400;500,403);(500,403;394,406);(500,403;500,600);(0,417;-100,420);"
@@ -2144,17 +2112,74 @@ TEST(33)
 
   ep.process (ec, op);
 
-  s.clear ();
-  for (size_t i = 0; i < out.size (); ++i) {
-    if (i > 0) {
-      s += ";";
-    }
-    s += out[i].to_string ();
-  }
-
+  s = tl::join (out.begin (), out.end (), ";");
   EXPECT_EQ (s, "(-100,-100;-100,500);(-100,-100;400,-100);(400,-100;400,0);(400,-100;600,-100);"
                 "(600,-100;600,500);(400,400;400,500);(-100,500;-100,600);(-100,500;0,500);"
                 "(300,500;400,500);(400,500;400,600);(400,500;600,500);(600,500;600,600)");
+}
+
+TEST(34)
+{
+  std::vector<db::Polygon> a;
+  db::Point a1[] = {
+    db::Point (0, 0),
+    db::Point (0, 500),
+    db::Point (300, 500),
+    db::Point (500, 300),
+    db::Point (500, 0)
+  };
+  a.push_back (db::Polygon ());
+  a.back ().assign_hull (a1 + 0, a1 + sizeof (a1) / sizeof (a1[0]));
+
+  db::EdgeProcessor ep;
+  for (std::vector<db::Polygon>::const_iterator i = a.begin (); i != a.end (); ++i) {
+    ep.insert (*i, 0);
+  }
+  ep.insert (db::Edge (600, 400, -100, 420), 1);
+  ep.insert (db::Edge (600, 400, -100, 400), 1);
+  ep.insert (db::Edge (-100, 0, 600, 0), 1);
+  ep.insert (db::Edge (0, -100, 0, 600), 1);
+  ep.insert (db::Edge (500, -100, 500, 600), 1);
+
+  std::vector<db::Edge> out2;
+  db::EdgeContainer ec2 (out2, false, 2);
+  std::vector<db::Edge> out;
+  db::EdgeContainer ec (out, false, 1, &ec2);
+  db::EdgePolygonOp op (db::EdgePolygonOp::Both, true /*not including touch*/);
+
+  ep.process (ec, op);
+
+  std::string s = tl::join (out2.begin (), out2.end (), ";");
+  EXPECT_EQ (s, "(0,-100;0,0);(500,-100;500,0);(-100,0;0,0);(500,0;600,0);(500,300;500,400);"
+                "(0,400;-100,400);(500,400;400,400);(500,400;500,403);(600,400;500,400);"
+                "(600,400;500,403);(500,403;394,406);(500,403;500,600);(0,417;-100,420);"
+                "(0,500;0,600)");
+
+  s = tl::join (out.begin (), out.end (), ";");
+  EXPECT_EQ (s, "(0,0;0,400);(0,0;500,0);(500,0;500,300);(0,400;0,417);(400,400;0,400);(394,406;0,417);(0,417;0,500)");
+
+  ep.clear ();
+  out.clear ();
+  out2.clear ();
+
+  for (std::vector<db::Polygon>::const_iterator i = a.begin (); i != a.end (); ++i) {
+    ep.insert (*i, 0);
+  }
+  ep.insert (db::Edge (-100, 500, 600, 500), 1);
+  ep.insert (db::Edge (400, -100, 400, 600), 1);
+  ep.insert (db::Edge (-100, -100, -100, 600), 1);
+  ep.insert (db::Edge (600, -100, 600, 600), 1);
+  ep.insert (db::Edge (-100, -100, 600, -100), 1);
+
+  ep.process (ec, op);
+
+  s = tl::join (out2.begin (), out2.end (), ";");
+  EXPECT_EQ (s, "(-100,-100;-100,500);(-100,-100;400,-100);(400,-100;400,0);(400,-100;600,-100);"
+                "(600,-100;600,500);(400,400;400,500);(-100,500;-100,600);(-100,500;0,500);"
+                "(300,500;400,500);(400,500;400,600);(400,500;600,500);(600,500;600,600)");
+
+  s = tl::join (out.begin (), out.end (), ";");
+  EXPECT_EQ (s, "(400,0;400,400);(0,500;300,500)");
 }
 
 //  TrapezoidGenerator

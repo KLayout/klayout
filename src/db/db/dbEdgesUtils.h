@@ -247,6 +247,21 @@ private:
 };
 
 /**
+ *  @brief A predicate defining edge a interacts with b
+ */
+DB_PUBLIC bool edge_interacts (const db::Edge &a, const db::Edge &b);
+
+/**
+ *  @brief A predicate defining edge a is "inside" b
+ */
+DB_PUBLIC bool edge_is_inside (const db::Edge &a, const db::Edge &b);
+
+/**
+ *  @brief A predicate defining edge a is "outside" b
+ */
+DB_PUBLIC bool edge_is_outside (const db::Edge &a, const db::Edge &b);
+
+/**
  *  @brief A helper class for the edge interaction functionality which acts as an edge pair receiver
  */
 template <class OutputContainer>
@@ -266,8 +281,9 @@ public:
     if (p1 != p2) {
       const db::Edge *o = p1 > p2 ? o2 : o1;
       const db::Edge *oo = p1 > p2 ? o1 : o2;
-      // @@@
-      if (o->intersect (*oo)) {
+      if ((m_mode == EdgesInteract && db::edge_interacts (*o, *oo)) ||
+          (m_mode == EdgesInside && db::edge_is_inside (*o, *oo)) ||
+          (m_mode == EdgesOutside && db::edge_is_outside (*o, *oo))) {
         if (m_seen.insert (o).second) {
           mp_output->insert (*o);
         }
@@ -280,6 +296,21 @@ private:
   std::set<const db::Edge *> m_seen;
   EdgeInteractionMode m_mode;
 };
+
+/**
+ *  @brief A predicate defining edge a interacts with polygon b
+ */
+DB_PUBLIC bool edge_interacts (const db::Edge &a, const db::Polygon &b);
+
+/**
+ *  @brief A predicate defining edge a is "inside" polygon b
+ */
+DB_PUBLIC bool edge_is_inside (const db::Edge &a, const db::Polygon &b);
+
+/**
+ *  @brief A predicate defining edge a is "outside" polygon b
+ */
+DB_PUBLIC bool edge_is_outside (const db::Edge &a, const db::Polygon &b);
 
 /**
  *  @brief A helper class for the edge to region interaction functionality which acts as an edge pair receiver
@@ -307,8 +338,9 @@ public:
     tl::select (ep, e, p);
 
     if (m_seen.find (ep) == m_seen.end ()) {
-      // @@@
-      if (db::interact (*p, *e)) {
+      if ((m_mode == EdgesInteract && db::edge_interacts (*e, *p)) ||
+          (m_mode == EdgesInside && db::edge_is_inside (*e, *p)) ||
+          (m_mode == EdgesOutside && db::edge_is_outside (*e, *p))) {
         m_seen.insert (ep);
         mp_output->insert (*ep);
       }

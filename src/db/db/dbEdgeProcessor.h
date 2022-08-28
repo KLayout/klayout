@@ -56,7 +56,7 @@ public:
   /** 
    *  @brief Constructor
    */
-  EdgeSink () { }
+  EdgeSink () : m_can_stop (false) { }
 
   /** 
    *  @brief Destructor
@@ -123,6 +123,38 @@ public:
    *  @brief Signal the end of a scanline at the given y coordinate
    */
   virtual void end_scanline (db::Coord /*y*/) { }
+
+  /**
+   *  @brief Gets a value indicating that the generator wants to stop
+   */
+  bool can_stop () const
+  {
+    return m_can_stop;
+  }
+
+  /**
+   *  @brief Resets the stop request
+   */
+  void reset_stop ()
+  {
+    m_can_stop = false;
+  }
+
+protected:
+  /**
+   *  @brief Sets the stop request
+   *
+   *  The scanner can choose to stop once the request is set.
+   *  This is useful for implementing receivers that can stop once a
+   *  specific condition is found.
+   */
+  void request_stop ()
+  {
+    m_can_stop = true;
+  }
+
+private:
+  bool m_can_stop;
 };
 
 /**

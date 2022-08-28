@@ -1629,12 +1629,18 @@ public:
 
   void reset ()
   {
+    mp_es->reset_stop ();
     mp_op->reset ();
   }
 
   bool is_reset ()
   {
     return mp_op->is_reset ();
+  }
+
+  bool can_stop ()
+  {
+    return mp_es->can_stop ();
   }
 
   void reserve (size_t n)
@@ -1939,6 +1945,19 @@ public:
       }
     }
     return true;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the generator wants to stop
+   */
+  bool can_stop ()
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      if (s->can_stop ()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -2414,7 +2433,7 @@ EdgeProcessor::redo_or_process (const std::vector<std::pair<db::EdgeSink *, db::
   y = edge_ymin ((*mp_work_edges) [0]);
 
   future = mp_work_edges->begin ();
-  for (std::vector <WorkEdge>::iterator current = mp_work_edges->begin (); current != mp_work_edges->end (); ) {
+  for (std::vector <WorkEdge>::iterator current = mp_work_edges->begin (); current != mp_work_edges->end () && ! gs.can_stop (); ) {
 
     if (m_report_progress) {
       double p = double (std::distance (mp_work_edges->begin (), current)) / double (mp_work_edges->size ());

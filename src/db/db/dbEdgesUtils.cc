@@ -297,7 +297,7 @@ bool edge_is_outside (const db::Edge &a, const db::Edge &b)
       //  no intersection -> outside
       return true;
     }
-    return ! b.contains_excl (pt.second);
+    return ! b.contains_excl (pt.second) || ! a.contains_excl (pt.second);
   }
 }
 

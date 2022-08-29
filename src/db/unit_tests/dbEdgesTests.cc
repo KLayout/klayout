@@ -1107,10 +1107,10 @@ TEST(27)
   EXPECT_EQ (db::compare (db::Edges ().selected_not_outside (ee), ""), true);
   EXPECT_EQ (db::compare (db::Edges ().selected_outside_differential (ee).first, ""), true);
   EXPECT_EQ (db::compare (db::Edges ().selected_outside_differential (ee).second, ""), true);
-  EXPECT_EQ (db::compare (e.selected_outside (ee), "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
-  EXPECT_EQ (db::compare (e.selected_not_outside (ee), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500)"), true);
-  EXPECT_EQ (db::compare (e.selected_outside_differential (ee).first, "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
-  EXPECT_EQ (db::compare (e.selected_outside_differential (ee).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside (ee), "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_outside (ee), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (ee).first, "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (ee).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200)"), true);
 }
 
 //  GitHub issue #72 (Edges/Region NOT issue)

@@ -708,8 +708,14 @@ TEST(11_SelectedInsideWithEdges)
   EXPECT_EQ (db::compare (e.selected_inside (eeflat), "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200)"), true);
   EXPECT_EQ (db::compare (eflat.selected_inside (ee), "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200)"), true);
   EXPECT_EQ (db::compare (e.selected_not_inside (ee), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_inside (eeflat), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_not_inside (ee), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
   EXPECT_EQ (db::compare (e.selected_inside_differential (ee).first, "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (eeflat).first, "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_inside_differential (ee).first, "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200)"), true);
   EXPECT_EQ (db::compare (e.selected_inside_differential (ee).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (eeflat).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_inside_differential (ee).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
 }
 
 TEST(12_SelectedOutsideWithRegion)
@@ -761,9 +767,17 @@ TEST(12_SelectedOutsideWithRegion)
   EXPECT_EQ (db::compare (db::Edges ().selected_outside_differential (r).first, ""), true);
   EXPECT_EQ (db::compare (db::Edges ().selected_outside_differential (r).second, ""), true);
   EXPECT_EQ (db::compare (e.selected_outside (r), "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside (rflat), "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_outside (r), "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
   EXPECT_EQ (db::compare (e.selected_not_outside (r), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_outside (rflat), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_not_outside (r), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500)"), true);
   EXPECT_EQ (db::compare (e.selected_outside_differential (r).first, "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (rflat).first, "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_outside_differential (r).first, "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
   EXPECT_EQ (db::compare (e.selected_outside_differential (r).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (rflat).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_outside_differential (r).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500)"), true);
 }
 
 TEST(13_SelectedOutsideWithEdges)
@@ -818,9 +832,17 @@ TEST(13_SelectedOutsideWithEdges)
   EXPECT_EQ (db::compare (db::Edges ().selected_not_outside (ee), ""), true);
   EXPECT_EQ (db::compare (db::Edges ().selected_outside_differential (ee).first, ""), true);
   EXPECT_EQ (db::compare (db::Edges ().selected_outside_differential (ee).second, ""), true);
-  EXPECT_EQ (db::compare (e.selected_outside (ee), "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
-  EXPECT_EQ (db::compare (e.selected_not_outside (ee), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500)"), true);
-  EXPECT_EQ (db::compare (e.selected_outside_differential (ee).first, "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
-  EXPECT_EQ (db::compare (e.selected_outside_differential (ee).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside (ee), "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside (eeflat), "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_outside (ee), "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_outside (ee), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_outside (eeflat), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_not_outside (ee), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (ee).first, "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (eeflat).first, "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_outside_differential (ee).first, "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (ee).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (eeflat).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_outside_differential (ee).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200)"), true);
 }
 

@@ -71,6 +71,7 @@ TEST(1)
   EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (0, 0), db::Point (10, 10)), db::Edge (db::Point (0, 0), db::Point (0, 20))), true);
   EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (0, 0), db::Point (10, 10)), db::Edge (db::Point (1, 1), db::Point (20, 20))), false);
   EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (0, 0), db::Point (10, 10)), db::Edge (db::Point (30, 30), db::Point (20, 20))), true);
+  EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (1700, 1500), db::Point (1600, 2500)), db::Edge (db::Point (1700, 1000), db::Point (1700, 2000))), true);
 
   EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (0, 0), db::Point (10, 10)), db::Polygon ()), true);
   EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (0, 0), db::Point (10, 10)), db::Polygon (db::Box (0, 0, 10, 10))), false);

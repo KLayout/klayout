@@ -130,15 +130,22 @@ public:
   /**
    *  @brief Constructor
    */
-  EdgeToEdgeSetGenerator (std::unordered_set<db::Edge> &edges);
+  EdgeToEdgeSetGenerator (std::unordered_set<db::Edge> &edges, int tag = 0, EdgeToEdgeSetGenerator *chained = 0);
 
   /**
    *  @brief Implementation of the PolygonSink interface
    */
   virtual void put (const db::Edge &edge);
 
+  /**
+   *  @brief Implementation of the PolygonSink interface
+   */
+  virtual void put (const db::Edge &edge, int tag);
+
 private:
   std::unordered_set<db::Edge> *mp_edges;
+  int m_tag;
+  EdgeToEdgeSetGenerator *mp_chained;
 };
 
 class DB_PUBLIC PolygonRefToShapesGenerator

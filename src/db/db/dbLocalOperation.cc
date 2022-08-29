@@ -430,7 +430,7 @@ EdgeToPolygonLocalOperation::EdgeToPolygonLocalOperation (EdgePolygonOp::mode_t 
 OnEmptyIntruderHint
 EdgeToPolygonLocalOperation::on_empty_intruder_hint () const
 {
-  return (m_op == EdgePolygonOp::Inside) ? Copy : Drop;
+  return (m_op != EdgePolygonOp::Inside) ? Copy : Drop;
 }
 
 std::string
@@ -493,7 +493,12 @@ EdgeToPolygonLocalOperation::do_compute_local (db::Layout * /*layout*/, const sh
       }
     }
 
-    db::EdgeToEdgeSetGenerator cc (result);
+    std::unique_ptr<db::EdgeToEdgeSetGenerator> cc_second;
+    if (result2) {
+      cc_second.reset (new db::EdgeToEdgeSetGenerator (*result2, 2 /*second tag*/));
+    }
+
+    db::EdgeToEdgeSetGenerator cc (result, 1 /*first tag*/, cc_second.get ());
     db::EdgePolygonOp op (m_op, m_include_borders);
     ep.process (cc, op);
 

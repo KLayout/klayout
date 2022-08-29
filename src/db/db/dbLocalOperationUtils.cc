@@ -30,8 +30,8 @@ namespace db
 // -----------------------------------------------------------------------------------------------
 //  class EdgeToEdgeSetGenerator
 
-EdgeToEdgeSetGenerator::EdgeToEdgeSetGenerator (std::unordered_set<db::Edge> &edges)
-  : mp_edges (&edges)
+EdgeToEdgeSetGenerator::EdgeToEdgeSetGenerator (std::unordered_set<db::Edge> &edges, int tag, EdgeToEdgeSetGenerator *chained)
+  : mp_edges (&edges), m_tag (tag), mp_chained (chained)
 {
   //  .. nothing yet ..
 }
@@ -39,6 +39,19 @@ EdgeToEdgeSetGenerator::EdgeToEdgeSetGenerator (std::unordered_set<db::Edge> &ed
 void EdgeToEdgeSetGenerator::put (const db::Edge &edge)
 {
   mp_edges->insert (edge);
+  if (mp_chained) {
+    mp_chained->put (edge);
+  }
+}
+
+void EdgeToEdgeSetGenerator::put (const db::Edge &edge, int tag)
+{
+  if (m_tag == 0 || m_tag == tag) {
+    mp_edges->insert (edge);
+  }
+  if (mp_chained) {
+    mp_chained->put (edge, tag);
+  }
 }
 
 // -----------------------------------------------------------------------------------------------

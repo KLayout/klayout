@@ -824,6 +824,7 @@ AsIfFlatEdges::edge_region_op (const Region &other, db::EdgePolygonOp::mode_t mo
   std::unique_ptr<FlatEdges> output_second;
   std::unique_ptr<db::EdgeShapeGenerator> cc_second;
   if (mode == db::EdgePolygonOp::Both) {
+    output_second.reset (new FlatEdges (false));
     cc_second.reset (new db::EdgeShapeGenerator (output_second->raw_edges (), true /*clear*/, 2 /*second tag*/));
   }
 

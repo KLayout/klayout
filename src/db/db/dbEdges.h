@@ -795,6 +795,24 @@ public:
   }
 
   /**
+   *  @brief Boolean AND/NOT operator in the same operation
+   */
+  std::pair<Edges, Edges> andnot (const Edges &other) const
+  {
+    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->andnot_with (other);
+    return std::pair<Edges, Edges> (Edges (p.first), Edges (p.second));
+  }
+
+  /**
+   *  @brief Boolean AND/NOT operator with a region in the same operation
+   */
+  std::pair<Edges, Edges> andnot (const Region &other) const
+  {
+    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->andnot_with (other);
+    return std::pair<Edges, Edges> (Edges (p.first), Edges (p.second));
+  }
+
+  /**
    *  @brief Boolean XOR operator
    */
   Edges operator^ (const Edges &other) const
@@ -975,6 +993,17 @@ public:
   }
 
   /**
+   *  @brief Returns the eges inside the given region and the ones outside the region.
+   *
+   *  This method combined both inside_part and outside_part.
+   */
+  std::pair<Edges, Edges> inside_outside_part (const Region &other) const
+  {
+    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->inside_outside_part_pair (other);
+    return std::pair<Edges, Edges> (Edges (p.first), Edges (p.second));
+  }
+
+  /**
    *  @brief Selects all polygons of the other region set which overlap or touch edges from this edge set
    *
    *  Merged semantics applies for the other region. Merged polygons will be selected from the other region
@@ -1035,6 +1064,15 @@ public:
   Edges selected_not_interacting (const Region &other) const
   {
     return Edges (mp_delegate->selected_not_interacting (other));
+  }
+
+  /**
+   *  @brief Returns all edges of this edge set which do not overlap or touch with polygons from the region together with the ones that do not
+   */
+  std::pair<Edges, Edges> selected_interacting_differential (const Region &other) const
+  {
+    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->selected_interacting_pair (other);
+    return std::pair<Edges, Edges> (Edges (p.first), Edges (p.second));
   }
 
   /**
@@ -1293,6 +1331,15 @@ public:
   Edges selected_interacting (const Edges &other) const
   {
     return Edges (mp_delegate->selected_interacting (other));
+  }
+
+  /**
+   *  @brief Returns all edges of this edge set which do not overlap or touch with edges from the other edge set together with the ones that do not
+   */
+  std::pair<Edges, Edges> selected_interacting_differential (const Edges &other) const
+  {
+    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->selected_interacting_pair (other);
+    return std::pair<Edges, Edges> (Edges (p.first), Edges (p.second));
   }
 
   /**

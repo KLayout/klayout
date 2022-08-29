@@ -120,13 +120,16 @@ TEST(2)
   r2.insert (db::Box (db::Point (0, 10), db::Point (100, 210)));
 
   EXPECT_EQ (db::compare ((r & r1), "(10,200;100,200);(100,0;10,0)"), true);
+  EXPECT_EQ (db::compare (r.andnot(r1).first, "(10,200;100,200);(100,0;10,0)"), true);
   EXPECT_EQ (db::compare ((r & r2), "(0,10;0,200);(100,200;100,10)"), true);
+  EXPECT_EQ (db::compare (r.andnot(r2).first, "(0,10;0,200);(100,200;100,10)"), true);
   db::Edges o1 = r;
   o1 &= r1;
   EXPECT_EQ (o1.is_merged (), true);
   EXPECT_EQ (db::compare (o1, "(10,200;100,200);(100,0;10,0)"), true);
 
   EXPECT_EQ (db::compare ((r - r1), "(0,0;0,200);(100,200;100,0);(0,200;10,200);(10,0;0,0)"), true);
+  EXPECT_EQ (db::compare (r.andnot(r1).second, "(0,0;0,200);(100,200;100,0);(0,200;10,200);(10,0;0,0)"), true);
   db::Edges o2 = r;
   o2 -= r1;
   EXPECT_EQ (o2.is_merged (), true);
@@ -392,31 +395,41 @@ TEST(8)
   e2.insert (db::Edge (db::Point (0, 100), db::Point (100, 100)));
 
   EXPECT_EQ (e.selected_interacting (e2).to_string (), "(0,0;0,200)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).first.to_string (), "(0,0;0,200)");
   EXPECT_EQ (e.selected_not_interacting (e2).to_string (), "(250,200;300,0)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).second.to_string (), "(250,200;300,0)");
 
   e2.clear ();
   e2.insert (db::Edge (db::Point (0, 100), db::Point (0, 100)));
 
   EXPECT_EQ (e.selected_interacting (e2).to_string (), "(0,0;0,200)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).first.to_string (), "(0,0;0,200)");
   EXPECT_EQ (e.selected_not_interacting (e2).to_string (), "(250,200;300,0)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).second.to_string (), "(250,200;300,0)");
 
   e2.clear ();
   e2.insert (db::Edge (db::Point (100, 0), db::Point (0, 0)));
 
   EXPECT_EQ (e.selected_interacting (e2).to_string (), "(0,0;0,200)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).first.to_string (), "(0,0;0,200)");
   EXPECT_EQ (e.selected_not_interacting (e2).to_string (), "(250,200;300,0)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).second.to_string (), "(250,200;300,0)");
 
   e2.clear ();
   e2.insert (db::Edge (db::Point (-100, -1), db::Point (100, -1)));
 
   EXPECT_EQ (e.selected_interacting (e2).to_string (), "");
+  EXPECT_EQ (e.selected_interacting_differential (e2).first.to_string (), "");
   EXPECT_EQ (db::compare (e.selected_not_interacting (e2), "(0,0;0,200);(250,200;300,0)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (e2).second, "(0,0;0,200);(250,200;300,0)"), true);
 
   e2.clear ();
   e2.insert (db::Edge (db::Point (-100, 0), db::Point (100, 0)));
 
   EXPECT_EQ (e.selected_interacting (e2).to_string (), "(0,0;0,200)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).first.to_string (), "(0,0;0,200)");
   EXPECT_EQ (e.selected_not_interacting (e2).to_string (), "(250,200;300,0)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).second.to_string (), "(250,200;300,0)");
 
   db::Edges ee = e;
   e.select_interacting (e2);
@@ -785,7 +798,9 @@ TEST(20)
     EXPECT_EQ (r2.merged ().to_string (100), "(60,10;60,20);(60,20;70,20);(70,20;70,10);(70,10;60,10);(10,10;10,40);(10,40;40,40);(40,40;40,10);(40,10;10,10);(80,40;80,70);(80,70;140,70);(140,70;140,40);(140,40;80,40)");
     EXPECT_EQ (rr1.to_string (100), "(0,0;0,30;30,30;30,0);(50,0;50,30;80,30;80,0);(50,40;50,70;80,70;80,40)");
     EXPECT_EQ (r2.selected_interacting (rr1).to_string (100), "(60,10;60,20);(60,20;70,20);(70,20;70,10);(70,10;60,10);(10,10;10,40);(40,10;10,10);(80,40;80,70);(80,70;140,70);(140,40;80,40)");
+    EXPECT_EQ (r2.selected_interacting_differential (rr1).first.to_string (100), "(60,10;60,20);(60,20;70,20);(70,20;70,10);(70,10;60,10);(10,10;10,40);(40,10;10,10);(80,40;80,70);(80,70;140,70);(140,40;80,40)");
     EXPECT_EQ (r2.selected_not_interacting (rr1).to_string (100), "(10,40;40,40);(40,40;40,10);(140,70;140,40)");
+    EXPECT_EQ (r2.selected_interacting_differential (rr1).second.to_string (100), "(10,40;40,40);(40,40;40,10);(140,70;140,40)");
 
     db::Edges r2dup = r2;
     r2.select_interacting (rr1);
@@ -809,7 +824,9 @@ TEST(21)
   db::Edges e, ee;
   e.insert (db::Edge (-100, 100, 200, 100));
   EXPECT_EQ ((e & r).to_string (), "(0,100;100,100)");
+  EXPECT_EQ (e.andnot(r).first.to_string (), "(0,100;100,100)");
   EXPECT_EQ (e.inside_part (r).to_string (), "(0,100;100,100)");
+  EXPECT_EQ (e.inside_outside_part (r).first.to_string (), "(0,100;100,100)");
 
   ee = e;
   ee &= r;
@@ -820,7 +837,9 @@ TEST(21)
   EXPECT_EQ (ee.to_string (), "(0,100;100,100)");
 
   EXPECT_EQ (db::compare ((e - r), "(-100,100;0,100);(100,100;200,100)"), true);
+  EXPECT_EQ (db::compare (e.andnot(r).second, "(-100,100;0,100);(100,100;200,100)"), true);
   EXPECT_EQ (db::compare (e.outside_part (r), "(-100,100;0,100);(100,100;200,100)"), true);
+  EXPECT_EQ (db::compare (e.inside_outside_part (r).second, "(-100,100;0,100);(100,100;200,100)"), true);
 
   ee = e;
   ee -= r;
@@ -833,7 +852,9 @@ TEST(21)
   e.clear ();
   e.insert (db::Edge (-100, 0, 200, 0));
   EXPECT_EQ ((e & r).to_string (), "(0,0;100,0)");
+  EXPECT_EQ (e.andnot(r).first.to_string (), "(0,0;100,0)");
   EXPECT_EQ (e.inside_part (r).to_string (), "");
+  EXPECT_EQ (e.inside_outside_part (r).first.to_string (), "");
 
   ee = e;
   ee &= r;
@@ -844,6 +865,7 @@ TEST(21)
   EXPECT_EQ (ee.to_string (), "");
 
   EXPECT_EQ (db::compare ((e - r), "(-100,0;0,0);(100,0;200,0)"), true);
+  EXPECT_EQ (db::compare (e.andnot(r).second, "(-100,0;0,0);(100,0;200,0)"), true);
   EXPECT_EQ (db::compare (e.outside_part (r), "(-100,0;0,0);(0,0;100,0);(100,0;200,0)"), true);
 
   ee = e;
@@ -874,6 +896,7 @@ TEST(22)
   ee.insert (db::Edge (4000,-2000,-2000,-2000));
 
   EXPECT_EQ (db::compare ((e & ee), "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)"), true);
+  EXPECT_EQ (db::compare (e.andnot(ee).first, "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)"), true);
   EXPECT_EQ (db::compare (e.intersections (ee), "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)"), true);
 
   //  Edge/edge intersections
@@ -883,6 +906,7 @@ TEST(22)
   ee.insert (db::Edge (-50, 50, 50, 50));
   ee.insert (db::Edge (-50, 100, 50, 100));
   EXPECT_EQ ((e & ee).to_string (), "");  //  AND does not report intersection points
+  EXPECT_EQ (e.andnot(ee).first.to_string (), "");  //  AND does not report intersection points
   EXPECT_EQ (db::compare (e.intersections (ee), "(0,50;0,50);(0,100;0,100)"), true);
 
   //  Edge is intersected by pair with connection point on this line
@@ -894,6 +918,7 @@ TEST(22)
   ee.insert (db::Edge (-50, 100, 0, 100));
   ee.insert (db::Edge (0, 100, 50, 100));
   EXPECT_EQ ((e & ee).to_string (), "");  //  AND does not report intersection points
+  EXPECT_EQ (e.andnot(ee).first.to_string (), "");  //  AND does not report intersection points
   EXPECT_EQ (db::compare (e.intersections (ee), "(0,50;0,50);(0,60;0,60);(0,100;0,100)"), true);
 
   //  Coincident edges are crossed by another one
@@ -904,6 +929,7 @@ TEST(22)
   ee.insert (db::Edge (-50, 100, 50, 100));
   ee.insert (db::Edge (-50, 200, 50, 200));
   EXPECT_EQ ((e & ee).to_string (), "(0,0;0,150)");
+  EXPECT_EQ (e.andnot(ee).first.to_string (), "(0,0;0,150)");
   EXPECT_EQ (db::compare (e.intersections (ee), "(0,0;0,150);(0,200;0,200)"), true);
 }
 

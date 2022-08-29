@@ -430,7 +430,7 @@ EdgeToPolygonLocalOperation::EdgeToPolygonLocalOperation (EdgePolygonOp::mode_t 
 OnEmptyIntruderHint
 EdgeToPolygonLocalOperation::on_empty_intruder_hint () const
 {
-  return (m_op != EdgePolygonOp::Inside) ? Copy : Drop;
+  return m_op == EdgePolygonOp::Inside ? Drop : (m_op == EdgePolygonOp::Outside ? Copy : CopyToSecond);
 }
 
 std::string

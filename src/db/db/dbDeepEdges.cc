@@ -1320,10 +1320,10 @@ public:
 
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const
   {
-    if (m_output_mode != Normal) {
-      return Copy;
+    if (m_mode == EdgesOutside) {
+      return m_output_mode == Both ? Copy : (m_output_mode == Inverse ? Drop : Copy);
     } else {
-      return Drop;
+      return m_output_mode == Both ? CopyToSecond : (m_output_mode == Inverse ? Copy : Drop);
     }
   }
 
@@ -1472,16 +1472,41 @@ public:
 
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const
   {
-    if (m_output_mode != Normal) {
-      return Copy;
+    if (m_mode == EdgesOutside) {
+      return m_output_mode == Both ? Copy : (m_output_mode == Inverse ? Drop : Copy);
     } else {
-      return Drop;
+      return m_output_mode == Both ? CopyToSecond : (m_output_mode == Inverse ? Copy : Drop);
     }
   }
 
   virtual std::string description () const
   {
-    return tl::to_string (tr ("Select interacting edges"));
+    if (m_mode == EdgesInteract) {
+      if (m_output_mode == Inverse) {
+        return tl::to_string (tr ("Select non-interacting edges"));
+      } else if (m_output_mode == Normal) {
+        return tl::to_string (tr ("Select interacting edges"));
+      } else {
+        return tl::to_string (tr ("Select interacting and non-interacting edges"));
+      }
+    } else if (m_mode == EdgesInside) {
+      if (m_output_mode == Inverse) {
+        return tl::to_string (tr ("Select non-inside edges"));
+      } else if (m_output_mode == Normal) {
+        return tl::to_string (tr ("Select inside edges"));
+      } else {
+        return tl::to_string (tr ("Select inside and non-inside edges"));
+      }
+    } else if (m_mode == EdgesOutside) {
+      if (m_output_mode == Inverse) {
+        return tl::to_string (tr ("Select non-outside edges"));
+      } else if (m_output_mode == Normal) {
+        return tl::to_string (tr ("Select outside edges"));
+      } else {
+        return tl::to_string (tr ("Select outside and non-outside edges"));
+      }
+    }
+    return std::string ();
   }
 
 private:

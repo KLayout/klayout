@@ -221,9 +221,9 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Region &region, EdgeInte
 
   for (EdgesIterator o (begin_merged ()); ! o.at_end (); ++o) {
     if (result.find (*o) == result.end ()) {
-      output->insert (*o);
-    } else {
       output2->insert (*o);
+    } else {
+      output->insert (*o);
     }
   }
 
@@ -265,9 +265,9 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Edges &other, EdgeIntera
 
   for (EdgesIterator o (begin_merged ()); ! o.at_end (); ++o) {
     if (results.find (*o) == results.end ()) {
-      output->insert (*o);
-    } else {
       output2->insert (*o);
+    } else {
+      output->insert (*o);
     }
   }
 

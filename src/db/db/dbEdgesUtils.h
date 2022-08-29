@@ -275,19 +275,35 @@ public:
     //  .. nothing yet ..
   }
 
+  void finish (const db::Edge *o, size_t p)
+  {
+    if (p == 0 && m_mode == EdgesOutside && m_seen.find (o) == m_seen.end ()) {
+      mp_output->insert (*o);
+    }
+  }
+
   void add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2)
   {
     //  Select the edges which intersect
     if (p1 != p2) {
+
       const db::Edge *o = p1 > p2 ? o2 : o1;
       const db::Edge *oo = p1 > p2 ? o1 : o2;
+
       if ((m_mode == EdgesInteract && db::edge_interacts (*o, *oo)) ||
-          (m_mode == EdgesInside && db::edge_is_inside (*o, *oo)) ||
-          (m_mode == EdgesOutside && db::edge_is_outside (*o, *oo))) {
+          (m_mode == EdgesInside && db::edge_is_inside (*o, *oo))) {
+
         if (m_seen.insert (o).second) {
           mp_output->insert (*o);
         }
+
+      } else if (m_mode == EdgesOutside && ! db::edge_is_outside (*o, *oo)) {
+
+        //  In this case we need to collect edges which are outside always - we report those on "finished".
+        m_seen.insert (o);
+
       }
+
     }
   }
 
@@ -332,18 +348,51 @@ public:
     //  .. nothing yet ..
   }
 
+  void finish (const OutputType *o)
+  {
+    if (m_mode == EdgesOutside && m_seen.find (o) == m_seen.end ()) {
+      mp_output->insert (*o);
+    }
+  }
+
+  void finish1 (const db::Edge *o, size_t /*p*/)
+  {
+    const OutputType *ep = 0;
+    tl::select (ep, o, (const db::Polygon *) 0);
+    if (ep) {
+      finish (ep);
+    }
+  }
+
+  void finish2 (const db::Polygon *o, size_t /*p*/)
+  {
+    const OutputType *ep = 0;
+    tl::select (ep, (const db::Edge *) 0, o);
+    if (ep) {
+      finish (ep);
+    }
+  }
+
   void add (const db::Edge *e, size_t, const db::Polygon *p, size_t)
   {
     const OutputType *ep = 0;
     tl::select (ep, e, p);
 
     if (m_seen.find (ep) == m_seen.end ()) {
+
       if ((m_mode == EdgesInteract && db::edge_interacts (*e, *p)) ||
-          (m_mode == EdgesInside && db::edge_is_inside (*e, *p)) ||
-          (m_mode == EdgesOutside && db::edge_is_outside (*e, *p))) {
+          (m_mode == EdgesInside && db::edge_is_inside (*e, *p))) {
+
         m_seen.insert (ep);
         mp_output->insert (*ep);
+
+      } else if (m_mode == EdgesOutside && ! db::edge_is_outside (*e, *p)) {
+
+        //  In this case we need to collect edges which are outside always - we report those on "finished".
+        m_seen.insert (ep);
+
       }
+
     }
   }
 

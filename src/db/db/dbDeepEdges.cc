@@ -914,6 +914,32 @@ EdgesDelegate *DeepEdges::and_with (const Region &other) const
   }
 }
 
+std::pair<EdgesDelegate *, EdgesDelegate *> DeepEdges::andnot_with (const Region &other) const
+{
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+
+  if (empty ()) {
+
+    //  Nothing to do
+    return std::make_pair (new EmptyEdges (), new EmptyEdges ());
+
+  } else if (other.empty ()) {
+
+    //  Nothing to do
+    return std::make_pair (new EmptyEdges (), clone ());
+
+  } else if (! other_deep) {
+
+    return AsIfFlatEdges::andnot_with (other);
+
+  } else {
+
+    auto res = edge_region_op (other_deep, EdgePolygonOp::Both, true /*include borders*/);
+    return std::make_pair (new DeepEdges (res.first), new DeepEdges (res.second));
+
+  }
+}
+
 EdgesDelegate *DeepEdges::not_with (const Region &other) const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());

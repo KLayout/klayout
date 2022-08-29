@@ -20,12 +20,11 @@
 
 */
 
-
+#include "dbLocalOperation.h"
 #include "dbHierProcessor.h"
 #include "dbBoxScanner.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbBoxConvert.h"
-#include "dbEdgeProcessor.h"
 #include "dbPolygonGenerators.h"
 #include "dbPolygonTools.h"
 #include "dbLocalOperationUtils.h"
@@ -366,10 +365,16 @@ EdgeBoolAndOrNotLocalOperation::description () const
 void
 EdgeBoolAndOrNotLocalOperation::do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
-  tl_assert (results.size () == 1);
+  tl_assert (results.size () == size_t (m_op == EdgeAndNot ? 2 : 1));
+
   std::unordered_set<db::Edge> &result = results.front ();
 
-  EdgeBooleanClusterCollector<std::unordered_set<db::Edge> > cluster_collector (&result, m_op);
+  std::unordered_set<db::Edge> *result2 = 0;
+  if (results.size () > 1) {
+    result2 = &results[1];
+  }
+
+  EdgeBooleanClusterCollector<std::unordered_set<db::Edge> > cluster_collector (&result, m_op, result2);
 
   db::box_scanner<db::Edge, size_t> scanner;
 
@@ -381,7 +386,7 @@ EdgeBoolAndOrNotLocalOperation::do_compute_local (db::Layout * /*layout*/, const
   }
 
   bool any_subject = false;
-  bool is_and = (m_op == EdgeAnd || m_op == EdgeIntersections);
+  bool is_and = (m_op == EdgeAnd || m_op == EdgeAndNot || m_op == EdgeIntersections);
 
   for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
@@ -416,8 +421,8 @@ EdgeBoolAndOrNotLocalOperation::do_compute_local (db::Layout * /*layout*/, const
 // ---------------------------------------------------------------------------------------------
 //  EdgeToPolygonLocalOperation implementation
 
-EdgeToPolygonLocalOperation::EdgeToPolygonLocalOperation (bool outside, bool include_borders)
-  : m_outside (outside), m_include_borders (include_borders)
+EdgeToPolygonLocalOperation::EdgeToPolygonLocalOperation (EdgePolygonOp::mode_t op, bool include_borders)
+  : m_op (op), m_include_borders (include_borders)
 {
   //  .. nothing yet ..
 }
@@ -425,20 +430,32 @@ EdgeToPolygonLocalOperation::EdgeToPolygonLocalOperation (bool outside, bool inc
 OnEmptyIntruderHint
 EdgeToPolygonLocalOperation::on_empty_intruder_hint () const
 {
-  return m_outside ? Copy : Drop;
+  return (m_op == EdgePolygonOp::Inside) ? Copy : Drop;
 }
 
 std::string
 EdgeToPolygonLocalOperation::description () const
 {
-  return tl::to_string (m_outside ? tr ("Edge to polygon AND/INSIDE") : tr ("Edge to polygons NOT/OUTSIDE"));
+  if (m_op == EdgePolygonOp::Inside) {
+    return tl::to_string (tr ("Edge to polygon AND/INSIDE"));
+  } else if (m_op == EdgePolygonOp::Outside) {
+    return tl::to_string (tr ("Edge to polygon NOT/OUTSIDE"));
+  } else {
+    return tl::to_string (tr ("Edge to polygon ANDNOT/INOUTSIDE"));
+  }
 }
 
 void
 EdgeToPolygonLocalOperation::do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
-  tl_assert (results.size () == 1);
+  tl_assert (results.size () == size_t (m_op == EdgePolygonOp::Both ? 2 : 1));
+
   std::unordered_set<db::Edge> &result = results.front ();
+
+  std::unordered_set<db::Edge> *result2 = 0;
+  if (results.size () > 1) {
+    result2 = &results[1];
+  }
 
   db::EdgeProcessor ep;
 
@@ -456,8 +473,10 @@ EdgeToPolygonLocalOperation::do_compute_local (db::Layout * /*layout*/, const sh
     const db::Edge &subject = interactions.subject_shape (i->first);
     if (i->second.empty ()) {
       //  shortcut (outside: keep, otherwise: drop)
-      if (m_outside) {
+      if (m_op == db::EdgePolygonOp::Outside) {
         result.insert (subject);
+      } else if (m_op == db::EdgePolygonOp::Both) {
+        result2->insert (subject);
       }
     } else {
       ep.insert (subject, 1);
@@ -475,7 +494,7 @@ EdgeToPolygonLocalOperation::do_compute_local (db::Layout * /*layout*/, const sh
     }
 
     db::EdgeToEdgeSetGenerator cc (result);
-    db::EdgePolygonOp op (m_outside ? db::EdgePolygonOp::Outside : db::EdgePolygonOp::Inside, m_include_borders);
+    db::EdgePolygonOp op (m_op, m_include_borders);
     ep.process (cc, op);
 
   }

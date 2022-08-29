@@ -29,6 +29,7 @@
 
 #include "dbLayout.h"
 #include "dbEdgeBoolean.h"
+#include "dbEdgeProcessor.h"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -187,7 +188,7 @@ class DB_PUBLIC EdgeBoolAndOrNotLocalOperation
   : public local_operation<db::Edge, db::Edge, db::Edge>
 {
 public:
-  EdgeBoolAndOrNotLocalOperation (EdgeBoolOp op);
+  EdgeBoolAndOrNotLocalOperation (db::EdgeBoolOp op);
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &result, size_t max_vertex_count, double area_ratio) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
@@ -197,7 +198,7 @@ public:
   virtual db::Coord dist () const { return 1; }
 
 private:
-  EdgeBoolOp m_op;
+  db::EdgeBoolOp m_op;
 };
 
 /**
@@ -210,7 +211,7 @@ class DB_PUBLIC EdgeToPolygonLocalOperation
   : public local_operation<db::Edge, db::PolygonRef, db::Edge>
 {
 public:
-  EdgeToPolygonLocalOperation (bool outside, bool include_borders);
+  EdgeToPolygonLocalOperation (EdgePolygonOp::mode_t op, bool include_borders);
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &result, size_t max_vertex_count, double area_ratio) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
@@ -220,7 +221,7 @@ public:
   virtual db::Coord dist () const { return m_include_borders ? 1 : 0; }
 
 private:
-  bool m_outside;
+  db::EdgePolygonOp::mode_t m_op;
   bool m_include_borders;
 };
 

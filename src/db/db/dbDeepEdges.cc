@@ -797,12 +797,21 @@ DeepEdges::and_or_not_with (const DeepEdges *other, EdgeBoolOp op) const
   return dl_out;
 }
 
-DeepLayer
-DeepEdges::edge_region_op (const DeepRegion *other, bool outside, bool include_borders) const
+std::pair<DeepLayer, DeepLayer>
+DeepEdges::edge_region_op (const DeepRegion *other, EdgePolygonOp::mode_t mode, bool include_borders) const
 {
-  DeepLayer dl_out (deep_layer ().derived ());
+  std::vector<unsigned int> output_layers;
 
-  db::EdgeToPolygonLocalOperation op (outside, include_borders);
+  DeepLayer dl_out (deep_layer ().derived ());
+  output_layers.push_back (dl_out.layer ());
+
+  DeepLayer dl_out2;
+  if (mode == EdgePolygonOp::Both) {
+    dl_out2 = DeepLayer (deep_layer ().derived ());
+    output_layers.push_back (dl_out2.layer ());
+  }
+
+  db::EdgeToPolygonLocalOperation op (mode, include_borders);
 
   db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
   proc.set_base_verbosity (base_verbosity ());
@@ -810,9 +819,9 @@ DeepEdges::edge_region_op (const DeepRegion *other, bool outside, bool include_b
   proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
   proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
 
-  proc.run (&op, deep_layer ().layer (), other->deep_layer ().layer (), dl_out.layer ());
+  proc.run (&op, deep_layer ().layer (), other->deep_layer ().layer (), output_layers);
 
-  return dl_out;
+  return std::make_pair (dl_out, dl_out2);
 }
 
 EdgesDelegate *DeepEdges::intersections (const Edges &other) const
@@ -855,31 +864,6 @@ EdgesDelegate *DeepEdges::and_with (const Edges &other) const
   }
 }
 
-EdgesDelegate *DeepEdges::and_with (const Region &other) const
-{
-  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
-
-  if (empty ()) {
-
-    //  Nothing to do
-    return new EmptyEdges ();
-
-  } else if (other.empty ()) {
-
-    //  Nothing to do
-    return clone ();
-
-  } else if (! other_deep) {
-
-    return AsIfFlatEdges::not_with (other);
-
-  } else {
-
-    return new DeepEdges (edge_region_op (other_deep, false /*outside*/, true /*include borders*/));
-
-  }
-}
-
 EdgesDelegate *DeepEdges::not_with (const Edges &other) const
 {
   const DeepEdges *other_deep = dynamic_cast <const DeepEdges *> (other.delegate ());
@@ -905,6 +889,31 @@ EdgesDelegate *DeepEdges::not_with (const Edges &other) const
   }
 }
 
+EdgesDelegate *DeepEdges::and_with (const Region &other) const
+{
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+
+  if (empty ()) {
+
+    //  Nothing to do
+    return new EmptyEdges ();
+
+  } else if (other.empty ()) {
+
+    //  Nothing to do
+    return clone ();
+
+  } else if (! other_deep) {
+
+    return AsIfFlatEdges::and_with (other);
+
+  } else {
+
+    return new DeepEdges (edge_region_op (other_deep, EdgePolygonOp::Inside, true /*include borders*/).first);
+
+  }
+}
+
 EdgesDelegate *DeepEdges::not_with (const Region &other) const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
@@ -925,23 +934,36 @@ EdgesDelegate *DeepEdges::not_with (const Region &other) const
 
   } else {
 
-    return new DeepEdges (edge_region_op (other_deep, true /*outside*/, true /*include borders*/));
+    return new DeepEdges (edge_region_op (other_deep, EdgePolygonOp::Outside, true /*include borders*/).first);
 
   }
 }
 
 std::pair<EdgesDelegate *, EdgesDelegate *>
-DeepEdges::andnot_with (const Edges &) const
+DeepEdges::andnot_with (const Edges &other) const
 {
-  // @@@
-  return std::pair<EdgesDelegate *, EdgesDelegate *>();
-}
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
 
-std::pair<EdgesDelegate *, EdgesDelegate *>
-DeepEdges::andnot_with (const Region &) const
-{
-  // @@@
-  return std::pair<EdgesDelegate *, EdgesDelegate *>();
+  if (empty ()) {
+
+    //  Nothing to do
+    return std::make_pair (new EmptyEdges (), new EmptyEdges ());
+
+  } else if (other.empty ()) {
+
+    //  Nothing to do
+    return std::make_pair (new EmptyEdges (), clone ());
+
+  } else if (! other_deep) {
+
+    return AsIfFlatEdges::andnot_with (other);
+
+  } else {
+
+    auto res = edge_region_op (other_deep, EdgePolygonOp::Both, true /*include borders*/);
+    return std::make_pair (new DeepEdges (res.first), new DeepEdges (res.second));
+
+  }
 }
 
 EdgesDelegate *DeepEdges::xor_with (const Edges &other) const
@@ -1037,11 +1059,11 @@ EdgesDelegate *DeepEdges::inside_part (const Region &other) const
 
   } else if (! other_deep) {
 
-    return AsIfFlatEdges::not_with (other);
+    return AsIfFlatEdges::inside_part (other);
 
   } else {
 
-    return new DeepEdges (edge_region_op (other_deep, false /*outside*/, false /*include borders*/));
+    return new DeepEdges (edge_region_op (other_deep, db::EdgePolygonOp::Inside, false /*include borders*/).first);
 
   }
 }
@@ -1062,19 +1084,39 @@ EdgesDelegate *DeepEdges::outside_part (const Region &other) const
 
   } else if (! other_deep) {
 
-    return AsIfFlatEdges::not_with (other);
+    return AsIfFlatEdges::outside_part (other);
 
   } else {
 
-    return new DeepEdges (edge_region_op (other_deep, true /*outside*/, false /*include borders*/));
+    return new DeepEdges (edge_region_op (other_deep, db::EdgePolygonOp::Outside, false /*include borders*/).first);
 
   }
 }
 
-std::pair<EdgesDelegate *, EdgesDelegate *> DeepEdges::inside_outside_part_pair (const Region &) const
+std::pair<EdgesDelegate *, EdgesDelegate *> DeepEdges::inside_outside_part_pair (const Region &other) const
 {
-  // @@@
-  return std::pair<EdgesDelegate *, EdgesDelegate *>();
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+
+  if (empty ()) {
+
+    //  Nothing to do
+    return std::make_pair (new EmptyEdges (), new EmptyEdges ());
+
+  } else if (other.empty ()) {
+
+    //  Nothing to do
+    return std::make_pair (new EmptyEdges (), clone ());
+
+  } else if (! other_deep) {
+
+    return AsIfFlatEdges::inside_outside_part_pair (other);
+
+  } else {
+
+    auto res = edge_region_op (other_deep, EdgePolygonOp::Both, false /*include borders*/);
+    return std::make_pair (new DeepEdges (res.first), new DeepEdges (res.second));
+
+  }
 }
 
 RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const
@@ -1177,8 +1219,10 @@ class Edge2EdgeInteractingLocalOperation
   : public local_operation<db::Edge, db::Edge, db::Edge>
 {
 public:
-  Edge2EdgeInteractingLocalOperation (EdgeInteractionMode mode, bool inverse)
-    : m_mode (mode), m_inverse (inverse)
+  enum output_mode_t { Normal, Inverse, Both };
+
+  Edge2EdgeInteractingLocalOperation (EdgeInteractionMode mode, output_mode_t output_mode)
+    : m_mode (mode), m_output_mode (output_mode)
   {
     //  .. nothing yet ..
   }
@@ -1191,8 +1235,14 @@ public:
 
   virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    tl_assert (results.size () == 1);
+    tl_assert (results.size () == (m_output_mode == Both ? 2 : 1));
+
     std::unordered_set<db::Edge> &result = results.front ();
+
+    std::unordered_set<db::Edge> *result2 = 0;
+    if (m_output_mode == Both) {
+      result2 = &results[1];
+    }
 
     db::box_scanner<db::Edge, size_t> scanner;
 
@@ -1212,17 +1262,25 @@ public:
       scanner.insert (o.operator-> (), 1);
     }
 
-    if (m_inverse) {
+    if (m_output_mode == Inverse || m_output_mode == Both) {
 
       std::unordered_set<db::Edge> interacting;
       edge_interaction_filter<std::unordered_set<db::Edge> > filter (interacting, m_mode);
       scanner.process (filter, 1, db::box_convert<db::Edge> ());
 
       for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
         const db::Edge &subject = interactions.subject_shape (i->first);
         if (interacting.find (subject) == interacting.end ()) {
+          if (m_output_mode != Both) {
+            result.insert (subject);
+          } else {
+            result2->insert (subject);
+          }
+        } else if (m_output_mode == Both) {
           result.insert (subject);
         }
+
       }
 
     } else {
@@ -1236,7 +1294,7 @@ public:
 
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const
   {
-    if (m_inverse) {
+    if (m_output_mode != Normal) {
       return Copy;
     } else {
       return Drop;
@@ -1250,7 +1308,7 @@ public:
 
 private:
   EdgeInteractionMode m_mode;
-  bool m_inverse;
+  output_mode_t m_output_mode;
 };
 
 class Edge2EdgePullLocalOperation
@@ -1311,8 +1369,10 @@ class Edge2PolygonInteractingLocalOperation
   : public local_operation<db::Edge, db::PolygonRef, db::Edge>
 {
 public:
-  Edge2PolygonInteractingLocalOperation (EdgeInteractionMode mode, bool inverse)
-    : m_mode (mode), m_inverse (inverse)
+  enum output_mode_t { Normal, Inverse, Both };
+
+  Edge2PolygonInteractingLocalOperation (EdgeInteractionMode mode, output_mode_t output_mode)
+    : m_mode (mode), m_output_mode (output_mode)
   {
     //  .. nothing yet ..
   }
@@ -1325,8 +1385,14 @@ public:
 
   virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
-    tl_assert (results.size () == 1);
+    tl_assert (results.size () == size_t (m_output_mode == Both ? 2 : 1));
+
     std::unordered_set<db::Edge> &result = results.front ();
+
+    std::unordered_set<db::Edge> *result2 = 0;
+    if (m_output_mode == Both) {
+      result2 = &results[1];
+    }
 
     db::box_scanner2<db::Edge, size_t, db::Polygon, size_t> scanner;
 
@@ -1348,17 +1414,26 @@ public:
       scanner.insert2 (& heap.back (), 1);
     }
 
-    if (m_inverse) {
+    if (m_output_mode == Inverse || m_output_mode == Both) {
 
       std::unordered_set<db::Edge> interacting;
       edge_to_region_interaction_filter<std::unordered_set<db::Edge> > filter (&interacting, m_mode);
       scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
 
       for (shape_interactions<db::Edge, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
         const db::Edge &subject = interactions.subject_shape (i->first);
+
         if (interacting.find (subject) == interacting.end ()) {
+          if (m_output_mode != Both) {
+            result.insert (subject);
+          } else {
+            result2->insert (subject);
+          }
+        } else if (m_output_mode == Both) {
           result.insert (subject);
         }
+
       }
 
     } else {
@@ -1371,7 +1446,7 @@ public:
 
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const
   {
-    if (m_inverse) {
+    if (m_output_mode != Normal) {
       return Copy;
     } else {
       return Drop;
@@ -1385,7 +1460,7 @@ public:
 
 private:
   EdgeInteractionMode m_mode;
-  bool m_inverse;
+  output_mode_t m_output_mode;
 };
 
 struct ResultInserter
@@ -1481,7 +1556,7 @@ DeepEdges::selected_interacting_generic (const Region &other, EdgeInteractionMod
 
   DeepLayer dl_out (edges.derived ());
 
-  db::Edge2PolygonInteractingLocalOperation op (mode, inverse);
+  db::Edge2PolygonInteractingLocalOperation op (mode, inverse ? db::Edge2PolygonInteractingLocalOperation::Inverse : db::Edge2PolygonInteractingLocalOperation::Normal);
 
   db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
   proc.set_base_verbosity (base_verbosity ());
@@ -1490,6 +1565,38 @@ DeepEdges::selected_interacting_generic (const Region &other, EdgeInteractionMod
   proc.run (&op, edges.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
 
   return new db::DeepEdges (dl_out);
+}
+
+std::pair<EdgesDelegate *, EdgesDelegate *>
+DeepEdges::selected_interacting_pair_generic (const Region &other, EdgeInteractionMode mode) const
+{
+  std::unique_ptr<db::DeepRegion> dr_holder;
+  const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
+    dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
+
+  const db::DeepLayer &edges = merged_deep_layer ();
+
+  DeepLayer dl_out (edges.derived ());
+  DeepLayer dl_out2 (edges.derived ());
+
+  std::vector<unsigned int> output_layers;
+  output_layers.reserve (2);
+  output_layers.push_back (dl_out.layer ());
+  output_layers.push_back (dl_out2.layer ());
+
+  db::Edge2PolygonInteractingLocalOperation op (mode, db::Edge2PolygonInteractingLocalOperation::Both);
+
+  db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (edges.store ()->threads ());
+
+  proc.run (&op, edges.layer (), other_deep->deep_layer ().layer (), output_layers);
+
+  return std::make_pair (new db::DeepEdges (dl_out), new db::DeepEdges (dl_out2));
 }
 
 EdgesDelegate *
@@ -1507,7 +1614,7 @@ DeepEdges::selected_interacting_generic (const Edges &other, EdgeInteractionMode
 
   DeepLayer dl_out (edges.derived ());
 
-  db::Edge2EdgeInteractingLocalOperation op (mode, inverse);
+  db::Edge2EdgeInteractingLocalOperation op (mode, inverse ? db::Edge2EdgeInteractingLocalOperation::Inverse : db::Edge2EdgeInteractingLocalOperation::Normal);
 
   db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
   proc.set_base_verbosity (base_verbosity ());
@@ -1519,17 +1626,35 @@ DeepEdges::selected_interacting_generic (const Edges &other, EdgeInteractionMode
 }
 
 std::pair<EdgesDelegate *, EdgesDelegate *>
-DeepEdges::selected_interacting_pair_generic (const Edges &edges, EdgeInteractionMode mode) const
+DeepEdges::selected_interacting_pair_generic (const Edges &other, EdgeInteractionMode mode) const
 {
-  // @@@
-  return std::pair<EdgesDelegate *, EdgesDelegate *>();
-}
+  std::unique_ptr<db::DeepEdges> dr_holder;
+  const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other edge collection isn't deep, turn into a top-level only deep edge collection to facilitate re-hierarchization
+    dr_holder.reset (new db::DeepEdges (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
 
-std::pair<EdgesDelegate *, EdgesDelegate *>
-DeepEdges::selected_interacting_pair_generic (const Region &region, EdgeInteractionMode mode) const
-{
-  // @@@
-  return std::pair<EdgesDelegate *, EdgesDelegate *>();
+  const db::DeepLayer &edges = merged_deep_layer ();
+
+  DeepLayer dl_out (edges.derived ());
+  DeepLayer dl_out2 (edges.derived ());
+
+  std::vector<unsigned int> output_layers;
+  output_layers.reserve (2);
+  output_layers.push_back (dl_out.layer ());
+  output_layers.push_back (dl_out2.layer ());
+
+  db::Edge2EdgeInteractingLocalOperation op (mode, db::Edge2EdgeInteractingLocalOperation::Both);
+
+  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (edges.store ()->threads ());
+
+  proc.run (&op, edges.layer (), other_deep->deep_layer ().layer (), output_layers);
+
+  return std::make_pair (new db::DeepEdges (dl_out), new db::DeepEdges (dl_out2));
 }
 
 RegionDelegate *DeepEdges::pull_generic (const Region &other) const

@@ -387,7 +387,7 @@ DeepEdges::has_valid_edges () const
 bool
 DeepEdges::has_valid_merged_edges () const
 {
-  return merged_semantics ();
+  return false;
 }
 
 const db::RecursiveShapeIterator *
@@ -1613,7 +1613,7 @@ DeepEdges::selected_interacting_generic (const Region &other, EdgeInteractionMod
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
-  proc.run (&op, edges.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
+  proc.run (&op, edges.layer (), (mode == EdgesInside ? other_deep->merged_deep_layer () : other_deep->deep_layer ()).layer (), dl_out.layer ());
 
   return new db::DeepEdges (dl_out);
 }
@@ -1645,7 +1645,7 @@ DeepEdges::selected_interacting_pair_generic (const Region &other, EdgeInteracti
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
-  proc.run (&op, edges.layer (), other_deep->deep_layer ().layer (), output_layers);
+  proc.run (&op, edges.layer (), other_deep->merged_deep_layer ().layer (), output_layers);
 
   return std::make_pair (new db::DeepEdges (dl_out), new db::DeepEdges (dl_out2));
 }
@@ -1671,7 +1671,7 @@ DeepEdges::selected_interacting_generic (const Edges &other, EdgeInteractionMode
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
-  proc.run (&op, edges.layer (), other_deep->deep_layer ().layer (), dl_out.layer ());
+  proc.run (&op, edges.layer (), (mode == EdgesInside ? other_deep->merged_deep_layer () : other_deep->deep_layer ()).layer (), dl_out.layer ());
 
   return new db::DeepEdges (dl_out);
 }
@@ -1703,7 +1703,7 @@ DeepEdges::selected_interacting_pair_generic (const Edges &other, EdgeInteractio
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
-  proc.run (&op, edges.layer (), other_deep->deep_layer ().layer (), output_layers);
+  proc.run (&op, edges.layer (), other_deep->merged_deep_layer ().layer (), output_layers);
 
   return std::make_pair (new db::DeepEdges (dl_out), new db::DeepEdges (dl_out2));
 }

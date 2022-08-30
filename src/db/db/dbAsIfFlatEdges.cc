@@ -110,7 +110,7 @@ AsIfFlatEdges::selected_interacting_generic (const Region &other, EdgeInteractio
     scanner.insert1 (e.operator-> (), 0);
   }
 
-  AddressablePolygonDelivery p = other.addressable_polygons ();
+  AddressablePolygonDelivery p = (mode == EdgesInside ? other.addressable_merged_polygons () : other.addressable_polygons ());
 
   for ( ; ! p.at_end (); ++p) {
     scanner.insert2 (p.operator-> (), 1);
@@ -156,7 +156,8 @@ AsIfFlatEdges::selected_interacting_generic (const Edges &edges, EdgeInteraction
     scanner.insert (e.operator-> (), 0);
   }
 
-  AddressableEdgeDelivery ee = edges.addressable_edges ();
+  //  NOTE: "inside" needs merged edges for the other edges as the algorithm works edge by edge
+  AddressableEdgeDelivery ee = (mode == EdgesInside ? edges.addressable_merged_edges () : edges.addressable_edges ());
 
   for ( ; ! ee.at_end (); ++ee) {
     scanner.insert (ee.operator-> (), 1);
@@ -206,7 +207,7 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Region &region, EdgeInte
     scanner.insert1 (e.operator-> (), 0);
   }
 
-  AddressablePolygonDelivery p = region.addressable_polygons ();
+  AddressablePolygonDelivery p = region.addressable_merged_polygons ();
 
   for ( ; ! p.at_end (); ++p) {
     scanner.insert2 (p.operator-> (), 1);
@@ -250,7 +251,7 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Edges &other, EdgeIntera
     scanner.insert (e.operator-> (), 0);
   }
 
-  AddressableEdgeDelivery ee = other.addressable_edges ();
+  AddressableEdgeDelivery ee = other.addressable_merged_edges ();
 
   for ( ; ! ee.at_end (); ++ee) {
     scanner.insert (ee.operator-> (), 1);

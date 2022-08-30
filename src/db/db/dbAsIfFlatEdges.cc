@@ -803,10 +803,12 @@ AsIfFlatEdges::edge_region_op (const Region &other, db::EdgePolygonOp::mode_t mo
 {
   //  shortcuts
   if (other.empty () || empty ()) {
-    if (mode != db::EdgePolygonOp::Outside) {
+    if (mode == db::EdgePolygonOp::Both) {
       return std::make_pair (new EmptyEdges (), clone ());
+    } else if (mode == db::EdgePolygonOp::Inside) {
+      return std::make_pair (new EmptyEdges (), (EdgesDelegate *) 0);
     } else {
-      return std::make_pair (clone (), new EmptyEdges ());
+      return std::make_pair (clone (), (EdgesDelegate *) 0);
     }
   }
 

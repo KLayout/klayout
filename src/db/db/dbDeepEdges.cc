@@ -830,8 +830,7 @@ EdgesDelegate *DeepEdges::intersections (const Edges &other) const
 
   if (empty () || other.empty ()) {
 
-    //  Nothing to do
-    return new EmptyEdges ();
+    return clone ();
 
   } else if (! other_deep) {
 
@@ -848,10 +847,14 @@ EdgesDelegate *DeepEdges::and_with (const Edges &other) const
 {
   const DeepEdges *other_deep = dynamic_cast <const DeepEdges *> (other.delegate ());
 
-  if (empty () || other.empty ()) {
+  if (empty ()) {
 
-    //  Nothing to do
-    return new EmptyEdges ();
+    return clone ();
+
+  } else if (other.empty ()) {
+
+    //  NOTE: we do not use "EmptyEdges" as we want to maintain
+    return new DeepEdges (deep_layer ().derived ());
 
   } else if (! other_deep) {
 
@@ -868,14 +871,8 @@ EdgesDelegate *DeepEdges::not_with (const Edges &other) const
 {
   const DeepEdges *other_deep = dynamic_cast <const DeepEdges *> (other.delegate ());
 
-  if (empty ()) {
+  if (empty () || other.empty ()) {
 
-    //  Nothing to do
-    return new EmptyEdges ();
-
-  } else if (other.empty ()) {
-
-    //  Nothing to do
     return clone ();
 
   } else if (! other_deep) {
@@ -895,13 +892,12 @@ EdgesDelegate *DeepEdges::and_with (const Region &other) const
 
   if (empty ()) {
 
-    //  Nothing to do
-    return new EmptyEdges ();
+    return clone ();
 
   } else if (other.empty ()) {
 
-    //  Nothing to do
-    return clone ();
+    //  NOTE: we do not use "EmptyEdges" as we want to maintain
+    return new DeepEdges (deep_layer ().derived ());
 
   } else if (! other_deep) {
 
@@ -920,13 +916,12 @@ std::pair<EdgesDelegate *, EdgesDelegate *> DeepEdges::andnot_with (const Region
 
   if (empty ()) {
 
-    //  Nothing to do
-    return std::make_pair (new EmptyEdges (), new EmptyEdges ());
+    return std::make_pair (clone (), clone ());
 
   } else if (other.empty ()) {
 
-    //  Nothing to do
-    return std::make_pair (new EmptyEdges (), clone ());
+    //  NOTE: we do not use "EmptyEdges" as we want to maintain "deepness"
+    return std::make_pair (new DeepEdges (deep_layer ().derived ()), clone ());
 
   } else if (! other_deep) {
 
@@ -944,14 +939,8 @@ EdgesDelegate *DeepEdges::not_with (const Region &other) const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
 
-  if (empty ()) {
+  if (empty () || other.empty ()) {
 
-    //  Nothing to do
-    return new EmptyEdges ();
-
-  } else if (other.empty ()) {
-
-    //  Nothing to do
     return clone ();
 
   } else if (! other_deep) {
@@ -972,13 +961,12 @@ DeepEdges::andnot_with (const Edges &other) const
 
   if (empty ()) {
 
-    //  Nothing to do
-    return std::make_pair (new EmptyEdges (), new EmptyEdges ());
+    return std::make_pair (clone (), clone ());
 
   } else if (other.empty ()) {
 
-    //  Nothing to do
-    return std::make_pair (new EmptyEdges (), clone ());
+    //  NOTE: we do not use "EmptyEdges" as we want to maintain
+    return std::make_pair (new DeepEdges (deep_layer ().derived ()), clone ());
 
   } else if (! other_deep) {
 
@@ -998,12 +986,10 @@ EdgesDelegate *DeepEdges::xor_with (const Edges &other) const
 
   if (empty ()) {
 
-    //  Nothing to do
     return other.delegate ()->clone ();
 
   } else if (other.empty ()) {
 
-    //  Nothing to do
     return clone ();
 
   } else if (! other_deep) {
@@ -1075,13 +1061,12 @@ EdgesDelegate *DeepEdges::inside_part (const Region &other) const
 
   if (empty ()) {
 
-    //  Nothing to do
-    return new EmptyEdges ();
+    return clone ();
 
   } else if (other.empty ()) {
 
-    //  Nothing to do
-    return clone ();
+    //  NOTE: we do not use "EmptyEdges" as we want to maintain
+    return new DeepEdges (deep_layer ().derived ());
 
   } else if (! other_deep) {
 
@@ -1098,14 +1083,8 @@ EdgesDelegate *DeepEdges::outside_part (const Region &other) const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
 
-  if (empty ()) {
+  if (empty () || other.empty ()) {
 
-    //  Nothing to do
-    return new EmptyEdges ();
-
-  } else if (other.empty ()) {
-
-    //  Nothing to do
     return clone ();
 
   } else if (! other_deep) {
@@ -1125,13 +1104,12 @@ std::pair<EdgesDelegate *, EdgesDelegate *> DeepEdges::inside_outside_part_pair 
 
   if (empty ()) {
 
-    //  Nothing to do
-    return std::make_pair (new EmptyEdges (), new EmptyEdges ());
+    return std::make_pair (clone (), clone ());
 
   } else if (other.empty ()) {
 
-    //  Nothing to do
-    return std::make_pair (new EmptyEdges (), clone ());
+    //  NOTE: we do not use "EmptyEdges" as we want to maintain "deepness"
+    return std::make_pair (new DeepEdges (deep_layer ().derived ()), clone ());
 
   } else if (! other_deep) {
 

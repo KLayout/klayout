@@ -275,6 +275,16 @@ public:
   }
 
   /**
+   *  @brief Takes the underlying delegate object
+   */
+  EdgesDelegate *take_delegate ()
+  {
+    EdgesDelegate *delegate = mp_delegate;
+    mp_delegate = 0;
+    return delegate;
+  }
+
+  /**
    *  @brief Sets the base verbosity
    *
    *  Setting this value will make timing measurements appear at least at

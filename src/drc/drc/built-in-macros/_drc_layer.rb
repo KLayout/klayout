@@ -2858,29 +2858,6 @@ CODE
 CODE
     end
     
-    %w(split_inside split_outside).each do |f|
-      eval <<"CODE"
-      def #{f}(other, *args)
-
-        @engine._context("#{f}") do
-
-          check_is_layer(other)
-          requires_edges_or_region
-          if self.data.is_a?(RBA::Edges)
-            other.requires_edges_or_region
-          elsif self.data.is_a?(RBA::Region)
-            other.requires_region
-          end
-
-          res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data, *minmax_count(*args))
-          [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
-
-        end
-
-      end
-CODE
-    end
-    
     %w(overlapping not_overlapping covering not_covering).each do |f| 
       eval <<"CODE"
 
@@ -2971,15 +2948,19 @@ CODE
     
     %w(split_inside split_outside).each do |f|
       eval <<"CODE"
-      def #{f}(other)
+      def #{f}(other, *args)
 
         @engine._context("#{f}") do
 
           check_is_layer(other)
-          requires_region
-          other.requires_region
+          requires_edges_or_region
+          if self.data.is_a?(RBA::Edges)
+            other.requires_edges_or_region
+          elsif self.data.is_a?(RBA::Region)
+            other.requires_region
+          end
 
-          res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data)
+          res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data, *minmax_count(*args))
           [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
 
         end

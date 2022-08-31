@@ -77,15 +77,15 @@ def Get_Build_Options( targetDic ):
         if target == "std": # use 'Qt5MacPorts' that provides Qt 5.15.2~ to run on "Big Sur", too
             buildOp["std"]     = [ '-q', 'Qt5MacPorts', '-r', 'sys',  '-p', 'sys'    ]
         elif target == "ports":
-            buildOp["ports"]   = [ '-q', 'Qt5MacPorts', '-r', 'MP27', '-p', 'MP38'   ]
+            buildOp["ports"]   = [ '-q', 'Qt5MacPorts', '-r', 'MP31', '-p', 'MP38'   ]
         elif target == "brew":
-            buildOp["brew"]    = [ '-q', 'Qt5Brew',     '-r', 'HB27', '-p', 'HB38'   ]
+            buildOp["brew"]    = [ '-q', 'Qt5Brew',     '-r', 'HB31', '-p', 'HB38'   ]
         elif target == "brewHW":
             buildOp["brewHW"]  = [ '-q', 'Qt5Brew',     '-r', 'sys',  '-p', 'HB38'   ]
         elif target == "ana3":
             buildOp["ana3"]    = [ '-q', 'Qt5Ana3',     '-r', 'Ana3', '-p', 'Ana3'   ]
         elif target == "brewA":
-            buildOp["brewA"]   = [ '-q', 'Qt5Brew',     '-r', 'HB27', '-p', 'HBAuto' ]
+            buildOp["brewA"]   = [ '-q', 'Qt5Brew',     '-r', 'HB31', '-p', 'HBAuto' ]
         elif target == "brewAHW":
             buildOp["brewAHW"] = [ '-q', 'Qt5Brew',     '-r', 'sys',  '-p', 'HBAuto' ]
 
@@ -110,15 +110,15 @@ def Get_QAT_Directory( targetDic, platform ):
         if target == "std":
             dirQAT["std"]       = 'qt5MP.build.macos-%s-release-RsysPsys.macQAT' % platform
         elif target == "ports":
-            dirQAT["ports"]     = 'qt5MP.build.macos-%s-release-Rmp27Pmp38.macQAT' % platform
+            dirQAT["ports"]     = 'qt5MP.build.macos-%s-release-Rmp31Pmp38.macQAT' % platform
         elif target == "brew":
-            dirQAT["brew"]      = 'qt5Brew.build.macos-%s-release-Rhb27Phb38.macQAT' % platform
+            dirQAT["brew"]      = 'qt5Brew.build.macos-%s-release-Rhb31Phb38.macQAT' % platform
         elif target == "brewHW":
             dirQAT["brewHW"]    = 'qt5Brew.build.macos-%s-release-RsysPhb38.macQAT' % platform
         elif target == "ana3":
             dirQAT["ana3"]      = 'qt5Ana3.build.macos-%s-release-Rana3Pana3.macQAT' % platform
         elif target == "brewA":
-            dirQAT["brewA"]     = 'qt5Brew.build.macos-%s-release-Rhb27Phbauto.macQAT' % platform
+            dirQAT["brewA"]     = 'qt5Brew.build.macos-%s-release-Rhb31Phbauto.macQAT' % platform
         elif target == "brewAHW":
             dirQAT["brewAHW"]   = 'qt5Brew.build.macos-%s-release-RsysPhbauto.macQAT' % platform
     return dirQAT
@@ -146,10 +146,10 @@ def Get_Package_Options( targetDic, platform, srlDMG, makeflag ):
             packOp["std"]       = [ '-p', 'ST-qt5MP.pkg.macos-%s-release-RsysPsys' % platform,
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "ports":
-            packOp["ports"]     = [ '-p', 'LW-qt5MP.pkg.macos-%s-release-Rmp27Pmp38' % platform,
+            packOp["ports"]     = [ '-p', 'LW-qt5MP.pkg.macos-%s-release-Rmp31Pmp38' % platform,
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brew":
-            packOp["brew"]      = [ '-p', 'LW-qt5Brew.pkg.macos-%s-release-Rhb27Phb38' % platform,
+            packOp["brew"]      = [ '-p', 'LW-qt5Brew.pkg.macos-%s-release-Rhb31Phb38' % platform,
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brewHW":
             packOp["brewHW"]    = [ '-p', 'HW-qt5Brew.pkg.macos-%s-release-RsysPhb38' % platform,
@@ -158,7 +158,7 @@ def Get_Package_Options( targetDic, platform, srlDMG, makeflag ):
             packOp["ana3"]      = [ '-p', 'LW-qt5Ana3.pkg.macos-%s-release-Rana3Pana3' % platform,
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brewA":
-            packOp["brewA"]     = [ '-p', 'LW-qt5Brew.pkg.macos-%s-release-Rhb27Phbauto' % platform,
+            packOp["brewA"]     = [ '-p', 'LW-qt5Brew.pkg.macos-%s-release-Rhb31Phbauto' % platform,
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brewAHW":
             packOp["brewAHW"]   = [ '-p', 'HW-qt5Brew.pkg.macos-%s-release-RsysPhbauto' % platform,
@@ -216,7 +216,7 @@ def Parse_CommandLine_Arguments():
     Usage += "          (3) $ ./nightlyBuild.py  --test                                  | \n"
     Usage += "          (4) $ ./nightlyBuild.py  --check (confirm the QA Test results)   | \n"
     Usage += "          (5) $ ./nightlyBuild.py  --makedmg  1                            | \n"
-    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.27.9'                      | \n"
+    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.27.10'                     | \n"
     Usage += "          (7) $ ./nightlyBuild.py  --cleandmg 1                            | \n"
     Usage += "---------------------------------------------------------------------------+----------------------\n"
 

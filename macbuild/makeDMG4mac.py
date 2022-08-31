@@ -77,7 +77,7 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.27.4 or later on different Apple macOS / Mac OSX platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.27.10 or later on different Apple macOS / Mac OSX platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
@@ -197,8 +197,8 @@ def SetGlobals():
 # The package directory name should look like:
 #     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys      --- (1)
 #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
-#     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb38
-#     * LW-qt5MP.pkg.macos-Catalina-release-Rmp27Pmp38
+#     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb31Phb38
+#     * LW-qt5MP.pkg.macos-Catalina-release-Rmp31Pmp38
 #
 # Generated DMG will be, for example,
 #     (1) ---> ST-klayout-0.26.1-macOS-Catalina-1-qt5MP-RsysPsys.dmg
@@ -241,9 +241,9 @@ def CheckPkgDirectory():
     #
     #     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys
     #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
-    #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb38
+    #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb31Phb38
     #     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb38
-    #     * EX-qt5MP.pkg.macos-Catalina-release-Rmp27Pmp38
+    #     * EX-qt5MP.pkg.macos-Catalina-release-Rmp31Pmp38
     #-----------------------------------------------------------------------------
     patQRP = u'(ST|LW|HW|EX)([-])(qt5[0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
     regQRP = re.compile(patQRP)
@@ -266,12 +266,12 @@ def CheckPkgDirectory():
         LatestOSMacPorts   = Platform == LatestOS
         LatestOSMacPorts  &= PackagePrefix == "LW"
         LatestOSMacPorts  &= QtIdentification == "qt5MP"
-        LatestOSMacPorts  &= RubyPythonID == "Rmp27Pmp38"
+        LatestOSMacPorts  &= RubyPythonID == "Rmp31Pmp38"
 
         LatestOSHomebrew   = Platform == LatestOS
         LatestOSHomebrew  &= PackagePrefix == "LW"
         LatestOSHomebrew  &= QtIdentification == "qt5Brew"
-        LatestOSHomebrew  &= RubyPythonID == "Rhb27Phb38" or RubyPythonID == "Rhb27Phbauto"
+        LatestOSHomebrew  &= RubyPythonID == "Rhb31Phb38" or RubyPythonID == "Rhb31Phbauto"
 
         LatestOSAnaconda3  = Platform == LatestOS
         LatestOSAnaconda3 &= PackagePrefix == "LW"

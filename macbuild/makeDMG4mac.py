@@ -77,13 +77,13 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.27.5 or later on different Apple macOS / Mac OSX platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.27.10 or later on different Apple macOS / Mac OSX platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
     Usage += "   ----------------------------------------------------------------------------------+-----------------\n"
     Usage += "   <-p|--pkg <dir>>     : package directory created by `build4mac.py` with [-y|-Y]   | ``\n"
-    Usage += "                        : like 'ST-qt6MP.pkg.macos-Catalina-release-RsysPsys'        | \n"
+    Usage += "                        : like 'ST-qt5MP.pkg.macos-Catalina-release-RsysPsys'        | \n"
     Usage += "   <-c|--clean>         : clean the work directory                                   | disabled\n"
     Usage += "   <-m|--make>          : make a compressed DMG file                                 | disabled\n"
     Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
@@ -137,7 +137,7 @@ def SetGlobals():
         sys.exit(1)
 
     if not Machine == "x86_64":
-        if Machine == "arm64" and Platform in ["Monterey", "BigSur"]: # with an Apple Silicon Chip
+        if Machine == "arm64" and (Platform == "Monterey" or Platform == "BigSur"): # with an Apple Silicon Chip
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print("")
@@ -195,17 +195,13 @@ def SetGlobals():
 ## To check the contents of the package directory
 #
 # The package directory name should look like:
-#     * ST-qt6MP.pkg.macos-Catalina-release-RsysPsys      --- (1)
-#     * LW-qt6MP.pkg.macos-Catalina-release-Rmp27Pmp38
-#     * LW-qt6Brew.pkg.macos-Catalina-release-Rhb27Phb38
-#
-#     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys
-#     * LW-qt5MP.pkg.macos-Catalina-release-Rmp27Pmp38
-#     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb38
+#     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys      --- (1)
 #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
+#     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb31Phb38
+#     * LW-qt5MP.pkg.macos-Catalina-release-Rmp31Pmp38
 #
 # Generated DMG will be, for example,
-#     (1) ---> ST-klayout-0.27.5-macOS-Catalina-1-qt6MP-RsysPsys.dmg
+#     (1) ---> ST-klayout-0.26.1-macOS-Catalina-1-qt5MP-RsysPsys.dmg
 #
 # @return on success, positive integer in [MB] that tells approx. occupied disc space;
 #         on failure, -1
@@ -242,18 +238,14 @@ def CheckPkgDirectory():
 
     #-----------------------------------------------------------------------------
     # [2] Identify (Qt, Ruby, Python) from PkgDir
-    #     * ST-qt6MP.pkg.macos-Catalina-release-RsysPsys
-    #     * LW-qt6MP.pkg.macos-Catalina-release-Rmp27Pmp38
-    #     * LW-qt6Brew.pkg.macos-Catalina-release-Rhb27Phb38
     #
     #     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys
-    #     * LW-qt5MP.pkg.macos-Catalina-release-Rmp27Pmp38
-    #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb27Phb38
     #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
+    #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb31Phb38
     #     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb38
-    #     * EX-qt5MP.pkg.macos-Catalina-release-Rmp27Pmp38
+    #     * EX-qt5MP.pkg.macos-Catalina-release-Rmp31Pmp38
     #-----------------------------------------------------------------------------
-    patQRP = u'(ST|LW|HW|EX)([-])([qt6|qt5][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
+    patQRP = u'(ST|LW|HW|EX)([-])(qt5[0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
     regQRP = re.compile(patQRP)
     if not regQRP.match(PkgDir):
         print( "! Cannot identify (Qt, Ruby, Python) from the package directory name" )
@@ -273,18 +265,18 @@ def CheckPkgDirectory():
         #-----------------------------------------------------------------------------
         LatestOSMacPorts   = Platform == LatestOS
         LatestOSMacPorts  &= PackagePrefix == "LW"
-        LatestOSMacPorts  &= QtIdentification in ["qt6MP", "qt5MP"]
-        LatestOSMacPorts  &= RubyPythonID in ["Rmp27Pmp38"]
+        LatestOSMacPorts  &= QtIdentification == "qt5MP"
+        LatestOSMacPorts  &= RubyPythonID == "Rmp31Pmp38"
 
         LatestOSHomebrew   = Platform == LatestOS
         LatestOSHomebrew  &= PackagePrefix == "LW"
-        LatestOSHomebrew  &= QtIdentification in ["qt6Brew", "qt5Brew"]
-        LatestOSHomebrew  &= RubyPythonID in ["Rhb27Phb38", "Rhb27Phb39", "Rhb27Phbauto"]
+        LatestOSHomebrew  &= QtIdentification == "qt5Brew"
+        LatestOSHomebrew  &= RubyPythonID == "Rhb31Phb38" or RubyPythonID == "Rhb31Phbauto"
 
         LatestOSAnaconda3  = Platform == LatestOS
         LatestOSAnaconda3 &= PackagePrefix == "LW"
-        LatestOSAnaconda3 &= QtIdentification in ["qt5Ana3"]
-        LatestOSAnaconda3 &= RubyPythonID in ["Rana3Pana3"]
+        LatestOSAnaconda3 &= QtIdentification == "qt5Ana3"
+        LatestOSAnaconda3 &= RubyPythonID == "Rana3Pana3"
 
         if LatestOSMacPorts:
             mydic  = DicLightWeight["ports"]

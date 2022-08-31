@@ -387,7 +387,7 @@ DeepEdges::has_valid_edges () const
 bool
 DeepEdges::has_valid_merged_edges () const
 {
-  return merged_semantics ();
+  return false;
 }
 
 const db::RecursiveShapeIterator *
@@ -859,19 +859,14 @@ EdgesDelegate *DeepEdges::and_with (const Region &other) const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
 
-  if (empty ()) {
+  if (empty () || other.empty ()) {
 
     //  Nothing to do
     return new EmptyEdges ();
 
-  } else if (other.empty ()) {
-
-    //  Nothing to do
-    return clone ();
-
   } else if (! other_deep) {
 
-    return AsIfFlatEdges::not_with (other);
+    return AsIfFlatEdges::and_with (other);
 
   } else {
 
@@ -1011,19 +1006,14 @@ EdgesDelegate *DeepEdges::inside_part (const Region &other) const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
 
-  if (empty ()) {
+  if (empty () || other.empty ()) {
 
     //  Nothing to do
     return new EmptyEdges ();
 
-  } else if (other.empty ()) {
-
-    //  Nothing to do
-    return clone ();
-
   } else if (! other_deep) {
 
-    return AsIfFlatEdges::not_with (other);
+    return AsIfFlatEdges::inside_part (other);
 
   } else {
 
@@ -1048,7 +1038,7 @@ EdgesDelegate *DeepEdges::outside_part (const Region &other) const
 
   } else if (! other_deep) {
 
-    return AsIfFlatEdges::not_with (other);
+    return AsIfFlatEdges::outside_part (other);
 
   } else {
 

@@ -78,6 +78,14 @@
   <file alias="drc_not3.png">doc/images/drc_not3.png</file>
   <file alias="drc_inside_part.png">doc/images/drc_inside_part.png</file>
   <file alias="drc_outside_part.png">doc/images/drc_outside_part.png</file>
+  <file alias="drc_inside_ep.png">doc/images/drc_inside_ep.png</file>
+  <file alias="drc_inside_ee.png">doc/images/drc_inside_ee.png</file>
+  <file alias="drc_not_inside_ep.png">doc/images/drc_not_inside_ep.png</file>
+  <file alias="drc_not_inside_ee.png">doc/images/drc_not_inside_ee.png</file>
+  <file alias="drc_outside_ep.png">doc/images/drc_outside_ep.png</file>
+  <file alias="drc_outside_ee.png">doc/images/drc_outside_ee.png</file>
+  <file alias="drc_not_outside_ep.png">doc/images/drc_not_outside_ep.png</file>
+  <file alias="drc_not_outside_ee.png">doc/images/drc_not_outside_ee.png</file>
   <file alias="drc_covering.png">doc/images/drc_covering.png</file>
   <file alias="drc_not_covering.png">doc/images/drc_not_covering.png</file>
   <file alias="drc_interacting2.png">doc/images/drc_interacting2.png</file>

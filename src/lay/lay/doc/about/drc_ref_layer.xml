@@ -103,7 +103,9 @@ polygons will be written to the output (labels: red, input2: blue):
 This method returns a two-element array containing one layer for the
 AND result and one for the NOT result.
 </p><p>
-This method is available for polygon layers.
+This method is available for polygon and edge layers.
+For polygon layers, the other input must be a polygon layer too.
+For edge layers, the other input can be polygon or edge.
 </p><p>
 It can be used to initialize two variables with the AND and NOT results:
 </p><p>
@@ -1343,30 +1345,67 @@ pl = polygon_layer
 pl.insert(box(0.0, 0.0, 100.0, 200.0)
 </pre>
 </p>
-<a name="inside"/><h2>"inside" - Selects shapes or regions of self which are inside the other region</h2>
+<a name="inside"/><h2>"inside" - Selects edges or polygons of self which are inside edges or polygons from the other layer</h2>
 <keyword name="inside"/>
 <p>Usage:</p>
 <ul>
 <li><tt>layer.inside(other)</tt></li>
 </ul>
 <p>
-This method selects all shapes or regions from self which are inside the other region.
-completely (completely covered by polygons from the other region). If self is
-in raw mode, this method will select individual shapes. Otherwise, this method
-will select coherent regions and no part of these regions may be outside the 
-other region.
-It returns a new layer containing the selected shapes. A version which modifies self
-is <a href="#select_inside">select_inside</a>.
+If layer is a polygon layer, the other layer needs to be a polygon layer too.
+In this case, this method selects all polygons which are completely inside 
+polygons from the other layer.
 </p><p>
-This method is available for polygon layers.
+If layer is an edge layer, the other layer can be polygon or edge layer. In the
+first case, all edges completely inside the polygons from the other layer are
+selected. If the other layer is an edge layer, all edges completely contained 
+in edges from the other layer are selected.
 </p><p>
-The following image shows the effect of the "inside" method (input1: red, input2: blue):
+Merged semantics applies - i.e. edges or polygons are joined before the 
+result is computed, unless the layers are in <a href="#raw">raw</a> mode.
+</p><p>
+This method returns a new layer containing the selected shapes. A version which modifies self
+is <a href="#select_inside">select_inside</a>. <a href="#not_inside">not_inside</a> is a function computing the inverse of <a href="#inside">inside</a>.
+<a href="#split_inside">split_inside</a> is a function computing both results in a single call. <a href="#outside">outside</a>
+is a similar function selecting edges or polygons outside other edges or polygons.
+</p><p>
+The following image shows the effect of the "inside" method for polygons (input1: red, input2: blue):
 </p><p>
 <table>
 <tr>
 <td><img src="/images/drc_inside.png"/></td>
 </tr>
 </table>
+</p><p>
+The following images show the effect of the "inside" method for edge layers and edge or polygon layers
+the second input. Note that the edges are computed from the polygons in this example 
+(input1: red, input2: blue):
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_inside_ee.png"/></td>
+</tr>
+</table>
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_inside_ep.png"/></td>
+</tr>
+</table>
+</p>
+<a name="inside_outside_part"/><h2>"inside_outside_part" - Returns the parts of the edges inside and outside the given region</h2>
+<keyword name="inside_outside_part"/>
+<p>Usage:</p>
+<ul>
+<li><tt>(inside_part, outside_part) = layer.inside_outside_part(region)</tt></li>
+</ul>
+<p>
+The method is available for edge layers. The argument must be a polygon layer.
+</p><p>
+This method returns two layers: the first with the edge parts inside the given region
+and the second with the parts outside the given region. It is equivalent 
+to calling <a href="#inside_part">inside_part</a> and <a href="#outside_part">outside_part</a>, but more efficient if both parts
+need to be computed.
 </p>
 <a name="inside_part"/><h2>"inside_part" - Returns the parts of the edges inside the given region</h2>
 <keyword name="inside_part"/>
@@ -1380,6 +1419,9 @@ This method returns the parts of the edges which are inside the given region. Th
 of the polygons of the region.
 </p><p>
 This method is available for edge layers. The argument must be a polygon layer.
+</p><p>
+<a href="#outside_part">outside_part</a> is a method computing the opposite part. <a href="#inside_outside_part">inside_outside_part</a> is a
+method computing both inside and outside part in a single call.
 </p><p>
 <table>
 <tr>
@@ -1798,28 +1840,43 @@ The following image shows the effect of the "not_in" method (input1: red, input2
 </tr>
 </table>
 </p>
-<a name="not_inside"/><h2>"not_inside" - Selects shapes or regions of self which are not inside the other region</h2>
+<a name="not_inside"/><h2>"not_inside" - Selects edges or polygons of self which are not inside edges or polygons from the other layer</h2>
 <keyword name="not_inside"/>
 <p>Usage:</p>
 <ul>
 <li><tt>layer.not_inside(other)</tt></li>
 </ul>
 <p>
-This method selects all shapes or regions from self which are not inside the other region.
-completely (completely covered by polygons from the other region). If self is
-in raw mode, this method will select individual shapes. Otherwise, this method
-will select coherent regions and no part of these regions may be outside the 
-other region.
-It returns a new layer containing the selected shapes. A version which modifies self
+This method computes the inverse of <a href="#inside">inside</a> - i.e. edges or polygons from the layer
+not being inside polygons or edges from the other layer. 
+</p><p>
+This method returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_not_inside">select_not_inside</a>.
+<a href="#split_inside">split_inside</a> is a function computing both results of <a href="#inside">inside</a> and <a href="#not_inside">not_inside</a> in a single call. <a href="#outside">outside</a>
+is a similar function selecting edges or polygons outside other edges or polygons. Note
+that "outside" is not the same than "not inside".
 </p><p>
-This method is available for polygon layers.
-</p><p>
-The following image shows the effect of the "not_inside" method (input1: red, input2: blue):
+The following image shows the effect of the "not_inside" method for polygon layers (input1: red, input2: blue):
 </p><p>
 <table>
 <tr>
 <td><img src="/images/drc_not_inside.png"/></td>
+</tr>
+</table>
+</p><p>
+The following images show the effect of the "not_inside" method for edge layers and edge or polygon layers
+the second input. Note that the edges are computed from the polygons in this example 
+(input1: red, input2: blue):
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_not_inside_ee.png"/></td>
+</tr>
+</table>
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_not_inside_ep.png"/></td>
 </tr>
 </table>
 </p>
@@ -1867,28 +1924,43 @@ from the other layer. Two polygons overlapping or touching at two locations are 
 </tr>
 </table>
 </p>
-<a name="not_outside"/><h2>"not_outside" - Selects shapes or regions of self which are not outside the other region</h2>
+<a name="not_outside"/><h2>"not_outside" - Selects edges or polygons of self which are not outside edges or polygons from the other layer</h2>
 <keyword name="not_outside"/>
 <p>Usage:</p>
 <ul>
 <li><tt>layer.not_outside(other)</tt></li>
 </ul>
 <p>
-This method selects all shapes or regions from self which are not completely outside 
-the other region (part of these shapes or regions may be covered by shapes from
-the other region). If self is in raw mode, this method will select individual 
-shapes. Otherwise, this method will select coherent regions and no part of these 
-regions may overlap with shapes from the other region.
-It returns a new layer containing the selected shapes. A version which modifies self
+This method computes the inverse of <a href="#outside">outside</a> - i.e. edges or polygons from the layer
+not being outside polygons or edges from the other layer. 
+</p><p>
+This method returns a new layer containing the selected shapes. A version which modifies self
 is <a href="#select_not_outside">select_not_outside</a>.
+<a href="#split_outside">split_outside</a> is a function computing both results of <a href="#outside">outside</a> and <a href="#not_outside">not_outside</a> in a single call. <a href="#outside">outside</a>
+is a similar function selecting edges or polygons outside other edges or polygons. Note
+that "outside" is not the same than "not outside".
 </p><p>
-This method is available for polygon layers.
-</p><p>
-The following image shows the effect of the "not_outside" method (input1: red, input2: blue):
+The following image shows the effect of the "not_outside" method for polygon layers (input1: red, input2: blue):
 </p><p>
 <table>
 <tr>
 <td><img src="/images/drc_not_outside.png"/></td>
+</tr>
+</table>
+</p><p>
+The following images show the effect of the "not_outside" method for edge layers and edge or polygon layers
+the second input. Note that the edges are computed from the polygons in this example 
+(input1: red, input2: blue):
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_not_outside_ee.png"/></td>
+</tr>
+</table>
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_not_outside_ep.png"/></td>
 </tr>
 </table>
 </p>
@@ -2009,28 +2081,51 @@ a single <class_doc href="LayerInfo">LayerInfo</class_doc> object.
 See <a href="/about/drc_ref_global.xml#report">report</a> and <a href="/about/drc_ref_global.xml#target">target</a> on how to configure output to a target layout
 or report database. 
 </p>
-<a name="outside"/><h2>"outside" - Selects shapes or regions of self which are outside the other region</h2>
+<a name="outside"/><h2>"outside" - Selects edges or polygons of self which are outside edges or polygons from the other layer</h2>
 <keyword name="outside"/>
 <p>Usage:</p>
 <ul>
 <li><tt>layer.outside(other)</tt></li>
 </ul>
 <p>
-This method selects all shapes or regions from self which are completely outside 
-the other region (no part of these shapes or regions may be covered by shapes from
-the other region). If self is in raw mode, this method will select individual 
-shapes. Otherwise, this method will select coherent regions and no part of these 
-regions may overlap with shapes from the other region.
-It returns a new layer containing the selected shapes. A version which modifies self
-is <a href="#select_outside">select_outside</a>.
+If layer is a polygon layer, the other layer needs to be a polygon layer too.
+In this case, this method selects all polygons which are entirely outside 
+polygons from the other layer.
 </p><p>
-This method is available for polygon layers.
+If layer is an edge layer, the other layer can be polygon or edge layer. In the
+first case, all edges entirely outside the polygons from the other layer are
+selected. If the other layer is an edge layer, all edges entirely outside
+of edges from the other layer are selected.
 </p><p>
-The following image shows the effect of the "outside" method (input1: red, input2: blue):
+Merged semantics applies - i.e. edges or polygons are joined before the 
+result is computed, unless the layers are in <a href="#raw">raw</a> mode.
+</p><p>
+This method returns a new layer containing the selected shapes. A version which modifies self
+is <a href="#select_outside">select_outside</a>. <a href="#not_outside">not_outside</a> is a function computing the inverse of <a href="#outside">outside</a>.
+<a href="#split_outside">split_outside</a> is a function computing both results in a single call. <a href="#outside">outside</a>
+is a similar function selecting edges or polygons outside other edges or polygons.
+</p><p>
+The following image shows the effect of the "outside" method for polygons (input1: red, input2: blue):
 </p><p>
 <table>
 <tr>
 <td><img src="/images/drc_outside.png"/></td>
+</tr>
+</table>
+</p><p>
+The following images show the effect of the "outside" method for edge layers and edge or polygon layers
+the second input. Note that the edges are computed from the polygons in this example 
+(input1: red, input2: blue):
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_outside_ee.png"/></td>
+</tr>
+</table>
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_outside_ep.png"/></td>
 </tr>
 </table>
 </p>
@@ -2046,6 +2141,9 @@ This method returns the parts of the edges which are outside the given region. T
 of the polygons of the region.
 </p><p>
 This method is available for edge layers. The argument must be a polygon layer.
+</p><p>
+<a href="#inside_part">inside_part</a> is a method computing the opposite part. <a href="#inside_outside_part">inside_outside_part</a> is a
+method computing both inside and outside part in a single call.
 </p><p>
 <table>
 <tr>
@@ -2401,22 +2499,15 @@ is <a href="#covering">covering</a>.
 </p><p>
 This method is available for polygons only.
 </p>
-<a name="select_inside"/><h2>"select_inside" - Selects shapes or regions of self which are inside the other region</h2>
+<a name="select_inside"/><h2>"select_inside" - Selects edges or polygons of self which are inside edges or polygons from the other layer</h2>
 <keyword name="select_inside"/>
 <p>Usage:</p>
 <ul>
 <li><tt>layer.select_inside(other)</tt></li>
 </ul>
 <p>
-This method selects all shapes or regions from self which are inside the other region.
-completely (completely covered by polygons from the other region). If self is
-in raw mode, this method will select individual shapes. Otherwise, this method
-will select coherent regions and no part of these regions may be outside the 
-other region.
-It modifies self to contain the selected shapes. A version which does not modify self
-is <a href="#inside">inside</a>.
-</p><p>
-This method is available for polygon layers.
+This method is the in-place version of <a href="#inside">inside</a> - i.e. it modifies the layer instead
+of returning a new layer and leaving the original layer untouched.
 </p>
 <a name="select_interacting"/><h2>"select_interacting" - Selects shapes or regions of self which touch or overlap shapes from the other region</h2>
 <keyword name="select_interacting"/>
@@ -2461,22 +2552,15 @@ is <a href="#not_covering">not_covering</a>.
 </p><p>
 This method is available for polygons only.
 </p>
-<a name="select_not_inside"/><h2>"select_not_inside" - Selects shapes or regions of self which are not inside the other region</h2>
+<a name="select_not_inside"/><h2>"select_not_inside" - Selects edges or polygons of self which are not inside edges or polygons from the other layer</h2>
 <keyword name="select_not_inside"/>
 <p>Usage:</p>
 <ul>
 <li><tt>layer.select_not_inside(other)</tt></li>
 </ul>
 <p>
-This method selects all shapes or regions from self which are not inside the other region.
-completely (completely covered by polygons from the other region). If self is
-in raw mode, this method will select individual shapes. Otherwise, this method
-will select coherent regions and no part of these regions may be outside the 
-other region.
-It modifies self to contain the selected shapes. A version which does not modify self
-is <a href="#not_inside">not_inside</a>.
-</p><p>
-This method is available for polygon layers.
+This method is the in-place version of <a href="#inside">inside</a> - i.e. it modifies the layer instead
+of returning a new layer and leaving the original layer untouched.
 </p>
 <a name="select_not_interacting"/><h2>"select_not_interacting" - Selects shapes or regions of self which do not touch or overlap shapes from the other region</h2>
 <keyword name="select_not_interacting"/>
@@ -2503,22 +2587,15 @@ number of (different) shapes from the other layer. If a min and max count is giv
 self are selected only if they interact with less than min_count or more than max_count different shapes
 from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
 </p>
-<a name="select_not_outside"/><h2>"select_not_outside" - Selects shapes or regions of self which are not outside the other region</h2>
+<a name="select_not_outside"/><h2>"select_not_outside" - Selects edges or polygons of self which are not outside edges or polygons from the other layer</h2>
 <keyword name="select_not_outside"/>
 <p>Usage:</p>
 <ul>
 <li><tt>layer.select_not_outside(other)</tt></li>
 </ul>
 <p>
-This method selects all shapes or regions from self which are not completely outside 
-the other region (part of these shapes or regions may be covered by shapes from
-the other region). If self is in raw mode, this method will select individual 
-shapes. Otherwise, this method will select coherent regions and no part of these 
-regions may overlap with shapes from the other region.
-It modifies self to contain the selected shapes. A version which does not modify self
-is <a href="#not_outside">not_outside</a>.
-</p><p>
-This method is available for polygon layers.
+This method is the in-place version of <a href="#outside">outside</a> - i.e. it modifies the layer instead
+of returning a new layer and leaving the original layer untouched.
 </p>
 <a name="select_not_overlapping"/><h2>"select_not_overlapping" - Selects shapes or regions of self which do not overlap shapes from the other region</h2>
 <keyword name="select_not_overlapping"/>
@@ -2538,22 +2615,15 @@ is <a href="#not_overlapping">not_overlapping</a>.
 </p><p>
 This method is available for polygons only.
 </p>
-<a name="select_outside"/><h2>"select_outside" - Selects shapes or regions of self which are outside the other region</h2>
+<a name="select_outside"/><h2>"select_outside" - Selects edges or polygons of self which are outside edges or polygons from the other layer</h2>
 <keyword name="select_outside"/>
 <p>Usage:</p>
 <ul>
 <li><tt>layer.select_outside(other)</tt></li>
 </ul>
 <p>
-This method selects all shapes or regions from self which are completely outside 
-the other region (no part of these shapes or regions may be covered by shapes from
-the other region). If self is in raw mode, this method will select individual 
-shapes. Otherwise, this method will select coherent regions and no part of these 
-regions may overlap with shapes from the other region.
-It modifies self to contain the selected shapes. A version which does not modify self
-is <a href="#outside">outside</a>.
-</p><p>
-This method is available for polygon layers.
+This method is the in-place version of <a href="#outside">outside</a> - i.e. it modifies the layer instead
+of returning a new layer and leaving the original layer untouched.
 </p>
 <a name="select_overlapping"/><h2>"select_overlapping" - Selects shapes or regions of self which overlap shapes from the other region</h2>
 <keyword name="select_overlapping"/>
@@ -2866,7 +2936,7 @@ The options of this method are the same than <a href="#covering">covering</a>.
 <li><tt>(a, b) = layer.split_inside(other)</tt></li>
 </ul>
 <p>
-This method returns the polygons inside of polygons from the other layer in 
+This method returns the polygons or edges inside of polygons or edges from the other layer in 
 one layer and all others in a second layer. This method is equivalent to calling 
 <a href="#inside">inside</a> and <a href="#not_inside">not_inside</a>, but is faster than doing this in separate steps:
 </p><p>
@@ -2881,7 +2951,7 @@ one layer and all others in a second layer. This method is equivalent to calling
 <li><tt>(a, b) = layer.split_interacting(other [, options ])</tt></li>
 </ul>
 <p>
-This method returns the polygons interacting with objects from the other container in 
+This method returns the polygons or edges interacting with objects from the other container in 
 one layer and all others in a second layer. This method is equivalent to calling 
 <a href="#interacting">interacting</a> and <a href="#not_interacting">not_interacting</a>, but is faster than doing this in separate steps:
 </p><p>
@@ -2898,7 +2968,7 @@ The options of this method are the same than <a href="#interacting">interacting<
 <li><tt>(a, b) = layer.split_outside(other)</tt></li>
 </ul>
 <p>
-This method returns the polygons outside of polygons from the other layer in 
+This method returns the polygons or edges outside of polygons or edges from the other layer in 
 one layer and all others in a second layer. This method is equivalent to calling 
 <a href="#outside">outside</a> and <a href="#not_outside">not_outside</a>, but is faster than doing this in separate steps:
 </p><p>

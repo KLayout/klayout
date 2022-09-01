@@ -89,7 +89,7 @@ class EditorOptionsPages;
 /**
  *  @brief A custom QFrame that acts as the central widget for the LayoutView
  */
-class LayoutViewFrame
+class LAYVIEW_PUBLIC LayoutViewFrame
   : public QFrame
 {
 Q_OBJECT
@@ -181,7 +181,7 @@ public:
 
   typedef lay::LayoutViewBase::cell_path_type cell_path_type;
 
-private slots:
+public slots:
   void active_cellview_changed (int index);
   void active_library_changed (int index);
   void side_panel_destroyed ();
@@ -191,6 +191,7 @@ private slots:
   void select_cell_dispatch (const cell_path_type &path, int cellview_index);
   void min_hier_changed (int i);
   void max_hier_changed (int i);
+  void app_terminated ();
 
   void timer ();
 
@@ -212,12 +213,12 @@ public:
   /**
    *  @brief Constructor
    */
-  LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent = 0, const char *name = "view", unsigned int options = (unsigned int) LV_Normal);
+  LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
 
   /**
    *  @brief Constructor (clone from another view)
    */
-  LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent = 0, const char *name = "view", unsigned int options = (unsigned int) LV_Normal);
+  LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
 
   /**
    *  @brief Destructor
@@ -707,6 +708,8 @@ public:
 
   void deactivate_all_browsers ();
 
+  void close ();
+
 private:
   friend class LayoutViewSignalConnector;
   friend class LayoutViewFrame;
@@ -732,6 +735,8 @@ private:
 
   void active_library_changed (int index);
   void side_panel_destroyed (QObject *sender);
+  void widget_destroyed (QObject *sender);
+  void app_destroyed ();
   void layer_tab_changed ();
   void layer_order_changed ();
   void min_hier_changed (int i);
@@ -740,10 +745,20 @@ private:
   bool event_filter (QObject *obj, QEvent *ev, bool &taken);
   QSize size_hint () const;
 
-  void init_ui (QWidget *parent, const char *name);
+  void init_ui ();
   void do_setup_editor_options_pages ();
 
 protected:
+  /**
+   *  @brief Constructor with widget
+   */
+  LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, LayoutViewFrame *widget, unsigned int options = (unsigned int) LV_Normal);
+
+  /**
+   *  @brief Constructor (clone from another view) with widget
+   */
+  LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, LayoutViewFrame *widget, unsigned int options = (unsigned int) LV_Normal);
+
   void activate ();
   void deactivate ();
 
@@ -773,6 +788,35 @@ protected:
 
 private:
   using LayoutViewBase::ui;
+};
+
+/**
+ *  @brief The layout view widget
+ *
+ *  This is a LayoutView which actually is a widget. It can be used in a widget tree
+ *  but only created if a QApplication is present.
+ */
+class LAYVIEW_PUBLIC LayoutViewWidget
+  : public LayoutViewFrame, public LayoutView
+{
+public:
+  /**
+   *  @brief Constructor
+   */
+  LayoutViewWidget (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent = 0, unsigned int options = (unsigned int) LV_Normal)
+    : LayoutViewFrame (parent, this), LayoutView (mgr, editable, plugin_parent, this, options)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Constructor (clone from another view)
+   */
+  LayoutViewWidget (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent = 0, unsigned int options = (unsigned int) LV_Normal)
+    : LayoutViewFrame (parent, this), LayoutView (source, mgr, editable, plugin_parent, this, options)
+  {
+    //  .. nothing yet ..
+  }
 };
 
 }

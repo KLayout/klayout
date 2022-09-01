@@ -40,7 +40,7 @@ namespace lay
 
 const double initial_elevation = 15.0;
 
-D25View::D25View (lay::Dispatcher *root, LayoutViewBase *view)
+D25View::D25View (Dispatcher *root, LayoutViewBase *view)
   : lay::Browser (root, view, "d25_view"),
     dm_rerun_macro (this, &D25View::rerun_macro),
     dm_fit (this, &D25View::fit)

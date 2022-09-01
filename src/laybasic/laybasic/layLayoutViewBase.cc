@@ -514,6 +514,16 @@ LayoutViewBase::~LayoutViewBase ()
   mp_canvas = 0;
 }
 
+void LayoutViewBase::unregister_plugin (lay::Plugin *pi)
+{
+  for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
+    if (pi == *p) {
+      mp_plugins.erase (p);
+      break;
+    }
+  }
+}
+
 void LayoutViewBase::resize (unsigned int width, unsigned int height)
 {
   mp_canvas->resize (width, height);

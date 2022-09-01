@@ -1540,9 +1540,11 @@ AbstractMenu::insert_separator (const std::string &p, const std::string &name)
 void
 AbstractMenu::insert_menu (const std::string &p, const std::string &name, Action *action)
 {
-  if (! action->menu ()) {
+#if defined(HAVE_QT)
+  if (! action->menu () && mp_dispatcher && mp_dispatcher->menu_parent_widget ()) {
     action->set_menu (new QMenu (), true);
   }
+#endif
 
   typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
   tl::Extractor extr (p.c_str ());

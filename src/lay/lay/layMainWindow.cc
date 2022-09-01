@@ -2578,7 +2578,7 @@ MainWindow::clone_current_view ()
   }
 
   //  create a new view
-  view = new lay::LayoutView (current_view (), &m_manager, lay::ApplicationBase::instance ()->is_editable (), dispatcher (), mp_view_stack);
+  view = new lay::LayoutViewWidget (current_view (), &m_manager, lay::ApplicationBase::instance ()->is_editable (), dispatcher (), mp_view_stack);
   add_view (view);
 
   //  set initial attributes
@@ -3389,7 +3389,7 @@ int
 MainWindow::do_create_view ()
 {
   //  create a new view
-  lay::LayoutView *view = new lay::LayoutView (&m_manager, lay::ApplicationBase::instance ()->is_editable (), dispatcher (), mp_view_stack);
+  lay::LayoutViewWidget *view = new lay::LayoutViewWidget (&m_manager, lay::ApplicationBase::instance ()->is_editable (), dispatcher (), mp_view_stack);
   add_view (view);
 
   //  set initial attributes

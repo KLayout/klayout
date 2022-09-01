@@ -2670,6 +2670,11 @@ public:
     return const_cast<LayoutViewBase *> (this)->get_ui ();
   }
 
+  /**
+   *  @brief Unregisters the given plugin
+   */
+  void unregister_plugin (lay::Plugin *pi);
+
 private:
   //  event handlers used to connect to the layout object's events
   void signal_hier_changed ();

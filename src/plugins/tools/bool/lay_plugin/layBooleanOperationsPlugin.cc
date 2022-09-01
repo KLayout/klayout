@@ -39,8 +39,8 @@ class BooleanOperationsPlugin
   : public lay::Plugin
 {
 public:
-  BooleanOperationsPlugin (Plugin *parent, lay::LayoutViewBase *view)
-    : lay::Plugin (parent), mp_view (view)
+  BooleanOperationsPlugin (lay::LayoutViewBase *view)
+    : lay::Plugin (view), mp_view (view)
   {
     m_boolean_cva = -1;
     m_boolean_cvb = -1;
@@ -494,9 +494,9 @@ public:
     // .. nothing yet ..
   }
 
-  lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
+  lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *, lay::LayoutViewBase *view) const
   {
-    return new BooleanOperationsPlugin (root, view);
+    return new BooleanOperationsPlugin (view);
   }
 };
 

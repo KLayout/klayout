@@ -51,7 +51,7 @@ Navigator::Navigator (QWidget *parent)
 img::Object *
 Navigator::setup (lay::Dispatcher *root, img::Object *img)
 {
-  mp_view = new lay::LayoutView (0, false, root, this, "img_navigator_view", lay::LayoutView::LV_Naked + lay::LayoutView::LV_NoZoom + lay::LayoutView::LV_NoServices + lay::LayoutView::LV_NoGrid);
+  mp_view = new lay::LayoutViewWidget (0, false, root, this, lay::LayoutView::LV_Naked + lay::LayoutView::LV_NoZoom + lay::LayoutView::LV_NoServices + lay::LayoutView::LV_NoGrid);
   tl_assert (mp_view->widget ());
   mp_view->widget ()->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
   mp_view->widget ()->setMinimumWidth (100);

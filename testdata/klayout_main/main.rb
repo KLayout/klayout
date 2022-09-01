@@ -183,6 +183,14 @@ class KLayoutMain_TestClass < TestBase
 
   end
 
+  def test_11
+
+    # Headless LayoutView (GUI enabled)
+    out = `#{self.klayout_bin} -z -rd input=#{File.join(File.dirname(__FILE__), "test1.gds")} -r #{File.join(File.dirname(__FILE__), "test10.rb")} 2>&1`
+    assert_equal(out, "(0,0;8,8)\n")
+
+  end
+
 end
 
 load("test_epilogue.rb")

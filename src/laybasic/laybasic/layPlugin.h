@@ -696,6 +696,14 @@ public:
   Dispatcher *dispatcher ();
 
   /**
+   *  @brief Notifies the plugin that a child plugin got deleted
+   */
+  virtual void unregister_plugin (lay::Plugin * /*plugin*/)
+  {
+    // .. this implementation does nothing ..
+  }
+
+  /**
    *  @brief Menu command handler
    *
    *  This method is called if a menu entry registered in the 

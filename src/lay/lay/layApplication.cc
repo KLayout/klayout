@@ -1290,7 +1290,7 @@ lay::LayoutView *
 ApplicationBase::create_view (db::Manager &manager)
 {
   //  create a new view
-  lay::LayoutView *view = new lay::LayoutView (&manager, lay::ApplicationBase::instance ()->is_editable (), dispatcher (), 0 /*parent*/);
+  lay::LayoutView *view = new lay::LayoutView (&manager, lay::ApplicationBase::instance ()->is_editable (), dispatcher ());
 
   //  set initial attributes
   view->set_synchronous (m_sync_mode);
@@ -1581,6 +1581,10 @@ GuiApplication::shutdown ()
     if (gsi_obj) {
       gsi_obj->keep ();
     }
+  }
+
+  while (! (tl_widgets = topLevelWidgets ()).empty ()) {
+    delete tl_widgets [0];
   }
 
   if (mp_recorder) {

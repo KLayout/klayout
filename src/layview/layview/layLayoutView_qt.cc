@@ -47,6 +47,7 @@
 #include "tlLog.h"
 #include "tlAssert.h"
 #include "tlExceptions.h"
+#include "tlStaticObjects.h"
 #include "layLayoutView.h"
 #include "layViewOp.h"
 #include "layViewObject.h"
@@ -187,13 +188,18 @@ void LayoutViewSignalConnector::max_hier_changed (int i)
   mp_view->max_hier_changed (i);
 }
 
+void LayoutViewSignalConnector::app_terminated ()
+{
+  mp_view->close ();
+}
+
 // -------------------------------------------------------------
 
 const int timer_interval = 10;
 
 static LayoutView *ms_current = 0;
 
-LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
+LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
   : LayoutViewBase (this, manager, editable, plugin_parent, options),
     mp_widget (0),
     dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
@@ -201,10 +207,10 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  init_ui (parent, name);
+  init_ui ();
 }
 
-LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
+LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
   : LayoutViewBase (this, source, manager, editable, plugin_parent, options),
     mp_widget (0),
     dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
@@ -212,13 +218,38 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  init_ui (parent, name);
+  init_ui ();
 
   bookmarks (source->bookmarks ());
-  set_active_cellview_index (source->active_cellview_index ());
+  LayoutView::set_active_cellview_index (source->active_cellview_index ());
 }
 
-bool 
+LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, LayoutViewFrame *widget, unsigned int options)
+  : LayoutViewBase (this, manager, editable, plugin_parent, options),
+    mp_widget (widget),
+    dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
+{
+  //  ensures the deferred method scheduler is present
+  tl::DeferredMethodScheduler::instance ();
+
+  init_ui ();
+}
+
+LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, LayoutViewFrame *widget, unsigned int options)
+  : LayoutViewBase (this, source, manager, editable, plugin_parent, options),
+    mp_widget (widget),
+    dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
+{
+  //  ensures the deferred method scheduler is present
+  tl::DeferredMethodScheduler::instance ();
+
+  init_ui ();
+
+  bookmarks (source->bookmarks ());
+  LayoutView::set_active_cellview_index (source->active_cellview_index ());
+}
+
+bool
 LayoutView::event_filter (QObject *obj, QEvent *event, bool &taken)
 {
   if (obj == mp_min_hier_spbx || obj == mp_max_hier_spbx) {
@@ -242,14 +273,13 @@ LayoutView::event_filter (QObject *obj, QEvent *event, bool &taken)
 }
 
 void
-LayoutView::init_ui (QWidget *parent, const char *name)
+LayoutView::init_ui ()
 {
   m_activated = true;
   m_always_show_source = false;
   m_always_show_ld = true;
   m_always_show_layout_index = false;
 
-  mp_widget = 0;
   mp_connector = 0;
   mp_timer = 0;
   mp_left_frame = 0;
@@ -265,14 +295,13 @@ LayoutView::init_ui (QWidget *parent, const char *name)
   mp_min_hier_spbx = 0;
   mp_max_hier_spbx = 0;
 
-  if (lay::has_gui ()) {
-
-    mp_widget = new LayoutViewFrame (parent, this);
-    mp_widget->setObjectName (QString::fromUtf8 (name));
+  if (mp_widget) {
 
     canvas ()->init_ui (mp_widget);
 
     mp_connector = new LayoutViewSignalConnector (mp_widget, this);
+    QObject::connect (mp_widget, SIGNAL (destroyed ()), mp_connector, SLOT (widget_destroyed ()));
+    QObject::connect (qApp, SIGNAL (destroyed ()), mp_connector, SLOT (app_destroyed ()));
 
     QVBoxLayout *vbl = new QVBoxLayout (mp_widget);
     vbl->setContentsMargins (0, 0, 0, 0);
@@ -384,14 +413,20 @@ LayoutView::init_ui (QWidget *parent, const char *name)
     mp_timer->start (timer_interval);
 
   }
-  
+
   config_setup ();
   finish ();
 }
 
 LayoutView::~LayoutView ()
 {
+  close ();
+}
+
+void LayoutView::close()
+{
   close_event ();
+  close_event.clear ();
 
   if (ms_current == this) {
     ms_current = 0;
@@ -428,11 +463,6 @@ LayoutView::~LayoutView ()
   }
   mp_bookmarks_frame = 0;
   mp_bookmarks_view = 0;
-
-  if (mp_widget) {
-    delete mp_widget;
-    mp_widget = 0;
-  }
 }
 
 void
@@ -477,6 +507,19 @@ void LayoutView::side_panel_destroyed (QObject *sender)
   } else if (sender == mp_bookmarks_frame) {
     mp_bookmarks_frame = 0;
     mp_bookmarks_view = 0;
+  }
+}
+
+void LayoutView::app_destroyed ()
+{
+  close ();
+}
+
+void LayoutView::widget_destroyed (QObject *sender)
+{
+  if (sender == mp_widget) {
+    mp_widget = 0;
+    close ();
   }
 }
 

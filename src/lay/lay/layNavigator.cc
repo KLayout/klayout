@@ -655,7 +655,7 @@ Navigator::attach_view (LayoutView *view)
 
     if (mp_source_view) {
 
-      mp_view = new LayoutView (0, false, mp_source_view, this, "navigator", LayoutView::LV_Naked + LayoutView::LV_NoZoom + LayoutView::LV_NoServices + LayoutView::LV_NoGrid);
+      mp_view = new LayoutViewWidget (0, false, mp_source_view, this, LayoutView::LV_Naked + LayoutView::LV_NoZoom + LayoutView::LV_NoServices + LayoutView::LV_NoGrid);
       tl_assert (mp_view->widget ());
       mp_view->widget ()->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
       mp_view->widget ()->setMinimumWidth (100);

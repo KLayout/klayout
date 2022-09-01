@@ -35,13 +35,18 @@
 #include "dbLayoutVsSchematic.h"
 #include "tlStream.h"
 
+#include "gsiQtGuiExternals.h"
+#include "gsiQtWidgetsExternals.h"  //  for Qt5
+
+#include <QFrame>
+
 namespace gsi
 {
 
 #if defined(HAVE_QTBINDINGS)
 static lay::LayoutViewWidget *new_view_widget (QWidget *parent, bool editable, db::Manager *manager, unsigned int options)
 {
-  lay::LayoutView *lv = new lay::LayoutViewWidget (manager, editable, 0 /*plugin parent*/, parent, "view", options);
+  lay::LayoutViewWidget *lv = new lay::LayoutViewWidget (manager, editable, 0 /*plugin parent*/, parent, options);
   if (parent) {
     //  transfer ownership to the parent
     lv->keep ();
@@ -54,27 +59,27 @@ static lay::LayoutView *get_view (lay::LayoutViewWidget *lv)
   return lv;
 }
 
-static QFrame *layer_control_frame (lay::LayoutViewWidget *lv)
+static QWidget *layer_control_frame (lay::LayoutViewWidget *lv)
 {
   return lv->layer_control_frame ();
 }
 
-static QFrame *hierarchy_control_frame (lay::LayoutViewWidget *lv)
+static QWidget *hierarchy_control_frame (lay::LayoutViewWidget *lv)
 {
   return lv->hierarchy_control_frame ();
 }
 
-static QFrame *libraries_frame (lay::LayoutViewWidget *lv)
+static QWidget *libraries_frame (lay::LayoutViewWidget *lv)
 {
   return lv->libraries_frame ();
 }
 
-static QFrame *bookmarks_frame (lay::LayoutViewWidget *lv)
+static QWidget *bookmarks_frame (lay::LayoutViewWidget *lv)
 {
   return lv->bookmarks_frame ();
 }
 
-Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QFrame), "lay", "LayoutViewWidget",
+Class<lay::LayoutViewWidget> decl_LayoutViewWidget (QT_EXTERNAL_BASE (QFrame) "lay", "LayoutViewWidget",
   gsi::constructor ("new", &new_view_widget, gsi::arg ("parent"), gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),
     "@brief Creates a standalone view widget\n"
     "\n"

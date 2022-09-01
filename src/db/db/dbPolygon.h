@@ -41,6 +41,7 @@
 #include "tlAssert.h"
 
 #include <cstddef>
+#include <cmath>
 #include <string>
 #include <vector>
 #include <iterator>

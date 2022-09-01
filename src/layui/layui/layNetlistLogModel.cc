@@ -112,9 +112,9 @@ QModelIndex
 NetlistLogModel::index (int row, int column, const QModelIndex &parent) const
 {
   if (! parent.isValid ()) {
-    return createIndex (row, column, quintptr (0));
+    return createIndex (row, column, (void *) (0));
   } else {
-    return createIndex (row, column, quintptr (& m_circuits [parent.row ()]));
+    return createIndex (row, column, (void *) (& m_circuits [parent.row ()]));
   }
 }
 
@@ -125,7 +125,7 @@ NetlistLogModel::parent (const QModelIndex &child) const
     return QModelIndex ();
   } else {
     const circuit_entry *ce = (const circuit_entry *) child.internalPointer ();
-    return createIndex (int (ce - & m_circuits.front ()), child.column (), quintptr (0));
+    return createIndex (int (ce - & m_circuits.front ()), child.column (), (void *) (0));
   }
 }
 

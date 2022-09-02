@@ -33,7 +33,7 @@ class QLabel;
 namespace lay
 {
 
-class LayoutView;
+class LayoutViewWidget;
 
 class ViewWidgetStack
   : public QWidget
@@ -41,10 +41,10 @@ class ViewWidgetStack
 public:
   ViewWidgetStack (QWidget *parent = 0, const char *name = 0);
 
-  void add_widget (LayoutView *w);
+  void add_widget (lay::LayoutViewWidget *w);
   void remove_widget (size_t index);
   void raise_widget (size_t index);
-  LayoutView *widget (size_t index);
+  LayoutViewWidget *widget (size_t index);
   QWidget *background_widget ();
 
 protected:
@@ -55,7 +55,7 @@ protected:
 
   void resize_children ();
 
-  std::vector <LayoutView *> m_widgets;
+  std::vector <LayoutViewWidget *> m_widgets;
   QLabel *mp_bglabel;
 };
 

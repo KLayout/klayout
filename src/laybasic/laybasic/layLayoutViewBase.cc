@@ -413,15 +413,7 @@ LayoutViewBase::finish ()
 {
   //  if we're the root dispatcher initialize the menu and build the context menus. No other menus are built so far.
   if (dispatcher () == this) {
-#if defined(HAVE_QT)
-    set_menu_parent_widget (widget ());
     init_menu ();
-    if (widget ()) {
-      menu ()->build (0, 0);
-    }
-#else
-    init_menu ();
-#endif
   }
 }
 
@@ -3456,14 +3448,6 @@ LayoutViewBase::box () const
 {
   return mp_canvas->viewport ().box ();
 }
-
-#if defined(HAVE_QT)
-QWidget *
-LayoutViewBase::widget ()
-{
-  return 0;
-}
-#endif
 
 LayoutView *
 LayoutViewBase::get_ui ()

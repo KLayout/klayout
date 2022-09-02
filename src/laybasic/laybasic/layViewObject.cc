@@ -216,8 +216,8 @@ ViewService::set_cursor (lay::Cursor::cursor_shape cursor)
 class ViewObjectQWidget : public QWidget
 {
 public:
-  ViewObjectQWidget (ViewObjectUI *view)
-    : QWidget (), mp_view (view)
+  ViewObjectQWidget (QWidget *parent, ViewObjectUI *view)
+    : QWidget (parent), mp_view (view)
   {
     //  .. nothing yet ..
   }
@@ -529,7 +529,7 @@ ViewObjectUI::init_ui (QWidget *parent)
   tl_assert (parent != 0);
   tl_assert (mp_widget == 0);
 
-  mp_widget = new ViewObjectQWidget (this);
+  mp_widget = new ViewObjectQWidget (parent, this);
   mp_widget->setMouseTracking (true);
   mp_widget->setAcceptDrops (true);
 }

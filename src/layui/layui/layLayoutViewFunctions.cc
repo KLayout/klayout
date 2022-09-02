@@ -41,9 +41,29 @@
 
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QApplication>
+#include <QMainWindow>
 
 namespace lay
 {
+
+/**
+ *  @brief Gets a suitable parent widget for the modal dialogs used in this module
+ */
+static QWidget *parent ()
+{
+  QWidgetList tl_widgets;
+  if (qApp) {
+    tl_widgets = qApp->topLevelWidgets ();
+  }
+  for (auto i = tl_widgets.begin (); i != tl_widgets.end (); ++i) {
+    QMainWindow *mw = dynamic_cast<QMainWindow *> (*i);
+    if (mw) {
+      return mw;
+    }
+  }
+  return 0;
+}
 
 static void
 collect_cells_to_delete (const db::Layout &layout, const db::Cell &cell, std::set<db::cell_index_type> &called)
@@ -113,7 +133,7 @@ LayoutViewFunctions::menu_activated (const std::string &symbol)
 
   if (symbol == "cm_show_properties") {
 
-    view ()->show_properties (view ()->widget ());
+    view ()->show_properties (parent ());
 
   } else if (symbol == "cm_delete") {
 
@@ -306,10 +326,10 @@ LayoutViewFunctions::menu_activated (const std::string &symbol)
       cm_new_layer ();
     }
   } else if (symbol == "cm_layout_props") {
-    lay::LayoutPropertiesForm lp_form (view ()->widget (), view (), "layout_props_form");
+    lay::LayoutPropertiesForm lp_form (parent (), view (), "layout_props_form");
     lp_form.exec ();
   } else if (symbol == "cm_layout_stats") {
-    lay::LayoutStatisticsForm lp_form (view ()->widget (), view (), "layout_props_form");
+    lay::LayoutStatisticsForm lp_form (parent (), view (), "layout_props_form");
     lp_form.exec ();
   } else if (symbol == "cm_reload") {
     cm_reload ();
@@ -429,7 +449,7 @@ LayoutViewFunctions::cm_cell_user_properties ()
     db::Cell &cell = layout.cell (path.back ());
     db::properties_id_type prop_id = cell.prop_id ();
 
-    lay::UserPropertiesForm props_form (view ()->widget ());
+    lay::UserPropertiesForm props_form (parent ());
     if (props_form.show (view (), cv_index, prop_id)) {
 
       view ()->transaction (tl::to_string (tr ("Edit cell's user properties")));
@@ -464,7 +484,7 @@ LayoutViewFunctions::cm_cell_replace ()
     }
 
 
-    lay::ReplaceCellOptionsDialog mode_dialog (view ()->widget ());
+    lay::ReplaceCellOptionsDialog mode_dialog (parent ());
 
     db::cell_index_type with_cell = paths.front ().back ();
     int mode = needs_to_ask ? m_del_cell_mode : 0;
@@ -652,7 +672,7 @@ LayoutViewFunctions::cm_cell_delete ()
       mode = 0;
     }
 
-    lay::DeleteCellModeDialog mode_dialog (view ()->widget ());
+    lay::DeleteCellModeDialog mode_dialog (parent ());
     if (! needs_to_ask || mode_dialog.exec_dialog (mode)) {
 
       if (needs_to_ask) {
@@ -775,7 +795,7 @@ LayoutViewFunctions::cm_cell_flatten ()
         }
       }
 
-      FlattenInstOptionsDialog options_dialog (view ()->widget ());
+      FlattenInstOptionsDialog options_dialog (parent ());
 
       int flatten_insts_levels = -1;
       bool prune = true;
@@ -857,7 +877,7 @@ LayoutViewFunctions::cm_cell_rename ()
 
   if (cv_index >= 0 && path.size () > 0) {
 
-    lay::RenameCellDialog name_dialog (view ()->widget ());
+    lay::RenameCellDialog name_dialog (parent ());
 
     db::Layout &layout = view ()->cellview (cv_index)->layout ();
     std::string name (layout.cell_name (path.back ()));
@@ -1207,7 +1227,7 @@ LayoutViewFunctions::cm_new_cell ()
   static double s_new_cell_window_size = 2.0;
   static std::string s_new_cell_cell_name;
 
-  NewCellPropertiesDialog cell_prop_dia (view ()->widget ());
+  NewCellPropertiesDialog cell_prop_dia (parent ());
   if (cell_prop_dia.exec_dialog (& cv->layout (), s_new_cell_cell_name, s_new_cell_window_size)) {
 
     db::cell_index_type new_ci = view ()->new_cell (view ()->active_cellview_index (), s_new_cell_cell_name.c_str ());
@@ -1270,7 +1290,7 @@ LayoutViewFunctions::cm_reload ()
     bool can_reload = true;
     if (dirty_layouts != 0) {
 
-      QMessageBox mbox (view ()->widget ());
+      QMessageBox mbox (parent ());
       mbox.setText (tl::to_qstring (tl::to_string (tr ("The following layouts need saving:\n\n")) + dirty_files + "\n\nPress 'Reload Without Saving' to reload anyhow and discard changes."));
       mbox.setWindowTitle (tr ("Save Needed"));
       mbox.setIcon (QMessageBox::Warning);
@@ -1323,7 +1343,7 @@ LayoutViewFunctions::transform_layout (const db::DCplxTrans &tr_mic)
     }
 
     if (has_proxy && 
-        QMessageBox::question (view ()->widget (),
+        QMessageBox::question (parent (),
                                tr ("Transforming PCells Or Library Cells"),
                                tr ("The layout contains PCells or library cells or both.\n"
                                    "Any changes to such cells may be lost when their layout is refreshed later.\n"
@@ -1410,7 +1430,7 @@ LayoutViewFunctions::cm_lay_scale ()
 void 
 LayoutViewFunctions::cm_lay_move ()
 {
-  lay::MoveOptionsDialog options (view ()->widget ());
+  lay::MoveOptionsDialog options (parent ());
   if (options.exec_dialog (m_move_dist)) {
     transform_layout (db::DCplxTrans (m_move_dist));
   }
@@ -1530,7 +1550,7 @@ LayoutViewFunctions::cm_sel_move_to ()
   double y = sel_bbox.bottom () + (sel_bbox.height () * (1 + m_move_to_origin_mode_y) * 0.5);
   db::DPoint move_target (x, y);
 
-  lay::MoveToOptionsDialog options (view ()->widget ());
+  lay::MoveToOptionsDialog options (parent ());
   if (options.exec_dialog (m_move_to_origin_mode_x, m_move_to_origin_mode_y, move_target)) {
 
     x = sel_bbox.left () + (sel_bbox.width () * (1 + m_move_to_origin_mode_x) * 0.5);
@@ -1544,7 +1564,7 @@ LayoutViewFunctions::cm_sel_move_to ()
 void 
 LayoutViewFunctions::cm_sel_move ()
 {
-  lay::MoveOptionsDialog options (view ()->widget ());
+  lay::MoveOptionsDialog options (parent ());
   if (options.exec_dialog (m_move_dist)) {
     do_transform (db::DCplxTrans (m_move_dist));
   }
@@ -1578,7 +1598,7 @@ LayoutViewFunctions::cm_copy_layer ()
 
   }
 
-  lay::DuplicateLayerDialog dialog (view ()->widget ());
+  lay::DuplicateLayerDialog dialog (parent ());
   if (dialog.exec_dialog (view (), m_copy_cva, m_copy_layera, m_copy_cvr, m_copy_layerr, m_duplicate_hier_mode, m_clear_before)) {
 
     bool supports_undo = true;
@@ -1738,7 +1758,7 @@ LayoutViewFunctions::cm_new_layer ()
 
     const lay::CellView &cv = view ()->cellview (index);
 
-    lay::NewLayerPropertiesDialog prop_dia (view ()->widget ());
+    lay::NewLayerPropertiesDialog prop_dia (parent ());
     if (prop_dia.exec_dialog (cv, m_new_layer_props)) {
 
       for (unsigned int l = 0; l < cv->layout ().layers (); ++l) {
@@ -1776,7 +1796,7 @@ LayoutViewFunctions::cm_align_cell_origin ()
       throw tl::Exception (tl::to_string (tr ("Cannot use this function on a PCell or library cell")));
     }
 
-    lay::AlignCellOptionsDialog dialog (view ()->widget ());
+    lay::AlignCellOptionsDialog dialog (parent ());
     if (dialog.exec_dialog (m_align_cell_options)) {
 
       view ()->clear_selection ();
@@ -1877,7 +1897,7 @@ LayoutViewFunctions::cm_edit_layer ()
   db::LayerProperties layer_props = layout.get_properties ((unsigned int) sel->layer_index ());
   db::LayerProperties old_props = layer_props;
 
-  lay::NewLayerPropertiesDialog prop_dia (view ()->widget ());
+  lay::NewLayerPropertiesDialog prop_dia (parent ());
   if (prop_dia.exec_dialog (cv, layer_props)) {
 
     for (unsigned int l = 0; l < layout.layers (); ++l) {
@@ -2020,7 +2040,7 @@ LayoutViewFunctions::cm_clear_layer ()
     throw tl::Exception (tl::to_string (tr ("No layer selected for clearing")));
   }
 
-  lay::ClearLayerModeDialog mode_dialog (view ()->widget ());
+  lay::ClearLayerModeDialog mode_dialog (parent ());
   if (mode_dialog.exec_dialog (m_layer_hier_mode)) {
 
     view ()->cancel_edits ();

@@ -93,22 +93,34 @@ namespace lay
 {
 
 // -------------------------------------------------------------
-//  LayoutViewFrame implementation
+//  LayoutViewWidget implementation
 
-LayoutViewFrame::LayoutViewFrame (QWidget *parent, lay::LayoutView *view)
-  : QFrame (parent), mp_view (view)
+LayoutViewWidget::LayoutViewWidget (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent, unsigned int options)
+  : QFrame (parent)
 {
-  //  .. nothing yet ..
+  mp_view = new LayoutView (mgr, editable, plugin_parent, this, options);
+}
+
+LayoutViewWidget::LayoutViewWidget (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent, unsigned int options)
+  : QFrame (parent)
+{
+  mp_view = new LayoutView (source, mgr, editable, plugin_parent, this, options);
+}
+
+LayoutViewWidget::~LayoutViewWidget ()
+{
+  delete mp_view;
+  mp_view = 0;
 }
 
 QSize
-LayoutViewFrame::sizeHint () const
+LayoutViewWidget::sizeHint () const
 {
   return mp_view->size_hint ();
 }
 
 bool
-LayoutViewFrame::eventFilter(QObject *obj, QEvent *event)
+LayoutViewWidget::eventFilter(QObject *obj, QEvent *event)
 {
   bool taken = false;
   bool res = mp_view->event_filter (obj, event, taken);
@@ -119,14 +131,39 @@ LayoutViewFrame::eventFilter(QObject *obj, QEvent *event)
   }
 }
 
-void LayoutViewFrame::showEvent (QShowEvent *)
+void LayoutViewWidget::showEvent (QShowEvent *)
 {
   mp_view->show_event ();
 }
 
-void LayoutViewFrame::hideEvent (QHideEvent *)
+void LayoutViewWidget::hideEvent (QHideEvent *)
 {
   mp_view->hide_event ();
+}
+
+QWidget *LayoutViewWidget::layer_control_frame ()
+{
+  return view ()->layer_control_frame ();
+}
+
+QWidget *LayoutViewWidget::hierarchy_control_frame ()
+{
+  return view ()->hierarchy_control_frame ();
+}
+
+QWidget *LayoutViewWidget::libraries_frame ()
+{
+  return view ()->libraries_frame ();
+}
+
+QWidget *LayoutViewWidget::bookmarks_frame ()
+{
+  return view ()->bookmarks_frame ();
+}
+
+QWidget *LayoutViewWidget::editor_options_frame ()
+{
+  return view ()->editor_options_frame ();
 }
 
 // -------------------------------------------------------------
@@ -224,7 +261,7 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   LayoutView::set_active_cellview_index (source->active_cellview_index ());
 }
 
-LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, LayoutViewFrame *widget, unsigned int options)
+LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, LayoutViewWidget *widget, unsigned int options)
   : LayoutViewBase (this, manager, editable, plugin_parent, options),
     mp_widget (widget),
     dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
@@ -235,7 +272,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
   init_ui ();
 }
 
-LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, LayoutViewFrame *widget, unsigned int options)
+LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, LayoutViewWidget *widget, unsigned int options)
   : LayoutViewBase (this, source, manager, editable, plugin_parent, options),
     mp_widget (widget),
     dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
@@ -423,6 +460,11 @@ LayoutView::~LayoutView ()
   close ();
 }
 
+QWidget *LayoutView::widget ()
+{
+  return mp_widget;
+}
+
 void LayoutView::close()
 {
   close_event ();
@@ -463,6 +505,18 @@ void LayoutView::close()
   }
   mp_bookmarks_frame = 0;
   mp_bookmarks_view = 0;
+}
+
+void
+LayoutView::finish ()
+{
+  if (dispatcher () == this) {
+    set_menu_parent_widget (mp_widget);
+    init_menu ();
+    if (mp_widget) {
+      menu ()->build (0, 0);
+    }
+  }
 }
 
 void

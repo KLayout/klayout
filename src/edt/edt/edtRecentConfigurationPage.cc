@@ -182,7 +182,7 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
 
   case RecentConfigurationPage::Layer:
     {
-      int icon_size = view ()->widget ()->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
+      int icon_size = item->treeWidget ()->style ()->pixelMetric (QStyle::PM_ButtonIconSize);
       lay::LayerPropertiesConstIterator l;
       try {
         l = lp_iter_from_string (view (), values [column]);
@@ -348,7 +348,7 @@ RecentConfigurationPage::update_list (const std::list<std::vector<std::string> >
 }
 
 static bool
-set_or_request_current_layer (lay::LayoutViewBase *view, unsigned int cv_index, const db::LayerProperties &lp)
+set_or_request_current_layer (QWidget *parent, lay::LayoutViewBase *view, unsigned int cv_index, const db::LayerProperties &lp)
 {
   bool ok = view->set_current_layer (cv_index, lp);
   if (ok) {
@@ -364,7 +364,7 @@ set_or_request_current_layer (lay::LayoutViewBase *view, unsigned int cv_index, 
     return false;
   }
 
-  if (QMessageBox::question (view->widget (), tr ("Create Layer"), tr ("Layer %1 does not exist yet. Create it now?").arg (tl::to_qstring (lp.to_string ()))) == QMessageBox::Yes) {
+  if (QMessageBox::question (parent, tr ("Create Layer"), tr ("Layer %1 does not exist yet. Create it now?").arg (tl::to_qstring (lp.to_string ()))) == QMessageBox::Yes) {
 
     lay::LayerPropertiesNode lpn;
     lpn.set_source (lay::ParsedLayerSource (lp, cv_index));
@@ -400,7 +400,7 @@ RecentConfigurationPage::item_clicked (QTreeWidgetItem *item)
         ex.read (cv_index);
       }
 
-      set_or_request_current_layer (view (), cv_index, lp);
+      set_or_request_current_layer (item->treeWidget (), view (), cv_index, lp);
 
     } else {
       dispatcher ()->config_set (c->cfg_name, v);

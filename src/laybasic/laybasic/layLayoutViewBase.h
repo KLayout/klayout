@@ -1662,10 +1662,6 @@ public:
 
   /**
    *  @brief Gets the canvas object (where the layout is drawn and view objects are placed)
-   *  
-   *  This method intentionally delivers the ViewObjectWidget, not the 
-   *  LayoutCanvas to emphasize that the LayoutCanvas object shall not
-   *  be modified.
    */
   lay::LayoutCanvas *canvas ()
   {
@@ -1690,7 +1686,7 @@ public:
   }
 
   /**
-   *  @brief Gets the hierarchy panel
+   *  @brief Gets the editor options page
    */
   virtual lay::EditorOptionsPages *editor_options_pages ()
   {
@@ -1863,9 +1859,6 @@ public:
 
   /**
    *  @brief Get the Drawings interface
-   *  
-   *  Although the Drawings interface is implemented by LayoutCanvas,
-   *  it is a different interface from ViewObjectWidget. 
    */
   lay::Drawings *drawings () 
   {
@@ -2647,13 +2640,6 @@ public:
 
   virtual void deactivate_all_browsers ();
 
-#if defined(HAVE_QT)
-  /**
-   *  @brief Gets the QWidget interface
-   */
-  virtual QWidget *widget ();
-#endif
-
   /**
    *  @brief Gets the LayoutView interface
    */
@@ -2866,9 +2852,9 @@ protected:
 
   void free_resources ();
   void shutdown ();
-  void finish ();
   void init_menu ();
 
+  virtual void finish ();
   virtual tl::Color default_background_color ();
   virtual void do_set_background_color (tl::Color color, tl::Color contrast);
   virtual void do_paste ();

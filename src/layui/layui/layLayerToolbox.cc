@@ -258,7 +258,7 @@ LCPDitherPalette::button_clicked (int index)
     
     //  edit pattern
     lay::DitherPattern pattern (mp_view->dither_pattern ());
-    lay::EditStipplesForm stipples_form (mp_view, pattern);
+    lay::EditStipplesForm stipples_form (this, mp_view, pattern);
     if (stipples_form.exec () && stipples_form.pattern () != pattern) {
       emit pattern_changed (stipples_form.pattern ());
     }
@@ -686,7 +686,7 @@ LCPStylePalette::button_clicked (int index)
 
     //  edit pattern
     lay::LineStyles styles (mp_view->line_styles ());
-    lay::EditLineStylesForm line_styles_form (mp_view, styles);
+    lay::EditLineStylesForm line_styles_form (this, mp_view, styles);
     if (line_styles_form.exec () && line_styles_form.styles () != styles) {
       emit line_styles_changed (line_styles_form.styles ());
     }

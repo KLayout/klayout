@@ -72,6 +72,7 @@ namespace db {
 
 namespace lay {
 
+class LayoutViewWidget;
 class AbstractMenu;
 class LayerControlPanel;
 class HierarchyControlPanel;
@@ -85,88 +86,6 @@ class Browser;
 class ColorButton;
 class ConfigureAction;
 class EditorOptionsPages;
-
-/**
- *  @brief A custom QFrame that acts as the central widget for the LayoutView
- */
-class LAYVIEW_PUBLIC LayoutViewFrame
-  : public QFrame
-{
-Q_OBJECT
-
-public:
-  LayoutViewFrame (QWidget *parent, lay::LayoutView *view);
-
-  virtual QSize sizeHint () const;
-  virtual bool eventFilter(QObject *obj, QEvent *event);
-  virtual void showEvent (QShowEvent *);
-  virtual void hideEvent (QHideEvent *);
-
-  void emit_title_changed (lay::LayoutView *view) { emit title_changed (view); }
-  void emit_dirty_changed (lay::LayoutView *view) { emit dirty_changed (view); }
-  void emit_show_message (const std::string &s, int ms) { emit show_message (s, ms); }
-  void emit_current_pos_changed (double x, double y, bool dbu_units) { emit current_pos_changed (x, y, dbu_units); }
-  void emit_clear_current_pos () { emit clear_current_pos (); }
-  void emit_edits_enabled_changed () { emit edits_enabled_changed (); }
-  void emit_mode_change (int m) { emit mode_change (m); }
-  void emit_current_layer_changed (const lay::LayerPropertiesConstIterator &l) { emit current_layer_changed (l); }
-  void emit_menu_needs_update () { emit menu_needs_update (); }
-  void emit_layer_order_changed () { emit layer_order_changed (); }
-
-signals:
-  /**
-   *  @brief This signal is emitted when the title changes
-   */
-  void title_changed (lay::LayoutView *view);
-
-  /**
-   *  @brief This signal is emitted when the "dirty" flag changes
-   */
-  void dirty_changed (lay::LayoutView *view);
-
-  /**
-   *  @brief This signal is emitted when the view wants to show a message for the given time (of infinitely for ms == 0)
-   */
-  void show_message (const std::string &s, int ms);
-
-  /**
-   *  @brief This signal is emitted when the view wants to indicate a mouse position change
-   */
-  void current_pos_changed (double x, double y, bool dbu_units);
-
-  /**
-   *  @brief This signal is emitted when the view wants to clear the mouse position
-   */
-  void clear_current_pos ();
-
-  /**
-   *  @brief This signal is sent when the "edits_enabled" state has changed
-   */
-  void edits_enabled_changed ();
-
-  /**
-   *  @brief This signal is sent when the view wants to update the menu
-   */
-  void menu_needs_update ();
-
-  /**
-   *  @brief The view initiated a mode change
-   */
-  void mode_change (int m);
-
-  /**
-   *  @brief The current layer changed
-   */
-  void current_layer_changed (const lay::LayerPropertiesConstIterator &l);
-
-  /**
-   *  @brief The layer order has changed
-   */
-  void layer_order_changed ();
-
-private:
-  LayoutView *mp_view;
-};
 
 /**
  *  @brief An object connecting child widget signals with methods from LayoutView
@@ -224,6 +143,11 @@ public:
    *  @brief Destructor
    */
   ~LayoutView ();
+
+  /**
+   *  @brief Gets the widget object that view is embedded in
+   */
+  QWidget *widget ();
 
   /**
    *  @brief Makes this view the current one
@@ -440,14 +364,6 @@ public:
   virtual lay::EditorOptionsPages *editor_options_pages ();
 
   /**
-   *  @brief Gets the container with the layer control panel
-   */
-  QWidget *layer_control_frame () 
-  {
-    return mp_control_frame;
-  }
-
-  /**
    *  @brief Gets the layer control panel
    */
   virtual lay::LayerControlPanel *control_panel ()
@@ -456,43 +372,11 @@ public:
   }
 
   /**
-   *  @brief Gets the container with the hierarchy control panel
-   */
-  QWidget *hierarchy_control_frame () 
-  {
-    return mp_hierarchy_frame;
-  }
-
-  /**
    *  @brief Gets the hierarchy panel
    */
   virtual lay::HierarchyControlPanel *hierarchy_panel ()
   {
     return mp_hierarchy_panel;
-  }
-
-  /**
-   *  @brief Gets the container with the libraries view
-   */
-  QWidget *libraries_frame ()
-  {
-    return mp_libraries_frame;
-  }
-
-  /**
-   *  @brief Gets the container with the bookmarks view
-   */
-  QWidget *bookmarks_frame ()
-  {
-    return mp_bookmarks_frame;
-  }
-
-  /**
-   *  @brief Gets the container with the editor options
-   */
-  QWidget *editor_options_frame ()
-  {
-    return mp_editor_options_frame;
   }
 
   /**
@@ -518,16 +402,6 @@ public:
    *  looks for cut & copy providers in the tree views for example.
    */
   virtual void cut ();
-
-  /**
-   *  @brief Gets the widget object
-   *
-   *  This pointer may be 0 if the layout view is created in a headless environment.
-   */
-  virtual QWidget *widget ()
-  {
-    return mp_widget;
-  }
 
   /**
    *  @brief An event signalling that the view is going to close
@@ -712,10 +586,10 @@ public:
 
 private:
   friend class LayoutViewSignalConnector;
-  friend class LayoutViewFrame;
+  friend class LayoutViewWidget;
 
   QTimer *mp_timer;
-  LayoutViewFrame *mp_widget;
+  LayoutViewWidget *mp_widget;
   LayoutViewSignalConnector *mp_connector;
   bool m_activated;
   QFrame *mp_left_frame;
@@ -748,16 +622,22 @@ private:
   void init_ui ();
   void do_setup_editor_options_pages ();
 
+  QWidget *layer_control_frame () { return mp_control_frame; }
+  QWidget *hierarchy_control_frame () { return mp_hierarchy_frame; }
+  QWidget *libraries_frame () { return mp_libraries_frame; }
+  QWidget *bookmarks_frame () { return mp_bookmarks_frame; }
+  QWidget *editor_options_frame () { return mp_editor_options_frame; }
+
 protected:
   /**
    *  @brief Constructor with widget
    */
-  LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, LayoutViewFrame *widget, unsigned int options = (unsigned int) LV_Normal);
+  LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, LayoutViewWidget *widget, unsigned int options = (unsigned int) LV_Normal);
 
   /**
    *  @brief Constructor (clone from another view) with widget
    */
-  LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, LayoutViewFrame *widget, unsigned int options = (unsigned int) LV_Normal);
+  LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, LayoutViewWidget *widget, unsigned int options = (unsigned int) LV_Normal);
 
   void activate ();
   void deactivate ();
@@ -765,6 +645,7 @@ protected:
   virtual bool configure (const std::string &name, const std::string &value);
   virtual void config_finalize ();
 
+  virtual void finish ();
   virtual tl::Color default_background_color ();
   virtual void do_set_background_color (tl::Color color, tl::Color contrast);
   virtual void do_paste ();
@@ -797,27 +678,138 @@ private:
  *  but only created if a QApplication is present.
  */
 class LAYVIEW_PUBLIC LayoutViewWidget
-  : public LayoutViewFrame, public LayoutView
+  : public QFrame, public gsi::ObjectBase
 {
+Q_OBJECT
+
 public:
   /**
    *  @brief Constructor
    */
-  LayoutViewWidget (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent = 0, unsigned int options = (unsigned int) LV_Normal)
-    : LayoutViewFrame (parent, this), LayoutView (mgr, editable, plugin_parent, this, options)
-  {
-    //  .. nothing yet ..
-  }
+  LayoutViewWidget (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent = 0, unsigned int options = (unsigned int) LayoutView::LV_Normal);
 
   /**
    *  @brief Constructor (clone from another view)
    */
-  LayoutViewWidget (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent = 0, unsigned int options = (unsigned int) LV_Normal)
-    : LayoutViewFrame (parent, this), LayoutView (source, mgr, editable, plugin_parent, this, options)
+  LayoutViewWidget (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent = 0, unsigned int options = (unsigned int) LayoutView::LV_Normal);
+
+  /**
+   *  @brief Destructor
+   */
+  ~LayoutViewWidget ();
+
+  /**
+   *  @brief Gets the LayoutView embedded into this widget
+   */
+  lay::LayoutView *view ()
   {
-    //  .. nothing yet ..
+    return mp_view;
   }
+
+  virtual QSize sizeHint () const;
+  virtual bool eventFilter(QObject *obj, QEvent *event);
+  virtual void showEvent (QShowEvent *);
+  virtual void hideEvent (QHideEvent *);
+
+  void emit_title_changed (lay::LayoutView *view) { emit title_changed (view); }
+  void emit_dirty_changed (lay::LayoutView *view) { emit dirty_changed (view); }
+  void emit_show_message (const std::string &s, int ms) { emit show_message (s, ms); }
+  void emit_current_pos_changed (double x, double y, bool dbu_units) { emit current_pos_changed (x, y, dbu_units); }
+  void emit_clear_current_pos () { emit clear_current_pos (); }
+  void emit_edits_enabled_changed () { emit edits_enabled_changed (); }
+  void emit_mode_change (int m) { emit mode_change (m); }
+  void emit_current_layer_changed (const lay::LayerPropertiesConstIterator &l) { emit current_layer_changed (l); }
+  void emit_menu_needs_update () { emit menu_needs_update (); }
+  void emit_layer_order_changed () { emit layer_order_changed (); }
+
+  /**
+   *  @brief Gets the container with the layer control panel
+   */
+  QWidget *layer_control_frame ();
+
+  /**
+   *  @brief Gets the container with the hierarchy control panel
+   */
+  QWidget *hierarchy_control_frame ();
+
+  /**
+   *  @brief Gets the container with the libraries view
+   */
+  QWidget *libraries_frame ();
+
+  /**
+   *  @brief Gets the container with the bookmarks view
+   */
+  QWidget *bookmarks_frame ();
+
+  /**
+   *  @brief Gets the container with the editor options
+   */
+  QWidget *editor_options_frame ();
+
+signals:
+  /**
+   *  @brief This signal is emitted when the title changes
+   */
+  void title_changed (lay::LayoutView *view);
+
+  /**
+   *  @brief This signal is emitted when the "dirty" flag changes
+   */
+  void dirty_changed (lay::LayoutView *view);
+
+  /**
+   *  @brief This signal is emitted when the view wants to show a message for the given time (of infinitely for ms == 0)
+   */
+  void show_message (const std::string &s, int ms);
+
+  /**
+   *  @brief This signal is emitted when the view wants to indicate a mouse position change
+   */
+  void current_pos_changed (double x, double y, bool dbu_units);
+
+  /**
+   *  @brief This signal is emitted when the view wants to clear the mouse position
+   */
+  void clear_current_pos ();
+
+  /**
+   *  @brief This signal is sent when the "edits_enabled" state has changed
+   */
+  void edits_enabled_changed ();
+
+  /**
+   *  @brief This signal is sent when the view wants to update the menu
+   */
+  void menu_needs_update ();
+
+  /**
+   *  @brief The view initiated a mode change
+   */
+  void mode_change (int m);
+
+  /**
+   *  @brief The current layer changed
+   */
+  void current_layer_changed (const lay::LayerPropertiesConstIterator &l);
+
+  /**
+   *  @brief The layer order has changed
+   */
+  void layer_order_changed ();
+
+private:
+  LayoutView *mp_view;
 };
+
+/**
+ *  @brief Gets the container widget for a LayoutViewBase object
+ */
+inline QWidget *widget_from_view (lay::LayoutViewBase *view_base)
+{
+  lay::LayoutView *view = dynamic_cast<lay::LayoutView *> (view_base);
+  return view ? view->widget () : 0;
+}
 
 }
 

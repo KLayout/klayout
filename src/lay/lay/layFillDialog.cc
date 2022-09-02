@@ -63,14 +63,14 @@ public:
     menu_entries.push_back (lay::menu_item ("fill_tool::show", "fill_tool:edit_mode", "edit_menu.utils_menu.end", tl::to_string (QObject::tr ("Fill Tool"))));
   }
  
-   virtual lay::Plugin *create_plugin (db::Manager *, lay::LayoutViewBase *view) const
-   {
-     if (lay::has_gui ()) {
-       return new FillDialog (view);
-     } else {
-       return 0;
-     }
-   }
+  virtual lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *, lay::LayoutViewBase *view) const
+  {
+    if (lay::has_gui ()) {
+      return new FillDialog (lay::MainWindow::instance (), view);
+    } else {
+      return 0;
+    }
+  }
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new FillDialogPluginDeclaration (), 20000, "FillDialogPlugin");
@@ -78,8 +78,8 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new FillDialogPl
 
 // ------------------------------------------------------------
 
-FillDialog::FillDialog (LayoutViewBase *view)
-  : QDialog (view->widget ()),
+FillDialog::FillDialog (QWidget *parent, LayoutViewBase *view)
+  : QDialog (parent),
     lay::Plugin (view),
     Ui::FillDialog (),
     mp_view (view)

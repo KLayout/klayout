@@ -76,7 +76,7 @@ class LAY_PUBLIC FillDialog
 Q_OBJECT 
 
 public:
-  FillDialog (lay::LayoutViewBase *view);
+  FillDialog (QWidget *parent, lay::LayoutViewBase *view);
   ~FillDialog ();
 
 public slots:

@@ -630,8 +630,8 @@ Navigator::view_closed (int index)
 void
 Navigator::resizeEvent (QResizeEvent *)
 {
-  if (mp_view && mp_view->widget ()) {
-    mp_view->widget ()->setGeometry (mp_placeholder_label->geometry ());
+  if (mp_view) {
+    mp_view->setGeometry (mp_placeholder_label->geometry ());
   }
 }
 
@@ -650,21 +650,20 @@ Navigator::attach_view (LayoutView *view)
     delete mp_service;
     mp_service = 0;
 
-    LayoutView *old_view = mp_view;
+    LayoutViewWidget *old_view = mp_view;
     mp_view = 0;
 
     if (mp_source_view) {
 
       mp_view = new LayoutViewWidget (0, false, mp_source_view, this, LayoutView::LV_Naked + LayoutView::LV_NoZoom + LayoutView::LV_NoServices + LayoutView::LV_NoGrid);
-      tl_assert (mp_view->widget ());
-      mp_view->widget ()->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
-      mp_view->widget ()->setMinimumWidth (100);
-      mp_view->widget ()->setMinimumHeight (100);
-      mp_view->widget ()->setGeometry (mp_placeholder_label->geometry ());
-      mp_view->widget ()->show ();
+      mp_view->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
+      mp_view->setMinimumWidth (100);
+      mp_view->setMinimumHeight (100);
+      mp_view->setGeometry (mp_placeholder_label->geometry ());
+      mp_view->show ();
 
-      mp_service = new NavigatorService (mp_view);
-      mp_view->canvas ()->activate (mp_service);
+      mp_service = new NavigatorService (mp_view->view ());
+      mp_view->view ()->canvas ()->activate (mp_service);
 
       mp_source_view->cellviews_changed_event.add (this, &Navigator::content_changed);
       mp_source_view->cellview_changed_event.add (this, &Navigator::content_changed_with_int);
@@ -714,7 +713,7 @@ void
 Navigator::hier_levels_changed ()
 {
   if (m_show_all_hier_levels && mp_source_view && m_frozen_list.find (mp_source_view) == m_frozen_list.end ()) {
-    mp_view->set_hier_levels (mp_source_view->get_hier_levels ());
+    mp_view->view ()->set_hier_levels (mp_source_view->get_hier_levels ());
   }
 }
 
@@ -729,19 +728,19 @@ Navigator::update_layers ()
 void
 Navigator::update ()
 {
-  if (! mp_view || ! mp_source_view) {
+  if (! mp_view || ! mp_view->view () || ! mp_source_view) {
     return;
   }
 
   if (m_frozen_list.find (mp_source_view) == m_frozen_list.end ()) {
-    mp_view->select_cellviews (mp_source_view->cellview_list ());
-    mp_view->set_properties (mp_source_view->get_properties ());
+    mp_view->view ()->select_cellviews (mp_source_view->cellview_list ());
+    mp_view->view ()->set_properties (mp_source_view->get_properties ());
   } else {
-    mp_view->select_cellviews (mp_source_view->cellview_list ());
-    mp_view->set_properties (m_frozen_list [mp_source_view].layer_properties);
+    mp_view->view ()->select_cellviews (mp_source_view->cellview_list ());
+    mp_view->view ()->set_properties (m_frozen_list [mp_source_view].layer_properties);
   }
 
-  img::Service *img_target = mp_view->get_plugin<img::Service> ();
+  img::Service *img_target = mp_view->view ()->get_plugin<img::Service> ();
   if (img_target) {
 
     img_target->clear_images ();
@@ -759,16 +758,16 @@ Navigator::update ()
 
   if (m_show_all_hier_levels && mp_source_view) {
     if (m_frozen_list.find (mp_source_view) == m_frozen_list.end ()) {
-      mp_view->set_hier_levels (mp_source_view->get_hier_levels ());
+      mp_view->view ()->set_hier_levels (mp_source_view->get_hier_levels ());
     } else {
-      mp_view->set_hier_levels (m_frozen_list [mp_source_view].hierarchy_levels);
+      mp_view->view ()->set_hier_levels (m_frozen_list [mp_source_view].hierarchy_levels);
     }
   } else {
-    mp_view->set_hier_levels (std::make_pair (0, 0));
+    mp_view->view ()->set_hier_levels (std::make_pair (0, 0));
   }
 
-  mp_view->zoom_fit ();
-  mp_view->update_content ();
+  mp_view->view ()->zoom_fit ();
+  mp_view->view ()->update_content ();
   mp_service->update_marker ();
 }
 

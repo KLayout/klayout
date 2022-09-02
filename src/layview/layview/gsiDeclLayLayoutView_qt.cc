@@ -44,6 +44,7 @@ namespace gsi
 {
 
 #if defined(HAVE_QTBINDINGS)
+
 static lay::LayoutViewWidget *new_view_widget (QWidget *parent, bool editable, db::Manager *manager, unsigned int options)
 {
   lay::LayoutViewWidget *lv = new lay::LayoutViewWidget (manager, editable, 0 /*plugin parent*/, parent, options);
@@ -56,7 +57,7 @@ static lay::LayoutViewWidget *new_view_widget (QWidget *parent, bool editable, d
 
 static lay::LayoutView *get_view (lay::LayoutViewWidget *lv)
 {
-  return lv;
+  return lv->view ();
 }
 
 static QWidget *layer_control_frame (lay::LayoutViewWidget *lv)
@@ -86,7 +87,7 @@ Class<lay::LayoutViewWidget> decl_LayoutViewWidget (QT_EXTERNAL_BASE (QFrame) "l
     "@param parent The parent widget in which to embed the view\n"
     "@param editable True to make the view editable\n"
     "@param manager The \\Manager object to enable undo/redo\n"
-    "@param options A combination of the values in the LV_... constants\n"
+    "@param options A combination of the values in the LV_... constants from \\LayoutView\n"
     "\n"
     "This constructor has been introduced in version 0.25.\n"
     "It has been enhanced with the arguments in version 0.27.\n"

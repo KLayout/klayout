@@ -251,6 +251,7 @@ signals:
   void hidden_flags_need_update ();
 
 private: 
+  QWidget *mp_parent;
   lay::LayoutViewBase *mp_view;
   bool m_filter_mode;
   size_t m_id_start, m_id_end;

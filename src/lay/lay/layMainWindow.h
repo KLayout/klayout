@@ -703,7 +703,7 @@ private:
   lay::LogViewerDialog *mp_log_viewer_dialog;
   int m_mode;
   SettingsForm *mp_setup_form;
-  std::vector <lay::LayoutView *> mp_views;
+  std::vector <lay::LayoutViewWidget *> mp_views;
   int m_open_mode;
   int m_keep_backups;
   std::vector<std::pair<std::string, std::string> > m_mru;
@@ -808,7 +808,7 @@ private:
   void current_view_changed ();
   void update_window_title ();
   void update_tab_title (int i);
-  void add_view (LayoutView *view);
+  void add_view (LayoutViewWidget *view);
 
   bool can_close ();
   lay::CellViewRef create_or_load_layout (const std::string *filename, const db::LoadLayoutOptions *options, const std::string &tech, const int mode);

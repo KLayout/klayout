@@ -41,6 +41,7 @@ namespace lay
 
 class MainWindow;
 class LayoutView;
+class LayoutViewWidget;
 class AbstractMenu;
 class DMarker;
 class NavigatorService;
@@ -98,7 +99,7 @@ private:
   bool m_update_layers_needed;
   bool m_update_needed;
   MainWindow *mp_main_window;  
-  LayoutView *mp_view;  
+  LayoutViewWidget *mp_view;
   QLabel *mp_placeholder_label;  
   QFrame *mp_menu_bar;
   LayoutView *mp_source_view;

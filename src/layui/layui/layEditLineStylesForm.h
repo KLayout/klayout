@@ -48,7 +48,7 @@ class EditLineStylesForm
   Q_OBJECT 
 
 public:
-  EditLineStylesForm (lay::LayoutViewBase *view, const lay::LineStyles &styles);
+  EditLineStylesForm (QWidget *parent, lay::LayoutViewBase *view, const lay::LineStyles &styles);
   ~EditLineStylesForm ();
 
   //  ...

@@ -65,6 +65,11 @@ static QWidget *layer_control_frame (lay::LayoutViewWidget *lv)
   return lv->layer_control_frame ();
 }
 
+static QWidget *layer_toolbox_frame (lay::LayoutViewWidget *lv)
+{
+  return lv->layer_toolbox_frame ();
+}
+
 static QWidget *hierarchy_control_frame (lay::LayoutViewWidget *lv)
 {
   return lv->hierarchy_control_frame ();
@@ -101,6 +106,16 @@ Class<lay::LayoutViewWidget> decl_LayoutViewWidget (QT_EXTERNAL_BASE (QFrame) "l
     "The side widget can be configured through the views configuration interface.\n"
     "\n"
     "This method has been introduced in version 0.27\n"
+  ) +
+  gsi::method_ext ("layer_toolbox_frame", &layer_toolbox_frame,
+    "@brief Gets the layer toolbox side widget\n"
+    "A 'side widget' is a widget attached to the view. It does not have a parent, so you can "
+    "embed it into a different context. Please note that with embedding through 'setParent' it will be "
+    "destroyed when your parent widget gets destroyed. It will be lost then to the view.\n"
+    "\n"
+    "The side widget can be configured through the views configuration interface.\n"
+    "\n"
+    "This method has been introduced in version 0.28\n"
   ) +
   gsi::method_ext ("hierarchy_control_frame", &hierarchy_control_frame,
     "@brief Gets the cell view (hierarchy view) side widget\n"

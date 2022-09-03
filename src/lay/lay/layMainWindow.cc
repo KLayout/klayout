@@ -274,9 +274,9 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
 
   mp_layer_toolbox_dock_widget = new QDockWidget (QObject::tr ("Layer Toolbox"), this);
   mp_layer_toolbox_dock_widget->setObjectName (QString::fromUtf8 ("lt_dock_widget"));
-  mp_layer_toolbox = new LayerToolbox (mp_layer_toolbox_dock_widget, "layer_toolbox");
-  mp_layer_toolbox_dock_widget->setWidget (mp_layer_toolbox);
-  mp_layer_toolbox_dock_widget->setFocusProxy (mp_layer_toolbox);
+  mp_layer_toolbox_stack = new ControlWidgetStack (mp_layer_toolbox_dock_widget, "layer_toolbox_stack", true);
+  mp_layer_toolbox_dock_widget->setWidget (mp_layer_toolbox_stack);
+  mp_layer_toolbox_dock_widget->setFocusProxy (mp_layer_toolbox_stack);
   connect (mp_layer_toolbox_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_layer_toolbox_visible = true;
 
@@ -667,7 +667,6 @@ void
 MainWindow::close_all ()
 {
   cancel ();
-  mp_layer_toolbox->set_view (0);
 
   //  try a smooth shutdown of the current view
   lay::LayoutView::set_current (0);
@@ -697,6 +696,7 @@ MainWindow::close_all ()
 
     lay::LayoutViewWidget *view = mp_views.back ();
     mp_views.pop_back ();
+    mp_layer_toolbox_stack->remove_widget (mp_views.size ());
     mp_lp_stack->remove_widget (mp_views.size ());
     mp_hp_stack->remove_widget (mp_views.size ());
     mp_libs_stack->remove_widget (mp_views.size ());
@@ -979,63 +979,6 @@ MainWindow::configure (const std::string &name, const std::string &value)
     }
 
     return true;
-
-  } else if (name == cfg_stipple_palette) {
-
-    lay::StipplePalette palette = lay::StipplePalette::default_palette ();
-
-    try {
-      //  empty string means: default palette
-      if (! value.empty ()) {
-        palette.from_string (value);
-      }
-    } catch (...) {
-      //  ignore errors: just reset the palette
-      palette = lay::StipplePalette::default_palette ();
-    }
-
-    mp_layer_toolbox->set_palette (palette);
-
-    // others need this property too ..
-    return false;
-
-  } else if (name == cfg_line_style_palette) {
-
-    lay::LineStylePalette palette = lay::LineStylePalette::default_palette ();
-
-    try {
-      //  empty string means: default palette
-      if (! value.empty ()) {
-        palette.from_string (value);
-      }
-    } catch (...) {
-      //  ignore errors: just reset the palette
-      palette = lay::LineStylePalette::default_palette ();
-    }
-
-    mp_layer_toolbox->set_palette (palette);
-
-    // others need this property too ..
-    return false;
-
-  } else if (name == cfg_color_palette) {
-
-    lay::ColorPalette palette = lay::ColorPalette::default_palette ();
-
-    try {
-      //  empty string means: default palette
-      if (! value.empty ()) {
-        palette.from_string (value);
-      }
-    } catch (...) {
-      //  ignore errors: just reset the palette
-      palette = lay::ColorPalette::default_palette ();
-    }
-
-    mp_layer_toolbox->set_palette (palette);
-
-    // others need this property too ..
-    return false;
 
   } else if (name == cfg_mru) {
 
@@ -2391,8 +2334,6 @@ MainWindow::select_view (int index)
 
     view (index)->set_current ();
 
-    mp_layer_toolbox->set_view (current_view ());
-
     if (current_view ()) {
 
       if (box_set) {
@@ -2401,6 +2342,7 @@ MainWindow::select_view (int index)
 
       mp_view_stack->raise_widget (index);
       mp_hp_stack->raise_widget (index);
+      mp_layer_toolbox_stack->raise_widget (index);
       mp_lp_stack->raise_widget (index);
       mp_libs_stack->raise_widget (index);
       mp_eo_stack->raise_widget (index);
@@ -2601,10 +2543,9 @@ MainWindow::clone_current_view ()
 
   mp_views.back ()->view ()->set_current ();
 
-  mp_layer_toolbox->set_view (current_view ());
-
   mp_view_stack->add_widget (view_widget);
   mp_lp_stack->add_widget (view_widget->layer_control_frame ());
+  mp_layer_toolbox_stack->add_widget (view_widget->layer_toolbox_frame ());
   mp_hp_stack->add_widget (view_widget->hierarchy_control_frame ());
   mp_libs_stack->add_widget (view_widget->libraries_frame ());
   mp_eo_stack->add_widget (view_widget->editor_options_frame ());
@@ -2856,6 +2797,7 @@ MainWindow::close_view (int index)
       mp_tab_bar->removeTab (index);
       mp_view_stack->remove_widget (index);
       mp_lp_stack->remove_widget (index);
+      mp_layer_toolbox_stack->remove_widget (index);
       mp_hp_stack->remove_widget (index);
       mp_libs_stack->remove_widget (index);
       mp_eo_stack->remove_widget (index);
@@ -2880,7 +2822,6 @@ MainWindow::close_view (int index)
 
         //  last view closed
 
-        mp_layer_toolbox->set_view (0);
         current_view_changed ();
 
         clear_current_pos ();
@@ -3419,10 +3360,9 @@ MainWindow::create_view ()
   //  add a new tab and make the new view the current one
   mp_views.back ()->view ()->set_current ();
 
-  mp_layer_toolbox->set_view (current_view ());
-
   mp_view_stack->add_widget (mp_views.back ());
   mp_lp_stack->add_widget (mp_views.back ()->layer_control_frame ());
+  mp_layer_toolbox_stack->add_widget (mp_views.back ()->layer_toolbox_frame ());
   mp_hp_stack->add_widget (mp_views.back ()->hierarchy_control_frame ());
   mp_libs_stack->add_widget (mp_views.back ()->libraries_frame ());
   mp_eo_stack->add_widget (mp_views.back ()->editor_options_frame ());
@@ -3483,10 +3423,9 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
 
       mp_views.back ()->view ()->set_current ();
 
-      mp_layer_toolbox->set_view (current_view ());
-
       mp_view_stack->add_widget (mp_views.back ());
       mp_lp_stack->add_widget (mp_views.back ()->layer_control_frame ());
+      mp_layer_toolbox_stack->add_widget (mp_views.back ()->layer_toolbox_frame ());
       mp_hp_stack->add_widget (mp_views.back ()->hierarchy_control_frame ());
       mp_libs_stack->add_widget (mp_views.back ()->libraries_frame ());
       mp_eo_stack->add_widget (mp_views.back ()->editor_options_frame ());

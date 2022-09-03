@@ -62,6 +62,7 @@
 #include "laySelector.h"
 #include "layLayoutCanvas.h"
 #include "layLayerControlPanel.h"
+#include "layLayerToolbox.h"
 #include "layHierarchyControlPanel.h"
 #include "layLibrariesView.h"
 #include "layBrowser.h"
@@ -164,6 +165,11 @@ void LayoutViewWidget::hideEvent (QHideEvent *)
 QWidget *LayoutViewWidget::layer_control_frame ()
 {
   return !mp_view ? 0 : mp_view->layer_control_frame ();
+}
+
+QWidget *LayoutViewWidget::layer_toolbox_frame ()
+{
+  return !mp_view ? 0 : mp_view->layer_toolbox_frame ();
 }
 
 QWidget *LayoutViewWidget::hierarchy_control_frame ()
@@ -345,6 +351,8 @@ LayoutView::init_ui ()
   mp_libraries_view = 0;
   mp_bookmarks_view = 0;
   mp_control_frame = 0;
+  mp_toolbox = 0;
+  mp_toolbox_frame = 0;
   mp_hierarchy_frame = 0;
   mp_libraries_frame = 0;
   mp_bookmarks_frame = 0;
@@ -463,6 +471,18 @@ LayoutView::init_ui ()
       QObject::connect (mp_control_panel, SIGNAL (order_changed ()), mp_connector, SLOT (layer_order_changed ()));
       QObject::connect (mp_control_panel, SIGNAL (current_layer_changed (const lay::LayerPropertiesConstIterator &)), mp_connector, SLOT (current_layer_changed_slot (const lay::LayerPropertiesConstIterator &)));
 
+      mp_toolbox_frame = new QFrame (0);
+      mp_toolbox_frame->setObjectName (QString::fromUtf8 ("lt_frame"));
+      QVBoxLayout *lt_frame_ly = new QVBoxLayout (mp_toolbox_frame);
+      lt_frame_ly->setContentsMargins (0, 0, 0, 0);
+      lt_frame_ly->setSpacing (0);
+
+      mp_toolbox = new lay::LayerToolbox (mp_toolbox_frame, "lt");
+      mp_toolbox->set_view (this);
+      lt_frame_ly->addWidget (mp_toolbox, 0 /*stretch*/);
+
+      QObject::connect (mp_toolbox_frame, SIGNAL (destroyed ()), mp_connector, SLOT (side_panel_destroyed ()));
+
     }
 
     mp_timer = new QTimer (mp_widget);
@@ -505,6 +525,12 @@ void LayoutView::close()
   }
   mp_control_panel = 0;
   mp_control_frame = 0;
+
+  if (mp_toolbox_frame) {
+    delete mp_toolbox_frame;
+  }
+  mp_toolbox = 0;
+  mp_toolbox_frame = 0;
 
   if (mp_hierarchy_frame) {
     delete mp_hierarchy_frame;
@@ -584,6 +610,9 @@ void LayoutView::side_panel_destroyed (QObject *sender)
   } else if (sender == mp_bookmarks_frame) {
     mp_bookmarks_frame = 0;
     mp_bookmarks_view = 0;
+  } else if (sender == mp_toolbox_frame) {
+    mp_toolbox_frame = 0;
+    mp_toolbox = 0;
   }
 }
 
@@ -796,6 +825,69 @@ LayoutView::configure (const std::string &name, const std::string &value)
     }
 
     return true;
+
+  } else if (name == cfg_stipple_palette) {
+
+    lay::StipplePalette palette = lay::StipplePalette::default_palette ();
+
+    try {
+      //  empty string means: default palette
+      if (! value.empty ()) {
+        palette.from_string (value);
+      }
+    } catch (...) {
+      //  ignore errors: just reset the palette
+      palette = lay::StipplePalette::default_palette ();
+    }
+
+    if (mp_toolbox) {
+      mp_toolbox->set_palette (palette);
+    }
+
+    // others need this property too ..
+    return false;
+
+  } else if (name == cfg_line_style_palette) {
+
+    lay::LineStylePalette palette = lay::LineStylePalette::default_palette ();
+
+    try {
+      //  empty string means: default palette
+      if (! value.empty ()) {
+        palette.from_string (value);
+      }
+    } catch (...) {
+      //  ignore errors: just reset the palette
+      palette = lay::LineStylePalette::default_palette ();
+    }
+
+    if (mp_toolbox) {
+      mp_toolbox->set_palette (palette);
+    }
+
+    // others need this property too ..
+    return false;
+
+  } else if (name == cfg_color_palette) {
+
+    lay::ColorPalette palette = lay::ColorPalette::default_palette ();
+
+    try {
+      //  empty string means: default palette
+      if (! value.empty ()) {
+        palette.from_string (value);
+      }
+    } catch (...) {
+      //  ignore errors: just reset the palette
+      palette = lay::ColorPalette::default_palette ();
+    }
+
+    if (mp_toolbox) {
+      mp_toolbox->set_palette (palette);
+    }
+
+    // others need this property too ..
+    return false;
 
   } else {
     return false;

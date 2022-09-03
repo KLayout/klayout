@@ -1047,6 +1047,8 @@ LayerToolbox::panel_button_clicked (int index)
   int h = sizeHint ().height ();
   setMinimumHeight (h);
   setMaximumHeight (h);
+
+  updateGeometry ();
 }
 
 template <class Op>

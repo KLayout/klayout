@@ -75,6 +75,7 @@ namespace lay {
 class LayoutViewWidget;
 class AbstractMenu;
 class LayerControlPanel;
+class LayerToolbox;
 class HierarchyControlPanel;
 class LibrariesView;
 class BookmarksView;
@@ -380,6 +381,14 @@ public:
   }
 
   /**
+   *  @brief Gets the layer toolbox
+   */
+  virtual lay::LayerToolbox *layer_toolbox ()
+  {
+    return mp_toolbox;
+  }
+
+  /**
    *  @brief Resizes the view to the given width and height in pixels
    */
   void resize (unsigned int width, unsigned int height)
@@ -597,7 +606,8 @@ private:
   lay::HierarchyControlPanel *mp_hierarchy_panel;
   lay::LibrariesView *mp_libraries_view;
   lay::BookmarksView *mp_bookmarks_view;
-  QWidget *mp_control_frame, *mp_hierarchy_frame, *mp_libraries_frame, *mp_bookmarks_frame;
+  lay::LayerToolbox *mp_toolbox;
+  QWidget *mp_control_frame, *mp_toolbox_frame, *mp_hierarchy_frame, *mp_libraries_frame, *mp_bookmarks_frame;
   lay::EditorOptionsFrame *mp_editor_options_frame;
   QSpinBox *mp_min_hier_spbx;
   QSpinBox *mp_max_hier_spbx;
@@ -623,6 +633,7 @@ private:
   void do_setup_editor_options_pages ();
 
   QWidget *layer_control_frame () { return mp_control_frame; }
+  QWidget *layer_toolbox_frame () { return mp_toolbox_frame; }
   QWidget *hierarchy_control_frame () { return mp_hierarchy_frame; }
   QWidget *libraries_frame () { return mp_libraries_frame; }
   QWidget *bookmarks_frame () { return mp_bookmarks_frame; }
@@ -726,6 +737,11 @@ public:
    *  @brief Gets the container with the layer control panel
    */
   QWidget *layer_control_frame ();
+
+  /**
+   *  @brief Gets the container with the layer toolbox
+   */
+  QWidget *layer_toolbox_frame ();
 
   /**
    *  @brief Gets the container with the hierarchy control panel

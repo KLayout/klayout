@@ -597,7 +597,7 @@ public:
   /**
    *  @brief Initializes the UI components
    */
-  void init_ui (QWidget *parent);
+  virtual void init_ui (QWidget *parent);
 #endif
 
   /**

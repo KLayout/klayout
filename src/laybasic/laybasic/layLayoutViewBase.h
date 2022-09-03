@@ -2661,6 +2661,14 @@ public:
    */
   void unregister_plugin (lay::Plugin *pi);
 
+  /**
+   *  @brief Gets the options the view was created with
+   */
+  unsigned int options () const
+  {
+    return m_options;
+  }
+
 private:
   //  event handlers used to connect to the layout object's events
   void signal_hier_changed ();
@@ -2828,11 +2836,6 @@ private:
   void merge_dither_pattern (lay::LayerPropertiesList &props);
 
 protected:
-  unsigned int options () const
-  {
-    return m_options;
-  }
-
   lay::Plugin *active_plugin () const
   {
     return mp_active_plugin;

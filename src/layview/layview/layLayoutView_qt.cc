@@ -109,19 +109,35 @@ LayoutViewWidget::LayoutViewWidget (lay::LayoutView *source, db::Manager *mgr, b
 
 LayoutViewWidget::~LayoutViewWidget ()
 {
-  delete mp_view;
+  lay::LayoutView *view = mp_view;
   mp_view = 0;
+  delete view;
+}
+
+void
+LayoutViewWidget::view_deleted (lay::LayoutView *view)
+{
+  if (view != mp_view) {
+    return;
+  }
+
+  //  creates a new view so the view is never invalid
+  mp_view = new LayoutView (view->manager (), view->is_editable (), view->plugin_parent (), this, view->options ());
 }
 
 QSize
 LayoutViewWidget::sizeHint () const
 {
-  return mp_view->size_hint ();
+  return mp_view ? mp_view->size_hint () : QFrame::sizeHint ();
 }
 
 bool
 LayoutViewWidget::eventFilter(QObject *obj, QEvent *event)
 {
+  if (! mp_view) {
+    return QFrame::eventFilter (obj, event);
+  }
+
   bool taken = false;
   bool res = mp_view->event_filter (obj, event, taken);
   if (taken) {
@@ -133,37 +149,41 @@ LayoutViewWidget::eventFilter(QObject *obj, QEvent *event)
 
 void LayoutViewWidget::showEvent (QShowEvent *)
 {
-  mp_view->show_event ();
+  if (mp_view) {
+    mp_view->show_event ();
+  }
 }
 
 void LayoutViewWidget::hideEvent (QHideEvent *)
 {
-  mp_view->hide_event ();
+  if (mp_view) {
+    mp_view->hide_event ();
+  }
 }
 
 QWidget *LayoutViewWidget::layer_control_frame ()
 {
-  return view ()->layer_control_frame ();
+  return !mp_view ? 0 : mp_view->layer_control_frame ();
 }
 
 QWidget *LayoutViewWidget::hierarchy_control_frame ()
 {
-  return view ()->hierarchy_control_frame ();
+  return !mp_view ? 0 : mp_view->hierarchy_control_frame ();
 }
 
 QWidget *LayoutViewWidget::libraries_frame ()
 {
-  return view ()->libraries_frame ();
+  return !mp_view ? 0 : mp_view->libraries_frame ();
 }
 
 QWidget *LayoutViewWidget::bookmarks_frame ()
 {
-  return view ()->bookmarks_frame ();
+  return !mp_view ? 0 : mp_view->bookmarks_frame ();
 }
 
 QWidget *LayoutViewWidget::editor_options_frame ()
 {
-  return view ()->editor_options_frame ();
+  return !mp_view ? 0 : mp_view->editor_options_frame ();
 }
 
 // -------------------------------------------------------------
@@ -458,6 +478,9 @@ LayoutView::init_ui ()
 LayoutView::~LayoutView ()
 {
   close ();
+  if (mp_widget) {
+    mp_widget->view_deleted (this);
+  }
 }
 
 QWidget *LayoutView::widget ()

@@ -799,6 +799,10 @@ signals:
   void layer_order_changed ();
 
 private:
+  friend class LayoutView;
+
+  void view_deleted (lay::LayoutView *view);
+
   LayoutView *mp_view;
 };
 

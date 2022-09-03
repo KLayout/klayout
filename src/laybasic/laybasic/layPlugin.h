@@ -786,6 +786,14 @@ public:
   }
 
   /**
+   *  @brief Gets the plugin parent
+   */
+  Plugin *plugin_parent ()
+  {
+    return mp_parent;
+  }
+
+  /**
    *  @brief Associate a service with the plugin declaration for that service (setter)
    *
    *  The association is done when the plugin is created. It should not be changed.

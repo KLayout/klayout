@@ -1110,10 +1110,10 @@ LayerToolbox::fill_color_changed (QColor c)
     return;
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Change fill color"))); 
+  db::Transaction tr (mp_view->manager (), tl::to_string (QObject::tr ("Change fill color")));
+
   SetColor op (c, 3 /*fill,frame and vertex*/);
   foreach_selected (op);
-  mp_view->manager ()->commit ();
 }
 
 void 
@@ -1123,10 +1123,10 @@ LayerToolbox::frame_color_changed (QColor c)
     return;
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Change frame color"))); 
+  db::Transaction tr (mp_view->manager (), tl::to_string (QObject::tr ("Change frame color")));
+
   SetColor op (c, 1 /*frame and vertex*/);
   foreach_selected (op);
-  mp_view->manager ()->commit ();
 }
 
 struct SetBrightness
@@ -1173,10 +1173,10 @@ LayerToolbox::fill_color_brightness (int delta)
     return;
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Change fill color brightness"))); 
+  db::Transaction tr (mp_view->manager (), tl::to_string (QObject::tr ("Change fill color brightness")));
+
   SetBrightness op (delta, 3 /*fill,frame and vertex*/);
   foreach_selected (op);
-  mp_view->manager ()->commit ();
 }
 
 void 
@@ -1186,10 +1186,10 @@ LayerToolbox::frame_color_brightness (int delta)
     return;
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Change frame color brightness"))); 
+  db::Transaction tr (mp_view->manager (), tl::to_string (QObject::tr ("Change frame color brightness")));
+
   SetBrightness op (delta, 1 /*frame and vertex*/);
   foreach_selected (op);
-  mp_view->manager ()->commit ();
 }
 
 struct SetDither
@@ -1218,9 +1218,8 @@ LayerToolbox::line_styles_changed (const lay::LineStyles &styles)
     return;
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Edit line styles")));
+  db::Transaction tr (mp_view->manager (), tl::to_string (QObject::tr ("Edit line styles")));
   mp_view->set_line_styles (styles);
-  mp_view->manager ()->commit ();
 }
 
 void
@@ -1230,9 +1229,8 @@ LayerToolbox::dither_pattern_changed (const lay::DitherPattern &pattern)
     return;
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Edit stipple pattern"))); 
+  db::Transaction tr (mp_view->manager (), tl::to_string (QObject::tr ("Edit stipple pattern")));
   mp_view->set_dither_pattern (pattern);
-  mp_view->manager ()->commit ();
 }
 
 void
@@ -1242,10 +1240,10 @@ LayerToolbox::dither_changed (int di)
     return;
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Set stipple pattern"))); 
+  db::Transaction tr (mp_view->manager (), tl::to_string (QObject::tr ("Set stipple pattern")));
+
   SetDither op (di);
   foreach_selected (op);
-  mp_view->manager ()->commit ();
 }
 
 struct SetVisible
@@ -1270,15 +1268,10 @@ LayerToolbox::visibility_changed (bool visible)
     return;
   }
 
-  if (visible) {
-    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Show layer"))); 
-  } else {
-    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Hide layer"))); 
-  }
+  db::Transaction tr (mp_view->manager (), tl::to_string (visible ? QObject::tr ("Show layer") : QObject::tr ("Hide layer")));
 
   SetVisible op (visible);
   foreach_selected (op);
-  mp_view->manager ()->commit ();
 }
 
 struct SetTransparency
@@ -1303,10 +1296,10 @@ LayerToolbox::transparency_changed (bool transparent)
     return;
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Change transparency"))); 
+  db::Transaction tr (mp_view->manager (), tl::to_string (QObject::tr ("Change transparency")));
+
   SetTransparency op (transparent);
   foreach_selected (op);
-  mp_view->manager ()->commit ();
 }
 
 struct SetAnimation
@@ -1331,10 +1324,10 @@ LayerToolbox::animation_changed (int mode)
     return;
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Change animation mode"))); 
+  db::Transaction tr (mp_view->manager (), tl::to_string (QObject::tr ("Change animation mode")));
+
   SetAnimation op (mode);
   foreach_selected (op);
-  mp_view->manager ()->commit ();
 }
 
 struct SetWidth
@@ -1359,10 +1352,10 @@ LayerToolbox::width_changed (int width)
     return;
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Change line width"))); 
+  db::Transaction tr (mp_view->manager (), tl::to_string (QObject::tr ("Change line width")));
+
   SetWidth op (width);
   foreach_selected (op);
-  mp_view->manager ()->commit ();
 }
 
 struct SetXFill
@@ -1387,10 +1380,10 @@ LayerToolbox::xfill_changed (bool xf)
     return;
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Change cross fill")));
+  db::Transaction tr (mp_view->manager (), tl::to_string (QObject::tr ("Change cross fill")));
+
   SetXFill op (xf);
   foreach_selected (op);
-  mp_view->manager ()->commit ();
 }
 
 struct SetLineStyle
@@ -1415,10 +1408,10 @@ LayerToolbox::line_style_changed (int ls)
     return;
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Change line style")));
+  db::Transaction tr (mp_view->manager (), tl::to_string (QObject::tr ("Change line style")));
+
   SetLineStyle op (ls);
   foreach_selected (op);
-  mp_view->manager ()->commit ();
 }
 
 struct SetMarked
@@ -1443,10 +1436,10 @@ LayerToolbox::marked_changed (bool marked)
     return;
   }
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Change marked vertices"))); 
+  db::Transaction tr (mp_view->manager (), tl::to_string (QObject::tr ("Change marked vertices")));
+
   SetMarked op (marked);
   foreach_selected (op);
-  mp_view->manager ()->commit ();
 }
 
 void

@@ -1707,9 +1707,8 @@ MainWindow::select_mode (int m)
     std::vector<std::string> items = menu ()->items ("@toolbar");
     for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
       Action *a = menu ()->action (*i);
-      if (a->is_checkable() && a->is_for_mode (m_mode)) {
-        a->set_checked (true);
-        break;
+      if (a->is_checkable()) {
+        a->set_checked (a->is_for_mode (m_mode));
       }
     }
 

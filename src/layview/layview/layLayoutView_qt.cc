@@ -555,6 +555,10 @@ void LayoutView::close()
   }
   mp_bookmarks_frame = 0;
   mp_bookmarks_view = 0;
+
+  if (mp_properties_dialog) {
+    delete mp_properties_dialog.data ();
+  }
 }
 
 void

@@ -38,7 +38,7 @@ namespace lay
 
 static QWidget *parent_widget ()
 {
-  return lay::MainWindow::instance ();
+  return QApplication::activeWindow ();
 }
 
 class BooleanOperationsPlugin

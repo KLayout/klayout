@@ -179,6 +179,7 @@ public:
     LV_NoTracker = 512,
     LV_NoSelection = 1024,
     LV_NoPlugins = 2048,
+    LV_NoPropertiesPopup = 4096,
     LV_NoServices = LV_NoMove + LV_NoTracker + LV_NoSelection + LV_NoPlugins
   };
 

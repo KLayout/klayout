@@ -66,8 +66,10 @@ protected:
   }
 
   void resize_children ();
+  void update_geometry ();
 
   bool event (QEvent *e);
+
 
   std::vector <QWidget *> m_widgets;
   QWidget *mp_current_widget;

@@ -534,6 +534,12 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "\n"
     "This constant has been introduced in version 0.27.\n"
   ) +
+  gsi::constant ("LV_NoPropertiesPopup", (unsigned int) lay::LayoutViewBase::LV_NoPropertiesPopup,
+    "@brief This option disables the properties popup on double click\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "\n"
+    "This constant has been introduced in version 0.28.\n"
+  ) +
   gsi::constant ("LV_NoServices", (unsigned int) lay::LayoutViewBase::LV_NoServices,
     "@brief This option disables all services except the ones for pure viewing\n"
     "Use this value with the constructor's 'options' argument.\n"

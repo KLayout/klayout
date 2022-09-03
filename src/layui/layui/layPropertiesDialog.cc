@@ -29,6 +29,8 @@
 #include "layProperties.h"
 #include "tlExceptions.h"
 
+#include "ui_PropertiesDialog.h"
+
 #include <QStackedLayout>
 
 namespace lay
@@ -38,16 +40,17 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   : QDialog (0 /*parent*/),
     mp_manager (manager), mp_editables (editables), m_index (-1), m_auto_applied (false), m_transaction_id (0)
 {
-  mp_editables->enable_edits (false);
+  mp_ui = new Ui::PropertiesDialog ();
 
   setObjectName (QString::fromUtf8 ("properties_dialog"));
+  mp_ui->setupUi (this);
 
-  Ui::PropertiesDialog::setupUi (this);
+  mp_editables->enable_edits (false);
 
   mp_stack = new QStackedLayout;
 
   for (lay::Editables::iterator e = mp_editables->begin (); e != mp_editables->end (); ++e) {
-    mp_properties_pages.push_back (e->properties_page (mp_manager, content_frame));
+    mp_properties_pages.push_back (e->properties_page (mp_manager, mp_ui->content_frame));
     if (mp_properties_pages.back ()) {
       mp_stack->addWidget (mp_properties_pages.back ());
       connect (mp_properties_pages.back (), SIGNAL (edited ()), this, SLOT (apply ()));
@@ -58,19 +61,19 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   std::reverse (mp_properties_pages.begin (), mp_properties_pages.end ());
 
   //  Add a label as a dummy 
-  QLabel *dummy = new QLabel (QObject::tr ("No object with properties to display"), content_frame);
+  QLabel *dummy = new QLabel (QObject::tr ("No object with properties to display"), mp_ui->content_frame);
   dummy->setAlignment (Qt::AlignHCenter | Qt::AlignVCenter);
   mp_stack->addWidget (dummy);
 
-  content_frame->setLayout (mp_stack);
+  mp_ui->content_frame->setLayout (mp_stack);
 
   //  disable the apply button for first ..
-  apply_to_all_cbx->setEnabled (false);
-  relative_cbx->setEnabled (false);
-  ok_button->setEnabled (false);
+  mp_ui->apply_to_all_cbx->setEnabled (false);
+  mp_ui->relative_cbx->setEnabled (false);
+  mp_ui->ok_button->setEnabled (false);
 
   //  as a proposal, the start button can be enabled in most cases
-  prev_button->setEnabled (true);
+  mp_ui->prev_button->setEnabled (true);
 
   //  count the total number of objects
   m_objects = mp_editables->selection_size ();
@@ -84,40 +87,43 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
     ++m_index;
   }
 
-  prev_button->setEnabled (false);
+  mp_ui->prev_button->setEnabled (false);
 
   //  if at end disable the "Next" button and return (this may only happen at the first call)
   if (m_index >= int (mp_properties_pages.size ())) {
 
-    next_button->setEnabled (false);
+    mp_ui->next_button->setEnabled (false);
     mp_stack->setCurrentWidget (dummy);
-    apply_to_all_cbx->setEnabled (false);
-    apply_to_all_cbx->setChecked (false);
-    relative_cbx->setEnabled (false);
-    relative_cbx->setChecked (false);
-    ok_button->setEnabled (false);
+    mp_ui->apply_to_all_cbx->setEnabled (false);
+    mp_ui->apply_to_all_cbx->setChecked (false);
+    mp_ui->relative_cbx->setEnabled (false);
+    mp_ui->relative_cbx->setChecked (false);
+    mp_ui->ok_button->setEnabled (false);
 
   } else {
 
-    next_button->setEnabled (any_next ());
+    mp_ui->next_button->setEnabled (any_next ());
     mp_properties_pages [m_index]->update ();
     mp_stack->setCurrentWidget (mp_properties_pages [m_index]);
-    apply_to_all_cbx->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
-    apply_to_all_cbx->setChecked (false);
-    relative_cbx->setEnabled (apply_to_all_cbx->isEnabled () && apply_to_all_cbx->isChecked ());
-    relative_cbx->setChecked (true);
-    ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
+    mp_ui->apply_to_all_cbx->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
+    mp_ui->apply_to_all_cbx->setChecked (false);
+    mp_ui->relative_cbx->setEnabled (mp_ui->apply_to_all_cbx->isEnabled () && mp_ui->apply_to_all_cbx->isChecked ());
+    mp_ui->relative_cbx->setChecked (true);
+    mp_ui->ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
 
   }
 
-  connect (ok_button, SIGNAL (clicked ()), this, SLOT (ok_pressed ()));
-  connect (cancel_button, SIGNAL (clicked ()), this, SLOT (cancel_pressed ()));
-  connect (prev_button, SIGNAL (clicked ()), this, SLOT (prev_pressed ()));
-  connect (next_button, SIGNAL (clicked ()), this, SLOT (next_pressed ()));
+  connect (mp_ui->ok_button, SIGNAL (clicked ()), this, SLOT (ok_pressed ()));
+  connect (mp_ui->cancel_button, SIGNAL (clicked ()), this, SLOT (cancel_pressed ()));
+  connect (mp_ui->prev_button, SIGNAL (clicked ()), this, SLOT (prev_pressed ()));
+  connect (mp_ui->next_button, SIGNAL (clicked ()), this, SLOT (next_pressed ()));
 }
 
 PropertiesDialog::~PropertiesDialog ()
 {
+  delete mp_ui;
+  mp_ui = 0;
+
   disconnect ();
 }
 
@@ -166,11 +172,11 @@ BEGIN_PROTECTED
   ++m_current_object;
   update_title ();
 
-  prev_button->setEnabled (true);
-  next_button->setEnabled (any_next ());
-  apply_to_all_cbx->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
-  relative_cbx->setEnabled (apply_to_all_cbx->isEnabled () && apply_to_all_cbx->isChecked ());
-  ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
+  mp_ui->prev_button->setEnabled (true);
+  mp_ui->next_button->setEnabled (any_next ());
+  mp_ui->apply_to_all_cbx->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
+  mp_ui->relative_cbx->setEnabled (mp_ui->apply_to_all_cbx->isEnabled () && mp_ui->apply_to_all_cbx->isChecked ());
+  mp_ui->ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
   mp_properties_pages [m_index]->update ();
 
 END_PROTECTED
@@ -212,11 +218,11 @@ BEGIN_PROTECTED
   --m_current_object;
   update_title ();
 
-  next_button->setEnabled (true);
-  prev_button->setEnabled (any_prev ());
-  apply_to_all_cbx->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
-  relative_cbx->setEnabled (apply_to_all_cbx->isEnabled () && apply_to_all_cbx->isChecked ());
-  ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
+  mp_ui->next_button->setEnabled (true);
+  mp_ui->prev_button->setEnabled (any_prev ());
+  mp_ui->apply_to_all_cbx->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
+  mp_ui->relative_cbx->setEnabled (mp_ui->apply_to_all_cbx->isEnabled () && mp_ui->apply_to_all_cbx->isChecked ());
+  mp_ui->ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
   mp_properties_pages [m_index]->update ();
 
 END_PROTECTED
@@ -274,8 +280,8 @@ BEGIN_PROTECTED
 
   try {
 
-    if (apply_to_all_cbx->isChecked () && mp_properties_pages [m_index]->can_apply_to_all ()) {
-      mp_properties_pages [m_index]->apply_to_all (relative_cbx->isChecked ());
+    if (mp_ui->apply_to_all_cbx->isChecked () && mp_properties_pages [m_index]->can_apply_to_all ()) {
+      mp_properties_pages [m_index]->apply_to_all (mp_ui->relative_cbx->isChecked ());
     } else {
       mp_properties_pages [m_index]->apply ();
     }

@@ -75,6 +75,7 @@
 #include "layEditorOptionsFrame.h"
 #include "layEditorOptionsPages.h"
 #include "layUtils.h"
+#include "layPropertiesDialog.h"
 #include "dbClipboard.h"
 #include "dbLayout.h"
 #include "dbLayoutUtils.h"
@@ -565,6 +566,32 @@ LayoutView::finish ()
     if (mp_widget) {
       menu ()->build (0, 0);
     }
+  }
+}
+
+void
+LayoutView::show_properties ()
+{
+  if ((options () & lay::LayoutViewBase::LV_NoPropertiesPopup) != 0) {
+    return;
+  }
+
+  if (! has_selection ()) {
+    //  try to use the transient selection for the real one
+    transient_to_selection ();
+  }
+
+  //  re-create a new properties dialog
+  if (mp_properties_dialog) {
+    delete mp_properties_dialog.data ();
+  }
+  mp_properties_dialog = new lay::PropertiesDialog (widget (), manager (), this);
+
+  //  if launched from a dialog, do not use "show" as this blocks user interaction
+  if (QApplication::activeModalWidget ()) {
+    mp_properties_dialog->exec ();
+  } else {
+    mp_properties_dialog->show ();
   }
 }
 
@@ -1241,6 +1268,17 @@ LayoutView::set_current_cell_path (int cv_index, const cell_path_type &path)
   } else {
     LayoutViewBase::set_current_cell_path (cv_index, path);
   }
+}
+
+void
+LayoutView::cancel_edits ()
+{
+  //  close the property dialog
+  if (mp_properties_dialog) {
+    mp_properties_dialog->hide ();
+  }
+
+  LayoutViewBase::cancel_edits ();
 }
 
 void

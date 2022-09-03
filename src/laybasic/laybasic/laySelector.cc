@@ -30,7 +30,6 @@
 
 #if defined(HAVE_QT)
 #  include <QMessageBox>
-#  include <QApplication>
 #endif
 
 namespace lay
@@ -185,12 +184,10 @@ SelectionService::mouse_double_click_event (const db::DPoint & /*p*/, unsigned i
     reset_box ();
   }
 
-#if defined(HAVE_QT)
   if (prio && (buttons & lay::LeftButton) != 0) {
-    mp_view->show_properties (QApplication::activeWindow ());
+    mp_view->show_properties ();
     return true;
   }
-#endif
 
   return false;
 }

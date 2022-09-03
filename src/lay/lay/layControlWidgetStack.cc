@@ -68,20 +68,29 @@ void ControlWidgetStack::add_widget(QWidget *w)
     resize (minimumWidth (), height ());
   }
 
+  update_geometry ();
+}
+
+void ControlWidgetStack::update_geometry ()
+{
   if (m_size_follows_content) {
-    updateGeometry ();
+
+    int h = sizeHint ().height ();
+    if (h > 0) {
+      setMinimumHeight (h);
+      setMaximumHeight (h);
+    } else {
+      setMinimumHeight (0);
+      setMaximumHeight (QWIDGETSIZE_MAX);
+    }
+
   }
 }
 
 bool ControlWidgetStack::event(QEvent *e)
 {
   if (e->type () == QEvent::LayoutRequest) {
-    if (m_size_follows_content) {
-      int h = sizeHint ().height ();
-      setMinimumHeight (h);
-      setMaximumHeight (h);
-      updateGeometry ();
-    }
+    update_geometry ();
   }
   return QWidget::event (e);
 }
@@ -115,9 +124,7 @@ void ControlWidgetStack::remove_widget(size_t index)
     mp_bglabel->show ();
   }
 
-  if (m_size_follows_content) {
-    updateGeometry ();
-  }
+  update_geometry ();
 }
 
 void ControlWidgetStack::raise_widget(size_t index)
@@ -142,9 +149,7 @@ void ControlWidgetStack::raise_widget(size_t index)
     mp_bglabel->hide ();
   }
 
-  if (m_size_follows_content) {
-    updateGeometry ();
-  }
+  update_geometry ();
 }
 
 QWidget *ControlWidgetStack::widget(size_t index)

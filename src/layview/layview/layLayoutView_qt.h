@@ -56,6 +56,7 @@
 #include <memory>
 
 #include <QImage>
+#include <QPointer>
 
 class QSpinBox;
 
@@ -87,6 +88,7 @@ class Browser;
 class ColorButton;
 class ConfigureAction;
 class EditorOptionsPages;
+class PropertiesDialog;
 
 /**
  *  @brief An object connecting child widget signals with methods from LayoutView
@@ -454,10 +456,7 @@ public:
   /**
    *  @brief Cancels all edit operations but maintains selection
    */
-  void cancel_edits ()
-  {
-    LayoutViewBase::cancel_edits ();
-  }
+  void cancel_edits ();
 
   /**
    *  @brief Select all levels of hierarchy available
@@ -611,6 +610,7 @@ private:
   lay::EditorOptionsFrame *mp_editor_options_frame;
   QSpinBox *mp_min_hier_spbx;
   QSpinBox *mp_max_hier_spbx;
+  QPointer<lay::PropertiesDialog> mp_properties_dialog;
   bool m_always_show_source;
   bool m_always_show_ld;
   bool m_always_show_layout_index;
@@ -669,6 +669,7 @@ protected:
   virtual void do_change_active_cellview ();
   virtual bool is_activated () const;
   virtual void bookmarks_changed ();
+  virtual void show_properties ();
 
   //  overrides Editables method to display a message
   void signal_selection_changed ();

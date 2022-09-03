@@ -25,10 +25,6 @@
 #include "dbClipboard.h"
 #include "tlAssert.h"
 
-#if defined(HAVE_QT)
-#  include "layPropertiesDialog.h"
-#endif
-
 #include <algorithm>
 #include <memory>
 
@@ -76,21 +72,11 @@ Editable::~Editable ()
 Editables::Editables (db::Manager *manager)
   : db::Object (manager), m_move_selection (false), m_any_move_operation (false)
 {
-#if defined(HAVE_QT)
-  mp_properties_dialog = 0;
-#endif
 }
 
 Editables::~Editables ()
 {
   cancel_edits ();
-
-#if defined(HAVE_QT)
-  if (mp_properties_dialog) {
-    delete mp_properties_dialog;
-    mp_properties_dialog = 0;
-  }
-#endif
 }
 
 void 
@@ -674,36 +660,17 @@ Editables::edit_cancel ()
 void
 Editables::cancel_edits ()
 {
-#if defined(HAVE_QT)
-  //  close the property dialog
-  if (mp_properties_dialog) {
-    mp_properties_dialog->hide ();
-  }
-#endif
-
   //  cancel any edit operations
   for (iterator e = begin (); e != end (); ++e) {
     e->edit_cancel ();
   }
 }
 
-#if defined(HAVE_QT)
 void
-Editables::show_properties (QWidget *parent)
+Editables::show_properties ()
 {
-  if (! has_selection ()) {
-    //  try to use the transient selection for the real one
-    transient_to_selection ();
-  }
-
-  //  re-create a new properties dialog
-  if (mp_properties_dialog) {
-    delete mp_properties_dialog;
-  }
-  mp_properties_dialog = new lay::PropertiesDialog (parent, manager (), this);
-  mp_properties_dialog->show ();
+  //  The default implementation does nothing
 }
-#endif
 
 }
 

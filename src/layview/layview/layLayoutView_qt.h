@@ -619,8 +619,6 @@ private:
 
   void active_library_changed (int index);
   void side_panel_destroyed (QObject *sender);
-  void widget_destroyed (QObject *sender);
-  void app_destroyed ();
   void layer_tab_changed ();
   void layer_order_changed ();
   void min_hier_changed (int i);

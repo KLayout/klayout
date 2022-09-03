@@ -366,8 +366,6 @@ LayoutView::init_ui ()
     canvas ()->init_ui (mp_widget);
 
     mp_connector = new LayoutViewSignalConnector (mp_widget, this);
-    QObject::connect (mp_widget, SIGNAL (destroyed ()), mp_connector, SLOT (widget_destroyed ()));
-    QObject::connect (qApp, SIGNAL (destroyed ()), mp_connector, SLOT (app_destroyed ()));
 
     QVBoxLayout *vbl = new QVBoxLayout (mp_widget);
     vbl->setContentsMargins (0, 0, 0, 0);
@@ -644,19 +642,6 @@ void LayoutView::side_panel_destroyed (QObject *sender)
   } else if (sender == mp_toolbox_frame) {
     mp_toolbox_frame = 0;
     mp_toolbox = 0;
-  }
-}
-
-void LayoutView::app_destroyed ()
-{
-  close ();
-}
-
-void LayoutView::widget_destroyed (QObject *sender)
-{
-  if (sender == mp_widget) {
-    mp_widget = 0;
-    close ();
   }
 }
 

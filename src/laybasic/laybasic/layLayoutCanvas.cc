@@ -291,27 +291,6 @@ LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
     m_do_end_of_drawing_dm (this, &LayoutCanvas::do_end_of_drawing),
     m_image_cache_size (1)
 {
-  tl::Color bg (0xffffffff), fg (0xff000000), active (0xffc0c0c0);
-
-#if defined(HAVE_QT)
-  if (widget ()) {
-
-#if QT_VERSION > 0x050000
-    m_dpr = widget ()->devicePixelRatio ();
-#endif
-
-    widget ()->setObjectName (QString::fromUtf8 ("canvas"));
-    widget ()->setBackgroundRole (QPalette::NoRole);
-
-    bg = tl::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Window).rgb ());
-    fg = tl::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Text).rgb ());
-    active = tl::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Mid).rgb ());
-
-    widget ()->setAttribute (Qt::WA_NoSystemBackground);
-
-  }
-#endif
-
   //  The gamma value used for subsampling: something between 1.8 and 2.2.
   m_gamma = 2.0;
 
@@ -321,6 +300,7 @@ LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
 
   mp_redraw_thread = new lay::RedrawThread (this, view);
 
+  tl::Color bg (0xffffffff), fg (0xff000000), active (0xffc0c0c0);
   set_colors (bg, fg, active);
 }
 
@@ -348,6 +328,32 @@ LayoutCanvas::~LayoutCanvas ()
 
   clear_fg_bitmaps ();
 }
+
+#if defined(HAVE_QT)
+void
+LayoutCanvas::init_ui (QWidget *parent)
+{
+  lay::ViewObjectUI::init_ui (parent);
+
+  if (widget ()) {
+
+#if QT_VERSION > 0x050000
+    m_dpr = widget ()->devicePixelRatio ();
+#endif
+
+    widget ()->setObjectName (QString::fromUtf8 ("canvas"));
+    widget ()->setBackgroundRole (QPalette::NoRole);
+
+    tl::Color bg = tl::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Window).rgb ());
+    tl::Color fg = tl::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Text).rgb ());
+    tl::Color active = tl::Color (widget ()->palette ().color (QPalette::Normal, QPalette::Mid).rgb ());
+    set_colors (bg, fg, active);
+
+    widget ()->setAttribute (Qt::WA_NoSystemBackground);
+
+  }
+}
+#endif
 
 void
 LayoutCanvas::key_event (unsigned int key, unsigned int buttons)

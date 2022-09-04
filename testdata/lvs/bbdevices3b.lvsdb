@@ -293,6 +293,9 @@ xref(
   )
  )
  circuit(BWBTEST BWBTEST nomatch
+  log(
+   entry(error description('No equivalent pin A from reference netlist found in netlist.\nThis is an indication that a physical connection is not made to the subcircuit.'))
+  )
   xref(
    pin(() 0 mismatch)
    pin(0 1 match)

@@ -80,6 +80,26 @@ public:
   ~LoadLayoutOptions ();
 
   /**
+   *  @brief Gets the warning level
+   *
+   *  The warning level is a reader-specific setting which enables or disables warnings
+   *  on specific levels. Level 0 is always "warnings off". The default level is 1
+   *  which means "reasonable warnings emitted".
+   */
+  int warn_level () const
+  {
+    return m_warn_level;
+  }
+
+  /**
+   *  @brief Sets the warning level
+   */
+  void set_warn_level (int w)
+  {
+    m_warn_level = w;
+  }
+
+  /**
    *  @brief Sets specific options for the given format
    *
    *  T is a type derived from FormatSpecificReaderOptions.
@@ -217,6 +237,7 @@ public:
 
 private:
   std::map <std::string, FormatSpecificReaderOptions *> m_options;
+  int m_warn_level;
 
   void release ();
 };

@@ -417,6 +417,12 @@ Z(
   )
  )
  X(INV2 INV2 1
+  L(
+   M(W B('Matching nets $I8 vs. 4 from an ambiguous group of nets'))
+   M(W B('Matching nets $I7 vs. 6 from an ambiguous group of nets'))
+   M(I B('Matching nets $I6 vs. 3 following an ambiguous match'))
+   M(I B('Matching nets $I5 vs. 5 following an ambiguous match'))
+  )
   Z(
    N(5 1 1)
    N(6 2 1)
@@ -435,6 +441,14 @@ Z(
   )
  )
  X(INV3 INV3 1
+  L(
+   M(W B('Matching nets 4 from an ambiguous group of nets'))
+   M(W B('Matching nets 6 from an ambiguous group of nets'))
+   M(W B('Matching nets 8 from an ambiguous group of nets'))
+   M(I B('Matching nets 3 following an ambiguous match'))
+   M(I B('Matching nets 5 following an ambiguous match'))
+   M(I B('Matching nets 7 following an ambiguous match'))
+  )
   Z(
    N(7 1 1)
    N(8 2 1)

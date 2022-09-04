@@ -560,8 +560,8 @@ private:
 // -------------------------------------------------------------------------------
 //  EdgePolygonOp implementation
 
-EdgePolygonOp::EdgePolygonOp (bool outside, bool include_touching, int polygon_mode) 
-  : m_outside (outside), m_include_touching (include_touching),
+EdgePolygonOp::EdgePolygonOp (EdgePolygonOp::mode_t mode, bool include_touching, int polygon_mode)
+  : m_mode (mode), m_include_touching (include_touching),
     m_function (polygon_mode),
     m_wcp_n (0), m_wcp_s (0)
 {
@@ -572,27 +572,30 @@ void EdgePolygonOp::reset ()
   m_wcp_n = m_wcp_s = 0;
 }
 
-bool EdgePolygonOp::select_edge (bool horizontal, property_type p) 
+int EdgePolygonOp::select_edge (bool horizontal, property_type p)
 {
   if (p == 0) {
+    return 0;
+  }
 
-    return false;
+  bool inside;
 
-  } else if (horizontal) {
-
-    bool res;
+  if (horizontal) {
     if (m_include_touching) {
-      res = (m_function (m_wcp_n) || m_function (m_wcp_s));
+      inside = (m_function (m_wcp_n) || m_function (m_wcp_s));
     } else {
-      res = (m_function (m_wcp_n) && m_function (m_wcp_s));
+      inside = (m_function (m_wcp_n) && m_function (m_wcp_s));
     }
-
-    return m_outside ? !res : res;
-
   } else {
+    inside = m_function (m_wcp_n);
+  }
 
-    return m_outside ? !m_function (m_wcp_n) : m_function (m_wcp_n);
-
+  if (m_mode == Inside) {
+    return inside ? 1 : 0;
+  } else if (m_mode == Outside) {
+    return inside ? 0 : 1;
+  } else {
+    return inside ? 1 : 2;
   }
 }
 
@@ -1626,12 +1629,18 @@ public:
 
   void reset ()
   {
+    mp_es->reset_stop ();
     mp_op->reset ();
   }
 
   bool is_reset ()
   {
     return mp_op->is_reset ();
+  }
+
+  bool can_stop ()
+  {
+    return mp_es->can_stop ();
   }
 
   void reserve (size_t n)
@@ -1705,10 +1714,11 @@ public:
 
   void select_edge (const WorkEdge &e)
   {
-    if (mp_op->select_edge (e.dy () == 0, e.prop)) {
-      mp_es->put (e);
+    int tag = mp_op->select_edge (e.dy () == 0, e.prop);
+    if (tag > 0) {
+      mp_es->put (e, (unsigned int) tag);
 #ifdef DEBUG_EDGE_PROCESSOR
-      printf ("put(%s)\n", e.to_string().c_str());
+      printf ("put(%s, %d)\n", e.to_string().c_str(), tag);
 #endif
     }
   }
@@ -1935,6 +1945,19 @@ public:
       }
     }
     return true;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the generator wants to stop
+   */
+  bool can_stop ()
+  {
+    for (std::vector<EdgeProcessorState>::iterator s = m_states.begin (); s != m_states.end (); ++s) {
+      if (s->can_stop ()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -2410,7 +2433,7 @@ EdgeProcessor::redo_or_process (const std::vector<std::pair<db::EdgeSink *, db::
   y = edge_ymin ((*mp_work_edges) [0]);
 
   future = mp_work_edges->begin ();
-  for (std::vector <WorkEdge>::iterator current = mp_work_edges->begin (); current != mp_work_edges->end (); ) {
+  for (std::vector <WorkEdge>::iterator current = mp_work_edges->begin (); current != mp_work_edges->end () && ! gs.can_stop (); ) {
 
     if (m_report_progress) {
       double p = double (std::distance (mp_work_edges->begin (), current)) / double (mp_work_edges->size ());

@@ -29,6 +29,11 @@ class DBReaders_TestClass < TestBase
   def test_common_options
 
     opt = RBA::LoadLayoutOptions::new
+
+    assert_equal(opt.warn_level, 1)
+    opt.warn_level = 2
+    assert_equal(opt.warn_level, 2)
+
     lm = RBA::LayerMap::new
     lm.map(RBA::LayerInfo::new(1, 0), 2, RBA::LayerInfo::new(42, 17))
     opt.set_layer_map(lm, true)

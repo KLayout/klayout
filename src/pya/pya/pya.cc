@@ -38,6 +38,7 @@
 #include "tlTimer.h"
 #include "tlFileUtils.h"
 #include "tlString.h"
+#include "tlInternational.h"
 
 #if defined(HAVE_QT)
 #  include <QCoreApplication>
@@ -50,6 +51,21 @@
 
 namespace pya
 {
+
+// --------------------------------------------------------------------------
+//  PythonError implementation
+
+PythonError::PythonError (const char *msg, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
+  : tl::ScriptError (msg, cls, backtrace)
+{ }
+
+PythonError::PythonError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
+  : tl::ScriptError (msg, sourcefile, line, cls, backtrace)
+{ }
+
+PythonError::PythonError (const PythonError &d)
+  : tl::ScriptError (d)
+{ }
 
 // --------------------------------------------------------------------------
 

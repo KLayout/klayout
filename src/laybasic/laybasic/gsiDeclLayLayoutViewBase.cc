@@ -33,13 +33,6 @@
 #include "dbLayoutVsSchematic.h"
 #include "tlStream.h"
 
-#if defined(HAVE_QTBINDINGS)
-# include "gsiQtGuiExternals.h"
-# include "gsiQtWidgetsExternals.h"  // for Qt5
-#else
-# define QT_EXTERNAL_BASE(x)
-#endif
-
 namespace gsi
 {
 
@@ -466,11 +459,7 @@ static lay::AbstractMenu *menu (lay::LayoutViewBase *view)
   return view->menu ();
 }
 
-#if defined(HAVE_QT)
-LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutViewBase",
-#else
-LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutViewBase",
-#endif
+LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutViewBase",
   gsi::constant ("LV_NoLayers", (unsigned int) lay::LayoutViewBase::LV_NoLayers,
     "@brief With this option, no layers view will be provided (see \\layer_control_frame)\n"
     "Use this value with the constructor's 'options' argument.\n"
@@ -544,6 +533,12 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (QT_EXTERNAL_BASE
     "Use this value with the constructor's 'options' argument.\n"
     "\n"
     "This constant has been introduced in version 0.27.\n"
+  ) +
+  gsi::constant ("LV_NoPropertiesPopup", (unsigned int) lay::LayoutViewBase::LV_NoPropertiesPopup,
+    "@brief This option disables the properties popup on double click\n"
+    "Use this value with the constructor's 'options' argument.\n"
+    "\n"
+    "This constant has been introduced in version 0.28.\n"
   ) +
   gsi::constant ("LV_NoServices", (unsigned int) lay::LayoutViewBase::LV_NoServices,
     "@brief This option disables all services except the ones for pure viewing\n"

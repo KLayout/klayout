@@ -914,10 +914,10 @@ LEFDEFReaderState::common_reader_error (const std::string &msg)
 }
 
 void
-LEFDEFReaderState::common_reader_warn (const std::string &msg)
+LEFDEFReaderState::common_reader_warn (const std::string &msg, int warn_level)
 {
   if (mp_importer) {
-    mp_importer->warn (msg);
+    mp_importer->warn (msg, warn_level);
   }
 }
 
@@ -1902,11 +1902,12 @@ LEFDEFReaderState::macro_cell (const std::string &mn, Layout &layout, const std:
 // -----------------------------------------------------------------------------------
 //  LEFDEFImporter implementation
 
-LEFDEFImporter::LEFDEFImporter ()
+LEFDEFImporter::LEFDEFImporter (int warn_level)
   : mp_progress (0), mp_stream (0), mp_reader_state (0),
     m_produce_net_props (false), m_net_prop_name_id (0),
     m_produce_inst_props (false), m_inst_prop_name_id (0),
-    m_produce_pin_props (false), m_pin_prop_name_id (0)
+    m_produce_pin_props (false), m_pin_prop_name_id (0),
+    m_warn_level (warn_level)
 {
   //  .. nothing yet ..
 }
@@ -1993,8 +1994,12 @@ LEFDEFImporter::error (const std::string &msg)
 }
 
 void 
-LEFDEFImporter::warn (const std::string &msg)
+LEFDEFImporter::warn (const std::string &msg, int wl)
 {
+  if (m_warn_level < wl) {
+    return;
+  }
+
   tl::warn << msg 
            << tl::to_string (tr (" (line=")) << mp_stream->line_number ()
            << tl::to_string (tr (", cell=")) << m_cellname

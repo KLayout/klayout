@@ -177,7 +177,7 @@ extended_edge (const db::Edge &edge, db::Coord ext_b, db::Coord ext_e, db::Coord
 // -------------------------------------------------------------------------------------------------------------
 //  EdgeSegmentSelector processor
 
-EdgeSegmentSelector::EdgeSegmentSelector (int mode, db::Edges::length_type length, double fraction)
+EdgeSegmentSelector::EdgeSegmentSelector (int mode, Edge::distance_type length, double fraction)
   : m_mode (mode), m_length (length), m_fraction (fraction)
 { }
 
@@ -272,6 +272,98 @@ EdgeOrientationFilter::selected (const db::Edge &edge) const
   } else {
     return m_checker (db::Vector (edge.ortho_length (), 0), edge.d ()) != m_inverse;
   }
+}
+
+// -------------------------------------------------------------------------------------------------------------
+//  Edge to Edge relation implementation
+
+bool edge_interacts (const db::Edge &a, const db::Edge &b)
+{
+  return a.intersect (b);
+}
+
+bool edge_is_inside (const db::Edge &a, const db::Edge &b)
+{
+  return b.contains (a.p1 ()) && b.contains (a.p2 ());
+}
+
+bool edge_is_outside (const db::Edge &a, const db::Edge &b)
+{
+  if (a.parallel (b)) {
+    return ! a.coincident (b);
+  } else {
+    auto pt = a.intersect_point (b);
+    if (! pt.first) {
+      //  no intersection -> outside
+      return true;
+    }
+    return ! b.contains_excl (pt.second) || ! a.contains_excl (pt.second);
+  }
+}
+
+// -------------------------------------------------------------------------------------------------------------
+//  Edge to Polygon relation implementation
+
+bool edge_interacts (const db::Edge &a, const db::Polygon &b)
+{
+  return db::interact (b, a);
+}
+
+namespace {
+
+struct DetectTagEdgeSink
+  : public db::EdgeSink
+{
+  DetectTagEdgeSink (int tag)
+    : fail_tag (tag), result (true) { }
+
+  virtual void put (const db::Edge &, int tag)
+  {
+    if (tag == fail_tag) {
+      result = false;
+      request_stop ();
+    }
+  }
+
+  int fail_tag;
+  bool result;
+};
+
+}
+
+static bool
+edge_is_inside_or_outside (bool outside, const db::Edge &a, const db::Polygon &b)
+{
+  db::EdgeProcessor ep;
+  ep.insert (b, 0);
+
+  ep.insert (a, 1);
+
+  DetectTagEdgeSink es (outside ? 1 : 2);   //  2 is the "outside" tag in "Both" mode -> this makes inside fail
+  db::EdgePolygonOp op (db::EdgePolygonOp::Both, true /*include borders*/);
+  ep.process (es, op);
+
+  return es.result;
+}
+
+bool edge_is_inside (const db::Edge &a, const db::Polygon &b)
+{
+  //  shortcuts
+  if (!a.bbox ().inside (b.box ())) {
+    return false;
+  }
+
+  return edge_is_inside_or_outside (false, a, b);
+}
+
+bool edge_is_outside (const db::Edge &a, const db::Polygon &b)
+{
+  //  shortcuts
+  if (! a.bbox ().overlaps (b.box ())) {
+    return true;
+  }
+
+  return edge_is_inside_or_outside (true, a, b);
 }
 
 }

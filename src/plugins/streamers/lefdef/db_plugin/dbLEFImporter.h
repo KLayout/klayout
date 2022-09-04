@@ -50,7 +50,7 @@ public:
   /**
    *  @brief Default constructor
    */
-  LEFImporter ();
+  LEFImporter (int warn_level);
 
   /**
    *  @brief Destructor

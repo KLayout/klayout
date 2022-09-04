@@ -57,6 +57,7 @@ class LAYUI_PUBLIC NetlistBrowserTreeModel
 Q_OBJECT
 
 public:
+  NetlistBrowserTreeModel (QWidget *parent, db::Netlist *netlist);
   NetlistBrowserTreeModel (QWidget *parent, db::LayoutToNetlist *l2ndb);
   NetlistBrowserTreeModel (QWidget *parent, db::LayoutVsSchematic *lvsdb);
   ~NetlistBrowserTreeModel ();

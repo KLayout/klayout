@@ -60,6 +60,7 @@ public:
   D25View (lay::Dispatcher *root, lay::LayoutViewBase *view);
   ~D25View ();
 
+  virtual bool configure (const std::string &name, const std::string &value);
   virtual void menu_activated (const std::string &symbol);
   virtual void deactivated ();
   virtual void activated ();

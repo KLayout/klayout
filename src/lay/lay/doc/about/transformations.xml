@@ -4,6 +4,7 @@
 <doc>
 
   <title>Transformations in KLayout</title>
+  <keyword name="transformation"/>
 
   <p>
   KLayout supports a subset of affine transformations with the following contributions:
@@ -37,7 +38,9 @@
   given displacement vector.
   </p>
 
+  <p>
   <img src="/about/transformation_overview.png"/>
+  </p>
 
   <p>
   The notation shown here is used in many places within KLayout. It is basically composed of the following parts
@@ -75,12 +78,169 @@
   multiples of 90 degree:
   </p>
 
+  <p>
   <img src="/about/transformation_basic.png"/>
+  </p>
 
   <p>
   KLayout is not restricted to these basic operations. Arbitrary angles are supported (i.e. "r45" or "m22.5"). Usually however,
   this implies grid snapping and other issues. This also is true for arbitrary scaling values. KLayout is also more effective when using
   simple transformations involving only rotations by multiples of 90 degree and do not use scaling.
+  </p>
+
+  <h2>Coding transformations</h2>
+  <keyword name="transformation objects"/>
+
+  <p>
+  Note that mirroring at an axis with a given angle "a" is equivalent to mirroring at the x axis followed by a rotation
+  by twice the angle "a". For example:
+  </p>
+
+  <pre>m45 == m0 followed by r90</pre>
+
+  <p>
+  When coding transformations, two parameters are used to represent the rotation/mirror part: 
+  a rotation angle and a flag indicating mirroring at the x axis. The mirroring is applied before
+  the rotation. In terms of these parameters, the basic transformations are:
+  </p>
+
+  <table>
+    <tr><th>Rotation angle<br/>(degree)</th><th>Mirror flag <br/>= False</th><th>Mirror flag <br/>= True</th></tr>
+    <tr><td>0</td><td>r0</td><td>m0</td></tr>
+    <tr><td>90</td><td>r90</td><td>m45</td></tr>
+    <tr><td>180</td><td>r180</td><td>m90</td></tr>
+    <tr><td>270</td><td>r270</td><td>m135</td></tr>
+  </table>
+
+  <h3>Transformation objects</h3>
+
+  <p>
+  Transformation objects are convenient objects to operate with. They represent a 
+  transformation (technically a matrix) consisting of an angle/mirror and a displacement 
+  part. They support some basic operations:
+  </p>
+
+  <ul>
+    <li>Concatenation: <tt>T = T1 * T2</tt><br/><tt>T</tt> is transformation <tt>T2</tt> applied, then <tt>T1</tt> (note this order)</li>
+    <li>Inversion: <tt>TI = T.inverted()</tt><br/><tt>TI</tt> is the inverse of <tt>T</tt>, i.e. <tt>TI * T = T * TI = 1</tt> where <tt>1</tt> is the neutral transformation which does not modify coordinates</li>
+    <li>Application to geometrical objects: <tt>q = T * p</tt><br/>where <tt>p</tt> is a box, polygon, path, text, point, vector etc. and <tt>q</tt> is the transformed object</li>
+  </ul>
+
+  <h3>Vectors and Points</h3>
+  <keyword name="vector"/>
+  <keyword name="point"/>
+
+  <p>
+  In KLayout there are two two-dimensional coordinate objects: the vector and the point.
+  Basically, the vector is the difference between two points:
+  </p>
+
+  <pre>v = p2 - p1</pre>
+
+  <p>Here <tt>v</tt> is a vector object while <tt>p1</tt> and <tt>p2</tt> are points.</p>
+
+  <p>
+  Regarding transformations, vectors and points behave differently. While for a point, the
+  displacement is applied, it is not for vectors. So 
+  </p>
+
+  <pre>p' = T * p = M * p + d
+v' = T * v = M * v</pre>
+
+  <p>
+  Here <tt>M</tt> is the 2x2 rotation/mirror matrix part of the transformation and <tt>d</tt> is the
+  displacement vector
+  </p>
+
+  <p>
+  The reason why the displacement is not applied to a vector is seen here:
+  </p>
+
+  <pre>
+ v' = T * v 
+    = T * (p2 - p1) 
+    = T * p2 - T * p1
+    = (M * p2 + d) - (M * p1 + d)
+    = M * p2 + d - M * p1 - d
+    = M * p2 - M * p1 
+    = M * (p2 - p1)</pre>
+
+  <p>where the latter simply is:</p>
+
+  <pre>v' = M * v</pre>
+
+  <h3>Simple transformations</h3>
+  <keyword name="simple transformation"/>
+  <keyword name="Trans"/>
+  <keyword name="DTrans"/>
+
+  <p>
+  Simple transformations are represented by <class_doc href="DTrans"/> or <class_doc href="Trans"/> objects.
+  The first operates with floating-point displacements in units of micrometers while the second one with integer displacements
+  in database units. "DTrans" objects act on "D" type floating-point coordinate shapes (e.g. <class_doc href="DBox"/>) while "Trans" objects act
+  on the integer coordinate shapes (e.g. <class_doc href="Box"/>).
+  </p>
+  
+  <p>
+  The basic construction parameters of "DTrans" and "Trans" are:
+  </p>
+
+  <pre>Trans(angle, mirror, displacement)
+DTrans(angle, mirror, displacement)</pre>
+
+  <p>"displacement" is a <class_doc href="DVector"/> (for DTrans) or a <class_doc href="Vector"/> (for Trans).</p>
+
+  <p>"angle" is the rotation angle in units of 90 degree and "mirror" is the mirror flag:</p>
+
+  <table>
+    <tr><th>angle</th><th>mirror <br/>= False</th><th>mirror <br/>= True</th></tr>
+    <tr><td>0</td><td>r0</td><td>m0</td></tr>
+    <tr><td>1</td><td>r90</td><td>m45</td></tr>
+    <tr><td>2</td><td>r180</td><td>m90</td></tr>
+    <tr><td>3</td><td>r270</td><td>m135</td></tr>
+  </table>
+
+  <h3>Complex transformations</h3>
+  <keyword name="complex transformation"/>
+  <keyword name="CplxTrans"/>
+  <keyword name="ICplxTrans"/>
+  <keyword name="DCplxTrans"/>
+  <keyword name="VCplxTrans"/>
+
+  <p>
+  Complex transformations in addition to the simple transformations feature 
+  scaling (magnification) and arbitrary rotation angles. Other than simple transformations
+  they do not necessarily preserve a grid and rounding is implied. Furthermore they imply a shift is physical scale
+  which renders them difficult to use in physical frameworks (e.g. DRC). Hence their 
+  use is discouraged for certain applications.
+  </p>
+
+  <p>
+  The basic classes are <class_doc href="DCplxTrans"/> for the micrometer-unit (floating-point) version
+  and <class_doc href="ICplxTrans"/> for the database-unit (integer) version. The 
+  construction parameters are:
+  </p>
+
+  <pre>ICplxTrans(angle, mirror, magnification, displacement)
+DCplxTrans(angle, mirror, magnification, displacement)</pre>
+
+  <p>
+  Here, "angle" is the rotation angle in degree (note the difference to "Trans" and "DTrans" where the 
+  rotation angle is in units for 90 degree. "magnification" is a factor (1.0 for "no change in scale").
+  </p>
+
+  <p>
+  There are two other variants useful for transforming coordinate systems: <class_doc href="CplxTrans"/> takes
+  integer-unit objects and converts them to floating-point unit objects. It can be used to convert
+  from database units to micrometer units when configured with a magnification equal to the database unit value:
+  </p>
+
+  <pre>T = CplxTrans(magnification: dbu)
+q = T * p</pre>
+
+  <p>
+  The other variant is <class_doc href="VCplxTrans"/> which converts floating-point unit objects
+  to integer-unit ones. These objects are generated when inverting "CplxTrans" objects.
   </p>
 
 </doc>

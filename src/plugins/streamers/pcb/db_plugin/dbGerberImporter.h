@@ -184,7 +184,7 @@ public:
   /**
    *  @brief Constructor
    */
-  GerberFileReader ();
+  GerberFileReader (int warn_level);
 
   /**
    *  @brief Destructor
@@ -405,7 +405,7 @@ protected:
   /**
    *  @brief Issue a warning
    */
-  void warn (const std::string &warning);
+  void warn (const std::string &warning, int warn_level = 1);
 
   /**
    *  @brief Issue a non-fatal error
@@ -597,6 +597,7 @@ private:
   tl::TextInputStream *mp_stream;
   tl::AbsoluteProgress m_progress;
   std::list<GraphicsState> m_graphics_stack;
+  int m_warn_level;
 
   void process_clear_polygons ();
   void swap_graphics_state (GraphicsState &state);
@@ -775,7 +776,7 @@ public:
   /**
    *  @brief Default constructor
    */
-  GerberImporter ();
+  GerberImporter (int warn_level = 1);
 
   /**
    *  @brief Scans the given file and extracts the metadata from it
@@ -1043,6 +1044,7 @@ private:
   bool m_invert_negative_layers;
   double m_border;
   int m_circle_points;
+  int m_warn_level;
   std::string m_format_string;
   std::string m_layer_styles;
   std::string m_dir;

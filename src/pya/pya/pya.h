@@ -77,17 +77,9 @@ class PYA_PUBLIC PythonError
   : public tl::ScriptError
 {
 public:
-  PythonError (const char *msg, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
-    : tl::ScriptError (msg, cls, backtrace)
-  { }
-
-  PythonError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
-    : tl::ScriptError (msg, sourcefile, line, cls, backtrace)
-  { }
-
-  PythonError (const PythonError &d)
-    : tl::ScriptError (d)
-  { }
+  PythonError (const char *msg, const char *cls, const std::vector <tl::BacktraceElement> &backtrace);
+  PythonError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector <tl::BacktraceElement> &backtrace);
+  PythonError (const PythonError &d);
 };
 
 class PythonModule;

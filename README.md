@@ -11,12 +11,12 @@ For more details see http://www.klayout.org.
 
 Building on Linux:
 
-* Qt 4.7 or later (4.6 with some restrictions) or Qt 5
+* Qt 4.7 or later (4.6 with some restrictions), Qt 5 or Qt 6
 * gcc 4.6 or later or clang 3.8 or later
 
 Building on Windows with MSYS2:
 
-* MSYS2 with gcc, Qt4 or 5, zlib, ruby and python packages installed
+* MSYS2 with gcc, Qt4, 5 or 6, zlib, ruby and python packages installed
 
 Building on Windows with MSVC 2017:
 
@@ -34,13 +34,9 @@ For more build instructions see http://www.klayout.de/build.html.
 
 ## Building instructions (Linux)
 
-### Plain building for Qt4
+### Plain building for Qt4, Qt5 and Qt6 (one Qt version installed)
 
     ./build.sh
-
-### Plain building for Qt5
-
-    ./build.sh -qt5
 
 ### Building without Qt binding
 

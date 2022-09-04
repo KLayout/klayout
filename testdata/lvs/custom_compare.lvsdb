@@ -100,6 +100,10 @@ reference(
 # Cross reference
 xref(
  circuit(TOP TOP match
+  log(
+   entry(warning description('Matching nets $13 vs. R1 from an ambiguous group of nets'))
+   entry(warning description('Matching nets $14 vs. R2 from an ambiguous group of nets'))
+  )
   xref(
    net(1 1 warning)
    net(2 2 warning)

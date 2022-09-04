@@ -59,6 +59,8 @@ CIFReader::~CIFReader ()
 const LayerMap &
 CIFReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
+  init (options);
+
   const db::CIFReaderOptions &specific_options = options.get_options<db::CIFReaderOptions> ();
   m_wire_mode = specific_options.wire_mode;
   m_dbu = specific_options.dbu;
@@ -88,8 +90,12 @@ CIFReader::error (const std::string &msg)
 }
 
 void 
-CIFReader::warn (const std::string &msg) 
+CIFReader::warn (const std::string &msg, int wl)
 {
+  if (warn_level () < wl) {
+    return;
+  }
+
   // TODO: compress
   tl::warn << msg 
            << tl::to_string (tr (" (line=")) << m_stream.line_number ()

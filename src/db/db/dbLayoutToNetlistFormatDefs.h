@@ -46,55 +46,76 @@ namespace db
  *  The file follows the declaration-before-use principle
  *  (circuits before subcircuits, nets before use ...)
  *
- *  Global statements:
+ *  Main body:
+ *    [version|description|unit|top|layer|connect|global|circuit|class|device|any]*
  *
+ *  [version]:
  *    version(<number>)             - file format version [short key: V]
+ *
+ *  [description]:
  *    description(<text>)           - an arbitrary description text [short key: B]
+ *
+ *  [unit]:
  *    unit(<unit>)                  - specifies the database unit [short key: U]
+ *
+ *  [top]:
  *    top(<circuit>)                - specifies the name of the top circuit [short key: W]
+ *
+ *  [layer]:
  *    layer(<name> <source-spec>?)  - define a layer [short key: L]
+ *
+ *  [connect]:
  *    connect(<layer1> <name> ...)  - connects layer1 with the following layers [short key: C]
+ *
+ *  [global]:
  *    global(<layer> <net-name> ...)
  *                                  - connects the shapes of the layer with the given global
  *                                    nets [short key: G]
+ *
+ *  [circuit]:
  *    circuit(<name> [circuit-def]) - circuit (cell) [short key: X]
+ *
+ *  [class]:
  *    class(<name> <template> [template-def])  - a device class definition (template: RES,CAP,...) [short key: K]
- *    device(<name> <class> [device-abstract-def])
+ *
+ *  [device]:
+ *    device(<name> <class> [device-abstract-terminal|any]*)
  *                                  - device abstract [short key: D]
  *
  *  [circuit-def]:
+ *    [boundary|property|circuit-net|circuit-pin|circuit-device|subcircuit|any]*
  *
- *    [boundary-def]
- *
- *    [property-def]*
- *
- *    net(<id> [name]? [property-def]* [geometry-def]*)
+ *  [circuit-net]:
+ *    net(<id> [name]? [geometries-def])
  *                                  - net geometry [short key: N]
  *                                    A net declaration shall be there also if no geometry
  *                                    is present. The ID is a numerical shortcut for the net.
+ *
+ *  [circuit-pin]:
  *    pin(<net-id> [name]?)         - outgoing pin connection [short key: P]
  *                                    Statement order specifies pin order.
- *    device(<id> <abstract-or-class> [name]? [combined-device]* [terminal-route]* [device-def])
+ *
+ *  [circuit-device]:
+ *    device(<id> <abstract-or-class> [name|trans|combined-device|terminal-route|param|device-terminal|any]*)
  *                                  - device with connections [short key: D]
- *    circuit(<id> [name]? [subcircuit-def])
+ *
+ *  [subcircuit]:
+ *    circuit(<id> [name]? [property|trans|subcircuit-pin|any])
  *                                  - subcircuit with connections [short key: X]
  *
- *  [boundary-def]:
- *
- *    polygon([coord] ...)          - defines a polygon [short key: Q]
+ *  [boundary]:
+ *    polygon([coord] ...) |        - defines a polygon [short key: Q]
  *                                    "*" for <x> or <y> means take previous
  *    rect([coord] [coord])         - defines a rectangle [short key: R]
  *                                    coordinates are bottom/left and top/right
  *
  *  [combined-device]:
- *
- *    device(<abstract> [trans-def])
+ *    device(<abstract> [trans])
  *                                  - specifies an additional device component
  *                                    (for combined devices) with abstract <abstract>
  *                                    and offset dx, dy.
  *
  *  [terminal-route]:
- *
  *    connect(<device-index> <outer-terminal-name> <inner-terminal-name>)
  *                                  - connects the outer terminal with the terminal
  *                                    of the device component with <device-index>:
@@ -102,68 +123,70 @@ namespace db
  *                                    device etc.
  *
  *  [name]:
- *
  *    name(<name>)                  - specify net name [short key: I]
  *
- *  [property-def]:
+ *  [geometries-def]:
+ *    [property|polygon|rect|text|any]*
  *
+ *  [property]:
  *    property(<prop-name> <prop-value>)
  *                                  - specifies a property value/key pair [short key: F]
  *                                    prop-name and prop-value are variant specifications
  *                                    in klayout notation: #x is an integer, ##y a floating-point
  *                                    value, a word or quoted literal is a string.
  *
- *  [geometry-def]:
- *
+ *  [polygon]:
  *    polygon(<layer> [coord] ...)  - defines a polygon [short key: Q]
  *                                    "*" for <x> or <y> means take previous
+ *
+ *  [rect]:
  *    rect(<layer> [coord] [coord]) - defines a rectangle [short key: R]
  *                                    coordinates are bottom/left and top/right
+ *
+ *  [text]:
  *    text(<layer> [text] [coord])  - defines a rectangle [short key: J]
  *
- *  [coord]
- *
+ *  [coord]:
  *    <x> <y>                       - absolute coordinates
  *    (<x> <y>)                     - relative coordinates (reference is reset to 0,0
  *                                    for each net or terminal in device abstract)
  *
  *  [template-def]:
+ *    [template-param|template-terminal|any]*
  *
+ *  [template-param]:
  *    param(<name> <primary>? <default-value>*)    - defines a template parameter [short key: E]
  *                                    ('primary' is a value: 0 or 1)
+ *
+ *  [template-terminal]:
  *    terminal(<name>)              - defines a terminal [short key: T]
  *
- *  [device-abstract-def]:
- *
- *    [device-abstract-terminal-def]*
- *
- *  [device-abstract-terminal-def]:
- *
- *    terminal(<terminal-name> [geometry-def]*)
+ *  [device-abstract-terminal]:
+ *    terminal(<terminal-name> [geometries-def])
  *                                  - specifies the terminal geometry [short key: T]
  *
- *  [device-def]:
- *
- *    [property-def]*               - user properties
- *    [trans-def]                   - location of the device
- *                                    must be before terminal
+ *  [param]:
  *    param(<name> <value>)         - defines a parameter [short key: E]
+ *
+ *  [device-terminal]:
  *    terminal(<terminal-name> <net-id>)
- *                                  - specifies connection of the terminal with
- *                                    a net (short key: T)
+ *                                  - specifies connection of the terminal with a net (short key: T)
  *
- *  [subcircuit-def]:
- *
- *    [property-def]*               - user properties
- *    [trans-def]                   - location of the subcircuit
+ *  [subcircuit-pin]:
  *    pin(<pin-id> <net-id>)        - specifies connection of the pin with a net [short key: P]
  *
- *  [trans-def]:
- *
+ *  [trans]:
  *    location(<x> <y>)             - location of the instance [short key: Y]
  *    rotation(<angle>)             - rotation angle (in degree, default is 0) [short key: O]
  *    mirror                        - if specified, the instance is mirrored before rotation [short key: M]
  *    scale(<mag>)                  - magnification (default is 1) [short key: S]
+ *
+ *  [any]:
+ *    * |
+ *    <token> |
+ *    <token> ( [any]* ) |
+ *    <float> |
+ *    <quoted-string>
  */
 
 namespace l2n_std_format

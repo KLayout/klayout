@@ -61,7 +61,7 @@ join_layer_names (std::string &s, const std::string &n)
 //  ReaderBase implementation
 
 ReaderBase::ReaderBase () 
-  : m_warnings_as_errors (false)
+  : m_warnings_as_errors (false), m_warn_level (1)
 { 
 }
 
@@ -73,6 +73,12 @@ void
 ReaderBase::set_warnings_as_errors (bool f)
 {
   m_warnings_as_errors = f;
+}
+
+void
+ReaderBase::init (const db::LoadLayoutOptions &options)
+{
+  m_warn_level = options.warn_level ();
 }
 
 // ---------------------------------------------------------------
@@ -91,7 +97,13 @@ Reader::Reader (tl::InputStream &stream)
   }
 
   if (! mp_actual_reader) {
-    throw db::ReaderException (tl::to_string (tr ("Stream has unknown format: ")) + stream.source ());
+
+    m_stream.reset ();
+    std::string head = m_stream.read_all (4000);
+    bool has_more (m_stream.get (1) != 0);
+
+    throw db::ReaderUnknownFormatException (tl::to_string (tr ("Stream has unknown format: ")) + stream.source (), head, has_more);
+
   }
 }
 

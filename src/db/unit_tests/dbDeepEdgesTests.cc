@@ -590,3 +590,595 @@ TEST(10_PullInteracting)
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au10.gds");
 }
 
+TEST(11_SelectedInsideWithRegion)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (100, 0, 100, 3000));
+  e.insert (db::Edge (1100, -1000, 1100, 2000));
+  e.insert (db::Edge (1200, -1000, 1200, 0));
+  e.insert (db::Edge (1300, -800, 1300, -200));
+  e.insert (db::Edge (1400, 1000, 1400, 1100));
+  e.insert (db::Edge (1500, 1000, 1500, 2100));
+  e.insert (db::Edge (1600, -800, 1600, -400));
+  e.insert (db::Edge (1600, -400, 1600, -200));
+  e.insert (db::Edge (1700, 1500, 1600, 2500));
+  e.insert (db::Edge (1800, 2500, 1800, 3500));
+  e.insert (db::Edge (1900, 1000, 1900, 2000));
+  e.insert (db::Edge (-1500, 0, -1500, 1000));
+
+  db::Region r;
+  r.insert (db::Box (0, -1000, 2000, 0));
+  r.insert (db::Box (1000, 1000, 2000, 1500));
+  r.insert (db::Box (1000, 1500, 2000, 2000));
+
+  //  make deep
+
+  db::DeepShapeStore dss;
+
+  db::Layout ly;
+  ly.add_cell ("TOP");
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  e.insert_into (&ly, top_cell.cell_index (), l1);
+  db::Edges eflat = e;
+  e = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+
+  r.insert_into (&ly, top_cell.cell_index (), l2);
+  db::Region rflat = r;
+  r = db::Region (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  EXPECT_EQ (db::compare (e.selected_inside (db::Region ()), ""), true);
+  EXPECT_EQ (db::compare (e.selected_not_inside (db::Region ()), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (db::Region ()).first, ""), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (db::Region ()).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_inside (r), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_not_inside (r), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_inside_differential (r).first, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_inside_differential (r).second, ""), true);
+  EXPECT_EQ (db::compare (e.selected_inside (r), "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside (rflat), "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_inside (r), "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_inside (r), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_inside (rflat), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_not_inside (r), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (r).first, "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (rflat).first, "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_inside_differential (r).first, "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (r).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (rflat).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_inside_differential (r).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+}
+
+TEST(12_SelectedInsideWithEdges)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (100, 0, 100, 3000));
+  e.insert (db::Edge (1100, -1000, 1100, 2000));
+  e.insert (db::Edge (1200, -1000, 1200, 0));
+  e.insert (db::Edge (1300, -800, 1300, -200));
+  e.insert (db::Edge (1400, 1000, 1400, 1100));
+  e.insert (db::Edge (1500, 1000, 1500, 2100));
+  e.insert (db::Edge (1600, -800, 1600, -400));
+  e.insert (db::Edge (1600, -400, 1600, -200));
+  e.insert (db::Edge (1700, 1500, 1600, 2500));
+  e.insert (db::Edge (1800, 2500, 1800, 3500));
+  e.insert (db::Edge (1900, 1000, 1900, 2000));
+  e.insert (db::Edge (-1500, 0, -1500, 1000));
+
+  db::Edges ee;
+  for (int i = 0; i <= 2000; i += 100) {
+    ee.insert (db::Edge (i, -1000, i, 0));
+  }
+  for (int i = 1000; i <= 2000; i += 100) {
+    ee.insert (db::Edge (i, 1000, i, 1500));
+    ee.insert (db::Edge (i, 1500, i, 2000));
+  }
+
+  //  make deep
+
+  db::DeepShapeStore dss;
+
+  db::Layout ly;
+  ly.add_cell ("TOP");
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  e.insert_into (&ly, top_cell.cell_index (), l1);
+  db::Edges eflat = e;
+  e = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+
+  ee.insert_into (&ly, top_cell.cell_index (), l2);
+  db::Edges eeflat = ee;
+  ee = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  EXPECT_EQ (db::compare (e.selected_inside (db::Edges ()), ""), true);
+  EXPECT_EQ (db::compare (e.selected_not_inside (db::Edges ()), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (db::Edges ()).first, ""), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (db::Edges ()).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_inside (ee), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_not_inside (ee), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_inside_differential (ee).first, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_inside_differential (ee).second, ""), true);
+  EXPECT_EQ (db::compare (e.selected_inside (ee), "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside (eeflat), "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_inside (ee), "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_inside (ee), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_inside (eeflat), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_not_inside (ee), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (ee).first, "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (eeflat).first, "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_inside_differential (ee).first, "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (ee).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (eeflat).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_inside_differential (ee).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+}
+
+TEST(13_SelectedOutsideWithRegion)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (100, 0, 100, 3000));
+  e.insert (db::Edge (1100, -1000, 1100, 2000));
+  e.insert (db::Edge (1200, -1000, 1200, 0));
+  e.insert (db::Edge (1300, -800, 1300, -200));
+  e.insert (db::Edge (1400, 1000, 1400, 1100));
+  e.insert (db::Edge (1500, 1000, 1500, 2100));
+  e.insert (db::Edge (1600, -800, 1600, -400));
+  e.insert (db::Edge (1600, -400, 1600, -200));
+  e.insert (db::Edge (1700, 1500, 1600, 2500));
+  e.insert (db::Edge (1800, 2500, 1800, 3500));
+  e.insert (db::Edge (1900, 1000, 1900, 2000));
+  e.insert (db::Edge (-1500, 0, -1500, 1000));
+
+  db::Region r;
+  r.insert (db::Box (0, -1000, 2000, 0));
+  r.insert (db::Box (1000, 1000, 2000, 1500));
+  r.insert (db::Box (1000, 1500, 2000, 2000));
+
+  //  make deep
+
+  db::DeepShapeStore dss;
+
+  db::Layout ly;
+  ly.add_cell ("TOP");
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  e.insert_into (&ly, top_cell.cell_index (), l1);
+  db::Edges eflat = e;
+  e = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+
+  r.insert_into (&ly, top_cell.cell_index (), l2);
+  db::Region rflat = r;
+  r = db::Region (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  EXPECT_EQ (db::compare (e.selected_outside (db::Region ()), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_outside (db::Region ()), ""), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (db::Region ()).first, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (db::Region ()).second, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_outside (r), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_not_outside (r), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_outside_differential (r).first, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_outside_differential (r).second, ""), true);
+  EXPECT_EQ (db::compare (e.selected_outside (r), "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside (rflat), "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_outside (r), "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_outside (r), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_outside (rflat), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_not_outside (r), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (r).first, "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (rflat).first, "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_outside_differential (r).first, "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (r).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (rflat).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_outside_differential (r).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+}
+
+TEST(14_SelectedOutsideWithEdges)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (100, 0, 100, 3000));
+  e.insert (db::Edge (1100, -1000, 1100, 2000));
+  e.insert (db::Edge (1200, -1000, 1200, 0));
+  e.insert (db::Edge (1300, -800, 1300, -200));
+  e.insert (db::Edge (1400, 1000, 1400, 1100));
+  e.insert (db::Edge (1500, 1000, 1500, 2100));
+  e.insert (db::Edge (1600, -800, 1600, -400));
+  e.insert (db::Edge (1600, -400, 1600, -200));
+  e.insert (db::Edge (1700, 1500, 1600, 2500));
+  e.insert (db::Edge (1800, 2500, 1800, 3500));
+  e.insert (db::Edge (1900, 1000, 1900, 2000));
+  e.insert (db::Edge (-1500, 0, -1500, 1000));
+
+  db::Edges ee;
+  for (int i = 0; i <= 2000; i += 100) {
+    ee.insert (db::Edge (i, -1000, i, 0));
+  }
+  for (int i = 1000; i <= 2000; i += 100) {
+    ee.insert (db::Edge (i, 1000, i, 1500));
+    ee.insert (db::Edge (i, 1500, i, 2000));
+  }
+
+  //  make deep
+
+  db::DeepShapeStore dss;
+
+  db::Layout ly;
+  ly.add_cell ("TOP");
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  e.insert_into (&ly, top_cell.cell_index (), l1);
+  db::Edges eflat = e;
+  e = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+
+  ee.insert_into (&ly, top_cell.cell_index (), l2);
+  db::Edges eeflat = ee;
+  ee = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  EXPECT_EQ (db::compare (e.selected_outside (db::Edges ()), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_outside (db::Edges ()), ""), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (db::Edges ()).first, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (db::Edges ()).second, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_outside (ee), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_not_outside (ee), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_outside_differential (ee).first, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_outside_differential (ee).second, ""), true);
+  EXPECT_EQ (db::compare (e.selected_outside (ee), "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside (eeflat), "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_outside (ee), "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_outside (ee), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_outside (eeflat), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_not_outside (ee), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (ee).first, "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (eeflat).first, "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_outside_differential (ee).first, "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (ee).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (eeflat).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_outside_differential (ee).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+}
+
+TEST(15_SelectedInteractingWithRegion)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (100, 0, 100, 3000));
+  e.insert (db::Edge (1100, -1000, 1100, 2000));
+  e.insert (db::Edge (1200, -1000, 1200, 0));
+  e.insert (db::Edge (1300, -800, 1300, -200));
+  e.insert (db::Edge (1400, 1000, 1400, 1100));
+  e.insert (db::Edge (1500, 1000, 1500, 2100));
+  e.insert (db::Edge (1600, -800, 1600, -400));
+  e.insert (db::Edge (1600, -400, 1600, -200));
+  e.insert (db::Edge (1700, 1500, 1600, 2500));
+  e.insert (db::Edge (1800, 2500, 1800, 3500));
+  e.insert (db::Edge (1900, 1000, 1900, 2000));
+  e.insert (db::Edge (-1500, 0, -1500, 1000));
+
+  db::Region r;
+  r.insert (db::Box (0, -1000, 2000, 0));
+  r.insert (db::Box (1000, 1000, 2000, 1500));
+  r.insert (db::Box (1000, 1500, 2000, 2000));
+
+  //  make deep
+
+  db::DeepShapeStore dss;
+
+  db::Layout ly;
+  ly.add_cell ("TOP");
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  e.insert_into (&ly, top_cell.cell_index (), l1);
+  db::Edges eflat = e;
+  e = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+
+  r.insert_into (&ly, top_cell.cell_index (), l2);
+  db::Region rflat = r;
+  r = db::Region (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  EXPECT_EQ (db::compare (e.selected_interacting (db::Region ()), ""), true);
+  EXPECT_EQ (db::compare (e.selected_not_interacting (db::Region ()), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (db::Region ()).first, ""), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (db::Region ()).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_interacting (r), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_not_interacting (r), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_interacting_differential (r).first, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_interacting_differential (r).second, ""), true);
+  EXPECT_EQ (db::compare (e.selected_interacting (r), "(0,0;0,1000);(1100,-1000;1100,2000);(1300,-800;1300,-200);(1200,-1000;1200,0);(1400,1000;1400,1100);(1600,-800;1600,-200);(100,0;100,3000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting (rflat), "(0,0;0,1000);(1100,-1000;1100,2000);(1300,-800;1300,-200);(1200,-1000;1200,0);(1400,1000;1400,1100);(1600,-800;1600,-200);(100,0;100,3000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_interacting (r), "(0,0;0,1000);(1100,-1000;1100,2000);(1300,-800;1300,-200);(1200,-1000;1200,0);(1400,1000;1400,1100);(1600,-800;1600,-200);(100,0;100,3000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_interacting (r), "(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_interacting (rflat), "(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_not_interacting (r), "(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (r).first, "(0,0;0,1000);(1100,-1000;1100,2000);(1300,-800;1300,-200);(1200,-1000;1200,0);(1400,1000;1400,1100);(1600,-800;1600,-200);(100,0;100,3000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (rflat).first, "(0,0;0,1000);(1100,-1000;1100,2000);(1300,-800;1300,-200);(1200,-1000;1200,0);(1400,1000;1400,1100);(1600,-800;1600,-200);(100,0;100,3000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_interacting_differential (r).first, "(0,0;0,1000);(1100,-1000;1100,2000);(1300,-800;1300,-200);(1200,-1000;1200,0);(1400,1000;1400,1100);(1600,-800;1600,-200);(100,0;100,3000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (r).second, "(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (rflat).second, "(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_interacting_differential (r).second, "(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+}
+
+TEST(16_SelectedInteractingWithEdges)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (100, 0, 100, 3000));
+  e.insert (db::Edge (1100, -1000, 1100, 2000));
+  e.insert (db::Edge (1200, -1000, 1200, 0));
+  e.insert (db::Edge (1300, -800, 1300, -200));
+  e.insert (db::Edge (1400, 1000, 1400, 1100));
+  e.insert (db::Edge (1500, 1000, 1500, 2100));
+  e.insert (db::Edge (1600, -800, 1600, -400));
+  e.insert (db::Edge (1600, -400, 1600, -200));
+  e.insert (db::Edge (1700, 1500, 1600, 2500));
+  e.insert (db::Edge (1800, 2500, 1800, 3500));
+  e.insert (db::Edge (1900, 1000, 1900, 2000));
+  e.insert (db::Edge (-1500, 0, -1500, 1000));
+
+  db::Edges ee;
+  for (int i = 0; i <= 2000; i += 100) {
+    ee.insert (db::Edge (i, -1000, i, 0));
+  }
+  for (int i = 1000; i <= 2000; i += 100) {
+    ee.insert (db::Edge (i, 1000, i, 1500));
+    ee.insert (db::Edge (i, 1500, i, 2000));
+  }
+
+  //  make deep
+
+  db::DeepShapeStore dss;
+
+  db::Layout ly;
+  ly.add_cell ("TOP");
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  e.insert_into (&ly, top_cell.cell_index (), l1);
+  db::Edges eflat = e;
+  e = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+
+  ee.insert_into (&ly, top_cell.cell_index (), l2);
+  db::Edges eeflat = ee;
+  ee = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  EXPECT_EQ (db::compare (e.selected_interacting (db::Edges ()), ""), true);
+  EXPECT_EQ (db::compare (e.selected_not_interacting (db::Edges ()), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (db::Edges ()).first, ""), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (db::Edges ()).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_interacting (ee), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_not_interacting (ee), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_interacting_differential (ee).first, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_interacting_differential (ee).second, ""), true);
+  EXPECT_EQ (db::compare (e.selected_interacting (ee), "(0,0;0,1000);(1100,-1000;1100,2000);(1300,-800;1300,-200);(1200,-1000;1200,0);(1400,1000;1400,1100);(1600,-800;1600,-200);(100,0;100,3000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting (eeflat), "(0,0;0,1000);(1100,-1000;1100,2000);(1300,-800;1300,-200);(1200,-1000;1200,0);(1400,1000;1400,1100);(1600,-800;1600,-200);(100,0;100,3000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_interacting (ee), "(0,0;0,1000);(1100,-1000;1100,2000);(1300,-800;1300,-200);(1200,-1000;1200,0);(1400,1000;1400,1100);(1600,-800;1600,-200);(100,0;100,3000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_interacting (ee), "(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_interacting (eeflat), "(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_not_interacting (ee), "(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (ee).first, "(0,0;0,1000);(1100,-1000;1100,2000);(1300,-800;1300,-200);(1200,-1000;1200,0);(1400,1000;1400,1100);(1600,-800;1600,-200);(100,0;100,3000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (eeflat).first, "(0,0;0,1000);(1100,-1000;1100,2000);(1300,-800;1300,-200);(1200,-1000;1200,0);(1400,1000;1400,1100);(1600,-800;1600,-200);(100,0;100,3000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_interacting_differential (ee).first, "(0,0;0,1000);(1100,-1000;1100,2000);(1300,-800;1300,-200);(1200,-1000;1200,0);(1400,1000;1400,1100);(1600,-800;1600,-200);(100,0;100,3000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (ee).second, "(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (eeflat).second, "(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.selected_interacting_differential (ee).second, "(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+}
+
+TEST(17_InsideOutside)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (100, 0, 100, 3000));
+  e.insert (db::Edge (1100, -1000, 1100, 2000));
+  e.insert (db::Edge (1200, -1000, 1200, 0));
+  e.insert (db::Edge (1300, -800, 1300, -200));
+  e.insert (db::Edge (1400, 1000, 1400, 1100));
+  e.insert (db::Edge (1500, 1000, 1500, 2100));
+  e.insert (db::Edge (1600, -800, 1600, -400));
+  e.insert (db::Edge (1600, -400, 1600, -200));
+  e.insert (db::Edge (1700, 1500, 1600, 2500));
+  e.insert (db::Edge (1800, 2500, 1800, 3500));
+  e.insert (db::Edge (1900, 1000, 1900, 2000));
+  e.insert (db::Edge (-1500, 0, -1500, 1000));
+
+  db::Region r;
+  r.insert (db::Box (0, -1000, 2000, 0));
+  r.insert (db::Box (1000, 1000, 2000, 1500));
+  r.insert (db::Box (1000, 1500, 2000, 2000));
+
+  //  make deep
+
+  db::DeepShapeStore dss;
+
+  db::Layout ly;
+  ly.add_cell ("TOP");
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  e.insert_into (&ly, top_cell.cell_index (), l1);
+  db::Edges eflat = e;
+  e = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+
+  r.insert_into (&ly, top_cell.cell_index (), l2);
+  db::Region rflat = r;
+  r = db::Region (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  EXPECT_EQ (db::compare (e.inside_part (db::Region ()), ""), true);
+  EXPECT_EQ (db::compare (e.outside_part (db::Region ()), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-400);(1600,-400;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.inside_outside_part (db::Region ()).first, ""), true);
+  EXPECT_EQ (db::compare (e.inside_outside_part (db::Region ()).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-400);(1600,-400;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (db::Edges ().inside_part (r), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().outside_part (r), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().inside_outside_part (r).first, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().inside_outside_part (r).second, ""), true);
+  EXPECT_EQ (db::compare (e.inside_part (r), "(1500,1500;1500,2000);(1100,1500;1100,2000);(1900,1000;1900,1500);(1900,1500;1900,2000);(1600,-800;1600,-400);(1500,1000;1500,1500);(1100,1000;1100,1500);(1600,-400;1600,-200);(1300,-800;1300,-200);(1700,1500;1650,2000);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (e.inside_part (rflat), "(1500,1500;1500,2000);(1100,1500;1100,2000);(1900,1000;1900,1500);(1900,1500;1900,2000);(1600,-800;1600,-400);(1500,1000;1500,1500);(1100,1000;1100,1500);(1600,-400;1600,-200);(1300,-800;1300,-200);(1700,1500;1650,2000);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (eflat.inside_part (r), "(1500,1500;1500,2000);(1100,1500;1100,2000);(1900,1000;1900,1500);(1900,1500;1900,2000);(1600,-800;1600,-400);(1500,1000;1500,1500);(1100,1000;1100,1500);(1600,-400;1600,-200);(1300,-800;1300,-200);(1700,1500;1650,2000);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (e.outside_part (r), "(1650,2000;1600,2500);(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.outside_part (rflat), "(1650,2000;1600,2500);(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.outside_part (r), "(1650,2000;1600,2500);(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.inside_outside_part (r).first, "(1500,1500;1500,2000);(1100,1500;1100,2000);(1900,1000;1900,1500);(1900,1500;1900,2000);(1600,-800;1600,-400);(1500,1000;1500,1500);(1100,1000;1100,1500);(1600,-400;1600,-200);(1300,-800;1300,-200);(1700,1500;1650,2000);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (e.inside_outside_part (rflat).first, "(1500,1500;1500,2000);(1100,1500;1100,2000);(1900,1000;1900,1500);(1900,1500;1900,2000);(1600,-800;1600,-400);(1500,1000;1500,1500);(1100,1000;1100,1500);(1600,-400;1600,-200);(1300,-800;1300,-200);(1700,1500;1650,2000);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (eflat.inside_outside_part (r).first, "(1500,1500;1500,2000);(1100,1500;1100,2000);(1900,1000;1900,1500);(1900,1500;1900,2000);(1600,-800;1600,-400);(1500,1000;1500,1500);(1100,1000;1100,1500);(1600,-400;1600,-200);(1300,-800;1300,-200);(1700,1500;1650,2000);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (e.inside_outside_part (r).second, "(1650,2000;1600,2500);(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.inside_outside_part (rflat).second, "(1650,2000;1600,2500);(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.inside_outside_part (r).second, "(1650,2000;1600,2500);(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+}
+
+TEST(18_AndNotWithRegion)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (100, 0, 100, 3000));
+  e.insert (db::Edge (1100, -1000, 1100, 2000));
+  e.insert (db::Edge (1200, -1000, 1200, 0));
+  e.insert (db::Edge (1300, -800, 1300, -200));
+  e.insert (db::Edge (1400, 1000, 1400, 1100));
+  e.insert (db::Edge (1500, 1000, 1500, 2100));
+  e.insert (db::Edge (1600, -800, 1600, -400));
+  e.insert (db::Edge (1600, -400, 1600, -200));
+  e.insert (db::Edge (1700, 1500, 1600, 2500));
+  e.insert (db::Edge (1800, 2500, 1800, 3500));
+  e.insert (db::Edge (1900, 1000, 1900, 2000));
+  e.insert (db::Edge (-1500, 0, -1500, 1000));
+
+  db::Region r;
+  r.insert (db::Box (0, -1000, 2000, 0));
+  r.insert (db::Box (1000, 1000, 2000, 1500));
+  r.insert (db::Box (1000, 1500, 2000, 2000));
+
+  //  make deep
+
+  db::DeepShapeStore dss;
+
+  db::Layout ly;
+  ly.add_cell ("TOP");
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  e.insert_into (&ly, top_cell.cell_index (), l1);
+  db::Edges eflat = e;
+  e = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+
+  r.insert_into (&ly, top_cell.cell_index (), l2);
+  db::Region rflat = r;
+  r = db::Region (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  EXPECT_EQ (db::compare (e & db::Region (), ""), true);
+  EXPECT_EQ (db::compare (e - db::Region (), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-400);(1600,-400;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.andnot (db::Region ()).first, ""), true);
+  EXPECT_EQ (db::compare (e.andnot (db::Region ()).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-400);(1600,-400;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (db::Edges () & r, ""), true);
+  EXPECT_EQ (db::compare (db::Edges () - r, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().andnot (r).first, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().andnot (r).second, ""), true);
+  EXPECT_EQ (db::compare (e & r, "(1500,1500;1500,2000);(1100,1500;1100,2000);(1900,1000;1900,1500);(1900,1500;1900,2000);(1600,-800;1600,-400);(1500,1000;1500,1500);(1100,1000;1100,1500);(1600,-400;1600,-200);(1300,-800;1300,-200);(1700,1500;1650,2000);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (e & rflat, "(1500,1500;1500,2000);(1100,1500;1100,2000);(1900,1000;1900,1500);(1900,1500;1900,2000);(1600,-800;1600,-400);(1500,1000;1500,1500);(1100,1000;1100,1500);(1600,-400;1600,-200);(1300,-800;1300,-200);(1700,1500;1650,2000);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (eflat & r, "(1500,1500;1500,2000);(1100,1500;1100,2000);(1900,1000;1900,1500);(1900,1500;1900,2000);(1600,-800;1600,-400);(1500,1000;1500,1500);(1100,1000;1100,1500);(1600,-400;1600,-200);(1300,-800;1300,-200);(1700,1500;1650,2000);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (e - r, "(1650,2000;1600,2500);(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e - rflat, "(1650,2000;1600,2500);(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat - r, "(1650,2000;1600,2500);(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.andnot (r).first, "(1500,1500;1500,2000);(1100,1500;1100,2000);(1900,1000;1900,1500);(1900,1500;1900,2000);(1600,-800;1600,-400);(1500,1000;1500,1500);(1100,1000;1100,1500);(1600,-400;1600,-200);(1300,-800;1300,-200);(1700,1500;1650,2000);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (e.andnot (rflat).first, "(1500,1500;1500,2000);(1100,1500;1100,2000);(1900,1000;1900,1500);(1900,1500;1900,2000);(1600,-800;1600,-400);(1500,1000;1500,1500);(1100,1000;1100,1500);(1600,-400;1600,-200);(1300,-800;1300,-200);(1700,1500;1650,2000);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (eflat.andnot (r).first, "(1500,1500;1500,2000);(1100,1500;1100,2000);(1900,1000;1900,1500);(1900,1500;1900,2000);(1600,-800;1600,-400);(1500,1000;1500,1500);(1100,1000;1100,1500);(1600,-400;1600,-200);(1300,-800;1300,-200);(1700,1500;1650,2000);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (e.andnot (r).second, "(1650,2000;1600,2500);(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.andnot (rflat).second, "(1650,2000;1600,2500);(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (eflat.andnot (r).second, "(1650,2000;1600,2500);(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+}
+
+TEST(19_AndNotWithEdges)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (100, 0, 100, 3000));
+  e.insert (db::Edge (1100, -1000, 1100, 2000));
+  e.insert (db::Edge (1200, -1000, 1200, 0));
+  e.insert (db::Edge (1300, -800, 1300, -200));
+  e.insert (db::Edge (1400, 1000, 1400, 1100));
+  e.insert (db::Edge (1500, 1000, 1500, 2100));
+  e.insert (db::Edge (1600, -800, 1600, -400));
+  e.insert (db::Edge (1600, -400, 1600, -200));
+  e.insert (db::Edge (1700, 1500, 1600, 2500));
+  e.insert (db::Edge (1800, 2500, 1800, 3500));
+  e.insert (db::Edge (1900, 1000, 1900, 2000));
+  e.insert (db::Edge (-1500, 0, -1500, 1000));
+
+  db::Edges ee;
+  for (int i = 0; i <= 2000; i += 100) {
+    ee.insert (db::Edge (i, -1000, i, 0));
+  }
+  for (int i = 1000; i <= 2000; i += 100) {
+    ee.insert (db::Edge (i, 1000, i, 1500));
+    ee.insert (db::Edge (i, 1500, i, 2000));
+  }
+
+  //  make deep
+
+  db::DeepShapeStore dss;
+
+  db::Layout ly;
+  ly.add_cell ("TOP");
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  e.insert_into (&ly, top_cell.cell_index (), l1);
+  db::Edges eflat = e;
+  e = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+
+  ee.insert_into (&ly, top_cell.cell_index (), l2);
+  db::Edges eeflat = ee;
+  ee = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  EXPECT_EQ (db::compare (e & db::Edges (), ""), true);
+  EXPECT_EQ (db::compare (e - db::Edges (), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-400);(1600,-400;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.andnot (db::Edges ()).first, ""), true);
+  EXPECT_EQ (db::compare (e.andnot (db::Edges ()).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-400);(1600,-400;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (db::Edges () & ee, ""), true);
+  EXPECT_EQ (db::compare (db::Edges () - ee, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().andnot (ee).first, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().andnot (ee).second, ""), true);
+  EXPECT_EQ (db::compare (e & ee, "(1500,1000;1500,2000);(1900,1000;1900,2000);(1600,-800;1600,-200);(1100,1000;1100,2000);(1300,-800;1300,-200);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (e & eeflat, "(1500,1000;1500,2000);(1900,1000;1900,2000);(1600,-800;1600,-200);(1100,1000;1100,2000);(1300,-800;1300,-200);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (eflat & ee, "(1500,1000;1500,2000);(1900,1000;1900,2000);(1600,-800;1600,-200);(1100,1000;1100,2000);(1300,-800;1300,-200);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (e - ee, "(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000);(1700,1500;1600,2500)"), true);
+  EXPECT_EQ (db::compare (e - eeflat, "(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000);(1700,1500;1600,2500)"), true);
+  EXPECT_EQ (db::compare (eflat - ee, "(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000);(1700,1500;1600,2500)"), true);
+  EXPECT_EQ (db::compare (e.andnot (ee).first, "(1500,1000;1500,2000);(1900,1000;1900,2000);(1600,-800;1600,-200);(1100,1000;1100,2000);(1300,-800;1300,-200);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (e.andnot (eeflat).first, "(1500,1000;1500,2000);(1900,1000;1900,2000);(1600,-800;1600,-200);(1100,1000;1100,2000);(1300,-800;1300,-200);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (eflat.andnot (ee).first, "(1500,1000;1500,2000);(1900,1000;1900,2000);(1600,-800;1600,-200);(1100,1000;1100,2000);(1300,-800;1300,-200);(1100,-1000;1100,0);(1200,-1000;1200,0);(1400,1000;1400,1100)"), true);
+  EXPECT_EQ (db::compare (e.andnot (ee).second, "(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000);(1700,1500;1600,2500)"), true);
+  EXPECT_EQ (db::compare (e.andnot (eeflat).second, "(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000);(1700,1500;1600,2500)"), true);
+  EXPECT_EQ (db::compare (eflat.andnot (ee).second, "(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000);(1700,1500;1600,2500)"), true);
+}
+

@@ -437,6 +437,15 @@ static void insert_texts_with_dtrans (db::Shapes *sh, const db::Texts &r, const 
   }
 }
 
+static db::Layout *layout (db::Shapes *sh)
+{
+  if (sh->cell ()) {
+    return sh->cell ()->layout ();
+  } else {
+    return 0;
+  }
+}
+
 static unsigned int s_all ()                 { return db::ShapeIterator::All; }
 static unsigned int s_all_with_properties () { return db::ShapeIterator::AllWithProperties; }
 static unsigned int s_properties ()          { return db::ShapeIterator::Properties; }
@@ -1230,6 +1239,18 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "@brief Gets the number of shapes in this container\n"
     "This method was introduced in version 0.16\n"
     "@return The number of shapes in this container\n"
+  ) +
+  gsi::method ("cell", &db::Shapes::cell,
+    "@brief Gets the cell the shape container belongs to\n"
+    "This method returns nil if the shape container does not belong to a cell.\n"
+    "\n"
+    "This method has been added in version 0.28."
+  ) +
+  gsi::method_ext ("layout", &layout,
+    "@brief Gets the layout object the shape container belongs to\n"
+    "This method returns nil if the shape container does not belong to a layout.\n"
+    "\n"
+    "This method has been added in version 0.28."
   ) +
   gsi::method ("replace_prop_id", (db::Shape (db::Shapes::*) (const db::Shape &, db::properties_id_type)) &db::Shapes::replace_prop_id, gsi::arg ("shape"), gsi::arg ("property_id"),
     "@brief Replaces (or install) the properties of a shape\n"

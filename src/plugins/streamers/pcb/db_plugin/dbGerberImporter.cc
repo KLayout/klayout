@@ -108,7 +108,7 @@ static std::string format_to_string (int l, int t, bool tz)
 // ---------------------------------------------------------------------------------------
 //  Implementation of GerberFile
 
-GerberFileReader::GerberFileReader ()
+GerberFileReader::GerberFileReader (int warn_level)
   : m_circle_points (64), m_digits_before (-1), m_digits_after (-1), m_omit_leading_zeroes (true),
     m_merge (false), m_inverse (false),
     m_dbu (0.001), m_unit (1000.0),
@@ -117,7 +117,8 @@ GerberFileReader::GerberFileReader ()
     m_orot (0.0), m_os (1.0), m_omx (false), m_omy (false),
     m_ep (true /*report progress*/),
     mp_layout (0), mp_top_cell (0), mp_stream (0),
-    m_progress (tl::to_string (tr ("Reading Gerber file")), 10000)
+    m_progress (tl::to_string (tr ("Reading Gerber file")), 10000),
+    m_warn_level (warn_level)
 {
   m_progress.set_format (tl::to_string (tr ("%.0f MB")));
   m_progress.set_unit (1024 * 1024);
@@ -196,8 +197,12 @@ GerberFileReader::format_string () const
 }
 
 void 
-GerberFileReader::warn (const std::string &warning)
+GerberFileReader::warn (const std::string &warning, int wl)
 {
+  if (m_warn_level < wl) {
+    return;
+  }
+
   tl::warn << warning << tl::to_string (tr (" in line ")) << mp_stream->line_number () << tl::to_string (tr (" (file ")) << mp_stream->source () << ")";
 }
 
@@ -541,18 +546,18 @@ GerberFile::layers_string () const
 //  Implementation of GerberImporter
 
 //  TODO: generalize this:
-std::vector <tl::shared_ptr<db::GerberFileReader> > get_readers ()
+std::vector <tl::shared_ptr<db::GerberFileReader> > get_readers (int warn_level)
 {
   std::vector <tl::shared_ptr<db::GerberFileReader> > readers;
-  readers.push_back (new db::GerberDrillFileReader ());
-  readers.push_back (new db::RS274XReader ());
+  readers.push_back (new db::GerberDrillFileReader (warn_level));
+  readers.push_back (new db::RS274XReader (warn_level));
   return readers;
 }
 
-GerberImporter::GerberImporter ()
+GerberImporter::GerberImporter (int warn_level)
   : m_cell_name ("PCB"), m_dbu (0.001), m_merge (false), 
     m_invert_negative_layers (false), m_border (5000), 
-    m_circle_points (64)
+    m_circle_points (64), m_warn_level (warn_level)
 {
   // .. nothing yet ..
 }
@@ -593,7 +598,7 @@ GerberImporter::scan (tl::TextInputStream &stream)
 {
   try {
 
-    std::vector <tl::shared_ptr<db::GerberFileReader> > readers = get_readers ();
+    std::vector <tl::shared_ptr<db::GerberFileReader> > readers = get_readers (0);
 
     //  determine the reader to use:
     for (std::vector <tl::shared_ptr<db::GerberFileReader> >::iterator r = readers.begin (); r != readers.end (); ++r) {
@@ -1010,7 +1015,7 @@ GerberImporter::do_read (db::Layout &layout, db::cell_index_type cell_index)
       tl::InputStream input_file (fp);
       tl::TextInputStream stream (input_file);
 
-      std::vector <tl::shared_ptr<db::GerberFileReader> > readers = get_readers ();
+      std::vector <tl::shared_ptr<db::GerberFileReader> > readers = get_readers (m_warn_level);
 
       //  determine the reader to use:
       db::GerberFileReader *reader = 0;
@@ -1115,14 +1120,16 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual const db::LayerMap &read (db::Layout &layout, const db::LoadLayoutOptions & /*options*/)
-  {
-    //  TODO: too simple, should provide at least a layer filtering.
-    return read (layout);
-  }
-
   virtual const db::LayerMap &read (db::Layout &layout)
   {
+    return read (layout, db::LoadLayoutOptions ());
+  }
+
+  virtual const db::LayerMap &read (db::Layout &layout, const db::LoadLayoutOptions &options)
+  {
+    init (options);
+
+    //  TODO: too simple, should provide at least a layer filtering.
     db::GerberImportData data;
 
     std::string fn (m_stream.source ());
@@ -1132,7 +1139,7 @@ public:
 
     data.load (m_stream);
 
-    db::GerberImporter importer;
+    db::GerberImporter importer (warn_level ());
     data.setup_importer (&importer);
 
     importer.read (layout);

@@ -107,6 +107,10 @@ reference(
 # Cross reference
 xref(
  circuit(Rre RRE nomatch
+  log(
+   entry(error description('Net gnd! is not matching any net from reference netlist'))
+   entry(error description('Net vdd! is not matching any net from reference netlist'))
+  )
   xref(
    net(() 2 mismatch)
    net(() 1 mismatch)

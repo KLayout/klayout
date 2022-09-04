@@ -212,6 +212,8 @@ private slots:
   void search_editing ();
   void search_finished ();
   void tab_close_requested (int);
+  void close_all ();
+  void close_all_but_current ();
   void replace_mode_button_clicked ();
   void replace_next_button_clicked ();
   void replace_all_button_clicked ();

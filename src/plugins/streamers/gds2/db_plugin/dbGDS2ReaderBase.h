@@ -101,10 +101,10 @@ private:
   void finish_element ();
 
   virtual void common_reader_error (const std::string &msg) { error (msg); }
-  virtual void common_reader_warn (const std::string &msg) { warn (msg); }
+  virtual void common_reader_warn (const std::string &msg, int warn_level = 1) { warn (msg, warn_level); }
 
   virtual void error (const std::string &txt) = 0;
-  virtual void warn (const std::string &txt) = 0;
+  virtual void warn (const std::string &txt, int warn_level = 1) = 0;
 
   virtual std::string path () const = 0;
   virtual const char *get_string () = 0;

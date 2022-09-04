@@ -48,7 +48,7 @@ class EditStipplesForm
   Q_OBJECT 
 
 public:
-  EditStipplesForm (lay::LayoutViewBase *view, const lay::DitherPattern &pattern);
+  EditStipplesForm (QWidget *parent, lay::LayoutViewBase *view, const lay::DitherPattern &pattern);
   ~EditStipplesForm ();
 
   //  ...

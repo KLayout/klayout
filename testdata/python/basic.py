@@ -1011,7 +1011,7 @@ class BasicTest(unittest.TestCase):
       self.assertEqual( False, True )  # this must never hit
     except Exception as e:
       err = str(e)
-    self.assertEqual( err, "Unexpected object type (expected argument of class A, got X) in B.b4" );
+    self.assertEqual( err, "Unexpected object type (expected argument of class A, got X) for argument #1 in B.b4" );
   
     # Test, if this throws an error (object of class X passed to A argument):
     err = ""
@@ -1022,7 +1022,7 @@ class BasicTest(unittest.TestCase):
       self.assertEqual( False, True )  # this must never hit
     except Exception as e:
       err = str(e)
-    self.assertEqual( err, "Unexpected object type (expected argument of class A, got B) in B.b4" );
+    self.assertEqual( err, "Unexpected object type (expected argument of class A, got B) for argument #1 in B.b4" );
   
   def test_17(self):
 

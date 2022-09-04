@@ -281,18 +281,18 @@ MacroCollection::add_folder (const std::string &description, const std::string &
       if (! force_create) {
 
         if (tl::verbosity () >= 20) {
-          tl::log << "Folder does not exist - skipping: " << fp;
+          tl::log << tl::to_string (tr ("Folder does not exist - skipping: ")) << fp;
         }
         return 0;
 
       } else {
 
         if (tl::verbosity () >= 20) {
-          tl::log << "Folder does not exist yet - trying to create it: " << fp;
+          tl::log << tl::to_string (tr ("Folder does not exist yet - trying to create it: ")) << fp;
         }
         if (! tl::mkpath (fp)) {
-          if (tl::verbosity () >= 10) {
-            tl::error << "Unable to create folder path: " << fp;
+          if (tl::verbosity () >= 20) {
+            tl::error << tl::to_string (tr ("Unable to create folder path: ")) << fp;
           }
           return 0;
         }
@@ -301,8 +301,8 @@ MacroCollection::add_folder (const std::string &description, const std::string &
     }
 
     if (! tl::is_dir (fp)) {
-      if (tl::verbosity () >= 10) {
-        tl::error << "Folder is not a directory: " << fp;
+      if (tl::verbosity () >= 20) {
+        tl::error << tl::to_string (tr ("Folder is not a directory - skipping: ")) << fp;
       }
       return 0;
     }
@@ -317,7 +317,7 @@ MacroCollection::add_folder (const std::string &description, const std::string &
     if (! readonly && ! tl::is_writable (fp)) {
       readonly = true;
       if (tl::verbosity () >= 20) {
-        tl::log << "Folder is read-only: " << fp;
+        tl::log << tl::to_string (tr ("Folder is read-only: ")) << fp;
       }
     }
 
@@ -368,7 +368,7 @@ void MacroCollection::scan ()
   std::string p = path ();
 
   if (tl::verbosity () >= 20) {
-    tl::info << "Scanning macro path " << p << " (readonly=" << m_readonly << ")";
+    tl::info << tl::to_string (tr ("Scanning macro path ")) << p << " (readonly=" << m_readonly << ")";
   }
 
   if (! p.empty () && p[0] == ':') {
@@ -501,7 +501,7 @@ MacroCollection::create_entry (const std::string &path)
     }
 
   } catch (tl::Exception &ex) {
-    tl::error << "Reading " << path << ": " << ex.msg ();
+    tl::error << tl::to_string (tr ("Reading ")) << path << ": " << ex.msg ();
   }
 }
 
@@ -578,7 +578,7 @@ void MacroCollection::save ()
 bool MacroCollection::rename (const std::string &n)
 {
   if (tl::verbosity () >= 20) {
-    tl::info << "Renaming macro folder " << path () << " to " << n;
+    tl::info << tl::to_string (tr ("Renaming macro folder ")) << path () << " to " << n;
   }
   begin_changes ();
   if (! tl::rename_file (path (), n)) {

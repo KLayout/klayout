@@ -221,14 +221,6 @@ public:
   ~NetlistDeviceExtractor ();
 
   /**
-   *  @brief Gets the name of the extractor and the device class
-   */
-  const std::string &name ()
-  {
-    return m_name;
-  }
-
-  /**
    *  @brief Gets the property name for the device terminal annotation
    *  This name is used to attach the terminal ID to terminal shapes.
    */
@@ -319,6 +311,14 @@ public:
   void set_name (const std::string &name)
   {
     m_name = name;
+  }
+
+  /**
+   *  @brief Sets the name of the device class and the device extractor
+   */
+  const std::string &name () const
+  {
+    return m_name;
   }
 
   /**

@@ -450,6 +450,11 @@ xref(
   )
  )
  circuit(testall TESTALL nomatch
+  log(
+   entry(error description('Net $10 is not matching any net from reference netlist'))
+   entry(error description('Net $5 is not matching any net from reference netlist'))
+   entry(info description('Connecting nets $10 and $5 is making a better match to net D1 from reference netlist (fuzziness 0 nodes)'))
+  )
   xref(
    net(5 () mismatch)
    net(2 2 match)

@@ -110,6 +110,8 @@ LEFDEFReader::format () const
 const db::LayerMap &
 LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &options, bool import_lef)
 {
+  init (options);
+
   const db::LEFDEFReaderOptions *lefdef_options = dynamic_cast<const db::LEFDEFReaderOptions *> (options.get_options (format ()));
   db::LEFDEFReaderOptions effective_options;
   if (lefdef_options) {
@@ -135,7 +137,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file")));
 
-    db::LEFImporter importer;
+    db::LEFImporter importer (warn_level ());
 
     for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
 
@@ -156,7 +158,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading DEF file")));
 
-    DEFImporter importer;
+    DEFImporter importer (warn_level ());
 
     for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
 

@@ -31,6 +31,7 @@
 
 #include "tlAssert.h"
 #include "tlLog.h"
+#include "tlInternational.h"
 
 namespace db
 {
@@ -402,6 +403,7 @@ NetlistCompareCore::NetlistCompareCore (NetGraph *graph, NetGraph *other_graph)
     dont_consider_net_names (false),
     with_ambiguous (false),
     logger (0),
+    with_log (true),
     circuit_pin_mapper (0),
     subcircuit_equivalence (0),
     device_equivalence (0),
@@ -1049,6 +1051,10 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
 
       if (ambiguous) {
         if (logger) {
+          if (with_log) {
+            logger->log_entry (db::NetlistCompareLogger::Warning,
+                               tl::sprintf (tl::to_string (tr ("Matching nets %s from an ambiguous group of nets")), nets2string (p->first->net (), p->second->net ())));
+          }
           logger->match_ambiguous_nets (p->first->net (), p->second->net ());
         }
         for (db::Net::const_pin_iterator i = p->first->net ()->begin_pins (); i != p->first->net ()->end_pins (); ++i) {
@@ -1070,9 +1076,11 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
     std::vector<std::pair<const NetGraphNode *, const NetGraphNode *> >::const_iterator p = pairs.begin ();
     for (std::list<TentativeNodeMapping>::iterator tn_of_pair = tn_for_pairs.begin (); tn_of_pair != tn_for_pairs.end (); ++tn_of_pair, ++p) {
 
+      bool was_ambiguous = equivalent_other_nodes.has_attribute (p->second);
+
       //  Note: this would propagate ambiguities to all *derived* mappings. But this probably goes too far:
-      //    bool ambiguous = equivalent_other_nodes.has_attribute (p->second);
-      //  Instead we ignore propagated ambiguities for now:
+      //    bool ambiguous = was_ambiguous;
+      //  Instead we ignore propagated ambiguitied for now:
       bool ambiguous = false;
 
       if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare || tl::verbosity () >= 40) {
@@ -1100,11 +1108,16 @@ NetlistCompareCore::derive_node_identities_from_ambiguity_group (const NodeRange
         NetGraphNode *n_other = & mp_other_graph->node (other_net_index);
 
         if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare || tl::verbosity () >= 40) {
-          if (ambiguous) {
-            tl::info << indent_s << "deduced ambiguous match: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
+          if (was_ambiguous) {
+            tl::info << indent_s << "deduced from ambiguous match: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
           } else {
             tl::info << indent_s << "deduced match: " << n->net ()->expanded_name () << " vs. " << n_other->net ()->expanded_name ();
           }
+        }
+
+        if (logger && with_log && was_ambiguous) {
+          logger->log_entry (db::NetlistCompareLogger::Info,
+                             tl::sprintf (tl::to_string (tr ("Matching nets %s following an ambiguous match")), nets2string (n->net (), n_other->net ())));
         }
 
         if (ambiguous) {
@@ -1168,7 +1181,7 @@ NetlistCompareCore::derive_node_identities_from_singular_match (const NetGraphNo
     }
     return tentative ? failed_match : 0;
 
-  } else if ((! n->has_any_other () && ! n_other->has_any_other ()) || (n->has_unknown_other () && n_other->has_unknown_other ())) { // @@@
+  } else if ((! n->has_any_other () && ! n_other->has_any_other ()) || (n->has_unknown_other () && n_other->has_unknown_other ())) {
 
     //  in tentative mode, reject this choice if both nets are named and
     //  their names differ -> this favors net matching by name
@@ -1244,6 +1257,263 @@ NetlistCompareCore::derive_node_identities_from_singular_match (const NetGraphNo
   }
 }
 
+static size_t distance (const NetGraphNode &a, const NetGraphNode &b)
+{
+  auto i = a.begin ();
+  auto j = b.begin ();
+
+  size_t fuzz = 0;
+
+  while (i != a.end () || j != b.end ()) {
+
+    if (j == b.end ()) {
+      ++fuzz;
+      ++i;
+      continue;
+    }
+    if (i == a.end ()) {
+      ++fuzz;
+      ++j;
+      continue;
+    }
+
+    if (i->first < j->first) {
+      ++fuzz;
+      ++i;
+      continue;
+    } else if (j->first < i->first) {
+      ++fuzz;
+      ++j;
+      continue;
+    }
+
+    ++i;
+    ++j;
+
+  }
+
+  return fuzz;
+}
+
+static size_t distance3 (const NetGraphNode &a, const NetGraphNode &b1, const NetGraphNode &b2, const NetGraph &gb)
+{
+  bool needs_join = false;
+
+  for (auto e = b1.begin (); e != b1.end () && ! needs_join; ++e) {
+    needs_join = (e->second.second == b1.net () || e->second.second == b2.net ());
+  }
+
+  for (auto e = b2.begin (); e != b2.end () && ! needs_join; ++e) {
+    needs_join = (e->second.second == b1.net () || e->second.second == b2.net ());
+  }
+
+  if (needs_join) {
+    return distance (a, gb.joined (b1, b2));
+  }
+
+  auto i = a.begin ();
+  auto j1 = b1.begin ();
+  auto j2 = b2.begin ();
+
+  size_t fuzz = 0;
+
+  while (i != a.end () || j1 != b1.end () || j2 != b2.end ()) {
+
+    if (j1 == b1.end () && j2 == b2.end ()) {
+      ++fuzz;
+      ++i;
+      continue;
+    }
+
+    bool use_j1 = j2 == b2.end () || (j1 != b1.end () && *j1 < *j2);
+    auto &j = use_j1 ? j1 : j2;
+
+    if (i == a.end ()) {
+      ++fuzz;
+      ++j;
+      continue;
+    }
+
+    if (i->first < j->first) {
+      ++fuzz;
+      ++i;
+      continue;
+    } else if (j->first < i->first) {
+      ++fuzz;
+      ++j;
+      continue;
+    }
+
+    ++i;
+    ++j;
+
+  }
+
+  return fuzz;
+}
+
+static void
+analyze_nodes_for_close_matches (const std::multimap<size_t, const NetGraphNode *> &nodes_by_edges1, const std::multimap<size_t, const NetGraphNode *> &nodes_by_edges2, bool layout2ref, db::NetlistCompareLogger *logger, const db::NetGraph &g2)
+{
+  size_t max_search = 100;
+  double max_fuzz_factor = 0.25;
+  size_t max_fuzz_count = 3;
+  size_t max_edges_split = 3;  //  by how many edges joining will reduce the edge count at max
+  size_t min_edges = 2;
+
+  std::string msg;
+  if (layout2ref) {
+    msg = tl::to_string (tr ("Net %s may be shorting nets %s and %s from reference netlist (fuzziness %d nodes)"));
+  } else {
+    msg = tl::to_string (tr ("Connecting nets %s and %s is making a better match to net %s from reference netlist (fuzziness %d nodes)"));
+  }
+
+  for (auto i = nodes_by_edges1.begin (); i != nodes_by_edges1.end (); ++i) {
+
+    if (i->first < min_edges) {
+      continue;
+    }
+
+    std::set<const db::NetGraphNode *> seen;
+
+    for (auto j = nodes_by_edges2.begin (); j != nodes_by_edges2.end (); ++j) {
+
+      seen.insert (j->second);
+
+      if (j->first > i->first + max_fuzz_count - 1) {
+        break;
+      }
+
+      size_t ne = i->first > j->first ? i->first - j->first : 0;
+      if (ne > max_fuzz_count) {
+        ne -= max_fuzz_count;
+      }
+
+      if (ne == 0 && layout2ref) {
+
+        //  analyze nets for similarities (only layout -> ref as the other case is symmetric)
+
+        size_t fuzz = distance (*i->second, *j->second);
+        double fuzz_factor = double (fuzz) / ne;
+        if (fuzz_factor < max_fuzz_factor) {
+          std::string msg = tl::to_string (tr ("Net %s from netlist approximately matches net %s from reference netlist (fuzziness %d nodes)"));
+          logger->log_entry (db::NetlistCompareLogger::Info, tl::sprintf (msg,
+                                  i->second->net ()->expanded_name (),
+                                  j->second->net ()->expanded_name (),
+                                  int (fuzz)));
+        }
+
+      }
+
+      auto k = nodes_by_edges2.lower_bound (ne);
+
+      size_t tries = max_search;
+      for ( ; k != nodes_by_edges2.end () && j->first + k->first < i->first + max_fuzz_count + max_edges_split && tries > 0; ++k) {
+
+        if (seen.find (k->second) != seen.end ()) {
+          continue;
+        }
+
+        size_t fuzz = distance3 (*i->second, *j->second, *k->second, g2);
+        double fuzz_factor = double (fuzz) / i->first;
+        if (fuzz_factor < max_fuzz_factor) {
+          logger->log_entry (db::NetlistCompareLogger::Info, tl::sprintf (msg,
+                                  (layout2ref ? i : j)->second->net ()->expanded_name (),
+                                  (layout2ref ? j : k)->second->net ()->expanded_name (),
+                                  (layout2ref ? k : i)->second->net ()->expanded_name (),
+                                  int (fuzz)));
+        }
+
+        --tries;
+
+      }
+
+    }
+
+  }
+}
+
+void
+NetlistCompareCore::analyze_failed_matches () const
+{
+  //  Determine the range of nodes with same identity
+
+  std::vector<NetGraphNode::edge_type> no_edges;
+  no_edges.push_back (NetGraphNode::edge_type ());
+
+  std::vector<NodeEdgePair> nodes, other_nodes;
+
+  nodes.reserve (mp_graph->end () - mp_graph->begin ());
+  for (db::NetGraph::node_iterator i1 = mp_graph->begin (); i1 != mp_graph->end (); ++i1) {
+    if (i1->net ()) {
+      nodes.push_back (NodeEdgePair (i1.operator-> (), no_edges.begin ()));
+    }
+  }
+
+  other_nodes.reserve (mp_other_graph->end () - mp_other_graph->begin ());
+  for (db::NetGraph::node_iterator i2 = mp_other_graph->begin (); i2 != mp_other_graph->end (); ++i2) {
+    if (i2->net ()) {
+      other_nodes.push_back (NodeEdgePair (i2.operator-> (), no_edges.begin ()));
+    }
+  }
+
+  std::sort (nodes.begin (), nodes.end (), CompareNodeEdgePair ());
+  std::sort (other_nodes.begin (), other_nodes.end (), CompareNodeEdgePair ());
+
+  auto n1 = nodes.begin ();
+  auto n2 = other_nodes.begin ();
+
+  std::vector<const db::NetGraphNode *> singular1, singular2;
+
+  while (n1 != nodes.end () || n2 != other_nodes.end ()) {
+
+    if (n2 == other_nodes.end ()) {
+      singular1.push_back (n1->node);
+      ++n1;
+      continue;
+    } else if (n1 == nodes.end ()) {
+      singular2.push_back (n2->node);
+      ++n2;
+      continue;
+    }
+
+    if (*n1->node < *n2->node) {
+      singular1.push_back (n1->node);
+      ++n1;
+      continue;
+    } else if (*n2->node < *n1->node) {
+      singular2.push_back (n2->node);
+      ++n2;
+      continue;
+    }
+
+    ++n1;
+    ++n2;
+
+  }
+
+  for (auto i = singular1.begin (); i != singular1.end (); ++i) {
+    logger->log_entry (db::NetlistCompareLogger::Error, tl::sprintf (tl::to_string (tr ("Net %s is not matching any net from reference netlist")), (*i)->net ()->expanded_name ()));
+  }
+
+  //  attempt some analysis for close matches (including shorts / opens)
+
+  std::multimap<size_t, const NetGraphNode *> nodes_by_edges1, nodes_by_edges2;
+
+  for (auto i = singular1.begin (); i != singular1.end (); ++i) {
+    const NetGraphNode *n = *i;
+    nodes_by_edges1.insert (std::make_pair (n->end () - n->begin (), n));
+  }
+
+  for (auto i = singular2.begin (); i != singular2.end (); ++i) {
+    const NetGraphNode *n = *i;
+    nodes_by_edges2.insert (std::make_pair (n->end () - n->begin (), n));
+  }
+
+  analyze_nodes_for_close_matches (nodes_by_edges1, nodes_by_edges2, true, logger, *mp_other_graph);
+  analyze_nodes_for_close_matches (nodes_by_edges2, nodes_by_edges1, false, logger, *mp_graph);
+}
+
 size_t
 NetlistCompareCore::derive_node_identities_from_node_set (std::vector<NodeEdgePair> &nodes, std::vector<NodeEdgePair> &other_nodes) const
 {
@@ -1281,6 +1551,9 @@ NetlistCompareCore::derive_node_identities_from_node_set (std::vector<NodeEdgePa
   }
 
   if (max_depth != std::numeric_limits<size_t>::max() && depth > max_depth) {
+    if (with_log) {
+      logger->log_entry (db::NetlistCompareLogger::Warning, tl::sprintf (tl::to_string (tr ("Maximum depth exhausted (max depth is %d)")), int (max_depth)));
+    }
     if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
       tl::info << indent_s << "max. depth exhausted (" << depth << ">" << max_depth << ")";
     }
@@ -1396,6 +1669,9 @@ NetlistCompareCore::derive_node_identities_from_node_set (std::vector<NodeEdgePa
 
     } else if (max_n_branch != std::numeric_limits<size_t>::max () && double (std::max (nr->num1, nr->num2)) * double (n_branch) > double (max_n_branch)) {
 
+      if (with_log) {
+        logger->log_entry (db::NetlistCompareLogger::Warning, tl::sprintf (tl::to_string (tr ("Maximum complexity exhausted (max complexity is %s, needs at least %s)")), tl::to_string (max_n_branch), tl::to_string (std::max (nr->num1, nr->num2) * n_branch)));
+      }
       if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
         tl::info << indent_s << "max. complexity exhausted (" << std::max (nr->num1, nr->num2) << "*" << n_branch << ">" << max_n_branch << ") - mismatch.";
       }

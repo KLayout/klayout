@@ -37,7 +37,7 @@ See <a href="/about/lvs_ref_netter.xml#align">Netter#align</a> for a description
 <p>
 See <a href="/about/lvs_ref_netter.xml#blank_circuit">Netter#blank_circuit</a> for a description of that function.
 </p>
-<a name="compare"/><h2>"compare" - Compares the extracted netlist vs. the schematic</h2>
+<a name="compare"/><h2>"compare" - Compares the extracted netlist vs. the schematic netlist</h2>
 <keyword name="compare"/>
 <p>Usage:</p>
 <ul>
@@ -153,6 +153,15 @@ See <a href="/about/lvs_ref_netter.xml#min_caps">Netter#min_caps</a> for a descr
 </ul>
 <p>
 See <a href="/about/lvs_ref_netter.xml">Netter</a> for more details
+</p>
+<a name="no_lvs_hints"/><h2>"no_lvs_hints" - Disables LVS hints</h2>
+<keyword name="no_lvs_hints"/>
+<p>Usage:</p>
+<ul>
+<li><tt>no_lvs_hints</tt></li>
+</ul>
+<p>
+See <a href="/about/lvs_ref_netter.xml#no_lvs_hints">Netter#no_lvs_hints</a> for a description of that feature.
 </p>
 <a name="report_lvs"/><h2>"report_lvs" - Specifies an LVS report for output</h2>
 <keyword name="report_lvs"/>

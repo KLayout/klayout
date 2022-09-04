@@ -50,8 +50,8 @@ struct CurrentStyleOp
   int prev_index, new_index;
 };
 
-EditLineStylesForm::EditLineStylesForm (lay::LayoutViewBase *view, const lay::LineStyles &styles)
-  : QDialog (view->widget ()), db::Object (0),
+EditLineStylesForm::EditLineStylesForm (QWidget *parent, lay::LayoutViewBase *view, const lay::LineStyles &styles)
+  : QDialog (parent), db::Object (0),
     m_selected (-1), m_styles (styles), m_manager (true), mp_view (view)
 {
   m_selection_changed_enabled = false;

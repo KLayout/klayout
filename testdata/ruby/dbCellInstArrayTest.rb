@@ -631,6 +631,35 @@ class DBCellInst_TestClass < TestBase
 
   end
 
+  # Cell * variants
+  def test_5_CellPointer
+
+    ly = RBA::Layout::new
+    cell = ly.create_cell("TOP")
+
+    a = RBA::CellInstArray::new(cell, RBA::Trans::new(RBA::Trans::R90))
+    assert_equal(a.cell_index, cell.cell_index)
+
+    a = RBA::CellInstArray::new(cell, RBA::Vector::new(42, -17))
+    assert_equal(a.cell_index, cell.cell_index)
+
+    a = RBA::CellInstArray::new(cell, RBA::ICplxTrans::new(1.5))
+    assert_equal(a.cell_index, cell.cell_index)
+
+    a = RBA::CellInstArray::new(cell, RBA::ICplxTrans::new(1.0, 45, false, RBA::Vector::new))
+    assert_equal(a.cell_index, cell.cell_index)
+
+    a = RBA::CellInstArray::new(cell, RBA::Trans::new(RBA::Trans::R90), RBA::Vector::new(10, 20), RBA::Vector::new(30, 40), 3, 5)
+    assert_equal(a.cell_index, cell.cell_index)
+
+    a = RBA::CellInstArray::new(cell, RBA::Vector::new(42, -17), RBA::Vector::new(10, 20), RBA::Vector::new(30, 40), 3, 5)
+    assert_equal(a.cell_index, cell.cell_index)
+
+    a = RBA::CellInstArray::new(cell, RBA::ICplxTrans::new(1.5), RBA::Vector::new(10, 20), RBA::Vector::new(30, 40), 3, 5)
+    assert_equal(a.cell_index, cell.cell_index)
+
+  end
+
 end
 
 load("test_epilogue.rb")

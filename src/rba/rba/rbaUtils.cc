@@ -113,6 +113,18 @@ rba_get_backtrace_from_array (VALUE backtrace, std::vector<tl::BacktraceElement>
 }
 
 void
+block_exceptions (bool f)
+{
+  RubyInterpreter::instance ()->block_exceptions (f);
+}
+
+bool
+exceptions_blocked ()
+{
+  return RubyInterpreter::instance ()->exceptions_blocked ();
+}
+
+void
 rba_check_error ()
 {
   VALUE lasterr = rb_errinfo ();

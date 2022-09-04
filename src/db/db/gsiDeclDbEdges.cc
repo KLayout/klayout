@@ -371,6 +371,61 @@ static size_t id (const db::Edges *e)
   return tl::id_of (e->delegate ());
 }
 
+static inline std::vector<db::Edges> as_2edges_vector (const std::pair<db::Edges, db::Edges> &rp)
+{
+  std::vector<db::Edges> res;
+  res.reserve (2);
+  res.push_back (db::Edges (const_cast<db::Edges &> (rp.first).take_delegate ()));
+  res.push_back (db::Edges (const_cast<db::Edges &> (rp.second).take_delegate ()));
+  return res;
+}
+
+static std::vector<db::Edges> andnot_with_edges (const db::Edges *r, const db::Edges &other)
+{
+  return as_2edges_vector (r->andnot (other));
+}
+
+static std::vector<db::Edges> andnot_with_region (const db::Edges *r, const db::Region &other)
+{
+  return as_2edges_vector (r->andnot (other));
+}
+
+static std::vector<db::Edges> inside_outside_part (const db::Edges *r, const db::Region &other)
+{
+  return as_2edges_vector (r->inside_outside_part (other));
+}
+
+static std::vector<db::Edges> split_inside_with_edges (const db::Edges *r, const db::Edges &other)
+{
+  return as_2edges_vector (r->selected_inside_differential (other));
+}
+
+static std::vector<db::Edges> split_inside_with_region (const db::Edges *r, const db::Region &other)
+{
+  return as_2edges_vector (r->selected_inside_differential (other));
+}
+
+static std::vector<db::Edges> split_outside_with_edges (const db::Edges *r, const db::Edges &other)
+{
+  return as_2edges_vector (r->selected_outside_differential (other));
+}
+
+static std::vector<db::Edges> split_outside_with_region (const db::Edges *r, const db::Region &other)
+{
+  return as_2edges_vector (r->selected_outside_differential (other));
+}
+
+static std::vector<db::Edges> split_interacting_with_edges (const db::Edges *r, const db::Edges &other)
+{
+  return as_2edges_vector (r->selected_interacting_differential (other));
+}
+
+static std::vector<db::Edges> split_interacting_with_region (const db::Edges *r, const db::Region &other)
+{
+  return as_2edges_vector (r->selected_interacting_differential (other));
+}
+
+
 extern Class<db::ShapeCollection> decl_dbShapeCollection;
 
 //  NOTE: the Metrics constants are injected into Edges in gsiDeclDbRegion.cc because this is where these constants are instantiated.
@@ -774,6 +829,26 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
+  method_ext ("andnot", &andnot_with_edges, gsi::arg ("other"),
+    "@brief Returns the boolean AND and NOT between self and the other edge set\n"
+    "\n"
+    "@return A two-element array of edge collections with the first one being the AND result and the second one being the NOT result\n"
+    "\n"
+    "This method will compute the boolean AND and NOT between two edge sets simultaneously. "
+    "Because this requires a single sweep only, using this method is faster than doing AND and NOT separately.\n"
+    "\n"
+    "This method has been added in version 0.28.\n"
+  ) +
+  method_ext ("andnot", &andnot_with_region, gsi::arg ("other"),
+    "@brief Returns the boolean AND and NOT between self and the region\n"
+    "\n"
+    "@return A two-element array of edge collections with the first one being the AND result and the second one being the NOT result\n"
+    "\n"
+    "This method will compute the boolean AND and NOT simultaneously. "
+    "Because this requires a single sweep only, using this method is faster than doing AND and NOT separately.\n"
+    "\n"
+    "This method has been added in version 0.28.\n"
+  ) +
   method ("^", &db::Edges::operator^, gsi::arg ("other"),
     "@brief Returns the boolean XOR between self and the other edge collection\n"
     "\n"
@@ -828,66 +903,202 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "@brief Returns the edges of this edge collection which overlap or touch edges from the other edge collection\n"
     "\n"
     "@return A new edge collection containing the edges overlapping or touching edges from the other edge collection\n"
-    "\n"
-    "This method does not merge the edges before they are selected. If you want to select coherent "
-    "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
   method ("not_interacting", (db::Edges (db::Edges::*) (const db::Edges &) const)  &db::Edges::selected_not_interacting, gsi::arg ("other"),
     "@brief Returns the edges of this edge collection which do not overlap or touch edges from the other edge collection\n"
     "\n"
     "@return A new edge collection containing the edges not overlapping or touching edges from the other edge collection\n"
-    "\n"
-    "This method does not merge the edges before they are selected. If you want to select coherent "
-    "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
   method ("select_interacting", (db::Edges &(db::Edges::*) (const db::Edges &)) &db::Edges::select_interacting, gsi::arg ("other"),
     "@brief Selects the edges from this edge collection which overlap or touch edges from the other edge collection\n"
     "\n"
     "@return The edge collection after the edges have been selected (self)\n"
-    "\n"
-    "This method does not merge the edges before they are selected. If you want to select coherent "
-    "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
   method ("select_not_interacting", (db::Edges &(db::Edges::*) (const db::Edges &)) &db::Edges::select_not_interacting, gsi::arg ("other"),
     "@brief Selects the edges from this edge collection which do not overlap or touch edges from the other edge collection\n"
     "\n"
     "@return The edge collection after the edges have been selected (self)\n"
-    "\n"
-    "This method does not merge the edges before they are selected. If you want to select coherent "
-    "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
+  method_ext ("split_interacting", &split_interacting_with_edges, gsi::arg ("other"),
+    "@brief Selects the edges from this edge collection which do and do not interact with edges from the other collection\n"
+    "\n"
+    "@return A two-element list of edge collections (first: interacting, second: non-interacting)\n"
+    "\n"
+    "This method provides a faster way to compute both interacting and non-interacting edges compared to using separate methods. "
+    "It has been introduced in version 0.28."
+  ) +
   method ("interacting", (db::Edges (db::Edges::*) (const db::Region &) const)  &db::Edges::selected_interacting, gsi::arg ("other"),
     "@brief Returns the edges from this edge collection which overlap or touch polygons from the region\n"
     "\n"
     "@return A new edge collection containing the edges overlapping or touching polygons from the region\n"
-    "\n"
-    "This method does not merge the edges before they are selected. If you want to select coherent "
-    "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
   method ("not_interacting", (db::Edges (db::Edges::*) (const db::Region &) const)  &db::Edges::selected_not_interacting, gsi::arg ("other"),
     "@brief Returns the edges from this edge collection which do not overlap or touch polygons from the region\n"
     "\n"
     "@return A new edge collection containing the edges not overlapping or touching polygons from the region\n"
-    "\n"
-    "This method does not merge the edges before they are selected. If you want to select coherent "
-    "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
   method ("select_interacting", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_interacting, gsi::arg ("other"),
     "@brief Selects the edges from this edge collection which overlap or touch polygons from the region\n"
     "\n"
     "@return The edge collection after the edges have been selected (self)\n"
-    "\n"
-    "This method does not merge the edges before they are selected. If you want to select coherent "
-    "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
   method ("select_not_interacting", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_not_interacting, gsi::arg ("other"),
     "@brief Selects the edges from this edge collection which do not overlap or touch polygons from the region\n"
     "\n"
     "@return The edge collection after the edges have been selected (self)\n"
-    "\n"
-    "This method does not merge the edges before they are selected. If you want to select coherent "
-    "edges, make sure the edge collection is merged before this method is used.\n"
   ) + 
+  method_ext ("split_interacting", &split_interacting_with_region, gsi::arg ("other"),
+    "@brief Selects the edges from this edge collection which do and do not interact with polygons from the other region\n"
+    "\n"
+    "@return A two-element list of edge collections (first: interacting, second: non-interacting)\n"
+    "\n"
+    "This method provides a faster way to compute both interacting and non-interacting edges compared to using separate methods. "
+    "It has been introduced in version 0.28."
+  ) +
+  method ("inside", (db::Edges (db::Edges::*) (const db::Edges &) const) &db::Edges::selected_inside, gsi::arg ("other"),
+    "@brief Returns the edges of this edge collection which are inside (completely covered by) edges from the other edge collection\n"
+    "\n"
+    "@return A new edge collection containing the edges overlapping or touching edges from the other edge collection\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method ("not_inside", (db::Edges (db::Edges::*) (const db::Edges &) const) &db::Edges::selected_not_inside, gsi::arg ("other"),
+    "@brief Returns the edges of this edge collection which are not inside (completely covered by) edges from the other edge collection\n"
+    "\n"
+    "@return A new edge collection containing the edges not overlapping or touching edges from the other edge collection\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method ("select_inside", (db::Edges &(db::Edges::*) (const db::Edges &)) &db::Edges::select_inside, gsi::arg ("other"),
+    "@brief Selects the edges from this edge collection which are inside (completely covered by) edges from the other edge collection\n"
+    "\n"
+    "@return The edge collection after the edges have been selected (self)\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method ("select_not_inside", (db::Edges &(db::Edges::*) (const db::Edges &)) &db::Edges::select_not_inside, gsi::arg ("other"),
+    "@brief Selects the edges from this edge collection which are not inside (completely covered by) edges from the other edge collection\n"
+    "\n"
+    "@return The edge collection after the edges have been selected (self)\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method_ext ("split_inside", &split_inside_with_edges, gsi::arg ("other"),
+    "@brief Selects the edges from this edge collection which are and are not inside (completely covered by) edges from the other collection\n"
+    "\n"
+    "@return A two-element list of edge collections (first: inside, second: non-inside)\n"
+    "\n"
+    "This method provides a faster way to compute both inside and non-inside edges compared to using separate methods. "
+    "It has been introduced in version 0.28."
+  ) +
+  method ("inside", (db::Edges (db::Edges::*) (const db::Region &) const) &db::Edges::selected_inside, gsi::arg ("other"),
+    "@brief Returns the edges from this edge collection which are inside (completely covered by) polygons from the region\n"
+    "\n"
+    "@return A new edge collection containing the edges overlapping or touching polygons from the region\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method ("not_inside", (db::Edges (db::Edges::*) (const db::Region &) const) &db::Edges::selected_not_inside, gsi::arg ("other"),
+    "@brief Returns the edges from this edge collection which are not inside (completely covered by) polygons from the region\n"
+    "\n"
+    "@return A new edge collection containing the edges not overlapping or touching polygons from the region\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method ("select_inside", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_inside, gsi::arg ("other"),
+    "@brief Selects the edges from this edge collection which are inside (completely covered by) polygons from the region\n"
+    "\n"
+    "@return The edge collection after the edges have been selected (self)\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method ("select_not_inside", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_not_inside, gsi::arg ("other"),
+    "@brief Selects the edges from this edge collection which are not inside (completely covered by) polygons from the region\n"
+    "\n"
+    "@return The edge collection after the edges have been selected (self)\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method_ext ("split_inside", &split_inside_with_region, gsi::arg ("other"),
+    "@brief Selects the edges from this edge collection which are and are not inside (completely covered by) polygons from the other region\n"
+    "\n"
+    "@return A two-element list of edge collections (first: inside, second: non-inside)\n"
+    "\n"
+    "This method provides a faster way to compute both inside and non-inside edges compared to using separate methods. "
+    "It has been introduced in version 0.28."
+  ) +
+  method ("outside", (db::Edges (db::Edges::*) (const db::Edges &) const) &db::Edges::selected_outside, gsi::arg ("other"),
+    "@brief Returns the edges of this edge collection which are outside (completely covered by) edges from the other edge collection\n"
+    "\n"
+    "@return A new edge collection containing the edges overlapping or touching edges from the other edge collection\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method ("not_outside", (db::Edges (db::Edges::*) (const db::Edges &) const) &db::Edges::selected_not_outside, gsi::arg ("other"),
+    "@brief Returns the edges of this edge collection which are not outside (completely covered by) edges from the other edge collection\n"
+    "\n"
+    "@return A new edge collection containing the edges not overlapping or touching edges from the other edge collection\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method ("select_outside", (db::Edges &(db::Edges::*) (const db::Edges &)) &db::Edges::select_outside, gsi::arg ("other"),
+    "@brief Selects the edges from this edge collection which are outside (completely covered by) edges from the other edge collection\n"
+    "\n"
+    "@return The edge collection after the edges have been selected (self)\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method ("select_not_outside", (db::Edges &(db::Edges::*) (const db::Edges &)) &db::Edges::select_not_outside, gsi::arg ("other"),
+    "@brief Selects the edges from this edge collection which are not outside (completely covered by) edges from the other edge collection\n"
+    "\n"
+    "@return The edge collection after the edges have been selected (self)\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method_ext ("split_outside", &split_outside_with_edges, gsi::arg ("other"),
+    "@brief Selects the edges from this edge collection which are and are not outside (completely covered by) edges from the other collection\n"
+    "\n"
+    "@return A two-element list of edge collections (first: outside, second: non-outside)\n"
+    "\n"
+    "This method provides a faster way to compute both outside and non-outside edges compared to using separate methods. "
+    "It has been introduced in version 0.28."
+  ) +
+  method ("outside", (db::Edges (db::Edges::*) (const db::Region &) const) &db::Edges::selected_outside, gsi::arg ("other"),
+    "@brief Returns the edges from this edge collection which are outside (completely covered by) polygons from the region\n"
+    "\n"
+    "@return A new edge collection containing the edges overlapping or touching polygons from the region\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method ("not_outside", (db::Edges (db::Edges::*) (const db::Region &) const) &db::Edges::selected_not_outside, gsi::arg ("other"),
+    "@brief Returns the edges from this edge collection which are not outside (completely covered by) polygons from the region\n"
+    "\n"
+    "@return A new edge collection containing the edges not overlapping or touching polygons from the region\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method ("select_outside", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_outside, gsi::arg ("other"),
+    "@brief Selects the edges from this edge collection which are outside (completely covered by) polygons from the region\n"
+    "\n"
+    "@return The edge collection after the edges have been selected (self)\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method ("select_not_outside", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_not_outside, gsi::arg ("other"),
+    "@brief Selects the edges from this edge collection which are not outside (completely covered by) polygons from the region\n"
+    "\n"
+    "@return The edge collection after the edges have been selected (self)\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  method_ext ("split_outside", &split_outside_with_region, gsi::arg ("other"),
+    "@brief Selects the edges from this edge collection which are and are not outside (completely covered by) polygons from the other region\n"
+    "\n"
+    "@return A two-element list of edge collections (first: outside, second: non-outside)\n"
+    "\n"
+    "This method provides a faster way to compute both outside and non-outside edges compared to using separate methods. "
+    "It has been introduced in version 0.28."
+  ) +
   method_ext ("pull_interacting", &pull_interacting, gsi::arg ("other"),
     "@brief Returns all polygons of \"other\" which are interacting with (overlapping, touching) edges of this edge set\n"
     "The \"pull_...\" methods are similar to \"select_...\" but work the opposite way: they "
@@ -966,6 +1177,16 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
+  method_ext ("inside_outside_part", &inside_outside_part, gsi::arg ("other"),
+    "@brief Returns the partial edges inside and outside the given region\n"
+    "\n"
+    "@return A two-element array of edge collections with the first one being the \\inside_part result and the second one being the \\outside_part result\n"
+    "\n"
+    "This method will compute the results simultaneously. "
+    "Because this requires a single sweep only, using this method is faster than doing \\inside_part and \\outside_part separately.\n"
+    "\n"
+    "This method has been added in version 0.28.\n"
+  ) +
   method ("clear", &db::Edges::clear,
     "@brief Clears the edge collection\n"
   ) +

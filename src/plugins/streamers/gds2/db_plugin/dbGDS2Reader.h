@@ -92,7 +92,7 @@ private:
   tl::AbsoluteProgress m_progress;
 
   virtual void error (const std::string &txt);
-  virtual void warn (const std::string &txt);
+  virtual void warn (const std::string &txt, int wl = 1);
 
   virtual std::string path () const;
   virtual const char *get_string ();

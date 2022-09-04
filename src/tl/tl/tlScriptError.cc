@@ -98,12 +98,6 @@ ScriptError::ScriptError (const ScriptError &d)
 }
 
 std::string
-ScriptError::basic_msg () const
-{
-  return tl::Exception::msg ();
-}
-
-std::string
 ScriptError::msg () const
 {
   std::string m = basic_msg ();

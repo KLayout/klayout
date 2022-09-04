@@ -53,6 +53,7 @@ FORMS = \
   NewLayerPropertiesDialog.ui \
   NewLayoutPropertiesDialog.ui \
   OpenLayoutModeDialog.ui \
+  PropertiesDialog.ui \
   RenameCellDialog.ui \
   ReplaceCellOptionsDialog.ui \
   SaveLayoutOptionsDialog.ui \
@@ -126,6 +127,8 @@ SOURCES = \
   layNetlistBrowserPage.cc \
   layNetlistBrowserTreeModel.cc \
   layNetlistCrossReferenceModel.cc \
+  layNetlistLogModel.cc \
+  layPropertiesDialog.cc \
   layQtTools.cc \
   laySaveLayoutOptionsDialog.cc \
   laySelectCellViewForm.cc \
@@ -184,6 +187,8 @@ HEADERS = \
   layNetlistBrowserPage.h \
   layNetlistBrowserTreeModel.h \
   layNetlistCrossReferenceModel.h \
+  layNetlistLogModel.h \
+  layPropertiesDialog.h \
   layQtTools.h \
   laySaveLayoutOptionsDialog.h \
   laySelectCellViewForm.h \

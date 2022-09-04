@@ -25,6 +25,8 @@
 #ifndef HDR_layPropertiesDialog
 #define HDR_layPropertiesDialog
 
+#include "layuiCommon.h"
+
 #include <vector>
 
 #include <QMutex>
@@ -35,11 +37,14 @@
 
 #include <dbManager.h>
 
-#include "ui_PropertiesDialog.h"
-
 #include <memory>
 
 class QStackedLayout;
+
+namespace Ui
+{
+  class PropertiesDialog;
+}
 
 namespace lay
 {
@@ -57,8 +62,8 @@ class MainWindow;
  *  objects from a set of editables.
  */
 
-class PropertiesDialog
-  : public QDialog, private Ui::PropertiesDialog
+class LAYUI_PUBLIC PropertiesDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -98,6 +103,9 @@ public slots:
 
 protected:
   void reject ();
+
+private:
+  Ui::PropertiesDialog *mp_ui;
 };
 
 }

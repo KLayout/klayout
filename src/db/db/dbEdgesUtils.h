@@ -34,6 +34,11 @@
 
 namespace db {
 
+/**
+ *  @brief The operation mode for the interaction filters
+ */
+enum EdgeInteractionMode { EdgesInteract, EdgesInside, EdgesOutside };
+
 class PolygonSink;
 
 /**
@@ -242,6 +247,21 @@ private:
 };
 
 /**
+ *  @brief A predicate defining edge a interacts with b
+ */
+DB_PUBLIC bool edge_interacts (const db::Edge &a, const db::Edge &b);
+
+/**
+ *  @brief A predicate defining edge a is "inside" b
+ */
+DB_PUBLIC bool edge_is_inside (const db::Edge &a, const db::Edge &b);
+
+/**
+ *  @brief A predicate defining edge a is "outside" b
+ */
+DB_PUBLIC bool edge_is_outside (const db::Edge &a, const db::Edge &b);
+
+/**
  *  @brief A helper class for the edge interaction functionality which acts as an edge pair receiver
  */
 template <class OutputContainer>
@@ -249,30 +269,64 @@ class edge_interaction_filter
   : public db::box_scanner_receiver<db::Edge, size_t>
 {
 public:
-  edge_interaction_filter (OutputContainer &output)
-    : mp_output (&output)
+  edge_interaction_filter (OutputContainer &output, EdgeInteractionMode mode)
+    : mp_output (&output), m_mode (mode)
   {
     //  .. nothing yet ..
+  }
+
+  void finish (const db::Edge *o, size_t p)
+  {
+    if (p == 0 && m_mode == EdgesOutside && m_seen.find (o) == m_seen.end ()) {
+      mp_output->insert (*o);
+    }
   }
 
   void add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2)
   {
     //  Select the edges which intersect
     if (p1 != p2) {
+
       const db::Edge *o = p1 > p2 ? o2 : o1;
       const db::Edge *oo = p1 > p2 ? o1 : o2;
-      if (o->intersect (*oo)) {
+
+      if ((m_mode == EdgesInteract && db::edge_interacts (*o, *oo)) ||
+          (m_mode == EdgesInside && db::edge_is_inside (*o, *oo))) {
+
         if (m_seen.insert (o).second) {
           mp_output->insert (*o);
         }
+
+      } else if (m_mode == EdgesOutside && ! db::edge_is_outside (*o, *oo)) {
+
+        //  In this case we need to collect edges which are outside always - we report those on "finished".
+        m_seen.insert (o);
+
       }
+
     }
   }
 
 private:
   OutputContainer *mp_output;
   std::set<const db::Edge *> m_seen;
+  EdgeInteractionMode m_mode;
 };
+
+/**
+ *  @brief A predicate defining edge a interacts with polygon b
+ */
+DB_PUBLIC bool edge_interacts (const db::Edge &a, const db::Polygon &b);
+
+/**
+ *  @brief A predicate defining edge a is "inside" polygon b
+ */
+DB_PUBLIC bool edge_is_inside (const db::Edge &a, const db::Polygon &b);
+
+/**
+ *  @brief A predicate defining edge a is "outside" polygon b
+ */
+DB_PUBLIC bool edge_is_outside (const db::Edge &a, const db::Polygon &b);
 
 /**
  *  @brief A helper class for the edge to region interaction functionality which acts as an edge pair receiver
@@ -288,10 +342,35 @@ class edge_to_region_interaction_filter
   : public db::box_scanner_receiver2<db::Edge, size_t, db::Polygon, size_t>
 {
 public:
-  edge_to_region_interaction_filter (OutputContainer &output)
-    : mp_output (&output)
+  edge_to_region_interaction_filter (OutputContainer *output, EdgeInteractionMode mode)
+    : mp_output (output), m_mode (mode)
   {
     //  .. nothing yet ..
+  }
+
+  void finish (const OutputType *o)
+  {
+    if (m_mode == EdgesOutside && m_seen.find (o) == m_seen.end ()) {
+      mp_output->insert (*o);
+    }
+  }
+
+  void finish1 (const db::Edge *o, size_t /*p*/)
+  {
+    const OutputType *ep = 0;
+    tl::select (ep, o, (const db::Polygon *) 0);
+    if (ep) {
+      finish (ep);
+    }
+  }
+
+  void finish2 (const db::Polygon *o, size_t /*p*/)
+  {
+    const OutputType *ep = 0;
+    tl::select (ep, (const db::Edge *) 0, o);
+    if (ep) {
+      finish (ep);
+    }
   }
 
   void add (const db::Edge *e, size_t, const db::Polygon *p, size_t)
@@ -300,16 +379,27 @@ public:
     tl::select (ep, e, p);
 
     if (m_seen.find (ep) == m_seen.end ()) {
-      if (db::interact (*p, *e)) {
+
+      if ((m_mode == EdgesInteract && db::edge_interacts (*e, *p)) ||
+          (m_mode == EdgesInside && db::edge_is_inside (*e, *p))) {
+
         m_seen.insert (ep);
         mp_output->insert (*ep);
+
+      } else if (m_mode == EdgesOutside && ! db::edge_is_outside (*e, *p)) {
+
+        //  In this case we need to collect edges which are outside always - we report those on "finished".
+        m_seen.insert (ep);
+
       }
+
     }
   }
 
 private:
   OutputContainer *mp_output;
   std::set<const OutputType *> m_seen;
+  EdgeInteractionMode m_mode;
 };
 
 /**
@@ -407,7 +497,7 @@ class DB_PUBLIC EdgeSegmentSelector
   : public EdgeProcessorBase
 {
 public:
-  EdgeSegmentSelector (int mode, db::Edges::length_type length, double fraction);
+  EdgeSegmentSelector (int mode, Edge::distance_type length, double fraction);
   ~EdgeSegmentSelector ();
 
   virtual void process (const db::Edge &edge, std::vector<db::Edge> &res) const;
@@ -420,7 +510,7 @@ public:
 
 private:
   int m_mode;
-  db::Edges::length_type m_length;
+  db::Edge::distance_type m_length;
   double m_fraction;
   db::MagnificationReducer m_vars;
 };

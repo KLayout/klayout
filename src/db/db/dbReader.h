@@ -55,6 +55,35 @@ public:
 };
 
 /**
+ *  @brief A class representing the "unknown format" reader error
+ *
+ *  The purpose of this class is supply the header bytes of the
+ *  data stream for analysis.
+ */
+class DB_PUBLIC ReaderUnknownFormatException
+  : public ReaderException
+{
+public:
+  ReaderUnknownFormatException (const std::string &msg, const std::string &data, bool has_more)
+    : ReaderException (msg), m_data (data), m_has_more (has_more)
+  { }
+
+  const std::string &data () const
+  {
+    return m_data;
+  }
+
+  bool has_more () const
+  {
+    return m_has_more;
+  }
+
+private:
+  std::string m_data;
+  bool m_has_more;
+};
+
+/**
  *  @brief Joins layer names into a single, combined layer
  *  @param s The first layer name and output
  *  @param n The name to add
@@ -89,8 +118,20 @@ public:
     return m_warnings_as_errors;
   }
 
+  /**
+   *  @brief Gets the warning level
+   */
+  int warn_level () const
+  {
+    return m_warn_level;
+  }
+
+protected:
+  virtual void init (const db::LoadLayoutOptions &options);
+
 private:
   bool m_warnings_as_errors;
+  int m_warn_level;
 };
 
 /**

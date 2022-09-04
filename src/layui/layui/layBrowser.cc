@@ -23,6 +23,7 @@
 #if defined(HAVE_QT)
 
 #include <QDialog>
+#include <QApplication>
 
 #include "layBrowser.h"
 #include "layLayoutViewBase.h"

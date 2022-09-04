@@ -23,6 +23,9 @@ connect(metal1, via1)
 connect(via1, metal2)
 
 antenna_check(gate, metal2, 1.0).output(101)
+values = labels
+antenna_check(gate, metal2, 1.0, values).output(101, 1)
+values.output(101, 10)
 antenna_check(gate, metal2, 5.0).output(105)
 antenna_check(gate, metal2, 10.0).output(110)
 antenna_check(gate, metal2, 50.0).output(150)

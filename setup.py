@@ -759,4 +759,6 @@ if __name__ == '__main__':
           url='https://github.com/klayout/klayout',
           packages=find_packages('src/pymod/distutils_src'),
           package_dir={'': 'src/pymod/distutils_src'},  # https://github.com/pypa/setuptools/issues/230
+          package_data={config.root: ["src/pymod/distutils_src/klayout/*.pyi"]},
+          include_package_data=True,
           ext_modules=[_tl, _gsi, _pya, _rba, _db, _lib, _rdb, _lym, _laybasic, _layview, _ant, _edt, _img] + db_plugins + [tl, db, lib, rdb, lay])

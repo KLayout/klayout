@@ -47,7 +47,6 @@ namespace lay
 class Editables;
 #if defined(HAVE_QT)
 class PropertiesPage;
-class PropertiesDialog;
 #endif
 
 /**
@@ -590,12 +589,10 @@ public:
     return m_editables.end ();
   }
 
-#if defined(HAVE_QT)
   /**
    *  @brief The "show properties" operation
    */
-  void show_properties (QWidget *parent);
-#endif
+  virtual void show_properties ();
 
   /**
    *  @brief An event triggered if the selection changed
@@ -651,9 +648,6 @@ private:
 
   tl::shared_collection<lay::Editable> m_editables;
   std::set<lay::Editable *> m_enabled;
-#if defined(HAVE_QT)
-  lay::PropertiesDialog *mp_properties_dialog;
-#endif
   bool m_move_selection;
   bool m_any_move_operation;
   db::DBox m_last_selected_point;

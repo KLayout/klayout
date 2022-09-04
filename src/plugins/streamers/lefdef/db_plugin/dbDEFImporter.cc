@@ -52,8 +52,9 @@ struct DEFImporterGroup
   std::vector<tl::GlobPattern> comp_match;
 };
 
-DEFImporter::DEFImporter ()
-  : LEFDEFImporter ()
+DEFImporter::DEFImporter (int warn_level)
+  : LEFDEFImporter (warn_level),
+    m_lef_importer (warn_level)
 {
   //  .. nothing yet ..
 }

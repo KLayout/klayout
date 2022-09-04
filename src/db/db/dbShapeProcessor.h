@@ -105,8 +105,8 @@ public:
    *
    *  @param clear_shapes If true, the shapes container is cleared on the start event.
    */
-  EdgeShapeGenerator (db::Shapes &shapes, bool clear_shapes = false)
-    : EdgeSink (), mp_shapes (&shapes), m_clear_shapes (clear_shapes)
+  EdgeShapeGenerator (db::Shapes &shapes, bool clear_shapes = false, int tag = 0, EdgeShapeGenerator *chained = 0)
+    : EdgeSink (), mp_shapes (&shapes), m_clear_shapes (clear_shapes), m_tag (tag), mp_chained (chained)
   { }
 
   /**
@@ -115,6 +115,22 @@ public:
   virtual void put (const db::Edge &edge) 
   {
     mp_shapes->insert (edge);
+    if (mp_chained) {
+      mp_chained->put (edge);
+    }
+  }
+
+  /**
+   *  @brief Implementation of the EdgeSink interface
+   */
+  virtual void put (const db::Edge &edge, int tag)
+  {
+    if (m_tag == 0 || m_tag == tag) {
+      mp_shapes->insert (edge);
+    }
+    if (mp_chained) {
+      mp_chained->put (edge, tag);
+    }
   }
 
   /**
@@ -127,11 +143,16 @@ public:
       //  The single-shot scheme is a easy way to overcome problems with multiple start/flush brackets (i.e. on size filter)
       m_clear_shapes = false;
     }
+    if (mp_chained) {
+      mp_chained->start ();
+    }
   }
 
 private:
   db::Shapes *mp_shapes;
   bool m_clear_shapes;
+  int m_tag;
+  EdgeShapeGenerator *mp_chained;
 };
 
 /**

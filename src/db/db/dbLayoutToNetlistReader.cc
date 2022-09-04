@@ -97,6 +97,13 @@ LayoutToNetlistStandardReader::read_int ()
   return i;
 }
 
+bool
+LayoutToNetlistStandardReader::try_read_int (int &i)
+{
+  i = 0;
+  return m_ex.try_read (i);
+}
+
 db::Coord
 LayoutToNetlistStandardReader::read_coord ()
 {
@@ -133,6 +140,50 @@ LayoutToNetlistStandardReader::skip ()
   }
 }
 
+void LayoutToNetlistStandardReader::skip_element ()
+{
+  std::string s;
+  double f;
+
+  if (m_ex.try_read_word (s)) {
+
+    //  skip bracket elements after token key
+    Brace br (this);
+    while (br) {
+      skip_element ();
+    }
+    br.done ();
+
+  } else if (m_ex.test ("*")) {
+
+    //  asterisk is allowed as element (e.g. inside point)
+
+  } else if (m_ex.try_read_quoted (s)) {
+
+    //  skip string
+
+  } else if (m_ex.try_read (f)) {
+
+    //  skip numeric value
+
+  } else {
+
+    Brace br (this);
+    if (br) {
+
+      //  skip bracket elements without token
+      while (br) {
+        skip_element ();
+      }
+      br.done ();
+
+    } else {
+      throw tl::Exception (tl::to_string (tr ("Unexpected token")));
+    }
+
+  }
+}
+
 void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("File read: ")) + m_path);
@@ -153,7 +204,7 @@ static db::Region &layer_by_name (db::LayoutToNetlist *l2n, const std::string &n
   return *l;
 }
 
-void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::LayoutToNetlist *l2n, bool nested, std::map<const db::Circuit *, ObjectMap> *map_per_circuit)
+void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::LayoutToNetlist *l2n, LayoutToNetlistStandardReader::Brace *nested, std::map<const db::Circuit *, ObjectMap> *map_per_circuit)
 {
   m_dbu = 0.001;
   int version = 0;
@@ -179,7 +230,7 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
 
   db::LayoutLocker layout_locker (l2n ? l2n->internal_layout () : 0);
 
-  while (! at_end ()) {
+  while (nested ? *nested : ! at_end ()) {
 
     if (test (skeys::version_key) || test (lkeys::version_key)) {
 
@@ -289,7 +340,7 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
           br.done ();
 
         } else {
-          throw tl::Exception (tl::to_string (tr ("Invalid keyword")));
+          skip_element ();
         }
 
       }
@@ -369,7 +420,7 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
         } else if (at_end ()) {
           throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside circuit definition (rect, polygon, net, pin, device or circuit expected)")));
         } else {
-          throw tl::Exception (tl::to_string (tr ("Invalid keyword inside circuit definition (rect, polygon, net, pin, device or circuit expected)")));
+          skip_element ();
         }
 
       }
@@ -430,25 +481,27 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
         } else if (at_end ()) {
           throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside device abstract definition (terminal expected)")));
         } else {
-          throw tl::Exception (tl::to_string (tr ("Invalid keyword inside device abstract definition (terminal expected)")));
+          skip_element ();
         }
 
       }
 
       br.done ();
 
-    } else if (nested) {
-      break;
     } else if (at_end ()) {
-      throw tl::Exception (tl::to_string (tr ("Unexpected end of file")));
+      throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside device abstract definition (terminal expected)")));
     } else {
-      throw tl::Exception (tl::to_string (tr ("Invalid keyword")));
+      skip_element ();
     }
 
   }
 
   if (l2n) {
     l2n->set_netlist_extracted ();
+  }
+
+  if (version > 1) {
+    throw tl::Exception (tl::to_string (tr ("This program version only supports version 1 of the L2N DB format. File version is: ")) + tl::to_string (version));
   }
 }
 
@@ -490,65 +543,6 @@ LayoutToNetlistStandardReader::read_property (db::NetlistObject *obj)
   br.done ();
 }
 
-std::pair<unsigned int, NetShape> LayoutToNetlistStandardReader::read_geometry(db::LayoutToNetlist *l2n)
-{
-  std::string lname;
-
-  if (test (skeys::rect_key) || test (lkeys::rect_key)) {
-
-    Brace br (this);
-
-    read_word_or_quoted (lname);
-    unsigned int lid = l2n->layer_of (layer_by_name (l2n, lname));
-
-    db::Point lb = read_point ();
-    db::Point rt = read_point ();
-    db::Box box (lb, rt);
-
-    br.done ();
-
-    return std::make_pair (lid, db::PolygonRef (db::Polygon (box), l2n->internal_layout ()->shape_repository ()));
-
-  } else if (test (skeys::polygon_key) || test (lkeys::polygon_key)) {
-
-    Brace br (this);
-
-    read_word_or_quoted (lname);
-    unsigned int lid = l2n->layer_of (layer_by_name (l2n, lname));
-
-    std::vector<db::Point> pt;
-    while (br) {
-      pt.push_back (read_point ());
-    }
-    br.done ();
-
-    db::Polygon poly;
-    poly.assign_hull (pt.begin (), pt.end ());
-    return std::make_pair (lid, db::PolygonRef (poly, l2n->internal_layout ()->shape_repository ()));
-
-  } else if (test (skeys::text_key) || test (lkeys::text_key)) {
-
-    Brace br (this);
-
-    read_word_or_quoted (lname);
-    unsigned int lid = l2n->layer_of (layer_by_name (l2n, lname));
-
-    std::string text;
-    read_word_or_quoted (text);
-
-    db::Point pt = read_point ();
-
-    br.done ();
-
-    return std::make_pair (lid, db::TextRef (db::Text (text, db::Trans (pt - db::Point ())), l2n->internal_layout ()->shape_repository ()));
-
-  } else if (at_end ()) {
-    throw tl::Exception (tl::to_string (tr ("Unexpected end of file (polygon or rect expected)")));
-  } else {
-    throw tl::Exception (tl::to_string (tr ("Invalid keyword (polygon or rect expected)")));
-  }
-}
-
 db::Box
 LayoutToNetlistStandardReader::read_rect ()
 {
@@ -587,14 +581,75 @@ void
 LayoutToNetlistStandardReader::read_geometries (db::NetlistObject *obj, Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<db::NetShape> &lc, db::Cell &cell)
 {
   m_ref = db::Point ();
+  std::string lname;
 
   while (br) {
+
     if (test (skeys::property_key) || test (lkeys::property_key)) {
+
       read_property (obj);
+
+    } else if (test (skeys::rect_key) || test (lkeys::rect_key)) {
+
+      Brace br (this);
+
+      read_word_or_quoted (lname);
+      unsigned int lid = l2n->layer_of (layer_by_name (l2n, lname));
+
+      db::Point lb = read_point ();
+      db::Point rt = read_point ();
+      db::Box box (lb, rt);
+
+      br.done ();
+
+      NetShape n (db::PolygonRef (db::Polygon (box), l2n->internal_layout ()->shape_repository ()));
+
+      lc.add (n, lid);
+      n.insert_into (cell.shapes (lid));
+
+    } else if (test (skeys::polygon_key) || test (lkeys::polygon_key)) {
+
+      Brace br (this);
+
+      read_word_or_quoted (lname);
+      unsigned int lid = l2n->layer_of (layer_by_name (l2n, lname));
+
+      std::vector<db::Point> pt;
+      while (br) {
+        pt.push_back (read_point ());
+      }
+      br.done ();
+
+      db::Polygon poly;
+      poly.assign_hull (pt.begin (), pt.end ());
+      NetShape n (db::PolygonRef (poly, l2n->internal_layout ()->shape_repository ()));
+
+      lc.add (n, lid);
+      n.insert_into (cell.shapes (lid));
+
+    } else if (test (skeys::text_key) || test (lkeys::text_key)) {
+
+      Brace br (this);
+
+      read_word_or_quoted (lname);
+      unsigned int lid = l2n->layer_of (layer_by_name (l2n, lname));
+
+      std::string text;
+      read_word_or_quoted (text);
+
+      db::Point pt = read_point ();
+
+      br.done ();
+
+      NetShape n (db::TextRef (db::Text (text, db::Trans (pt - db::Point ())), l2n->internal_layout ()->shape_repository ()));
+
+      lc.add (n, lid);
+      n.insert_into (cell.shapes (lid));
+
+    } else if (at_end ()) {
+      throw tl::Exception (tl::to_string (tr ("Unexpected end of file (polygon, text or rect expected)")));
     } else {
-      std::pair<unsigned int, db::NetShape> pr = read_geometry (l2n);
-      lc.add (pr.second, pr.first);
-      pr.second.insert_into (cell.shapes (pr.first));
+      skip_element ();
     }
   }
 }
@@ -641,6 +696,7 @@ LayoutToNetlistStandardReader::read_pin (db::Netlist * /*netlist*/, db::LayoutTo
   db::Net *net = 0;
 
   db::Pin pin;
+  int netid = 0;
 
   while (br) {
 
@@ -660,18 +716,19 @@ LayoutToNetlistStandardReader::read_pin (db::Netlist * /*netlist*/, db::LayoutTo
 
       read_property (&pin);
 
-    } else {
+    } else if (try_read_int (netid)) {
 
       if (net) {
         throw tl::Exception (tl::to_string (tr ("Duplicate net ID")));
       }
 
-      unsigned int netid = (unsigned int) read_int ();
-      net = map.id2net [netid];
+      net = map.id2net [(unsigned int) netid];
       if (!net) {
         throw tl::Exception (tl::to_string (tr ("Not a valid net ID: ")) + tl::to_string (netid));
       }
 
+    } else {
+      skip_element ();
     }
 
   }
@@ -851,7 +908,7 @@ LayoutToNetlistStandardReader::read_device (db::Netlist *netlist, db::LayoutToNe
     } else if (at_end ()) {
       throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside device definition (location, scale, mirror, rotation, param or terminal expected)")));
     } else {
-      throw tl::Exception (tl::to_string (tr ("Invalid keyword inside device definition (location, scale, mirror, rotation, param or terminal expected)")));
+      skip_element ();
     }
 
   }
@@ -1032,7 +1089,7 @@ LayoutToNetlistStandardReader::read_subcircuit (db::Netlist *netlist, db::Layout
     } else if (at_end ()) {
       throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside subcircuit definition (location, rotation, mirror, scale or pin expected)")));
     } else {
-      throw tl::Exception (tl::to_string (tr ("Invalid keyword inside subcircuit definition (location, rotation, mirror, scale or pin expected)")));
+      skip_element ();
     }
 
   }

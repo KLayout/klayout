@@ -23,12 +23,13 @@
 #include "layControlWidgetStack.h"
 
 #include <QLabel>
+#include <QEvent>
 
 namespace lay
 {
 
-ControlWidgetStack::ControlWidgetStack(QWidget *parent, const char *name)
-  : QFrame (parent), mp_current_widget (0)
+ControlWidgetStack::ControlWidgetStack(QWidget *parent, const char *name, bool size_follows_content)
+  : QFrame (parent), mp_current_widget (0), m_size_follows_content (size_follows_content)
 {
   setObjectName (QString::fromUtf8 (name));
 
@@ -66,10 +67,44 @@ void ControlWidgetStack::add_widget(QWidget *w)
     setMinimumWidth (mw);
     resize (minimumWidth (), height ());
   }
+
+  update_geometry ();
+}
+
+void ControlWidgetStack::update_geometry ()
+{
+  if (m_size_follows_content) {
+
+    int h = sizeHint ().height ();
+    if (h > 0) {
+      setMinimumHeight (h);
+      setMaximumHeight (h);
+    } else {
+      setMinimumHeight (0);
+      setMaximumHeight (QWIDGETSIZE_MAX);
+    }
+
+  }
+}
+
+bool ControlWidgetStack::event(QEvent *e)
+{
+  if (e->type () == QEvent::LayoutRequest) {
+    update_geometry ();
+  }
+  return QWidget::event (e);
 }
 
 QSize ControlWidgetStack::sizeHint() const
 {
+  if (m_size_follows_content) {
+    for (size_t i = 0; i < m_widgets.size (); ++i) {
+      if (m_widgets [i] && m_widgets [i]->isVisible ()) {
+        return m_widgets [i]->sizeHint ();
+      }
+    }
+  }
+
   int w = 0;
   for (size_t i = 0; i < m_widgets.size (); ++i) {
     w = std::max (m_widgets [i]->sizeHint ().width (), w);
@@ -88,6 +123,8 @@ void ControlWidgetStack::remove_widget(size_t index)
   if (m_widgets.size () == 0) {
     mp_bglabel->show ();
   }
+
+  update_geometry ();
 }
 
 void ControlWidgetStack::raise_widget(size_t index)
@@ -111,6 +148,8 @@ void ControlWidgetStack::raise_widget(size_t index)
   } else {
     mp_bglabel->hide ();
   }
+
+  update_geometry ();
 }
 
 QWidget *ControlWidgetStack::widget(size_t index)

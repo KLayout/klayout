@@ -624,4 +624,48 @@ NetGraph::build (const db::Circuit *c, DeviceCategorizer &device_categorizer, Ci
   }
 }
 
+NetGraphNode
+NetGraph::joined (const NetGraphNode &a, const NetGraphNode &b) const
+{
+  NetGraphNode nj = a;
+
+  nj.edges ().clear ();
+  nj.edges ().reserve ((a.end () - a.begin ()) + (b.end () - b.begin ()));
+
+  std::map<const db::Net *, NetGraphNode::edge_type> joined;
+
+  for (int m = 0; m < 2; ++m) {
+
+    const NetGraphNode &n = (m == 0 ? a : b);
+
+    for (auto i = n.begin (); i != n.end (); ++i) {
+
+      if (i->second.second) {
+
+        const db::Net *net = i->second.second == b.net () ? a.net () : i->second.second;
+
+        auto j = joined.find (net);
+        if (j != joined.end ()) {
+          j->second.first.insert (j->second.first.end (), i->first.begin (), i->first.end ());
+        } else {
+          j = joined.insert (std::make_pair (net, *i)).first;
+          j->second.second.second = net;
+        }
+
+      } else {
+        nj.edges ().push_back (*i);
+      }
+
+    }
+
+  }
+
+  for (auto i = joined.begin (); i != joined.end (); ++i) {
+    nj.edges ().push_back (i->second);
+  }
+
+  nj.apply_net_index (m_net_index);
+  return nj;
+}
+
 }

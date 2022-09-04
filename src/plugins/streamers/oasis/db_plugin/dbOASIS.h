@@ -55,7 +55,7 @@ public:
   /**
    *  @brief Issue a warning with positional information
    */
-  virtual void warn (const std::string &txt) = 0;
+  virtual void warn (const std::string &txt, int warn_level = 1) = 0;
 };
 
 class RepetitionBase;

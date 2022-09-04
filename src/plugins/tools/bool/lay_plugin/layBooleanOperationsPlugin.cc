@@ -27,6 +27,7 @@
 #include "layPlugin.h"
 #include "layTipDialog.h"
 #include "layLayoutViewBase.h"
+#include "layMainWindow.h"
 
 #include "dbShapeProcessor.h"
 
@@ -35,12 +36,17 @@
 namespace lay
 {
 
+static QWidget *parent_widget ()
+{
+  return QApplication::activeWindow ();
+}
+
 class BooleanOperationsPlugin
   : public lay::Plugin
 {
 public:
-  BooleanOperationsPlugin (Plugin *parent, lay::LayoutViewBase *view)
-    : lay::Plugin (parent), mp_view (view)
+  BooleanOperationsPlugin (lay::LayoutViewBase *view)
+    : lay::Plugin (view), mp_view (view)
   {
     m_boolean_cva = -1;
     m_boolean_cvb = -1;
@@ -100,7 +106,7 @@ public:
 
     }
 
-    lay::BooleanOptionsDialog dialog (mp_view->widget ());
+    lay::BooleanOptionsDialog dialog (parent_widget ());
     if (dialog.exec_dialog (mp_view, m_boolean_cva, m_boolean_layera, m_boolean_cvb, m_boolean_layerb, m_boolean_cvr, m_boolean_layerr, m_boolean_mode, m_boolean_hier_mode, m_boolean_mincoh)) {
 
       mp_view->cancel ();
@@ -237,7 +243,7 @@ public:
 
     }
 
-    lay::MergeOptionsDialog dialog (mp_view->widget ());
+    lay::MergeOptionsDialog dialog (parent_widget ());
     if (dialog.exec_dialog (mp_view, m_boolean_cva, m_boolean_layera, m_boolean_cvr, m_boolean_layerr, m_boolean_minwc, m_boolean_hier_mode, m_boolean_mincoh)) {
 
       mp_view->cancel ();
@@ -352,7 +358,7 @@ public:
 
     }
 
-    lay::SizingOptionsDialog dialog (mp_view->widget ());
+    lay::SizingOptionsDialog dialog (parent_widget ());
     if (dialog.exec_dialog (mp_view, m_boolean_cva, m_boolean_layera, m_boolean_cvr, m_boolean_layerr, m_boolean_sizex, m_boolean_sizey, m_boolean_size_mode, m_boolean_hier_mode, m_boolean_mincoh)) {
 
       mp_view->cancel ();
@@ -494,9 +500,9 @@ public:
     // .. nothing yet ..
   }
 
-  lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
+  lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *, lay::LayoutViewBase *view) const
   {
-    return new BooleanOperationsPlugin (root, view);
+    return new BooleanOperationsPlugin (view);
   }
 };
 

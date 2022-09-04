@@ -52,7 +52,7 @@ long python2c_func<long>::operator() (PyObject *rval)
   } else if (PyFloat_Check (rval)) {
     return (long) (PyFloat_AsDouble (rval));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Argument cannot be converted to an integer")));
+    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to an integer")));
   }
 }
 
@@ -75,7 +75,7 @@ char python2c_func<char>::operator() (PyObject *rval)
   } else if (PyFloat_Check (rval)) {
     return char (PyFloat_AsDouble (rval));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Argument cannot be converted to a character")));
+    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to a character")));
   }
 }
 
@@ -92,7 +92,7 @@ unsigned long python2c_func<unsigned long>::operator() (PyObject *rval)
   } else if (PyFloat_Check (rval)) {
     return (unsigned long) (PyFloat_AsDouble (rval));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Argument cannot be converted to an integer")));
+    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to an integer")));
   }
 }
 
@@ -109,7 +109,7 @@ long long python2c_func<long long>::operator() (PyObject *rval)
   } else if (PyFloat_Check (rval)) {
     return (long long) (PyFloat_AsDouble (rval));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Argument cannot be converted to an integer")));
+    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to an integer")));
   }
 }
 
@@ -126,7 +126,7 @@ unsigned long long python2c_func<unsigned long long>::operator() (PyObject *rval
   } else if (PyFloat_Check (rval)) {
     return (unsigned long long) (PyFloat_AsDouble (rval));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Argument cannot be converted to an integer")));
+    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to an integer")));
   }
 }
 
@@ -145,7 +145,7 @@ __int128 python2c_func<__int128>::operator() (PyObject *rval)
   } else if (PyFloat_Check (rval)) {
     return PyFloat_AsDouble (rval);
   } else {
-    throw tl::Exception (tl::to_string (tr ("Argument cannot be converted to an integer")));
+    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to an integer")));
   }
 }
 #endif
@@ -163,7 +163,7 @@ double python2c_func<double>::operator() (PyObject *rval)
   } else if (PyFloat_Check (rval)) {
     return PyFloat_AsDouble (rval);
   } else {
-    throw tl::Exception (tl::to_string (tr ("Argument cannot be converted to a floating-point value")));
+    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to a floating-point value")));
   }
 }
 
@@ -188,7 +188,7 @@ std::string python2c_func<std::string>::operator() (PyObject *rval)
   } else if (PyByteArray_Check (rval)) {
     return std::string (PyByteArray_AsString (rval), PyByteArray_Size (rval));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Argument cannot be converted to a string")));
+    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to a string")));
   }
 }
 
@@ -224,7 +224,7 @@ std::vector<char> python2c_func<std::vector<char> >::operator() (PyObject *rval)
     Py_ssize_t sz = PyByteArray_Size (rval);
     return std::vector<char> (cp, cp + sz);
   } else {
-    throw tl::Exception (tl::to_string (tr ("Argument cannot be converted to a byte array")));
+    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to a byte array")));
   }
 }
 
@@ -250,7 +250,7 @@ QByteArray python2c_func<QByteArray>::operator() (PyObject *rval)
   } else if (PyByteArray_Check (rval)) {
     return QByteArray (PyByteArray_AsString (rval), PyByteArray_Size (rval));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Argument cannot be converted to a byte array")));
+    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to a byte array")));
   }
 }
 

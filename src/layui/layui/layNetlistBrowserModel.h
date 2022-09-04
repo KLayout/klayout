@@ -183,8 +183,9 @@ public:
     return ! root.first && ! root.second;
   }
 
-  static NetlistObjectsPath from_first(const NetlistObjectPath &p);
+  static NetlistObjectsPath from_first (const NetlistObjectPath &p);
   static NetlistObjectsPath from_second (const NetlistObjectPath &p);
+  static bool translate (NetlistObjectsPath &p, const db::NetlistCrossReference &xref);
 
   NetlistObjectPath first () const;
   NetlistObjectPath second () const;
@@ -229,6 +230,7 @@ class LAYUI_PUBLIC NetlistBrowserModel
 Q_OBJECT
 
 public:
+  NetlistBrowserModel (QWidget *parent, db::Netlist *netlist, NetColorizer *colorizer);
   NetlistBrowserModel (QWidget *parent, db::LayoutToNetlist *l2ndb, NetColorizer *colorizer);
   NetlistBrowserModel (QWidget *parent, db::LayoutVsSchematic *lvsdb, NetColorizer *colorizer);
   ~NetlistBrowserModel ();

@@ -31,6 +31,7 @@ namespace tl
 void
 Exception::init (const std::string &fmt, const std::vector<tl::Variant> &a)
 { 
+  m_first_chance = true;
   m_msg = tl::sprintf (fmt, a);
 }
 

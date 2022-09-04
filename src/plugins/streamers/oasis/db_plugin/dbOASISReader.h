@@ -99,10 +99,10 @@ protected:
    *
    *  Reimplements OASISDiagnostics
    */
-  virtual void warn (const std::string &txt);
+  virtual void warn (const std::string &txt, int warn_level = 1);
 
   virtual void common_reader_error (const std::string &msg) { error (msg); }
-  virtual void common_reader_warn (const std::string &msg) { warn (msg); }
+  virtual void common_reader_warn (const std::string &msg, int warn_level = 1) { warn (msg, warn_level); }
   virtual void init (const LoadLayoutOptions &options);
   virtual void do_read (db::Layout &layout);
 

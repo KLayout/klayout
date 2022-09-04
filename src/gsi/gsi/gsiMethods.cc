@@ -85,7 +85,7 @@ void MethodBase::parse_name (const std::string &name)
 {
   const char *n = name.c_str ();
 
-  if (*n == '*' && n[1]) {
+  if (*n == '*' && n[1] && n[1] != '*' && n[1] != '=') {
     m_protected = true;
     ++n;
   }

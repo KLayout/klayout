@@ -120,13 +120,16 @@ TEST(2)
   r2.insert (db::Box (db::Point (0, 10), db::Point (100, 210)));
 
   EXPECT_EQ (db::compare ((r & r1), "(10,200;100,200);(100,0;10,0)"), true);
+  EXPECT_EQ (db::compare (r.andnot(r1).first, "(10,200;100,200);(100,0;10,0)"), true);
   EXPECT_EQ (db::compare ((r & r2), "(0,10;0,200);(100,200;100,10)"), true);
+  EXPECT_EQ (db::compare (r.andnot(r2).first, "(0,10;0,200);(100,200;100,10)"), true);
   db::Edges o1 = r;
   o1 &= r1;
   EXPECT_EQ (o1.is_merged (), true);
   EXPECT_EQ (db::compare (o1, "(10,200;100,200);(100,0;10,0)"), true);
 
   EXPECT_EQ (db::compare ((r - r1), "(0,0;0,200);(100,200;100,0);(0,200;10,200);(10,0;0,0)"), true);
+  EXPECT_EQ (db::compare (r.andnot(r1).second, "(0,0;0,200);(100,200;100,0);(0,200;10,200);(10,0;0,0)"), true);
   db::Edges o2 = r;
   o2 -= r1;
   EXPECT_EQ (o2.is_merged (), true);
@@ -392,31 +395,41 @@ TEST(8)
   e2.insert (db::Edge (db::Point (0, 100), db::Point (100, 100)));
 
   EXPECT_EQ (e.selected_interacting (e2).to_string (), "(0,0;0,200)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).first.to_string (), "(0,0;0,200)");
   EXPECT_EQ (e.selected_not_interacting (e2).to_string (), "(250,200;300,0)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).second.to_string (), "(250,200;300,0)");
 
   e2.clear ();
   e2.insert (db::Edge (db::Point (0, 100), db::Point (0, 100)));
 
   EXPECT_EQ (e.selected_interacting (e2).to_string (), "(0,0;0,200)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).first.to_string (), "(0,0;0,200)");
   EXPECT_EQ (e.selected_not_interacting (e2).to_string (), "(250,200;300,0)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).second.to_string (), "(250,200;300,0)");
 
   e2.clear ();
   e2.insert (db::Edge (db::Point (100, 0), db::Point (0, 0)));
 
   EXPECT_EQ (e.selected_interacting (e2).to_string (), "(0,0;0,200)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).first.to_string (), "(0,0;0,200)");
   EXPECT_EQ (e.selected_not_interacting (e2).to_string (), "(250,200;300,0)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).second.to_string (), "(250,200;300,0)");
 
   e2.clear ();
   e2.insert (db::Edge (db::Point (-100, -1), db::Point (100, -1)));
 
   EXPECT_EQ (e.selected_interacting (e2).to_string (), "");
+  EXPECT_EQ (e.selected_interacting_differential (e2).first.to_string (), "");
   EXPECT_EQ (db::compare (e.selected_not_interacting (e2), "(0,0;0,200);(250,200;300,0)"), true);
+  EXPECT_EQ (db::compare (e.selected_interacting_differential (e2).second, "(0,0;0,200);(250,200;300,0)"), true);
 
   e2.clear ();
   e2.insert (db::Edge (db::Point (-100, 0), db::Point (100, 0)));
 
   EXPECT_EQ (e.selected_interacting (e2).to_string (), "(0,0;0,200)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).first.to_string (), "(0,0;0,200)");
   EXPECT_EQ (e.selected_not_interacting (e2).to_string (), "(250,200;300,0)");
+  EXPECT_EQ (e.selected_interacting_differential (e2).second.to_string (), "(250,200;300,0)");
 
   db::Edges ee = e;
   e.select_interacting (e2);
@@ -785,7 +798,9 @@ TEST(20)
     EXPECT_EQ (r2.merged ().to_string (100), "(60,10;60,20);(60,20;70,20);(70,20;70,10);(70,10;60,10);(10,10;10,40);(10,40;40,40);(40,40;40,10);(40,10;10,10);(80,40;80,70);(80,70;140,70);(140,70;140,40);(140,40;80,40)");
     EXPECT_EQ (rr1.to_string (100), "(0,0;0,30;30,30;30,0);(50,0;50,30;80,30;80,0);(50,40;50,70;80,70;80,40)");
     EXPECT_EQ (r2.selected_interacting (rr1).to_string (100), "(60,10;60,20);(60,20;70,20);(70,20;70,10);(70,10;60,10);(10,10;10,40);(40,10;10,10);(80,40;80,70);(80,70;140,70);(140,40;80,40)");
+    EXPECT_EQ (r2.selected_interacting_differential (rr1).first.to_string (100), "(60,10;60,20);(60,20;70,20);(70,20;70,10);(70,10;60,10);(10,10;10,40);(40,10;10,10);(80,40;80,70);(80,70;140,70);(140,40;80,40)");
     EXPECT_EQ (r2.selected_not_interacting (rr1).to_string (100), "(10,40;40,40);(40,40;40,10);(140,70;140,40)");
+    EXPECT_EQ (r2.selected_interacting_differential (rr1).second.to_string (100), "(10,40;40,40);(40,40;40,10);(140,70;140,40)");
 
     db::Edges r2dup = r2;
     r2.select_interacting (rr1);
@@ -809,7 +824,9 @@ TEST(21)
   db::Edges e, ee;
   e.insert (db::Edge (-100, 100, 200, 100));
   EXPECT_EQ ((e & r).to_string (), "(0,100;100,100)");
+  EXPECT_EQ (e.andnot(r).first.to_string (), "(0,100;100,100)");
   EXPECT_EQ (e.inside_part (r).to_string (), "(0,100;100,100)");
+  EXPECT_EQ (e.inside_outside_part (r).first.to_string (), "(0,100;100,100)");
 
   ee = e;
   ee &= r;
@@ -820,7 +837,9 @@ TEST(21)
   EXPECT_EQ (ee.to_string (), "(0,100;100,100)");
 
   EXPECT_EQ (db::compare ((e - r), "(-100,100;0,100);(100,100;200,100)"), true);
+  EXPECT_EQ (db::compare (e.andnot(r).second, "(-100,100;0,100);(100,100;200,100)"), true);
   EXPECT_EQ (db::compare (e.outside_part (r), "(-100,100;0,100);(100,100;200,100)"), true);
+  EXPECT_EQ (db::compare (e.inside_outside_part (r).second, "(-100,100;0,100);(100,100;200,100)"), true);
 
   ee = e;
   ee -= r;
@@ -833,7 +852,9 @@ TEST(21)
   e.clear ();
   e.insert (db::Edge (-100, 0, 200, 0));
   EXPECT_EQ ((e & r).to_string (), "(0,0;100,0)");
+  EXPECT_EQ (e.andnot(r).first.to_string (), "(0,0;100,0)");
   EXPECT_EQ (e.inside_part (r).to_string (), "");
+  EXPECT_EQ (e.inside_outside_part (r).first.to_string (), "");
 
   ee = e;
   ee &= r;
@@ -844,6 +865,7 @@ TEST(21)
   EXPECT_EQ (ee.to_string (), "");
 
   EXPECT_EQ (db::compare ((e - r), "(-100,0;0,0);(100,0;200,0)"), true);
+  EXPECT_EQ (db::compare (e.andnot(r).second, "(-100,0;0,0);(100,0;200,0)"), true);
   EXPECT_EQ (db::compare (e.outside_part (r), "(-100,0;0,0);(0,0;100,0);(100,0;200,0)"), true);
 
   ee = e;
@@ -874,6 +896,7 @@ TEST(22)
   ee.insert (db::Edge (4000,-2000,-2000,-2000));
 
   EXPECT_EQ (db::compare ((e & ee), "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)"), true);
+  EXPECT_EQ (db::compare (e.andnot(ee).first, "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)"), true);
   EXPECT_EQ (db::compare (e.intersections (ee), "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)"), true);
 
   //  Edge/edge intersections
@@ -883,6 +906,7 @@ TEST(22)
   ee.insert (db::Edge (-50, 50, 50, 50));
   ee.insert (db::Edge (-50, 100, 50, 100));
   EXPECT_EQ ((e & ee).to_string (), "");  //  AND does not report intersection points
+  EXPECT_EQ (e.andnot(ee).first.to_string (), "");  //  AND does not report intersection points
   EXPECT_EQ (db::compare (e.intersections (ee), "(0,50;0,50);(0,100;0,100)"), true);
 
   //  Edge is intersected by pair with connection point on this line
@@ -894,6 +918,7 @@ TEST(22)
   ee.insert (db::Edge (-50, 100, 0, 100));
   ee.insert (db::Edge (0, 100, 50, 100));
   EXPECT_EQ ((e & ee).to_string (), "");  //  AND does not report intersection points
+  EXPECT_EQ (e.andnot(ee).first.to_string (), "");  //  AND does not report intersection points
   EXPECT_EQ (db::compare (e.intersections (ee), "(0,50;0,50);(0,60;0,60);(0,100;0,100)"), true);
 
   //  Coincident edges are crossed by another one
@@ -904,6 +929,7 @@ TEST(22)
   ee.insert (db::Edge (-50, 100, 50, 100));
   ee.insert (db::Edge (-50, 200, 50, 200));
   EXPECT_EQ ((e & ee).to_string (), "(0,0;0,150)");
+  EXPECT_EQ (e.andnot(ee).first.to_string (), "(0,0;0,150)");
   EXPECT_EQ (db::compare (e.intersections (ee), "(0,0;0,150);(0,200;0,200)"), true);
 }
 
@@ -937,6 +963,162 @@ TEST(23)
   e2.insert (db::Edge (db::Point (-100, 0), db::Point (100, 0)));
 
   EXPECT_EQ (e2.pull_interacting (e).to_string (), "(0,0;0,200)");
+}
+
+//  Edges::selected_inside(region)
+TEST(24)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (100, 0, 100, 3000));
+  e.insert (db::Edge (1100, -1000, 1100, 2000));
+  e.insert (db::Edge (1200, -1000, 1200, 0));
+  e.insert (db::Edge (1300, -800, 1300, -200));
+  e.insert (db::Edge (1400, 1000, 1400, 1100));
+  e.insert (db::Edge (1500, 1000, 1500, 2100));
+  e.insert (db::Edge (1600, -800, 1600, -400));
+  e.insert (db::Edge (1600, -400, 1600, -200));
+  e.insert (db::Edge (1700, 1500, 1600, 2500));
+  e.insert (db::Edge (1800, 2500, 1800, 3500));
+  e.insert (db::Edge (1900, 1000, 1900, 2000));
+  e.insert (db::Edge (-1500, 0, -1500, 1000));
+
+  db::Region r;
+  r.insert (db::Box (0, -1000, 2000, 0));
+  r.insert (db::Box (1000, 1000, 2000, 1500));
+  r.insert (db::Box (1000, 1500, 2000, 2000));
+
+  EXPECT_EQ (db::compare (e.selected_inside (db::Region ()), ""), true);
+  EXPECT_EQ (db::compare (e.selected_not_inside (db::Region ()), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-400);(1600,-400;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (db::Region ()).first, ""), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (db::Region ()).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-400);(1600,-400;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_inside (r), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_not_inside (r), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_inside_differential (r).first, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_inside_differential (r).second, ""), true);
+  EXPECT_EQ (db::compare (e.selected_inside (r), "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_inside (r), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (r).first, "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (r).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+}
+
+//  Edges::selected_inside(edges)
+TEST(25)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (100, 0, 100, 3000));
+  e.insert (db::Edge (1100, -1000, 1100, 2000));
+  e.insert (db::Edge (1200, -1000, 1200, 0));
+  e.insert (db::Edge (1300, -800, 1300, -200));
+  e.insert (db::Edge (1400, 1000, 1400, 1100));
+  e.insert (db::Edge (1500, 1000, 1500, 2100));
+  e.insert (db::Edge (1600, -800, 1600, -400));
+  e.insert (db::Edge (1600, -400, 1600, -200));
+  e.insert (db::Edge (1700, 1500, 1600, 2500));
+  e.insert (db::Edge (1800, 2500, 1800, 3500));
+  e.insert (db::Edge (1900, 1000, 1900, 2000));
+  e.insert (db::Edge (-1500, 0, -1500, 1000));
+
+  db::Edges ee;
+  for (int i = 0; i <= 2000; i += 100) {
+    ee.insert (db::Edge (i, -1000, i, 0));
+  }
+  for (int i = 1000; i <= 2000; i += 100) {
+    ee.insert (db::Edge (i, 1000, i, 1500));
+    ee.insert (db::Edge (i, 1500, i, 2000));
+  }
+
+  EXPECT_EQ (db::compare (e.selected_inside (db::Edges ()), ""), true);
+  EXPECT_EQ (db::compare (e.selected_not_inside (db::Edges ()), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-400);(1600,-400;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (db::Edges ()).first, ""), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (db::Edges ()).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-400);(1600,-400;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_inside (ee), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_not_inside (ee), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_inside_differential (ee).first, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_inside_differential (ee).second, ""), true);
+  EXPECT_EQ (db::compare (e.selected_inside (ee), "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_inside (ee), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (ee).first, "(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_inside_differential (ee).second, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1500,1000;1500,2100);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+}
+
+//  Edges::selected_outside(region)
+TEST(26)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (100, 0, 100, 3000));
+  e.insert (db::Edge (1100, -1000, 1100, 2000));
+  e.insert (db::Edge (1200, -1000, 1200, 0));
+  e.insert (db::Edge (1300, -800, 1300, -200));
+  e.insert (db::Edge (1400, 1000, 1400, 1100));
+  e.insert (db::Edge (1500, 1000, 1500, 2100));
+  e.insert (db::Edge (1600, -800, 1600, -400));
+  e.insert (db::Edge (1600, -400, 1600, -200));
+  e.insert (db::Edge (1700, 1500, 1600, 2500));
+  e.insert (db::Edge (1800, 2500, 1800, 3500));
+  e.insert (db::Edge (1900, 1000, 1900, 2000));
+  e.insert (db::Edge (-1500, 0, -1500, 1000));
+
+  db::Region r;
+  r.insert (db::Box (0, -1000, 2000, 0));
+  r.insert (db::Box (1000, 1000, 2000, 1500));
+  r.insert (db::Box (1000, 1500, 2000, 2000));
+
+  EXPECT_EQ (db::compare (e.selected_outside (db::Region ()), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-400);(1600,-400;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_outside (db::Region ()), ""), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (db::Region ()).first, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-400);(1600,-400;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (db::Region ()).second, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_outside (r), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_not_outside (r), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_outside_differential (r).first, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_outside_differential (r).second, ""), true);
+  EXPECT_EQ (db::compare (e.selected_outside (r), "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_outside (r), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (r).first, "(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (r).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1700,1500;1600,2500);(1900,1000;1900,2000)"), true);
+}
+
+//  Edges::selected_outside(edges)
+TEST(27)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (100, 0, 100, 3000));
+  e.insert (db::Edge (1100, -1000, 1100, 2000));
+  e.insert (db::Edge (1200, -1000, 1200, 0));
+  e.insert (db::Edge (1300, -800, 1300, -200));
+  e.insert (db::Edge (1400, 1000, 1400, 1100));
+  e.insert (db::Edge (1500, 1000, 1500, 2100));
+  e.insert (db::Edge (1600, -800, 1600, -400));
+  e.insert (db::Edge (1600, -400, 1600, -200));
+  e.insert (db::Edge (1700, 1500, 1600, 2500));
+  e.insert (db::Edge (1800, 2500, 1800, 3500));
+  e.insert (db::Edge (1900, 1000, 1900, 2000));
+  e.insert (db::Edge (-1500, 0, -1500, 1000));
+
+  db::Edges ee;
+  for (int i = 0; i <= 2000; i += 100) {
+    ee.insert (db::Edge (i, -1000, i, 0));
+  }
+  for (int i = 1000; i <= 2000; i += 100) {
+    ee.insert (db::Edge (i, 1000, i, 1500));
+    ee.insert (db::Edge (i, 1500, i, 2000));
+  }
+
+  EXPECT_EQ (db::compare (e.selected_outside (db::Edges ()), "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-400);(1600,-400;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_outside (db::Edges ()), ""), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (db::Edges ()).first, "(0,0;0,1000);(100,0;100,3000);(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-400);(1600,-400;1600,-200);(1700,1500;1600,2500);(1800,2500;1800,3500);(1900,1000;1900,2000);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (db::Edges ()).second, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_outside (ee), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_not_outside (ee), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_outside_differential (ee).first, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().selected_outside_differential (ee).second, ""), true);
+  EXPECT_EQ (db::compare (e.selected_outside (ee), "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_not_outside (ee), "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (ee).first, "(0,0;0,1000);(100,0;100,3000);(1700,1500;1600,2500);(1800,2500;1800,3500);(-1500,0;-1500,1000)"), true);
+  EXPECT_EQ (db::compare (e.selected_outside_differential (ee).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
 }
 
 //  GitHub issue #72 (Edges/Region NOT issue)

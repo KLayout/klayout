@@ -476,9 +476,15 @@ BEGIN_PROTECTED
 
       mp_ui->browser_page->set_db (0);
       try {
-        l2ndb->load (l2ndb->filename ());
-        mp_ui->browser_page->set_db (l2ndb);
+
+        m_l2ndb_name = l2ndb->name ();
+        db::LayoutToNetlist *new_l2ndb = db::LayoutToNetlist::create_from_file (l2ndb->filename ());
+
+        view ()->replace_l2ndb (m_l2n_index, new_l2ndb);
+        mp_ui->browser_page->set_db (new_l2ndb);
+
         current_db_changed_event ();
+
       } catch (...) {
         current_db_changed_event ();
         throw;

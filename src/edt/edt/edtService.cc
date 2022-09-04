@@ -79,7 +79,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
     m_seq (0),
     dm_selection_to_view (this, &edt::Service::do_selection_to_view)
 { 
-  //  .. nothing yet ..
+  mp_view->geom_changed_event.add (this, &edt::Service::selection_to_view);
 }
 
 Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
@@ -99,7 +99,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     m_seq (0),
     dm_selection_to_view (this, &edt::Service::do_selection_to_view)
 { 
-  //  .. nothing yet ..
+  mp_view->geom_changed_event.add (this, &edt::Service::selection_to_view);
 }
 
 Service::~Service ()
@@ -1510,6 +1510,19 @@ Service::do_selection_to_view ()
 
   //  build the transformation variants cache
   TransformationVariants tv (view ());
+
+  //  Reduce the selection to valid paths (issue-1145)
+  std::vector<std::set<lay::ObjectInstPath>::iterator> invalid_objects;
+  for (std::set<lay::ObjectInstPath>::iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
+    if (! r->is_valid (view ())) {
+      invalid_objects.push_back (r);
+    }
+  }
+  for (auto i = invalid_objects.begin (); i != invalid_objects.end (); ++i) {
+    m_selection.erase (*i);
+  }
+
+  //  Build markers
 
   for (std::set<lay::ObjectInstPath>::iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
 

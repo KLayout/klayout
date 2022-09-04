@@ -26,7 +26,7 @@
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
 #include "tlExceptions.h"
-#include "layLayoutViewBase.h"
+#include "layLayoutView.h"
 #include "laySelector.h"
 #include "layFinder.h"
 #include "layLayerProperties.h"
@@ -100,7 +100,7 @@ edt::RoundCornerOptionsDialog *
 MainService::round_corners_dialog ()
 {
   if (! mp_round_corners_dialog) {
-    mp_round_corners_dialog = new edt::RoundCornerOptionsDialog (view ()->widget ());
+    mp_round_corners_dialog = new edt::RoundCornerOptionsDialog (lay::widget_from_view (view ()));
   }
   return mp_round_corners_dialog;
 }
@@ -109,7 +109,7 @@ edt::AlignOptionsDialog *
 MainService::align_options_dialog ()
 {
   if (! mp_align_options_dialog) {
-    mp_align_options_dialog = new edt::AlignOptionsDialog (view ()->widget ());
+    mp_align_options_dialog = new edt::AlignOptionsDialog (lay::widget_from_view (view ()));
   }
   return mp_align_options_dialog;
 }
@@ -118,7 +118,7 @@ edt::DistributeOptionsDialog *
 MainService::distribute_options_dialog ()
 {
   if (! mp_distribute_options_dialog) {
-    mp_distribute_options_dialog = new edt::DistributeOptionsDialog (view ()->widget ());
+    mp_distribute_options_dialog = new edt::DistributeOptionsDialog (lay::widget_from_view (view ()));
   }
   return mp_distribute_options_dialog;
 }
@@ -127,7 +127,7 @@ lay::FlattenInstOptionsDialog *
 MainService::flatten_inst_options_dialog ()
 {
   if (! mp_flatten_inst_options_dialog) {
-    mp_flatten_inst_options_dialog = new lay::FlattenInstOptionsDialog (view ()->widget (), false /*don't allow pruning*/);
+    mp_flatten_inst_options_dialog = new lay::FlattenInstOptionsDialog (lay::widget_from_view (view ()), false /*don't allow pruning*/);
   }
   return mp_flatten_inst_options_dialog;
 }
@@ -136,7 +136,7 @@ edt::MakeCellOptionsDialog *
 MainService::make_cell_options_dialog ()
 {
   if (! mp_make_cell_options_dialog) {
-    mp_make_cell_options_dialog = new edt::MakeCellOptionsDialog (view ()->widget ());
+    mp_make_cell_options_dialog = new edt::MakeCellOptionsDialog (lay::widget_from_view (view ()));
   }
   return mp_make_cell_options_dialog;
 }
@@ -145,7 +145,7 @@ edt::MakeArrayOptionsDialog *
 MainService::make_array_options_dialog ()
 {
   if (! mp_make_array_options_dialog) {
-    mp_make_array_options_dialog = new edt::MakeArrayOptionsDialog (view ()->widget ());
+    mp_make_array_options_dialog = new edt::MakeArrayOptionsDialog (lay::widget_from_view (view ()));
   }
   return mp_make_array_options_dialog;
 }
@@ -1228,7 +1228,7 @@ MainService::cm_convert_to_pcell ()
   }
 
   bool ok = false;
-  QString item = QInputDialog::getItem (view ()->widget (),
+  QString item = QInputDialog::getItem (lay::widget_from_view (view ()),
                                         tr ("Select Target PCell"),
                                         tr ("Select the PCell the shape should be converted into"),
                                         items, 0, false, &ok);
@@ -1333,7 +1333,7 @@ MainService::cm_convert_to_pcell ()
     if (any_non_converted) {
       tl::warn << tl::to_string (tr ("Some of the shapes could not be converted to the desired PCell"));
 #if defined(HAVE_QT)
-      QMessageBox::warning (view ()->widget (), tr ("Warning"), tr ("Some of the shapes could not be converted to the desired PCell"));
+      QMessageBox::warning (lay::widget_from_view (view ()), tr ("Warning"), tr ("Some of the shapes could not be converted to the desired PCell"));
 #endif
     }
 
@@ -1565,7 +1565,7 @@ MainService::cm_size ()
 #if defined(HAVE_QT)
   //  TODO: keep the value persistent so we can set it externally in the Qt-less case
   bool ok = false;
-  QString s = QInputDialog::getText (view ()->widget (),
+  QString s = QInputDialog::getText (lay::widget_from_view (view ()),
                                      tr ("Sizing"),
                                      tr ("Sizing (in micron, positive or negative). Two values (dx, dy) for anisotropic sizing."),
                                      QLineEdit::Normal, QString::fromUtf8 ("0.0"), 
@@ -2159,7 +2159,8 @@ MainService::cm_tap ()
 #endif
 
 #if defined(HAVE_QT)
-  if (! view ()->canvas ()->widget ()) {
+  QWidget *view_widget = lay::widget_from_view (view ());
+  if (! view_widget) {
     return;
   }
 #endif
@@ -2202,7 +2203,8 @@ MainService::cm_tap ()
 
 #if defined(HAVE_QT)
   //  TODO: what to do here in Qt-less case? Store results in configuration so they can be retrieved externally?
-  std::unique_ptr<QMenu> menu (new QMenu (view ()->widget ()));
+
+  std::unique_ptr<QMenu> menu (new QMenu (view_widget));
   menu->show ();
 
   int icon_size = menu->style ()->pixelMetric (QStyle::PM_ButtonIconSize);

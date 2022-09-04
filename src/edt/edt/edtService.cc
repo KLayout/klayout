@@ -31,7 +31,7 @@
 #  include "edtDialogs.h"
 #endif
 #include "layFinder.h"
-#include "layLayoutViewBase.h"
+#include "layLayoutView.h"
 #include "laySnap.h"
 #include "tlProgress.h"
 #include "tlTimer.h"
@@ -315,7 +315,7 @@ void
 Service::copy_selected ()
 {
 #if defined(HAVE_QT)
-  edt::CopyModeDialog mode_dialog (view ()->widget ());
+  edt::CopyModeDialog mode_dialog (lay::widget_from_view (view ()));
 
   bool need_to_ask_for_copy_mode = false;
   unsigned int inst_mode = 0;

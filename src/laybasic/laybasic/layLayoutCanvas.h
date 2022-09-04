@@ -143,6 +143,15 @@ public:
   LayoutCanvas (lay::LayoutViewBase *view);
   ~LayoutCanvas ();
 
+#if defined(HAVE_QT)
+  /**
+   *  @brief Initializes the widgets
+   *
+   *  This method needs to be called after the constructor to establish the drawing widget.
+   */
+  virtual void init_ui (QWidget *parent);
+#endif
+
   void set_colors (tl::Color background, tl::Color foreground, tl::Color active);
 
   /**

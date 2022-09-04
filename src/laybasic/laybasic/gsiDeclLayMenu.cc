@@ -36,7 +36,13 @@ public:
     if (triggered_cb.can_issue ()) {
       triggered_cb.issue<lay::Action> (&lay::Action::triggered);
     }
-    on_triggered_event ();
+  }
+
+  virtual void menu_opening ()
+  {
+    if (menu_opening_cb.can_issue ()) {
+      menu_opening_cb.issue<lay::Action> (&lay::Action::menu_opening);
+    }
   }
 
   virtual bool wants_visible () const
@@ -58,9 +64,9 @@ public:
   }
 
   gsi::Callback triggered_cb;
+  gsi::Callback menu_opening_cb;
   gsi::Callback wants_visible_cb;
   gsi::Callback wants_enabled_cb;
-  tl::Event on_triggered_event;
 };
 
 }
@@ -192,10 +198,29 @@ Class<lay::AbstractMenu> decl_AbstractMenu ("lay", "AbstractMenu",
     "@param name The name of the submenu to insert \n"
     "@param title The title of the submenu to insert\n"
   ) +
+  method ("insert_menu", (void (lay::AbstractMenu::*) (const std::string &, const std::string &, lay::Action *)) &lay::AbstractMenu::insert_menu, gsi::arg ("path"), gsi::arg ("name"), gsi::arg ("action"),
+    "@brief Inserts a new submenu before the item given by the path\n"
+    "\n"
+    "@param path The path to the item before which to insert the submenu\n"
+    "@param name The name of the submenu to insert \n"
+    "@param action The action object of the submenu to insert\n"
+    "\n"
+    "This method variant has been added in version 0.28."
+  ) +
+  method ("clear_menu", &lay::AbstractMenu::clear_menu, gsi::arg ("path"),
+    "@brief Deletes the children of the item given by the path\n"
+    "\n"
+    "@param path The path to the item whose children to delete\n"
+    "\n"
+    "This method has been introduced in version 0.28.\n"
+  ) +
   method ("delete_item", &lay::AbstractMenu::delete_item, gsi::arg ("path"),
     "@brief Deletes the item given by the path\n"
     "\n"
     "@param path The path to the item to delete\n"
+    "\n"
+    "This method will also delete all children of the given item. "
+    "To clear the children only, use \\clear_menu.\n"
   ) +
   method ("group", &lay::AbstractMenu::group, gsi::arg ("group"),
     "@brief Gets the group members\n"
@@ -360,6 +385,15 @@ Class<lay::Action> decl_ActionBase ("lay", "ActionBase",
     "\n"
     "Passing an empty string will reset the icon.\n"
   ) +
+#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
+  method ("icon=", &lay::Action::set_qicon, gsi::arg ("qicon"),
+    "@brief Sets the icon to the given \\QIcon object\n"
+    "\n"
+    "@param qicon The QIcon object\n"
+    "\n"
+    "This variant has been added in version 0.28.\n"
+  ) +
+#endif
   method ("icon_text=", &lay::Action::set_icon_text, gsi::arg ("icon_text"),
     "@brief Sets the icon's text\n"
     "\n"
@@ -385,6 +419,18 @@ Class<lay::Action> decl_ActionBase ("lay", "ActionBase",
   ) +
   method ("trigger", &lay::Action::trigger,
     "@brief Triggers the action programmatically"
+  ) +
+  gsi::event ("on_triggered", &ActionStub::on_triggered_event,
+    "@brief This event is called if the menu item is selected.\n"
+    "\n"
+    "This event has been introduced in version 0.21 and moved to the ActionBase class in 0.28.\n"
+  ) +
+  gsi::event ("on_menu_opening", &ActionStub::on_menu_opening_event,
+    "@brief This event is called if the menu item is a sub-menu and before the menu is opened.\n"
+    "\n"
+    "This event provides an opportunity to populate the menu before it is opened.\n"
+    "\n"
+    "This event has been introduced in version 0.28.\n"
   ),
   "@hide\n"
   "@alias Action\n"
@@ -392,7 +438,18 @@ Class<lay::Action> decl_ActionBase ("lay", "ActionBase",
   
 Class<ActionStub> decl_Action (decl_ActionBase, "lay", "Action",
   gsi::callback ("triggered", &ActionStub::triggered, &ActionStub::triggered_cb,
-    "@brief This method is called if the menu item is selected"
+    "@brief This method is called if the menu item is selected.\n"
+    "\n"
+    "Reimplement this method is a derived class to receive this event. "
+    "You can also use the \\on_triggered event instead."
+  ) +
+  gsi::callback ("menu_opening", &ActionStub::menu_opening, &ActionStub::menu_opening_cb,
+    "@brief This method is called if the menu item is a sub-menu and before the menu is opened."
+    "\n"
+    "Reimplement this method is a derived class to receive this event. "
+    "You can also use the \\on_menu_opening event instead.\n"
+    "\n"
+    "This method has been added in version 0.28."
   ) +
   gsi::callback ("wants_visible", &ActionStub::wants_visible, &ActionStub::wants_visible_cb,
     "@brief Returns a value whether the action wants to become visible\n"
@@ -404,18 +461,13 @@ Class<ActionStub> decl_Action (decl_ActionBase, "lay", "Action",
     "This feature has been introduced in version 0.28.\n"
   ) +
   gsi::callback ("wants_enabled", &ActionStub::wants_enabled, &ActionStub::wants_enabled_cb,
-    "@brief Returns a value whether the action wants to become enabled\n"
+    "@brief Returns a value whether the action wants to become enabled.\n"
     "This is a dynamic query for enabled state which the system uses to dynamically show or hide "
     "menu items. This information is evaluated in addition "
     "to \\is_enabled? and contributes to the effective enabled status from "
     "\\is_effective_enabled?.\n"
     "\n"
     "This feature has been introduced in version 0.28.\n"
-  ) +
-  gsi::event ("on_triggered", &ActionStub::on_triggered_event,
-    "@brief This event is called if the menu item is selected\n"
-    "\n"
-    "This event has been introduced in version 0.21.\n"
   ),
   "@brief The abstraction for an action (i.e. used inside menus)\n"
   "\n"

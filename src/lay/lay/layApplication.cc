@@ -31,6 +31,7 @@
 #include "layVersion.h"
 #include "laySignalHandler.h"
 #include "layRuntimeErrorForm.h"
+#include "layReaderErrorForm.h"
 #include "layProgress.h"
 #include "layTextProgress.h"
 #include "layBackgroundAwareTreeStyle.h"
@@ -106,6 +107,7 @@ static void ui_exception_handler_tl (const tl::Exception &ex, QWidget *parent)
   const tl::ExitException *gsi_exit = dynamic_cast <const tl::ExitException *> (&ex);
   const tl::BreakException *gsi_break = dynamic_cast <const tl::BreakException *> (&ex);
   const tl::ScriptError *gsi_excpt = dynamic_cast <const tl::ScriptError *> (&ex);
+  const db::ReaderUnknownFormatException *reader_excpt = dynamic_cast <const db::ReaderUnknownFormatException *> (&ex);
 
   if (gsi_exit || gsi_break) {
     //  exit and break exceptions are not shown - they are issued when a script is aborted or
@@ -131,11 +133,19 @@ static void ui_exception_handler_tl (const tl::Exception &ex, QWidget *parent)
     error_dialog.exec ();
 
   } else {
+
     tl::error << ex.msg (); 
     if (! parent) {
       parent = QApplication::activeWindow () ? QApplication::activeWindow () : lay::MainWindow::instance ();
     }
-    QMessageBox::critical (parent, QObject::tr ("Error"), tl::to_qstring (ex.msg ())); 
+
+    if (reader_excpt) {
+      lay::ReaderErrorForm error_dialog (parent, "reader_error_form", reader_excpt);
+      error_dialog.exec ();
+    } else {
+      QMessageBox::critical (parent, QObject::tr ("Error"), tl::to_qstring (ex.msg ()));
+    }
+
   }
 }
 
@@ -1280,7 +1290,7 @@ lay::LayoutView *
 ApplicationBase::create_view (db::Manager &manager)
 {
   //  create a new view
-  lay::LayoutView *view = new lay::LayoutView (&manager, lay::ApplicationBase::instance ()->is_editable (), dispatcher (), 0 /*parent*/);
+  lay::LayoutView *view = new lay::LayoutView (&manager, lay::ApplicationBase::instance ()->is_editable (), dispatcher ());
 
   //  set initial attributes
   view->set_synchronous (m_sync_mode);
@@ -1571,6 +1581,10 @@ GuiApplication::shutdown ()
     if (gsi_obj) {
       gsi_obj->keep ();
     }
+  }
+
+  while (! (tl_widgets = topLevelWidgets ()).empty ()) {
+    delete tl_widgets [0];
   }
 
   if (mp_recorder) {

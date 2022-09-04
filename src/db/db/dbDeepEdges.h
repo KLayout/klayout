@@ -133,10 +133,12 @@ public:
   virtual EdgesDelegate *merged () const;
 
   virtual EdgesDelegate *and_with (const Edges &other) const;
-  virtual EdgesDelegate *and_with (const Region &other) const;
-
   virtual EdgesDelegate *not_with (const Edges &other) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> andnot_with (const Edges &) const;
+
+  virtual EdgesDelegate *and_with (const Region &other) const;
   virtual EdgesDelegate *not_with (const Region &other) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> andnot_with (const Region &) const;
 
   virtual EdgesDelegate *xor_with (const Edges &other) const;
 
@@ -149,6 +151,7 @@ public:
 
   virtual EdgesDelegate *inside_part (const Region &other) const;
   virtual EdgesDelegate *outside_part (const Region &other) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> inside_outside_part_pair (const Region &) const;
 
   virtual RegionDelegate *extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const;
 
@@ -179,12 +182,14 @@ private:
   void ensure_merged_edges_valid () const;
   const DeepLayer &merged_deep_layer () const;
   DeepLayer and_or_not_with(const DeepEdges *other, EdgeBoolOp op) const;
-  DeepLayer edge_region_op (const DeepRegion *other, bool outside, bool include_borders) const;
+  std::pair<DeepLayer, DeepLayer> edge_region_op (const DeepRegion *other, EdgePolygonOp::mode_t op, bool include_borders) const;
   EdgePairsDelegate *run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, const db::EdgesCheckOptions &options) const;
   virtual EdgesDelegate *pull_generic (const Edges &edges) const;
   virtual RegionDelegate *pull_generic (const Region &region) const;
-  virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, bool invert) const;
-  virtual EdgesDelegate *selected_interacting_generic (const Region &region, bool invert) const;
+  virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, EdgeInteractionMode mode, bool inverse) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic (const Edges &edges, EdgeInteractionMode mode) const;
+  virtual EdgesDelegate *selected_interacting_generic (const Region &region, EdgeInteractionMode mode, bool inverse) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic (const Region &region, EdgeInteractionMode mode) const;
   DeepEdges *apply_filter (const EdgeFilterBase &filter) const;
 
   template <class Result, class OutputContainer> OutputContainer *processed_impl (const edge_processor<Result> &filter) const;

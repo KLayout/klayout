@@ -687,10 +687,9 @@ private:
   QDockWidget *mp_navigator_dock_widget;
   lay::Navigator *mp_navigator;
   QDockWidget *mp_hp_dock_widget, *mp_lp_dock_widget, *mp_libs_dock_widget, *mp_eo_dock_widget, *mp_bm_dock_widget;
-  ControlWidgetStack *mp_hp_stack, *mp_lp_stack, *mp_libs_stack, *mp_eo_stack, *mp_bm_stack;
+  ControlWidgetStack *mp_hp_stack, *mp_lp_stack, *mp_layer_toolbox_stack, *mp_libs_stack, *mp_eo_stack, *mp_bm_stack;
   bool m_hp_visible, m_lp_visible, m_libs_visible, m_eo_visible, m_bm_visible, m_navigator_visible, m_layer_toolbox_visible, m_always_exit_without_saving;
   QDockWidget *mp_layer_toolbox_dock_widget;
-  lay::LayerToolbox *mp_layer_toolbox;
   ViewWidgetStack *mp_view_stack;
   lay::FileDialog *mp_bookmarks_fdia;
   lay::FileDialog *mp_session_fdia;
@@ -703,7 +702,7 @@ private:
   lay::LogViewerDialog *mp_log_viewer_dialog;
   int m_mode;
   SettingsForm *mp_setup_form;
-  std::vector <lay::LayoutView *> mp_views;
+  std::vector <lay::LayoutViewWidget *> mp_views;
   int m_open_mode;
   int m_keep_backups;
   std::vector<std::pair<std::string, std::string> > m_mru;
@@ -808,7 +807,7 @@ private:
   void current_view_changed ();
   void update_window_title ();
   void update_tab_title (int i);
-  void add_view (LayoutView *view);
+  void add_view (LayoutViewWidget *view);
 
   bool can_close ();
   lay::CellViewRef create_or_load_layout (const std::string *filename, const db::LoadLayoutOptions *options, const std::string &tech, const int mode);

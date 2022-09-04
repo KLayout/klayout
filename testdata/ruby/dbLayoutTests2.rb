@@ -23,7 +23,7 @@ end
 
 load("test_prologue.rb")
 
-class DBLayoutTest_TestClass < TestBase
+class DBLayoutTests2_TestClass < TestBase
 
   # LayerInfo
   def test_1_Layout
@@ -206,22 +206,28 @@ class DBLayoutTest_TestClass < TestBase
     assert_equal( c1.bbox.to_s, "(10,-10;50,40)" )
     assert_equal( c1.bbox_per_layer( lindex ).to_s, "(10,-10;50,40)" )
     assert_equal( c1.bbox_per_layer( ldummy ).to_s, "()" )
+    assert_equal( c1.bbox( lindex ).to_s, "(10,-10;50,40)" )
+    assert_equal( c1.bbox( ldummy ).to_s, "()" )
+    assert_equal( c1.dbbox_per_layer( lindex ).to_s, "(0.01,-0.01;0.05,0.04)" )
+    assert_equal( c1.dbbox_per_layer( ldummy ).to_s, "()" )
+    assert_equal( c1.dbbox( lindex ).to_s, "(0.01,-0.01;0.05,0.04)" )
+    assert_equal( c1.dbbox( ldummy ).to_s, "()" )
 
     c1.swap( lindex, ldummy )
-    assert_equal( c1.bbox_per_layer( lindex ).to_s, "()" )
-    assert_equal( c1.bbox_per_layer( ldummy ).to_s, "(10,-10;50,40)" )
+    assert_equal( c1.bbox( lindex ).to_s, "()" )
+    assert_equal( c1.bbox( ldummy ).to_s, "(10,-10;50,40)" )
     
     c1.clear( lindex )
     c1.clear( ldummy )
-    assert_equal( c1.bbox_per_layer( lindex ).to_s, "()" )
-    assert_equal( c1.bbox_per_layer( ldummy ).to_s, "()" )
+    assert_equal( c1.bbox( lindex ).to_s, "()" )
+    assert_equal( c1.bbox( ldummy ).to_s, "()" )
     
     c1.shapes( lindex ).insert( RBA::Box::new( 10, -10, 50, 40 ) )
-    assert_equal( c1.bbox_per_layer( lindex ).to_s, "(10,-10;50,40)" )
-    assert_equal( c1.bbox_per_layer( ldummy ).to_s, "()" )
+    assert_equal( c1.bbox( lindex ).to_s, "(10,-10;50,40)" )
+    assert_equal( c1.bbox( ldummy ).to_s, "()" )
     c1.clear_shapes
-    assert_equal( c1.bbox_per_layer( lindex ).to_s, "()" )
-    assert_equal( c1.bbox_per_layer( ldummy ).to_s, "()" )
+    assert_equal( c1.bbox( lindex ).to_s, "()" )
+    assert_equal( c1.bbox( ldummy ).to_s, "()" )
 
     assert_equal( ly.unique_cell_name("c3"), "c3" )
     assert_equal( ly.unique_cell_name("c1"), "c1$1" )
@@ -255,8 +261,8 @@ class DBLayoutTest_TestClass < TestBase
     tr = RBA::Trans::new( RBA::Trans::R90, RBA::Point::new( 100, -50 ) ) 
     inst = RBA::CellInstArray::new( c1.cell_index, tr )
     assert_equal( inst.bbox( ly ).to_s, c1.bbox.transformed(tr).to_s )
-    assert_equal( inst.bbox_per_layer( ly, lindex ).to_s, c1.bbox.transformed(tr).to_s )
-    assert_equal( inst.bbox_per_layer( ly, ldummy ).to_s, "()" )
+    assert_equal( inst.bbox( ly, lindex ).to_s, c1.bbox.transformed(tr).to_s )
+    assert_equal( inst.bbox( ly, ldummy ).to_s, "()" )
     assert_equal( inst.size, 1 )
     assert_equal( inst.is_complex?, false )
     c2.insert( inst )
@@ -496,8 +502,8 @@ class DBLayoutTest_TestClass < TestBase
     tr = RBA::Trans::new( RBA::Trans::R90, RBA::Point::new( 100, -50 ) ) 
     inst = RBA::CellInstArray::new( c1.cell_index, tr )
     assert_equal( inst.bbox( ly ).to_s, c1.bbox.transformed(tr).to_s )
-    assert_equal( inst.bbox_per_layer( ly, lindex ).to_s, c1.bbox.transformed(tr).to_s )
-    assert_equal( inst.bbox_per_layer( ly, ldummy ).to_s, "()" )
+    assert_equal( inst.bbox( ly, lindex ).to_s, c1.bbox.transformed(tr).to_s )
+    assert_equal( inst.bbox( ly, ldummy ).to_s, "()" )
     assert_equal( inst.size, 1 )
     assert_equal( inst.is_complex?, false )
     c2.insert( inst, pid )

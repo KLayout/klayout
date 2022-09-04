@@ -324,7 +324,9 @@ Plugin::Plugin (Plugin *parent, bool standalone)
 
 Plugin::~Plugin ()
 {
-  // .. nothing yet ..
+  if (mp_parent) {
+    mp_parent->unregister_plugin (this);
+  }
 }
 
 void 

@@ -181,7 +181,8 @@ EmptyWithinViewCache::determine_empty_layers (const db::Layout *layout, unsigned
 
 LayerTreeModel::LayerTreeModel (QWidget *parent, lay::LayoutViewBase *view)
   : QAbstractItemModel (parent), 
-    mp_view (view), m_filter_mode (false), m_id_start (0), m_id_end (0), m_phase ((unsigned int) -1), m_test_shapes_in_view (false), m_hide_empty_layers (false)
+    mp_parent (parent), mp_view (view), m_filter_mode (false), m_id_start (0), m_id_end (0),
+    m_phase ((unsigned int) -1), m_test_shapes_in_view (false), m_hide_empty_layers (false)
 {
   // .. nothing yet ..
 }
@@ -849,9 +850,9 @@ LayerTreeModel::data (const QModelIndex &index, int role) const
 
     } else if (role == Qt::BackgroundRole) {
 
-      if (m_selected_ids.find (size_t (index.internalPointer ())) != m_selected_ids.end ()) {
+      if (mp_parent && m_selected_ids.find (size_t (index.internalPointer ())) != m_selected_ids.end ()) {
         //  for selected items pick a color between Highlight and Base
-        QPalette pl (mp_view->widget ()->palette ());
+        QPalette pl (mp_parent->palette ());
         QColor c1 = pl.color (QPalette::Highlight);
         QColor cb = pl.color (QPalette::Base);
         return QVariant (QColor ((c1.red () + cb.red ()) / 2, (c1.green () + cb.green ()) / 2, (c1.blue () + cb.blue ()) / 2));

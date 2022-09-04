@@ -271,6 +271,16 @@ public:
    */
   void set_icon (const std::string &filename);
 
+#if defined(HAVE_QT)
+  /**
+   *  @brief Sets the icon from a QIcon object
+   *
+   *  After using this function, "get_icon" will return an empty string as there
+   *  is no path for the icon file.
+   */
+  void set_qicon (const QIcon &icon);
+#endif
+
   /**
    *  @brief Set the icon's text
    *
@@ -306,9 +316,14 @@ public:
   void trigger ();
 
   /**
-   *  @brief Reimplement this method to implement a trigger handler
+   *  @brief Reimplement this method for a trigger handler
    */
   virtual void triggered ();
+
+  /**
+   *  @brief Reimplement this method for a handler called before a sub-menu is opening
+   */
+  virtual void menu_opening ();
 
   /**
    *  @brief Returns true, if the action is associated with a specific mode ID
@@ -358,6 +373,11 @@ public:
    *  @brief Gets the QMenu object if the action is a menu action
    */
   QMenu *menu () const;
+
+  /**
+   *  @brief Sets the menu object
+   */
+  void set_menu (QMenu *menu, bool owned);
 #endif
 
   /**
@@ -367,6 +387,16 @@ public:
   {
     return mp_dispatcher;
   }
+
+  /**
+   *  @brief This event is called when the action is triggered
+   */
+  tl::Event on_triggered_event;
+
+  /**
+   *  @brief This event gets called when the action is a sub-menu and the menu is opened
+   */
+  tl::Event on_menu_opening_event;
 
 #if defined(HAVE_QT)
 protected slots:
@@ -407,6 +437,7 @@ private:
 #if defined(HAVE_QT)
   QKeySequence get_key_sequence () const;
   QKeySequence get_key_sequence_for (const std::string &sc) const;
+  void configure_action (QAction *target) const;
 #endif
 
   void configure_from_title (const std::string &s);
@@ -563,6 +594,11 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
   QMenu *menu ()
   {
     return mp_action->menu ();
+  }
+
+  void set_menu (QMenu *menu, bool owned)
+  {
+    return mp_action->set_menu (menu, owned);
   }
 #endif
 
@@ -888,7 +924,6 @@ private:
   Dispatcher *mp_dispatcher;
   AbstractMenuItem m_root;
 #if defined(HAVE_QT)
-  tl::stable_vector<QMenu> m_helper_menu_items;
   std::map<std::string, QActionGroup *> m_action_groups;
 #endif
   std::map<std::string, std::vector<ConfigureAction *> > m_config_action_by_name;

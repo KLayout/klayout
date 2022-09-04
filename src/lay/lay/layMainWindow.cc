@@ -274,9 +274,9 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
 
   mp_layer_toolbox_dock_widget = new QDockWidget (QObject::tr ("Layer Toolbox"), this);
   mp_layer_toolbox_dock_widget->setObjectName (QString::fromUtf8 ("lt_dock_widget"));
-  mp_layer_toolbox = new LayerToolbox (mp_layer_toolbox_dock_widget, "layer_toolbox");
-  mp_layer_toolbox_dock_widget->setWidget (mp_layer_toolbox);
-  mp_layer_toolbox_dock_widget->setFocusProxy (mp_layer_toolbox);
+  mp_layer_toolbox_stack = new ControlWidgetStack (mp_layer_toolbox_dock_widget, "layer_toolbox_stack", true);
+  mp_layer_toolbox_dock_widget->setWidget (mp_layer_toolbox_stack);
+  mp_layer_toolbox_dock_widget->setFocusProxy (mp_layer_toolbox_stack);
   connect (mp_layer_toolbox_dock_widget, SIGNAL (visibilityChanged (bool)), this, SLOT (dock_widget_visibility_changed (bool)));
   m_layer_toolbox_visible = true;
 
@@ -594,18 +594,18 @@ BEGIN_PROTECTED
 
     m_file_changed_timer.blockSignals (false);
 
-    std::map<QString, std::pair<lay::LayoutView *, int> > views_per_file;
+    std::map<QString, std::pair<lay::LayoutViewWidget *, int> > views_per_file;
 
-    for (std::vector<lay::LayoutView *>::iterator v = mp_views.begin (); v != mp_views.end (); ++v) {
-      for (int cv = 0; cv < int ((*v)->cellviews ()); ++cv) {
-        views_per_file [tl::to_qstring ((*v)->cellview (cv)->filename ())] = std::make_pair (*v, cv);
+    for (std::vector<lay::LayoutViewWidget *>::iterator v = mp_views.begin (); v != mp_views.end (); ++v) {
+      for (int cv = 0; cv < int ((*v)->view ()->cellviews ()); ++cv) {
+        views_per_file [tl::to_qstring ((*v)->view ()->cellview (cv)->filename ())] = std::make_pair (*v, cv);
       }
     }
 
     for (std::vector<QString>::const_iterator f = changed_files.begin (); f != changed_files.end (); ++f) {
-      std::map<QString, std::pair<lay::LayoutView *, int> >::const_iterator v = views_per_file.find (*f);
+      std::map<QString, std::pair<lay::LayoutViewWidget *, int> >::const_iterator v = views_per_file.find (*f);
       if (v != views_per_file.end ()) {
-        v->second.first->reload_layout (v->second.second);
+        v->second.first->view ()->reload_layout (v->second.second);
         reloaded_files.insert (*f);
       }
     }
@@ -667,7 +667,6 @@ void
 MainWindow::close_all ()
 {
   cancel ();
-  mp_layer_toolbox->set_view (0);
 
   //  try a smooth shutdown of the current view
   lay::LayoutView::set_current (0);
@@ -675,7 +674,7 @@ MainWindow::close_all ()
   current_view_changed ();
 
   for (unsigned int i = 0; i < mp_views.size (); ++i) {
-    mp_views [i]->stop ();
+    mp_views [i]->view ()->stop ();
   }
 
   m_manager.clear ();
@@ -695,8 +694,9 @@ MainWindow::close_all ()
 
     view_closed_event (int (mp_views.size () - 1));
 
-    lay::LayoutView *view = mp_views.back ();
+    lay::LayoutViewWidget *view = mp_views.back ();
     mp_views.pop_back ();
+    mp_layer_toolbox_stack->remove_widget (mp_views.size ());
     mp_lp_stack->remove_widget (mp_views.size ());
     mp_hp_stack->remove_widget (mp_views.size ());
     mp_libs_stack->remove_widget (mp_views.size ());
@@ -979,63 +979,6 @@ MainWindow::configure (const std::string &name, const std::string &value)
     }
 
     return true;
-
-  } else if (name == cfg_stipple_palette) {
-
-    lay::StipplePalette palette = lay::StipplePalette::default_palette ();
-
-    try {
-      //  empty string means: default palette
-      if (! value.empty ()) {
-        palette.from_string (value);
-      }
-    } catch (...) {
-      //  ignore errors: just reset the palette
-      palette = lay::StipplePalette::default_palette ();
-    }
-
-    mp_layer_toolbox->set_palette (palette);
-
-    // others need this property too ..
-    return false;
-
-  } else if (name == cfg_line_style_palette) {
-
-    lay::LineStylePalette palette = lay::LineStylePalette::default_palette ();
-
-    try {
-      //  empty string means: default palette
-      if (! value.empty ()) {
-        palette.from_string (value);
-      }
-    } catch (...) {
-      //  ignore errors: just reset the palette
-      palette = lay::LineStylePalette::default_palette ();
-    }
-
-    mp_layer_toolbox->set_palette (palette);
-
-    // others need this property too ..
-    return false;
-
-  } else if (name == cfg_color_palette) {
-
-    lay::ColorPalette palette = lay::ColorPalette::default_palette ();
-
-    try {
-      //  empty string means: default palette
-      if (! value.empty ()) {
-        palette.from_string (value);
-      }
-    } catch (...) {
-      //  ignore errors: just reset the palette
-      palette = lay::ColorPalette::default_palette ();
-    }
-
-    mp_layer_toolbox->set_palette (palette);
-
-    // others need this property too ..
-    return false;
 
   } else if (name == cfg_mru) {
 
@@ -1333,9 +1276,9 @@ MainWindow::libraries_changed ()
 {
   //  if the libraries have changed, remove all selections and cancel any operations to avoid
   //  that the view refers to an invalid instance or shape
-  for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
-    (*vp)->clear_selection ();
-    (*vp)->cancel ();
+  for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+    (*vp)->view ()->clear_selection ();
+    (*vp)->view ()->cancel ();
   }
 }
 
@@ -1650,7 +1593,7 @@ lay::LayoutView *
 MainWindow::view (int index)
 {
   if (index >= 0 && index < int (mp_views.size ())) {
-    return mp_views [index];
+    return mp_views [index]->view ();
   } else {
     return 0;
   }
@@ -1660,7 +1603,7 @@ const lay::LayoutView *
 MainWindow::view (int index) const
 {
   if (index >= 0 && index < int (mp_views.size ())) {
-    return mp_views [index];
+    return mp_views [index]->view ();
   } else {
     return 0;
   }
@@ -1670,7 +1613,7 @@ int
 MainWindow::index_of (const lay::LayoutView *view) const
 {
   for (int i = 0; i < int (mp_views.size ()); ++i) {
-    if (mp_views [i] == view) {
+    if (mp_views [i]->view () == view) {
       return i;
     }
   }
@@ -1696,8 +1639,8 @@ MainWindow::select_mode (int m)
   if (m_mode != m) {
 
     m_mode = m;
-    for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
-      (*vp)->mode (m);
+    for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+      (*vp)->view ()->mode (m);
     }
 
     //  Update the actions by checking the one that is selected programmatically. Use the toolbar menu for reference.
@@ -1707,9 +1650,8 @@ MainWindow::select_mode (int m)
     std::vector<std::string> items = menu ()->items ("@toolbar");
     for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
       Action *a = menu ()->action (*i);
-      if (a->is_checkable() && a->is_for_mode (m_mode)) {
-        a->set_checked (true);
-        break;
+      if (a->is_checkable()) {
+        a->set_checked (a->is_for_mode (m_mode));
       }
     }
 
@@ -1753,9 +1695,9 @@ void
 MainWindow::cm_undo ()
 {
   if (current_view () && m_manager.available_undo ().first) {
-    for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
-      (*vp)->clear_selection ();
-      (*vp)->cancel ();
+    for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+      (*vp)->view ()->clear_selection ();
+      (*vp)->view ()->cancel ();
     }
     m_manager.undo ();
   }
@@ -1765,9 +1707,9 @@ void
 MainWindow::cm_redo ()
 {
   if (current_view () && m_manager.available_redo ().first) {
-    for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
-      (*vp)->clear_selection ();
-      (*vp)->cancel ();
+    for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+      (*vp)->view ()->clear_selection ();
+      (*vp)->view ()->cancel ();
     }
     m_manager.redo ();
   }
@@ -1964,8 +1906,8 @@ MainWindow::cancel ()
     m_manager.commit ();
   }
 
-  for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
-    (*vp)->cancel ();
+  for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+    (*vp)->view ()->cancel ();
   }
 
   select_mode (lay::LayoutView::default_mode ());
@@ -1975,8 +1917,8 @@ void
 MainWindow::load_layer_properties (const std::string &fn, bool all_views, bool add_default)
 {
   if (all_views) {
-    for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
-      (*vp)->load_layer_props (fn, add_default);
+    for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+      (*vp)->view ()->load_layer_props (fn, add_default);
     }
   } else if (current_view ()) {
     current_view ()->load_layer_props (fn, add_default);
@@ -1987,8 +1929,8 @@ void
 MainWindow::load_layer_properties (const std::string &fn, int cv_index, bool all_views, bool add_default)
 {
   if (all_views) {
-    for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
-      (*vp)->load_layer_props (fn, cv_index, add_default);
+    for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+      (*vp)->view ()->load_layer_props (fn, cv_index, add_default);
     }
   } else if (current_view ()) {
     current_view ()->load_layer_props (fn, cv_index, add_default);
@@ -2392,8 +2334,6 @@ MainWindow::select_view (int index)
 
     view (index)->set_current ();
 
-    mp_layer_toolbox->set_view (current_view ());
-
     if (current_view ()) {
 
       if (box_set) {
@@ -2402,6 +2342,7 @@ MainWindow::select_view (int index)
 
       mp_view_stack->raise_widget (index);
       mp_hp_stack->raise_widget (index);
+      mp_layer_toolbox_stack->raise_widget (index);
       mp_lp_stack->raise_widget (index);
       mp_libs_stack->raise_widget (index);
       mp_eo_stack->raise_widget (index);
@@ -2571,15 +2512,17 @@ MainWindow::cm_clone ()
 void
 MainWindow::clone_current_view ()
 {
-  lay::LayoutView *view = 0;
+  lay::LayoutViewWidget *view_widget = 0;
   lay::LayoutView *curr = current_view ();
   if (! curr) {
     throw tl::Exception (tl::to_string (QObject::tr ("No view open to clone")));
   }
 
   //  create a new view
-  view = new lay::LayoutView (current_view (), &m_manager, lay::ApplicationBase::instance ()->is_editable (), dispatcher (), mp_view_stack);
-  add_view (view);
+  view_widget = new lay::LayoutViewWidget (current_view (), &m_manager, lay::ApplicationBase::instance ()->is_editable (), dispatcher (), mp_view_stack);
+  add_view (view_widget);
+
+  lay::LayoutView *view = view_widget->view ();
 
   //  set initial attributes
   view->set_hier_levels (curr->get_hier_levels ());
@@ -2598,16 +2541,15 @@ MainWindow::clone_current_view ()
 
   view->update_content ();
 
-  mp_views.back ()->set_current ();
+  mp_views.back ()->view ()->set_current ();
 
-  mp_layer_toolbox->set_view (current_view ());
-
-  mp_view_stack->add_widget (view);
-  mp_lp_stack->add_widget (view->layer_control_frame ());
-  mp_hp_stack->add_widget (view->hierarchy_control_frame ());
-  mp_libs_stack->add_widget (view->libraries_frame ());
-  mp_eo_stack->add_widget (view->editor_options_frame ());
-  mp_bm_stack->add_widget (view->bookmarks_frame ());
+  mp_view_stack->add_widget (view_widget);
+  mp_lp_stack->add_widget (view_widget->layer_control_frame ());
+  mp_layer_toolbox_stack->add_widget (view_widget->layer_toolbox_frame ());
+  mp_hp_stack->add_widget (view_widget->hierarchy_control_frame ());
+  mp_libs_stack->add_widget (view_widget->libraries_frame ());
+  mp_eo_stack->add_widget (view_widget->editor_options_frame ());
+  mp_bm_stack->add_widget (view_widget->bookmarks_frame ());
 
   bool f = m_disable_tab_selected;
   m_disable_tab_selected = true;
@@ -2752,9 +2694,9 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
 
           int count = 0;
 
-          for (std::vector <lay::LayoutView *>::const_iterator v = mp_views.begin (); v != mp_views.end (); ++v) {
-            for (unsigned int cvi = 0; cvi < (*v)->cellviews (); ++cvi) {
-              if ((*v)->cellview (cvi)->name () == name) {
+          for (std::vector <lay::LayoutViewWidget *>::const_iterator v = mp_views.begin (); v != mp_views.end (); ++v) {
+            for (unsigned int cvi = 0; cvi < (*v)->view ()->cellviews (); ++cvi) {
+              if ((*v)->view ()->cellview (cvi)->name () == name) {
                 ++count;
               }
             }
@@ -2855,6 +2797,7 @@ MainWindow::close_view (int index)
       mp_tab_bar->removeTab (index);
       mp_view_stack->remove_widget (index);
       mp_lp_stack->remove_widget (index);
+      mp_layer_toolbox_stack->remove_widget (index);
       mp_hp_stack->remove_widget (index);
       mp_libs_stack->remove_widget (index);
       mp_eo_stack->remove_widget (index);
@@ -2863,7 +2806,7 @@ MainWindow::close_view (int index)
       view_closed_event (int (index));
 
       //  delete the view later as it may still be needed by event handlers or similar
-      std::unique_ptr<lay::LayoutView> old_view (view (index));
+      std::unique_ptr<lay::LayoutViewWidget> old_view (mp_views [index]);
 
       mp_views.erase (mp_views.begin () + index, mp_views.begin () + index + 1);
 
@@ -2879,7 +2822,6 @@ MainWindow::close_view (int index)
 
         //  last view closed
 
-        mp_layer_toolbox->set_view (0);
         current_view_changed ();
 
         clear_current_pos ();
@@ -3364,33 +3306,33 @@ MainWindow::create_layout (const std::string &technology, int mode)
 }
 
 void
-MainWindow::add_view (lay::LayoutView *view)
+MainWindow::add_view (lay::LayoutViewWidget *view)
 {
-  tl_assert (view->widget ());
-
-  connect (view->widget (), SIGNAL (title_changed (lay::LayoutView *)), this, SLOT (view_title_changed (lay::LayoutView *)));
-  connect (view->widget (), SIGNAL (dirty_changed (lay::LayoutView *)), this, SLOT (view_title_changed (lay::LayoutView *)));
-  connect (view->widget (), SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
-  connect (view->widget (), SIGNAL (menu_needs_update ()), this, SLOT (menu_needs_update ()));
-  connect (view->widget (), SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
-  connect (view->widget (), SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
-  connect (view->widget (), SIGNAL (clear_current_pos ()), this, SLOT (clear_current_pos ()));
-  connect (view->widget (), SIGNAL (mode_change (int)), this, SLOT (select_mode (int)));
+  connect (view, SIGNAL (title_changed (lay::LayoutView *)), this, SLOT (view_title_changed (lay::LayoutView *)));
+  connect (view, SIGNAL (dirty_changed (lay::LayoutView *)), this, SLOT (view_title_changed (lay::LayoutView *)));
+  connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
+  connect (view, SIGNAL (menu_needs_update ()), this, SLOT (menu_needs_update ()));
+  connect (view, SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
+  connect (view, SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
+  connect (view, SIGNAL (clear_current_pos ()), this, SLOT (clear_current_pos ()));
+  connect (view, SIGNAL (mode_change (int)), this, SLOT (select_mode (int)));
 
   mp_views.push_back (view);
 
   //  we must resize the widget here to set the geometry properly.
   //  This is required to make zoom_fit work.
-  view->widget ()->setGeometry (0, 0, mp_view_stack->width (), mp_view_stack->height ());
-  view->widget ()->show ();
+  view->setGeometry (0, 0, mp_view_stack->width (), mp_view_stack->height ());
+  view->show ();
 }
 
 int
 MainWindow::do_create_view ()
 {
   //  create a new view
-  lay::LayoutView *view = new lay::LayoutView (&m_manager, lay::ApplicationBase::instance ()->is_editable (), dispatcher (), mp_view_stack);
-  add_view (view);
+  lay::LayoutViewWidget *view_widget = new lay::LayoutViewWidget (&m_manager, lay::ApplicationBase::instance ()->is_editable (), dispatcher (), mp_view_stack);
+  add_view (view_widget);
+
+  lay::LayoutView *view = view_widget->view ();
 
   //  set initial attributes
   view->set_synchronous (synchronous ());
@@ -3416,12 +3358,11 @@ MainWindow::create_view ()
   int view_index = do_create_view ();
 
   //  add a new tab and make the new view the current one
-  mp_views.back ()->set_current ();
-
-  mp_layer_toolbox->set_view (current_view ());
+  mp_views.back ()->view ()->set_current ();
 
   mp_view_stack->add_widget (mp_views.back ());
   mp_lp_stack->add_widget (mp_views.back ()->layer_control_frame ());
+  mp_layer_toolbox_stack->add_widget (mp_views.back ()->layer_toolbox_frame ());
   mp_hp_stack->add_widget (mp_views.back ()->hierarchy_control_frame ());
   mp_libs_stack->add_widget (mp_views.back ()->libraries_frame ());
   mp_eo_stack->add_widget (mp_views.back ()->editor_options_frame ());
@@ -3480,12 +3421,11 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
     //  make the new view the current one
     if (mode == 1) {
 
-      mp_views.back ()->set_current ();
-
-      mp_layer_toolbox->set_view (current_view ());
+      mp_views.back ()->view ()->set_current ();
 
       mp_view_stack->add_widget (mp_views.back ());
       mp_lp_stack->add_widget (mp_views.back ()->layer_control_frame ());
+      mp_layer_toolbox_stack->add_widget (mp_views.back ()->layer_toolbox_frame ());
       mp_hp_stack->add_widget (mp_views.back ()->hierarchy_control_frame ());
       mp_libs_stack->add_widget (mp_views.back ()->libraries_frame ());
       mp_eo_stack->add_widget (mp_views.back ()->editor_options_frame ());
@@ -3640,8 +3580,8 @@ void
 MainWindow::set_synchronous (bool sync_mode)
 {
   m_synchronous = sync_mode;
-  for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
-    (*vp)->set_synchronous (sync_mode);
+  for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+    (*vp)->view ()->set_synchronous (sync_mode);
   }
 }
 
@@ -4187,8 +4127,8 @@ MainWindow::plugin_registered (lay::PluginDeclaration *cls)
   cls->init_menu (dispatcher ());
 
   //  recreate all plugins
-  for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
-    (*vp)->create_plugins ();
+  for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+    (*vp)->view ()->create_plugins ();
   }
 }
 
@@ -4198,8 +4138,8 @@ MainWindow::plugin_removed (lay::PluginDeclaration *cls)
   cls->remove_menu_items (dispatcher ());
 
   //  recreate all plugins except the one that got removed
-  for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
-    (*vp)->create_plugins (cls);
+  for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+    (*vp)->view ()->create_plugins (cls);
   }
 }
 

@@ -47,6 +47,7 @@
 #include "tlLog.h"
 #include "tlAssert.h"
 #include "tlExceptions.h"
+#include "tlStaticObjects.h"
 #include "layLayoutView.h"
 #include "layViewOp.h"
 #include "layViewObject.h"
@@ -61,6 +62,7 @@
 #include "laySelector.h"
 #include "layLayoutCanvas.h"
 #include "layLayerControlPanel.h"
+#include "layLayerToolbox.h"
 #include "layHierarchyControlPanel.h"
 #include "layLibrariesView.h"
 #include "layBrowser.h"
@@ -73,6 +75,7 @@
 #include "layEditorOptionsFrame.h"
 #include "layEditorOptionsPages.h"
 #include "layUtils.h"
+#include "layPropertiesDialog.h"
 #include "dbClipboard.h"
 #include "dbLayout.h"
 #include "dbLayoutUtils.h"
@@ -92,23 +95,51 @@ namespace lay
 {
 
 // -------------------------------------------------------------
-//  LayoutViewFrame implementation
+//  LayoutViewWidget implementation
 
-LayoutViewFrame::LayoutViewFrame (QWidget *parent, lay::LayoutView *view)
-  : QFrame (parent), mp_view (view)
+LayoutViewWidget::LayoutViewWidget (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent, unsigned int options)
+  : QFrame (parent)
 {
-  //  .. nothing yet ..
+  mp_view = new LayoutView (mgr, editable, plugin_parent, this, options);
+}
+
+LayoutViewWidget::LayoutViewWidget (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent, unsigned int options)
+  : QFrame (parent)
+{
+  mp_view = new LayoutView (source, mgr, editable, plugin_parent, this, options);
+}
+
+LayoutViewWidget::~LayoutViewWidget ()
+{
+  lay::LayoutView *view = mp_view;
+  mp_view = 0;
+  delete view;
+}
+
+void
+LayoutViewWidget::view_deleted (lay::LayoutView *view)
+{
+  if (view != mp_view) {
+    return;
+  }
+
+  //  creates a new view so the view is never invalid
+  mp_view = new LayoutView (view->manager (), view->is_editable (), view->plugin_parent (), this, view->options ());
 }
 
 QSize
-LayoutViewFrame::sizeHint () const
+LayoutViewWidget::sizeHint () const
 {
-  return mp_view->size_hint ();
+  return mp_view ? mp_view->size_hint () : QFrame::sizeHint ();
 }
 
 bool
-LayoutViewFrame::eventFilter(QObject *obj, QEvent *event)
+LayoutViewWidget::eventFilter(QObject *obj, QEvent *event)
 {
+  if (! mp_view) {
+    return QFrame::eventFilter (obj, event);
+  }
+
   bool taken = false;
   bool res = mp_view->event_filter (obj, event, taken);
   if (taken) {
@@ -118,14 +149,48 @@ LayoutViewFrame::eventFilter(QObject *obj, QEvent *event)
   }
 }
 
-void LayoutViewFrame::showEvent (QShowEvent *)
+void LayoutViewWidget::showEvent (QShowEvent *)
 {
-  mp_view->show_event ();
+  if (mp_view) {
+    mp_view->show_event ();
+  }
 }
 
-void LayoutViewFrame::hideEvent (QHideEvent *)
+void LayoutViewWidget::hideEvent (QHideEvent *)
 {
-  mp_view->hide_event ();
+  if (mp_view) {
+    mp_view->hide_event ();
+  }
+}
+
+QWidget *LayoutViewWidget::layer_control_frame ()
+{
+  return !mp_view ? 0 : mp_view->layer_control_frame ();
+}
+
+QWidget *LayoutViewWidget::layer_toolbox_frame ()
+{
+  return !mp_view ? 0 : mp_view->layer_toolbox_frame ();
+}
+
+QWidget *LayoutViewWidget::hierarchy_control_frame ()
+{
+  return !mp_view ? 0 : mp_view->hierarchy_control_frame ();
+}
+
+QWidget *LayoutViewWidget::libraries_frame ()
+{
+  return !mp_view ? 0 : mp_view->libraries_frame ();
+}
+
+QWidget *LayoutViewWidget::bookmarks_frame ()
+{
+  return !mp_view ? 0 : mp_view->bookmarks_frame ();
+}
+
+QWidget *LayoutViewWidget::editor_options_frame ()
+{
+  return !mp_view ? 0 : mp_view->editor_options_frame ();
 }
 
 // -------------------------------------------------------------
@@ -187,13 +252,18 @@ void LayoutViewSignalConnector::max_hier_changed (int i)
   mp_view->max_hier_changed (i);
 }
 
+void LayoutViewSignalConnector::app_terminated ()
+{
+  mp_view->close ();
+}
+
 // -------------------------------------------------------------
 
 const int timer_interval = 10;
 
 static LayoutView *ms_current = 0;
 
-LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
+LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
   : LayoutViewBase (this, manager, editable, plugin_parent, options),
     mp_widget (0),
     dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
@@ -201,10 +271,10 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  init_ui (parent, name);
+  init_ui ();
 }
 
-LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
+LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
   : LayoutViewBase (this, source, manager, editable, plugin_parent, options),
     mp_widget (0),
     dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
@@ -212,13 +282,38 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  init_ui (parent, name);
+  init_ui ();
 
   bookmarks (source->bookmarks ());
-  set_active_cellview_index (source->active_cellview_index ());
+  LayoutView::set_active_cellview_index (source->active_cellview_index ());
 }
 
-bool 
+LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, LayoutViewWidget *widget, unsigned int options)
+  : LayoutViewBase (this, manager, editable, plugin_parent, options),
+    mp_widget (widget),
+    dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
+{
+  //  ensures the deferred method scheduler is present
+  tl::DeferredMethodScheduler::instance ();
+
+  init_ui ();
+}
+
+LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, LayoutViewWidget *widget, unsigned int options)
+  : LayoutViewBase (this, source, manager, editable, plugin_parent, options),
+    mp_widget (widget),
+    dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
+{
+  //  ensures the deferred method scheduler is present
+  tl::DeferredMethodScheduler::instance ();
+
+  init_ui ();
+
+  bookmarks (source->bookmarks ());
+  LayoutView::set_active_cellview_index (source->active_cellview_index ());
+}
+
+bool
 LayoutView::event_filter (QObject *obj, QEvent *event, bool &taken)
 {
   if (obj == mp_min_hier_spbx || obj == mp_max_hier_spbx) {
@@ -242,14 +337,13 @@ LayoutView::event_filter (QObject *obj, QEvent *event, bool &taken)
 }
 
 void
-LayoutView::init_ui (QWidget *parent, const char *name)
+LayoutView::init_ui ()
 {
   m_activated = true;
   m_always_show_source = false;
   m_always_show_ld = true;
   m_always_show_layout_index = false;
 
-  mp_widget = 0;
   mp_connector = 0;
   mp_timer = 0;
   mp_left_frame = 0;
@@ -258,6 +352,8 @@ LayoutView::init_ui (QWidget *parent, const char *name)
   mp_libraries_view = 0;
   mp_bookmarks_view = 0;
   mp_control_frame = 0;
+  mp_toolbox = 0;
+  mp_toolbox_frame = 0;
   mp_hierarchy_frame = 0;
   mp_libraries_frame = 0;
   mp_bookmarks_frame = 0;
@@ -265,10 +361,7 @@ LayoutView::init_ui (QWidget *parent, const char *name)
   mp_min_hier_spbx = 0;
   mp_max_hier_spbx = 0;
 
-  if (lay::has_gui ()) {
-
-    mp_widget = new LayoutViewFrame (parent, this);
-    mp_widget->setObjectName (QString::fromUtf8 (name));
+  if (mp_widget) {
 
     canvas ()->init_ui (mp_widget);
 
@@ -377,6 +470,18 @@ LayoutView::init_ui (QWidget *parent, const char *name)
       QObject::connect (mp_control_panel, SIGNAL (order_changed ()), mp_connector, SLOT (layer_order_changed ()));
       QObject::connect (mp_control_panel, SIGNAL (current_layer_changed (const lay::LayerPropertiesConstIterator &)), mp_connector, SLOT (current_layer_changed_slot (const lay::LayerPropertiesConstIterator &)));
 
+      mp_toolbox_frame = new QFrame (0);
+      mp_toolbox_frame->setObjectName (QString::fromUtf8 ("lt_frame"));
+      QVBoxLayout *lt_frame_ly = new QVBoxLayout (mp_toolbox_frame);
+      lt_frame_ly->setContentsMargins (0, 0, 0, 0);
+      lt_frame_ly->setSpacing (0);
+
+      mp_toolbox = new lay::LayerToolbox (mp_toolbox_frame, "lt");
+      mp_toolbox->set_view (this);
+      lt_frame_ly->addWidget (mp_toolbox, 0 /*stretch*/);
+
+      QObject::connect (mp_toolbox_frame, SIGNAL (destroyed ()), mp_connector, SLOT (side_panel_destroyed ()));
+
     }
 
     mp_timer = new QTimer (mp_widget);
@@ -384,14 +489,28 @@ LayoutView::init_ui (QWidget *parent, const char *name)
     mp_timer->start (timer_interval);
 
   }
-  
+
   config_setup ();
   finish ();
 }
 
 LayoutView::~LayoutView ()
 {
+  close ();
+  if (mp_widget) {
+    mp_widget->view_deleted (this);
+  }
+}
+
+QWidget *LayoutView::widget ()
+{
+  return mp_widget;
+}
+
+void LayoutView::close()
+{
   close_event ();
+  close_event.clear ();
 
   if (ms_current == this) {
     ms_current = 0;
@@ -405,6 +524,12 @@ LayoutView::~LayoutView ()
   }
   mp_control_panel = 0;
   mp_control_frame = 0;
+
+  if (mp_toolbox_frame) {
+    delete mp_toolbox_frame;
+  }
+  mp_toolbox = 0;
+  mp_toolbox_frame = 0;
 
   if (mp_hierarchy_frame) {
     delete mp_hierarchy_frame;
@@ -429,9 +554,46 @@ LayoutView::~LayoutView ()
   mp_bookmarks_frame = 0;
   mp_bookmarks_view = 0;
 
-  if (mp_widget) {
-    delete mp_widget;
-    mp_widget = 0;
+  if (mp_properties_dialog) {
+    delete mp_properties_dialog.data ();
+  }
+}
+
+void
+LayoutView::finish ()
+{
+  if (dispatcher () == this) {
+    set_menu_parent_widget (mp_widget);
+    init_menu ();
+    if (mp_widget) {
+      menu ()->build (0, 0);
+    }
+  }
+}
+
+void
+LayoutView::show_properties ()
+{
+  if ((options () & lay::LayoutViewBase::LV_NoPropertiesPopup) != 0) {
+    return;
+  }
+
+  if (! has_selection ()) {
+    //  try to use the transient selection for the real one
+    transient_to_selection ();
+  }
+
+  //  re-create a new properties dialog
+  if (mp_properties_dialog) {
+    delete mp_properties_dialog.data ();
+  }
+  mp_properties_dialog = new lay::PropertiesDialog (widget (), manager (), this);
+
+  //  if launched from a dialog, do not use "show" as this blocks user interaction
+  if (QApplication::activeModalWidget ()) {
+    mp_properties_dialog->exec ();
+  } else {
+    mp_properties_dialog->show ();
   }
 }
 
@@ -477,6 +639,9 @@ void LayoutView::side_panel_destroyed (QObject *sender)
   } else if (sender == mp_bookmarks_frame) {
     mp_bookmarks_frame = 0;
     mp_bookmarks_view = 0;
+  } else if (sender == mp_toolbox_frame) {
+    mp_toolbox_frame = 0;
+    mp_toolbox = 0;
   }
 }
 
@@ -676,6 +841,69 @@ LayoutView::configure (const std::string &name, const std::string &value)
     }
 
     return true;
+
+  } else if (name == cfg_stipple_palette) {
+
+    lay::StipplePalette palette = lay::StipplePalette::default_palette ();
+
+    try {
+      //  empty string means: default palette
+      if (! value.empty ()) {
+        palette.from_string (value);
+      }
+    } catch (...) {
+      //  ignore errors: just reset the palette
+      palette = lay::StipplePalette::default_palette ();
+    }
+
+    if (mp_toolbox) {
+      mp_toolbox->set_palette (palette);
+    }
+
+    // others need this property too ..
+    return false;
+
+  } else if (name == cfg_line_style_palette) {
+
+    lay::LineStylePalette palette = lay::LineStylePalette::default_palette ();
+
+    try {
+      //  empty string means: default palette
+      if (! value.empty ()) {
+        palette.from_string (value);
+      }
+    } catch (...) {
+      //  ignore errors: just reset the palette
+      palette = lay::LineStylePalette::default_palette ();
+    }
+
+    if (mp_toolbox) {
+      mp_toolbox->set_palette (palette);
+    }
+
+    // others need this property too ..
+    return false;
+
+  } else if (name == cfg_color_palette) {
+
+    lay::ColorPalette palette = lay::ColorPalette::default_palette ();
+
+    try {
+      //  empty string means: default palette
+      if (! value.empty ()) {
+        palette.from_string (value);
+      }
+    } catch (...) {
+      //  ignore errors: just reset the palette
+      palette = lay::ColorPalette::default_palette ();
+    }
+
+    if (mp_toolbox) {
+      mp_toolbox->set_palette (palette);
+    }
+
+    // others need this property too ..
+    return false;
 
   } else {
     return false;
@@ -1029,6 +1257,17 @@ LayoutView::set_current_cell_path (int cv_index, const cell_path_type &path)
   } else {
     LayoutViewBase::set_current_cell_path (cv_index, path);
   }
+}
+
+void
+LayoutView::cancel_edits ()
+{
+  //  close the property dialog
+  if (mp_properties_dialog) {
+    mp_properties_dialog->hide ();
+  }
+
+  LayoutViewBase::cancel_edits ();
 }
 
 void

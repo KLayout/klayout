@@ -35,60 +35,69 @@
 #include "dbLayoutVsSchematic.h"
 #include "tlStream.h"
 
+#include "gsiQtGuiExternals.h"
+#include "gsiQtWidgetsExternals.h"  //  for Qt5
+
+#include <QFrame>
+
 namespace gsi
 {
 
 #if defined(HAVE_QTBINDINGS)
-static lay::LayoutView *new_view (QWidget *parent, bool editable, db::Manager *manager, unsigned int options)
+
+static lay::LayoutViewWidget *new_view_widget (QWidget *parent, bool editable, db::Manager *manager, unsigned int options)
 {
-  lay::LayoutView *lv = new lay::LayoutView (manager, editable, 0 /*plugin parent*/, parent, "view", options);
+  lay::LayoutViewWidget *lv = new lay::LayoutViewWidget (manager, editable, 0 /*plugin parent*/, parent, options);
   if (parent) {
     //  transfer ownership to the parent
     lv->keep ();
   }
   return lv;
 }
-#endif
 
-static lay::LayoutView *new_view2 (bool editable, db::Manager *manager, unsigned int options)
+static lay::LayoutView *get_view (lay::LayoutViewWidget *lv)
 {
-  return new lay::LayoutView (manager, editable, 0 /*plugin parent*/, 0 /*parent*/, "view", options);
+  return lv->view ();
 }
 
-extern LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase;
+static QWidget *layer_control_frame (lay::LayoutViewWidget *lv)
+{
+  return lv->layer_control_frame ();
+}
 
-Class<lay::LayoutView> decl_LayoutView (decl_LayoutViewBase, "lay", "LayoutView",
-#if defined(HAVE_QTBINDINGS)
-  gsi::constructor ("new", &new_view, gsi::arg ("parent"), gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),
-    "@brief Creates a standalone view\n"
-    "\n"
-    "This constructor is for special purposes only. To create a view in the context of a main window, "
-    "use \\MainWindow#create_view and related methods.\n"
+static QWidget *layer_toolbox_frame (lay::LayoutViewWidget *lv)
+{
+  return lv->layer_toolbox_frame ();
+}
+
+static QWidget *hierarchy_control_frame (lay::LayoutViewWidget *lv)
+{
+  return lv->hierarchy_control_frame ();
+}
+
+static QWidget *libraries_frame (lay::LayoutViewWidget *lv)
+{
+  return lv->libraries_frame ();
+}
+
+static QWidget *bookmarks_frame (lay::LayoutViewWidget *lv)
+{
+  return lv->bookmarks_frame ();
+}
+
+Class<lay::LayoutViewWidget> decl_LayoutViewWidget (QT_EXTERNAL_BASE (QFrame) "lay", "LayoutViewWidget",
+  gsi::constructor ("new", &new_view_widget, gsi::arg ("parent"), gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),
+    "@brief Creates a standalone view widget\n"
     "\n"
     "@param parent The parent widget in which to embed the view\n"
     "@param editable True to make the view editable\n"
     "@param manager The \\Manager object to enable undo/redo\n"
-    "@param options A combination of the values in the LV_... constants\n"
+    "@param options A combination of the values in the LV_... constants from \\LayoutViewBase\n"
     "\n"
     "This constructor has been introduced in version 0.25.\n"
     "It has been enhanced with the arguments in version 0.27.\n"
   ) +
-#endif
-  gsi::constructor ("new", &new_view2, gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),
-    "@brief Creates a standalone view\n"
-    "\n"
-    "This constructor is for special purposes only. To create a view in the context of a main window, "
-    "use \\MainWindow#create_view and related methods.\n"
-    "\n"
-    "@param editable True to make the view editable\n"
-    "@param manager The \\Manager object to enable undo/redo\n"
-    "@param options A combination of the values in the LV_... constants\n"
-    "\n"
-    "This constructor has been introduced in version 0.25.\n"
-    "It has been enhanced with the arguments in version 0.27.\n"
-  ) +
-#if defined(HAVE_QTBINDINGS)
-  gsi::method ("layer_control_frame", static_cast<QWidget *(lay::LayoutView::*) ()> (&lay::LayoutView::layer_control_frame),
+  gsi::method_ext ("layer_control_frame", &layer_control_frame,
     "@brief Gets the layer control side widget\n"
     "A 'side widget' is a widget attached to the view. It does not have a parent, so you can "
     "embed it into a different context. Please note that with embedding through 'setParent' it will be "
@@ -98,30 +107,65 @@ Class<lay::LayoutView> decl_LayoutView (decl_LayoutViewBase, "lay", "LayoutView"
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
-  gsi::method ("hierarchy_control_frame", static_cast<QWidget *(lay::LayoutView::*) ()> (&lay::LayoutView::hierarchy_control_frame),
+  gsi::method_ext ("layer_toolbox_frame", &layer_toolbox_frame,
+    "@brief Gets the layer toolbox side widget\n"
+    "A 'side widget' is a widget attached to the view. It does not have a parent, so you can "
+    "embed it into a different context. Please note that with embedding through 'setParent' it will be "
+    "destroyed when your parent widget gets destroyed. It will be lost then to the view.\n"
+    "\n"
+    "The side widget can be configured through the views configuration interface.\n"
+    "\n"
+    "This method has been introduced in version 0.28\n"
+  ) +
+  gsi::method_ext ("hierarchy_control_frame", &hierarchy_control_frame,
     "@brief Gets the cell view (hierarchy view) side widget\n"
     "For details about side widgets see \\layer_control_frame.\n"
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
-  gsi::method ("libraries_frame", static_cast<QWidget *(lay::LayoutView::*) ()> (&lay::LayoutView::libraries_frame),
+  gsi::method_ext ("libraries_frame", &libraries_frame,
     "@brief Gets the library view side widget\n"
     "For details about side widgets see \\layer_control_frame.\n"
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
-  gsi::method ("bookmarks_frame", static_cast<QWidget *(lay::LayoutView::*) ()> (&lay::LayoutView::bookmarks_frame),
+  gsi::method_ext ("bookmarks_frame", &bookmarks_frame,
     "@brief Gets the bookmarks side widget\n"
     "For details about side widgets see \\layer_control_frame.\n"
     "\n"
     "This method has been introduced in version 0.27\n"
   ) +
-  gsi::method ("widget", &lay::LayoutView::widget,
-    "@brief Gets the QWidget object for the layout view\n"
-    "\n"
-    "This method has been introduced in version 0.28 where LayoutView is no longer derived from QWidget directly.\n"
-  ) +
+  gsi::method_ext ("view", &get_view,
+    "@brief Gets the embedded view object.\n"
+  ),
+  "This object produces a widget which embeds a LayoutView. This widget can be used inside Qt widget hierarchies.\n"
+  "To access the \\LayoutView object within, use \\view.\n"
+  "\n"
+  "This class has been introduced in version 0.28."
+);
 #endif
+
+static lay::LayoutView *new_view (bool editable, db::Manager *manager, unsigned int options)
+{
+  return new lay::LayoutView (manager, editable, 0 /*plugin parent*/, options);
+}
+
+extern LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase;
+
+Class<lay::LayoutView> decl_LayoutView (decl_LayoutViewBase, "lay", "LayoutView",
+  gsi::constructor ("new", &new_view, gsi::arg ("editable", false), gsi::arg ("manager", (db::Manager *) 0, "nil"), gsi::arg ("options", (unsigned int) 0),
+    "@brief Creates a standalone view\n"
+    "\n"
+    "This constructor is for special purposes only. To create a view in the context of a main window, "
+    "use \\MainWindow#create_view and related methods.\n"
+    "\n"
+    "@param editable True to make the view editable\n"
+    "@param manager The \\Manager object to enable undo/redo\n"
+    "@param options A combination of the values in the LV_... constants from \\LayoutViewBase\n"
+    "\n"
+    "This constructor has been introduced in version 0.25.\n"
+    "It has been enhanced with the arguments in version 0.27.\n"
+  ) +
   gsi::method ("current", &lay::LayoutView::current,
     "@brief Returns the current view\n"
     "The current view is the one that is shown in the current tab. Returns nil if no layout is loaded.\n"

@@ -28,7 +28,6 @@
 #include <cctype>
 #include <limits>
 #include <vector>
-#include <sstream>
 #include <cwctype>
 #include <algorithm>
 
@@ -934,23 +933,6 @@ from_string (const std::string &s, bool &b)
   } else {
     throw tl::Exception (tl::to_string (tr ("Invalid boolean value: ")) + s);
   }
-}
-
-std::string
-join (const std::vector <std::string> &vv, const std::string &s)
-{
-  std::ostringstream r;
-
-  bool first = true;
-  for (std::vector <std::string>::const_iterator i = vv.begin (); i != vv.end (); ++i) {
-    if (!first) {
-      r << s;
-    }
-    first = false;
-    r << *i;
-  }
-
-  return r.str ();
 }
 
 std::vector<std::string>

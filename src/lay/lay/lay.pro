@@ -31,6 +31,7 @@ HEADERS = \
     layProgressWidget.h \
     layResourceHelpProvider.h \
     layRuntimeErrorForm.h \
+    layReaderErrorForm.h \
     laySearchReplaceConfigPage.h \
     laySearchReplaceDialog.h \
     laySearchReplacePropertiesWidgets.h \
@@ -87,6 +88,7 @@ FORMS = \
     ReplacePropertiesShape.ui \
     ReplacePropertiesText.ui \
     RuntimeErrorForm.ui \
+    ReaderErrorForm.ui \
     SearchPropertiesBox.ui \
     SearchPropertiesInstance.ui \
     SearchPropertiesPath.ui \
@@ -139,6 +141,7 @@ SOURCES = \
     layProgressWidget.cc \
     layResourceHelpProvider.cc \
     layRuntimeErrorForm.cc \
+    layReaderErrorForm.cc \
     laySearchReplaceConfigPage.cc \
     laySearchReplaceDialog.cc \
     laySearchReplacePlugin.cc \

@@ -602,6 +602,32 @@ run_demo gen, "input1.edges.outside_part(input2)", "drc_outside_part.png"
 
 class Gen
   def produce(s1, s2)
+    pts = [ 
+      RBA::Point::new(0   , 0   ),
+      RBA::Point::new(0   , 3000),
+      RBA::Point::new(2000, 3000),
+      RBA::Point::new(2000, 5000),
+      RBA::Point::new(6000, 5000),
+      RBA::Point::new(6000, 0   )
+    ];
+    s1.insert(RBA::Polygon::new(pts))
+    s2.insert(RBA::Box::new(0, 0, 4000, 6000))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.edges.inside(input2)", "drc_inside_ep.png"
+run_demo gen, "input1.edges.inside(input2.edges)", "drc_inside_ee.png"
+run_demo gen, "input1.edges.not_inside(input2)", "drc_not_inside_ep.png"
+run_demo gen, "input1.edges.not_inside(input2.edges)", "drc_not_inside_ee.png"
+run_demo gen, "input1.edges.outside(input2)", "drc_outside_ep.png"
+run_demo gen, "input1.edges.outside(input2.edges)", "drc_outside_ee.png"
+run_demo gen, "input1.edges.not_outside(input2)", "drc_not_outside_ep.png"
+run_demo gen, "input1.edges.not_outside(input2.edges)", "drc_not_outside_ee.png"
+
+class Gen
+  def produce(s1, s2)
     s1.insert(RBA::Box::new(-1000, 0, 1000, 2000))
     s1.insert(RBA::Box::new(2000, 0, 4000, 2000))
     s1.insert(RBA::Box::new(5000, 0, 7000, 2000))

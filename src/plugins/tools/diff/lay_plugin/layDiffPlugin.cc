@@ -27,6 +27,8 @@
 #include "layLayoutViewBase.h"
 #include "layUtils.h"
 
+#include <QPointer>
+
 namespace lay
 {
 
@@ -34,20 +36,19 @@ class DiffPlugin
   : public lay::Plugin
 {
 public:
-  DiffPlugin (Plugin *parent, lay::LayoutViewBase *view)
-    : lay::Plugin (parent), mp_view (view)
+  DiffPlugin (lay::LayoutViewBase *view)
+    : lay::Plugin (view), mp_view (view)
   {
     if (lay::has_gui ()) {
       mp_dialog = new lay::DiffToolDialog (0);
-    } else {
-      mp_dialog = 0;
     }
   }
 
   ~DiffPlugin ()
   {
-    delete mp_dialog;
-    mp_dialog = 0;
+    if (mp_dialog) {
+      delete mp_dialog.data ();
+    }
   }
 
   void menu_activated (const std::string &symbol) 
@@ -65,7 +66,7 @@ public:
 
 private:
   lay::LayoutViewBase *mp_view;
-  lay::DiffToolDialog *mp_dialog;
+  QPointer<lay::DiffToolDialog> mp_dialog;
 };
 
 class DiffPluginDeclaration
@@ -108,9 +109,9 @@ public:
     // .. nothing yet ..
   }
 
-  lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *root, lay::LayoutViewBase *view) const
+  lay::Plugin *create_plugin (db::Manager *, lay::Dispatcher *, lay::LayoutViewBase *view) const
   {
-    return new DiffPlugin (root, view);
+    return new DiffPlugin (view);
   }
 };
 

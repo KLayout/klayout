@@ -97,7 +97,13 @@ Reader::Reader (tl::InputStream &stream)
   }
 
   if (! mp_actual_reader) {
-    throw db::ReaderException (tl::to_string (tr ("Stream has unknown format: ")) + stream.source ());
+
+    m_stream.reset ();
+    std::string head = m_stream.read_all (4000);
+    bool has_more (m_stream.get (1) != 0);
+
+    throw db::ReaderUnknownFormatException (tl::to_string (tr ("Stream has unknown format: ")) + stream.source (), head, has_more);
+
   }
 }
 

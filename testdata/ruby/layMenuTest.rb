@@ -440,47 +440,99 @@ RESULT
 
   end
 
-  class MyAction < RBA::Action
-    attr_accessor :dyn_visible, :dyn_enabled
-    def initialize
-      self.dyn_visible = true
-      self.dyn_enabled = true
+  if RBA.constants.member?(:Action)
+
+    class MyAction < RBA::Action
+      attr_accessor :dyn_visible, :dyn_enabled
+      def initialize
+        self.dyn_visible = true
+        self.dyn_enabled = true
+      end
+      def wants_visible
+        self.dyn_visible
+      end
+      def wants_enabled
+        self.dyn_enabled
+      end
     end
-    def wants_visible
-      self.dyn_visible
+
+    def test_7
+
+      a = MyAction::new
+
+      assert_equal(a.is_effective_visible?, true)
+      a.hidden = true
+      assert_equal(a.is_effective_visible?, false)
+      a.hidden = false
+      assert_equal(a.is_effective_visible?, true)
+      a.visible = false
+      assert_equal(a.is_effective_visible?, false)
+      a.visible = true
+      assert_equal(a.is_effective_visible?, true)
+      a.dyn_visible = false
+      assert_equal(a.is_effective_visible?, false)
+      a.dyn_visible = true
+      assert_equal(a.is_effective_visible?, true)
+
+      assert_equal(a.is_effective_enabled?, true)
+      a.enabled = false
+      assert_equal(a.is_effective_enabled?, false)
+      a.enabled = true
+      assert_equal(a.is_effective_enabled?, true)
+      a.dyn_enabled = false
+      assert_equal(a.is_effective_enabled?, false)
+      a.dyn_enabled = true
+      assert_equal(a.is_effective_enabled?, true)
+
     end
-    def wants_enabled
-      self.dyn_enabled
-    end
+
   end
 
-  def test_7
+  def test_8
 
-    a = MyAction::new
+    if !RBA.constants.member?(:Action)
+      return
+    end
 
-    assert_equal(a.is_effective_visible?, true)
-    a.hidden = true
-    assert_equal(a.is_effective_visible?, false)
-    a.hidden = false
-    assert_equal(a.is_effective_visible?, true)
-    a.visible = false
-    assert_equal(a.is_effective_visible?, false)
-    a.visible = true
-    assert_equal(a.is_effective_visible?, true)
-    a.dyn_visible = false
-    assert_equal(a.is_effective_visible?, false)
-    a.dyn_visible = true
-    assert_equal(a.is_effective_visible?, true)
+    action = RBA::Action::new
+    action.title = "title:n1"
 
-    assert_equal(a.is_effective_enabled?, true)
-    a.enabled = false
-    assert_equal(a.is_effective_enabled?, false)
-    a.enabled = true
-    assert_equal(a.is_effective_enabled?, true)
-    a.dyn_enabled = false
-    assert_equal(a.is_effective_enabled?, false)
-    a.dyn_enabled = true
-    assert_equal(a.is_effective_enabled?, true)
+    menu = RBA::AbstractMenu::new
+
+    assert_equal(menu.action("s1.n1"), nil)
+    assert_equal(menu.action("s1"), nil)
+
+    menu.insert_menu("end", "s1", "submenu1")
+    menu.insert_menu("end", "s2", "submenu2")
+
+    menu.insert_item("s1.end", "n1", action)
+    menu.insert_item("s1.end", "n2", action)
+    menu.insert_item("s2.end", "n1", action)
+
+    assert_equal(menu.action("s1.n1") == action, true)
+    assert_equal(menu.action("s1.n2") == action, true)
+    assert_equal(menu.action("s2.n1") == action, true)
+
+    assert_equal(menu.is_valid?("s1.n1"), true)
+    assert_equal(menu.is_valid?("s1.n2"), true)
+    assert_equal(menu.is_valid?("s2.n1"), true)
+
+    menu.clear_menu("s1")
+
+    assert_equal(menu.is_valid?("s1.n1"), false)
+    assert_equal(menu.is_valid?("s1.n2"), false)
+    assert_equal(menu.is_valid?("s2.n1"), true)
+
+    menu.clear_menu("s2")
+
+    assert_equal(menu.is_valid?("s1.n1"), false)
+    assert_equal(menu.is_valid?("s1.n2"), false)
+    assert_equal(menu.is_valid?("s2.n1"), false)
+
+    # proof of transfer of ownership
+    assert_equal(action._destroyed?, true)
+
+    menu._destroy
 
   end
 

@@ -1181,7 +1181,7 @@ NetlistCompareCore::derive_node_identities_from_singular_match (const NetGraphNo
     }
     return tentative ? failed_match : 0;
 
-  } else if ((! n->has_any_other () && ! n_other->has_any_other ()) || (n->has_unknown_other () && n_other->has_unknown_other ())) { // @@@
+  } else if ((! n->has_any_other () && ! n_other->has_any_other ()) || (n->has_unknown_other () && n_other->has_unknown_other ())) {
 
     //  in tentative mode, reject this choice if both nets are named and
     //  their names differ -> this favors net matching by name

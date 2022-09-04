@@ -1873,7 +1873,9 @@ CODE
     # This method returns a two-element array containing one layer for the
     # AND result and one for the NOT result.
     #
-    # This method is available for polygon layers.
+    # This method is available for polygon and edge layers.
+    # For polygon layers, the other input must be a polygon layer too.
+    # For edge layers, the other input can be polygon or edge.
     #
     # It can be used to initialize two variables with the AND and NOT results:
     #
@@ -1889,8 +1891,12 @@ CODE
       @engine._context("andnot") do
 
         check_is_layer(other)
-        requires_region
-        other.requires_region
+        requires_edges_or_region
+        if self.data.is_a?(RBA::Edges)
+          other.requires_edges_or_region
+        elsif self.data.is_a?(RBA::Region)
+          other.requires_region
+        end
 
         res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :andnot, other.data)
 
@@ -2140,45 +2146,85 @@ CODE
     
     # %DRC%
     # @name inside
-    # @brief Selects shapes or regions of self which are inside the other region
+    # @brief Selects edges or polygons of self which are inside edges or polygons from the other layer
     # @synopsis layer.inside(other)
-    # This method selects all shapes or regions from self which are inside the other region.
-    # completely (completely covered by polygons from the other region). If self is
-    # in raw mode, this method will select individual shapes. Otherwise, this method
-    # will select coherent regions and no part of these regions may be outside the 
-    # other region.
-    # It returns a new layer containing the selected shapes. A version which modifies self
-    # is \select_inside.
     #
-    # This method is available for polygon layers.
+    # If layer is a polygon layer, the other layer needs to be a polygon layer too.
+    # In this case, this method selects all polygons which are completely inside 
+    # polygons from the other layer.
     #
-    # The following image shows the effect of the "inside" method (input1: red, input2: blue):
+    # If layer is an edge layer, the other layer can be polygon or edge layer. In the
+    # first case, all edges completely inside the polygons from the other layer are
+    # selected. If the other layer is an edge layer, all edges completely contained 
+    # in edges from the other layer are selected.
+    #
+    # Merged semantics applies - i.e. edges or polygons are joined before the 
+    # result is computed, unless the layers are in \raw mode.
+    #
+    # This method returns a new layer containing the selected shapes. A version which modifies self
+    # is \select_inside. \not_inside is a function computing the inverse of \inside.
+    # \split_inside is a function computing both results in a single call. \outside
+    # is a similar function selecting edges or polygons outside other edges or polygons.
+    #
+    # The following image shows the effect of the "inside" method for polygons (input1: red, input2: blue):
     #
     # @table
     #   @tr 
     #     @td @img(/images/drc_inside.png) @/td
     #   @/tr
     # @/table
+    # 
+    # The following images show the effect of the "inside" method for edge layers and edge or polygon layers
+    # the second input. Note that the edges are computed from the polygons in this example 
+    # (input1: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_inside_ee.png) @/td
+    #   @/tr
+    # @/table
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_inside_ep.png) @/td
+    #   @/tr
+    # @/table
     
     # %DRC%
     # @name not_inside
-    # @brief Selects shapes or regions of self which are not inside the other region
+    # @brief Selects edges or polygons of self which are not inside edges or polygons from the other layer
     # @synopsis layer.not_inside(other)
-    # This method selects all shapes or regions from self which are not inside the other region.
-    # completely (completely covered by polygons from the other region). If self is
-    # in raw mode, this method will select individual shapes. Otherwise, this method
-    # will select coherent regions and no part of these regions may be outside the 
-    # other region.
-    # It returns a new layer containing the selected shapes. A version which modifies self
+    #
+    # This method computes the inverse of \inside - i.e. edges or polygons from the layer
+    # not being inside polygons or edges from the other layer. 
+    #
+    # This method returns a new layer containing the selected shapes. A version which modifies self
     # is \select_not_inside.
+    # \split_inside is a function computing both results of \inside and \not_inside in a single call. \outside
+    # is a similar function selecting edges or polygons outside other edges or polygons. Note
+    # that "outside" is not the same than "not inside".
     #
-    # This method is available for polygon layers.
-    #
-    # The following image shows the effect of the "not_inside" method (input1: red, input2: blue):
+    # The following image shows the effect of the "not_inside" method for polygon layers (input1: red, input2: blue):
     #
     # @table
     #   @tr 
     #     @td @img(/images/drc_not_inside.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # The following images show the effect of the "not_inside" method for edge layers and edge or polygon layers
+    # the second input. Note that the edges are computed from the polygons in this example 
+    # (input1: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_not_inside_ee.png) @/td
+    #   @/tr
+    # @/table
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_not_inside_ep.png) @/td
     #   @/tr
     # @/table
     
@@ -2187,7 +2233,7 @@ CODE
     # @brief Returns the results of \inside and \not_inside at the same time
     # @synopsis (a, b) = layer.split_inside(other)
     #
-    # This method returns the polygons inside of polygons from the other layer in 
+    # This method returns the polygons or edges inside of polygons or edges from the other layer in 
     # one layer and all others in a second layer. This method is equivalent to calling 
     # \inside and \not_inside, but is faster than doing this in separate steps:
     #
@@ -2197,73 +2243,101 @@ CODE
     
     # %DRC%
     # @name select_inside
-    # @brief Selects shapes or regions of self which are inside the other region
+    # @brief Selects edges or polygons of self which are inside edges or polygons from the other layer
     # @synopsis layer.select_inside(other)
-    # This method selects all shapes or regions from self which are inside the other region.
-    # completely (completely covered by polygons from the other region). If self is
-    # in raw mode, this method will select individual shapes. Otherwise, this method
-    # will select coherent regions and no part of these regions may be outside the 
-    # other region.
-    # It modifies self to contain the selected shapes. A version which does not modify self
-    # is \inside.
     #
-    # This method is available for polygon layers.
+    # This method is the in-place version of \inside - i.e. it modifies the layer instead
+    # of returning a new layer and leaving the original layer untouched.
     
     # %DRC%
     # @name select_not_inside
-    # @brief Selects shapes or regions of self which are not inside the other region
+    # @brief Selects edges or polygons of self which are not inside edges or polygons from the other layer
     # @synopsis layer.select_not_inside(other)
-    # This method selects all shapes or regions from self which are not inside the other region.
-    # completely (completely covered by polygons from the other region). If self is
-    # in raw mode, this method will select individual shapes. Otherwise, this method
-    # will select coherent regions and no part of these regions may be outside the 
-    # other region.
-    # It modifies self to contain the selected shapes. A version which does not modify self
-    # is \not_inside.
     #
-    # This method is available for polygon layers.
+    # This method is the in-place version of \inside - i.e. it modifies the layer instead
+    # of returning a new layer and leaving the original layer untouched.
     
     # %DRC%
     # @name outside
-    # @brief Selects shapes or regions of self which are outside the other region
+    # @brief Selects edges or polygons of self which are outside edges or polygons from the other layer
     # @synopsis layer.outside(other)
-    # This method selects all shapes or regions from self which are completely outside 
-    # the other region (no part of these shapes or regions may be covered by shapes from
-    # the other region). If self is in raw mode, this method will select individual 
-    # shapes. Otherwise, this method will select coherent regions and no part of these 
-    # regions may overlap with shapes from the other region.
-    # It returns a new layer containing the selected shapes. A version which modifies self
-    # is \select_outside.
     #
-    # This method is available for polygon layers.
+    # If layer is a polygon layer, the other layer needs to be a polygon layer too.
+    # In this case, this method selects all polygons which are entirely outside 
+    # polygons from the other layer.
     #
-    # The following image shows the effect of the "outside" method (input1: red, input2: blue):
+    # If layer is an edge layer, the other layer can be polygon or edge layer. In the
+    # first case, all edges entirely outside the polygons from the other layer are
+    # selected. If the other layer is an edge layer, all edges entirely outside
+    # of edges from the other layer are selected.
+    #
+    # Merged semantics applies - i.e. edges or polygons are joined before the 
+    # result is computed, unless the layers are in \raw mode.
+    #
+    # This method returns a new layer containing the selected shapes. A version which modifies self
+    # is \select_outside. \not_outside is a function computing the inverse of \outside.
+    # \split_outside is a function computing both results in a single call. \outside
+    # is a similar function selecting edges or polygons outside other edges or polygons.
+    #
+    # The following image shows the effect of the "outside" method for polygons (input1: red, input2: blue):
     #
     # @table
     #   @tr 
     #     @td @img(/images/drc_outside.png) @/td
     #   @/tr
     # @/table
+    # 
+    # The following images show the effect of the "outside" method for edge layers and edge or polygon layers
+    # the second input. Note that the edges are computed from the polygons in this example 
+    # (input1: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_outside_ee.png) @/td
+    #   @/tr
+    # @/table
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_outside_ep.png) @/td
+    #   @/tr
+    # @/table
     
     # %DRC%
     # @name not_outside
-    # @brief Selects shapes or regions of self which are not outside the other region
+    # @brief Selects edges or polygons of self which are not outside edges or polygons from the other layer
     # @synopsis layer.not_outside(other)
-    # This method selects all shapes or regions from self which are not completely outside 
-    # the other region (part of these shapes or regions may be covered by shapes from
-    # the other region). If self is in raw mode, this method will select individual 
-    # shapes. Otherwise, this method will select coherent regions and no part of these 
-    # regions may overlap with shapes from the other region.
-    # It returns a new layer containing the selected shapes. A version which modifies self
+    #
+    # This method computes the inverse of \outside - i.e. edges or polygons from the layer
+    # not being outside polygons or edges from the other layer. 
+    #
+    # This method returns a new layer containing the selected shapes. A version which modifies self
     # is \select_not_outside.
+    # \split_outside is a function computing both results of \outside and \not_outside in a single call. \outside
+    # is a similar function selecting edges or polygons outside other edges or polygons. Note
+    # that "outside" is not the same than "not outside".
     #
-    # This method is available for polygon layers.
-    #
-    # The following image shows the effect of the "not_outside" method (input1: red, input2: blue):
+    # The following image shows the effect of the "not_outside" method for polygon layers (input1: red, input2: blue):
     #
     # @table
     #   @tr 
     #     @td @img(/images/drc_not_outside.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # The following images show the effect of the "not_outside" method for edge layers and edge or polygon layers
+    # the second input. Note that the edges are computed from the polygons in this example 
+    # (input1: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_not_outside_ee.png) @/td
+    #   @/tr
+    # @/table
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_not_outside_ep.png) @/td
     #   @/tr
     # @/table
     
@@ -2272,7 +2346,7 @@ CODE
     # @brief Returns the results of \outside and \not_outside at the same time
     # @synopsis (a, b) = layer.split_outside(other)
     #
-    # This method returns the polygons outside of polygons from the other layer in 
+    # This method returns the polygons or edges outside of polygons or edges from the other layer in 
     # one layer and all others in a second layer. This method is equivalent to calling 
     # \outside and \not_outside, but is faster than doing this in separate steps:
     #
@@ -2282,31 +2356,19 @@ CODE
     
     # %DRC%
     # @name select_outside
-    # @brief Selects shapes or regions of self which are outside the other region
+    # @brief Selects edges or polygons of self which are outside edges or polygons from the other layer
     # @synopsis layer.select_outside(other)
-    # This method selects all shapes or regions from self which are completely outside 
-    # the other region (no part of these shapes or regions may be covered by shapes from
-    # the other region). If self is in raw mode, this method will select individual 
-    # shapes. Otherwise, this method will select coherent regions and no part of these 
-    # regions may overlap with shapes from the other region.
-    # It modifies self to contain the selected shapes. A version which does not modify self
-    # is \outside.
     #
-    # This method is available for polygon layers.
+    # This method is the in-place version of \outside - i.e. it modifies the layer instead
+    # of returning a new layer and leaving the original layer untouched.
     
     # %DRC%
     # @name select_not_outside
-    # @brief Selects shapes or regions of self which are not outside the other region
+    # @brief Selects edges or polygons of self which are not outside edges or polygons from the other layer
     # @synopsis layer.select_not_outside(other)
-    # This method selects all shapes or regions from self which are not completely outside 
-    # the other region (part of these shapes or regions may be covered by shapes from
-    # the other region). If self is in raw mode, this method will select individual 
-    # shapes. Otherwise, this method will select coherent regions and no part of these 
-    # regions may overlap with shapes from the other region.
-    # It modifies self to contain the selected shapes. A version which does not modify self
-    # is \not_outside.
     #
-    # This method is available for polygon layers.
+    # This method is the in-place version of \outside - i.e. it modifies the layer instead
+    # of returning a new layer and leaving the original layer untouched.
     
     # %DRC%
     # @name in
@@ -2439,7 +2501,7 @@ CODE
     # @brief Returns the results of \interacting and \not_interacting at the same time
     # @synopsis (a, b) = layer.split_interacting(other [, options ])
     #
-    # This method returns the polygons interacting with objects from the other container in 
+    # This method returns the polygons or edges interacting with objects from the other container in 
     # one layer and all others in a second layer. This method is equivalent to calling 
     # \interacting and \not_interacting, but is faster than doing this in separate steps:
     #
@@ -2513,6 +2575,9 @@ CODE
     #
     # This method is available for edge layers. The argument must be a polygon layer.
     #
+    # \outside_part is a method computing the opposite part. \inside_outside_part is a
+    # method computing both inside and outside part in a single call.
+    #
     # @table
     #   @tr 
     #     @td @img(/images/drc_inside_part.png) @/td
@@ -2529,12 +2594,26 @@ CODE
     #
     # This method is available for edge layers. The argument must be a polygon layer.
     #
+    # \inside_part is a method computing the opposite part. \inside_outside_part is a
+    # method computing both inside and outside part in a single call.
+    #
     # @table
     #   @tr 
     #     @td @img(/images/drc_outside_part.png) @/td
     #   @/tr
     # @/table
     
+    # %DRC%
+    # @name inside_outside_part
+    # @brief Returns the parts of the edges inside and outside the given region
+    # @synopsis (inside_part, outside_part) = layer.inside_outside_part(region)
+    # The method is available for edge layers. The argument must be a polygon layer.
+    #
+    # This method returns two layers: the first with the edge parts inside the given region
+    # and the second with the parts outside the given region. It is equivalent 
+    # to calling \inside_part and \outside_part, but more efficient if both parts
+    # need to be computed.
+
     # %DRC%
     # @name pull_interacting
     # @brief Selects shapes or edges of other which touch or overlap shapes from the this region
@@ -2608,7 +2687,28 @@ CODE
 CODE
     end
 
-    %w(| ^ inside not_inside outside not_outside in not_in).each do |f| 
+    %w(inside not_inside outside not_outside).each do |f| 
+      eval <<"CODE"
+      def #{f}(other)
+
+        @engine._context("#{f}") do
+
+          requires_edges_or_region
+          if self.data.is_a?(RBA::Edges)
+            other.requires_edges_or_region
+          else
+            other.requires_region
+          end
+
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
+
+        end
+
+      end
+CODE
+    end
+
+    %w(| ^ in not_in).each do |f| 
       eval <<"CODE"
       def #{f}(other)
 
@@ -2723,8 +2823,31 @@ CODE
         @engine._context("#{f}") do
 
           check_is_layer(other)
-          requires_region
-          other.requires_edges_texts_or_region
+          requires_edges_or_region
+          if self.data.is_a?(RBA::Edges)
+            other.requires_edges_or_region
+          elsif self.data.is_a?(RBA::Region)
+            other.requires_edges_texts_or_region
+          end
+
+          res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data, *minmax_count(*args))
+          [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
+
+        end
+
+      end
+CODE
+    end
+    
+    %w(inside_outside_part).each do |f|
+      eval <<"CODE"
+      def #{f}(other, *args)
+
+        @engine._context("#{f}") do
+
+          check_is_layer(other)
+          requires_edges
+          other.requires_region
 
           res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data, *minmax_count(*args))
           [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
@@ -2803,8 +2926,12 @@ CODE
 
         @engine._context("#{f}") do
 
-          requires_region
-          requires_same_type(other)
+          requires_edges_or_region
+          if self.data.is_a?(RBA::Edges)
+            other.requires_edges_or_region
+          else
+            other.requires_region
+          end
 
           if @engine.is_tiled?
             self.data = @engine._tcmd(self.data, 0, self.data.class, :#{fi}, other.data)
@@ -2821,15 +2948,19 @@ CODE
     
     %w(split_inside split_outside).each do |f|
       eval <<"CODE"
-      def #{f}(other)
+      def #{f}(other, *args)
 
         @engine._context("#{f}") do
 
           check_is_layer(other)
-          requires_region
-          other.requires_region
+          requires_edges_or_region
+          if self.data.is_a?(RBA::Edges)
+            other.requires_edges_or_region
+          elsif self.data.is_a?(RBA::Region)
+            other.requires_region
+          end
 
-          res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data)
+          res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data, *minmax_count(*args))
           [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
 
         end

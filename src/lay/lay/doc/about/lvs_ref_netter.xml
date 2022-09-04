@@ -302,6 +302,16 @@ with a resistance value above the given threshold (in Farad).
 After using this method, the netlist compare will ignore capacitance devices
 with a capacitance values below the given threshold (in Farad).
 </p>
+<a name="no_lvs_hints"/><h2>"no_lvs_hints" - Disables LVS hints</h2>
+<keyword name="no_lvs_hints"/>
+<p>Usage:</p>
+<ul>
+<li><tt>no_lvs_hints</tt></li>
+</ul>
+<p>
+LVS hints may be expensive to compute. Use this function to disable
+generation of LVS hints
+</p>
 <a name="same_circuits"/><h2>"same_circuits" - Establishes an equivalence between the circuits</h2>
 <keyword name="same_circuits"/>
 <p>Usage:</p>

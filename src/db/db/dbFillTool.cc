@@ -152,30 +152,6 @@ public:
     }
   }
 
-  size_t filled_pixels () const
-  {
-    size_t n = 0;
-
-    for (std::vector<db::AreaMap>::const_iterator a = m_area_maps.begin (); a != m_area_maps.end (); ++a) {
-
-      db::Coord nx = db::Coord (a->nx ());
-      db::Coord ny = db::Coord (a->ny ());
-      db::AreaMap::area_type amax = a->pixel_area ();
-
-      double n = 0;
-      for (size_t i = 0; i < size_t (nx); ++i) {
-        for (size_t j = 0; j < size_t (ny); ++j) {
-          if (a->get (i, j) >= amax) {
-            n += 1;
-          }
-        }
-      }
-
-    }
-
-    return n;
-  }
-
   const db::Point &p0 () const { return m_origin; }
 
   unsigned int row_steps () const { return m_row_steps; }

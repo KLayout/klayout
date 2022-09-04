@@ -9,12 +9,10 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
 !equals(HAVE_QT, 0) {
 
   FORMS = \
-    PropertiesDialog.ui \
 
   SOURCES = \
     gtf.cc \
     layPluginConfigPage.cc \
-    layPropertiesDialog.cc \
     layProperties.cc \
     layDragDropData.cc \
     layCursor.cc \
@@ -22,7 +20,6 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
   HEADERS = \
     gtf.h \
     layPluginConfigPage.h \
-    layPropertiesDialog.h \
     layProperties.h \
     layDragDropData.h \
     layCursor.h \

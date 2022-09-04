@@ -38,9 +38,11 @@
 #include "dbCellMapping.h"
 #include "dbPCellDeclaration.h"
 #include "dbSaveLayoutOptions.h"
+#include "dbLoadLayoutOptions.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbRecursiveInstanceIterator.h"
 #include "dbWriter.h"
+#include "dbReader.h"
 #include "dbHash.h"
 #include "tlStream.h"
 
@@ -1683,6 +1685,39 @@ static const char *cell_name (const db::Cell *cell)
   }
 }
 
+static std::vector<db::cell_index_type>
+read_options (db::Cell *cell, const std::string &path, const db::LoadLayoutOptions &options)
+{
+  if (! cell->layout ()) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout - cannot read such cells")));
+  }
+
+  db::Layout tmp (cell->layout ()->dbu ());
+
+  {
+    tl::InputStream stream (path);
+    db::Reader reader (stream);
+    reader.read (tmp, options);
+  }
+
+  if (tmp.end_top_cells () - tmp.begin_top_down () != 1) {
+    throw tl::Exception (tl::to_string (tr ("Imported layout does not have a single top cell - cannot read such layouts into a cell")));
+  }
+
+  db::CellMapping cm;
+  std::vector<db::cell_index_type> new_cells = cm.create_single_mapping_full (*cell->layout (), cell->cell_index (), tmp, *tmp.begin_top_down ());
+  cell->move_tree_shapes (tmp.cell (*tmp.begin_top_down ()), cm);
+
+  return new_cells;
+}
+
+static std::vector<db::cell_index_type>
+read_simple (db::Cell *cell, const std::string &path)
+{
+  return read_options (cell, path, db::LoadLayoutOptions ());
+}
+
+
 static db::Point default_origin;
 
 Class<db::Cell> decl_Cell ("db", "Cell",
@@ -1760,6 +1795,40 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "scaling etc.\n"
     "\n"
     "This method has been introduced in version 0.23.\n"
+  ) +
+  gsi::method_ext ("read", &read_options, gsi::arg ("file_name"), gsi::arg ("options"),
+    "@brief Reads a layout file into this cell\n"
+    "\n"
+    "@param file_name The path of the file to read\n"
+    "@param options The reader options to use\n"
+    "@return The indexes of the cells created during the reading (new child cells)\n"
+    "\n"
+    "The format of the file will be determined from the file name. "
+    "The layout will be read into the cell, potentially creating new layers and "
+    "a subhierarchy of cells below this cell.\n"
+    "\n"
+    "This feature is equivalent to the following code:\n"
+    "\n"
+    "@code\n"
+    "def Cell.read(file_name, options)\n"
+    "  layout = RBA::Layout::new\n"
+    "  layout.read(file_name, options)\n"
+    "  cm = RBA::CellMapping::new\n"
+    "  cm.for_single_cell_full(self, layout.top_cell)\n"
+    "  self.move_tree_shapes(layout.top_cell)\n"
+    "end\n"
+    "@/code\n"
+    "\n"
+    "See \\move_tree_shapes and \\CellMapping for more details and how to "
+    "implement more elaborate schemes.\n"
+    "\n"
+    "This method has been introduced in version 0.28.\n"
+  ) +
+  gsi::method_ext ("read", &read_simple, gsi::arg ("file_name"),
+    "@brief Reads a layout file into this cell\n"
+    "This version uses the default options for reading the file.\n"
+    "\n"
+    "This method has been introduced in version 0.28.\n"
   ) +
   gsi::method_ext ("dup", &dup_cell,
     "@brief Creates a copy of the cell\n"
@@ -2649,14 +2718,16 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@return The bounding box of the cell\n"
     "\n"
     "The bounding box is computed over all layers. To compute the bounding box over single layers, "
-    "use \\bbox_per_layer.\n"
+    "use \\bbox with a layer index argument.\n"
   ) +
-  gsi::method ("bbox_per_layer", (const db::Cell::box_type &(db::Cell::*) (unsigned int) const) &db::Cell::bbox, gsi::arg ("layer_index"),
+  gsi::method ("bbox|#bbox_per_layer", (const db::Cell::box_type &(db::Cell::*) (unsigned int) const) &db::Cell::bbox, gsi::arg ("layer_index"),
     "@brief Gets the per-layer bounding box of the cell\n"
     "\n"
     "@return The bounding box of the cell considering only the given layer\n"
     "\n"
     "The bounding box is the box enclosing all shapes on the given layer.\n"
+    "\n"
+    "'bbox' is the preferred synonym since version 0.28.\n"
   ) +
   gsi::method_ext ("dbbox", &cell_dbbox,
     "@brief Gets the bounding box of the cell in micrometer units\n"
@@ -2664,18 +2735,19 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@return The bounding box of the cell\n"
     "\n"
     "The bounding box is computed over all layers. To compute the bounding box over single layers, "
-    "use \\dbbox_per_layer.\n"
+    "use \\dbbox with a layer index argument.\n"
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("dbbox_per_layer", &cell_dbbox_per_layer, gsi::arg ("layer_index"),
+  gsi::method_ext ("dbbox|#dbbox_per_layer", &cell_dbbox_per_layer, gsi::arg ("layer_index"),
     "@brief Gets the per-layer bounding box of the cell in micrometer units\n"
     "\n"
     "@return The bounding box of the cell considering only the given layer\n"
     "\n"
     "The bounding box is the box enclosing all shapes on the given layer.\n"
     "\n"
-    "This method has been introduced in version 0.25."
+    "This method has been introduced in version 0.25. "
+    "'dbbox' is the preferred synonym since version 0.28.\n"
   ) +
   gsi::iterator_ext ("each_overlapping_inst", &begin_overlapping_inst, gsi::arg ("b"),
     "@brief Gets the instances overlapping the given rectangle\n"
@@ -3844,22 +3916,22 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("bbox_per_layer", &inst_bbox_per_layer, gsi::arg ("layer_index"),
+  gsi::method_ext ("bbox|#bbox_per_layer", &inst_bbox_per_layer, gsi::arg ("layer_index"),
     "@brief Gets the bounding box of the instance for a given layer\n"
     "@param layer_index The index of the layer the bounding box will be computed for.\n"
     "The bounding box incorporates all instances that the array represents. "
     "It gives the overall extension of the child cell as seen in the calling cell (or all array members if the instance forms an array) "
     "for the given layer. If the layer is empty in this cell and all it's children', an empty bounding box will be returned. "
     "\n"
-    "This method has been introduced in version 0.25."
+    "This method has been introduced in version 0.25. 'bbox' is the preferred synonym for it since version 0.28."
   ) +
-  gsi::method_ext ("dbbox_per_layer", &inst_dbbox_per_layer, gsi::arg ("layer_index"),
+  gsi::method_ext ("dbbox|#dbbox_per_layer", &inst_dbbox_per_layer, gsi::arg ("layer_index"),
     "@brief Gets the bounding box of the instance in micron units\n"
     "@param layer_index The index of the layer the bounding box will be computed for.\n"
-    "Gets the bounding box (see \\bbox_per_layer) of the instance, but will compute the micrometer unit box by "
-    "multiplying \\bbox_per_layer with the database unit.\n"
+    "Gets the bounding box (see \\bbox) of the instance, but will compute the micrometer unit box by "
+    "multiplying \\bbox with the database unit.\n"
     "\n"
-    "This method has been introduced in version 0.25."
+    "This method has been introduced in version 0.25. 'dbbox' is the preferred synonym for it since version 0.28."
   ) +
   gsi::method_ext ("parent_cell", &parent_cell_ptr,
     "@brief Gets the cell this instance is contained in\n"
@@ -4343,10 +4415,12 @@ static db::CellInstArray::box_type cell_inst_array_bbox_per_layer (const db::Cel
 
 Class<db::CellInstArray> decl_CellInstArray ("db", "CellInstArray",
   cell_inst_array_defs<db::CellInstArray>::methods (false /*old version*/) +
-  gsi::method_ext ("bbox_per_layer", &cell_inst_array_bbox_per_layer, gsi::arg ("layout"), gsi::arg ("layer_index"),
+  gsi::method_ext ("bbox|#bbox_per_layer", &cell_inst_array_bbox_per_layer, gsi::arg ("layout"), gsi::arg ("layer_index"),
     "@brief Gets the bounding box of the array with respect to one layer\n"
     "The bounding box incorporates all instances that the array represents. It needs the layout object to access the "
-    "actual cell from the cell index."
+    "actual cell from the cell index.\n"
+    "\n"
+    "'bbox' is the preferred synonym since version 0.28.\n"
   ) +
   gsi::method_ext ("bbox", &cell_inst_array_bbox, gsi::arg ("layout"),
     "@brief Gets the bounding box of the array\n"
@@ -4405,10 +4479,12 @@ static db::DBox cell_dinst_array_bbox_per_layer (const db::DCellInstArray *a, co
 
 Class<db::DCellInstArray> decl_DCellInstArray ("db", "DCellInstArray",
   cell_inst_array_defs<db::DCellInstArray>::methods (true /*new version*/) +
-  gsi::method_ext ("bbox_per_layer", &cell_dinst_array_bbox_per_layer, gsi::arg ("layout"), gsi::arg ("layer_index"),
+  gsi::method_ext ("bbox|#bbox_per_layer", &cell_dinst_array_bbox_per_layer, gsi::arg ("layout"), gsi::arg ("layer_index"),
     "@brief Gets the bounding box of the array with respect to one layer\n"
     "The bounding box incorporates all instances that the array represents. It needs the layout object to access the "
-    "actual cell from the cell index."
+    "actual cell from the cell index.\n"
+    "\n"
+    "'bbox' is the preferred synonym since version 0.28.\n"
   ) +
   gsi::method_ext ("bbox", &cell_dinst_array_bbox, gsi::arg ("layout"),
     "@brief Gets the bounding box of the array\n"

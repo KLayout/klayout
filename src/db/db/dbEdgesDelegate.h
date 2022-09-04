@@ -294,9 +294,11 @@ public:
   virtual EdgesDelegate *merged () const = 0;
 
   virtual EdgesDelegate *and_with (const Edges &other) const = 0;
-  virtual EdgesDelegate *and_with (const Region &other) const = 0;
   virtual EdgesDelegate *not_with (const Edges &other) const = 0;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> andnot_with (const Edges &) const = 0;
+  virtual EdgesDelegate *and_with (const Region &other) const = 0;
   virtual EdgesDelegate *not_with (const Region &other) const = 0;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> andnot_with (const Region &) const = 0;
   virtual EdgesDelegate *xor_with (const Edges &other) const = 0;
   virtual EdgesDelegate *or_with (const Edges &other) const = 0;
   virtual EdgesDelegate *add_in_place (const Edges &other) = 0;
@@ -307,12 +309,28 @@ public:
 
   virtual EdgesDelegate *inside_part (const Region &other) const = 0;
   virtual EdgesDelegate *outside_part (const Region &other) const = 0;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> inside_outside_part_pair (const Region &other) const = 0;
   virtual RegionDelegate *pull_interacting (const Region &) const = 0;
   virtual EdgesDelegate *pull_interacting (const Edges &) const = 0;
   virtual EdgesDelegate *selected_interacting (const Region &other) const = 0;
   virtual EdgesDelegate *selected_not_interacting (const Region &other) const = 0;
   virtual EdgesDelegate *selected_interacting (const Edges &other) const = 0;
   virtual EdgesDelegate *selected_not_interacting (const Edges &other) const = 0;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair (const Region &other) const = 0;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair (const Edges &other) const = 0;
+
+  virtual EdgesDelegate *selected_outside (const Region &other) const = 0;
+  virtual EdgesDelegate *selected_not_outside (const Region &other) const = 0;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_outside_pair (const Region &other) const = 0;
+  virtual EdgesDelegate *selected_inside (const Region &other) const = 0;
+  virtual EdgesDelegate *selected_not_inside (const Region &other) const = 0;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_inside_pair (const Region &other) const = 0;
+  virtual EdgesDelegate *selected_outside (const Edges &other) const = 0;
+  virtual EdgesDelegate *selected_not_outside (const Edges &other) const = 0;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_outside_pair (const Edges &other) const = 0;
+  virtual EdgesDelegate *selected_inside (const Edges &other) const = 0;
+  virtual EdgesDelegate *selected_not_inside (const Edges &other) const = 0;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_inside_pair (const Edges &other) const = 0;
 
   virtual EdgesDelegate *in (const Edges &other, bool invert) const = 0;
 

@@ -30,6 +30,7 @@
 namespace lay
 {
   class Dispatcher;
+  class LayoutViewWidget;
   class LayoutView;
   class ZoomService;
   class ViewService;
@@ -55,15 +56,12 @@ public:
   void background_color (QColor c);
   img::Object *setup (lay::Dispatcher *root, img::Object *img);
 
-  lay::LayoutView *view ()
-  {
-    return mp_view;
-  }
+  lay::LayoutView *view ();
 
   void activate_service (lay::ViewService *service);
 
 private:
-  lay::LayoutView *mp_view;
+  lay::LayoutViewWidget *mp_view;
   lay::ZoomService *mp_zoom_service;
 };
 

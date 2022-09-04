@@ -71,6 +71,7 @@ SOURCES = \
     dbEdgePairRelationsTests.cc \
     dbEdgePairTests.cc \
     dbEdgeTests.cc \
+    dbEdgesUtilsTests.cc \
     dbClipTests.cc \
     dbCellMappingTests.cc \
     dbCellHullGeneratorTests.cc \

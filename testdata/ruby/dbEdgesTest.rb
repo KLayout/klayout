@@ -336,11 +336,17 @@ class DBEdges_TestClass < TestBase
     r = r1 & r2
     assert_equal(r.to_s, "(50,0;100,0)")
     assert_equal(r.is_merged?, true)
+    r = r1.andnot(r2)[0]
+    assert_equal(r.to_s, "(50,0;100,0)")
+    assert_equal(r.is_merged?, true)
     r = r1.dup
     r &= r2
     assert_equal(r.to_s, "(50,0;100,0)")
 
     r = r1 - r2
+    assert_equal(r.to_s, "(0,0;50,0)")
+    assert_equal(r.is_merged?, true)
+    r = r1.andnot(r2)[1]
     assert_equal(r.to_s, "(0,0;50,0)")
     assert_equal(r.is_merged?, true)
     r = r1.dup
@@ -482,7 +488,9 @@ class DBEdges_TestClass < TestBase
     g2.insert(RBA::Box::new(0, 10, 200, 20))
 
     assert_equal(r.interacting(r2).to_s, "(100,0;100,50)")
+    assert_equal(r.split_interacting(r2)[0].to_s, "(100,0;100,50)")
     assert_equal(r.not_interacting(r2).to_s, "(0,0;100,0)")
+    assert_equal(r.split_interacting(r2)[1].to_s, "(0,0;100,0)")
     rr = r.dup
     rr.select_interacting(r2)
     assert_equal(rr.to_s, "(100,0;100,50)")
@@ -491,7 +499,9 @@ class DBEdges_TestClass < TestBase
     assert_equal(rr.to_s, "(0,0;100,0)")
 
     assert_equal(r.interacting(g2).to_s, "(100,0;100,50)")
+    assert_equal(r.split_interacting(g2)[0].to_s, "(100,0;100,50)")
     assert_equal(r.not_interacting(g2).to_s, "(0,0;100,0)")
+    assert_equal(r.split_interacting(g2)[1].to_s, "(0,0;100,0)")
     rr = r.dup
     rr.select_interacting(g2)
     assert_equal(rr.to_s, "(100,0;100,50)")
@@ -539,8 +549,11 @@ class DBEdges_TestClass < TestBase
     e.insert(RBA::Edge::new(-100, 100, 200, 100))
     assert_equal((e & r).to_s, "(0,100;100,100)")
     assert_equal(e.inside_part(r).to_s, "(0,100;100,100)")
+    assert_equal(e.inside_outside_part(r)[0].to_s, "(0,100;100,100)")
 
     ee = e.dup
+    assert_equal((ee & r).to_s, "(0,100;100,100)")
+    assert_equal(ee.andnot(r)[0].to_s, "(0,100;100,100)")
     ee &= r
     assert_equal(ee.to_s, "(0,100;100,100)")
 
@@ -550,8 +563,11 @@ class DBEdges_TestClass < TestBase
 
     assert_equal(csort((e - r).to_s), csort("(-100,100;0,100);(100,100;200,100)"))
     assert_equal(csort(e.outside_part(r).to_s), csort("(-100,100;0,100);(100,100;200,100)"))
+    assert_equal(csort(e.inside_outside_part(r)[1].to_s), csort("(-100,100;0,100);(100,100;200,100)"))
 
     ee = e.dup
+    assert_equal((ee - r).to_s, csort("(-100,100;0,100);(100,100;200,100)"))
+    assert_equal(ee.andnot(r)[1].to_s, csort("(-100,100;0,100);(100,100;200,100)"))
     ee -= r
     assert_equal(csort(ee.to_s), csort("(-100,100;0,100);(100,100;200,100)"))
 
@@ -622,6 +638,76 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.count, 12)
     assert_equal(r.hier_count, 12)
     assert_equal(r.to_s, "(-10,-20;-10,20);(-10,20;10,20);(10,20;10,-20);(10,-20;-10,-20);(-10,80;-10,120);(-10,120;10,120);(10,120;10,80);(10,80;-10,80);(190,80;190,120);(190,120;210,120)...")
+
+  end
+
+  # inside
+  def test_10
+
+    r = RBA::Edges::new
+    r.insert(RBA::Edge::new(0, 0, 100, 0))
+    r.insert(RBA::Edge::new(0, 10, 100, 10))
+    r2 = RBA::Edges::new
+    r2.insert(RBA::Edge::new(0, 10, 200, 10))
+    g2 = RBA::Region::new
+    g2.insert(RBA::Box::new(0, 10, 200, 20))
+
+    assert_equal(r.inside(r2).to_s, "(0,10;100,10)")
+    assert_equal(r.split_inside(r2)[0].to_s, "(0,10;100,10)")
+    assert_equal(r.not_inside(r2).to_s, "(0,0;100,0)")
+    assert_equal(r.split_inside(r2)[1].to_s, "(0,0;100,0)")
+    rr = r.dup
+    rr.select_inside(r2)
+    assert_equal(rr.to_s, "(0,10;100,10)")
+    rr = r.dup
+    rr.select_not_inside(r2)
+    assert_equal(rr.to_s, "(0,0;100,0)")
+
+    assert_equal(r.inside(g2).to_s, "(0,10;100,10)")
+    assert_equal(r.split_inside(g2)[0].to_s, "(0,10;100,10)")
+    assert_equal(r.not_inside(g2).to_s, "(0,0;100,0)")
+    assert_equal(r.split_inside(g2)[1].to_s, "(0,0;100,0)")
+    rr = r.dup
+    rr.select_inside(g2)
+    assert_equal(rr.to_s, "(0,10;100,10)")
+    rr = r.dup
+    rr.select_not_inside(g2)
+    assert_equal(rr.to_s, "(0,0;100,0)")
+
+  end
+
+  # outside
+  def test_11
+
+    r = RBA::Edges::new
+    r.insert(RBA::Edge::new(0, 0, 100, 0))
+    r.insert(RBA::Edge::new(0, 10, 100, 10))
+    r2 = RBA::Edges::new
+    r2.insert(RBA::Edge::new(0, 0, 200, 0))
+    g2 = RBA::Region::new
+    g2.insert(RBA::Box::new(0, -5, 200, 5))
+
+    assert_equal(r.outside(r2).to_s, "(0,10;100,10)")
+    assert_equal(r.split_outside(r2)[0].to_s, "(0,10;100,10)")
+    assert_equal(r.not_outside(r2).to_s, "(0,0;100,0)")
+    assert_equal(r.split_outside(r2)[1].to_s, "(0,0;100,0)")
+    rr = r.dup
+    rr.select_outside(r2)
+    assert_equal(rr.to_s, "(0,10;100,10)")
+    rr = r.dup
+    rr.select_not_outside(r2)
+    assert_equal(rr.to_s, "(0,0;100,0)")
+
+    assert_equal(r.outside(g2).to_s, "(0,10;100,10)")
+    assert_equal(r.split_outside(g2)[0].to_s, "(0,10;100,10)")
+    assert_equal(r.not_outside(g2).to_s, "(0,0;100,0)")
+    assert_equal(r.split_outside(g2)[1].to_s, "(0,0;100,0)")
+    rr = r.dup
+    rr.select_outside(g2)
+    assert_equal(rr.to_s, "(0,10;100,10)")
+    rr = r.dup
+    rr.select_not_outside(g2)
+    assert_equal(rr.to_s, "(0,0;100,0)")
 
   end
 

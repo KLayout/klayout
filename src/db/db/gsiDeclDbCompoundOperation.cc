@@ -711,7 +711,7 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
     "This node renders the input if the specified bounding box parameter of the input shape is between pmin and pmax (exclusively). If 'inverse' is set to true, the "
     "input shape is returned if the parameter is less than pmin (exclusively) or larger than pmax (inclusively)."
   ) +
-  gsi::constructor ("new_ratio_filter", &new_ratio_filter, gsi::arg ("input"), gsi::arg ("parameter"), gsi::arg ("inverse", false), gsi::arg ("pmin", 0.0), gsi::arg ("pmin_included"), gsi::arg ("pmax", std::numeric_limits<double>::max (), "max"), gsi::arg ("pmax_included", true),
+  gsi::constructor ("new_ratio_filter", &new_ratio_filter, gsi::arg ("input"), gsi::arg ("parameter"), gsi::arg ("inverse", false), gsi::arg ("pmin", 0.0), gsi::arg ("pmin_included", true), gsi::arg ("pmax", std::numeric_limits<double>::max (), "max"), gsi::arg ("pmax_included", true),
     "@brief Creates a node filtering the input by ratio parameters.\n"
     "This node renders the input if the specified ratio parameter of the input shape is between pmin and pmax. If 'pmin_included' is true, the range will include pmin. Same for 'pmax_included' and pmax. "
     "If 'inverse' is set to true, the input shape is returned if the parameter is not within the specified range."
@@ -732,7 +732,7 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_edge_length_sum_filter", &new_edge_length_sum_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("lmin", 0), gsi::arg ("lmax", std::numeric_limits<db::Edge::distance_type>::max (), "max"),
     "@brief Creates a node filtering edges by their length sum (over the local set).\n"
   ) +
-  gsi::constructor ("new_edge_orientation_filter", &new_edge_orientation_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("amin"), gsi::arg ("include_amin"), gsi::arg ("amax"), gsi::arg ("include_amax"),
+  gsi::constructor ("new_edge_orientation_filter", &new_edge_orientation_filter, gsi::arg ("input"), gsi::arg ("inverse"), gsi::arg ("amin"), gsi::arg ("include_amin"), gsi::arg ("amax"), gsi::arg ("include_amax"),
     "@brief Creates a node filtering edges by their orientation.\n"
   ) +
   gsi::constructor ("new_polygons", &new_polygons, gsi::arg ("input"), gsi::arg ("e", 0),
@@ -923,4 +923,3 @@ gsi::EnumIn<db::CompoundRegionOperationNode, db::RegionRatioFilter::parameter_ty
 );
 
 }
-

@@ -169,6 +169,22 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   p.output(lb, dm + 10)
   m.output(lb, dm + 11)
 
+  b.edges.inside(c).output(lb, dm + 20)
+  b.edges.not_inside(c).output(lb, dm + 21)
+  b.edges.inside(empty).output(lb, dm + 22)
+  b.edges.not_inside(empty).output(lb, dm + 23)
+  (p, m) = b.edges.split_inside(c)
+  p.output(lb, dm + 30)
+  m.output(lb, dm + 31)
+
+  b.edges.inside(c.edges).output(lb, dm + 40)
+  b.edges.not_inside(c.edges).output(lb, dm + 41)
+  b.edges.inside(empty.edges).output(lb, dm + 42)
+  b.edges.not_inside(empty.edges).output(lb, dm + 43)
+  (p, m) = b.edges.split_inside(c.edges)
+  p.output(lb, dm + 50)
+  m.output(lb, dm + 51)
+
   b.covering(c).output(lb, dm + 100)
   b.not_covering(c).output(lb, dm + 101)
   b.covering(empty).output(lb, dm + 102)
@@ -184,6 +200,22 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   (p, m) = b.split_outside(c)
   p.output(lb + 1, dm + 10)
   m.output(lb + 1, dm + 11)
+
+  b.edges.outside(c).output(lb + 1, dm + 20)
+  b.edges.not_outside(c).output(lb + 1, dm + 21)
+  b.edges.outside(empty).output(lb + 1, dm + 22)
+  b.edges.not_outside(empty).output(lb + 1, dm + 23)
+  (p, m) = b.edges.split_outside(c)
+  p.output(lb + 1, dm + 30)
+  m.output(lb + 1, dm + 31)
+
+  b.edges.outside(c.edges).output(lb + 1, dm + 40)
+  b.edges.not_outside(c.edges).output(lb + 1, dm + 41)
+  b.edges.outside(empty.edges).output(lb + 1, dm + 42)
+  b.edges.not_outside(empty.edges).output(lb + 1, dm + 43)
+  (p, m) = b.edges.split_outside(c.edges)
+  p.output(lb + 1, dm + 50)
+  m.output(lb + 1, dm + 51)
 
   b.overlapping(c).output(lb + 2, dm)
   b.not_overlapping(c).output(lb + 2, dm + 1)
@@ -201,6 +233,22 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   p.output(lb + 3, dm + 10)
   m.output(lb + 3, dm + 11)
 
+  b.edges.interacting(c).output(lb + 3, dm + 20)
+  b.edges.not_interacting(c).output(lb + 3, dm + 21)
+  b.edges.interacting(empty).output(lb + 3, dm + 22)
+  b.edges.not_interacting(empty).output(lb + 3, dm + 23)
+  (p, m) = b.edges.split_interacting(c)
+  p.output(lb + 3, dm + 30)
+  m.output(lb + 3, dm + 31)
+
+  b.edges.interacting(c.edges).output(lb + 3, dm + 40)
+  b.edges.not_interacting(c.edges).output(lb + 3, dm + 41)
+  b.edges.interacting(empty.edges).output(lb + 3, dm + 42)
+  b.edges.not_interacting(empty.edges).output(lb + 3, dm + 43)
+  (p, m) = b.edges.split_interacting(c.edges)
+  p.output(lb + 3, dm + 50)
+  m.output(lb + 3, dm + 51)
+
   bdup = b.dup
   bdup.select_inside(c)
   bdup.xor(b.inside(c)).output(lb + 4, dm)
@@ -213,6 +261,31 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   bdup = b.dup
   bdup.select_not_inside(empty)
   bdup.output(lb + 4, dm + 3)
+  bdup = b.dup.edges
+  bdup.select_inside(c)
+  bdup.xor(b.edges.inside(c)).output(lb + 4, dm + 10)
+  bdup = b.dup.edges
+  bdup.select_not_inside(c)
+  bdup.output(lb + 4, dm + 11)
+  bdup = b.dup.edges
+  bdup.select_inside(empty)
+  bdup.output(lb + 4, dm + 12)
+  bdup = b.dup.edges
+  bdup.select_not_inside(empty)
+  bdup.output(lb + 4, dm + 13)
+  bdup = b.dup.edges
+  bdup.select_inside(c.edges)
+  bdup.xor(b.edges.inside(c.edges)).output(lb + 4, dm + 20)
+  bdup = b.dup.edges
+  bdup.select_not_inside(c.edges)
+  bdup.output(lb + 4, dm + 21)
+  bdup = b.dup.edges
+  bdup.select_inside(empty)
+  bdup.output(lb + 4, dm + 22)
+  bdup = b.dup.edges
+  bdup.select_not_inside(empty)
+  bdup.output(lb + 4, dm + 23)
+
   bdup = b.dup
   bdup.select_outside(c)
   bdup.xor(b.outside(c)).output(lb + 5, dm)
@@ -225,6 +298,31 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   bdup = b.dup
   bdup.select_not_outside(empty)
   bdup.output(lb + 5, dm + 3)
+  bdup = b.dup.edges
+  bdup.select_outside(c)
+  bdup.xor(b.edges.outside(c)).output(lb + 5, dm + 10)
+  bdup = b.dup.edges
+  bdup.select_not_outside(c)
+  bdup.output(lb + 5, dm + 11)
+  bdup = b.dup.edges
+  bdup.select_outside(empty)
+  bdup.output(lb + 5, dm + 12)
+  bdup = b.dup.edges
+  bdup.select_not_outside(empty)
+  bdup.output(lb + 5, dm + 13)
+  bdup = b.dup.edges
+  bdup.select_outside(c.edges)
+  bdup.xor(b.edges.outside(c.edges)).output(lb + 5, dm + 20)
+  bdup = b.dup.edges
+  bdup.select_not_outside(c.edges)
+  bdup.output(lb + 5, dm + 21)
+  bdup = b.dup.edges
+  bdup.select_outside(empty)
+  bdup.output(lb + 5, dm + 22)
+  bdup = b.dup.edges
+  bdup.select_not_outside(empty)
+  bdup.output(lb + 5, dm + 23)
+
   bdup = b.dup
   bdup.select_overlapping(c)
   bdup.xor(b.overlapping(c)).output(lb + 6, dm)
@@ -237,6 +335,7 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   bdup = b.dup
   bdup.select_not_overlapping(empty)
   bdup.output(lb + 6, dm + 3)
+
   bdup = b.dup
   bdup.select_interacting(c)
   bdup.xor(b.interacting(c)).output(lb + 7, dm)
@@ -249,8 +348,10 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   bdup = b.dup
   bdup.select_not_interacting(empty)
   bdup.output(lb + 7, dm + 3)
+
   b.inside(empty).output(lb + 8, dm)
   b.not_inside(empty).output(lb + 8, dm + 1)
+
   b.outside(empty).output(lb + 9, dm)
   b.not_outside(empty).output(lb + 9, dm + 1)
   
@@ -641,6 +742,16 @@ def run_testsuite(dm, ic, tiled = false, hier = false)
   p.output(lb + 4, dm)
   p = b.edges.intersections(c.edges)
   p.output(lb + 5, dm)
+  (u, v) = c.edges.andnot(b.edges)
+  u.output(lb + 6, dm)
+  v.output(lb + 6, dm + 1)
+  p = b.edges.inside_part(c)
+  p.output(lb + 7, dm)
+  p = b.edges.outside_part(c)
+  p.output(lb + 7, dm + 1)
+  (u, v) = b.edges.inside_outside_part(c)
+  u.output(lb + 7, dm + 2)
+  v.output(lb + 7, dm + 3)
   
   lb += 10 #450
   message "--- texts and filters #{lb}"

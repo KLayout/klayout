@@ -1117,18 +1117,18 @@ TEST(24_enclosing)
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
-static void run_test (tl::TestBase *_this, const std::string &number, bool deep)
+static void run_test (tl::TestBase *_this, const std::string &number, bool deep, bool oasis = false)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_" + number + ".drc";
 
   std::string input = tl::testdata ();
-  input += "/drc/drcSimpleTests_" + number + ".gds";
+  input += "/drc/drcSimpleTests_" + number + "." + (oasis ? "oas" : "gds");
 
   std::string au = tl::testdata ();
-  au += "/drc/drcSimpleTests_au" + number + std::string (deep ? "d" : "") + ".gds";
+  au += "/drc/drcSimpleTests_au" + number + std::string (deep ? "d" : "") + "." + (oasis ? "oas" : "gds");
 
-  std::string output = _this->tmp_file ("tmp.gds");
+  std::string output = _this->tmp_file (oasis ? "tmp.oas" : "tmp.gds");
 
   {
     //  Set some variables
@@ -1295,7 +1295,7 @@ TEST(49d_epAngle)
 
 TEST(50_issue826)
 {
-  run_test (_this, "50", false);
+  run_test (_this, "50", false, true /*OASIS*/);
 }
 
 TEST(51_epInternalAngle)

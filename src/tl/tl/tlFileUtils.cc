@@ -27,6 +27,9 @@
 
 #include <cctype>
 
+// Use this define to print debug output
+// #define FILE_UTILS_VERBOSE
+
 #if defined(_MSC_VER)
 
 #  include <sys/types.h>
@@ -448,7 +451,9 @@ bool mkpath (const std::string &p)
     front += parts[i++];
     if (! file_exists (front)) {
       if (! mkdir (front)) {
+#if defined(FILE_UTILS_VERBOSE)
         tl::error << tr ("Unable to create directory: ") << front;
+#endif
         return false;
       }
     }
@@ -511,13 +516,17 @@ bool rm_dir_recursive (const std::string &p)
   for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
     std::string tc = tl::combine_path (path, *e);
     if (! rm_file (tc)) {
+#if defined(FILE_UTILS_VERBOSE)
       tl::error << tr ("Unable to remove file: ") << tc;
+#endif
       return false;
     }
   }
 
   if (! rm_dir (path)) {
+#if defined(FILE_UTILS_VERBOSE)
     tl::error << tr ("Unable to remove directory: ") << path;
+#endif
     return false;
   }
 
@@ -535,7 +544,9 @@ cp_dir_recursive (const std::string &source, const std::string &target)
   for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
     std::string tc = tl::combine_path (path_to, *e);
     if (! mkpath (tc)) {
+#if defined(FILE_UTILS_VERBOSE)
       tl::error << tr ("Unable to create target directory: ") << tc;
+#endif
       return false;
     }
     if (! cp_dir_recursive (tl::combine_path (path, *e), tc)) {
@@ -558,8 +569,10 @@ cp_dir_recursive (const std::string &source, const std::string &target)
       is.copy_to (os);
 
     } catch (tl::Exception &ex) {
+#if defined(FILE_UTILS_VERBOSE)
       tl::error << tr ("Unable to copy file ") << tl::combine_path (path_to, *e) << tr (" to ") << tl::combine_path (path, *e)
                 << tr ("(Error ") << ex.msg () << ")";
+#endif
       return false;
     }
 

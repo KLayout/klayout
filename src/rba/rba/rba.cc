@@ -675,49 +675,78 @@ struct RubyInterpreterPrivateData
 // -------------------------------------------------------------------
 //  Ruby API 
 
+static void
+handle_exception (VALUE exc, bool first_chance)
+{
+  if (! first_chance) {
+    //  Re-raise the exception without blocking in the debugger
+    block_exceptions (true);
+  }
+
+  rb_exc_raise (exc);
+}
+
+static void
+handle_exception (const std::string &where, std::exception &ex)
+{
+  VALUE error_msg = rb_str_new2 ((std::string(ex.what ()) + tl::to_string (tr (" in ")) + where).c_str ());
+  VALUE args [1];
+  args [0] = error_msg;
+  VALUE exc = rb_class_new_instance(1, args, rb_eRuntimeError);
+  handle_exception (exc, true);
+}
+
+static void
+handle_exception (const std::string &where, tl::ExitException &ex)
+{
+  VALUE error_msg = rb_str_new2 ((ex.msg () + tl::to_string (tr (" in ")) + where).c_str ());
+  VALUE args [2];
+  args [0] = INT2NUM (ex.status ());
+  args [1] = error_msg;
+  VALUE exc = rb_class_new_instance (2, args, rb_eSystemExit);
+  handle_exception (exc, ex.first_chance ());
+}
+
+static void
+handle_exception (const std::string & /*where*/, rba::RubyError &ex)
+{
+  handle_exception (ex.exc (), ex.first_chance ());
+}
+
+static void
+handle_exception (const std::string &where, tl::Exception &ex)
+{
+  VALUE error_msg = rb_str_new2 ((ex.msg () + tl::to_string (tr (" in ")) + where).c_str ()); \
+  VALUE args [1];
+  args [0] = error_msg;
+  VALUE exc = rb_class_new_instance(1, args, rb_eRuntimeError);
+  handle_exception (exc, ex.first_chance ());
+}
+
+static void
+handle_exception (const std::string &where)
+{
+  VALUE error_msg = rb_str_new2 ((tl::to_string (tr ("Unspecific exception in ")) + where).c_str ()); \
+  VALUE args [1];
+  args [0] = error_msg;
+  VALUE exc = rb_class_new_instance(1, args, rb_eRuntimeError);
+  handle_exception (exc, true);
+}
+
 #define RBA_TRY \
-  VALUE __error_msg = Qnil; \
-  int __estatus = 0; \
-  VALUE __exc = Qnil; \
-  VALUE __eclass = Qnil; \
-  { \
-    try { 
+  try {
 
 #define RBA_CATCH(where) \
-    } catch (std::exception &ex) { \
-      __eclass = rb_eRuntimeError; \
-      __error_msg = rb_str_new2 ((std::string(ex.what ()) + tl::to_string (tr (" in ")) + (where)).c_str ()); \
-    } catch (tl::ExitException &ex) { \
-      __estatus = ex.status (); \
-      __eclass = rb_eSystemExit; \
-      __error_msg = rb_str_new2 ((ex.msg () + tl::to_string (tr (" in ")) + (where)).c_str ()); \
-    } catch (rba::RubyError &ex) { \
-      __eclass = rb_eRuntimeError; \
-      __exc = ex.exc (); \
-    } catch (tl::Exception &ex) { \
-      __eclass = rb_eRuntimeError; \
-      __error_msg = rb_str_new2 ((ex.msg () + tl::to_string (tr (" in ")) + (where)).c_str ()); \
-    } catch (...) { \
-      __eclass = rb_eRuntimeError; \
-      __error_msg = rb_str_new2 ((tl::to_string (tr ("Unspecific exception in ")) + (where)).c_str ()); \
-    } \
-  } \
-  if (__exc != Qnil) { \
-    /* Re-raise the exception without blocking in the debugger */ \
-    /* TODO: should not access private data */ \
-    RubyInterpreter::instance ()->d->block_exceptions = true; \
-    rb_exc_raise (__exc); \
-  } else if (__eclass == rb_eSystemExit) { \
-    /* HINT: we do the rb_raise outside any destructor code - sometimes this longjmp seems not to work properly */ \
-    VALUE args [2]; \
-    args [0] = INT2NUM (__estatus); \
-    args [1] = __error_msg; \
-    rb_exc_raise (rb_class_new_instance(2, args, __eclass)); \
-  } else if (__eclass != Qnil) { \
-    /* HINT: we do the rb_raise outside any destructor code - sometimes this longjmp seems not to work properly */ \
-    VALUE args [1]; \
-    args [0] = __error_msg; \
-    rb_exc_raise (rb_class_new_instance(1, args, __eclass)); \
+  } catch (std::exception &ex) { \
+    handle_exception ((where), ex); \
+  } catch (tl::ExitException &ex) { \
+    handle_exception ((where), ex); \
+  } catch (rba::RubyError &ex) { \
+    handle_exception ((where), ex); \
+  } catch (tl::Exception &ex) { \
+    handle_exception ((where), ex); \
+  } catch (...) { \
+    handle_exception ((where)); \
   }
 
 static VALUE
@@ -914,6 +943,52 @@ static gsi::ArgType create_void_type ()
 
 static gsi::ArgType s_void_type = create_void_type ();
 
+static void
+push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, int argc, tl::Heap &heap)
+{
+  int i = 0;
+
+  try {
+
+    VALUE *av = argv;
+    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && av < argv + argc; ++a, ++av, ++i) {
+      push_arg (*a, arglist, *av, heap);
+    }
+
+  } catch (tl::Exception &ex) {
+
+    //  In case of an error upon write, pop the arguments to clean them up.
+    //  Without this, there is a risk to keep dead objects on the stack.
+    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
+      pop_arg (*a, 0, arglist, heap);
+    }
+
+    const gsi::ArgSpecBase *arg_spec = meth->begin_arguments () [i].spec ();
+
+    std::string msg;
+    if (arg_spec && ! arg_spec->name ().empty ()) {
+      msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d ('%s')")), ex.basic_msg (), i + 1, arg_spec->name ());
+    } else {
+      msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d")), ex.basic_msg (), i + 1);
+    }
+
+    tl::Exception new_ex (msg);
+    new_ex.set_first_chance (ex.first_chance ());
+    throw new_ex;
+
+  } catch (...) {
+
+    //  In case of an error upon write, pop the arguments to clean them up.
+    //  Without this, there is a risk to keep dead objects on the stack.
+    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
+      pop_arg (*a, 0, arglist, heap);
+    }
+
+    throw;
+
+  }
+}
+
 VALUE
 method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 {
@@ -991,28 +1066,8 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
       {
         gsi::SerialArgs arglist (meth->argsize ());
-
-        try {
-
-          VALUE *av = argv;
-          for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && av < argv + argc; ++a, ++av) {
-            push_arg (*a, arglist, *av, heap);
-          }
-
-        } catch (...) {
-
-          //  In case of an error upon write, pop the arguments to clean them up.
-          //  Without this, there is a risk to keep dead objects on the stack.
-          for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-            pop_arg (*a, 0, arglist, heap);
-          }
-
-          throw;
-
-        }
-
+        push_args (arglist, meth, argv, argc, heap);
         meth->call (0, arglist, retlist);
-
       }
 
       void *obj = retlist.read<void *> (heap);
@@ -1065,28 +1120,8 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
       {
         gsi::SerialArgs arglist (meth->argsize ());
-
-        try {
-
-          VALUE *av = argv;
-          for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && av < argv + argc; ++a, ++av) {
-            push_arg (*a, arglist, *av, heap);
-          }
-
-        } catch (...) {
-
-          //  In case of an error upon write, pop the arguments to clean them up.
-          //  Without this, there is a risk to keep dead objects on the stack.
-          for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-            pop_arg (*a, 0, arglist, heap);
-          }
-
-          throw;
-
-        }
-
+        push_args (arglist, meth, argv, argc, heap);
         meth->call (obj, arglist, retlist);
-
       }
 
       if (meth->ret_type ().is_iter ()) {
@@ -2218,6 +2253,18 @@ RubyInterpreter::remove_console (gsi::Console *console)
     }
 
   }
+}
+
+void
+RubyInterpreter::block_exceptions (bool f)
+{
+  d->block_exceptions = f;
+}
+
+bool
+RubyInterpreter::exceptions_blocked ()
+{
+  return d->block_exceptions;
 }
 
 static size_t

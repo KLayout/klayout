@@ -101,6 +101,74 @@ NetlistObjectsPath::second () const
   return p;
 }
 
+static bool
+translate_circuit (const db::Circuit *&a, const db::NetlistCrossReference &xref)
+{
+  if (a) {
+    a = xref.other_circuit_for (a);
+    if (! a) {
+      return false;
+    }
+  }
+  return true;
+}
+
+static bool
+translate_subcircuit (const db::SubCircuit *&a, const db::NetlistCrossReference &xref)
+{
+  if (a) {
+    a = xref.other_subcircuit_for (a);
+    if (! a) {
+      return false;
+    }
+  }
+  return true;
+}
+
+static bool
+translate_device (const db::Device *&a, const db::NetlistCrossReference &xref)
+{
+  if (a) {
+    a = xref.other_device_for (a);
+    if (! a) {
+      return false;
+    }
+  }
+  return true;
+}
+
+static bool
+translate_net (const db::Net *&a, const db::NetlistCrossReference &xref)
+{
+  if (a) {
+    a = xref.other_net_for (a);
+    if (! a) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+NetlistObjectsPath::translate (NetlistObjectsPath &p, const db::NetlistCrossReference &xref)
+{
+  if (! translate_circuit (p.root.first, xref) || ! translate_circuit (p.root.second, xref)) {
+    return false;
+  }
+  for (NetlistObjectsPath::path_type::iterator i = p.path.begin (); i != p.path.end (); ++i) {
+    if (! translate_subcircuit (i->first, xref) || ! translate_subcircuit (i->second, xref)) {
+      return false;
+    }
+  }
+  if (! translate_device (p.device.first, xref) || ! translate_device (p.device.second, xref)) {
+    return false;
+  }
+  if (! translate_net (p.net.first, xref) || ! translate_net (p.net.second, xref)) {
+    return false;
+  }
+  return true;
+}
+
 // ----------------------------------------------------------------------------------
 //  Implementation of the item classes
 
@@ -2376,6 +2444,19 @@ CircuitDeviceTerminalItemData::search_text ()
 
 // ----------------------------------------------------------------------------------
 //  NetlistBrowserModel implementation
+
+NetlistBrowserModel::NetlistBrowserModel (QWidget *parent, db::Netlist *netlist, NetColorizer *colorizer)
+  : QAbstractItemModel (parent), mp_l2ndb (0), mp_lvsdb (0), mp_colorizer (colorizer)
+{
+  mp_root.reset (new RootItemData ());
+  mp_indexer.reset (new SingleIndexedNetlistModel (netlist));
+  mp_colorizer->colors_changed.add (this, &NetlistBrowserModel::colors_changed);
+
+  m_object_column = 0;
+  m_status_column = -1;
+  m_first_column = 2;
+  m_second_column = -1;
+}
 
 NetlistBrowserModel::NetlistBrowserModel (QWidget *parent, db::LayoutToNetlist *l2ndb, NetColorizer *colorizer)
   : QAbstractItemModel (parent), mp_l2ndb (l2ndb), mp_lvsdb (0), mp_colorizer (colorizer)

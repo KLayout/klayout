@@ -645,6 +645,10 @@ xref(
   )
  )
  circuit(RINGO RINGO nomatch
+  log(
+   entry(error description('Net $I22 is not matching any net from reference netlist'))
+   entry(error description('Net FB is not matching any net from reference netlist'))
+  )
   xref(
    net(8 () mismatch)
    net(7 7 match)

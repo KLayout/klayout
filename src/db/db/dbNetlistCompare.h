@@ -51,6 +51,16 @@ public:
   virtual ~NetlistCompareLogger () { }
 
   /**
+   *  @brief An enum describing the severity for the log_entry function
+   */
+  enum Severity {
+    NoSeverity = 0,   //  unspecific
+    Info = 1,         //  information only
+    Warning = 2,      //  a warning
+    Error = 3         //  an error
+  };
+
+  /**
    *  @brief Begin logging for netlist a and b
    */
   virtual void begin_netlist (const db::Netlist * /*a*/, const db::Netlist * /*b*/) { }
@@ -87,6 +97,11 @@ public:
    *  "a" is null if there is no match for b and vice versa.
    */
   virtual void circuit_mismatch (const db::Circuit * /*a*/, const db::Circuit * /*b*/, const std::string & /*msg*/ = std::string ()) { }
+
+  /**
+   *  @brief Receives log entries for the current circuit pair
+   */
+  virtual void log_entry (Severity /*level*/, const std::string & /*msg*/) { }
 
   /**
    *  @brief Nets a and b match exactly
@@ -258,6 +273,24 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating that log messages are generated
+   *  Log messages may be expensive to compute, hence they can be turned off.
+   *  By default, log messages are generated.
+   */
+  void set_with_log (bool f)
+  {
+    m_with_log = f;
+  }
+
+  /**
+   *  @brief Gets a value indicating that log messages are generated
+   */
+  bool with_log () const
+  {
+    return m_with_log;
+  }
+
+  /**
    *  @brief Sets a value indicating whether not to consider net names
    *  This feature is mainly intended for testing.
    */
@@ -365,6 +398,7 @@ protected:
   bool handle_pin_mismatch (const NetGraph &g1, const db::Circuit *c1, const db::Pin *pin1, const NetGraph &g2, const db::Circuit *c2, const db::Pin *p2) const;
 
   mutable NetlistCompareLogger *mp_logger;
+  bool m_with_log;
   std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > > m_same_nets;
   std::unique_ptr<CircuitPinCategorizer> mp_circuit_pin_categorizer;
   std::unique_ptr<DeviceCategorizer> mp_device_categorizer;

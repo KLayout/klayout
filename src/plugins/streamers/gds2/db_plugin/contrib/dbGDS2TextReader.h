@@ -101,7 +101,7 @@ private:
   void vConvertToXY(const std::string &_sArg);
 
   void error (const std::string &txt);
-  void warn (const std::string &txt);
+  void warn (const std::string &txt, int warn_level = 1);
 };
 
 }

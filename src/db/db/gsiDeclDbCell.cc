@@ -141,6 +141,55 @@ struct cell_inst_array_defs
     }
   }
 
+  //  Cell-based constructors
+
+  static C *
+  new_cell_inst_vector2 (const db::Cell *cell, const vector_type &v)
+  {
+    tl_assert (cell != 0);
+    return new_cell_inst_vector (cell->cell_index (), v);
+  }
+
+  static C *
+  new_cell_inst2 (const db::Cell *cell, const trans_type &t)
+  {
+    tl_assert (cell != 0);
+    return new_cell_inst (cell->cell_index (), t);
+  }
+
+  static C *
+  new_cell_inst_cplx2 (const db::Cell *cell, const complex_trans_type &t)
+  {
+    tl_assert (cell != 0);
+    return new_cell_inst_cplx (cell->cell_index (), t);
+  }
+
+  static C *
+  new_cell_inst_array_vector2 (const db::Cell *cell, const vector_type &v,
+                               const vector_type &a, const vector_type &b, unsigned long na, unsigned long nb)
+  {
+    tl_assert (cell != 0);
+    return new_cell_inst_array_vector (cell->cell_index (), v, a, b, na, nb);
+  }
+
+  static C *
+  new_cell_inst_array2 (const db::Cell *cell, const trans_type &t,
+                        const vector_type &a, const vector_type &b, unsigned long na, unsigned long nb)
+  {
+    tl_assert (cell != 0);
+    return new_cell_inst_array (cell->cell_index (), t, a, b, na, nb);
+  }
+
+  static C *
+  new_cell_inst_array_cplx2 (const db::Cell *cell, const complex_trans_type &t,
+                             const vector_type &a, const vector_type &b, unsigned long na, unsigned long nb)
+  {
+    tl_assert (cell != 0);
+    return new_cell_inst_array_cplx (cell->cell_index (), t, a, b, na, nb);
+  }
+
+  //  Methods
+
   static db::cell_index_type cell_index (const C *a)
   {
     return a->object ().cell_index ();
@@ -149,6 +198,12 @@ struct cell_inst_array_defs
   static void set_cell_index (C *a, db::cell_index_type cell_index)
   {
     a->object ().cell_index (cell_index);
+  }
+
+  static void set_cell (C *a, db::Cell *cell)
+  {
+    tl_assert (cell != 0);
+    a->object ().cell_index (cell->cell_index ());
   }
 
   static C transformed_simple (const C *arr, const coord_trans_type &t)
@@ -421,16 +476,40 @@ struct cell_inst_array_defs
       "@param cell_index The cell to instantiate\n"
       "@param trans The transformation by which to instantiate the cell\n"
     ) +
+    gsi::constructor ("new", &new_cell_inst2, gsi::arg ("cell"), gsi::arg ("trans"),
+      "@brief Creates a single cell instance\n"
+      "@param cell The cell to instantiate\n"
+      "@param trans The transformation by which to instantiate the cell\n"
+      "\n"
+      "This convenience variant takes a \\Cell pointer and is equivalent to using 'cell.cell_index()'. It "
+      "has been introduced in version 0.28."
+    ) +
     gsi::constructor ("new", &new_cell_inst_vector, gsi::arg ("cell_index"), gsi::arg ("disp"),
       "@brief Creates a single cell instance\n"
       "@param cell_index The cell to instantiate\n"
       "@param disp The displacement\n"
       "This convenience initializer has been introduced in version 0.28."
     ) +
+    gsi::constructor ("new", &new_cell_inst_vector2, gsi::arg ("cell"), gsi::arg ("disp"),
+      "@brief Creates a single cell instance\n"
+      "@param cell The cell to instantiate\n"
+      "@param disp The displacement\n"
+      "\n"
+      "This convenience variant takes a \\Cell pointer and is equivalent to using 'cell.cell_index()'. It "
+      "has been introduced in version 0.28."
+    ) +
     gsi::constructor ("new", &new_cell_inst_cplx, gsi::arg ("cell_index"), gsi::arg ("trans"),
       "@brief Creates a single cell instance with a complex transformation\n"
       "@param cell_index The cell to instantiate\n"
       "@param trans The complex transformation by which to instantiate the cell\n"
+    ) +
+    gsi::constructor ("new", &new_cell_inst_cplx2, gsi::arg ("cell"), gsi::arg ("trans"),
+      "@brief Creates a single cell instance with a complex transformation\n"
+      "@param cell The cell to instantiate\n"
+      "@param trans The complex transformation by which to instantiate the cell\n"
+      "\n"
+      "This convenience variant takes a \\Cell pointer and is equivalent to using 'cell.cell_index()'. It "
+      "has been introduced in version 0.28."
     ) +
     gsi::constructor ("new", &new_cell_inst_array, gsi::arg ("cell_index"), gsi::arg ("trans"), gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("na"), gsi::arg ("nb"),
       "@brief Creates a single cell instance\n"
@@ -445,6 +524,18 @@ struct cell_inst_array_defs
         "Starting with version 0.25 the displacements are of vector type."
       )
     ) +
+    gsi::constructor ("new", &new_cell_inst_array2, gsi::arg ("cell"), gsi::arg ("trans"), gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("na"), gsi::arg ("nb"),
+      "@brief Creates a single cell instance\n"
+      "@param cell The cell to instantiate\n"
+      "@param trans The transformation by which to instantiate the cell\n"
+      "@param a The displacement vector of the array in the 'a' axis\n"
+      "@param b The displacement vector of the array in the 'b' axis\n"
+      "@param na The number of placements in the 'a' axis\n"
+      "@param nb The number of placements in the 'b' axis\n"
+      "\n"
+      "This convenience variant takes a \\Cell pointer and is equivalent to using 'cell.cell_index()'. It "
+      "has been introduced in version 0.28."
+    ) +
     gsi::constructor ("new", &new_cell_inst_array_vector, gsi::arg ("cell_index"), gsi::arg ("disp"), gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("na"), gsi::arg ("nb"),
       "@brief Creates a single cell instance\n"
       "@param cell_index The cell to instantiate\n"
@@ -455,6 +546,18 @@ struct cell_inst_array_defs
       "@param nb The number of placements in the 'b' axis\n"
       "\n"
       "This convenience initializer has been introduced in version 0.28."
+    ) +
+    gsi::constructor ("new", &new_cell_inst_array_vector2, gsi::arg ("cell"), gsi::arg ("disp"), gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("na"), gsi::arg ("nb"),
+      "@brief Creates a single cell instance\n"
+      "@param cell The cell to instantiate\n"
+      "@param disp The basic displacement of the first instance\n"
+      "@param a The displacement vector of the array in the 'a' axis\n"
+      "@param b The displacement vector of the array in the 'b' axis\n"
+      "@param na The number of placements in the 'a' axis\n"
+      "@param nb The number of placements in the 'b' axis\n"
+      "\n"
+      "This convenience variant takes a \\Cell pointer and is equivalent to using 'cell.cell_index()'. It "
+      "has been introduced in version 0.28."
     ) +
     gsi::constructor ("new", &new_cell_inst_array_cplx, gsi::arg ("cell_index"), gsi::arg ("trans"), gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("na"), gsi::arg ("nb"),
       "@brief Creates a single cell instance with a complex transformation\n"
@@ -468,6 +571,18 @@ struct cell_inst_array_defs
         "\n"
         "Starting with version 0.25 the displacements are of vector type."
       )
+    ) +
+    gsi::constructor ("new", &new_cell_inst_array_cplx2, gsi::arg ("cell"), gsi::arg ("trans"), gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("na"), gsi::arg ("nb"),
+      "@brief Creates a single cell instance with a complex transformation\n"
+      "@param cell The cell to instantiate\n"
+      "@param trans The complex transformation by which to instantiate the cell\n"
+      "@param a The displacement vector of the array in the 'a' axis\n"
+      "@param b The displacement vector of the array in the 'b' axis\n"
+      "@param na The number of placements in the 'a' axis\n"
+      "@param nb The number of placements in the 'b' axis\n"
+      "\n"
+      "This convenience variant takes a \\Cell pointer and is equivalent to using 'cell.cell_index()'. It "
+      "has been introduced in version 0.28."
     ) +
     gsi::iterator ("each_trans", (typename C::iterator (C::*) () const) &C::begin,
       "@brief Gets the simple transformations represented by this instance\n"
@@ -500,9 +615,17 @@ struct cell_inst_array_defs
     ) +
     gsi::method_ext ("cell_index", &cell_index,
       "@brief Gets the cell index of the cell instantiated \n"
+      "Use \\Layout#cell to get the \\Cell object from the cell index."
     ) +
     method_ext ("cell_index=", &set_cell_index, gsi::arg ("index"),
       "@brief Sets the index of the cell this instance refers to\n"
+    ) +
+    method_ext ("cell=", &set_cell, gsi::arg ("cell"),
+      "@brief Sets the cell this instance refers to\n"
+      "This is a convenience method and equivalent to 'cell_index = cell.cell_index()'. There is no getter for "
+      "the cell pointer because the \\CellInstArray object only knows about cell indexes.\n"
+      "\n"
+      "This convenience method has been introduced in version 0.28.\n"
     ) +
     gsi::method ("cplx_trans", (complex_trans_type (C::*) () const) &C::complex_trans,
       "@brief Gets the complex transformation of the first instance in the array\n"

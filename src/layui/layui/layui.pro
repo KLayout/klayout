@@ -126,6 +126,7 @@ SOURCES = \
   layNetlistBrowserPage.cc \
   layNetlistBrowserTreeModel.cc \
   layNetlistCrossReferenceModel.cc \
+  layNetlistLogModel.cc \
   layQtTools.cc \
   laySaveLayoutOptionsDialog.cc \
   laySelectCellViewForm.cc \
@@ -184,6 +185,7 @@ HEADERS = \
   layNetlistBrowserPage.h \
   layNetlistBrowserTreeModel.h \
   layNetlistCrossReferenceModel.h \
+  layNetlistLogModel.h \
   layQtTools.h \
   laySaveLayoutOptionsDialog.h \
   laySelectCellViewForm.h \

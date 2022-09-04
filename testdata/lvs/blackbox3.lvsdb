@@ -184,6 +184,9 @@ xref(
   )
  )
  circuit(TOP TOP nomatch
+  log(
+   entry(error description('Nets $1 vs. (not connected) are paired explicitly, but are not identical topologically'))
+  )
   xref(
    net(() 7 mismatch)
    net(1 () mismatch)

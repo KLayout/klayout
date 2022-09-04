@@ -89,8 +89,20 @@ public:
     return m_warnings_as_errors;
   }
 
+  /**
+   *  @brief Gets the warning level
+   */
+  int warn_level () const
+  {
+    return m_warn_level;
+  }
+
+protected:
+  virtual void init (const db::LoadLayoutOptions &options);
+
 private:
   bool m_warnings_as_errors;
+  int m_warn_level;
 };
 
 /**

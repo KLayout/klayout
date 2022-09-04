@@ -237,7 +237,7 @@ protected:
   friend class CommonReaderLayerMapping;
 
   virtual void common_reader_error (const std::string &msg) = 0;
-  virtual void common_reader_warn (const std::string &msg) = 0;
+  virtual void common_reader_warn (const std::string &msg, int warn_level = 1) = 0;
 
   /**
    * @brief Merge (and delete) the src_cell into target_cell

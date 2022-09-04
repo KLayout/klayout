@@ -48,7 +48,7 @@ public:
   /**
    *  @brief Default constructor
    */
-  DEFImporter ();
+  DEFImporter (int warn_level = 1);
 
   /**
    *  @brief Read the given LEF file prior to the DEF file

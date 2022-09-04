@@ -1175,6 +1175,51 @@ special_method_impl (gsi::MethodBase::special_method_type smt, PyObject *self, P
   }
 }
 
+static void
+push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args, tl::Heap &heap)
+{
+  int i = 0;
+  int argc = args == NULL ? 0 : int (PyTuple_Size (args));
+
+  try {
+
+    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); i < argc && a != meth->end_arguments (); ++a, ++i) {
+      push_arg (*a, arglist, PyTuple_GetItem (args, i), heap);
+    }
+
+  } catch (tl::Exception &ex) {
+
+    //  In case of an error upon write, pop the arguments to clean them up.
+    //  Without this, there is a risk to keep dead objects on the stack.
+    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
+      pop_arg (*a, arglist, 0, heap);
+    }
+
+    std::string msg;
+    const gsi::ArgSpecBase *arg_spec = meth->begin_arguments () [i].spec ();
+
+    if (arg_spec && ! arg_spec->name ().empty ()) {
+      msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d ('%s')")), ex.basic_msg (), i + 1, arg_spec->name ());
+    } else {
+      msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d")), ex.basic_msg (), i + 1);
+    }
+
+    ex.set_basic_msg (msg);
+    throw ex;
+
+  } catch (...) {
+
+    //  In case of an error upon write, pop the arguments to clean them up.
+    //  Without this, there is a risk to keep dead objects on the stack.
+    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
+      pop_arg (*a, arglist, 0, heap);
+    }
+
+    throw;
+
+  }
+}
+
 static PyObject *
 method_adaptor (int mid, PyObject *self, PyObject *args)
 {
@@ -1203,8 +1248,6 @@ method_adaptor (int mid, PyObject *self, PyObject *args)
         throw tl::Exception (tl::to_string (tr ("Cannot call non-const method on a const reference")));
       }
 
-      int argc = args == NULL ? 0 : int (PyTuple_Size (args));
-
       void *obj = 0;
       if (p) {
         //  Hint: this potentially instantiates the object
@@ -1214,24 +1257,7 @@ method_adaptor (int mid, PyObject *self, PyObject *args)
       gsi::SerialArgs retlist (meth->retsize ());
       gsi::SerialArgs arglist (meth->argsize ());
 
-      try {
-
-        int i = 0;
-        for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); i < argc && a != meth->end_arguments (); ++a, ++i) {
-          push_arg (*a, arglist, PyTuple_GetItem (args, i), heap);
-        }
-
-      } catch (...) {
-
-        //  In case of an error upon write, pop the arguments to clean them up.
-        //  Without this, there is a risk to keep dead objects on the stack.
-        for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-          pop_arg (*a, arglist, 0, heap);
-        }
-
-        throw;
-
-      }
+      push_args (arglist, meth, args, heap);
 
       meth->call (obj, arglist, retlist);
 
@@ -1764,25 +1790,7 @@ method_init_adaptor (int mid, PyObject *self, PyObject *args)
       gsi::SerialArgs retlist (meth->retsize ());
       gsi::SerialArgs arglist (meth->argsize ());
 
-      try {
-
-        int i = 0;
-        int argc = args == NULL ? 0 : int (PyTuple_Size (args));
-        for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); i < argc && a != meth->end_arguments (); ++a, ++i) {
-          push_arg (*a, arglist, PyTuple_GetItem (args, i), heap);
-        }
-
-      } catch (...) {
-
-        //  In case of an error upon write, pop the arguments to clean them up.
-        //  Without this, there is a risk to keep dead objects on the stack.
-        for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-          pop_arg (*a, arglist, 0, heap);
-        }
-
-        throw;
-
-      }
+      push_args (arglist, meth, args, heap);
 
       meth->call (0, arglist, retlist);
 

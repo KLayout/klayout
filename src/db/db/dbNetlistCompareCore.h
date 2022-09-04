@@ -85,12 +85,18 @@ public:
    */
   size_t derive_node_identities_from_node_set (std::vector<NodeEdgePair> &nodes, std::vector<NodeEdgePair> &other_nodes) const;
 
+  /**
+   *  @brief Analyzes the non-matched remaining nodes and produces log output
+   */
+  void analyze_failed_matches () const;
+
   size_t max_depth;
   size_t max_n_branch;
   bool depth_first;
   bool dont_consider_net_names;
   bool with_ambiguous;
   NetlistCompareLogger *logger;
+  bool with_log;
   CircuitPinCategorizer *circuit_pin_mapper;
   SubCircuitEquivalenceTracker *subcircuit_equivalence;
   DeviceEquivalenceTracker *device_equivalence;

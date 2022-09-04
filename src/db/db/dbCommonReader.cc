@@ -556,6 +556,7 @@ CommonReader::read (db::Layout &layout)
 void
 CommonReader::init (const LoadLayoutOptions &options)
 {
+  ReaderBase::init (options);
   CommonReaderBase::init ();
 
   db::CommonReaderOptions common_options = options.get_options<db::CommonReaderOptions> ();

@@ -65,7 +65,7 @@ More methods will be added in the future to support network-related features.
 <keyword name="antenna_check"/>
 <p>Usage:</p>
 <ul>
-<li><tt>antenna_check(gate, metal, ratio, [ diode_specs ... ])</tt></li>
+<li><tt>antenna_check(gate, metal, ratio, [ diode_specs ... ] [, texts ])</tt></li>
 </ul>
 <p>
 The antenna check is used to avoid plasma induced damage. Physically, 
@@ -201,6 +201,10 @@ errors = antenna_check(perimeter_only(gate, 0.5), ...)
 The error shapes produced by the antenna check are copies
 of the metal shapes on the metal layers of each network 
 violating the antenna rule.
+</p><p>
+You can specify a text layer (use "labels" to create one). It will receive
+error labels describing the measured values and computation parameters for debugging
+the layout. This option has been introduced in version 0.27.11.
 </p>
 <a name="clear_connections"/><h2>"clear_connections" - Clears all connections stored so far</h2>
 <keyword name="clear_connections"/>

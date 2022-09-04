@@ -392,6 +392,15 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   connect (tabWidget, SIGNAL (tabCloseRequested (int)), this, SLOT (tab_close_requested (int)));
 #endif
 
+  tabWidget->setContextMenuPolicy (Qt::ActionsContextMenu);
+
+  QAction *action = new QAction (tr ("Close All"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (close_all ()));
+  tabWidget->addAction (action);
+  action = new QAction (tr ("Close All Except Current"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_but_current ()));
+  tabWidget->addAction (action);
+
   dbgOn->setEnabled (true);
   runButton->setEnabled (true);
   runThisButton->setEnabled (true);
@@ -2229,6 +2238,75 @@ MacroEditorDialog::new_macro()
 }
 
 void
+MacroEditorDialog::close_all ()
+{
+  if (m_in_exec) {
+    return;
+  }
+
+BEGIN_PROTECTED
+
+  tabWidget->clear ();
+
+  for (std::map <lym::Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.begin (); p != m_tab_widgets.end (); ++p) {
+    if (p->second) {
+      p->second->connect_macro (0);
+    }
+    delete p->second;
+  }
+
+  m_tab_widgets.clear ();
+
+  refresh_file_watcher ();
+
+END_PROTECTED
+}
+
+void
+MacroEditorDialog::close_all_but_current ()
+{
+  if (m_in_exec) {
+    return;
+  }
+
+BEGIN_PROTECTED
+
+  QWidget *cw = tabWidget->currentWidget ();
+  int ci = tabWidget->currentIndex ();
+
+  if (ci < 0) {
+    close_all ();
+    return;
+  }
+
+  for (int i = tabWidget->count (); i > 0; ) {
+    --i;
+    if (i != ci) {
+      tabWidget->removeTab (i);
+    }
+  }
+
+  std::map <lym::Macro *, MacroEditorPage *> new_widgets;
+
+  for (std::map <lym::Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.begin (); p != m_tab_widgets.end (); ++p) {
+    if (cw && p->second == cw) {
+      new_widgets.insert (*p);
+    } else {
+      if (p->second) {
+        p->second->connect_macro (0);
+      }
+      delete p->second;
+    }
+  }
+
+  m_tab_widgets.swap (new_widgets);
+
+  refresh_file_watcher ();
+
+END_PROTECTED
+}
+
+void
 MacroEditorDialog::tab_close_requested (int index)
 {
   if (m_in_exec) {
@@ -3405,7 +3483,12 @@ MacroEditorDialog::editor_for_macro (lym::Macro *macro)
     if (macro == mp_run_macro) {
       tabWidget->setTabIcon (index, QIcon (QString::fromUtf8 (m_in_exec ? (m_in_breakpoint ? ":/pause.png" : ":/stop.png") : ":/run.png")));
     }
+
+    bool f = m_add_edit_trace_enabled;
+    m_add_edit_trace_enabled = false;
     tabWidget->setCurrentWidget (editor);
+    m_add_edit_trace_enabled = f;
+
     m_tab_widgets.insert (std::make_pair (macro, editor));
 
     refresh_file_watcher ();

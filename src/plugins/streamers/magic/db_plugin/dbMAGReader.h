@@ -131,7 +131,7 @@ public:
    *
    *  Reimplements MAGDiagnostics
    */
-  virtual void warn (const std::string &txt);
+  virtual void warn (const std::string &txt, int wl = 1);
 
 private:
   tl::TextInputStream m_stream;

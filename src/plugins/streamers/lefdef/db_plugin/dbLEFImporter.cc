@@ -33,7 +33,8 @@ namespace db
 // -----------------------------------------------------------------------------------
 //  LEFImporter implementation
 
-LEFImporter::LEFImporter ()
+LEFImporter::LEFImporter (int warn_level)
+  : LEFDEFImporter (warn_level)
 {
   //  .. nothing yet ..
 }

@@ -57,6 +57,10 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
       tl::OutputStream stream (tmp_file);
       db::OASISWriter writer;
       db::SaveLayoutOptions options;
+      db::OASISWriterOptions oasis_options;
+      oasis_options.write_cblocks = false;
+      oasis_options.strict_mode = false;
+      options.set_options (oasis_options);
       writer.write (layout, stream, options);
     }
 
@@ -158,6 +162,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
       db::OASISWriter writer;
       db::SaveLayoutOptions options;
       db::OASISWriterOptions oasis_options;
+      oasis_options.write_cblocks = false;
       oasis_options.strict_mode = false;
       oasis_options.write_std_properties = 2;
       options.set_options (oasis_options);
@@ -1462,6 +1467,7 @@ TEST(116)
       db::OASISWriterOptions oas_write_options;
       oas_write_options.write_std_properties = 2;
       oas_write_options.strict_mode = true;
+      oas_write_options.write_cblocks = false;
       write_options.set_options (oas_write_options);
       db::Writer writer (write_options);
       writer.write (g, out);

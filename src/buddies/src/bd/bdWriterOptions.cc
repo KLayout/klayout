@@ -30,34 +30,43 @@ namespace bd
 {
 
 GenericWriterOptions::GenericWriterOptions ()
-  : m_scale_factor (1.0),
-    m_dbu (0.0),
-    m_dont_write_empty_cells (false),
-    m_keep_instances (false),
-    m_write_context_info (true),
-    m_gds2_max_vertex_count (8000),
-    m_gds2_no_zero_length_paths (false),
-    m_gds2_multi_xy_records (false),
-    m_gds2_resolve_skew_arrays (false),
-    m_gds2_max_cellname_length (32000),
-    m_gds2_libname ("LIB"),
-    m_gds2_user_units (1.0),
-    m_gds2_write_timestamps (true),
-    m_gds2_write_cell_properties (false),
-    m_gds2_write_file_properties (false),
-    m_oasis_compression_level (2),
-    m_oasis_write_cblocks (false),
-    m_oasis_strict_mode (false),
-    m_oasis_recompress (false),
-    m_oasis_permissive (false),
-    m_oasis_write_std_properties (1),
-    m_oasis_subst_char ("*"),
-    m_cif_dummy_calls (false),
-    m_cif_blank_separator (false),
-    m_magic_lambda (1.0),
-    m_dxf_polygon_mode (0)
+  : m_scale_factor (1.0)
 {
-  //  .. nothing yet ..
+  db::SaveLayoutOptions save_options;
+
+  m_dbu = save_options.get_option_by_name ("dbu").to_double ();
+
+  m_dont_write_empty_cells = save_options.get_option_by_name ("no_empty_cells").to_bool ();
+  m_keep_instances = save_options.get_option_by_name ("keep_instances").to_bool ();
+  m_write_context_info = save_options.get_option_by_name ("write_context_info").to_bool ();
+
+  m_gds2_max_vertex_count = save_options.get_option_by_name ("gds2_max_vertex_count").to_uint ();
+  m_gds2_no_zero_length_paths = save_options.get_option_by_name ("gds2_no_zero_length_paths").to_bool ();
+  m_gds2_multi_xy_records = save_options.get_option_by_name ("gds2_multi_xy_records").to_bool ();
+  m_gds2_resolve_skew_arrays = save_options.get_option_by_name ("gds2_resolve_skew_arrays").to_bool ();
+  m_gds2_max_cellname_length = save_options.get_option_by_name ("gds2_max_cellname_length").to_uint ();
+  m_gds2_libname = save_options.get_option_by_name ("gds2_libname").to_string ();
+  m_gds2_user_units = save_options.get_option_by_name ("gds2_user_units").to_double ();
+  m_gds2_write_timestamps = save_options.get_option_by_name ("gds2_write_timestamps").to_bool ();
+  m_gds2_write_cell_properties = save_options.get_option_by_name ("gds2_write_cell_properties").to_bool ();
+  m_gds2_write_file_properties = save_options.get_option_by_name ("gds2_write_file_properties").to_bool ();
+
+  m_oasis_compression_level = save_options.get_option_by_name ("oasis_compression_level").to_int ();
+  m_oasis_write_cblocks = save_options.get_option_by_name ("oasis_write_cblocks").to_bool ();
+  m_oasis_strict_mode = save_options.get_option_by_name ("oasis_strict_mode").to_bool ();
+  m_oasis_recompress = save_options.get_option_by_name ("oasis_recompress").to_bool ();
+  m_oasis_permissive = save_options.get_option_by_name ("oasis_permissive").to_bool ();
+  m_oasis_write_std_properties = save_options.get_option_by_name ("oasis_write_std_properties").to_int ();
+  m_oasis_subst_char = save_options.get_option_by_name ("oasis_substitution_char").to_string ();
+
+  m_cif_dummy_calls = save_options.get_option_by_name ("cif_dummy_calls").to_bool ();
+  m_cif_blank_separator = save_options.get_option_by_name ("cif_blank_separator").to_bool ();
+
+  //  The default options do not specify a lambda, but we prefer having a default here:
+  //  m_magic_lambda = save_options.get_option_by_name ("mag_lambda").to_double ();
+  m_magic_lambda = 1.0;
+
+  m_dxf_polygon_mode = save_options.get_option_by_name ("dxf_polygon_mode").to_int ();
 }
 
 const std::string GenericWriterOptions::gds2_format_name      = "GDS2";
@@ -210,7 +219,9 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                     "* 2++ - enhanced shape array search algorithm using 2nd and further neighbor distances as well\n"
                    )
         << tl::arg (group +
-                    "-ob|--cblocks", &m_oasis_write_cblocks, "Uses CBLOCK compression"
+                    "-ob|--cblocks", &m_oasis_write_cblocks, "Uses CBLOCK compression",
+                    "Please note that since version 0.27.12, CBLOCK compression is enabled by default. If you do not want "
+                    "CBLOCK compression, use '--cblocks=false'."
                    )
         << tl::arg (group +
                     "-ot|--strict-mode", &m_oasis_strict_mode, "Uses strict mode"

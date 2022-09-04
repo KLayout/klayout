@@ -24,10 +24,30 @@
 #ifndef HDR_layOASISWriterPlugin_h
 #define HDR_layOASISWriterPlugin_h
 
+#include "layStream.h"
+#include "ui_OASISWriterOptionPage.h"
+
 namespace lay
 {
 
-  // .. nothing yet (but needed for MOC) ..
+class OASISWriterOptionPage
+  : public StreamWriterOptionsPage
+{
+Q_OBJECT
+
+public:
+  OASISWriterOptionPage (QWidget *parent);
+  ~OASISWriterOptionPage ();
+
+  void setup (const db::FormatSpecificWriterOptions *options, const db::Technology *tech);
+  void commit (db::FormatSpecificWriterOptions *options, const db::Technology *tech, bool gzip);
+
+public slots:
+  void cblock_flag_changed ();
+
+private:
+  Ui::OASISWriterOptionPage *mp_ui;
+};
 
 }
 

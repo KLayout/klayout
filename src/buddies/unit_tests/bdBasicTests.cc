@@ -58,7 +58,7 @@ TEST(1)
                    "--write-cell-properties",
                    "--write-file-properties",
                    //  OASIS
-                   "-ob",
+                   "-ob=false",
                    "-ok=9",
                    "-ot",
                    "--recompress",
@@ -85,7 +85,7 @@ TEST(1)
   EXPECT_EQ (tl::to_string (stream_opt.get_option_by_name ("gds2_user_units").to_double ()), "1");
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_cell_properties").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_file_properties").to_bool (), false);
-  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_write_cblocks").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_write_cblocks").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_compression_level").to_int (), 2);
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_strict_mode").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_recompress").to_bool (), false);
@@ -110,7 +110,7 @@ TEST(1)
   EXPECT_EQ (tl::to_string (stream_opt.get_option_by_name ("gds2_user_units").to_double ()), "2.5");
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_cell_properties").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_file_properties").to_bool (), true);
-  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_write_cblocks").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_write_cblocks").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_compression_level").to_int (), 9);
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_strict_mode").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_recompress").to_bool (), true);

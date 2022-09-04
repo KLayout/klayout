@@ -101,7 +101,7 @@ public:
    *  @brief The constructor
    */
   OASISWriterOptions ()
-    : compression_level (2), write_cblocks (false), strict_mode (false), recompress (false), permissive (false), write_std_properties (1), subst_char ("*")
+    : compression_level (2), write_cblocks (true), strict_mode (false), recompress (false), permissive (false), write_std_properties (1), subst_char ("*")
   {
     //  .. nothing yet ..
   }

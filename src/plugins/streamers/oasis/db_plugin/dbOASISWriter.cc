@@ -1176,6 +1176,11 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
   m_options = options.get_options<OASISWriterOptions> ();
   mp_stream = &stream;
 
+  if (stream.is_compressing ()) {
+    std::string msg = tl::to_string (tr ("File compression is discouraged in OASIS, please use CBLOCK compression"));
+    tl::warn << msg;
+  }
+
   double dbu = (options.dbu () == 0.0) ? layout.dbu () : options.dbu ();
   m_sf = options.scale_factor () * (layout.dbu () / dbu);
   if (fabs (m_sf - 1.0) < 1e-9) {

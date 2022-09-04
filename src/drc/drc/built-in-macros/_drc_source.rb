@@ -161,9 +161,11 @@ module DRC
     # %DRC%
     # @name select
     # @brief Adds cell name expressions to the cell filters
-    # @synopsis source.select(filter1, filter2, ...)
+    # @synopsis new_source = source.select(filter1, filter2, ...)
     # This method will construct a new source object with the given cell filters 
-    # applied.
+    # applied. Note that there is a global version of "select" which does not 
+    # create a new source, but acts on the default source.
+    #
     # Cell filters will enable or disable cells plus their subtree.
     # Cells can be switched on and off, which makes the hierarchy traversal
     # stop or begin delivering shapes at the given cell. The arguments of 
@@ -184,8 +186,8 @@ module DRC
     # code:
     #
     # @code
-    # layout_with_selection = source.select("-TOP", "+B")
-    # l1 = source.input(1, 0)
+    # source_with_selection = source.select("-TOP", "+B")
+    # l1 = source_with_selection.input(1, 0)
     # ...
     # @/code
     #
@@ -201,8 +203,8 @@ module DRC
     # first "-*" selection, all cells including the children of "B" are disabled:
     #
     # @code
-    # layout_with_selection = source.select("-*", "+B")
-    # l1 = source.input(1, 0)
+    # source_with_selection = source.select("-*", "+B")
+    # l1 = source_with_selection.input(1, 0)
     # ...
     # @/code
     # 
@@ -210,8 +212,8 @@ module DRC
     # and will start with a disabled top cell regardless of its name:
     # 
     # @code
-    # layout_with_selection = source.select("-", "+B")
-    # l1 = source.input(1, 0)
+    # source_with_selection = source.select("-", "+B")
+    # l1 = source_with_selection.input(1, 0)
     # ...
     # @/code
     

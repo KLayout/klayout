@@ -320,11 +320,13 @@ Use the global version of "polygons" without a source object to address the defa
 <keyword name="select"/>
 <p>Usage:</p>
 <ul>
-<li><tt>source.select(filter1, filter2, ...)</tt></li>
+<li><tt>new_source = source.select(filter1, filter2, ...)</tt></li>
 </ul>
 <p>
 This method will construct a new source object with the given cell filters 
-applied.
+applied. Note that there is a global version of "select" which does not 
+create a new source, but acts on the default source.
+</p><p>
 Cell filters will enable or disable cells plus their subtree.
 Cells can be switched on and off, which makes the hierarchy traversal
 stop or begin delivering shapes at the given cell. The arguments of 
@@ -345,8 +347,8 @@ To disable the TOP cell but enabled a hypothetical cell B below the top cell, us
 code:
 </p><p>
 <pre>
-layout_with_selection = source.select("-TOP", "+B")
-l1 = source.input(1, 0)
+source_with_selection = source.select("-TOP", "+B")
+l1 = source_with_selection.input(1, 0)
 ...
 </pre>
 </p><p>
@@ -362,8 +364,8 @@ The following code will just select "B" without its children, because in the
 first "-*" selection, all cells including the children of "B" are disabled:
 </p><p>
 <pre>
-layout_with_selection = source.select("-*", "+B")
-l1 = source.input(1, 0)
+source_with_selection = source.select("-*", "+B")
+l1 = source_with_selection.input(1, 0)
 ...
 </pre>
 </p><p>
@@ -371,8 +373,8 @@ The short form "-" will disable the top cell. This code is identical to the firs
 and will start with a disabled top cell regardless of its name:
 </p><p>
 <pre>
-layout_with_selection = source.select("-", "+B")
-l1 = source.input(1, 0)
+source_with_selection = source.select("-", "+B")
+l1 = source_with_selection.input(1, 0)
 ...
 </pre>
 </p>

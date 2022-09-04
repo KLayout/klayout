@@ -1597,6 +1597,14 @@ out = l1.drc(primary &amp; secondary(l2))
 </ul>
 <p>
 See <a href="/about/drc_ref_source.xml#select">Source#select</a> for a description of that function.
+Using the global version does not create a new source, but
+modifies the default source.
+</p><p>
+<pre>
+# Selects only B cell instances below the top cell
+select("-", "+B*")
+l1 = input(1, 0)
+</pre>
 </p>
 <a name="sep"/><h2>"sep" - Synonym for "separation"</h2>
 <keyword name="sep"/>

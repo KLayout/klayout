@@ -337,6 +337,7 @@ private:
   virtual void accept ();
 
   Ui::NewLayoutPropertiesDialog *mp_ui;
+  double m_default_dbu;
 };
 
 /**

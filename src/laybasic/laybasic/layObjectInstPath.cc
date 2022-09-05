@@ -26,6 +26,7 @@
 
 #include "layObjectInstPath.h"
 #include "layCellView.h"
+#include "layLayoutViewBase.h"
 #include "tlException.h"
 
 namespace lay {
@@ -37,6 +38,42 @@ ObjectInstPath::ObjectInstPath ()
   : m_cv_index (0), m_topcell (0), m_layer (-1), m_seq (0)
 {
   //  .. nothing yet ..
+}
+
+bool
+ObjectInstPath::is_valid (lay::LayoutViewBase *view) const
+{
+  const lay::CellView &cv = view->cellview (cv_index ());
+  if (! cv.is_valid ()) {
+    return false;
+  }
+
+  const db::Layout &ly = cv->layout ();
+  db::cell_index_type ci = topcell ();
+  if (! ly.is_valid_cell_index (ci)) {
+    return false;
+  }
+
+  for (auto p = begin (); p != end (); ++p) {
+    if (! ly.cell (ci).is_valid (p->inst_ptr)) {
+      return false;
+    }
+    ci = p->inst_ptr.cell_index ();
+    if (! ly.is_valid_cell_index (ci)) {
+      return false;
+    }
+  }
+
+  if (! is_cell_inst ()) {
+    if (! ly.is_valid_layer (layer ())) {
+      return false;
+    }
+    if (! ly.cell (ci).shapes (layer ()).is_valid (shape ())) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 db::cell_index_type 

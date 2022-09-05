@@ -1028,13 +1028,16 @@ PartialService::PartialService (db::Manager *manager, lay::LayoutViewBase *view,
     m_snap_to_objects (true),
     m_top_level_sel (false),
     m_hover (false),
-    m_hover_wait (false)
-{ 
+    m_hover_wait (false),
+    dm_selection_to_view (this, &edt::PartialService::do_selection_to_view)
+{
 #if defined(HAVE_QT)
   m_timer.setInterval (100 /*hover time*/);
   m_timer.setSingleShot (true);
   connect (&m_timer, SIGNAL (timeout ()), this, SLOT (timeout ()));
 #endif
+
+  mp_view->geom_changed_event.add (this, &edt::PartialService::selection_to_view);
 }
 
 PartialService::~PartialService ()
@@ -2398,8 +2401,14 @@ PartialService::select (const db::DBox &box, SelectionMode mode)
   return false;
 }
 
-void 
+void
 PartialService::selection_to_view ()
+{
+  dm_selection_to_view ();
+}
+
+void
+PartialService::do_selection_to_view ()
 {
   //  if dragging, establish the current displacement
   db::DTrans move_trans;
@@ -2423,6 +2432,17 @@ PartialService::selection_to_view ()
 
   size_t n_marker = 0;
   size_t n_inst_marker = 0;
+
+  //  Reduce the selection to valid paths (issue-1145)
+  std::vector<partial_objects::iterator> invalid_objects;
+  for (partial_objects::iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
+    if (! r->first.is_valid (view ())) {
+      invalid_objects.push_back (r);
+    }
+  }
+  for (auto i = invalid_objects.begin (); i != invalid_objects.end (); ++i) {
+    m_selection.erase (*i);
+  }
 
   if (! m_selection.empty ()) {
 

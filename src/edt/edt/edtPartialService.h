@@ -31,6 +31,7 @@
 #include "layRubberBox.h"
 #include "laySnap.h"
 #include "tlAssert.h"
+#include "tlDeferredExecution.h"
 #include "edtUtils.h"
 #include "edtConfig.h"
 
@@ -329,11 +330,15 @@ private:
   bool m_hover_wait;
   db::DPoint m_hover_point;
 
+  //  Deferred method to update the selection
+  tl::DeferredMethod<edt::PartialService> dm_selection_to_view;
+
   void hover_reset ();
 
   void clear_partial_transient_selection ();
   bool partial_select (const db::DBox &box, lay::Editable::SelectionMode mode);
   void selection_to_view ();
+  void do_selection_to_view ();
 
   db::DPoint snap (const db::DPoint &p) const;
   db::DVector snap (const db::DVector &p) const;

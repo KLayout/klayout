@@ -24,9 +24,7 @@
 #include "dbOASIS.h"
 #include "dbOASISWriter.h"
 #include "dbSaveLayoutOptions.h"
-#include "layStream.h"
-
-#include "ui_OASISWriterOptionPage.h"
+#include "layOASISWriterPlugin.h"
 
 #include <QFrame>
 
@@ -36,25 +34,14 @@ namespace lay
 // ---------------------------------------------------------------
 //  OASISWriterOptionPage definition and implementation
 
-class OASISWriterOptionPage 
-  : public StreamWriterOptionsPage
-{
-public:
-  OASISWriterOptionPage (QWidget *parent);
-  ~OASISWriterOptionPage ();
-
-  void setup (const db::FormatSpecificWriterOptions *options, const db::Technology *tech);
-  void commit (db::FormatSpecificWriterOptions *options, const db::Technology *tech, bool gzip);
-
-private:
-  Ui::OASISWriterOptionPage *mp_ui;
-};
-
 OASISWriterOptionPage::OASISWriterOptionPage (QWidget *parent)
   : StreamWriterOptionsPage (parent)
 {
   mp_ui = new Ui::OASISWriterOptionPage ();
   mp_ui->setupUi (this);
+
+  connect (mp_ui->write_cblocks, SIGNAL (clicked(bool)), this, SLOT (flags_changed()));
+  connect (mp_ui->strict_mode, SIGNAL (clicked(bool)), this, SLOT (flags_changed()));
 }
 
 OASISWriterOptionPage::~OASISWriterOptionPage ()
@@ -69,11 +56,20 @@ OASISWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db
   if (options) {
     mp_ui->compression_slider->setValue (options->compression_level);
     mp_ui->write_cblocks->setChecked (options->write_cblocks);
+    mp_ui->cblock_warning_frame->setEnabled (! options->write_cblocks);
     mp_ui->strict_mode->setChecked (options->strict_mode);
+    mp_ui->strict_mode_warning_frame->setEnabled (! options->strict_mode);
     mp_ui->std_prop_mode->setCurrentIndex (options->write_std_properties);
     mp_ui->subst_char->setText (tl::to_qstring (options->subst_char));
     mp_ui->permissive->setChecked (options->permissive);
   }
+}
+
+void
+OASISWriterOptionPage::flags_changed ()
+{
+  mp_ui->cblock_warning_frame->setEnabled (! mp_ui->write_cblocks->isChecked ());
+  mp_ui->strict_mode_warning_frame->setEnabled (! mp_ui->strict_mode->isChecked ());
 }
 
 void 

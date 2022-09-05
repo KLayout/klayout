@@ -40,7 +40,8 @@ OASISWriterOptionPage::OASISWriterOptionPage (QWidget *parent)
   mp_ui = new Ui::OASISWriterOptionPage ();
   mp_ui->setupUi (this);
 
-  connect (mp_ui->write_cblocks, SIGNAL (clicked(bool)), this, SLOT (cblock_flag_changed()));
+  connect (mp_ui->write_cblocks, SIGNAL (clicked(bool)), this, SLOT (flags_changed()));
+  connect (mp_ui->strict_mode, SIGNAL (clicked(bool)), this, SLOT (flags_changed()));
 }
 
 OASISWriterOptionPage::~OASISWriterOptionPage ()
@@ -55,8 +56,9 @@ OASISWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db
   if (options) {
     mp_ui->compression_slider->setValue (options->compression_level);
     mp_ui->write_cblocks->setChecked (options->write_cblocks);
-    mp_ui->cblock_warning_frame->setVisible (! options->write_cblocks);
+    mp_ui->cblock_warning_frame->setEnabled (! options->write_cblocks);
     mp_ui->strict_mode->setChecked (options->strict_mode);
+    mp_ui->strict_mode_warning_frame->setEnabled (! options->strict_mode);
     mp_ui->std_prop_mode->setCurrentIndex (options->write_std_properties);
     mp_ui->subst_char->setText (tl::to_qstring (options->subst_char));
     mp_ui->permissive->setChecked (options->permissive);
@@ -64,9 +66,10 @@ OASISWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db
 }
 
 void
-OASISWriterOptionPage::cblock_flag_changed ()
+OASISWriterOptionPage::flags_changed ()
 {
-  mp_ui->cblock_warning_frame->setVisible (! mp_ui->write_cblocks->isChecked ());
+  mp_ui->cblock_warning_frame->setEnabled (! mp_ui->write_cblocks->isChecked ());
+  mp_ui->strict_mode_warning_frame->setEnabled (! mp_ui->strict_mode->isChecked ());
 }
 
 void 

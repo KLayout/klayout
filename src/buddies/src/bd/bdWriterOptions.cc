@@ -224,7 +224,9 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                     "CBLOCK compression, use '--cblocks=false'."
                    )
         << tl::arg (group +
-                    "-ot|--strict-mode", &m_oasis_strict_mode, "Uses strict mode"
+                    "-ot|--strict-mode", &m_oasis_strict_mode, "Uses strict mode",
+                    "Please note that since version 0.27.12, strict mode is enabled by default. If you do not want "
+                    "strict mode, use '--strict-mode=false'."
                    )
         << tl::arg (group +
                     "#--recompress", &m_oasis_recompress, "Compresses shape arrays again",

@@ -43,7 +43,7 @@ public:
   void commit (db::FormatSpecificWriterOptions *options, const db::Technology *tech, bool gzip);
 
 public slots:
-  void cblock_flag_changed ();
+  void flags_changed ();
 
 private:
   Ui::OASISWriterOptionPage *mp_ui;

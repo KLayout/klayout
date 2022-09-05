@@ -39,7 +39,7 @@
 
 namespace lay
 {
-  class LayoutView;
+  class LayoutViewBase;
 }
 
 namespace lay {
@@ -300,6 +300,15 @@ public:
   {
     m_seq = s;
   }
+
+  /**
+   *  @brief Gets a value indicating whether the object path is valid
+   *
+   *  After the layout has been modified, this method is able to check
+   *  whether the object path (including shape if applicable) still points
+   *  to a valid object.
+   */
+  bool is_valid (lay::LayoutViewBase *view) const;
 
 private:
   unsigned int m_cv_index;

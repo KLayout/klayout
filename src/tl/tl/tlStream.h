@@ -706,6 +706,14 @@ public:
   }
 
   /**
+   *  @brief Returns a value indicating whether that stream is compressing
+   */
+  virtual bool is_compressing () const
+  {
+    return false;
+  }
+
+  /**
    *  @brief Rejects the output - for delegates supporting unrolling, this means the original file is restored
    */
   virtual void reject ()
@@ -950,6 +958,11 @@ protected:
    *  @brief The seek operation isn't implemented for zlib files
    */
   virtual void seek_file (size_t /*s*/) { }
+
+  /**
+   *  @brief Returns a value indicating whether this steam is compressing
+   */
+  virtual bool is_compressing () const { return true; }
 
 private:
   //  No copying
@@ -1221,6 +1234,14 @@ public:
     if (mp_delegate) {
       mp_delegate->reject ();
     }
+  }
+
+  /**
+   *  @brief Returns a value indicating whether that stream is compressing
+   */
+  bool is_compressing () const
+  {
+    return mp_delegate != 0 && mp_delegate->is_compressing ();
   }
 
   /**

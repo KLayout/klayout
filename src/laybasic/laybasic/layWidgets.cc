@@ -389,10 +389,8 @@ BEGIN_PROTECTED
 
       mp_private->view->manager ()->commit ();
 
-      insertItem (index, tl::to_qstring (lp.to_string ()));
-      setCurrentIndex (index);
-
-      mp_private->layers.push_back (std::make_pair (lp, int (l)));
+      //  NOTE: add_new_layers has triggered update_layer_list which already added the new layer
+      set_current_layer (lp);
 
     }
 

@@ -167,7 +167,12 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "\n"
     "This method has been introduced with version 0.24.\n"
   ) +
-  gsi::method ("cv_index", &lay::ObjectInstPath::cv_index, 
+  gsi::method ("is_valid?", &lay::ObjectInstPath::is_valid, gsi::arg ("view"),
+    "@brief Gets a value indicating whether the instance path refers to a valid object in the context of the given view\n"
+    "\n"
+    "This predicate has been introduced in version 0.27.12.\n"
+  ) +
+  gsi::method ("cv_index", &lay::ObjectInstPath::cv_index,
     "@brief Gets the cellview index that describes which cell view the shape or instance is located in\n"
   ) + 
   gsi::method ("cv_index=", &lay::ObjectInstPath::set_cv_index, gsi::arg ("index"),

@@ -1594,6 +1594,14 @@ CODE
     # @brief Specifies cell filters on the default source
     # @synopsis select(args)
     # See \Source#select for a description of that function.
+    # Using the global version does not create a new source, but
+    # modifies the default source.
+    #
+    # @code
+    # # Selects only B cell instances below the top cell
+    # select("-", "+B*")
+    # l1 = input(1, 0)
+    # @/code
  
     def select(*args)
       self._context("select") do

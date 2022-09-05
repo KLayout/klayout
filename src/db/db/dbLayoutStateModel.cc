@@ -78,11 +78,11 @@ LayoutStateModel::invalidate_bboxes (unsigned int index)
       m_all_bboxes_dirty = true;
     }
   } else {
-    if (index >= (unsigned int) m_bboxes_dirty.size ()) {
-      m_bboxes_dirty.resize (index + 1, false);
-    }
-    if ((! m_all_bboxes_dirty && ! m_bboxes_dirty [index]) || m_busy) {
+    if ((! m_all_bboxes_dirty && (index >= (unsigned int) m_bboxes_dirty.size () || ! m_bboxes_dirty [index])) || m_busy) {
       do_invalidate_bboxes (index);  //  must be called before the bboxes are invalidated (stopping of redraw thread requires this)
+      if (index >= (unsigned int) m_bboxes_dirty.size ()) {
+        m_bboxes_dirty.resize (index + 1, false);
+      }
       m_bboxes_dirty [index] = true;
     }
   }

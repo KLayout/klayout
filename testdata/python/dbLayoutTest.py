@@ -1122,7 +1122,11 @@ class DBLayoutTest(unittest.TestCase):
     shape.set_property("42", "the answer")
 
     ly.write(file_gds)
-    ly.write(file_oas)
+
+    opt = pya.SaveLayoutOptions()
+    opt.format = "OASIS"
+    opt.oasis_strict_mode = False
+    ly.write(file_oas, opt)
 
     ly2 = pya.Layout()
     ly2.read(file_gds)

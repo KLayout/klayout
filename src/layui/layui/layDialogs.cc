@@ -98,7 +98,7 @@ LayerSourceDialog::exec_dialog (std::string &s)
 //  NewLayoutPropertiesDialog implementation
 
 NewLayoutPropertiesDialog::NewLayoutPropertiesDialog (QWidget *parent)
-  : QDialog (parent)
+  : QDialog (parent), m_default_dbu (0.0)
 {
   setObjectName (QString::fromUtf8 ("new_layout_properties_dialog"));
 
@@ -117,14 +117,20 @@ NewLayoutPropertiesDialog::~NewLayoutPropertiesDialog ()
 void
 NewLayoutPropertiesDialog::tech_changed ()
 {
-  double dbu = 0.001;
+  double dbu = 0.0;
   int technology_index = mp_ui->tech_cbx->currentIndex ();
   if (technology_index >= 0 && technology_index < (int) db::Technologies::instance ()->technologies ()) {
     dbu = db::Technologies::instance ()->begin () [technology_index].dbu ();
   }
 
+  m_default_dbu = dbu;
+
 #if QT_VERSION >= 0x40700
-  mp_ui->dbu_le->setPlaceholderText (tl::to_qstring (tl::to_string (dbu)));
+  if (dbu > 1e-10) {
+    mp_ui->dbu_le->setPlaceholderText (tl::to_qstring (tl::to_string (dbu)));
+  } else {
+    mp_ui->dbu_le->setPlaceholderText (QString ());
+  }
 #endif
 }
 
@@ -141,6 +147,8 @@ NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &ce
     }
 
   }
+
+  tech_changed ();
 
   mp_ui->window_le->setText (tl::to_qstring (tl::to_string (size)));
   if (dbu > 1e-10) {
@@ -174,7 +182,7 @@ NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &ce
     if (! mp_ui->dbu_le->text ().isEmpty ()) {
       tl::from_string_ext (tl::to_string (mp_ui->dbu_le->text ()), dbu);
     } else {
-      dbu = 0.0;
+      dbu = m_default_dbu;
     }
 
     cell_name = tl::to_string (mp_ui->topcell_le->text ());

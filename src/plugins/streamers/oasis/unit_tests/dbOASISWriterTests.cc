@@ -57,6 +57,10 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
       tl::OutputStream stream (tmp_file);
       db::OASISWriter writer;
       db::SaveLayoutOptions options;
+      db::OASISWriterOptions oasis_options;
+      oasis_options.write_cblocks = false;
+      oasis_options.strict_mode = false;
+      options.set_options (oasis_options);
       writer.write (layout, stream, options);
     }
 
@@ -158,6 +162,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
       db::OASISWriter writer;
       db::SaveLayoutOptions options;
       db::OASISWriterOptions oasis_options;
+      oasis_options.write_cblocks = false;
       oasis_options.strict_mode = false;
       oasis_options.write_std_properties = 2;
       options.set_options (oasis_options);
@@ -557,6 +562,7 @@ TEST(100)
   {
     tl::OutputStream out (tmp_file);
     db::SaveLayoutOptions options;
+    options.set_option_by_name ("oasis_strict_mode", false);
     options.set_format ("OASIS");
     db::Writer writer (options);
     writer.write (g, out);
@@ -1225,6 +1231,7 @@ TEST(115)
   {
     tl::OutputStream out (tmp_file);
     db::SaveLayoutOptions options;
+    options.set_option_by_name ("oasis_strict_mode", false);
     options.set_format ("OASIS");
     db::Writer writer (options);
     writer.write (g, out);
@@ -1302,6 +1309,7 @@ TEST(116)
     {
       tl::OutputStream out (tmp_file);
       db::SaveLayoutOptions write_options;
+      write_options.set_option_by_name ("oasis_strict_mode", false);
       write_options.set_format ("OASIS");
       db::Writer writer (write_options);
       writer.write (g, out);
@@ -1354,6 +1362,7 @@ TEST(116)
       write_options.set_format ("OASIS");
       db::OASISWriterOptions oas_write_options;
       oas_write_options.write_std_properties = 0;
+      oas_write_options.strict_mode = false;
       write_options.set_options (oas_write_options);
       db::Writer writer (write_options);
       writer.write (g, out);
@@ -1403,6 +1412,7 @@ TEST(116)
       write_options.set_format ("OASIS");
       db::OASISWriterOptions oas_write_options;
       oas_write_options.write_std_properties = 2;
+      oas_write_options.strict_mode = false;
       write_options.set_options (oas_write_options);
       db::Writer writer (write_options);
       writer.write (g, out);
@@ -1462,6 +1472,7 @@ TEST(116)
       db::OASISWriterOptions oas_write_options;
       oas_write_options.write_std_properties = 2;
       oas_write_options.strict_mode = true;
+      oas_write_options.write_cblocks = false;
       write_options.set_options (oas_write_options);
       db::Writer writer (write_options);
       writer.write (g, out);
@@ -1522,6 +1533,7 @@ TEST(116)
       tl::OutputStream out (tmp_file);
       db::SaveLayoutOptions write_options;
       write_options.set_format ("OASIS");
+      write_options.set_option_by_name ("oasis_strict_mode", false);
       db::Writer writer (write_options);
       writer.write (g, out);
     }
@@ -1572,6 +1584,7 @@ TEST(116)
       db::SaveLayoutOptions write_options;
       write_options.select_cell (c2.cell_index ());
       write_options.set_format ("OASIS");
+      write_options.set_option_by_name ("oasis_strict_mode", false);
       db::Writer writer (write_options);
       writer.write (g, out);
     }

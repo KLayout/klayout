@@ -41,7 +41,7 @@ ObjectInstPath::ObjectInstPath ()
 }
 
 bool
-ObjectInstPath::is_valid (lay::LayoutViewBase *view) const
+ObjectInstPath::is_valid (lay::LayoutView *view) const
 {
   const lay::CellView &cv = view->cellview (cv_index ());
   if (! cv.is_valid ()) {

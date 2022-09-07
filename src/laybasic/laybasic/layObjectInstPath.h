@@ -39,7 +39,7 @@
 
 namespace lay
 {
-  class LayoutViewBase;
+  class LayoutView;
 }
 
 namespace lay {
@@ -308,7 +308,7 @@ public:
    *  whether the object path (including shape if applicable) still points
    *  to a valid object.
    */
-  bool is_valid (lay::LayoutViewBase *view) const;
+  bool is_valid (lay::LayoutView *view) const;
 
 private:
   unsigned int m_cv_index;

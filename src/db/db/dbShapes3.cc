@@ -45,7 +45,7 @@ iterator_from_shape (const db::layer<Sh, db::unstable_layer_tag> &layer, const d
 {
   //  compute the iterator by some pointer arithmetics assuming that layer uses an contiguous container
   //  in unstable mode ...
-  return layer.begin () + (shape.basic_ptr (typename Sh::tag ()) - &*layer.begin ());
+  return layer.begin () + (shape.basic_ptr (typename Sh::tag ()) - layer.begin ().operator-> ());
 }
 
 template <class Sh>
@@ -60,7 +60,7 @@ template <class Sh>
 inline bool
 iterator_from_shape_is_valid (const db::layer<Sh, db::unstable_layer_tag> &layer, const db::Shape &shape)
 {
-  return layer.size () < (shape.basic_ptr (typename Sh::tag ()) - &*layer.begin ());
+  return layer.size () > size_t (shape.basic_ptr (typename Sh::tag ()) - layer.begin ().operator-> ());
 }
 
 // -------------------------------------------------------------------------------
@@ -272,14 +272,21 @@ bool
 Shapes::is_valid_shape_by_tag (Tag /*tag*/, const shape_type &shape) const
 {
   if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (tr ("Function 'is_valid' is permitted only in editable mode")));
-  }
-  if (! shape.has_prop_id ()) {
-    typedef typename Tag::object_type s_type;
-    return iterator_from_shape_is_valid (get_layer<s_type, db::stable_layer_tag> (), shape);
+    if (! shape.has_prop_id ()) {
+      typedef typename Tag::object_type s_type;
+      return iterator_from_shape_is_valid (get_layer<s_type, db::unstable_layer_tag> (), shape);
+    } else {
+      typedef db::object_with_properties<typename Tag::object_type> swp_type;
+      return iterator_from_shape_is_valid (get_layer<swp_type, db::unstable_layer_tag> (), shape);
+    }
   } else {
-    typedef db::object_with_properties<typename Tag::object_type> swp_type;
-    return iterator_from_shape_is_valid (get_layer<swp_type, db::stable_layer_tag> (), shape);
+    if (! shape.has_prop_id ()) {
+      typedef typename Tag::object_type s_type;
+      return iterator_from_shape_is_valid (get_layer<s_type, db::stable_layer_tag> (), shape);
+    } else {
+      typedef db::object_with_properties<typename Tag::object_type> swp_type;
+      return iterator_from_shape_is_valid (get_layer<swp_type, db::stable_layer_tag> (), shape);
+    }
   }
 }
 

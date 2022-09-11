@@ -31,6 +31,8 @@ equals(HAVE_RUBY, "1") {
     lay \
     layui \
     fontgen \
+    doc \
+    icons \
 
 }
 

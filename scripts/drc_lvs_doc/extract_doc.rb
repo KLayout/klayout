@@ -5,7 +5,7 @@ $script_call = $0 + " " + ARGV.join(" ")
 $indirs = [ "src/drc/drc/built-in-macros", "src/lvs/lvs/built-in-macros" ]
 
 $loc = "about"
-$outfiles = "src/lay/lay/doc"
+$outfiles = "src/doc/doc"
 
 def create_ref(mod, s)
   if s =~ /(.*)::(.*)#(.*)/

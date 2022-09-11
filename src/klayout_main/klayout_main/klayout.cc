@@ -42,6 +42,8 @@
 #include "libForceLink.h"
 #include "antForceLink.h"
 #include "imgForceLink.h"
+#include "docForceLink.h"
+#include "iconsForceLink.h"
 #if defined(HAVE_RUBY)
 #include "drcForceLink.h"
 #include "lvsForceLink.h"

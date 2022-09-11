@@ -5,7 +5,6 @@ include($$PWD/../../klayout.pri)
 
 TARGET = klayout
 
-include($$PWD/../../klayout.pri)
 include($$PWD/../../app.pri)
 include($$PWD/../../with_all_libs.pri)
 
@@ -22,8 +21,10 @@ win32 {
   RC_FILE = $$PWD/klayout.rc
 }
 
-INCLUDEPATH += $$QTBASIC_INC
-DEPENDPATH += $$QTBASIC_INC
+INCLUDEPATH += $$DOC_INC $$ICONS_INC $$QTBASIC_INC
+DEPENDPATH += $$DOC_INC $$ICONS_INC $$QTBASIC_INC
+
+LIBS += -lklayout_doc -lklayout_icons
 
 equals(HAVE_QTBINDINGS, "1") {
 

@@ -5,7 +5,7 @@
 class QRCGenerator
 
   def res_path 
-    "src/lay/lay"
+    "src/doc"
   end
 
   def img_path
@@ -13,7 +13,7 @@ class QRCGenerator
   end
 
   def initialize
-    @path = res_path + "/" + "layDRCLVSHelpResources.qrc"
+    @path = res_path + "/" + "docDRCLVSResources.qrc"
     @file = File.open(@path, "w")
     @file.puts("<RCC>")
     @file.puts(" <qresource prefix=\"/help/images\">")

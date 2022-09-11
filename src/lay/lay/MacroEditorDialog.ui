@@ -131,7 +131,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="layResources.qrc">
-               <normaloff>:/add.png</normaloff>:/add.png</iconset>
+               <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -151,7 +151,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="layResources.qrc">
-               <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+               <normaloff>:/clear_16px.png</normaloff>:/clear_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -375,7 +375,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="layResources.qrc">
-               <normaloff>:/del.png</normaloff>:/del.png</iconset>
+               <normaloff>:/del_16px.png</normaloff>:/del_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -1386,7 +1386,7 @@ p, li { white-space: pre-wrap; }
   <action name="actionAddMacro">
    <property name="icon">
     <iconset resource="layResources.qrc">
-     <normaloff>:/add.png</normaloff>:/add.png</iconset>
+     <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -1395,7 +1395,7 @@ p, li { white-space: pre-wrap; }
   <action name="actionDelete">
    <property name="icon">
     <iconset resource="layResources.qrc">
-     <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+     <normaloff>:/clear_16px.png</normaloff>:/clear_16px.png</iconset>
    </property>
    <property name="text">
     <string>Delete</string>

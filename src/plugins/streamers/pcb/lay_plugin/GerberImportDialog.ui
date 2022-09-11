@@ -261,7 +261,7 @@ surface.</string>
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="icons.qrc" >:/clear.png</iconset>
+             <iconset resource="icons.qrc" >:/clear_16px.png</iconset>
             </property>
             <property name="shortcut" >
              <string>Del</string>
@@ -277,7 +277,7 @@ surface.</string>
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="icons.qrc" >:/add.png</iconset>
+             <iconset resource="icons.qrc" >:/add_16px.png</iconset>
             </property>
             <property name="shortcut" >
              <string>Return</string>
@@ -602,7 +602,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="icons.qrc" >:/add.png</iconset>
+          <iconset resource="icons.qrc" >:/add_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Return</string>
@@ -634,7 +634,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="icons.qrc" >:/clear.png</iconset>
+          <iconset resource="icons.qrc" >:/clear_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Del</string>
@@ -736,7 +736,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="icons.qrc" >:/clear.png</iconset>
+          <iconset resource="icons.qrc" >:/clear_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Del</string>
@@ -752,7 +752,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="icons.qrc" >:/add.png</iconset>
+          <iconset resource="icons.qrc" >:/add_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Return</string>
@@ -791,7 +791,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="icons.qrc" >:/clear.png</iconset>
+          <iconset resource="icons.qrc" >:/clear_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Del</string>

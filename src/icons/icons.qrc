@@ -1,6 +1,9 @@
 <RCC>
     <qresource prefix="/">
-        <file alias="add.png">images/add.png</file>
+        <file alias="add_16px.png">images/add_16px.png</file>
+        <file alias="add_16px@2x.png">images/add_16px@2x.png</file>
+        <file alias="add_24px.png">images/add_24px.png</file>
+        <file alias="add_24px@2x.png">images/add_24px@2x.png</file>
         <file alias="edit.png">images/edit.png</file>
         <file alias="align_bottom.png">images/align_bottom.png</file>
         <file alias="align_hcenter.png">images/align_hcenter.png</file>
@@ -23,7 +26,10 @@
         <file alias="cb.png">images/cb.png</file>
         <file alias="cc.png">images/cc.png</file>
         <file alias="checked.png">images/checked.png</file>
-        <file alias="clear.png">images/clear.png</file>
+        <file alias="clear_16px.png">images/clear_16px.png</file>
+        <file alias="clear_16px@2x.png">images/clear_16px@2x.png</file>
+        <file alias="clear_24px.png">images/clear_24px.png</file>
+        <file alias="clear_24px@2x.png">images/clear_24px@2x.png</file>
         <file alias="clear_edit.png">images/clear_edit.png</file>
         <file alias="clearbreakpoints.png">images/clearbreakpoints.png</file>
         <file alias="close.png">images/close.png</file>
@@ -35,7 +41,10 @@
         <file alias="ct.png">images/ct.png</file>
         <file alias="dark.png">images/dark.png</file>
         <file alias="defaultmacroicon.png">images/defaultmacroicon.png</file>
-        <file alias="del.png">images/del.png</file>
+        <file alias="del_16px.png">images/del_16px.png</file>
+        <file alias="del_16px@2x.png">images/del_16px@2x.png</file>
+        <file alias="del_24px.png">images/del_24px.png</file>
+        <file alias="del_24px@2x.png">images/del_24px@2x.png</file>
         <file alias="down.png">images/down.png</file>
         <file alias="downdown.png">images/downdown.png</file>
         <file alias="execmark.png">images/execmark.png</file>

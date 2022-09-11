@@ -179,7 +179,7 @@
            </property>
            <property name="icon">
             <iconset resource="layResources.qrc">
-             <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+             <normaloff>:/clear_16px.png</normaloff>:/clear_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
@@ -196,7 +196,7 @@
            </property>
            <property name="icon">
             <iconset resource="layResources.qrc">
-             <normaloff>:/add.png</normaloff>:/add.png</iconset>
+             <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
@@ -390,7 +390,7 @@
            </property>
            <property name="icon">
             <iconset resource="layResources.qrc">
-             <normaloff>:/add.png</normaloff>:/add.png</iconset>
+             <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
            </property>
            <property name="iconSize">
             <size>

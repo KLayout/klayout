@@ -251,7 +251,7 @@
                </property>
                <property name="icon">
                 <iconset resource="../../../../lay/lay/layResources.qrc">
-                 <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+                 <normaloff>:/clear_16px.png</normaloff>:/clear_16px.png</iconset>
                </property>
               </widget>
              </item>
@@ -265,7 +265,7 @@
                </property>
                <property name="icon">
                 <iconset resource="../../../../lay/lay/layResources.qrc">
-                 <normaloff>:/add.png</normaloff>:/add.png</iconset>
+                 <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
                </property>
               </widget>
              </item>
@@ -341,7 +341,7 @@
             </property>
             <property name="icon">
              <iconset resource="../../../../lay/lay/layResources.qrc">
-              <normaloff>:/add.png</normaloff>:/add.png</iconset>
+              <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
             </property>
            </widget>
           </item>
@@ -355,7 +355,7 @@
             </property>
             <property name="icon">
              <iconset resource="../../../../lay/lay/layResources.qrc">
-              <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+              <normaloff>:/clear_16px.png</normaloff>:/clear_16px.png</iconset>
             </property>
            </widget>
           </item>

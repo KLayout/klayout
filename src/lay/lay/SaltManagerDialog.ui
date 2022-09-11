@@ -871,7 +871,7 @@
 &lt;table&gt;
   &lt;tr&gt;&lt;td&gt;The &quot;Install New Packages&quot; tab to install a package&lt;br/&gt;from an external repository&lt;/td&gt;&lt;/tr&gt;
   &lt;tr&gt;&lt;/tr&gt;
-  &lt;tr&gt;&lt;td&gt;The &lt;a href=&quot;:add&quot;&gt;&lt;img src=&quot;:/add.png&quot;&gt;&lt;/a&gt; button to create a new package&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;The &lt;a href=&quot;:add&quot;&gt;&lt;img src=&quot;:/add_16px.png&quot;&gt;&lt;/a&gt; button to create a new package&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
 &lt;/body&gt;&lt;/html&gt;</string>
                         </property>
@@ -1013,7 +1013,7 @@
             </property>
             <property name="icon">
              <iconset resource="layResources.qrc">
-              <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+              <normaloff>:/clear_16px.png</normaloff>:/clear_16px.png</iconset>
             </property>
            </widget>
           </item>
@@ -1037,7 +1037,7 @@
             </property>
             <property name="icon">
              <iconset resource="layResources.qrc">
-              <normaloff>:/add.png</normaloff>:/add.png</iconset>
+              <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
             </property>
             <property name="autoDefault">
              <bool>false</bool>
@@ -1062,7 +1062,7 @@
   <action name="actionNew">
    <property name="icon">
     <iconset resource="layResources.qrc">
-     <normaloff>:/add.png</normaloff>:/add.png</iconset>
+     <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -1074,7 +1074,7 @@
   <action name="actionDelete">
    <property name="icon">
     <iconset resource="layResources.qrc">
-     <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+     <normaloff>:/clear_16px.png</normaloff>:/clear_16px.png</iconset>
    </property>
    <property name="text">
     <string>Remove Package</string>
@@ -1134,7 +1134,7 @@
   <action name="actionCreatePackage">
    <property name="icon">
     <iconset resource="layResources.qrc">
-     <normaloff>:/add.png</normaloff>:/add.png</iconset>
+     <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
    </property>
    <property name="text">
     <string>Create (edit) package</string>

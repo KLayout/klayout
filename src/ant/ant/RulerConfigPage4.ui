@@ -104,7 +104,7 @@
            </property>
            <property name="icon">
             <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/add.png</normaloff>:/add.png</iconset>
+             <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
            </property>
           </widget>
          </item>
@@ -118,7 +118,7 @@
            </property>
            <property name="icon">
             <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/del.png</normaloff>:/del.png</iconset>
+             <normaloff>:/del_16px.png</normaloff>:/del_16px.png</iconset>
            </property>
           </widget>
          </item>

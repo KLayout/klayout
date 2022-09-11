@@ -9,8 +9,10 @@
         <file alias="align_right.png">images/align_right.png</file>
         <file alias="align_top.png">images/align_top.png</file>
         <file alias="align_vcenter.png">images/align_vcenter.png</file>
-        <file alias="back.png">images/back.png</file>
-        <file alias="back_16.png">images/back_16.png</file>
+        <file alias="back_24px.png">images/back_24px.png</file>
+        <file alias="back_24px@2x.png">images/back_24px@2x.png</file>
+        <file alias="back_16px.png">images/back_16px.png</file>
+        <file alias="back_16px@2x.png">images/back_16px@2x.png</file>
         <file alias="blue_flag.png">images/blue_flag.png</file>
         <file alias="box.png">images/box.png</file>
         <file alias="breakpoint.png">images/breakpoint.png</file>
@@ -41,8 +43,10 @@
         <file alias="fliph.png">images/fliph.png</file>
         <file alias="flipv.png">images/flipv.png</file>
         <file alias="folder.png">images/folder.png</file>
-        <file alias="forward.png">images/forward.png</file>
-        <file alias="forward_16.png">images/forward_16.png</file>
+        <file alias="forward_24px.png">images/forward_24px.png</file>
+        <file alias="forward_24px@2x.png">images/forward_24px@2x.png</file>
+        <file alias="forward_16px.png">images/forward_16px.png</file>
+        <file alias="forward_16px@2x.png">images/forward_16px@2x.png</file>
         <file alias="generalmacroicon.png">images/generalmacroicon.png</file>
         <file alias="generalmacroiconactive.png">images/generalmacroiconactive.png</file>
         <file alias="green_flag.png">images/green_flag.png</file>

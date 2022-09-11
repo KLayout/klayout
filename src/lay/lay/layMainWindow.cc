@@ -4255,8 +4255,8 @@ public:
     menu_entries.push_back (lay::separator ("macros_group", at));
 
     at = "@toolbar.end";
-    menu_entries.push_back (lay::menu_item ("cm_prev_display_state", "prev_display_state", at, tl::to_string (QObject::tr ("Back<:/back.png>"))));
-    menu_entries.push_back (lay::menu_item ("cm_next_display_state", "next_display_state", at, tl::to_string (QObject::tr ("Forward<:/forward.png>"))));
+    menu_entries.push_back (lay::menu_item ("cm_prev_display_state", "prev_display_state", at, tl::to_string (QObject::tr ("Back<:/back_24px.png>"))));
+    menu_entries.push_back (lay::menu_item ("cm_next_display_state", "next_display_state", at, tl::to_string (QObject::tr ("Forward<:/forward_24px.png>"))));
     menu_entries.push_back (lay::separator ("toolbar_post_navigation_group", at));
   }
 };

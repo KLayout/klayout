@@ -60,8 +60,10 @@
         <file alias="del_16px@2x.png">images/del_16px@2x.png</file>
         <file alias="del_24px.png">images/del_24px.png</file>
         <file alias="del_24px@2x.png">images/del_24px@2x.png</file>
-        <file alias="down.png">images/down.png</file>
-        <file alias="downdown.png">images/downdown.png</file>
+        <file alias="down_16px.png">images/down_16px.png</file>
+        <file alias="down_16px@2x.png">images/down_16px@2x.png</file>
+        <file alias="downdown_16px.png">images/downdown_16px.png</file>
+        <file alias="downdown_16px@2x.png">images/downdown_16px@2x.png</file>
         <file alias="execmark.png">images/execmark.png</file>
         <file alias="find.png">images/find.png</file>
         <file alias="fliph.png">images/fliph.png</file>
@@ -87,7 +89,8 @@
         <file alias="lb_31px@2x.png">images/lb_31px@2x.png</file>
         <file alias="lc_31px.png">images/lc_31px.png</file>
         <file alias="lc_31px@2x.png">images/lc_31px@2x.png</file>
-        <file alias="left.png">images/left.png</file>
+        <file alias="left_16px.png">images/left_16px.png</file>
+        <file alias="left_16px@2x.png">images/left_16px@2x.png</file>
         <file alias="logo.png">images/logo.png</file>
         <file alias="lt_31px.png">images/lt_31px.png</file>
         <file alias="lt_31px@2x.png">images/lt_31px@2x.png</file>
@@ -137,7 +140,8 @@
         <file alias="rename.png">images/rename.png</file>
         <file alias="replace.png">images/replace.png</file>
         <file alias="replace_all.png">images/replace_all.png</file>
-        <file alias="right.png">images/right.png</file>
+        <file alias="right_16px.png">images/right_16px.png</file>
+        <file alias="right_16px@2x.png">images/right_16px@2x.png</file>
         <file alias="rotate.png">images/rotate.png</file>
         <file alias="rt_31px.png">images/rt_31px.png</file>
         <file alias="rt_31px@2x.png">images/rt_31px@2x.png</file>
@@ -161,8 +165,10 @@
         <file alias="text.png">images/text.png</file>
         <file alias="textdocumenticon.png">images/textdocumenticon.png</file>
         <file alias="unchecked.png">images/unchecked.png</file>
-        <file alias="up.png">images/up.png</file>
-        <file alias="upup.png">images/upup.png</file>
+        <file alias="up_16px.png">images/up_16px.png</file>
+        <file alias="up_16px@2x.png">images/up_16px@2x.png</file>
+        <file alias="upup_16px.png">images/upup_16px.png</file>
+        <file alias="upup_16px@2x.png">images/upup_16px@2x.png</file>
         <file alias="waived.png">images/waived.png</file>
         <file alias="yellow_flag_16px.png">images/yellow_flag_16px.png</file>
         <file alias="yellow_flag_16px@2x.png">images/yellow_flag_16px@2x.png</file>

@@ -237,7 +237,7 @@
                </property>
                <property name="icon">
                 <iconset resource="../../../../lay/lay/layResources.qrc">
-                 <normaloff>:/down.png</normaloff>:/down.png</iconset>
+                 <normaloff>:/down_16px.png</normaloff>:/down_16px.png</iconset>
                </property>
               </widget>
              </item>
@@ -279,7 +279,7 @@
                </property>
                <property name="icon">
                 <iconset resource="../../../../lay/lay/layResources.qrc">
-                 <normaloff>:/up.png</normaloff>:/up.png</iconset>
+                 <normaloff>:/up_16px.png</normaloff>:/up_16px.png</iconset>
                </property>
               </widget>
              </item>
@@ -369,7 +369,7 @@
             </property>
             <property name="icon">
              <iconset resource="../../../../lay/lay/layResources.qrc">
-              <normaloff>:/up.png</normaloff>:/up.png</iconset>
+              <normaloff>:/up_16px.png</normaloff>:/up_16px.png</iconset>
             </property>
            </widget>
           </item>
@@ -383,7 +383,7 @@
             </property>
             <property name="icon">
              <iconset resource="../../../../lay/lay/layResources.qrc">
-              <normaloff>:/down.png</normaloff>:/down.png</iconset>
+              <normaloff>:/down_16px.png</normaloff>:/down_16px.png</iconset>
             </property>
            </widget>
           </item>
@@ -620,7 +620,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
             </property>
            </widget>
           </item>
@@ -670,7 +670,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
             </property>
            </widget>
           </item>
@@ -716,7 +716,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
             </property>
            </widget>
           </item>
@@ -736,7 +736,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
             </property>
            </widget>
           </item>
@@ -765,7 +765,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
             </property>
            </widget>
           </item>
@@ -899,7 +899,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+             <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
             </property>
            </widget>
           </item>
@@ -1084,7 +1084,7 @@ suffix ...</string>
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
                     </property>
                    </widget>
                   </item>
@@ -1107,7 +1107,7 @@ suffix ...</string>
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
                     </property>
                    </widget>
                   </item>
@@ -1143,7 +1143,7 @@ suffix ...</string>
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
                     </property>
                    </widget>
                   </item>
@@ -1159,7 +1159,7 @@ suffix ...</string>
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
                     </property>
                    </widget>
                   </item>
@@ -1195,7 +1195,7 @@ suffix ...</string>
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
                     </property>
                    </widget>
                   </item>
@@ -1211,7 +1211,7 @@ suffix ...</string>
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
                     </property>
                    </widget>
                   </item>
@@ -1228,7 +1228,7 @@ suffix ...</string>
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
                     </property>
                    </widget>
                   </item>
@@ -1265,7 +1265,7 @@ suffix ...</string>
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
                     </property>
                    </widget>
                   </item>
@@ -1364,7 +1364,7 @@ suffix ...</string>
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
                     </property>
                    </widget>
                   </item>
@@ -1470,7 +1470,7 @@ type ...</string>
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right.png</pixmap>
+                     <pixmap resource="../../../../lay/lay/layResources.qrc">:/right_16px.png</pixmap>
                     </property>
                    </widget>
                   </item>

@@ -72,7 +72,7 @@
           <string>></string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/down.png</iconset>
+          <iconset resource="layResources.qrc" >:/down_16px.png</iconset>
          </property>
         </widget>
        </item>
@@ -82,7 +82,7 @@
           <string>&lt;</string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/up.png</iconset>
+          <iconset resource="layResources.qrc" >:/up_16px.png</iconset>
          </property>
         </widget>
        </item>
@@ -169,7 +169,7 @@
           <string>></string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/down.png</iconset>
+          <iconset resource="layResources.qrc" >:/down_16px.png</iconset>
          </property>
         </widget>
        </item>
@@ -179,7 +179,7 @@
           <string>&lt;</string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/up.png</iconset>
+          <iconset resource="layResources.qrc" >:/up_16px.png</iconset>
          </property>
         </widget>
        </item>
@@ -246,7 +246,7 @@
           <string>></string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/down.png</iconset>
+          <iconset resource="layResources.qrc" >:/down_16px.png</iconset>
          </property>
         </widget>
        </item>
@@ -256,7 +256,7 @@
           <string>&lt;</string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/up.png</iconset>
+          <iconset resource="layResources.qrc" >:/up_16px.png</iconset>
          </property>
         </widget>
        </item>

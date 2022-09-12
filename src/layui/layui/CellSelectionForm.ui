@@ -205,7 +205,7 @@
             <string/>
            </property>
            <property name="pixmap">
-            <pixmap resource="../lay/layResources.qrc">:/right.png</pixmap>
+            <pixmap resource="../lay/layResources.qrc">:/right_16px.png</pixmap>
            </property>
           </widget>
          </item>
@@ -428,7 +428,7 @@
             <string/>
            </property>
            <property name="pixmap">
-            <pixmap resource="../lay/layResources.qrc">:/right.png</pixmap>
+            <pixmap resource="../lay/layResources.qrc">:/right_16px.png</pixmap>
            </property>
           </widget>
          </item>

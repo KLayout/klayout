@@ -207,7 +207,7 @@
           <widget class="QToolButton" name="down_button">
            <property name="icon">
             <iconset resource="../lay/layResources.qrc">
-             <normaloff>:/down.png</normaloff>:/down.png</iconset>
+             <normaloff>:/down_16px.png</normaloff>:/down_16px.png</iconset>
            </property>
           </widget>
          </item>
@@ -255,7 +255,7 @@
            </property>
            <property name="icon">
             <iconset resource="../lay/layResources.qrc">
-             <normaloff>:/up.png</normaloff>:/up.png</iconset>
+             <normaloff>:/up_16px.png</normaloff>:/up_16px.png</iconset>
            </property>
           </widget>
          </item>
@@ -428,7 +428,7 @@
               </property>
               <property name="icon">
                <iconset resource="../lay/layResources.qrc">
-                <normaloff>:/left.png</normaloff>:/left.png</iconset>
+                <normaloff>:/left_16px.png</normaloff>:/left_16px.png</iconset>
               </property>
              </widget>
             </item>
@@ -439,7 +439,7 @@
               </property>
               <property name="icon">
                <iconset resource="../lay/layResources.qrc">
-                <normaloff>:/right.png</normaloff>:/right.png</iconset>
+                <normaloff>:/right_16px.png</normaloff>:/right_16px.png</iconset>
               </property>
              </widget>
             </item>

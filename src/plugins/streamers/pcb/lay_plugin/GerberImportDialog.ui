@@ -229,7 +229,7 @@ surface.</string>
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="icons.qrc" >:/down.png</iconset>
+             <iconset resource="icons.qrc" >:/down_16px.png</iconset>
             </property>
             <property name="shortcut" >
              <string>Ctrl+Down</string>
@@ -245,7 +245,7 @@ surface.</string>
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="icons.qrc" >:/up.png</iconset>
+             <iconset resource="icons.qrc" >:/up_16px.png</iconset>
             </property>
             <property name="shortcut" >
              <string>Ctrl+Up</string>
@@ -586,7 +586,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="icons.qrc" >:/up.png</iconset>
+          <iconset resource="icons.qrc" >:/up_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Ctrl+Up</string>
@@ -618,7 +618,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="icons.qrc" >:/down.png</iconset>
+          <iconset resource="icons.qrc" >:/down_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Ctrl+Down</string>
@@ -704,7 +704,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="icons.qrc" >:/down.png</iconset>
+          <iconset resource="icons.qrc" >:/down_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Ctrl+Down</string>
@@ -720,7 +720,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="icons.qrc" >:/up.png</iconset>
+          <iconset resource="icons.qrc" >:/up_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Ctrl+Up</string>

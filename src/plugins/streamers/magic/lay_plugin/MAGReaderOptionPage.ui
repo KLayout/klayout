@@ -162,7 +162,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../../../lay/lay/layResources.qrc">
-          <normaloff>:/down.png</normaloff>:/down.png</iconset>
+          <normaloff>:/down_16px.png</normaloff>:/down_16px.png</iconset>
         </property>
        </widget>
       </item>
@@ -198,7 +198,7 @@ You can use expressions inside the path components for variable paths</string>
         </property>
         <property name="icon">
          <iconset resource="../../../../lay/lay/layResources.qrc">
-          <normaloff>:/up.png</normaloff>:/up.png</iconset>
+          <normaloff>:/up_16px.png</normaloff>:/up_16px.png</iconset>
         </property>
        </widget>
       </item>

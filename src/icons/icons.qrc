@@ -23,7 +23,8 @@
         <file alias="back_24px@2x.png">images/back_24px@2x.png</file>
         <file alias="back_16px.png">images/back_16px.png</file>
         <file alias="back_16px@2x.png">images/back_16px@2x.png</file>
-        <file alias="blue_flag.png">images/blue_flag.png</file>
+        <file alias="blue_flag_16px.png">images/blue_flag_16px.png</file>
+        <file alias="blue_flag_16px@2x.png">images/blue_flag_16px@2x.png</file>
         <file alias="box.png">images/box.png</file>
         <file alias="breakpoint.png">images/breakpoint.png</file>
         <file alias="breakpointmark.png">images/breakpointmark.png</file>
@@ -65,7 +66,8 @@
         <file alias="forward_16px@2x.png">images/forward_16px@2x.png</file>
         <file alias="generalmacroicon.png">images/generalmacroicon.png</file>
         <file alias="generalmacroiconactive.png">images/generalmacroiconactive.png</file>
-        <file alias="green_flag.png">images/green_flag.png</file>
+        <file alias="green_flag_16px.png">images/green_flag_16px.png</file>
+        <file alias="green_flag_16px@2x.png">images/green_flag_16px@2x.png</file>
         <file alias="help.png">images/help.png</file>
         <file alias="home.png">images/home.png</file>
         <file alias="import.png">images/import.png</file>
@@ -87,7 +89,8 @@
         <file alias="new_folder.png">images/new_folder.png</file>
         <file alias="next_topic.png">images/next_topic.png</file>
         <file alias="nextstep.png">images/nextstep.png</file>
-        <file alias="no_flag.png">images/no_flag.png</file>
+        <file alias="no_flag_16px.png">images/no_flag_16px.png</file>
+        <file alias="no_flag_16px@2x.png">images/no_flag_16px@2x.png</file>
         <file alias="nophoto.png">images/nophoto.png</file>
         <file alias="options_edit.png">images/options_edit.png</file>
         <file alias="partial.png">images/partial.png</file>
@@ -103,7 +106,8 @@
         <file alias="r90.png">images/r90.png</file>
         <file alias="rb.png">images/rb.png</file>
         <file alias="rc.png">images/rc.png</file>
-        <file alias="red_flag.png">images/red_flag.png</file>
+        <file alias="red_flag_16px.png">images/red_flag_16px.png</file>
+        <file alias="red_flag_16px@2x.png">images/red_flag_16px@2x.png</file>
         <file alias="rename.png">images/rename.png</file>
         <file alias="replace.png">images/replace.png</file>
         <file alias="replace_all.png">images/replace_all.png</file>
@@ -132,7 +136,8 @@
         <file alias="up.png">images/up.png</file>
         <file alias="upup.png">images/upup.png</file>
         <file alias="waived.png">images/waived.png</file>
-        <file alias="yellow_flag.png">images/yellow_flag.png</file>
+        <file alias="yellow_flag_16px.png">images/yellow_flag_16px.png</file>
+        <file alias="yellow_flag_16px@2x.png">images/yellow_flag_16px@2x.png</file>
         <file alias="salt.png">images/salt.png</file>
         <file alias="salt_icon.png">images/salt_icon.png</file>
         <file alias="warn.png">images/warn.png</file>

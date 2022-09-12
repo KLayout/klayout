@@ -56,11 +56,11 @@ struct FlagDescriptor
 
 static FlagDescriptor flag_descriptors[] = 
 {
-  FlagDescriptor (":no_flag.png", tl::to_string (QObject::tr ("No flag")), ""),
-  FlagDescriptor (":red_flag.png", tl::to_string (QObject::tr ("Red flag")), "red"),
-  FlagDescriptor (":green_flag.png", tl::to_string (QObject::tr ("Green flag")), "green"),
-  FlagDescriptor (":blue_flag.png", tl::to_string (QObject::tr ("Blue flag")), "blue"),
-  FlagDescriptor (":yellow_flag.png", tl::to_string (QObject::tr ("Yellow flag")), "yellow")
+  FlagDescriptor (":no_flag_16px.png", tl::to_string (QObject::tr ("No flag")), ""),
+  FlagDescriptor (":red_flag_16px.png", tl::to_string (QObject::tr ("Red flag")), "red"),
+  FlagDescriptor (":green_flag_16px.png", tl::to_string (QObject::tr ("Green flag")), "green"),
+  FlagDescriptor (":blue_flag_16px.png", tl::to_string (QObject::tr ("Blue flag")), "blue"),
+  FlagDescriptor (":yellow_flag_16px.png", tl::to_string (QObject::tr ("Yellow flag")), "yellow")
 };
 
 // ----------------------------------------------------------------------------------

@@ -2190,14 +2190,14 @@ public:
     menu_entries.push_back (lay::submenu ("global_trans", at, tl::to_string (tr ("Global Transformation"))));
     {
       std::string at = "zoom_menu.global_trans.end";
-      menu_entries.push_back (lay::config_menu_item ("r0", at, tl::to_string (tr ("\\(r0\\)<:/r0.png>")), cfg_global_trans, "?r0 *1 0,0"));
-      menu_entries.push_back (lay::config_menu_item ("r90", at, tl::to_string (tr ("\\(r90\\)<:/r90.png>")), cfg_global_trans, "?r90 *1 0,0"));
-      menu_entries.push_back (lay::config_menu_item ("r180", at, tl::to_string (tr ("\\(r180\\)<:/r180.png>")), cfg_global_trans, "?r180 *1 0,0"));
-      menu_entries.push_back (lay::config_menu_item ("r270", at, tl::to_string (tr ("\\(r270\\)<:/r270.png>")), cfg_global_trans, "?r270 *1 0,0"));
-      menu_entries.push_back (lay::config_menu_item ("m0", at, tl::to_string (tr ("\\(m0\\)<:/m0.png>")), cfg_global_trans, "?m0 *1 0,0"));
-      menu_entries.push_back (lay::config_menu_item ("m45", at, tl::to_string (tr ("\\(m45\\)<:/m45.png>")), cfg_global_trans, "?m45 *1 0,0"));
-      menu_entries.push_back (lay::config_menu_item ("m90", at, tl::to_string (tr ("\\(m90\\)<:/m90.png>")), cfg_global_trans, "?m90 *1 0,0"));
-      menu_entries.push_back (lay::config_menu_item ("m135", at, tl::to_string (tr ("\\(m135\\)<:/m135.png>")), cfg_global_trans, "?m135 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("r0", at, tl::to_string (tr ("\\(r0\\)<:/r0_24px.png>")), cfg_global_trans, "?r0 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("r90", at, tl::to_string (tr ("\\(r90\\)<:/r90_24px.png>")), cfg_global_trans, "?r90 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("r180", at, tl::to_string (tr ("\\(r180\\)<:/r180_24px.png>")), cfg_global_trans, "?r180 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("r270", at, tl::to_string (tr ("\\(r270\\)<:/r270_24px.png>")), cfg_global_trans, "?r270 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("m0", at, tl::to_string (tr ("\\(m0\\)<:/m0_24px.png>")), cfg_global_trans, "?m0 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("m45", at, tl::to_string (tr ("\\(m45\\)<:/m45_24px.png>")), cfg_global_trans, "?m45 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("m90", at, tl::to_string (tr ("\\(m90\\)<:/m90_24px.png>")), cfg_global_trans, "?m90 *1 0,0"));
+      menu_entries.push_back (lay::config_menu_item ("m135", at, tl::to_string (tr ("\\(m135\\)<:/m135_24px.png>")), cfg_global_trans, "?m135 *1 0,0"));
     }
 
     menu_entries.push_back (lay::separator ("hier_group", at));

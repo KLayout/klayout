@@ -246,6 +246,12 @@ struct vector_defs
       "\n"
       "The scalar product of a and b is defined as: vp = ax*bx+ay*by.\n"
     ) +
+    method_ext ("*", &sprod, gsi::arg ("v"),
+      "@brief Computes the scalar product between self and the given vector\n"
+      "\n"
+      "\n"
+      "The scalar product of a and b is defined as: vp = ax*bx+ay*by.\n"
+    ) +
     method_ext ("sprod_sign", &sprod_sign, gsi::arg ("v"),
       "@brief Computes the scalar product between self and the given vector and returns a value indicating the sign of the product\n"
       "\n"

@@ -68,3 +68,5 @@ dist/
 # Macos artifacts
 *.dmg
 *.dmg.md5
+.DS_Store
+

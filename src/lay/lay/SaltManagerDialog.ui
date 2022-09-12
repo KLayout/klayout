@@ -238,7 +238,7 @@
                 </property>
                 <property name="icon">
                  <iconset resource="layResources.qrc">
-                  <normaloff>:/empty_16.png</normaloff>:/empty_16.png</iconset>
+                  <normaloff>:/empty_16px.png</normaloff>:/empty_16px.png</iconset>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>
@@ -537,7 +537,7 @@
                 </property>
                 <property name="icon">
                  <iconset resource="layResources.qrc">
-                  <normaloff>:/empty_16.png</normaloff>:/empty_16.png</iconset>
+                  <normaloff>:/empty_16px.png</normaloff>:/empty_16px.png</iconset>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>

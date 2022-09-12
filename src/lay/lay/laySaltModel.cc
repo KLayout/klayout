@@ -163,15 +163,15 @@ SaltModel::data (const QModelIndex &index, int role) const
     if (m != m_messages.end ()) {
       if (m->second.first == Warning) {
         QPainter painter (&img);
-        QImage warn (":/warn_16.png");
+        QImage warn (":/warn_16px.png");
         painter.drawImage (0, 0, warn);
       } else if (m->second.first == Error) {
         QPainter painter (&img);
-        QImage warn (":/error_16.png");
+        QImage warn (":/error_16px.png");
         painter.drawImage (0, 0, warn);
       } else if (m->second.first == Info) {
         QPainter painter (&img);
-        QImage warn (":/info_16.png");
+        QImage warn (":/info_16px.png");
         painter.drawImage (0, 0, warn);
       }
     }

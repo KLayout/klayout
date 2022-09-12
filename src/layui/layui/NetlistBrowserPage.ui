@@ -121,7 +121,7 @@
            </property>
            <property name="icon">
             <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/info_16.png</normaloff>:/info_16.png</iconset>
+             <normaloff>:/info_16px.png</normaloff>:/info_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>

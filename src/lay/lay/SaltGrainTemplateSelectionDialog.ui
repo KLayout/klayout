@@ -118,7 +118,7 @@
         </property>
         <property name="icon">
          <iconset resource="layResources.qrc">
-          <normaloff>:/warn.png</normaloff>:/warn.png</iconset>
+          <normaloff>:/warn_16px.png</normaloff>:/warn_16px.png</iconset>
         </property>
         <property name="autoRaise">
          <bool>true</bool>

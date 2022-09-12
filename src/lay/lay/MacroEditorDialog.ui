@@ -492,7 +492,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="layResources.qrc">
-               <normaloff>:/breakpoint.png</normaloff>:/breakpoint.png</iconset>
+               <normaloff>:/breakpoint_16px.png</normaloff>:/breakpoint_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>F9</string>
@@ -515,7 +515,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="layResources.qrc">
-               <normaloff>:/clearbreakpoints.png</normaloff>:/clearbreakpoints.png</iconset>
+               <normaloff>:/clearbreakpoints_16px.png</normaloff>:/clearbreakpoints_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>Ctrl+Shift+F9</string>
@@ -628,7 +628,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="layResources.qrc">
-               <normaloff>:/properties.png</normaloff>:/properties.png</iconset>
+               <normaloff>:/properties_16px.png</normaloff>:/properties_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -648,7 +648,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="layResources.qrc">
-               <normaloff>:/setup.png</normaloff>:/setup.png</iconset>
+               <normaloff>:/setup_16px.png</normaloff>:/setup_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -821,7 +821,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="layResources.qrc">
-               <normaloff>:/help.png</normaloff>:/help.png</iconset>
+               <normaloff>:/help_16px.png</normaloff>:/help_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string/>

@@ -244,7 +244,7 @@
            </property>
            <property name="icon">
             <iconset resource="layResources.qrc">
-             <normaloff>:/warn.png</normaloff>:/warn.png</iconset>
+             <normaloff>:/warn_16px.png</normaloff>:/warn_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
@@ -345,7 +345,7 @@
            </property>
            <property name="icon">
             <iconset resource="layResources.qrc">
-             <normaloff>:/clear_edit.png</normaloff>:/clear_edit.png</iconset>
+             <normaloff>:/clear_edit_16px.png</normaloff>:/clear_edit_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
@@ -452,7 +452,7 @@
            </property>
            <property name="icon">
             <iconset resource="layResources.qrc">
-             <normaloff>:/clear_edit.png</normaloff>:/clear_edit.png</iconset>
+             <normaloff>:/clear_edit_16px.png</normaloff>:/clear_edit_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
@@ -517,7 +517,7 @@
            </property>
            <property name="icon">
             <iconset resource="layResources.qrc">
-             <normaloff>:/warn.png</normaloff>:/warn.png</iconset>
+             <normaloff>:/warn_16px.png</normaloff>:/warn_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
@@ -618,7 +618,7 @@
            </property>
            <property name="icon">
             <iconset resource="layResources.qrc">
-             <normaloff>:/warn.png</normaloff>:/warn.png</iconset>
+             <normaloff>:/warn_16px.png</normaloff>:/warn_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
@@ -732,7 +732,7 @@
            </property>
            <property name="icon">
             <iconset resource="layResources.qrc">
-             <normaloff>:/warn.png</normaloff>:/warn.png</iconset>
+             <normaloff>:/warn_16px.png</normaloff>:/warn_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
@@ -824,7 +824,7 @@
            </property>
            <property name="icon">
             <iconset resource="layResources.qrc">
-             <normaloff>:/warn.png</normaloff>:/warn.png</iconset>
+             <normaloff>:/warn_16px.png</normaloff>:/warn_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>

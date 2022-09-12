@@ -2505,9 +2505,9 @@ NetlistBrowserModel::columnCount (const QModelIndex & /*parent*/) const
 QIcon icon_for_status (db::NetlistCrossReference::Status status)
 {
   if (status == db::NetlistCrossReference::NoMatch || status == db::NetlistCrossReference::Mismatch) {
-    return QIcon (":/error2_16.png");
+    return QIcon (":/error2_16px.png");
   } else if (status == db::NetlistCrossReference::MatchWithWarning || status == db::NetlistCrossReference::Skipped) {
-    return QIcon (":/warn_16.png");
+    return QIcon (":/warn_16px.png");
   } else {
     return QIcon ();
   }
@@ -2921,7 +2921,7 @@ NetlistBrowserModel::headerData (int section, Qt::Orientation /*orientation*/, i
     }
 
   } else if (role == Qt::DecorationRole && section == m_status_column) {
-    return QIcon (":/info_16.png");
+    return QIcon (":/info_16px.png");
   }
 
   return QVariant ();

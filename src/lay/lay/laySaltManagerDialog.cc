@@ -999,7 +999,7 @@ SaltManagerDialog::update_models ()
   }
 
   if (has_warning) {
-    mode_tab->setTabIcon (1, QIcon (":/warn_16.png"));
+    mode_tab->setTabIcon (1, QIcon (":/warn_16px.png"));
   } else {
     mode_tab->setTabIcon (1, QIcon ());
   }

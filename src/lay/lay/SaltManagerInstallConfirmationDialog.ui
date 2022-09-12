@@ -260,7 +260,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="layResources.qrc">:/warn_16.png</pixmap>
+                <pixmap resource="layResources.qrc">:/warn_16px.png</pixmap>
                </property>
               </widget>
              </item>

@@ -321,8 +321,8 @@ const int sidePanelMargin = 4;
 
 MacroEditorSidePanel::MacroEditorSidePanel (QWidget *parent, MacroEditorTextWidget *text, MacroEditorExecutionModel *exec_model)
   : QWidget (parent), mp_text (text), mp_exec_model (exec_model), 
-    m_breakpoint_pixmap (QString::fromUtf8 (":/breakpointmark.png")),
-    m_breakpoint_disabled_pixmap (QString::fromUtf8 (":/breakpointmarkdisabled.png")),
+    m_breakpoint_pixmap (QString::fromUtf8 (":/breakpointmark_16px.png")),
+    m_breakpoint_disabled_pixmap (QString::fromUtf8 (":/breakpointmarkdisabled_16px.png")),
     m_exec_point_pixmap (QString::fromUtf8 (":/execmark.png")),
     m_debugging_on (true)
 {

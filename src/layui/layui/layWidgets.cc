@@ -1006,7 +1006,7 @@ DecoratedLineEdit::DecoratedLineEdit (QWidget *parent)
   mp_clear_label = new QLabel (this);
   mp_clear_label->hide ();
   mp_clear_label->setCursor (Qt::ArrowCursor);
-  mp_clear_label->setPixmap (QString::fromUtf8 (":/clear_edit.png"));
+  mp_clear_label->setPixmap (QString::fromUtf8 (":/clear_edit_16px.png"));
 
   QMargins margins = textMargins ();
   m_default_left_margin = margins.left ();

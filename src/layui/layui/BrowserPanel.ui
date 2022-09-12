@@ -241,7 +241,7 @@
                </property>
                <property name="icon">
                 <iconset resource="../../icons/icons.qrc">
-                 <normaloff>:/clear_edit.png</normaloff>:/clear_edit.png</iconset>
+                 <normaloff>:/clear_edit_16px.png</normaloff>:/clear_edit_16px.png</iconset>
                </property>
                <property name="autoRaise">
                 <bool>true</bool>
@@ -314,7 +314,7 @@
      </property>
      <property name="icon">
       <iconset resource="../../icons/icons.qrc">
-       <normaloff>:/home.png</normaloff>:/home.png</iconset>
+       <normaloff>:/home_24px.png</normaloff>:/home_24px.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -353,7 +353,7 @@
      </property>
      <property name="icon">
       <iconset resource="../../icons/icons.qrc">
-       <normaloff>:/prev_topic.png</normaloff>:/prev_topic.png</iconset>
+       <normaloff>:/prev_topic_24px.png</normaloff>:/prev_topic_24px.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -406,7 +406,7 @@
      </property>
      <property name="icon">
       <iconset resource="../../icons/icons.qrc">
-       <normaloff>:/next_topic.png</normaloff>:/next_topic.png</iconset>
+       <normaloff>:/next_topic_24px.png</normaloff>:/next_topic_24px.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -462,7 +462,7 @@
      </property>
      <property name="icon">
       <iconset resource="../../icons/icons.qrc">
-       <normaloff>:/bookmark.png</normaloff>:/bookmark.png</iconset>
+       <normaloff>:/bookmark_24px.png</normaloff>:/bookmark_24px.png</iconset>
      </property>
      <property name="iconSize">
       <size>

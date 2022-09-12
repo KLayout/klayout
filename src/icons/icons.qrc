@@ -109,7 +109,8 @@
         <file alias="no_flag_16px.png">images/no_flag_16px.png</file>
         <file alias="no_flag_16px@2x.png">images/no_flag_16px@2x.png</file>
         <file alias="nophoto.png">images/nophoto.png</file>
-        <file alias="options_edit.png">images/options_edit.png</file>
+        <file alias="options_edit_16px.png">images/options_edit_16px.png</file>
+        <file alias="options_edit_16px@2x.png">images/options_edit_16px@2x.png</file>
         <file alias="partial.png">images/partial.png</file>
         <file alias="path.png">images/path.png</file>
         <file alias="pause.png">images/pause.png</file>

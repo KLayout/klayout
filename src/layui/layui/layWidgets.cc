@@ -1001,7 +1001,7 @@ DecoratedLineEdit::DecoratedLineEdit (QWidget *parent)
   mp_options_label = new QLabel (this);
   mp_options_label->hide ();
   mp_options_label->setCursor (Qt::ArrowCursor);
-  mp_options_label->setPixmap (QString::fromUtf8 (":/options_edit.png"));
+  mp_options_label->setPixmap (QString::fromUtf8 (":/options_edit_16px.png"));
 
   mp_clear_label = new QLabel (this);
   mp_clear_label->hide ();

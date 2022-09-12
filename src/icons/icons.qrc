@@ -47,7 +47,6 @@
         <file alias="clear_edit_16px@2x.png">images/clear_edit_16px@2x.png</file>
         <file alias="clearbreakpoints_16px.png">images/clearbreakpoints_16px.png</file>
         <file alias="clearbreakpoints_16px@2x.png">images/clearbreakpoints_16px@2x.png</file>
-        <file alias="close.png">images/close.png</file>
         <file alias="cm_add.png">images/cm_add.png</file>
         <file alias="cm_diff.png">images/cm_diff.png</file>
         <file alias="cm_erase.png">images/cm_erase.png</file>
@@ -181,9 +180,12 @@
         <file alias="marked_24.png">images/marked_24.png</file>
         <file alias="marked_64.png">images/marked_64.png</file>
         <file alias="marked_16.png">images/marked_16.png</file>
-        <file alias="folder_12.png">images/folder_12.png</file>
-        <file alias="file_12.png">images/file_12.png</file>
-        <file alias="empty_12.png">images/empty_12.png</file>
+        <file alias="folder_12px.png">images/folder_12px.png</file>
+        <file alias="folder_12px@2x.png">images/folder_12px@2x.png</file>
+        <file alias="file_12px.png">images/file_12px.png</file>
+        <file alias="file_12px@2x.png">images/file_12px@2x.png</file>
+        <file alias="empty_12px.png">images/empty_12px.png</file>
+        <file alias="empty_12px@2x.png">images/empty_12px@2x.png</file>
         <file alias="fit_front_24px.png">images/fit_front_24px.png</file>
         <file alias="fit_front_24px@2x.png">images/fit_front_24px@2x.png</file>
         <file alias="fit_back_24px.png">images/fit_back_24px.png</file>

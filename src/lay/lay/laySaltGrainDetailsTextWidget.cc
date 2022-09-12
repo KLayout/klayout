@@ -142,9 +142,9 @@ SaltGrainDetailsTextWidget::loadResource (int type, const QUrl &url)
 static void produce_listing (QTextStream &stream, QDir dir, int level)
 {
   for (int i = 0; i < level + 1; ++i) {
-    stream << "<img src=\":/empty_12.png\"/>&nbsp;&nbsp;";
+    stream << "<img src=\":/empty_12px.png\"/>&nbsp;&nbsp;";
   }
-  stream << "<img src=\":/folder_12.png\"/>&nbsp;&nbsp;<i>";
+  stream << "<img src=\":/folder_12px.png\"/>&nbsp;&nbsp;<i>";
   if (level > 0) {
     stream << tl::escaped_to_html (tl::to_string (dir.dirName ())).c_str ();
   } else {
@@ -162,9 +162,9 @@ static void produce_listing (QTextStream &stream, QDir dir, int level)
       produce_listing (stream, QDir (fi.filePath ()), level);
     } else {
       for (int i = 0; i < level + 1; ++i) {
-        stream << "<img src=\":/empty_12.png\"/>&nbsp;&nbsp;";
+        stream << "<img src=\":/empty_12px.png\"/>&nbsp;&nbsp;";
       }
-      stream << "<img src=\":/file_12.png\"/>&nbsp;&nbsp;" << tl::escaped_to_html (tl::to_string (*e)).c_str () << "<br/>\n";
+      stream << "<img src=\":/file_12px.png\"/>&nbsp;&nbsp;" << tl::escaped_to_html (tl::to_string (*e)).c_str () << "<br/>\n";
     }
 
   }

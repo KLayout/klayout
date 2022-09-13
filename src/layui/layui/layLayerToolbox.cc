@@ -796,7 +796,7 @@ LCPColorPalette::LCPColorPalette (QWidget *parent, const char *name)
     b = new LCPActiveLabel (-10, f);
     b->setFrameStyle (QFrame::Panel | QFrame::Raised);
     b->setLineWidth (1);
-    b->setPixmap (QPixmap (QString::fromUtf8 (":dark.png")));
+    b->setPixmap (QPixmap (QString::fromUtf8 (":dark_12px.png")));
     b->setBackgroundRole (QPalette::Button);
     b->setAlignment (Qt::AlignHCenter);
     connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
@@ -805,7 +805,7 @@ LCPColorPalette::LCPColorPalette (QWidget *parent, const char *name)
     b = new LCPActiveLabel (-11, f);
     b->setFrameStyle (QFrame::Panel | QFrame::Raised);
     b->setLineWidth (1);
-    b->setPixmap (QPixmap (QString::fromUtf8 (":bright.png")));
+    b->setPixmap (QPixmap (QString::fromUtf8 (":bright_12px.png")));
     b->setBackgroundRole (QPalette::Button);
     b->setAlignment (Qt::AlignHCenter);
     connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
@@ -814,7 +814,7 @@ LCPColorPalette::LCPColorPalette (QWidget *parent, const char *name)
     b = new LCPActiveLabel (-12, f);
     b->setFrameStyle (QFrame::Panel | QFrame::Raised);
     b->setLineWidth (1);
-    b->setPixmap (QPixmap (QString::fromUtf8 (":neutral.png")));
+    b->setPixmap (QPixmap (QString::fromUtf8 (":neutral_12px.png")));
     b->setBackgroundRole (QPalette::Button);
     b->setAlignment (Qt::AlignHCenter);
     connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));

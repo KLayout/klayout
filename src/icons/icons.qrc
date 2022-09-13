@@ -32,7 +32,8 @@
         <file alias="breakpointmark_16px@2x.png">images/breakpointmark_16px@2x.png</file>
         <file alias="breakpointmarkdisabled_16px.png">images/breakpointmarkdisabled_16px.png</file>
         <file alias="breakpointmarkdisabled_16px@2x.png">images/breakpointmarkdisabled_16px@2x.png</file>
-        <file alias="bright.png">images/bright.png</file>
+        <file alias="bright_12px.png">images/bright_12px.png</file>
+        <file alias="bright_12px@2x.png">images/bright_12px@2x.png</file>
         <file alias="bulb.png">images/bulb.png</file>
         <file alias="cb_31px.png">images/cb_31px.png</file>
         <file alias="cb_31px@2x.png">images/cb_31px@2x.png</file>
@@ -54,7 +55,8 @@
         <file alias="cm_merge.png">images/cm_merge.png</file>
         <file alias="ct_31px.png">images/ct_31px.png</file>
         <file alias="ct_31px@2x.png">images/ct_31px@2x.png</file>
-        <file alias="dark.png">images/dark.png</file>
+        <file alias="dark_12px.png">images/dark_12px.png</file>
+        <file alias="dark_12px@2x.png">images/dark_12px@2x.png</file>
         <file alias="defaultmacroicon.png">images/defaultmacroicon.png</file>
         <file alias="del_16px.png">images/del_16px.png</file>
         <file alias="del_16px@2x.png">images/del_16px@2x.png</file>
@@ -104,7 +106,8 @@
         <file alias="m90_24px@2x.png">images/m90_24px@2x.png</file>
         <file alias="move.png">images/move.png</file>
         <file alias="move_simple.png">images/move_simple.png</file>
-        <file alias="neutral.png">images/neutral.png</file>
+        <file alias="neutral_12px.png">images/neutral_12px.png</file>
+        <file alias="neutral_12px@2x.png">images/neutral_12px@2x.png</file>
         <file alias="new_folder.png">images/new_folder.png</file>
         <file alias="next_topic_24px.png">images/next_topic_24px.png</file>
         <file alias="next_topic_24px@2x.png">images/next_topic_24px@2x.png</file>

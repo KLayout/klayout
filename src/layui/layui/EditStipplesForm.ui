@@ -391,7 +391,7 @@
              <widget class="QToolButton" name="invert_button">
               <property name="icon">
                <iconset resource="../lay/layResources.qrc">
-                <normaloff>:/invert.png</normaloff>:/invert.png</iconset>
+                <normaloff>:/invert_16px.png</normaloff>:/invert_16px.png</iconset>
               </property>
              </widget>
             </item>
@@ -402,7 +402,7 @@
               </property>
               <property name="icon">
                <iconset resource="../lay/layResources.qrc">
-                <normaloff>:/fliph.png</normaloff>:/fliph.png</iconset>
+                <normaloff>:/fliph_16px.png</normaloff>:/fliph_16px.png</iconset>
               </property>
              </widget>
             </item>
@@ -413,7 +413,7 @@
               </property>
               <property name="icon">
                <iconset resource="../lay/layResources.qrc">
-                <normaloff>:/flipv.png</normaloff>:/flipv.png</iconset>
+                <normaloff>:/flipv_16px.png</normaloff>:/flipv_16px.png</iconset>
               </property>
              </widget>
             </item>
@@ -424,7 +424,7 @@
               </property>
               <property name="icon">
                <iconset resource="../lay/layResources.qrc">
-                <normaloff>:/rotate.png</normaloff>:/rotate.png</iconset>
+                <normaloff>:/rotate_16px.png</normaloff>:/rotate_16px.png</iconset>
               </property>
              </widget>
             </item>

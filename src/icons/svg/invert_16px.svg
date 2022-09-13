@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="16"
+   height="16"
+   viewBox="0 0 4.2333332 4.2333335"
+   version="1.1"
+   id="svg1011"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="invert_16px.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1013"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="true"
+     units="px"
+     inkscape:snap-nodes="false"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-nodes="true"
+     inkscape:snap-others="false"
+     inkscape:zoom="11.313709"
+     inkscape:cx="7.7781746"
+     inkscape:cy="5.6126601"
+     inkscape:window-width="1535"
+     inkscape:window-height="1081"
+     inkscape:window-x="316"
+     inkscape:window-y="81"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     width="16px">
+    <inkscape:grid
+       type="xygrid"
+       id="grid1074"
+       spacingx="0.13229167"
+       spacingy="0.13229167"
+       empspacing="2" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1008">
+    <linearGradient
+       id="linearGradient3600">
+      <stop
+         style="stop-color:#ff9f3f;stop-opacity:1;"
+         offset="0"
+         id="stop3602" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="1"
+         id="stop3604" />
+    </linearGradient>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="color:#000000;overflow:visible;fill:#000000;fill-opacity:0.998857;stroke:#333333;stroke-width:0.264583;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.499998;stroke-opacity:1"
+       id="path848"
+       sodipodi:type="arc"
+       sodipodi:cx="2.1163101"
+       sodipodi:cy="2.1169496"
+       sodipodi:rx="1.9834706"
+       sodipodi:ry="1.982132"
+       sodipodi:start="0"
+       sodipodi:end="6.2826093"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       d="M 4.0997807,2.1169496 A 1.9834706,1.982132 0 0 1 2.1165957,4.0990815 1.9834706,1.982132 0 0 1 0.13283964,2.1175204 1.9834706,1.982132 0 0 1 2.1154532,0.13481779 1.9834706,1.982132 0 0 1 4.0997803,2.1158078" />
+    <rect
+       style="fill:none;stroke:#865b26;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect3596"
+       width="4.2223287"
+       height="4.2268672"
+       x="0.0035604495"
+       y="0.0027145317"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/back.png"
+       inkscape:export-xdpi="27.093315"
+       inkscape:export-ydpi="27.093315" />
+    <path
+       style="fill:#ffffff;fill-opacity:0.998857;fill-rule:evenodd;stroke:none;stroke-width:0.352049px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 2.1147249,0.1788337 2.994377,0.35495318 3.6980985,0.88331169 4.0499592,1.7639092 v 0.704478 L 3.6980985,3.3489846 2.994377,3.877343 2.1147249,4.0534625 Z"
+       id="path2225" />
+    <path
+       style="color:#000000;overflow:visible;fill:none;fill-opacity:0.998857;stroke:#333333;stroke-width:0.264583;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.499998;stroke-opacity:1"
+       id="path1772"
+       sodipodi:type="arc"
+       sodipodi:cx="2.1160319"
+       sodipodi:cy="2.1172237"
+       sodipodi:rx="1.9824846"
+       sodipodi:ry="1.9830992"
+       sodipodi:start="0"
+       sodipodi:end="6.2826093"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       d="M 4.0985165,2.1172237 A 1.9824846,1.9830992 0 0 1 2.1163174,4.1003229 1.9824846,1.9830992 0 0 1 0.13354739,2.1177949 1.9824846,1.9830992 0 0 1 2.1151754,0.1341247 1.9824846,1.9830992 0 0 1 4.0985161,2.1160815" />
+  </g>
+</svg>

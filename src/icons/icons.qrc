@@ -68,8 +68,10 @@
         <file alias="downdown_16px@2x.png">images/downdown_16px@2x.png</file>
         <file alias="execmark.png">images/execmark.png</file>
         <file alias="find.png">images/find.png</file>
-        <file alias="fliph.png">images/fliph.png</file>
-        <file alias="flipv.png">images/flipv.png</file>
+        <file alias="fliph_16px.png">images/fliph_16px.png</file>
+        <file alias="fliph_16px@2x.png">images/fliph_16px@2x.png</file>
+        <file alias="flipv_16px.png">images/flipv_16px.png</file>
+        <file alias="flipv_16px@2x.png">images/flipv_16px@2x.png</file>
         <file alias="folder.png">images/folder.png</file>
         <file alias="forward_24px.png">images/forward_24px.png</file>
         <file alias="forward_24px@2x.png">images/forward_24px@2x.png</file>
@@ -86,7 +88,8 @@
         <file alias="import.png">images/import.png</file>
         <file alias="important.png">images/important.png</file>
         <file alias="instance.png">images/instance.png</file>
-        <file alias="invert.png">images/invert.png</file>
+        <file alias="invert_16px.png">images/invert_16px.png</file>
+        <file alias="invert_16px@2x.png">images/invert_16px@2x.png</file>
         <file alias="lb_31px.png">images/lb_31px.png</file>
         <file alias="lb_31px@2x.png">images/lb_31px@2x.png</file>
         <file alias="lc_31px.png">images/lc_31px.png</file>
@@ -145,7 +148,10 @@
         <file alias="replace_all.png">images/replace_all.png</file>
         <file alias="right_16px.png">images/right_16px.png</file>
         <file alias="right_16px@2x.png">images/right_16px@2x.png</file>
-        <file alias="rotate.png">images/rotate.png</file>
+        <file alias="rotate_16px.png">images/rotate_16px.png</file>
+        <file alias="rotate_16px@2x.png">images/rotate_16px@2x.png</file>
+        <file alias="rrotate_16px.png">images/rrotate_16px.png</file>
+        <file alias="rrotate_16px@2x.png">images/rrotate_16px@2x.png</file>
         <file alias="rt_31px.png">images/rt_31px.png</file>
         <file alias="rt_31px@2x.png">images/rt_31px@2x.png</file>
         <file alias="rubymacroicon.png">images/rubymacroicon.png</file>

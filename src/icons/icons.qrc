@@ -39,7 +39,8 @@
         <file alias="cb_31px@2x.png">images/cb_31px@2x.png</file>
         <file alias="cc_31px.png">images/cc_31px.png</file>
         <file alias="cc_31px@2x.png">images/cc_31px@2x.png</file>
-        <file alias="checked.png">images/checked.png</file>
+        <file alias="checked_16px.png">images/checked_16px.png</file>
+        <file alias="checked_16px@2x.png">images/checked_16px@2x.png</file>
         <file alias="clear_16px.png">images/clear_16px.png</file>
         <file alias="clear_16px@2x.png">images/clear_16px@2x.png</file>
         <file alias="clear_24px.png">images/clear_24px.png</file>
@@ -187,7 +188,8 @@
         <file alias="text.png">images/text.png</file>
         <file alias="textdocumenticon_16px.png">images/textdocumenticon_16px.png</file>
         <file alias="textdocumenticon_16px@2x.png">images/textdocumenticon_16px@2x.png</file>
-        <file alias="unchecked.png">images/unchecked.png</file>
+        <file alias="unchecked_16px.png">images/unchecked_16px.png</file>
+        <file alias="unchecked_16px@2x.png">images/unchecked_16px@2x.png</file>
         <file alias="up_16px.png">images/up_16px.png</file>
         <file alias="up_16px@2x.png">images/up_16px@2x.png</file>
         <file alias="upup_16px.png">images/upup_16px.png</file>

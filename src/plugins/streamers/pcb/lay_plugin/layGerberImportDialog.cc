@@ -815,7 +815,7 @@ GerberImportDialog::free_layer_mapping_item_clicked (QTreeWidgetItem *item, int 
   if (column > 0) {
     bool value = ! item->data (column, Qt::UserRole).toBool ();
     item->setData (column, Qt::UserRole, value);
-    item->setData (column, Qt::DecorationRole, QVariant (QIcon (QString::fromUtf8 (value ? ":checked.png" : ":unchecked.png"))));
+    item->setData (column, Qt::DecorationRole, QVariant (QIcon (QString::fromUtf8 (value ? ":checked_16px.png" : ":unchecked_16px.png"))));
   }
 }
 
@@ -828,7 +828,7 @@ GerberImportDialog::reset_free_mapping ()
   for (QList<QTreeWidgetItem *>::const_iterator s = selected.begin (); s != selected.end (); ++s) {
     for (int column = 1; column <= int (mp_data->layout_layers.size ()); ++column) {
       (*s)->setData (column, Qt::UserRole, false);
-      (*s)->setData (column, Qt::DecorationRole, QVariant (QIcon (QString::fromUtf8 (":unchecked.png"))));
+      (*s)->setData (column, Qt::DecorationRole, QVariant (QIcon (QString::fromUtf8 (":unchecked_16px.png"))));
     }
   }
 }
@@ -1607,7 +1607,7 @@ GerberImportDialog::update ()
       }
 
       item->setData (layer + 1, Qt::UserRole, QVariant (is_present));
-      item->setData (layer + 1, Qt::DecorationRole, QVariant (QIcon (QString::fromUtf8 (is_present ? ":checked.png" : ":unchecked.png"))));
+      item->setData (layer + 1, Qt::DecorationRole, QVariant (QIcon (QString::fromUtf8 (is_present ? ":checked_16px.png" : ":unchecked_16px.png"))));
 
     }
 

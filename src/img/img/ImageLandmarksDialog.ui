@@ -166,7 +166,7 @@
             <string>Move</string>
            </property>
            <property name="icon" >
-            <iconset resource="layResources.qrc" >:/move_simple.png</iconset>
+            <iconset resource="layResources.qrc" >:/move_simple_16px.png</iconset>
            </property>
            <property name="checkable" >
             <bool>true</bool>

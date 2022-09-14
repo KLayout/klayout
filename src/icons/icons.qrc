@@ -114,7 +114,8 @@
         <file alias="m90_24px.png">images/m90_24px.png</file>
         <file alias="m90_24px@2x.png">images/m90_24px@2x.png</file>
         <file alias="move.png">images/move.png</file>
-        <file alias="move_simple.png">images/move_simple.png</file>
+        <file alias="move_simple_16px.png">images/move_simple_16px.png</file>
+        <file alias="move_simple_16px@2x.png">images/move_simple_16px@2x.png</file>
         <file alias="neutral_12px.png">images/neutral_12px.png</file>
         <file alias="neutral_12px@2x.png">images/neutral_12px@2x.png</file>
         <file alias="new_folder_16px.png">images/new_folder_16px.png</file>

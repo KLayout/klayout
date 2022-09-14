@@ -91,7 +91,8 @@
         <file alias="home_24px.png">images/home_24px.png</file>
         <file alias="home_24px@2x.png">images/home_24px@2x.png</file>
         <file alias="import.png">images/import.png</file>
-        <file alias="important.png">images/important.png</file>
+        <file alias="important_16px.png">images/important_16px.png</file>
+        <file alias="important_16px@2x.png">images/important_16px@2x.png</file>
         <file alias="instance.png">images/instance.png</file>
         <file alias="invert_16px.png">images/invert_16px.png</file>
         <file alias="invert_16px@2x.png">images/invert_16px@2x.png</file>

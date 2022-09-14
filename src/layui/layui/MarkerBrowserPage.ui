@@ -546,7 +546,7 @@
           </property>
           <property name="icon">
            <iconset resource="../../lay/lay/layResources.qrc">
-            <normaloff>:/important.png</normaloff>:/important.png</iconset>
+            <normaloff>:/important_16px.png</normaloff>:/important_16px.png</iconset>
           </property>
          </widget>
         </item>

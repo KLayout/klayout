@@ -373,7 +373,7 @@ LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *ma
 
   m_no_stipples_label = new QLabel (tb);
   m_no_stipples_label->hide ();
-  m_no_stipples_label->setPixmap (QPixmap (QString::fromUtf8 (":/important.png")));
+  m_no_stipples_label->setPixmap (QPixmap (QString::fromUtf8 (":/warn_16px.png")));
   m_no_stipples_label->setToolTip (tr ("Stipples are disabled - unselect \"View/Show Layers Without Fill\" to re-enable them"));
   ltb->addWidget (m_no_stipples_label);
 

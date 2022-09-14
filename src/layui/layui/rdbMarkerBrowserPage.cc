@@ -1268,7 +1268,7 @@ public:
 
         const rdb::Item *i = item (index.row ());
         if (i != 0 && i->has_tag (m_important_tag_id)) {
-          return QVariant (QIcon (QString::fromUtf8 (":important.png")));
+          return QVariant (QIcon (QString::fromUtf8 (":important_16px.png")));
         }
 
       } else if (index.column () == 2) {

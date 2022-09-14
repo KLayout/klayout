@@ -399,7 +399,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="layResources.qrc">
-               <normaloff>:/run.png</normaloff>:/run.png</iconset>
+               <normaloff>:/run_16px.png</normaloff>:/run_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>F5</string>
@@ -419,7 +419,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="layResources.qrc">
-               <normaloff>:/runthis.png</normaloff>:/runthis.png</iconset>
+               <normaloff>:/runthis_16px.png</normaloff>:/runthis_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>Shift+F5</string>
@@ -442,7 +442,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="layResources.qrc">
-               <normaloff>:/stop.png</normaloff>:/stop.png</iconset>
+               <normaloff>:/stop_16px.png</normaloff>:/stop_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -462,7 +462,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="layResources.qrc">
-               <normaloff>:/pause.png</normaloff>:/pause.png</iconset>
+               <normaloff>:/pause_16px.png</normaloff>:/pause_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>Ctrl+F5</string>

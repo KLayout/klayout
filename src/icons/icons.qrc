@@ -72,7 +72,8 @@
         <file alias="fliph_16px@2x.png">images/fliph_16px@2x.png</file>
         <file alias="flipv_16px.png">images/flipv_16px.png</file>
         <file alias="flipv_16px@2x.png">images/flipv_16px@2x.png</file>
-        <file alias="folder.png">images/folder.png</file>
+        <file alias="folder_16px.png">images/folder_16px.png</file>
+        <file alias="folder_16px@2x.png">images/folder_16px@2x.png</file>
         <file alias="forward_24px.png">images/forward_24px.png</file>
         <file alias="forward_24px@2x.png">images/forward_24px@2x.png</file>
         <file alias="forward_16px.png">images/forward_16px.png</file>
@@ -111,7 +112,8 @@
         <file alias="move_simple.png">images/move_simple.png</file>
         <file alias="neutral_12px.png">images/neutral_12px.png</file>
         <file alias="neutral_12px@2x.png">images/neutral_12px@2x.png</file>
-        <file alias="new_folder.png">images/new_folder.png</file>
+        <file alias="new_folder_16px.png">images/new_folder_16px.png</file>
+        <file alias="new_folder_16px@2x.png">images/new_folder_16px@2x.png</file>
         <file alias="next_topic_24px.png">images/next_topic_24px.png</file>
         <file alias="next_topic_24px@2x.png">images/next_topic_24px@2x.png</file>
         <file alias="nextstep.png">images/nextstep.png</file>

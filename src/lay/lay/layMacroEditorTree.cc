@@ -363,7 +363,7 @@ QVariant MacroTreeModel::data (const QModelIndex &index, int role) const
     if (role == Qt::DisplayRole) {
       return QVariant (tl::to_qstring (mc->display_string ()));
     } else if (role == Qt::DecorationRole) {
-      return QVariant (QIcon (QString::fromUtf8 (":/folder.png")));
+      return QVariant (QIcon (QString::fromUtf8 (":/folder_16px.png")));
     } else if (role == Qt::ToolTipRole) {
       return QVariant (tl::to_qstring (mc->path ()));
     } else if (role == Qt::UserRole) {

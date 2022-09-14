@@ -104,7 +104,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="layResources.qrc">
-               <normaloff>:/new_folder.png</normaloff>:/new_folder.png</iconset>
+               <normaloff>:/new_folder_16px.png</normaloff>:/new_folder_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -1377,7 +1377,7 @@ p, li { white-space: pre-wrap; }
   <action name="actionNewFolder">
    <property name="icon">
     <iconset resource="layResources.qrc">
-     <normaloff>:/new_folder.png</normaloff>:/new_folder.png</iconset>
+     <normaloff>:/new_folder_16px.png</normaloff>:/new_folder_16px.png</iconset>
    </property>
    <property name="text">
     <string>New Folder</string>

@@ -131,7 +131,7 @@
          </property>
          <property name="icon">
           <iconset resource="../../lay/lay/layResources.qrc">
-           <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+           <normaloff>:/edit_16px.png</normaloff>:/edit_16px.png</iconset>
          </property>
         </widget>
        </item>

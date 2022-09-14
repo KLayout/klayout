@@ -4,7 +4,8 @@
         <file alias="add_16px@2x.png">images/add_16px@2x.png</file>
         <file alias="add_24px.png">images/add_24px.png</file>
         <file alias="add_24px@2x.png">images/add_24px@2x.png</file>
-        <file alias="edit.png">images/edit.png</file>
+        <file alias="edit_16px.png">images/edit_16px.png</file>
+        <file alias="edit_16px@2x.png">images/edit_16px@2x.png</file>
         <file alias="align_bottom_32px.png">images/align_bottom_32px.png</file>
         <file alias="align_bottom_32px@2x.png">images/align_bottom_32px@2x.png</file>
         <file alias="align_hcenter_32px.png">images/align_hcenter_32px.png</file>

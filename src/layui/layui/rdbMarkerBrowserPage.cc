@@ -1275,7 +1275,7 @@ public:
 
         const rdb::Item *i = item (index.row ());
         if (i != 0 && i->has_tag (m_waived_tag_id)) {
-          return QVariant (QIcon (QString::fromUtf8 (":waived.png")));
+          return QVariant (QIcon (QString::fromUtf8 (":waived_16px.png")));
         }
 
       }

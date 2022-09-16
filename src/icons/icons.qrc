@@ -203,7 +203,8 @@
         <file alias="up_16px@2x.png">images/up_16px@2x.png</file>
         <file alias="upup_16px.png">images/upup_16px.png</file>
         <file alias="upup_16px@2x.png">images/upup_16px@2x.png</file>
-        <file alias="waived.png">images/waived.png</file>
+        <file alias="waived_16px.png">images/waived_16px.png</file>
+        <file alias="waived_16px@2x.png">images/waived_16px@2x.png</file>
         <file alias="yellow_flag_16px.png">images/yellow_flag_16px.png</file>
         <file alias="yellow_flag_16px@2x.png">images/yellow_flag_16px@2x.png</file>
         <file alias="salt.png">images/salt.png</file>

@@ -261,12 +261,12 @@ private:
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl1 (
-  new edt::PluginDeclaration<edt::PolygonService> (tl::to_string (tr ("Polygons")), "polygon:edit_mode\t" + tl::to_string (tr ("Polygon")) + "<:polygon.png>" + tl::to_string (tr ("{Create a polygon}")), 0, &get_shape_editor_options_pages),
+  new edt::PluginDeclaration<edt::PolygonService> (tl::to_string (tr ("Polygons")), "polygon:edit_mode\t" + tl::to_string (tr ("Polygon")) + "<:polygon_24px.png>" + tl::to_string (tr ("{Create a polygon}")), 0, &get_shape_editor_options_pages),
   4010, 
   "edt::Service(Polygons)"
 );
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl2 (
-  new edt::PluginDeclaration<edt::BoxService> (tl::to_string (tr ("Boxes")), "box:edit_mode\t" + tl::to_string (tr ("Box")) + "\t<:box.png>" + tl::to_string (tr ("{Create a box}")), 0, &get_shape_editor_options_pages),
+  new edt::PluginDeclaration<edt::BoxService> (tl::to_string (tr ("Boxes")), "box:edit_mode\t" + tl::to_string (tr ("Box")) + "\t<:box_24px.png>" + tl::to_string (tr ("{Create a box}")), 0, &get_shape_editor_options_pages),
   4011, 
   "edt::Service(Boxes)"
 );
@@ -276,7 +276,7 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl3 (
   "edt::Service(Texts)"
 );
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl4 (
-  new edt::PluginDeclaration<edt::PathService> (tl::to_string (tr ("Paths")), "path:edit_mode\t" + tl::to_string (tr ("Path")) + "\t<:path.png>" + tl::to_string (tr ("{Create a path}")), &get_path_options, &get_path_editor_options_pages),
+  new edt::PluginDeclaration<edt::PathService> (tl::to_string (tr ("Paths")), "path:edit_mode\t" + tl::to_string (tr ("Path")) + "\t<:path_24px.png>" + tl::to_string (tr ("{Create a path}")), &get_path_options, &get_path_editor_options_pages),
   4013, 
   "edt::Service(Paths)"
 );
@@ -414,19 +414,19 @@ public:
 
     if (cm == CM_Add) {
       combine_menu->set_title (tl::to_string (tr ("Add")));
-      combine_menu->set_icon (":/cm_add.png");
+      combine_menu->set_icon (":/cm_add_24px.png");
     } else if (cm == CM_Merge) {
       combine_menu->set_title (tl::to_string (tr ("Merge")));
-      combine_menu->set_icon (":/cm_merge.png");
+      combine_menu->set_icon (":/cm_merge_24px.png");
     } else if (cm == CM_Erase) {
       combine_menu->set_title (tl::to_string (tr ("Erase")));
-      combine_menu->set_icon (":/cm_erase.png");
+      combine_menu->set_icon (":/cm_erase_24px.png");
     } else if (cm == CM_Mask) {
       combine_menu->set_title (tl::to_string (tr ("Mask")));
-      combine_menu->set_icon (":/cm_mask.png");
+      combine_menu->set_icon (":/cm_mask_24px.png");
     } else if (cm == CM_Diff) {
       combine_menu->set_title (tl::to_string (tr ("Diff")));
-      combine_menu->set_icon (":/cm_diff.png");
+      combine_menu->set_icon (":/cm_diff_24px.png");
     }
 #endif
   }
@@ -528,7 +528,7 @@ private:
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl30 (
-  new edt::PartialPluginDeclaration (tl::to_string (tr ("Partial shapes")), "partial:edit_mode\t" + tl::to_string (tr ("Partial{Edit points and edges of shapes}")) + "<:partial.png>"),
+  new edt::PartialPluginDeclaration (tl::to_string (tr ("Partial shapes")), "partial:edit_mode\t" + tl::to_string (tr ("Partial{Edit points and edges of shapes}")) + "<:partial_24px.png>"),
   4030, 
   "edt::PartialService"
 );

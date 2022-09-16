@@ -155,7 +155,7 @@ SaltModel::data (const QModelIndex &index, int role) const
 
     if (m_marked.find (g->name ()) != m_marked.end ()) {
       QPainter painter (&img);
-      QImage warn (":/marked_64.png");
+      QImage warn (":/marked_64px.png");
       painter.drawImage (0, 0, warn);
     }
 

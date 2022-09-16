@@ -102,7 +102,7 @@ p, li { white-space: pre-wrap; }
             <string>...</string>
            </property>
            <property name="icon" >
-            <iconset resource="layResources.qrc" >:/find.png</iconset>
+            <iconset resource="layResources.qrc" >:/find_16px.png</iconset>
            </property>
            <property name="autoRaise" >
             <bool>true</bool>

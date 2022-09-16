@@ -188,7 +188,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="../../lay/lay/layResources.qrc">:/find.png</pixmap>
+             <pixmap resource="../../lay/lay/layResources.qrc">:/find_16px.png</pixmap>
             </property>
            </widget>
           </item>

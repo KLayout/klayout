@@ -77,7 +77,7 @@
                 </property>
                 <property name="icon">
                  <iconset resource="layResources.qrc">
-                  <normaloff>:/marked_16.png</normaloff>:/marked_16.png</iconset>
+                  <normaloff>:/marked_16px.png</normaloff>:/marked_16px.png</iconset>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>
@@ -103,7 +103,7 @@
                  <string/>
                 </property>
                 <property name="pixmap">
-                 <pixmap resource="layResources.qrc">:/find.png</pixmap>
+                 <pixmap resource="layResources.qrc">:/find_16px.png</pixmap>
                 </property>
                </widget>
               </item>
@@ -376,7 +376,7 @@
                 </property>
                 <property name="icon">
                  <iconset resource="layResources.qrc">
-                  <normaloff>:/marked_16.png</normaloff>:/marked_16.png</iconset>
+                  <normaloff>:/marked_16px.png</normaloff>:/marked_16px.png</iconset>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>
@@ -402,7 +402,7 @@
                  <string/>
                 </property>
                 <property name="pixmap">
-                 <pixmap resource="layResources.qrc">:/find.png</pixmap>
+                 <pixmap resource="layResources.qrc">:/find_16px.png</pixmap>
                 </property>
                </widget>
               </item>
@@ -690,7 +690,7 @@
                  <string/>
                 </property>
                 <property name="pixmap">
-                 <pixmap resource="layResources.qrc">:/find.png</pixmap>
+                 <pixmap resource="layResources.qrc">:/find_16px.png</pixmap>
                 </property>
                </widget>
               </item>

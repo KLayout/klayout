@@ -545,7 +545,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="../../icons/icons.qrc">
-               <normaloff>:/singlestep.png</normaloff>:/singlestep.png</iconset>
+               <normaloff>:/singlestep_16px.png</normaloff>:/singlestep_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>F11</string>
@@ -568,7 +568,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="../../icons/icons.qrc">
-               <normaloff>:/nextstep.png</normaloff>:/nextstep.png</iconset>
+               <normaloff>:/nextstep_16px.png</normaloff>:/nextstep_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>F10</string>
@@ -598,7 +598,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="../../icons/icons.qrc">
-               <normaloff>:/debug.png</normaloff>:/debug.png</iconset>
+               <normaloff>:/debug_16px.png</normaloff>:/debug_16px.png</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -684,7 +684,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="../../icons/icons.qrc">
-               <normaloff>:/find.png</normaloff>:/find.png</iconset>
+               <normaloff>:/find_16px.png</normaloff>:/find_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>F3</string>
@@ -774,7 +774,7 @@ p, li { white-space: pre-wrap; }
                 </property>
                 <property name="icon">
                  <iconset resource="../../icons/icons.qrc">
-                  <normaloff>:/replace.png</normaloff>:/replace.png</iconset>
+                  <normaloff>:/replace_16px.png</normaloff>:/replace_16px.png</iconset>
                 </property>
                 <property name="shortcut">
                  <string/>
@@ -797,7 +797,7 @@ p, li { white-space: pre-wrap; }
                 </property>
                 <property name="icon">
                  <iconset resource="../../icons/icons.qrc">
-                  <normaloff>:/replace_all.png</normaloff>:/replace_all.png</iconset>
+                  <normaloff>:/replace_all_16px.png</normaloff>:/replace_all_16px.png</iconset>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>

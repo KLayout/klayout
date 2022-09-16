@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="16"
+   height="16"
+   viewBox="0 0 4.2333332 4.2333335"
+   version="1.1"
+   id="svg1011"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="singlestep_16px.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1013"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="true"
+     units="px"
+     inkscape:snap-nodes="false"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-nodes="true"
+     inkscape:snap-others="false"
+     inkscape:zoom="17.288462"
+     inkscape:cx="7.461624"
+     inkscape:cy="13.506118"
+     inkscape:window-width="1535"
+     inkscape:window-height="1081"
+     inkscape:window-x="99"
+     inkscape:window-y="111"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     width="16px">
+    <inkscape:grid
+       type="xygrid"
+       id="grid1074"
+       spacingx="0.13229167"
+       spacingy="0.13229167"
+       empspacing="2" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1008">
+    <linearGradient
+       id="linearGradient3600">
+      <stop
+         style="stop-color:#ff9f3f;stop-opacity:1;"
+         offset="0"
+         id="stop3602" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="1"
+         id="stop3604" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5164"
+       id="linearGradient5170"
+       x1="1222.441"
+       y1="864.56683"
+       x2="1279.1339"
+       y2="864.56683"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.07467134,0,0,0.07467123,-91.28131,-62.441605)" />
+    <linearGradient
+       id="linearGradient5164">
+      <stop
+         style="stop-color:#c3bef4;stop-opacity:1;"
+         offset="0"
+         id="stop5166" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="1"
+         id="stop5168" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4507-1"
+       id="linearGradient5140"
+       x1="1226.7131"
+       y1="850.74963"
+       x2="1247.2272"
+       y2="850.74963"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.07467134,0,0,0.07467123,-91.28131,-62.441605)" />
+    <linearGradient
+       id="linearGradient4507-1">
+      <stop
+         style="stop-color:#03b800;stop-opacity:1;"
+         offset="0"
+         id="stop4509-2" />
+      <stop
+         style="stop-color:#23ff7b;stop-opacity:1;"
+         offset="1"
+         id="stop4511-1" />
+    </linearGradient>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:none;stroke:#865b26;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect3596"
+       width="4.2333326"
+       height="4.2333331"
+       x="3.3333333e-07"
+       y="3.3333333e-07"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/back.png"
+       inkscape:export-xdpi="27.093315"
+       inkscape:export-ydpi="27.093315" />
+    <rect
+       inkscape:export-ydpi="25.399982"
+       inkscape:export-xdpi="25.399982"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       y="-8.8817842e-16"
+       x="-4.4408921e-16"
+       height="4.2333336"
+       width="4.2333336"
+       id="rect5108"
+       style="fill:url(#linearGradient5170);fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       style="fill:#999999;fill-opacity:1;stroke:none;stroke-width:0.896055;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect5120"
+       width="2.3812516"
+       height="0.26458314"
+       x="0.26457649"
+       y="3.175004"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       inkscape:export-xdpi="25"
+       inkscape:export-ydpi="25" />
+    <rect
+       style="fill:#999999;fill-opacity:1;stroke:none;stroke-width:0.896055;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect5122"
+       width="2.9104185"
+       height="0.26458314"
+       x="0.26457649"
+       y="3.70417"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       inkscape:export-xdpi="25"
+       inkscape:export-ydpi="25" />
+    <rect
+       style="fill:#221890;fill-opacity:1;stroke:none;stroke-width:0.896055;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect5124"
+       width="2.1166668"
+       height="0.26458314"
+       x="1.5874952"
+       y="2.3812578"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       inkscape:export-xdpi="25"
+       inkscape:export-ydpi="25" />
+    <rect
+       style="fill:#221890;fill-opacity:1;stroke:none;stroke-width:0.896055;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect5126"
+       width="2.3812501"
+       height="0.26458314"
+       x="1.5874952"
+       y="1.8520917"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       inkscape:export-xdpi="25"
+       inkscape:export-ydpi="25" />
+    <rect
+       style="fill:#221890;fill-opacity:1;stroke:none;stroke-width:0.896055;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect5128"
+       width="1.0583327"
+       height="0.26458314"
+       x="1.5874952"
+       y="1.3229259"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       inkscape:export-xdpi="25"
+       inkscape:export-ydpi="25" />
+    <rect
+       style="fill:#999999;fill-opacity:1;stroke:none;stroke-width:0.896055;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect5130"
+       width="2.9104185"
+       height="0.26458314"
+       x="0.26457649"
+       y="0.2645897"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       inkscape:export-xdpi="25"
+       inkscape:export-ydpi="25" />
+    <rect
+       inkscape:export-ydpi="25"
+       inkscape:export-xdpi="25"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       y="1.5875067"
+       x="1.5874952"
+       height="0.26458314"
+       width="2.1166668"
+       id="rect5144"
+       style="fill:#c3bef4;fill-opacity:1;stroke:none;stroke-width:0.896055;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       style="fill:#c3bef4;fill-opacity:1;stroke:none;stroke-width:0.896055;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect5150"
+       width="1.322916"
+       height="0.26458314"
+       x="1.5874952"
+       y="1.0583408"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       inkscape:export-xdpi="25"
+       inkscape:export-ydpi="25" />
+    <rect
+       inkscape:export-ydpi="25"
+       inkscape:export-xdpi="25"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       y="0.52917492"
+       x="0.26457649"
+       height="0.26458314"
+       width="2.6458349"
+       id="rect5154"
+       style="fill:#bebebe;fill-opacity:1;stroke:none;stroke-width:0.896055;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       sodipodi:nodetypes="cccccccc"
+       inkscape:connector-curvature="0"
+       id="path5142"
+       d="M 0.45340142,0.95861757 0.9586053,0.45341364 1.4638091,0.95861757 1.7164073,0.70601525 V 1.7164216 H 0.70599962 L 0.9586053,1.4638199 Z"
+       style="fill:url(#linearGradient5140);fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.74671;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       inkscape:export-xdpi="25"
+       inkscape:export-ydpi="25" />
+    <path
+       style="fill:#00ca00;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.268817;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 0.45340142,0.95861757 0.9586053,0.45341364 1.4638091,0.95861757 1.7164073,0.70601525 V 1.7164216 H 0.70599962 L 0.9586053,1.4638199 Z"
+       id="path5132"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccc"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       inkscape:export-xdpi="25"
+       inkscape:export-ydpi="25" />
+    <rect
+       style="fill:#c3bef4;fill-opacity:1;stroke:none;stroke-width:0.896055;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect5146"
+       width="1.5874996"
+       height="0.26458314"
+       x="1.5874952"
+       y="2.1166725"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       inkscape:export-xdpi="25"
+       inkscape:export-ydpi="25" />
+    <rect
+       inkscape:export-ydpi="25"
+       inkscape:export-xdpi="25"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       y="2.6458383"
+       x="1.5874952"
+       height="0.26458314"
+       width="1.852083"
+       id="rect5148"
+       style="fill:#c3bef4;fill-opacity:1;stroke:none;stroke-width:0.896055;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       inkscape:export-ydpi="25"
+       inkscape:export-xdpi="25"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/lay/images/singlestep.png"
+       y="3.4395893"
+       x="0.26457649"
+       height="0.26458314"
+       width="2.116668"
+       id="rect5152"
+       style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:0.896055;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+  </g>
+</svg>

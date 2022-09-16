@@ -190,7 +190,7 @@
            </property>
            <property name="icon">
             <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/find.png</normaloff>:/find.png</iconset>
+             <normaloff>:/find_16px.png</normaloff>:/find_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>

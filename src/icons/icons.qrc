@@ -185,7 +185,8 @@
         <file alias="pythonmacroicon_16px@2x.png">images/pythonmacroicon_16px@2x.png</file>
         <file alias="pythonmacroiconactive_16px.png">images/pythonmacroiconactive_16px.png</file>
         <file alias="pythonmacroiconactive_16px@2x.png">images/pythonmacroiconactive_16px@2x.png</file>
-        <file alias="ruler.png">images/ruler.png</file>
+        <file alias="ruler_24px.png">images/ruler_24px.png</file>
+        <file alias="ruler_24px@2x.png">images/ruler_24px@2x.png</file>
         <file alias="debug_16px.png">images/debug_16px.png</file>
         <file alias="debug_16px@2x.png">images/debug_16px@2x.png</file>
         <file alias="bug.png">images/bug.png</file>

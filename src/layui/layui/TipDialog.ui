@@ -202,7 +202,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../../icons/icons.qrc">:/bulb.png</pixmap>
+         <pixmap resource="../../icons/icons.qrc">:/bulb@2x.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>false</bool>

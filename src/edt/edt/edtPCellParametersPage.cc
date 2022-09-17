@@ -183,7 +183,7 @@ PCellParametersPage::init ()
   }
 
   mp_changed_icon = new QLabel (mp_update_frame);
-  mp_changed_icon->setPixmap (QPixmap (":/warn_16px.png"));
+  mp_changed_icon->setPixmap (QPixmap (":/warn_16px@2x.png"));
   update_frame_layout->addWidget (mp_changed_icon, 0, 0, 1, 1);
 
   mp_update_button = new QToolButton (mp_update_frame);
@@ -210,7 +210,7 @@ PCellParametersPage::init ()
   }
 
   mp_error_icon = new QLabel (mp_update_frame);
-  mp_error_icon->setPixmap (QPixmap (":/warn_16px.png"));
+  mp_error_icon->setPixmap (QPixmap (":/warn_16px@2x.png"));
   error_frame_layout->addWidget (mp_error_icon, 1, 0, 1, 1);
 
   mp_error_label = new QLabel (mp_update_frame);

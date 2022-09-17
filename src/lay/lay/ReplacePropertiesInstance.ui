@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>ReplacePropertiesInstance</class>
- <widget class="QWidget" name="ReplacePropertiesInstance" >
-  <property name="geometry" >
+ <widget class="QWidget" name="ReplacePropertiesInstance">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,35 +10,35 @@
     <height>195</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="margin" >
+  <layout class="QGridLayout">
+   <property name="margin" stdset="0">
     <number>9</number>
    </property>
-   <property name="spacing" >
+   <property name="spacing">
     <number>6</number>
    </property>
-   <item row="0" column="1" >
-    <widget class="QLabel" name="label_56" >
-     <property name="text" >
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_56">
+     <property name="text">
       <string/>
      </property>
-     <property name="pixmap" >
-      <pixmap resource="layResources.qrc" >:/right_16px.png</pixmap>
+     <property name="pixmap">
+      <pixmap resource="../../icons/icons.qrc">:/right_16px@2x.png</pixmap>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="3" >
+   <item row="1" column="0" colspan="3">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeType" >
+     <property name="sizeType">
       <enum>QSizePolicy::Expanding</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>200</width>
        <height>71</height>
@@ -45,19 +46,17 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="0" >
-    <widget class="QLabel" name="label_41" >
-     <property name="text" >
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_41">
+     <property name="text">
       <string>Instance cell name</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="2" >
-    <widget class="QLineEdit" name="instance_cellname" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>0</vsizetype>
+   <item row="0" column="2">
+    <widget class="QLineEdit" name="instance_cellname">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -66,6 +65,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../icons/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

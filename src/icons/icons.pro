@@ -15,4 +15,3 @@ SOURCES = \
 
 RESOURCES = \
     icons.qrc \
-

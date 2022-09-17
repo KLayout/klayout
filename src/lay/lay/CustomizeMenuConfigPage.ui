@@ -195,7 +195,7 @@ For special keys:
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../../icons/icons.qrc">:/find_16px.png</pixmap>
+         <pixmap resource="../../icons/icons.qrc">:/find_16px@2x.png</pixmap>
         </property>
        </widget>
       </item>

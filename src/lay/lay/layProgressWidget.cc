@@ -172,7 +172,7 @@ ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool fw)
   attn_layout->setContentsMargins (0, 0, 0, 0);
 
   QLabel *attn_label1 = new QLabel (attn_frame);
-  attn_label1->setPixmap (QPixmap (QString::fromUtf8 (":/warn_16px.png")));
+  attn_label1->setPixmap (QPixmap (QString::fromUtf8 (":/warn_16px@2x.png")));
   attn_layout->addWidget (attn_label1);
 
   QLabel *attn_label2 = new QLabel (attn_frame);

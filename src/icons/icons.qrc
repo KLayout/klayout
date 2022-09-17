@@ -37,6 +37,7 @@
         <file alias="bright_12px.png">images/bright_12px.png</file>
         <file alias="bright_12px@2x.png">images/bright_12px@2x.png</file>
         <file alias="bulb.png">images/bulb.png</file>
+        <file alias="bulb@2x.png">images/bulb@2x.png</file>
         <file alias="cb_31px.png">images/cb_31px.png</file>
         <file alias="cb_31px@2x.png">images/cb_31px@2x.png</file>
         <file alias="cc_31px.png">images/cc_31px.png</file>
@@ -231,7 +232,9 @@
         <file alias="yellow_flag_16px.png">images/yellow_flag_16px.png</file>
         <file alias="yellow_flag_16px@2x.png">images/yellow_flag_16px@2x.png</file>
         <file alias="salt.png">images/salt.png</file>
+        <file alias="salt@2x.png">images/salt@2x.png</file>
         <file alias="salt_icon.png">images/salt_icon.png</file>
+        <file alias="salt_icon@2x.png">images/salt_icon@2x.png</file>
         <file alias="warn_16px.png">images/warn_16px.png</file>
         <file alias="warn_16px@2x.png">images/warn_16px@2x.png</file>
         <file alias="empty_16px.png">images/empty_16px.png</file>

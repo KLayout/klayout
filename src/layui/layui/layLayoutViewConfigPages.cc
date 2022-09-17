@@ -871,9 +871,9 @@ LayoutViewConfigPage4::update ()
     }
 
 #if QT_VERSION > 0x050000
-    unsigned int dpr = 1; //devicePixelRatio ();
+    double dpr = devicePixelRatio ();
 #else
-    unsigned int dpr = 1;
+    double dpr = 1.0;
 #endif
 
     QFontMetrics fm (font (), this);
@@ -882,21 +882,22 @@ LayoutViewConfigPage4::update ()
     const unsigned int h = rt.height () + 10;
     const unsigned int w = rt.width () + 10;
 
-    QPixmap pxmp (w * dpr, h * dpr);
+    QImage img (w * dpr, h * dpr, QImage::Format_RGB32);
 #if QT_VERSION > 0x050000
-    pxmp.setDevicePixelRatio (dpr);
+    img.setDevicePixelRatio (dpr);
 #endif
 
-    QPainter pxpainter (&pxmp);
-    pxpainter.setPen (QPen (palette ().color (QPalette::Active, QPalette::Text)));
-    pxpainter.setBrush (QBrush (color));
-    QRect r (0, 0, pxmp.width () - 1, pxmp.height () - 1);
-    pxpainter.drawRect (r);
-    pxpainter.setFont (font ());
-    pxpainter.setPen (QPen (text_color));
-    pxpainter.drawText (r, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, text);
+    QPainter painter (&img);
+    painter.setPen (QPen (palette ().color (QPalette::Active, QPalette::Text), 1.0 / dpr));
+    painter.setBrush (QBrush (color));
+    QRectF r (0, 0, w - painter.pen ().widthF (), h - painter.pen ().widthF ());
+    painter.drawRect (r);
+    painter.setFont (font ());
+    painter.setPen (QPen (text_color));
+    painter.drawText (r, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, text);
 
-    (mp_ui->*(cfg4_buttons [i]))->setIconSize (pxmp.size ());
+    QPixmap pxmp = QPixmap::fromImage (img);
+    (mp_ui->*(cfg4_buttons [i]))->setIconSize (QSize (w, h));
     (mp_ui->*(cfg4_buttons [i]))->setIcon (QIcon (pxmp));
 
   }
@@ -1226,9 +1227,9 @@ LayoutViewConfigPage6::update ()
     QColor color1 = palette ().color (QPalette::Active, QPalette::Dark);
 
 #if QT_VERSION > 0x050000
-    unsigned int dpr = 1; //devicePixelRatio ();
+    double dpr = devicePixelRatio ();
 #else
-    unsigned int dpr = 1;
+    double dpr = 1;
 #endif
 
     QImage image (w * dpr, h * dpr, QImage::Format_RGB32);
@@ -1244,19 +1245,14 @@ LayoutViewConfigPage6::update ()
     painter.setBackgroundMode (Qt::TransparentMode);
     painter.drawPixmap (0, 0, w, h, bitmap);
 
-    QPixmap pxmp = QPixmap::fromImage (image); // Qt 4.6.0 workaround
-    QPainter pxpainter (&pxmp);
-    pxpainter.setPen (QPen (palette ().color (QPalette::Active, QPalette::Text)));
-    QRect r (0, 0, pxmp.width () - 1, pxmp.height () - 1);
-    pxpainter.drawRect (r);
-    pxpainter.setFont (font ());
-    pxpainter.drawText (r, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, text);
+    painter.setPen (QPen (palette ().color (QPalette::Active, QPalette::Text), 1.0 / dpr));
+    QRectF r (0, 0, w - painter.pen ().widthF (), h - painter.pen ().widthF ());
+    painter.drawRect (r);
+    painter.setFont (font ());
+    painter.drawText (r, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, text);
 
-#if QT_VERSION > 0x050000
-    pxmp.setDevicePixelRatio (dpr);
-#endif
-
-    (mp_ui->*(cfg6_buttons [i]))->setIconSize (pxmp.size ());
+    QPixmap pxmp = QPixmap::fromImage (image);
+    (mp_ui->*(cfg6_buttons [i]))->setIconSize (QSize (w, h));
     (mp_ui->*(cfg6_buttons [i]))->setIcon (QIcon (pxmp));
 
   }
@@ -1433,7 +1429,7 @@ LayoutViewConfigPage6a::update ()
     const unsigned int w = 26;
 
 #if QT_VERSION > 0x050000
-    unsigned int dpr = 1; //devicePixelRatio ();
+    unsigned int dpr = devicePixelRatio ();
 #else
     unsigned int dpr = 1;
 #endif
@@ -1450,11 +1446,8 @@ LayoutViewConfigPage6a::update ()
     painter.setBackgroundMode (Qt::TransparentMode);
     painter.drawPixmap (0, 0, w, h, bitmap);
 
-    QPixmap pixmap = QPixmap::fromImage (image); // Qt 4.6.0 workaround
-#if QT_VERSION > 0x050000
-    pixmap.setDevicePixelRatio (dpr);
-#endif
-    b->setIconSize (pixmap.size ());
+    QPixmap pixmap = QPixmap::fromImage (image);
+    b->setIconSize (QSize (w, h));
     b->setIcon (QIcon (pixmap));
 
   }

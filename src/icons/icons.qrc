@@ -75,7 +75,8 @@
         <file alias="down_16px@2x.png">images/down_16px@2x.png</file>
         <file alias="downdown_16px.png">images/downdown_16px.png</file>
         <file alias="downdown_16px@2x.png">images/downdown_16px@2x.png</file>
-        <file alias="execmark.png">images/execmark.png</file>
+        <file alias="execmark_16px.png">images/execmark_16px.png</file>
+        <file alias="execmark_16px@2x.png">images/execmark_16px@2x.png</file>
         <file alias="find_16px.png">images/find_16px.png</file>
         <file alias="find_16px@2x.png">images/find_16px@2x.png</file>
         <file alias="fliph_16px.png">images/fliph_16px.png</file>
@@ -101,7 +102,8 @@
         <file alias="import.png">images/import.png</file>
         <file alias="important_16px.png">images/important_16px.png</file>
         <file alias="important_16px@2x.png">images/important_16px@2x.png</file>
-        <file alias="instance.png">images/instance.png</file>
+        <file alias="instance_24px.png">images/instance_24px.png</file>
+        <file alias="instance_24px@2x.png">images/instance_24px@2x.png</file>
         <file alias="invert_16px.png">images/invert_16px.png</file>
         <file alias="invert_16px@2x.png">images/invert_16px@2x.png</file>
         <file alias="lb_31px.png">images/lb_31px.png</file>
@@ -205,8 +207,10 @@
         <file alias="singlestep_16px@2x.png">images/singlestep_16px@2x.png</file>
         <file alias="stop_16px.png">images/stop_16px.png</file>
         <file alias="stop_16px@2x.png">images/stop_16px@2x.png</file>
-        <file alias="techs.png">images/techs.png</file>
-        <file alias="text.png">images/text.png</file>
+        <file alias="techs_24px.png">images/techs_24px.png</file>
+        <file alias="techs_24px@2x.png">images/techs_24px@2x.png</file>
+        <file alias="text_24px.png">images/text_24px.png</file>
+        <file alias="text_24px@2x.png">images/text_24px@2x.png</file>
         <file alias="textdocumenticon_16px.png">images/textdocumenticon_16px.png</file>
         <file alias="textdocumenticon_16px@2x.png">images/textdocumenticon_16px@2x.png</file>
         <file alias="unchecked_16px.png">images/unchecked_16px.png</file>

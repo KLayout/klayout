@@ -271,7 +271,7 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl2 (
   "edt::Service(Boxes)"
 );
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl3 (
-  new edt::PluginDeclaration<edt::TextService> (tl::to_string (tr ("Texts")), "text:edit_mode\t" + tl::to_string (tr ("Text")) + "\t<:text.png>" + tl::to_string (tr ("{Create a text object}")), &get_text_options, &get_text_editor_options_pages),
+  new edt::PluginDeclaration<edt::TextService> (tl::to_string (tr ("Texts")), "text:edit_mode\t" + tl::to_string (tr ("Text")) + "\t<:text_24px.png>" + tl::to_string (tr ("{Create a text object}")), &get_text_options, &get_text_editor_options_pages),
   4012, 
   "edt::Service(Texts)"
 );
@@ -281,7 +281,7 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl4 (
   "edt::Service(Paths)"
 );
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl5 (
-  new edt::PluginDeclaration<edt::InstService> (tl::to_string (tr ("Instances")), "instance:edit_mode\t" + tl::to_string (tr ("Instance")) + "\t<:instance.png>" + tl::to_string (tr ("{Create a cell instance}")), &get_inst_options, &get_inst_editor_options_pages),
+  new edt::PluginDeclaration<edt::InstService> (tl::to_string (tr ("Instances")), "instance:edit_mode\t" + tl::to_string (tr ("Instance")) + "\t<:instance_24px.png>" + tl::to_string (tr ("{Create a cell instance}")), &get_inst_options, &get_inst_editor_options_pages),
   4020, 
   "edt::Service(CellInstances)"
 );

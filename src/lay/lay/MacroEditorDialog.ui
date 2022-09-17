@@ -215,7 +215,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="../../icons/icons.qrc">
-               <normaloff>:/save_all.png</normaloff>:/save_all.png</iconset>
+               <normaloff>:/save_all_16px.png</normaloff>:/save_all_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>Ctrl+Shift+S</string>
@@ -235,7 +235,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="../../icons/icons.qrc">
-               <normaloff>:/save.png</normaloff>:/save.png</iconset>
+               <normaloff>:/save_16px.png</normaloff>:/save_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>Ctrl+S</string>
@@ -1422,7 +1422,7 @@ p, li { white-space: pre-wrap; }
   <action name="actionSaveAll">
    <property name="icon">
     <iconset resource="../../icons/icons.qrc">
-     <normaloff>:/save_all.png</normaloff>:/save_all.png</iconset>
+     <normaloff>:/save_all_16px.png</normaloff>:/save_all_16px.png</iconset>
    </property>
    <property name="text">
     <string>Save All</string>
@@ -1431,7 +1431,7 @@ p, li { white-space: pre-wrap; }
   <action name="actionSave">
    <property name="icon">
     <iconset resource="../../icons/icons.qrc">
-     <normaloff>:/save.png</normaloff>:/save.png</iconset>
+     <normaloff>:/save_16px.png</normaloff>:/save_16px.png</iconset>
    </property>
    <property name="text">
     <string>Save</string>

@@ -193,6 +193,7 @@
         <file alias="debug_16px.png">images/debug_16px.png</file>
         <file alias="debug_16px@2x.png">images/debug_16px@2x.png</file>
         <file alias="bug.png">images/bug.png</file>
+        <file alias="bug@2x.png">images/bug@2x.png</file>
         <file alias="run_16px.png">images/run_16px.png</file>
         <file alias="run_16px@2x.png">images/run_16px@2x.png</file>
         <file alias="runthis_16px.png">images/runthis_16px.png</file>

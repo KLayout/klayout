@@ -121,7 +121,8 @@
         <file alias="m45_24px@2x.png">images/m45_24px@2x.png</file>
         <file alias="m90_24px.png">images/m90_24px.png</file>
         <file alias="m90_24px@2x.png">images/m90_24px@2x.png</file>
-        <file alias="move.png">images/move.png</file>
+        <file alias="move_24px.png">images/move_24px.png</file>
+        <file alias="move_24px@2x.png">images/move_24px@2x.png</file>
         <file alias="move_simple_16px.png">images/move_simple_16px.png</file>
         <file alias="move_simple_16px@2x.png">images/move_simple_16px@2x.png</file>
         <file alias="neutral_12px.png">images/neutral_12px.png</file>
@@ -196,7 +197,8 @@
         <file alias="runthis_16px@2x.png">images/runthis_16px@2x.png</file>
         <file alias="save.png">images/save.png</file>
         <file alias="save_all.png">images/save_all.png</file>
-        <file alias="select.png">images/select.png</file>
+        <file alias="select_24px.png">images/select_24px.png</file>
+        <file alias="select_24px@2x.png">images/select_24px@2x.png</file>
         <file alias="setup_16px.png">images/setup_16px.png</file>
         <file alias="setup_16px@2x.png">images/setup_16px@2x.png</file>
         <file alias="singlestep_16px.png">images/singlestep_16px.png</file>

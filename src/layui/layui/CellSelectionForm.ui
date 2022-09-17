@@ -205,7 +205,7 @@
             <string/>
            </property>
            <property name="pixmap">
-            <pixmap resource="../lay/layResources.qrc">:/right_16px.png</pixmap>
+            <pixmap resource="../../icons/icons.qrc">:/right_16px.png</pixmap>
            </property>
           </widget>
          </item>
@@ -285,7 +285,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../lay/layResources.qrc">
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/find_16px.png</normaloff>:/find_16px.png</iconset>
            </property>
            <property name="autoRaise">
@@ -428,7 +428,7 @@
             <string/>
            </property>
            <property name="pixmap">
-            <pixmap resource="../lay/layResources.qrc">:/right_16px.png</pixmap>
+            <pixmap resource="../../icons/icons.qrc">:/right_16px.png</pixmap>
            </property>
           </widget>
          </item>
@@ -546,7 +546,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../lay/layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -17,7 +17,7 @@
    <property name="spacing">
     <number>6</number>
    </property>
-   <property name="margin">
+   <property name="margin" stdset="0">
     <number>9</number>
    </property>
    <item>
@@ -121,7 +121,7 @@
       <property name="spacing">
        <number>6</number>
       </property>
-      <property name="margin">
+      <property name="margin" stdset="0">
        <number>9</number>
       </property>
       <item>
@@ -149,7 +149,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <layout class="QGridLayout">
-         <property name="margin">
+         <property name="margin" stdset="0">
           <number>15</number>
          </property>
          <property name="spacing">
@@ -161,7 +161,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="layResources.qrc">
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/ct_31px.png</normaloff>:/ct_31px.png</iconset>
            </property>
            <property name="iconSize">
@@ -181,7 +181,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="layResources.qrc">
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/lt_31px.png</normaloff>:/lt_31px.png</iconset>
            </property>
            <property name="iconSize">
@@ -201,7 +201,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="layResources.qrc">
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/rt_31px.png</normaloff>:/rt_31px.png</iconset>
            </property>
            <property name="iconSize">
@@ -221,7 +221,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="layResources.qrc">
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/lc_31px.png</normaloff>:/lc_31px.png</iconset>
            </property>
            <property name="iconSize">
@@ -241,7 +241,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="layResources.qrc">
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/cc_31px.png</normaloff>:/cc_31px.png</iconset>
            </property>
            <property name="iconSize">
@@ -261,7 +261,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="layResources.qrc">
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/rc_31px.png</normaloff>:/rc_31px.png</iconset>
            </property>
            <property name="iconSize">
@@ -281,7 +281,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="layResources.qrc">
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/lb_31px.png</normaloff>:/lb_31px.png</iconset>
            </property>
            <property name="iconSize">
@@ -301,7 +301,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="layResources.qrc">
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/cb_31px.png</normaloff>:/cb_31px.png</iconset>
            </property>
            <property name="iconSize">
@@ -321,7 +321,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="layResources.qrc">
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/rb_31px.png</normaloff>:/rb_31px.png</iconset>
            </property>
            <property name="iconSize">
@@ -366,7 +366,7 @@
       <property name="spacing">
        <number>6</number>
       </property>
-      <property name="margin">
+      <property name="margin" stdset="0">
        <number>0</number>
       </property>
       <item>
@@ -418,7 +418,7 @@
   <tabstop>rb</tabstop>
  </tabstops>
  <resources>
-  <include location="layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections>
   <connection>

@@ -122,7 +122,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../../lay/lay/layResources.qrc">
+             <iconset resource="../../icons/icons.qrc">
               <normaloff>:/del_16px.png</normaloff>:/del_16px.png</iconset>
             </property>
            </widget>
@@ -133,7 +133,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../../lay/lay/layResources.qrc">
+             <iconset resource="../../icons/icons.qrc">
               <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
             </property>
            </widget>
@@ -195,7 +195,7 @@
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
-  <include location="../../lay/lay/layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections>
   <connection>

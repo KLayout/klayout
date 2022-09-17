@@ -175,7 +175,6 @@ SOURCES = \
 
 RESOURCES = layBuildInMacros.qrc \
     layMacroTemplates.qrc \
-  layResources.qrc \
     laySyntaxHighlighters.qrc \
     laySaltTemplates.qrc \
 

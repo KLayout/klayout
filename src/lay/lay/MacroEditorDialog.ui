@@ -171,7 +171,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="../../icons/icons.qrc">
-               <normaloff>:/rename.png</normaloff>:/rename.png</iconset>
+               <normaloff>:/rename_16px.png</normaloff>:/rename_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -191,7 +191,7 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="icon">
               <iconset resource="../../icons/icons.qrc">
-               <normaloff>:/import.png</normaloff>:/import.png</iconset>
+               <normaloff>:/import_16px.png</normaloff>:/import_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -1404,7 +1404,7 @@ p, li { white-space: pre-wrap; }
   <action name="actionRename">
    <property name="icon">
     <iconset resource="../../icons/icons.qrc">
-     <normaloff>:/rename.png</normaloff>:/rename.png</iconset>
+     <normaloff>:/rename_16px.png</normaloff>:/rename_16px.png</iconset>
    </property>
    <property name="text">
     <string>Rename</string>
@@ -1413,7 +1413,7 @@ p, li { white-space: pre-wrap; }
   <action name="actionImport">
    <property name="icon">
     <iconset resource="../../icons/icons.qrc">
-     <normaloff>:/import.png</normaloff>:/import.png</iconset>
+     <normaloff>:/import_16px.png</normaloff>:/import_16px.png</iconset>
    </property>
    <property name="text">
     <string>Import</string>

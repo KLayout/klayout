@@ -498,7 +498,7 @@
           </property>
           <property name="icon">
            <iconset resource="../../lay/lay/layResources.qrc">
-            <normaloff>:/photo.png</normaloff>:/photo.png</iconset>
+            <normaloff>:/photo_16px.png</normaloff>:/photo_16px.png</iconset>
           </property>
          </widget>
         </item>
@@ -563,7 +563,7 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="icon">
            <iconset resource="../../lay/lay/layResources.qrc">
-            <normaloff>:/nophoto.png</normaloff>:/nophoto.png</iconset>
+            <normaloff>:/nophoto_16px.png</normaloff>:/nophoto_16px.png</iconset>
           </property>
          </widget>
         </item>

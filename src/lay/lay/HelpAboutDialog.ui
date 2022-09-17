@@ -137,7 +137,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="layResources.qrc">:/logo.png</pixmap>
+         <pixmap resource="../../icons/icons.qrc">:/logo.png</pixmap>
         </property>
        </widget>
       </item>
@@ -226,7 +226,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections>
   <connection>

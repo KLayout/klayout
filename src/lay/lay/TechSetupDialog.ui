@@ -112,7 +112,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="layResources.qrc">
+             <iconset resource="../../icons/icons.qrc">
               <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
             </property>
             <property name="autoRaise">
@@ -126,7 +126,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="layResources.qrc">
+             <iconset resource="../../icons/icons.qrc">
               <normaloff>:/clear_16px.png</normaloff>:/clear_16px.png</iconset>
             </property>
             <property name="autoRaise">
@@ -303,7 +303,7 @@
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
-  <include location="layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections>
   <connection>

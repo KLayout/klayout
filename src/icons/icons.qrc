@@ -99,7 +99,8 @@
         <file alias="help_16px@2x.png">images/help_16px@2x.png</file>
         <file alias="home_24px.png">images/home_24px.png</file>
         <file alias="home_24px@2x.png">images/home_24px@2x.png</file>
-        <file alias="import.png">images/import.png</file>
+        <file alias="import_16px.png">images/import_16px.png</file>
+        <file alias="import_16px@2x.png">images/import_16px@2x.png</file>
         <file alias="important_16px.png">images/important_16px.png</file>
         <file alias="important_16px@2x.png">images/important_16px@2x.png</file>
         <file alias="instance_24px.png">images/instance_24px.png</file>
@@ -169,7 +170,8 @@
         <file alias="rc_31px@2x.png">images/rc_31px@2x.png</file>
         <file alias="red_flag_16px.png">images/red_flag_16px.png</file>
         <file alias="red_flag_16px@2x.png">images/red_flag_16px@2x.png</file>
-        <file alias="rename.png">images/rename.png</file>
+        <file alias="rename_16px.png">images/rename_16px.png</file>
+        <file alias="rename_16px@2x.png">images/rename_16px@2x.png</file>
         <file alias="replace_16px.png">images/replace_16px.png</file>
         <file alias="replace_16px@2x.png">images/replace_16px@2x.png</file>
         <file alias="replace_all_16px.png">images/replace_all_16px.png</file>

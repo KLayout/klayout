@@ -281,7 +281,6 @@ LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
     mp_image_fg (0),
     m_background (0), m_foreground (0), m_active (0),
     m_oversampling (1),
-    m_dpr (1),
     m_need_redraw (false),
     m_redraw_clearing (false),
     m_redraw_force_update (true),
@@ -330,16 +329,26 @@ LayoutCanvas::~LayoutCanvas ()
 }
 
 #if defined(HAVE_QT)
+double
+LayoutCanvas::dpr ()
+{
+  return widget () ? widget ()->devicePixelRatio () : 1.0;
+}
+#else
+double
+LayoutCanvas::dpr ()
+{
+  return 1.0;
+}
+#endif
+
+#if defined(HAVE_QT)
 void
 LayoutCanvas::init_ui (QWidget *parent)
 {
   lay::ViewObjectUI::init_ui (parent);
 
   if (widget ()) {
-
-#if QT_VERSION > 0x050000
-    m_dpr = widget ()->devicePixelRatio ();
-#endif
 
     widget ()->setObjectName (QString::fromUtf8 ("canvas"));
     widget ()->setBackgroundRole (QPalette::NoRole);
@@ -419,6 +428,7 @@ LayoutCanvas::set_view_ops (std::vector <lay::ViewOp> &view_ops)
 {
   if (view_ops != m_view_ops) {
     m_view_ops.swap (view_ops);
+    m_scaled_view_ops.clear ();
     update_image ();
   }
 }
@@ -428,6 +438,7 @@ LayoutCanvas::set_dither_pattern (const lay::DitherPattern &p)
 {
   if (p != m_dither_pattern) {
     m_dither_pattern = p;
+    m_scaled_dither_pattern.clear ();
     update_image ();
   }
 }
@@ -441,12 +452,52 @@ LayoutCanvas::set_line_styles (const lay::LineStyles &s)
   }
 }
 
+const std::vector <lay::ViewOp> &
+LayoutCanvas::scaled_view_ops (unsigned int lw)
+{
+  if (lw <= 1) {
+    return m_view_ops;
+  }
+
+  auto cached = m_scaled_view_ops.find (lw);
+  if (cached != m_scaled_view_ops.end ()) {
+    return cached->second;
+  }
+
+  std::vector<lay::ViewOp> &scaled_view_ops = m_scaled_view_ops [lw];
+  scaled_view_ops = m_view_ops;
+  for (std::vector<lay::ViewOp>::iterator vo = scaled_view_ops.begin (); vo != scaled_view_ops.end (); ++vo) {
+    vo->width (std::min (31, vo->width () * int (lw)));
+  }
+
+  return scaled_view_ops;
+}
+
+const lay::DitherPattern &
+LayoutCanvas::scaled_dither_pattern (unsigned int lw)
+{
+  if (lw <= 1) {
+    return m_dither_pattern;
+  }
+
+  auto cached = m_scaled_dither_pattern.find (lw);
+  if (cached != m_scaled_dither_pattern.end ()) {
+    return cached->second;
+  }
+
+  lay::DitherPattern &scaled_dither_pattern = m_scaled_dither_pattern [lw];
+  scaled_dither_pattern = m_dither_pattern;
+  // @@@ TODO: scale
+
+  return scaled_dither_pattern;
+}
+
 void
 LayoutCanvas::prepare_drawing ()
 {
   if (m_need_redraw) {
 
-    BitmapViewObjectCanvas::set_size (m_viewport_l.width (), m_viewport_l.height (), 1.0 / double (m_oversampling * m_dpr));
+    BitmapViewObjectCanvas::set_size (m_viewport_l.width (), m_viewport_l.height (), 1.0 / double (m_oversampling * dpr ()));
 
     if (! mp_image ||
         (unsigned int) mp_image->width () != m_viewport_l.width () || 
@@ -482,7 +533,7 @@ LayoutCanvas::prepare_drawing ()
         ++c;
       }
 
-      mp_redraw_thread->commit (m_layers, m_viewport_l, 1.0 / double (m_oversampling * m_dpr));
+      mp_redraw_thread->commit (m_layers, m_viewport_l, 1.0 / double (m_oversampling * dpr ()));
 
       if (tl::verbosity () >= 20) {
         tl::info << "Restored image from cache";
@@ -532,7 +583,7 @@ LayoutCanvas::prepare_drawing ()
       }
 
       if (m_redraw_clearing) {
-        mp_redraw_thread->start (mp_view->synchronous () ? 0 : mp_view->drawing_workers (), m_layers, m_viewport_l, 1.0 / double (m_oversampling * m_dpr), m_redraw_force_update);
+        mp_redraw_thread->start (mp_view->synchronous () ? 0 : mp_view->drawing_workers (), m_layers, m_viewport_l, 1.0 / double (m_oversampling * dpr ()), m_redraw_force_update);
       } else {
         mp_redraw_thread->restart (m_need_redraw_layer);
       }
@@ -603,7 +654,7 @@ LayoutCanvas::paint_event ()
       }
 
       //  render the main bitmaps
-      to_image (m_view_ops, dither_pattern (), line_styles (), background_color (), foreground_color (), active_color (), this, *mp_image, m_viewport_l.width (), m_viewport_l.height ());
+      to_image (scaled_view_ops (m_oversampling * dpr ()), scaled_dither_pattern (m_oversampling * dpr ()), line_styles (), background_color (), foreground_color (), active_color (), this, *mp_image, m_viewport_l.width (), m_viewport_l.height ());
 
       if (mp_image_fg) {
         delete mp_image_fg;
@@ -670,7 +721,7 @@ LayoutCanvas::paint_event ()
     QPainter painter (widget ());
     QImage img = mp_image_fg->to_image ();
 #if QT_VERSION > 0x050000
-    img.setDevicePixelRatio (double (m_dpr));
+    img.setDevicePixelRatio (dpr ());
 #endif
     painter.drawImage (QPoint (0, 0), img);
 
@@ -686,7 +737,7 @@ LayoutCanvas::paint_event ()
       if (m_oversampling == 1) {
         QImage img = full_image.to_image ();
 #if QT_VERSION > 0x050000
-        img.setDevicePixelRatio (double (m_dpr));
+        img.setDevicePixelRatio (dpr ());
 #endif
         painter.drawImage (QPoint (0, 0), img);
       } else {
@@ -695,7 +746,7 @@ LayoutCanvas::paint_event ()
         subsample (full_image, subsampled_image, m_oversampling, m_gamma);
         QImage img = subsampled_image.to_image ();
 #if QT_VERSION > 0x050000
-        img.setDevicePixelRatio (double (m_dpr));
+        img.setDevicePixelRatio (dpr ());
 #endif
         painter.drawImage (QPoint (0, 0), img);
       }
@@ -884,13 +935,6 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
   Viewport vp (width * oversampling, height * oversampling, tb);
   vp.set_global_trans (m_viewport.global_trans ());
 
-  std::vector<lay::ViewOp> view_ops (m_view_ops); 
-  if (linewidth > 1) {
-    for (std::vector<lay::ViewOp>::iterator vo = view_ops.begin (); vo != view_ops.end (); ++vo) {
-      vo->width (std::min (31, vo->width () * linewidth));
-    }
-  }
-
   lay::RedrawThread redraw_thread (&rd_canvas, mp_view);
 
   //  render the layout
@@ -901,7 +945,7 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
   do_render_bg (vp, vo_canvas);
 
   //  paint the layout bitmaps
-  rd_canvas.to_image (view_ops, dither_pattern (), line_styles (), background, foreground, active, this, *vo_canvas.bg_image (), vp.width (), vp.height ());
+  rd_canvas.to_image (scaled_view_ops (linewidth), scaled_dither_pattern (1.0 / resolution + 0.5), line_styles (), background, foreground, active, this, *vo_canvas.bg_image (), vp.width (), vp.height ());
 
   //  subsample current image to provide the background for the foreground objects
   vo_canvas.make_background ();
@@ -939,13 +983,6 @@ LayoutCanvas::image_with_options_mono (unsigned int width, unsigned int height, 
   Viewport vp (width, height, tb);
   vp.set_global_trans (m_viewport.global_trans ());
 
-  std::vector<lay::ViewOp> view_ops (m_view_ops);
-  if (linewidth > 1) {
-    for (std::vector<lay::ViewOp>::iterator vo = view_ops.begin (); vo != view_ops.end (); ++vo) {
-      vo->width (std::min (31, vo->width () * linewidth));
-    }
-  }
-
   lay::RedrawThread redraw_thread (&rd_canvas, mp_view);
 
   //  render the layout
@@ -955,7 +992,7 @@ LayoutCanvas::image_with_options_mono (unsigned int width, unsigned int height, 
   tl::BitmapBuffer img (width, height);
   img.fill (background);
 
-  rd_canvas.to_image_mono (view_ops, dither_pattern (), line_styles (), background, foreground, active, this, img, vp.width (), vp.height ());
+  rd_canvas.to_image_mono (scaled_view_ops (linewidth), scaled_dither_pattern (linewidth), line_styles (), background, foreground, active, this, img, vp.width (), vp.height ());
 
   return img;
 }
@@ -969,13 +1006,13 @@ LayoutCanvas::screenshot ()
   tl::PixelBuffer img (m_viewport.width (), m_viewport.height ());
   img.fill (m_background);
 
-  DetachedViewObjectCanvas vo_canvas (background_color (), foreground_color (), active_color (), m_viewport_l.width (), m_viewport_l.height (), 1.0 / double (m_oversampling * m_dpr), &img);
+  DetachedViewObjectCanvas vo_canvas (background_color (), foreground_color (), active_color (), m_viewport_l.width (), m_viewport_l.height (), 1.0 / double (m_oversampling * dpr ()), &img);
 
   //  and paint the background objects. It uses "img" to paint on.
   do_render_bg (m_viewport_l, vo_canvas);
 
   //  paint the layout bitmaps
-  to_image (m_view_ops, dither_pattern (), line_styles (), background_color (), foreground_color (), active_color (), this, *vo_canvas.bg_image (), m_viewport_l.width (), m_viewport_l.height ());
+  to_image (scaled_view_ops (m_oversampling * dpr ()), scaled_dither_pattern (m_oversampling * dpr ()), line_styles (), background_color (), foreground_color (), active_color (), this, *vo_canvas.bg_image (), m_viewport_l.width (), m_viewport_l.height ());
 
   //  subsample current image to provide the background for the foreground objects
   vo_canvas.make_background ();
@@ -993,8 +1030,8 @@ LayoutCanvas::screenshot ()
 void
 LayoutCanvas::resize_event (unsigned int width, unsigned int height)
 {
-  unsigned int w = width * m_dpr, h = height * m_dpr;
-  unsigned int wl = width * m_oversampling * m_dpr, hl = height * m_oversampling * m_dpr;
+  unsigned int w = width * dpr () + 0.5, h = height * dpr () + 0.5;
+  unsigned int wl = width * m_oversampling * dpr () + 0.5, hl = height * m_oversampling * dpr () + 0.5;
 
   if (m_viewport.width () != w || m_viewport.height () != h ||
       m_viewport_l.width () != wl || m_viewport_l.height () != hl) {
@@ -1003,10 +1040,10 @@ LayoutCanvas::resize_event (unsigned int width, unsigned int height)
     m_image_cache.clear ();
 
     //  set the viewport to the new size
-    m_viewport.set_size (width * m_dpr, height * m_dpr);
-    m_viewport_l.set_size (width * m_oversampling * m_dpr, height * m_oversampling * m_dpr);
+    m_viewport.set_size (width * dpr () + 0.5, height * dpr () + 0.5);
+    m_viewport_l.set_size (width * m_oversampling * dpr () + 0.5, height * m_oversampling * dpr () + 0.5);
 
-    mouse_event_trans (db::DCplxTrans (1.0 / double (m_dpr)) * m_viewport.trans ());
+    mouse_event_trans (db::DCplxTrans (1.0 / dpr ()) * m_viewport.trans ());
     do_redraw_all (true);
     viewport_changed_event ();
 
@@ -1016,7 +1053,7 @@ LayoutCanvas::resize_event (unsigned int width, unsigned int height)
 void 
 LayoutCanvas::update_viewport ()
 {
-  mouse_event_trans (db::DCplxTrans (1.0 / double (m_dpr)) * m_viewport.trans ());
+  mouse_event_trans (db::DCplxTrans (1.0 / dpr ()) * m_viewport.trans ());
   for (service_iterator svc = begin_services (); svc != end_services (); ++svc) {
     (*svc)->update ();
   }

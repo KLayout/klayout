@@ -262,7 +262,12 @@ LineStyleInfo::scale_pattern (unsigned int n)
 
   uint32_t *pp = m_pattern;
   uint32_t pt = m_pattern [0];
+  uint32_t ptr = pt >> 1; // right-rotated by 1
+  if (pt & 1) {
+    ptr |= (1 << (m_width - 1));
+  }
   uint32_t dd = pt;
+  uint32_t ddr = ptr;
 
   memset (m_pattern, 0, sizeof (m_pattern));
 
@@ -271,14 +276,18 @@ LineStyleInfo::scale_pattern (unsigned int n)
   for (unsigned int i = 0; i < m_pattern_stride; ++i) {
     uint32_t dout = 0;
     for (uint32_t m = 1; m != 0; m <<= 1) {
-      if ((dd & 1) != 0) {
+      //  NOTE: we do not fully expand "1" fields with a following "0" as pixel expansion
+      //  will take care of this.
+      if ((dd & 1) != 0 && ((ddr & 1) != 0 || bi == 0)) {
         dout |= m;
       }
       if (++bi == n) {
         bi = 0;
         dd >>= 1;
+        ddr >>= 1;
         if (++b == m_width) {
           dd = pt;
+          ddr = ptr;
           b = 0;
         }
       }

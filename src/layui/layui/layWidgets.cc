@@ -177,19 +177,15 @@ DitherPatternSelectionButton::update_pattern ()
 
   } else {
 
-    lay::DitherPatternInfo dp_info;
+    const lay::DitherPatternInfo *dp_info;
     if (mp_view) {
-      dp_info = mp_view->dither_pattern ().pattern ((unsigned int) m_dither_pattern);
+      dp_info = & mp_view->dither_pattern ().pattern ((unsigned int) m_dither_pattern).scaled (dpr);
     } else {
       static lay::DitherPattern default_pattern;
-      dp_info= default_pattern.pattern ((unsigned int) m_dither_pattern);
+      dp_info = & default_pattern.pattern ((unsigned int) m_dither_pattern).scaled (dpr);
     }
 
-    if (dpr > 1) {
-      dp_info.scale_pattern (dpr);
-    }
-
-    QPushButton::setIcon (dp_info.get_bitmap (rt.width () * dpr, rt.height () * dpr, dpr));
+    QPushButton::setIcon (dp_info->get_bitmap (rt.width () * dpr, rt.height () * dpr, dpr));
 
   }
 }

@@ -207,6 +207,11 @@ public:
   void scale_pattern (unsigned int n);
 
   /**
+   *  @brief Gets a scaled version of the pattern
+   */
+  const DitherPatternInfo &scaled (unsigned int n) const;
+
+  /**
    *  @brief Load from a string
    */
   void from_string (const std::string &s);
@@ -233,6 +238,10 @@ private:
   unsigned int m_pattern_stride;
   unsigned int m_order_index;
   std::string m_name;
+  mutable std::unique_ptr<std::map<unsigned int, DitherPatternInfo> > m_scaled_pattern;
+
+  void set_pattern_impl (const uint32_t *pattern, unsigned int w, unsigned int h);
+  void set_pattern_impl (const uint64_t *pattern, unsigned int w, unsigned int h);
 };
 
 /**

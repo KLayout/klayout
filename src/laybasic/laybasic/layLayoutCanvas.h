@@ -379,7 +379,6 @@ private:
   lay::DitherPattern m_dither_pattern;
   lay::LineStyles m_line_styles;
   std::map<unsigned int, std::vector <lay::ViewOp> > m_scaled_view_ops;
-  std::map<unsigned int, lay::DitherPattern> m_scaled_dither_pattern;
   unsigned int m_oversampling;
   double m_gamma;
 
@@ -420,8 +419,7 @@ private:
   void prepare_drawing ();
   double dpr ();
 
-  const std::vector<ViewOp> &scaled_view_ops(unsigned int lw);
-  const DitherPattern &scaled_dither_pattern(unsigned int lw);
+  const std::vector<ViewOp> &scaled_view_ops (unsigned int lw);
 };
 
 } //  namespace lay

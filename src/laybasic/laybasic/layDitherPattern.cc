@@ -24,6 +24,7 @@
 
 #include "layDitherPattern.h"
 #include "tlAssert.h"
+#include "tlThreads.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -596,13 +597,26 @@ DitherPatternInfo::get_bitmap (int width, int height, int frame_width) const
 
 #endif
 
+static tl::Mutex s_mutex;
+
 void 
 DitherPatternInfo::set_pattern (const uint32_t *pt, unsigned int w, unsigned int h) 
+{
+  {
+    tl::MutexLocker locker (& s_mutex);
+    m_scaled_pattern.reset (0);
+  }
+
+  set_pattern_impl (pt, w, h);
+}
+
+void
+DitherPatternInfo::set_pattern_impl (const uint32_t *pt, unsigned int w, unsigned int h)
 {
   //  pattern size must be 1x1 at least
   if (w == 0 || h == 0) {
     uint32_t zero = 0;
-    set_pattern (&zero, 1, 1);
+    set_pattern_impl (&zero, 1, 1);
     return;
   }
 
@@ -655,10 +669,21 @@ DitherPatternInfo::set_pattern (const uint32_t *pt, unsigned int w, unsigned int
 void
 DitherPatternInfo::set_pattern (const uint64_t *pt, unsigned int w, unsigned int h)
 {
+  {
+    tl::MutexLocker locker (& s_mutex);
+    m_scaled_pattern.reset (0);
+  }
+
+  set_pattern_impl (pt, w, h);
+}
+
+void
+DitherPatternInfo::set_pattern_impl (const uint64_t *pt, unsigned int w, unsigned int h)
+{
   //  pattern size must be 1x1 at least
   if (w == 0 || h == 0) {
     uint32_t zero = 0;
-    set_pattern (&zero, 1, 1);
+    set_pattern_impl (&zero, 1, 1);
     return;
   }
 
@@ -706,6 +731,30 @@ DitherPatternInfo::set_pattern (const uint64_t *pt, unsigned int w, unsigned int
     }
 
   }
+}
+
+const DitherPatternInfo &
+DitherPatternInfo::scaled (unsigned int n) const
+{
+  if (n <= 1) {
+    return *this;
+  }
+
+  tl::MutexLocker locker (& s_mutex);
+
+  if (! m_scaled_pattern.get ()) {
+    m_scaled_pattern.reset (new std::map<unsigned int, DitherPatternInfo> ());
+  }
+
+  auto i = m_scaled_pattern->find (n);
+  if (i != m_scaled_pattern->end ()) {
+    return i->second;
+  }
+
+  DitherPatternInfo &sp = (*m_scaled_pattern) [n];
+  sp = *this;
+  sp.scale_pattern (n);
+  return sp;
 }
 
 void
@@ -802,7 +851,7 @@ DitherPatternInfo::scale_pattern (unsigned int n)
 
   }
 
-  set_pattern (new_pattern.begin ().operator-> (), n * m_width, n * m_height);
+  set_pattern_impl (new_pattern.begin ().operator-> (), n * m_width, n * m_height);
 }
 
 std::string

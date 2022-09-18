@@ -438,7 +438,6 @@ LayoutCanvas::set_dither_pattern (const lay::DitherPattern &p)
 {
   if (p != m_dither_pattern) {
     m_dither_pattern = p;
-    m_scaled_dither_pattern.clear ();
     update_image ();
   }
 }
@@ -471,25 +470,6 @@ LayoutCanvas::scaled_view_ops (unsigned int lw)
   }
 
   return scaled_view_ops;
-}
-
-const lay::DitherPattern &
-LayoutCanvas::scaled_dither_pattern (unsigned int lw)
-{
-  if (lw <= 1) {
-    return m_dither_pattern;
-  }
-
-  auto cached = m_scaled_dither_pattern.find (lw);
-  if (cached != m_scaled_dither_pattern.end ()) {
-    return cached->second;
-  }
-
-  lay::DitherPattern &scaled_dither_pattern = m_scaled_dither_pattern [lw];
-  scaled_dither_pattern = m_dither_pattern;
-  scaled_dither_pattern.scale_pattern (lw);
-
-  return scaled_dither_pattern;
 }
 
 void
@@ -654,7 +634,7 @@ LayoutCanvas::paint_event ()
       }
 
       //  render the main bitmaps
-      to_image (scaled_view_ops (m_oversampling * dpr ()), scaled_dither_pattern (m_oversampling * dpr ()), line_styles (), background_color (), foreground_color (), active_color (), this, *mp_image, m_viewport_l.width (), m_viewport_l.height ());
+      to_image (scaled_view_ops (m_oversampling * dpr ()), dither_pattern (), line_styles (), m_oversampling * dpr (), background_color (), foreground_color (), active_color (), this, *mp_image, m_viewport_l.width (), m_viewport_l.height ());
 
       if (mp_image_fg) {
         delete mp_image_fg;
@@ -684,7 +664,7 @@ LayoutCanvas::paint_event ()
       if (fg_bitmaps () > 0) {
 
         tl::PixelBuffer full_image (*mp_image);
-        bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dither_pattern (), line_styles (), &full_image, m_viewport_l.width (), m_viewport_l.height (), false, &m_mutex);
+        bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dither_pattern (), line_styles (), m_oversampling * dpr (), &full_image, m_viewport_l.width (), m_viewport_l.height (), false, &m_mutex);
 
         //  render the foreground parts ..
         if (m_oversampling == 1) {
@@ -731,7 +711,7 @@ LayoutCanvas::paint_event ()
       full_image.set_transparent (true);
       full_image.fill (0);
 
-      bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dither_pattern (), line_styles (), &full_image, m_viewport_l.width (), m_viewport_l.height (), false, &m_mutex);
+      bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dither_pattern (), line_styles (), m_oversampling * dpr (), &full_image, m_viewport_l.width (), m_viewport_l.height (), false, &m_mutex);
 
       //  render the foreground parts ..
       if (m_oversampling == 1) {
@@ -820,10 +800,10 @@ public:
     if (mp_image_l) {
       unsigned int os = mp_image_l->width () / width;
       blowup (*mp_image, *mp_image_l, os);
-      bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dp, ls, mp_image_l, mp_image_l->width (), mp_image_l->height (), false, 0);
+      bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dp, ls, 1.0 / resolution (), mp_image_l, mp_image_l->width (), mp_image_l->height (), false, 0);
       subsample (*mp_image_l, *mp_image, os, m_gamma);
     } else {
-      bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dp, ls, mp_image, width, height, false, 0);
+      bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dp, ls, 1.0 / resolution (), mp_image, width, height, false, 0);
     }
     clear_fg_bitmaps ();
   }
@@ -945,7 +925,7 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
   do_render_bg (vp, vo_canvas);
 
   //  paint the layout bitmaps
-  rd_canvas.to_image (scaled_view_ops (linewidth), scaled_dither_pattern (1.0 / resolution + 0.5), line_styles (), background, foreground, active, this, *vo_canvas.bg_image (), vp.width (), vp.height ());
+  rd_canvas.to_image (scaled_view_ops (linewidth), dither_pattern (), line_styles (), 1.0 / resolution, background, foreground, active, this, *vo_canvas.bg_image (), vp.width (), vp.height ());
 
   //  subsample current image to provide the background for the foreground objects
   vo_canvas.make_background ();
@@ -992,7 +972,7 @@ LayoutCanvas::image_with_options_mono (unsigned int width, unsigned int height, 
   tl::BitmapBuffer img (width, height);
   img.fill (background);
 
-  rd_canvas.to_image_mono (scaled_view_ops (linewidth), scaled_dither_pattern (linewidth), line_styles (), background, foreground, active, this, img, vp.width (), vp.height ());
+  rd_canvas.to_image_mono (scaled_view_ops (linewidth), dither_pattern (), line_styles (), linewidth, background, foreground, active, this, img, vp.width (), vp.height ());
 
   return img;
 }
@@ -1012,7 +992,7 @@ LayoutCanvas::screenshot ()
   do_render_bg (m_viewport_l, vo_canvas);
 
   //  paint the layout bitmaps
-  to_image (scaled_view_ops (m_oversampling * dpr ()), scaled_dither_pattern (m_oversampling * dpr ()), line_styles (), background_color (), foreground_color (), active_color (), this, *vo_canvas.bg_image (), m_viewport_l.width (), m_viewport_l.height ());
+  to_image (scaled_view_ops (m_oversampling * dpr ()), dither_pattern (), line_styles (), m_oversampling * dpr (), background_color (), foreground_color (), active_color (), this, *vo_canvas.bg_image (), m_viewport_l.width (), m_viewport_l.height ());
 
   //  subsample current image to provide the background for the foreground objects
   vo_canvas.make_background ();

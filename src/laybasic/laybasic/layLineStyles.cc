@@ -24,6 +24,7 @@
 
 #include "layLineStyles.h"
 #include "tlAssert.h"
+#include "tlThreads.h"
 
 #include <ctype.h>
 #include <algorithm>
@@ -200,9 +201,16 @@ LineStyleInfo::get_bitmap (int width, int height) const
 }
 #endif
 
+static tl::Mutex s_mutex;
+
 void
 LineStyleInfo::set_pattern (uint32_t pt, unsigned int w) 
 {
+  {
+    tl::MutexLocker locker (& s_mutex);
+    m_scaled_pattern.reset (0);
+  }
+
   memset (m_pattern, 0, sizeof (m_pattern));
 
   if (w >= 32) {
@@ -242,6 +250,30 @@ LineStyleInfo::set_pattern (uint32_t pt, unsigned int w)
     }
     *pp++ = dout;
   }
+}
+
+const LineStyleInfo &
+LineStyleInfo::scaled (unsigned int n) const
+{
+  if (n <= 1) {
+    return *this;
+  }
+
+  tl::MutexLocker locker (& s_mutex);
+
+  if (! m_scaled_pattern.get ()) {
+    m_scaled_pattern.reset (new std::map<unsigned int, LineStyleInfo> ());
+  }
+
+  auto i = m_scaled_pattern->find (n);
+  if (i != m_scaled_pattern->end ()) {
+    return i->second;
+  }
+
+  LineStyleInfo &sp = (*m_scaled_pattern) [n];
+  sp = *this;
+  sp.scale_pattern (n);
+  return sp;
 }
 
 void
@@ -297,6 +329,8 @@ LineStyleInfo::scale_pattern (unsigned int n)
 
   m_width = w;
 }
+
+
 
 std::string
 LineStyleInfo::to_string () const
@@ -413,11 +447,8 @@ LineStyles::style (unsigned int i) const
 void 
 LineStyles::replace_style (unsigned int i, const LineStyleInfo &p)
 {
-  bool chg = false;
-
   while (i >= count ()) {
     m_styles.push_back (LineStyleInfo ());
-    chg = true;
   }
 
   if (m_styles [i] != p) {
@@ -425,7 +456,6 @@ LineStyles::replace_style (unsigned int i, const LineStyleInfo &p)
       manager ()->queue (this, new ReplaceLineStyleOp (i, m_styles [i], p));
     }
     m_styles [i] = p;
-    chg = true;
   }
 }
 

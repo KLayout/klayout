@@ -1239,8 +1239,7 @@ LayoutViewConfigPage6::update ()
     image.fill (color0.rgb ());
 
     // copying code from layLayerToolbox.cc
-    lay::DitherPatternInfo info = m_pattern.pattern ((unsigned int) s);
-    info.scale_pattern (dpr);
+    const lay::DitherPatternInfo &info = m_pattern.pattern ((unsigned int) s).scaled (dpr);
 
     QBitmap bitmap = info.get_bitmap (w * dpr, h * dpr, dpr);
     QPainter painter (&image);

@@ -169,6 +169,11 @@ public:
   void scale_pattern (unsigned int n);
 
   /**
+   *  @brief Gets a scaled version of the pattern
+   */
+  const LineStyleInfo &scaled (unsigned int n) const;
+
+  /**
    *  @brief Gets the pattern stride
    *
    *  The pattern stride is the number of words each pattern is made of
@@ -209,6 +214,7 @@ private:
   unsigned int m_pattern_stride;
   unsigned int m_order_index;
   std::string m_name;
+  mutable std::unique_ptr<std::map<unsigned int, LineStyleInfo> > m_scaled_pattern;
 };
 
 /**

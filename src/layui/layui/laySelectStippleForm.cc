@@ -105,8 +105,7 @@ SelectStippleForm::update ()
       name = tl::sprintf ("#%d", std::distance (m_pattern.begin (), i));
     }
 
-    lay::DitherPatternInfo dp_info = *i;
-    dp_info.scale_pattern (dpr);
+    const lay::DitherPatternInfo &dp_info = i->scaled (dpr);
     QBitmap bitmap = dp_info.get_bitmap (icon_size.width () * dpr, icon_size.height () * dpr, dpr);
 #if QT_VERSION >= 0x050000
     bitmap.setDevicePixelRatio (dpr);
@@ -124,8 +123,7 @@ SelectStippleForm::update ()
         name = tl::sprintf ("custom #%d", (*i)->order_index ());
       }
 
-      lay::DitherPatternInfo dp_info = **i;
-      dp_info.scale_pattern (dpr);
+      const lay::DitherPatternInfo &dp_info = (*i)->scaled (dpr);
       QBitmap bitmap = dp_info.get_bitmap (icon_size.width () * dpr, icon_size.height () * dpr, dpr);
 #if QT_VERSION >= 0x050000
       bitmap.setDevicePixelRatio (dpr);

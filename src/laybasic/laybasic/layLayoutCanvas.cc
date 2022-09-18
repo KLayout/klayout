@@ -877,11 +877,11 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
   if (oversampling <= 0) {
     oversampling = m_oversampling;
   }
-  if (linewidth <= 0) {
-    linewidth = 1;
-  }
   if (resolution <= 0.0) {
     resolution = 1.0 / oversampling;
+  }
+  if (linewidth <= 0) {
+    linewidth = 1.0 / resolution + 0.5;
   }
   if (! background.is_valid ()) {
     background = background_color ();

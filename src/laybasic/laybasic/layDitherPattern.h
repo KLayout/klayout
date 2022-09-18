@@ -165,6 +165,11 @@ public:
   void set_pattern (const uint32_t *pattern, unsigned int w, unsigned int h);
 
   /**
+   *  @brief Replaces the dither pattern (64 bit version)
+   */
+  void set_pattern (const uint64_t *pattern, unsigned int w, unsigned int h);
+
+  /**
    *  @brief Gets the pattern stride
    *
    *  The pattern stride is the number of words each pattern is made of
@@ -193,6 +198,14 @@ public:
   }
 
   /**
+   *  @brief Scales the existing pattern
+   *
+   *  Each bit is stretch into n bits vertically and horizontally.
+   *  Smart interpolation is attempted.
+   */
+  void scale_pattern (unsigned int n);
+
+  /**
    *  @brief Load from a string
    */
   void from_string (const std::string &s);
@@ -214,7 +227,7 @@ public:
 
 private:
   uint32_t *m_pattern[64];
-  uint32_t m_buffer [64 * 32];
+  uint32_t m_buffer [64 * 64];
   unsigned int m_width, m_height;
   unsigned int m_pattern_stride;
   unsigned int m_order_index;
@@ -313,6 +326,11 @@ public:
    *  plus one thus placing the new pattern at the end of the list in the editor.
    */
   unsigned int add_pattern (const DitherPatternInfo &p);
+
+  /**
+   *  @brief Scales the pattern by the given factor
+   */
+  void scale_pattern (unsigned int n);
 
   /**
    *  @brief Renumber the order indices to numbers increasing by 1 only

@@ -487,7 +487,7 @@ LayoutCanvas::scaled_dither_pattern (unsigned int lw)
 
   lay::DitherPattern &scaled_dither_pattern = m_scaled_dither_pattern [lw];
   scaled_dither_pattern = m_dither_pattern;
-  // @@@ TODO: scale
+  scaled_dither_pattern.scale_pattern (lw);
 
   return scaled_dither_pattern;
 }

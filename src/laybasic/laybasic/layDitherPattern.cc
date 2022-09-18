@@ -654,6 +654,100 @@ DitherPatternInfo::set_pattern (const uint32_t *pt, unsigned int w, unsigned int
   }
 }
 
+void
+DitherPatternInfo::set_pattern (const uint64_t *pt, unsigned int w, unsigned int h)
+{
+  //  pattern size must be 1x1 at least
+  if (w == 0 || h == 0) {
+    uint32_t zero = 0;
+    set_pattern (&zero, 1, 1);
+    return;
+  }
+
+  memset (m_buffer, 0, sizeof (m_buffer));
+
+  if (w >= 64) {
+    w = 64;
+  }
+  m_width = w;
+
+  if (h >= 64) {
+    h = 64;
+  }
+  m_height = h;
+
+  //  compute pattern stride
+  m_pattern_stride = 1;
+  while ((m_pattern_stride * 32) % w != 0) {
+    ++m_pattern_stride;
+  }
+
+  uint32_t *pp = &m_buffer[0];
+
+  for (unsigned int j = 0; j < sizeof (m_pattern) / sizeof (m_pattern [0]); ++j) {
+
+    m_pattern [j] = pp;
+
+    uint64_t din = pt[j % h];
+    uint64_t dd = din;
+
+    unsigned int b = 0;
+    for (unsigned int i = 0; i < m_pattern_stride; ++i) {
+      uint32_t dout = 0;
+      for (uint32_t m = 1; m != 0; m <<= 1) {
+        if ((dd & 1) != 0) {
+          dout |= m;
+        }
+        dd >>= 1;
+        if (++b == w) {
+          dd = din;
+          b = 0;
+        }
+      }
+      *pp++ = dout;
+    }
+
+  }
+}
+
+void
+DitherPatternInfo::scale_pattern (unsigned int n)
+{
+  //  limit scale factor such that the width and height do not get larger than 64
+  while (n * m_width > 64 || n * m_height > 64) {
+    --n;
+  }
+
+  if (n <= 1) {
+    return;
+  }
+
+  std::vector<uint64_t> new_pattern;
+  new_pattern.resize (n * m_height, (uint64_t) 0);
+
+  for (unsigned int r = 0; r < n * m_height; ++r) {
+
+    const uint32_t *p = pattern () [r / n];
+
+    uint64_t d = 0;
+    uint64_t mm = 1;
+    uint32_t m = 1;
+    for (unsigned int c = 0; c < m_width; ++c) {
+      for (unsigned int b = 0; b < n; ++b) {
+        if ((*p & m) != 0) {
+          d |= mm;
+        }
+        mm <<= 1;
+      }
+    }
+
+    new_pattern [r] = d;
+
+  }
+
+  set_pattern (new_pattern.begin ().operator-> (), n * m_width, n * m_height);
+}
+
 std::string
 DitherPatternInfo::to_string () const
 {
@@ -872,6 +966,14 @@ DitherPattern::add_pattern (const DitherPatternInfo &p)
   replace_pattern (index, pdup);
 
   return index;
+}
+
+void
+DitherPattern::scale_pattern (unsigned int n)
+{
+  for (auto i = m_pattern.begin (); i != m_pattern.end (); ++i) {
+    i->scale_pattern (n);
+  }
 }
 
 namespace {

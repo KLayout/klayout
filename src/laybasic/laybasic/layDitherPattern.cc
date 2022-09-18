@@ -725,23 +725,82 @@ DitherPatternInfo::scale_pattern (unsigned int n)
   std::vector<uint64_t> new_pattern;
   new_pattern.resize (n * m_height, (uint64_t) 0);
 
-  for (unsigned int r = 0; r < n * m_height; ++r) {
+  for (unsigned int r = 0; r < m_height; ++r) {
 
-    const uint32_t *p = pattern () [r / n];
+    const uint32_t *p = pattern () [r];
+    const uint32_t *pb = pattern () [(r + m_height - 1) % m_height];
+    const uint32_t *pt = pattern () [(r + 1) % m_height];
 
-    uint64_t d = 0;
-    uint64_t mm = 1;
-    uint32_t m = 1;
-    for (unsigned int c = 0; c < m_width; ++c) {
-      for (unsigned int b = 0; b < n; ++b) {
-        if ((*p & m) != 0) {
-          d |= mm;
+    for (unsigned int l = 0; l < n; ++l) {
+
+      const uint32_t *py1 = (l < n / 2) ? pb : pt;
+      const uint32_t *py2 = (l < n / 2) ? pt : pb;
+
+      uint64_t d = 0;
+      uint64_t mm = 1;
+      uint32_t m = 1;
+      uint32_t mmax = 1 << m_width;
+      uint32_t ml = m_width > 1 ? (1 << (m_width - 1)) : 1;
+      uint32_t mr = m_width > 1 ? 2 : 1;
+
+      for (unsigned int c = 0; c < m_width; ++c) {
+        for (unsigned int b = 0; b < n; ++b) {
+          if ((*p & m) != 0) {
+            d |= mm;
+          } else {
+            //  Try interpolation.
+            //  In the following cases, the center's pixel lower-right quadrant fill be filled:
+            //
+            //  (A1)     (A2)     (A3)
+            //  x 0 0    x 0 0    x 0 1
+            //  0 0 1    0 0 1    0 0 1
+            //  0 1 x    1 1 x    0 1 x
+            //
+            //  (B1)     (B2)
+            //  0 1 x    0 0 0
+            //  0 0 1    1 0 1
+            //  0 1 x    x 1 x
+            //
+            //  For easy implementation, we encode the pattern into a byte k with the following significant bits
+            //  (for lower-right subpixel, mirrored accordingly for the other subpixels)
+            //
+            //  k bits:
+            //  0 1 2
+            //  3 - 4
+            //  5 6 7
+            //
+            uint32_t mx1 = (b < n / 2) ? ml : mr;
+            uint32_t mx2 = (b < n / 2) ? mr : ml;
+            uint8_t k = ((*py2 & mx2) != 0 ? 1   : 0) |
+                        ((*py2 & m)   != 0 ? 2   : 0) |
+                        ((*py2 & mx1) != 0 ? 4   : 0) |
+                        ((*p & mx2)   != 0 ? 8   : 0) |
+                        ((*p & mx1)   != 0 ? 16  : 0) |
+                        ((*py1 & mx2) != 0 ? 32  : 0) |
+                        ((*py1 & m)   != 0 ? 64  : 0) |
+                        ((*py1 & mx1) != 0 ? 128 : 0);
+            if ((k & 0x7e) == 0x50 /*(A1)*/ ||
+                (k & 0x7e) == 0x70 /*(A2)*/ ||
+                (k & 0x7e) == 0x54 /*(A3)*/ ||
+                (k & 0x7b) == 0x52 /*(B1)*/ ||
+                (k & 0x5f) == 0x58 /*(B2)*/) {
+              d |= mm;
+            }
+          }
+          mm <<= 1;
         }
-        mm <<= 1;
+        m <<= 1;
+        if ((ml <<= 1) == mmax) {
+          ml = 1;
+        }
+        if ((mr <<= 1) == mmax) {
+          mr = 1;
+        }
       }
-    }
 
-    new_pattern [r] = d;
+      new_pattern [r * n + l] = d;
+
+    }
 
   }
 

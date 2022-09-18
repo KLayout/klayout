@@ -328,7 +328,7 @@ LayoutCanvas::~LayoutCanvas ()
   clear_fg_bitmaps ();
 }
 
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) && QT_VERSION >= 0x050000
 double
 LayoutCanvas::dpr ()
 {
@@ -700,7 +700,7 @@ LayoutCanvas::paint_event ()
     //  produce the pixmap first and then overdraw with dynamic content.
     QPainter painter (widget ());
     QImage img = mp_image_fg->to_image ();
-#if QT_VERSION > 0x050000
+#if QT_VERSION >= 0x050000
     img.setDevicePixelRatio (dpr ());
 #endif
     painter.drawImage (QPoint (0, 0), img);
@@ -716,7 +716,7 @@ LayoutCanvas::paint_event ()
       //  render the foreground parts ..
       if (m_oversampling == 1) {
         QImage img = full_image.to_image ();
-#if QT_VERSION > 0x050000
+#if QT_VERSION >= 0x050000
         img.setDevicePixelRatio (dpr ());
 #endif
         painter.drawImage (QPoint (0, 0), img);
@@ -725,7 +725,7 @@ LayoutCanvas::paint_event ()
         subsampled_image.set_transparent (true);
         subsample (full_image, subsampled_image, m_oversampling, m_gamma);
         QImage img = subsampled_image.to_image ();
-#if QT_VERSION > 0x050000
+#if QT_VERSION >= 0x050000
         img.setDevicePixelRatio (dpr ());
 #endif
         painter.drawImage (QPoint (0, 0), img);

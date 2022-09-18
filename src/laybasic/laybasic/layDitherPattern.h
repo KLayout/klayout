@@ -135,7 +135,7 @@ public:
    *  @param width The desired width (-1 for default)
    *  @param height The desired height (-1 for default)
    */
-  QBitmap get_bitmap (int width = -1, int height = -1) const;
+  QBitmap get_bitmap (int width = -1, int height = -1, int frame_width = -1) const;
 #endif
 
   /**
@@ -286,19 +286,6 @@ public:
   {
     return m_pattern != p.m_pattern;
   }
-
-#if defined(HAVE_QT)
-  /**
-   *  @brief Gets a monochrome bitmap object for this pattern
-   *
-   *  If the index is not valid, an empty bitmap is returned.
-   *
-   *  @param i The index of the pattern to get the bitmap of
-   *  @param width The desired width (-1 for default)
-   *  @param height The desired height (-1 for default)
-   */
-  QBitmap get_bitmap (unsigned int i, int width = -1, int height = -1) const;
-#endif
 
   /**
    *  @brief Deliver the pattern with the given index

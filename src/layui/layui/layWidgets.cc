@@ -151,9 +151,18 @@ DitherPatternSelectionButton::update_pattern ()
 
   QPushButton::setIconSize (QSize (rt.width (), rt.height ()));
 
+#if QT_VERSION >= 0x050000
+  double dpr = devicePixelRatio ();
+#else
+  double dpr = 1.0;
+#endif
+
   if (m_dither_pattern < 0) {
 
-    QPixmap pixmap (rt.width (), rt.height ());
+    QPixmap pixmap (rt.width () * dpr, rt.height () * dpr);
+#if QT_VERSION >= 0x050000
+    pixmap.setDevicePixelRatio (dpr);
+#endif
     pixmap.fill (QColor (0, 0, 0, 0));
 
     QPainter pxpainter (&pixmap);
@@ -161,19 +170,26 @@ DitherPatternSelectionButton::update_pattern ()
     QColor text_color = palette ().color (QPalette::Active, QPalette::Text);
     pxpainter.setPen (QPen (text_color));
 
-    QRect r (0, 0, pixmap.width () - 1, pixmap.height () - 1);
+    QRectF r (0, 0, rt.width () - pxpainter.pen ().widthF (), rt.height () - pxpainter.pen ().widthF ());
     pxpainter.drawText (r, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, QObject::tr ("None"));
 
     QPushButton::setIcon (QIcon (pixmap));
 
   } else {
 
+    lay::DitherPatternInfo dp_info;
     if (mp_view) {
-      QPushButton::setIcon (QIcon (mp_view->dither_pattern ().get_bitmap ((unsigned int) m_dither_pattern, rt.width (), rt.height ())));
+      dp_info = mp_view->dither_pattern ().pattern ((unsigned int) m_dither_pattern);
     } else {
-      lay::DitherPattern default_pattern;
-      QPushButton::setIcon (QIcon (default_pattern.get_bitmap ((unsigned int) m_dither_pattern, rt.width (), rt.height ())));
+      static lay::DitherPattern default_pattern;
+      dp_info= default_pattern.pattern ((unsigned int) m_dither_pattern);
     }
+
+    if (dpr > 1) {
+      dp_info.scale_pattern (dpr);
+    }
+
+    QPushButton::setIcon (dp_info.get_bitmap (rt.width () * dpr, rt.height () * dpr, dpr));
 
   }
 }
@@ -208,14 +224,17 @@ DitherPatternSelectionButton::update_menu ()
       unsigned int n = palette.stipple_by_index (i);
       if (int (n) < std::distance (patterns.begin (), patterns.end ())) {
       
-        const lay::DitherPatternInfo &info = patterns.begin () [n];
+        lay::DitherPatternInfo info = patterns.begin () [n];
+#if QT_VERSION > 0x050000
+        info.scale_pattern (devicePixelRatio ());
+#endif
 
         std::string name (info.name ());
         if (name.empty ()) {
           name = tl::sprintf ("#%d", n);
         }
 
-        menu ()->addAction (QIcon (info.get_bitmap ()), tl::to_qstring (name), this, SLOT (menu_selected ()))->setData (n);
+        menu ()->addAction (QIcon (info.get_bitmap (-1, -1, devicePixelRatio ())), tl::to_qstring (name), this, SLOT (menu_selected ()))->setData (n);
 
       }
     }

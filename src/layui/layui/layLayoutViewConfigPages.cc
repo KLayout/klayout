@@ -1239,15 +1239,17 @@ LayoutViewConfigPage6::update ()
     image.fill (color0.rgb ());
 
     // copying code from layLayerToolbox.cc
-    QBitmap bitmap = m_pattern.pattern ((unsigned int) s).get_bitmap (w * dpr, h * dpr);
+    lay::DitherPatternInfo info = m_pattern.pattern ((unsigned int) s);
+    info.scale_pattern (dpr);
+
+    QBitmap bitmap = info.get_bitmap (w * dpr, h * dpr, dpr);
     QPainter painter (&image);
     painter.setPen (QPen (color1));
     painter.setBackgroundMode (Qt::TransparentMode);
     painter.drawPixmap (0, 0, w, h, bitmap);
 
-    painter.setPen (QPen (palette ().color (QPalette::Active, QPalette::Text), 1.0 / dpr));
+    painter.setPen (QPen (palette ().color (QPalette::Active, QPalette::Text), 1.0));
     QRectF r (0, 0, w - painter.pen ().widthF (), h - painter.pen ().widthF ());
-    painter.drawRect (r);
     painter.setFont (font ());
     painter.drawText (r, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, text);
 
@@ -1425,22 +1427,16 @@ LayoutViewConfigPage6a::update ()
     QColor color0 = b->palette ().color (QPalette::Normal, b->backgroundRole ());
     QColor color1 = b->palette ().color (QPalette::Normal, b->foregroundRole ());
 
+    //  NOTE: we intentionally don't apply devicePixelRatio here as this way, the
+    //  image looks more like the style applied on the layout canvas.
+
     const unsigned int h = 26;
     const unsigned int w = 26;
 
-#if QT_VERSION > 0x050000
-    unsigned int dpr = devicePixelRatio ();
-#else
-    unsigned int dpr = 1;
-#endif
-
-    QImage image (w * dpr, h * dpr, QImage::Format_RGB32);
+    QImage image (w, h, QImage::Format_RGB32);
     image.fill (color0.rgb ());
-#if QT_VERSION > 0x050000
-    image.setDevicePixelRatio (dpr);
-#endif
 
-    QBitmap bitmap = m_style.style (s).get_bitmap (w * dpr, h * dpr);
+    QBitmap bitmap = m_style.style (s).get_bitmap (w, h);
     QPainter painter (&image);
     painter.setPen (QPen (color1));
     painter.setBackgroundMode (Qt::TransparentMode);

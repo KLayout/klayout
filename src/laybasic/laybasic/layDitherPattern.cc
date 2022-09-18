@@ -560,7 +560,7 @@ DitherPatternInfo::operator< (const DitherPatternInfo &d) const
 
 // TODO including a scaling algorithm in this formula, or give more resolution to the dither
 QBitmap
-DitherPatternInfo::get_bitmap (int width, int height) const
+DitherPatternInfo::get_bitmap (int width, int height, int frame_width) const
 {
   if (height < 0) {
     height = 36;
@@ -568,6 +568,7 @@ DitherPatternInfo::get_bitmap (int width, int height) const
   if (width < 0) {
     width = 34;
   }
+  unsigned int fw = frame_width < 0 ? 1 : frame_width;
 
   const uint32_t * const *p = pattern ();
   unsigned int stride = (width + 7) / 8;
@@ -575,17 +576,14 @@ DitherPatternInfo::get_bitmap (int width, int height) const
   unsigned char *data = new unsigned char[stride * height];
   memset (data, 0x00, size_t (stride * height));
 
-  for (unsigned int i = 1; i < (unsigned int)(height - 1); ++i) {
-    for (unsigned int j = 0; j < stride; ++j) {
-      data [i * stride + j] = 0xff;
+  for (unsigned int i = 0; i < (unsigned int) height; ++i) {
+    uint32_t w = 0xffffffff;
+    if (i >= fw && i < (unsigned int) height - fw) {
+      w = *(p [(height - 1 - i) % m_height]);
     }
-  }
-
-  for (unsigned int i = 0; i < (unsigned int)(height - 4); ++i) {
-    uint32_t w = *(p [(height - 5 - i) % m_height]);
-    for (unsigned int j = 0; j < (unsigned int)(width - 2); ++j) {
-      if (! (w & (1 << (j % m_width)))) {
-        data [stride * (i + 2) + (j + 1) / 8] &= ~(1 << ((j + 1) % 8));
+    for (unsigned int j = 0; j < (unsigned int) width; ++j) {
+      if (j < fw || j >= (unsigned int) width - fw || (w & (1 << (j % m_width))) != 0) {
+        data [stride * i + j / 8] |= (1 << (j % 8));
       }
     }
   }
@@ -964,18 +962,6 @@ DitherPattern::operator= (const DitherPattern &p)
   }
   return *this;
 }
-
-#if defined(HAVE_QT)
-QBitmap
-DitherPattern::get_bitmap (unsigned int i, int width, int height) const
-{
-  if (i < count ()) {
-    return m_pattern [i].get_bitmap (width, height);
-  } else {
-    return m_pattern [1].get_bitmap (width, height);
-  }
-}
-#endif
 
 const DitherPatternInfo &
 DitherPattern::pattern (unsigned int i) const

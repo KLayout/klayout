@@ -220,17 +220,21 @@ DitherPatternSelectionButton::update_menu ()
       unsigned int n = palette.stipple_by_index (i);
       if (int (n) < std::distance (patterns.begin (), patterns.end ())) {
       
-        lay::DitherPatternInfo info = patterns.begin () [n];
 #if QT_VERSION > 0x050000
-        info.scale_pattern (devicePixelRatio ());
+        double dpr = devicePixelRatio ();
+#else
+        double dpr = 1.0;
 #endif
+
+        lay::DitherPatternInfo info = patterns.begin () [n];
+        info.scale_pattern (dpr);
 
         std::string name (info.name ());
         if (name.empty ()) {
           name = tl::sprintf ("#%d", n);
         }
 
-        menu ()->addAction (QIcon (info.get_bitmap (-1, -1, devicePixelRatio ())), tl::to_qstring (name), this, SLOT (menu_selected ()))->setData (n);
+        menu ()->addAction (QIcon (info.get_bitmap (-1, -1, dpr)), tl::to_qstring (name), this, SLOT (menu_selected ()))->setData (n);
 
       }
     }

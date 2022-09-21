@@ -115,7 +115,6 @@ HEADERS += \
   layNetColorizer.h \
   layObjectInstPath.h \
   layParsedLayerSource.h \
-  tlPixelBuffer.h \
   layPixelBufferPainter.h \
   layPlugin.h \
   layRedrawLayerInfo.h \

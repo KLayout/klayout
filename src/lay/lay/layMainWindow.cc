@@ -1529,6 +1529,8 @@ MainWindow::cm_print ()
 
     if (current_view ()) {
 
+      int scale_factor = 3;
+
       //  choose a resolution around 300dpi
       double rf = floor (0.5 + 300.0 / mp_printer->resolution ());
       mp_printer->setResolution (int (floor (0.5 + mp_printer->resolution () * rf)));
@@ -1559,7 +1561,16 @@ MainWindow::cm_print ()
       text_rect.setBottom (text_rect.bottom () - hh / 2);
       text_rect.setTop (text_rect.top () + hh / 2);
 
-      QImage img = current_view ()->get_image_with_options (page_rect.width (), page_rect.height () - 4 * hh, 1, 1, 1.0 / 3.0, Qt::white, Qt::black, Qt::black, db::DBox (), false);
+      QImage img = current_view ()->get_image_with_options (page_rect.width (),
+                                                            page_rect.height () - 4 * hh,
+                                                            scale_factor,
+                                                            1,
+                                                            1.0 / scale_factor,
+                                                            tl::Color (QColor (Qt::white)),  //  foreground
+                                                            tl::Color (QColor (Qt::black)),  //  background
+                                                            tl::Color (QColor (Qt::black)),  //  active
+                                                            db::DBox (),
+                                                            false);
 
       painter.drawImage (QPoint (page_rect.left (), page_rect.top () + hh * 2), img);
       painter.setFont (header_font);
@@ -4255,8 +4266,8 @@ public:
     menu_entries.push_back (lay::separator ("macros_group", at));
 
     at = "@toolbar.end";
-    menu_entries.push_back (lay::menu_item ("cm_prev_display_state", "prev_display_state", at, tl::to_string (QObject::tr ("Back<:/back.png>"))));
-    menu_entries.push_back (lay::menu_item ("cm_next_display_state", "next_display_state", at, tl::to_string (QObject::tr ("Forward<:/forward.png>"))));
+    menu_entries.push_back (lay::menu_item ("cm_prev_display_state", "prev_display_state", at, tl::to_string (QObject::tr ("Back<:/back_24px.png>"))));
+    menu_entries.push_back (lay::menu_item ("cm_next_display_state", "next_display_state", at, tl::to_string (QObject::tr ("Forward<:/forward_24px.png>"))));
     menu_entries.push_back (lay::separator ("toolbar_post_navigation_group", at));
   }
 };

@@ -288,7 +288,7 @@ LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *ma
   QToolButton *sf_next = new QToolButton (mp_search_frame);
   sf_next->setAutoRaise (true);
   sf_next->setToolTip (tr ("Find next"));
-  sf_next->setIcon (QIcon (QString::fromUtf8 (":/find.png")));
+  sf_next->setIcon (QIcon (QString::fromUtf8 (":/find_16px.png")));
   connect (sf_next, SIGNAL (clicked ()), this, SLOT (search_next ()));
   sf_ly->addWidget (sf_next);
 
@@ -348,32 +348,32 @@ LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *ma
   b = new QToolButton (tb);
   b->setObjectName (QString::fromUtf8 ("lcp_dd"));
   ltb->addWidget (b);
-  b->setIcon (QIcon (QString::fromUtf8 (":downdown.png")));
+  b->setIcon (QIcon (QString::fromUtf8 (":downdown_16px.png")));
   connect (b, SIGNAL (clicked ()), this, SLOT (downdown_clicked ()));
 
   b = new QToolButton (tb);
   b->setObjectName (QString::fromUtf8 ("lcp_d"));
   ltb->addWidget (b);
-  b->setIcon (QIcon (QString::fromUtf8 (":down.png")));
+  b->setIcon (QIcon (QString::fromUtf8 (":down_16px.png")));
   connect (b, SIGNAL (clicked ()), this, SLOT (down_clicked ()));
 
   b = new QToolButton (tb);
   b->setObjectName (QString::fromUtf8 ("lcp_u"));
   ltb->addWidget (b);
-  b->setIcon (QIcon (QString::fromUtf8 (":up.png")));
+  b->setIcon (QIcon (QString::fromUtf8 (":up_16px.png")));
   connect (b, SIGNAL (clicked ()), this, SLOT (up_clicked ()));
 
   b = new QToolButton (tb);
   b->setObjectName (QString::fromUtf8 ("lcp_uu"));
   ltb->addWidget (b);
-  b->setIcon (QIcon (QString::fromUtf8 (":upup.png")));
+  b->setIcon (QIcon (QString::fromUtf8 (":upup_16px.png")));
   connect (b, SIGNAL (clicked ()), this, SLOT (upup_clicked ()));
 
   ltb->addStretch (0);
 
   m_no_stipples_label = new QLabel (tb);
   m_no_stipples_label->hide ();
-  m_no_stipples_label->setPixmap (QPixmap (QString::fromUtf8 (":/important.png")));
+  m_no_stipples_label->setPixmap (QPixmap (QString::fromUtf8 (":/warn_16px@2x.png")));
   m_no_stipples_label->setToolTip (tr ("Stipples are disabled - unselect \"View/Show Layers Without Fill\" to re-enable them"));
   ltb->addWidget (m_no_stipples_label);
 

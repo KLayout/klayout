@@ -278,7 +278,7 @@ to show text objects scaled and rotated</string>
        <string>(r0)</string>
       </property>
       <property name="icon" >
-       <iconset resource="layResources.qrc" >:/r0.png</iconset>
+       <iconset resource="layResources.qrc" >:/r0_24px.png</iconset>
       </property>
      </item>
      <item>
@@ -286,7 +286,7 @@ to show text objects scaled and rotated</string>
        <string>(r90)</string>
       </property>
       <property name="icon" >
-       <iconset resource="layResources.qrc" >:/r90.png</iconset>
+       <iconset resource="layResources.qrc" >:/r90_24px.png</iconset>
       </property>
      </item>
      <item>
@@ -294,7 +294,7 @@ to show text objects scaled and rotated</string>
        <string>(r180)</string>
       </property>
       <property name="icon" >
-       <iconset resource="layResources.qrc" >:/r180.png</iconset>
+       <iconset resource="layResources.qrc" >:/r180_24px.png</iconset>
       </property>
      </item>
      <item>
@@ -302,7 +302,7 @@ to show text objects scaled and rotated</string>
        <string>(r270)</string>
       </property>
       <property name="icon" >
-       <iconset resource="layResources.qrc" >:/r270.png</iconset>
+       <iconset resource="layResources.qrc" >:/r270_24px.png</iconset>
       </property>
      </item>
      <item>
@@ -310,7 +310,7 @@ to show text objects scaled and rotated</string>
        <string>(m0)</string>
       </property>
       <property name="icon" >
-       <iconset resource="layResources.qrc" >:/m0.png</iconset>
+       <iconset resource="layResources.qrc" >:/m0_24px.png</iconset>
       </property>
      </item>
      <item>
@@ -318,7 +318,7 @@ to show text objects scaled and rotated</string>
        <string>(m45)</string>
       </property>
       <property name="icon" >
-       <iconset resource="layResources.qrc" >:/m45.png</iconset>
+       <iconset resource="layResources.qrc" >:/m45_24px.png</iconset>
       </property>
      </item>
      <item>
@@ -326,7 +326,7 @@ to show text objects scaled and rotated</string>
        <string>(m90)</string>
       </property>
       <property name="icon" >
-       <iconset resource="layResources.qrc" >:/m90.png</iconset>
+       <iconset resource="layResources.qrc" >:/m90_24px.png</iconset>
       </property>
      </item>
      <item>
@@ -334,7 +334,7 @@ to show text objects scaled and rotated</string>
        <string>(m135)</string>
       </property>
       <property name="icon" >
-       <iconset resource="layResources.qrc" >:/m135.png</iconset>
+       <iconset resource="layResources.qrc" >:/m135_24px.png</iconset>
       </property>
      </item>
     </widget>

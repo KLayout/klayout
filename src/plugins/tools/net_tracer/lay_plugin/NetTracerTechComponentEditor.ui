@@ -97,7 +97,7 @@
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="layResources.qrc" >:/down.png</iconset>
+             <iconset resource="layResources.qrc" >:/down_16px.png</iconset>
             </property>
            </widget>
           </item>
@@ -107,7 +107,7 @@
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="layResources.qrc" >:/del.png</iconset>
+             <iconset resource="layResources.qrc" >:/del_16px.png</iconset>
             </property>
             <property name="shortcut" >
              <string>Del</string>
@@ -139,7 +139,7 @@
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="layResources.qrc" >:/add.png</iconset>
+             <iconset resource="layResources.qrc" >:/add_16px.png</iconset>
             </property>
             <property name="shortcut" >
              <string>Return</string>
@@ -165,7 +165,7 @@
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="layResources.qrc" >:/up.png</iconset>
+             <iconset resource="layResources.qrc" >:/up_16px.png</iconset>
             </property>
            </widget>
           </item>
@@ -247,7 +247,7 @@
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="layResources.qrc" >:/down.png</iconset>
+             <iconset resource="layResources.qrc" >:/down_16px.png</iconset>
             </property>
            </widget>
           </item>
@@ -257,7 +257,7 @@
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="layResources.qrc" >:/del.png</iconset>
+             <iconset resource="layResources.qrc" >:/del_16px.png</iconset>
             </property>
             <property name="shortcut" >
              <string>Del</string>
@@ -288,7 +288,7 @@
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="layResources.qrc" >:/add.png</iconset>
+             <iconset resource="layResources.qrc" >:/add_16px.png</iconset>
             </property>
             <property name="shortcut" >
              <string>Return</string>
@@ -314,7 +314,7 @@
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="layResources.qrc" >:/up.png</iconset>
+             <iconset resource="layResources.qrc" >:/up_16px.png</iconset>
             </property>
            </widget>
           </item>

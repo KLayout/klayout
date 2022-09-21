@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="16"
+   height="16"
+   viewBox="0 0 4.2333332 4.2333335"
+   version="1.1"
+   id="svg1011"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="locked_16px.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1013"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="true"
+     units="px"
+     inkscape:snap-nodes="false"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-nodes="true"
+     inkscape:snap-others="false"
+     inkscape:zoom="17.288462"
+     inkscape:cx="9.3704113"
+     inkscape:cy="9.2836483"
+     inkscape:window-width="1535"
+     inkscape:window-height="1081"
+     inkscape:window-x="215"
+     inkscape:window-y="82"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     width="16px">
+    <inkscape:grid
+       type="xygrid"
+       id="grid1074"
+       spacingx="0.13229167"
+       spacingy="0.13229167"
+       empspacing="2" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1008">
+    <linearGradient
+       id="linearGradient3600">
+      <stop
+         style="stop-color:#ff9f3f;stop-opacity:1;"
+         offset="0"
+         id="stop3602" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="1"
+         id="stop3604" />
+    </linearGradient>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#282828;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.5;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       id="rect851"
+       width="2.3814235"
+       height="1.8522556"
+       x="0.92595309"
+       y="1.9842902"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/locked_16.png"
+       inkscape:export-xdpi="27.093332"
+       inkscape:export-ydpi="27.093332" />
+    <path
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#282828;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:0.52916667;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.5;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       d="M 2.1151107,0.52914383 C 1.5327299,0.53002436 1.0583073,1.0052636 1.0583372,1.5875212 H 1.3227489 C 1.3226967,1.1479851 1.6757762,0.79422389 2.1154027,0.79355558 2.5552748,0.79288388 2.9096446,1.1460399 2.9105354,1.5859173 a 0.13221874,0.13221873 0 0 0 0,7.458e-4 0.13221874,0.13221873 0 0 0 0,8.76e-4 h 0.2644118 a 0.13221874,0.13221873 0 0 0 0,-7.459e-4 0.13221874,0.13221873 0 0 0 0,-0.00146 c -7e-7,-3.734e-4 -1.493e-4,-6.721e-4 -1.493e-4,-0.00102 a 0.13221874,0.13221873 0 0 0 -0.00263,-0.025378 C 3.156584,0.98865151 2.6887841,0.52827088 2.115104,0.52914231 Z"
+       id="path853"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/locked_16.png"
+       inkscape:export-xdpi="27.093332"
+       inkscape:export-ydpi="27.093332" />
+    <rect
+       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#282828;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:0.52916667;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.5;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       id="rect855"
+       width="0.2645832"
+       height="0.26458368"
+       x="1.0583324"
+       y="1.5874988"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/locked_16.png"
+       inkscape:export-xdpi="27.093332"
+       inkscape:export-ydpi="27.093332" />
+    <rect
+       style="fill:none;stroke:#865b26;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect3596"
+       width="1.1947405"
+       height="1.1947405"
+       x="1.4696121"
+       y="1.4781405"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/back.png"
+       inkscape:export-xdpi="27.093315"
+       inkscape:export-ydpi="27.093315" />
+    <rect
+       style="fill:none;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect1620"
+       width="4.2333336"
+       height="4.2333336"
+       x="-4.4408921e-16"
+       y="8.8817842e-16"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/locked_16.png"
+       inkscape:export-xdpi="27.093332"
+       inkscape:export-ydpi="27.093332" />
+    <rect
+       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#282828;fill-opacity:1;fill-rule:nonzero;stroke:#282828;stroke-width:0.264411;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       id="rect1632"
+       width="2.3814235"
+       height="1.8522556"
+       x="0.92595309"
+       y="1.9842902"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/locked_16.png"
+       inkscape:export-xdpi="27.093332"
+       inkscape:export-ydpi="27.093332" />
+    <path
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#282828;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.264411;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       d="M 2.1151107,0.52914383 C 1.5327299,0.53002436 1.0583073,1.0052636 1.0583372,1.5875212 H 1.3227489 C 1.3226967,1.1479851 1.6757762,0.79422389 2.1154027,0.79355558 2.5552748,0.79288388 2.9096446,1.1460399 2.9105354,1.5859173 a 0.13221874,0.13221873 0 0 0 0,7.458e-4 0.13221874,0.13221873 0 0 0 0,8.76e-4 h 0.2644118 a 0.13221874,0.13221873 0 0 0 0,-7.459e-4 0.13221874,0.13221873 0 0 0 0,-0.00146 c -7e-7,-3.734e-4 -1.493e-4,-6.721e-4 -1.493e-4,-0.00102 a 0.13221874,0.13221873 0 0 0 -0.00263,-0.025378 C 3.156584,0.98865151 2.6887841,0.52827088 2.115104,0.52914231 Z"
+       id="path1634"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/locked_16.png"
+       inkscape:export-xdpi="27.093332"
+       inkscape:export-ydpi="27.093332" />
+    <rect
+       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#282828;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.264411;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       id="rect1643"
+       width="0.2645832"
+       height="0.26458368"
+       x="1.0583324"
+       y="1.5874988"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/locked_16.png"
+       inkscape:export-xdpi="27.093332"
+       inkscape:export-ydpi="27.093332" />
+    <rect
+       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#282828;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.264411;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       id="rect1643-8"
+       width="0.2645832"
+       height="0.26458368"
+       x="2.9104166"
+       y="1.5874988"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/locked_16.png"
+       inkscape:export-xdpi="27.093332"
+       inkscape:export-ydpi="27.093332" />
+    <path
+       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#e9e9e9;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.541;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       id="path1668"
+       sodipodi:type="arc"
+       sodipodi:cx="2.1210105"
+       sodipodi:cy="2.6458311"
+       sodipodi:rx="0.26023939"
+       sodipodi:ry="0.26458362"
+       sodipodi:start="0"
+       sodipodi:end="6.2811607"
+       sodipodi:open="true"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/locked_16.png"
+       inkscape:export-xdpi="27.093332"
+       inkscape:export-ydpi="27.093332"
+       sodipodi:arc-type="arc"
+       d="M 2.3812499,2.6458311 A 0.26023939,0.26458362 0 0 1 2.1211423,2.9104147 0.26023939,0.26458362 0 0 1 1.8607713,2.6460989 0.26023939,0.26458362 0 0 1 2.1206154,2.3812478 0.26023939,0.26458362 0 0 1 2.3812494,2.6452954" />
+    <path
+       style="fill:#e9e9e9;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.0746713px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 2.1253533,2.6458306 1.8607705,3.4395812 h 0.5291664 z"
+       id="path1670"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/locked_16.png"
+       inkscape:export-xdpi="27.093332"
+       inkscape:export-ydpi="27.093332" />
+  </g>
+</svg>

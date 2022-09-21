@@ -62,7 +62,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../lay/lay/layResources.qrc">
+         <iconset>
           <normaloff>:/run.png</normaloff>:/run.png</iconset>
         </property>
         <property name="shortcut">
@@ -188,7 +188,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="../../lay/lay/layResources.qrc">:/find.png</pixmap>
+             <pixmap resource="../../icons/icons.qrc">:/find_16px@2x.png</pixmap>
             </property>
            </widget>
           </item>
@@ -247,8 +247,8 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../lay/lay/layResources.qrc">
-           <normaloff>:/down.png</normaloff>:/down.png</iconset>
+          <iconset resource="../../icons/icons.qrc">
+           <normaloff>:/down_16px.png</normaloff>:/down_16px.png</iconset>
          </property>
         </widget>
        </item>
@@ -258,8 +258,8 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset resource="../../lay/lay/layResources.qrc">
-           <normaloff>:/up.png</normaloff>:/up.png</iconset>
+          <iconset resource="../../icons/icons.qrc">
+           <normaloff>:/up_16px.png</normaloff>:/up_16px.png</iconset>
          </property>
         </widget>
        </item>
@@ -355,8 +355,8 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../lay/lay/layResources.qrc">
-            <normaloff>:/up.png</normaloff>:/up.png</iconset>
+           <iconset resource="../../icons/icons.qrc">
+            <normaloff>:/up_16px.png</normaloff>:/up_16px.png</iconset>
           </property>
          </widget>
         </item>
@@ -373,8 +373,8 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../lay/lay/layResources.qrc">
-            <normaloff>:/down.png</normaloff>:/down.png</iconset>
+           <iconset resource="../../icons/icons.qrc">
+            <normaloff>:/down_16px.png</normaloff>:/down_16px.png</iconset>
           </property>
          </widget>
         </item>
@@ -419,7 +419,6 @@
           </property>
           <property name="font">
            <font>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -497,8 +496,8 @@
            <string>Photo</string>
           </property>
           <property name="icon">
-           <iconset resource="../../lay/lay/layResources.qrc">
-            <normaloff>:/photo.png</normaloff>:/photo.png</iconset>
+           <iconset resource="../../icons/icons.qrc">
+            <normaloff>:/photo_16px.png</normaloff>:/photo_16px.png</iconset>
           </property>
          </widget>
         </item>
@@ -511,8 +510,8 @@
            <string>W</string>
           </property>
           <property name="icon">
-           <iconset resource="../../lay/lay/layResources.qrc">
-            <normaloff>:/waived.png</normaloff>:/waived.png</iconset>
+           <iconset resource="../../icons/icons.qrc">
+            <normaloff>:/waived_16px.png</normaloff>:/waived_16px.png</iconset>
           </property>
          </widget>
         </item>
@@ -545,8 +544,8 @@
            <string>Imp</string>
           </property>
           <property name="icon">
-           <iconset resource="../../lay/lay/layResources.qrc">
-            <normaloff>:/important.png</normaloff>:/important.png</iconset>
+           <iconset resource="../../icons/icons.qrc">
+            <normaloff>:/important_16px.png</normaloff>:/important_16px.png</iconset>
           </property>
          </widget>
         </item>
@@ -562,8 +561,8 @@ p, li { white-space: pre-wrap; }
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../lay/lay/layResources.qrc">
-            <normaloff>:/nophoto.png</normaloff>:/nophoto.png</iconset>
+           <iconset resource="../../icons/icons.qrc">
+            <normaloff>:/nophoto_16px.png</normaloff>:/nophoto_16px.png</iconset>
           </property>
          </widget>
         </item>
@@ -644,7 +643,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>photo_pb</tabstop>
  </tabstops>
  <resources>
-  <include location="../../lay/lay/layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -206,8 +206,8 @@
          <item row="1" column="1">
           <widget class="QToolButton" name="down_button">
            <property name="icon">
-            <iconset resource="../lay/layResources.qrc">
-             <normaloff>:/down.png</normaloff>:/down.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/down_16px.png</normaloff>:/down_16px.png</iconset>
            </property>
           </widget>
          </item>
@@ -254,8 +254,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../lay/layResources.qrc">
-             <normaloff>:/up.png</normaloff>:/up.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/up_16px.png</normaloff>:/up_16px.png</iconset>
            </property>
           </widget>
          </item>
@@ -391,8 +391,8 @@
                <string>Clear</string>
               </property>
               <property name="icon">
-               <iconset resource="../lay/layResources.qrc">
-                <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+               <iconset resource="../../icons/icons.qrc">
+                <normaloff>:/clear_16px.png</normaloff>:/clear_16px.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -405,7 +405,7 @@
             <item>
              <widget class="QToolButton" name="invert_button">
               <property name="icon">
-               <iconset resource="../lay/layResources.qrc">
+               <iconset>
                 <normaloff>:/invert.png</normaloff>:/invert.png</iconset>
               </property>
              </widget>
@@ -416,7 +416,7 @@
                <string>Flip h.</string>
               </property>
               <property name="icon">
-               <iconset resource="../lay/layResources.qrc">
+               <iconset>
                 <normaloff>:/fliph.png</normaloff>:/fliph.png</iconset>
               </property>
              </widget>
@@ -427,8 +427,8 @@
                <string>Left</string>
               </property>
               <property name="icon">
-               <iconset resource="../lay/layResources.qrc">
-                <normaloff>:/left.png</normaloff>:/left.png</iconset>
+               <iconset resource="../../icons/icons.qrc">
+                <normaloff>:/left_16px.png</normaloff>:/left_16px.png</iconset>
               </property>
              </widget>
             </item>
@@ -438,8 +438,8 @@
                <string>Right</string>
               </property>
               <property name="icon">
-               <iconset resource="../lay/layResources.qrc">
-                <normaloff>:/right.png</normaloff>:/right.png</iconset>
+               <iconset resource="../../icons/icons.qrc">
+                <normaloff>:/right_16px.png</normaloff>:/right_16px.png</iconset>
               </property>
              </widget>
             </item>
@@ -546,7 +546,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../lay/layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections>
   <connection>

@@ -24,6 +24,7 @@
 
 #include "layDitherPattern.h"
 #include "tlAssert.h"
+#include "tlThreads.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -560,7 +561,7 @@ DitherPatternInfo::operator< (const DitherPatternInfo &d) const
 
 // TODO including a scaling algorithm in this formula, or give more resolution to the dither
 QBitmap
-DitherPatternInfo::get_bitmap (int width, int height) const
+DitherPatternInfo::get_bitmap (int width, int height, int frame_width) const
 {
   if (height < 0) {
     height = 36;
@@ -568,6 +569,7 @@ DitherPatternInfo::get_bitmap (int width, int height) const
   if (width < 0) {
     width = 34;
   }
+  unsigned int fw = frame_width < 0 ? 1 : frame_width;
 
   const uint32_t * const *p = pattern ();
   unsigned int stride = (width + 7) / 8;
@@ -575,17 +577,14 @@ DitherPatternInfo::get_bitmap (int width, int height) const
   unsigned char *data = new unsigned char[stride * height];
   memset (data, 0x00, size_t (stride * height));
 
-  for (unsigned int i = 1; i < (unsigned int)(height - 1); ++i) {
-    for (unsigned int j = 0; j < stride; ++j) {
-      data [i * stride + j] = 0xff;
+  for (unsigned int i = 0; i < (unsigned int) height; ++i) {
+    uint32_t w = 0xffffffff;
+    if (i >= fw && i < (unsigned int) height - fw) {
+      w = *(p [(height - 1 - i) % m_height]);
     }
-  }
-
-  for (unsigned int i = 0; i < (unsigned int)(height - 4); ++i) {
-    uint32_t w = *(p [(height - 5 - i) % m_height]);
-    for (unsigned int j = 0; j < (unsigned int)(width - 2); ++j) {
-      if (! (w & (1 << (j % m_width)))) {
-        data [stride * (i + 2) + (j + 1) / 8] &= ~(1 << ((j + 1) % 8));
+    for (unsigned int j = 0; j < (unsigned int) width; ++j) {
+      if (j < fw || j >= (unsigned int) width - fw || (w & (1 << (j % m_width))) != 0) {
+        data [stride * i + j / 8] |= (1 << (j % 8));
       }
     }
   }
@@ -598,13 +597,26 @@ DitherPatternInfo::get_bitmap (int width, int height) const
 
 #endif
 
+static tl::Mutex s_mutex;
+
 void 
 DitherPatternInfo::set_pattern (const uint32_t *pt, unsigned int w, unsigned int h) 
+{
+  {
+    tl::MutexLocker locker (& s_mutex);
+    m_scaled_pattern.reset (0);
+  }
+
+  set_pattern_impl (pt, w, h);
+}
+
+void
+DitherPatternInfo::set_pattern_impl (const uint32_t *pt, unsigned int w, unsigned int h)
 {
   //  pattern size must be 1x1 at least
   if (w == 0 || h == 0) {
     uint32_t zero = 0;
-    set_pattern (&zero, 1, 1);
+    set_pattern_impl (&zero, 1, 1);
     return;
   }
 
@@ -652,6 +664,194 @@ DitherPatternInfo::set_pattern (const uint32_t *pt, unsigned int w, unsigned int
     }
 
   }
+}
+
+void
+DitherPatternInfo::set_pattern (const uint64_t *pt, unsigned int w, unsigned int h)
+{
+  {
+    tl::MutexLocker locker (& s_mutex);
+    m_scaled_pattern.reset (0);
+  }
+
+  set_pattern_impl (pt, w, h);
+}
+
+void
+DitherPatternInfo::set_pattern_impl (const uint64_t *pt, unsigned int w, unsigned int h)
+{
+  //  pattern size must be 1x1 at least
+  if (w == 0 || h == 0) {
+    uint32_t zero = 0;
+    set_pattern_impl (&zero, 1, 1);
+    return;
+  }
+
+  memset (m_buffer, 0, sizeof (m_buffer));
+
+  if (w >= 64) {
+    w = 64;
+  }
+  m_width = w;
+
+  if (h >= 64) {
+    h = 64;
+  }
+  m_height = h;
+
+  //  compute pattern stride
+  m_pattern_stride = 1;
+  while ((m_pattern_stride * 32) % w != 0) {
+    ++m_pattern_stride;
+  }
+
+  uint32_t *pp = &m_buffer[0];
+
+  for (unsigned int j = 0; j < sizeof (m_pattern) / sizeof (m_pattern [0]); ++j) {
+
+    m_pattern [j] = pp;
+
+    uint64_t din = pt[j % h];
+    uint64_t dd = din;
+
+    unsigned int b = 0;
+    for (unsigned int i = 0; i < m_pattern_stride; ++i) {
+      uint32_t dout = 0;
+      for (uint32_t m = 1; m != 0; m <<= 1) {
+        if ((dd & 1) != 0) {
+          dout |= m;
+        }
+        dd >>= 1;
+        if (++b == w) {
+          dd = din;
+          b = 0;
+        }
+      }
+      *pp++ = dout;
+    }
+
+  }
+}
+
+const DitherPatternInfo &
+DitherPatternInfo::scaled (unsigned int n) const
+{
+  if (n <= 1) {
+    return *this;
+  }
+
+  tl::MutexLocker locker (& s_mutex);
+
+  if (! m_scaled_pattern.get ()) {
+    m_scaled_pattern.reset (new std::map<unsigned int, DitherPatternInfo> ());
+  }
+
+  auto i = m_scaled_pattern->find (n);
+  if (i != m_scaled_pattern->end ()) {
+    return i->second;
+  }
+
+  DitherPatternInfo &sp = (*m_scaled_pattern) [n];
+  sp = *this;
+  sp.scale_pattern (n);
+  return sp;
+}
+
+void
+DitherPatternInfo::scale_pattern (unsigned int n)
+{
+  //  limit scale factor such that the width and height do not get larger than 64
+  while (n * m_width > 64 || n * m_height > 64) {
+    --n;
+  }
+
+  if (n <= 1) {
+    return;
+  }
+
+  std::vector<uint64_t> new_pattern;
+  new_pattern.resize (n * m_height, (uint64_t) 0);
+
+  for (unsigned int r = 0; r < m_height; ++r) {
+
+    const uint32_t *p = pattern () [r];
+    const uint32_t *pb = pattern () [(r + m_height - 1) % m_height];
+    const uint32_t *pt = pattern () [(r + 1) % m_height];
+
+    for (unsigned int l = 0; l < n; ++l) {
+
+      const uint32_t *py1 = (l < n / 2) ? pb : pt;
+      const uint32_t *py2 = (l < n / 2) ? pt : pb;
+
+      uint64_t d = 0;
+      uint64_t mm = 1;
+      uint32_t m = 1;
+      uint32_t mmax = 1 << m_width;
+      uint32_t ml = m_width > 1 ? (1 << (m_width - 1)) : 1;
+      uint32_t mr = m_width > 1 ? 2 : 1;
+
+      for (unsigned int c = 0; c < m_width; ++c) {
+        for (unsigned int b = 0; b < n; ++b) {
+          if ((*p & m) != 0) {
+            d |= mm;
+          } else {
+            //  Try interpolation.
+            //  In the following cases, the center's pixel lower-right quadrant fill be filled:
+            //
+            //  (A1)     (A2)     (A3)
+            //  x 0 0    x 0 0    x 0 1
+            //  0 0 1    0 0 1    0 0 1
+            //  0 1 x    1 1 x    0 1 x
+            //
+            //  (B1)     (B2)
+            //  0 1 x    0 0 0
+            //  0 0 1    1 0 1
+            //  0 1 x    x 1 x
+            //
+            //  For easy implementation, we encode the pattern into a byte k with the following significant bits
+            //  (for lower-right subpixel, mirrored accordingly for the other subpixels)
+            //
+            //  k bits:
+            //  0 1 2
+            //  3 - 4
+            //  5 6 7
+            //
+            uint32_t mx1 = (b < n / 2) ? ml : mr;
+            uint32_t mx2 = (b < n / 2) ? mr : ml;
+            uint8_t k = ((*py2 & mx2) != 0 ? 1   : 0) |
+                        ((*py2 & m)   != 0 ? 2   : 0) |
+                        ((*py2 & mx1) != 0 ? 4   : 0) |
+                        ((*p & mx2)   != 0 ? 8   : 0) |
+                        ((*p & mx1)   != 0 ? 16  : 0) |
+                        ((*py1 & mx2) != 0 ? 32  : 0) |
+                        ((*py1 & m)   != 0 ? 64  : 0) |
+                        ((*py1 & mx1) != 0 ? 128 : 0);
+            if ((k & 0x7e) == 0x50 /*(A1)*/ ||
+                (k & 0x7e) == 0x70 /*(A2)*/ ||
+                (k & 0x7e) == 0x54 /*(A3)*/ ||
+                (k & 0x7b) == 0x52 /*(B1)*/ ||
+                (k & 0x5f) == 0x58 /*(B2)*/) {
+              d |= mm;
+            }
+          }
+          mm <<= 1;
+        }
+        m <<= 1;
+        if ((ml <<= 1) == mmax) {
+          ml = 1;
+        }
+        if ((mr <<= 1) == mmax) {
+          mr = 1;
+        }
+      }
+
+      new_pattern [r * n + l] = d;
+
+    }
+
+  }
+
+  set_pattern_impl (new_pattern.begin ().operator-> (), n * m_width, n * m_height);
 }
 
 std::string
@@ -812,18 +1012,6 @@ DitherPattern::operator= (const DitherPattern &p)
   return *this;
 }
 
-#if defined(HAVE_QT)
-QBitmap
-DitherPattern::get_bitmap (unsigned int i, int width, int height) const
-{
-  if (i < count ()) {
-    return m_pattern [i].get_bitmap (width, height);
-  } else {
-    return m_pattern [1].get_bitmap (width, height);
-  }
-}
-#endif
-
 const DitherPatternInfo &
 DitherPattern::pattern (unsigned int i) const
 {
@@ -872,6 +1060,14 @@ DitherPattern::add_pattern (const DitherPatternInfo &p)
   replace_pattern (index, pdup);
 
   return index;
+}
+
+void
+DitherPattern::scale_pattern (unsigned int n)
+{
+  for (auto i = m_pattern.begin (); i != m_pattern.end (); ++i) {
+    i->scale_pattern (n);
+  }
 }
 
 namespace {

@@ -44,37 +44,37 @@ static QIcon tree_icon_for_format (const lym::Macro *m, bool active)
 {
   //  TODO: create a nice icon for the DSL interpreted scripts
   if (m->interpreter () == lym::Macro::Text) {
-    return QIcon (QString::fromUtf8 (":/textdocumenticon.png"));
+    return QIcon (QString::fromUtf8 (":/textdocumenticon_16px.png"));
   } else if (m->interpreter () == lym::Macro::Ruby) {
     if (m->format () == lym::Macro::PlainTextFormat || m->format () == lym::Macro::PlainTextWithHashAnnotationsFormat) {
       if (active) {
-        return QIcon (QString::fromUtf8 (":/rubymacroiconactive.png"));
+        return QIcon (QString::fromUtf8 (":/rubymacroiconactive_16px.png"));
       } else {
-        return QIcon (QString::fromUtf8 (":/rubymacroicon.png"));
+        return QIcon (QString::fromUtf8 (":/rubymacroicon_16px.png"));
       }
     } else {
       if (active) {
-        return QIcon (QString::fromUtf8 (":/generalmacroiconactive.png"));
+        return QIcon (QString::fromUtf8 (":/generalmacroiconactive_16px.png"));
       } else {
-        return QIcon (QString::fromUtf8 (":/generalmacroicon.png"));
+        return QIcon (QString::fromUtf8 (":/generalmacroicon_16px.png"));
       }
     }
   } else if (m->interpreter () == lym::Macro::Python) {
     if (m->format () == lym::Macro::PlainTextFormat || m->format () == lym::Macro::PlainTextWithHashAnnotationsFormat) {
       if (active) {
-        return QIcon (QString::fromUtf8 (":/pythonmacroiconactive.png"));
+        return QIcon (QString::fromUtf8 (":/pythonmacroiconactive_16px.png"));
       } else {
-        return QIcon (QString::fromUtf8 (":/pythonmacroicon.png"));
+        return QIcon (QString::fromUtf8 (":/pythonmacroicon_16px.png"));
       }
     } else {
       if (active) {
-        return QIcon (QString::fromUtf8 (":/generalmacroiconactive.png"));
+        return QIcon (QString::fromUtf8 (":/generalmacroiconactive_16px.png"));
       } else {
-        return QIcon (QString::fromUtf8 (":/generalmacroicon.png"));
+        return QIcon (QString::fromUtf8 (":/generalmacroicon_16px.png"));
       }
     }
   } else {
-    return QIcon (QString::fromUtf8 (":/defaultmacroicon.png"));
+    return QIcon (QString::fromUtf8 (":/defaultmacroicon_16px.png"));
   }
 }
 
@@ -363,7 +363,7 @@ QVariant MacroTreeModel::data (const QModelIndex &index, int role) const
     if (role == Qt::DisplayRole) {
       return QVariant (tl::to_qstring (mc->display_string ()));
     } else if (role == Qt::DecorationRole) {
-      return QVariant (QIcon (QString::fromUtf8 (":/folder.png")));
+      return QVariant (QIcon (QString::fromUtf8 (":/folder_16px.png")));
     } else if (role == Qt::ToolTipRole) {
       return QVariant (tl::to_qstring (mc->path ()));
     } else if (role == Qt::UserRole) {
@@ -586,6 +586,7 @@ MacroEditorTree::MacroEditorTree (QWidget *parent, const std::string &cat)
   setDragEnabled (true);
   setAcceptDrops (true);
   setDropIndicatorShown (true);
+  setIconSize (QSize (16, 16));
 }
 
 void MacroEditorTree::model_macro_renamed (lym::Macro *macro)

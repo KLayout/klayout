@@ -109,8 +109,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/ct.png</normaloff>:/ct.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/ct_31px.png</normaloff>:/ct_31px.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -129,8 +129,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/lt.png</normaloff>:/lt.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/lt_31px.png</normaloff>:/lt_31px.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -149,8 +149,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/rt.png</normaloff>:/rt.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/rt_31px.png</normaloff>:/rt_31px.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -169,8 +169,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/lc.png</normaloff>:/lc.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/lc_31px.png</normaloff>:/lc_31px.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -189,8 +189,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/cc.png</normaloff>:/cc.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/cc_31px.png</normaloff>:/cc_31px.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -209,8 +209,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/rc.png</normaloff>:/rc.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/rc_31px.png</normaloff>:/rc_31px.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -229,8 +229,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/lb.png</normaloff>:/lb.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/lb_31px.png</normaloff>:/lb_31px.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -249,8 +249,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/cb.png</normaloff>:/cb.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/cb_31px.png</normaloff>:/cb_31px.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -269,8 +269,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/rb.png</normaloff>:/rb.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/rb_31px.png</normaloff>:/rb_31px.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -482,7 +482,7 @@
   <tabstop>adjust_calls_cbx</tabstop>
  </tabstops>
  <resources>
-  <include location="../../lay/lay/layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections>
   <connection>

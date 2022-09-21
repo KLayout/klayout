@@ -151,7 +151,7 @@ PluginDeclaration::implements_editable (std::string &title) const
 bool 
 PluginDeclaration::implements_mouse_mode (std::string &title) const
 {
-  title = "ruler:ruler_mode_group:ruler_templates_group\t" + tl::to_string (tr ("Ruler{Add rulers and annotations}")) + "<:ruler.png>";
+  title = "ruler:ruler_mode_group:ruler_templates_group\t" + tl::to_string (tr ("Ruler{Add rulers and annotations}")) + "<:ruler_24px.png>";
   return true;
 }
 

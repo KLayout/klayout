@@ -67,7 +67,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="layResources.qrc">:/bug.png</pixmap>
+         <pixmap resource="../../icons/icons.qrc">:/bug@2x.png</pixmap>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -126,7 +126,7 @@
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
-  <include location="layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections>
   <connection>

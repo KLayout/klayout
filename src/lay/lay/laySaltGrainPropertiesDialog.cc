@@ -208,7 +208,7 @@ void
 SaltGrainPropertiesDialog::update_screenshot ()
 {
   if (m_grain.screenshot ().isNull ()) {
-    screenshot_config_button->setIcon (QIcon (":/add.png"));
+    screenshot_config_button->setIcon (QIcon (":/add_16px.png"));
   } else {
     QImage img = m_grain.screenshot ();
     if (img.width () == screenshot_config_button->iconSize ().width ()) {

@@ -5390,8 +5390,8 @@ unsigned int
 LayoutViewBase::intrinsic_mouse_modes (std::vector<std::string> *descriptions)
 {
   if (descriptions) {
-    descriptions->push_back ("select\t" + tl::to_string (tr ("Select")) + "<:select.png>");
-    descriptions->push_back ("move\t" + tl::to_string (tr ("Move")) + "<:move.png>");
+    descriptions->push_back ("select\t" + tl::to_string (tr ("Select")) + "<:select_24px.png>");
+    descriptions->push_back ("move\t" + tl::to_string (tr ("Move")) + "<:move_24px.png>");
   }
   return 2;
 }

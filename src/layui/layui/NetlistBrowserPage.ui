@@ -89,7 +89,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
+            <iconset>
              <normaloff>:/back_16.png</normaloff>:/back_16.png</iconset>
            </property>
            <property name="autoRaise">
@@ -103,7 +103,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
+            <iconset>
              <normaloff>:/forward_16.png</normaloff>:/forward_16.png</iconset>
            </property>
            <property name="autoRaise">
@@ -120,8 +120,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/info_16.png</normaloff>:/info_16.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/info_16px.png</normaloff>:/info_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
@@ -134,7 +134,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
+            <iconset>
              <normaloff>:/run.png</normaloff>:/run.png</iconset>
            </property>
            <property name="shortcut">
@@ -189,8 +189,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
-             <normaloff>:/find.png</normaloff>:/find.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/find_16px.png</normaloff>:/find_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
@@ -673,7 +673,7 @@
   <tabstop>find_button</tabstop>
  </tabstops>
  <resources>
-  <include location="../../lay/lay/layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

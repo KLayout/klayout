@@ -193,7 +193,7 @@ LCPDitherPalette::LCPDitherPalette (QWidget *parent, const char *name)
 void
 LCPDitherPalette::create_pixmap_for (LCPActiveLabel *b, int n)
 {
-  const lay::DitherPattern &pattern = !mp_view ? lay::DitherPattern::default_pattern () : mp_view->dither_pattern ();
+  lay::DitherPattern pattern = !mp_view ? lay::DitherPattern::default_pattern () : mp_view->dither_pattern ();
 
   QColor color0 = b->palette ().color (QPalette::Normal, b->backgroundRole ());
   QColor color1 = b->palette ().color (QPalette::Normal, b->foregroundRole ());
@@ -207,23 +207,22 @@ LCPDitherPalette::create_pixmap_for (LCPActiveLabel *b, int n)
   unsigned int dpr = 1;
 #endif
 
+  pattern.scale_pattern (dpr);
+
   QImage image (w * dpr, h * dpr, QImage::Format_RGB32);
   image.fill (color0.rgb ());
 #if QT_VERSION > 0x050000
   image.setDevicePixelRatio (dpr);
 #endif
 
-  // TODO include a scaling algorithm in get_bitmap, because it looks small in highDPI screens
-  QBitmap bitmap = pattern.pattern (n).get_bitmap (w * dpr, h * dpr);
+  QBitmap bitmap = pattern.pattern (n).get_bitmap (w * dpr, h * dpr, dpr);
   QPainter painter (&image);
+
   painter.setPen (QPen (color1));
   painter.setBackgroundMode (Qt::TransparentMode);
   painter.drawPixmap (0, 0, w, h, bitmap);
 
-  QPixmap pixmap = QPixmap::fromImage (image); // Qt 4.6.0 workaround
-#if QT_VERSION > 0x050000
-  pixmap.setDevicePixelRatio (dpr);
-#endif
+  QPixmap pixmap = QPixmap::fromImage (image);
   b->setPixmap (pixmap);
 }
 
@@ -632,31 +631,22 @@ LCPStylePalette::create_pixmap_for_line_style (LCPActiveLabel *b, int n)
   QColor color0 = b->palette ().color (QPalette::Normal, b->backgroundRole ());
   QColor color1 = b->palette ().color (QPalette::Normal, b->foregroundRole ());
 
+  //  NOTE: we intentionally don't apply devicePixelRatio here as this way, the
+  //  image looks more like the style applied on the layout canvas.
+
   const unsigned int h = 14;
   const unsigned int w = 24;
 
-#if QT_VERSION > 0x050000
-  unsigned int dpr = devicePixelRatio ();
-#else
-  unsigned int dpr = 1;
-#endif
-
-  QImage image (dpr * w, dpr * h, QImage::Format_RGB32);
+  QImage image (w, h, QImage::Format_RGB32);
   image.fill (color0.rgb ());
-#if QT_VERSION > 0x050000
-  image.setDevicePixelRatio (dpr);
-#endif
 
-  QBitmap bitmap = styles.style (n).get_bitmap (dpr * w, dpr * h);
+  QBitmap bitmap = styles.style (n).get_bitmap (w, h);
   QPainter painter (&image);
   painter.setPen (QPen (color1));
   painter.setBackgroundMode (Qt::TransparentMode);
   painter.drawPixmap (0, 0, w, h, bitmap);
 
-  QPixmap pixmap = QPixmap::fromImage (image); // Qt 4.6.0 workaround
-#if QT_VERSION > 0x050000
-  pixmap.setDevicePixelRatio (dpr);
-#endif
+  QPixmap pixmap = QPixmap::fromImage (image);
   b->setPixmap (pixmap);
 }
 
@@ -796,7 +786,7 @@ LCPColorPalette::LCPColorPalette (QWidget *parent, const char *name)
     b = new LCPActiveLabel (-10, f);
     b->setFrameStyle (QFrame::Panel | QFrame::Raised);
     b->setLineWidth (1);
-    b->setPixmap (QPixmap (QString::fromUtf8 (":dark.png")));
+    b->setPixmap (QPixmap (QString::fromUtf8 (":dark_12px@2x.png")));
     b->setBackgroundRole (QPalette::Button);
     b->setAlignment (Qt::AlignHCenter);
     connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
@@ -805,7 +795,7 @@ LCPColorPalette::LCPColorPalette (QWidget *parent, const char *name)
     b = new LCPActiveLabel (-11, f);
     b->setFrameStyle (QFrame::Panel | QFrame::Raised);
     b->setLineWidth (1);
-    b->setPixmap (QPixmap (QString::fromUtf8 (":bright.png")));
+    b->setPixmap (QPixmap (QString::fromUtf8 (":bright_12px@2x.png")));
     b->setBackgroundRole (QPalette::Button);
     b->setAlignment (Qt::AlignHCenter);
     connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));
@@ -814,7 +804,7 @@ LCPColorPalette::LCPColorPalette (QWidget *parent, const char *name)
     b = new LCPActiveLabel (-12, f);
     b->setFrameStyle (QFrame::Panel | QFrame::Raised);
     b->setLineWidth (1);
-    b->setPixmap (QPixmap (QString::fromUtf8 (":neutral.png")));
+    b->setPixmap (QPixmap (QString::fromUtf8 (":neutral_12px@2x.png")));
     b->setBackgroundRole (QPalette::Button);
     b->setAlignment (Qt::AlignHCenter);
     connect (b, SIGNAL (clicked (int)), this, SLOT (button_clicked (int)));

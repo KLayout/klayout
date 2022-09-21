@@ -202,7 +202,10 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../../lay/lay/layResources.qrc">:/bulb.png</pixmap>
+         <pixmap resource="../../icons/icons.qrc">:/bulb@2x.png</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -313,7 +316,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../lay/lay/layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections>
   <connection>

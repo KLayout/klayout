@@ -526,23 +526,6 @@ LayerTreeModel::parent (const QModelIndex &index) const
   }
 }
 
-/**
- *  @brief A helper function to create an image from a single bitmap
- */
-static void
-single_bitmap_to_image (const lay::ViewOp &view_op, lay::Bitmap &bitmap,
-                        tl::PixelBuffer *pimage, const lay::DitherPattern &dither_pattern, const lay::LineStyles &line_styles,
-                        unsigned int width, unsigned int height)
-{
-  std::vector <lay::ViewOp> view_ops;
-  view_ops.push_back (view_op);
-
-  std::vector <lay::Bitmap *> pbitmaps;
-  pbitmaps.push_back (&bitmap);
-
-  lay::bitmaps_to_image (view_ops, pbitmaps, dither_pattern, line_styles, pimage, width, height, false, 0);
-}
-
 bool
 LayerTreeModel::is_hidden (const QModelIndex &index) const
 {
@@ -637,12 +620,29 @@ LayerTreeModel::empty_within_view_predicate (const QModelIndex &index) const
   }
 }
 
+/**
+ *  @brief A helper function to create an image from a single bitmap
+ */
+static void
+single_bitmap_to_image (const lay::ViewOp &view_op, lay::Bitmap &bitmap,
+                        tl::PixelBuffer *pimage, const lay::DitherPattern &dither_pattern, const lay::LineStyles &line_styles,
+                        double dpr, unsigned int width, unsigned int height)
+{
+  std::vector <lay::ViewOp> view_ops;
+  view_ops.push_back (view_op);
+
+  std::vector <lay::Bitmap *> pbitmaps;
+  pbitmaps.push_back (&bitmap);
+
+  lay::bitmaps_to_image (view_ops, pbitmaps, dither_pattern, line_styles, dpr, pimage, width, height, false, 0);
+}
+
 LAYUI_PUBLIC
 QIcon
-LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, lay::LayoutViewBase *view, unsigned int w, unsigned int h, unsigned int di_off, bool no_state)
+LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, lay::LayoutViewBase *view, unsigned int w, unsigned int h, double dpr, unsigned int di_off, bool no_state)
 {
-  h = std::max ((unsigned int) 16, h);
-  w = std::max ((unsigned int) 16, w);
+  h = std::max ((unsigned int) 16, h) * dpr + 0.5;
+  w = std::max ((unsigned int) 16, w) * dpr + 0.5;
 
   tl::color_t def_color   = 0x808080;
   tl::color_t fill_color  = iter->has_fill_color (true)  ? iter->eff_fill_color (true)  : def_color;
@@ -701,6 +701,7 @@ LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, l
     //  default line width is 0 for parents and 1 for leafs
     lw = iter->has_children () ? 0 : 1;
   }
+  lw = lw * dpr + 0.5;
 
   int p0 = lw / 2;
   p0 = std::max (0, std::min (int (w / 4 - 1), p0));
@@ -770,19 +771,22 @@ LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, l
   lay::ViewOp::Mode mode = lay::ViewOp::Copy;
 
   //  create fill
-  single_bitmap_to_image (lay::ViewOp (fill_color, mode, 0, iter->eff_dither_pattern (true), di_off), fill, &image, view->dither_pattern (), view->line_styles (), w, h);
+  single_bitmap_to_image (lay::ViewOp (fill_color, mode, 0, iter->eff_dither_pattern (true), di_off), fill, &image, view->dither_pattern (), view->line_styles (), dpr, w, h);
   //  create frame
   if (lw == 0) {
-    single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0 /*solid line*/, 2 /*dotted*/, 0), frame, &image, view->dither_pattern (), view->line_styles (), w, h);
+    single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0 /*solid line*/, 2 /*dotted*/, 0), frame, &image, view->dither_pattern (), view->line_styles (), dpr, w, h);
   } else {
-    single_bitmap_to_image (lay::ViewOp (frame_color, mode, iter->eff_line_style (true), 0, 0, lay::ViewOp::Rect, lw), frame, &image, view->dither_pattern (), view->line_styles (), w, h);
+    single_bitmap_to_image (lay::ViewOp (frame_color, mode, iter->eff_line_style (true), 0, 0, lay::ViewOp::Rect, lw), frame, &image, view->dither_pattern (), view->line_styles (), dpr, w, h);
   }
   //  create text
-  single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0, 0, 0), text, &image, view->dither_pattern (), view->line_styles (), w, h);
+  single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0, 0, 0), text, &image, view->dither_pattern (), view->line_styles (), dpr, w, h);
   //  create vertex
-  single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Cross, iter->marked (true) ? 9/*mark size*/ : 0), vertex, &image, view->dither_pattern (), view->line_styles (),  w, h);
+  single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Cross, iter->marked (true) ? 9/*mark size*/ : 0), vertex, &image, view->dither_pattern (), view->line_styles (), dpr, w, h);
 
-  QPixmap pixmap = QPixmap::fromImage (image.to_image ()); // Qt 4.6.0 workaround
+  QPixmap pixmap = QPixmap::fromImage (image.to_image ());
+#if QT_VERSION >= 0x050000
+  pixmap.setDevicePixelRatio (dpr);
+#endif
   return QIcon (pixmap);
 }
 
@@ -841,7 +845,12 @@ LayerTreeModel::data (const QModelIndex &index, int role) const
         QSize is = icon_size ();
 
         if (animate_visible) {
-          return QVariant (icon_for_layer (iter, mp_view, is.width (), is.height (), di_off));
+#if QT_VERSION >= 0x050000
+          double dpr = mp_parent ? mp_parent->devicePixelRatio () : 1.0;
+#else
+          double dpr = 1.0;
+#endif
+          return QVariant (icon_for_layer (iter, mp_view, is.width (), is.height (), dpr, di_off));
         } else {
           return QVariant (QIcon ());
         }

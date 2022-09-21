@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>BrowserDialog</class>
- <widget class="QDialog" name="BrowserDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="BrowserDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,22 +10,20 @@
     <height>461</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Browser</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="margin" stdset="0">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="lay::BrowserPanel" native="1" name="browser" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>13</hsizetype>
-       <vsizetype>7</vsizetype>
+    <widget class="lay::BrowserPanel" name="browser" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -32,26 +31,26 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="frame" >
-     <property name="frameShape" >
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>0</number>
-      </property>
-      <property name="spacing" >
+     <layout class="QHBoxLayout">
+      <property name="spacing">
        <number>6</number>
+      </property>
+      <property name="margin" stdset="0">
+       <number>0</number>
       </property>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -60,8 +59,8 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="close_pb" >
-        <property name="text" >
+       <widget class="QPushButton" name="close_pb">
+        <property name="text">
          <string>Close</string>
         </property>
        </widget>
@@ -78,9 +77,7 @@
    <header>layBrowserPanel.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="layResources.qrc" />
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>close_pb</sender>
@@ -88,11 +85,11 @@
    <receiver>BrowserDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>469</x>
      <y>422</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>257</x>
      <y>222</y>
     </hint>

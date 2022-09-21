@@ -48,7 +48,7 @@
       <string/>
      </property>
      <property name="pixmap" >
-      <pixmap resource="layResources.qrc" >:/right.png</pixmap>
+      <pixmap resource="layResources.qrc" >:/right_16px@2x.png</pixmap>
      </property>
     </widget>
    </item>
@@ -58,7 +58,7 @@
       <string/>
      </property>
      <property name="pixmap" >
-      <pixmap resource="layResources.qrc" >:/right.png</pixmap>
+      <pixmap resource="layResources.qrc" >:/right_16px@2x.png</pixmap>
      </property>
     </widget>
    </item>
@@ -78,7 +78,7 @@
       <string/>
      </property>
      <property name="pixmap" >
-      <pixmap resource="layResources.qrc" >:/right.png</pixmap>
+      <pixmap resource="layResources.qrc" >:/right_16px@2x.png</pixmap>
      </property>
     </widget>
    </item>

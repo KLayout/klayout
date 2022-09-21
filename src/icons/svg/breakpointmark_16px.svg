@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="16"
+   height="16"
+   viewBox="0 0 4.2333332 4.2333335"
+   version="1.1"
+   id="svg1011"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="breakpointmark_16px.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1013"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="true"
+     units="px"
+     inkscape:snap-nodes="true"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-nodes="true"
+     inkscape:snap-others="false"
+     inkscape:zoom="24.449577"
+     inkscape:cx="1.9632242"
+     inkscape:cy="12.822308"
+     inkscape:window-width="1535"
+     inkscape:window-height="1081"
+     inkscape:window-x="74"
+     inkscape:window-y="82"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     width="16px">
+    <inkscape:grid
+       type="xygrid"
+       id="grid1074"
+       spacingx="0.13229167"
+       spacingy="0.13229167"
+       empspacing="2" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1008">
+    <linearGradient
+       id="linearGradient3600">
+      <stop
+         style="stop-color:#ff9f3f;stop-opacity:1;"
+         offset="0"
+         id="stop3602" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="1"
+         id="stop3604" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4100"
+       id="radialGradient4098-4"
+       cx="822.32922"
+       cy="188.59673"
+       fx="822.32922"
+       fy="188.59673"
+       r="22.520477"
+       gradientTransform="matrix(0.11699721,-9.033806e-8,6.3489762e-8,0.08157167,-94.349742,-13.529951)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient4100">
+      <stop
+         id="stop4102"
+         offset="0"
+         style="stop-color:#ff5a5a;stop-opacity:1;" />
+      <stop
+         id="stop4104"
+         offset="1"
+         style="stop-color:#cc0000;stop-opacity:1;" />
+    </linearGradient>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:none;stroke:#865b26;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect3596"
+       width="4.2333326"
+       height="4.2333331"
+       x="3.3333333e-07"
+       y="3.3333333e-07"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/back.png"
+       inkscape:export-xdpi="27.093315"
+       inkscape:export-ydpi="27.093315" />
+    <rect
+       transform="scale(-1,1)"
+       inkscape:export-ydpi="25.400002"
+       inkscape:export-xdpi="25.400002"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/images/breakpointmark.png"
+       y="4.9119961e-07"
+       x="-4.2333331"
+       height="4.2333326"
+       width="4.2333326"
+       id="rect3308-5"
+       style="fill:none;stroke:#865b26;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.695473;fill:url(#radialGradient4098-4);fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.216374;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       id="path3322-0"
+       sodipodi:cx="2.1239774"
+       sodipodi:cy="2.1165581"
+       sodipodi:rx="1.7514321"
+       sodipodi:ry="1.7444521"
+       sodipodi:start="0"
+       sodipodi:end="6.2826057"
+       sodipodi:open="true"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/images/breakpointmark.png"
+       inkscape:export-xdpi="25.400002"
+       inkscape:export-ydpi="25.400002"
+       sodipodi:arc-type="arc"
+       d="M 3.8754095,2.1165581 A 1.7514321,1.7444521 0 0 1 2.1242312,3.8610102 1.7514321,1.7444521 0 0 1 0.37254544,2.1170636 1.7514321,1.7444521 0 0 1 2.1232161,0.37210612 1.7514321,1.7444521 0 0 1 3.8754092,2.115547" />
+  </g>
+</svg>

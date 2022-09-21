@@ -2204,6 +2204,12 @@ MainService::cm_tap ()
 #if defined(HAVE_QT)
   //  TODO: what to do here in Qt-less case? Store results in configuration so they can be retrieved externally?
 
+#if QT_VERSION >= 0x050000
+  double dpr = view_widget->devicePixelRatio ();
+#else
+  double dpr = 1.0;
+#endif
+
   std::unique_ptr<QMenu> menu (new QMenu (view_widget));
   menu->show ();
 
@@ -2213,7 +2219,7 @@ MainService::cm_tap ()
   QPoint mp = view ()->canvas ()->widget ()->mapToGlobal (QPoint (mp_local.x (), mp_local.y ()));
 
   for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = tapped_layers.begin (); l != tapped_layers.end (); ++l) {
-    QAction *a = menu->addAction (lay::LayerTreeModel::icon_for_layer (*l, view (), icon_size, icon_size, 0, true), tl::to_qstring ((*l)->display_string (view (), true, true /*with source*/)));
+    QAction *a = menu->addAction (lay::LayerTreeModel::icon_for_layer (*l, view (), icon_size, icon_size, dpr, 0, true), tl::to_qstring ((*l)->display_string (view (), true, true /*with source*/)));
     a->setData (int (l - tapped_layers.begin ()));
   }
 

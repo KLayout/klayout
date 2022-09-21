@@ -39,6 +39,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <memory>
 
 namespace lay
 {
@@ -134,8 +135,9 @@ public:
    *
    *  @param width The desired width (-1 for default)
    *  @param height The desired height (-1 for default)
+   *  @param frame_width The width of the frame around the bitmap
    */
-  QBitmap get_bitmap (int width = -1, int height = -1) const;
+  QBitmap get_bitmap (int width = -1, int height = -1, int frame_width = -1) const;
 #endif
 
   /**
@@ -163,6 +165,11 @@ public:
    *  first w bits of these words are taken.
    */
   void set_pattern (const uint32_t *pattern, unsigned int w, unsigned int h);
+
+  /**
+   *  @brief Replaces the dither pattern (64 bit version)
+   */
+  void set_pattern (const uint64_t *pattern, unsigned int w, unsigned int h);
 
   /**
    *  @brief Gets the pattern stride
@@ -193,6 +200,19 @@ public:
   }
 
   /**
+   *  @brief Scales the existing pattern
+   *
+   *  Each bit is stretch into n bits vertically and horizontally.
+   *  Smart interpolation is attempted.
+   */
+  void scale_pattern (unsigned int n);
+
+  /**
+   *  @brief Gets a scaled version of the pattern
+   */
+  const DitherPatternInfo &scaled (unsigned int n) const;
+
+  /**
    *  @brief Load from a string
    */
   void from_string (const std::string &s);
@@ -214,11 +234,15 @@ public:
 
 private:
   uint32_t *m_pattern[64];
-  uint32_t m_buffer [64 * 32];
+  uint32_t m_buffer [64 * 64];
   unsigned int m_width, m_height;
   unsigned int m_pattern_stride;
   unsigned int m_order_index;
   std::string m_name;
+  mutable std::unique_ptr<std::map<unsigned int, DitherPatternInfo> > m_scaled_pattern;
+
+  void set_pattern_impl (const uint32_t *pattern, unsigned int w, unsigned int h);
+  void set_pattern_impl (const uint64_t *pattern, unsigned int w, unsigned int h);
 };
 
 /**
@@ -274,19 +298,6 @@ public:
     return m_pattern != p.m_pattern;
   }
 
-#if defined(HAVE_QT)
-  /**
-   *  @brief Gets a monochrome bitmap object for this pattern
-   *
-   *  If the index is not valid, an empty bitmap is returned.
-   *
-   *  @param i The index of the pattern to get the bitmap of
-   *  @param width The desired width (-1 for default)
-   *  @param height The desired height (-1 for default)
-   */
-  QBitmap get_bitmap (unsigned int i, int width = -1, int height = -1) const;
-#endif
-
   /**
    *  @brief Deliver the pattern with the given index
    *
@@ -313,6 +324,11 @@ public:
    *  plus one thus placing the new pattern at the end of the list in the editor.
    */
   unsigned int add_pattern (const DitherPatternInfo &p);
+
+  /**
+   *  @brief Scales the pattern by the given factor
+   */
+  void scale_pattern (unsigned int n);
 
   /**
    *  @brief Renumber the order indices to numbers increasing by 1 only

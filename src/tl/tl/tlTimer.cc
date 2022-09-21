@@ -28,7 +28,7 @@
 #if defined(_MSC_VER) || defined(_WIN32)
 #  include <Windows.h>
 #  include <Psapi.h>
-#elif defined(__MACH__)
+#elif defined(__MACH__) && defined(__APPLE__)
 #  include <mach/clock.h>
 #  include <mach/mach.h>
 #  include <sys/times.h>
@@ -54,7 +54,7 @@ const uint64_t ft_to_epoch_offset = uint64_t (11644473600) * uint64_t (10000000)
 void current_utc_time (struct timespec *ts)
 {
 
-#if defined(__MACH__)
+#if defined(__MACH__) && defined(__APPLE__)
 
   clock_serv_t cclock;
   mach_timespec_t mts;
@@ -86,7 +86,7 @@ void current_utc_time (struct timespec *ts)
 
 static int64_t ms_time ()
 {
-#if defined(__MACH__)
+#if defined(__MACH__) && defined(__APPLE__)
 
   clock_serv_t cclock;
   mach_timespec_t mts;

@@ -200,8 +200,8 @@
           <string>(r0)</string>
          </property>
          <property name="icon">
-          <iconset resource="../../lay/lay/layResources.qrc">
-           <normaloff>:/r0.png</normaloff>:/r0.png</iconset>
+          <iconset resource="../../icons/icons.qrc">
+           <normaloff>:/r0_24px.png</normaloff>:/r0_24px.png</iconset>
          </property>
         </item>
         <item>
@@ -209,8 +209,8 @@
           <string>(r90)</string>
          </property>
          <property name="icon">
-          <iconset resource="../../lay/lay/layResources.qrc">
-           <normaloff>:/r90.png</normaloff>:/r90.png</iconset>
+          <iconset resource="../../icons/icons.qrc">
+           <normaloff>:/r90_24px.png</normaloff>:/r90_24px.png</iconset>
          </property>
         </item>
         <item>
@@ -218,8 +218,8 @@
           <string>(r180)</string>
          </property>
          <property name="icon">
-          <iconset resource="../../lay/lay/layResources.qrc">
-           <normaloff>:/r180.png</normaloff>:/r180.png</iconset>
+          <iconset resource="../../icons/icons.qrc">
+           <normaloff>:/r180_24px.png</normaloff>:/r180_24px.png</iconset>
          </property>
         </item>
         <item>
@@ -227,8 +227,8 @@
           <string>(r270)</string>
          </property>
          <property name="icon">
-          <iconset resource="../../lay/lay/layResources.qrc">
-           <normaloff>:/r270.png</normaloff>:/r270.png</iconset>
+          <iconset resource="../../icons/icons.qrc">
+           <normaloff>:/r270_24px.png</normaloff>:/r270_24px.png</iconset>
          </property>
         </item>
         <item>
@@ -236,8 +236,8 @@
           <string>(m0)</string>
          </property>
          <property name="icon">
-          <iconset resource="../../lay/lay/layResources.qrc">
-           <normaloff>:/m0.png</normaloff>:/m0.png</iconset>
+          <iconset resource="../../icons/icons.qrc">
+           <normaloff>:/m0_24px.png</normaloff>:/m0_24px.png</iconset>
          </property>
         </item>
         <item>
@@ -245,8 +245,8 @@
           <string>(m45)</string>
          </property>
          <property name="icon">
-          <iconset resource="../../lay/lay/layResources.qrc">
-           <normaloff>:/m45.png</normaloff>:/m45.png</iconset>
+          <iconset resource="../../icons/icons.qrc">
+           <normaloff>:/m45_24px.png</normaloff>:/m45_24px.png</iconset>
          </property>
         </item>
         <item>
@@ -254,8 +254,8 @@
           <string>(m90)</string>
          </property>
          <property name="icon">
-          <iconset resource="../../lay/lay/layResources.qrc">
-           <normaloff>:/m90.png</normaloff>:/m90.png</iconset>
+          <iconset resource="../../icons/icons.qrc">
+           <normaloff>:/m90_24px.png</normaloff>:/m90_24px.png</iconset>
          </property>
         </item>
         <item>
@@ -263,8 +263,8 @@
           <string>(m135)</string>
          </property>
          <property name="icon">
-          <iconset resource="../../lay/lay/layResources.qrc">
-           <normaloff>:/m135.png</normaloff>:/m135.png</iconset>
+          <iconset resource="../../icons/icons.qrc">
+           <normaloff>:/m135_24px.png</normaloff>:/m135_24px.png</iconset>
          </property>
         </item>
        </widget>
@@ -350,7 +350,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../../lay/lay/layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

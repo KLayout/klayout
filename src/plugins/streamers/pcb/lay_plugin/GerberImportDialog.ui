@@ -229,7 +229,7 @@ surface.</string>
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="layResources.qrc" >:/down.png</iconset>
+             <iconset resource="icons.qrc" >:/down_16px.png</iconset>
             </property>
             <property name="shortcut" >
              <string>Ctrl+Down</string>
@@ -245,7 +245,7 @@ surface.</string>
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="layResources.qrc" >:/up.png</iconset>
+             <iconset resource="icons.qrc" >:/up_16px.png</iconset>
             </property>
             <property name="shortcut" >
              <string>Ctrl+Up</string>
@@ -261,7 +261,7 @@ surface.</string>
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="layResources.qrc" >:/clear.png</iconset>
+             <iconset resource="icons.qrc" >:/clear_16px.png</iconset>
             </property>
             <property name="shortcut" >
              <string>Del</string>
@@ -277,7 +277,7 @@ surface.</string>
              <string>...</string>
             </property>
             <property name="icon" >
-             <iconset resource="layResources.qrc" >:/add.png</iconset>
+             <iconset resource="icons.qrc" >:/add_16px.png</iconset>
             </property>
             <property name="shortcut" >
              <string>Return</string>
@@ -586,7 +586,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/up.png</iconset>
+          <iconset resource="icons.qrc" >:/up_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Ctrl+Up</string>
@@ -602,7 +602,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/add.png</iconset>
+          <iconset resource="icons.qrc" >:/add_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Return</string>
@@ -618,7 +618,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/down.png</iconset>
+          <iconset resource="icons.qrc" >:/down_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Ctrl+Down</string>
@@ -634,7 +634,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/clear.png</iconset>
+          <iconset resource="icons.qrc" >:/clear_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Del</string>
@@ -704,7 +704,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/down.png</iconset>
+          <iconset resource="icons.qrc" >:/down_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Ctrl+Down</string>
@@ -720,7 +720,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/up.png</iconset>
+          <iconset resource="icons.qrc" >:/up_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Ctrl+Up</string>
@@ -736,7 +736,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/clear.png</iconset>
+          <iconset resource="icons.qrc" >:/clear_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Del</string>
@@ -752,7 +752,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/add.png</iconset>
+          <iconset resource="icons.qrc" >:/add_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Return</string>
@@ -791,7 +791,7 @@ For "bottom" mounting, the top PCB layer will be assigned to the last layout lay
           <string>...</string>
          </property>
          <property name="icon" >
-          <iconset resource="layResources.qrc" >:/clear.png</iconset>
+          <iconset resource="icons.qrc" >:/clear_16px.png</iconset>
          </property>
          <property name="shortcut" >
           <string>Del</string>
@@ -1278,7 +1278,7 @@ Alternatively the transformation (imported to existing layout) can be specified 
       <string>Next</string>
      </property>
      <property name="icon" >
-      <iconset resource="layResources.qrc" >:/forward.png</iconset>
+      <iconset resource="icons.qrc" >:/forward_24px.png</iconset>
      </property>
     </widget>
    </item>
@@ -1302,7 +1302,7 @@ Alternatively the transformation (imported to existing layout) can be specified 
       <string>Back</string>
      </property>
      <property name="icon" >
-      <iconset resource="layResources.qrc" >:/back.png</iconset>
+      <iconset resource="icons.qrc" >:/back_24px.png</iconset>
      </property>
     </widget>
    </item>
@@ -1461,7 +1461,7 @@ Alternatively the transformation (imported to existing layout) can be specified 
   <tabstop>cancel_pb</tabstop>
  </tabstops>
  <resources>
-  <include location="layResources.qrc" />
+  <include location="icons.qrc" />
  </resources>
  <connections>
   <connection>

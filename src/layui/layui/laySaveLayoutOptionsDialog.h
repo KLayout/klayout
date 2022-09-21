@@ -48,7 +48,7 @@ namespace Ui
 {
   class SaveLayoutAsOptionsDialog;
   class SaveLayoutOptionsDialog;
-};
+}
 
 namespace lay
 {

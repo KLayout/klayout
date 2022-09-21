@@ -106,7 +106,7 @@
             <string>Add</string>
            </property>
            <property name="icon" >
-            <iconset resource="layResources.qrc" >:/add.png</iconset>
+            <iconset resource="layResources.qrc" >:/add_16px.png</iconset>
            </property>
            <property name="checkable" >
             <bool>true</bool>
@@ -136,7 +136,7 @@
             <string>Delete</string>
            </property>
            <property name="icon" >
-            <iconset resource="layResources.qrc" >:/clear.png</iconset>
+            <iconset resource="layResources.qrc" >:/clear_16px.png</iconset>
            </property>
            <property name="checkable" >
             <bool>true</bool>
@@ -166,7 +166,7 @@
             <string>Move</string>
            </property>
            <property name="icon" >
-            <iconset resource="layResources.qrc" >:/move_simple.png</iconset>
+            <iconset resource="layResources.qrc" >:/move_simple_16px.png</iconset>
            </property>
            <property name="checkable" >
             <bool>true</bool>

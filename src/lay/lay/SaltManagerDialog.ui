@@ -76,8 +76,8 @@
                  <string>Mark</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="layResources.qrc">
-                  <normaloff>:/marked_16.png</normaloff>:/marked_16.png</iconset>
+                 <iconset resource="../../icons/icons.qrc">
+                  <normaloff>:/marked_16px.png</normaloff>:/marked_16px.png</iconset>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>
@@ -103,7 +103,7 @@
                  <string/>
                 </property>
                 <property name="pixmap">
-                 <pixmap resource="layResources.qrc">:/find.png</pixmap>
+                 <pixmap resource="../../icons/icons.qrc">:/find_16px@2x.png</pixmap>
                 </property>
                </widget>
               </item>
@@ -219,7 +219,6 @@
                <widget class="QLabel" name="label_6">
                 <property name="font">
                  <font>
-                  <weight>75</weight>
                   <bold>true</bold>
                  </font>
                 </property>
@@ -237,8 +236,8 @@
                  <string>...</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="layResources.qrc">
-                  <normaloff>:/empty_16.png</normaloff>:/empty_16.png</iconset>
+                 <iconset resource="../../icons/icons.qrc">
+                  <normaloff>:/empty_16px.png</normaloff>:/empty_16px.png</iconset>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>
@@ -375,8 +374,8 @@
                  <string>Mark</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="layResources.qrc">
-                  <normaloff>:/marked_16.png</normaloff>:/marked_16.png</iconset>
+                 <iconset resource="../../icons/icons.qrc">
+                  <normaloff>:/marked_16px.png</normaloff>:/marked_16px.png</iconset>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>
@@ -402,7 +401,7 @@
                  <string/>
                 </property>
                 <property name="pixmap">
-                 <pixmap resource="layResources.qrc">:/find.png</pixmap>
+                 <pixmap resource="../../icons/icons.qrc">:/find_16px@2x.png</pixmap>
                 </property>
                </widget>
               </item>
@@ -518,7 +517,6 @@
                <widget class="QLabel" name="label_9">
                 <property name="font">
                  <font>
-                  <weight>75</weight>
                   <bold>true</bold>
                  </font>
                 </property>
@@ -536,8 +534,8 @@
                  <string>...</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="layResources.qrc">
-                  <normaloff>:/empty_16.png</normaloff>:/empty_16.png</iconset>
+                 <iconset resource="../../icons/icons.qrc">
+                  <normaloff>:/empty_16px.png</normaloff>:/empty_16px.png</iconset>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>
@@ -690,7 +688,7 @@
                  <string/>
                 </property>
                 <property name="pixmap">
-                 <pixmap resource="layResources.qrc">:/find.png</pixmap>
+                 <pixmap resource="../../icons/icons.qrc">:/find_16px@2x.png</pixmap>
                 </property>
                </widget>
               </item>
@@ -804,8 +802,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>537</width>
-                       <height>284</height>
+                       <width>334</width>
+                       <height>213</height>
                       </rect>
                      </property>
                      <layout class="QGridLayout" name="gridLayout_2">
@@ -828,7 +826,7 @@
                          <string/>
                         </property>
                         <property name="pixmap">
-                         <pixmap resource="layResources.qrc">:/salt.png</pixmap>
+                         <pixmap resource="../../icons/icons.qrc">:/salt@2x.png</pixmap>
                         </property>
                        </widget>
                       </item>
@@ -843,7 +841,6 @@
                         <property name="font">
                          <font>
                           <pointsize>9</pointsize>
-                          <weight>50</weight>
                           <bold>false</bold>
                          </font>
                         </property>
@@ -871,7 +868,7 @@
 &lt;table&gt;
   &lt;tr&gt;&lt;td&gt;The &quot;Install New Packages&quot; tab to install a package&lt;br/&gt;from an external repository&lt;/td&gt;&lt;/tr&gt;
   &lt;tr&gt;&lt;/tr&gt;
-  &lt;tr&gt;&lt;td&gt;The &lt;a href=&quot;:add&quot;&gt;&lt;img src=&quot;:/add.png&quot;&gt;&lt;/a&gt; button to create a new package&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;The &lt;a href=&quot;:add&quot;&gt;&lt;img src=&quot;:/add_16px@2x.png&quot;&gt;&lt;/a&gt; button to create a new package&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
 &lt;/body&gt;&lt;/html&gt;</string>
                         </property>
@@ -942,7 +939,6 @@
             <widget class="QLabel" name="label">
              <property name="font">
               <font>
-               <weight>75</weight>
                <bold>true</bold>
               </font>
              </property>
@@ -960,8 +956,8 @@
               <string>Edit</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/edit_16px.png</normaloff>:/edit_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -1012,8 +1008,8 @@
              <string>Remove Package</string>
             </property>
             <property name="icon">
-             <iconset resource="layResources.qrc">
-              <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+             <iconset resource="../../icons/icons.qrc">
+              <normaloff>:/clear_16px.png</normaloff>:/clear_16px.png</iconset>
             </property>
            </widget>
           </item>
@@ -1036,8 +1032,8 @@
              <string>Create (Edit) Package</string>
             </property>
             <property name="icon">
-             <iconset resource="layResources.qrc">
-              <normaloff>:/add.png</normaloff>:/add.png</iconset>
+             <iconset resource="../../icons/icons.qrc">
+              <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
             </property>
             <property name="autoDefault">
              <bool>false</bool>
@@ -1061,8 +1057,8 @@
   </layout>
   <action name="actionNew">
    <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/add.png</normaloff>:/add.png</iconset>
+    <iconset resource="../../icons/icons.qrc">
+     <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -1073,8 +1069,8 @@
   </action>
   <action name="actionDelete">
    <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+    <iconset resource="../../icons/icons.qrc">
+     <normaloff>:/clear_16px.png</normaloff>:/clear_16px.png</iconset>
    </property>
    <property name="text">
     <string>Remove Package</string>
@@ -1133,8 +1129,8 @@
   </action>
   <action name="actionCreatePackage">
    <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/add.png</normaloff>:/add.png</iconset>
+    <iconset resource="../../icons/icons.qrc">
+     <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
    </property>
    <property name="text">
     <string>Create (edit) package</string>
@@ -1178,7 +1174,7 @@
   <tabstop>scrollArea</tabstop>
  </tabstops>
  <resources>
-  <include location="layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections>
   <connection>

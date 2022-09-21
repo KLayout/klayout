@@ -62,9 +62,9 @@ static QIcon icon_for_circuit ()
 static QIcon icon_for_status (db::NetlistCrossReference::Status status)
 {
   if (status == db::NetlistCrossReference::NoMatch || status == db::NetlistCrossReference::Mismatch) {
-    return QIcon (":/error2_16.png");
+    return QIcon (":/error2_16px.png");
   } else if (status == db::NetlistCrossReference::MatchWithWarning || status == db::NetlistCrossReference::Skipped) {
-    return QIcon (":/warn_16.png");
+    return QIcon (":/warn_16px.png");
   } else {
     return QIcon ();
   }
@@ -392,7 +392,7 @@ NetlistBrowserTreeModel::headerData (int section, Qt::Orientation /*orientation*
       return tr ("Circuits");
     }
   } else if (role == Qt::DecorationRole && section == m_status_column) {
-    return QIcon (":/info_16.png");
+    return QIcon (":/info_16px.png");
   }
   return QVariant ();
 }

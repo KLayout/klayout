@@ -165,11 +165,11 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
     if (! le) {
       //  ignore
     } else if (le->severity == db::NetlistCrossReference::Error) {
-      return QIcon (QString::fromUtf8 (":/error_16.png"));
+      return QIcon (QString::fromUtf8 (":/error_16px.png"));
     } else if (le->severity == db::NetlistCrossReference::Warning) {
-      return QIcon (QString::fromUtf8 (":/warn_16.png"));
+      return QIcon (QString::fromUtf8 (":/warn_16px.png"));
     } else if (le->severity == db::NetlistCrossReference::Info) {
-      return QIcon (QString::fromUtf8 (":/info_16.png"));
+      return QIcon (QString::fromUtf8 (":/info_16px.png"));
     }
 
   } else if (role == Qt::DisplayRole) {

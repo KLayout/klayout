@@ -261,7 +261,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../../../lay/lay/layResources.qrc">
-          <normaloff>:/fit_left.png</normaloff>:/fit_left.png</iconset>
+          <normaloff>:/fit_left_24px.png</normaloff>:/fit_left_24px.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -281,7 +281,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../../../lay/lay/layResources.qrc">
-          <normaloff>:/fit_front.png</normaloff>:/fit_front.png</iconset>
+          <normaloff>:/fit_front_24px.png</normaloff>:/fit_front_24px.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -301,7 +301,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../../../lay/lay/layResources.qrc">
-          <normaloff>:/fit_right.png</normaloff>:/fit_right.png</iconset>
+          <normaloff>:/fit_right_24px.png</normaloff>:/fit_right_24px.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -321,7 +321,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../../../lay/lay/layResources.qrc">
-          <normaloff>:/fit_back.png</normaloff>:/fit_back.png</iconset>
+          <normaloff>:/fit_back_24px.png</normaloff>:/fit_back_24px.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -341,7 +341,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../../../lay/lay/layResources.qrc">
-          <normaloff>:/fit_top.png</normaloff>:/fit_top.png</iconset>
+          <normaloff>:/fit_top_24px.png</normaloff>:/fit_top_24px.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -361,7 +361,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../../../lay/lay/layResources.qrc">
-          <normaloff>:/fit_bottom.png</normaloff>:/fit_bottom.png</iconset>
+          <normaloff>:/fit_bottom_24px.png</normaloff>:/fit_bottom_24px.png</iconset>
         </property>
         <property name="iconSize">
          <size>

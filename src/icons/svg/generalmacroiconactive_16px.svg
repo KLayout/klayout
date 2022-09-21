@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="16"
+   height="16"
+   viewBox="0 0 4.2333332 4.2333335"
+   version="1.1"
+   id="svg1011"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="generalmacroiconactive_16px.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1013"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="true"
+     units="px"
+     inkscape:snap-nodes="true"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-nodes="true"
+     inkscape:snap-others="false"
+     inkscape:zoom="24.449577"
+     inkscape:cx="6.3804784"
+     inkscape:cy="5.0103115"
+     inkscape:window-width="1535"
+     inkscape:window-height="1081"
+     inkscape:window-x="116"
+     inkscape:window-y="82"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     width="16px">
+    <inkscape:grid
+       type="xygrid"
+       id="grid1074"
+       spacingx="0.13229167"
+       spacingy="0.13229167"
+       empspacing="2" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1008">
+    <linearGradient
+       id="linearGradient3600">
+      <stop
+         style="stop-color:#ff9f3f;stop-opacity:1;"
+         offset="0"
+         id="stop3602" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="1"
+         id="stop3604" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4507"
+       id="linearGradient3857"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.05226991,0,0,0.05230034,-2.7924326,-6.5931909)"
+       x1="78.732666"
+       y1="151.35863"
+       x2="111.6348"
+       y2="176.65323" />
+    <linearGradient
+       id="linearGradient3600-4-7">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop3602-3-8" />
+      <stop
+         style="stop-color:#dcdcdb;stop-opacity:1;"
+         offset="1"
+         id="stop3604-9-1" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4507">
+      <stop
+         style="stop-color:#03b800;stop-opacity:1;"
+         offset="0"
+         id="stop4509" />
+      <stop
+         style="stop-color:#23ff7b;stop-opacity:1;"
+         offset="1"
+         id="stop4511" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4507"
+       id="linearGradient846"
+       x1="0.30333081"
+       y1="0.94541538"
+       x2="1.5874999"
+       y2="0.94541538"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       sodipodi:nodetypes="cccccc"
+       inkscape:export-ydpi="25.399982"
+       inkscape:export-xdpi="25.399982"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/images/defaultmacroicon.png"
+       id="path2154"
+       d="M 0.39687501,1.4552084 1.4552084,0.39687501 h 2.38125 l 0,3.43958339 H 0.39687501 Z"
+       style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.52916667;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:0.5"
+       inkscape:connector-curvature="0" />
+    <rect
+       style="fill:none;stroke:#865b26;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect3596"
+       width="4.2333326"
+       height="4.2333331"
+       x="3.3333333e-07"
+       y="3.3333333e-07"
+       inkscape:export-filename="/home/matthias/klayout/master/src/lay/lay/images/back.png"
+       inkscape:export-xdpi="27.093315"
+       inkscape:export-ydpi="27.093315" />
+    <path
+       sodipodi:nodetypes="cccccc"
+       inkscape:export-ydpi="25.399982"
+       inkscape:export-xdpi="25.399982"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/images/defaultmacroicon.png"
+       id="path3598-38-6"
+       d="M 0.39687501,1.4552084 1.4552084,0.39687501 h 2.38125 l 0,3.43958339 H 0.39687501 Z"
+       style="fill:url(#linearGradient3857);fill-opacity:1;stroke:#000000;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 1.190625,0.92604169 3.1750001,2.1166667 1.190625,3.1750001 Z"
+       id="path4505"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/images/generalmacroicon.png"
+       inkscape:export-xdpi="25.399982"
+       inkscape:export-ydpi="25.399982"
+       sodipodi:nodetypes="cccc" />
+    <path
+       inkscape:export-ydpi="25.399982"
+       inkscape:export-xdpi="25.399982"
+       inkscape:export-filename="/home/matthias/klayout/trunk/src/images/defaultmacroicon.png"
+       sodipodi:nodetypes="cccc"
+       inkscape:connector-curvature="0"
+       id="path3890"
+       d="M 0.39687501,1.4552084 H 1.4552084 V 0.39687501 L 0.39687501,1.4552084"
+       style="fill:url(#linearGradient846);fill-opacity:1.0;stroke:#000000;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+</svg>

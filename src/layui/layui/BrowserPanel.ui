@@ -223,8 +223,8 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="../../lay/lay/layResources.qrc">
-                 <normaloff>:/find.png</normaloff>:/find.png</iconset>
+                <iconset resource="../../icons/icons.qrc">
+                 <normaloff>:/find_16px.png</normaloff>:/find_16px.png</iconset>
                </property>
                <property name="autoRaise">
                 <bool>true</bool>
@@ -240,8 +240,8 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="../../lay/lay/layResources.qrc">
-                 <normaloff>:/clear_edit.png</normaloff>:/clear_edit.png</iconset>
+                <iconset resource="../../icons/icons.qrc">
+                 <normaloff>:/clear_edit_16px.png</normaloff>:/clear_edit_16px.png</iconset>
                </property>
                <property name="autoRaise">
                 <bool>true</bool>
@@ -267,8 +267,8 @@
       <string>...</string>
      </property>
      <property name="icon">
-      <iconset resource="../../lay/lay/layResources.qrc">
-       <normaloff>:/forward.png</normaloff>:/forward.png</iconset>
+      <iconset resource="../../icons/icons.qrc">
+       <normaloff>:/forward_24px.png</normaloff>:/forward_24px.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -290,8 +290,8 @@
       <string>...</string>
      </property>
      <property name="icon">
-      <iconset resource="../../lay/lay/layResources.qrc">
-       <normaloff>:/back.png</normaloff>:/back.png</iconset>
+      <iconset resource="../../icons/icons.qrc">
+       <normaloff>:/back_24px.png</normaloff>:/back_24px.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -313,8 +313,8 @@
       <string>...</string>
      </property>
      <property name="icon">
-      <iconset resource="../../lay/lay/layResources.qrc">
-       <normaloff>:/home.png</normaloff>:/home.png</iconset>
+      <iconset resource="../../icons/icons.qrc">
+       <normaloff>:/home_24px.png</normaloff>:/home_24px.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -352,8 +352,8 @@
       <string>...</string>
      </property>
      <property name="icon">
-      <iconset resource="../../lay/lay/layResources.qrc">
-       <normaloff>:/prev_topic.png</normaloff>:/prev_topic.png</iconset>
+      <iconset resource="../../icons/icons.qrc">
+       <normaloff>:/prev_topic_24px.png</normaloff>:/prev_topic_24px.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -388,8 +388,8 @@
       <string>...</string>
      </property>
      <property name="icon">
-      <iconset resource="../../lay/lay/layResources.qrc">
-       <normaloff>:/find.png</normaloff>:/find.png</iconset>
+      <iconset resource="../../icons/icons.qrc">
+       <normaloff>:/find_16px.png</normaloff>:/find_16px.png</iconset>
      </property>
      <property name="autoRaise">
       <bool>true</bool>
@@ -405,8 +405,8 @@
       <string>...</string>
      </property>
      <property name="icon">
-      <iconset resource="../../lay/lay/layResources.qrc">
-       <normaloff>:/next_topic.png</normaloff>:/next_topic.png</iconset>
+      <iconset resource="../../icons/icons.qrc">
+       <normaloff>:/next_topic_24px.png</normaloff>:/next_topic_24px.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -461,8 +461,8 @@
       <string>...</string>
      </property>
      <property name="icon">
-      <iconset resource="../../lay/lay/layResources.qrc">
-       <normaloff>:/bookmark.png</normaloff>:/bookmark.png</iconset>
+      <iconset resource="../../icons/icons.qrc">
+       <normaloff>:/bookmark_24px.png</normaloff>:/bookmark_24px.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -512,7 +512,7 @@
   <tabstop>home_pb</tabstop>
  </tabstops>
  <resources>
-  <include location="../../lay/lay/layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections>
   <connection>

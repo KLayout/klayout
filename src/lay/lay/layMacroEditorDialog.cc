@@ -3434,7 +3434,7 @@ MacroEditorDialog::do_update_ui_to_run_mode ()
   if (t != m_tab_widgets.end ()) {
     int index = tabWidget->indexOf (t->second);
     if (index >= 0) {
-      tabWidget->setTabIcon (index, QIcon (QString::fromUtf8 (m_in_exec ? (m_in_breakpoint ? ":/pause.png" : ":/stop.png") : ":/run.png")));
+      tabWidget->setTabIcon (index, QIcon (QString::fromUtf8 (m_in_exec ? (m_in_breakpoint ? ":/pause_16px.png" : ":/stop_16px.png") : ":/run_16px.png")));
     }
   }
 }
@@ -3481,7 +3481,7 @@ MacroEditorDialog::editor_for_macro (lym::Macro *macro)
     int index = tabWidget->addTab (editor, tl::to_qstring (macro->name ()));
     tabWidget->setTabToolTip (index, tl::to_qstring (macro->summary ()));
     if (macro == mp_run_macro) {
-      tabWidget->setTabIcon (index, QIcon (QString::fromUtf8 (m_in_exec ? (m_in_breakpoint ? ":/pause.png" : ":/stop.png") : ":/run.png")));
+      tabWidget->setTabIcon (index, QIcon (QString::fromUtf8 (m_in_exec ? (m_in_breakpoint ? ":/pause_16px.png" : ":/stop_16px.png") : ":/run_16px.png")));
     }
 
     bool f = m_add_edit_trace_enabled;
@@ -3736,7 +3736,7 @@ MacroEditorDialog::set_run_macro (lym::Macro *m)
     if (t != m_tab_widgets.end ()) {
       int index = tabWidget->indexOf (t->second);
       if (index >= 0) {
-        tabWidget->setTabIcon (index, QIcon (QString::fromUtf8 (":/run.png")));
+        tabWidget->setTabIcon (index, QIcon (QString::fromUtf8 (":/run_16px.png")));
       }
     }
 

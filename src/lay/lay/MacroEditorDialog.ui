@@ -103,8 +103,8 @@ p, li { white-space: pre-wrap; }
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/new_folder.png</normaloff>:/new_folder.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/new_folder_16px.png</normaloff>:/new_folder_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -130,8 +130,8 @@ p, li { white-space: pre-wrap; }
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/add.png</normaloff>:/add.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -150,8 +150,8 @@ p, li { white-space: pre-wrap; }
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/clear_16px.png</normaloff>:/clear_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -170,8 +170,8 @@ p, li { white-space: pre-wrap; }
               <string>Rename</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/rename.png</normaloff>:/rename.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/rename_16px.png</normaloff>:/rename_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -190,8 +190,8 @@ p, li { white-space: pre-wrap; }
               <string>Import</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/import.png</normaloff>:/import.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/import_16px.png</normaloff>:/import_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -214,8 +214,8 @@ p, li { white-space: pre-wrap; }
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/save_all.png</normaloff>:/save_all.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/save_all_16px.png</normaloff>:/save_all_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>Ctrl+Shift+S</string>
@@ -234,8 +234,8 @@ p, li { white-space: pre-wrap; }
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/save.png</normaloff>:/save.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/save_16px.png</normaloff>:/save_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>Ctrl+S</string>
@@ -333,7 +333,7 @@ p, li { white-space: pre-wrap; }
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
+              <iconset>
                <normaloff>:/back_16.png</normaloff>:/back_16.png</iconset>
              </property>
              <property name="autoRaise">
@@ -347,7 +347,7 @@ p, li { white-space: pre-wrap; }
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
+              <iconset>
                <normaloff>:/forward_16.png</normaloff>:/forward_16.png</iconset>
              </property>
              <property name="autoRaise">
@@ -374,8 +374,8 @@ p, li { white-space: pre-wrap; }
               <string>close</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/del.png</normaloff>:/del.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/del_16px.png</normaloff>:/del_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -398,8 +398,8 @@ p, li { white-space: pre-wrap; }
               <string>run</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/run.png</normaloff>:/run.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/run_16px.png</normaloff>:/run_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>F5</string>
@@ -418,8 +418,8 @@ p, li { white-space: pre-wrap; }
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/runthis.png</normaloff>:/runthis.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/runthis_16px.png</normaloff>:/runthis_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>Shift+F5</string>
@@ -441,8 +441,8 @@ p, li { white-space: pre-wrap; }
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/stop.png</normaloff>:/stop.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/stop_16px.png</normaloff>:/stop_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -461,8 +461,8 @@ p, li { white-space: pre-wrap; }
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/pause.png</normaloff>:/pause.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/pause_16px.png</normaloff>:/pause_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>Ctrl+F5</string>
@@ -491,8 +491,8 @@ p, li { white-space: pre-wrap; }
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/breakpoint.png</normaloff>:/breakpoint.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/breakpoint_16px.png</normaloff>:/breakpoint_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>F9</string>
@@ -514,8 +514,8 @@ p, li { white-space: pre-wrap; }
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/clearbreakpoints.png</normaloff>:/clearbreakpoints.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/clearbreakpoints_16px.png</normaloff>:/clearbreakpoints_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>Ctrl+Shift+F9</string>
@@ -544,8 +544,8 @@ p, li { white-space: pre-wrap; }
               <string>S</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/singlestep.png</normaloff>:/singlestep.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/singlestep_16px.png</normaloff>:/singlestep_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>F11</string>
@@ -567,8 +567,8 @@ p, li { white-space: pre-wrap; }
               <string>N</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/nextstep.png</normaloff>:/nextstep.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/nextstep_16px.png</normaloff>:/nextstep_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>F10</string>
@@ -597,8 +597,8 @@ p, li { white-space: pre-wrap; }
               <string>DBG</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/debug.png</normaloff>:/debug.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/debug_16px.png</normaloff>:/debug_16px.png</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -627,8 +627,8 @@ p, li { white-space: pre-wrap; }
               <string>P</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/properties.png</normaloff>:/properties.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/properties_16px.png</normaloff>:/properties_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -647,8 +647,8 @@ p, li { white-space: pre-wrap; }
               <string>prop</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/setup.png</normaloff>:/setup.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/setup_16px.png</normaloff>:/setup_16px.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -683,8 +683,8 @@ p, li { white-space: pre-wrap; }
               <string>N</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/find.png</normaloff>:/find.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/find_16px.png</normaloff>:/find_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>F3</string>
@@ -773,8 +773,8 @@ p, li { white-space: pre-wrap; }
                  <string>RN</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="layResources.qrc">
-                  <normaloff>:/replace.png</normaloff>:/replace.png</iconset>
+                 <iconset resource="../../icons/icons.qrc">
+                  <normaloff>:/replace_16px.png</normaloff>:/replace_16px.png</iconset>
                 </property>
                 <property name="shortcut">
                  <string/>
@@ -796,8 +796,8 @@ p, li { white-space: pre-wrap; }
                  <string>All</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="layResources.qrc">
-                  <normaloff>:/replace_all.png</normaloff>:/replace_all.png</iconset>
+                 <iconset resource="../../icons/icons.qrc">
+                  <normaloff>:/replace_all_16px.png</normaloff>:/replace_all_16px.png</iconset>
                 </property>
                 <property name="autoRaise">
                  <bool>true</bool>
@@ -820,8 +820,8 @@ p, li { white-space: pre-wrap; }
               <string>Help</string>
              </property>
              <property name="icon">
-              <iconset resource="layResources.qrc">
-               <normaloff>:/help.png</normaloff>:/help.png</iconset>
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/help_16px.png</normaloff>:/help_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string/>
@@ -1376,8 +1376,8 @@ p, li { white-space: pre-wrap; }
   </layout>
   <action name="actionNewFolder">
    <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/new_folder.png</normaloff>:/new_folder.png</iconset>
+    <iconset resource="../../icons/icons.qrc">
+     <normaloff>:/new_folder_16px.png</normaloff>:/new_folder_16px.png</iconset>
    </property>
    <property name="text">
     <string>New Folder</string>
@@ -1385,8 +1385,8 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionAddMacro">
    <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/add.png</normaloff>:/add.png</iconset>
+    <iconset resource="../../icons/icons.qrc">
+     <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -1394,8 +1394,8 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionDelete">
    <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+    <iconset resource="../../icons/icons.qrc">
+     <normaloff>:/clear_16px.png</normaloff>:/clear_16px.png</iconset>
    </property>
    <property name="text">
     <string>Delete</string>
@@ -1403,8 +1403,8 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionRename">
    <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/rename.png</normaloff>:/rename.png</iconset>
+    <iconset resource="../../icons/icons.qrc">
+     <normaloff>:/rename_16px.png</normaloff>:/rename_16px.png</iconset>
    </property>
    <property name="text">
     <string>Rename</string>
@@ -1412,8 +1412,8 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionImport">
    <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/import.png</normaloff>:/import.png</iconset>
+    <iconset resource="../../icons/icons.qrc">
+     <normaloff>:/import_16px.png</normaloff>:/import_16px.png</iconset>
    </property>
    <property name="text">
     <string>Import</string>
@@ -1421,8 +1421,8 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionSaveAll">
    <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/save_all.png</normaloff>:/save_all.png</iconset>
+    <iconset resource="../../icons/icons.qrc">
+     <normaloff>:/save_all_16px.png</normaloff>:/save_all_16px.png</iconset>
    </property>
    <property name="text">
     <string>Save All</string>
@@ -1430,8 +1430,8 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/save.png</normaloff>:/save.png</iconset>
+    <iconset resource="../../icons/icons.qrc">
+     <normaloff>:/save_16px.png</normaloff>:/save_16px.png</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -1527,7 +1527,7 @@ p, li { white-space: pre-wrap; }
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

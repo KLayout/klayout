@@ -98,7 +98,7 @@ ConfirmationDialog::mark_fetching (const std::string &name)
 void
 ConfirmationDialog::mark_error (const std::string &name)
 {
-  set_icon_for_name (name, QIcon (QString::fromUtf8 (":/error_16.png")));
+  set_icon_for_name (name, QIcon (QString::fromUtf8 (":/error_16px.png")));
 
   std::map<std::string, QTreeWidgetItem *>::const_iterator i = m_items_by_name.find (name);
   if (i != m_items_by_name.end ()) {
@@ -114,7 +114,7 @@ ConfirmationDialog::mark_error (const std::string &name)
 void
 ConfirmationDialog::mark_success (const std::string &name)
 {
-  set_icon_for_name (name, QIcon (QString::fromUtf8 (":/marked_16.png")));
+  set_icon_for_name (name, QIcon (QString::fromUtf8 (":/marked_16px.png")));
 
   std::map<std::string, QTreeWidgetItem *>::const_iterator i = m_items_by_name.find (name);
   if (i != m_items_by_name.end ()) {

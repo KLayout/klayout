@@ -276,13 +276,13 @@ LogFile::data(const QModelIndex &index, int role) const
     if (index.row () < int (m_messages.size ()) && index.row () >= 0) {
       LogFileEntry::mode_type mode = m_messages [index.row ()].mode ();
       if (mode == LogFileEntry::Error) {
-        return QIcon (QString::fromUtf8 (":/error_16.png"));
+        return QIcon (QString::fromUtf8 (":/error_16px.png"));
       } else if (mode == LogFileEntry::Warning) {
-        return QIcon (QString::fromUtf8 (":/warn_16.png"));
+        return QIcon (QString::fromUtf8 (":/warn_16px.png"));
       } else if (mode == LogFileEntry::Info) {
-        return QIcon (QString::fromUtf8 (":/info_16.png"));
+        return QIcon (QString::fromUtf8 (":/info_16px.png"));
       } else {
-        return QIcon (QString::fromUtf8 (":/empty_16.png"));
+        return QIcon (QString::fromUtf8 (":/empty_16px.png"));
       }
     }
 

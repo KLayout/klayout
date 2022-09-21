@@ -378,8 +378,8 @@ private:
   std::vector <lay::ViewOp> m_view_ops;
   lay::DitherPattern m_dither_pattern;
   lay::LineStyles m_line_styles;
+  std::map<unsigned int, std::vector <lay::ViewOp> > m_scaled_view_ops;
   unsigned int m_oversampling;
-  unsigned int m_dpr;
   double m_gamma;
 
   bool m_need_redraw;
@@ -417,6 +417,9 @@ private:
   void do_redraw_all (bool force_redraw = true);
 
   void prepare_drawing ();
+  double dpr ();
+
+  const std::vector<ViewOp> &scaled_view_ops (unsigned int lw);
 };
 
 } //  namespace lay

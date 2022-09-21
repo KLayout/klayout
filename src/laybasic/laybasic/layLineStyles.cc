@@ -24,6 +24,7 @@
 
 #include "layLineStyles.h"
 #include "tlAssert.h"
+#include "tlThreads.h"
 
 #include <ctype.h>
 #include <algorithm>
@@ -200,9 +201,16 @@ LineStyleInfo::get_bitmap (int width, int height) const
 }
 #endif
 
+static tl::Mutex s_mutex;
+
 void
 LineStyleInfo::set_pattern (uint32_t pt, unsigned int w) 
 {
+  {
+    tl::MutexLocker locker (& s_mutex);
+    m_scaled_pattern.reset (0);
+  }
+
   memset (m_pattern, 0, sizeof (m_pattern));
 
   if (w >= 32) {
@@ -244,6 +252,30 @@ LineStyleInfo::set_pattern (uint32_t pt, unsigned int w)
   }
 }
 
+const LineStyleInfo &
+LineStyleInfo::scaled (unsigned int n) const
+{
+  if (n <= 1) {
+    return *this;
+  }
+
+  tl::MutexLocker locker (& s_mutex);
+
+  if (! m_scaled_pattern.get ()) {
+    m_scaled_pattern.reset (new std::map<unsigned int, LineStyleInfo> ());
+  }
+
+  auto i = m_scaled_pattern->find (n);
+  if (i != m_scaled_pattern->end ()) {
+    return i->second;
+  }
+
+  LineStyleInfo &sp = (*m_scaled_pattern) [n];
+  sp = *this;
+  sp.scale_pattern (n);
+  return sp;
+}
+
 void
 LineStyleInfo::scale_pattern (unsigned int n)
 {
@@ -262,7 +294,12 @@ LineStyleInfo::scale_pattern (unsigned int n)
 
   uint32_t *pp = m_pattern;
   uint32_t pt = m_pattern [0];
+  uint32_t ptr = pt >> 1; // right-rotated by 1
+  if (pt & 1) {
+    ptr |= (1 << (m_width - 1));
+  }
   uint32_t dd = pt;
+  uint32_t ddr = ptr;
 
   memset (m_pattern, 0, sizeof (m_pattern));
 
@@ -271,14 +308,18 @@ LineStyleInfo::scale_pattern (unsigned int n)
   for (unsigned int i = 0; i < m_pattern_stride; ++i) {
     uint32_t dout = 0;
     for (uint32_t m = 1; m != 0; m <<= 1) {
-      if ((dd & 1) != 0) {
+      //  NOTE: we do not fully expand "1" fields with a following "0" as pixel expansion
+      //  will take care of this.
+      if ((dd & 1) != 0 && ((ddr & 1) != 0 || bi == 0)) {
         dout |= m;
       }
       if (++bi == n) {
         bi = 0;
         dd >>= 1;
+        ddr >>= 1;
         if (++b == m_width) {
           dd = pt;
+          ddr = ptr;
           b = 0;
         }
       }
@@ -288,6 +329,8 @@ LineStyleInfo::scale_pattern (unsigned int n)
 
   m_width = w;
 }
+
+
 
 std::string
 LineStyleInfo::to_string () const
@@ -404,11 +447,8 @@ LineStyles::style (unsigned int i) const
 void 
 LineStyles::replace_style (unsigned int i, const LineStyleInfo &p)
 {
-  bool chg = false;
-
   while (i >= count ()) {
     m_styles.push_back (LineStyleInfo ());
-    chg = true;
   }
 
   if (m_styles [i] != p) {
@@ -416,7 +456,6 @@ LineStyles::replace_style (unsigned int i, const LineStyleInfo &p)
       manager ()->queue (this, new ReplaceLineStyleOp (i, m_styles [i], p));
     }
     m_styles [i] = p;
-    chg = true;
   }
 }
 

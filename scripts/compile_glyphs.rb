@@ -1,5 +1,12 @@
 #!/usr/bin/ruby 
 
+# Synopsis:
+#
+#   compile_glyphs.rb
+#
+# This script generates the src/db/db/glyphs.cc text generator's font definitions
+# from the GDS files placed inside the src/db/db/glyphs folder.
+
 files = []
 
 glyph_dir = File.join(File.dirname($0), "..", "src", "db", "db", "glyphs")

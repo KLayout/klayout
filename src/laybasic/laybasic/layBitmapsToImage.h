@@ -56,12 +56,15 @@ class Bitmap;
  *  The "use_bitmap_index" parameter specifies whether the bitmap_index
  *  parameter of the operators is being used to map a operator to a certain
  *  bitmap.
+ *  "dpr" is the device pixel ratio and will be used to scale line widths,
+ *  stipple pattern and line styles.
  */
 LAYBASIC_PUBLIC void
 bitmaps_to_image (const std::vector <lay::ViewOp> &view_ops, 
                   const std::vector <lay::Bitmap *> &pbitmaps,
                   const lay::DitherPattern &dp, 
                   const lay::LineStyles &ls,
+                  double dpr,
                   tl::PixelBuffer *pimage, unsigned int width, unsigned int height,
                   bool use_bitmap_index,
                   tl::Mutex *mutex);
@@ -76,6 +79,7 @@ bitmaps_to_image (const std::vector <lay::ViewOp> &view_ops,
                   const std::vector <lay::Bitmap *> &pbitmaps,
                   const lay::DitherPattern &dp,
                   const lay::LineStyles &ls,
+                  double dpr,
                   tl::BitmapBuffer *pimage, unsigned int width, unsigned int height,
                   bool use_bitmap_index,
                   tl::Mutex *mutex);
@@ -92,7 +96,8 @@ bitmap_to_bitmap (const lay::ViewOp &view_op, const lay::Bitmap &bitmap,
                   unsigned char *data,
                   unsigned int width, unsigned int height,
                   const lay::DitherPattern &dp,
-                  const lay::LineStyles &ls);
+                  const lay::LineStyles &ls,
+                  double dpr);
 
 } // namespace lay
 

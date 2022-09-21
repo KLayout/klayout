@@ -35,8 +35,8 @@
       <string>Back</string>
      </property>
      <property name="icon">
-      <iconset resource="../../../../lay/lay/layResources.qrc">
-       <normaloff>:/back.png</normaloff>:/back.png</iconset>
+      <iconset resource="../../../../icons/icons.qrc">
+       <normaloff>:/back_24px.png</normaloff>:/back_24px.png</iconset>
      </property>
     </widget>
    </item>
@@ -66,8 +66,8 @@
       <string>Next</string>
      </property>
      <property name="icon">
-      <iconset resource="../../../../lay/lay/layResources.qrc">
-       <normaloff>:/forward.png</normaloff>:/forward.png</iconset>
+      <iconset resource="../../../../icons/icons.qrc">
+       <normaloff>:/forward_24px.png</normaloff>:/forward_24px.png</iconset>
      </property>
     </widget>
    </item>
@@ -938,7 +938,7 @@ Alternatively the transformation (imported to existing layout) can be specified 
   <tabstop>cancel_pb</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../../lay/lay/layResources.qrc"/>
+  <include location="../../../../icons/icons.qrc"/>
  </resources>
  <connections>
   <connection>

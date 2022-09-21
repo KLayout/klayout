@@ -260,7 +260,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="layResources.qrc">:/warn_16.png</pixmap>
+                <pixmap resource="../../icons/icons.qrc">:/warn_16px@2x.png</pixmap>
                </property>
               </widget>
              </item>
@@ -335,8 +335,8 @@
   </layout>
   <action name="actionNew">
    <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/add.png</normaloff>:/add.png</iconset>
+    <iconset resource="../../icons/icons.qrc">
+     <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -347,8 +347,8 @@
   </action>
   <action name="actionDelete">
    <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+    <iconset resource="../../icons/icons.qrc">
+     <normaloff>:/clear_16px.png</normaloff>:/clear_16px.png</iconset>
    </property>
    <property name="text">
     <string>Delete</string>
@@ -359,8 +359,8 @@
   </action>
   <action name="actionImport">
    <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/import.png</normaloff>:/import.png</iconset>
+    <iconset resource="../../icons/icons.qrc">
+     <normaloff>:/import_16px.png</normaloff>:/import_16px.png</iconset>
    </property>
    <property name="text">
     <string>Import</string>
@@ -371,7 +371,7 @@
   </action>
  </widget>
  <resources>
-  <include location="layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

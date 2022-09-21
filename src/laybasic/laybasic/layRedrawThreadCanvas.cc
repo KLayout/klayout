@@ -392,7 +392,7 @@ BitmapRedrawThreadCanvas::initialize_plane (lay::CanvasPlane *plane, unsigned in
 }
 
 void
-BitmapRedrawThreadCanvas::to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, tl::Color background, tl::Color foreground, tl::Color active, const lay::Drawings *drawings, tl::PixelBuffer &img, unsigned int width, unsigned int height)
+BitmapRedrawThreadCanvas::to_image (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, double dpr, tl::Color background, tl::Color foreground, tl::Color active, const lay::Drawings *drawings, tl::PixelBuffer &img, unsigned int width, unsigned int height)
 {
   if (width > m_width) {
     width = m_width;
@@ -402,17 +402,17 @@ BitmapRedrawThreadCanvas::to_image (const std::vector <lay::ViewOp> &view_ops, c
   }
 
   //  convert the plane data to image data
-  bitmaps_to_image (view_ops, mp_plane_buffers, dp, ls, &img, width, height, true, &mutex ());
+  bitmaps_to_image (view_ops, mp_plane_buffers, dp, ls, dpr, &img, width, height, true, &mutex ());
 
   //  convert the planes of the "drawing" objects too:
   std::vector <std::vector <lay::Bitmap *> >::const_iterator bt = mp_drawing_plane_buffers.begin ();
   for (lay::Drawings::const_iterator d = drawings->begin (); d != drawings->end () && bt != mp_drawing_plane_buffers.end (); ++d, ++bt) {
-    bitmaps_to_image (d->get_view_ops (*this, background, foreground, active), *bt, dp, ls, &img, width, height, true, &mutex ());
+    bitmaps_to_image (d->get_view_ops (*this, background, foreground, active), *bt, dp, ls, dpr, &img, width, height, true, &mutex ());
   }
 }
 
 void
-BitmapRedrawThreadCanvas::to_image_mono (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, bool background, bool foreground, bool active, const lay::Drawings *drawings, tl::BitmapBuffer &img, unsigned int width, unsigned int height)
+BitmapRedrawThreadCanvas::to_image_mono (const std::vector <lay::ViewOp> &view_ops, const lay::DitherPattern &dp, const lay::LineStyles &ls, double dpr, bool background, bool foreground, bool active, const lay::Drawings *drawings, tl::BitmapBuffer &img, unsigned int width, unsigned int height)
 {
   if (width > m_width) {
     width = m_width;
@@ -424,12 +424,12 @@ BitmapRedrawThreadCanvas::to_image_mono (const std::vector <lay::ViewOp> &view_o
   unsigned int all_one = 0xffffffff;
 
   //  convert the plane data to image data
-  bitmaps_to_image (view_ops, mp_plane_buffers, dp, ls, &img, width, height, true, &mutex ());
+  bitmaps_to_image (view_ops, mp_plane_buffers, dp, ls, dpr, &img, width, height, true, &mutex ());
 
   //  convert the planes of the "drawing" objects too:
   std::vector <std::vector <lay::Bitmap *> >::const_iterator bt = mp_drawing_plane_buffers.begin ();
   for (lay::Drawings::const_iterator d = drawings->begin (); d != drawings->end () && bt != mp_drawing_plane_buffers.end (); ++d, ++bt) {
-    bitmaps_to_image (d->get_view_ops (*this, background ? all_one : 0, foreground ? all_one : 0, active ? all_one : 0), *bt, dp, ls, &img, width, height, true, &mutex ());
+    bitmaps_to_image (d->get_view_ops (*this, background ? all_one : 0, foreground ? all_one : 0, active ? all_one : 0), *bt, dp, ls, dpr, &img, width, height, true, &mutex ());
   }
 }
 

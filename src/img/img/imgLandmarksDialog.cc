@@ -238,6 +238,7 @@ public:
         double l = double (search_range) / ui ()->mouse_event_trans ().mag ();
         db::DBox search_box = db::DBox (p, p).enlarged (db::DVector (l, l));
 
+        m_selected = -1;
         int li = 0;
         for (std::vector<db::DPoint>::const_iterator l = mp_image->landmarks ().begin (); l != mp_image->landmarks ().end (); ++l, ++li) {
           if (search_box.contains (*l)) {
@@ -419,7 +420,7 @@ LandmarksDialog::LandmarksDialog (QWidget *parent, img::Object &img)
   mp_service->updated_event.add (this, &LandmarksDialog::landmarks_updated);
 
   new_pb->setChecked (true);
-  update_mode ();
+  mp_service->set_mode (Add);
   landmarks_updated ();
 }
 
@@ -436,11 +437,11 @@ LandmarksDialog::update_mode ()
 {
   mode_t new_mode = None;
 
-  if (new_pb->isChecked ()) {
+  if (sender () == new_pb) {
     new_mode = Add;
-  } else if (move_pb->isChecked ()) {
+  } else if (sender () == move_pb) {
     new_mode = Move;
-  } else if (delete_pb->isChecked ()) {
+  } else if (sender () == delete_pb) {
     new_mode = Delete;
   }
 

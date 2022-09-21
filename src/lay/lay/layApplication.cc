@@ -1437,6 +1437,9 @@ GuiApplication::GuiApplication (int &argc, char **argv)
 #if QT_VERSION >= 0x040500
   setAttribute (Qt::AA_DontShowIconsInMenus, false);
 #endif
+#if QT_VERSION >= 0x050000
+  setAttribute (Qt::AA_UseHighDpiPixmaps, true);
+#endif
 }
 
 GuiApplication::~GuiApplication ()

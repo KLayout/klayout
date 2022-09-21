@@ -405,8 +405,7 @@ static void create_precursor_bitmaps (const std::vector<lay::ViewOp> &view_ops_i
       }
 
       lay::Bitmap &bp = precursors.insert (std::make_pair (bm_index, lay::Bitmap (width, height, 1.0))).first->second;
-      LineStyleInfo ls_info = ls.style (op.line_style_index ());
-      ls_info.scale_pattern (op.width ());
+      const LineStyleInfo &ls_info = ls.style (op.line_style_index ()).scaled (op.width ());
 
       for (unsigned int y = 0; y < height; y++) {
         render_scanline_std_edge (ls_info.pattern (), ls_info.pattern_stride (), pbitmaps_in [bm_index], y, width, height, bp.scanline (y));
@@ -426,6 +425,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
                   const std::vector<lay::Bitmap *> &pbitmaps_in,
                   const lay::DitherPattern &dp,
                   const lay::LineStyles &ls,
+                  double dpr,
                   tl::PixelBuffer *pimage, unsigned int width, unsigned int height,
                   bool use_bitmap_index,
                   tl::Mutex *mutex)
@@ -547,8 +547,8 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
       const ViewOp &op = view_ops [i];
       if (op.width () > 1 || (op.width () == 1 && (non_empty_sls [i] & ne_mask) != 0)) {
 
-        const LineStyleInfo &ls_info = ls.style (op.line_style_index ());
-        const DitherPatternInfo &dp_info = dp.pattern (op.dither_index ());
+        const LineStyleInfo &ls_info = ls.style (op.line_style_index ()).scaled (op.width ());
+        const DitherPatternInfo &dp_info = dp.pattern (op.dither_index ()).scaled (dpr);
         const uint32_t *dither = dp_info.pattern () [(y + op.dither_offset ()) % dp_info.height ()];
         if (dither != 0) {
 
@@ -666,6 +666,7 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
                   const std::vector<lay::Bitmap *> &pbitmaps_in,
                   const lay::DitherPattern &dp,
                   const lay::LineStyles &ls,
+                  double dpr,
                   tl::BitmapBuffer *pimage, unsigned int width, unsigned int height,
                   bool use_bitmap_index,
                   tl::Mutex *mutex)
@@ -784,8 +785,8 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
       const ViewOp &op = view_ops [i];
       if (op.width () > 1 || (op.width () == 1 && (non_empty_sls [i] & ne_mask) != 0)) {
 
-        const LineStyleInfo &ls_info = ls.style (op.line_style_index ());
-        const DitherPatternInfo &dp_info = dp.pattern (op.dither_index ());
+        const LineStyleInfo &ls_info = ls.style (op.line_style_index ()).scaled (op.width ());
+        const DitherPatternInfo &dp_info = dp.pattern (op.dither_index ()).scaled (dpr);
         const uint32_t *dither = dp_info.pattern () [(y + op.dither_offset ()) % dp_info.height ()];
         if (dither != 0) {
 
@@ -871,7 +872,8 @@ bitmap_to_bitmap (const lay::ViewOp &view_op, const lay::Bitmap &bitmap,
                   unsigned char *data,
                   unsigned int width, unsigned int height,
                   const lay::DitherPattern &dp,
-                  const lay::LineStyles &ls)
+                  const lay::LineStyles &ls,
+                  double dpr)
 {
   //  quick exit, if line width is zero
   if (view_op.width () == 0) {
@@ -885,12 +887,12 @@ bitmap_to_bitmap (const lay::ViewOp &view_op, const lay::Bitmap &bitmap,
   unsigned int x = 0xc0000001;
   unsigned char x0 = ((unsigned char *) &x) [0];
 
-  const DitherPatternInfo &dp_info = dp.pattern (view_op.dither_index ());
-  const LineStyleInfo &ls_info = ls.style (view_op.line_style_index ());
+  const DitherPatternInfo &dp_info = dp.pattern (view_op.dither_index ()).scaled (dpr);
+  const LineStyleInfo &ls_info = ls.style (view_op.line_style_index ()).scaled (view_op.width ());
 
   for (unsigned int y = 0; y < height; ++y) {
 
-    unsigned nbytes = ((width + 7) / 8);
+    unsigned int nbytes = ((width + 7) / 8);
 
     if (view_op.width () > 1 || ! bitmap.is_scanline_empty (height - 1 - y)) {
 
@@ -917,7 +919,6 @@ bitmap_to_bitmap (const lay::ViewOp &view_op, const lay::Bitmap &bitmap,
           precursor = lay::Bitmap (width, height, 1.0);
 
           LineStyleInfo lsi = ls_info;
-          lsi.scale_pattern (view_op.width ());
 
           for (unsigned int y = 0; y < height; y++) {
             render_scanline_std_edge (lsi.pattern (), lsi.pattern_stride (), bp, y, width, height, precursor.scanline (y));

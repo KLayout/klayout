@@ -332,7 +332,7 @@ BrowserPanel::refresh_bookmark_list ()
     QTreeWidgetItem *item = new QTreeWidgetItem (mp_ui->browser_bookmark_view);
     item->setData (0, Qt::DisplayRole, tl::to_qstring (i->title));
     item->setData (0, Qt::ToolTipRole, tl::to_qstring (i->title));
-    item->setData (0, Qt::DecorationRole, QIcon (":/bookmark_16.png"));
+    item->setData (0, Qt::DecorationRole, QIcon (":/bookmark_16px.png"));
   }
 
   update_navigation_panel ();

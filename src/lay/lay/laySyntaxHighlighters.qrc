@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/syntax">
+        <file alias="ruby.xml">syntax/ruby.xml</file>
+        <file alias="python.xml">syntax/python.xml</file>
+    </qresource>
+</RCC>

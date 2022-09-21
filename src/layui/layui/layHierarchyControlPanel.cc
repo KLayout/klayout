@@ -299,7 +299,7 @@ HierarchyControlPanel::HierarchyControlPanel (lay::LayoutViewBase *view, QWidget
   QToolButton *sf_next = new QToolButton (mp_search_frame);
   sf_next->setAutoRaise (true);
   sf_next->setToolTip (tr ("Find next"));
-  sf_next->setIcon (QIcon (QString::fromUtf8 (":/find.png")));
+  sf_next->setIcon (QIcon (QString::fromUtf8 (":/find_16px.png")));
   connect (sf_next, SIGNAL (clicked ()), this, SLOT (search_next ()));
   sf_ly->addWidget (sf_next);
 

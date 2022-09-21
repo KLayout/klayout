@@ -53,10 +53,6 @@
 #include "tlTimer.h"
 #include "dbInstElement.h"
 
-#if defined(HAVE_QT)
-#  include <QFrame>
-#endif
-
 namespace rdb {
   class Database;
 }

@@ -77,7 +77,15 @@ namespace {
 void 
 SelectStippleForm::update ()
 {
+#if QT_VERSION >= 0x050000
+  double dpr = devicePixelRatio ();
+#else
+  double dpr = 1.0;
+#endif
+
   mp_ui->stipple_items->clear ();
+
+  QSize icon_size = mp_ui->stipple_items->iconSize ();
 
   if (m_include_nil) {
     new QListWidgetItem (QObject::tr ("None"), mp_ui->stipple_items);
@@ -91,21 +99,39 @@ SelectStippleForm::update ()
 
   //  fill the list of stipple items
   for (lay::DitherPattern::iterator i = m_pattern.begin (); i != m_pattern.begin_custom (); ++i) {
+
     std::string name (i->name ());
     if (name.empty ()) {
       name = tl::sprintf ("#%d", std::distance (m_pattern.begin (), i));
     }
-    new QListWidgetItem (QIcon (i->get_bitmap ()), tl::to_qstring (name), mp_ui->stipple_items);
+
+    const lay::DitherPatternInfo &dp_info = i->scaled (dpr);
+    QBitmap bitmap = dp_info.get_bitmap (icon_size.width () * dpr, icon_size.height () * dpr, dpr);
+#if QT_VERSION >= 0x050000
+    bitmap.setDevicePixelRatio (dpr);
+#endif
+    new QListWidgetItem (QIcon (bitmap), tl::to_qstring (name), mp_ui->stipple_items);
+
   }
 
   for (std::vector <lay::DitherPattern::iterator>::const_iterator i = iters.begin (); i != iters.end (); ++i) {
+
     if ((*i)->order_index () > 0) {
+
       std::string name ((*i)->name ());
       if (name.empty ()) {
         name = tl::sprintf ("custom #%d", (*i)->order_index ());
       }
-      new QListWidgetItem (QIcon ((*i)->get_bitmap ()), tl::to_qstring (name), mp_ui->stipple_items);
+
+      const lay::DitherPatternInfo &dp_info = (*i)->scaled (dpr);
+      QBitmap bitmap = dp_info.get_bitmap (icon_size.width () * dpr, icon_size.height () * dpr, dpr);
+#if QT_VERSION >= 0x050000
+      bitmap.setDevicePixelRatio (dpr);
+#endif
+      new QListWidgetItem (QIcon (bitmap), tl::to_qstring (name), mp_ui->stipple_items);
+
     }
+
   }
 }
 

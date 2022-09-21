@@ -92,7 +92,7 @@ TEST(1)
   lay::LineStyles ls;
 
   tl::Mutex m;
-  lay::bitmaps_to_image (view_ops, pbitmaps, dp, ls, &img, 32, 32, 0, &m);
+  lay::bitmaps_to_image (view_ops, pbitmaps, dp, ls, 1.0, &img, 32, 32, 0, &m);
 
   EXPECT_EQ (to_string (img, 0x800000),
     "................................\n"

@@ -56,11 +56,11 @@ struct FlagDescriptor
 
 static FlagDescriptor flag_descriptors[] = 
 {
-  FlagDescriptor (":no_flag.png", tl::to_string (QObject::tr ("No flag")), ""),
-  FlagDescriptor (":red_flag.png", tl::to_string (QObject::tr ("Red flag")), "red"),
-  FlagDescriptor (":green_flag.png", tl::to_string (QObject::tr ("Green flag")), "green"),
-  FlagDescriptor (":blue_flag.png", tl::to_string (QObject::tr ("Blue flag")), "blue"),
-  FlagDescriptor (":yellow_flag.png", tl::to_string (QObject::tr ("Yellow flag")), "yellow")
+  FlagDescriptor (":no_flag_16px.png", tl::to_string (QObject::tr ("No flag")), ""),
+  FlagDescriptor (":red_flag_16px.png", tl::to_string (QObject::tr ("Red flag")), "red"),
+  FlagDescriptor (":green_flag_16px.png", tl::to_string (QObject::tr ("Green flag")), "green"),
+  FlagDescriptor (":blue_flag_16px.png", tl::to_string (QObject::tr ("Blue flag")), "blue"),
+  FlagDescriptor (":yellow_flag_16px.png", tl::to_string (QObject::tr ("Yellow flag")), "yellow")
 };
 
 // ----------------------------------------------------------------------------------
@@ -1268,14 +1268,14 @@ public:
 
         const rdb::Item *i = item (index.row ());
         if (i != 0 && i->has_tag (m_important_tag_id)) {
-          return QVariant (QIcon (QString::fromUtf8 (":important.png")));
+          return QVariant (QIcon (QString::fromUtf8 (":important_16px.png")));
         }
 
       } else if (index.column () == 2) {
 
         const rdb::Item *i = item (index.row ());
         if (i != 0 && i->has_tag (m_waived_tag_id)) {
-          return QVariant (QIcon (QString::fromUtf8 (":waived.png")));
+          return QVariant (QIcon (QString::fromUtf8 (":waived_16px.png")));
         }
 
       }

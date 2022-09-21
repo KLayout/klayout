@@ -161,6 +161,12 @@ lp_iter_from_string (lay::LayoutViewBase *view, const std::string &s)
 void
 RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std::vector<std::string> &values, RecentConfigurationPage::ConfigurationRendering rendering)
 {
+#if QT_VERSION >= 0x050000
+  double dpr = devicePixelRatio ();
+#else
+  double dpr = 1.0;
+#endif
+
   //  store original value
   item->setData (column, Qt::UserRole, tl::to_qstring (values [column]));
 
@@ -190,7 +196,7 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
         tl::error << tl::to_string (tr ("Configuration error (Layer): ")) << ex.msg ();
       }
       if (! l.is_null () && ! l.at_end ()) {
-        item->setIcon (column, lay::LayerTreeModel::icon_for_layer (l, view (), icon_size, icon_size, 0, true));
+        item->setIcon (column, lay::LayerTreeModel::icon_for_layer (l, view (), icon_size, icon_size, dpr, 0, true));
         item->setText (column, tl::to_qstring (values [column]));
       } else {
         item->setIcon (column, QIcon ());

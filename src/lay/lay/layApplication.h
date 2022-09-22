@@ -376,6 +376,13 @@ public:
   QApplication *qapp_gui () { return this; }
 
   /**
+   *  @brief Does some pre-initialization
+   *
+   *  Must be called before the GuiApplication object is created
+   */
+  static void initialize ();
+
+  /**
    *  @brief Reimplementation of notify from QApplication
    */
   bool notify (QObject *receiver, QEvent *e);

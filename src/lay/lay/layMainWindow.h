@@ -51,7 +51,7 @@
 #include "tlDeferredExecution.h"
 #include "gsi.h"
 
-class QTabWidget;
+class QTabBar;
 class QToolBar;
 class QLabel;
 class QAction;
@@ -632,6 +632,8 @@ public slots:
   void exit ();
   void close_current_view ();
   void close_view (int index);
+  void close_all_views ();
+  void close_all_except_current_view ();
   void tab_close_requested (int);
   void open_recent (size_t n);
   void open_recent_session (size_t n);
@@ -682,7 +684,7 @@ private:
   TextProgressDelegate m_text_progress;
 
   //  Main menu
-  QTabWidget *mp_tab_widget;
+  QTabBar *mp_tab_bar;
   QToolBar *mp_tool_bar;
   QDockWidget *mp_navigator_dock_widget;
   lay::Navigator *mp_navigator;
@@ -788,6 +790,7 @@ private:
   void cm_new_layout ();
   void cm_clone ();
   void cm_close_all ();
+  void cm_close_all_except_current ();
   void cm_close ();
   void cm_packages ();
   void cm_technologies ();

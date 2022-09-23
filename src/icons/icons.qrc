@@ -125,6 +125,10 @@
         <file alias="m45_24px@2x.png">images/m45_24px@2x.png</file>
         <file alias="m90_24px.png">images/m90_24px.png</file>
         <file alias="m90_24px@2x.png">images/m90_24px@2x.png</file>
+        <file alias="menu_16px.png">images/menu_16px.png</file>
+        <file alias="menu_16px@2x.png">images/menu_16px@2x.png</file>
+        <file alias="menu_24px.png">images/menu_24px.png</file>
+        <file alias="menu_24px@2x.png">images/menu_24px@2x.png</file>
         <file alias="move_24px.png">images/move_24px.png</file>
         <file alias="move_24px@2x.png">images/move_24px@2x.png</file>
         <file alias="move_simple_16px.png">images/move_simple_16px.png</file>

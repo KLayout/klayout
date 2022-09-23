@@ -51,7 +51,7 @@
 #include "tlDeferredExecution.h"
 #include "gsi.h"
 
-class QTabBar;
+class QTabWidget;
 class QToolBar;
 class QLabel;
 class QAction;
@@ -110,7 +110,7 @@ public:
    */
   MainWindow (QApplication *app = 0, const char *name = "main_window", bool undo_enabled = true);
 
-  /** 
+  /**
    *  @brief Destructor
    */
   ~MainWindow ();
@@ -137,7 +137,7 @@ public:
   void close_all ();
 
   /**
-   *  @brief Create a new view 
+   *  @brief Create a new view
    *
    *  @return The index of the newly created view
    */
@@ -147,7 +147,7 @@ public:
    *  @brief Startup behaviour immediately before the application is executed.
    *
    *  This method will be called shortly the before the application is executed.
-   *  It is supposed to perform some startup procedure, i.e. displaying tip-of-the-day 
+   *  It is supposed to perform some startup procedure, i.e. displaying tip-of-the-day
    *  windows.
    */
   void about_to_exec ();
@@ -167,14 +167,14 @@ public:
    */
   void restore_session (const std::string &fn);
 
-  /** 
+  /**
    *  @brief Reload the given cellview into the current view
    *
    *  The cellview is given by index in the current view's cellview list.
    */
   void reload_layout (unsigned int cv_index);
 
-  /** 
+  /**
    *  @brief Load a (new) file into the layout
    *
    *  The mode param controls how to open the file:
@@ -185,7 +185,7 @@ public:
     return load_layout (filename, m_initial_technology, mode);
   }
 
-  /** 
+  /**
    *  @brief Load a (new) file into the layout and associate it with the given technology
    *
    *  The mode param controls how to open the file:
@@ -196,7 +196,7 @@ public:
     return load_layout (filename, db::Technologies::instance ()->technology_by_name (technology)->load_layout_options (), technology, mode);
   }
 
-  /** 
+  /**
    *  @brief Load a (new) file into the layout using the given options
    *
    *  The mode param controls how to open the file:
@@ -207,7 +207,7 @@ public:
     return load_layout (filename, options, m_initial_technology, mode);
   }
 
-  /** 
+  /**
    *  @brief Load a (new) file into the layout using the given options and technology
    *
    *  The mode param controls how to open the file:
@@ -215,7 +215,7 @@ public:
    */
   lay::CellViewRef load_layout (const std::string &filename, const db::LoadLayoutOptions &options, const std::string &technology, int mode = 0);
 
-  /** 
+  /**
    *  @brief Create new, empty layout
    *
    *  The mode param controls how to create the layout
@@ -226,7 +226,7 @@ public:
     return create_layout (m_initial_technology, mode);
   }
 
-  /** 
+  /**
    *  @brief Create new, empty layout and associate it with the given technology
    *
    *  The mode param controls how to create the layout
@@ -244,33 +244,33 @@ public:
    *
    *  This version will load the layer properties file "as it is". No mapping of cellview index
    *  is performed. Only adding of missing layers is supported.
-   *  The file name can be an empty string. 
+   *  The file name can be an empty string.
    *
-   *  @param fn The name of the .lyp file to load. 
+   *  @param fn The name of the .lyp file to load.
    *  @param all_views Apply the .lyp file to all views. If false, load the layer properties for the current view.
    *  @param add_default Add the missing layers for each view.
    */
   void load_layer_properties (const std::string &fn, bool all_views, bool add_default);
 
   /**
-   *  @brief Load a layer definition file for a specific cv 
+   *  @brief Load a layer definition file for a specific cv
    *
    *  This version will load the layer properties file and apply it to the given cv. The cv_index
-   *  parameter will denote the cv index to which to apply the layer properties file. It is assumed 
+   *  parameter will denote the cv index to which to apply the layer properties file. It is assumed
    *  that the .lyp file will contain definitions for a single layout only. This definition is
-   *  mapped to the specified cv_index after all definitions for this layout have been removed 
+   *  mapped to the specified cv_index after all definitions for this layout have been removed
    *  from the layer properties list.
-   *  "cv_index" can be -1. In that case, the layer properties file will be loaded multiple times, 
+   *  "cv_index" can be -1. In that case, the layer properties file will be loaded multiple times,
    *  once for each cv present.
    *
-   *  @param fn The name of the .lyp file to load. 
+   *  @param fn The name of the .lyp file to load.
    *  @param cv_index See above
    *  @param all_views Apply the .lyp file to all views. If false, load the layer properties for the current view.
    *  @param add_default Add the missing layers for each view.
    */
   void load_layer_properties (const std::string &fn, int cv_index, bool all_views, bool add_default);
 
-  /** 
+  /**
    *  @brief Grid accessor: get the grid value
    *
    *  This is the version delivering a double value in micron.
@@ -367,12 +367,12 @@ public:
    */
   bool show_progress_bar (bool show);
 
-  /** 
+  /**
    *  @brief Implementation of the Plugin interface
    */
   bool configure (const std::string &name, const std::string &value);
 
-  /** 
+  /**
    *  @brief Implementation of the Plugin interface
    */
   void config_finalize ();
@@ -383,7 +383,7 @@ public:
    *  This method returns true if exit () has been called. This state is never reset.
    *  The main purpose is to detect "exit ()" calls before the event loop is executed.
    */
-  bool exited () 
+  bool exited ()
   {
     return m_exited;
   }
@@ -393,9 +393,9 @@ public:
    *
    *  In busy state, the main window will not try to ask for saving changes etc.
    *  Instead, it will ask whether to shut down the application anyway.
-   *  The intention of the busy state is to implement a special behavior while inside a processEvent 
+   *  The intention of the busy state is to implement a special behavior while inside a processEvent
    *  loop.
-   */  
+   */
   void enter_busy_mode (bool bm)
   {
     m_busy = bm;
@@ -485,14 +485,14 @@ public:
    *  @brief Show the assistant with the given URL
    */
   void show_assistant_url (const std::string &url, bool modal = false);
-  
+
   /**
    *  @brief Show the assistant with the given topic
    */
   void show_assistant_topic (const std::string &s, bool modal = false);
 
   /**
-   *  @brief Show the macro editor 
+   *  @brief Show the macro editor
    *
    *  The category can be given to specify the category to show. If empty, the current category
    *  is shown.
@@ -522,7 +522,7 @@ public:
    *  @brief Open a new layout in mode 'mode'
    *
    *  If mode is 2, the layout is opened in the current view in addition to the existing ones.
-   *  If mode is 1, the layout is opened in a new view. If mode is 0, the layout is opened in 
+   *  If mode is 1, the layout is opened in a new view. If mode is 0, the layout is opened in
    *  the current view deleting the existing ones.
    */
   void open (int mode);
@@ -572,7 +572,7 @@ public:
   /**
    *  @brief Gets the technology used for loading or creating layouts
    */
-  const std::string &initial_technology () 
+  const std::string &initial_technology ()
   {
     return m_initial_technology;
   }
@@ -615,7 +615,7 @@ public slots:
   void message (const std::string &s, int ms);
 
   /**
-   *  @brief Clears the current message 
+   *  @brief Clears the current message
    */
   void clear_message ();
 
@@ -682,7 +682,7 @@ private:
   TextProgressDelegate m_text_progress;
 
   //  Main menu
-  QTabBar *mp_tab_bar;
+  QTabWidget *mp_tab_widget;
   QToolBar *mp_tool_bar;
   QDockWidget *mp_navigator_dock_widget;
   lay::Navigator *mp_navigator;

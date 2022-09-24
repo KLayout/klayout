@@ -65,6 +65,33 @@ namespace tl
   };
 }
 
+namespace
+{
+
+template <class Value>
+struct FallbackXMLWriteAdapator
+{
+  FallbackXMLWriteAdapator (void (db::NetTracerConnectivity::*member) (const Value &))
+    : mp_member (member)
+  {
+    // .. nothing yet ..
+  }
+
+  void operator () (db::NetTracerTechnologyComponent &owner, tl::XMLReaderState &reader) const
+  {
+    if (owner.size () == 0) {
+      owner.push_back (db::NetTracerConnectivity ());
+    }
+    tl::XMLObjTag<Value> tag;
+    ((*owner.begin ()).*mp_member) (*reader.back (tag));
+  }
+
+private:
+  void (db::NetTracerConnectivity::*mp_member) (const Value &);
+};
+
+}
+
 namespace db
 {
 
@@ -86,8 +113,18 @@ public:
   virtual tl::XMLElementBase *xml_element () const
   {
     return new db::TechnologyComponentXMLElement<NetTracerTechnologyComponent> (net_tracer_component_name (),
-      tl::make_member ((NetTracerTechnologyComponent::const_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::begin, (NetTracerTechnologyComponent::const_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::end, &NetTracerTechnologyComponent::add, "connection") +
-      tl::make_member ((NetTracerTechnologyComponent::const_symbol_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::begin_symbols, (NetTracerTechnologyComponent::const_symbol_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::end_symbols, &NetTracerTechnologyComponent::add_symbol, "symbols")
+      //  Fallback readers for migrating pre-0.28 setups to 0.28
+      tl::XMLMember<NetTracerConnectionInfo, NetTracerTechnologyComponent, tl::XMLMemberDummyReadAdaptor <NetTracerConnectionInfo, NetTracerTechnologyComponent>, FallbackXMLWriteAdapator <NetTracerConnectionInfo>, tl::XMLStdConverter <NetTracerConnectionInfo> > (
+        tl::XMLMemberDummyReadAdaptor <NetTracerConnectionInfo, NetTracerTechnologyComponent> (),
+        FallbackXMLWriteAdapator <NetTracerConnectionInfo> (&NetTracerConnectivity::add), "connection") +
+      tl::XMLMember<NetTracerSymbolInfo, NetTracerTechnologyComponent, tl::XMLMemberDummyReadAdaptor <NetTracerSymbolInfo, NetTracerTechnologyComponent>, FallbackXMLWriteAdapator <NetTracerSymbolInfo>, tl::XMLStdConverter <NetTracerSymbolInfo> > (
+        tl::XMLMemberDummyReadAdaptor <NetTracerSymbolInfo, NetTracerTechnologyComponent> (),
+        FallbackXMLWriteAdapator <NetTracerSymbolInfo> (&NetTracerConnectivity::add_symbol), "symbols") +
+      //  0.28 definitions
+      tl::make_element ((NetTracerTechnologyComponent::const_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::begin, (NetTracerTechnologyComponent::const_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::end, (void (NetTracerTechnologyComponent::*) (const NetTracerConnectivity &)) &NetTracerTechnologyComponent::push_back, "connectivity",
+        tl::make_member ((NetTracerConnectivity::const_iterator (NetTracerConnectivity::*) () const) &NetTracerConnectivity::begin, (NetTracerConnectivity::const_iterator (NetTracerConnectivity::*) () const) &NetTracerConnectivity::end, &NetTracerConnectivity::add, "connection") +
+        tl::make_member ((NetTracerConnectivity::const_symbol_iterator (NetTracerConnectivity::*) () const) &NetTracerConnectivity::begin_symbols, (NetTracerConnectivity::const_symbol_iterator (NetTracerConnectivity::*) () const) &NetTracerConnectivity::end_symbols, &NetTracerConnectivity::add_symbol, "symbols")
+      )
     );
   }
 };

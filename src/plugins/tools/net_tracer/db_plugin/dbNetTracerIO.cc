@@ -182,9 +182,9 @@ NetTracerLayerExpressionInfo::compile (const std::string &s)
 }
 
 NetTracerLayerExpression *
-NetTracerLayerExpressionInfo::get_expr (const db::LayerProperties &lp, const db::Layout &layout, const NetTracerTechnologyComponent &tech, const std::set<std::string> &used_symbols) const
+NetTracerLayerExpressionInfo::get_expr (const db::LayerProperties &lp, const db::Layout &layout, const NetTracerConnectivity &tech, const std::set<std::string> &used_symbols) const
 {
-  for (NetTracerTechnologyComponent::const_symbol_iterator s = tech.begin_symbols (); s != tech.end_symbols (); ++s) {
+  for (NetTracerConnectivity::const_symbol_iterator s = tech.begin_symbols (); s != tech.end_symbols (); ++s) {
     if (s->symbol ().log_equal (lp)) {
       std::set<std::string> us = used_symbols;
       if (! us.insert (s->symbol ().to_string ()).second) {
@@ -204,14 +204,14 @@ NetTracerLayerExpressionInfo::get_expr (const db::LayerProperties &lp, const db:
 }
 
 NetTracerLayerExpression *
-NetTracerLayerExpressionInfo::get (const db::Layout &layout, const NetTracerTechnologyComponent &tech) const
+NetTracerLayerExpressionInfo::get (const db::Layout &layout, const NetTracerConnectivity &tech) const
 {
   std::set<std::string> us;
   return get (layout, tech, us);
 }
 
 NetTracerLayerExpression *
-NetTracerLayerExpressionInfo::get (const db::Layout &layout, const NetTracerTechnologyComponent &tech, const std::set<std::string> &used_symbols) const
+NetTracerLayerExpressionInfo::get (const db::Layout &layout, const NetTracerConnectivity &tech, const std::set<std::string> &used_symbols) const
 {
   NetTracerLayerExpression *e = 0;
 
@@ -252,7 +252,7 @@ NetTracerConnectionInfo::NetTracerConnectionInfo (const NetTracerLayerExpression
   // .. nothing yet ..
 }
 
-static int get_layer_id (const NetTracerLayerExpressionInfo &e, const db::Layout &layout, const NetTracerTechnologyComponent &tech, NetTracerData *data)
+static int get_layer_id (const NetTracerLayerExpressionInfo &e, const db::Layout &layout, const NetTracerConnectivity &tech, NetTracerData *data)
 {
   std::unique_ptr<NetTracerLayerExpression> expr_in (NetTracerLayerExpressionInfo::compile (e.to_string ()).get (layout, tech));
   int l = expr_in->alias_for ();
@@ -266,7 +266,7 @@ static int get_layer_id (const NetTracerLayerExpressionInfo &e, const db::Layout
 }
 
 NetTracerConnection
-NetTracerConnectionInfo::get (const db::Layout &layout, const NetTracerTechnologyComponent &tech, NetTracerData &data) const
+NetTracerConnectionInfo::get (const db::Layout &layout, const NetTracerConnectivity &tech, NetTracerData &data) const
 {
   int la = get_layer_id (m_la, layout, tech, &data);
   int lb = get_layer_id (m_lb, layout, tech, &data);
@@ -491,29 +491,39 @@ NetTracerNet::define_layer (unsigned int l, const db::LayerProperties &lp, const
 NetTracerTechnologyComponent::NetTracerTechnologyComponent ()
   : db::TechnologyComponent (net_tracer_component_name (), tl::to_string (tr ("Connectivity")))
 {
+  //  .. nothing yet ..
+}
+
+// -----------------------------------------------------------------------------------
+//  NetTracerConnectivity implementation
+
+NetTracerConnectivity::NetTracerConnectivity ()
+{
   // .. nothing yet ..
 }
 
-NetTracerTechnologyComponent::NetTracerTechnologyComponent (const NetTracerTechnologyComponent &d)
-  : db::TechnologyComponent (net_tracer_component_name (), tl::to_string (tr ("Connectivity")))
+NetTracerConnectivity::NetTracerConnectivity (const NetTracerConnectivity &d)
 {
-  m_connections = d.m_connections;
-  m_symbols = d.m_symbols;
+  operator= (d);
 }
 
-NetTracerTechnologyComponent &NetTracerTechnologyComponent::operator= (const NetTracerTechnologyComponent &d)
+NetTracerConnectivity &NetTracerConnectivity::operator= (const NetTracerConnectivity &d)
 {
-  m_connections = d.m_connections;
-  m_symbols = d.m_symbols;
+  if (this != &d) {
+    m_connections = d.m_connections;
+    m_symbols = d.m_symbols;
+    m_name = d.m_name;
+    m_description = d.m_description;
+  }
   return *this;
 }
 
 NetTracerData
-NetTracerTechnologyComponent::get_tracer_data (const db::Layout &layout) const
+NetTracerConnectivity::get_tracer_data (const db::Layout &layout) const
 {
   //  test run on the expressions to verify their syntax
   int n = 1;
-  for (NetTracerTechnologyComponent::const_iterator c = begin (); c != end (); ++c, ++n) {
+  for (NetTracerConnectivity::const_iterator c = begin (); c != end (); ++c, ++n) {
     if (c->layer_a ().to_string ().empty ()) {
       throw tl::Exception (tl::to_string (tr ("Missing first layer specification on connectivity specification #%d")), n);
     }
@@ -523,7 +533,7 @@ NetTracerTechnologyComponent::get_tracer_data (const db::Layout &layout) const
   }
 
   n = 1;
-  for (NetTracerTechnologyComponent::const_symbol_iterator s = begin_symbols (); s != end_symbols (); ++s, ++n) {
+  for (NetTracerConnectivity::const_symbol_iterator s = begin_symbols (); s != end_symbols (); ++s, ++n) {
     if (s->symbol ().to_string ().empty ()) {
       throw tl::Exception (tl::to_string (tr ("Missing symbol name on symbol specification #%d")), n);
     }
@@ -540,12 +550,12 @@ NetTracerTechnologyComponent::get_tracer_data (const db::Layout &layout) const
   NetTracerData data;
 
   //  register a logical layer for each original one as alias and one for each expression with a new ID
-  for (db::NetTracerTechnologyComponent::const_symbol_iterator s = begin_symbols (); s != end_symbols (); ++s) {
+  for (db::NetTracerConnectivity::const_symbol_iterator s = begin_symbols (); s != end_symbols (); ++s) {
     db::NetTracerLayerExpression *expr = db::NetTracerLayerExpressionInfo::compile (s->expression ()).get (layout, *this);
     data.register_logical_layer (expr, s->symbol ().to_string ().c_str ());
   }
 
-  for (db::NetTracerTechnologyComponent::const_iterator c = begin (); c != end (); ++c) {
+  for (db::NetTracerConnectivity::const_iterator c = begin (); c != end (); ++c) {
     data.add_connection (c->get (layout, *this, data));
   }
 

@@ -32,14 +32,14 @@ namespace gsi
 // -----------------------------------------------------------------------------------
 //  GSI binding
 
-static void def_connection2 (db::NetTracerTechnologyComponent *tech, const std::string &la, const std::string &lb)
+static void def_connection2 (db::NetTracerConnectivity *tech, const std::string &la, const std::string &lb)
 {
   db::NetTracerLayerExpressionInfo la_info = db::NetTracerLayerExpressionInfo::compile (la);
   db::NetTracerLayerExpressionInfo lb_info = db::NetTracerLayerExpressionInfo::compile (lb);
   tech->add (db::NetTracerConnectionInfo (la_info, lb_info));
 }
 
-static void def_connection3 (db::NetTracerTechnologyComponent *tech, const std::string &la, const std::string &via, const std::string &lb)
+static void def_connection3 (db::NetTracerConnectivity *tech, const std::string &la, const std::string &via, const std::string &lb)
 {
   db::NetTracerLayerExpressionInfo la_info = db::NetTracerLayerExpressionInfo::compile (la);
   db::NetTracerLayerExpressionInfo via_info = db::NetTracerLayerExpressionInfo::compile (via);
@@ -47,14 +47,26 @@ static void def_connection3 (db::NetTracerTechnologyComponent *tech, const std::
   tech->add (db::NetTracerConnectionInfo (la_info, via_info, lb_info));
 }
 
-static void def_symbol (db::NetTracerTechnologyComponent *tech, const std::string &name, const std::string &expr)
+static void def_symbol (db::NetTracerConnectivity *tech, const std::string &name, const std::string &expr)
 {
   tech->add_symbol (db::NetTracerSymbolInfo (db::LayerProperties (name), expr));
 }
 
-gsi::Class<db::TechnologyComponent> &decl_dbTechnologyComponent ();
-
-gsi::Class<db::NetTracerTechnologyComponent> decl_NetTracerTechnology (decl_dbTechnologyComponent (), "db", "NetTracerTechnology",
+gsi::Class<db::NetTracerConnectivity> decl_NetTracerConnectivity ("db", "NetTracerConnectivity",
+  gsi::method ("name", &db::NetTracerConnectivity::name,
+    "@brief Gets the name of the connectivty definition\n"
+    "The name is an optional string defining the formal name for this definition.\n"
+  ) +
+  gsi::method ("name=", &db::NetTracerConnectivity::set_name, gsi::arg ("n"),
+    "@brief Sets the name of the connectivty definition\n"
+  ) +
+  gsi::method ("description", &db::NetTracerConnectivity::description,
+    "@brief Gets the description text of the connectivty definition\n"
+    "The description is an optional string giving a human-readable description for this definition."
+  ) +
+  gsi::method ("description=", &db::NetTracerConnectivity::set_description, gsi::arg ("d"),
+    "@brief Sets the description of the connectivty definition\n"
+  ) +
   gsi::method_ext ("connection", &def_connection2, gsi::arg("a"), gsi::arg("b"),
     "@brief Defines a connection between two materials\n"
     "See the class description for details about this method."
@@ -68,7 +80,7 @@ gsi::Class<db::NetTracerTechnologyComponent> decl_NetTracerTechnology (decl_dbTe
     "Defines a sub-expression to be used in further symbols or material expressions. "
     "For the detailed notation of the expression see the description of the net tracer feature."
   ),
-  "@brief A technology description for the net tracer\n"
+  "@brief A connectivity description for the net tracer\n"
   "\n"
   "This object represents the technology description for the net tracer (represented by the \\NetTracer class).\n"
   "A technology description basically consists of connection declarations.\n"
@@ -83,16 +95,17 @@ gsi::Class<db::NetTracerTechnologyComponent> decl_NetTracerTechnology (decl_dbTe
   "\n"
   "For details about the expressions see the description of the net tracer feature.\n"
   "\n"
-  "This class has been introduced in version 0.25.\n"
+  "This class has been introduced in version 0.28 and replaces the 'NetTracerTechnology' class which "
+  "has been generalized.\n"
 );
 
-static void trace1 (db::NetTracer *net_tracer, const db::NetTracerTechnologyComponent &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer)
+static void trace1 (db::NetTracer *net_tracer, const db::NetTracerConnectivity &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer)
 {
   db::NetTracerData tracer_data = tech.get_tracer_data (layout);
   net_tracer->trace (layout, cell, start_point, start_layer, tracer_data);
 }
 
-static void trace2 (db::NetTracer *net_tracer, const db::NetTracerTechnologyComponent &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer, const db::Point &stop_point, unsigned int stop_layer)
+static void trace2 (db::NetTracer *net_tracer, const db::NetTracerConnectivity &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer, const db::Point &stop_point, unsigned int stop_layer)
 {
   db::NetTracerData tracer_data = tech.get_tracer_data (layout);
   net_tracer->trace (layout, cell, start_point, start_layer, stop_point, stop_layer, tracer_data);
@@ -106,7 +119,31 @@ static db::NetTracerData get_tracer_data_from_tech (const std::string &tech_name
   const db::NetTracerTechnologyComponent *tech_component = dynamic_cast <const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
   tl_assert (tech_component != 0);
 
-  return tech_component->get_tracer_data (layout);
+  if (tech_component->size () < 1) {
+    throw tl::Exception (tl::to_string (tr ("No connectivity setup exists for technology '%s'")), tech_name);
+  }
+  if (tech_component->size () > 1) {
+    throw tl::Exception (tl::to_string (tr ("Multiple connectivity setups exist for technology '%s' - specify a name")), tech_name);
+  }
+
+  return tech_component->begin ()->get_tracer_data (layout);
+}
+
+static db::NetTracerData get_tracer_data_from_tech (const std::string &tech_name, const std::string &name, const db::Layout &layout)
+{
+  const db::Technology *tech = db::Technologies::instance ()->technology_by_name (tech_name);
+  tl_assert (tech != 0);
+
+  const db::NetTracerTechnologyComponent *tech_component = dynamic_cast <const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
+  tl_assert (tech_component != 0);
+
+  for (auto t = tech_component->begin (); t != tech_component->end (); ++t) {
+    if (t->name () == name) {
+      return t->get_tracer_data (layout);
+    }
+  }
+
+  throw tl::Exception (tl::to_string (tr ("No connectivity setup exists with name '%s' for technology '%s'")), name, tech_name);
 }
 
 static void trace1_tn (db::NetTracer *net_tracer, const std::string &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer)
@@ -115,9 +152,21 @@ static void trace1_tn (db::NetTracer *net_tracer, const std::string &tech, const
   net_tracer->trace (layout, cell, start_point, start_layer, tracer_data);
 }
 
+static void trace1_tn2 (db::NetTracer *net_tracer, const std::string &tech, const std::string &name, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer)
+{
+  db::NetTracerData tracer_data = get_tracer_data_from_tech (tech, name, layout);
+  net_tracer->trace (layout, cell, start_point, start_layer, tracer_data);
+}
+
 static void trace2_tn (db::NetTracer *net_tracer, const std::string &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer, const db::Point &stop_point, unsigned int stop_layer)
 {
   db::NetTracerData tracer_data = get_tracer_data_from_tech (tech, layout);
+  net_tracer->trace (layout, cell, start_point, start_layer, stop_point, stop_layer, tracer_data);
+}
+
+static void trace2_tn2 (db::NetTracer *net_tracer, const std::string &tech, const std::string &name, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer, const db::Point &stop_point, unsigned int stop_layer)
+{
+  db::NetTracerData tracer_data = get_tracer_data_from_tech (tech, name, layout);
   net_tracer->trace (layout, cell, start_point, start_layer, stop_point, stop_layer, tracer_data);
 }
 
@@ -178,7 +227,7 @@ gsi::Class<db::NetTracer> decl_NetTracer ("db", "NetTracer",
     "A path extraction version is provided as well which will extract one (the presumably shortest) path between two "
     "points.\n"
     "\n"
-    "@param tech The technology definition\n"
+    "@param tech The connectivity definition\n"
     "@param layout The layout on which to run the extraction\n"
     "@param cell The cell on which to run the extraction (child cells will be included)\n"
     "@param start_point The start point from which to start extraction of the net\n"
@@ -194,7 +243,7 @@ gsi::Class<db::NetTracer> decl_NetTracer ("db", "NetTracer",
     "\n"
     "This version runs a path extraction and will deliver elements forming one path leading from the start to the end point.\n"
     "\n"
-    "@param tech The technology definition\n"
+    "@param tech The connectivity definition\n"
     "@param layout The layout on which to run the extraction\n"
     "@param cell The cell on which to run the extraction (child cells will be included)\n"
     "@param start_point The start point from which to start extraction of the net\n"
@@ -205,12 +254,30 @@ gsi::Class<db::NetTracer> decl_NetTracer ("db", "NetTracer",
   gsi::method_ext ("trace", &trace1_tn, gsi::arg ("tech"), gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("start_point"), gsi::arg ("start_layer"),
     "@brief Runs a net extraction taking a predefined technology\n"
     "This method behaves identical as the version with a technology object, except that it will look for a technology "
-    "with the given name to obtain the extraction setup."
+    "with the given name to obtain the extraction setup.\n"
+    "The technology is looked up by technology name. A version of this method exists where it is possible "
+    "to specify the name of the particular connectivity to use in case there are multiple definitions available."
+  ) +
+  gsi::method_ext ("trace", &trace1_tn2, gsi::arg ("tech"), gsi::arg ("connectivity_name"), gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("start_point"), gsi::arg ("start_layer"),
+    "@brief Runs a net extraction taking a predefined technology\n"
+    "This method behaves identical as the version with a technology object, except that it will look for a technology "
+    "with the given name to obtain the extraction setup. "
+    "This version allows specifying the name of the connecvitiy setup.\n"
+    "\n"
+    "This method variant has been introduced in version 0.28."
   ) +
   gsi::method_ext ("trace", &trace2_tn, gsi::arg ("tech"), gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("start_point"), gsi::arg ("start_layer"), gsi::arg ("stop_point"), gsi::arg ("stop_layer"),
     "@brief Runs a path extraction taking a predefined technology\n"
     "This method behaves identical as the version with a technology object, except that it will look for a technology "
     "with the given name to obtain the extraction setup."
+  ) +
+  gsi::method_ext ("trace", &trace2_tn2, gsi::arg ("tech"), gsi::arg ("connectivity_name"), gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("start_point"), gsi::arg ("start_layer"), gsi::arg ("stop_point"), gsi::arg ("stop_layer"),
+    "@brief Runs a path extraction taking a predefined technology\n"
+    "This method behaves identical as the version with a technology object, except that it will look for a technology "
+    "with the given name to obtain the extraction setup."
+    "This version allows specifying the name of the connecvitiy setup.\n"
+    "\n"
+    "This method variant has been introduced in version 0.28."
   ) +
   gsi::iterator ("each_element", &db::NetTracer::begin, &db::NetTracer::end,
     "@brief Iterates over the elements found during extraction\n"

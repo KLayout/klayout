@@ -22,10 +22,10 @@
 
 
 
-#ifndef HDR_layNetTracerIO
-#define HDR_layNetTracerIO
+#ifndef HDR_layNetTracerConnectivityEditor
+#define HDR_layNetTracerConnectivityEditor
 
-#include "ui_NetTracerTechComponentEditor.h"
+#include "ui_NetTracerConnectivityEditor.h"
 
 #include "dbNetTracer.h"
 #include "dbNetTracerIO.h"
@@ -42,25 +42,23 @@
 
 namespace db
 {
-  class NetTracerTechnologyComponent;
+  class NetTracerConnectivity;
 }
 
 namespace lay
 {
 
-class FileDialog;
-
-class NetTracerTechComponentEditor
-  : public lay::TechnologyComponentEditor,
-    public Ui::NetTracerTechComponentEditor
+class NetTracerConnectivityEditor
+  : public QWidget,
+    public Ui::NetTracerConnectivityEditor
 {
 Q_OBJECT
 
 public:
-  NetTracerTechComponentEditor (QWidget *parent);
+  NetTracerConnectivityEditor (QWidget *parent);
 
-  void commit ();
-  void setup ();
+  void set_connectivity (const db::NetTracerConnectivity &data);
+  const db::NetTracerConnectivity &get_connectiviy();
 
 public slots:
   void add_clicked ();
@@ -73,7 +71,7 @@ public slots:
   void symbol_move_down_clicked ();
 
 private:
-  db::NetTracerTechnologyComponent m_data;
+  db::NetTracerConnectivity m_data;
 
   void update ();
 };

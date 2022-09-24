@@ -50,7 +50,7 @@ static db::NetTracerSymbolInfo symbol (const std::string &s, const std::string &
   return db::NetTracerSymbolInfo (s, e);
 }
 
-void run_test (tl::TestBase *_this, const std::string &file, const db::NetTracerTechnologyComponent &tc, const std::string &file_au)
+void run_test (tl::TestBase *_this, const std::string &file, const db::NetTracerConnectivity &tc, const std::string &file_au)
 {
   db::Manager m (false);
 
@@ -93,7 +93,7 @@ TEST(1)
   std::string file = "t1.oas.gz";
   std::string file_au = "t1_all_nets.oas.gz";
 
-  db::NetTracerTechnologyComponent tc;
+  db::NetTracerConnectivity tc;
   tc.add (connection ("1/0", "2/0", "3/0"));
 
   run_test (_this, file, tc, file_au);
@@ -104,7 +104,7 @@ TEST(1c)
   std::string file = "t1.oas.gz";
   std::string file_au = "t1_all_nets.oas.gz";
 
-  db::NetTracerTechnologyComponent tc;
+  db::NetTracerConnectivity tc;
   tc.add_symbol (symbol ("a", "1/0"));
   tc.add_symbol (symbol ("c", "cc"));
   tc.add_symbol (symbol ("cc", "3/0"));
@@ -118,7 +118,7 @@ TEST(1d)
   std::string file = "t1.oas.gz";
   std::string file_au = "t1d_all_nets.oas.gz";
 
-  db::NetTracerTechnologyComponent tc;
+  db::NetTracerConnectivity tc;
   tc.add (connection ("1/0", "10/0", "11/0"));
 
   //  some layers are non-existing
@@ -130,7 +130,7 @@ TEST(4)
   std::string file = "t4.oas.gz";
   std::string file_au = "t4_all_nets.oas.gz";
 
-  db::NetTracerTechnologyComponent tc;
+  db::NetTracerConnectivity tc;
   tc.add (connection ("1/0", "2/0", "3/0"));
 
   run_test (_this, file, tc, file_au);
@@ -141,7 +141,7 @@ TEST(4b)
   std::string file = "t4.oas.gz";
   std::string file_au = "t4b_all_nets.oas.gz";
 
-  db::NetTracerTechnologyComponent tc;
+  db::NetTracerConnectivity tc;
   tc.add (connection ("1/0", "3/0"));
 
   run_test (_this, file, tc, file_au);
@@ -152,7 +152,7 @@ TEST(5)
   std::string file = "t5.oas.gz";
   std::string file_au = "t5_all_nets.oas.gz";
 
-  db::NetTracerTechnologyComponent tc;
+  db::NetTracerConnectivity tc;
   tc.add (connection ("1/0*10/0", "2/0", "3/0"));
 
   run_test (_this, file, tc, file_au);
@@ -163,7 +163,7 @@ TEST(5b)
   std::string file = "t5.oas.gz";
   std::string file_au = "t5b_all_nets.oas.gz";
 
-  db::NetTracerTechnologyComponent tc;
+  db::NetTracerConnectivity tc;
   tc.add (connection ("1/0", "2/0*10/0", "3/0"));
 
   run_test (_this, file, tc, file_au);
@@ -174,7 +174,7 @@ TEST(5c)
   std::string file = "t5.oas.gz";
   std::string file_au = "t5c_all_nets.oas.gz";
 
-  db::NetTracerTechnologyComponent tc;
+  db::NetTracerConnectivity tc;
   tc.add (connection ("1/0", "2/0-11/0", "3/0"));
 
   run_test (_this, file, tc, file_au);
@@ -185,7 +185,7 @@ TEST(5d)
   std::string file = "t5.oas.gz";
   std::string file_au = "t5d_all_nets.oas.gz";
 
-  db::NetTracerTechnologyComponent tc;
+  db::NetTracerConnectivity tc;
   tc.add (connection ("1/0-12/0", "2/0", "3/0-12/0"));
 
   run_test (_this, file, tc, file_au);
@@ -196,7 +196,7 @@ TEST(5f)
   std::string file = "t5.oas.gz";
   std::string file_au = "t5f_all_nets.oas.gz";
 
-  db::NetTracerTechnologyComponent tc;
+  db::NetTracerConnectivity tc;
   tc.add_symbol (symbol ("x", "3-14"));
   tc.add (connection ("10-13", "x"));
   tc.add (connection ("x", "2", "1+13"));
@@ -209,7 +209,7 @@ TEST(6)
   std::string file = "t6.oas.gz";
   std::string file_au = "t6_all_nets.oas.gz";
 
-  db::NetTracerTechnologyComponent tc;
+  db::NetTracerConnectivity tc;
   tc.add (connection ("1-10", "2", "3"));
   tc.add (connection ("3", "4", "5"));
 
@@ -221,7 +221,7 @@ TEST(7)
   std::string file = "t7.oas.gz";
   std::string file_au = "t7_all_nets.oas.gz";
 
-  db::NetTracerTechnologyComponent tc;
+  db::NetTracerConnectivity tc;
   tc.add (connection ("15", "14", "2-7"));
   tc.add (connection ("15", "14", "7"));
 

@@ -290,7 +290,7 @@ NetTracerDialog::get_net_tracer_setup (const lay::CellView &cv, db::NetTracerDat
   if (! tech) {
     return false;
   }
-  const db::NetTracerTechnologyComponent *tech_component = dynamic_cast <const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
+  const db::NetTracerConnectivity *tech_component = dynamic_cast <const db::NetTracerConnectivity *> (tech->component_by_name (db::net_tracer_component_name ()));
   if (! tech_component) {
     return false;
   }

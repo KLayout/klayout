@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>NetTracerTechComponentEditor</class>
- <widget class="QWidget" name="NetTracerTechComponentEditor" >
-  <property name="geometry" >
+ <widget class="QWidget" name="NetTracerTechComponentEditor">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,317 +10,204 @@
     <height>449</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
-    <number>6</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QSplitter" name="splitter" >
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QFrame" name="frame_6" >
-      <property name="frameShape" >
+     <widget class="QFrame" name="frame_5">
+      <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
       </property>
-      <property name="frameShadow" >
+      <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <layout class="QVBoxLayout" >
-       <property name="margin" >
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
         <number>0</number>
        </property>
-       <property name="spacing" >
-        <number>6</number>
+       <property name="topMargin">
+        <number>0</number>
        </property>
-       <item>
-        <widget class="QFrame" name="frame_2" >
-         <property name="frameShape" >
-          <enum>QFrame::NoFrame</enum>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="4" column="4">
+        <widget class="QToolButton" name="move_down_pb">
+         <property name="text">
+          <string>...</string>
          </property>
-         <property name="frameShadow" >
-          <enum>QFrame::Raised</enum>
+         <property name="icon">
+          <iconset resource="../../../../icons/icons.qrc">
+           <normaloff>:/down_16px.png</normaloff>:/down_16px.png</iconset>
          </property>
-         <layout class="QHBoxLayout" >
-          <property name="margin" >
-           <number>0</number>
-          </property>
-          <property name="spacing" >
-           <number>6</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="help_label" >
-            <property name="text" >
-             <string>&lt;html>Connectivity (&lt;a href="int:/about/connectivity.xml">See here for details&lt;/a>)&lt;/html></string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer>
-            <property name="orientation" >
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" >
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
         </widget>
        </item>
-       <item>
-        <widget class="QFrame" name="frame_5" >
-         <property name="frameShape" >
+       <item row="4" column="2">
+        <widget class="QToolButton" name="del_pb">
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../../icons/icons.qrc">
+           <normaloff>:/del_16px.png</normaloff>:/del_16px.png</iconset>
+         </property>
+         <property name="shortcut">
+          <string>Del</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="3">
+        <widget class="QToolButton" name="move_up_pb">
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../../icons/icons.qrc">
+           <normaloff>:/up_16px.png</normaloff>:/up_16px.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" colspan="5">
+        <widget class="QFrame" name="frame_2">
+         <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
-         <property name="frameShadow" >
+         <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QGridLayout" >
-          <property name="margin" >
-           <number>0</number>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="6">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Double-click to edit text</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" rowspan="2" colspan="6">
+        <widget class="QTreeWidget" name="stack_tree">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
+         </property>
+         <column>
+          <property name="text">
+           <string>Name</string>
           </property>
-          <property name="spacing" >
-           <number>6</number>
+         </column>
+         <column>
+          <property name="text">
+           <string>Description</string>
           </property>
-          <item row="3" column="1" >
-           <widget class="QToolButton" name="move_conductor_down_pb" >
-            <property name="text" >
-             <string>...</string>
-            </property>
-            <property name="icon" >
-             <iconset resource="layResources.qrc" >:/down_16px.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1" >
-           <widget class="QToolButton" name="del_conductor_pb" >
-            <property name="text" >
-             <string>...</string>
-            </property>
-            <property name="icon" >
-             <iconset resource="layResources.qrc" >:/del_16px.png</iconset>
-            </property>
-            <property name="shortcut" >
-             <string>Del</string>
-            </property>
-           </widget>
-          </item>
-          <item rowspan="5" row="0" column="0" >
-           <widget class="QTableWidget" name="connectivity_table" >
-            <property name="editTriggers" >
-             <set>QAbstractItemView::AllEditTriggers</set>
-            </property>
-            <property name="alternatingRowColors" >
-             <bool>true</bool>
-            </property>
-            <property name="selectionBehavior" >
-             <enum>QAbstractItemView::SelectRows</enum>
-            </property>
-            <property name="columnCount" >
-             <number>3</number>
-            </property>
-            <column/>
-            <column/>
-            <column/>
-           </widget>
-          </item>
-          <item row="0" column="1" >
-           <widget class="QToolButton" name="add_conductor_pb" >
-            <property name="text" >
-             <string>...</string>
-            </property>
-            <property name="icon" >
-             <iconset resource="layResources.qrc" >:/add_16px.png</iconset>
-            </property>
-            <property name="shortcut" >
-             <string>Return</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1" >
-           <spacer>
-            <property name="orientation" >
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" >
-             <size>
-              <width>20</width>
-              <height>131</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="2" column="1" >
-           <widget class="QToolButton" name="move_conductor_up_pb" >
-            <property name="text" >
-             <string>...</string>
-            </property>
-            <property name="icon" >
-             <iconset resource="layResources.qrc" >:/up_16px.png</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         </column>
+        </widget>
+       </item>
+       <item row="4" column="5">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>157</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="4" column="0" colspan="2">
+        <widget class="QToolButton" name="add_pb">
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../../icons/icons.qrc">
+           <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
+         </property>
+         <property name="shortcut">
+          <string>Return</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="6">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Technology Stacks</string>
+         </property>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QFrame" name="frame_4" >
-      <property name="frameShape" >
+     <widget class="QFrame" name="frame">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>1</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
       </property>
-      <property name="frameShadow" >
+      <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <layout class="QVBoxLayout" >
-       <property name="margin" >
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="leftMargin">
         <number>0</number>
        </property>
-       <property name="spacing" >
-        <number>6</number>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
        </property>
        <item>
-        <widget class="QFrame" name="frame_3" >
-         <property name="frameShape" >
-          <enum>QFrame::NoFrame</enum>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Connectivity</string>
          </property>
-         <property name="frameShadow" >
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QHBoxLayout" >
-          <property name="margin" >
-           <number>0</number>
-          </property>
-          <property name="spacing" >
-           <number>6</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="symbol_help_label" >
-            <property name="text" >
-             <string>&lt;html>Computed and symbolic layers (&lt;a href="int:/about/symbolic_layers.xml">See here for details&lt;/a>)&lt;/html></string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer>
-            <property name="orientation" >
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" >
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frame" >
-         <property name="frameShape" >
-          <enum>QFrame::NoFrame</enum>
+        <widget class="lay::NetTracerConnectivityEditor" name="connectivity_editor_widget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
          </property>
-         <property name="frameShadow" >
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QGridLayout" >
-          <property name="margin" >
-           <number>0</number>
-          </property>
-          <property name="spacing" >
-           <number>6</number>
-          </property>
-          <item row="3" column="1" >
-           <widget class="QToolButton" name="move_symbol_down_pb" >
-            <property name="text" >
-             <string>...</string>
-            </property>
-            <property name="icon" >
-             <iconset resource="layResources.qrc" >:/down_16px.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1" >
-           <widget class="QToolButton" name="del_symbol_pb" >
-            <property name="text" >
-             <string>...</string>
-            </property>
-            <property name="icon" >
-             <iconset resource="layResources.qrc" >:/del_16px.png</iconset>
-            </property>
-            <property name="shortcut" >
-             <string>Del</string>
-            </property>
-           </widget>
-          </item>
-          <item rowspan="5" row="0" column="0" >
-           <widget class="QTableWidget" name="symbol_table" >
-            <property name="editTriggers" >
-             <set>QAbstractItemView::AllEditTriggers</set>
-            </property>
-            <property name="alternatingRowColors" >
-             <bool>true</bool>
-            </property>
-            <property name="selectionBehavior" >
-             <enum>QAbstractItemView::SelectRows</enum>
-            </property>
-            <property name="columnCount" >
-             <number>2</number>
-            </property>
-            <column/>
-            <column/>
-           </widget>
-          </item>
-          <item row="0" column="1" >
-           <widget class="QToolButton" name="add_symbol_pb" >
-            <property name="text" >
-             <string>...</string>
-            </property>
-            <property name="icon" >
-             <iconset resource="layResources.qrc" >:/add_16px.png</iconset>
-            </property>
-            <property name="shortcut" >
-             <string>Return</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1" >
-           <spacer>
-            <property name="orientation" >
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" >
-             <size>
-              <width>20</width>
-              <height>131</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="2" column="1" >
-           <widget class="QToolButton" name="move_symbol_up_pb" >
-            <property name="text" >
-             <string>...</string>
-            </property>
-            <property name="icon" >
-             <iconset resource="layResources.qrc" >:/up_16px.png</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -327,6 +215,16 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>lay::NetTracerConnectivityEditor</class>
+   <extends>QWidget</extends>
+   <header>layNetTracerConnectivityEditor.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../../../icons/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

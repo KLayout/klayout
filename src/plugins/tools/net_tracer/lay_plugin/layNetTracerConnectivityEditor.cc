@@ -21,7 +21,7 @@
 */
 
 
-#include "layNetTracerIO.h"
+#include "layNetTracerConnectivityEditor.h"
 #include "layNetTracerConfig.h"
 
 #include "layConfigurationDialog.h"
@@ -56,7 +56,7 @@ class NetTracerConnectivityColumnDelegate
   : public QItemDelegate
 {
 public:
-  NetTracerConnectivityColumnDelegate (QWidget *parent, db::NetTracerTechnologyComponent *data)
+  NetTracerConnectivityColumnDelegate (QWidget *parent, db::NetTracerConnectivity *data)
     : QItemDelegate (parent), mp_data (data)
   {
     //  .. nothing yet ..
@@ -148,7 +148,7 @@ public:
   }
 
 private:
-  db::NetTracerTechnologyComponent *mp_data;
+  db::NetTracerConnectivity *mp_data;
 };
 
 // -----------------------------------------------------------------------------------------
@@ -158,7 +158,7 @@ class NetTracerConnectivitySymbolColumnDelegate
   : public QItemDelegate
 {
 public:
-  NetTracerConnectivitySymbolColumnDelegate (QWidget *parent, db::NetTracerTechnologyComponent *data)
+  NetTracerConnectivitySymbolColumnDelegate (QWidget *parent, db::NetTracerConnectivity *data)
     : QItemDelegate (parent), mp_data (data)
   {
     //  .. nothing yet ..
@@ -262,16 +262,16 @@ public:
   }
 
 private:
-  db::NetTracerTechnologyComponent *mp_data;
+  db::NetTracerConnectivity *mp_data;
 };
 
 // -----------------------------------------------------------------------------------
 //  NetTracerTechComponentEditor implementation
 
-NetTracerTechComponentEditor::NetTracerTechComponentEditor (QWidget *parent)
-  : TechnologyComponentEditor (parent)
+NetTracerConnectivityEditor::NetTracerConnectivityEditor (QWidget *parent)
+  : QWidget (parent)
 {
-  Ui::NetTracerTechComponentEditor::setupUi (this);
+  Ui::NetTracerConnectivityEditor::setupUi (this);
 
   connect (add_conductor_pb, SIGNAL (clicked ()), this, SLOT (add_clicked ()));
   connect (del_conductor_pb, SIGNAL (clicked ()), this, SLOT (del_clicked ()));
@@ -293,26 +293,16 @@ NetTracerTechComponentEditor::NetTracerTechComponentEditor (QWidget *parent)
   symbol_table->verticalHeader ()->hide ();
 }
 
-void 
-NetTracerTechComponentEditor::commit ()
+const db::NetTracerConnectivity &
+NetTracerConnectivityEditor::get_connectiviy ()
 {
-  db::NetTracerTechnologyComponent *data = dynamic_cast <db::NetTracerTechnologyComponent *> (tech_component ());
-  if (! data) {
-    return;
-  }
-
-  *data = m_data;
+  return m_data;
 }
 
 void 
-NetTracerTechComponentEditor::setup ()
+NetTracerConnectivityEditor::set_connectivity (const db::NetTracerConnectivity &data)
 {
-  db::NetTracerTechnologyComponent *data = dynamic_cast <db::NetTracerTechnologyComponent *> (tech_component ());
-  if (! data) {
-    return;
-  }
-
-  m_data = *data;
+  m_data = data;
 
   for (int c = 0; c < 3; ++c) {
     if (connectivity_table->itemDelegateForColumn (c) != 0) {
@@ -332,7 +322,7 @@ NetTracerTechComponentEditor::setup ()
 }
 
 void 
-NetTracerTechComponentEditor::add_clicked ()
+NetTracerConnectivityEditor::add_clicked ()
 {
   //  removes focus from the tree view - commits the data
   add_conductor_pb->setFocus (); 
@@ -351,7 +341,7 @@ NetTracerTechComponentEditor::add_clicked ()
 }
 
 void 
-NetTracerTechComponentEditor::del_clicked ()
+NetTracerConnectivityEditor::del_clicked ()
 {
   //  removes focus from the tree view - commits the data
   del_conductor_pb->setFocus (); 
@@ -374,7 +364,7 @@ NetTracerTechComponentEditor::del_clicked ()
 }
 
 void 
-NetTracerTechComponentEditor::move_up_clicked ()
+NetTracerConnectivityEditor::move_up_clicked ()
 {
   //  removes focus from the tree view - commits the data
   move_conductor_up_pb->setFocus (); 
@@ -391,7 +381,7 @@ NetTracerTechComponentEditor::move_up_clicked ()
   connectivity_table->setCurrentIndex (QModelIndex ());
 
   int n = 0;
-  for (db::NetTracerTechnologyComponent::iterator l = m_data.begin (); l != m_data.end (); ++l, ++n) {
+  for (db::NetTracerConnectivity::iterator l = m_data.begin (); l != m_data.end (); ++l, ++n) {
     if (selected_rows.find (n + 1) != selected_rows.end () && selected_rows.find (n) == selected_rows.end ()) {
       std::swap (m_data.begin () [n + 1], m_data.begin () [n]);
       selected_rows.erase (n + 1);
@@ -415,7 +405,7 @@ NetTracerTechComponentEditor::move_up_clicked ()
 }
 
 void 
-NetTracerTechComponentEditor::move_down_clicked ()
+NetTracerConnectivityEditor::move_down_clicked ()
 {
   //  removes focus from the tree view - commits the data
   move_conductor_down_pb->setFocus (); 
@@ -432,7 +422,7 @@ NetTracerTechComponentEditor::move_down_clicked ()
   connectivity_table->setCurrentIndex (QModelIndex ());
 
   int n = int (m_data.size ());
-  for (db::NetTracerTechnologyComponent::iterator l = m_data.end (); l != m_data.begin (); ) {
+  for (db::NetTracerConnectivity::iterator l = m_data.end (); l != m_data.begin (); ) {
     --l;
     --n;
     if (selected_rows.find (n - 1) != selected_rows.end () && selected_rows.find (n) == selected_rows.end ()) {
@@ -458,7 +448,7 @@ NetTracerTechComponentEditor::move_down_clicked ()
 }
 
 void 
-NetTracerTechComponentEditor::symbol_add_clicked ()
+NetTracerConnectivityEditor::symbol_add_clicked ()
 {
   //  removes focus from the tree view - commits the data
   add_symbol_pb->setFocus (); 
@@ -477,7 +467,7 @@ NetTracerTechComponentEditor::symbol_add_clicked ()
 }
 
 void 
-NetTracerTechComponentEditor::symbol_del_clicked ()
+NetTracerConnectivityEditor::symbol_del_clicked ()
 {
   //  removes focus from the tree view - commits the data
   del_symbol_pb->setFocus (); 
@@ -500,7 +490,7 @@ NetTracerTechComponentEditor::symbol_del_clicked ()
 }
 
 void 
-NetTracerTechComponentEditor::symbol_move_up_clicked ()
+NetTracerConnectivityEditor::symbol_move_up_clicked ()
 {
   //  removes focus from the tree view - commits the data
   move_symbol_up_pb->setFocus (); 
@@ -517,7 +507,7 @@ NetTracerTechComponentEditor::symbol_move_up_clicked ()
   symbol_table->setCurrentIndex (QModelIndex ());
 
   int n = 0;
-  for (db::NetTracerTechnologyComponent::symbol_iterator l = m_data.begin_symbols (); l != m_data.end_symbols (); ++l, ++n) {
+  for (db::NetTracerConnectivity::symbol_iterator l = m_data.begin_symbols (); l != m_data.end_symbols (); ++l, ++n) {
     if (selected_rows.find (n + 1) != selected_rows.end () && selected_rows.find (n) == selected_rows.end ()) {
       std::swap (m_data.begin_symbols () [n + 1], m_data.begin_symbols () [n]);
       selected_rows.erase (n + 1);
@@ -541,7 +531,7 @@ NetTracerTechComponentEditor::symbol_move_up_clicked ()
 }
 
 void 
-NetTracerTechComponentEditor::symbol_move_down_clicked ()
+NetTracerConnectivityEditor::symbol_move_down_clicked ()
 {
   //  removes focus from the tree view - commits the data
   move_symbol_down_pb->setFocus (); 
@@ -558,7 +548,7 @@ NetTracerTechComponentEditor::symbol_move_down_clicked ()
   symbol_table->setCurrentIndex (QModelIndex ());
 
   int n = int (m_data.symbols ());
-  for (db::NetTracerTechnologyComponent::symbol_iterator l = m_data.end_symbols (); l != m_data.begin_symbols (); ) {
+  for (db::NetTracerConnectivity::symbol_iterator l = m_data.end_symbols (); l != m_data.begin_symbols (); ) {
     --l;
     --n;
     if (selected_rows.find (n - 1) != selected_rows.end () && selected_rows.find (n) == selected_rows.end ()) {
@@ -584,7 +574,7 @@ NetTracerTechComponentEditor::symbol_move_down_clicked ()
 }
 
 void
-NetTracerTechComponentEditor::update ()
+NetTracerConnectivityEditor::update ()
 {
   QStringList labels;
   int n;
@@ -600,7 +590,7 @@ NetTracerTechComponentEditor::update ()
   connectivity_table->setHorizontalHeaderLabels (labels);
 
   n = 0;
-  for (db::NetTracerTechnologyComponent::iterator l = m_data.begin (); l != m_data.end (); ++l, ++n) {
+  for (db::NetTracerConnectivity::iterator l = m_data.begin (); l != m_data.end (); ++l, ++n) {
 
     for (int c = 0; c < 3; ++c) {
 
@@ -652,7 +642,7 @@ NetTracerTechComponentEditor::update ()
   symbol_table->setHorizontalHeaderLabels (labels);
 
   n = 0;
-  for (db::NetTracerTechnologyComponent::symbol_iterator l = m_data.begin_symbols (); l != m_data.end_symbols (); ++l, ++n) {
+  for (db::NetTracerConnectivity::symbol_iterator l = m_data.begin_symbols (); l != m_data.end_symbols (); ++l, ++n) {
 
     for (int c = 0; c < 2; ++c) {
 

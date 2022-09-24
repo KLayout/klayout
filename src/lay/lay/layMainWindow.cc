@@ -251,6 +251,18 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   action = new QAction (tr ("Close All Except Current"), this);
   connect (action, SIGNAL (triggered ()), this, SLOT (close_all_except_current_view ()));
   mp_tab_bar->addAction (action);
+  action = new QAction (tr ("Close All Left"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_views_left ()));
+  mp_tab_bar->addAction (action);
+  action = new QAction (tr ("Close All Right"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_views_right ()));
+  mp_tab_bar->addAction (action);
+  action = new QAction (this);
+  action->setSeparator (true);
+  mp_tab_bar->addAction (action);
+  action = new QAction (tr ("Clone Panel"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (clone ()));
+  mp_tab_bar->addAction (action);
 
   mp_hp_dock_widget = new QDockWidget (QObject::tr ("Cells"), this);
   mp_hp_dock_widget->setObjectName (QString::fromUtf8 ("hp_dock_widget"));
@@ -2593,7 +2605,7 @@ MainWindow::clone_current_view ()
 void
 MainWindow::cm_close_all ()
 {
-  interactive_close_view (-1, false);
+  interactive_close_view (0, views (), false, false);
 }
 
 void
@@ -2601,7 +2613,25 @@ MainWindow::cm_close_all_except_current ()
 {
   int current_index = index_of (lay::LayoutView::current ());
   if (current_index >= 0) {
-    interactive_close_view (-current_index - 2, false);
+    interactive_close_view (current_index, current_index + 1, true, false);
+  }
+}
+
+void
+MainWindow::cm_close_all_left ()
+{
+  int current_index = index_of (lay::LayoutView::current ());
+  if (current_index >= 0) {
+    interactive_close_view (0, current_index, false, false);
+  }
+}
+
+void
+MainWindow::cm_close_all_right ()
+{
+  int current_index = index_of (lay::LayoutView::current ());
+  if (current_index >= 0) {
+    interactive_close_view (current_index + 1, views (), false, false);
   }
 }
 
@@ -2610,26 +2640,21 @@ MainWindow::cm_close ()
 {
   int current_index = index_of (lay::LayoutView::current ());
   if (current_index >= 0) {
-    interactive_close_view (current_index, false);
+    interactive_close_view (current_index, current_index + 1, false, false);
   }
 }
 
 void
 MainWindow::tab_close_requested (int index)
 {
-  interactive_close_view (index, true);
+  interactive_close_view (index, index + 1, false, true);
 }
 
 void
-MainWindow::interactive_close_view (int index, bool all_cellviews)
+MainWindow::interactive_close_view (int from, int to, bool invert_range, bool all_cellviews)
 {
-  if (index < 0) {
-
-    //  close all views or all except one:
-    //    -1: close all
-    //    -2: close except view #0
-    //    -3: close except view #1
-    //    ...
+  //  closes views in range [from, to[ (invert_range=false) or outside this range (invert_range=true)
+  if (invert_range || from + 1 != to) {
 
     bool can_close = true;
 
@@ -2637,11 +2662,9 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
     std::string dirty_files;
     std::set<std::string> seen_names;
 
-    int except = -2 - index;
+    for (int index = 0; index < int (views ()); ++index) {
 
-    for (index = 0; index < int (views ()); ++index) {
-
-      if (index == except) {
+      if ((index >= from && index < to) == invert_range) {
         continue;
       }
 
@@ -2691,31 +2714,31 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
 
     if (can_close) {
       BEGIN_PROTECTED
-      for (index = int (views ()); index > 0; ) {
+      for (int index = int (views ()); index > 0; ) {
         --index;
-        if (index != except) {
+        if ((index >= from && index < to) != invert_range) {
           close_view (index);
         }
       }
       END_PROTECTED
     }
 
-  } else if (view (index)) {
+  } else if (view (from)) {
 
     std::vector <int> selected;
 
-    if (view (index)->cellviews () > 1) {
+    if (view (from)->cellviews () > 1) {
 
       if (all_cellviews) {
 
-        for (int i = 0; i < int (view (index)->cellviews ()); ++i) {
+        for (int i = 0; i < int (view (from)->cellviews ()); ++i) {
           selected.push_back (i);
         }
 
       } else {
 
-        SelectCellViewForm form (0, view (index), tl::to_string (QObject::tr ("Select Layouts To Close")));
-        form.set_selection (view (index)->active_cellview_index ());
+        SelectCellViewForm form (0, view (from), tl::to_string (QObject::tr ("Select Layouts To Close")));
+        form.set_selection (view (from)->active_cellview_index ());
 
         if (form.exec () != QDialog::Accepted) {
           return;
@@ -2728,7 +2751,7 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
 
       }
 
-    } else if (view (index)->cellviews () > 0) {
+    } else if (view (from)->cellviews () > 0) {
       selected.push_back (0);
     }
 
@@ -2739,7 +2762,7 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
 
       for (std::vector <int>::const_iterator i = selected.begin (); i != selected.end (); ++i) {
 
-        const lay::CellView &cv = view (index)->cellview (*i);
+        const lay::CellView &cv = view (from)->cellview (*i);
 
         if (cv->layout ().is_editable () && cv->is_dirty ()) {
 
@@ -2756,7 +2779,7 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
           }
 
           for (std::vector <int>::const_iterator ii = selected.begin (); ii != selected.end (); ++ii) {
-            if (view (index)->cellview (*ii)->name () == name) {
+            if (view (from)->cellview (*ii)->name () == name) {
               --count;
             }
           }
@@ -2799,14 +2822,14 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
         BEGIN_PROTECTED
 
         //  Actually erase the selected cellviews
-        if (view (index)->cellviews () == selected.size ()) {
+        if (view (from)->cellviews () == selected.size ()) {
           //  all cellviews selected - simply close
-          close_view (index);
+          close_view (from);
         } else {
           std::sort (selected.begin (), selected.end ());
           int offset = 0;
           for (std::vector <int>::const_iterator i = selected.begin (); i != selected.end (); ++i) {
-            view (index)->erase_cellview ((unsigned int)(*i - offset));
+            view (from)->erase_cellview ((unsigned int)(*i - offset));
             ++offset;
           }
         }
@@ -2816,11 +2839,17 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
       }
 
     } else {
-      close_view (index);
+      close_view (from);
     }
 
   }
 
+}
+
+void
+MainWindow::clone ()
+{
+  clone_current_view ();
 }
 
 void
@@ -2839,6 +2868,18 @@ void
 MainWindow::close_all_except_current_view ()
 {
   cm_close_all_except_current ();
+}
+
+void
+MainWindow::close_all_views_left ()
+{
+  cm_close_all_left ();
+}
+
+void
+MainWindow::close_all_views_right ()
+{
+  cm_close_all_right ();
 }
 
 void
@@ -3945,6 +3986,10 @@ MainWindow::menu_activated (const std::string &symbol)
     cm_clone ();
   } else if (symbol == "cm_close_all") {
     cm_close_all ();
+  } else if (symbol == "cm_close_all_left") {
+    cm_close_all_left ();
+  } else if (symbol == "cm_close_all_right") {
+    cm_close_all_right ();
   } else if (symbol == "cm_close_all_except_current") {
     cm_close_all_except_current ();
   } else if (symbol == "cm_close") {

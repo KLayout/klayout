@@ -634,6 +634,9 @@ public slots:
   void close_view (int index);
   void close_all_views ();
   void close_all_except_current_view ();
+  void close_all_views_left ();
+  void close_all_views_right ();
+  void clone ();
   void tab_close_requested (int);
   void open_recent (size_t n);
   void open_recent_session (size_t n);
@@ -791,6 +794,8 @@ private:
   void cm_clone ();
   void cm_close_all ();
   void cm_close_all_except_current ();
+  void cm_close_all_left ();
+  void cm_close_all_right ();
   void cm_close ();
   void cm_packages ();
   void cm_technologies ();
@@ -805,7 +810,7 @@ private:
   int dirty_files (std::string &dirty_files);
 
   void load_layer_props_from_file (const std::string &fn);
-  void interactive_close_view (int index, bool all_cellviews);
+  void interactive_close_view (int from, int to, bool invert_range, bool all_cellviews);
   void call_on_current_view (void (lay::LayoutView::*func) (), const std::string &op_desc);
   void current_view_changed ();
   void update_window_title ();

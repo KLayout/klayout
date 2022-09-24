@@ -2295,7 +2295,6 @@ MacroEditorDialog::close_many (int r2c)
 
 BEGIN_PROTECTED
 
-  QWidget *cw = tabWidget->currentWidget ();
   int ci = tabWidget->currentIndex ();
 
   if (ci < 0) {

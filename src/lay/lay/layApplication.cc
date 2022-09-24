@@ -1291,9 +1291,6 @@ GuiApplication::GuiApplication (int &argc, char **argv)
   setStyle (new lay::BackgroundAwareTreeStyle (0));
 
   setWindowIcon (QIcon (QString::fromUtf8 (":/logo.png")));
-#if QT_VERSION >= 0x040500
-  setAttribute (Qt::AA_DontShowIconsInMenus, false);
-#endif
 }
 
 GuiApplication::~GuiApplication ()
@@ -1305,6 +1302,20 @@ GuiApplication::~GuiApplication ()
   }
 
   shutdown ();
+}
+
+void
+GuiApplication::initialize ()
+{
+#if QT_VERSION >= 0x040500
+  QCoreApplication::setAttribute (Qt::AA_DontShowIconsInMenus, false);
+#endif
+#if QT_VERSION >= 0x050000
+  QCoreApplication::setAttribute (Qt::AA_UseHighDpiPixmaps, true);
+#endif
+#if QT_VERSION >= 0x050600
+  QCoreApplication::setAttribute (Qt::AA_EnableHighDpiScaling, true);
+#endif
 }
 
 bool

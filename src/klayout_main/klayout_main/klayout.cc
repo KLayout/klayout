@@ -285,6 +285,7 @@ klayout_main_cont (int &argc, char **argv)
     if (non_ui_mode) {
       app.reset (new lay::NonGuiApplication (argc, argv));
     } else {
+      lay::GuiApplication::initialize ();
       app.reset (new lay::GuiApplication (argc, argv));
       lay::enable_signal_handler_gui (true);
     }

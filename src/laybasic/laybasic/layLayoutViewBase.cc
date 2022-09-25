@@ -2314,6 +2314,8 @@ LayoutViewBase::signal_apply_technology (lay::LayoutHandle *layout_handle)
 
       }
 
+      apply_technology_event (int (i));
+
     }
 
   }

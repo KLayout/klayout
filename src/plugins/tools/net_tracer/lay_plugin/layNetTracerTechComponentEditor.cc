@@ -300,8 +300,6 @@ NetTracerTechComponentEditor::del_clicked ()
     selected_rows.insert (i->row ());
   }
 
-  stack_tree->setCurrentIndex (QModelIndex ());
-
   int offset = 0;
   for (std::set<int>::const_iterator r = selected_rows.begin (); r != selected_rows.end (); ++r) {
     m_data.erase (m_data.begin () + (*r - offset));
@@ -309,6 +307,7 @@ NetTracerTechComponentEditor::del_clicked ()
   }
 
   update ();
+  stack_tree->setCurrentItem (0);
 }
 
 void 
@@ -345,11 +344,10 @@ NetTracerTechComponentEditor::move_up_clicked ()
 
   // select the new items
   for (std::set <int>::const_iterator s = selected_rows.begin (); s != selected_rows.end (); ++s) {
-    stack_tree->selectionModel ()->select (stack_tree->model ()->index (*s, 0), QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    stack_tree->topLevelItem (*s)->setSelected (true);
   }
-
   if (n_current >= 0) {
-    stack_tree->selectionModel ()->select (stack_tree->model ()->index (n_current, 0), QItemSelectionModel::Current | QItemSelectionModel::Rows);
+    stack_tree->setCurrentItem (stack_tree->topLevelItem (n_current), 0, QItemSelectionModel::Current);
   }
 }
 
@@ -389,11 +387,10 @@ NetTracerTechComponentEditor::move_down_clicked ()
 
   // select the new items
   for (std::set <int>::const_iterator s = selected_rows.begin (); s != selected_rows.end (); ++s) {
-    stack_tree->selectionModel ()->select (stack_tree->model ()->index (*s, 0), QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    stack_tree->topLevelItem (*s)->setSelected (true);
   }
-
   if (n_current >= 0) {
-    stack_tree->selectionModel ()->select (stack_tree->model ()->index (n_current, 0), QItemSelectionModel::Current | QItemSelectionModel::Rows);
+    stack_tree->setCurrentItem (stack_tree->topLevelItem (n_current), 0, QItemSelectionModel::Current);
   }
 }
 

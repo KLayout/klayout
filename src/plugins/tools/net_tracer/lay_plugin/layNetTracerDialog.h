@@ -112,6 +112,11 @@ private:
 
   void commit ();
   size_t get_trace_depth ();
+  void attach_events ();
+  void update_list_of_stacks_with_technology (db::Technology *);
+  void update_list_of_stacks_with_cellview (int);
+  void update_list_of_stacks ();
+
   void update_highlights ();
   void adjust_view ();
   void clear_markers ();

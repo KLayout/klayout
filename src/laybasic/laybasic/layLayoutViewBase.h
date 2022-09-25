@@ -678,6 +678,14 @@ public:
   tl::event<int> cellview_changed_event;
 
   /**
+   *  @brief A event signalling that one cellview has requested a new technology
+   *
+   *  This event is triggered if a cellview has requested a new technology.
+   *  The argument is the index of the cellview that received the new technology.
+   */
+  tl::event<int> apply_technology_event;
+
+  /**
    *  @brief An event signalling that a file has been loaded.
    *  
    *  If a new file is loaded, this event is triggered.

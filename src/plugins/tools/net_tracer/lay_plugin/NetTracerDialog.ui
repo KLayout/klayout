@@ -29,24 +29,14 @@
    <property name="spacing">
     <number>6</number>
    </property>
-   <item row="3" column="0" rowspan="2" colspan="8">
+   <item row="3" column="0" rowspan="2" colspan="9">
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="5" column="0" rowspan="2">
-    <widget class="QPushButton" name="configure_pb">
-     <property name="text">
-      <string>Configure</string>
-     </property>
-     <property name="autoDefault">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="8">
+   <item row="1" column="0" colspan="9">
     <widget class="QLabel" name="label_2">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -67,7 +57,7 @@ Select one or multiple nets and choose &quot;Export&quot; to export the selected
      </property>
     </widget>
    </item>
-   <item row="2" column="7">
+   <item row="2" column="8">
     <widget class="QFrame" name="frame">
      <property name="minimumSize">
       <size>
@@ -196,60 +186,7 @@ Select one or multiple nets and choose &quot;Export&quot; to export the selected
      </layout>
     </widget>
    </item>
-   <item row="5" column="2">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>5</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="5" column="3" rowspan="2">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Trace depth:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="7" rowspan="2">
-    <widget class="QPushButton" name="close_pb">
-     <property name="text">
-      <string>Close</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="6" rowspan="2">
-    <widget class="QLabel" name="tech_info_label">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>1</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1" rowspan="2">
-    <widget class="QPushButton" name="stack_pb">
-     <property name="text">
-      <string>Layer Stack</string>
-     </property>
-     <property name="autoDefault">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="7">
+   <item row="2" column="0" colspan="8">
     <widget class="QSplitter" name="splitter">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -332,7 +269,6 @@ Select one or multiple nets and choose &quot;Export&quot; to export the selected
             <property name="font">
              <font>
               <pointsize>12</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -477,7 +413,23 @@ p, li { white-space: pre-wrap; }
      </widget>
     </widget>
    </item>
-   <item row="0" column="0" colspan="8">
+   <item row="5" column="3">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>5</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="0" colspan="9">
     <widget class="QLabel" name="label_3">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -488,7 +440,6 @@ p, li { white-space: pre-wrap; }
      <property name="font">
       <font>
        <pointsize>12</pointsize>
-       <weight>75</weight>
        <italic>false</italic>
        <bold>true</bold>
       </font>
@@ -498,14 +449,54 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="5" column="5" rowspan="2">
+   <item row="5" column="2">
+    <widget class="QComboBox" name="stack_selector">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToContents</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QPushButton" name="stack_pb">
+     <property name="text">
+      <string>Layer Stack</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QPushButton" name="configure_pb">
+     <property name="text">
+      <string>Configure</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="8">
+    <widget class="QPushButton" name="close_pb">
+     <property name="text">
+      <string>Close</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="6">
     <widget class="QLabel" name="label_6">
      <property name="text">
       <string>shapes</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="4" rowspan="2">
+   <item row="5" column="5">
     <widget class="QLineEdit" name="depth_le">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -518,6 +509,26 @@ p, li { white-space: pre-wrap; }
        <width>80</width>
        <height>16777215</height>
       </size>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="4">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Trace depth:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="7">
+    <widget class="QLabel" name="tech_info_label">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string/>
      </property>
     </widget>
    </item>

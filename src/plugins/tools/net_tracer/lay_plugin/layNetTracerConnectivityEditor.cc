@@ -293,10 +293,14 @@ NetTracerConnectivityEditor::NetTracerConnectivityEditor (QWidget *parent)
   symbol_table->verticalHeader ()->hide ();
 }
 
-const db::NetTracerConnectivity &
-NetTracerConnectivityEditor::get_connectiviy ()
+void
+NetTracerConnectivityEditor::get_connectivity (db::NetTracerConnectivity &data)
 {
-  return m_data;
+  std::string name = data.name ();
+  std::string description = data.description ();
+  data = m_data;
+  data.set_name (name);
+  data.set_description (description);
 }
 
 void 

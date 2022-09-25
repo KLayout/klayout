@@ -203,7 +203,7 @@ NetTracerTechComponentEditor::commit_current (QTreeWidgetItem *current)
 {
   int row = current ? stack_tree->indexOfTopLevelItem (current) : -1;
   if (row >= 0 && row < int (m_data.size ())) {
-    m_data.begin () [row] = connectivity_editor_widget->get_connectiviy ();
+     connectivity_editor_widget->get_connectivity (m_data.begin () [row]);
   }
 }
 

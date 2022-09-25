@@ -122,6 +122,8 @@ public:
         FallbackXMLWriteAdapator <NetTracerSymbolInfo> (&NetTracerConnectivity::add_symbol), "symbols") +
       //  0.28 definitions
       tl::make_element ((NetTracerTechnologyComponent::const_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::begin, (NetTracerTechnologyComponent::const_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::end, (void (NetTracerTechnologyComponent::*) (const NetTracerConnectivity &)) &NetTracerTechnologyComponent::push_back, "connectivity",
+        tl::make_member (&NetTracerConnectivity::name, &NetTracerConnectivity::set_name, "name") +
+        tl::make_member (&NetTracerConnectivity::description, &NetTracerConnectivity::set_description, "description") +
         tl::make_member ((NetTracerConnectivity::const_iterator (NetTracerConnectivity::*) () const) &NetTracerConnectivity::begin, (NetTracerConnectivity::const_iterator (NetTracerConnectivity::*) () const) &NetTracerConnectivity::end, &NetTracerConnectivity::add, "connection") +
         tl::make_member ((NetTracerConnectivity::const_symbol_iterator (NetTracerConnectivity::*) () const) &NetTracerConnectivity::begin_symbols, (NetTracerConnectivity::const_symbol_iterator (NetTracerConnectivity::*) () const) &NetTracerConnectivity::end_symbols, &NetTracerConnectivity::add_symbol, "symbols")
       )

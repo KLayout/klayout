@@ -58,7 +58,7 @@ public:
   NetTracerConnectivityEditor (QWidget *parent);
 
   void set_connectivity (const db::NetTracerConnectivity &data);
-  const db::NetTracerConnectivity &get_connectiviy();
+  void get_connectivity (db::NetTracerConnectivity &);
 
 public slots:
   void add_clicked ();

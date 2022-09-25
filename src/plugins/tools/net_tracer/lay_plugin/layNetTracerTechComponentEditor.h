@@ -62,6 +62,7 @@ public:
 
 public slots:
   void add_clicked ();
+  void clone_clicked ();
   void del_clicked ();
   void move_up_clicked ();
   void move_down_clicked ();

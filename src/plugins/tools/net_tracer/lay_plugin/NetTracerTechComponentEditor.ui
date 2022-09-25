@@ -20,6 +20,12 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QFrame" name="frame_5">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
       </property>
@@ -39,8 +45,11 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item row="4" column="4">
+       <item row="4" column="5">
         <widget class="QToolButton" name="move_down_pb">
+         <property name="toolTip">
+          <string>Move selected stacks up</string>
+         </property>
          <property name="text">
           <string>...</string>
          </property>
@@ -50,32 +59,24 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="2">
-        <widget class="QToolButton" name="del_pb">
+       <item row="4" column="0" colspan="2">
+        <widget class="QToolButton" name="add_pb">
+         <property name="toolTip">
+          <string>Add new stack</string>
+         </property>
          <property name="text">
           <string>...</string>
          </property>
          <property name="icon">
           <iconset resource="../../../../icons/icons.qrc">
-           <normaloff>:/del_16px.png</normaloff>:/del_16px.png</iconset>
+           <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
          </property>
          <property name="shortcut">
-          <string>Del</string>
+          <string>Return</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="3">
-        <widget class="QToolButton" name="move_up_pb">
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../../../../icons/icons.qrc">
-           <normaloff>:/up_16px.png</normaloff>:/up_16px.png</iconset>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1" colspan="5">
+       <item row="2" column="1" colspan="6">
         <widget class="QFrame" name="frame_2">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
@@ -85,19 +86,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="6">
-        <widget class="QLabel" name="label">
-         <property name="font">
-          <font>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string>Double-click to edit text</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" rowspan="2" colspan="6">
+       <item row="1" column="0" rowspan="2" colspan="7">
         <widget class="QTreeWidget" name="stack_tree">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -105,8 +94,17 @@
            <verstretch>1</verstretch>
           </sizepolicy>
          </property>
+         <property name="contextMenuPolicy">
+          <enum>Qt::ActionsContextMenu</enum>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
          <property name="rootIsDecorated">
           <bool>false</bool>
+         </property>
+         <property name="allColumnsShowFocus">
+          <bool>true</bool>
          </property>
          <column>
           <property name="text">
@@ -120,7 +118,50 @@
          </column>
         </widget>
        </item>
-       <item row="4" column="5">
+       <item row="4" column="3">
+        <widget class="QToolButton" name="del_pb">
+         <property name="toolTip">
+          <string>Remove selected stacks</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../../icons/icons.qrc">
+           <normaloff>:/del_16px.png</normaloff>:/del_16px.png</iconset>
+         </property>
+         <property name="shortcut">
+          <string>Del</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="4">
+        <widget class="QToolButton" name="move_up_pb">
+         <property name="toolTip">
+          <string>Move selected stacks down</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../../icons/icons.qrc">
+           <normaloff>:/up_16px.png</normaloff>:/up_16px.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="7">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Double-click to edit text</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="6">
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -133,24 +174,24 @@
          </property>
         </spacer>
        </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="QToolButton" name="add_pb">
+       <item row="0" column="0" colspan="7">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Technology Stacks</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="QToolButton" name="clone_pb">
+         <property name="toolTip">
+          <string>Clone current stack</string>
+         </property>
          <property name="text">
           <string>...</string>
          </property>
          <property name="icon">
           <iconset resource="../../../../icons/icons.qrc">
-           <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
-         </property>
-         <property name="shortcut">
-          <string>Return</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="6">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Technology Stacks</string>
+           <normaloff>:/clone_16px.png</normaloff>:/clone_16px.png</iconset>
          </property>
         </widget>
        </item>

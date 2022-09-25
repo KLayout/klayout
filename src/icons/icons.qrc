@@ -52,6 +52,8 @@
         <file alias="clear_edit_16px@2x.png">images/clear_edit_16px@2x.png</file>
         <file alias="clearbreakpoints_16px.png">images/clearbreakpoints_16px.png</file>
         <file alias="clearbreakpoints_16px@2x.png">images/clearbreakpoints_16px@2x.png</file>
+        <file alias="clone_16px.png">images/clone_16px.png</file>
+        <file alias="clone_16px@2x.png">images/clone_16px@2x.png</file>
         <file alias="cm_add_24px.png">images/cm_add_24px.png</file>
         <file alias="cm_add_24px@2x.png">images/cm_add_24px@2x.png</file>
         <file alias="cm_diff_24px.png">images/cm_diff_24px.png</file>

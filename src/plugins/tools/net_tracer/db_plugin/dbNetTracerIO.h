@@ -435,6 +435,16 @@ public:
     m_symbols.clear ();
   }
 
+  void clear_connections ()
+  {
+    m_connections.clear ();
+  }
+
+  void clear_symbols ()
+  {
+    m_symbols.clear ();
+  }
+
   void erase (iterator p)
   {
     m_connections.erase (p);
@@ -524,7 +534,7 @@ public:
 
   const_iterator end () const
   {
-    return m_connectivity.begin ();
+    return m_connectivity.end ();
   }
 
   iterator begin ()

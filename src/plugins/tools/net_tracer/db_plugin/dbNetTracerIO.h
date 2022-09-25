@@ -534,7 +534,7 @@ public:
 
   iterator end ()
   {
-    return m_connectivity.begin ();
+    return m_connectivity.end ();
   }
 
   db::NetTracerTechnologyComponent *clone () const

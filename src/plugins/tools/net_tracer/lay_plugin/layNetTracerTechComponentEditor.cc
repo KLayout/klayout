@@ -49,7 +49,83 @@
 namespace lay
 {
 
-// @@@ TODO: edit on double-click
+// -----------------------------------------------------------------------------------------
+//  NetTracerTechComponentColumnDelegate definition and implementation
+
+class NetTracerTechComponentColumnDelegate
+  : public QItemDelegate
+{
+public:
+  NetTracerTechComponentColumnDelegate (QWidget *parent, db::NetTracerTechnologyComponent *data)
+    : QItemDelegate (parent), mp_data (data)
+  {
+    //  .. nothing yet ..
+  }
+
+  QWidget *createEditor (QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const
+  {
+    return new QLineEdit (parent);
+  }
+
+  void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
+  {
+    editor->setGeometry(option.rect);
+  }
+
+  void setEditorData (QWidget *widget, const QModelIndex &index) const
+  {
+    QLineEdit *editor = dynamic_cast<QLineEdit *> (widget);
+    if (editor) {
+      int n = index.model ()->data (index, Qt::UserRole).toInt ();
+      if (mp_data->size () > size_t (n)) {
+        if (index.column () == 0) {
+          std::string name = mp_data->begin () [n].name ();
+          editor->setText (tl::to_qstring (name));
+          editor->setPlaceholderText (tr ("(default)"));
+        } else if (index.column () == 1) {
+          editor->setText (tl::to_qstring (mp_data->begin () [n].description ()));
+        }
+      }
+    }
+  }
+
+  void setModelData (QWidget *widget, QAbstractItemModel *model, const QModelIndex &index) const
+  {
+    QLineEdit *editor = dynamic_cast<QLineEdit *> (widget);
+    if (editor) {
+
+      int n = model->data (index, Qt::UserRole).toInt ();
+      if (mp_data->size () > size_t (n)) {
+
+        std::string text = tl::to_string (editor->text ());
+        if (index.column () == 0 && text.empty ()) {
+          model->setData (index, QVariant (tr ("(default)")), Qt::DisplayRole);
+        } else {
+          model->setData (index, QVariant (tl::to_qstring (text)), Qt::DisplayRole);
+        }
+
+        if (index.column () == 0) {
+          mp_data->begin () [n].set_name (text);
+        } else if (index.column () == 1) {
+          mp_data->begin () [n].set_description (text);
+        }
+
+      }
+
+    }
+  }
+
+  QSize sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const
+  {
+    QWidget *editor = createEditor (0, option, index);
+    QSize size = editor->sizeHint ();
+    delete editor;
+    return size - QSize (2, 2);
+  }
+
+private:
+  db::NetTracerTechnologyComponent *mp_data;
+};
 
 // -----------------------------------------------------------------------------------
 //  NetTracerTechComponentEditor implementation
@@ -68,7 +144,6 @@ NetTracerTechComponentEditor::NetTracerTechComponentEditor (QWidget *parent)
   stack_tree->header ()->setStretchLastSection (true);
 
   connect (stack_tree, SIGNAL (currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT (current_item_changed(QTreeWidgetItem *, QTreeWidgetItem *)));
-  connect (stack_tree, SIGNAL (itemChanged(QTreeWidgetItem *, int)), this, SLOT (item_changed(QTreeWidgetItem *, int)));
 }
 
 void 
@@ -96,27 +171,10 @@ NetTracerTechComponentEditor::setup ()
     m_data.push_back (db::NetTracerConnectivity ());
   }
 
-  update ();
-}
+  stack_tree->setItemDelegateForColumn (0, new NetTracerTechComponentColumnDelegate (stack_tree, &m_data));
+  stack_tree->setItemDelegateForColumn (1, new NetTracerTechComponentColumnDelegate (stack_tree, &m_data));
 
-void
-NetTracerTechComponentEditor::item_changed (QTreeWidgetItem *item, int column)
-{
-  int row = stack_tree->indexOfTopLevelItem (item);
-  if (row >= 0 && row < int (m_data.size ())) {
-    if (column == 0) {
-      std::string n = tl::to_string (item->data (column, Qt::EditRole));
-      m_data.begin ()[row].set_name (n);
-      if (n.empty ()) {
-        item->setData (column, Qt::DisplayRole, tr ("(default)"));
-      } else {
-        item->setData (column, Qt::DisplayRole, tl::to_qstring (n));
-      }
-    }
-    if (column == 1) {
-      m_data.begin ()[row].set_description (tl::to_string (item->data (column, Qt::EditRole)));
-    }
-  }
+  update ();
 }
 
 void
@@ -291,19 +349,22 @@ NetTracerTechComponentEditor::update ()
     QTreeWidgetItem *item = new QTreeWidgetItem (stack_tree);
     item->setFlags (item->flags () | Qt::ItemIsEditable);
 
-    if (l->name ().empty ()) {
+    std::string name = l->name ();
+    if (name.empty ()) {
       item->setData (0, Qt::DisplayRole, QVariant (tr ("(default)")));
     } else {
-      item->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (l->name ())));
+      item->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (name)));
     }
-    item->setData (0, Qt::EditRole, QVariant (tl::to_qstring (l->name ())));
     item->setData (1, Qt::DisplayRole, QVariant (tl::to_qstring (l->description ())));
 
     item->setData (0, Qt::UserRole, QVariant (n));
 
   }
 
-  current_item_changed (0, 0);
+  if (! stack_tree->currentItem () && stack_tree->topLevelItemCount () > 0) {
+    stack_tree->setCurrentItem (stack_tree->topLevelItem (0));
+  }
+  current_item_changed (stack_tree->currentItem (), 0);
 }
 
 }

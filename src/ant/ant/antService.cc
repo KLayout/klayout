@@ -570,21 +570,23 @@ draw_ellipse (const db::DPoint &q1,
 }
 
 void
-draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+draw_ruler_segment (const ant::Object &ruler, size_t index, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
+  db::DPoint p1 = ruler.seg_p1 (index), p2 = ruler.seg_p2 (index);
+
   //  round the starting point, shift both, and round the end point 
-  std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * ruler.p1 (), trans * ruler.p2 ());
+  std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * p1, trans * p2);
   db::DPoint q1 = v.first;
   db::DPoint q2 = v.second;
   
   bool xy_swapped = ((trans.rot () % 2) != 0);
-  double lu = ruler.p1 ().double_distance (ruler.p2 ());
+  double lu = p1.double_distance (p2);
   int min_tick_spc = int (0.5 + 20 / renderer.resolution ());  //  min tick spacing in canvas units
   double mu = double (min_tick_spc) / trans.ctrans (1.0);
 
   if (ruler.outline () == Object::OL_diag) {
     draw_ruler (q1, q2, lu, mu, sel, q2.x () < q1.x (), ruler.style (), bitmap, renderer);
-    draw_text (q1, q2, lu, ruler.text (), q2.x () < q1.x (), ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+    draw_text (q1, q2, lu, ruler.text (index), q2.x () < q1.x (), ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
   }
 
   if ((!xy_swapped && (ruler.outline () == Object::OL_xy || ruler.outline () == Object::OL_diag_xy)) ||
@@ -594,12 +596,12 @@ draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay
 
     if (ruler.outline () == Object::OL_diag_xy || ruler.outline () == Object::OL_diag_yx) {
       draw_ruler (q1, q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer);
-      draw_text (q1, q2, lu, ruler.text (), !r, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+      draw_text (q1, q2, lu, ruler.text (index), !r, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
     }
     draw_ruler (q1, db::DPoint (q2.x (), q1.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer);
-    draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
+    draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
     draw_ruler (db::DPoint (q2.x (), q1.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer);
-    draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
+    draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
 
   }
 
@@ -610,12 +612,12 @@ draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay
 
     if (ruler.outline () == Object::OL_diag_xy || ruler.outline () == Object::OL_diag_yx) {
       draw_ruler (q1, q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer);
-      draw_text (q1, q2, lu, ruler.text (), !r, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+      draw_text (q1, q2, lu, ruler.text (index), !r, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
     }
     draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer);
-    draw_text (q1, db::DPoint (q1.x (), q2.y ()), lu, ruler.text_y (trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
+    draw_text (q1, db::DPoint (q1.x (), q2.y ()), lu, ruler.text_y (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
     draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer);
-    draw_text (db::DPoint (q1.x (), q2.y ()), q2, lu, ruler.text_x (trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
+    draw_text (db::DPoint (q1.x (), q2.y ()), q2, lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
 
   }
 
@@ -624,34 +626,43 @@ draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay
     bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
 
     draw_ruler (q1, db::DPoint (q2.x (), q1.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer);
-    draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
+    draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
     draw_ruler (db::DPoint (q2.x (), q1.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer);
-    draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
+    draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
     draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, !r, ruler.style (), bitmap, renderer);
     draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer);
-    draw_text (q1, q2, lu, ruler.text (), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+    draw_text (q1, q2, lu, ruler.text (index), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
 
   } else if (ruler.outline () == Object::OL_ellipse) {
 
     bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
 
-    draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (trans.fp_trans ()), r, ant::Object::STY_none, ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
-    draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (trans.fp_trans ()), r, ant::Object::STY_none, ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
-    draw_text (q1, q2, lu, ruler.text (), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+    draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ant::Object::STY_none, ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
+    draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ant::Object::STY_none, ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
+    draw_text (q1, q2, lu, ruler.text (index), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
 
     draw_ellipse (q1, q2, lu, sel, bitmap, renderer);
 
   }
 }
 
-static bool
-is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double &distance)
+void
+draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
+  for (size_t index = 0; index < ruler.segments (); ++index) {
+    draw_ruler_segment (ruler, index, trans, sel, bitmap, renderer);
+  }
+}
+
+static bool
+is_selected (const ant::Object &ruler, size_t index, const db::DPoint &pos, double enl, double &distance)
+{
+  db::DPoint p1 = ruler.seg_p1 (index), p2 = ruler.seg_p2 (index);
+  db::DBox b (p1, p2);
+
   if (ruler.outline () == ant::Object::OL_ellipse) {
 
     //  special handling of the (non-degenerated) ellipse case
-    db::DBox b (ruler.p1 (), ruler.p2 ());
-
     if (b.height () > 1e-6 && b.width () > 1e-6) {
 
       double dx = (pos.x () - b.center ().x ()) / (b.width () * 0.5);
@@ -673,8 +684,6 @@ is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double
     }
 
   }
-
-  db::DBox b (ruler.p1 (), ruler.p2 ());
 
   //  enlarge this box by some pixels
   b.enlarge (db::DVector (enl, enl));
@@ -718,9 +727,22 @@ is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double
 }
 
 static bool
+is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double &distance)
+{
+  bool any = false;
+  for (size_t index = 0; index < ruler.segments (); ++index) {
+    //  NOTE: we check *all* since distance is updated herein.
+    if (is_selected (ruler, index, pos, enl, distance)) {
+      any = true;
+    }
+  }
+  return any;
+}
+
+static bool
 is_selected (const ant::Object &ruler, const db::DBox &box, double /*enl*/)
 {
-  return (box.contains (ruler.p1 ()) && box.contains (ruler.p2 ()));
+  return ruler.box ().inside (box);
 }
 
 
@@ -2180,7 +2202,11 @@ Service::display_status (bool transient)
     if (! transient) {
       msg = tl::to_string (tr ("selected: "));
     }
-    msg += tl::sprintf (tl::to_string (tr ("annotation(d=%s x=%s y=%s)")), ruler->text (), ruler->text_x (), ruler->text_y ());
+    if (ruler->segments () > 1) {
+      msg += tl::sprintf (tl::to_string (tr ("annotation(d=%s x=%s y=%s ...)")), ruler->text (0), ruler->text_x (0), ruler->text_y (0));
+    } else {
+      msg += tl::sprintf (tl::to_string (tr ("annotation(d=%s x=%s y=%s)")), ruler->text (0), ruler->text_x (0), ruler->text_y (0));
+    }
     view ()->message (msg);
 
   }

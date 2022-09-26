@@ -50,6 +50,7 @@ class ANT_PUBLIC Object
 {
 public:
   typedef db::coord_traits<coord_type> coord_traits;
+  typedef std::vector<db::DPoint> point_list;
 
   /** 
    *  @brief The ruler style 
@@ -110,9 +111,19 @@ public:
   Object (const db::DPoint &p1, const db::DPoint &p2, int id, const std::string &fmt_x, const std::string &fmt_y, const std::string &fmt, style_type style, outline_type outline, bool snap, lay::angle_constraint_type angle_constraint);
 
   /**
+   *  @brief Parametrized constructor and a list of points
+   */
+  Object (const point_list &points, int id, const std::string &fmt_x, const std::string &fmt_y, const std::string &fmt, style_type style, outline_type outline, bool snap, lay::angle_constraint_type angle_constraint);
+
+  /**
    *  @brief Parametrized constructor from a template
    */
   Object (const db::DPoint &p1, const db::DPoint &p2, int id, const ant::Template &d);
+
+  /**
+   *  @brief Parametrized constructor from a template and a list of points
+   */
+  Object (const point_list &points, int id, const ant::Template &d);
 
   /**
    *  @brief Copy constructor
@@ -185,8 +196,9 @@ public:
    */
   virtual void transform (const db::DCplxTrans &t)
   {
-    m_p1 = t * m_p1;
-    m_p2 = t * m_p2;
+    for (auto p = m_points.begin (); p != m_points.end (); ++p) {
+      *p = t * *p;
+    }
     property_changed ();
   }
 
@@ -195,8 +207,9 @@ public:
    */
   virtual void transform (const db::DTrans &t)
   {
-    m_p1 = t * m_p1;
-    m_p2 = t * m_p2;
+    for (auto p = m_points.begin (); p != m_points.end (); ++p) {
+      *p = t * *p;
+    }
     property_changed ();
   }
 
@@ -205,8 +218,9 @@ public:
    */
   virtual void transform (const db::DFTrans &t)
   {
-    m_p1 = t * m_p1;
-    m_p2 = t * m_p2;
+    for (auto p = m_points.begin (); p != m_points.end (); ++p) {
+      *p = t * *p;
+    }
     property_changed ();
   }
 
@@ -224,10 +238,11 @@ public:
   /**
    *  @brief Moves the object by the given distance
    */
-  Object &move (const db::DVector &p)
+  Object &move (const db::DVector &d)
   {
-    m_p1 += p;
-    m_p2 += p;
+    for (auto p = m_points.begin (); p != m_points.end (); ++p) {
+      *p += d;
+    }
     return *this;
   }
 
@@ -265,42 +280,71 @@ public:
   }
 
   /**
-   *  @brief Gets the first definition point
+   *  @brief Gets the ruler's definition points
    */
-  const db::DPoint &p1 () const
+  const point_list &points () const
   {
-    return m_p1;
+    return m_points;
+  }
+
+  /**
+   *  @brief Sets the ruler's definition points
+   */
+  void set_points (const point_list &points);
+
+  /**
+   *  @brief Gets the first point of the indicated segment
+   */
+  db::DPoint seg_p1 (size_t seg_index) const;
+
+  /**
+   *  @brief Gets the second point of the indicated segment
+   */
+  db::DPoint seg_p2 (size_t seg_index) const;
+
+  /**
+   *  @brief Gets the number of segments
+   *
+   *  The number of segments is at least 1 for backward compatibility.
+   */
+  size_t segments () const
+  {
+    return m_points.size () < 2 ? 1 : m_points.size () - 1;
+  }
+
+  /**
+   *  @brief Gets the first definition point
+   *
+   *  This method is provided for backward compatibility. Use the point list accessor for generic point retrieval.
+   */
+  db::DPoint p1 () const
+  {
+    return seg_p1 (0);
   }
 
   /**
    *  @brief Gets the second definition point
+   *
+   *  This method is provided for backward compatibility. Use the point list accessor for generic point retrieval.
    */
-  const db::DPoint &p2 () const
+  db::DPoint p2 () const
   {
-    return m_p2;
+    return seg_p2 (0);
   }
 
   /**
    *  @brief Sets the first definition point
+   *
+   *  This method is provided for backward compatibility. Use the point list accessor for generic point retrieval.
    */
-  void p1 (const db::DPoint &p)
-  {
-    if (!m_p1.equal (p)) {
-      m_p1 = p;
-      property_changed ();
-    }
-  }
+  void p1 (const db::DPoint &p);
 
   /**
    *  @brief Sets the second definition point
+   *
+   *  This method is provided for backward compatibility. Use the point list accessor for generic point retrieval.
    */
-  void p2 (const db::DPoint &p)
-  {
-    if (!m_p2.equal (p)) {
-      m_p2 = p;
-      property_changed ();
-    }
-  }
+  void p2 (const db::DPoint &p);
 
   /**
    *  @brief Gets the ID of the annotation object
@@ -619,52 +663,52 @@ public:
   /**
    *  @brief Gets the formatted text for the x label
    */
-  std::string text_x () const
+  std::string text_x (size_t index) const
   {
-    return formatted (m_fmt_x, db::DFTrans ());
+    return formatted (m_fmt_x, db::DFTrans (), index);
   }
 
   /**
    *  @brief Gets the formatted text for the y label
    */
-  std::string text_y () const
+  std::string text_y (size_t index) const
   {
-    return formatted (m_fmt_y, db::DFTrans ());
+    return formatted (m_fmt_y, db::DFTrans (), index);
   }
 
   /**
    *  @brief Gets the formatted text for the main label
    */
-  std::string text () const
+  std::string text (size_t index) const
   {
-    return formatted (m_fmt, db::DFTrans ());
+    return formatted (m_fmt, db::DFTrans (), index);
   }
 
   /**
    *  @brief Gets the formatted text for the x label
    *  @param t The transformation to apply to the vector before producing the text
    */
-  std::string text_x (const db::DFTrans &t) const
+  std::string text_x (size_t index, const db::DFTrans &t) const
   {
-    return formatted (m_fmt_x, t);
+    return formatted (m_fmt_x, t, index);
   }
 
   /**
    *  @brief Gets the formatted text for the y label
    *  @param t The transformation to apply to the vector before producing the text
    */
-  std::string text_y (const db::DFTrans &t) const
+  std::string text_y (size_t index, const db::DFTrans &t) const
   {
-    return formatted (m_fmt_y, t);
+    return formatted (m_fmt_y, t, index);
   }
 
   /**
    *  @brief Gets the formatted text for the main label
    *  @param t The transformation to apply to the vector before producing the text
    */
-  std::string text (const db::DFTrans &t) const
+  std::string text (size_t index, const db::DFTrans &t) const
   {
-    return formatted (m_fmt, t);
+    return formatted (m_fmt, t, index);
   }
 
   /**
@@ -695,7 +739,7 @@ protected:
   virtual void property_changed ();
 
 private:
-  db::DPoint m_p1, m_p2;
+  point_list m_points;
   int m_id;
   std::string m_fmt_x;
   std::string m_fmt_y;
@@ -710,7 +754,7 @@ private:
   alignment_type m_xlabel_xalign, m_xlabel_yalign;
   alignment_type m_ylabel_xalign, m_ylabel_yalign;
 
-  std::string formatted (const std::string &fmt, const db::DFTrans &trans) const;
+  std::string formatted (const std::string &fmt, const db::DFTrans &trans, size_t index) const;
 };
 
 }

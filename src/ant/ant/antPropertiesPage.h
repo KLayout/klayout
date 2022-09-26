@@ -52,20 +52,26 @@ public:
   virtual void update ();
   virtual void leave ();
   virtual bool readonly ();
-  virtual void apply (); 
+  virtual void apply ();
 
 private slots:
   void swap_points_clicked ();
   void snap_to_layout_clicked ();
+  void text_changed ();
 
 private:
   std::vector <ant::Service::obj_iterator> m_selection;
   std::vector <ant::Service::obj_iterator>::iterator m_pos;
   ant::Service *mp_rulers;
   bool m_enable_cb_callback;
+  bool m_in_text_changed;
 
   const ant::Object &current () const;
-  void get_points(db::DPoint &p1, db::DPoint &p2);
+  void get_points (db::DPoint &p1, db::DPoint &p2);
+  void get_point (db::DPoint &p);
+  void get_points (ant::Object::point_list &points);
+  void update_with (const ant::Object &obj);
+  ant::Object get_object ();
 };
 
 }

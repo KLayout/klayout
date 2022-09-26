@@ -236,6 +236,13 @@ static AnnotationRef create_measure_ruler (lay::LayoutViewBase *view, const db::
   }
 }
 
+static AnnotationRef *ant_from_s (const std::string &s)
+{
+  std::unique_ptr<AnnotationRef> aref (new AnnotationRef ());
+  aref->from_string (s.c_str ());
+  return aref.release ();
+}
+
 static int get_style (const AnnotationRef *obj)
 {
   return int (obj->style ());
@@ -704,27 +711,80 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method ("p1", (const db::DPoint & (AnnotationRef::*) () const) &AnnotationRef::p1,
+  gsi::method ("points", &AnnotationRef::points,
+    "@brief Gets the points of the ruler\n"
+    "A single-segmented ruler has two points. Rulers with more points "
+    "have more segments correspondingly. Note that the point list may have one point "
+    "only (single-point ruler) or may even be empty.\n"
+    "\n"
+    "Use \\points= to set the segment points. Use \\segments to get the number of "
+    "segments and \\seg_p1 and \\seg_p2 to get the first and second point of one segment.\n"
+    "\n"
+    "Multi-segmented rulers have been introduced in version 0.28"
+  ) +
+  gsi::method ("points=", &AnnotationRef::set_points, gsi::arg ("points"),
+    "@brief Sets the points for a (potentially) multi-segmented ruler\n"
+    "See \\points for a description of multi-segmented rulers. "
+    "The list of points passed to this method is cleaned from duplicates before being "
+    "stored inside the ruler.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("segments", &AnnotationRef::segments,
+    "@brief Gets the number of segments.\n"
+    "This method returns the number of segments the ruler is made up. Even though the "
+    "ruler can be one or even zero points, the number of segments is at least 1.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("seg_p1", &AnnotationRef::seg_p1, gsi::arg ("segment_index"),
+    "@brief Gets the first point of the given segment.\n"
+    "The segment is indicated by the segment index which is a number between 0 and \\segments-1.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("seg_p2", &AnnotationRef::seg_p2, gsi::arg ("segment_index"),
+    "@brief Gets the second point of the given segment.\n"
+    "The segment is indicated by the segment index which is a number between 0 and \\segments-1.\n"
+    "The second point of a segment is also the first point of the following segment if there is one.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("p1", (db::DPoint (AnnotationRef::*) () const) &AnnotationRef::p1,
     "@brief Gets the first point of the ruler or marker\n"
     "The points of the ruler or marker are always given in micron units in floating-point "
     "coordinates.\n"
+    "\n"
+    "This method is provided for backward compatibility. Starting with version 0.28, rulers can "
+    "be multi-segmented. Use \\points or \\seg_p1 to retrieve the points of the ruler segments.\n"
+    "\n"
     "@return The first point\n"
   ) +
-  gsi::method ("p2", (const db::DPoint & (AnnotationRef::*) () const) &AnnotationRef::p2,
+  gsi::method ("p2", (db::DPoint (AnnotationRef::*) () const) &AnnotationRef::p2,
     "@brief Gets the second point of the ruler or marker\n"
     "The points of the ruler or marker are always given in micron units in floating-point "
     "coordinates.\n"
+    "\n"
+    "This method is provided for backward compatibility. Starting with version 0.28, rulers can "
+    "be multi-segmented. Use \\points or \\seg_p1 to retrieve the points of the ruler segments.\n"
+    "\n"
     "@return The second point\n"
   ) +
   gsi::method ("p1=", (void (AnnotationRef::*) (const db::DPoint &)) &AnnotationRef::p1, gsi::arg ("point"),
     "@brief Sets the first point of the ruler or marker\n"
     "The points of the ruler or marker are always given in micron units in floating-point "
     "coordinates.\n"
+    "\n"
+    "This method is provided for backward compatibility. Starting with version 0.28, rulers can "
+    "be multi-segmented. Use \\points= to specify the ruler segments.\n"
   ) +
   gsi::method ("p2=", (void (AnnotationRef::*) (const db::DPoint &)) &AnnotationRef::p2, gsi::arg ("point"),
     "@brief Sets the second point of the ruler or marker\n"
     "The points of the ruler or marker are always given in micron units in floating-point "
     "coordinates.\n"
+    "\n"
+    "This method is provided for backward compatibility. Starting with version 0.28, rulers can "
+    "be multi-segmented. Use \\points= to specify the ruler segments.\n"
   ) +
   gsi::method ("box", &AnnotationRef::box,
     "@brief Gets the bounding box of the object (not including text)\n"
@@ -924,14 +984,17 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "@brief Returns the angle constraint attribute\n"
     "See \\angle_constraint= for a more detailed description."
   ) +
-  gsi::method ("text_x", (std::string (AnnotationRef::*)() const) &AnnotationRef::text_x,
-    "@brief Returns the formatted text for the x-axis label"
+  gsi::method ("text_x", (std::string (AnnotationRef::*)(size_t index) const) &AnnotationRef::text_x, gsi::arg ("index", 0),
+    "@brief Returns the formatted text for the x-axis label\n"
+    "The index parameter indicates which segment to use (0 is the first one). It has been added in version 0.28.\n"
   ) +
-  gsi::method ("text_y", (std::string (AnnotationRef::*)() const) &AnnotationRef::text_y,
-    "@brief Returns the formatted text for the y-axis label"
+  gsi::method ("text_y", (std::string (AnnotationRef::*)(size_t index) const) &AnnotationRef::text_y, gsi::arg ("index", 0),
+    "@brief Returns the formatted text for the y-axis label\n"
+    "The index parameter indicates which segment to use (0 is the first one). It has been added in version 0.28.\n"
   ) +
-  gsi::method ("text", (std::string (AnnotationRef::*)() const) &AnnotationRef::text,
-    "@brief Returns the formatted text for the main label"
+  gsi::method ("text", (std::string (AnnotationRef::*)(size_t index) const) &AnnotationRef::text, gsi::arg ("index", 0),
+    "@brief Returns the formatted text for the main label\n"
+    "The index parameter indicates which segment to use (0 is the first one). It has been added in version 0.28.\n"
   ) +
   gsi::method ("id", (int (AnnotationRef::*)() const) &AnnotationRef::id,
     "@brief Returns the annotation's ID"
@@ -952,6 +1015,12 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "@brief Returns the string representation of the ruler"
     "\n"
     "This method was introduced in version 0.19."
+  ) +
+  gsi::constructor ("from_s", &ant_from_s, gsi::arg ("s"),
+    "@brief Creates a ruler from a string representation\n"
+    "This function creates a ruler from the string returned by \\to_s.\n"
+    "\n"
+    "This method was introduced in version 0.28."
   ) +
   gsi::method ("==", &AnnotationRef::operator==, gsi::arg ("other"),
     "@brief Equality operator\n"

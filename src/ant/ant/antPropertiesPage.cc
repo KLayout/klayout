@@ -402,9 +402,6 @@ PropertiesPage::update_with (const ant::Object &obj)
     tab = 1;
   }
 
-  segments_tab->setTabEnabled (0, tab == 0);
-  segments_tab->setTabEnabled (1, tab == 1);
-
   if (! m_in_text_changed) {
     segments_tab->setCurrentIndex (tab);
   }
@@ -412,19 +409,23 @@ PropertiesPage::update_with (const ant::Object &obj)
   point_list->clear ();
   for (auto p = obj.points ().begin (); p != obj.points ().end (); ++p) {
     QTreeWidgetItem *item = new QTreeWidgetItem (point_list);
-    item->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (tl::to_string (p->x ()))));
-    item->setData (1, Qt::DisplayRole, QVariant (tl::to_qstring (tl::to_string (p->y ()))));
+    item->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (tl::micron_to_string (p->x ()))));
+    item->setData (1, Qt::DisplayRole, QVariant (tl::to_qstring (tl::micron_to_string (p->y ()))));
   }
 
   if (! m_in_text_changed) {
+
     std::string text;
     for (auto p = obj.points ().begin (); p != obj.points ().end (); ++p) {
-      text += tl::to_string (p->x ());
+      text += tl::micron_to_string (p->x ());
       text += ", ";
-      text += tl::to_string (p->y ());
+      text += tl::micron_to_string (p->y ());
       text += "\n";
     }
+
+    QSignalBlocker blocker (points_edit);
     points_edit->setPlainText (tl::to_qstring (text));
+
   }
 
   x0->setText (tl::to_qstring (tl::micron_to_string (obj.p1 ().x ())));
@@ -477,7 +478,7 @@ PropertiesPage::get_object ()
   if (segments_tab->currentIndex () == 0 || segments_tab->currentIndex () == 1) {
 
     db::DPoint p1, p2;
-    if (segments_tab->currentIndex () == 0) {
+    if (segments_tab->currentIndex () == 1) {
       get_points (p1, p2);
     } else {
       get_point (p1);

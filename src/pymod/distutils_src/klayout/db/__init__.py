@@ -1,4 +1,5 @@
 import functools
+from typing import Type
 import klayout.dbcore
 from klayout.dbcore import *
 
@@ -32,12 +33,19 @@ def convert_type_error_to_not_implemented(cls, method):
             return old_func(*args, **kwargs)
         except TypeError:
             return NotImplemented
-
-    setattr(cls, method, new_func)
-
+    try:
+        setattr(cls, method, new_func)
+    except TypeError:
+        # Some classes are immutable and cannot be changed.
+        # At the time of writing, this happens to (_StaticAttribute, _AmbiguousMethodDispatcher, _Iterator, _Signal).__or__
+        return
 
 for PClass in PointLike:
     PClass.__deepcopy__ = pyaPoint__deepcopy__  # type: ignore
+
+for cls in klayout.dbcore.__dict__.values():
+    if not isinstance(cls, type):  # skip if not a class
+        continue
     for method in (
         "__add__",
         "__sub__",
@@ -55,7 +63,7 @@ for PClass in PointLike:
         "__or__",
     ):
         # list of methods extracted from https://docs.python.org/3.7/reference/datamodel.html#emulating-numeric-types
-        convert_type_error_to_not_implemented(PClass, method)
+        convert_type_error_to_not_implemented(cls, method)
 
 
 # If class has from_s, to_s, and assign, use them to

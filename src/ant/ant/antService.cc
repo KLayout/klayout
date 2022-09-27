@@ -1560,10 +1560,51 @@ Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio
   return mouse_click_event (p, buttons, prio);
 }
 
-bool 
+void
+Service::finish_drawing ()
+{
+  //  create the ruler object
+
+  //  begin the transaction
+  if (manager ()) {
+    tl_assert (! manager ()->transacting ());
+    manager ()->transaction (tl::to_string (tr ("Create ruler")));
+  }
+
+  show_message ();
+
+  insert_ruler (ant::Object (m_current.points (), 0, current_template ()), true);
+
+  //  stop dragging
+  drag_cancel ();
+  clear_transient_selection ();
+
+  //  end the transaction
+  if (manager ()) {
+    manager ()->commit ();
+  }
+}
+
+bool
+Service::mouse_double_click_event (const db::DPoint & /*p*/, unsigned int buttons, bool prio)
+{
+  if (m_drawing && prio && (buttons & lay::LeftButton) != 0) {
+
+    //  ends the current ruler (specifically in multi-segment mode)
+    finish_drawing ();
+    return true;
+
+  }
+
+  return false;
+}
+
+bool
 Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio) 
 {
   if (prio && (buttons & lay::LeftButton) != 0) {
+
+    const ant::Template &tpl = current_template ();
 
     if (! m_drawing) {
 
@@ -1576,8 +1617,6 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
       //  set the maximum number of rulers minus 1 to account for the new ruler
       //  and clear surplus rulers
       reduce_rulers (m_max_number_of_rulers - 1);
-
-      const ant::Template &tpl = current_template ();
 
       //  create and start dragging the ruler
       
@@ -1648,7 +1687,13 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
         m_p1 = snap1 (p, m_obj_snap && tpl.snap ()).second;
 
-        m_current = ant::Object (m_p1, m_p1, 0, tpl);
+        //  NOTE: generating the ruler this way makes sure we have two points
+        ant::Object::point_list pts;
+        m_current = ant::Object (pts, 0, tpl);
+        pts.push_back (m_p1);
+        pts.push_back (m_p1);
+        m_current.set_points_exact (pts);
+
         show_message ();
 
         if (mp_active_ruler) {
@@ -1662,29 +1707,29 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
       }
 
+    } else if (tpl.mode () == ant::Template::RulerMultiSegment || tpl.mode () == ant::Template::RulerAngle) {
+
+      ant::Object::point_list pts = m_current.points ();
+      tl_assert (! pts.empty ());
+
+      if (tpl.mode () == ant::Template::RulerAngle && pts.size () == 3) {
+
+        finish_drawing ();
+
+      } else {
+
+        //  add a new point
+        m_p1 = pts.back ();
+
+        pts.push_back (m_p1);
+        m_current.set_points_exact (pts);
+
+      }
+
     } else {
 
-      //  create the ruler object
+      finish_drawing ();
 
-      //  begin the transaction
-      if (manager ()) {
-        tl_assert (! manager ()->transacting ());
-        manager ()->transaction (tl::to_string (tr ("Create ruler")));
-      }
-
-      show_message ();
-
-      insert_ruler (ant::Object (m_current.p1 (), m_current.p2 (), 0, current_template ()), true);
-
-      //  stop dragging
-      drag_cancel ();
-      clear_transient_selection ();
-
-      //  end the transaction
-      if (manager ()) {
-        manager ()->commit ();
-      }
-      
     }
 
     return true;
@@ -1731,7 +1776,14 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 
     set_cursor (lay::Cursor::cross);
 
-    m_current.p2 (snap2 (m_p1, p, mp_active_ruler->ruler (), ac_from_buttons (buttons)).second);
+    //  NOTE: we use the direct access path so we do not encounter cleanup by the p1 and p2 setters
+    //  otherwise we risk manipulating p1 too.
+    ant::Object::point_list pts = m_current.points ();
+    if (! pts.empty ()) {
+      pts.back () = snap2 (m_p1, p, mp_active_ruler->ruler (), ac_from_buttons (buttons)).second;
+    }
+    m_current.set_points_exact (pts);
+
     mp_active_ruler->redraw ();
     show_message ();
 

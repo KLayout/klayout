@@ -293,6 +293,14 @@ public:
   void set_points (const point_list &points);
 
   /**
+   *  @brief Sets the ruler's definition points without cleaning
+   */
+  void set_points_exact (const point_list &points)
+  {
+    m_points = points;
+  }
+
+  /**
    *  @brief Gets the first point of the indicated segment
    */
   db::DPoint seg_p1 (size_t seg_index) const;

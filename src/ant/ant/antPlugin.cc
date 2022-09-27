@@ -68,11 +68,17 @@ static std::vector<ant::Template> make_standard_templates ()
 
   templates.push_back (ant::Template (tl::to_string (tr ("Ruler")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_ruler"));
 
+  templates.push_back (ant::Template (tl::to_string (tr ("Multi-ruler")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_multi_ruler"));
+  templates.back ().set_mode (ant::Template::RulerMultiSegment);
+
   templates.push_back (ant::Template (tl::to_string (tr ("Cross")), "", "", "$U,$V", ant::Object::STY_cross_both, ant::Object::OL_diag, true, lay::AC_Global, "_cross"));
   templates.back ().set_mode (ant::Template::RulerSingleClick);
 
   templates.push_back (ant::Template (tl::to_string (tr ("Measure")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_measure"));
   templates.back ().set_mode (ant::Template::RulerAutoMetric);
+
+  templates.push_back (ant::Template (tl::to_string (tr ("Angle")), "$X", "$Y", "$D", ant::Object::STY_line, ant::Object::OL_diag, true, lay::AC_Global, "_angle"));
+  templates.back ().set_mode (ant::Template::RulerAngle);
 
   templates.push_back (ant::Template (tl::to_string (tr ("Ellipse")), "W=$(abs(X))", "H=$(abs(Y))", "", ant::Object::STY_line, ant::Object::OL_ellipse, true, lay::AC_Global, std::string ()));
 
@@ -197,14 +203,50 @@ PluginDeclaration::initialized (lay::Dispatcher *root)
   //  Check if we already have templates (initial setup)
   //  NOTE: this is not done by using a default value for the configuration item but dynamically.
   //  This provides a migration path from earlier versions (not having templates) to recent ones.
-  bool any_templates = false;
-  for (std::vector<ant::Template>::iterator i = m_templates.begin (); ! any_templates && i != m_templates.end (); ++i) {
-    any_templates = ! i->category ().empty ();
+  std::map<std::string, const ant::Template *> cat_names;
+  for (auto i = m_templates.begin (); i != m_templates.end (); ++i) {
+    if (! i->category ().empty ()) {
+      cat_names.insert (std::make_pair (i->category (), i.operator-> ()));
+    }
   }
 
-  if (! any_templates) {
+  bool any_missing = false;
+  auto std_templates = make_standard_templates ();
+  for (auto t = std_templates.begin (); ! any_missing && t != std_templates.end (); ++t) {
+    if (! t->category ().empty () && cat_names.find (t->category ()) == cat_names.end ()) {
+      any_missing = true;
+    }
+  }
+
+  if (cat_names.empty ()) {
+
+    //  full initial configuration
     root->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (make_standard_templates ()));
     root->config_end ();
+
+  } else if (any_missing) {
+
+    //  some standard templates are missing - add them now (migration path for later versions)
+    decltype (m_templates) new_templates;
+    for (auto t = std_templates.begin (); t != std_templates.end (); ++t) {
+      if (! t->category ().empty ()) {
+        auto tt = cat_names.find (t->category ());
+        if (tt != cat_names.end ()) {
+          new_templates.push_back (*tt->second);
+        } else {
+          new_templates.push_back (*t);
+        }
+      }
+    }
+    for (auto i = m_templates.begin (); i != m_templates.end (); ++i) {
+      if (i->category ().empty ()) {
+        new_templates.push_back (*i);
+      }
+    }
+
+    root->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (new_templates));
+    root->config_end ();
+
   }
 }
 

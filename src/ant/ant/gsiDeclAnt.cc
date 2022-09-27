@@ -432,6 +432,16 @@ static int ruler_mode_auto_metric ()
   return ant::Template::RulerAutoMetric;
 }
 
+static int ruler_mode_angle ()
+{
+  return ant::Template::RulerAngle;
+}
+
+static int ruler_mode_multi_segment ()
+{
+  return ant::Template::RulerMultiSegment;
+}
+
 static void register_annotation_template (const ant::Object &a, const std::string &title, int mode)
 {
   ant::Template t = ant::Template::from_object (a, title, mode);
@@ -503,15 +513,27 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
   ) +
   gsi::method ("RulerModeSingleClick", &gsi::ruler_mode_single_click,
     "@brief Specifies single-click ruler mode for the \\register_template method\n"
-    "In single click-mode, a ruler can be placed with a single click and p1 will be == p2."
+    "In single click-mode, a ruler can be placed with a single click and p1 will be == p2.\n"
     "\n"
     "This constant has been introduced in version 0.25"
   ) +
   gsi::method ("RulerModeAutoMetric", &gsi::ruler_mode_auto_metric,
     "@brief Specifies auto-metric ruler mode for the \\register_template method\n"
-    "In auto-metric mode, a ruler can be placed with a single click and p1/p2 will be determined from the neighborhood."
+    "In auto-metric mode, a ruler can be placed with a single click and p1/p2 will be determined from the neighborhood.\n"
     "\n"
     "This constant has been introduced in version 0.25"
+  ) +
+  gsi::method ("RulerAngle", &gsi::ruler_mode_angle,
+    "@brief Specifies angle ruler mode for the \\register_template method\n"
+    "In angle ruler mode, two segments are created for angle and circle radius measurements. Three mouse clicks are required.\n"
+    "\n"
+    "This constant has been introduced in version 0.28"
+  ) +
+  gsi::method ("RulerMultiSegment", &gsi::ruler_mode_multi_segment,
+    "@brief Specifies multi-segment mode\n"
+    "In multi-segment mode, multiple segments can be created. The ruler is finished with a double click.\n"
+    "\n"
+    "This constant has been introduced in version 0.28"
   ) +
   gsi::method ("StyleRuler|#style_ruler", &gsi::style_ruler,
     "@brief Gets the ruler style code for use the \\style method\n"

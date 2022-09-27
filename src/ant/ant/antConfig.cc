@@ -239,6 +239,10 @@ RulerModeConverter::to_string (ant::Template::ruler_mode_type m)
     return "single_click";
   } else if (m == ant::Template::RulerAutoMetric) {
     return "auto_metric";
+  } else if (m == ant::Template::RulerMultiSegment) {
+    return "multi_segment";
+  } else if (m == ant::Template::RulerAngle) {
+    return "angle";
   } else {
     return "normal";
   }
@@ -254,6 +258,10 @@ RulerModeConverter::from_string (const std::string &s, ant::Template::ruler_mode
     a = ant::Template::RulerSingleClick;
   } else if (t == "auto_metric") {
     a = ant::Template::RulerAutoMetric;
+  } else if (t == "multi_segment") {
+    a = ant::Template::RulerMultiSegment;
+  } else if (t == "angle") {
+    a = ant::Template::RulerAngle;
   } else {
     a = ant::Template::RulerNormal;
   }

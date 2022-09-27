@@ -329,7 +329,7 @@ public:
    */
   db::DPoint p2 () const
   {
-    return seg_p2 (0);
+    return seg_p2 (segments () - 1);
   }
 
   /**

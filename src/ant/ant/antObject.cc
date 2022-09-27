@@ -247,7 +247,9 @@ Object::set_points (const point_list &points)
 db::DPoint
 Object::seg_p1 (size_t seg_index) const
 {
-  if (seg_index < m_points.size ()) {
+  if (seg_index == std::numeric_limits<size_t>::max ()) {
+    return p1 ();
+  } else if (seg_index < m_points.size ()) {
     return m_points[seg_index];
   } else if (m_points.empty ()) {
     return db::DPoint ();
@@ -259,7 +261,9 @@ Object::seg_p1 (size_t seg_index) const
 db::DPoint
 Object::seg_p2 (size_t seg_index) const
 {
-  if (seg_index + 1 < m_points.size ()) {
+  if (seg_index == std::numeric_limits<size_t>::max ()) {
+    return p2 ();
+  } else if (seg_index + 1 < m_points.size ()) {
     return m_points[seg_index + 1];
   } else if (m_points.empty ()) {
     return db::DPoint ();

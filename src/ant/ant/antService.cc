@@ -113,6 +113,8 @@ tick_spacings (double d, double min_d, int &minor_ticks, double &ticks)
  *  @param pos The position where to draw the text
  *  @param bitmap The bitmap to draw the ruler on
  *  @param renderer The renderer object
+ *  @param first_segment True, if we're drawing the first segment
+ *  @param last_segment True, if we're drawing the last segment
  */
 void 
 draw_ruler (const db::DPoint &q1,
@@ -123,7 +125,9 @@ draw_ruler (const db::DPoint &q1,
             bool right,
             ant::Object::style_type style,
             lay::CanvasPlane *bitmap,
-            lay::Renderer &renderer)
+            lay::Renderer &renderer,
+            bool first_segment,
+            bool last_segment)
 {
   double arrow_width = 8 / renderer.resolution ();
   double arrow_length = 12 / renderer.resolution ();
@@ -189,12 +193,16 @@ draw_ruler (const db::DPoint &q1,
       db::DVector qw = qq * (sel_width * 0.5);
       
       db::DVector dq1, dq2;
-      if (style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_start) {
+      if (! first_segment) {
+        //  no start indicator if not first segment
+      } else if (style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_start) {
         dq1 = qu * (arrow_length - 1);
       } else if (style == ant::Object::STY_cross_both || style == ant::Object::STY_cross_start) {
         dq1 = qu * (sel_width * 0.5);
       }
-      if (style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_end) {
+      if (! last_segment) {
+        //  no end indicator if not last segment
+      } else if (style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_end) {
         dq2 = qu * -(arrow_length - 1);
       } else if (style == ant::Object::STY_cross_both || style == ant::Object::STY_cross_end) {
         dq2 = qu * -(sel_width * 0.5);
@@ -212,7 +220,11 @@ draw_ruler (const db::DPoint &q1,
       
     }
 
-    if (style == ant::Object::STY_arrow_end || style == ant::Object::STY_arrow_both) {
+    if (! last_segment) {
+
+      //  no end indicator if not last segment
+
+    } else if (style == ant::Object::STY_arrow_end || style == ant::Object::STY_arrow_both) {
 
       db::DPolygon p;
       db::DPoint points[] = {
@@ -239,7 +251,11 @@ draw_ruler (const db::DPoint &q1,
 
     }
     
-    if (style == ant::Object::STY_arrow_start || style == ant::Object::STY_arrow_both) {
+    if (! first_segment) {
+
+      //  no start indicator if not first segment
+
+    } else if (style == ant::Object::STY_arrow_start || style == ant::Object::STY_arrow_both) {
 
       db::DPolygon p;
       db::DPoint points[] = {
@@ -572,6 +588,9 @@ draw_ellipse (const db::DPoint &q1,
 void
 draw_ruler_segment (const ant::Object &ruler, size_t index, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
+  bool last_segment = (index == ruler.segments () - 1 || index == std::numeric_limits<size_t>::max ());
+  bool first_segment = (index == 0 || index == std::numeric_limits<size_t>::max ());
+
   db::DPoint p1 = ruler.seg_p1 (index), p2 = ruler.seg_p2 (index);
 
   //  round the starting point, shift both, and round the end point 
@@ -585,7 +604,7 @@ draw_ruler_segment (const ant::Object &ruler, size_t index, const db::DCplxTrans
   double mu = double (min_tick_spc) / trans.ctrans (1.0);
 
   if (ruler.outline () == Object::OL_diag) {
-    draw_ruler (q1, q2, lu, mu, sel, q2.x () < q1.x (), ruler.style (), bitmap, renderer);
+    draw_ruler (q1, q2, lu, mu, sel, q2.x () < q1.x (), ruler.style (), bitmap, renderer, first_segment, last_segment);
     draw_text (q1, q2, lu, ruler.text (index), q2.x () < q1.x (), ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
   }
 
@@ -595,12 +614,12 @@ draw_ruler_segment (const ant::Object &ruler, size_t index, const db::DCplxTrans
     bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
 
     if (ruler.outline () == Object::OL_diag_xy || ruler.outline () == Object::OL_diag_yx) {
-      draw_ruler (q1, q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer);
+      draw_ruler (q1, q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer, first_segment, last_segment);
       draw_text (q1, q2, lu, ruler.text (index), !r, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
     }
-    draw_ruler (q1, db::DPoint (q2.x (), q1.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer);
+    draw_ruler (q1, db::DPoint (q2.x (), q1.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer, false, false);
     draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
-    draw_ruler (db::DPoint (q2.x (), q1.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer);
+    draw_ruler (db::DPoint (q2.x (), q1.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer, false, false);
     draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
 
   }
@@ -611,12 +630,12 @@ draw_ruler_segment (const ant::Object &ruler, size_t index, const db::DCplxTrans
     bool r = (q2.x () > q1.x ()) ^ (q2.y () > q1.y ());
 
     if (ruler.outline () == Object::OL_diag_xy || ruler.outline () == Object::OL_diag_yx) {
-      draw_ruler (q1, q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer);
+      draw_ruler (q1, q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer, first_segment, last_segment);
       draw_text (q1, q2, lu, ruler.text (index), !r, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
     }
-    draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer);
+    draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer, false, false);
     draw_text (q1, db::DPoint (q1.x (), q2.y ()), lu, ruler.text_y (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
-    draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer);
+    draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer, false, false);
     draw_text (db::DPoint (q1.x (), q2.y ()), q2, lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
 
   }
@@ -625,12 +644,12 @@ draw_ruler_segment (const ant::Object &ruler, size_t index, const db::DCplxTrans
 
     bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
 
-    draw_ruler (q1, db::DPoint (q2.x (), q1.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer);
+    draw_ruler (q1, db::DPoint (q2.x (), q1.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer, true, true);
     draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
-    draw_ruler (db::DPoint (q2.x (), q1.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer);
+    draw_ruler (db::DPoint (q2.x (), q1.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer, true, true);
     draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
-    draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, !r, ruler.style (), bitmap, renderer);
-    draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer);
+    draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, !r, ruler.style (), bitmap, renderer, true, true);
+    draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer, true, true);
     draw_text (q1, q2, lu, ruler.text (index), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
 
   } else if (ruler.outline () == Object::OL_ellipse) {
@@ -649,18 +668,29 @@ draw_ruler_segment (const ant::Object &ruler, size_t index, const db::DCplxTrans
 void
 draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
-  for (size_t index = 0; index < ruler.segments (); ++index) {
-    draw_ruler_segment (ruler, index, trans, sel, bitmap, renderer);
+  if (ruler.outline () == Object::OL_box || ruler.outline () == Object::OL_ellipse) {
+
+    draw_ruler_segment (ruler, std::numeric_limits<size_t>::max (), trans, sel, bitmap, renderer);
+
+  } else {
+
+    //  other styles support segments, so paint them individually
+    for (size_t index = 0; index < ruler.segments (); ++index) {
+      draw_ruler_segment (ruler, index, trans, sel, bitmap, renderer);
+    }
+
   }
 }
 
 static bool
 is_selected (const ant::Object &ruler, size_t index, const db::DPoint &pos, double enl, double &distance)
 {
+  ant::Object::outline_type outline = ruler.outline ();
+
   db::DPoint p1 = ruler.seg_p1 (index), p2 = ruler.seg_p2 (index);
   db::DBox b (p1, p2);
 
-  if (ruler.outline () == ant::Object::OL_ellipse) {
+  if (outline == ant::Object::OL_ellipse) {
 
     //  special handling of the (non-degenerated) ellipse case
     if (b.height () > 1e-6 && b.width () > 1e-6) {
@@ -695,24 +725,24 @@ is_selected (const ant::Object &ruler, size_t index, const db::DPoint &pos, doub
   db::DEdge edges[4];
   unsigned int nedges = 0;
 
-  if (ruler.outline () == ant::Object::OL_diag ||
-      ruler.outline () == ant::Object::OL_diag_xy ||
-      ruler.outline () == ant::Object::OL_diag_yx) {
-    edges [nedges++] = db::DEdge (ruler.p1 (), ruler.p2 ());
+  if (outline == ant::Object::OL_diag ||
+      outline == ant::Object::OL_diag_xy ||
+      outline == ant::Object::OL_diag_yx) {
+    edges [nedges++] = db::DEdge (p1, p2);
   }
-  if (ruler.outline () == ant::Object::OL_xy ||
-      ruler.outline () == ant::Object::OL_diag_xy ||
-      ruler.outline () == ant::Object::OL_box ||
-      ruler.outline () == ant::Object::OL_ellipse) {
-    edges [nedges++] = db::DEdge (ruler.p1 (), db::DPoint (ruler.p2 ().x (), ruler.p1 ().y ()));
-    edges [nedges++] = db::DEdge (db::DPoint (ruler.p2 ().x (), ruler.p1 ().y ()), ruler.p2 ());
+  if (outline == ant::Object::OL_xy ||
+      outline == ant::Object::OL_diag_xy ||
+      outline == ant::Object::OL_box ||
+      outline == ant::Object::OL_ellipse) {
+    edges [nedges++] = db::DEdge (p1, db::DPoint (p2.x (), p1.y ()));
+    edges [nedges++] = db::DEdge (db::DPoint (p2.x (), p1.y ()), p2);
   }
-  if (ruler.outline () == ant::Object::OL_yx ||
-      ruler.outline () == ant::Object::OL_diag_yx ||
-      ruler.outline () == ant::Object::OL_box ||
-      ruler.outline () == ant::Object::OL_ellipse) {
-    edges [nedges++] = db::DEdge (ruler.p1 (), db::DPoint (ruler.p1 ().x (), ruler.p2 ().y ()));
-    edges [nedges++] = db::DEdge (db::DPoint (ruler.p1 ().x (), ruler.p2 ().y ()), ruler.p2 ());
+  if (outline == ant::Object::OL_yx ||
+      outline == ant::Object::OL_diag_yx ||
+      outline == ant::Object::OL_box ||
+      outline == ant::Object::OL_ellipse) {
+    edges [nedges++] = db::DEdge (p1, db::DPoint (p1.x (), p2.y ()));
+    edges [nedges++] = db::DEdge (db::DPoint (p1.x (), p2.y ()), p2);
   }
 
   for (unsigned int i = 0; i < nedges; ++i) {
@@ -729,6 +759,10 @@ is_selected (const ant::Object &ruler, size_t index, const db::DPoint &pos, doub
 static bool
 is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double &distance)
 {
+  if (ruler.outline () == ant::Object::OL_box || ruler.outline () == ant::Object::OL_ellipse) {
+    return is_selected (ruler, std::numeric_limits<size_t>::max (), pos, enl, distance);
+  }
+
   bool any = false;
   for (size_t index = 0; index < ruler.segments (); ++index) {
     //  NOTE: we check *all* since distance is updated herein.

@@ -31,10 +31,38 @@ namespace ant
 {
 
 // -------------------------------------------------------------------------
+//  A ruler that tells us if he was modified
+
+class RulerWithModifiedProperty
+  : public ant::Object
+{
+public:
+  RulerWithModifiedProperty ()
+    : ant::Object (), m_modified (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  bool is_modified () const
+  {
+    return m_modified;
+  }
+
+protected:
+  void property_changed ()
+  {
+    m_modified = true;
+    ant::Object::property_changed ();
+  }
+
+  bool m_modified;
+};
+
+// -------------------------------------------------------------------------
 //  PropertiesPage implementation
 
 PropertiesPage::PropertiesPage (ant::Service *rulers, db::Manager *manager, QWidget *parent)
-  : lay::PropertiesPage (parent, manager, rulers), mp_rulers (rulers), m_enable_cb_callback (true), m_in_text_changed (false)
+  : lay::PropertiesPage (parent, manager, rulers), mp_rulers (rulers), m_enable_cb_callback (true), m_in_something_changed (false)
 {
   mp_rulers->get_selection (m_selection);
   m_pos = m_selection.begin ();
@@ -54,27 +82,27 @@ PropertiesPage::PropertiesPage (ant::Service *rulers, db::Manager *manager, QWid
 
   if (! readonly ()) {
 
-    connect (fmt_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-    connect (fmt_x_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-    connect (fmt_y_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-    connect (x0, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-    connect (x1, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-    connect (x2, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-    connect (y0, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-    connect (y1, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
-    connect (y2, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    connect (fmt_le, SIGNAL (editingFinished ()), this, SLOT (something_changed ()));
+    connect (fmt_x_le, SIGNAL (editingFinished ()), this, SLOT (something_changed ()));
+    connect (fmt_y_le, SIGNAL (editingFinished ()), this, SLOT (something_changed ()));
+    connect (x0, SIGNAL (editingFinished ()), this, SLOT (something_changed ()));
+    connect (x1, SIGNAL (editingFinished ()), this, SLOT (something_changed ()));
+    connect (x2, SIGNAL (editingFinished ()), this, SLOT (something_changed ()));
+    connect (y0, SIGNAL (editingFinished ()), this, SLOT (something_changed ()));
+    connect (y1, SIGNAL (editingFinished ()), this, SLOT (something_changed ()));
+    connect (y2, SIGNAL (editingFinished ()), this, SLOT (something_changed ()));
 
-    connect (style_cb, SIGNAL (activated (int)), this, SIGNAL (edited ()));
-    connect (outline_cb, SIGNAL (activated (int)), this, SIGNAL (edited ()));
-    connect (main_position, SIGNAL (activated (int)), this, SIGNAL (edited ()));
-    connect (main_xalign, SIGNAL (activated (int)), this, SIGNAL (edited ()));
-    connect (main_yalign, SIGNAL (activated (int)), this, SIGNAL (edited ()));
-    connect (xlabel_xalign, SIGNAL (activated (int)), this, SIGNAL (edited ()));
-    connect (xlabel_yalign, SIGNAL (activated (int)), this, SIGNAL (edited ()));
-    connect (ylabel_xalign, SIGNAL (activated (int)), this, SIGNAL (edited ()));
-    connect (ylabel_yalign, SIGNAL (activated (int)), this, SIGNAL (edited ()));
+    connect (style_cb, SIGNAL (activated (int)), this, SLOT (something_changed ()));
+    connect (outline_cb, SIGNAL (activated (int)), this, SLOT (something_changed ()));
+    connect (main_position, SIGNAL (activated (int)), this, SLOT (something_changed ()));
+    connect (main_xalign, SIGNAL (activated (int)), this, SLOT (something_changed ()));
+    connect (main_yalign, SIGNAL (activated (int)), this, SLOT (something_changed ()));
+    connect (xlabel_xalign, SIGNAL (activated (int)), this, SLOT (something_changed ()));
+    connect (xlabel_yalign, SIGNAL (activated (int)), this, SLOT (something_changed ()));
+    connect (ylabel_xalign, SIGNAL (activated (int)), this, SLOT (something_changed ()));
+    connect (ylabel_yalign, SIGNAL (activated (int)), this, SLOT (something_changed ()));
 
-    connect (points_edit, SIGNAL (textChanged ()), this, SLOT (text_changed ()));
+    connect (points_edit, SIGNAL (textChanged ()), this, SLOT (something_changed ()));
 
   } else {
 
@@ -234,19 +262,28 @@ PropertiesPage::get_points (ant::Object::point_list &points)
 }
 
 void
-PropertiesPage::text_changed ()
+PropertiesPage::something_changed ()
 {
-  if (m_in_text_changed) {
+  if (m_in_something_changed) {
     return;
   }
 
   try {
-    m_in_text_changed = true;
-    update_with (get_object ());
-    emit edited ();
-    m_in_text_changed = false;
+
+    m_in_something_changed = true;
+
+    RulerWithModifiedProperty obj;
+    obj.ant::Object::operator= (current ());
+    get_object (obj);
+    if (obj.is_modified ()) {
+      update_with (obj);
+      emit edited ();
+    }
+
+    m_in_something_changed = false;
+
   } catch (...) {
-    m_in_text_changed = false;
+    m_in_something_changed = false;
     //  ignore exceptions - the edit field will be highlighted anyway
   }
 }
@@ -395,16 +432,20 @@ PropertiesPage::update_with (const ant::Object &obj)
   ylabel_xalign->setCurrentIndex (obj.ylabel_xalign ());
   ylabel_yalign->setCurrentIndex (obj.ylabel_yalign ());
 
-  int tab = 2;
-  if (obj.points ().size () == 1) {
-    tab = 0;
-  } else if (obj.points ().size () == 2) {
-    tab = 1;
+  //  change tabs if required
+  if (segments_tab->currentIndex () == 1) {
+    if (obj.points ().size () > 2 || obj.points ().size () == 0) {
+      segments_tab->setCurrentIndex (2);
+    }
+  } else if (segments_tab->currentIndex () == 0) {
+    if (obj.points ().size () > 2 || obj.points ().size () == 0) {
+      segments_tab->setCurrentIndex (2);
+    } else if (obj.points ().size () > 1) {
+      segments_tab->setCurrentIndex (1);
+    }
   }
-
-  if (! m_in_text_changed) {
-    segments_tab->setCurrentIndex (tab);
-  }
+  segments_tab->setTabEnabled (0, obj.points ().size () == 1);
+  segments_tab->setTabEnabled (1, obj.points ().size () <= 2 && obj.points ().size () > 0);
 
   point_list->clear ();
   for (auto p = obj.points ().begin (); p != obj.points ().end (); ++p) {
@@ -413,7 +454,7 @@ PropertiesPage::update_with (const ant::Object &obj)
     item->setData (1, Qt::DisplayRole, QVariant (tl::to_qstring (tl::micron_to_string (p->y ()))));
   }
 
-  if (! m_in_text_changed) {
+  if (! m_in_something_changed || segments_tab->currentIndex () != 3) {
 
     std::string text;
     for (auto p = obj.points ().begin (); p != obj.points ().end (); ++p) {
@@ -461,14 +502,13 @@ PropertiesPage::readonly ()
 void 
 PropertiesPage::apply ()
 {
-  mp_rulers->change_ruler (*m_pos, get_object ());
+  ant::Object obj;
+  get_object (obj);
+  mp_rulers->change_ruler (*m_pos, obj);
 }
 
-ant::Object
-PropertiesPage::get_object ()
+void PropertiesPage::get_object(ant::Object &obj)
 {
-  ant::Object ruler;
-
   std::string fmt = tl::to_string (fmt_le->text ());
   std::string fmt_x = tl::to_string (fmt_x_le->text ());
   std::string fmt_y = tl::to_string (fmt_y_le->text ());
@@ -485,28 +525,26 @@ PropertiesPage::get_object ()
       p2 = p1;
     }
 
-    ruler = ant::Object (p1, p2, current ().id (), fmt_x, fmt_y, fmt, style, outline, current ().snap (), current ().angle_constraint ());
+    obj = ant::Object (p1, p2, current ().id (), fmt_x, fmt_y, fmt, style, outline, current ().snap (), current ().angle_constraint ());
 
   } else if (segments_tab->currentIndex () == 2 || segments_tab->currentIndex () == 3) {
 
     ant::Object::point_list points;
     get_points (points);
 
-    ruler = ant::Object (points, current ().id (), fmt_x, fmt_y, fmt, style, outline, current ().snap (), current ().angle_constraint ());
+    obj = ant::Object (points, current ().id (), fmt_x, fmt_y, fmt, style, outline, current ().snap (), current ().angle_constraint ());
 
   }
 
-  ruler.set_main_position (Object::position_type (main_position->currentIndex ()));
-  ruler.set_main_xalign (Object::alignment_type (main_xalign->currentIndex ()));
-  ruler.set_main_yalign (Object::alignment_type (main_yalign->currentIndex ()));
-  ruler.set_xlabel_xalign (Object::alignment_type (xlabel_xalign->currentIndex ()));
-  ruler.set_xlabel_yalign (Object::alignment_type (xlabel_yalign->currentIndex ()));
-  ruler.set_ylabel_xalign (Object::alignment_type (ylabel_xalign->currentIndex ()));
-  ruler.set_ylabel_yalign (Object::alignment_type (ylabel_yalign->currentIndex ()));
+  obj.set_main_position (Object::position_type (main_position->currentIndex ()));
+  obj.set_main_xalign (Object::alignment_type (main_xalign->currentIndex ()));
+  obj.set_main_yalign (Object::alignment_type (main_yalign->currentIndex ()));
+  obj.set_xlabel_xalign (Object::alignment_type (xlabel_xalign->currentIndex ()));
+  obj.set_xlabel_yalign (Object::alignment_type (xlabel_yalign->currentIndex ()));
+  obj.set_ylabel_xalign (Object::alignment_type (ylabel_xalign->currentIndex ()));
+  obj.set_ylabel_yalign (Object::alignment_type (ylabel_yalign->currentIndex ()));
 
-  ruler.set_category (current ().category ());
-
-  return ruler;
+  obj.set_category (current ().category ());
 }
 
 }

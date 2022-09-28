@@ -545,6 +545,8 @@ private:
   ant::Object m_original;
   //  The current move mode
   MoveMode m_move_mode;
+  //  The currently moving segment
+  size_t m_seg_index;
   //  The ruler template
   std::vector<ant::Template> m_ruler_templates;
   unsigned int m_current_template;

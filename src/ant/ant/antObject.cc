@@ -32,6 +32,24 @@
 namespace ant
 {
 
+static void
+clean_points_impl (ant::Object::point_list &points)
+{
+  auto wp = points.begin ();
+  auto p = points.begin ();
+  while (p != points.end ()) {
+    auto pp = p + 1;
+    while (pp != points.end () && *pp == *p) {
+      ++pp;
+    }
+    *wp++ = *p;
+    p = pp;
+  }
+
+  points.erase (wp, points.end ());
+}
+
+
 Object::Object ()
   : m_id (-1),
     m_fmt_x ("$X"), m_fmt_y ("$Y"), m_fmt ("$D"),
@@ -88,7 +106,7 @@ Object::Object (const db::DPoint &_p1, const db::DPoint &_p2, int id, const ant:
 }
 
 Object::Object (const Object::point_list &pts, int id, const ant::Template &t)
-  : m_id (id),
+  : m_points (pts), m_id (id),
     m_fmt_x (t.fmt_x ()), m_fmt_y (t.fmt_y ()), m_fmt (t.fmt ()),
     m_style (t.style ()), m_outline (t.outline ()),
     m_snap (t.snap ()), m_angle_constraint (t.angle_constraint ()),
@@ -98,7 +116,7 @@ Object::Object (const Object::point_list &pts, int id, const ant::Template &t)
     m_xlabel_xalign (t.xlabel_xalign ()), m_xlabel_yalign (t.xlabel_yalign ()),
     m_ylabel_xalign (t.ylabel_xalign ()), m_ylabel_yalign (t.ylabel_yalign ())
 {
-  set_points (pts);
+  clean_points_impl (m_points);
 }
 
 Object::Object (const ant::Object &d)
@@ -225,21 +243,35 @@ Object::operator== (const ant::Object &d) const
 }
 
 void
+Object::clean_points ()
+{
+  auto new_points = m_points;
+  clean_points_impl (new_points);
+  set_points_exact (std::move (new_points));
+}
+
+void
 Object::set_points (const point_list &points)
 {
-  point_list new_points;
-  auto p = points.begin ();
-  while (p != points.end ()) {
-    auto pp = p + 1;
-    while (pp != points.end () && *pp == *p) {
-      ++pp;
-    }
-    new_points.push_back (*p);
-    p = pp;
-  }
+  auto new_points = points;
+  clean_points_impl (new_points);
+  set_points_exact (std::move (new_points));
+}
 
-  if (m_points != new_points) {
-    m_points = new_points;
+void
+Object::set_points_exact (const point_list &points)
+{
+  if (m_points != points) {
+    m_points = points;
+    property_changed ();
+  }
+}
+
+void
+Object::set_points_exact (point_list &&points)
+{
+  if (m_points != points) {
+    m_points.swap (points);
     property_changed ();
   }
 }
@@ -269,6 +301,30 @@ Object::seg_p2 (size_t seg_index) const
     return db::DPoint ();
   } else {
     return m_points.back ();
+  }
+}
+
+void
+Object::seg_p1 (size_t seg_index, const db::DPoint &p)
+{
+  if (seg_index == std::numeric_limits<size_t>::max ()) {
+    p1 (p);
+  } else if (seg_index < m_points.size ()) {
+    m_points[seg_index] = p;
+  } else if (! m_points.empty ()) {
+    m_points.back () = p;
+  }
+}
+
+void
+Object::seg_p2 (size_t seg_index, const db::DPoint &p)
+{
+  if (seg_index == std::numeric_limits<size_t>::max ()) {
+    p2 (p);
+  } else if (seg_index + 1 < m_points.size ()) {
+    m_points[seg_index + 1] = p;
+  } else if (! m_points.empty ()) {
+    m_points.back () = p;
   }
 }
 

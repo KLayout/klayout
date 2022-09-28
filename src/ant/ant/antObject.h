@@ -295,10 +295,17 @@ public:
   /**
    *  @brief Sets the ruler's definition points without cleaning
    */
-  void set_points_exact (const point_list &points)
-  {
-    m_points = points;
-  }
+  void set_points_exact (const point_list &points);
+
+  /**
+   *  @brief Sets the ruler's definition points without cleaning (move semantics)
+   */
+  void set_points_exact (point_list &&points);
+
+  /**
+   *  @brief Cleans the point list
+   */
+  void clean_points ();
 
   /**
    *  @brief Gets the first point of the indicated segment
@@ -309,6 +316,16 @@ public:
    *  @brief Gets the second point of the indicated segment
    */
   db::DPoint seg_p2 (size_t seg_index) const;
+
+  /**
+   *  @brief Sets the first point of the indicated segment
+   */
+  void seg_p1 (size_t seg_index, const db::DPoint &p);
+
+  /**
+   *  @brief Sets the second point of the indicated segment
+   */
+  void seg_p2 (size_t seg_index, const db::DPoint &p);
 
   /**
    *  @brief Gets the number of segments

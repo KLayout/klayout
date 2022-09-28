@@ -858,6 +858,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     mp_transient_ruler (0),
     m_drawing (false), m_current (),
     m_move_mode (MoveNone),
+    m_seg_index (0),
     m_current_template (0)
 { 
   mp_view->annotations_changed_event.add (this, &Service::annotations_changed);
@@ -1074,29 +1075,28 @@ Service::insert_ruler (const ant::Object &ruler, bool limit_number)
   return new_id;
 }
 
-/**
- *  @brief Helper function to determine which move mode to choose given a certain search box and ant::Object
- */
 static bool
-dragging_what (const ant::Object *robj, const db::DBox &search_dbox, ant::Service::MoveMode &mode, db::DPoint &p1)
+dragging_what_seg (const ant::Object *robj, const db::DBox &search_dbox, ant::Service::MoveMode &mode, db::DPoint &p1, size_t index)
 {
+  ant::Object::outline_type outline = robj->outline ();
+
   db::DPoint p12, p21;
   bool has_p12 = false, has_p21 = false;
 
-  db::DPoint p11 = robj->p1 (), p22 = robj->p2 ();
+  db::DPoint p11 = robj->seg_p1 (index), p22 = robj->seg_p2 (index);
   db::DPoint c = p11 + (p22 - p11) * 0.5;
-  
-  if (robj->outline () == ant::Object::OL_xy || robj->outline () == ant::Object::OL_diag_xy || robj->outline () == ant::Object::OL_box) {
-    p12 = db::DPoint (robj->p2 ().x (), robj->p1 ().y ());
+
+  if (outline == ant::Object::OL_xy || outline== ant::Object::OL_diag_xy || outline == ant::Object::OL_box) {
+    p12 = db::DPoint (p22.x (), p11.y ());
     has_p12 = true;
   }
 
-  if (robj->outline () == ant::Object::OL_yx || robj->outline () == ant::Object::OL_diag_yx || robj->outline () == ant::Object::OL_box) {
-    p21 = db::DPoint (robj->p1 ().x (), robj->p2 ().y ());
+  if (outline == ant::Object::OL_yx || outline == ant::Object::OL_diag_yx || outline == ant::Object::OL_box) {
+    p21 = db::DPoint (p11.x (), p22.y ());
     has_p21 = true;
   }
- 
-  if (robj->outline () == ant::Object::OL_ellipse) {
+
+  if (outline == ant::Object::OL_ellipse) {
     db::DVector d = (p22 - p11) * 0.5;
     p12 = c + db::DVector (d.x (), -d.y ());
     p21 = c + db::DVector (-d.x (), d.y ());
@@ -1106,7 +1106,7 @@ dragging_what (const ant::Object *robj, const db::DBox &search_dbox, ant::Servic
 
   //  HINT: this was implemented returning a std::pair<MoveMode, db::DPoint>, but
   //  I was not able to get it to work in gcc 4.1.2 in -O3 mode ...
-  
+
   if (search_dbox.contains (p11)) {
     p1 = p11;
     mode = ant::Service::MoveP1;
@@ -1147,18 +1147,28 @@ dragging_what (const ant::Object *robj, const db::DBox &search_dbox, ant::Servic
     mode = ant::Service::MoveP2Y;
     return true;
   }
-  if ((robj->outline () == ant::Object::OL_diag || robj->outline () == ant::Object::OL_diag_xy || robj->outline () == ant::Object::OL_diag_yx)
-    && db::DEdge (p11, p22).distance_abs (search_dbox.center ()) <= search_dbox.width () * 0.5) {
-    p1 = search_dbox.center ();
-    mode = ant::Service::MoveRuler;
-    return true;
+
+  return false;
+}
+
+/**
+ *  @brief Helper function to determine which move mode to choose given a certain search box and ant::Object
+ */
+static bool
+dragging_what (const ant::Object *robj, const db::DBox &search_dbox, ant::Service::MoveMode &mode, db::DPoint &p1, size_t &index)
+{
+  ant::Object::outline_type outline = robj->outline ();
+
+  if (outline == ant::Object::OL_box || outline == ant::Object::OL_ellipse) {
+    index = std::numeric_limits<size_t>::max ();
+    return dragging_what_seg (robj, search_dbox, mode, p1, index);
   }
-  if ((robj->outline () == ant::Object::OL_box || robj->outline () == ant::Object::OL_ellipse) && search_dbox.inside (db::DBox (p11, p22))) {
-    p1 = search_dbox.center ();
-    mode = ant::Service::MoveRuler;
-    return true;
+
+  for (index = 0; index < robj->segments (); ++index) {
+    if (dragging_what_seg (robj, search_dbox, mode, p1, index)) {
+      return true;
+    }
   }
-  
   return false;
 }
 
@@ -1185,6 +1195,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
   } else if (mode == lay::Editable::Partial) {
   
     m_move_mode = MoveNone;
+    m_seg_index = 0;
 
     //  compute search box
     double l = catch_distance ();
@@ -1216,7 +1227,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
       const ant::Object *robj = dynamic_cast <const ant::Object *> ((*ri).ptr ());
       if (robj && (! robj_min || robj == robj_min)) {
         
-        if (dragging_what (robj, search_dbox, m_move_mode, m_p1) && m_move_mode != MoveRuler) {
+        if (dragging_what (robj, search_dbox, m_move_mode, m_p1, m_seg_index) && m_move_mode != MoveRuler) {
           
           //  found anything: make the moved ruler the selection
           clear_selection ();
@@ -1273,7 +1284,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
       const ant::Object *robj = dynamic_cast <const ant::Object *> ((*r).ptr ());
       if (robj && (! robj_min || robj == robj_min)) {
 
-        if (dragging_what (robj, search_dbox, m_move_mode, m_p1)) {
+        if (dragging_what (robj, search_dbox, m_move_mode, m_p1, m_seg_index)) {
 
           //  found anything: make the moved ruler the selection
           clear_selection ();
@@ -1340,50 +1351,50 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
 
   if (m_move_mode == MoveP1) {
     
-    m_current.p1 (snap2 (m_p1, p, &m_current, ac).second);
+    m_current.seg_p1 (m_seg_index, snap2 (m_p1, p, &m_current, ac).second);
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveP2) {
     
-    m_current.p2 (snap2 (m_p1, p, &m_current, ac).second);
+    m_current.seg_p2 (m_seg_index, snap2 (m_p1, p, &m_current, ac).second);
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveP12) {
     
     db::DPoint p12 = snap2 (m_p1, p, &m_current, ac).second;
-    m_current.p1 (db::DPoint (m_current.p1 ().x(), p12.y ()));
-    m_current.p2 (db::DPoint (p12.x (), m_current.p2 ().y ()));
+    m_current.seg_p1 (m_seg_index, db::DPoint (m_current.seg_p1 (m_seg_index).x(), p12.y ()));
+    m_current.seg_p2 (m_seg_index, db::DPoint (p12.x (), m_current.seg_p2 (m_seg_index).y ()));
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveP21) {
     
     db::DPoint p21 = snap2 (m_p1, p, &m_current, ac).second;
-    m_current.p1 (db::DPoint (p21.x (), m_current.p1 ().y ()));
-    m_current.p2 (db::DPoint (m_current.p2 ().x(), p21.y ()));
+    m_current.seg_p1 (m_seg_index, db::DPoint (p21.x (), m_current.seg_p1 (m_seg_index).y ()));
+    m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x(), p21.y ()));
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveP1X) {
     
     db::DPoint pc = snap2 (m_p1, p, &m_current, ac).second;
-    m_current.p1 (db::DPoint (pc.x (), m_current.p1 ().y ()));
+    m_current.seg_p1 (m_seg_index, db::DPoint (pc.x (), m_current.seg_p1 (m_seg_index).y ()));
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveP2X) {
     
     db::DPoint pc = snap2 (m_p1, p, &m_current, ac).second;
-    m_current.p2 (db::DPoint (pc.x (), m_current.p2 ().y ()));
+    m_current.seg_p2 (m_seg_index, db::DPoint (pc.x (), m_current.seg_p2 (m_seg_index).y ()));
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveP1Y) {
     
     db::DPoint pc = snap2 (m_p1, p, &m_current, ac).second;
-    m_current.p1 (db::DPoint (m_current.p1 ().x (), pc.y ()));
+    m_current.seg_p1 (m_seg_index, db::DPoint (m_current.seg_p1 (m_seg_index).x (), pc.y ()));
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveP2Y) {
     
     db::DPoint pc = snap2 (m_p1, p, &m_current, ac).second;
-    m_current.p2 (db::DPoint (m_current.p2 ().x (), pc.y ()));
+    m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x (), pc.y ()));
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveRuler) {
@@ -1474,6 +1485,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
     } else if (m_move_mode != MoveNone) {
 
       //  replace the ruler that was moved
+      m_current.clean_points ();
       mp_view->annotation_shapes ().replace (m_selected.begin ()->first, db::DUserObject (new ant::Object (m_current)));
       annotation_changed_event (m_current.id ());
 

@@ -77,8 +77,10 @@ public:
    *  OL_diag_yx: both OL_diag and OL_yx
    *  OL_box: draw a box defined by start and end point
    *  OL_ellipse: draws an ellipse with p1 and p2 defining the extension (style is ignored)
+   *  OL_angle: an angle measurement ruler (first vs. last segment)
+   *  OL_radius: a radius measurement ruler
    */
-  enum outline_type { OL_diag = 0, OL_xy = 1, OL_diag_xy = 2, OL_yx = 3, OL_diag_yx = 4, OL_box = 5, OL_ellipse = 6 };
+  enum outline_type { OL_diag = 0, OL_xy = 1, OL_diag_xy = 2, OL_yx = 3, OL_diag_yx = 4, OL_box = 5, OL_ellipse = 6, OL_angle = 7, OL_radius = 8 };
 
   /**
    *  @brief The position type of the main label

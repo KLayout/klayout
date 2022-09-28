@@ -503,9 +503,12 @@ draw_text (const db::DPoint &q1,
  *
  *  @param q1 The first point in pixel space
  *  @param q2 The second point in pixel space
+ *  @param length_u The "typical dimension" - used to simplify for very small ellipses
  *  @param sel True to draw ruler in "selected" mode
  *  @param bitmap The bitmap to draw the ruler on
  *  @param renderer The renderer object
+ *  @param start_angle The starting angle (in radians)
+ *  @param stop_angle The stop angle (in radians)
  */
 void
 draw_ellipse (const db::DPoint &q1,
@@ -513,7 +516,9 @@ draw_ellipse (const db::DPoint &q1,
               double length_u,
               bool sel,
               lay::CanvasPlane *bitmap,
-              lay::Renderer &renderer)
+              lay::Renderer &renderer,
+              double start_angle = 0.0,
+              double stop_angle = 2.0 * M_PI)
 {
   double sel_width = 2 / renderer.resolution ();
 
@@ -532,7 +537,7 @@ draw_ellipse (const db::DPoint &q1,
 
   } else {
 
-    int npoints = 200;
+    int npoints = int (floor (200 * abs (stop_angle - start_angle) / (2.0 * M_PI)));
 
     //  produce polygon stuff
 
@@ -540,43 +545,29 @@ draw_ellipse (const db::DPoint &q1,
     double ry = fabs ((q2 - q1).y () * 0.5);
     db::DPoint c = q1 + (q2 - q1) * 0.5;
 
-    db::DPolygon p;
-
-    std::vector<db::DPoint> pts;
-    pts.reserve (npoints);
-
     if (sel) {
       rx += sel_width * 0.5;
       ry += sel_width * 0.5;
     }
 
-    double da = M_PI * 2.0 / double (npoints);
-    for (int i = 0; i < npoints; ++i) {
-      double a = da * i;
+    std::vector<db::DPoint> pts;
+    pts.reserve (npoints + 1);
+
+    double da = fabs (stop_angle - start_angle) / double (npoints);
+    for (int i = 0; i < npoints + 1; ++i) {
+      double a = da * i + start_angle;
       pts.push_back (c + db::DVector (rx * cos (a), ry * sin (a)));
     }
 
-    p.assign_hull (pts.begin (), pts.end ());
-
     if (sel) {
 
-      pts.clear ();
-
-      rx -= sel_width;
-      ry -= sel_width;
-      for (int i = 0; i < npoints; ++i) {
-        double a = da * i;
-        pts.push_back (c + db::DVector (rx * cos (a), ry * sin (a)));
-      }
-
-      p.insert_hole (pts.begin (), pts.end ());
-
+      db::DPath p (pts.begin (), pts.end (), sel_width);
       renderer.draw (p, bitmap, bitmap, 0, 0);
 
     } else {
 
-      for (db::DPolygon::polygon_edge_iterator e = p.begin_edge (); ! e.at_end (); ++e) {
-        renderer.draw (*e, 0, bitmap, 0, 0);
+      for (size_t i = 0; i + 1 < pts.size (); ++i) {
+        renderer.draw (db::DEdge (pts [i], pts [i + 1]), 0, bitmap, 0, 0);
       }
 
     }
@@ -639,52 +630,236 @@ draw_ruler_segment (const ant::Object &ruler, size_t index, const db::DCplxTrans
     draw_text (db::DPoint (q1.x (), q2.y ()), q2, lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
 
   }
+}
 
-  if (ruler.outline () == Object::OL_box) {
+void
+draw_ruler_box (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+{
+  db::DPoint p1 = ruler.p1 (), p2 = ruler.p2 ();
 
-    bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
+  //  round the starting point, shift both, and round the end point
+  std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * p1, trans * p2);
+  db::DPoint q1 = v.first;
+  db::DPoint q2 = v.second;
 
-    draw_ruler (q1, db::DPoint (q2.x (), q1.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer, true, true);
-    draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
-    draw_ruler (db::DPoint (q2.x (), q1.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer, true, true);
-    draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
-    draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, !r, ruler.style (), bitmap, renderer, true, true);
-    draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer, true, true);
-    draw_text (q1, q2, lu, ruler.text (index), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+  double lu = p1.double_distance (p2);
+  int min_tick_spc = int (0.5 + 20 / renderer.resolution ());  //  min tick spacing in canvas units
+  double mu = double (min_tick_spc) / trans.ctrans (1.0);
 
-  } else if (ruler.outline () == Object::OL_ellipse) {
+  bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
 
-    bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
+  size_t index = std::numeric_limits<size_t>::max ();
+  draw_ruler (q1, db::DPoint (q2.x (), q1.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer, true, true);
+  draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
+  draw_ruler (db::DPoint (q2.x (), q1.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer, true, true);
+  draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
+  draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, !r, ruler.style (), bitmap, renderer, true, true);
+  draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer, true, true);
+  draw_text (q1, q2, lu, ruler.text (index), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+}
 
-    draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ant::Object::STY_none, ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
-    draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ant::Object::STY_none, ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
-    draw_text (q1, q2, lu, ruler.text (index), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+void
+draw_ruler_ellipse (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+{
+  db::DPoint p1 = ruler.p1 (), p2 = ruler.p2 ();
 
-    draw_ellipse (q1, q2, lu, sel, bitmap, renderer);
+  //  round the starting point, shift both, and round the end point
+  std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * p1, trans * p2);
+  db::DPoint q1 = v.first;
+  db::DPoint q2 = v.second;
+
+  double lu = p1.double_distance (p2);
+
+  bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
+
+  size_t index = std::numeric_limits<size_t>::max ();
+  draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ant::Object::STY_none, ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
+  draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ant::Object::STY_none, ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
+  draw_text (q1, q2, lu, ruler.text (index), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+
+  draw_ellipse (q1, q2, lu, sel, bitmap, renderer);
+}
+
+bool
+compute_interpolating_circle (const ant::Object::point_list &points, double &radius, db::DPoint &center, double &start_angle, double &stop_angle)
+{
+  if (points.size () < 2) {
+    return false;
+  }
+
+  double d = points.back ().distance (points.front ()) * 0.5;
+  if (d < db::epsilon) {
+    return false;
+  }
+
+  db::DVector n = points.back () - points.front ();
+  db::DPoint m = points.front () + n * 0.5;
+  n = db::DVector (n.y (), -n.x ()) * (1.0 / d);
+
+  double nom = 0.0;
+  double div = 0.0;
+
+  for (size_t i = 1; i + 1 < points.size (); ++i) {
+    db::DVector p = points [i] - m;
+    double pn = db::sprod (p, n);
+    div += pn * pn;
+    nom += pn * (p.sq_double_length () - d * d);
+  }
+
+  if (div < db::epsilon) {
+    return false;
+  }
+
+  double l = 0.5 * nom / div;
+  radius = sqrt (l * l + d * d);
+  center = m + n * l;
+
+  double a = atan2 (-n.y (), -n.x ());
+  double da = atan2 (d, l);
+
+  if (fabs (l) < db::epsilon) {
+
+    start_angle = 0.0;
+    stop_angle = M_PI * 2.0;
+
+  } else if (l < 0.0) {
+
+    start_angle = a + da;
+    stop_angle = start_angle + 2.0 * (M_PI - da);
+
+  } else {
+
+    start_angle = a - da;
+    stop_angle = a + da;
+
+  }
+
+  while (stop_angle < start_angle - db::epsilon) {
+    stop_angle += M_PI * 2.0;
+  }
+
+  return true;
+}
+
+void
+draw_ruler_radius (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+{
+  //  draw crosses for the support points
+  for (auto p = ruler.points ().begin (); p != ruler.points ().end (); ++p) {
+    ant::Object supp (*p, *p, 0, std::string (), std::string (), std::string (), ant::Object::STY_cross_start, ant::Object::OL_diag, false, lay::AC_Global);
+    draw_ruler_segment (supp, 0, trans, sel, bitmap, renderer);
+  }
+
+  double radius = 0.0;
+  double start_angle = 0.0, stop_angle = 0.0;
+  db::DPoint center;
+
+  //  circle interpolation
+  if (compute_interpolating_circle (ruler.points (), radius, center, start_angle, stop_angle)) {
+
+    //  draw circle segment
+    db::DVector rr (radius, radius);
+    std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * (center - rr), trans * (center + rr));
+    draw_ellipse (v.first, v.second, radius * 2.0, sel, bitmap, renderer, start_angle, stop_angle);
+
+    double a = 0.5 * (start_angle + stop_angle);
+    db::DPoint rc = center + db::DVector (cos (a), sin (a)) * radius;
+
+    //  draw a center marker
+    ant::Object center_loc (center, center, 0, std::string (), ruler.fmt_x (), ruler.fmt_y (), ant::Object::STY_cross_start, ant::Object::OL_diag, false, lay::AC_Global);
+    draw_ruler_segment (center_loc, 0, trans, sel, bitmap, renderer);
+
+    //  draw the radius ruler
+    ant::Object radius (center, rc, 0, ruler.fmt (), std::string (), std::string (), ruler.style (), ruler.outline (), false, lay::AC_Global);
+    draw_ruler_segment (radius, 0, trans, sel, bitmap, renderer);
 
   }
 }
 
 void
+draw_ruler_angle (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+{
+  //  draw segments in diag mode
+  ant::Object basic = ruler;
+  basic.outline (ant::Object::OL_diag);
+  draw_ruler_segment (basic, 0, trans, sel, bitmap, renderer);
+  if (basic.segments () > 1) {
+    draw_ruler_segment (basic, basic.segments () - 1, trans, sel, bitmap, renderer);
+  }
+
+  if (ruler.points ().size () < 3) {
+    return;
+  }
+
+  db::DPoint p1 = ruler.p1 (), p2 = ruler.p2 ();
+
+  db::DVector pc;
+  for (size_t i = 1; i + 1 < ruler.points ().size (); ++i) {
+    pc += ruler.points ()[i] - db::DPoint ();
+  }
+  db::DPoint center = db::DPoint () + pc * (1.0 / double (ruler.points ().size () - 2));
+
+  db::DVector v1 (p1 - center);
+  if (v1.double_length () < db::epsilon) {
+    return;
+  }
+
+  db::DVector v2 (p2 - center);
+  if (v2.double_length () < db::epsilon) {
+    return;
+  }
+
+  double radius = std::min (v1.double_length (), v2.double_length ());
+
+  v1 *= 1.0 / v1.double_length ();
+  v2 *= 1.0 / v2.double_length ();
+
+  if (db::vprod_sign (v1, v2) == 0) {
+    return;
+  }
+
+  double start_angle = 0.0, stop_angle = 0.0;
+  start_angle = atan2 (v1.y (), v1.x ());
+  stop_angle = atan2 (v2.y (), v2.x ());
+
+  if (db::vprod_sign (v1, v2) < 0) {
+    std::swap (start_angle, stop_angle);
+  }
+
+  while (stop_angle < start_angle - db::epsilon) {
+    stop_angle += M_PI * 2.0;
+  }
+
+  db::DVector rr (radius * 0.9, radius * 0.9);
+  std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * (center - rr), trans * (center + rr));
+  draw_ellipse (v.first, v.second, radius * 2.0, sel, bitmap, renderer, start_angle, stop_angle);
+
+  //  @@@ TODO: draw text, apply styles to circle segments? ...
+}
+
+void
 draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
-  if (ruler.outline () == Object::OL_box || ruler.outline () == Object::OL_ellipse) {
-
-    draw_ruler_segment (ruler, std::numeric_limits<size_t>::max (), trans, sel, bitmap, renderer);
-
+  if (ruler.outline () == Object::OL_box) {
+    draw_ruler_box (ruler, trans, sel, bitmap, renderer);
+  } else if (ruler.outline () == Object::OL_ellipse) {
+    draw_ruler_ellipse (ruler, trans, sel, bitmap, renderer);
+  } else if (ruler.outline () == Object::OL_angle) {
+    draw_ruler_angle (ruler, trans, sel, bitmap, renderer);
+  } else if (ruler.outline () == Object::OL_radius) {
+    draw_ruler_radius (ruler, trans, sel, bitmap, renderer);
   } else {
-
-    //  other styles support segments, so paint them individually
+    //  other outline styles support segments, so paint them individually
     for (size_t index = 0; index < ruler.segments (); ++index) {
       draw_ruler_segment (ruler, index, trans, sel, bitmap, renderer);
     }
-
   }
 }
 
 static bool
 is_selected (const ant::Object &ruler, size_t index, const db::DPoint &pos, double enl, double &distance)
 {
+// @@@ angle, radius
   ant::Object::outline_type outline = ruler.outline ();
 
   db::DPoint p1 = ruler.seg_p1 (index), p2 = ruler.seg_p2 (index);
@@ -759,7 +934,7 @@ is_selected (const ant::Object &ruler, size_t index, const db::DPoint &pos, doub
 static bool
 is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double &distance)
 {
-  if (ruler.outline () == ant::Object::OL_box || ruler.outline () == ant::Object::OL_ellipse) {
+  if (ruler.outline () == ant::Object::OL_box || ruler.outline () == ant::Object::OL_ellipse || ruler.outline () == ant::Object::OL_angle || ruler.outline () == ant::Object::OL_radius) {
     return is_selected (ruler, std::numeric_limits<size_t>::max (), pos, enl, distance);
   }
 
@@ -1078,6 +1253,7 @@ Service::insert_ruler (const ant::Object &ruler, bool limit_number)
 static bool
 dragging_what_seg (const ant::Object *robj, const db::DBox &search_dbox, ant::Service::MoveMode &mode, db::DPoint &p1, size_t index)
 {
+//  @@@ radius, angle
   ant::Object::outline_type outline = robj->outline ();
 
   db::DPoint p12, p21;
@@ -1159,7 +1335,7 @@ dragging_what (const ant::Object *robj, const db::DBox &search_dbox, ant::Servic
 {
   ant::Object::outline_type outline = robj->outline ();
 
-  if (outline == ant::Object::OL_box || outline == ant::Object::OL_ellipse) {
+  if (outline == ant::Object::OL_box || outline == ant::Object::OL_ellipse || outline == ant::Object::OL_angle || outline == ant::Object::OL_radius) {
     index = std::numeric_limits<size_t>::max ();
     return dragging_what_seg (robj, search_dbox, mode, p1, index);
   }
@@ -1719,12 +1895,12 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
       }
 
-    } else if (tpl.mode () == ant::Template::RulerMultiSegment || tpl.mode () == ant::Template::RulerAngle) {
+    } else if (tpl.mode () == ant::Template::RulerMultiSegment || tpl.mode () == ant::Template::RulerThreeClicks) {
 
       ant::Object::point_list pts = m_current.points ();
       tl_assert (! pts.empty ());
 
-      if (tpl.mode () == ant::Template::RulerAngle && pts.size () == 3) {
+      if (tpl.mode () == ant::Template::RulerThreeClicks && pts.size () == 3) {
 
         finish_drawing ();
 

@@ -67,7 +67,7 @@ public:
     /**
      *  @brief The ruler an angle type (two segments, three mouse clicks) for angle and circle radius measurements
      */
-    RulerAngle = 3,
+    RulerThreeClicks = 3,
 
     /**
      *  @brief The ruler is a multi-segment type

@@ -48,6 +48,8 @@ static int outline_yx ()        { return int (ant::Object::OL_yx); }
 static int outline_diag_yx ()   { return int (ant::Object::OL_diag_yx); }
 static int outline_box ()       { return int (ant::Object::OL_box); }
 static int outline_ellipse ()   { return int (ant::Object::OL_ellipse); }
+static int outline_angle ()     { return int (ant::Object::OL_angle); }
+static int outline_radius ()    { return int (ant::Object::OL_radius); }
 
 static int angle_any ()         { return int (lay::AC_Any); }
 static int angle_diagonal ()    { return int (lay::AC_Diagonal); }
@@ -432,9 +434,9 @@ static int ruler_mode_auto_metric ()
   return ant::Template::RulerAutoMetric;
 }
 
-static int ruler_mode_angle ()
+static int ruler_mode_three_clicks ()
 {
-  return ant::Template::RulerAngle;
+  return ant::Template::RulerThreeClicks;
 }
 
 static int ruler_mode_multi_segment ()
@@ -523,9 +525,9 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "\n"
     "This constant has been introduced in version 0.25"
   ) +
-  gsi::method ("RulerAngle", &gsi::ruler_mode_angle,
-    "@brief Specifies angle ruler mode for the \\register_template method\n"
-    "In angle ruler mode, two segments are created for angle and circle radius measurements. Three mouse clicks are required.\n"
+  gsi::method ("RulerThreeClicks", &gsi::ruler_mode_three_clicks,
+    "@brief Specifies three-click ruler mode for the \\register_template method\n"
+    "In this ruler mode, two segments are created for angle and circle radius measurements. Three mouse clicks are required.\n"
     "\n"
     "This constant has been introduced in version 0.28"
   ) +
@@ -535,58 +537,58 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "\n"
     "This constant has been introduced in version 0.28"
   ) +
-  gsi::method ("StyleRuler|#style_ruler", &gsi::style_ruler,
+  gsi::method ("StyleRuler", &gsi::style_ruler,
     "@brief Gets the ruler style code for use the \\style method\n"
     "When this style is specified, the annotation will show a ruler with "
     "some ticks at distances indicating a decade of units and a suitable "
     "subdivision into minor ticks at intervals of 1, 2 or 5 units."
   ) +
-  gsi::method ("StyleArrowEnd|#style_arrow_end", &gsi::style_arrow_end,
+  gsi::method ("StyleArrowEnd", &gsi::style_arrow_end,
     "@brief Gets the end arrow style code for use the \\style method\n"
     "When this style is specified, an arrow is drawn pointing from the start to the end point."
   ) +
-  gsi::method ("StyleArrowStart|#style_arrow_start", &gsi::style_arrow_start,
+  gsi::method ("StyleArrowStart", &gsi::style_arrow_start,
     "@brief Gets the start arrow style code for use the \\style method\n"
     "When this style is specified, an arrow is drawn pointing from the end to the start point."
   ) +
-  gsi::method ("StyleArrowBoth|#style_arrow_both", &gsi::style_arrow_both,
+  gsi::method ("StyleArrowBoth", &gsi::style_arrow_both,
     "@brief Gets the both arrow ends style code for use the \\style method\n"
     "When this style is specified, a two-headed arrow is drawn."
   ) +
-  gsi::method ("StyleLine|#style_line", &gsi::style_line,
+  gsi::method ("StyleLine", &gsi::style_line,
     "@brief Gets the line style code for use with the \\style method\n"
     "When this style is specified, a plain line is drawn."
   ) +
-  gsi::method ("StyleCrossStart|#style_cross_start", &gsi::style_cross_start,
+  gsi::method ("StyleCrossStart", &gsi::style_cross_start,
     "@brief Gets the line style code for use with the \\style method\n"
     "When this style is specified, a cross is drawn at the start point.\n"
     "\n"
     "This constant has been added in version 0.26."
   ) +
-  gsi::method ("StyleCrossEnd|#style_cross_end", &gsi::style_cross_end,
+  gsi::method ("StyleCrossEnd", &gsi::style_cross_end,
     "@brief Gets the line style code for use with the \\style method\n"
     "When this style is specified, a cross is drawn at the end point.\n"
     "\n"
     "This constant has been added in version 0.26."
   ) +
-  gsi::method ("StyleCrossBoth|#style_cross_both", &gsi::style_cross_both,
+  gsi::method ("StyleCrossBoth", &gsi::style_cross_both,
     "@brief Gets the line style code for use with the \\style method\n"
     "When this style is specified, a cross is drawn at both points.\n"
     "\n"
     "This constant has been added in version 0.26."
   ) +
-  gsi::method ("OutlineDiag|#outline_diag", &gsi::outline_diag,
+  gsi::method ("OutlineDiag", &gsi::outline_diag,
     "@brief Gets the diagonal output code for use with the \\outline method\n"
     "When this outline style is specified, a line connecting start and "
     "end points in the given style (ruler, arrow or plain line) is drawn."
   ) +
-  gsi::method ("OutlineXY|#outline_xy", &gsi::outline_xy,
+  gsi::method ("OutlineXY", &gsi::outline_xy,
     "@brief Gets the xy outline code for use with the \\outline method\n"
     "When this outline style is specified, two lines are drawn: one horizontal from left "
     "to right and attached to the end of that a line from the bottom to the top. The lines "
     "are drawn in the specified style (see \\style method)."
   ) +
-  gsi::method ("OutlineDiagXY|#outline_diag_xy", &gsi::outline_diag_xy,
+  gsi::method ("OutlineDiagXY", &gsi::outline_diag_xy,
     "@brief Gets the xy plus diagonal outline code for use with the \\outline method\n"
     "@brief outline_xy code used by the \\outline method\n"
     "When this outline style is specified, three lines are drawn: one horizontal from left "
@@ -594,53 +596,65 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "is drawn connecting the start and end points directly. The lines "
     "are drawn in the specified style (see \\style method)."
   ) +
-  gsi::method ("OutlineYX|#outline_yx", &gsi::outline_yx ,
+  gsi::method ("OutlineYX", &gsi::outline_yx ,
     "@brief Gets the yx outline code for use with the \\outline method\n"
     "When this outline style is specified, two lines are drawn: one vertical from bottom "
     "to top and attached to the end of that a line from the left to the right. The lines "
     "are drawn in the specified style (see \\style method)."
   ) +
-  gsi::method ("OutlineDiagYX|#outline_diag_yx", &gsi::outline_diag_yx ,
+  gsi::method ("OutlineDiagYX", &gsi::outline_diag_yx ,
     "@brief Gets the yx plus diagonal outline code for use with the \\outline method\n"
     "When this outline style is specified, three lines are drawn: one vertical from bottom "
     "to top and attached to the end of that a line from the left to the right. Another line "
     "is drawn connecting the start and end points directly. The lines "
     "are drawn in the specified style (see \\style method)."
   ) +
-  gsi::method ("OutlineBox|#outline_box", &gsi::outline_box,
+  gsi::method ("OutlineBox", &gsi::outline_box,
     "@brief Gets the box outline code for use with the \\outline method\n"
     "When this outline style is specified, a box is drawn with the corners specified by the "
     "start and end point. All box edges are drawn in the style specified with the \\style "
     "attribute."
   ) +
-  gsi::method ("OutlineEllipse|#outline_ellipse", &gsi::outline_ellipse,
+  gsi::method ("OutlineEllipse", &gsi::outline_ellipse,
     "@brief Gets the ellipse outline code for use with the \\outline method\n"
     "When this outline style is specified, an ellipse is drawn with the extensions specified by the "
     "start and end point. The contour drawn as a line.\n"
     "\n"
     "This constant has been introduced in version 0.26."
   ) +
-  gsi::method ("AngleAny|#angle_any", &gsi::angle_any,
+  gsi::method ("OutlineAngle", &gsi::outline_angle,
+    "@brief Gets the angle measurement ruler outline code for use with the \\outline method\n"
+    "When this outline style is specified, the ruler is drawn to indicate the angle between the first and last segment.\n"
+    "\n"
+    "This constant has been introduced in version 0.28."
+  ) +
+  gsi::method ("OutlineRadius", &gsi::outline_radius,
+    "@brief Gets the radius measurement ruler outline code for use with the \\outline method\n"
+    "When this outline style is specified, the ruler is drawn to indicate a radius defined by at least three points of the ruler.\n"
+    "\n"
+    "This constant has been introduced in version 0.28."
+  ) +
+  gsi::method ("AngleAny", &gsi::angle_any,
     "@brief Gets the any angle code for use with the \\angle_constraint method\n"
     "If this value is specified for the angle constraint, all angles will be allowed."
   ) +
-  gsi::method ("AngleDiagonal|#angle_diagonal", &gsi::angle_diagonal,
+  gsi::method ("AngleDiagonal", &gsi::angle_diagonal,
     "@brief Gets the diagonal angle code for use with the \\angle_constraint method\n"
     "If this value is specified for the angle constraint, only multiples of 45 degree are allowed."
   ) +
-  gsi::method ("AngleOrtho|#angle_ortho", &gsi::angle_ortho,
+  gsi::method ("AngleOrtho", &gsi::angle_ortho,
     "@brief Gets the ortho angle code for use with the \\angle_constraint method\n"
     "If this value is specified for the angle constraint, only multiples of 90 degree are allowed."
   ) +
-  gsi::method ("AngleHorizontal|#angle_horizontal", &gsi::angle_horizontal,
+  gsi::method ("AngleHorizontal", &gsi::angle_horizontal,
     "@brief Gets the horizontal angle code for use with the \\angle_constraint method\n"
     "If this value is specified for the angle constraint, only horizontal rulers are allowed."
   ) +
-  gsi::method ("AngleVertical|#angle_vertical", &gsi::angle_vertical,
+  gsi::method ("AngleVertical", &gsi::angle_vertical,
     "@brief Gets the vertical angle code for use with the \\angle_constraint method\n"
     "If this value is specified for the angle constraint, only vertical rulers are allowed."
   ) +
-  gsi::method ("AngleGlobal|#angle_global", &gsi::angle_global,
+  gsi::method ("AngleGlobal", &gsi::angle_global,
     "@brief Gets the global angle code for use with the \\angle_constraint method.\n"
     "This code will tell the ruler or marker to use the angle constraint defined globally."
   ) +

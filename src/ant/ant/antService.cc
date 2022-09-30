@@ -709,12 +709,19 @@ draw_ruler_radius (const ant::Object &ruler, const db::DCplxTrans &trans, bool s
     double a = 0.5 * (start_angle + stop_angle);
     db::DPoint rc = center + db::DVector (cos (a), sin (a)) * radius;
 
+#if 0
     //  draw a center marker
     ant::Object center_loc (center, center, 0, std::string (), ruler.fmt_x (), ruler.fmt_y (), ant::Object::STY_cross_start, ant::Object::OL_diag, false, lay::AC_Global);
     draw_ruler_segment (center_loc, 0, trans, sel, bitmap, renderer);
+#endif
 
     //  draw the radius ruler
-    ant::Object radius (center, rc, 0, ruler.fmt (), std::string (), std::string (), ruler.style (), ruler.outline (), false, lay::AC_Global);
+    ant::Object radius = ruler;
+    radius.outline (ant::Object::OL_diag);
+    ant::Object::point_list pts;
+    pts.push_back (center);
+    pts.push_back (rc);
+    radius.set_points (pts);
     draw_ruler_segment (radius, 0, trans, sel, bitmap, renderer);
 
   }

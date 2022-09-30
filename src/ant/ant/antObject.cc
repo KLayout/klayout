@@ -452,14 +452,6 @@ public:
       out = (trans * p2 (obj)).x ();
     } else if (m_function == 'Q') {
       out = (trans * p2 (obj)).y ();
-    } else if (m_function == 'R') {
-      double r, a1, a2;
-      db::DPoint c;
-      if (obj.compute_interpolating_circle (r, c, a1, a2)) {
-        out = tl::Variant (r);
-      } else {
-        out = tl::Variant ();
-      }
     } else if (m_function == 'G') {
       double r, a1, a2;
       db::DPoint c;
@@ -528,7 +520,6 @@ Object::formatted (const std::string &fmt, const db::DFTrans &t, size_t index) c
   eval.define_function ("P", new AnnotationEvalFunction('P', &eval, index)); // p2.x
   eval.define_function ("Q", new AnnotationEvalFunction('Q', &eval, index)); // p2.y
   eval.define_function ("A", new AnnotationEvalFunction('A', &eval, index)); // area mm2
-  eval.define_function ("R", new AnnotationEvalFunction('R', &eval, index)); // radius (if applicable)
   eval.define_function ("G", new AnnotationEvalFunction('G', &eval, index)); // angle (if applicable)
   return eval.interpolate (fmt);
 }
@@ -840,7 +831,7 @@ Object::compute_interpolating_circle (double &radius, db::DPoint &center, double
 
   db::DVector n = m_points.back () - m_points.front ();
   db::DPoint m = m_points.front () + n * 0.5;
-  n = db::DVector (n.y (), -n.x ()) * (1.0 / d);
+  n = db::DVector (n.y (), -n.x ()) * (0.5 / d);
 
   double nom = 0.0;
   double div = 0.0;
@@ -872,6 +863,7 @@ Object::compute_interpolating_circle (double &radius, db::DPoint &center, double
 
     start_angle = a + da;
     stop_angle = start_angle + 2.0 * (M_PI - da);
+    std::swap (start_angle, stop_angle); // @@@
 
   } else {
 

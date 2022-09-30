@@ -759,6 +759,26 @@ public:
    */
   virtual std::string to_string () const;
 
+  /**
+   *  @brief Computes the parameters for an angle ruler
+   *  @param radius Returns the radius
+   *  @param center Returns the center point
+   *  @param start_angle Returns the start angle (in radians)
+   *  @param stop_angle Returns the stop angle (in radians)
+   *  @return True, if the ruler represents an angle measurement
+   */
+  bool compute_angle_parameters (double &radius, db::DPoint &center, double &start_angle, double &stop_angle) const;
+
+  /**
+   *  @brief Computes the parameters for a radius ruler
+   *  @param radius Returns the radius
+   *  @param center Returns the center point
+   *  @param start_angle Returns the start angle (in radians)
+   *  @param stop_angle Returns the stop angle (in radians)
+   *  @return True, if the ruler represents an angle measurement
+   */
+  bool compute_interpolating_circle (double &radius, db::DPoint &center, double &start_angle, double &stop_angle) const;
+
 protected:
   /**
    *  @brief A notification method that is called when a property of the annotation has changed

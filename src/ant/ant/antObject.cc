@@ -452,6 +452,22 @@ public:
       out = (trans * p2 (obj)).x ();
     } else if (m_function == 'Q') {
       out = (trans * p2 (obj)).y ();
+    } else if (m_function == 'R') {
+      double r, a1, a2;
+      db::DPoint c;
+      if (obj.compute_interpolating_circle (r, c, a1, a2)) {
+        out = tl::Variant (r);
+      } else {
+        out = tl::Variant ();
+      }
+    } else if (m_function == 'G') {
+      double r, a1, a2;
+      db::DPoint c;
+      if (obj.compute_angle_parameters (r, c, a1, a2)) {
+        out = tl::Variant ((a2 - a1) * 180.0 / M_PI);
+      } else {
+        out = tl::Variant ();
+      }
     } else {
       out = tl::Variant ();
     }
@@ -512,6 +528,8 @@ Object::formatted (const std::string &fmt, const db::DFTrans &t, size_t index) c
   eval.define_function ("P", new AnnotationEvalFunction('P', &eval, index)); // p2.x
   eval.define_function ("Q", new AnnotationEvalFunction('Q', &eval, index)); // p2.y
   eval.define_function ("A", new AnnotationEvalFunction('A', &eval, index)); // area mm2
+  eval.define_function ("R", new AnnotationEvalFunction('R', &eval, index)); // radius (if applicable)
+  eval.define_function ("G", new AnnotationEvalFunction('G', &eval, index)); // angle (if applicable)
   return eval.interpolate (fmt);
 }
 
@@ -806,6 +824,113 @@ Object::to_string () const
   r += acc.to_string (angle_constraint ());
 
   return r;
+}
+
+bool
+Object::compute_interpolating_circle (double &radius, db::DPoint &center, double &start_angle, double &stop_angle) const
+{
+  if (m_points.size () < 2) {
+    return false;
+  }
+
+  double d = m_points.back ().distance (m_points.front ()) * 0.5;
+  if (d < db::epsilon) {
+    return false;
+  }
+
+  db::DVector n = m_points.back () - m_points.front ();
+  db::DPoint m = m_points.front () + n * 0.5;
+  n = db::DVector (n.y (), -n.x ()) * (1.0 / d);
+
+  double nom = 0.0;
+  double div = 0.0;
+
+  for (size_t i = 1; i + 1 < m_points.size (); ++i) {
+    db::DVector p = m_points [i] - m;
+    double pn = db::sprod (p, n);
+    div += pn * pn;
+    nom += pn * (p.sq_double_length () - d * d);
+  }
+
+  if (div < db::epsilon) {
+    return false;
+  }
+
+  double l = 0.5 * nom / div;
+  radius = sqrt (l * l + d * d);
+  center = m + n * l;
+
+  double a = atan2 (-n.y (), -n.x ());
+  double da = atan2 (d, l);
+
+  if (fabs (l) < db::epsilon) {
+
+    start_angle = 0.0;
+    stop_angle = M_PI * 2.0;
+
+  } else if (l < 0.0) {
+
+    start_angle = a + da;
+    stop_angle = start_angle + 2.0 * (M_PI - da);
+
+  } else {
+
+    start_angle = a - da;
+    stop_angle = a + da;
+
+  }
+
+  while (stop_angle < start_angle - db::epsilon) {
+    stop_angle += M_PI * 2.0;
+  }
+
+  return true;
+}
+
+bool
+Object::compute_angle_parameters (double &radius, db::DPoint &center, double &start_angle, double &stop_angle) const
+{
+  if (m_points.size () < 3) {
+    return false;
+  }
+
+  db::DPoint p1 = m_points.front (), p2 = m_points.back ();
+
+  db::DVector pc;
+  for (size_t i = 1; i + 1 < m_points.size (); ++i) {
+    pc += m_points[i] - db::DPoint ();
+  }
+  center = db::DPoint () + pc * (1.0 / double (m_points.size () - 2));
+
+  db::DVector v1 (p1 - center);
+  if (v1.double_length () < db::epsilon) {
+    return false;
+  }
+
+  db::DVector v2 (p2 - center);
+  if (v2.double_length () < db::epsilon) {
+    return false;
+  }
+
+  radius = std::min (v1.double_length (), v2.double_length ());
+
+  v1 *= 1.0 / v1.double_length ();
+  v2 *= 1.0 / v2.double_length ();
+
+  if (db::vprod_sign (v1, v2) == 0) {
+    return false;
+  }
+
+  start_angle = 0.0;
+  stop_angle = 0.0;
+  start_angle = atan2 (v1.y (), v1.x ());
+  stop_angle = atan2 (v2.y (), v2.x ());
+
+  while (stop_angle < start_angle - db::epsilon) {
+    stop_angle += M_PI * 2.0;
+  }
+
+  return true;
 }
 
 void

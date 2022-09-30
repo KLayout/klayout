@@ -127,7 +127,8 @@ draw_ruler (const db::DPoint &q1,
             lay::CanvasPlane *bitmap,
             lay::Renderer &renderer,
             bool first_segment,
-            bool last_segment)
+            bool last_segment,
+            bool no_line = false)
 {
   double arrow_width = 8 / renderer.resolution ();
   double arrow_length = 12 / renderer.resolution ();
@@ -161,12 +162,14 @@ draw_ruler (const db::DPoint &q1,
     //  normal and unit vector
     
     double len = q1.double_distance (q2);
-    if ((style == ant::Object::STY_arrow_end || style == ant::Object::STY_arrow_start) && len < double (arrow_length) * 1.2) {
-      arrow_length = len / 1.2;
-      arrow_width = arrow_length * 2.0 / 3.0;
-    } else if (style == ant::Object::STY_arrow_both && len < double (arrow_length) * 2.4) {
-      arrow_length = len / 2.4;
-      arrow_width = arrow_length * 2.0 / 3.0;
+    if (! no_line && len < double (arrow_length) * 2.4) {
+      if ((style == ant::Object::STY_arrow_end || style == ant::Object::STY_arrow_start)) {
+        arrow_length = len / 1.2;
+        arrow_width = arrow_length * 2.0 / 3.0;
+      } else if (style == ant::Object::STY_arrow_both) {
+        arrow_length = len / 2.4;
+        arrow_width = arrow_length * 2.0 / 3.0;
+      }
     }
     
     db::DVector qq (q2.y () - q1.y (), q1.x () - q2.x ());
@@ -186,38 +189,46 @@ draw_ruler (const db::DPoint &q1,
       qu = db::DVector (1.0, 0.0);
     }
       
-    //  produce polygon stuff
+    //  produce line in selected and unselected mode
       
-    if (sel && style != ant::Object::STY_none) {
+    if (! no_line && style != ant::Object::STY_none) {
 
-      db::DVector qw = qq * (sel_width * 0.5);
-      
-      db::DVector dq1, dq2;
-      if (! first_segment) {
-        //  no start indicator if not first segment
-      } else if (style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_start) {
-        dq1 = qu * (arrow_length - 1);
-      } else if (style == ant::Object::STY_cross_both || style == ant::Object::STY_cross_start) {
-        dq1 = qu * (sel_width * 0.5);
-      }
-      if (! last_segment) {
-        //  no end indicator if not last segment
-      } else if (style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_end) {
-        dq2 = qu * -(arrow_length - 1);
-      } else if (style == ant::Object::STY_cross_both || style == ant::Object::STY_cross_end) {
-        dq2 = qu * -(sel_width * 0.5);
+      if (sel) {
+
+        db::DVector qw = qq * (sel_width * 0.5);
+
+        db::DVector dq1, dq2;
+        if (! first_segment) {
+          //  no start indicator if not first segment
+        } else if (style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_start) {
+          dq1 = qu * (arrow_length - 1);
+        } else if (style == ant::Object::STY_cross_both || style == ant::Object::STY_cross_start) {
+          dq1 = qu * (sel_width * 0.5);
+        }
+        if (! last_segment) {
+          //  no end indicator if not last segment
+        } else if (style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_end) {
+          dq2 = qu * -(arrow_length - 1);
+        } else if (style == ant::Object::STY_cross_both || style == ant::Object::STY_cross_end) {
+          dq2 = qu * -(sel_width * 0.5);
+        }
+
+        db::DPolygon p;
+        db::DPoint points[] = {
+          db::DPoint (q1 + dq1 + qw),
+          db::DPoint (q2 + dq2 + qw),
+          db::DPoint (q2 + dq2 - qw),
+          db::DPoint (q1 + dq1 - qw),
+        };
+        p.assign_hull (points, points + sizeof (points) / sizeof (points [0]));
+        renderer.draw (p, bitmap, bitmap, 0, 0);
+
+      } else {
+
+        renderer.draw (db::DEdge (q1, q2), 0, bitmap, 0, 0);
+
       }
 
-      db::DPolygon p;
-      db::DPoint points[] = {
-        db::DPoint (q1 + dq1 + qw),
-        db::DPoint (q2 + dq2 + qw),
-        db::DPoint (q2 + dq2 - qw),
-        db::DPoint (q1 + dq1 - qw),
-      };
-      p.assign_hull (points, points + sizeof (points) / sizeof (points [0]));
-      renderer.draw (p, bitmap, bitmap, 0, 0);
-      
     }
 
     if (! last_segment) {
@@ -282,12 +293,6 @@ draw_ruler (const db::DPoint &q1,
 
     }
 
-    //  produce edge and text stuff
-    
-    if (! sel && style != ant::Object::STY_none) {
-      renderer.draw (db::DEdge (q1, q2), 0, bitmap, 0, 0);
-    }
-    
     //  create three tick vectors in tv_text, tv_short and tv_long
 
     double tf = tick_length;
@@ -680,67 +685,6 @@ draw_ruler_ellipse (const ant::Object &ruler, const db::DCplxTrans &trans, bool 
   draw_ellipse (q1, q2, lu, sel, bitmap, renderer);
 }
 
-bool
-compute_interpolating_circle (const ant::Object::point_list &points, double &radius, db::DPoint &center, double &start_angle, double &stop_angle)
-{
-  if (points.size () < 2) {
-    return false;
-  }
-
-  double d = points.back ().distance (points.front ()) * 0.5;
-  if (d < db::epsilon) {
-    return false;
-  }
-
-  db::DVector n = points.back () - points.front ();
-  db::DPoint m = points.front () + n * 0.5;
-  n = db::DVector (n.y (), -n.x ()) * (1.0 / d);
-
-  double nom = 0.0;
-  double div = 0.0;
-
-  for (size_t i = 1; i + 1 < points.size (); ++i) {
-    db::DVector p = points [i] - m;
-    double pn = db::sprod (p, n);
-    div += pn * pn;
-    nom += pn * (p.sq_double_length () - d * d);
-  }
-
-  if (div < db::epsilon) {
-    return false;
-  }
-
-  double l = 0.5 * nom / div;
-  radius = sqrt (l * l + d * d);
-  center = m + n * l;
-
-  double a = atan2 (-n.y (), -n.x ());
-  double da = atan2 (d, l);
-
-  if (fabs (l) < db::epsilon) {
-
-    start_angle = 0.0;
-    stop_angle = M_PI * 2.0;
-
-  } else if (l < 0.0) {
-
-    start_angle = a + da;
-    stop_angle = start_angle + 2.0 * (M_PI - da);
-
-  } else {
-
-    start_angle = a - da;
-    stop_angle = a + da;
-
-  }
-
-  while (stop_angle < start_angle - db::epsilon) {
-    stop_angle += M_PI * 2.0;
-  }
-
-  return true;
-}
-
 void
 draw_ruler_radius (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
@@ -755,7 +699,7 @@ draw_ruler_radius (const ant::Object &ruler, const db::DCplxTrans &trans, bool s
   db::DPoint center;
 
   //  circle interpolation
-  if (compute_interpolating_circle (ruler.points (), radius, center, start_angle, stop_angle)) {
+  if (ruler.compute_interpolating_circle (radius, center, start_angle, stop_angle)) {
 
     //  draw circle segment
     db::DVector rr (radius, radius);
@@ -779,62 +723,100 @@ draw_ruler_radius (const ant::Object &ruler, const db::DCplxTrans &trans, bool s
 void
 draw_ruler_angle (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
-  //  draw segments in diag mode
-  ant::Object basic = ruler;
-  basic.outline (ant::Object::OL_diag);
-  draw_ruler_segment (basic, 0, trans, sel, bitmap, renderer);
-  if (basic.segments () > 1) {
-    draw_ruler_segment (basic, basic.segments () - 1, trans, sel, bitmap, renderer);
+  //  draw guiding segments in diag/plain line mode
+
+  for (int p = 0; p < 2; ++p) {
+
+    auto p1 = (p == 0 ? ruler.p1 () : ruler.seg_p1 (ruler.segments () - 1));
+    auto p2 = (p == 0 ? ruler.seg_p2 (0) : ruler.p2 ());
+
+    auto v = lay::snap (trans * p1, trans * p2);
+    auto q1 = v.first;
+    auto q2 = v.second;
+
+    double lu = p1.double_distance (p2);
+
+    draw_ruler (q1, q2, lu, 0.0, sel, false, ant::Object::STY_line, bitmap, renderer, true, true);
+
   }
 
-  if (ruler.points ().size () < 3) {
+  double radius = 0.0, start_angle = 0.0, stop_angle = 0.0;
+  db::DPoint center;
+
+  if (! ruler.compute_angle_parameters (radius, center, start_angle, stop_angle)) {
     return;
   }
 
-  db::DPoint p1 = ruler.p1 (), p2 = ruler.p2 ();
+  double circle_radius = 0.9 * radius;
 
-  db::DVector pc;
-  for (size_t i = 1; i + 1 < ruler.points ().size (); ++i) {
-    pc += ruler.points ()[i] - db::DPoint ();
-  }
-  db::DPoint center = db::DPoint () + pc * (1.0 / double (ruler.points ().size () - 2));
+  //  draw decorations at start/end
 
-  db::DVector v1 (p1 - center);
-  if (v1.double_length () < db::epsilon) {
-    return;
-  }
+  for (int p = 0; p < 2; ++p) {
 
-  db::DVector v2 (p2 - center);
-  if (v2.double_length () < db::epsilon) {
-    return;
-  }
+    double a = (p == 0 ? start_angle : stop_angle);
 
-  double radius = std::min (v1.double_length (), v2.double_length ());
+    db::DPoint p1 = center + db::DVector (cos (a), sin (a)) * circle_radius;
 
-  v1 *= 1.0 / v1.double_length ();
-  v2 *= 1.0 / v2.double_length ();
+    auto v = lay::snap (trans * p1, trans * p1);
+    db::DVector vn = db::DVector (-sin (a), cos (a));
+    auto q1 = v.first + vn * (p == 0 ? 0.0 : -1.0);
+    auto q2 = v.second + vn * (p == 0 ? 1.0 : 0.0);
 
-  if (db::vprod_sign (v1, v2) == 0) {
-    return;
+    double lu = abs (circle_radius * (stop_angle - start_angle));
+
+    draw_ruler (q1, q2, lu, 0.0, sel, false, ruler.style (), bitmap, renderer, p == 0, p != 0, true);
+
   }
 
-  double start_angle = 0.0, stop_angle = 0.0;
-  start_angle = atan2 (v1.y (), v1.x ());
-  stop_angle = atan2 (v2.y (), v2.x ());
-
-  if (db::vprod_sign (v1, v2) < 0) {
-    std::swap (start_angle, stop_angle);
-  }
-
-  while (stop_angle < start_angle - db::epsilon) {
-    stop_angle += M_PI * 2.0;
-  }
-
-  db::DVector rr (radius * 0.9, radius * 0.9);
+  db::DVector rr (circle_radius, circle_radius);
   std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * (center - rr), trans * (center + rr));
   draw_ellipse (v.first, v.second, radius * 2.0, sel, bitmap, renderer, start_angle, stop_angle);
 
-  //  @@@ TODO: draw text, apply styles to circle segments? ...
+  if (ruler.style () == ant::Object::STY_ruler) {
+
+    //  draw ticks if required - minor at 5 degree, major at 10 degree
+
+    double tick_length = 8 / renderer.resolution ();
+
+    double da = 5.0 / 180.0 * M_PI;
+    unsigned int major_ticks = 2;
+
+    double n = floor (db::epsilon + std::min (2 * M_PI, stop_angle - start_angle) / da);
+    unsigned int ticks = (unsigned int) std::max (1.0, n);
+
+    for (unsigned int i = 0; i <= ticks; ++i) {
+
+      double l = tick_length * ((i % major_ticks) == 0 ? 1.0 : 0.5);
+
+      double a = start_angle + i * da;
+      db::DVector tv (cos (a), sin (a));
+      db::DPoint p1 = center + tv * circle_radius;
+
+      auto v = lay::snap (trans * p1, trans * p1);
+      auto q1 = v.first;
+      auto q2 = v.second + tv * l;
+
+      renderer.draw (db::DEdge (q1, q2), 0, bitmap, 0, 0);
+
+    }
+
+  }
+
+  {
+    double ta = 0.5 * (stop_angle + start_angle);
+
+    db::DPoint tp = center + db::DVector (cos (ta), sin (ta)) * circle_radius;
+    db::DVector tv = db::DVector (-sin (ta), cos (ta));
+
+    auto v = lay::snap (trans * tp, trans * tp);
+    auto q1 = v.first + tv;
+    auto q2 = v.second - tv;
+
+    double lu = abs (circle_radius * (stop_angle - start_angle));
+
+    draw_text (q1, q2, lu, ruler.text (0), false, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+
+  }
 }
 
 void

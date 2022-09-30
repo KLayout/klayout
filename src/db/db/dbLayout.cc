@@ -914,7 +914,8 @@ Layout::delete_cell (cell_index_type id)
   if (manager () && manager ()->transacting ()) {
      
     //  not the "take" method - this takes out the cell
-    manager ()->queue (this, new NewRemoveCellOp (id, cell_name (id), true /*remove*/, take_cell (id)));
+    std::string cn (cell_name (id));
+    manager ()->queue (this, new NewRemoveCellOp (id, cn, true /*remove*/, take_cell (id)));
 
   } else {
 

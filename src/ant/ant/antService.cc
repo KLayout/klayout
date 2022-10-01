@@ -44,6 +44,8 @@
 namespace ant
 {
 
+double angle_ruler_radius_factor = 0.9;
+
 // -------------------------------------------------------------
 //  Convert buttons to an angle constraint
 
@@ -544,16 +546,9 @@ draw_ellipse (const db::DPoint &q1,
 
     int npoints = int (floor (200 * abs (stop_angle - start_angle) / (2.0 * M_PI)));
 
-    //  produce polygon stuff
-
     double rx = fabs ((q2 - q1).x () * 0.5);
     double ry = fabs ((q2 - q1).y () * 0.5);
     db::DPoint c = q1 + (q2 - q1) * 0.5;
-
-    if (sel) {
-      rx += sel_width * 0.5;
-      ry += sel_width * 0.5;
-    }
 
     std::vector<db::DPoint> pts;
     pts.reserve (npoints + 1);
@@ -754,7 +749,7 @@ draw_ruler_angle (const ant::Object &ruler, const db::DCplxTrans &trans, bool se
     return;
   }
 
-  double circle_radius = 0.9 * radius;
+  double circle_radius = angle_ruler_radius_factor * radius;
 
   //  draw decorations at start/end
 
@@ -846,9 +841,37 @@ draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay
 }
 
 static bool
+is_selected_by_circle_segment (const ant::Object &ruler, const db::DPoint &pos, double enl, double &distance)
+{
+  double r = 0.0, a1 = 0.0, a2 = 0.0;
+  db::DPoint c;
+
+  bool good;
+  if (ruler.outline () == ant::Object::OL_angle) {
+    good = ruler.compute_angle_parameters (r, c, a1, a2);
+    r *= angle_ruler_radius_factor;
+  } else {
+    good = ruler.compute_interpolating_circle (r, c, a1, a2);
+  }
+  if (good && fabs (pos.distance (c) - r) < enl) {
+
+    double a = atan2 ((pos - c).y (), (pos - c).x ()) - 2 * M_PI;
+    while (a < a1 - db::epsilon) {
+      a += 2 * M_PI;
+    }
+    if (a < a2 + db::epsilon) {
+      distance = std::min (distance, fabs (pos.distance (c) - r));
+      return true;
+    }
+
+  }
+
+  return false;
+}
+
+static bool
 is_selected (const ant::Object &ruler, size_t index, const db::DPoint &pos, double enl, double &distance)
 {
-// @@@ angle, radius
   ant::Object::outline_type outline = ruler.outline ();
 
   db::DPoint p1 = ruler.seg_p1 (index), p2 = ruler.seg_p2 (index);
@@ -868,7 +891,7 @@ is_selected (const ant::Object &ruler, size_t index, const db::DPoint &pos, doub
         db::DPoint ref = b.center () + db::DVector (dx * b.width () * 0.5 / dd, dy * b.height () * 0.5 / dd);
         double d = ref.distance (pos);
         if (d < enl) {
-          distance = d;
+          distance = std::min (distance, d);
           return true;
         }
       }
@@ -890,6 +913,8 @@ is_selected (const ant::Object &ruler, size_t index, const db::DPoint &pos, doub
   unsigned int nedges = 0;
 
   if (outline == ant::Object::OL_diag ||
+      outline == ant::Object::OL_angle ||
+      outline == ant::Object::OL_radius ||
       outline == ant::Object::OL_diag_xy ||
       outline == ant::Object::OL_diag_yx) {
     edges [nedges++] = db::DEdge (p1, p2);
@@ -912,7 +937,7 @@ is_selected (const ant::Object &ruler, size_t index, const db::DPoint &pos, doub
   for (unsigned int i = 0; i < nedges; ++i) {
     double d = edges [i].distance_abs (pos);
     if (d <= enl) {
-      distance = d;
+      distance = std::min (distance, d);
       return true;
     }
   }
@@ -923,11 +948,15 @@ is_selected (const ant::Object &ruler, size_t index, const db::DPoint &pos, doub
 static bool
 is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double &distance)
 {
-  if (ruler.outline () == ant::Object::OL_box || ruler.outline () == ant::Object::OL_ellipse || ruler.outline () == ant::Object::OL_angle || ruler.outline () == ant::Object::OL_radius) {
+  distance = std::numeric_limits<double>::max ();
+  bool any = false;
+
+  if (ruler.outline () == ant::Object::OL_box || ruler.outline () == ant::Object::OL_ellipse) {
     return is_selected (ruler, std::numeric_limits<size_t>::max (), pos, enl, distance);
+  } else if (ruler.outline () == ant::Object::OL_angle || ruler.outline () == ant::Object::OL_radius) {
+    any = is_selected_by_circle_segment (ruler, pos, enl, distance);
   }
 
-  bool any = false;
   for (size_t index = 0; index < ruler.segments (); ++index) {
     //  NOTE: we check *all* since distance is updated herein.
     if (is_selected (ruler, index, pos, enl, distance)) {
@@ -1242,7 +1271,6 @@ Service::insert_ruler (const ant::Object &ruler, bool limit_number)
 static bool
 dragging_what_seg (const ant::Object *robj, const db::DBox &search_dbox, ant::Service::MoveMode &mode, db::DPoint &p1, size_t index)
 {
-//  @@@ radius, angle
   ant::Object::outline_type outline = robj->outline ();
 
   db::DPoint p12, p21;
@@ -1324,7 +1352,7 @@ dragging_what (const ant::Object *robj, const db::DBox &search_dbox, ant::Servic
 {
   ant::Object::outline_type outline = robj->outline ();
 
-  if (outline == ant::Object::OL_box || outline == ant::Object::OL_ellipse || outline == ant::Object::OL_angle || outline == ant::Object::OL_radius) {
+  if (outline == ant::Object::OL_box || outline == ant::Object::OL_ellipse) {
     index = std::numeric_limits<size_t>::max ();
     return dragging_what_seg (robj, search_dbox, mode, p1, index);
   }

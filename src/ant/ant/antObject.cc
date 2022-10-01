@@ -861,9 +861,8 @@ Object::compute_interpolating_circle (double &radius, db::DPoint &center, double
 
   } else if (l < 0.0) {
 
-    start_angle = a + da;
-    stop_angle = start_angle + 2.0 * (M_PI - da);
-    std::swap (start_angle, stop_angle); // @@@
+    stop_angle = a + da;
+    start_angle = stop_angle + 2.0 * (M_PI - da);
 
   } else {
 
@@ -917,6 +916,10 @@ Object::compute_angle_parameters (double &radius, db::DPoint &center, double &st
   stop_angle = 0.0;
   start_angle = atan2 (v1.y (), v1.x ());
   stop_angle = atan2 (v2.y (), v2.x ());
+
+  if (db::vprod_sign (v1, v2) < 0) {
+    std::swap (stop_angle, start_angle);
+  }
 
   while (stop_angle < start_angle - db::epsilon) {
     stop_angle += M_PI * 2.0;

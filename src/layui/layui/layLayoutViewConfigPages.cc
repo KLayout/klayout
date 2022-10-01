@@ -888,10 +888,10 @@ LayoutViewConfigPage4::update ()
 #endif
 
     QPainter painter (&img);
-    painter.setPen (QPen (palette ().color (QPalette::Active, QPalette::Text), 1.0 / dpr));
-    painter.setBrush (QBrush (color));
-    QRectF r (0, 0, w - painter.pen ().widthF (), h - painter.pen ().widthF ());
-    painter.drawRect (r);
+    QRectF r (0.0, 0.0, w, h);
+    painter.fillRect (r, QBrush (palette ().color (QPalette::Active, QPalette::ButtonText)));
+    r = QRectF (1.0, 1.0, w - 2.0, h - 2.0);
+    painter.fillRect (r, QBrush (color));
     painter.setFont (font ());
     painter.setPen (QPen (text_color));
     painter.drawText (r, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, text);

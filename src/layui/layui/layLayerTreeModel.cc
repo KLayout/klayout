@@ -623,8 +623,8 @@ LayerTreeModel::empty_within_view_predicate (const QModelIndex &index) const
 QIcon
 LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, lay::LayoutViewBase *view, unsigned int w, unsigned int h, double dpr, unsigned int di_off, bool no_state)
 {
-  tl::PixelBuffer px = view->icon_for_layer (iter, w, h, dpr, di_off, no_state);
-  QPixmap pixmap = QPixmap::fromImage (px.to_image ());
+  QImage img = view->icon_for_layer (iter, w, h, dpr, di_off, no_state).to_image_copy ();
+  QPixmap pixmap = QPixmap::fromImage (std::move (img));
 #if QT_VERSION >= 0x050000
   pixmap.setDevicePixelRatio (dpr);
 #endif

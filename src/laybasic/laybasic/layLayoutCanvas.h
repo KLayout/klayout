@@ -257,9 +257,25 @@ public:
   void set_oversampling (unsigned int os);
 
   /**
-   *  @brief Set high-resolution mode (utilize full DPI on high-DPI displays)
+   *  @brief Gets the oversampling factor
+   */
+  unsigned int oversampling () const
+  {
+    return m_oversampling;
+  }
+
+  /**
+   *  @brief Set high resolution mode (utilize full DPI on high-DPI displays)
    */
   void set_highres_mode (bool hrm);
+
+  /**
+   *  @brief Gets the high resolution mode flag
+   */
+  bool highres_mode () const
+  {
+    return m_hrm;
+  }
 
   /**
    *  @brief Sets the depth of the image cache

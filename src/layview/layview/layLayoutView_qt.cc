@@ -731,6 +731,20 @@ LayoutView::update_menu (lay::LayoutView *view, lay::AbstractMenu &menu)
 bool 
 LayoutView::configure (const std::string &name, const std::string &value)
 {
+  if (name == cfg_bitmap_oversampling) {
+
+    int os = 1;
+    tl::from_string (value, os);
+    mp_control_panel->set_oversampling (os);
+
+  } else if (name == cfg_highres_mode) {
+
+    bool hrm = false;
+    tl::from_string (value, hrm);
+    mp_control_panel->set_highres_mode (hrm);
+
+  }
+
   if (LayoutViewBase::configure (name, value)) {
     return true;
   }

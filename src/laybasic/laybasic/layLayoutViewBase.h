@@ -582,6 +582,18 @@ public:
   virtual std::vector<lay::LayerPropertiesConstIterator> selected_layers () const;
 
   /**
+   *  @brief Gets a pixmap representing the given layer
+   *
+   *  @param iter indicates the layer
+   *  @param w The width in logical pixels of the generated pixmap (will be multiplied by dpr)
+   *  @param h The height in logical pixels of the generated pixmap (will be multiplied by dpr)
+   *  @param dpr The device pixel ratio (number of image pixes per logical pixel)
+   *  @param di_off The dither pattern offset (used for animation)
+   *  @param no_state If true, the state will not be indicated
+   */
+  tl::PixelBuffer icon_for_layer (const lay::LayerPropertiesConstIterator &iter, unsigned int w, unsigned int h, double dpr, unsigned int di_off, bool no_state);
+
+  /**
    *  @brief Sets the layers that are selected in the layer browser
    */
   virtual void set_selected_layers (const std::vector<lay::LayerPropertiesConstIterator> &sel);

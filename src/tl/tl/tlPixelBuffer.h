@@ -258,6 +258,28 @@ public:
   PixelBuffer diff (const PixelBuffer &other) const;
 
   /**
+   *  @brief Subsamples the image and puts the subsampled image into the destination image
+   *
+   *  @param dest Where the subsampled image goes to
+   *  @param os The subsampling factor
+   *  @param g The gamma value for color interpolation
+   *
+   *  The dimension of the destination image must be set to the corresponding fraction of
+   *  self's dimension.
+   */
+  void subsample (tl::PixelBuffer &dest, unsigned int os, double g);
+
+  /**
+   *  @brief Scales the image into the given destination image
+   *
+   *  @param dest Where the scaled image goes to
+   *  @param os The scaling factor
+   *
+   *  The destination images dimension must have been set of self's dimension times os.
+   */
+  void blowup (tl::PixelBuffer &dest, unsigned int os);
+
+  /**
    *  @brief Gets the texts
    *
    *  Texts are annotations which can be stored to PNG and back.

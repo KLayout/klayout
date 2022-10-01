@@ -30,6 +30,7 @@
 #include "laySelector.h"
 #include "layFinder.h"
 #include "layLayerProperties.h"
+#include "laybasicConfig.h"
 #include "tlProgress.h"
 #include "edtPlugin.h"
 #include "edtMainService.h"

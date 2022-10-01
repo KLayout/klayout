@@ -131,137 +131,6 @@ std::string ImageCacheEntry::to_string () const
 
 // ----------------------------------------------------------------------------
 
-static void 
-blowup (const tl::PixelBuffer &src, tl::PixelBuffer &dest, unsigned int os)
-{
-  unsigned int ymax = src.height ();
-  unsigned int xmax = src.width ();
-
-  for (unsigned int y = 0; y < ymax; ++y) {
-    for (unsigned int i = 0; i < os; ++i) {
-      const uint32_t *psrc = (const uint32_t *) src.scan_line (y);
-      uint32_t *pdest = (uint32_t *) dest.scan_line (y * os + i);
-      for (unsigned int x = 0; x < xmax; ++x) {
-        for (unsigned int j = 0; j < os; ++j) {
-          *pdest++ = *psrc;
-        }
-        ++psrc;
-      }
-    }
-  }
-}
-
-static void 
-subsample (const tl::PixelBuffer &src, tl::PixelBuffer &dest, unsigned int os, double g)
-{
-  //  TODO: this is probably not compatible with the endianess of SPARC ..
-  
-  //  LUT's for combining the RGB channels
-
-  //  forward transformation table
-  unsigned short lut1[256];
-  for (unsigned int i = 0; i < 256; ++i) {
-    double f = (65536 / (os * os)) - 1;
-    lut1[i] = (unsigned short)std::min (f, std::max (0.0, floor (0.5 + pow (i / 255.0, g) * f)));
-  } 
-
-  //  backward transformation table
-  unsigned char lut2[65536];
-  for (unsigned int i = 0; i < 65536; ++i) {
-    double f = os * os * ((65536 / (os * os)) - 1);
-    lut2[i] = (unsigned char)std::min (255.0, std::max (0.0, floor (0.5 + pow (i / f, 1.0 / g) * 255.0)));
-  } 
-
-  //  LUT's for alpha channel
-
-  //  forward transformation table
-  unsigned short luta1[256];
-  for (unsigned int i = 0; i < 256; ++i) {
-    double f = (65536 / (os * os)) - 1;
-    luta1[i] = (unsigned short)std::min (f, std::max (0.0, floor (0.5 + (i / 255.0) * f)));
-  }
-
-  //  backward transformation table
-  unsigned char luta2[65536];
-  for (unsigned int i = 0; i < 65536; ++i) {
-    double f = os * os * ((65536 / (os * os)) - 1);
-    luta2[i] = (unsigned char)std::min (255.0, std::max (0.0, floor (0.5 + (i / f) * 255.0)));
-  }
-
-  unsigned int ymax = dest.height ();
-  unsigned int xmax = dest.width ();
-
-  unsigned short *buffer = new unsigned short[xmax * 4];
-
-  for (unsigned int y = 0; y < ymax; ++y) {
-
-    {
-
-      const unsigned char *psrc = (const unsigned char *) src.scan_line (y * os);
-      unsigned short *pdest = buffer;
-
-      for (unsigned int x = 0; x < xmax; ++x) {
-
-        pdest[0] = lut1[psrc[0]];
-        pdest[1] = lut1[psrc[1]];
-        pdest[2] = lut1[psrc[2]];
-        pdest[3] = luta1[psrc[3]];
-        psrc += 4;
-
-        for (unsigned int j = os; j > 1; j--) {
-          pdest[0] += lut1[psrc[0]];
-          pdest[1] += lut1[psrc[1]];
-          pdest[2] += lut1[psrc[2]];
-          pdest[3] += luta1[psrc[3]];
-          psrc += 4;
-        }
-
-        pdest += 4;
-
-      }
-
-    }
-
-    for (unsigned int i = 1; i < os; ++i) {
-
-      const unsigned char *psrc = (const unsigned char *) src.scan_line (y * os + i);
-      unsigned short *pdest = buffer;
-
-      for (unsigned int x = 0; x < xmax; ++x) {
-
-        for (unsigned int j = os; j > 0; j--) {
-          pdest[0] += lut1[psrc[0]];
-          pdest[1] += lut1[psrc[1]];
-          pdest[2] += lut1[psrc[2]];
-          pdest[3] += luta1[psrc[3]];
-          psrc += 4;
-        }
-
-        pdest += 4;
-
-      }
-
-    }
-
-    {
-
-      unsigned char *pdest = (unsigned char *) dest.scan_line (y);
-      const unsigned short *psrc = buffer;
-
-      for (unsigned int x = 0; x < xmax; ++x) {
-        *pdest++ = lut2[*psrc++];
-        *pdest++ = lut2[*psrc++];
-        *pdest++ = lut2[*psrc++];
-        *pdest++ = luta2[*psrc++];
-      }
-
-    }
-
-  }
-
-  delete[] buffer;
-}
-
 void 
 invert (unsigned char *data, unsigned int width, unsigned int height)
 {
@@ -693,7 +562,7 @@ LayoutCanvas::paint_event ()
         } else {
           tl::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
           subsampled_image.set_transparent (mp_image->transparent ());
-          subsample (full_image, subsampled_image, m_oversampling, m_gamma);
+          full_image.subsample (subsampled_image, m_oversampling, m_gamma);
           *mp_image_fg = subsampled_image;
         }
 
@@ -705,7 +574,7 @@ LayoutCanvas::paint_event ()
 
         tl::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
         subsampled_image.set_transparent (mp_image->transparent ());
-        subsample (*mp_image, subsampled_image, m_oversampling, m_gamma);
+        mp_image->subsample (subsampled_image, m_oversampling, m_gamma);
         *mp_image_fg = subsampled_image;
 
       }
@@ -744,7 +613,7 @@ LayoutCanvas::paint_event ()
       } else {
         tl::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
         subsampled_image.set_transparent (true);
-        subsample (full_image, subsampled_image, m_oversampling, m_gamma);
+        full_image.subsample (subsampled_image, m_oversampling, m_gamma);
         QImage img = subsampled_image.to_image ();
 #if QT_VERSION >= 0x050000
         img.setDevicePixelRatio (dpr ());
@@ -820,9 +689,9 @@ public:
   {
     if (mp_image_l) {
       unsigned int os = mp_image_l->width () / width;
-      blowup (*mp_image, *mp_image_l, os);
+      mp_image->blowup (*mp_image_l, os);
       bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dp, ls, 1.0 / resolution (), mp_image_l, mp_image_l->width (), mp_image_l->height (), false, 0);
-      subsample (*mp_image_l, *mp_image, os, m_gamma);
+      mp_image_l->subsample (*mp_image, os, m_gamma);
     } else {
       bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dp, ls, 1.0 / resolution (), mp_image, width, height, false, 0);
     }
@@ -833,7 +702,7 @@ public:
   {
     if (mp_image_l && mp_image->width () > 0) {
       unsigned int os = mp_image_l->width () / mp_image->width ();
-      subsample (*mp_image_l, *mp_image, os, m_gamma);
+      mp_image_l->subsample (*mp_image, os, m_gamma);
     }
   }
 

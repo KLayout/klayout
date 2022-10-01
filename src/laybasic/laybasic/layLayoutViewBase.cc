@@ -1692,7 +1692,7 @@ LayoutViewBase::icon_for_layer (const LayerPropertiesConstIterator &iter, unsign
   //  create text
   single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0, 0, 0), text, &image, dither_pattern (), line_styles (), dpr_drawing, w, h);
   //  create vertex
-  single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Cross, iter->marked (true) ? 9/*mark size*/ : 0), vertex, &image, dither_pattern (), line_styles (), dpr_drawing, w, h);
+  single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Cross, iter->marked (true) ? int (9 * dpr_drawing + 0.5) : 0), vertex, &image, dither_pattern (), line_styles (), dpr_drawing, w, h);
 
   if (oversampling > 1) {
     tl::PixelBuffer subsampled (image.width () / oversampling, image.height () / oversampling);

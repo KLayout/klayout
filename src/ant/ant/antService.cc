@@ -32,6 +32,7 @@
 #include "laybasicConfig.h"
 #include "layConverters.h"
 #include "layLayoutCanvas.h"
+#include "layFixedFont.h"
 #if defined(HAVE_QT)
 #  include "layProperties.h"
 #endif
@@ -45,6 +46,8 @@ namespace ant
 {
 
 double angle_ruler_radius_factor = 0.9;
+double ruler_tick_length = 8.0;
+double ruler_arrow_width = 8.0;
 
 // -------------------------------------------------------------
 //  Convert buttons to an angle constraint
@@ -132,8 +135,8 @@ draw_ruler (const db::DPoint &q1,
             bool last_segment,
             bool no_line = false)
 {
-  double arrow_width = 8 / renderer.resolution ();
-  double arrow_length = 12 / renderer.resolution ();
+  double arrow_width = ruler_arrow_width / renderer.resolution ();
+  double arrow_length = 1.5 * arrow_width;
   double sel_width = 2 / renderer.resolution ();
 
   if (length_u < 1e-5 /*micron*/ && style != ant::Object::STY_cross_both && style != ant::Object::STY_cross_end && style != ant::Object::STY_cross_start) {
@@ -152,7 +155,7 @@ draw_ruler (const db::DPoint &q1,
   } else {
 
     //  compute the tick distribution
-    double tick_length = (style == ant::Object::STY_ruler ? 8 : 0) / renderer.resolution ();
+    double tick_length = (style == ant::Object::STY_ruler ? ruler_tick_length : 0) / renderer.resolution ();
 
     double ticks = -1.0;
     int minor_ticks = -1;
@@ -363,8 +366,8 @@ draw_text (const db::DPoint &q1,
     return;
   }
 
-  double arrow_width = 8 / renderer.resolution ();
-  double arrow_length = 12 / renderer.resolution ();
+  double arrow_width = ruler_arrow_width / renderer.resolution ();
+  double arrow_length = 1.5 * arrow_width;
 
   //  Currently, "auto" means p2.
   if (pos == ant::Object::POS_auto) {
@@ -383,7 +386,7 @@ draw_text (const db::DPoint &q1,
   } else {
 
     //  compute the tick distribution
-    double tick_length = (style == ant::Object::STY_ruler ? 8 : 0) / renderer.resolution ();
+    double tick_length = (style == ant::Object::STY_ruler ? ruler_tick_length : 0) / renderer.resolution ();
 
     //  normal and unit vector
 
@@ -778,7 +781,7 @@ draw_ruler_angle (const ant::Object &ruler, const db::DCplxTrans &trans, bool se
 
     //  draw ticks if required - minor at 5 degree, major at 10 degree
 
-    double tick_length = 8 / renderer.resolution ();
+    double tick_length = ruler_tick_length / renderer.resolution ();
 
     double da = 5.0 / 180.0 * M_PI;
     unsigned int major_ticks = 2;

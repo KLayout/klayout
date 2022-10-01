@@ -257,6 +257,11 @@ public:
   void set_oversampling (unsigned int os);
 
   /**
+   *  @brief Set high-resolution mode (utilize full DPI on high-DPI displays)
+   */
+  void set_highres_mode (bool hrm);
+
+  /**
    *  @brief Sets the depth of the image cache
    */
   void set_image_cache_size (size_t len);
@@ -380,6 +385,7 @@ private:
   lay::LineStyles m_line_styles;
   std::map<unsigned int, std::vector <lay::ViewOp> > m_scaled_view_ops;
   unsigned int m_oversampling;
+  bool m_hrm;
   double m_gamma;
 
   bool m_need_redraw;
@@ -417,7 +423,8 @@ private:
   void do_redraw_all (bool force_redraw = true);
 
   void prepare_drawing ();
-  double dpr ();
+  double dpr () const;
+  virtual double resolution () const;
 
   const std::vector<ViewOp> &scaled_view_ops (unsigned int lw);
 };

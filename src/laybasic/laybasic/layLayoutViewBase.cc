@@ -780,6 +780,13 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
     mp_canvas->set_oversampling (os);
     return true;
 
+  } else if (name == cfg_highres_mode) {
+
+    bool hrm = false;
+    tl::from_string (value, hrm);
+    mp_canvas->set_highres_mode (hrm);
+    return true;
+
   } else if (name == cfg_image_cache_size) {
 
     int sz = 0;

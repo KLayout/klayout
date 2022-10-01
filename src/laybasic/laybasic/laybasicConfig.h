@@ -120,6 +120,7 @@ static const std::string cfg_reader_options_show_always ("reader-options-show-al
 static const std::string cfg_tip_window_hidden ("tip-window-hidden");
 
 static const std::string cfg_bitmap_oversampling ("bitmap-oversampling");
+static const std::string cfg_highres_mode ("highres-mode");
 static const std::string cfg_image_cache_size ("image-cache-size");
 static const std::string cfg_default_font_size ("default-font-size");
 

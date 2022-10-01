@@ -966,7 +966,7 @@ public:
   /**
    *  @brief Gets the QWidget representing this canvas visually in Qt
    */
-  QWidget *widget ()
+  QWidget *widget () const
   {
     return mp_widget;
   }

@@ -26,6 +26,7 @@
 
 #include "layCommon.h"
 #include "layBusy.h"
+#include "tlEvents.h"
 
 #include <QApplication>
 #include <QEventLoop>
@@ -76,7 +77,7 @@ class LayoutView;
  *  and one for the GUI version (derived from QApplication).
  */
 class LAY_PUBLIC ApplicationBase
-  : public gsi::ObjectBase
+  : public gsi::ObjectBase, public tl::Object
 {
 public:
   /**
@@ -314,6 +315,11 @@ public:
   void init_app ();
 
   /**
+   *  @brief An event indicating that the package collection has changed
+   */
+  tl::Event salt_changed_event;
+
+  /**
    *  @brief Gets the QApplication object
    *  This method will return non-null only if a GUI-enabled application is present.
    */
@@ -376,6 +382,8 @@ private:
   //  in order to maintain a valid MainWindow reference for ruby scripts and Ruby's GC all the time.
   gsi::Interpreter *mp_ruby_interpreter;
   gsi::Interpreter *mp_python_interpreter;
+
+  void salt_changed ();
 };
 
 /**

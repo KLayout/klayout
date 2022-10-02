@@ -29,6 +29,7 @@
 #include "laySalt.h"
 #include "tlFileSystemWatcher.h"
 #include "tlDeferredExecution.h"
+#include "tlEvents.h"
 
 #include <vector>
 #include <string>
@@ -172,6 +173,11 @@ public:
   }
 
   /**
+   *  @brief Event-style version of "salt_changed"
+   */
+  tl::Event salt_changed_event;
+
+  /**
    *  @brief Gets the singleton instance for this object
    */
   static SaltController *instance ();
@@ -181,6 +187,11 @@ private slots:
    *  @brief Called when the file watcher detects a change in the file system
    */
   void file_watcher_triggered ();
+
+  /**
+   *  @brief Emits a salt_changed event + signal
+   */
+  void emit_salt_changed ();
 
 signals:
   /**

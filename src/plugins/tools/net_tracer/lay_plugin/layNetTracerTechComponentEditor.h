@@ -67,7 +67,7 @@ public slots:
   void move_up_clicked ();
   void move_down_clicked ();
   void current_item_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous);
-  void item_changed (QTreeWidgetItem *item, int column);
+
 private:
   db::NetTracerTechnologyComponent m_data;
 

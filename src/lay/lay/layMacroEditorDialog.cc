@@ -397,8 +397,8 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   QAction *action = new QAction (tr ("Close All"), this);
   connect (action, SIGNAL (triggered ()), this, SLOT (close_all ()));
   tabWidget->addAction (action);
-  action = new QAction (tr ("Close All Except Current"), this);
-  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_but_current ()));
+  action = new QAction (tr ("Close All Except This"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_but_this ()));
   tabWidget->addAction (action);
   action = new QAction (tr ("Close All Left"), this);
   connect (action, SIGNAL (triggered ()), this, SLOT (close_all_left ()));
@@ -473,6 +473,8 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   connect (findNextButton, SIGNAL (clicked ()), this, SLOT (find_next_button_clicked ()));
   connect (replaceAllButton, SIGNAL (clicked ()), this, SLOT (replace_all_button_clicked ()));
   connect (allVariables, SIGNAL (clicked (bool)), variableList, SLOT (set_show_all (bool)));
+
+  tabWidget->installEventFilter (this);
 
   splitter->setCollapsible (1, false);
   replaceFrame->hide ();
@@ -1541,7 +1543,13 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
 
     }
 
-  } 
+  } else if (obj == tabWidget->tabBar () && dynamic_cast<QMouseEvent *> (event) != 0) {
+
+    //  just spy on the events, don't eat them
+    QMouseEvent *mouse_event = dynamic_cast<QMouseEvent *> (event);
+    m_mouse_pos = mouse_event->pos ();
+
+  }
 
   return false;
 }
@@ -2269,7 +2277,7 @@ END_PROTECTED
 }
 
 void
-MacroEditorDialog::close_all_but_current ()
+MacroEditorDialog::close_all_but_this ()
 {
   close_many (0);
 }
@@ -2295,10 +2303,8 @@ MacroEditorDialog::close_many (int r2c)
 
 BEGIN_PROTECTED
 
-  int ci = tabWidget->currentIndex ();
-
+  int ci = tabWidget->tabBar ()->tabAt (m_mouse_pos);
   if (ci < 0) {
-    close_all ();
     return;
   }
 

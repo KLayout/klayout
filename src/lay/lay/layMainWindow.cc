@@ -234,6 +234,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
 
   EnhancedTabBar *enh_tab_widget = new EnhancedTabBar (mp_main_frame);
   mp_tab_bar = enh_tab_widget;
+  mp_tab_bar->installEventFilter (this);
   vbh_tab->addWidget (enh_tab_widget);
   vbh_tab->addWidget (enh_tab_widget->menu_button ());
 
@@ -248,8 +249,8 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   QAction *action = new QAction (tr ("Close All"), this);
   connect (action, SIGNAL (triggered ()), this, SLOT (close_all_views ()));
   mp_tab_bar->addAction (action);
-  action = new QAction (tr ("Close All Except Current"), this);
-  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_except_current_view ()));
+  action = new QAction (tr ("Close All Except This"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_except_this ()));
   mp_tab_bar->addAction (action);
   action = new QAction (tr ("Close All Left"), this);
   connect (action, SIGNAL (triggered ()), this, SLOT (close_all_views_left ()));
@@ -2609,33 +2610,6 @@ MainWindow::cm_close_all ()
 }
 
 void
-MainWindow::cm_close_all_except_current ()
-{
-  int current_index = index_of (lay::LayoutView::current ());
-  if (current_index >= 0) {
-    interactive_close_view (current_index, current_index + 1, true, false);
-  }
-}
-
-void
-MainWindow::cm_close_all_left ()
-{
-  int current_index = index_of (lay::LayoutView::current ());
-  if (current_index >= 0) {
-    interactive_close_view (0, current_index, false, false);
-  }
-}
-
-void
-MainWindow::cm_close_all_right ()
-{
-  int current_index = index_of (lay::LayoutView::current ());
-  if (current_index >= 0) {
-    interactive_close_view (current_index + 1, views (), false, false);
-  }
-}
-
-void
 MainWindow::cm_close ()
 {
   int current_index = index_of (lay::LayoutView::current ());
@@ -2865,21 +2839,30 @@ MainWindow::close_all_views ()
 }
 
 void
-MainWindow::close_all_except_current_view ()
+MainWindow::close_all_except_this ()
 {
-  cm_close_all_except_current ();
+  int index = mp_tab_bar->tabAt (m_mouse_pos);
+  if (index >= 0) {
+    interactive_close_view (index, index + 1, true, false);
+  }
 }
 
 void
 MainWindow::close_all_views_left ()
 {
-  cm_close_all_left ();
+  int index = mp_tab_bar->tabAt (m_mouse_pos);
+  if (index >= 0) {
+    interactive_close_view (0, index, false, false);
+  }
 }
 
 void
 MainWindow::close_all_views_right ()
 {
-  cm_close_all_right ();
+  int index = mp_tab_bar->tabAt (m_mouse_pos);
+  if (index >= 0) {
+    interactive_close_view (index + 1, views (), false, false);
+  }
 }
 
 void
@@ -3986,12 +3969,6 @@ MainWindow::menu_activated (const std::string &symbol)
     cm_clone ();
   } else if (symbol == "cm_close_all") {
     cm_close_all ();
-  } else if (symbol == "cm_close_all_left") {
-    cm_close_all_left ();
-  } else if (symbol == "cm_close_all_right") {
-    cm_close_all_right ();
-  } else if (symbol == "cm_close_all_except_current") {
-    cm_close_all_except_current ();
   } else if (symbol == "cm_close") {
     cm_close ();
   } else if (symbol == "cm_packages") {
@@ -4056,6 +4033,17 @@ MainWindow::dragEnterEvent(QDragEnterEvent *event)
   if (event->mimeData () && event->mimeData ()->hasUrls () && event->mimeData ()->urls ().size () >= 1) {
     event->acceptProposedAction ();
   }
+}
+
+bool
+MainWindow::eventFilter (QObject *watched, QEvent *event)
+{
+  //  spy on the mouse events of the tab bar so we can tell which tab the menu was issued on
+  if (watched == mp_tab_bar && dynamic_cast<QMouseEvent *> (event) != 0) {
+    m_mouse_pos = dynamic_cast<QMouseEvent *> (event)->pos ();
+  }
+
+  return QMainWindow::eventFilter (watched, event);
 }
 
 void

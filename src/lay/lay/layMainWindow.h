@@ -633,7 +633,7 @@ public slots:
   void close_current_view ();
   void close_view (int index);
   void close_all_views ();
-  void close_all_except_current_view ();
+  void close_all_except_this ();
   void close_all_views_left ();
   void close_all_views_right ();
   void clone ();
@@ -680,6 +680,7 @@ protected:
   void update_content ();
   void do_update_menu ();
   void do_update_mru_menus ();
+  bool eventFilter (QObject *watched, QEvent *event);
 
 private:
   lay::Dispatcher m_dispatcher;
@@ -688,6 +689,7 @@ private:
 
   //  Main menu
   QTabBar *mp_tab_bar;
+  QPoint m_mouse_pos;
   QToolBar *mp_tool_bar;
   QDockWidget *mp_navigator_dock_widget;
   lay::Navigator *mp_navigator;
@@ -793,9 +795,6 @@ private:
   void cm_new_layout ();
   void cm_clone ();
   void cm_close_all ();
-  void cm_close_all_except_current ();
-  void cm_close_all_left ();
-  void cm_close_all_right ();
   void cm_close ();
   void cm_packages ();
   void cm_technologies ();

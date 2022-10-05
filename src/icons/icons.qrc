@@ -117,6 +117,7 @@
         <file alias="left_16px.png">images/left_16px.png</file>
         <file alias="left_16px@2x.png">images/left_16px@2x.png</file>
         <file alias="logo.png">images/logo.png</file>
+        <file alias="logo@2x.png">images/logo@2x.png</file>
         <file alias="lt_31px.png">images/lt_31px.png</file>
         <file alias="lt_31px@2x.png">images/lt_31px@2x.png</file>
         <file alias="m0_24px.png">images/m0_24px.png</file>

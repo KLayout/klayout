@@ -35,7 +35,13 @@ ViewWidgetStack::ViewWidgetStack (QWidget *parent, const char *name)
 
   mp_bglabel = new QLabel (this);
   mp_bglabel->setAutoFillBackground (true);
-  mp_bglabel->setText (QObject::tr ("<html><body><p><img src=\":/logo.png\"/></p><p>Use File/Open to open a layout</p></body></html>"));
+  std::string logo = "logo.png";
+#if QT_VERSION >= 0x50000
+  if (devicePixelRatio () >= 2.0) {
+    logo = "logo@2x.png";
+  }
+#endif
+  mp_bglabel->setText (QObject::tr ("<html><body><p><img src=\":/%1\" width=\"256\" height=\"256\"/></p><p>Use File/Open to open a layout</p></body></html>").arg (tl::to_qstring (logo)));
   mp_bglabel->setAlignment (Qt::AlignVCenter | Qt::AlignHCenter);
   mp_bglabel->show ();
 }

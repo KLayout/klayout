@@ -226,40 +226,23 @@ InstPropertiesPage::display_mode_changed (bool)
   update ();
 }
 
-void 
-InstPropertiesPage::back ()
+size_t
+InstPropertiesPage::count () const
 {
-  m_index = (unsigned int) m_selection_ptrs.size ();
+  return m_selection_ptrs.size ();
 }
 
-void 
-InstPropertiesPage::front ()
+void
+InstPropertiesPage::select_entries (const std::vector<size_t> &entries)
 {
-  m_index = 0;
+  tl_assert (entries.size () == 1); // @@@
+  m_index = entries.front ();
 }
 
-bool 
-InstPropertiesPage::at_begin () const
+std::string
+InstPropertiesPage::description (size_t entry) const
 {
-  return (m_index == 0);
-}
-
-bool 
-InstPropertiesPage::at_end () const
-{
-  return (m_index == m_selection_ptrs.size ());
-}
-
-void 
-InstPropertiesPage::operator-- ()
-{
-  --m_index;
-}
-
-void 
-InstPropertiesPage::operator++ ()
-{
-  ++m_index;
+  return m_selection_ptrs [entry]->back ().inst_ptr.to_string (); // @@@
 }
 
 void 

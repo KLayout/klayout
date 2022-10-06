@@ -38,7 +38,7 @@ namespace lay
 
 PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, lay::Editables *editables)
   : QDialog (0 /*parent*/),
-    mp_manager (manager), mp_editables (editables), m_index (-1), m_auto_applied (false), m_transaction_id (0)
+    mp_manager (manager), mp_editables (editables), m_index (-1), m_object_index (0), m_auto_applied (false), m_transaction_id (0)
 {
   mp_ui = new Ui::PropertiesDialog ();
 
@@ -83,7 +83,7 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
 
   //  look for next usable editable 
   while (m_index < int (mp_properties_pages.size ()) && 
-         (m_index < 0 || mp_properties_pages [m_index] == 0 || mp_properties_pages [m_index]->at_end ())) {
+         (m_index < 0 || mp_properties_pages [m_index] == 0 || m_object_index >= int (mp_properties_pages [m_index]->count ()))) {
     ++m_index;
   }
 
@@ -103,8 +103,9 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   } else {
 
     mp_ui->next_button->setEnabled (any_next ());
-    mp_properties_pages [m_index]->update ();
     mp_stack->setCurrentWidget (mp_properties_pages [m_index]);
+    mp_properties_pages [m_index]->select_entry (m_object_index);
+    mp_properties_pages [m_index]->update ();
     mp_ui->apply_to_all_cbx->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
     mp_ui->apply_to_all_cbx->setChecked (false);
     mp_ui->relative_cbx->setEnabled (mp_ui->apply_to_all_cbx->isEnabled () && mp_ui->apply_to_all_cbx->isChecked ());
@@ -152,21 +153,26 @@ BEGIN_PROTECTED
   }
 
   //  advance the current entry
-  ++(*mp_properties_pages [m_index]);
+  ++m_object_index;
 
   //  look for next usable editable if at end
-  if (mp_properties_pages [m_index]->at_end ()) {
+  if (m_object_index >= int (mp_properties_pages [m_index]->count ())) {
+
     mp_properties_pages [m_index]->leave ();
     ++m_index;
+    m_object_index = 0;
+
     while (m_index < int (mp_properties_pages.size ()) && 
-           (mp_properties_pages [m_index] == 0 || ! mp_properties_pages [m_index]->front_checked ())) {
+           (mp_properties_pages [m_index] == 0 || mp_properties_pages [m_index]->count () == 0)) {
       ++m_index;
     }
     //  because we checked that there are any further elements, this should not happen:
     if (m_index >= int (mp_properties_pages.size ())) {
       return;
     }
+
     mp_stack->setCurrentWidget (mp_properties_pages [m_index]);
+
   }
 
   ++m_current_object;
@@ -177,6 +183,7 @@ BEGIN_PROTECTED
   mp_ui->apply_to_all_cbx->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
   mp_ui->relative_cbx->setEnabled (mp_ui->apply_to_all_cbx->isEnabled () && mp_ui->apply_to_all_cbx->isChecked ());
   mp_ui->ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
+  mp_properties_pages [m_index]->select_entry (m_object_index);
   mp_properties_pages [m_index]->update ();
 
 END_PROTECTED
@@ -195,25 +202,28 @@ BEGIN_PROTECTED
     }
   }
 
-  if (mp_properties_pages [m_index]->at_begin ()) {
+  if (m_object_index == 0) {
 
     //  look for last usable editable if at end
     mp_properties_pages [m_index]->leave ();
     --m_index;
     while (m_index >= 0 && 
-           (mp_properties_pages [m_index] == 0 || ! mp_properties_pages [m_index]->back_checked ())) {
+           (mp_properties_pages [m_index] == 0 || mp_properties_pages [m_index]->count () == 0)) {
       --m_index;
     }
     //  because we checked that there are any further elements, this should not happen:
     if (m_index < 0) {
       return;
     }
+
+    m_object_index = mp_properties_pages [m_index]->count () - 1;
+
     mp_stack->setCurrentWidget (mp_properties_pages [m_index]);
-   
+
   } 
 
   //  decrement the current entry
-  --(*mp_properties_pages [m_index]);
+  --m_object_index;
 
   --m_current_object;
   update_title ();
@@ -223,6 +233,7 @@ BEGIN_PROTECTED
   mp_ui->apply_to_all_cbx->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
   mp_ui->relative_cbx->setEnabled (mp_ui->apply_to_all_cbx->isEnabled () && mp_ui->apply_to_all_cbx->isChecked ());
   mp_ui->ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
+  mp_properties_pages [m_index]->select_entry (m_object_index);
   mp_properties_pages [m_index]->update ();
 
 END_PROTECTED
@@ -237,32 +248,31 @@ PropertiesDialog::update_title ()
 bool
 PropertiesDialog::any_next () const
 {
-  //  test-advance
+  //  look for the next applicable page
+  //  @@@ Pages should not be empty
   int index = m_index;
-  ++(*mp_properties_pages [index]);
-  if (mp_properties_pages [index]->at_end ()) {
+  if (m_object_index + 1 >= int (mp_properties_pages [index]->count ())) {
     ++index;
-    while (index < int (mp_properties_pages.size ()) && 
-           (mp_properties_pages [index] == 0 || ! mp_properties_pages [index]->front_checked ())) {
+    while (index < int (mp_properties_pages.size ()) &&
+           (mp_properties_pages [index] == 0 || mp_properties_pages [index]->count () == 0)) {
       ++index;
     }
   }
 
   //  return true, if not at end
-  bool ret = (index < int (mp_properties_pages.size ()));
-  --(*mp_properties_pages [m_index]);
-  return ret;
+  return (index < int (mp_properties_pages.size ()));
 }
 
 bool
 PropertiesDialog::any_prev () const
 {
-  //  test-decrement
+  //  look for the next applicable page
+  //  @@@ Pages should not be empty
   int index = m_index;
-  if (mp_properties_pages [index]->at_begin ()) {
+  if (m_object_index == 0) {
     --index;
     while (index >= 0 && 
-           (mp_properties_pages [index] == 0 || ! mp_properties_pages [index]->back_checked ())) {
+           (mp_properties_pages [index] == 0 || mp_properties_pages [index]->count () == 0)) {
       --index;
     }
   }

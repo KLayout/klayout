@@ -73,40 +73,23 @@ ShapePropertiesPage::setup ()
   m_enable_cb_callback = true;
 }
 
-void 
-ShapePropertiesPage::back ()
+size_t
+ShapePropertiesPage::count () const
 {
-  m_index = (unsigned int) m_selection_ptrs.size ();
+  return m_selection_ptrs.size ();
 }
 
-void 
-ShapePropertiesPage::front ()
+void
+ShapePropertiesPage::select_entries (const std::vector<size_t> &entries)
 {
-  m_index = 0;
+  tl_assert (entries.size () == 1); // @@@
+  m_index = entries.front ();
 }
 
-bool 
-ShapePropertiesPage::at_begin () const
+std::string
+ShapePropertiesPage::description (size_t entry) const
 {
-  return (m_index == 0);
-}
-
-bool 
-ShapePropertiesPage::at_end () const
-{
-  return (m_index == m_selection_ptrs.size ());
-}
-
-void 
-ShapePropertiesPage::operator-- ()
-{
-  --m_index;
-}
-
-void 
-ShapePropertiesPage::operator++ ()
-{
-  ++m_index;
+  return m_selection_ptrs [entry]->shape ().to_string (); // @@@
 }
 
 void 

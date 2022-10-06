@@ -47,12 +47,9 @@ public:
   InstPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
   ~InstPropertiesPage ();
 
-  virtual void back ();
-  virtual void front ();
-  virtual bool at_begin () const;
-  virtual bool at_end () const;
-  virtual void operator-- ();
-  virtual void operator++ ();
+  virtual size_t count () const;
+  virtual void select_entries (const std::vector<size_t> &entries);
+  virtual std::string description (size_t entry) const;
   virtual void leave ();
 
 private:

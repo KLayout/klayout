@@ -65,7 +65,7 @@ PropertiesPage::PropertiesPage (ant::Service *rulers, db::Manager *manager, QWid
   : lay::PropertiesPage (parent, manager, rulers), mp_rulers (rulers), m_enable_cb_callback (true), m_in_something_changed (false)
 {
   mp_rulers->get_selection (m_selection);
-  m_pos = m_selection.begin ();
+  m_index = 0;
 
   setupUi (this);
 
@@ -124,18 +124,6 @@ PropertiesPage::PropertiesPage (ant::Service *rulers, db::Manager *manager, QWid
 PropertiesPage::~PropertiesPage ()
 {
   mp_rulers->restore_highlights ();
-}
-
-void 
-PropertiesPage::back ()
-{
-  m_pos = m_selection.end ();
-}
-
-void 
-PropertiesPage::front ()
-{
-  m_pos = m_selection.begin ();
 }
 
 void
@@ -374,32 +362,27 @@ PropertiesPage::snap_to_layout_clicked ()
 const ant::Object &
 PropertiesPage::current () const
 {
-  const ant::Object *ruler = dynamic_cast <const ant::Object *> ((*m_pos)->ptr ());
+  const ant::Object *ruler = dynamic_cast <const ant::Object *> (m_selection [m_index]->ptr ());
   return *ruler;
 }
 
-bool 
-PropertiesPage::at_begin () const
+size_t
+PropertiesPage::count () const
 {
-  return (m_pos == m_selection.begin ());
+  return m_selection.size ();
 }
 
-bool 
-PropertiesPage::at_end () const
+void
+PropertiesPage::select_entries (const std::vector<size_t> &entries)
 {
-  return (m_pos == m_selection.end ());
+  tl_assert (entries.size () == 1); // @@@
+  m_index = entries.front ();
 }
 
-void 
-PropertiesPage::operator-- ()
+std::string
+PropertiesPage::description (size_t entry) const
 {
-  --m_pos;
-}
-
-void 
-PropertiesPage::operator++ ()
-{
-  ++m_pos;
+  return "Ruler"; // @@@
 }
 
 void
@@ -411,7 +394,7 @@ PropertiesPage::leave ()
 void 
 PropertiesPage::update ()
 {
-  mp_rulers->highlight (std::distance (m_selection.begin (), m_pos));
+  mp_rulers->highlight (m_index);
   update_with (current ());
 }
 
@@ -504,7 +487,7 @@ PropertiesPage::apply ()
 {
   ant::Object obj;
   get_object (obj);
-  mp_rulers->change_ruler (*m_pos, obj);
+  mp_rulers->change_ruler (m_selection [m_index], obj); // @@@ multi-apply
 }
 
 void PropertiesPage::get_object(ant::Object &obj)

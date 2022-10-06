@@ -44,7 +44,7 @@ PropertiesPage::PropertiesPage (img::Service *service, db::Manager *manager, QWi
   : lay::PropertiesPage (parent, manager, service), mp_service (service), mp_direct_image (0)
 {
   mp_service->get_selection (m_selection);
-  m_pos = m_selection.begin ();
+  m_index = 0;
 
   mp_service->clear_highlights ();
 
@@ -154,44 +154,24 @@ PropertiesPage::invalidate ()
   }
 }
 
-void 
-PropertiesPage::back ()
+size_t
+PropertiesPage::count () const
 {
-  m_pos = m_selection.end ();
+  return m_selection.size ();
+}
+
+void
+PropertiesPage::select_entries (const std::vector<size_t> &entries)
+{
+  tl_assert (entries.size () == 1); // @@@
+  m_index = entries.front ();
   invalidate ();
 }
 
-void 
-PropertiesPage::front ()
+std::string
+PropertiesPage::description (size_t entry) const
 {
-  m_pos = m_selection.begin ();
-  invalidate ();
-}
-
-bool 
-PropertiesPage::at_begin () const
-{
-  return (m_pos == m_selection.begin ());
-}
-
-bool 
-PropertiesPage::at_end () const
-{
-  return (m_pos == m_selection.end ());
-}
-
-void 
-PropertiesPage::operator-- ()
-{
-  --m_pos;
-  invalidate ();
-}
-
-void 
-PropertiesPage::operator++ ()
-{
-  ++m_pos;
-  invalidate ();
+  return "image"; // @@@
 }
 
 void
@@ -378,11 +358,11 @@ PropertiesPage::update ()
 
   if (mp_service) {
 
-    mp_service->highlight (std::distance (m_selection.begin (), m_pos));
+    mp_service->highlight (m_index);
 
     //  create a local copy in which we can apply modifications
     if (! mp_direct_image) {
-      const img::Object *image = dynamic_cast <const img::Object *> ((*m_pos)->ptr ());
+      const img::Object *image = dynamic_cast <const img::Object *> (m_selection [m_index]->ptr ());
       mp_direct_image = new img::Object (*image);
     }
 
@@ -908,7 +888,7 @@ PropertiesPage::apply ()
   mp_direct_image->set_data_mapping (dm);
 
   if (mp_service) {
-    mp_service->change_image (*m_pos, *mp_direct_image);
+    mp_service->change_image (m_selection [m_index], *mp_direct_image);
   }
 }
 

@@ -43,12 +43,9 @@ public:
   PropertiesPage (ant::Service *rulers, db::Manager *manager, QWidget *parent);
   ~PropertiesPage ();
 
-  virtual void back ();
-  virtual void front ();
-  virtual bool at_begin () const;
-  virtual bool at_end () const;
-  virtual void operator-- ();
-  virtual void operator++ ();
+  virtual size_t count () const;
+  virtual void select_entries (const std::vector<size_t> &entries);
+  virtual std::string description (size_t entry) const;
   virtual void update ();
   virtual void leave ();
   virtual bool readonly ();
@@ -61,7 +58,7 @@ private slots:
 
 private:
   std::vector <ant::Service::obj_iterator> m_selection;
-  std::vector <ant::Service::obj_iterator>::iterator m_pos;
+  size_t m_index;
   ant::Service *mp_rulers;
   bool m_enable_cb_callback;
   bool m_in_something_changed;

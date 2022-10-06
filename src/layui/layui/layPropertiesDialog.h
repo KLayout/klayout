@@ -82,7 +82,7 @@ private:
   std::vector<lay::PropertiesPage *> mp_properties_pages;
   db::Manager *mp_manager;
   lay::Editables *mp_editables;
-  int m_index;
+  int m_index, m_object_index;
   QStackedLayout *mp_stack;
   lay::MainWindow *mp_mw;
   size_t m_objects, m_current_object;

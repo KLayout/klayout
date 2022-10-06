@@ -584,10 +584,15 @@ LayoutView::show_properties ()
   }
 
   //  re-create a new properties dialog
+  QByteArray geom;
   if (mp_properties_dialog) {
+    geom = mp_properties_dialog->saveGeometry ();
     delete mp_properties_dialog.data ();
   }
   mp_properties_dialog = new lay::PropertiesDialog (widget (), manager (), this);
+  if (! geom.isEmpty ()) {
+    mp_properties_dialog->restoreGeometry (geom);
+  }
 
   //  if launched from a dialog, do not use "show" as this blocks user interaction
   if (QApplication::activeModalWidget ()) {

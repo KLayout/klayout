@@ -385,6 +385,12 @@ PropertiesPage::description (size_t entry) const
   return "Ruler"; // @@@
 }
 
+std::string
+PropertiesPage::description () const
+{
+  return tl::to_string (tr ("Rulers and Annotations"));
+}
+
 void
 PropertiesPage::leave ()
 {

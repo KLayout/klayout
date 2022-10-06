@@ -2507,10 +2507,12 @@ Service::display_status (bool transient)
 }
 
 #if defined(HAVE_QT)
-lay::PropertiesPage *
-Service::properties_page (db::Manager *manager, QWidget *parent)
+std::vector<lay::PropertiesPage *>
+Service::properties_pages (db::Manager *manager, QWidget *parent)
 {
-  return new PropertiesPage (this, manager, parent);
+  std::vector<lay::PropertiesPage *> pages;
+  pages.push_back (new PropertiesPage (this, manager, parent));
+  return pages;
 }
 #endif
 

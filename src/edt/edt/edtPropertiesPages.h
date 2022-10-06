@@ -46,12 +46,13 @@ class ShapePropertiesPage
 Q_OBJECT
 
 public:
-  ShapePropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
+  ShapePropertiesPage (const std::string &description, edt::Service *service, db::Manager *manager, QWidget *parent);
   ~ShapePropertiesPage ();
 
   virtual size_t count () const;
   virtual void select_entries (const std::vector<size_t> &entries);
   virtual std::string description (size_t entry) const;
+  virtual std::string description () const;
   virtual void leave ();
 
 protected:
@@ -66,6 +67,7 @@ private:
   void recompute_selection_ptrs (const std::vector<lay::ObjectInstPath> &new_sel);
 
 protected:
+  std::string m_description;
   std::vector<edt::Service::obj_iterator> m_selection_ptrs;
   unsigned int m_index;
   edt::Service *mp_service;

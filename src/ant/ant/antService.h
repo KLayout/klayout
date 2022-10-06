@@ -350,7 +350,7 @@ public:
   /**
    *  @brief Create the properties page
    */
-  virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+  virtual std::vector<lay::PropertiesPage *> properties_pages (db::Manager *manager, QWidget *parent);
 #endif
 
   /**

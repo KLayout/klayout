@@ -245,7 +245,13 @@ InstPropertiesPage::description (size_t entry) const
   return m_selection_ptrs [entry]->back ().inst_ptr.to_string (); // @@@
 }
 
-void 
+std::string
+InstPropertiesPage::description () const
+{
+  return "Instances"; // @@@
+}
+
+void
 InstPropertiesPage::leave ()
 {
   mp_service->clear_highlights ();

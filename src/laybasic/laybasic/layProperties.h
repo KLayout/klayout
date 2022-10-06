@@ -98,6 +98,11 @@ public:
   virtual std::string description (size_t entry) const = 0;
 
   /**
+   *  @brief Gets a description text for the whole group
+   */
+  virtual std::string description () const = 0;
+
+  /**
    *  @brief Update the display
    *
    *  This method is called by the dialog to transfer data from the

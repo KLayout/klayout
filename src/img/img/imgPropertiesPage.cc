@@ -174,6 +174,12 @@ PropertiesPage::description (size_t entry) const
   return "image"; // @@@
 }
 
+std::string
+PropertiesPage::description () const
+{
+  return tl::to_string (tr ("Images"));
+}
+
 void
 PropertiesPage::leave ()
 {

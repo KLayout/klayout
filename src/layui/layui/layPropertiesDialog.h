@@ -53,6 +53,7 @@ class Editable;
 class Editables;
 class PropertiesPage;
 class MainWindow;
+class PropertiesTreeModel;
 
 /**
  *  @brief The properties dialog
@@ -79,20 +80,27 @@ public:
   ~PropertiesDialog ();
 
 private:
+  friend class PropertiesTreeModel;
+
   std::vector<lay::PropertiesPage *> mp_properties_pages;
   db::Manager *mp_manager;
   lay::Editables *mp_editables;
-  int m_index, m_object_index;
+  int m_index, m_prev_index, m_object_index;
   QStackedLayout *mp_stack;
+  QLabel *mp_none;
   lay::MainWindow *mp_mw;
   size_t m_objects, m_current_object;
   bool m_auto_applied;
   db::Manager::transaction_id_t m_transaction_id;
+  PropertiesTreeModel *mp_tree_model;
+  bool m_signals_enabled;
 
+  const std::vector<lay::PropertiesPage *> &properties_pages () { return mp_properties_pages; }
   void disconnect ();
   bool any_prev () const;
   bool any_next () const;
   void update_title ();
+  void update_controls ();
 
 public slots:
   void apply ();
@@ -100,6 +108,7 @@ public slots:
   void prev_pressed ();
   void cancel_pressed ();
   void ok_pressed ();
+  void current_index_changed (const QModelIndex &index, const QModelIndex &previous);
 
 protected:
   void reject ();

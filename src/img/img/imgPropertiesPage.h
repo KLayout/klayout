@@ -53,6 +53,7 @@ public:
   virtual size_t count () const;
   virtual void select_entries (const std::vector<size_t> &entries);
   virtual std::string description (size_t entry) const;
+  virtual std::string description () const;
   virtual void update ();
   virtual void leave ();
   virtual bool readonly ();

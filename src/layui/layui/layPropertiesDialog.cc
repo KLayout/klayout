@@ -66,7 +66,7 @@ public:
       if (index.internalId () < mp_dialog->properties_pages ().size ()) {
         icon = mp_dialog->properties_pages () [index.internalId ()]->icon (index.row (), m_icon_width, m_icon_height);
       } else {
-        icon = mp_dialog->properties_pages () [index.internalId ()]->icon (m_icon_width, m_icon_height);
+        icon = mp_dialog->properties_pages () [index.row ()]->icon (m_icon_width, m_icon_height);
       }
       if (! icon.isNull ()) {
         return QVariant (icon);

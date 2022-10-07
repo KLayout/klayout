@@ -587,11 +587,11 @@ public:
    *  @param iter indicates the layer
    *  @param w The width in logical pixels of the generated pixmap (will be multiplied by dpr)
    *  @param h The height in logical pixels of the generated pixmap (will be multiplied by dpr)
-   *  @param dpr The device pixel ratio (number of image pixes per logical pixel)
+   *  @param dpr The device pixel ratio (number of image pixes per logical pixel) - negative values mean auto-detect
    *  @param di_off The dither pattern offset (used for animation)
    *  @param no_state If true, the state will not be indicated
    */
-  tl::PixelBuffer icon_for_layer (const lay::LayerPropertiesConstIterator &iter, unsigned int w, unsigned int h, double dpr, unsigned int di_off, bool no_state);
+  tl::PixelBuffer icon_for_layer (const lay::LayerPropertiesConstIterator &iter, unsigned int w, unsigned int h, double dpr = -1.0, unsigned int di_off = 0, bool no_state = false);
 
   /**
    *  @brief Sets the layers that are selected in the layer browser

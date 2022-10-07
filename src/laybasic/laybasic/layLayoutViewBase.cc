@@ -1548,6 +1548,10 @@ single_bitmap_to_image (const lay::ViewOp &view_op, lay::Bitmap &bitmap,
 tl::PixelBuffer
 LayoutViewBase::icon_for_layer (const LayerPropertiesConstIterator &iter, unsigned int w, unsigned int h, double dpr, unsigned int di_off, bool no_state)
 {
+  if (dpr < 0.0) {
+    dpr = canvas ()->dpr ();
+  }
+
   int oversampling = canvas () ? canvas ()->oversampling () : 1;
   double gamma = 2.0;
 

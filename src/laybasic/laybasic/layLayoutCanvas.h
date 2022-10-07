@@ -278,6 +278,11 @@ public:
   }
 
   /**
+   *  @brief Gets the default device pixel ratio for this canvas
+   */
+  double dpr () const;
+
+  /**
    *  @brief Sets the depth of the image cache
    */
   void set_image_cache_size (size_t len);
@@ -439,7 +444,6 @@ private:
   void do_redraw_all (bool force_redraw = true);
 
   void prepare_drawing ();
-  double dpr () const;
   virtual double resolution () const;
 
   const std::vector<ViewOp> &scaled_view_ops (unsigned int lw);

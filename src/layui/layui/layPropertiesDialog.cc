@@ -44,8 +44,8 @@ class PropertiesTreeModel
   : public QAbstractItemModel
 {
 public:
-  PropertiesTreeModel (PropertiesDialog *dialog)
-    : QAbstractItemModel (dialog), mp_dialog (dialog)
+  PropertiesTreeModel (PropertiesDialog *dialog, int icon_width, int icon_height)
+    : QAbstractItemModel (dialog), mp_dialog (dialog), m_icon_width (icon_width), m_icon_height (icon_height)
   { }
 
   int columnCount (const QModelIndex &) const
@@ -61,6 +61,16 @@ public:
       } else {
         return tl::to_qstring (mp_dialog->properties_pages () [index.row ()]->description ());
       }
+    } else if (role == Qt::DecorationRole) {
+      QIcon icon;
+      if (index.internalId () < mp_dialog->properties_pages ().size ()) {
+        icon = mp_dialog->properties_pages () [index.internalId ()]->icon (index.row (), m_icon_width, m_icon_height);
+      } else {
+        icon = mp_dialog->properties_pages () [index.internalId ()]->icon (m_icon_width, m_icon_height);
+      }
+      if (! icon.isNull ()) {
+        return QVariant (icon);
+      }
     }
     return QVariant ();
   }
@@ -68,7 +78,7 @@ public:
   Qt::ItemFlags flags (const QModelIndex &index) const
   {
     Qt::ItemFlags f = QAbstractItemModel::flags (index);
-    if (index.internalId () >= mp_dialog->properties_pages ().size ()) {
+    if (index.internalId () >= mp_dialog->properties_pages ().size () && ! mp_dialog->properties_pages () [index.row ()]->can_apply_to_all ()) {
       f &= ~Qt::ItemIsSelectable;
     }
     return f;
@@ -120,11 +130,25 @@ public:
 
   QModelIndex index_for (int page_index, int object_index)
   {
-    return createIndex (object_index, 0, qint64 (page_index));
+    if (page_index < 0) {
+      return QModelIndex ();
+    } else {
+      return createIndex (object_index, 0, qint64 (page_index));
+    }
+  }
+
+  QModelIndex index_for (int page_index)
+  {
+    if (page_index < 0) {
+      return QModelIndex ();
+    } else {
+      return createIndex (page_index, 0, qint64 (mp_dialog->properties_pages ().size ()));
+    }
   }
 
 private:
   PropertiesDialog *mp_dialog;
+  int m_icon_width, m_icon_height;
 };
 
 // ----------------------------------------------------------------------------------------------------------
@@ -175,14 +199,6 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
 
   mp_ui->content_frame->setLayout (mp_stack);
 
-  //  disable the apply button for first ..
-  mp_ui->apply_to_all_cbx->setEnabled (false);
-  mp_ui->relative_cbx->setEnabled (false);
-  mp_ui->ok_button->setEnabled (false);
-
-  //  as a proposal, the start button can be enabled in most cases
-  mp_ui->prev_button->setEnabled (true);
-
   //  count the total number of objects
   m_objects = mp_editables->selection_size ();
   m_current_object = 0;
@@ -195,41 +211,26 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   update_title ();
 
   //  if at end disable the "Next" button and return (this may only happen at the first call)
-  if (m_index < 0) {
+  mp_tree_model = new PropertiesTreeModel (this, mp_ui->tree->iconSize ().width (), mp_ui->tree->iconSize ().height ());
+  mp_ui->tree->setModel (mp_tree_model);
+  mp_ui->tree->expandAll ();
 
-    mp_ui->prev_button->setEnabled (false);
-    mp_ui->next_button->setEnabled (false);
-    mp_stack->setCurrentWidget (mp_none);
-    mp_ui->apply_to_all_cbx->setEnabled (false);
-    mp_ui->apply_to_all_cbx->setChecked (false);
-    mp_ui->relative_cbx->setEnabled (false);
-    mp_ui->relative_cbx->setChecked (false);
-    mp_ui->ok_button->setEnabled (false);
-    mp_ui->tree->setEnabled (false);
+  m_signals_enabled = false;
+  mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, m_object_index));
+  m_signals_enabled = true;
 
-  } else {
-
-    mp_tree_model = new PropertiesTreeModel (this);
-    mp_ui->tree->setModel (mp_tree_model);
-    mp_ui->tree->expandAll ();
-
-    m_signals_enabled = false;
-    mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, m_object_index));
-    m_signals_enabled = true;
-
-    update_controls ();
+  update_controls ();
 
 // @@@ save this status!
-    mp_ui->apply_to_all_cbx->setChecked (false);
-    mp_ui->relative_cbx->setChecked (true);
+  mp_ui->apply_to_all_cbx->setChecked (false);
+  mp_ui->relative_cbx->setChecked (true);
 
-    connect (mp_ui->ok_button, SIGNAL (clicked ()), this, SLOT (ok_pressed ()));
-    connect (mp_ui->cancel_button, SIGNAL (clicked ()), this, SLOT (cancel_pressed ()));
-    connect (mp_ui->prev_button, SIGNAL (clicked ()), this, SLOT (prev_pressed ()));
-    connect (mp_ui->next_button, SIGNAL (clicked ()), this, SLOT (next_pressed ()));
-    connect (mp_ui->tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &, const QModelIndex &)));
-
-  }
+  connect (mp_ui->ok_button, SIGNAL (clicked ()), this, SLOT (ok_pressed ()));
+  connect (mp_ui->cancel_button, SIGNAL (clicked ()), this, SLOT (cancel_pressed ()));
+  connect (mp_ui->prev_button, SIGNAL (clicked ()), this, SLOT (prev_pressed ()));
+  connect (mp_ui->next_button, SIGNAL (clicked ()), this, SLOT (next_pressed ()));
+  connect (mp_ui->apply_to_all_cbx, SIGNAL (clicked ()), this, SLOT (apply_to_all_pressed ()));
+  connect (mp_ui->tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &, const QModelIndex &)));
 }
 
 PropertiesDialog::~PropertiesDialog ()
@@ -252,50 +253,90 @@ PropertiesDialog::disconnect ()
 }
 
 void
+PropertiesDialog::apply_to_all_pressed ()
+{
+  m_signals_enabled = false;
+  if (mp_ui->apply_to_all_cbx->isChecked ()) {
+    mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index));
+  } else {
+    mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, m_object_index));
+  }
+  m_signals_enabled = true;
+}
+
+void
 PropertiesDialog::current_index_changed (const QModelIndex &index, const QModelIndex & /*previous*/)
 {
-  if (m_signals_enabled && index.isValid ()) {
+  if (! m_signals_enabled) {
+    return;
+  }
 
-    if (mp_tree_model->parent (index).isValid ()) {
+  if (! index.isValid ()) {
+    return;
+  }
 
-      m_index = mp_tree_model->page_index (index);
-      m_object_index = mp_tree_model->object_index (index);
+  if (mp_tree_model->parent (index).isValid ()) {
 
-    } else {
+    m_index = mp_tree_model->page_index (index);
+    mp_ui->apply_to_all_cbx->setChecked (false);
 
-      m_index = index.row ();
-      m_object_index = 0;
+    m_object_index = mp_tree_model->object_index (index);
 
-    }
+  } else {
 
-    m_current_object = 0;
-    for (int i = 0; i < m_index; ++i) {
-      m_current_object += mp_properties_pages [i]->count ();
-    }
-    m_current_object += m_object_index;
+    m_index = index.row ();
+    mp_ui->apply_to_all_cbx->setChecked (mp_properties_pages [m_index]->can_apply_to_all ());
 
-    update_title ();
-    update_controls ();
+    m_object_index = 0;
 
   }
+
+  m_current_object = 0;
+  for (int i = 0; i < m_index; ++i) {
+    m_current_object += mp_properties_pages [i]->count ();
+  }
+  m_current_object += m_object_index;
+
+  update_title ();
+  update_controls ();
 }
 
 void
 PropertiesDialog::update_controls ()
 {
   if (m_prev_index >= 0 && m_index != m_prev_index) {
-    mp_properties_pages [m_prev_index]->leave ();
+    if (m_prev_index >= 0 && m_prev_index < int (mp_properties_pages.size ())) {
+      mp_properties_pages [m_prev_index]->leave ();
+    }
   }
   m_prev_index = m_index;
 
-  mp_stack->setCurrentWidget (mp_properties_pages [m_index]);
-  mp_ui->prev_button->setEnabled (any_prev ());
-  mp_ui->next_button->setEnabled (any_next ());
-  mp_ui->apply_to_all_cbx->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
-  mp_ui->relative_cbx->setEnabled (mp_ui->apply_to_all_cbx->isEnabled () && mp_ui->apply_to_all_cbx->isChecked ());
-  mp_ui->ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
-  mp_properties_pages [m_index]->select_entry (m_object_index);
-  mp_properties_pages [m_index]->update ();
+  if (m_index < 0) {
+
+    mp_stack->setCurrentWidget (mp_none);
+
+    mp_ui->prev_button->setEnabled (false);
+    mp_ui->next_button->setEnabled (false);
+    mp_ui->apply_to_all_cbx->setEnabled (false);
+    mp_ui->relative_cbx->setEnabled (false);
+    mp_ui->ok_button->setEnabled (false);
+    mp_ui->tree->setEnabled (false);
+
+  } else {
+
+    mp_stack->setCurrentWidget (mp_properties_pages [m_index]);
+
+    mp_ui->prev_button->setEnabled (any_prev ());
+    mp_ui->next_button->setEnabled (any_next ());
+    mp_ui->apply_to_all_cbx->setEnabled (! mp_properties_pages [m_index]->readonly () && mp_properties_pages [m_index]->can_apply_to_all ());
+    mp_ui->relative_cbx->setEnabled (mp_ui->apply_to_all_cbx->isEnabled () && mp_ui->apply_to_all_cbx->isChecked ());
+    mp_ui->ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
+    mp_ui->tree->setEnabled (true);
+
+    mp_properties_pages [m_index]->select_entry (m_object_index);
+    mp_properties_pages [m_index]->update ();
+
+  }
 }
 
 void 

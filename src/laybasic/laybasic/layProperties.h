@@ -29,6 +29,7 @@
 #include "layEditable.h"
 
 #include <QFrame>
+#include <QIcon>
 
 namespace db
 {
@@ -98,9 +99,25 @@ public:
   virtual std::string description (size_t entry) const = 0;
 
   /**
+   *  @brief Gets the icon for the nth entry
+   */
+  virtual QIcon icon (size_t /*entry*/, int /*w*/, int /*h*/) const
+  {
+    return QIcon ();
+  }
+
+  /**
    *  @brief Gets a description text for the whole group
    */
   virtual std::string description () const = 0;
+
+  /**
+   *  @brief Gets the icon associated with the whole group
+   */
+  virtual QIcon icon (int /*w*/, int /*h*/) const
+  {
+    return QIcon ();
+  }
 
   /**
    *  @brief Update the display

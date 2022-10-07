@@ -198,20 +198,6 @@ LayoutCanvas::~LayoutCanvas ()
   clear_fg_bitmaps ();
 }
 
-#if defined(HAVE_QT) && QT_VERSION >= 0x050000
-double
-LayoutCanvas::dpr () const
-{
-  return widget () ? widget ()->devicePixelRatio () : 1.0;
-}
-#else
-double
-LayoutCanvas::dpr () const
-{
-  return 1.0;
-}
-#endif
-
 double
 LayoutCanvas::resolution () const
 {
@@ -295,6 +281,16 @@ LayoutCanvas::set_highres_mode (bool hrm)
     m_hrm = hrm;
     do_redraw_all ();
   }
+}
+
+double
+LayoutCanvas::dpr () const
+{
+#if defined(HAVE_QT) && QT_VERSION >= 0x50000
+  return widget () ? widget ()->devicePixelRatio () : 1.0;
+#else
+  return 1.0;
+#endif
 }
 
 void 

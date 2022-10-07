@@ -86,12 +86,59 @@ ShapePropertiesPage::select_entries (const std::vector<size_t> &entries)
   m_index = entries.front ();
 }
 
+lay::LayoutViewBase *
+ShapePropertiesPage::view () const
+{
+  return mp_service->view ();
+}
+
+const db::Shape &
+ShapePropertiesPage::shape (size_t entry) const
+{
+  return m_selection_ptrs [entry]->shape ();
+}
+
+double
+ShapePropertiesPage::dbu (size_t entry) const
+{
+  unsigned int cv_index = m_selection_ptrs [entry]->cv_index ();
+  return view ()->cellview (cv_index)->layout ().dbu ();
+}
+
 std::string
 ShapePropertiesPage::description (size_t entry) const
 {
-  return m_selection_ptrs [entry]->shape ().to_string (); // @@@
+  unsigned int cv_index = m_selection_ptrs [entry]->cv_index ();
+  unsigned int layer = m_selection_ptrs [entry]->layer ();
+
+  if (view ()->cellview (cv_index).is_valid ()) {
+    const db::LayerProperties &lp = view ()->cellview (cv_index)->layout ().get_properties (layer);
+    if (view ()->cellviews () > 1) {
+      return lp.to_string () + "@" + tl::to_string (cv_index + 1);
+    } else {
+      return lp.to_string ();
+    }
+  }
+
+  return std::string ();
 }
 
+QIcon
+ShapePropertiesPage::icon (size_t entry, int w, int h) const
+{
+  int cv_index = m_selection_ptrs [entry]->cv_index ();
+  int layer = m_selection_ptrs [entry]->layer ();
+
+  auto *view = mp_service->view ();
+  for (auto lp = view->begin_layers (view->current_layer_list ()); ! lp.at_end (); ++lp) {
+    const lay::LayerPropertiesNode *ln = lp.operator-> ();
+    if (ln->cellview_index () == cv_index && ln->layer_index () == layer) {
+      return QIcon (QPixmap::fromImage (view->icon_for_layer (lp, w, h).to_image ()));
+    }
+  }
+
+  return QIcon ();
+}
 std::string
 ShapePropertiesPage::description () const
 {
@@ -394,7 +441,32 @@ PolygonPropertiesPage::PolygonPropertiesPage (edt::Service *service, db::Manager
   }
 }
 
-void 
+static size_t count_polygon_points (const db::Shape &sh)
+{
+  size_t n = 0;
+  for (auto pt = sh.begin_hull (); pt != sh.end_hull (); ++pt) {
+    ++n;
+  }
+  return n;
+}
+
+std::string
+PolygonPropertiesPage::description (size_t entry) const
+{
+  const db::Shape &sh = shape (entry);
+
+  size_t npts = count_polygon_points (sh);
+  if (sh.holes () == 0 && npts > 4) {
+    return ShapePropertiesPage::description () + " " + tl::sprintf (tl::to_string (tr ("Polygon(%d points)")), npts);
+  } else if (sh.holes () > 0) {
+    return ShapePropertiesPage::description () + " " + tl::sprintf (tl::to_string (tr ("Polygon(%d points, %d holes)")), npts, sh.holes ());
+  } else {
+    db::CplxTrans dbu_trans (dbu (entry));
+    return ShapePropertiesPage::description () + " " + tl::sprintf (tl::to_string (tr ("Polygon(%s)")), (dbu_trans * sh.polygon ()).to_string ());
+  }
+}
+
+void
 PolygonPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
 {
   layer_lbl->setText (tl::to_qstring (lname));
@@ -560,6 +632,14 @@ BoxPropertiesPage::BoxPropertiesPage (edt::Service *service, db::Manager *manage
 
   connect (inst_pb, SIGNAL (clicked ()), this, SLOT (show_inst ()));
   connect (prop_pb, SIGNAL (clicked ()), this, SLOT (show_props ()));
+}
+
+std::string
+BoxPropertiesPage::description (size_t entry) const
+{
+  const db::Shape &sh = shape (entry);
+  db::CplxTrans dbu_trans (dbu (entry));
+  return ShapePropertiesPage::description () + " " + tl::sprintf (tl::to_string (tr ("Box(%s)")), (dbu_trans * sh.box ()).to_string ());
 }
 
 void 
@@ -793,7 +873,15 @@ TextPropertiesPage::TextPropertiesPage (edt::Service *service, db::Manager *mana
   }
 }
 
-void 
+std::string
+TextPropertiesPage::description (size_t entry) const
+{
+  const db::Shape &sh = shape (entry);
+  db::CplxTrans dbu_trans (dbu (entry));
+  return ShapePropertiesPage::description () + " " + tl::sprintf (tl::to_string (tr ("Text(%s)")), (dbu_trans * sh.text ()).to_string ());
+}
+
+void
 TextPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
 {
   layer_lbl->setText (tl::to_qstring (lname));
@@ -917,6 +1005,32 @@ PathPropertiesPage::PathPropertiesPage (edt::Service *service, db::Manager *mana
   round_cb->setEnabled (false);
 }
 
+static size_t count_path_points (const db::Shape &sh)
+{
+  size_t n = 0;
+  for (auto pt = sh.begin_point (); pt != sh.end_point (); ++pt) {
+    ++n;
+  }
+  return n;
+}
+
+static std::string path_description (const db::Shape &sh, double dbu)
+{
+  size_t npts = count_path_points (sh);
+  if (npts > 4) {
+    return tl::sprintf (tl::to_string (tr ("Path(%d points, w=%s)")), npts, tl::micron_to_string (sh.path_width () * dbu));
+  } else {
+    db::CplxTrans dbu_trans (dbu);
+    return tl::sprintf (tl::to_string (tr ("Path(%s)")), (dbu_trans * sh.path ()).to_string ());
+  }
+}
+
+std::string
+PathPropertiesPage::description (size_t entry) const
+{
+  return ShapePropertiesPage::description () + " " + path_description (shape (entry), dbu (entry));
+}
+
 void
 PathPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
 {
@@ -1013,6 +1127,12 @@ EditablePathPropertiesPage::text_changed ()
     //  ignore exceptions
   }
   m_in_text_changed = false;
+}
+
+std::string
+EditablePathPropertiesPage::description (size_t entry) const
+{
+  return ShapePropertiesPage::description () + " " + path_description (shape (entry), dbu (entry));
 }
 
 void

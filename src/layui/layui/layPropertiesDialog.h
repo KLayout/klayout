@@ -108,6 +108,7 @@ public slots:
   void prev_pressed ();
   void cancel_pressed ();
   void ok_pressed ();
+  void apply_to_all_pressed ();
   void current_index_changed (const QModelIndex &index, const QModelIndex &previous);
 
 protected:

@@ -457,12 +457,12 @@ PolygonPropertiesPage::description (size_t entry) const
 
   size_t npts = count_polygon_points (sh);
   if (sh.holes () == 0 && npts > 4) {
-    return ShapePropertiesPage::description (entry) + " " + tl::sprintf (tl::to_string (tr ("Polygon(%d points)")), npts);
+    return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Polygon(%d points)")), npts);
   } else if (sh.holes () > 0) {
-    return ShapePropertiesPage::description (entry) + " " + tl::sprintf (tl::to_string (tr ("Polygon(%d points, %d holes)")), npts, sh.holes ());
+    return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Polygon(%d points, %d holes)")), npts, sh.holes ());
   } else {
     db::CplxTrans dbu_trans (dbu (entry));
-    return ShapePropertiesPage::description (entry) + " " + tl::sprintf (tl::to_string (tr ("Polygon(%s)")), (dbu_trans * sh.polygon ()).to_string ());
+    return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Polygon%s")), (dbu_trans * sh.polygon ()).to_string ());
   }
 }
 
@@ -639,7 +639,7 @@ BoxPropertiesPage::description (size_t entry) const
 {
   const db::Shape &sh = shape (entry);
   db::CplxTrans dbu_trans (dbu (entry));
-  return ShapePropertiesPage::description (entry) + " " + tl::sprintf (tl::to_string (tr ("Box%s")), (dbu_trans * sh.box ()).to_string ());
+  return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Box%s")), (dbu_trans * sh.box ()).to_string ());
 }
 
 void 
@@ -878,7 +878,7 @@ TextPropertiesPage::description (size_t entry) const
 {
   const db::Shape &sh = shape (entry);
   db::CplxTrans dbu_trans (dbu (entry));
-  return ShapePropertiesPage::description (entry) + " " + tl::sprintf (tl::to_string (tr ("Text(%s)")), (dbu_trans * sh.text ()).to_string ());
+  return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Text%s")), (dbu_trans * sh.text ()).to_string ());
 }
 
 void
@@ -1021,14 +1021,14 @@ static std::string path_description (const db::Shape &sh, double dbu)
     return tl::sprintf (tl::to_string (tr ("Path(%d points, w=%s)")), npts, tl::micron_to_string (sh.path_width () * dbu));
   } else {
     db::CplxTrans dbu_trans (dbu);
-    return tl::sprintf (tl::to_string (tr ("Path(%s)")), (dbu_trans * sh.path ()).to_string ());
+    return tl::sprintf (tl::to_string (tr ("Path%s")), (dbu_trans * sh.path ()).to_string ());
   }
 }
 
 std::string
 PathPropertiesPage::description (size_t entry) const
 {
-  return ShapePropertiesPage::description (entry) + " " + path_description (shape (entry), dbu (entry));
+  return ShapePropertiesPage::description (entry) + " - " + path_description (shape (entry), dbu (entry));
 }
 
 void
@@ -1132,7 +1132,7 @@ EditablePathPropertiesPage::text_changed ()
 std::string
 EditablePathPropertiesPage::description (size_t entry) const
 {
-  return ShapePropertiesPage::description (entry) + " " + path_description (shape (entry), dbu (entry));
+  return ShapePropertiesPage::description (entry) + " - " + path_description (shape (entry), dbu (entry));
 }
 
 void

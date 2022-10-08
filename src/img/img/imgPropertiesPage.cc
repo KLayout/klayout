@@ -171,7 +171,17 @@ PropertiesPage::select_entries (const std::vector<size_t> &entries)
 std::string
 PropertiesPage::description (size_t entry) const
 {
-  return "image"; // @@@
+  const img::Object *obj = dynamic_cast <const img::Object *> (m_selection [entry]->ptr ());
+  if (! obj) {
+    return std::string ("nil");
+  }
+
+  std::string d = tl::to_string (tr ("Image"));
+  if (! obj->filename ().empty ()) {
+    d += "[" + tl::filename (obj->filename ()) + "]";
+  }
+  d += tl::sprintf ("(%dx%d)", obj->width (), obj->height ());
+  return d;
 }
 
 std::string

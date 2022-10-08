@@ -382,7 +382,35 @@ PropertiesPage::select_entries (const std::vector<size_t> &entries)
 std::string
 PropertiesPage::description (size_t entry) const
 {
-  return "Ruler"; // @@@
+  const ant::Object *obj = dynamic_cast <const ant::Object *> (m_selection [entry]->ptr ());
+  if (! obj) {
+    return std::string ("nil");
+  }
+
+  std::string d = tl::to_string (tr ("Ruler"));
+  if (! obj->category ().empty ()) {
+    std::string cat = obj->category ();
+    //  category is "_ruler" for example. Turn in into "Ruler".
+    if (cat.size () >= 2 && cat [0] == '_') {
+      cat = tl::to_upper_case (std::string (cat.begin () + 1, cat.begin () + 2)) + std::string (cat.begin () + 2, cat.end ());
+    }
+    d += "[" + cat + "]";
+  }
+
+  if (obj->points ().size () > 3) {
+    d += tl::sprintf (tl::to_string (tr ("(%d points)")), obj->points ().size ());
+  } else {
+    d += "(";
+    for (auto p = obj->points ().begin (); p != obj->points ().end (); ++p) {
+      if (p != obj->points ().begin ()) {
+        d += ";";
+      }
+      d += p->to_string ();
+    }
+    d += ")";
+  }
+
+  return d;
 }
 
 std::string

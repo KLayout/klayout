@@ -322,6 +322,9 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
     macro_tree->addAction (actionSaveAs);
 
     macro_tree->header ()->hide ();
+    //  TODO: that is supposed to enable the horizontal scroll bar, but it doesn't:
+    macro_tree->header ()->setStretchLastSection (false);
+    macro_tree->header ()->setSectionResizeMode (QHeaderView::ResizeToContents);
 
     macro_tree->setItemDelegate (new EditRoleDelegate (macro_tree));
 

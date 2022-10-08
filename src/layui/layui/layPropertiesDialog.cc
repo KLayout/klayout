@@ -213,6 +213,7 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   //  if at end disable the "Next" button and return (this may only happen at the first call)
   mp_tree_model = new PropertiesTreeModel (this, mp_ui->tree->iconSize ().width (), mp_ui->tree->iconSize ().height ());
   mp_ui->tree->setModel (mp_tree_model);
+  mp_ui->tree->header ()->setSectionResizeMode (QHeaderView::ResizeToContents);
   mp_ui->tree->expandAll ();
 
   m_signals_enabled = false;

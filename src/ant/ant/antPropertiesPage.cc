@@ -27,6 +27,8 @@
 #include "layQtTools.h"
 #include "tlException.h"
 
+#include <QSignalBlocker>
+
 namespace ant
 {
 

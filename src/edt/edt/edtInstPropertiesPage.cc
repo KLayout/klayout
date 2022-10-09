@@ -242,13 +242,49 @@ InstPropertiesPage::select_entries (const std::vector<size_t> &entries)
 std::string
 InstPropertiesPage::description (size_t entry) const
 {
-  return m_selection_ptrs [entry]->back ().inst_ptr.to_string (); // @@@
+  std::string d;
+
+  edt::Service::obj_iterator pos = m_selection_ptrs [entry];
+  if (! pos->is_cell_inst ()) {
+    return d;
+  }
+
+  const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
+  double dbu = cv->layout ().dbu ();
+
+  db::Layout *def_layout = &cv->layout ();
+  db::cell_index_type def_cell_index = pos->back ().inst_ptr.cell_index ();
+  std::pair<db::Library *, db::cell_index_type> dl = def_layout->defining_library (def_cell_index);
+  if (dl.first) {
+    def_layout = &dl.first->layout ();
+    def_cell_index = dl.second;
+  }
+
+  std::pair<bool, db::pcell_id_type> pci = def_layout->is_pcell_instance (def_cell_index);
+  if (pci.first && def_layout->pcell_declaration (pci.second)) {
+    d += def_layout->pcell_header (pci.second)->get_name ();
+  } else {
+    d += def_layout->cell_name (def_cell_index);
+  }
+
+  db::ICplxTrans t (pos->back ().inst_ptr.complex_trans ());
+  db::DCplxTrans dt = db::CplxTrans (dbu) * t * db::CplxTrans (dbu).inverted ();
+
+  db::Vector rowv, columnv;
+  unsigned long rows, columns;
+  if (pos->back ().inst_ptr.is_regular_array (rowv, columnv, rows, columns)) {
+    d += tl::sprintf ("(%s; array %dx%d)", dt.to_string (true), rows, columns);
+  } else {
+    d += tl::sprintf ("(%s)", dt.to_string (true));
+  }
+
+  return d;
 }
 
 std::string
 InstPropertiesPage::description () const
 {
-  return "Instances"; // @@@
+  return tl::to_string (tr ("Instances"));
 }
 
 void

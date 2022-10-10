@@ -70,6 +70,7 @@
 #include "layDialogs.h"
 #include "laybasicConfig.h"
 #include "layConfig.h"
+#include "layEnhancedTabWidget.h"
 #include "layMainWindow.h"
 #include "layHelpDialog.h"
 #include "layNavigator.h"
@@ -203,7 +204,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   init_menu ();
 
   mp_assistant = 0;
-      
+
   m_always_exit_without_saving = false;
 
   mp_pr = new lay::ProgressReporter ();
@@ -227,12 +228,12 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   vbl->setContentsMargins (0, 0, 0, 0);
   vbl->setSpacing (0);
 
-  mp_tab_bar = new QTabBar (mp_main_frame);
-  vbl->addWidget (mp_tab_bar);
-  connect (mp_tab_bar, SIGNAL (currentChanged (int)), this, SLOT (view_selected (int)));
+  mp_tab_widget = new EnhancedTabWidget (mp_main_frame);
+  vbl->addWidget (mp_tab_widget);
+  connect (mp_tab_widget, SIGNAL (currentChanged (int)), this, SLOT (view_selected (int)));
 #if QT_VERSION >= 0x040500
-  mp_tab_bar->setTabsClosable(true);
-  connect (mp_tab_bar, SIGNAL (tabCloseRequested (int)), this, SLOT (tab_close_requested (int)));
+  mp_tab_widget->setTabsClosable(true);
+  connect (mp_tab_widget, SIGNAL (tabCloseRequested (int)), this, SLOT (tab_close_requested (int)));
 #endif
 
   mp_hp_dock_widget = new QDockWidget (QObject::tr ("Cells"), this);
@@ -682,8 +683,8 @@ MainWindow::close_all ()
   //  Clear the tab bar
   bool f = m_disable_tab_selected;
   m_disable_tab_selected = true;
-  while (mp_tab_bar->count () > 0) {
-    mp_tab_bar->removeTab (mp_tab_bar->count () - 1);
+  while (mp_tab_widget->count () > 0) {
+    mp_tab_widget->removeTab (mp_tab_widget->count () - 1);
   }
   m_disable_tab_selected = f;
 
@@ -745,8 +746,8 @@ MainWindow::about_to_exec ()
 
   //  TODO: later, each view may get it's own editable flag
   if (lay::ApplicationBase::instance () && !lay::ApplicationBase::instance ()->is_editable ()) {
-    TipDialog td (this, 
-                  tl::to_string (QObject::tr ("KLayout has been started in viewer mode. In this mode, editor functions are not available.\n\nTo enable these functions, start KLayout in editor mode by using the \"-e\" command line switch or select it as the default mode in the setup dialog. Choose \"Setup\" in the \"File\" menu and check \"Use editing mode by default\" on the \"Editing Mode\" page in the \"Application\" section.")), 
+    TipDialog td (this,
+                  tl::to_string (QObject::tr ("KLayout has been started in viewer mode. In this mode, editor functions are not available.\n\nTo enable these functions, start KLayout in editor mode by using the \"-e\" command line switch or select it as the default mode in the setup dialog. Choose \"Setup\" in the \"File\" menu and check \"Use editing mode by default\" on the \"Editing Mode\" page in the \"Application\" section.")),
                   "editor-mode");
     if (td.exec_dialog ()) {
       //  Don't bother the user with more dialogs.
@@ -2314,7 +2315,7 @@ MainWindow::view_selected (int index)
     //  Hint: setting the focus to the tab bar avoids problem with dangling keyboard focus.
     //  Sometimes, the focus was set to the hierarchy level spin buttons which caught Copy&Paste
     //  events in effect.
-    mp_tab_bar->setFocus ();
+    mp_tab_widget->setFocus ();
 
     if (! m_disable_tab_selected) {
       select_view (index);
@@ -2335,7 +2336,7 @@ MainWindow::select_view (int index)
 
     tl_assert (index >= 0 && index < int (views ()));
 
-    mp_tab_bar->setCurrentIndex (index);
+    mp_tab_widget->setCurrentIndex (index);
 
     bool box_set = (m_synchronized_views && current_view () != 0);
     db::DBox box;
@@ -2564,7 +2565,7 @@ MainWindow::clone_current_view ()
 
   bool f = m_disable_tab_selected;
   m_disable_tab_selected = true;
-  int index = mp_tab_bar->insertTab (-1, tl::to_qstring (view->title ()));
+  int index = mp_tab_widget->insertTab (-1, mp_views.back (), tl::to_qstring (view->title ()));
   m_disable_tab_selected = f;
 
   view_created_event (index);
@@ -2805,7 +2806,7 @@ MainWindow::close_view (int index)
         box = view (index)->viewport ().box ();
       }
 
-      mp_tab_bar->removeTab (index);
+      mp_tab_widget->removeTab (index);
       mp_view_stack->remove_widget (index);
       mp_lp_stack->remove_widget (index);
       mp_layer_toolbox_stack->remove_widget (index);
@@ -3381,7 +3382,7 @@ MainWindow::create_view ()
 
   bool f = m_disable_tab_selected;
   m_disable_tab_selected = true;
-  int index = mp_tab_bar->insertTab (-1, tl::to_qstring (current_view ()->title ()));
+  int index = mp_tab_widget->insertTab (-1, mp_views.back (), tl::to_qstring (current_view ()->title ()));
   m_disable_tab_selected = f;
 
   view_created_event (index);
@@ -3444,7 +3445,7 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
 
       bool f = m_disable_tab_selected;
       m_disable_tab_selected = true;
-      int index = mp_tab_bar->insertTab (-1, QString ());
+      int index = mp_tab_widget->insertTab (-1, mp_views.back (), QString ());
       update_tab_title (index);
       m_disable_tab_selected = f;
       view_created_event (index);
@@ -3484,8 +3485,8 @@ MainWindow::update_tab_title (int i)
     title += v->title ();
   }
 
-  if (tl::to_string (mp_tab_bar->tabText (i)) != title) {
-    mp_tab_bar->setTabText (i, tl::to_qstring (title));
+  if (tl::to_string (mp_tab_widget->tabText (i)) != title) {
+    mp_tab_widget->setTabText (i, tl::to_qstring (title));
   }
 
   if (v) {
@@ -3500,8 +3501,8 @@ MainWindow::update_tab_title (int i)
         files += tl::to_string (tr ("(not saved)"));
       }
     }
-    if (tl::to_string (mp_tab_bar->tabToolTip (i)) != files) {
-      mp_tab_bar->setTabToolTip (i, tl::to_qstring (files));
+    if (tl::to_string (mp_tab_widget->tabToolTip (i)) != files) {
+      mp_tab_widget->setTabToolTip (i, tl::to_qstring (files));
     }
   }
 }

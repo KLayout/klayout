@@ -11,6 +11,7 @@ HEADERS = \
     layClipDialog.h \
     layControlWidgetStack.h \
     layCrashMessage.h \
+    layEnhancedTabWidget.h \
     layFillDialog.h \
     layGSIHelpProvider.h \
     layHelpAboutDialog.h \
@@ -121,6 +122,7 @@ SOURCES = \
     layClipDialog.cc \
     layControlWidgetStack.cc \
     layCrashMessage.cc \
+    layEnhancedTabWidget.cc \
     layFillDialog.cc \
     layGSIHelpProvider.cc \
     layHelpAboutDialog.cc \

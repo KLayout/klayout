@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #===============================================================================
@@ -32,30 +32,13 @@ else:
 del System, Node, Release, MacVersion, Machine, Processor
 
 #-----------------------------------------------------
-# [1] Qt6 or Qt5
+# [1] Qt5 or Qt6
 #-----------------------------------------------------
-Qts  = [ 'Qt6MacPorts', 'Qt6Brew' ]
-Qts += [ 'Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3' ]
+Qts  = [ 'Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3' ]
+Qts += [ 'Qt6MacPorts', 'Qt6Brew' ]
 
 #-----------------------------------------------------
-# Whereabout of different components of Qt6
-#-----------------------------------------------------
-# Qt6 from MacPorts (https://www.macports.org/)
-#   install with 'sudo port install [qt6|qt6-qttools]'
-# [Key Type Name] = 'Qt6MacPorts'
-Qt6MacPorts = { 'qmake' : '/opt/local/libexec/qt6/bin/qmake',
-                'deploy': '/opt/local/libexec/qt6/bin/macdeployqt'
-              }
-
-# Qt6 from Homebrew (https://brew.sh/)
-#   install with 'brew install qt6'
-# [Key Type Name] = 'Qt6Brew'
-Qt6Brew = { 'qmake' : '%s/opt/qt@6/bin/qmake' % DefaultHomebrewRoot,
-            'deploy': '%s/opt/qt@6/bin/macdeployqt' % DefaultHomebrewRoot
-          }
-
-#-----------------------------------------------------
-# Whereabout of different components of Qt5
+# Whereabouts of different components of Qt5
 #-----------------------------------------------------
 # Qt5 from MacPorts (https://www.macports.org/)
 #   install with 'sudo port install [qt5|qt5-qttools]'
@@ -79,17 +62,34 @@ Qt5Ana3 = { 'qmake' : '/Applications/anaconda3/bin/qmake',
             'deploy': '/Applications/anaconda3/bin/macdeployqt'
           }
 
+#-------------------------------------------------------------------------
+# Whereabouts of different components of Qt6    *+*+*+ EXPERIMENTAL *+*+*+
+#-------------------------------------------------------------------------
+# Qt6 from MacPorts (https://www.macports.org/)
+#   install with 'sudo port install [qt6|qt6-qttools]'
+# [Key Type Name] = 'Qt6MacPorts'
+Qt6MacPorts = { 'qmake' : '/opt/local/libexec/qt6/bin/qmake',
+                'deploy': '/opt/local/libexec/qt6/bin/macdeployqt'
+              }
+
+# Qt6 from Homebrew (https://brew.sh/)
+#   install with 'brew install qt6'
+# [Key Type Name] = 'Qt6Brew'
+Qt6Brew = { 'qmake' : '%s/opt/qt@6/bin/qmake' % DefaultHomebrewRoot,
+            'deploy': '%s/opt/qt@6/bin/macdeployqt' % DefaultHomebrewRoot
+          }
+
 #-----------------------------------------------------
 # [2] Ruby
 #-----------------------------------------------------
 RubyNil  = [ 'nil' ]
 RubySys  = [ 'RubyElCapitan', 'RubySierra', 'RubyHighSierra', 'RubyMojave' ]
 RubySys += [ 'RubyCatalina', 'RubyBigSur', 'RubyMonterey' ]
-RubyExt  = [ 'Ruby27MacPorts', 'Ruby27Brew', 'RubyAnaconda3' ]
+RubyExt  = [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3' ]
 Rubies   = RubyNil + RubySys + RubyExt
 
 #-----------------------------------------------------
-# Whereabout of different components of Ruby
+# Whereabouts of different components of Ruby
 #-----------------------------------------------------
 # Bundled with Yosemite (10.10)
 #   !!! Yosemite is no longer supported (KLayout 0.26 ~) but remains here to keep the record of
@@ -174,30 +174,30 @@ RubyMonterey    = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions/
                     'lib':  '%s/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.tbd' % MontereySDK
                   }
 
-# Ruby 2.7 from MacPorts (https://www.macports.org/) *+*+*+ EXPERIMENTAL *+*+*+
-#  install with 'sudo port install ruby27'
-# [Key Type Name] = 'MP27'
-Ruby27MacPorts  = { 'exe': '/opt/local/bin/ruby2.7',
-                    'inc': '/opt/local/include/ruby-2.7.0',
-                    'lib': '/opt/local/lib/libruby.2.7.dylib'
+# Ruby 3.1 from MacPorts (https://www.macports.org/) *+*+*+ EXPERIMENTAL *+*+*+
+#  install with 'sudo port install ruby31'
+# [Key Type Name] = 'MP31'
+Ruby31MacPorts  = { 'exe': '/opt/local/bin/ruby3.1',
+                    'inc': '/opt/local/include/ruby-3.1.2',
+                    'lib': '/opt/local/lib/libruby.3.1.dylib'
                   }
 
-# Ruby 2.7 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
-#   install with 'brew install ruby'
-# [Key Type Name] = 'HB27'
-HBRuby27Path    = '%s/opt/ruby@2.7' % DefaultHomebrewRoot
-Ruby27Brew      = { 'exe': '%s/bin/ruby' % HBRuby27Path,
-                    'inc': '%s/include/ruby-2.7.0' % HBRuby27Path,
-                    'lib': '%s/lib/libruby.2.7.dylib' % HBRuby27Path
+# Ruby 3.1 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
+#   install with 'brew install ruby@3.1'
+# [Key Type Name] = 'HB31'
+HBRuby31Path    = '%s/opt/ruby@3.1' % DefaultHomebrewRoot
+Ruby31Brew      = { 'exe': '%s/bin/ruby' % HBRuby31Path,
+                    'inc': '%s/include/ruby-3.1.0' % HBRuby31Path,
+                    'lib': '%s/lib/libruby.3.1.dylib' % HBRuby31Path
                   }
 
-# Ruby 2.5 bundled with anaconda3 installed under /Applications/anaconda3/ *+*+*+ EXPERIMENTAL *+*+*+
+# Ruby 3.1 bundled with anaconda3 installed under /Applications/anaconda3/ *+*+*+ EXPERIMENTAL *+*+*+
 # The standard installation deploys the tool under $HOME/opt/anaconda3/.
 # If so, you need to make a symbolic link: /Applications/anaconda3 ---> $HOME/opt/anaconda3/
 # [Key Type Name] = 'Ana3'
 RubyAnaconda3   = { 'exe': '/Applications/anaconda3/bin/ruby',
-                    'inc': '/Applications/anaconda3/include/ruby-2.5.0',
-                    'lib': '/Applications/anaconda3/lib/libruby.2.5.1.dylib'
+                    'inc': '/Applications/anaconda3/include/ruby-3.1.0',
+                    'lib': '/Applications/anaconda3/lib/libruby.3.1.dylib'
                   }
 
 # Consolidated dictionary kit for Ruby
@@ -210,8 +210,8 @@ RubyDictionary  = { 'nil'           : None,
                     'RubyCatalina'  : RubyCatalina,
                     'RubyBigSur'    : RubyBigSur,
                     'RubyMonterey'  : RubyMonterey,
-                    'Ruby27MacPorts': Ruby27MacPorts,
-                    'Ruby27Brew'    : Ruby27Brew,
+                    'Ruby31MacPorts': Ruby31MacPorts,
+                    'Ruby31Brew'    : Ruby31Brew,
                     'RubyAnaconda3' : RubyAnaconda3
                   }
 
@@ -225,7 +225,7 @@ PythonExt  = [ 'Python38MacPorts', 'Python38Brew', 'Python39Brew', 'PythonAnacon
 Pythons    = PythonNil + PythonSys + PythonExt
 
 #-----------------------------------------------------
-# Whereabout of different components of Python
+# Whereabouts of different components of Python
 #-----------------------------------------------------
 # Bundled with Yosemite (10.10)
 #   !!! Yosemite is no longer supported but remains here to keep the record of the directory structure

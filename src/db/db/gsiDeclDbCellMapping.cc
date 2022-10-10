@@ -283,7 +283,7 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
   "target_cells = cell_names.collect { |n| target.create_cell(n).cell_index }\n"
   "\n"
   "cm = RBA::CellMapping::new\n"
-  "cm.for_multi_cells_full(source, source_cells, target, target_cells)\n"
+  "cm.for_multi_cells_full(target, target_cells, source, source_cells)\n"
   "target.copy_tree_shapes(source, cm)\n"
   "@/code\n"
 );

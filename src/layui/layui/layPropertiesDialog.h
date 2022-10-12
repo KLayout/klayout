@@ -85,7 +85,8 @@ private:
   std::vector<lay::PropertiesPage *> mp_properties_pages;
   db::Manager *mp_manager;
   lay::Editables *mp_editables;
-  int m_index, m_prev_index, m_object_index;
+  int m_index, m_prev_index;
+  std::vector<int> m_object_indexes;
   QStackedLayout *mp_stack;
   QLabel *mp_none;
   lay::MainWindow *mp_mw;
@@ -110,6 +111,7 @@ public slots:
   void ok_pressed ();
   void apply_to_all_pressed ();
   void current_index_changed (const QModelIndex &index, const QModelIndex &previous);
+  void selection_changed ();
 
 protected:
   void reject ();

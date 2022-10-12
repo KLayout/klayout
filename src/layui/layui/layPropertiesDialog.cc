@@ -159,7 +159,6 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
     mp_manager (manager),
     mp_editables (editables),
     m_index (0), m_prev_index (-1),
-    m_object_index (0),
     m_auto_applied (false),
     m_transaction_id (0),
     m_signals_enabled (true)
@@ -206,6 +205,8 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   //  look for next usable editable 
   if (m_index >= int (mp_properties_pages.size ())) {
     m_index = -1;
+  } else {
+    m_object_indexes.push_back (0);
   }
 
   update_title ();
@@ -217,7 +218,7 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   mp_ui->tree->expandAll ();
 
   m_signals_enabled = false;
-  mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, m_object_index));
+  mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, 0));
   m_signals_enabled = true;
 
   update_controls ();
@@ -232,6 +233,7 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   connect (mp_ui->next_button, SIGNAL (clicked ()), this, SLOT (next_pressed ()));
   connect (mp_ui->apply_to_all_cbx, SIGNAL (clicked ()), this, SLOT (apply_to_all_pressed ()));
   connect (mp_ui->tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &, const QModelIndex &)));
+  connect (mp_ui->tree->selectionModel (), SIGNAL (selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT (selection_changed ()));
 }
 
 PropertiesDialog::~PropertiesDialog ()
@@ -259,10 +261,16 @@ PropertiesDialog::apply_to_all_pressed ()
   m_signals_enabled = false;
   if (mp_ui->apply_to_all_cbx->isChecked ()) {
     mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index));
-  } else {
-    mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, m_object_index));
+  } else if (! m_object_indexes.empty ()) {
+    mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, m_object_indexes.front ()));
   }
   m_signals_enabled = true;
+}
+
+void
+PropertiesDialog::selection_changed ()
+{
+  current_index_changed (mp_ui->tree->currentIndex (), QModelIndex ());
 }
 
 void
@@ -272,31 +280,60 @@ PropertiesDialog::current_index_changed (const QModelIndex &index, const QModelI
     return;
   }
 
+  m_object_indexes.clear ();
+
   if (! index.isValid ()) {
-    return;
-  }
 
-  if (mp_tree_model->parent (index).isValid ()) {
-
-    m_index = mp_tree_model->page_index (index);
-    mp_ui->apply_to_all_cbx->setChecked (false);
-
-    m_object_index = mp_tree_model->object_index (index);
+    m_index = -1;
 
   } else {
 
-    m_index = index.row ();
-    mp_ui->apply_to_all_cbx->setChecked (mp_properties_pages [m_index]->can_apply_to_all ());
+    if (mp_tree_model->parent (index).isValid ()) {
 
-    m_object_index = 0;
+      m_index = mp_tree_model->page_index (index);
+
+      if (mp_properties_pages [m_index]->can_apply_to_all ()) {
+
+        m_object_indexes.push_back (mp_tree_model->object_index (index));
+
+        auto selection = mp_ui->tree->selectionModel ()->selectedIndexes ();
+        for (auto i = selection.begin (); i != selection.end (); ++i) {
+          if (mp_tree_model->parent (*i).isValid () && mp_tree_model->page_index (*i) == m_index) {
+            int oi = mp_tree_model->object_index (*i);
+            if (oi != m_object_indexes.front ()) {
+              m_object_indexes.push_back (oi);
+            }
+          }
+        }
+
+      } else {
+
+        m_object_indexes.push_back (mp_tree_model->object_index (index));
+
+      }
+
+    } else {
+
+      m_index = index.row ();
+      mp_ui->apply_to_all_cbx->setChecked (mp_properties_pages [m_index]->can_apply_to_all ());
+
+      for (int oi = 0; oi < mp_properties_pages [m_index]->count (); ++oi) {
+        m_object_indexes.push_back (oi);
+      }
+
+    }
 
   }
 
-  m_current_object = 0;
-  for (int i = 0; i < m_index; ++i) {
-    m_current_object += mp_properties_pages [i]->count ();
+  if (! m_object_indexes.empty ()) {
+    m_current_object = 0;
+    for (int i = 0; i < m_index; ++i) {
+      m_current_object += mp_properties_pages [i]->count ();
+    }
+    m_current_object += m_object_indexes.front ();
+  } else {
+    m_current_object = -1;
   }
-  m_current_object += m_object_index;
 
   update_title ();
   update_controls ();
@@ -311,6 +348,8 @@ PropertiesDialog::update_controls ()
     }
   }
   m_prev_index = m_index;
+
+  mp_ui->apply_to_all_cbx->setChecked (m_object_indexes.size () > 1);
 
   if (m_index < 0) {
 
@@ -334,7 +373,7 @@ PropertiesDialog::update_controls ()
     mp_ui->ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
     mp_ui->tree->setEnabled (true);
 
-    mp_properties_pages [m_index]->select_entry (m_object_index);
+    mp_properties_pages [m_index]->select_entry (m_object_indexes);
     mp_properties_pages [m_index]->update ();
 
   }
@@ -345,6 +384,10 @@ PropertiesDialog::next_pressed ()
 {
 BEGIN_PROTECTED
 
+  if (m_object_indexes.empty ()) {
+    return;
+  }
+
   if (! mp_properties_pages [m_index]->readonly ()) {
     db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
     mp_properties_pages [m_index]->apply ();
@@ -354,13 +397,14 @@ BEGIN_PROTECTED
   }
 
   //  advance the current entry
-  ++m_object_index;
+  int object_index = m_object_indexes.front ();
+  ++object_index;
 
   //  look for next usable editable if at end
-  if (m_object_index >= int (mp_properties_pages [m_index]->count ())) {
+  if (object_index >= int (mp_properties_pages [m_index]->count ())) {
 
     ++m_index;
-    m_object_index = 0;
+    object_index = 0;
 
     //  because we checked that there are any further elements, this should not happen:
     if (m_index >= int (mp_properties_pages.size ())) {
@@ -369,12 +413,15 @@ BEGIN_PROTECTED
 
   }
 
+  m_object_indexes.clear ();
+  m_object_indexes.push_back (object_index);
+
   ++m_current_object;
   update_title ();
 
   update_controls ();
   m_signals_enabled = false;
-  mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, m_object_index));
+  mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, object_index));
   m_signals_enabled = true;
 
 END_PROTECTED
@@ -385,6 +432,10 @@ PropertiesDialog::prev_pressed ()
 {
 BEGIN_PROTECTED
 
+  if (m_object_indexes.empty ()) {
+    return;
+  }
+
   if (! mp_properties_pages [m_index]->readonly ()) {
     db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
     mp_properties_pages [m_index]->apply ();
@@ -393,7 +444,9 @@ BEGIN_PROTECTED
     }
   }
 
-  if (m_object_index == 0) {
+  //  advance the current entry
+  int object_index = m_object_indexes.front ();
+  if (object_index == 0) {
 
     //  look for last usable editable if at end
     --m_index;
@@ -403,19 +456,22 @@ BEGIN_PROTECTED
       return;
     }
 
-    m_object_index = mp_properties_pages [m_index]->count ();
+    object_index = mp_properties_pages [m_index]->count ();
 
   } 
 
   //  decrement the current entry
-  --m_object_index;
+  --object_index;
+
+  m_object_indexes.clear ();
+  m_object_indexes.push_back (object_index);
 
   --m_current_object;
   update_title ();
 
   update_controls ();
   m_signals_enabled = false;
-  mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, m_object_index));
+  mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, object_index));
   m_signals_enabled = true;
 
 END_PROTECTED
@@ -434,10 +490,14 @@ PropertiesDialog::update_title ()
 bool
 PropertiesDialog::any_next () const
 {
+  if (m_object_indexes.empty ()) {
+    return false;
+  }
+
   //  look for the next applicable page
   //  @@@ Pages should not be empty
   int index = m_index;
-  if (m_object_index + 1 >= int (mp_properties_pages [index]->count ())) {
+  if (m_object_indexes.front () + 1 >= int (mp_properties_pages [index]->count ())) {
     ++index;
     while (index < int (mp_properties_pages.size ()) &&
            (mp_properties_pages [index] == 0 || mp_properties_pages [index]->count () == 0)) {
@@ -452,10 +512,14 @@ PropertiesDialog::any_next () const
 bool
 PropertiesDialog::any_prev () const
 {
+  if (m_object_indexes.empty ()) {
+    return false;
+  }
+
   //  look for the next applicable page
   //  @@@ Pages should not be empty
   int index = m_index;
-  if (m_object_index == 0) {
+  if (m_object_indexes.front () == 0) {
     --index;
     while (index >= 0 && 
            (mp_properties_pages [index] == 0 || mp_properties_pages [index]->count () == 0)) {

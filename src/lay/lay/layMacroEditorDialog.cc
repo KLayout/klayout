@@ -397,8 +397,14 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   QAction *action = new QAction (tr ("Close All"), this);
   connect (action, SIGNAL (triggered ()), this, SLOT (close_all ()));
   tabWidget->addAction (action);
-  action = new QAction (tr ("Close All Except Current"), this);
-  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_but_current ()));
+  action = new QAction (tr ("Close All Except This"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_but_this ()));
+  tabWidget->addAction (action);
+  action = new QAction (tr ("Close All Left"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_left ()));
+  tabWidget->addAction (action);
+  action = new QAction (tr ("Close All Right"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_right ()));
   tabWidget->addAction (action);
 
   dbgOn->setEnabled (true);
@@ -467,6 +473,8 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   connect (findNextButton, SIGNAL (clicked ()), this, SLOT (find_next_button_clicked ()));
   connect (replaceAllButton, SIGNAL (clicked ()), this, SLOT (replace_all_button_clicked ()));
   connect (allVariables, SIGNAL (clicked (bool)), variableList, SLOT (set_show_all (bool)));
+
+  tabWidget->installEventFilter (this);
 
   splitter->setCollapsible (1, false);
   replaceFrame->hide ();
@@ -1535,7 +1543,13 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
 
     }
 
-  } 
+  } else if (obj == tabWidget->tabBar () && dynamic_cast<QMouseEvent *> (event) != 0) {
+
+    //  just spy on the events, don't eat them
+    QMouseEvent *mouse_event = dynamic_cast<QMouseEvent *> (event);
+    m_mouse_pos = mouse_event->pos ();
+
+  }
 
   return false;
 }
@@ -2263,7 +2277,25 @@ END_PROTECTED
 }
 
 void
-MacroEditorDialog::close_all_but_current ()
+MacroEditorDialog::close_all_but_this ()
+{
+  close_many (0);
+}
+
+void
+MacroEditorDialog::close_all_left ()
+{
+  close_many (-1);
+}
+
+void
+MacroEditorDialog::close_all_right ()
+{
+  close_many (1);
+}
+
+void
+MacroEditorDialog::close_many (int r2c)
 {
   if (m_in_exec) {
     return;
@@ -2271,17 +2303,19 @@ MacroEditorDialog::close_all_but_current ()
 
 BEGIN_PROTECTED
 
-  QWidget *cw = tabWidget->currentWidget ();
-  int ci = tabWidget->currentIndex ();
-
+  int ci = tabWidget->tabBar ()->tabAt (m_mouse_pos);
   if (ci < 0) {
-    close_all ();
     return;
   }
 
+  std::set<QWidget *> removed;
+
   for (int i = tabWidget->count (); i > 0; ) {
     --i;
-    if (i != ci) {
+    if ((r2c == 0 && i != ci) ||
+        (r2c < 0  && i < ci) ||
+        (r2c > 0  && i > ci)) {
+      removed.insert (tabWidget->widget (i));
       tabWidget->removeTab (i);
     }
   }
@@ -2289,7 +2323,7 @@ BEGIN_PROTECTED
   std::map <lym::Macro *, MacroEditorPage *> new_widgets;
 
   for (std::map <lym::Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.begin (); p != m_tab_widgets.end (); ++p) {
-    if (cw && p->second == cw) {
+    if (removed.find (p->second) == removed.end ()) {
       new_widgets.insert (*p);
     } else {
       if (p->second) {

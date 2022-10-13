@@ -51,7 +51,7 @@
 #include "tlDeferredExecution.h"
 #include "gsi.h"
 
-class QTabWidget;
+class QTabBar;
 class QToolBar;
 class QLabel;
 class QAction;
@@ -632,6 +632,11 @@ public slots:
   void exit ();
   void close_current_view ();
   void close_view (int index);
+  void close_all_views ();
+  void close_all_except_this ();
+  void close_all_views_left ();
+  void close_all_views_right ();
+  void clone ();
   void tab_close_requested (int);
   void open_recent (size_t n);
   void open_recent_session (size_t n);
@@ -675,6 +680,7 @@ protected:
   void update_content ();
   void do_update_menu ();
   void do_update_mru_menus ();
+  bool eventFilter (QObject *watched, QEvent *event);
 
 private:
   lay::Dispatcher m_dispatcher;
@@ -682,7 +688,8 @@ private:
   TextProgressDelegate m_text_progress;
 
   //  Main menu
-  QTabWidget *mp_tab_widget;
+  QTabBar *mp_tab_bar;
+  QPoint m_mouse_pos;
   QToolBar *mp_tool_bar;
   QDockWidget *mp_navigator_dock_widget;
   lay::Navigator *mp_navigator;
@@ -802,7 +809,7 @@ private:
   int dirty_files (std::string &dirty_files);
 
   void load_layer_props_from_file (const std::string &fn);
-  void interactive_close_view (int index, bool all_cellviews);
+  void interactive_close_view (int from, int to, bool invert_range, bool all_cellviews);
   void call_on_current_view (void (lay::LayoutView::*func) (), const std::string &op_desc);
   void current_view_changed ();
   void update_window_title ();

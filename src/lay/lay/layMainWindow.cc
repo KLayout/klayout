@@ -70,7 +70,7 @@
 #include "layDialogs.h"
 #include "laybasicConfig.h"
 #include "layConfig.h"
-#include "layEnhancedTabWidget.h"
+#include "layEnhancedTabBar.h"
 #include "layMainWindow.h"
 #include "layHelpDialog.h"
 #include "layNavigator.h"
@@ -228,13 +228,42 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   vbl->setContentsMargins (0, 0, 0, 0);
   vbl->setSpacing (0);
 
-  mp_tab_widget = new EnhancedTabWidget (mp_main_frame);
-  vbl->addWidget (mp_tab_widget);
-  connect (mp_tab_widget, SIGNAL (currentChanged (int)), this, SLOT (view_selected (int)));
+  QHBoxLayout *vbh_tab = new QHBoxLayout (mp_main_frame);
+  vbh_tab->setSpacing (6);
+  vbl->addLayout (vbh_tab);
+
+  EnhancedTabBar *enh_tab_widget = new EnhancedTabBar (mp_main_frame);
+  mp_tab_bar = enh_tab_widget;
+  mp_tab_bar->installEventFilter (this);
+  vbh_tab->addWidget (enh_tab_widget);
+  vbh_tab->addWidget (enh_tab_widget->menu_button ());
+
+  connect (mp_tab_bar, SIGNAL (currentChanged (int)), this, SLOT (view_selected (int)));
 #if QT_VERSION >= 0x040500
-  mp_tab_widget->setTabsClosable(true);
-  connect (mp_tab_widget, SIGNAL (tabCloseRequested (int)), this, SLOT (tab_close_requested (int)));
+  mp_tab_bar->setTabsClosable (true);
+  connect (mp_tab_bar, SIGNAL (tabCloseRequested (int)), this, SLOT (tab_close_requested (int)));
 #endif
+
+  mp_tab_bar->setContextMenuPolicy (Qt::ActionsContextMenu);
+
+  QAction *action = new QAction (tr ("Close All"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_views ()));
+  mp_tab_bar->addAction (action);
+  action = new QAction (tr ("Close All Except This"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_except_this ()));
+  mp_tab_bar->addAction (action);
+  action = new QAction (tr ("Close All Left"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_views_left ()));
+  mp_tab_bar->addAction (action);
+  action = new QAction (tr ("Close All Right"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (close_all_views_right ()));
+  mp_tab_bar->addAction (action);
+  action = new QAction (this);
+  action->setSeparator (true);
+  mp_tab_bar->addAction (action);
+  action = new QAction (tr ("Clone Panel"), this);
+  connect (action, SIGNAL (triggered ()), this, SLOT (clone ()));
+  mp_tab_bar->addAction (action);
 
   mp_hp_dock_widget = new QDockWidget (QObject::tr ("Cells"), this);
   mp_hp_dock_widget->setObjectName (QString::fromUtf8 ("hp_dock_widget"));
@@ -683,8 +712,8 @@ MainWindow::close_all ()
   //  Clear the tab bar
   bool f = m_disable_tab_selected;
   m_disable_tab_selected = true;
-  while (mp_tab_widget->count () > 0) {
-    mp_tab_widget->removeTab (mp_tab_widget->count () - 1);
+  while (mp_tab_bar->count () > 0) {
+    mp_tab_bar->removeTab (mp_tab_bar->count () - 1);
   }
   m_disable_tab_selected = f;
 
@@ -2315,7 +2344,7 @@ MainWindow::view_selected (int index)
     //  Hint: setting the focus to the tab bar avoids problem with dangling keyboard focus.
     //  Sometimes, the focus was set to the hierarchy level spin buttons which caught Copy&Paste
     //  events in effect.
-    mp_tab_widget->setFocus ();
+    mp_tab_bar->setFocus ();
 
     if (! m_disable_tab_selected) {
       select_view (index);
@@ -2336,7 +2365,7 @@ MainWindow::select_view (int index)
 
     tl_assert (index >= 0 && index < int (views ()));
 
-    mp_tab_widget->setCurrentIndex (index);
+    mp_tab_bar->setCurrentIndex (index);
 
     bool box_set = (m_synchronized_views && current_view () != 0);
     db::DBox box;
@@ -2565,7 +2594,7 @@ MainWindow::clone_current_view ()
 
   bool f = m_disable_tab_selected;
   m_disable_tab_selected = true;
-  int index = mp_tab_widget->insertTab (-1, mp_views.back (), tl::to_qstring (view->title ()));
+  int index = mp_tab_bar->insertTab (-1, tl::to_qstring (view->title ()));
   m_disable_tab_selected = f;
 
   view_created_event (index);
@@ -2577,27 +2606,29 @@ MainWindow::clone_current_view ()
 void
 MainWindow::cm_close_all ()
 {
-  interactive_close_view (-1, false);
+  interactive_close_view (0, views (), false, false);
 }
 
 void
 MainWindow::cm_close ()
 {
-  interactive_close_view (index_of (lay::LayoutView::current ()), false);
+  int current_index = index_of (lay::LayoutView::current ());
+  if (current_index >= 0) {
+    interactive_close_view (current_index, current_index + 1, false, false);
+  }
 }
 
 void
 MainWindow::tab_close_requested (int index)
 {
-  interactive_close_view (index, true);
+  interactive_close_view (index, index + 1, false, true);
 }
 
 void
-MainWindow::interactive_close_view (int index, bool all_cellviews)
+MainWindow::interactive_close_view (int from, int to, bool invert_range, bool all_cellviews)
 {
-  if (index < 0) {
-
-    //  close all views
+  //  closes views in range [from, to[ (invert_range=false) or outside this range (invert_range=true)
+  if (invert_range || from + 1 != to) {
 
     bool can_close = true;
 
@@ -2605,7 +2636,11 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
     std::string dirty_files;
     std::set<std::string> seen_names;
 
-    for (index = 0; index < int (views ()); ++index) {
+    for (int index = 0; index < int (views ()); ++index) {
+
+      if ((index >= from && index < to) == invert_range) {
+        continue;
+      }
 
       for (unsigned int i = 0; i < view (index)->cellviews (); ++i) {
 
@@ -2653,28 +2688,31 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
 
     if (can_close) {
       BEGIN_PROTECTED
-      while (views () > 0) {
-        close_view (0);
+      for (int index = int (views ()); index > 0; ) {
+        --index;
+        if ((index >= from && index < to) != invert_range) {
+          close_view (index);
+        }
       }
       END_PROTECTED
     }
 
-  } else if (view (index)) {
+  } else if (view (from)) {
 
     std::vector <int> selected;
 
-    if (view (index)->cellviews () > 1) {
+    if (view (from)->cellviews () > 1) {
 
       if (all_cellviews) {
 
-        for (int i = 0; i < int (view (index)->cellviews ()); ++i) {
+        for (int i = 0; i < int (view (from)->cellviews ()); ++i) {
           selected.push_back (i);
         }
 
       } else {
 
-        SelectCellViewForm form (0, view (index), tl::to_string (QObject::tr ("Select Layouts To Close")));
-        form.set_selection (view (index)->active_cellview_index ());
+        SelectCellViewForm form (0, view (from), tl::to_string (QObject::tr ("Select Layouts To Close")));
+        form.set_selection (view (from)->active_cellview_index ());
 
         if (form.exec () != QDialog::Accepted) {
           return;
@@ -2687,7 +2725,7 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
 
       }
 
-    } else if (view (index)->cellviews () > 0) {
+    } else if (view (from)->cellviews () > 0) {
       selected.push_back (0);
     }
 
@@ -2698,7 +2736,7 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
 
       for (std::vector <int>::const_iterator i = selected.begin (); i != selected.end (); ++i) {
 
-        const lay::CellView &cv = view (index)->cellview (*i);
+        const lay::CellView &cv = view (from)->cellview (*i);
 
         if (cv->layout ().is_editable () && cv->is_dirty ()) {
 
@@ -2715,7 +2753,7 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
           }
 
           for (std::vector <int>::const_iterator ii = selected.begin (); ii != selected.end (); ++ii) {
-            if (view (index)->cellview (*ii)->name () == name) {
+            if (view (from)->cellview (*ii)->name () == name) {
               --count;
             }
           }
@@ -2758,14 +2796,14 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
         BEGIN_PROTECTED
 
         //  Actually erase the selected cellviews
-        if (view (index)->cellviews () == selected.size ()) {
+        if (view (from)->cellviews () == selected.size ()) {
           //  all cellviews selected - simply close
-          close_view (index);
+          close_view (from);
         } else {
           std::sort (selected.begin (), selected.end ());
           int offset = 0;
           for (std::vector <int>::const_iterator i = selected.begin (); i != selected.end (); ++i) {
-            view (index)->erase_cellview ((unsigned int)(*i - offset));
+            view (from)->erase_cellview ((unsigned int)(*i - offset));
             ++offset;
           }
         }
@@ -2775,7 +2813,7 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
       }
 
     } else {
-      close_view (index);
+      close_view (from);
     }
 
   }
@@ -2783,9 +2821,48 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
 }
 
 void
+MainWindow::clone ()
+{
+  clone_current_view ();
+}
+
+void
 MainWindow::close_current_view ()
 {
   close_view (index_of (lay::LayoutView::current ()));
+}
+
+void
+MainWindow::close_all_views ()
+{
+  cm_close_all ();
+}
+
+void
+MainWindow::close_all_except_this ()
+{
+  int index = mp_tab_bar->tabAt (m_mouse_pos);
+  if (index >= 0) {
+    interactive_close_view (index, index + 1, true, false);
+  }
+}
+
+void
+MainWindow::close_all_views_left ()
+{
+  int index = mp_tab_bar->tabAt (m_mouse_pos);
+  if (index >= 0) {
+    interactive_close_view (0, index, false, false);
+  }
+}
+
+void
+MainWindow::close_all_views_right ()
+{
+  int index = mp_tab_bar->tabAt (m_mouse_pos);
+  if (index >= 0) {
+    interactive_close_view (index + 1, views (), false, false);
+  }
 }
 
 void
@@ -2806,7 +2883,7 @@ MainWindow::close_view (int index)
         box = view (index)->viewport ().box ();
       }
 
-      mp_tab_widget->removeTab (index);
+      mp_tab_bar->removeTab (index);
       mp_view_stack->remove_widget (index);
       mp_lp_stack->remove_widget (index);
       mp_layer_toolbox_stack->remove_widget (index);
@@ -3382,7 +3459,7 @@ MainWindow::create_view ()
 
   bool f = m_disable_tab_selected;
   m_disable_tab_selected = true;
-  int index = mp_tab_widget->insertTab (-1, mp_views.back (), tl::to_qstring (current_view ()->title ()));
+  int index = mp_tab_bar->insertTab (-1, tl::to_qstring (current_view ()->title ()));
   m_disable_tab_selected = f;
 
   view_created_event (index);
@@ -3445,7 +3522,7 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
 
       bool f = m_disable_tab_selected;
       m_disable_tab_selected = true;
-      int index = mp_tab_widget->insertTab (-1, mp_views.back (), QString ());
+      int index = mp_tab_bar->insertTab (-1, QString ());
       update_tab_title (index);
       m_disable_tab_selected = f;
       view_created_event (index);
@@ -3485,8 +3562,8 @@ MainWindow::update_tab_title (int i)
     title += v->title ();
   }
 
-  if (tl::to_string (mp_tab_widget->tabText (i)) != title) {
-    mp_tab_widget->setTabText (i, tl::to_qstring (title));
+  if (tl::to_string (mp_tab_bar->tabText (i)) != title) {
+    mp_tab_bar->setTabText (i, tl::to_qstring (title));
   }
 
   if (v) {
@@ -3501,8 +3578,8 @@ MainWindow::update_tab_title (int i)
         files += tl::to_string (tr ("(not saved)"));
       }
     }
-    if (tl::to_string (mp_tab_widget->tabToolTip (i)) != files) {
-      mp_tab_widget->setTabToolTip (i, tl::to_qstring (files));
+    if (tl::to_string (mp_tab_bar->tabToolTip (i)) != files) {
+      mp_tab_bar->setTabToolTip (i, tl::to_qstring (files));
     }
   }
 }
@@ -3956,6 +4033,17 @@ MainWindow::dragEnterEvent(QDragEnterEvent *event)
   if (event->mimeData () && event->mimeData ()->hasUrls () && event->mimeData ()->urls ().size () >= 1) {
     event->acceptProposedAction ();
   }
+}
+
+bool
+MainWindow::eventFilter (QObject *watched, QEvent *event)
+{
+  //  spy on the mouse events of the tab bar so we can tell which tab the menu was issued on
+  if (watched == mp_tab_bar && dynamic_cast<QMouseEvent *> (event) != 0) {
+    m_mouse_pos = dynamic_cast<QMouseEvent *> (event)->pos ();
+  }
+
+  return QMainWindow::eventFilter (watched, event);
 }
 
 void

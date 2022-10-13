@@ -21,7 +21,7 @@
 */
 
 
-#include "layEnhancedTabWidget.h"
+#include "layEnhancedTabBar.h"
 
 #include <QAction>
 #include <QActionGroup>
@@ -35,18 +35,18 @@ namespace lay
 // ---------------------------------------------------------------------------------------------
 //  EnhancedTabWidget implementation
 
-EnhancedTabWidget::EnhancedTabWidget (QWidget *parent)
-  : QTabWidget (parent)
+EnhancedTabBar::EnhancedTabBar (QWidget *parent)
+  : QTabBar (parent)
 {
   mp_list_tool_button = new QToolButton (this);
   mp_list_tool_button->setAutoRaise (true);
-  mp_list_tool_button->setIcon (QIcon (QString::fromUtf8 (":/find_16px.png")));
-  mp_list_tool_button->setIconSize (QSize (20, 20));
+  mp_list_tool_button->hide ();
+  mp_list_tool_button->setIcon (QIcon (QString::fromUtf8 (":/menu_24px.png")));
+  mp_list_tool_button->setIconSize (QSize (24, 24));
   mp_list_tool_button->setMenu (new QMenu (this));
   mp_list_tool_button->setPopupMode (QToolButton::InstantPopup);
   mp_list_tool_button->setToolButtonStyle (Qt::ToolButtonIconOnly);
-  mp_list_tool_button->setToolTip ( tr ("List of all opened views"));
-  setCornerWidget (mp_list_tool_button, Qt::TopRightCorner);
+  mp_list_tool_button->setToolTip (tr ("List of all opened views"));
 
   connect (mp_list_tool_button->menu (), SIGNAL (aboutToShow()),
            this, SLOT (list_tool_button_menu_about_to_show()));
@@ -58,26 +58,29 @@ EnhancedTabWidget::EnhancedTabWidget (QWidget *parent)
            this, SLOT (list_action_group_triggered(QAction *)));
 }
 
-EnhancedTabWidget::~EnhancedTabWidget () = default;
-
-void EnhancedTabWidget::tabInserted (int index)
+EnhancedTabBar::~EnhancedTabBar ()
 {
-  QTabWidget::tabInserted (index);
+  //  .. nothing yet ..
+}
+
+void EnhancedTabBar::tabInserted (int index)
+{
+  QTabBar::tabInserted (index);
   update_list_button_visibility ();
 }
 
-void EnhancedTabWidget::tabRemoved (int index)
+void EnhancedTabBar::tabRemoved (int index)
 {
-  QTabWidget::tabRemoved (index);
+  QTabBar::tabRemoved (index);
   update_list_button_visibility ();
 }
 
-void EnhancedTabWidget::list_action_group_triggered (QAction *action)
+void EnhancedTabBar::list_action_group_triggered (QAction *action)
 {
   setCurrentIndex (action->data ().toInt ());
 }
 
-void EnhancedTabWidget::list_tool_button_menu_about_to_show ()
+void EnhancedTabBar::list_tool_button_menu_about_to_show ()
 {
   mp_list_tool_button->menu ()->clear ();
   if (count () > 1) {
@@ -91,11 +94,9 @@ void EnhancedTabWidget::list_tool_button_menu_about_to_show ()
   }
 }
 
-void EnhancedTabWidget::update_list_button_visibility()
+void EnhancedTabBar::update_list_button_visibility()
 {
-  if (cornerWidget (Qt::TopRightCorner) != nullptr) {
-    cornerWidget (Qt::TopRightCorner)->setVisible (count () > 1);
-  }
+  mp_list_tool_button->setVisible (count () > 1);
 }
 
 }

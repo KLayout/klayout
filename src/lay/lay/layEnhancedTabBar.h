@@ -24,7 +24,7 @@
 #ifndef HDR_layEnhancedTabWidget
 #define HDR_layEnhancedTabWidget
 
-#include <QTabWidget>
+#include <QTabBar>
 
 class QActionGroup;
 class QToolButton;
@@ -32,14 +32,16 @@ class QToolButton;
 namespace lay
 {
 
-class EnhancedTabWidget
-  : public QTabWidget
+class EnhancedTabBar
+  : public QTabBar
 {
 Q_OBJECT
 
 public:
-  EnhancedTabWidget (QWidget *parent);
-  ~EnhancedTabWidget () override;
+  EnhancedTabBar (QWidget *parent);
+  ~EnhancedTabBar () override;
+
+  QToolButton *menu_button () { return mp_list_tool_button; }
 
 protected:
   void tabInserted (int index) override;

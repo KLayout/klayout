@@ -213,7 +213,9 @@ private slots:
   void search_finished ();
   void tab_close_requested (int);
   void close_all ();
-  void close_all_but_current ();
+  void close_all_but_this ();
+  void close_all_left ();
+  void close_all_right ();
   void replace_mode_button_clicked ();
   void replace_next_button_clicked ();
   void replace_all_button_clicked ();
@@ -264,6 +266,7 @@ private:
   void move_subfolder (lym::MacroCollection *source, lym::MacroCollection *target);
   lay::MacroEditorPage *create_page (lym::Macro *macro);
   void open_macro (lym::Macro *macro);
+  void close_many (int which_relative_to_current);
   void ensure_writeable_collection_selected ();
   void update_console_text ();
   void start_exec (gsi::Interpreter *interpreter);
@@ -303,6 +306,7 @@ private:
   lay::Dispatcher *mp_plugin_root;
   lym::MacroCollection *mp_root;
   bool m_first_show;
+  QPoint m_mouse_pos;
   bool m_debugging_on;
   lym::Macro *mp_run_macro;
   std::vector<lym::Macro *> m_macro_templates;

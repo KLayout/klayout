@@ -162,7 +162,6 @@ public:
 
   /**
    *  @brief Returns true, if the properties page supports "apply all"
-   *  @@@ TODO: remove
    */
   virtual bool can_apply_to_all () const
   {

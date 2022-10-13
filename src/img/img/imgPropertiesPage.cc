@@ -163,7 +163,7 @@ PropertiesPage::count () const
 void
 PropertiesPage::select_entries (const std::vector<size_t> &entries)
 {
-  tl_assert (entries.size () == 1); // @@@
+  tl_assert (entries.size () == 1);
   m_index = entries.front ();
   invalidate ();
 }

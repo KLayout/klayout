@@ -377,7 +377,7 @@ PropertiesPage::count () const
 void
 PropertiesPage::select_entries (const std::vector<size_t> &entries)
 {
-  tl_assert (entries.size () == 1); // @@@
+  tl_assert (entries.size () == 1);
   m_index = entries.front ();
 }
 
@@ -523,7 +523,7 @@ PropertiesPage::apply ()
 {
   ant::Object obj;
   get_object (obj);
-  mp_rulers->change_ruler (m_selection [m_index], obj); // @@@ multi-apply
+  mp_rulers->change_ruler (m_selection [m_index], obj);
 }
 
 void PropertiesPage::get_object(ant::Object &obj)

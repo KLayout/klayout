@@ -70,7 +70,7 @@ private:
 protected:
   std::string m_description;
   std::vector<edt::Service::obj_iterator> m_selection_ptrs;
-  unsigned int m_index;
+  std::vector<size_t> m_indexes;
   edt::Service *mp_service;
   bool m_enable_cb_callback;
   db::properties_id_type m_prop_id;

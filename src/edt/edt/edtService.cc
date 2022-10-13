@@ -77,6 +77,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
     m_hier_copy_mode (-1),
     m_indicate_secondary_selection (false),
     m_seq (0),
+    m_highlights_selected (false),
     dm_selection_to_view (this, &edt::Service::do_selection_to_view)
 { 
   mp_view->geom_changed_event.add (this, &edt::Service::selection_to_view);
@@ -97,6 +98,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     m_hier_copy_mode (-1),
     m_indicate_secondary_selection (false),
     m_seq (0),
+    m_highlights_selected (false),
     dm_selection_to_view (this, &edt::Service::do_selection_to_view)
 { 
   mp_view->geom_changed_event.add (this, &edt::Service::selection_to_view);
@@ -271,28 +273,36 @@ Service::configure (const std::string &name, const std::string &value)
 void 
 Service::clear_highlights ()
 {
-  for (std::vector<lay::ViewObject *>::iterator r = m_markers.begin (); r != m_markers.end (); ++r) {
-    (*r)->visible (false);
-  }
+  m_highlights_selected = true;
+  m_selected_highlights.clear ();
+  apply_highlights ();
 }
 
 void 
 Service::restore_highlights ()
 {
-  for (std::vector<lay::ViewObject *>::iterator r = m_markers.begin (); r != m_markers.end (); ++r) {
-    (*r)->visible (true);
-  }
+  m_highlights_selected = false;
+  m_selected_highlights.clear ();
+  apply_highlights ();
 }
 
-void 
-Service::highlight (unsigned int n)
+void
+Service::highlight (const std::vector<size_t> &n)
+{
+  m_highlights_selected = true;
+  m_selected_highlights = std::set<size_t> (n.begin (), n.end ());
+  apply_highlights ();
+}
+
+void
+Service::apply_highlights ()
 {
   for (std::vector<lay::ViewObject *>::iterator r = m_markers.begin (); r != m_markers.end (); ++r) {
-    (*r)->visible (n-- == 0);
+    (*r)->visible (! m_highlights_selected || m_selected_highlights.find (r - m_markers.begin ()) != m_selected_highlights.end ());
   }
 }
 
-void 
+void
 Service::cut ()
 {
   if (has_selection () && view ()->is_editable ()) {
@@ -1597,6 +1607,8 @@ Service::do_selection_to_view ()
     }
 
   }
+
+  apply_highlights ();
 }
 
 void 

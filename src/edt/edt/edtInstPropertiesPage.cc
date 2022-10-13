@@ -61,7 +61,6 @@ InstPropertiesPage::InstPropertiesPage (edt::Service *service, db::Manager *mana
   for (edt::Service::obj_iterator s = service->selection ().begin (); s != service->selection ().end (); ++s) {
     m_selection_ptrs.push_back (s);
   }
-  m_index = 0;
   m_prop_id = 0;
   mp_service->clear_highlights ();
 
@@ -156,6 +155,10 @@ get_cell_or_pcell_ids_by_name (const db::Layout *layout, const std::string &name
 void
 InstPropertiesPage::browse_cell ()
 {
+  if (m_indexes.empty ()) {
+    return;
+  }
+
 BEGIN_PROTECTED
 
   //  find the layout the cell has to be looked up: that is either the layout of the current instance or 
@@ -166,7 +169,7 @@ BEGIN_PROTECTED
     lib = lib_cbx->current_library ();
     layout = &lib->layout ();
   } else {
-    edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
+    edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
     const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
     layout = &cv->layout ();
   }
@@ -207,8 +210,12 @@ END_PROTECTED
 void
 InstPropertiesPage::show_props ()
 {
+  if (m_indexes.empty ()) {
+    return;
+  }
+
   lay::UserPropertiesForm props_form (this);
-  if (props_form.show (mp_service->view (), m_selection_ptrs [m_index]->cv_index (), m_prop_id)) {
+  if (props_form.show (mp_service->view (), m_selection_ptrs [m_indexes.front ()]->cv_index (), m_prop_id)) {
     emit edited ();
   }
 }
@@ -235,8 +242,7 @@ InstPropertiesPage::count () const
 void
 InstPropertiesPage::select_entries (const std::vector<size_t> &entries)
 {
-  tl_assert (entries.size () == 1); // @@@
-  m_index = entries.front ();
+  m_indexes = entries;
 }
 
 std::string
@@ -296,10 +302,14 @@ InstPropertiesPage::leave ()
 void 
 InstPropertiesPage::update ()
 {
-  edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
+  if (m_indexes.empty ()) {
+    return;
+  }
+
+  edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
   tl_assert (pos->is_cell_inst ());
 
-  mp_service->highlight (m_index);
+  mp_service->highlight (m_indexes);
 
   m_enable_cb_callback = false;
   dbu_cb->setChecked (mp_service->view ()->dbu_coordinates ());
@@ -407,7 +417,11 @@ InstPropertiesPage::update ()
 void 
 InstPropertiesPage::show_cell ()
 {
-  edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
+  if (m_indexes.empty ()) {
+    return;
+  }
+
+  edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
 
   lay::CellView::unspecific_cell_path_type path (mp_service->view ()->cellview (pos->cv_index ()).combined_unspecific_path ());
   for (lay::ObjectInstPath::iterator p = pos->begin (); p != pos->end (); ++p) {
@@ -420,8 +434,12 @@ InstPropertiesPage::show_cell ()
 void
 InstPropertiesPage::show_inst ()
 {
+  if (m_indexes.empty ()) {
+    return;
+  }
+
   InstantiationForm inst_form (this);
-  inst_form.show (mp_service->view (), *m_selection_ptrs [m_index]);
+  inst_form.show (mp_service->view (), *m_selection_ptrs [m_indexes.front ()]);
 }
 
 bool 
@@ -433,12 +451,14 @@ InstPropertiesPage::readonly ()
 ChangeApplicator *
 InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance & /*inst*/, double dbu)
 {
+  tl_assert (! m_indexes.empty ());
+
   bool has_error = false;
   bool has_pcell_error = false;
 
   std::unique_ptr<CombinedChangeApplicator> appl (new CombinedChangeApplicator ());
 
-  edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
+  edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
   const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
 
   bool du = dbu_cb->isChecked ();
@@ -732,13 +752,17 @@ InstPropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInstP
 void 
 InstPropertiesPage::do_apply (bool current_only, bool relative)
 {
+  if (m_indexes.empty ()) {
+    return;
+  }
+
   lay::LayerState layer_state = mp_service->view ()->layer_snapshot ();
-  unsigned int cv_index = m_selection_ptrs [m_index]->cv_index ();
+  unsigned int cv_index = m_selection_ptrs [m_indexes.front ()]->cv_index ();
 
   std::unique_ptr<ChangeApplicator> applicator;
 
   {
-    edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
+    edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
     tl_assert (pos->is_cell_inst ());
 
     const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
@@ -766,7 +790,7 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
   //  But it avoids issues with duplicate selections of the same instance which may happen when
   //  an instance is selected multiple times through different hierarchy branches.
 
-  db::Instance current = m_selection_ptrs [m_index]->back ().inst_ptr;
+  db::Instance current = m_selection_ptrs [m_indexes.front ()]->back ().inst_ptr;
 
   std::vector<lay::ObjectInstPath> new_sel;
   new_sel.reserve (m_selection_ptrs.size ());
@@ -780,9 +804,10 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
 
   try {
 
-    for (std::vector<edt::Service::obj_iterator>::const_iterator p = m_selection_ptrs.begin (); p != m_selection_ptrs.end (); ++p) {
+    for (auto ii = m_indexes.begin (); ii != m_indexes.end (); ++ii) {
 
-      edt::Service::obj_iterator pos = *p;
+      size_t index = *ii;
+      edt::Service::obj_iterator pos = m_selection_ptrs [*ii];
 
       //  only update objects from the same layout - this is not practical limitation but saves a lot of effort for
       //  managing different property id's etc.
@@ -814,8 +839,6 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
       }
 
       if (new_inst != pos->back ().inst_ptr) {
-
-        size_t index = p - m_selection_ptrs.begin ();
 
         //  change selection to new instance
         new_sel[index].back ().inst_ptr = new_inst;
@@ -869,6 +892,10 @@ InstPropertiesPage::apply_to_all (bool relative)
 void
 InstPropertiesPage::update_pcell_parameters ()
 {
+  if (m_indexes.empty ()) {
+    return;
+  }
+
   db::Layout *layout;
 
   //  find the layout the cell has to be looked up: that is either the layout of the current instance or 
@@ -879,7 +906,7 @@ InstPropertiesPage::update_pcell_parameters ()
 
   } else {
 
-    edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
+    edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
     const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
     layout = &cv->layout ();
 
@@ -903,7 +930,7 @@ InstPropertiesPage::update_pcell_parameters ()
 
     std::vector<tl::Variant> parameters;
 
-    edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
+    edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
     const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
     db::Cell &cell = cv->layout ().cell (pos->cell_index ());
     std::pair<bool, db::pcell_id_type> pci = cell.is_pcell_instance (pos->back ().inst_ptr);

@@ -51,7 +51,6 @@ ShapePropertiesPage::ShapePropertiesPage (const std::string &description, edt::S
   for (edt::Service::obj_iterator s = service->selection ().begin (); s != service->selection ().end (); ++s) {
     m_selection_ptrs.push_back (s);
   }
-  m_index = 0;
   m_prop_id = 0;
   mp_service->clear_highlights ();
 }
@@ -82,8 +81,7 @@ ShapePropertiesPage::count () const
 void
 ShapePropertiesPage::select_entries (const std::vector<size_t> &entries)
 {
-  tl_assert (entries.size () == 1); // @@@
-  m_index = entries.front ();
+  m_indexes = entries;
 }
 
 lay::LayoutViewBase *
@@ -166,8 +164,8 @@ ShapePropertiesPage::abs_trans () const
 db::ICplxTrans
 ShapePropertiesPage::trans () const
 {
-  if (abs_trans ()) {
-    return m_selection_ptrs[m_index]->trans ();
+  if (abs_trans () && ! m_indexes.empty ()) {
+    return m_selection_ptrs[m_indexes.front ()]->trans ();
   } else {
     return db::ICplxTrans ();
   }
@@ -190,7 +188,7 @@ END_PROTECTED
 void 
 ShapePropertiesPage::update ()
 {
-  mp_service->highlight (m_index);
+  mp_service->highlight (m_indexes);
 
   update_shape ();
 }
@@ -215,12 +213,16 @@ ShapePropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInst
 void 
 ShapePropertiesPage::do_apply (bool current_only, bool relative)
 {
+  if (m_indexes.empty ()) {
+    return;
+  }
+
   std::unique_ptr<ChangeApplicator> applicator;
 
-  unsigned int cv_index = m_selection_ptrs [m_index]->cv_index ();
+  unsigned int cv_index = m_selection_ptrs [m_indexes.front ()]->cv_index ();
 
   {
-    edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
+    edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
     tl_assert (! pos->is_cell_inst ());
 
     const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
@@ -249,7 +251,7 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative)
   //  But it avoids issues with duplicate selections of the same shape which may happen when
   //  a shape is selected multiple times through different hierarchy branches.
 
-  db::Shape current = m_selection_ptrs [m_index]->shape ();
+  db::Shape current = m_selection_ptrs [m_indexes.front ()]->shape ();
 
   std::vector<lay::ObjectInstPath> new_sel;
   new_sel.reserve (m_selection_ptrs.size ());
@@ -263,11 +265,10 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative)
 
   try {
 
-    for (std::vector<edt::Service::obj_iterator>::const_iterator p = m_selection_ptrs.begin (); p != m_selection_ptrs.end (); ++p) {
+    for (auto i = m_indexes.begin (); i != m_indexes.end (); ++i) {
 
-      size_t index = p - m_selection_ptrs.begin ();
-
-      edt::Service::obj_iterator pos = *p;
+      size_t index = *i;
+      edt::Service::obj_iterator pos = m_selection_ptrs [*i];
 
       //  only update objects from the same layout - this is not practical limitation but saves a lot of effort for
       //  managing different property id's etc.
@@ -365,7 +366,11 @@ ShapePropertiesPage::apply_to_all (bool relative)
 void 
 ShapePropertiesPage::update_shape ()
 {
-  edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
+  if (m_indexes.empty ()) {
+    return;
+  }
+
+  edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
 
   const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
   double dbu = cv->layout ().dbu ();
@@ -397,15 +402,23 @@ ShapePropertiesPage::update_shape ()
 void
 ShapePropertiesPage::show_inst ()
 {
+  if (m_indexes.empty ()) {
+    return;
+  }
+
   InstantiationForm inst_form (this);
-  inst_form.show (mp_service->view (), *m_selection_ptrs [m_index]);
+  inst_form.show (mp_service->view (), *m_selection_ptrs [m_indexes.front ()]);
 }
 
 void
 ShapePropertiesPage::show_props ()
 {
+  if (m_indexes.empty ()) {
+    return;
+  }
+
   lay::UserPropertiesForm props_form (this);
-  if (props_form.show (mp_service->view (), m_selection_ptrs [m_index]->cv_index (), m_prop_id)) {
+  if (props_form.show (mp_service->view (), m_selection_ptrs [m_indexes.front ()]->cv_index (), m_prop_id)) {
     emit edited ();
   }
 }

@@ -58,14 +58,14 @@ public:
     if (role == Qt::DisplayRole) {
       if (index.internalId () < mp_dialog->properties_pages ().size ()) {
         return tl::to_qstring (mp_dialog->properties_pages () [index.internalId ()]->description (index.row ()));
-      } else {
+      } else if (index.row () < int (mp_dialog->properties_pages ().size ())) {
         return tl::to_qstring (mp_dialog->properties_pages () [index.row ()]->description ());
       }
     } else if (role == Qt::DecorationRole) {
       QIcon icon;
       if (index.internalId () < mp_dialog->properties_pages ().size ()) {
         icon = mp_dialog->properties_pages () [index.internalId ()]->icon (index.row (), m_icon_width, m_icon_height);
-      } else {
+      } else if (index.row () < int (mp_dialog->properties_pages ().size ())) {
         icon = mp_dialog->properties_pages () [index.row ()]->icon (m_icon_width, m_icon_height);
       }
       if (! icon.isNull ()) {
@@ -217,13 +217,16 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   mp_ui->tree->header()->setSectionResizeMode (QHeaderView::ResizeToContents);
   mp_ui->tree->expandAll ();
 
+  if (mp_properties_pages.empty ()) {
+    mp_ui->tree->hide ();
+  }
+
   m_signals_enabled = false;
   mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, 0));
   m_signals_enabled = true;
 
   update_controls ();
 
-// @@@ save this status!
   mp_ui->apply_to_all_cbx->setChecked (false);
   mp_ui->relative_cbx->setChecked (true);
 
@@ -262,7 +265,7 @@ PropertiesDialog::apply_to_all_pressed ()
   if (mp_ui->apply_to_all_cbx->isChecked ()) {
     mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index));
   } else if (! m_object_indexes.empty ()) {
-    mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, m_object_indexes.front ()));
+    mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, int (m_object_indexes.front ())));
   }
   m_signals_enabled = true;
 }
@@ -294,21 +297,21 @@ PropertiesDialog::current_index_changed (const QModelIndex &index, const QModelI
 
       if (mp_properties_pages [m_index]->can_apply_to_all ()) {
 
-        m_object_indexes.push_back (mp_tree_model->object_index (index));
+        m_object_indexes.push_back (size_t (mp_tree_model->object_index (index)));
 
         auto selection = mp_ui->tree->selectionModel ()->selectedIndexes ();
         for (auto i = selection.begin (); i != selection.end (); ++i) {
           if (mp_tree_model->parent (*i).isValid () && mp_tree_model->page_index (*i) == m_index) {
             int oi = mp_tree_model->object_index (*i);
-            if (oi != m_object_indexes.front ()) {
-              m_object_indexes.push_back (oi);
+            if (oi != int (m_object_indexes.front ())) {
+              m_object_indexes.push_back (size_t (oi));
             }
           }
         }
 
       } else {
 
-        m_object_indexes.push_back (mp_tree_model->object_index (index));
+        m_object_indexes.push_back (size_t (mp_tree_model->object_index (index)));
 
       }
 
@@ -317,8 +320,16 @@ PropertiesDialog::current_index_changed (const QModelIndex &index, const QModelI
       m_index = index.row ();
       mp_ui->apply_to_all_cbx->setChecked (mp_properties_pages [m_index]->can_apply_to_all ());
 
-      for (int oi = 0; oi < mp_properties_pages [m_index]->count (); ++oi) {
-        m_object_indexes.push_back (oi);
+      if (mp_properties_pages [m_index]->can_apply_to_all ()) {
+
+        for (size_t oi = 0; oi < mp_properties_pages [m_index]->count (); ++oi) {
+          m_object_indexes.push_back (oi);
+        }
+
+      } else {
+
+        m_object_indexes.push_back (size_t (mp_tree_model->object_index (index)));
+
       }
 
     }
@@ -330,7 +341,7 @@ PropertiesDialog::current_index_changed (const QModelIndex &index, const QModelI
     for (int i = 0; i < m_index; ++i) {
       m_current_object += mp_properties_pages [i]->count ();
     }
-    m_current_object += m_object_indexes.front ();
+    m_current_object += int (m_object_indexes.front ());
   } else {
     m_current_object = -1;
   }
@@ -373,7 +384,7 @@ PropertiesDialog::update_controls ()
     mp_ui->ok_button->setEnabled (! mp_properties_pages [m_index]->readonly ());
     mp_ui->tree->setEnabled (true);
 
-    mp_properties_pages [m_index]->select_entry (m_object_indexes);
+    mp_properties_pages [m_index]->select_entries (m_object_indexes);
     mp_properties_pages [m_index]->update ();
 
   }
@@ -397,7 +408,7 @@ BEGIN_PROTECTED
   }
 
   //  advance the current entry
-  int object_index = m_object_indexes.front ();
+  int object_index = int (m_object_indexes.front ());
   ++object_index;
 
   //  look for next usable editable if at end
@@ -445,7 +456,7 @@ BEGIN_PROTECTED
   }
 
   //  advance the current entry
-  int object_index = m_object_indexes.front ();
+  int object_index = int (m_object_indexes.front ());
   if (object_index == 0) {
 
     //  look for last usable editable if at end
@@ -494,15 +505,9 @@ PropertiesDialog::any_next () const
     return false;
   }
 
-  //  look for the next applicable page
-  //  @@@ Pages should not be empty
   int index = m_index;
-  if (m_object_indexes.front () + 1 >= int (mp_properties_pages [index]->count ())) {
+  if (m_object_indexes.front () + 1 >= mp_properties_pages [index]->count ()) {
     ++index;
-    while (index < int (mp_properties_pages.size ()) &&
-           (mp_properties_pages [index] == 0 || mp_properties_pages [index]->count () == 0)) {
-      ++index;
-    }
   }
 
   //  return true, if not at end
@@ -516,15 +521,9 @@ PropertiesDialog::any_prev () const
     return false;
   }
 
-  //  look for the next applicable page
-  //  @@@ Pages should not be empty
   int index = m_index;
   if (m_object_indexes.front () == 0) {
     --index;
-    while (index >= 0 && 
-           (mp_properties_pages [index] == 0 || mp_properties_pages [index]->count () == 0)) {
-      --index;
-    }
   }
 
   //  return true, if not at the beginning

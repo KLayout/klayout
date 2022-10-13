@@ -40,7 +40,6 @@ EnhancedTabWidget::EnhancedTabWidget (QWidget *parent)
 {
   mp_list_tool_button = new QToolButton (this);
   mp_list_tool_button->setAutoRaise (true);
-  ///\TODO: Replace placeholder with real icon.
   mp_list_tool_button->setIcon (QIcon (QString::fromUtf8 (":/find_16px.png")));
   mp_list_tool_button->setIconSize (QSize (20, 20));
   mp_list_tool_button->setMenu (new QMenu (this));
@@ -49,14 +48,14 @@ EnhancedTabWidget::EnhancedTabWidget (QWidget *parent)
   mp_list_tool_button->setToolTip ( tr ("List of all opened views"));
   setCornerWidget (mp_list_tool_button, Qt::TopRightCorner);
 
-  connect (mp_list_tool_button->menu (), &QMenu::aboutToShow,
-           this, &EnhancedTabWidget::list_tool_button_menu_about_to_show);
+  connect (mp_list_tool_button->menu (), SIGNAL (aboutToShow()),
+           this, SLOT (list_tool_button_menu_about_to_show()));
 
   mp_list_action_group = new QActionGroup (this);
   mp_list_action_group->setExclusive (true);
 
-  connect (mp_list_action_group, &QActionGroup::triggered,
-           this, &EnhancedTabWidget::list_action_group_triggered);
+  connect (mp_list_action_group, SIGNAL (triggered(QAction *)),
+           this, SLOT (list_action_group_triggered(QAction *)));
 }
 
 EnhancedTabWidget::~EnhancedTabWidget () = default;

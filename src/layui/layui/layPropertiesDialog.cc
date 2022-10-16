@@ -33,9 +33,16 @@
 
 #include <QStackedLayout>
 #include <QAbstractItemModel>
+#include <QModelIndex>
 
 namespace lay
 {
+
+#if QT_VERSION >= 0x50000
+typedef qint64 tree_id_type;
+#else
+typedef qint32 tree_id_type;
+#endif
 
 // ----------------------------------------------------------------------------------------------------------
 //  PropertiesTreeModel definition and implementation
@@ -56,14 +63,14 @@ public:
   QVariant data (const QModelIndex &index, int role) const
   {
     if (role == Qt::DisplayRole) {
-      if (index.internalId () < mp_dialog->properties_pages ().size ()) {
+      if (tree_id_type (index.internalId ()) < tree_id_type (mp_dialog->properties_pages ().size ())) {
         return tl::to_qstring (mp_dialog->properties_pages () [index.internalId ()]->description (index.row ()));
       } else if (index.row () < int (mp_dialog->properties_pages ().size ())) {
         return tl::to_qstring (mp_dialog->properties_pages () [index.row ()]->description ());
       }
     } else if (role == Qt::DecorationRole) {
       QIcon icon;
-      if (index.internalId () < mp_dialog->properties_pages ().size ()) {
+      if (tree_id_type (index.internalId ()) < tree_id_type (mp_dialog->properties_pages ().size ())) {
         icon = mp_dialog->properties_pages () [index.internalId ()]->icon (index.row (), m_icon_width, m_icon_height);
       } else if (index.row () < int (mp_dialog->properties_pages ().size ())) {
         icon = mp_dialog->properties_pages () [index.row ()]->icon (m_icon_width, m_icon_height);
@@ -78,7 +85,7 @@ public:
   Qt::ItemFlags flags (const QModelIndex &index) const
   {
     Qt::ItemFlags f = QAbstractItemModel::flags (index);
-    if (index.internalId () >= mp_dialog->properties_pages ().size () && ! mp_dialog->properties_pages () [index.row ()]->can_apply_to_all ()) {
+    if (tree_id_type (index.internalId ()) >= tree_id_type (mp_dialog->properties_pages ().size ()) && ! mp_dialog->properties_pages () [index.row ()]->can_apply_to_all ()) {
       f &= ~Qt::ItemIsSelectable;
     }
     return f;
@@ -86,22 +93,22 @@ public:
 
   bool hasChildren (const QModelIndex &parent) const
   {
-    return (! parent.isValid () || parent.internalId () >= mp_dialog->properties_pages ().size ());
+    return (! parent.isValid () || tree_id_type (parent.internalId ()) >= tree_id_type (mp_dialog->properties_pages ().size ()));
   }
 
   QModelIndex index (int row, int column, const QModelIndex &parent) const
   {
     if (! parent.isValid ()) {
-      return createIndex (row, column, qint64 (mp_dialog->properties_pages ().size ()));
+      return createIndex (row, column, tree_id_type (mp_dialog->properties_pages ().size ()));
     } else {
-      return createIndex (row, column, qint64 (parent.row ()));
+      return createIndex (row, column, tree_id_type (parent.row ()));
     }
   }
 
   QModelIndex parent (const QModelIndex &child) const
   {
-    if (child.internalId () < mp_dialog->properties_pages ().size ()) {
-      return createIndex (int (child.internalId ()), child.column (), qint64 (mp_dialog->properties_pages ().size ()));
+    if (tree_id_type (child.internalId ()) < tree_id_type (mp_dialog->properties_pages ().size ())) {
+      return createIndex (int (child.internalId ()), child.column (), tree_id_type (mp_dialog->properties_pages ().size ()));
     } else {
       return QModelIndex ();
     }
@@ -133,7 +140,7 @@ public:
     if (page_index < 0) {
       return QModelIndex ();
     } else {
-      return createIndex (object_index, 0, qint64 (page_index));
+      return createIndex (object_index, 0, tree_id_type (page_index));
     }
   }
 
@@ -142,7 +149,7 @@ public:
     if (page_index < 0) {
       return QModelIndex ();
     } else {
-      return createIndex (page_index, 0, qint64 (mp_dialog->properties_pages ().size ()));
+      return createIndex (page_index, 0, tree_id_type (mp_dialog->properties_pages ().size ()));
     }
   }
 
@@ -214,7 +221,11 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   //  if at end disable the "Next" button and return (this may only happen at the first call)
   mp_tree_model = new PropertiesTreeModel (this, mp_ui->tree->iconSize ().width (), mp_ui->tree->iconSize ().height ());
   mp_ui->tree->setModel (mp_tree_model);
+#if QT_VERSION >= 0x50000
   mp_ui->tree->header()->setSectionResizeMode (QHeaderView::ResizeToContents);
+#else
+  mp_ui->tree->header()->setResizeMode (QHeaderView::ResizeToContents);
+#endif
   mp_ui->tree->expandAll ();
 
   if (mp_properties_pages.empty ()) {

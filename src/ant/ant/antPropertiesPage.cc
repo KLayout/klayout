@@ -27,8 +27,6 @@
 #include "layQtTools.h"
 #include "tlException.h"
 
-#include <QSignalBlocker>
-
 namespace ant
 {
 
@@ -483,7 +481,7 @@ PropertiesPage::update_with (const ant::Object &obj)
       text += "\n";
     }
 
-    QSignalBlocker blocker (points_edit);
+    lay::SignalBlocker blocker (points_edit);
     points_edit->setPlainText (tl::to_qstring (text));
 
   }

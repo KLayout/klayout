@@ -740,13 +740,17 @@ LayoutView::configure (const std::string &name, const std::string &value)
 
     int os = 1;
     tl::from_string (value, os);
-    mp_control_panel->set_oversampling (os);
+    if (mp_control_panel) {
+      mp_control_panel->set_oversampling (os);
+    }
 
   } else if (name == cfg_highres_mode) {
 
     bool hrm = false;
     tl::from_string (value, hrm);
-    mp_control_panel->set_highres_mode (hrm);
+    if (mp_control_panel) {
+      mp_control_panel->set_highres_mode (hrm);
+    }
 
   }
 

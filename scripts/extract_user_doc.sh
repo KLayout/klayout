@@ -22,7 +22,7 @@ while [ "$1" != "" ]; do
   fi
 done
 
-doc_src=./src/lay/lay/doc
+doc_src=./src/doc/doc
 . ./version.sh
 
 for qt in 5 4; do

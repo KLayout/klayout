@@ -83,6 +83,23 @@ const std::string cfg_macro_editor_debugging_enabled ("macro-editor-debugging-en
 const std::string cfg_macro_editor_ignore_exception_list ("macro-editor-ignore-exception-list");
 
 // -----------------------------------------------------------------------------------------
+
+/**
+ *  @brief Finds the tab bar widget for a QTabWidget
+ */
+static QTabBar *tab_bar_of (QTabWidget *tab)
+{
+#if QT_VERSION >= 0x50000
+  return tab->tabBar ();
+#else
+  //  Qt 4 does not have a public method for getting the QTabBar
+  QTabBar *tb = tab->findChild<QTabBar *> ();
+  tl_assert (tb != 0);
+  return tb;
+#endif
+}
+
+// -----------------------------------------------------------------------------------------
 //  Implementation of the macro template selection dialog
 
 class MacroTemplateSelectionDialog
@@ -322,6 +339,13 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
     macro_tree->addAction (actionSaveAs);
 
     macro_tree->header ()->hide ();
+    //  TODO: that is supposed to enable the horizontal scroll bar, but it doesn't:
+    macro_tree->header ()->setStretchLastSection (false);
+#if QT_VERSION >= 0x50000
+    macro_tree->header ()->setSectionResizeMode (QHeaderView::ResizeToContents);
+#else
+    macro_tree->header ()->setResizeMode (QHeaderView::ResizeToContents);
+#endif
 
     macro_tree->setItemDelegate (new EditRoleDelegate (macro_tree));
 
@@ -1543,7 +1567,7 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
 
     }
 
-  } else if (obj == tabWidget->tabBar () && dynamic_cast<QMouseEvent *> (event) != 0) {
+  } else if (obj == tab_bar_of (tabWidget) && dynamic_cast<QMouseEvent *> (event) != 0) {
 
     //  just spy on the events, don't eat them
     QMouseEvent *mouse_event = dynamic_cast<QMouseEvent *> (event);
@@ -2303,7 +2327,7 @@ MacroEditorDialog::close_many (int r2c)
 
 BEGIN_PROTECTED
 
-  int ci = tabWidget->tabBar ()->tabAt (m_mouse_pos);
+  int ci = tab_bar_of (tabWidget)->tabAt (m_mouse_pos);
   if (ci < 0) {
     return;
   }

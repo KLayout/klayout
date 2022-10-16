@@ -228,7 +228,7 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   vbl->setContentsMargins (0, 0, 0, 0);
   vbl->setSpacing (0);
 
-  QHBoxLayout *vbh_tab = new QHBoxLayout (mp_main_frame);
+  QHBoxLayout *vbh_tab = new QHBoxLayout ();
   vbh_tab->setSpacing (6);
   vbl->addLayout (vbh_tab);
 

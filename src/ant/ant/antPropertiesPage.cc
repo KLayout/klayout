@@ -25,6 +25,7 @@
 #include "antPropertiesPage.h"
 #include "layLayoutViewBase.h"
 #include "layQtTools.h"
+#include "tlException.h"
 
 namespace ant
 {

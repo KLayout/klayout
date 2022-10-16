@@ -40,6 +40,7 @@
 #include <memory>
 
 class QStackedLayout;
+class QModelIndex;
 
 namespace Ui
 {

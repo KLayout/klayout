@@ -1366,10 +1366,38 @@ compute_area_and_perimeter_of_net_shapes (const db::hier_clusters<db::NetShape> 
   perimeter = ap_collector.perimeter ();
 }
 
+namespace {
+
+class AntennaShapeGenerator
+  : public PolygonSink
+{
+public:
+  AntennaShapeGenerator (db::Layout *layout, db::Shapes &shapes, db::properties_id_type prop_id)
+    : PolygonSink (), mp_layout (layout), mp_shapes (&shapes), m_prop_id (prop_id)
+  { }
+
+  virtual void put (const db::Polygon &polygon)
+  {
+    if (m_prop_id != 0) {
+      mp_shapes->insert (db::PolygonRefWithProperties (db::PolygonRef (polygon, mp_layout->shape_repository ()), m_prop_id));
+    } else {
+      mp_shapes->insert (db::PolygonRef (polygon, mp_layout->shape_repository ()));
+    }
+  }
+
+private:
+  db::Layout *mp_layout;
+  db::Shapes *mp_shapes;
+  db::properties_id_type m_prop_id;
+};
+
+}
+
 static db::Point
-get_merged_shapes_of_net (const db::hier_clusters<db::NetShape> &clusters, db::cell_index_type ci, size_t cid, unsigned int layer_id, db::Shapes &shapes)
+get_merged_shapes_of_net (const db::hier_clusters<db::NetShape> &clusters, db::cell_index_type ci, size_t cid, unsigned int layer_id, db::Layout *layout, db::Shapes &shapes, db::properties_id_type prop_id)
 {
   db::Point ref;
+  bool any_ref = false;
   db::EdgeProcessor ep;
 
   //  count vertices and reserve space
@@ -1386,7 +1414,10 @@ get_merged_shapes_of_net (const db::hier_clusters<db::NetShape> &clusters, db::c
       db::PolygonRef::polygon_edge_iterator e = pr.begin_edge ();
       if (! e.at_end ()) {
         //  pick one reference point for the label
-        ref = (*e).p1 ();
+        if (! any_ref && (*e).p1 () < ref) {
+          ref = (*e).p1 ();
+          any_ref = true;
+        }
         ep.insert (pr, ++p);
       }
     } else {
@@ -1394,7 +1425,7 @@ get_merged_shapes_of_net (const db::hier_clusters<db::NetShape> &clusters, db::c
     }
   }
 
-  db::ShapeGenerator sg (shapes);
+  db::AntennaShapeGenerator sg (layout, shapes, prop_id);
   db::PolygonGenerator pg (sg, false);
   db::SimpleMerge op;
   ep.process (pg, op);
@@ -1402,52 +1433,51 @@ get_merged_shapes_of_net (const db::hier_clusters<db::NetShape> &clusters, db::c
   return ref;
 }
 
-static std::string
-create_antenna_msg (double agate, db::Polygon::area_type agate_int, double gate_area_factor, db::Polygon::perimeter_type pgate_int, double gate_perimeter_factor,
-                    double ametal, db::Polygon::area_type ametal_int, double metal_area_factor, db::Polygon::perimeter_type pmetal_int, double metal_perimeter_factor,
-                    const std::vector<std::pair<const db::Region *, double> > &diodes,
-                    const std::vector<db::Polygon::area_type> &adiodes_int,
-                    double r, double ratio, double dbu)
+static std::vector<std::pair<std::string, tl::Variant> >
+create_antenna_values (double agate, db::Polygon::area_type agate_int, double gate_area_factor, db::Polygon::perimeter_type pgate_int, double gate_perimeter_factor,
+                       double ametal, db::Polygon::area_type ametal_int, double metal_area_factor, db::Polygon::perimeter_type pmetal_int, double metal_perimeter_factor,
+                       const std::vector<std::pair<const db::Region *, double> > &diodes,
+                       const std::vector<db::Polygon::area_type> &adiodes_int,
+                       double r, double ratio, double dbu)
 {
-  std::string msg;
-  msg            += tl::sprintf ("agate_eff: %.12g, ", agate);
+  std::vector<std::pair<std::string, tl::Variant> > values;
+
+  values.push_back (std::make_pair ("agate_eff", agate));
   if (fabs (gate_area_factor) > 1e-6) {
-    msg          += tl::sprintf ("agate: %.12g, agate_factor: %.12g, ", agate_int * dbu * dbu, gate_area_factor);
+    values.push_back (std::make_pair ("agate", agate_int * dbu * dbu));
+    values.push_back (std::make_pair ("agate_factor", gate_area_factor));
   }
   if (fabs (gate_perimeter_factor) > 1e-6) {
-    msg          += tl::sprintf ("pgate: %.12g, pgate_factor: %.12g, ", pgate_int * dbu * dbu, gate_perimeter_factor);
+    values.push_back (std::make_pair ("pgate", pgate_int * dbu));
+    values.push_back (std::make_pair ("pgate_factor", gate_perimeter_factor));
   }
-  msg            += tl::sprintf ("ametal_eff: %.12g, ", ametal);
+  values.push_back (std::make_pair ("ametal_eff", ametal));
   if (fabs (metal_area_factor) > 1e-6) {
-    msg          += tl::sprintf ("ametal: %.12g, ametal_factor: %.12g, ", ametal_int * dbu * dbu, metal_area_factor);
+    values.push_back (std::make_pair ("ametal", ametal_int * dbu * dbu));
+    values.push_back (std::make_pair ("ametal_factor", metal_area_factor));
   }
   if (fabs (metal_perimeter_factor) > 1e-6) {
-    msg          += tl::sprintf ("pmetal: %.12g, pmetal_factor: %.12g, ", pmetal_int * dbu * dbu, metal_perimeter_factor);
+    values.push_back (std::make_pair ("pmetal", pmetal_int * dbu));
+    values.push_back (std::make_pair ("pmetal_factor", metal_perimeter_factor));
   }
   if (! adiodes_int.empty ()) {
-    msg          += "adiodes: [";
+    tl::Variant adiodes;
     for (auto d = adiodes_int.begin (); d != adiodes_int.end (); ++d) {
-      if (d != adiodes_int.begin ()) {
-        msg      += ", ";
-      }
-      msg        += tl::sprintf ("%.12g", *d * dbu * dbu);
+      adiodes.push (*d * dbu * dbu);
     }
-    msg          += "], ";
+    values.push_back (std::make_pair ("adiodes", adiodes));
   }
   if (! diodes.empty ()) {
-    msg          += "diode_factors: [";
+    tl::Variant diode_factors;
     for (auto d = diodes.begin (); d != diodes.end (); ++d) {
-      if (d != diodes.begin ()) {
-        msg      += ", ";
-      }
-      msg        += tl::sprintf ("%.12g", d->second);
+      diode_factors.push (d->second);
     }
-    msg          += "], ";
+    values.push_back (std::make_pair ("diode_factors", diode_factors));
   }
-  msg            += tl::sprintf ("ratio: %.12g, ", ametal / agate);
-  msg            += tl::sprintf ("max_ratio_eff: %.12g, ", r);
-  msg            += tl::sprintf ("max_ratio: %.12g", ratio);
-  return msg;
+  values.push_back (std::make_pair ("ratio", ametal / agate));
+  values.push_back (std::make_pair ("max_ratio_eff", r));
+  values.push_back (std::make_pair ("max_ratio", ratio));
+  return values;
 }
 
 db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_area_factor, double gate_perimeter_factor, const db::Region &metal, double metal_area_factor, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes, db::Texts *values)
@@ -1538,25 +1568,50 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_a
           }
 
           if (tl::verbosity () >= 50) {
-            tl::info << "cell [" << ly.cell_name (*cid) << "]: " <<
-              create_antenna_msg (agate, agate_int, gate_area_factor, pgate_int, gate_perimeter_factor,
-                                  ametal, ametal_int, metal_area_factor, pmetal_int, metal_perimeter_factor,
-                                  diodes, adiodes_int, r, ratio, dbu);
+            std::vector<std::pair<std::string, tl::Variant> > antenna_values =
+              create_antenna_values (agate, agate_int, gate_area_factor, pgate_int, gate_perimeter_factor,
+                                     ametal, ametal_int, metal_area_factor, pmetal_int, metal_perimeter_factor,
+                                     diodes, adiodes_int, r, ratio, dbu);
+            tl::info << "cell [" << ly.cell_name (*cid) << "]: ";
+            for (auto v = antenna_values.begin (); v != antenna_values.end (); ++v) {
+              tl::info << "  " << v->first << ": " << v->second.to_string ();
+            }
           }
 
           if (ametal / agate > r + db::epsilon) {
 
             db::Shapes &shapes = ly.cell (*cid).shapes (dl.layer ());
-            db::Point ref = get_merged_shapes_of_net (m_net_clusters, *cid, *c, layer_of (metal), shapes);
+
+            std::vector<std::pair<std::string, tl::Variant> > antenna_values =
+              create_antenna_values (agate, agate_int, gate_area_factor, pgate_int, gate_perimeter_factor,
+                                     ametal, ametal_int, metal_area_factor, pmetal_int, metal_perimeter_factor,
+                                     diodes, adiodes_int, r, ratio, dbu);
+
+            db::properties_id_type prop_id = 0;
+            if (! values) {
+              db::PropertiesRepository::properties_set ps;
+              for (auto v = antenna_values.begin (); v != antenna_values.end (); ++v) {
+                ps.insert (std::make_pair (ly.properties_repository ().prop_name_id (v->first), v->second));
+              }
+              prop_id = ly.properties_repository ().properties_id (ps);
+            }
+
+            db::Point ref = get_merged_shapes_of_net (m_net_clusters, *cid, *c, layer_of (metal), &ly, shapes, prop_id);
 
             if (values) {
 
-              //  generate a data string with the details of the antenna computation (intentionally like JSON)
-              std::string msg = create_antenna_msg (agate, agate_int, gate_area_factor, pgate_int, gate_perimeter_factor,
-                                                    ametal, ametal_int, metal_area_factor, pmetal_int, metal_perimeter_factor,
-                                                    diodes, adiodes_int, r, ratio, dbu);
-
               db::Shapes &shapesv = ly.cell (*cid).shapes (dlv.layer ());
+
+              std::string msg;
+              for (auto v = antenna_values.begin (); v != antenna_values.end (); ++v) {
+                if (v != antenna_values.begin ()) {
+                  msg += ", ";
+                }
+                msg += v->first;
+                msg += ": ";
+                msg += v->second.to_string ();
+              }
+
               shapesv.insert (db::Text (msg, db::Trans (ref - db::Point ())));
 
             }

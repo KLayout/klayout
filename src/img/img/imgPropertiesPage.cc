@@ -107,10 +107,12 @@ PropertiesPage::init ()
 
   colors->set_color (std::make_pair (QColor (), QColor ()));
   colors->setEnabled (false);
+  value_le->setEnabled (false);
 
   connect (browse_pb, SIGNAL (clicked ()), this, SLOT (browse ()));
   connect (colors, SIGNAL (color_changed (std::pair<QColor, QColor>)), false_color_control, SLOT (set_current_color (std::pair<QColor, QColor>)));
   connect (false_color_control, SIGNAL (selection_changed (std::pair<QColor, QColor>)), colors, SLOT (set_color (std::pair<QColor, QColor>)));
+  connect (false_color_control, SIGNAL (selection_changed (std::pair<QColor, QColor>)), this, SLOT (color_mapping_changed ()));
   connect (false_color_control, SIGNAL (color_mapping_changed ()), this, SLOT (color_mapping_changed ()));
 
   connect (brightness_slider, SIGNAL (valueChanged (int)), this, SLOT (brightness_slider_changed (int)));

@@ -276,6 +276,12 @@ static void scan_edge_pairs (rdb::Category *cat, rdb::Cell *cell, const db::Cplx
   rdb::scan_layer (cat, cell, trans * it.second, it.first, flat, with_properties);
 }
 
+static void scan_texts (rdb::Category *cat, rdb::Cell *cell, const db::CplxTrans &trans, const db::Texts &texts, bool flat, bool with_properties)
+{
+  std::pair<db::RecursiveShapeIterator, db::ICplxTrans> it = texts.begin_iter ();
+  rdb::scan_layer (cat, cell, trans * it.second, it.first, flat, with_properties);
+}
+
 Class<rdb::Category> decl_RdbCategory ("rdb", "RdbCategory",
   gsi::method ("rdb_id", &rdb::Category::id, 
     "@brief Gets the category ID\n"
@@ -325,17 +331,19 @@ Class<rdb::Category> decl_RdbCategory ("rdb", "RdbCategory",
     "@brief Turns the given edge collection into a hierarchical or flat report database\n"
     "This a another flavour of \\scan_collection accepting an edge collection.\n"
     "\n"
-    "If 'with_properties' is true, user properties will be turned into tagged values as well.\n"
-    "\n"
     "This method has been introduced in version 0.26. The 'with_properties' argument has been added in version 0.28.\n"
   ) +
   gsi::method_ext ("scan_collection", &scan_edge_pairs, gsi::arg ("cell"), gsi::arg ("trans"), gsi::arg ("edge_pairs"), gsi::arg ("flat", false), gsi::arg ("with_properties", true),
     "@brief Turns the given edge pair collection into a hierarchical or flat report database\n"
     "This a another flavour of \\scan_collection accepting an edge pair collection.\n"
     "\n"
-    "If 'with_properties' is true, user properties will be turned into tagged values as well.\n"
-    "\n"
     "This method has been introduced in version 0.26. The 'with_properties' argument has been added in version 0.28.\n"
+  ) +
+  gsi::method_ext ("scan_collection", &scan_texts, gsi::arg ("cell"), gsi::arg ("trans"), gsi::arg ("texts"), gsi::arg ("flat", false), gsi::arg ("with_properties", true),
+    "@brief Turns the given edge pair collection into a hierarchical or flat report database\n"
+    "This a another flavour of \\scan_collection accepting a text collection.\n"
+    "\n"
+    "This method has been introduced in version 0.28.\n"
   ) +
   gsi::method_ext ("scan_layer", &scan_layer, gsi::arg ("layout"), gsi::arg ("layer"), gsi::arg ("cell", (const db::Cell *) 0, "nil"), gsi::arg ("levels", -1), gsi::arg ("with_properties", true),
     "@brief Scans a layer from a layout into this category, starting with a given cell and a depth specification\n"
@@ -1238,7 +1246,7 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@param trans The transformation to apply\n"
     "@param with_properties If true, user properties will be turned into tagged values as well\n"
   ) +
-  gsi::method_ext ("create_items", &rdb::create_items_from_region, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("region"),
+  gsi::method_ext ("#create_items", &rdb::create_items_from_region, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("region"),
     "@brief Creates new polygon items for the given cell/category combination\n"
     "For each polygon in the region a single item will be created. The value of the item will be this "
     "polygon.\n"
@@ -1249,14 +1257,14 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "\\RdbCategory#scan_collection is a similar method which also supports construction of "
     "hierarchical databases from deep regions.\n"
     "\n"
-    "This method has been introduced in version 0.23.\n"
+    "This method has been introduced in version 0.23. It has been deprecated in favor of \\RdbCategory#scan_collection in version 0.28.\n"
     "\n"
     "@param cell_id The ID of the cell to which the item is associated\n"
     "@param category_id The ID of the category to which the item is associated\n"
     "@param trans The transformation to apply\n"
     "@param region The region (a \\Region object) containing the polygons for which to create items\n"
   ) +
-  gsi::method_ext ("create_items", &rdb::create_items_from_edges, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("edges"),
+  gsi::method_ext ("#create_items", &rdb::create_items_from_edges, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("edges"),
     "@brief Creates new edge items for the given cell/category combination\n"
     "For each edge a single item will be created. The value of the item will be this "
     "edge.\n"
@@ -1267,14 +1275,14 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "\\RdbCategory#scan_collection is a similar method which also supports construction of "
     "hierarchical databases from deep edge collections.\n"
     "\n"
-    "This method has been introduced in version 0.23.\n"
+    "This method has been introduced in version 0.23. It has been deprecated in favor of \\RdbCategory#scan_collection in version 0.28.\n"
     "\n"
     "@param cell_id The ID of the cell to which the item is associated\n"
     "@param category_id The ID of the category to which the item is associated\n"
     "@param trans The transformation to apply\n"
     "@param edges The list of edges (an \\Edges object) for which the items are created\n"
   ) +
-  gsi::method_ext ("create_items", &rdb::create_items_from_edge_pairs, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("edge_pairs"),
+  gsi::method_ext ("#create_items", &rdb::create_items_from_edge_pairs, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("edge_pairs"),
     "@brief Creates new edge pair items for the given cell/category combination\n"
     "For each edge pair a single item will be created. The value of the item will be this "
     "edge pair.\n"
@@ -1285,7 +1293,7 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "\\RdbCategory#scan_collection is a similar method which also supports construction of "
     "hierarchical databases from deep edge pair collections.\n"
     "\n"
-    "This method has been introduced in version 0.23.\n"
+    "This method has been introduced in version 0.23. It has been deprecated in favor of \\RdbCategory#scan_collection in version 0.28.\n"
     "\n"
     "@param cell_id The ID of the cell to which the item is associated\n"
     "@param category_id The ID of the category to which the item is associated\n"

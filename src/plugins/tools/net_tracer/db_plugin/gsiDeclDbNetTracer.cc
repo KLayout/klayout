@@ -334,7 +334,7 @@ gsi::Class<db::NetTracer> decl_NetTracer ("db", "NetTracer",
   "\n"
   "tracer = RBA::NetTracer::new\n"
   "\n"
-  "tech = RBA::NetTracerTechnology::new\n"
+  "tech = RBA::NetTracerConnectivity::new\n"
   "tech.connection(\"1/0\", \"2/0\", \"3/0\")\n"
   "\n"
   "tracer.trace(tech, ly, ly.top_cell, RBA::Point::new(7000, 1500), ly.find_layer(1, 0))\n"
@@ -344,7 +344,7 @@ gsi::Class<db::NetTracer> decl_NetTracer ("db", "NetTracer",
   "end\n"
   "@/code\n"
   "\n"
-  "This class has been introduced in version 0.25."
+  "This class has been introduced in version 0.25. With version 0.28, the \\NetTracerConnectivity class replaces the 'NetTracerTechnology' class."
 );
 
 }

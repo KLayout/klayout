@@ -117,7 +117,7 @@ END
 
     assert_equal(tech.component_names.size > 0, true)
     assert_equal(tech.component_names.find("connectivity") != nil, true)
-    assert_equal(tech.component("connectivity").class.to_s, "RBA::NetTracerTechnology")
+    assert_equal(tech.component("connectivity").class.to_s, "RBA::TechnologyComponent")
 
   end
 

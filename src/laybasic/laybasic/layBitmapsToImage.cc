@@ -312,7 +312,7 @@ render_scanline_cross (const uint32_t *dp, unsigned int ds, const lay::Bitmap *p
   }
 
   //  NOTE: hardcoded bar/width ratio for crosses.
-  unsigned int lw = std::min ((unsigned int) 6, pixels / 9);
+  unsigned int lw = std::max (std::min ((unsigned int) 6, pixels / 9), (unsigned int) 1);
 
   const int max_pixels = 31;
   if (pixels > max_pixels) {

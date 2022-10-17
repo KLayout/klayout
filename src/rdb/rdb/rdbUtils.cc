@@ -371,6 +371,8 @@ ValueBase *add_item_value (rdb::Item *item, const tl::Variant &v, const db::Cplx
     return item->add_value (v.to_user<db::DPath> (), tag_id);
   } else if (v.is_user<db::DText> ()) {
     return item->add_value (v.to_user<db::DText> (), tag_id);
+  } else if (v.is_double () || v.is_long () || v.is_ulong () || v.is_longlong () || v.is_ulonglong ()) {
+    return item->add_value (v.to_double (), tag_id);
   } else {
     return item->add_value (std::string (v.to_string ()), tag_id);
   }
@@ -418,6 +420,8 @@ ValueBase *add_item_value(rdb::Item *item, const tl::Variant &v, double dbu, rdb
     return item->add_value (v.to_user<db::DPath> (), tag_id);
   } else if (v.is_user<db::DText> ()) {
     return item->add_value (v.to_user<db::DText> (), tag_id);
+  } else if (v.is_double () || v.is_long () || v.is_ulong () || v.is_longlong () || v.is_ulonglong ()) {
+    return item->add_value (v.to_double (), tag_id);
   } else {
     return item->add_value (std::string (v.to_string ()), tag_id);
   }

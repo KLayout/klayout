@@ -599,6 +599,14 @@ class DBLayoutTests2_TestClass < TestBase
     c1.each_parent_inst { |i| arr.push( i ) }
     assert_equal( arr.size, 1 )
 
+    strarr = []
+    c1.each_parent_inst { |i| strarr.push( i.inst.to_s ) }
+    assert_equal( strarr.join(";"), "#1 m45 *0.666666667 33,-67 [0,-67*10;-67,0*20]" )
+
+    strarr = []
+    c1.each_parent_inst { |i| strarr.push( i.dinst.to_s ) }
+    assert_equal( strarr.join(";"), "#1 m45 *0.666666667 0.033,-0.067 [0,-0.067*10;-0.067,0*20]" )
+
     assert_equal( arr[0].parent_cell_index, c2.cell_index )
     assert_equal( arr[0].child_inst.cell_index, c1.cell_index )
     assert_equal( arr[0].inst.cell_index, c2.cell_index )

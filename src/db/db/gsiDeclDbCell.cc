@@ -4370,6 +4370,17 @@ Class<db::Instance> decl_Instance ("db", "Instance",
 // ---------------------------------------------------------------
 //  db::ParentInstRep binding (to "ParentInstArray")
 
+static db::DCellInstArray
+dinst (const db::ParentInstRep *parent_inst)
+{
+  const db::Instances *instances = parent_inst->child_inst ().instances ();
+  if (! instances || ! instances->layout ()) {
+    return db::DCellInstArray ();
+  }
+
+  return cell_inst_array_defs<db::CellInstArray>::transform_array (parent_inst->inst (), db::CplxTrans (instances->layout ()->dbu ()));
+}
+
 Class<db::ParentInstRep> decl_ParentInstArray ("db", "ParentInstArray",
   method ("parent_cell_index", &db::ParentInstRep::parent_cell_index,
     "@brief Gets the index of the parent cell\n"
@@ -4381,6 +4392,11 @@ Class<db::ParentInstRep> decl_ParentInstArray ("db", "ParentInstArray",
   ) +
   method ("inst", &db::ParentInstRep::inst,
     "@brief Compute the inverse instance by which the parent is seen from the child\n"
+  ) +
+  method_ext ("dinst", &dinst,
+    "@brief Compute the inverse instance by which the parent is seen from the child in micrometer units\n"
+    "\n"
+    "This convenience method has been introduced in version 0.28."
   ),
   "@brief A parent instance\n"
   "\n"

@@ -920,7 +920,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
     if (! strict) {
       return 0;
     } else {
-      throw tl::Exception (tl::to_string (tr ("No overload with matching arguments")));
+      throw tl::TypeError (tl::to_string (tr ("No overload with matching arguments")));
     }
   }
 
@@ -928,7 +928,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
     if (! strict) {
       return 0;
     } else {
-      throw tl::Exception (tl::to_string (tr ("Ambiguous overload variants - multiple method declarations match arguments")));
+      throw tl::TypeError (tl::to_string (tr ("Ambiguous overload variants - multiple method declarations match arguments")));
     }
   }
 
@@ -2734,10 +2734,26 @@ public:
               alt_names.push_back ("__iter__");
 
             } else if (name == "__mul__") {
-              // Adding right multiplication
-              // Rationale: if pyaObj * x works, so should x * pyaObj
-              mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is also available as '__mul__'")));
-              alt_names.push_back ("__rmul__");
+
+              //  Adding right multiplication
+              //  Rationale: if pyaObj * x works, so should x * pyaObj
+              //  But this should only apply if the multiplication is commutative
+              //  There are a few exceptions like Trans * Trans, so we support this case only if 
+              //  the second argument is double (scaling).
+              gsi::ArgType double_argtype;
+              double_argtype.template init<double> ();
+              if (m_first->arg (0) == double_argtype) {
+                add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as '__rmul__'")));
+                alt_names.push_back ("__rmul__");
+              }
+
+            } else if (name == "dup" && m_first->compatible_with_num_args (0) ) {
+
+              //  If the object supports the dup method, then it is a good
+              //  idea to define the __copy__ method.
+              add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method also implements '__copy__'")));
+              alt_names.push_back ("__copy__");
+
             }
 
             for (std::vector <std::string>::const_iterator an = alt_names.begin (); an != alt_names.end (); ++an) {
@@ -2901,10 +2917,12 @@ public:
         PyObject *attr_class = PyObject_GetAttrString ((PyObject *) type, ("_class_" + *a).c_str ());
         if (attr_inst == NULL || attr_class == NULL) {
 
-          //  some error or disambiguator is not required -> don't install it
+          //  some error -> don't install the disambiguator
           Py_XDECREF (attr_inst);
           Py_XDECREF (attr_class);
           PyErr_Clear ();
+
+          tl::warn << "Unable to install a static/non-static disambiguator for " << *a << " in class " << (*c)->name ();
 
         } else {
 

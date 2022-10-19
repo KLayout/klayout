@@ -63,7 +63,17 @@ class _PCellDeclarationHelper(PCellDeclaration):
         self.layer = None
         self.cell = None
 
-    def param(self, name, value_type, description, hidden=False, readonly=False, unit=None, default=None, choices=None):
+    def param(
+        self,
+        name,
+        value_type,
+        description,
+        hidden=False,
+        readonly=False,
+        unit=None,
+        default=None,
+        choices=None,
+    ):
         """
         Defines a parameter
           name         -> the short name of the parameter
@@ -84,11 +94,16 @@ class _PCellDeclarationHelper(PCellDeclaration):
 
         # create accessor methods for the parameters
         param_index = len(self._param_decls)
-        setattr(type(self), name, _PCellDeclarationHelperParameterDescriptor(param_index))
+        setattr(
+            type(self), name, _PCellDeclarationHelperParameterDescriptor(param_index)
+        )
 
         if value_type == type(self).TypeLayer:
-            setattr(type(self), name + "_layer",
-                    _PCellDeclarationHelperLayerDescriptor(len(self._layer_param_index)))
+            setattr(
+                type(self),
+                name + "_layer",
+                _PCellDeclarationHelperLayerDescriptor(len(self._layer_param_index)),
+            )
             self._layer_param_index.append(param_index)
 
         # store the parameter declarations
@@ -104,10 +119,16 @@ class _PCellDeclarationHelper(PCellDeclaration):
             pdecl.unit = unit
         if not (choices is None):
             if not isinstance(choices, list) and not isinstance(choices, tuple):
-                raise Exception("choices value must be an list/tuple of two-element arrays (description, value)")
+                raise Exception(
+                    "choices value must be an list/tuple of two-element arrays (description, value)"
+                )
             for c in choices:
-                if (not isinstance(choices, list) and not isinstance(choices, tuple)) or len(c) != 2:
-                    raise Exception("choices value must be an list/tuple of two-element arrays (description, value)")
+                if (
+                    not isinstance(choices, list) and not isinstance(choices, tuple)
+                ) or len(c) != 2:
+                    raise Exception(
+                        "choices value must be an list/tuple of two-element arrays (description, value)"
+                    )
                 pdecl.add_choice(c[0], c[1])
 
         # return the declaration object for further operations

@@ -469,7 +469,7 @@ struct writer<gsi::ObjectType>
 
       const gsi::ClassBase *cls_decl = PythonModule::cls_for_type (Py_TYPE (arg));
       if (! cls_decl) {
-        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), Py_TYPE (arg)->tp_name));
+        throw tl::TypeError (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), Py_TYPE (arg)->tp_name));
       }
 
       if (cls_decl->is_derived_from (atype.cls ())) {
@@ -494,14 +494,14 @@ struct writer<gsi::ObjectType>
         aa->write<void *> (new_obj);
 
       } else {
-        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), cls_decl->name ()));
+        throw tl::TypeError (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), cls_decl->name ()));
       }
 
     } else {
 
       const gsi::ClassBase *cls_decl = PythonModule::cls_for_type (Py_TYPE (arg));
       if (! cls_decl) {
-        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), Py_TYPE (arg)->tp_name));
+        throw tl::TypeError (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), Py_TYPE (arg)->tp_name));
       }
 
       if (cls_decl->is_derived_from (atype.cls ())) {
@@ -521,7 +521,7 @@ struct writer<gsi::ObjectType>
         aa->write<void *> (atype.cls ()->create_obj_from (cls_decl, p->obj ()));
 
       } else {
-        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), cls_decl->name ()));
+        throw tl::TypeError (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), cls_decl->name ()));
       }
 
     }
